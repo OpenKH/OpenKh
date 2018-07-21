@@ -1,0 +1,3 @@
+[submodule "XeEngine.Tools.Public"]
+	path = XeEngine.Tools.Public
+	url = https://github.com/Xeeynamo/XeEngine.Tools.Public
