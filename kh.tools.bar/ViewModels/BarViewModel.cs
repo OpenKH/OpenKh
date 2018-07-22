@@ -105,6 +105,7 @@ namespace kh.tools.bar.ViewModels
 				if (fd.ShowDialog() == true)
 				{
 					var fStream = File.OpenWrite(fd.FileName);
+					SelectedItem.Entry.Stream.Position = 0;
 					SelectedItem.Entry.Stream.CopyTo(fStream);
 				}
 			}, x => IsItemSelected);

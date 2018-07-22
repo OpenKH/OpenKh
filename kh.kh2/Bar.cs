@@ -9,13 +9,14 @@ namespace kh.kh2
 {
 	public partial class Bar
 	{
-		private const uint MagicHeader = 0x01524142U;
+		private const uint MagicCode = 0x01524142U;
 
 		public enum EntryType
 		{
 			Dummy = 0x00,
 			Msg = 0x02,
 			Ai = 0x03,
+			Tim2 = 0x07,
 			Bar = 0x11,
 			Pax = 0x12,
 			Imgd = 0x18,
@@ -43,7 +44,7 @@ namespace kh.kh2
 				throw new InvalidDataException($"Read or seek must be supported.");
 
 			var reader = new BinaryReader(stream);
-			if (stream.Length < 16L || reader.ReadUInt32() != MagicHeader)
+			if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
 				throw new InvalidDataException("Invalid header");
 
 			int filesCount = reader.ReadInt32();
@@ -120,7 +121,7 @@ namespace kh.kh2
 			var writer = new BinaryWriter(stream);
 			var entriesCount = entries.Count();
 
-			writer.Write(MagicHeader);
+			writer.Write(MagicCode);
 			writer.Write(entriesCount);
 			writer.Write(0);
 			writer.Write(0);
