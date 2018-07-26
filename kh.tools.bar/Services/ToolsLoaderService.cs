@@ -17,6 +17,9 @@ namespace kh.tools.bar.Services
 				case Bar.EntryType.Bar:
 					name = "kh.tools.bar";
 					break;
+				case Bar.EntryType.Imgd:
+					name = "kh.tools.bar";
+					break;
 				default:
 					throw new NotImplementedException($"Unable to find a tool for \"{type}\" files.");
 			}

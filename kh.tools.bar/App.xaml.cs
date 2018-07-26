@@ -7,5 +7,6 @@ namespace kh.tools.bar
 	/// </summary>
 	public partial class App : Application
 	{
+
 	}
 }

@@ -57,9 +57,16 @@ namespace kh.tools.bar.ViewModels
 
 			SaveCommand = new RelayCommand(x =>
 			{
-				using (var stream = File.Open(FileName, FileMode.Create))
+				if (!string.IsNullOrEmpty(FileName))
 				{
-					Bar.Save(stream, Items.Select(item => item.Entry));
+					using (var stream = File.Open(FileName, FileMode.Create))
+					{
+						Bar.Save(stream, Items.Select(item => item.Entry));
+					}
+				}
+				else
+				{
+					SaveAsCommand.Execute(x);
 				}
 			}, x => true);
 
