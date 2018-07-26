@@ -7,7 +7,7 @@ using Xe;
 
 namespace kh.kh2
 {
-	public partial class Bar
+	public static class Bar
 	{
 		private const uint MagicCode = 0x01524142U;
 

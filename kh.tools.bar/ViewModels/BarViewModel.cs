@@ -21,7 +21,6 @@ namespace kh.tools.bar.ViewModels
 			this(Bar.Open(stream))
 		{
 			OpenCommand = new RelayCommand(x => { }, x => false);
-			SaveAsCommand = new RelayCommand(x => { }, x => false);
 			SaveCommand = new RelayCommand(x =>
 			{
 				stream.Position = 0;
@@ -104,9 +103,11 @@ namespace kh.tools.bar.ViewModels
 				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
 				if (fd.ShowDialog() == true)
 				{
-					var fStream = File.OpenWrite(fd.FileName);
-					SelectedItem.Entry.Stream.Position = 0;
-					SelectedItem.Entry.Stream.CopyTo(fStream);
+					using (var fStream = File.OpenWrite(fd.FileName))
+					{
+						SelectedItem.Entry.Stream.Position = 0;
+						SelectedItem.Entry.Stream.CopyTo(fStream);
+					}
 				}
 			}, x => IsItemSelected);
 			ImportCommand = new RelayCommand(x =>
@@ -114,10 +115,12 @@ namespace kh.tools.bar.ViewModels
 				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open);
 				if (fd.ShowDialog() == true)
 				{
-					var fStream = File.OpenRead(fd.FileName);
-					var memStream = new MemoryStream((int)fStream.Length);
-					fStream.CopyTo(memStream);
-					SelectedItem.Entry.Stream = memStream;
+					using (var fStream = File.OpenRead(fd.FileName))
+					{
+						var memStream = new MemoryStream((int)fStream.Length);
+						fStream.CopyTo(memStream);
+						SelectedItem.Entry.Stream = memStream;
+					}
 
 					OnPropertyChanged(nameof(SelectedItem.Size));
 				}
