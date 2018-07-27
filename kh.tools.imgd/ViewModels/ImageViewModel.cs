@@ -18,7 +18,7 @@ namespace kh.tools.imgd.ViewModels
 		{
 			OpenCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, FileDialog.Type.Any);
+				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, ("IMGD texture", "imgd"));
 				if (fd.ShowDialog() == true)
 				{
 					using (var stream = File.OpenRead(fd.FileName))
@@ -50,7 +50,9 @@ namespace kh.tools.imgd.ViewModels
 
 			SaveAsCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, FileDialog.Type.Any);
+				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, ("IMGD texture", "imgd"));
+				fd.DefaultFileName = FileName;
+
 				if (fd.ShowDialog() == true)
 				{
 					using (var stream = File.Open(fd.FileName, FileMode.Create))
@@ -73,6 +75,8 @@ namespace kh.tools.imgd.ViewModels
 			ExportCommand = new RelayCommand(x =>
 			{
 				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, FileDialog.Type.ImagePng);
+				fd.DefaultFileName = $"{Path.GetFileNameWithoutExtension(FileName)}.png";
+
 				if (fd.ShowDialog() == true)
 				{
 					using (var fStream = File.OpenWrite(fd.FileName))
@@ -87,6 +91,8 @@ namespace kh.tools.imgd.ViewModels
 			ImportCommand = new RelayCommand(x =>
 			{
 				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, FileDialog.Type.ImagePng);
+				fd.DefaultFileName = $"{Path.GetFileNameWithoutExtension(FileName)}.png";
+
 				if (fd.ShowDialog() == true)
 				{
 					using (var fStream = File.OpenRead(fd.FileName))

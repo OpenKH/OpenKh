@@ -12,6 +12,7 @@ namespace kh.tools.imgd.Views
 	{
 		public ImgdView()
 		{
+			InitializeComponent();
 			DataContext = new ImageViewModel();
 		}
 
@@ -41,7 +42,7 @@ namespace kh.tools.imgd.Views
 
 		private void Initialize(Stream stream)
 		{
-			DataContext = new ImageViewModel(new Imgd(stream));
+			DataContext = new ImageViewModel(stream);
 		}
 
 		private void Initialize(Imgd image)

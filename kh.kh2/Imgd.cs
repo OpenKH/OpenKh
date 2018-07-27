@@ -110,7 +110,7 @@ namespace kh.kh2
 						, Palette, Size.Width, Size.Height);
 				case 0x14:
 					return GetBitmapFrom4bpp(
-						swizzled == 7 ? Decode4(Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data
+						swizzled == 7 ? Decode4(Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data
 						, Palette, Size.Width, Size.Height);
 				default:
 					throw new NotSupportedException($"The format {format} is not supported.");
