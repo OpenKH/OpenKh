@@ -143,7 +143,7 @@ namespace kh.kh2
 				dst[i + 2] = palette[index * 4 + 2];
 				dst[i + 3] = palette[index * 4 + 3];
 
-				index = src[i / 4] >> 4;
+				index = src[i / 8] >> 4;
 				dst[i + 4] = palette[index * 4 + 0];
 				dst[i + 5] = palette[index * 4 + 1];
 				dst[i + 6] = palette[index * 4 + 2];
