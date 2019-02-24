@@ -1,6 +1,6 @@
 ﻿namespace kh.kh2
 {
-    public partial class Imgd
+    public partial class Ps2
 	{
 		private static readonly byte[] tbl4bc =
 		{

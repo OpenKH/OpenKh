@@ -1,4 +1,6 @@
-﻿namespace kh.kh2
+﻿using System.Drawing;
+
+namespace kh.kh2
 {
 	public enum ImageFormat
 	{
@@ -12,6 +14,9 @@
 	}
 
     public interface IImage
-    {
-    }
+	{
+		Size Size { get; }
+
+		byte[] GetBitmap();
+	}
 }

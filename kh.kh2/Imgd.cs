@@ -106,11 +106,11 @@ namespace kh.kh2
 			{
 				case 0x13:
 					return GetBitmapFrom8bpp(
-						swizzled == 7 ? Decode8(Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data
+						swizzled == 7 ? Ps2.Decode8(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data
 						, Palette, Size.Width, Size.Height);
 				case 0x14:
 					return GetBitmapFrom4bpp(
-						swizzled == 7 ? Decode4(Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data
+						swizzled == 7 ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data
 						, Palette, Size.Width, Size.Height);
 				default:
 					throw new NotSupportedException($"The format {format} is not supported.");
@@ -122,7 +122,7 @@ namespace kh.kh2
 			var dst = new byte[width * height * 4];
 			for (int i = 0; i < dst.Length; i += 4)
 			{
-				var index = Repl(src[i / 4]);
+				var index = Ps2.Repl(src[i / 4]);
 				dst[i + 0] = (byte)Math.Max(0, palette[index * 4 + 2] * 2 - 1);
 				dst[i + 1] = (byte)Math.Max(0, palette[index * 4 + 1] * 2 - 1);
 				dst[i + 2] = (byte)Math.Max(0, palette[index * 4 + 0] * 2 - 1);

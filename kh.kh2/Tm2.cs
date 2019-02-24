@@ -3,7 +3,7 @@ using System.IO;
 
 namespace kh.kh2
 {
-    public class Tm2 : IImage
+    public class Tm2
     {
 		private const uint MagicCode = 0x324D4954U;
 
