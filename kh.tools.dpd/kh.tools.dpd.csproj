@@ -108,6 +108,10 @@
       <Project>{545D863A-CD36-4C79-A07F-CF82B718FC3E}</Project>
       <Name>Xe.Tools.Wpf</Name>
     </ProjectReference>
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj">
+      <Project>{C02F5C8B-16A0-4591-A65D-8A7E845D5F59}</Project>
+      <Name>Xe.Tools</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

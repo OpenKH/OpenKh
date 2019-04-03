@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using Xe.Tools.Models;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using Xe.Tools.Wpf.Models;

@@ -40,7 +40,7 @@ namespace kh.kh2
 			}
 
 			Textures = OffsetTextures
-				.Select(x => new Texture(new BinaryReader(new SubStream(reader.BaseStream, x))));
+				.Select(x => new Texture(new BinaryReader(new SubStream(reader.BaseStream, x, 0))));
 		}
 
 		public IEnumerable<Texture> Textures { get; }

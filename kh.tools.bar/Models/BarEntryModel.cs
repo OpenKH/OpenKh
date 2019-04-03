@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Xe.Tools;
 using Xe.Tools.Wpf;
 using static kh.kh2.Bar;
 

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Xe.Tools;
 using Xe.Tools.Wpf;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;

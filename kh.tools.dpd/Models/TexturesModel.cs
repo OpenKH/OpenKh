@@ -1,6 +1,7 @@
 ﻿using kh.kh2;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Xe.Tools;
 using Xe.Tools.Wpf;
 
 namespace kh.tools.dpd.Models

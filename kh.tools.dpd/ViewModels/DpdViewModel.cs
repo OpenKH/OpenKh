@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using Xe.Tools;
 using Xe.Tools.Wpf;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
