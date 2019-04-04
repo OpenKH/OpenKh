@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Xe.BinaryMapper;
 
@@ -87,6 +88,8 @@ namespace kh.kh2
             }
         }
 
+        private Dictionary<uint, Entry> dictionaryEntries;
+
         [Data] public int Length
         {
             get => Items.TryGetCount();
@@ -102,6 +105,51 @@ namespace kh.kh2
         }
 
         public void Write(Stream stream) => BinaryMapping.WriteObject<Idx>(stream, this);
+
+        public Entry GetEntry(string name)
+        {
+            var hash32 = GetHash32(name);
+            var hash16 = GetHash16(name);
+
+            var dictionaryEntries = GetDictionaryEntries();
+            if (dictionaryEntries.TryGetValue(hash32, out var entry))
+            {
+                if (entry.Hash16 == hash16)
+                    return entry;
+            }
+
+            return null;
+        }
+
+        public Idx Merge(Idx idx)
+        {
+            var dictionaryEntries = Items
+                .ToDictionary(x => x.Hash32, x => x);
+
+            foreach (var item in idx.Items)
+            {
+                if (!dictionaryEntries.ContainsKey(item.Hash32))
+                {
+                    dictionaryEntries.Add(item.Hash32, item);
+                }
+            }
+
+            return new Idx
+            {
+                Items = dictionaryEntries
+                    .Values
+                    .OrderBy(x => x.Hash32)
+                    .ToList()
+            };
+        }
+
+        private Dictionary<uint, Entry> GetDictionaryEntries()
+        {
+            if (dictionaryEntries == null)
+                dictionaryEntries = Items.ToDictionary(x => x.Hash32, x => x);
+
+            return dictionaryEntries;
+        }
 
         public static uint GetHash32(string text) => GetHash32(Encoding.UTF8.GetBytes(text));
 
