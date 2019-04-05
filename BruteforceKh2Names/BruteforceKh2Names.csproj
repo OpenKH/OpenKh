@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.3" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\kh.kh2\kh.kh2.csproj" />
   </ItemGroup>
 

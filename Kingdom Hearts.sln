@@ -27,11 +27,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kh.tools.dpd", "kh.tools.dpd\kh.tools.dpd.csproj", "{CC70D894-EAFB-43F8-9DF3-3AC6DE95E093}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kh.tests", "kh.tests\kh.tests.csproj", "{B2B253FE-1A8D-473D-9501-748C2E37E34D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kh.tests", "kh.tests\kh.tests.csproj", "{B2B253FE-1A8D-473D-9501-748C2E37E34D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateKh2FilesMarkdown", "GenerateKh2FilesMarkdown\GenerateKh2FilesMarkdown.csproj", "{64B4B066-DFD5-469A-9259-DA1E57BD0984}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateKh2FilesMarkdown", "GenerateKh2FilesMarkdown\GenerateKh2FilesMarkdown.csproj", "{64B4B066-DFD5-469A-9259-DA1E57BD0984}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Research", "Research", "{9AEB4887-7C23-4992-A26D-A1E73DC4FE53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BruteforceKh2Names", "BruteforceKh2Names\BruteforceKh2Names.csproj", "{8171D53D-5329-4809-9716-66FE5EFE4CE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -221,6 +223,22 @@ Global
 		{64B4B066-DFD5-469A-9259-DA1E57BD0984}.Release|x64.Build.0 = Release|Any CPU
 		{64B4B066-DFD5-469A-9259-DA1E57BD0984}.Release|x86.ActiveCfg = Release|Any CPU
 		{64B4B066-DFD5-469A-9259-DA1E57BD0984}.Release|x86.Build.0 = Release|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Debug|ARM.Build.0 = Debug|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Debug|x64.Build.0 = Debug|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Debug|x86.Build.0 = Debug|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Release|ARM.ActiveCfg = Release|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Release|ARM.Build.0 = Release|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Release|x64.ActiveCfg = Release|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Release|x64.Build.0 = Release|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Release|x86.ActiveCfg = Release|Any CPU
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -228,6 +246,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{812E9C9B-C5AA-459B-9C30-FCAE79A0B3B9} = {9AEB4887-7C23-4992-A26D-A1E73DC4FE53}
 		{64B4B066-DFD5-469A-9259-DA1E57BD0984} = {9AEB4887-7C23-4992-A26D-A1E73DC4FE53}
+		{8171D53D-5329-4809-9716-66FE5EFE4CE7} = {9AEB4887-7C23-4992-A26D-A1E73DC4FE53}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}
