@@ -16,4 +16,13 @@
     <ProjectReference Include="..\kh.kh2\kh.kh2.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="kh2\res\50worldmap.cmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\50worldmap.dec">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

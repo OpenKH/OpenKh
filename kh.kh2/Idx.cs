@@ -7,7 +7,7 @@ using Xe.BinaryMapper;
 
 namespace kh.kh2
 {
-    public class Idx
+    public partial class Idx
     {
         public class Entry
         {
@@ -98,29 +98,49 @@ namespace kh.kh2
 
         [Data] public List<Entry> Items { get; set; }
 
+        /// <summary>
+        /// Deserialize an IDX from a stream
+        /// </summary>
+        /// <param name="stream">Readable stream where the IDX has been serialized.</param>
+        /// <returns></returns>
         public static Idx Read(Stream stream)
         {
             BinaryMapping.SetMemberLengthMapping<Idx>(nameof(Items), (o, m) => o.Length);
             return BinaryMapping.ReadObject<Idx>(stream);
         }
 
-        public void Write(Stream stream) => BinaryMapping.WriteObject<Idx>(stream, this);
+        /// <summary>
+        /// Serialize an IDX to a stream
+        /// </summary>
+        /// <param name="stream">Writable stream that will contain the IDX data</param>
+        public void Write(Stream stream) => BinaryMapping.WriteObject(stream, this);
 
-        public Entry GetEntry(string name)
+        /// <summary>
+        /// Try to get an entry form a file name 
+        /// </summary>
+        /// <param name="name">file name to search</param>
+        /// <param name="entry">Found entry</param>
+        /// <returns>Return true if the entry has been found</returns>
+        public bool TryGetEntry(string name, out Entry entry)
         {
             var hash32 = GetHash32(name);
             var hash16 = GetHash16(name);
 
             var dictionaryEntries = GetDictionaryEntries();
-            if (dictionaryEntries.TryGetValue(hash32, out var entry))
+            if (dictionaryEntries.TryGetValue(hash32, out entry))
             {
                 if (entry.Hash16 == hash16)
-                    return entry;
+                    return true;
             }
 
-            return null;
+            return false;
         }
 
+        /// <summary>
+        /// Create a copy of the merge between the current IDX and the specified IDX.
+        /// </summary>
+        /// <param name="idx">Idx to merge in</param>
+        /// <returns></returns>
         public Idx Merge(Idx idx)
         {
             var dictionaryEntries = Items
@@ -151,8 +171,18 @@ namespace kh.kh2
             return dictionaryEntries;
         }
 
+        /// <summary>
+        /// Calculate an hash32 from a name
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static uint GetHash32(string text) => GetHash32(Encoding.UTF8.GetBytes(text));
 
+        /// <summary>
+        /// Calculate an hash32 from data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static uint GetHash32(byte[] data)
         {
             int c = -1;
@@ -171,8 +201,18 @@ namespace kh.kh2
             return (uint)~c;
         }
 
+        /// <summary>
+        /// Calculate an hash16 from a name
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static ushort GetHash16(string text) => GetHash16(Encoding.UTF8.GetBytes(text));
 
+        /// <summary>
+        /// Calculate an hash16 from data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static ushort GetHash16(byte[] data)
         {
             int s1 = -1;
