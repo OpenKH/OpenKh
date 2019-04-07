@@ -4,3 +4,4 @@
 * [Worlds](worlds.md)
 * [Game files](files.md)
 * [Undiscovered game files](files-unknown.md)
+* [File types](file-type.md)
