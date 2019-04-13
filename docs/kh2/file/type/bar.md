@@ -12,25 +12,31 @@ The game seeks the files by their index numbers. For example: An MDLX-BAR seeks 
 
 All the values are Little Endian in the PS2/PS4 Versions, while they are Big Endian in the PS3 Version. The "always" values given are in Little Endian.
 
-### BAR Header:
+### BAR Header
+
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 | int32_t | The identifier of the file (Should be always 0x01524142) |
 | 4 | int32_t | The sub-file count of the BAR File. |
 | 8 | int64_t | File padding, has no effect. (Always 0x00)
-### BAR Entry:
+
+### BAR Entry
+
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 | int32_t | The sub-file's type (List given below) |
 | 4 | char[4] | The name of the sub-file. Empty characters are registered as 0x00.|
 | 8 | uint32_t | Sub-file's offset/location. Must be divisible by 0x10. Can be padded. |
 | 12 | uint32_t | Sub-file's size. Everything that comes after [ offset + size ] will be ignored for that specific sub-file.
+
 ### BAR Remains
+
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | BAREntry[index]->fileOffset | byte[BAREntry[index]->fileSize | The sub-file itself in RAW Data (Uncompressed). |
 
 ## BAR File Types
+
 Keep in mind that this list is still incomplete and will be changed over the course of this project:
 
 | Value | Description | General Location/File Type |
