@@ -20,3 +20,4 @@
 |TT|Twilight Town
 |WI|Timeless River
 |WM|World Map
+|ZZ|Miscellaneous
