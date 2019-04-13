@@ -3,7 +3,7 @@
 | SLPM 66233 | Playstation 2 | JP     | 2005-12-06 | First version   | http://redump.org/disc/26787/ |
 | SLUS 21005 | Playstation 2 | US     | 2006-01-31 | Beta            |                               |
 | SLUS 21005 | Playstation 2 | US     | 2006-02-02 | Beta            | http://redump.org/disc/56827/ |
-| SLUS 21005 | Playstation 2 | US     | 2006-02-15 | Retail          | http://redump.org/disc/56827/ |
+| SLUS 21005 | Playstation 2 | US     | 2006-02-15 | Retail          | http://redump.org/disc/761/	 |
 | SLES 54234 | Playstation 2 | EU-IT  | 2006-07-21 | Retail          | http://redump.org/disc/26092/ |
 | SLES 54232 | Playstation 2 | EU-FR  | 2006-07-21 | Retail          | http://redump.org/disc/13716/ |
 | SLES 54235 | Playstation 2 | EU-ES  | 2006-07-24 | Retail          | http://redump.org/disc/5329/  |

@@ -1,8 +1,8 @@
-# Kingdom Hearts hacking community
+# Kingdom Hearts Hacking Community
 
 This is a central place for documentation and discoveries about Kingdom Hearts games.
 
-Every contribute will be more than welcome!
+Every contribution is more than welcome!
 
 Right now the documentation contains info about the following games:
 
