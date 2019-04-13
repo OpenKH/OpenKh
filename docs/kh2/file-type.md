@@ -2,10 +2,10 @@
 
 | Extension | Description | Tool | 
 |-----------|-------------|------|
-| IDX | File table for an IMG
-| IMG | Contains a bunch of un/compressed files; they are indexed by IDX
+| [IDX](file//type/idx.md) | File table for an IMG | [kh.cmd.idximg](/kh.cmd.idximg/README.md)
+| [IMG](file//type/idx.md) | Contains a bunch of un/compressed files; they are indexed by IDX | [kh.cmd.idximg](/kh.cmd.idximg/README.md)
 | DBG | Binary file; probably used by a debug menu
-| BAR | Primary file and data container
+| [BAR](file/type/bar.md) | Primary file and data container
 | 2DD | A sub-tybe of BAR; usually for menus on the 2D screen buffer
 | 2LD | A sub-tybe of BAR; usually for menus on the 3D screen buffer
 | ANB | Raw animation data (bone manipulations, positions, etc.)
