@@ -1,0 +1,1 @@
+# kh.cmd.idximg - Extract files from IDX/IMG

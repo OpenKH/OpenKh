@@ -1,1 +1,1 @@
-# kh.cmd.idximg - Extract files from IDX/IMG
+Please refer to https://xeeynamo.github.io/KingdomHearts/tool/kh.cmd.idximg
