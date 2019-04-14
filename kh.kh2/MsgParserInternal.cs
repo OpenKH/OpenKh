@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using static kh.kh2.MsgParser;
@@ -102,6 +102,18 @@ namespace kh.kh2
                 [0x53] = x => new Text('-'),
                 [0x56] = x => new Text('〜'),
                 [0x57] = x => new Text('\''),
+                [0x5a] = x => new Text('('),
+                [0x5b] = x => new Text(')'),
+                [0x5c] = x => new Text('「'),
+                [0x5d] = x => new Text('」'),
+                [0x5e] = x => new Text('『'),
+                [0x5f] = x => new Text('』'),
+                [0x60] = x => new Text('“'),
+                [0x61] = x => new Text('”'),
+                [0x62] = x => new Text('['),
+                [0x63] = x => new Text(']'),
+                [0x64] = x => new Text('<'),
+                [0x65] = x => new Text('>'),
                 [0x66] = x => new Text('-'),
                 [0x90] = x => new Text('0'),
                 [0x91] = x => new Text('1'),
@@ -142,6 +154,7 @@ namespace kh.kh2
                 [0xeb] = x => new Text('‘'),
                 [0xec] = x => new Text('’'),
                 [0xee] = x => new Text('\''),
+                [0xf0] = x => new Text('☆'),
             };
 
         private StringBuilder _stringBuilder;
