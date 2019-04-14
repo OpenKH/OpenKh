@@ -35,21 +35,44 @@ namespace kh.kh2
                 .ToList()
                 .Select(x =>
                 {
-                    var data = new List<byte>();
                     reader.BaseStream.Position = x.Offset;
-
-                    byte r;
-                    while ((r = reader.ReadByte()) != Terminator)
-                        data.Add(r);
-                    data.Add(0);
 
                     return new Entry
                     {
                         Id = x.Id,
-                        Data = data.ToArray()
+                        Data = GetMsgData(reader)
                     };
                 })
                 .ToList();
+        }
+
+        private static byte[] GetMsgData(BinaryReader stream)
+        {
+            byte r;
+            var data = new List<byte>();
+            do
+            {
+                r = stream.ReadByte();
+                data.Add(r);
+
+                switch (r)
+                {
+                    case 0x07:
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        break;
+                    case 0x09:
+                    case 0x0B:
+                        data.Add(stream.ReadByte());
+                        break;
+                }
+            } while (r != Terminator);
+
+            data.Add(0);
+
+            return data.ToArray();
         }
 
         public static bool IsValid(Stream stream) =>
