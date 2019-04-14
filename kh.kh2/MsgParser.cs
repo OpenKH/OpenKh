@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using static kh.kh2.MsgParser;
 
 namespace kh.kh2
@@ -130,7 +131,7 @@ namespace kh.kh2
                 [0xb3] = x => new Character('z'),
             };
 
-        private Entry _textEntry;
+        private StringBuilder _stringBuilder;
         private List<Entry> _entries;
         private byte[] _data;
         private int _index;
@@ -156,48 +157,41 @@ namespace kh.kh2
                     AppendEntry(entry);
             }
 
-            FlushTextEntry();
+            FlushTextBuilder();
             return _entries;
         }
 
-        private bool IsEof()
-        {
-            return _index >= _data.Length;
-        }
-
-        private Entry RequestTextEntry()
-        {
-            if (_textEntry == null)
-            {
-                _textEntry = new Entry();
-                _textEntry.Command = Command.PrintText;
-                _textEntry.Text = "";
-            }
-
-            return _textEntry;
-        }
-
-        private void FlushTextEntry()
-        {
-            if (_textEntry != null)
-            {
-                _entries.Add(_textEntry);
-                _textEntry = null;
-            }
-        }
+        private bool IsEof() => _index >= _data.Length;
 
         private byte Next() => _data[_index++];
 
+        private StringBuilder RequestTextBuilder()
+        {
+            if (_stringBuilder == null)
+                _stringBuilder = new StringBuilder();
+
+            return _stringBuilder;
+        }
+
+        private void FlushTextBuilder()
+        {
+            if (_stringBuilder != null)
+            {
+                _entries.Add(new Entry
+                {
+                    Command = Command.PrintText,
+                    Text = _stringBuilder.ToString()
+                });
+                _stringBuilder = null;
+            }
+        }
+
         private void AppendEntry(Entry entry)
         {
-            FlushTextEntry();
+            FlushTextBuilder();
             _entries.Add(entry);
         }
 
-        private void AppendChar(char ch)
-        {
-            RequestTextEntry();
-            _textEntry.Text += ch;
-        }
+        private void AppendChar(char ch) => RequestTextBuilder().Append(ch);
     }
 }
