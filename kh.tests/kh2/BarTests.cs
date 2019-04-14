@@ -1,5 +1,4 @@
 ﻿using kh.kh2;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +6,7 @@ using Xunit;
 
 namespace kh.tests.kh2
 {
-    public class BarTests
+    public class BarTests : Common
     {
         private const string FilePath = "kh2/res/bar_test.bar";
 
@@ -164,12 +163,6 @@ namespace kh.tests.kh2
             }
 
             Assert.Equal(expectedName, entries[0].Name);
-        }
-
-        private void FileOpenRead(string path, Action<Stream> action)
-        {
-            using (var stream = File.OpenRead(path))
-                action(stream);
         }
     }
 }
