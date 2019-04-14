@@ -1,4 +1,5 @@
-﻿using System;
+﻿using kh.common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace kh.kh2
 			Imgz = 0x1d,
 			Seb = 0x1f,
 			Wd = 0x20,
+            Vibration = 0x2f,
 			Vag = 0x30,
 		}
 
@@ -48,8 +50,10 @@ namespace kh.kh2
 				throw new InvalidDataException("Invalid header");
 
 			int filesCount = reader.ReadInt32();
-			reader.ReadInt32();
-			reader.ReadInt32();
+			reader.ReadInt32(); // padding
+			reader.ReadInt32(); // padding
+
+
 
 			var buffer = new byte[4];
 			var tmpEntries = new List<(Entry, int, int)>(filesCount);
@@ -90,6 +94,7 @@ namespace kh.kh2
 					{
 						reader.BaseStream.CopyTo(e.Item1.Stream, length: length);
 					}
+                    e.Item1.Stream.Position = 0;
 				}
 
 				entries.Add(e.Item1);
@@ -150,5 +155,8 @@ namespace kh.kh2
 				entry.Stream.CopyTo(writer.BaseStream);
 			}
 		}
-	}
+
+        public static bool IsValid(Stream stream) => new BinaryReader(stream).PeekInt32() == MagicCode;
+
+    }
 }
