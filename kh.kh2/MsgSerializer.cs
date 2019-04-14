@@ -21,6 +21,8 @@ namespace kh.kh2
                     var rgba = $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}";
                     return new XElement("color", rgba);
                 },
+                [MsgParser.Command.ButtonCircle] = x => new XElement("buttoncircle"),
+                [MsgParser.Command.ButtonCross] = x => new XElement("buttoncross"),
             };
 
         private static Dictionary<byte, string> _icons =

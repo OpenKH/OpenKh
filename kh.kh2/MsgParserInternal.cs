@@ -116,6 +116,8 @@ namespace kh.kh2
                 [0x64] = x => new Text('<'),
                 [0x65] = x => new Text('>'),
                 [0x66] = x => new Text('-'),
+                [0x6c] = x => new GenericCommand(Command.ButtonCircle),
+                [0x6d] = x => new GenericCommand(Command.ButtonCross),
                 [0x90] = x => new Text('0'),
                 [0x91] = x => new Text('1'),
                 [0x92] = x => new Text('2'),

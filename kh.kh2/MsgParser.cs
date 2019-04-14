@@ -12,7 +12,9 @@ namespace kh.kh2
             Parameter,
             NewLine,
             TextSize,
-            Color
+            Color,
+            ButtonCross,
+            ButtonCircle,
         }
 
         public class Entry
