@@ -9,6 +9,7 @@ namespace kh.kh2
         {
             End,
             PrintText,
+            PrintIcon,
 
             Unknown = -1
         }
@@ -21,23 +22,27 @@ namespace kh.kh2
         }
 
         public static List<Entry> Map(this Msg.Entry entry) =>
-            new MsgParserInternal().Parse(entry);
+            new MsgParserInternal(entry.Data).Parse();
     }
 
     internal class MsgParserInternal
     {
         private Entry _textEntry;
         private List<Entry> _entries;
+        private byte[] _data;
+        private int _index;
 
-        internal MsgParserInternal()
+        internal MsgParserInternal(byte[] data)
         {
             _entries = new List<Entry>();
+            _data = data;
         }
 
-        internal List<Entry> Parse(Msg.Entry entry)
+        internal List<Entry> Parse()
         {
-            foreach (byte c in entry.Data)
+            while (!IsEof())
             {
+                var c = Next();
                 if (c >= 0x2e && c <= 0x47)
                 {
                     AppendChar((c - 0x2e) + 'A');
@@ -67,13 +72,22 @@ namespace kh.kh2
                     {
                         AppendChar(' ');
                     }
+                    else if (c == 0x09)
+                    {
+                        FlushTextEntry();
+                        _entries.Add(new Entry
+                        {
+                            Command = Command.PrintIcon,
+                            Data = new byte[] { Next() }
+                        });
+                    }
                     else if (c == 0x48)
                     {
                         AppendChar('!');
                     }
                     else if (c == 0x57)
                     {
-                        AppendChar(''');
+                        AppendChar('\'');
                     }
                     else
                     {
@@ -84,6 +98,11 @@ namespace kh.kh2
 
             FlushTextEntry();
             return _entries;
+        }
+
+        private bool IsEof()
+        {
+            return _index >= _data.Length;
         }
 
         private Entry RequestTextEntry()
@@ -106,6 +125,10 @@ namespace kh.kh2
                 _textEntry = null;
             }
         }
+
+        private byte Peek() => _data[_index];
+
+        private byte Next() => _data[_index++];
 
         private void AppendDebug(byte ch)
         {

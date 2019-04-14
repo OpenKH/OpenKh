@@ -91,5 +91,23 @@ namespace kh.tests.kh2
             Assert.Equal("Hello world!", decodedEntry[0].Text);
             Assert.Equal(MsgParser.Command.End, decodedEntry[1].Command);
         }
+
+        [Fact]
+        public void DecodeIconCorrectly()
+        {
+            var decodedEntry = MsgParser.Map(new Msg.Entry()
+            {
+                Data = new byte[]
+                {
+                    0x09, 0x00, 0x09, 0x01, 0x00
+                }
+            });
+
+            Assert.Equal(MsgParser.Command.PrintIcon, decodedEntry[0].Command);
+            Assert.Equal(0, decodedEntry[0].Data[0]);
+            Assert.Equal(MsgParser.Command.PrintIcon, decodedEntry[1].Command);
+            Assert.Equal(1, decodedEntry[1].Data[0]);
+            Assert.Equal(MsgParser.Command.End, decodedEntry[2].Command);
+        }
     }
 }
