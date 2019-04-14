@@ -53,54 +53,35 @@ namespace kh.kh2
 			reader.ReadInt32(); // padding
 			reader.ReadInt32(); // padding
 
+            return Enumerable.Range(0, filesCount)
+                .Select(x => new
+                {
+                    Type = (EntryType)reader.ReadUInt16(),
+                    Index = reader.ReadInt16(),
+                    Name = Encoding.UTF8.GetString(reader.ReadBytes(4)),
+                    Offset = reader.ReadInt32(),
+                    Size = reader.ReadInt32()
+                })
+                .ToList() // Needs to be consumed
+                .Where(x => filter(x.Name, x.Type))
+                .Select(x =>
+                {
+                    reader.BaseStream.Position = x.Offset;
+                    var data = reader.ReadBytes(x.Size);
 
+                    var fileStream = new MemoryStream();
+                    fileStream.Write(data, 0, data.Length);
+                    fileStream.Position = 0;
 
-			var buffer = new byte[4];
-			var tmpEntries = new List<(Entry, int, int)>(filesCount);
-
-			for (int i = 0; i < filesCount; i++)
-			{
-				var type = (EntryType)reader.ReadUInt16();
-				var index = reader.ReadInt16();
-
-				reader.Read(buffer, 0, 4);
-				var name = Encoding.UTF8.GetString(buffer);
-
-				if (filter(name, type))
-				{
-					tmpEntries.Add((new Entry()
-					{
-						Type = type,
-						Index = index,
-						Name = name
-					},
-					reader.ReadInt32(), // offset
-					reader.ReadInt32())); // size
-				}
-			}
-
-			var entries = new List<Entry>(filesCount);
-			for (int i = 0; i < filesCount; i++)
-			{
-				var e = tmpEntries[i];
-
-				if (loadStream)
-				{
-					var length = e.Item3;
-					e.Item1.Stream = new MemoryStream(length);
-					reader.BaseStream.Position = e.Item2;
-
-					if (length > 0)
-					{
-						reader.BaseStream.CopyTo(e.Item1.Stream, length: length);
-					}
-                    e.Item1.Stream.Position = 0;
-				}
-
-				entries.Add(e.Item1);
-			}
-
-			return entries;
+                    return new Entry
+                    {
+                        Type = x.Type,
+                        Index = x.Index,
+                        Name = x.Name,
+                        Stream = fileStream
+                    };
+                })
+                .ToList();
 		}
 
 		public static IEnumerable<Entry> Open(Stream stream)
