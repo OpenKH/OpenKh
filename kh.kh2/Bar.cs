@@ -13,19 +13,22 @@ namespace kh.kh2
 
 		public enum EntryType
 		{
-			Dummy = 0x00,
-			Msg = 0x02,
-			Ai = 0x03,
-			Tim2 = 0x07,
-			Bar = 0x11,
-			Pax = 0x12,
-			Imgd = 0x18,
-			Seqd = 0x19,
-			Imgz = 0x1d,
-			Seb = 0x1f,
-			Wd = 0x20,
-            Vibration = 0x2f,
-			Vag = 0x30,
+			Dummy = 0,
+			Msg = 2,
+			Ai = 3,
+			Tim2 = 7,
+            SpawnPoint = 12,
+            SpawnScript = 13,
+			Bar = 17,
+			Pax = 18,
+            AnimationLoader = 22,
+			Imgd = 24,
+			Seqd = 25,
+			Imgz = 29,
+			Seb = 31,
+			Wd = 32,
+            Vibration = 47,
+			Vag = 48,
 		}
 
 		public class Entry

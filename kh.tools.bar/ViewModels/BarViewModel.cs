@@ -109,6 +109,8 @@ namespace kh.tools.bar.ViewModels
 			ExportCommand = new RelayCommand(x =>
 			{
 				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
+                fd.DefaultFileName = $"{SelectedItem.Entry.Name}.bin";
+
 				if (fd.ShowDialog() == true)
 				{
 					using (var fStream = File.OpenWrite(fd.FileName))
@@ -118,7 +120,27 @@ namespace kh.tools.bar.ViewModels
 					}
 				}
 			}, x => IsItemSelected);
-			ImportCommand = new RelayCommand(x =>
+
+            ExportAllCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Folder);
+
+                if (fd.ShowDialog() == true)
+                {
+                    var basePath = fd.FileName;
+                    foreach (var item in Items.Select(item => item.Entry))
+                    {
+                        var fileName = $"{item.Name}.bin";
+                        using (var fStream = File.OpenWrite(Path.Combine(basePath, fileName)))
+                        {
+                            item.Stream.Position = 0;
+                            item.Stream.CopyTo(fStream);
+                        }
+                    }
+                }
+            }, x => true);
+
+            ImportCommand = new RelayCommand(x =>
 			{
 				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open);
 				if (fd.ShowDialog() == true)
@@ -150,9 +172,11 @@ namespace kh.tools.bar.ViewModels
 
 		public RelayCommand AboutCommand { get; set; }
 
-		public RelayCommand ExportCommand { get; set; }
+        public RelayCommand ExportCommand { get; set; }
 
-		public RelayCommand ImportCommand { get; set; }
+        public RelayCommand ExportAllCommand { get; set; }
+
+        public RelayCommand ImportCommand { get; set; }
 
 		public RelayCommand OpenItemCommand { get; set; }
 
