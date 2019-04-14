@@ -72,11 +72,13 @@ namespace kh.kh2
                     fileStream.Write(data, 0, data.Length);
                     fileStream.Position = 0;
 
+                    var name = x.Name.Split('\0').FirstOrDefault();
+
                     return new Entry
                     {
                         Type = x.Type,
                         Index = x.Index,
-                        Name = x.Name,
+                        Name = name,
                         Stream = fileStream
                     };
                 })

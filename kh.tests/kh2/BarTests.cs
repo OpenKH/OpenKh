@@ -1,5 +1,6 @@
 ﻿using kh.kh2;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -135,6 +136,35 @@ namespace kh.tests.kh2
                     Assert.Equal(expectedData, actualData);
                 }
             });
+
+        [Theory]
+        [InlineData("TEST", "TEST")]
+        [InlineData("333", "333")]
+        [InlineData("22", "22")]
+        [InlineData("1", "1")]
+        [InlineData("666666", "6666")]
+        public void AlwaysReadCorrectName(string name, string expectedName)
+        {
+            var entries = new List<Bar.Entry>
+            {
+                new Bar.Entry
+                {
+                    Type = Bar.EntryType.Dummy,
+                    Index = 0,
+                    Name = name,
+                    Stream = new MemoryStream()
+                }
+            };
+
+            using (var tmpStream = new MemoryStream())
+            {
+                Bar.Save(tmpStream, entries);
+                tmpStream.Position = 0;
+                entries = Bar.Open(tmpStream);
+            }
+
+            Assert.Equal(expectedName, entries[0].Name);
+        }
 
         private void FileOpenRead(string path, Action<Stream> action)
         {
