@@ -10,11 +10,11 @@ namespace kh.kh2
         private static Dictionary<MsgParser.Command, Func<MsgParser.Entry, XElement>> _serializer =
             new Dictionary<MsgParser.Command, Func<MsgParser.Entry, XElement>>()
             {
-                [MsgParser.Command.End] = x => new XElement("end"),
+                [MsgParser.Command.End] = x => null,
                 [MsgParser.Command.PrintIcon] = x => SerializePrintIcon(x),
                 [MsgParser.Command.PrintText] = x => new XElement("text", x.Text),
                 [MsgParser.Command.Parameter] = x => new XElement("param", x.Data[0].ToString()),
-                [MsgParser.Command.LineFeed] = x => new XElement("linefeed"),
+                [MsgParser.Command.NewLine] = x => new XElement("newline"),
                 [MsgParser.Command.TextSize] = x => new XElement("size", x.Data[0].ToString()),
             };
 
@@ -83,7 +83,7 @@ namespace kh.kh2
             if (!_serializer.TryGetValue(entry.Command, out var funcSerializer))
                 throw new NotImplementedException($"The command {entry.Command} serialization is not implemented yet.");
 
-            return funcSerializer(entry);
+            return funcSerializer?.Invoke(entry);
         }
 
         private static XElement SerializePrintIcon(MsgParser.Entry entry)

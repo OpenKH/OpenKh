@@ -57,7 +57,7 @@ namespace kh.cmd.msg
         {
             var root = MsgSerializer.SerializeXEntries(Msg.Open(inStream), true);
             var document = new XDocument(root);
-            new StreamWriter(outStream).Write(document.ToString());
+            document.Save(outStream);
         }
     }
 }

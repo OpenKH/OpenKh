@@ -28,7 +28,7 @@ namespace kh.kh2
         {
             public GenericCommand(Command command)
             {
-                Command = Command;
+                Command = command;
             }
         }
 
@@ -50,7 +50,7 @@ namespace kh.kh2
             {
                 [0x00] = x => new GenericCommand(Command.End),
                 [0x01] = x => new Text(' '),
-                [0x02] = x => new GenericCommand(Command.LineFeed),
+                [0x02] = x => new GenericCommand(Command.NewLine),
                 [0x09] = x => new SingleData(Command.PrintIcon, x),
                 [0x0b] = x => new SingleData(Command.TextSize, x),
                 [0x22] = x => new SingleData(Command.Parameter, 0),
@@ -141,7 +141,7 @@ namespace kh.kh2
                 [0xb3] = x => new Text('z'),
                 [0xeb] = x => new Text('‘'),
                 [0xec] = x => new Text('’'),
-                [0xee] = x => new Text("{{'}}"), // ???
+                [0xee] = x => new Text('\''),
             };
 
         private StringBuilder _stringBuilder;

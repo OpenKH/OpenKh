@@ -10,7 +10,7 @@ namespace kh.kh2
             PrintText,
             PrintIcon,
             Parameter,
-            LineFeed,
+            NewLine,
             TextSize,
         }
 
