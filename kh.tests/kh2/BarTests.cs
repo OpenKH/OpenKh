@@ -121,6 +121,26 @@ namespace kh.tests.kh2
                 Assert.Equal(86, entries[6].Stream.ReadByte());
             });
 
+        [Fact]
+        public void IsWritingBackCorrectly() =>
+            FileOpenRead(FilePath, stream =>
+            {
+                var expectedData = new byte[stream.Length];
+                stream.Read(expectedData, 0, expectedData.Length);
+
+                var entries = Bar.Open(new MemoryStream(expectedData));
+                using (var dstStream = new MemoryStream(expectedData.Length))
+                {
+                    Bar.Save(dstStream, entries);
+                    dstStream.Position = 0;
+                    var actualData = new byte[dstStream.Length];
+                    dstStream.Read(actualData, 0, actualData.Length);
+
+                    Assert.Equal(expectedData.Length, actualData.Length);
+                    Assert.Equal(expectedData, actualData);
+                }
+            });
+
         private void FileOpenRead(string path, Action<Stream> action)
         {
             using (var stream = File.OpenRead(path))
