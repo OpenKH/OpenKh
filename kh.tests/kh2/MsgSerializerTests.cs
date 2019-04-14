@@ -16,8 +16,8 @@ namespace kh.tests.kh2
                 Text = "Hello world!"
             };
 
-            var element = MsgSerializer.SerializeXEntries(new[] { entry });
-            Assert.Equal("<message><text>Hello world!</text></message>", element.ToString(xmlFormatting));
+            var element = MsgSerializer.SerializeXEntries(1234, new[] { entry });
+            Assert.Equal("<message id=\"1234\"><text>Hello world!</text></message>", element.ToString(xmlFormatting));
         }
 
         [Fact]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace kh.kh2
@@ -9,8 +10,12 @@ namespace kh.kh2
         private static Dictionary<MsgParser.Command, Func<MsgParser.Entry, XElement>> _serializer =
             new Dictionary<MsgParser.Command, Func<MsgParser.Entry, XElement>>()
             {
+                [MsgParser.Command.End] = x => new XElement("end"),
                 [MsgParser.Command.PrintIcon] = x => SerializePrintIcon(x),
                 [MsgParser.Command.PrintText] = x => new XElement("text", x.Text),
+                [MsgParser.Command.Parameter] = x => new XElement("param", x.Data[0].ToString()),
+                [MsgParser.Command.LineFeed] = x => new XElement("linefeed"),
+                [MsgParser.Command.TextSize] = x => new XElement("size", x.Data[0].ToString()),
             };
 
         private static Dictionary<byte, string> _icons =
@@ -25,9 +30,14 @@ namespace kh.kh2
                 [6] = "weapon-shield"
             };
 
-        public static XElement SerializeXEntries(IEnumerable<MsgParser.Entry> entries)
+        public static XElement SerializeXEntries(IEnumerable<Msg.Entry> entries)
         {
-            var element = new XElement("message");
+            return new XElement("messages", entries.Select(x => SerializeXEntries(x.Id, x.Map())));
+        }
+
+        public static XElement SerializeXEntries(int id, IEnumerable<MsgParser.Entry> entries)
+        {
+            var element = new XElement("message", new XAttribute("id", id));
             foreach (var entry in entries)
             {
                 element.Add(SerializeXEntry(entry));

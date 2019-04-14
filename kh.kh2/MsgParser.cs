@@ -9,8 +9,9 @@ namespace kh.kh2
             End,
             PrintText,
             PrintIcon,
-
-            Unknown = -1
+            Parameter,
+            LineFeed,
+            TextSize,
         }
 
         public class Entry
