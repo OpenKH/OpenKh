@@ -50,8 +50,7 @@ namespace kh.tests.kh2
         public void IsReadingEntryNamesCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream)
-                    .ToArray();
+                var entries = Bar.Open(stream);
                 Assert.Equal("s_da", entries[0].Name);
                 Assert.Equal("m_da", entries[1].Name);
                 Assert.Equal("l_da", entries[2].Name);
@@ -65,8 +64,7 @@ namespace kh.tests.kh2
         public void IsReadingEntrySizesCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream)
-                    .ToArray();
+                var entries = Bar.Open(stream);
                 Assert.Equal(40, entries[0].Stream.Length);
                 Assert.Equal(40, entries[1].Stream.Length);
                 Assert.Equal(48, entries[2].Stream.Length);
@@ -80,8 +78,7 @@ namespace kh.tests.kh2
         public void IsReadingEntryTypesCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream)
-                    .ToArray();
+                var entries = Bar.Open(stream);
                 Assert.Equal(Bar.EntryType.Vibration, entries[0].Type);
                 Assert.Equal(Bar.EntryType.Vibration, entries[1].Type);
                 Assert.Equal(Bar.EntryType.Vibration, entries[2].Type);
@@ -95,8 +92,7 @@ namespace kh.tests.kh2
         public void IsReadingEntryIndexesCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream)
-                    .ToArray();
+                var entries = Bar.Open(stream);
                 Assert.Equal(0, entries[0].Index);
                 Assert.Equal(0, entries[1].Index);
                 Assert.Equal(0, entries[2].Index);
@@ -110,8 +106,7 @@ namespace kh.tests.kh2
         public void IsReadingEntryDataCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream)
-                    .ToArray();
+                var entries = Bar.Open(stream);
                 Assert.Equal(86, entries[0].Stream.ReadByte());
                 Assert.Equal(86, entries[1].Stream.ReadByte());
                 Assert.Equal(86, entries[2].Stream.ReadByte());

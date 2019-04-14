@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Xe;
 
 namespace kh.kh2
 {
@@ -38,20 +37,20 @@ namespace kh.kh2
 			public string Name { get; set; }
 
 			public Stream Stream { get; set; }
-		}
+        }
 
-		private static List<Entry> Open(Stream stream, Func<string, EntryType, bool> filter, bool loadStream)
-		{
-			if (!stream.CanRead || !stream.CanSeek)
-				throw new InvalidDataException($"Read or seek must be supported.");
+        public static List<Entry> Open(Stream stream, Func<string, EntryType, bool> filter)
+        {
+            if (!stream.CanRead || !stream.CanSeek)
+                throw new InvalidDataException($"Read or seek must be supported.");
 
-			var reader = new BinaryReader(stream);
-			if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
-				throw new InvalidDataException("Invalid header");
+            var reader = new BinaryReader(stream);
+            if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
+                throw new InvalidDataException("Invalid header");
 
-			int filesCount = reader.ReadInt32();
-			reader.ReadInt32(); // padding
-			reader.ReadInt32(); // padding
+            int filesCount = reader.ReadInt32();
+            reader.ReadInt32(); // padding
+            reader.ReadInt32(); // padding
 
             return Enumerable.Range(0, filesCount)
                 .Select(x => new
@@ -82,21 +81,16 @@ namespace kh.kh2
                     };
                 })
                 .ToList();
-		}
+        }
 
-		public static IEnumerable<Entry> Open(Stream stream)
+        public static List<Entry> Open(Stream stream)
 		{
 			return Open(stream, (name, type) => true);
 		}
 
-		public static IEnumerable<Entry> Open(Stream stream, Func<string, EntryType, bool> filter)
-		{
-			return Open(stream, filter, true);
-		}
-
 		public static int Count(Stream stream, Func<string, EntryType, bool> filter)
 		{
-			return Open(stream, filter, false).Count;
+			return Open(stream, filter).Count;
 		}
 
 		public static void Save(Stream stream, IEnumerable<Entry> entries)
