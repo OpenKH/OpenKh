@@ -55,7 +55,7 @@ namespace kh.cmd.msg
 
         private void ConvertMsgToXml(Stream inStream, Stream outStream)
         {
-            var root = MsgSerializer.SerializeXEntries(Msg.Open(inStream));
+            var root = MsgSerializer.SerializeXEntries(Msg.Open(inStream), true);
             var document = new XDocument(root);
             new StreamWriter(outStream).Write(document.ToString());
         }

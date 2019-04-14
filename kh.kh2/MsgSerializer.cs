@@ -30,19 +30,52 @@ namespace kh.kh2
                 [6] = "weapon-shield"
             };
 
-        public static XElement SerializeXEntries(IEnumerable<Msg.Entry> entries)
+        public static XElement SerializeXEntries(IEnumerable<Msg.Entry> entries, bool ignoreExceptions = false)
         {
-            return new XElement("messages", entries.Select(x => SerializeXEntries(x.Id, x.Map())));
+            return new XElement("messages", entries.Select(x =>
+            {
+                List<MsgParser.Entry> parsedEntries;
+
+                try
+                {
+                    parsedEntries = x.Map();
+                }
+                catch (NotImplementedException ex)
+                {
+                    if (ignoreExceptions)
+                        return new XElement("msgerror",
+                            new XAttribute("id", x.Id),
+                            ex.Message);
+                    else
+                        throw ex;
+                }
+
+                return SerializeXEntries(x.Id, parsedEntries, ignoreExceptions); ;
+            }));
         }
 
-        public static XElement SerializeXEntries(int id, IEnumerable<MsgParser.Entry> entries)
+        public static XElement SerializeXEntries(int id, IEnumerable<MsgParser.Entry> entries, bool ignoreExceptions = false)
         {
-            var element = new XElement("message", new XAttribute("id", id));
+            var root = new XElement("message", new XAttribute("id", id));
             foreach (var entry in entries)
             {
-                element.Add(SerializeXEntry(entry));
+                XElement element;
+
+                try
+                {
+                    element = SerializeXEntry(entry);
+                }
+                catch (NotImplementedException ex)
+                {
+                    if (ignoreExceptions)
+                        element = new XElement("error", ex.Message);
+                    else
+                        throw ex;
+                }
+
+                root.Add(element);
             }
-            return element;
+            return root;
         }
 
         public static XElement SerializeXEntry(MsgParser.Entry entry)
