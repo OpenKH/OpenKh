@@ -1,9 +1,9 @@
-﻿using System;
+﻿using kh.common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Xe;
 
 namespace kh.kh2
 {
@@ -13,18 +13,22 @@ namespace kh.kh2
 
 		public enum EntryType
 		{
-			Dummy = 0x00,
-			Msg = 0x02,
-			Ai = 0x03,
-			Tim2 = 0x07,
-			Bar = 0x11,
-			Pax = 0x12,
-			Imgd = 0x18,
-			Seqd = 0x19,
-			Imgz = 0x1d,
-			Seb = 0x1f,
-			Wd = 0x20,
-			Vag = 0x30,
+			Dummy = 0,
+			Msg = 2,
+			Ai = 3,
+			Tim2 = 7,
+            SpawnPoint = 12,
+            SpawnScript = 13,
+			Bar = 17,
+			Pax = 18,
+            AnimationLoader = 22,
+			Imgd = 24,
+			Seqd = 25,
+			Imgz = 29,
+			Seb = 31,
+			Wd = 32,
+            Vibration = 47,
+			Vag = 48,
 		}
 
 		public class Entry
@@ -36,81 +40,62 @@ namespace kh.kh2
 			public string Name { get; set; }
 
 			public Stream Stream { get; set; }
-		}
+        }
 
-		private static List<Entry> Open(Stream stream, Func<string, EntryType, bool> filter, bool loadStream)
-		{
-			if (!stream.CanRead || !stream.CanSeek)
-				throw new InvalidDataException($"Read or seek must be supported.");
+        public static List<Entry> Open(Stream stream, Func<string, EntryType, bool> filter)
+        {
+            if (!stream.CanRead || !stream.CanSeek)
+                throw new InvalidDataException($"Read or seek must be supported.");
 
-			var reader = new BinaryReader(stream);
-			if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
-				throw new InvalidDataException("Invalid header");
+            var reader = new BinaryReader(stream);
+            if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
+                throw new InvalidDataException("Invalid header");
 
-			int filesCount = reader.ReadInt32();
-			reader.ReadInt32();
-			reader.ReadInt32();
+            int filesCount = reader.ReadInt32();
+            reader.ReadInt32(); // padding
+            reader.ReadInt32(); // padding
 
-			var buffer = new byte[4];
-			var tmpEntries = new List<(Entry, int, int)>(filesCount);
+            return Enumerable.Range(0, filesCount)
+                .Select(x => new
+                {
+                    Type = (EntryType)reader.ReadUInt16(),
+                    Index = reader.ReadInt16(),
+                    Name = Encoding.UTF8.GetString(reader.ReadBytes(4)),
+                    Offset = reader.ReadInt32(),
+                    Size = reader.ReadInt32()
+                })
+                .ToList() // Needs to be consumed
+                .Where(x => filter(x.Name, x.Type))
+                .Select(x =>
+                {
+                    reader.BaseStream.Position = x.Offset;
+                    var data = reader.ReadBytes(x.Size);
 
-			for (int i = 0; i < filesCount; i++)
-			{
-				var type = (EntryType)reader.ReadUInt16();
-				var index = reader.ReadInt16();
+                    var fileStream = new MemoryStream();
+                    fileStream.Write(data, 0, data.Length);
+                    fileStream.Position = 0;
 
-				reader.Read(buffer, 0, 4);
-				var name = Encoding.UTF8.GetString(buffer);
+                    var name = x.Name.Split('\0').FirstOrDefault();
 
-				if (filter(name, type))
-				{
-					tmpEntries.Add((new Entry()
-					{
-						Type = type,
-						Index = index,
-						Name = name
-					},
-					reader.ReadInt32(), // offset
-					reader.ReadInt32())); // size
-				}
-			}
+                    return new Entry
+                    {
+                        Type = x.Type,
+                        Index = x.Index,
+                        Name = name,
+                        Stream = fileStream
+                    };
+                })
+                .ToList();
+        }
 
-			var entries = new List<Entry>(filesCount);
-			for (int i = 0; i < filesCount; i++)
-			{
-				var e = tmpEntries[i];
-
-				if (loadStream)
-				{
-					var length = e.Item3;
-					e.Item1.Stream = new MemoryStream(length);
-					reader.BaseStream.Position = e.Item2;
-
-					if (length > 0)
-					{
-						reader.BaseStream.CopyTo(e.Item1.Stream, length: length);
-					}
-				}
-
-				entries.Add(e.Item1);
-			}
-
-			return entries;
-		}
-
-		public static IEnumerable<Entry> Open(Stream stream)
+        public static List<Entry> Open(Stream stream)
 		{
 			return Open(stream, (name, type) => true);
 		}
 
-		public static IEnumerable<Entry> Open(Stream stream, Func<string, EntryType, bool> filter)
-		{
-			return Open(stream, filter, true);
-		}
-
 		public static int Count(Stream stream, Func<string, EntryType, bool> filter)
 		{
-			return Open(stream, filter, false).Count;
+			return Open(stream, filter).Count;
 		}
 
 		public static void Save(Stream stream, IEnumerable<Entry> entries)
@@ -150,5 +135,8 @@ namespace kh.kh2
 				entry.Stream.CopyTo(writer.BaseStream);
 			}
 		}
-	}
+
+        public static bool IsValid(Stream stream) => new BinaryReader(stream).PeekInt32() == MagicCode;
+
+    }
 }
