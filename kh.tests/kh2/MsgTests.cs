@@ -109,5 +109,24 @@ namespace kh.tests.kh2
             Assert.Equal(1, decodedEntry[1].Data[0]);
             Assert.Equal(MsgParser.Command.End, decodedEntry[2].Command);
         }
+
+        [Fact]
+        public void DecodeColorCommandCorrectly()
+        {
+            var decodedEntry = MsgParser.Map(new Msg.Entry()
+            {
+                Data = new byte[]
+                {
+                    0x07, 0x00, 0xFF, 0x00, 0x00, 0x00
+                }
+            });
+
+            Assert.Equal(MsgParser.Command.Color, decodedEntry[0].Command);
+            Assert.Equal(0, decodedEntry[0].Data[0]);
+            Assert.Equal(0xFF, decodedEntry[0].Data[1]);
+            Assert.Equal(0, decodedEntry[0].Data[2]);
+            Assert.Equal(0, decodedEntry[0].Data[3]);
+            Assert.Equal(MsgParser.Command.End, decodedEntry[1].Command);
+        }
     }
 }

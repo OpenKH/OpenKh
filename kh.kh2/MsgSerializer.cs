@@ -16,6 +16,11 @@ namespace kh.kh2
                 [MsgParser.Command.Parameter] = x => new XElement("param", x.Data[0].ToString()),
                 [MsgParser.Command.NewLine] = x => new XElement("newline"),
                 [MsgParser.Command.TextSize] = x => new XElement("size", x.Data[0].ToString()),
+                [MsgParser.Command.Color] = x =>
+                {
+                    var rgba = $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}";
+                    return new XElement("color", rgba);
+                },
             };
 
         private static Dictionary<byte, string> _icons =

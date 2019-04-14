@@ -12,6 +12,7 @@ namespace kh.kh2
             Parameter,
             NewLine,
             TextSize,
+            Color
         }
 
         public class Entry

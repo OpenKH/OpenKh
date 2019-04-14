@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using static kh.kh2.MsgParser;
@@ -51,6 +51,7 @@ namespace kh.kh2
                 [0x00] = x => new GenericCommand(Command.End),
                 [0x01] = x => new Text(' '),
                 [0x02] = x => new GenericCommand(Command.NewLine),
+                [0x07] = x => new Entry { Command = Command.Color, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next() } },
                 [0x09] = x => new SingleData(Command.PrintIcon, x),
                 [0x0b] = x => new SingleData(Command.TextSize, x),
                 [0x22] = x => new SingleData(Command.Parameter, 0),
