@@ -1,24 +1,13 @@
 ﻿using kh.kh2;
+using System.Xml.Linq;
 using Xunit;
 
 namespace kh.tests.kh2
 {
     public class MsgSerializerTests
     {
-        private const System.Xml.Linq.SaveOptions xmlFormatting = System.Xml.Linq.SaveOptions.DisableFormatting;
-
-        [Fact]
-        public void SerializeEntries()
-        {
-            var entry = new MsgParser.Entry
-            {
-                Command = MsgParser.Command.PrintText,
-                Text = "Hello world!"
-            };
-
-            var element = MsgSerializer.SerializeXEntries(1234, new[] { entry });
-            Assert.Equal("<message id=\"1234\"><text>Hello world!</text></message>", element.ToString(xmlFormatting));
-        }
+        private const SaveOptions xmlFormatting = SaveOptions.DisableFormatting;
+        private const int MessageId = 12345;
 
         [Fact]
         public void SerializeSimpleText()
@@ -29,8 +18,12 @@ namespace kh.tests.kh2
                 Text = "Hello world!"
             };
 
-            var element = MsgSerializer.SerializeXEntry(entry);
-            Assert.Equal("<text>Hello world!</text>", element.ToString());
+            var element = MsgSerializer.SerializeXEntries(MessageId, new[] { entry });
+            var content = new XElement("message",
+                new XAttribute("id", MessageId),
+                new XElement("text", "Hello world!")
+            );
+            Assert.Equal(content.ToString(xmlFormatting), element.ToString(xmlFormatting));
         }
 
         [Theory]
@@ -38,7 +31,7 @@ namespace kh.tests.kh2
         [InlineData(1, "tent")]
         [InlineData(2, "key-item")]
         [InlineData(3, "ability")]
-        public void SerializeIcon(byte id, string expected)
+        public void SerializeIcon(byte id, string content)
         {
             var entry = new MsgParser.Entry
             {
@@ -46,8 +39,12 @@ namespace kh.tests.kh2
                 Data = new[] { id }
             };
 
-            var element = MsgSerializer.SerializeXEntry(entry);
-            Assert.Equal($"<icon class=\"{expected}\" />", element.ToString());
+            var actual = MsgSerializer.SerializeXEntries(MessageId, new[] { entry });
+            var expected = new XElement("message",
+                new XAttribute("id", MessageId),
+                new XElement("icon", new XAttribute("class", content))
+            );
+            Assert.Equal(expected.ToString(xmlFormatting), actual.ToString(xmlFormatting));
         }
     }
 }

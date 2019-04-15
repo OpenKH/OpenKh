@@ -7,8 +7,8 @@ namespace kh.kh2
 {
     public class MsgSerializer
     {
-        private static Dictionary<MsgParser.Command, Func<MsgParser.Entry, XElement>> _serializer =
-            new Dictionary<MsgParser.Command, Func<MsgParser.Entry, XElement>>()
+        private static Dictionary<MsgParser.Command, Func<MsgParser.Entry, XNode>> _serializer =
+            new Dictionary<MsgParser.Command, Func<MsgParser.Entry, XNode>>()
             {
                 [MsgParser.Command.End] = x => null,
                 [MsgParser.Command.PrintText] = x => new XElement("text", x.Text),
@@ -106,31 +106,26 @@ namespace kh.kh2
             var root = new XElement("message", new XAttribute("id", id));
             foreach (var entry in entries)
             {
-                XElement element;
+                XNode node;
 
                 try
                 {
-                    element = SerializeXEntry(entry);
+                    if (!_serializer.TryGetValue(entry.Command, out var funcSerializer))
+                        throw new NotImplementedException($"The command {entry.Command} serialization is not implemented yet.");
+
+                    node = funcSerializer?.Invoke(entry);
                 }
                 catch (NotImplementedException ex)
                 {
                     if (ignoreExceptions)
-                        element = new XElement("error", ex.Message);
+                        node = new XElement("error", ex.Message);
                     else
                         throw ex;
                 }
 
-                root.Add(element);
+                root.Add(node);
             }
             return root;
-        }
-
-        public static XElement SerializeXEntry(MsgParser.Entry entry)
-        {
-            if (!_serializer.TryGetValue(entry.Command, out var funcSerializer))
-                throw new NotImplementedException($"The command {entry.Command} serialization is not implemented yet.");
-
-            return funcSerializer?.Invoke(entry);
         }
 
         private static XElement SerializePrintIcon(MsgParser.Entry entry)
