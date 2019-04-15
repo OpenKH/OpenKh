@@ -9,7 +9,7 @@ namespace kh.kh2
             End,
             PrintText,
             NewLine,
-            Unknown03,
+            Reset,
             Unknown04,
             Unknown05,
             Unknown06,

@@ -51,7 +51,7 @@ namespace kh.kh2
                 [0x00] = x => new GenericCommand(Command.End),
                 [0x01] = x => new Text(' '),
                 [0x02] = x => new GenericCommand(Command.NewLine),
-                [0x03] = x => new GenericCommand(Command.Unknown03),
+                [0x03] = x => new GenericCommand(Command.Reset),
                 [0x04] = x => new SingleData(Command.Unknown04, x),
                 [0x05] = x => new Entry { Command = Command.Unknown05, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next(), x.Next(), x.Next() } },
                 [0x06] = x => new SingleData(Command.Unknown06, x),

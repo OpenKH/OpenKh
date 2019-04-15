@@ -13,7 +13,7 @@ namespace kh.kh2
                 [MsgParser.Command.End] = x => null,
                 [MsgParser.Command.PrintText] = x => new XElement("text", x.Text),
                 [MsgParser.Command.NewLine] = x => new XElement("newline"),
-                [MsgParser.Command.Unknown03] = x => new XElement("unk03"),
+                [MsgParser.Command.Reset] = x => new XElement("reset"),
                 [MsgParser.Command.Unknown04] = x => new XElement("unk04", ToStringRawData(x.Data)),
                 [MsgParser.Command.Unknown05] = x => new XElement("unk05", ToStringRawData(x.Data)),
                 [MsgParser.Command.Unknown06] = x => new XElement("unk06", ToStringRawData(x.Data)),
