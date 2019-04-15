@@ -57,14 +57,55 @@ namespace kh.kh2
 
                 switch (r)
                 {
+                    case 0x04:
+                    case 0x06:
+                    case 0x09:
+                    case 0x0a:
+                    case 0x0b:
+                    case 0x0c:
+                    case 0x0e:
+                    case 0x16:
+                    case 0x19:
+                    case 0x1a:
+                    case 0x1b:
+                    case 0x1c:
+                    case 0x1d:
+                    case 0x1e:
+                    case 0x1f:
+                        data.Add(stream.ReadByte());
+                        break;
+                    case 0x12:
+                    case 0x14:
+                    case 0x15:
+                    case 0x18:
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        break;
+                    case 0x08:
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        break;
                     case 0x07:
+                    case 0x13:
                         data.Add(stream.ReadByte());
                         data.Add(stream.ReadByte());
                         data.Add(stream.ReadByte());
                         data.Add(stream.ReadByte());
                         break;
-                    case 0x09:
-                    case 0x0B:
+                    case 0x0f:
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        break;
+                    case 0x05:
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
+                        data.Add(stream.ReadByte());
                         data.Add(stream.ReadByte());
                         break;
                 }

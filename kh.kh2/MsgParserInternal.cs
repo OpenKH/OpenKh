@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using static kh.kh2.MsgParser;
@@ -51,9 +51,36 @@ namespace kh.kh2
                 [0x00] = x => new GenericCommand(Command.End),
                 [0x01] = x => new Text(' '),
                 [0x02] = x => new GenericCommand(Command.NewLine),
+                [0x03] = x => new GenericCommand(Command.Unknown03),
+                [0x04] = x => new SingleData(Command.Unknown04, x),
+                [0x05] = x => new Entry { Command = Command.Unknown05, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next(), x.Next(), x.Next() } },
+                [0x06] = x => new SingleData(Command.Unknown06, x),
                 [0x07] = x => new Entry { Command = Command.Color, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next() } },
+                [0x08] = x => new Entry { Command = Command.Unknown08, Data = new byte[] { x.Next(), x.Next(), x.Next() } },
                 [0x09] = x => new SingleData(Command.PrintIcon, x),
-                [0x0b] = x => new SingleData(Command.TextSize, x),
+                [0x0a] = x => new SingleData(Command.TextScale, x),
+                [0x0b] = x => new SingleData(Command.TextWidth, x),
+                [0x0c] = x => new SingleData(Command.Unknown0c, x),
+                [0x0d] = x => new GenericCommand(Command.Unknown0d),
+                [0x0e] = x => new SingleData(Command.Unknown0e, x),
+                [0x0f] = x => new Entry { Command = Command.Unknown0f, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next(), x.Next() } },
+                [0x10] = null,
+                [0x11] = null,
+                [0x12] = x => new Entry { Command = Command.Unknown12, Data = new byte[] { x.Next(), x.Next() } },
+                [0x13] = x => new Entry { Command = Command.Unknown13, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next() } },
+                [0x14] = x => new Entry { Command = Command.Unknown14, Data = new byte[] { x.Next(), x.Next() } },
+                [0x15] = x => new Entry { Command = Command.Unknown15, Data = new byte[] { x.Next(), x.Next() } },
+                [0x16] = x => new SingleData(Command.Unknown16, x),
+                [0x17] = null,
+                [0x18] = x => new Entry { Command = Command.Unknown18, Data = new byte[] { x.Next(), x.Next() } },
+                [0x19] = x => new SingleData(Command.Unknown19, x),
+                [0x1a] = x => new SingleData(Command.Unknown1a, x),
+                [0x1b] = x => new SingleData(Command.Unknown1b, x),
+                [0x1c] = x => new SingleData(Command.Unknown1c, x),
+                [0x1d] = x => new SingleData(Command.Unknown1d, x),
+                [0x1e] = x => new SingleData(Command.Unknown1e, x),
+                [0x1f] = x => new SingleData(Command.Unknown1f, x),
+                [0x20] = null,
                 [0x21] = x => new SingleData(Command.Number, 0),
                 [0x22] = x => new SingleData(Command.Number, 1),
                 [0x23] = x => new SingleData(Command.Number, 2),
@@ -204,7 +231,7 @@ namespace kh.kh2
             while (!IsEof())
             {
                 byte ch = Next();
-                if (!_table.TryGetValue(ch, out var getter))
+                if (!_table.TryGetValue(ch, out var getter) || getter == null)
                     throw new NotImplementedException($"Command {ch:X02} not implemented yet");
 
                 var entry = getter(this);

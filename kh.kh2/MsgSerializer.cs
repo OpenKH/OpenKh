@@ -15,7 +15,7 @@ namespace kh.kh2
                 [MsgParser.Command.PrintText] = x => new XElement("text", x.Text),
                 [MsgParser.Command.Number] = x => new XElement("number", x.Data[0].ToString()),
                 [MsgParser.Command.NewLine] = x => new XElement("newline"),
-                [MsgParser.Command.TextSize] = x => new XElement("size", x.Data[0].ToString()),
+                [MsgParser.Command.TextWidth] = x => new XElement("size", x.Data[0].ToString()),
                 [MsgParser.Command.Color] = x =>
                 {
                     var rgba = $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}";
