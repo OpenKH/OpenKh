@@ -51,11 +51,30 @@ namespace kh.kh2
             {
                 [0] = "consumable",
                 [1] = "tent",
-                [2] = "material",
-                [3] = "ability-off",
+                [2] = "key-item",
+                [3] = "ability",
                 [4] = "weapon-keyblade",
                 [5] = "weapon-staff",
-                [6] = "weapon-shield"
+                [6] = "weapon-shield",
+                [7] = "armor",
+                [8] = "magic",
+                [9] = "material",
+                [10] = "exclamation-mark",
+                [11] = "question-mark",
+                [12] = "consumable-equipped",
+                [13] = "ability-equipped",
+                [14] = "weapon-keyblade-equipped",
+                [15] = "weapon-staff-equipped",
+                [16] = "weapon-shield-equipped",
+                [17] = "accessory",
+                [30] = "button-r1",
+                [31] = "button-r2",
+                [32] = "button-l1",
+                [33] = "button-l2",
+                [34] = "button-triangle",
+                [35] = "button-cross",
+                [36] = "button-square",
+                [37] = "button-circle",
             };
 
         public static XElement SerializeXEntries(IEnumerable<Msg.Entry> entries, bool ignoreExceptions = false)
@@ -120,7 +139,7 @@ namespace kh.kh2
             if (!_icons.TryGetValue(value, out var content))
                 throw new NotImplementedException($"The icon {value} is not implemented yet.");
 
-            return new XElement("icon", content);
+            return new XElement("icon", new XAttribute("class", content));
         }
 
         private static string ToStringRawData(byte[] data) =>

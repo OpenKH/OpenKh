@@ -36,8 +36,8 @@ namespace kh.tests.kh2
         [Theory]
         [InlineData(0, "consumable")]
         [InlineData(1, "tent")]
-        [InlineData(2, "material")]
-        [InlineData(3, "ability-off")]
+        [InlineData(2, "key-item")]
+        [InlineData(3, "ability")]
         public void SerializeIcon(byte id, string expected)
         {
             var entry = new MsgParser.Entry
@@ -47,7 +47,7 @@ namespace kh.tests.kh2
             };
 
             var element = MsgSerializer.SerializeXEntry(entry);
-            Assert.Equal($"<icon>{expected}</icon>", element.ToString());
+            Assert.Equal($"<icon class=\"{expected}\" />", element.ToString());
         }
     }
 }
