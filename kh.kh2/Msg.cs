@@ -111,8 +111,6 @@ namespace kh.kh2
                 }
             } while (r != Terminator);
 
-            data.Add(0);
-
             return data.ToArray();
         }
 
