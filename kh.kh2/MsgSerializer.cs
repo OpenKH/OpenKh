@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -13,7 +13,7 @@ namespace kh.kh2
                 [MsgParser.Command.End] = x => null,
                 [MsgParser.Command.PrintIcon] = x => SerializePrintIcon(x),
                 [MsgParser.Command.PrintText] = x => new XElement("text", x.Text),
-                [MsgParser.Command.Parameter] = x => new XElement("param", x.Data[0].ToString()),
+                [MsgParser.Command.Number] = x => new XElement("number", x.Data[0].ToString()),
                 [MsgParser.Command.NewLine] = x => new XElement("newline"),
                 [MsgParser.Command.TextSize] = x => new XElement("size", x.Data[0].ToString()),
                 [MsgParser.Command.Color] = x =>
@@ -21,8 +21,6 @@ namespace kh.kh2
                     var rgba = $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}";
                     return new XElement("color", rgba);
                 },
-                [MsgParser.Command.ButtonCircle] = x => new XElement("buttoncircle"),
-                [MsgParser.Command.ButtonCross] = x => new XElement("buttoncross"),
             };
 
         private static Dictionary<byte, string> _icons =

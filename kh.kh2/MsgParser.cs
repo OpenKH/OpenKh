@@ -9,12 +9,10 @@ namespace kh.kh2
             End,
             PrintText,
             PrintIcon,
-            Parameter,
+            Number,
             NewLine,
             TextSize,
             Color,
-            ButtonCross,
-            ButtonCircle,
         }
 
         public class Entry
