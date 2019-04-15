@@ -11,16 +11,39 @@ namespace kh.kh2
             new Dictionary<MsgParser.Command, Func<MsgParser.Entry, XElement>>()
             {
                 [MsgParser.Command.End] = x => null,
-                [MsgParser.Command.PrintIcon] = x => SerializePrintIcon(x),
                 [MsgParser.Command.PrintText] = x => new XElement("text", x.Text),
-                [MsgParser.Command.Number] = x => new XElement("number", x.Data[0].ToString()),
                 [MsgParser.Command.NewLine] = x => new XElement("newline"),
-                [MsgParser.Command.TextWidth] = x => new XElement("size", x.Data[0].ToString()),
+                [MsgParser.Command.Unknown03] = x => new XElement("unk03"),
+                [MsgParser.Command.Unknown04] = x => new XElement("unk04", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown05] = x => new XElement("unk05", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown06] = x => new XElement("unk06", ToStringRawData(x.Data)),
                 [MsgParser.Command.Color] = x =>
                 {
                     var rgba = $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}";
                     return new XElement("color", rgba);
                 },
+                [MsgParser.Command.Unknown08] = x => new XElement("unk08", ToStringRawData(x.Data)),
+                [MsgParser.Command.PrintIcon] = x => SerializePrintIcon(x),
+                [MsgParser.Command.TextScale] = x => new XElement("scale", x.Data[0].ToString()),
+                [MsgParser.Command.TextWidth] = x => new XElement("width", x.Data[0].ToString()),
+                [MsgParser.Command.Unknown0c] = x => new XElement("unk0c", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown0d] = x => new XElement("unk0d"),
+                [MsgParser.Command.Unknown0e] = x => new XElement("unk0e", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown0f] = x => new XElement("unk0f", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown12] = x => new XElement("unk12", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown13] = x => new XElement("unk13", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown14] = x => new XElement("unk14", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown15] = x => new XElement("unk15", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown16] = x => new XElement("unk16", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown18] = x => new XElement("unk18", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown19] = x => new XElement("unk19", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown1a] = x => new XElement("unk1a", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown1b] = x => new XElement("unk1b", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown1c] = x => new XElement("unk1c", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown1d] = x => new XElement("unk1d", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown1e] = x => new XElement("unk1e", ToStringRawData(x.Data)),
+                [MsgParser.Command.Unknown1f] = x => new XElement("unk1f", ToStringRawData(x.Data)),
+                [MsgParser.Command.Number] = x => new XElement("number", x.Data[0].ToString()),
             };
 
         private static Dictionary<byte, string> _icons =
@@ -99,5 +122,8 @@ namespace kh.kh2
 
             return new XElement("icon", content);
         }
+
+        private static string ToStringRawData(byte[] data) =>
+            string.Join(" ", data.Select(x => $"{x:X02}"));
     }
 }
