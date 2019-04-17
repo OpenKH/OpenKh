@@ -1,4 +1,3 @@
-using kh.kh2.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,11 +81,11 @@ namespace kh.kh2.Messages
         {
             return new XElement("messages", entries.Select(x =>
             {
-                List<MessageCommandModel> parsedEntries;
+                List<MessageCommandModel> messageDecoded;
 
                 try
                 {
-                    parsedEntries = x.Map();
+                    messageDecoded = Encoders.InternationalSystem.Decode(x.Data);
                 }
                 catch (NotImplementedException ex)
                 {
@@ -98,7 +97,7 @@ namespace kh.kh2.Messages
                         throw ex;
                 }
 
-                return SerializeXEntries(x.Id, parsedEntries, ignoreExceptions); ;
+                return SerializeXEntries(x.Id, messageDecoded, ignoreExceptions); ;
             }));
         }
 

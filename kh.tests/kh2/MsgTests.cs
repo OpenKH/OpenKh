@@ -98,12 +98,9 @@ namespace kh.tests.kh2
         [Fact]
         public void DecodeTextCorrectly()
         {
-            var decodedEntry = MsgParser.Map(new Msg.Entry()
+            var decodedEntry = Encoders.InternationalSystem.Decode(new byte[]
             {
-                Data = new byte[]
-                {
-                    0x35, 0x9E, 0xA5, 0xA5, 0xA8, 0x01, 0xB0, 0xA8, 0xAB, 0xA5, 0x9D, 0x48, 0x00
-                }
+                0x35, 0x9E, 0xA5, 0xA5, 0xA8, 0x01, 0xB0, 0xA8, 0xAB, 0xA5, 0x9D, 0x48, 0x00
             });
 
             Assert.Equal(MessageCommand.PrintText, decodedEntry[0].Command);
@@ -114,12 +111,9 @@ namespace kh.tests.kh2
         [Fact]
         public void DecodeIconCorrectly()
         {
-            var decodedEntry = MsgParser.Map(new Msg.Entry()
+            var decodedEntry = Encoders.InternationalSystem.Decode(new byte[]
             {
-                Data = new byte[]
-                {
-                    0x09, 0x00, 0x09, 0x01, 0x00
-                }
+                0x09, 0x00, 0x09, 0x01, 0x00
             });
 
             Assert.Equal(MessageCommand.PrintIcon, decodedEntry[0].Command);
@@ -132,12 +126,9 @@ namespace kh.tests.kh2
         [Fact]
         public void DecodeColorCommandCorrectly()
         {
-            var decodedEntry = MsgParser.Map(new Msg.Entry()
+            var decodedEntry = Encoders.InternationalSystem.Decode(new byte[]
             {
-                Data = new byte[]
-                {
-                    0x07, 0x00, 0xFF, 0x00, 0x00, 0x00
-                }
+                0x07, 0x00, 0xFF, 0x00, 0x00, 0x00
             });
 
             Assert.Equal(MessageCommand.Color, decodedEntry[0].Command);
@@ -181,12 +172,9 @@ namespace kh.tests.kh2
         [InlineData(0x1f, "123456789")]
         public void DecodeTheRightAmountOfCharacters(byte commandId, string expectedText)
         {
-            var decodedEntry = MsgParser.Map(new Msg.Entry()
+            var decodedEntry = Encoders.InternationalSystem.Decode(new byte[]
             {
-                Data = new byte[]
-                {
-                    commandId, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99
-                }
+                commandId, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99
             });
 
             Assert.Equal(expectedText, decodedEntry[1].Text);
