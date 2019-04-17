@@ -34,6 +34,6 @@
         Unknown1d,
         Unknown1e,
         Unknown1f,
-        Number,
+        Unsupported,
     }
 }
