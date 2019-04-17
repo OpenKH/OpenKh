@@ -1,4 +1,5 @@
 ﻿using kh.kh2;
+using kh.kh2.Messages;
 using System.Xml.Linq;
 using Xunit;
 
@@ -12,9 +13,9 @@ namespace kh.tests.kh2
         [Fact]
         public void SerializeSimpleText()
         {
-            var entry = new MsgParser.Entry
+            var entry = new MessageCommandModel
             {
-                Command = MsgParser.Command.PrintText,
+                Command = MessageCommand.PrintText,
                 Text = "Hello world!"
             };
 
@@ -33,9 +34,9 @@ namespace kh.tests.kh2
         [InlineData(3, "ability")]
         public void SerializeIcon(byte id, string content)
         {
-            var entry = new MsgParser.Entry
+            var entry = new MessageCommandModel
             {
-                Command = MsgParser.Command.PrintIcon,
+                Command = MessageCommand.PrintIcon,
                 Data = new[] { id }
             };
 

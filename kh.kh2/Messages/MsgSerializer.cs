@@ -1,49 +1,50 @@
+using kh.kh2.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace kh.kh2
+namespace kh.kh2.Messages
 {
     public class MsgSerializer
     {
-        private static Dictionary<MsgParser.Command, Func<MsgParser.Entry, XNode>> _serializer =
-            new Dictionary<MsgParser.Command, Func<MsgParser.Entry, XNode>>()
+        private static Dictionary<MessageCommand, Func<MessageCommandModel, XNode>> _serializer =
+            new Dictionary<MessageCommand, Func<MessageCommandModel, XNode>>()
             {
-                [MsgParser.Command.End] = x => null,
-                [MsgParser.Command.PrintText] = x => new XElement("text", x.Text),
-                [MsgParser.Command.NewLine] = x => new XElement("newline"),
-                [MsgParser.Command.Reset] = x => new XElement("reset"),
-                [MsgParser.Command.Unknown04] = x => new XElement("unk04", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown05] = x => new XElement("unk05", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown06] = x => new XElement("unk06", ToStringRawData(x.Data)),
-                [MsgParser.Command.Color] = x =>
+                [MessageCommand.End] = x => null,
+                [MessageCommand.PrintText] = x => new XElement("text", x.Text),
+                [MessageCommand.NewLine] = x => new XElement("newline"),
+                [MessageCommand.Reset] = x => new XElement("reset"),
+                [MessageCommand.Unknown04] = x => new XElement("unk04", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown05] = x => new XElement("unk05", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown06] = x => new XElement("unk06", ToStringRawData(x.Data)),
+                [MessageCommand.Color] = x =>
                 {
                     var rgba = $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}";
                     return new XElement("color", rgba);
                 },
-                [MsgParser.Command.Unknown08] = x => new XElement("unk08", ToStringRawData(x.Data)),
-                [MsgParser.Command.PrintIcon] = x => SerializePrintIcon(x),
-                [MsgParser.Command.TextScale] = x => new XElement("scale", x.Data[0].ToString()),
-                [MsgParser.Command.TextWidth] = x => new XElement("width", x.Data[0].ToString()),
-                [MsgParser.Command.Unknown0c] = x => new XElement("unk0c", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown0d] = x => new XElement("unk0d"),
-                [MsgParser.Command.Unknown0e] = x => new XElement("unk0e", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown0f] = x => new XElement("unk0f", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown12] = x => new XElement("unk12", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown13] = x => new XElement("unk13", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown14] = x => new XElement("unk14", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown15] = x => new XElement("unk15", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown16] = x => new XElement("unk16", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown18] = x => new XElement("unk18", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown19] = x => new XElement("unk19", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown1a] = x => new XElement("unk1a", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown1b] = x => new XElement("unk1b", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown1c] = x => new XElement("unk1c", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown1d] = x => new XElement("unk1d", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown1e] = x => new XElement("unk1e", ToStringRawData(x.Data)),
-                [MsgParser.Command.Unknown1f] = x => new XElement("unk1f", ToStringRawData(x.Data)),
-                [MsgParser.Command.Number] = x => new XElement("number", x.Data[0].ToString()),
+                [MessageCommand.Unknown08] = x => new XElement("unk08", ToStringRawData(x.Data)),
+                [MessageCommand.PrintIcon] = x => SerializePrintIcon(x),
+                [MessageCommand.TextScale] = x => new XElement("scale", x.Data[0].ToString()),
+                [MessageCommand.TextWidth] = x => new XElement("width", x.Data[0].ToString()),
+                [MessageCommand.Unknown0c] = x => new XElement("unk0c", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown0d] = x => new XElement("unk0d"),
+                [MessageCommand.Unknown0e] = x => new XElement("unk0e", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown0f] = x => new XElement("unk0f", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown12] = x => new XElement("unk12", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown13] = x => new XElement("unk13", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown14] = x => new XElement("unk14", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown15] = x => new XElement("unk15", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown16] = x => new XElement("unk16", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown18] = x => new XElement("unk18", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown19] = x => new XElement("unk19", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown1a] = x => new XElement("unk1a", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown1b] = x => new XElement("unk1b", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown1c] = x => new XElement("unk1c", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown1d] = x => new XElement("unk1d", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown1e] = x => new XElement("unk1e", ToStringRawData(x.Data)),
+                [MessageCommand.Unknown1f] = x => new XElement("unk1f", ToStringRawData(x.Data)),
+                [MessageCommand.Number] = x => new XElement("number", x.Data[0].ToString()),
             };
 
         private static Dictionary<byte, string> _icons =
@@ -81,7 +82,7 @@ namespace kh.kh2
         {
             return new XElement("messages", entries.Select(x =>
             {
-                List<MsgParser.Entry> parsedEntries;
+                List<MessageCommandModel> parsedEntries;
 
                 try
                 {
@@ -101,7 +102,7 @@ namespace kh.kh2
             }));
         }
 
-        public static XElement SerializeXEntries(int id, IEnumerable<MsgParser.Entry> entries, bool ignoreExceptions = false)
+        public static XElement SerializeXEntries(int id, IEnumerable<MessageCommandModel> entries, bool ignoreExceptions = false)
         {
             var root = new XElement("message", new XAttribute("id", id));
             foreach (var entry in entries)
@@ -128,7 +129,7 @@ namespace kh.kh2
             return root;
         }
 
-        private static XElement SerializePrintIcon(MsgParser.Entry entry)
+        private static XElement SerializePrintIcon(MessageCommandModel entry)
         {
             byte value = entry.Data[0];
             if (!_icons.TryGetValue(value, out var content))

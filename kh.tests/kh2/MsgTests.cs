@@ -1,4 +1,5 @@
 using kh.kh2;
+using kh.kh2.Messages;
 using System.IO;
 using Xunit;
 
@@ -105,9 +106,9 @@ namespace kh.tests.kh2
                 }
             });
 
-            Assert.Equal(MsgParser.Command.PrintText, decodedEntry[0].Command);
+            Assert.Equal(MessageCommand.PrintText, decodedEntry[0].Command);
             Assert.Equal("Hello world!", decodedEntry[0].Text);
-            Assert.Equal(MsgParser.Command.End, decodedEntry[1].Command);
+            Assert.Equal(MessageCommand.End, decodedEntry[1].Command);
         }
 
         [Fact]
@@ -121,11 +122,11 @@ namespace kh.tests.kh2
                 }
             });
 
-            Assert.Equal(MsgParser.Command.PrintIcon, decodedEntry[0].Command);
+            Assert.Equal(MessageCommand.PrintIcon, decodedEntry[0].Command);
             Assert.Equal(0, decodedEntry[0].Data[0]);
-            Assert.Equal(MsgParser.Command.PrintIcon, decodedEntry[1].Command);
+            Assert.Equal(MessageCommand.PrintIcon, decodedEntry[1].Command);
             Assert.Equal(1, decodedEntry[1].Data[0]);
-            Assert.Equal(MsgParser.Command.End, decodedEntry[2].Command);
+            Assert.Equal(MessageCommand.End, decodedEntry[2].Command);
         }
 
         [Fact]
@@ -139,12 +140,12 @@ namespace kh.tests.kh2
                 }
             });
 
-            Assert.Equal(MsgParser.Command.Color, decodedEntry[0].Command);
+            Assert.Equal(MessageCommand.Color, decodedEntry[0].Command);
             Assert.Equal(0, decodedEntry[0].Data[0]);
             Assert.Equal(0xFF, decodedEntry[0].Data[1]);
             Assert.Equal(0, decodedEntry[0].Data[2]);
             Assert.Equal(0, decodedEntry[0].Data[3]);
-            Assert.Equal(MsgParser.Command.End, decodedEntry[1].Command);
+            Assert.Equal(MessageCommand.End, decodedEntry[1].Command);
         }
 
         [Theory]

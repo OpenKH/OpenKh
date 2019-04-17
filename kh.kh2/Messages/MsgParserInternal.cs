@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using static kh.kh2.MsgParser;
+using static kh.kh2.Messages.MsgParser;
 
-namespace kh.kh2
+namespace kh.kh2.Messages
 {
     internal class MsgParserInternal
     {
-        public class Text : Entry
+        internal class Text : MessageCommandModel
         {
             public Text(byte chData) :
                 this((char)chData)
@@ -19,78 +20,89 @@ namespace kh.kh2
 
             public Text(string str)
             {
-                Command = Command.PrintText;
+                Command = MessageCommand.PrintText;
                 Text = $"{str}";
             }
         }
 
-        public class GenericCommand : Entry
+        internal class GenericCommand : MessageCommandModel
         {
-            public GenericCommand(Command command)
+            public GenericCommand(MessageCommand command)
             {
                 Command = command;
             }
         }
 
-        public class SingleData : Entry
+        internal class SingleData : MessageCommandModel
         {
-            public SingleData(Command command, MsgParserInternal msgParser) :
+            public SingleData(MessageCommand command, MsgParserInternal msgParser) :
                 this(command, msgParser.Next())
             { }
 
-            public SingleData(Command command, byte data)
+            public SingleData(MessageCommand command, byte data)
             {
                 Command = command;
                 Data = new byte[] { data };
             }
         }
 
-        private readonly Dictionary<byte, Func<MsgParserInternal, Entry>> _table
-            = new Dictionary<byte, Func<MsgParserInternal, Entry>>
+        internal class MultipleData : MessageCommandModel
+        {
+            public MultipleData(MessageCommand command, MsgParserInternal msgParser, int count)
             {
-                [0x00] = x => new GenericCommand(Command.End),
+                Command = command;
+                Data = Enumerable.Range(0, count)
+                    .Select(x => msgParser.Next())
+                    .ToArray();
+            }
+        }
+
+        private readonly Dictionary<byte, Func<MsgParserInternal, MessageCommandModel>> _table
+            = new Dictionary<byte, Func<MsgParserInternal, MessageCommandModel>>
+            {
+                [0x00] = x => new GenericCommand(MessageCommand.End),
                 [0x01] = x => new Text(' '),
-                [0x02] = x => new GenericCommand(Command.NewLine),
-                [0x03] = x => new GenericCommand(Command.Reset),
-                [0x04] = x => new SingleData(Command.Unknown04, x),
-                [0x05] = x => new Entry { Command = Command.Unknown05, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next(), x.Next(), x.Next() } },
-                [0x06] = x => new SingleData(Command.Unknown06, x),
-                [0x07] = x => new Entry { Command = Command.Color, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next() } },
-                [0x08] = x => new Entry { Command = Command.Unknown08, Data = new byte[] { x.Next(), x.Next(), x.Next() } },
-                [0x09] = x => new SingleData(Command.PrintIcon, x),
-                [0x0a] = x => new SingleData(Command.TextScale, x),
-                [0x0b] = x => new SingleData(Command.TextWidth, x),
-                [0x0c] = x => new SingleData(Command.Unknown0c, x),
-                [0x0d] = x => new GenericCommand(Command.Unknown0d),
-                [0x0e] = x => new SingleData(Command.Unknown0e, x),
-                [0x0f] = x => new Entry { Command = Command.Unknown0f, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next(), x.Next() } },
+                [0x02] = x => new GenericCommand(MessageCommand.NewLine),
+                [0x03] = x => new GenericCommand(MessageCommand.Reset),
+                [0x04] = x => new SingleData(MessageCommand.Unknown04, x),
+                [0x05] = x => new MultipleData(MessageCommand.Unknown05, x, 6),
+                [0x06] = x => new SingleData(MessageCommand.Unknown06, x),
+                [0x07] = x => new MultipleData(MessageCommand.Color, x, 4),
+                [0x08] = x => new MultipleData(MessageCommand.Unknown08, x, 3),
+                [0x09] = x => new SingleData(MessageCommand.PrintIcon, x),
+                [0x0a] = x => new SingleData(MessageCommand.TextScale, x),
+                [0x0b] = x => new SingleData(MessageCommand.TextWidth, x),
+                [0x0c] = x => new SingleData(MessageCommand.Unknown0c, x),
+                [0x0d] = x => new GenericCommand(MessageCommand.Unknown0d),
+                [0x0e] = x => new SingleData(MessageCommand.Unknown0e, x),
+                [0x0f] = x => new MultipleData(MessageCommand.Unknown0f, x, 5),
                 [0x10] = null,
                 [0x11] = null,
-                [0x12] = x => new Entry { Command = Command.Unknown12, Data = new byte[] { x.Next(), x.Next() } },
-                [0x13] = x => new Entry { Command = Command.Unknown13, Data = new byte[] { x.Next(), x.Next(), x.Next(), x.Next() } },
-                [0x14] = x => new Entry { Command = Command.Unknown14, Data = new byte[] { x.Next(), x.Next() } },
-                [0x15] = x => new Entry { Command = Command.Unknown15, Data = new byte[] { x.Next(), x.Next() } },
-                [0x16] = x => new SingleData(Command.Unknown16, x),
+                [0x12] = x => new MultipleData(MessageCommand.Unknown12, x, 2),
+                [0x13] = x => new MultipleData(MessageCommand.Unknown13, x, 4),
+                [0x14] = x => new MultipleData(MessageCommand.Unknown14, x, 2),
+                [0x15] = x => new MultipleData(MessageCommand.Unknown15, x, 2),
+                [0x16] = x => new SingleData(MessageCommand.Unknown16, x),
                 [0x17] = null,
-                [0x18] = x => new Entry { Command = Command.Unknown18, Data = new byte[] { x.Next(), x.Next() } },
-                [0x19] = x => new SingleData(Command.Unknown19, x),
-                [0x1a] = x => new SingleData(Command.Unknown1a, x),
-                [0x1b] = x => new SingleData(Command.Unknown1b, x),
-                [0x1c] = x => new SingleData(Command.Unknown1c, x),
-                [0x1d] = x => new SingleData(Command.Unknown1d, x),
-                [0x1e] = x => new SingleData(Command.Unknown1e, x),
-                [0x1f] = x => new SingleData(Command.Unknown1f, x),
+                [0x18] = x => new MultipleData(MessageCommand.Unknown18, x, 2),
+                [0x19] = x => new SingleData(MessageCommand.Unknown19, x),
+                [0x1a] = x => new SingleData(MessageCommand.Unknown1a, x),
+                [0x1b] = x => new SingleData(MessageCommand.Unknown1b, x),
+                [0x1c] = x => new SingleData(MessageCommand.Unknown1c, x),
+                [0x1d] = x => new SingleData(MessageCommand.Unknown1d, x),
+                [0x1e] = x => new SingleData(MessageCommand.Unknown1e, x),
+                [0x1f] = x => new SingleData(MessageCommand.Unknown1f, x),
                 [0x20] = null,
-                [0x21] = x => new SingleData(Command.Number, 0),
-                [0x22] = x => new SingleData(Command.Number, 1),
-                [0x23] = x => new SingleData(Command.Number, 2),
-                [0x24] = x => new SingleData(Command.Number, 3),
-                [0x25] = x => new SingleData(Command.Number, 4),
-                [0x26] = x => new SingleData(Command.Number, 5),
-                [0x27] = x => new SingleData(Command.Number, 6),
-                [0x28] = x => new SingleData(Command.Number, 7),
-                [0x29] = x => new SingleData(Command.Number, 8),
-                [0x2a] = x => new SingleData(Command.Number, 9),
+                [0x21] = x => new SingleData(MessageCommand.Number, 0),
+                [0x22] = x => new SingleData(MessageCommand.Number, 1),
+                [0x23] = x => new SingleData(MessageCommand.Number, 2),
+                [0x24] = x => new SingleData(MessageCommand.Number, 3),
+                [0x25] = x => new SingleData(MessageCommand.Number, 4),
+                [0x26] = x => new SingleData(MessageCommand.Number, 5),
+                [0x27] = x => new SingleData(MessageCommand.Number, 6),
+                [0x28] = x => new SingleData(MessageCommand.Number, 7),
+                [0x29] = x => new SingleData(MessageCommand.Number, 8),
+                [0x2a] = x => new SingleData(MessageCommand.Number, 9),
                 [0x2b] = x => new Text('+'),
                 [0x2c] = x => new Text('−'),
                 [0x2d] = x => new Text('ₓ'),
@@ -216,17 +228,17 @@ namespace kh.kh2
             };
 
         private StringBuilder _stringBuilder;
-        private List<Entry> _entries;
+        private List<MessageCommandModel> _entries;
         private byte[] _data;
         private int _index;
 
         internal MsgParserInternal(byte[] data)
         {
-            _entries = new List<Entry>();
+            _entries = new List<MessageCommandModel>();
             _data = data;
         }
 
-        internal List<Entry> Parse()
+        internal List<MessageCommandModel> Parse()
         {
             while (!IsEof())
             {
@@ -235,7 +247,7 @@ namespace kh.kh2
                     throw new NotImplementedException($"Command {ch:X02} not implemented yet");
 
                 var entry = getter(this);
-                if (entry.Command == Command.PrintText)
+                if (entry.Command == MessageCommand.PrintText)
                     AppendChar(entry.Text[0]);
                 else
                     AppendEntry(entry);
@@ -261,16 +273,16 @@ namespace kh.kh2
         {
             if (_stringBuilder != null)
             {
-                _entries.Add(new Entry
+                _entries.Add(new MessageCommandModel
                 {
-                    Command = Command.PrintText,
+                    Command = MessageCommand.PrintText,
                     Text = _stringBuilder.ToString()
                 });
                 _stringBuilder = null;
             }
         }
 
-        private void AppendEntry(Entry entry)
+        private void AppendEntry(MessageCommandModel entry)
         {
             FlushTextBuilder();
             _entries.Add(entry);
