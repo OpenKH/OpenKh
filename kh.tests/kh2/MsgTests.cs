@@ -77,6 +77,24 @@ namespace kh.tests.kh2
             });
 
         [Fact]
+        public void WriteAndReadCorrecty() =>
+            FileOpenRead(FilePath, stream =>
+            {
+                var expected = new BinaryReader(stream).ReadBytes((int)stream.Length);
+                var entries = Msg.Open(new MemoryStream(expected));
+                byte[] actual;
+
+                using (var outStream = new MemoryStream())
+                {
+                    Msg.Write(outStream, entries);
+                    outStream.Position = 0;
+                    actual = new BinaryReader(outStream).ReadBytes((int)outStream.Length);
+                }
+
+                Assert.Equal(expected, actual);
+            });
+
+        [Fact]
         public void DecodeTextCorrectly()
         {
             var decodedEntry = MsgParser.Map(new Msg.Entry()

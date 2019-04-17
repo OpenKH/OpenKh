@@ -46,6 +46,28 @@ namespace kh.kh2
                 .ToList();
         }
 
+        public static void Write(Stream stream, List<Entry> entries)
+        {
+            if (!stream.CanWrite || !stream.CanSeek)
+                throw new InvalidDataException($"Write or seek must be supported.");
+
+            var writer = new BinaryWriter(stream);
+            writer.Write(MagicCode);
+            writer.Write(entries.Count);
+
+            var offset = 8 + entries.Count * 8;
+            foreach (var entry in entries)
+            {
+                writer.Write(entry.Id);
+                writer.Write(offset);
+                offset += entry.Data.Length;
+            }
+            foreach (var entry in entries)
+            {
+                writer.Write(entry.Data);
+            }
+        }
+
         private static byte[] GetMsgData(BinaryReader stream)
         {
             byte r;
