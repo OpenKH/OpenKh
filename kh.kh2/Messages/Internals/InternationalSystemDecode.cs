@@ -110,10 +110,10 @@ namespace kh.kh2.Messages.Internals
             [0x65] = new TextCmdModel('>'),
             [0x66] = new UnsupportedCmdModel(), // was -
             [0x67] = new UnsupportedCmdModel(), // was –
-            [0x68] = new UnsupportedCmdModel(),
+            [0x68] = new TextCmdModel('⤷'), // Used only in EVT
             [0x69] = new TextCmdModel('♩'),
-            [0x6a] = new UnsupportedCmdModel(), // Unused
-            [0x6b] = new UnsupportedCmdModel(), // Unused
+            [0x6a] = new TextCmdModel('⇾'), // Used only in EVT
+            [0x6b] = new TextCmdModel('⇽'), // Used only in EVT
             [0x6c] = new TextCmdModel('◯'),
             [0x6d] = new TextCmdModel('✕'),
             [0x6e] = new UnsupportedCmdModel(), // Unused
