@@ -43,7 +43,6 @@ namespace kh.kh2.Messages
                 [MessageCommand.Unknown1d] = x => new XElement("unk1d", ToStringRawData(x.Data)),
                 [MessageCommand.Unknown1e] = x => new XElement("unk1e", ToStringRawData(x.Data)),
                 [MessageCommand.Unknown1f] = x => new XElement("unk1f", ToStringRawData(x.Data)),
-                [MessageCommand.Number] = x => new XElement("number", x.Data[0].ToString()),
             };
 
         private static Dictionary<byte, string> _icons =
