@@ -1,6 +1,6 @@
 ﻿namespace kh.kh2.Messages.Internals
 {
-    internal class TextCmdModel : MessageCommandModel
+    internal class TextCmdModel : BaseCmdModel
     {
         public TextCmdModel(byte chData) :
             this((char)chData)

@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace kh.kh2.Messages.Internals
 {
     internal partial class BaseMessageDecoder
     {
-        private readonly Dictionary<byte, Func<BaseMessageDecoder, MessageCommandModel>> _table;
+        private readonly Dictionary<byte, BaseCmdModel> _table;
         private readonly List<MessageCommandModel> _entries;
         private StringBuilder _stringBuilder;
         private byte[] _data;
         private int _index;
 
         internal BaseMessageDecoder(
-            Dictionary<byte, Func<BaseMessageDecoder, MessageCommandModel>> table,
+            Dictionary<byte, BaseCmdModel> table,
             byte[] data)
         {
             _table = table;
@@ -26,14 +27,13 @@ namespace kh.kh2.Messages.Internals
             while (!IsEof())
             {
                 byte ch = Next();
-                if (!_table.TryGetValue(ch, out var getter) || getter == null)
+                if (!_table.TryGetValue(ch, out var cmdModel) || cmdModel == null)
                     throw new NotImplementedException($"Command {ch:X02} not implemented yet");
 
-                var entry = getter(this);
-                if (entry.Command == MessageCommand.PrintText)
-                    AppendChar(entry.Text[0]);
+                if (cmdModel.Command == MessageCommand.PrintText)
+                    AppendChar(cmdModel.Text[0]);
                 else
-                    AppendEntry(entry);
+                    AppendEntry(cmdModel);
             }
 
             FlushTextBuilder();
@@ -65,12 +65,21 @@ namespace kh.kh2.Messages.Internals
             }
         }
 
-        private void AppendEntry(MessageCommandModel entry)
+        private void AppendEntry(BaseCmdModel cmdModel)
         {
             FlushTextBuilder();
-            _entries.Add(entry);
+            _entries.Add(new MessageCommandModel
+            {
+                Command = cmdModel.Command,
+                Data = ReadBytes(cmdModel.Length)
+            });
         }
 
         private void AppendChar(char ch) => RequestTextBuilder().Append(ch);
+
+        private byte[] ReadBytes(int length) =>
+            Enumerable.Range(0, length)
+            .Select(x => Next())
+            .ToArray();
     }
 }

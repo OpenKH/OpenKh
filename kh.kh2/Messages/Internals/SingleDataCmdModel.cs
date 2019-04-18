@@ -1,15 +1,9 @@
 ﻿namespace kh.kh2.Messages.Internals
 {
-    internal class SingleDataCmdModel : MessageCommandModel
+    internal class SingleDataCmdModel : DataCmdModel
     {
-        public SingleDataCmdModel(MessageCommand command, BaseMessageDecoder msgParser) :
-            this(command, msgParser.Next())
+        public SingleDataCmdModel(MessageCommand command) :
+            base(command, 1)
         { }
-
-        public SingleDataCmdModel(MessageCommand command, byte data)
-        {
-            Command = command;
-            Data = new byte[] { data };
-        }
     }
 }

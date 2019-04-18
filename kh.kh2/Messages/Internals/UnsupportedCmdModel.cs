@@ -2,10 +2,8 @@
 {
     internal class UnsupportedCmdModel : SingleDataCmdModel
     {
-        public UnsupportedCmdModel(byte chData) :
-            base(MessageCommand.Unsupported, chData)
-        {
-
-        }
+        public UnsupportedCmdModel() :
+            base(MessageCommand.Unsupported)
+        { }
     }
 }
