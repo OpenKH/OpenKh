@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kh.tools.bar", "kh.tools.ba
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xe", "XeEngine.Tools.Public\Xe\Xe.csproj", "{E3882222-BB73-4FBE-9185-BB5C76E56912}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xe.Tools.Wpf", "XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj", "{F6E4E1DF-ACC6-4DDE-912F-C6465CB3D393}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xe.Tools.Wpf", "XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj", "{F6E4E1DF-ACC6-4DDE-912F-C6465CB3D393}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xe.Tools", "XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj", "{C02F5C8B-16A0-4591-A65D-8A7E845D5F59}"
 EndProject
@@ -48,6 +48,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Graphical tools", "Graphical tools", "{402B2669-D594-4DFA-965B-02A92626ADC6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd party libraries", "3rd party libraries", "{4FBC958A-4685-4DF2-8D4F-98850BAE61B3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xe.Drawing", "XeEngine.Tools.Public\Xe.Drawing\Xe.Drawing.csproj", "{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -301,6 +303,22 @@ Global
 		{78C8F66C-3CCC-4EE3-8D97-9272D1D02FA7}.Release|x64.Build.0 = Release|Any CPU
 		{78C8F66C-3CCC-4EE3-8D97-9272D1D02FA7}.Release|x86.ActiveCfg = Release|Any CPU
 		{78C8F66C-3CCC-4EE3-8D97-9272D1D02FA7}.Release|x86.Build.0 = Release|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Debug|ARM.Build.0 = Debug|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Debug|x64.Build.0 = Debug|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Debug|x86.Build.0 = Debug|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Release|ARM.ActiveCfg = Release|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Release|ARM.Build.0 = Release|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Release|x64.ActiveCfg = Release|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Release|x64.Build.0 = Release|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Release|x86.ActiveCfg = Release|Any CPU
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -321,6 +339,7 @@ Global
 		{11D9F155-69EA-4486-908B-51CB799E4E01} = {9C52D787-9819-4B89-989B-EEA6FEB20731}
 		{ECE73C11-C9A0-4132-9FF3-DD52126846E5} = {0FB7CD6A-EE31-467D-A590-267DCD028618}
 		{78C8F66C-3CCC-4EE3-8D97-9272D1D02FA7} = {9C52D787-9819-4B89-989B-EEA6FEB20731}
+		{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31} = {4FBC958A-4685-4DF2-8D4F-98850BAE61B3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}
