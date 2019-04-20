@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\kh.Imaging\kh.Imaging.csproj" />
+    <ProjectReference Include="..\kh.kh2\kh.kh2.csproj" />
+  </ItemGroup>
+
+</Project>
