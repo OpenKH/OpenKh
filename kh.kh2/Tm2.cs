@@ -1,4 +1,5 @@
-﻿using System;
+﻿using kh.Imaging;
+using System;
 using System.IO;
 
 namespace kh.kh2
@@ -184,16 +185,16 @@ namespace kh.kh2
 			public int gsreg;
 			public int gspal;
 
-			public ImageFormat ImageFormat
+			public PixelFormat ImageFormat
 			{
 				get
 				{
 					switch (imgFormat)
 					{
-						case 2: return ImageFormat.Rgb888;
-						case 3: return ImageFormat.Rgba8888;
-						case 4: return ImageFormat.Indexed4;
-						case 5: return ImageFormat.Indexed8;
+						case 2: return PixelFormat.Rgb888;
+						case 3: return PixelFormat.Rgba8888;
+						case 4: return PixelFormat.Indexed4;
+						case 5: return PixelFormat.Indexed8;
 						default:
 							throw new ArgumentOutOfRangeException($"imgFormat {imgFormat} invalid or not supported.");
 					}
@@ -216,16 +217,16 @@ namespace kh.kh2
 				}
 			}
 
-			public ImageFormat PaletteFormat
+			public PixelFormat PaletteFormat
 			{
 				get
 				{
 					switch (palFormat)
 					{
-						case 0: return ImageFormat.Undefined;
-						case 1: return ImageFormat.Rgba1555;
-						case 2: return ImageFormat.Rgbx8888;
-						case 3: return ImageFormat.Rgba8888;
+						case 0: return PixelFormat.Undefined;
+						case 1: return PixelFormat.Rgba1555;
+						case 2: return PixelFormat.Rgbx8888;
+						case 3: return PixelFormat.Rgba8888;
 						default:
 							throw new ArgumentOutOfRangeException(nameof(palFormat), $"{palFormat} invalid or not supported.");
 					}
@@ -294,11 +295,11 @@ namespace kh.kh2
 			palData = reader.ReadBytes(pic.palSize);
 		}
 
-		private void InvertRedBlueChannels(byte[] data, ImageFormat format)
+		private void InvertRedBlueChannels(byte[] data, PixelFormat format)
 		{
 			switch (format)
 			{
-				case ImageFormat.Rgb888:
+				case PixelFormat.Rgb888:
 					for (int i = 0; i < pic.width * pic.height; i++)
 					{
 						byte tmp = data[i * 3 + 0];
@@ -306,7 +307,7 @@ namespace kh.kh2
 						data[i * 3 + 2] = tmp;
 					}
 					break;
-				case ImageFormat.Rgba8888:
+				case PixelFormat.Rgba8888:
 					for (int i = 0; i < pic.width * pic.height; i++)
 					{
 						byte tmp = data[i * 4 + 0];
@@ -314,7 +315,7 @@ namespace kh.kh2
 						data[i * 4 + 2] = tmp;
 					}
 					break;
-				case ImageFormat.Indexed4:
+				case PixelFormat.Indexed4:
 					for (int i = 0; i < pic.width * pic.height / 2; i++)
 					{
 						data[i] = (byte)(((data[i] & 0x0F) << 4) | (data[i] >> 4));

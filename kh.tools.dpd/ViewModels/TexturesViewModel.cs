@@ -13,7 +13,8 @@ namespace kh.tools.dpd.ViewModels
 		{ }
 
 		public TexturesViewModel(IEnumerable<Dpd.Texture> textures) :
-			base(textures.Select(x => new TextureModel(x)))
+			//base(textures.Select(x => new TextureModel(x)))
+            base(null)
 		{
 
 		}

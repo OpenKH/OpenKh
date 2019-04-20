@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\kh.common\kh.common.csproj" />
+    <ProjectReference Include="..\kh.Imaging\kh.Imaging.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe\Xe.csproj" />
   </ItemGroup>
 

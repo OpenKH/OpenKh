@@ -1,4 +1,5 @@
-﻿using kh.kh2;
+﻿using kh.Imaging;
+using kh.kh2;
 using System;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace kh.tools.imgd.ViewModels
 		{
 			OpenCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, ("IMGD texture", "imgd"));
+				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, ("IMGD texture", "imd"));
 				if (fd.ShowDialog() == true)
 				{
 					using (var stream = File.OpenRead(fd.FileName))
@@ -123,11 +124,6 @@ namespace kh.tools.imgd.ViewModels
 			OpenCommand = new RelayCommand(x => { }, x => false);
 		}
 
-		public ImageViewModel(byte[] data, int width, int height)
-		{
-			LoadImage(data, width, height);
-		}
-
 		private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
 
 		public BitmapSource Image { get; set; }
@@ -152,12 +148,14 @@ namespace kh.tools.imgd.ViewModels
 
 		private void LoadImgd(Imgd imgd)
 		{
-			LoadImage(imgd.GetBitmap(), imgd.Size.Width, imgd.Size.Height);
+			LoadImage(imgd);
 		}
 
-		private void LoadImage(byte[] data, int width, int height)
+		private void LoadImage(IImageRead imageRead)
 		{
-			Image = BitmapSource.Create(width, height, 96.0, 96.0, PixelFormats.Bgra32, null, data, width * 4);
+            var size = imageRead.Size;
+            var data = imageRead.ToBgra32();
+            Image = BitmapSource.Create(size.Width, size.Height, 96.0, 96.0, PixelFormats.Bgra32, null, data, size.Width * 4);
 		}
 	}
 }
