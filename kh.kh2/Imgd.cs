@@ -21,7 +21,8 @@ namespace kh.kh2
 		private short unk2e;
 		private int unk30;
 
-        public static bool IsValid(Stream stream) => new BinaryReader(stream).PeekInt32() == MagicCode;
+        public static bool IsValid(Stream stream) =>
+            stream.Length >= 4 && new BinaryReader(stream).PeekInt32() == MagicCode;
 
         private short unk34;
 		private short unk36;

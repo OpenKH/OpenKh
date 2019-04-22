@@ -137,7 +137,7 @@ namespace kh.kh2
         }
 
         public static bool IsValid(Stream stream) =>
-            new BinaryReader(stream).PeekUInt32() == MagicCode;
+            stream.Length >= 4 && new BinaryReader(stream).PeekUInt32() == MagicCode;
 
     }
 }

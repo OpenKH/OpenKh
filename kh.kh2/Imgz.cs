@@ -47,7 +47,8 @@ namespace kh.kh2
                 .ToList();
         }
 
-        public static bool IsValid(Stream stream) => new BinaryReader(stream).PeekInt32() == MagicCode;
+        public static bool IsValid(Stream stream) =>
+            stream.Length >= 4 && new BinaryReader(stream).PeekInt32() == MagicCode;
 
         public static IEnumerable<Imgd> Open(Stream stream) =>
             OpenAsStream(stream).Select(x => new Imgd(x));
