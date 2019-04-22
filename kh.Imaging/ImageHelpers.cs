@@ -83,8 +83,14 @@ namespace kh.Imaging
 
                 for (var i = 0; i < colorsCount; i++)
                 {
-                    palette.Entries[i] = Color.FromArgb(clut[i * 4 + 2], clut[i * 4 + 1], clut[i * 4 + 0], clut[i * 4 + 3]);
+                    palette.Entries[i] = Color.FromArgb(
+                        clut[i * 4 + 3],
+                        clut[i * 4 + 0],
+                        clut[i * 4 + 1],
+                        clut[i * 4 + 2]);
                 }
+
+                bitmap.Palette = palette;
             }
 
             return bitmap;
