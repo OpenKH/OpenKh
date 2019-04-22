@@ -1,4 +1,5 @@
-﻿using kh.Imaging;
+﻿using kh.common;
+using kh.Imaging;
 using System;
 using System.Drawing;
 using System.IO;
@@ -19,7 +20,10 @@ namespace kh.kh2
 		private short unk2c;
 		private short unk2e;
 		private int unk30;
-		private short unk34;
+
+        public static bool IsValid(Stream stream) => new BinaryReader(stream).PeekInt32() == MagicCode;
+
+        private short unk34;
 		private short unk36;
 		private int unk38;
 		private int swizzled;

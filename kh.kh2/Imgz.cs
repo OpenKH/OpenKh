@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using kh.common;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.IO;
@@ -44,6 +46,8 @@ namespace kh.kh2
                 .Select(x => new SubStream(stream, x.Offset, x.Length))
                 .ToList();
         }
+
+        public static bool IsValid(Stream stream) => new BinaryReader(stream).PeekInt32() == MagicCode;
 
         public static IEnumerable<Imgd> Open(Stream stream) =>
             OpenAsStream(stream).Select(x => new Imgd(x));
