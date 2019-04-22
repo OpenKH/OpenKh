@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="resources\files.txt">
+    <None Update="resources\kh2idx.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

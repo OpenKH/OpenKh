@@ -9,7 +9,7 @@ namespace BruteforceKh2Names
     {
         public static void Main(string[] args)
         {
-            var files = LoadFilesList("resources/files.txt").ToArray();
+            var files = LoadFilesList("resources/kh2idx.txt").ToArray();
             var knownExtensions = files.Select(x => Path.GetExtension(x)).Distinct().ToArray();
             var knownLangs = new[] { "jp", "us", "uk", "it", "fr", "sp", "gr", "fm", "fj" };
             var knownWorlds = new[] { "al", "bb", "ca", "cm", "dc", "di", "dw", "eh", "es", "ex", "fa", "gumi", "hb", "he", "lk", "lm", "mu", "nm", "po", "to", "tr", "tt", "wi", "wm", "zz" };
