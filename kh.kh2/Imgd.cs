@@ -1,10 +1,12 @@
-﻿using System;
+﻿using kh.Imaging;
+using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace kh.kh2
 {
-    public partial class Imgd : IImage
+    public partial class Imgd : IImageRead
 	{
 		private const uint MagicCode = 0x44474D49U;
 		private int unk04 = 0x100;
@@ -54,7 +56,7 @@ namespace kh.kh2
 
 			Size = new Size(width, height);
 			Data = reader.ReadBytes(dataLength);
-			Palette = reader.ReadBytes(palLength);
+			Clut = reader.ReadBytes(palLength);
 		}
 
 		public void Save(Stream stream)
@@ -73,7 +75,7 @@ namespace kh.kh2
 			writer.Write(dataOffset);
 			writer.Write(Data.Length);
 			writer.Write(palOffset);
-			writer.Write(Palette.Length);
+			writer.Write(Clut.Length);
 			writer.Write(unk18);
 			writer.Write((short)Size.Width);
 			writer.Write((short)Size.Height);
@@ -91,66 +93,81 @@ namespace kh.kh2
 			writer.Write(swizzled);
 
 			writer.Write(Data, 0, Data.Length);
-			writer.Write(Palette, 0, Palette.Length);
+			writer.Write(Clut, 0, Clut.Length);
 		}
 
 		public Size Size { get; }
 
 		public byte[] Data { get; }
 
-		public byte[] Palette { get; }
+		public byte[] Clut { get; }
 
-		public byte[] GetBitmap()
+        public PixelFormat PixelFormat
+        {
+            get
+            {
+                switch (format)
+                {
+                    case 0x13: return PixelFormat.Indexed8;
+                    case 0x14: return PixelFormat.Indexed4;
+                    default: return PixelFormat.Undefined;
+                }
+            }
+        }
+
+        public byte[] GetData()
 		{
 			switch (format)
 			{
 				case 0x13:
-					return GetBitmapFrom8bpp(
-						swizzled == 7 ? Ps2.Decode8(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data
-						, Palette, Size.Width, Size.Height);
+                    return swizzled == 7 ? Ps2.Decode8(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data;
 				case 0x14:
-					return GetBitmapFrom4bpp(
-						swizzled == 7 ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data
-						, Palette, Size.Width, Size.Height);
+					return swizzled == 7 ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data;
 				default:
 					throw new NotSupportedException($"The format {format} is not supported.");
 			}
-		}
+        }
 
-		private static byte[] GetBitmapFrom8bpp(byte[] src, byte[] palette, int width, int height)
-		{
-			var dst = new byte[width * height * 4];
-			for (int i = 0; i < dst.Length; i += 4)
-			{
-				var index = Ps2.Repl(src[i / 4]);
-				dst[i + 0] = (byte)Math.Max(0, palette[index * 4 + 2] * 2 - 1);
-				dst[i + 1] = (byte)Math.Max(0, palette[index * 4 + 1] * 2 - 1);
-				dst[i + 2] = (byte)Math.Max(0, palette[index * 4 + 0] * 2 - 1);
-				dst[i + 3] = (byte)Math.Max(0, palette[index * 4 + 3] * 2 - 1);
-			}
+        public byte[] GetClut()
+        {
+            switch (format)
+            {
+                case 0x13: return GetClut8();
+                case 0x14: return GetClut4();
+                default:
+                    throw new NotSupportedException($"The format {format} is not supported.");
+            }
+        }
 
-			return dst;
-		}
+        public byte[] GetClut4()
+        {
+            var data = new byte[16 * 4];
+            for (var i = 0; i < 16; i++)
+            {
+                data[i * 4 + 0] = Clut[(i & 15) * 4 + 0];
+                data[i * 4 + 1] = Clut[(i & 15) * 4 + 1];
+                data[i * 4 + 2] = Clut[(i & 15) * 4 + 2];
+                data[i * 4 + 3] = FromPs2Alpha(Clut[(i & 15) * 4 + 3]);
+            }
 
-		private static byte[] GetBitmapFrom4bpp(byte[] src, byte[] palette, int width, int height)
-		{
-			var dst = new byte[width * height * 4];
-			for (int i = 0; i < dst.Length; i += 8)
-			{
-				var index = src[i / 8] & 0x0F;
-				dst[i + 0] = palette[index * 4 + 0];
-				dst[i + 1] = palette[index * 4 + 1];
-				dst[i + 2] = palette[index * 4 + 2];
-				dst[i + 3] = palette[index * 4 + 3];
+            return data;
+        }
 
-				index = src[i / 8] >> 4;
-				dst[i + 4] = palette[index * 4 + 0];
-				dst[i + 5] = palette[index * 4 + 1];
-				dst[i + 6] = palette[index * 4 + 2];
-				dst[i + 7] = palette[index * 4 + 3];
-			}
+        public byte[] GetClut8()
+        {
+            var data = new byte[256 * 4];
+            for (var i = 0; i < 256; i++)
+            {
+                var srcIndex = Ps2.Repl(i);
+                data[i * 4 + 0] = Clut[srcIndex * 4 + 0];
+                data[i * 4 + 1] = Clut[srcIndex * 4 + 1];
+                data[i * 4 + 2] = Clut[srcIndex * 4 + 2];
+                data[i * 4 + 3] = FromPs2Alpha(Clut[srcIndex * 4 + 3]);
+            }
 
-			return dst;
-		}
-	}
+            return data;
+        }
+
+        public byte FromPs2Alpha(byte alpha) => (byte)Math.Min(alpha * 2, byte.MaxValue);
+    }
 }

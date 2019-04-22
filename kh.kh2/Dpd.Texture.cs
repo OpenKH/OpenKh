@@ -6,7 +6,7 @@ namespace kh.kh2
 {
     public partial class Dpd
     {
-		public class Texture : IImage
+		public class Texture
 		{
 			private short unk00;
 			private short unk02;
