@@ -56,12 +56,13 @@ namespace kh.Imaging
 
         public static void SaveImage(this IImageRead imageRead, string fileName)
         {
-            imageRead
-                .LoadPixelData()
-                .Save(fileName);
+            using (var gdiBitmap = imageRead.CreateBitmap())
+            {
+                gdiBitmap.Save(fileName);
+            }
         }
 
-        private static Bitmap LoadPixelData(this IImageRead imageRead)
+        private static Bitmap CreateBitmap(this IImageRead imageRead)
         {
             var drawingPixelFormat = imageRead.PixelFormat.GetDrawingPixelFormat();
             Bitmap bitmap = new Bitmap(imageRead.Size.Width, imageRead.Size.Height, drawingPixelFormat);
