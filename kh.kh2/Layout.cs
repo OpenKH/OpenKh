@@ -63,10 +63,11 @@ namespace kh.kh2
             if (header.Version != SupportedVersion)
                 throw new InvalidDataException($"Unsupported version {header.Version}");
 
-            L1Items = ReadList<L1>(stream, header.L1Offset, header.L1Count);
-            L2Items = ReadList<L2>(stream, header.L2Offset, header.L2Count);
+            L1Items = stream.ReadList<L1>(header.L1Offset, header.L1Count);
+            L2Items = stream.ReadList<L2>(header.L2Offset, header.L2Count);
             SequenceItems = new List<Sequence>();
-            var sequenceOffsets = ReadOffsetList(stream, header.SequenceOffset, header.SequenceCount);
+
+            var sequenceOffsets = stream.ReadInt32List(header.SequenceOffset, header.SequenceCount);
             sequenceOffsets.Add((int)stream.Length);
             for (var i = 0; i < sequenceOffsets.Count - 1; i++)
             {
@@ -76,24 +77,6 @@ namespace kh.kh2
                 var sequenceStream = new SubStream(stream, offset, length);
                 SequenceItems.Add(Sequence.Open(sequenceStream));
             }
-        }
-
-        private List<T> ReadList<T>(Stream stream, int offset, int count)
-            where T : class
-        {
-            stream.Position = offset;
-            return Enumerable.Range(0, count)
-                .Select(x => BinaryMapping.ReadObject<T>(stream, (int)stream.Position))
-                .ToList();
-        }
-
-        private List<int> ReadOffsetList(Stream stream, int offset, int count)
-        {
-            var reader = new BinaryReader(stream);
-            stream.Position = offset;
-            return Enumerable.Range(0, count)
-                .Select(x => reader.ReadInt32())
-                .ToList();
         }
 
         public static bool IsValid(Stream stream) =>
