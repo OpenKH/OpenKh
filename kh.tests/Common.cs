@@ -22,7 +22,7 @@ namespace kh.tests
 
     public class Common
     {
-        protected static void FileOpenRead(string path, Action<Stream> action)
+        public static void FileOpenRead(string path, Action<Stream> action)
         {
             File.OpenRead(path).Using(x => action(x));
         }
