@@ -75,7 +75,7 @@ namespace kh.kh2
                 int offset = sequenceOffsets[i];
                 var length = sequenceOffsets[i + 1] - offset;
                 var sequenceStream = new SubStream(stream, offset, length);
-                SequenceItems.Add(Sequence.Open(sequenceStream));
+                SequenceItems.Add(Sequence.Read(sequenceStream));
             }
         }
 
