@@ -45,5 +45,15 @@ namespace kh.common
 
             return (int)stream.Position - oldPosition;
         }
+
+        public static int Write(this Stream stream, IEnumerable<int> items)
+        {
+            var oldPosition = (int)stream.Position;
+            var writer = new BinaryWriter(stream);
+            foreach (var item in items)
+                writer.Write(item);
+
+            return (int)stream.Position - oldPosition;
+        }
     }
 }

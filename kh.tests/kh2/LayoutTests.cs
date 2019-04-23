@@ -105,5 +105,21 @@ namespace kh.tests.kh2
             Assert.Equal(0, layout.L2Items[2].Unknown0c);
             Assert.Equal(0, layout.L2Items[2].Unknown10);
         });
+
+        [Fact]
+        public void WriteLayoutTest() => Common.FileOpenRead(FilePath, stream =>
+        {
+            var expected = new BinaryReader(stream).ReadBytes((int)stream.Length);
+            var layout = new MemoryStream(expected).Using(x => Layout.Read(x));
+            new MemoryStream().Using(x =>
+            {
+                layout.Write(x);
+                x.Position = 0;
+                var actual = new BinaryReader(x).ReadBytes((int)x.Length);
+                x.Dump("dump.layd");
+                Assert.Equal(expected.Length, actual.Length);
+                Assert.Equal(expected, actual);
+            });
+        });
     }
 }

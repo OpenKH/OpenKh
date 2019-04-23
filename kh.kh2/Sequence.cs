@@ -155,16 +155,19 @@ namespace kh.kh2
                 Q5 = new Section() { Count = Q5Items.Count },
             };
 
-            stream.Position = MinimumLength;
-            header.Q1.Offset = (int)stream.Position;
+            var basePosition = stream.Position;
+            stream.Position = basePosition + MinimumLength;
+            header.Q1.Offset = (int)(stream.Position - basePosition);
             header.Q2.Offset = stream.WriteList(Q1Items) + header.Q1.Offset;
             header.Q3.Offset = stream.WriteList(Q2Items) + header.Q2.Offset;
             header.Q4.Offset = stream.WriteList(Q3Items) + header.Q3.Offset;
             header.Q5.Offset = stream.WriteList(Q4Items) + header.Q4.Offset;
             stream.WriteList(Q5Items);
 
-            stream.Position = 0;
+            var endPosition = stream.Position;
+            stream.Position = basePosition;
             BinaryMapping.WriteObject(stream, header);
+            stream.Position = endPosition;
         }
 
         public static Sequence Read(Stream stream) =>

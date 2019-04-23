@@ -18,6 +18,13 @@ namespace kh.tests
             using (disposable)
                 return func(disposable);
         }
+
+        public static void Dump(this Stream stream, string path) =>
+            File.OpenWrite(path).Using(outStream =>
+            {
+                stream.Position = 0;
+                stream.CopyTo(outStream);
+            });
     }
 
     public class Common

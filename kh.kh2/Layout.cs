@@ -79,6 +79,47 @@ namespace kh.kh2
             }
         }
 
+        public void Write(Stream stream)
+        {
+            if (!stream.CanWrite || !stream.CanSeek)
+                throw new InvalidDataException($"Write and seek must be supported.");
+
+            var header = new Header
+            {
+                MagicCode = MagicCodeValidator,
+                Version = SupportedVersion,
+                L1Count = L1Items.Count,
+                L2Count = L2Items.Count,
+                SequenceCount = SequenceItems.Count,
+            };
+
+            stream.Position = MinimumLength;
+            header.L1Offset = (int)stream.Position;
+            header.L2Offset = stream.WriteList(L1Items) + header.L1Offset;
+            header.SequenceOffset = stream.WriteList(L2Items) + header.L2Offset;
+            WriteSequences(stream);
+
+            stream.Position = 0;
+            BinaryMapping.WriteObject(stream, header);
+        }
+
+        private void WriteSequences(Stream stream)
+        {
+            var currentPosition = stream.Position;
+            var offsets = new int[SequenceItems.Count];
+
+            stream.Position += SequenceItems.Count * 4;
+            for (var i = 0; i < SequenceItems.Count; i++)
+            {
+                offsets[i] = (int)stream.Position;
+                SequenceItems[i].Write(stream);
+            }
+
+            stream.Position = currentPosition;
+            stream.Write(offsets);
+
+        }
+
         public static bool IsValid(Stream stream) =>
             stream.Length >= MinimumLength && new BinaryReader(stream).PeekInt32() == MagicCodeValidator;
 
