@@ -19,7 +19,7 @@ namespace kh.kh2
         private class Header
         {
             [Data] public uint MagicCode { get; set; }
-            [Data] public int Unknown { get; set; }
+            [Data] public int Unknown04 { get; set; }
             [Data] public Section Q1 { get; set; }
             [Data] public Section Q2 { get; set; }
             [Data] public Section Q3 { get; set; }
@@ -112,6 +112,7 @@ namespace kh.kh2
             [Data] public int Unknown20 { get; set; }
         }
 
+        public int Unknown04 { get; set; }
         public List<Q1> Q1Items { get; set; }
         public List<Q2> Q2Items { get; set; }
         public List<Q3> Q3Items { get; set; }
@@ -130,11 +131,40 @@ namespace kh.kh2
             if (header.MagicCode != MagicCodeValidator)
                 throw new InvalidDataException("Invalid header");
 
+            Unknown04 = header.Unknown04;
             Q1Items = stream.ReadList<Q1>(header.Q1.Offset, header.Q1.Count);
             Q2Items = stream.ReadList<Q2>(header.Q2.Offset, header.Q2.Count);
             Q3Items = stream.ReadList<Q3>(header.Q3.Offset, header.Q3.Count);
             Q4Items = stream.ReadList<Q4>(header.Q4.Offset, header.Q4.Count);
             Q5Items = stream.ReadList<Q5>(header.Q5.Offset, header.Q5.Count);
+        }
+
+        public void Write(Stream stream)
+        {
+            if (!stream.CanWrite || !stream.CanSeek)
+                throw new InvalidDataException($"Write and seek must be supported.");
+
+            var header = new Header
+            {
+                MagicCode = MagicCodeValidator,
+                Unknown04 = Unknown04,
+                Q1 = new Section() { Count = Q1Items.Count },
+                Q2 = new Section() { Count = Q2Items.Count },
+                Q3 = new Section() { Count = Q3Items.Count },
+                Q4 = new Section() { Count = Q4Items.Count },
+                Q5 = new Section() { Count = Q5Items.Count },
+            };
+
+            stream.Position = MinimumLength;
+            header.Q1.Offset = (int)stream.Position;
+            header.Q2.Offset = stream.WriteList(Q1Items) + header.Q1.Offset;
+            header.Q3.Offset = stream.WriteList(Q2Items) + header.Q2.Offset;
+            header.Q4.Offset = stream.WriteList(Q3Items) + header.Q3.Offset;
+            header.Q5.Offset = stream.WriteList(Q4Items) + header.Q4.Offset;
+            stream.WriteList(Q5Items);
+
+            stream.Position = 0;
+            BinaryMapping.WriteObject(stream, header);
         }
 
         public static Sequence Read(Stream stream) =>

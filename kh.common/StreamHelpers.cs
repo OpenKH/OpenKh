@@ -35,5 +35,15 @@ namespace kh.common
                 .Select(x => reader.ReadInt32())
                 .ToList();
         }
+
+        public static int WriteList<T>(this Stream stream, IEnumerable<T> items)
+            where T : class
+        {
+            var oldPosition = (int)stream.Position;
+            foreach (var item in items)
+                BinaryMapping.WriteObject<T>(stream, item, oldPosition);
+
+            return (int)stream.Position - oldPosition;
+        }
     }
 }

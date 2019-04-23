@@ -63,6 +63,20 @@ namespace kh.tests.kh2
             Assert.Equal(2, sequence.Q5Items.Count);
         });
 
+        [Fact]
+        public void WriteSequenceTest() => StartTest(stream =>
+        {
+            var expected = new BinaryReader(stream).ReadBytes((int)stream.Length);
+            var sequence = new MemoryStream(expected).Using(x => Sequence.Read(x));
+            new MemoryStream().Using(x =>
+            {
+                sequence.Write(x);
+                x.Position = 0;
+                var actual = new BinaryReader(x).ReadBytes((int)x.Length);
+                Assert.Equal(expected, actual);
+            });
+        });
+
         private void StartTest(Action<Stream> action) =>
             Common.FileOpenRead(FilePath, x =>
                 action(new Xe.IO.SubStream(x, Offset, Length)));
