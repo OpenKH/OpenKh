@@ -11,33 +11,44 @@ namespace MineImgd
     {
         static void Main(string[] args)
         {
-            Directory
+            foreach (var item in Directory
                 .GetFiles(".", "*", SearchOption.AllDirectories)
                 .Select(x =>
                 {
-                    using (var stream = File.OpenRead(x))
+                    var stream = File.OpenRead(x);
                     {
                         var imgds = GetImgd(stream);
                         return new
                         {
                             FileName = x,
-                            Images = imgds
+                            ImageStreams = imgds
                         };
                     }
                 })
-                .Where(x => x.Images.Count > 0)
-                .Select(x => x.Images.Select(image => new
+                .Where(x => x.ImageStreams.Count > 0)
+                .Select(x => x.ImageStreams.Select(imageStream => new
                 {
                     FileName = GetExportPath(x.FileName),
-                    Image = image
+                    ImageStream = imageStream
                 }))
-                .SelectMany(x => x)
-                .ToList()
-                .AsParallel()
-                .ForAll(x =>
-                {
-                    x.Image.SaveImage(x.FileName);
-                });
+                .SelectMany(x => x))
+            {
+                SaveImageRaw(item.ImageStream, item.FileName);
+            }
+        }
+
+        private static void SaveImageRaw(Stream stream, string fileName)
+        {
+            using (var outStream = File.Create($"{fileName}.imd"))
+            {
+                stream.Position = 0;
+                stream.CopyTo(outStream);
+            }
+        }
+
+        private static void SaveImagePng(Stream stream, string fileName)
+        {
+            new Imgd(stream).SaveImage($"{fileName}.png");
         }
 
         private static string GetExportPath(string path)
@@ -46,45 +57,45 @@ namespace MineImgd
             fileName = fileName.Replace('\\', '-');
             fileName = Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName));
             fileName = Path.Combine("export-imgd", fileName);
-            return $"{fileName}_{Guid.NewGuid()}.png";
+            return $"{fileName}_{Guid.NewGuid()}";
         }
 
-        private static List<Imgd> GetImgd(Stream stream)
+        private static List<Stream> GetImgd(Stream stream)
         {
-            if (TryGetImgdFromBar(stream, out List<Imgd> imgs))
-                return imgs;
-            if (TryGetImgdFromImgz(stream, out imgs))
-                return imgs;
-            if (TryGetImgdFromImgd(stream, out imgs))
-                return imgs;
-            return new List<Imgd>();
+            if (TryGetImgdFromBar(stream, out List<Stream> imgdStreams))
+                return imgdStreams;
+            if (TryGetImgdFromImgz(stream, out imgdStreams))
+                return imgdStreams;
+            if (TryGetImgdFromImgd(stream, out imgdStreams))
+                return imgdStreams;
+            return new List<Stream>();
         }
 
-        private static bool TryGetImgdFromBar(Stream stream, out List<Imgd> imgds)
+        private static bool TryGetImgdFromBar(Stream stream, out List<Stream> streams)
         {
             if (!Bar.IsValid(stream))
             {
-                imgds = null;
+                streams = null;
                 return false;
             }
 
-            imgds = Bar.Open(stream)
+            streams = Bar.Open(stream)
                 .Select(x =>
                 {
-                    if (TryGetImgdFromBar(x.Stream, out List<Imgd> imgs))
-                        return imgs;
-                    if (TryGetImgdFromImgz(x.Stream, out imgs))
-                        return imgs;
-                    if (TryGetImgdFromImgd(x.Stream, out imgs))
-                        return imgs;
-                    return new List<Imgd>();
+                    if (TryGetImgdFromBar(x.Stream, out List<Stream> imgdStreams))
+                        return imgdStreams;
+                    if (TryGetImgdFromImgz(x.Stream, out imgdStreams))
+                        return imgdStreams;
+                    if (TryGetImgdFromImgd(x.Stream, out imgdStreams))
+                        return imgdStreams;
+                    return new List<Stream>();
                 })
                 .SelectMany(x => x)
                 .ToList();
             return true;
         }
 
-        private static bool TryGetImgdFromImgz(Stream stream, out List<Imgd> imgds)
+        private static bool TryGetImgdFromImgz(Stream stream, out List<Stream> imgds)
         {
             if (!Imgz.IsValid(stream))
             {
@@ -92,22 +103,20 @@ namespace MineImgd
                 return false;
             }
 
-            imgds = Imgz.Open(stream).ToList();
+            imgds = Imgz.OpenAsStream(stream).ToList();
             return true;
         }
 
-        private static bool TryGetImgdFromImgd(Stream stream, out List<Imgd> imgds)
+        private static bool TryGetImgdFromImgd(Stream stream, out List<Stream> outStream)
         {
             if (!Imgd.IsValid(stream))
             {
-                imgds = null;
+                outStream = null;
                 return false;
             }
 
-            imgds = new List<Imgd> { new Imgd(stream) };
+            outStream = new List<Stream>{ stream };
             return true;
         }
-
-
     }
 }
