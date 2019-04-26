@@ -10,14 +10,14 @@ namespace kh.kh2
     public partial class Imgd : IImageRead
 	{
 		private const uint MagicCode = 0x44474D49U;
-        private const int Format8bpp = 0x13;
-        private const int Format4bpp = 0x14;
-        private short format;
+        private const short Format8bpp = 0x13;
+        private const short Format4bpp = 0x14;
 
         public static bool IsValid(Stream stream) =>
             stream.Length >= 4 && new BinaryReader(stream).PeekInt32() == MagicCode;
 
-		private int swizzled;
+        private readonly short format;
+        private readonly int swizzled;
 
 		public Imgd(Stream stream)
 		{
@@ -99,18 +99,7 @@ namespace kh.kh2
 
         public bool IsSwizzled => (swizzled & 4) != 0;
 
-        public PixelFormat PixelFormat
-        {
-            get
-            {
-                switch (format)
-                {
-                    case Format8bpp: return PixelFormat.Indexed8;
-                    case Format4bpp: return PixelFormat.Indexed4;
-                    default: return PixelFormat.Undefined;
-                }
-            }
-        }
+        public PixelFormat PixelFormat => GetPixelFormat(format);
 
         public byte[] GetData()
 		{
@@ -136,7 +125,7 @@ namespace kh.kh2
             }
         }
 
-        public byte[] GetClut4()
+        private byte[] GetClut4()
         {
             var data = new byte[16 * 4];
             for (var i = 0; i < 16; i++)
@@ -150,7 +139,7 @@ namespace kh.kh2
             return data;
         }
 
-        public byte[] GetClut8()
+        private byte[] GetClut8()
         {
             var data = new byte[256 * 4];
             for (var i = 0; i < 256; i++)
@@ -174,6 +163,16 @@ namespace kh.kh2
             return pow;
         }
 
-        public byte FromPs2Alpha(byte alpha) => (byte)Math.Min(alpha * 2, byte.MaxValue);
+        private byte FromPs2Alpha(byte alpha) => (byte)Math.Min(alpha * 2, byte.MaxValue);
+
+        private static PixelFormat GetPixelFormat(int format)
+        {
+            switch (format)
+            {
+                case Format8bpp: return PixelFormat.Indexed8;
+                case Format4bpp: return PixelFormat.Indexed4;
+                default: return PixelFormat.Undefined;
+            }
+        }
     }
 }
