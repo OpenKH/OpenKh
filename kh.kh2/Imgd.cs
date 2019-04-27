@@ -19,7 +19,7 @@ namespace kh.kh2
         private readonly short format;
         private readonly int swizzled;
 
-		public Imgd(Stream stream)
+		private Imgd(Stream stream)
 		{
 			if (!stream.CanRead || !stream.CanSeek)
 				throw new InvalidDataException($"Read or seek must be supported.");
@@ -52,9 +52,11 @@ namespace kh.kh2
 			Size = new Size(width, height);
 			Data = reader.ReadBytes(dataLength);
 			Clut = reader.ReadBytes(palLength);
-		}
+        }
 
-		public void Save(Stream stream)
+        public static Imgd Read(Stream stream) => new Imgd(stream);
+
+        public void Write(Stream stream)
 		{
 			if (!stream.CanWrite || !stream.CanSeek)
 				throw new InvalidDataException($"Write or seek must be supported.");

@@ -51,7 +51,7 @@ namespace kh.kh2
             stream.Length >= 4 && new BinaryReader(stream).PeekInt32() == MagicCode;
 
         public static IEnumerable<Imgd> Open(Stream stream) =>
-            OpenAsStream(stream).Select(x => new Imgd(x));
+            OpenAsStream(stream).Select(x => Imgd.Read(x));
 
 
         public static void Save(Stream stream, IEnumerable<Imgd> images)
@@ -81,7 +81,7 @@ namespace kh.kh2
 			foreach (var image in images)
 			{
 				var memStream = new MemoryStream();
-				image.Save(memStream);
+				image.Write(memStream);
 				imgStreams.Add(memStream);
 
 				writer.Write(currentOffset);

@@ -27,7 +27,7 @@ namespace kh.tests.kh2
         [Fact]
         public void ReadHeaderTest() => Common.FileOpenRead(FilePath, stream =>
         {
-            var image = new Imgd(stream);
+            var image = Imgd.Read(stream);
             Assert.Equal(128, image.Size.Width);
             Assert.Equal(128, image.Size.Height);
             Assert.Equal(PixelFormat.Indexed8, image.PixelFormat);
@@ -54,10 +54,10 @@ namespace kh.tests.kh2
             var expectedData = new byte[stream.Length];
             stream.Read(expectedData, 0, expectedData.Length);
 
-            var image = new Imgd(new MemoryStream(expectedData));
+            var image = Imgd.Read(new MemoryStream(expectedData));
             using (var dstStream = new MemoryStream(expectedData.Length))
             {
-                image.Save(dstStream);
+                image.Write(dstStream);
                 dstStream.Position = 0;
                 var actualData = new byte[dstStream.Length];
                 dstStream.Read(actualData, 0, actualData.Length);
@@ -88,7 +88,7 @@ namespace kh.tests.kh2
             var expectedData = new byte[stream.Length];
             stream.Read(expectedData, 0, expectedData.Length);
 
-            var image = new Imgd(new MemoryStream(expectedData));
+            var image = Imgd.Read(new MemoryStream(expectedData));
             using (var dstStream = new MemoryStream(expectedData.Length))
             {
                 var newImage = Imgd.Create(
@@ -101,7 +101,7 @@ namespace kh.tests.kh2
                 Assert.Equal(image.GetClut(), newImage.GetClut());
                 Assert.Equal(image.GetData(), newImage.GetData());
 
-                newImage.Save(dstStream);
+                newImage.Write(dstStream);
                 dstStream.Position = 0;
                 var actualData = new byte[dstStream.Length];
                 dstStream.Read(actualData, 0, actualData.Length);
