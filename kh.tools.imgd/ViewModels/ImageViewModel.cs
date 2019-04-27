@@ -26,7 +26,7 @@ namespace kh.tools.imgd.ViewModels
 					using (var stream = File.OpenRead(fd.FileName))
 					{
 						FileName = fd.FileName;
-						LoadImgd(Imgd = new Imgd(stream));
+						LoadImgd(Imgd = Imgd.Read(stream));
 
 						OnPropertyChanged(nameof(Image));
 						OnPropertyChanged(nameof(SaveCommand));
@@ -41,7 +41,7 @@ namespace kh.tools.imgd.ViewModels
 				{
 					using (var stream = File.Open(FileName, FileMode.Create))
 					{
-						Imgd.Save(stream);
+						Imgd.Write(stream);
 					}
 				}
 				else
@@ -59,7 +59,7 @@ namespace kh.tools.imgd.ViewModels
 				{
 					using (var stream = File.Open(fd.FileName, FileMode.Create))
 					{
-						Imgd.Save(stream);
+						Imgd.Write(stream);
 					}
 				}
 			}, x => Imgd != null);
@@ -106,13 +106,13 @@ namespace kh.tools.imgd.ViewModels
 		}
 
 		public ImageViewModel(Stream stream) :
-			this(new Imgd(stream))
+			this(Imgd.Read(stream))
 		{
 			SaveCommand = new RelayCommand(x =>
 			{
 				stream.Position = 0;
 				stream.SetLength(0);
-				Imgd.Save(stream);
+				Imgd.Write(stream);
 			});
 		}
 

@@ -25,6 +25,9 @@ namespace kh.tests
                 stream.Position = 0;
                 stream.CopyTo(outStream);
             });
+
+        public static void Dump(this byte[] data, string path) =>
+            new MemoryStream(data).Using(x => x.Dump(path));
     }
 
     public class Common
