@@ -174,5 +174,17 @@ namespace kh.kh2
                 default: return PixelFormat.Undefined;
             }
         }
+
+        private static short GetFormat(PixelFormat pixelFormat)
+        {
+            switch (pixelFormat)
+            {
+                case PixelFormat.Indexed4: return Format4bpp;
+                case PixelFormat.Indexed8: return Format8bpp;
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        $"Pixel format {pixelFormat} is not supported.");
+            }
+        }
     }
 }
