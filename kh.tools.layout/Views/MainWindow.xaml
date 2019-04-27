@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:kh.tools.layout.Views"
         xmlns:controls="clr-namespace:kh.tools.common.Controls;assembly=kh.tools.common"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="{Binding Title}" Height="450" Width="800">
     <Grid>
         <controls:DrawPanel
             DataContext="{Binding Renderer}"
