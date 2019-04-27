@@ -4,9 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:kh.tools.layout.Views"
+        xmlns:controls="clr-namespace:kh.tools.common.Controls;assembly=kh.tools.common"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <controls:DrawPanel
+            DataContext="{Binding Renderer}"
+            DrawCreate="{Binding DrawCreateCommand}"
+            DrawDestroy="{Binding DrawDestroyCommand}"
+            DrawBegin="{Binding DrawBeginCommand}"
+            DrawEnd="{Binding DrawEndCommand}"
+            Drawing="{Binding Drawing}"
+            />
     </Grid>
 </Window>
