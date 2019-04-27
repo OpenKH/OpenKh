@@ -22,8 +22,10 @@ namespace kh.kh2
                 switch (format)
                 {
                     case Format4bpp:
+                        Data = Swizzle4bpp(size, data);
                         break;
                     case Format8bpp:
+                        Data = Swizzle8bpp(size, data);
                         break;
                 }
             }
@@ -47,10 +49,23 @@ namespace kh.kh2
             Size size,
             PixelFormat pixelFormat,
             byte[] data,
-            byte[] clut) =>
-            new Imgd(size, pixelFormat, data, clut, false);
+            byte[] clut,
+            bool isSwizzled) =>
+            new Imgd(size, pixelFormat, data, clut, isSwizzled);
 
-        private byte[] GetKh2Clut4(byte[] rawClut)
+        private static byte[] Swizzle4bpp(Size size, byte[] data)
+        {
+            data = Ps2.Encode4(data, size.Width / 128, size.Height / 128);
+            return Ps2.Decode32(data, size.Width / 128, size.Height / 128);
+        }
+
+        private static byte[] Swizzle8bpp(Size size, byte[] data)
+        {
+            data = Ps2.Encode8(data, size.Width / 128, size.Height / 64);
+            return Ps2.Decode32(data, size.Width / 128, size.Height / 64);
+        }
+
+        private static byte[] GetKh2Clut4(byte[] rawClut)
         {
             var newClut = new byte[16 * 4];
             if (rawClut.Length < newClut.Length)
@@ -68,7 +83,7 @@ namespace kh.kh2
             return newClut;
         }
 
-        private byte[] GetKh2Clut8(byte[] rawClut)
+        private static byte[] GetKh2Clut8(byte[] rawClut)
         {
             var newClut = new byte[256 * 4];
             if (rawClut.Length < newClut.Length)
@@ -87,6 +102,6 @@ namespace kh.kh2
             return newClut;
         }
 
-        private byte ToPs2Alpha(byte data) => (byte)((data + 1) / 2);
+        private static byte ToPs2Alpha(byte data) => (byte)((data + 1) / 2);
     }
 }

@@ -1,4 +1,4 @@
-using kh.Imaging;
+﻿using kh.Imaging;
 using kh.kh2;
 using System.IO;
 using Xunit;
@@ -68,19 +68,19 @@ namespace kh.tests.kh2
         });
 
         [Theory]
-        //[InlineData("4bit-128-128")]
-        //[InlineData("4bit-256-128")]
-        //[InlineData("4bit-256-512")]
+        [InlineData("4bit-128-128")]
+        [InlineData("4bit-256-128")]
+        [InlineData("4bit-256-512")]
         [InlineData("4bit-512-128")]
-        //[InlineData("4bit-512-512")]
-        //[InlineData("8bit-128-128")]
+        [InlineData("4bit-512-512")]
+        [InlineData("8bit-128-128")]
         [InlineData("8bit-128-64")]
-        //[InlineData("8bit-256-128")]
-        //[InlineData("8bit-256-256")]
+        [InlineData("8bit-256-128")]
+        [InlineData("8bit-256-256")]
         [InlineData("8bit-32-32")]
         [InlineData("8bit-48-48")]
-        //[InlineData("8bit-512-256")]
-        //[InlineData("8bit-512-512")]
+        [InlineData("8bit-512-256")]
+        [InlineData("8bit-512-512")]
         [InlineData("8bit-64-64")]
         public void IsCreatingCorrectlyTest(string baseName) =>
             Common.FileOpenRead($"kh2/res/image-{baseName}.imd", stream =>
@@ -95,7 +95,8 @@ namespace kh.tests.kh2
                     image.Size,
                     image.PixelFormat,
                     image.GetData(),
-                    image.GetClut());
+                    image.GetClut(),
+                    image.IsSwizzled);
 
                 Assert.Equal(image.GetClut(), newImage.GetClut());
                 Assert.Equal(image.GetData(), newImage.GetData());
