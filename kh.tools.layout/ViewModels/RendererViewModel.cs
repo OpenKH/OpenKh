@@ -19,8 +19,9 @@ namespace kh.tools.layout.ViewModels
         public RelayCommand DrawBeginCommand { get; }
         public RelayCommand DrawEndCommand { get; }
 
-        private Sequence sequence;
+        private Layout layout;
         private ISurface[] surfaces;
+        private LayoutRenderer layoutRenderer;
 
         public RendererViewModel()
         {
@@ -36,10 +37,7 @@ namespace kh.tools.layout.ViewModels
             DrawBeginCommand = new RelayCommand<IDrawing>(x =>
             {
                 x.Clear(Color.Magenta);
-                if (surfaces?.Any() ?? false)
-                {
-                    x.DrawSurface(surfaces[0], 0, 0);
-                }
+                layoutRenderer?.Draw();
                 x.Flush();
             });
             DrawEndCommand = new RelayCommand<IDrawing>(x =>
@@ -47,14 +45,16 @@ namespace kh.tools.layout.ViewModels
             });
         }
 
-        public void PlaySequence(Sequence sequence, IEnumerable<Imgd> images)
+        public void SetLayout(Layout layout, IEnumerable<Imgd> images)
         {
             DisposeAllSurfaces();
 
-            this.sequence = sequence;
+            this.layout = layout;
             surfaces = images
                 .Select(x => Drawing.CreateSurface(x))
                 .ToArray();
+
+            layoutRenderer = new LayoutRenderer(layout, Drawing, surfaces);
         }
 
         private void DisposeAllSurfaces()

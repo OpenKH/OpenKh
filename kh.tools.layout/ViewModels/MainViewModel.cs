@@ -1,4 +1,4 @@
-﻿using kh.kh2;
+using kh.kh2;
 using kh.tools.common;
 using System.Collections.Generic;
 using System.IO;
@@ -39,12 +39,7 @@ namespace kh.tools.layout.ViewModels
 
         private void OpenLayout(Layout layout, IEnumerable<Imgd> images)
         {
-            OpenSequence(layout.SequenceItems.First(), images);
-        }
-
-        private void OpenSequence(Sequence sequence, IEnumerable<Imgd> images)
-        {
-            Renderer.PlaySequence(sequence, images);
+            Renderer.SetLayout(layout, images);
         }
     }
 }
