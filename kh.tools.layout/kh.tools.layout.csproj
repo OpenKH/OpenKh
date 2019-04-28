@@ -8,6 +8,7 @@
     <Description>https://github.com/Xeeynamo/KingdomHearts</Description>
     <Copyright>Copyright ©  2019</Copyright>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Xaml" />
