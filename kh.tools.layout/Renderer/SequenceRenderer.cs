@@ -1,19 +1,15 @@
 ﻿using kh.kh2;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using Xe.Drawing;
 
-namespace kh.tools.layout
+namespace kh.tools.layout.Renderer
 {
-    public class LayoutRenderer
+    public class SequenceRenderer
     {
         private class Context
         {
-            public ISurface Surface { get; set; }
-            public Sequence Sequence { get; set; }
-            public int CurrentFrameIndex { get; set; }
+            public int FrameIndex { get; set; }
             public float PositionX { get; set; }
             public float PositionY { get; set; }
             public float ScaleX { get; set; }
@@ -27,9 +23,7 @@ namespace kh.tools.layout
 
             public Context Clone() => new Context
             {
-                Surface = Surface,
-                Sequence = Sequence,
-                CurrentFrameIndex = CurrentFrameIndex,
+                FrameIndex = FrameIndex,
                 PositionX = PositionX,
                 PositionY = PositionY,
                 ScaleX = ScaleX,
@@ -49,51 +43,24 @@ namespace kh.tools.layout
         private const int ColorInterpolationFlag = 0x00000080;
         private const int TraslateFlag = 0x00004000;
 
-        private readonly Layout layout;
+        private readonly Sequence sequence;
         private readonly IDrawing drawing;
-        private readonly ISurface[] surfaces;
+        private readonly ISurface surface;
 
-        public int FrameIndex { get; set; }
-
-        public LayoutRenderer(Layout layout, IDrawing drawing, IEnumerable<ISurface> surfaces)
+        public SequenceRenderer(Sequence sequence, IDrawing drawing, ISurface surface)
         {
-            this.layout = layout;
+            this.sequence = sequence;
             this.drawing = drawing;
-            this.surfaces = surfaces.ToArray();
+            this.surface = surface;
         }
 
-        public void Draw()
-        {
-            DrawLayoutGroup(layout.L2Items[1]);
-            FrameIndex++;
-        }
-
-        private void DrawLayoutGroup(Layout.L2 l2)
-        {
-            var index = l2.L1Index;
-            var count = l2.L1Count;
-            for (var i = 0; i < count; i++)
+        public void Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
+            DrawAnimationGroup(new Context
             {
-                DrawLayout(layout.L1Items[index + i]);
-            }
-        }
-
-        private void DrawLayout(Layout.L1 l1)
-        {
-            var context = new Context
-            {
-                Surface = surfaces[l1.TextureIndex],
-                Sequence = layout.SequenceItems[l1.SequenceIndex],
-                CurrentFrameIndex = FrameIndex - l1.ShowAtFrame,
-                PositionX = l1.PositionX,
-                PositionY = l1.PositionY
-            };
-
-            if (context.CurrentFrameIndex >= 0)
-            {
-                DrawAnimationGroup(context, context.Sequence.Q5Items[l1.AnimationGroup]);
-            }
-        }
+                FrameIndex = frameIndex,
+                PositionX = positionX,
+                PositionY = positionY
+            }, sequence.Q5Items[animationGroupIndex]);
 
         private void DrawAnimationGroup(Context contextParent, Sequence.Q5 q5)
         {
@@ -110,16 +77,16 @@ namespace kh.tools.layout
             //        (q5.Tick1 + ((context.CurrentFrameIndex - q5.Tick1) % (q5.Tick2 - q5.Tick1)));
 
             if (q5.Tick2 != 0)
-                context.CurrentFrameIndex = (context.CurrentFrameIndex < q5.Tick1) ? context.CurrentFrameIndex :
-                (q5.Tick1 + ((context.CurrentFrameIndex - q5.Tick1) % (q5.Tick2 - q5.Tick1)));
+                context.FrameIndex = (context.FrameIndex < q5.Tick1) ? context.FrameIndex :
+                (q5.Tick1 + ((context.FrameIndex - q5.Tick1) % (q5.Tick2 - q5.Tick1)));
 
             for (var i = 0; i < count; i++)
             {
-                DrawAnimation(context, context.Sequence.Q4Items[index + i]);
+                DrawAnimation(context, sequence.Q4Items[index + i]);
             }
         }
 
-        private void DrawAnimation(Context pParent, Sequence.Q4 q4)
+        private void DrawAnimation(Context contextParent, Sequence.Q4 q4)
         {
             // 0000 0001 = (0 = SINC INTERPOLATION, 1 = LINEAR INTERPOLATION)
             // 0000 0008 = (0 = BOUNCING START FROM CENTER, 1 = BOUNCING START FROM X / MOVE FROM Y)
@@ -129,12 +96,12 @@ namespace kh.tools.layout
             // 0000 0080 = (0 = ENABLE COLOR FADING, 1 = IGNORE COLOR FADING)
             // 0000 0400 = (0 = ENABLE COLOR MASKING, 1 = IGNORE COLOR MASKING)
             // 0000 4000 = (0 = ENABLE XYB, 1 = IGNORE XYB)
-            
-            if (pParent.CurrentFrameIndex < q4.FrameStart || pParent.CurrentFrameIndex > q4.FrameEnd)
+
+            if (contextParent.FrameIndex < q4.FrameStart || contextParent.FrameIndex > q4.FrameEnd)
                 return;
 
-            var context = pParent.Clone();
-            var delta = (float)(context.CurrentFrameIndex - q4.FrameStart) / (q4.FrameEnd - q4.FrameStart);
+            var context = contextParent.Clone();
+            var delta = (float)(context.FrameIndex - q4.FrameStart) / (q4.FrameEnd - q4.FrameStart);
             float t;
 
             if ((q4.Flags & SincInterpolationFlag) != 0)
@@ -174,7 +141,7 @@ namespace kh.tools.layout
                 }
             }
             else
-                context.Color = new ColorF(Color.White);
+                context.Color = new ColorF(1.0f, 1.0f, 1.0f, 1.0f);
 
             if ((q4.Flags & TraslateFlag) != 0)
             {
@@ -183,7 +150,7 @@ namespace kh.tools.layout
             }
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS
-            DrawFrameGroup(context, context.Sequence.Q3Items[q4.Q3Index]);
+            DrawFrameGroup(context, sequence.Q3Items[q4.Q3Index]);
         }
 
         private void DrawFrameGroup(Context context, Sequence.Q3 q3)
@@ -192,27 +159,27 @@ namespace kh.tools.layout
             var count = q3.Count;
             for (var i = 0; i < count; i++)
             {
-                DrawFrameExtended(context, context.Sequence.Q2Items[index + i]);
+                DrawFrameExtended(context, sequence.Q2Items[index + i]);
             }
         }
 
-        private void DrawFrameExtended(Context pParent, Sequence.Q2 q)
+        private void DrawFrameExtended(Context contextParent, Sequence.Q2 q)
         {
-            var context = pParent.Clone();
+            var context = contextParent.Clone();
             context.Left = q.Left * context.ScaleX;
             context.Top = q.Top * context.ScaleY;
             context.Right = q.Right * context.ScaleX;
             context.Bottom = q.Bottom * context.ScaleY;
 
-            DrawFrame(context, context.Sequence.Q1Items[q.Q1Index]);
+            DrawFrame(context, sequence.Q1Items[q.Q1Index]);
         }
 
-        private void DrawFrame(Context p, Sequence.Q1 q)
+        private void DrawFrame(Context context, Sequence.Q1 q)
         {
-            drawing.DrawSurface(p.Surface,
+            drawing.DrawSurface(surface,
                 Rectangle.FromLTRB(q.Left, q.Top, q.Right, q.Bottom),
-                RectangleF.FromLTRB(p.PositionX + p.Left, p.PositionY + p.Top,
-                    p.PositionX + p.Right, p.PositionY + p.Bottom));
+                RectangleF.FromLTRB(context.PositionX + context.Left, context.PositionY + context.Top,
+                    context.PositionX + context.Right, context.PositionY + context.Bottom));
         }
 
         private static ColorF ConvertColor(int color) => new ColorF(1.0f, 1.0f, 1.0f, 1.0f); // TODO

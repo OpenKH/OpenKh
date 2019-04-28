@@ -1,6 +1,7 @@
 ﻿using kh.Imaging;
 using kh.kh2;
 using kh.tools.common;
+using kh.tools.layout.Renderer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,7 +13,6 @@ namespace kh.tools.layout.ViewModels
 {
     public class RendererViewModel
     {
-
         public IDrawing Drawing { get; }
         public RelayCommand DrawCreateCommand { get; }
         public RelayCommand DrawDestroyCommand { get; }
