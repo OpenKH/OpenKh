@@ -141,7 +141,7 @@ namespace kh.tools.layout.Renderer
                 }
             }
             else
-                context.Color = new ColorF(1.0f, 1.0f, 1.0f, 1.0f);
+                context.Color = ConvertColor(q4.ColorStart);
 
             if ((q4.Flags & TraslateFlag) != 0)
             {
@@ -179,10 +179,25 @@ namespace kh.tools.layout.Renderer
             drawing.DrawSurface(surface,
                 Rectangle.FromLTRB(q.Left, q.Top, q.Right, q.Bottom),
                 RectangleF.FromLTRB(context.PositionX + context.Left, context.PositionY + context.Top,
-                    context.PositionX + context.Right, context.PositionY + context.Bottom));
+                    context.PositionX + context.Right, context.PositionY + context.Bottom),
+                Multiply(ConvertColor(q.ColorLeft), context.Color),
+                Multiply(ConvertColor(q.ColorTop), context.Color),
+                Multiply(ConvertColor(q.ColorRight), context.Color),
+                Multiply(ConvertColor(q.ColorBottom), context.Color));
         }
 
-        private static ColorF ConvertColor(int color) => new ColorF(1.0f, 1.0f, 1.0f, 1.0f); // TODO
+        public static ColorF Multiply(ColorF a, ColorF b) =>
+            new ColorF(
+                a.R * b.R,
+                a.G * b.G,
+                a.B * b.B,
+                a.A * b.A);
+
+        private static ColorF ConvertColor(int color) => new ColorF(
+            ((color >> 0) & 0xFF) / 128.0f,
+            ((color >> 8) & 0xFF) / 128.0f,
+            ((color >> 16) & 0xFF) / 128.0f,
+            ((color >> 24) & 0xFF) / 128.0f);
         private static float Lerp(float m, float x1, float x2) => (x1 * (1.0f - m) + x2 * m);
         private static double Lerp(double m, double x1, double x2) => (x1 * (1.0 - m) + x2 * m);
         private static ColorF Lerp(double m, ColorF x1, ColorF x2) => new ColorF(
