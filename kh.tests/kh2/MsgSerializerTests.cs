@@ -43,7 +43,7 @@ namespace kh.tests.kh2
             var actual = MsgSerializer.SerializeXEntries(MessageId, new[] { entry });
             var expected = new XElement("message",
                 new XAttribute("id", MessageId),
-                new XElement("icon", new XAttribute("class", content))
+                new XElement("icon", new XAttribute("value", content))
             );
             Assert.Equal(expected.ToString(xmlFormatting), actual.ToString(xmlFormatting));
         }

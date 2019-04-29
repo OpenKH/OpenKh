@@ -7,43 +7,51 @@ namespace kh.kh2.Messages
 {
     public class MsgSerializer
     {
-        private static Dictionary<MessageCommand, Func<MessageCommandModel, XNode>> _serializer =
-            new Dictionary<MessageCommand, Func<MessageCommandModel, XNode>>()
+        private class SerializeModel
+        {
+            public string Name { get; set; }
+            public Func<MessageCommandModel, string> ValueGetter { get; set; }
+        }
+
+        private static Dictionary<MessageCommand, SerializeModel> _serializer =
+            new Dictionary<MessageCommand, SerializeModel>()
             {
-                [MessageCommand.End] = x => null,
-                [MessageCommand.PrintText] = x => new XElement("text", x.Text),
-                [MessageCommand.NewLine] = x => new XElement("newline"),
-                [MessageCommand.Reset] = x => new XElement("reset"),
-                [MessageCommand.Theme] = x => new XElement("theme", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown05] = x => new XElement("unk05", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown06] = x => new XElement("unk06", ToStringRawData(x.Data)),
-                [MessageCommand.Color] = x =>
-                {
-                    var rgba = $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}";
-                    return new XElement("color", rgba);
-                },
-                [MessageCommand.Unknown08] = x => new XElement("unk08", ToStringRawData(x.Data)),
-                [MessageCommand.PrintIcon] = x => SerializePrintIcon(x),
-                [MessageCommand.TextScale] = x => new XElement("scale", x.Data[0].ToString()),
-                [MessageCommand.TextWidth] = x => new XElement("width", x.Data[0].ToString()),
-                [MessageCommand.LineSpacing] = x => new XElement("linespacing", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown0d] = x => new XElement("unk0d"),
-                [MessageCommand.Unknown0e] = x => new XElement("unk0e", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown0f] = x => new XElement("unk0f", ToStringRawData(x.Data)),
-                [MessageCommand.Clear] = x => new XElement("clear", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown12] = x => new XElement("unk12", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown13] = x => new XElement("unk13", ToStringRawData(x.Data)),
-                [MessageCommand.Delay] = x => new XElement("delay", ToStringRawData(x.Data)),
-                [MessageCommand.CharDelay] = x => new XElement("chardelay", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown16] = x => new XElement("unk16", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown18] = x => new XElement("unk18", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown19] = x => new XElement("unk19", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown1a] = x => new XElement("unk1a", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown1b] = x => new XElement("unk1b", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown1c] = x => new XElement("unk1c", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown1d] = x => new XElement("unk1d", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown1e] = x => new XElement("unk1e", ToStringRawData(x.Data)),
-                [MessageCommand.Unknown1f] = x => new XElement("unk1f", ToStringRawData(x.Data)),
+                [MessageCommand.End] = null,
+                [MessageCommand.PrintText] = new SerializeModel { Name = "text", ValueGetter = x => x.Text },
+                [MessageCommand.NewLine] = new SerializeModel { Name = "newline" },
+                [MessageCommand.Reset] = new SerializeModel { Name = "reset" },
+                [MessageCommand.Theme] = new SerializeModel { Name = "theme", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown05] = new SerializeModel { Name = "unk05", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown06] = new SerializeModel { Name = "unk06", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Color] = new SerializeModel { Name = "color", ValueGetter = x => $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}" },
+                [MessageCommand.Unknown08] = new SerializeModel { Name = "unk08", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.PrintIcon] = new SerializeModel { Name = "icon", ValueGetter = x => _icons[x.Data[0]] },
+                [MessageCommand.TextScale] = new SerializeModel { Name = "scale", ValueGetter = x => x.Data[0].ToString() },
+                [MessageCommand.TextWidth] = new SerializeModel { Name = "width", ValueGetter = x => x.Data[0].ToString() },
+                [MessageCommand.LineSpacing] = new SerializeModel { Name = "linespacing", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown0d] = new SerializeModel { Name = "unk0d" },
+                [MessageCommand.Unknown0e] = new SerializeModel { Name = "unk0e", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown0f] = new SerializeModel { Name = "unk0f", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Clear] = new SerializeModel { Name = "clear", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown12] = new SerializeModel { Name = "unk12", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown13] = new SerializeModel { Name = "unk13", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Delay] = new SerializeModel { Name = "delay", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.CharDelay] = new SerializeModel { Name = "chardelay", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown16] = new SerializeModel { Name = "unk16", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown18] = new SerializeModel { Name = "unk18", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown19] = new SerializeModel { Name = "unk19", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown1a] = new SerializeModel { Name = "unk1a", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown1b] = new SerializeModel { Name = "unk1b", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown1c] = new SerializeModel { Name = "unk1c", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown1d] = new SerializeModel { Name = "unk1d", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown1e] = new SerializeModel { Name = "unk1e", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown1f] = new SerializeModel { Name = "unk1f", ValueGetter = x => ToStringRawData(x.Data) },
+            };
+
+        private static Dictionary<MessageCommand, Func<MessageCommandModel, SerializeModel, XNode>> _xmlCustomSerializer =
+            new Dictionary<MessageCommand, Func<MessageCommandModel, SerializeModel, XNode>>()
+            {
+                [MessageCommand.PrintText] = (msgCmd, model) => new XElement("text", model.ValueGetter(msgCmd)),
             };
 
         private static Dictionary<byte, string> _icons =
@@ -144,10 +152,16 @@ namespace kh.kh2.Messages
 
                 try
                 {
-                    if (!_serializer.TryGetValue(entry.Command, out var funcSerializer))
+                    if (!_serializer.TryGetValue(entry.Command, out var serializeModel))
                         throw new NotImplementedException($"The command {entry.Command} serialization is not implemented yet.");
 
-                    node = funcSerializer?.Invoke(entry);
+                    if (serializeModel == null)
+                        break;
+
+                    if (_xmlCustomSerializer.TryGetValue(entry.Command, out var xmlCustomSerializer))
+                        node = xmlCustomSerializer(entry, serializeModel);
+                    else
+                        node = GetDefaultSerializer(entry, serializeModel);
                 }
                 catch (NotImplementedException ex)
                 {
@@ -162,13 +176,10 @@ namespace kh.kh2.Messages
             return root;
         }
 
-        private static XElement SerializePrintIcon(MessageCommandModel entry)
+        private static XNode GetDefaultSerializer(MessageCommandModel msgCmd, SerializeModel model)
         {
-            byte value = entry.Data[0];
-            if (!_icons.TryGetValue(value, out var content))
-                throw new NotImplementedException($"The icon {value} is not implemented yet.");
-
-            return new XElement("icon", new XAttribute("class", content));
+            var attribute = new XAttribute("value", model.ValueGetter(msgCmd));
+            return attribute != null ? new XElement(model.Name, attribute) : new XElement(model.Name);
         }
 
         private static string ToStringRawData(byte[] data) =>
