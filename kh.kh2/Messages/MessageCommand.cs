@@ -5,6 +5,7 @@
         End,
         PrintText,
         PrintComplex,
+        Tabulation,
         NewLine,
         Reset,
         Theme,

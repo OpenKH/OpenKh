@@ -121,7 +121,7 @@ namespace kh.kh2.Messages.Internals
             [0x70] = new UnsupportedCmdModel(), // Unused
             [0x71] = new UnsupportedCmdModel(), // Unused
             [0x72] = new UnsupportedCmdModel(), // Unused
-            [0x73] = new TextCmdModel('\t'),
+            [0x73] = new SimpleCmdModel(MessageCommand.Tabulation),
             [0x74] = new TextCmdModel("I"),
             [0x75] = new TextCmdModel("II"),
             [0x76] = new TextCmdModel("III"),
