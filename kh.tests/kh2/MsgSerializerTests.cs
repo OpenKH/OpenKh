@@ -11,7 +11,20 @@ namespace kh.tests.kh2
         private const int MessageId = 12345;
 
         [Fact]
-        public void SerializeSimpleText()
+        public void SerializePlainSimpleText()
+        {
+            var entry = new MessageCommandModel
+            {
+                Command = MessageCommand.PrintText,
+                Text = "Hello world!"
+            };
+
+            var element = MsgSerializer.SerializeText(new[] { entry });
+            Assert.Equal(entry.Text, element);
+        }
+
+        [Fact]
+        public void SerializeXmlSimpleText()
         {
             var entry = new MessageCommandModel
             {
@@ -32,7 +45,7 @@ namespace kh.tests.kh2
         [InlineData(1, "item-tent")]
         [InlineData(2, "item-key")]
         [InlineData(3, "ability-unequip")]
-        public void SerializeIcon(byte id, string content)
+        public void SerializeXmlIcon(byte id, string content)
         {
             var entry = new MessageCommandModel
             {
