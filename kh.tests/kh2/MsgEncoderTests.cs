@@ -19,6 +19,23 @@ namespace kh.tests.kh2
         }
 
         [Fact]
+        public void DecodeComplexTextCorrectly()
+        {
+            var decoded = Encoders.InternationalSystem.Decode(new byte[]
+            {
+                0x90, 0x7a, 0x91, 0x00
+            });
+
+            Assert.Equal(MessageCommand.PrintText, decoded[0].Command);
+            Assert.Equal("0", decoded[0].Text);
+            Assert.Equal(MessageCommand.PrintComplex, decoded[1].Command);
+            Assert.Equal("VII", decoded[1].Text);
+            Assert.Equal(MessageCommand.PrintText, decoded[2].Command);
+            Assert.Equal("1", decoded[2].Text);
+            Assert.Equal(MessageCommand.End, decoded[3].Command);
+        }
+
+        [Fact]
         public void DecodeIconCorrectly()
         {
             var decoded = Encoders.InternationalSystem.Decode(new byte[]

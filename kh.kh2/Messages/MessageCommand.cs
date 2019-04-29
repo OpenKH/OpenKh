@@ -4,6 +4,7 @@
     {
         End,
         PrintText,
+        PrintComplex,
         NewLine,
         Reset,
         Theme,

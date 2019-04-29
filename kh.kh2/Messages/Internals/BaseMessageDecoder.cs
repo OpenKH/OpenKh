@@ -32,6 +32,8 @@ namespace kh.kh2.Messages.Internals
 
                 if (cmdModel.Command == MessageCommand.PrintText)
                     AppendChar(cmdModel.Text[0]);
+                else if (cmdModel.Command == MessageCommand.PrintComplex)
+                    AppendText(cmdModel.Text);
                 else
                     AppendEntry(cmdModel);
             }
@@ -52,13 +54,13 @@ namespace kh.kh2.Messages.Internals
             return _stringBuilder;
         }
 
-        private void FlushTextBuilder()
+        private void FlushTextBuilder(MessageCommand command = MessageCommand.PrintText)
         {
             if (_stringBuilder != null)
             {
                 _entries.Add(new MessageCommandModel
                 {
-                    Command = MessageCommand.PrintText,
+                    Command = command,
                     Text = _stringBuilder.ToString()
                 });
                 _stringBuilder = null;
@@ -76,6 +78,12 @@ namespace kh.kh2.Messages.Internals
         }
 
         private void AppendChar(char ch) => RequestTextBuilder().Append(ch);
+        private void AppendText(string str)
+        {
+            FlushTextBuilder();
+            RequestTextBuilder().Append(str);
+            FlushTextBuilder(MessageCommand.PrintComplex);
+        }
 
         private byte[] ReadBytes(int length) =>
             Enumerable.Range(0, length)

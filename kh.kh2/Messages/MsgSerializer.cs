@@ -18,6 +18,7 @@ namespace kh.kh2.Messages
             {
                 [MessageCommand.End] = null,
                 [MessageCommand.PrintText] = new SerializeModel { Name = "text", ValueGetter = x => x.Text },
+                [MessageCommand.PrintComplex] = new SerializeModel { Name = "complex", ValueGetter = x => x.Text },
                 [MessageCommand.NewLine] = new SerializeModel { Name = "newline" },
                 [MessageCommand.Reset] = new SerializeModel { Name = "reset" },
                 [MessageCommand.Theme] = new SerializeModel { Name = "theme", ValueGetter = x => ToStringRawData(x.Data) },
