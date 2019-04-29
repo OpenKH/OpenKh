@@ -24,6 +24,32 @@ namespace kh.tests.kh2
         }
 
         [Fact]
+        public void SerializePlainComplexText()
+        {
+            var entries = new[]
+            {
+                new MessageCommandModel
+                {
+                    Command = MessageCommand.PrintText,
+                    Text = "Hey "
+                },
+                new MessageCommandModel
+                {
+                    Command = MessageCommand.PrintComplex,
+                    Text = "VII"
+                },
+                new MessageCommandModel
+                {
+                    Command = MessageCommand.PrintText,
+                    Text = " complex!"
+                },
+            };
+
+            var element = MsgSerializer.SerializeText(entries);
+            Assert.Equal("Hey {VII} complex!", element);
+        }
+
+        [Fact]
         public void SerializeXmlSimpleText()
         {
             var entry = new MessageCommandModel

@@ -16,7 +16,12 @@ namespace kh.kh2.Messages
 
         public static string SerializeToText(MessageCommandModel entry)
         {
-            return entry.Text;
+            if (entry.Command == MessageCommand.PrintText)
+                return entry.Text;
+            if (entry.Command == MessageCommand.PrintComplex)
+                return $"{{{entry.Text}}}";
+
+            return null;
         }
     }
 }
