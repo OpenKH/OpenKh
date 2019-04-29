@@ -20,8 +20,15 @@ namespace kh.kh2.Messages
                 return entry.Text;
             if (entry.Command == MessageCommand.PrintComplex)
                 return $"{{{entry.Text}}}";
+            if (entry.Command == MessageCommand.NewLine)
+                return "\n";
+            if (entry.Command == MessageCommand.Tabulation)
+                return "\t";
 
-            return null;
+            if (!_serializer.TryGetValue(entry.Command, out var serializeModel))
+                throw new NotImplementedException($"The command {entry.Command} serialization is not implemented yet.");
+
+            return $"{{:{serializeModel.Name} {serializeModel.ValueGetter(entry)}}}";
         }
     }
 }

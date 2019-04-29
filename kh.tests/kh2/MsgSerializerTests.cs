@@ -43,10 +43,31 @@ namespace kh.tests.kh2
                     Command = MessageCommand.PrintText,
                     Text = " complex!"
                 },
+                new MessageCommandModel
+                {
+                    Command = MessageCommand.NewLine,
+                    Text = " complex!"
+                },
             };
 
             var element = MsgSerializer.SerializeText(entries);
-            Assert.Equal("Hey {VII} complex!", element);
+            Assert.Equal("Hey {VII} complex!\n", element);
+        }
+
+        [Fact]
+        public void SerializePlainCommand()
+        {
+            var entries = new[]
+            {
+                new MessageCommandModel
+                {
+                    Command = MessageCommand.TextScale,
+                    Data = new byte[] { 0x22 }
+                },
+            };
+
+            var element = MsgSerializer.SerializeText(entries);
+            Assert.Equal("{:scale 34}", element);
         }
 
         [Fact]
