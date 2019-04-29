@@ -28,10 +28,10 @@ namespace kh.tests.kh2
         }
 
         [Theory]
-        [InlineData(0, "consumable")]
-        [InlineData(1, "tent")]
-        [InlineData(2, "key-item")]
-        [InlineData(3, "ability")]
+        [InlineData(0, "item-consumable")]
+        [InlineData(1, "item-tent")]
+        [InlineData(2, "item-key")]
+        [InlineData(3, "ability-unequip")]
         public void SerializeIcon(byte id, string content)
         {
             var entry = new MessageCommandModel
