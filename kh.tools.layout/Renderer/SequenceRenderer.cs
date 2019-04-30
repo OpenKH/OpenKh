@@ -60,33 +60,33 @@ namespace kh.tools.layout.Renderer
                 FrameIndex = frameIndex,
                 PositionX = positionX,
                 PositionY = positionY
-            }, sequence.Q5Items[animationGroupIndex]);
+            }, sequence.AnimationGroups[animationGroupIndex]);
 
-        private void DrawAnimationGroup(Context contextParent, Sequence.Q5 q5)
+        private void DrawAnimationGroup(Context contextParent, Sequence.AnimationGroup animationGroup)
         {
-            var index = q5.Q4Index;
-            var count = q5.Count;
+            var index = animationGroup.AnimationIndex;
+            var count = animationGroup.Count;
             var context = contextParent.Clone();
 
-            //if (q5.Tick1 == 0)
+            //if (animationGroup.Tick1 == 0)
             //    context.CurrentFrameIndex = 0;
-            //else if (q5.Tick2 == 0)
-            //    context.CurrentFrameIndex = Math.Min(context.CurrentFrameIndex, q5.Tick1);
+            //else if (animationGroup.Tick2 == 0)
+            //    context.CurrentFrameIndex = Math.Min(context.CurrentFrameIndex, animationGroup.Tick1);
             //else
-            //    context.CurrentFrameIndex = (context.CurrentFrameIndex < q5.Tick1) ? context.CurrentFrameIndex :
-            //        (q5.Tick1 + ((context.CurrentFrameIndex - q5.Tick1) % (q5.Tick2 - q5.Tick1)));
+            //    context.CurrentFrameIndex = (context.CurrentFrameIndex < animationGroup.Tick1) ? context.CurrentFrameIndex :
+            //        (animationGroup.Tick1 + ((context.CurrentFrameIndex - animationGroup.Tick1) % (animationGroup.Tick2 - animationGroup.Tick1)));
 
-            if (q5.Tick2 != 0)
-                context.FrameIndex = (context.FrameIndex < q5.Tick1) ? context.FrameIndex :
-                (q5.Tick1 + ((context.FrameIndex - q5.Tick1) % (q5.Tick2 - q5.Tick1)));
+            if (animationGroup.Tick2 != 0)
+                context.FrameIndex = (context.FrameIndex < animationGroup.Tick1) ? context.FrameIndex :
+                (animationGroup.Tick1 + ((context.FrameIndex - animationGroup.Tick1) % (animationGroup.Tick2 - animationGroup.Tick1)));
 
             for (var i = 0; i < count; i++)
             {
-                DrawAnimation(context, sequence.Q4Items[index + i]);
+                DrawAnimation(context, sequence.Animations[index + i]);
             }
         }
 
-        private void DrawAnimation(Context contextParent, Sequence.Q4 q4)
+        private void DrawAnimation(Context contextParent, Sequence.Animation animation)
         {
             // 0000 0001 = (0 = SINC INTERPOLATION, 1 = LINEAR INTERPOLATION)
             // 0000 0008 = (0 = BOUNCING START FROM CENTER, 1 = BOUNCING START FROM X / MOVE FROM Y)
@@ -97,27 +97,27 @@ namespace kh.tools.layout.Renderer
             // 0000 0400 = (0 = ENABLE COLOR MASKING, 1 = IGNORE COLOR MASKING)
             // 0000 4000 = (0 = ENABLE XYB, 1 = IGNORE XYB)
 
-            if (contextParent.FrameIndex < q4.FrameStart || contextParent.FrameIndex > q4.FrameEnd)
+            if (contextParent.FrameIndex < animation.FrameStart || contextParent.FrameIndex > animation.FrameEnd)
                 return;
 
             var context = contextParent.Clone();
-            var delta = (float)(context.FrameIndex - q4.FrameStart) / (q4.FrameEnd - q4.FrameStart);
+            var delta = (float)(context.FrameIndex - animation.FrameStart) / (animation.FrameEnd - animation.FrameStart);
             float t;
 
-            if ((q4.Flags & SincInterpolationFlag) != 0)
+            if ((animation.Flags & SincInterpolationFlag) != 0)
                 t = delta;
             else
                 t = (float)Math.Sin(delta * Math.PI / 2);
 
-            context.PositionX += Lerp(t, q4.Xa0, q4.Xa1);
-            context.PositionY += Lerp(t, q4.Ya0, q4.Ya1);
-            context.ColorBlendType = q4.ColorBlend;
+            context.PositionX += Lerp(t, animation.Xa0, animation.Xa1);
+            context.PositionY += Lerp(t, animation.Ya0, animation.Ya1);
+            context.ColorBlendType = animation.ColorBlend;
 
-            if ((q4.Flags & ScalingFlag) != 0)
+            if ((animation.Flags & ScalingFlag) != 0)
             {
-                var scale = Lerp(t, q4.ScaleStart, q4.ScaleEnd);
-                var scaleX = Lerp(t, q4.ScaleXStart, q4.ScaleXEnd);
-                var scaleY = Lerp(t, q4.ScaleYStart, q4.ScaleYEnd);
+                var scale = Lerp(t, animation.ScaleStart, animation.ScaleEnd);
+                var scaleX = Lerp(t, animation.ScaleXStart, animation.ScaleXEnd);
+                var scaleY = Lerp(t, animation.ScaleYStart, animation.ScaleYEnd);
                 context.ScaleX = scale * scaleX;
                 context.ScaleY = scale * scaleY;
             }
@@ -127,63 +127,63 @@ namespace kh.tools.layout.Renderer
                 context.ScaleY = 1.0f;
             }
 
-            if ((q4.Flags & ColorMaskingFlag) != 0)
+            if ((animation.Flags & ColorMaskingFlag) != 0)
             {
-                if ((q4.Flags & ColorInterpolationFlag) != 0)
+                if ((animation.Flags & ColorInterpolationFlag) != 0)
                 {
                     context.Color = Lerp(t,
-                        ConvertColor(q4.ColorStart),
-                        ConvertColor(q4.ColorEnd));
+                        ConvertColor(animation.ColorStart),
+                        ConvertColor(animation.ColorEnd));
                 }
                 else
                 {
-                    context.Color = ConvertColor(q4.ColorStart);
+                    context.Color = ConvertColor(animation.ColorStart);
                 }
             }
             else
-                context.Color = ConvertColor(q4.ColorStart);
+                context.Color = ConvertColor(animation.ColorStart);
 
-            if ((q4.Flags & TraslateFlag) != 0)
+            if ((animation.Flags & TraslateFlag) != 0)
             {
-                context.PositionX += Lerp(t, q4.Xb0, q4.Xb1);
-                context.PositionY += Lerp(t, q4.Yb0, q4.Yb1);
+                context.PositionX += Lerp(t, animation.Xb0, animation.Xb1);
+                context.PositionY += Lerp(t, animation.Yb0, animation.Yb1);
             }
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS
-            DrawFrameGroup(context, sequence.Q3Items[q4.Q3Index]);
+            DrawFrameGroup(context, sequence.FrameGroups[animation.FrameGroupIndex]);
         }
 
-        private void DrawFrameGroup(Context context, Sequence.Q3 q3)
+        private void DrawFrameGroup(Context context, Sequence.FrameGroup frameGroup)
         {
-            var index = q3.Start;
-            var count = q3.Count;
+            var index = frameGroup.Start;
+            var count = frameGroup.Count;
             for (var i = 0; i < count; i++)
             {
-                DrawFrameExtended(context, sequence.Q2Items[index + i]);
+                DrawFrameExtended(context, sequence.FramesEx[index + i]);
             }
         }
 
-        private void DrawFrameExtended(Context contextParent, Sequence.Q2 q)
+        private void DrawFrameExtended(Context contextParent, Sequence.FrameEx frameEx)
         {
             var context = contextParent.Clone();
-            context.Left = q.Left * context.ScaleX;
-            context.Top = q.Top * context.ScaleY;
-            context.Right = q.Right * context.ScaleX;
-            context.Bottom = q.Bottom * context.ScaleY;
+            context.Left = frameEx.Left * context.ScaleX;
+            context.Top = frameEx.Top * context.ScaleY;
+            context.Right = frameEx.Right * context.ScaleX;
+            context.Bottom = frameEx.Bottom * context.ScaleY;
 
-            DrawFrame(context, sequence.Q1Items[q.Q1Index]);
+            DrawFrame(context, sequence.Frames[frameEx.FrameIndex]);
         }
 
-        private void DrawFrame(Context context, Sequence.Q1 q)
+        private void DrawFrame(Context context, Sequence.Frame frame)
         {
             drawing.DrawSurface(surface,
-                Rectangle.FromLTRB(q.Left, q.Top, q.Right, q.Bottom),
+                Rectangle.FromLTRB(frame.Left, frame.Top, frame.Right, frame.Bottom),
                 RectangleF.FromLTRB(context.PositionX + context.Left, context.PositionY + context.Top,
                     context.PositionX + context.Right, context.PositionY + context.Bottom),
-                Multiply(ConvertColor(q.ColorLeft), context.Color),
-                Multiply(ConvertColor(q.ColorTop), context.Color),
-                Multiply(ConvertColor(q.ColorRight), context.Color),
-                Multiply(ConvertColor(q.ColorBottom), context.Color));
+                Multiply(ConvertColor(frame.ColorLeft), context.Color),
+                Multiply(ConvertColor(frame.ColorTop), context.Color),
+                Multiply(ConvertColor(frame.ColorRight), context.Color),
+                Multiply(ConvertColor(frame.ColorBottom), context.Color));
         }
 
         public static ColorF Multiply(ColorF a, ColorF b) =>

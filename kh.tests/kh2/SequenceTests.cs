@@ -56,11 +56,11 @@ namespace kh.tests.kh2
         public void ValidateSequenceHeader() => StartTest(stream =>
         {
             var sequence = Sequence.Read(stream);
-            Assert.Equal(3, sequence.Q1Items.Count);
-            Assert.Equal(15, sequence.Q2Items.Count);
-            Assert.Equal(3, sequence.Q3Items.Count);
-            Assert.Equal(10, sequence.Q4Items.Count);
-            Assert.Equal(2, sequence.Q5Items.Count);
+            Assert.Equal(3, sequence.Frames.Count);
+            Assert.Equal(15, sequence.FramesEx.Count);
+            Assert.Equal(3, sequence.FrameGroups.Count);
+            Assert.Equal(10, sequence.Animations.Count);
+            Assert.Equal(2, sequence.AnimationGroups.Count);
         });
 
         [Fact]
