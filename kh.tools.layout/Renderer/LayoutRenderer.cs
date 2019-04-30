@@ -1,4 +1,5 @@
 ﻿using kh.kh2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xe.Drawing;
@@ -10,6 +11,20 @@ namespace kh.tools.layout.Renderer
         private readonly Layout layout;
         private readonly IDrawing drawing;
         private readonly ISurface[] surfaces;
+        private int selectedSequenceGroupIndex;
+
+        public int SelectedSequenceGroupIndex
+        {
+            get => selectedSequenceGroupIndex;
+            set
+            {
+                if (value < 0 || value >= layout.SequenceGroups.Count)
+                    throw new ArgumentOutOfRangeException(nameof(value),
+                        "Cannot be negative or greater than the amount of sequence groups.");
+
+                selectedSequenceGroupIndex = value;
+            }
+        }
 
         public int FrameIndex { get; set; }
 
@@ -22,8 +37,7 @@ namespace kh.tools.layout.Renderer
 
         public void Draw()
         {
-            DrawLayoutGroup(layout.SequenceGroups[1]);
-            FrameIndex++;
+            DrawLayoutGroup(layout.SequenceGroups[selectedSequenceGroupIndex]);
         }
 
         private void DrawLayoutGroup(Layout.SequenceGroup l2)
