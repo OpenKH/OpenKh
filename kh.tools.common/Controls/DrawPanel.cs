@@ -178,10 +178,10 @@ namespace kh.tools.common.Controls
             }
         }
 
-        protected void OnDrawCreate() => drawCreateCommand.Invoke(drawing);
-        protected void OnDrawDestroy() => drawDestroyCommand.Invoke(drawing);
-        protected void OnDrawBegin() => drawBeginCommand.Invoke(drawing);
-        protected void OnDrawEnd() => drawEndCommand.Invoke(drawing);
+        protected virtual void OnDrawCreate() => drawCreateCommand.Invoke(drawing);
+        protected virtual void OnDrawDestroy() => drawDestroyCommand.Invoke(drawing);
+        protected virtual void OnDrawBegin() => drawBeginCommand.Invoke(drawing);
+        protected virtual void OnDrawEnd() => drawEndCommand.Invoke(drawing);
 
         private void SetDrawing(IDrawing drawing)
         {
