@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xe.Drawing;
+using static kh.tools.common.DependencyPropertyUtils;
 
 namespace kh.tools.common.Controls
 {
@@ -281,36 +282,5 @@ namespace kh.tools.common.Controls
                 width, height, Xe.Drawing.PixelFormat.Format32bppArgb, SurfaceType.InputOutput);
             DoRender();
         }
-
-        private static DependencyProperty GetDependencyProperty<TClass, TValue>(
-            string name,
-            Action<TClass, TValue> setter,
-            Func<TValue, bool> validator = null)
-            where TClass : class =>
-            GetDependencyProperty(name, (TValue)(object)null, setter);
-
-        private static DependencyProperty GetDependencyProperty<TClass, TValue>(
-            string name,
-            TValue defaultValue,
-            Action<TClass, TValue> setter,
-            Func<TValue, bool> validator = null)
-            where TClass : class => DependencyProperty.Register(
-                name,
-                typeof(TValue),
-                typeof(TClass),
-                GetProperyMetadata(defaultValue, setter),
-                validator == null ?
-                    GetValidateDefault<TValue>(defaultValue == null) :
-                    GetValidateWithFunc(validator, defaultValue == null));
-
-        private static PropertyMetadata GetProperyMetadata<TClass, TValue>(TValue defalutValue, Action<TClass, TValue> setter)
-            where TClass : class => new PropertyMetadata(defalutValue, GetProperyCallback(setter));
-        private static PropertyChangedCallback GetProperyCallback<TClass, TValue>(Action<TClass, TValue> setter)
-            where TClass : class => new PropertyChangedCallback((d, e) => setter(d as TClass, (TValue)e.NewValue));
-
-        private static ValidateValueCallback GetValidateWithFunc<T>(Func<T, bool> funcValidator, bool canBeNull) =>
-            new ValidateValueCallback(x => (x == null && canBeNull) || (x is T value ? funcValidator(value) : false));
-        private static ValidateValueCallback GetValidateDefault<T>(bool canBeNull) =>
-            new ValidateValueCallback(x => (x == null && canBeNull) || (x is T));
     }
 }
