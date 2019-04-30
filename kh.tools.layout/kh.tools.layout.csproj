@@ -25,6 +25,11 @@
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
+    <Page Update="Views\FrameView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SequenceGroupView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 </Project>
