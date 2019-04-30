@@ -8,13 +8,13 @@
         mc:Ignorable="d"
         Title="{Binding Title}" Height="450" Width="800">
     <Grid>
-        <controls:DrawPanel
-            DataContext="{Binding Renderer}"
-            DrawCreate="{Binding DrawCreateCommand}"
-            DrawDestroy="{Binding DrawDestroyCommand}"
-            DrawBegin="{Binding DrawBeginCommand}"
-            DrawEnd="{Binding DrawEndCommand}"
+        <local:LayoutRendererPanel
+            Grid.Row="1"
             Drawing="{Binding Drawing}"
+            SelectedLayout="{Binding SelectedLayout}"
+            SelectedImages="{Binding SelectedImages}"
+            SelectedSequenceGroupIndex="{Binding SelectedSequenceGroupIndex, Mode=TwoWay}"
+            FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
             />
     </Grid>
 </Window>

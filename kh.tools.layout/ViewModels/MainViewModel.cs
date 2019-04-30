@@ -4,19 +4,74 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.Drawing;
+using Xe.Tools;
 
 namespace kh.tools.layout.ViewModels
 {
-    public class MainViewModel
+    public class MainViewModel : BaseNotifyPropertyChanged
     {
+        private SequenceGroupsViewModel sequenceGroups;
+        private Layout selectedLayout;
+        private IEnumerable<Imgd> selectedImages;
+        private int frameIndex;
+        private int selectedSequenceGroupIndex;
+
         public string Title { get; }
 
-        public RendererViewModel Renderer { get; }
+        public IDrawing Drawing { get; }
+
+        public Layout SelectedLayout
+        {
+            get => selectedLayout; private set
+            {
+                selectedLayout = value;
+                OnPropertyChanged(nameof(SelectedLayout));
+            }
+        }
+
+        public IEnumerable<Imgd> SelectedImages
+        {
+            get => selectedImages; private set
+            {
+                selectedImages = value;
+                OnPropertyChanged(nameof(SelectedImages));
+            }
+        }
+
+        public SequenceGroupsViewModel SequenceGroups
+        {
+            get => sequenceGroups;
+            private set
+            {
+                sequenceGroups = value;
+                OnPropertyChanged(nameof(SequenceGroups));
+            }
+        }
+
+        public int SelectedSequenceGroupIndex
+        {
+            get => selectedSequenceGroupIndex;
+            set
+            {
+                selectedSequenceGroupIndex = value;
+                OnPropertyChanged(nameof(SelectedSequenceGroupIndex));
+            }
+        }
+
+        public int FrameIndex
+        {
+            get => frameIndex;
+            set
+            {
+                frameIndex = value;
+                OnPropertyChanged(nameof(FrameIndex));
+            }
+        }
 
         public MainViewModel()
         {
             Title = Utilities.GetApplicationName();
-            Renderer = new RendererViewModel();
+            Drawing = new DrawingDirect3D();
         }
 
         private void OpenFile(string fileName)
@@ -39,7 +94,9 @@ namespace kh.tools.layout.ViewModels
 
         private void OpenLayout(Layout layout, IEnumerable<Imgd> images)
         {
-            Renderer.SetLayout(layout, images);
+            SequenceGroups = new SequenceGroupsViewModel(layout);
+            SelectedLayout = layout;
+            SelectedImages = images;
         }
     }
 }
