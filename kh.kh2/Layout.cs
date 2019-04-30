@@ -25,7 +25,7 @@ namespace kh.kh2
             [Data] public int SequenceOffset { get; set; }
         }
 
-        public class L1
+        public class SequenceProperty
         {
             [Data] public int TextureIndex { get; set; }
             [Data] public int SequenceIndex { get; set; }
@@ -35,7 +35,7 @@ namespace kh.kh2
             [Data] public int PositionY { get; set; }
         }
 
-        public class L2
+        public class SequenceGroup
         {
             [Data] public short L1Index { get; set; }
             [Data] public short L1Count { get; set; }
@@ -45,8 +45,8 @@ namespace kh.kh2
             [Data] public int Unknown10 { get; set; }
         }
 
-        public List<L1> L1Items { get; set; }
-        public List<L2> L2Items { get; set; }
+        public List<SequenceProperty> SequenceProperties { get; set; }
+        public List<SequenceGroup> SequenceGroups { get; set; }
         public List<Sequence> SequenceItems { get; set; }
 
         internal Layout(Stream stream)
@@ -63,8 +63,8 @@ namespace kh.kh2
             if (header.Version != SupportedVersion)
                 throw new InvalidDataException($"Unsupported version {header.Version}");
 
-            L1Items = stream.ReadList<L1>(header.L1Offset, header.L1Count);
-            L2Items = stream.ReadList<L2>(header.L2Offset, header.L2Count);
+            SequenceProperties = stream.ReadList<SequenceProperty>(header.L1Offset, header.L1Count);
+            SequenceGroups = stream.ReadList<SequenceGroup>(header.L2Offset, header.L2Count);
             SequenceItems = new List<Sequence>();
 
             var sequenceOffsets = stream.ReadInt32List(header.SequenceOffset, header.SequenceCount);
@@ -88,15 +88,15 @@ namespace kh.kh2
             {
                 MagicCode = MagicCodeValidator,
                 Version = SupportedVersion,
-                L1Count = L1Items.Count,
-                L2Count = L2Items.Count,
+                L1Count = SequenceProperties.Count,
+                L2Count = SequenceGroups.Count,
                 SequenceCount = SequenceItems.Count,
             };
 
             stream.Position = MinimumLength;
             header.L1Offset = (int)stream.Position;
-            header.L2Offset = stream.WriteList(L1Items) + header.L1Offset;
-            header.SequenceOffset = stream.WriteList(L2Items) + header.L2Offset;
+            header.L2Offset = stream.WriteList(SequenceProperties) + header.L1Offset;
+            header.SequenceOffset = stream.WriteList(SequenceGroups) + header.L2Offset;
             WriteSequences(stream);
 
             stream.Position = 0;

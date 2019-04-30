@@ -22,21 +22,21 @@ namespace kh.tools.layout.Renderer
 
         public void Draw()
         {
-            DrawLayoutGroup(layout.L2Items[1]);
+            DrawLayoutGroup(layout.SequenceGroups[1]);
             FrameIndex++;
         }
 
-        private void DrawLayoutGroup(Layout.L2 l2)
+        private void DrawLayoutGroup(Layout.SequenceGroup l2)
         {
             var index = l2.L1Index;
             var count = l2.L1Count;
             for (var i = 0; i < count; i++)
             {
-                DrawLayout(layout.L1Items[index + i]);
+                DrawLayout(layout.SequenceProperties[index + i]);
             }
         }
 
-        private void DrawLayout(Layout.L1 l1)
+        private void DrawLayout(Layout.SequenceProperty l1)
         {
             var currentFrameIndex = FrameIndex - l1.ShowAtFrame;
             if (currentFrameIndex < 0)
