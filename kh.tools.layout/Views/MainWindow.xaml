@@ -8,6 +8,22 @@
         mc:Ignorable="d"
         Title="{Binding Title}" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock>Sequence Group Index</TextBlock>
+            <ComboBox
+                ItemsSource="{Binding SequenceGroups.Items}"
+                SelectedIndex="{Binding SelectedSequenceGroupIndex}"/>
+
+            <TextBlock>Frame Index</TextBlock>
+            <TextBox 
+                Text="{Binding FrameIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+
         <local:LayoutRendererPanel
             Grid.Row="1"
             Drawing="{Binding Drawing}"
