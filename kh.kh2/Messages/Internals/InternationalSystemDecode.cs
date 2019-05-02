@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace kh.kh2.Messages.Internals
 {
@@ -94,8 +94,8 @@ namespace kh.kh2.Messages.Internals
             [0x55] = new TextCmdModel('–'),
             [0x56] = new TextCmdModel('〜'),
             [0x57] = new TextCmdModel('\''),
-            [0x58] = new UnsupportedCmdModel(), // Unused
-            [0x59] = new UnsupportedCmdModel(), // Unused
+            [0x58] = new UnsupportedCmdModel(0x58), // Unused
+            [0x59] = new UnsupportedCmdModel(0x59), // Unused
             [0x5a] = new TextCmdModel('('),
             [0x5b] = new TextCmdModel(')'),
             [0x5c] = new TextCmdModel('「'),
@@ -116,11 +116,11 @@ namespace kh.kh2.Messages.Internals
             [0x6b] = new TextCmdModel('⇽'), // Used only in EVT
             [0x6c] = new TextCmdModel('◯'),
             [0x6d] = new TextCmdModel('✕'),
-            [0x6e] = new UnsupportedCmdModel(), // Unused
-            [0x6f] = new UnsupportedCmdModel(), // Unused
-            [0x70] = new UnsupportedCmdModel(), // Unused
-            [0x71] = new UnsupportedCmdModel(), // Unused
-            [0x72] = new UnsupportedCmdModel(), // Unused
+            [0x6e] = new UnsupportedCmdModel(0x6e), // Unused
+            [0x6f] = new UnsupportedCmdModel(0x6e), // Unused
+            [0x70] = new UnsupportedCmdModel(0x70), // Unused
+            [0x71] = new UnsupportedCmdModel(0x71), // Unused
+            [0x72] = new UnsupportedCmdModel(0x72), // Unused
             [0x73] = new SimpleCmdModel(MessageCommand.Tabulation),
             [0x74] = new TextCmdModel("I"),
             [0x75] = new TextCmdModel("II"),
@@ -149,7 +149,7 @@ namespace kh.kh2.Messages.Internals
             [0x8c] = new TextCmdModel('◂'),
             [0x8d] = new TextCmdModel('°'),
             [0x8e] = new TextCmdModel("♪"),
-            [0x8f] = new UnsupportedCmdModel(), // Unused
+            [0x8f] = new UnsupportedCmdModel(0x8f), // Unused
             [0x90] = new TextCmdModel('0'),
             [0x91] = new TextCmdModel('1'),
             [0x92] = new TextCmdModel('2'),
@@ -261,7 +261,7 @@ namespace kh.kh2.Messages.Internals
             [0xfc] = new TextCmdModel('↓'),
             [0xfd] = new TextCmdModel('・'),
             [0xfe] = new TextCmdModel('❤'),
-            [0xff] = new UnsupportedCmdModel(), // Unused
+            [0xff] = new UnsupportedCmdModel(0xff), // Unused
         };
 
         public List<MessageCommandModel> Decode(byte[] data) =>

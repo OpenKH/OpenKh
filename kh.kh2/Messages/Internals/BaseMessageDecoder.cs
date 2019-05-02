@@ -34,6 +34,8 @@ namespace kh.kh2.Messages.Internals
                     AppendChar(cmdModel.Text[0]);
                 else if (cmdModel.Command == MessageCommand.PrintComplex)
                     AppendText(cmdModel.Text);
+                else if (cmdModel.Command == MessageCommand.Unsupported)
+                    AppendEntry(cmdModel.Command, new byte[] { cmdModel.RawData });
                 else
                     AppendEntry(cmdModel);
             }
@@ -67,13 +69,15 @@ namespace kh.kh2.Messages.Internals
             }
         }
 
-        private void AppendEntry(BaseCmdModel cmdModel)
+        private void AppendEntry(BaseCmdModel cmdModel) => AppendEntry(cmdModel.Command, ReadBytes(cmdModel.Length));
+
+        private void AppendEntry(MessageCommand command, byte[] data)
         {
             FlushTextBuilder();
             _entries.Add(new MessageCommandModel
             {
-                Command = cmdModel.Command,
-                Data = ReadBytes(cmdModel.Length)
+                Command = command,
+                Data = data
             });
         }
 
