@@ -109,6 +109,7 @@ namespace kh.kh2
                         data.Add(stream.ReadByte());
                         break;
                     case 0x07:
+                    case 0x11:
                     case 0x13:
                         data.Add(stream.ReadByte());
                         data.Add(stream.ReadByte());
