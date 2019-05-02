@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace kh.kh2.Messages
@@ -16,6 +17,8 @@ namespace kh.kh2.Messages
 
         public static string SerializeToText(MessageCommandModel entry)
         {
+            if (entry.Command == MessageCommand.End)
+                return string.Empty;
             if (entry.Command == MessageCommand.PrintText)
                 return entry.Text;
             if (entry.Command == MessageCommand.PrintComplex)
@@ -28,7 +31,11 @@ namespace kh.kh2.Messages
             if (!_serializer.TryGetValue(entry.Command, out var serializeModel))
                 throw new NotImplementedException($"The command {entry.Command} serialization is not implemented yet.");
 
-            return $"{{:{serializeModel.Name} {serializeModel.ValueGetter(entry)}}}";
+            Debug.Assert(serializeModel != null, $"BUG: {nameof(serializeModel)} should never be null");
+
+            if (serializeModel.ValueGetter != null)
+                return $"{{:{serializeModel.Name} {serializeModel.ValueGetter(entry)}}}";
+            return $"{{:{serializeModel.Name}}}";
         }
     }
 }
