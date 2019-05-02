@@ -35,6 +35,7 @@ namespace kh.kh2.Messages
                 [MessageCommand.Unknown0e] = new SerializeModel { Name = "unk0e", ValueGetter = x => ToStringRawData(x.Data) },
                 [MessageCommand.Unknown0f] = new SerializeModel { Name = "unk0f", ValueGetter = x => ToStringRawData(x.Data) },
                 [MessageCommand.Clear] = new SerializeModel { Name = "clear", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unknown11] = new SerializeModel { Name = "unk11", ValueGetter = x => ToStringRawData(x.Data) },
                 [MessageCommand.Unknown12] = new SerializeModel { Name = "unk12", ValueGetter = x => ToStringRawData(x.Data) },
                 [MessageCommand.Unknown13] = new SerializeModel { Name = "unk13", ValueGetter = x => ToStringRawData(x.Data) },
                 [MessageCommand.Delay] = new SerializeModel { Name = "delay", ValueGetter = x => ToStringRawData(x.Data) },
@@ -48,6 +49,7 @@ namespace kh.kh2.Messages
                 [MessageCommand.Unknown1d] = new SerializeModel { Name = "unk1d", ValueGetter = x => ToStringRawData(x.Data) },
                 [MessageCommand.Unknown1e] = new SerializeModel { Name = "unk1e", ValueGetter = x => ToStringRawData(x.Data) },
                 [MessageCommand.Unknown1f] = new SerializeModel { Name = "unk1f", ValueGetter = x => ToStringRawData(x.Data) },
+                [MessageCommand.Unsupported] = new SerializeModel { Name = "unk", ValueGetter = x => ToStringRawData(x.Data) }
             };
 
         private static Dictionary<byte, string> _icons =
