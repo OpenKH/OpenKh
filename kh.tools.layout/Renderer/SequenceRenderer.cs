@@ -113,7 +113,7 @@ namespace kh.tools.layout.Renderer
             context.PositionY += Lerp(t, animation.Ya0, animation.Ya1);
             context.ColorBlendType = animation.ColorBlend;
 
-            if ((animation.Flags & ScalingFlag) != 0)
+            if ((animation.Flags & ScalingFlag) == 0)
             {
                 var scale = Lerp(t, animation.ScaleStart, animation.ScaleEnd);
                 var scaleX = Lerp(t, animation.ScaleXStart, animation.ScaleXEnd);
@@ -127,9 +127,9 @@ namespace kh.tools.layout.Renderer
                 context.ScaleY = 1.0f;
             }
 
-            if ((animation.Flags & ColorMaskingFlag) != 0)
+            if ((animation.Flags & ColorMaskingFlag) == 0)
             {
-                if ((animation.Flags & ColorInterpolationFlag) != 0)
+                if ((animation.Flags & ColorInterpolationFlag) == 0)
                 {
                     context.Color = Lerp(t,
                         ConvertColor(animation.ColorStart),
@@ -143,7 +143,7 @@ namespace kh.tools.layout.Renderer
             else
                 context.Color = ConvertColor(animation.ColorStart);
 
-            if ((animation.Flags & TraslateFlag) != 0)
+            if ((animation.Flags & TraslateFlag) == 0)
             {
                 context.PositionX += Lerp(t, animation.Xb0, animation.Xb1);
                 context.PositionY += Lerp(t, animation.Yb0, animation.Yb1);
