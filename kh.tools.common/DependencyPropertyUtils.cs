@@ -10,7 +10,7 @@ namespace kh.tools.common
             Action<TClass, TValue> setter,
             Func<TValue, bool> validator = null)
             where TClass : class =>
-            GetDependencyProperty(name, (TValue)(object)null, setter);
+            GetDependencyProperty(name, default, setter);
 
         public static DependencyProperty GetDependencyProperty<TClass, TValue>(
             string name,
