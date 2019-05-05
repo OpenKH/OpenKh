@@ -49,8 +49,8 @@ namespace kh.tools.layout
                 for (var i = 0; i < size.Width / 2; i++)
                 {
                     var ch = data[srcIndex++];
-                    var palIndex1 = (ch & 15);
-                    var palIndex2 = (ch >> 4);
+                    var palIndex1 = (ch >> 4);
+                    var palIndex2 = (ch & 15);
                     dstData[dstIndex++] = clut[palIndex1 * 4 + 2];
                     dstData[dstIndex++] = clut[palIndex1 * 4 + 1];
                     dstData[dstIndex++] = clut[palIndex1 * 4 + 0];
