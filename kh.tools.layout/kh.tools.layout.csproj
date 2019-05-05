@@ -25,6 +25,9 @@
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Controls\Timeline.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\FrameView.xaml">
       <SubType>Designer</SubType>
     </Page>
