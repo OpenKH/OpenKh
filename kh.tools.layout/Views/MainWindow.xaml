@@ -8,29 +8,44 @@
         mc:Ignorable="d"
         Title="{Binding Title}" Height="450" Width="800">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Grid Grid.Column="0" Margin="0 0 5 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock>Sequence Group Index</TextBlock>
-            <ComboBox
-                ItemsSource="{Binding SequenceGroups.Items}"
-                SelectedIndex="{Binding SelectedSequenceGroupIndex}"/>
+            <StackPanel Grid.Row="0">
+                <TextBlock>Sequence Group Index</TextBlock>
+                <ComboBox
+                    ItemsSource="{Binding SequenceGroups.Items}"
+                    DisplayMemberPath="Name"
+                    SelectedIndex="{Binding SelectedSequenceGroupIndex}"
+                    SelectedItem="{Binding SequenceGroups.SelectedItem}"/>
 
-            <TextBlock>Frame Index</TextBlock>
-            <TextBox 
-                Text="{Binding FrameIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        </StackPanel>
+                <TextBlock>Frame Index</TextBlock>
+                <TextBox 
+                    Text="{Binding FrameIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
 
-        <local:LayoutRendererPanel
-            Grid.Row="1"
-            Drawing="{Binding Drawing}"
-            SelectedLayout="{Binding SelectedLayout}"
-            SelectedImages="{Binding SelectedImages}"
-            SelectedSequenceGroupIndex="{Binding SelectedSequenceGroupIndex, Mode=TwoWay}"
-            FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
-            />
+            <local:LayoutRendererPanel
+                Grid.Row="1"
+                Drawing="{Binding Drawing}"
+                SelectedLayout="{Binding SelectedLayout}"
+                SelectedImages="{Binding SelectedImages}"
+                SelectedSequenceGroupIndex="{Binding SelectedSequenceGroupIndex, Mode=TwoWay}"
+                FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
+                />
+        </Grid>
+
+        <Grid Grid.Column="1">
+            <local:SequenceGroupView
+                DataContext="{Binding SequenceGroups.SelectedItem}"/>
+        </Grid>
+        
     </Grid>
 </Window>

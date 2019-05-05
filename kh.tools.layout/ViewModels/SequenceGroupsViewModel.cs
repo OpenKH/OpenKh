@@ -23,6 +23,7 @@ namespace kh.tools.layout.ViewModels
         {
             base.OnSelectedItem(item);
             OnPropertyChanged(nameof(SelectedSequenceGroupIndex));
+            OnPropertyChanged(nameof(SelectedItem));
         }
 
         protected override SequenceGroupModel OnNewItem()
