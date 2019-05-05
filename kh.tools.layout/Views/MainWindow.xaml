@@ -41,6 +41,7 @@
                 SelectedImages="{Binding SelectedImages}"
                 SelectedSequenceGroupIndex="{Binding SelectedSequenceGroupIndex, Mode=TwoWay}"
                 FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
+                FramesPerSecond="60"
                 />
 
             <localcontrols:Timeline
