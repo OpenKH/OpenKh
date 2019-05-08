@@ -48,6 +48,7 @@ namespace kh.tests.kh2
         [InlineData("8bit-512-256")]
         [InlineData("8bit-512-512")]
         [InlineData("8bit-64-64")]
+        [InlineData("32bit-512-512")]
         public void IsWritingBackCorrectly(string baseName) =>
             Common.FileOpenRead($"kh2/res/image-{baseName}.imd", stream =>
         {

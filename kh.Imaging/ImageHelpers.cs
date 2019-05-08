@@ -117,6 +117,8 @@ namespace kh.Imaging
                     return System.Drawing.Imaging.PixelFormat.Format4bppIndexed;
                 case PixelFormat.Indexed8:
                     return System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                case PixelFormat.Rgba8888:
+                    return System.Drawing.Imaging.PixelFormat.Format32bppArgb;
                 default:
                     throw new NotImplementedException(
                         $"The reading from pixel format {pixelFormat} is not implemented.");

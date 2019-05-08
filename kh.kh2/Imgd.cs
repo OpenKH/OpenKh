@@ -10,8 +10,12 @@ namespace kh.kh2
     public partial class Imgd : IImageRead
 	{
 		private const uint MagicCode = 0x44474D49U;
+        private const short Format32bpp = 0x00;
         private const short Format8bpp = 0x13;
         private const short Format4bpp = 0x14;
+        private const short SubFormat32bpp = 3;
+        private const short SubFormat8bpp = 5;
+        private const short SubFormat4bpp = 4;
 
         public static bool IsValid(Stream stream) =>
             stream.Length >= 4 && new BinaryReader(stream).PeekInt32() == MagicCode;
@@ -81,12 +85,14 @@ namespace kh.kh2
 			writer.Write((short)(Size.Width / 64));
 			writer.Write(format);
 			writer.Write(-1);
-			writer.Write((short)(format == Format8bpp ? 16 : 8));
-			writer.Write((short)(format == Format8bpp ? 16 : 2));
-			writer.Write(1);
-			writer.Write((short)(format == Format8bpp ? 5 : 4));
-			writer.Write((short)3);
-			writer.Write(0);
+			writer.Write((short)(format == Format4bpp ? 8 : 16));
+            writer.Write((short)(format == Format4bpp ? 2 : 16));
+			writer.Write((short)1);
+			writer.Write((short)(format == Format32bpp ? 19 : 0));
+			writer.Write(GetSubFormat(format));
+			writer.Write((short)(format == Format32bpp ? 0 : 3));
+            writer.Write(0);
+
 			writer.Write(swizzled);
 
             writer.Write(Data, 0, Data.Length);
@@ -106,10 +112,12 @@ namespace kh.kh2
         public byte[] GetData()
 		{
 			switch (format)
-			{
-				case Format8bpp:
+            {
+                case Format32bpp:
+                    return GetData32bpp();
+                case Format8bpp:
                     return IsSwizzled ? Ps2.Decode8(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data;
-				case Format4bpp:
+                case Format4bpp:
 					return IsSwizzled ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data;
 				default:
 					throw new NotSupportedException($"The format {format} is not supported.");
@@ -156,6 +164,20 @@ namespace kh.kh2
             return data;
         }
 
+        private byte[] GetData32bpp()
+        {
+            var newData = new byte[Data.Length];
+            for (var i = 0; i < newData.Length - 3; i += 4)
+            {
+                newData[i + 0] = Data[i + 2];
+                newData[i + 1] = Data[i + 1];
+                newData[i + 2] = Data[i + 0];
+                newData[i + 3] = FromPs2Alpha(Data[i + 3]);
+            }
+
+            return newData;
+        }
+
         private static short GetPow(short value)
         {
             short pow = 1;
@@ -171,6 +193,7 @@ namespace kh.kh2
         {
             switch (format)
             {
+                case Format32bpp: return PixelFormat.Rgba8888;
                 case Format8bpp: return PixelFormat.Indexed8;
                 case Format4bpp: return PixelFormat.Indexed4;
                 default: return PixelFormat.Undefined;
@@ -181,11 +204,25 @@ namespace kh.kh2
         {
             switch (pixelFormat)
             {
+                case PixelFormat.Rgba8888: return Format32bpp;
                 case PixelFormat.Indexed4: return Format4bpp;
                 case PixelFormat.Indexed8: return Format8bpp;
                 default:
                     throw new ArgumentOutOfRangeException(
                         $"Pixel format {pixelFormat} is not supported.");
+            }
+        }
+
+        private static short GetSubFormat(short format)
+        {
+            switch (format)
+            {
+                case Format32bpp: return SubFormat32bpp;
+                case Format4bpp: return SubFormat4bpp;
+                case Format8bpp: return SubFormat8bpp;
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        $"Format {format} is not supported.");
             }
         }
     }
