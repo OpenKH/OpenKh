@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kh.kh2", "kh.kh2\kh.kh2.csproj", "{D5B36CD1-5B5D-4CE9-A673-209AD386D68A}"
 EndProject
@@ -37,7 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BruteforceKh2Names", "Brute
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kh.cmd.idximg", "kh.cmd.idximg\kh.cmd.idximg.csproj", "{11D9F155-69EA-4486-908B-51CB799E4E01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kh.common", "kh.common\kh.common.csproj", "{ECE73C11-C9A0-4132-9FF3-DD52126846E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kh.common", "kh.common\kh.common.csproj", "{ECE73C11-C9A0-4132-9FF3-DD52126846E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kh.tools.lvup", "kh.tools.lvup\kh.tools.lvup.csproj", "{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -275,6 +277,22 @@ Global
 		{ECE73C11-C9A0-4132-9FF3-DD52126846E5}.Release|x64.Build.0 = Release|Any CPU
 		{ECE73C11-C9A0-4132-9FF3-DD52126846E5}.Release|x86.ActiveCfg = Release|Any CPU
 		{ECE73C11-C9A0-4132-9FF3-DD52126846E5}.Release|x86.Build.0 = Release|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Debug|ARM.Build.0 = Debug|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Debug|x64.Build.0 = Debug|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Debug|x86.Build.0 = Debug|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Release|ARM.ActiveCfg = Release|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Release|ARM.Build.0 = Release|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Release|x64.ActiveCfg = Release|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Release|x64.Build.0 = Release|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Release|x86.ActiveCfg = Release|Any CPU
+		{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

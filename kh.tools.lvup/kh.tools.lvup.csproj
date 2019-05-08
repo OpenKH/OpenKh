@@ -53,7 +53,12 @@
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModels\CharactersViewModel.cs" />
+    <Compile Include="Views\CharactersViewModel.xaml.cs">
+      <DependentUpon>CharactersViewModel.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -66,6 +71,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\CharactersViewModel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -93,5 +102,20 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\kh.kh2\kh.kh2.csproj">
+      <Project>{d5b36cd1-5b5d-4ce9-a673-209ad386d68a}</Project>
+      <Name>kh.kh2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj">
+      <Project>{f6e4e1df-acc6-4dde-912f-c6465cb3d393}</Project>
+      <Name>Xe.Tools.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj">
+      <Project>{c02f5c8b-16a0-4591-a65d-8a7e845d5f59}</Project>
+      <Name>Xe.Tools</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
