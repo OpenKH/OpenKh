@@ -1,51 +1,57 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace kh.kh2
 {
-    public class Lvup
+    public static class Lvup
     {
-        private byte[] Header { get; }
+        private static byte[] _header;
 
-        public ObservableCollection<PlayableCharacter> Characters { get; set; }
-
-        public Lvup(Stream stream)
+        public static List<PlayableCharacter> Open(Stream stream)
         {
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
 
             var reader = new BinaryReader(stream);
-            Header = reader.ReadBytes(0x40);
-            for (int i = 0; i < 13; i++)
-            {
-                reader.BaseStream.Seek(4, SeekOrigin.Current);
-                Characters.Add(new PlayableCharacter(stream, i));
-            }
+            _header = reader.ReadBytes(0x40);
+
+            return Enumerable.Range(0, 13)
+                .Select(x =>
+                {
+                    reader.BaseStream.Seek(4, SeekOrigin.Current);
+                    return new PlayableCharacter(stream, x);
+                })
+                .ToList();
         }
 
-        public void Save(Stream stream)
+        public static void Save(Stream stream, IEnumerable<PlayableCharacter> characters)
         {
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
 
-            var writer = new BinaryWriter(stream);
-            writer.Write(Header);
-
-            foreach(var character in Characters)
+            if (_header?.Length > 0)
             {
-                writer.Write((int)0);
-                foreach(var lvl in character.Levels)
-                {
-                    writer.Write(lvl.EXP);
-                    writer.Write(lvl.Strength);
-                    writer.Write(lvl.Magic);
-                    writer.Write(lvl.Defense);
-                    writer.Write(lvl.AP);
+                var writer = new BinaryWriter(stream);
+                writer.Write(_header);
 
-                    writer.Write(lvl.SwordAbility);
-                    writer.Write(lvl.ShieldAbility);
-                    writer.Write(lvl.StaffAbility);
-                    writer.Write((short)0);
+                foreach (var character in characters)
+                {
+                    writer.Write(0);
+                    foreach (var lvl in character.Levels)
+                    {
+                        writer.Write(lvl.EXP);
+                        writer.Write(lvl.Strength);
+                        writer.Write(lvl.Magic);
+                        writer.Write(lvl.Defense);
+                        writer.Write(lvl.AP);
+
+                        writer.Write(lvl.SwordAbility);
+                        writer.Write(lvl.ShieldAbility);
+                        writer.Write(lvl.StaffAbility);
+                        writer.Write((short)0);
+                    }
                 }
             }
         }
@@ -102,7 +108,6 @@ namespace kh.kh2
         public short SwordAbility { get; set; }
         public short ShieldAbility { get; set; }
         public short StaffAbility { get; set; }
-        public short Padding { get; }
 
         public string Name
         {
