@@ -23,6 +23,9 @@ namespace kh.tools.bar.Services
 				case Bar.EntryType.Imgz:
 					name = "kh.tools.imgz";
 					break;
+                case Bar.EntryType.Msg:
+                    name = "kh.tools.lvup";
+                    break;
 				default:
 					throw new NotImplementedException($"Unable to find a tool for \"{type}\" files.");
 			}

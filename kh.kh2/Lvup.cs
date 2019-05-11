@@ -31,7 +31,7 @@ namespace kh.kh2
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
 
-            if (_header?.Length > 0)
+            if (CanSave())
             {
                 var writer = new BinaryWriter(stream);
                 writer.Write(_header);
@@ -55,6 +55,8 @@ namespace kh.kh2
                 }
             }
         }
+
+        public static bool CanSave() => _header?.Length > 0;
     }
 
     public class PlayableCharacter
