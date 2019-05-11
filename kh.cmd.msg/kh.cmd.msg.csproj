@@ -3,6 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>OpenKh.Command.MsgTool</AssemblyName>
+    <RootNamespace>OpenKh.Command.MsgTool</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

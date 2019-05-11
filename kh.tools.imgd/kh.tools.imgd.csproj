@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
+<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net472</TargetFramework>
@@ -9,6 +9,8 @@
     <Copyright>Copyright ©  2018</Copyright>
     <OutputPath>..\bin\$(Configuration)\</OutputPath>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <AssemblyName>OpenKh.Tools.ImgdViewer</AssemblyName>
+    <RootNamespace>OpenKh.Tools.ImgdViewer</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Xaml" />

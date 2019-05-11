@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
+<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net472</TargetFramework>
@@ -8,6 +8,8 @@
     <Description>https://github.com/Xeeynamo/KingdomHearts</Description>
     <Copyright>Copyright ©  2018</Copyright>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <AssemblyName>OpenKh.Tools.DpdViewer</AssemblyName>
+    <RootNamespace>OpenKh.Tools.DpdViewer</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Xaml" />
