@@ -8,7 +8,7 @@ namespace kh.tools.lvup.ViewModels
 {
     public class CharactersViewModel : GenericListModel<CharacterViewModel>
     {
-        public CharactersViewModel(IEnumerable<PlayableCharacter> list) 
+        public CharactersViewModel(IEnumerable<Lvup.PlayableCharacter> list) 
             : base(list.Select(x => new CharacterViewModel(x)))
         {
         }
