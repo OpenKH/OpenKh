@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace kh.tools.layout.Views
+namespace OpenKh.Tools.LayoutViewer.Views
 {
     /// <summary>
-    /// Interaction logic for SequenceGroupView.xaml
+    /// Interaction logic for FrameView.xaml
     /// </summary>
-    public partial class SequenceGroupView : UserControl
+    public partial class FrameView : UserControl
     {
-        public SequenceGroupView()
+        public FrameView()
         {
             InitializeComponent();
         }

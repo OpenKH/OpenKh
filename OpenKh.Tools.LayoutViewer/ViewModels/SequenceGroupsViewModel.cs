@@ -1,9 +1,9 @@
 ﻿using kh.kh2;
-using kh.tools.layout.Models;
+using OpenKh.Tools.LayoutViewer.Models;
 using System.Linq;
 using Xe.Tools.Wpf.Models;
 
-namespace kh.tools.layout.ViewModels
+namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
     public class SequenceGroupsViewModel : GenericListModel<SequenceGroupModel>
     {

@@ -1,6 +1,6 @@
 ﻿using kh.kh2;
 
-namespace kh.tools.layout.Models
+namespace OpenKh.Tools.LayoutViewer.Models
 {
     public class SequenceGroupModel
     {

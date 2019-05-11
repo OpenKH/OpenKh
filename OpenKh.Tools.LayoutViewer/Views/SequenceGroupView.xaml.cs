@@ -1,5 +1,4 @@
-﻿using kh.tools.layout.ViewModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,17 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace kh.tools.layout.Views
+namespace OpenKh.Tools.LayoutViewer.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for SequenceGroupView.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class SequenceGroupView : UserControl
     {
-        public MainWindow()
+        public SequenceGroupView()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
         }
     }
 }

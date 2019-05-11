@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using static kh.tools.common.DependencyPropertyUtils;
 
-namespace kh.tools.layout.Controls
+namespace OpenKh.Tools.LayoutViewer.Controls
 {
     /// <summary>
     /// Interaction logic for Timeline.xaml

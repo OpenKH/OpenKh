@@ -55,11 +55,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xe.Drawing", "XeEngine.Tool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kh.Imaging", "kh.Imaging\kh.Imaging.csproj", "{8A94810E-753B-4CB4-810A-1DF2745A885B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kh.tools.layout", "kh.tools.layout\kh.tools.layout.csproj", "{FF37C4CF-FC13-4986-8FE5-1458A8676F2C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.LayoutViewer", "OpenKh.Tools.LayoutViewer\OpenKh.Tools.LayoutViewer.csproj", "{FF37C4CF-FC13-4986-8FE5-1458A8676F2C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xe.Drawing.Direct3D", "XeEngine.Tools.Public\Xe.Drawing.Direct3D\Xe.Drawing.Direct3D.csproj", "{8580F123-1AA8-4FB0-BCEC-26BF04D64767}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kh.tools.common", "kh.tools.common\kh.tools.common.csproj", "{9B1D6729-66A0-4688-AC16-8C6B741B92A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.Common", "OpenKh.Tools.Common\OpenKh.Tools.Common.csproj", "{9B1D6729-66A0-4688-AC16-8C6B741B92A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

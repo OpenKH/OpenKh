@@ -1,6 +1,6 @@
 ﻿using kh.kh2;
 using kh.tools.common.Controls;
-using kh.tools.layout.Renderer;
+using OpenKh.Tools.LayoutViewer.Renderer;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Windows;
 using Xe.Drawing;
 using static kh.tools.common.DependencyPropertyUtils;
 
-namespace kh.tools.layout.Views
+namespace OpenKh.Tools.LayoutViewer.Views
 {
     public class LayoutRendererPanel : DrawPanel
     {

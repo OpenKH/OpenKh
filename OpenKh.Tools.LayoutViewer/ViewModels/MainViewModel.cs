@@ -6,7 +6,7 @@ using System.Linq;
 using Xe.Drawing;
 using Xe.Tools;
 
-namespace kh.tools.layout.ViewModels
+namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
     public class MainViewModel : BaseNotifyPropertyChanged
     {

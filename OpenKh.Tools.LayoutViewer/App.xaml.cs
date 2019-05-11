@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace kh.tools.layout
+namespace OpenKh.Tools.LayoutViewer
 {
     /// <summary>
     /// Interaction logic for App.xaml

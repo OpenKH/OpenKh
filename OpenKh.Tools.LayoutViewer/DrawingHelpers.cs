@@ -2,7 +2,7 @@
 using System;
 using Xe.Drawing;
 
-namespace kh.tools.layout
+namespace OpenKh.Tools.LayoutViewer
 {
     public static partial class DrawingHelpers
     {
@@ -18,10 +18,10 @@ namespace kh.tools.layout
             byte[] data;
             switch (image.PixelFormat)
             {
-                case Imaging.PixelFormat.Indexed4:
+                case kh.Imaging.PixelFormat.Indexed4:
                     data = GetDataResource4bpp(image);
                     break;
-                case Imaging.PixelFormat.Indexed8:
+                case kh.Imaging.PixelFormat.Indexed8:
                     data = GetDataResource8bpp(image);
                     break;
                 default:
