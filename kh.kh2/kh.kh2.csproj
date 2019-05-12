@@ -1,7 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>OpenKh.Kh2</AssemblyName>
+    <RootNamespace>OpenKh.Kh2</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,11 +13,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\kh.common\kh.common.csproj" />
+    <ProjectReference Include="..\kh.Imaging\kh.Imaging.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe\Xe.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="resources\files.txt">
+    <None Update="resources\kh2idx.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

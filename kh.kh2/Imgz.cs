@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using kh.common;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.IO;
@@ -14,38 +16,45 @@ namespace kh.kh2
 
 		private const uint MagicCode = 0x5A474D49U;
 
-		public static IEnumerable<Imgd> Open(Stream stream)
-		{
-			if (!stream.CanRead || !stream.CanSeek)
-				throw new InvalidDataException($"Read or seek must be supported.");
+        public static IEnumerable<Stream> OpenAsStream(Stream stream)
+        {
+            if (!stream.CanRead || !stream.CanSeek)
+                throw new InvalidDataException($"Read or seek must be supported.");
 
-			var reader = new BinaryReader(stream);
-			var offsetBase = reader.BaseStream.Position;
+            var reader = new BinaryReader(stream);
+            var offsetBase = reader.BaseStream.Position;
 
-			if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
-				throw new InvalidDataException("Invalid header");
+            if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
+                throw new InvalidDataException("Invalid header");
 
-			var unknown = reader.ReadInt32();
-			var entriesOffset = reader.ReadInt32();
-			var count = reader.ReadInt32();
+            var unknown = reader.ReadInt32();
+            var entriesOffset = reader.ReadInt32();
+            var count = reader.ReadInt32();
 
-			stream.Position = entriesOffset;
-			var entries = new List<Entry>(count);
-			for (int i = 0; i < count; i++)
-			{
-				entries.Add(new Entry()
-				{
-					Offset = reader.ReadInt32(),
-					Length = reader.ReadInt32(),
-				});
-			}
+            stream.Position = entriesOffset;
+            var entries = new List<Entry>(count);
+            for (int i = 0; i < count; i++)
+            {
+                entries.Add(new Entry()
+                {
+                    Offset = reader.ReadInt32(),
+                    Length = reader.ReadInt32(),
+                });
+            }
 
-			return entries
-				.Select(x => new Imgd(new SubStream(stream, x.Offset, x.Length)))
-				.ToList();
-		}
+            return entries
+                .Select(x => new SubStream(stream, x.Offset, x.Length))
+                .ToList();
+        }
 
-		public static void Save(Stream stream, IEnumerable<Imgd> images)
+        public static bool IsValid(Stream stream) =>
+            stream.Length >= 4 && new BinaryReader(stream).PeekInt32() == MagicCode;
+
+        public static IEnumerable<Imgd> Open(Stream stream) =>
+            OpenAsStream(stream).Select(x => Imgd.Read(x));
+
+
+        public static void Save(Stream stream, IEnumerable<Imgd> images)
 		{
 			if (!stream.CanWrite)
 				throw new InvalidDataException($"Read or seek must be supported.");
@@ -72,7 +81,7 @@ namespace kh.kh2
 			foreach (var image in images)
 			{
 				var memStream = new MemoryStream();
-				image.Save(memStream);
+				image.Write(memStream);
 				imgStreams.Add(memStream);
 
 				writer.Write(currentOffset);

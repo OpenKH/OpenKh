@@ -1,4 +1,5 @@
-﻿using kh.kh2;
+﻿using kh.Imaging;
+using kh.kh2;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xe.Tools;
@@ -25,15 +26,17 @@ namespace kh.tools.imgz.Models
 
 		public string DisplayName => $"{Image.PixelWidth}x{Image.PixelHeight}";
 
-		private void LoadImgd(Imgd imgd)
-		{
-			LoadImage(imgd.GetBitmap(), imgd.Size.Width, imgd.Size.Height);
-		}
+        private void LoadImgd(Imgd imgd)
+        {
+            LoadImage(imgd);
+        }
 
-		private void LoadImage(byte[] data, int width, int height)
-		{
-			Image = BitmapSource.Create(width, height, 96.0, 96.0, PixelFormats.Bgra32, null, data, width * 4);
-			OnPropertyChanged(nameof(Image));
-		}
+        private void LoadImage(IImageRead imageRead)
+        {
+            var size = imageRead.Size;
+            var data = imageRead.ToBgra32();
+            Image = BitmapSource.Create(size.Width, size.Height, 96.0, 96.0, PixelFormats.Bgra32, null, data, size.Width * 4);
+            OnPropertyChanged(nameof(Image));
+        }
 	}
 }

@@ -35,7 +35,7 @@ namespace GenerateKh2FilesMarkdown
             idxDictionary = GenerateIdxDictionary();
 
             Console.WriteLine("Load file list...");
-            names = LoadNames("resources/files.txt");
+            names = LoadNames("resources/kh2idx.txt");
         }
 
         public static IEnumerable<IdxEntryResearch> GetEntries()

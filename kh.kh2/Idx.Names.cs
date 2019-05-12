@@ -35,7 +35,7 @@ namespace kh.kh2
         {
             if (nameDictionary == null)
             {
-                nameDictionary = ReadLines("resources/files.txt")
+                nameDictionary = ReadLines("resources/kh2idx.txt")
                     .ToDictionary(x => $"{GetHash32(x)}{GetHash16(x)}", x => x);
             }
 
