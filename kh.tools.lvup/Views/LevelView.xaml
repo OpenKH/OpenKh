@@ -1,0 +1,108 @@
+﻿<UserControl x:Class="kh.tools.lvup.Views.LevelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:views="clr-namespace:kh.tools.lvup.Views"
+             xmlns:local="clr-namespace:kh.tools.lvup"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="200">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Vertical" Grid.Column="0" Margin="0,0,10,0">
+            <TextBlock Text="EXP for Level Up" Margin="0,0,0,8"/>
+            <TextBlock Text="Strength" Margin="0,0,0,7"/>
+            <TextBlock Text="Magic" Margin="0,0,0,7"/>
+            <TextBlock Text="Defense" Margin="0,0,0,7"/>
+            <TextBlock Text="AP" Margin="0,0,0,7"/>
+            <TextBlock Text="Sword ability" Margin="0,0,0,7"/>
+            <TextBlock Text="Shield ability" Margin="0,0,0,7"/>
+            <TextBlock Text="Staff ability"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Left">
+            <TextBox Style="{StaticResource ValidationTextBox}" Width="100" Margin="0,0,0,5">
+                <TextBox.Text>
+                    <Binding Path="EXP" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:RangeValidationRule MinValue="0" MaxValue="2147483647"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Style="{StaticResource ValidationTextBox}" Width="100" Margin="0,0,0,5">
+                <TextBox.Text>
+                    <Binding Path="Strength" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:RangeValidationRule MinValue="0" MaxValue="255"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Style="{StaticResource ValidationTextBox}" Width="100" Margin="0,0,0,5">
+                <TextBox.Text>
+                    <Binding Path="Magic" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:RangeValidationRule MinValue="0" MaxValue="255"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Style="{StaticResource ValidationTextBox}" Width="100" Margin="0,0,0,5">
+                <TextBox.Text>
+                    <Binding Path="Defense" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:RangeValidationRule MinValue="0" MaxValue="255"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Style="{StaticResource ValidationTextBox}" Width="100" Margin="0,0,0,5">
+                <TextBox.Text>
+                    <Binding Path="AP" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <local:RangeValidationRule MinValue="0" MaxValue="255"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Style="{StaticResource ValidationTextBox}" Width="100" Margin="0,0,0,5">
+                <TextBox.Text>
+                    <Binding Path="SwordAbility" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <!--<Binding.ValidationRules>
+                                    <local:RangeValidationRule MinValue="0" MaxValue="255"/>
+                                </Binding.ValidationRules>-->
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Style="{StaticResource ValidationTextBox}" Width="100" Margin="0,0,0,5">
+                <TextBox.Text>
+                    <Binding Path="ShieldAbility" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <!--<Binding.ValidationRules>
+                                    <local:RangeValidationRule MinValue="0" MaxValue="255"/>
+                                </Binding.ValidationRules>-->
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Style="{StaticResource ValidationTextBox}" Width="100" Margin="0,0,0,5">
+                <TextBox.Text>
+                    <Binding Path="StaffAbility" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <!--<Binding.ValidationRules>
+                                    <local:RangeValidationRule MinValue="0" MaxValue="255"/>
+                                </Binding.ValidationRules>-->
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+        </StackPanel>
+    </Grid>
+</UserControl>
