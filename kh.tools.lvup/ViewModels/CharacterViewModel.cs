@@ -6,13 +6,13 @@ namespace kh.tools.lvup.ViewModels
 {
     public class CharacterViewModel : BaseNotifyPropertyChanged
     {
-        private Lvup.PlayableCharacter _char;
+        public Lvup.PlayableCharacter Character { get; }
         private Lvup.LevelUpEntry selectedItem;
         private int selectedIndex;
 
         public CharacterViewModel(Lvup.PlayableCharacter character)
         {
-            _char = character;
+            Character = character;
         }
 
         public Lvup.LevelUpEntry SelectedItem
@@ -37,15 +37,15 @@ namespace kh.tools.lvup.ViewModels
 
         public string Name
         {
-            get => _char.Name;
+            get => Character.Name;
         }
 
         public ObservableCollection<Lvup.LevelUpEntry> Items
         {
-            get => _char.Levels;
+            get => Character.Levels;
             set
             {
-                _char.Levels = value;
+                Character.Levels = value;
                 OnPropertyChanged();
             }
         }

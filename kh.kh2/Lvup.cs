@@ -20,7 +20,6 @@ namespace kh.kh2
             return Enumerable.Range(0, 13)
                 .Select(x =>
                 {
-                    reader.BaseStream.Seek(4, SeekOrigin.Current);
                     return new PlayableCharacter(stream, x);
                 })
                 .ToList();
@@ -38,7 +37,7 @@ namespace kh.kh2
 
                 foreach (var character in characters)
                 {
-                    writer.Write(0);
+                    writer.Write(character.Unknown0);
                     foreach (var lvl in character.Levels)
                     {
                         writer.Write(lvl.EXP);
@@ -77,7 +76,9 @@ namespace kh.kh2
 
         public class PlayableCharacter
         {
-            public Lvup.PlayableCharacterType Type { get; }
+            public int Unknown0 { get; }
+
+            public PlayableCharacterType Type { get; }
             public ObservableCollection<LevelUpEntry> Levels { get; set; }
             public string Name
             {
@@ -89,10 +90,11 @@ namespace kh.kh2
                 if (!stream.CanRead || !stream.CanSeek)
                     throw new InvalidDataException($"Read or seek must be supported.");
 
-                Type = (Lvup.PlayableCharacterType)index;
+                Type = (PlayableCharacterType)index;
                 Levels = new ObservableCollection<LevelUpEntry>();
 
                 var reader = new BinaryReader(stream);
+                Unknown0 = reader.ReadInt32();
                 for (int j = 0; j < 99; j++)
                 {
                     Levels.Add(new LevelUpEntry

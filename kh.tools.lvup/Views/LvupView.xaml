@@ -16,8 +16,12 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
                 <MenuItem Header="_Save" Command="{Binding SaveCommand}"/>
+                <!--<MenuItem Header="Save _as..." Command="{Binding SaveAsCommand}"/>-->
                 <Separator/>
-                <MenuItem Header="_Exit"/>
+                <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
             </MenuItem>
         </Menu>
         <views:CharactersView Grid.Row="1" DataContext="{Binding Characters}" Margin="5"/>
