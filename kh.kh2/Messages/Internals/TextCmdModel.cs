@@ -8,12 +8,15 @@
 
         public TextCmdModel(char ch) :
             this($"{ch}")
-        { }
+        {
+            Command = MessageCommand.PrintText;
+            Text = $"{ch}";
+        }
 
         public TextCmdModel(string str)
         {
-            Command = MessageCommand.PrintText;
-            Text = $"{str}";
+            Command = MessageCommand.PrintComplex;
+            Text = str;
         }
     }
 }
