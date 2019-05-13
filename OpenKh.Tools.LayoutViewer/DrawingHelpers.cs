@@ -1,4 +1,4 @@
-﻿using kh.Imaging;
+﻿using OpenKh.Imaging;
 using System;
 using Xe.Drawing;
 
@@ -18,10 +18,10 @@ namespace OpenKh.Tools.LayoutViewer
             byte[] data;
             switch (image.PixelFormat)
             {
-                case kh.Imaging.PixelFormat.Indexed4:
+                case Imaging.PixelFormat.Indexed4:
                     data = GetDataResource4bpp(image);
                     break;
-                case kh.Imaging.PixelFormat.Indexed8:
+                case Imaging.PixelFormat.Indexed8:
                     data = GetDataResource8bpp(image);
                     break;
                 default:

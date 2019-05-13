@@ -1,4 +1,4 @@
-﻿using kh.kh2;
+﻿using OpenKh.Kh2;
 
 namespace OpenKh.Tools.LayoutViewer.Models
 {

@@ -1,9 +1,0 @@
-﻿<Application x:Class="kh.tools.bar.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:kh.tools.bar"
-             StartupUri="Views/BarView.xaml">
-    <Application.Resources>
-         
-    </Application.Resources>
-</Application>

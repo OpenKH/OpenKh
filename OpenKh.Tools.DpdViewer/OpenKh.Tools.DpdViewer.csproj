@@ -1,0 +1,23 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyTitle>DPD viewer</AssemblyTitle>
+    <Company>OpenKH</Company>
+    <Product>DPD viewer - OpenKH</Product>
+    <Description>https://github.com/Xeeynamo/OpenKh</Description>
+    <Copyright>Copyright ©  2019</Copyright>
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
+  </ItemGroup>
+</Project>

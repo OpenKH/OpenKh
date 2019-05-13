@@ -1,5 +1,5 @@
-﻿using kh.kh2;
-using kh.tools.common.Controls;
+﻿using kh.tools.common.Controls;
+using OpenKh.Kh2;
 using OpenKh.Tools.LayoutViewer.Renderer;
 using System.Collections.Generic;
 using System.Drawing;

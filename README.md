@@ -1,6 +1,6 @@
 # Documentation
 
-ALl the documentation is located in the `/docs` folder and it can be accessed to https://xeeynamo.github.io/KingdomHearts as well.
+ALl the documentation is located in the `/docs` folder and it can be accessed to https://xeeynamo.github.io/OpenKh as well.
 
 # Additional info
 

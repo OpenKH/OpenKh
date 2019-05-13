@@ -1,4 +1,4 @@
-﻿using kh.kh2;
+﻿using OpenKh.Kh2;
 using OpenKh.Tools.LayoutViewer.Models;
 using System.Linq;
 using Xe.Tools.Wpf.Models;
