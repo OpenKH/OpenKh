@@ -61,7 +61,8 @@ namespace OpenKh.Kh2.Messages
         private static Dictionary<string, DeserializeModel> _deserializer =
             new Dictionary<string, DeserializeModel>()
             {
-                ["reset"] = new DeserializeModel { Command = MessageCommand.Reset }
+                ["reset"] = new DeserializeModel { Command = MessageCommand.Reset },
+                ["scale"] = new DeserializeModel { Command = MessageCommand.TextScale, ValueGetter = x => DeserializeScale(x) },
             };
 
         private static Dictionary<byte, string> _icons =
@@ -128,6 +129,14 @@ namespace OpenKh.Kh2.Messages
                 [58] = "gumi-block",
                 [59] = "gumi-gear",
             };
+
+        private static byte[] DeserializeScale(string parameter) => FromStringToByte(parameter);
+
+        private static byte[] FromStringToByte(string parameter)
+        {
+            var scaleValue = byte.Parse(parameter);
+            return new byte[] { scaleValue };
+        }
 
         private static string ToStringRawData(byte[] data) =>
             string.Join(" ", data.Select(x => $"{x:X02}"));

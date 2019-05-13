@@ -96,15 +96,19 @@ namespace OpenKh.Kh2.Messages
             return entries;
         }
 
-        private static MessageCommandModel GetCommandModel(string v)
+        private static MessageCommandModel GetCommandModel(string value)
         {
-            if (!_deserializer.TryGetValue(v, out var deserializerModel))
-                throw new ParseException(v, 0, $"Command not existing or un-supported");
+            var splitIndex = value.IndexOf(' ');
+            var command = splitIndex >= 0 ? value.Substring(0, splitIndex) : value;
 
+            if (!_deserializer.TryGetValue(command, out var deserializerModel))
+                throw new ParseException(command, 0, $"Command not existing or un-supported");
+
+            var parameter = splitIndex >= 0 ? value.Substring(splitIndex) : null;
             return new MessageCommandModel
             {
                 Command = deserializerModel.Command,
-                Data = deserializerModel.ValueGetter?.Invoke(v.Split(' ').Skip(1).FirstOrDefault())
+                Data = deserializerModel.ValueGetter?.Invoke(parameter)
             };
         }
 
