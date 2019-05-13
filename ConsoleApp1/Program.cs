@@ -13,10 +13,10 @@ namespace ConsoleApp1
 		{
 			//var stream = ProcessStream.SearchProcess("pcsx2");
 			//stream.Position = 0x00964c10;
-			//var dpd = new kh.kh2.Dpd(stream);
+			//var dpd = new OpenKh.Kh2.Dpd(stream);
 
-			//var dpd = new kh.kh2.Dpd(File.OpenRead(@"D:\Hacking\KH2\reverse\SAMPLES\tt_0.dpd"));
-			var dpd = new kh.kh2.Dpd(File.OpenRead(@"D:\Hacking\KH2\reverse\SAMPLES\texcommon.dpd"));
+			//var dpd = new OpenKh.Kh2.Dpd(File.OpenRead(@"D:\Hacking\KH2\reverse\SAMPLES\tt_0.dpd"));
+			var dpd = new OpenKh.Kh2.Dpd(File.OpenRead(@"D:\Hacking\KH2\reverse\SAMPLES\texcommon.dpd"));
 		}
 	}
 }

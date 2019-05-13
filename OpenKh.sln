@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28822.285
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kh.kh2", "kh.kh2\kh.kh2.csproj", "{D5B36CD1-5B5D-4CE9-A673-209AD386D68A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Kh2", "OpenKh.Kh2\OpenKh.Kh2.csproj", "{D5B36CD1-5B5D-4CE9-A673-209AD386D68A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DC4CA2F6-9A43-4112-92A8-8ACFF5E6C5A2}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.DpdViewer", "OpenKh.Tools.DpdViewer\OpenKh.Tools.DpdViewer.csproj", "{CC70D894-EAFB-43F8-9DF3-3AC6DE95E093}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kh.tests", "kh.tests\kh.tests.csproj", "{B2B253FE-1A8D-473D-9501-748C2E37E34D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tests", "OpenKh.Tests\OpenKh.Tests.csproj", "{B2B253FE-1A8D-473D-9501-748C2E37E34D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateKh2FilesMarkdown", "GenerateKh2FilesMarkdown\GenerateKh2FilesMarkdown.csproj", "{64B4B066-DFD5-469A-9259-DA1E57BD0984}"
 EndProject
@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BruteforceKh2Names", "Brute
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.IdxImg", "OpenKh.Command.IdxImg\OpenKh.Command.IdxImg.csproj", "{11D9F155-69EA-4486-908B-51CB799E4E01}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kh.common", "kh.common\kh.common.csproj", "{ECE73C11-C9A0-4132-9FF3-DD52126846E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Common", "OpenKh.Common\OpenKh.Common.csproj", "{ECE73C11-C9A0-4132-9FF3-DD52126846E5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.LevelUpEditor", "OpenKh.Tools.LevelUpEditor\OpenKh.Tools.LevelUpEditor.csproj", "{0DFC02CD-99BF-4B4B-84AB-569764A0ECA3}"
 EndProject
@@ -52,7 +52,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd party libraries", "3rd 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xe.Drawing", "XeEngine.Tools.Public\Xe.Drawing\Xe.Drawing.csproj", "{40EA5893-1C3F-4D11-9D2A-6E5529FEBB31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kh.Imaging", "kh.Imaging\kh.Imaging.csproj", "{8A94810E-753B-4CB4-810A-1DF2745A885B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Imaging", "OpenKh.Imaging\OpenKh.Imaging.csproj", "{8A94810E-753B-4CB4-810A-1DF2745A885B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

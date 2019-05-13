@@ -1,4 +1,4 @@
-﻿using kh.kh2;
+﻿using OpenKh.Kh2;
 using OpenKh.Tools.ImgzViewer.Models;
 using System;
 using System.Collections.Generic;

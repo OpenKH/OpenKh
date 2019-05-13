@@ -1,4 +1,4 @@
-﻿using kh.Imaging;
+﻿using OpenKh.Imaging;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xe.Tools;

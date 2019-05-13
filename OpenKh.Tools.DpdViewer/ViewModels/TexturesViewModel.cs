@@ -1,4 +1,4 @@
-﻿using kh.kh2;
+﻿using OpenKh.Kh2;
 using OpenKh.Tools.DpdViewer.Models;
 using System.Collections.Generic;
 using System.Linq;

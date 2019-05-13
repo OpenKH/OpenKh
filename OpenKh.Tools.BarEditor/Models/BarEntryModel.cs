@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Xe.Tools;
 using Xe.Tools.Wpf;
-using static kh.kh2.Bar;
+using static OpenKh.Kh2.Bar;
 
 namespace OpenKh.Tools.BarEditor.Models
 {

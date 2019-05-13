@@ -1,5 +1,5 @@
-﻿using kh.kh2;
-using kh.kh2.Messages;
+﻿using OpenKh.Kh2;
+using OpenKh.Kh2.Messages;
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.IO;
