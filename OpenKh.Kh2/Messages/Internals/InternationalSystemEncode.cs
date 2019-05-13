@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenKh.Common.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,10 +18,17 @@ namespace OpenKh.Kh2.Messages.Internals
             .Where(x => x.Value?.Command == MessageCommand.PrintText)
             .ToDictionary(x => x.Value.Text[0], x => x.Key);
 
+        private static readonly Dictionary<string, byte> _tableComplex =
+            InternationalSystemDecode._table
+            .Where(x => x.Value?.Command == MessageCommand.PrintComplex)
+            .ToDictionary(x => x.Value.Text, x => x.Key);
+
         private void AppendEncodedMessageCommand(List<byte> list, MessageCommandModel messageCommand)
         {
             if (messageCommand.Command == MessageCommand.PrintText)
                 AppendEncodedText(list, messageCommand.Text);
+            else if (messageCommand.Command == MessageCommand.PrintComplex)
+                AppendEncodedComplex(list, messageCommand.Text);
             else
                 AppendEncodedCommand(list, messageCommand.Command, messageCommand.Data);
         }
@@ -39,6 +47,14 @@ namespace OpenKh.Kh2.Messages.Internals
         {
             foreach (var ch in text)
                 AppendEncodedChar(list, ch);
+        }
+
+        private void AppendEncodedComplex(List<byte> list, string text)
+        {
+            if (!_tableComplex.TryGetValue(text, out var data))
+                throw new ParseException(text, 0, "Complex text does not exists");
+
+            list.Add(data);
         }
 
         private void AppendEncodedChar(List<byte> list, char ch)

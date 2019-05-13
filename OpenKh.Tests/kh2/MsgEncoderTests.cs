@@ -1,4 +1,5 @@
 ﻿using OpenKh.Kh2.Messages;
+using System.Collections.Generic;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -105,6 +106,28 @@ namespace OpenKh.Tests.kh2
             });
 
             Assert.Equal(expectedText, decoded[1].Text);
+        }
+
+        [Theory]
+        [InlineData("I", 0x74)]
+        [InlineData("II", 0x75)]
+        [InlineData("III", 0x76)]
+        [InlineData("IV", 0x77)]
+        [InlineData("V", 0x78)]
+        [InlineData("VI", 0x79)]
+        [InlineData("♪", 0x8e)]
+        public void EncodeComplexTextCorrectly(string value, byte expected)
+        {
+            var actual = Encoders.InternationalSystem.Encode(new List<MessageCommandModel>
+            {
+                new MessageCommandModel
+                {
+                    Command = MessageCommand.PrintComplex,
+                    Text = value
+                }
+            })[0];
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]

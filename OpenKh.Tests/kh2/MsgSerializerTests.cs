@@ -1,5 +1,8 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Common.Exceptions;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
+using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using Xunit;
 
@@ -68,6 +71,52 @@ namespace OpenKh.Tests.kh2
 
             var element = MsgSerializer.SerializeText(entries);
             Assert.Equal("{:scale 34}", element);
+        }
+
+        [Theory]
+        [InlineData("hello", new byte[] { 0xA1, 0x9E, 0xA5, 0xA5, 0xA8, 0x00 })]
+        [InlineData("7: {VII}", new byte[] { 0x97, 0x52, 0x01, 0x7A, 0x00 })]
+        [InlineData("{:reset}", new byte[] { 0x03, 0x00 })]
+        [InlineData("{:scale 22}hey{:reset}", new byte[] { 0x0A, 0x16, 0xA1, 0x9E, 0xB2, 0x03, 0x00 })]
+        public void DeserializePlainText(string value, byte[] expected)
+        {
+            var entries = MsgSerializer.DeserializeText(value);
+            using (var stream = new MemoryStream())
+            {
+                var actual = Encoders.InternationalSystem.Encode(entries.ToList());
+                Assert.Equal(expected, actual);
+            }
+        }
+
+        [Theory]
+        [InlineData("hello", 2, "hello")]
+        [InlineData("hello{VII}", 3, "hello")]
+        [InlineData("{VII}world", 3, "world")]
+        [InlineData("hello{VII}world", 4, "hello;world")]
+        [InlineData("hello{:reset}world", 4, "hello;world")]
+        public void DeserializeCorrectNumberOfMsgEntries(string value, int expectedEntries, string expectedText)
+        {
+            var entries = MsgSerializer.DeserializeText(value).ToList();
+            Assert.Equal(expectedEntries, entries.Count);
+
+            var index = 0;
+            foreach (var word in expectedText.Split(';'))
+            {
+                if (entries[index].Command == MessageCommand.PrintText)
+                    Assert.Equal(entries[index].Text, word);
+                index++;
+            }
+        }
+
+        [Theory]
+        [InlineData("hello{:reset")]
+        [InlineData("hello{:reset hello")]
+        [InlineData("hello{")]
+        [InlineData("{hello")]
+        [InlineData("{")]
+        public void ThrowsExceptionForParseError(string value)
+        {
+            Assert.Throws<ParseException>(() => MsgSerializer.DeserializeText(value));
         }
 
         [Fact]
