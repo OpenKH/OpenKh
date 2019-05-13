@@ -1,5 +1,7 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
+using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using Xunit;
 
@@ -68,6 +70,18 @@ namespace OpenKh.Tests.kh2
 
             var element = MsgSerializer.SerializeText(entries);
             Assert.Equal("{:scale 34}", element);
+        }
+
+        [Theory]
+        [InlineData("hello", new byte[] { 0xA1, 0x9E, 0xA5, 0xA5, 0xA8, 0x00 })]
+        public void DeserializePlainText(string value, byte[] expected)
+        {
+            var entries = MsgSerializer.DeserializeText(value);
+            using (var stream = new MemoryStream())
+            {
+                var actual = Encoders.InternationalSystem.Encode(entries.ToList());
+                Assert.Equal(expected, actual);
+            }
         }
 
         [Fact]

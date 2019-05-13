@@ -37,5 +37,36 @@ namespace OpenKh.Kh2.Messages
                 return $"{{:{serializeModel.Name} {serializeModel.ValueGetter(entry)}}}";
             return $"{{:{serializeModel.Name}}}";
         }
+
+
+        public static IEnumerable<MessageCommandModel> DeserializeText(string value)
+        {
+            var entries = new List<MessageCommandModel>();
+
+            var i = 0;
+            while (i < value.Length)
+            {
+                var ch = value[i++];
+                if (ch == '{')
+                {
+
+                }
+                else
+                {
+                    entries.Add(new MessageCommandModel
+                    {
+                        Command = MessageCommand.PrintText,
+                        Text = $"{ch}"
+                    });
+                }
+            }
+
+            entries.Add(new MessageCommandModel
+            {
+                Command = MessageCommand.End,
+            });
+
+            return entries;
+        }
     }
 }
