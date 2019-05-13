@@ -58,11 +58,19 @@ namespace OpenKh.Kh2.Messages
                             Command = MessageCommand.PrintText,
                             Text = strBuilder.ToString()
                         });
+                        strBuilder.Clear();
                     }
 
                     var closeBracketIndex = value.Substring(i).IndexOf('}') + i;
                     if (closeBracketIndex < i)
                         throw new ParseException(value, i, "Expected '}'");
+
+                    entries.Add(new MessageCommandModel
+                    {
+                        Command = MessageCommand.Unsupported,
+                    });
+
+                    i = closeBracketIndex + 1;
                 }
                 else
                 {

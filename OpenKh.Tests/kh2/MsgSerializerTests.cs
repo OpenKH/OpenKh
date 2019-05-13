@@ -87,6 +87,10 @@ namespace OpenKh.Tests.kh2
 
         [Theory]
         [InlineData("hello", 2, "hello")]
+        [InlineData("hello{VII}", 3, "hello")]
+        [InlineData("{VII}world", 3, "world")]
+        [InlineData("hello{VII}world", 4, "hello;world")]
+        [InlineData("hello{:reset}world", 4, "hello;world")]
         public void DeserializeCorrectNumberOfMsgEntries(string value, int expectedEntries, string expectedText)
         {
             var entries = MsgSerializer.DeserializeText(value).ToList();
