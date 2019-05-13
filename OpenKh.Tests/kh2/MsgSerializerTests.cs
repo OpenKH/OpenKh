@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System.IO;
 using System.Linq;
@@ -81,6 +81,22 @@ namespace OpenKh.Tests.kh2
             {
                 var actual = Encoders.InternationalSystem.Encode(entries.ToList());
                 Assert.Equal(expected, actual);
+            }
+        }
+
+        [Theory]
+        [InlineData("hello", 2, "hello")]
+        public void DeserializeCorrectNumberOfMsgEntries(string value, int expectedEntries, string expectedText)
+        {
+            var entries = MsgSerializer.DeserializeText(value).ToList();
+            Assert.Equal(expectedEntries, entries.Count);
+
+            var index = 0;
+            foreach (var word in expectedText.Split(';'))
+            {
+                if (entries[index].Command == MessageCommand.PrintText)
+                    Assert.Equal(entries[index].Text, word);
+                index++;
             }
         }
 

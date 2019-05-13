@@ -42,6 +42,7 @@ namespace OpenKh.Kh2.Messages
         public static IEnumerable<MessageCommandModel> DeserializeText(string value)
         {
             var entries = new List<MessageCommandModel>();
+            var strBuilder = new StringBuilder();
 
             var i = 0;
             while (i < value.Length)
@@ -49,16 +50,28 @@ namespace OpenKh.Kh2.Messages
                 var ch = value[i++];
                 if (ch == '{')
                 {
-
+                    if (strBuilder.Length > 0)
+                    {
+                        entries.Add(new MessageCommandModel
+                        {
+                            Command = MessageCommand.PrintText,
+                            Text = strBuilder.ToString()
+                        });
+                    }
                 }
                 else
                 {
-                    entries.Add(new MessageCommandModel
-                    {
-                        Command = MessageCommand.PrintText,
-                        Text = $"{ch}"
-                    });
+                    strBuilder.Append(ch);
                 }
+            }
+
+            if (strBuilder.Length > 0)
+            {
+                entries.Add(new MessageCommandModel
+                {
+                    Command = MessageCommand.PrintText,
+                    Text = strBuilder.ToString()
+                });
             }
 
             entries.Add(new MessageCommandModel
