@@ -65,10 +65,7 @@ namespace OpenKh.Kh2.Messages
                     if (closeBracketIndex < i)
                         throw new ParseException(value, i, "Expected '}'");
 
-                    entries.Add(new MessageCommandModel
-                    {
-                        Command = MessageCommand.Unsupported,
-                    });
+                    entries.Add(GetPrintComplexCommandModel(value.Substring(i, closeBracketIndex - i)));
 
                     i = closeBracketIndex + 1;
                 }
@@ -94,5 +91,12 @@ namespace OpenKh.Kh2.Messages
 
             return entries;
         }
+
+        private static MessageCommandModel GetPrintComplexCommandModel(string value)
+            => new MessageCommandModel
+            {
+                Command = MessageCommand.PrintComplex,
+                Text = value
+            };
     }
 }

@@ -1,4 +1,4 @@
-using OpenKh.Common.Exceptions;
+﻿using OpenKh.Common.Exceptions;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System.IO;
@@ -75,6 +75,7 @@ namespace OpenKh.Tests.kh2
 
         [Theory]
         [InlineData("hello", new byte[] { 0xA1, 0x9E, 0xA5, 0xA5, 0xA8, 0x00 })]
+        [InlineData("7: {VII}", new byte[] { 0x97, 0x52, 0x01, 0x7A, 0x00 })]
         public void DeserializePlainText(string value, byte[] expected)
         {
             var entries = MsgSerializer.DeserializeText(value);
