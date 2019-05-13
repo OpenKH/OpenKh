@@ -1,3 +1,4 @@
+using OpenKh.Common.Exceptions;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System.IO;
@@ -98,6 +99,17 @@ namespace OpenKh.Tests.kh2
                     Assert.Equal(entries[index].Text, word);
                 index++;
             }
+        }
+
+        [Theory]
+        [InlineData("hello{:reset")]
+        [InlineData("hello{:reset hello")]
+        [InlineData("hello{")]
+        [InlineData("{hello")]
+        [InlineData("{")]
+        public void ThrowsExceptionForParseError(string value)
+        {
+            Assert.Throws<ParseException>(() => MsgSerializer.DeserializeText(value));
         }
 
         [Fact]

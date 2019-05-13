@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenKh.Common.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -58,6 +59,10 @@ namespace OpenKh.Kh2.Messages
                             Text = strBuilder.ToString()
                         });
                     }
+
+                    var closeBracketIndex = value.Substring(i).IndexOf('}') + i;
+                    if (closeBracketIndex < i)
+                        throw new ParseException(value, i, "Expected '}'");
                 }
                 else
                 {
