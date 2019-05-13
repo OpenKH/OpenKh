@@ -13,6 +13,12 @@ namespace OpenKh.Kh2.Messages
             public Func<MessageCommandModel, string> ValueGetter { get; set; }
         }
 
+        private class DeserializeModel
+        {
+            public MessageCommand Command { get; set; }
+            public Func<string, byte[]> ValueGetter { get; set; }
+        }
+
         private static Dictionary<MessageCommand, SerializeModel> _serializer =
             new Dictionary<MessageCommand, SerializeModel>()
             {
@@ -50,6 +56,12 @@ namespace OpenKh.Kh2.Messages
                 [MessageCommand.Unknown1e] = new SerializeModel { Name = "unk1e", ValueGetter = x => ToStringRawData(x.Data) },
                 [MessageCommand.Unknown1f] = new SerializeModel { Name = "unk1f", ValueGetter = x => ToStringRawData(x.Data) },
                 [MessageCommand.Unsupported] = new SerializeModel { Name = "unk", ValueGetter = x => ToStringRawData(x.Data) }
+            };
+
+        private static Dictionary<string, DeserializeModel> _deserializer =
+            new Dictionary<string, DeserializeModel>()
+            {
+                ["reset"] = new DeserializeModel { Command = MessageCommand.Reset }
             };
 
         private static Dictionary<byte, string> _icons =

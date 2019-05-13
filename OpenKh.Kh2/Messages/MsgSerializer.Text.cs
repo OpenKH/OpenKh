@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace OpenKh.Kh2.Messages
@@ -65,7 +66,10 @@ namespace OpenKh.Kh2.Messages
                     if (closeBracketIndex < i)
                         throw new ParseException(value, i, "Expected '}'");
 
-                    entries.Add(GetPrintComplexCommandModel(value.Substring(i, closeBracketIndex - i)));
+                    if (value[i] == ':')
+                        entries.Add(GetCommandModel(value.Substring(i + 1, closeBracketIndex - i - 1)));
+                    else
+                        entries.Add(GetPrintComplexCommandModel(value.Substring(i, closeBracketIndex - i)));
 
                     i = closeBracketIndex + 1;
                 }
@@ -90,6 +94,18 @@ namespace OpenKh.Kh2.Messages
             });
 
             return entries;
+        }
+
+        private static MessageCommandModel GetCommandModel(string v)
+        {
+            if (!_deserializer.TryGetValue(v, out var deserializerModel))
+                throw new ParseException(v, 0, $"Command not existing or un-supported");
+
+            return new MessageCommandModel
+            {
+                Command = deserializerModel.Command,
+                Data = deserializerModel.ValueGetter?.Invoke(v.Split(' ').Skip(1).FirstOrDefault())
+            };
         }
 
         private static MessageCommandModel GetPrintComplexCommandModel(string value)
