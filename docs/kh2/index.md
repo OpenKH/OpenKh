@@ -8,6 +8,12 @@
   
   * [IDX/IMG](file/type/idx)
   * [BAR](file/type/bar)
+  
+* Other files
+
+    * [00battle.bin](file/type/lvup)
+
+
 
 ## Research
 
