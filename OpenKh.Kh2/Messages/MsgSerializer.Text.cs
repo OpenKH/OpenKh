@@ -35,8 +35,8 @@ namespace OpenKh.Kh2.Messages
 
             Debug.Assert(serializeModel != null, $"BUG: {nameof(serializeModel)} should never be null");
 
-            if (serializeModel.ValueGetter != null)
-                return $"{{:{serializeModel.Name} {serializeModel.ValueGetter(entry)}}}";
+            if (serializeModel.Serializer != null)
+                return $"{{:{serializeModel.Name} {serializeModel.Serializer(entry)}}}";
             return $"{{:{serializeModel.Name}}}";
         }
 
@@ -108,7 +108,7 @@ namespace OpenKh.Kh2.Messages
             return new MessageCommandModel
             {
                 Command = deserializerModel.Command,
-                Data = deserializerModel.ValueGetter?.Invoke(parameter)
+                Data = deserializerModel.Deserializer?.Invoke(parameter)
             };
         }
 

@@ -1,69 +1,260 @@
+using OpenKh.Common.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace OpenKh.Kh2.Messages
 {
     public partial class MsgSerializer
     {
-        private class SerializeModel
+        private class SerializerModel
         {
             public string Name { get; set; }
-            public Func<MessageCommandModel, string> ValueGetter { get; set; }
-        }
-
-        private class DeserializeModel
-        {
             public MessageCommand Command { get; set; }
-            public Func<string, byte[]> ValueGetter { get; set; }
+            public Func<MessageCommandModel, string> Serializer { get; set; }
+            public Func<string, byte[]> Deserializer { get; set; }
         }
 
-        private static Dictionary<MessageCommand, SerializeModel> _serializer =
-            new Dictionary<MessageCommand, SerializeModel>()
+        private static List<SerializerModel> _serializeModel = new List<SerializerModel>
+        {
+            new SerializerModel
             {
-                [MessageCommand.End] = null,
-                [MessageCommand.PrintText] = new SerializeModel { Name = "text", ValueGetter = x => x.Text },
-                [MessageCommand.PrintComplex] = new SerializeModel { Name = "complex", ValueGetter = x => x.Text },
-                [MessageCommand.Tabulation] = new SerializeModel { Name = "tabulation" },
-                [MessageCommand.NewLine] = new SerializeModel { Name = "newline" },
-                [MessageCommand.Reset] = new SerializeModel { Name = "reset" },
-                [MessageCommand.Theme] = new SerializeModel { Name = "theme", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown05] = new SerializeModel { Name = "unk05", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown06] = new SerializeModel { Name = "unk06", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Color] = new SerializeModel { Name = "color", ValueGetter = x => $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}" },
-                [MessageCommand.Unknown08] = new SerializeModel { Name = "unk08", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.PrintIcon] = new SerializeModel { Name = "icon", ValueGetter = x => _icons[x.Data[0]] },
-                [MessageCommand.TextScale] = new SerializeModel { Name = "scale", ValueGetter = x => x.Data[0].ToString() },
-                [MessageCommand.TextWidth] = new SerializeModel { Name = "width", ValueGetter = x => x.Data[0].ToString() },
-                [MessageCommand.LineSpacing] = new SerializeModel { Name = "linespacing", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown0d] = new SerializeModel { Name = "unk0d" },
-                [MessageCommand.Unknown0e] = new SerializeModel { Name = "unk0e", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown0f] = new SerializeModel { Name = "unk0f", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Clear] = new SerializeModel { Name = "clear", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown11] = new SerializeModel { Name = "unk11", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown12] = new SerializeModel { Name = "unk12", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown13] = new SerializeModel { Name = "unk13", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Delay] = new SerializeModel { Name = "delay", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.CharDelay] = new SerializeModel { Name = "chardelay", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown16] = new SerializeModel { Name = "unk16", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown18] = new SerializeModel { Name = "unk18", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown19] = new SerializeModel { Name = "unk19", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown1a] = new SerializeModel { Name = "unk1a", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown1b] = new SerializeModel { Name = "unk1b", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown1c] = new SerializeModel { Name = "unk1c", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown1d] = new SerializeModel { Name = "unk1d", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown1e] = new SerializeModel { Name = "unk1e", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unknown1f] = new SerializeModel { Name = "unk1f", ValueGetter = x => ToStringRawData(x.Data) },
-                [MessageCommand.Unsupported] = new SerializeModel { Name = "unk", ValueGetter = x => ToStringRawData(x.Data) }
-            };
+                Name = "end",
+                Command = MessageCommand.End
+            },
+            new SerializerModel
+            {
+                Name = "text",
+                Command = MessageCommand.PrintText,
+                Serializer = x => x.Text,
+                Deserializer = null
+            },
+            new SerializerModel
+            {
+                Name = "complex",
+                Command = MessageCommand.PrintComplex,
+                Serializer = x => x.Text,
+                Deserializer = null
+            },
+            new SerializerModel
+            {
+                Name = "tabulation",
+                Command = MessageCommand.Tabulation,
+            },
+            new SerializerModel
+            {
+                Name = "newline",
+                Command = MessageCommand.NewLine,
+            },
+            new SerializerModel
+            {
+                Name = "reset",
+                Command = MessageCommand.Reset,
+            },
+            new SerializerModel
+            {
+                Name = "theme",
+                Command = MessageCommand.Theme,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk05",
+                Command = MessageCommand.Unknown05,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk06",
+                Command = MessageCommand.Unknown06,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "color",
+                Command = MessageCommand.Color,
+                Serializer = x => $"#{x.Data[0]:X02}{x.Data[1]:X02}{x.Data[2]:X02}{x.Data[3]:X02}",
+                Deserializer = x => DeserializeColor(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk08",
+                Command = MessageCommand.Unknown08,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "icon",
+                Command = MessageCommand.PrintIcon,
+                Serializer = x =>  _icons[x.Data[0]],
+                Deserializer = x => DeserializeIcon(x)
+            },
+            new SerializerModel
+            {
+                Name = "scale",
+                Command = MessageCommand.TextScale,
+                Serializer = x => x.Data[0].ToString(),
+                Deserializer = x => DeserializeScale(x)
+            },
+            new SerializerModel
+            {
+                Name = "width",
+                Command = MessageCommand.TextWidth,
+                Serializer = x => x.Data[0].ToString(),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "linespacing",
+                Command = MessageCommand.LineSpacing,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk0d",
+                Command = MessageCommand.Unknown0d,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk0e",
+                Command = MessageCommand.Unknown0e,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk0f",
+                Command = MessageCommand.Unknown0f,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "clear",
+                Command = MessageCommand.Clear,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk11",
+                Command = MessageCommand.Unknown11,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk12",
+                Command = MessageCommand.Unknown12,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk13",
+                Command = MessageCommand.Unknown13,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "delay",
+                Command = MessageCommand.Delay,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "chardelay",
+                Command = MessageCommand.CharDelay,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk16",
+                Command = MessageCommand.Unknown16,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk18",
+                Command = MessageCommand.Unknown18,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk19",
+                Command = MessageCommand.Unknown19,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk1a",
+                Command = MessageCommand.Unknown1a,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk1b",
+                Command = MessageCommand.Unknown1b,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk1c",
+                Command = MessageCommand.Unknown1c,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk1d",
+                Command = MessageCommand.Unknown1d,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk1e",
+                Command = MessageCommand.Unknown1e,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk1f",
+                Command = MessageCommand.Unknown1f,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+            new SerializerModel
+            {
+                Name = "unk",
+                Command = MessageCommand.Unsupported,
+                Serializer = x => ToStringRawData(x.Data),
+                Deserializer = x => FromStringToByte(x)
+            },
+        };
 
-        private static Dictionary<string, DeserializeModel> _deserializer =
-            new Dictionary<string, DeserializeModel>()
-            {
-                ["reset"] = new DeserializeModel { Command = MessageCommand.Reset },
-                ["scale"] = new DeserializeModel { Command = MessageCommand.TextScale, ValueGetter = x => DeserializeScale(x) },
-            };
+        private static Dictionary<MessageCommand, SerializerModel> _serializer =
+            _serializeModel.ToDictionary(x => x.Command, x => x);
+
+        private static Dictionary<string, SerializerModel> _deserializer =
+            _serializeModel.ToDictionary(x => x.Name, x => x);
 
         private static Dictionary<byte, string> _icons =
             new Dictionary<byte, string>()
@@ -130,12 +321,38 @@ namespace OpenKh.Kh2.Messages
                 [59] = "gumi-gear",
             };
 
+        private static Dictionary<string, byte> _iconsDeserialize =
+            _icons.ToDictionary(x => x.Value, x => x.Key);
+
         private static byte[] DeserializeScale(string parameter) => FromStringToByte(parameter);
 
         private static byte[] FromStringToByte(string parameter)
         {
             var scaleValue = byte.Parse(parameter);
             return new byte[] { scaleValue };
+        }
+
+        private static byte[] DeserializeColor(string value)
+        {
+            if (value[0] == '#')
+                value = value.Substring(1);
+
+            // horrible piece of crap, but works
+            return new byte[]
+            {
+                byte.Parse(value.Substring(0, 2), NumberStyles.HexNumber),
+                byte.Parse(value.Substring(2, 2), NumberStyles.HexNumber),
+                byte.Parse(value.Substring(4, 2), NumberStyles.HexNumber),
+                byte.Parse(value.Substring(6, 2), NumberStyles.HexNumber),
+            };
+        }
+
+        private static byte[] DeserializeIcon(string value)
+        {
+            if (!_iconsDeserialize.TryGetValue(value, out var data))
+                throw new ParseException(value, 0, "Icon not supported");
+
+            return new byte[] { data };
         }
 
         private static string ToStringRawData(byte[] data) =>
