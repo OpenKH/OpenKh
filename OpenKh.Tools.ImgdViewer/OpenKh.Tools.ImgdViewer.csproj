@@ -1,0 +1,25 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyTitle>IMGD editor</AssemblyTitle>
+    <Company>Luciano (Xeeynamo) Ciccariello</Company>
+    <Product>IMGD editor - Kingdom Hearts II</Product>
+    <Description>https://github.com/Xeeynamo/KingdomHearts</Description>
+    <Copyright>Copyright ©  2018</Copyright>
+    <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\kh.Imaging\kh.Imaging.csproj" />
+    <ProjectReference Include="..\kh.kh2\kh.kh2.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
+  </ItemGroup>
+</Project>

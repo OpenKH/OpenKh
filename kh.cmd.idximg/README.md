@@ -1,1 +1,0 @@
-Please refer to https://xeeynamo.github.io/KingdomHearts/tool/kh.cmd.idximg
