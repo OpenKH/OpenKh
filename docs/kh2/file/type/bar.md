@@ -55,9 +55,9 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 11 | Camera Collision Data | MAP
 | 12 | Spawn Point Data | MAP
 | 13 | Spawn Point Script | ARD
-| 14 | Sky Disposition | MAP
+| 14 | Map Color Array/Diffuse Maps | MAP
 | 15 | Lighting Data | MAP
-| 16 | Effect Caster Data | ANB
+| 16 | Moveset Instructions | ANB
 | 17 | Animation Binary Archive (ANB) | MSET
 | 18 | PAX Effect | A.FM - MAG - MDLX
 | 19 | Map Collision Data | MAP 
@@ -65,12 +65,12 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 21 | Unknown | MAP
 | 22 | Animation Loader | ARD - A.FM - limit/*
 | 23 | Model Collision | MDLX
-| 24 | Image Data (IMGD) | Varies.
+| 24 | Image Data (IMGD) | Varies
 | 25 | Sequenced Layers (SEQD) | 2LD - 2DD - A.FM - fontinfo.bar
 | 26 | Unknown | Unknown
 | 27 | Unknown | Unknown
 | 28 | LAYD (Layer Data?) | menu/* - gumi/sprite/*
-| 29 | Image Data Archive (IMGZ) | Varies.
+| 29 | Multi-Image Data Archive (IMGZ) | Varies.
 | 30 | Binary Archive | MAP
 | 31 | Sound Effect Block (SEB) | MDLX - A.FM
 | 32 | BGM Instrument Data (WD) | BGM - MDLX - A.FM
