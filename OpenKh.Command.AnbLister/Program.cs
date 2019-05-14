@@ -10,7 +10,6 @@ namespace OpenKh.Command.AnbLister
 	{
 		const string Auteur = "Soraiko";
 		const string Version = "1.1";
-		
 		public static byte[] SubArray(byte[] data, long index, long length) {byte[] result = new byte[length];Array.Copy(data, index, result, 0, length);return result;}
 		public static byte[] Combine(byte[] a, byte[] b) {byte[] c = new byte[a.Length + b.Length];  System.Buffer.BlockCopy(a, 0, c, 0, a.Length); System.Buffer.BlockCopy(b, 0, c, a.Length, b.Length);  return c;}
 		
