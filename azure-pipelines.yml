@@ -10,13 +10,15 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
+  solution: '**/OpenKh.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
 steps:
 - checkout: self
   submodules: true | recursive
+
+- script: git submodule update --init --recursive
 
 - task: NuGetToolInstaller@0
 
@@ -29,6 +31,7 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    vsVersion: '16.0'
 
 - task: VSTest@2
   inputs:
