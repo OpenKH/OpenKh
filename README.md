@@ -26,10 +26,11 @@ If you want to make improvements, do not be shy and open pull requestes. They ar
 
 ## License
 
-Please do not redistribuite this code under your own name, steal it, or use it artfully, but instead support it and its author.
-Thank you.
+The entire content of the repository is protected by the GPLv3 license. Some of the key points of the license are:
 
-
-## Notes
-
-As soon as the repository will be big and populated enough, it will be moved from my personal account to an organization.
+- You can copy, modify and distribute the software.
+- You have to include the license and copyright notice with each and every distribution.
+- You can use this software privately.
+- You can use this software for commercial purposes.
+- If you modify it, you have to indicate changes made to the code.
+- Any modifications of this code base MUST be distributed with the same license, GPLv3.
