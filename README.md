@@ -21,7 +21,7 @@ All the documentation is located in the `/docs` folder in its raw form, and it c
 
 ## Contribution
 
-If you want to make improvements, do not be shy and open pull requestes. They are more than welcome. :)
+There is a [whole guide](CONTRIBUTING.md) describing how to contribute to the project.
 
 
 ## License
