@@ -143,7 +143,7 @@ namespace OpenKh.Kh2
                 data[i * 4 + 0] = Clut[(i & 15) * 4 + 0];
                 data[i * 4 + 1] = Clut[(i & 15) * 4 + 1];
                 data[i * 4 + 2] = Clut[(i & 15) * 4 + 2];
-                data[i * 4 + 3] = FromPs2Alpha(Clut[(i & 15) * 4 + 3]);
+                data[i * 4 + 3] = Ps2.FromPs2Alpha(Clut[(i & 15) * 4 + 3]);
             }
 
             return data;
@@ -158,7 +158,7 @@ namespace OpenKh.Kh2
                 data[i * 4 + 0] = Clut[srcIndex * 4 + 0];
                 data[i * 4 + 1] = Clut[srcIndex * 4 + 1];
                 data[i * 4 + 2] = Clut[srcIndex * 4 + 2];
-                data[i * 4 + 3] = FromPs2Alpha(Clut[srcIndex * 4 + 3]);
+                data[i * 4 + 3] = Ps2.FromPs2Alpha(Clut[srcIndex * 4 + 3]);
             }
 
             return data;
@@ -172,7 +172,7 @@ namespace OpenKh.Kh2
                 newData[i + 0] = Data[i + 2];
                 newData[i + 1] = Data[i + 1];
                 newData[i + 2] = Data[i + 0];
-                newData[i + 3] = FromPs2Alpha(Data[i + 3]);
+                newData[i + 3] = Ps2.FromPs2Alpha(Data[i + 3]);
             }
 
             return newData;
@@ -186,8 +186,6 @@ namespace OpenKh.Kh2
 
             return pow;
         }
-
-        private byte FromPs2Alpha(byte alpha) => (byte)Math.Min(alpha * 2, byte.MaxValue);
 
         private static PixelFormat GetPixelFormat(int format)
         {
