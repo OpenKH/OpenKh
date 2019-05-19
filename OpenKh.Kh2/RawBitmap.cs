@@ -9,24 +9,72 @@ namespace OpenKh.Kh2
     {
         private const int PaletteCount = 256;
         private const int BitsPerColor = 32;
+        private static readonly uint[] FontColors = new uint[]
+        {
+            0x00000000,
+            0x80a0a0a0,
+            0xe4cccccc,
+            0xfff0f0f0
+        };
+        private static readonly byte[] FontPalette = GeneratePalette(FontColors);
 
         private readonly byte[] _data;
         private readonly byte[] _clut;
 
-        private RawBitmap(Stream stream, int width, int height)
+        private RawBitmap(Stream stream, int width, int height, bool is8bit)
         {
             Size = new Size(width, height);
+            PixelFormat = is8bit ? PixelFormat.Indexed8 : PixelFormat.Indexed4;
 
             var reader = new BinaryReader(stream);
-            _data = reader.ReadBytes(width * height);
-            _clut = reader.ReadBytes(PaletteCount * BitsPerColor / 8);
+            var bpp = is8bit ? 8 : 4;
+            _data = reader.ReadBytes(width * height * bpp / 8);
+
+            if (is8bit == false)
+                _data = SwapBitOrder(_data);
+
+            // If we did not reached the end of the stream, then it does mean that there is a palette
+            if (stream.Position < stream.Length)
+            {
+                _clut = reader.ReadBytes(PaletteCount * BitsPerColor / 8);
+            }
+            else
+            {
+                // Just assign a default palette
+                _clut = FontPalette;
+            }
         }
 
         public Size Size { get; }
 
-        public PixelFormat PixelFormat => PixelFormat.Indexed8;
+        public PixelFormat PixelFormat { get; }
 
         public byte[] GetClut()
+        {
+            switch (PixelFormat)
+            {
+                case PixelFormat.Indexed8: return GetClut8();
+                case PixelFormat.Indexed4: return GetClut4();
+                default:
+                    throw new NotSupportedException($"The format {PixelFormat} is not supported.");
+            }
+        }
+
+        private byte[] GetClut4()
+        {
+            var data = new byte[16 * 4];
+            for (var i = 0; i < 16; i++)
+            {
+                data[i * 4 + 0] = _clut[(i & 15) * 4 + 0];
+                data[i * 4 + 1] = _clut[(i & 15) * 4 + 1];
+                data[i * 4 + 2] = _clut[(i & 15) * 4 + 2];
+                data[i * 4 + 3] = Ps2.FromPs2Alpha(_clut[(i & 15) * 4 + 3]);
+            }
+
+            return data;
+        }
+
+        private byte[] GetClut8()
         {
             var data = new byte[256 * 4];
             for (var i = 0; i < 256; i++)
@@ -43,7 +91,32 @@ namespace OpenKh.Kh2
 
         public byte[] GetData() => _data;
 
-        public static RawBitmap Read(Stream stream, int width, int height) =>
-            new RawBitmap(stream, width, height);
+        public static RawBitmap Read(Stream stream, int width, int height, bool is8bit) =>
+            new RawBitmap(stream, width, height, is8bit);
+
+        private static byte[] GeneratePalette(uint[] fontColors)
+        {
+            var palette = new byte[16 * 4];
+            for (int i = 0, index = 0; i < 16; i++)
+            {
+                palette[index++] = (byte)((FontColors[i & 3] >> 0) & 0xFF);
+                palette[index++] = (byte)((FontColors[i & 3] >> 8) & 0xFF);
+                palette[index++] = (byte)((FontColors[i & 3] >> 16) & 0xFF);
+                palette[index++] = (byte)((((FontColors[i & 3] >> 24) & 0xFF) + 1) / 2);
+            }
+
+            return palette;
+        }
+
+        private static byte[] SwapBitOrder(byte[] data)
+        {
+            for (var i = 0; i < data.Length; i++)
+            {
+                var ch = data[i];
+                data[i] = (byte)((ch >> 4) | (ch << 4));
+            }
+
+            return data;
+        }
     }
 }
