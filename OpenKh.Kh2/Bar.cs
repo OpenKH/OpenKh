@@ -28,6 +28,7 @@ namespace OpenKh.Kh2
             Imgz = 29,
 			Seb = 31,
 			Wd = 32,
+            RawBitmap = 36,
             Vibration = 47,
 			Vag = 48,
 		}
