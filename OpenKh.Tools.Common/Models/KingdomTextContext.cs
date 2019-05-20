@@ -6,6 +6,7 @@ namespace OpenKh.Tools.Common.Models
     public class KingdomTextContext
     {
         public IImageRead Font { get; set; }
+        public byte[] Spacing { get; set; }
         public IMessageEncode Encode { get; set; }
     }
 }

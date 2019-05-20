@@ -22,6 +22,7 @@ namespace OpenKh.Tools.Common.Controls
         public static DependencyProperty ContextProperty =>
             DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, KingdomTextContext>(nameof(Context), (o, x) => o.SetContext(x));
 
+        private byte[] _spacing;
         private IMessageEncode _encode;
         private BitmapSource _imageFont;
         private int _charPerRow;
@@ -86,12 +87,13 @@ namespace OpenKh.Tools.Common.Controls
             {
                 if (ch >= 0x20)
                 {
-                    DrawChar(dc, context.x, context.y, ch - 0x20);
-                    context.x += FontWidth;
+                    int chIndex = ch - 0x20;
+                    DrawChar(dc, context.x, context.y, chIndex);
+                    context.x += _spacing[chIndex];
                 }
                 else if (ch == 1)
                 {
-                    context.x += FontWidth;
+                    context.x += _spacing[0];
                 }
             }
         }
@@ -111,6 +113,7 @@ namespace OpenKh.Tools.Common.Controls
 
         private void SetContext(KingdomTextContext context)
         {
+            _spacing = context.Spacing;
             _encode = context.Encode;
             _imageFont = context.Font.GetWindowsMediaImage();
             _charPerRow = context.Font.Size.Width / FontWidth;
