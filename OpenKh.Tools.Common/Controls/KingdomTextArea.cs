@@ -18,14 +18,19 @@ namespace OpenKh.Tools.Common.Controls
 
         private const int FontWidth = 18;
         private const int FontHeight = 24;
+        private const int IconWidth = 24;
+        private const int IconHeight = 24;
 
         public static DependencyProperty ContextProperty =>
             DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, KingdomTextContext>(nameof(Context), (o, x) => o.SetContext(x));
 
-        private byte[] _spacing;
-        private IMessageEncode _encode;
+        private byte[] _fontSpacing;
+        private byte[] _iconSpacing;
         private BitmapSource _imageFont;
+        private BitmapSource _imageIcon;
         private int _charPerRow;
+        private int _iconPerRow;
+        private IMessageEncode _encode;
 
         public KingdomTextContext Context
         {
@@ -71,6 +76,8 @@ namespace OpenKh.Tools.Common.Controls
                 DrawText(dc, context, command);
             else if (command.Command == MessageCommand.PrintComplex)
                 DrawText(dc, context, command);
+            else if (command.Command == MessageCommand.PrintIcon)
+                DrawIcon(dc, context, command.Data[0]);
         }
 
         private void DrawText(DrawingContext dc, DrawContext context, MessageCommandModel command)
@@ -91,7 +98,7 @@ namespace OpenKh.Tools.Common.Controls
                 {
                     int chIndex = ch - 0x20;
                     DrawChar(dc, context.x, context.y, chIndex);
-                    context.x += _spacing[chIndex];
+                    context.x += _fontSpacing?[chIndex] ?? FontWidth;
                 }
                 else if (ch == 1)
                 {
@@ -100,11 +107,25 @@ namespace OpenKh.Tools.Common.Controls
             }
         }
 
+        private void DrawIcon(DrawingContext dc, DrawContext context, byte data)
+        {
+            if (_imageIcon != null)
+                DrawIcon(dc, context.x, context.y, data);
+
+            context.x += _iconSpacing?[data] ?? IconWidth;
+        }
+
         protected void DrawChar(DrawingContext dc, double x, double y, int index) =>
             DrawChar(dc, x, y, (index % _charPerRow) * FontWidth, (index / _charPerRow) * FontHeight);
 
         protected void DrawChar(DrawingContext dc, double x, double y, int sourceX, int sourceY) =>
             DrawImage(dc, _imageFont, x, y, sourceX, sourceY, FontWidth, FontHeight);
+
+        protected void DrawIcon(DrawingContext dc, double x, double y, int index) =>
+            DrawIcon(dc, x, y, (index % _iconPerRow) * IconWidth, (index / _iconPerRow) * IconHeight);
+
+        protected void DrawIcon(DrawingContext dc, double x, double y, int sourceX, int sourceY) =>
+            DrawImage(dc, _imageIcon, x, y, sourceX, sourceY, IconWidth, IconHeight);
 
         protected void DrawImage(DrawingContext dc, BitmapSource bitmap, double x, double y, int sourceX, int sourceY, int width, int height)
         {
@@ -116,10 +137,13 @@ namespace OpenKh.Tools.Common.Controls
 
         private void SetContext(KingdomTextContext context)
         {
-            _spacing = context.Spacing;
+            _fontSpacing = context.FontSpacing;
+            _iconSpacing = context.IconSpacing;
+            _imageFont = context.Font?.GetWindowsMediaImage();
+            _imageIcon = context.Icon?.GetWindowsMediaImage();
+            _charPerRow = context.Font?.Size.Width / FontWidth ?? 1;
+            _iconPerRow = context.Icon?.Size.Width / IconWidth ?? 1;
             _encode = context.Encode;
-            _imageFont = context.Font.GetWindowsMediaImage();
-            _charPerRow = context.Font.Size.Width / FontWidth;
 
             InvalidateVisual();
         }
