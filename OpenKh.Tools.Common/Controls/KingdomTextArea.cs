@@ -1,5 +1,6 @@
-﻿using OpenKh.Tools.Common.Models;
-using System;
+﻿using OpenKh.Kh2.Messages;
+using OpenKh.Tools.Common.Models;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -9,12 +10,19 @@ namespace OpenKh.Tools.Common.Controls
 {
     public class KingdomTextArea : Control
     {
+        private class DrawContext
+        {
+            public double x;
+            public double y;
+        }
+
         private const int FontWidth = 18;
         private const int FontHeight = 24;
 
         public static DependencyProperty ContextProperty =>
             DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, KingdomTextContext>(nameof(Context), (o, x) => o.SetContext(x));
 
+        private IMessageEncode _encode;
         private BitmapSource _imageFont;
         private int _charPerRow;
 
@@ -30,7 +38,7 @@ namespace OpenKh.Tools.Common.Controls
                 return;
 
             DrawBackground(drawingContext);
-            DrawText(drawingContext, "Hello world!");
+            Draw(drawingContext, "Hello world!");
         }
 
         protected void DrawBackground(DrawingContext drawingContext)
@@ -43,13 +51,48 @@ namespace OpenKh.Tools.Common.Controls
             drawingContext.DrawRectangle(background, null, new Rect(0.0, 0.0, renderSize.Width, renderSize.Height));
         }
 
-        protected void DrawText(DrawingContext dc, string text)
+        protected void Draw(DrawingContext dc, string text)
         {
-            double x = 0.0;
-            foreach (var ch in text)
+            var commands = MsgSerializer.DeserializeText(text);
+            Draw(dc, commands);
+        }
+
+        protected void Draw(DrawingContext dc, IEnumerable<MessageCommandModel> commands)
+        {
+            var context = new DrawContext();
+            foreach (var command in commands)
+                Draw(dc, context, command);
+        }
+
+        private void Draw(DrawingContext dc, DrawContext context, MessageCommandModel command)
+        {
+            if (command.Command == MessageCommand.PrintText)
+                DrawText(dc, context, command);
+        }
+
+        private void DrawText(DrawingContext dc, DrawContext context, MessageCommandModel command)
+        {
+            var data = _encode.Encode(new List<MessageCommandModel>
             {
-                DrawChar(dc, x, 0.0, 0);
-                x += FontWidth;
+                command
+            });
+
+            DrawText(dc, context, data);
+        }
+
+        private void DrawText(DrawingContext dc, DrawContext context, byte[] data)
+        {
+            foreach (var ch in data)
+            {
+                if (ch >= 0x20)
+                {
+                    DrawChar(dc, context.x, context.y, ch - 0x20);
+                    context.x += FontWidth;
+                }
+                else if (ch == 1)
+                {
+                    context.x += FontWidth;
+                }
             }
         }
 
@@ -68,6 +111,7 @@ namespace OpenKh.Tools.Common.Controls
 
         private void SetContext(KingdomTextContext context)
         {
+            _encode = context.Encode;
             _imageFont = context.Font.GetWindowsMediaImage();
             _charPerRow = context.Font.Size.Width / FontWidth;
 
