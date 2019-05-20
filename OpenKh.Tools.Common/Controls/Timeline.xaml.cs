@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static kh.tools.common.DependencyPropertyUtils;
+using static OpenKh.Tools.Common.DependencyPropertyUtils;
 
 namespace OpenKh.Tools.Common.Controls
 {

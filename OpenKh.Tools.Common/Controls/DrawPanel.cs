@@ -7,7 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xe.Drawing;
-using static kh.tools.common.DependencyPropertyUtils;
+using static OpenKh.Tools.Common.DependencyPropertyUtils;
 
 namespace kh.tools.common.Controls
 {
