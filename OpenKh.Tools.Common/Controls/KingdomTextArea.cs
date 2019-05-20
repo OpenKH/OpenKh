@@ -12,6 +12,7 @@ namespace OpenKh.Tools.Common.Controls
     {
         private class DrawContext
         {
+            public double xStart;
             public double x;
             public double y;
         }
@@ -78,6 +79,11 @@ namespace OpenKh.Tools.Common.Controls
                 DrawText(dc, context, command);
             else if (command.Command == MessageCommand.PrintIcon)
                 DrawIcon(dc, context, command.Data[0]);
+            else if (command.Command == MessageCommand.NewLine)
+            {
+                context.x = context.xStart;
+                context.y += FontHeight;
+            }
         }
 
         private void DrawText(DrawingContext dc, DrawContext context, MessageCommandModel command)
