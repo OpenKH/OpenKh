@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2.Messages;
+using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Common.Models;
 using System.Collections.Generic;
 using System.Windows;
@@ -69,6 +69,8 @@ namespace OpenKh.Tools.Common.Controls
         {
             if (command.Command == MessageCommand.PrintText)
                 DrawText(dc, context, command);
+            else if (command.Command == MessageCommand.PrintComplex)
+                DrawText(dc, context, command);
         }
 
         private void DrawText(DrawingContext dc, DrawContext context, MessageCommandModel command)
@@ -93,22 +95,23 @@ namespace OpenKh.Tools.Common.Controls
                 }
                 else if (ch == 1)
                 {
-                    context.x += _spacing[0];
+                    context.x += 6;
                 }
             }
         }
 
-        protected void DrawChar(DrawingContext dc, double x, double y, int index)
-        {
-            DrawChar(dc, x, y, index % _charPerRow, index / _charPerRow);
-        }
+        protected void DrawChar(DrawingContext dc, double x, double y, int index) =>
+            DrawChar(dc, x, y, (index % _charPerRow) * FontWidth, (index / _charPerRow) * FontHeight);
 
-        protected void DrawChar(DrawingContext dc, double x, double y, int sourceX, int sourceY)
-        {
-            var croppedBitmap = new CroppedBitmap(_imageFont,
-                new Int32Rect(sourceX * FontWidth, sourceY * FontHeight, FontWidth, FontHeight));
+        protected void DrawChar(DrawingContext dc, double x, double y, int sourceX, int sourceY) =>
+            DrawImage(dc, _imageFont, x, y, sourceX, sourceY, FontWidth, FontHeight);
 
-            dc.DrawImage(croppedBitmap, new Rect(x, y, FontWidth, FontHeight));
+        protected void DrawImage(DrawingContext dc, BitmapSource bitmap, double x, double y, int sourceX, int sourceY, int width, int height)
+        {
+            var croppedBitmap = new CroppedBitmap(bitmap,
+                new Int32Rect(sourceX, sourceY, width, height));
+
+            dc.DrawImage(croppedBitmap, new Rect(x, y, width, height));
         }
 
         private void SetContext(KingdomTextContext context)
