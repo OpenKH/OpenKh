@@ -21,7 +21,7 @@
         Unknown0e,
         Unknown0f,
         Clear,
-        Unknown11,
+        Position,
         Unknown12,
         Unknown13,
         Delay,

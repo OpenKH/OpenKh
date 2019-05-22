@@ -145,10 +145,10 @@ namespace OpenKh.Kh2.Messages
             },
             new SerializerModel
             {
-                Name = "unk11",
-                Command = MessageCommand.Unknown11,
-                Serializer = x => ToStringRawData(x.Data),
-                Deserializer = x => FromStringToByte(x)
+                Name = "position",
+                Command = MessageCommand.Position,
+                Serializer = x => ToPosition(x),
+                Deserializer = x => FromPosition(x)
             },
             new SerializerModel
             {
@@ -353,6 +353,27 @@ namespace OpenKh.Kh2.Messages
                 throw new ParseException(value, 0, "Icon not supported");
 
             return new byte[] { data };
+        }
+
+        private static string ToPosition(MessageCommandModel command) =>
+            $"{command.PositionX},{command.PositionY}";
+
+        private static byte[] FromPosition(string text)
+        {
+            var parameters = text.Split(',')
+                .Select(x => short.TryParse(x.Trim(), out var result) ? result : 0)
+                .ToArray();
+
+            var xCoord = parameters.Length > 0 ? parameters[0] : 0;
+            var yCoord = parameters.Length > 1 ? parameters[1] : 0;
+
+            return new byte[4]
+            {
+                (byte)((ushort)xCoord & 0xFF),
+                (byte)(((ushort)xCoord >> 8) & 0xFF),
+                (byte)((ushort)yCoord & 0xFF),
+                (byte)(((ushort)yCoord >> 8) & 0xFF),
+            };
         }
 
         private static string ToStringRawData(byte[] data) =>

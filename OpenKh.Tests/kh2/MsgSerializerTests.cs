@@ -156,5 +156,25 @@ namespace OpenKh.Tests.kh2
             );
             Assert.Equal(expected.ToString(xmlFormatting), actual.ToString(xmlFormatting));
         }
+
+        [Theory]
+        [InlineData(new byte[] { 0x11, 0x00, 0x00, 0x00, 0x00 }, "{:position 0,0}")]
+        [InlineData(new byte[] { 0x11, 0xff, 0xff, 0xff, 0x7f }, "{:position -1,32767}")]
+        public void SerializeTextPositionCommand(byte[] data, string expected)
+        {
+            var decoded = Encoders.InternationalSystem.Decode(data);
+            var actual = MsgSerializer.SerializeText(decoded);
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(new byte[] { 0x11, 0x00, 0x00, 0x00, 0x00, 0x00 }, "{:position 0,0}")]
+        [InlineData(new byte[] { 0x11, 0xff, 0xff, 0xff, 0x7f, 0x00 }, "{:position -1,32767}")]
+        public void DeserializeTextPositionCommand(byte[] expected, string text)
+        {
+            var commands = MsgSerializer.DeserializeText(text).ToList();
+            var actual = Encoders.InternationalSystem.Encode(commands);
+            Assert.Equal(expected, actual);
+        }
     }
 }
