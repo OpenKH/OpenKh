@@ -31,6 +31,10 @@ namespace OpenKh.Tools.Common.Controls
             DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, IEnumerable<MessageCommandModel>>(
                 nameof(MessageCommands), (o, x) => o.SetTextCommands(x));
 
+        public static DependencyProperty BackgroundProperty =
+            DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, System.Windows.Media.Color>(
+                nameof(Background), (o, x) => { });
+
         private byte[] _fontSpacing;
         private byte[] _iconSpacing;
         private IImageRead _imageFont;
@@ -51,6 +55,12 @@ namespace OpenKh.Tools.Common.Controls
         {
             get => GetValue(MessageCommandsProperty) as IEnumerable<MessageCommandModel>;
             set => SetValue(MessageCommandsProperty, value);
+        }
+
+        public System.Windows.Media.Color Background
+        {
+            get => (System.Windows.Media.Color)GetValue(BackgroundProperty);
+            set => SetValue(BackgroundProperty, value);
         }
 
         protected override void OnDrawCreate()
@@ -85,7 +95,14 @@ namespace OpenKh.Tools.Common.Controls
 
         protected void DrawBackground()
         {
-            Drawing.Clear(System.Drawing.Color.Magenta);
+            var backgroundColor = Background;
+            var color = Color.FromArgb(
+                backgroundColor.A,
+                backgroundColor.R,
+                backgroundColor.G,
+                backgroundColor.B);
+
+            Drawing.Clear(color);
         }
 
         protected void Draw(string text)
