@@ -20,14 +20,14 @@ namespace OpenKh.Kh2
         {
             [Data] public uint MagicCode { get; set; }
             [Data] public int Unknown04 { get; set; }
-            [Data] public Section Q1 { get; set; }
-            [Data] public Section Q2 { get; set; }
-            [Data] public Section Q3 { get; set; }
-            [Data] public Section Q4 { get; set; }
-            [Data] public Section Q5 { get; set; }
+            [Data] public Section AnimationGroupsDesc { get; set; }
+            [Data] public Section AnimationsDesc { get; set; }
+            [Data] public Section FrameGroupsDesc { get; set; }
+            [Data] public Section FramesExDesc { get; set; }
+            [Data] public Section FramesDesc { get; set; }
         }
 
-        public class Q1
+        public class Frame
         {
             [Data] public int Unknown00 { get; set; }
             [Data] public int Left { get; set; }
@@ -42,25 +42,25 @@ namespace OpenKh.Kh2
             [Data] public int ColorBottom { get; set; }
         }
 
-        public class Q2
+        public class FrameEx
         {
             [Data] public int Left { get; set; }
             [Data] public int Top { get; set; }
             [Data] public int Right { get; set; }
             [Data] public int Bottom { get; set; }
-            [Data] public int Q1Index { get; set; }
+            [Data] public int FrameIndex { get; set; }
         }
 
-        public class Q3
+        public class FrameGroup
         {
             [Data] public short Start { get; set; }
             [Data] public short Count { get; set; }
         }
 
-        public class Q4
+        public class Animation
         {
             [Data] public int Flags { get; set; }
-            [Data] public int Q3Index { get; set; }
+            [Data] public int FrameGroupIndex { get; set; }
             [Data] public int FrameStart { get; set; }
             [Data] public int FrameEnd { get; set; }
             [Data] public int Xa0 { get; set; }
@@ -97,9 +97,9 @@ namespace OpenKh.Kh2
             [Data] public int ColorEnd { get; set; }
         }
 
-        public class Q5
+        public class AnimationGroup
         {
-            [Data] public short Q4Index { get; set; }
+            [Data] public short AnimationIndex { get; set; }
             [Data] public short Count { get; set; }
             [Data] public short Unknown04 { get; set; }
             [Data] public short Unknown06 { get; set; }
@@ -113,11 +113,11 @@ namespace OpenKh.Kh2
         }
 
         public int Unknown04 { get; set; }
-        public List<Q1> Q1Items { get; set; }
-        public List<Q2> Q2Items { get; set; }
-        public List<Q3> Q3Items { get; set; }
-        public List<Q4> Q4Items { get; set; }
-        public List<Q5> Q5Items { get; set; }
+        public List<Frame> Frames { get; set; }
+        public List<FrameEx> FramesEx { get; set; }
+        public List<FrameGroup> FrameGroups { get; set; }
+        public List<Animation> Animations { get; set; }
+        public List<AnimationGroup> AnimationGroups { get; set; }
 
         private Sequence(Stream stream)
         {
@@ -132,11 +132,11 @@ namespace OpenKh.Kh2
                 throw new InvalidDataException("Invalid header");
 
             Unknown04 = header.Unknown04;
-            Q1Items = stream.ReadList<Q1>(header.Q1.Offset, header.Q1.Count);
-            Q2Items = stream.ReadList<Q2>(header.Q2.Offset, header.Q2.Count);
-            Q3Items = stream.ReadList<Q3>(header.Q3.Offset, header.Q3.Count);
-            Q4Items = stream.ReadList<Q4>(header.Q4.Offset, header.Q4.Count);
-            Q5Items = stream.ReadList<Q5>(header.Q5.Offset, header.Q5.Count);
+            Frames = stream.ReadList<Frame>(header.AnimationGroupsDesc.Offset, header.AnimationGroupsDesc.Count);
+            FramesEx = stream.ReadList<FrameEx>(header.AnimationsDesc.Offset, header.AnimationsDesc.Count);
+            FrameGroups = stream.ReadList<FrameGroup>(header.FrameGroupsDesc.Offset, header.FrameGroupsDesc.Count);
+            Animations = stream.ReadList<Animation>(header.FramesExDesc.Offset, header.FramesExDesc.Count);
+            AnimationGroups = stream.ReadList<AnimationGroup>(header.FramesDesc.Offset, header.FramesDesc.Count);
         }
 
         public void Write(Stream stream)
@@ -148,21 +148,21 @@ namespace OpenKh.Kh2
             {
                 MagicCode = MagicCodeValidator,
                 Unknown04 = Unknown04,
-                Q1 = new Section() { Count = Q1Items.Count },
-                Q2 = new Section() { Count = Q2Items.Count },
-                Q3 = new Section() { Count = Q3Items.Count },
-                Q4 = new Section() { Count = Q4Items.Count },
-                Q5 = new Section() { Count = Q5Items.Count },
+                AnimationGroupsDesc = new Section() { Count = Frames.Count },
+                AnimationsDesc = new Section() { Count = FramesEx.Count },
+                FrameGroupsDesc = new Section() { Count = FrameGroups.Count },
+                FramesExDesc = new Section() { Count = Animations.Count },
+                FramesDesc = new Section() { Count = AnimationGroups.Count },
             };
 
             var basePosition = stream.Position;
             stream.Position = basePosition + MinimumLength;
-            header.Q1.Offset = (int)(stream.Position - basePosition);
-            header.Q2.Offset = stream.WriteList(Q1Items) + header.Q1.Offset;
-            header.Q3.Offset = stream.WriteList(Q2Items) + header.Q2.Offset;
-            header.Q4.Offset = stream.WriteList(Q3Items) + header.Q3.Offset;
-            header.Q5.Offset = stream.WriteList(Q4Items) + header.Q4.Offset;
-            stream.WriteList(Q5Items);
+            header.AnimationGroupsDesc.Offset = (int)(stream.Position - basePosition);
+            header.AnimationsDesc.Offset = stream.WriteList(Frames) + header.AnimationGroupsDesc.Offset;
+            header.FrameGroupsDesc.Offset = stream.WriteList(FramesEx) + header.AnimationsDesc.Offset;
+            header.FramesExDesc.Offset = stream.WriteList(FrameGroups) + header.FrameGroupsDesc.Offset;
+            header.FramesDesc.Offset = stream.WriteList(Animations) + header.FramesExDesc.Offset;
+            stream.WriteList(AnimationGroups);
 
             var endPosition = stream.Position;
             stream.Position = basePosition;
