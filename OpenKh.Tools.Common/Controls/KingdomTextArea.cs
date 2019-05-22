@@ -1,4 +1,4 @@
-using kh.tools.common.Controls;
+﻿using kh.tools.common.Controls;
 using OpenKh.Imaging;
 using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Common.Models;
@@ -16,6 +16,17 @@ namespace OpenKh.Tools.Common.Controls
             public double xStart;
             public double x;
             public double y;
+            public ColorF Color;
+
+            public DrawContext()
+            {
+                Reset();
+            }
+
+            public void Reset()
+            {
+                Color = new ColorF(1.0f, 1.0f, 1.0f, 1.0f);
+            }
         }
 
         private const int FontWidth = 18;
@@ -129,11 +140,23 @@ namespace OpenKh.Tools.Common.Controls
                 DrawText(context, command);
             else if (command.Command == MessageCommand.PrintIcon)
                 DrawIcon(context, command.Data[0]);
+            else if (command.Command == MessageCommand.Color)
+                SetColor(context, command.Data);
+            else if (command.Command == MessageCommand.Reset)
+                context.Reset();
             else if (command.Command == MessageCommand.NewLine)
             {
                 context.x = context.xStart;
                 context.y += FontHeight;
             }
+        }
+
+        private void SetColor(DrawContext context, byte[] data)
+        {
+            context.Color.R = data[0] / 255.0f;
+            context.Color.G = data[1] / 255.0f;
+            context.Color.B = data[2] / 255.0f;
+            context.Color.A = data[3] / 255.0f;
         }
 
         private void DrawText(DrawContext context, MessageCommandModel command)
@@ -185,7 +208,7 @@ namespace OpenKh.Tools.Common.Controls
             var src = new Rectangle(sourceX, sourceY, width, height);
             var dst = new Rectangle((int)context.x, (int)context.y, width, height);
 
-            Drawing.DrawSurface(surface, src, dst);
+            Drawing.DrawSurface(surface, src, dst, context.Color);
         }
 
         private void SetContext(KingdomTextContext context)
