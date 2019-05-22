@@ -22,7 +22,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0x0d] = new SimpleCmdModel(MessageCommand.Unknown0d),
             [0x0e] = new SingleDataCmdModel(MessageCommand.Unknown0e),
             [0x0f] = new DataCmdModel(MessageCommand.Unknown0f, 5),
-            [0x10] = null,
+            [0x10] = new SimpleCmdModel(MessageCommand.Clear),
             [0x11] = new DataCmdModel(MessageCommand.Position, 4),
             [0x12] = new DataCmdModel(MessageCommand.Unknown12, 2),
             [0x13] = new DataCmdModel(MessageCommand.Unknown13, 4),
