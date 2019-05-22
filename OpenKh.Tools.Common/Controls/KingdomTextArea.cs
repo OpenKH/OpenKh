@@ -1,5 +1,6 @@
-using OpenKh.Kh2.Messages;
+﻿using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Common.Models;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,8 +23,13 @@ namespace OpenKh.Tools.Common.Controls
         private const int IconWidth = 24;
         private const int IconHeight = 24;
 
-        public static DependencyProperty ContextProperty =>
-            DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, KingdomTextContext>(nameof(Context), (o, x) => o.SetContext(x));
+        public static DependencyProperty ContextProperty =
+            DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, KingdomTextContext>(
+                nameof(Context), (o, x) => o.SetContext(x));
+
+        public static DependencyProperty MessageCommandsProperty =
+            DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, IEnumerable<MessageCommandModel>>(
+                nameof(MessageCommands), (o, x) => o.SetTextCommands(x));
 
         private byte[] _fontSpacing;
         private byte[] _iconSpacing;
@@ -39,13 +45,19 @@ namespace OpenKh.Tools.Common.Controls
             set => SetValue(ContextProperty, value);
         }
 
+        public IEnumerable<MessageCommandModel> MessageCommands
+        {
+            get => GetValue(MessageCommandsProperty) as IEnumerable<MessageCommandModel>;
+            set => SetValue(MessageCommandsProperty, value);
+        }
+
         protected override void OnRender(DrawingContext drawingContext)
         {
             if (_imageFont == null)
                 return;
 
             DrawBackground(drawingContext);
-            Draw(drawingContext, "Hello world!");
+            Draw(drawingContext, MessageCommands);
         }
 
         protected void DrawBackground(DrawingContext drawingContext)
@@ -66,6 +78,9 @@ namespace OpenKh.Tools.Common.Controls
 
         protected void Draw(DrawingContext dc, IEnumerable<MessageCommandModel> commands)
         {
+            if (commands == null)
+                return;
+
             var context = new DrawContext();
             foreach (var command in commands)
                 Draw(dc, context, command);
@@ -151,6 +166,11 @@ namespace OpenKh.Tools.Common.Controls
             _iconPerRow = context.Icon?.Size.Width / IconWidth ?? 1;
             _encode = context.Encode;
 
+            InvalidateVisual();
+        }
+
+        private void SetTextCommands(IEnumerable<MessageCommandModel> textCommands)
+        {
             InvalidateVisual();
         }
     }
