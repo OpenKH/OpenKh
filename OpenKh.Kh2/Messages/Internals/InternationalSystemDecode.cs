@@ -125,7 +125,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0x74] = new TextCmdModel("I"),
             [0x75] = new TextCmdModel("II"),
             [0x76] = new TextCmdModel("III"),
-            [0x77] = new TextCmdModel("VI"),
+            [0x77] = new TextCmdModel("IV"),
             [0x78] = new TextCmdModel("V"),
             [0x79] = new TextCmdModel("VI"),
             [0x7a] = new TextCmdModel("VII"),

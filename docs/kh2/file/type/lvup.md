@@ -27,12 +27,14 @@ This sub-file is found within 00battle.bin. It stores informations about the
  - Riku
 
 ### Lvup 'Character' Entry
+
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | int32_t | Unknown 
 | 4 	 | LevelUp[0..99] | Holds informations for the level up 
 
 ### Lvup 'LevelUp' Entry
+
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	| int32_t | Needed EXP 

@@ -7,10 +7,10 @@ namespace OpenKh.Kh2.Messages
 {
     public partial class MsgSerializer
     {
-        private static Dictionary<MessageCommand, Func<MessageCommandModel, SerializeModel, XNode>> _xmlCustomSerializer =
-            new Dictionary<MessageCommand, Func<MessageCommandModel, SerializeModel, XNode>>()
+        private static Dictionary<MessageCommand, Func<MessageCommandModel, SerializerModel, XNode>> _xmlCustomSerializer =
+            new Dictionary<MessageCommand, Func<MessageCommandModel, SerializerModel, XNode>>()
             {
-                [MessageCommand.PrintText] = (msgCmd, model) => new XElement("text", model.ValueGetter(msgCmd)),
+                [MessageCommand.PrintText] = (msgCmd, model) => new XElement("text", model.Serializer(msgCmd)),
             };
 
         public static XElement SerializeXEntries(IEnumerable<Msg.Entry> entries, bool ignoreExceptions = false)
@@ -70,9 +70,9 @@ namespace OpenKh.Kh2.Messages
             return root;
         }
 
-        private static XNode GetDefaultSerializer(MessageCommandModel msgCmd, SerializeModel model)
+        private static XNode GetDefaultSerializer(MessageCommandModel msgCmd, SerializerModel model)
         {
-            var attribute = new XAttribute("value", model.ValueGetter(msgCmd));
+            var attribute = new XAttribute("value", model.Serializer(msgCmd));
             return attribute != null ? new XElement(model.Name, attribute) : new XElement(model.Name);
         }
     }
