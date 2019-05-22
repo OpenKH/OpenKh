@@ -90,13 +90,12 @@ namespace OpenKh.Tools.Common.Controls
         {
             base.OnDrawBegin();
 
-            if (Drawing == null)
-                return;
             DrawBackground();
 
             if (_surfaceFont == null)
                 return;
             Draw(MessageCommands);
+            Drawing.Flush();
         }
 
         protected override void OnDrawEnd()
@@ -144,6 +143,11 @@ namespace OpenKh.Tools.Common.Controls
                 SetColor(context, command.Data);
             else if (command.Command == MessageCommand.Reset)
                 context.Reset();
+            else if (command.Command == MessageCommand.Position)
+            {
+                context.x = command.PositionX;
+                context.y = command.PositionY;
+            }
             else if (command.Command == MessageCommand.NewLine)
             {
                 context.x = context.xStart;
