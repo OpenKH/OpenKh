@@ -17,6 +17,8 @@ namespace OpenKh.Tools.Common.Controls
             public double x;
             public double y;
             public ColorF Color;
+            public double WidthMultiplier;
+            public double Scale;
 
             public DrawContext()
             {
@@ -26,6 +28,8 @@ namespace OpenKh.Tools.Common.Controls
             public void Reset()
             {
                 Color = new ColorF(1.0f, 1.0f, 1.0f, 1.0f);
+                WidthMultiplier = 1.0;
+                Scale = 1.0;
             }
         }
 
@@ -148,10 +152,14 @@ namespace OpenKh.Tools.Common.Controls
                 context.x = command.PositionX;
                 context.y = command.PositionY;
             }
+            else if (command.Command == MessageCommand.TextWidth)
+                context.WidthMultiplier = command.TextWidth;
+            else if (command.Command == MessageCommand.TextScale)
+                context.Scale = command.TextScale;
             else if (command.Command == MessageCommand.NewLine)
             {
                 context.x = context.xStart;
-                context.y += FontHeight;
+                context.y += FontHeight * context.Scale;
             }
         }
 
@@ -177,16 +185,24 @@ namespace OpenKh.Tools.Common.Controls
         {
             foreach (var ch in data)
             {
+                int spacing;
+
                 if (ch >= 0x20)
                 {
                     int chIndex = ch - 0x20;
                     DrawChar(context, chIndex);
-                    context.x += _fontSpacing?[chIndex] ?? FontWidth;
+                    spacing = _fontSpacing?[chIndex] ?? FontWidth;
                 }
                 else if (ch == 1)
                 {
-                    context.x += 6;
+                    spacing = 6;
                 }
+                else
+                {
+                    spacing = 0;
+                }
+
+                context.x += spacing * context.WidthMultiplier;
             }
         }
 
@@ -202,17 +218,22 @@ namespace OpenKh.Tools.Common.Controls
             DrawChar(context, (index % _charPerRow) * FontWidth, (index / _charPerRow) * FontHeight);
 
         protected void DrawChar(DrawContext context, int sourceX, int sourceY) =>
-            DrawImage(context, _surfaceFont, sourceX, sourceY, FontWidth, FontHeight);
+            DrawImageScale(context, _surfaceFont, sourceX, sourceY, FontWidth, FontHeight);
 
         protected void DrawIcon(DrawContext context, int sourceX, int sourceY) =>
-            DrawImage(context, _surfaceIcon, sourceX, sourceY, IconWidth, IconHeight);
+            DrawImage(_surfaceIcon, context.x, context.y, sourceX, sourceY, IconWidth, IconHeight, 1.0, 1.0, new ColorF(1.0f, 1.0f, 1.0f, 1.0f));
 
-        protected void DrawImage(DrawContext context, ISurface surface, int sourceX, int sourceY, int width, int height)
+        protected void DrawImageScale(DrawContext context, ISurface surface, int sourceX, int sourceY, int width, int height) =>
+            DrawImage(surface, context.x, context.y, sourceX, sourceY, width, height, context.WidthMultiplier * context.Scale, context.Scale, context.Color);
+
+        protected void DrawImage(ISurface surface, double x, double y, int sourceX, int sourceY, int width, int height, double scaleX, double scaleY, ColorF color)
         {
+            var dstWidth = width * scaleX;
+            var dstHeight = height * scaleY;
             var src = new Rectangle(sourceX, sourceY, width, height);
-            var dst = new Rectangle((int)context.x, (int)context.y, width, height);
+            var dst = new Rectangle((int)x, (int)y, (int)dstWidth, (int)dstHeight);
 
-            Drawing.DrawSurface(surface, src, dst, context.Color);
+            Drawing.DrawSurface(surface, src, dst, color);
         }
 
         private void SetContext(KingdomTextContext context)
