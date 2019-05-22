@@ -90,10 +90,10 @@ namespace OpenKh.Kh2.Messages.Internals
             [0x51] = new TextCmdModel(';'),
             [0x52] = new TextCmdModel(':'),
             [0x53] = new TextCmdModel('…'),
-            [0x54] = new TextCmdModel('-'),
+            [0x54] = new TextCmdModel("-"),
             [0x55] = new TextCmdModel('–'),
             [0x56] = new TextCmdModel('〜'),
-            [0x57] = new TextCmdModel('\''),
+            [0x57] = new TextCmdModel("'"),
             [0x58] = new UnsupportedCmdModel(0x58), // Unused
             [0x59] = new UnsupportedCmdModel(0x59), // Unused
             [0x5a] = new TextCmdModel('('),
@@ -108,7 +108,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0x63] = new TextCmdModel(']'),
             [0x64] = new TextCmdModel('<'),
             [0x65] = new TextCmdModel('>'),
-            [0x66] = new TextCmdModel("-"),
+            [0x66] = new TextCmdModel('-'),
             [0x67] = new TextCmdModel("–"),
             [0x68] = new TextCmdModel('⤷'), // Used only in EVT
             [0x69] = new TextCmdModel('♩'),
@@ -244,7 +244,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xeb] = new TextCmdModel('`'),
             [0xec] = new TextCmdModel('´'),
             [0xed] = new TextCmdModel('"'),
-            [0xee] = new TextCmdModel("'"), 
+            [0xee] = new TextCmdModel('\''), 
             [0xef] = new TextCmdModel('★'),
             [0xf0] = new TextCmdModel('☆'),
             [0xf1] = new TextCmdModel('■'),
