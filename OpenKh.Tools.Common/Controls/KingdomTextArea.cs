@@ -1,20 +1,17 @@
-﻿using kh.tools.common.Controls;
+using kh.tools.common.Controls;
 using OpenKh.Imaging;
 using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Common.Models;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Xe.Drawing;
 
 namespace OpenKh.Tools.Common.Controls
 {
     public class KingdomTextArea : DrawPanel
     {
-        private class DrawContext
+        protected class DrawContext
         {
             public double xStart;
             public double x;
@@ -139,7 +136,7 @@ namespace OpenKh.Tools.Common.Controls
                 if (ch >= 0x20)
                 {
                     int chIndex = ch - 0x20;
-                    DrawChar(context.x, context.y, chIndex);
+                    DrawChar(context, chIndex);
                     context.x += _fontSpacing?[chIndex] ?? FontWidth;
                 }
                 else if (ch == 1)
@@ -149,30 +146,27 @@ namespace OpenKh.Tools.Common.Controls
             }
         }
 
-        private void DrawIcon(DrawContext context, byte data)
+        private void DrawIcon(DrawContext context, byte index)
         {
             if (_surfaceIcon != null)
-                DrawIcon(context.x, context.y, data);
+                DrawIcon(context, (index % _iconPerRow) * IconWidth, (index / _iconPerRow) * IconHeight);
 
-            context.x += _iconSpacing?[data] ?? IconWidth;
+            context.x += _iconSpacing?[index] ?? IconWidth;
         }
 
-        protected void DrawChar(double x, double y, int index) =>
-            DrawChar(x, y, (index % _charPerRow) * FontWidth, (index / _charPerRow) * FontHeight);
+        protected void DrawChar(DrawContext context, int index) =>
+            DrawChar(context, (index % _charPerRow) * FontWidth, (index / _charPerRow) * FontHeight);
 
-        protected void DrawChar(double x, double y, int sourceX, int sourceY) =>
-            DrawImage(_surfaceFont, x, y, sourceX, sourceY, FontWidth, FontHeight);
+        protected void DrawChar(DrawContext context, int sourceX, int sourceY) =>
+            DrawImage(context, _surfaceFont, sourceX, sourceY, FontWidth, FontHeight);
 
-        protected void DrawIcon(double x, double y, int index) =>
-            DrawIcon(x, y, (index % _iconPerRow) * IconWidth, (index / _iconPerRow) * IconHeight);
+        protected void DrawIcon(DrawContext context, int sourceX, int sourceY) =>
+            DrawImage(context, _surfaceIcon, sourceX, sourceY, IconWidth, IconHeight);
 
-        protected void DrawIcon(double x, double y, int sourceX, int sourceY) =>
-            DrawImage(_surfaceIcon, x, y, sourceX, sourceY, IconWidth, IconHeight);
-
-        protected void DrawImage(ISurface surface, double x, double y, int sourceX, int sourceY, int width, int height)
+        protected void DrawImage(DrawContext context, ISurface surface, int sourceX, int sourceY, int width, int height)
         {
             var src = new Rectangle(sourceX, sourceY, width, height);
-            var dst = new Rectangle((int)x, (int)y, width, height);
+            var dst = new Rectangle((int)context.x, (int)context.y, width, height);
 
             Drawing.DrawSurface(surface, src, dst);
         }
