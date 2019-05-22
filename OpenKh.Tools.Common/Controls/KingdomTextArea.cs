@@ -1,15 +1,18 @@
-﻿using OpenKh.Kh2.Messages;
+﻿using kh.tools.common.Controls;
+using OpenKh.Imaging;
+using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Xe.Drawing;
 
 namespace OpenKh.Tools.Common.Controls
 {
-    public class KingdomTextArea : Control
+    public class KingdomTextArea : DrawPanel
     {
         private class DrawContext
         {
@@ -33,8 +36,10 @@ namespace OpenKh.Tools.Common.Controls
 
         private byte[] _fontSpacing;
         private byte[] _iconSpacing;
-        private BitmapSource _imageFont;
-        private BitmapSource _imageIcon;
+        private IImageRead _imageFont;
+        private IImageRead _imageIcon;
+        private ISurface _surfaceFont;
+        private ISurface _surfaceIcon;
         private int _charPerRow;
         private int _iconPerRow;
         private IMessageEncode _encode;
@@ -51,49 +56,65 @@ namespace OpenKh.Tools.Common.Controls
             set => SetValue(MessageCommandsProperty, value);
         }
 
-        protected override void OnRender(DrawingContext drawingContext)
+        protected override void OnDrawCreate()
         {
-            if (_imageFont == null)
-                return;
-
-            DrawBackground(drawingContext);
-            Draw(drawingContext, MessageCommands);
+            base.OnDrawCreate();
+            GetOrInitializeSurface(ref _surfaceFont, _imageFont);
+            GetOrInitializeSurface(ref _surfaceIcon, _imageIcon);
         }
 
-        protected void DrawBackground(DrawingContext drawingContext)
+        protected override void OnDrawDestroy()
         {
-            var background = Background;
-            if (background == null)
-                return;
-
-            var renderSize = RenderSize;
-            drawingContext.DrawRectangle(background, null, new Rect(0.0, 0.0, renderSize.Width, renderSize.Height));
+            base.OnDrawDestroy();
         }
 
-        protected void Draw(DrawingContext dc, string text)
+        protected override void OnDrawBegin()
+        {
+            base.OnDrawBegin();
+
+            if (Drawing == null)
+                return;
+            DrawBackground();
+
+            if (_surfaceFont == null)
+                return;
+            Draw(MessageCommands);
+        }
+
+        protected override void OnDrawEnd()
+        {
+            base.OnDrawEnd();
+        }
+
+        protected void DrawBackground()
+        {
+            Drawing.Clear(System.Drawing.Color.Magenta);
+        }
+
+        protected void Draw(string text)
         {
             var commands = MsgSerializer.DeserializeText(text);
-            Draw(dc, commands);
+            Draw(commands);
         }
 
-        protected void Draw(DrawingContext dc, IEnumerable<MessageCommandModel> commands)
+        protected void Draw(IEnumerable<MessageCommandModel> commands)
         {
             if (commands == null)
                 return;
 
             var context = new DrawContext();
             foreach (var command in commands)
-                Draw(dc, context, command);
+                Draw(context, command);
         }
 
-        private void Draw(DrawingContext dc, DrawContext context, MessageCommandModel command)
+        private void Draw(DrawContext context, MessageCommandModel command)
         {
             if (command.Command == MessageCommand.PrintText)
-                DrawText(dc, context, command);
+                DrawText(context, command);
             else if (command.Command == MessageCommand.PrintComplex)
-                DrawText(dc, context, command);
+                DrawText(context, command);
             else if (command.Command == MessageCommand.PrintIcon)
-                DrawIcon(dc, context, command.Data[0]);
+                DrawIcon(context, command.Data[0]);
             else if (command.Command == MessageCommand.NewLine)
             {
                 context.x = context.xStart;
@@ -101,24 +122,24 @@ namespace OpenKh.Tools.Common.Controls
             }
         }
 
-        private void DrawText(DrawingContext dc, DrawContext context, MessageCommandModel command)
+        private void DrawText(DrawContext context, MessageCommandModel command)
         {
             var data = _encode.Encode(new List<MessageCommandModel>
             {
                 command
             });
 
-            DrawText(dc, context, data);
+            DrawText(context, data);
         }
 
-        private void DrawText(DrawingContext dc, DrawContext context, byte[] data)
+        private void DrawText(DrawContext context, byte[] data)
         {
             foreach (var ch in data)
             {
                 if (ch >= 0x20)
                 {
                     int chIndex = ch - 0x20;
-                    DrawChar(dc, context.x, context.y, chIndex);
+                    DrawChar(context.x, context.y, chIndex);
                     context.x += _fontSpacing?[chIndex] ?? FontWidth;
                 }
                 else if (ch == 1)
@@ -128,43 +149,46 @@ namespace OpenKh.Tools.Common.Controls
             }
         }
 
-        private void DrawIcon(DrawingContext dc, DrawContext context, byte data)
+        private void DrawIcon(DrawContext context, byte data)
         {
-            if (_imageIcon != null)
-                DrawIcon(dc, context.x, context.y, data);
+            if (_surfaceIcon != null)
+                DrawIcon(context.x, context.y, data);
 
             context.x += _iconSpacing?[data] ?? IconWidth;
         }
 
-        protected void DrawChar(DrawingContext dc, double x, double y, int index) =>
-            DrawChar(dc, x, y, (index % _charPerRow) * FontWidth, (index / _charPerRow) * FontHeight);
+        protected void DrawChar(double x, double y, int index) =>
+            DrawChar(x, y, (index % _charPerRow) * FontWidth, (index / _charPerRow) * FontHeight);
 
-        protected void DrawChar(DrawingContext dc, double x, double y, int sourceX, int sourceY) =>
-            DrawImage(dc, _imageFont, x, y, sourceX, sourceY, FontWidth, FontHeight);
+        protected void DrawChar(double x, double y, int sourceX, int sourceY) =>
+            DrawImage(_surfaceFont, x, y, sourceX, sourceY, FontWidth, FontHeight);
 
-        protected void DrawIcon(DrawingContext dc, double x, double y, int index) =>
-            DrawIcon(dc, x, y, (index % _iconPerRow) * IconWidth, (index / _iconPerRow) * IconHeight);
+        protected void DrawIcon(double x, double y, int index) =>
+            DrawIcon(x, y, (index % _iconPerRow) * IconWidth, (index / _iconPerRow) * IconHeight);
 
-        protected void DrawIcon(DrawingContext dc, double x, double y, int sourceX, int sourceY) =>
-            DrawImage(dc, _imageIcon, x, y, sourceX, sourceY, IconWidth, IconHeight);
+        protected void DrawIcon(double x, double y, int sourceX, int sourceY) =>
+            DrawImage(_surfaceIcon, x, y, sourceX, sourceY, IconWidth, IconHeight);
 
-        protected void DrawImage(DrawingContext dc, BitmapSource bitmap, double x, double y, int sourceX, int sourceY, int width, int height)
+        protected void DrawImage(ISurface surface, double x, double y, int sourceX, int sourceY, int width, int height)
         {
-            var croppedBitmap = new CroppedBitmap(bitmap,
-                new Int32Rect(sourceX, sourceY, width, height));
+            var src = new Rectangle(sourceX, sourceY, width, height);
+            var dst = new Rectangle((int)x, (int)y, width, height);
 
-            dc.DrawImage(croppedBitmap, new Rect(x, y, width, height));
+            Drawing.DrawSurface(surface, src, dst);
         }
 
         private void SetContext(KingdomTextContext context)
         {
             _fontSpacing = context.FontSpacing;
             _iconSpacing = context.IconSpacing;
-            _imageFont = context.Font?.GetWindowsMediaImage();
-            _imageIcon = context.Icon?.GetWindowsMediaImage();
+            _imageFont = context.Font;
+            _imageIcon = context.Icon;
             _charPerRow = context.Font?.Size.Width / FontWidth ?? 1;
             _iconPerRow = context.Icon?.Size.Width / IconWidth ?? 1;
             _encode = context.Encode;
+
+            InitializeSurface(ref _surfaceFont, _imageFont);
+            InitializeSurface(ref _surfaceIcon, _imageIcon);
 
             InvalidateVisual();
         }
@@ -172,6 +196,20 @@ namespace OpenKh.Tools.Common.Controls
         private void SetTextCommands(IEnumerable<MessageCommandModel> textCommands)
         {
             InvalidateVisual();
+        }
+
+        private void GetOrInitializeSurface(ref ISurface surface, IImageRead image)
+        {
+            if (surface != null)
+                return;
+
+            InitializeSurface(ref surface, image);
+        }
+
+        private void InitializeSurface(ref ISurface surface, IImageRead image)
+        {
+            surface?.Dispose();
+            surface = Drawing?.CreateSurface(image);
         }
     }
 }
