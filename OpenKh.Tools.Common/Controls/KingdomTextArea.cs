@@ -202,7 +202,7 @@ namespace OpenKh.Tools.Common.Controls
                     spacing = 0;
                 }
 
-                context.x += spacing * context.WidthMultiplier;
+                context.x += spacing * context.WidthMultiplier * context.Scale;
             }
         }
 
