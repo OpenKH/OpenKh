@@ -29,6 +29,8 @@ namespace OpenKh.Kh2.Messages.Internals
                 AppendEncodedText(list, messageCommand.Text);
             else if (messageCommand.Command == MessageCommand.PrintComplex)
                 AppendEncodedComplex(list, messageCommand.Text);
+            else if (messageCommand.Command == MessageCommand.Unsupported)
+                list.AddRange(messageCommand.Data);
             else
                 AppendEncodedCommand(list, messageCommand.Command, messageCommand.Data);
         }

@@ -218,5 +218,25 @@ namespace OpenKh.Tests.kh2
             var actual = Encoders.InternationalSystem.Encode(commands.ToList());
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData(new byte[] { 0x71 }, "{:unk 71}")]
+        [InlineData(new byte[] { 0x72 }, "{:unk 72}")]
+        public void SerializeTextUnknown(byte[] data, string expected)
+        {
+            var commands = Encoders.InternationalSystem.Decode(data);
+            var actual = MsgSerializer.SerializeText(commands);
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData("{:unk 71}", new byte[] { 0x71, 0x00 })]
+        [InlineData("{:unk 72}", new byte[] { 0x72, 0x00 })]
+        public void DeserializeTextUnknown(string text, byte[] expected)
+        {
+            var commands = MsgSerializer.DeserializeText(text);
+            var actual = Encoders.InternationalSystem.Encode(commands.ToList());
+            Assert.Equal(expected, actual);
+        }
     }
 }
