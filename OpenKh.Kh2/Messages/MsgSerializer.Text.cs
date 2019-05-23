@@ -59,6 +59,13 @@ namespace OpenKh.Kh2.Messages
                         Command = MessageCommand.NewLine,
                     };
                 }
+                else if (ch == '\t')
+                {
+                    messageCommand = new MessageCommandModel
+                    {
+                        Command = MessageCommand.Tabulation,
+                    };
+                }
                 else if (ch == '\r')
                 {
                     // ignore
@@ -124,7 +131,7 @@ namespace OpenKh.Kh2.Messages
             if (!_deserializer.TryGetValue(command, out var deserializerModel))
                 throw new ParseException(command, 0, $"Command not existing or un-supported");
 
-            var parameter = splitIndex >= 0 ? value.Substring(splitIndex) : null;
+            var parameter = splitIndex >= 0 ? value.Substring(splitIndex).Trim() : null;
             return new MessageCommandModel
             {
                 Command = deserializerModel.Command,

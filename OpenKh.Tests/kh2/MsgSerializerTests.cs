@@ -187,5 +187,36 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(MessageCommand.PrintText, commands[2].Command);
             Assert.Equal("world!", commands[2].Text);
         }
+
+        [Fact]
+        public void DeserializeTabulation()
+        {
+            var commands = MsgSerializer.DeserializeText("hello\tworld!").ToArray();
+            Assert.Equal(MessageCommand.PrintText, commands[0].Command);
+            Assert.Equal("hello", commands[0].Text);
+            Assert.Equal(MessageCommand.Tabulation, commands[1].Command);
+            Assert.Equal(MessageCommand.PrintText, commands[2].Command);
+            Assert.Equal("world!", commands[2].Text);
+        }
+
+        [Theory]
+        [InlineData(new byte[] { 0x0b, 0x90 }, "{:width 144}")]
+        [InlineData(new byte[] { 0x0b, 0x50 }, "{:width 80}")]
+        public void SerializeTextScale(byte[] data, string expected)
+        {
+            var commands = Encoders.InternationalSystem.Decode(data);
+            var actual = MsgSerializer.SerializeText(commands);
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData("{:width 144}", new byte[] { 0x0b, 0x90, 0x00 })]
+        [InlineData("{:width 80}", new byte[] { 0x0b, 0x50, 0x00 })]
+        public void DeserializeTextScale(string text, byte[] expected)
+        {
+            var commands = MsgSerializer.DeserializeText(text);
+            var actual = Encoders.InternationalSystem.Encode(commands.ToList());
+            Assert.Equal(expected, actual);
+        }
     }
 }

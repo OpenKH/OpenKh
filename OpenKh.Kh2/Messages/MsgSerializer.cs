@@ -106,7 +106,7 @@ namespace OpenKh.Kh2.Messages
                 Name = "width",
                 Command = MessageCommand.TextWidth,
                 Serializer = x => x.Data[0].ToString(),
-                Deserializer = x => FromStringToByte(x)
+                Deserializer = x => DeserializeWidth(x)
             },
             new SerializerModel
             {
@@ -120,7 +120,7 @@ namespace OpenKh.Kh2.Messages
                 Name = "unk0d",
                 Command = MessageCommand.Unknown0d,
                 Serializer = x => ToStringRawData(x.Data),
-                Deserializer = x => FromStringToByte(x)
+                Deserializer = x => new byte[0]
             },
             new SerializerModel
             {
@@ -141,7 +141,7 @@ namespace OpenKh.Kh2.Messages
                 Name = "clear",
                 Command = MessageCommand.Clear,
                 Serializer = x => ToStringRawData(x.Data),
-                Deserializer = x => FromStringToByte(x)
+                Deserializer = x => new byte[0]
             },
             new SerializerModel
             {
@@ -324,13 +324,11 @@ namespace OpenKh.Kh2.Messages
         private static Dictionary<string, byte> _iconsDeserialize =
             _icons.ToDictionary(x => x.Value, x => x.Key);
 
-        private static byte[] DeserializeScale(string parameter) => FromStringToByte(parameter);
+        private static byte[] DeserializeScale(string parameter) => new byte[] { byte.Parse(parameter) };
+        private static byte[] DeserializeWidth(string parameter) => new byte[] { byte.Parse(parameter) };
 
-        private static byte[] FromStringToByte(string parameter)
-        {
-            var scaleValue = byte.Parse(parameter);
-            return new byte[] { scaleValue };
-        }
+        private static byte[] FromStringToByte(string parameter) =>
+            parameter.Split(' ').Select(x => byte.Parse(x, NumberStyles.HexNumber)).ToArray();
 
         private static byte[] DeserializeColor(string value)
         {
