@@ -49,8 +49,41 @@ namespace OpenKh.Kh2.Messages
             var i = 0;
             while (i < value.Length)
             {
+                MessageCommandModel messageCommand;
+
                 var ch = value[i++];
-                if (ch == '{')
+                if (ch == '\n')
+                {
+                    messageCommand = new MessageCommandModel
+                    {
+                        Command = MessageCommand.NewLine,
+                    };
+                }
+                else if (ch == '\r')
+                {
+                    // ignore
+                    messageCommand = null;
+                }
+                else if (ch == '{')
+                {
+                    var closeBracketIndex = value.Substring(i).IndexOf('}') + i;
+                    if (closeBracketIndex < i)
+                        throw new ParseException(value, i, "Expected '}'");
+
+                    if (value[i] == ':')
+                        messageCommand = GetCommandModel(value.Substring(i + 1, closeBracketIndex - i - 1));
+                    else
+                        messageCommand = GetPrintComplexCommandModel(value.Substring(i, closeBracketIndex - i));
+
+                    i = closeBracketIndex + 1;
+                }
+                else
+                {
+                    messageCommand = null;
+                    strBuilder.Append(ch);
+                }
+
+                if (messageCommand != null)
                 {
                     if (strBuilder.Length > 0)
                     {
@@ -62,20 +95,7 @@ namespace OpenKh.Kh2.Messages
                         strBuilder.Clear();
                     }
 
-                    var closeBracketIndex = value.Substring(i).IndexOf('}') + i;
-                    if (closeBracketIndex < i)
-                        throw new ParseException(value, i, "Expected '}'");
-
-                    if (value[i] == ':')
-                        entries.Add(GetCommandModel(value.Substring(i + 1, closeBracketIndex - i - 1)));
-                    else
-                        entries.Add(GetPrintComplexCommandModel(value.Substring(i, closeBracketIndex - i)));
-
-                    i = closeBracketIndex + 1;
-                }
-                else
-                {
-                    strBuilder.Append(ch);
+                    entries.Add(messageCommand);
                 }
             }
 

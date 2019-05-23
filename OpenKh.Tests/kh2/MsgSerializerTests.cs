@@ -176,5 +176,16 @@ namespace OpenKh.Tests.kh2
             var actual = Encoders.InternationalSystem.Encode(commands);
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        public void DeserializeNewLine()
+        {
+            var commands = MsgSerializer.DeserializeText("hello\nworld!").ToArray();
+            Assert.Equal(MessageCommand.PrintText, commands[0].Command);
+            Assert.Equal("hello", commands[0].Text);
+            Assert.Equal(MessageCommand.NewLine, commands[1].Command);
+            Assert.Equal(MessageCommand.PrintText, commands[2].Command);
+            Assert.Equal("world!", commands[2].Text);
+        }
     }
 }
