@@ -106,7 +106,7 @@ namespace OpenKh.Kh2.Messages
                 Name = "width",
                 Command = MessageCommand.TextWidth,
                 Serializer = x => x.Data[0].ToString(),
-                Deserializer = x => FromStringToByte(x)
+                Deserializer = x => DeserializeWidth(x)
             },
             new SerializerModel
             {
@@ -120,7 +120,7 @@ namespace OpenKh.Kh2.Messages
                 Name = "unk0d",
                 Command = MessageCommand.Unknown0d,
                 Serializer = x => ToStringRawData(x.Data),
-                Deserializer = x => FromStringToByte(x)
+                Deserializer = x => new byte[0]
             },
             new SerializerModel
             {
@@ -141,14 +141,14 @@ namespace OpenKh.Kh2.Messages
                 Name = "clear",
                 Command = MessageCommand.Clear,
                 Serializer = x => ToStringRawData(x.Data),
-                Deserializer = x => FromStringToByte(x)
+                Deserializer = x => new byte[0]
             },
             new SerializerModel
             {
-                Name = "unk11",
-                Command = MessageCommand.Unknown11,
-                Serializer = x => ToStringRawData(x.Data),
-                Deserializer = x => FromStringToByte(x)
+                Name = "position",
+                Command = MessageCommand.Position,
+                Serializer = x => ToPosition(x),
+                Deserializer = x => FromPosition(x)
             },
             new SerializerModel
             {
@@ -324,13 +324,11 @@ namespace OpenKh.Kh2.Messages
         private static Dictionary<string, byte> _iconsDeserialize =
             _icons.ToDictionary(x => x.Value, x => x.Key);
 
-        private static byte[] DeserializeScale(string parameter) => FromStringToByte(parameter);
+        private static byte[] DeserializeScale(string parameter) => new byte[] { byte.Parse(parameter) };
+        private static byte[] DeserializeWidth(string parameter) => new byte[] { byte.Parse(parameter) };
 
-        private static byte[] FromStringToByte(string parameter)
-        {
-            var scaleValue = byte.Parse(parameter);
-            return new byte[] { scaleValue };
-        }
+        private static byte[] FromStringToByte(string parameter) =>
+            parameter.Split(' ').Select(x => byte.Parse(x, NumberStyles.HexNumber)).ToArray();
 
         private static byte[] DeserializeColor(string value)
         {
@@ -353,6 +351,27 @@ namespace OpenKh.Kh2.Messages
                 throw new ParseException(value, 0, "Icon not supported");
 
             return new byte[] { data };
+        }
+
+        private static string ToPosition(MessageCommandModel command) =>
+            $"{command.PositionX},{command.PositionY}";
+
+        private static byte[] FromPosition(string text)
+        {
+            var parameters = text.Split(',')
+                .Select(x => short.TryParse(x.Trim(), out var result) ? result : 0)
+                .ToArray();
+
+            var xCoord = parameters.Length > 0 ? parameters[0] : 0;
+            var yCoord = parameters.Length > 1 ? parameters[1] : 0;
+
+            return new byte[4]
+            {
+                (byte)((ushort)xCoord & 0xFF),
+                (byte)(((ushort)xCoord >> 8) & 0xFF),
+                (byte)((ushort)yCoord & 0xFF),
+                (byte)(((ushort)yCoord >> 8) & 0xFF),
+            };
         }
 
         private static string ToStringRawData(byte[] data) =>

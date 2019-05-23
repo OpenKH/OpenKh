@@ -72,6 +72,9 @@ namespace OpenKh.Kh2.Messages
 
         private static XNode GetDefaultSerializer(MessageCommandModel msgCmd, SerializerModel model)
         {
+            if (model.Serializer == null)
+                return null;
+
             var attribute = new XAttribute("value", model.Serializer(msgCmd));
             return attribute != null ? new XElement(model.Name, attribute) : new XElement(model.Name);
         }

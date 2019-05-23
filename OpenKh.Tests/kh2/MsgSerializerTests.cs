@@ -156,5 +156,87 @@ namespace OpenKh.Tests.kh2
             );
             Assert.Equal(expected.ToString(xmlFormatting), actual.ToString(xmlFormatting));
         }
+
+        [Theory]
+        [InlineData(new byte[] { 0x11, 0x00, 0x00, 0x00, 0x00 }, "{:position 0,0}")]
+        [InlineData(new byte[] { 0x11, 0xff, 0xff, 0xff, 0x7f }, "{:position -1,32767}")]
+        public void SerializeTextPositionCommand(byte[] data, string expected)
+        {
+            var decoded = Encoders.InternationalSystem.Decode(data);
+            var actual = MsgSerializer.SerializeText(decoded);
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(new byte[] { 0x11, 0x00, 0x00, 0x00, 0x00, 0x00 }, "{:position 0,0}")]
+        [InlineData(new byte[] { 0x11, 0xff, 0xff, 0xff, 0x7f, 0x00 }, "{:position -1,32767}")]
+        public void DeserializeTextPositionCommand(byte[] expected, string text)
+        {
+            var commands = MsgSerializer.DeserializeText(text).ToList();
+            var actual = Encoders.InternationalSystem.Encode(commands);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void DeserializeNewLine()
+        {
+            var commands = MsgSerializer.DeserializeText("hello\nworld!").ToArray();
+            Assert.Equal(MessageCommand.PrintText, commands[0].Command);
+            Assert.Equal("hello", commands[0].Text);
+            Assert.Equal(MessageCommand.NewLine, commands[1].Command);
+            Assert.Equal(MessageCommand.PrintText, commands[2].Command);
+            Assert.Equal("world!", commands[2].Text);
+        }
+
+        [Fact]
+        public void DeserializeTabulation()
+        {
+            var commands = MsgSerializer.DeserializeText("hello\tworld!").ToArray();
+            Assert.Equal(MessageCommand.PrintText, commands[0].Command);
+            Assert.Equal("hello", commands[0].Text);
+            Assert.Equal(MessageCommand.Tabulation, commands[1].Command);
+            Assert.Equal(MessageCommand.PrintText, commands[2].Command);
+            Assert.Equal("world!", commands[2].Text);
+        }
+
+        [Theory]
+        [InlineData(new byte[] { 0x0b, 0x90 }, "{:width 144}")]
+        [InlineData(new byte[] { 0x0b, 0x50 }, "{:width 80}")]
+        public void SerializeTextScale(byte[] data, string expected)
+        {
+            var commands = Encoders.InternationalSystem.Decode(data);
+            var actual = MsgSerializer.SerializeText(commands);
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData("{:width 144}", new byte[] { 0x0b, 0x90, 0x00 })]
+        [InlineData("{:width 80}", new byte[] { 0x0b, 0x50, 0x00 })]
+        public void DeserializeTextScale(string text, byte[] expected)
+        {
+            var commands = MsgSerializer.DeserializeText(text);
+            var actual = Encoders.InternationalSystem.Encode(commands.ToList());
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(new byte[] { 0x71 }, "{:unk 71}")]
+        [InlineData(new byte[] { 0x72 }, "{:unk 72}")]
+        public void SerializeTextUnknown(byte[] data, string expected)
+        {
+            var commands = Encoders.InternationalSystem.Decode(data);
+            var actual = MsgSerializer.SerializeText(commands);
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData("{:unk 71}", new byte[] { 0x71, 0x00 })]
+        [InlineData("{:unk 72}", new byte[] { 0x72, 0x00 })]
+        public void DeserializeTextUnknown(string text, byte[] expected)
+        {
+            var commands = MsgSerializer.DeserializeText(text);
+            var actual = Encoders.InternationalSystem.Encode(commands.ToList());
+            Assert.Equal(expected, actual);
+        }
     }
 }
