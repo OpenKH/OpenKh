@@ -10,20 +10,32 @@ namespace OpenKh.Tests.kh2
     public class FontContextTests
     {
         [Fact]
-        public void LoadEnglishSystemFontTest() =>
+        public void LoadEnglishSystemFontTest()
+        {
             LoadFontTest(512, 256, 4, "sys", x => x.ImageSystem);
+            LoadFontTest(512, 256, 4, "sys", x => x.ImageSystem2);
+        }
 
         [Fact]
-        public void LoadJapaneseSystemFontTest() =>
+        public void LoadJapaneseSystemFontTest()
+        {
             LoadFontTest(512, 512, 4, "sys", x => x.ImageSystem);
+            LoadFontTest(512, 512, 4, "sys", x => x.ImageSystem2);
+        }
 
         [Fact]
-        public void LoadEnglishEventFontTest() =>
+        public void LoadEnglishEventFontTest()
+        {
             LoadFontTest(512, 512, 4, "evt", x => x.ImageEvent);
+            LoadFontTest(512, 512, 4, "evt", x => x.ImageEvent2);
+        }
 
         [Fact]
-        public void LoadJapaneseEventFontTest() =>
+        public void LoadJapaneseEventFontTest()
+        {
             LoadFontTest(512, 1024, 4, "evt", x => x.ImageEvent);
+            LoadFontTest(512, 1024, 4, "evt", x => x.ImageEvent2);
+        }
 
         [Fact]
         public void LoadIconFontTest() =>

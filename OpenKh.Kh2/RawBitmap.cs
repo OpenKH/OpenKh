@@ -16,12 +16,13 @@ namespace OpenKh.Kh2
             0xe4cccccc,
             0xfff0f0f0
         };
-        private static readonly byte[] FontPalette = GeneratePalette(FontColors);
+        private static readonly byte[] FontPalette1 = GeneratePalette1(FontColors);
+        private static readonly byte[] FontPalette2 = GeneratePalette2(FontColors);
 
         private readonly byte[] _data;
         private readonly byte[] _clut;
 
-        private RawBitmap(Stream stream, int width, int height, bool is8bit)
+        private RawBitmap(Stream stream, int width, int height, bool is8bit, bool defaultPaletteSwitch = false)
         {
             Size = new Size(width, height);
             PixelFormat = is8bit ? PixelFormat.Indexed8 : PixelFormat.Indexed4;
@@ -41,7 +42,7 @@ namespace OpenKh.Kh2
             else
             {
                 // Just assign a default palette
-                _clut = FontPalette;
+                _clut = defaultPaletteSwitch ? FontPalette2 : FontPalette1;
             }
         }
 
@@ -91,10 +92,16 @@ namespace OpenKh.Kh2
 
         public byte[] GetData() => _data;
 
-        public static RawBitmap Read(Stream stream, int width, int height, bool is8bit) =>
-            new RawBitmap(stream, width, height, is8bit);
+        public static RawBitmap Read8bit(Stream stream, int width, int height) =>
+            new RawBitmap(stream, width, height, true);
 
-        private static byte[] GeneratePalette(uint[] fontColors)
+        public static RawBitmap Read4bitPalette1(Stream stream, int width, int height) =>
+            new RawBitmap(stream, width, height, false, false);
+
+        public static RawBitmap Read4bitPalette2(Stream stream, int width, int height) =>
+            new RawBitmap(stream, width, height, false, true);
+
+        private static byte[] GeneratePalette1(uint[] fontColors)
         {
             var palette = new byte[16 * 4];
             for (int i = 0, index = 0; i < 16; i++)
@@ -103,6 +110,20 @@ namespace OpenKh.Kh2
                 palette[index++] = (byte)((FontColors[i & 3] >> 8) & 0xFF);
                 palette[index++] = (byte)((FontColors[i & 3] >> 16) & 0xFF);
                 palette[index++] = (byte)((((FontColors[i & 3] >> 24) & 0xFF) + 1) / 2);
+            }
+
+            return palette;
+        }
+
+        private static byte[] GeneratePalette2(uint[] fontColors)
+        {
+            var palette = new byte[16 * 4];
+            for (int i = 0, index = 0; i < 16; i++)
+            {
+                palette[index++] = (byte)((FontColors[i / 4] >> 0) & 0xFF);
+                palette[index++] = (byte)((FontColors[i / 4] >> 8) & 0xFF);
+                palette[index++] = (byte)((FontColors[i / 4] >> 16) & 0xFF);
+                palette[index++] = (byte)((((FontColors[i / 4] >> 24) & 0xFF) + 1) / 2);
             }
 
             return palette;
