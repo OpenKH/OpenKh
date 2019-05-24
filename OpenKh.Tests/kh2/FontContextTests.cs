@@ -11,23 +11,32 @@ namespace OpenKh.Tests.kh2
     {
         [Fact]
         public void LoadEnglishSystemFontTest() =>
-            LoadFontTest(512, 256, "sys", x => x.ImageSystem);
+            LoadFontTest(512, 256, 4, "sys", x => x.ImageSystem);
+
+        [Fact]
+        public void LoadJapaneseSystemFontTest() =>
+            LoadFontTest(512, 512, 4, "sys", x => x.ImageSystem);
 
         [Fact]
         public void LoadEnglishEventFontTest() =>
-            LoadFontTest(512, 512, "evt", x => x.ImageEvent);
+            LoadFontTest(512, 512, 4, "evt", x => x.ImageEvent);
+
+        [Fact]
+        public void LoadJapaneseEventFontTest() =>
+            LoadFontTest(512, 1024, 4, "evt", x => x.ImageEvent);
 
         [Fact]
         public void LoadIconFontTest() =>
-            LoadFontTest(256, 160, "icon", x => x.ImageIcon);
+            LoadFontTest(256, 160, 8, "icon", x => x.ImageIcon);
 
         private static void LoadFontTest(
             int expectedWidth,
             int expectedHeight,
+            int bitsPerPixel,
             string name,
             Func<FontContext, IImage> getter)
         {
-            var expectedLength = expectedWidth * expectedHeight;
+            var expectedLength = expectedWidth * expectedHeight * bitsPerPixel / 8;
 
             var fontContext = new FontContext();
             var entry = new Bar.Entry
@@ -50,6 +59,7 @@ namespace OpenKh.Tests.kh2
         {
             var stream = new MemoryStream(length);
             stream.Write(new byte[length]);
+            stream.Position = 0;
 
             return stream;
         }
