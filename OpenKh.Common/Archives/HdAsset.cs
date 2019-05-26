@@ -12,8 +12,8 @@ namespace OpenKh.Common.Archives
         {
             [Data] public int OriginalLength { get; set; }
             [Data] public int AssetCount { get; set; }
-            [Data] public int Unknown08 { get; set; }
-            [Data] public int Unknown0c { get; set; }
+            [Data] public int Unused08 { get; set; }
+            [Data] public int Unused0c { get; set; }
             [Data] public List<HeaderEntry> Entries { get; set; }
         }
 
@@ -23,7 +23,7 @@ namespace OpenKh.Common.Archives
             [Data] public int Offset { get; set; }
             [Data] public int Flags { get; set; }
             [Data] public int Length { get; set; }
-            [Data] public int Unknown { get; set; }
+            [Data] public int Unused { get; set; }
         }
 
         public class Entry
@@ -37,7 +37,6 @@ namespace OpenKh.Common.Archives
                 set => stream = value ?? throw new ArgumentNullException(nameof(Stream));
             }
             public int Flags { get; set; }
-            public int Unknown { get; set; }
 
             public Entry()
             {
@@ -84,7 +83,6 @@ namespace OpenKh.Common.Archives
                 Name = x.Name,
                 Stream = GetSubStreamCopy(stream, x.Offset, x.Length),
                 Flags = x.Flags,
-                Unknown = x.Unknown
             }).ToList();
         }
 
@@ -98,7 +96,7 @@ namespace OpenKh.Common.Archives
                 Offset = -1,
                 Length = (int)x.Stream.Length,
                 Flags = x.Flags,
-                Unknown = x.Unknown
+                Unused = 0
             }).ToList();
 
             BinaryMapping.WriteObject(stream, _header);
