@@ -51,7 +51,7 @@ namespace OpenKh.Tools.ImgdViewer.ViewModels
 
 			SaveAsCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, ("IMGD texture", "imgd"));
+				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, ("IMGD texture", "imd"));
 				fd.DefaultFileName = FileName;
 
 				if (fd.ShowDialog() == true)

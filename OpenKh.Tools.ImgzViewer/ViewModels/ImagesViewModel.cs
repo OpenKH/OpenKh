@@ -40,7 +40,7 @@ namespace OpenKh.Tools.ImgzViewer.ViewModels
 		{
 			OpenCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, ("IMGZ texture", "imgd"));
+				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, ("IMGZ texture", "imz"));
 				if (fd.ShowDialog() == true)
 				{
 					using (var stream = File.OpenRead(fd.FileName))
@@ -75,7 +75,7 @@ namespace OpenKh.Tools.ImgzViewer.ViewModels
 
 			SaveAsCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, ("IMGZ texture", "imgd"));
+				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, ("IMGZ texture", "imz"));
 				if (fd.ShowDialog() == true)
 				{
 					using (var stream = File.Open(fd.FileName, FileMode.Create))
