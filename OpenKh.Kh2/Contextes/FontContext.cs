@@ -45,7 +45,7 @@ namespace OpenKh.Kh2.Contextes
                         ReadIcon(entry, ref imageIcon, ref spacingIcon, 256, 160);
                         break;
                     case "ftst":
-                        if (entry.Type == Bar.EntryType.Msg)
+                        if (entry.Type == Bar.EntryType.Binary)
                             palette = Ftst.Read(entry.Stream).ToDictionary(x => x.Id, x => x);
                         break;
                 }
@@ -56,7 +56,7 @@ namespace OpenKh.Kh2.Contextes
         {
             switch (entry.Type)
             {
-                case Bar.EntryType.Msg:
+                case Bar.EntryType.Binary:
                     spacing = ReadSpacing(entry);
                     break;
                 case Bar.EntryType.RawBitmap:
@@ -72,7 +72,7 @@ namespace OpenKh.Kh2.Contextes
         {
             switch (entry.Type)
             {
-                case Bar.EntryType.Msg:
+                case Bar.EntryType.Binary:
                     spacing = ReadSpacing(entry);
                     break;
                 case Bar.EntryType.RawBitmap:

@@ -14,7 +14,7 @@ namespace OpenKh.Kh2
 		public enum EntryType
 		{
 			Dummy = 0,
-			Msg = 2,
+			Binary = 2,
 			Ai = 3,
 			Tim2 = 7,
             SpawnPoint = 12,
