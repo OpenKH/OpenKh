@@ -1,23 +1,23 @@
 # Kingdom Hearts II - Worlds
 
-|Id|World
-|--|--
-|AL|Agrabah
-|BB|Beast's Castle
-|CA|Port Royal
-|DC|Disney Castle
-|DI|Destiny Island
-|EH|The World That Never Was
-|ES|Dark World
-|HB|Hollow Bastion
-|HE|Olympus Coliseum
-|LK|Pride Land
-|LM|Atlantica
-|MU|The Land of Dragons
-|NM|Halloween Town
-|PO|100 Acre Wood
-|TR|Space Paranoids
-|TT|Twilight Town
-|WI|Timeless River
-|WM|World Map
-|ZZ|Miscellaneous
+|Id|Index|World
+|--|-----|--
+|AL| 07  |Agrabah
+|BB| 05  |Beast's Castle
+|CA| 10  |Port Royal
+|DC| 0c  |Disney Castle
+|DI| 03  |Destiny Island
+|EH| 12  |The World That Never Was
+|ES| 01  |Dark World
+|HB| 04  |Hollow Bastion
+|HE| 06  |Olympus Coliseum
+|LK| 0a  |Pride Land
+|LM| 0b  |Atlantica
+|MU| 08  |The Land of Dragons
+|NM| 0e  |Halloween Town
+|PO| 09  |100 Acre Wood
+|TR| 11  |Space Paranoids
+|TT| 02  |Twilight Town
+|WI| 0d  |Timeless River
+|WM| 0f  |World Map
+|ZZ| 00  |Miscellaneous

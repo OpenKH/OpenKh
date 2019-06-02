@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="OpenKh.Tools.LayoutViewer.Views.SequenceGroupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="400">
+    <StackPanel>
+        <TextBlock>L1Index</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding L1Index, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock>L1Count</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding L1Count, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock>Unknown04</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding Unknown04, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock>Unknown08</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding Unknown08, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock>Unknown0c</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding Unknown0c, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock>Unknown10</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding Unknown10, UpdateSourceTrigger=PropertyChanged}"/>
+    </StackPanel>
+</UserControl>

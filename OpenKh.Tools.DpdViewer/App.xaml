@@ -1,0 +1,9 @@
+﻿<Application x:Class="OpenKh.Tools.DpdViewer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OpenKh.Tools.DpdViewer"
+             StartupUri="Views/DpdView.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
