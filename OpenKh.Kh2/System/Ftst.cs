@@ -6,12 +6,10 @@ namespace OpenKh.Kh2.System
 {
     public class Ftst
     {
-        public const int WorldCount = 19;
-
         public class Entry
         {
             [Data] public int Id { get; set; }
-            [Data(Count = WorldCount)] public int[] Colors { get; set; }
+            [Data(Count = Constants.WorldCount)] public int[] Colors { get; set; }
         }
 
         private class Header
