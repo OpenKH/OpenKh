@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
@@ -54,6 +55,18 @@ namespace OpenKh.Common
                 writer.Write(item);
 
             return (int)stream.Position - oldPosition;
+        }
+
+        public static void Copy(this Stream source, Stream destination, int length, int bufferSize = 65536)
+        {
+            int read;
+            byte[] buffer = new byte[Math.Min(length, bufferSize)];
+
+            while ((read = source.Read(buffer, 0, Math.Min(length, bufferSize))) != 0)
+            {
+                destination.Write(buffer, 0, read);
+                length -= read;
+            }
         }
     }
 }
