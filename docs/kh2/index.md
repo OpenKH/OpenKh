@@ -12,6 +12,7 @@
 * Other files
 
     * [00battle.bin](file/type/lvup)
+    * [03system.bin](file/type/03system)
 
 
 
