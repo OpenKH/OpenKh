@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Xe.BinaryMapper" Version="1.3.0" />
+    <PackageReference Include="Xe.BinaryMapper" Version="1.4.0" />
   </ItemGroup>
 
 </Project>

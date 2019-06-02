@@ -1,6 +1,8 @@
 ﻿using OpenKh.Imaging;
+using OpenKh.Kh2.System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace OpenKh.Kh2.Contextes
 {
@@ -25,6 +27,8 @@ namespace OpenKh.Kh2.Contextes
         public byte[] SpacingEvent { get => spacingEvent; set => spacingEvent = value; }
         public byte[] SpacingIcon { get => spacingIcon; set => spacingIcon = value; }
 
+        public Dictionary<int, Ftst.Entry> palette;
+
         public void Read(IEnumerable<Bar.Entry> entries)
         {
             foreach (var entry in entries)
@@ -40,6 +44,10 @@ namespace OpenKh.Kh2.Contextes
                     case "icon":
                         ReadIcon(entry, ref imageIcon, ref spacingIcon, 256, 160);
                         break;
+                    case "ftst":
+                        if (entry.Type == Bar.EntryType.Binary)
+                            palette = Ftst.Read(entry.Stream).ToDictionary(x => x.Id, x => x);
+                        break;
                 }
             }
         }
@@ -48,7 +56,7 @@ namespace OpenKh.Kh2.Contextes
         {
             switch (entry.Type)
             {
-                case Bar.EntryType.Msg:
+                case Bar.EntryType.Binary:
                     spacing = ReadSpacing(entry);
                     break;
                 case Bar.EntryType.RawBitmap:
@@ -64,7 +72,7 @@ namespace OpenKh.Kh2.Contextes
         {
             switch (entry.Type)
             {
-                case Bar.EntryType.Msg:
+                case Bar.EntryType.Binary:
                     spacing = ReadSpacing(entry);
                     break;
                 case Bar.EntryType.RawBitmap:
