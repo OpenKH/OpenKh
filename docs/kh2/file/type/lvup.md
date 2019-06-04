@@ -1,4 +1,4 @@
-# Lvup
+# [Kingdom Hearts II](index.md) - Lvup
 This sub-file is found within 00battle.bin. It stores informations about the
 - needed EXP for the level up
 - Strength, Magic, Defense and AP stats after the level up

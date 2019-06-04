@@ -1,4 +1,4 @@
-# Kingdom Hearts Birth By Sleep - Worlds
+# [Kingdom Hearts Birth By Sleep](index.md) - Worlds
 
 |Id|World
 |--|--
