@@ -25,3 +25,5 @@ The _Edition Id_ variable can be found in the following offset:
 |SLPM66233|00349510|sub_105ca0     |
 |SLUS21005|00349D44|sub_105cb0     |
 |SLPM66675|0033CAFC|sub_105af8     |
+
+While the vanilla japanese version have hard-coded the edition as `jp`, the Final Mix version checks the content of `SYSTEM.CNF` to establish which edition to set.
