@@ -3,6 +3,7 @@
 ## General documentation
 
 * [Games builds](builds.md)
+* [Editions](editions.md)
 * [Worlds](worlds.md)
 * [File types](file-type.md)
   
