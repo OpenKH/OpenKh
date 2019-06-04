@@ -1,4 +1,4 @@
-# Code of conduct
+# Code guideline
 
 ## Do not re-invent the wheel
 

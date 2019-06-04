@@ -18,9 +18,9 @@ To report bugs and errors, [open a new issue](https://github.com/Xeeynamo/OpenKh
 
 To request a feature, [open a new issue](https://github.com/Xeeynamo/OpenKh/issues/new) detailing your request. This can be anything from optimizations to new features.
 
-## Code contribution
+## Code guideline
 
-[This](CODE_OF_CONDUCT.md) is a document that gives an idea on the code requirements to have your content merged into the master branch. For the most part, as long as the code works as intended and can be cleaned up later if needed, it's more than welcome!
+[This](CODE_GUIDELINE.md) is a document that gives an idea on the code requirements to have your content merged into the master branch. For the most part, as long as the code works as intended and can be cleaned up later if needed, it's more than welcome!
 
 ## Documents contribution
 
