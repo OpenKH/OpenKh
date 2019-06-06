@@ -1,3 +1,5 @@
+# [Kingdom Hearts II](index.md) - Unknown files
+
 | Name | Hash32 | Hash16 | Games |
 |------|--------|--------|-------|
 ||84EDA9EE|5FC6|us,au
