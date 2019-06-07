@@ -15,6 +15,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private IEnumerable<Imgd> selectedImages;
         private int frameIndex;
         private int selectedSequenceGroupIndex;
+        private int _targetFramesPerSecond;
+        private bool _isSequencePlaying;
 
         public string Title { get; }
 
@@ -68,13 +70,38 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
+        public bool IsSequencePlaying
+        {
+            get => _isSequencePlaying;
+            set
+            {
+                _isSequencePlaying = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ActualFramesPerSecond));
+            }
+        }
+
+        public int TargetFramesPerSecond
+        {
+            get => _targetFramesPerSecond;
+            set
+            {
+                _targetFramesPerSecond = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int ActualFramesPerSecond => IsSequencePlaying ? _targetFramesPerSecond : 0;
+
         public MainViewModel()
         {
             Title = Utilities.GetApplicationName();
             Drawing = new DrawingDirect3D();
+            _isSequencePlaying = true;
+            _targetFramesPerSecond = 60;
         }
 
-        private void OpenFile(string fileName)
+        public void OpenFile(string fileName)
         {
             using (var stream = File.OpenRead(fileName))
             {

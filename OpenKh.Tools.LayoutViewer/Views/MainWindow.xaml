@@ -41,14 +41,27 @@
                 SelectedImages="{Binding SelectedImages}"
                 SelectedSequenceGroupIndex="{Binding SelectedSequenceGroupIndex, Mode=TwoWay}"
                 FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
-                FramesPerSecond="60"
+                FramesPerSecond="{Binding ActualFramesPerSecond}"
                 />
 
-            <localcontrols:Timeline
-                Grid.Row="2"
-                Value="{Binding FrameIndex, Mode=TwoWay}"
-                MaxValue="500"
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox
+                    Grid.Column="0"
+                    Content="Play"
+                    IsChecked="{Binding IsSequencePlaying}"
+                    />
+
+                <localcontrols:Timeline
+                    Grid.Column="1"
+                    Value="{Binding FrameIndex, Mode=TwoWay}"
+                    MaxValue="500"
                 />
+            </Grid>
         </Grid>
 
         <Grid Grid.Column="1">
