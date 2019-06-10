@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Views"
         xmlns:controls="clr-namespace:kh.tools.common.Controls;assembly=kh.tools.common"
         xmlns:localcontrols="clr-namespace:OpenKh.Tools.LayoutViewer.Controls"
+        xmlns:xecontrols="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="650" Width="800">
     <Grid>
@@ -22,16 +23,31 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <TextBlock>Sequence Group Index</TextBlock>
-                <ComboBox
-                    ItemsSource="{Binding SequenceGroups.Items}"
-                    DisplayMemberPath="Name"
-                    SelectedIndex="{Binding SelectedSequenceGroupIndex}"
-                    SelectedItem="{Binding SequenceGroups.SelectedItem}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <TextBlock>Frame Index</TextBlock>
-                <TextBox 
-                    Text="{Binding FrameIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock>Sequence Group Index</TextBlock>
+                        <ComboBox
+                            ItemsSource="{Binding SequenceGroups.Items}"
+                            DisplayMemberPath="Name"
+                            SelectedIndex="{Binding SelectedSequenceGroupIndex}"
+                            SelectedItem="{Binding SequenceGroups.SelectedItem}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock>Sequence Group Index</TextBlock>
+                        <ComboBox
+                            ItemsSource="{Binding SequenceGroups.Items}"
+                            DisplayMemberPath="Name"
+                            SelectedIndex="{Binding SelectedSequenceGroupIndex}"
+                            SelectedItem="{Binding SequenceGroups.SelectedItem}"/>
+                    </StackPanel>
+                </Grid>
             </StackPanel>
 
             <local:LayoutRendererPanel
@@ -50,11 +66,15 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <CheckBox
-                    Grid.Column="0"
-                    Content="Play"
-                    IsChecked="{Binding IsSequencePlaying}"
-                    />
+                <StackPanel>
+                    <CheckBox
+                        Grid.Column="0"
+                        Content="Play"
+                        IsChecked="{Binding IsSequencePlaying}"/>
+
+                    <TextBlock>Frame</TextBlock>
+                    <TextBox Text="{Binding FrameIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
 
                 <localcontrols:Timeline
                     Grid.Column="1"
@@ -65,8 +85,11 @@
         </Grid>
 
         <Grid Grid.Column="1">
-            <local:SequenceGroupView
+            <xecontrols:SpecialGroupBox
+                Header="Sequence Group">
+                <local:SequenceGroupView
                 DataContext="{Binding SequenceGroups.SelectedItem}"/>
+            </xecontrols:SpecialGroupBox>
         </Grid>
         
     </Grid>
