@@ -1,0 +1,43 @@
+﻿<Window x:Class="OpenKh.Tools.LayoutViewer.Views.LayoutSelectionDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Views"
+             mc:Ignorable="d" 
+             Title="Layout selection" ResizeMode="NoResize"
+             SizeToContent="Height" Width="280">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="120"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+            Text="The selected 2ld contains multiple layouts. Please choose the layout you want to load." TextWrapping="Wrap"/>
+        <ListBox
+            Grid.Row="1"
+            ItemsSource="{Binding Items}"
+            SelectedValuePath="Entry"
+            SelectedItem="{Binding SelectedItem}"
+            SelectedValue="{Binding SelectedLayoutEntry}"
+            />
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="60"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="1" Content="_Cancel" IsCancel="True"/>
+            <Button Grid.Column="3"
+                Content="_Ok"
+                IsDefault="True"
+                IsEnabled="{Binding IsItemSelected}"
+                Click="Button_Click"/>
+        </Grid>
+    </Grid>
+</Window>

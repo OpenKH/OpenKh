@@ -1,5 +1,7 @@
 using kh.tools.common;
 using OpenKh.Kh2;
+using OpenKh.Tools.LayoutViewer.Models;
+using OpenKh.Tools.LayoutViewer.Views;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -101,29 +103,54 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             _targetFramesPerSecond = 60;
         }
 
-        public void OpenFile(string fileName)
+        public void OpenFile(string fileName, bool doNotShowLayoutSelectionDialog = false)
         {
             using (var stream = File.OpenRead(fileName))
             {
                 if (!Bar.IsValid(stream))
                     throw new InvalidDataException("Not a bar file");
 
-                OpenBarContent(Bar.Open(stream));
+                OpenBarContent(Bar.Open(stream), doNotShowLayoutSelectionDialog);
             }
         }
 
-        private void OpenBarContent(List<Bar.Entry> entries)
+        private void OpenBarContent(List<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
         {
-            var layout = entries.Where(x => x.Type == Bar.EntryType.Layout).Select(x => Layout.Read(x.Stream)).First();
-            var images = entries.Where(x => x.Type == Bar.EntryType.Imgz).Select(x => Imgz.Open(x.Stream)).First();
-            OpenLayout(layout, images);
+            LayoutEntryModel layoutEntryModel;
+            
+            if (!doNotShowLayoutSelectionDialog && entries.Count(x => x.Type == Bar.EntryType.Layout) > 1)
+            {
+                var vm = new LayoutSelectionViewModel(entries);
+                var dialog = new LayoutSelectionDialog()
+                {
+                    DataContext = vm
+                };
+
+                layoutEntryModel = dialog.ShowDialog() == true ? vm.SelectedLayoutEntry : null;
+            }
+            else
+            {
+                var barLayoutEntry = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout);
+                var layout = barLayoutEntry != null ? Layout.Read(barLayoutEntry.Stream) : null;
+                var images = entries.Where(x => x.Type == Bar.EntryType.Imgz).Select(x => Imgz.Open(x.Stream)).First();
+
+                layoutEntryModel = new LayoutEntryModel
+                {
+                    Name = barLayoutEntry?.Name,
+                    Layout = layout,
+                    Images = images
+                };
+            }
+
+            if (layoutEntryModel != null)
+                OpenLayout(layoutEntryModel);
         }
 
-        private void OpenLayout(Layout layout, IEnumerable<Imgd> images)
+        private void OpenLayout(LayoutEntryModel layoutEntryModel)
         {
-            SequenceGroups = new SequenceGroupsViewModel(layout);
-            SelectedLayout = layout;
-            SelectedImages = images;
+            SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout);
+            SelectedLayout = layoutEntryModel.Layout;
+            SelectedImages = layoutEntryModel.Images;
         }
     }
 }
