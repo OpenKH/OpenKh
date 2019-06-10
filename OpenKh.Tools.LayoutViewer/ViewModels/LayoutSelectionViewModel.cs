@@ -59,7 +59,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             {
                 Name = barEntries.FirstOrDefault()?.Name,
                 Layout = layout,
-                Images = images
+                Images = images.ToList()
             };
         }
 

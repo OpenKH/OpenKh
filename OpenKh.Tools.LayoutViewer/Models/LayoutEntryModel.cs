@@ -7,6 +7,6 @@ namespace OpenKh.Tools.LayoutViewer.Models
     {
         public string Name { get; set; }
         public Layout Layout { get; set; }
-        public IEnumerable<Imgd> Images { get; set; }
+        public List<Imgd> Images { get; set; }
     }
 }

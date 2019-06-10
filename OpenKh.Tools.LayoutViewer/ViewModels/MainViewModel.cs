@@ -5,24 +5,57 @@ using OpenKh.Tools.LayoutViewer.Views;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Windows;
 using Xe.Drawing;
 using Xe.Tools;
+using Xe.Tools.Wpf.Commands;
+using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
     public class MainViewModel : BaseNotifyPropertyChanged
     {
+        private const string DefaultLayoutName = "FAKE";
+        private static string ApplicationName = Utilities.GetApplicationName();
         private SequenceGroupsViewModel sequenceGroups;
+        private string layoutName;
         private Layout selectedLayout;
         private IEnumerable<Imgd> selectedImages;
         private int frameIndex;
         private int selectedSequenceGroupIndex;
         private int _targetFramesPerSecond;
         private bool _isSequencePlaying;
+        private string fileName;
 
-        public string Title { get; }
+        public string Title => $"{LayoutName ?? DefaultLayoutName} | {FileName ?? "untitled"} | {ApplicationName}";
+        private string FileName
+        {
+            get => fileName; set
+            {
+                fileName = value;
+                OnPropertyChanged(nameof(Title));
+            }
+        }
 
         public IDrawing Drawing { get; }
+
+        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+        public RelayCommand OpenCommand { get; set; }
+        public RelayCommand SaveCommand { get; set; }
+        public RelayCommand SaveAsCommand { get; set; }
+        public RelayCommand ExitCommand { get; set; }
+        public RelayCommand AboutCommand { get; set; }
+
+        public string LayoutName
+        {
+            get => layoutName; private set
+            {
+                layoutName = value.Length > 4 ? value.Substring(0, 4) : value;
+                OnPropertyChanged(nameof(LayoutName));
+                OnPropertyChanged(nameof(Title));
+            }
+        }
 
         public Layout SelectedLayout
         {
@@ -97,27 +130,104 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public MainViewModel()
         {
-            Title = Utilities.GetApplicationName();
             Drawing = new DrawingDirect3D();
             _isSequencePlaying = true;
             _targetFramesPerSecond = 60;
+
+            OpenCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, FileDialog.Type.Any);
+                if (fd.ShowDialog() == true)
+                {
+                    OpenFile(fd.FileName);
+                }
+            }, x => true);
+
+            SaveCommand = new RelayCommand(x =>
+            {
+                if (!string.IsNullOrEmpty(FileName))
+                {
+                    SaveFile(FileName, FileName);
+                }
+                else
+                {
+                    SaveAsCommand.Execute(x);
+                }
+            }, x => true);
+
+            SaveAsCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, FileDialog.Type.Any);
+                if (fd.ShowDialog() == true)
+                {
+                    SaveFile(FileName, fd.FileName);
+                    FileName = fd.FileName;
+                }
+            }, x => true);
+
+            ExitCommand = new RelayCommand(x =>
+            {
+                Window.Close();
+            }, x => true);
+
+            AboutCommand = new RelayCommand(x =>
+            {
+                new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
+            }, x => true);
         }
 
-        public void OpenFile(string fileName, bool doNotShowLayoutSelectionDialog = false)
+        private static IEnumerable<Bar.Entry> ReadBarEntriesFromFileName(string fileName)
         {
             using (var stream = File.OpenRead(fileName))
             {
                 if (!Bar.IsValid(stream))
                     throw new InvalidDataException("Not a bar file");
 
-                OpenBarContent(Bar.Open(stream), doNotShowLayoutSelectionDialog);
+                return Bar.Open(stream);
             }
         }
 
-        private void OpenBarContent(List<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
+
+        public void OpenFile(string fileName, bool doNotShowLayoutSelectionDialog = false)
+        {
+            if (OpenBarContent(ReadBarEntriesFromFileName(fileName), doNotShowLayoutSelectionDialog))
+                FileName = fileName;
+        }
+
+        public void SaveFile(string previousFileName, string fileName)
+        {
+            var existingEntries = File.Exists(previousFileName) ? ReadBarEntriesFromFileName(previousFileName).ToList() : new List<Bar.Entry>();
+
+            var layoutBarEntry = existingEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout && x.Name == LayoutName);
+            if (layoutBarEntry == null)
+                existingEntries.Add(layoutBarEntry = new Bar.Entry
+                {
+                    Index = 0,
+                    Name = LayoutName,
+                    Type = Bar.EntryType.Layout
+                });
+            var layoutStream = layoutBarEntry.Stream = new MemoryStream();
+            SelectedLayout.Write(layoutStream);
+
+            var imagesBarEntry = existingEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout && x.Name == LayoutName);
+            if (imagesBarEntry == null)
+                existingEntries.Add(imagesBarEntry = new Bar.Entry
+                {
+                    Index = 0,
+                    Name = LayoutName,
+                    Type = Bar.EntryType.Imgz
+                });
+            var imgzStream = imagesBarEntry.Stream = new MemoryStream();
+            Imgz.Save(imgzStream, SelectedImages);
+
+            using (var stream = File.Create(fileName))
+                Bar.Save(stream, existingEntries);
+        }
+
+        private bool OpenBarContent(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
         {
             LayoutEntryModel layoutEntryModel;
-            
+
             if (!doNotShowLayoutSelectionDialog && entries.Count(x => x.Type == Bar.EntryType.Layout) > 1)
             {
                 var vm = new LayoutSelectionViewModel(entries);
@@ -138,17 +248,21 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 {
                     Name = barLayoutEntry?.Name,
                     Layout = layout,
-                    Images = images
+                    Images = images.ToList()
                 };
             }
 
-            if (layoutEntryModel != null)
-                OpenLayout(layoutEntryModel);
+            if (layoutEntryModel == null)
+                return false;
+
+            OpenLayout(layoutEntryModel);
+            return true;
         }
 
         private void OpenLayout(LayoutEntryModel layoutEntryModel)
         {
             SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout);
+            LayoutName = layoutEntryModel.Name;
             SelectedLayout = layoutEntryModel.Layout;
             SelectedImages = layoutEntryModel.Images;
         }

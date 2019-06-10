@@ -10,12 +10,34 @@
         mc:Ignorable="d"
         Title="{Binding Title}" Height="650" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        
-        <Grid Grid.Column="0" Margin="0 0 5 0">
+
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open"
+                          Command="{Binding OpenCommand}"/>
+                <MenuItem Header="_Save"
+                          Command="{Binding SaveCommand}"/>
+                <MenuItem Header="Save _as..."
+                          Command="{Binding SaveAsCommand}"/>
+                <Separator/>
+                <MenuItem Header="E_xit"
+                          Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About"
+                          Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <Grid Grid.Row="1" Grid.Column="0" Margin="0 0 5 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -84,7 +106,7 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Column="1">
+        <Grid Grid.Row="1" Grid.Column="1">
             <xecontrols:SpecialGroupBox
                 Header="Sequence Group">
                 <local:SequenceGroupView
