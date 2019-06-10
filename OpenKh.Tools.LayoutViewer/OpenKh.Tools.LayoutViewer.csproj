@@ -3,8 +3,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net472</TargetFramework>
     <AssemblyTitle>Layout editor</AssemblyTitle>
-    <Company>Luciano (Xeeynamo) Ciccariello</Company>
-    <Product>Layout editor - Kingdom Hearts II</Product>
+    <Company>OpenKH</Company>
+    <Product>Layout editor - OpenKh</Product>
     <Description>https://github.com/Xeeynamo/KingdomHearts</Description>
     <Copyright>Copyright ©  2019</Copyright>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
