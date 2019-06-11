@@ -14,12 +14,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
 
-        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+        <Menu Grid.Row="0">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open"
                           Command="{Binding OpenCommand}"/>
@@ -37,82 +33,6 @@
             </MenuItem>
         </Menu>
 
-        <Grid Grid.Row="1" Grid.Column="0" Margin="0 0 5 0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="60"/>
-            </Grid.RowDefinitions>
-
-            <StackPanel Grid.Row="0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="5"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0">
-                        <TextBlock>Sequence Group Index</TextBlock>
-                        <ComboBox
-                            ItemsSource="{Binding SequenceGroups.Items}"
-                            DisplayMemberPath="Name"
-                            SelectedIndex="{Binding SelectedSequenceGroupIndex}"
-                            SelectedItem="{Binding SequenceGroups.SelectedItem}"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2">
-                        <TextBlock>Sequence Group Index</TextBlock>
-                        <ComboBox
-                            ItemsSource="{Binding SequenceGroups.Items}"
-                            DisplayMemberPath="Name"
-                            SelectedIndex="{Binding SelectedSequenceGroupIndex}"
-                            SelectedItem="{Binding SequenceGroups.SelectedItem}"/>
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
-
-            <local:LayoutRendererPanel
-                Grid.Row="1"
-                Drawing="{Binding Drawing}"
-                SelectedLayout="{Binding SelectedLayout}"
-                SelectedImages="{Binding SelectedImages}"
-                SelectedSequenceGroupIndex="{Binding SelectedSequenceGroupIndex, Mode=TwoWay}"
-                FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
-                FramesPerSecond="{Binding ActualFramesPerSecond}"
-                />
-
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel>
-                    <CheckBox
-                        Grid.Column="0"
-                        Content="Play"
-                        IsChecked="{Binding IsSequencePlaying}"/>
-
-                    <TextBlock>Frame</TextBlock>
-                    <TextBox Text="{Binding FrameIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-
-                <localcontrols:Timeline
-                    Grid.Column="1"
-                    Value="{Binding FrameIndex, Mode=TwoWay}"
-                    MaxValue="500"
-                />
-            </Grid>
-        </Grid>
-
-        <Grid Grid.Row="1" Grid.Column="1">
-            <xecontrols:SpecialGroupBox
-                Header="Sequence Group">
-                <local:SequenceGroupView
-                DataContext="{Binding SequenceGroups.SelectedItem}"/>
-            </xecontrols:SpecialGroupBox>
-        </Grid>
-        
+        <local:LayoutEditorView Grid.Row="1" DataContext="{Binding}"/>
     </Grid>
 </Window>
