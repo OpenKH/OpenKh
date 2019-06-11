@@ -1,5 +1,6 @@
 using kh.tools.common;
 using OpenKh.Kh2;
+using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Models;
 using OpenKh.Tools.LayoutViewer.Views;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
-    public class MainViewModel : BaseNotifyPropertyChanged
+    public class MainViewModel : BaseNotifyPropertyChanged, ISequencePlayer
     {
         private const string DefaultLayoutName = "FAKE";
         private static string ApplicationName = Utilities.GetApplicationName();
@@ -128,11 +129,14 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public int ActualFramesPerSecond => IsSequencePlaying ? _targetFramesPerSecond : 0;
 
+        public SequenceEditorViewModel SequenceEditor { get; private set; }
+
         public MainViewModel()
         {
             Drawing = new DrawingDirect3D();
             _isSequencePlaying = true;
             _targetFramesPerSecond = 60;
+            SequenceEditor = new SequenceEditorViewModel(new DrawingDirect3D(), this);
 
             OpenCommand = new RelayCommand(x =>
             {
@@ -265,6 +269,9 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             LayoutName = layoutEntryModel.Name;
             SelectedLayout = layoutEntryModel.Layout;
             SelectedImages = layoutEntryModel.Images;
+
+            SequenceEditor.SelectedSequence = layoutEntryModel.Layout.SequenceItems.FirstOrDefault();
+            SequenceEditor.SelectedImage = layoutEntryModel.Images.FirstOrDefault();
         }
     }
 }

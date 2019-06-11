@@ -195,7 +195,7 @@ namespace kh.tools.common.Controls
             }
 
             this.drawing = drawing;
-            ResizeRenderingEngine((int)Math.Round(ActualWidth), (int)Math.Round(ActualHeight));
+            ResizeRenderingEngine((int)Math.Round(Math.Max(1, ActualWidth)), (int)Math.Round(Math.Max(1, ActualHeight)));
             OnDrawCreate();
         }
 
