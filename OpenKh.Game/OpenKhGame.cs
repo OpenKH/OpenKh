@@ -14,16 +14,23 @@ namespace OpenKh.Game
 
         private readonly IDataContent dataContent;
         private readonly ArchiveManager archiveManager;
+        private readonly InputManager inputManager;
         private IState state;
 
         public OpenKhGame()
         {
-            graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this)
+            {
+                PreferredBackBufferWidth = 512,
+                PreferredBackBufferHeight = 448
+            };
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
             dataContent = new StandardDataContent();
             archiveManager = new ArchiveManager(dataContent);
+            inputManager = new InputManager();
         }
 
         protected override void Initialize()
@@ -35,6 +42,7 @@ namespace OpenKh.Game
             {
                 DataContent = dataContent,
                 ArchiveManager = archiveManager,
+                InputManager = inputManager,
                 GraphicsDevice = graphics
             });
             base.Initialize();
@@ -50,10 +58,9 @@ namespace OpenKh.Game
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            inputManager.Update();
+            if (inputManager.IsExit)
                 Exit();
-
-            // TODO: Add your update logic here
 
             state?.Update(new DeltaTimes
             {

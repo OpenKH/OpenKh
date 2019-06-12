@@ -6,6 +6,7 @@ namespace OpenKh.Game.Infrastructure
     {
         public IDataContent DataContent { get; set; }
         public ArchiveManager ArchiveManager { get; set; }
+        public InputManager InputManager { get; set; }
         public GraphicsDeviceManager GraphicsDevice { get; set; }
     }
 }
