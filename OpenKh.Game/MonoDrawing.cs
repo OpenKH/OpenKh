@@ -55,7 +55,16 @@ namespace OpenKh.Game
         public ISurface CreateSurface(int width, int height, PixelFormat pixelFormat, SurfaceType type = SurfaceType.Input, DataResource dataResource = null)
         {
             var texture = new Texture2D(GraphicsDevice, width, height);
-            texture.SetData(dataResource.Data);
+            var data = new byte[dataResource.Data.Length];
+            for (int i = 0; i < data.Length; i+=4)
+            {
+                data[i + 2] = dataResource.Data[i + 0];
+                data[i + 1] = dataResource.Data[i + 1];
+                data[i + 0] = dataResource.Data[i + 2];
+                data[i + 3] = dataResource.Data[i + 3];
+            }
+
+            texture.SetData(data);
 
             return new CSurface(texture);
         }
