@@ -20,4 +20,10 @@
     <Folder Include="Content\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Drawing\Xe.Drawing.csproj" />
+  </ItemGroup>
+
 </Project>

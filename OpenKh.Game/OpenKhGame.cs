@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using OpenKh.Game.DataContent;
+using OpenKh.Game.Infrastructure;
+using OpenKh.Game.States;
 
 namespace OpenKh.Game
 {
@@ -9,17 +12,31 @@ namespace OpenKh.Game
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
+        private readonly IDataContent dataContent;
+        private readonly ArchiveManager archiveManager;
+        private IState state;
+
         public OpenKhGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            dataContent = new StandardDataContent();
+            archiveManager = new ArchiveManager(dataContent);
         }
 
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
 
+            state = new TitleState();
+            state.Initialize(new StateInitDesc
+            {
+                DataContent = dataContent,
+                ArchiveManager = archiveManager,
+                GraphicsDevice = graphics
+            });
             base.Initialize();
         }
 
@@ -38,6 +55,10 @@ namespace OpenKh.Game
 
             // TODO: Add your update logic here
 
+            state?.Update(new DeltaTimes
+            {
+
+            });
             base.Update(gameTime);
         }
 
@@ -47,6 +68,10 @@ namespace OpenKh.Game
 
             // TODO: Add your drawing code here
 
+            state?.Draw(new DeltaTimes
+            {
+
+            });
             base.Draw(gameTime);
         }
     }
