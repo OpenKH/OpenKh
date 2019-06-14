@@ -6,29 +6,52 @@
              xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="400">
-    <StackPanel>
-        <TextBlock>L1Index</TextBlock>
-        <TextBox Margin="0 0 0 3"
-            Text="{Binding L1Index, UpdateSourceTrigger=PropertyChanged}"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Grid.Row="0">
+            <TextBlock>Unknown04</TextBlock>
+            <TextBox Margin="0 0 0 3"
+                Text="{Binding Unknown04, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock>L1Count</TextBlock>
-        <TextBox Margin="0 0 0 3"
-            Text="{Binding L1Count, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock>Unknown08</TextBlock>
+            <TextBox Margin="0 0 0 3"
+                Text="{Binding Unknown08, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock>Unknown04</TextBlock>
-        <TextBox Margin="0 0 0 3"
-            Text="{Binding Unknown04, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock>Unknown0c</TextBlock>
+            <TextBox Margin="0 0 0 3"
+                Text="{Binding Unknown0c, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock>Unknown08</TextBlock>
-        <TextBox Margin="0 0 0 3"
-            Text="{Binding Unknown08, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock>Unknown10</TextBlock>
+            <TextBox Margin="0 0 0 3"
+                Text="{Binding Unknown10, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock>Unknown0c</TextBlock>
-        <TextBox Margin="0 0 0 3"
-            Text="{Binding Unknown0c, UpdateSourceTrigger=PropertyChanged}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0">Start index</TextBlock>
+                <TextBox Margin="0 0 0 3" Grid.Column="0" Grid.Row="1"
+                    Text="{Binding L1Index, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <TextBlock>Unknown10</TextBlock>
-        <TextBox Margin="0 0 0 3"
-            Text="{Binding Unknown10, UpdateSourceTrigger=PropertyChanged}"/>
-    </StackPanel>
+                <TextBlock Grid.Column="2">Count</TextBlock>
+                <TextBox Margin="0 0 0 3" Grid.Column="2" Grid.Row="1"
+                    Text="{Binding L1Count, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </StackPanel>
+
+        <ListBox Grid.Row="1"
+            ItemsSource="{Binding Items}"
+            SelectedItem="{Binding SelectedItem}"
+            />
+    </Grid>
 </UserControl>

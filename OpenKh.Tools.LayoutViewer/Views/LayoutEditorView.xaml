@@ -66,11 +66,8 @@
         </Grid>
 
         <Grid Grid.Column="1">
-            <xecontrols:SpecialGroupBox
-                Header="Sequence Group">
-                <local:SequenceGroupView
+            <local:SequenceGroupView
                 DataContext="{Binding SequenceGroups.SelectedItem}"/>
-            </xecontrols:SpecialGroupBox>
         </Grid>
     </Grid>
 </UserControl>
