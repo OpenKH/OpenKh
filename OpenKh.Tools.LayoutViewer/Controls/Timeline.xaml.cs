@@ -12,10 +12,10 @@ namespace OpenKh.Tools.LayoutViewer.Controls
     public partial class Timeline : UserControl
     {
         public static readonly DependencyProperty ValueProperty =
-            GetDependencyProperty<Timeline, double>("Value", (o, x) => o.SetValue(x));
+            GetDependencyProperty<Timeline, double>(nameof(Value), (o, x) => o.SetValue(x));
 
         public static readonly DependencyProperty MaxValueProperty =
-            GetDependencyProperty<Timeline, double>("MaxValue", (o, x) => o.SetMaxValue(x));
+            GetDependencyProperty<Timeline, double>(nameof(MaxValue), (o, x) => o.SetMaxValue(x));
 
         public double Value
         {

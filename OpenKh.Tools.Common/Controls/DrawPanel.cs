@@ -13,26 +13,26 @@ namespace kh.tools.common.Controls
 {
     public class DrawPanel : FrameworkElement
     {
-        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+        [DllImport("kernel32.dll", EntryPoint = nameof(CopyMemory), SetLastError = false)]
         private static extern void CopyMemory(IntPtr dest, IntPtr src, int count);
 
         public static readonly DependencyProperty DrawingProperty =
-            GetDependencyProperty<DrawPanel, IDrawing>("Drawing", (o, x) => o.SetDrawing(x));
+            GetDependencyProperty<DrawPanel, IDrawing>(nameof(Drawing),(o, x) => o.SetDrawing(x));
 
         public static readonly DependencyProperty DrawCreateCommandProperty =
-            GetDependencyProperty<DrawPanel, ICommand>("DrawCreate", (o, x) => o.drawCreateCommand = x);
+            GetDependencyProperty<DrawPanel, ICommand>(nameof(DrawCreate), (o, x) => o.drawCreateCommand = x);
 
         public static readonly DependencyProperty DrawDestroyCommandProperty =
-            GetDependencyProperty<DrawPanel, ICommand>("DrawDestroy", (o, x) => o.drawDestroyCommand = x);
+            GetDependencyProperty<DrawPanel, ICommand>(nameof(DrawDestroy), (o, x) => o.drawDestroyCommand = x);
 
         public static readonly DependencyProperty DrawBeginCommandProperty =
-            GetDependencyProperty<DrawPanel, ICommand>("DrawBegin", (o, x) => o.drawBeginCommand = x);
+            GetDependencyProperty<DrawPanel, ICommand>(nameof(DrawBegin), (o, x) => o.drawBeginCommand = x);
 
         public static readonly DependencyProperty DrawEndCommandProperty =
-            GetDependencyProperty<DrawPanel, ICommand>("DrawEnd", (o, x) => o.drawEndCommand = x);
+            GetDependencyProperty<DrawPanel, ICommand>(nameof(DrawEnd), (o, x) => o.drawEndCommand = x);
 
         public static readonly DependencyProperty FramesPerSecondProperty =
-            GetDependencyProperty<DrawPanel, double>("FramesPerSecond", 30.0f, (o, x) => o.SetFramesPerSecond(x), x => x >= 0.0f);
+            GetDependencyProperty<DrawPanel, double>(nameof(FramesPerSecond), 30.0f, (o, x) => o.SetFramesPerSecond(x), x => x >= 0.0f);
 
         private IDrawing drawing;
         private ICommand drawCreateCommand;

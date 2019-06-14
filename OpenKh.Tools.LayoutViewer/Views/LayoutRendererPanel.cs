@@ -15,16 +15,16 @@ namespace OpenKh.Tools.LayoutViewer.Views
     public class LayoutRendererPanel : DrawPanel
     {
         public static readonly DependencyProperty SelectedLayoutProperty =
-            GetDependencyProperty<LayoutRendererPanel, Layout>("SelectedLayout", null, (o, x) => o.TrySetLayout(), x => true);
+            GetDependencyProperty<LayoutRendererPanel, Layout>(nameof(SelectedLayout), null, (o, x) => o.TrySetLayout(), x => true);
 
         public static readonly DependencyProperty SelectedImagesProperty =
-            GetDependencyProperty<LayoutRendererPanel, IEnumerable<Imgd>>("SelectedImages", null, (o, x) => o.LoadImages(x), x => true);
+            GetDependencyProperty<LayoutRendererPanel, IEnumerable<Imgd>>(nameof(SelectedImages), null, (o, x) => o.LoadImages(x), x => true);
 
         public static readonly DependencyProperty SelectedSequenceGroupIndexProperty =
-            GetDependencyProperty<LayoutRendererPanel, int>("SelectedSequenceGroupIndex", 0, (o, x) => o.SelectSequenceGroup(x), x => x >= 0);
+            GetDependencyProperty<LayoutRendererPanel, int>(nameof(SelectedSequenceGroupIndex), 0, (o, x) => o.SelectSequenceGroup(x), x => x >= 0);
 
         public static readonly DependencyProperty FrameIndexProperty =
-            GetDependencyProperty<LayoutRendererPanel, int>("FrameIndex", 0, (o, x) => o.SetFrameIndex(x), x => x >= 0);
+            GetDependencyProperty<LayoutRendererPanel, int>(nameof(FrameIndex), 0, (o, x) => o.SetFrameIndex(x), x => x >= 0);
 
         public static readonly DependencyProperty DebugLayoutRendererProperty =
             GetDependencyProperty<LayoutRendererPanel, IDebugLayoutRenderer>(nameof(DebugLayoutRenderer), null, (o, x) => o.SetDebugLayoutRenderer(x));
