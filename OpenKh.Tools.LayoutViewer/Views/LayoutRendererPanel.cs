@@ -1,6 +1,7 @@
 ﻿using kh.tools.common.Controls;
+using OpenKh.Engine;
+using OpenKh.Engine.Renderers;
 using OpenKh.Kh2;
-using OpenKh.Tools.LayoutViewer.Renderer;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;

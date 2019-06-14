@@ -3,7 +3,7 @@ using System;
 using System.Drawing;
 using Xe.Drawing;
 
-namespace OpenKh.Tools.LayoutViewer.Renderer
+namespace OpenKh.Engine.Renderers
 {
     public class SequenceRenderer
     {

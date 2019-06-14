@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xe.Drawing;
 
-namespace OpenKh.Tools.LayoutViewer.Renderer
+namespace OpenKh.Engine.Renderers
 {
     public class LayoutRenderer
     {

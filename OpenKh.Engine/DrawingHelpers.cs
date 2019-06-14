@@ -2,7 +2,7 @@
 using System;
 using Xe.Drawing;
 
-namespace OpenKh.Tools.LayoutViewer
+namespace OpenKh.Engine
 {
     public static partial class DrawingHelpers
     {
@@ -35,7 +35,7 @@ namespace OpenKh.Tools.LayoutViewer
             };
         }
 
-        private unsafe static byte[] GetDataResource4bpp(IImageRead image)
+        private static byte[] GetDataResource4bpp(IImageRead image)
         {
             var size = image.Size;
             var data = image.GetData();
@@ -65,7 +65,7 @@ namespace OpenKh.Tools.LayoutViewer
             return dstData;
         }
 
-        private unsafe static byte[] GetDataResource8bpp(IImageRead image)
+        private static byte[] GetDataResource8bpp(IImageRead image)
         {
             var size = image.Size;
             var data = image.GetData();
