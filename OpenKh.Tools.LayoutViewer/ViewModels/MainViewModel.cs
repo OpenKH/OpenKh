@@ -26,7 +26,6 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private IEnumerable<Imgd> selectedImages;
         private int frameIndex;
         private int selectedSequenceGroupIndex;
-        private int _targetFramesPerSecond;
         private bool _isSequencePlaying;
         private string fileName;
 
@@ -115,21 +114,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             {
                 _isSequencePlaying = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(ActualFramesPerSecond));
             }
         }
-
-        public int TargetFramesPerSecond
-        {
-            get => _targetFramesPerSecond;
-            set
-            {
-                _targetFramesPerSecond = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int ActualFramesPerSecond => IsSequencePlaying ? _targetFramesPerSecond : 0;
 
         public SequenceEditorViewModel SequenceEditor { get; private set; }
 
@@ -137,7 +123,6 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         {
             Drawing = new DrawingDirect3D();
             _isSequencePlaying = true;
-            _targetFramesPerSecond = 60;
             EditorDebugRenderingService = new EditorDebugRenderingService();
             SequenceEditor = new SequenceEditorViewModel(EditorDebugRenderingService, this);
 

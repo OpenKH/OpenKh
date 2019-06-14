@@ -26,6 +26,9 @@ namespace OpenKh.Tools.LayoutViewer.Views
         public static readonly DependencyProperty FrameIndexProperty =
             GetDependencyProperty<LayoutRendererPanel, int>(nameof(FrameIndex), 0, (o, x) => o.SetFrameIndex(x), x => x >= 0);
 
+        public static readonly DependencyProperty IsPlayingProperty =
+            GetDependencyProperty<LayoutRendererPanel, bool>(nameof(IsPlaying), true, (o, x) => o.SetIsPlaying(x));
+
         public static readonly DependencyProperty DebugLayoutRendererProperty =
             GetDependencyProperty<LayoutRendererPanel, IDebugLayoutRenderer>(nameof(DebugLayoutRenderer), null, (o, x) => o.SetDebugLayoutRenderer(x));
 
@@ -53,6 +56,12 @@ namespace OpenKh.Tools.LayoutViewer.Views
             set => SetValue(FrameIndexProperty, value);
         }
 
+        public bool IsPlaying
+        {
+            get => (bool)GetValue(IsPlayingProperty);
+            set => SetValue(IsPlayingProperty, value);
+        }
+
         public IDebugLayoutRenderer DebugLayoutRenderer
         {
             get => (IDebugLayoutRenderer)GetValue(DebugLayoutRendererProperty);
@@ -77,7 +86,10 @@ namespace OpenKh.Tools.LayoutViewer.Views
         {
             Drawing.Clear(Color.Magenta);
             layoutRenderer?.Draw();
-            FrameIndex++;
+
+            if (IsPlaying)
+                FrameIndex++;
+
             Drawing.Flush();
             base.OnDrawBegin();
         }
@@ -98,6 +110,8 @@ namespace OpenKh.Tools.LayoutViewer.Views
             if (layoutRenderer != null)
                 layoutRenderer.FrameIndex = frameIndex;
         }
+
+        private void SetIsPlaying(bool isPlaying) { }
 
         private void SetDebugLayoutRenderer(IDebugLayoutRenderer debugLayoutRenderer) =>
             layoutRenderer.SetDebugLayoutRenderer(debugLayoutRenderer);

@@ -38,7 +38,8 @@
                 SelectedImages="{Binding SelectedImages}"
                 SelectedSequenceGroupIndex="{Binding SelectedSequenceGroupIndex, Mode=TwoWay}"
                 FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
-                FramesPerSecond="{Binding ActualFramesPerSecond}"
+                FramesPerSecond="60"
+                IsPlaying="{Binding IsSequencePlaying}"
                 DebugLayoutRenderer="{Binding EditorDebugRenderingService}"
                 />
 

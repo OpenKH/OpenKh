@@ -4,7 +4,5 @@
     {
         bool IsSequencePlaying { get; set; }
         int FrameIndex { get; set; }
-        int TargetFramesPerSecond { get; set; }
-        int ActualFramesPerSecond { get; }
     }
 }

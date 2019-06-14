@@ -65,7 +65,7 @@ namespace OpenKh.Tools.LayoutViewer.Views
         {
             Drawing.Clear(Color.Magenta);
             sequenceRenderer?.Draw(SelectedAnimationGroupIndex, FrameIndex, 0, 0);
-            FrameIndex++;
+            //FrameIndex++;
             Drawing.Flush();
             base.OnDrawBegin();
         }
