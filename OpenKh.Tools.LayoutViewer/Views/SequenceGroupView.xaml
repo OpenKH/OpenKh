@@ -52,6 +52,6 @@
         <ListBox Grid.Row="1"
             ItemsSource="{Binding Items}"
             SelectedItem="{Binding SelectedItem}"
-            />
+            SelectedIndex="{Binding SelectedIndex}"/>
     </Grid>
 </UserControl>

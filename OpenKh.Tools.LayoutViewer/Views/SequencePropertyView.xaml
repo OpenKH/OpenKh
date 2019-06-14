@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="OpenKh.Tools.LayoutViewer.Views.SequencePropertyView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="250" d:DesignWidth="200">
+    <StackPanel>
+        <TextBlock Margin="0 0 0 3" Text="{Binding Index, StringFormat=Property {0}}"/>
+
+        <TextBlock>Texture index</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding TextureIndex, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock>Sequence index</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding SequenceIndex, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock>Animation group</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding AnimationGroup, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock>Show at frame</TextBlock>
+        <TextBox Margin="0 0 0 3"
+            Text="{Binding ShowAtFrame, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock>Position</TextBlock>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="X"/>
+            <TextBox Grid.Column="2"
+                Text="{Binding PositionX, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Grid.Column="4" Text="Y"/>
+            <TextBox Grid.Column="6"
+                Text="{Binding PositionY, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+    </StackPanel>
+</UserControl>

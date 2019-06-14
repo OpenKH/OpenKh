@@ -10,6 +10,8 @@ namespace OpenKh.Tools.LayoutViewer.Models
     {
         private readonly Layout layout;
         private readonly int index;
+        private int _selectedIndex = -1;
+        private SequencePropertyModel selectedItem;
 
         public SequenceGroupModel(Layout layout, int index)
         {
@@ -78,7 +80,27 @@ namespace OpenKh.Tools.LayoutViewer.Models
                 Enumerable.Range(L1Index, L1Count)
                 .Select(x => new SequencePropertyModel(x, layout)));
 
-        public SequencePropertyModel SelectedItem { get; set; }
+        public SequencePropertyModel SelectedItem
+        {
+            get => selectedItem;
+            set
+            {
+                selectedItem = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int SelectedIndex
+        {
+            get => _selectedIndex;
+            set
+            {
+                _selectedIndex = value;
+                OnPropertyChanged(nameof(IsItemSelected));
+            }
+        }
+
+        public bool IsItemSelected => SelectedIndex >= 0;
 
         public override string ToString() => Name;
 

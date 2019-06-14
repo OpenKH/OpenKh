@@ -66,8 +66,17 @@
         </Grid>
 
         <Grid Grid.Column="1">
-            <local:SequenceGroupView
-                DataContext="{Binding SequenceGroups.SelectedItem}"/>
+            <TabControl>
+                <TabItem Header="Seq. group">
+                    <local:SequenceGroupView
+                        DataContext="{Binding SequenceGroups.SelectedItem}"/>
+                </TabItem>
+                <TabItem Header="Seq. property"
+                    IsEnabled="{Binding SequenceGroups.SelectedItem.IsItemSelected, FallbackValue=false}">
+                    <local:SequencePropertyView
+                        DataContext="{Binding SequenceGroups.SelectedItem.SelectedItem}"/>
+                </TabItem>
+            </TabControl>
         </Grid>
     </Grid>
 </UserControl>
