@@ -39,6 +39,7 @@
                 SelectedSequenceGroupIndex="{Binding SelectedSequenceGroupIndex, Mode=TwoWay}"
                 FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
                 FramesPerSecond="{Binding ActualFramesPerSecond}"
+                DebugLayoutRenderer="{Binding EditorDebugRenderingService}"
                 />
 
             <Grid Grid.Row="2">

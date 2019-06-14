@@ -1,6 +1,7 @@
 ﻿using kh.tools.common.Controls;
 using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
+using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.Drawing;
@@ -25,6 +26,9 @@ namespace OpenKh.Tools.LayoutViewer.Views
         public static readonly DependencyProperty FrameIndexProperty =
             GetDependencyProperty<LayoutRendererPanel, int>("FrameIndex", 0, (o, x) => o.SetFrameIndex(x), x => x >= 0);
 
+        public static readonly DependencyProperty DebugLayoutRendererProperty =
+            GetDependencyProperty<LayoutRendererPanel, IDebugLayoutRenderer>(nameof(DebugLayoutRenderer), null, (o, x) => o.SetDebugLayoutRenderer(x));
+
         public int SelectedSequenceGroupIndex
         {
             get => (int)GetValue(SelectedSequenceGroupIndexProperty);
@@ -47,6 +51,12 @@ namespace OpenKh.Tools.LayoutViewer.Views
         {
             get => (int)GetValue(FrameIndexProperty);
             set => SetValue(FrameIndexProperty, value);
+        }
+
+        public IDebugLayoutRenderer DebugLayoutRenderer
+        {
+            get => (IDebugLayoutRenderer)GetValue(DebugLayoutRendererProperty);
+            set => SetValue(DebugLayoutRendererProperty, value);
         }
 
         private ISurface[] surfaces;
@@ -88,6 +98,9 @@ namespace OpenKh.Tools.LayoutViewer.Views
             if (layoutRenderer != null)
                 layoutRenderer.FrameIndex = frameIndex;
         }
+
+        private void SetDebugLayoutRenderer(IDebugLayoutRenderer debugLayoutRenderer) =>
+            layoutRenderer.SetDebugLayoutRenderer(debugLayoutRenderer);
 
         private void TrySetLayout()
         {

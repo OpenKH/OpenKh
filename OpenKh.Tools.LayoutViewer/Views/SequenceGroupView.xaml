@@ -53,6 +53,15 @@
             ItemsSource="{Binding Items}"
             SelectedItem="{Binding SelectedItem}"
             SelectedIndex="{Binding SelectedIndex}"
-            MouseDoubleClick="ListBox_MouseDoubleClick"/>
+            MouseDoubleClick="ListBox_MouseDoubleClick">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsVisible}"/>
+                        <TextBlock Text="{Binding}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </UserControl>

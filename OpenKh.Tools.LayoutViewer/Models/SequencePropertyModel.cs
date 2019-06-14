@@ -6,10 +6,13 @@ namespace OpenKh.Tools.LayoutViewer.Models
 {
     public class SequencePropertyModel : BaseNotifyPropertyChanged
     {
-        public SequencePropertyModel(int index, Layout layout)
+        private readonly Service.EditorDebugRenderingService editorDebugRenderingService;
+
+        public SequencePropertyModel(int index, Layout layout, Service.EditorDebugRenderingService editorDebugRenderingService)
         {
             Index = index;
             Layout = layout;
+            this.editorDebugRenderingService = editorDebugRenderingService;
         }
 
         public int Index { get; }
@@ -50,6 +53,12 @@ namespace OpenKh.Tools.LayoutViewer.Models
         {
             get => SequenceProperty.PositionY;
             set => SequenceProperty.PositionY = value;
+        }
+
+        public bool IsVisible
+        {
+            get => editorDebugRenderingService.IsSequencePropertyVisible(Index);
+            set => editorDebugRenderingService.SetSequencePropertyVisible(Index, value);
         }
 
         public override string ToString() =>

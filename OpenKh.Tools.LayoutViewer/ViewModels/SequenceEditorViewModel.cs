@@ -1,5 +1,6 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.LayoutViewer.Interfaces;
+using OpenKh.Tools.LayoutViewer.Service;
 using System.Collections.Generic;
 using System.Linq;
 using Xe.Drawing;
@@ -47,6 +48,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private int selectedAnimationGroupIndex;
 
         public IDrawing Drawing { get; }
+        public EditorDebugRenderingService EditorDebugRenderingService { get; }
         public ISequencePlayer SequencePlayer { get; }
 
         public object AnimationGroupList
@@ -80,9 +82,10 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
-        public SequenceEditorViewModel(IDrawing drawing, ISequencePlayer sequencePlayer)
+        public SequenceEditorViewModel(EditorDebugRenderingService editorDebugRenderingService, ISequencePlayer sequencePlayer)
         {
-            Drawing = drawing;
+            Drawing = new DrawingDirect3D();
+            EditorDebugRenderingService = editorDebugRenderingService;
             SequencePlayer = sequencePlayer;
         }
     }

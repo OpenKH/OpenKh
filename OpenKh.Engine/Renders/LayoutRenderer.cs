@@ -1,4 +1,5 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace OpenKh.Engine.Renderers
         private readonly IDrawing drawing;
         private readonly ISurface[] surfaces;
         private int selectedSequenceGroupIndex;
+        private IDebugLayoutRenderer _debugLayoutRenderer;
 
         public int SelectedSequenceGroupIndex
         {
@@ -33,10 +35,16 @@ namespace OpenKh.Engine.Renderers
             this.layout = layout;
             this.drawing = drawing;
             this.surfaces = surfaces.ToArray();
+            _debugLayoutRenderer = new DefaultDebugLayoutRenderer();
         }
+
+        public void SetDebugLayoutRenderer(IDebugLayoutRenderer debugLayoutRenderer) =>
+            _debugLayoutRenderer = debugLayoutRenderer;
 
         public void Draw()
         {
+            if (!_debugLayoutRenderer.IsSequenceGroupVisible(selectedSequenceGroupIndex))
+                return;
             DrawLayoutGroup(layout.SequenceGroups[selectedSequenceGroupIndex]);
         }
 
@@ -46,6 +54,8 @@ namespace OpenKh.Engine.Renderers
             var count = l2.L1Count;
             for (var i = 0; i < count; i++)
             {
+                if (!_debugLayoutRenderer.IsSequencePropertyVisible(index + i))
+                    continue;
                 DrawLayout(layout.SequenceProperties[index + i]);
             }
         }

@@ -2,6 +2,7 @@ using kh.tools.common;
 using OpenKh.Kh2;
 using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Models;
+using OpenKh.Tools.LayoutViewer.Service;
 using OpenKh.Tools.LayoutViewer.Views;
 using System.Collections.Generic;
 using System.IO;
@@ -40,6 +41,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         }
 
         public IDrawing Drawing { get; }
+        public EditorDebugRenderingService EditorDebugRenderingService { get; }
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         public RelayCommand OpenCommand { get; set; }
@@ -136,7 +138,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             Drawing = new DrawingDirect3D();
             _isSequencePlaying = true;
             _targetFramesPerSecond = 60;
-            SequenceEditor = new SequenceEditorViewModel(new DrawingDirect3D(), this);
+            EditorDebugRenderingService = new EditorDebugRenderingService();
+            SequenceEditor = new SequenceEditorViewModel(EditorDebugRenderingService, this);
 
             OpenCommand = new RelayCommand(x =>
             {
@@ -265,7 +268,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         private void OpenLayout(LayoutEntryModel layoutEntryModel)
         {
-            SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout);
+            SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout, EditorDebugRenderingService);
             LayoutName = layoutEntryModel.Name;
             SelectedLayout = layoutEntryModel.Layout;
             SelectedImages = layoutEntryModel.Images;
