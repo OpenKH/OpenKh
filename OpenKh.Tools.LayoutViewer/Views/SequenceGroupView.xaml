@@ -52,6 +52,7 @@
         <ListBox Grid.Row="1"
             ItemsSource="{Binding Items}"
             SelectedItem="{Binding SelectedItem}"
-            SelectedIndex="{Binding SelectedIndex}"/>
+            SelectedIndex="{Binding SelectedIndex}"
+            MouseDoubleClick="ListBox_MouseDoubleClick"/>
     </Grid>
 </UserControl>

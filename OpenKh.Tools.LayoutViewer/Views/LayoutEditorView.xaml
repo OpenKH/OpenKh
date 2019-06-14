@@ -66,12 +66,12 @@
         </Grid>
 
         <Grid Grid.Column="1">
-            <TabControl>
+            <TabControl x:Name="SequenceEditorTabControl">
                 <TabItem Header="Seq. group">
                     <local:SequenceGroupView
                         DataContext="{Binding SequenceGroups.SelectedItem}"/>
                 </TabItem>
-                <TabItem Header="Seq. property"
+                <TabItem x:Name="SequencePropertyTab" Header="Seq. property"
                     IsEnabled="{Binding SequenceGroups.SelectedItem.IsItemSelected, FallbackValue=false}">
                     <local:SequencePropertyView
                         DataContext="{Binding SequenceGroups.SelectedItem.SelectedItem}"/>
