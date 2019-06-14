@@ -10,6 +10,13 @@
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Renderer\**" />
+    <EmbeddedResource Remove="Renderer\**" />
+    <None Remove="Renderer\**" />
+    <Page Remove="Renderer\**" />
+    <_SettingsFiles Remove="Renderer\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -58,8 +65,5 @@
     <Page Update="Views\SequenceGroupView.xaml">
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Renderer\" />
   </ItemGroup>
 </Project>
