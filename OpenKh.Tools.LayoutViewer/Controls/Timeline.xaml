@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="120" d:DesignWidth="300"
-             MouseDown="UserControl_MouseDown">
+             MouseDown="UserControl_MouseDown"
+             MouseMove="UserControl_MouseMove">
     <Grid Background="White">
         <Canvas>
             <Line

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using static kh.tools.common.DependencyPropertyUtils;
 
@@ -55,10 +56,19 @@ namespace OpenKh.Tools.LayoutViewer.Controls
             UpdateCursorPosition();
         }
 
-        private void UserControl_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void UserControl_MouseDown(object sender, MouseButtonEventArgs e) =>
+            HandleMouse(sender, e);
+
+        private void UserControl_MouseMove(object sender, MouseEventArgs e) =>
+            HandleMouse(sender, e);
+
+        private void HandleMouse(object sender, MouseEventArgs e)
         {
-            var mousePosition = e.GetPosition(sender as FrameworkElement);
-            Value = mousePosition.X / ActualWidth * MaxValue;
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                var mousePosition = e.GetPosition(sender as FrameworkElement);
+                Value = mousePosition.X / ActualWidth * MaxValue;
+            }
         }
     }
 }
