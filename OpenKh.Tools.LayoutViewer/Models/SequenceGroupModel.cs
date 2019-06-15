@@ -10,14 +10,16 @@ namespace OpenKh.Tools.LayoutViewer.Models
     {
         private readonly Layout layout;
         private readonly int index;
+        private readonly ViewModels.TexturesViewModel texturesViewModel;
         private readonly Service.EditorDebugRenderingService editorDebugRenderingService;
         private int _selectedIndex = -1;
         private SequencePropertyModel selectedItem;
 
-        public SequenceGroupModel(Layout layout, int index, Service.EditorDebugRenderingService editorDebugRenderingService)
+        public SequenceGroupModel(Layout layout, int index, ViewModels.TexturesViewModel texturesViewModel, Service.EditorDebugRenderingService editorDebugRenderingService)
         {
             this.layout = layout;
             this.index = index;
+            this.texturesViewModel = texturesViewModel;
             this.editorDebugRenderingService = editorDebugRenderingService;
         }
 
@@ -80,7 +82,7 @@ namespace OpenKh.Tools.LayoutViewer.Models
         public ObservableCollection<SequencePropertyModel> Items =>
             new ObservableCollection<SequencePropertyModel>(
                 Enumerable.Range(L1Index, L1Count)
-                .Select(x => new SequencePropertyModel(x, layout, editorDebugRenderingService)));
+                .Select(x => new SequencePropertyModel(x, layout, texturesViewModel, editorDebugRenderingService)));
 
         public SequencePropertyModel SelectedItem
         {

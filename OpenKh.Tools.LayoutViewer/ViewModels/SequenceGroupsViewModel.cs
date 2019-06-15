@@ -8,8 +8,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
     public class SequenceGroupsViewModel : GenericListModel<SequenceGroupModel>
     {
-        public SequenceGroupsViewModel(Layout layout, EditorDebugRenderingService editorDebugRenderingService) :
-            base(layout.SequenceGroups.Select((_, i) => new SequenceGroupModel(layout, i, editorDebugRenderingService)))
+        public SequenceGroupsViewModel(Layout layout, TexturesViewModel texturesViewModel, EditorDebugRenderingService editorDebugRenderingService) :
+            base(layout.SequenceGroups.Select((_, i) => new SequenceGroupModel(layout, i, texturesViewModel, editorDebugRenderingService)))
         {
 
         }

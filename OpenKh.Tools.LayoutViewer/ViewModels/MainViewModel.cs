@@ -28,6 +28,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private int selectedSequenceGroupIndex;
         private bool _isSequencePlaying;
         private string fileName;
+        private TexturesViewModel texturesViewModel;
 
         public string Title => $"{LayoutName ?? DefaultLayoutName} | {FileName ?? "untitled"} | {ApplicationName}";
         private string FileName
@@ -253,7 +254,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         private void OpenLayout(LayoutEntryModel layoutEntryModel)
         {
-            SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout, EditorDebugRenderingService);
+            texturesViewModel = new TexturesViewModel(layoutEntryModel.Images);
+            SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout, texturesViewModel, EditorDebugRenderingService);
             LayoutName = layoutEntryModel.Name;
             SelectedLayout = layoutEntryModel.Layout;
             SelectedImages = layoutEntryModel.Images;

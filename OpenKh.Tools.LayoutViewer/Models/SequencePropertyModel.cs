@@ -1,4 +1,6 @@
 ﻿using OpenKh.Kh2;
+using OpenKh.Tools.LayoutViewer.ViewModels;
+using System.Windows.Media;
 using Xe.Tools;
 using static OpenKh.Kh2.Layout;
 
@@ -8,16 +10,20 @@ namespace OpenKh.Tools.LayoutViewer.Models
     {
         private readonly Service.EditorDebugRenderingService editorDebugRenderingService;
 
-        public SequencePropertyModel(int index, Layout layout, Service.EditorDebugRenderingService editorDebugRenderingService)
+        public SequencePropertyModel(int index, Layout layout, ViewModels.TexturesViewModel texturesViewModel, Service.EditorDebugRenderingService editorDebugRenderingService)
         {
             Index = index;
             Layout = layout;
+            Textures = texturesViewModel;
             this.editorDebugRenderingService = editorDebugRenderingService;
         }
 
         public int Index { get; }
         public Layout Layout { get; }
         public SequenceProperty SequenceProperty => Layout.SequenceProperties[Index];
+
+        public TexturesViewModel Textures { get; }
+        public ImageSource TextureImage => Textures.Items[TextureIndex].Image;
 
         public int TextureIndex
         {
