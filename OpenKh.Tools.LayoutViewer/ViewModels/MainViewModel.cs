@@ -50,6 +50,12 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AboutCommand { get; set; }
 
+        public RelayCommand TimelinePlayCommand { get; set; }
+        public RelayCommand TimelinePauseCommand { get; set; }
+        public RelayCommand TimelineRestartCommand { get; set; }
+        public Visibility TimelinePlayVisibility => IsSequencePlaying ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility TimelinePauseVisibility => IsSequencePlaying ? Visibility.Visible : Visibility.Collapsed;
+
         public string LayoutName
         {
             get => layoutName; private set
@@ -104,7 +110,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             set
             {
                 frameIndex = value;
-                OnPropertyChanged(nameof(FrameIndex));
+                OnPropertyChanged();
             }
         }
 
@@ -115,6 +121,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             {
                 _isSequencePlaying = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(TimelinePlayVisibility));
+                OnPropertyChanged(nameof(TimelinePauseVisibility));
             }
         }
 
@@ -166,6 +174,21 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             AboutCommand = new RelayCommand(x =>
             {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
+            }, x => true);
+
+            TimelinePlayCommand = new RelayCommand(x =>
+            {
+                IsSequencePlaying = true;
+            }, x => true);
+
+            TimelinePauseCommand = new RelayCommand(x =>
+            {
+                IsSequencePlaying = false;
+            }, x => true);
+
+            TimelineRestartCommand = new RelayCommand(x =>
+            {
+                FrameIndex = 0;
             }, x => true);
         }
 

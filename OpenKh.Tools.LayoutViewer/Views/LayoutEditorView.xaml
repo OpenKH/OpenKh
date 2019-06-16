@@ -17,22 +17,16 @@
 
         <Grid Grid.Column="0" Margin="0 0 5 0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
                 <RowDefinition Height="60"/>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <TextBlock>Sequence Group Index</TextBlock>
-                <ComboBox
-                    ItemsSource="{Binding SequenceGroups.Items}"
-                    DisplayMemberPath="Name"
-                    SelectedIndex="{Binding SelectedSequenceGroupIndex}"
-                    SelectedItem="{Binding SequenceGroups.SelectedItem}"/>
             </StackPanel>
 
             <local:LayoutRendererPanel
-                Grid.Row="1"
+                Grid.Row="0"
                 Drawing="{Binding Drawing}"
                 SelectedLayout="{Binding SelectedLayout}"
                 SelectedImages="{Binding SelectedImages}"
@@ -44,23 +38,60 @@
                 />
 
             <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <StackPanel>
-                    <CheckBox
-                        Grid.Column="0"
-                        Content="Play"
-                        IsChecked="{Binding IsSequencePlaying}"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button VerticalAlignment="Center"
+                        Command="{Binding TimelinePlayCommand}"
+                        Visibility="{Binding TimelinePlayVisibility}">
+                        <Button.Content>
+                            <Image Source="{StaticResource Run_16x}"/>
+                        </Button.Content>
+                        <Button.ToolTip>
+                            <TextBlock Text="Play"/>
+                        </Button.ToolTip>
+                    </Button>
+                    <Button VerticalAlignment="Center"
+                        Command="{Binding TimelinePauseCommand}"
+                        Visibility="{Binding TimelinePauseVisibility}">
+                        <Button.Content>
+                            <Image Source="{StaticResource Pause_16x}"/>
+                        </Button.Content>
+                        <Button.ToolTip>
+                            <TextBlock Text="Play"/>
+                        </Button.ToolTip>
+                    </Button>
+                    <Button VerticalAlignment="Center"
+                        Command="{Binding TimelineRestartCommand}">
+                        <Button.Content>
+                            <Image Source="{StaticResource Restart_16x}"/>
+                        </Button.Content>
+                        <Button.ToolTip>
+                            <TextBlock Text="Rewind to frame 0"/>
+                        </Button.ToolTip>
+                    </Button>
 
-                    <TextBlock>Frame</TextBlock>
-                    <TextBox Text="{Binding FrameIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Rectangle Fill="Gray" Width="1" Margin="3"/>
+
+                    <TextBlock Margin="0 0 3 0" VerticalAlignment="Center" Text="Frame"/>
+                    <TextBox Width="40" VerticalAlignment="Center"
+                        Text="{Binding FrameIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <Rectangle Fill="Gray" Width="1" Margin="3"/>
+
+                    <TextBlock Margin="0 0 3 0" VerticalAlignment="Center" Text="Seq. group"/>
+                    <ComboBox VerticalAlignment="Center" Width="40"
+                        ItemsSource="{Binding SequenceGroups.Items}"
+                        DisplayMemberPath="Name"
+                        SelectedIndex="{Binding SelectedSequenceGroupIndex}"
+                        SelectedItem="{Binding SequenceGroups.SelectedItem}"/>
                 </StackPanel>
 
                 <localcontrols:Timeline
-                    Grid.Column="1"
+                    Grid.Row="1"
                     Value="{Binding FrameIndex, Mode=TwoWay}"
                     MaxValue="500"
                 />

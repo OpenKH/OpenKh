@@ -25,7 +25,7 @@ namespace OpenKh.Tools.LayoutViewer.Models
 
         public Layout.SequenceGroup SequenceGroup => layout.SequenceGroups[index];
 
-        public string Name => $"Sequence {index}";
+        public string Name => $"{index}";
 
         public short L1Index
         {

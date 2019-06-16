@@ -8,7 +8,7 @@
         xmlns:localcontrols="clr-namespace:OpenKh.Tools.LayoutViewer.Controls"
         xmlns:xecontrols="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="650" Width="800">
+        Title="{Binding Title}" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
