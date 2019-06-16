@@ -2,6 +2,7 @@
 using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using System.Drawing;
 using System.Windows;
 using Xe.Drawing;
@@ -23,16 +24,29 @@ namespace OpenKh.Tools.LayoutViewer.Views
         public static readonly DependencyProperty FrameIndexProperty =
             GetDependencyProperty<SequenceRendererPanel, int>(nameof(FrameIndex), 0, (o, x) => o.SetFrameIndex(x), x => x >= 0);
 
+        public static readonly DependencyProperty AdjustPositionProperty =
+            GetDependencyProperty<SequenceRendererPanel, bool>(nameof(AdjustPosition), false, (o, x) => { });
+
+        private Rectangle _sequenceVisibilyRectangle;
+
         public int SelectedAnimationGroupIndex
         {
             get => (int)GetValue(SelectedSequenceGroupIndexProperty);
-            set => SetValue(SelectedSequenceGroupIndexProperty, value);
+            set
+            {
+                SetValue(SelectedSequenceGroupIndexProperty, value);
+                InvalidateMeasure();
+            }
         }
 
         public Sequence SelectedSequence
         {
             get => (Sequence)GetValue(SelectedSequenceProperty);
-            set => SetValue(SelectedSequenceProperty, value);
+            set
+            {
+                SetValue(SelectedSequenceProperty, value);
+                InvalidateMeasure();
+            }
         }
 
         public Imgd SelectedImage
@@ -47,8 +61,25 @@ namespace OpenKh.Tools.LayoutViewer.Views
             set => SetValue(FrameIndexProperty, value);
         }
 
+        public bool AdjustPosition
+        {
+            get => (bool)GetValue(AdjustPositionProperty);
+            set => SetValue(AdjustPositionProperty, value);
+        }
+
         private ISurface surface;
         private SequenceRenderer sequenceRenderer;
+
+        protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
+        {
+            var rect = SelectedSequence?.GetVisibilityRectangleFromAnimationGroup(SelectedAnimationGroupIndex);
+            if (rect == null)
+                return base.MeasureOverride(availableSize);
+
+            _sequenceVisibilyRectangle = rect.Value;
+            var size = _sequenceVisibilyRectangle.Size;
+            return new System.Windows.Size(size.Width, size.Height);
+        }
 
         protected override void OnDrawCreate()
         {
@@ -64,8 +95,11 @@ namespace OpenKh.Tools.LayoutViewer.Views
         protected override void OnDrawBegin()
         {
             Drawing.Clear(Color.Magenta);
-            sequenceRenderer?.Draw(SelectedAnimationGroupIndex, FrameIndex, 0, 0);
-            //FrameIndex++;
+
+            int posX = AdjustPosition ? -_sequenceVisibilyRectangle.X : 0;
+            int posY = AdjustPosition ? -_sequenceVisibilyRectangle.Y : 0;
+            sequenceRenderer?.Draw(SelectedAnimationGroupIndex, FrameIndex, posX, posY);
+            FrameIndex++;
             Drawing.Flush();
             base.OnDrawBegin();
         }
@@ -95,7 +129,7 @@ namespace OpenKh.Tools.LayoutViewer.Views
         private void LoadImage(Imgd image)
         {
             surface?.Dispose();
-            surface = Drawing.CreateSurface(image);
+            surface = Drawing?.CreateSurface(image);
 
             TrySetSequence();
         }
