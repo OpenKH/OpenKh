@@ -16,6 +16,15 @@
             <ComboBox.ToolTip>
                 <Image Source="{Binding TextureImage}"/>
             </ComboBox.ToolTip>
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}">
+                        <TextBlock.ToolTip>
+                            <Image Source="{Binding Image}"/>
+                        </TextBlock.ToolTip>
+                    </TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
         </ComboBox>
 
         <TextBlock>Sequence index</TextBlock>
