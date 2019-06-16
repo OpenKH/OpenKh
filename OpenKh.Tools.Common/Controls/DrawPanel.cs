@@ -141,6 +141,10 @@ namespace kh.tools.common.Controls
             _stopwatchDeltaTime.Restart();
 
             _stopwatch.Restart();
+
+            if (Drawing == null)
+                return;
+
             OnDrawBegin();
             LastDrawTime = _stopwatch.Elapsed.TotalMilliseconds;
             Present();
