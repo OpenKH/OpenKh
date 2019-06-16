@@ -12,20 +12,20 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
     {
         public class TextureModel
         {
-            private readonly Imgd imgd;
-
             public TextureModel(int index, Imgd imgd)
             {
-                this.imgd = imgd;
                 Index = index;
+                Texture = imgd;
                 Image = imgd.GetBimapSource();
             }
 
             public int Index { get; }
 
+            public Imgd Texture { get; }
+
             public ImageSource Image { get; }
 
-            public override string ToString() => $"{Index}: image {imgd.Size.Width}x{imgd.Size.Height}";
+            public override string ToString() => $"{Index}: image {Texture.Size.Width}x{Texture.Size.Height}";
         }
 
         public TexturesViewModel(IEnumerable<Imgd> images) :
