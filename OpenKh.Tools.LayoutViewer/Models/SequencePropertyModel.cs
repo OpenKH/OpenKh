@@ -1,6 +1,7 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.LayoutViewer.ViewModels;
+using System;
 using System.Linq;
 using System.Windows.Media;
 using Xe.Drawing;
@@ -25,6 +26,20 @@ namespace OpenKh.Tools.LayoutViewer.Models
             public override string ToString() => $"Sequence {index}";
         }
 
+        public class AnimationGroupModel
+        {
+            private readonly int index;
+            private readonly Sequence sequence;
+
+            public AnimationGroupModel(int index, Sequence sequence)
+            {
+                this.index = index;
+                this.sequence = sequence;
+            }
+
+            public override string ToString() => $"Animation group {index}";
+        }
+
         private readonly Service.EditorDebugRenderingService editorDebugRenderingService;
 
         public SequencePropertyModel(int index, Layout layout, ViewModels.TexturesViewModel texturesViewModel, Service.EditorDebugRenderingService editorDebugRenderingService)
@@ -45,6 +60,10 @@ namespace OpenKh.Tools.LayoutViewer.Models
         public MyGenericListModel<SequenceModel> SequenceItems =>
             new MyGenericListModel<SequenceModel>(Layout.SequenceItems.Select((x, i) => new SequenceModel(i, x)));
 
+        public MyGenericListModel<AnimationGroupModel> AnimationGroupItems =>
+            new MyGenericListModel<AnimationGroupModel>(Layout.SequenceItems[SequenceIndex].AnimationGroups.Select((x, i) =>
+                new AnimationGroupModel(i, Layout.SequenceItems[SequenceIndex])));
+
         public int TextureIndex
         {
             get => SequenceProperty.TextureIndex;
@@ -60,8 +79,10 @@ namespace OpenKh.Tools.LayoutViewer.Models
             get => SequenceProperty.SequenceIndex;
             set
             {
+                AnimationGroup = 0;
                 SequenceProperty.SequenceIndex = value;
                 OnPropertyChanged(nameof(SelectedSequence));
+                OnPropertyChanged(nameof(AnimationGroupItems));
             }
         }
 
@@ -70,7 +91,8 @@ namespace OpenKh.Tools.LayoutViewer.Models
             get => SequenceProperty.AnimationGroup;
             set
             {
-                SequenceProperty.AnimationGroup = value;
+                SequenceProperty.AnimationGroup = Math.Max(0, value);
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedAnimationGroupIndex));
             }
         }

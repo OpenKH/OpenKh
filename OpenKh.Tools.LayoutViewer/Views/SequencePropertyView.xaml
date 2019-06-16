@@ -33,8 +33,9 @@
             SelectedIndex="{Binding SequenceIndex}"/>
 
         <TextBlock>Animation group</TextBlock>
-        <TextBox Margin="0 0 0 3"
-            Text="{Binding AnimationGroup, UpdateSourceTrigger=PropertyChanged}"/>
+        <ComboBox Margin="0 0 0 3"
+            ItemsSource="{Binding AnimationGroupItems}"
+            SelectedIndex="{Binding AnimationGroup}"/>
 
         <TextBlock>Show at frame</TextBlock>
         <TextBox Margin="0 0 0 3"
