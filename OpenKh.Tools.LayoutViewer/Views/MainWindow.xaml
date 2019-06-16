@@ -43,8 +43,8 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <local:SequenceEditorView Grid.Row="1"
-                        DataContext="{Binding SequenceEditor}"/>
+                    <!--<local:SequenceEditorView Grid.Row="1"
+                        DataContext="{Binding SequenceEditor}"/>-->
                 </Grid>
             </TabItem>
         </TabControl>
