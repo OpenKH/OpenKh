@@ -10,7 +10,7 @@
         <TextBlock Margin="0 0 0 3" Text="{Binding Index, StringFormat=Property {0}}"/>
 
         <TextBlock>Texture</TextBlock>
-        <ComboBox
+        <ComboBox Margin="0 0 0 3"
             ItemsSource="{Binding Textures.Items}"
             SelectedIndex="{Binding TextureIndex, FallbackValue=0}">
             <ComboBox.ToolTip>
@@ -27,9 +27,10 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <TextBlock>Sequence index</TextBlock>
-        <TextBox Margin="0 0 0 3"
-            Text="{Binding SequenceIndex, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock>Sequence</TextBlock>
+        <ComboBox Margin="0 0 0 3"
+            ItemsSource="{Binding SequenceItems}"
+            SelectedIndex="{Binding SequenceIndex}"/>
 
         <TextBlock>Animation group</TextBlock>
         <TextBox Margin="0 0 0 3"

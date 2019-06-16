@@ -1,5 +1,7 @@
 ﻿using OpenKh.Kh2;
+using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.LayoutViewer.ViewModels;
+using System.Linq;
 using System.Windows.Media;
 using Xe.Drawing;
 using Xe.Tools;
@@ -9,6 +11,20 @@ namespace OpenKh.Tools.LayoutViewer.Models
 {
     public class SequencePropertyModel : BaseNotifyPropertyChanged
     {
+        public class SequenceModel
+        {
+            private readonly int index;
+            private readonly Sequence sequence;
+
+            public SequenceModel(int index, Sequence sequence)
+            {
+                this.index = index;
+                this.sequence = sequence;
+            }
+
+            public override string ToString() => $"Sequence {index}";
+        }
+
         private readonly Service.EditorDebugRenderingService editorDebugRenderingService;
 
         public SequencePropertyModel(int index, Layout layout, ViewModels.TexturesViewModel texturesViewModel, Service.EditorDebugRenderingService editorDebugRenderingService)
@@ -25,6 +41,9 @@ namespace OpenKh.Tools.LayoutViewer.Models
 
         public TexturesViewModel Textures { get; }
         public ImageSource TextureImage => Textures.Items[TextureIndex].Image;
+
+        public MyGenericListModel<SequenceModel> SequenceItems =>
+            new MyGenericListModel<SequenceModel>(Layout.SequenceItems.Select((x, i) => new SequenceModel(i, x)));
 
         public int TextureIndex
         {
