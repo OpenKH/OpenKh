@@ -1,6 +1,7 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.LayoutViewer.ViewModels;
 using System.Windows.Media;
+using Xe.Drawing;
 using Xe.Tools;
 using static OpenKh.Kh2.Layout;
 
@@ -28,19 +29,31 @@ namespace OpenKh.Tools.LayoutViewer.Models
         public int TextureIndex
         {
             get => SequenceProperty.TextureIndex;
-            set => SequenceProperty.TextureIndex = value;
+            set
+            {
+                SequenceProperty.TextureIndex = value;
+                OnPropertyChanged(nameof(SelectedImage));
+            }
         }
 
         public int SequenceIndex
         {
             get => SequenceProperty.SequenceIndex;
-            set => SequenceProperty.SequenceIndex = value;
+            set
+            {
+                SequenceProperty.SequenceIndex = value;
+                OnPropertyChanged(nameof(SelectedSequence));
+            }
         }
 
         public int AnimationGroup
         {
             get => SequenceProperty.AnimationGroup;
-            set => SequenceProperty.AnimationGroup = value;
+            set
+            {
+                SequenceProperty.AnimationGroup = value;
+                OnPropertyChanged(nameof(SelectedAnimationGroupIndex));
+            }
         }
 
         public int ShowAtFrame
@@ -66,6 +79,12 @@ namespace OpenKh.Tools.LayoutViewer.Models
             get => editorDebugRenderingService.IsSequencePropertyVisible(Index);
             set => editorDebugRenderingService.SetSequencePropertyVisible(Index, value);
         }
+
+        public IDrawing Drawing => new DrawingDirect3D();
+        public int FrameIndex => 0;
+        public Sequence SelectedSequence => Layout.SequenceItems[SequenceIndex];
+        public Imgd SelectedImage => Textures.Items[TextureIndex].Texture;
+        public int SelectedAnimationGroupIndex => AnimationGroup;
 
         public override string ToString() =>
             $"#{Index} Seq {SequenceIndex}:{AnimationGroup}, Frame {ShowAtFrame}, XY({PositionX},{PositionY})";
