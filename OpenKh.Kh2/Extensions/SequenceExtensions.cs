@@ -42,6 +42,11 @@ namespace OpenKh.Kh2.Extensions
             sequence.AggregateAnimationGroup<Rectangle>(animationGroupIndex, (x, i) =>
                 x.Union(sequence.GetVisibilityRectangleFromAnimation(i)));
 
+        public static int GetFrameLengthFromAnimationGroup(
+            this Sequence sequence, int animationGroupIndex) =>
+            sequence.AggregateAnimationGroup<int>(animationGroupIndex, (x, i) =>
+                Math.Max(x, sequence.GetFrameLengthFromAnimation(i)));
+
         public static Rectangle GetVisibilityRectangleFromAnimation(
             this Sequence sequence, int animationIndex)
         {
@@ -67,6 +72,10 @@ namespace OpenKh.Kh2.Extensions
 
             return minRect.Union(maxRect);
         }
+
+        public static int GetFrameLengthFromAnimation(
+            this Sequence sequence, int animationIndex) =>
+            sequence.Animations[animationIndex].FrameEnd;
 
         public static Rectangle GetVisibilityRectangleForFrameGroup(
             this Sequence sequence, int frameGroupIndex) =>

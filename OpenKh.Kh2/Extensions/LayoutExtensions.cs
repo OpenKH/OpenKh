@@ -26,6 +26,11 @@ namespace OpenKh.Kh2.Extensions
             layout.AggregateSequenceGroup<Rectangle>(sequenceGroupIndex, (x, i) =>
                 x.Union(layout.GetVisibilityRectangleFromSequenceProperty(i)));
 
+        public static int GetFrameLengthFromSequenceGroup(
+            this Layout layout, int sequenceGroupIndex) =>
+            layout.AggregateSequenceGroup<int>(sequenceGroupIndex, (x, i) =>
+                Math.Max(x, layout.GetFrameLengthFromSequenceProperty(i)));
+
         public static Rectangle GetVisibilityRectangleFromSequenceProperty(
             this Layout layout, int sequencePropertyIndex)
         {
@@ -34,6 +39,16 @@ namespace OpenKh.Kh2.Extensions
 
             return sequence.GetVisibilityRectangleFromAnimationGroup(sequenceProperty.AnimationGroup)
                 .Traslate(sequenceProperty.PositionX, sequenceProperty.PositionY);
+        }
+
+        public static int GetFrameLengthFromSequenceProperty(
+            this Layout layout, int sequencePropertyIndex)
+        {
+            var sequenceProperty = layout.SequenceProperties[sequencePropertyIndex];
+            var sequence = layout.SequenceItems[sequenceProperty.SequenceIndex];
+
+            return sequence.GetFrameLengthFromAnimationGroup(sequenceProperty.AnimationGroup) +
+                sequenceProperty.ShowAtFrame;
         }
     }
 }
