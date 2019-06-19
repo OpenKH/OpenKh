@@ -9,38 +9,31 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using Xe.Drawing;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
-    public class MainViewModel : BaseNotifyPropertyChanged, ISequencePlayer
+    public class MainViewModel : BaseNotifyPropertyChanged
     {
         private const string DefaultLayoutName = "FAKE";
         private static string ApplicationName = Utilities.GetApplicationName();
-        private SequenceGroupsViewModel sequenceGroups;
         private string layoutName;
-        private Layout selectedLayout;
-        private IEnumerable<Imgd> selectedImages;
-        private int frameIndex;
-        private int selectedSequenceGroupIndex;
-        private bool _isSequencePlaying;
         private string fileName;
         private TexturesViewModel texturesViewModel;
 
         public string Title => $"{LayoutName ?? DefaultLayoutName} | {FileName ?? "untitled"} | {ApplicationName}";
         private string FileName
         {
-            get => fileName; set
+            get => fileName;
+            set
             {
                 fileName = value;
                 OnPropertyChanged(nameof(Title));
             }
         }
 
-        public IDrawing Drawing { get; }
         public EditorDebugRenderingService EditorDebugRenderingService { get; }
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
@@ -50,11 +43,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AboutCommand { get; set; }
 
-        public RelayCommand TimelinePlayCommand { get; set; }
-        public RelayCommand TimelinePauseCommand { get; set; }
-        public RelayCommand TimelineRestartCommand { get; set; }
-        public Visibility TimelinePlayVisibility => IsSequencePlaying ? Visibility.Collapsed : Visibility.Visible;
-        public Visibility TimelinePauseVisibility => IsSequencePlaying ? Visibility.Visible : Visibility.Collapsed;
+        public LayoutEditorViewModel LayoutEditor { get; set; }
 
         public string LayoutName
         {
@@ -66,74 +55,13 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
-        public Layout SelectedLayout
-        {
-            get => selectedLayout; private set
-            {
-                selectedLayout = value;
-                OnPropertyChanged(nameof(SelectedLayout));
-            }
-        }
-
-        public IEnumerable<Imgd> SelectedImages
-        {
-            get => selectedImages; private set
-            {
-                selectedImages = value;
-                OnPropertyChanged(nameof(SelectedImages));
-            }
-        }
-
-        public SequenceGroupsViewModel SequenceGroups
-        {
-            get => sequenceGroups;
-            private set
-            {
-                sequenceGroups = value;
-                OnPropertyChanged(nameof(SequenceGroups));
-            }
-        }
-
-        public int SelectedSequenceGroupIndex
-        {
-            get => selectedSequenceGroupIndex;
-            set
-            {
-                selectedSequenceGroupIndex = value;
-                OnPropertyChanged(nameof(SelectedSequenceGroupIndex));
-            }
-        }
-
-        public int FrameIndex
-        {
-            get => frameIndex;
-            set
-            {
-                frameIndex = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsSequencePlaying
-        {
-            get => _isSequencePlaying;
-            set
-            {
-                _isSequencePlaying = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(TimelinePlayVisibility));
-                OnPropertyChanged(nameof(TimelinePauseVisibility));
-            }
-        }
-
         public SequenceEditorViewModel SequenceEditor { get; private set; }
 
         public MainViewModel()
         {
-            Drawing = new DrawingDirect3D();
-            _isSequencePlaying = true;
             EditorDebugRenderingService = new EditorDebugRenderingService();
-            SequenceEditor = new SequenceEditorViewModel(EditorDebugRenderingService, this);
+            LayoutEditor = new LayoutEditorViewModel(EditorDebugRenderingService);
+            SequenceEditor = new SequenceEditorViewModel(EditorDebugRenderingService);
 
             OpenCommand = new RelayCommand(x =>
             {
@@ -175,21 +103,6 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
-
-            TimelinePlayCommand = new RelayCommand(x =>
-            {
-                IsSequencePlaying = true;
-            }, x => true);
-
-            TimelinePauseCommand = new RelayCommand(x =>
-            {
-                IsSequencePlaying = false;
-            }, x => true);
-
-            TimelineRestartCommand = new RelayCommand(x =>
-            {
-                FrameIndex = 0;
-            }, x => true);
         }
 
         private static IEnumerable<Bar.Entry> ReadBarEntriesFromFileName(string fileName)
@@ -202,7 +115,6 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 return Bar.Open(stream);
             }
         }
-
 
         public void OpenFile(string fileName, bool doNotShowLayoutSelectionDialog = false)
         {
@@ -223,7 +135,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                     Type = Bar.EntryType.Layout
                 });
             var layoutStream = layoutBarEntry.Stream = new MemoryStream();
-            SelectedLayout.Write(layoutStream);
+            LayoutEditor.Layout.Write(layoutStream);
 
             var imagesBarEntry = existingEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout && x.Name == LayoutName);
             if (imagesBarEntry == null)
@@ -234,7 +146,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                     Type = Bar.EntryType.Imgz
                 });
             var imgzStream = imagesBarEntry.Stream = new MemoryStream();
-            Imgz.Save(imgzStream, SelectedImages);
+            Imgz.Save(imgzStream, LayoutEditor.Images);
 
             using (var stream = File.Create(fileName))
                 Bar.Save(stream, existingEntries);
@@ -277,11 +189,12 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         private void OpenLayout(LayoutEntryModel layoutEntryModel)
         {
-            texturesViewModel = new TexturesViewModel(layoutEntryModel.Images);
-            SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout, texturesViewModel, EditorDebugRenderingService);
             LayoutName = layoutEntryModel.Name;
-            SelectedLayout = layoutEntryModel.Layout;
-            SelectedImages = layoutEntryModel.Images;
+
+            texturesViewModel = new TexturesViewModel(layoutEntryModel.Images);
+            LayoutEditor.SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout, texturesViewModel, EditorDebugRenderingService);
+            LayoutEditor.Layout = layoutEntryModel.Layout;
+            LayoutEditor.Images = layoutEntryModel.Images;
 
             SequenceEditor.SelectedSequence = layoutEntryModel.Layout.SequenceItems.FirstOrDefault();
             SequenceEditor.SelectedImage = layoutEntryModel.Images.FirstOrDefault();

@@ -49,7 +49,6 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public IDrawing Drawing { get; }
         public EditorDebugRenderingService EditorDebugRenderingService { get; }
-        public ISequencePlayer SequencePlayer { get; }
 
         public object AnimationGroupList
         {
@@ -82,11 +81,10 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
-        public SequenceEditorViewModel(EditorDebugRenderingService editorDebugRenderingService, ISequencePlayer sequencePlayer)
+        public SequenceEditorViewModel(EditorDebugRenderingService editorDebugRenderingService)
         {
             Drawing = new DrawingDirect3D();
             EditorDebugRenderingService = editorDebugRenderingService;
-            SequencePlayer = sequencePlayer;
         }
     }
 }

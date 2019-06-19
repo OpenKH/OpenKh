@@ -28,12 +28,12 @@
             <local:LayoutRendererPanel
                 Grid.Row="0"
                 Drawing="{Binding Drawing}"
-                SelectedLayout="{Binding SelectedLayout}"
-                SelectedImages="{Binding SelectedImages}"
-                SelectedSequenceGroupIndex="{Binding SelectedSequenceGroupIndex, Mode=TwoWay}"
+                SelectedLayout="{Binding Layout}"
+                SelectedImages="{Binding Images}"
+                SelectedSequenceGroupIndex="{Binding SequenceIndex}"
                 FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
                 FramesPerSecond="60"
-                IsPlaying="{Binding IsSequencePlaying}"
+                IsPlaying="{Binding IsPlaying}"
                 DebugLayoutRenderer="{Binding EditorDebugRenderingService}"
                 />
 
@@ -86,7 +86,7 @@
                     <ComboBox VerticalAlignment="Center" Width="40"
                         ItemsSource="{Binding SequenceGroups.Items}"
                         DisplayMemberPath="Name"
-                        SelectedIndex="{Binding SelectedSequenceGroupIndex}"
+                        SelectedIndex="{Binding SequenceIndex}"
                         SelectedItem="{Binding SequenceGroups.SelectedItem}"/>
                 </StackPanel>
 
