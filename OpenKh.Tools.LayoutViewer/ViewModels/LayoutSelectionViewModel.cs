@@ -18,7 +18,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
             public LayoutEntryModel Entry { get; }
 
-            public override string ToString() => Entry.Name;
+            public override string ToString() => Entry.Layout.Name;
         }
 
         public LayoutSelectionViewModel(IEnumerable<Bar.Entry> barEntries)
@@ -43,25 +43,26 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             throw new System.NotImplementedException();
         }
 
-        private static LayoutEntryModel GetLayoutImagePair(IEnumerable<Bar.Entry> barEntries)
-        {
-            var layout = barEntries
-                .Where(x => x.Type == Bar.EntryType.Layout)
-                .Select(x => Layout.Read(x.Stream))
-                .FirstOrDefault();
-
-            var images = barEntries
-                .Where(x => x.Type == Bar.EntryType.Imgd || x.Type == Bar.EntryType.Imgz)
-                .Select(x => x.Type == Bar.EntryType.Imgz ? Imgz.Open(x.Stream) : new[] { Imgd.Read(x.Stream) })
-                .FirstOrDefault();
-
-            return new LayoutEntryModel
+        private static LayoutEntryModel GetLayoutImagePair(IEnumerable<Bar.Entry> barEntries) =>
+            new LayoutEntryModel
             {
-                Name = barEntries.FirstOrDefault()?.Name,
-                Layout = layout,
-                Images = images.ToList()
+                Layout = barEntries
+                        .Where(x => x.Type == Bar.EntryType.Layout)
+                        .Select(x => new LayoutEntryPropertyModel<Layout>
+                        {
+                            Name = x.Name,
+                            Value = Layout.Read(x.Stream)
+                        })
+                        .FirstOrDefault(),
+                Images = barEntries
+                        .Where(x => x.Type == Bar.EntryType.Imgz)
+                        .Select(x => new LayoutEntryPropertyModel<List<Imgd>>
+                        {
+                            Name = x.Name,
+                            Value = Imgz.Open(x.Stream).ToList()
+                        })
+                        .FirstOrDefault()
             };
-        }
 
         private static IEnumerable<LayoutEntryModel> GetLayoutImagePairs(IEnumerable<Bar.Entry> barEntries) =>
             barEntries.GroupBy(x => x.Name)

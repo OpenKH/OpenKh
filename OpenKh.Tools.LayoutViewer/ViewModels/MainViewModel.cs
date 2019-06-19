@@ -17,13 +17,13 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
     public class MainViewModel : BaseNotifyPropertyChanged
     {
-        private const string DefaultLayoutName = "FAKE";
+        private const string DefaultName = "FAKE";
         private static string ApplicationName = Utilities.GetApplicationName();
         private string layoutName;
         private string fileName;
         private TexturesViewModel texturesViewModel;
 
-        public string Title => $"{LayoutName ?? DefaultLayoutName} | {FileName ?? "untitled"} | {ApplicationName}";
+        public string Title => $"{LayoutName ?? DefaultName},{ImagesName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
         private string FileName
         {
             get => fileName;
@@ -50,7 +50,17 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             get => layoutName; private set
             {
                 layoutName = value.Length > 4 ? value.Substring(0, 4) : value;
-                OnPropertyChanged(nameof(LayoutName));
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Title));
+            }
+        }
+
+        public string ImagesName
+        {
+            get => layoutName; private set
+            {
+                layoutName = value.Length > 4 ? value.Substring(0, 4) : value;
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(Title));
             }
         }
@@ -142,7 +152,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 existingEntries.Add(imagesBarEntry = new Bar.Entry
                 {
                     Index = 0,
-                    Name = LayoutName,
+                    Name = ImagesName,
                     Type = Bar.EntryType.Imgz
                 });
             var imgzStream = imagesBarEntry.Stream = new MemoryStream();
@@ -168,15 +178,23 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
             else
             {
-                var barLayoutEntry = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout);
-                var layout = barLayoutEntry != null ? Layout.Read(barLayoutEntry.Stream) : null;
+                var layoutName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout);
+                var imagesName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Imgz);
+                var layout = layoutName != null ? Layout.Read(layoutName.Stream) : null;
                 var images = entries.Where(x => x.Type == Bar.EntryType.Imgz).Select(x => Imgz.Open(x.Stream)).First();
 
                 layoutEntryModel = new LayoutEntryModel
                 {
-                    Name = barLayoutEntry?.Name,
-                    Layout = layout,
-                    Images = images.ToList()
+                    Layout = new LayoutEntryPropertyModel<Layout>
+                    {
+                        Name = layoutName.Name,
+                        Value = layout
+                    },
+                    Images = new LayoutEntryPropertyModel<List<Imgd>>
+                    {
+                        Name = imagesName.Name,
+                        Value = images.ToList()
+                    },
                 };
             }
 
@@ -189,15 +207,16 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         private void OpenLayout(LayoutEntryModel layoutEntryModel)
         {
-            LayoutName = layoutEntryModel.Name;
+            LayoutName = layoutEntryModel.Layout.Name;
+            ImagesName = layoutEntryModel.Images.Name;
 
-            texturesViewModel = new TexturesViewModel(layoutEntryModel.Images);
-            LayoutEditor.SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout, texturesViewModel, EditorDebugRenderingService);
-            LayoutEditor.Layout = layoutEntryModel.Layout;
-            LayoutEditor.Images = layoutEntryModel.Images;
+            texturesViewModel = new TexturesViewModel(layoutEntryModel.Images.Value);
+            LayoutEditor.SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout.Value, texturesViewModel, EditorDebugRenderingService);
+            LayoutEditor.Layout = layoutEntryModel.Layout.Value;
+            LayoutEditor.Images = layoutEntryModel.Images.Value;
 
-            SequenceEditor.SelectedSequence = layoutEntryModel.Layout.SequenceItems.FirstOrDefault();
-            SequenceEditor.SelectedImage = layoutEntryModel.Images.FirstOrDefault();
+            SequenceEditor.SelectedSequence = layoutEntryModel.Layout.Value.SequenceItems.FirstOrDefault();
+            SequenceEditor.SelectedImage = layoutEntryModel.Images.Value.FirstOrDefault();
         }
     }
 }
