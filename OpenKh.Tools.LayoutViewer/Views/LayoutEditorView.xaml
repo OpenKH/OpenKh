@@ -5,10 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Views"
              xmlns:xecontrols="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
-             xmlns:localcontrols="clr-namespace:OpenKh.Tools.LayoutViewer.Controls"
+             xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="600"
-             Background="White">
+             d:DesignHeight="450" d:DesignWidth="600">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -25,7 +24,7 @@
             <StackPanel Grid.Row="0">
             </StackPanel>
 
-            <local:LayoutRendererPanel
+            <controls:LayoutRendererPanel
                 Grid.Row="0"
                 Drawing="{Binding Drawing}"
                 SelectedLayout="{Binding Layout}"
@@ -100,11 +99,10 @@
                         Text="{Binding ImagesName, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
-                <localcontrols:Timeline
+                <controls:Timeline
                     Grid.Row="1"
                     Value="{Binding FrameIndex, Mode=TwoWay}"
-                    MaxValue="500"
-                />
+                    MaxValue="500"/>
             </Grid>
         </Grid>
 

@@ -4,9 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Views"
-        xmlns:controls="clr-namespace:kh.tools.common.Controls;assembly=kh.tools.common"
-        xmlns:localcontrols="clr-namespace:OpenKh.Tools.LayoutViewer.Controls"
-        xmlns:xecontrols="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="600" Width="800">
     <Grid>

@@ -8,7 +8,7 @@ using System.Windows;
 using Xe.Drawing;
 using static kh.tools.common.DependencyPropertyUtils;
 
-namespace OpenKh.Tools.LayoutViewer.Views
+namespace OpenKh.Tools.Common.Controls
 {
     public class SequenceRendererPanel : DrawPanel
     {

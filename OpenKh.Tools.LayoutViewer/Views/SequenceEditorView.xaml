@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Views"
-             xmlns:localcontrols="clr-namespace:OpenKh.Tools.LayoutViewer.Controls"
+             xmlns:localcontrols="clr-namespace:OpenKh.Tools.Common.Controls"
+             xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="500"
-             Background="White">
+             d:DesignHeight="450" d:DesignWidth="500">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
@@ -18,7 +18,7 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
-        <local:SequenceRendererPanel Grid.Column="0" Grid.Row="0"
+        <controls:SequenceRendererPanel Grid.Column="0" Grid.Row="0"
             Drawing="{Binding Drawing}"
             FrameIndex="{Binding SequencePlayer.FrameIndex, Mode=TwoWay}"
             FramesPerSecond="{Binding SequencePlayer.ActualFramesPerSecond}"
@@ -26,10 +26,9 @@
             SelectedImage="{Binding SelectedImage}"
             SelectedAnimationGroupIndex="{Binding SelectedAnimationGroupIndex, Mode=TwoWay}"/>
 
-        <localcontrols:Timeline Grid.Column="0" Grid.Row="1"
+        <controls:Timeline Grid.Column="0" Grid.Row="1"
             Value="{Binding SequencePlayer.FrameIndex, Mode=TwoWay}"
-            MaxValue="500"
-        />
+            MaxValue="500"/>
 
         <StackPanel Grid.Column="1" Grid.RowSpan="2">
             <TextBlock Text="Animation group"/>
