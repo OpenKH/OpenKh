@@ -1,6 +1,6 @@
 using kh.tools.common;
 using OpenKh.Kh2;
-using OpenKh.Tools.LayoutViewer.Interfaces;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.LayoutViewer.Models;
 using OpenKh.Tools.LayoutViewer.Service;
 using OpenKh.Tools.LayoutViewer.Views;
@@ -134,29 +134,10 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public void SaveFile(string previousFileName, string fileName)
         {
-            var existingEntries = File.Exists(previousFileName) ? ReadBarEntriesFromFileName(previousFileName).ToList() : new List<Bar.Entry>();
+            var existingEntries = File.Exists(previousFileName) ? ReadBarEntriesFromFileName(previousFileName) : new List<Bar.Entry>();
 
-            var layoutBarEntry = existingEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout && x.Name == LayoutName);
-            if (layoutBarEntry == null)
-                existingEntries.Add(layoutBarEntry = new Bar.Entry
-                {
-                    Index = 0,
-                    Name = LayoutName,
-                    Type = Bar.EntryType.Layout
-                });
-            var layoutStream = layoutBarEntry.Stream = new MemoryStream();
-            LayoutEditor.Layout.Write(layoutStream);
-
-            var imagesBarEntry = existingEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Imgz && x.Name == LayoutName);
-            if (imagesBarEntry == null)
-                existingEntries.Add(imagesBarEntry = new Bar.Entry
-                {
-                    Index = 0,
-                    Name = ImagesName,
-                    Type = Bar.EntryType.Imgz
-                });
-            var imgzStream = imagesBarEntry.Stream = new MemoryStream();
-            Imgz.Save(imgzStream, LayoutEditor.Images);
+            existingEntries = existingEntries.ForEntry(Bar.EntryType.Layout, LayoutName, 0, entry => LayoutEditor.Layout.Write(entry.Stream));
+            existingEntries = existingEntries.ForEntry(Bar.EntryType.Imgz, ImagesName, 0, entry => Imgz.Save(entry.Stream, LayoutEditor.Images));
 
             using (var stream = File.Create(fileName))
                 Bar.Save(stream, existingEntries);
