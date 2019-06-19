@@ -1,6 +1,7 @@
 using kh.tools.common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
+using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Models;
 using OpenKh.Tools.LayoutViewer.Service;
 using OpenKh.Tools.LayoutViewer.Views;
@@ -15,7 +16,7 @@ using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
-    public class MainViewModel : BaseNotifyPropertyChanged
+    public class MainViewModel : BaseNotifyPropertyChanged, IElementNames
     {
         private const string DefaultName = "FAKE";
         private static string ApplicationName = Utilities.GetApplicationName();
@@ -47,7 +48,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public string LayoutName
         {
-            get => layoutName; private set
+            get => layoutName;
+            set
             {
                 layoutName = value.Length > 4 ? value.Substring(0, 4) : value;
                 OnPropertyChanged();
@@ -57,7 +59,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public string ImagesName
         {
-            get => layoutName; private set
+            get => layoutName;
+            set
             {
                 layoutName = value.Length > 4 ? value.Substring(0, 4) : value;
                 OnPropertyChanged();
@@ -70,7 +73,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public MainViewModel()
         {
             EditorDebugRenderingService = new EditorDebugRenderingService();
-            LayoutEditor = new LayoutEditorViewModel(EditorDebugRenderingService);
+            LayoutEditor = new LayoutEditorViewModel(this, EditorDebugRenderingService);
             SequenceEditor = new SequenceEditorViewModel(EditorDebugRenderingService);
 
             OpenCommand = new RelayCommand(x =>

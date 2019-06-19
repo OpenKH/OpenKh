@@ -1,4 +1,5 @@
 ﻿using OpenKh.Kh2;
+using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Service;
 using System.Collections.Generic;
 using System.Windows;
@@ -16,6 +17,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private int _frameIndex;
         private bool _isPlaying;
         private SequenceGroupsViewModel _sequenceGroups;
+        private readonly IElementNames _elementNames;
 
         public IDrawing Drawing { get; }
 
@@ -73,6 +75,9 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
+        public string LayoutName { get => _elementNames.LayoutName; set => _elementNames.LayoutName = value; }
+        public string ImagesName { get => _elementNames.ImagesName; set => _elementNames.ImagesName = value; }
+
         public SequenceGroupsViewModel SequenceGroups
         {
             get => _sequenceGroups;
@@ -91,8 +96,10 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public Visibility TimelinePauseVisibility => IsPlaying ? Visibility.Visible : Visibility.Collapsed;
 
         public LayoutEditorViewModel(
+            IElementNames elementNames,
             EditorDebugRenderingService editorDebugRenderingService)
         {
+            _elementNames = elementNames;
             Drawing = new DrawingDirect3D();
             EditorDebugRenderingService = editorDebugRenderingService;
             IsPlaying = true;
