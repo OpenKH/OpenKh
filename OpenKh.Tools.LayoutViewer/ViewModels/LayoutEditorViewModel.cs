@@ -1,4 +1,5 @@
 ﻿using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Service;
 using System.Collections.Generic;
@@ -30,6 +31,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             {
                 _layout = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(MaxFramesCount));
             }
         }
 
@@ -50,6 +52,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             {
                 _sequenceIndex = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(MaxFramesCount));
             }
         }
 
@@ -62,6 +65,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 OnPropertyChanged();
             }
         }
+
+        public int MaxFramesCount => SequenceIndex >= 0 ? Layout.GetFrameLengthFromSequenceGroup(SequenceIndex) : 0;
 
         public bool IsPlaying
         {

@@ -102,7 +102,7 @@
                 <controls:Timeline
                     Grid.Row="1"
                     Value="{Binding FrameIndex, Mode=TwoWay}"
-                    MaxValue="500"/>
+                    MaxValue="{Binding MaxFramesCount}"/>
             </Grid>
         </Grid>
 
