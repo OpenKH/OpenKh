@@ -24,18 +24,27 @@
             <StackPanel Grid.Row="0">
             </StackPanel>
 
-            <controls:LayoutRendererPanel
-                Grid.Row="0"
-                Background="{Binding Background, FallbackValue=#FF00FF}"
-                Drawing="{Binding Drawing}"
-                SelectedLayout="{Binding Layout}"
-                SelectedImages="{Binding Images}"
-                SelectedSequenceGroupIndex="{Binding SequenceIndex}"
-                FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
-                FramesPerSecond="60"
-                IsPlaying="{Binding IsPlaying}"
-                DebugLayoutRenderer="{Binding EditorDebugRenderingService}"
+            <Grid >
+                <Grid.Background>
+                    <DrawingBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute">
+                        <DrawingBrush.Drawing>
+                            <GeometryDrawing Geometry="M0,0 H1 V1 H2 V2 H1 V1 H0Z" Brush="LightGray"/>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Grid.Background>
+                <controls:LayoutRendererPanel
+                    Grid.Row="0"
+                    Background="{Binding Background, FallbackValue=#FF00FF}"
+                    Drawing="{Binding Drawing}"
+                    SelectedLayout="{Binding Layout}"
+                    SelectedImages="{Binding Images}"
+                    SelectedSequenceGroupIndex="{Binding SequenceIndex}"
+                    FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
+                    FramesPerSecond="60"
+                    IsPlaying="{Binding IsPlaying}"
+                    DebugLayoutRenderer="{Binding EditorDebugRenderingService}"
                 />
+            </Grid>
 
             <Grid Grid.Row="2">
                 <Grid.RowDefinitions>
