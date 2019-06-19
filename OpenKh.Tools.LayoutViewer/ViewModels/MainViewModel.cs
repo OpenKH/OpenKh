@@ -3,6 +3,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Models;
+using OpenKh.Tools.LayoutViewer.Properties;
 using OpenKh.Tools.LayoutViewer.Service;
 using OpenKh.Tools.LayoutViewer.Views;
 using System.Collections.Generic;
@@ -10,13 +11,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
-    public class MainViewModel : BaseNotifyPropertyChanged, IElementNames
+    public class MainViewModel : BaseNotifyPropertyChanged, IElementNames, IEditorSettings
     {
         private const string DefaultName = "FAKE";
         private static string ApplicationName = Utilities.GetApplicationName();
@@ -80,10 +82,24 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public SequenceEditorViewModel SequenceEditor { get; private set; }
 
+        public Color EditorBackground
+        {
+            get
+            {
+                var background = Settings.Default.BackgroundColor;
+                return Color.FromArgb(background.A, background.R, background.G, background.B);
+            }
+            set
+            {
+                Settings.Default.BackgroundColor = System.Drawing.Color.FromArgb(value.A, value.R, value.G, value.B);
+                OnPropertyChanged();
+            }
+        }
+
         public MainViewModel()
         {
             EditorDebugRenderingService = new EditorDebugRenderingService();
-            LayoutEditor = new LayoutEditorViewModel(this, EditorDebugRenderingService);
+            LayoutEditor = new LayoutEditorViewModel(this, this, EditorDebugRenderingService);
             SequenceEditor = new SequenceEditorViewModel(EditorDebugRenderingService);
 
             OpenCommand = new RelayCommand(x =>
@@ -208,7 +224,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             SequenceEditor.SelectedImage = layoutEntryModel.Images.Value.FirstOrDefault();
 
             _texturesViewModel = new TexturesViewModel(layoutEntryModel.Images.Value);
-            LayoutEditor = new LayoutEditorViewModel(this, EditorDebugRenderingService)
+            LayoutEditor = new LayoutEditorViewModel(this, this, EditorDebugRenderingService)
             {
                 SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout.Value, _texturesViewModel, EditorDebugRenderingService),
                 Layout = layoutEntryModel.Layout.Value,

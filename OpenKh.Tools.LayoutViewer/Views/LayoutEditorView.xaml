@@ -26,6 +26,7 @@
 
             <controls:LayoutRendererPanel
                 Grid.Row="0"
+                Background="{Binding Background, FallbackValue=#FF00FF}"
                 Drawing="{Binding Drawing}"
                 SelectedLayout="{Binding Layout}"
                 SelectedImages="{Binding Images}"

@@ -14,6 +14,9 @@ namespace OpenKh.Tools.Common.Controls
 {
     public class LayoutRendererPanel : DrawPanel
     {
+        public static readonly DependencyProperty BackgroundProperty =
+            GetDependencyProperty<LayoutRendererPanel, System.Windows.Media.Color>(nameof(Background), System.Windows.Media.Colors.Magenta, (o, x) => o.SetBackgroundColor(x));
+
         public static readonly DependencyProperty SelectedLayoutProperty =
             GetDependencyProperty<LayoutRendererPanel, Layout>(nameof(SelectedLayout), null, (o, x) => o.TrySetLayout(), x => true);
 
@@ -31,6 +34,14 @@ namespace OpenKh.Tools.Common.Controls
 
         public static readonly DependencyProperty DebugLayoutRendererProperty =
             GetDependencyProperty<LayoutRendererPanel, IDebugLayoutRenderer>(nameof(DebugLayoutRenderer), null, (o, x) => o.SetDebugLayoutRenderer(x));
+
+        private Color _backgroundColor;
+
+        public System.Windows.Media.Color Background
+        {
+            get => (System.Windows.Media.Color)GetValue(BackgroundProperty);
+            set => SetValue(BackgroundProperty, value);
+        }
 
         public int SelectedSequenceGroupIndex
         {
@@ -71,6 +82,11 @@ namespace OpenKh.Tools.Common.Controls
         private ISurface[] surfaces;
         private LayoutRenderer layoutRenderer;
 
+        public LayoutRendererPanel()
+        {
+            SetBackgroundColor(Background);
+        }
+
         protected override void OnDrawCreate()
         {
             base.OnDrawCreate();
@@ -84,7 +100,7 @@ namespace OpenKh.Tools.Common.Controls
 
         protected override void OnDrawBegin()
         {
-            Drawing.Clear(Color.Magenta);
+            Drawing.Clear(_backgroundColor);
             layoutRenderer?.Draw();
 
             if (IsPlaying)
@@ -123,6 +139,9 @@ namespace OpenKh.Tools.Common.Controls
             else
                 layoutRenderer = null;
         }
+
+        private void SetBackgroundColor(System.Windows.Media.Color color) =>
+            _backgroundColor = Color.FromArgb(color.A, color.R, color.G, color.B);
 
         private void LoadImages(IEnumerable<Imgd> images)
         {

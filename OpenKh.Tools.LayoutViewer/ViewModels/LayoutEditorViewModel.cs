@@ -19,10 +19,13 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private bool _isPlaying;
         private SequenceGroupsViewModel _sequenceGroups;
         private readonly IElementNames _elementNames;
+        private readonly IEditorSettings _editorSettings;
 
         public IDrawing Drawing { get; }
 
         public EditorDebugRenderingService EditorDebugRenderingService { get; }
+
+        public System.Windows.Media.Color Background => _editorSettings.EditorBackground;
 
         public Layout Layout
         {
@@ -102,9 +105,11 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public LayoutEditorViewModel(
             IElementNames elementNames,
+            IEditorSettings editorSettings,
             EditorDebugRenderingService editorDebugRenderingService)
         {
             _elementNames = elementNames;
+            _editorSettings = editorSettings;
             Drawing = new DrawingDirect3D();
             EditorDebugRenderingService = editorDebugRenderingService;
             IsPlaying = true;
