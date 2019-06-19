@@ -20,17 +20,19 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
     {
         private const string DefaultName = "FAKE";
         private static string ApplicationName = Utilities.GetApplicationName();
-        private string layoutName;
-        private string fileName;
-        private TexturesViewModel texturesViewModel;
+        private string _layoutName;
+        private string _imagesName;
+        private string _fileName;
+        private TexturesViewModel _texturesViewModel;
+        private LayoutEditorViewModel _layoutEditor;
 
         public string Title => $"{LayoutName ?? DefaultName},{ImagesName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
         private string FileName
         {
-            get => fileName;
+            get => _fileName;
             set
             {
-                fileName = value;
+                _fileName = value;
                 OnPropertyChanged(nameof(Title));
             }
         }
@@ -44,14 +46,22 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AboutCommand { get; set; }
 
-        public LayoutEditorViewModel LayoutEditor { get; set; }
+        public LayoutEditorViewModel LayoutEditor
+        {
+            get => _layoutEditor;
+            set
+            {
+                _layoutEditor = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string LayoutName
         {
-            get => layoutName;
+            get => _layoutName;
             set
             {
-                layoutName = value.Length > 4 ? value.Substring(0, 4) : value;
+                _layoutName = value.Length > 4 ? value.Substring(0, 4) : value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(Title));
             }
@@ -59,10 +69,10 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public string ImagesName
         {
-            get => layoutName;
+            get => _imagesName;
             set
             {
-                layoutName = value.Length > 4 ? value.Substring(0, 4) : value;
+                _imagesName = value.Length > 4 ? value.Substring(0, 4) : value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(Title));
             }
@@ -194,13 +204,16 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             LayoutName = layoutEntryModel.Layout.Name;
             ImagesName = layoutEntryModel.Images.Name;
 
-            texturesViewModel = new TexturesViewModel(layoutEntryModel.Images.Value);
-            LayoutEditor.SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout.Value, texturesViewModel, EditorDebugRenderingService);
-            LayoutEditor.Layout = layoutEntryModel.Layout.Value;
-            LayoutEditor.Images = layoutEntryModel.Images.Value;
-
             SequenceEditor.SelectedSequence = layoutEntryModel.Layout.Value.SequenceItems.FirstOrDefault();
             SequenceEditor.SelectedImage = layoutEntryModel.Images.Value.FirstOrDefault();
+
+            _texturesViewModel = new TexturesViewModel(layoutEntryModel.Images.Value);
+            LayoutEditor = new LayoutEditorViewModel(this, EditorDebugRenderingService)
+            {
+                SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout.Value, _texturesViewModel, EditorDebugRenderingService),
+                Layout = layoutEntryModel.Layout.Value,
+                Images = layoutEntryModel.Images.Value
+            };
         }
     }
 }
