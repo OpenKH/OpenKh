@@ -175,8 +175,10 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private bool OpenBarContent(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
         {
             LayoutEntryModel layoutEntryModel;
+            var layoutEntries = entries.Count(x => x.Type == Bar.EntryType.Layout);
+            int imagesEntries = entries.Count(x => x.Type == Bar.EntryType.Imgz);
 
-            if (!doNotShowLayoutSelectionDialog && entries.Count(x => x.Type == Bar.EntryType.Layout) > 1)
+            if (!doNotShowLayoutSelectionDialog && (layoutEntries > 1 || imagesEntries > 1))
             {
                 var vm = new LayoutSelectionViewModel(entries);
                 var dialog = new LayoutSelectionDialog()
@@ -186,7 +188,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
                 layoutEntryModel = dialog.ShowDialog() == true ? vm.SelectedLayoutEntry : null;
             }
-            else
+            else if (layoutEntries > 0 && imagesEntries > 0)
             {
                 var layoutName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout);
                 var imagesName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Imgz);
@@ -206,6 +208,16 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                         Value = images.ToList()
                     },
                 };
+            }
+            else
+            {
+                if (layoutEntries == 0)
+                    MessageBox.Show(Window, "No Layout data found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                else if (imagesEntries == 0)
+                    MessageBox.Show(Window, "No IMGZ data found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                else
+                    MessageBox.Show(Window, "Unspecified error. Please report this.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
 
             if (layoutEntryModel == null)
