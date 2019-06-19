@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:OpenKh.Tools.LayoutViewer.Views"
              mc:Ignorable="d" 
              Title="Layout selection" ResizeMode="NoResize"
-             SizeToContent="Height" Width="280">
+             SizeToContent="Height" Width="300">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -15,15 +15,29 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-            Text="The selected 2ld contains multiple layouts. Please choose the layout you want to load." TextWrapping="Wrap"/>
-        <ListBox
-            Grid.Row="1"
-            ItemsSource="{Binding Items}"
-            SelectedValuePath="Entry"
-            SelectedItem="{Binding SelectedItem}"
-            SelectedValue="{Binding SelectedLayoutEntry}"
-            />
+        <TextBlock Grid.Row="0" Margin="0 0 0 5"
+            Text="The selected 2ld contains multiple layouts or images. Please choose the entries you want to load." TextWrapping="Wrap"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Layouts"/>
+            <ListBox Grid.Row="1" Grid.Column="0"
+                ItemsSource="{Binding LayoutItems}"
+                SelectedItem="{Binding SelectedLayout}"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Image groups"/>
+                <ListBox Grid.Row="1" Grid.Column="2"
+                ItemsSource="{Binding ImagesItems}"
+                SelectedItem="{Binding SelectedImages}"/>
+        </Grid>
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

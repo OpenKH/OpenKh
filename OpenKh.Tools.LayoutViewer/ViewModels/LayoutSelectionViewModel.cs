@@ -1,72 +1,95 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Common;
+using OpenKh.Kh2;
+using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.LayoutViewer.Models;
 using System.Collections.Generic;
 using System.Linq;
-using Xe.Tools.Wpf.Models;
-using static OpenKh.Tools.LayoutViewer.ViewModels.LayoutSelectionViewModel;
+using Xe.Tools;
 
 namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
-    public class LayoutSelectionViewModel : GenericListModel<LayoutSelectionEntryModel>
+    public class LayoutSelectionViewModel : BaseNotifyPropertyChanged
     {
+        private LayoutSelectionEntryModel selectedLayout;
+        private ImagesSelectionEntryModel selectedImages;
+
         public class LayoutSelectionEntryModel
         {
-            public LayoutSelectionEntryModel(LayoutEntryModel layoutEntry)
+            private readonly Bar.Entry _entry;
+
+            public LayoutSelectionEntryModel(Bar.Entry entry)
             {
-                Entry = layoutEntry;
+                _entry = entry;
             }
 
-            public LayoutEntryModel Entry { get; }
+            public string Name => _entry.Name;
+            public Layout Layout => Layout.Read(_entry.Stream.FromBegin());
 
-            public override string ToString() => Entry.Layout.Name;
+            public override string ToString() => Name;
         }
+
+        public class ImagesSelectionEntryModel
+        {
+            private readonly Bar.Entry _entry;
+
+            public ImagesSelectionEntryModel(Bar.Entry entry)
+            {
+                _entry = entry;
+            }
+
+            public string Name => _entry.Name;
+            public List<Imgd> Layout => Imgz.Open(_entry.Stream.FromBegin()).ToList();
+
+            public override string ToString() => Name;
+        }
+
+        public IEnumerable<LayoutSelectionEntryModel> LayoutItems { get; }
+        public IEnumerable<ImagesSelectionEntryModel> ImagesItems { get; }
+
+        public LayoutSelectionEntryModel SelectedLayout
+        {
+            get => selectedLayout;
+            set
+            {
+                selectedLayout = value;
+                OnPropertyChanged(nameof(IsItemSelected));
+            }
+        }
+
+        public ImagesSelectionEntryModel SelectedImages
+        {
+            get => selectedImages;
+            set
+            {
+                selectedImages = value;
+                OnPropertyChanged(nameof(IsItemSelected));
+            }
+        }
+
+        public LayoutEntryModel SelectedLayoutEntry => IsItemSelected ? new LayoutEntryModel
+        {
+            Layout = new LayoutEntryPropertyModel<Layout>
+            {
+                Name = SelectedLayout.Name,
+                Value = SelectedLayout.Layout
+            },
+            Images = new LayoutEntryPropertyModel<List<Imgd>>
+            {
+                Name = SelectedImages.Name,
+                Value = SelectedImages.Layout
+            }
+        } : null;
+
+        public bool IsItemSelected => SelectedLayout != null && SelectedImages != null;
 
         public LayoutSelectionViewModel(IEnumerable<Bar.Entry> barEntries)
-            : this(GetLayoutImagePairs(barEntries))
         {
+            LayoutItems = barEntries
+                .Where(x => x.Type == Bar.EntryType.Layout)
+                .Select(x => new LayoutSelectionEntryModel(x)).ToList();
+            ImagesItems = barEntries
+                .Where(x => x.Type == Bar.EntryType.Imgz)
+                .Select(x => new ImagesSelectionEntryModel(x)).ToList();
         }
-
-        public LayoutSelectionViewModel(IEnumerable<LayoutEntryModel> list)
-            : this(list.Select(x => new LayoutSelectionEntryModel(x)))
-        {
-        }
-
-        public LayoutSelectionViewModel(IEnumerable<LayoutSelectionEntryModel> list)
-            : base(list)
-        {
-        }
-
-        public LayoutEntryModel SelectedLayoutEntry { get; set; }
-
-        protected override LayoutSelectionEntryModel OnNewItem()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        private static LayoutEntryModel GetLayoutImagePair(IEnumerable<Bar.Entry> barEntries) =>
-            new LayoutEntryModel
-            {
-                Layout = barEntries
-                        .Where(x => x.Type == Bar.EntryType.Layout)
-                        .Select(x => new LayoutEntryPropertyModel<Layout>
-                        {
-                            Name = x.Name,
-                            Value = Layout.Read(x.Stream)
-                        })
-                        .FirstOrDefault(),
-                Images = barEntries
-                        .Where(x => x.Type == Bar.EntryType.Imgz)
-                        .Select(x => new LayoutEntryPropertyModel<List<Imgd>>
-                        {
-                            Name = x.Name,
-                            Value = Imgz.Open(x.Stream).ToList()
-                        })
-                        .FirstOrDefault()
-            };
-
-        private static IEnumerable<LayoutEntryModel> GetLayoutImagePairs(IEnumerable<Bar.Entry> barEntries) =>
-            barEntries.GroupBy(x => x.Name)
-                .Select(x => GetLayoutImagePair(x))
-                .Where(x => x.Layout != null || x.Images != null);
     }
 }
