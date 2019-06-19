@@ -30,20 +30,7 @@
             </MenuItem>
         </Menu>
 
-        <TabControl Grid.Row="1">
-            <TabItem Header="Layout">
-                <local:LayoutEditorView DataContext="{Binding LayoutEditor}"/>
-            </TabItem>
-            <TabItem Header="Sequence">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <!--<local:SequenceEditorView Grid.Row="1"
-                        DataContext="{Binding SequenceEditor}"/>-->
-                </Grid>
-            </TabItem>
-        </TabControl>
+        <local:LayoutEditorView Grid.Row="1"
+            DataContext="{Binding LayoutEditor}"/>
     </Grid>
 </Window>
