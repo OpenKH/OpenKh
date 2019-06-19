@@ -147,7 +147,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             var layoutStream = layoutBarEntry.Stream = new MemoryStream();
             LayoutEditor.Layout.Write(layoutStream);
 
-            var imagesBarEntry = existingEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout && x.Name == LayoutName);
+            var imagesBarEntry = existingEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Imgz && x.Name == LayoutName);
             if (imagesBarEntry == null)
                 existingEntries.Add(imagesBarEntry = new Bar.Entry
                 {
