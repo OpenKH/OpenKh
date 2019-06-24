@@ -36,6 +36,7 @@ namespace OpenKh.Tools.Common.Controls
             GetDependencyProperty<LayoutRendererPanel, IDebugLayoutRenderer>(nameof(DebugLayoutRenderer), null, (o, x) => o.SetDebugLayoutRenderer(x));
 
         private Color _backgroundColor;
+        private IDebugLayoutRenderer _debugLayoutRenderer;
 
         public System.Windows.Media.Color Background
         {
@@ -129,13 +130,19 @@ namespace OpenKh.Tools.Common.Controls
 
         private void SetIsPlaying(bool isPlaying) { }
 
-        private void SetDebugLayoutRenderer(IDebugLayoutRenderer debugLayoutRenderer) =>
-            layoutRenderer.SetDebugLayoutRenderer(debugLayoutRenderer);
+        private void SetDebugLayoutRenderer(IDebugLayoutRenderer debugLayoutRenderer)
+        {
+            _debugLayoutRenderer = debugLayoutRenderer;
+            layoutRenderer?.SetDebugLayoutRenderer(debugLayoutRenderer);
+        }
 
         private void TrySetLayout()
         {
             if (SelectedLayout != null && surfaces != null)
+            {
                 layoutRenderer = new LayoutRenderer(SelectedLayout, Drawing, surfaces);
+                layoutRenderer.SetDebugLayoutRenderer(_debugLayoutRenderer);
+            }
             else
                 layoutRenderer = null;
         }

@@ -69,7 +69,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
-        public int MaxFramesCount => SequenceIndex >= 0 ? Layout.GetFrameLengthFromSequenceGroup(SequenceIndex) : 0;
+        public int MaxFramesCount => SequenceIndex >= 0 ? Layout?.GetFrameLengthFromSequenceGroup(SequenceIndex) ?? 0 : 0;
 
         public bool IsPlaying
         {
