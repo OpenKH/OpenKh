@@ -18,7 +18,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | p_ex011 | Sora (KH2)
 | p_bx001 | Sora (Baymax)
 | p_ca001 | Sora (Caribbean)
-|         | Sora (Monstropolis)
+| p_mi001 | Sora (Monstropolis)
 | p_po001 | Sora (Pooh)
 
 ## Npc
@@ -36,6 +36,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ex007 | Terra, is that you?!?
 | n_ex009 | Roxas
 | n_ex010 | Axel
+| n_ex011 | Aquanort
 | n_dw003 | Mickey (0.2)
 
 ## Enemy
