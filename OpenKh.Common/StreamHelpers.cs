@@ -8,6 +8,12 @@ namespace OpenKh.Common
 {
     public static class StreamHelpers
     {
+        public static T FromBegin<T>(this T stream) where T : Stream
+        {
+            stream.Position = 0;
+            return stream;
+        }
+
         public static List<T> ReadList<T>(this Stream stream, int offset, int count)
             where T : class
         {

@@ -119,6 +119,11 @@ namespace OpenKh.Kh2
         public List<Animation> Animations { get; set; }
         public List<AnimationGroup> AnimationGroups { get; set; }
 
+        public Sequence()
+        {
+            Unknown04 = 0x100; // assuming that this value is constant
+        }
+
         private Sequence(Stream stream)
         {
             if (!stream.CanRead || !stream.CanSeek)

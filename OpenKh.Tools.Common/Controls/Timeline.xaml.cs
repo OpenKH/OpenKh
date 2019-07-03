@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using System.Windows.Input;
 using static kh.tools.common.DependencyPropertyUtils;
 
-namespace OpenKh.Tools.LayoutViewer.Controls
+namespace OpenKh.Tools.Common.Controls
 {
     /// <summary>
     /// Interaction logic for Timeline.xaml
@@ -12,10 +12,10 @@ namespace OpenKh.Tools.LayoutViewer.Controls
     public partial class Timeline : UserControl
     {
         public static readonly DependencyProperty ValueProperty =
-            GetDependencyProperty<Timeline, double>("Value", (o, x) => o.SetValue(x));
+            GetDependencyProperty<Timeline, double>(nameof(Value), (o, x) => o.SetValue(x));
 
         public static readonly DependencyProperty MaxValueProperty =
-            GetDependencyProperty<Timeline, double>("MaxValue", (o, x) => o.SetMaxValue(x));
+            GetDependencyProperty<Timeline, double>(nameof(MaxValue), (o, x) => o.SetMaxValue(x));
 
         public double Value
         {
@@ -55,10 +55,19 @@ namespace OpenKh.Tools.LayoutViewer.Controls
             UpdateCursorPosition();
         }
 
-        private void UserControl_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void UserControl_MouseDown(object sender, MouseButtonEventArgs e) =>
+            HandleMouse(sender, e);
+
+        private void UserControl_MouseMove(object sender, MouseEventArgs e) =>
+            HandleMouse(sender, e);
+
+        private void HandleMouse(object sender, MouseEventArgs e)
         {
-            var mousePosition = e.GetPosition(sender as FrameworkElement);
-            Value = mousePosition.X / ActualWidth * MaxValue;
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                var mousePosition = e.GetPosition(sender as FrameworkElement);
+                Value = mousePosition.X / ActualWidth * MaxValue;
+            }
         }
     }
 }

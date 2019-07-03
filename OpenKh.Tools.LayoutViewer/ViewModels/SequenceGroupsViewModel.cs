@@ -1,5 +1,6 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.LayoutViewer.Models;
+using OpenKh.Tools.LayoutViewer.Service;
 using System.Linq;
 using Xe.Tools.Wpf.Models;
 
@@ -7,8 +8,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
     public class SequenceGroupsViewModel : GenericListModel<SequenceGroupModel>
     {
-        public SequenceGroupsViewModel(Layout layout) :
-            base(layout.SequenceGroups.Select((_, i) => new SequenceGroupModel(layout, i)))
+        public SequenceGroupsViewModel(Layout layout, TexturesViewModel texturesViewModel, EditorDebugRenderingService editorDebugRenderingService) :
+            base(layout.SequenceGroups.Select((_, i) => new SequenceGroupModel(layout, i, texturesViewModel, editorDebugRenderingService)))
         {
 
         }
