@@ -10,6 +10,7 @@
   * [IDX/IMG](file/type/idx)
   * [BAR](file/type/bar)
   * [ARD](file/type/ard)
+  * [MSN](file/type/msn)
   
 * Other files
 
