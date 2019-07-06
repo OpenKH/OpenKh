@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Common
 {
-    public static class StreamHelpers
+    public static class StreamExtensions
     {
-        public static T FromBegin<T>(this T stream) where T : Stream
+        public static T FromBegin<T>(this T stream) where T : Stream => stream.SetPosition(0);
+
+        public static T SetPosition<T>(this T stream, int position) where T : Stream
         {
-            stream.Position = 0;
+            stream.Position = position;
             return stream;
         }
 
@@ -41,6 +44,33 @@ namespace OpenKh.Common
             return Enumerable.Range(0, count)
                 .Select(x => reader.ReadInt32())
                 .ToList();
+        }
+
+        public static byte[] ReadBytes(this Stream stream) =>
+            stream.ReadBytes((int)(stream.Length - stream.Position));
+
+        public static byte[] ReadBytes(this Stream stream, int length)
+        {
+            var data = new byte[length];
+            stream.Read(data, 0, length);
+            return data;
+        }
+
+        public static byte[] ReadAllBytes(this Stream stream)
+        {
+            var data = stream.SetPosition(0).ReadBytes();
+            stream.Position = 0;
+            return data;
+        }
+
+        public static string ReadString(this Stream stream, int maxLength) =>
+            stream.ReadString(maxLength, Encoding.UTF8);
+
+        public static string ReadString(this Stream stream, int maxLength, Encoding encoding)
+        {
+            var data = stream.ReadBytes(maxLength);
+            var terminatorIndex = Array.FindIndex(data, x => x == 0);
+            return encoding.GetString(data, 0, terminatorIndex < 0 ? maxLength : terminatorIndex);
         }
 
         public static int WriteList<T>(this Stream stream, IEnumerable<T> items)
