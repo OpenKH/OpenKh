@@ -40,7 +40,7 @@ namespace OpenKh.Tools.BarEditor.Views
 				{
 					using (var fStream = File.Open(args[0].ToString(), FileMode.Open))
 					{
-						DataContext = new BarViewModel(Bar.Open(fStream));
+						DataContext = new BarViewModel(Bar.Read(fStream));
 					}
 				}
 			}

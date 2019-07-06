@@ -151,7 +151,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 if (!Bar.IsValid(stream))
                     throw new InvalidDataException("Not a bar file");
 
-                return Bar.Open(stream);
+                return Bar.Read(stream);
             }
         }
 
@@ -169,7 +169,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             existingEntries = existingEntries.ForEntry(Bar.EntryType.Imgz, ImagesName, 0, entry => Imgz.Save(entry.Stream, LayoutEditor.Images));
 
             using (var stream = File.Create(fileName))
-                Bar.Save(stream, existingEntries);
+                Bar.Write(stream, existingEntries);
         }
 
         private bool OpenBarContent(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)

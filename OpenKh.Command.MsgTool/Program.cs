@@ -34,7 +34,7 @@ namespace OpenKh.Command.MsgTool
 
             using (var stream = File.OpenRead(Input))
             {
-                var barEntries = Bar.Open(stream);
+                var barEntries = Bar.Read(stream);
                 foreach (Bar.Entry barEntry in barEntries)
                 {
                     if (barEntry.Type == Bar.EntryType.Binary)
