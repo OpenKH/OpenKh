@@ -56,7 +56,7 @@ namespace OpenKh.Command.MsgTool
 
         private void ConvertMsgToXml(Stream inStream, Stream outStream)
         {
-            var root = MsgSerializer.SerializeXEntries(Msg.Open(inStream), true);
+            var root = MsgSerializer.SerializeXEntries(Msg.Read(inStream), true);
             var document = new XDocument(root);
             document.Save(outStream);
         }
