@@ -1,4 +1,5 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Common;
+using OpenKh.Kh2;
 using System.IO;
 using Xunit;
 
