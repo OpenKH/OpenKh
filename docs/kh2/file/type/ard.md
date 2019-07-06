@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](ard.md) - ARD
+# [Kingdom Hearts II](../../index) - ARD
 
 Object disposition in a map. Internally it is a [bar](bar.md) which contains a bunch of information.
 

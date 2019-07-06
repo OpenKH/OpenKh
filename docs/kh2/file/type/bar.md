@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](index.md) - BAR (Binary ARchives)
+# [Kingdom Hearts II](../../index) - BAR (Binary ARchives)
 Most of the game's information is stored within these files in order to keep everything organized and easily accessable by the game. These files are kind of like ZIP files, with certain limitations. 
 
 Those limitations include the file's limitations, like the 4 character file names, file types having to be declared within the header, not all file types being declareable, but it also includes PS2's limitations, like the offsets of the files within having to be divisible by 16, even though the size of the previous file is not, file names being unable to contain some characters, etc.

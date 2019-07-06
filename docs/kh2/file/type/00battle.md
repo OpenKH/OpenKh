@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](index.md) - 00battle.bin
+# [Kingdom Hearts II](../../index) - 00battle.bin
 
 This is an essential file for booting [Kingdom Hearts II](../../index) and it contains everything related to the battle system.
 
