@@ -43,7 +43,7 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
                     IEnumerable<Bar.Entry> entries;
                     using (var file = File.Open(FileName, FileMode.Open))
                     {
-                        entries = Bar.Open(file);
+                        entries = Bar.Read(file);
                     }
                     var lvup = entries?.Where(e => e.Name == "lvup").First() ?? null;
 
@@ -54,7 +54,7 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
 
                     using (var stream = File.Open(FileName, FileMode.Create))
                     {
-                        Bar.Save(stream, entries);
+                        Bar.Write(stream, entries);
                     }
                     MessageBox.Show("File saved.", string.Empty, MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -84,7 +84,7 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
             {
                 using (var file = File.Open(fileName, FileMode.Open))
                 {
-                    var ent = Bar.Open(file,
+                    var ent = Bar.Read(file,
                         (str, type) => str == "lvup" && type == Bar.EntryType.Binary)
                         .FirstOrDefault();
 

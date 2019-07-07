@@ -3,7 +3,7 @@ using System.IO;
 
 namespace OpenKh.Common
 {
-    public static class BinaryReaderHelpers
+    public static class BinaryReaderExtensions
     {
         public static byte PeekByte(this BinaryReader reader) => reader.Peek(x => x.ReadByte());
         public static char PeekChar(this BinaryReader reader) => reader.Peek(x => x.ReadChar());

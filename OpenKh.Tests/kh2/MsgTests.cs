@@ -46,7 +46,7 @@ namespace OpenKh.Tests.kh2
                 stream.WriteByte(0x00);
                 stream.WriteByte(0x00);
                 stream.Position = 0;
-                Assert.Throws<InvalidDataException>(() => Msg.Open(stream));
+                Assert.Throws<InvalidDataException>(() => Msg.Read(stream));
             }
         }
 
@@ -54,7 +54,7 @@ namespace OpenKh.Tests.kh2
         public void ReadsRightAmountOfEntries() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Msg.Open(stream);
+                var entries = Msg.Read(stream);
                 Assert.Equal(694, entries.Count);
             });
 
@@ -62,7 +62,7 @@ namespace OpenKh.Tests.kh2
         public void ReadsIdCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Msg.Open(stream);
+                var entries = Msg.Read(stream);
                 Assert.Equal(20233, entries[0].Id);
                 Assert.Equal(20234, entries[1].Id);
             });
@@ -71,7 +71,7 @@ namespace OpenKh.Tests.kh2
         public void ReadsTextDataCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Msg.Open(stream);
+                var entries = Msg.Read(stream);
                 Assert.Equal(19, entries[0].Data.Length);
                 Assert.Equal(7, entries[1].Data.Length);
             });
@@ -81,7 +81,7 @@ namespace OpenKh.Tests.kh2
             FileOpenRead(FilePath, stream =>
             {
                 var expected = new BinaryReader(stream).ReadBytes((int)stream.Length);
-                var entries = Msg.Open(new MemoryStream(expected));
+                var entries = Msg.Read(new MemoryStream(expected));
                 byte[] actual;
 
                 using (var outStream = new MemoryStream())

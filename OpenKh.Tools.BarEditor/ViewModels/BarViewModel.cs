@@ -19,14 +19,14 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 		public BarViewModel() : this((IEnumerable<BarEntryModel>)null) { }
 
 		public BarViewModel(Stream stream) :
-			this(Bar.Open(stream))
+			this(Bar.Read(stream))
 		{
 			OpenCommand = new RelayCommand(x => { }, x => false);
 			SaveCommand = new RelayCommand(x =>
 			{
 				stream.Position = 0;
 				stream.SetLength(0);
-				Bar.Save(stream, Items.Select(item => item.Entry));
+				Bar.Write(stream, Items.Select(item => item.Entry));
 			});
 		}
 
@@ -48,7 +48,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 					{
 						FileName = fd.FileName;
 						Items.Clear();
-						foreach (var item in Bar.Open(stream))
+						foreach (var item in Bar.Read(stream))
 						{
 							Items.Add(new BarEntryModel(item));
 						}
@@ -62,7 +62,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 				{
 					using (var stream = File.Open(FileName, FileMode.Create))
 					{
-						Bar.Save(stream, Items.Select(item => item.Entry));
+						Bar.Write(stream, Items.Select(item => item.Entry));
 					}
 				}
 				else
@@ -78,7 +78,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 				{
 					using (var stream = File.Open(fd.FileName, FileMode.Create))
 					{
-						Bar.Save(stream, Items.Select(item => item.Entry));
+						Bar.Write(stream, Items.Select(item => item.Entry));
 					}
 				}
 			}, x => true);

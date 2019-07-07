@@ -42,7 +42,7 @@ namespace OpenKh.Tests.kh2
         public void IsReadingEntryCountCorrect() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream);
+                var entries = Bar.Read(stream);
                 Assert.Equal(7, entries.Count());
             });
 
@@ -50,7 +50,7 @@ namespace OpenKh.Tests.kh2
         public void IsReadingEntryNamesCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream);
+                var entries = Bar.Read(stream);
                 Assert.Equal("s_da", entries[0].Name);
                 Assert.Equal("m_da", entries[1].Name);
                 Assert.Equal("l_da", entries[2].Name);
@@ -64,7 +64,7 @@ namespace OpenKh.Tests.kh2
         public void IsReadingEntrySizesCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream);
+                var entries = Bar.Read(stream);
                 Assert.Equal(40, entries[0].Stream.Length);
                 Assert.Equal(40, entries[1].Stream.Length);
                 Assert.Equal(48, entries[2].Stream.Length);
@@ -78,7 +78,7 @@ namespace OpenKh.Tests.kh2
         public void IsReadingEntryTypesCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream);
+                var entries = Bar.Read(stream);
                 Assert.Equal(Bar.EntryType.Vibration, entries[0].Type);
                 Assert.Equal(Bar.EntryType.Vibration, entries[1].Type);
                 Assert.Equal(Bar.EntryType.Vibration, entries[2].Type);
@@ -92,7 +92,7 @@ namespace OpenKh.Tests.kh2
         public void IsReadingEntryIndexesCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream);
+                var entries = Bar.Read(stream);
                 Assert.Equal(0, entries[0].Index);
                 Assert.Equal(0, entries[1].Index);
                 Assert.Equal(0, entries[2].Index);
@@ -106,7 +106,7 @@ namespace OpenKh.Tests.kh2
         public void IsReadingEntryDataCorrectly() =>
             FileOpenRead(FilePath, stream =>
             {
-                var entries = Bar.Open(stream);
+                var entries = Bar.Read(stream);
                 Assert.Equal(86, entries[0].Stream.ReadByte());
                 Assert.Equal(86, entries[1].Stream.ReadByte());
                 Assert.Equal(86, entries[2].Stream.ReadByte());
@@ -123,10 +123,10 @@ namespace OpenKh.Tests.kh2
                 var expectedData = new byte[stream.Length];
                 stream.Read(expectedData, 0, expectedData.Length);
 
-                var entries = Bar.Open(new MemoryStream(expectedData));
+                var entries = Bar.Read(new MemoryStream(expectedData));
                 using (var dstStream = new MemoryStream(expectedData.Length))
                 {
-                    Bar.Save(dstStream, entries);
+                    Bar.Write(dstStream, entries);
                     dstStream.Position = 0;
                     var actualData = new byte[dstStream.Length];
                     dstStream.Read(actualData, 0, actualData.Length);
@@ -157,9 +157,9 @@ namespace OpenKh.Tests.kh2
 
             using (var tmpStream = new MemoryStream())
             {
-                Bar.Save(tmpStream, entries);
+                Bar.Write(tmpStream, entries);
                 tmpStream.Position = 0;
-                entries = Bar.Open(tmpStream);
+                entries = Bar.Read(tmpStream);
             }
 
             Assert.Equal(expectedName, entries[0].Name);
