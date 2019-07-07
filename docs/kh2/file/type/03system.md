@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](index.md) - 03system.bin
+# [Kingdom Hearts II](../../index) - 03system.bin
 
 This is an essential file for booting [Kingdom Hearts II](../../index).
 
