@@ -1,0 +1,27 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyTitle>KH2 Text editor</AssemblyTitle>
+    <Company>OpenKH</Company>
+    <Product>KH2 Text editor - OpenKH</Product>
+    <Description>https://github.com/Xeeynamo/OpenKh</Description>
+    <Copyright>Copyright ©  2019</Copyright>
+    <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Drawing.Direct3D\Xe.Drawing.Direct3D.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
+  </ItemGroup>
+</Project>
