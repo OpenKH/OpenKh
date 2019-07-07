@@ -2,6 +2,7 @@
 using OpenKh.Imaging;
 using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Common.Models;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
@@ -20,6 +21,8 @@ namespace OpenKh.Tools.Common.Controls
             public ColorF Color;
             public double WidthMultiplier;
             public double Scale;
+            public double Width;
+            public double Height;
 
             public DrawContext()
             {
@@ -77,6 +80,18 @@ namespace OpenKh.Tools.Common.Controls
         {
             get => (System.Windows.Media.Color)GetValue(BackgroundProperty);
             set => SetValue(BackgroundProperty, value);
+        }
+
+        protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
+        {
+            var drawContext = new DrawContext()
+            {
+                IgnoreDraw = true
+            };
+
+            Draw(drawContext, MessageCommands);
+
+            return new System.Windows.Size(drawContext.Width, drawContext.Height);
         }
 
         protected override void OnDrawCreate()
@@ -163,6 +178,9 @@ namespace OpenKh.Tools.Common.Controls
                 context.x = context.xStart;
                 context.y += FontHeight * context.Scale;
             }
+
+            context.Width = Math.Max(context.Width, context.x);
+            context.Height = Math.Max(context.Height, context.y + FontHeight * context.Scale);
         }
 
         private void SetColor(DrawContext context, byte[] data)
@@ -257,6 +275,7 @@ namespace OpenKh.Tools.Common.Controls
 
         private void SetTextCommands(IEnumerable<MessageCommandModel> textCommands)
         {
+            InvalidateMeasure();
             InvalidateVisual();
         }
 
