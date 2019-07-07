@@ -193,6 +193,9 @@ namespace OpenKh.Tools.Common.Controls
 
         private void DrawText(DrawContext context, MessageCommandModel command)
         {
+            if (_encode == null)
+                return;
+
             var data = _encode.Encode(new List<MessageCommandModel>
             {
                 command
@@ -282,6 +285,9 @@ namespace OpenKh.Tools.Common.Controls
         private void GetOrInitializeSurface(ref ISurface surface, IImageRead image)
         {
             if (surface != null)
+                return;
+
+            if (surface == null && image == null)
                 return;
 
             InitializeSurface(ref surface, image);
