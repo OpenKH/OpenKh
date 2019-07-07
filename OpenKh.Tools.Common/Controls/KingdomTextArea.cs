@@ -13,6 +13,7 @@ namespace OpenKh.Tools.Common.Controls
     {
         protected class DrawContext
         {
+            public bool IgnoreDraw;
             public double xStart;
             public double x;
             public double y;
@@ -98,7 +99,7 @@ namespace OpenKh.Tools.Common.Controls
 
             if (_surfaceFont == null)
                 return;
-            Draw(MessageCommands);
+            Draw(new DrawContext(), MessageCommands);
             Drawing.Flush();
         }
 
@@ -119,20 +120,19 @@ namespace OpenKh.Tools.Common.Controls
             Drawing.Clear(color);
         }
 
-        protected void Draw(string text)
+        protected void Draw(DrawContext drawContext, string text)
         {
             var commands = MsgSerializer.DeserializeText(text);
-            Draw(commands);
+            Draw(drawContext, commands);
         }
 
-        protected void Draw(IEnumerable<MessageCommandModel> commands)
+        protected void Draw(DrawContext drawContext, IEnumerable<MessageCommandModel> commands)
         {
             if (commands == null)
                 return;
 
-            var context = new DrawContext();
             foreach (var command in commands)
-                Draw(context, command);
+                Draw(drawContext, command);
         }
 
         private void Draw(DrawContext context, MessageCommandModel command)
@@ -156,6 +156,8 @@ namespace OpenKh.Tools.Common.Controls
                 context.WidthMultiplier = command.TextWidth;
             else if (command.Command == MessageCommand.TextScale)
                 context.Scale = command.TextScale;
+            else if (command.Command == MessageCommand.Tabulation)
+                context.x += 16; // TODO random number
             else if (command.Command == MessageCommand.NewLine)
             {
                 context.x = context.xStart;
@@ -190,7 +192,8 @@ namespace OpenKh.Tools.Common.Controls
                 if (ch >= 0x20)
                 {
                     int chIndex = ch - 0x20;
-                    DrawChar(context, chIndex);
+                    if (!context.IgnoreDraw)
+                        DrawChar(context, chIndex);
                     spacing = _fontSpacing?[chIndex] ?? FontWidth;
                 }
                 else if (ch == 1)
