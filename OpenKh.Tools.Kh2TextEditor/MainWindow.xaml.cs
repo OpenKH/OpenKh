@@ -12,10 +12,7 @@ namespace OpenKh.Tools.Kh2TextEditor
         public MainWindow()
         {
             InitializeComponent();
-
-            var vm = new TextEditorViewModel();
-
-            DataContext = vm;
+            DataContext = new MainViewModel();
         }
 
         protected override void OnInitialized(EventArgs e)

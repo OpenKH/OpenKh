@@ -5,57 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2TextEditor"
         xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
+        xmlns:local1="clr-namespace:OpenKh.Tools.Kh2TextEditor.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="{Binding Title}" Height="600" Width="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="88*"/>
-            <ColumnDefinition Width="61*"/>
-            <ColumnDefinition Width="115*"/>
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open message"
+                          Command="{Binding OpenCommand}"/>
+                <MenuItem Header="_Save message"
+                          Command="{Binding SaveCommand}"/>
+                <MenuItem Header="Save message _as..."
+                          Command="{Binding SaveAsCommand}"/>
+                <Separator/>
+                <MenuItem Header="E_xit"
+                          Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About"
+                          Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
 
-            <ListBox
-                Grid.Column="0"
-                ItemsSource="{Binding Messages.Items}"
-                SelectedItem="{Binding SelectedItem}"
-                DisplayMemberPath="Title"/>
-
-            <Grid Grid.Row="1" Margin="0 5 0 5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="5"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
-                <TextBox Grid.Column="2"
-                    Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
-            </Grid>
-        </Grid>
-
-        <Grid Grid.Column="1" Grid.ColumnSpan="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <TextBox
-                Grid.Row="0"
-                MaxLines="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
-
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                <controls:KingdomTextArea
-                    x:Name="textArea"
-                    Background="Black"
-                    Drawing="{Binding Drawing}"
-                    MessageCommands="{Binding SelectedItem.MessageCommands}"/>
-            </ScrollViewer>
-        </Grid>
+        <local1:TextEditorView Grid.Row="1"
+            DataContext="{Binding TextEditor}"/>
     </Grid>
 </Window>

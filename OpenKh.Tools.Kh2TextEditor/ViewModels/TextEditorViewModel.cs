@@ -18,6 +18,16 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private string _currentText;
         private string _searchTerm;
 
+        public List<Msg.Entry> MessageEntries
+        {
+            get => _msgs;
+            set
+            {
+                _msgs = value;
+                ResetMessagesView();
+            }
+        }
+
         public IDrawing Drawing { get; }
 
         public MessagesModel Messages
@@ -83,29 +93,11 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             Drawing = new DrawingDirect3D();
         }
 
-        public void OpenMsg(string fileName)
-        {
-            using (var stream = File.OpenRead(fileName))
-            {
-                var entry = Bar.Read(stream)
-                    .FirstOrDefault(x => x.Type == Bar.EntryType.Binary);
-
-                if (entry != null)
-                    OpenMsg(entry);
-            }
-        }
-
-        public void OpenMsg(Bar.Entry entry)
-        {
-            _msgs = Msg.Read(entry.Stream);
-            ResetMessagesView();
-        }
-
         public void SelectMessage(int id) => SelectedItem = Messages.GetMessage(id);
 
         private void ResetMessagesView()
         {
-            Messages = new MessagesModel(_encoder, _msgs);
+            Messages = new MessagesModel(_encoder, MessageEntries);
         }
 
         private bool FilterNone(MessageModel arg) => true;
