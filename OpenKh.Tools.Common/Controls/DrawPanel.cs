@@ -281,6 +281,9 @@ namespace kh.tools.common.Controls
             if (drawing == null)
                 return;
 
+            width = Math.Min(Math.Max(1, width), 65536);
+            height = Math.Min(Math.Max(1, height), 65536);
+
             drawing.Surface?.Dispose();
             drawing.Surface = drawing.CreateSurface(
                 width, height, Xe.Drawing.PixelFormat.Format32bppArgb, SurfaceType.InputOutput);
