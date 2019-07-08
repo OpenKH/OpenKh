@@ -187,6 +187,13 @@ namespace OpenKh.Kh2.Messages
             },
             new SerializerModel
             {
+                Name = "delay&fade",
+                Command = MessageCommand.DelayAndFade,
+                Serializer = x => ToDelayAndFade(x.Data),
+                Deserializer = x => FromDelayAndFade(x)
+            },
+            new SerializerModel
+            {
                 Name = "unk18",
                 Command = MessageCommand.Unknown18,
                 Serializer = x => ToStringRawData(x.Data),
@@ -373,6 +380,10 @@ namespace OpenKh.Kh2.Messages
                 (byte)(((ushort)yCoord >> 8) & 0xFF),
             };
         }
+
+        private static string ToDelayAndFade(byte[] data) => ToStringRawData(data);
+
+        private static byte[] FromDelayAndFade(string text) => FromStringToByte(text);
 
         private static string ToStringRawData(byte[] data) =>
             string.Join(" ", data.Select(x => $"{x:X02}"));

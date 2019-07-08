@@ -27,7 +27,7 @@
         Delay,
         CharDelay,
         Unknown16,
-        Unknown17,
+        DelayAndFade,
         Unknown18,
         Unknown19,
         Unknown1a,
