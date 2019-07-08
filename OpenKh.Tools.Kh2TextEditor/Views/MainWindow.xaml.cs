@@ -2,7 +2,7 @@ using System;
 using System.Windows;
 using OpenKh.Tools.Kh2TextEditor.ViewModels;
 
-namespace OpenKh.Tools.Kh2TextEditor
+namespace OpenKh.Tools.Kh2TextEditor.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -11,8 +11,9 @@ namespace OpenKh.Tools.Kh2TextEditor
     {
         public MainWindow()
         {
-            InitializeComponent();
             DataContext = new MainViewModel();
+
+            InitializeComponent();
         }
 
         protected override void OnInitialized(EventArgs e)
