@@ -1,4 +1,4 @@
-using OpenKh.Kh2;
+﻿using OpenKh.Kh2;
 using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Common.Models;
@@ -111,11 +111,12 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private void ResetMessagesView()
         {
             Messages = new MessagesModel(_encoder, MessageEntries);
+            SelectMessage(16117);
         }
 
         private bool FilterNone(MessageModel arg) => true;
 
         private bool FilterTextAndId(MessageModel arg) =>
-            $"{arg.Id.ToString()} {arg.Text}".Contains(SearchTerm);
+            $"{arg.Id.ToString()} {arg.Text}".ToLower().Contains(SearchTerm.ToLower());
     }
 }
