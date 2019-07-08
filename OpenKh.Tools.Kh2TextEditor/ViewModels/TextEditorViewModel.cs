@@ -1,5 +1,7 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
+using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Messages;
+using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.Kh2TextEditor.Models;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +19,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private MessageModel _selectedItem;
         private string _currentText;
         private string _searchTerm;
+        private KingdomTextContext textContext;
 
         public List<Msg.Entry> MessageEntries
         {
@@ -84,6 +87,16 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                     _messages.Filter(FilterNone);
                 else
                     _messages.Filter(FilterTextAndId);
+            }
+        }
+
+        public KingdomTextContext TextContext
+        {
+            get => textContext;
+            set
+            {
+                textContext = value;
+                OnPropertyChanged();
             }
         }
 

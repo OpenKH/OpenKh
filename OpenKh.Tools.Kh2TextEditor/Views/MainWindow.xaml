@@ -25,6 +25,21 @@
                 <MenuItem Header="E_xit"
                           Command="{Binding ExitCommand}"/>
             </MenuItem>
+            <MenuItem Header="Fon_t">
+                <MenuItem Header="Open font _image..."
+                          Command="{Binding OpenFontImageCommand}"/>
+                <MenuItem Header="Save font image as..." Visibility="Collapsed"
+                          Command="{Binding SaveFontImageCommand}"/>
+                <MenuItem Header="Edit font image..." Visibility="Collapsed"
+                          Command="{Binding EditFontImageCommand}"/>
+                <Separator/>
+                <MenuItem Header="Open font in_fo..."
+                          Command="{Binding OpenFontInfoCommand}"/>
+                <MenuItem Header="Save font info as..." Visibility="Collapsed"
+                          Command="{Binding SaveFontInfoCommand}"/>
+                <MenuItem Header="Edit font info..." Visibility="Collapsed"
+                          Command="{Binding EditFontInfoCommand}"/>
+            </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About"
                           Command="{Binding AboutCommand}"/>

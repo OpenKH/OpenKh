@@ -1,7 +1,11 @@
 ﻿using kh.tools.common;
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Extensions;
+using OpenKh.Kh2.Messages;
+using OpenKh.Tools.Common.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,6 +24,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private static string ApplicationName = Utilities.GetApplicationName();
         private string _fileName;
         private string _barEntryName;
+        private FontContext _fontContext = new FontContext();
 
         public string Title => $"{_barEntryName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
 
@@ -34,11 +39,18 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         }
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
-        public RelayCommand OpenCommand { get; private set; }
-        public RelayCommand SaveCommand { get; private set; }
-        public RelayCommand SaveAsCommand { get; private set; }
-        public RelayCommand ExitCommand { get; private set; }
-        public RelayCommand AboutCommand { get; private set; }
+        public RelayCommand OpenCommand { get; }
+        public RelayCommand SaveCommand { get; }
+        public RelayCommand SaveAsCommand { get; }
+        public RelayCommand ExitCommand { get; }
+        public RelayCommand AboutCommand { get; }
+
+        public RelayCommand OpenFontImageCommand { get; }
+        public RelayCommand SaveFontImageCommand { get; }
+        public RelayCommand EditFontImageCommand { get; }
+        public RelayCommand OpenFontInfoCommand { get; }
+        public RelayCommand SaveFontInfoCommand { get; }
+        public RelayCommand EditFontInfoCommand { get; }
 
         public TextEditorViewModel TextEditor { get; private set; }
 
@@ -84,6 +96,62 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             ExitCommand = new RelayCommand(x =>
             {
                 Window.Close();
+            }, x => true);
+
+            OpenFontImageCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new (string, string)[]
+                {
+                    ("fontimage.bar", "bar"),
+                    ("All files", "")
+                });
+
+                if (fd.ShowDialog() == true)
+                {
+                    OpenFontImageFile(fd.FileName);
+                }
+            }, x => true);
+
+            SaveFontImageCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, new (string, string)[]
+                {
+                    ("fontimage.bar", "bar"),
+                    ("All files", "")
+                });
+
+                if (fd.ShowDialog() == true)
+                {
+                    SaveFontImageFile(fd.FileName);
+                }
+            }, x => true);
+
+            OpenFontInfoCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new (string, string)[]
+                {
+                    ("fontinfo.bar", "bar"),
+                    ("All files", "")
+                });
+
+                if (fd.ShowDialog() == true)
+                {
+                    OpenFontInfoFile(fd.FileName);
+                }
+            }, x => true);
+
+            SaveFontInfoCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, new (string, string)[]
+                {
+                    ("fontinfo.bar", "bar"),
+                    ("All files", "")
+                });
+
+                if (fd.ShowDialog() == true)
+                {
+                    SaveFontInfoFile(fd.FileName);
+                }
             }, x => true);
 
             AboutCommand = new RelayCommand(x =>
@@ -138,6 +206,46 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             {
                 File.Create(fileName).Using(WriteMsg);
             }
+        }
+
+        private void OpenFontImageFile(string fileName) => File.OpenRead(fileName).Using(stream =>
+        {
+            if (Bar.IsValid(stream))
+            {
+                _fontContext.Read(Bar.Read(stream));
+                InvalidateFontContext();
+            }
+        });
+
+        private void SaveFontImageFile(string fileName)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OpenFontInfoFile(string fileName) => File.OpenRead(fileName).Using(stream =>
+        {
+            if (Bar.IsValid(stream))
+            {
+                _fontContext.Read(Bar.Read(stream));
+                InvalidateFontContext();
+            }
+        });
+
+        private void SaveFontInfoFile(string fileName)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void InvalidateFontContext()
+        {
+            TextEditor.TextContext = new KingdomTextContext
+            {
+                Font = _fontContext.ImageSystem,
+                Icon = _fontContext.ImageIcon,
+                FontSpacing = _fontContext.SpacingSystem,
+                IconSpacing = _fontContext.SpacingIcon,
+                Encode = Encoders.InternationalSystem
+            };
         }
 
         private bool TryReadMsg(Stream stream)

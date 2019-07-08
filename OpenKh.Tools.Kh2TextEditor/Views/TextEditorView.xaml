@@ -54,6 +54,7 @@
                     x:Name="textArea"
                     Background="Black"
                     Drawing="{Binding Drawing}"
+                    Context="{Binding TextContext}"
                     MessageCommands="{Binding SelectedItem.MessageCommands}"/>
             </ScrollViewer>
         </Grid>
