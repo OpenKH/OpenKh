@@ -4,7 +4,9 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Messages;
+using OpenKh.Tools.Common.Extensions;
 using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Kh2TextEditor.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,6 +27,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private string _fileName;
         private string _barEntryName;
         private FontContext _fontContext = new FontContext();
+        private FontType _fontType;
 
         public string Title => $"{_barEntryName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
 
@@ -53,6 +56,16 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         public RelayCommand EditFontInfoCommand { get; }
 
         public TextEditorViewModel TextEditor { get; private set; }
+
+        public FontType FontType
+        {
+            get => _fontType;
+            set
+            {
+                _fontType = value;
+                InvalidateFontContext();
+            }
+        }
 
         public MainViewModel()
         {
@@ -155,11 +168,12 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }, x => true);
 
             AboutCommand = new RelayCommand(x =>
-            {
+            {   
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
 
             TextEditor = new TextEditorViewModel();
+            FontType = FontType.System;
         }
 
         public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
@@ -238,14 +252,9 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
         private void InvalidateFontContext()
         {
-            TextEditor.TextContext = new KingdomTextContext
-            {
-                Font = _fontContext.ImageSystem,
-                Icon = _fontContext.ImageIcon,
-                FontSpacing = _fontContext.SpacingSystem,
-                IconSpacing = _fontContext.SpacingIcon,
-                Encode = Encoders.InternationalSystem
-            };
+            TextEditor.TextContext = FontType == FontType.System ?
+                _fontContext.ToKh2EuSystemTextContext() :
+                _fontContext.ToKh2EuEventTextContext();
         }
 
         private bool TryReadMsg(Stream stream)

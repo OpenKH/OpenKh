@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2TextEditor.Views"
         xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
+        xmlns:converters="clr-namespace:OpenKh.Tools.Kh2TextEditor.Converters"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="600" Width="800">
+    <Window.Resources>
+        <converters:EnumMatchToBooleanConverter x:Key="enumConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -39,6 +43,18 @@
                           Command="{Binding SaveFontInfoCommand}"/>
                 <MenuItem Header="Edit font info..." Visibility="Collapsed"
                           Command="{Binding EditFontInfoCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Encoding">
+                <RadioButton
+                    Content="System font type"
+                    IsChecked="{Binding Path=FontType, Mode=TwoWay, 
+                        Converter={StaticResource enumConverter},
+                        ConverterParameter=System}"/>
+                <RadioButton
+                    Content="Event encoding"
+                    IsChecked="{Binding Path=FontType, Mode=TwoWay, 
+                        Converter={StaticResource enumConverter},
+                        ConverterParameter=Event}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About"
