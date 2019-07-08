@@ -65,14 +65,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                     return;
 
                 _currentText = value;
-                try
-                {
-                    selectedItem.Text = value;
-                }
-                catch
-                {
-
-                }
+                selectedItem.Text = value;
             }
         }
 

@@ -23,8 +23,23 @@
             <ListBox
                 Grid.Column="0"
                 ItemsSource="{Binding Messages.Items}"
-                SelectedItem="{Binding SelectedItem}"
-                DisplayMemberPath="Title"/>
+                SelectedItem="{Binding SelectedItem}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image
+                                Margin="0 0 3 0"
+                                Source="{StaticResource StatusWarning_16x}"
+                                Visibility="{Binding IconErrorVisiblity}">
+                                <Image.ToolTip>
+                                    <TextBlock Text="{Binding LastError}"/>
+                                </Image.ToolTip>
+                            </Image>
+                            <TextBlock Text="{Binding Title}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
             <Grid Grid.Row="1" Margin="0 5 0 5">
                 <Grid.ColumnDefinitions>

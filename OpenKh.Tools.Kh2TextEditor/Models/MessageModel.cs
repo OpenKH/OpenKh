@@ -1,7 +1,9 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using Xe.Tools;
 
 namespace OpenKh.Tools.Kh2TextEditor.Models
@@ -10,6 +12,8 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
     {
         private readonly IMessageEncoder _encoder;
         private readonly Msg.Entry _entry;
+        private bool _doesNotContainErrors = true;
+        private string _lastError;
 
         public MessageModel(IMessageEncoder encoder, Msg.Entry entry)
         {
@@ -21,10 +25,35 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
 
         public string Text
         {
-            get => MsgSerializer.SerializeText(MessageCommands);
+            get
+            {
+                try
+                {
+                    var text = MsgSerializer.SerializeText(MessageCommands);
+                    DoesNotContainErrors = DoesNotContainErrors && true;
+                    return text;
+                }
+                catch (Exception ex)
+                {
+                    DoesNotContainErrors = false;
+                    LastError = ex.Message;
+                    return ex.Message;
+                }
+            }
+
             set
             {
-                MessageCommands = MsgSerializer.DeserializeText(value);
+                try
+                {
+                    MessageCommands = MsgSerializer.DeserializeText(value);
+                    DoesNotContainErrors = true;
+                }
+                catch (Exception ex)
+                {
+                    DoesNotContainErrors = false;
+                    LastError = ex.Message;
+                }
+
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(Title));
             }
@@ -47,6 +76,28 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
                 const int MaxTitleLength = 100;
                 var title = $"{Id}: {Text}";
                 return title.Length > MaxTitleLength ? $"{title.Substring(0, MaxTitleLength)}..." : title;
+            }
+        }
+
+        public bool DoesNotContainErrors
+        {
+            get => _doesNotContainErrors;
+            private set
+            {
+                _doesNotContainErrors = value;
+                OnPropertyChanged(nameof(IconErrorVisiblity));
+            }
+        }
+
+        public Visibility IconErrorVisiblity => DoesNotContainErrors ? Visibility.Collapsed : Visibility.Visible;
+
+        public string LastError
+        {
+            get => _lastError;
+            private set
+            {
+                _lastError = value;
+                OnPropertyChanged();
             }
         }
     }
