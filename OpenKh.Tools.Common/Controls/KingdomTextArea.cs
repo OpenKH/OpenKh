@@ -36,6 +36,12 @@ namespace OpenKh.Tools.Common.Controls
                 WidthMultiplier = 1.0;
                 Scale = 1.0;
             }
+
+            public void NewLine(int fontHeight)
+            {
+                x = xStart;
+                y += fontHeight * Scale;
+            }
         }
 
         private const int IconWidth = Constants.FontIconWidth;
@@ -161,6 +167,13 @@ namespace OpenKh.Tools.Common.Controls
                 SetColor(context, command.Data);
             else if (command.Command == MessageCommand.Reset)
                 context.Reset();
+            else if (command.Command == MessageCommand.Clear)
+            {
+                context.NewLine(Context.FontHeight);
+                context.y += 4;
+                Drawing.FillRectangle(new RectangleF(8, (float)context.y, Math.Max(1.0f, (float)(ActualWidth - 16)), 2), Color.White);
+                context.y += 4;
+            }
             else if (command.Command == MessageCommand.Position)
             {
                 context.x = command.PositionX;
@@ -173,10 +186,7 @@ namespace OpenKh.Tools.Common.Controls
             else if (command.Command == MessageCommand.Tabulation)
                 context.x += 16; // TODO random number
             else if (command.Command == MessageCommand.NewLine)
-            {
-                context.x = context.xStart;
-                context.y += Context.FontHeight * context.Scale;
-            }
+                context.NewLine(Context.FontHeight);
 
             context.Width = Math.Max(context.Width, context.x);
             context.Height = Math.Max(context.Height, context.y + Context.FontHeight * context.Scale);
