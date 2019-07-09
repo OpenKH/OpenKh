@@ -75,7 +75,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 {
                     ("BAR file", "bar"),
                     ("MSG file", "msg"),
-                    ("All files", "")
+                    ("All files", "*")
                 });
 
                 if (fd.ShowDialog() == true)
@@ -116,7 +116,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new (string, string)[]
                 {
                     ("fontimage.bar", "bar"),
-                    ("All files", "")
+                    ("All files", "*")
                 });
 
                 if (fd.ShowDialog() == true)
@@ -130,7 +130,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, new (string, string)[]
                 {
                     ("fontimage.bar", "bar"),
-                    ("All files", "")
+                    ("All files", "*")
                 });
 
                 if (fd.ShowDialog() == true)
@@ -144,7 +144,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new (string, string)[]
                 {
                     ("fontinfo.bar", "bar"),
-                    ("All files", "")
+                    ("All files", "*")
                 });
 
                 if (fd.ShowDialog() == true)
@@ -158,7 +158,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, new (string, string)[]
                 {
                     ("fontinfo.bar", "bar"),
-                    ("All files", "")
+                    ("All files", "*")
                 });
 
                 if (fd.ShowDialog() == true)
