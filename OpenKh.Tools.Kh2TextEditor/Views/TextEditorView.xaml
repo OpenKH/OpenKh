@@ -44,12 +44,23 @@
             <Grid Grid.Row="1" Margin="0 5 0 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="3"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
                 <TextBox Grid.Column="2"
                     Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+                <ToggleButton Grid.Column="3" Margin="3 0 3 0"
+                    Visibility="{Binding AnyErrorVisibility}"
+                    IsChecked="{Binding ShowErrors, Mode=TwoWay}">
+                    <ToggleButton.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{StaticResource StatusWarning_16x}"/>
+                            <TextBlock Text="{Binding ErrorCount}"/>
+                        </StackPanel>
+                    </ToggleButton.Content>
+                </ToggleButton>
             </Grid>
         </Grid>
 

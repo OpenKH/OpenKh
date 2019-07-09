@@ -12,13 +12,15 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
     public class MessageModel : BaseNotifyPropertyChanged
     {
         private readonly ICurrentMessageEncoder _currentEncoder;
+        private readonly IInvalidateErrorCount _invalidateErrorCount;
         private readonly Msg.Entry _entry;
         private bool _doesNotContainErrors = true;
         private string _lastError;
 
-        public MessageModel(ICurrentMessageEncoder currentEncoder, Msg.Entry entry)
+        public MessageModel(ICurrentMessageEncoder currentEncoder, IInvalidateErrorCount invalidateErrorCount, Msg.Entry entry)
         {
             _currentEncoder = currentEncoder;
+            _invalidateErrorCount = invalidateErrorCount;
             _entry = entry;
         }
 
@@ -85,7 +87,12 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
             get => _doesNotContainErrors;
             private set
             {
+                var prevValue = _doesNotContainErrors;
                 _doesNotContainErrors = value;
+
+                if (prevValue != value)
+                    _invalidateErrorCount.InvalidateErrorCount();
+
                 OnPropertyChanged(nameof(IconErrorVisiblity));
             }
         }

@@ -12,8 +12,8 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
     {
         private readonly ICurrentMessageEncoder _currentEncoder;
 
-        public MessagesModel(ICurrentMessageEncoder currentEncoder, IEnumerable<Msg.Entry> messages) :
-            this(currentEncoder, messages.Select(x => new MessageModel(currentEncoder, x)))
+        public MessagesModel(ICurrentMessageEncoder currentEncoder, IInvalidateErrorCount invalidateErrorCount, IEnumerable<Msg.Entry> messages) :
+            this(currentEncoder, messages.Select(x => new MessageModel(currentEncoder, invalidateErrorCount, x)))
         { }
 
         public MessagesModel(ICurrentMessageEncoder currentEncoder, IEnumerable<MessageModel> messages) :
