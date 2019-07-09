@@ -1,5 +1,6 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
+using OpenKh.Tools.Kh2TextEditor.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,14 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
 {
     public class MessageModel : BaseNotifyPropertyChanged
     {
-        private readonly IMessageEncoder _encoder;
+        private readonly ICurrentMessageEncoder _currentEncoder;
         private readonly Msg.Entry _entry;
         private bool _doesNotContainErrors = true;
         private string _lastError;
 
-        public MessageModel(IMessageEncoder encoder, Msg.Entry entry)
+        public MessageModel(ICurrentMessageEncoder currentEncoder, Msg.Entry entry)
         {
-            _encoder = encoder;
+            _currentEncoder = currentEncoder;
             _entry = entry;
         }
 
@@ -61,10 +62,10 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
 
         public IEnumerable<MessageCommandModel> MessageCommands
         {
-            get => _encoder.Decode(_entry.Data);
+            get => _currentEncoder.CurrentMessageEncoder.Decode(_entry.Data);
             set
             {
-                _entry.Data = _encoder.Encode(value.ToList());
+                _entry.Data = _currentEncoder.CurrentMessageEncoder.Encode(value.ToList());
                 OnPropertyChanged();
             }
         }

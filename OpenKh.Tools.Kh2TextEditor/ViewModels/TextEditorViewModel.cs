@@ -2,6 +2,7 @@
 using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Kh2TextEditor.Interfaces;
 using OpenKh.Tools.Kh2TextEditor.Models;
 using System.Collections.Generic;
 using System.IO;
@@ -11,11 +12,11 @@ using Xe.Tools;
 
 namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 {
-    public class TextEditorViewModel : BaseNotifyPropertyChanged
+    public class TextEditorViewModel : BaseNotifyPropertyChanged, ICurrentMessageEncoder
     {
         private MessagesModel _messages;
         private List<Msg.Entry> _msgs;
-        private IMessageEncoder _encoder;
+        private IMessageEncoder _currentMessageEncoder;
         private MessageModel _selectedItem;
         private string _currentText;
         private string _searchTerm;
@@ -93,18 +94,28 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }
         }
 
+        public IMessageEncoder CurrentMessageEncoder
+        {
+            get => _currentMessageEncoder;
+            private set
+            {
+                _currentMessageEncoder = value;
+                OnPropertyChanged();
+            }
+        }
+
         public TextEditorViewModel()
         {
-            _encoder = Encoders.InternationalSystem;
             Drawing = new DrawingDirect3D();
+            CurrentMessageEncoder = Encoders.InternationalSystem;
+            _messages = new MessagesModel(this, new Msg.Entry[] { });
         }
 
         public void SelectMessage(int id) => SelectedItem = Messages.GetMessage(id);
 
         private void ResetMessagesView()
         {
-            Messages = new MessagesModel(_encoder, MessageEntries);
-            SelectMessage(16117);
+            Messages = new MessagesModel(this, MessageEntries);
         }
 
         private bool FilterNone(MessageModel arg) => true;
