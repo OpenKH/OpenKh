@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace kh.tools.common
+namespace OpenKh.Tools.Common
 {
     public static class CommandHelpers
     {

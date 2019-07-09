@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using Xe.Drawing;
 using static OpenKh.Tools.Common.DependencyPropertyUtils;
 
-namespace kh.tools.common.Controls
+namespace OpenKh.Tools.Common.Controls
 {
     public class DrawPanel : FrameworkElement
     {

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace kh.tools.common
+namespace OpenKh.Tools.Common
 {
     public static class Utilities
     {

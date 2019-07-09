@@ -1,4 +1,4 @@
-﻿using kh.tools.common.Controls;
+﻿using OpenKh.Tools.Common.Controls;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
