@@ -7,9 +7,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xe.Drawing;
-using static kh.tools.common.DependencyPropertyUtils;
+using static OpenKh.Tools.Common.DependencyPropertyUtils;
 
-namespace kh.tools.common.Controls
+namespace OpenKh.Tools.Common.Controls
 {
     public class DrawPanel : FrameworkElement
     {
@@ -280,6 +280,9 @@ namespace kh.tools.common.Controls
         {
             if (drawing == null)
                 return;
+
+            width = Math.Min(Math.Max(1, width), 65536);
+            height = Math.Min(Math.Max(1, height), 65536);
 
             drawing.Surface?.Dispose();
             drawing.Surface = drawing.CreateSurface(

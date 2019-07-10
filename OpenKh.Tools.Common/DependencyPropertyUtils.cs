@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace kh.tools.common
+namespace OpenKh.Tools.Common
 {
     public static class DependencyPropertyUtils
     {

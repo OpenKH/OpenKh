@@ -1,4 +1,4 @@
-﻿using kh.tools.common.Controls;
+﻿using OpenKh.Tools.Common.Controls;
 using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Kh2;
@@ -6,7 +6,7 @@ using OpenKh.Kh2.Extensions;
 using System.Drawing;
 using System.Windows;
 using Xe.Drawing;
-using static kh.tools.common.DependencyPropertyUtils;
+using static OpenKh.Tools.Common.DependencyPropertyUtils;
 
 namespace OpenKh.Tools.Common.Controls
 {
