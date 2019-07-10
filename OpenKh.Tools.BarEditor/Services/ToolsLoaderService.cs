@@ -1,4 +1,5 @@
 ﻿using OpenKh.Kh2;
+using OpenKh.Tools.Common;
 using System;
 using System.IO;
 using System.Linq;
@@ -8,11 +9,11 @@ namespace OpenKh.Tools.BarEditor.Services
 {
 	public static class ToolsLoaderService
 	{
-		public static bool? OpenTool(Stream stream, Bar.EntryType type)
+		public static bool? OpenTool(string fileName, Bar.Entry entry)
 		{
 			string name;
 
-			switch (type)
+			switch (entry.Type)
 			{
 				case Bar.EntryType.Bar:
 					name = "OpenKh.Tools.BarEditor";
@@ -28,13 +29,17 @@ namespace OpenKh.Tools.BarEditor.Services
 			}
 
 			var toolModule = Plugins
-				.GetModules<IToolModule>(null, x => x.Contains(name) && Path.GetExtension(x) == ".exe")
+				.GetModules<IToolModule<ToolInvokeDesc>>(null, x => x.Contains(name) && Path.GetExtension(x) == ".exe")
 				.FirstOrDefault();
 
-			var tool = Activator.CreateInstance(toolModule.Item2) as IToolModule;
+			var tool = Activator.CreateInstance(toolModule.Item2) as IToolModule<ToolInvokeDesc>;
 
-			stream.Position = 0;
-			return tool?.ShowDialog(stream);
+			entry.Stream.Position = 0;
+			return tool?.ShowDialog(new ToolInvokeDesc
+            {
+                FileName = fileName,
+                SelectedEntry = entry
+            });
 		}
 
 	}

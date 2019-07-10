@@ -97,7 +97,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 			{
 				try
 				{
-					ToolsLoaderService.OpenTool(SelectedItem.Entry.Stream, SelectedItem.Type);
+					ToolsLoaderService.OpenTool(FileName, SelectedItem.Entry);
 				}
 				catch (Exception e)
 				{
