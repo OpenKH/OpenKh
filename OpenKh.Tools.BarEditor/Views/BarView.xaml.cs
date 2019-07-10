@@ -1,5 +1,6 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.BarEditor.ViewModels;
+using OpenKh.Tools.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,33 +23,18 @@ namespace OpenKh.Tools.BarEditor.Views
 	/// </summary>
 	public partial class BarView : Window
 	{
-		public BarView() :
-			this(new object[0])
-		{ }
-
-		public BarView(params object[] args)
+		public BarView()
 		{
 			InitializeComponent();
-			
-			if (args.Length > 0)
-			{
-				if (args[0] is Stream stream)
-				{
-					DataContext = new BarViewModel(stream);
-				}
-				else if (args[0] is string)
-				{
-					using (var fStream = File.Open(args[0].ToString(), FileMode.Open))
-					{
-						DataContext = new BarViewModel(Bar.Read(fStream));
-					}
-				}
-			}
-			else
-			{
-				DataContext = new BarViewModel();
-			}
-		}
+            DataContext = new BarViewModel();
+        }
+
+        public BarView(ToolInvokeDesc desc) :
+            base()
+        {
+            var vm = DataContext as BarViewModel;
+            DataContext = new BarViewModel(Bar.Read(desc.SelectedEntry.Stream));
+        }
 
 		private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{

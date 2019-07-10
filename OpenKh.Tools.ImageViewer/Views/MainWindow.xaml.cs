@@ -1,4 +1,5 @@
-﻿using OpenKh.Tools.ImageViewer.ViewModels;
+﻿using OpenKh.Tools.Common;
+using OpenKh.Tools.ImageViewer.ViewModels;
 using System.Windows;
 
 namespace OpenKh.Tools.ImageViewer.Views
@@ -12,6 +13,11 @@ namespace OpenKh.Tools.ImageViewer.Views
         {
             InitializeComponent();
             DataContext = new ImageViewerViewModel();
+        }
+
+        public MainWindow(ToolInvokeDesc toolInvokeDesc) : this()
+        {
+            (DataContext as ImageViewerViewModel).LoadImage(toolInvokeDesc);
         }
     }
 }
