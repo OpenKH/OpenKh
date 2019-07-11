@@ -1,4 +1,5 @@
-﻿using OpenKh.Tools.LayoutViewer.ViewModels;
+﻿using OpenKh.Tools.Common;
+using OpenKh.Tools.LayoutViewer.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,13 @@ namespace OpenKh.Tools.LayoutViewer.Views
         {
             InitializeComponent();
             DataContext = new MainViewModel();
+        }
+
+        public MainWindow(ToolInvokeDesc desc) :
+            this()
+        {
+            var vm = DataContext as MainViewModel;
+            vm.OpenFile(desc.FileName);
         }
     }
 }
