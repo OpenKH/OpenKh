@@ -107,7 +107,7 @@ Contains the level-up table for summons and drive forms.
 | Offset | Type  | Description 
 |--------|-------|-------------
 | 00     | byte  | First digit is the Form id, second digit is the Form level (e.g. 0x13 is Valor Form Level 3)
-| 01     | byte  | Level of the movement ability (High Jump, Quick Run etc.)
+| 01     | byte  | Level of the movement ability in the form (High Jump, Quick Run etc.)
 | 02     | short | Ability obtained through level up
 | 04     | int   | EXP needed for level up
 
