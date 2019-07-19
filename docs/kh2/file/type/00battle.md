@@ -5,13 +5,11 @@ This is an essential file for booting [Kingdom Hearts II](../../index) and it co
 * [LVUP](#lvup)
 * [LVPM](#lvpm)
 * [ENMP](#enmp)
+* [FMLV](#fmlv)
 
 ## Lvup
 
-This sub-file is found within 00battle.bin. It stores informations about the
-- needed EXP for the level up
-- Strength, Magic, Defense and AP stats after the level up
-- given ability for the corresponding route
+Contains the level-up table for every playable character.
 
 ### Lvup Structure
 
@@ -37,24 +35,24 @@ This sub-file is found within 00battle.bin. It stores informations about the
 
 ### Lvup 'Character' Entry
 
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | int32_t | Unknown 
-| 4 	 | LevelUp[0..99] | Holds informations for the level up 
+| Offset | Type | Description |
+|--------|------|-------------|
+| 00 	 | int32 | Unknown 
+| 04 	 | LevelUp[0..99] | Holds informations for the level up 
 
 ### Lvup 'LevelUp' Entry
 
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	| int32_t | Needed EXP 
-| 4 	| byte | Strength of Character 
-| 5 	| byte | Magic of Character 
-| 6 	| byte | Defense of Character 
-| 7 	| byte | AP of Character 
-| 8 	| short | Ability given when using Sword route (03system.bin --> ITEM sub file) 
-| 10 	| short | Ability given when using Shield route (03system.bin --> ITEM sub file) 
-| 12 	| short | Ability given when using Staff route (03system.bin --> ITEM sub file) 
-| 14 	| short | Padding 
+| Offset | Type | Description |
+|--------|------|-------------|
+| 00 	 | int  | Needed EXP 
+| 04 	 | byte | Strength of Character 
+| 05 	 | byte | Magic of Character 
+| 06 	 | byte | Defense of Character 
+| 07 	 | byte | AP of Character 
+| 08 	 | short | Ability given when using Sword route (03system.bin --> ITEM sub file) 
+| 0A 	 | short | Ability given when using Shield route (03system.bin --> ITEM sub file) 
+| 0C 	 | short | Ability given when using Staff route (03system.bin --> ITEM sub file) 
+| 0E 	 | short | Padding 
 
 ## Lvpm
 
@@ -91,3 +89,49 @@ Contains enemy statistics
 | F6 | Xaldin Data
 | FC | Xigbar Data
 | FD | Saix Data
+
+## Fmlv
+
+Contains the level-up table for summons and drive forms.
+
+### Header
+
+| Offset | Type  | Description 
+|--------|-------|-------------
+| 00     | int   | File type; always 2
+| 04     | int   | Entries count
+| 08     | Entry[Count] | Entries
+
+### Entry
+
+| Offset | Type  | Description 
+|--------|-------|-------------
+| 00     | byte  | First digit is the Form id, second digit is the Form level (e.g. 0x13 is Valor Form Level 3)
+| 01     | byte  | Level of the movement ability (High Jump, Quick Run etc.)
+| 02     | short | Ability obtained through level up
+| 04     | int   | EXP needed for level up
+
+### Forms
+
+Standard (JP/US/EU)
+
+| ID | Form
+|----|-----
+| 00 | Summon
+| 01 | Valor
+| 02 | Wisdom
+| 03 | Master
+| 04 | Final
+| 05 | Anti
+
+Final Mix (JP/PS3/PS4)
+
+| ID | Form
+|----|-----
+| 00 | Summon
+| 01 | Valor
+| 02 | Wisdom
+| 03 | Limit
+| 04 | Master
+| 05 | Final
+| 06 | Anti
