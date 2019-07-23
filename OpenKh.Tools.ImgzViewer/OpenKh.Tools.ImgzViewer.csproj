@@ -7,7 +7,6 @@
     <Product>IMGZ editor - Kingdom Hearts II</Product>
     <Description>https://github.com/Xeeynamo/KingdomHearts</Description>
     <Copyright>Copyright ©  2018</Copyright>
-    <OutputPath>..\bin\$(Configuration)\</OutputPath>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
   <ItemGroup>
