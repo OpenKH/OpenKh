@@ -13,7 +13,7 @@ namespace OpenKh.Kh2
         private const int HeaderSize = 0x10;
         private const int EntrySize = 0x10;
 
-        private static Dictionary<EntryType, int> _alignmentsByType = new Dictionary<EntryType, int>
+        private static Dictionary<EntryType, int> _alignments = new Dictionary<EntryType, int>
         {
             [EntryType.Vif] = 0x10,
             [EntryType.Tim2] = 0x80,
@@ -105,8 +105,8 @@ namespace OpenKh.Kh2
                 throw new InvalidDataException("Invalid header");
 
             int filesCount = reader.ReadInt32();
-            reader.ReadInt32(); // padding
-            reader.ReadInt32(); // padding
+            reader.ReadInt32(); // always zero
+            reader.ReadInt32(); // unknown
 
             return Enumerable.Range(0, filesCount)
                 .Select(x => new
@@ -219,7 +219,7 @@ namespace OpenKh.Kh2
 
         private static int Align(int offset, Entry entry)
         {
-            if (!_alignmentsByType.TryGetValue(entry.Type, out var alignment))
+            if (!_alignments.TryGetValue(entry.Type, out var alignment))
             {
                 var stream = entry.Stream;
                 var magicCode = stream.Length >= 4 ?
