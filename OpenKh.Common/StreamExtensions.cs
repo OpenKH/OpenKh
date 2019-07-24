@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,6 +31,12 @@ namespace OpenKh.Common
                 .Select(x => BinaryMapping.ReadObject<T>(stream, (int)stream.Position))
                 .ToList();
         }
+
+        public static int ReadInt32(this Stream stream) =>
+            new BinaryReader(stream).ReadInt32();
+
+        public static uint ReadUInt32(this Stream stream) =>
+            new BinaryReader(stream).ReadUInt32();
 
         public static List<int> ReadInt32List(this Stream stream, int offset, int count)
         {

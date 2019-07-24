@@ -18,7 +18,8 @@ All the values are Little Endian in the PS2/PS4 Versions, while they are Big End
 |--------|---------------|-------------|
 | 0 | int32_t | The identifier of the file (Should be always 0x01524142) |
 | 4 | int32_t | The sub-file count of the BAR File. |
-| 8 | int64_t | File padding, has no effect. (Always 0x00)
+| 8 | int32_t | Always zero. Has no known effects.
+| 8 | int32_t | Unknown. Often 0. Some mset files set it to 1 or 2.
 
 ### BAR Entry
 
