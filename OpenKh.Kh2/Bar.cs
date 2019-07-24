@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,23 +17,31 @@ namespace OpenKh.Kh2
         {
             [EntryType.Vif] = 0x10,
             [EntryType.Tim2] = 0x80,
+            [EntryType.AnimationData] = 0x10,
             [EntryType.Texture] = 0x40,
             [EntryType.CameraCollision] = 0x10,
             [EntryType.MapCollision] = 0x10,
             [EntryType.LightData] = 0x10,
             [EntryType.Bar] = 0x10,
             [EntryType.Pax] = 0x10,
+            [EntryType.MapCollision2] = 0x10,
             [EntryType.AnimationLimit] = 0x10,
             [EntryType.Imgd] = 0x10,
             [EntryType.Seqd] = 0x10,
             [EntryType.Layout] = 0x10,
+            [EntryType.Imgz] = 0x10,
             [EntryType.AnimationMap] = 0x10,
             [EntryType.Seb] = 0x40,
             [EntryType.Wd] = 0x40,
             [EntryType.IopVoice] = 0x40,
+            [EntryType.RawBitmap] = 0x80,
+            [EntryType.MemoryCard] = 0x40,
             [EntryType.WrappedCollisionData] = 0x10,
+            [EntryType.Unknown] = 0x10,
             [EntryType.Minigame] = 0x10,
+            [EntryType.Progress] = 0x10,
             [EntryType.BarUnknown] = 0x10,
+            [EntryType.Vag] = 0x10,
         };
 
         public enum EntryType
@@ -44,6 +52,7 @@ namespace OpenKh.Kh2
 			Vif = 4,
             MapCollision = 6,
 			Tim2 = 7,
+			AnimationData = 9,
 			Texture = 10,
             CameraCollision = 11,
             SpawnPoint = 12,
@@ -51,6 +60,7 @@ namespace OpenKh.Kh2
             LightData = 15,
 			Bar = 17,
 			Pax = 18,
+            MapCollision2 = 19,
             AnimationLimit = 20,
             AnimationLoader = 22,
 			Imgd = 24,
@@ -62,8 +72,11 @@ namespace OpenKh.Kh2
 			Wd = 32,
 			IopVoice = 34,
             RawBitmap = 36,
+            MemoryCard = 37,
             WrappedCollisionData = 38,
+            Unknown = 39,
             Minigame = 42,
+            Progress = 44,
             BarUnknown = 46,
             Vibration = 47,
 			Vag = 48,
