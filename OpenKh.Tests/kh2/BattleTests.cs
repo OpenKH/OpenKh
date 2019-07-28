@@ -34,5 +34,27 @@ namespace OpenKh.Tests.kh2
                 Assert.Equal(0x4C, table.Levels.FirstOrDefault(x => x.FormId == 2 && x.FormLevel == 4).Exp);
             });
         }
+
+        public class BonsTests
+        {
+            [Fact]
+            public void CheckHeaderSize() => Common.FileOpenRead(@"kh2/res/bons_fm.bin", stream =>
+            {
+                var table = new Bons(stream);
+
+                Assert.Equal(0xB3, table.BonusLevels.Count);
+            });
+        }
+
+        public class PrztTests
+        {
+            [Fact]
+            public void CheckHeaderSize() => Common.FileOpenRead(@"E:\HAX\KH Hacking\00battle\przt_fm.bin", stream =>
+            {
+                var table = new Przt(stream);
+
+                Assert.Equal(0xB8, table.Drops.Count);
+            });
+        }
     }
 }
