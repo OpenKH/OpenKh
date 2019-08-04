@@ -89,5 +89,16 @@ namespace OpenKh.Tests.kh2
                 Assert.Equal(0xB8, table.Drops.Count);
             });
         }
+
+        public class VtblTests
+        {
+            [Fact]
+            public void CheckHeaderSize() => Common.FileOpenRead(@"E:\HAX\KH Hacking\00battle\vtbl_fm.bin", stream =>
+            {
+                var table = new Vtbl(stream);
+                var characters = table.RandomizationTables.GroupBy(x => x.CharacterId).ToList();
+                Assert.Equal(0xF1, table.RandomizationTables.Count);
+            });
+        }
     }
 }
