@@ -92,7 +92,10 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 textContext = value;
                 OnPropertyChanged();
 
-                CurrentMessageEncoder = textContext.Encoder;
+                if (CurrentMessageEncoder != textContext.Encoder)
+                {
+                    CurrentMessageEncoder = textContext.Encoder;
+                }
             }
         }
 
@@ -102,8 +105,9 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             private set
             {
                 _currentMessageEncoder = value;
+                _messages?.InvalidateText();
+                OnPropertyChanged(nameof(SelectedItem));
                 OnPropertyChanged();
-                ResetMessagesView();
             }
         }
 
