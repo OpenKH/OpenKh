@@ -43,29 +43,31 @@
                           Command="{Binding SaveFontInfoCommand}"/>
                 <MenuItem Header="Edit font info..." Visibility="Collapsed"
                           Command="{Binding EditFontInfoCommand}"/>
-            </MenuItem>
-            <MenuItem Header="_Encoding">
-                <RadioButton
-                    Content="System font"
-                    IsChecked="{Binding Path=FontType, Mode=TwoWay, 
-                        Converter={StaticResource enumConverter},
-                        ConverterParameter=System}"/>
-                <RadioButton
-                    Content="Event font"
-                    IsChecked="{Binding Path=FontType, Mode=TwoWay, 
-                        Converter={StaticResource enumConverter},
-                        ConverterParameter=Event}"/>
                 <Separator/>
-                <RadioButton
-                    Content="US/EU encoder"
-                    IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
-                        Converter={StaticResource enumConverter},
-                        ConverterParameter=European}"/>
-                <RadioButton
-                    Content="JP encoder"
-                    IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
-                        Converter={StaticResource enumConverter},
-                        ConverterParameter=Japanese}"/>
+                <MenuItem Header="Font type">
+                    <RadioButton
+                        Content="System font"
+                        IsChecked="{Binding Path=FontType, Mode=TwoWay, 
+                            Converter={StaticResource enumConverter},
+                            ConverterParameter=System}"/>
+                    <RadioButton
+                        Content="Event font"
+                        IsChecked="{Binding Path=FontType, Mode=TwoWay, 
+                            Converter={StaticResource enumConverter},
+                            ConverterParameter=Event}"/>
+                </MenuItem>
+                <MenuItem Header="Encoding">
+                    <RadioButton
+                        Content="US/EU encoder"
+                        IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
+                            Converter={StaticResource enumConverter},
+                            ConverterParameter=European}"/>
+                    <RadioButton
+                        Content="JP encoder"
+                        IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
+                            Converter={StaticResource enumConverter},
+                            ConverterParameter=Japanese}"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_Guide"
