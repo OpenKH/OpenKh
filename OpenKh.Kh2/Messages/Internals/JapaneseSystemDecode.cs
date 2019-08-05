@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace OpenKh.Kh2.Messages.Internals
 {
@@ -370,6 +370,10 @@ namespace OpenKh.Kh2.Messages.Internals
             '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?',
             '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?',
             '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?',
+        };
+
+        public static readonly char[] _table8 = new char[0]
+        {
         };
 
         public List<MessageCommandModel> Decode(byte[] data) =>

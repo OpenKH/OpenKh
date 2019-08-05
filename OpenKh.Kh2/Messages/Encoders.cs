@@ -18,10 +18,10 @@ namespace OpenKh.Kh2.Messages
         internal class JapaneseSystemEncoder : IMessageEncoder
         {
             private readonly IMessageDecode _decode = new JapaneseSystemDecode();
-            private readonly IMessageEncode _encode = null;
+            private readonly IMessageEncode _encode = new JapaneseSystemEncode();
 
             public List<MessageCommandModel> Decode(byte[] data) => _decode.Decode(data);
-            public byte[] Encode(List<MessageCommandModel> messageCommands) => throw new NotImplementedException();
+            public byte[] Encode(List<MessageCommandModel> messageCommands) => _encode.Encode(messageCommands);
         }
 
         public static IMessageEncoder InternationalSystem { get; } =
