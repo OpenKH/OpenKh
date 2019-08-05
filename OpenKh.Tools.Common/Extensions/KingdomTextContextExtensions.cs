@@ -14,7 +14,7 @@ namespace OpenKh.Tools.Common.Extensions
                 Icon = fontContext.ImageIcon,
                 FontSpacing = fontContext.SpacingSystem,
                 IconSpacing = fontContext.SpacingIcon,
-                Encode = Encoders.InternationalSystem,
+                Encoder = Encoders.InternationalSystem,
                 FontWidth = Constants.FontEuropeanSystemWidth,
                 FontHeight = Constants.FontEuropeanSystemHeight,
             };
@@ -26,9 +26,33 @@ namespace OpenKh.Tools.Common.Extensions
                 Icon = fontContext.ImageIcon,
                 FontSpacing = fontContext.SpacingEvent,
                 IconSpacing = fontContext.SpacingIcon,
-                Encode = Encoders.InternationalSystem,
+                Encoder = Encoders.InternationalSystem,
                 FontWidth = Constants.FontEuropeanEventWidth,
                 FontHeight = Constants.FontEuropeanEventHeight,
+            };
+
+        public static KingdomTextContext ToKh2JpSystemTextContext(this kh2.FontContext fontContext) =>
+            new KingdomTextContext
+            {
+                Font = fontContext.ImageSystem,
+                Icon = fontContext.ImageIcon,
+                FontSpacing = fontContext.SpacingSystem,
+                IconSpacing = fontContext.SpacingIcon,
+                Encoder = Encoders.JapaneseSystem,
+                FontWidth = Constants.FontJapaneseSystemWidth,
+                FontHeight = Constants.FontJapaneseSystemHeight,
+            };
+
+        public static KingdomTextContext ToKh2JpEventTextContext(this kh2.FontContext fontContext) =>
+            new KingdomTextContext
+            {
+                Font = fontContext.ImageEvent,
+                Icon = fontContext.ImageIcon,
+                FontSpacing = fontContext.SpacingEvent,
+                IconSpacing = fontContext.SpacingIcon,
+                Encoder = Encoders.JapaneseSystem,
+                FontWidth = Constants.FontJapaneseEventWidth,
+                FontHeight = Constants.FontJapaneseEventHeight,
             };
     }
 }

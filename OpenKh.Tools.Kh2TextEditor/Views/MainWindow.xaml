@@ -46,15 +46,26 @@
             </MenuItem>
             <MenuItem Header="_Encoding">
                 <RadioButton
-                    Content="System font type"
+                    Content="System font"
                     IsChecked="{Binding Path=FontType, Mode=TwoWay, 
                         Converter={StaticResource enumConverter},
                         ConverterParameter=System}"/>
                 <RadioButton
-                    Content="Event encoding"
+                    Content="Event font"
                     IsChecked="{Binding Path=FontType, Mode=TwoWay, 
                         Converter={StaticResource enumConverter},
                         ConverterParameter=Event}"/>
+                <Separator/>
+                <RadioButton
+                    Content="US/EU encoder"
+                    IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
+                        Converter={StaticResource enumConverter},
+                        ConverterParameter=European}"/>
+                <RadioButton
+                    Content="JP encoder"
+                    IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
+                        Converter={StaticResource enumConverter},
+                        ConverterParameter=Japanese}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_Guide"

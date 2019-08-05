@@ -277,7 +277,7 @@ namespace OpenKh.Tools.Common.Controls
             _imageIcon = context.Icon;
             _charPerRow = context.Font?.Size.Width / context.FontWidth ?? 1;
             _iconPerRow = context.Icon?.Size.Width / IconWidth ?? 1;
-            _encode = context.Encode;
+            _encode = context.Encoder;
 
             if (_imageFont != null)
                 InitializeSurface(ref _surfaceFont, _imageFont);
