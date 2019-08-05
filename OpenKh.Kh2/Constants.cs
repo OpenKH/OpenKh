@@ -29,6 +29,10 @@
         public const int FontEuropeanSystemHeight = 24;
         public const int FontEuropeanEventWidth = 24;
         public const int FontEuropeanEventHeight = 32;
+        public const int FontJapaneseSystemWidth = 18;
+        public const int FontJapaneseSystemHeight = 18;
+        public const int FontJapaneseEventWidth = 24;
+        public const int FontJapaneseEventHeight = 24;
         public const int FontIconWidth = 24;
         public const int FontIconHeight = 24;
 
