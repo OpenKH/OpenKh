@@ -15,6 +15,8 @@ namespace OpenKh.Imaging
                     return FromIndexed4ToBgra(imageRead.GetData(), imageRead.GetClut());
                 case PixelFormat.Indexed8:
                     return FromIndexed8ToBgra(imageRead.GetData(), imageRead.GetClut());
+                case PixelFormat.Rgba8888:
+                    return imageRead.GetData();
                 default:
                     throw new NotImplementedException($"The PixelFormat {imageRead.PixelFormat} cannot be converted to a Bgra32.");
             }
