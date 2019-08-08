@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Battle;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.Common;
+using OpenKh.Tools.Kh2BattleEditor.Interfaces;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
@@ -18,6 +22,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
         private IEnumerable<Bar.Entry> _battleItems;
+        private EnmpViewModel _enmp;
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
@@ -36,6 +41,12 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public RelayCommand SaveAsCommand { get; }
         public RelayCommand ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
+
+        public EnmpViewModel Enmp
+        {
+            get => _enmp;
+            private set { _enmp = value; OnPropertyChanged();}
+        }
 
         public MainViewModel()
         {
@@ -85,6 +96,8 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
+
+            CreateBattleItems();
         }
 
         public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
@@ -118,19 +131,38 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             });
         }
 
-        private bool Is00battle(IEnumerable<Bar.Entry> entries)
+        private bool Is00battle(List<Bar.Entry> items) => items.Any(x => new[]
         {
-            return true;
+            "atkp",
+            "enmp",
+            "fmlv",
+            "lvpm",
+        }.Contains(x.Name));
+
+        private void CreateBattleItems()
+        {
+            _battleItems = new Bar.Entry[0];
+            Enmp = GetDefaultBattleViewModelInstance<EnmpViewModel>();
         }
 
         private void LoadBattleItems(IEnumerable<Bar.Entry> entries)
         {
             _battleItems = entries;
+            Enmp = GetBattleViewModelInstance<EnmpViewModel>(_battleItems);
         }
 
         private void SaveBattleItems()
         {
-
+            _battleItems = SaveBattleItem(_battleItems, Enmp);
         }
+
+        private IEnumerable<Bar.Entry> SaveBattleItem(IEnumerable<Bar.Entry> entries, IBattleGetChanges battleGetChanges) =>
+            entries.ForEntry(Bar.EntryType.Binary, battleGetChanges.EntryName, 0, entry => entry.Stream = battleGetChanges.CreateStream());
+
+        private T GetBattleViewModelInstance<T>(IEnumerable<Bar.Entry> entries)
+            where T : IBattleGetChanges => (T)Activator.CreateInstance(typeof(T), entries);
+
+        private T GetDefaultBattleViewModelInstance<T>()
+            where T : IBattleGetChanges => Activator.CreateInstance<T>();
     }
 }
