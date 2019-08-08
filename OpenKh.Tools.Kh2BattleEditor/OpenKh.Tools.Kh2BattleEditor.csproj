@@ -8,6 +8,7 @@
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
     <AssemblyTitle>KH2 Battle Editor</AssemblyTitle>
     <Product>KH2 Battle Editor - OpenKh</Product>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
