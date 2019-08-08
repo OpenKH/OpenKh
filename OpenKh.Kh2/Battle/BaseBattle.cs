@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
@@ -6,8 +7,8 @@ namespace OpenKh.Kh2.Battle
     public class BaseBattle<T>
     {
         [Data] public int Id { get; set; }
-        [Data] public int Count { get; set; }
-        [Data] public T[] Items { get; set; }
+        [Data] public int Count { get => Items.TryGetCount(); set => Items = Items.CreateOrResize(value); }
+        [Data] public List<T> Items { get; set; }
 
         static BaseBattle() => BinaryMapping.SetMemberLengthMapping<BaseBattle<T>>(nameof(Items), (o, m) => o.Count);
 
