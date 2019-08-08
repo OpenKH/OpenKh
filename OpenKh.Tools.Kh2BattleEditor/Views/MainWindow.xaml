@@ -29,5 +29,11 @@
                           Command="{Binding AboutCommand}"/>
             </MenuItem>
         </Menu>
+
+        <TabControl Grid.Row="1">
+            <TabItem Header="Enmp">
+                <local:EnmpView DataContext="{Binding Enmp}"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
