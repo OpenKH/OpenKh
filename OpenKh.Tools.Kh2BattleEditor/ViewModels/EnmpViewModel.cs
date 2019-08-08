@@ -8,6 +8,7 @@ using OpenKh.Kh2.Battle;
 using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.Kh2BattleEditor.Extensions;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
+using OpenKh.Tools.Kh2BattleEditor.Services;
 
 namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 {
@@ -22,7 +23,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
                 Enmp = enmp;
             }
 
-            public string Name => $"{Id}";
+            public string Name => $"{Id} {EnemyNameProvider.GetEnemyName(Enmp.Id)}";
 
             public string Id => $"{Enmp.Id:X02}";
 
