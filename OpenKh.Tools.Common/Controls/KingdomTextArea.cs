@@ -215,13 +215,21 @@ namespace OpenKh.Tools.Common.Controls
 
         private void DrawText(DrawContext context, byte[] data)
         {
-            foreach (var ch in data)
+            for (int i = 0; i < data.Length; i++)
             {
+                byte ch = data[i];
                 int spacing;
 
                 if (ch >= 0x20)
                 {
                     int chIndex = ch - 0x20;
+                    if (!context.IgnoreDraw)
+                        DrawChar(context, chIndex);
+                    spacing = _fontSpacing?[chIndex] ?? Context.FontWidth;
+                }
+                else if (ch >= 0x19 && ch <= 0x1f)
+                {
+                    int chIndex = data[++i] + (ch - 0x19) * 0x100 + 0xE0;
                     if (!context.IgnoreDraw)
                         DrawChar(context, chIndex);
                     spacing = _fontSpacing?[chIndex] ?? Context.FontWidth;
