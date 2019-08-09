@@ -1,7 +1,9 @@
 ﻿using OpenKh.Common.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace OpenKh.Kh2.Messages.Internals
 {
@@ -88,6 +90,7 @@ namespace OpenKh.Kh2.Messages.Internals
                 .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table8, JapaneseSystemDecode._table8));
 
 #if DEBUG
+            var stringBuilder = new StringBuilder();
             foreach (var item in pairs
                 .GroupBy(x => x.Key)
                 .Where(x => x.Count() > 1))
@@ -95,11 +98,16 @@ namespace OpenKh.Kh2.Messages.Internals
                 var ch = item.Key;
                 var data1 = item.First().Value;
                 var data2 = item.Skip(1).First().Value;
-                throw new ArgumentException($"Character '{ch}' ({data1.Item1:X02} {data1.Item2:X02}) is duplicate (with {data2.Item1:X02} {data2.Item2:X02}).");
+
+                stringBuilder.AppendLine($"Character '{ch}' ({data1.Item1:X02} {data1.Item2:X02}) is duplicate (with {data2.Item1:X02} {data2.Item2:X02}).");
             }
+
+            Debug.WriteLine(stringBuilder);
 #endif
 
-            return pairs.ToDictionary(x => x.Key, x => x.Value);
+            return pairs
+                .GroupBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.First().Value);
         }
 
         private static IEnumerable<KeyValuePair<char, (byte, byte)>> GenerateCharacterKeyValuePair(
