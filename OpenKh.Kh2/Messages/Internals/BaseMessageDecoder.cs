@@ -30,14 +30,30 @@ namespace OpenKh.Kh2.Messages.Internals
                 if (!_table.TryGetValue(ch, out var cmdModel) || cmdModel == null)
                     throw new NotImplementedException($"Command {ch:X02} not implemented yet");
 
-                if (cmdModel.Command == MessageCommand.PrintText)
-                    AppendChar(cmdModel.Text[0]);
-                else if (cmdModel.Command == MessageCommand.PrintComplex)
-                    AppendText(cmdModel.Text);
-                else if (cmdModel.Command == MessageCommand.Unsupported)
-                    AppendEntry(cmdModel.Command, new byte[] { cmdModel.RawData });
-                else
-                    AppendEntry(cmdModel);
+                switch (cmdModel.Command)
+                {
+                    case MessageCommand.PrintText:
+                        Append(cmdModel.Text[0]);
+                        break;
+                    case MessageCommand.PrintComplex:
+                        AppendComplex(cmdModel.Text);
+                        break;
+                    case MessageCommand.Table2:
+                    case MessageCommand.Table3:
+                    case MessageCommand.Table4:
+                    case MessageCommand.Table5:
+                    case MessageCommand.Table6:
+                    case MessageCommand.Table7:
+                    case MessageCommand.Table8:
+                        Append((cmdModel as TableCmdModel).GetText(Next()));
+                        break;
+                    case MessageCommand.Unsupported:
+                        AppendEntry(cmdModel.Command, new byte[] { cmdModel.RawData });
+                        break;
+                    default:
+                        AppendEntry(cmdModel);
+                        break;
+                }
             }
 
             FlushTextBuilder();
@@ -81,8 +97,9 @@ namespace OpenKh.Kh2.Messages.Internals
             });
         }
 
-        private void AppendChar(char ch) => RequestTextBuilder().Append(ch);
-        private void AppendText(string str)
+        private void Append(char ch) => RequestTextBuilder().Append(ch);
+        private void Append(string str) => RequestTextBuilder().Append(str);
+        private void AppendComplex(string str)
         {
             FlushTextBuilder();
             RequestTextBuilder().Append(str);

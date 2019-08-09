@@ -81,13 +81,13 @@ namespace OpenKh.Kh2.Messages.Internals
         private static Dictionary<char, (byte, byte)> GenerateCharacterDictionary()
         {
             var pairs = GenerateCharacterKeyValuePair(MessageCommand.PrintText)
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table2, JapaneseSystemDecode._table2))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table3, JapaneseSystemDecode._table3))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table4, JapaneseSystemDecode._table4))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table5, JapaneseSystemDecode._table5))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table6, JapaneseSystemDecode._table6))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table7, JapaneseSystemDecode._table7))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table8, JapaneseSystemDecode._table8));
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table2, JapaneseTable._table2))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table3, JapaneseTable._table3))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table4, JapaneseTable._table4))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table5, JapaneseTable._table5))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table6, JapaneseTable._table6))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table7, JapaneseTable._table7))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table8, JapaneseTable._table8));
 
 #if DEBUG
             var stringBuilder = new StringBuilder();

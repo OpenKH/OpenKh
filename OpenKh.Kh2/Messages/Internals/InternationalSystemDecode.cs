@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenKh.Kh2.Messages.Internals
 {
     internal class InternationalSystemDecode : IMessageDecode
     {
+        private static readonly char[] _tableGeneric = Enumerable.Range(0, 0x100).Select(x => '?').ToArray();
+
         public static readonly Dictionary<byte, BaseCmdModel> _table = new Dictionary<byte, BaseCmdModel>
         {
             [0x00] = new SimpleCmdModel(MessageCommand.End),
@@ -31,13 +34,13 @@ namespace OpenKh.Kh2.Messages.Internals
             [0x16] = new SingleDataCmdModel(MessageCommand.Unknown16),
             [0x17] = new DataCmdModel(MessageCommand.DelayAndFade, 2),
             [0x18] = new DataCmdModel(MessageCommand.Unknown18, 2),
-            [0x19] = new SingleDataCmdModel(MessageCommand.Table2),
-            [0x1a] = new SingleDataCmdModel(MessageCommand.Table3),
-            [0x1b] = new SingleDataCmdModel(MessageCommand.Table4),
-            [0x1c] = new SingleDataCmdModel(MessageCommand.Table5),
-            [0x1d] = new SingleDataCmdModel(MessageCommand.Table6),
-            [0x1e] = new SingleDataCmdModel(MessageCommand.Table7),
-            [0x1f] = new SingleDataCmdModel(MessageCommand.Table8),
+            [0x19] = new TableCmdModel(MessageCommand.Table2, _tableGeneric),
+            [0x1a] = new TableCmdModel(MessageCommand.Table3, _tableGeneric),
+            [0x1b] = new TableCmdModel(MessageCommand.Table4, _tableGeneric),
+            [0x1c] = new TableCmdModel(MessageCommand.Table5, _tableGeneric),
+            [0x1d] = new TableCmdModel(MessageCommand.Table6, _tableGeneric),
+            [0x1e] = new TableCmdModel(MessageCommand.Table7, _tableGeneric),
+            [0x1f] = new TableCmdModel(MessageCommand.Table8, _tableGeneric),
             [0x20] = new TextCmdModel('⬛'),
             [0x21] = new TextCmdModel('０'),
             [0x22] = new TextCmdModel('１'),
