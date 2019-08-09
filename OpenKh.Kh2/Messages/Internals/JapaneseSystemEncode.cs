@@ -62,7 +62,7 @@ namespace OpenKh.Kh2.Messages.Internals
         private void AppendEncodedChar(List<byte> list, char ch)
         {
             if (!_tableCharacters.TryGetValue(ch, out var data))
-                throw new ArgumentException($"The character {ch} it is not supported by the specified encoding.");
+                throw new CharacterNotSupportedException(ch);
 
             if (data.Item1 != 0)
                 list.Add(data.Item1);
