@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using OpenKh.Common;
 using Xe.IO;
 
 namespace OpenKh.Bbs
@@ -70,11 +71,33 @@ namespace OpenKh.Bbs
                 else
                     return null;
 
-                return new SubStream(bbsaLoader(archiveIndex), realOffset * 0x800, length * 0x800);
+                var stream = bbsaLoader(archiveIndex);
+                var subStreamOffset = realOffset * 0x800;
+                var subStreamLength = length * 0x800;
+
+                if (length == 0xFFF)
+                {
+                    if (IsPsmf(stream, subStreamOffset))
+                        subStreamLength = GetPsmfLength(stream, subStreamOffset);
+                }
+
+                return new SubStream(stream, subStreamOffset, subStreamLength);
             }
 
             private string FileName => fileName ?? $"@{fileHash:X08}";
             private string FolderName => folderName ?? $"@{folderHash:X08}";
+        }
+
+        private static bool IsPsmf(Stream stream, int offset) =>
+            new BinaryReader(stream.SetPosition(offset)).ReadInt32() == 0x464D5350;
+
+        private static int GetPsmfLength(Stream stream, int offset)
+        {
+            stream.SetPosition(offset + 12);
+            return (stream.ReadByte() << 24) |
+                (stream.ReadByte() << 16) |
+                (stream.ReadByte() << 8) |
+                (stream.ReadByte() << 0);
         }
     }
 }
