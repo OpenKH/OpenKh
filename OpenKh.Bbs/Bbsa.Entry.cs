@@ -14,8 +14,6 @@ namespace OpenKh.Bbs
             private readonly int length;
             private readonly string fileName;
             private readonly string folderName;
-            private readonly uint fileHash;
-            private readonly uint folderHash;
 
             internal Entry(
                 Bbsa bbsa,
@@ -31,10 +29,12 @@ namespace OpenKh.Bbs
                 this.length = length;
                 this.fileName = fileName;
                 this.folderName = folderName;
-                this.fileHash = fileHash;
-                this.folderHash = folderHash;
+                FileHash = fileHash;
+                FolderHash = folderHash;
             }
 
+            public uint FileHash { get; }
+            public uint FolderHash { get; }
             public string Name => $"{FolderName}/{FileName}";
             public bool HasCompleteName => fileName != null && folderName != null;
 
@@ -84,8 +84,8 @@ namespace OpenKh.Bbs
                 return new SubStream(stream, subStreamOffset, subStreamLength);
             }
 
-            private string FileName => fileName ?? $"@{fileHash:X08}";
-            private string FolderName => folderName ?? $"@{folderHash:X08}";
+            private string FileName => fileName ?? $"@{FileHash:X08}";
+            private string FolderName => folderName ?? $"@{FolderHash:X08}";
         }
 
         private static bool IsPsmf(Stream stream, int offset) =>

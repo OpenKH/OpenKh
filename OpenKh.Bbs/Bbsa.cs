@@ -138,11 +138,14 @@ namespace OpenKh.Bbs
 
                     foreach (var lba in partition.Lba)
                     {
+                        if (NameDictionary.TryGetValue(lba.Hash, out var fileName))
+                            fileName += ".ARC";
+
                         yield return new Entry(
                             this,
                             lba.Offset,
                             lba.Size,
-                            null,
+                            fileName,
                             folder,
                             lba.Hash,
                             0);
@@ -151,12 +154,15 @@ namespace OpenKh.Bbs
 
                 foreach (var file in _directoryEntries)
                 {
+                    NameDictionary.TryGetValue(file.FileHash, out var fileName);
+                    NameDictionary.TryGetValue(file.DirectoryHash, out var folderName);
+
                     yield return new Entry(
                         this,
                         file.Offset,
                         file.Size,
-                        null,
-                        null,
+                        fileName,
+                        folderName,
                         file.FileHash,
                         file.DirectoryHash);
                 }
