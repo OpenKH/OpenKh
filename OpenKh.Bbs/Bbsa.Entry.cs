@@ -9,6 +9,7 @@ namespace OpenKh.Bbs
     {
         public class Entry
         {
+            private const int SectorLength = 0x800;
             private readonly Header bbsaHeader;
             private readonly int offset;
             private readonly int length;
@@ -38,42 +39,27 @@ namespace OpenKh.Bbs
             public string Name => $"{FolderName}/{FileName}";
             public bool HasCompleteName => fileName != null && folderName != null;
 
+            public string CalculateNameWithExtension(Func<int, Stream> bbsaLoader)
+            {
+                if (!CalculateArchiveOffset(bbsaHeader, offset, out var archiveIndex, out var physicalSector))
+                    return Name;
+
+                var stream = bbsaLoader(archiveIndex);
+                var extension = CalculateExtension(stream, physicalSector * SectorLength);
+                if (extension == null)
+                    return Name;
+
+                return $"{Name}.{extension}";
+            }
+
             public SubStream OpenStream(Func<int, Stream> bbsaLoader)
             {
-                int archiveIndex;
-                int realOffset;
-
-                if (offset >= bbsaHeader.Archive4SectorIndex)
-                {
-                    archiveIndex = 4;
-                    realOffset = offset - bbsaHeader.Archive4SectorIndex + 1;
-                }
-                else if (offset >= bbsaHeader.Archive3SectorIndex)
-                {
-                    archiveIndex = 3;
-                    realOffset = offset - bbsaHeader.Archive3SectorIndex + 1;
-                }
-                else if (offset >= bbsaHeader.Archive2SectorIndex)
-                {
-                    archiveIndex = 2;
-                    realOffset = offset - bbsaHeader.Archive2SectorIndex + 1;
-                }
-                else if (offset >= bbsaHeader.Archive1SectorIndex)
-                {
-                    archiveIndex = 1;
-                    realOffset = offset - bbsaHeader.Archive1SectorIndex + 1;
-                }
-                else if (offset >= bbsaHeader.Archive0SectorIndex)
-                {
-                    archiveIndex = 0;
-                    realOffset = offset + bbsaHeader.Archive0SectorIndex;
-                }
-                else
+                if (!CalculateArchiveOffset(bbsaHeader, offset, out var archiveIndex, out var physicalSector))
                     return null;
 
                 var stream = bbsaLoader(archiveIndex);
-                var subStreamOffset = realOffset * 0x800;
-                var subStreamLength = length * 0x800;
+                var subStreamOffset = physicalSector * SectorLength;
+                var subStreamLength = length * SectorLength;
 
                 if (length == 0xFFF)
                 {
@@ -98,6 +84,71 @@ namespace OpenKh.Bbs
                 (stream.ReadByte() << 16) |
                 (stream.ReadByte() << 8) |
                 (stream.ReadByte() << 0);
+        }
+
+        private static bool CalculateArchiveOffset(
+            Header header, int offset, out int archiveIndex, out int physicalSector)
+        {
+            if (offset >= header.Archive4SectorIndex)
+            {
+                archiveIndex = 4;
+                physicalSector = offset - header.Archive4SectorIndex + 1;
+            }
+            else if (offset >= header.Archive3SectorIndex)
+            {
+                archiveIndex = 3;
+                physicalSector = offset - header.Archive3SectorIndex + 1;
+            }
+            else if (offset >= header.Archive2SectorIndex)
+            {
+                archiveIndex = 2;
+                physicalSector = offset - header.Archive2SectorIndex + 1;
+            }
+            else if (offset >= header.Archive1SectorIndex)
+            {
+                archiveIndex = 1;
+                physicalSector = offset - header.Archive1SectorIndex + 1;
+            }
+            else if (offset >= header.Archive0SectorIndex)
+            {
+                archiveIndex = 0;
+                physicalSector = offset + header.Archive0SectorIndex;
+            }
+            else
+            {
+                archiveIndex = -1;
+                physicalSector = -1;
+                return false;
+            }
+
+            return true;
+        }
+
+        private static string CalculateExtension(Stream stream, int offset)
+        {
+            stream.Position = offset;
+            var magicCode = new BinaryReader(stream).ReadUInt32();
+            switch (magicCode)
+            {
+                case 0x61754C1B: return "lub";
+                case 0x41264129: return "ice";
+                case 0x44544340: return "ctd";
+                case 0x50444540: return "edp";
+                case 0x00435241: return "arc";
+                case 0x44424D40: return "mbd";
+                case 0x00444145: return "ead";
+                case 0x07504546: return "fep";
+                case 0x00425449: return "itb";
+                case 0x00435449: return "itc";
+                case 0x00455449: return "ite";
+                case 0x004D4150: return "pam";
+                case 0x004F4D50: return "pmo";
+                case 0x42444553: return "scd";
+                case 0x324D4954: return "tm2";
+                case 0x00415854: return "txa";
+                case 0x00617865: return "exa";
+                default: return null;
+            }
         }
     }
 }

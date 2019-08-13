@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
@@ -138,8 +138,7 @@ namespace OpenKh.Bbs
 
                     foreach (var lba in partition.Lba)
                     {
-                        if (NameDictionary.TryGetValue(lba.Hash, out var fileName))
-                            fileName += ".ARC";
+                        NameDictionary.TryGetValue(lba.Hash, out var fileName);
 
                         yield return new Entry(
                             this,

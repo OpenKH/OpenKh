@@ -58,16 +58,17 @@ namespace OpenKh.Command.Bbsa
             var bbsa = Bbs.Bbsa.Read(streams[0]);
             foreach (var file in bbsa.Files)
             {
+                var name = file.CalculateNameWithExtension(i => streams[i]);
                 var bbsaFileStream = file.OpenStream(i => streams[i]);
                 if (bbsaFileStream == null)
                     continue;
 
-                var destinationFileName = Path.Combine(outputDir, file.Name);
+                var destinationFileName = Path.Combine(outputDir, name);
                 var destinationFolder = Path.GetDirectoryName(destinationFileName);
                 if (!Directory.Exists(destinationFolder))
                     Directory.CreateDirectory(destinationFolder);
 
-                Console.WriteLine(file.Name);
+                Console.WriteLine(name);
 
                 using (var outStream = File.Create(destinationFileName))
                     bbsaFileStream.CopyTo(outStream);
