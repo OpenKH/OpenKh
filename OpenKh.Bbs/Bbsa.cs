@@ -22,7 +22,7 @@ namespace OpenKh.Bbs
             "PMF", "ESE", "PTX", ""
         };
 
-        private static Dictionary<int, string> Paths = new Dictionary<int, string>
+        protected static Dictionary<int, string> Paths = new Dictionary<int, string>
         {
             [0x0050414D] = "arc/map",
             [0x4E455645] = "arc/event",
@@ -84,7 +84,7 @@ namespace OpenKh.Bbs
             [Data] public short Unknown02 { get; set; }
             [Data] public short LbaStartOffset { get; set; }
             [Data] public short UnknownOffset { get; set; }
-            public Partition<Lba2>[] Partitions { get; set; }
+            public Partition<ArcLba>[] Partitions { get; set; }
         }
 
         protected class DirectoryEntry
@@ -123,7 +123,7 @@ namespace OpenKh.Bbs
             int header2Offset = _header.PartitionTable2SectorIndex * 0x800;
             stream.Position = header2Offset;
             _header2 = BinaryMapping.ReadObject<Header2>(stream);
-            _header2.Partitions = ReadPartitions<Lba2>(stream, header2Offset + 8, _header2.PartitionCount);
+            _header2.Partitions = ReadPartitions<ArcLba>(stream, header2Offset + 8, _header2.PartitionCount);
             ReadPartitionLba(_header2.Partitions, stream, header2Offset + _header2.LbaStartOffset);
             ReadUnknownStruct(_header2.Partitions, stream, header2Offset + _header2.UnknownOffset);
         }

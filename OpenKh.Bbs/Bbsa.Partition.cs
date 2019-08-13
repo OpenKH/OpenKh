@@ -37,31 +37,31 @@ namespace OpenKh.Bbs
                 BinaryMapping.ReadObject<Lba>(stream);
         }
 
-        protected class Lba2 : ILba
+        protected class ArcLba : ILba
         {
             [Data] public uint Hash { get; set; }
             [Data] public short Offset { get; set; }
             [Data] public byte Count { get; set; }
             [Data] public byte Unknown { get; set; }
-            public UnknownStruct[] UnknownItems { get; set; }
+            public ArcEntry[] UnknownItems { get; set; }
 
             public override string ToString() =>
                 $"{Hash:X08} {Offset:X04} {Count:X02} {Unknown:X02}";
 
-            internal static Lba2 Read(Stream stream) =>
-                BinaryMapping.ReadObject<Lba2>(stream);
+            internal static ArcLba Read(Stream stream) =>
+                BinaryMapping.ReadObject<ArcLba>(stream);
         }
 
-        protected class UnknownStruct
+        protected class ArcEntry
         {
             [Data] public short Unknown00 { get; set; }
-            [Data] public int Unknown04 { get; set; }
+            [Data] public uint Hash { get; set; }
 
             public override string ToString() =>
-                $"{Unknown04:X08} {Unknown00:X04}";
+                $"{Hash:X08} {Unknown00:X04}";
 
-            internal static UnknownStruct Read(Stream stream) =>
-                BinaryMapping.ReadObject<UnknownStruct>(stream);
+            internal static ArcEntry Read(Stream stream) =>
+                BinaryMapping.ReadObject<ArcEntry>(stream);
         }
 
         private static Partition<TLba>[] ReadPartitions<TLba>(Stream stream, int offset, int count)
@@ -88,18 +88,18 @@ namespace OpenKh.Bbs
             }
         }
 
-        private static void ReadPartitionLba(IEnumerable<Partition<Lba2>> partitions, Stream stream, int baseOffset)
+        private static void ReadPartitionLba(IEnumerable<Partition<ArcLba>> partitions, Stream stream, int baseOffset)
         {
             stream.Position = baseOffset;
             foreach (var partition in partitions)
             {
                 stream.Position = baseOffset + partition.Offset * LbaLength;
                 partition.Lba = Enumerable.Range(0, partition.Count)
-                    .Select(x => Lba2.Read(stream)).ToArray();
+                    .Select(x => ArcLba.Read(stream)).ToArray();
             }
         }
 
-        private static void ReadUnknownStruct(IEnumerable<Partition<Lba2>> partitions, Stream stream, int baseOffset)
+        private static void ReadUnknownStruct(IEnumerable<Partition<ArcLba>> partitions, Stream stream, int baseOffset)
         {
             foreach (var partition in partitions)
             {
@@ -107,7 +107,7 @@ namespace OpenKh.Bbs
                 {
                     stream.Position = baseOffset + lba.Offset * 6;
                     lba.UnknownItems = Enumerable.Range(0, lba.Count)
-                        .Select(x => UnknownStruct.Read(stream)).ToArray();
+                        .Select(x => ArcEntry.Read(stream)).ToArray();
                 }
             }
         }

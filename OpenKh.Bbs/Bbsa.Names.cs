@@ -7,7 +7,7 @@ namespace OpenKh.Bbs
 {
     public partial class Bbsa
     {
-        private static Dictionary<uint, string> NameDictionary =
+        protected static Dictionary<uint, string> NameDictionary =
             TryReadLines(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources/bbsa.txt"))
             .ToDictionary(x => GetHash(x), x => x);
 
