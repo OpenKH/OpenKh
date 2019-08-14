@@ -71,7 +71,10 @@ namespace OpenKh.Bbs
             }
 
             private string FileName => fileName ?? $"@{FileHash:X08}";
-            private string FolderName => folderName ?? $"@{FolderHash:X08}";
+            private string FolderName =>
+                folderName ??
+                CalculateFolderName(FolderHash) ??
+                $"@{FolderHash:X08}";
         }
 
         private static bool IsPsmf(Stream stream, int offset) =>
@@ -147,6 +150,47 @@ namespace OpenKh.Bbs
                 case 0x324D4954: return "tm2";
                 case 0x00415854: return "txa";
                 case 0x00617865: return "exa";
+                default: return null;
+            }
+        }
+
+        private static string CalculateFolderName(uint hash)
+        {
+            var category = hash >> 24;
+            var world = (hash >> 16) & 0x1F;
+            var language = (hash >> 21) & 7;
+            var id = hash & 0xFFFF;
+
+            var strWorld = world < Constants.Worlds.Length ?
+                Constants.Worlds[world] : null;
+            var strLanguage = language < Constants.Language.Length ?
+                Constants.Language[language] : null;
+
+            switch (category)
+            {
+                case 0x00: return "arc_";
+                case 0x80: return "sound/bgm";
+                case 0xC0: return "lua";
+                case 0x90: return $"sound/se/common";
+                case 0x91: return $"sound/se/event/{strWorld}";
+                case 0x92: return $"sound/se/footstep/{strWorld}";
+                case 0x93: return "sound/se/enemy";
+                case 0x94: return "sound/se/weapon";
+                case 0x95: return "sound/se/act";
+                case 0xA1: return $"sound/voice/{strLanguage}/event/{strWorld}";
+                case 0xAA: return $"sound/voice/{strLanguage}/battle";
+                case 0xD0: return $"message/{strLanguage}/system";
+                case 0xD1: return $"message/{strLanguage}/map";
+                case 0xD2: return $"message/{strLanguage}/menu";
+                case 0xD3: return $"message/{strLanguage}/event";
+                case 0xD4: return $"message/{strLanguage}/mission";
+                case 0xD5: return $"message/{strLanguage}/npc_talk/{strWorld}";
+                case 0xD6: return $"message/{strLanguage}/network";
+                case 0xD7: return $"message/{strLanguage}/battledice";
+                case 0xD8: return $"message/{strLanguage}/minigame";
+                case 0xD9: return $"message/{strLanguage}/shop";
+                case 0xDA: return $"message/{strLanguage}/playerselect";
+                case 0xDB: return $"message/{strLanguage}/report";
                 default: return null;
             }
         }

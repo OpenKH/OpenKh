@@ -11,5 +11,10 @@
             "bd", "wm", "wp", "19",
             "20", "21", "22", "jf",
         };
+
+        public static readonly string[] Language =
+        {
+            "jp", "en", "fr", "it", "de", "es"
+        };
     }
 }
