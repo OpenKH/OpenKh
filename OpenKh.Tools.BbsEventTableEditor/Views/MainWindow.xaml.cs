@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using OpenKh.Tools.BbsEventTableEditor.ViewModels;
+using System.Windows;
 
 namespace OpenKh.Tools.BbsEventTableEditor.Views
 {
@@ -10,6 +11,7 @@ namespace OpenKh.Tools.BbsEventTableEditor.Views
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainViewModel();
         }
     }
 }
