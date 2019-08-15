@@ -15,12 +15,14 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="5"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5"/>
         </Grid.ColumnDefinitions>
         
         <ListBox
             Grid.Column="0"
             ItemsSource="{Binding Items}"
-            SelectedItem="{Binding SelectedItem}"/>
+            SelectedItem="{Binding SelectedItem}"
+            DisplayMemberPath="Name"/>
 
         <TextBlock
             Grid.Column="2"
@@ -39,7 +41,12 @@
                 <TextBox Text="{Binding EventIndex}"/>
 
                 <TextBlock Text="World" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding World}"/>
+                <ComboBox
+                    ItemsSource="{Binding Worlds}"
+                    SelectedValue="{Binding World}"
+                    SelectedValuePath="Key"
+                    DisplayMemberPath="Value"
+                    />
 
                 <TextBlock Text="Room" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Room}"/>
