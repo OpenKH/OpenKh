@@ -23,6 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Bbs\res\event-table.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="kh2\res\50worldmap.cmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
