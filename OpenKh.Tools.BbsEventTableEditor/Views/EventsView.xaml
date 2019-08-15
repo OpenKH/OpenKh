@@ -35,10 +35,10 @@
             Visibility="{Binding EditVisibility}">
             <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
                 <TextBlock Text="ID" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Id}"/>
+                <TextBox Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Event index" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding EventIndex}"/>
+                <TextBox Text="{Binding EventIndex, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="World" Margin="{StaticResource LabelMargin}"/>
                 <ComboBox
@@ -49,11 +49,17 @@
                     />
 
                 <TextBlock Text="Room" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Room}"/>
+                <TextBox Text="{Binding Room, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown06}"/>
+                <TextBox Text="{Binding Unknown06, UpdateSourceTrigger=PropertyChanged}"/>
             </controls:TwoColumnsPanel>
+
+            <Separator Margin="0 5 0 5"/>
+            <TextBlock Text="Files involved:"/>
+            <TextBlock DataContext="{Binding SelectedItem}" Text="{Binding MapPath}"/>
+            <TextBlock DataContext="{Binding SelectedItem}" Text="{Binding EventPath}"/>
+
         </StackPanel>
     </Grid>
 </UserControl>

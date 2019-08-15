@@ -19,7 +19,7 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
         private string _fileName;
         private EventsViewModel _eventsViewModel;
 
-        public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
+        public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
 
         private string FileName
         {
@@ -55,7 +55,7 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
             {
                 var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new[]
                 {
-                    ("Event table", "event_*"),
+                    ("Event table (EVENT_TE, EVENT_VE, EVENT_AQ)", "*"),
                     ("All files", "*")
                 });
 

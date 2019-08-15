@@ -21,11 +21,11 @@ namespace OpenKh.Bbs
             }
         }
 
-        [Data] public short Id { get; set; }
-        [Data] public short EventIndex { get; set; }
+        [Data] public ushort Id { get; set; }
+        [Data] public ushort EventIndex { get; set; }
         [Data] public byte World { get; set; }
         [Data] public byte Room { get; set; }
-        [Data] public short Unknown06 { get; set; }
+        [Data] public ushort Unknown06 { get; set; }
 
         public static bool IsValid(Stream stream)
         {
