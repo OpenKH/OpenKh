@@ -87,6 +87,12 @@ The purpose of this structure is still unknown. Each name represents an existing
 
 The hash is calculate using a non-modified version of the CRC32 algorithm with `0xEDB88320` as polynomial.
 
+The following subroutines are used to calculate the hash:
+
+| Game      | Subroutine |
+|-----------|-------------|
+| ULJM05600 | sub_8AC7580 |
+
 ## PDG keys
 
 The following keys are used from the game to decrypt, at runtime, the BBSA files:
