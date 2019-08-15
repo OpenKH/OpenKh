@@ -23,7 +23,7 @@ namespace OpenKh.Bbs
                 $"{Name:X08} {Count:X04} {Offset:X04}";
         }
 
-        protected class Lba : ILba
+        protected class PartitionFileEntry : ILba
         {
             [Data] public uint Hash { get; set; }
             [Data] public uint Info { get; set; }
@@ -33,11 +33,11 @@ namespace OpenKh.Bbs
             public override string ToString() =>
                 $"{Hash:X08} {Offset:X06} {Size:X03}";
 
-            internal static Lba Read(Stream stream) =>
-                BinaryMapping.ReadObject<Lba>(stream);
+            internal static PartitionFileEntry Read(Stream stream) =>
+                BinaryMapping.ReadObject<PartitionFileEntry>(stream);
         }
 
-        protected class ArcLba : ILba
+        protected class ArchivePartitionEntry : ILba
         {
             [Data] public uint Hash { get; set; }
             [Data] public short Offset { get; set; }
@@ -48,8 +48,8 @@ namespace OpenKh.Bbs
             public override string ToString() =>
                 $"{Hash:X08} {Offset:X04} {Count:X02} {Unknown:X02}";
 
-            internal static ArcLba Read(Stream stream) =>
-                BinaryMapping.ReadObject<ArcLba>(stream);
+            internal static ArchivePartitionEntry Read(Stream stream) =>
+                BinaryMapping.ReadObject<ArchivePartitionEntry>(stream);
         }
 
         protected class ArcEntry
@@ -77,29 +77,29 @@ namespace OpenKh.Bbs
             where TLba : ILba =>
                 BinaryMapping.ReadObject<Partition<TLba>>(stream);
 
-        private static void ReadPartitionLba(IEnumerable<Partition<Lba>> partitions, Stream stream, int baseOffset)
+        private static void ReadPartitionLba(IEnumerable<Partition<PartitionFileEntry>> partitions, Stream stream, int baseOffset)
         {
             stream.Position = baseOffset;
             foreach (var partition in partitions)
             {
                 stream.Position = baseOffset + partition.Offset * LbaLength;
                 partition.Lba = Enumerable.Range(0, partition.Count)
-                    .Select(x => Lba.Read(stream)).ToArray();
+                    .Select(x => PartitionFileEntry.Read(stream)).ToArray();
             }
         }
 
-        private static void ReadPartitionLba(IEnumerable<Partition<ArcLba>> partitions, Stream stream, int baseOffset)
+        private static void ReadPartitionLba(IEnumerable<Partition<ArchivePartitionEntry>> partitions, Stream stream, int baseOffset)
         {
             stream.Position = baseOffset;
             foreach (var partition in partitions)
             {
                 stream.Position = baseOffset + partition.Offset * LbaLength;
                 partition.Lba = Enumerable.Range(0, partition.Count)
-                    .Select(x => ArcLba.Read(stream)).ToArray();
+                    .Select(x => ArchivePartitionEntry.Read(stream)).ToArray();
             }
         }
 
-        private static void ReadUnknownStruct(IEnumerable<Partition<ArcLba>> partitions, Stream stream, int baseOffset)
+        private static void ReadUnknownStruct(IEnumerable<Partition<ArchivePartitionEntry>> partitions, Stream stream, int baseOffset)
         {
             foreach (var partition in partitions)
             {

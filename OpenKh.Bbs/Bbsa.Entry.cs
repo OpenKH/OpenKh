@@ -92,30 +92,30 @@ namespace OpenKh.Bbs
         private static bool CalculateArchiveOffset(
             Header header, int offset, out int archiveIndex, out int physicalSector)
         {
-            if (offset >= header.Archive4SectorIndex)
+            if (offset >= header.Archive4Sector)
             {
                 archiveIndex = 4;
-                physicalSector = offset - header.Archive4SectorIndex + 1;
+                physicalSector = offset - header.Archive4Sector + 1;
             }
-            else if (offset >= header.Archive3SectorIndex)
+            else if (offset >= header.Archive3Sector)
             {
                 archiveIndex = 3;
-                physicalSector = offset - header.Archive3SectorIndex + 1;
+                physicalSector = offset - header.Archive3Sector + 1;
             }
-            else if (offset >= header.Archive2SectorIndex)
+            else if (offset >= header.Archive2Sector)
             {
                 archiveIndex = 2;
-                physicalSector = offset - header.Archive2SectorIndex + 1;
+                physicalSector = offset - header.Archive2Sector + 1;
             }
-            else if (offset >= header.Archive1SectorIndex)
+            else if (offset >= header.Archive1Sector)
             {
                 archiveIndex = 1;
-                physicalSector = offset - header.Archive1SectorIndex + 1;
+                physicalSector = offset - header.Archive1Sector + 1;
             }
-            else if (offset >= header.Archive0SectorIndex)
+            else if (offset >= header.Archive0Sector)
             {
                 archiveIndex = 0;
-                physicalSector = offset + header.Archive0SectorIndex;
+                physicalSector = offset + header.Archive0Sector;
             }
             else
             {

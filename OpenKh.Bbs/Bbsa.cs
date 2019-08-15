@@ -64,27 +64,27 @@ namespace OpenKh.Bbs
             [Data] public short PartitionCount { get; set; }
             [Data] public short Unk0a { get; set; }
             [Data] public short Unk0c { get; set; }
-            [Data] public short FileDirectoryCount { get; set; }
+            [Data] public short DirectoryCount { get; set; }
             [Data] public int PartitionOffset { get; set; }
-            [Data] public int FileDirectoryOffset { get; set; }
-            [Data] public short PartitionTable2SectorIndex { get; set; }
-            [Data] public short Archive0SectorIndex { get; set; }
+            [Data] public int DirectoryOffset { get; set; }
+            [Data] public short ArchivePartitionSector { get; set; }
+            [Data] public short Archive0Sector { get; set; }
             [Data] public int TotalSectorCount { get; set; }
-            [Data] public int Archive1SectorIndex { get; set; }
-            [Data] public int Archive2SectorIndex { get; set; }
-            [Data] public int Archive3SectorIndex { get; set; }
-            [Data] public int Archive4SectorIndex { get; set; }
-            public Partition<Lba>[] Partitions { get; set; }
+            [Data] public int Archive1Sector { get; set; }
+            [Data] public int Archive2Sector { get; set; }
+            [Data] public int Archive3Sector { get; set; }
+            [Data] public int Archive4Sector { get; set; }
+            public Partition<PartitionFileEntry>[] Partitions { get; set; }
         }
 
-        protected class Header2
+        protected class ArchivePartitionHeader
         {
             [Data] public byte Unknown00 { get; set; }
             [Data] public byte PartitionCount { get; set; }
             [Data] public short Unknown02 { get; set; }
             [Data] public short LbaStartOffset { get; set; }
             [Data] public short UnknownOffset { get; set; }
-            public Partition<ArcLba>[] Partitions { get; set; }
+            public Partition<ArchivePartitionEntry>[] Partitions { get; set; }
         }
 
         protected class DirectoryEntry
@@ -101,18 +101,18 @@ namespace OpenKh.Bbs
 
         private const int LbaLength = 8;
         protected readonly Header _header;
-        protected readonly Header2 _header2;
+        protected readonly ArchivePartitionHeader _header2;
         protected readonly DirectoryEntry[] _directoryEntries;
 
         protected Bbsa(Stream stream)
         {
             _header = BinaryMapping.ReadObject<Header>(stream, (int)stream.Position);
-            _header.Partitions = ReadPartitions<Lba>(stream, 0x30, _header.PartitionCount);
+            _header.Partitions = ReadPartitions<PartitionFileEntry>(stream, 0x30, _header.PartitionCount);
             ReadPartitionLba(_header.Partitions, stream, _header.PartitionOffset);
 
-            stream.Position = _header.FileDirectoryOffset;
+            stream.Position = _header.DirectoryOffset;
             var reader = new BinaryReader(stream);
-            _directoryEntries = Enumerable.Range(0, _header.FileDirectoryCount)
+            _directoryEntries = Enumerable.Range(0, _header.DirectoryCount)
                     .Select(x => new DirectoryEntry
                     {
                         FileHash = reader.ReadUInt32(),
@@ -120,10 +120,10 @@ namespace OpenKh.Bbs
                         DirectoryHash = reader.ReadUInt32()
                     }).ToArray();
 
-            int header2Offset = _header.PartitionTable2SectorIndex * 0x800;
+            int header2Offset = _header.ArchivePartitionSector * 0x800;
             stream.Position = header2Offset;
-            _header2 = BinaryMapping.ReadObject<Header2>(stream);
-            _header2.Partitions = ReadPartitions<ArcLba>(stream, header2Offset + 8, _header2.PartitionCount);
+            _header2 = BinaryMapping.ReadObject<ArchivePartitionHeader>(stream);
+            _header2.Partitions = ReadPartitions<ArchivePartitionEntry>(stream, header2Offset + 8, _header2.PartitionCount);
             ReadPartitionLba(_header2.Partitions, stream, header2Offset + _header2.LbaStartOffset);
             ReadUnknownStruct(_header2.Partitions, stream, header2Offset + _header2.UnknownOffset);
         }
@@ -186,7 +186,7 @@ namespace OpenKh.Bbs
             if (lba == null)
                 return -1;
 
-            return (lba.Offset + _header.Archive0SectorIndex) * 0x800;
+            return (lba.Offset + _header.Archive0Sector) * 0x800;
         }
 
         public static Bbsa Read(Stream stream) => new Bbsa(stream);
