@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe\Xe.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Xe.BinaryMapper" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="resources\bbsa.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

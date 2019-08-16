@@ -3,3 +3,4 @@
 ## General documentation
 
 * [Worlds](worlds.md)
+* [Archive format](bbsa.md)
