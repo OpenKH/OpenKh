@@ -35,6 +35,9 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
         public RelayCommand ExitCommand { get; }
+        public RelayCommand ExportEventsListCommand { get; }
+        public RelayCommand ExportUsedEventsCommand { get; }
+        public RelayCommand ExportUsedMapsCommand { get; }
         public RelayCommand AboutCommand { get; }
 
         public EventsViewModel EventsViewModel
@@ -92,6 +95,54 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
                 Window.Close();
             }, x => true);
 
+            ExportEventsListCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
+                fd.DefaultFileName = CreateExportFilePath("events_list.txt");
+                if (fd.ShowDialog() == true)
+                {
+                    File.CreateText(fd.FileName).Using(stream =>
+                    {
+                        foreach (var item in Events)
+                        {
+                            stream.WriteLine($"ID {item.Id:X03} MAP {Constants.Worlds[item.World]}_{item.Room:D02} EVENT {item.EventIndex:D03}");
+                        }
+                    });
+                }
+            }, x => true);
+
+            ExportUsedEventsCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
+                fd.DefaultFileName = CreateExportFilePath("events_used.txt");
+                if (fd.ShowDialog() == true)
+                {
+                    File.CreateText(fd.FileName).Using(stream =>
+                    {
+                        foreach (var item in Events)
+                        {
+                            stream.WriteLine($"event/{Constants.Worlds[item.World]}/{Constants.Worlds[item.World]}_{item.EventIndex:D03}.exa");
+                        }
+                    });
+                }
+            }, x => true);
+
+            ExportUsedMapsCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
+                fd.DefaultFileName = CreateExportFilePath("maps_used.txt");
+                if (fd.ShowDialog() == true)
+                {
+                    File.CreateText(fd.FileName).Using(stream =>
+                    {
+                        foreach (var item in Events)
+                        {
+                            stream.WriteLine($"arc/map/{Constants.Worlds[item.World]}{item.Room:D02}.arc");
+                        }
+                    });
+                }
+            }, x => true);
+
             AboutCommand = new RelayCommand(x =>
             {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
@@ -104,7 +155,7 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
         {
             if (!Event.IsValid(stream))
             {
-                MessageBox.Show(Window, $"{Path.GetFileName(fileName)} is not a valid BAR file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Window, $"{Path.GetFileName(fileName)} is not a valid event file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
 
@@ -119,6 +170,14 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
             {
                 Event.Write(stream, Events);
             });
+        }
+
+        private string CreateExportFilePath(string newFileName)
+        {
+            var dirName = Path.GetDirectoryName(FileName);
+            var fileName = Path.GetFileNameWithoutExtension(FileName);
+
+            return Path.Combine(dirName, $"{fileName}_{newFileName}");
         }
     }
 }

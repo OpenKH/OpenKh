@@ -24,6 +24,14 @@
                 <MenuItem Header="E_xit"
                           Command="{Binding ExitCommand}"/>
             </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="_Export events list"
+                          Command="{Binding ExportEventsListCommand}"/>
+                <MenuItem Header="_Export event used"
+                          Command="{Binding ExportUsedEventsCommand}"/>
+                <MenuItem Header="_Export maps used"
+                          Command="{Binding ExportUsedMapsCommand}"/>
+            </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About"
                           Command="{Binding AboutCommand}"/>
