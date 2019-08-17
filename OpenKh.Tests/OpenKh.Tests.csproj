@@ -38,6 +38,9 @@
     <None Update="Imaging\res\image-8bit-512-272.tm2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Bbs\res\ctdtest.ctd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="kh2\res\00objentry.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
