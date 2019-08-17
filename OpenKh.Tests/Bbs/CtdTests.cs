@@ -49,5 +49,17 @@ namespace OpenKh.Tests.Bbs
             var ctd = Ctd.Read(stream);
             Assert.Equal(14, ctd.Entries2.Count);
         });
+
+        [Theory]
+        [InlineData(0, "Command Deck")]
+        [InlineData(1, "Action Commands")]
+        [InlineData(12345678, null)]
+        public void ReadStringCorrectly(int id, string expected) => FileOpenRead(FileName, stream =>
+        {
+            var ctd = Ctd.Read(stream);
+            var str = ctd.GetString(id);
+
+            Assert.Equal(expected, str);
+        });
     }
 }

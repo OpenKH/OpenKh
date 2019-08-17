@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Bbs
@@ -25,10 +26,15 @@ namespace OpenKh.Bbs
 
         public class Entry
         {
-            public short Unknown00 { get; set; }
-            public short Unknown02 { get; set; }
-            public int Unknown04 { get; set; }
-            public int Unknown08 { get; set; }
+            [Data] public short Id { get; set; }
+            [Data] public short Unknown02 { get; set; }
+            [Data] public int Offset { get; set; }
+            [Data] public int Entry2Index { get; set; }
+
+            public string Text { get; set; }
+
+            public override string ToString() =>
+                $"{Id:X04} {Unknown02:X04} {Entry2Index:X08}: {Text}";
         }
 
         public class Entry2
@@ -58,6 +64,15 @@ namespace OpenKh.Bbs
         public List<Entry> Entries1 { get; set; }
         public List<Entry2> Entries2 { get; set; }
 
+        public string GetString(int id)
+        {
+            var entry = Entries1.FirstOrDefault(x => x.Id == id);
+            if (entry == null)
+                return null;
+
+            return entry.Text;
+        }
+
         private Ctd(Stream stream)
         {
             _header = BinaryMapping.ReadObject<Header>(stream);
@@ -71,6 +86,28 @@ namespace OpenKh.Bbs
             Entries2 = Enumerable.Range(0, _header.Entry2Count)
                 .Select(x => BinaryMapping.ReadObject<Entry2>(stream))
                 .ToList();
+
+            foreach (var entry in Entries1)
+            {
+                stream.Position = entry.Offset;
+                entry.Text = Encoding.UTF8.GetString(ReadUntilTerminator(stream));
+            }
+        }
+
+        private byte[] ReadUntilTerminator(Stream stream)
+        {
+            var byteList = new List<byte>(100);
+
+            while (stream.Position < stream.Length)
+            {
+                var ch = stream.ReadByte();
+                if (ch <= 0)
+                    break;
+
+                byteList.Add((byte)ch);
+            }
+
+            return byteList.ToArray();
         }
 
         public static Ctd Read(Stream stream) => new Ctd(stream);
