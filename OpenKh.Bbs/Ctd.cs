@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OpenKh.Common;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,10 @@ namespace OpenKh.Bbs
     public class Ctd
     {
         private const int MagicCode = 0x44544340;
+        private const int Version = 1;
+        private const int HeaderLength = 0x20;
+        private const int Entry1Length = 0xC;
+        private const int Entry2Length = 0x20;
 
         private class Header
         {
@@ -64,8 +69,7 @@ namespace OpenKh.Bbs
             [Data] public ushort unk8 { get; set; }
         }
 
-        private readonly Header _header;
-
+        public short Unknown { get; set; }
         public List<Entry> Entries1 { get; set; }
         public List<Entry2> Entries2 { get; set; }
 
@@ -78,17 +82,54 @@ namespace OpenKh.Bbs
             return entry.Text;
         }
 
+        public void Write(Stream stream)
+        {
+            var entry1Offset = HeaderLength;
+            var entry2Offset = Helpers.Align(entry1Offset + Entries1.Count * Entry1Length, 16);
+            var textOffset = entry2Offset + Entries2.Count * Entry2Length;
+
+            BinaryMapping.WriteObject(stream, new Header
+            {
+                MagicCode = MagicCode,
+                Version = Version,
+                Unknown08 = 0,
+                Unknown0a = Unknown,
+                Entry2Count = (short)Entries2.Count,
+                Entry1Count = (short)Entries1.Count,
+                Entry1Offset = entry1Offset,
+                Entry2Offset = entry2Offset,
+                TextOffset = textOffset,
+                Unknown1c = 0,
+            });
+
+            stream.Position = entry1Offset;
+            foreach (var item in Entries1)
+                BinaryMapping.WriteObject(stream, item);
+
+            stream.Position = entry2Offset;
+            foreach (var item in Entries2)
+                BinaryMapping.WriteObject(stream, item);
+
+            stream.Position = textOffset;
+            foreach (var entry in Entries1)
+            {
+                stream.Write(entry.Data, 0, entry.Data.Length);
+                stream.WriteByte(0);
+            }
+        }
+
         private Ctd(Stream stream)
         {
-            _header = BinaryMapping.ReadObject<Header>(stream);
+            var header = BinaryMapping.ReadObject<Header>(stream);
+            Unknown = header.Unknown0a;
 
-            stream.Position = _header.Entry1Offset;
-            Entries1 = Enumerable.Range(0, _header.Entry1Count)
+            stream.Position = header.Entry1Offset;
+            Entries1 = Enumerable.Range(0, header.Entry1Count)
                 .Select(x => BinaryMapping.ReadObject<Entry>(stream))
                 .ToList();
 
-            stream.Position = _header.Entry2Offset;
-            Entries2 = Enumerable.Range(0, _header.Entry2Count)
+            stream.Position = header.Entry2Offset;
+            Entries2 = Enumerable.Range(0, header.Entry2Count)
                 .Select(x => BinaryMapping.ReadObject<Entry2>(stream))
                 .ToList();
 

@@ -1,4 +1,5 @@
 ﻿using OpenKh.Bbs;
+using System.Collections.Generic;
 using System.IO;
 using Xunit;
 
@@ -61,5 +62,17 @@ namespace OpenKh.Tests.Bbs
 
             Assert.Equal(expected, str);
         });
+
+        [Fact]
+        public void WritesBackCorrectly() => FileOpenRead(FileName, stream =>
+            Helpers.AssertStream(stream, x =>
+            {
+                var ctd = Ctd.Read(stream);
+
+                var outStream = new MemoryStream();
+                ctd.Write(outStream);
+
+                return outStream;
+            }));
     }
 }
