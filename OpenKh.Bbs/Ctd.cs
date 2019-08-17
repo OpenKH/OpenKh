@@ -31,7 +31,12 @@ namespace OpenKh.Bbs
             [Data] public int Offset { get; set; }
             [Data] public int Entry2Index { get; set; }
 
-            public string Text { get; set; }
+            public byte[] Data { get; set; }
+            public string Text
+            {
+                get => Encoding.UTF8.GetString(Data);
+                set => Data = Encoding.UTF8.GetBytes(value);
+            }
 
             public override string ToString() =>
                 $"{Id:X04} {Unknown02:X04} {Entry2Index:X08}: {Text}";
@@ -90,7 +95,7 @@ namespace OpenKh.Bbs
             foreach (var entry in Entries1)
             {
                 stream.Position = entry.Offset;
-                entry.Text = Encoding.UTF8.GetString(ReadUntilTerminator(stream));
+                entry.Data = ReadUntilTerminator(stream);
             }
         }
 
