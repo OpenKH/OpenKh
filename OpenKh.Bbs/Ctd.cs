@@ -29,11 +29,18 @@ namespace OpenKh.Bbs
             [Data] public int Unknown1c { get; set; }
         }
 
-        public class Entry
+        private class Entry
         {
             [Data] public short Id { get; set; }
             [Data] public short Unknown02 { get; set; }
             [Data] public int Offset { get; set; }
+            [Data] public int Entry2Index { get; set; }
+        }
+
+        public class FakeEntry
+        {
+            [Data] public short Id { get; set; }
+            [Data] public short Unknown02 { get; set; }
             [Data] public int Entry2Index { get; set; }
 
             public byte[] Data { get; set; }
@@ -70,7 +77,7 @@ namespace OpenKh.Bbs
         }
 
         public short Unknown { get; set; }
-        public List<Entry> Entries1 { get; set; }
+        public List<FakeEntry> Entries1 { get; set; }
         public List<Entry2> Entries2 { get; set; }
 
         public string GetString(int id)
@@ -103,8 +110,23 @@ namespace OpenKh.Bbs
             });
 
             stream.Position = entry1Offset;
+            var textStream = new MemoryStream(4096);
+            var nextTextOffset = textOffset;
             foreach (var item in Entries1)
-                BinaryMapping.WriteObject(stream, item);
+            {
+                textStream.Write(item.Data, 0, item.Data.Length);
+                textStream.WriteByte(0);
+
+                BinaryMapping.WriteObject(stream, new Entry
+                {
+                    Id = item.Id,
+                    Unknown02 = item.Unknown02,
+                    Offset = nextTextOffset,
+                    Entry2Index = item.Entry2Index
+                });
+
+                nextTextOffset += item.Data.Length + 1;
+            }
 
             stream.Position = entry2Offset;
             foreach (var item in Entries2)
@@ -124,7 +146,7 @@ namespace OpenKh.Bbs
             Unknown = header.Unknown0a;
 
             stream.Position = header.Entry1Offset;
-            Entries1 = Enumerable.Range(0, header.Entry1Count)
+            var textEntries = Enumerable.Range(0, header.Entry1Count)
                 .Select(x => BinaryMapping.ReadObject<Entry>(stream))
                 .ToList();
 
@@ -133,11 +155,18 @@ namespace OpenKh.Bbs
                 .Select(x => BinaryMapping.ReadObject<Entry2>(stream))
                 .ToList();
 
-            foreach (var entry in Entries1)
-            {
-                stream.Position = entry.Offset;
-                entry.Data = ReadUntilTerminator(stream);
-            }
+            Entries1 = textEntries
+                .Select(x =>
+                {
+                    stream.SetPosition(x.Offset);
+                    return new FakeEntry
+                    {
+                        Id = x.Id,
+                        Unknown02 = x.Unknown02,
+                        Entry2Index = x.Entry2Index,
+                        Data = ReadUntilTerminator(stream)
+                    };
+                }).ToList();
         }
 
         private byte[] ReadUntilTerminator(Stream stream)
