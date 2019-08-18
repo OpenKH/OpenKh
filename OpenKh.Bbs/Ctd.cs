@@ -185,9 +185,9 @@ namespace OpenKh.Bbs
             return byteList.ToArray();
         }
 
-        public static Ctd Read(Stream stream) => new Ctd(stream);
+        public static Ctd Read(Stream stream) => new Ctd(stream.SetPosition(0));
 
         public static bool IsValid(Stream stream) =>
-            new BinaryReader(stream).ReadInt32() == MagicCode;
+            new BinaryReader(stream.SetPosition(0)).ReadInt32() == MagicCode;
     }
 }
