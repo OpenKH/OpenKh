@@ -140,6 +140,13 @@ namespace OpenKh.Bbs
             }
         }
 
+        public Ctd()
+        {
+            Unknown = 0;
+            Entries1 = new List<FakeEntry>();
+            Entries2 = new List<Entry2>();
+        }
+
         private Ctd(Stream stream)
         {
             var header = BinaryMapping.ReadObject<Header>(stream);

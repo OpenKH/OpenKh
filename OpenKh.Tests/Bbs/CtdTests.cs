@@ -74,5 +74,16 @@ namespace OpenKh.Tests.Bbs
 
                 return outStream;
             }));
+
+        [Fact]
+        public void CreateEmptyCtdWithoutNullValues()
+        {
+            var ctd = new Ctd();
+            Assert.NotNull(ctd.Entries1);
+            Assert.NotNull(ctd.Entries2);
+            Assert.Empty(ctd.Entries1);
+            Assert.Empty(ctd.Entries2);
+            Assert.Equal(0, ctd.Unknown);
+        }
     }
 }
