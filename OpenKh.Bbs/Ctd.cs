@@ -1,4 +1,5 @@
-﻿using OpenKh.Common;
+﻿using OpenKh.Bbs.Messages;
+using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,8 +47,8 @@ namespace OpenKh.Bbs
             public byte[] Data { get; set; }
             public string Text
             {
-                get => Encoding.UTF8.GetString(Data);
-                set => Data = Encoding.UTF8.GetBytes(value);
+                get => CtdEncoders.International.Decode(Data);
+                set => Data = CtdEncoders.International.Encode(value);
             }
 
             public override string ToString() =>
