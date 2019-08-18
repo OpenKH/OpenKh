@@ -11,25 +11,41 @@ namespace OpenKh.Tests.Bbs
         [Theory]
         [InlineData(' ', 0x20)]
         [InlineData('A', 0x41)]
-        public void InternationalEncodingTest(char ch, byte expected, byte? expected2 = null)
+        [InlineData('~', 0x7e)]
+        public void InternationalEncodingSimpleTest(char ch, byte expected)
         {
             var actual = euEnc.Encode($"{ch}");
             Assert.Equal(expected, actual[0]);
-            if (expected2.HasValue)
-                Assert.Equal(expected2, actual[1]);
+        }
+
+        [Theory]
+        [InlineData('Ò', 0x99, 0x8f)]
+        [InlineData('ç', 0x99, 0x9f)]
+        [InlineData('ú', 0x99, 0xaf)]
+        public void InternationalEncodingExtTest(char ch, byte expected, byte expected2)
+        {
+            var actual = euEnc.Encode($"{ch}");
+            Assert.Equal(expected, actual[0]);
+            Assert.Equal(expected2, actual[1]);
         }
 
         [Theory]
         [InlineData(' ', 0x20)]
         [InlineData('A', 0x41)]
-        public void InternationalDecodingTest(char expected, byte ch, byte? ch2 = null)
+        [InlineData('~', 0x7e)]
+        public void InternationalDecodingSimpleTest(char expected, byte ch)
         {
-            string actual;
-            if (ch2.HasValue)
-                actual = euDec.Decode(new byte[] { ch, ch2.Value });
-            else
-                actual = euDec.Decode(new byte[] { ch });
+            string actual = euDec.Decode(new byte[] { ch });
+            Assert.Equal(expected, actual[0]);
+        }
 
+        [Theory]
+        [InlineData('Ò', 0x99, 0x8f)]
+        [InlineData('ç', 0x99, 0x9f)]
+        [InlineData('ú', 0x99, 0xaf)]
+        public void InternationalDecodingExtTest(char expected, byte ch, byte ch2)
+        {
+            string actual = euDec.Decode(new byte[] { ch, ch2 });
             Assert.Equal(expected, actual[0]);
         }
     }

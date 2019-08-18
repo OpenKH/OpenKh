@@ -9,6 +9,8 @@ namespace OpenKh.Bbs.Messages.Internals
     {
         private static readonly string _mapping0 =
             " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[¥]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+        private static readonly string _mapping99 =
+            "ÀÁÂÄÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖŒÙÚÛÜßàáâäæçèéêëìíîïñòóôõöùúûüœ¿¡";
 
         private static readonly Dictionary<char, int> _inverseMapping = _mapping0
             .Select((x, i) => new { Ch = x, Data = i + 0x20 })
@@ -43,8 +45,18 @@ namespace OpenKh.Bbs.Messages.Internals
         {
             var ch = data[index++];
 
+            if (ch >= 0x00 && ch < 0x20)
+                return (char)ch;
+
             if (ch >= 0x20 && ch < 0x80)
                 return _mapping0[ch - 0x20];
+
+            var ch2 = data[index++];
+            switch (ch)
+            {
+                case 0x99:
+                    return _mapping99[ch2 - 0x80];
+            }
 
             throw new Exception($"Data {ch:X02} cannot be decoded.");
         }
