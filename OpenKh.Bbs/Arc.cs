@@ -24,17 +24,35 @@ namespace OpenKh.Bbs
 
         private class MetaEntry
         {
-            [Data] public int Unknown00 { get; set; }
+            [Data] public int DirectoryPointer { get; set; }
             [Data] public int Offset { get; set; }
             [Data] public int Length { get; set; }
-            [Data] public int Unknown0c { get; set; }
+            [Data] public int Unused { get; set; }
             [Data(Count = 16)] public string Name { get; set; }
+
+            public bool IsPointer => DirectoryPointer != 0;
         }
 
         public class Entry
         {
+            public bool IsLink => DirectoryPointer != 0;
+            public int DirectoryPointer { get; set; }
             public string Name { get; set; }
             public byte[] Data { get; set; }
+
+            public string Path
+            {
+                get
+                {
+                    if (DirectoryPointer == 0)
+                        return Name;
+
+                    if (Bbsa.Paths.TryGetValue(DirectoryPointer, out var basePath))
+                        return $"{basePath}/{Name}";
+
+                    return $"{DirectoryPointer:X08}/{Name}";
+                }
+            }
         }
 
         public static IEnumerable<Entry> Read(Stream stream)
@@ -44,18 +62,11 @@ namespace OpenKh.Bbs
             return Enumerable.Range(0, header.EntryCount)
                 .Select(x => BinaryMapping.ReadObject<MetaEntry>(stream))
                 .ToArray()
-                .Select(x =>
+                .Select(x => new Entry
                 {
-                    System.Diagnostics.Debug.Assert(x.Unknown00 == 0,
-                        $"{nameof(x.Unknown00)} was expected to be 0 but was {x.Unknown00:X}");
-                    System.Diagnostics.Debug.Assert(x.Unknown00 == 0,
-                        $"{nameof(x.Unknown0c)} was expected to be 0 but was {x.Unknown0c:X}");
-
-                    return new Entry
-                    {
-                        Name = x.Name,
-                        Data = stream.SetPosition(x.Offset).ReadBytes(x.Length)
-                    };
+                    DirectoryPointer = x.DirectoryPointer,
+                    Name = x.Name,
+                    Data = x.IsPointer ? null : stream.SetPosition(x.Offset).ReadBytes(x.Length)
                 })
                 .ToArray();
         }
@@ -79,17 +90,17 @@ namespace OpenKh.Bbs
             {
                 BinaryMapping.WriteObject(stream, new MetaEntry
                 {
-                    Unknown00 = 0,
-                    Offset = dataStartOffset,
-                    Length = entry.Data.Length,
-                    Unknown0c = 0,
+                    DirectoryPointer = entry.DirectoryPointer,
+                    Offset = entry.IsLink ? 0 : dataStartOffset,
+                    Length = entry.IsLink ? 0 : entry.Data.Length,
+                    Unused = 0,
                     Name = entry.Name
                 });
 
-                dataStartOffset += Helpers.Align(entry.Data.Length, Alignment);
+                dataStartOffset += Helpers.Align(entry.Data?.Length ?? 0, Alignment);
             }
 
-            foreach (var entry in myEntries)
+            foreach (var entry in myEntries.Where(x => !x.IsLink))
             {
                 stream.Write(entry.Data, 0, entry.Data.Length);
                 stream.AlignPosition(Alignment);
@@ -97,6 +108,7 @@ namespace OpenKh.Bbs
         }
 
         public static bool IsValid(Stream stream) =>
+            stream.Length >= 4 &&
             new BinaryReader(stream.SetPosition(0)).ReadInt32() == MagicCode;
     }
 }

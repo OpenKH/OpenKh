@@ -22,7 +22,7 @@ namespace OpenKh.Bbs
             "PMF", "ESE", "PTX", ""
         };
 
-        protected static Dictionary<int, string> Paths = new Dictionary<int, string>
+        public static Dictionary<int, string> Paths = new Dictionary<int, string>
         {
             [0x0050414D] = "arc/map",
             [0x4E455645] = "arc/event",
