@@ -7,6 +7,55 @@
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="600">
     <Grid>
-            
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="88*"/>
+            <ColumnDefinition Width="61*"/>
+            <ColumnDefinition Width="115*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ListBox
+                Grid.Column="0"
+                ItemsSource="{Binding Items}"
+                SelectedItem="{Binding SelectedItem}"
+                DisplayMemberPath="Title"/>
+
+            <Grid Grid.Row="1" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
+                <TextBox Grid.Column="2"
+                    Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </Grid>
+
+        <Grid
+            Grid.Column="1"
+            Grid.ColumnSpan="2"
+            DataContext="{Binding SelectedItem}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBox
+                Grid.Row="0"
+                MaxLines="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBox
+                Grid.Row="1"
+                TextWrapping="Wrap" MaxLines="99"
+                Text="{Binding TextDump, Mode=OneWay}" IsReadOnly="True"/>
+        </Grid>
     </Grid>
 </UserControl>
