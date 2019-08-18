@@ -5,8 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.CtdEditor.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="{Binding Title}" Height="350" Width="600">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open"
+                          Command="{Binding OpenCommand}"/>
+                <MenuItem Header="_Save"
+                          Command="{Binding SaveCommand}"/>
+                <MenuItem Header="Save _as..."
+                          Command="{Binding SaveAsCommand}"/>
+                <Separator/>
+                <MenuItem Header="E_xit"
+                          Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About"
+                          Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <local:CtdView
+            Grid.Row="1"
+            DataContext="{Binding CtdViewModel}"/>
     </Grid>
 </Window>

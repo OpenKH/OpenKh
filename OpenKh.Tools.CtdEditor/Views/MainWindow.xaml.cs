@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using OpenKh.Tools.CtdEditor.ViewModels;
+using System.Windows;
 
 namespace OpenKh.Tools.CtdEditor.Views
 {
@@ -10,6 +11,7 @@ namespace OpenKh.Tools.CtdEditor.Views
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainViewModel();
         }
     }
 }
