@@ -68,37 +68,27 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(25, roxas.Unknown52);
             Assert.Equal(100, roxas.ReflectWeakness);
         }));
-        public class BonsTests
+
+        [Fact]
+        public void BonsTableTest() => Common.FileOpenRead(@"kh2/res/bons_fm.bin", x => x.Using(stream =>
         {
-            [Fact]
-            public void CheckHeaderSize() => Common.FileOpenRead(@"kh2/res/bons_fm.bin", stream =>
-            {
-                var table = new Bons(stream);
+            var table = BaseBattle<Bons>.Read(stream);
+            Assert.Equal(0xB3, table.Count);
+        }));
 
-                Assert.Equal(0xB3, table.BonusLevels.Count);
-            });
-        }
-
-        public class PrztTests
+        [Fact]
+        public void PrztTableTest() => Common.FileOpenRead(@"E:\HAX\KH Hacking\00battle\przt_fm.bin", x => x.Using(stream =>
         {
-            [Fact]
-            public void CheckHeaderSize() => Common.FileOpenRead(@"E:\HAX\KH Hacking\00battle\przt_fm.bin", stream =>
-            {
-                var table = new Przt(stream);
+            var table = BaseBattle<Przt>.Read(stream);
+            Assert.Equal(0xB8, table.Count);
+        }));
 
-                Assert.Equal(0xB8, table.Drops.Count);
-            });
-        }
-
-        public class VtblTests
+        [Fact]
+        public void VtblTableTest() => Common.FileOpenRead(@"E:\HAX\KH Hacking\00battle\vtbl_fm.bin", x => x.Using(stream =>
         {
-            [Fact]
-            public void CheckHeaderSize() => Common.FileOpenRead(@"E:\HAX\KH Hacking\00battle\vtbl_fm.bin", stream =>
-            {
-                var table = new Vtbl(stream);
-                var characters = table.RandomizationTables.GroupBy(x => x.CharacterId).ToList();
-                Assert.Equal(0xF1, table.RandomizationTables.Count);
-            });
-        }
+            var table = BaseBattle<Vtbl>.Read(stream);
+            var characters = table.Items.GroupBy(c => c.CharacterId).ToList();
+            Assert.Equal(0xF1, table.Items.Count);
+        }));
     }
 }
