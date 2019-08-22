@@ -23,6 +23,10 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             .Concat(new[] { ("All files", "*") })
             .ToArray();
 
+        private static string ApplicationName = Utilities.GetApplicationName();
+        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+
+        public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
 
         public ImageViewerViewModel()
         {
@@ -115,8 +119,6 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             LoadImage(stream);
         }
 
-        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
-
         private string _fileName;
         private IImageRead _imageRead;
         private IImageFormat _imageFormat;
@@ -148,6 +150,9 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             {
                 _imageRead = value;
                 Image = _imageRead.GetBimapSource();
+                OnPropertyChanged(nameof(ImageType));
+                OnPropertyChanged(nameof(ImageSize));
+                OnPropertyChanged(nameof(ImageFormat));
             }
         }
 
@@ -161,12 +166,17 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             }
         }
 
+        public string ImageType { get; private set; }
+        public string ImageSize => _imageRead != null ? $"{_imageRead.Size.Width}x{_imageRead.Size.Height}" : "-";
+        public string ImageFormat => _imageRead?.PixelFormat.ToString();
+
         private void LoadImage(Stream stream)
         {
             _imageFormat = _imageFormatService.GetFormatByContent(stream);
             if (_imageFormat == null)
                 throw new Exception("Image format not found for the given stream.");
 
+            ImageType = _imageFormat.Name;
             ImageRead = _imageFormat.Read(stream);
         }
 
