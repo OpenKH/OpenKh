@@ -1,8 +1,7 @@
-﻿using OpenKh.Imaging;
-using System;
+﻿using System;
 using System.IO;
 
-namespace OpenKh.Kh2
+namespace OpenKh.Imaging
 {
     public class Tm2
     {
