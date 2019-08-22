@@ -17,8 +17,9 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
     public class ImageViewerViewModel : BaseNotifyPropertyChanged
     {
         private static readonly IImageFormatService _imageFormatService = new ImageFormatService();
-        private static readonly (string, string)[] _filter = _imageFormatService.Formats
-            .Select(x => ($"{x.Name} image", x.Extension))
+        private static readonly (string, string)[] _filter =
+            new (string, string)[] { ("All supported images", GetAllSupportedExtensions()) }
+            .Concat(_imageFormatService.Formats.Select(x => ($"{x.Name} image", x.Extension)))
             .Concat(new[] { ("All files", "*") })
             .ToArray();
 
@@ -167,6 +168,12 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 throw new Exception("Image format not found for the given stream.");
 
             ImageRead = _imageFormat.Read(stream);
+        }
+
+        private static string GetAllSupportedExtensions()
+        {
+            var extensions = _imageFormatService.Formats.Select(x => $"*.{x.Extension}");
+            return string.Join(";", extensions).Substring(2);
         }
     }
 }
