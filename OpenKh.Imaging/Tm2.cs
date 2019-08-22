@@ -70,80 +70,90 @@ namespace OpenKh.Imaging
 		///     
 		/// http://forum.xentax.com/viewtopic.php?f=16&t=4501&start=75
 		/// </summary>
-		private class GsTex0
+		private class GsTex
 		{
-            [Data] public long data { get; set; }
+            public GsTex()
+            {
+
+            }
+
+            public GsTex(GsTex gsTex)
+            {
+                Data = gsTex.Data;
+            }
+
+            [Data] public long Data { get; set; }
 
 			public int TBP0
 			{
-				get => (int)(data >> 0) & 0x3FFF;
-				set => data = (data & ~(0x3FFF << 0)) + (value & 0x3FFF);
+				get => (int)(Data >> 0) & 0x3FFF;
+				set => Data = (Data & ~(0x3FFF << 0)) + (value & 0x3FFF);
 			}
 
 			public int TBW
 			{
-				get => (int)(data >> 14) & 0x3F;
-				set => data = (data & ~(0x3F << 14)) + (value & 0x3F);
+				get => (int)(Data >> 14) & 0x3F;
+				set => Data = (Data & ~(0x3F << 14)) + (value & 0x3F);
 			}
 
 			public GsPSM PSM
 			{
-				get => (GsPSM)((data >> 20) & 0x3F);
-				set => data = (data & ~(0x3F << 20)) + ((int)value & 0x3F);
+				get => (GsPSM)((Data >> 20) & 0x3F);
+				set => Data = (Data & ~(0x3F << 20)) + ((int)value & 0x3F);
 			}
 
 			public int TW
 			{
-				get => (int)(data >> 26) & 0xF;
-				set => data = (data & ~(0xF << 26)) + (value & 0xF);
+				get => (int)(Data >> 26) & 0xF;
+				set => Data = (Data & ~(0xF << 26)) + (value & 0xF);
 			}
 
 			public int TH
 			{
-				get => (int)(data >> 30) & 0xF;
-				set => data = (data & ~(0xF << 30)) + (value & 0xF);
+				get => (int)(Data >> 30) & 0xF;
+				set => Data = (Data & ~(0xF << 30)) + (value & 0xF);
 			}
 
 			public int TCC
 			{
-				get => (int)(data >> 34) & 1;
-				set => data = (data & ~(1 << 34)) + (value & 1);
+				get => (int)(Data >> 34) & 1;
+				set => Data = (Data & ~(1 << 34)) + (value & 1);
 			}
 
 			public int TFX
 			{
-				get => (int)(data >> 35) & 3;
-				set => data = (data & ~(3 << 35)) + (value & 3);
+				get => (int)(Data >> 35) & 3;
+				set => Data = (Data & ~(3 << 35)) + (value & 3);
 			}
 
 			public int CBP
 			{
-				get => (int)(data >> 37) & 0x3FFF;
-				set => data = (data & ~(0x3FFF << 37)) + (value & 0x3FFF);
+				get => (int)(Data >> 37) & 0x3FFF;
+				set => Data = (Data & ~(0x3FFF << 37)) + (value & 0x3FFF);
 			}
 
 			public GsCPSM CPSM
 			{
-				get => (GsCPSM)((data >> 51) & 0xF);
-				set => data = (data & ~(0xF << 51)) + ((int)value & 0xF);
+				get => (GsCPSM)((Data >> 51) & 0xF);
+				set => Data = (Data & ~(0xF << 51)) + ((int)value & 0xF);
 			}
 
 			public int CSM
 			{
-				get => (int)(data >> 55) & 1;
-				set => data = (data & ~(1 << 55)) + (value & 1);
+				get => (int)(Data >> 55) & 1;
+				set => Data = (Data & ~(1 << 55)) + (value & 1);
 			}
 
 			public int CSA
 			{
-				get => (int)(data >> 56) & 0x1F;
-				set => data = (data & ~(0x1F << 56)) + (value & 0x1F);
+				get => (int)(Data >> 56) & 0x1F;
+				set => Data = (Data & ~(0x1F << 56)) + (value & 0x1F);
 			}
 
 			public int CLD
 			{
-				get => (int)(data >> 61) & 7;
-				set => data = (data & ~(7 << 61)) + (value & 7);
+				get => (int)(Data >> 61) & 7;
+				set => Data = (Data & ~(7 << 61)) + (value & 7);
 			}
 		}
 
@@ -159,58 +169,10 @@ namespace OpenKh.Imaging
 			[Data] public byte ImageFormat { get; set; }
 			[Data] public short Width { get; set; }
 			[Data] public short Height { get; set; }
-			[Data] public GsTex0 GsTex1 { get; set; }
-			[Data] public GsTex0 GsTex2 { get; set; }
+			[Data] public GsTex GsTex0 { get; set; }
+			[Data] public GsTex GsTex1 { get; set; }
 			[Data] public int GsReg { get; set; }
 			[Data] public int GsPal { get; set; }
-
-			public PixelFormat ImagePixelFormat
-			{
-				get
-				{
-					switch (ImageFormat)
-					{
-						case 2: return PixelFormat.Rgb888;
-						case 3: return PixelFormat.Rgba8888;
-						case 4: return PixelFormat.Indexed4;
-						case 5: return PixelFormat.Indexed8;
-						default:
-							throw new ArgumentOutOfRangeException($"imgFormat {ImageFormat} invalid or not supported.");
-					}
-				}
-			}
-
-			public int BitsPerPixel
-			{
-				get
-				{
-					switch (ImageFormat)
-					{
-						case 2: return 24;
-						case 3: return 32;
-						case 4: return 4;
-						case 5: return 8;
-						default:
-							throw new ArgumentOutOfRangeException(nameof(ImageFormat), $"{ImageFormat} invalid or not supported.");
-					}
-				}
-			}
-
-			public PixelFormat ClutPixelFormat
-			{
-				get
-				{
-					switch (ClutFormat)
-					{
-						case 0: return PixelFormat.Undefined;
-						case 1: return PixelFormat.Rgba1555;
-						case 2: return PixelFormat.Rgbx8888;
-						case 3: return PixelFormat.Rgba8888;
-						default:
-							throw new ArgumentOutOfRangeException(nameof(ClutFormat), $"{ClutFormat} invalid or not supported.");
-					}
-				}
-			}
 		};
 
         private class Header
@@ -222,23 +184,34 @@ namespace OpenKh.Imaging
             [Data] public int Unknown0c { get; set; }
         }
 
-		private readonly Picture _picture;
-		private readonly byte[] _imageData;
+        private readonly byte _imageFormat;
+        private readonly byte _clutFormat;
+        private readonly GsTex _gsTex0;
+        private readonly GsTex _gsTex1;
+        private readonly int _gsReg;
+        private readonly int _gsPal;
+        private readonly byte[] _imageData;
 		private readonly byte[] _clutData;
 
-        public Size Size => new Size(_picture.Width, _picture.Height);
+        public Size Size { get; }
 
-        public PixelFormat PixelFormat => _picture.ImagePixelFormat;
+        public PixelFormat PixelFormat => GetPixelFormat(_imageFormat);
 
         private Tm2(Stream stream, Picture picture)
 		{
-            _picture = picture;
+            _imageFormat = picture.ImageFormat;
+            _clutFormat = picture.ClutFormat;
+            _gsTex0 = picture.GsTex0;
+            _gsTex1 = picture.GsTex1;
+            _gsReg = picture.GsReg;
+            _gsPal = picture.GsPal;
+            Size = new Size(picture.Width, picture.Height);
 
-            stream.Position = HeaderLength + _picture.DataOffset;
-			_imageData = stream.ReadBytes(_picture.ImageLength);
-			_clutData = stream.ReadBytes(_picture.ClutLength);
+            stream.Position = HeaderLength + picture.DataOffset;
+			_imageData = stream.ReadBytes(picture.ImageLength);
+			_clutData = stream.ReadBytes(picture.ClutLength);
 
-            InvertRedBlueChannels(_imageData, _picture);
+            InvertRedBlueChannels(_imageData, Size, PixelFormat);
         }
 
         public static bool IsValid(Stream stream) =>
@@ -279,23 +252,41 @@ namespace OpenKh.Imaging
 
             foreach (var image in myImages)
             {
-                BinaryMapping.WriteObject(stream, image._picture);
+                var colorCount = image._clutData.Length > 0 ? image._clutData.Length * 8 / GetBitsPerPixel(image._clutFormat) : 0;
+
+                BinaryMapping.WriteObject(stream, new Picture
+                {
+                    DataLength = 0x30 + image._imageData.Length + image._clutData.Length,
+                    ClutLength = image._clutData.Length,
+                    ImageLength = image._imageData.Length,
+                    DataOffset = 0x30,
+                    ColorCount = (short)colorCount,
+                    ColorUsedCount = (short)(colorCount > 0 ? colorCount : 256),
+                    ClutFormat = image._clutFormat,
+                    ImageFormat = image._imageFormat,
+                    Width = (short)image.Size.Width,
+                    Height = (short)image.Size.Height,
+                    GsTex0 = new GsTex(image._gsTex0),
+                    GsTex1 = new GsTex(image._gsTex1),
+                    GsReg = image._gsReg,
+                    GsPal = image._gsPal,
+                });
             }
 
             foreach (var image in myImages)
             {
-                InvertRedBlueChannels(image._imageData, image._picture);
+                InvertRedBlueChannels(image._imageData, image.Size, image.PixelFormat);
                 stream.Write(image._imageData, 0, image._imageData.Length);
-                InvertRedBlueChannels(image._imageData, image._picture);
+                InvertRedBlueChannels(image._imageData, image.Size, image.PixelFormat);
 
                 stream.Write(image._clutData, 0, image._clutData.Length);
             }
         }
 
-        private static void InvertRedBlueChannels(byte[] data, Picture picture)
+        private static void InvertRedBlueChannels(byte[] data, Size size, PixelFormat pixelFormat)
 		{
-            var length = picture.Width * picture.Height;
-            switch (picture.ImagePixelFormat)
+            var length = size.Width * size.Height;
+            switch (pixelFormat)
 			{
 				case PixelFormat.Rgb888:
 					for (int i = 0; i < length; i++)
@@ -324,5 +315,35 @@ namespace OpenKh.Imaging
 
         public byte[] GetData() => _imageData;
         public byte[] GetClut() => _clutData;
+
+        private static int GetBitsPerPixel(int format)
+        {
+            switch (format)
+            {
+                case 0: return 0;
+                case 1: return 16;
+                case 2: return 24;
+                case 3: return 32;
+                case 4: return 4;
+                case 5: return 8;
+                default:
+                    throw new ArgumentOutOfRangeException($"The format ID {format} is invalid or not supported.");
+            }
+        }
+
+        private static PixelFormat GetPixelFormat(int format)
+        {
+            switch (format)
+            {
+                case 0: return PixelFormat.Undefined;
+                case 1: return PixelFormat.Rgba1555;
+                case 2: return PixelFormat.Rgb888;
+                case 3: return PixelFormat.Rgba8888;
+                case 4: return PixelFormat.Indexed4;
+                case 5: return PixelFormat.Indexed8;
+                default:
+                    throw new ArgumentOutOfRangeException($"The format ID {format} is invalid or not supported.");
+            }
+        }
     }
 }
