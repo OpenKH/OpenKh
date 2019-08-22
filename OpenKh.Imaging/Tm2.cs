@@ -1,7 +1,9 @@
 ﻿using OpenKh.Common;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Imaging
@@ -9,7 +11,8 @@ namespace OpenKh.Imaging
     public class Tm2 : IImageRead
     {
 		private const uint MagicCode = 0x324D4954U;
-        private const int MinimumLength = 16;
+        private const int Version = 4;
+        private const int HeaderLength = 16;
 
         private enum GsPSM
 		{
@@ -144,51 +147,35 @@ namespace OpenKh.Imaging
 			}
 		}
 
-		/// <summary>
-		/// description of image
-		/// 4 byte, total size
-		/// 4 byte, palette size
-		/// 4 byte, image size
-		/// 2 byte, head size
-		/// 2 byte, how palettes there are
-		/// 2 byte, how palettes are used
-		/// 1 byte, palette format
-		/// 1 byte, image format
-		/// 2 byte, width
-		/// 2 byte, height
-		/// GsTex0, for two times
-		/// 4 byte, gsreg
-		/// 4 byte, gspal
-		/// </summary>
 		private class Picture
 		{
-			[Data] public int size { get; set; }
-			[Data] public int palSize { get; set; }
-			[Data] public int imgSize { get; set; }
-			[Data] public short headSize { get; set; }
-			[Data] public short howPal { get; set; }
-			[Data] public short howPalUsed { get; set; }
-			[Data] public byte palFormat { get; set; }
-			[Data] public byte imgFormat { get; set; }
-			[Data] public short width { get; set; }
-			[Data] public short height { get; set; }
-			[Data] public GsTex0 gstex1 { get; set; }
-			[Data] public GsTex0 gstex2 { get; set; }
-			[Data] public int gsreg { get; set; }
-			[Data] public int gspal { get; set; }
+			[Data] public int DataLength { get; set; }
+			[Data] public int ClutLength { get; set; }
+			[Data] public int ImageLength { get; set; }
+			[Data] public short DataOffset { get; set; }
+			[Data] public short ColorCount { get; set; }
+			[Data] public short ColorUsedCount { get; set; }
+			[Data] public byte ClutFormat { get; set; }
+			[Data] public byte ImageFormat { get; set; }
+			[Data] public short Width { get; set; }
+			[Data] public short Height { get; set; }
+			[Data] public GsTex0 GsTex1 { get; set; }
+			[Data] public GsTex0 GsTex2 { get; set; }
+			[Data] public int GsReg { get; set; }
+			[Data] public int GsPal { get; set; }
 
-			public PixelFormat ImageFormat
+			public PixelFormat ImagePixelFormat
 			{
 				get
 				{
-					switch (imgFormat)
+					switch (ImageFormat)
 					{
 						case 2: return PixelFormat.Rgb888;
 						case 3: return PixelFormat.Rgba8888;
 						case 4: return PixelFormat.Indexed4;
 						case 5: return PixelFormat.Indexed8;
 						default:
-							throw new ArgumentOutOfRangeException($"imgFormat {imgFormat} invalid or not supported.");
+							throw new ArgumentOutOfRangeException($"imgFormat {ImageFormat} invalid or not supported.");
 					}
 				}
 			}
@@ -197,30 +184,30 @@ namespace OpenKh.Imaging
 			{
 				get
 				{
-					switch (imgFormat)
+					switch (ImageFormat)
 					{
 						case 2: return 24;
 						case 3: return 32;
 						case 4: return 4;
 						case 5: return 8;
 						default:
-							throw new ArgumentOutOfRangeException(nameof(imgFormat), $"{imgFormat} invalid or not supported.");
+							throw new ArgumentOutOfRangeException(nameof(ImageFormat), $"{ImageFormat} invalid or not supported.");
 					}
 				}
 			}
 
-			public PixelFormat PaletteFormat
+			public PixelFormat ClutPixelFormat
 			{
 				get
 				{
-					switch (palFormat)
+					switch (ClutFormat)
 					{
 						case 0: return PixelFormat.Undefined;
 						case 1: return PixelFormat.Rgba1555;
 						case 2: return PixelFormat.Rgbx8888;
 						case 3: return PixelFormat.Rgba8888;
 						default:
-							throw new ArgumentOutOfRangeException(nameof(palFormat), $"{palFormat} invalid or not supported.");
+							throw new ArgumentOutOfRangeException(nameof(ClutFormat), $"{ClutFormat} invalid or not supported.");
 					}
 				}
 			}
@@ -237,48 +224,52 @@ namespace OpenKh.Imaging
             [Data] public short Unknown0e { get; set; }
         }
 
-		private readonly Picture pic = new Picture();
-		private readonly byte[] imgData;
-		private readonly byte[] palData;
+		private readonly Picture _picture;
+		private readonly byte[] _imageData;
+		private readonly byte[] _clutData;
 
-        public Size Size => new Size(pic.width, pic.height);
+        public Size Size => new Size(_picture.Width, _picture.Height);
 
-        public PixelFormat PixelFormat => pic.ImageFormat;
+        public PixelFormat PixelFormat => _picture.ImagePixelFormat;
 
-        public Tm2(Stream stream)
+        private Tm2(Stream stream, Picture picture)
 		{
-			if (!stream.CanRead || !stream.CanSeek)
-				throw new InvalidDataException($"Read or seek must be supported.");
+            _picture = picture;
 
-            var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
+            stream.Position = HeaderLength + _picture.DataOffset;
+			_imageData = stream.ReadBytes(_picture.ImageLength);
+			_clutData = stream.ReadBytes(_picture.ClutLength);
 
-			var reader = new BinaryReader(stream);
-			if (stream.Length < MinimumLength || header.MagicCode != MagicCode)
-				throw new InvalidDataException("Invalid header");
-
-            pic = BinaryMapping.ReadObject<Picture>(stream);
-
-			var imgPos = (int)stream.Position;
-			var palPos = imgPos = pic.imgSize;
-			imgData = reader.ReadBytes(pic.imgSize);
-			palData = reader.ReadBytes(pic.palSize);
-
-            InvertRedBlueChannels(imgData, pic.ImageFormat);
-
+            InvertRedBlueChannels(_imageData, _picture.ImagePixelFormat);
         }
 
         public static bool IsValid(Stream stream) =>
             stream.SetPosition(0).ReadInt32() == MagicCode &&
-            stream.Length >= MinimumLength;
+            stream.Length >= HeaderLength;
 
-        public static Tm2 Read(Stream stream) => new Tm2(stream.SetPosition(0));
+        public static IEnumerable<Tm2> Read(Stream stream)
+        {
+            if (!stream.CanRead || !stream.CanSeek)
+                throw new InvalidDataException($"Read or seek must be supported.");
 
-		private void InvertRedBlueChannels(byte[] data, PixelFormat format)
+            var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
+
+            if (stream.Length < HeaderLength || header.MagicCode != MagicCode)
+                throw new InvalidDataException("Invalid header");
+
+            return Enumerable.Range(0, header.ImageCount)
+                .Select(x => BinaryMapping.ReadObject<Picture>(stream))
+                .ToArray()
+                .Select(x => new Tm2(stream, x))
+                .ToArray();
+        }
+
+        private void InvertRedBlueChannels(byte[] data, PixelFormat format)
 		{
 			switch (format)
 			{
 				case PixelFormat.Rgb888:
-					for (int i = 0; i < pic.width * pic.height; i++)
+					for (int i = 0; i < _picture.Width * _picture.Height; i++)
 					{
 						byte tmp = data[i * 3 + 0];
 						data[i * 3 + 0] = data[i * 3 + 2];
@@ -286,7 +277,7 @@ namespace OpenKh.Imaging
 					}
 					break;
 				case PixelFormat.Rgba8888:
-					for (int i = 0; i < pic.width * pic.height; i++)
+					for (int i = 0; i < _picture.Width * _picture.Height; i++)
 					{
 						byte tmp = data[i * 4 + 0];
 						data[i * 4 + 0] = data[i * 4 + 2];
@@ -294,7 +285,7 @@ namespace OpenKh.Imaging
 					}
 					break;
 				case PixelFormat.Indexed4:
-					for (int i = 0; i < pic.width * pic.height / 2; i++)
+					for (int i = 0; i < _picture.Width * _picture.Height / 2; i++)
 					{
 						data[i] = (byte)(((data[i] & 0x0F) << 4) | (data[i] >> 4));
 					}
@@ -302,7 +293,7 @@ namespace OpenKh.Imaging
 			}
 		}
 
-        public byte[] GetData() => imgData;
-        public byte[] GetClut() => palData;
+        public byte[] GetData() => _imageData;
+        public byte[] GetClut() => _clutData;
     }
 }
