@@ -1,15 +1,17 @@
-using OpenKh.Common;
+﻿using OpenKh.Common;
 using System;
+using System.Drawing;
 using System.IO;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Imaging
 {
-    public class Tm2
+    public class Tm2 : IImageRead
     {
 		private const uint MagicCode = 0x324D4954U;
         private const int MinimumLength = 16;
 
-		private enum GsPSM
+        private enum GsPSM
 		{
 			GS_PSMCT32 = 0, // 32bit RGBA
 			GS_PSMCT24 = 1,
@@ -65,9 +67,9 @@ namespace OpenKh.Imaging
 		///     
 		/// http://forum.xentax.com/viewtopic.php?f=16&t=4501&start=75
 		/// </summary>
-		private struct GsTex0
+		private class GsTex0
 		{
-			private long data;
+            [Data] public long data { get; set; }
 
 			public int TBP0
 			{
@@ -140,18 +142,7 @@ namespace OpenKh.Imaging
 				get => (int)(data >> 61) & 7;
 				set => data = (data & ~(7 << 61)) + (value & 7);
 			}
-
-			public void Read(BinaryReader reader)
-			{
-				data = reader.ReadInt64();
-			}
-
-			public void Write(BinaryWriter writer)
-			{
-				writer.Write(data);
-			}
 		}
-
 
 		/// <summary>
 		/// description of image
@@ -169,22 +160,22 @@ namespace OpenKh.Imaging
 		/// 4 byte, gsreg
 		/// 4 byte, gspal
 		/// </summary>
-		private struct TM2Pic
+		private class Picture
 		{
-			public int size;
-			public int palSize;
-			public int imgSize;
-			public short headSize;
-			public short howPal;
-			public short howPalUsed;
-			public byte palFormat;
-			public byte imgFormat;
-			public short width;
-			public short height;
-			public GsTex0 gstex1;
-			public GsTex0 gstex2;
-			public int gsreg;
-			public int gspal;
+			[Data] public int size { get; set; }
+			[Data] public int palSize { get; set; }
+			[Data] public int imgSize { get; set; }
+			[Data] public short headSize { get; set; }
+			[Data] public short howPal { get; set; }
+			[Data] public short howPalUsed { get; set; }
+			[Data] public byte palFormat { get; set; }
+			[Data] public byte imgFormat { get; set; }
+			[Data] public short width { get; set; }
+			[Data] public short height { get; set; }
+			[Data] public GsTex0 gstex1 { get; set; }
+			[Data] public GsTex0 gstex2 { get; set; }
+			[Data] public int gsreg { get; set; }
+			[Data] public int gspal { get; set; }
 
 			public PixelFormat ImageFormat
 			{
@@ -233,72 +224,54 @@ namespace OpenKh.Imaging
 					}
 				}
 			}
-
-			public void Read(BinaryReader reader)
-			{
-				size = reader.ReadInt32();
-				palSize = reader.ReadInt32();
-				imgSize = reader.ReadInt32();
-				headSize = reader.ReadInt16();
-				howPal = reader.ReadInt16();
-				howPalUsed = reader.ReadInt16();
-				palFormat = reader.ReadByte();
-				imgFormat = reader.ReadByte();
-				width = reader.ReadInt16();
-				height = reader.ReadInt16();
-				gstex1.Read(reader);
-				gstex2.Read(reader);
-				gsreg = reader.ReadInt32();
-				gspal = reader.ReadInt32();
-			}
-
-			public void Write(BinaryWriter writer)
-			{
-				writer.Write(size);
-				writer.Write(palSize);
-				writer.Write(imgSize);
-				writer.Write(headSize);
-				writer.Write(howPal);
-				writer.Write(howPalUsed);
-				writer.Write(palFormat);
-				writer.Write(imgFormat);
-				writer.Write(width);
-				writer.Write(height);
-				gstex1.Write(writer);
-				gstex2.Write(writer);
-				writer.Write(gsreg);
-				writer.Write(gspal);
-			}
 		};
 
-		private readonly TM2Pic pic = new TM2Pic();
+        private class Header
+        {
+            [Data] public uint MagicCode { get; set; }
+            [Data] public short Version { get; set; }
+            [Data] public short ImageCount { get; set; }
+            [Data] public short Unknown08 { get; set; }
+            [Data] public short Unknown0a { get; set; }
+            [Data] public short Unknown0c { get; set; }
+            [Data] public short Unknown0e { get; set; }
+        }
+
+		private readonly Picture pic = new Picture();
 		private readonly byte[] imgData;
 		private readonly byte[] palData;
 
-		public Tm2(Stream stream)
+        public Size Size => new Size(pic.width, pic.height);
+
+        public PixelFormat PixelFormat => pic.ImageFormat;
+
+        public Tm2(Stream stream)
 		{
 			if (!stream.CanRead || !stream.CanSeek)
 				throw new InvalidDataException($"Read or seek must be supported.");
 
+            var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
+
 			var reader = new BinaryReader(stream);
-			if (stream.Length < MinimumLength || reader.ReadUInt32() != MagicCode)
+			if (stream.Length < MinimumLength || header.MagicCode != MagicCode)
 				throw new InvalidDataException("Invalid header");
 
-			short version = reader.ReadInt16();
-			short imagesCount = reader.ReadInt16();
-			int unk08 = reader.ReadInt16();
-			int unk0c = reader.ReadInt16();
-			pic.Read(reader);
+            pic = BinaryMapping.ReadObject<Picture>(stream);
 
 			var imgPos = (int)stream.Position;
 			var palPos = imgPos = pic.imgSize;
 			imgData = reader.ReadBytes(pic.imgSize);
 			palData = reader.ReadBytes(pic.palSize);
-		}
+
+            InvertRedBlueChannels(imgData, pic.ImageFormat);
+
+        }
 
         public static bool IsValid(Stream stream) =>
             stream.SetPosition(0).ReadInt32() == MagicCode &&
             stream.Length >= MinimumLength;
+
+        public static Tm2 Read(Stream stream) => new Tm2(stream.SetPosition(0));
 
 		private void InvertRedBlueChannels(byte[] data, PixelFormat format)
 		{
@@ -328,5 +301,8 @@ namespace OpenKh.Imaging
 					break;
 			}
 		}
+
+        public byte[] GetData() => imgData;
+        public byte[] GetClut() => palData;
     }
 }
