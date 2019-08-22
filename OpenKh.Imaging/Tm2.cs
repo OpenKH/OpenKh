@@ -1,4 +1,5 @@
-﻿using System;
+using OpenKh.Common;
+using System;
 using System.IO;
 
 namespace OpenKh.Imaging
@@ -6,6 +7,7 @@ namespace OpenKh.Imaging
     public class Tm2
     {
 		private const uint MagicCode = 0x324D4954U;
+        private const int MinimumLength = 16;
 
 		private enum GsPSM
 		{
@@ -279,7 +281,7 @@ namespace OpenKh.Imaging
 				throw new InvalidDataException($"Read or seek must be supported.");
 
 			var reader = new BinaryReader(stream);
-			if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
+			if (stream.Length < MinimumLength || reader.ReadUInt32() != MagicCode)
 				throw new InvalidDataException("Invalid header");
 
 			short version = reader.ReadInt16();
@@ -293,6 +295,10 @@ namespace OpenKh.Imaging
 			imgData = reader.ReadBytes(pic.imgSize);
 			palData = reader.ReadBytes(pic.palSize);
 		}
+
+        public static bool IsValid(Stream stream) =>
+            stream.SetPosition(0).ReadInt32() == MagicCode &&
+            stream.Length >= MinimumLength;
 
 		private void InvertRedBlueChannels(byte[] data, PixelFormat format)
 		{
