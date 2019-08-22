@@ -18,6 +18,8 @@ namespace OpenKh.Tools.ImageViewer.Services
             public GenericImageFormat(
                 string name,
                 string ext,
+                bool isContainer,
+                bool isCreationSupported,
                 Func<Stream, bool> isValid,
                 Func<Stream, IImageRead> read,
                 Action<Stream, IImageRead> write)
@@ -42,10 +44,13 @@ namespace OpenKh.Tools.ImageViewer.Services
         {
             imageFormat = new IImageFormat[]
             {
-                new GenericImageFormat("IMGD", "imd", Imgd.IsValid, Imgd.Read, (stream, image) =>
+                new GenericImageFormat("IMGD", "imd", false, true, Imgd.IsValid, Imgd.Read, (stream, image) =>
                     new Imgd(image.Size, image.PixelFormat, image.GetData(), image.GetClut(), false)),
 
-                new GenericImageFormat("TIM2", "tm2", Tm2.IsValid, s => Tm2.Read(s).First(), (stream, image) =>
+                new GenericImageFormat("IMGZ", "imz", true, true, Imgz.IsValid, s => Imgz.Read(s).First(), (stream, image) =>
+                    throw new NotImplementedException()),
+
+                new GenericImageFormat("TIM2", "tm2", true, false, Tm2.IsValid, s => Tm2.Read(s).First(), (stream, image) =>
                     throw new NotImplementedException()),
             };
         }
