@@ -218,10 +218,8 @@ namespace OpenKh.Imaging
             [Data] public uint MagicCode { get; set; }
             [Data] public short Version { get; set; }
             [Data] public short ImageCount { get; set; }
-            [Data] public short Unknown08 { get; set; }
-            [Data] public short Unknown0a { get; set; }
-            [Data] public short Unknown0c { get; set; }
-            [Data] public short Unknown0e { get; set; }
+            [Data] public int Unknown08 { get; set; }
+            [Data] public int Unknown0c { get; set; }
         }
 
 		private readonly Picture _picture;
@@ -240,7 +238,7 @@ namespace OpenKh.Imaging
 			_imageData = stream.ReadBytes(_picture.ImageLength);
 			_clutData = stream.ReadBytes(_picture.ClutLength);
 
-            InvertRedBlueChannels(_imageData, _picture.ImagePixelFormat);
+            InvertRedBlueChannels(_imageData, _picture);
         }
 
         public static bool IsValid(Stream stream) =>
@@ -264,12 +262,43 @@ namespace OpenKh.Imaging
                 .ToArray();
         }
 
-        private void InvertRedBlueChannels(byte[] data, PixelFormat format)
+        public static void Write(Stream stream, IEnumerable<Tm2> images)
+        {
+            if (!stream.CanWrite || !stream.CanSeek)
+                throw new InvalidDataException($"Write or seek must be supported.");
+
+            var myImages = images.ToArray();
+            BinaryMapping.WriteObject(stream, new Header
+            {
+                MagicCode = MagicCode,
+                Version = Version,
+                ImageCount = (short)myImages.Length,
+                Unknown08 = 0,
+                Unknown0c = 0
+            });
+
+            foreach (var image in myImages)
+            {
+                BinaryMapping.WriteObject(stream, image._picture);
+            }
+
+            foreach (var image in myImages)
+            {
+                InvertRedBlueChannels(image._imageData, image._picture);
+                stream.Write(image._imageData, 0, image._imageData.Length);
+                InvertRedBlueChannels(image._imageData, image._picture);
+
+                stream.Write(image._clutData, 0, image._clutData.Length);
+            }
+        }
+
+        private static void InvertRedBlueChannels(byte[] data, Picture picture)
 		{
-			switch (format)
+            var length = picture.Width * picture.Height;
+            switch (picture.ImagePixelFormat)
 			{
 				case PixelFormat.Rgb888:
-					for (int i = 0; i < _picture.Width * _picture.Height; i++)
+					for (int i = 0; i < length; i++)
 					{
 						byte tmp = data[i * 3 + 0];
 						data[i * 3 + 0] = data[i * 3 + 2];
@@ -277,7 +306,7 @@ namespace OpenKh.Imaging
 					}
 					break;
 				case PixelFormat.Rgba8888:
-					for (int i = 0; i < _picture.Width * _picture.Height; i++)
+					for (int i = 0; i < length; i++)
 					{
 						byte tmp = data[i * 4 + 0];
 						data[i * 4 + 0] = data[i * 4 + 2];
@@ -285,7 +314,7 @@ namespace OpenKh.Imaging
 					}
 					break;
 				case PixelFormat.Indexed4:
-					for (int i = 0; i < _picture.Width * _picture.Height / 2; i++)
+					for (int i = 0; i < length / 2; i++)
 					{
 						data[i] = (byte)(((data[i] & 0x0F) << 4) | (data[i] >> 4));
 					}
