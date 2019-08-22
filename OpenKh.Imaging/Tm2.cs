@@ -173,7 +173,7 @@ namespace OpenKh.Imaging
 			[Data] public int ClutSize { get; set; }
 			[Data] public int ImageSize { get; set; }
 			[Data] public short HeaderSize { get; set; }
-			[Data] public short ClutColors { get; set; }
+			[Data] public short ClutColorCount { get; set; }
             [Data] public byte PictureFormat { get; set; }
             [Data] public byte MipMapCount { get; set; }
 			[Data] public byte ClutType { get; set; }
@@ -205,10 +205,12 @@ namespace OpenKh.Imaging
         private readonly int _gsPal;
         private readonly byte[] _imageData;
 		private readonly byte[] _clutData;
+        private readonly MipMap _mipmap;
+        private bool IsClutSwizzled => (_clutType & 0x80) == 0;
 
         public Size Size { get; }
-
         public PixelFormat PixelFormat => GetPixelFormat(_imageType);
+        public PixelFormat ClutFormat => GetPixelFormat(_clutType & 7);
 
         private Tm2(Stream stream, Picture picture)
 		{
@@ -222,8 +224,16 @@ namespace OpenKh.Imaging
             _gsPal = picture.GsClut;
             Size = new Size(picture.Width, picture.Height);
 
+            if (picture.MipMapCount > 1)
+            {
+                _mipmap = BinaryMapping.ReadObject<MipMap>(stream);
+                throw new NotImplementedException("Mipmaps are not currently supported.");
+            }
+
 			_imageData = stream.ReadBytes(picture.ImageSize);
 			_clutData = stream.ReadBytes(picture.ClutSize);
+            if (IsClutSwizzled)
+                _clutData = SortClut(_clutData, ClutFormat, picture.ClutColorCount);
 
             ImageDataHelpers.InvertRedBlueChannels(_imageData, Size, PixelFormat);
         }
@@ -274,7 +284,7 @@ namespace OpenKh.Imaging
                     ClutSize = image._clutData.Length,
                     ImageSize = image._imageData.Length,
                     HeaderSize = 0x30,
-                    ClutColors = (short)colorCount,
+                    ClutColorCount = (short)colorCount,
                     PictureFormat = image._imageFormat,
                     MipMapCount = image._mipMapCount,
                     ClutType = image._clutType,
@@ -289,7 +299,9 @@ namespace OpenKh.Imaging
 
                 var data = ImageDataHelpers.GetInvertedRedBlueChannels(image._imageData, image.Size, image.PixelFormat);
                 stream.Write(data, 0, image._imageData.Length);
-                stream.Write(image._clutData, 0, image._clutData.Length);
+
+                var clut = image.IsClutSwizzled ? SortClut(image._clutData, image.ClutFormat, colorCount) : image._clutData;
+                stream.Write(clut, 0, image._clutData.Length);
             }
         }
 
@@ -324,6 +336,72 @@ namespace OpenKh.Imaging
                 default:
                     throw new ArgumentOutOfRangeException($"The format ID {format} is invalid or not supported.");
             }
+        }
+
+        private static byte[] SortClut(byte[] clut, PixelFormat format, int colorCount)
+        {
+            if (colorCount != 256)
+                return clut;
+
+            var index = 0;
+            var dst = ToIntArray(clut);
+            switch (format)
+            {
+                case PixelFormat.Rgba1555:
+                    for (int i = 0; i < 8; i++)
+                    {
+                        for (int j = 0; j < 4; j++)
+                        {
+                            int tmp = dst[index + 4 + j];
+                            dst[index + 4 + j] = dst[index + 8 + j];
+                            dst[index + 8 + j] = tmp;
+                        }
+                        index += 16;
+                    }
+                    break;
+                case PixelFormat.Rgba8888:
+                    for (int i = 0; i < 8; i++)
+                    {
+                        for (int j = 0; j < 8; j++)
+                        {
+                            int tmp = dst[index + 8 + j];
+                            dst[index + 8 + j] = dst[index + 16 + j];
+                            dst[index + 16 + j] = tmp;
+                        }
+                        index += 32;
+                    }
+                    break;
+            }
+
+            return ToByteArray(dst);
+        }
+
+        private static int[] ToIntArray(byte[] a)
+        {
+            var b = new int[a.Length / 4];
+            for (var i = 0; i < b.Length; i++)
+            {
+                b[i] = a[i * 4 + 0] |
+                    (a[i * 4 + 1] << 8) |
+                    (a[i * 4 + 2] << 16) |
+                    (a[i * 4 + 3] << 24);
+            }
+
+            return b;
+        }
+
+        private static byte[] ToByteArray(int[] src)
+        {
+            var dst = new byte[src.Length * 4];
+            for (var i = 0; i < src.Length; i++)
+            {
+                dst[i * 4 + 0] = (byte)(src[i] >> 0);
+                dst[i * 4 + 1] = (byte)(src[i] >> 8);
+                dst[i * 4 + 2] = (byte)(src[i] >> 16);
+                dst[i * 4 + 3] = (byte)(src[i] >> 24);
+            }
+
+            return dst;
         }
     }
 }
