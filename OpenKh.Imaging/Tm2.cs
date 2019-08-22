@@ -12,6 +12,7 @@ namespace OpenKh.Imaging
     {
 		private const uint MagicCode = 0x324D4954U;
         private const int Version = 4;
+        private const int Format = 0;
         private const int HeaderLength = 16;
 
         private enum GsPSM
@@ -155,37 +156,49 @@ namespace OpenKh.Imaging
 				get => (int)(Data >> 61) & 7;
 				set => Data = (Data & ~(7 << 61)) + (value & 7);
 			}
-		}
-
-		private class Picture
-		{
-			[Data] public int DataLength { get; set; }
-			[Data] public int ClutLength { get; set; }
-			[Data] public int ImageLength { get; set; }
-			[Data] public short DataOffset { get; set; }
-			[Data] public short ColorCount { get; set; }
-			[Data] public short ColorUsedCount { get; set; }
-			[Data] public byte ClutFormat { get; set; }
-			[Data] public byte ImageFormat { get; set; }
-			[Data] public short Width { get; set; }
-			[Data] public short Height { get; set; }
-			[Data] public GsTex GsTex0 { get; set; }
-			[Data] public GsTex GsTex1 { get; set; }
-			[Data] public int GsReg { get; set; }
-			[Data] public int GsPal { get; set; }
-		};
+        }
 
         private class Header
         {
             [Data] public uint MagicCode { get; set; }
-            [Data] public short Version { get; set; }
+            [Data] public byte Version { get; set; }
+            [Data] public byte Format { get; set; }
             [Data] public short ImageCount { get; set; }
-            [Data] public int Unknown08 { get; set; }
-            [Data] public int Unknown0c { get; set; }
+            [Data] public long Zero { get; set; }
+        }
+
+        private class Picture
+		{
+			[Data] public int TotalSize { get; set; }
+			[Data] public int ClutSize { get; set; }
+			[Data] public int ImageSize { get; set; }
+			[Data] public short HeaderSize { get; set; }
+			[Data] public short ClutColors { get; set; }
+            [Data] public byte PictureFormat { get; set; }
+            [Data] public byte MipMapCount { get; set; }
+			[Data] public byte ClutType { get; set; }
+			[Data] public byte ImageType { get; set; }
+			[Data] public short Width { get; set; }
+			[Data] public short Height { get; set; }
+			[Data] public GsTex GsTex0 { get; set; }
+			[Data] public GsTex GsTex1 { get; set; }
+			[Data] public int GsRegs { get; set; }
+			[Data] public int GsClut { get; set; }
+		};
+
+        private class MipMap
+        {
+            [Data] public int GsMiptbp1_1 { get; set; }
+            [Data] public int GsMiptbp1_2 { get; set; }
+            [Data] public int GsMiptbp2_1 { get; set; }
+            [Data] public int GsMiptbp2_2 { get; set; }
+            [Data(Count = 8)] public int[] Sizes { get; set; }
         }
 
         private readonly byte _imageFormat;
-        private readonly byte _clutFormat;
+        private readonly byte _mipMapCount;
+        private readonly byte _imageType;
+        private readonly byte _clutType;
         private readonly GsTex _gsTex0;
         private readonly GsTex _gsTex1;
         private readonly int _gsReg;
@@ -195,21 +208,22 @@ namespace OpenKh.Imaging
 
         public Size Size { get; }
 
-        public PixelFormat PixelFormat => GetPixelFormat(_imageFormat);
+        public PixelFormat PixelFormat => GetPixelFormat(_imageType);
 
         private Tm2(Stream stream, Picture picture)
 		{
-            _imageFormat = picture.ImageFormat;
-            _clutFormat = picture.ClutFormat;
+            _imageFormat = picture.PictureFormat;
+            _mipMapCount = picture.MipMapCount;
+            _imageType = picture.ImageType;
+            _clutType = picture.ClutType;
             _gsTex0 = picture.GsTex0;
             _gsTex1 = picture.GsTex1;
-            _gsReg = picture.GsReg;
-            _gsPal = picture.GsPal;
+            _gsReg = picture.GsRegs;
+            _gsPal = picture.GsClut;
             Size = new Size(picture.Width, picture.Height);
 
-            stream.Position = HeaderLength + picture.DataOffset;
-			_imageData = stream.ReadBytes(picture.ImageLength);
-			_clutData = stream.ReadBytes(picture.ClutLength);
+			_imageData = stream.ReadBytes(picture.ImageSize);
+			_clutData = stream.ReadBytes(picture.ClutSize);
 
             ImageDataHelpers.InvertRedBlueChannels(_imageData, Size, PixelFormat);
         }
@@ -224,14 +238,14 @@ namespace OpenKh.Imaging
                 throw new InvalidDataException($"Read or seek must be supported.");
 
             var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
+            if (header.Format != 0)
+                stream.Position = 128;
 
             if (stream.Length < HeaderLength || header.MagicCode != MagicCode)
                 throw new InvalidDataException("Invalid header");
 
             return Enumerable.Range(0, header.ImageCount)
-                .Select(x => BinaryMapping.ReadObject<Picture>(stream))
-                .ToArray()
-                .Select(x => new Tm2(stream, x))
+                .Select(x => new Tm2(stream, BinaryMapping.ReadObject<Picture>(stream)))
                 .ToArray();
         }
 
@@ -245,39 +259,36 @@ namespace OpenKh.Imaging
             {
                 MagicCode = MagicCode,
                 Version = Version,
+                Format = Format,
                 ImageCount = (short)myImages.Length,
-                Unknown08 = 0,
-                Unknown0c = 0
+                Zero = 0,
             });
 
             foreach (var image in myImages)
             {
-                var colorCount = image._clutData.Length > 0 ? image._clutData.Length * 8 / GetBitsPerPixel(image._clutFormat) : 0;
+                var colorCount = image._clutData.Length > 0 ? image._clutData.Length * 8 / GetBitsPerPixel(image._clutType) : 0;
 
                 BinaryMapping.WriteObject(stream, new Picture
                 {
-                    DataLength = 0x30 + image._imageData.Length + image._clutData.Length,
-                    ClutLength = image._clutData.Length,
-                    ImageLength = image._imageData.Length,
-                    DataOffset = 0x30,
-                    ColorCount = (short)colorCount,
-                    ColorUsedCount = (short)(colorCount > 0 ? colorCount : 256),
-                    ClutFormat = image._clutFormat,
-                    ImageFormat = image._imageFormat,
+                    TotalSize = 0x30 + image._imageData.Length + image._clutData.Length,
+                    ClutSize = image._clutData.Length,
+                    ImageSize = image._imageData.Length,
+                    HeaderSize = 0x30,
+                    ClutColors = (short)colorCount,
+                    PictureFormat = image._imageFormat,
+                    MipMapCount = image._mipMapCount,
+                    ClutType = image._clutType,
+                    ImageType = image._imageType,
                     Width = (short)image.Size.Width,
                     Height = (short)image.Size.Height,
                     GsTex0 = new GsTex(image._gsTex0),
                     GsTex1 = new GsTex(image._gsTex1),
-                    GsReg = image._gsReg,
-                    GsPal = image._gsPal,
+                    GsRegs = image._gsReg,
+                    GsClut = image._gsPal,
                 });
-            }
 
-            foreach (var image in myImages)
-            {
                 var data = ImageDataHelpers.GetInvertedRedBlueChannels(image._imageData, image.Size, image.PixelFormat);
                 stream.Write(data, 0, image._imageData.Length);
-
                 stream.Write(image._clutData, 0, image._clutData.Length);
             }
         }
