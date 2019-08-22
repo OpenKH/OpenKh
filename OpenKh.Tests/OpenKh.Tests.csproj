@@ -35,9 +35,6 @@
     <None Update="Imaging\res\image-8bit-512-272.tm2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Imaging\res\image-8bit-512-512.tm2">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="kh2\res\50worldmap.cmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

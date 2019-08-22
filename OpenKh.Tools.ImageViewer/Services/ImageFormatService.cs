@@ -44,6 +44,9 @@ namespace OpenKh.Tools.ImageViewer.Services
             {
                 new GenericImageFormat("IMGD", "imgd", Imgd.IsValid, Imgd.Read, (stream, image) =>
                     new Imgd(image.Size, image.PixelFormat, image.GetData(), image.GetClut(), false)),
+
+                new GenericImageFormat("TIM2", "tm2", Tm2.IsValid, s => Tm2.Read(s).First(), (stream, image) =>
+                    throw new NotImplementedException()),
             };
         }
 

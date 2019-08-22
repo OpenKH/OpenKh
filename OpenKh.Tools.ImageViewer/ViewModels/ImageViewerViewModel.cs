@@ -2,6 +2,7 @@
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ImageViewer.Services;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,13 +16,18 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 {
     public class ImageViewerViewModel : BaseNotifyPropertyChanged
     {
+        private static readonly IImageFormatService _imageFormatService = new ImageFormatService();
+        private static readonly (string, string)[] _filter = _imageFormatService.Formats
+            .Select(x => ($"{x.Name} image", x.Extension))
+            .Concat(new[] { ("All files", "*") })
+            .ToArray();
+
+
         public ImageViewerViewModel()
         {
-            _imageFormatService = new ImageFormatService();
-
             OpenCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, ("IMGD texture", "imd"));
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, _filter);
                 if (fd.ShowDialog() == true)
                 {
                     using (var stream = File.OpenRead(fd.FileName))
@@ -49,7 +55,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
             SaveAsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, ("IMGD texture", "imd"));
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, _filter);
                 fd.DefaultFileName = FileName;
 
                 if (fd.ShowDialog() == true)
@@ -110,7 +116,6 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
 
-        private readonly IImageFormatService _imageFormatService;
         private string _fileName;
         private IImageRead _imageRead;
         private IImageFormat _imageFormat;
