@@ -211,7 +211,7 @@ namespace OpenKh.Imaging
 			_imageData = stream.ReadBytes(picture.ImageLength);
 			_clutData = stream.ReadBytes(picture.ClutLength);
 
-            InvertRedBlueChannels(_imageData, Size, PixelFormat);
+            ImageDataHelpers.InvertRedBlueChannels(_imageData, Size, PixelFormat);
         }
 
         public static bool IsValid(Stream stream) =>
@@ -275,43 +275,12 @@ namespace OpenKh.Imaging
 
             foreach (var image in myImages)
             {
-                InvertRedBlueChannels(image._imageData, image.Size, image.PixelFormat);
-                stream.Write(image._imageData, 0, image._imageData.Length);
-                InvertRedBlueChannels(image._imageData, image.Size, image.PixelFormat);
+                var data = ImageDataHelpers.GetInvertedRedBlueChannels(image._imageData, image.Size, image.PixelFormat);
+                stream.Write(data, 0, image._imageData.Length);
 
                 stream.Write(image._clutData, 0, image._clutData.Length);
             }
         }
-
-        private static void InvertRedBlueChannels(byte[] data, Size size, PixelFormat pixelFormat)
-		{
-            var length = size.Width * size.Height;
-            switch (pixelFormat)
-			{
-				case PixelFormat.Rgb888:
-					for (int i = 0; i < length; i++)
-					{
-						byte tmp = data[i * 3 + 0];
-						data[i * 3 + 0] = data[i * 3 + 2];
-						data[i * 3 + 2] = tmp;
-					}
-					break;
-				case PixelFormat.Rgba8888:
-					for (int i = 0; i < length; i++)
-					{
-						byte tmp = data[i * 4 + 0];
-						data[i * 4 + 0] = data[i * 4 + 2];
-						data[i * 4 + 2] = tmp;
-					}
-					break;
-				case PixelFormat.Indexed4:
-					for (int i = 0; i < length / 2; i++)
-					{
-						data[i] = (byte)(((data[i] & 0x0F) << 4) | (data[i] >> 4));
-					}
-					break;
-			}
-		}
 
         public byte[] GetData() => _imageData;
         public byte[] GetClut() => _clutData;
