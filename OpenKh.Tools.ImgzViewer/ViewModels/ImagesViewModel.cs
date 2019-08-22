@@ -20,7 +20,7 @@ namespace OpenKh.Tools.ImgzViewer.ViewModels
 		{ }
 
 		public ImagesViewModel(Stream stream) :
-			this(Imgz.Open(stream))
+			this(Imgz.Read(stream))
 		{
 			OpenCommand = new RelayCommand(x => { }, x => false);
 			SaveCommand = new RelayCommand(x =>
@@ -47,7 +47,7 @@ namespace OpenKh.Tools.ImgzViewer.ViewModels
 					{
 						FileName = fd.FileName;
 						Items.Clear();
-						foreach (var item in Imgz.Open(stream))
+						foreach (var item in Imgz.Read(stream))
 						{
 							Items.Add(new ImageModel(item));
 						}

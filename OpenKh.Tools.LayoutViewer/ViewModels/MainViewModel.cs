@@ -193,7 +193,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 var layoutName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout);
                 var imagesName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Imgz);
                 var layout = layoutName != null ? Layout.Read(layoutName.Stream) : null;
-                var images = entries.Where(x => x.Type == Bar.EntryType.Imgz).Select(x => Imgz.Open(x.Stream)).First();
+                var images = entries.Where(x => x.Type == Bar.EntryType.Imgz).Select(x => Imgz.Read(x.Stream)).First();
 
                 layoutEntryModel = new LayoutEntryModel
                 {
