@@ -49,6 +49,16 @@
             <StatusBarItem Margin="{StaticResource LabelMargin}" Content="{Binding ImageFormat}"/>
         </StatusBar>
 
+        <Canvas Grid.Row="1">
+            <Canvas.Background>
+                <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
+                    <DrawingBrush.Drawing>
+                        <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#809D9D9D"/>
+                    </DrawingBrush.Drawing>
+                </DrawingBrush>
+            </Canvas.Background>
+        </Canvas>
+        
         <Image
             Grid.Row="1"
             HorizontalAlignment="Left"
