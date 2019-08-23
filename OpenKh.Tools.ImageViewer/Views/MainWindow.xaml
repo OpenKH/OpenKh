@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpenKh.Tools.ImageViewer.Views"
         xmlns:xe="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="250" Width="300">
+        Title="{Binding Title}" Height="450" Width="600">
     <Window.Resources>
         <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
     </Window.Resources>
@@ -35,6 +35,15 @@
         </Menu>
 
         <StatusBar Grid.Row="2">
+            <Image Source="{StaticResource ZoomIn_16x}" Width="16"/>
+            <ComboBox
+                MinWidth="50"
+                ItemsSource="{Binding ZoomLevels}"
+                SelectedValue="{Binding ZoomLevel}"
+                DisplayMemberPath="Key"
+                SelectedValuePath="Value"
+                IsEditable="True"/>
+            <Separator/>
             <StatusBarItem Margin="{StaticResource LabelMargin}" Content="{Binding ImageType}"/>
             <StatusBarItem Margin="{StaticResource LabelMargin}" Content="{Binding ImageSize}"/>
             <StatusBarItem Margin="{StaticResource LabelMargin}" Content="{Binding ImageFormat}"/>
@@ -42,7 +51,25 @@
 
         <Image
             Grid.Row="1"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Visibility="{Binding ImageFitVisibility}"
             Source="{Binding Image}"/>
+
+        <Grid Grid.Row="1">
+            <ScrollViewer
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto"
+                Visibility="{Binding ImageCustomZoomVisibility}">
+                <Image
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Width="{Binding ImageZoomWidth}"
+                    Height="{Binding ImageZoomHeight}"
+                    RenderTransform="{Binding ImageTransform}"
+                    Source="{Binding Image}" Stretch="None"/>
+            </ScrollViewer>
+        </Grid>
 
     </Grid>
 </Window>

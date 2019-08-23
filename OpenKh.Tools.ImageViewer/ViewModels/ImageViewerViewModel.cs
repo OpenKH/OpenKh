@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
@@ -16,6 +17,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 {
     public class ImageViewerViewModel : BaseNotifyPropertyChanged
     {
+        private const int ZoomLevelFit = -1;
         private static readonly IImageFormatService _imageFormatService = new ImageFormatService();
         private static readonly (string, string)[] _filter =
             new (string, string)[] { ("All supported images", GetAllSupportedExtensions()) }
@@ -111,6 +113,8 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                     }
                 }
             }, x => false);
+
+            ZoomLevel = ZoomLevelFit;
         }
 
         public ImageViewerViewModel(Stream stream) :
@@ -123,6 +127,8 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         private IImageRead _imageRead;
         private IImageFormat _imageFormat;
         private BitmapSource _bitmapSource;
+        private double _zoomLevel;
+        private bool _zoomFit;
 
         public string FileName
         {
@@ -142,6 +148,18 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         public RelayCommand AboutCommand { get; set; }
         public RelayCommand ExportCommand { get; set; }
         public RelayCommand ImportCommand { get; set; }
+
+        public IEnumerable<KeyValuePair<string, double>> ZoomLevels { get; } =
+            new double[]
+            {
+                0.25, 0.33, 0.5, 0.75, 1, 1.25, 1.50, 1.75, 2, 2.5, 3, 4, 6, 8, 12, 16, 1
+            }
+            .Select(x => new KeyValuePair<string, double>($"{x * 100.0}%", x))
+            .Concat(new KeyValuePair<string, double>[]
+            {
+                new KeyValuePair<string, double>("Fit", ZoomLevelFit)
+            })
+            .ToArray();
 
         private IImageRead ImageRead
         {
@@ -169,6 +187,45 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         public string ImageType { get; private set; }
         public string ImageSize => _imageRead != null ? $"{_imageRead.Size.Width}x{_imageRead.Size.Height}" : "-";
         public string ImageFormat => _imageRead?.PixelFormat.ToString();
+        public double ZoomLevel
+        {
+            get => _zoomLevel;
+            set
+            {
+                _zoomLevel = value;
+                ZoomFit = _zoomLevel <= 0; 
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ImageTransform));
+                OnPropertyChanged(nameof(ImageZoomWidth));
+                OnPropertyChanged(nameof(ImageZoomHeight));
+            }
+        }
+
+        public bool ZoomFit
+        {
+            get => _zoomFit;
+            set
+            {
+                _zoomFit = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ImageFitVisibility));
+                OnPropertyChanged(nameof(ImageCustomZoomVisibility));
+            }
+        }
+
+        public Transform ImageTransform
+        {
+            get
+            {
+                return new ScaleTransform(ZoomLevel, ZoomLevel);
+            }
+        }
+
+        public double ImageZoomWidth => (_imageRead?.Size.Width * ZoomLevel) ?? 0;
+        public double ImageZoomHeight => (_imageRead?.Size.Height * ZoomLevel) ?? 0;
+
+        public Visibility ImageFitVisibility => ZoomFit ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility ImageCustomZoomVisibility => ZoomFit ? Visibility.Collapsed : Visibility.Visible;
 
         private void LoadImage(Stream stream)
         {
