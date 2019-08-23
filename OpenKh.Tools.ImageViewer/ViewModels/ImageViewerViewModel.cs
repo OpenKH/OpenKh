@@ -1,4 +1,4 @@
-using OpenKh.Imaging;
+﻿using OpenKh.Imaging;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ImageViewer.Services;
 using System;
@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
@@ -51,14 +50,14 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 {
                     using (var stream = File.Open(FileName, FileMode.Create))
                     {
-                        _imageFormat.Write(stream, ImageRead);
+                        _imageFormat.Write(stream, Image.Source);
                     }
                 }
                 else
                 {
                     SaveAsCommand.Execute(x);
                 }
-            }, x => ImageRead != null);
+            }, x => ImageFormat != null);
 
             SaveAsCommand = new RelayCommand(x =>
             {
@@ -69,10 +68,10 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 {
                     using (var stream = File.Open(fd.FileName, FileMode.Create))
                     {
-                        _imageFormat.Write(stream, ImageRead);
+                        _imageFormat.Write(stream, Image.Source);
                     }
                 }
-            }, x => ImageRead != null);
+            }, x => ImageFormat != null);
 
             ExitCommand = new RelayCommand(x =>
             {
@@ -94,7 +93,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                     using (var fStream = File.OpenWrite(fd.FileName))
                     {
                         BitmapEncoder encoder = new PngBitmapEncoder();
-                        encoder.Frames.Add(BitmapFrame.Create(Image));
+                        encoder.Frames.Add(BitmapFrame.Create(Image.Bitmap));
                         encoder.Save(fStream);
                     }
                 }
@@ -124,11 +123,10 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         }
 
         private string _fileName;
-        private IImageRead _imageRead;
         private IImageFormat _imageFormat;
-        private BitmapSource _bitmapSource;
         private double _zoomLevel;
         private bool _zoomFit;
+        private ImageViewModel _imageViewModel;
 
         public string FileName
         {
@@ -137,8 +135,6 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             {
                 _fileName = value;
                 OnPropertyChanged(nameof(Title));
-                OnPropertyChanged(nameof(SaveCommand));
-                OnPropertyChanged(nameof(SaveAsCommand));
             }
         }
 
@@ -162,41 +158,40 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             })
             .ToArray();
 
-        private IImageRead ImageRead
+        private IImageFormat ImageFormat
         {
-            get => _imageRead;
+            get => _imageFormat;
             set
             {
-                _imageRead = value;
-                Image = _imageRead.GetBimapSource();
+                _imageFormat = value;
                 OnPropertyChanged(nameof(ImageType));
                 OnPropertyChanged(nameof(ImageMultiple));
-                OnPropertyChanged(nameof(ImageSize));
-                OnPropertyChanged(nameof(ImageFormat));
+                OnPropertyChanged(nameof(SaveCommand));
+                OnPropertyChanged(nameof(SaveAsCommand));
             }
         }
 
-        public BitmapSource Image
+        public ImageViewModel Image
         {
-            get => _bitmapSource;
-            set
+            get => _imageViewModel;
+            private set
             {
-                _bitmapSource = value;
+                _imageViewModel = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ImageZoomWidth));
+                OnPropertyChanged(nameof(ImageZoomHeight));
             }
         }
 
-        public string ImageType { get; private set; } = "Unknown";
+        public string ImageType => _imageFormat?.Name ?? "Unknown";
         public string ImageMultiple => _imageFormat != null ? _imageFormat.IsContainer ? "Multiple" : "Single" : null;
-        public string ImageSize => _imageRead != null ? $"{_imageRead.Size.Width}x{_imageRead.Size.Height}" : "-";
-        public string ImageFormat => _imageRead?.PixelFormat.ToString();
         public double ZoomLevel
         {
             get => _zoomLevel;
             set
             {
                 _zoomLevel = value;
-                ZoomFit = _zoomLevel <= 0; 
+                ZoomFit = _zoomLevel <= 0;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ImageZoomWidth));
                 OnPropertyChanged(nameof(ImageZoomHeight));
@@ -215,20 +210,20 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             }
         }
 
-        public double ImageZoomWidth => (_imageRead?.Size.Width * ZoomLevel) ?? 0;
-        public double ImageZoomHeight => (_imageRead?.Size.Height * ZoomLevel) ?? 0;
+        public double ImageZoomWidth => (Image?.Width * ZoomLevel) ?? 0;
+        public double ImageZoomHeight => (Image?.Height * ZoomLevel) ?? 0;
 
         public Visibility ImageFitVisibility => ZoomFit ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ImageCustomZoomVisibility => ZoomFit ? Visibility.Collapsed : Visibility.Visible;
 
         private void LoadImage(Stream stream)
         {
-            _imageFormat = _imageFormatService.GetFormatByContent(stream);
-            if (_imageFormat == null)
+            var imageFormat = _imageFormatService.GetFormatByContent(stream);
+            if (imageFormat == null)
                 throw new Exception("Image format not found for the given stream.");
 
-            ImageType = _imageFormat.Name;
-            ImageRead = _imageFormat.Read(stream);
+            ImageFormat = imageFormat;
+            Image = new ImageViewModel(_imageFormat.Read(stream));
         }
 
         private static string GetAllSupportedExtensions()
