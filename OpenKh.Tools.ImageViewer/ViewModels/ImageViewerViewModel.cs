@@ -195,7 +195,6 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 _zoomLevel = value;
                 ZoomFit = _zoomLevel <= 0; 
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(ImageTransform));
                 OnPropertyChanged(nameof(ImageZoomWidth));
                 OnPropertyChanged(nameof(ImageZoomHeight));
             }
@@ -210,14 +209,6 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ImageFitVisibility));
                 OnPropertyChanged(nameof(ImageCustomZoomVisibility));
-            }
-        }
-
-        public Transform ImageTransform
-        {
-            get
-            {
-                return new ScaleTransform(ZoomLevel, ZoomLevel);
             }
         }
 

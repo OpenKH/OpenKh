@@ -76,8 +76,8 @@
                     VerticalAlignment="Top"
                     Width="{Binding ImageZoomWidth}"
                     Height="{Binding ImageZoomHeight}"
-                    RenderTransform="{Binding ImageTransform}"
-                    Source="{Binding Image}" Stretch="None"/>
+                    Source="{Binding Image}" 
+                    Stretch="Fill"/>
             </ScrollViewer>
         </Grid>
 
