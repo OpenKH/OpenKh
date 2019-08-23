@@ -44,9 +44,11 @@
                 SelectedValuePath="Value"
                 IsEditable="True"/>
             <Separator/>
-            <StatusBarItem Margin="{StaticResource LabelMargin}" Content="{Binding ImageType}"/>
-            <StatusBarItem Margin="{StaticResource LabelMargin}" Content="{Binding ImageSize}"/>
-            <StatusBarItem Margin="{StaticResource LabelMargin}" Content="{Binding ImageFormat}"/>
+            <StatusBarItem Content="{Binding ImageType}"/>
+            <StatusBarItem Content="{Binding ImageMultiple}"/>
+            <Separator/>
+            <StatusBarItem Content="{Binding ImageSize}"/>
+            <StatusBarItem Content="{Binding ImageFormat}"/>
         </StatusBar>
 
         <Canvas Grid.Row="1">

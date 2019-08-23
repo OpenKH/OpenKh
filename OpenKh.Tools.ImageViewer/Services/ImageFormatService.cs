@@ -26,6 +26,8 @@ namespace OpenKh.Tools.ImageViewer.Services
             {
                 Name = name;
                 Extension = ext;
+                IsContainer = isContainer;
+                IsCreationSupported = isCreationSupported;
                 this.isValid = isValid;
                 this.read = read;
                 this.write = write;
@@ -33,6 +35,8 @@ namespace OpenKh.Tools.ImageViewer.Services
 
             public string Name { get; }
             public string Extension { get; }
+            public bool IsContainer { get; }
+            public bool IsCreationSupported { get; }
             public bool IsValid(Stream stream) => isValid(stream);
             public IImageRead Read(Stream stream) => read(stream);
             public void Write(Stream stream, IImageRead image) => write(stream, image);

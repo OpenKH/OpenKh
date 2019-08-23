@@ -169,6 +169,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 _imageRead = value;
                 Image = _imageRead.GetBimapSource();
                 OnPropertyChanged(nameof(ImageType));
+                OnPropertyChanged(nameof(ImageMultiple));
                 OnPropertyChanged(nameof(ImageSize));
                 OnPropertyChanged(nameof(ImageFormat));
             }
@@ -184,7 +185,8 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             }
         }
 
-        public string ImageType { get; private set; }
+        public string ImageType { get; private set; } = "Unknown";
+        public string ImageMultiple => _imageFormat != null ? _imageFormat.IsContainer ? "Multiple" : "Single" : null;
         public string ImageSize => _imageRead != null ? $"{_imageRead.Size.Width}x{_imageRead.Size.Height}" : "-";
         public string ImageFormat => _imageRead?.PixelFormat.ToString();
         public double ZoomLevel

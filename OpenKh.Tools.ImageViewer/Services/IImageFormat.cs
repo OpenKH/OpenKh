@@ -9,6 +9,10 @@ namespace OpenKh.Tools.ImageViewer.Services
 
         string Extension { get; }
 
+        bool IsContainer { get; }
+
+        bool IsCreationSupported { get; }
+
         bool IsValid(Stream stream);
 
         IImageRead Read(Stream stream);
