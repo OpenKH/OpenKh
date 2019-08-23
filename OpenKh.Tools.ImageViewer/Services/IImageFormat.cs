@@ -15,8 +15,6 @@ namespace OpenKh.Tools.ImageViewer.Services
 
         bool IsValid(Stream stream);
 
-        IImageRead Read(Stream stream);
-
-        void Write(Stream stream, IImageRead image);
+        T As<T>() where T : IImageFormat;
     }
 }

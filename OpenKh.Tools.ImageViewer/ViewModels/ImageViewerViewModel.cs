@@ -50,7 +50,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 {
                     using (var stream = File.Open(FileName, FileMode.Create))
                     {
-                        _imageFormat.Write(stream, Image.Source);
+                        Save(stream);
                     }
                 }
                 else
@@ -68,7 +68,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 {
                     using (var stream = File.Open(fd.FileName, FileMode.Create))
                     {
-                        _imageFormat.Write(stream, Image.Source);
+                        Save(stream);
                     }
                 }
             }, x => ImageFormat != null);
@@ -223,7 +223,27 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 throw new Exception("Image format not found for the given stream.");
 
             ImageFormat = imageFormat;
-            Image = new ImageViewModel(_imageFormat.Read(stream));
+
+            if (ImageFormat.IsContainer)
+            {
+
+            }
+            else
+            {
+                Image = new ImageViewModel(_imageFormat.As<IImageSingle>().Read(stream));
+            }
+        }
+
+        public void Save(Stream stream)
+        {
+            if (ImageFormat.IsContainer)
+            {
+
+            }
+            else
+            {
+                _imageFormat.As<IImageSingle>().Write(stream, Image.Source);
+            }
         }
 
         private static string GetAllSupportedExtensions()
