@@ -1,4 +1,4 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ImageViewer.Services;
 using System;
@@ -136,6 +136,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             set
             {
                 _fileName = value;
+                OnPropertyChanged(nameof(Title));
                 OnPropertyChanged(nameof(SaveCommand));
                 OnPropertyChanged(nameof(SaveAsCommand));
             }
