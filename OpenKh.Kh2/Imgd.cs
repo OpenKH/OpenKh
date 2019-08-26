@@ -76,7 +76,7 @@ namespace OpenKh.Kh2
 			writer.Write(dataOffset);
 			writer.Write(Data.Length);
 			writer.Write(palOffset);
-			writer.Write(Clut.Length);
+			writer.Write(Clut?.Length ?? 0);
 			writer.Write(-1);
 			writer.Write((short)Size.Width);
 			writer.Write((short)Size.Height);
@@ -96,7 +96,9 @@ namespace OpenKh.Kh2
 			writer.Write(swizzled);
 
             writer.Write(Data, 0, Data.Length);
-			writer.Write(Clut, 0, Clut.Length);
+
+            if (Clut != null)
+			    writer.Write(Clut, 0, Clut.Length);
 		}
 
 		public Size Size { get; }
