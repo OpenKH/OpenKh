@@ -23,7 +23,7 @@ namespace OpenKh.Tools.ImageViewer.Services
                 GetImageFormat("IMGD", "imd", true, Imgd.IsValid, Imgd.Read, (stream, image) => image.AsImgd().Write(stream)),
 
                 GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, images) =>
-                    Imgz.Save(stream, images.Select(x => x.AsImgd()))),
+                    Imgz.Write(stream, images.Select(x => x.AsImgd()))),
 
                 GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
                     throw new NotImplementedException()),

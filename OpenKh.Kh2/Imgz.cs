@@ -54,7 +54,7 @@ namespace OpenKh.Kh2
             OpenAsStream(stream.SetPosition(0)).Select(x => Imgd.Read(x));
 
 
-        public static void Save(Stream stream, IEnumerable<Imgd> images)
+        public static void Write(Stream stream, IEnumerable<Imgd> images)
 		{
 			if (!stream.CanWrite)
 				throw new InvalidDataException($"Read or seek must be supported.");
