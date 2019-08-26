@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
@@ -16,8 +17,10 @@ namespace OpenKh.Tools.ImageViewer.Services
         {
             imageFormat = new IImageFormat[]
             {
-                GetImageFormat("IMGD", "imd", true, Imgd.IsValid, Imgd.Read, (stream, image) =>
-                    image.AsImgd().Write(stream)),
+                GetImageFormat("PNG", "png", true, Png.IsValid, Png.Read, (stream, image) => Png.Write(stream, image)),
+                GetImageFormat("BMP", "bmp", true, Bmp.IsValid, Bmp.Read, (stream, image) => Bmp.Write(stream, image)),
+                GetImageFormat("TIFF", "tiff", true, Tiff.IsValid, Tiff.Read, (stream, image) => Tiff.Write(stream, image)),
+                GetImageFormat("IMGD", "imd", true, Imgd.IsValid, Imgd.Read, (stream, image) => image.AsImgd().Write(stream)),
 
                 GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, images) =>
                     Imgz.Save(stream, images.Select(x => x.AsImgd()))),
@@ -30,7 +33,7 @@ namespace OpenKh.Tools.ImageViewer.Services
         public IEnumerable<IImageFormat> Formats => imageFormat;
 
         public IImageFormat GetFormatByContent(Stream stream) =>
-            imageFormat.FirstOrDefault(x => x.IsValid(stream));
+            imageFormat.FirstOrDefault(x => x.IsValid(stream.SetPosition(0)));
 
         public IImageFormat GetFormatByFileName(string fileName)
         {

@@ -30,7 +30,7 @@ namespace OpenKh.Imaging
             }
         }
 
-        private static Bitmap CreateBitmap(this IImageRead imageRead)
+        internal static Bitmap CreateBitmap(this IImageRead imageRead)
         {
             var drawingPixelFormat = imageRead.PixelFormat.GetDrawingPixelFormat();
             Bitmap bitmap = new Bitmap(imageRead.Size.Width, imageRead.Size.Height, drawingPixelFormat);
