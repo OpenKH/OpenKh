@@ -18,7 +18,7 @@ namespace OpenKh.Kh2
         private const short SubFormat4bpp = 4;
 
         public static bool IsValid(Stream stream) =>
-            stream.Length >= 4 && new BinaryReader(stream).PeekInt32() == MagicCode;
+            stream.Length >= 4 && stream.SetPosition(0).ReadInt32() == MagicCode;
 
         private readonly short format;
         private readonly int swizzled;
@@ -58,7 +58,7 @@ namespace OpenKh.Kh2
 			Clut = reader.ReadBytes(palLength);
         }
 
-        public static Imgd Read(Stream stream) => new Imgd(stream);
+        public static Imgd Read(Stream stream) => new Imgd(stream.SetPosition(0));
 
         public void Write(Stream stream)
 		{
