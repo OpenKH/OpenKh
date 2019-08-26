@@ -124,6 +124,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
         private string _fileName;
         private IImageFormat _imageFormat;
+        private IImageContainer _imageContainer;
         private double _zoomLevel;
         private bool _zoomFit;
         private ImageViewModel _imageViewModel;
@@ -168,6 +169,15 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 OnPropertyChanged(nameof(ImageMultiple));
                 OnPropertyChanged(nameof(SaveCommand));
                 OnPropertyChanged(nameof(SaveAsCommand));
+            }
+        }
+
+        private IImageContainer ImageContainer
+        {
+            get => _imageContainer;
+            set
+            {
+                _imageContainer = value;
             }
         }
 
@@ -226,7 +236,8 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
             if (ImageFormat.IsContainer)
             {
-
+                ImageContainer = _imageFormat.As<IImageMultiple>().Read(stream);
+                Image = new ImageViewModel(ImageContainer.Images.FirstOrDefault());
             }
             else
             {
@@ -238,7 +249,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         {
             if (ImageFormat.IsContainer)
             {
-
+                _imageFormat.As<IImageMultiple>().Write(stream, ImageContainer);
             }
             else
             {

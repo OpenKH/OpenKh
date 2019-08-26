@@ -80,19 +80,33 @@ namespace OpenKh.Tools.ImageViewer.Services
             public void Write(Stream stream, IImageContainer image) => write(stream, image);
         }
 
+        private class ImageContainer : IImageContainer
+        {
+            private readonly IImageRead[] _images;
+
+            public ImageContainer(IEnumerable<IImageRead> images)
+            {
+                _images = images.ToArray();
+            }
+
+            public int Count => _images.Length;
+            public IEnumerable<IImageRead> Images => _images;
+            public IImageRead GetImage(int index) => _images[index];
+        }
+
         private static readonly IImageFormat[] imageFormat;
 
         static ImageFormatService()
         {
             imageFormat = new IImageFormat[]
             {
-                new SingleImageFormat("IMGD", "imd", false, Imgd.IsValid, Imgd.Read, (stream, image) =>
+                GetImageFormat("IMGD", "imd", false, Imgd.IsValid, Imgd.Read, (stream, image) =>
                     new Imgd(image.Size, image.PixelFormat, image.GetData(), image.GetClut(), false)),
 
-                new SingleImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s).First(), (stream, image) =>
+                GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, container) =>
                     throw new NotImplementedException()),
 
-                new SingleImageFormat("TIM2", "tm2", true, Tm2.IsValid, s => Tm2.Read(s).First(), (stream, image) =>
+                GetImageFormat("TIM2", "tm2", true, Tm2.IsValid, s => Tm2.Read(s), (stream, container) =>
                     throw new NotImplementedException()),
             };
         }
@@ -110,6 +124,30 @@ namespace OpenKh.Tools.ImageViewer.Services
                 extension = extension.Substring(dotIndex);
 
             return imageFormat.FirstOrDefault(x => string.Compare(x.Extension, extension, System.StringComparison.OrdinalIgnoreCase) == 0);
+        }
+
+        private static IImageFormat GetImageFormat(
+            string name,
+            string extension,
+            bool isCreationSupported,
+            Func<Stream, bool> isValid,
+            Func<Stream, IImageRead> read,
+            Action<Stream, IImageRead> write)
+        {
+            return new SingleImageFormat(name, extension, isCreationSupported, isValid, read, write);
+        }
+
+        private static IImageFormat GetImageFormat(
+            string name,
+            string extension,
+            bool isCreationSupported,
+            Func<Stream, bool> isValid,
+            Func<Stream, IEnumerable<IImageRead>> read,
+            Action<Stream, IEnumerable<IImageRead>> write)
+        {
+            return new MultipleImageFormat(name, extension, isCreationSupported, isValid,
+                stream => new ImageContainer(read(stream)),
+                (stream, container) => write(stream, container.Images));
         }
     }
 }
