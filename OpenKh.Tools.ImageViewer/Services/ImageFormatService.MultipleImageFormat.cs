@@ -17,7 +17,7 @@ namespace OpenKh.Tools.ImageViewer.Services
                 Func<Stream, bool> isValid,
                 Func<Stream, IImageContainer> read,
                 Action<Stream, IImageContainer> write) :
-                base(name, ext, isCreationSupported, true, isValid)
+                base(name, ext, true, isCreationSupported, isValid)
             {
                 this.read = read;
                 this.write = write;

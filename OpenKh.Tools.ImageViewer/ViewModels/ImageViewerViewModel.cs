@@ -128,6 +128,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         private double _zoomLevel;
         private bool _zoomFit;
         private ImageViewModel _imageViewModel;
+        private ImageContainerViewModel _imageContainerItems;
 
         public string FileName
         {
@@ -167,6 +168,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 _imageFormat = value;
                 OnPropertyChanged(nameof(ImageType));
                 OnPropertyChanged(nameof(ImageMultiple));
+                OnPropertyChanged(nameof(ImageSelectionVisibility));
                 OnPropertyChanged(nameof(SaveCommand));
                 OnPropertyChanged(nameof(SaveAsCommand));
             }
@@ -178,13 +180,14 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             set
             {
                 _imageContainer = value;
+                ImageContainerItems = new ImageContainerViewModel(_imageContainer);
             }
         }
 
         public ImageViewModel Image
         {
             get => _imageViewModel;
-            private set
+            set
             {
                 _imageViewModel = value;
                 OnPropertyChanged();
@@ -193,8 +196,19 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             }
         }
 
+        public ImageContainerViewModel ImageContainerItems
+        {
+            get => _imageContainerItems;
+            set
+            {
+                _imageContainerItems = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string ImageType => _imageFormat?.Name ?? "Unknown";
         public string ImageMultiple => _imageFormat != null ? _imageFormat.IsContainer ? "Multiple" : "Single" : null;
+        public Visibility ImageSelectionVisibility => (_imageFormat?.IsContainer ?? false) ? Visibility.Visible : Visibility.Collapsed;
         public double ZoomLevel
         {
             get => _zoomLevel;
@@ -237,7 +251,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             if (ImageFormat.IsContainer)
             {
                 ImageContainer = _imageFormat.As<IImageMultiple>().Read(stream);
-                Image = new ImageViewModel(ImageContainer.Images.FirstOrDefault());
+                Image = ImageContainerItems.First();
             }
             else
             {

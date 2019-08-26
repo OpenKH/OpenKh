@@ -46,6 +46,13 @@
             <Separator/>
             <StatusBarItem Content="{Binding ImageType}"/>
             <StatusBarItem Content="{Binding ImageMultiple}"/>
+            <StatusBarItem Visibility="{Binding ImageSelectionVisibility}">
+                <ComboBox
+                    MinWidth="50"
+                    ItemsSource="{Binding ImageContainerItems}"
+                    SelectedValue="{Binding Image}"
+                    DisplayMemberPath="Name"/>
+            </StatusBarItem>
             <Separator/>
             <StatusBarItem Content="{Binding Image.Size}"/>
             <StatusBarItem Content="{Binding Image.Format}"/>
