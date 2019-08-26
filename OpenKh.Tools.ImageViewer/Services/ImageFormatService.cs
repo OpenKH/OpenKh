@@ -40,7 +40,7 @@ namespace OpenKh.Tools.ImageViewer.Services
             var extension = Path.GetExtension(fileName);
             var dotIndex = extension.IndexOf('.');
             if (dotIndex >= 0)
-                extension = extension.Substring(dotIndex);
+                extension = extension.Substring(dotIndex + 1);
 
             return imageFormat.FirstOrDefault(x => string.Compare(x.Extension, extension, System.StringComparison.OrdinalIgnoreCase) == 0);
         }

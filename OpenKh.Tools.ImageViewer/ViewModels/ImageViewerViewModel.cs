@@ -1,4 +1,4 @@
-﻿using OpenKh.Imaging;
+﻿using OpenKh.Common;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ImageViewer.Services;
 using System;
@@ -18,9 +18,14 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
     {
         private const int ZoomLevelFit = -1;
         private static readonly IImageFormatService _imageFormatService = new ImageFormatService();
-        private static readonly (string, string)[] _filter =
+        private static readonly (string, string)[] _openFilter =
             new (string, string)[] { ("All supported images", GetAllSupportedExtensions()) }
             .Concat(_imageFormatService.Formats.Select(x => ($"{x.Name} image", x.Extension)))
+            .Concat(new[] { ("All files", "*") })
+            .ToArray();
+        private static readonly (string, string)[] _exportFilter =
+            new (string, string)[] { ("All supported images for export", GetAllSupportedExtensions()) }
+            .Concat(_imageFormatService.Formats.Where(x => x.IsCreationSupported).Select(x => ($"{x.Name} image", x.Extension)))
             .Concat(new[] { ("All files", "*") })
             .ToArray();
 
@@ -33,7 +38,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         {
             OpenCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, _filter);
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, _openFilter);
                 if (fd.ShowDialog() == true)
                 {
                     using (var stream = File.OpenRead(fd.FileName))
@@ -61,7 +66,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
             SaveAsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, _filter);
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, ($"{ImageFormat.Name} format", ImageFormat.Extension));
                 fd.DefaultFileName = FileName;
 
                 if (fd.ShowDialog() == true)
@@ -85,17 +90,21 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
             ExportCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, FileDialog.Type.ImagePng);
-                fd.DefaultFileName = $"{Path.GetFileNameWithoutExtension(FileName)}.png";
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, _exportFilter);
+                fd.DefaultFileName = Path.GetFileName(FileName);
 
                 if (fd.ShowDialog() == true)
                 {
-                    using (var fStream = File.OpenWrite(fd.FileName))
+                    var imageFormat = _imageFormatService.GetFormatByFileName(fd.FileName);
+                    if (imageFormat == null)
                     {
-                        BitmapEncoder encoder = new PngBitmapEncoder();
-                        encoder.Frames.Add(BitmapFrame.Create(Image.Bitmap));
-                        encoder.Save(fStream);
+                        var extension = Path.GetExtension(fd.FileName);
+                        MessageBox.Show($"The format with extension {extension} is not supported for export.",
+                            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
                     }
+
+                    File.OpenWrite(fd.FileName).Using(stream => Save(stream, imageFormat));
                 }
             }, x => true);
 
@@ -259,15 +268,17 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             }
         }
 
-        public void Save(Stream stream)
+        public void Save(Stream stream) => Save(stream, ImageFormat);
+
+        public void Save(Stream stream, IImageFormat imageFormat)
         {
-            if (ImageFormat.IsContainer)
+            if (imageFormat.IsContainer)
             {
-                _imageFormat.As<IImageMultiple>().Write(stream, ImageContainer);
+                imageFormat.As<IImageMultiple>().Write(stream, ImageContainer);
             }
             else
             {
-                _imageFormat.As<IImageSingle>().Write(stream, Image.Source);
+                imageFormat.As<IImageSingle>().Write(stream, Image.Source);
             }
         }
 
