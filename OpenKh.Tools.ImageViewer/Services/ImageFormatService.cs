@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 
 namespace OpenKh.Tools.ImageViewer.Services
 {
@@ -15,13 +16,13 @@ namespace OpenKh.Tools.ImageViewer.Services
         {
             imageFormat = new IImageFormat[]
             {
-                GetImageFormat("IMGD", "imd", false, Imgd.IsValid, Imgd.Read, (stream, image) =>
-                    new Imgd(image.Size, image.PixelFormat, image.GetData(), image.GetClut(), false)),
+                GetImageFormat("IMGD", "imd", true, Imgd.IsValid, Imgd.Read, (stream, image) =>
+                    image.AsImgd().Write(stream)),
 
-                GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, container) =>
-                    throw new NotImplementedException()),
+                GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, images) =>
+                    Imgz.Save(stream, images.Select(x => x.AsImgd()))),
 
-                GetImageFormat("TIM2", "tm2", true, Tm2.IsValid, s => Tm2.Read(s), (stream, container) =>
+                GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
                     throw new NotImplementedException()),
             };
         }
