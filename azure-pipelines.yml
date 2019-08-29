@@ -38,7 +38,7 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    vsVersion: '16.0'
+    vsVersion: 'latest'
 
 - task: VSTest@2
   inputs:
@@ -50,15 +50,32 @@ steps:
 - task: CopyFiles@2
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
-    contents: '**/$(BuildConfiguration)/net4**/?(*.exe|*.dll)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/net4**/?(*.exe|*.dll|*.json|*.config)
     targetFolder: '$(Build.ArtifactStagingDirectory)/net4'
     flattenFolders: true
 - task: CopyFiles@2
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
-    contents: '**/$(BuildConfiguration)/netcoreapp**/?(*.exe|*.dll)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/net4**/resources/**
+    targetFolder: '$(Build.ArtifactStagingDirectory)/net4/resources'
+    flattenFolders: true
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/?(*.exe|*.dll|*.json|*.config)
     targetFolder: '$(Build.ArtifactStagingDirectory)/netcore'
     flattenFolders: true
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/resources/**
+    targetFolder: '$(Build.ArtifactStagingDirectory)/netcore/resources'
+    flattenFolders: true
+
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
