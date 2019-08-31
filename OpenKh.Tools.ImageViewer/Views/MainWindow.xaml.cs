@@ -12,6 +12,7 @@ namespace OpenKh.Tools.ImageViewer.Views
         {
             InitializeComponent();
             DataContext = new ImageViewerViewModel();
+            (DataContext as ImageViewerViewModel).LoadImage(@"D:\Hacking\KHBBS\DUMP_EU\BBS\arc\system\fonten.arc");
         }
     }
 }
