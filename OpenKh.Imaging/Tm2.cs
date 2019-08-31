@@ -86,76 +86,77 @@ namespace OpenKh.Imaging
             [Data] public long Data { get; set; }
 
 			public int TBP0
-			{
-				get => (int)(Data >> 0) & 0x3FFF;
-				set => Data = (Data & ~(0x3FFF << 0)) + (value & 0x3FFF);
-			}
+            {
+                get => GetBits(Data, 0, 14);
+                set => Data = SetBits(Data, 0, 14, value);
+            }
 
 			public int TBW
-			{
-				get => (int)(Data >> 14) & 0x3F;
-				set => Data = (Data & ~(0x3F << 14)) + (value & 0x3F);
-			}
+            {
+                get => GetBits(Data, 14, 6);
+                set => Data = SetBits(Data, 14, 6, value);
+            }
 
 			public GsPSM PSM
 			{
-				get => (GsPSM)((Data >> 20) & 0x3F);
-				set => Data = (Data & ~(0x3F << 20)) + ((int)value & 0x3F);
+				get => (GsPSM)GetBits(Data, 20, 6);
+				set => Data = SetBits(Data, 20, 6, (int)value);
 			}
 
 			public int TW
-			{
-				get => (int)(Data >> 26) & 0xF;
-				set => Data = (Data & ~(0xF << 26)) + (value & 0xF);
-			}
+            {
+                get => GetBits(Data, 26, 4);
+                set => SetBits(Data, 26, 4, value);
+            }
 
-			public int TH
-			{
-				get => (int)(Data >> 30) & 0xF;
-				set => Data = (Data & ~(0xF << 30)) + (value & 0xF);
-			}
+            public int TH
+            {
+                get => GetBits(Data, 30, 4);
+                set => SetBits(Data, 30, 4, value);
+            }
 
-			public int TCC
+			public bool TCC
 			{
-				get => (int)(Data >> 34) & 1;
-				set => Data = (Data & ~(1 << 34)) + (value & 1);
-			}
+				get => GetBit(Data, 34);
+                set => Data = SetBit(Data, 34, value);
+
+            }
 
 			public int TFX
-			{
-				get => (int)(Data >> 35) & 3;
-				set => Data = (Data & ~(3 << 35)) + (value & 3);
-			}
+            {
+                get => GetBits(Data, 35, 2);
+                set => Data = SetBits(Data, 35, 2, value);
+            }
 
 			public int CBP
-			{
-				get => (int)(Data >> 37) & 0x3FFF;
-				set => Data = (Data & ~(0x3FFF << 37)) + (value & 0x3FFF);
-			}
+            {
+                get => GetBits(Data, 37, 14);
+                set => Data = SetBits(Data, 37, 14, value);
+            }
 
 			public GsCPSM CPSM
-			{
-				get => (GsCPSM)((Data >> 51) & 0xF);
-				set => Data = (Data & ~(0xF << 51)) + ((int)value & 0xF);
-			}
+            {
+                get => (GsCPSM)GetBits(Data, 51, 4);
+                set => Data = SetBits(Data, 51, 4, (int)value);
+            }
 
-			public int CSM
-			{
-				get => (int)(Data >> 55) & 1;
-				set => Data = (Data & ~(1 << 55)) + (value & 1);
-			}
+			public bool CSM
+            {
+                get => GetBit(Data, 55);
+                set => Data = SetBit(Data, 55, value);
+            }
 
 			public int CSA
-			{
-				get => (int)(Data >> 56) & 0x1F;
-				set => Data = (Data & ~(0x1F << 56)) + (value & 0x1F);
-			}
+            {
+                get => GetBits(Data, 56, 5);
+                set => Data = SetBits(Data, 56, 5, value);
+            }
 
 			public int CLD
-			{
-				get => (int)(Data >> 61) & 7;
-				set => Data = (Data & ~(7 << 61)) + (value & 7);
-			}
+            {
+                get => GetBits(Data, 61, 3);
+                set => Data = SetBits(Data, 61, 3, value);
+            }
         }
 
         private class Header
@@ -322,6 +323,21 @@ namespace OpenKh.Imaging
                     throw new ArgumentOutOfRangeException($"The format ID {format} is invalid or not supported.");
             }
         }
+
+        private static int GetBits(long Data, int position, int size)
+        {
+            var mask = (1 << size) - 1;
+            return (int)((Data >> position) & mask);
+        }
+
+        private static long SetBits(long Data, int position, int size, int value)
+        {
+            var mask = (1 << size) - 1U;
+            return Data & ~(mask << position) | ((value & mask) << position);
+        }
+
+        private static bool GetBit(long Data, int position) => GetBits(Data, position, 1) != 0;
+        private static long SetBit(long Data, int position, bool value) => SetBits(Data, position, 1, value ? 1 : 0);
 
         private static PixelFormat GetPixelFormat(int format)
         {
