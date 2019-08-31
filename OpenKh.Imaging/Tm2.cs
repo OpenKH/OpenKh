@@ -83,6 +83,13 @@ namespace OpenKh.Imaging
                 Data = gsTex.Data;
             }
 
+            public GsTex(GsTex gsTex, int width, int height)
+            {
+                Data = gsTex.Data;
+                TW = GetSizeRegister(width);
+                TH = GetSizeRegister(height);
+            }
+
             [Data] public long Data { get; set; }
 
 			public int TBP0
@@ -292,7 +299,7 @@ namespace OpenKh.Imaging
                     ImageType = image._imageType,
                     Width = (short)image.Size.Width,
                     Height = (short)image.Size.Height,
-                    GsTex0 = new GsTex(image._gsTex0),
+                    GsTex0 = new GsTex(image._gsTex0, image.Size.Width, image.Size.Height),
                     GsTex1 = new GsTex(image._gsTex1),
                     GsRegs = image._gsReg,
                     GsClut = image._gsPal,
@@ -323,6 +330,8 @@ namespace OpenKh.Imaging
                     throw new ArgumentOutOfRangeException($"The format ID {format} is invalid or not supported.");
             }
         }
+
+        private static int GetSizeRegister(int realSize) => (int)Math.Ceiling(Math.Log(realSize, 2));
 
         private static int GetBits(long Data, int position, int size)
         {
