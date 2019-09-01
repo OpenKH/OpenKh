@@ -29,6 +29,15 @@
     <None Update="Bbs\res\event-table.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Imaging\res\image-32bit-480-279.tm2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Imaging\res\image-8bit-128-128.tm2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Imaging\res\image-8bit-512-272.tm2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="kh2\res\50worldmap.cmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -108,5 +117,7 @@
 
   <ItemGroup>
     <Folder Include="Bbs\res\" />
+    <Folder Include="Imaging\res\" />
   </ItemGroup>
+
 </Project>

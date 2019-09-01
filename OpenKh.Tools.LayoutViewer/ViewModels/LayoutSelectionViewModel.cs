@@ -38,7 +38,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
 
             public string Name => _entry.Name;
-            public List<Imgd> Layout => Imgz.Open(_entry.Stream.FromBegin()).ToList();
+            public List<Imgd> Layout => Imgz.Read(_entry.Stream.FromBegin()).ToList();
 
             public override string ToString() => Name;
         }

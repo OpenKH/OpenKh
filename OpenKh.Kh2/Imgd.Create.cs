@@ -34,6 +34,8 @@ namespace OpenKh.Kh2
                 Data = data;
             }
 
+            Data = ImageDataHelpers.GetInvertedRedBlueChannels(Data, Size, PixelFormat);
+
             switch (format)
             {
                 case Format4bpp:
