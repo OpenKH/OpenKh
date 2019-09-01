@@ -27,6 +27,9 @@ namespace OpenKh.Command.Arc
         [Argument(0, "ARC file", "The ARC file to pack or unpack")]
         public string FileName { get; }
 
+        [Argument(1, "ARC directory", "The ARC directory used as destination for unpakcing or source for packing")]
+        public string DirectoryName { get; }
+
         [Option(ShortName = "p", LongName = "pack", Description = "Pack ARC")]
         public bool Pack { get; }
 
@@ -35,9 +38,9 @@ namespace OpenKh.Command.Arc
             try
             {
                 if (Pack)
-                    Repack(FileName);
+                    Repack(FileName, DirectoryName);
                 else
-                    Unpack(FileName);
+                    Unpack(FileName, DirectoryName);
             }
             catch (Exception ex)
             {
@@ -45,12 +48,12 @@ namespace OpenKh.Command.Arc
             }
         }
 
-        private static void Unpack(string input)
+        private static void Unpack(string inputFile, string outputDirectory)
         {
-            if (!File.Exists(input))
-                throw new FileNotFoundException("The specified file name cannot be found", input);
+            if (!File.Exists(inputFile))
+                throw new FileNotFoundException("The specified file name cannot be found", inputFile);
 
-            var entries = File.OpenRead(input).Using(stream =>
+            var entries = File.OpenRead(inputFile).Using(stream =>
             {
                 if (!Bbs.Arc.IsValid(stream))
                     throw new InvalidDataException("The specified ARC file is not valid");
@@ -58,7 +61,8 @@ namespace OpenKh.Command.Arc
                 return Bbs.Arc.Read(stream);
             });
 
-            var outputDirectory = Path.Combine(Path.GetDirectoryName(input), Path.GetFileNameWithoutExtension(input));
+            if (string.IsNullOrEmpty(outputDirectory))
+                outputDirectory = Path.Combine(Path.GetDirectoryName(inputFile), Path.GetFileNameWithoutExtension(inputFile));
             Directory.CreateDirectory(outputDirectory);
 
             foreach (var entry in entries.Where(x => !x.IsLink))
@@ -80,9 +84,50 @@ namespace OpenKh.Command.Arc
             });
         }
 
-        private static void Repack(string input)
+        private static void Repack(string outputFile, string inputDirectory)
         {
-            throw new NotImplementedException();
+            if (!Directory.Exists(inputDirectory))
+                throw new DirectoryNotFoundException("The specified input directory cannot be found");
+
+            var arcEntriesFileName = Path.Combine(inputDirectory, "@ARC.txt");
+            if (!File.Exists(arcEntriesFileName))
+                throw new FileNotFoundException("The @ARC.txt descriptor cannot be found in the specified directory", arcEntriesFileName);
+
+            var entries = File.ReadAllLines(arcEntriesFileName)
+                .Select(x => GetEntry(inputDirectory, x));
+
+            File.Create(outputFile).Using(stream => Bbs.Arc.Write(entries, stream));
+
+        }
+
+        private static Bbs.Arc.Entry GetEntry(string baseDirectory, string entryName)
+        {
+            if (entryName.FirstOrDefault() == '@')
+            {
+                var linkFileName = entryName.Substring(1);
+                var directoryName = Path.GetDirectoryName(linkFileName).Replace('\\', '/');
+                var fileName = Path.GetFileName(linkFileName);
+
+                var directoryPointer = Bbs.Bbsa.GetDirectoryHash(directoryName);
+                if (directoryPointer == uint.MaxValue)
+                    throw new DirectoryNotFoundException($"The directory {directoryName} cannot be recognized by BBS engine.");
+
+                return new Bbs.Arc.Entry
+                {
+                    DirectoryPointer = directoryPointer,
+                    Name = fileName
+                };
+            }
+            else
+            {
+                var fileName = Path.Combine(baseDirectory, entryName);
+                return new Bbs.Arc.Entry
+                {
+                    DirectoryPointer = 0,
+                    Data = File.ReadAllBytes(fileName),
+                    Name = entryName
+                };
+            }
         }
     }
 }
