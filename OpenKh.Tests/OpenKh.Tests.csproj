@@ -23,6 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Bbs\res\arctest.arc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Bbs\res\event-table.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -113,6 +116,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Bbs\res\" />
     <Folder Include="Imaging\res\" />
   </ItemGroup>
 

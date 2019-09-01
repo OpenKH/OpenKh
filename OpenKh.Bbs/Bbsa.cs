@@ -22,7 +22,7 @@ namespace OpenKh.Bbs
             "PMF", "ESE", "PTX", ""
         };
 
-        protected static Dictionary<int, string> Paths = new Dictionary<int, string>
+        protected static Dictionary<uint, string> Paths = new Dictionary<uint, string>
         {
             [0x0050414D] = "arc/map",
             [0x4E455645] = "arc/event",
@@ -45,7 +45,52 @@ namespace OpenKh.Bbs
             [0x55424544] = "arc/debug",
         };
 
-        protected static Dictionary<string, int> PathsReverse =
+        protected static Dictionary<byte, string> PathCategories = new Dictionary<byte, string>
+        {
+            [0x00] = "arc_",
+            [0x80] = "sound/bgm",
+            [0xC0] = "lua",
+            [0x90] = "sound/se/common",
+            [0x91] = "sound/se/event/{1}",
+            [0x92] = "sound/se/footstep/{1}",
+            [0x93] = "sound/se/enemy",
+            [0x94] = "sound/se/weapon",
+            [0x95] = "sound/se/act",
+            [0xA1] = "sound/voice/{0}/event/{1}",
+            [0xAA] = "sound/voice/{0}/battle",
+            [0xD0] = "message/{0}/system",
+            [0xD1] = "message/{0}/map",
+            [0xD2] = "message/{0}/menu",
+            [0xD3] = "message/{0}/event",
+            [0xD4] = "message/{0}/mission",
+            [0xD5] = "message/{0}/npc_talk/{1}",
+            [0xD6] = "message/{0}/network",
+            [0xD7] = "message/{0}/battledice",
+            [0xD8] = "message/{0}/minigame",
+            [0xD9] = "message/{0}/shop",
+            [0xDA] = "message/{0}/playerselect",
+            [0xDB] = "message/{0}/report",
+        };
+
+        protected static Dictionary<string, uint> PathCategoriesReverse = PathCategories
+            .SelectMany(x =>
+                Constants.Language.Select((l, i) => new
+                {
+                    Key = (x.Key << 24) | (i << 21),
+                    Value = x.Value.Replace("{0}", l)
+                })
+            )
+            .SelectMany(x =>
+                Constants.Worlds.Select((w, i) => new
+                {
+                    Key = x.Key | (i << 16),
+                    Value = x.Value.Replace("{1}", w)
+                })
+            )
+            .GroupBy(x => x.Value)
+            .ToDictionary(x => x.Key, x => (uint)x.First().Key);
+
+        protected static Dictionary<string, uint> PathsReverse =
             Paths.ToDictionary(x => x.Value, x => x.Key);
 
         protected static string[] AllPaths =
@@ -190,5 +235,19 @@ namespace OpenKh.Bbs
         }
 
         public static Bbsa Read(Stream stream) => new Bbsa(stream);
+
+        public static string GetDirectoryName(uint hash) =>
+            Paths.TryGetValue(hash, out var path) ? path : CalculateFolderName(hash);
+
+        public static uint GetDirectoryHash(string directory)
+        {
+            if (PathsReverse.TryGetValue(directory.ToLower(), out var hash))
+                return (uint)hash;
+
+            if (PathCategoriesReverse.TryGetValue(directory.ToLower(), out hash))
+                return (uint)hash;
+
+            return uint.MaxValue;
+        }
     }
 }
