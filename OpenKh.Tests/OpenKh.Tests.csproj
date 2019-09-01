@@ -29,6 +29,15 @@
     <None Update="Bbs\res\event-table.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Bbs\res\font-test.cod">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Bbs\res\font-test.inf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Bbs\res\font-test2.inf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Imaging\res\image-32bit-480-279.tm2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
