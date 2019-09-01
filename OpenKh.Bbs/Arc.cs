@@ -24,7 +24,7 @@ namespace OpenKh.Bbs
 
         private class MetaEntry
         {
-            [Data] public int DirectoryPointer { get; set; }
+            [Data] public uint DirectoryPointer { get; set; }
             [Data] public int Offset { get; set; }
             [Data] public int Length { get; set; }
             [Data] public int Unused { get; set; }
@@ -36,7 +36,7 @@ namespace OpenKh.Bbs
         public class Entry
         {
             public bool IsLink => DirectoryPointer != 0;
-            public int DirectoryPointer { get; set; }
+            public uint DirectoryPointer { get; set; }
             public string Name { get; set; }
             public byte[] Data { get; set; }
 
@@ -47,10 +47,12 @@ namespace OpenKh.Bbs
                     if (DirectoryPointer == 0)
                         return Name;
 
-                    if (Bbsa.Paths.TryGetValue(DirectoryPointer, out var basePath))
-                        return $"{basePath}/{Name}";
+                    var directory = Bbsa.GetDirectoryName(DirectoryPointer);
+                    if (string.IsNullOrEmpty(directory))
+                        return $"{DirectoryPointer:X08}/{Name}";
 
-                    return $"{DirectoryPointer:X08}/{Name}";
+                    return $"{directory}/{Name}";
+
                 }
             }
         }

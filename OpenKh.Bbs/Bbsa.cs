@@ -22,7 +22,7 @@ namespace OpenKh.Bbs
             "PMF", "ESE", "PTX", ""
         };
 
-        public static Dictionary<int, string> Paths = new Dictionary<int, string>
+        protected static Dictionary<int, string> Paths = new Dictionary<int, string>
         {
             [0x0050414D] = "arc/map",
             [0x4E455645] = "arc/event",
@@ -190,5 +190,8 @@ namespace OpenKh.Bbs
         }
 
         public static Bbsa Read(Stream stream) => new Bbsa(stream);
+
+        public static string GetDirectoryName(uint hash) =>
+            Paths.TryGetValue((int)hash, out var path) ? path : CalculateFolderName(hash);
     }
 }
