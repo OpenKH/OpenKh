@@ -57,7 +57,7 @@ namespace OpenKh.Bbs
 
         public static IEnumerable<Entry> Read(Stream stream)
         {
-            var header = BinaryMapping.ReadObject<Header>(stream);
+            var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
 
             return Enumerable.Range(0, header.EntryCount)
                 .Select(x => BinaryMapping.ReadObject<MetaEntry>(stream))
