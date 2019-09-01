@@ -26,7 +26,19 @@ namespace OpenKh.Tools.ImageViewer.Services
                 GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, images) =>
                     Imgz.Write(stream, images.Select(x => x.AsImgd()))),
 
-                GetImageFormat("Font ARC", "arc", false, FontsArc.IsValid, s => FontsArc.Read(s).Images, (stream, images) =>
+                GetImageFormat("Font ARC", "arc", false, FontsArc.IsValid, s =>
+                {
+                    var fonts = FontsArc.Read(s);
+                    return new[]
+                    {
+                        fonts.FontCmd,
+                        fonts.FontIcon,
+                        fonts.FontHelp,
+                        fonts.FontMenu,
+                        fonts.FontMes,
+                        fonts.FontNumeral
+                    };
+                }, (stream, images) =>
                     throw new NotImplementedException()),
 
                 GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
