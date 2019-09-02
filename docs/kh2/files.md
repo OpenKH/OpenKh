@@ -1,3 +1,5 @@
+# [Kingdom Hearts II](index.md) - Game files
+
 | Name | Hash32 | Hash16 | Games |
 |------|--------|--------|-------|
 |000al.idx|35F6154A|81F3|jp,us,fr,it,au,de,es,fm

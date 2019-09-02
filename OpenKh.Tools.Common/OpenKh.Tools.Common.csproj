@@ -1,10 +1,14 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
+<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
+    <ProjectReference Include="..\OpenKh.Imaging\OpenKh.Imaging.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -12,5 +16,10 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\Timeline.xaml">
+      <DependentUpon>Designer</DependentUpon>
+    </Page>
   </ItemGroup>
 </Project>

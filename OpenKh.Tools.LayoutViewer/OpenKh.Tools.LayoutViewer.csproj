@@ -3,13 +3,19 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net472</TargetFramework>
     <AssemblyTitle>Layout editor</AssemblyTitle>
-    <Company>Luciano (Xeeynamo) Ciccariello</Company>
-    <Product>Layout editor - Kingdom Hearts II</Product>
+    <Company>OpenKH</Company>
+    <Product>Layout editor - OpenKh</Product>
     <Description>https://github.com/Xeeynamo/KingdomHearts</Description>
     <Copyright>Copyright ©  2019</Copyright>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Renderer\**" />
+    <EmbeddedResource Remove="Renderer\**" />
+    <None Remove="Renderer\**" />
+    <Page Remove="Renderer\**" />
+    <_SettingsFiles Remove="Renderer\**" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
@@ -17,6 +23,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Drawing.Direct3D\Xe.Drawing.Direct3D.csproj" />
@@ -49,9 +56,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Controls\Timeline.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="Views\FrameView.xaml">
       <SubType>Designer</SubType>
     </Page>

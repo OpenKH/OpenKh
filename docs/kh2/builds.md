@@ -1,3 +1,5 @@
+# [Kingdom Hearts II](index.md) - Builds
+
 | Code       | Platform      | Region | Time stamp | Additional info | Differences               | Checksum                      |
 |------------|---------------|:------:|------------|-----------------|---------------------------|-------------------------------|
 | SLPM 66233 | Playstation 2 | JP     | 2005-12-06 | First version   |                           | http://redump.org/disc/26787/ |

@@ -22,5 +22,17 @@ namespace OpenKh.Tools.LayoutViewer.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Magenta")]
+        public global::System.Drawing.Color BackgroundColor {
+            get {
+                return ((global::System.Drawing.Color)(this["BackgroundColor"]));
+            }
+            set {
+                this["BackgroundColor"] = value;
+            }
+        }
     }
 }

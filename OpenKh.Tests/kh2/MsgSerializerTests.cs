@@ -220,6 +220,26 @@ namespace OpenKh.Tests.kh2
         }
 
         [Theory]
+        [InlineData(new byte[] { 0x17, 0x0c, 0xdd }, "{:delay&fade 0C DD}")]
+        [InlineData(new byte[] { 0x17, 0x01, 0x02 }, "{:delay&fade 01 02}")]
+        public void SerializeDelayAndFade(byte[] data, string expected)
+        {
+            var commands = Encoders.InternationalSystem.Decode(data);
+            var actual = MsgSerializer.SerializeText(commands);
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData("{:delay&fade 0C DD}", new byte[] { 0x17, 0x0c, 0xdd, 0x00 })]
+        [InlineData("{:delay&fade 01 02}", new byte[] { 0x17, 0x01, 0x02, 0x00 })]
+        public void DeserializeDelayAndFade(string text, byte[] expected)
+        {
+            var commands = MsgSerializer.DeserializeText(text);
+            var actual = Encoders.InternationalSystem.Encode(commands.ToList());
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
         [InlineData(new byte[] { 0x71 }, "{:unk 71}")]
         [InlineData(new byte[] { 0x72 }, "{:unk 72}")]
         public void SerializeTextUnknown(byte[] data, string expected)

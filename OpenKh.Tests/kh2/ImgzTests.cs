@@ -17,7 +17,6 @@ namespace OpenKh.Tests.kh2
                 stream.WriteByte(0x5a);
                 stream.Position = 0;
                 Assert.True(Imgz.IsValid(stream));
-                Assert.Equal(0, stream.Position);
             }
         }
     }

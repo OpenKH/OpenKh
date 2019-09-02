@@ -1,4 +1,4 @@
-# Kingdom Hearts II - Worlds
+# [Kingdom Hearts II](index.md) - Worlds
 
 |Id|Index|World
 |--|-----|--

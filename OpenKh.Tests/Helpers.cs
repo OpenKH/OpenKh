@@ -1,25 +1,12 @@
 ﻿using System;
 using System.IO;
+using OpenKh.Common;
 using Xunit;
 
 namespace OpenKh.Tests
 {
     public static class Helpers
     {
-        public static void Using<T>(this T disposable, Action<T> action)
-            where T : IDisposable
-        {
-            using (disposable)
-                action(disposable);
-        }
-
-        public static TResult Using<T, TResult>(this T disposable, Func<T, TResult> func)
-            where T : IDisposable
-        {
-            using (disposable)
-                return func(disposable);
-        }
-
         public static void Dump(this Stream stream, string path) =>
             File.OpenWrite(path).Using(outStream =>
             {
@@ -29,22 +16,18 @@ namespace OpenKh.Tests
 
         public static void AssertStream(Stream expectedStream, Func<Stream, Stream> funcGenerateNewStream)
         {
-            var expectedData = ReadBytes(expectedStream);
+            var expectedData = expectedStream.ReadAllBytes();
             var actualStream = funcGenerateNewStream(new MemoryStream(expectedData));
-            var actualData = ReadBytes(actualStream);
+            var actualData = actualStream.ReadAllBytes();
 
             Assert.Equal(expectedData.Length, actualData.Length);
-            Assert.Equal(expectedData, actualData);
-        }
 
-        public static byte[] ReadBytes(Stream stream)
-        {
-            var data = new byte[stream.Length];
-            stream.Position = 0;
-            stream.Read(data, 0, data.Length);
-            stream.Position = 0;
-
-            return data;
+            for (var i = 0; i < expectedData.Length; i++)
+            {
+                var ch1 = expectedData[i];
+                var ch2 = actualData[i];
+                Assert.True(ch1 == ch2, $"Expected {ch1:X02} but found {ch2:X02} at {i:X}");
+            }
         }
 
         public static void UseAsset(string assetName, Action<Stream> action) =>

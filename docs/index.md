@@ -8,5 +8,7 @@ Right now the documentation contains info about the following games:
 
 * [Kingdom Hearts II](kh2/index.md)
 * [Kingdom Hearts Birth By Sleep](bbs/index.md)
+* [Kingdom Hearts III](kh3/index.md)
 * Common
+    * [TM2 PlayStation 2 textures](common/tm2.md)
     * [PS4 HD assets](common/hdassets.md)

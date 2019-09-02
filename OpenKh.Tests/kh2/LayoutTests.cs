@@ -1,4 +1,5 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Common;
+using OpenKh.Kh2;
 using System.IO;
 using Xunit;
 
@@ -109,16 +110,12 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void WriteLayoutTest() => Common.FileOpenRead(FilePath, stream =>
         {
-            var expected = new BinaryReader(stream).ReadBytes((int)stream.Length);
-            var layout = new MemoryStream(expected).Using(x => Layout.Read(x));
-            new MemoryStream().Using(x =>
+            Helpers.AssertStream(stream, inStream =>
             {
-                layout.Write(x);
-                x.Position = 0;
-                var actual = new BinaryReader(x).ReadBytes((int)x.Length);
-                x.Dump("dump.layd");
-                Assert.Equal(expected.Length, actual.Length);
-                Assert.Equal(expected, actual);
+                var outStream = new MemoryStream();
+                Layout.Read(inStream).Write(outStream);
+
+                return outStream;
             });
         });
     }

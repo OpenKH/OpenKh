@@ -6,7 +6,6 @@
     <Company>OpenKH</Company>
     <Product>LevelUp editor - OpenKH</Product>
     <Copyright>Copyright ©  2019</Copyright>
-    <OutputPath>..\bin\$(Configuration)\</OutputPath>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
   <ItemGroup>

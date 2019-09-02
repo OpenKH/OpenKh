@@ -16,7 +16,7 @@ namespace OpenKh.Kh2
             public byte[] Data { get; set; }
         }
 
-        public static List<Entry> Open(Stream stream)
+        public static List<Entry> Read(Stream stream)
         {
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");

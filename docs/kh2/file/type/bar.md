@@ -1,4 +1,4 @@
-# BAR (Binary ARchives)
+# [Kingdom Hearts II](../../index) - BAR (Binary ARchives)
 Most of the game's information is stored within these files in order to keep everything organized and easily accessable by the game. These files are kind of like ZIP files, with certain limitations. 
 
 Those limitations include the file's limitations, like the 4 character file names, file types having to be declared within the header, not all file types being declareable, but it also includes PS2's limitations, like the offsets of the files within having to be divisible by 16, even though the size of the previous file is not, file names being unable to contain some characters, etc.
@@ -16,15 +16,17 @@ All the values are Little Endian in the PS2/PS4 Versions, while they are Big End
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 | int32_t | The identifier of the file (Should be always 0x01524142) |
-| 4 | int32_t | The sub-file count of the BAR File. |
-| 8 | int64_t | File padding, has no effect. (Always 0x00)
+| 0 | char[4] | The identifier of the file (Should be always 0x01524142) |
+| 4 | uint32_t | The sub-file count of the BAR File. |
+| 8 | uint32_t | Always zero. Padding for a lookup address at runtime. 
+| 12 | int32_t | Unknown. Often 0. Some mset files set it to 1 or 2.
 
 ### BAR Entry
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 | int32_t | The sub-file's type (List given below) |
+| 0 | uint16_t | The sub-file's type (List given below) |
+| 2 | uint16_t | Duplicate flag (if the entry is already included in the BAR) |
 | 4 | char[4] | The name of the sub-file. Empty characters are registered as 0x00.|
 | 8 | uint32_t | Sub-file's offset/location. Must be divisible by 0x10. Can be padded. |
 | 12 | uint32_t | Sub-file's size. Everything that comes after [ offset + size ] will be ignored for that specific sub-file.
@@ -45,10 +47,10 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 1 | Binary Archive | Varies.
 | 2 | Independent Format (ItemList, TreasureList, StringList, etc.) | 03system.bin (Varies) - msg/jp/xxx.bar (Always StringList)
 | 3 | AI Code (Also should not be used, unless you can code an AI) | MDLX - ARD - MAG
-| 4 | VIF Data (Vertices, Skinning, Bones, etc.) | MDLX - MAP
+| 4 | 3D Model data (Encapsulated VIF packets containing Vertices, Skinning, Bones for MDLX, etc.) | MDLX - MAP
 | 5 | Mesh Occlusion/Obstruction (Probably Culling) | MAP
 | 6 | Map Collision Data | MAP 
-| 7 | RAW Texture Data | MDLX - MAP
+| 7 | RAW(TIM2) Texture Data | MDLX - MAP
 | 8 | DPX (A bit unknown) | PAX
 | 9 | Animation Data | ANB
 | 10 | Texture Data | MAP - minigame/xxx.bar

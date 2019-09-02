@@ -31,14 +31,56 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
+- powershell: .\pre-build.ps1
+
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    vsVersion: '16.0'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build;Publish'
+    maximumCpuCount: true
 
 - task: VSTest@2
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- powershell: gci env:* | sort-object name | Format-Table -AutoSize | Out-File $env:BUILD_ARTIFACTSTAGINGDIRECTORY/environment-variables.txt
+
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/net4**/**/publish/**/?(*.exe|*.dll|*.json|*.config)
+    targetFolder: '$(Build.ArtifactStagingDirectory)/net4'
+    flattenFolders: true
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/net4**/**/publish/**/resources/**
+    targetFolder: '$(Build.ArtifactStagingDirectory)/net4/resources'
+    flattenFolders: true
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/publish/**/?(*.exe|*.dll|*.json|*.config)
+    targetFolder: '$(Build.ArtifactStagingDirectory)/netcore'
+    flattenFolders: true
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/publish/**/resources/**
+    targetFolder: '$(Build.ArtifactStagingDirectory)/netcore/resources'
+    flattenFolders: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: tools
+    parallel: true
+    parallelCount: 8

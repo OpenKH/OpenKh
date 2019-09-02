@@ -1,4 +1,4 @@
-# Kingdom Hearts I & II file types
+# Kingdom Hearts II file types
 
 | Extension | Description | Tool | 
 |-----------|-------------|------|

@@ -1,0 +1,88 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2TextEditor.Views.TextEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2TextEditor.Views"
+             xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="250" d:DesignWidth="400">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="88*"/>
+            <ColumnDefinition Width="61*"/>
+            <ColumnDefinition Width="115*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ListBox
+                Grid.Column="0"
+                ItemsSource="{Binding Messages.Items}"
+                SelectedItem="{Binding SelectedItem}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image
+                                Margin="0 0 3 0"
+                                Source="{StaticResource StatusWarning_16x}"
+                                Visibility="{Binding IconErrorVisiblity}">
+                                <Image.ToolTip>
+                                    <TextBlock Text="{Binding LastError}"/>
+                                </Image.ToolTip>
+                            </Image>
+                            <TextBlock Text="{Binding Title}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Grid Grid.Row="1" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
+                <TextBox Grid.Column="2"
+                    Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+                <ToggleButton Grid.Column="3" Margin="3 0 3 0"
+                    Visibility="{Binding AnyErrorVisibility}"
+                    IsChecked="{Binding ShowErrors, Mode=TwoWay}">
+                    <ToggleButton.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{StaticResource StatusWarning_16x}"/>
+                            <TextBlock Text="{Binding ErrorCount}"/>
+                        </StackPanel>
+                    </ToggleButton.Content>
+                </ToggleButton>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBox
+                Grid.Row="0"
+                MaxLines="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <controls:KingdomTextArea
+                    x:Name="textArea"
+                    Background="Black"
+                    Drawing="{Binding Drawing}"
+                    Context="{Binding TextContext}"
+                    MessageCommands="{Binding SelectedItem.MessageCommands}"/>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -3,15 +3,18 @@
 ## General documentation
 
 * [Games builds](builds.md)
+* [Editions](editions.md)
 * [Worlds](worlds.md)
 * [File types](file-type.md)
   
   * [IDX/IMG](file/type/idx)
   * [BAR](file/type/bar)
+  * [ARD](file/type/ard)
+  * [MSN](file/type/msn)
   
 * Other files
 
-    * [00battle.bin](file/type/lvup)
+    * [00battle.bin](file/type/enmp)
     * [03system.bin](file/type/03system)
 
 
