@@ -362,7 +362,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex319 | Demyx
 | e_ex320 | Luxord (Hooded)
 | e_ex321 | 
-| e_ex322 | Aqua
+| e_ex322 | Darqua (Dark Aqua)
 | e_ex323 | Xigbar Arm
 | e_ex324 | Xigbar Arm (?)
 | e_ex325 | Terra
