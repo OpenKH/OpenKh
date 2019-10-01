@@ -12,7 +12,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 |---------|-------------
 | p_bx001 | Sora (Baymax)
 | p_ca001 | Sora (Caribbean)
-| p_ew001 | Sora (End World?)
+| p_ew001 | Sora (Partially Faded Final World Model)
 | p_ex001 | Sora (KH3)
 | p_ex002 | Aqua
 | p_ex003 | Riku (KH3 Long Hair)
@@ -59,10 +59,10 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ew002 | Goofy
 | n_ew003 | Mickey (?)
 | n_ew004 | Riku (?)
-| n_ew005 | Aqua
+| n_ew005 | Aqua (?)
 | n_ew006 | Ventus (?)
 | n_ew007 | Lea (?)
-| n_ew008 | Sora (Final World Clones?)
+| n_ew008 | Sora (Final World Clones)
 | n_ex001 | Donald
 | n_ex002 | Goofy
 | n_ex003 | Mickey (KH3)
@@ -73,7 +73,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ex008 | Roxas
 | n_ex009 | Roxas (Coat)
 | n_ex010 | Lea (Coat)
-| n_ex011 | Aquanort
+| n_ex011 | Darqua (Dark Aqua)
 | n_ex013 | Naminé
 | n_ex014 | Moogle
 | n_ex015 | Dilan
@@ -362,7 +362,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex319 | Demyx
 | e_ex320 | Luxord (Hooded)
 | e_ex321 | 
-| e_ex322 | Aqua
+| e_ex322 | Darqua (Dark Aqua)
 | e_ex323 | Xigbar Arm
 | e_ex324 | Xigbar Arm (?)
 | e_ex325 | Terra
