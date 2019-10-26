@@ -23,6 +23,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         private string _fileName;
         private IEnumerable<Bar.Entry> _battleItems;
         private EnmpViewModel _enmp;
+        private FmlvViewModel _fmlv;
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
@@ -46,6 +47,12 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         {
             get => _enmp;
             private set { _enmp = value; OnPropertyChanged();}
+        }
+
+        public FmlvViewModel Fmlv
+        {
+            get => _fmlv;
+            private set { _fmlv = value; OnPropertyChanged(); }
         }
 
         public MainViewModel()
@@ -143,17 +150,20 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         {
             _battleItems = new Bar.Entry[0];
             Enmp = GetDefaultBattleViewModelInstance<EnmpViewModel>();
+            Fmlv = GetDefaultBattleViewModelInstance<FmlvViewModel>();
         }
 
         private void LoadBattleItems(IEnumerable<Bar.Entry> entries)
         {
             _battleItems = entries;
             Enmp = GetBattleViewModelInstance<EnmpViewModel>(_battleItems);
+            Fmlv = GetBattleViewModelInstance<FmlvViewModel>(_battleItems);
         }
 
         private void SaveBattleItems()
         {
             _battleItems = SaveBattleItem(_battleItems, Enmp);
+            _battleItems = SaveBattleItem(_battleItems, Fmlv);
         }
 
         private IEnumerable<Bar.Entry> SaveBattleItem(IEnumerable<Bar.Entry> entries, IBattleGetChanges battleGetChanges) =>

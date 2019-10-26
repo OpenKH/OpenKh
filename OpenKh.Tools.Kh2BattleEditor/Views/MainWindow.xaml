@@ -34,6 +34,9 @@
             <TabItem Header="Enmp">
                 <local:EnmpView DataContext="{Binding Enmp}"/>
             </TabItem>
+            <TabItem Header="Fmlv">
+                <local:FmlvView DataContext="{Binding Fmlv}"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
