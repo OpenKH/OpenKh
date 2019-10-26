@@ -21,23 +21,23 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public string EntryName => entryName;
         
         public FmlvViewModel() :
-            this(new BaseBattle<Fmlv2>
+            this(new BaseBattle<Fmlv>
             {
                 Id = DefaultType,
-                Items = new List<Fmlv2>()
+                Items = new List<Fmlv>()
             })
         {}
 
         public FmlvViewModel(IEnumerable<Bar.Entry> entries) :
-            this(Fmlv2.Read(entries.GetBattleStream(entryName)))
+            this(Fmlv.Read(entries.GetBattleStream(entryName)))
         {}
 
 
-        public FmlvViewModel(BaseBattle<Fmlv2> fmlv) :
+        public FmlvViewModel(BaseBattle<Fmlv> fmlv) :
             this(fmlv.Id, fmlv.Items, (fmlv.Items.Count == 0x2D))
         {}
 
-        public FmlvViewModel(int type, IEnumerable<Fmlv2> list, bool isFinalMix) :
+        public FmlvViewModel(int type, IEnumerable<Fmlv> list, bool isFinalMix) :
             base(list.GroupBy(x => x.FormId).Select(x => new FmlvFormViewModel(x, isFinalMix)))
         {
             _type = type;
@@ -46,7 +46,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            new BaseBattle<Fmlv2>
+            new BaseBattle<Fmlv>
             {
                 Id = _type,
                 Items = Items.SelectMany(form => form).Select(x => x.Fmlv).ToList()
@@ -59,10 +59,10 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
     public class FmlvFormViewModel : GenericListModel<FmlvFormViewModel.FmlvEntryViewModel>
     {
-        private readonly IGrouping<int, Fmlv2> fmlvGroup;
+        private readonly IGrouping<int, Fmlv> fmlvGroup;
         private readonly bool isFinalMix;
 
-        public FmlvFormViewModel(IGrouping<int, Fmlv2> x, bool isFinalMix) :
+        public FmlvFormViewModel(IGrouping<int, Fmlv> x, bool isFinalMix) :
             base(x.Select(y => new FmlvEntryViewModel(y)))
             
         {
@@ -74,8 +74,8 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
         public class FmlvEntryViewModel
         {
-            public Fmlv2 Fmlv { get; }
-            public FmlvEntryViewModel(Fmlv2 fmlv)
+            public Fmlv Fmlv { get; }
+            public FmlvEntryViewModel(Fmlv fmlv)
             {
                 Fmlv = fmlv;
             }
