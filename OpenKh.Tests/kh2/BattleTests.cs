@@ -10,29 +10,27 @@ namespace OpenKh.Tests.kh2
         public class FmlvTests
         {
             [Fact]
-            public void CheckStandardFile() => Common.FileOpenRead(@"kh2/res/fmlv_de.bin", stream =>
+            public void CheckStandardNewImpl() => Common.FileOpenRead(@"kh2/res/fmlv_de.bin", stream =>
             {
-                var table = new Fmlv(stream);
-
+                var table = BaseBattle<Fmlv>.Read(stream);
                 Assert.Equal(0x26, table.Count);
-                Assert.Equal(0x26, table.Levels.Count);
+                Assert.Equal(0x26, table.Items.Count);
 
-                Assert.Equal(6, table.Levels.GroupBy(x => x.FormId).ToList().Count);
-
-                Assert.Equal(0x5A, table.Levels.FirstOrDefault(x => x.FormId == 2 && x.FormLevel == 4).Exp);
+                Assert.Equal(6, table.Items.GroupBy(x => x.FormId).ToList().Count);
+                Assert.Equal(0x5A, table.Items.FirstOrDefault(x => x.FormId == 2 && x.FormLevel == 4).Exp);
             });
 
             [Fact]
-            public void CheckFinalMixFile() => Common.FileOpenRead(@"kh2/res/fmlv_fm.bin", stream =>
+            public void CheckFinalMixNewImpl() => Common.FileOpenRead(@"kh2/res/fmlv_fm.bin", stream =>
             {
-                var table = new Fmlv(stream);
+                var table = BaseBattle<Fmlv>.Read(stream);
 
                 Assert.Equal(0x2D, table.Count);
-                Assert.Equal(0x2D, table.Levels.Count);
+                Assert.Equal(0x2D, table.Items.Count);
 
-                Assert.Equal(7, table.Levels.GroupBy(x => x.FormId).ToList().Count);
+                Assert.Equal(7, table.Items.GroupBy(x => x.FormId).ToList().Count);
 
-                Assert.Equal(0x4C, table.Levels.FirstOrDefault(x => x.FormId == 2 && x.FormLevel == 4).Exp);
+                Assert.Equal(0x4C, table.Items.FirstOrDefault(x => x.FormId == 2 && x.FormLevel == 4).Exp);
             });
         }
 
