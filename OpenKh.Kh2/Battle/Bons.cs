@@ -5,7 +5,7 @@ namespace OpenKh.Kh2.Battle
 {
     public class Bons
     {
-        [Data] public byte RewardIndex { get; set; }
+        [Data] public byte RewardId { get; set; }
         [Data] public byte CharacterId { get; set; }
         [Data] public byte HpIncrease { get; set; }
         [Data] public byte MpIncrease { get; set; }
