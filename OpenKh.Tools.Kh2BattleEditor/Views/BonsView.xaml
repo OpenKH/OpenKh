@@ -56,7 +56,7 @@
             Visibility="{Binding IsItemEditingVisible}">
             <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
                 <TextBlock Text="Reward ID" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding RewardId, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{Binding Id}"/>
 
                 <TextBlock Text="Character ID" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding CharacterId, UpdateSourceTrigger=PropertyChanged}"/>
