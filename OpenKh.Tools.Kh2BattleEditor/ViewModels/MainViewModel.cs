@@ -24,6 +24,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         private IEnumerable<Bar.Entry> _battleItems;
         private EnmpViewModel _enmp;
         private FmlvViewModel _fmlv;
+        private BonsViewModel _bons;
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
@@ -54,6 +55,13 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             get => _fmlv;
             private set { _fmlv = value; OnPropertyChanged(); }
         }
+
+        public BonsViewModel Bons
+        {
+            get => _bons;
+            private set { _bons = value; OnPropertyChanged(); }
+        }
+
 
         public MainViewModel()
         {
@@ -144,6 +152,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             "enmp",
             "fmlv",
             "lvpm",
+            "bons",
         }.Contains(x.Name));
 
         private void CreateBattleItems()
@@ -151,6 +160,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             _battleItems = new Bar.Entry[0];
             Enmp = GetDefaultBattleViewModelInstance<EnmpViewModel>();
             Fmlv = GetDefaultBattleViewModelInstance<FmlvViewModel>();
+            Bons = GetDefaultBattleViewModelInstance<BonsViewModel>();
         }
 
         private void LoadBattleItems(IEnumerable<Bar.Entry> entries)
@@ -158,12 +168,14 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             _battleItems = entries;
             Enmp = GetBattleViewModelInstance<EnmpViewModel>(_battleItems);
             Fmlv = GetBattleViewModelInstance<FmlvViewModel>(_battleItems);
+            Bons = GetBattleViewModelInstance<BonsViewModel>(_battleItems);
         }
 
         private void SaveBattleItems()
         {
             _battleItems = SaveBattleItem(_battleItems, Enmp);
             _battleItems = SaveBattleItem(_battleItems, Fmlv);
+            _battleItems = SaveBattleItem(_battleItems, Bons);
         }
 
         private IEnumerable<Bar.Entry> SaveBattleItem(IEnumerable<Bar.Entry> entries, IBattleGetChanges battleGetChanges) =>

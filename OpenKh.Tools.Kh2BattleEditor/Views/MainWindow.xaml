@@ -37,6 +37,9 @@
             <TabItem Header="Fmlv">
                 <local:FmlvView DataContext="{Binding Fmlv}"/>
             </TabItem>
+            <TabItem Header="Bons">
+                <local:BonsView DataContext="{Binding Bons}"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
