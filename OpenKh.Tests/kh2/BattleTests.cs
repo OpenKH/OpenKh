@@ -78,5 +78,12 @@ namespace OpenKh.Tests.kh2
             var characters = table.Items.GroupBy(c => c.CharacterId).ToList();
             Assert.Equal(0xF1, table.Items.Count);
         }));
+
+        [Fact]
+        public void LvupTableTest() => Common.FileOpenRead(@"kh2/res/lvup_fm.bin", x => x.Using(stream =>
+        {
+            var table = Lvup2.Read(stream);
+            Assert.Equal(0xE, table.Count);
+        }));
     }
 }
