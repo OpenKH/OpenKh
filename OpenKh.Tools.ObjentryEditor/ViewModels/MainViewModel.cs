@@ -109,6 +109,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             //FileName = fileName;
             Objentry = new ObjentryViewModel(BaseTable<Objentry>.Read(stream));
             OnPropertyChanged("Objentry");
+            FileName = fileName;
             return true;
         });
 
