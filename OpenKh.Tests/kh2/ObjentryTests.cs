@@ -1,6 +1,4 @@
 ﻿using OpenKh.Kh2;
-using OpenKh.Kh2.Battle;
-using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
