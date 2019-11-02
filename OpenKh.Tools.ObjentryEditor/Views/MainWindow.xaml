@@ -1,0 +1,35 @@
+﻿<Window x:Class="OpenKh.Tools.ObjentryEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ObjentryEditor"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open 00objentry"
+                          Command="{Binding OpenCommand}"/>
+                <MenuItem Header="_Save 00objentry"
+                          Command="{Binding SaveCommand}"/>
+                <MenuItem Header="Save 00objentry _as..."
+                          Command="{Binding SaveAsCommand}"/>
+                <Separator/>
+                <MenuItem Header="E_xit"
+                          Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About"
+                          Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        
+    </Grid>
+</Window>
