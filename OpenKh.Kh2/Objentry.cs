@@ -5,9 +5,9 @@ namespace OpenKh.Kh2
 {
     public class Objentry
     {
-        [Data] public ushort CharacterId { get; set; }
+        [Data] public ushort ObjectId { get; set; }
         [Data] public ushort Unknown02 { get; set; }
-        [Data] public ushort CharacterType { get; set; }
+        [Data] public ushort ObjectType { get; set; }
         [Data] public ushort ApparationPriority { get; set; }
         [Data(Count = 32)] public byte[] ModelName { get; set; }
         [Data(Count = 32)] public byte[] AnimationName { get; set; }
