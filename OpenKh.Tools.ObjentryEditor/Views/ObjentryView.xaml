@@ -56,7 +56,7 @@
             Visibility="{Binding IsItemEditingVisible}">
             <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
                 <TextBlock Text="Object ID" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding ObjectId}"/>
+                <TextBlock Text="{Binding Id}"/>
 
                 <TextBlock Text="Unknown02" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown02, UpdateSourceTrigger=PropertyChanged}"/>
