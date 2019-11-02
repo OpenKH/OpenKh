@@ -1,0 +1,99 @@
+﻿<UserControl x:Class="OpenKh.Tools.ObjentryEditor.Views.ObjentryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.ObjentryEditor.Views"
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="0"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ListBox
+                Grid.Column="0"
+                ItemsSource="{Binding Items}"
+                SelectedItem="{Binding SelectedItem}"
+                DisplayMemberPath="Name">
+            </ListBox>
+
+            <Grid Grid.Row="1" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!--<Image Grid.Column="0" Source="{StaticResource Search_16x}"/>-->
+                <TextBox Grid.Column="2"
+                    Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </Grid>
+
+        <!--<StackPanel
+            Grid.Column="2"
+            Visibility="{Binding IsItemEditMessageVisible}">
+            <TextBlock
+                Text="Please select an item to modify"/>
+        </StackPanel>-->
+
+        <ScrollViewer
+            Grid.Column="2"
+            Margin="5"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="{Binding IsItemEditingVisible}">
+            <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
+                <TextBlock Text="Object ID" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding ObjectId}"/>
+
+                <TextBlock Text="Unknown02" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown02, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Object Type" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding ObjectType, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Apparation Priority" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding ApparationPriority, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Model Name" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding ModelName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Animation Name" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding AnimationName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown48" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown48, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Loaded Vsb" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding LoadedVsb, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Loaded Weapon" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding LoadedWeapon, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="CameraPosition" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding CameraPosition, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown54" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown54, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown58" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown58, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown5c" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown5c, UpdateSourceTrigger=PropertyChanged}"/>
+            </controls:TwoColumnsPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
