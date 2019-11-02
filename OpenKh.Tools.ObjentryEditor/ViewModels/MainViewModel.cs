@@ -1,4 +1,6 @@
-﻿using OpenKh.Tools.Common;
+﻿using OpenKh.Common;
+using OpenKh.Kh2;
+using OpenKh.Tools.Common;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,6 +19,8 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         private string _fileName;
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
+
+        public ObjentryViewModel Objentry { get; private set; }
 
         private string FileName
         {
@@ -40,8 +44,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             {
                 var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new[]
                 {
-                    ("00battle.bin", "bin"),
-                    ("BAR file", "bar"),
+                    ("00objentry.bin", "bin"),
                     ("All files", "*")
                 });
 
@@ -87,24 +90,50 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
         public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
-            if (!Bar.IsValid(stream))
-            {
-                MessageBox.Show(Window, $"{Path.GetFileName(fileName)} is not a valid BAR file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
+            //if (!Bar.IsValid(stream))
+            //{
+            //    MessageBox.Show(Window, $"{Path.GetFileName(fileName)} is not a valid BAR file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    return false;
+            //}
 
-            var items = Bar.Read(stream);
+            //var items = Bar.Read(stream);
 
-            if (!Is00battle(items))
-            {
-                MessageBox.Show(Window, $"{Path.GetFileName(fileName)} does not appear to be a valid 00battle.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
+            //if (!Is00battle(items))
+            //{
+            //    MessageBox.Show(Window, $"{Path.GetFileName(fileName)} does not appear to be a valid 00battle.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    return false;
+            //}
 
-            LoadBattleItems(items);
+            //LoadBattleItems(items);
 
-            FileName = fileName;
+            //FileName = fileName;
+            Objentry = new ObjentryViewModel(BaseTable<Objentry>.Read(stream));
+
             return true;
         });
+
+        public void SaveFile(string previousFileName, string fileName)
+        {
+            //if (File.Exists(previousFileName))
+            //{
+            //    bool isBar = false;
+            //    List<Bar.Entry> entries;
+
+            //    entries = File.OpenRead(previousFileName).Using(stream =>
+            //    {
+            //        isBar = Bar.IsValid(stream);
+            //        return isBar ? Bar.Read(stream) : null;
+            //    });
+
+            //    if (isBar)
+            //        File.Create(fileName).Using(stream => WriteBar(entries, stream));
+            //    else
+            //        File.Create(fileName).Using(WriteMsg);
+            //}
+            //else
+            //{
+            //    File.Create(fileName).Using(WriteMsg);
+            //}
+        }
     }
 }
