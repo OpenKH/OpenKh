@@ -14,7 +14,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 {
     public class MainViewModel : BaseNotifyPropertyChanged
     {
-        private static string ApplicationName = Utilities.GetApplicationName();
+        private static readonly string ApplicationName = Utilities.GetApplicationName();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
 
@@ -90,23 +90,6 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
         public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
-            //if (!Bar.IsValid(stream))
-            //{
-            //    MessageBox.Show(Window, $"{Path.GetFileName(fileName)} is not a valid BAR file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    return false;
-            //}
-
-            //var items = Bar.Read(stream);
-
-            //if (!Is00battle(items))
-            //{
-            //    MessageBox.Show(Window, $"{Path.GetFileName(fileName)} does not appear to be a valid 00battle.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    return false;
-            //}
-
-            //LoadBattleItems(items);
-
-            //FileName = fileName;
             Objentry = new ObjentryViewModel(BaseTable<Objentry>.Read(stream));
             OnPropertyChanged("Objentry");
             FileName = fileName;
@@ -115,26 +98,12 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
         public void SaveFile(string previousFileName, string fileName)
         {
-            //if (File.Exists(previousFileName))
-            //{
-            //    bool isBar = false;
-            //    List<Bar.Entry> entries;
-
-            //    entries = File.OpenRead(previousFileName).Using(stream =>
-            //    {
-            //        isBar = Bar.IsValid(stream);
-            //        return isBar ? Bar.Read(stream) : null;
-            //    });
-
-            //    if (isBar)
-            //        File.Create(fileName).Using(stream => WriteBar(entries, stream));
-            //    else
-            //        File.Create(fileName).Using(WriteMsg);
-            //}
-            //else
-            //{
-            //    File.Create(fileName).Using(WriteMsg);
-            //}
+            var objstream = Objentry.CreateStream();
+            using (var f = File.Create(fileName))
+            {
+                objstream.Seek(0, SeekOrigin.Begin);
+                objstream.CopyTo(f);
+            }
         }
     }
 }
