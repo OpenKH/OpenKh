@@ -17,9 +17,10 @@
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
 
-        <Grid>
+        <Grid Margin="5 5 0 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
@@ -32,13 +33,24 @@
 
             <Grid Grid.Row="1" Margin="0 5 0 5">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Command="{Binding AddCommand}" Content="Add"/>
+                <Button Grid.Column="2" Command="{Binding RemoveCommand}" Content="Remove"/>
+            </Grid>
+
+            <Grid Grid.Row="2" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="3"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <!--<Image Grid.Column="0" Source="{StaticResource Search_16x}"/>-->
+                <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
                 <TextBox Grid.Column="2"
                     Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+
             </Grid>
         </Grid>
 

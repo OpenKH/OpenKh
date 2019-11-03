@@ -27,8 +27,16 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public ushort Unknown02 { get => Objentry.Unknown02; set => Objentry.Unknown02 = value; }
             public ushort ObjectType { get => Objentry.ObjectType; set => Objentry.ObjectType = value; }
             public ushort ApparationPriority { get => Objentry.ApparationPriority; set => Objentry.ApparationPriority = value; }
-            public string ModelName { get => Encoding.Default.GetString(Objentry.ModelName); set => Objentry.ModelName = Encoding.Default.GetBytes(value); }
-            public string AnimationName { get => Encoding.Default.GetString(Objentry.AnimationName); set => Objentry.AnimationName = Encoding.Default.GetBytes(value); }
+            public string ModelName 
+            { 
+                get { return Objentry.ModelName == null ? string.Empty : Encoding.Default.GetString(Objentry.ModelName); }
+                set => Objentry.ModelName = Encoding.Default.GetBytes(value); 
+            }
+            public string AnimationName
+            {
+                get { return Objentry.AnimationName == null ? string.Empty : Encoding.Default.GetString(Objentry.AnimationName); }
+                set { Objentry.AnimationName = Encoding.Default.GetBytes(value); }
+            }
             public uint Unknown48 { get => Objentry.Unknown48; set => Objentry.Unknown48 = value; }
             public ushort LoadedVsb { get => Objentry.LoadedVsb; set => Objentry.LoadedVsb = value; }
             public ushort LoadedWeapon { get => Objentry.LoadedWeapon; set => Objentry.LoadedWeapon = value; }
@@ -95,6 +103,19 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
                 Filter(FilterNone);
             else
                 Filter(FilterByCharacter);
+        }
+
+        protected override ObjentryEntryViewModel OnNewItem()
+        {
+            return new ObjentryEntryViewModel(new Objentry()
+            {
+                ObjectId = GetObjectIdForNewEntry()
+            });
+        }
+
+        private ushort GetObjectIdForNewEntry()
+        {
+            return (ushort)(Items.LastOrDefault()?.ObjectId + 1 ?? 0);
         }
 
         private bool FilterNone(ObjentryEntryViewModel arg) => true;
