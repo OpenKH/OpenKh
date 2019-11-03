@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.ObjentryEditor.Views"
              xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+             xmlns:bhv="clr-namespace:OpenKh.Tools.ObjentryEditor.Behavior"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -28,7 +30,11 @@
                 Grid.Column="0"
                 ItemsSource="{Binding Items}"
                 SelectedItem="{Binding SelectedItem}"
+                SelectedIndex="{Binding SelectedIndex}"
                 DisplayMemberPath="Name">
+                <i:Interaction.Behaviors>
+                    <bhv:ScrollIntoViewBehavior/>
+                </i:Interaction.Behaviors>
             </ListBox>
 
             <Grid Grid.Row="1" Margin="0 5 0 5">
@@ -36,9 +42,12 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="5"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Command="{Binding AddCommand}" Content="Add"/>
-                <Button Grid.Column="2" Command="{Binding RemoveCommand}" Content="Remove"/>
+                <Button Grid.Column="0" Command="{Binding AddAndSelectCommand}" Content="Add"/>
+                <Button Grid.Column="2" Command="{Binding CloneCommand}" Content="Clone"/>
+                <Button Grid.Column="4" Command="{Binding RemoveCommand}" Content="Remove"/>
             </Grid>
 
             <Grid Grid.Row="2" Margin="0 5 0 5">
@@ -53,13 +62,6 @@
 
             </Grid>
         </Grid>
-
-        <!--<StackPanel
-            Grid.Column="2"
-            Visibility="{Binding IsItemEditMessageVisible}">
-            <TextBlock
-                Text="Please select an item to modify"/>
-        </StackPanel>-->
 
         <ScrollViewer
             Grid.Column="2"
@@ -76,8 +78,11 @@
                 <TextBlock Text="Object Type" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding ObjectType, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Apparation Priority" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding ApparationPriority, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Unknown06" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown06, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Weapon Joint" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding WeaponJoint, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Model Name" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding ModelName, UpdateSourceTrigger=PropertyChanged}"/>
@@ -88,14 +93,14 @@
                 <TextBlock Text="Unknown48" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown48, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Loaded Vsb" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding LoadedVsb, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Neo Status" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding NeoStatus, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Loaded Weapon" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding LoadedWeapon, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Neo Moveset" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding NeoMoveset, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="CameraPosition" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding CameraPosition, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Unknown50" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown50, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown54" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown54, UpdateSourceTrigger=PropertyChanged}"/>

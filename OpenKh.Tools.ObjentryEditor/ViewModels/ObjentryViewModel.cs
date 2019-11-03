@@ -4,13 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using Xe.Tools;
+using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Models;
 
 namespace OpenKh.Tools.ObjentryEditor.ViewModels
 {
     public class ObjentryViewModel : GenericListModel<ObjentryViewModel.ObjentryEntryViewModel>
     {
-        public class ObjentryEntryViewModel
+        public class ObjentryEntryViewModel : BaseNotifyPropertyChanged
         {
             public Objentry Objentry { get; }
 
@@ -26,11 +28,12 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public ushort ObjectId { get => Objentry.ObjectId; set => Objentry.ObjectId = value; }
             public ushort Unknown02 { get => Objentry.Unknown02; set => Objentry.Unknown02 = value; }
             public ushort ObjectType { get => Objentry.ObjectType; set => Objentry.ObjectType = value; }
-            public ushort ApparationPriority { get => Objentry.ApparationPriority; set => Objentry.ApparationPriority = value; }
+            public byte Unknown06 { get => Objentry.Unknown06; set => Objentry.Unknown06 = value; }
+            public byte WeaponJoint { get => Objentry.WeaponJoint; set => Objentry.WeaponJoint = value; }
             public string ModelName 
             { 
                 get { return Objentry.ModelName == null ? string.Empty : Encoding.Default.GetString(Objentry.ModelName); }
-                set => Objentry.ModelName = Encoding.Default.GetBytes(value); 
+                set { Objentry.ModelName = Encoding.Default.GetBytes(value); OnPropertyChanged("Name"); } 
             }
             public string AnimationName
             {
@@ -38,9 +41,9 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
                 set { Objentry.AnimationName = Encoding.Default.GetBytes(value); }
             }
             public uint Unknown48 { get => Objentry.Unknown48; set => Objentry.Unknown48 = value; }
-            public ushort LoadedVsb { get => Objentry.LoadedVsb; set => Objentry.LoadedVsb = value; }
-            public ushort LoadedWeapon { get => Objentry.LoadedWeapon; set => Objentry.LoadedWeapon = value; }
-            public uint CameraPosition { get => Objentry.CameraPosition; set => Objentry.CameraPosition = value; }
+            public ushort NeoStatus { get => Objentry.NeoStatus; set => Objentry.NeoStatus = value; }
+            public ushort NeoMoveset { get => Objentry.NeoMoveset; set => Objentry.NeoMoveset = value; }
+            public uint Unknown50 { get => Objentry.Unknown50; set => Objentry.Unknown50 = value; }
             public uint Unknown54 { get => Objentry.Unknown54; set => Objentry.Unknown54 = value; }
             public uint Unknown58 { get => Objentry.Unknown58; set => Objentry.Unknown58 = value; }
             public uint Unknown5c { get => Objentry.Unknown5c; set => Objentry.Unknown5c = value; }
@@ -61,8 +64,20 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             base(items.Select(Map))
         {
             _type = type;
+            AddAndSelectCommand = new RelayCommand(x =>
+            {
+                AddCommand.Execute(null);
+                SelectedIndex = Items.Count - 1;
+            });
+
+            CloneCommand = new RelayCommand(x =>
+            {
+
+            }, x => SelectedItem != null);
         }
 
+        public RelayCommand AddAndSelectCommand { get; set; }
+        public RelayCommand CloneCommand { get; set; }
 
         public Visibility IsItemEditingVisible => IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsItemEditMessageVisible => !IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
