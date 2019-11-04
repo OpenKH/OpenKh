@@ -70,17 +70,35 @@
                 <TextBlock Text="StatEntry" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding StatEntry, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="ShopValue1 weakness" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="Name" Margin="{StaticResource LabelMargin}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding NameId, UpdateSourceTrigger=PropertyChanged}" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Visibility="Collapsed" Width="22" Content="..." Command="{Binding ChangeNameCommand}"/>
+                </Grid>
+
+                <TextBlock Text="Description" Margin="{StaticResource LabelMargin}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding DescriptionId, UpdateSourceTrigger=PropertyChanged}" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Visibility="Collapsed" Width="22" Content="..." Command="{Binding ChangeDescriptionCommand}"/>
+                </Grid>
+
+                <TextBlock Text="ShopValue1" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding ShopValue1, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="ShopValue2" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding ShopValue2, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <TextBlock Text="String1" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding String1, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <TextBlock Text="String2" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding String2, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Command" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Command, UpdateSourceTrigger=PropertyChanged}"/>

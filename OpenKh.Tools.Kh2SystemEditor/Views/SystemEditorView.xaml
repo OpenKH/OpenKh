@@ -31,13 +31,13 @@
         </Menu>
 
         <TabControl Grid.Row="1">
-            <TabItem Header="Enmp">
+            <TabItem Header="Item">
                 <local:ItemView DataContext="{Binding Item}"/>
             </TabItem>
-            <TabItem Header="Fmlv">
+            <TabItem Header="Trsr">
                 <local:TrsrView DataContext="{Binding Trsr}"/>
             </TabItem>
-            <TabItem Header="Bons">
+            <TabItem Header="Ftst">
                 <local:FtstView DataContext="{Binding Ftst}"/>
             </TabItem>
         </TabControl>

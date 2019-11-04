@@ -12,6 +12,7 @@ using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
+using OpenKh.Tools.Kh2SystemEditor.Services;
 
 namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
@@ -21,6 +22,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
         private IEnumerable<Bar.Entry> _barItems;
+        private BucketService _bucketService;
         private ItemViewModel _item;
         private TrsrViewModel _trsr;
         private FtstViewModel _ftst;
@@ -111,7 +113,8 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
 
-            CreateBattleItems();
+            _bucketService = new BucketService();
+            CreateSystem();
         }
 
         public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
@@ -130,7 +133,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 return false;
             }
 
-            LoadBattleItems(items);
+            LoadSystem(items);
 
             FileName = fileName;
             return true;
@@ -140,7 +143,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         {
             File.Create(fileName).Using(stream =>
             {
-                SaveBattleItems();
+                SaveSystem();
                 Bar.Write(stream, _barItems);
             });
         }
@@ -152,34 +155,41 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             "ftst",
         }.Contains(x.Name));
 
-        private void CreateBattleItems()
+        private void CreateSystem()
         {
             _barItems = new Bar.Entry[0];
-            Item = GetDefaultViewModelInstance<ItemViewModel>();
+            Item = new ItemViewModel(_bucketService);
             Trsr = GetDefaultViewModelInstance<TrsrViewModel>();
             Ftst = GetDefaultViewModelInstance<FtstViewModel>();
         }
 
-        private void LoadBattleItems(IEnumerable<Bar.Entry> entries)
+        private void LoadSystem(IEnumerable<Bar.Entry> entries)
         {
             _barItems = entries;
-            Item = GetViewModelInstance<ItemViewModel>(_barItems);
+            Item = new ItemViewModel(_bucketService, _barItems);
             //Trsr = GetViewModelInstance<TrsrViewModel>(_barItems);
             //Ftst = GetViewModelInstance<FtstViewModel>(_barItems);
         }
 
-        private void SaveBattleItems()
+        private void SaveSystem()
         {
-            _barItems = SaveBattleItem(_barItems, Item);
-            _barItems = SaveBattleItem(_barItems, Trsr);
-            _barItems = SaveBattleItem(_barItems, Ftst);
+            _barItems = SaveSystemEntry(_barItems, Item);
+            //_barItems = SaveSystemEntry(_barItems, Trsr);
+            //_barItems = SaveSystemEntry(_barItems, Ftst);
         }
 
-        private IEnumerable<Bar.Entry> SaveBattleItem(IEnumerable<Bar.Entry> entries, ISystemGetChanges battleGetChanges) =>
+        public void LoadMessage(Stream stream)
+        {
+            if (!_bucketService.LoadMessages(stream))
+                return;
+
+            SaveSystem();
+            LoadSystem(_barItems);
+        }
+
+        private IEnumerable<Bar.Entry> SaveSystemEntry(IEnumerable<Bar.Entry> entries, ISystemGetChanges battleGetChanges) =>
             entries.ForEntry(Bar.EntryType.Binary, battleGetChanges.EntryName, 0, entry => entry.Stream = battleGetChanges.CreateStream());
 
-        private T GetViewModelInstance<T>(IEnumerable<Bar.Entry> entries)
-            where T : ISystemGetChanges => (T)Activator.CreateInstance(typeof(T), entries);
 
         private T GetDefaultViewModelInstance<T>()
             where T : ISystemGetChanges => Activator.CreateInstance<T>();

@@ -44,8 +44,8 @@ namespace OpenKh.Kh2.System
             [Data] public byte Flag1 { get; set; }
             [Data] public byte Flag2 { get; set; }
             [Data] public ushort StatEntry { get; set; }
-            [Data] public ushort String1 { get; set; }
-            [Data] public ushort String2 { get; set; }
+            [Data] public ushort Name { get; set; }
+            [Data] public ushort Description { get; set; }
             [Data] public ushort ShopValue1 { get; set; }
             [Data] public ushort ShopValue2 { get; set; }
             [Data] public ushort Command { get; set; }

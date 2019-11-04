@@ -14,22 +14,41 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
     {
         public class Entry : BaseNotifyPropertyChanged
         {
+            private readonly IMessageProvider _messageProvider;
+
             public Item.Entry Item { get; }
 
-            public Entry(Item.Entry item)
+            public Entry(IMessageProvider messageProvider, Item.Entry item)
             {
+                _messageProvider = messageProvider;
                 Item = item;
             }
 
-            public string Name => $"{Item.Id:X02}";
+            public string Title => $"{Item.Id:X02} {_messageProvider.GetMessage(Item.Name)}";
 
             public ushort Id { get => Item.Id; set => Item.Id = value; }
             public ushort TypeShort  { get => Item.Type; set => Item.Type = value; }
             public byte Flag1  { get => Item.Flag1; set => Item.Flag1 = value; }
             public byte Flag2  { get => Item.Flag2; set => Item.Flag2 = value; }
             public ushort StatEntry  { get => Item.StatEntry; set => Item.StatEntry = value; }
-            public ushort String1 { get => (ushort)(Item.String1 & 0x7FFF); set => Item.String1 = (ushort)(value | 0x8000); }
-            public ushort String2 { get => (ushort)(Item.String2 & 0x7FFF); set => Item.String2 = (ushort)(value | 0x8000); }
+            public ushort NameId
+            {
+                get => Item.Name;
+                set
+                {
+                    Item.Name = value;
+                    OnPropertyChanged(nameof(Name));
+                }
+            }
+            public ushort DescriptionId
+            {
+                get => Item.Description;
+                set
+                {
+                    Item.Description = value;
+                    OnPropertyChanged(nameof(Description));
+                }
+            }
             public ushort ShopValue1 { get => Item.ShopValue1; set => Item.ShopValue1 = value; }
             public ushort ShopValue2 { get => Item.ShopValue2; set => Item.ShopValue2 = value; }
             public ushort Command  { get => Item.Command; set => Item.Command = value; }
@@ -38,40 +57,73 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public byte Icon1  { get => Item.Icon1; set => Item.Icon1 = value; }
             public byte Icon2  { get => Item.Icon1; set => Item.Icon1 = value; }
 
-            public override string ToString() => Name;
+            public string Name { get => _messageProvider.GetMessage(Item.Name); set => _messageProvider.SetMessage(Item.Name, value); }
+            public string Description { get => _messageProvider.GetMessage(Item.Description); set => _messageProvider.SetMessage(Item.Description, value); }
+
+            public override string ToString() => Title;
         }
 
         private const string entryName = "item";
+        private readonly IMessageProvider _messageProvider;
+        private string _searchTerm;
 
-        public ItemViewModel(IEnumerable<Bar.Entry> entries) :
-            this(Item.Read(entries.GetBinaryStream(entryName)))
+        public ItemViewModel(IMessageProvider messageProvider, IEnumerable<Bar.Entry> entries) :
+            this(messageProvider, Item.Read(entries.GetBinaryStream(entryName)))
         { }
 
-        public ItemViewModel() :
-            this(new Item
+        public ItemViewModel(IMessageProvider messageProvider) :
+            this(messageProvider, new Item
             {
                 Items1 = new List<Item.Entry>(),
                 Items2 = new List<Item.Stat>()
             })
         { }
 
-        private ItemViewModel(Item item) :
-            this(item.Items1)
+        private ItemViewModel(IMessageProvider messageProvider, Item item) :
+            this(messageProvider, item.Items1)
         { }
 
-        private ItemViewModel(IEnumerable<Item.Entry> items) :
-            base(items.Select(Map))
+        private ItemViewModel(IMessageProvider messageProvider, IEnumerable<Item.Entry> items) :
+            base(items.Select(item => new Entry(messageProvider, item)))
         {
+            _messageProvider = messageProvider;
         }
 
         public string EntryName => entryName;
 
-        public Stream CreateStream()
+        public string SearchTerm
         {
-            throw new System.NotImplementedException();
+            get => _searchTerm;
+            set
+            {
+                _searchTerm = value;
+                PerformFiltering();
+            }
         }
 
-        private static Entry Map(Item.Entry item) =>
-            new Entry(item);
+        public Stream CreateStream()
+        {
+            var stream = new MemoryStream();
+            new Item
+            {
+                Items1 = this.Select(x => x.Item).ToList(),
+                Items2 = new List<Item.Stat>()
+            }.Write(stream);
+
+            return stream;
+        }
+
+        private void PerformFiltering()
+        {
+            if (string.IsNullOrWhiteSpace(SearchTerm))
+                Filter(FilterNone);
+            else
+                Filter(FilterByName);
+        }
+
+        private bool FilterNone(Entry arg) => true;
+
+        private bool FilterByName(Entry arg) =>
+            arg.Title.ToUpper().Contains(SearchTerm.ToUpper());
     }
 }
