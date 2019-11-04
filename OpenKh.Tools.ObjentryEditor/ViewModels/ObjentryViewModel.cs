@@ -77,7 +77,9 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
             CloneCommand = new RelayCommand(x =>
             {
-
+                var clonedItem = Clone(SelectedItem.Objentry);
+                Items.Add(new ObjentryEntryViewModel(clonedItem));
+                OnPropertyChanged(nameof(Items));
             }, x => SelectedItem != null);
         }
 
@@ -131,6 +133,32 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             {
                 ObjectId = GetObjectIdForNewEntry()
             });
+        }
+
+        private Objentry Clone(Objentry source)
+        {
+            return new Objentry()
+            {
+                ObjectId = GetObjectIdForNewEntry(),
+                Unknown02 = source.Unknown02,
+                ObjectType = source.ObjectType,
+                Unknown05 = source.Unknown05,
+                Unknown06 = source.Unknown06,
+                WeaponJoint = source.WeaponJoint,
+                ModelName = source.ModelName,
+                AnimationName = source.AnimationName,
+                Unknown48 = source.Unknown48,
+                NeoStatus = source.NeoStatus,
+                NeoMoveset = source.NeoMoveset,
+                Unknown50 = source.Unknown50,
+                SpawnLimiter = source.SpawnLimiter,
+                Unknown55 = source.Unknown55,
+                Unknown56 = source.Unknown56,
+                Unknown57 = source.Unknown57,
+                SpawnObject1 = source.SpawnObject1,
+                SpawnObject2 = source.SpawnObject2,
+                Unknown5c = source.Unknown5c
+            };
         }
 
         private ushort GetObjectIdForNewEntry()
