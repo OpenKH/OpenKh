@@ -91,6 +91,7 @@ namespace OpenKh.Kh2.System
 
         public static Item Read(Stream stream)
         {
+            stream.Position = 0;
             var one = SubItemReader<Entry>.Read(stream);
             var two = SubItemReader<Stat>.Read(stream);
 

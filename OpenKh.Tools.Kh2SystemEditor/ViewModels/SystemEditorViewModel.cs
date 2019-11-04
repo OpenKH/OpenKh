@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Windows;
 using OpenKh.Common;
 using OpenKh.Kh2;
-using OpenKh.Kh2.System;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.Common;
 using Xe.Tools;
@@ -16,7 +15,7 @@ using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 
 namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
-    public class MainViewModel : BaseNotifyPropertyChanged
+    public class SystemEditorViewModel : BaseNotifyPropertyChanged
     {
         private static string ApplicationName = Utilities.GetApplicationName();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
@@ -63,7 +62,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         }
 
 
-        public MainViewModel()
+        public SystemEditorViewModel()
         {
             OpenCommand = new RelayCommand(x =>
             {
@@ -156,17 +155,17 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private void CreateBattleItems()
         {
             _barItems = new Bar.Entry[0];
-            Item = GetDefaultBattleViewModelInstance<ItemViewModel>();
-            Trsr = GetDefaultBattleViewModelInstance<TrsrViewModel>();
-            Ftst = GetDefaultBattleViewModelInstance<FtstViewModel>();
+            Item = GetDefaultViewModelInstance<ItemViewModel>();
+            Trsr = GetDefaultViewModelInstance<TrsrViewModel>();
+            Ftst = GetDefaultViewModelInstance<FtstViewModel>();
         }
 
         private void LoadBattleItems(IEnumerable<Bar.Entry> entries)
         {
             _barItems = entries;
-            Item = GetBattleViewModelInstance<ItemViewModel>(_barItems);
-            Trsr = GetBattleViewModelInstance<TrsrViewModel>(_barItems);
-            Ftst = GetBattleViewModelInstance<FtstViewModel>(_barItems);
+            Item = GetViewModelInstance<ItemViewModel>(_barItems);
+            //Trsr = GetViewModelInstance<TrsrViewModel>(_barItems);
+            //Ftst = GetViewModelInstance<FtstViewModel>(_barItems);
         }
 
         private void SaveBattleItems()
@@ -179,10 +178,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private IEnumerable<Bar.Entry> SaveBattleItem(IEnumerable<Bar.Entry> entries, ISystemGetChanges battleGetChanges) =>
             entries.ForEntry(Bar.EntryType.Binary, battleGetChanges.EntryName, 0, entry => entry.Stream = battleGetChanges.CreateStream());
 
-        private T GetBattleViewModelInstance<T>(IEnumerable<Bar.Entry> entries)
+        private T GetViewModelInstance<T>(IEnumerable<Bar.Entry> entries)
             where T : ISystemGetChanges => (T)Activator.CreateInstance(typeof(T), entries);
 
-        private T GetDefaultBattleViewModelInstance<T>()
+        private T GetDefaultViewModelInstance<T>()
             where T : ISystemGetChanges => Activator.CreateInstance<T>();
     }
 }

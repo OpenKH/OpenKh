@@ -1,4 +1,5 @@
-﻿using System.Windows;
+using OpenKh.Tools.Kh2SystemEditor.ViewModels;
+using System.Windows;
 
 namespace OpenKh.Tools.Kh2SystemEditor.Views
 {
@@ -10,6 +11,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.Views
         public SystemEditorView()
         {
             InitializeComponent();
+            DataContext = new SystemEditorViewModel();
         }
     }
 }
