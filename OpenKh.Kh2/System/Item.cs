@@ -8,46 +8,44 @@ namespace OpenKh.Kh2.System
     {
         public enum Type : byte
         {
-        }
-
-        public enum Category : byte
-        {
-            Item,
-            MenuItem,
-            SoraKeyblade,
+            Consumable,
+            Boost,
+            Keyblade,
             Staff,
             Shield,
-            Scimitar,
-            Fangs,
-            BoneHand,
-            Sword,
-            RikuKeyblade,
-            Claws,
-            Rapier,
-            DataDisc,
+            PingWeapon,
+            AuronWeapon,
+            BeastWeapon,
+            JackWeapon,
+            DummyWeapon,
+            RikuWeapon,
+            SimbaWeapon,
+            JackSparrowWeapon,
+            TronWeapon,
             Armor,
             Accessory,
-            Gem,
-            KeyItem,
+            Synthesis,
+            Recipe,
             Magic,
             Ability,
             Summon,
             Form,
             Map,
-            Report
+            Report,
         }
 
         public class Entry
         {
             [Data] public ushort Id { get; set; }
-            [Data] public ushort Type { get; set; }
+            [Data] public Type Type { get; set; }
+            [Data] public byte Flag0 { get; set; }
             [Data] public byte Flag1 { get; set; }
             [Data] public byte Flag2 { get; set; }
             [Data] public ushort StatEntry { get; set; }
             [Data] public ushort Name { get; set; }
             [Data] public ushort Description { get; set; }
-            [Data] public ushort ShopValue1 { get; set; }
-            [Data] public ushort ShopValue2 { get; set; }
+            [Data] public ushort ShopBuy { get; set; }
+            [Data] public ushort ShopSell { get; set; }
             [Data] public ushort Command { get; set; }
             [Data] public ushort Slot { get; set; }
             [Data] public short Picture { get; set; }

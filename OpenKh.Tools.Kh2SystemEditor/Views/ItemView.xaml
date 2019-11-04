@@ -56,10 +56,17 @@
             Visibility="{Binding IsItemEditingVisible}">
             <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
                 <TextBlock Text="Id" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding Id}"/>
+                <TextBlock Text="{Binding IdText}"/>
 
-                <TextBlock Text="TypeShort" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding TypeShort, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox
+                    ItemsSource="{Binding Types}"
+                    SelectedValue="{Binding Type}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"/>
+
+                <TextBlock Text="Flag0" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Flag0, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Flag1" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Flag1, UpdateSourceTrigger=PropertyChanged}"/>
@@ -94,11 +101,11 @@
                     <Button Grid.Column="2" Visibility="Collapsed" Width="22" Content="..." Command="{Binding ChangeDescriptionCommand}"/>
                 </Grid>
 
-                <TextBlock Text="ShopValue1" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding ShopValue1, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Shop buy id" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding ShopBuy, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="ShopValue2" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding ShopValue2, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Shop sell id" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding ShopSell, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Command" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Command, UpdateSourceTrigger=PropertyChanged}"/>
