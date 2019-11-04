@@ -77,6 +77,9 @@
 
                 <TextBlock Text="Object Type" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding ObjectType, UpdateSourceTrigger=PropertyChanged}"/>
+                
+                <TextBlock Text="Unknown05" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown05, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown06" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown06, UpdateSourceTrigger=PropertyChanged}"/>
@@ -102,11 +105,23 @@
                 <TextBlock Text="Unknown50" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown50, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown54" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown54, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Spawn Limiter" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SpawnLimiter, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown58" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown58, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Unknown55" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown55, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown56" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown56, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown57" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown57, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Spawn Object 1" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SpawnObject1, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Spawn Object 2" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SpawnObject2, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown5c" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown5c, UpdateSourceTrigger=PropertyChanged}"/>

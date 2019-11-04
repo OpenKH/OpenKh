@@ -27,13 +27,14 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
             public ushort ObjectId { get => Objentry.ObjectId; set => Objentry.ObjectId = value; }
             public ushort Unknown02 { get => Objentry.Unknown02; set => Objentry.Unknown02 = value; }
-            public ushort ObjectType { get => Objentry.ObjectType; set => Objentry.ObjectType = value; }
+            public byte ObjectType { get => Objentry.ObjectType; set => Objentry.ObjectType = value; }
+            public byte Unknown05 { get => Objentry.Unknown05; set => Objentry.Unknown05 = value; }
             public byte Unknown06 { get => Objentry.Unknown06; set => Objentry.Unknown06 = value; }
             public byte WeaponJoint { get => Objentry.WeaponJoint; set => Objentry.WeaponJoint = value; }
             public string ModelName 
             { 
                 get { return Objentry.ModelName == null ? string.Empty : Encoding.Default.GetString(Objentry.ModelName); }
-                set { Objentry.ModelName = Encoding.Default.GetBytes(value); OnPropertyChanged("Name"); } 
+                set { Objentry.ModelName = Encoding.Default.GetBytes(value); OnPropertyChanged(nameof(Name)); } 
             }
             public string AnimationName
             {
@@ -44,8 +45,12 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public ushort NeoStatus { get => Objentry.NeoStatus; set => Objentry.NeoStatus = value; }
             public ushort NeoMoveset { get => Objentry.NeoMoveset; set => Objentry.NeoMoveset = value; }
             public uint Unknown50 { get => Objentry.Unknown50; set => Objentry.Unknown50 = value; }
-            public uint Unknown54 { get => Objentry.Unknown54; set => Objentry.Unknown54 = value; }
-            public uint Unknown58 { get => Objentry.Unknown58; set => Objentry.Unknown58 = value; }
+            public byte SpawnLimiter { get => Objentry.SpawnLimiter; set => Objentry.SpawnLimiter = value; }
+            public byte Unknown55 { get => Objentry.Unknown55; set => Objentry.Unknown55 = value; }
+            public byte Unknown56 { get => Objentry.Unknown56; set => Objentry.Unknown56 = value; }
+            public byte Unknown57 { get => Objentry.Unknown57; set => Objentry.Unknown57 = value; }
+            public ushort SpawnObject1 { get => Objentry.SpawnObject1; set => Objentry.SpawnObject1 = value; }
+            public ushort SpawnObject2 { get => Objentry.SpawnObject2; set => Objentry.SpawnObject2 = value; }
             public uint Unknown5c { get => Objentry.Unknown5c; set => Objentry.Unknown5c = value; }
 
             public override string ToString() => Name;
