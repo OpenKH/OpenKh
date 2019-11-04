@@ -1,4 +1,5 @@
 ﻿using Xunit;
+using OpenKh.Common;
 using OpenKh.Kh2.System;
 
 namespace OpenKh.Tests.kh2
