@@ -42,16 +42,17 @@
             </Grid>
         </Grid>
 
-        <!--<StackPanel
+        <StackPanel
             Grid.Column="2"
-            Visibility="{Binding IsItemEditMessageVisible}">
+            Margin="5 0 5 0"
+            Visibility="{Binding IsItemEditMessageVisible, FallbackValue=Collapsed}">
             <TextBlock
                 Text="Please select an item to modify"/>
-        </StackPanel>-->
+        </StackPanel>
 
         <ScrollViewer
             Grid.Column="2"
-            Margin="5"
+            Margin="5 0 5 0"
             VerticalScrollBarVisibility="Auto"
             Visibility="{Binding IsItemEditingVisible}">
             <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">

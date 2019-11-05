@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using OpenKh.Kh2;
 using OpenKh.Kh2.System;
 using OpenKh.Tools.Common.Models;
@@ -95,6 +96,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         }
 
         public string EntryName => entryName;
+        
+        public Visibility IsItemEditingVisible => IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsItemEditMessageVisible => !IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
+
 
         public string SearchTerm
         {
@@ -116,6 +121,14 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             }.Write(stream);
 
             return stream;
+        }
+
+        protected override void OnSelectedItem(Entry item)
+        {
+            base.OnSelectedItem(item);
+
+            OnPropertyChanged(nameof(IsItemEditingVisible));
+            OnPropertyChanged(nameof(IsItemEditMessageVisible));
         }
 
         private void PerformFiltering()
