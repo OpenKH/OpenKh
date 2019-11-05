@@ -72,6 +72,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private const string entryName = "item";
         private readonly IMessageProvider _messageProvider;
         private string _searchTerm;
+        private List<Item.Stat> _item2;
 
         public ItemViewModel(IMessageProvider messageProvider, IEnumerable<Bar.Entry> entries) :
             this(messageProvider, Item.Read(entries.GetBinaryStream(entryName)))
@@ -87,7 +88,9 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
         private ItemViewModel(IMessageProvider messageProvider, Item item) :
             this(messageProvider, item.Items1)
-        { }
+        {
+            _item2 = item.Items2;
+        }
 
         private ItemViewModel(IMessageProvider messageProvider, IEnumerable<Item.Entry> items) :
             base(items.Select(item => new Entry(messageProvider, item)))
@@ -117,7 +120,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             new Item
             {
                 Items1 = this.Select(x => x.Item).ToList(),
-                Items2 = new List<Item.Stat>()
+                Items2 = _item2
             }.Write(stream);
 
             return stream;
