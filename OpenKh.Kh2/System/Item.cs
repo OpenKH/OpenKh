@@ -34,13 +34,21 @@ namespace OpenKh.Kh2.System
             Report,
         }
 
+        public enum Rank : byte
+        {
+            C,
+            B,
+            A,
+            S
+        }
+
         public class Entry
         {
             [Data] public ushort Id { get; set; }
             [Data] public Type Type { get; set; }
             [Data] public byte Flag0 { get; set; }
             [Data] public byte Flag1 { get; set; }
-            [Data] public byte Flag2 { get; set; }
+            [Data] public Rank Rank { get; set; }
             [Data] public ushort StatEntry { get; set; }
             [Data] public ushort Name { get; set; }
             [Data] public ushort Description { get; set; }

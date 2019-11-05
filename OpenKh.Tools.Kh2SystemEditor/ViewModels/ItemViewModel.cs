@@ -23,6 +23,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 _messageProvider = messageProvider;
                 Item = item;
                 Types = new EnumModel<Item.Type>();
+                Ranks = new EnumModel<Item.Rank>();
             }
 
             public Item.Entry Item { get; }
@@ -33,7 +34,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public Item.Type Type  { get => Item.Type; set => Item.Type = value; }
             public byte Flag0  { get => Item.Flag0; set => Item.Flag0 = value; }
             public byte Flag1  { get => Item.Flag1; set => Item.Flag1 = value; }
-            public byte Flag2  { get => Item.Flag2; set => Item.Flag2 = value; }
+            public Item.Rank Rank { get => Item.Rank; set => Item.Rank = value; }
             public ushort StatEntry  { get => Item.StatEntry; set => Item.StatEntry = value; }
             public ushort NameId
             {
@@ -65,6 +66,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public string Name { get => _messageProvider.GetMessage(Item.Name); set => _messageProvider.SetMessage(Item.Name, value); }
             public string Description { get => _messageProvider.GetMessage(Item.Description); set => _messageProvider.SetMessage(Item.Description, value); }
             public EnumModel<Item.Type> Types { get; }
+            public EnumModel<Item.Rank> Ranks { get; }
 
             public override string ToString() => Title;
         }

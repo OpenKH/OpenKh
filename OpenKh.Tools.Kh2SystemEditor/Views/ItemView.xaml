@@ -72,8 +72,12 @@
                 <TextBlock Text="Flag1" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Flag1, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Flag2" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Flag2, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Rank" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox
+                    ItemsSource="{Binding Ranks}"
+                    SelectedValue="{Binding Rank}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"/>
 
                 <TextBlock Text="StatEntry" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding StatEntry, UpdateSourceTrigger=PropertyChanged}"/>
