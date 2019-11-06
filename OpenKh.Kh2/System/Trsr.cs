@@ -1,47 +1,36 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Xe.BinaryMapper;
+using static OpenKh.Kh2.Constants;
 
 namespace OpenKh.Kh2.System
 {
     public class Trsr
     {
+        public const short MagicHeader = 3;
+
         public enum TrsrType : byte
         {
             Chest,
             Event
         }
-        public enum TrsrWorld : byte
-        {
-            Undefined,
-            DarkRealm,
-            TwilightTown,
-            Unknown,
-            HollowBastion,
-            BeastCastle,
-            TheUnderworld,
-            Agrabah,
-            LandofDragons,
-            HundredAcreWood,
-            PrideLands,
-            Atlantica,
-            DisneyCastle,
-            TimelessRiver,
-            HalloweenTown,
-            WorldMap,
-            PortRoyal,
-            SpaceParanoids,
-            FinalWorld
-        }
 
-        [Data] public short Identifier { get; set; }
-        [Data] public short Item { get; set; }
+        [Data] public ushort Id { get; set; }
+        [Data] public ushort ItemId { get; set; }
         [Data] public TrsrType Type { get; set; }
-        [Data] public TrsrWorld World { get; set; }
+        [Data] public Worlds World { get; set; }
         [Data] public byte Room { get; set; }
         [Data] public byte RoomChestIndex { get; set; }
         [Data] public short EventId { get; set; }
         [Data] public short OverallChestIndex { get; set; }
 
-        public static BaseSystem<Trsr> Read(Stream stream) => BaseSystem<Trsr>.Read(stream);
+        public static List<Trsr> Read(Stream stream) => BaseSystem<Trsr>.Read(stream).Items;
+
+        public static void Write(Stream stream, IEnumerable<Trsr> items) => new BaseSystem<Trsr>
+        {
+            Id = MagicHeader,
+            Items = items.ToList()
+        }.Write(stream);
     }
 }
