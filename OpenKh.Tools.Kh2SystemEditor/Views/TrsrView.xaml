@@ -4,9 +4,82 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2SystemEditor.Views"
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="350" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </UserControl.Resources>
     <Grid>
-            
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="0"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ListBox
+                Grid.Column="0"
+                ItemsSource="{Binding Items}"
+                SelectedItem="{Binding SelectedItem}"
+                DisplayMemberPath="Title">
+            </ListBox>
+
+            <Grid Grid.Row="1" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
+                <TextBox Grid.Column="2"
+                    Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </Grid>
+
+        <StackPanel
+            Grid.Column="2"
+            Margin="5 0 5 0"
+            Visibility="{Binding IsItemEditMessageVisible, FallbackValue=Collapsed}">
+            <TextBlock
+                Text="Please select an item to modify"/>
+        </StackPanel>
+
+        <ScrollViewer
+            Grid.Column="2"
+            Margin="5 0 5 0"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="{Binding IsItemEditingVisible}">
+            <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
+                <TextBlock Text="Id" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding IdText}"/>
+
+                <TextBlock Text="Item" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding ItemId}"/>
+
+                <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding Type}"/>
+
+                <TextBlock Text="World" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding World}"/>
+
+                <TextBlock Text="Room" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding Room}"/>
+
+                <TextBlock Text="Room Chest index" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding RoomChestIndex}"/>
+
+                <TextBlock Text="Event Id" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding EventId}"/>
+
+                <TextBlock Text="Overall chest index" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding OverallChestIndex}"/>
+            </controls:TwoColumnsPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>
