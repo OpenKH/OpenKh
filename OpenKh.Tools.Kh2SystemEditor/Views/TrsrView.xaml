@@ -59,8 +59,8 @@
                 <TextBlock Text="Id" Margin="{StaticResource LabelMargin}"/>
                 <TextBlock Text="{Binding IdText}"/>
 
-                <TextBlock Text="Item" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding ItemId}"/>
+                <TextBlock Text="Item name" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding ItemName}"/>
 
                 <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
                 <TextBlock Text="{Binding Type}"/>
@@ -70,6 +70,9 @@
 
                 <TextBlock Text="Room" Margin="{StaticResource LabelMargin}"/>
                 <TextBlock Text="{Binding Room}"/>
+
+                <TextBlock Text="Map" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding MapName}"/>
 
                 <TextBlock Text="Room Chest index" Margin="{StaticResource LabelMargin}"/>
                 <TextBlock Text="{Binding RoomChestIndex}"/>

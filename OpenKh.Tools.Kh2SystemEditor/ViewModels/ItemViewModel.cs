@@ -12,7 +12,7 @@ using Xe.Tools.Models;
 
 namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
-    public class ItemViewModel : MyGenericListModel<ItemViewModel.Entry>, ISystemGetChanges
+    public class ItemViewModel : MyGenericListModel<ItemViewModel.Entry>, ISystemGetChanges, IItemProvider
     {
         public class Entry : BaseNotifyPropertyChanged
         {
@@ -127,6 +127,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
             return stream;
         }
+
+        public bool IsItemExists(int itemId) => this.Any(x => x.Id == itemId);
+
+        public string GetItemName(int itemId) => this.FirstOrDefault(x => x.Id == itemId)?.Name;
 
         protected override void OnSelectedItem(Entry item)
         {

@@ -15,11 +15,11 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
     {
         public class Entry : BaseNotifyPropertyChanged
         {
-            private readonly IMessageProvider _messageProvider;
+            private readonly IItemProvider _itemProvider;
 
-            public Entry(IMessageProvider messageProvider, Trsr treasure)
+            public Entry(IItemProvider itemProvider, Trsr treasure)
             {
-                _messageProvider = messageProvider;
+                _itemProvider = itemProvider;
                 Treasure = treasure;
             }
 
@@ -38,26 +38,28 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public short OverallChestIndex { get => Treasure.OverallChestIndex; set => Treasure.OverallChestIndex = value; }
 
             public string IdText => $"{Id} (0x{Id:X})";
+            public string MapName => $"{Constants.WorldIds[(int)World]}_{Room:D02}";
+            public string ItemName => _itemProvider.GetItemName(ItemId);
 
             public override string ToString() => Title;
         }
 
         private const string entryName = "trsr";
-        private readonly IMessageProvider _messageProvider;
+        private readonly IItemProvider _itemProvider;
         private string _searchTerm;
 
-        public TrsrViewModel(IMessageProvider messageProvider, IEnumerable<Bar.Entry> entries) :
-            this(messageProvider, Trsr.Read(entries.GetBinaryStream(entryName)))
+        public TrsrViewModel(IItemProvider itemProvider, IEnumerable<Bar.Entry> entries) :
+            this(itemProvider, Trsr.Read(entries.GetBinaryStream(entryName)))
         { }
 
-        public TrsrViewModel(IMessageProvider messageProvider) :
-            this(messageProvider, new Trsr[0])
+        public TrsrViewModel(IItemProvider itemProvider) :
+            this(itemProvider, new Trsr[0])
         { }
 
-        private TrsrViewModel(IMessageProvider messageProvider, IEnumerable<Trsr> items) :
-            base(items.Select(item => new Entry(messageProvider, item)))
+        private TrsrViewModel(IItemProvider itemProvider, IEnumerable<Trsr> items) :
+            base(items.Select(item => new Entry(itemProvider, item)))
         {
-            _messageProvider = messageProvider;
+            _itemProvider = itemProvider;
         }
 
         public string EntryName => entryName;
