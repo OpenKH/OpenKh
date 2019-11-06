@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OpenKh.Common;
+using System.Collections.Generic;
 using System.IO;
 using Xe.BinaryMapper;
 
@@ -12,7 +13,7 @@ namespace OpenKh.Kh2.System
 
         static BaseSystem() => BinaryMapping.SetMemberLengthMapping<BaseSystem<T>>(nameof(Items), (o, m) => o.Count);
 
-        public static BaseSystem<T> Read(Stream stream) => BinaryMapping.ReadObject<BaseSystem<T>>(stream);
+        public static BaseSystem<T> Read(Stream stream) => BinaryMapping.ReadObject<BaseSystem<T>>(stream.SetPosition(0));
 
         public void Write(Stream stream) => BinaryMapping.WriteObject(stream, this);
     }
