@@ -125,6 +125,21 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             OnPropertyChanged(nameof(IsItemEditMessageVisible));
         }
 
+        protected override Entry OnNewItem()
+        {
+            ushort smallestUnusedId = 0;
+            foreach (var item in this.OrderBy(x => x.Id))
+            {
+                if (smallestUnusedId++ + 1 != item.Id)
+                    break;
+            }
+
+            return SelectedItem = new Entry(_itemProvider, new Trsr
+            {
+                Id = smallestUnusedId
+            });
+        }
+
         private void PerformFiltering()
         {
             if (string.IsNullOrWhiteSpace(SearchTerm))

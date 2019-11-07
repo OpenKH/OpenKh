@@ -21,6 +21,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <ListBox
@@ -39,6 +40,16 @@
                 <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
                 <TextBox Grid.Column="2"
                     Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="0 5 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="_Add" Command="{Binding AddCommand}"/>
+                <Button Grid.Column="2" Content="_Remove" Command="{Binding RemoveCommand}"/>
             </Grid>
         </Grid>
 
