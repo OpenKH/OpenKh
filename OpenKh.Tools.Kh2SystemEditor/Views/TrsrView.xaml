@@ -68,7 +68,11 @@
                     IsEditable="True"/>
 
                 <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding Type}"/>
+                <ComboBox
+                    ItemsSource="{Binding Types}"
+                    SelectedValue="{Binding Type}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"/>
 
                 <TextBlock Grid.Column="0" Text="Map" Margin="{StaticResource LabelMargin}"/>
                 <Grid>
@@ -93,13 +97,13 @@
                 </Grid>
                     
                 <TextBlock Text="Room Chest index" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding RoomChestIndex}"/>
+                <TextBox Text="{Binding RoomChestIndex, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Event Id" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding EventId}"/>
+                <TextBox Text="{Binding EventId, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Overall chest index" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding OverallChestIndex}"/>
+                <TextBox Text="{Binding OverallChestIndex, UpdateSourceTrigger=PropertyChanged}"/>
             </controls:TwoColumnsPanel>
         </ScrollViewer>
     </Grid>

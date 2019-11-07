@@ -21,6 +21,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 ItemProvider = itemProvider;
                 Treasure = treasure;
                 Worlds = new EnumModel<Constants.Worlds>();
+                Types = new EnumModel<Trsr.TrsrType>();
             }
 
             public Trsr Treasure { get; }
@@ -70,6 +71,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public string ItemName => ItemProvider.GetItemName(ItemId);
 
             public EnumModel<Constants.Worlds> Worlds { get; }
+            public EnumModel<Trsr.TrsrType> Types { get; }
 
             public override string ToString() => Title;
         }
