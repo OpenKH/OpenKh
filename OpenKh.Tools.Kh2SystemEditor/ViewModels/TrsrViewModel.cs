@@ -8,6 +8,7 @@ using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.Kh2SystemEditor.Extensions;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using Xe.Tools;
+using Xe.Tools.Models;
 
 namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
@@ -15,31 +16,60 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
     {
         public class Entry : BaseNotifyPropertyChanged
         {
-            private readonly IItemProvider _itemProvider;
-
             public Entry(IItemProvider itemProvider, Trsr treasure)
             {
-                _itemProvider = itemProvider;
+                ItemProvider = itemProvider;
                 Treasure = treasure;
+                Worlds = new EnumModel<Constants.Worlds>();
             }
 
             public Trsr Treasure { get; }
+            public IItemProvider ItemProvider { get; }
 
-            public string Title => $"{Treasure.Id:X02}";
+            public string Title => $"{Treasure.Id:X03} {MapName} {ItemName}";
+            public string Query => $"{Id} {Title} {Type} {World} {RoomChestIndex} {EventId}";
 
             public ushort Id { get => Treasure.Id; set => Treasure.Id = value; }
 
-            public ushort ItemId { get => Treasure.ItemId; set => Treasure.ItemId = value; }
+            public ushort ItemId
+            {
+                get => Treasure.ItemId;
+                set
+                {
+                    Treasure.ItemId = value;
+                    OnPropertyChanged(nameof(Title));
+                }
+            }
             public Trsr.TrsrType Type { get => Treasure.Type; set => Treasure.Type = value; }
-            public Constants.Worlds World { get => Treasure.World; set => Treasure.World = value; }
-            public byte Room { get => Treasure.Room; set => Treasure.Room = value; }
+            public Constants.Worlds World
+            {
+                get => Treasure.World;
+                set
+                {
+                    Treasure.World = value;
+                    OnPropertyChanged(nameof(Title));
+                    OnPropertyChanged(nameof(MapName));
+                }
+            }
+            public byte Room
+            {
+                get => Treasure.Room;
+                set
+                {
+                    Treasure.Room = value;
+                    OnPropertyChanged(nameof(Title));
+                    OnPropertyChanged(nameof(MapName));
+                }
+            }
             public byte RoomChestIndex { get => Treasure.RoomChestIndex; set => Treasure.RoomChestIndex = value; }
             public short EventId { get => Treasure.EventId; set => Treasure.EventId = value; }
             public short OverallChestIndex { get => Treasure.OverallChestIndex; set => Treasure.OverallChestIndex = value; }
 
             public string IdText => $"{Id} (0x{Id:X})";
             public string MapName => $"{Constants.WorldIds[(int)World]}_{Room:D02}";
-            public string ItemName => _itemProvider.GetItemName(ItemId);
+            public string ItemName => ItemProvider.GetItemName(ItemId);
+
+            public EnumModel<Constants.Worlds> Worlds { get; }
 
             public override string ToString() => Title;
         }
@@ -66,7 +96,6 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
         public Visibility IsItemEditingVisible => IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsItemEditMessageVisible => !IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
-
 
         public string SearchTerm
         {
@@ -104,7 +133,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
         private bool FilterNone(Entry arg) => true;
 
-        private bool FilterByName(Entry arg) =>
-            arg.Title.ToUpper().Contains(SearchTerm.ToUpper());
+        private bool FilterByName(Entry arg)
+        {
+            var query = arg.Query.ToUpper();
+            return SearchTerm.ToUpper().Split(new char[] { ',', ' ' }).All(term => query.Contains(term));
+        }
     }
 }

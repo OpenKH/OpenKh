@@ -59,21 +59,39 @@
                 <TextBlock Text="Id" Margin="{StaticResource LabelMargin}"/>
                 <TextBlock Text="{Binding IdText}"/>
 
-                <TextBlock Text="Item name" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding ItemName}"/>
+                <TextBlock Text="Item" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox
+                    ItemsSource="{Binding ItemProvider.ItemEntries}"
+                    SelectedValue="{Binding ItemId}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Id"
+                    IsEditable="True"/>
 
                 <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
                 <TextBlock Text="{Binding Type}"/>
 
-                <TextBlock Text="World" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding World}"/>
-
-                <TextBlock Text="Room" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding Room}"/>
-
-                <TextBlock Text="Map" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding MapName}"/>
-
+                <TextBlock Grid.Column="0" Text="Map" Margin="{StaticResource LabelMargin}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="{StaticResource LabelMargin}"
+                        ItemsSource="{Binding Worlds}"
+                        SelectedValue="{Binding World}"
+                        DisplayMemberPath="Name"
+                        SelectedValuePath="Value"/>
+                    <TextBox
+                        Grid.Column="2"
+                        Margin="{StaticResource LabelMargin}"
+                        Text="{Binding Room, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Column="3" Text="{Binding MapName}"/>
+                </Grid>
+                    
                 <TextBlock Text="Room Chest index" Margin="{StaticResource LabelMargin}"/>
                 <TextBlock Text="{Binding RoomChestIndex}"/>
 

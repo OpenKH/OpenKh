@@ -14,7 +14,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
     public class ItemViewModel : MyGenericListModel<ItemViewModel.Entry>, ISystemGetChanges, IItemProvider
     {
-        public class Entry : BaseNotifyPropertyChanged
+        public class Entry : BaseNotifyPropertyChanged, IItemEntry
         {
             private readonly IMessageProvider _messageProvider;
 
@@ -72,7 +72,6 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         }
 
         private const string entryName = "item";
-        private readonly IMessageProvider _messageProvider;
         private string _searchTerm;
         private List<Item.Stat> _item2;
 
@@ -97,7 +96,6 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private ItemViewModel(IMessageProvider messageProvider, IEnumerable<Item.Entry> items) :
             base(items.Select(item => new Entry(messageProvider, item)))
         {
-            _messageProvider = messageProvider;
         }
 
         public string EntryName => entryName;
@@ -128,9 +126,14 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             return stream;
         }
 
+        public IEnumerable<IItemEntry> ItemEntries => this;
         public bool IsItemExists(int itemId) => this.Any(x => x.Id == itemId);
-
         public string GetItemName(int itemId) => this.FirstOrDefault(x => x.Id == itemId)?.Name;
+        public void InvalidateItemName(int itemId)
+        {
+            OnPropertyChanged(nameof(ItemEntries));
+        }
+
 
         protected override void OnSelectedItem(Entry item)
         {
