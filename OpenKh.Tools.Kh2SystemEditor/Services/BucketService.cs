@@ -13,7 +13,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.Services
 
         public string GetMessage(ushort id)
         {
-            var message = _messages.FirstOrDefault(x => x.Id == (id & 0x7fff));
+            var message = _messages?.FirstOrDefault(x => x.Id == (id & 0x7fff));
             if (message == null)
             {
                 if (id == Msg.FallbackMessage)
@@ -27,7 +27,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.Services
 
         public void SetMessage(ushort id, string text)
         {
-            var message = _messages.FirstOrDefault(x => x.Id == (id & 0x7fff));
+            var message = _messages?.FirstOrDefault(x => x.Id == (id & 0x7fff));
             if (message == null)
                 return;
 
