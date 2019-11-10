@@ -178,6 +178,9 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             //_barItems = SaveSystemEntry(_barItems, Ftst);
         }
 
+        public void LoadMessage(string fileName) =>
+            File.OpenRead(fileName).Using(stream => LoadMessage(stream));
+
         public void LoadMessage(Stream stream)
         {
             if (!_bucketService.LoadMessages(stream))
