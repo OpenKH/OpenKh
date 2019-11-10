@@ -18,7 +18,7 @@
             "ca", "tr", "eh"
         };
 
-        public enum Worlds : byte
+        public enum Worlds
         {
             Debug,
             DarkRealm,

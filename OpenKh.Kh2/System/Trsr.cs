@@ -18,7 +18,7 @@ namespace OpenKh.Kh2.System
         [Data] public ushort Id { get; set; }
         [Data] public ushort ItemId { get; set; }
         [Data] public TrsrType Type { get; set; }
-        [Data] public Constants.Worlds World { get; set; }
+        [Data] public byte World { get; set; }
         [Data] public byte Room { get; set; }
         [Data] public byte RoomChestIndex { get; set; }
         [Data] public short EventId { get; set; }

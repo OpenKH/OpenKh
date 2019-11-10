@@ -44,10 +44,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public Trsr.TrsrType Type { get => Treasure.Type; set => Treasure.Type = value; }
             public Constants.Worlds World
             {
-                get => Treasure.World;
+                get => (Constants.Worlds)Treasure.World;
                 set
                 {
-                    Treasure.World = value;
+                    Treasure.World = (byte)value;
                     OnPropertyChanged(nameof(Title));
                     OnPropertyChanged(nameof(MapName));
                 }
