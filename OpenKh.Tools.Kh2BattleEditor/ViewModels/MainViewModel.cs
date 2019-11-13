@@ -25,6 +25,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         private EnmpViewModel _enmp;
         private FmlvViewModel _fmlv;
         private BonsViewModel _bons;
+        private PrztViewModel _przt;
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
@@ -60,6 +61,12 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         {
             get => _bons;
             private set { _bons = value; OnPropertyChanged(); }
+        }
+
+        public PrztViewModel Przt
+        {
+            get => _przt;
+            private set { _przt = value; OnPropertyChanged(); }
         }
 
 
@@ -153,6 +160,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             "fmlv",
             "lvpm",
             "bons",
+            "przt",
         }.Contains(x.Name));
 
         private void CreateBattleItems()
@@ -161,6 +169,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             Enmp = GetDefaultBattleViewModelInstance<EnmpViewModel>();
             Fmlv = GetDefaultBattleViewModelInstance<FmlvViewModel>();
             Bons = GetDefaultBattleViewModelInstance<BonsViewModel>();
+            Przt = GetDefaultBattleViewModelInstance<PrztViewModel>();
         }
 
         private void LoadBattleItems(IEnumerable<Bar.Entry> entries)
@@ -169,6 +178,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             Enmp = GetBattleViewModelInstance<EnmpViewModel>(_battleItems);
             Fmlv = GetBattleViewModelInstance<FmlvViewModel>(_battleItems);
             Bons = GetBattleViewModelInstance<BonsViewModel>(_battleItems);
+            Przt = GetBattleViewModelInstance<PrztViewModel>(_battleItems);
         }
 
         private void SaveBattleItems()
@@ -176,6 +186,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             _battleItems = SaveBattleItem(_battleItems, Enmp);
             _battleItems = SaveBattleItem(_battleItems, Fmlv);
             _battleItems = SaveBattleItem(_battleItems, Bons);
+            _battleItems = SaveBattleItem(_battleItems, Przt);
         }
 
         private IEnumerable<Bar.Entry> SaveBattleItem(IEnumerable<Bar.Entry> entries, IBattleGetChanges battleGetChanges) =>
