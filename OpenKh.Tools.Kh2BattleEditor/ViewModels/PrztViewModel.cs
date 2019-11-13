@@ -1,11 +1,10 @@
-﻿using OpenKh.Kh2.Battle;
+﻿using OpenKh.Kh2;
+using OpenKh.Kh2.Battle;
+using OpenKh.Tools.Kh2BattleEditor.Extensions;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Xe.Tools.Wpf.Models;
 
@@ -51,12 +50,16 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         private string _searchTerm;
         public string EntryName => entryName;
 
+        public PrztViewModel(IEnumerable<Bar.Entry> entries) :
+            this(Przt.Read(entries.GetBattleStream(entryName)))
+        { }
+
         public PrztViewModel() :
-    this(new BaseBattle<Przt>
-    {
-        Id = DefaultType,
-        Items = new List<Przt>()
-    })
+            this(new BaseBattle<Przt>
+            {
+                Id = DefaultType,
+                Items = new List<Przt>()
+            })
         { }
 
         private PrztViewModel(BaseBattle<Przt> przt) :
