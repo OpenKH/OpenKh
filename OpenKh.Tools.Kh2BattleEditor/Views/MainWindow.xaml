@@ -40,6 +40,9 @@
             <TabItem Header="Bons">
                 <local:BonsView DataContext="{Binding Bons}"/>
             </TabItem>
+            <TabItem Header="Przt">
+                <local:PrztView DataContext="{Binding Przt}"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
