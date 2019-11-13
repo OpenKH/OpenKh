@@ -58,47 +58,53 @@
                 <TextBlock Text="ID" Margin="{StaticResource LabelMargin}"/>
                 <TextBlock Text="{Binding Id}"/>
 
-                <TextBlock Text="Level" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Level, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Small HP Orbs" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SmallHpOrbs, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Health" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Health, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Big HP Orbs" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding BigHpOrbs, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown44, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Small Money Orbs" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SmallMoneyOrbs, UpdateSourceTrigger=PropertyChanged}"/>
+                
+                <TextBlock Text="Medium Money Orbs" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding MediumMoneyOrbs, UpdateSourceTrigger=PropertyChanged}"/>
+                
+                <TextBlock Text="Big Money Orbs" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding BigMoneyOrbs, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown46, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Small MP Orbs" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SmallMpOrbs, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Physical weakness" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding PhysicalWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Big MP Orbs" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding BigMpOrbs, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Fire weakness" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding FireWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Small Drive Orbs" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SmallDriveOrbs, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Ice weakness" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding IceWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Big Drive Orbs" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding BigDriveOrbs, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Thunder weakness" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding ThunderWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Unknown0a" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown0a, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Dark weakness" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding DarkWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Item 1" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Item1, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown52, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Item 1 Drop Percentage" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Item1Percentage, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Reflect weakness" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding ReflectWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Item 2" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Item2, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown56, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Item 2 Drop Percentage" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Item2Percentage, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown58, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Item 3" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Item3, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown5a, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Item 3 Drop Percentage" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Item3Percentage, UpdateSourceTrigger=PropertyChanged}"/>
             </controls:TwoColumnsPanel>
         </ScrollViewer>
     </Grid>
