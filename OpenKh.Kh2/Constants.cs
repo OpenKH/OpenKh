@@ -32,6 +32,7 @@
         public const int FontIconWidth = 24;
         public const int FontIconHeight = 24;
 
+        public const int PaletteCount = 9;
         public const int WorldCount = (int)World.WorldThatNeverWas + 1;
 
         public static readonly string[] WorldIds = new string[WorldCount]

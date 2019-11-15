@@ -160,7 +160,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             _barItems = new Bar.Entry[0];
             Item = new ItemViewModel(_bucketService);
             Trsr = new TrsrViewModel(Item);
-            Ftst = GetDefaultViewModelInstance<FtstViewModel>();
+            Ftst = new FtstViewModel();
         }
 
         private void LoadSystem(IEnumerable<Bar.Entry> entries)
@@ -168,14 +168,14 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             _barItems = entries;
             Item = new ItemViewModel(_bucketService, _barItems);
             Trsr = new TrsrViewModel(Item, _barItems);
-            //Ftst = GetViewModelInstance<FtstViewModel>(_barItems);
+            Ftst = new FtstViewModel(_barItems);
         }
 
         private void SaveSystem()
         {
             _barItems = SaveSystemEntry(_barItems, Item);
             _barItems = SaveSystemEntry(_barItems, Trsr);
-            //_barItems = SaveSystemEntry(_barItems, Ftst);
+            _barItems = SaveSystemEntry(_barItems, Ftst);
         }
 
         public void LoadMessage(string fileName) =>
