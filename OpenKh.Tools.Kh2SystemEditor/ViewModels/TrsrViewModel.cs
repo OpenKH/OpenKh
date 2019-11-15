@@ -20,7 +20,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             {
                 ItemProvider = itemProvider;
                 Treasure = treasure;
-                Worlds = new EnumModel<Constants.Worlds>();
+                Worlds = new Kh2WorldsList();
                 Types = new EnumModel<Trsr.TrsrType>();
             }
 
@@ -42,9 +42,9 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 }
             }
             public Trsr.TrsrType Type { get => Treasure.Type; set => Treasure.Type = value; }
-            public Constants.Worlds World
+            public World World
             {
-                get => (Constants.Worlds)Treasure.World;
+                get => (World)Treasure.World;
                 set
                 {
                     Treasure.World = (byte)value;
@@ -70,7 +70,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public string MapName => $"{Constants.WorldIds[(int)World]}_{Room:D02}";
             public string ItemName => ItemProvider.GetItemName(ItemId);
 
-            public EnumModel<Constants.Worlds> Worlds { get; }
+            public Kh2WorldsList Worlds { get; }
             public EnumModel<Trsr.TrsrType> Types { get; }
 
             public override string ToString() => Title;
