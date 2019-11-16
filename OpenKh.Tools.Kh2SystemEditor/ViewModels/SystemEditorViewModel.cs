@@ -13,12 +13,20 @@ using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using OpenKh.Tools.Kh2SystemEditor.Services;
+using OpenKh.Common.Exceptions;
 
 namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
     public class SystemEditorViewModel : BaseNotifyPropertyChanged
     {
         private static string ApplicationName = Utilities.GetApplicationName();
+        private static readonly List<FileDialogFilter> SystemFilter = FileDialogFilterComposer.Compose()
+            .AddExtensions("03system", "bin", "bar").AddAllFiles();
+        private static readonly List<FileDialogFilter> IdxFilter = FileDialogFilterComposer.Compose()
+            .AddExtensions("KH2.IDX", "idx").AddAllFiles();
+        private static readonly List<FileDialogFilter> MsgFilter = FileDialogFilterComposer.Compose()
+            .AddExtensions("sys.msg", "msg", "bin").AddAllFiles();
+
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
         private IEnumerable<Bar.Entry> _barItems;
@@ -44,6 +52,8 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         public RelayCommand SaveAsCommand { get; }
         public RelayCommand ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
+        public RelayCommand LoadSupportIdxCommand { get; }
+        public RelayCommand LoadSupportMsgCommand { get; }
 
         public ItemViewModel Item
         {
@@ -63,23 +73,9 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             private set { _ftst = value; OnPropertyChanged(); }
         }
 
-
         public SystemEditorViewModel()
         {
-            OpenCommand = new RelayCommand(x =>
-            {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new[]
-                {
-                    ("03system.bin", "bin"),
-                    ("BAR file", "bar"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    OpenFile(fd.FileName);
-                }
-            }, x => true);
+            OpenCommand = new RelayCommand(_ => FileDialog.OnOpen(fileName => OpenFile(fileName), SystemFilter, parent: Window));
 
             SaveCommand = new RelayCommand(x =>
             {
@@ -93,25 +89,18 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 }
             }, x => true);
 
-            SaveAsCommand = new RelayCommand(x =>
+            SaveAsCommand = new RelayCommand(_ => FileDialog.OnSave(fileName =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
-                if (fd.ShowDialog() == true)
-                {
-                    SaveFile(FileName, fd.FileName);
-                    FileName = fd.FileName;
-                }
-            }, x => true);
+                SaveFile(FileName, fileName);
+                FileName = fileName;
+            }, SystemFilter, defaultFileName: FileName parent: Window));
 
-            ExitCommand = new RelayCommand(x =>
-            {
-                Window.Close();
-            }, x => true);
+            ExitCommand = new RelayCommand(x => Window.Close());
 
-            AboutCommand = new RelayCommand(x =>
-            {
-                new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
-            }, x => true);
+            AboutCommand = new RelayCommand(x => new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog());
+
+            LoadSupportIdxCommand = new RelayCommand(_ => FileDialog.OnOpen(fileName => OpenIdx(fileName), IdxFilter, parent: Window));
+            LoadSupportMsgCommand = new RelayCommand(_ => FileDialog.OnOpen(fileName => OpenMsg(fileName), MsgFilter, parent: Window));
 
             _bucketService = new BucketService();
             CreateSystem();
@@ -177,6 +166,27 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             _barItems = SaveSystemEntry(_barItems, Trsr);
             _barItems = SaveSystemEntry(_barItems, Ftst);
         }
+
+        private void OpenMsg(string fileName) =>
+            File.OpenRead(fileName).Using(stream => LoadMessage(stream));
+
+        private void OpenIdx(string fileName) => File.OpenRead(fileName).Using(stream =>
+        {
+            if (!Idx.IsValid(stream))
+                throw new InvalidFileException<Idx>();
+
+            var imgFileName = $"{Path.GetFileNameWithoutExtension(fileName)}.img";
+            var imgFilePath = Path.Combine(Path.GetDirectoryName(fileName), imgFileName);
+            File.OpenRead(imgFilePath).Using(imgStream =>
+            {
+                var img = new Img(imgStream, Idx.Read(stream), false);
+                foreach (var language in Constants.Languages)
+                {
+                    if (img.FileOpen($"msg/{language}/sys.bar", LoadMessage))
+                        break;
+                }
+            });
+        });
 
         public void LoadMessage(string fileName) =>
             File.OpenRead(fileName).Using(stream => LoadMessage(stream));
