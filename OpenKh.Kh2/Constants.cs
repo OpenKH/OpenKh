@@ -42,6 +42,11 @@
             "ca", "tr", "eh"
         };
 
+        public static readonly string[] Languages = new string[]
+        {
+            "jp", "us", "it", "sp", "fr", "gr",
+        };
+
         public static readonly string[] WorldNames = new string[WorldCount]
         {
             "World ZZ",
