@@ -73,6 +73,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
         private const string entryName = "item";
         private string _searchTerm;
+        private IMessageProvider _messageProvider;
         private List<Item.Stat> _item2;
 
         public ItemViewModel(IMessageProvider messageProvider, IEnumerable<Bar.Entry> entries) :
@@ -90,6 +91,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private ItemViewModel(IMessageProvider messageProvider, Item item) :
             this(messageProvider, item.Items1)
         {
+            _messageProvider = messageProvider;
             _item2 = item.Items2;
         }
 
@@ -134,13 +136,27 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             OnPropertyChanged(nameof(ItemEntries));
         }
 
-
         protected override void OnSelectedItem(Entry item)
         {
             base.OnSelectedItem(item);
 
             OnPropertyChanged(nameof(IsItemEditingVisible));
             OnPropertyChanged(nameof(IsItemEditMessageVisible));
+        }
+
+        protected override Entry OnNewItem()
+        {
+            ushort smallestUnusedId = 0;
+            foreach (var item in UnfilteredItems.OrderBy(x => x.Id))
+            {
+                if (smallestUnusedId++ + 1 != item.Id)
+                    break;
+            }
+
+            return SelectedItem = new Entry(_messageProvider, new Item.Entry
+            {
+                Id = smallestUnusedId
+            });
         }
 
         private void PerformFiltering()

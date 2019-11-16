@@ -128,7 +128,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         protected override Entry OnNewItem()
         {
             ushort smallestUnusedId = 0;
-            foreach (var item in this.OrderBy(x => x.Id))
+            foreach (var item in UnfilteredItems.OrderBy(x => x.Id))
             {
                 if (smallestUnusedId++ + 1 != item.Id)
                     break;

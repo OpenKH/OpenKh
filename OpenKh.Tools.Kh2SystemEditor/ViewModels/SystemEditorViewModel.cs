@@ -93,7 +93,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             {
                 SaveFile(FileName, fileName);
                 FileName = fileName;
-            }, SystemFilter, defaultFileName: FileName parent: Window));
+            }, SystemFilter, defaultFileName: FileName, parent: Window));
 
             ExitCommand = new RelayCommand(x => Window.Close());
 
