@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenKh.Game.DataContent;
@@ -64,7 +64,7 @@ namespace OpenKh.Game
 
             state?.Update(new DeltaTimes
             {
-
+                DeltaTime = 1.0 / 60.0
             });
             base.Update(gameTime);
         }
