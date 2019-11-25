@@ -37,7 +37,7 @@
                 </i:Interaction.Behaviors>
             </ListBox>
 
-            <Grid Grid.Row="1" Margin="0 5 0 5">
+            <Grid Grid.Row="2" Margin="0 5 0 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="5"/>
@@ -50,7 +50,7 @@
                 <Button Grid.Column="4" Command="{Binding RemoveCommand}" Content="Remove"/>
             </Grid>
 
-            <Grid Grid.Row="2" Margin="0 5 0 5">
+            <Grid Grid.Row="1" Margin="0 5 0 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="3"/>
@@ -76,7 +76,7 @@
                 <TextBox Text="{Binding Unknown02, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Object Type" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding ObjectType, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding ObjectType, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:X1}}"/>
                 
                 <TextBlock Text="Unknown05" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown05, UpdateSourceTrigger=PropertyChanged}"/>
@@ -125,6 +125,9 @@
 
                 <TextBlock Text="Unknown5c" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown5c, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown5e" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown5e, UpdateSourceTrigger=PropertyChanged}"/>
             </controls:TwoColumnsPanel>
         </ScrollViewer>
     </Grid>
