@@ -51,7 +51,8 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public byte Unknown57 { get => Objentry.Unknown57; set => Objentry.Unknown57 = value; }
             public ushort SpawnObject1 { get => Objentry.SpawnObject1; set => Objentry.SpawnObject1 = value; }
             public ushort SpawnObject2 { get => Objentry.SpawnObject2; set => Objentry.SpawnObject2 = value; }
-            public uint Unknown5c { get => Objentry.Unknown5c; set => Objentry.Unknown5c = value; }
+            public ushort Unknown5c { get => Objentry.Unknown5c; set => Objentry.Unknown5c = value; }
+            public ushort Unknown5e { get => Objentry.Unknown5e; set => Objentry.Unknown5e = value; }
 
             public override string ToString() => Name;
         }
