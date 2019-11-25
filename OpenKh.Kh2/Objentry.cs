@@ -34,7 +34,7 @@ namespace OpenKh.Kh2
         }
         [Data] public ushort ObjectId { get; set; }
         [Data] public ushort Unknown02 { get; set; }
-        [Data] public byte ObjectType { get; set; }
+        [Data] public Type ObjectType { get; set; }
         [Data] public byte Unknown05{ get; set; }
         [Data] public byte Unknown06 { get; set; }
         [Data] public byte WeaponJoint { get; set; }
