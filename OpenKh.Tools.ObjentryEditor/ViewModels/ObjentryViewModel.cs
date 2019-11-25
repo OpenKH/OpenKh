@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using Xe.Tools;
+using Xe.Tools.Models;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Models;
 
@@ -19,6 +20,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public ObjentryEntryViewModel(Objentry entry)
             {
                 Objentry = entry;
+                Types = new EnumModel<Objentry.Type>();
             }
 
             public string Name => $"{Id} {ModelName}";
@@ -27,14 +29,14 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
             public ushort ObjectId { get => Objentry.ObjectId; set => Objentry.ObjectId = value; }
             public ushort Unknown02 { get => Objentry.Unknown02; set => Objentry.Unknown02 = value; }
-            public byte ObjectType { get => Objentry.ObjectType; set => Objentry.ObjectType = value; }
+            public Objentry.Type ObjectType { get => Objentry.ObjectType; set => Objentry.ObjectType = value; }
             public byte Unknown05 { get => Objentry.Unknown05; set => Objentry.Unknown05 = value; }
             public byte Unknown06 { get => Objentry.Unknown06; set => Objentry.Unknown06 = value; }
             public byte WeaponJoint { get => Objentry.WeaponJoint; set => Objentry.WeaponJoint = value; }
-            public string ModelName 
-            { 
+            public string ModelName
+            {
                 get { return Objentry.ModelName == null ? string.Empty : Encoding.Default.GetString(Objentry.ModelName); }
-                set { Objentry.ModelName = Encoding.Default.GetBytes(value); OnPropertyChanged(nameof(Name)); } 
+                set { Objentry.ModelName = Encoding.Default.GetBytes(value); OnPropertyChanged(nameof(Name)); }
             }
             public string AnimationName
             {
@@ -54,10 +56,10 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public ushort Unknown5c { get => Objentry.Unknown5c; set => Objentry.Unknown5c = value; }
             public ushort Unknown5e { get => Objentry.Unknown5e; set => Objentry.Unknown5e = value; }
 
+            public EnumModel<Objentry.Type> Types { get; }
+
             public override string ToString() => Name;
         }
-
-        private const int DefaultType = 3;
 
         private readonly int _type;
         private string _searchTerm;
@@ -158,7 +160,8 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
                 Unknown57 = source.Unknown57,
                 SpawnObject1 = source.SpawnObject1,
                 SpawnObject2 = source.SpawnObject2,
-                Unknown5c = source.Unknown5c
+                Unknown5c = source.Unknown5c,
+                Unknown5e = source.Unknown5e
             };
         }
 

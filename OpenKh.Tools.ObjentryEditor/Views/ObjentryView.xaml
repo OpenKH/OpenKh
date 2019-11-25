@@ -75,9 +75,9 @@
                 <TextBlock Text="Unknown02" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown02, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Object Type" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding ObjectType, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:X1}}"/>
-                
+                <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox ItemsSource="{Binding Types}" SelectedValue="{Binding ObjectType}" DisplayMemberPath="Name" SelectedValuePath="Value"/>
+
                 <TextBlock Text="Unknown05" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Unknown05, UpdateSourceTrigger=PropertyChanged}"/>
 
