@@ -1,14 +1,12 @@
-﻿using khkh_xldMii.Mc;
-using khkh_xldMii.Mx;
-using OpenKh.Engine.Parsers.Kddf2;
+﻿using OpenKh.Kh2;
 
 namespace OpenKh.Engine.Parsers
 {
     public class MdlxParser
     {
-        private readonly Mdlxfst _mdlx;
+        private readonly Mdlx _mdlx;
         
-        public MdlxParser(Mdlxfst mdlx)
+        public MdlxParser(Mdlx mdlx)
         {
             _mdlx = mdlx;
             Models = System.Array.Empty<Model>();

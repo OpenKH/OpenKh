@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace OpenKh.Game.Models
 {
@@ -9,6 +10,14 @@ namespace OpenKh.Game.Models
         public VertexPositionTexture[] Vertices { get; set; }
         public int Start { get; set; }
         public int Count { get; set; }
+
+        public Mesh(VertexPositionTexture[] vertices, PrimitiveType primitiveType)
+        {
+            PrimitiveType = primitiveType;
+            Vertices = vertices;
+            Start = 0;
+            Count = GetPrimitiveCount(vertices.Length, PrimitiveType.TriangleList);
+        }
 
         public static Mesh FromSample()
         {
@@ -20,13 +29,18 @@ namespace OpenKh.Game.Models
             vertices[4].Position = new Vector3(20, 20, 0);
             vertices[5].Position = vertices[2].Position;
 
-            return new Mesh
+            return new Mesh(vertices, PrimitiveType.TriangleList);
+        }
+
+        private static int GetPrimitiveCount(int verticesCount, PrimitiveType primitiveType)
+        {
+            switch (primitiveType)
             {
-                PrimitiveType = PrimitiveType.TriangleList,
-                Vertices = vertices,
-                Start = 0,
-                Count = 2
-            };
+                case PrimitiveType.TriangleList:
+                    return verticesCount / 3;
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }
