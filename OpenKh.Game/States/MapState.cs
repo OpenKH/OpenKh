@@ -32,15 +32,15 @@ namespace OpenKh.Game.States
             _effect = new BasicEffect(_graphics.GraphicsDevice);
 
             FieldOfView = MathHelper.PiOver4;
-            CameraPosition = new Vector3(0, 40, 30);
-            CameraLookAt = Vector3.Zero;
+            CameraPosition = new Vector3(0, 316, 238);
+            CameraLookAt = new Vector3(0, -40, -30);
             CameraUp = Vector3.UnitZ;
 
             _mesh = new List<Mesh>
             {
                 Mesh.FromSample()
             }
-            .Concat(FromMdlx("obj/P_EX100.mdlx"))
+            .Concat(FromMdlx(_graphics.GraphicsDevice, "obj/P_EX100.mdlx"))
             .ToList();
         }
 
@@ -50,18 +50,22 @@ namespace OpenKh.Game.States
 
         public void Update(DeltaTimes deltaTimes)
         {
-            FieldOfView += (float)(deltaTimes.DeltaTime * 0.5);
+            const double Speed = 1.0;
+            var speed = (float)(deltaTimes.DeltaTime * Speed);
+
+            if (_input.Up) CameraPosition += Vector3.Multiply(CameraLookAt, speed);
+            if (_input.Down) CameraPosition -= Vector3.Multiply(CameraLookAt, speed);
         }
 
         public void Draw(DeltaTimes deltaTimes)
         {
             var aspectRatio = _graphics.PreferredBackBufferWidth / (float)_graphics.PreferredBackBufferHeight;
             var nearClipPlane = 1;
-            var farClipPlane = 200;
+            var farClipPlane = 1000;
 
             _effect.Projection = Matrix.CreatePerspectiveFieldOfView(
                 (float)fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
-            _effect.View = Matrix.CreateLookAt(CameraPosition, CameraLookAt, CameraUp);
+            _effect.View = Matrix.CreateLookAt(CameraPosition, CameraPosition + CameraLookAt, CameraUp);
 
             foreach (var pass in _effect.CurrentTechnique.Passes)
             {
@@ -69,13 +73,20 @@ namespace OpenKh.Game.States
 
                 foreach (var mesh in _mesh)
                 {
+                    if (_effect.Texture != mesh.Texture)
+                    {
+                        _effect.Texture = mesh.Texture;
+                        _effect.TextureEnabled = _effect.Texture != null;
+                        pass.Apply();
+                    }
+
                     _graphics.GraphicsDevice.DrawUserPrimitives(
                         mesh.PrimitiveType, mesh.Vertices, mesh.Start, mesh.Count);
                 }
             }
         }
 
-        private static Mesh[] FromMdlx(string fileName)
+        private static Mesh[] FromMdlx(GraphicsDevice graphics, string fileName)
         {
             var barEntries = File.OpenRead(fileName).Using(stream => Bar.Read(stream));
             var entry = barEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Vif);
@@ -86,14 +97,23 @@ namespace OpenKh.Game.States
 
                 return models.Select(model =>
                 {
-                    var vertices = model.Vertices.Select(vertex => new VertexPositionTexture
+                    var vertices = model.Vertices.Select(vertex => new VertexPositionColorTexture
                     {
                         Position = new Vector3(vertex.X, vertex.Y, vertex.Z),
-                        TextureCoordinate = new Vector2(vertex.Tu, vertex.Tv)
+                        TextureCoordinate = new Vector2(vertex.U, vertex.V),
+                        Color = new Color((uint)vertex.Color)
                     }).ToArray();
 
                     return new Mesh(vertices, PrimitiveType.TriangleList);
-                }).ToArray();
+                })
+                .Select((model, index) =>
+                {
+                    var path = $@"D:\Hacking\KH2\reseach\mdlx\P_EX100 export\tim_ (07)\tex{index} (19)_1.png";
+                    model.Texture = File.OpenRead(path).Using(stream => Texture2D.FromStream(graphics, stream));
+                    
+                    return model;
+                })
+                .ToArray();
 
             }
 

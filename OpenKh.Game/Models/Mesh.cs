@@ -7,11 +7,12 @@ namespace OpenKh.Game.Models
     public class Mesh
     {
         public PrimitiveType PrimitiveType { get; set; }
-        public VertexPositionTexture[] Vertices { get; set; }
+        public VertexPositionColorTexture[] Vertices { get; set; }
         public int Start { get; set; }
         public int Count { get; set; }
+        public Texture2D Texture { get; set; }
 
-        public Mesh(VertexPositionTexture[] vertices, PrimitiveType primitiveType)
+        public Mesh(VertexPositionColorTexture[] vertices, PrimitiveType primitiveType)
         {
             PrimitiveType = primitiveType;
             Vertices = vertices;
@@ -19,9 +20,9 @@ namespace OpenKh.Game.Models
             Count = GetPrimitiveCount(vertices.Length, PrimitiveType.TriangleList);
         }
 
-        public static Mesh FromSample()
+        public static Mesh FromSample(Texture2D texture = null)
         {
-            var vertices = new VertexPositionTexture[6];
+            var vertices = new VertexPositionColorTexture[6];
             vertices[0].Position = new Vector3(-20, -20, 0);
             vertices[1].Position = new Vector3(-20, 20, 0);
             vertices[2].Position = new Vector3(20, -20, 0);
@@ -29,7 +30,18 @@ namespace OpenKh.Game.Models
             vertices[4].Position = new Vector3(20, 20, 0);
             vertices[5].Position = vertices[2].Position;
 
-            return new Mesh(vertices, PrimitiveType.TriangleList);
+            vertices[0].TextureCoordinate = new Vector2(0, 0);
+            vertices[1].TextureCoordinate = new Vector2(0, 1);
+            vertices[2].TextureCoordinate = new Vector2(1, 0);
+
+            vertices[3].TextureCoordinate = vertices[1].TextureCoordinate;
+            vertices[4].TextureCoordinate = new Vector2(1, 1);
+            vertices[5].TextureCoordinate = vertices[2].TextureCoordinate;
+
+            return new Mesh(vertices, PrimitiveType.TriangleList)
+            {
+                Texture = texture
+            };
         }
 
         private static int GetPrimitiveCount(int verticesCount, PrimitiveType primitiveType)
