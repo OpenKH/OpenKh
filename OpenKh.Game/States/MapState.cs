@@ -19,10 +19,21 @@ namespace OpenKh.Game.States
         private List<Mesh> _models;
         private BasicEffect _effect;
         private double fieldOfView;
+        private Vector3 _cameraYpr;
 
         public double FieldOfView { get => fieldOfView; set => fieldOfView = Math.Max(0, Math.Min(Math.PI, value)); }
         public Vector3 CameraPosition { get; set; }
         public Vector3 CameraLookAt { get; set; }
+        public Vector3 CameraRotationYawPitchRoll
+        {
+            get => _cameraYpr;
+            set
+            {
+                _cameraYpr = value;
+                var matrix = Matrix.CreateFromYawPitchRoll(value.X / 180.0f * 3.14159f, value.Y / 180.0f * 3.14159f, value.Z / 180.0f * 3.14159f);
+                CameraLookAt = Vector3.Transform(new Vector3(1, 0, 0), matrix);
+            }
+        }
         public Vector3 CameraUp { get; set; }
 
         public void Initialize(StateInitDesc initDesc)
@@ -31,10 +42,11 @@ namespace OpenKh.Game.States
             _input = initDesc.InputManager;
             _effect = new BasicEffect(_graphics.GraphicsDevice);
 
-            FieldOfView = MathHelper.PiOver4;
-            CameraPosition = new Vector3(0, 316, 238);
-            CameraLookAt = new Vector3(0, -40, -30);
-            CameraUp = Vector3.UnitZ;
+            FieldOfView = MathHelper.PiOver4 * 2;
+            CameraPosition = new Vector3(0, 500, 0);
+            CameraLookAt = new Vector3(0, 0, 0);
+            CameraUp = Vector3.UnitY;
+            CameraRotationYawPitchRoll = new Vector3(-180, 0, 10);
 
             _models = new List<Mesh>
             {
@@ -48,22 +60,32 @@ namespace OpenKh.Game.States
 
         public void Update(DeltaTimes deltaTimes)
         {
-            const double Speed = 1.0;
+            const double Speed = 100.0;
             var speed = (float)(deltaTimes.DeltaTime * Speed);
 
-            if (_input.Up) CameraPosition += Vector3.Multiply(CameraLookAt, speed);
-            if (_input.Down) CameraPosition -= Vector3.Multiply(CameraLookAt, speed);
+            if (_input.W) CameraPosition += Vector3.Multiply(CameraLookAt, speed * 5);
+            if (_input.S) CameraPosition -= Vector3.Multiply(CameraLookAt, speed * 100);
+
+            if (_input.Up) CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
+            if (_input.Down) CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
+            if (_input.Left) CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
+            if (_input.Right) CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
         }
 
         public void Draw(DeltaTimes deltaTimes)
         {
             var aspectRatio = _graphics.PreferredBackBufferWidth / (float)_graphics.PreferredBackBufferHeight;
             var nearClipPlane = 1;
-            var farClipPlane = 1000;
+            var farClipPlane = 100000;
 
             _effect.Projection = Matrix.CreatePerspectiveFieldOfView(
                 (float)fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
-            _effect.View = Matrix.CreateLookAt(CameraPosition, CameraPosition + CameraLookAt, CameraUp);
+            _effect.World = Matrix.CreateLookAt(CameraPosition, CameraPosition + CameraLookAt, CameraUp);
+
+            _effect.GraphicsDevice.RasterizerState = new RasterizerState()
+            {
+                CullMode = CullMode.CullClockwiseFace
+            };
 
             foreach (var pass in _effect.CurrentTechnique.Passes)
             {
