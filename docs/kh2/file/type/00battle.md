@@ -6,6 +6,8 @@ This is an essential file for booting [Kingdom Hearts II](../../index) and it co
 * [LVPM](#lvpm)
 * [ENMP](#enmp)
 * [FMLV](#fmlv)
+* [PRZT](#przt)
+* [BONS](#bons)
 
 ## Lvup
 
@@ -169,3 +171,28 @@ Final Mix (JP/PS3/PS4)
 | 04 | Master
 | 05 | Final
 | 06 | Anti
+
+## Przt
+
+Contains the item drop table.
+The ID of the entry is assigned in the AI of the object.
+
+| Offset | Type  | Description
+|--------|------ |--------------
+| 00     | ushort | ID
+| 02     | byte  | Small HP orbs
+| 03     | byte  | Big HP orbs
+| 04     | byte  | Big Money orbs
+| 05     | byte  | Medium Money orbs
+| 06     | byte  | Small Money orbs
+| 07     | byte  | Small MP orbs
+| 08     | byte  | Big MP orbs
+| 09     | byte  | Small Drive orbs
+| 0A     | byte  | Big Drive orbs
+| 0B     | byte  | Unknown
+| 0C     | ushort  | Item 1 (Refer to ITEM from 03system)
+| 0E     | short  | Item 1 Drop Percentage
+| 10     | ushort  | Item 2 (Refer to ITEM from 03system)
+| 12     | short  | Item 2 Drop Percentage
+| 14     | ushort  | Item 3 (Refer to ITEM from 03system)
+| 16     | short  | Item 3 Drop Percentage
