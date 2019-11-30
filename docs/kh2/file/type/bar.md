@@ -37,6 +37,45 @@ All the values are Little Endian in the PS2/PS4 Versions, while they are Big End
 |--------|---------------|-------------|
 | BAREntry[index]->fileOffset | byte[BAREntry[index]->fileSize | The sub-file itself in RAW Data (Uncompressed). |
 
+### Kaitai file structure
+
+```
+meta:
+  id: kh2_bar
+  endian: le
+seq:
+  - id: magic
+    contents: [0x42, 0x41, 0x52, 0x01]
+  - id: num_files
+    type: s4
+  - id: padding
+    size: 8
+  - id: files
+    type: file_entry
+    repeat: expr
+    repeat-expr: num_files
+types:
+  file_entry:
+    seq:
+      - id: type
+        type: u2
+      - id: duplicate
+        type: u2
+      - id: name
+        type: str
+        size: 4
+        encoding: UTF-8
+      - id: offset
+        type: s4
+      - id: size
+        type: s4
+    instances:
+      file:
+        io: _root._io
+        pos: offset
+        size: size
+```
+
 ## BAR File Types
 
 Keep in mind that this list is still incomplete and will be changed over the course of this project:
@@ -92,3 +131,5 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 46 | Binary Archive | Unknown
 | 47 | Vibration Data | vibration.bar
 | 48 | Sony Audio Format (VAG) | Varies.
+
+
