@@ -224,7 +224,7 @@ Contains informations about starting Character statistics, starting Abilities et
 | Offset | Type  | Description
 |--------|-------|--------------
 | 00     | short | Unknown
-| 02     | short | Unknown
+| 02     | byte  | Unknown
 | 03     | byte  | HP
 | 04     | byte  | MP
 | 05     | byte  | AP
