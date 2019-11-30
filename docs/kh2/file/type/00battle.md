@@ -8,6 +8,7 @@ This is an essential file for booting [Kingdom Hearts II](../../index) and it co
 * [FMLV](#fmlv)
 * [PRZT](#przt)
 * [BONS](#bons)
+* [PLRP](#plrp)
 
 ## Lvup
 
@@ -178,7 +179,7 @@ Contains the item drop table.
 The ID of the entry is assigned in the AI of the object.
 
 | Offset | Type  | Description
-|--------|------ |--------------
+|--------|-------|--------------
 | 00     | ushort | ID
 | 02     | byte  | Small HP orbs
 | 03     | byte  | Big HP orbs
@@ -196,3 +197,38 @@ The ID of the entry is assigned in the AI of the object.
 | 12     | short  | Item 2 Drop Percentage
 | 14     | ushort  | Item 3 (Refer to ITEM from 03system)
 | 16     | short  | Item 3 Drop Percentage
+
+## Bons
+
+Contains reward items (GET! BONUS).
+The ID is assigned in the msn file (first sub file, offset 0xD).
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 00     | byte  | ID
+| 01     | byte  | Character Id
+| 02     | byte  | HP Increase
+| 03     | byte  | MP Increase
+| 04     | byte  | Drive Gauge Upgrade
+| 05     | byte  | Item Slot Upgrade
+| 06     | byte  | Accessory Slot Upgrade
+| 07     | byte  | Armor Slot Upgrade
+| 08     | short | Bonus Item 1 (Refer to ITEM from 03system)
+| 10     | short | Bonus Item 2 (Refer to ITEM from 03system)
+| 12     | int   | Unknown
+
+## Plrp
+
+Contains informations about starting Character statistics, starting Abilities etc.
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 00     | short | Unknown
+| 02     | short | Unknown
+| 03     | byte  | HP
+| 04     | byte  | MP
+| 05     | byte  | AP
+| 06     | short | Unknown
+| 08     | short | Unknown
+| 0A     | short | Unknown
+| 0C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system). These are obtained after the dusk fight in Station of Awakening.
