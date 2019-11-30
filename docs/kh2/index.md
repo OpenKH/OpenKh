@@ -20,7 +20,7 @@
   
 * Other files
 
-    * [00battle.bin](file/type/enmp)
+    * [00battle.bin](file/type/00battle)
     * [00objentry.bin](file/type/00objentry)
     * [03system.bin](file/type/03system)
 
