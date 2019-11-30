@@ -231,4 +231,4 @@ Contains informations about starting Character statistics, starting Abilities et
 | 06     | short | Unknown
 | 08     | short | Unknown
 | 0A     | short | Unknown
-| 0C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system). These are obtained after the dusk fight in Station of Awakening.
+| 0C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system). These are obtained after the dusks fight in Station of Awakening.
