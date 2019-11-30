@@ -8,7 +8,7 @@ This is an essential file for [Kingdom Hearts II](../../index) and it contains o
 |--------|------|-------------|
 | 00     | ushort | ID
 | 02     | ushort | Unknown
-| 04     | byte | Object Type. Refer to [types](#types).
+| 04     | byte | Object Type. Refer to [Object Types](#object-types).
 | 05     | byte | Unknown
 | 06     | byte | Unknown
 | 07     | byte | Weapon Joint
