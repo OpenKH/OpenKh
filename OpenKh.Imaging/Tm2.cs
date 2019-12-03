@@ -15,7 +15,7 @@ namespace OpenKh.Imaging
         private const int Format = 0;
         private const int HeaderLength = 16;
 
-        private enum GsPSM
+        public enum GsPSM
 		{
 			GS_PSMCT32 = 0, // 32bit RGBA
 			GS_PSMCT24 = 1,
@@ -71,7 +71,7 @@ namespace OpenKh.Imaging
 		///     
 		/// http://forum.xentax.com/viewtopic.php?f=16&t=4501&start=75
 		/// </summary>
-		private class GsTex
+		public class GsTex
 		{
             public GsTex()
             {
