@@ -8,7 +8,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 
 namespace OpenKh.Tools.ImageViewer.Services
-{
+{  
     public partial class ImageFormatService : IImageFormatService
     {
         private static readonly IImageFormat[] imageFormat;
@@ -27,6 +27,10 @@ namespace OpenKh.Tools.ImageViewer.Services
 
                 GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
                     throw new NotImplementedException()),
+
+                GetImageFormat("KH2TIM", "tex", true, _ => true,
+                    s => ModelTexture.Read(s).Images.Cast<IImageRead>(),
+                    (stream, images) => throw new NotImplementedException()),
             };
         }
 
