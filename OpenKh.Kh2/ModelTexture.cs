@@ -244,7 +244,7 @@ namespace OpenKh.Kh2
                 var dataLength = width * height / (pixelFormat == PixelFormat.Indexed4 ? 2 : 1);
                 var data = stream.SetPosition(texInfo1.PictureOffset).ReadBytes(dataLength);
 
-                var texture = new Texture(width, height, pixelFormat, PictureData, PaletteData);
+                var texture = new Texture(width, height, pixelFormat, data, PaletteData);
                 Images.Add(texture);
 
                 //Debug.Assert(PictureData.Length == width * height / 2);
@@ -394,7 +394,8 @@ namespace OpenKh.Kh2
             var data = new byte[256 * 4];
             for (var i = 0; i < 256; i++)
             {
-                var srcIndex = Ps2.Repl(i);
+                var srcIndex = (i & 7) + ((i & 8) * 8) + ((i & 16) / 2) +
+                    ((i & 32) * 4) + ((i & 64) * 4) +  ((i & 128) * 4);
                 data[i * 4 + 0] = clut[srcIndex * 4 + 0];
                 data[i * 4 + 1] = clut[srcIndex * 4 + 1];
                 data[i * 4 + 2] = clut[srcIndex * 4 + 2];

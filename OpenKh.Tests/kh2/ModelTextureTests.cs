@@ -17,7 +17,7 @@ namespace OpenKh.Tests.kh2
 
         [Theory]
         [InlineData(FileName1, 1)]
-        [InlineData(FileName2, 2)]
+        [InlineData(FileName2, 3)]
         public void ReadCorrectAmountOfTextures(string fileName, int expectedCount) => File.OpenRead(fileName).Using(stream =>
         {
             var modelTexture = ModelTexture.Read(stream);
@@ -31,16 +31,22 @@ namespace OpenKh.Tests.kh2
             var modelTexture = ModelTexture.Read(stream);
 
             var image0 = modelTexture.Images[0];
-            Assert.Equal(128, image0.Size.Width);
-            Assert.Equal(128, image0.Size.Height);
-            Assert.Equal(PixelFormat.Indexed4, image0.PixelFormat);
-            Assert.Equal(128 * 128 / 2, image0.GetData().Length);
+            Assert.Equal(256, image0.Size.Width);
+            Assert.Equal(256, image0.Size.Height);
+            Assert.Equal(PixelFormat.Indexed8, image0.PixelFormat);
+            Assert.Equal(256 * 256, image0.GetData().Length);
 
             var image1 = modelTexture.Images[1];
-            Assert.Equal(128, image1.Size.Width);
-            Assert.Equal(128, image1.Size.Height);
-            Assert.Equal(PixelFormat.Indexed4, image0.PixelFormat);
-            Assert.Equal(128 * 128 / 2, image1.GetData().Length);
+            Assert.Equal(256, image1.Size.Width);
+            Assert.Equal(256, image1.Size.Height);
+            Assert.Equal(PixelFormat.Indexed8, image1.PixelFormat);
+            Assert.Equal(256 * 256, image1.GetData().Length);
+
+            var image2 = modelTexture.Images[2];
+            Assert.Equal(128, image2.Size.Width);
+            Assert.Equal(64, image2.Size.Height);
+            Assert.Equal(PixelFormat.Indexed8, image2.PixelFormat);
+            Assert.Equal(128 * 64, image2.GetData().Length);
         });
 
         [Theory]
@@ -54,7 +60,7 @@ namespace OpenKh.Tests.kh2
         }));
 
         [Fact]
-        public void ReadPaletteCorrectly() => File.OpenRead(FileName1).Using(stream =>
+        public void Read4bitPaletteCorrectly() => File.OpenRead(FileName1).Using(stream =>
         {
             var clut = ModelTexture.Read(stream).Images.First().GetClut();
 
@@ -77,6 +83,48 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(147, clut[33]);
             Assert.Equal(158, clut[34]);
             Assert.Equal(255, clut[35]);
+        });
+
+        [Fact]
+        public void Read8bitPaletteCorrectly() => File.OpenRead(FileName2).Using(stream =>
+        {
+            var clut = ModelTexture.Read(stream).Images.First().GetClut();
+
+            Assert.Equal(0, clut[0 * 4 + 0]);
+            Assert.Equal(0, clut[0 * 4 + 1]);
+            Assert.Equal(0, clut[0 * 4 + 2]);
+            Assert.Equal(0, clut[0 * 4 + 3]);
+
+            Assert.Equal(10, clut[4 * 4 + 0]);
+            Assert.Equal(10, clut[4 * 4 + 1]);
+            Assert.Equal(10, clut[4 * 4 + 2]);
+            Assert.Equal(255, clut[4 * 4 + 3]);
+
+            Assert.Equal(11, clut[8 * 4 + 0]);
+            Assert.Equal(15, clut[8 * 4 + 1]);
+            Assert.Equal(23, clut[8 * 4 + 2]);
+            Assert.Equal(255, clut[8 * 4 + 3]);
+
+            Assert.Equal(23, clut[16 * 4 + 0]);
+            Assert.Equal(19, clut[16 * 4 + 1]);
+            Assert.Equal(29, clut[16 * 4 + 2]);
+            Assert.Equal(255, clut[16 * 4 + 3]);
+
+            Assert.Equal(23, clut[32 * 4 + 0]);
+            Assert.Equal(35, clut[32 * 4 + 1]);
+            Assert.Equal(56, clut[32 * 4 + 2]);
+            Assert.Equal(255, clut[32 * 4 + 3]);
+
+            Assert.Equal(57, clut[64 * 4 + 0]);
+            Assert.Equal(51, clut[64 * 4 + 1]);
+            Assert.Equal(71, clut[64 * 4 + 2]);
+            Assert.Equal(255, clut[64 * 4 + 3]);
+
+            Assert.Equal(153, clut[128 * 4 + 0]);
+            Assert.Equal(96, clut[128 * 4 + 1]);
+            Assert.Equal(7, clut[128 * 4 + 2]);
+            Assert.Equal(255, clut[128 * 4 + 3]);
+
         });
     }
 }
