@@ -2,7 +2,6 @@
 using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -160,6 +159,8 @@ namespace OpenKh.Kh2
             [Data] public long Data98 { get; set; }
         }
 
+        private const int HeaderLength = 0x24;
+
         public List<Texture> Images { get; }
 
         [Data] public int TextureCountWcx { get; }
@@ -255,8 +256,6 @@ namespace OpenKh.Kh2
 
         public void Write(Stream stream)
         {
-            const int HeaderLength = 0x24;
-
             stream.Position = HeaderLength;
             stream.Write(OffsetData);
             stream.AlignPosition(0x10);
@@ -411,5 +410,27 @@ namespace OpenKh.Kh2
 
         public static ModelTexture Read(Stream stream) =>
             new ModelTexture(stream);
+
+        public static bool IsValid(Stream stream)
+        {
+            if (stream.Length < HeaderLength)
+                return false;
+
+            var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
+            if (header.Unk00 != 0)
+                return false;
+
+            var streamLength = stream.Length;
+            if (header.Offset1 > streamLength ||
+                header.Texinf1off > streamLength ||
+                header.Texinf2off > streamLength ||
+                header.PictureOffset > streamLength ||
+                header.PaletteOffset > streamLength ||
+                header.TextureCountWcx <= 0 ||
+                header.TextureCountWcy <= 0)
+                return false;
+
+            return true;
+        }
     }
 }

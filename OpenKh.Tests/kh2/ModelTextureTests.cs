@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using System;
@@ -14,6 +14,12 @@ namespace OpenKh.Tests.kh2
     {
         private const string FileName1 = "kh2/res/model_texture1.tex";
         private const string FileName2 = "kh2/res/model_texture2.tex";
+
+        [Fact]
+        public void IsValidReturnsTrueWhenStreamContainsValidData() => File.OpenRead(FileName1).Using(stream =>
+        {
+            Assert.True(ModelTexture.IsValid(stream));
+        });
 
         [Theory]
         [InlineData(FileName1, 1)]
