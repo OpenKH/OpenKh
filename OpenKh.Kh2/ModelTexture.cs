@@ -29,13 +29,15 @@ namespace OpenKh.Kh2
         {
             private readonly byte[] _data;
             private readonly byte[] _palette;
+            private readonly int _paletteIndex;
 
-            public Texture(int width, int height, PixelFormat pixelFormat, byte[] data, byte[] palette)
+            public Texture(int width, int height, PixelFormat pixelFormat, byte[] data, byte[] palette, int paletteIndex)
             {
                 Size = new Size(width, height);
                 PixelFormat = pixelFormat;
                 _data = data;
                 _palette = palette;
+                _paletteIndex = paletteIndex;
             }
 
             public Size Size { get; }
@@ -46,7 +48,7 @@ namespace OpenKh.Kh2
             {
                 switch (PixelFormat)
                 {
-                    case PixelFormat.Indexed8: return GetClut8(_palette);
+                    case PixelFormat.Indexed8: return GetClut8(_palette, _paletteIndex);
                     case PixelFormat.Indexed4: return GetClut4(_palette);
                     default:
                         throw new NotSupportedException($"The format {PixelFormat} is not supported or does not contain any palette.");
@@ -244,7 +246,7 @@ namespace OpenKh.Kh2
                 var dataLength = width * height / (pixelFormat == PixelFormat.Indexed4 ? 2 : 1);
                 var data = stream.SetPosition(texInfo1.PictureOffset).ReadBytes(dataLength);
 
-                var texture = new Texture(width, height, pixelFormat, data, PaletteData);
+                var texture = new Texture(width, height, pixelFormat, data, PaletteData, i);
                 Images.Add(texture);
 
                 //Debug.Assert(PictureData.Length == width * height / 2);
@@ -389,13 +391,15 @@ namespace OpenKh.Kh2
             return data;
         }
 
-        private static byte[] GetClut8(byte[] clut)
+        private static byte[] GetClut8(byte[] clut, int clutIndex)
         {
             var data = new byte[256 * 4];
             for (var i = 0; i < 256; i++)
             {
                 var srcIndex = (i & 7) + ((i & 8) * 8) + ((i & 16) / 2) +
                     ((i & 32) * 4) + ((i & 64) * 4) +  ((i & 128) * 4);
+                srcIndex += (clutIndex & 1) * 16 + (clutIndex & 2) * 0x200;
+
                 data[i * 4 + 0] = clut[srcIndex * 4 + 0];
                 data[i * 4 + 1] = clut[srcIndex * 4 + 1];
                 data[i * 4 + 2] = clut[srcIndex * 4 + 2];
