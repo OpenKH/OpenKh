@@ -17,10 +17,11 @@ namespace OpenKh.Game.States
     {
         private GraphicsDeviceManager _graphics;
         private InputManager _input;
-        private List<Mesh> _models;
+        private List<Mesh> _models = new List<Mesh>();
         private BasicEffect _effect;
         private double fieldOfView;
         private Vector3 _cameraYpr;
+        private const int _languageId = 0;
 
         public double FieldOfView { get => fieldOfView; set => fieldOfView = Math.Max(0, Math.Min(Math.PI, value)); }
         public Vector3 CameraPosition { get; set; }
@@ -49,10 +50,7 @@ namespace OpenKh.Game.States
             CameraUp = Vector3.UnitY;
             CameraRotationYawPitchRoll = new Vector3(-180, 0, 10);
 
-            _models = new List<Mesh>
-            {
-                FromMdlx(_graphics.GraphicsDevice, "obj/P_EX100.mdlx"),
-            };
+            LoadMap(2, 4);
         }
 
         public void Destroy()
@@ -94,28 +92,11 @@ namespace OpenKh.Game.States
 
                 foreach (var mesh in _models)
                 {
-                    //if (_effect.Texture != mesh.Texture)
-                    //{
-                    //    _effect.Texture = mesh.Texture;
-                    //    _effect.TextureEnabled = _effect.Texture != null;
-                    //    pass.Apply();
-                    //}
-
-                    //_graphics.GraphicsDevice.DrawUserPrimitives(
-                    //    mesh.PrimitiveType, mesh.Vertices, mesh.Start, mesh.Count);
-
                     var index = 0;
                     foreach (var part in mesh.Parts)
                     {
-                        //using (var vb = CreateVertexBuffer(mesh.Segments[part.SegmentId]))
-                        //{
-                        //    using (var ib = CreateIndexBuffer(part))
-                        //    {
-                        //        _graphics.GraphicsDevice.SetVertexBuffer(vb);
-                        //        _graphics.GraphicsDevice.Indices = ib;
-                        //        _graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, part.Indices.Length / 3);
-                        //    }
-                        //}
+                        if (part.Indices.Length == 0)
+                            continue;
 
                         var texture = mesh.Textures[part.TextureId & 0xffff];
                         if (_effect.Texture != texture)
@@ -140,6 +121,17 @@ namespace OpenKh.Game.States
             }
         }
 
+        private void LoadMap(int worldIndex, int mapIndex)
+        {
+            var fileName = $"map/{Constants.Languages[_languageId]}/{Constants.WorldIds[worldIndex]}{mapIndex:D02}.map";
+
+            _models.Clear();
+
+            var entries = File.OpenRead(fileName).Using(stream => Bar.Read(stream));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
+        }
+
         private static Mesh FromMdlx(GraphicsDevice graphics, string fileName)
         {
             var barEntries = File.OpenRead(fileName).Using(stream => Bar.Read(stream));
@@ -147,32 +139,55 @@ namespace OpenKh.Game.States
             var textureEntry = barEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Tim2);
             if (modelEntry != null && textureEntry != null)
             {
-                var mdlx = Mdlx.Read(modelEntry.Stream);
-                var model = new MdlxParser(mdlx).Model;
-                var textures = ModelTexture.Read(textureEntry.Stream);
-
-                return new Mesh
-                {
-                    Segments = model.Segments.Select(segment => new Mesh.Segment
-                    {
-                        Vertices = segment.Vertices.Select(vertex => new VertexPositionColorTexture
-                        {
-                            Position = new Vector3(vertex.X, vertex.Y, vertex.Z),
-                            TextureCoordinate = new Vector2(vertex.U, vertex.V),
-                            Color = new Color((uint)vertex.Color)
-                        }).ToArray()
-                    }).ToArray(),
-                    Parts = model.Parts.Select(part => new Mesh.Part
-                    {
-                        Indices = part.Indices,
-                        SegmentId = part.SegmentId,
-                        TextureId = part.TextureId
-                    }).ToArray(),
-                    Textures = textures.Images.Select(texture => texture.CreateTexture(graphics)).ToArray()
-                };
+                FromMdlx(graphics, modelEntry.Stream, textureEntry.Stream);
             }
 
             return null;
+        }
+
+        private static Mesh FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
+        {
+            var modelEntry = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Vif && x.Name == name);
+            var textureEntry = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Tim2 && x.Name == name);
+            if (modelEntry != null && textureEntry != null)
+                return FromMdlx(graphics, modelEntry.Stream, textureEntry.Stream);
+
+            return null;
+        }
+
+        private static Mesh FromMdlx(GraphicsDevice graphics, Stream mdlxStream, Stream texturesStream)
+        {
+            var mdlx = Mdlx.Read(mdlxStream);
+            var model = new MdlxParser(mdlx).Model;
+            var textures = ModelTexture.Read(texturesStream);
+
+            return new Mesh
+            {
+                Segments = model.Segments.Select(segment => new Mesh.Segment
+                {
+                    Vertices = segment.Vertices.Select(vertex => new VertexPositionColorTexture
+                    {
+                        Position = new Vector3(vertex.X, vertex.Y, vertex.Z),
+                        TextureCoordinate = new Vector2(vertex.U, vertex.V),
+                        Color = new Color((uint)vertex.Color)
+                    }).ToArray()
+                }).ToArray(),
+                Parts = model.Parts.Select(part => new Mesh.Part
+                {
+                    Indices = part.Indices,
+                    SegmentId = part.SegmentId,
+                    TextureId = part.TextureId
+                }).ToArray(),
+                Textures = textures.Images.Select(texture => texture.CreateTexture(graphics)).ToArray()
+            };
+        }
+
+        private void AddMesh(Mesh mesh)
+        {
+            if (mesh == null)
+                return;
+
+            _models.Add(mesh);
         }
     }
 }
