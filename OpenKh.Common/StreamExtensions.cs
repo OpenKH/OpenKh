@@ -35,6 +35,12 @@ namespace OpenKh.Common
                 .ToList();
         }
 
+        public static short ReadInt16(this Stream stream) =>
+            new BinaryReader(stream).ReadInt16();
+
+        public static ushort ReadUInt16(this Stream stream) =>
+            new BinaryReader(stream).ReadUInt16();
+
         public static int ReadInt32(this Stream stream) =>
             new BinaryReader(stream).ReadInt32();
 
