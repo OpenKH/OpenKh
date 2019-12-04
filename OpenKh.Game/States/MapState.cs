@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.Parsers;
+using OpenKh.Game.Extensions;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
 using OpenKh.Kh2;
@@ -142,11 +143,13 @@ namespace OpenKh.Game.States
         private static Mesh FromMdlx(GraphicsDevice graphics, string fileName)
         {
             var barEntries = File.OpenRead(fileName).Using(stream => Bar.Read(stream));
-            var entry = barEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Vif);
-            if (entry != null)
+            var modelEntry = barEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Vif);
+            var textureEntry = barEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Tim2);
+            if (modelEntry != null && textureEntry != null)
             {
-                var mdlx = Mdlx.Read(entry.Stream);
+                var mdlx = Mdlx.Read(modelEntry.Stream);
                 var model = new MdlxParser(mdlx).Model;
+                var textures = ModelTexture.Read(textureEntry.Stream);
 
                 return new Mesh
                 {
@@ -165,10 +168,7 @@ namespace OpenKh.Game.States
                         SegmentId = part.SegmentId,
                         TextureId = part.TextureId
                     }).ToArray(),
-                    Textures = Enumerable.Range(0, model.Parts.Max(part => part.TextureId & 15) + 1)
-                        .Select(i => $@"..\reseach\mdlx\P_EX100 export\tim_ (07)\tex{i} (19)_1.png")
-                        .Select(texFileName => File.OpenRead(texFileName).Using(stream => Texture2D.FromStream(graphics, stream)))
-                        .ToArray()
+                    Textures = textures.Images.Select(texture => texture.CreateTexture(graphics)).ToArray()
                 };
             }
 
