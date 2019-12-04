@@ -13,10 +13,10 @@ namespace OpenKh.Kh2
     {
         private class Header
         {
-            [Data] public int Unk00 { get; set; }
-            [Data] public int Unk04 { get; set; }
-            [Data] public int TextureCountWcx { get; set; }
-            [Data] public int TextureCountWcy { get; set; }
+            [Data] public int MagicCode { get; set; }
+            [Data] public int ColorCount { get; set; }
+            [Data] public int TextureInfoCount { get; set; }
+            [Data] public int GsInfoCount { get; set; }
             [Data] public int Offset1 { get; set; }
             [Data] public int Texinf1off { get; set; }
             [Data] public int Texinf2off { get; set; }
@@ -71,7 +71,7 @@ namespace OpenKh.Kh2
             }
         }
 
-        private class TexInf1
+        private class TextureInfo
         {
             public int Data24 { get; set; }
             public int Data28 { get; set; }
@@ -84,7 +84,7 @@ namespace OpenKh.Kh2
             public int Data80 { get; set; }
         }
 
-        private class _TexInf1
+        private class _TextureInfo
         {
             [Data] public int Data00 { get; set; }
             [Data] public int Data04 { get; set; }
@@ -124,7 +124,7 @@ namespace OpenKh.Kh2
             [Data] public int Data8c { get; set; }
         }
 
-        private class TexInf2
+        private class GsInfo
         {
             public long Data30 { get; set; }
             public long Data40 { get; set; }
@@ -135,7 +135,7 @@ namespace OpenKh.Kh2
             public long Data80 { get; set; }
         }
 
-        private class _TexInf2
+        private class _GsInfo
         {
             [Data] public long Data00 { get; set; }
             [Data] public long Data08 { get; set; }
@@ -159,15 +159,13 @@ namespace OpenKh.Kh2
             [Data] public long Data98 { get; set; }
         }
 
+        private const int MagicCode = 0;
         private const int HeaderLength = 0x24;
 
+        private List<TextureInfo> _textureInfo;
+        private List<GsInfo> _gsInfo;
+
         public List<Texture> Images { get; }
-
-        [Data] public int TextureCountWcx { get; }
-        [Data] public int TextureCountWcy { get; }
-
-        private List<TexInf1> TexInfo1 { get; }
-        private List<TexInf2> TexInfo2 { get; }
 
         private byte[] OffsetData { get; }
         private byte[] PictureData { get; }
@@ -177,27 +175,24 @@ namespace OpenKh.Kh2
         private ModelTexture(Stream stream)
         {
             var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
-            if (header.Unk00 == -1)
+            if (header.MagicCode == -1)
                 return;
-
-            TextureCountWcx = header.TextureCountWcx;
-            TextureCountWcy = header.TextureCountWcy;
 
             var offset1Size = header.Texinf1off - header.Offset1;
             var Texinf2offSize = header.PictureOffset - header.Texinf2off;
             var pictureSize = header.PaletteOffset - header.PictureOffset;
-            var paletteSize = header.Unk04 * 4;
+            var paletteSize = header.ColorCount * 4;
             var footerSize = (int)stream.Length - (header.PaletteOffset + paletteSize);
             if (footerSize < 0)
                 throw new NotFiniteNumberException("Invalid texture");
 
             stream.Position = header.Offset1;
-            OffsetData = stream.ReadBytes(header.TextureCountWcy);
+            OffsetData = stream.ReadBytes(header.GsInfoCount);
 
             stream.Position = header.Texinf1off;
-            TexInfo1 = Enumerable.Range(0, header.TextureCountWcx + 1)
-                .Select(_ => BinaryMapping.ReadObject<_TexInf1>(stream))
-                .Select(x => new TexInf1
+            _textureInfo = Enumerable.Range(0, header.TextureInfoCount + 1)
+                .Select(_ => BinaryMapping.ReadObject<_TextureInfo>(stream))
+                .Select(x => new TextureInfo
                 {
                     Data24 = x.Data24,
                     Data28 = x.Data28,
@@ -212,9 +207,9 @@ namespace OpenKh.Kh2
                 .ToList();
 
             stream.Position = header.Texinf2off;
-            TexInfo2 = Enumerable.Range(0, header.TextureCountWcy)
-                .Select(_ => BinaryMapping.ReadObject<_TexInf2>(stream))
-                .Select(x => new TexInf2
+            _gsInfo = Enumerable.Range(0, header.GsInfoCount)
+                .Select(_ => BinaryMapping.ReadObject<_GsInfo>(stream))
+                .Select(x => new GsInfo
                 {
                     Data30 = x.Data30,
                     Data40 = x.Data40,
@@ -235,22 +230,18 @@ namespace OpenKh.Kh2
             FooterData = stream.ReadBytes(footerSize);
 
             Images = new List<Texture>();
-            for (var i = 0; i < header.TextureCountWcy; i++)
+            for (var i = 0; i < header.GsInfoCount; i++)
             {
-                var texInfo1 = TexInfo1[OffsetData[i] + 1];
-                var texInfo2 = TexInfo2[i];
-                var gsTex = texInfo2.GsTex0;
+                var texInfo = _textureInfo[OffsetData[i] + 1];
+                var gsTex = _gsInfo[i].GsTex0;
 
                 var width = 1 << gsTex.TW;
                 var height = 1 << gsTex.TH;
                 var pixelFormat = GetPixelFormat(gsTex.PSM);
                 var dataLength = width * height / (pixelFormat == PixelFormat.Indexed4 ? 2 : 1);
-                var data = stream.SetPosition(texInfo1.PictureOffset).ReadBytes(dataLength);
+                var data = stream.SetPosition(texInfo.PictureOffset).ReadBytes(dataLength);
 
-                var texture = new Texture(width, height, pixelFormat, data, PaletteData, i);
-                Images.Add(texture);
-
-                //Debug.Assert(PictureData.Length == width * height / 2);
+                Images.Add(new Texture(width, height, pixelFormat, data, PaletteData, i));
             }
         }
 
@@ -261,8 +252,8 @@ namespace OpenKh.Kh2
             stream.AlignPosition(0x10);
 
             var texInfo1Offset = (int)stream.Position;
-            foreach (var textureInfo in TexInfo1)
-                BinaryMapping.WriteObject(stream, new _TexInf1
+            foreach (var textureInfo in _textureInfo)
+                BinaryMapping.WriteObject(stream, new _TextureInfo
                 {
                     Data00 = 0x10000006,
                     Data04 = 0x00000000,
@@ -303,8 +294,8 @@ namespace OpenKh.Kh2
                 });
 
             var texInfo2Offset = (int)stream.Position;
-            foreach (var textureInfo in TexInfo2)
-                BinaryMapping.WriteObject(stream, new _TexInf2
+            foreach (var textureInfo in _gsInfo)
+                BinaryMapping.WriteObject(stream, new _GsInfo
                 {
                     Data00 = 0x0000000010000008,
                     Data08 = 0x5000000813000000,
@@ -339,10 +330,10 @@ namespace OpenKh.Kh2
             stream.Write(FooterData);
 
             var writer = new BinaryWriter(stream.SetPosition(0));
-            writer.Write(0);
+            writer.Write(MagicCode);
             writer.Write(PaletteData.Length / 4);
-            writer.Write(TextureCountWcx);
-            writer.Write(TextureCountWcy);
+            writer.Write(_textureInfo.Count - 1);
+            writer.Write(_gsInfo.Count);
             writer.Write(HeaderLength);
             writer.Write(texInfo1Offset);
             writer.Write(texInfo2Offset);
@@ -417,7 +408,7 @@ namespace OpenKh.Kh2
                 return false;
 
             var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
-            if (header.Unk00 != 0)
+            if (header.MagicCode != MagicCode)
                 return false;
 
             var streamLength = stream.Length;
@@ -426,8 +417,8 @@ namespace OpenKh.Kh2
                 header.Texinf2off > streamLength ||
                 header.PictureOffset > streamLength ||
                 header.PaletteOffset > streamLength ||
-                header.TextureCountWcx <= 0 ||
-                header.TextureCountWcy <= 0)
+                header.TextureInfoCount <= 0 ||
+                header.GsInfoCount <= 0)
                 return false;
 
             return true;
