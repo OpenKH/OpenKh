@@ -234,7 +234,7 @@ namespace OpenKh.Kh2
             Images = new List<Texture>();
             for (var i = 0; i < header.TextureCountWcy; i++)
             {
-                var texInfo1 = TexInfo1[OffsetData[i]];
+                var texInfo1 = TexInfo1[OffsetData[i] + 1];
                 var texInfo2 = TexInfo2[i];
                 var gsTex = texInfo2.GsTex0;
 
