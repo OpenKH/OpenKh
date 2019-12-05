@@ -1,4 +1,6 @@
 ﻿using OpenKh.Kh2;
+using OpenKh.Tools.ObjentryEditor.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,11 +13,13 @@ using Xe.Tools.Wpf.Models;
 
 namespace OpenKh.Tools.ObjentryEditor.ViewModels
 {
-    public class ObjentryViewModel : GenericListModel<ObjentryViewModel.ObjentryEntryViewModel>
+    public class ObjentryViewModel : GenericListModel<ObjentryViewModel.ObjentryEntryViewModel>, IObjentryProvider
     {
-        public class ObjentryEntryViewModel : BaseNotifyPropertyChanged
+        public class ObjentryEntryViewModel : BaseNotifyPropertyChanged, IObjentryEntry
         {
-            public Objentry Objentry { get; }
+            public IObjentryProvider ObjentryProvider { get; set; }
+
+            public Objentry Objentry { get; set; }
 
             public ObjentryEntryViewModel(Objentry entry)
             {
@@ -61,6 +65,14 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public override string ToString() => Name;
         }
 
+        public void UpdateSubEntries()
+        {
+            foreach(var it in Items)
+            {
+                it.ObjentryProvider = this;
+            }
+        }
+
         private readonly int _type;
         private string _searchTerm;
 
@@ -69,7 +81,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         { }
 
         public ObjentryViewModel(int type, IEnumerable<Objentry> items) :
-            base(items.Select(Map))
+            base(items.Select(x => new ObjentryEntryViewModel(x)))
         {
             _type = type;
             AddAndSelectCommand = new RelayCommand(x =>
@@ -101,6 +113,10 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
                 PerformFiltering();
             }
         }
+
+        public IEnumerable<IObjentryEntry> ObjentryEntries => this.Items;
+        public bool DoesObjentryExists(ushort itemId) => this.Items.Any(x => x.ObjectId == itemId);
+        public string GetObjName(ushort itemId) => this.Items.FirstOrDefault(x => x.ObjectId == itemId)?.ModelName;
 
         public Stream CreateStream()
         {

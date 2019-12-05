@@ -118,7 +118,8 @@
                 <TextBox Text="{Binding Unknown57, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Spawn Object 1" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding SpawnObject1, UpdateSourceTrigger=PropertyChanged}"/>
+                <!--<TextBox Text="{Binding SpawnObject1, UpdateSourceTrigger=PropertyChanged}"/>-->
+                <ComboBox ItemsSource="{Binding ObjentryProvider.ObjentryEntries}" SelectedValue="{Binding SpawnObject1}" DisplayMemberPath="ModelName" />
 
                 <TextBlock Text="Spawn Object 2" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding SpawnObject2, UpdateSourceTrigger=PropertyChanged}"/>
