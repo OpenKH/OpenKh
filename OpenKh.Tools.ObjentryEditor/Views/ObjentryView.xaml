@@ -68,67 +68,68 @@
             Margin="5"
             VerticalScrollBarVisibility="Auto"
             Visibility="{Binding IsItemEditingVisible}">
-            <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
+            <controls:TwoColumnsPanel RowSpacing="3">
                 <TextBlock Text="Object ID" Margin="{StaticResource LabelMargin}"/>
-                <TextBlock Text="{Binding Id}"/>
+                <TextBlock Text="{Binding SelectedItem.Id}"/>
 
                 <TextBlock Text="Unknown02" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown02, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown02, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
-                <ComboBox ItemsSource="{Binding Types}" SelectedValue="{Binding ObjectType}" DisplayMemberPath="Name" SelectedValuePath="Value"/>
+                <ComboBox ItemsSource="{Binding ObjEntryTypes}" SelectedValue="{Binding SelectedItem.ObjectType}" DisplayMemberPath="Name" SelectedValuePath="Value"/>
 
                 <TextBlock Text="Unknown05" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown05, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown05, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown06" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown06, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown06, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Weapon Joint" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding WeaponJoint, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.WeaponJoint, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Model Name" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding ModelName, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.ModelName, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Animation Name" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding AnimationName, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.AnimationName, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown48" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown48, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown48, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Neo Status" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding NeoStatus, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.NeoStatus, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Neo Moveset" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding NeoMoveset, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.NeoMoveset, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown50" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown50, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown50, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Spawn Limiter" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding SpawnLimiter, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.SpawnLimiter, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown55" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown55, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown55, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown56" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown56, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown56, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown57" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown57, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown57, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Spawn Object 1" Margin="{StaticResource LabelMargin}"/>
                 <!--<TextBox Text="{Binding SpawnObject1, UpdateSourceTrigger=PropertyChanged}"/>-->
-                <ComboBox ItemsSource="{Binding ObjentryProvider.ObjentryEntries}" SelectedValue="{Binding SpawnObject1}" DisplayMemberPath="ModelName" />
+                <ComboBox ItemsSource="{Binding Items}" SelectedValue="{Binding SelectedItem.SpawnObject1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          DisplayMemberPath="Name" SelectedValuePath="ObjectId" />
 
                 <TextBlock Text="Spawn Object 2" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding SpawnObject2, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.SpawnObject2, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown5c" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown5c, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown5c, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Unknown5e" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown5e, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown5e, UpdateSourceTrigger=PropertyChanged}"/>
             </controls:TwoColumnsPanel>
         </ScrollViewer>
     </Grid>

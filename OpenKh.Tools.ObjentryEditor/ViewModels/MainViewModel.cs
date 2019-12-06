@@ -91,7 +91,6 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             Objentry = new ObjentryViewModel(BaseTable<Objentry>.Read(stream));
-            Objentry.UpdateSubEntries();
             OnPropertyChanged("Objentry");
             FileName = fileName;
             return true;

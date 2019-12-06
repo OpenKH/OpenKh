@@ -1,5 +1,4 @@
-﻿using OpenKh.Kh2;
-using OpenKh.Tools.ObjentryEditor.Interfaces;
+using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,25 +12,27 @@ using Xe.Tools.Wpf.Models;
 
 namespace OpenKh.Tools.ObjentryEditor.ViewModels
 {
-    public class ObjentryViewModel : GenericListModel<ObjentryViewModel.ObjentryEntryViewModel>, IObjentryProvider
+    public class ObjentryViewModel : GenericListModel<ObjentryViewModel.ObjentryEntryViewModel>
     {
-        public class ObjentryEntryViewModel : BaseNotifyPropertyChanged, IObjentryEntry
+        public class ObjentryEntryViewModel : BaseNotifyPropertyChanged
         {
-            public IObjentryProvider ObjentryProvider { get; set; }
+            public Objentry Objentry { get; }
 
-            public Objentry Objentry { get; set; }
-
-            public ObjentryEntryViewModel(Objentry entry)
+            public ObjentryEntryViewModel(Objentry objEntry)
             {
-                Objentry = entry;
-                Types = new EnumModel<Objentry.Type>();
+                Objentry = objEntry;
             }
 
             public string Name => $"{Id} {ModelName}";
 
             public string Id => $"{Objentry.ObjectId:X02}";
 
-            public ushort ObjectId { get => Objentry.ObjectId; set => Objentry.ObjectId = value; }
+            public ushort ObjectId
+            {
+                get => Objentry.ObjectId;
+                set { Objentry.ObjectId = value; OnPropertyChanged(nameof(Name)); }
+            }
+
             public ushort Unknown02 { get => Objentry.Unknown02; set => Objentry.Unknown02 = value; }
             public Objentry.Type ObjectType { get => Objentry.ObjectType; set => Objentry.ObjectType = value; }
             public byte Unknown05 { get => Objentry.Unknown05; set => Objentry.Unknown05 = value; }
@@ -60,21 +61,14 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public ushort Unknown5c { get => Objentry.Unknown5c; set => Objentry.Unknown5c = value; }
             public ushort Unknown5e { get => Objentry.Unknown5e; set => Objentry.Unknown5e = value; }
 
-            public EnumModel<Objentry.Type> Types { get; }
-
             public override string ToString() => Name;
         }
 
-        public void UpdateSubEntries()
-        {
-            foreach(var it in Items)
-            {
-                it.ObjentryProvider = this;
-            }
-        }
 
         private readonly int _type;
         private string _searchTerm;
+
+        public EnumModel<Objentry.Type> ObjEntryTypes { get; }
 
         public ObjentryViewModel(BaseTable<Objentry> objentry) :
             this(objentry.Id, objentry.Items)
@@ -84,6 +78,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             base(items.Select(x => new ObjentryEntryViewModel(x)))
         {
             _type = type;
+            ObjEntryTypes = new EnumModel<Objentry.Type>();
             AddAndSelectCommand = new RelayCommand(x =>
             {
                 AddCommand.Execute(null);
@@ -113,10 +108,6 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
                 PerformFiltering();
             }
         }
-
-        public IEnumerable<IObjentryEntry> ObjentryEntries => this.Items;
-        public bool DoesObjentryExists(ushort itemId) => this.Items.Any(x => x.ObjectId == itemId);
-        public string GetObjName(ushort itemId) => this.Items.FirstOrDefault(x => x.ObjectId == itemId)?.ModelName;
 
         public Stream CreateStream()
         {
