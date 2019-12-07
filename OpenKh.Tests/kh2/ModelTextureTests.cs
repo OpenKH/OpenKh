@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -94,43 +93,63 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void Read8bitPaletteCorrectly() => File.OpenRead(FileName2).Using(stream =>
         {
-            var clut = ModelTexture.Read(stream).Images.First().GetClut();
+            var images = ModelTexture.Read(stream).Images;
+            
+            AssertPalette(images, 0, 0, 0, 0, 0);
+            AssertPalette(images, 0, 4, 10, 10, 10);
+            AssertPalette(images, 0, 8, 11, 15, 23);
+            AssertPalette(images, 0, 16, 23, 19, 29);
+            AssertPalette(images, 0, 32, 23, 35, 56);
+            AssertPalette(images, 0, 64, 57, 51, 71);
+            AssertPalette(images, 0, 128, 153, 96, 7);
 
-            Assert.Equal(0, clut[0 * 4 + 0]);
-            Assert.Equal(0, clut[0 * 4 + 1]);
-            Assert.Equal(0, clut[0 * 4 + 2]);
-            Assert.Equal(0, clut[0 * 4 + 3]);
-
-            Assert.Equal(10, clut[4 * 4 + 0]);
-            Assert.Equal(10, clut[4 * 4 + 1]);
-            Assert.Equal(10, clut[4 * 4 + 2]);
-            Assert.Equal(255, clut[4 * 4 + 3]);
-
-            Assert.Equal(11, clut[8 * 4 + 0]);
-            Assert.Equal(15, clut[8 * 4 + 1]);
-            Assert.Equal(23, clut[8 * 4 + 2]);
-            Assert.Equal(255, clut[8 * 4 + 3]);
-
-            Assert.Equal(23, clut[16 * 4 + 0]);
-            Assert.Equal(19, clut[16 * 4 + 1]);
-            Assert.Equal(29, clut[16 * 4 + 2]);
-            Assert.Equal(255, clut[16 * 4 + 3]);
-
-            Assert.Equal(23, clut[32 * 4 + 0]);
-            Assert.Equal(35, clut[32 * 4 + 1]);
-            Assert.Equal(56, clut[32 * 4 + 2]);
-            Assert.Equal(255, clut[32 * 4 + 3]);
-
-            Assert.Equal(57, clut[64 * 4 + 0]);
-            Assert.Equal(51, clut[64 * 4 + 1]);
-            Assert.Equal(71, clut[64 * 4 + 2]);
-            Assert.Equal(255, clut[64 * 4 + 3]);
-
-            Assert.Equal(153, clut[128 * 4 + 0]);
-            Assert.Equal(96, clut[128 * 4 + 1]);
-            Assert.Equal(7, clut[128 * 4 + 2]);
-            Assert.Equal(255, clut[128 * 4 + 3]);
-
+            AssertPalette(images, 1, 3, 22, 18, 27);
         });
+
+        [Theory]
+        [InlineData(0, 0, 0, 0x0)]
+        [InlineData(1, 0, 0, 0x4)]
+        [InlineData(2, 0, 0, 0x8)]
+        [InlineData(4, 0, 0, 0x10)]
+        [InlineData(7, 0, 0, 0x1c)]
+        [InlineData(8, 0, 0, 0x100)]
+        [InlineData(16, 0, 0, 0x20)]
+        [InlineData(32, 0, 0, 0x200)]
+        [InlineData(64, 0, 0, 0x400)]
+        [InlineData(0, 4, 0, 0x40)]
+        [InlineData(8, 4, 0, 0x140)]
+        [InlineData(16, 4, 0, 0x60)]
+        [InlineData(32, 4, 0, 0x240)]
+        [InlineData(0, 0x08, 0, 0x1000)]
+        [InlineData(0, 0x08, 1, 0x1020)]
+        [InlineData(0, 0x08, 2, 0x1200)]
+        [InlineData(0, 0x08, 3, 0x1220)]
+        [InlineData(0, 0x08, 4, 0x1400)]
+        [InlineData(0, 0x08, 8, 0x1800)]
+        [InlineData(0, 0x0c, 0, 0x1040)]
+        [InlineData(0, 0x10, 0, 0x80)]
+        [InlineData(0, 0x20, 0, 0x2000)]
+        public void PointerTest(int index, int cbp, int csa, int expectedPointer)
+        {
+            Assert.Equal(expectedPointer / 4, ModelTexture.GetClutPointer(index, cbp, csa));
+        }
+
+        private void AssertPalette(List<ModelTexture.Texture> textures, int imageIndex, int colorIndex, byte r, byte g, byte b)
+        {
+            var texture = textures[imageIndex];
+            var clut = texture.GetClut();
+
+            try
+            {
+                Assert.Equal(r, clut[colorIndex * 4 + 0]);
+                Assert.Equal(g, clut[colorIndex * 4 + 1]);
+                Assert.Equal(b, clut[colorIndex * 4 + 2]);
+            }
+            catch
+            {
+                Console.WriteLine($"Error for texture {imageIndex}");
+                throw;
+            }
+        }
     }
 }
