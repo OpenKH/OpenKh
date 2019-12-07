@@ -50,6 +50,8 @@ namespace OpenKh.Game.States
             CameraUp = Vector3.UnitY;
             CameraRotationYawPitchRoll = new Vector3(-180, 0, 10);
 
+            _graphics.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+
             LoadMap(2, 4);
         }
 
@@ -77,6 +79,7 @@ namespace OpenKh.Game.States
             var nearClipPlane = 1;
             var farClipPlane = int.MaxValue;
 
+            _effect.VertexColorEnabled = true;
             _effect.Projection = Matrix.CreatePerspectiveFieldOfView(
                 (float)fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
             _effect.World = Matrix.CreateLookAt(CameraPosition, CameraPosition + CameraLookAt, CameraUp);
@@ -85,6 +88,7 @@ namespace OpenKh.Game.States
             {
                 CullMode = CullMode.CullClockwiseFace
             };
+
 
             foreach (var pass in _effect.CurrentTechnique.Passes)
             {
@@ -169,7 +173,7 @@ namespace OpenKh.Game.States
                     {
                         Position = new Vector3(vertex.X, vertex.Y, vertex.Z),
                         TextureCoordinate = new Vector2(vertex.U, vertex.V),
-                        Color = new Color((uint)vertex.Color)
+                        Color = new Color((vertex.Color >> 16) & 0xff, (vertex.Color >> 8) & 0xff, vertex.Color & 0xff, (vertex.Color >> 24) & 0xff)
                     }).ToArray()
                 }).ToArray(),
                 Parts = model.Parts.Select(part => new Mesh.Part

@@ -40,6 +40,9 @@ namespace OpenKh.Game
         {
             GraphicsDevice = graphicsDevice;
             spriteBatch = new SpriteBatch(graphicsDevice);
+
+
+            GraphicsDevice.BlendState = BlendState.NonPremultiplied;
         }
 
         public GraphicsDevice GraphicsDevice { get; }
