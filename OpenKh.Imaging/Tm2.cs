@@ -15,20 +15,75 @@ namespace OpenKh.Imaging
         private const int Format = 0;
         private const int HeaderLength = 16;
 
+        /// <summary>
+        /// Pixel Storage Mode, or PSM
+        /// Defines how pixel are arranged in each 32-bit word of local memory.
+        /// </summary>
         public enum GsPSM
 		{
-			GS_PSMCT32 = 0, // 32bit RGBA
+            /// <summary>
+            /// RGBA32, uses 32-bit per pixel.
+            /// </summary>
+			GS_PSMCT32 = 0,
+
+            /// <summary>
+            /// RGB24, uses 24-bit per pixel with the upper 8 bit unused.
+            /// </summary>
 			GS_PSMCT24 = 1,
+
+            /// <summary>
+            /// RGBA16, pack two pixels in 32-bit in little endian order.
+            /// </summary>
 			GS_PSMCT16 = 2,
-			GS_PSMCT16S = 10,
+
+            /// <summary>
+            /// RGBA16, pack two pixels in 32-bit in little endian order.
+            /// </summary>
+            GS_PSMCT16S = 10,
+
+            /// <summary>
+            /// 8-bit indexed, packing 4 pixels per 32-bit.
+            /// </summary>
 			GS_PSMT8 = 19,
+
+            /// <summary>
+            /// 4-bit indexed, packing 8 pixels per 32-bit.
+            /// </summary>
 			GS_PSMT4 = 20,
+
+            /// <summary>
+            /// 8-bit indexed, but the upper 24-bit are unused.
+            /// </summary>
 			GS_PSMT8H = 27,
+
+            /// <summary>
+            /// 4-bit indexed, but the upper 24-bit are unused.
+            /// </summary>
 			GS_PSMT4HL = 36,
+
+            /// <summary>
+            /// 4-bit indexed, where the bits 4-7 are evaluated and the rest discarded.
+            /// </summary>
 			GS_PSMT4HH = 44,
+
+            /// <summary>
+            /// 32-bit Z buffer
+            /// </summary>
 			GS_PSMZ32 = 48,
+
+            /// <summary>
+            /// 24-bit Z buffer with the upper 8-bit unused
+            /// </summary>
 			GS_PSMZ24 = 49,
-			GS_PSMZ16 = 50,
+
+            /// <summary>
+            /// 16-bit Z buffer, pack two pixels in 32-bit in little endian order.
+            /// </summary>
+            GS_PSMZ16 = 50,
+
+            /// <summary>
+            /// 16-bit Z buffer, pack two pixels in 32-bit in little endian order.
+            /// </summary>
 			GS_PSMZ16S = 58,
 		};
 
@@ -92,30 +147,46 @@ namespace OpenKh.Imaging
 
             [Data] public long Data { get; set; }
 
+            /// <summary>
+            /// Texture Base Pointer.
+            /// </summary>
 			public int TBP0
             {
                 get => GetBits(Data, 0, 14);
                 set => Data = SetBits(Data, 0, 14, value);
             }
 
+            /// <summary>
+            /// Texture Buffer Width.
+            /// </summary>
 			public int TBW
             {
                 get => GetBits(Data, 14, 6);
                 set => Data = SetBits(Data, 14, 6, value);
             }
 
+            /// <summary>
+            /// Pixel Storage Mode.
+            /// Tells what is the format used to store the individual pixels.
+            /// </summary>
 			public GsPSM PSM
 			{
 				get => (GsPSM)GetBits(Data, 20, 6);
 				set => Data = SetBits(Data, 20, 6, (int)value);
 			}
 
+            /// <summary>
+            /// Texture Width; power of 2.
+            /// </summary>
 			public int TW
             {
                 get => GetBits(Data, 26, 4);
                 set => SetBits(Data, 26, 4, value);
             }
 
+            /// <summary>
+            /// Texture Height; power of 2
+            /// </summary>
             public int TH
             {
                 get => GetBits(Data, 30, 4);
@@ -129,36 +200,57 @@ namespace OpenKh.Imaging
 
             }
 
+            /// <summary>
+            /// Texture Function
+            /// </summary>
 			public int TFX
             {
                 get => GetBits(Data, 35, 2);
                 set => Data = SetBits(Data, 35, 2, value);
             }
 
+            /// <summary>
+            /// Clut Base Pointer
+            /// </summary>
 			public int CBP
             {
                 get => GetBits(Data, 37, 14);
                 set => Data = SetBits(Data, 37, 14, value);
             }
 
+            /// <summary>
+            /// Clut Pixel Storage mode
+            /// </summary>
 			public GsCPSM CPSM
             {
                 get => (GsCPSM)GetBits(Data, 51, 4);
                 set => Data = SetBits(Data, 51, 4, (int)value);
             }
 
+
+            /// <summary>
+            /// Clut storage mode field
+            /// false: store CLUT using CSM1, which swizzled the data every 8 colours.
+            /// true: store CLUT using CSM2, which is linear but slower.
+            /// </summary>
 			public bool CSM
             {
                 get => GetBit(Data, 55);
                 set => Data = SetBit(Data, 55, value);
             }
 
+            /// <summary>
+            /// Clut Entry Offset
+            /// </summary>
 			public int CSA
             {
                 get => GetBits(Data, 56, 5);
                 set => Data = SetBits(Data, 56, 5, value);
             }
 
+            /// <summary>
+            /// Clut Buffer Load Control
+            /// </summary>
 			public int CLD
             {
                 get => GetBits(Data, 61, 3);
