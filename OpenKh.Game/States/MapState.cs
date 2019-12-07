@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.Parsers;
@@ -75,7 +75,7 @@ namespace OpenKh.Game.States
         {
             var aspectRatio = _graphics.PreferredBackBufferWidth / (float)_graphics.PreferredBackBufferHeight;
             var nearClipPlane = 1;
-            var farClipPlane = 100000;
+            var farClipPlane = int.MaxValue;
 
             _effect.Projection = Matrix.CreatePerspectiveFieldOfView(
                 (float)fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
