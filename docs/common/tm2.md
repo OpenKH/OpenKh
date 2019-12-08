@@ -77,15 +77,15 @@ The purpose of those fields is currently unknown.
 |-----|-------|------|------------
 | 0   | 14    | TBP0 | Texture buffer location. Multiply it by 0x100 to get the raw VRAM pointer.
 | 14  | 6     | TBW  | Texture buffer width
-| 20  | 6     | PSM  | [Pixel storage format](#psm)
+| 20  | 6     | PSM  | [Pixel storage format](#psm-register-pixel-storage-mode)
 | 26  | 4     | TW   | log2(texture width)
 | 30  | 4     | TH   | log2(texture height)
 | 34  | 1     | TCC  | 1 if the texture or the clut contains an alpha channel.
-| 35  | 2     | TFX  | [Texture function](#texture-function)
+| 35  | 2     | TFX  | [Texture function](#tfx-register-texture-function)
 | 37  | 14    | CBP  | Clut buffer location. Multiply it by 0x100 to get the raw VRAM pointer.
-| 51  | 4     | CPSM | [Clut storage format](#cpsm)
-| 55  | 1     | CSM  | Storage mode. Purpose unknown.
-| 56  | 5     | CSA  | Offset. Purpose unknown.
+| 51  | 4     | CPSM | [Clut storage format](#cpsm-register-color-look-up-pixel-storage-mode)
+| 55  | 1     | CSM  | [Clut Storage mode](#csm-register-color-storage-mode)
+| 56  | 5     | CSA  | Clut Entry Offset. Mostly used by 4-bit images.
 | 61  | 3     | CLD  | Load control. Purpose unknown.
 
 ### GsReg
@@ -98,32 +98,41 @@ Undocumented.
 
 ## Types
 
-### PSM
+### PSM register (Pixel Storage Mode)
 
-| Value | Description
-|-------|------------
-| 0     | PSMCT32
-| 1     | PSMCT24
-| 2     | PSMCT16
-| 10    | PSMCT16S
-| 19    | PSMT8
-| 20    | PSMT4
-| 27    | PSMT8H
-| 26    | PSMT4HL
-| 44    | PSMT4HH
-| 48    | PSMZ32
-| 49    | PSMZ24
-| 50    | PSMZ16
-| 58    | PSMZ16S
+Defines how pixel are arranged in each 32-bit word of local memory.
 
-### CPSM
+| Value | Name     | Description
+|-------|----------|-------------
+| 0     | PSMCT32  | RGBA32, uses 32-bit per pixel.
+| 1     | PSMCT24  | RGB24, uses 24-bit per pixel with the upper 8 bit unused.
+| 2     | PSMCT16  | RGBA16 unsigned, pack two pixels in 32-bit in little endian order.
+| 10    | PSMCT16S | RGBA16 signed, pack two pixels in 32-bit in little endian order.
+| 19    | PSMT8    | 8-bit indexed, packing 4 pixels per 32-bit.
+| 20    | PSMT4    | 4-bit indexed, packing 8 pixels per 32-bit.
+| 27    | PSMT8H   | 8-bit indexed, but the upper 24-bit are unused.
+| 26    | PSMT4HL  | 4-bit indexed, but the upper 24-bit are unused.
+| 44    | PSMT4HH  | 4-bit indexed, where the bits 4-7 are evaluated and the rest discarded.
+| 48    | PSMZ32   | 32-bit Z buffer
+| 49    | PSMZ24   | 24-bit Z buffer with the upper 8-bit unused
+| 50    | PSMZ16   | 16-bit unsigned Z buffer, pack two pixels in 32-bit in little endian order.
+| 58    | PSMZ16S  | 16-bit signed Z buffer, pack two pixels in 32-bit in little endian order.
 
-| Value | Description
-|-------|------------
-| 0     | PSMCT32, 32-bit color palette
-| 1     | PSMCT24, 24-bit color palette
-| 2     | PSMCT16, 16-bit color palette
-| 10    | PSMCT16S, 16-bit color palette
+### CPSM register (Color look-up Pixel Storage Mode)
+
+| Value | Name     | Description
+|-------|----------|-------------
+| 0     | PSMCT32  | 32-bit color palette
+| 1     | PSMCT24  | 24-bit color palette
+| 2     | PSMCT16  | 16-bit color palette
+| 10    | PSMCT16S | 16-bit color palette
+
+### CSM register (Color Storage Mode)
+
+There are two possible storage modes:
+
+* `CSM1`: The pixels are stored and swizzled every 0x20 bytes. This option is faster for PS2 rendering.
+* `CSM2`: The pixels are stored sequencially. But the PS2 GPU uses the CLUT slower.
 
 ### Color type
 
@@ -136,7 +145,7 @@ Undocumented.
 | 4     | 4-bit indexed
 | 5     | 8-bit indexed
 
-### Texture function
+### TFX register (Texture function)
 
 | Value | Description
 |-------|------------
