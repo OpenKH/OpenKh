@@ -4,7 +4,7 @@ This is used by 3D models of Kingdom Hearts II to give them a texture.
 
 The format holds low-level data to instruct the Playstation 2 where to store the texture in the VRAM and how the GPU should use it for rendering.
 
-When GS is read, it refers to the Playstation 2 GPU.
+When GS is mentioned, it refers to the Playstation 2 GPU.
 
 ## Header
 
@@ -22,7 +22,7 @@ When GS is read, it refers to the Playstation 2 GPU.
 
 ## Offset data
 
-The offset data is tells what is the Texture Info associated to a specific GS Info.
+The offset data tells what Texture Info is associated to a specific GS Info.
 
 The algorithm is `textureInfo = textureInfoTable[OffsetData[gsInfoIndex]]`.
 
