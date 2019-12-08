@@ -50,7 +50,7 @@ namespace OpenKh.Kh2
         [Data] public byte Unknown57{ get; set; }
         [Data] public ushort SpawnObject1 { get; set; }
         [Data] public ushort SpawnObject2 { get; set; }
-        [Data] public ushort Unknown5c { get; set; }
+        [Data] public ushort SpawnObject3 { get; set; }
         [Data] public ushort Unknown5e { get; set; }
 
         public static BaseTable<Objentry> Read(Stream stream) => BaseTable<Objentry>.Read(stream);
