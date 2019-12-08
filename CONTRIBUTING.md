@@ -8,7 +8,7 @@ The project involves code and documentation. There is no need for you to have co
 
 Asking is the most important part when it comes to helping the project. If there is any aspect that you would like to help improve, feel free to discuss it openly!
 
-There are multiple ways to open a discussion. You can [open a new issue](https://github.com/Xeeynamo/OpenKh/issues/new) or [join to our Discord server](https://discord.gg/MgTaQgf). There is even a [Trello board](https://trello.com/b/xUMpsGBE/openkh) showing an organized list of objectives that need to be worked on, have been completed, or are currently being worked on.
+There are multiple ways to open a discussion. You can [open a new issue](https://github.com/Xeeynamo/OpenKh/issues/new) or [join to our Discord server](https://discord.gg/DjTGXp3). There is even a [Trello board](https://trello.com/b/xUMpsGBE/openkh) showing an organized list of objectives that need to be worked on, have been completed, or are currently being worked on.
 
 ## Bug report
 
