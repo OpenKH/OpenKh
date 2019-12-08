@@ -1,5 +1,4 @@
 using OpenKh.Kh2;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -75,7 +74,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         { }
 
         public ObjentryViewModel(int type, IEnumerable<Objentry> items) :
-            base(items.Select(x => new ObjentryEntryViewModel(x)))
+            base(items.Select(Map))
         {
             _type = type;
             ObjEntryTypes = new EnumModel<Objentry.Type>();
