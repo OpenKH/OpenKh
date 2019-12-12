@@ -133,7 +133,7 @@ namespace OpenKh.Kh2
                 case Format8bpp: return GetClut8();
                 case Format4bpp: return GetClut4();
                 default:
-                    throw new NotSupportedException($"The format {format} is not supported.");
+                    throw new NotSupportedException($"The format {format} is not supported or does not contain any palette.");
             }
         }
 

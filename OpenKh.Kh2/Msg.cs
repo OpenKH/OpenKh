@@ -9,6 +9,7 @@ namespace OpenKh.Kh2
     {
         private static uint MagicCode = 1;
         private static byte Terminator = 0;
+        public static ushort FallbackMessage = 2780;
 
         public class Entry
         {
