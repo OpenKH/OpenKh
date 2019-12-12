@@ -90,7 +90,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
         public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
-            Objentry = new ObjentryViewModel(BaseTable<Objentry>.Read(stream));
+            Objentry = new ObjentryViewModel(Kh2.Objentry.Read(stream));
             OnPropertyChanged("Objentry");
             FileName = fileName;
             return true;
@@ -98,12 +98,8 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
         public void SaveFile(string previousFileName, string fileName)
         {
-            var objstream = Objentry.CreateStream();
             using (var f = File.Create(fileName))
-            {
-                objstream.Seek(0, SeekOrigin.Begin);
-                objstream.CopyTo(f);
-            }
+                Kh2.Objentry.Write(f, Objentry.AsObjEntries());
         }
     }
 }

@@ -108,17 +108,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             }
         }
 
-        public Stream CreateStream()
-        {
-            var stream = new MemoryStream();
-            new BaseTable<Objentry>
-            {
-                Id = _type,
-                Items = Items.Select(x => x.Objentry).ToList()
-            }.Write(stream);
-
-            return stream;
-        }
+        public IEnumerable<Objentry> AsObjEntries() => Items.Select(x => x.Objentry);
 
         protected override void OnSelectedItem(ObjentryEntryViewModel item)
         {
