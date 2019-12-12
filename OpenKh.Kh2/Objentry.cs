@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
@@ -54,5 +56,7 @@ namespace OpenKh.Kh2
         [Data] public ushort Unknown5e { get; set; }
 
         public static BaseTable<Objentry> Read(Stream stream) => BaseTable<Objentry>.Read(stream);
+        public static void Write(Stream stream, IEnumerable<Objentry> entries) =>
+            BaseTable<Objentry>.Write(stream, 3, entries.ToList());
     }
 }
