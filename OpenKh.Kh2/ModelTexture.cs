@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
@@ -28,15 +28,20 @@ namespace OpenKh.Kh2
         {
             private readonly byte[] _data;
             private readonly byte[] _palette;
+            private readonly TextureAddressMode _textureAddressMode;
             private readonly int _csp;
             private readonly int _csa;
 
-            public Texture(int width, int height, PixelFormat pixelFormat, byte[] data, byte[] palette, int csp, int csa)
+            internal Texture(
+                int width, int height, PixelFormat pixelFormat,
+                byte[] data, byte[] palette,
+                TextureAddressMode textureAddressMode, int csp, int csa)
             {
                 Size = new Size(width, height);
                 PixelFormat = pixelFormat;
                 _data = data;
                 _palette = palette;
+                _textureAddressMode = textureAddressMode;
                 _csp = csp;
                 _csa = csa;
             }
@@ -134,7 +139,7 @@ namespace OpenKh.Kh2
             public long Data60 { get; set; }
             public Tm2.GsTex GsTex0 { get; set; }
             public long Data78 { get; set; }
-            public long Data80 { get; set; }
+            public TextureAddressMode AddressMode { get; set; }
         }
 
         private class _GsInfo
@@ -155,10 +160,36 @@ namespace OpenKh.Kh2
             [Data] public long Data68 { get; set; }
             [Data] public Tm2.GsTex GsTex0 { get; set; }
             [Data] public long Data78 { get; set; }
-            [Data] public long Data80 { get; set; }
+            [Data] public _TextureAddressMode AddressMode { get; set; }
             [Data] public long Data88 { get; set; }
             [Data] public long Data90 { get; set; }
             [Data] public long Data98 { get; set; }
+        }
+
+        public enum AddressMode
+        {
+            Repeat, Clamp, Repeat2, Clamp2
+        }
+
+        private class _TextureAddressMode
+        {
+            [Data] public long Data { get; set; }
+            public AddressMode AddressU { get => (AddressMode)GetBits(Data, 0, 2); set => Data = SetBits(Data, 0, 2, (int)value); }
+            public AddressMode AddressV { get => (AddressMode)GetBits(Data, 2, 2); set => Data = SetBits(Data, 2, 2, (int)value); }
+            public int Left { get => GetBits(Data, 4, 10); set => Data = SetBits(Data, 4, 10, value); }
+            public int Top { get => GetBits(Data, 14, 10); set => Data = SetBits(Data, 14, 10, value); }
+            public int Right { get => GetBits(Data, 24, 10); set => Data = SetBits(Data, 24, 10, value); }
+            public int Bottom { get => GetBits(Data, 34, 10); set => Data = SetBits(Data, 34, 10, value); }
+        }
+
+        internal class TextureAddressMode
+        {
+            public AddressMode AddressU { get; set; }
+            public AddressMode AddressV { get; set; }
+            public int Left { get; set; }
+            public int Top { get; set; }
+            public int Right { get; set; }
+            public int Bottom { get; set; }
         }
 
         private const int MagicCode = 0;
@@ -219,7 +250,15 @@ namespace OpenKh.Kh2
                     Data60 = x.Data60,
                     GsTex0 = x.GsTex0,
                     Data78 = x.Data78,
-                    Data80 = x.Data80
+                    AddressMode = new TextureAddressMode
+                    {
+                        AddressU = x.AddressMode.AddressU,
+                        AddressV = x.AddressMode.AddressV,
+                        Left = x.AddressMode.Left,
+                        Top = x.AddressMode.Top,
+                        Right = x.AddressMode.Right,
+                        Bottom = x.AddressMode.Bottom
+                    }
                 })
                 .ToList();
 
@@ -240,7 +279,8 @@ namespace OpenKh.Kh2
             for (var i = 0; i < header.GsInfoCount; i++)
             {
                 var texInfo = _textureInfo[OffsetData[i] + 1];
-                var gsTex = _gsInfo[i].GsTex0;
+                var gsInfo = _gsInfo[i];
+                var gsTex = gsInfo.GsTex0;
 
                 var width = 1 << gsTex.TW;
                 var height = 1 << gsTex.TH;
@@ -248,7 +288,7 @@ namespace OpenKh.Kh2
                 var dataLength = width * height / (pixelFormat == PixelFormat.Indexed4 ? 2 : 1);
                 var data = stream.SetPosition(texInfo.PictureOffset).ReadBytes(dataLength);
 
-                Images.Add(new Texture(width, height, pixelFormat, data, PaletteData, gsTex.CBP - paletteBaseOffset, gsTex.CSA));
+                Images.Add(new Texture(width, height, pixelFormat, data, PaletteData, gsInfo.AddressMode, gsTex.CBP - paletteBaseOffset, gsTex.CSA));
             }
         }
 
@@ -319,8 +359,16 @@ namespace OpenKh.Kh2
                     Data60 = textureInfo.Data60,
                     Data68 = 0x0000000000000014,
                     GsTex0 = textureInfo.GsTex0,
+                    AddressMode = new _TextureAddressMode
+                    {
+                        AddressU = textureInfo.AddressMode.AddressU,
+                        AddressV = textureInfo.AddressMode.AddressV,
+                        Left = textureInfo.AddressMode.Left,
+                        Top = textureInfo.AddressMode.Top,
+                        Right = textureInfo.AddressMode.Right,
+                        Bottom = textureInfo.AddressMode.Bottom,
+                    },
                     Data78 = textureInfo.Data78,
-                    Data80 = textureInfo.Data80,
                     Data88 = 0x0000000000000008,
                     Data90 = 0x0000000060000000,
                     Data98 = 0x0000000013000000,
@@ -435,6 +483,18 @@ namespace OpenKh.Kh2
             return (index & 7) + (index & 8) * 8 + (index & 16) / 2 + (index & ~31) * 4 +
                 (cbp & 7) * 0x4 + (cbp & 8) * 0x80 + (cbp & 16) * 0x2 + +(cbp & ~31) * 0x40 +
                 (csa & 1) * 0x8 + (csa & 14) * 0x40;
+        }
+
+        private static int GetBits(long Data, int position, int size)
+        {
+            var mask = (1 << size) - 1;
+            return (int)((Data >> position) & mask);
+        }
+
+        private static long SetBits(long Data, int position, int size, int value)
+        {
+            var mask = (1 << size) - 1U;
+            return Data & ~(mask << position) | ((value & mask) << position);
         }
     }
 }
