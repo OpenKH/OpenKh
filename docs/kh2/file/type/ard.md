@@ -19,7 +19,7 @@ Entry
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | int   | Model ID
+| 00     | int   | [Model ID](./00objentry)
 | 04     | float | Position X  
 | 08     | float | Position Z
 | 0c     | float | Position Y
