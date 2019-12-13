@@ -27,7 +27,7 @@ namespace OpenKh.Kh2
                     MapModel = ReadAsMap(new SubStream(stream, ReservedArea, stream.Length - ReservedArea));
                     break;
                 case Entity:
-                    SubModels = new Mdlxfst(stream).SubModels;
+                    SubModels = ReadAsModel(stream).ToList();
                     break;
             }
         }
