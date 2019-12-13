@@ -19,6 +19,8 @@ namespace OpenKh.Game.Infrastructure
             [Bar.EntryType.Seqd] = entry => Sequence.Read(entry.Stream),
             [Bar.EntryType.Imgd] = entry => Imgd.Read(entry.Stream),
             [Bar.EntryType.Imgz] = entry => new Imgz(entry.Stream),
+            [Bar.EntryType.Vif] = entry => Mdlx.Read(entry.Stream),
+            [Bar.EntryType.Tim2] = entry => ModelTexture.Read(entry.Stream),
         };
         private readonly Dictionary<(string name, Bar.EntryType type), Entry> archives;
         private readonly IDataContent dataContent;
@@ -48,6 +50,8 @@ namespace OpenKh.Game.Infrastructure
             if (typeof(T) == typeof(Sequence)) return GetItem<T>(resourceName, Bar.EntryType.Seqd);
             if (typeof(T) == typeof(Imgd)) return GetItem<T>(resourceName, Bar.EntryType.Imgd);
             if (typeof(T) == typeof(Imgz)) return GetItem<T>(resourceName, Bar.EntryType.Imgz);
+            if (typeof(T) == typeof(Mdlx)) return GetItem<T>(resourceName, Bar.EntryType.Vif);
+            if (typeof(T) == typeof(ModelTexture)) return GetItem<T>(resourceName, Bar.EntryType.Tim2);
             return null;
         }
 

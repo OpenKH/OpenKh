@@ -15,6 +15,7 @@ namespace OpenKh.Game.States
 {
     public class MapState : IState
     {
+        private ArchiveManager _archiveManager;
         private GraphicsDeviceManager _graphics;
         private InputManager _input;
         private List<Mesh> _models = new List<Mesh>();
@@ -40,6 +41,7 @@ namespace OpenKh.Game.States
 
         public void Initialize(StateInitDesc initDesc)
         {
+            _archiveManager = initDesc.ArchiveManager;
             _graphics = initDesc.GraphicsDevice;
             _input = initDesc.InputManager;
             _effect = new BasicEffect(_graphics.GraphicsDevice);
@@ -131,39 +133,17 @@ namespace OpenKh.Game.States
 
             _models.Clear();
 
-            var entries = File.OpenRead(fileName).Using(stream => Bar.Read(stream));
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
+            _archiveManager.LoadArchive(fileName);
+            try { AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP")); } catch { }
+            try { AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK0")); } catch { }
         }
 
-        private static Mesh FromMdlx(GraphicsDevice graphics, string fileName)
+        private static Mesh FromMdlx(GraphicsDevice graphics, ArchiveManager archiveManager, string name)
         {
-            var barEntries = File.OpenRead(fileName).Using(stream => Bar.Read(stream));
-            var modelEntry = barEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Vif);
-            var textureEntry = barEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Tim2);
-            if (modelEntry != null && textureEntry != null)
-            {
-                FromMdlx(graphics, modelEntry.Stream, textureEntry.Stream);
-            }
+            var mdlx = archiveManager.Get<Mdlx>(name);
+            var textures = archiveManager.Get<ModelTexture>(name);
 
-            return null;
-        }
-
-        private static Mesh FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
-        {
-            var modelEntry = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Vif && x.Name == name);
-            var textureEntry = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Tim2 && x.Name == name);
-            if (modelEntry != null && textureEntry != null)
-                return FromMdlx(graphics, modelEntry.Stream, textureEntry.Stream);
-
-            return null;
-        }
-
-        private static Mesh FromMdlx(GraphicsDevice graphics, Stream mdlxStream, Stream texturesStream)
-        {
-            var mdlx = Mdlx.Read(mdlxStream);
             var model = new MdlxParser(mdlx).Model;
-            var textures = ModelTexture.Read(texturesStream);
 
             return new Mesh
             {
