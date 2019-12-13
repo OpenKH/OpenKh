@@ -100,7 +100,7 @@ namespace OpenKh.Kh2
                     Bones = new List<Bone>(),
                 };
 
-                var dmaChains = For(header.DmaChainCount, () => BinaryMapping.ReadObject<DmaChainHeader>(stream)).ToArray();
+                var dmaChains = For(header.DmaChainCount, () => BinaryMapping.ReadObject<DmaChainHeader>(stream));
                 for (var j = 0; j < header.DmaChainCount; j++)
                 {
                     header.SubModel.DmaVifs.AddRange(ReadDmaChain(stream, dmaChains[j]));
