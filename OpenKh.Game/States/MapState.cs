@@ -134,14 +134,16 @@ namespace OpenKh.Game.States
             _models.Clear();
 
             _archiveManager.LoadArchive(fileName);
-            try { AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP")); } catch { }
-            try { AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK0")); } catch { }
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK0"));
         }
 
         private static Mesh FromMdlx(GraphicsDevice graphics, ArchiveManager archiveManager, string name)
         {
             var mdlx = archiveManager.Get<Mdlx>(name);
             var textures = archiveManager.Get<ModelTexture>(name);
+            if (mdlx == null || textures == null)
+                return null;
 
             var model = new MdlxParser(mdlx).Model;
 

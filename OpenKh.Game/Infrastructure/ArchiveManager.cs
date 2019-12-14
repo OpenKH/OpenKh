@@ -58,7 +58,9 @@ namespace OpenKh.Game.Infrastructure
         private T GetItem<T>(string resourceName, Bar.EntryType type)
             where T : class
         {
-            var entry = archives[(resourceName, type)];
+            if (!archives.TryGetValue((resourceName, type), out var entry))
+                return null;
+
             if (entry.Object is T item)
                 return item;
 
