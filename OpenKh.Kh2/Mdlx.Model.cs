@@ -1,4 +1,4 @@
-﻿// Inspired by Kddf2's khkh_xldM.
+// Inspired by Kddf2's khkh_xldM.
 // Original source code: https://gitlab.com/kenjiuno/khkh_xldM/blob/master/khkh_xldMii/Mdlxfst.cs
 
 using OpenKh.Common;
@@ -14,10 +14,22 @@ namespace OpenKh.Kh2
     {
         public class Bone
         {
-            public int Index, Parent, Unk08, Unk0c;
-            public float ScaleX, ScaleY, ScaleZ, ScaleW;
-            public float RotationX, RotationY, RotationZ, RotationW;
-            public float TranslationX, TranslationY, TranslationZ, TranslationW;
+            [Data] public int Index { get; set; }
+            [Data] public int Parent { get; set; }
+            [Data] public int Unk08 { get; set; }
+            [Data] public int Unk0c { get; set; }
+            [Data] public float ScaleX { get; set; }
+            [Data] public float ScaleY { get; set; }
+            [Data] public float ScaleZ { get; set; }
+            [Data] public float ScaleW { get; set; }
+            [Data] public float RotationX { get; set; }
+            [Data] public float RotationY { get; set; }
+            [Data] public float RotationZ { get; set; }
+            [Data] public float RotationW { get; set; }
+            [Data] public float TranslationX { get; set; }
+            [Data] public float TranslationY { get; set; }
+            [Data] public float TranslationZ { get; set; }
+            [Data] public float TranslationW { get; set; }
         }
 
         public class SubModel
@@ -166,28 +178,6 @@ namespace OpenKh.Kh2
             return dmaVifs;
         }
 
-        private static Bone ReadBone(Stream stream)
-        {
-            var reader = new BinaryReader(stream);
-            return new Bone
-            {
-                Index = reader.ReadInt32(),
-                Parent = reader.ReadInt32(),
-                Unk08 = reader.ReadInt32(),
-                Unk0c = reader.ReadInt32(),
-                ScaleX = reader.ReadSingle(),
-                ScaleY = reader.ReadSingle(),
-                ScaleZ = reader.ReadSingle(),
-                ScaleW = reader.ReadSingle(),
-                RotationX = reader.ReadSingle(),
-                RotationY = reader.ReadSingle(),
-                RotationZ = reader.ReadSingle(),
-                RotationW = reader.ReadSingle(),
-                TranslationX = reader.ReadSingle(),
-                TranslationY = reader.ReadSingle(),
-                TranslationZ = reader.ReadSingle(),
-                TranslationW = reader.ReadSingle()
-            };
-        }
+        private static Bone ReadBone(Stream stream) => BinaryMapping.ReadObject<Bone>(stream);
     }
 }
