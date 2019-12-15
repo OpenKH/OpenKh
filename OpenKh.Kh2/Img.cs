@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Xe.IO;
 
@@ -42,6 +43,14 @@ namespace OpenKh.Kh2
         }
 
         public Idx Idx { get; }
+
+        public bool FileOpen(string fileName, Action<Stream> callback)
+        {
+            bool result;
+            if (result = Idx.TryGetEntry(fileName, out var entry))
+                callback(FileOpen(entry));
+            return result;
+        }
 
         public Stream FileOpen(string fileName)
         {

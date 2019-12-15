@@ -117,7 +117,6 @@ namespace OpenKh.Kh2
 
             stream.Position = currentPosition;
             stream.Write(offsets);
-
         }
 
         public static bool IsValid(Stream stream) =>

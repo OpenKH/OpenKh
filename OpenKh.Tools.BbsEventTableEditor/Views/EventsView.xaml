@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="OpenKh.Tools.BbsEventTableEditor.Views.EventsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.BbsEventTableEditor.Views"
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5"/>
+        </Grid.ColumnDefinitions>
+        
+        <ListBox
+            Grid.Column="0"
+            ItemsSource="{Binding Items}"
+            SelectedItem="{Binding SelectedItem}"
+            DisplayMemberPath="Name"/>
+
+        <TextBlock
+            Grid.Column="2"
+            Visibility="{Binding GuideVisibility}"
+            Text="Select an event to modify"/>
+
+        <StackPanel
+            Grid.Column="2"
+            IsEnabled="{Binding IsItemSelected}"
+            Visibility="{Binding EditVisibility}">
+            <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
+                <TextBlock Text="ID" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Event index" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding EventIndex, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="World" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox
+                    ItemsSource="{Binding Worlds}"
+                    SelectedValue="{Binding World}"
+                    SelectedValuePath="Key"
+                    DisplayMemberPath="Value"
+                    />
+
+                <TextBlock Text="Room" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Room, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown06, UpdateSourceTrigger=PropertyChanged}"/>
+            </controls:TwoColumnsPanel>
+
+            <Separator Margin="0 5 0 5"/>
+            <TextBlock Text="Files involved:"/>
+            <TextBlock DataContext="{Binding SelectedItem}" Text="{Binding MapPath}"/>
+            <TextBlock DataContext="{Binding SelectedItem}" Text="{Binding EventPath}"/>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

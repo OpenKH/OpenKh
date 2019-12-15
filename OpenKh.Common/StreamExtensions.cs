@@ -17,6 +17,9 @@ namespace OpenKh.Common
             return stream;
         }
 
+        public static T AlignPosition<T>(this T stream, int alignValue) where T : Stream =>
+            stream.SetPosition(Helpers.Align((int)stream.Position, alignValue));
+
         public static List<T> ReadList<T>(this Stream stream, int offset, int count)
             where T : class
         {
@@ -88,6 +91,9 @@ namespace OpenKh.Common
 
             return (int)stream.Position - oldPosition;
         }
+
+        public static void Write(this Stream stream, byte[] data) =>
+            stream.Write(data, 0, data.Length);
 
         public static int Write(this Stream stream, IEnumerable<int> items)
         {

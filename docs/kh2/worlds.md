@@ -8,7 +8,7 @@
 |DC| 0c  |Disney Castle
 |DI| 03  |Destiny Island
 |EH| 12  |The World That Never Was
-|ES| 01  |Dark World
+|ES| 01  |End of Sea
 |HB| 04  |Hollow Bastion
 |HE| 06  |Olympus Coliseum
 |LK| 0a  |Pride Land
@@ -20,4 +20,4 @@
 |TT| 02  |Twilight Town
 |WI| 0d  |Timeless River
 |WM| 0f  |World Map
-|ZZ| 00  |Miscellaneous
+|ZZ| 00  |World ZZ

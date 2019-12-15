@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenKh.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -98,6 +99,9 @@ namespace OpenKh.Kh2
 
         [Data] public List<Entry> Items { get; set; }
 
+        public static bool IsValid(Stream stream) =>
+            stream.Length == new BinaryReader(stream.SetPosition(0)).ReadInt32() * 0x10 + 4;
+
         /// <summary>
         /// Deserialize an IDX from a stream
         /// </summary>
@@ -106,14 +110,14 @@ namespace OpenKh.Kh2
         public static Idx Read(Stream stream)
         {
             BinaryMapping.SetMemberLengthMapping<Idx>(nameof(Items), (o, m) => o.Length);
-            return BinaryMapping.ReadObject<Idx>(stream);
+            return BinaryMapping.ReadObject<Idx>(stream.SetPosition(0));
         }
 
         /// <summary>
         /// Serialize an IDX to a stream
         /// </summary>
         /// <param name="stream">Writable stream that will contain the IDX data</param>
-        public void Write(Stream stream) => BinaryMapping.WriteObject(stream, this);
+        public void Write(Stream stream) => BinaryMapping.WriteObject(stream.SetPosition(0), this);
 
         /// <summary>
         /// Try to get an entry form a file name 

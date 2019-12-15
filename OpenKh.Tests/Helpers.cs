@@ -21,7 +21,13 @@ namespace OpenKh.Tests
             var actualData = actualStream.ReadAllBytes();
 
             Assert.Equal(expectedData.Length, actualData.Length);
-            Assert.Equal(expectedData, actualData);
+
+            for (var i = 0; i < expectedData.Length; i++)
+            {
+                var ch1 = expectedData[i];
+                var ch2 = actualData[i];
+                Assert.True(ch1 == ch2, $"Expected {ch1:X02} but found {ch2:X02} at {i:X}");
+            }
         }
 
         public static void UseAsset(string assetName, Action<Stream> action) =>

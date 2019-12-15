@@ -166,7 +166,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             var existingEntries = File.Exists(previousFileName) ? ReadBarEntriesFromFileName(previousFileName) : new List<Bar.Entry>();
 
             existingEntries = existingEntries.ForEntry(Bar.EntryType.Layout, LayoutName, 0, entry => LayoutEditor.Layout.Write(entry.Stream));
-            existingEntries = existingEntries.ForEntry(Bar.EntryType.Imgz, ImagesName, 0, entry => Imgz.Save(entry.Stream, LayoutEditor.Images));
+            existingEntries = existingEntries.ForEntry(Bar.EntryType.Imgz, ImagesName, 0, entry => Imgz.Write(entry.Stream, LayoutEditor.Images));
 
             using (var stream = File.Create(fileName))
                 Bar.Write(stream, existingEntries);
@@ -193,7 +193,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 var layoutName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout);
                 var imagesName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Imgz);
                 var layout = layoutName != null ? Layout.Read(layoutName.Stream) : null;
-                var images = entries.Where(x => x.Type == Bar.EntryType.Imgz).Select(x => Imgz.Open(x.Stream)).First();
+                var images = entries.Where(x => x.Type == Bar.EntryType.Imgz).Select(x => Imgz.Read(x.Stream)).First();
 
                 layoutEntryModel = new LayoutEntryModel
                 {

@@ -1,9 +1,11 @@
 # [Kingdom Hearts II](../../index) - BAR (Binary ARchives)
+
 Most of the game's information is stored within these files in order to keep everything organized and easily accessable by the game. These files are kind of like ZIP files, with certain limitations. 
 
 Those limitations include the file's limitations, like the 4 character file names, file types having to be declared within the header, not all file types being declareable, but it also includes PS2's limitations, like the offsets of the files within having to be divisible by 16, even though the size of the previous file is not, file names being unable to contain some characters, etc.
 
 ## BAR Structure
+
 BARs can come in all shapes and sizes and forms. Some have the ".bin" extension, meaning it is a system file. Some have the ".mset" extension, meaning it is a moveset file. Some have the ".mdlx" extension, meaning it is a model file. However, no matter the type, it still follows the basic file structure of the BAR.
 
 In this structure, the names do not matter. They can be whatever as long as the PS2 is OK with it. They are just there in order to identify what file it is. This may or may not be the case in 03system, however. 
@@ -37,6 +39,45 @@ All the values are Little Endian in the PS2/PS4 Versions, while they are Big End
 |--------|---------------|-------------|
 | BAREntry[index]->fileOffset | byte[BAREntry[index]->fileSize | The sub-file itself in RAW Data (Uncompressed). |
 
+### Kaitai file structure
+
+```
+meta:
+  id: kh2_bar
+  endian: le
+seq:
+  - id: magic
+    contents: [0x42, 0x41, 0x52, 0x01]
+  - id: num_files
+    type: s4
+  - id: padding
+    size: 8
+  - id: files
+    type: file_entry
+    repeat: expr
+    repeat-expr: num_files
+types:
+  file_entry:
+    seq:
+      - id: type
+        type: u2
+      - id: duplicate
+        type: u2
+      - id: name
+        type: str
+        size: 4
+        encoding: UTF-8
+      - id: offset
+        type: s4
+      - id: size
+        type: s4
+    instances:
+      file:
+        io: _root._io
+        pos: offset
+        size: size
+```
+
 ## BAR File Types
 
 Keep in mind that this list is still incomplete and will be changed over the course of this project:
@@ -50,7 +91,7 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 4 | 3D Model data (Encapsulated VIF packets containing Vertices, Skinning, Bones for MDLX, etc.) | MDLX - MAP
 | 5 | Mesh Occlusion/Obstruction (Probably Culling) | MAP
 | 6 | Map Collision Data | MAP 
-| 7 | RAW(TIM2) Texture Data | MDLX - MAP
+| 7 | [RAW Texture](../raw-texture) | MDLX - MAP
 | 8 | DPX (A bit unknown) | PAX
 | 9 | Animation Data | ANB
 | 10 | Texture Data | MAP - minigame/xxx.bar
@@ -92,3 +133,5 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 46 | Binary Archive | Unknown
 | 47 | Vibration Data | vibration.bar
 | 48 | Sony Audio Format (VAG) | Varies.
+
+
