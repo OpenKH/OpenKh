@@ -1,6 +1,7 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -21,10 +22,12 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ShouldReadVifPackets() => File.OpenRead(FileName).Using(stream =>
         {
-            var dmaVifs = Mdlx.Read(stream).SubModels[0].DmaVifs;
-            Assert.Equal(58, dmaVifs.Count);
-            
-            var dmaVif = dmaVifs[0];
+            var dmaChain = Mdlx.Read(stream).SubModels[0].DmaChains;
+            Assert.Equal(26, dmaChain[0].DmaVifs.Count);
+            Assert.Equal(4, dmaChain.Count);
+            Assert.Equal(58, dmaChain.Sum(x => x.DmaVifs.Count));
+
+            var dmaVif = dmaChain[0].DmaVifs[0];
             Assert.Equal(0, dmaVif.TextureIndex);
             Assert.Equal(10, dmaVif.Alaxi.Length);
             Assert.Equal(53, dmaVif.Alaxi[0]);
@@ -57,6 +60,20 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(0, bone.ScaleW);
             Assert.Equal(0, bone.RotationW);
             Assert.Equal(0, bone.TranslationW);
+        });
+
+        [Fact]
+        public void ShouldWriteBackTheExactSameFile() => File.OpenRead(FileName).Using(stream =>
+        {
+            Helpers.AssertStream(stream, inStream =>
+            {
+                var mdlx = Mdlx.Read(inStream);
+
+                var outStream = new MemoryStream();
+                mdlx.Write(outStream);
+
+                return outStream;
+            });
         });
 
         [Fact]

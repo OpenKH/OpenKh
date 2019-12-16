@@ -1,8 +1,10 @@
 using OpenKh.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Xe.BinaryMapper;
 using Xe.IO;
 
 namespace OpenKh.Kh2
@@ -11,6 +13,7 @@ namespace OpenKh.Kh2
     {
         private const int Map = 2;
         private const int Entity = 3;
+        private const int Shadow = 4;
         private const int ReservedArea = 0x90;
 
         public List<SubModel> SubModels { get; }
@@ -29,6 +32,29 @@ namespace OpenKh.Kh2
                 case Entity:
                     SubModels = ReadAsModel(stream).ToList();
                     break;
+            }
+        }
+
+        public void Write(Stream realStream)
+        {
+            var stream = new MemoryStream();
+            Write(stream, SubModels);
+
+            realStream.Position = ReservedArea;
+            realStream.Write(stream.GetBuffer(), 0, (int)stream.Length);
+        }
+
+        private static void Write(Stream stream, List<SubModel> subModels)
+        {
+            var baseAddress = 0;
+            for (var i = 0; i < subModels.Count; i++)
+            {
+                if (i + 1 >= subModels.Count)
+                    baseAddress = -1;
+
+                var subModelStream = new MemoryStream();
+                WriteSubModel(subModelStream, subModels[i], baseAddress);
+                subModelStream.SetPosition(0).Copy(stream, (int)subModelStream.Length);
             }
         }
 
