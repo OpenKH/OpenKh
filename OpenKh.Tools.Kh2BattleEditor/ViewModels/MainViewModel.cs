@@ -115,7 +115,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
             AboutCommand = new RelayCommand(x =>
             {
-                new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
+                new OpenKh.Tools.Common.Dialogs.AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
 
             CreateBattleItems();
