@@ -4,19 +4,7 @@ Process the artifical intelligence of the game. The engine parse this kind of fi
 
 # Format
 
-Header
-
-| Offset | Type  | Description
-|--------|-------|------------
-| 00     | char[16] | Name of the script
-| 04     |       | 
-| 08     |       | 
-| 0c     |       |
-| 10     |       | 
-| 14     |       | 
-| 18     |       | 
-| 1c     |       |
-| 20     |       | 
-| 24     |       | 
-| 28     | int   | Program counter entry point
-| 2c     |       |
+An entire ISA manual has been written specifically for this file format. It can
+be found at [KH2AI ISA v0.1](ai/kh2ai.pdf). Tools to interface with the format
+along with additional documentation can be found at [ghidra-kh2ai's project
+page](code.govanify.com/govanify/ghidra-kh2ai/).
