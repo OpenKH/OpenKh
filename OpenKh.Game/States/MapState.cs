@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenKh.Game.Infrastructure;
-using OpenKh.Game.Models;
 using OpenKh.Common;
 using OpenKh.Engine.Parsers;
+using OpenKh.Game.Infrastructure;
+using OpenKh.Game.Models;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace OpenKh.Game.States
     {
         private GraphicsDeviceManager _graphics;
         private InputManager _input;
-        private List<Mesh> _mesh;
+        private List<Mesh> _models;
         private BasicEffect _effect;
         private double fieldOfView;
 
@@ -36,12 +36,10 @@ namespace OpenKh.Game.States
             CameraLookAt = new Vector3(0, -40, -30);
             CameraUp = Vector3.UnitZ;
 
-            _mesh = new List<Mesh>
+            _models = new List<Mesh>
             {
-                Mesh.FromSample()
-            }
-            .Concat(FromMdlx(_graphics.GraphicsDevice, "obj/P_EX100.mdlx"))
-            .ToList();
+                FromMdlx(_graphics.GraphicsDevice, "obj/P_EX100.mdlx"),
+            };
         }
 
         public void Destroy()
@@ -71,53 +69,88 @@ namespace OpenKh.Game.States
             {
                 pass.Apply();
 
-                foreach (var mesh in _mesh)
+                foreach (var mesh in _models)
                 {
-                    if (_effect.Texture != mesh.Texture)
-                    {
-                        _effect.Texture = mesh.Texture;
-                        _effect.TextureEnabled = _effect.Texture != null;
-                        pass.Apply();
-                    }
+                    //if (_effect.Texture != mesh.Texture)
+                    //{
+                    //    _effect.Texture = mesh.Texture;
+                    //    _effect.TextureEnabled = _effect.Texture != null;
+                    //    pass.Apply();
+                    //}
 
-                    _graphics.GraphicsDevice.DrawUserPrimitives(
-                        mesh.PrimitiveType, mesh.Vertices, mesh.Start, mesh.Count);
+                    //_graphics.GraphicsDevice.DrawUserPrimitives(
+                    //    mesh.PrimitiveType, mesh.Vertices, mesh.Start, mesh.Count);
+
+                    var index = 0;
+                    foreach (var part in mesh.Parts)
+                    {
+                        //using (var vb = CreateVertexBuffer(mesh.Segments[part.SegmentId]))
+                        //{
+                        //    using (var ib = CreateIndexBuffer(part))
+                        //    {
+                        //        _graphics.GraphicsDevice.SetVertexBuffer(vb);
+                        //        _graphics.GraphicsDevice.Indices = ib;
+                        //        _graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, part.Indices.Length / 3);
+                        //    }
+                        //}
+
+                        var texture = mesh.Textures[part.TextureId & 0xffff];
+                        if (_effect.Texture != texture)
+                        {
+                            _effect.Texture = texture;
+                            _effect.TextureEnabled = _effect.Texture != null;
+                            pass.Apply();
+                        }
+
+                        _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
+                            PrimitiveType.TriangleList,
+                            mesh.Segments[index].Vertices,
+                            0,
+                            mesh.Segments[index].Vertices.Length,
+                            part.Indices,
+                            0,
+                            part.Indices.Length / 3);
+
+                        index = (index + 1) % mesh.Segments.Length;
+                    }
                 }
             }
         }
 
-        private static Mesh[] FromMdlx(GraphicsDevice graphics, string fileName)
+        private static Mesh FromMdlx(GraphicsDevice graphics, string fileName)
         {
             var barEntries = File.OpenRead(fileName).Using(stream => Bar.Read(stream));
             var entry = barEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Vif);
             if (entry != null)
             {
-                var mdlx = new Mdlx(entry.Stream);
-                var models = new MdlxParser(mdlx).Models;
+                var mdlx = Mdlx.Read(entry.Stream);
+                var model = new MdlxParser(mdlx).Model;
 
-                return models.Select(model =>
+                return new Mesh
                 {
-                    var vertices = model.Vertices.Select(vertex => new VertexPositionColorTexture
+                    Segments = model.Segments.Select(segment => new Mesh.Segment
                     {
-                        Position = new Vector3(vertex.X, vertex.Y, vertex.Z),
-                        TextureCoordinate = new Vector2(vertex.U, vertex.V),
-                        Color = new Color((uint)vertex.Color)
-                    }).ToArray();
-
-                    return new Mesh(vertices, PrimitiveType.TriangleList);
-                })
-                .Select((model, index) =>
-                {
-                    var path = $@"D:\Hacking\KH2\reseach\mdlx\P_EX100 export\tim_ (07)\tex{index} (19)_1.png";
-                    model.Texture = File.OpenRead(path).Using(stream => Texture2D.FromStream(graphics, stream));
-                    
-                    return model;
-                })
-                .ToArray();
-
+                        Vertices = segment.Vertices.Select(vertex => new VertexPositionColorTexture
+                        {
+                            Position = new Vector3(vertex.X, vertex.Y, vertex.Z),
+                            TextureCoordinate = new Vector2(vertex.U, vertex.V),
+                            Color = new Color((uint)vertex.Color)
+                        }).ToArray()
+                    }).ToArray(),
+                    Parts = model.Parts.Select(part => new Mesh.Part
+                    {
+                        Indices = part.Indices,
+                        SegmentId = part.SegmentId,
+                        TextureId = part.TextureId
+                    }).ToArray(),
+                    Textures = Enumerable.Range(0, model.Parts.Max(part => part.TextureId & 15) + 1)
+                        .Select(i => $@"..\reseach\mdlx\P_EX100 export\tim_ (07)\tex{i} (19)_1.png")
+                        .Select(texFileName => File.OpenRead(texFileName).Using(stream => Texture2D.FromStream(graphics, stream)))
+                        .ToArray()
+                };
             }
 
-            return Array.Empty<Mesh>();
+            return null;
         }
     }
 }

@@ -12,6 +12,19 @@ namespace OpenKh.Engine.Parsers
 
     public class Model
     {
-        public PositionColoredTextured[] Vertices { get; set; }
+        public class Segment
+        {
+            public PositionColoredTextured[] Vertices { get; set; }
+        }
+
+        public class Part
+        {
+            public int[] Indices { get; set; }
+            public int TextureId { get; set; }
+            public int SegmentId { get; set; }
+        }
+
+        public Segment[] Segments { get; set; }
+        public Part[] Parts { get; set; }
     }
 }

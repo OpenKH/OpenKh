@@ -1,4 +1,4 @@
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenKh.Game.DataContent;
@@ -37,7 +37,7 @@ namespace OpenKh.Game
         {
             // TODO: Add your initialization logic here
 
-            state = new TitleState();
+            state = new MapState();
             state.Initialize(new StateInitDesc
             {
                 DataContent = dataContent,
@@ -45,6 +45,7 @@ namespace OpenKh.Game
                 InputManager = inputManager,
                 GraphicsDevice = graphics
             });
+
             base.Initialize();
         }
 
