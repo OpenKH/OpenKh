@@ -9,25 +9,25 @@ In this particular document, we will be taking a look at the first fully functio
 
 First and foremost, one you have opened the program, you need to open both the fontimage.bar and fontinfo.bar files (located in ./KH2/msg/jp), which can be done so like this:
 
-![alt text](./images/gif01.gif)
+<img src="./images/gif01.gif" width="540">
 
 Afterwards, open the desired .bar file containing the text in question that you would like to edit. For this documentation, we will go with sys.bar, which contains all frequently referenced, important, and miscellaneous text.
 
-![alt text](./images/gif02.gif)
+<img src="./images/gif02.gif" width="540">
 
 ## Basic Text Editing
 
 Now that we've got our sys.bar open, let's say we want to edit some of the Command Menu text. It should be easy enough. Let's change its text output from the classic "Attack" to something more fierce. How about "Slash"?
 
-![alt text](./images/gif03.gif)
+<img src="./images/gif03.gif" width="540">
 
 There is a search bar at yor disposal in the bottom left which will greatly help you narrow down your search for specific strings of text! Once we've changed all of our basic single line text, such as "Attack", "Magic", and whatnot, let's save the file to a new location so we don't accidentaly overwrite the original.
 
-![alt text](./images/gif04.gif)
+<img src="./images/gif04.gif" width="540">
 
 After saving, we can finally patch in our simple edit to see if the changes are reflected in-game!
 
-![image](./images/image01.png)
+<img src="./images/image01.png" width="240">
 
 Uh-Oh! Some of our changed text is going a little farther than it should. We'll fix that and do some other neat adjustments in the next section!
 
@@ -35,11 +35,11 @@ Uh-Oh! Some of our changed text is going a little farther than it should. We'll 
 
 Before we get started, here's just how fancy text editing can get with this powerful tool!
 
-![image](./images/image02.png)
+<img src="./images/image02.png" width="240">
 
 As far as we know, this is just the tip of the iceberg. There are many more powerful functions built into this very tool, and the best part is it's utilizing functions in the game engine itself! There's a somewhat lengthy list of commands that can be called for various purposes, from width-scaling to forcing specific colors and transparency, and more! We'll now be going over how exactly to utilize these string maps we have at our disposal.
 
-First, let's list all the primary functions you will be likely to use, their type indicator, and detail exactly what they do:
+For now, let's list all the primary functions you will be likely to use, their type indicator, and detail exactly what they do:
 
 | Type | Human-Readable Format 	| Description
 |------|------------------------|------------------------
@@ -69,15 +69,14 @@ Let's test some more arguments for various texts in our sys.bar.
 | 482         | Items                                  | {:width 64}{:color 219542FF}Consumables
 | 483         | Drive                                  | {:width 50}{:color 218995FF}Transformations
 | 14133       | Kingdom Hearts                         | {:icon form}{:color D3D971FF}Classic Menu{:icon form}
-| 14135       | Keep the look of the original command  | {:scale 24}{:color D3D971FF}Use this if you prefer the classic{:newline}
-|             | menu.                                  | Command Menu.
+| 14135       | Keep the look of the original command menu. | {:scale 24}{:color D3D971FF}Use this if you prefer the classic{:newline}Command Menu.
 
-![image](./images/image03.png)
+<img src="./images/image03.png" width="540">
 
 And how it all appears in-game:
 
-![image](./images/image04.png)
-![image](./images/image05.png)
+<img src="./images/image04.png" width="240">
+<img src="./images/image05.png" width="480">
 
 ## Closing Notes
 
