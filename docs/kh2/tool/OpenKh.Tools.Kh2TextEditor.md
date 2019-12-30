@@ -54,11 +54,11 @@ For now, let's list all the primary functions you will be likely to use, their t
 While there are more types, as of writing these are the primary ones you might wish to use, since they generally cover all your bases. Let's get down to showing examples of both using the text edited for our Command Menu in the previous image!
 
 While it's a ridiculous setup and you would never use it practically, in order to fix the width spacing and add all those fancy colors to the transformation text, my text string ended up looking like this:
-`{:width 50}{:color #75FFFFFF}T{:color #FF75FFFF}r{:color #FFFF75FF}a{:color #C3FFFFFF}n{:color #FFC3FFFF}s{:color #FFFFC3FF}f{:color #00C3FFFF}o{:color #FF00C3FF}r{:color #FF00C3FF}m{:color #C3FF00FF}a{:color #C325FFFF}t{:color #FFC325FF}i{:color #25FFC3FF}o{:color #C325FFFF}n{:color #FFFFFFFF}s`
+```{:width 50}{:color #75FFFFFF}T{:color #FF75FFFF}r{:color #FFFF75FF}a{:color #C3FFFFFF}n{:color #FFC3FFFF}s{:color #FFFFC3FF}f{:color #00C3FFFF}o{:color #FF00C3FF}r{:color #FF00C3FF}m{:color #C3FF00FF}a{:color #C325FFFF}t{:color #FFC325FF}i{:color #25FFC3FF}o{:color #C325FFFF}n{:color #FFFFFFFF}s```
 
 It's certainly not practical, but it's cool nonetheless that we can do such a thing! It really doesn't get any simpler than this though. To start, I needed to determine that all the text should scale in width proportionately, so I made sure to place my {:width 50} argument at the very beginning so I didn't have to do it for every individual letter, as the arguments apply to everything that come after it!
 
-**In addition to the aforementioned arguments, certain special characters such as Roman numberals can be called at any point by using arguments such as {I}, {III}, {XIII}, and so forth. A complete list will be included at the bottom of this document.**
+**In addition to the aforementioned arguments, certain special characters such as Roman numberals can be called at any point by using arguments such as {I}, {III}, {XIII}, and so forth.**
 
 Let's test some more arguments for various texts in our sys.bar.
 
