@@ -1,9 +1,11 @@
 # [Kingdom Hearts II](../../index) - BAR (Binary ARchives)
+
 Most of the game's information is stored within these files in order to keep everything organized and easily accessable by the game. These files are kind of like ZIP files, with certain limitations. 
 
 Those limitations include the file's limitations, like the 4 character file names, file types having to be declared within the header, not all file types being declareable, but it also includes PS2's limitations, like the offsets of the files within having to be divisible by 16, even though the size of the previous file is not, file names being unable to contain some characters, etc.
 
 ## BAR Structure
+
 BARs can come in all shapes and sizes and forms. Some have the ".bin" extension, meaning it is a system file. Some have the ".mset" extension, meaning it is a moveset file. Some have the ".mdlx" extension, meaning it is a model file. However, no matter the type, it still follows the basic file structure of the BAR.
 
 In this structure, the names do not matter. They can be whatever as long as the PS2 is OK with it. They are just there in order to identify what file it is. This may or may not be the case in 03system, however. 
@@ -89,7 +91,7 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 4 | 3D Model data (Encapsulated VIF packets containing Vertices, Skinning, Bones for MDLX, etc.) | MDLX - MAP
 | 5 | Mesh Occlusion/Obstruction (Probably Culling) | MAP
 | 6 | Map Collision Data | MAP 
-| 7 | RAW(TIM2) Texture Data | MDLX - MAP
+| 7 | [RAW Texture](../raw-texture) | MDLX - MAP
 | 8 | DPX (A bit unknown) | PAX
 | 9 | Animation Data | ANB
 | 10 | Texture Data | MAP - minigame/xxx.bar

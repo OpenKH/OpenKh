@@ -1,0 +1,137 @@
+﻿<UserControl x:Class="OpenKh.Tools.ObjentryEditor.Views.ObjentryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.ObjentryEditor.Views"
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+             xmlns:bhv="clr-namespace:OpenKh.Tools.ObjentryEditor.Behavior"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="0"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Margin="5 5 0 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ListBox
+                Grid.Column="0"
+                ItemsSource="{Binding Items}"
+                SelectedItem="{Binding SelectedItem}"
+                SelectedIndex="{Binding SelectedIndex}"
+                DisplayMemberPath="Name">
+                <i:Interaction.Behaviors>
+                    <bhv:ScrollIntoViewBehavior/>
+                </i:Interaction.Behaviors>
+            </ListBox>
+
+            <Grid Grid.Row="2" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Command="{Binding AddAndSelectCommand}" Content="Add"/>
+                <Button Grid.Column="2" Command="{Binding CloneCommand}" Content="Clone"/>
+                <Button Grid.Column="4" Command="{Binding RemoveCommand}" Content="Remove"/>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
+                <TextBox Grid.Column="2"
+                    Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+
+            </Grid>
+        </Grid>
+
+        <ScrollViewer
+            Grid.Column="2"
+            Margin="5"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="{Binding IsItemEditingVisible}">
+            <controls:TwoColumnsPanel RowSpacing="3">
+                <TextBlock Text="Object ID" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding SelectedItem.Id}"/>
+
+                <TextBlock Text="Unknown02" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown02, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox ItemsSource="{Binding ObjEntryTypes}" SelectedValue="{Binding SelectedItem.ObjectType}" DisplayMemberPath="Name" SelectedValuePath="Value"/>
+
+                <TextBlock Text="Unknown05" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown05, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown06" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown06, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Weapon Joint" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.WeaponJoint, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Model Name" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.ModelName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Animation Name" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.AnimationName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown48" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown48, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Neo Status" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.NeoStatus, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Neo Moveset" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.NeoMoveset, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown50" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown50, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Spawn Limiter" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.SpawnLimiter, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown55" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown55, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown56" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown56, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown57" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown57, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Spawn Object 1" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          DisplayMemberPath="Name" SelectedValuePath="ObjectId" />
+
+                <TextBlock Text="Spawn Object 2" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          DisplayMemberPath="Name" SelectedValuePath="ObjectId" />
+
+                <TextBlock Text="Spawn Object 3" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          DisplayMemberPath="Name" SelectedValuePath="ObjectId" />
+
+                <TextBlock Text="Unknown5e" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown5e, UpdateSourceTrigger=PropertyChanged}"/>
+            </controls:TwoColumnsPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

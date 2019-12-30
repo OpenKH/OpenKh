@@ -92,6 +92,9 @@ namespace OpenKh.Common
             return (int)stream.Position - oldPosition;
         }
 
+        public static void Write(this Stream stream, byte[] data) =>
+            stream.Write(data, 0, data.Length);
+
         public static int Write(this Stream stream, IEnumerable<int> items)
         {
             var oldPosition = (int)stream.Position;
