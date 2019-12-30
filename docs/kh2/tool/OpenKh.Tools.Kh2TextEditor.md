@@ -13,17 +13,17 @@ First and foremost, one you have opened the program, you need to open both the f
 
 Afterwards, open the desired .bar file containing the text in question that you would like to edit. For this documentation, we will go with sys.bar, which contains all frequently referenced, important, and miscellaneous text.
 
-![alt text](./images/gif.gif)
+![alt text](./images/gif02.gif)
 
 ## Basic Text Editing
 
 Now that we've got our sys.bar open, let's say we want to edit some of the Command Menu text. It should be easy enough. Let's change its text output from the classic "Attack" to something more fierce. How about "Slash"?
 
-![alt text](./images/gif.gif)
+![alt text](./images/gif03.gif)
 
 There is a search bar at yor disposal in the bottom left which will greatly help you narrow down your search for specific strings of text! Once we've changed all of our basic single line text, such as "Attack", "Magic", and whatnot, let's save the file to a new location so we don't accidentaly overwrite the original.
 
-![alt text](./images/gif.gif)
+![alt text](./images/gif04.gif)
 
 After saving, we can finally patch in our simple edit to see if the changes are reflected in-game!
 
