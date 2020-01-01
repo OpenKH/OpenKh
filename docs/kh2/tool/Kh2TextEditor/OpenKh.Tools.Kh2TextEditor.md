@@ -44,6 +44,7 @@ For now, let's list all the primary functions you will be likely to use, their t
 | Type | Human-Readable Format 	| Description
 |------|------------------------|------------------------
 | 02   | {:newline}             | Feeds a new line to the current selected text.
+| 03   | {:reset}               | Resets all text afterwards to be argument-less.
 | 07   | {:color #FFFFFFFF}     | Forces all text after this argument to appear as the specified color in Hex.
 | 09   | {:icon icon-name}      | Displays the named icon within the text string.
 | 0A   | {:scale Value}         | Forces all text after this argument to scale proportionately to the original size (16 is normal).
