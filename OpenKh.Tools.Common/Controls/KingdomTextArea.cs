@@ -197,7 +197,7 @@ namespace OpenKh.Tools.Common.Controls
             context.Color.R = data[0] / 255.0f;
             context.Color.G = data[1] / 255.0f;
             context.Color.B = data[2] / 255.0f;
-            context.Color.A = data[3] / 255.0f;
+            context.Color.A = Math.Min(data[3] * 2, Byte.MaxValue) / 255.0f;
         }
 
         private void DrawText(DrawContext context, MessageCommandModel command)
