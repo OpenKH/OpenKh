@@ -17,12 +17,14 @@ using System.Windows.Media;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
+using System.Diagnostics;
 
 namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 {
     public class MainViewModel : BaseNotifyPropertyChanged
     {
         private const string DefaultName = "FAKE";
+        private const string GuideUrl = "https://openkh.dev/kh2/tool/Kh2TextEditor/OpenKh.Tools.Kh2TextEditor";
         private static string ApplicationName = Utilities.GetApplicationName();
         private string _fileName;
         private string _barEntryName;
@@ -46,6 +48,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
         public RelayCommand ExitCommand { get; }
+        public RelayCommand GuideCommand { get; }
         public RelayCommand AboutCommand { get; }
 
         public RelayCommand OpenFontImageCommand { get; }
@@ -165,6 +168,11 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 {
                     SaveFontInfoFile(fd.FileName);
                 }
+            }, x => true);
+
+            GuideCommand = new RelayCommand(x =>
+            {
+                Process.Start(new ProcessStartInfo(GuideUrl));
             }, x => true);
 
             AboutCommand = new RelayCommand(x =>
