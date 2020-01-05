@@ -57,6 +57,8 @@
                         ConverterParameter=Event}"/>
             </MenuItem>
             <MenuItem Header="_Help">
+                <MenuItem Header="_Guide"
+                          Command="{Binding GuideCommand}"/>
                 <MenuItem Header="_About"
                           Command="{Binding AboutCommand}"/>
             </MenuItem>

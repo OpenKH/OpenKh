@@ -40,8 +40,8 @@ namespace OpenKh.Kh2
         [Data] public byte Unknown05{ get; set; }
         [Data] public byte Unknown06 { get; set; }
         [Data] public byte WeaponJoint { get; set; }
-        [Data(Count = 32)] public byte[] ModelName { get; set; }
-        [Data(Count = 32)] public byte[] AnimationName { get; set; }
+        [Data(Count = 32)] public string ModelName { get; set; }
+        [Data(Count = 32)] public string AnimationName { get; set; }
         [Data] public uint Unknown48 { get; set; }
         [Data] public ushort NeoStatus { get; set; }
         [Data] public ushort NeoMoveset { get; set; }
