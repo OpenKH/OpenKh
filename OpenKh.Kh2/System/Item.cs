@@ -6,35 +6,37 @@ namespace OpenKh.Kh2.System
 {
     public class Item
     {
-        public enum Type : byte
+        public enum Type : ushort // Declaring this as a byte is a mistake you do NOT want to make. Trust me, I have been there.
         {
-            Consumable,
-            Boost,
-            Keyblade,
-            Staff,
-            Shield,
-            PingWeapon,
-            AuronWeapon,
-            BeastWeapon,
-            JackWeapon,
-            DummyWeapon,
-            RikuWeapon,
-            SimbaWeapon,
-            JackSparrowWeapon,
-            TronWeapon,
-            Armor,
-            Accessory,
-            Synthesis,
-            Recipe,
-            Magic,
-            Ability,
-            Summon,
-            Form,
-            Map,
-            Report,
+            Consumable = 0x00,
+            CampItem = 0x01,
+            MegaConsumbale = 0x0200,
+            MegaCamp = 0x0201,
+            Keyblade = 0x02,
+            Staff = 0x03,
+            Shield = 0x04,
+            AladdinWeapon = 0x05, 
+            AuronWeapon = 0x06,
+            BeastWeapon = 0x07,
+            JackWeapon = 0x08,
+            MulanWeapon = 0x09,
+            RikuWeapon = 0x0A,
+            SimbaWeapon = 0x0B, 
+            JackSparrowWeapon = 0x0C,
+            TronWeapon = 0x0D,
+            Armor = 0x0E,
+            Accessory = 0x0F,
+            Gem = 0x10,
+            KeyItem = 0x11,
+            Magic = 0x12,
+            Ability = 0x13,
+            Summon = 0x0114,
+            Form = 0x0115,
+            Map = 0x0116,
+            Report = 0x117,
         }
 
-        public enum Rank : byte
+        public enum Rank : byte // Haven't seen rank declared in this table.
         {
             C,
             B,
@@ -46,19 +48,17 @@ namespace OpenKh.Kh2.System
         {
             [Data] public ushort Id { get; set; }
             [Data] public Type Type { get; set; }
-            [Data] public byte Flag0 { get; set; }
-            [Data] public byte Flag1 { get; set; }
-            [Data] public Rank Rank { get; set; }
-            [Data] public ushort StatEntry { get; set; }
-            [Data] public ushort Name { get; set; }
-            [Data] public ushort Description { get; set; }
-            [Data] public ushort ShopBuy { get; set; }
-            [Data] public ushort ShopSell { get; set; }
+            [Data] public ushort Flag0 { get; set; } // Dependent on Type, can be a ushort or a byte array depending on type.
+            [Data] public ushort Flag1 { get; set; } // Same as Flag0.
+            [Data] public ushort NameID { get; set; } // Applies some weird math which I shall note later.
+            [Data] public ushort DescriptionID { get; set; } // Same as NameID.
+            [Data] public short ShopBuy { get; set; }
+            [Data] public short ShopSell { get; set; }
             [Data] public ushort Command { get; set; }
-            [Data] public ushort Slot { get; set; }
-            [Data] public short Picture { get; set; }
-            [Data] public byte Icon1 { get; set; }
-            [Data] public byte Icon2 { get; set; }
+            [Data] public ushort Slot { get; set; } // Weird in it's own way. Always "0" for Abilities.
+            [Data] public short Picture { get; set; } // Up to 999.
+            [Data] public byte DropContainer { get; set; } // Uncertain, needs verification
+            [Data] public byte Icon { get; set; }
         }
 
         public class Stat
@@ -70,12 +70,12 @@ namespace OpenKh.Kh2.System
             [Data] public byte Defense { get; set; }
             [Data] public byte AbilityPoints { get; set; }
             [Data] public byte Unknown08 { get; set; }
-            [Data] public byte FireResistance { get; set; }
-            [Data] public byte IceResistance { get; set; }
-            [Data] public byte LightningResistance { get; set; }
-            [Data] public byte DarkResistance { get; set; }
+            [Data] public byte FireVulnerability { get; set; } // These show "Vulnerability"
+            [Data] public byte IceVulnerability  { get; set; } // Not "Resistance"
+            [Data] public byte LightningVulnerability  { get; set; } // They are in percentages
+            [Data] public byte DarkVulnerability  { get; set; } // "0x64" to "0x00"
             [Data] public byte Unknown0d { get; set; }
-            [Data] public byte GeneralResistance { get; set; }
+            [Data] public byte GeneralVulnerability  { get; set; }
             [Data] public byte Unknown { get; set; }
         }
 
