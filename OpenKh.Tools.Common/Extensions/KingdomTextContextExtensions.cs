@@ -11,6 +11,7 @@ namespace OpenKh.Tools.Common.Extensions
             new KingdomTextContext
             {
                 Font = fontContext.ImageSystem,
+                Font2 = fontContext.ImageSystem2,
                 Icon = fontContext.ImageIcon,
                 FontSpacing = fontContext.SpacingSystem,
                 IconSpacing = fontContext.SpacingIcon,
@@ -23,6 +24,7 @@ namespace OpenKh.Tools.Common.Extensions
             new KingdomTextContext
             {
                 Font = fontContext.ImageEvent,
+                Font2 = fontContext.ImageEvent2,
                 Icon = fontContext.ImageIcon,
                 FontSpacing = fontContext.SpacingEvent,
                 IconSpacing = fontContext.SpacingIcon,
@@ -35,6 +37,7 @@ namespace OpenKh.Tools.Common.Extensions
             new KingdomTextContext
             {
                 Font = fontContext.ImageSystem,
+                Font2 = fontContext.ImageSystem2,
                 Icon = fontContext.ImageIcon,
                 FontSpacing = fontContext.SpacingSystem,
                 IconSpacing = fontContext.SpacingIcon,
@@ -47,6 +50,7 @@ namespace OpenKh.Tools.Common.Extensions
             new KingdomTextContext
             {
                 Font = fontContext.ImageEvent,
+                Font2 = fontContext.ImageEvent2,
                 Icon = fontContext.ImageIcon,
                 FontSpacing = fontContext.SpacingEvent,
                 IconSpacing = fontContext.SpacingIcon,

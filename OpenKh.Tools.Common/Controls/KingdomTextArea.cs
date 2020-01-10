@@ -46,7 +46,8 @@ namespace OpenKh.Tools.Common.Controls
 
         private const int IconWidth = Constants.FontIconWidth;
         private const int IconHeight = Constants.FontIconHeight;
-
+        private const int CharactersPerTextureBlock = 392;
+        private const int CharactersPerTexture = 784;
         public static DependencyProperty ContextProperty =
             DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, KingdomTextContext>(
                 nameof(Context), (o, x) => o.SetContext(x));
@@ -62,8 +63,10 @@ namespace OpenKh.Tools.Common.Controls
         private byte[] _fontSpacing;
         private byte[] _iconSpacing;
         private IImageRead _imageFont;
+        private IImageRead _imageFont2;
         private IImageRead _imageIcon;
         private ISurface _surfaceFont;
+        private ISurface _surfaceFont2;
         private ISurface _surfaceIcon;
         private int _charPerRow;
         private int _iconPerRow;
@@ -103,6 +106,7 @@ namespace OpenKh.Tools.Common.Controls
         {
             base.OnDrawCreate();
             GetOrInitializeSurface(ref _surfaceFont, _imageFont);
+            GetOrInitializeSurface(ref _surfaceFont2, _imageFont2);
             GetOrInitializeSurface(ref _surfaceIcon, _imageIcon);
         }
 
@@ -255,11 +259,31 @@ namespace OpenKh.Tools.Common.Controls
             context.x += _iconSpacing?[index] ?? IconWidth;
         }
 
-        protected void DrawChar(DrawContext context, int index) =>
-            DrawChar(context, (index % _charPerRow) * Context.FontWidth, (index / _charPerRow) * Context.FontHeight);
+        protected void DrawChar(DrawContext context, int index)
+        {
+            var sourceY = (index / _charPerRow) * Context.FontHeight;
+            if ((index % CharactersPerTexture) >= CharactersPerTextureBlock)
+                sourceY += 4;
 
-        protected void DrawChar(DrawContext context, int sourceX, int sourceY) =>
-            DrawImageScale(context, _surfaceFont, sourceX, sourceY, Context.FontWidth, Context.FontHeight);
+            DrawChar(context, (index % _charPerRow) * Context.FontWidth, sourceY);
+        }
+
+        protected void DrawChar(DrawContext context, int sourceX, int sourceY)
+        {
+            ISurface surfaceFont;
+            if (sourceY >= 504)
+            {
+                sourceY -= 504;
+                surfaceFont = _surfaceFont2;
+            }
+            else
+                surfaceFont = _surfaceFont;
+
+            if (surfaceFont == null)
+                return;
+
+            DrawImageScale(context, surfaceFont, sourceX, sourceY, Context.FontWidth, Context.FontHeight);
+        }
 
         protected void DrawIcon(DrawContext context, int sourceX, int sourceY) =>
             DrawImage(_surfaceIcon, context.x, context.y, sourceX, sourceY, IconWidth, IconHeight, 1.0, 1.0, new ColorF(1.0f, 1.0f, 1.0f, 1.0f));
@@ -282,6 +306,7 @@ namespace OpenKh.Tools.Common.Controls
             _fontSpacing = context.FontSpacing;
             _iconSpacing = context.IconSpacing;
             _imageFont = context.Font;
+            _imageFont2 = context.Font2;
             _imageIcon = context.Icon;
             _charPerRow = context.Font?.Size.Width / context.FontWidth ?? 1;
             _iconPerRow = context.Icon?.Size.Width / IconWidth ?? 1;
@@ -289,6 +314,9 @@ namespace OpenKh.Tools.Common.Controls
 
             if (_imageFont != null)
                 InitializeSurface(ref _surfaceFont, _imageFont);
+
+            if (_imageFont2 != null)
+                InitializeSurface(ref _surfaceFont2, _imageFont2);
 
             if (_imageIcon != null)
                 InitializeSurface(ref _surfaceIcon, _imageIcon);
