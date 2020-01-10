@@ -12,6 +12,7 @@
   * [ARD](file/type/ard)
   * [MSN](file/type/msn)
   * [ANB](file/anb/anb)
+  * [AI](file/ai/index)
   
 * Other files
 
