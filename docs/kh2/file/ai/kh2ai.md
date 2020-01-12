@@ -1,6 +1,6 @@
-     
+# [Kingdom Hearts II](../../index) - AI ISA
 
-KH2AI ISA  
+This document is licensed under the [CC-BY license](https://creativecommons.org/licenses/by/4.0/) by GovanifY.
 \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_  
 v0.1
 
