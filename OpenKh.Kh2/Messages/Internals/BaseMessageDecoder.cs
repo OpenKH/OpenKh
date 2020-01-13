@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,8 +27,7 @@ namespace OpenKh.Kh2.Messages.Internals
             while (!IsEof())
             {
                 byte ch = Next();
-                if (!_table.TryGetValue(ch, out var cmdModel) || cmdModel == null)
-                    throw new NotImplementedException($"Command {ch:X02} not implemented yet");
+                var cmdModel = GetCommandModel(ch);
 
                 switch (cmdModel.Command)
                 {
@@ -45,7 +44,7 @@ namespace OpenKh.Kh2.Messages.Internals
                     case MessageCommand.Table6:
                     case MessageCommand.Table7:
                     case MessageCommand.Table8:
-                        Append((cmdModel as TableCmdModel).GetText(Next()));
+                        AppendFromTable(cmdModel, ch, Next());
                         break;
                     case MessageCommand.Unsupported:
                         AppendEntry(cmdModel.Command, new byte[] { cmdModel.RawData });
@@ -58,6 +57,32 @@ namespace OpenKh.Kh2.Messages.Internals
 
             FlushTextBuilder();
             return _entries;
+        }
+
+        private void AppendFromTable(BaseCmdModel cmdModel, byte ch, byte parameter)
+        {
+            var data = (ushort)((ch << 8) | parameter);
+            if (data >= 0x1e40)
+            {
+                if (data >= 0x1fc8)
+                    data -= 0x310;
+                else
+                    data -= 0x498;
+
+                ch = (byte)(data >> 8);
+                parameter = (byte)(data & 0xff);
+                AppendFromTable(GetCommandModel(ch), ch, parameter);
+            }
+            else
+                Append((cmdModel as TableCmdModel).GetText(parameter));
+        }
+
+        private BaseCmdModel GetCommandModel(byte ch)
+        {
+            if (!_table.TryGetValue(ch, out var commandModel) || commandModel == null)
+                throw new NotImplementedException($"Command {ch:X02} not implemented yet");
+
+            return commandModel;
         }
 
         private bool IsEof() => _index >= _data.Length;

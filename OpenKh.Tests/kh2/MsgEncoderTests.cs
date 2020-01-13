@@ -1,5 +1,6 @@
 ﻿using OpenKh.Kh2.Messages;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -186,6 +187,20 @@ namespace OpenKh.Tests.kh2
             var encoded = Encoders.InternationalSystem.Encode(decoded);
 
             Assert.Equal(expected, encoded);
+        }
+
+        [Theory]
+        [InlineData(0x1e, 0x40, '外')]
+        [InlineData(0x1f, 0x00, '銅')]
+        [InlineData(0x1f, 0xc7, '念')]
+        [InlineData(0x1f, 0xc8, '還')]
+        [InlineData(0x1f, 0xDF, '夕')]
+        public void DecodeJapaneseTextThatExceedsTheFontTable(byte command, byte data, char expected)
+        {
+            var decoded = Encoders.JapaneseSystem.Decode(new byte[] { command, data });
+
+            Assert.NotEmpty(decoded);
+            Assert.Equal(expected, decoded.Single().Text.Single());
         }
     }
 }
