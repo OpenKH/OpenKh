@@ -42,10 +42,13 @@ steps:
     msbuildArgs: '/t:Build;Publish'
     maximumCpuCount: true
 
-- task: VSTest@2
+- script: dotnet test --configuration $(buildConfiguration) --logger trx --verbosity normal --collect "Code coverage"
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
   inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
 
 - powershell: gci env:* | sort-object name | Format-Table -AutoSize | Out-File $env:BUILD_ARTIFACTSTAGINGDIRECTORY/environment-variables.txt
 
