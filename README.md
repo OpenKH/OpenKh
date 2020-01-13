@@ -2,12 +2,12 @@
 
 This is a project centralizes all the technical knowledge of Kingdom Hearts series in one place, providing documentation, tools, code libraries and the foundation for modding the commercial games.
 
-[![Build Status](https://dev.azure.com/xeeynamo/OpenKH/_apis/build/status/Xeeynamo.OpenKh?branchName=master)](https://dev.azure.com/xeeynamo/OpenKH/_build/latest?definitionId=4&branchName=master)
+[![Build Status](https://dev.azure.com/xeeynamo/OpenKH/_apis/build/status/Xeeynamo.OpenKh?branchName=master) ![Tests](https://img.shields.io/azure-devops/tests/xeeynamo/OpenKh/4) ![Coverage](https://img.shields.io/azure-devops/coverage/xeeynamo/OpenKh/4)](https://dev.azure.com/xeeynamo/OpenKH/_build/latest?definitionId=4&branchName=master)
 
 
 ## Documentation
 
-All the documentation is located in the `/docs` folder in its raw form, and it can be accessed to https://xeeynamo.github.io/OpenKh for a more web-friendly version.
+All the documentation is located in the `/docs` folder in its raw form, and it can be accessed to https://openkh.dev for a more web-friendly version.
 
 ## Downloads
 
