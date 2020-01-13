@@ -92,13 +92,6 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x16, "123456789")]
         //[InlineData(0x17, "")]
         [InlineData(0x18, "23456789")]
-        [InlineData(0x19, "123456789")]
-        [InlineData(0x1a, "123456789")]
-        [InlineData(0x1b, "123456789")]
-        [InlineData(0x1c, "123456789")]
-        [InlineData(0x1d, "123456789")]
-        [InlineData(0x1e, "123456789")]
-        [InlineData(0x1f, "123456789")]
         public void DecodeTheRightAmountOfCharacters(byte commandId, string expectedText)
         {
             var decoded = Encoders.InternationalSystem.Decode(new byte[]
@@ -169,13 +162,6 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x16)]
         //[InlineData(0x17)]
         [InlineData(0x18)]
-        [InlineData(0x19)]
-        [InlineData(0x1a)]
-        [InlineData(0x1b)]
-        [InlineData(0x1c)]
-        [InlineData(0x1d)]
-        [InlineData(0x1e)]
-        [InlineData(0x1f)]
         public void AdvancedReEncodeTest(byte commandByte)
         {
             var expected = new byte[]
