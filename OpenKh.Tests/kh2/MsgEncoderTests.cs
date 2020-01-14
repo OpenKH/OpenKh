@@ -209,5 +209,34 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(MessageCommand.PrintComplex, decoded.First().Command);
             Assert.Equal(expected, decoded.First().Text);
         }
+
+        [Theory]
+        [InlineData(0x84, 0x00, "III")]
+        [InlineData(0x85, 0x00, "VII")]
+        [InlineData(0x86, 0x00, "VIII")]
+        [InlineData(0x87, 0x00, "X")]
+        [InlineData(0x19, 0xb2, "XIII")]
+        [InlineData(0x1b, 0x54, "I")]
+        [InlineData(0x1b, 0x55, "II")]
+        [InlineData(0x1b, 0x56, "IV")]
+        [InlineData(0x1b, 0x57, "V")]
+        [InlineData(0x1b, 0x58, "VI")]
+        [InlineData(0x1b, 0x59, "IX")]
+        public void EncodeRomanNumbersForJapaneseTable(byte command, byte data, string textSource)
+        {
+            var encoded = Encoders.JapaneseSystem.Encode(new List<MessageCommandModel>
+            {
+                new MessageCommandModel
+                {
+                    Command = MessageCommand.PrintComplex,
+                    Text = textSource
+                }
+            });
+
+            if (data == 0)
+                Assert.Equal(new byte[] { command }, encoded);
+            else
+                Assert.Equal(new byte[] { command, data }, encoded);
+        }
     }
 }

@@ -18,10 +18,25 @@ namespace OpenKh.Kh2.Messages.Internals
         private static readonly Dictionary<char, (byte, byte)> _tableCharacters =
             GenerateCharacterDictionary();
 
-        private static readonly Dictionary<string, byte> _tableComplex =
+        private static readonly Dictionary<string, byte[]> _tableComplex =
             JapaneseSystemDecode._table
             .Where(x => x.Value?.Command == MessageCommand.PrintComplex)
-            .ToDictionary(x => x.Value.Text, x => x.Key);
+            .Select(x => new
+            {
+                Key = x.Value.Text,
+                Value = new byte[] { x.Key }
+            })
+            .Concat(new[]
+            {
+                new { Key = "XIII", Value = new byte[] { 0x19, 0xb2 } },
+                new { Key = "I", Value = new byte[] { 0x1b, 0x54 } },
+                new { Key = "II", Value = new byte[] { 0x1b, 0x55 } },
+                new { Key = "IV", Value = new byte[] { 0x1b, 0x56 } },
+                new { Key = "V", Value = new byte[] { 0x1b, 0x57 } },
+                new { Key = "VI", Value = new byte[] { 0x1b, 0x58 } },
+                new { Key = "IX", Value = new byte[] { 0x1b, 0x59 } },
+            })
+            .ToDictionary(x => x.Key, x => x.Value);
 
         private void AppendEncodedMessageCommand(List<byte> list, MessageCommandModel messageCommand)
         {
@@ -56,7 +71,7 @@ namespace OpenKh.Kh2.Messages.Internals
             if (!_tableComplex.TryGetValue(text, out var data))
                 throw new ParseException(text, 0, "Complex text does not exists");
 
-            list.Add(data);
+            list.AddRange(data);
         }
 
         private void AppendEncodedChar(List<byte> list, char ch)
