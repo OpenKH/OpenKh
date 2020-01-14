@@ -147,8 +147,8 @@ namespace OpenKh.Kh2.Messages.Internals
             [0x8a] = new TextCmdModel("n"),
             [0x8b] = new TextCmdModel("r"),
             [0x8c] = new UnsupportedCmdModel(0x8c),
-            [0x8d] = new TextCmdModel("前"),
-            [0x8e] = new TextCmdModel("選"),
+            [0x8d] = new TextCmdModel('前'),
+            [0x8e] = new TextCmdModel('選'),
             [0x8f] = new TextCmdModel('一'),
             [0x90] = new TextCmdModel('あ'),
             [0x91] = new TextCmdModel('い'),
@@ -267,23 +267,21 @@ namespace OpenKh.Kh2.Messages.Internals
         public List<MessageCommandModel> Decode(byte[] data) =>
             new BaseMessageDecoder(_table, data).Decode(decoder =>
             {
-                if (decoder.IsEof())
+                if (decoder.IsEof(1))
                     return false;
 
-                switch (decoder.Peek(0))
+                var ch = decoder.Peek(0);
+                var parameter = decoder.Peek(1);
+                decoder.WrapTable(ref ch, ref parameter);
+
+                switch (ch)
                 {
                     case 0x19:
-                        if (decoder.IsEof())
-                            return false;
-
-                        if (decoder.Peek(1) == 0xb2)
+                        if (parameter == 0xb2)
                             return AppendComplex(decoder, "XIII");
                         break;
                     case 0x1b:
-                        if (decoder.IsEof())
-                            return false;
-
-                        switch (decoder.Peek(1))
+                        switch (parameter)
                         {
                             case 0x54: return AppendComplex(decoder, "I");
                             case 0x55: return AppendComplex(decoder, "II");

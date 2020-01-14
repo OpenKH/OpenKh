@@ -204,6 +204,7 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x1b, 0x57, "V")]
         [InlineData(0x1b, 0x58, "VI")]
         [InlineData(0x1b, 0x59, "IX")]
+        [InlineData(0x1e, 0x66, "IV")]
         public void DecodeRomanNumbersFromJapaneseTable(byte command, byte data, string expected)
         {
             var decoded = Encoders.JapaneseSystem.Decode(new byte[] { command, data });

@@ -7,9 +7,10 @@ namespace OpenKh.Kh2.Messages.Internals
 {
     internal interface IDecoder
     {
-        bool IsEof();
+        bool IsEof(int offset = 0);
         byte Peek(int offset);
         byte Next();
+        bool WrapTable(ref byte ch, ref byte parameter);
         void AppendComplex(string str);
     }
 
@@ -39,6 +40,7 @@ namespace OpenKh.Kh2.Messages.Internals
 
                 byte ch = Next();
                 var cmdModel = GetCommandModel(ch);
+
 
                 switch (cmdModel.Command)
                 {
@@ -72,15 +74,8 @@ namespace OpenKh.Kh2.Messages.Internals
 
         private void AppendFromTable(BaseCmdModel cmdModel, byte ch, byte parameter)
         {
-            var data = (ushort)((ch << 8) | parameter);
-            if (data >= 0x1e40)
-            {
-                data -= 0x310;
-
-                ch = (byte)(data >> 8);
-                parameter = (byte)(data & 0xff);
+            if (WrapTable(ref ch, ref parameter))
                 AppendFromTable(GetCommandModel(ch), ch, parameter);
-            }
             else
                 Append((cmdModel as TableCmdModel).GetText(parameter));
         }
@@ -93,9 +88,26 @@ namespace OpenKh.Kh2.Messages.Internals
             return commandModel;
         }
 
-        public bool IsEof() => _index >= _data.Length;
+        public bool IsEof(int offset = 0) => _index + offset >= _data.Length;
         public byte Peek(int offset) => _data[_index + offset];
         public byte Next() => _data[_index++];
+        public bool WrapTable(ref byte ch, ref byte parameter)
+        {
+            if (ch >= 0x20)
+                return false;
+
+            var data = (ushort)((ch << 8) | parameter);
+            if (data >= 0x1e40)
+            {
+                data -= 0x310;
+
+                ch = (byte)(data >> 8);
+                parameter = (byte)(data & 0xff);
+                return true;
+            }
+
+            return false;
+        }
 
         private StringBuilder RequestTextBuilder()
         {
