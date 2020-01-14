@@ -176,12 +176,15 @@ namespace OpenKh.Tests.kh2
         }
 
         [Theory]
+        [InlineData(0x1a, 0x00, '珍')]
+        [InlineData(0x1b, 0x00, '何')]
+        [InlineData(0x1c, 0x00, '係')]
         [InlineData(0x1e, 0x40, '外')]
         [InlineData(0x1f, 0x00, '銅')]
         [InlineData(0x1f, 0xc7, '念')]
         [InlineData(0x1f, 0xc8, '還')]
         [InlineData(0x1f, 0xDF, '夕')]
-        public void DecodeJapaneseTextThatExceedsTheFontTable(byte command, byte data, char expected)
+        public void DecodeJapaneseTextCorrectly(byte command, byte data, char expected)
         {
             var decoded = Encoders.JapaneseSystem.Decode(new byte[] { command, data });
 

@@ -75,10 +75,7 @@ namespace OpenKh.Kh2.Messages.Internals
             var data = (ushort)((ch << 8) | parameter);
             if (data >= 0x1e40)
             {
-                if (data >= 0x1fc8)
-                    data -= 0x310;
-                else
-                    data -= 0x498;
+                data -= 0x310;
 
                 ch = (byte)(data >> 8);
                 parameter = (byte)(data & 0xff);
