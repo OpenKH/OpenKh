@@ -33,6 +33,8 @@
         public const int FontJapaneseSystemHeight = 18;
         public const int FontJapaneseEventWidth = 24;
         public const int FontJapaneseEventHeight = 24;
+        public const int FontTableSystemHeight = 256;
+        public const int FontTableEventHeight = 512;
         public const int FontIconWidth = 24;
         public const int FontIconHeight = 24;
 

@@ -18,6 +18,7 @@ namespace OpenKh.Tools.Common.Extensions
                 Encoder = Encoders.InternationalSystem,
                 FontWidth = Constants.FontEuropeanSystemWidth,
                 FontHeight = Constants.FontEuropeanSystemHeight,
+                TableHeight = Constants.FontTableSystemHeight,
             };
 
         public static KingdomTextContext ToKh2EuEventTextContext(this kh2.FontContext fontContext) =>
@@ -31,6 +32,7 @@ namespace OpenKh.Tools.Common.Extensions
                 Encoder = Encoders.InternationalSystem,
                 FontWidth = Constants.FontEuropeanEventWidth,
                 FontHeight = Constants.FontEuropeanEventHeight,
+                TableHeight = Constants.FontTableEventHeight,
             };
 
         public static KingdomTextContext ToKh2JpSystemTextContext(this kh2.FontContext fontContext) =>
@@ -44,6 +46,7 @@ namespace OpenKh.Tools.Common.Extensions
                 Encoder = Encoders.JapaneseSystem,
                 FontWidth = Constants.FontJapaneseSystemWidth,
                 FontHeight = Constants.FontJapaneseSystemHeight,
+                TableHeight = Constants.FontTableSystemHeight,
             };
 
         public static KingdomTextContext ToKh2JpEventTextContext(this kh2.FontContext fontContext) =>
@@ -57,6 +60,7 @@ namespace OpenKh.Tools.Common.Extensions
                 Encoder = Encoders.JapaneseSystem,
                 FontWidth = Constants.FontJapaneseEventWidth,
                 FontHeight = Constants.FontJapaneseEventHeight,
+                TableHeight = Constants.FontTableEventHeight,
             };
     }
 }

@@ -70,6 +70,8 @@ namespace OpenKh.Tools.Common.Controls
         private ISurface _surfaceIcon;
         private int _charPerRow;
         private int _iconPerRow;
+        private int _tableHeight;
+        private int _charTableHeight;
         private IMessageEncode _encode;
 
         public KingdomTextContext Context
@@ -268,8 +270,8 @@ namespace OpenKh.Tools.Common.Controls
         {
             ISurface surfaceFont;
 
-            var tableIndex = sourceY / 252;
-            sourceY %= 252;
+            var tableIndex = sourceY / _charTableHeight;
+            sourceY %= _charTableHeight;
 
             if ((tableIndex & 1) != 0)
                 surfaceFont = _surfaceFont2;
@@ -277,7 +279,7 @@ namespace OpenKh.Tools.Common.Controls
                 surfaceFont = _surfaceFont;
 
             if ((tableIndex & 2) != 0)
-                sourceY += 256;
+                sourceY += _tableHeight;
 
             if (surfaceFont == null)
                 return;
@@ -310,6 +312,8 @@ namespace OpenKh.Tools.Common.Controls
             _imageIcon = context.Icon;
             _charPerRow = context.Font?.Size.Width / context.FontWidth ?? 1;
             _iconPerRow = context.Icon?.Size.Width / IconWidth ?? 1;
+            _tableHeight = context.TableHeight;
+            _charTableHeight = context.TableHeight / context.FontHeight * context.FontHeight;
             _encode = context.Encoder;
 
             if (_imageFont != null)

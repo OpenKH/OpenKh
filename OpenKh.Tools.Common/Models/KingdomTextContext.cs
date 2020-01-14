@@ -14,5 +14,6 @@ namespace OpenKh.Tools.Common.Models
 
         public int FontWidth { get; set; }
         public int FontHeight { get; set; }
+        public int TableHeight { get; set; }
     }
 }
