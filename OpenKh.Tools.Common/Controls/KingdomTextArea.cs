@@ -261,23 +261,23 @@ namespace OpenKh.Tools.Common.Controls
 
         protected void DrawChar(DrawContext context, int index)
         {
-            var sourceY = (index / _charPerRow) * Context.FontHeight;
-            if ((index % CharactersPerTexture) >= CharactersPerTextureBlock)
-                sourceY += 4;
-
-            DrawChar(context, (index % _charPerRow) * Context.FontWidth, sourceY);
+            DrawChar(context, (index % _charPerRow) * Context.FontWidth, (index / _charPerRow) * Context.FontHeight);
         }
 
         protected void DrawChar(DrawContext context, int sourceX, int sourceY)
         {
             ISurface surfaceFont;
-            if (sourceY >= 504)
-            {
-                sourceY -= 504;
+
+            var tableIndex = sourceY / 252;
+            sourceY %= 252;
+
+            if ((tableIndex & 1) != 0)
                 surfaceFont = _surfaceFont2;
-            }
             else
                 surfaceFont = _surfaceFont;
+
+            if ((tableIndex & 2) != 0)
+                sourceY += 256;
 
             if (surfaceFont == null)
                 return;
