@@ -5,7 +5,15 @@ using System.Text;
 
 namespace OpenKh.Kh2.Messages.Internals
 {
-    internal partial class BaseMessageDecoder
+    internal interface IDecoder
+    {
+        bool IsEof();
+        byte Peek(int offset);
+        byte Next();
+        void AppendComplex(string str);
+    }
+
+    internal partial class BaseMessageDecoder : IDecoder
     {
         private readonly Dictionary<byte, BaseCmdModel> _table;
         private readonly List<MessageCommandModel> _entries;
@@ -22,10 +30,13 @@ namespace OpenKh.Kh2.Messages.Internals
             _data = data;
         }
 
-        internal List<MessageCommandModel> Decode()
+        internal List<MessageCommandModel> Decode(Func<IDecoder, bool> handler = null)
         {
             while (!IsEof())
             {
+                if (handler?.Invoke(this) ?? false)
+                    continue;
+
                 byte ch = Next();
                 var cmdModel = GetCommandModel(ch);
 
@@ -85,8 +96,8 @@ namespace OpenKh.Kh2.Messages.Internals
             return commandModel;
         }
 
-        private bool IsEof() => _index >= _data.Length;
-
+        public bool IsEof() => _index >= _data.Length;
+        public byte Peek(int offset) => _data[_index + offset];
         public byte Next() => _data[_index++];
 
         private StringBuilder RequestTextBuilder()
@@ -124,7 +135,7 @@ namespace OpenKh.Kh2.Messages.Internals
 
         private void Append(char ch) => RequestTextBuilder().Append(ch);
         private void Append(string str) => RequestTextBuilder().Append(str);
-        private void AppendComplex(string str)
+        public void AppendComplex(string str)
         {
             FlushTextBuilder();
             RequestTextBuilder().Append(str);

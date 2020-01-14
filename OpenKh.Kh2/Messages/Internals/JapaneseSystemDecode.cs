@@ -265,7 +265,46 @@ namespace OpenKh.Kh2.Messages.Internals
         };
 
         public List<MessageCommandModel> Decode(byte[] data) =>
-            new BaseMessageDecoder(_table, data).Decode();
+            new BaseMessageDecoder(_table, data).Decode(decoder =>
+            {
+                if (decoder.IsEof())
+                    return false;
+
+                switch (decoder.Peek(0))
+                {
+                    case 0x19:
+                        if (decoder.IsEof())
+                            return false;
+
+                        if (decoder.Peek(1) == 0xb2)
+                            return AppendComplex(decoder, "XIII");
+                        break;
+                    case 0x1b:
+                        if (decoder.IsEof())
+                            return false;
+
+                        switch (decoder.Peek(1))
+                        {
+                            case 0x54: return AppendComplex(decoder, "I");
+                            case 0x55: return AppendComplex(decoder, "II");
+                            case 0x56: return AppendComplex(decoder, "IV");
+                            case 0x57: return AppendComplex(decoder, "V");
+                            case 0x58: return AppendComplex(decoder, "VI");
+                            case 0x59: return AppendComplex(decoder, "IX");
+                        }
+                        break;
+                }
+
+                return false;
+            });
+
+        private bool AppendComplex(IDecoder decoder, string value)
+        {
+            decoder.Next();
+            decoder.Next();
+            decoder.AppendComplex(value);
+            return true;
+        }
     }
 
     internal static class JapaneseTable

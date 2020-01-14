@@ -188,5 +188,26 @@ namespace OpenKh.Tests.kh2
             Assert.NotEmpty(decoded);
             Assert.Equal(expected, decoded.Single().Text.Single());
         }
+
+        [Theory]
+        [InlineData(0x84, 0x00, "III")]
+        [InlineData(0x85, 0x00, "VII")]
+        [InlineData(0x86, 0x00, "VIII")]
+        [InlineData(0x87, 0x00, "X")]
+        [InlineData(0x19, 0xb2, "XIII")]
+        [InlineData(0x1b, 0x54, "I")]
+        [InlineData(0x1b, 0x55, "II")]
+        [InlineData(0x1b, 0x56, "IV")]
+        [InlineData(0x1b, 0x57, "V")]
+        [InlineData(0x1b, 0x58, "VI")]
+        [InlineData(0x1b, 0x59, "IX")]
+        public void DecodeRomanNumbersFromJapaneseTable(byte command, byte data, string expected)
+        {
+            var decoded = Encoders.JapaneseSystem.Decode(new byte[] { command, data });
+
+            Assert.NotEmpty(decoded);
+            Assert.Equal(MessageCommand.PrintComplex, decoded.First().Command);
+            Assert.Equal(expected, decoded.First().Text);
+        }
     }
 }
