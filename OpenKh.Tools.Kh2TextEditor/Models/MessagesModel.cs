@@ -25,6 +25,12 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
         public MessageModel GetMessage(int id) =>
             Items.FirstOrDefault(x => x.Id == id);
 
+        public void InvalidateText()
+        {
+            foreach (var item in Items)
+                item.InvalidateText();
+        }
+
         protected override MessageModel OnNewItem()
         {
             throw new System.NotImplementedException();
