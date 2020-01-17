@@ -31,13 +31,13 @@ namespace OpenKh.Kh2.Messages.Internals
             [0x16] = new SingleDataCmdModel(MessageCommand.Unknown16),
             [0x17] = null,
             [0x18] = new DataCmdModel(MessageCommand.Unknown18, 2),
-            [0x19] = new TableCmdModel(MessageCommand.Table2, JapaneseTable._table2),
-            [0x1a] = new TableCmdModel(MessageCommand.Table3, JapaneseTable._table3),
-            [0x1b] = new TableCmdModel(MessageCommand.Table4, JapaneseTable._table4),
-            [0x1c] = new TableCmdModel(MessageCommand.Table5, JapaneseTable._table5),
-            [0x1d] = new TableCmdModel(MessageCommand.Table6, JapaneseTable._table6),
-            [0x1e] = new TableCmdModel(MessageCommand.Table7, JapaneseTable._table7),
-            [0x1f] = new TableCmdModel(MessageCommand.Table8, JapaneseTable._table8),
+            [0x19] = new TableCmdModel(MessageCommand.Table2, JapaneseSystemTable._table2),
+            [0x1a] = new TableCmdModel(MessageCommand.Table3, JapaneseSystemTable._table3),
+            [0x1b] = new TableCmdModel(MessageCommand.Table4, JapaneseSystemTable._table4),
+            [0x1c] = new TableCmdModel(MessageCommand.Table5, JapaneseSystemTable._table5),
+            [0x1d] = new TableCmdModel(MessageCommand.Table6, JapaneseSystemTable._table6),
+            [0x1e] = new TableCmdModel(MessageCommand.Table7, JapaneseSystemTable._table7),
+            [0x1f] = new TableCmdModel(MessageCommand.Table8, JapaneseSystemTable._table8),
             [0x20] = new TextCmdModel('⬛'),
             [0x21] = new TextCmdModel('0'),
             [0x22] = new TextCmdModel('1'),
@@ -305,7 +305,7 @@ namespace OpenKh.Kh2.Messages.Internals
         }
     }
 
-    internal static class JapaneseTable
+    internal static class JapaneseSystemTable
     {
         public static readonly char[] _table2 = new char[0x100]
         {
