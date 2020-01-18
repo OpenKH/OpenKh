@@ -184,7 +184,7 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x1f, 0xc7, '念')]
         [InlineData(0x1f, 0xc8, '還')]
         [InlineData(0x1f, 0xDF, '夕')]
-        public void DecodeJapaneseTextCorrectly(byte command, byte data, char expected)
+        public void DecodeJapaneseSystemTextCorrectly(byte command, byte data, char expected)
         {
             var decoded = Encoders.JapaneseSystem.Decode(new byte[] { command, data });
 
@@ -205,7 +205,7 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x1b, 0x58, "VI")]
         [InlineData(0x1b, 0x59, "IX")]
         [InlineData(0x1e, 0x66, "IV")]
-        public void DecodeRomanNumbersFromJapaneseTable(byte command, byte data, string expected)
+        public void DecodeRomanNumbersFromJapaneseSystemTable(byte command, byte data, string expected)
         {
             var decoded = Encoders.JapaneseSystem.Decode(new byte[] { command, data });
 
@@ -226,7 +226,7 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x1b, 0x57, "V")]
         [InlineData(0x1b, 0x58, "VI")]
         [InlineData(0x1b, 0x59, "IX")]
-        public void EncodeRomanNumbersForJapaneseTable(byte command, byte data, string textSource)
+        public void EncodeRomanNumbersForJapaneseSystemTable(byte command, byte data, string textSource)
         {
             var encoded = Encoders.JapaneseSystem.Encode(new List<MessageCommandModel>
             {
@@ -241,6 +241,20 @@ namespace OpenKh.Tests.kh2
                 Assert.Equal(new byte[] { command }, encoded);
             else
                 Assert.Equal(new byte[] { command, data }, encoded);
+        }
+
+        [Theory]
+        [InlineData(0x1a, 0x02, '納')]
+        [InlineData(0x1b, 0x00, '竜')]
+        [InlineData(0x1c, 0x00, '操')]
+        [InlineData(0x1d, 0x00, '猫')]
+        [InlineData(0x1f, 0x00, '捧')]
+        public void DecodeJapaneseEventTextCorrectly(byte command, byte data, char expected)
+        {
+            var decoded = Encoders.JapaneseEvent.Decode(new byte[] { command, data });
+
+            Assert.NotEmpty(decoded);
+            Assert.Equal(expected, decoded.Single().Text.Single());
         }
     }
 }
