@@ -57,7 +57,7 @@ namespace OpenKh.Engine.Extensions
                 Icon = fontContext.ImageIcon,
                 FontSpacing = fontContext.SpacingEvent,
                 IconSpacing = fontContext.SpacingIcon,
-                Encoder = Encoders.JapaneseSystem,
+                Encoder = Encoders.JapaneseEvent,
                 FontWidth = Constants.FontJapaneseEventWidth,
                 FontHeight = Constants.FontJapaneseEventHeight,
                 TableHeight = Constants.FontTableEventHeight,
