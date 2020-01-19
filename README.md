@@ -1,4 +1,6 @@
-<img src="./images/OpenKH.png" width="540">
+<p align="center">
+  <img src="./images/OpenKH.png" width="540">
+</p>
 
 This is a project aiming to centralize all the technical knowledge of the 'Kingdom Hearts' game series in one place, providing documentation, tools, code libraries, and the foundation for modding the commercial games.
 
