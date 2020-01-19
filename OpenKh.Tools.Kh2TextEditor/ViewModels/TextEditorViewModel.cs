@@ -91,6 +91,11 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             {
                 textContext = value;
                 OnPropertyChanged();
+
+                if (CurrentMessageEncoder != textContext.Encoder)
+                {
+                    CurrentMessageEncoder = textContext.Encoder;
+                }
             }
         }
 
@@ -100,6 +105,8 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             private set
             {
                 _currentMessageEncoder = value;
+                _messages?.InvalidateText();
+                OnPropertyChanged(nameof(SelectedItem));
                 OnPropertyChanged();
             }
         }
@@ -138,7 +145,8 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
         private void ResetMessagesView()
         {
-            Messages = new MessagesModel(this, this, MessageEntries);
+            if (MessageEntries != null)
+                Messages = new MessagesModel(this, this, MessageEntries);
         }
 
         private void PerformFiltering()

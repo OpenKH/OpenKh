@@ -201,50 +201,50 @@ namespace OpenKh.Kh2.Messages
             },
             new SerializerModel
             {
-                Name = "unk19",
-                Command = MessageCommand.Unknown19,
+                Name = "t2",
+                Command = MessageCommand.Table2,
                 Serializer = x => ToStringRawData(x.Data),
                 Deserializer = x => FromStringToByte(x)
             },
             new SerializerModel
             {
-                Name = "unk1a",
-                Command = MessageCommand.Unknown1a,
+                Name = "t3",
+                Command = MessageCommand.Table3,
                 Serializer = x => ToStringRawData(x.Data),
                 Deserializer = x => FromStringToByte(x)
             },
             new SerializerModel
             {
-                Name = "unk1b",
-                Command = MessageCommand.Unknown1b,
+                Name = "t4",
+                Command = MessageCommand.Table4,
                 Serializer = x => ToStringRawData(x.Data),
                 Deserializer = x => FromStringToByte(x)
             },
             new SerializerModel
             {
-                Name = "unk1c",
-                Command = MessageCommand.Unknown1c,
+                Name = "t5",
+                Command = MessageCommand.Table5,
                 Serializer = x => ToStringRawData(x.Data),
                 Deserializer = x => FromStringToByte(x)
             },
             new SerializerModel
             {
-                Name = "unk1d",
-                Command = MessageCommand.Unknown1d,
+                Name = "t6",
+                Command = MessageCommand.Table6,
                 Serializer = x => ToStringRawData(x.Data),
                 Deserializer = x => FromStringToByte(x)
             },
             new SerializerModel
             {
-                Name = "unk1e",
-                Command = MessageCommand.Unknown1e,
+                Name = "t7",
+                Command = MessageCommand.Table7,
                 Serializer = x => ToStringRawData(x.Data),
                 Deserializer = x => FromStringToByte(x)
             },
             new SerializerModel
             {
-                Name = "unk1f",
-                Command = MessageCommand.Unknown1f,
+                Name = "t8",
+                Command = MessageCommand.Table8,
                 Serializer = x => ToStringRawData(x.Data),
                 Deserializer = x => FromStringToByte(x)
             },

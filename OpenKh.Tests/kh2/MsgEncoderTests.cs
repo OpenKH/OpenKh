@@ -1,5 +1,6 @@
 ﻿using OpenKh.Kh2.Messages;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -91,13 +92,6 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x16, "123456789")]
         //[InlineData(0x17, "")]
         [InlineData(0x18, "23456789")]
-        [InlineData(0x19, "123456789")]
-        [InlineData(0x1a, "123456789")]
-        [InlineData(0x1b, "123456789")]
-        [InlineData(0x1c, "123456789")]
-        [InlineData(0x1d, "123456789")]
-        [InlineData(0x1e, "123456789")]
-        [InlineData(0x1f, "123456789")]
         public void DecodeTheRightAmountOfCharacters(byte commandId, string expectedText)
         {
             var decoded = Encoders.InternationalSystem.Decode(new byte[]
@@ -168,13 +162,6 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x16)]
         //[InlineData(0x17)]
         [InlineData(0x18)]
-        [InlineData(0x19)]
-        [InlineData(0x1a)]
-        [InlineData(0x1b)]
-        [InlineData(0x1c)]
-        [InlineData(0x1d)]
-        [InlineData(0x1e)]
-        [InlineData(0x1f)]
         public void AdvancedReEncodeTest(byte commandByte)
         {
             var expected = new byte[]
@@ -186,6 +173,74 @@ namespace OpenKh.Tests.kh2
             var encoded = Encoders.InternationalSystem.Encode(decoded);
 
             Assert.Equal(expected, encoded);
+        }
+
+        [Theory]
+        [InlineData(0x1a, 0x00, '珍')]
+        [InlineData(0x1b, 0x00, '何')]
+        [InlineData(0x1c, 0x00, '係')]
+        [InlineData(0x1e, 0x40, '外')]
+        [InlineData(0x1f, 0x00, '銅')]
+        [InlineData(0x1f, 0xc7, '念')]
+        [InlineData(0x1f, 0xc8, '還')]
+        [InlineData(0x1f, 0xDF, '夕')]
+        public void DecodeJapaneseTextCorrectly(byte command, byte data, char expected)
+        {
+            var decoded = Encoders.JapaneseSystem.Decode(new byte[] { command, data });
+
+            Assert.NotEmpty(decoded);
+            Assert.Equal(expected, decoded.Single().Text.Single());
+        }
+
+        [Theory]
+        [InlineData(0x84, 0x00, "III")]
+        [InlineData(0x85, 0x00, "VII")]
+        [InlineData(0x86, 0x00, "VIII")]
+        [InlineData(0x87, 0x00, "X")]
+        [InlineData(0x19, 0xb2, "XIII")]
+        [InlineData(0x1b, 0x54, "I")]
+        [InlineData(0x1b, 0x55, "II")]
+        [InlineData(0x1b, 0x56, "IV")]
+        [InlineData(0x1b, 0x57, "V")]
+        [InlineData(0x1b, 0x58, "VI")]
+        [InlineData(0x1b, 0x59, "IX")]
+        [InlineData(0x1e, 0x66, "IV")]
+        public void DecodeRomanNumbersFromJapaneseTable(byte command, byte data, string expected)
+        {
+            var decoded = Encoders.JapaneseSystem.Decode(new byte[] { command, data });
+
+            Assert.NotEmpty(decoded);
+            Assert.Equal(MessageCommand.PrintComplex, decoded.First().Command);
+            Assert.Equal(expected, decoded.First().Text);
+        }
+
+        [Theory]
+        [InlineData(0x84, 0x00, "III")]
+        [InlineData(0x85, 0x00, "VII")]
+        [InlineData(0x86, 0x00, "VIII")]
+        [InlineData(0x87, 0x00, "X")]
+        [InlineData(0x19, 0xb2, "XIII")]
+        [InlineData(0x1b, 0x54, "I")]
+        [InlineData(0x1b, 0x55, "II")]
+        [InlineData(0x1b, 0x56, "IV")]
+        [InlineData(0x1b, 0x57, "V")]
+        [InlineData(0x1b, 0x58, "VI")]
+        [InlineData(0x1b, 0x59, "IX")]
+        public void EncodeRomanNumbersForJapaneseTable(byte command, byte data, string textSource)
+        {
+            var encoded = Encoders.JapaneseSystem.Encode(new List<MessageCommandModel>
+            {
+                new MessageCommandModel
+                {
+                    Command = MessageCommand.PrintComplex,
+                    Text = textSource
+                }
+            });
+
+            if (data == 0)
+                Assert.Equal(new byte[] { command }, encoded);
+            else
+                Assert.Equal(new byte[] { command, data }, encoded);
         }
     }
 }

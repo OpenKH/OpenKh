@@ -46,7 +46,8 @@ namespace OpenKh.Tools.Common.Controls
 
         private const int IconWidth = Constants.FontIconWidth;
         private const int IconHeight = Constants.FontIconHeight;
-
+        private const int CharactersPerTextureBlock = 392;
+        private const int CharactersPerTexture = 784;
         public static DependencyProperty ContextProperty =
             DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, KingdomTextContext>(
                 nameof(Context), (o, x) => o.SetContext(x));
@@ -62,11 +63,15 @@ namespace OpenKh.Tools.Common.Controls
         private byte[] _fontSpacing;
         private byte[] _iconSpacing;
         private IImageRead _imageFont;
+        private IImageRead _imageFont2;
         private IImageRead _imageIcon;
         private ISurface _surfaceFont;
+        private ISurface _surfaceFont2;
         private ISurface _surfaceIcon;
         private int _charPerRow;
         private int _iconPerRow;
+        private int _tableHeight;
+        private int _charTableHeight;
         private IMessageEncode _encode;
 
         public KingdomTextContext Context
@@ -103,6 +108,7 @@ namespace OpenKh.Tools.Common.Controls
         {
             base.OnDrawCreate();
             GetOrInitializeSurface(ref _surfaceFont, _imageFont);
+            GetOrInitializeSurface(ref _surfaceFont2, _imageFont2);
             GetOrInitializeSurface(ref _surfaceIcon, _imageIcon);
         }
 
@@ -215,13 +221,21 @@ namespace OpenKh.Tools.Common.Controls
 
         private void DrawText(DrawContext context, byte[] data)
         {
-            foreach (var ch in data)
+            for (int i = 0; i < data.Length; i++)
             {
+                byte ch = data[i];
                 int spacing;
 
                 if (ch >= 0x20)
                 {
                     int chIndex = ch - 0x20;
+                    if (!context.IgnoreDraw)
+                        DrawChar(context, chIndex);
+                    spacing = _fontSpacing?[chIndex] ?? Context.FontWidth;
+                }
+                else if (ch >= 0x19 && ch <= 0x1f)
+                {
+                    int chIndex = data[++i] + (ch - 0x19) * 0x100 + 0xE0;
                     if (!context.IgnoreDraw)
                         DrawChar(context, chIndex);
                     spacing = _fontSpacing?[chIndex] ?? Context.FontWidth;
@@ -247,11 +261,31 @@ namespace OpenKh.Tools.Common.Controls
             context.x += _iconSpacing?[index] ?? IconWidth;
         }
 
-        protected void DrawChar(DrawContext context, int index) =>
+        protected void DrawChar(DrawContext context, int index)
+        {
             DrawChar(context, (index % _charPerRow) * Context.FontWidth, (index / _charPerRow) * Context.FontHeight);
+        }
 
-        protected void DrawChar(DrawContext context, int sourceX, int sourceY) =>
-            DrawImageScale(context, _surfaceFont, sourceX, sourceY, Context.FontWidth, Context.FontHeight);
+        protected void DrawChar(DrawContext context, int sourceX, int sourceY)
+        {
+            ISurface surfaceFont;
+
+            var tableIndex = sourceY / _charTableHeight;
+            sourceY %= _charTableHeight;
+
+            if ((tableIndex & 1) != 0)
+                surfaceFont = _surfaceFont2;
+            else
+                surfaceFont = _surfaceFont;
+
+            if ((tableIndex & 2) != 0)
+                sourceY += _tableHeight;
+
+            if (surfaceFont == null)
+                return;
+
+            DrawImageScale(context, surfaceFont, sourceX, sourceY, Context.FontWidth, Context.FontHeight);
+        }
 
         protected void DrawIcon(DrawContext context, int sourceX, int sourceY) =>
             DrawImage(_surfaceIcon, context.x, context.y, sourceX, sourceY, IconWidth, IconHeight, 1.0, 1.0, new ColorF(1.0f, 1.0f, 1.0f, 1.0f));
@@ -274,13 +308,19 @@ namespace OpenKh.Tools.Common.Controls
             _fontSpacing = context.FontSpacing;
             _iconSpacing = context.IconSpacing;
             _imageFont = context.Font;
+            _imageFont2 = context.Font2;
             _imageIcon = context.Icon;
             _charPerRow = context.Font?.Size.Width / context.FontWidth ?? 1;
             _iconPerRow = context.Icon?.Size.Width / IconWidth ?? 1;
-            _encode = context.Encode;
+            _tableHeight = context.TableHeight;
+            _charTableHeight = context.TableHeight / context.FontHeight * context.FontHeight;
+            _encode = context.Encoder;
 
             if (_imageFont != null)
                 InitializeSurface(ref _surfaceFont, _imageFont);
+
+            if (_imageFont2 != null)
+                InitializeSurface(ref _surfaceFont2, _imageFont2);
 
             if (_imageIcon != null)
                 InitializeSurface(ref _surfaceIcon, _imageIcon);

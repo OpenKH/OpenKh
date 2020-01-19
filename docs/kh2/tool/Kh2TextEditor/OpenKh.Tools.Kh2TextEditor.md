@@ -43,11 +43,11 @@ For now, let's list all the primary functions you will be likely to use, their t
 
 | Type | Human-Readable Format 	| Description
 |------|------------------------|------------------------
-| 02   | {:newline}             | Feeds a new line to the current selected text.
+| 02   | {:newline}             | Feeds a new line to the current selected text string.
 | 03   | {:reset}               | Resets all text afterwards to be argument-less.
-| 07   | {:color #FFFFFFFF}     | Forces all text after this argument to appear as the specified color in Hex.
-| 09   | {:icon icon-name}      | Displays the named icon within the text string.
-| 0A   | {:scale Value}         | Forces all text after this argument to scale proportionately to the original size (16 is normal).
+| 07   | {:color #RRGGBBAA}     | Forces all text after this argument to appear as the specified color in Hex. An AA value higher than 80 (default) will make your text appear bold, while values lower than 80 will make it appear less bold. The default color value for most text is also F0F0F080.
+| 09   | {:icon icon-name}      | Displays the named icon within the text string. A list of all icons resides at the end of this document.
+| 0A   | {:scale Value}         | Forces all text after this argument to scale proportionately to the original size. (16 is normal.)
 | 0B   | {:width Value}         | Forces all text after this argument to scale only in width, leaving height untouched (100 is normal, 72 for widescreen fixed).
 | 10   | {:clear}               | Nullifies all text in the selected string after this argument is placed.
 | 11   | {:position X,Y}        | Forces text after this argument to appear X,Y pixels away from the origin point of the text string on screen.
@@ -55,7 +55,9 @@ For now, let's list all the primary functions you will be likely to use, their t
 While there are more types, as of writing these are the primary ones you might wish to use, since they generally cover all your bases. Let's get down to showing examples of both using the text edited for our Command Menu in the previous image!
 
 While it's a ridiculous setup and you would never use it practically, in order to fix the width spacing and add all those fancy colors to the transformation text, my text string ended up looking like this:
-```{:width 50}{:color #75FFFFFF}T{:color #FF75FFFF}r{:color #FFFF75FF}a{:color #C3FFFFFF}n{:color #FFC3FFFF}s{:color #FFFFC3FF}f{:color #00C3FFFF}o{:color #FF00C3FF}r{:color #FF00C3FF}m{:color #C3FF00FF}a{:color #C325FFFF}t{:color #FFC325FF}i{:color #25FFC3FF}o{:color #C325FFFF}n{:color #FFFFFFFF}s```
+```
+{:width 50}{:color #75FFFFFF}T{:color #FF75FFFF}r{:color #FFFF75FF}a{:color #C3FFFFFF}n{:color #FFC3FFFF}s{:color #FFFFC3FF}f{:color #00C3FFFF}o{:color #FF00C3FF}r{:color #FF00C3FF}m{:color #C3FF00FF}a{:color #C325FFFF}t{:color #FFC325FF}i{:color #25FFC3FF}o{:color #C325FFFF}n{:color #FFFFFFFF}s
+```
 
 It's certainly not practical, but it's cool nonetheless that we can do such a thing! It really doesn't get any simpler than this though. To start, I needed to determine that all the text should scale in width proportionately, so I made sure to place my {:width 50} argument at the very beginning so I didn't have to do it for every individual letter, as the arguments apply to everything that come after it!
 
