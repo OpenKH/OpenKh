@@ -9,6 +9,7 @@
 | DP | [Land of Departure ](#land-of-departure)| Land of **D**e**p**arture
 | DW | [Dark World        ](#dark-world)| **D**ark **W**orld
 | EW | [The Final World   ](#the-final-world)| **E**nd **W**orld
+| EX | [EX                ](#ex)|
 | FZ | [Arendelle         ](#arendelle)| **F**ro**z**en
 | GM | [Gummiship         ](#gummiship)| **G**u**m**miship
 | HE | [Olympus           ](#olympus)| **He**rcules
@@ -17,6 +18,9 @@
 | PO | [100 Acre Wood     ](#100-acre-wood)| **Po**oh
 | RA | [Kingdom of Corona ](#kingdom-of-corona)| **Ra**punzel
 | RG | [Radiant Garden    ](#radiant-garden)| **R**adiang **G**arden
+| SF | [SF                ](#sf)|
+| SP | [SP                ](#sp)|
+| SS | [SS                ](#ss)|
 | TS | [Toy Box           ](#toy-box)| **T**oy **S**tory
 | TT | [Twilight Town     ](#twilight-town)| **T**wilight **T**own
 | WM | [World Map         ](#world-map)| **W**orld **M**ap
@@ -30,7 +34,7 @@
 |bt_02|                        |         | 
 |bt_03|                        |         | 
 |bt_04|                        |         | 
-|bt_50|                        |         | 
+|bt_50|                        |         |
 
 ## San Fransokyo
 
@@ -68,6 +72,7 @@
 | Map | Name or description    | Pawn    | Additional details
 |-----|------------------------|---------|-------------------
 |dw_21|                        |         | 
+|dw_49|                        |         | 
 |dw_71|                        |         | 
 
 ## The Final World
@@ -84,6 +89,31 @@
 |ew_26|                        |         | 
 |ew_27|                        |         | 
 |ew_28|                        |         | 
+
+## EX
+
+| Map | Name or description    | Pawn    | Additional details
+|-----|------------------------|---------|-------------------
+|ex_21| Battlegate 1           |         | Battlegate at Olympus
+|ex_22| Battlegate 2           |         | Battlegate at Olympus
+|ex_23| Battlegate 3           |         | Battlegate at Twilight Town
+|ex_24| Battlegate 4           |         | Battlegate at Toy Box
+|ex_25| Battlegate 5           |         | Battlegate at Toy Box
+|ex_26| Battlegate 6           |         | Battlegate at Kingdom of Corona
+|ex_27| Battlegate 7           |         | Battlegate at Kingdom of Corona
+|ex_28| Unused battlegate      |         | Black room with a white floor square
+|ex_29| Battlegate 8           |         | Battlegate at Monstropolis
+|ex_30| Unused battlegate      |         | Black room with a white floor square
+|ex_31| Battlegate 9           |         | Battlegate at Arendelle
+|ex_32| Unused battlegate      |         | Black room with a white floor square
+|ex_33| Battlegate 10          |         | Battlegate at Caribbean
+|ex_34| Battlegate 11          |         | Battlegate at San Fransokyo
+|ex_35| Battlegate 12          |         | Battlegate at San Fransokyo
+|ex_36| Unused battlegate      |         | Black room with a white floor square
+|ex_37| Battlegate 13          |         | Battlegate at Keyblade Graveyard
+|ex_38| Battlegate 14          |         | Battlegate at Keyblade Graveyard
+|ex_39| Battlegate 0           |         | Battlegate at Keyblade Graveyard
+|ex_40| Unused battlegate      |         | Black room with a white floor square
 
 ## Arendelle
 
@@ -152,6 +182,7 @@
 |-----|------------------------|---------|-------------------
 |ra_01| The Forest             | p_ex001 |
 |ra_02| The Kingdom            | p_ex001 | 
+|ra_50|                        |         | 
 
 ## Radiant Garden
 
@@ -159,6 +190,30 @@
 |-----|------------------------|---------|-------------------
 |rg_50|                        |         | 
 |rg_51|                        |         | 
+
+## SF
+
+| Map | Name or description    | Pawn    | Additional details
+|-----|------------------------|---------|-------------------
+|sf_50|                        |         | Black screen
+
+## SP
+
+| Map | Name or description    | Pawn    | Additional details
+|-----|------------------------|---------|-------------------
+|sp_01|                        |         | Black screen
+
+## SS
+
+| Map | Name or description    | Pawn    | Additional details
+|-----|------------------------|---------|-------------------
+|ss_50|                        |         | Black screen
+
+？？？　「あなたは、真のキーブレード使いではない。。。。」
+???「You are not a true keyblade wielder.」
+
+Used to display CGI cutscenes (E.g. end credits, epilogue, memory)
+
 
 ## Toy Box
 
