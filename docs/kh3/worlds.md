@@ -30,11 +30,14 @@
 
 | Map | Name or description    | Pawn    | Additional details
 |-----|------------------------|---------|-------------------
-|bt_01|                        |         |
-|bt_02|                        |         | 
-|bt_03|                        |         | 
-|bt_04|                        |         | 
-|bt_50|                        |         |
+|bt_01| 
+|bt_02| 
+|bt_03| 
+|bt_04| 
+|bt_07| /Game/Levels/bt_DLC/bt_07/bt_07 | Breezy Quarter, explorable Scala Ad Caelum
+|bt_08| /Game/Levels/bt_DLC/bt_08/bt_08 | The Stairway to the Sky, explorable Scala Ad Caelum
+|bt_50| 
+|bt_51| /Game/Levels/bt_DLC/bt_51/bt_51 | Blank screen
 
 ## San Fransokyo
 
@@ -59,21 +62,22 @@
 
 | Map | Name or description    | Pawn    | Additional details
 |-----|------------------------|---------|-------------------
-|di_50|                        |         | 
+|di_50| 
 
 ## Land of Departure
 
 | Map | Name or description    | Pawn    | Additional details
 |-----|------------------------|---------|-------------------
 |dp_01| Land of Departure      | variable| Loads p_ex001 or p_ex002 based on the story flag
+|dp_50| /Game/Levels/dp_DLC/dp_50/dp_50 | Drops the debug message "[rg071] Ends the reminiscence scene". Need to research more.
 
 ## Dark World
 
 | Map | Name or description    | Pawn    | Additional details
 |-----|------------------------|---------|-------------------
-|dw_21|                        |         | 
-|dw_49|                        |         | 
-|dw_71|                        |         | 
+|dw_21| 
+|dw_22| /Game/Levels/dw_DLC/dw_22/dw_22 | Make Sora spawn to the battle arena of Dark Aqua, without the actual fight.
+|dw_71| 
 
 ## The Final World
 
@@ -81,6 +85,8 @@
 |-----|------------------------|---------|-------------------
 |ew_01|                        |         |
 |ew_02|                        |         | 
+|ew_03| /Game/Levels/ew_DLC/ew_03/ew_03 | Triggers cutscene at EW... need to research more.
+|ew_04| /Game/Levels/ew_DLC/ew_04/ew_04 | Triggers tutorial at the beginning of the game. Need to research more on this...
 |ew_21|                        |         |
 |ew_22|                        |         | 
 |ew_23|                        |         | 
@@ -145,7 +151,8 @@
 |he_04| Thebes                 |         |
 |he_05| Titans battle arena    | p_ex011 | No boss with the wrong story flag
 |he_06| Titans battle tornado  | p_ex011 | No boss with the wrong story flag
-|he_50| First cutscene map     | p_ex011 | Load out of bounds with high story flag
+|he_50| First cutscene map     | p_ex011 | Loads out of bounds with high story flag
+|he_52| /Game/Levels/he_DLC/he_01/he_01 | Triggers CGI cutscene with the speech between Xigbar and Luxord
 
 ## Keyblade Graveyard
 
@@ -188,6 +195,21 @@
 
 | Map | Name or description    | Pawn    | Additional details
 |-----|------------------------|---------|-------------------
+|rg_01| /Game/Levels/rg_DLC/rg_01/rg_01 | Merlin's House
+|rg_03| /Game/Levels/rg_DLC/rg_03/rg_03 | Garden of Assemblage
+|rg_10| /Game/Levels/rg_DLC/rg_10/rg_10 | ? Data Battle
+|rg_11| /Game/Levels/rg_DLC/rg_11/rg_11 | ? Data Battle
+|rg_12| /Game/Levels/rg_DLC/rg_12/rg_12 | ? Data Battle
+|rg_13| /Game/Levels/rg_DLC/rg_13/rg_13 | ? Data Battle
+|rg_14| /Game/Levels/rg_DLC/rg_14/rg_14 | Luxord Data Battle
+|rg_15| /Game/Levels/rg_DLC/rg_15/rg_15 | Larxene Data Battle
+|rg_16| /Game/Levels/rg_DLC/rg_16/rg_16 | Marluxia Data Battle
+|rg_17| /Game/Levels/rg_DLC/rg_17/rg_17 | Saix Data Battle
+|rg_18| /Game/Levels/rg_DLC/rg_18/rg_18 | Terranort Data Battle
+|rg_19| /Game/Levels/rg_DLC/rg_19/rg_19 | Riku Data Battle
+|rg_20| /Game/Levels/rg_DLC/rg_20/rg_20 | Vanitas Data Battle
+|rg_21| /Game/Levels/rg_DLC/rg_21/rg_21 | Young Xehanort Data Battle
+|rg_22| /Game/Levels/rg_DLC/rg_22/rg_22 | Xion Data Battle
 |rg_50|                        |         | 
 |rg_51|                        |         | 
 
@@ -207,13 +229,9 @@
 
 | Map | Name or description    | Pawn    | Additional details
 |-----|------------------------|---------|-------------------
-|ss_50|                        |         | Black screen
-
-？？？　「あなたは、真のキーブレード使いではない。。。。」
-???「You are not a true keyblade wielder.」
-
-Used to display CGI cutscenes (E.g. end credits, epilogue, memory)
-
+|ss_01| Triggers the CGI cutscene that preceeds Yozora's fight.
+|ss_50| Responsible to trigger CGI ending cutscenes. Drops "？？？　「あなたは、真のキーブレード使いではない。。。。」" when loaded manually.
+|ss_51| Triggers the final CGI cutscene.
 
 ## Toy Box
 
