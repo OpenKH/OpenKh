@@ -120,7 +120,7 @@ No public updates exists
 * [CUSA16864](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA16864_00/1/f_13997c8a061d492b611b1a6fc7d5c4778bcebf76cc02a8ee9bdc28837abd8807/f/EP0082-CUSA16864_00-KINGDOMHEARTS3TR.json)
 * [CUSA10243](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA10243_00/1/f_b2db9742f5054b570b5ac943c59cadcbeaf7c73181477cfed4481bf3446a536e/f/JP0082-CUSA10243_00-TRIALVERSION0000.json)
 
-## Re:Mind DLC
+## Re:Mind DLC english voices
 
 * [CUSA11060](http://gs2.ww.prod.dl.playstation.net/gs2/acpkgo/prod/CUSA11060_00/13/f_718619081b1abeb73870057eacfb40858399207ee3d3f73c77c948cf93f38cc2/f/JP0082-CUSA11060_00-KHX30DLC00000003.json)
 
