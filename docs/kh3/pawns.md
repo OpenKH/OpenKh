@@ -14,7 +14,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | p_ca001 | Sora (Caribbean)
 | p_dl001 | Sora (Yozora world)
 | p_ew001 | Sora (Partially Faded Final World Model)
-| p_ex001 | Sora SOra DLC
+| p_ex001 | Sora
 | p_ex002 | Aqua
 | p_ex003 | Riku (KH3 Long Hair)
 | p_ex004 | Riku (KH3)
