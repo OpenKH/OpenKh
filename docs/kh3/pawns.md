@@ -12,12 +12,15 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 |---------|-------------
 | p_bx001 | Sora (Baymax)
 | p_ca001 | Sora (Caribbean)
+| p_dl001 | Sora (Yozora world)
 | p_ew001 | Sora (Partially Faded Final World Model)
-| p_ex001 | Sora (KH3)
+| p_ex001 | Sora
 | p_ex002 | Aqua
 | p_ex003 | Riku (KH3 Long Hair)
 | p_ex004 | Riku (KH3)
 | p_ex005 | Sora (KH1)
+| p_ex006 | Kairi
+| p_ex007 | Roxas
 | p_ex011 | Sora (KH2)
 | p_mi001 | Sora (Monstropolis)
 | p_po001 | Sora (Pooh)
