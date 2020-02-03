@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenKh.Kh2.Messages.Internals
 {
-    internal class JapaneseSystemEncode : IMessageEncode
+    internal class JapaneseEventEncode : IMessageEncode
     {
         private static readonly Dictionary<MessageCommand, KeyValuePair<byte, BaseCmdModel>> _tableCommands =
             JapaneseSystemDecode._table
@@ -96,13 +96,13 @@ namespace OpenKh.Kh2.Messages.Internals
         private static Dictionary<char, (byte, byte)> GenerateCharacterDictionary()
         {
             var pairs = GenerateCharacterKeyValuePair(MessageCommand.PrintText)
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table2, JapaneseSystemTable._table2))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table3, JapaneseSystemTable._table3))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table4, JapaneseSystemTable._table4))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table5, JapaneseSystemTable._table5))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table6, JapaneseSystemTable._table6))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table7, JapaneseSystemTable._table7))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table8, JapaneseSystemTable._table8));
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table2, JapaneseEventTable._table2))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table3, JapaneseEventTable._table3))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table4, JapaneseEventTable._table4))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table5, JapaneseEventTable._table5))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table6, JapaneseEventTable._table6))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table7, JapaneseEventTable._table7))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table8, JapaneseEventTable._table8));
 
 #if DEBUG
             var stringBuilder = new StringBuilder();
