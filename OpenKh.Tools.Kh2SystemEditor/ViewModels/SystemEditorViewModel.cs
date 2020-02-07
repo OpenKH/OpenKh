@@ -25,7 +25,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private static readonly List<FileDialogFilter> IdxFilter = FileDialogFilterComposer.Compose()
             .AddExtensions("KH2.IDX", "idx").AddAllFiles();
         private static readonly List<FileDialogFilter> MsgFilter = FileDialogFilterComposer.Compose()
-            .AddExtensions("sys.msg", "msg", "bin").AddAllFiles();
+            .AddExtensions("sys.bar", "bar", "msg", "bin").AddAllFiles();
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
