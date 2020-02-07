@@ -177,6 +177,14 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
             var imgFileName = $"{Path.GetFileNameWithoutExtension(fileName)}.img";
             var imgFilePath = Path.Combine(Path.GetDirectoryName(fileName), imgFileName);
+
+            if (!File.Exists(imgFilePath))
+            {
+                MessageBox.Show($"Unable to find {imgFileName} in the same directory of the IDX loaded.",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             File.OpenRead(imgFilePath).Using(imgStream =>
             {
                 var img = new Img(imgStream, Idx.Read(stream), false);
