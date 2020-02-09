@@ -13,6 +13,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | p_bx001 | Sora (Baymax)
 | p_ca001 | Sora (Caribbean)
 | p_dl001 | Sora (Yozora world)
+| p_zz001 | Sora (Debug Mod)
 | p_ew001 | Sora (Partially Faded Final World Model)
 | p_ex001 | Sora
 | p_ex002 | Aqua
