@@ -55,7 +55,7 @@ namespace OpenKh.Kh2
 
 			Size = new Size(width, height);
 			Data = reader.ReadBytes(dataLength);
-			Clut = reader.ReadBytes(palLength);
+            Clut = reader.ReadBytes(palLength);
         }
 
         public static Imgd Read(Stream stream) => new Imgd(stream.SetPosition(0));
@@ -105,7 +105,7 @@ namespace OpenKh.Kh2
 
 		public byte[] Data { get; }
 
-		public byte[] Clut { get; }
+        public byte[] Clut { get; }
 
         public bool IsSwizzled => (swizzled & 4) != 0;
 
@@ -142,10 +142,10 @@ namespace OpenKh.Kh2
             var data = new byte[16 * 4];
             for (var i = 0; i < 16; i++)
             {
-                data[i * 4 + 0] = Clut[(i & 15) * 4 + 0];
-                data[i * 4 + 1] = Clut[(i & 15) * 4 + 1];
-                data[i * 4 + 2] = Clut[(i & 15) * 4 + 2];
-                data[i * 4 + 3] = Ps2.FromPs2Alpha(Clut[(i & 15) * 4 + 3]);
+                data[i * 4 + 0] = Clut[i * 4 + 0];
+                data[i * 4 + 1] = Clut[i * 4 + 1];
+                data[i * 4 + 2] = Clut[i * 4 + 2];
+                data[i * 4 + 3] = Ps2.FromPs2Alpha(Clut[i * 4 + 3]);
             }
 
             return data;
@@ -157,10 +157,13 @@ namespace OpenKh.Kh2
             for (var i = 0; i < 256; i++)
             {
                 var srcIndex = Ps2.Repl(i);
-                data[i * 4 + 0] = Clut[srcIndex * 4 + 0];
-                data[i * 4 + 1] = Clut[srcIndex * 4 + 1];
-                data[i * 4 + 2] = Clut[srcIndex * 4 + 2];
-                data[i * 4 + 3] = Ps2.FromPs2Alpha(Clut[srcIndex * 4 + 3]);
+                if (srcIndex * 4 < Clut.Length)
+                {
+                    data[i * 4 + 0] = Clut[srcIndex * 4 + 0];
+                    data[i * 4 + 1] = Clut[srcIndex * 4 + 1];
+                    data[i * 4 + 2] = Clut[srcIndex * 4 + 2];
+                    data[i * 4 + 3] = Ps2.FromPs2Alpha(Clut[srcIndex * 4 + 3]);
+                }
             }
 
             return data;
