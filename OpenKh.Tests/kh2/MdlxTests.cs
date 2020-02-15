@@ -1,4 +1,4 @@
-using OpenKh.Common;
+﻿using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
 using System.Linq;
@@ -77,7 +77,7 @@ namespace OpenKh.Tests.kh2
         });
 
         [Fact]
-        public void alb1t2() => File.OpenRead(MapFileName).Using(stream =>
+        public void ReadAlb1t2Table() => File.OpenRead(MapFileName).Using(stream =>
         {
             var alb1t2 = Mdlx.Read(stream).MapModel.alb1t2;
             Assert.Equal(97, alb1t2.Count);
@@ -89,7 +89,7 @@ namespace OpenKh.Tests.kh2
         });
 
         [Fact]
-        public void alb2() => File.OpenRead(MapFileName).Using(stream =>
+        public void ReadAlb2() => File.OpenRead(MapFileName).Using(stream =>
         {
             var alb2 = Mdlx.Read(stream).MapModel.alb2;
             Assert.Equal(9, alb2.Count);
@@ -104,7 +104,7 @@ namespace OpenKh.Tests.kh2
         });
 
         [Fact]
-        public void alvifpkt() => File.OpenRead(MapFileName).Using(stream =>
+        public void ReadVifPackets() => File.OpenRead(MapFileName).Using(stream =>
         {
             var alvifpkt = Mdlx.Read(stream).MapModel.VifPackets;
             Assert.Equal(97, alvifpkt.Count);
@@ -122,6 +122,20 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(960, packet2.VifPacket.Length);
             Assert.Equal(1, packet2.VifPacket[0]);
             Assert.Equal(117, packet2.VifPacket[500]);
+        });
+
+        [Fact]
+        public void WriteMapBack() => File.OpenRead(MapFileName).Using(stream =>
+        {
+            Helpers.AssertStream(stream, inStream =>
+            {
+                var mdlx = Mdlx.Read(inStream);
+
+                var outStream = new MemoryStream();
+                mdlx.Write(outStream);
+
+                return outStream;
+            });
         });
     }
 }

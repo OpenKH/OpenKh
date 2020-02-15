@@ -1,10 +1,8 @@
 using OpenKh.Common;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Xe.BinaryMapper;
 using Xe.IO;
 
 namespace OpenKh.Kh2
@@ -35,16 +33,21 @@ namespace OpenKh.Kh2
             }
         }
 
+        public bool IsMap => MapModel != null;
+
         public void Write(Stream realStream)
         {
             var stream = new MemoryStream();
-            Write(stream, SubModels);
+            if (IsMap)
+                WriteAsMap(stream, MapModel);
+            else
+                WriteAsModel(stream, SubModels);
 
             realStream.Position = ReservedArea;
             realStream.Write(stream.GetBuffer(), 0, (int)stream.Length);
         }
 
-        private static void Write(Stream stream, List<SubModel> subModels)
+        private static void WriteAsModel(Stream stream, List<SubModel> subModels)
         {
             var baseAddress = 0;
             for (var i = 0; i < subModels.Count; i++)

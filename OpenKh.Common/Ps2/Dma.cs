@@ -65,8 +65,8 @@ namespace OpenKh.Common.Ps2
 
         public int TagId
         {
-            get => (Param >> 12) & 3;
-            set => Param = (ushort)(((value & 3) << 12) | (Irq ? 0x8000 : 0));
+            get => (Param >> 12) & 7;
+            set => Param = (ushort)(((value & 7) << 12) | (Irq ? 0x8000 : 0));
         }
 
         public bool Irq
