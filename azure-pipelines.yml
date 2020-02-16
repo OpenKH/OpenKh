@@ -5,11 +5,11 @@
 
 trigger:
 - master
-- releases/*
+- release/*
 
 pr:
 - master
-- releases/*
+- release/*
 
 pool:
   vmImage: 'windows-latest'
@@ -24,44 +24,87 @@ steps:
   submodules: true | recursive
 
 - script: git submodule update --init --recursive
+  displayName: 'Download dependencies'
 
 - task: NuGetToolInstaller@0
+  displayName: 'Install build tools'
 
 - task: NuGetCommand@2
+  displayName: 'Restore packages'
   inputs:
     restoreSolution: '$(solution)'
 
 - powershell: .\pre-build.ps1
+  displayName: 'Build tools and libraries metadata'
 
 - task: VSBuild@1
+  displayName: 'Build project'
   inputs:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    vsVersion: '16.0'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build;Publish'
+    maximumCpuCount: true
 
-- task: VSTest@2
+- script: dotnet test --configuration $(buildConfiguration) --logger trx --verbosity normal --collect "Code coverage"
+  displayName: 'Run tests'
+
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  condition: succeededOrFailed()
   inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish test coverage'
+  inputs:
+    summaryFileLocation: '**/*.coverage'
 
 - powershell: gci env:* | sort-object name | Format-Table -AutoSize | Out-File $env:BUILD_ARTIFACTSTAGINGDIRECTORY/environment-variables.txt
+  displayName: 'List artifacts to publish'
 
 - task: CopyFiles@2
+  displayName: 'Pack .Net Framework 4 tools and libraries'
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
-    contents: '**/$(BuildConfiguration)/net4**/?(*.exe|*.dll)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/net4**/**/publish/**/?(*.exe|*.dll|*.json|*.config)
     targetFolder: '$(Build.ArtifactStagingDirectory)/net4'
     flattenFolders: true
+
 - task: CopyFiles@2
+  displayName: 'Pack .Net Framework 4 resources'
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
-    contents: '**/$(BuildConfiguration)/netcoreapp**/?(*.exe|*.dll)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/net4**/**/publish/**/resources/**
+    targetFolder: '$(Build.ArtifactStagingDirectory)/net4/resources'
+    flattenFolders: true
+
+- task: CopyFiles@2
+  displayName: 'Pack .Net Core tools and libraries'
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/publish/**/?(*.exe|*.dll|*.json|*.config)
     targetFolder: '$(Build.ArtifactStagingDirectory)/netcore'
     flattenFolders: true
+
+- task: CopyFiles@2
+  displayName: 'Pack .Net Core resources'
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/publish/**/resources/**
+    targetFolder: '$(Build.ArtifactStagingDirectory)/netcore/resources'
+    flattenFolders: true
+
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish artifacts'
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: tools
+    artifactName: openkh
     parallel: true
     parallelCount: 8

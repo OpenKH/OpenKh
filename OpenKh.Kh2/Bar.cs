@@ -228,13 +228,7 @@ namespace OpenKh.Kh2
                 alignment = magicCode == MagicCode ? 0x80 : 4;
             }
 
-            return Align(offset, alignment);
-        }
-
-        private static int Align(int offset, int alignment)
-        {
-            var misalignment = offset % alignment;
-            return misalignment > 0 ? offset + alignment - misalignment : offset;
+            return Helpers.Align(offset, alignment);
         }
 
         public static bool IsValid(Stream stream) =>

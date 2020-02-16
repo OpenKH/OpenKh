@@ -17,6 +17,9 @@ namespace OpenKh.Common
             return stream;
         }
 
+        public static T AlignPosition<T>(this T stream, int alignValue) where T : Stream =>
+            stream.SetPosition(Helpers.Align((int)stream.Position, alignValue));
+
         public static List<T> ReadList<T>(this Stream stream, int offset, int count)
             where T : class
         {
@@ -32,11 +35,23 @@ namespace OpenKh.Common
                 .ToList();
         }
 
+        public static short ReadInt16(this Stream stream) =>
+            new BinaryReader(stream).ReadInt16();
+
+        public static ushort ReadUInt16(this Stream stream) =>
+            new BinaryReader(stream).ReadUInt16();
+
         public static int ReadInt32(this Stream stream) =>
             new BinaryReader(stream).ReadInt32();
 
         public static uint ReadUInt32(this Stream stream) =>
             new BinaryReader(stream).ReadUInt32();
+
+        public static long ReadInt64(this Stream stream) =>
+            new BinaryReader(stream).ReadInt64();
+
+        public static ulong ReadUInt64(this Stream stream) =>
+            new BinaryReader(stream).ReadUInt64();
 
         public static List<int> ReadInt32List(this Stream stream, int offset, int count)
         {
@@ -89,6 +104,9 @@ namespace OpenKh.Common
             return (int)stream.Position - oldPosition;
         }
 
+        public static void Write(this Stream stream, byte[] data) =>
+            stream.Write(data, 0, data.Length);
+
         public static int Write(this Stream stream, IEnumerable<int> items)
         {
             var oldPosition = (int)stream.Position;
@@ -98,6 +116,30 @@ namespace OpenKh.Common
 
             return (int)stream.Position - oldPosition;
         }
+
+        public static void Write(this Stream stream, byte value) =>
+            new BinaryWriter(stream).Write(value);
+
+        public static void Write(this Stream stream, char value) =>
+            new BinaryWriter(stream).Write(value);
+
+        public static void Write(this Stream stream, short value) =>
+            new BinaryWriter(stream).Write(value);
+
+        public static void Write(this Stream stream, ushort value) =>
+            new BinaryWriter(stream).Write(value);
+
+        public static void Write(this Stream stream, int value) =>
+            new BinaryWriter(stream).Write(value);
+
+        public static void Write(this Stream stream, uint value) =>
+            new BinaryWriter(stream).Write(value);
+
+        public static void Write(this Stream stream, long value) =>
+            new BinaryWriter(stream).Write(value);
+
+        public static void Write(this Stream stream, ulong value) =>
+            new BinaryWriter(stream).Write(value);
 
         public static void Copy(this Stream source, Stream destination, int length, int bufferSize = 65536)
         {

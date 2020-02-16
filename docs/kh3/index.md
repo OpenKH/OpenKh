@@ -2,7 +2,7 @@
 
 ## General documentation
 
-* [Updates](updates.md)
+* [Editions and updates](updates.md)
 * [Worlds](worlds.md)
 * Save editing
     * [Pawns](pawns.md)

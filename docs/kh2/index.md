@@ -11,10 +11,13 @@
   * [BAR](file/type/bar)
   * [ARD](file/type/ard)
   * [MSN](file/type/msn)
+  * [ANB](file/anb/anb)
+  * [AI](file/ai/index)
   
 * Other files
 
     * [00battle.bin](file/type/enmp)
+    * [00objentry.bin](file/type/00objentry)
     * [03system.bin](file/type/03system)
 
 

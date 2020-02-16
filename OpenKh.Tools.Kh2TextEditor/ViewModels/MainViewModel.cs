@@ -3,17 +3,16 @@ using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Extensions;
-using OpenKh.Kh2.Messages;
-using OpenKh.Tools.Common.Extensions;
 using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Common.Extensions;
 using OpenKh.Tools.Kh2TextEditor.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Media;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
@@ -23,11 +22,13 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
     public class MainViewModel : BaseNotifyPropertyChanged
     {
         private const string DefaultName = "FAKE";
+        private const string GuideUrl = "https://openkh.dev/kh2/tool/Kh2TextEditor/OpenKh.Tools.Kh2TextEditor";
         private static string ApplicationName = Utilities.GetApplicationName();
         private string _fileName;
         private string _barEntryName;
         private FontContext _fontContext = new FontContext();
         private FontType _fontType;
+        private EncodingType _encodingType;
 
         public string Title => $"{_barEntryName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
 
@@ -46,6 +47,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
         public RelayCommand ExitCommand { get; }
+        public RelayCommand GuideCommand { get; }
         public RelayCommand AboutCommand { get; }
 
         public RelayCommand OpenFontImageCommand { get; }
@@ -63,6 +65,16 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             set
             {
                 _fontType = value;
+                InvalidateFontContext();
+            }
+        }
+
+        public EncodingType EncodingType
+        {
+            get => _encodingType;
+            set
+            {
+                _encodingType = value;
                 InvalidateFontContext();
             }
         }
@@ -167,6 +179,11 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 }
             }, x => true);
 
+            GuideCommand = new RelayCommand(x =>
+            {
+                Process.Start(new ProcessStartInfo(GuideUrl));
+            }, x => true);
+
             AboutCommand = new RelayCommand(x =>
             {   
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
@@ -252,9 +269,44 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
         private void InvalidateFontContext()
         {
-            TextEditor.TextContext = FontType == FontType.System ?
-                _fontContext.ToKh2EuSystemTextContext() :
-                _fontContext.ToKh2EuEventTextContext();
+            KingdomTextContext context;
+
+            switch (EncodingType)
+            {
+                case EncodingType.European:
+                    switch (FontType)
+                    {
+                        case FontType.System:
+                            context = _fontContext.ToKh2EuSystemTextContext();
+                            break;
+                        case FontType.Event:
+                            context = _fontContext.ToKh2EuEventTextContext();
+                            break;
+                        default:
+                            context = null;
+                            break;
+                    }
+                    break;
+                case EncodingType.Japanese:
+                    switch (FontType)
+                    {
+                        case FontType.System:
+                            context = _fontContext.ToKh2JpSystemTextContext();
+                            break;
+                        case FontType.Event:
+                            context = _fontContext.ToKh2JpEventTextContext();
+                            break;
+                        default:
+                            context = null;
+                            break;
+                    }
+                    break;
+                default:
+                    context = null;
+                    break;
+            }
+
+            TextEditor.TextContext = context;
         }
 
         private bool TryReadMsg(Stream stream)

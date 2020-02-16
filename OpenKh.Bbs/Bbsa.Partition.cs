@@ -14,7 +14,7 @@ namespace OpenKh.Bbs
 
         protected class Partition<TLba> where TLba : ILba
         {
-            [Data] public int Name { get; set; }
+            [Data] public uint Name { get; set; }
             [Data] public short Count { get; set; }
             [Data] public short Offset { get; set; }
             public TLba[] Lba { get; set; }

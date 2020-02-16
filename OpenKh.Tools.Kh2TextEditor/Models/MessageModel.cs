@@ -108,5 +108,11 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
                 OnPropertyChanged();
             }
         }
+
+        public void InvalidateText()
+        {
+            OnPropertyChanged(nameof(Title));
+            OnPropertyChanged(nameof(Text));
+        }
     }
 }

@@ -41,3 +41,36 @@ NOTE: While seems to be logical leaving a file uncompressed to improve performan
 | 8      | bool : 14 | Positive if the file is compressed.
 | 8      | bool : 15 | Positive if the file is streamed.
 | 12     | int    | Uncompressed length of the file in bytes.
+
+### Kaitai file structure
+
+```
+meta:
+  id: kh2_idx
+  endian: le
+seq:
+  - id: num_files
+    type: u4
+  - id: files
+    type: file_entry
+    repeat: expr
+    repeat-expr: num_files
+types:
+  file_entry:
+    seq:
+      - id: main_hash
+        type: u4
+      - id: second_hash
+        type: u2
+      - id: flags
+        type: u2
+        doc: |
+            & 0x8000: Verify secondary hash
+            & 0x4000: Is compressed
+            & 0x3FFF: Compressed size = (flags + 1) * 2048
+      - id: offset
+        type: s4
+        doc: offset in the IMG
+      - id: size
+        type: s4
+```

@@ -1,0 +1,121 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2SystemEditor.Views.TrsrView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2SystemEditor.Views"
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="0"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ListBox
+                Grid.Column="0"
+                ItemsSource="{Binding Items}"
+                SelectedItem="{Binding SelectedItem}"
+                DisplayMemberPath="Title">
+            </ListBox>
+
+            <Grid Grid.Row="1" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
+                <TextBox Grid.Column="2"
+                    Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="0 5 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="_Add" Command="{Binding AddCommand}"/>
+                <Button Grid.Column="2" Content="_Remove" Command="{Binding RemoveCommand}"/>
+            </Grid>
+        </Grid>
+
+        <StackPanel
+            Grid.Column="2"
+            Margin="5 0 5 0"
+            Visibility="{Binding IsItemEditMessageVisible, FallbackValue=Collapsed}">
+            <TextBlock
+                Text="Please select an item to modify"/>
+        </StackPanel>
+
+        <ScrollViewer
+            Grid.Column="2"
+            Margin="5 0 5 0"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="{Binding IsItemEditingVisible}">
+            <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
+                <TextBlock Text="Id" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding IdText}"/>
+
+                <TextBlock Text="Item" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox
+                    ItemsSource="{Binding ItemProvider.ItemEntries}"
+                    SelectedValue="{Binding ItemId}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Id"
+                    IsEditable="True"/>
+
+                <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox
+                    ItemsSource="{Binding Types}"
+                    SelectedValue="{Binding Type}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"/>
+
+                <TextBlock Grid.Column="0" Text="Map" Margin="{StaticResource LabelMargin}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="{StaticResource LabelMargin}"
+                        ItemsSource="{Binding Worlds}"
+                        SelectedValue="{Binding World}"
+                        DisplayMemberPath="Name"
+                        SelectedValuePath="Value"/>
+                    <TextBox
+                        Grid.Column="2"
+                        Margin="{StaticResource LabelMargin}"
+                        Text="{Binding Room, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Column="3" Text="{Binding MapName}"/>
+                </Grid>
+                    
+                <TextBlock Text="Room Chest index" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding RoomChestIndex, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Event Id" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding EventId, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Overall chest index" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding OverallChestIndex, UpdateSourceTrigger=PropertyChanged}"/>
+            </controls:TwoColumnsPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
