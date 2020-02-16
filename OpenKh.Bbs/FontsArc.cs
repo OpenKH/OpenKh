@@ -32,9 +32,11 @@ namespace OpenKh.Bbs
                         break;
                 }
 
-                _imageData = new byte[width * maxHeight * 8 / bpp];
+                _imageData = new byte[width * maxHeight * bpp / 8];
                 Array.Copy(mtx.Data, _imageData, Math.Min(_imageData.Length, mtx.Data.Length));
-                Unswizzle(_imageData, width);
+                _imageData = Unswizzle(_imageData, width * bpp / 8);
+                if (pixelFormat == PixelFormat.Indexed4)
+                    InvertEndianess(_imageData);
 
                 _clutData = new byte[clu.Data.Length];
                 Array.Copy(clu.Data, _clutData, _clutData.Length);
@@ -104,7 +106,26 @@ namespace OpenKh.Bbs
 
         private static byte[] Unswizzle(byte[] data, int width)
         {
-            return data;
+            var dst = new byte[data.Length];
+
+            for (var i = 0; i < data.Length; i += 16)
+            {
+                var srcIndex = i;
+                var dstIndex = srcIndex % 0x10;
+                dstIndex += srcIndex / 0x10 % 8 * width;
+                dstIndex += srcIndex / 0x80 % (width / 16) * 16;
+                dstIndex += srcIndex / (width * 8) * width * 8;
+
+                Array.Copy(data, srcIndex, dst, dstIndex, 16);
+            }
+
+            return dst;
+        }
+
+        private static void InvertEndianess(byte[] data)
+        {
+            for (var i = 0; i < data.Length; i++)
+                data[i] = (byte)(((data[i] & 15) << 4) | (data[i] >> 4));
         }
 
         public static bool IsValid(Stream stream) => Arc.IsValid(stream);
