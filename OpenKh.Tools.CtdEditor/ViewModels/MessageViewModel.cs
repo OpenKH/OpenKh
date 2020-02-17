@@ -8,13 +8,13 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
     {
         private readonly Ctd _ctd;
 
-        public MessageViewModel(Ctd ctd, Ctd.FakeEntry message)
+        public MessageViewModel(Ctd ctd, Ctd.Message message)
         {
             _ctd = ctd;
             Message = message;
         }
 
-        public Ctd.FakeEntry Message { get; }
+        public Ctd.Message Message { get; }
 
         public short Id
         {

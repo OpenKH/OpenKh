@@ -43,14 +43,14 @@ namespace OpenKh.Tests.Bbs
         public void ReadCorrectAmountOfEntry1() => FileOpenRead(FileName, stream =>
         {
             var ctd = Ctd.Read(stream);
-            Assert.Equal(41, ctd.Entries1.Count);
+            Assert.Equal(41, ctd.Messages.Count);
         });
 
         [Fact]
         public void ReadCorrectAmountOfEntry2() => FileOpenRead(FileName, stream =>
         {
             var ctd = Ctd.Read(stream);
-            Assert.Equal(14, ctd.Entries2.Count);
+            Assert.Equal(14, ctd.Layouts.Count);
         });
 
         [Theory]
@@ -81,10 +81,10 @@ namespace OpenKh.Tests.Bbs
         public void CreateEmptyCtdWithoutNullValues()
         {
             var ctd = new Ctd();
-            Assert.NotNull(ctd.Entries1);
-            Assert.NotNull(ctd.Entries2);
-            Assert.Empty(ctd.Entries1);
-            Assert.Empty(ctd.Entries2);
+            Assert.NotNull(ctd.Messages);
+            Assert.NotNull(ctd.Layouts);
+            Assert.Empty(ctd.Messages);
+            Assert.Empty(ctd.Layouts);
             Assert.Equal(0, ctd.Unknown);
         }
     }

@@ -22,15 +22,15 @@ namespace OpenKh.Bbs
             [Data] public int Version { get; set; }
             [Data] public short Unknown08 { get; set; }
             [Data] public short Unknown0a { get; set; }
-            [Data] public short Entry2Count { get; set; }
-            [Data] public short Entry1Count { get; set; }
-            [Data] public int Entry1Offset { get; set; }
-            [Data] public int Entry2Offset { get; set; }
+            [Data] public short LayoutCount { get; set; }
+            [Data] public short MessageCount { get; set; }
+            [Data] public int MessageOffset { get; set; }
+            [Data] public int LayoutOffset { get; set; }
             [Data] public int TextOffset { get; set; }
             [Data] public int Unknown1c { get; set; }
         }
 
-        private class Entry
+        private class _Message
         {
             [Data] public short Id { get; set; }
             [Data] public short Unknown02 { get; set; }
@@ -38,13 +38,14 @@ namespace OpenKh.Bbs
             [Data] public int Entry2Index { get; set; }
         }
 
-        public class FakeEntry
+        public class Message
         {
-            [Data] public short Id { get; set; }
-            [Data] public short Unknown02 { get; set; }
-            [Data] public int Entry2Index { get; set; }
+            public short Id { get; set; }
+            public short Unknown02 { get; set; }
+            public int Entry2Index { get; set; }
 
             public byte[] Data { get; set; }
+
             public string Text
             {
                 get => CtdEncoders.International.Decode(Data);
@@ -55,7 +56,7 @@ namespace OpenKh.Bbs
                 $"{Id:X04} {Unknown02:X04} {Entry2Index:X08}: {Text}";
         }
 
-        public class Entry2
+        public class Layout
         {
             [Data] public ushort textX { get; set; }
             [Data] public ushort textY { get; set; }
@@ -78,12 +79,12 @@ namespace OpenKh.Bbs
         }
 
         public short Unknown { get; set; }
-        public List<FakeEntry> Entries1 { get; set; }
-        public List<Entry2> Entries2 { get; set; }
+        public List<Message> Messages { get; set; }
+        public List<Layout> Layouts { get; set; }
 
         public string GetString(int id)
         {
-            var entry = Entries1.FirstOrDefault(x => x.Id == id);
+            var entry = Messages.FirstOrDefault(x => x.Id == id);
             if (entry == null)
                 return null;
 
@@ -92,9 +93,9 @@ namespace OpenKh.Bbs
 
         public void Write(Stream stream)
         {
-            var entry1Offset = HeaderLength;
-            var entry2Offset = Helpers.Align(entry1Offset + Entries1.Count * Entry1Length, 16);
-            var textOffset = entry2Offset + Entries2.Count * Entry2Length;
+            var messageOffset = HeaderLength;
+            var layoutOffset = Helpers.Align(messageOffset + Messages.Count * Entry1Length, 16);
+            var textOffset = layoutOffset + Layouts.Count * Entry2Length;
 
             BinaryMapping.WriteObject(stream, new Header
             {
@@ -102,23 +103,23 @@ namespace OpenKh.Bbs
                 Version = Version,
                 Unknown08 = 0,
                 Unknown0a = Unknown,
-                Entry2Count = (short)Entries2.Count,
-                Entry1Count = (short)Entries1.Count,
-                Entry1Offset = entry1Offset,
-                Entry2Offset = entry2Offset,
+                LayoutCount = (short)Layouts.Count,
+                MessageCount = (short)Messages.Count,
+                MessageOffset = messageOffset,
+                LayoutOffset = layoutOffset,
                 TextOffset = textOffset,
                 Unknown1c = 0,
             });
 
-            stream.Position = entry1Offset;
+            stream.Position = messageOffset;
             var textStream = new MemoryStream(4096);
             var nextTextOffset = textOffset;
-            foreach (var item in Entries1)
+            foreach (var item in Messages)
             {
                 textStream.Write(item.Data, 0, item.Data.Length);
                 textStream.WriteByte(0);
 
-                BinaryMapping.WriteObject(stream, new Entry
+                BinaryMapping.WriteObject(stream, new _Message
                 {
                     Id = item.Id,
                     Unknown02 = item.Unknown02,
@@ -129,12 +130,12 @@ namespace OpenKh.Bbs
                 nextTextOffset += item.Data.Length + 1;
             }
 
-            stream.Position = entry2Offset;
-            foreach (var item in Entries2)
+            stream.Position = layoutOffset;
+            foreach (var item in Layouts)
                 BinaryMapping.WriteObject(stream, item);
 
             stream.Position = textOffset;
-            foreach (var entry in Entries1)
+            foreach (var entry in Messages)
             {
                 stream.Write(entry.Data, 0, entry.Data.Length);
                 stream.WriteByte(0);
@@ -144,8 +145,8 @@ namespace OpenKh.Bbs
         public Ctd()
         {
             Unknown = 0;
-            Entries1 = new List<FakeEntry>();
-            Entries2 = new List<Entry2>();
+            Messages = new List<Message>();
+            Layouts = new List<Layout>();
         }
 
         private Ctd(Stream stream)
@@ -153,21 +154,21 @@ namespace OpenKh.Bbs
             var header = BinaryMapping.ReadObject<Header>(stream);
             Unknown = header.Unknown0a;
 
-            stream.Position = header.Entry1Offset;
-            var textEntries = Enumerable.Range(0, header.Entry1Count)
-                .Select(x => BinaryMapping.ReadObject<Entry>(stream))
+            stream.Position = header.MessageOffset;
+            var textEntries = Enumerable.Range(0, header.MessageCount)
+                .Select(x => BinaryMapping.ReadObject<_Message>(stream))
                 .ToList();
 
-            stream.Position = header.Entry2Offset;
-            Entries2 = Enumerable.Range(0, header.Entry2Count)
-                .Select(x => BinaryMapping.ReadObject<Entry2>(stream))
+            stream.Position = header.LayoutOffset;
+            Layouts = Enumerable.Range(0, header.LayoutCount)
+                .Select(x => BinaryMapping.ReadObject<Layout>(stream))
                 .ToList();
 
-            Entries1 = textEntries
+            Messages = textEntries
                 .Select(x =>
                 {
                     stream.SetPosition(x.Offset);
-                    return new FakeEntry
+                    return new Message
                     {
                         Id = x.Id,
                         Unknown02 = x.Unknown02,

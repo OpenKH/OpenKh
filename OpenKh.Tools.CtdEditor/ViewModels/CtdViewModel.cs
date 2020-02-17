@@ -15,8 +15,8 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         {
             get
             {
-                _ctd.Entries1.Clear();
-                _ctd.Entries1.AddRange(Items.Select(x => x.Message));
+                _ctd.Messages.Clear();
+                _ctd.Messages.AddRange(Items.Select(x => x.Message));
                 return _ctd;
             }
         }
@@ -36,10 +36,10 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         { }
 
         public CtdViewModel(Ctd ctd) :
-            this(ctd, ctd.Entries1)
+            this(ctd, ctd.Messages)
         { }
 
-        private CtdViewModel(Ctd ctd, IEnumerable<Ctd.FakeEntry> messages) :
+        private CtdViewModel(Ctd ctd, IEnumerable<Ctd.Message> messages) :
             base(messages.Select(x => new MessageViewModel(ctd, x)))
         {
             _ctd = ctd;
@@ -51,7 +51,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         }
 
         protected override MessageViewModel OnNewItem() =>
-            new MessageViewModel(_ctd, new Ctd.FakeEntry
+            new MessageViewModel(_ctd, new Ctd.Message
             {
                 Id = (short)(Items.Max(x => x.Message.Id) + 1),
                 Data = new byte[0],
