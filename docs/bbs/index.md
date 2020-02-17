@@ -6,4 +6,5 @@
 * [Archive format](bbsa.md)
 * [ARC format](arc.md)
 * [Animation Container](pam.md)
+* [CTD text format](ctd.md)
 * [Events](events.md)
