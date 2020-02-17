@@ -38,21 +38,83 @@ Describe how a message should be presented on screen
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | short | Position X
-| 02     | short | Position Y
-| 04     | short | *winW
-| 06     | short | *winH
-| 08     | byte  | *formatType1
-| 09     | byte  | *dialogType
-| 0a     | byte  | *formatType2
-| 0b     | byte  | *unk1
-| 0c     | short | Font size
-| 0e     | short | *unk2
-| 10     | short | *fontSeparation
-| 12     | short | *unk3
-| 14     | short | *unk4
-| 16     | short | *unk5
-| 18     | short | *unk6
-| 1a     | short | *color
-| 1c     | short | *unk7
-| 1e     | short | *unk8
+| 00     | short | Dialog X position
+| 02     | short | Dialog Y position
+| 04     | short | Balloon window width (borders excluded)
+| 06     | short | Balloon window height (borders excluded)
+| 08     | byte  | [Dialog box alignment](#dialog-box-alignment)
+| 09     | byte  | [Dialog box border type](#dialog-box-borders)
+| 0a     | byte  | [Text alignment](#text-alignment)
+| 0b     | byte  | Unknown
+| 0c     | short | Font size. 16=100%, 8=50%
+| 0e     | short | Horizontal space between letters
+| 10     | short | Vertical space between letters
+| 12     | short | Text X offset
+| 14     | short | Text Y offset
+| 16     | short | [Dialog Hook type](#dialog-hook)
+| 18     | short | Dialog hook horizontal position
+| 1a     | short | Unknown
+| 1c     | short | Unknown
+| 1e     | short | Unknown
+
+### Dialog box alignment
+
+| Value | Description
+|-------|-------------
+| 00    | Use position
+| 01    | Align to the left
+| 02    | Align to the centre
+| 03    | Align to the right
+
+### Dialog box borders
+
+| Value | Description
+|-------|-------------
+| 00    | Rounded borders
+| 01    | Diamond borders
+| 02    | Spike borders
+| 03    | Black information dialog
+| 04    | Diamond borders
+| 05    | Invisible box
+
+### Text aligment
+
+| Value | Vertical | Horizontal | Text alignment
+|-------|----------|------------|----------------
+| 00    | Top      | Left       | Left
+| 01    | Top      | Right      | Left
+| 02    | Top      | Center     | Left
+| 03    | Top      | Left       | Left
+| 04    | Top      | Left       | Left
+| 05    | Top      | Right      | Right
+| 06    | Top      | Center     | Center
+| 07    | Top      | Left       | Left
+| 08    | Center   | Left       | Left
+| 09    | Center   | Right      | Left
+| 0a    | Center   | Center     | Left
+| 0b    | Bottom   | Center     | Left
+| 0c    | Top      | Left       | Left
+| 0d    | Center   | Right      | Right
+| 0e    | Center   | Center     | Center
+| 0f    | Bottom   | Center     | Center
+
+### Dialog hook
+
+| Value | Shape  | Location | Origin
+|-------|--------|----------|--------
+| 00    | Hook   | Bottom   | Left
+| 01    | Hook   | Bottom   | Right
+| 02    | Hook   | Top      | Left
+| 03    | Hook   | Top      | Right
+| 04    | Bubble | Bottom   | Left
+| 05    | Bubble | Bottom   | Right
+| 06    | Bubble | Top      | Left
+| 07    | Bubble | Top      | Right
+| 08    | Spike  | Bottom   | Left
+| 09    | Spike  | Bottom   | Right
+| 0a    | Spike  | Top      | Left
+| 0b    | Spike  | Top      | Right
+| 0c    | None   |          |
+| 0d    | None   |          |
+| 0e    | None   |          |
+| 0f    | None   |          |
