@@ -3,7 +3,6 @@ using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Bbs
@@ -58,24 +57,24 @@ namespace OpenKh.Bbs
 
         public class Layout
         {
-            [Data] public ushort textX { get; set; }
-            [Data] public ushort textY { get; set; }
-            [Data] public ushort winW { get; set; }
-            [Data] public ushort winH { get; set; }
-            [Data] public byte formatType1 { get; set; }
-            [Data] public byte dialogType { get; set; }
-            [Data] public byte formatType2 { get; set; }
-            [Data] public byte unk1 { get; set; }
-            [Data] public ushort fontSize { get; set; }
-            [Data] public ushort unk2 { get; set; }
-            [Data] public ushort fontSeparation { get; set; } // NOT TESTED
-            [Data] public ushort unk3 { get; set; }
-            [Data] public ushort unk4 { get; set; }
-            [Data] public ushort unk5 { get; set; }
-            [Data] public ushort unk6 { get; set; }
-            [Data] public ushort color { get; set; }
-            [Data] public ushort unk7 { get; set; }
-            [Data] public ushort unk8 { get; set; }
+            [Data] public ushort DialogX { get; set; }
+            [Data] public ushort DialogY { get; set; }
+            [Data] public ushort DialogWidth { get; set; }
+            [Data] public ushort DialogHeight { get; set; }
+            [Data] public byte DialogAlignment { get; set; }
+            [Data] public byte DialogBorders { get; set; }
+            [Data] public byte TextAlignment { get; set; }
+            [Data] public byte Unknown0b { get; set; }
+            [Data] public ushort FontSize { get; set; }
+            [Data] public ushort HorizontalSpace { get; set; }
+            [Data] public ushort VerticalSpace { get; set; }
+            [Data] public ushort TextX { get; set; }
+            [Data] public ushort TextY { get; set; }
+            [Data] public ushort DialogHook { get; set; }
+            [Data] public ushort DialogHookX { get; set; }
+            [Data] public ushort Unknown1a { get; set; }
+            [Data] public ushort Unknown1c { get; set; }
+            [Data] public ushort Unknown1e { get; set; }
         }
 
         public short Unknown { get; set; }
