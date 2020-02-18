@@ -15,7 +15,7 @@ namespace OpenKh.Bbs
             private readonly byte[] _imageData;
             private readonly byte[] _clutData;
 
-            internal Image(string name, Arc.Entry mtx, Arc.Entry clu, int width, int maxHeight, PixelFormat pixelFormat)
+            internal Image(string name, Arc.Entry mtx, byte[] clut, int width, int maxHeight, PixelFormat pixelFormat)
             {
                 Name = name;
                 Size = new Size(width, maxHeight);
@@ -38,8 +38,8 @@ namespace OpenKh.Bbs
                 if (pixelFormat == PixelFormat.Indexed4)
                     InvertEndianess(_imageData);
 
-                _clutData = new byte[clu.Data.Length];
-                Array.Copy(clu.Data, _clutData, _clutData.Length);
+                _clutData = new byte[clut.Length];
+                Array.Copy(clut, _clutData, _clutData.Length);
             }
 
             public string Name { get; }
@@ -54,25 +54,56 @@ namespace OpenKh.Bbs
         }
 
         private readonly IEnumerable<Arc.Entry> _entries;
+        private readonly Image _fontCmd1;
+        private readonly Image _fontCmd2;
+        private readonly Image _fontHelp1;
+        private readonly Image _fontHelp2;
+        private readonly Image _fontMenu1;
+        private readonly Image _fontMenu2;
+        private readonly Image _fontMes1;
+        private readonly Image _fontMes2;
+        private readonly Image _fontNumeral1;
+        private readonly Image _fontNumeral2;
 
         private FontsArc(Stream stream)
         {
             _entries = Arc.Read(stream);
 
-            FontCmd = CreateFontImage(_entries, "cmdfont");
             FontIcon = CreateFontIconImage(_entries, "FontIcon");
-            FontHelp = CreateFontImage(_entries, "helpfont");
-            FontMenu = CreateFontImage(_entries, "menufont");
-            FontMes = CreateFontImage(_entries, "mesfont");
-            FontNumeral = CreateFontImage(_entries, "numeral");
+            CreateFontImage(_entries, "cmdfont", out _fontCmd1, out _fontCmd2);
+            CreateFontImage(_entries, "helpfont", out _fontHelp1, out _fontHelp2);
+            CreateFontImage(_entries, "menufont", out _fontMenu1, out _fontMenu2);
+            CreateFontImage(_entries, "mesfont", out _fontMes1, out _fontMes2);
+            CreateFontImage(_entries, "numeral", out _fontNumeral1, out _fontNumeral2);
         }
 
-        public IImageRead FontCmd { get; }
         public IImageRead FontIcon { get; }
-        public IImageRead FontHelp { get; }
-        public IImageRead FontMenu { get; }
-        public IImageRead FontMes { get; }
-        public IImageRead FontNumeral { get; }
+        public IImageRead FontCmd => _fontCmd1;
+        public IImageRead FontCmd2 => _fontCmd2;
+        public IImageRead FontHelp => _fontHelp1;
+        public IImageRead FontHelp2 => _fontHelp2;
+        public IImageRead FontMenu => _fontMenu1;
+        public IImageRead FontMenu2 => _fontMenu2;
+        public IImageRead FontMes => _fontMes1;
+        public IImageRead FontMes2 => _fontMes2;
+        public IImageRead FontNumeral => _fontNumeral1;
+        public IImageRead FontNumeral2 => _fontNumeral2;
+
+        private void CreateFontImage(IEnumerable<Arc.Entry> entries, string name, out Image image1, out Image image2)
+        {
+            var mtx = RequireFileEntry(entries, $"{name}.mtx");
+            var clu = RequireFileEntry(entries, $"{name}.clu");
+            var inf = new MemoryStream(RequireFileEntry(entries, $"{name}.inf").Data)
+                .Using(stream => FontInfo.Read(stream));
+            var cod = RequireFileEntry(entries, $"{name}.cod");
+
+            var clut = new byte[0x40];
+            Array.Copy(clu.Data, 0, clut, 0, clut.Length);
+            image1 = new Image(name, mtx, clut, inf.ImageWidth, inf.MaxImageHeight, PixelFormat.Indexed4);
+
+            Array.Copy(clu.Data, 0x40, clut, 0, clut.Length);
+            image2 = new Image(name, mtx, clut, inf.ImageWidth, inf.MaxImageHeight, PixelFormat.Indexed4);
+        }
 
         private Image CreateFontImage(IEnumerable<Arc.Entry> entries, string name)
         {
@@ -82,7 +113,7 @@ namespace OpenKh.Bbs
                 .Using(stream => FontInfo.Read(stream));
             var cod = RequireFileEntry(entries, $"{name}.cod");
 
-            return new Image(name, mtx, clu, inf.ImageWidth, inf.MaxImageHeight, PixelFormat.Indexed4);
+            return new Image(name, mtx, clu.Data, inf.ImageWidth, inf.MaxImageHeight, PixelFormat.Indexed4);
         }
 
         private Image CreateFontIconImage(IEnumerable<Arc.Entry> entries, string name)
@@ -92,7 +123,7 @@ namespace OpenKh.Bbs
             var inf = new MemoryStream(RequireFileEntry(entries, $"{name}.inf").Data)
                 .Using(stream => FontIconInfo.Read(stream));
 
-            return new Image(name, mtx, clu, 256, 64, PixelFormat.Indexed8);
+            return new Image(name, mtx, clu.Data, 256, 64, PixelFormat.Indexed8);
         }
 
         private static Arc.Entry RequireFileEntry(IEnumerable<Arc.Entry> entries, string name)

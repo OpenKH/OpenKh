@@ -32,11 +32,16 @@ namespace OpenKh.Tools.ImageViewer.Services
                     return new[]
                     {
                         fonts.FontCmd,
-                        fonts.FontIcon,
+                        fonts.FontCmd2,
                         fonts.FontHelp,
+                        fonts.FontHelp2,
                         fonts.FontMenu,
+                        fonts.FontMenu2,
                         fonts.FontMes,
-                        fonts.FontNumeral
+                        fonts.FontMes2,
+                        fonts.FontNumeral,
+                        fonts.FontNumeral2,
+                        fonts.FontIcon,
                     };
                 }, (stream, images) =>
                     throw new NotImplementedException()),
