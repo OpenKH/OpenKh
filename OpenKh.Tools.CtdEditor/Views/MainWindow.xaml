@@ -24,6 +24,10 @@
                 <MenuItem Header="E_xit"
                           Command="{Binding ExitCommand}"/>
             </MenuItem>
+            <MenuItem Header="F_ont">
+                <MenuItem Header="_Open font archive"
+                          Command="{Binding OpenFontCommand}"/>
+            </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About"
                           Command="{Binding AboutCommand}"/>

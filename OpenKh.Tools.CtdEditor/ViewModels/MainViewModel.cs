@@ -1,6 +1,8 @@
 ﻿using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Tools.Common;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +16,13 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
     public class MainViewModel : BaseNotifyPropertyChanged
     {
         private static string ApplicationName = Utilities.GetApplicationName();
+        private static readonly IEnumerable<FileDialogFilter> CtdFilter = FileDialogFilterComposer.Compose()
+            .AddExtensions("CTD message", "ctd")
+            .AddAllFiles();
+        private static readonly IEnumerable<FileDialogFilter> FontArcFilter = FileDialogFilterComposer.Compose()
+            .AddExtensions("Font archive", "arc")
+            .AddAllFiles();
+
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
         private CtdViewModel _ctdViewModel;
@@ -36,6 +45,8 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         public RelayCommand ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
 
+        public RelayCommand OpenFontCommand { get; }
+
         public CtdViewModel CtdViewModel
         {
             get => _ctdViewModel;
@@ -48,21 +59,16 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             set => CtdViewModel = new CtdViewModel(value);
         }
 
+        public FontsArc Fonts
+        {
+            get => CtdViewModel.Fonts;
+            set => CtdViewModel.Fonts = value;
+        }
+
         public MainViewModel()
         {
             OpenCommand = new RelayCommand(x =>
-            {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new[]
-                {
-                    ("CTD text file", "ctd"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    OpenFile(fd.FileName);
-                }
-            }, x => true);
+                FileDialog.OnOpen(fileName => OpenFile(fileName), CtdFilter), x => true);
 
             SaveCommand = new RelayCommand(x =>
             {
@@ -77,23 +83,16 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }, x => true);
 
             SaveAsCommand = new RelayCommand(x =>
-            {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, new[]
-                {
-                    ("CTD text file", "ctd"),
-                    ("All files", "*")
-                });
-                if (fd.ShowDialog() == true)
-                {
-                    SaveFile(FileName, fd.FileName);
-                    FileName = fd.FileName;
-                }
-            }, x => true);
+                FileDialog.OnSave(fileName => SaveFile(FileName, fileName), CtdFilter), x => true);
 
             ExitCommand = new RelayCommand(x =>
             {
                 Window.Close();
             }, x => true);
+
+            OpenFontCommand = new RelayCommand(x =>
+                FileDialog.OnOpen(fileName => OpenFontFile(fileName), FontArcFilter),
+                x => CtdViewModel != null);
 
             AboutCommand = new RelayCommand(x =>
             {
@@ -103,7 +102,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             CtdViewModel = new CtdViewModel();
         }
 
-        public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
+        private bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             if (!Ctd.IsValid(stream))
             {
@@ -116,11 +115,22 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             return true;
         });
 
-        public void SaveFile(string previousFileName, string fileName)
+        private void SaveFile(string previousFileName, string fileName)
         {
             File.Create(fileName).Using(stream =>
             {
                 Ctd.Write(stream);
+            });
+        }
+
+        private void OpenFontFile(string fileName)
+        {
+            Fonts = File.OpenRead(fileName).Using(stream =>
+            {
+                if (!Arc.IsValid(stream))
+                    throw new Exception("Not a valid ARC file");
+
+                return FontsArc.Read(stream);
             });
         }
     }
