@@ -10,6 +10,7 @@ namespace OpenKh.Tests.Bbs
     {
         private static string InfFileName = "Bbs/res/font-test.inf";
         private static string Inf2FileName = "Bbs/res/font-test2.inf";
+        private static byte[] FontCharacterInfo = new byte[] { 0x34, 0x12, 33, 0, 66, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 99 };
 
         [Fact]
         public void ReadFontInfo() => File.OpenRead(InfFileName).Using(stream =>
@@ -51,6 +52,29 @@ namespace OpenKh.Tests.Bbs
         {
             var outStream = new MemoryStream();
             FontIconInfo.Write(outStream, FontIconInfo.Read(stream));
+            return outStream;
+        });
+
+        [Fact]
+        public void ReadFontCharacterInfo()
+        {
+            var stream = new MemoryStream(FontCharacterInfo);
+            var info = OpenKh.Bbs.FontCharacterInfo.Read(stream);
+
+            Assert.Equal(2, info.Length);
+            Assert.Equal(0x1234, info[0].Id);
+            Assert.Equal(33, info[0].PositionX);
+            Assert.Equal(66, info[0].PositionY);
+            Assert.Equal(2, info[0].Palette);
+            Assert.Equal(3, info[0].Width);
+            Assert.Equal(99, info[1].Width);
+        }
+
+        [Fact]
+        public void WriteFontCharacterInfo() => Helpers.AssertStream(new MemoryStream(FontCharacterInfo), stream =>
+        {
+            var outStream = new MemoryStream();
+            OpenKh.Bbs.FontCharacterInfo.Write(outStream, OpenKh.Bbs.FontCharacterInfo.Read(stream));
             return outStream;
         });
     }
