@@ -27,6 +27,8 @@
             <MenuItem Header="F_ont">
                 <MenuItem Header="_Open font archive"
                           Command="{Binding OpenFontCommand}"/>
+                <MenuItem Header="_Edit font"
+                          Command="{Binding OpenFontEditorCommand}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About"

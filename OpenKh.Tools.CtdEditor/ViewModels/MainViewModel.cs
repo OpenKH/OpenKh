@@ -1,6 +1,7 @@
 ﻿using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Tools.Common;
+using OpenKh.Tools.CtdEditor.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -46,6 +47,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         public RelayCommand AboutCommand { get; }
 
         public RelayCommand OpenFontCommand { get; }
+        public RelayCommand OpenFontEditorCommand { get; }
 
         public CtdViewModel CtdViewModel
         {
@@ -62,7 +64,11 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         public FontsArc Fonts
         {
             get => CtdViewModel.Fonts;
-            set => CtdViewModel.Fonts = value;
+            set
+            {
+                CtdViewModel.Fonts = value;
+                OnPropertyChanged(nameof(OpenFontEditorCommand));
+            }
         }
 
         public MainViewModel()
@@ -93,6 +99,13 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             OpenFontCommand = new RelayCommand(x =>
                 FileDialog.OnOpen(fileName => OpenFontFile(fileName), FontArcFilter),
                 x => CtdViewModel != null);
+
+            OpenFontEditorCommand = new RelayCommand(x =>
+                new FontWindow()
+                {
+                    DataContext = new FontEditorViewModel(Fonts)
+                }.ShowDialog(),
+                x => Fonts != null);
 
             AboutCommand = new RelayCommand(x =>
             {
