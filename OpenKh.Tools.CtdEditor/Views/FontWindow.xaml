@@ -15,6 +15,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -27,13 +28,18 @@
                   SelectedValue="{Binding SelectedFont}"
                   DisplayMemberPath="Name"/>
 
+        <CheckBox
+            Grid.Row="2"
+            Content="Sort IDs"
+            IsChecked="{Binding OrderCharacters}"/>
+
         <ListBox Grid.Row="1" Grid.Column="0"
                  IsEnabled="{Binding IsFontSeleted}"
                  ItemsSource="{Binding Characters}"
                  SelectedValue="{Binding SelectedCharacter}"
                  DisplayMemberPath="Title"/>
 
-        <Grid Grid.Row="1" Grid.Column="2"
+        <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="2"
               IsEnabled="{Binding IsCharacterSelected}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

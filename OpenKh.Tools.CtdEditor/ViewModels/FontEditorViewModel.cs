@@ -17,6 +17,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         private CharacterViewModel _selectedCharacter;
         private ISurface _surface1;
         private ISurface _surface2;
+        private bool orderCharacters;
 
         public FontEditorViewModel(FontsArc fonts)
         {
@@ -65,7 +66,8 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         }
         public bool IsFontSeleted => SelectedFont != null;
 
-        public IEnumerable<CharacterViewModel> Characters => _characters;
+        public IEnumerable<CharacterViewModel> Characters =>
+            OrderCharacters ? _characters.OrderBy(x => x.Id) : _characters as IEnumerable<CharacterViewModel>;
         public CharacterViewModel SelectedCharacter
         {
             get => _selectedCharacter;
@@ -77,6 +79,16 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }
         }
         public bool IsCharacterSelected => SelectedCharacter != null;
+
+        public bool OrderCharacters
+        {
+            get => orderCharacters;
+            set
+            {
+                orderCharacters = value;
+                OnPropertyChanged(nameof(Characters));
+            }
+        }
 
         public IDrawing DrawingContext { get; }
         public RelayCommand DrawBegin { get; }
