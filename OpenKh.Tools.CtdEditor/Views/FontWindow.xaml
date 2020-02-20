@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.CtdEditor.Views"
         xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+        xmlns:controls1="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
         mc:Ignorable="d"
         Title="Font window" Height="250" Width="400" ResizeMode="NoResize">
     <Window.Resources>
@@ -55,8 +56,11 @@
                 <TextBlock Text="Width"/>
                 <TextBox Text="{Binding Width, UpdateSourceTrigger=PropertyChanged}"/>
             </controls:TwoColumnsPanel>
-            
-            <Image Margin="5" Grid.Row="1"  Source="{Binding PreviewImage}"/>
+
+            <controls1:DrawPanel
+                Margin="5" Grid.Row="1"
+                Drawing="{Binding DrawingContext}"
+                DrawBegin="{Binding DrawBegin}"/>
         </Grid>
 
     </Grid>

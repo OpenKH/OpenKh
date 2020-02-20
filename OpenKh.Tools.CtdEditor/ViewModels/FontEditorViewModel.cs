@@ -1,9 +1,11 @@
 ﻿using OpenKh.Bbs;
-using OpenKh.Imaging;
+using OpenKh.Tools.Common;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Drawing;
 using System.Linq;
+using Xe.Drawing;
 using Xe.Tools;
+using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.CtdEditor.ViewModels
 {
@@ -13,48 +15,38 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         private CharacterViewModel[] _characters;
         private FontEntryViewModel _selectedFont;
         private CharacterViewModel _selectedCharacter;
+        private ISurface _surface1;
+        private ISurface _surface2;
 
         public FontEditorViewModel(FontsArc fonts)
         {
             _fonts = fonts;
             Fonts = new[]
             {
-                new FontEntryViewModel
-                {
-                    Name = "Cmd",
-                    Font1 = fonts.FontCmd,
-                    Font2 = fonts.FontCmd2,
-                    Info = fonts.FontCmdInfo
-                },
-                new FontEntryViewModel
-                {
-                    Name = "Help",
-                    Font1 = fonts.FontHelp,
-                    Font2 = fonts.FontHelp2,
-                    Info = fonts.FontHelpInfo
-                },
-                new FontEntryViewModel
-                {
-                    Name = "Menu",
-                    Font1 = fonts.FontMenu,
-                    Font2 = fonts.FontMenu2,
-                    Info = fonts.FontMenuInfo
-                },
-                new FontEntryViewModel
-                {
-                    Name = "Mes",
-                    Font1 = fonts.FontMes,
-                    Font2 = fonts.FontMes2,
-                    Info = fonts.FontMesInfo
-                },
-                new FontEntryViewModel
-                {
-                    Name = "Numeral",
-                    Font1 = fonts.FontNumeral,
-                    Font2 = fonts.FontNumeral2,
-                    Info = fonts.FontNumeralInfo
-                },
+                new FontEntryViewModel(fonts.FontCmd),
+                new FontEntryViewModel(fonts.FontHelp),
+                new FontEntryViewModel(fonts.FontMenu),
+                new FontEntryViewModel(fonts.FontMes),
+                new FontEntryViewModel(fonts.FontNumeral)
             };
+
+            DrawingContext = new DrawingDirect3D();
+            DrawBegin = new RelayCommand(_ =>
+            {
+                if (_selectedFont?.Font1 == null ||
+                    SelectedCharacter == null)
+                    return;
+
+                if (_surface1 == null)
+                    CreateFontSurfaces();
+
+                if (_surface1 == null)
+                    return;
+
+                DrawingContext.Clear(Color.Black);
+                PrintCharacter(SelectedCharacter);
+                DrawingContext.Flush();
+            });
         }
 
         public FontEntryViewModel[] Fonts { get; }
@@ -64,7 +56,9 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             set
             {
                 _selectedFont = value;
-                _characters = _selectedFont.Info.Select(x => new CharacterViewModel(x)).ToArray();
+                _characters = _selectedFont.CharactersInfo.Select(x => new CharacterViewModel(x)).ToArray();
+
+                DestroyFontSurfaces();
                 OnPropertyChanged(nameof(IsFontSeleted));
                 OnPropertyChanged(nameof(Characters));
             }
@@ -83,68 +77,57 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }
         }
         public bool IsCharacterSelected => SelectedCharacter != null;
-    }
 
-    public class FontEntryViewModel
-    {
-        public string Name { get; set; }
-        public IImageRead Font1 { get; set; }
-        public IImageRead Font2 { get; set; }
-        public FontCharacterInfo[] Info { get; set; }
-    }
+        public IDrawing DrawingContext { get; }
+        public RelayCommand DrawBegin { get; }
 
-    public class CharacterViewModel : BaseNotifyPropertyChanged
-    {
-        private readonly FontCharacterInfo _info;
-
-        public CharacterViewModel(FontCharacterInfo info)
+        private void CreateFontSurfaces()
         {
-            _info = info;
+            _surface1 = DrawingContext.CreateSurface(_selectedFont.Font1);
+            _surface2 = DrawingContext.CreateSurface(_selectedFont.Font2);
         }
 
-        public string Id
+        private void DestroyFontSurfaces()
         {
-            get => $"{(_info.Id >> 8) & 0xff:X02} {_info.Id & 0xff:X02}";
-            set
+            _surface1?.Dispose();
+            _surface2?.Dispose();
+
+            _surface1 = null;
+            _surface2 = null;
+        }
+
+        private void PrintCharacter(CharacterViewModel characterViewModel)
+        {
+            ISurface surface;
+
+            switch (characterViewModel.Palette)
             {
-                var digits = value
-                    .Where(x => !char.IsWhiteSpace(x))
-                    .Select(x => int.Parse($"{x}", NumberStyles.HexNumber))
-                    .ToArray();
-                var actualValue = digits[0] << 12 |
-                    digits[1] << 8 |
-                    digits[2] << 4 |
-                    digits[3];
-
-                _info.Id = (ushort)actualValue;
-                OnPropertyChanged(nameof(Title));
+                case 0:
+                    surface = _surface1;
+                    break;
+                case 1:
+                    surface = _surface2;
+                    break;
+                default:
+                    return;
             }
-        }
 
-        public ushort PositionX
-        {
-            get => _info.PositionX;
-            set => _info.PositionX = value;
-        }
+            var src = new Rectangle()
+            {
+                X = characterViewModel.PositionX,
+                Y = characterViewModel.PositionY,
+                Width = characterViewModel.Width,
+                Height = SelectedFont.Info.CharacterHeight,
+            };
+            var dst = new Rectangle()
+            {
+                X = 0,
+                Y = 0,
+                Width = src.Width * 2,
+                Height = src.Height * 2
+            };
 
-        public ushort PositionY
-        {
-            get => _info.PositionY;
-            set => _info.PositionY = value;
+            DrawingContext.DrawSurface(surface, src, dst);
         }
-
-        public byte Palette
-        {
-            get => _info.Palette;
-            set => _info.Palette = value;
-        }
-
-        public byte Width
-        {
-            get => _info.Width;
-            set => _info.Width = value;
-        }
-
-        public string Title => Id;
     }
 }

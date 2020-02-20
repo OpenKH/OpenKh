@@ -31,16 +31,16 @@ namespace OpenKh.Tools.ImageViewer.Services
                     var fonts = FontsArc.Read(s);
                     return new[]
                     {
-                        fonts.FontCmd,
-                        fonts.FontCmd2,
-                        fonts.FontHelp,
-                        fonts.FontHelp2,
-                        fonts.FontMenu,
-                        fonts.FontMenu2,
-                        fonts.FontMes,
-                        fonts.FontMes2,
-                        fonts.FontNumeral,
-                        fonts.FontNumeral2,
+                        fonts.FontCmd.Image1,
+                        fonts.FontCmd.Image2,
+                        fonts.FontHelp.Image1,
+                        fonts.FontHelp.Image2,
+                        fonts.FontMenu.Image1,
+                        fonts.FontMenu.Image2,
+                        fonts.FontMes.Image1,
+                        fonts.FontMes.Image2,
+                        fonts.FontNumeral.Image1,
+                        fonts.FontNumeral.Image2,
                         fonts.FontIcon,
                     };
                 }, (stream, images) =>

@@ -53,65 +53,55 @@ namespace OpenKh.Bbs
             public byte[] GetData() => _imageData;
         }
 
+        public class Font
+        {
+            public string Name { get; }
+            public IImageRead Image1 { get; }
+            public IImageRead Image2 { get; }
+            public FontInfo Info { get; }
+            public FontCharacterInfo[] CharactersInfo { get; }
+
+            public Font(IEnumerable<Arc.Entry> entries, string name)
+            {
+                Name = name;
+
+                var mtx = RequireFileEntry(entries, $"{name}.mtx");
+                var clu = RequireFileEntry(entries, $"{name}.clu");
+                Info = new MemoryStream(RequireFileEntry(entries, $"{name}.inf").Data)
+                    .Using(stream => FontInfo.Read(stream));
+
+                var clut = new byte[0x40];
+                Array.Copy(clu.Data, 0, clut, 0, clut.Length);
+                Image1 = new Image(name, mtx, clut, Info.ImageWidth, Info.MaxImageHeight, PixelFormat.Indexed4);
+
+                Array.Copy(clu.Data, 0x40, clut, 0, clut.Length);
+                Image2 = new Image(name, mtx, clut, Info.ImageWidth, Info.MaxImageHeight, PixelFormat.Indexed4);
+
+                CharactersInfo = new MemoryStream(RequireFileEntry(entries, $"{name}.cod").Data).Using(stream =>
+                    FontCharacterInfo.Read(stream));
+            }
+        }
+
         private readonly IEnumerable<Arc.Entry> _entries;
-        private readonly Image _fontCmd1;
-        private readonly Image _fontCmd2;
-        private readonly Image _fontHelp1;
-        private readonly Image _fontHelp2;
-        private readonly Image _fontMenu1;
-        private readonly Image _fontMenu2;
-        private readonly Image _fontMes1;
-        private readonly Image _fontMes2;
-        private readonly Image _fontNumeral1;
-        private readonly Image _fontNumeral2;
 
         private FontsArc(Stream stream)
         {
             _entries = Arc.Read(stream);
 
             FontIcon = CreateFontIconImage(_entries, "FontIcon");
-            FontCmdInfo = CreateFontImage(_entries, "cmdfont", out _fontCmd1, out _fontCmd2);
-            FontHelpInfo = CreateFontImage(_entries, "helpfont", out _fontHelp1, out _fontHelp2);
-            FontMenuInfo = CreateFontImage(_entries, "menufont", out _fontMenu1, out _fontMenu2);
-            FontMesInfo = CreateFontImage(_entries, "mesfont", out _fontMes1, out _fontMes2);
-            FontNumeralInfo = CreateFontImage(_entries, "numeral", out _fontNumeral1, out _fontNumeral2);
+            FontCmd = new Font(_entries, "cmdfont");
+            FontHelp = new Font(_entries, "helpfont");
+            FontMenu = new Font(_entries, "menufont");
+            FontMes = new Font(_entries, "mesfont");
+            FontNumeral = new Font(_entries, "numeral");
         }
 
         public IImageRead FontIcon { get; }
-        public IImageRead FontCmd => _fontCmd1;
-        public IImageRead FontCmd2 => _fontCmd2;
-        public IImageRead FontHelp => _fontHelp1;
-        public IImageRead FontHelp2 => _fontHelp2;
-        public IImageRead FontMenu => _fontMenu1;
-        public IImageRead FontMenu2 => _fontMenu2;
-        public IImageRead FontMes => _fontMes1;
-        public IImageRead FontMes2 => _fontMes2;
-        public IImageRead FontNumeral => _fontNumeral1;
-        public IImageRead FontNumeral2 => _fontNumeral2;
-
-        public FontCharacterInfo[] FontCmdInfo { get; }
-        public FontCharacterInfo[] FontHelpInfo { get; }
-        public FontCharacterInfo[] FontMenuInfo { get; }
-        public FontCharacterInfo[] FontMesInfo { get; }
-        public FontCharacterInfo[] FontNumeralInfo { get; }
-
-        private FontCharacterInfo[] CreateFontImage(IEnumerable<Arc.Entry> entries, string name, out Image image1, out Image image2)
-        {
-            var mtx = RequireFileEntry(entries, $"{name}.mtx");
-            var clu = RequireFileEntry(entries, $"{name}.clu");
-            var inf = new MemoryStream(RequireFileEntry(entries, $"{name}.inf").Data)
-                .Using(stream => FontInfo.Read(stream));
-
-            var clut = new byte[0x40];
-            Array.Copy(clu.Data, 0, clut, 0, clut.Length);
-            image1 = new Image(name, mtx, clut, inf.ImageWidth, inf.MaxImageHeight, PixelFormat.Indexed4);
-
-            Array.Copy(clu.Data, 0x40, clut, 0, clut.Length);
-            image2 = new Image(name, mtx, clut, inf.ImageWidth, inf.MaxImageHeight, PixelFormat.Indexed4);
-
-            return new MemoryStream(RequireFileEntry(entries, $"{name}.cod").Data).Using(stream =>
-                FontCharacterInfo.Read(stream));
-        }
+        public Font FontCmd { get; }
+        public Font FontHelp { get; }
+        public Font FontMenu { get; }
+        public Font FontMes { get; }
+        public Font FontNumeral { get; }
 
         private Image CreateFontIconImage(IEnumerable<Arc.Entry> entries, string name)
         {
