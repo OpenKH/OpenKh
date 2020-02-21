@@ -16,6 +16,8 @@ using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
+using OpenKh.Tools.Kh2TextEditor.Services;
+using System.Text;
 
 namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 {
@@ -29,6 +31,12 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private FontContext _fontContext = new FontContext();
         private FontType _fontType;
         private EncodingType _encodingType;
+        private ITextExporter[] textExporters = new ITextExporter[] {
+            new PlainTextExporter(),
+            new CsvTextExporter(),
+            new XmlTextExporter(),
+            new YamlTextExporter(),
+        };
 
         public string Title => $"{_barEntryName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
 
@@ -46,6 +54,8 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         public RelayCommand OpenCommand { get; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
+        public RelayCommand ExportMessageAsCommand { get; }
+
         public RelayCommand ExitCommand { get; }
         public RelayCommand GuideCommand { get; }
         public RelayCommand AboutCommand { get; }
@@ -118,6 +128,31 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 }
             }, x => true);
 
+            ExportMessageAsCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save,
+                    textExporters.Select(exporter => exporter.Filter())
+                );
+
+                if (fd.ShowDialog() == true)
+                {
+                    var selectedExtension = $"{Path.GetExtension(fd.FileName).TrimStart('.')}";
+
+                    ExportMessageAsFile(
+                        fileName: fd.FileName,
+                        textExporter: 
+                            textExporters
+                                .Where(
+                                    exporter => exporter.Filter().Item2
+                                        .Any(
+                                            it => string.Compare(it, selectedExtension, true) == 0
+                                        )
+                                )
+                                .FirstOrDefault() ?? textExporters.First() // fallback
+                    );
+                }
+            }, x => true);
+
             ExitCommand = new RelayCommand(x =>
             {
                 Window.Close();
@@ -185,7 +220,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }, x => true);
 
             AboutCommand = new RelayCommand(x =>
-            {   
+            {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
 
@@ -237,6 +272,13 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             {
                 File.Create(fileName).Using(WriteMsg);
             }
+        }
+
+        public void ExportMessageAsFile(string fileName, ITextExporter textExporter)
+        {
+            new StreamWriter(fileName, false, Encoding.UTF8).Using(
+                writer => textExporter.Export(TextEditor.Messages, writer)
+            );
         }
 
         private void OpenFontImageFile(string fileName) => File.OpenRead(fileName).Using(stream =>
