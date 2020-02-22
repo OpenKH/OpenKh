@@ -11,22 +11,13 @@ namespace OpenKh.Tools.Kh2TextEditor.Services
 {
     public class XmlTextExporter : ITextExporter
     {
-        void ITextExporter.Export(MessagesModel messages, TextWriter writer)
+        void ITextExporter.Export(IEnumerable<ExchangeableMessage> messages, TextWriter writer)
         {
             new XmlSerializer(typeof(RootModel)).Serialize(
                 writer,
                 new RootModel
                 {
-                    Message = messages
-                        .Select(
-                            source => new Message
-                            {
-                                Id = source.Id,
-                                Text = source.Text,
-                                Title = source.Title,
-                            }
-                        )
-                        .ToArray()
+                    Message = messages.ToArray()
                 }
             );
         }
@@ -37,19 +28,7 @@ namespace OpenKh.Tools.Kh2TextEditor.Services
         public class RootModel
         {
             [XmlElement]
-            public Message[] Message { get; set; }
-        }
-
-        public class Message
-        {
-            [XmlElement]
-            public int Id { get; set; }
-
-            [XmlElement]
-            public string Text { get; set; }
-
-            [XmlElement]
-            public string Title { get; set; }
+            public ExchangeableMessage[] Message { get; set; }
         }
     }
 }

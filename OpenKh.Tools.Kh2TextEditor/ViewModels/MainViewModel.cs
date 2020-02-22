@@ -31,12 +31,6 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private FontContext _fontContext = new FontContext();
         private FontType _fontType;
         private EncodingType _encodingType;
-        private ITextExporter[] textExporters = new ITextExporter[] {
-            new PlainTextExporter(),
-            new CsvTextExporter(),
-            new XmlTextExporter(),
-            new YamlTextExporter(),
-        };
 
         public string Title => $"{_barEntryName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
 
@@ -131,7 +125,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             ExportMessageAsCommand = new RelayCommand(x =>
             {
                 var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save,
-                    textExporters.Select(exporter => exporter.Filter())
+                    TextExporters.GetAll().Select(exporter => exporter.Filter())
                 );
 
                 if (fd.ShowDialog() == true)
@@ -140,15 +134,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
                     ExportMessageAsFile(
                         fileName: fd.FileName,
-                        textExporter: 
-                            textExporters
-                                .Where(
-                                    exporter => exporter.Filter().Item2
-                                        .Any(
-                                            it => string.Compare(it, selectedExtension, true) == 0
-                                        )
-                                )
-                                .FirstOrDefault() ?? textExporters.First() // fallback
+                        textExporter: TextExporters.FindFromFile(fd.FileName)
                     );
                 }
             }, x => true);
@@ -277,7 +263,17 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         public void ExportMessageAsFile(string fileName, ITextExporter textExporter)
         {
             new StreamWriter(fileName, false, Encoding.UTF8).Using(
-                writer => textExporter.Export(TextEditor.Messages, writer)
+                writer => textExporter.Export(
+                    TextEditor.Messages
+                        .Select(
+                            source => new ExchangeableMessage
+                            {
+                                Id = source.Id,
+                                Text = source.Text,
+                            }
+                        ),
+                    writer
+                )
             );
         }
 

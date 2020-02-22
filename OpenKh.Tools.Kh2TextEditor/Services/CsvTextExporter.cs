@@ -13,35 +13,15 @@ namespace OpenKh.Tools.Kh2TextEditor.Services
 {
     class CsvTextExporter : ITextExporter
     {
-        void ITextExporter.Export(MessagesModel messages, TextWriter writer)
+        void ITextExporter.Export(IEnumerable<ExchangeableMessage> messages, TextWriter writer)
         {
             new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = ","
             })
-                .WriteRecords(
-                    messages
-                        .Select(
-                            source => new Message
-                            {
-                                Id = source.Id,
-                                Text = source.Text,
-                                Title = source.Title,
-                            }
-                        )
-                        .ToArray()
-                );
+                .WriteRecords(messages);
         }
 
         (string, string[]) ITextExporter.Filter() => ("CSV", "csv".Split(';'));
-
-        public class Message
-        {
-            public int Id { get; set; }
-
-            public string Text { get; set; }
-
-            public string Title { get; set; }
-        }
     }
 }

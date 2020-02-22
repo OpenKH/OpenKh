@@ -10,42 +10,19 @@ namespace OpenKh.Tools.Kh2TextEditor.Services
 {
     class YamlTextExporter : ITextExporter
     {
-        void ITextExporter.Export(MessagesModel messages, TextWriter writer)
+        void ITextExporter.Export(IEnumerable<ExchangeableMessage> messages, TextWriter writer)
         {
             new YamlDotNet.Serialization.SerializerBuilder()
                 .Build()
                 .Serialize(
                     writer,
-                    new RootModel
+                    new
                     {
-                        Message = messages
-                            .Select(
-                                source => new Message
-                                {
-                                    Id = source.Id,
-                                    Text = source.Text,
-                                    Title = source.Title,
-                                }
-                            )
-                            .ToArray()
+                        Messages = messages
                     }
                 );
         }
 
         (string, string[]) ITextExporter.Filter() => ("YAML", "yml".Split(';'));
-
-        public class RootModel
-        {
-            public Message[] Message { get; set; }
-        }
-
-        public class Message
-        {
-            public int Id { get; set; }
-
-            public string Text { get; set; }
-
-            public string Title { get; set; }
-        }
     }
 }
