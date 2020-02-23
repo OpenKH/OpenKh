@@ -2,6 +2,6 @@
 {
     public interface ICtdMessageEncode
     {
-        byte[] Encode(string text);
+        byte[] FromText(string text);
     }
 }

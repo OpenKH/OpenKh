@@ -47,8 +47,8 @@ namespace OpenKh.Bbs
 
             public string Text
             {
-                get => CtdEncoders.International.Decode(Data);
-                set => Data = CtdEncoders.International.Encode(value);
+                get => CtdEncoders.International.ToText(Data);
+                set => Data = CtdEncoders.International.FromText(value);
             }
 
             public override string ToString() =>

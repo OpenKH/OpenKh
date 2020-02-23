@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.CtdEditor.Views"
+             xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="600">
     <Grid>
@@ -53,9 +54,14 @@
                 Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBox
-                Grid.Row="1"
+                Grid.Row="1" Visibility="Collapsed"
                 TextWrapping="Wrap" MaxLines="99"
                 Text="{Binding TextDump, Mode=OneWay}" IsReadOnly="True"/>
+
+            <controls:DrawPanel Grid.Row="2"
+                Drawing="{Binding DrawingContext}"
+                DrawBegin="{Binding DrawHandler}"
+                />
         </Grid>
     </Grid>
 </UserControl>

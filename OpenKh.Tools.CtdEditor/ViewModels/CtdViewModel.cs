@@ -1,4 +1,5 @@
 ﻿using OpenKh.Bbs;
+using OpenKh.Tools.CtdEditor.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
     {
         private string _searchTerm;
         private readonly Ctd _ctd;
+        private readonly IDrawHandler _drawHandler;
         private FontsArc _fonts;
 
         public Ctd Ctd
@@ -41,27 +43,31 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }
         }
 
-        public CtdViewModel() :
-            this(new Ctd())
-        { }
+        public CtdViewModel(IDrawHandler drawHandler) :
+            this(drawHandler, new Ctd())
+        {
+        }
 
-        public CtdViewModel(Ctd ctd) :
-            this(ctd, ctd.Messages)
-        { }
+        public CtdViewModel(IDrawHandler drawHandler, Ctd ctd) :
+            this(drawHandler, ctd, ctd.Messages)
+        {
+            _drawHandler = drawHandler;
+        }
 
-        private CtdViewModel(Ctd ctd, IEnumerable<Ctd.Message> messages) :
-            base(messages.Select(x => new MessageViewModel(ctd, x)))
+        private CtdViewModel(IDrawHandler drawHandler, Ctd ctd, IEnumerable<Ctd.Message> messages) :
+            base(messages.Select(x => new MessageViewModel(drawHandler, ctd, x)))
         {
             _ctd = ctd;
         }
 
         protected override void OnSelectedItem(MessageViewModel item)
         {
+            item.FontContext = Fonts?.FontMes;
             base.OnSelectedItem(item);
         }
 
         protected override MessageViewModel OnNewItem() =>
-            new MessageViewModel(_ctd, new Ctd.Message
+            new MessageViewModel(_drawHandler, _ctd, new Ctd.Message
             {
                 Id = (short)(Items.Max(x => x.Message.Id) + 1),
                 Data = new byte[0],

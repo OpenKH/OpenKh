@@ -2,6 +2,6 @@
 {
     public interface ICtdMessageDecode
     {
-        string Decode(byte[] data);
+        string ToText(byte[] data);
     }
 }

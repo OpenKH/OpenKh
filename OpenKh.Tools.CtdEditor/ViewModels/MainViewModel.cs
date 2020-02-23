@@ -1,6 +1,7 @@
 ﻿using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Tools.Common;
+using OpenKh.Tools.CtdEditor.Interfaces;
 using OpenKh.Tools.CtdEditor.Views;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             .AddExtensions("Font archive", "arc")
             .AddAllFiles();
 
+        private readonly CtdDrawHandler _drawHandler = new CtdDrawHandler();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
         private CtdViewModel _ctdViewModel;
@@ -58,7 +60,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         public Ctd Ctd
         {
             get => CtdViewModel?.Ctd;
-            set => CtdViewModel = new CtdViewModel(value);
+            set => CtdViewModel = new CtdViewModel(_drawHandler, value);
         }
 
         public FontsArc Fonts
@@ -112,7 +114,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
 
-            CtdViewModel = new CtdViewModel();
+            CtdViewModel = new CtdViewModel(_drawHandler);
         }
 
         private bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
