@@ -51,7 +51,7 @@
             <TextBox
                 Grid.Row="0"
                 MaxLines="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
+                Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True"/>
 
             <TextBox
                 Grid.Row="1" Visibility="Collapsed"
