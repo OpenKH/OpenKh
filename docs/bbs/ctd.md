@@ -4,6 +4,10 @@ CTD is used to display text messages in game. It does not only contain the text 
 
 In order to make a specific text appear in-game, the engine selects a [message](#message) thorugh its unique identifier. Then, every message will refer to a [layout](#layout) which contains the display logic.
 
+## Text encoding
+
+The encoding used is [Shift-JIS](https://en.wikipedia.org/wiki/Shift_JIS). The European/American text uses a slighly different variant of Shift-JIS. To learn more on how the game engine renders those characters, check how [character mapping](font#character-mapping) is performed.
+
 ## File format
 
 ### Header
