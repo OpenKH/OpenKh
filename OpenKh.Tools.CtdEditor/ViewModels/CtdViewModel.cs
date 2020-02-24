@@ -71,7 +71,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             {
                 Id = (short)(Items.Max(x => x.Message.Id) + 1),
                 Data = new byte[0],
-                Entry2Index = 0,
+                LayoutIndex = 0,
                 Unknown02 = _ctd.Unknown
             });
 

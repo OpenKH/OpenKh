@@ -41,7 +41,7 @@ namespace OpenKh.Bbs
         {
             public short Id { get; set; }
             public short Unknown02 { get; set; }
-            public int Entry2Index { get; set; }
+            public int LayoutIndex { get; set; }
 
             public byte[] Data { get; set; }
 
@@ -52,7 +52,7 @@ namespace OpenKh.Bbs
             }
 
             public override string ToString() =>
-                $"{Id:X04} {Unknown02:X04} {Entry2Index:X08}: {Text}";
+                $"{Id:X04} {Unknown02:X04} {LayoutIndex:X08}: {Text}";
         }
 
         public class Layout
@@ -123,7 +123,7 @@ namespace OpenKh.Bbs
                     Id = item.Id,
                     Unknown02 = item.Unknown02,
                     Offset = nextTextOffset,
-                    Entry2Index = item.Entry2Index
+                    Entry2Index = item.LayoutIndex
                 });
 
                 nextTextOffset += item.Data.Length + 1;
@@ -171,7 +171,7 @@ namespace OpenKh.Bbs
                     {
                         Id = x.Id,
                         Unknown02 = x.Unknown02,
-                        Entry2Index = x.Entry2Index,
+                        LayoutIndex = x.Entry2Index,
                         Data = ReadUntilTerminator(stream)
                     };
                 }).ToList();
