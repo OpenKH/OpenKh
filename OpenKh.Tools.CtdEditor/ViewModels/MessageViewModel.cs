@@ -29,6 +29,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
                 var layout = _ctd.Layouts[Message.LayoutIndex];
                 _drawHandler.DrawHandler(CtdEncoders.International, FontContext, Message, layout);
+                _drawHandler.DrawingContext.Flush();
             });
         }
 
