@@ -63,7 +63,6 @@ namespace OpenKh.Tests.Bbs
         [InlineData(0x8162, '|')]
         [InlineData(0x8180, '÷')]
         [InlineData(0x8190, '$')]
-        [InlineData(0x819b, '●')]
         [InlineData(0x81a0, '□')]
         [InlineData(0x81ab, '↓')]
         [InlineData(0x81f4, '♪')]

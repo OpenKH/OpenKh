@@ -26,7 +26,7 @@ namespace OpenKh.Bbs.Messages.Internals
         private static readonly string _mapping0 =
             " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[¥]^_`abcdefghijklmnopqrstuvwxyz{|}~";
         private static readonly string _mapping81 =
-            " ､｡,.·:;?!_____^¯__________–-_/\\~-|…‥‘’“”()__[]{}⟨⟩⟪⟫「」『』__+-±×·÷=≠<>≤≥∞∴♂♀°′″_¥$¢£%#&*@§☆★○●◎◇◆□■△▲▽▼※〒→←↑↓";
+            " ､｡,.·:;?!_____^¯__________–-_/\\~-|…‥‘’“”()__[]{}⟨⟩⟪⟫「」『』__+-±×·÷=≠<>≤≥∞∴♂♀°′″_¥$¢£%#&*@§☆★○●◎◇◆□■△▲▽▼※〒→←↑↓________________________________________________________________________♪†‡¶________";
         private static readonly string _mapping99 =
             "ÀÁÂÄÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖŒÙÚÛÜßàáâäæçèéêëìíîïñòóôõöùúûüœ¿¡‚„—°«»≤≥❤¹²³⁴⁵£€§·¢¨‘’©®™‾ₐ";
         private static readonly Dictionary<byte, string> _mappingF1 = new Dictionary<byte, string>
