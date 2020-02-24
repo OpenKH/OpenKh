@@ -15,7 +15,9 @@ The following font types can be found in both font archives:
 
 ## Character mapping
 
-TODO lazyness
+Internally, the game engine uses UCS as encoding, meaning that all the Shift-JIS text is ingested and converted on-the-fly to 2-bytes for each character. Then it does a look-up to both [INF for FontIcon](#inf-fonticon-variant) and [COD](#cod) to match and print that specific character by searching it using the Character ID.
+
+Embedded in the executable, a hard-coded switch table is responsible to convert the characters from `0x21` (`'!'`) to `0x7E` (`~`) into a UCS character.
 
 ## INF
 
@@ -32,6 +34,17 @@ Describes the [texture](#mtx) of a font.
 ## INF - FontIcon variant
 
 For `fonticon`, the associated INF file is structured in a completely different way.
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | short | Character ID
+| 02     | byte  | Left
+| 03     | byte  | Top
+| 04     | byte  | Right
+| 05     | byte  | Bottom
+| 06     | short | Always 0
+
+Left, Top, Right and Bottom are used to locate the icon in the [texture](#mtx)
 
 ## MTX
 
