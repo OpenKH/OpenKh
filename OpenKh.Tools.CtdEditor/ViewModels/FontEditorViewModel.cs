@@ -1,5 +1,6 @@
 ﻿using OpenKh.Bbs;
 using OpenKh.Tools.Common;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -67,7 +68,9 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         public bool IsFontSeleted => SelectedFont != null;
 
         public IEnumerable<CharacterViewModel> Characters =>
-            OrderCharacters ? _characters.OrderBy(x => x.Id) : _characters as IEnumerable<CharacterViewModel>;
+            (OrderCharacters ? _characters?.OrderBy(x => x.Id) : _characters as IEnumerable<CharacterViewModel>)
+            ?? Array.Empty<CharacterViewModel>();
+
         public CharacterViewModel SelectedCharacter
         {
             get => _selectedCharacter;
