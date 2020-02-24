@@ -57,7 +57,7 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
                     };
                     DrawingContext.DrawSurface(texture, source, x, y);
 
-                    x += source.Width;
+                    x += source.Width + layout.HorizontalSpace;
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
                     {
                         case 0x0a: // '\n'
                             x = BeginX;
-                            y += fontContext.Info.CharacterHeight;
+                            y += 16 + layout.VerticalSpace;
                             break;
                     }
                 }
