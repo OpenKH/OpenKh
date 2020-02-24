@@ -1,6 +1,5 @@
 ﻿using OpenKh.Bbs;
 using OpenKh.Bbs.Messages;
-using OpenKh.Tools.Common;
 using OpenKh.Tools.CtdEditor.Interfaces;
 using System.Linq;
 using Xe.Drawing;
@@ -27,7 +26,9 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             {
                 if (FontContext == null)
                     return;
-                _drawHandler.DrawHandler(CtdEncoders.International, FontContext, Message);
+
+                var layout = _ctd.Layouts[Message.LayoutIndex];
+                _drawHandler.DrawHandler(CtdEncoders.International, FontContext, Message, layout);
             });
         }
 

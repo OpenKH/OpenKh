@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.CtdEditor.Views"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="350" Width="600">
+        Title="{Binding Title}" Height="384" Width="750">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

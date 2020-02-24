@@ -9,6 +9,9 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
 {
     public class CtdDrawHandler : IDrawHandler
     {
+        private const int PspScreenWidth = 480;
+        private const int PspScreenHeight = 272;
+
         public CtdDrawHandler()
         {
             DrawingContext = new DrawingDirect3D();
@@ -16,13 +19,19 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
 
         public IDrawing DrawingContext { get; }
 
-        public void DrawHandler(ICtdMessageEncoder encoder, FontsArc.Font fontContext, Ctd.Message message)
+        public void DrawHandler(
+            ICtdMessageEncoder encoder,
+            FontsArc.Font fontContext,
+            Ctd.Message message,
+            Ctd.Layout layout)
         {
-            DrawingContext.Clear(Color.Black);
+            DrawPspScreen();
+            DrawDialog(layout);
 
-            const int BeginX = 0;
+            int BeginX = layout.DialogX + layout.TextX;
+            int BeginY = layout.DialogY + layout.TextY;
             var x = BeginX;
-            var y = 0;
+            var y = BeginY;
             var texture1 = DrawingContext.CreateSurface(fontContext.Image1);
             var texture2 = DrawingContext.CreateSurface(fontContext.Image2);
             foreach (var ch in encoder.ToUcs(message.Data))
@@ -62,5 +71,16 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
                 }
             }
         }
+
+        private void DrawPspScreen() =>
+            DrawingContext.FillRectangle(new RectangleF(0, 0, PspScreenWidth, PspScreenHeight), Color.Black);
+
+        private void DrawDialog(Ctd.Layout layout) => DrawingContext.DrawRectangle(new RectangleF
+        {
+            X = layout.DialogX - 1,
+            Y = layout.DialogY - 1,
+            Width = layout.DialogWidth + 1,
+            Height = layout.DialogHeight + 1,
+        }, Color.Cyan);
     }
 }

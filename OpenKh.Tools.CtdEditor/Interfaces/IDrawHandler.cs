@@ -8,6 +8,10 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
     {
         IDrawing DrawingContext { get; }
 
-        void DrawHandler(ICtdMessageEncoder encoder, FontsArc.Font fontContext, Ctd.Message message);
+        void DrawHandler(
+            ICtdMessageEncoder encoder,
+            FontsArc.Font fontContext,
+            Ctd.Message message,
+            Ctd.Layout layout);
     }
 }
