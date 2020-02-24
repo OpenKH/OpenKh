@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.CtdEditor.Interfaces;
@@ -29,6 +29,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
         private CtdViewModel _ctdViewModel;
+        private FontsArc _fonts;
 
         public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
 
@@ -60,15 +61,19 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         public Ctd Ctd
         {
             get => CtdViewModel?.Ctd;
-            set => CtdViewModel = new CtdViewModel(_drawHandler, value);
+            set => CtdViewModel = new CtdViewModel(_drawHandler, value)
+            {
+                Fonts = _fonts
+            };
         }
 
         public FontsArc Fonts
         {
-            get => CtdViewModel.Fonts;
+            get => _fonts;
             set
             {
-                CtdViewModel.Fonts = value;
+                _fonts = value;
+                CtdViewModel.Fonts = _fonts;
                 OnPropertyChanged(nameof(OpenFontEditorCommand));
             }
         }

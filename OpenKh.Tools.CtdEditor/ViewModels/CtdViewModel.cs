@@ -62,7 +62,9 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         protected override void OnSelectedItem(MessageViewModel item)
         {
-            item.FontContext = Fonts?.FontMes;
+            if (item != null)
+                item.FontContext = Fonts?.FontMes;
+
             base.OnSelectedItem(item);
         }
 
