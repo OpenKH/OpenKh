@@ -189,6 +189,9 @@ namespace OpenKh.Tools.Common.Controls
 
         private void SetDrawing(IDrawing drawing)
         {
+            if (drawing == null) // HACK
+                return;
+
             if (this.drawing == drawing)
                 return;
 
