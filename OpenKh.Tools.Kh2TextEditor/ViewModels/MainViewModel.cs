@@ -49,6 +49,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
         public RelayCommand ExportMessageAsCommand { get; }
+        public RelayCommand ImportMessageFromCommand { get; }
 
         public RelayCommand ExitCommand { get; }
         public RelayCommand GuideCommand { get; }
@@ -136,6 +137,31 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                         fileName: fd.FileName,
                         textExporter: TextExporters.FindFromFile(fd.FileName)
                     );
+                }
+            }, x => true);
+
+            ImportMessageFromCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open,
+                    TextImporters.GetAll().Select(importer => importer.Filter())
+                );
+
+                if (fd.ShowDialog() == true)
+                {
+                    var selectedExtension = $"{Path.GetExtension(fd.FileName).TrimStart('.')}";
+
+                    var textImporter = TextImporters.FindFromFile(fd.FileName);
+                    if (textImporter != null)
+                    {
+                        ImportMessageFromFile(
+                            fileName: fd.FileName,
+                            textImporter
+                        );
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Failed to match text decoder for your file:\n{fd.FileName}");
+                    }
                 }
             }, x => true);
 
@@ -275,6 +301,23 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                     writer
                 )
             );
+        }
+
+        public void ImportMessageFromFile(string fileName, ITextImporter textImporter)
+        {
+            var importedMessages = new StreamReader(fileName, Encoding.UTF8).Using(
+                reader => textImporter.Import(reader)
+                    .ToArray() // make sure to import all messages from file before closing StreamReader!
+            );
+
+            foreach (var importMessage in importedMessages)
+            {
+                var found = TextEditor.Messages.SingleOrDefault(it => it.Id == importMessage.Id);
+                if (found != null)
+                {
+                    found.Text = importMessage.Text;
+                }
+            }
         }
 
         private void OpenFontImageFile(string fileName) => File.OpenRead(fileName).Using(stream =>
