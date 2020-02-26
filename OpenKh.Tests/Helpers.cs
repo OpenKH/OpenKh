@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using OpenKh.Common;
+using OpenKh.Kh2;
 using Xunit;
 
 namespace OpenKh.Tests
@@ -29,6 +31,15 @@ namespace OpenKh.Tests
                 Assert.True(ch1 == ch2, $"Expected {ch1:X02} but found {ch2:X02} at {i:X}");
             }
         }
+
+        public static void AssertAllBarEntries(string gamePath, Bar.EntryType entryType, Func<Stream, Stream> assertion) =>
+            Directory
+                .GetFiles(gamePath, "*", SearchOption.AllDirectories)
+                .Where(fileName => File.OpenRead(fileName).Using(stream => Bar.IsValid(stream)))
+                .SelectMany(fileName => File.OpenRead(fileName).Using(stream => Bar.Read(stream)))
+                .Where(x => x.Type == entryType && x.Index == 0)
+                .AsParallel()
+                .ForAll(entry => AssertStream(entry.Stream, assertion));
 
         public static void UseAsset(string assetName, Action<Stream> action) =>
             File.OpenRead(Path.Combine($"_Assets", assetName)).Using(x => action(x));
