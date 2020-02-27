@@ -16,6 +16,8 @@ using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
+using OpenKh.Tools.Kh2TextEditor.Services;
+using System.Text;
 
 namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 {
@@ -46,6 +48,9 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         public RelayCommand OpenCommand { get; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
+        public RelayCommand ExportMessageAsCommand { get; }
+        public RelayCommand ImportMessageFromCommand { get; }
+
         public RelayCommand ExitCommand { get; }
         public RelayCommand GuideCommand { get; }
         public RelayCommand AboutCommand { get; }
@@ -118,6 +123,48 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 }
             }, x => true);
 
+            ExportMessageAsCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save,
+                    TextExporters.GetAll().Select(exporter => exporter.Filter())
+                );
+
+                if (fd.ShowDialog() == true)
+                {
+                    var selectedExtension = $"{Path.GetExtension(fd.FileName).TrimStart('.')}";
+
+                    ExportMessageAsFile(
+                        fileName: fd.FileName,
+                        textExporter: TextExporters.FindFromFile(fd.FileName)
+                    );
+                }
+            }, x => true);
+
+            ImportMessageFromCommand = new RelayCommand(x =>
+            {
+                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open,
+                    TextImporters.GetAll().Select(importer => importer.Filter())
+                );
+
+                if (fd.ShowDialog() == true)
+                {
+                    var selectedExtension = $"{Path.GetExtension(fd.FileName).TrimStart('.')}";
+
+                    var textImporter = TextImporters.FindFromFile(fd.FileName);
+                    if (textImporter != null)
+                    {
+                        ImportMessageFromFile(
+                            fileName: fd.FileName,
+                            textImporter
+                        );
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Failed to match text decoder for your file:\n{fd.FileName}");
+                    }
+                }
+            }, x => true);
+
             ExitCommand = new RelayCommand(x =>
             {
                 Window.Close();
@@ -185,7 +232,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }, x => true);
 
             AboutCommand = new RelayCommand(x =>
-            {   
+            {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
 
@@ -236,6 +283,40 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             else
             {
                 File.Create(fileName).Using(WriteMsg);
+            }
+        }
+
+        public void ExportMessageAsFile(string fileName, ITextExporter textExporter)
+        {
+            new StreamWriter(fileName, false, Encoding.UTF8).Using(
+                writer => textExporter.Export(
+                    TextEditor.Messages
+                        .Select(
+                            source => new ExchangeableMessage
+                            {
+                                Id = source.Id,
+                                Text = source.Text,
+                            }
+                        ),
+                    writer
+                )
+            );
+        }
+
+        public void ImportMessageFromFile(string fileName, ITextImporter textImporter)
+        {
+            var importedMessages = new StreamReader(fileName, Encoding.UTF8).Using(
+                reader => textImporter.Import(reader)
+                    .ToArray() // make sure to import all messages from file before closing StreamReader!
+            );
+
+            foreach (var importMessage in importedMessages)
+            {
+                var found = TextEditor.Messages.SingleOrDefault(it => it.Id == importMessage.Id);
+                if (found != null)
+                {
+                    found.Text = importMessage.Text;
+                }
             }
         }
 

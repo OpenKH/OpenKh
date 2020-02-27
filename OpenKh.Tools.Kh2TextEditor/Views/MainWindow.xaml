@@ -26,6 +26,11 @@
                 <MenuItem Header="Save message _as..."
                           Command="{Binding SaveAsCommand}"/>
                 <Separator/>
+                <MenuItem Header="_Export message as text..."
+                          Command="{Binding ExportMessageAsCommand}"/>
+                <MenuItem Header="_Import message from text..."
+                          Command="{Binding ImportMessageFromCommand}"/>
+                <Separator/>
                 <MenuItem Header="E_xit"
                           Command="{Binding ExitCommand}"/>
             </MenuItem>
