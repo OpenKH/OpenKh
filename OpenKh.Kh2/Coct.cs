@@ -199,10 +199,15 @@ namespace OpenKh.Kh2
             });
         }
 
-        public static bool IsValid(Stream stream) =>
-            stream.SetPosition(0).ReadInt32() == MagicCode &&
-            stream.ReadInt32() == 1 &&
-            stream.Length >= 0x40;
+        public static bool IsValid(Stream stream)
+        {
+            if (stream.SetPosition(0).ReadInt32() != MagicCode ||
+                stream.ReadInt32() != 1 ||
+                stream.Length < 0x50)
+                return false;
+
+            return true;
+        }
 
         public static Coct Read(Stream stream) =>
             new Coct(stream);
