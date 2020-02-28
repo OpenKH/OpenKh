@@ -39,7 +39,8 @@ namespace OpenKh.Imaging
             var bitmapData = bitmap.LockBits(rect, ImageLockMode.WriteOnly, drawingPixelFormat);
 
             var srcData = imageRead.GetData();
-            Marshal.Copy(srcData, 0, bitmapData.Scan0, srcData.Length);
+            var dstLength = Math.Min(srcData.Length, bitmapData.Stride * bitmapData.Height);
+            Marshal.Copy(srcData, 0, bitmapData.Scan0, dstLength);
 
             bitmap.UnlockBits(bitmapData);
 

@@ -4,11 +4,12 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net472</TargetFramework>
     <UseWPF>true</UseWPF>
-    <AssemblyTitle>Image viewer</AssemblyTitle>
+    <AssemblyTitle>CTD editor</AssemblyTitle>
     <Company>OpenKH</Company>
-    <Product>Image viewer - OpenKH</Product>
+    <Product>CTD editor - OpenKH</Product>
     <Description>https://github.com/Xeeynamo/OpenKh</Description>
     <Copyright>Copyright ©  2019</Copyright>
+    <OutputPath>..\bin\$(Configuration)\</OutputPath>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
   <ItemGroup>
@@ -17,12 +18,13 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+    <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Drawing.Direct3D\Xe.Drawing.Direct3D.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
   </ItemGroup>
+
 </Project>

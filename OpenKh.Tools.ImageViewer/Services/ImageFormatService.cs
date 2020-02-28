@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
@@ -24,6 +25,26 @@ namespace OpenKh.Tools.ImageViewer.Services
 
                 GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, images) =>
                     Imgz.Write(stream, images.Select(x => x.AsImgd()))),
+
+                GetImageFormat("Font ARC", "arc", false, FontsArc.IsValid, s =>
+                {
+                    var fonts = FontsArc.Read(s);
+                    return new[]
+                    {
+                        fonts.FontCmd.Image1,
+                        fonts.FontCmd.Image2,
+                        fonts.FontHelp.Image1,
+                        fonts.FontHelp.Image2,
+                        fonts.FontMenu.Image1,
+                        fonts.FontMenu.Image2,
+                        fonts.FontMes.Image1,
+                        fonts.FontMes.Image2,
+                        fonts.FontNumeral.Image1,
+                        fonts.FontNumeral.Image2,
+                        fonts.FontIcon,
+                    };
+                }, (stream, images) =>
+                    throw new NotImplementedException()),
 
                 GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
                     throw new NotImplementedException()),

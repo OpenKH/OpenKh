@@ -1,0 +1,73 @@
+﻿<Window x:Class="OpenKh.Tools.CtdEditor.Views.FontWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.CtdEditor.Views"
+        xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+        xmlns:controls1="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
+        mc:Ignorable="d"
+        Title="Font window" Height="250" Width="400" ResizeMode="NoResize">
+    <Window.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </Window.Resources>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 5"
+                  ItemsSource="{Binding Fonts}"
+                  SelectedValue="{Binding SelectedFont}"
+                  DisplayMemberPath="Name"/>
+
+        <CheckBox
+            Grid.Row="2"
+            Content="Sort IDs"
+            IsChecked="{Binding OrderCharacters}"/>
+
+        <ListBox Grid.Row="1" Grid.Column="0"
+                 IsEnabled="{Binding IsFontSeleted}"
+                 ItemsSource="{Binding Characters}"
+                 SelectedValue="{Binding SelectedCharacter}"
+                 DisplayMemberPath="Title"/>
+
+        <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="2"
+              IsEnabled="{Binding IsCharacterSelected}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <controls:TwoColumnsPanel Margin="0 0 0 5" RowSpacing="3"
+                DataContext="{Binding SelectedCharacter}">
+                <TextBlock Text="ID" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Id}"/>
+
+                <TextBlock Text="Position X" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding PositionX, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Position Y " Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding PositionY, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Palette"/>
+                <TextBox Text="{Binding Palette, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Width"/>
+                <TextBox Text="{Binding Width, UpdateSourceTrigger=PropertyChanged}"/>
+            </controls:TwoColumnsPanel>
+
+            <controls1:DrawPanel
+                Margin="5" Grid.Row="1"
+                Drawing="{Binding DrawingContext}"
+                DrawBegin="{Binding DrawBegin}"/>
+        </Grid>
+
+    </Grid>
+</Window>

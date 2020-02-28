@@ -41,11 +41,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, _openFilter);
                 if (fd.ShowDialog() == true)
                 {
-                    using (var stream = File.OpenRead(fd.FileName))
-                    {
-                        LoadImage(stream);
-                        FileName = fd.FileName;
-                    }
+                    LoadImage(fd.FileName);
                 }
             }, x => true);
 
@@ -248,6 +244,15 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
         public Visibility ImageFitVisibility => ZoomFit ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ImageCustomZoomVisibility => ZoomFit ? Visibility.Collapsed : Visibility.Visible;
+
+        public void LoadImage(string fileName)
+        {
+            using (var stream = File.OpenRead(fileName))
+            {
+                LoadImage(stream);
+                FileName = fileName;
+            }
+        }
 
         private void LoadImage(Stream stream)
         {
