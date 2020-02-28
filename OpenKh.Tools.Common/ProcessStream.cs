@@ -28,7 +28,7 @@ namespace OpenKh.Tools.Common
 		private IntPtr _hProcess;
 		private long position;
 
-		public ProcessStream(Process process, int baseAddress, int length)
+		public ProcessStream(Process process, uint baseAddress, uint length)
 		{
 			OpenProcess(process);
 			BaseAddress = baseAddress;
@@ -36,7 +36,7 @@ namespace OpenKh.Tools.Common
 		}
 
 
-		public int BaseAddress { get; }
+		public uint BaseAddress { get; }
 		public override bool CanRead => true;
 
 		public override bool CanSeek => true;

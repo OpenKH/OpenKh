@@ -1,0 +1,31 @@
+﻿<Window x:Class="OpenKh.Tools.Kh2MapCollisionEditor.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.Kh2MapCollisionEditor.Views"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="350" Width="500">
+    <Grid>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open"
+                          Command="{Binding OpenCommand}"/>
+                <MenuItem Header="Open from _process"
+                          Command="{Binding OpenProcessCommand}"/>
+                <MenuItem Header="_Save"
+                          Command="{Binding SaveCommand}"/>
+                <MenuItem Header="Save _as..."
+                          Command="{Binding SaveAsCommand}"/>
+                <Separator/>
+                <MenuItem Header="E_xit"
+                          Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About"
+                          Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
+    </Grid>
+</Window>

@@ -210,6 +210,6 @@ namespace OpenKh.Kh2
         }
 
         public static Coct Read(Stream stream) =>
-            new Coct(stream);
+            new Coct(stream.SetPosition(0));
     }
 }
