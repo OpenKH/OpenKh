@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConsoleApp1
+namespace OpenKh.Tools.Common
 {
 	public class ProcessStream : Stream
 	{
@@ -23,23 +24,26 @@ namespace ConsoleApp1
 		[DllImport("kernel32.dll")]
 		static extern bool VirtualProtectEx(IntPtr hProcess, IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
 
-		Process process;
-		IntPtr hProcess;
+		private Process _process;
+		private IntPtr _hProcess;
 		private long position;
 
-		public ProcessStream(Process process)
+		public ProcessStream(Process process, int baseAddress, int length)
 		{
 			OpenProcess(process);
+			BaseAddress = baseAddress;
+			Length = length;
 		}
 
 
+		public int BaseAddress { get; }
 		public override bool CanRead => true;
 
 		public override bool CanSeek => true;
 
 		public override bool CanWrite => true;
 
-		public override long Length => 32 * 1024 * 1024;
+		public override long Length { get; }
 
 		public override long Position
 		{
@@ -54,16 +58,16 @@ namespace ConsoleApp1
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			int read;
-			var pos = (IntPtr)(0x20000000 + Position);
+			var pos = (IntPtr)(BaseAddress + Position);
 
 			if (offset == 0)
 			{
-				ReadProcessMemory(hProcess, pos, buffer, count, out read);
+				ReadProcessMemory(_hProcess, pos, buffer, count, out read);
 			}
 			else
 			{
 				byte[] data = new byte[count];
-				ReadProcessMemory(hProcess, pos, buffer, count, out read);
+				ReadProcessMemory(_hProcess, pos, buffer, count, out read);
 				Array.Copy(data, 0, buffer, offset, read);
 			}
 
@@ -93,18 +97,18 @@ namespace ConsoleApp1
 
 		public override void Write(byte[] buffer, int offset, int count)
 		{
-			int written = 0;
-			var pos = (IntPtr)(0x20000000 + Position);
+			var pos = (IntPtr)(BaseAddress + Position);
 
+			int written;
 			if (offset == 0)
 			{
-				WriteProcessMemory(hProcess, pos, buffer, count, out written);
+				WriteProcessMemory(_hProcess, pos, buffer, count, out written);
 			}
 			else
 			{
 				var data = new byte[count];
 				Array.Copy(buffer, offset, data, 0, count);
-				WriteProcessMemory(hProcess, pos, data, count, out written);
+				WriteProcessMemory(_hProcess, pos, data, count, out written);
 			}
 
 			Position += written;
@@ -112,36 +116,35 @@ namespace ConsoleApp1
 
 		private void OpenProcess(Process process)
 		{
-			var permissions = 0x001FFFFF;
-			hProcess = OpenProcess(permissions, true, process.Id);
-			this.process = process;
+			const int permissions = 0x001FFFFF;
+			_hProcess = OpenProcess(permissions, true, process.Id);
+			_process = process;
 
-			var pos = (IntPtr)(0x20000000 + Position);
-			VirtualProtectEx(hProcess, pos, (UIntPtr)Length, 0xFF, out var old);
+			var pos = (IntPtr)(BaseAddress + Position);
+			VirtualProtectEx(_hProcess, pos, (UIntPtr)Length, 0xFF, out var old);
 		}
 
-		public static ProcessStream SearchProcess(string processName)
+		public static IEnumerable<Process> GetProcesses() =>
+			Process.GetProcesses();
+
+		public static Process TryGetProcess(Func<Process, bool> predicate, int timeout = 10000, int sleep = 100)
 		{
-			while (true)
-			{
-				foreach (Process process in Process.GetProcesses())
-				{
-					if (process.ProcessName.Contains(processName))
-					{
-						return new ProcessStream(process);
-					}
-				}
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
 
-				Thread.Sleep(100);
-			}
+			do
+			{
+				var process = GetProcesses().FirstOrDefault(predicate);
+				if (process != null)
+					return process;
+
+				Thread.Sleep(sleep);
+			} while (stopwatch.ElapsedMilliseconds < timeout);
+
+			return null;
 		}
 
-		public static async Task<ProcessStream> SearchProcessAsync(string processName)
-		{
-			return await Task.Run(() =>
-			{
-				return SearchProcess(processName);
-			});
-		}
+		public static Task<Process> TryGetProcessAsync(Func<Process, bool> predicate, int timeout = 10000, int sleep = 100) =>
+			Task.Run(() => TryGetProcess(predicate, timeout, sleep));
 	}
 }
