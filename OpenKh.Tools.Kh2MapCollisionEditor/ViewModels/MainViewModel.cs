@@ -22,6 +22,8 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         private Window Window => Utilities.GetCurrentWindow();
 
         private string _fileName;
+        private bool _isProcess;
+        private ProcessStream _processStream;
 
         public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
 
@@ -53,10 +55,17 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
 
             SaveCommand = new RelayCommand(x =>
             {
-                if (!string.IsNullOrEmpty(FileName))
-                    SaveFile(FileName, FileName);
+                if (_isProcess)
+                {
+                    SaveStream(_processStream);
+                }
                 else
-                    SaveAsCommand.Execute(x);
+                {
+                    if (!string.IsNullOrEmpty(FileName))
+                        SaveFile(FileName, FileName);
+                    else
+                        SaveAsCommand.Execute(x);
+                }
             }, x => true);
 
             SaveAsCommand = new RelayCommand(x =>
@@ -77,7 +86,10 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
             File.OpenRead(fileName).Using(stream =>
             {
                 if (OpenStream(stream))
+                {
+                    _isProcess = false;
                     FileName = fileName;
+                }
             });
 
         private bool OpenStream(Stream stream)
@@ -94,9 +106,11 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
 
         private void SaveFile(string oldFileName, string fileName)
         {
-            File.Create(fileName).Using(stream => Coct.Write(stream));
+            File.Create(fileName).Using(SaveStream);
             FileName = fileName;
         }
+
+        private void SaveStream(Stream stream) => Coct.Write(stream);
 
         private void OpenProcess()
         {
@@ -106,7 +120,9 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
                 var stream = dialog.SelectedProcessStream;
                 if (OpenStream(stream))
                 {
-                    FileName = $"PCSX2 ({stream.BaseAddress:X07})";
+                    _isProcess = true;
+                    _processStream = stream;
+                    FileName = $"PCSX2 ({stream.BaseAddress:X08})";
                 }
             }
         }
