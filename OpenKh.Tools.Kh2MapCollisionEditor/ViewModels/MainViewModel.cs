@@ -57,7 +57,16 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
             {
                 if (_isProcess)
                 {
-                    SaveStream(_processStream);
+                    // Save it first to a buffer, then copy it to the destinatination
+                    // process as fast as possible.
+                    const int BufferSize = 512 * 1024; // 512kb
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        SaveStream(memoryStream);
+                        _processStream.Position = 0;
+                        memoryStream.Position = 0;
+                        memoryStream.CopyTo(_processStream, BufferSize);
+                    }
                 }
                 else
                 {
