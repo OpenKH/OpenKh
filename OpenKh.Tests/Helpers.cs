@@ -32,14 +32,17 @@ namespace OpenKh.Tests
             }
         }
 
-        public static void AssertAllBarEntries(string gamePath, Bar.EntryType entryType, Func<Stream, Stream> assertion) =>
+        public static void ForAllBarEntries(string gamePath, Bar.EntryType entryType, Action<Bar.Entry> action) =>
             Directory
                 .GetFiles(gamePath, "*", SearchOption.AllDirectories)
                 .Where(fileName => File.OpenRead(fileName).Using(stream => Bar.IsValid(stream)))
                 .SelectMany(fileName => File.OpenRead(fileName).Using(stream => Bar.Read(stream)))
                 .Where(x => x.Type == entryType && x.Index == 0)
                 .AsParallel()
-                .ForAll(entry => AssertStream(entry.Stream, assertion));
+                .ForAll(action);
+
+        public static void AssertAllBarEntries(string gamePath, Bar.EntryType entryType, Func<Stream, Stream> assertion) =>
+            ForAllBarEntries(gamePath, entryType, entry => AssertStream(entry.Stream, assertion));
 
         public static void UseAsset(string assetName, Action<Stream> action) =>
             File.OpenRead(Path.Combine($"_Assets", assetName)).Using(x => action(x));

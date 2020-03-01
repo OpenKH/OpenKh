@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2MapCollisionEditor.Views.CollisionEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2MapCollisionEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="C1"/>
+        <ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding C1}" SelectedItem="{Binding C1Item}"/>
+        <local:Collision1View Grid.Row="2" Grid.Column="0" DataContext="{Binding C1Item}"/>
+
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="C2"/>
+        <ListBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding C2}" SelectedItem="{Binding C2Item}"/>
+        <local:Collision2View Grid.Row="2" Grid.Column="1" DataContext="{Binding C2Item}"/>
+
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="C3"/>
+        <ListBox Grid.Row="1" Grid.Column="2" ItemsSource="{Binding C3}" SelectedItem="{Binding C3Item}"/>
+        <local:Collision3View Grid.Row="2" Grid.Column="2" DataContext="{Binding C3Item}"/>
+
+        <TextBlock Grid.Row="0" Grid.Column="3" Text="C4"/>
+        <ListBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding C4}" SelectedItem="{Binding C4Item}"/>
+        <local:VertexView Grid.Row="2" Grid.Column="3" DataContext="{Binding C4Item}"/>
+
+        <TextBlock Grid.Row="0" Grid.Column="4" Text="C5"/>
+        <ListBox Grid.Row="1" Grid.Column="4" ItemsSource="{Binding C5}" SelectedItem="{Binding C5Item}"/>
+        <local:Collision5View Grid.Row="2" Grid.Column="4" DataContext="{Binding C5Item}"/>
+
+        <TextBlock Grid.Row="0" Grid.Column="5" Text="C6"/>
+        <ListBox Grid.Row="1" Grid.Column="5" ItemsSource="{Binding C6}" SelectedItem="{Binding C6Item}"/>
+        <local:Collision6View Grid.Row="2" Grid.Column="5" DataContext="{Binding C6Item}"/>
+
+        <TextBlock Grid.Row="0" Grid.Column="6" Text="C7"/>
+        <ListBox Grid.Row="1" Grid.Column="6" ItemsSource="{Binding C7}" SelectedItem="{Binding C7Item}"/>
+        <StackPanel Grid.Row="2" Grid.Column="6" DataContext="{Binding C7Item}">
+            <TextBox Text="{Binding Unknown}"/>
+        </StackPanel>
+
+    </Grid>
+</UserControl>

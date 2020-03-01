@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2MapCollisionEditor.Views.Collision1View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2MapCollisionEditor.Views"
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="100">
+    <controls:TwoColumnsPanel>
+        <TextBlock Text="v00"/>
+        <TextBox Text="{Binding v00}"/>
+        <TextBlock Text="v02"/>
+        <TextBox Text="{Binding v02}"/>
+        <TextBlock Text="v04"/>
+        <TextBox Text="{Binding v04}"/>
+        <TextBlock Text="v06"/>
+        <TextBox Text="{Binding v06}"/>
+        <TextBlock Text="v08"/>
+        <TextBox Text="{Binding v08}"/>
+        <TextBlock Text="v0a"/>
+        <TextBox Text="{Binding v0a}"/>
+        <TextBlock Text="v0c"/>
+        <TextBox Text="{Binding v0c}"/>
+        <TextBlock Text="v0e"/>
+        <TextBox Text="{Binding v0e}"/>
+        <TextBlock Text="v10"/>
+        <TextBox Text="{Binding v10}"/>
+        <TextBlock Text="v12"/>
+        <TextBox Text="{Binding v12}"/>
+        <TextBlock Text="v14"/>
+        <TextBox Text="{Binding v14}"/>
+        <TextBlock Text="v16"/>
+        <TextBox Text="{Binding v16}"/>
+        <TextBlock Text="v18"/>
+        <TextBox Text="{Binding v18}"/>
+        <TextBlock Text="v1a"/>
+        <TextBox Text="{Binding v1a}"/>
+        <TextBlock Text="C2 Idx"/>
+        <TextBox Text="{Binding Collision2Index}"/>
+        <TextBlock Text="v1e"/>
+        <TextBox Text="{Binding v1e}"/>
+    </controls:TwoColumnsPanel>
+</UserControl>

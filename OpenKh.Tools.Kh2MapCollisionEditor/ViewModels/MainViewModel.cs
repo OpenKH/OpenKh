@@ -44,7 +44,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         public RelayCommand ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
 
-        public Coct Coct { get; set; }
+        public CollisionEditorViewModel CollisionEditor { get; } = new CollisionEditorViewModel();
 
         public MainViewModel()
         {
@@ -100,7 +100,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
                 return false;
             }
 
-            Coct = Coct.Read(stream);
+            CollisionEditor.Coct = Coct.Read(stream);
             return true;
         }
 
@@ -110,7 +110,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
             FileName = fileName;
         }
 
-        private void SaveStream(Stream stream) => Coct.Write(stream);
+        private void SaveStream(Stream stream) => CollisionEditor.Coct.Write(stream);
 
         private void OpenProcess()
         {

@@ -5,9 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2MapCollisionEditor.Views"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="350" Width="500">
+        Title="{Binding Title}" Height="500" Width="700">
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open"
@@ -27,5 +30,10 @@
                           Command="{Binding AboutCommand}"/>
             </MenuItem>
         </Menu>
+
+        <local:CollisionEditorView
+            Grid.Row="1"
+            DataContext="{Binding CollisionEditor}"
+            />
     </Grid>
 </Window>

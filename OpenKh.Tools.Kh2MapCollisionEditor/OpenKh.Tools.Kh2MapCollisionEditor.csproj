@@ -59,10 +59,56 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ProcessService.cs" />
+    <Compile Include="ViewModels\CollisionEditorViewModel.cs" />
     <Compile Include="ViewModels\OpenProcessViewModel.cs" />
+    <Compile Include="Views\Collision1View.xaml.cs">
+      <DependentUpon>Collision1View.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Collision2View.xaml.cs">
+      <DependentUpon>Collision2View.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Collision5View.xaml.cs">
+      <DependentUpon>Collision5View.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Collision6View.xaml.cs">
+      <DependentUpon>Collision6View.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CollisionEditorView.xaml.cs">
+      <DependentUpon>CollisionEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Collision3View.xaml.cs">
+      <DependentUpon>Collision3View.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\OpenProcessDialog.xaml.cs">
       <DependentUpon>OpenProcessDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\VertexView.xaml.cs">
+      <DependentUpon>VertexView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Views\Collision1View.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Collision2View.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Collision5View.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Collision6View.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CollisionEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Collision3View.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -77,6 +123,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\OpenProcessDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\VertexView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
