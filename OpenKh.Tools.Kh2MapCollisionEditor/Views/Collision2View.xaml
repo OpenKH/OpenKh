@@ -22,8 +22,8 @@
         <TextBox Text="{Binding v0a, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="C3 Idx"/>
         <TextBox Text="{Binding Collision3Index, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v0e"/>
-        <TextBox Text="{Binding v0e, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="C3 Cnt"/>
+        <TextBox Text="{Binding Collision3Count, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v10"/>
         <TextBox Text="{Binding v10, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v12"/>

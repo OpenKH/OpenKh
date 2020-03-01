@@ -38,7 +38,7 @@
         <TextBox Text="{Binding v1a, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="C2 Idx"/>
         <TextBox Text="{Binding Collision2Index, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v1e"/>
-        <TextBox Text="{Binding v1e, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="C2 Cnt"/>
+        <TextBox Text="{Binding Collision2Count, UpdateSourceTrigger=PropertyChanged}"/>
     </controls:TwoColumnsPanel>
 </UserControl>

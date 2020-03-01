@@ -50,10 +50,10 @@ namespace OpenKh.Kh2
             [Data] public short v18 { get; set; }
             [Data] public short v1a { get; set; }
             [Data] public short Collision2Index { get; set; }
-            [Data] public short v1e { get; set; }
+            [Data] public short Collision2Count { get; set; }
         }
 
-        public class Co2
+        public class CollisionMesh
         {
             [Data] public short v00 { get; set; }
             [Data] public short v02 { get; set; }
@@ -62,7 +62,7 @@ namespace OpenKh.Kh2
             [Data] public short v08 { get; set; }
             [Data] public short v0a { get; set; }
             [Data] public short Collision3Index { get; set; }
-            [Data] public short v0e { get; set; }
+            [Data] public short Collision3Count { get; set; }
             [Data] public short v10 { get; set; }
             [Data] public short v12 { get; set; }
         }
@@ -119,7 +119,7 @@ namespace OpenKh.Kh2
         public int Unknown08 { get; set; }
         public int Unknown0c { get; set; }
         public List<Co1> Collision1 { get; }
-        public List<Co2> Collision2 { get; }
+        public List<CollisionMesh> Collision2 { get; }
         public List<Co3> Collision3 { get; }
         public List<Vector4> CollisionVertices { get; }
         public List<Co5> Collision5 { get; }
@@ -136,7 +136,7 @@ namespace OpenKh.Kh2
             Unknown0c = header.Unknown0c;
 
             Collision1 = ReactCoctEntry<Co1>(stream, header.Entries[1], Col1Size);
-            Collision2 = ReactCoctEntry<Co2>(stream, header.Entries[2], Col2Size);
+            Collision2 = ReactCoctEntry<CollisionMesh>(stream, header.Entries[2], Col2Size);
             Collision3 = ReactCoctEntry<Co3>(stream, header.Entries[3], Col3Size);
             CollisionVertices = ReactCoctEntry<Vector4>(stream, header.Entries[4], Col4Size);
             Collision5 = ReactCoctEntry<Co5>(stream, header.Entries[5], Col5Size);
