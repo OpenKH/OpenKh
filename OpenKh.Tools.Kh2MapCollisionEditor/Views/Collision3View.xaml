@@ -9,20 +9,20 @@
              d:DesignHeight="150" d:DesignWidth="100">
     <controls:TwoColumnsPanel>
         <TextBlock Text="v00"/>
-        <TextBox Text="{Binding v00}"/>
+        <TextBox Text="{Binding v00, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="Vtx1"/>
-        <TextBox Text="{Binding Vertex1}"/>
+        <TextBox Text="{Binding Vertex1, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="Vtx2"/>
-        <TextBox Text="{Binding Vertex2}"/>
+        <TextBox Text="{Binding Vertex2, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="Vtx3"/>
-        <TextBox Text="{Binding Vertex3}"/>
+        <TextBox Text="{Binding Vertex3, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="Vtx4"/>
-        <TextBox Text="{Binding Vertex4}"/>
+        <TextBox Text="{Binding Vertex4, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v0a"/>
-        <TextBox Text="{Binding v0a}"/>
+        <TextBox Text="{Binding v0a, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v0c"/>
-        <TextBox Text="{Binding v0c}"/>
+        <TextBox Text="{Binding v0c, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v0e"/>
-        <TextBox Text="{Binding v0e}"/>
+        <TextBox Text="{Binding v0e, UpdateSourceTrigger=PropertyChanged}"/>
     </controls:TwoColumnsPanel>
 </UserControl>

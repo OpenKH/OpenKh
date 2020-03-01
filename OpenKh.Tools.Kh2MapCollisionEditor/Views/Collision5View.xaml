@@ -9,12 +9,12 @@
              d:DesignHeight="150" d:DesignWidth="100">
     <controls:TwoColumnsPanel>
         <TextBlock Text="X"/>
-        <TextBox Text="{Binding X}"/>
+        <TextBox Text="{Binding X, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="Y"/>
-        <TextBox Text="{Binding Y}"/>
+        <TextBox Text="{Binding Y, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="Z"/>
-        <TextBox Text="{Binding Z}"/>
+        <TextBox Text="{Binding Z, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="D"/>
-        <TextBox Text="{Binding D}"/>
+        <TextBox Text="{Binding D, UpdateSourceTrigger=PropertyChanged}"/>
     </controls:TwoColumnsPanel>
 </UserControl>

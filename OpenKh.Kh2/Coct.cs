@@ -85,6 +85,9 @@ namespace OpenKh.Kh2
             [Data] public float Y { get; set; }
             [Data] public float Z { get; set; }
             [Data] public float W { get; set; }
+
+            public override string ToString() =>
+                $"V({X}, {Y}, {Z}, {W})";
         }
 
         public class Co5
@@ -93,6 +96,9 @@ namespace OpenKh.Kh2
             [Data] public float Y { get; set; }
             [Data] public float Z { get; set; }
             [Data] public float D { get; set; }
+
+            public override string ToString() =>
+                $"N({X}, {Y}, {Z}, {D})";
         }
 
         public class Co6

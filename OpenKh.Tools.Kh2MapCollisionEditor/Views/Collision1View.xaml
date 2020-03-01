@@ -9,36 +9,36 @@
              d:DesignHeight="300" d:DesignWidth="100">
     <controls:TwoColumnsPanel>
         <TextBlock Text="v00"/>
-        <TextBox Text="{Binding v00}"/>
+        <TextBox Text="{Binding v00, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v02"/>
-        <TextBox Text="{Binding v02}"/>
+        <TextBox Text="{Binding v02, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v04"/>
-        <TextBox Text="{Binding v04}"/>
+        <TextBox Text="{Binding v04, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v06"/>
-        <TextBox Text="{Binding v06}"/>
+        <TextBox Text="{Binding v06, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v08"/>
-        <TextBox Text="{Binding v08}"/>
+        <TextBox Text="{Binding v08, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v0a"/>
-        <TextBox Text="{Binding v0a}"/>
+        <TextBox Text="{Binding v0a, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v0c"/>
-        <TextBox Text="{Binding v0c}"/>
+        <TextBox Text="{Binding v0c, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v0e"/>
-        <TextBox Text="{Binding v0e}"/>
+        <TextBox Text="{Binding v0e, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v10"/>
-        <TextBox Text="{Binding v10}"/>
+        <TextBox Text="{Binding v10, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v12"/>
-        <TextBox Text="{Binding v12}"/>
+        <TextBox Text="{Binding v12, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v14"/>
-        <TextBox Text="{Binding v14}"/>
+        <TextBox Text="{Binding v14, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v16"/>
-        <TextBox Text="{Binding v16}"/>
+        <TextBox Text="{Binding v16, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v18"/>
-        <TextBox Text="{Binding v18}"/>
+        <TextBox Text="{Binding v18, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v1a"/>
-        <TextBox Text="{Binding v1a}"/>
+        <TextBox Text="{Binding v1a, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="C2 Idx"/>
-        <TextBox Text="{Binding Collision2Index}"/>
+        <TextBox Text="{Binding Collision2Index, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v1e"/>
-        <TextBox Text="{Binding v1e}"/>
+        <TextBox Text="{Binding v1e, UpdateSourceTrigger=PropertyChanged}"/>
     </controls:TwoColumnsPanel>
 </UserControl>
