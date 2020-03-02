@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2MapCollisionEditor.Views"
              xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="100">
+             d:DesignHeight="160" d:DesignWidth="100">
     <controls:TwoColumnsPanel>
         <TextBlock Text="v00"/>
         <TextBox Text="{Binding v00, UpdateSourceTrigger=PropertyChanged}"/>
@@ -20,10 +20,6 @@
         <TextBox Text="{Binding v08, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v0a"/>
         <TextBox Text="{Binding v0a, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="C3 Idx"/>
-        <TextBox Text="{Binding Collision3Index, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="C3 Cnt"/>
-        <TextBox Text="{Binding Collision3Count, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v10"/>
         <TextBox Text="{Binding v10, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="v12"/>

@@ -26,11 +26,11 @@
         <ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding C1}" SelectedItem="{Binding C1Item}"/>
         <local:Collision1View Grid.Row="2" Grid.Column="0" DataContext="{Binding C1Item}"/>
 
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="C2"/>
+        <CheckBox Grid.Row="0" Grid.Column="1" Content="C2" IsChecked="{Binding AllC2}"/>
         <ListBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding C2}" SelectedItem="{Binding C2Item}"/>
         <local:Collision2View Grid.Row="2" Grid.Column="1" DataContext="{Binding C2Item}"/>
 
-        <TextBlock Grid.Row="0" Grid.Column="2" Text="C3"/>
+        <CheckBox Grid.Row="0" Grid.Column="2" Content="C3" IsChecked="{Binding AllC3}"/>
         <ListBox Grid.Row="1" Grid.Column="2" ItemsSource="{Binding C3}" SelectedItem="{Binding C3Item}"/>
         <local:Collision3View Grid.Row="2" Grid.Column="2" DataContext="{Binding C3Item}"/>
 

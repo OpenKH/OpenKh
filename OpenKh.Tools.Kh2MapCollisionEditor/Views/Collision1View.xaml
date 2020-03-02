@@ -6,39 +6,39 @@
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2MapCollisionEditor.Views"
              xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="100">
+             d:DesignHeight="260" d:DesignWidth="100">
     <controls:TwoColumnsPanel>
-        <TextBlock Text="v00"/>
+        <TextBlock Text="Link0"/>
         <TextBox Text="{Binding v00, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v02"/>
+        <TextBlock Text="Link1"/>
         <TextBox Text="{Binding v02, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v04"/>
+        <TextBlock Text="Link2"/>
         <TextBox Text="{Binding v04, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v06"/>
+        <TextBlock Text="Link3"/>
         <TextBox Text="{Binding v06, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v08"/>
+        <TextBlock Text="Link4"/>
         <TextBox Text="{Binding v08, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v0a"/>
+        <TextBlock Text="Link5"/>
         <TextBox Text="{Binding v0a, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v0c"/>
+        <TextBlock Text="Link6"/>
         <TextBox Text="{Binding v0c, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v0e"/>
+        <TextBlock Text="Link7"/>
         <TextBox Text="{Binding v0e, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v10"/>
+
+        <Separator/>
+        <Separator/>
+
+        <TextBlock Text="BoxA"/>
         <TextBox Text="{Binding v10, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v12"/>
+        <TextBlock Text="BoxB"/>
         <TextBox Text="{Binding v12, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v14"/>
+        <TextBlock Text="BoxC"/>
         <TextBox Text="{Binding v14, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v16"/>
+        <TextBlock Text="BoxD"/>
         <TextBox Text="{Binding v16, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v18"/>
+        <TextBlock Text="BoxE"/>
         <TextBox Text="{Binding v18, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v1a"/>
+        <TextBlock Text="BoxF"/>
         <TextBox Text="{Binding v1a, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="C2 Idx"/>
-        <TextBox Text="{Binding Collision2Index, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="C2 Cnt"/>
-        <TextBox Text="{Binding Collision2Count, UpdateSourceTrigger=PropertyChanged}"/>
     </controls:TwoColumnsPanel>
 </UserControl>
