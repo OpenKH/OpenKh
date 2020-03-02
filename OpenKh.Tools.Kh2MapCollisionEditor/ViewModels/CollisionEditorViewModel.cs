@@ -26,8 +26,8 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         }
 
         public List<Coct.Co1> C1 => _coct?.Collision1;
-        public List<Coct.CollisionMesh> C2 => _coct?.Collision2;
-        public List<Coct.Co3> C3 => _coct?.Collision3;
+        //public List<Coct.CollisionMesh> C2 => _coct?.Collision2;
+        //public List<Coct.Co3> C3 => _coct?.Collision3;
         public List<Coct.Vector4> C4 => _coct?.CollisionVertices;
         public List<Coct.Co5> C5 => _coct?.Collision5;
         public List<Coct.Co6> C6 => _coct?.Collision6;
