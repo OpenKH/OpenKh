@@ -1,188 +1,26 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DBBED77C-66DC-4580-9BFD-CCA2756F526D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>OpenKh.Tools.Kh2MapCollisionEditor</RootNamespace>
-    <AssemblyName>OpenKh.Tools.Kh2MapCollisionEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
+    <TargetFramework>net472</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyTitle>KH2 Collision Editor</AssemblyTitle>
+    <Product>Collision Editor - OpenKH</Product>
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xe.BinaryMapper, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xe.BinaryMapper.1.4.1\lib\net45\Xe.BinaryMapper.dll</HintPath>
-    </Reference>
   </ItemGroup>
+
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="ProcessService.cs" />
-    <Compile Include="ViewModels\CollisionEditorViewModel.cs" />
-    <Compile Include="ViewModels\OpenProcessViewModel.cs" />
-    <Compile Include="Views\Collision1View.xaml.cs">
-      <DependentUpon>Collision1View.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Collision2View.xaml.cs">
-      <DependentUpon>Collision2View.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Collision5View.xaml.cs">
-      <DependentUpon>Collision5View.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Collision6View.xaml.cs">
-      <DependentUpon>Collision6View.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\CollisionEditorView.xaml.cs">
-      <DependentUpon>CollisionEditorView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Collision3View.xaml.cs">
-      <DependentUpon>Collision3View.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\OpenProcessDialog.xaml.cs">
-      <DependentUpon>OpenProcessDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\VertexView.xaml.cs">
-      <DependentUpon>VertexView.xaml</DependentUpon>
-    </Compile>
-    <Page Include="Views\Collision1View.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Collision2View.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Collision5View.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Collision6View.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\CollisionEditorView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Collision3View.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="Views\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Views\OpenProcessDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\VertexView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj">
-      <Project>{ece73c11-c9a0-4132-9ff3-dd52126846e5}</Project>
-      <Name>OpenKh.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj">
-      <Project>{D5B36CD1-5B5D-4CE9-A673-209AD386D68A}</Project>
-      <Name>OpenKh.Kh2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj">
-      <Project>{9B1D6729-66A0-4688-AC16-8C6B741B92A7}</Project>
-      <Name>OpenKh.Tools.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj">
-      <Project>{F6E4E1DF-ACC6-4DDE-912F-C6465CB3D393}</Project>
-      <Name>Xe.Tools.Wpf</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj">
-      <Project>{C02F5C8B-16A0-4591-A65D-8A7E845D5F59}</Project>
-      <Name>Xe.Tools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XeEngine.Tools.Public\Xe\Xe.csproj">
-      <Project>{E3882222-BB73-4FBE-9185-BB5C76E56912}</Project>
-      <Name>Xe</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
