@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.WindowsDX.Core" Version="3.8.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />

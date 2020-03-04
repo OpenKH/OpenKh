@@ -4,13 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2MapCollisionEditor.Views"
+             xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="160"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -52,5 +54,13 @@
             <TextBox Text="{Binding Unknown}"/>
         </StackPanel>
 
+        <controls:DrawPanel
+            Grid.Row="3"
+            Grid.ColumnSpan="7"
+            Drawing="{Binding DrawingContext}"
+            DrawCreate="{Binding DrawCreate}"
+            DrawDestroy="{Binding DrawDestroy}"
+            DrawBegin="{Binding DrawBegin}"
+            DrawEnd="{Binding DrawEnd}"/>
     </Grid>
 </UserControl>

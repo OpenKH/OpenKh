@@ -1,7 +1,10 @@
-﻿using OpenKh.Kh2;
+﻿using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.Linq;
+using Xe.Drawing;
 using Xe.Tools;
+using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
 {
@@ -17,6 +20,13 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         private Coct.Co7 c7Item;
         private bool _allC2;
         private bool _allC3;
+        private readonly CollisionMapDrawHandler _drawHandler;
+
+        public IDrawing DrawingContext { get; }
+        public RelayCommand DrawCreate { get; }
+        public RelayCommand DrawDestroy { get; }
+        public RelayCommand DrawBegin { get; }
+        public RelayCommand DrawEnd { get; }
 
         public Coct Coct
         {
@@ -24,6 +34,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
             set
             {
                 _coct = value;
+                _drawHandler.Coct = value;
                 OnAllPropertiesChanged();
             }
         }
@@ -54,5 +65,18 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
 
         public bool AllC2 { get => _allC2; set { _allC2 = value; OnPropertyChanged(nameof(C2)); } }
         public bool AllC3 { get => _allC3; set { _allC3 = value; OnPropertyChanged(nameof(C3)); } }
+
+        public CollisionEditorViewModel(GraphicsDevice graphicsDevice, IDrawing drawing)
+        {
+            _drawHandler = new CollisionMapDrawHandler();
+            _drawHandler.Initialize(graphicsDevice);
+
+            DrawingContext = drawing;
+
+            DrawCreate = new RelayCommand(_ => { });
+            DrawDestroy = new RelayCommand(_ => _drawHandler.Destroy());
+            DrawBegin = new RelayCommand(_ => _drawHandler.DrawBegin());
+            DrawEnd = new RelayCommand(_ => _drawHandler.DrawEnd());
+        }
     }
 }

@@ -1,12 +1,13 @@
-﻿using OpenKh.Common;
+﻿using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Kh2MapCollisionEditor.Views;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using Xe.Drawing;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
@@ -44,10 +45,12 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         public RelayCommand ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
 
-        public CollisionEditorViewModel CollisionEditor { get; } = new CollisionEditorViewModel();
+        public CollisionEditorViewModel CollisionEditor { get; }
 
-        public MainViewModel()
+        public MainViewModel(GraphicsDevice graphicsDevice, IDrawing drawing)
         {
+            CollisionEditor = new CollisionEditorViewModel(graphicsDevice, drawing);
+
             OpenCommand = new RelayCommand(x =>
                 FileDialog.OnOpen(fileName => OpenFile(fileName), CtdFilter), x => true);
 
@@ -89,6 +92,8 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
             {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
+
+            OpenFile(@"D:\Hacking\KH2\reseach\map\tt00.coct");
         }
 
         private void OpenFile(string fileName) =>
