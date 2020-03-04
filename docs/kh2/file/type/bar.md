@@ -104,7 +104,7 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 17 | Animation Binary Archive (ANB) | MSET
 | 18 | PAX Effect | A.FM - MAG - MDLX
 | 19 | Map Collision Data | MAP 
-| 20 | Binary Archive | MSET - limit/*
+| 20 | Moveset | MSET - limit/*
 | 21 | Unknown | MAP
 | 22 | Animation Loader | ARD - A.FM - limit/*
 | 23 | Model Collision | MDLX
