@@ -42,7 +42,8 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public uint Unknown48 { get => Objentry.Unknown48; set => Objentry.Unknown48 = value; }
             public ushort NeoStatus { get => Objentry.NeoStatus; set => Objentry.NeoStatus = value; }
             public ushort NeoMoveset { get => Objentry.NeoMoveset; set => Objentry.NeoMoveset = value; }
-            public uint Unknown50 { get => Objentry.Unknown50; set => Objentry.Unknown50 = value; }
+            public ushort Unknown50 { get => Objentry.Unknown50; set => Objentry.Unknown50 = value; }
+            public short Weight { get => Objentry.Weight; set => Objentry.Weight = value; }
             public byte SpawnLimiter { get => Objentry.SpawnLimiter; set => Objentry.SpawnLimiter = value; }
             public byte Unknown55 { get => Objentry.Unknown55; set => Objentry.Unknown55 = value; }
             public byte Unknown56 { get => Objentry.Unknown56; set => Objentry.Unknown56 = value; }
@@ -142,6 +143,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
                 NeoStatus = source.NeoStatus,
                 NeoMoveset = source.NeoMoveset,
                 Unknown50 = source.Unknown50,
+                Weight = source.Weight,
                 SpawnLimiter = source.SpawnLimiter,
                 Unknown55 = source.Unknown55,
                 Unknown56 = source.Unknown56,

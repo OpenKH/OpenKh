@@ -45,7 +45,8 @@ namespace OpenKh.Kh2
         [Data] public uint Unknown48 { get; set; }
         [Data] public ushort NeoStatus { get; set; }
         [Data] public ushort NeoMoveset { get; set; }
-        [Data] public uint Unknown50 { get; set; }
+        [Data] public ushort Unknown50 { get; set; }
+        [Data] public short Weight { get; set; }
         [Data] public byte SpawnLimiter { get; set; }
         [Data] public byte Unknown55 { get; set; }
         [Data] public byte Unknown56{ get; set; }

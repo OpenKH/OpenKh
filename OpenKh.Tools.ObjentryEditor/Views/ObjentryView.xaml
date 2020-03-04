@@ -8,7 +8,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
              xmlns:bhv="clr-namespace:OpenKh.Tools.ObjentryEditor.Behavior"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="500" d:DesignWidth="800">
     <UserControl.Resources>
         <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
     </UserControl.Resources>
@@ -104,6 +104,9 @@
 
                 <TextBlock Text="Unknown50" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding SelectedItem.Unknown50, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Weight" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Weight, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Spawn Limiter" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding SelectedItem.SpawnLimiter, UpdateSourceTrigger=PropertyChanged}"/>
