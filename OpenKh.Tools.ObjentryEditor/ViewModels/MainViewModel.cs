@@ -98,8 +98,13 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
         public void SaveFile(string previousFileName, string fileName)
         {
+            var search = Objentry.SearchTerm;
+            Objentry.SearchTerm = string.Empty;
+
             using (var f = File.Create(fileName))
                 Kh2.Objentry.Write(f, Objentry.AsObjEntries());
+
+            Objentry.SearchTerm = search;
         }
     }
 }
