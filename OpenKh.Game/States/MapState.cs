@@ -1,14 +1,11 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenKh.Common;
 using OpenKh.Engine.Parsers;
 using OpenKh.Game.Extensions;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
 using OpenKh.Kh2;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace OpenKh.Game.States
@@ -20,24 +17,8 @@ namespace OpenKh.Game.States
         private InputManager _input;
         private List<Mesh> _models = new List<Mesh>();
         private BasicEffect _effect;
-        private double fieldOfView;
-        private Vector3 _cameraYpr;
+        private Camera _camera;
         private const int _languageId = 0;
-
-        public double FieldOfView { get => fieldOfView; set => fieldOfView = Math.Max(0, Math.Min(Math.PI, value)); }
-        public Vector3 CameraPosition { get; set; }
-        public Vector3 CameraLookAt { get; set; }
-        public Vector3 CameraRotationYawPitchRoll
-        {
-            get => _cameraYpr;
-            set
-            {
-                _cameraYpr = value;
-                var matrix = Matrix.CreateFromYawPitchRoll(value.X / 180.0f * 3.14159f, value.Y / 180.0f * 3.14159f, value.Z / 180.0f * 3.14159f);
-                CameraLookAt = Vector3.Transform(new Vector3(1, 0, 0), matrix);
-            }
-        }
-        public Vector3 CameraUp { get; set; }
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -45,12 +26,11 @@ namespace OpenKh.Game.States
             _graphics = initDesc.GraphicsDevice;
             _input = initDesc.InputManager;
             _effect = new BasicEffect(_graphics.GraphicsDevice);
-
-            FieldOfView = MathHelper.PiOver4 * 2;
-            CameraPosition = new Vector3(0, 500, 0);
-            CameraLookAt = new Vector3(0, 0, 0);
-            CameraUp = Vector3.UnitY;
-            CameraRotationYawPitchRoll = new Vector3(-180, 0, 10);
+            _camera = new Camera()
+            {
+                CameraPosition = new Vector3(0, 500, 0),
+                CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
+            };
 
             _graphics.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
 
@@ -66,25 +46,22 @@ namespace OpenKh.Game.States
             const double Speed = 100.0;
             var speed = (float)(deltaTimes.DeltaTime * Speed);
 
-            if (_input.W) CameraPosition += Vector3.Multiply(CameraLookAt, speed * 5);
-            if (_input.S) CameraPosition -= Vector3.Multiply(CameraLookAt, speed * 100);
+            if (_input.W) _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAt, speed * 5);
+            if (_input.S) _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAt, speed * 5);
 
-            if (_input.Up) CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
-            if (_input.Down) CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
-            if (_input.Left) CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
-            if (_input.Right) CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
+            if (_input.Up) _camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
+            if (_input.Down) _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
+            if (_input.Left) _camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
+            if (_input.Right) _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
         }
 
         public void Draw(DeltaTimes deltaTimes)
         {
-            var aspectRatio = _graphics.PreferredBackBufferWidth / (float)_graphics.PreferredBackBufferHeight;
-            var nearClipPlane = 1;
-            var farClipPlane = int.MaxValue;
+            _camera.AspectRatio = _graphics.PreferredBackBufferWidth / (float)_graphics.PreferredBackBufferHeight;
 
             _effect.VertexColorEnabled = true;
-            _effect.Projection = Matrix.CreatePerspectiveFieldOfView(
-                (float)fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
-            _effect.World = Matrix.CreateLookAt(CameraPosition, CameraPosition + CameraLookAt, CameraUp);
+            _effect.Projection = _camera.Projection;
+            _effect.World = _camera.World;
 
             _effect.GraphicsDevice.RasterizerState = new RasterizerState()
             {
