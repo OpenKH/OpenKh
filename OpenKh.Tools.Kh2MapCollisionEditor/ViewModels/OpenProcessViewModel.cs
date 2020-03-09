@@ -1,5 +1,6 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.Common;
+using OpenKh.Tools.Kh2MapCollisionEditor.Services;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;

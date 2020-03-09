@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using Xe.IO;
 
-namespace OpenKh.Tools.Kh2MapCollisionEditor
+namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
 {
     public static class ProcessService
     {

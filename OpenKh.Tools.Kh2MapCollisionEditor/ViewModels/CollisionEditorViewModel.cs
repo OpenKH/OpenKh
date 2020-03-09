@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Kh2;
+using OpenKh.Tools.Kh2MapCollisionEditor.Services;
 using System.Collections.Generic;
 using System.Linq;
 using Xe.Drawing;

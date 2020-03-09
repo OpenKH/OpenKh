@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Tools.Kh2MapCollisionEditor.Services;
 using OpenKh.Tools.Kh2MapCollisionEditor.ViewModels;
 using System;
 using System.Windows;

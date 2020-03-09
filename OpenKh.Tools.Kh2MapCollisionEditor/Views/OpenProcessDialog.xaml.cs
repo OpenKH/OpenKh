@@ -1,4 +1,5 @@
 ﻿using OpenKh.Tools.Common;
+using OpenKh.Tools.Kh2MapCollisionEditor.Services;
 using OpenKh.Tools.Kh2MapCollisionEditor.ViewModels;
 using System.IO;
 using System.Windows;

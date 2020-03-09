@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using Xe.Drawing;
 
-namespace OpenKh.Tools.Kh2MapCollisionEditor
+namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
 {
     public class MonoDrawing : IDrawing
     {
