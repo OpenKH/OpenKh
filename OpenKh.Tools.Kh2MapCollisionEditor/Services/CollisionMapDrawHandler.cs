@@ -1,10 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Kh2;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xe.Drawing;
 
 namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
 {
@@ -26,24 +24,9 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
         private BasicEffect _effect;
         private int _width;
         private int _height;
-        private double _fieldOfView;
-        private Vector3 _cameraYpr;
 
         public Coct Coct { get; set; }
-        public double FieldOfView { get => _fieldOfView; set => _fieldOfView = Math.Max(0, Math.Min(Math.PI, value)); }
-        public Vector3 CameraPosition { get; set; }
-        public Vector3 CameraLookAt { get; set; }
-        public Vector3 CameraRotationYawPitchRoll
-        {
-            get => _cameraYpr;
-            set
-            {
-                _cameraYpr = value;
-                var matrix = Matrix.CreateFromYawPitchRoll(value.X / 180.0f * 3.14159f, value.Y / 180.0f * 3.14159f, value.Z / 180.0f * 3.14159f);
-                CameraLookAt = Vector3.Transform(new Vector3(1, 0, 0), matrix);
-            }
-        }
-        public Vector3 CameraUp { get; set; }
+        public Camera Camera { get; private set; }
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
@@ -53,12 +36,6 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
                 CullMode = CullMode.CullClockwiseFace
             };
 
-            FieldOfView = MathHelper.PiOver4 * 2;
-            CameraPosition = new Vector3(0, -500, 0);
-            CameraLookAt = new Vector3(0, 0, 0);
-            CameraUp = Vector3.UnitY;
-            CameraRotationYawPitchRoll = new Vector3(-180, 0, 10);
-
             _effect = new BasicEffect(_graphicsDevice)
             {
                 VertexColorEnabled = true,
@@ -66,6 +43,11 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
                 FogEnabled = true,
                 FogEnd = 1400.0f,
                 FogStart = 0,
+            };
+
+            Camera = new Camera()
+            {
+                CameraPosition = new Vector3(0, -500, 0)
             };
         }
 
@@ -83,13 +65,12 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
 
             const float speed = 1.0f;
             var aspectRatio = _width / (float)_height;
-            var nearClipPlane = 1;
-            var farClipPlane = int.MaxValue;
+            Camera.AspectRatio = aspectRatio;
 
-            CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
-            _effect.Projection = Matrix.CreatePerspectiveFieldOfView(
-                (float)FieldOfView, aspectRatio, nearClipPlane, farClipPlane);
-            _effect.World = Matrix.CreateLookAt(CameraPosition, CameraPosition + CameraLookAt, CameraUp);
+            Camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
+
+            _effect.Projection = Camera.Projection;
+            _effect.World = Camera.World;
 
             foreach (var pass in _effect.CurrentTechnique.Passes)
             {
