@@ -92,8 +92,6 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
             {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
-
-            OpenFile(@"D:\Hacking\KH2\reseach\map\tt00.coct");
         }
 
         private void OpenFile(string fileName) =>
