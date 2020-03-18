@@ -26,7 +26,7 @@ namespace OpenKh.Kh2
             E_WEAPON = 0x6,
             [Description("Save Point")]
             SP = 0x7,
-            [Description("Neutral (attackable)")]
+            [Description("Neutral")]
             F_OBJ = 0x8,
             [Description("Out of Party Member")]
             BTLNPC = 0x9,
