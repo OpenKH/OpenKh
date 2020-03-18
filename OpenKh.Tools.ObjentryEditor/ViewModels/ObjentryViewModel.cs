@@ -1,8 +1,8 @@
 using OpenKh.Kh2;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Models;
@@ -138,30 +138,14 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
         private Objentry Clone(Objentry source)
         {
-            return new Objentry()
+            var newObj = Activator.CreateInstance<Objentry>();
+            foreach(var field in newObj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                ObjectId = GetObjectIdForNewEntry(),
-                Unknown02 = source.Unknown02,
-                ObjectType = source.ObjectType,
-                Unknown05 = source.Unknown05,
-                Unknown06 = source.Unknown06,
-                WeaponJoint = source.WeaponJoint,
-                ModelName = source.ModelName,
-                AnimationName = source.AnimationName,
-                Unknown48 = source.Unknown48,
-                NeoStatus = source.NeoStatus,
-                NeoMoveset = source.NeoMoveset,
-                Unknown50 = source.Unknown50,
-                Weight = source.Weight,
-                SpawnLimiter = source.SpawnLimiter,
-                Unknown55 = source.Unknown55,
-                Unknown56 = source.Unknown56,
-                Unknown57 = source.Unknown57,
-                SpawnObject1 = source.SpawnObject1,
-                SpawnObject2 = source.SpawnObject2,
-                SpawnObject3 = source.SpawnObject3,
-                Unknown5e = source.Unknown5e
-            };
+                field.SetValue(newObj, field.GetValue(source));
+            }
+            
+            newObj.ObjectId = GetObjectIdForNewEntry();
+            return newObj;
         }
 
         private ushort GetObjectIdForNewEntry()
