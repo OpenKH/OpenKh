@@ -78,7 +78,7 @@ namespace OpenKh.Kh2
         [Data] public byte SpawnLimiter { get; set; }
         [Data] public byte Unknown55 { get; set; } // padding?
         [Data] public byte Unknown56{ get; set; }
-        [Data] public byte Unknown57{ get; set; } //Unknown 57 on the other hand, I was sorta right about. It controls the inventory and and command menu options that the Object has access to.Haven't dug through the files to figure out what it's pulling from yet though, but it basically works like this:
+        [Data] public byte CommandMenuOptions { get; set; }
         [Data] public ushort SpawnObject1 { get; set; }
         [Data] public ushort SpawnObject2 { get; set; }
         [Data] public ushort SpawnObject3 { get; set; }

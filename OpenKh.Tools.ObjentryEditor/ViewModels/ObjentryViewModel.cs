@@ -56,7 +56,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public byte SpawnLimiter { get => Objentry.SpawnLimiter; set => Objentry.SpawnLimiter = value; }
             public byte Unknown55 { get => Objentry.Unknown55; set => Objentry.Unknown55 = value; }
             public byte Unknown56 { get => Objentry.Unknown56; set => Objentry.Unknown56 = value; }
-            public byte Unknown57 { get => Objentry.Unknown57; set => Objentry.Unknown57 = value; }
+            public byte CommandMenuOptions { get => Objentry.CommandMenuOptions; set => Objentry.CommandMenuOptions = value; }
             public ushort SpawnObject1 { get => Objentry.SpawnObject1; set => Objentry.SpawnObject1 = value; }
             public ushort SpawnObject2 { get => Objentry.SpawnObject2; set => Objentry.SpawnObject2 = value; }
             public ushort SpawnObject3 { get => Objentry.SpawnObject3; set => Objentry.SpawnObject3 = value; }

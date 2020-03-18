@@ -129,8 +129,8 @@
                 <TextBlock Text="Unknown56" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding SelectedItem.Unknown56, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown57" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding SelectedItem.Unknown57, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Command Menu" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.CommandMenuOptions, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Spawn Object 1" Margin="{StaticResource LabelMargin}"/>
                 <ComboBox ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
