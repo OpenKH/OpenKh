@@ -7,10 +7,12 @@
              xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
              xmlns:bhv="clr-namespace:OpenKh.Tools.ObjentryEditor.Behavior"
+             xmlns:conv="clr-namespace:OpenKh.Tools.ObjentryEditor.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
     <UserControl.Resources>
         <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+        <conv:EnumDescriptionConverter x:Key="EnumDescConverter" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -76,7 +78,14 @@
                 <TextBox Text="{Binding SelectedItem.Unknown02, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Type" Margin="{StaticResource LabelMargin}"/>
-                <ComboBox ItemsSource="{Binding ObjEntryTypes}" SelectedValue="{Binding SelectedItem.ObjectType}" DisplayMemberPath="Name" SelectedValuePath="Value"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" ItemsSource="{Binding ObjEntryTypes}" SelectedValue="{Binding SelectedItem.ObjectType}" DisplayMemberPath="Name" SelectedValuePath="Value" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding Path=SelectedItem.ObjectType, Converter={StaticResource EnumDescConverter}, UpdateSourceTrigger=PropertyChanged}"/>
+                </Grid>
 
                 <TextBlock Text="Unknown05" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding SelectedItem.Unknown05, UpdateSourceTrigger=PropertyChanged}"/>

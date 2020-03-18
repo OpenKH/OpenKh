@@ -33,7 +33,15 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             }
 
             public ushort Unknown02 { get => Objentry.Unknown02; set => Objentry.Unknown02 = value; }
-            public Objentry.Type ObjectType { get => Objentry.ObjectType; set => Objentry.ObjectType = value; }
+            public Objentry.Type ObjectType 
+            { 
+                get => Objentry.ObjectType; 
+                set
+                {
+                    Objentry.ObjectType = value;
+                    OnPropertyChanged(nameof(ObjectType));
+                } 
+            }
             public byte Unknown05 { get => Objentry.Unknown05; set => Objentry.Unknown05 = value; }
             public byte Unknown06 { get => Objentry.Unknown06; set => Objentry.Unknown06 = value; }
             public byte WeaponJoint { get => Objentry.WeaponJoint; set => Objentry.WeaponJoint = value; }
