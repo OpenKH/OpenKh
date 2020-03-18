@@ -105,6 +105,9 @@
                 <TextBlock Text="Unknown48" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding SelectedItem.Unknown48, UpdateSourceTrigger=PropertyChanged}"/>
 
+                <TextBlock Text="Unknown4a" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding SelectedItem.Unknown4a, UpdateSourceTrigger=PropertyChanged}"/>
+
                 <TextBlock Text="Neo Status" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding SelectedItem.NeoStatus, UpdateSourceTrigger=PropertyChanged}"/>
 

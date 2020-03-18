@@ -69,7 +69,8 @@ namespace OpenKh.Kh2
         [Data] public byte WeaponJoint { get; set; }
         [Data(Count = 32)] public string ModelName { get; set; }
         [Data(Count = 32)] public string AnimationName { get; set; }
-        [Data] public uint Unknown48 { get; set; }
+        [Data] public ushort Unknown48 { get; set; } //z_un_00169398 (00169840)
+        [Data] public ushort Unknown4a { get; set; }
         [Data] public ushort NeoStatus { get; set; }
         [Data] public ushort NeoMoveset { get; set; }
         [Data] public ushort Unknown50 { get; set; } // some kind of floating point calculation? z_un_0016a0a0

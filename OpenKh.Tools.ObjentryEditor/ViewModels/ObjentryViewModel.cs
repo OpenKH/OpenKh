@@ -47,7 +47,8 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public byte WeaponJoint { get => Objentry.WeaponJoint; set => Objentry.WeaponJoint = value; }
             public string ModelName { get => Objentry.ModelName; set => Objentry.ModelName = value; }
             public string AnimationName { get => Objentry.AnimationName; set => Objentry.AnimationName = value; }
-            public uint Unknown48 { get => Objentry.Unknown48; set => Objentry.Unknown48 = value; }
+            public ushort Unknown48 { get => Objentry.Unknown48; set => Objentry.Unknown48 = value; }
+            public ushort Unknown4a { get => Objentry.Unknown4a; set => Objentry.Unknown4a = value; }
             public ushort NeoStatus { get => Objentry.NeoStatus; set => Objentry.NeoStatus = value; }
             public ushort NeoMoveset { get => Objentry.NeoMoveset; set => Objentry.NeoMoveset = value; }
             public ushort Unknown50 { get => Objentry.Unknown50; set => Objentry.Unknown50 = value; }
