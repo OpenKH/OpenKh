@@ -35,9 +35,9 @@ namespace OpenKh.Kh2
             Unknown3 = 0x17, //pots in hercules world?
         }
         [Data] public ushort ObjectId { get; set; }
-        [Data] public ushort Unknown02 { get; set; }
+        [Data] public ushort Unknown02 { get; set; } // has something to do with if the obj is rendered or not, NO: ObjectId is actually an uint, but it's bitshifted afterwards?! see z_un_003216b8
         [Data] public Type ObjectType { get; set; }
-        [Data] public byte Unknown05{ get; set; }
+        [Data] public byte Unknown05{ get; set; } //padding? isn't used ingame
         [Data] public byte Unknown06 { get; set; }
         [Data] public byte WeaponJoint { get; set; }
         [Data(Count = 32)] public string ModelName { get; set; }
@@ -45,10 +45,10 @@ namespace OpenKh.Kh2
         [Data] public uint Unknown48 { get; set; }
         [Data] public ushort NeoStatus { get; set; }
         [Data] public ushort NeoMoveset { get; set; }
-        [Data] public ushort Unknown50 { get; set; }
+        [Data] public ushort Unknown50 { get; set; } // some kind of floating point calculation? z_un_0016a0a0
         [Data] public short Weight { get; set; }
         [Data] public byte SpawnLimiter { get; set; }
-        [Data] public byte Unknown55 { get; set; }
+        [Data] public byte Unknown55 { get; set; } // padding?
         [Data] public byte Unknown56{ get; set; }
         [Data] public byte Unknown57{ get; set; } //Unknown 57 on the other hand, I was sorta right about. It controls the inventory and and command menu options that the Object has access to.Haven't dug through the files to figure out what it's pulling from yet though, but it basically works like this:
         [Data] public ushort SpawnObject1 { get; set; }
