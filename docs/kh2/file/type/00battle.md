@@ -40,7 +40,7 @@ Contains the level-up table for every playable character.
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00 	 | int32 | Unknown
+| 00 	 | int32 | Number of 'LevelUp' entries
 | 04 	 | LevelUp[0..99] | Holds informations for the level up
 
 ### Lvup 'LevelUp' Entry
@@ -202,6 +202,15 @@ The ID of the entry is assigned in the AI of the object.
 
 Contains reward items (GET! BONUS).
 The ID is assigned in the msn file (first sub file, offset 0xD).
+
+### Bons header
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 00 	 | int32 | Magic number
+| 04 	 | int32 | Number of 'Bons' entries
+
+### Bons entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
