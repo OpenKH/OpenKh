@@ -1,6 +1,10 @@
+using OpenKh.Common;
 using OpenKh.Kh2;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xunit;
+using Xunit.Sdk;
 
 namespace OpenKh.Tests.kh2
 {
@@ -93,5 +97,94 @@ namespace OpenKh.Tests.kh2
 
                 Assert.Equal(expected, actual);
             });
+
+        [Fact]
+        public void WriteOptimized()
+        {
+            var stream = new MemoryStream();
+            var msgSource = new List<Msg.Entry>()
+            {
+                new Msg.Entry
+                {
+                    Id = 100,
+                    Data = new byte[] { 0x22, 0x23, 0x24, 0x00 } // this will be optimized with ID 101
+                },
+                new Msg.Entry
+                {
+                    Id = 101,
+                    Data = new byte[] { 0x20, 0x21, 0x22, 0x23, 0x24, 0x00 }
+                },
+                new Msg.Entry
+                {
+                    Id = 102,
+                    Data = new byte[] { 0x23, 0x24, 0x25, 0x00 }
+                },
+            };
+            Msg.WriteOptimized(stream, msgSource);
+
+            SkipHeader(stream);
+            AssertMsgLbaEntry(stream, 100, 34);
+            AssertMsgLbaEntry(stream, 101, 32);
+            AssertMsgLbaEntry(stream, 102, 38);
+
+            stream.Position = 0;
+            var msg = Msg.Read(stream);
+            Assert.Equal(msgSource[0].Data, msg[0].Data);
+            Assert.Equal(msgSource[1].Data, msg[1].Data);
+            Assert.Equal(msgSource[2].Data, msg[2].Data);
+        }
+
+        [Fact]
+        public void WriteOptimizedSecondScenario()
+        {
+            var stream = new MemoryStream();
+            var msgSource = new List<Msg.Entry>()
+            {
+                new Msg.Entry
+                {
+                    Id = 100,
+                    Data = new byte[] { 0x22, 0x23, 0x00 }
+                },
+                new Msg.Entry
+                {
+                    Id = 101,
+                    Data = new byte[] { 0x22, 0x23, 0x00 }
+                },
+                new Msg.Entry
+                {
+                    Id = 102,
+                    Data = new byte[] { 0x22, 0x23, 0x00 }
+                },
+            };
+            Msg.WriteOptimized(stream, msgSource);
+
+            SkipHeader(stream);
+            AssertMsgLbaEntry(stream, 100, 32);
+            AssertMsgLbaEntry(stream, 101, 32);
+            AssertMsgLbaEntry(stream, 102, 32);
+
+            stream.Position = 0;
+            var msg = Msg.Read(stream);
+            Assert.Equal(msgSource[0].Data, msg[0].Data);
+            Assert.Equal(msgSource[1].Data, msg[1].Data);
+            Assert.Equal(msgSource[2].Data, msg[2].Data);
+        }
+
+        private void SkipHeader(Stream stream)
+        {
+            stream.Position = 8;
+        }
+
+        private void AssertMsgLbaEntry(Stream stream, int expectedId, int expectedPosition)
+        {
+            var actualId = stream.ReadInt32();
+            var actualOffset = stream.ReadInt32();
+
+            if (expectedId != actualId)
+                throw new EqualException(expectedId, actualId);
+
+            if (expectedPosition != actualOffset)
+                throw new EqualException(expectedPosition, actualOffset);
+        }
     }
 }
