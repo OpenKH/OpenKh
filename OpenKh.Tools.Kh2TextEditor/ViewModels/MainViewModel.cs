@@ -64,6 +64,8 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
         public TextEditorViewModel TextEditor { get; private set; }
 
+        public bool OptimizeOnSave { get; set; }
+
         public FontType FontType
         {
             get => _fontType;
@@ -414,8 +416,14 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             return TryReadMsg(msgEntry.Stream);
         }
 
-        private void WriteMsg(Stream stream) =>
-            Msg.Write(stream, TextEditor.MessageEntries);
+        private void WriteMsg(Stream stream)
+        {
+            if (OptimizeOnSave)
+                Msg.WriteOptimized(stream, TextEditor.MessageEntries);
+            else
+                Msg.Write(stream, TextEditor.MessageEntries);
+            stream.SetLength(stream.Position);
+        }
 
         private void WriteBar(List<Bar.Entry> entries, Stream stream)
         {

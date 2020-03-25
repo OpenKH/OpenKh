@@ -25,6 +25,8 @@
                           Command="{Binding SaveCommand}"/>
                 <MenuItem Header="Save message _as..."
                           Command="{Binding SaveAsCommand}"/>
+                <CheckBox Content="Optimize on save"
+                          IsChecked="{Binding OptimizeOnSave}"/>
                 <Separator/>
                 <MenuItem Header="_Export message as text..."
                           Command="{Binding ExportMessageAsCommand}"/>
