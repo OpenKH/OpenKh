@@ -5,7 +5,6 @@
     <AssemblyTitle>LevelUp editor</AssemblyTitle>
     <Company>OpenKH</Company>
     <Product>LevelUp editor - OpenKH</Product>
-    <Copyright>Copyright ©  2019</Copyright>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
   <ItemGroup>
