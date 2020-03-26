@@ -106,5 +106,6 @@ steps:
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
     artifactName: openkh
+    publishLocation: 'Container'
     parallel: true
     parallelCount: 8
