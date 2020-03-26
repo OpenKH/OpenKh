@@ -23,7 +23,7 @@ steps:
 - checkout: self
   submodules: true | recursive
 
-- script: git submodule update --init --recursive
+- script: git submodule update --init --recursive --depth 1
   displayName: 'Download dependencies'
 
 - task: NuGetToolInstaller@0
