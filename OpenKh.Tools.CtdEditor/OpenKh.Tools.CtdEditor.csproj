@@ -9,7 +9,6 @@
     <Product>CTD editor - OpenKH</Product>
     <Description>https://github.com/Xeeynamo/OpenKh</Description>
     <Copyright>Copyright ©  2019</Copyright>
-    <OutputPath>..\bin\$(Configuration)\</OutputPath>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
   <ItemGroup>
