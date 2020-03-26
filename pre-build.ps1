@@ -72,9 +72,9 @@ ForEach-Object {
     Set-NodeValue $project "FileVersion" $actualVersion
     Set-NodeValue $project "Version" $informativeVersion
     Set-NodeValue $project "InformationalVersion" $informativeVersion
-    Set-NodeValue $project "Authors" "OpenKh contributors"
-    Set-NodeValue $project "Company" "OpenKh"
-    Set-NodeValue $project "Copyright" "Copyright (C) OpenKh $($date.Year)"
+    Set-NodeValue $project "Authors" "OpenKH contributors"
+    Set-NodeValue $project "Company" "OpenKH"
+    Set-NodeValue $project "Copyright" "Copyright (C) OpenKH $($date.Year)"
     Set-NodeValue $project "Description" "https://github.com/Xeeynamo/OpenKh"
 
     $document = $project.Node.OwnerDocument
