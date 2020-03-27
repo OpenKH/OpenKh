@@ -8,7 +8,6 @@
     <Company>OpenKH</Company>
     <Product>Image viewer - OpenKH</Product>
     <Description>https://github.com/Xeeynamo/OpenKh</Description>
-    <Copyright>Copyright ©  2019</Copyright>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
   <ItemGroup>

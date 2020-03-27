@@ -8,14 +8,14 @@ function Log([string]$text) {
 # set environment variables so that this script can be debugged
 if (-not ($Env:BUILD_SOURCESDIRECTORY -and $Env:BUILD_BUILDNUMBER)) {
     Write-Warning "Executing locally, setting dummy values"
+
     $Env:BUILD_SOURCESDIRECTORY = (Get-Location).Path
-    $Env:BUILD_BUILDNUMBER = 222
     $Env:BUILD_SOURCEBRANCHNAME = "local"
 }
 
 # Make sure path to source code directory is available
 if (-not $Env:BUILD_SOURCESDIRECTORY) {
-    Write-Error ("BUILD_SOURCESDIRECTORY environment variable is missing.")
+    Write-Error "BUILD_SOURCESDIRECTORY environment variable is missing."
     exit 1
 }
 elseif (-not (Test-Path $Env:BUILD_SOURCESDIRECTORY)) {
@@ -26,11 +26,13 @@ Log "BUILD_SOURCESDIRECTORY: $Env:BUILD_SOURCESDIRECTORY"
 
 # Make sure there is a build number
 if (-not $Env:BUILD_BUILDNUMBER) {
-    Write-Error ("BUILD_BUILDNUMBER environment variable is missing.")
-    exit 1
+    Write-Warning "BUILD_BUILDNUMBER environment variable is missing. Using default value."
+    
+    $dateNow = Get-Date
+    $Env:BUILD_BUILDNUMBER = "{0:D04}{1:D02}{2:D02}.0" -f $dateNow.Year, $dateNow.Month, $dateNow.Day
 }
-Log "BUILD_BUILDNUMBER: $Env:BUILD_BUILDNUMBER"
 
+Log "BUILD_BUILDNUMBER: $Env:BUILD_BUILDNUMBER"
 Log "BUILD_SOURCEBRANCHNAME: $Env:BUILD_SOURCEBRANCHNAME"
 
 $sourcesDirectory = $env:BUILD_SOURCESDIRECTORY
@@ -61,7 +63,8 @@ $actualVersion = "$($majorVersion).$($minorVersion).$($build).$($revision)"
 $informativeVersion = "$($actualVersion)-$($Env:BUILD_SOURCEBRANCHNAME)"
 
 Get-ChildItem -Path $sourcesDirectory -Filter "*.csproj" -Recurse -File |
-Where-Object { $_.FullName -like "*OpenKh*" } |
+Where-Object { $_.FullName -like "*OpenKh.*" } |
+Where-Object { $_.FullName -notlike "*OpenKh.*Test*" } |
 ForEach-Object {
     Log "Patching $($_.FullName)"
 
@@ -72,9 +75,9 @@ ForEach-Object {
     Set-NodeValue $project "FileVersion" $actualVersion
     Set-NodeValue $project "Version" $informativeVersion
     Set-NodeValue $project "InformationalVersion" $informativeVersion
-    Set-NodeValue $project "Authors" "OpenKh contributors"
-    Set-NodeValue $project "Company" "OpenKh"
-    Set-NodeValue $project "Copyright" "Copyright (C) OpenKh $($date.Year)"
+    Set-NodeValue $project "Authors" "OpenKH contributors"
+    Set-NodeValue $project "Company" "OpenKH"
+    Set-NodeValue $project "Copyright" "Copyright (C) OpenKH $($date.Year)"
     Set-NodeValue $project "Description" "https://github.com/Xeeynamo/OpenKh"
 
     $document = $project.Node.OwnerDocument

@@ -5,7 +5,6 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>ConsoleApp1</AssemblyTitle>
     <Product>ConsoleApp1</Product>
-    <Copyright>Copyright ©  2018</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.*" />
