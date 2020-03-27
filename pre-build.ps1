@@ -64,6 +64,7 @@ $informativeVersion = "$($actualVersion)-$($Env:BUILD_SOURCEBRANCHNAME)"
 
 Get-ChildItem -Path $sourcesDirectory -Filter "*.csproj" -Recurse -File |
 Where-Object { $_.FullName -like "*OpenKh.*" } |
+Where-Object { $_.FullName -notlike "*OpenKh.*Test*" } |
 ForEach-Object {
     Log "Patching $($_.FullName)"
 
