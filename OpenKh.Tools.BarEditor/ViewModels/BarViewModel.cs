@@ -16,6 +16,8 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 {
     public class BarViewModel : GenericListModel<BarEntryModel>
 	{
+		private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("All files", "*");
+
 		public BarViewModel() : this((IEnumerable<BarEntryModel>)null) { }
 
 		public BarViewModel(Stream stream) :
@@ -41,19 +43,18 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 
 			OpenCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, FileDialog.Type.Any);
-				if (fd.ShowDialog() == true)
+				FileDialog.OnOpen(fileName =>
 				{
-					using (var stream = File.Open(fd.FileName, FileMode.Open))
+					using (var stream = File.Open(fileName, FileMode.Open))
 					{
-						FileName = fd.FileName;
+						FileName = fileName;
 						Items.Clear();
 						foreach (var item in Bar.Read(stream))
 						{
 							Items.Add(new BarEntryModel(item));
 						}
 					}
-				}
+				}, Filters);
 			}, x => true);
 
 			SaveCommand = new RelayCommand(x =>
@@ -73,14 +74,13 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 
 			SaveAsCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, FileDialog.Type.Any);
-				if (fd.ShowDialog() == true)
+				FileDialog.OnSave(fileName =>
 				{
-					using (var stream = File.Open(fd.FileName, FileMode.Create))
+					using (var stream = File.Open(fileName, FileMode.Create))
 					{
 						Bar.Write(stream, Items.Select(item => item.Entry));
 					}
-				}
+				}, Filters);
 			}, x => true);
 
 			ExitCommand = new RelayCommand(x =>
@@ -108,44 +108,39 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 
 			ExportCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
-                fd.DefaultFileName = $"{SelectedItem.Entry.Name}.bin";
+                var defaultFileName = $"{SelectedItem.Entry.Name}.bin";
 
-				if (fd.ShowDialog() == true)
+				FileDialog.OnSave(fileName =>
 				{
-					using (var fStream = File.OpenWrite(fd.FileName))
+					using (var fStream = File.OpenWrite(fileName))
 					{
 						SelectedItem.Entry.Stream.Position = 0;
 						SelectedItem.Entry.Stream.CopyTo(fStream);
 					}
-				}
+				}, Filters, defaultFileName);
 			}, x => IsItemSelected);
 
             ExportAllCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Folder);
-
-                if (fd.ShowDialog() == true)
-                {
-                    var basePath = fd.FileName;
-                    foreach (var item in Items.Select(item => item.Entry))
-                    {
-                        var fileName = $"{item.Name}.bin";
-                        using (var fStream = File.OpenWrite(Path.Combine(basePath, fileName)))
-                        {
-                            item.Stream.Position = 0;
-                            item.Stream.CopyTo(fStream);
-                        }
-                    }
-                }
+				FileDialog.OnFolder(folder =>
+				{
+					foreach (var item in Items.Select(item => item.Entry))
+					{
+						var fileName = $"{item.Name}.bin";
+						using (var fStream = File.OpenWrite(Path.Combine(folder, fileName)))
+						{
+							item.Stream.Position = 0;
+							item.Stream.CopyTo(fStream);
+						}
+					}
+				});
             }, x => true);
 
             ImportCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open);
-				if (fd.ShowDialog() == true)
+				FileDialog.OnOpen(fileName =>
 				{
-					using (var fStream = File.OpenRead(fd.FileName))
+					using (var fStream = File.OpenRead(fileName))
 					{
 						var memStream = new MemoryStream((int)fStream.Length);
 						fStream.CopyTo(memStream);
@@ -153,7 +148,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 					}
 
 					OnPropertyChanged(nameof(SelectedItem.Size));
-				}
+				}, Filters);
 			}, x => IsItemSelected);
 			SearchCommand = new RelayCommand(x => { }, x => false);
 		}

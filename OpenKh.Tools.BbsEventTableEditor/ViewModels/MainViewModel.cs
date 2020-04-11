@@ -19,6 +19,8 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
         private string _fileName;
         private EventsViewModel _eventsViewModel;
 
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("Event table (EVENT_TE, EVENT_VE, EVENT_AQ)", "*").AddExtensions("All files", "*");
+
         public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
 
         private string FileName
@@ -56,16 +58,10 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
         {
             OpenCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new[]
+                FileDialog.OnOpen(fileName =>
                 {
-                    ("Event table (EVENT_TE, EVENT_VE, EVENT_AQ)", "*"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    OpenFile(fd.FileName);
-                }
+                    OpenFile(fileName);
+                }, Filters);
             }, x => true);
 
             SaveCommand = new RelayCommand(x =>
@@ -82,12 +78,11 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
 
             SaveAsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
-                if (fd.ShowDialog() == true)
+                FileDialog.OnSave(fileName =>
                 {
-                    SaveFile(FileName, fd.FileName);
-                    FileName = fd.FileName;
-                }
+                    SaveFile(FileName, fileName);
+                    FileName = fileName;
+                }, Filters);
             }, x => true);
 
             ExitCommand = new RelayCommand(x =>
@@ -97,50 +92,50 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
 
             ExportEventsListCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
-                fd.DefaultFileName = CreateExportFilePath("events_list.txt");
-                if (fd.ShowDialog() == true)
+                var defaultFileName = CreateExportFilePath("events_list.txt");
+
+                FileDialog.OnSave(fileName =>
                 {
-                    File.CreateText(fd.FileName).Using(stream =>
+                    File.CreateText(fileName).Using(stream =>
                     {
                         foreach (var item in Events)
                         {
                             stream.WriteLine($"ID {item.Id:X03} MAP {Constants.Worlds[item.World]}_{item.Room:D02} EVENT {item.EventIndex:D03}");
                         }
                     });
-                }
+                }, Filters, defaultFileName);
             }, x => true);
 
             ExportUsedEventsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
-                fd.DefaultFileName = CreateExportFilePath("events_used.txt");
-                if (fd.ShowDialog() == true)
+                var defaultFileName = CreateExportFilePath("events_used.txt");
+
+                FileDialog.OnSave(fileName =>
                 {
-                    File.CreateText(fd.FileName).Using(stream =>
+                    File.CreateText(fileName).Using(stream =>
                     {
                         foreach (var item in Events)
                         {
                             stream.WriteLine($"event/{Constants.Worlds[item.World]}/{Constants.Worlds[item.World]}_{item.EventIndex:D03}.exa");
                         }
                     });
-                }
+                }, Filters, defaultFileName);
             }, x => true);
 
             ExportUsedMapsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
-                fd.DefaultFileName = CreateExportFilePath("maps_used.txt");
-                if (fd.ShowDialog() == true)
+                var defaultFileName = CreateExportFilePath("maps_used.txt");
+
+                FileDialog.OnSave(fileName =>
                 {
-                    File.CreateText(fd.FileName).Using(stream =>
+                    File.CreateText(fileName).Using(stream =>
                     {
                         foreach (var item in Events)
                         {
                             stream.WriteLine($"arc/map/{Constants.Worlds[item.World]}{item.Room:D02}.arc");
                         }
                     });
-                }
+                }, Filters, defaultFileName);
             }, x => true);
 
             AboutCommand = new RelayCommand(x =>
