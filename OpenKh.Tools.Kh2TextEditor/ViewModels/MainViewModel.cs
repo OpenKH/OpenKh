@@ -47,6 +47,16 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             .AddExtensions("fontinfo.bar", "bar")
             .AddExtensions("All files", "*");
 
+        private static readonly List<FileDialogFilter> ExportFilters = FileDialogFilterComposer
+            .Compose()
+            .Concat(TextExporters.GetAll().Select(x => FileDialogFilter.ByExtensions(x.Filter().Item1, x.Filter().Item2)))
+            .ToList();
+
+        private static readonly List<FileDialogFilter> ImportFilters = FileDialogFilterComposer
+            .Compose()
+            .Concat(TextImporters.GetAll().Select(x => FileDialogFilter.ByExtensions(x.Filter().Item1, x.Filter().Item2)))
+            .ToList();
+
         public string Title => $"{_barEntryName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
 
         private string FileName
@@ -134,44 +144,36 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
             ExportMessageAsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save,
-                    TextExporters.GetAll().Select(exporter => exporter.Filter())
-                );
-
-                if (fd.ShowDialog() == true)
+                FileDialog.OnSave(fileName =>
                 {
-                    var selectedExtension = $"{Path.GetExtension(fd.FileName).TrimStart('.')}";
+                    var selectedExtension = $"{Path.GetExtension(fileName).TrimStart('.')}";
 
                     ExportMessageAsFile(
-                        fileName: fd.FileName,
-                        textExporter: TextExporters.FindFromFile(fd.FileName)
+                        fileName: fileName,
+                        textExporter: TextExporters.FindFromFile(fileName)
                     );
-                }
+                }, ExportFilters);
             }, x => true);
 
             ImportMessageFromCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open,
-                    TextImporters.GetAll().Select(importer => importer.Filter())
-                );
-
-                if (fd.ShowDialog() == true)
+                FileDialog.OnOpen(fileName =>
                 {
-                    var selectedExtension = $"{Path.GetExtension(fd.FileName).TrimStart('.')}";
+                    var selectedExtension = $"{Path.GetExtension(fileName).TrimStart('.')}";
 
-                    var textImporter = TextImporters.FindFromFile(fd.FileName);
+                    var textImporter = TextImporters.FindFromFile(fileName);
                     if (textImporter != null)
                     {
                         ImportMessageFromFile(
-                            fileName: fd.FileName,
+                            fileName: fileName,
                             textImporter
                         );
                     }
                     else
                     {
-                        MessageBox.Show($"Failed to match text decoder for your file:\n{fd.FileName}");
+                        MessageBox.Show($"Failed to match text decoder for your file:\n{fileName}");
                     }
-                }
+                }, ImportFilters);
             }, x => true);
 
             ExitCommand = new RelayCommand(x =>
