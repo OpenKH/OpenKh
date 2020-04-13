@@ -16,7 +16,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 {
     public class BarViewModel : GenericListModel<BarEntryModel>
 	{
-		private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("All files", "*");
+		private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
 
 		public BarViewModel() : this((IEnumerable<BarEntryModel>)null) { }
 

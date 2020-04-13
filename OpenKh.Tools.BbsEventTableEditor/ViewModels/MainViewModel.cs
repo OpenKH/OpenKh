@@ -19,7 +19,7 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
         private string _fileName;
         private EventsViewModel _eventsViewModel;
 
-        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("Event table (EVENT_TE, EVENT_VE, EVENT_AQ)", "*").AddExtensions("All files", "*");
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("Event table (EVENT_TE, EVENT_VE, EVENT_AQ)", "*").AddAllFiles();
 
         public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
 

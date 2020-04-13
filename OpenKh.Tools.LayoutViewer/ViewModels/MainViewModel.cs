@@ -28,7 +28,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private TexturesViewModel _texturesViewModel;
         private LayoutEditorViewModel _layoutEditor;
 
-        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("All files", "*");
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
 
         public string Title => $"{LayoutName ?? DefaultName},{ImagesName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
         private string FileName

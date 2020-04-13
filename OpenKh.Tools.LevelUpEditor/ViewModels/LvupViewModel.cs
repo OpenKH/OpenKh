@@ -13,7 +13,7 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
 {
     public class LvupViewModel : BaseNotifyPropertyChanged
     {
-        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("00battle.bin", "bin").AddExtensions("All files", "*");
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("00battle.bin", "bin").AddAllFiles();
         public CharactersViewModel Characters { get; set; }
 
         public RelayCommand OpenCommand { get; }

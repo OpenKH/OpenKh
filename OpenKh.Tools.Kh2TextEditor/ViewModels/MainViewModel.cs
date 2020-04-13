@@ -35,17 +35,17 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private static readonly List<FileDialogFilter> MessageFilters = FileDialogFilterComposer
             .Compose()
             .AddExtensions("Message files", "bar", "msg", "bin")
-            .AddExtensions("All files", "*");
+            .AddAllFiles();
 
         private static readonly List<FileDialogFilter> FontImageFilters = FileDialogFilterComposer
             .Compose()
             .AddExtensions("fontimage.bar", "bar")
-            .AddExtensions("All files", "*");
+            .AddAllFiles();
 
         private static readonly List<FileDialogFilter> FontInfoFilters = FileDialogFilterComposer
             .Compose()
             .AddExtensions("fontinfo.bar", "bar")
-            .AddExtensions("All files", "*");
+            .AddAllFiles();
 
         private static readonly List<FileDialogFilter> ExportFilters = FileDialogFilterComposer
             .Compose()

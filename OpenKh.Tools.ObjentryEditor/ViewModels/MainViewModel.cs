@@ -18,7 +18,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         private static readonly string ApplicationName = Utilities.GetApplicationName();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
-        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("00objentry.bin", "bin").AddExtensions("All files", "*");
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("00objentry.bin", "bin").AddAllFiles();
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 

@@ -22,14 +22,14 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             .AddExtensions("All supported images", GetAllSupportedExtensions())
             .Concat(_imageFormatService.Formats.Select(x => FileDialogFilter.ByExtensions($"{x.Name} image", x.Extension)))
             .ToList()
-            .AddExtensions("All files", "*");
+            .AddAllFiles();
 
         private static readonly List<FileDialogFilter> ExportFilters = FileDialogFilterComposer
             .Compose()
             .AddExtensions("All supported images for export", GetAllSupportedExtensions())
             .Concat(_imageFormatService.Formats.Where(x => x.IsCreationSupported).Select(x => FileDialogFilter.ByExtensions($"{x.Name} image", x.Extension)))
             .ToList()
-            .AddExtensions("All files", "*");
+            .AddAllFiles();
 
         private static string ApplicationName = Utilities.GetApplicationName();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
