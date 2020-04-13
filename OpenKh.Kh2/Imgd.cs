@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
+using Xe.IO;
 
 namespace OpenKh.Kh2
 {
@@ -45,6 +46,7 @@ namespace OpenKh.Kh2
         private const short SubFormat32bpp = 3;
         private const short SubFormat8bpp = 5;
         private const short SubFormat4bpp = 4;
+        private const int FacAlignment = 0x800;
         private static readonly InvalidDataException InvalidHeaderException = new InvalidDataException("Invalid header");
 
         public static bool IsValid(Stream stream) =>
@@ -57,8 +59,7 @@ namespace OpenKh.Kh2
 		{
             stream
                 .MustReadAndSeek()
-                .MustHaveHeaderLengthOf(HeaderLength)
-                .SetPosition(0);
+                .MustHaveHeaderLengthOf(HeaderLength);
 
             var reader = new BinaryReader(stream);
             var header = BinaryMapping.ReadObject<Header>(stream);
@@ -80,7 +81,7 @@ namespace OpenKh.Kh2
 
         public void Write(Stream stream)
 		{
-            stream.MustWriteAndSeek().SetPosition(0);
+            stream.MustWriteAndSeek();
 
             BinaryMapping.WriteObject(stream, new Header
             {
@@ -112,6 +113,52 @@ namespace OpenKh.Kh2
 
             if (Clut != null)
                 stream.Write(Clut, 0, Clut.Length);
+        }
+
+        public static bool IsFac(Stream stream)
+        {
+            if (stream.Length < HeaderLength)
+                return false;
+
+            stream.MustReadAndSeek().SetPosition(0);
+            var header = BinaryMapping.ReadObject<Header>(stream);
+            if (header.MagicCode != MagicCode)
+                return false;
+
+            stream
+                .SetPosition(header.ClutOffset + header.ClutLength)
+                .AlignPosition(FacAlignment);
+
+            if (stream.Position + HeaderLength >= stream.Length)
+                return false;
+
+            header = BinaryMapping.ReadObject<Header>(stream);
+            if (header.MagicCode != MagicCode)
+                return false;
+
+            return true;
+        }
+
+        public static IEnumerable<Imgd> ReadAsFac(Stream stream)
+        {
+            while (true)
+            {
+                stream.AlignPosition(FacAlignment);
+                var subStreamLength = stream.Length - stream.Position;
+                if (subStreamLength < HeaderLength)
+                    yield break;
+
+                yield return Imgd.Read(new SubStream(stream, stream.Position, subStreamLength));
+            }
+        }
+
+        public static void WriteAsFac(Stream stream, IEnumerable<Imgd> images)
+        {
+            foreach (var image in images)
+            {
+                image.Write(stream);
+                stream.SetLength(stream.AlignPosition(FacAlignment).Position);
+            }
         }
 
         public Size Size { get; }
