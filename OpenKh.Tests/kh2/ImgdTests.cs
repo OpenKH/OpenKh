@@ -1,6 +1,8 @@
-﻿using OpenKh.Imaging;
+﻿using OpenKh.Common;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -8,6 +10,7 @@ namespace OpenKh.Tests.kh2
     public class ImgdTests
     {
         private const string FilePath = "kh2/res/image-8bit-128-128.imd";
+        private const string FacFilePath = "kh2/res/image.fac";
 
         [Fact]
         public void IsValidTest()
@@ -18,6 +21,7 @@ namespace OpenKh.Tests.kh2
                 stream.WriteByte(0x4d);
                 stream.WriteByte(0x47);
                 stream.WriteByte(0x44);
+                stream.SetLength(0x40);
                 stream.Position = 0;
                 Assert.True(Imgd.IsValid(stream));
             }
@@ -110,5 +114,25 @@ namespace OpenKh.Tests.kh2
                 Assert.Equal(expectedData, actualData);
             }
         });
+
+        [Theory]
+        [InlineData(FilePath, false)]
+        [InlineData(FacFilePath, true)]
+        public void IsFac(string fileName, bool expected) =>
+            Assert.Equal(expected, File.OpenRead(fileName).Using(stream => Imgd.IsFac(stream)));
+
+        [Fact]
+        public void ReadAndWriteFac() =>
+            File.OpenRead(FacFilePath)
+            .Using(x => Helpers.AssertStream(x, inStream =>
+            {
+                var images = Imgd.ReadAsFac(inStream).ToList();
+                Assert.Equal(3, images.Count);
+
+                var outStream = new MemoryStream();
+                Imgd.WriteAsFac(outStream, images);
+
+                return outStream;
+            }));
     }
 }
