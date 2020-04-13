@@ -14,6 +14,9 @@
   * [MSN](file/type/msn)
   * [ANB](file/anb/anb)
   * [AI](file/ai/index)
+  * [IMD](file/type/image#imgd)
+  * [IMZ](file/type/image#imgz)
+  * [FAC](file/type/image#fac)
   
 * Other files
 
