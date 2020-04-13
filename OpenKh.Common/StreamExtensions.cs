@@ -9,11 +9,37 @@ namespace OpenKh.Common
 {
     public static class StreamExtensions
     {
+        private static readonly InvalidDataException ReadSeekException = new InvalidDataException($"Stream must be readable and seekable.");
+        private static readonly InvalidDataException WriteSeekException = new InvalidDataException($"Stream must be writable and seekable.");
+        private static readonly Func<long, InvalidDataException> InvalidHeaderLengthException = (minHeaderLength) =>
+            new InvalidDataException($"Invalid header: stream must be at least {minHeaderLength} bytes long.");
+
         public static T FromBegin<T>(this T stream) where T : Stream => stream.SetPosition(0);
 
         public static T SetPosition<T>(this T stream, int position) where T : Stream
         {
-            stream.Position = position;
+            stream.Seek(position, SeekOrigin.Begin);
+            return stream;
+        }
+
+        public static T MustReadAndSeek<T>(this T stream) where T : Stream
+        {
+            if (!stream.CanRead || !stream.CanSeek)
+                throw ReadSeekException;
+            return stream;
+        }
+
+        public static T MustWriteAndSeek<T>(this T stream) where T : Stream
+        {
+            if (!stream.CanWrite || !stream.CanSeek)
+                throw WriteSeekException;
+            return stream;
+        }
+
+        public static T MustHaveHeaderLengthOf<T>(this T stream, long minHeaderLength) where T : Stream
+        {
+            if (stream.Length < minHeaderLength)
+                throw InvalidHeaderLengthException(minHeaderLength);
             return stream;
         }
 

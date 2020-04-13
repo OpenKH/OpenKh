@@ -1,22 +1,51 @@
-using OpenKh.Common;
+﻿using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
 {
     public partial class Imgd : IImageRead
 	{
+        private class Header
+        {
+            [Data] public uint MagicCode { get; set; }
+            [Data] public int Unk04 { get; set; }
+            [Data] public int BitmapOffset { get; set; }
+            [Data] public int BitmapLength { get; set; }
+            [Data] public int ClutOffset { get; set; }
+            [Data] public int ClutLength { get; set; }
+            [Data] public int Unk18 { get; set; }
+            [Data] public short Width { get; set; }
+            [Data] public short Height { get; set; }
+            [Data] public short PowWidth { get; set; }
+            [Data] public short PowHeight { get; set; }
+            [Data] public short WidthDiv64 { get; set; }
+            [Data] public short Format { get; set; }
+            [Data] public int Unk28 { get; set; }
+            [Data] public short Unk2c { get; set; }
+            [Data] public short Unk2e { get; set; }
+            [Data] public short Unk30 { get; set; }
+            [Data] public short Unk32 { get; set; }
+            [Data] public short Unk34 { get; set; }
+            [Data] public short Unk36 { get; set; }
+            [Data] public int Unk38 { get; set; }
+            [Data] public int Swizzled { get; set; }
+        }
+
 		private const uint MagicCode = 0x44474D49U;
-        private const uint HeaderLength = 0x40;
+        private const int HeaderLength = 0x40;
         private const short Format32bpp = 0x00;
         private const short Format8bpp = 0x13;
         private const short Format4bpp = 0x14;
         private const short SubFormat32bpp = 3;
         private const short SubFormat8bpp = 5;
         private const short SubFormat4bpp = 4;
+        private static readonly InvalidDataException InvalidHeaderException = new InvalidDataException("Invalid header");
 
         public static bool IsValid(Stream stream) =>
             stream.Length >= HeaderLength && stream.SetPosition(0).ReadInt32() == MagicCode;
@@ -26,83 +55,66 @@ namespace OpenKh.Kh2
 
 		private Imgd(Stream stream)
 		{
-			if (!stream.CanRead || !stream.CanSeek)
-				throw new InvalidDataException($"Read or seek must be supported.");
+            stream
+                .MustReadAndSeek()
+                .MustHaveHeaderLengthOf(HeaderLength)
+                .SetPosition(0);
 
-			var reader = new BinaryReader(stream);
-			if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
-				throw new InvalidDataException("Invalid header");
+            var reader = new BinaryReader(stream);
+            var header = BinaryMapping.ReadObject<Header>(stream);
+            if (header.MagicCode != MagicCode)
+                throw InvalidHeaderException;
 
-			var unk04 = reader.ReadInt32();
-			var dataOffset = reader.ReadInt32();
-			var dataLength = reader.ReadInt32();
-			var palOffset = reader.ReadInt32();
-			var palLength = reader.ReadInt32();
-			var unk18 = reader.ReadInt32();
-			var width = reader.ReadInt16();
-			var height = reader.ReadInt16();
-			var powWidth = reader.ReadInt16();
-			var powHeight = reader.ReadInt16();
-			var widthDiv64 = reader.ReadInt16();
-			format = reader.ReadInt16();
-			var unk28 = reader.ReadInt32();
-			var unk2c = reader.ReadInt16();
-			var unk2e = reader.ReadInt16();
-			var unk30 = reader.ReadInt32();
-            var unk34 = reader.ReadInt16();
-			var unk36 = reader.ReadInt16();
-			var unk38 = reader.ReadInt32();
-			swizzled = reader.ReadInt32();
+            Size = new Size(header.Width, header.Height);
+            format = header.Format;
+            swizzled = header.Swizzled;
 
-			Size = new Size(width, height);
-			Data = reader.ReadBytes(dataLength);
-            Clut = reader.ReadBytes(palLength);
+            stream.SetPosition(header.BitmapOffset);
+            Data = reader.ReadBytes(header.BitmapLength);
+
+            stream.SetPosition(header.ClutOffset);
+            Clut = reader.ReadBytes(header.ClutLength);
         }
 
         public static Imgd Read(Stream stream) => new Imgd(stream.SetPosition(0));
 
         public void Write(Stream stream)
 		{
-			if (!stream.CanWrite || !stream.CanSeek)
-				throw new InvalidDataException($"Write or seek must be supported.");
+            stream.MustWriteAndSeek().SetPosition(0);
 
-			var writer = new BinaryWriter(stream);
-			var baseOffset = (int)stream.Position;
+            BinaryMapping.WriteObject(stream, new Header
+            {
+                MagicCode = MagicCode,
+                Unk04 = 0x100,
+                BitmapOffset = HeaderLength,
+                BitmapLength = Data.Length,
+                ClutOffset = HeaderLength + Data.Length,
+                ClutLength = Clut?.Length ?? 0,
+                Unk18 = -1,
+                Width = (short)Size.Width,
+                Height = (short)Size.Height,
+                PowWidth = GetPow(Size.Width),
+                PowHeight = GetPow(Size.Height),
+                WidthDiv64 = (short)(Size.Width / 64),
+                Format = format,
+                Unk28 = -1,
+                Unk2c = (short)(format == Format4bpp ? 8 : 16),
+                Unk2e = (short)(format == Format4bpp ? 2 : 16),
+                Unk30 = 1,
+                Unk32 = (short)(format == Format32bpp ? 19 : 0),
+                Unk34 = GetSubFormat(format),
+                Unk36 = (short)(format == Format32bpp ? 0 : 3),
+                Unk38 = 0,
+                Swizzled = swizzled,
+            });
 
-			var dataOffset = baseOffset + 0x40;
-			var palOffset = dataOffset + Data.Length;
-
-			writer.Write(MagicCode);
-			writer.Write(256);
-			writer.Write(dataOffset);
-			writer.Write(Data.Length);
-			writer.Write(palOffset);
-			writer.Write(Clut?.Length ?? 0);
-			writer.Write(-1);
-			writer.Write((short)Size.Width);
-			writer.Write((short)Size.Height);
-			writer.Write(GetPow((short)Size.Width));
-			writer.Write(GetPow((short)Size.Height));
-			writer.Write((short)(Size.Width / 64));
-			writer.Write(format);
-			writer.Write(-1);
-			writer.Write((short)(format == Format4bpp ? 8 : 16));
-            writer.Write((short)(format == Format4bpp ? 2 : 16));
-			writer.Write((short)1);
-			writer.Write((short)(format == Format32bpp ? 19 : 0));
-			writer.Write(GetSubFormat(format));
-			writer.Write((short)(format == Format32bpp ? 0 : 3));
-            writer.Write(0);
-
-			writer.Write(swizzled);
-
-            writer.Write(Data, 0, Data.Length);
+            stream.Write(Data, 0, Data.Length);
 
             if (Clut != null)
-			    writer.Write(Clut, 0, Clut.Length);
-		}
+                stream.Write(Clut, 0, Clut.Length);
+        }
 
-		public Size Size { get; }
+        public Size Size { get; }
 
 		public byte[] Data { get; }
 
@@ -184,7 +196,7 @@ namespace OpenKh.Kh2
             return newData;
         }
 
-        private static short GetPow(short value)
+        private static short GetPow(int value)
         {
             short pow = 1;
             while (value > (1 << pow))
