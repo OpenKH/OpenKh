@@ -1,6 +1,7 @@
 ﻿using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,6 +18,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         private static readonly string ApplicationName = Utilities.GetApplicationName();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("00objentry.bin", "bin").AddAllFiles();
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
@@ -42,16 +44,10 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         {
             OpenCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new[]
+                FileDialog.OnOpen(fileName =>
                 {
-                    ("00objentry.bin", "bin"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    OpenFile(fd.FileName);
-                }
+                    OpenFile(fileName);
+                }, Filters);
             }, x => true);
 
             SaveCommand = new RelayCommand(x =>
@@ -68,12 +64,11 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
             SaveAsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
-                if (fd.ShowDialog() == true)
+                FileDialog.OnSave(fileName =>
                 {
-                    SaveFile(FileName, fd.FileName);
-                    FileName = fd.FileName;
-                }
+                    SaveFile(FileName, fileName);
+                    FileName = fileName;
+                }, Filters);
             }, x => true);
 
             ExitCommand = new RelayCommand(x =>
