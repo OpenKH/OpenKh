@@ -1,4 +1,4 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using System.IO;
 using Xunit;
@@ -18,6 +18,7 @@ namespace OpenKh.Tests.kh2
                 stream.WriteByte(0x4d);
                 stream.WriteByte(0x47);
                 stream.WriteByte(0x44);
+                stream.SetLength(0x40);
                 stream.Position = 0;
                 Assert.True(Imgd.IsValid(stream));
             }

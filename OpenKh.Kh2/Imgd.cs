@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
 using System.Drawing;
@@ -10,6 +10,7 @@ namespace OpenKh.Kh2
     public partial class Imgd : IImageRead
 	{
 		private const uint MagicCode = 0x44474D49U;
+        private const uint HeaderLength = 0x40;
         private const short Format32bpp = 0x00;
         private const short Format8bpp = 0x13;
         private const short Format4bpp = 0x14;
@@ -18,7 +19,7 @@ namespace OpenKh.Kh2
         private const short SubFormat4bpp = 4;
 
         public static bool IsValid(Stream stream) =>
-            stream.Length >= 4 && stream.SetPosition(0).ReadInt32() == MagicCode;
+            stream.Length >= HeaderLength && stream.SetPosition(0).ReadInt32() == MagicCode;
 
         private readonly short format;
         private readonly int swizzled;
