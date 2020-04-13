@@ -141,6 +141,7 @@ namespace OpenKh.Kh2
 
         public static IEnumerable<Imgd> ReadAsFac(Stream stream)
         {
+            stream.SetPosition(0);
             while (true)
             {
                 stream.AlignPosition(FacAlignment);

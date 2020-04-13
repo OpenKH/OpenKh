@@ -21,6 +21,10 @@ namespace OpenKh.Tools.ImageViewer.Services
                 GetImageFormat("PNG", "png", true, Png.IsValid, Png.Read, (stream, image) => Png.Write(stream, image)),
                 GetImageFormat("BMP", "bmp", true, Bmp.IsValid, Bmp.Read, (stream, image) => Bmp.Write(stream, image)),
                 GetImageFormat("TIFF", "tiff", true, Tiff.IsValid, Tiff.Read, (stream, image) => Tiff.Write(stream, image)),
+
+                GetImageFormat("FAC", "fac", true, Imgd.IsFac, s => Imgd.ReadAsFac(s), (stream, images) =>
+                    Imgd.WriteAsFac(stream, images.Select(x => x.AsImgd()))),
+
                 GetImageFormat("IMGD", "imd", true, Imgd.IsValid, Imgd.Read, (stream, image) => image.AsImgd().Write(stream)),
 
                 GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, images) =>
