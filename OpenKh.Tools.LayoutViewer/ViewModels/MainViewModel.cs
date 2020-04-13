@@ -28,6 +28,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private TexturesViewModel _texturesViewModel;
         private LayoutEditorViewModel _layoutEditor;
 
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("All files", "*");
+
         public string Title => $"{LayoutName ?? DefaultName},{ImagesName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
         private string FileName
         {
@@ -104,11 +106,10 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
             OpenCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, FileDialog.Type.Any);
-                if (fd.ShowDialog() == true)
+                FileDialog.OnOpen(fileName =>
                 {
-                    OpenFile(fd.FileName);
-                }
+                    OpenFile(fileName);
+                }, Filters);
             }, x => true);
 
             SaveCommand = new RelayCommand(x =>
@@ -125,12 +126,11 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
             SaveAsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, FileDialog.Type.Any);
-                if (fd.ShowDialog() == true)
+                FileDialog.OnSave(fileName =>
                 {
-                    SaveFile(FileName, fd.FileName);
-                    FileName = fd.FileName;
-                }
+                    SaveFile(FileName, fileName);
+                    FileName = fileName;
+                }, Filters);
             }, x => true);
 
             ExitCommand = new RelayCommand(x =>

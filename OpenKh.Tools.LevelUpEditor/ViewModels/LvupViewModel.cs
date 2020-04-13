@@ -13,6 +13,7 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
 {
     public class LvupViewModel : BaseNotifyPropertyChanged
     {
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("00battle.bin", "bin").AddExtensions("All files", "*");
         public CharactersViewModel Characters { get; set; }
 
         public RelayCommand OpenCommand { get; }
@@ -30,11 +31,10 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
         {
             OpenCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(null, FileDialog.Behavior.Open, ("00battle.bin", "bin"));
-                if (fd.ShowDialog() == true)
+                FileDialog.OnOpen(fileName =>
                 {
-                    Open(fd.FileName);
-                }
+                    Open(fileName);
+                }, Filters);
             });
             SaveCommand = new RelayCommand(x =>
             {
