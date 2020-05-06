@@ -61,6 +61,37 @@ namespace OpenKh.Kh2
             [Description("Puzzle Piece")]
             JIGSAW = 0x18,
         }
+
+        public enum CommandMenuOptions : byte
+        {
+            [Description("Sora / Roxas")]
+            SoraRoxasDefault = 0x0,
+            [Description("Valor Form")]
+            ValorForm = 0x1,
+            [Description("Wisdom Form")]
+            WisdomForm = 0x2,
+            [Description("Limit Form")]
+            LimitForm = 0x3,
+            [Description("Master Form")]
+            MasterForm = 0x4,
+            [Description("Final Form")]
+            FinalForm = 0x5,
+            [Description("Anti Form")]
+            AntiForm = 0x6,
+            [Description("Lion King Sora")]
+            LionKingSora = 0x7,
+            [Description("Magic, Drive, Party and Limit commands are greyed out")]
+            Unk08 = 0x8,
+            [Description("Drive, Party and Limit commands are greyed out (not used ingame)")]
+            Unk09 = 0x9,
+            [Description("Roxas Dual-Wield")]
+            RoxasDualWield = 0xA,
+            [Description("Only Attack and Summon commands are available, default")]
+            Default = 0xB,
+            [Description("Sora in Cube / Card Form (Luxord battle, not used ingame)")]
+            CubeCardForm = 0xC,
+        }
+
         [Data] public ushort ObjectId { get; set; }
         [Data] public ushort Unknown02 { get; set; } // has something to do with if the obj is rendered or not, NO: ObjectId is actually an uint, but it's bitshifted afterwards?! see z_un_003216b8
         [Data] public Type ObjectType { get; set; }
@@ -78,7 +109,7 @@ namespace OpenKh.Kh2
         [Data] public byte SpawnLimiter { get; set; }
         [Data] public byte Unknown55 { get; set; } // padding?
         [Data] public byte Unknown56{ get; set; }
-        [Data] public byte CommandMenuOptions { get; set; }
+        [Data] public CommandMenuOptions CommandMenuOption { get; set; }
         [Data] public ushort SpawnObject1 { get; set; }
         [Data] public ushort SpawnObject2 { get; set; }
         [Data] public ushort SpawnObject3 { get; set; }

@@ -56,7 +56,15 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public byte SpawnLimiter { get => Objentry.SpawnLimiter; set => Objentry.SpawnLimiter = value; }
             public byte Unknown55 { get => Objentry.Unknown55; set => Objentry.Unknown55 = value; }
             public byte Unknown56 { get => Objentry.Unknown56; set => Objentry.Unknown56 = value; }
-            public byte CommandMenuOptions { get => Objentry.CommandMenuOptions; set => Objentry.CommandMenuOptions = value; }
+            public Objentry.CommandMenuOptions CommandMenuOption 
+            { 
+                get => Objentry.CommandMenuOption;
+                set
+                {
+                    Objentry.CommandMenuOption = value;
+                    OnPropertyChanged(nameof(CommandMenuOption));
+                }
+            }
             public ushort SpawnObject1 { get => Objentry.SpawnObject1; set => Objentry.SpawnObject1 = value; }
             public ushort SpawnObject2 { get => Objentry.SpawnObject2; set => Objentry.SpawnObject2 = value; }
             public ushort SpawnObject3 { get => Objentry.SpawnObject3; set => Objentry.SpawnObject3 = value; }
@@ -70,6 +78,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         private string _searchTerm;
 
         public EnumModel<Objentry.Type> ObjEntryTypes { get; }
+        public EnumModel<Objentry.CommandMenuOptions> CommandMenuOptions { get; }
 
         public ObjentryViewModel(BaseTable<Objentry> objentry) :
             this(objentry.Id, objentry.Items)
@@ -80,6 +89,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         {
             _type = type;
             ObjEntryTypes = new EnumModel<Objentry.Type>();
+            CommandMenuOptions = new EnumModel<Objentry.CommandMenuOptions>();
             AddAndSelectCommand = new RelayCommand(x =>
             {
                 AddCommand.Execute(null);

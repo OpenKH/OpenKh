@@ -128,9 +128,16 @@
 
                 <TextBlock Text="Unknown56" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding SelectedItem.Unknown56, UpdateSourceTrigger=PropertyChanged}"/>
-
+                
                 <TextBlock Text="Command Menu" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding SelectedItem.CommandMenuOptions, UpdateSourceTrigger=PropertyChanged}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" ItemsSource="{Binding CommandMenuOptions}" SelectedValue="{Binding SelectedItem.CommandMenuOption}" DisplayMemberPath="Name" SelectedValuePath="Value" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding Path=SelectedItem.CommandMenuOption, Converter={StaticResource EnumDescConverter}, UpdateSourceTrigger=PropertyChanged}" TextWrapping="WrapWithOverflow"/>
+                </Grid>
 
                 <TextBlock Text="Spawn Object 1" Margin="{StaticResource LabelMargin}"/>
                 <ComboBox ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
