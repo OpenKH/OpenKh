@@ -73,6 +73,6 @@ Contains a definition of every object and it's parameters.
 | 07 | Lion King Sora
 | 08 | Magic, Drive, Party and Limit commands are greyed out
 | 09 | Drive, Party and Limit commands are greyed out (not used ingame)
-| 0A | Same as 08, only used in P_EX110_BTLF
+| 0A | Same as 08, only used in P_EX110_BTLF (Roxas Dual-Wield)
 | 0B | Only Attack and Summon commands are available, default
-| 0C | Sora in Cube / Card Form (during Luxord battle, not used ingame)
+| 0C | Sora in Cube / Card Form (Luxord battle, not used ingame)
