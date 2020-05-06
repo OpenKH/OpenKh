@@ -86,7 +86,7 @@ namespace OpenKh.Kh2
             Unk09 = 0x9,
             [Description("Roxas Dual-Wield")]
             RoxasDualWield = 0xA,
-            [Description("Only Attack and Summon commands are available, default")]
+            [Description("Only Attack and Summon commands are available")]
             Default = 0xB,
             [Description("Sora in Cube / Card Form (Luxord battle, not used ingame)")]
             CubeCardForm = 0xC,
