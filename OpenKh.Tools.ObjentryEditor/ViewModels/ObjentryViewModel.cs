@@ -1,8 +1,8 @@
 using OpenKh.Kh2;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Models;
@@ -33,20 +33,38 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             }
 
             public ushort Unknown02 { get => Objentry.Unknown02; set => Objentry.Unknown02 = value; }
-            public Objentry.Type ObjectType { get => Objentry.ObjectType; set => Objentry.ObjectType = value; }
+            public Objentry.Type ObjectType 
+            { 
+                get => Objentry.ObjectType; 
+                set
+                {
+                    Objentry.ObjectType = value;
+                    OnPropertyChanged(nameof(ObjectType));
+                } 
+            }
             public byte Unknown05 { get => Objentry.Unknown05; set => Objentry.Unknown05 = value; }
             public byte Unknown06 { get => Objentry.Unknown06; set => Objentry.Unknown06 = value; }
             public byte WeaponJoint { get => Objentry.WeaponJoint; set => Objentry.WeaponJoint = value; }
             public string ModelName { get => Objentry.ModelName; set => Objentry.ModelName = value; }
             public string AnimationName { get => Objentry.AnimationName; set => Objentry.AnimationName = value; }
-            public uint Unknown48 { get => Objentry.Unknown48; set => Objentry.Unknown48 = value; }
+            public ushort Unknown48 { get => Objentry.Unknown48; set => Objentry.Unknown48 = value; }
+            public ushort Unknown4a { get => Objentry.Unknown4a; set => Objentry.Unknown4a = value; }
             public ushort NeoStatus { get => Objentry.NeoStatus; set => Objentry.NeoStatus = value; }
             public ushort NeoMoveset { get => Objentry.NeoMoveset; set => Objentry.NeoMoveset = value; }
-            public uint Unknown50 { get => Objentry.Unknown50; set => Objentry.Unknown50 = value; }
+            public ushort Unknown50 { get => Objentry.Unknown50; set => Objentry.Unknown50 = value; }
+            public short Weight { get => Objentry.Weight; set => Objentry.Weight = value; }
             public byte SpawnLimiter { get => Objentry.SpawnLimiter; set => Objentry.SpawnLimiter = value; }
             public byte Unknown55 { get => Objentry.Unknown55; set => Objentry.Unknown55 = value; }
             public byte Unknown56 { get => Objentry.Unknown56; set => Objentry.Unknown56 = value; }
-            public byte Unknown57 { get => Objentry.Unknown57; set => Objentry.Unknown57 = value; }
+            public Objentry.CommandMenuOptions CommandMenuOption 
+            { 
+                get => Objentry.CommandMenuOption;
+                set
+                {
+                    Objentry.CommandMenuOption = value;
+                    OnPropertyChanged(nameof(CommandMenuOption));
+                }
+            }
             public ushort SpawnObject1 { get => Objentry.SpawnObject1; set => Objentry.SpawnObject1 = value; }
             public ushort SpawnObject2 { get => Objentry.SpawnObject2; set => Objentry.SpawnObject2 = value; }
             public ushort SpawnObject3 { get => Objentry.SpawnObject3; set => Objentry.SpawnObject3 = value; }
@@ -60,6 +78,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         private string _searchTerm;
 
         public EnumModel<Objentry.Type> ObjEntryTypes { get; }
+        public EnumModel<Objentry.CommandMenuOptions> CommandMenuOptions { get; }
 
         public ObjentryViewModel(BaseTable<Objentry> objentry) :
             this(objentry.Id, objentry.Items)
@@ -70,6 +89,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         {
             _type = type;
             ObjEntryTypes = new EnumModel<Objentry.Type>();
+            CommandMenuOptions = new EnumModel<Objentry.CommandMenuOptions>();
             AddAndSelectCommand = new RelayCommand(x =>
             {
                 AddCommand.Execute(null);
@@ -128,29 +148,14 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
         private Objentry Clone(Objentry source)
         {
-            return new Objentry()
+            var newObj = Activator.CreateInstance<Objentry>();
+            foreach(var field in newObj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                ObjectId = GetObjectIdForNewEntry(),
-                Unknown02 = source.Unknown02,
-                ObjectType = source.ObjectType,
-                Unknown05 = source.Unknown05,
-                Unknown06 = source.Unknown06,
-                WeaponJoint = source.WeaponJoint,
-                ModelName = source.ModelName,
-                AnimationName = source.AnimationName,
-                Unknown48 = source.Unknown48,
-                NeoStatus = source.NeoStatus,
-                NeoMoveset = source.NeoMoveset,
-                Unknown50 = source.Unknown50,
-                SpawnLimiter = source.SpawnLimiter,
-                Unknown55 = source.Unknown55,
-                Unknown56 = source.Unknown56,
-                Unknown57 = source.Unknown57,
-                SpawnObject1 = source.SpawnObject1,
-                SpawnObject2 = source.SpawnObject2,
-                SpawnObject3 = source.SpawnObject3,
-                Unknown5e = source.Unknown5e
-            };
+                field.SetValue(newObj, field.GetValue(source));
+            }
+            
+            newObj.ObjectId = GetObjectIdForNewEntry();
+            return newObj;
         }
 
         private ushort GetObjectIdForNewEntry()

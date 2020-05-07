@@ -80,7 +80,6 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
-
         }
 
         public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
@@ -93,8 +92,13 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
         public void SaveFile(string previousFileName, string fileName)
         {
+            var search = Objentry.SearchTerm;
+            Objentry.SearchTerm = string.Empty;
+
             using (var f = File.Create(fileName))
                 Kh2.Objentry.Write(f, Objentry.AsObjEntries());
+
+            Objentry.SearchTerm = search;
         }
     }
 }
