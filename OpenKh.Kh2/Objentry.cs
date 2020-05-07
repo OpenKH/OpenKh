@@ -36,13 +36,13 @@ namespace OpenKh.Kh2
             SUBMENU = 0xB,
             [Description("Large Boss")]
             L_BOSS = 0xC,
-            [Description("")]
+            [Description]
             G_OBJ = 0xD,
-            [Description("")]
+            [Description]
             MEMO = 0xE,
-            [Description("")]
+            [Description]
             RTN = 0xF,
-            [Description("")]
+            [Description]
             MINIGAME = 0x10,
             [Description("World Map Object")]
             WORLDMAP = 0x11,
@@ -56,7 +56,7 @@ namespace OpenKh.Kh2
             L_ZAKO = 0x15,
             [Description("Crowd Spawner")]
             MASSEFFECT = 0x16,
-            [Description("")]
+            [Description]
             E_OBJ = 0x17,
             [Description("Puzzle Piece")]
             JIGSAW = 0x18,
