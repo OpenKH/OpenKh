@@ -3,7 +3,6 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Models;
-using OpenKh.Tools.LayoutViewer.Properties;
 using OpenKh.Tools.LayoutViewer.Service;
 using OpenKh.Tools.LayoutViewer.Views;
 using System.Collections.Generic;
