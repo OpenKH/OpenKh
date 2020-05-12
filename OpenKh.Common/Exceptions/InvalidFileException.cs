@@ -2,15 +2,20 @@
 
 namespace OpenKh.Common.Exceptions
 {
-    public class InvalidFileException<T> : Exception
+    public class InvalidFileException<T> : InvalidFileException
     {
         public InvalidFileException() :
-            base($"The specified file is not recognized as {typeof(T).Name}.")
+            base(typeof(T))
         { }
     }
 
+
     public class InvalidFileException : Exception
     {
+        public InvalidFileException(Type type) :
+            base($"The specified file is not recognized as {type.Name}.")
+        { }
+
         public InvalidFileException() :
             base("The specified file is not recognized.")
         { }
