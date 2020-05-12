@@ -46,15 +46,21 @@ namespace OpenKh.Command.IdxImg
 
             [Required]
             [FileExists]
-            [Option(Description = "Kingdom Hearts II IDX file, paired with a IMG", ShortName = "i", LongName = "idx")]
+            [Option(CommandOptionType.SingleValue, Description = "Kingdom Hearts II IDX file, paired with a IMG", ShortName = "i", LongName = "idx")]
             public string InputIdx { get; set; }
 
             [FileExists]
-            [Option(Description = "Custom Kingdom Hearts II IMG file", ShortName = "m", LongName = "img")]
+            [Option(CommandOptionType.SingleValue, Description = "Custom Kingdom Hearts II IMG file", ShortName = "m", LongName = "img")]
             public string InputImg { get; set; }
 
-            [Option(Description = "Path where the content will be extracted", ShortName = "o", LongName = "output")]
+            [Option(CommandOptionType.SingleValue, Description = "Path where the content will be extracted", ShortName = "o", LongName = "output")]
             public string OutputDir { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Extract all the sub-IDX recursively", ShortName = "r", LongName = "recursive")]
+            public bool Recursive { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Split sub-IDX when extracting recursively", ShortName = "s", LongName = "split")]
+            public bool Split { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -68,10 +74,14 @@ namespace OpenKh.Command.IdxImg
                     var img = new Img(imgStream, idx, false);
                     var idxName = Path.GetFileNameWithoutExtension(InputIdx);
 
-                    foreach (var idxFileName in ExtractIdx(img, idx, outputDir))
+                    var subIdxPath = ExtractIdx(img, idx, Recursive && Split ? Path.Combine(outputDir, "KH2") : outputDir);
+                    if (Recursive)
                     {
-                        idxName = Path.GetFileNameWithoutExtension(idxFileName);
-                        ExtractIdx(img, OpenIdx(idxFileName), Path.Combine(outputDir, idxName));
+                        foreach (var idxFileName in subIdxPath)
+                        {
+                            idxName = Path.GetFileNameWithoutExtension(idxFileName);
+                            ExtractIdx(img, OpenIdx(idxFileName), Split ? Path.Combine(outputDir, idxName) : outputDir);
+                        }
                     }
                 }
 
