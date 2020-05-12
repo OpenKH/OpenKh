@@ -46,17 +46,20 @@ namespace OpenKh.Command.IdxImg
 
             [Required]
             [FileExists]
-            [Option(Description = "Kingdom Hearts II IDX file, paired with a IMG", ShortName = "i", LongName = "input")]
+            [Option(Description = "Kingdom Hearts II IDX file, paired with a IMG", ShortName = "i", LongName = "idx")]
             public string InputIdx { get; set; }
 
-            [DirectoryExists]
+            [FileExists]
+            [Option(Description = "Custom Kingdom Hearts II IMG file", ShortName = "m", LongName = "img")]
+            public string InputImg { get; set; }
+
             [Option(Description = "Path where the content will be extracted", ShortName = "o", LongName = "output")]
             public string OutputDir { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
-                var inputImg = InputIdx.Replace(".idx", ".img", StringComparison.InvariantCultureIgnoreCase);
-                var outputDir = inputImg ?? Path.Combine(Path.GetFullPath(inputImg), "extract");
+                var inputImg = InputImg ?? InputIdx.Replace(".idx", ".img", StringComparison.InvariantCultureIgnoreCase);
+                var outputDir = OutputDir ?? Path.Combine(Path.GetFullPath(inputImg), "extract");
 
                 Idx idx = OpenIdx(InputIdx);
 
