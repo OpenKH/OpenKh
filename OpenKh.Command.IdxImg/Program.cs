@@ -5,12 +5,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace OpenKh.Command.IdxImg
 {
     [Command("OpenKh.Command.IdxImg")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(ExtractCommand))]
+    [Subcommand(typeof(ExtractCommand), typeof(ListCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -84,6 +85,61 @@ namespace OpenKh.Command.IdxImg
                         }
                     }
                 }
+
+                return 0;
+            }
+
+            public static List<string> ExtractIdx(Img img, Idx idx, string basePath)
+            {
+                var idxs = new List<string>();
+
+                foreach (var entry in idx.GetNameEntries())
+                {
+                    var fileName = entry.Name;
+                    if (fileName == null)
+                        fileName = $"@noname/{entry.Entry.Hash32:X08}-{entry.Entry.Hash16:X04}";
+
+                    Console.WriteLine(fileName);
+
+                    var outputFile = Path.Combine(basePath, fileName);
+                    var outputDir = Path.GetDirectoryName(outputFile);
+                    if (Directory.Exists(outputDir) == false)
+                        Directory.CreateDirectory(outputDir);
+
+                    using (var file = File.Create(outputFile))
+                    {
+                        // TODO handle decompression
+                        img.FileOpen(entry.Entry).CopyTo(file);
+                    }
+
+                    if (Path.GetExtension(fileName) == ".idx")
+                        idxs.Add(outputFile);
+                }
+
+                return idxs;
+            }
+        }
+
+        private class ListCommand
+        {
+            private Program Parent { get; set; }
+
+            [Required]
+            [FileExists]
+            [Option(CommandOptionType.SingleValue, Description = "Kingdom Hearts II IDX file, paired with a IMG", ShortName = "i", LongName = "idx")]
+            public string InputIdx { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Sort file list by their position in the IMG", ShortName = "s", LongName = "sort")]
+            public bool Sort { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var entries = OpenIdx(InputIdx).GetNameEntries();
+                if (Sort)
+                    entries = entries.OrderBy(x => x.Entry.Offset);
+
+                foreach (var entry in entries)
+                    Console.WriteLine(entry.Name);
 
                 return 0;
             }
