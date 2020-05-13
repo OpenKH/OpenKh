@@ -20,9 +20,9 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_Open 00place..."
                           Command="{Binding OpenCommand}"/>
-                <MenuItem Header="_Save 00objentry"
+                <MenuItem Header="_Save 00place"
                           Command="{Binding SaveCommand}"/>
-                <MenuItem Header="Save 00objentry _as..."
+                <MenuItem Header="Save 00place _as..."
                           Command="{Binding SaveAsCommand}"/>
                 <Separator/>
                 <MenuItem Header="Export as CSV..."
