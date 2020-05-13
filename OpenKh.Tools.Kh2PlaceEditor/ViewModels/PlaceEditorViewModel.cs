@@ -23,6 +23,7 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
         }
 
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("00place.bin or place.bin", "bin").AddAllFiles();
+        private static readonly List<FileDialogFilter> CsvFilter = FileDialogFilterComposer.Compose().AddExtensions("Map names as CSV", "csv");
         private static readonly string ApplicationName = Utilities.GetApplicationName();
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
@@ -47,6 +48,7 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
         public RelayCommand OpenCommand { get; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
+        public RelayCommand ExportAsCsvCommand { get; }
         public RelayCommand ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
         public RelayCommand LoadSupportIdxCommand { get; }
@@ -107,6 +109,27 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
             {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
+
+            ExportAsCsvCommand = new RelayCommand(_ =>
+            {
+                FileDialog.OnSave(fileName => File.CreateText(fileName).Using(writer =>
+                {
+                    foreach (var place in Places.Items.Cast<PlaceViewModel>())
+                    {
+                        var row = new string[]
+                        {
+                            place.Map,
+                            place.MessageId.ToString(),
+                            place.Name,
+                            place.Message
+                        }
+                        .Select(x => $"\"{x}\"");
+
+                        writer.WriteLine(string.Join(",", row));
+                    }
+                })
+                , CsvFilter);
+            });
 
             LoadSupportIdxCommand = new RelayCommand(_ => Utilities.Catch(() =>
             {

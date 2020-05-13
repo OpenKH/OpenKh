@@ -25,6 +25,9 @@
                 <MenuItem Header="Save 00objentry _as..."
                           Command="{Binding SaveAsCommand}"/>
                 <Separator/>
+                <MenuItem Header="Export as CSV..."
+                          Command="{Binding ExportAsCsvCommand}"/>
+                <Separator/>
                 <MenuItem Header="Su_pport files">
                     <MenuItem Header="Load _IDX/IMG" Command="{Binding LoadSupportIdxCommand}"/>
                     <MenuItem Header="Load MSG only" Command="{Binding LoadSupportMsgCommand}"/>
