@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
@@ -112,9 +113,9 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
 
             ExportAsCsvCommand = new RelayCommand(_ =>
             {
-                FileDialog.OnSave(fileName => File.CreateText(fileName).Using(writer =>
+                FileDialog.OnSave(fileName => new StreamWriter(fileName, false, new UTF8Encoding(true)).Using(writer =>
                 {
-                    foreach (var place in Places.Items.Cast<PlaceViewModel>())
+                    foreach (var place in Places?.Items?.Cast<PlaceViewModel>() ?? new PlaceViewModel[0])
                     {
                         var row = new string[]
                         {
