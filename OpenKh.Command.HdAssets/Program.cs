@@ -1,70 +1,111 @@
-﻿using OpenKh.Common.Archives;
+﻿using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Common.Archives;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace OpenKh.Command.HdAssets
 {
+    [Command("OpenKh.Command.IdxImg")]
+    [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
+    [Subcommand(typeof(ExtractCommand)))]
     class Program
     {
-        const string Prefix = "_ASSET_";
+        private const string DefaultPrefix = "_ASSET_";
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            var path = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
-            if (File.Exists(path))
-                UnpackFile(path);
-            else
-                UnpackDirectory(path);
-        }
-
-        private static void UnpackDirectory(string path)
-        {
-            var fileList = Directory
-                .GetFiles(path, "*", SearchOption.AllDirectories)
-                .Where(x => x.IndexOf(Prefix) != 0)
-                .ToList();
-
-            foreach (var filePath in fileList)
-                UnpackFile(filePath);
-        }
-
-
-        private static void UnpackFile(string filePath)
-        {
-            var directoryName = Path.GetDirectoryName(filePath);
-            Console.Write($"{filePath}... ");
-
-            using (var stream = File.OpenRead(filePath))
+            try
             {
-                HdAsset asset;
+                return CommandLineApplication.Execute<Program>(args);
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine($"The file {e.FileName} cannot be found. The program will now exit.");
+                return 2;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"FATAL ERROR: {e.Message}\n{e.StackTrace}");
+                return -1;
+            }
+        }
 
-                try
-                {
-                    // Avoids to throw a false positive to files that are not an HdAsset
-                    asset = HdAsset.Read(stream);
-                }
-                catch
-                {
-                    Console.WriteLine("ERROR!");
-                    return;
-                }
+        protected int OnExecute(CommandLineApplication app)
+        {
+            app.ShowHelp();
+            return 1;
+        }
 
-                foreach (var entry in asset.Entries)
-                {
-                    var outDir = Path.GetFileNameWithoutExtension(filePath);
-                    var outFileName = Path.Combine(directoryName, $"{Prefix}{outDir}", entry.Name);
-                    Directory.CreateDirectory(Path.GetDirectoryName(outFileName));
+        private static string GetVersion()
+            => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
-                    using (var outStream = File.Create(outFileName))
+        [Command(Description = "Extract ReMIX assets into an asset folder.")]
+        private class ExtractCommand
+        {
+            [Required]
+            [Argument(0, Description = "Input file or directory of 1.5/2.5 ReMIX assets")]
+            public string Input { get; set; }
+
+            [Option(CommandOptionType.SingleValue, Description = "Prefix used as extraction directory. By default it is '_ASSET_'", ShortName = "p", LongName = "prefix")]
+            public string Prefix { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Execute the command recursively for all the sub-folders", ShortName = "r", LongName = "recursive")]
+            public bool Recursive { get; set; }
+
+            protected void OnExecute(CommandLineApplication app)
+            {
+                var prefix = Prefix ?? DefaultPrefix;
+
+                foreach (var filePath in GetFiles(Input, Recursive, prefix))
+                {
+                    using (var stream = File.OpenRead(filePath))
                     {
-                        entry.Stream.Position = 0;
-                        entry.Stream.CopyTo(outStream);
+                        HdAsset asset;
+
+                        try
+                        {
+                            // Avoid to crash on files that are not a ReMIX asset
+                            asset = HdAsset.Read(stream);
+                        }
+                        catch
+                        {
+                            // Not a ReMIX asset
+                            continue;
+                        }
+
+                        var directoryName = Path.GetDirectoryName(filePath);
+                        Console.Write(filePath);
+
+                        foreach (var entry in asset.Entries)
+                        {
+                            var outDir = Path.GetFileNameWithoutExtension(filePath);
+                            var outFileName = Path.Combine(directoryName, $"{prefix}{outDir}", entry.Name);
+                            Directory.CreateDirectory(Path.GetDirectoryName(outFileName));
+
+                            using (var outStream = File.Create(outFileName))
+                            {
+                                entry.Stream.Position = 0;
+                                entry.Stream.CopyTo(outStream);
+                            }
+                        }
                     }
                 }
             }
+        }
 
-            Console.WriteLine("Ok!");
+        private static string[] GetFiles(string input, bool recursive, string excludePrefix)
+        {
+            if (File.Exists(input))
+                return new string[] { input };
+            else if (Directory.Exists(input))
+                return Directory.GetFiles(input, "*",
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+            else
+                throw new FileNotFoundException(null, input);
         }
     }
 }
