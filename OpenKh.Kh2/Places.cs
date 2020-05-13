@@ -7,11 +7,17 @@ namespace OpenKh.Kh2
 {
     public class Place
     {
+        /// <summary>
+        /// Refers to sys.bar
+        /// </summary>
         public ushort MessageId { get; set; }
 
-        public List<ushort> SubPlaces { get; set; }
+        /// <summary>
+        /// Place name to be decoded as Shift-JIS.
+        /// </summary>
+        public byte[] Name { get; set; }
 
-        private static IEnumerable<ushort> ReadPlaceSubEntries(Stream stream)
+        private static IEnumerable<byte> ReadPlaceSubEntries(Stream stream)
         {
             while (true)
             {
@@ -19,7 +25,7 @@ namespace OpenKh.Kh2
                 if (ch <= 0)
                     yield break;
 
-                yield return (ushort)(ch | (stream.ReadByte() << 8));
+                yield return (byte)ch;
             }
         }
 
@@ -41,22 +47,22 @@ namespace OpenKh.Kh2
 
             for (var i = 0; i < placeCount - 1; i++)
             {
-                var hasSubPlaces = offsetIds[i] != offsetIds[i + 1];
-                var subPlaces = hasSubPlaces ?
-                    ReadPlaceSubEntries(stream.SetPosition(offsetIds[i])).ToList() :
-                    new List<ushort>();
+                var hasName = offsetIds[i] != offsetIds[i + 1];
+                var name = hasName ?
+                    ReadPlaceSubEntries(stream.SetPosition(offsetIds[i])).ToArray() :
+                    new byte[0];
 
                 yield return new Place
                 {
                     MessageId = placeIds[i],
-                    SubPlaces = subPlaces
+                    Name = name
                 };
             }
 
             yield return new Place
             {
                 MessageId = placeIds[placeCount - 1],
-                SubPlaces = ReadPlaceSubEntries(stream.SetPosition(offsetIds[placeCount - 1])).ToList()
+                Name = ReadPlaceSubEntries(stream.SetPosition(offsetIds[placeCount - 1])).ToArray()
             };
         }
 
@@ -69,17 +75,15 @@ namespace OpenKh.Kh2
                 stream.Write((ushort)endOfFile);
 
                 endOfFile -= 4;
-                if (place.SubPlaces.Count > 0)
-                    endOfFile += place.SubPlaces.Count * 2 + 1;
+                if (place.Name.Length > 0)
+                    endOfFile += place.Name.Length + 1;
             }
 
             foreach (var place in places)
             {
-                // If no subplaces are found, then it's a place.bin and not a 00place.bin
-                if (place.SubPlaces.Count > 0)
+                if (place.Name.Length > 0)
                 {
-                    foreach (var subplace in place.SubPlaces)
-                        stream.Write(subplace);
+                    stream.Write(place.Name);
                     stream.Write((byte)0);
                 }
             }

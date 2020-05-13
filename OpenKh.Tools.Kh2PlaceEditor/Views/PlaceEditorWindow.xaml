@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2PlaceEditor.Views"
         xmlns:converters="clr-namespace:OpenKh.Tools.Kh2PlaceEditor.Converters"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="570" Width="800">
+        Title="{Binding Title}" Height="500" Width="800">
     <Window.Resources>
         <converters:EnumMatchToBooleanConverter x:Key="enumConverter" />
     </Window.Resources>

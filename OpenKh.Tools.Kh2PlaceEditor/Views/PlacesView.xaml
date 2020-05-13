@@ -6,31 +6,16 @@
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2PlaceEditor.Views"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="400">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
-
-        <ListBox
-            Grid.Column="0"
-            ItemsSource="{Binding Items}"
-            DisplayMemberPath="Name"/>
-
-        <StackPanel Grid.Column="2">
-            <TextBlock Text="Map name"/>
-            <Grid Margin="0 0 0 5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="3"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0" Text="{Binding MessageId}"/>
-                <TextBlock Grid.Column="2" Text="{Binding Name}"/>
-            </Grid>
-        </StackPanel>
-        
-    </Grid>
+    <DataGrid ItemsSource="{Binding Items.Items}" AutoGenerateColumns="False">
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Map" Width="Auto"
+                Binding="{Binding Map, Mode=OneWay}" IsReadOnly="True"/>
+            <DataGridTextColumn Header="Msg ID" Width="Auto"
+                Binding="{Binding MessageId}"/>
+            <DataGridTextColumn Header="Name" Width="*"
+                Binding="{Binding Name, Mode=TwoWay}"/>
+            <DataGridTextColumn Header="Message name" Width="*"
+                Binding="{Binding Message, Mode=OneWay}" IsReadOnly="True"/>
+        </DataGrid.Columns>
+    </DataGrid>
 </UserControl>

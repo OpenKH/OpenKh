@@ -38,15 +38,12 @@ namespace OpenKh.Tests.kh2
         });
 
         [Fact]
-        public void ReadSubPlaces() => Common.FileOpenRead(OldPlaceFileName, stream =>
+        public void ReadPlaceName() => Common.FileOpenRead(OldPlaceFileName, stream =>
         {
             var places = Place.Read(stream)["bb"];
-            Assert.Equal(9, places[0].SubPlaces.Count);
-            Assert.Equal(0x4783, places[0].SubPlaces[0]);
-            Assert.Equal(0x8B83, places[0].SubPlaces[8]);
-
-            Assert.Single(places[15].SubPlaces);
-            Assert.Equal(0xB48B, places[15].SubPlaces[0]);
+            Assert.Equal(18, places[0].Name.Length);
+            Assert.Equal(0x83, places[0].Name[0]);
+            Assert.Equal(0x8B, places[0].Name[17]);
         });
 
         [Theory]
@@ -58,10 +55,6 @@ namespace OpenKh.Tests.kh2
             {
                 var outStream = new MemoryStream();
                 Place.Write(outStream, Place.Read(inStream));
-
-                outStream.Position = 0;
-                using var tmp = File.Create("D:/place.bin");
-                outStream.CopyTo(tmp);
 
                 return outStream;
             });
