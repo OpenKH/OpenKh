@@ -12,3 +12,4 @@ Right now the documentation contains info about the following games:
 * Common
     * [TM2 PlayStation 2 textures](common/tm2.md)
     * [PS4 HD assets](common/hdassets.md)
+ * [Tools](tool/index)
