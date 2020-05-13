@@ -3,9 +3,13 @@ using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace OpenKh.Command.Arc
 {
+    [Command("OpenKh.Command.Arc")]
+    [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     class Program
     {
         static void Main(string[] args)
@@ -24,9 +28,14 @@ namespace OpenKh.Command.Arc
             }
         }
 
+        private static string GetVersion()
+            => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+        [Required]
         [Argument(0, "ARC file", "The ARC file to pack or unpack")]
         public string FileName { get; }
 
+        [Required]
         [Argument(1, "ARC directory", "The ARC directory used as destination for unpakcing or source for packing")]
         public string DirectoryName { get; }
 
