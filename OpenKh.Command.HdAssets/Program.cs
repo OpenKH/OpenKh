@@ -11,7 +11,9 @@ namespace OpenKh.Command.HdAssets
 {
     [Command("OpenKh.Command.IdxImg")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(ExtractCommand)))]
+    [Subcommand(
+        typeof(ExtractCommand),
+        typeof(StripCommand))]
     class Program
     {
         private const string DefaultPrefix = "_ASSET_";
@@ -93,6 +95,42 @@ namespace OpenKh.Command.HdAssets
                             }
                         }
                     }
+                }
+            }
+        }
+
+        [Command(Description = "Modify ReMIX assets by unwrapping them from their HD textures, effectly making them compatible with the original games.")]
+        private class StripCommand
+        {
+            [Required]
+            [Argument(0, Description = "Input file or directory of 1.5/2.5 ReMIX assets")]
+            public string Input { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Execute the command recursively for all the sub-folders", ShortName = "r", LongName = "recursive")]
+            public bool Recursive { get; set; }
+
+            protected void OnExecute(CommandLineApplication app)
+            {
+                foreach (var filePath in GetFiles(Input, Recursive, DefaultPrefix))
+                {
+                    HdAsset asset;
+                    using (var stream = File.OpenRead(filePath))
+                    {
+
+                        try
+                        {
+                            // Avoid to crash on files that are not a ReMIX asset
+                            asset = HdAsset.Read(stream);
+                        }
+                        catch
+                        {
+                            // Not a ReMIX asset
+                            continue;
+                        }
+                    }
+
+                    using (var stream = File.Create(filePath))
+                        asset.Stream.CopyTo(stream);
                 }
             }
         }
