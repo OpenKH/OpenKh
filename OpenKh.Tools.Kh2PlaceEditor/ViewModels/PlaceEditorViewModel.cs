@@ -22,7 +22,7 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
             Japanese
         }
 
-        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("00place.bin", "bin").AddAllFiles();
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("00place.bin or place.bin", "bin").AddAllFiles();
         private static readonly string ApplicationName = Utilities.GetApplicationName();
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
