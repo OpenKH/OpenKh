@@ -11,8 +11,8 @@
 | File | Tool name
 |------|-----------
 |[msg/*](../kh2/file/type/msg) | OpenKh.Command.MsgTool
-|[msg/*](../kh2/file/type/msg) | OpenKh.Tools.Kh2TextEditor
-|[BAR](../kh2/file/type/bar) | OpenKh.Tools.Kh2TextEditor
+|[msg/*](../kh2/file/type/msg) | [OpenKh.Tools.Kh2TextEditor](./Kh2TextEditor/index)
+|[BAR](../kh2/file/type/bar) | OpenKh.Tools.BarEditor
 |[IMD](../kh2/file/type/image#imgd) | OpenKh.Tools.ImageViewer
 |[IMZ](../kh2/file/type/image#imgz) | OpenKh.Tools.ImageViewer
 |[FAC](../kh2/file/type/image#fac) | OpenKh.Tools.ImageViewer
