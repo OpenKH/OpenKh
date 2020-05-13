@@ -33,7 +33,7 @@ namespace OpenKh.Command.MsgTool
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         [Required]
-        [Option(ShortName = "i", LongName = "input", Description = "IDX input")]
+        [Option(ShortName = "i", LongName = "input", Description = "MSG file (almost all the files inside msg/{language}/ are considered MSGs)")]
         public string Input { get; }
 
         private void OnExecute()
