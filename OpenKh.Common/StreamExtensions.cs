@@ -143,29 +143,15 @@ namespace OpenKh.Common
             return (int)stream.Position - oldPosition;
         }
 
-        public static void Write(this Stream stream, byte value) =>
-            new BinaryWriter(stream).Write(value);
-
-        public static void Write(this Stream stream, char value) =>
-            new BinaryWriter(stream).Write(value);
-
-        public static void Write(this Stream stream, short value) =>
-            new BinaryWriter(stream).Write(value);
-
-        public static void Write(this Stream stream, ushort value) =>
-            new BinaryWriter(stream).Write(value);
-
-        public static void Write(this Stream stream, int value) =>
-            new BinaryWriter(stream).Write(value);
-
-        public static void Write(this Stream stream, uint value) =>
-            new BinaryWriter(stream).Write(value);
-
-        public static void Write(this Stream stream, long value) =>
-            new BinaryWriter(stream).Write(value);
-
-        public static void Write(this Stream stream, ulong value) =>
-            new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, byte value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, sbyte value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, char value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, short value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, ushort value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, int value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, uint value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, long value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, ulong value) => new BinaryWriter(stream).Write(value);
 
         public static void Copy(this Stream source, Stream destination, int length, int bufferSize = 65536)
         {

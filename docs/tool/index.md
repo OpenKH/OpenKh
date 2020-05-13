@@ -21,7 +21,9 @@
 |[2DD](../kh2/file/type/2ld) | OpenKh.Tools.LayoutViewer (incomplete)
 |[00battle](../kh2/file/type/00battle) | OpenKh.Tools.LevelUpEditor
 |[00objentry](../kh2/file/type/00objentry) | OpenKh.Tools.ObjentryEditor
+|[00place](../kh2/file/type/place) | OpenKh.Tools.Kh2PlaceEditor
 |[03system](../kh2/file/type/03system) | OpenKh.Tools.Kh2SystemEditor
+|[msg/*/place.bin](../kh2/file/type/place) | OpenKh.Tools.Kh2PlaceEditor
 
 ## Kingdom Hearts Birth By Sleep
 

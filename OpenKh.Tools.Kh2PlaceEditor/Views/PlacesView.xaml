@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2PlaceEditor.Views.PlacesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2PlaceEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="400">
+    <DataGrid ItemsSource="{Binding Items.Items}" AutoGenerateColumns="False">
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Map" Width="Auto"
+                Binding="{Binding Map, Mode=OneWay}" IsReadOnly="True"/>
+            <DataGridTextColumn Header="Msg ID" Width="Auto"
+                Binding="{Binding MessageId}"/>
+            <DataGridTextColumn Header="Name" Width="*"
+                Binding="{Binding Name, Mode=TwoWay}"/>
+            <DataGridTextColumn Header="Message name" Width="*"
+                Binding="{Binding Message, Mode=OneWay}" IsReadOnly="True"/>
+        </DataGrid.Columns>
+    </DataGrid>
+</UserControl>
