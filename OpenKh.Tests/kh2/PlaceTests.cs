@@ -6,16 +6,21 @@ namespace OpenKh.Tests.kh2
 {
     public class PlaceTests
     {
-        private const string FileName = "kh2/res/00place.bin";
+        private const string PlaceFileName = "kh2/res/place.bin";
+        private const string OldPlaceFileName = "kh2/res/00place.bin";
 
-        [Fact]
-        public void HasTheRightAmountOfWorlds() => Common.FileOpenRead(FileName, stream =>
+        [Theory]
+        [InlineData(PlaceFileName)]
+        [InlineData(OldPlaceFileName)]
+        public void HasTheRightAmountOfWorlds(string fileName) => Common.FileOpenRead(fileName, stream =>
         {
             Assert.Equal(20, Place.Read(stream).Count);
         });
 
-        [Fact]
-        public void HasTheRightWorldNames() => Common.FileOpenRead(FileName, stream =>
+        [Theory]
+        [InlineData(PlaceFileName)]
+        [InlineData(OldPlaceFileName)]
+        public void HasTheRightWorldNames(string fileName) => Common.FileOpenRead(fileName, stream =>
         {
             var places = Place.Read(stream);
             Assert.Contains(places, x => x.Key == "tmp");
@@ -25,19 +30,27 @@ namespace OpenKh.Tests.kh2
             Assert.Contains(places, x => x.Key == "zz");
         });
 
-        [Fact]
-        public void HasWorldTheRightAmountOfPlaces() => Common.FileOpenRead(FileName, stream =>
+        [Theory]
+        [InlineData(PlaceFileName)]
+        [InlineData(OldPlaceFileName)]
+        public void HasWorldTheRightAmountOfPlaces(string fileName) => Common.FileOpenRead(fileName, stream =>
         {
             Assert.Equal(16, Place.Read(stream)["bb"].Count);
         });
 
-        [Fact]
-        public void WriteBackTheSameFile() => Common.FileOpenRead(FileName, stream =>
+        [Theory]
+        [InlineData(PlaceFileName)]
+        [InlineData(OldPlaceFileName)]
+        public void WriteBackTheSameFile(string fileName) => Common.FileOpenRead(fileName, stream =>
         {
             Helpers.AssertStream(stream, inStream =>
             {
                 var outStream = new MemoryStream();
                 Place.Write(outStream, Place.Read(inStream));
+
+                outStream.Position = 0;
+                using var tmp = File.Create("D:/place.bin");
+                outStream.CopyTo(tmp);
 
                 return outStream;
             });
