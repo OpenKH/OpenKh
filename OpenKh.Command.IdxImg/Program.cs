@@ -143,36 +143,6 @@ namespace OpenKh.Command.IdxImg
 
                 return 0;
             }
-
-            public static List<string> ExtractIdx(Img img, Idx idx, string basePath)
-            {
-                var idxs = new List<string>();
-
-                foreach (var entry in idx.GetNameEntries())
-                {
-                    var fileName = entry.Name;
-                    if (fileName == null)
-                        fileName = $"@noname/{entry.Entry.Hash32:X08}-{entry.Entry.Hash16:X04}";
-
-                    Console.WriteLine(fileName);
-
-                    var outputFile = Path.Combine(basePath, fileName);
-                    var outputDir = Path.GetDirectoryName(outputFile);
-                    if (Directory.Exists(outputDir) == false)
-                        Directory.CreateDirectory(outputDir);
-
-                    using (var file = File.Create(outputFile))
-                    {
-                        // TODO handle decompression
-                        img.FileOpen(entry.Entry).CopyTo(file);
-                    }
-
-                    if (Path.GetExtension(fileName) == ".idx")
-                        idxs.Add(outputFile);
-                }
-
-                return idxs;
-            }
         }
 
         private static Idx OpenIdx(string fileName)
