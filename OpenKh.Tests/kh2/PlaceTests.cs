@@ -14,7 +14,7 @@ namespace OpenKh.Tests.kh2
         [InlineData(OldPlaceFileName)]
         public void HasTheRightAmountOfWorlds(string fileName) => Common.FileOpenRead(fileName, stream =>
         {
-            Assert.Equal(20, Place.Read(stream).Count);
+            Assert.Equal(19, Place.Read(stream).Count);
         });
 
         [Theory]
@@ -23,7 +23,6 @@ namespace OpenKh.Tests.kh2
         public void HasTheRightWorldNames(string fileName) => Common.FileOpenRead(fileName, stream =>
         {
             var places = Place.Read(stream);
-            Assert.Contains(places, x => x.Key == "tmp");
             Assert.Contains(places, x => x.Key == "al");
             Assert.Contains(places, x => x.Key == "bb");
             Assert.Contains(places, x => x.Key == "wm");
@@ -36,6 +35,18 @@ namespace OpenKh.Tests.kh2
         public void HasWorldTheRightAmountOfPlaces(string fileName) => Common.FileOpenRead(fileName, stream =>
         {
             Assert.Equal(16, Place.Read(stream)["bb"].Count);
+        });
+
+        [Fact]
+        public void ReadSubPlaces() => Common.FileOpenRead(OldPlaceFileName, stream =>
+        {
+            var places = Place.Read(stream)["bb"];
+            Assert.Equal(9, places[0].SubPlaces.Count);
+            Assert.Equal(0x4783, places[0].SubPlaces[0]);
+            Assert.Equal(0x8B83, places[0].SubPlaces[8]);
+
+            Assert.Single(places[15].SubPlaces);
+            Assert.Equal(0xB48B, places[15].SubPlaces[0]);
         });
 
         [Theory]
