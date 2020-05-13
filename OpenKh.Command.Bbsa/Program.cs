@@ -49,7 +49,7 @@ namespace OpenKh.Command.Bbsa
         {
             [Required]
             [DirectoryExists]
-            [Option(CommandOptionType.SingleValue, Description = "Required. Path where the various BBSAx.DAT files are located", ShortName = "i", LongName = "input")]
+            [Argument(0, Description = "Required. Path where the various BBSAx.DAT files are located")]
             public string InputPath { get; set; }
 
             [Option(CommandOptionType.SingleValue, Description = "Path where the content will be extracted", ShortName = "o", LongName = "output")]
@@ -105,7 +105,7 @@ namespace OpenKh.Command.Bbsa
         {
             [Required]
             [DirectoryExists]
-            [Option(CommandOptionType.SingleValue, Description = "Required. Path where the various BBSAx.DAT files are located", ShortName = "i", LongName = "input")]
+            [Argument(0, Description = "Required. Path where the various BBSAx.DAT files are located")]
             public string InputPath { get; set; }
 
             [Option(CommandOptionType.SingleValue, Description = "Archive file name prefix. By default it is 'BBS'.", ShortName = "p", LongName = "prefix")]
