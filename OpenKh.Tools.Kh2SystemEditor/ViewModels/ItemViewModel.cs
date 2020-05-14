@@ -29,7 +29,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
             public Item.Entry Item { get; }
 
-            public string Title => $"{Item.Id:X02} {_messageProvider.GetMessage(Item.Name)}";
+            public string Title => $"{Item.Id:X02} {_messageProvider.GetString(Item.Name)}";
 
             public ushort Id { get => Item.Id; set => Item.Id = value; }
             public Item.Type Type  { get => Item.Type; set => Item.Type = value; }
@@ -64,8 +64,8 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public byte Icon2  { get => Item.Icon1; set => Item.Icon1 = value; }
 
             public string IdText => $"{Id} (0x{Id:X})";
-            public string Name { get => _messageProvider.GetMessage(Item.Name); set => _messageProvider.SetMessage(Item.Name, value); }
-            public string Description { get => _messageProvider.GetMessage(Item.Description); set => _messageProvider.SetMessage(Item.Description, value); }
+            public string Name { get => _messageProvider.GetString(Item.Name); set => _messageProvider.SetString(Item.Name, value); }
+            public string Description { get => _messageProvider.GetString(Item.Description); set => _messageProvider.SetString(Item.Description, value); }
             public EnumModel<Item.Type> Types { get; }
             public EnumModel<Item.Rank> Ranks { get; }
 

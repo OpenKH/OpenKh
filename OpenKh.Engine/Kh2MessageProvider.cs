@@ -11,7 +11,7 @@ namespace OpenKh.Engine
 
         public IMessageEncoder Encoder { get; set; } = Encoders.InternationalSystem;
 
-        public string GetMessage(ushort id)
+        public string GetString(ushort id)
         {
             var message = _messages?.FirstOrDefault(x => x.Id == (id & 0x7fff));
             if (message == null)
@@ -19,13 +19,13 @@ namespace OpenKh.Engine
                 if (id == Msg.FallbackMessage)
                     return null;
 
-                return GetMessage(Msg.FallbackMessage);
+                return GetString(Msg.FallbackMessage);
             }
 
             return MsgSerializer.SerializeText(Encoder.Decode(message.Data));
         }
 
-        public void SetMessage(ushort id, string text)
+        public void SetString(ushort id, string text)
         {
             var message = _messages?.FirstOrDefault(x => x.Id == (id & 0x7fff));
             if (message == null)
