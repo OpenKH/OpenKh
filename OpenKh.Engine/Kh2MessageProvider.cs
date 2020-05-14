@@ -11,19 +11,22 @@ namespace OpenKh.Engine
 
         public IMessageEncoder Encoder { get; set; } = Encoders.InternationalSystem;
 
-        public string GetString(ushort id)
+        public byte[] GetMessage(ushort id)
         {
             var message = _messages?.FirstOrDefault(x => x.Id == (id & 0x7fff));
             if (message == null)
             {
                 if (id == Msg.FallbackMessage)
-                    return null;
+                    return new byte[0];
 
-                return GetString(Msg.FallbackMessage);
+                return GetMessage(Msg.FallbackMessage);
             }
 
-            return MsgSerializer.SerializeText(Encoder.Decode(message.Data));
+            return message.Data;
         }
+
+        public string GetString(ushort id) =>
+            MsgSerializer.SerializeText(Encoder.Decode(GetMessage(id)));
 
         public void SetString(ushort id, string text)
         {
