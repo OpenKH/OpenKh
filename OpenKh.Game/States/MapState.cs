@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.Parsers;
-using OpenKh.Game.Extensions;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
 using OpenKh.Kh2;
@@ -120,11 +119,8 @@ namespace OpenKh.Game.States
                 return;
 
             var fileName = $"obj/{model.ModelName}.mdlx";
-            if (File.Exists(fileName))
-            {
-                _archiveManager.LoadArchive(fileName);
-                AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "p_ex", "tim_"));
-            }
+            _archiveManager.LoadArchive(fileName);
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "p_ex", "tim_"));
         }
 
         private void LoadMap(int worldIndex, int mapIndex)

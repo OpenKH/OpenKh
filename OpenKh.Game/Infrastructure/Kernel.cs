@@ -52,7 +52,7 @@ namespace OpenKh.Game.Infrastructure
 
         private void LoadSystem(string fileName)
         {
-            var bar = File.OpenRead(fileName).Using(stream => Bar.Read(stream));
+            var bar = _dataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
             bar.ForEntry("ftst", stream => Ftst = Kh2.System.Ftst.Read(stream));
             bar.ForEntry("item", stream => Item = Kh2.System.Item.Read(stream));
@@ -61,7 +61,7 @@ namespace OpenKh.Game.Infrastructure
 
         private void LoadBattle(string fileName)
         {
-            var bar = File.OpenRead(fileName).Using(stream => Bar.Read(stream));
+            var bar = _dataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
             bar.ForEntry("fmlv", stream => Fmlv = new Kh2.Battle.Fmlv(stream));
             bar.ForEntry("item", stream => Item = Kh2.System.Item.Read(stream));

@@ -5,6 +5,20 @@ namespace OpenKh.Game.DataContent
 {
     public class StandardDataContent : IDataContent
     {
-        public Stream FileOpen(string path) => File.OpenRead(path);
+        private readonly string _baseDirectory;
+
+        public StandardDataContent(string baseDirectory = ".")
+        {
+            _baseDirectory = baseDirectory;
+        }
+
+        public Stream FileOpen(string path)
+        {
+            var fileName = Path.Combine(_baseDirectory, path);
+            if (File.Exists(fileName))
+                return File.OpenRead(fileName);
+
+            return null;
+        }
     }
 }

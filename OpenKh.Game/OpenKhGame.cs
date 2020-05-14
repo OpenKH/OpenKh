@@ -1,10 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using OpenKh.Common;
 using OpenKh.Game.DataContent;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
-using System.Runtime.CompilerServices;
+using System.IO;
 
 namespace OpenKh.Game
 {
@@ -13,7 +14,7 @@ namespace OpenKh.Game
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        private readonly IDataContent dataContent;
+        private readonly IDataContent _dataContent;
         private readonly Kernel _kernel;
         private readonly ArchiveManager archiveManager;
         private readonly InputManager inputManager;
@@ -30,9 +31,22 @@ namespace OpenKh.Game
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            dataContent = new StandardDataContent();
-            archiveManager = new ArchiveManager(dataContent);
-            _kernel = new Kernel(dataContent);
+            if (File.Exists("KH2.IDX") && File.Exists("KH2.IMG"))
+            {
+                var imgStream = File.OpenRead("KH2.IMG");
+                var idxDataContent = File.OpenRead("KH2.IDX")
+                    .Using(stream => new IdxDataContent(stream, imgStream));
+                _dataContent = new SafeDataContent(new MultipleDataContent(
+                    new StandardDataContent(),
+                    idxDataContent,
+                    new IdxMultipleDataContent(idxDataContent, imgStream)
+                ));
+            }
+            else
+                _dataContent = new SafeDataContent(new StandardDataContent());
+
+            archiveManager = new ArchiveManager(_dataContent);
+            _kernel = new Kernel(_dataContent);
             inputManager = new InputManager();
         }
 
@@ -41,7 +55,7 @@ namespace OpenKh.Game
             state = new MapState();
             state.Initialize(new StateInitDesc
             {
-                DataContent = dataContent,
+                DataContent = _dataContent,
                 ArchiveManager = archiveManager,
                 Kernel = _kernel,
                 InputManager = inputManager,
