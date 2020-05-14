@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using OpenKh.Game.DataContent;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
+using System.Runtime.CompilerServices;
 
 namespace OpenKh.Game
 {
@@ -13,6 +14,7 @@ namespace OpenKh.Game
         private SpriteBatch spriteBatch;
 
         private readonly IDataContent dataContent;
+        private readonly Kernel _kernel;
         private readonly ArchiveManager archiveManager;
         private readonly InputManager inputManager;
         private IState state;
@@ -30,18 +32,18 @@ namespace OpenKh.Game
 
             dataContent = new StandardDataContent();
             archiveManager = new ArchiveManager(dataContent);
+            _kernel = new Kernel(dataContent);
             inputManager = new InputManager();
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             state = new MapState();
             state.Initialize(new StateInitDesc
             {
                 DataContent = dataContent,
                 ArchiveManager = archiveManager,
+                Kernel = _kernel,
                 InputManager = inputManager,
                 GraphicsDevice = graphics
             });

@@ -14,17 +14,17 @@ namespace OpenKh.Game.States
 {
     public class MapState : IState
     {
+        private Kernel _kernel;
         private ArchiveManager _archiveManager;
         private GraphicsDeviceManager _graphics;
         private InputManager _input;
         private List<Mesh> _models = new List<Mesh>();
         private BasicEffect _effect;
         private Camera _camera;
-        private BaseTable<Objentry> _objEntry;
-        private const int _languageId = 0;
 
         public void Initialize(StateInitDesc initDesc)
         {
+            _kernel = initDesc.Kernel;
             _archiveManager = initDesc.ArchiveManager;
             _graphics = initDesc.GraphicsDevice;
             _input = initDesc.InputManager;
@@ -36,8 +36,6 @@ namespace OpenKh.Game.States
             };
 
             _graphics.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-
-            _objEntry = File.OpenRead("00objentry.bin").Using(stream => Objentry.Read(stream));
 
             _models.Clear();
             LoadMap(2, 4);
@@ -117,7 +115,7 @@ namespace OpenKh.Game.States
 
         private void LoadObjEntry(string name)
         {
-            var model = _objEntry.FirstOrDefault(x => x.ModelName == name);
+            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ModelName == name);
             if (model == null)
                 return;
 
@@ -131,7 +129,7 @@ namespace OpenKh.Game.States
 
         private void LoadMap(int worldIndex, int mapIndex)
         {
-            var fileName = $"map/{Constants.Languages[_languageId]}/{Constants.WorldIds[worldIndex]}{mapIndex:D02}.map";
+            var fileName = $"map/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{mapIndex:D02}.map";
 
             _archiveManager.LoadArchive(fileName);
             AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP", "MAP"));
