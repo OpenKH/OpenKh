@@ -1,11 +1,11 @@
 ﻿using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
+using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace OpenKh.Game.Infrastructure
 {
@@ -14,6 +14,7 @@ namespace OpenKh.Game.Infrastructure
         private readonly IDataContent _dataContent;
 
         public string Language { get; private set; }
+        public FontContext FontContext { get; private set; }
         public BaseTable<Objentry> ObjEntries { get; private set; }
         public Dictionary<string, List<Place>> Places { get; private set; }
         public List<Ftst.Entry> Ftst { get; private set; }
@@ -24,6 +25,7 @@ namespace OpenKh.Game.Infrastructure
 
         public Kernel(IDataContent dataContent, int languageId = 0)
         {
+            FontContext = new FontContext();
             Language = Constants.Languages[languageId];
             _dataContent = dataContent;
 
@@ -37,8 +39,9 @@ namespace OpenKh.Game.Infrastructure
             // 07localset
             // 12soundinfo
             // 14mission
-            // msg/jp/fontimage
-            // msg/jp/fontinfo
+
+            LoadFontImage($"msg/{Language}/fontimage.bar");
+            LoadFontInfo($"msg/{Language}/fontinfo.bar");
             Places = LoadFile($"msg/{Language}/place.bin", stream => Place.Read(stream));
             // msg/jp/sys
             // 15jigsaw
@@ -67,5 +70,15 @@ namespace OpenKh.Game.Infrastructure
             bar.ForEntry("item", stream => Item = Kh2.System.Item.Read(stream));
             bar.ForEntry("lvup", stream => Lvup = Kh2.Lvup.Open(stream));
         }
+
+        private void LoadFontInfo(string fileName)
+        {
+            var bar = _dataContent.FileOpen(fileName)
+                .Using(stream => Bar.Read(stream));
+            FontContext.Read(bar);
+        }
+
+        private void LoadFontImage(string fileName) =>
+            LoadFontInfo(fileName);
     }
 }
