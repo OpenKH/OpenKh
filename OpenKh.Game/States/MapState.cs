@@ -1,11 +1,13 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Common;
 using OpenKh.Engine.Parsers;
 using OpenKh.Game.Extensions;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
 using OpenKh.Kh2;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace OpenKh.Game.States
@@ -18,6 +20,7 @@ namespace OpenKh.Game.States
         private List<Mesh> _models = new List<Mesh>();
         private BasicEffect _effect;
         private Camera _camera;
+        private BaseTable<Objentry> _objEntry;
         private const int _languageId = 0;
 
         public void Initialize(StateInitDesc initDesc)
@@ -28,13 +31,17 @@ namespace OpenKh.Game.States
             _effect = new BasicEffect(_graphics.GraphicsDevice);
             _camera = new Camera()
             {
-                CameraPosition = new Vector3(0, 500, 0),
+                CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
 
             _graphics.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
 
+            _objEntry = File.OpenRead("00objentry.bin").Using(stream => Objentry.Read(stream));
+
+            _models.Clear();
             LoadMap(2, 4);
+            LoadObjEntry("PLAYER");
         }
 
         public void Destroy()
@@ -81,12 +88,16 @@ namespace OpenKh.Game.States
                         if (part.Indices.Length == 0)
                             continue;
 
-                        var texture = mesh.Textures[part.TextureId & 0xffff];
-                        if (_effect.Texture != texture)
+                        var textureIndex = part.TextureId & 0xffff;
+                        if (textureIndex < mesh.Textures.Length)
                         {
-                            _effect.Texture = texture;
-                            _effect.TextureEnabled = _effect.Texture != null;
-                            pass.Apply();
+                            var texture = mesh.Textures[textureIndex];
+                            if (_effect.Texture != texture)
+                            {
+                                _effect.Texture = texture;
+                                _effect.TextureEnabled = _effect.Texture != null;
+                                pass.Apply();
+                            }
                         }
 
                         _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
@@ -104,22 +115,35 @@ namespace OpenKh.Game.States
             }
         }
 
+        private void LoadObjEntry(string name)
+        {
+            var model = _objEntry.FirstOrDefault(x => x.ModelName == name);
+            if (model == null)
+                return;
+
+            var fileName = $"obj/{model.ModelName}.mdlx";
+            if (File.Exists(fileName))
+            {
+                _archiveManager.LoadArchive(fileName);
+                AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "p_ex", "tim_"));
+            }
+        }
+
         private void LoadMap(int worldIndex, int mapIndex)
         {
             var fileName = $"map/{Constants.Languages[_languageId]}/{Constants.WorldIds[worldIndex]}{mapIndex:D02}.map";
 
-            _models.Clear();
-
             _archiveManager.LoadArchive(fileName);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP"));
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK0"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP", "MAP"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK0", "SK0"));
         }
 
-        private static Mesh FromMdlx(GraphicsDevice graphics, ArchiveManager archiveManager, string name)
+        private static Mesh FromMdlx(
+            GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)
         {
-            var mdlx = archiveManager.Get<Mdlx>(name);
-            var textures = archiveManager.Get<ModelTexture>(name);
-            if (mdlx == null || textures == null)
+            var mdlx = archiveManager.Get<Mdlx>(modelName);
+            var textures = archiveManager.Get<ModelTexture>(textureName);
+            if (mdlx == null)
                 return null;
 
             var model = new MdlxParser(mdlx).Model;
@@ -141,7 +165,7 @@ namespace OpenKh.Game.States
                     SegmentId = part.SegmentId,
                     TextureId = part.TextureId
                 }).ToArray(),
-                Textures = textures.Images.Select(texture => texture.CreateTexture(graphics)).ToArray()
+                Textures = textures?.Images?.Select(texture => texture.CreateTexture(graphics)).ToArray() ?? new Texture2D[0]
             };
         }
 
