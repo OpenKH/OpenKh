@@ -22,6 +22,7 @@ namespace OpenKh.Game.Infrastructure
             [Bar.EntryType.Vif] = entry => Mdlx.Read(entry.Stream),
             [Bar.EntryType.Tim2] = entry => ModelTexture.Read(entry.Stream),
         };
+
         private readonly Dictionary<(string name, Bar.EntryType type), Entry> archives;
         private readonly IDataContent dataContent;
 
@@ -33,7 +34,7 @@ namespace OpenKh.Game.Infrastructure
 
         public void LoadArchive(string fileName)
         {
-            var stream = dataContent.FileOpen(fileName);
+            using var stream = dataContent.FileOpen(fileName);
             var entries = Bar.Read(stream);
 
             foreach (var entry in entries)
