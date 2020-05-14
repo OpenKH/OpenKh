@@ -18,6 +18,7 @@ namespace OpenKh.Game
         private readonly Kernel _kernel;
         private readonly ArchiveManager archiveManager;
         private readonly InputManager inputManager;
+        private readonly DebugOverlay _debugOverlay;
         private IState state;
 
         public OpenKhGame()
@@ -48,19 +49,24 @@ namespace OpenKh.Game
             archiveManager = new ArchiveManager(_dataContent);
             _kernel = new Kernel(_dataContent);
             inputManager = new InputManager();
+            _debugOverlay = new DebugOverlay();
         }
 
         protected override void Initialize()
         {
-            state = new MapState();
-            state.Initialize(new StateInitDesc
+            var initDesc = new StateInitDesc
             {
                 DataContent = _dataContent,
                 ArchiveManager = archiveManager,
                 Kernel = _kernel,
                 InputManager = inputManager,
                 GraphicsDevice = graphics
-            });
+            };
+
+            _debugOverlay.Initialize(initDesc);
+
+            state = new MapState();
+            state.Initialize(initDesc);
 
             base.Initialize();
         }
@@ -79,10 +85,10 @@ namespace OpenKh.Game
             if (inputManager.IsExit)
                 Exit();
 
-            state?.Update(new DeltaTimes
-            {
-                DeltaTime = 1.0 / 60.0
-            });
+            var deltaTimes = GetDeltaTimes(gameTime);
+
+            _debugOverlay.Update(deltaTimes);
+            state?.Update(deltaTimes);
             base.Update(gameTime);
         }
 
@@ -90,13 +96,19 @@ namespace OpenKh.Game
         {
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            var deltaTimes = GetDeltaTimes(gameTime);
 
-            state?.Draw(new DeltaTimes
-            {
-
-            });
+            state?.Draw(deltaTimes);
+            _debugOverlay.Draw(deltaTimes);
             base.Draw(gameTime);
+        }
+
+        private DeltaTimes GetDeltaTimes(GameTime gameTime)
+        {
+            return new DeltaTimes
+            {
+                DeltaTime = 1.0 / 60.0
+            };
         }
     }
 }

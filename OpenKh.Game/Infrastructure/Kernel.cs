@@ -26,7 +26,7 @@ namespace OpenKh.Game.Infrastructure
         public Fmlv Fmlv { get; private set; }
         public List<Kh2.Lvup.PlayableCharacter> Lvup { get; private set; }
 
-        public Kernel(IDataContent dataContent, int languageId = 0)
+        public Kernel(IDataContent dataContent, int languageId = 1)
         {
             FontContext = new FontContext();
             MessageProvider = new Kh2MessageProvider();
