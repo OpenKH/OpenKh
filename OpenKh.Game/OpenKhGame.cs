@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using OpenKh.Common;
 using OpenKh.Game.DataContent;
+using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
 using System.IO;
@@ -67,6 +67,9 @@ namespace OpenKh.Game
 
             state = new MapState();
             state.Initialize(initDesc);
+
+            _debugOverlay.OnUpdate = state.DebugUpdate;
+            _debugOverlay.OnDraw = state.DebugDraw;
 
             base.Initialize();
         }

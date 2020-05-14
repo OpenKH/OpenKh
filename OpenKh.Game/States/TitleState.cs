@@ -1,7 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using OpenKh.Engine;
+﻿using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
+using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using System.Collections.Generic;
@@ -179,6 +178,15 @@ namespace OpenKh.Game.States
                     ?.Images?.Select(x => drawing.CreateSurface(x));
 
             return new LayoutRenderer(layout, drawing, images);
+        }
+
+        public void DebugUpdate(IDebug debug)
+        {
+        }
+
+        public void DebugDraw(IDebug debug)
+        {
+            debug.Println("TITLE SCREEN");
         }
     }
 }

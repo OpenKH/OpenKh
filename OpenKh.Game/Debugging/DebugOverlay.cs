@@ -4,17 +4,20 @@ using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
+using System;
 using System.Collections.Generic;
 
-namespace OpenKh.Game
+namespace OpenKh.Game.Debugging
 {
-    public class DebugOverlay : IState
+    // Most of the stuff here is copied from OpenKh.Tools.Common\Controls\KingdomTextArea.cs
+    public class DebugOverlay : IState, IDebug
     {
         private IDataContent _dataContent;
         private ArchiveManager _archiveManager;
         private Kernel _kernel;
         private InputManager _inputManager;
         private GraphicsDeviceManager _graphics;
+        private bool _overrideExternalDebugFeatures = false;
 
         private Texture2D _texFontSys1;
         private Texture2D _texFontSys2;
@@ -37,6 +40,9 @@ namespace OpenKh.Game
         public DebugOverlay()
         {
         }
+
+        public Action<IDebug> OnUpdate { get; set; }
+        public Action<IDebug> OnDraw { get; set; }
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -69,6 +75,9 @@ namespace OpenKh.Game
 
         public void Update(DeltaTimes deltaTimes)
         {
+            DebugUpdate(this);
+            if (!_overrideExternalDebugFeatures)
+                OnUpdate?.Invoke(this);
         }
 
         public void Draw(DeltaTimes deltaTimes)
@@ -76,21 +85,23 @@ namespace OpenKh.Game
             // Small hack to avoid weird stuff happening:
             // basically SpriteBatch sets its own stuff in the GraphicsDevice,
             // making 3D models to look weird. Here we are backing up the states
-            // before SpriteBatch reset them as its own will.
+            // before SpriteBatch reset them as its own will, to restore them later.
             var blendState = _graphics.GraphicsDevice.BlendState;
             var depthStencil = _graphics.GraphicsDevice.DepthStencilState;
 
             _textX = 0;
             _textY = 0;
 
-            Print("Hello world from OpenKH!");
+            DebugDraw(this);
+            if (!_overrideExternalDebugFeatures)
+                OnDraw?.Invoke(this);
 
             // small hack: see first comment of the method
             _graphics.GraphicsDevice.DepthStencilState = depthStencil;
             _graphics.GraphicsDevice.BlendState = blendState;
         }
 
-        private void Print(string text)
+        public void Print(string text)
         {
             var data = Encoders.InternationalSystem.Encode(new List<MessageCommandModel>()
             {
@@ -104,8 +115,20 @@ namespace OpenKh.Game
             Print(data);
         }
 
-        private void Print(ushort messageId) =>
+        public void Print(ushort messageId) =>
             _kernel.MessageProvider.GetMessage(messageId);
+
+        public void Println(string text)
+        {
+            Print(text);
+            EmitNewLine();
+        }
+
+        public void Println(ushort messageId)
+        {
+            Print(messageId);
+            EmitNewLine();
+        }
 
         private void Print(byte[] data)
         {
@@ -128,17 +151,36 @@ namespace OpenKh.Game
                     DrawChar(chIndex);
                     spacing = fontSpacing?[chIndex] ?? _fontHeight;
                 }
-                else if (ch == 1)
-                {
-                    spacing = 6;
-                }
                 else
                 {
                     spacing = 0;
+                    switch ((MessageCommand)ch)
+                    {
+                        case MessageCommand.LineSpacing:
+                            spacing = 6;
+                            break;
+                        case MessageCommand.NewLine:
+                            EmitNewLine();
+                            break;
+                        case MessageCommand.TextWidth:
+                            // TODO
+                            break;
+                        case MessageCommand.TextScale:
+                            // TODO
+                            break;
+                        case MessageCommand.Color:
+                            // TODO
+                            break;
+                    }
                 }
 
                 _textX += spacing * _widthMultiplier * _scale;
             }
+        }
+
+        private void EmitNewLine()
+        {
+            _textY += _fontHeight * _scale;
         }
 
         private void DrawChar(int index)
@@ -171,7 +213,6 @@ namespace OpenKh.Game
             Texture2D surface, int sourceX, int sourceY, int width, int height) =>
             DrawImage(surface, _textX, _textY, sourceX, sourceY, width, height, _widthMultiplier * _scale, _scale, 1.0f, 1.0f, 1.0f, 1.0f);
 
-
         protected void DrawImage(Texture2D texture,
             double x, double y, int sourceX, int sourceY,
             int width, int height, double scaleX, double scaleY,
@@ -185,6 +226,14 @@ namespace OpenKh.Game
             _spriteBatch.Begin();
             _spriteBatch.Draw(texture, dst, src, new Color(r, g, b, a));
             _spriteBatch.End();
+        }
+
+        public void DebugUpdate(IDebug debug)
+        {
+        }
+
+        public void DebugDraw(IDebug debug)
+        {
         }
     }
 }

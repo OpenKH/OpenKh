@@ -1,12 +1,11 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenKh.Common;
 using OpenKh.Engine.Parsers;
+using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
 using OpenKh.Kh2;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace OpenKh.Game.States
@@ -20,6 +19,9 @@ namespace OpenKh.Game.States
         private List<Mesh> _models = new List<Mesh>();
         private BasicEffect _effect;
         private Camera _camera;
+
+        private int _worldId = 2;
+        private int _placeId = 4;
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -37,7 +39,7 @@ namespace OpenKh.Game.States
             _graphics.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
 
             _models.Clear();
-            LoadMap(2, 4);
+            LoadMap(_worldId, _placeId);
             LoadObjEntry("PLAYER");
         }
 
@@ -169,6 +171,16 @@ namespace OpenKh.Game.States
                 return;
 
             _models.Add(mesh);
+        }
+
+
+        public void DebugUpdate(IDebug debug)
+        {
+        }
+
+        public void DebugDraw(IDebug debug)
+        {
+            debug.Println($"{Constants.WorldIds[_worldId]}{_placeId:D02}");
         }
     }
 }
