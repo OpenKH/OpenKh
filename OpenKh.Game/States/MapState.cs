@@ -130,9 +130,29 @@ namespace OpenKh.Game.States
             if (model == null)
                 return;
 
+            var internalName = "p_ex";
+            switch (model.ObjectType)
+            {
+                case Objentry.Type.ZAKO:
+                    internalName = "m_ex";
+                    break;
+                case Objentry.Type.PLAYER:
+                    internalName = "p_ex";
+                    break;
+                case Objentry.Type.NPC:
+                    internalName = "h_ex";
+                    break;
+                case Objentry.Type.WEAPON:
+                    internalName = "w_ex";
+                    break;
+                case Objentry.Type.F_OBJ:
+                    internalName = "f_ex";
+                    break;
+            }
+
             var fileName = $"obj/{model.ModelName}.mdlx";
             _archiveManager.LoadArchive(fileName);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "p_ex", "tim_"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, internalName, "tim_"));
         }
 
         private void LoadObjEntry(int id)
