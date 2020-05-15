@@ -95,12 +95,12 @@ namespace OpenKh.Game.States
             Copyright = 8,
             Intro = 13,
             IntroSkip = 14,
-            NewGame = 11, // but also 15?
+            NewGame = 11, // but also 16?
             MenuOptionNewGame = 2,
             MenuOptionLoad = 3,
             MenuOptionTheater = 4,
             MenuOptionBack = 19,
-            HasTheater = false,
+            HasTheater = true,
             HasBack = true,
         };
 
@@ -129,11 +129,20 @@ namespace OpenKh.Game.States
             drawing = new MonoDrawing(initDesc.GraphicsDevice.GraphicsDevice);
             cachedSurfaces = new Dictionary<string, IEnumerable<ISurface>>();
 
+            if (_kernel.IsReMix)
+                _archiveManager.LoadArchive($"menu/{_kernel.Region}/titlejf.2ld");
             _archiveManager.LoadArchive($"menu/{_kernel.Region}/title.2ld");
             _archiveManager.LoadArchive($"menu/{_kernel.Region}/save.2ld");
 
-            _isTheaterModeUnlocked = true;
-            if (_kernel.RegionId == Constants.RegionFinalMix)
+            _isTheaterModeUnlocked = false;
+            if (_kernel.IsReMix)
+            {
+                if (_isTheaterModeUnlocked)
+                    _titleLayout = ReMixTheaterTitleLayout;
+                else
+                    _titleLayout = ReMixTitleLayout;
+            }
+            else if (_kernel.RegionId == Constants.RegionFinalMix)
             {
                 if (_isTheaterModeUnlocked)
                     _titleLayout = FinalMixTheaterTitleLayout;
@@ -204,9 +213,26 @@ namespace OpenKh.Game.States
         {
             var currentOption = _optionSelected;
             if (_inputManager.IsUp)
+            {
                 currentOption--;
+                if (currentOption < 0)
+                    currentOption = MainMenuBackOption;
+
+                if (currentOption == MainMenuBackOption && !_titleLayout.HasBack)
+                    currentOption = MainMenuTheaterOption;
+                if (currentOption == MainMenuTheaterOption && !_titleLayout.HasTheater)
+                    currentOption = MainMenuLoadOption;
+            }
             else if (_inputManager.IsDown)
+            {
                 currentOption++;
+                if (currentOption == MainMenuTheaterOption && !_titleLayout.HasTheater)
+                    currentOption++;
+                if (currentOption == MainMenuBackOption && !_titleLayout.HasBack)
+                    currentOption++;
+                if (currentOption >= MainMenuMaxOptionCount)
+                    currentOption = 0;
+            }
             else if (_inputManager.IsCircle || _inputManager.IsCross)
             {
                 switch (currentOption)
@@ -225,21 +251,6 @@ namespace OpenKh.Game.States
                 }
             }
 
-            if (currentOption == MainMenuTheaterOption && !_titleLayout.HasTheater)
-                currentOption++;
-            if (currentOption == MainMenuBackOption && !_titleLayout.HasBack)
-                currentOption++;
-            if (currentOption >= MainMenuMaxOptionCount)
-                currentOption = 0;
-            if (currentOption < 0)
-            {
-                if (_titleLayout.HasBack)
-                    currentOption = MainMenuBackOption;
-                else if (_titleLayout.HasTheater)
-                    currentOption = MainMenuTheaterOption;
-                else
-                    currentOption = MainMenuLoadOption;
-            }
 
             if (currentOption != _optionSelected)
                 SetOption(currentOption);
