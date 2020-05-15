@@ -33,3 +33,8 @@ An entry can represents either a file contained in the archive or a file the arc
 When the file exists in the archive, `Directory hash` is `0`.
 
 When the entry is a link to anotehr file, `Directory hash` has a value and `Lenght` is `0` while `Offset` value is ignored.
+
+
+## Additional info
+
+Apparently the file `arc/menu/01_race.arc` from Birth By Sleep is corrupt and unreadable. It is unknown if the remastered actually uses that file; and if yes, how.

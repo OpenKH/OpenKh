@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
@@ -20,10 +21,34 @@ namespace OpenKh.Tools.ImageViewer.Services
                 GetImageFormat("PNG", "png", true, Png.IsValid, Png.Read, (stream, image) => Png.Write(stream, image)),
                 GetImageFormat("BMP", "bmp", true, Bmp.IsValid, Bmp.Read, (stream, image) => Bmp.Write(stream, image)),
                 GetImageFormat("TIFF", "tiff", true, Tiff.IsValid, Tiff.Read, (stream, image) => Tiff.Write(stream, image)),
+
+                GetImageFormat("FAC", "fac", true, Imgd.IsFac, s => Imgd.ReadAsFac(s), (stream, images) =>
+                    Imgd.WriteAsFac(stream, images.Select(x => x.AsImgd()))),
+
                 GetImageFormat("IMGD", "imd", true, Imgd.IsValid, Imgd.Read, (stream, image) => image.AsImgd().Write(stream)),
 
                 GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, images) =>
                     Imgz.Write(stream, images.Select(x => x.AsImgd()))),
+
+                GetImageFormat("Font ARC", "arc", false, FontsArc.IsValid, s =>
+                {
+                    var fonts = FontsArc.Read(s);
+                    return new[]
+                    {
+                        fonts.FontCmd.Image1,
+                        fonts.FontCmd.Image2,
+                        fonts.FontHelp.Image1,
+                        fonts.FontHelp.Image2,
+                        fonts.FontMenu.Image1,
+                        fonts.FontMenu.Image2,
+                        fonts.FontMes.Image1,
+                        fonts.FontMes.Image2,
+                        fonts.FontNumeral.Image1,
+                        fonts.FontNumeral.Image2,
+                        fonts.FontIcon,
+                    };
+                }, (stream, images) =>
+                    throw new NotImplementedException()),
 
                 GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
                     throw new NotImplementedException()),

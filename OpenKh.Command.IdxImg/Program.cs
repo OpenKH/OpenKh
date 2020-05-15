@@ -3,79 +3,149 @@ using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace OpenKh.Command.IdxImg
 {
+    [Command("OpenKh.Command.IdxImg")]
+    [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
+    [Subcommand(typeof(ExtractCommand), typeof(ListCommand))]
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             try
             {
-                CommandLineApplication.Execute<Program>(args);
+                return CommandLineApplication.Execute<Program>(args);
             }
             catch (FileNotFoundException e)
             {
                 Console.WriteLine($"The file {e.FileName} cannot be found. The program will now exit.");
+                return 2;
             }
             catch (Exception e)
             {
                 Console.WriteLine($"FATAL ERROR: {e.Message}\n{e.StackTrace}");
+                return -1;
             }
         }
 
-        [Option(ShortName = "i", LongName = "input", Description = "IDX input")]
-        public string Input { get; }
-
-        private void OnExecute()
+        protected int OnExecute(CommandLineApplication app)
         {
-            Idx idx = OpenIdx(Input);
-
-            string imgPath = Input.Replace(".idx", ".img", StringComparison.InvariantCultureIgnoreCase);
-            using (var imgStream = File.OpenRead(imgPath))
-            {
-                var img = new Img(imgStream, idx, false);
-                var idxName = Path.GetFileNameWithoutExtension(Input);
-                var outputDir = Path.Combine(Path.GetDirectoryName(Input), idxName);
-                foreach (var idxFileName in ExtractIdx(img, idx, Path.Combine(outputDir, "KH2")))
-                {
-                    idxName = Path.GetFileNameWithoutExtension(idxFileName);
-                    ExtractIdx(img, OpenIdx(idxFileName), Path.Combine(outputDir, idxName));
-                }
-            }
+            app.ShowHelp();
+            return 1;
         }
 
-        public List<string> ExtractIdx(Img img, Idx idx, string basePath)
+        private static string GetVersion()
+            => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+        private class ExtractCommand
         {
-            var idxs = new List<string>();
+            private Program Parent { get; set; }
 
-            foreach (var entry in idx.GetNameEntries())
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Kingdom Hearts II IDX file, paired with a IMG")]
+            public string InputIdx { get; set; }
+
+            [FileExists]
+            [Option(CommandOptionType.SingleValue, Description = "Custom Kingdom Hearts II IMG file", ShortName = "m", LongName = "img")]
+            public string InputImg { get; set; }
+
+            [Option(CommandOptionType.SingleValue, Description = "Path where the content will be extracted", ShortName = "o", LongName = "output")]
+            public string OutputDir { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Extract all the sub-IDX recursively", ShortName = "r", LongName = "recursive")]
+            public bool Recursive { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Split sub-IDX when extracting recursively", ShortName = "s", LongName = "split")]
+            public bool Split { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
             {
-                var fileName = entry.Name;
-                if (fileName == null)
-                    fileName = $"@noname/{entry.Entry.Hash32:X08}-{entry.Entry.Hash16:X04}";
+                var inputImg = InputImg ?? InputIdx.Replace(".idx", ".img", StringComparison.InvariantCultureIgnoreCase);
+                var outputDir = OutputDir ?? Path.Combine(Path.GetFullPath(inputImg), "extract");
 
-                Console.WriteLine(fileName);
+                Idx idx = OpenIdx(InputIdx);
 
-                var outputFile = Path.Combine(basePath, fileName);
-                var outputDir = Path.GetDirectoryName(outputFile);
-                if (Directory.Exists(outputDir) == false)
-                    Directory.CreateDirectory(outputDir);
-
-                using (var file = File.Create(outputFile))
+                using (var imgStream = File.OpenRead(inputImg))
                 {
-                    // TODO handle decompression
-                    img.FileOpen(entry.Entry).CopyTo(file);
+                    var img = new Img(imgStream, idx, false);
+                    var idxName = Path.GetFileNameWithoutExtension(InputIdx);
+
+                    var subIdxPath = ExtractIdx(img, idx, Recursive && Split ? Path.Combine(outputDir, "KH2") : outputDir);
+                    if (Recursive)
+                    {
+                        foreach (var idxFileName in subIdxPath)
+                        {
+                            idxName = Path.GetFileNameWithoutExtension(idxFileName);
+                            ExtractIdx(img, OpenIdx(idxFileName), Split ? Path.Combine(outputDir, idxName) : outputDir);
+                        }
+                    }
                 }
 
-                if (Path.GetExtension(fileName) == ".idx")
-                    idxs.Add(outputFile);
+                return 0;
             }
 
-            return idxs;
+            public static List<string> ExtractIdx(Img img, Idx idx, string basePath)
+            {
+                var idxs = new List<string>();
+
+                foreach (var entry in idx.GetNameEntries())
+                {
+                    var fileName = entry.Name;
+                    if (fileName == null)
+                        fileName = $"@noname/{entry.Entry.Hash32:X08}-{entry.Entry.Hash16:X04}";
+
+                    Console.WriteLine(fileName);
+
+                    var outputFile = Path.Combine(basePath, fileName);
+                    var outputDir = Path.GetDirectoryName(outputFile);
+                    if (Directory.Exists(outputDir) == false)
+                        Directory.CreateDirectory(outputDir);
+
+                    using (var file = File.Create(outputFile))
+                    {
+                        // TODO handle decompression
+                        img.FileOpen(entry.Entry).CopyTo(file);
+                    }
+
+                    if (Path.GetExtension(fileName) == ".idx")
+                        idxs.Add(outputFile);
+                }
+
+                return idxs;
+            }
         }
 
-        private Idx OpenIdx(string fileName)
+        private class ListCommand
+        {
+            private Program Parent { get; set; }
+
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Kingdom Hearts II IDX file, paired with a IMG")]
+            public string InputIdx { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Sort file list by their position in the IMG", ShortName = "s", LongName = "sort")]
+            public bool Sort { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var entries = OpenIdx(InputIdx).GetNameEntries();
+                if (Sort)
+                    entries = entries.OrderBy(x => x.Entry.Offset);
+
+                foreach (var entry in entries)
+                    Console.WriteLine(entry.Name);
+
+                return 0;
+            }
+        }
+
+        private static Idx OpenIdx(string fileName)
         {
             using (var idxStream = File.OpenRead(fileName))
                 return Idx.Read(idxStream);

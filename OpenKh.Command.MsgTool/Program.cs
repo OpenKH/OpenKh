@@ -4,9 +4,13 @@ using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.IO;
 using System.Xml.Linq;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace OpenKh.Command.MsgTool
 {
+    [Command("OpenKh.Command.MsgTool")]
+    [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     class Program
     {
         static void Main(string[] args)
@@ -25,7 +29,11 @@ namespace OpenKh.Command.MsgTool
             }
         }
 
-        [Option(ShortName = "i", LongName = "input", Description = "IDX input")]
+        private static string GetVersion()
+            => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+        [Required]
+        [Option(ShortName = "i", LongName = "input", Description = "MSG file (almost all the files inside msg/{language}/ are considered MSGs)")]
         public string Input { get; }
 
         private void OnExecute()

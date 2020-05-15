@@ -9,11 +9,37 @@ namespace OpenKh.Common
 {
     public static class StreamExtensions
     {
+        private static readonly InvalidDataException ReadSeekException = new InvalidDataException($"Stream must be readable and seekable.");
+        private static readonly InvalidDataException WriteSeekException = new InvalidDataException($"Stream must be writable and seekable.");
+        private static readonly Func<long, InvalidDataException> InvalidHeaderLengthException = (minHeaderLength) =>
+            new InvalidDataException($"Invalid header: stream must be at least {minHeaderLength} bytes long.");
+
         public static T FromBegin<T>(this T stream) where T : Stream => stream.SetPosition(0);
 
         public static T SetPosition<T>(this T stream, int position) where T : Stream
         {
-            stream.Position = position;
+            stream.Seek(position, SeekOrigin.Begin);
+            return stream;
+        }
+
+        public static T MustReadAndSeek<T>(this T stream) where T : Stream
+        {
+            if (!stream.CanRead || !stream.CanSeek)
+                throw ReadSeekException;
+            return stream;
+        }
+
+        public static T MustWriteAndSeek<T>(this T stream) where T : Stream
+        {
+            if (!stream.CanWrite || !stream.CanSeek)
+                throw WriteSeekException;
+            return stream;
+        }
+
+        public static T MustHaveHeaderLengthOf<T>(this T stream, long minHeaderLength) where T : Stream
+        {
+            if (stream.Length < minHeaderLength)
+                throw InvalidHeaderLengthException(minHeaderLength);
             return stream;
         }
 
@@ -35,11 +61,23 @@ namespace OpenKh.Common
                 .ToList();
         }
 
+        public static short ReadInt16(this Stream stream) =>
+            new BinaryReader(stream).ReadInt16();
+
+        public static ushort ReadUInt16(this Stream stream) =>
+            new BinaryReader(stream).ReadUInt16();
+
         public static int ReadInt32(this Stream stream) =>
             new BinaryReader(stream).ReadInt32();
 
         public static uint ReadUInt32(this Stream stream) =>
             new BinaryReader(stream).ReadUInt32();
+
+        public static long ReadInt64(this Stream stream) =>
+            new BinaryReader(stream).ReadInt64();
+
+        public static ulong ReadUInt64(this Stream stream) =>
+            new BinaryReader(stream).ReadUInt64();
 
         public static List<int> ReadInt32List(this Stream stream, int offset, int count)
         {
@@ -104,6 +142,16 @@ namespace OpenKh.Common
 
             return (int)stream.Position - oldPosition;
         }
+
+        public static void Write(this Stream stream, byte value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, sbyte value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, char value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, short value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, ushort value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, int value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, uint value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, long value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, ulong value) => new BinaryWriter(stream).Write(value);
 
         public static void Copy(this Stream source, Stream destination, int length, int bufferSize = 65536)
         {

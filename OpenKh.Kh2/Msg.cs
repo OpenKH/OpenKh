@@ -17,6 +17,35 @@ namespace OpenKh.Kh2
             public byte[] Data { get; set; }
         }
 
+        internal class OptimizedEntry
+        {
+            public int Id { get; }
+            public byte[] Data { get; }
+            public int Offset { get; set; }
+            public int LinkId { get; private set; }
+            public int LinkOffset { get; private set; }
+
+            public bool HasbeenLinked { get; private set; }
+            public bool IsLinked => LinkId >= 0;
+
+            public OptimizedEntry(Entry entry)
+            {
+                Id = entry.Id;
+                Data = entry.Data;
+                Offset = -1;
+                LinkId = -1;
+                LinkOffset = -1;
+                HasbeenLinked = false;
+            }
+
+            public void LinkTo(OptimizedEntry entry, int offset)
+            {
+                LinkId = entry.Id;
+                LinkOffset = offset;
+                entry.HasbeenLinked = true;
+            }
+        }
+
         public static List<Entry> Read(Stream stream)
         {
             if (!stream.CanRead || !stream.CanSeek)
@@ -67,6 +96,80 @@ namespace OpenKh.Kh2
             {
                 writer.Write(entry.Data);
             }
+        }
+
+        public static void WriteOptimized(Stream stream, List<Entry> entries)
+        {
+            if (!stream.CanWrite || !stream.CanSeek)
+                throw new InvalidDataException($"Write or seek must be supported.");
+
+            var writer = new BinaryWriter(stream);
+            writer.Write(MagicCode);
+            writer.Write(entries.Count);
+
+            var optimizedEntries = entries.Select(x => new OptimizedEntry(x)).ToList();
+            foreach (var entry in optimizedEntries)
+            {
+                if (entry.HasbeenLinked)
+                    continue;
+
+                foreach (var x in optimizedEntries)
+                {
+                    if (entry == x || x.IsLinked)
+                        continue;
+
+                    var indexFound = IndexOf(x.Data, entry.Data);
+                    if (indexFound >= 0)
+                    {
+                        entry.LinkTo(x, indexFound);
+                        break;
+                    }
+                }
+            }
+
+            var offset = 8 + entries.Count * 8;
+            foreach (var entry in optimizedEntries)
+            {
+                if (entry.LinkId < 0)
+                {
+                    entry.Offset = offset;
+                    offset += entry.Data.Length;
+                }
+            }
+
+            foreach (var entry in optimizedEntries)
+            {
+                writer.Write(entry.Id);
+                if (entry.IsLinked)
+                {
+                    var msgLink = optimizedEntries.Find(x => x.Id == entry.LinkId);
+                    writer.Write(msgLink.Offset + entry.LinkOffset);
+                }
+                else
+                    writer.Write(entry.Offset);
+            }
+
+            foreach (var entry in optimizedEntries)
+            {
+                if (!entry.IsLinked)
+                    writer.Write(entry.Data);
+            }
+        }
+
+        private static int IndexOf(byte[] data, byte[] pattern)
+        {
+            var c = data.Length - pattern.Length + 1;
+            for (var i = 0; i < c; i++)
+            {
+                if (data[i] != pattern[0])
+                    continue;
+
+                int j;
+                for (j = pattern.Length - 1; j >= 1 && data[i + j] == pattern[j]; j--) ;
+                if (j == 0) return i;
+            }
+
+            return -1;
         }
 
         private static byte[] GetMsgData(BinaryReader stream)

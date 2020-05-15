@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Windows;
+using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Kh2.System;
 using OpenKh.Tools.Common.Models;

@@ -12,8 +12,7 @@ using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
-using OpenKh.Tools.Kh2SystemEditor.Services;
-using OpenKh.Common.Exceptions;
+using OpenKh.Engine;
 
 namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
@@ -25,12 +24,12 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private static readonly List<FileDialogFilter> IdxFilter = FileDialogFilterComposer.Compose()
             .AddExtensions("KH2.IDX", "idx").AddAllFiles();
         private static readonly List<FileDialogFilter> MsgFilter = FileDialogFilterComposer.Compose()
-            .AddExtensions("sys.msg", "msg", "bin").AddAllFiles();
+            .AddExtensions("sys.bar", "bar", "msg", "bin").AddAllFiles();
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
         private IEnumerable<Bar.Entry> _barItems;
-        private BucketService _bucketService;
+        private Kh2MessageProvider _messageProvider;
         private ItemViewModel _item;
         private TrsrViewModel _trsr;
         private FtstViewModel _ftst;
@@ -99,11 +98,24 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
             AboutCommand = new RelayCommand(x => new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog());
 
-            LoadSupportIdxCommand = new RelayCommand(_ => FileDialog.OnOpen(fileName => OpenIdx(fileName), IdxFilter, parent: Window));
-            LoadSupportMsgCommand = new RelayCommand(_ => FileDialog.OnOpen(fileName => OpenMsg(fileName), MsgFilter, parent: Window));
+            LoadSupportIdxCommand = new RelayCommand(_ => Utilities.Catch(() =>
+            {
+                Kh2Utilities.OpenMsgFromIdxDialog(LoadMessages);
+            }));
+            LoadSupportMsgCommand = new RelayCommand(_ => Utilities.Catch(() =>
+            {
+                Kh2Utilities.OpenMsgFromBarDialog(LoadMessages);
+            }));
 
-            _bucketService = new BucketService();
+            _messageProvider = new Kh2MessageProvider();
             CreateSystem();
+        }
+
+        private void LoadMessages(List<Msg.Entry> msgs)
+        {
+            _messageProvider.Load(msgs);
+            SaveSystem();
+            LoadSystem(_barItems);
         }
 
         public bool OpenFile(string fileName) => File.OpenRead(fileName).Using(stream =>
@@ -147,7 +159,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private void CreateSystem()
         {
             _barItems = new Bar.Entry[0];
-            Item = new ItemViewModel(_bucketService);
+            Item = new ItemViewModel(_messageProvider);
             Trsr = new TrsrViewModel(Item);
             Ftst = new FtstViewModel();
         }
@@ -155,7 +167,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private void LoadSystem(IEnumerable<Bar.Entry> entries)
         {
             _barItems = entries;
-            Item = new ItemViewModel(_bucketService, _barItems);
+            Item = new ItemViewModel(_messageProvider, _barItems);
             Trsr = new TrsrViewModel(Item, _barItems);
             Ftst = new FtstViewModel(_barItems);
         }
@@ -165,39 +177,6 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             _barItems = SaveSystemEntry(_barItems, Item);
             _barItems = SaveSystemEntry(_barItems, Trsr);
             _barItems = SaveSystemEntry(_barItems, Ftst);
-        }
-
-        private void OpenMsg(string fileName) =>
-            File.OpenRead(fileName).Using(stream => LoadMessage(stream));
-
-        private void OpenIdx(string fileName) => File.OpenRead(fileName).Using(stream =>
-        {
-            if (!Idx.IsValid(stream))
-                throw new InvalidFileException<Idx>();
-
-            var imgFileName = $"{Path.GetFileNameWithoutExtension(fileName)}.img";
-            var imgFilePath = Path.Combine(Path.GetDirectoryName(fileName), imgFileName);
-            File.OpenRead(imgFilePath).Using(imgStream =>
-            {
-                var img = new Img(imgStream, Idx.Read(stream), false);
-                foreach (var language in Constants.Languages)
-                {
-                    if (img.FileOpen($"msg/{language}/sys.bar", LoadMessage))
-                        break;
-                }
-            });
-        });
-
-        public void LoadMessage(string fileName) =>
-            File.OpenRead(fileName).Using(stream => LoadMessage(stream));
-
-        public void LoadMessage(Stream stream)
-        {
-            if (!_bucketService.LoadMessages(stream))
-                return;
-
-            SaveSystem();
-            LoadSystem(_barItems);
         }
 
         private IEnumerable<Bar.Entry> SaveSystemEntry(IEnumerable<Bar.Entry> entries, ISystemGetChanges battleGetChanges) =>

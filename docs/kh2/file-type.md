@@ -30,7 +30,8 @@
 | a.it | Italian localized a.fm
 | a.jp | Non-Final Mix a.fm; used only in the JP PS2 Version
 | SEB | Sound effect
-| VAG | Streamed music or voice
+| VAG | Streamed music or voice (monaural audio)
+| VAS | Streamed music or voice (stereo audio)
 | VSB | A sub-type of BAR; contains VAG
 | BGM | Midi-like file
 | WD  | Instruents for BGM files

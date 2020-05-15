@@ -23,7 +23,7 @@ steps:
 - checkout: self
   submodules: true | recursive
 
-- script: git submodule update --init --recursive
+- script: git submodule update --init --recursive --depth 1
   displayName: 'Download dependencies'
 
 - task: NuGetToolInstaller@0
@@ -44,7 +44,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     vsVersion: 'latest'
-    msbuildArgs: '/t:Build;Publish'
+    msbuildArgs: '/t:Build'
     maximumCpuCount: true
 
 - script: dotnet test --configuration $(buildConfiguration) --logger trx --verbosity normal --collect "Code coverage"
@@ -70,7 +70,7 @@ steps:
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
     contents: |
-     OpenKh*/**/$(BuildConfiguration)/net4**/**/publish/**/?(*.exe|*.dll|*.json|*.config)
+     OpenKh*/**/$(BuildConfiguration)/net4**/**/?(*.exe|*.dll|*.json|*.config)
     targetFolder: '$(Build.ArtifactStagingDirectory)/net4'
     flattenFolders: true
 
@@ -79,7 +79,7 @@ steps:
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
     contents: |
-     OpenKh*/**/$(BuildConfiguration)/net4**/**/publish/**/resources/**
+     OpenKh*/**/$(BuildConfiguration)/net4**/**/resources/**
     targetFolder: '$(Build.ArtifactStagingDirectory)/net4/resources'
     flattenFolders: true
 
@@ -88,7 +88,7 @@ steps:
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
     contents: |
-     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/publish/**/?(*.exe|*.dll|*.json|*.config)
+     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/?(*.exe|*.dll|*.json|*.config)
     targetFolder: '$(Build.ArtifactStagingDirectory)/netcore'
     flattenFolders: true
 
@@ -97,7 +97,7 @@ steps:
   inputs:
     sourceFolder: '$(Build.SourcesDirectory)'
     contents: |
-     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/publish/**/resources/**
+     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/resources/**
     targetFolder: '$(Build.ArtifactStagingDirectory)/netcore/resources'
     flattenFolders: true
 
@@ -106,5 +106,6 @@ steps:
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
     artifactName: openkh
+    publishLocation: 'Container'
     parallel: true
     parallelCount: 8

@@ -1,5 +1,6 @@
 ﻿using OpenKh.Kh2;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,22 +15,23 @@ namespace OpenKh.Tools.DpdViewer.ViewModels
 	{
 		private Dpd dpd;
 
+		private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddExtensions("DPD effect", "dpd");
+
 		public DpdViewModel()
 		{
 			OpenCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, ("DPD effect", "dpd"));
-				if (fd.ShowDialog() == true)
+				FileDialog.OnOpen(fileName =>
 				{
-					using (var stream = File.OpenRead(fd.FileName))
+					using (var stream = File.OpenRead(fileName))
 					{
-						FileName = fd.FileName;
+						FileName = fileName;
 						Dpd = new Dpd(stream);
 
 						OnPropertyChanged(nameof(SaveCommand));
 						OnPropertyChanged(nameof(SaveAsCommand));
 					}
-				}
+				}, Filters);
 			}, x => true);
 
 			SaveCommand = new RelayCommand(x =>
@@ -49,14 +51,13 @@ namespace OpenKh.Tools.DpdViewer.ViewModels
 
 			SaveAsCommand = new RelayCommand(x =>
 			{
-				var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, ("DPD effect", "dpd"));
-				if (fd.ShowDialog() == true)
+				FileDialog.OnSave(fileName =>
 				{
-					using (var stream = File.Open(fd.FileName, FileMode.Create))
+					using (var stream = File.Open(fileName, FileMode.Create))
 					{
 						throw new NotImplementedException();
 					}
-				}
+				}, Filters);
 			}, x => true);
 
 			ExitCommand = new RelayCommand(x =>

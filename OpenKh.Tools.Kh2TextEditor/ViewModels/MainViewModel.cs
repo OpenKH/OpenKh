@@ -16,6 +16,8 @@ using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
+using OpenKh.Tools.Kh2TextEditor.Services;
+using System.Text;
 
 namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 {
@@ -29,6 +31,31 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private FontContext _fontContext = new FontContext();
         private FontType _fontType;
         private EncodingType _encodingType;
+
+        private static readonly List<FileDialogFilter> MessageFilters = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("Message files", "bar", "msg", "bin")
+            .AddAllFiles();
+
+        private static readonly List<FileDialogFilter> FontImageFilters = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("fontimage.bar", "bar")
+            .AddAllFiles();
+
+        private static readonly List<FileDialogFilter> FontInfoFilters = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("fontinfo.bar", "bar")
+            .AddAllFiles();
+
+        private static readonly List<FileDialogFilter> ExportFilters = FileDialogFilterComposer
+            .Compose()
+            .Concat(TextExporters.GetAll().Select(x => FileDialogFilter.ByExtensions(x.Filter().Item1, x.Filter().Item2)))
+            .ToList();
+
+        private static readonly List<FileDialogFilter> ImportFilters = FileDialogFilterComposer
+            .Compose()
+            .Concat(TextImporters.GetAll().Select(x => FileDialogFilter.ByExtensions(x.Filter().Item1, x.Filter().Item2)))
+            .ToList();
 
         public string Title => $"{_barEntryName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
 
@@ -46,6 +73,9 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         public RelayCommand OpenCommand { get; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
+        public RelayCommand ExportMessageAsCommand { get; }
+        public RelayCommand ImportMessageFromCommand { get; }
+
         public RelayCommand ExitCommand { get; }
         public RelayCommand GuideCommand { get; }
         public RelayCommand AboutCommand { get; }
@@ -58,6 +88,8 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         public RelayCommand EditFontInfoCommand { get; }
 
         public TextEditorViewModel TextEditor { get; private set; }
+
+        public bool OptimizeOnSave { get; set; }
 
         public FontType FontType
         {
@@ -83,17 +115,10 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         {
             OpenCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new (string, string)[]
+                FileDialog.OnOpen(fileName =>
                 {
-                    ("BAR file", "bar"),
-                    ("MSG file", "msg"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    OpenFile(fd.FileName);
-                }
+                    OpenFile(fileName);
+                }, MessageFilters);
             }, x => true);
 
             SaveCommand = new RelayCommand(x =>
@@ -110,12 +135,45 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
             SaveAsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, FileDialog.Type.Any);
-                if (fd.ShowDialog() == true)
+                FileDialog.OnSave(fileName =>
                 {
-                    SaveFile(FileName, fd.FileName);
-                    FileName = fd.FileName;
-                }
+                    SaveFile(FileName, fileName);
+                    FileName = fileName;
+                }, MessageFilters);
+            }, x => true);
+
+            ExportMessageAsCommand = new RelayCommand(x =>
+            {
+                FileDialog.OnSave(fileName =>
+                {
+                    var selectedExtension = $"{Path.GetExtension(fileName).TrimStart('.')}";
+
+                    ExportMessageAsFile(
+                        fileName: fileName,
+                        textExporter: TextExporters.FindFromFile(fileName)
+                    );
+                }, ExportFilters);
+            }, x => true);
+
+            ImportMessageFromCommand = new RelayCommand(x =>
+            {
+                FileDialog.OnOpen(fileName =>
+                {
+                    var selectedExtension = $"{Path.GetExtension(fileName).TrimStart('.')}";
+
+                    var textImporter = TextImporters.FindFromFile(fileName);
+                    if (textImporter != null)
+                    {
+                        ImportMessageFromFile(
+                            fileName: fileName,
+                            textImporter
+                        );
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Failed to match text decoder for your file:\n{fileName}");
+                    }
+                }, ImportFilters);
             }, x => true);
 
             ExitCommand = new RelayCommand(x =>
@@ -125,58 +183,34 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
             OpenFontImageCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new (string, string)[]
+                FileDialog.OnOpen(fileName =>
                 {
-                    ("fontimage.bar", "bar"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    OpenFontImageFile(fd.FileName);
-                }
+                    OpenFontImageFile(fileName);
+                }, FontImageFilters);
             }, x => true);
 
             SaveFontImageCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, new (string, string)[]
+                FileDialog.OnSave(fileName =>
                 {
-                    ("fontimage.bar", "bar"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    SaveFontImageFile(fd.FileName);
-                }
+                    SaveFontImageFile(fileName);
+                }, FontImageFilters);
             }, x => true);
 
             OpenFontInfoCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new (string, string)[]
+                FileDialog.OnOpen(fileName =>
                 {
-                    ("fontinfo.bar", "bar"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    OpenFontInfoFile(fd.FileName);
-                }
+                    OpenFontInfoFile(fileName);
+                }, FontInfoFilters);
             }, x => true);
 
             SaveFontInfoCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save, new (string, string)[]
+                FileDialog.OnSave(fileName =>
                 {
-                    ("fontinfo.bar", "bar"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    SaveFontInfoFile(fd.FileName);
-                }
+                    SaveFontInfoFile(fileName);
+                }, FontInfoFilters);
             }, x => true);
 
             GuideCommand = new RelayCommand(x =>
@@ -185,7 +219,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }, x => true);
 
             AboutCommand = new RelayCommand(x =>
-            {   
+            {
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
 
@@ -236,6 +270,40 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             else
             {
                 File.Create(fileName).Using(WriteMsg);
+            }
+        }
+
+        public void ExportMessageAsFile(string fileName, ITextExporter textExporter)
+        {
+            new StreamWriter(fileName, false, Encoding.UTF8).Using(
+                writer => textExporter.Export(
+                    TextEditor.Messages
+                        .Select(
+                            source => new ExchangeableMessage
+                            {
+                                Id = source.Id,
+                                Text = source.Text,
+                            }
+                        ),
+                    writer
+                )
+            );
+        }
+
+        public void ImportMessageFromFile(string fileName, ITextImporter textImporter)
+        {
+            var importedMessages = new StreamReader(fileName, Encoding.UTF8).Using(
+                reader => textImporter.Import(reader)
+                    .ToArray() // make sure to import all messages from file before closing StreamReader!
+            );
+
+            foreach (var importMessage in importedMessages)
+            {
+                var found = TextEditor.Messages.SingleOrDefault(it => it.Id == importMessage.Id);
+                if (found != null)
+                {
+                    found.Text = importMessage.Text;
+                }
             }
         }
 
@@ -333,8 +401,14 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             return TryReadMsg(msgEntry.Stream);
         }
 
-        private void WriteMsg(Stream stream) =>
-            Msg.Write(stream, TextEditor.MessageEntries);
+        private void WriteMsg(Stream stream)
+        {
+            if (OptimizeOnSave)
+                Msg.WriteOptimized(stream, TextEditor.MessageEntries);
+            else
+                Msg.Write(stream, TextEditor.MessageEntries);
+            stream.SetLength(stream.Position);
+        }
 
         private void WriteBar(List<Bar.Entry> entries, Stream stream)
         {

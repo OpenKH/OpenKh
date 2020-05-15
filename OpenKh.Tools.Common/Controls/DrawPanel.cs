@@ -189,6 +189,9 @@ namespace OpenKh.Tools.Common.Controls
 
         private void SetDrawing(IDrawing drawing)
         {
+            if (drawing == null) // HACK
+                return;
+
             if (this.drawing == drawing)
                 return;
 
@@ -287,7 +290,6 @@ namespace OpenKh.Tools.Common.Controls
             drawing.Surface?.Dispose();
             drawing.Surface = drawing.CreateSurface(
                 width, height, Xe.Drawing.PixelFormat.Format32bppArgb, SurfaceType.InputOutput);
-            DoRender();
         }
     }
 }

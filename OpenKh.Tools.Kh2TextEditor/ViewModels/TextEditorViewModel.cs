@@ -165,6 +165,6 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private bool FilterNone(MessageModel arg) => true;
 
         private bool FilterTextAndId(MessageModel arg) =>
-            $"{arg.Id.ToString()} {arg.Text}".ToLower().Contains(SearchTerm.ToLower());
+            arg.Title.ToLower().Contains(SearchTerm.ToLower());
     }
 }

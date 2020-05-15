@@ -13,11 +13,11 @@ All the documentation is located in the `/docs` folder in its raw form. A more w
 
 ## Downloads
 
-New builds of OpenKH are generated every time a contributor makes changes. There is a continuous integration system where it is possible to download the latest artifacts (or build version) of the entire project.
+New builds of OpenKH are automatically generated every time one of the contributors inspects and approves a new proposed feature or fix. Those builds are considered stable as they are built from the `master` branch. The version format used in the builds is `YEAR.MONTH.DAY.BUILDID`.
 
-[![OpenKh](https://img.shields.io/badge/OpenKh-Download-blue.svg)](https://dev.azure.com/xeeynamo/OpenKH/_build)
+[![OpenKh](https://img.shields.io/badge/OpenKh-Download-blue.svg)](https://github.com/Xeeynamo/OpenKh/releases)
 
-Every entry is a commit that can come from different branches. The stable branch is `master`. Once you click on the commit you're interested in, click *Artifacts* at the top right. Then from Artifacts explorer, just open the menu and click *Download as zip*.
+All the builds from `master` and from pull requestes are generated from [Azure Pipelines](https://dev.azure.com/xeeynamo/OpenKH/_build).
 
 ## Additional info
 

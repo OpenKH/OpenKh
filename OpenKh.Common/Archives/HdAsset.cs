@@ -53,6 +53,9 @@ namespace OpenKh.Common.Archives
         private Stream stream;
         private List<Entry> entries;
 
+        /// <summary>
+        /// Original file stream, without the ReMIX assets
+        /// </summary>
         public Stream Stream
         {
             get => stream;
@@ -78,6 +81,8 @@ namespace OpenKh.Common.Archives
 
             Stream = new MemoryStream(_header.OriginalLength);
             stream.Copy(Stream, _header.OriginalLength);
+            Stream.Position = 0;
+
             Entries = _header.Entries.Select(x => new Entry
             {
                 Name = x.Name,
