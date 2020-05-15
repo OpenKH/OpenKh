@@ -15,7 +15,9 @@ namespace OpenKh.Game.Infrastructure
     {
         private readonly IDataContent _dataContent;
 
-        public string Language { get; private set; }
+        public int RegionId { get; }
+        public string Language => Constants.Regions[RegionId == Constants.RegionFinalMix ? 0 : RegionId];
+        public string Region => Constants.Regions[RegionId];
         public FontContext FontContext { get; }
         public Kh2MessageProvider MessageProvider { get; }
         public BaseTable<Objentry> ObjEntries { get; }
@@ -26,12 +28,13 @@ namespace OpenKh.Game.Infrastructure
         public Fmlv Fmlv { get; private set; }
         public List<Kh2.Lvup.PlayableCharacter> Lvup { get; private set; }
 
-        public Kernel(IDataContent dataContent, int languageId = 0)
+        public Kernel(IDataContent dataContent)
         {
+            _dataContent = dataContent;
+
             FontContext = new FontContext();
             MessageProvider = new Kh2MessageProvider();
-            Language = Constants.Languages[languageId];
-            _dataContent = dataContent;
+            RegionId = DetectRegion(dataContent);
 
             // Load files in the same order as KH2 does
             ObjEntries = LoadFile("00objentry.bin", stream => Objentry.Read(stream));
@@ -91,6 +94,18 @@ namespace OpenKh.Game.Infrastructure
                 .Using(stream => Bar.Read(stream));
 
             MessageProvider.Load(messageBar.ForEntry(worldId, stream => Msg.Read(stream)));
+        }
+
+        private static int DetectRegion(IDataContent dataContent)
+        {
+            for (var i = 0; i < Constants.Regions.Length; i++)
+            {
+                var testFileName = $"menu/{Constants.Regions[i]}/title.2ld";
+                if (dataContent.FileExists(testFileName))
+                    return i;
+            }
+
+            throw new Exception("Unable to detect any region for the game. Some files are potentially missing.");
         }
     }
 }

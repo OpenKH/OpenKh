@@ -15,6 +15,8 @@ namespace OpenKh.Game.DataContent
             _img = new Img(imgStream, _idx, false);
         }
 
+        public bool FileExists(string fileName) => _idx.TryGetEntry(fileName, out var _);
+
         public Stream FileOpen(string path)
         {
             if (_idx.TryGetEntry(path, out var entry))

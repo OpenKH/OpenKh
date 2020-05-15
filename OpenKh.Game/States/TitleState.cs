@@ -20,6 +20,8 @@ namespace OpenKh.Game.States
         private const int MainMenuNewGameOption = 0;
         private const int MainMenuLoadOption = 1;
         private const int MainMenuTheaterOption = 2;
+
+        private Kernel _kernel;
         private ArchiveManager archiveManager;
         private InputManager inputManager;
         private MonoDrawing drawing;
@@ -32,13 +34,14 @@ namespace OpenKh.Game.States
 
         public void Initialize(StateInitDesc initDesc)
         {
+            _kernel = initDesc.Kernel;
             archiveManager = initDesc.ArchiveManager;
             inputManager = initDesc.InputManager;
             drawing = new MonoDrawing(initDesc.GraphicsDevice.GraphicsDevice);
             cachedSurfaces = new Dictionary<string, IEnumerable<ISurface>>();
 
-            archiveManager.LoadArchive("menu/fm/title.2ld");
-            archiveManager.LoadArchive("menu/fm/save.2ld");
+            archiveManager.LoadArchive($"menu/{_kernel.Region}/title.2ld");
+            archiveManager.LoadArchive($"menu/{_kernel.Region}/save.2ld");
 
             layoutRendererBg = CreateLayoutRenderer("titl");
             layoutRendererBg.SelectedSequenceGroupIndex = BackgroundScreen;
@@ -46,7 +49,8 @@ namespace OpenKh.Game.States
             layoutRendererFg = CreateLayoutRenderer("titl");
             SetOption(0);
 
-            layoutRendererTheater = CreateLayoutRenderer("even");
+            // it will not work for non-FM versions
+            //layoutRendererTheater = CreateLayoutRenderer("even");
         }
 
         public void Destroy()

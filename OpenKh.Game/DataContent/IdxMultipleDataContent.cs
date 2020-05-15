@@ -22,6 +22,8 @@ namespace OpenKh.Game.DataContent
             _dataContent = new MultipleDataContent(dataContents);
         }
 
+        public bool FileExists(string fileName) => _dataContent.FileExists(fileName);
+
         public Stream FileOpen(string path) => _dataContent.FileOpen(path);
     }
 }

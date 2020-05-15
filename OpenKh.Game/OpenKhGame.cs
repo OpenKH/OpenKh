@@ -5,6 +5,7 @@ using OpenKh.Game.DataContent;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
+using OpenKh.Kh2;
 using System.IO;
 
 namespace OpenKh.Game
@@ -56,19 +57,7 @@ namespace OpenKh.Game
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            if (File.Exists("KH2.IDX") && File.Exists("KH2.IMG"))
-            {
-                var imgStream = File.OpenRead("KH2.IMG");
-                var idxDataContent = File.OpenRead("KH2.IDX")
-                    .Using(stream => new IdxDataContent(stream, imgStream));
-                _dataContent = new SafeDataContent(new MultipleDataContent(
-                    new StandardDataContent(),
-                    idxDataContent,
-                    new IdxMultipleDataContent(idxDataContent, imgStream)
-                ));
-            }
-            else
-                _dataContent = new SafeDataContent(new StandardDataContent());
+            _dataContent = new SafeDataContent(CreateDataContent(".", "KH2.IDX", "KH2.IMG"));
 
             archiveManager = new ArchiveManager(_dataContent);
             _kernel = new Kernel(_dataContent);
@@ -82,18 +71,6 @@ namespace OpenKh.Game
             State = 0;
 
             base.Initialize();
-        }
-
-        private StateInitDesc GetStateInitDesc()
-        {
-            return new StateInitDesc
-            {
-                DataContent = _dataContent,
-                ArchiveManager = archiveManager,
-                Kernel = _kernel,
-                InputManager = inputManager,
-                GraphicsDevice = graphics
-            };
         }
 
         protected override void LoadContent()
@@ -128,12 +105,41 @@ namespace OpenKh.Game
             base.Draw(gameTime);
         }
 
+        private StateInitDesc GetStateInitDesc()
+        {
+            return new StateInitDesc
+            {
+                DataContent = _dataContent,
+                ArchiveManager = archiveManager,
+                Kernel = _kernel,
+                InputManager = inputManager,
+                GraphicsDevice = graphics,
+            };
+        }
+
         private DeltaTimes GetDeltaTimes(GameTime gameTime)
         {
             return new DeltaTimes
             {
                 DeltaTime = 1.0 / 60.0
             };
+        }
+
+        private static IDataContent CreateDataContent(string basePath, string idxFileName, string imgFileName)
+        {
+            if (File.Exists(idxFileName) && File.Exists(imgFileName))
+            {
+                var imgStream = File.OpenRead(imgFileName);
+                var idxDataContent = File.OpenRead(idxFileName)
+                    .Using(stream => new IdxDataContent(stream, imgStream));
+                return new SafeDataContent(new MultipleDataContent(
+                    new StandardDataContent(basePath),
+                    idxDataContent,
+                    new IdxMultipleDataContent(idxDataContent, imgStream)
+                ));
+            }
+            else
+                return new StandardDataContent(basePath);
         }
     }
 }

@@ -37,6 +37,7 @@
         public const int FontTableEventHeight = 512;
         public const int FontIconWidth = 24;
         public const int FontIconHeight = 24;
+        public const int RegionFinalMix = 7;
 
         public const int PaletteCount = 9;
         public const int WorldCount = (int)World.WorldThatNeverWas + 1;
@@ -48,9 +49,9 @@
             "ca", "tr", "eh"
         };
 
-        public static readonly string[] Languages = new string[]
+        public static readonly string[] Regions = new string[]
         {
-            "jp", "us", "it", "sp", "fr", "gr",
+            "jp", "us", "uk", "it", "sp", "gr", "fr", "fm"
         };
 
         public static readonly string[] WorldNames = new string[WorldCount]

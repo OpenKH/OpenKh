@@ -12,6 +12,8 @@ namespace OpenKh.Game.DataContent
             _innerDataContext = innerDataContext;
         }
 
+        public bool FileExists(string fileName) => _innerDataContext.FileExists(fileName);
+
         public Stream FileOpen(string fileName)
         {
             var stream = _innerDataContext.FileOpen(fileName);

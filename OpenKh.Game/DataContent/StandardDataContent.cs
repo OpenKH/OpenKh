@@ -12,6 +12,8 @@ namespace OpenKh.Game.DataContent
             _baseDirectory = baseDirectory;
         }
 
+        public bool FileExists(string fileName) => File.Exists(fileName);
+
         public Stream FileOpen(string path)
         {
             var fileName = Path.Combine(_baseDirectory, path);

@@ -1,5 +1,6 @@
 ﻿using OpenKh.Game.Infrastructure;
 using System.IO;
+using System.Linq;
 
 namespace OpenKh.Game.DataContent
 {
@@ -11,6 +12,9 @@ namespace OpenKh.Game.DataContent
         {
             _dataContents = dataContents;
         }
+
+        public bool FileExists(string fileName) =>
+            _dataContents.Any(x => x.FileExists(fileName));
 
         public Stream FileOpen(string path)
         {

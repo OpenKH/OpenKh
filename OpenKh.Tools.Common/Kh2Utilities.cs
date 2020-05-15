@@ -40,7 +40,7 @@ namespace OpenKh.Tools.Common
         public static List<Msg.Entry> ReadMsgFromIdx(Stream idxStream, Stream imgStream)
         {
             var img = new Img(imgStream, Idx.Read(idxStream), false);
-            foreach (var language in Constants.Languages)
+            foreach (var language in Constants.Regions)
             {
                 var stream = img.FileOpen($"msg/{language}/sys.bar");
                 if (stream != null)
