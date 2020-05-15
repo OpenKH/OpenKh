@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Kh2.Battle;
 using System;
 using System.Collections.Generic;
 using System.Linq;

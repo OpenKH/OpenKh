@@ -26,7 +26,7 @@ namespace OpenKh.Game.Infrastructure
         public Item Item { get; private set; }
         public List<Trsr> Trsr { get; private set; }
         public Fmlv Fmlv { get; private set; }
-        public List<Kh2.Lvup.PlayableCharacter> Lvup { get; private set; }
+        public List<Lvup.PlayableCharacter> Lvup { get; private set; }
 
         public Kernel(IDataContent dataContent)
         {
@@ -74,8 +74,7 @@ namespace OpenKh.Game.Infrastructure
             var bar = _dataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
             bar.ForEntry("fmlv", stream => Fmlv = new Kh2.Battle.Fmlv(stream));
-            bar.ForEntry("item", stream => Item = Kh2.System.Item.Read(stream));
-            bar.ForEntry("lvup", stream => Lvup = Kh2.Lvup.Open(stream));
+            bar.ForEntry("lvup", stream => Lvup = Kh2.Battle.Lvup.Read(stream));
         }
 
         private void LoadFontInfo(string fileName)
