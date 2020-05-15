@@ -76,6 +76,7 @@ namespace OpenKh.Game.States
             {
                 CullMode = CullMode.CullClockwiseFace
             };
+            _effect.GraphicsDevice.DepthStencilState = new DepthStencilState();
 
 
             foreach (var pass in _effect.CurrentTechnique.Passes)

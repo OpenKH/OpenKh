@@ -90,7 +90,6 @@ namespace OpenKh.Game.Debugging
             // making 3D models to look weird. Here we are backing up the states
             // before SpriteBatch reset them as its own will, to restore them later.
             var blendState = _graphics.GraphicsDevice.BlendState;
-            var depthStencil = _graphics.GraphicsDevice.DepthStencilState;
 
             _textX = 0;
             _textY = 0;
@@ -100,7 +99,6 @@ namespace OpenKh.Game.Debugging
                 OnDraw?.Invoke(this);
 
             // small hack: see first comment of the method
-            _graphics.GraphicsDevice.DepthStencilState = depthStencil;
             _graphics.GraphicsDevice.BlendState = blendState;
         }
 
