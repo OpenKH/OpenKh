@@ -116,7 +116,7 @@ namespace OpenKh.Game.Debugging
         }
 
         public void Print(ushort messageId) =>
-            _kernel.MessageProvider.GetMessage(messageId);
+            Print(_kernel.MessageProvider.GetMessage(messageId));
 
         public void Println(string text)
         {
@@ -156,7 +156,7 @@ namespace OpenKh.Game.Debugging
                     spacing = 0;
                     switch ((MessageCommand)ch)
                     {
-                        case MessageCommand.LineSpacing:
+                        case MessageCommand.PrintText:
                             spacing = 6;
                             break;
                         case MessageCommand.NewLine:
@@ -180,6 +180,7 @@ namespace OpenKh.Game.Debugging
 
         private void EmitNewLine()
         {
+            _textX = 0;
             _textY += _fontHeight * _scale;
         }
 

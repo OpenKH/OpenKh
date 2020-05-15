@@ -9,6 +9,13 @@ namespace OpenKh.Game.Infrastructure
         private KeyboardState keyboard;
         private KeyboardState prevKeyboard;
 
+        public bool IsDebug => keyboard.IsKeyDown(Keys.Tab) && !prevKeyboard.IsKeyDown(Keys.Tab);
+        public bool IsShift => keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
+        public bool IsDebugRight => keyboard.IsKeyDown(Keys.Right) && !prevKeyboard.IsKeyDown(Keys.Right);
+        public bool IsDebugLeft => keyboard.IsKeyDown(Keys.Left) && !prevKeyboard.IsKeyDown(Keys.Left);
+        public bool IsDebugUp => keyboard.IsKeyDown(Keys.Up) && !prevKeyboard.IsKeyDown(Keys.Up);
+        public bool IsDebugDown => keyboard.IsKeyDown(Keys.Down) && !prevKeyboard.IsKeyDown(Keys.Down);
+
         public bool IsExit => pad.Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape);
         public bool IsUp => Up && !prevKeyboard.IsKeyDown(Keys.Up);
         public bool IsDown => Down && !prevKeyboard.IsKeyDown(Keys.Down);

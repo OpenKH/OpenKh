@@ -22,6 +22,8 @@ namespace OpenKh.Game.States
 
         private int _worldId = 2;
         private int _placeId = 4;
+        private int _objEntryId = 0x236; // PLAYER
+        private bool _enableCameraMovement = true;
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -38,9 +40,7 @@ namespace OpenKh.Game.States
 
             _graphics.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
 
-            _models.Clear();
-            LoadMap(_worldId, _placeId);
-            LoadObjEntry("PLAYER");
+            BasicallyForceToReloadEverything();
         }
 
         public void Destroy()
@@ -49,16 +49,19 @@ namespace OpenKh.Game.States
 
         public void Update(DeltaTimes deltaTimes)
         {
-            const double Speed = 100.0;
-            var speed = (float)(deltaTimes.DeltaTime * Speed);
+            if (_enableCameraMovement)
+            {
+                const double Speed = 100.0;
+                var speed = (float)(deltaTimes.DeltaTime * Speed);
 
-            if (_input.W) _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAt, speed * 5);
-            if (_input.S) _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAt, speed * 5);
+                if (_input.W) _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAt, speed * 5);
+                if (_input.S) _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAt, speed * 5);
 
-            if (_input.Up) _camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
-            if (_input.Down) _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
-            if (_input.Left) _camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
-            if (_input.Right) _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
+                if (_input.Up) _camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
+                if (_input.Down) _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
+                if (_input.Left) _camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
+                if (_input.Right) _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
+            }
         }
 
         public void Draw(DeltaTimes deltaTimes)
@@ -114,6 +117,13 @@ namespace OpenKh.Game.States
             }
         }
 
+        private void BasicallyForceToReloadEverything()
+        {
+            _models.Clear();
+            LoadMap(_worldId, _placeId);
+            LoadObjEntry(_objEntryId);
+        }
+
         private void LoadObjEntry(string name)
         {
             var model = _kernel.ObjEntries.FirstOrDefault(x => x.ModelName == name);
@@ -125,9 +135,18 @@ namespace OpenKh.Game.States
             AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "p_ex", "tim_"));
         }
 
-        private void LoadMap(int worldIndex, int mapIndex)
+        private void LoadObjEntry(int id)
         {
-            var fileName = $"map/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{mapIndex:D02}.map";
+            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ObjectId == id);
+            if (model == null)
+                return;
+
+            LoadObjEntry(model.ModelName);
+        }
+
+        private void LoadMap(int worldIndex, int placeIndex)
+        {
+            var fileName = $"map/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
 
             _archiveManager.LoadArchive(fileName);
             AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP", "MAP"));
@@ -174,13 +193,172 @@ namespace OpenKh.Game.States
         }
 
 
+        #region DEBUG
+
+        private class DebugPlace
+        {
+            public int Index { get; set; }
+            public int WorldId { get; set; }
+            public int PlaceId { get; set; }
+            public ushort MessageId { get; set; }
+        }
+
+        private int _debugType = 0;
+        private int _debugPlaceCursor = 0;
+        private int _debugObjentryCursor = 0;
+        private DebugPlace[] _places;
+
         public void DebugUpdate(IDebug debug)
         {
+            if (_input.IsDebug)
+            {
+                if (!IsDebugMode())
+                {
+                    EnableDebugMode();
+
+                    if (_places == null)
+                        _places = DebugLoadPlaceList();
+
+                    _debugObjentryCursor = _kernel.ObjEntries
+                        .Select((entry, i) => new { entry, i })
+                        .FirstOrDefault(x => x.entry.ObjectId == _objEntryId)?.i ?? 0;
+                }
+                else
+                    DisableDebugMode();
+            }
+
+            if (IsDebugMode())
+            {
+                if (_input.IsDebugLeft)
+                    _debugType--;
+                else if (_input.IsDebugRight)
+                    _debugType++;
+                _debugType %= 2;
+
+                if (_debugType == 0)
+                    DebugUpdatePlaceList();
+                else if (_debugType == 1)
+                    DebugUpdateObjentryList();
+            }
         }
 
         public void DebugDraw(IDebug debug)
         {
-            debug.Println($"{Constants.WorldIds[_worldId]}{_placeId:D02}");
+            if (IsDebugMode())
+            {
+                if (_debugType == 0)
+                    DebugDrawPlaceList(debug);
+                else if (_debugType == 1)
+                    DebugDrawObjentryList(debug);
+            }
+            else
+            {
+                debug.Println($"MAP: {Constants.WorldIds[_worldId]}{_placeId:D02}");
+                debug.Println($"POS ({_camera.CameraPosition.X:F0}, {_camera.CameraPosition.Y:F0}, {_camera.CameraPosition.Z:F0})");
+                debug.Println($"YPR ({_camera.CameraRotationYawPitchRoll.X:F0}, {_camera.CameraRotationYawPitchRoll.Y:F0}, {_camera.CameraRotationYawPitchRoll.Z:F0})");
+            }
         }
+
+        private bool IsDebugMode() => _enableCameraMovement == false;
+        private void EnableDebugMode() => _enableCameraMovement = false;
+        private void DisableDebugMode() => _enableCameraMovement = true;
+        private int Increment(int n) => n + (_input.IsShift ? 10 : 1);
+        private int Decrement(int n) => n - (_input.IsShift ? 10 : 1);
+
+        private void DebugUpdatePlaceList()
+        {
+            if (_input.IsDebugUp) _debugPlaceCursor = Decrement(_debugPlaceCursor);
+            else if (_input.IsDebugDown) _debugPlaceCursor = Increment(_debugPlaceCursor);
+            if (_debugPlaceCursor < 0)
+                _debugPlaceCursor = _places.Length - 1;
+            _debugPlaceCursor %= _places.Length;
+
+            if (_input.IsCross)
+            {
+                var map = _places[_debugPlaceCursor];
+                _worldId = map.WorldId;
+                _placeId = map.PlaceId;
+
+                BasicallyForceToReloadEverything();
+                DisableDebugMode();
+            }
+        }
+
+        private void DebugDrawPlaceList(IDebug debug)
+        {
+            debug.Println("MAP SELECTION");
+            debug.Println("");
+
+            foreach (var place in _places.Skip(_debugPlaceCursor))
+            {
+                debug.Print($"{(place.Index == _debugPlaceCursor ? '>' : ' ')} ");
+                debug.Print($"{Constants.WorldIds[place.WorldId]}{place.PlaceId:D02} ");
+                debug.Println(place.MessageId);
+            }
+        }
+
+        private DebugPlace[] DebugLoadPlaceList() => _kernel.Places
+            .Select(x => new
+            {
+                World = x.Key,
+                Places = x.Value.Select((place, i) => new
+                {
+                    Index = i,
+                    Place = place
+                })
+            })
+            .SelectMany(x => x.Places, (x, place) => new DebugPlace
+            {
+                WorldId = Constants.WorldIds
+                    .Select((World, Index) => new { World, Index })
+                    .Where(e => e.World == x.World)
+                    .Select(x => x.Index).FirstOrDefault(),
+                PlaceId = place.Index,
+                MessageId = place.Place.MessageId
+            })
+            .Select((x, i) =>
+            {
+                x.Index = i;
+                return x;
+            })
+            .ToArray();
+
+        private void DebugUpdateObjentryList()
+        {
+            if (_input.IsDebugUp) _debugObjentryCursor = Decrement(_debugObjentryCursor);
+            else if (_input.IsDebugDown) _debugObjentryCursor = Increment(_debugObjentryCursor);
+            if (_debugObjentryCursor < 0)
+                _debugObjentryCursor = _kernel.ObjEntries.Count - 1;
+            _debugObjentryCursor %= _kernel.ObjEntries.Count;
+
+            if (_input.IsCross)
+            {
+                _objEntryId = _debugObjentryCursor;
+
+                BasicallyForceToReloadEverything();
+                DisableDebugMode();
+            }
+        }
+
+        private void DebugDrawObjentryList(IDebug debug)
+        {
+            debug.Println("OBJENTRY SELECTION");
+            debug.Println("");
+
+            var index = 0;
+            foreach (var entry in _kernel.ObjEntries)
+            {
+                if (index >= _debugObjentryCursor)
+                {
+                    debug.Print($"{(index == _debugObjentryCursor ? '>' : ' ')} ");
+                    debug.Print($"{entry.ObjectId:X04} ");
+                    debug.Println(entry.ModelName.Replace('_', '-'));
+                }
+
+                index++;
+            }
+        }
+
+        #endregion
     }
 }
