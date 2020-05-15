@@ -4,10 +4,10 @@ using Xe.Drawing;
 
 namespace OpenKh.Game
 {
+    using xnaf = Microsoft.Xna.Framework;
+
     public class MonoDrawing : IDrawing
     {
-        private readonly SpriteBatch spriteBatch;
-
         private class CSurface : ISurface
         {
             public CSurface(Texture2D texture)
@@ -36,13 +36,13 @@ namespace OpenKh.Game
             }
         }
 
+        private readonly BasicEffect _effect;
+
         public MonoDrawing(GraphicsDevice graphicsDevice)
         {
             GraphicsDevice = graphicsDevice;
-            spriteBatch = new SpriteBatch(graphicsDevice);
-
-
             GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+            _effect = new BasicEffect(graphicsDevice);
         }
 
         public GraphicsDevice GraphicsDevice { get; }
@@ -79,7 +79,6 @@ namespace OpenKh.Game
         
         public void Dispose()
         {
-            spriteBatch.Dispose();
         }
 
         public void DrawRectangle(RectangleF rect, Color color, float width = 1)
@@ -105,25 +104,73 @@ namespace OpenKh.Game
         public void DrawSurface(ISurface surface, Rectangle src, RectangleF dst, ColorF color0, ColorF color1, ColorF color2, ColorF color3)
         {
             var texture = (surface as CSurface)?.Texture;
-            spriteBatch.Begin();
-            spriteBatch.Draw(texture,
-                sourceRectangle: ToXnaRectangle(src),
-                destinationRectangle: ToXnaRectangle(dst),
-                color: ToXnaColor(color0));
-            spriteBatch.End();
+            var tw = 1.0f / texture.Width;
+            var th = 1.0f / texture.Height;
+
+            var indices = new int[] { 0, 1, 2, 1, 2, 3 };
+            var vertices = new VertexPositionColorTexture[]
+            {
+                new VertexPositionColorTexture()
+                {
+                    Position = new xnaf.Vector3(dst.Left, dst.Top, 0.0f),
+                    TextureCoordinate = new xnaf.Vector2(src.Left * tw, src.Top * th),
+                    Color = ToXnaColor(color0)
+                },
+                new VertexPositionColorTexture()
+                {
+                    Position = new xnaf.Vector3(dst.Right, dst.Top, 0.0f),
+                    TextureCoordinate = new xnaf.Vector2(src.Right * tw, src.Top * th),
+                    Color = ToXnaColor(color1)
+                },
+                new VertexPositionColorTexture()
+                {
+                    Position = new xnaf.Vector3(dst.Left, dst.Bottom, 0.0f),
+                    TextureCoordinate = new xnaf.Vector2(src.Left * tw, src.Bottom * th),
+                    Color = ToXnaColor(color2)
+                },
+                new VertexPositionColorTexture()
+                {
+                    Position = new xnaf.Vector3(dst.Right, dst.Bottom, 0.0f),
+                    TextureCoordinate = new xnaf.Vector2(src.Right * tw, src.Bottom * th),
+                    Color = ToXnaColor(color3)
+                },
+            };
+
+            foreach (var pass in _effect.CurrentTechnique.Passes)
+            {
+                _effect.Texture = texture;
+                _effect.TextureEnabled = true;
+                _effect.VertexColorEnabled = true;
+                _effect.Projection = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
+                pass.Apply();
+
+                GraphicsDevice.RasterizerState = new RasterizerState()
+                {
+                    CullMode = CullMode.None,
+                };
+
+                GraphicsDevice.DrawUserIndexedPrimitives(
+                    PrimitiveType.TriangleList,
+                    vertices,
+                    0,
+                    vertices.Length,
+                    indices,
+                    0,
+                    indices.Length / 3);
+            }
         }
 
         public void Flush()
         {
         }
 
-        private static Microsoft.Xna.Framework.Rectangle ToXnaRectangle(Rectangle rectangle) =>
-            new Microsoft.Xna.Framework.Rectangle(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
-        private static Microsoft.Xna.Framework.Rectangle ToXnaRectangle(RectangleF rectangle) =>
-            new Microsoft.Xna.Framework.Rectangle((int)rectangle.X, (int)rectangle.Y, (int)rectangle.Width, (int)rectangle.Height);
-        private static Microsoft.Xna.Framework.Color ToXnaColor(Color color) =>
-            new Microsoft.Xna.Framework.Color(color.R, color.G, color.B, color.A);
-        private static Microsoft.Xna.Framework.Color ToXnaColor(ColorF color) =>
-            new Microsoft.Xna.Framework.Color(color.R, color.G, color.B, color.A);
+        private static xnaf.Rectangle ToXnaRectangle(Rectangle rectangle) =>
+            new xnaf.Rectangle(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+        private static xnaf.Rectangle ToXnaRectangle(RectangleF rectangle) =>
+            new xnaf.Rectangle((int)rectangle.X, (int)rectangle.Y, (int)rectangle.Width, (int)rectangle.Height);
+        private static xnaf.Color ToXnaColor(Color color) =>
+            new xnaf.Color(color.R, color.G, color.B, color.A);
+        private static xnaf.Color ToXnaColor(ColorF color) =>
+            new xnaf.Color(color.R, color.G, color.B, color.A);
     }
 }
