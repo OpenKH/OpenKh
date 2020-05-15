@@ -114,6 +114,7 @@ namespace OpenKh.Game
                 Kernel = _kernel,
                 InputManager = inputManager,
                 GraphicsDevice = graphics,
+                StateChange = this,
             };
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using OpenKh.Game.States;
 
 namespace OpenKh.Game.Infrastructure
 {
@@ -9,5 +10,6 @@ namespace OpenKh.Game.Infrastructure
         public Kernel Kernel { get; set; }
         public InputManager InputManager { get; set; }
         public GraphicsDeviceManager GraphicsDevice { get; set; }
+        public IStateChange StateChange { get; set; }
     }
 }

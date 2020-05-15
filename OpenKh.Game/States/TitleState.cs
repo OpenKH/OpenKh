@@ -16,41 +16,54 @@ namespace OpenKh.Game.States
         private const int Menu2 = 2;
         private const int Menu1OptionsCount = 2;
         private const int Menu2OptionsCount = 3;
-        private const bool TheaterModeUnlocked = true;
         private const int MainMenuNewGameOption = 0;
         private const int MainMenuLoadOption = 1;
         private const int MainMenuTheaterOption = 2;
 
         private Kernel _kernel;
-        private ArchiveManager archiveManager;
-        private InputManager inputManager;
+        private ArchiveManager _archiveManager;
+        private InputManager _inputManager;
+        private IStateChange _stateChange;
         private MonoDrawing drawing;
         private LayoutRenderer layoutRendererFg;
         private LayoutRenderer layoutRendererBg;
         private LayoutRenderer layoutRendererTheater;
         private Dictionary<string, IEnumerable<ISurface>> cachedSurfaces;
-        private int optionSelected;
-        private bool isInTheaterMenu;
+        
+        private bool _isTheaterModeUnlocked;
+        private int _optionSelected;
+        private bool _isInTheaterMenu;
 
         public void Initialize(StateInitDesc initDesc)
         {
             _kernel = initDesc.Kernel;
-            archiveManager = initDesc.ArchiveManager;
-            inputManager = initDesc.InputManager;
+            _archiveManager = initDesc.ArchiveManager;
+            _inputManager = initDesc.InputManager;
+            _stateChange = initDesc.StateChange;
+
             drawing = new MonoDrawing(initDesc.GraphicsDevice.GraphicsDevice);
             cachedSurfaces = new Dictionary<string, IEnumerable<ISurface>>();
 
-            archiveManager.LoadArchive($"menu/{_kernel.Region}/title.2ld");
-            archiveManager.LoadArchive($"menu/{_kernel.Region}/save.2ld");
+            _archiveManager.LoadArchive($"menu/{_kernel.Region}/title.2ld");
+            _archiveManager.LoadArchive($"menu/{_kernel.Region}/save.2ld");
 
             layoutRendererBg = CreateLayoutRenderer("titl");
             layoutRendererBg.SelectedSequenceGroupIndex = BackgroundScreen;
 
             layoutRendererFg = CreateLayoutRenderer("titl");
-            SetOption(0);
 
             // it will not work for non-FM versions
-            //layoutRendererTheater = CreateLayoutRenderer("even");
+            if (_kernel.RegionId == Constants.RegionFinalMix)
+            {
+                _isTheaterModeUnlocked = true;
+                layoutRendererTheater = CreateLayoutRenderer("even");
+            }
+            else
+            {
+                _isTheaterModeUnlocked = false;
+            }
+
+            SetOption(0);
         }
 
         public void Destroy()
@@ -63,7 +76,7 @@ namespace OpenKh.Game.States
             CheckTitlLoop(layoutRendererBg);
             CheckTitlLoop(layoutRendererFg);
             
-            if (isInTheaterMenu)
+            if (_isInTheaterMenu)
             {
                 switch (layoutRendererTheater.SelectedSequenceGroupIndex)
                 {
@@ -80,12 +93,12 @@ namespace OpenKh.Game.States
                     case 2:
                         layoutRendererTheater.FrameIndex++;
                         if (layoutRendererTheater.FrameIndex > 32)
-                            isInTheaterMenu = false;
+                            _isInTheaterMenu = false;
                         break;
                 }
             }
 
-            if (isInTheaterMenu == false)
+            if (_isInTheaterMenu == false)
                 ProcessInputMainMenu();
             else
                 ProcessInputTheaterMenu();
@@ -96,60 +109,62 @@ namespace OpenKh.Game.States
             layoutRendererBg.Draw();
             layoutRendererFg.Draw();
 
-            if (isInTheaterMenu)
+            if (_isInTheaterMenu)
                 layoutRendererTheater.Draw();
         }
 
         private void ProcessInputMainMenu()
         {
-            var currentOption = optionSelected;
-            if (inputManager.IsUp)
+            var currentOption = _optionSelected;
+            if (_inputManager.IsUp)
             {
                 currentOption--;
                 if (currentOption < 0)
                     currentOption = GetMaxOptionsCount() - 1;
             }
-            else if (inputManager.IsDown)
+            else if (_inputManager.IsDown)
             {
                 currentOption++;
                 if (currentOption >= GetMaxOptionsCount())
                     currentOption = 0;
             }
-            else if (inputManager.IsCircle)
+            else if (_inputManager.IsCircle || _inputManager.IsCross)
             {
                 switch (currentOption)
                 {
                     case MainMenuNewGameOption:
+                        _stateChange.State = 1;
                         break;
                     case MainMenuLoadOption:
+                        _stateChange.State = 1;
                         break;
                     case MainMenuTheaterOption:
-                        isInTheaterMenu = true;
+                        _isInTheaterMenu = true;
                         layoutRendererTheater.FrameIndex = 0;
                         layoutRendererTheater.SelectedSequenceGroupIndex = 0;
                         break;
                 }
             }
 
-            if (currentOption != optionSelected)
+            if (currentOption != _optionSelected)
                 SetOption(currentOption);
         }
 
         private void ProcessInputTheaterMenu()
         {
-            if (inputManager.IsCross)
+            if (_inputManager.IsCross)
             {
                 layoutRendererTheater.FrameIndex = 0;
                 layoutRendererTheater.SelectedSequenceGroupIndex = 2;
             }
         }
 
-        private int GetMaxOptionsCount() => TheaterModeUnlocked ? Menu2OptionsCount : Menu1OptionsCount;
+        private int GetMaxOptionsCount() => _isTheaterModeUnlocked ? Menu2OptionsCount : Menu1OptionsCount;
 
         private void SetOption(int option)
         {
-            optionSelected = option;
-            layoutRendererFg.SelectedSequenceGroupIndex = optionSelected + (TheaterModeUnlocked ? Menu2 : Menu1);
+            _optionSelected = option;
+            layoutRendererFg.SelectedSequenceGroupIndex = _optionSelected + (_isTheaterModeUnlocked ? Menu2 : Menu1);
         }
 
         private void CheckTitlLoop(LayoutRenderer layout)
@@ -176,9 +191,9 @@ namespace OpenKh.Game.States
 
         private LayoutRenderer CreateLayoutRenderer(string layoutResourceName, string imagesResourceName)
         {
-            var layout = archiveManager.Get<Layout>(layoutResourceName);
+            var layout = _archiveManager.Get<Layout>(layoutResourceName);
             if (!cachedSurfaces.TryGetValue(imagesResourceName, out var images))
-                images = cachedSurfaces[imagesResourceName] = archiveManager.Get<Imgz>(imagesResourceName)
+                images = cachedSurfaces[imagesResourceName] = _archiveManager.Get<Imgz>(imagesResourceName)
                     ?.Images?.Select(x => drawing.CreateSurface(x));
 
             return new LayoutRenderer(layout, drawing, images);
