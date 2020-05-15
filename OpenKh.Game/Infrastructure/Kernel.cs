@@ -25,7 +25,7 @@ namespace OpenKh.Game.Infrastructure
         public List<Ftst.Entry> Ftst { get; private set; }
         public Item Item { get; private set; }
         public List<Trsr> Trsr { get; private set; }
-        public Fmlv Fmlv { get; private set; }
+        public List<Fmlv.Level> Fmlv { get; private set; }
         public List<Lvup.PlayableCharacter> Lvup { get; private set; }
 
         public Kernel(IDataContent dataContent)
@@ -73,7 +73,7 @@ namespace OpenKh.Game.Infrastructure
         {
             var bar = _dataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
-            bar.ForEntry("fmlv", stream => Fmlv = new Kh2.Battle.Fmlv(stream));
+            bar.ForEntry("fmlv", stream => Fmlv = Kh2.Battle.Fmlv.Read(stream));
             bar.ForEntry("lvup", stream => Lvup = Kh2.Battle.Lvup.Read(stream));
         }
 
