@@ -9,7 +9,7 @@ using System.IO;
 
 namespace OpenKh.Game
 {
-    public class OpenKhGame : Microsoft.Xna.Framework.Game
+    public class OpenKhGame : Microsoft.Xna.Framework.Game, IStateChange
     {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -20,6 +20,30 @@ namespace OpenKh.Game
         private readonly InputManager inputManager;
         private readonly DebugOverlay _debugOverlay;
         private IState state;
+
+        public int State
+        {
+            set
+            {
+                switch (value)
+                {
+                    case 0:
+                        state = new TitleState();
+                        state.Initialize(GetStateInitDesc());
+
+                        _debugOverlay.OnUpdate = state.DebugUpdate;
+                        _debugOverlay.OnDraw = state.DebugDraw;
+                        break;
+                    case 1:
+                        state = new MapState();
+                        state.Initialize(GetStateInitDesc());
+
+                        _debugOverlay.OnUpdate = state.DebugUpdate;
+                        _debugOverlay.OnDraw = state.DebugDraw;
+                        break;
+                }    
+            }
+        }
 
         public OpenKhGame()
         {
@@ -49,12 +73,20 @@ namespace OpenKh.Game
             archiveManager = new ArchiveManager(_dataContent);
             _kernel = new Kernel(_dataContent);
             inputManager = new InputManager();
-            _debugOverlay = new DebugOverlay();
+            _debugOverlay = new DebugOverlay(this);
         }
 
         protected override void Initialize()
         {
-            var initDesc = new StateInitDesc
+            _debugOverlay.Initialize(GetStateInitDesc());
+            State = 0;
+
+            base.Initialize();
+        }
+
+        private StateInitDesc GetStateInitDesc()
+        {
+            return new StateInitDesc
             {
                 DataContent = _dataContent,
                 ArchiveManager = archiveManager,
@@ -62,16 +94,6 @@ namespace OpenKh.Game
                 InputManager = inputManager,
                 GraphicsDevice = graphics
             };
-
-            _debugOverlay.Initialize(initDesc);
-
-            state = new MapState();
-            state.Initialize(initDesc);
-
-            _debugOverlay.OnUpdate = state.DebugUpdate;
-            _debugOverlay.OnDraw = state.DebugDraw;
-
-            base.Initialize();
         }
 
         protected override void LoadContent()

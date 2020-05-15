@@ -253,12 +253,15 @@ namespace OpenKh.Game.States
                     _debugType--;
                 else if (_input.IsDebugRight)
                     _debugType++;
-                _debugType %= 2;
+                _debugType %= 3;
 
                 if (_debugType == 0)
                     DebugUpdatePlaceList();
                 else if (_debugType == 1)
                     DebugUpdateObjentryList();
+                else if (_debugType == 2)
+                    if (_input.IsCross)
+                        debug.State = 0;
             }
         }
 
@@ -270,6 +273,8 @@ namespace OpenKh.Game.States
                     DebugDrawPlaceList(debug);
                 else if (_debugType == 1)
                     DebugDrawObjentryList(debug);
+                else if (_debugType == 2)
+                    debug.Println("Press X to return to title screen");
             }
             else
             {

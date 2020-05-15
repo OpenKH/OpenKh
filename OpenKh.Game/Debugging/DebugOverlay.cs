@@ -17,6 +17,7 @@ namespace OpenKh.Game.Debugging
         private Kernel _kernel;
         private InputManager _inputManager;
         private GraphicsDeviceManager _graphics;
+        private readonly IStateChange _stateChange;
         private bool _overrideExternalDebugFeatures = false;
 
         private Texture2D _texFontSys1;
@@ -37,12 +38,14 @@ namespace OpenKh.Game.Debugging
         private float _widthMultiplier = 1.0f;
         private float _scale = 1.0f;
 
-        public DebugOverlay()
+        public DebugOverlay(IStateChange stateChange)
         {
+            _stateChange = stateChange;
         }
 
         public Action<IDebug> OnUpdate { get; set; }
         public Action<IDebug> OnDraw { get; set; }
+        public int State { set => _stateChange.State = value; }
 
         public void Initialize(StateInitDesc initDesc)
         {
