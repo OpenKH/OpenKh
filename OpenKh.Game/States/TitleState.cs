@@ -261,10 +261,11 @@ namespace OpenKh.Game.States
                 switch (currentOption)
                 {
                     case MainMenuNewGameOption:
-                        _stateChange.State = 1;
+                        layoutRendererBg.SelectedSequenceGroupIndex = _titleLayout.NewGame;
+                        layoutRendererBg.FrameIndex = 0;
                         break;
                     case MainMenuLoadOption:
-                        _stateChange.State = 1;
+                        SetStateToGameplay();
                         break;
                     case MainMenuTheaterOption:
                         _isInTheaterMenu = true;
@@ -292,6 +293,11 @@ namespace OpenKh.Game.States
         {
             layoutRendererBg.SelectedSequenceGroupIndex = _titleLayout.IntroSkip;
             layoutRendererBg.FrameIndex = 0;
+        }
+
+        private void SetStateToGameplay()
+        {
+            _stateChange.State = 1;
         }
 
         private void SetOption(int option)
@@ -352,6 +358,13 @@ namespace OpenKh.Game.States
                     layout.SelectedSequenceGroupIndex = _titleLayout.IntroSkip;
                     layout.FrameIndex = 0;
                 }
+            }
+            else if (currentSequenceGroupIndex == _titleLayout.NewGame)
+            {
+                if (layout.FrameIndex < 250)
+                    layout.FrameIndex++;
+                else
+                    SetStateToGameplay();
             }
             else
                 layout.FrameIndex++;
