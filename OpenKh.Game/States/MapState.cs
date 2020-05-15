@@ -142,12 +142,16 @@ namespace OpenKh.Game.States
                     break;
                 case Objentry.Type.NPC:
                     internalName = "h_ex";
+                    internalName = "n_ex";
                     break;
                 case Objentry.Type.WEAPON:
                     internalName = "w_ex";
                     break;
                 case Objentry.Type.F_OBJ:
                     internalName = "f_ex";
+                    break;
+                case Objentry.Type.BOSS:
+                    internalName = "b_ex";
                     break;
             }
 

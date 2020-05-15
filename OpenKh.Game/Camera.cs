@@ -121,7 +121,7 @@ namespace OpenKh.Game
 
         public Camera()
         {
-            _fov = 1.5f;
+            _fov = 1.2f;
             AspectRatio = 512.0f / 448.0f;
             NearClipPlane = 1;
             FarClipPlane = int.MaxValue;

@@ -50,8 +50,8 @@ namespace OpenKh.Game
         {
             graphics = new GraphicsDeviceManager(this)
             {
-                PreferredBackBufferWidth = 512,
-                PreferredBackBufferHeight = 448
+                PreferredBackBufferWidth = 1024,
+                PreferredBackBufferHeight = 576
             };
 
             Content.RootDirectory = "Content";
