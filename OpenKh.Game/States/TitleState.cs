@@ -3,7 +3,9 @@ using OpenKh.Engine.Renderers;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Xe.Drawing;
 
@@ -119,6 +121,17 @@ namespace OpenKh.Game.States
         private int _optionSelected;
         private bool _isInTheaterMenu;
 
+        private bool IsIntro
+        {
+            get
+            {
+                var currentSequence = layoutRendererBg.SelectedSequenceGroupIndex;
+                return currentSequence == _titleLayout.Copyright ||
+                    currentSequence == _titleLayout.Intro ||
+                    currentSequence == _titleLayout.NewGame;
+            }
+        }
+
         public void Initialize(StateInitDesc initDesc)
         {
             _kernel = initDesc.Kernel;
@@ -154,7 +167,7 @@ namespace OpenKh.Game.States
 
             layoutRendererBg = CreateLayoutRenderer("titl");
             layoutRendererFg = CreateLayoutRenderer("titl");
-            layoutRendererBg.SelectedSequenceGroupIndex = _titleLayout.IntroSkip;
+            layoutRendererBg.SelectedSequenceGroupIndex = _titleLayout.Copyright;
 
             if (_titleLayout.HasTheater)
                 layoutRendererTheater = CreateLayoutRenderer("even");
@@ -194,16 +207,26 @@ namespace OpenKh.Game.States
                 }
             }
 
-            if (_isInTheaterMenu == false)
-                ProcessInputMainMenu();
+            if (IsIntro)
+            {
+                if (_inputManager.IsCross || _inputManager.IsCircle)
+                    SkipIntro();
+            }
             else
-                ProcessInputTheaterMenu();
+            {
+                if (_isInTheaterMenu == false)
+                    ProcessInputMainMenu();
+                else
+                    ProcessInputTheaterMenu();
+            }
         }
 
         public void Draw(DeltaTimes deltaTimes)
         {
             layoutRendererBg.Draw();
-            layoutRendererFg.Draw();
+
+            if (!IsIntro)
+                layoutRendererFg.Draw();
 
             if (_isInTheaterMenu)
                 layoutRendererTheater.Draw();
@@ -265,6 +288,12 @@ namespace OpenKh.Game.States
             }
         }
 
+        private void SkipIntro()
+        {
+            layoutRendererBg.SelectedSequenceGroupIndex = _titleLayout.IntroSkip;
+            layoutRendererBg.FrameIndex = 0;
+        }
+
         private void SetOption(int option)
         {
             _optionSelected = option;
@@ -304,6 +333,28 @@ namespace OpenKh.Game.States
                 if (layout.FrameIndex < 119)
                     layout.FrameIndex++;
             }
+            else if (currentSequenceGroupIndex == _titleLayout.Copyright)
+            {
+                if (layout.FrameIndex < 850)
+                    layout.FrameIndex++;
+                else
+                {
+                    layout.SelectedSequenceGroupIndex = _titleLayout.Intro;
+                    layout.FrameIndex = 0;
+                }
+            }
+            else if (currentSequenceGroupIndex == _titleLayout.Intro)
+            {
+                if (layout.FrameIndex < 478)
+                    layout.FrameIndex++;
+                else
+                {
+                    layout.SelectedSequenceGroupIndex = _titleLayout.IntroSkip;
+                    layout.FrameIndex = 0;
+                }
+            }
+            else
+                layout.FrameIndex++;
         }
 
         private LayoutRenderer CreateLayoutRenderer(string resourceName) => CreateLayoutRenderer(resourceName, resourceName);
