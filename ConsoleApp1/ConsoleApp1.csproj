@@ -14,4 +14,9 @@
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="SrkAlternatives">
+      <HintPath>..\SrkAlternatives\SrkAlternatives.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

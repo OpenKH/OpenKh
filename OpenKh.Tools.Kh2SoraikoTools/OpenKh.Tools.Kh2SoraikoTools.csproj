@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="OpenTK">
+      <HintPath>..\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="SrkAlternatives">
+      <HintPath>..\SrkAlternatives\SrkAlternatives.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
