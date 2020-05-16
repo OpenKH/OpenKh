@@ -12,13 +12,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Content\**" />
-    <EmbeddedResource Remove="Content\**" />
-    <None Remove="Content\**" />
-    <Page Remove="Content\**" />
+    <None Remove="Content\obj\P_EX100.mdlx" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\obj\P_EX100.mdlx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="sample.dae">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="OpenKh.Kh2">
+      <HintPath>..\OpenKh.Kh2\bin\Debug\netstandard2.0\OpenKh.Kh2.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK">
       <HintPath>..\OpenTK\OpenTK.dll</HintPath>
     </Reference>

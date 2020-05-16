@@ -82,7 +82,7 @@ namespace OpenKh.Tools.Kh2SoraikoTools
         public static void Init()
         {
             GL.Enable(EnableCap.Multisample);
-            GL.Enable(EnableCap.DepthTest);
+            
         }
 
     }

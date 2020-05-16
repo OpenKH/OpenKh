@@ -192,7 +192,7 @@ namespace OpenKh.Tools.Kh2SoraikoTools
                 if (enableAlpha)
                 {
                     GL.Enable(EnableCap.AlphaTest);
-                    GL.AlphaFunc(AlphaFunction.Gequal, 0.01f);
+                    GL.AlphaFunc(AlphaFunction.Gequal, 0.1f);
                 }
 
                 GL.Begin(PrimitiveType.Triangles);

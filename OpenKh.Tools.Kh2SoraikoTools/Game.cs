@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Diagnostics;
@@ -23,6 +24,13 @@ namespace OpenKh.Tools.Kh2SoraikoTools
 
             Size newSize = new Size((int)(Size.Width * 0.9f), (int)(Size.Height * 0.9f));
             Point newLocation = new Point(Location.X + (Size.Width - newSize.Width) / 2, Location.Y + (Size.Height - newSize.Height) / 2);
+
+            if (!File.Exists(@"Content\obj\P_EX100[p_ex].dae"))
+            {
+                FileStream fs = new System.IO.FileStream(@"Content\obj\P_EX100.mdlx", FileMode.Open);
+                SrkAlternatives.Mdlx m = new SrkAlternatives.Mdlx(fs);
+                m.ExportDAE(@"Content\obj\P_EX100.dae");
+            }
 
             Size = newSize;
             Location = newLocation;
@@ -86,6 +94,8 @@ namespace OpenKh.Tools.Kh2SoraikoTools
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
 
+
+            GL.Clear(ClearBufferMask.AccumBufferBit);
 
 
 
