@@ -25,12 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="OpenKh.Kh2">
-      <HintPath>..\OpenKh.Kh2\bin\Debug\netstandard2.0\OpenKh.Kh2.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenTK">
-      <HintPath>..\OpenTK\OpenTK.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="SrkAlternatives">
       <HintPath>..\SrkAlternatives\SrkAlternatives.dll</HintPath>
     </Reference>

@@ -47,9 +47,13 @@ namespace OpenKh.Kh2
 
 		private void pppInitPdt(BinaryReader reader, int offset, int unk)
 		{
-			int a0, a1, a2, a3, a4, a5, a6, a7;
-			int t0, t1, t2, t3, t4, t5, t6, t7;
-			int v0, v1, v2, v3;
+			//int a4, a5, a6, a7;
+			int a0, a1, a2, a3;
+			int t0, t4, t5, t6, t7;
+			//int t1, t2, t3;
+			int v1;
+			//int v0, v2, v3;
+
 			// a0 = offset
 			// a1 = unk
 

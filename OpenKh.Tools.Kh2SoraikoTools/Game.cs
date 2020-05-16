@@ -22,8 +22,8 @@ namespace OpenKh.Tools.Kh2SoraikoTools
             StaticConstants.ScreenWidth = OpenTK.DisplayDevice.Default.Bounds.Width;
             StaticConstants.ScreenHeight = OpenTK.DisplayDevice.Default.Bounds.Height;
 
-            Size newSize = new Size((int)(Size.Width * 0.9f), (int)(Size.Height * 0.9f));
-            Point newLocation = new Point(Location.X + (Size.Width - newSize.Width) / 2, Location.Y + (Size.Height - newSize.Height) / 2);
+            OpenTK.Size newSize = new OpenTK.Size((int)(Size.Width * 0.9f), (int)(Size.Height * 0.9f));
+            OpenTK.Point newLocation = new OpenTK.Point(Location.X + (Size.Width - newSize.Width) / 2, Location.Y + (Size.Height - newSize.Height) / 2);
 
             if (!File.Exists(@"Content\obj\P_EX100[p_ex].dae"))
             {
@@ -83,7 +83,7 @@ namespace OpenKh.Tools.Kh2SoraikoTools
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
 
-            GL.ClearColor(Color.Green);
+            GL.ClearColor(OpenTK.Color.Green);
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);

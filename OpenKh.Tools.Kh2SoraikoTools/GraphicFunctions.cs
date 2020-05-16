@@ -19,11 +19,11 @@ namespace OpenKh.Tools.Kh2SoraikoTools
         public static bool LastTextureAlpha = false;
 
         public static List<int> Textures = new List<int>(0);
-        public static List<Size> Textures_Bounds = new List<Size>(0);
+        public static List<System.Drawing.Size> Textures_Bounds = new List<System.Drawing.Size>(0);
         public static List<IntPtr> Textures_IntPtrs = new List<IntPtr>(0);
 
 
-        public static int LoadTexture(Bitmap bitmap)
+        public static int LoadTexture(System.Drawing.Bitmap bitmap)
         {
             int depth = System.Drawing.Bitmap.GetPixelFormatSize(bitmap.PixelFormat);
             if (depth != 32)
@@ -43,7 +43,7 @@ namespace OpenKh.Tools.Kh2SoraikoTools
             BitmapData data = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
                 ImageLockMode.ReadOnly, bitmap.PixelFormat);
 
-            Textures_Bounds.Add(new Size(bitmap.Width, bitmap.Height));
+            Textures_Bounds.Add(new System.Drawing.Size(bitmap.Width, bitmap.Height));
 
 
 
