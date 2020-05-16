@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreCompat.System.Drawing.v2" Version="5.2.0-preview1-r131" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
   </ItemGroup>
 

@@ -1,9 +1,10 @@
-﻿using System.Drawing;
+﻿using OpenKh.Imaging;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace OpenKh.Imaging
+namespace OpenKh.Tools.Common.Imaging
 {
     internal class GdiImage : IImageRead
     {
@@ -17,7 +18,7 @@ namespace OpenKh.Imaging
 
         public Size Size => _bitmap.Size;
 
-        public PixelFormat PixelFormat => _bitmap.PixelFormat.GetPixelFormat();
+        public OpenKh.Imaging.PixelFormat PixelFormat => _bitmap.PixelFormat.GetPixelFormat();
 
         public byte[] GetClut()
         {

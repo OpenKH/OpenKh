@@ -1,7 +1,8 @@
-﻿using System.Drawing.Imaging;
+﻿using OpenKh.Imaging;
+using System.Drawing.Imaging;
 using System.IO;
 
-namespace OpenKh.Imaging
+namespace OpenKh.Tools.Common.Imaging
 {
     public static class Png
     {
