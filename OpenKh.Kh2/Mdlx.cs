@@ -17,7 +17,7 @@ namespace OpenKh.Kh2
         public List<SubModel> SubModels { get; }
         public M4 MapModel { get; }
 
-        private Mdlx(Stream stream)
+        public Mdlx(Stream stream)
         {
             var type = ReadMdlxType(stream);
             stream.Position = 0;

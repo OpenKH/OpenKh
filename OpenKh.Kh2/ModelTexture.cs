@@ -174,7 +174,7 @@ namespace OpenKh.Kh2
         private byte[] PaletteData { get; }
         private byte[] FooterData { get; }
 
-        private ModelTexture(Stream stream)
+        public ModelTexture(Stream stream)
         {
             var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
             if (header.MagicCode == -1)
