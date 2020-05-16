@@ -26,8 +26,8 @@ namespace OpenKh.Tools.Kh2SoraikoTools
 		static float Roll = 0;
 		static float DestRoll = 0f;
 
-		static float Distance = 2000f;
-		static float DestDistance = 2000f;
+		static float Distance = 100f;
+		static float DestDistance = 100f;
 
 		static float FieldOfView = MathHelper.RadiansToDegrees(1.5f);
 		static float DestFieldOfView = MathHelper.RadiansToDegrees(1.5f);

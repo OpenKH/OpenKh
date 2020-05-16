@@ -12,6 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Content\**" />
+    <EmbeddedResource Remove="Content\**" />
+    <None Remove="Content\**" />
+    <Page Remove="Content\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="OpenTK">
       <HintPath>..\OpenTK\OpenTK.dll</HintPath>
     </Reference>

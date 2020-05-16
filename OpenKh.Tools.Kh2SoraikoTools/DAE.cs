@@ -478,7 +478,7 @@ namespace OpenKh.Tools.Kh2SoraikoTools
                             }
                             if (valCount % 2 == 1)
                             {
-                                TexCoordinates[valIndex].Y = -currVal;
+                                TexCoordinates[valIndex].Y = currVal;
                                 //currVal = 1 - currVal;
                                 valIndex++;
                             }

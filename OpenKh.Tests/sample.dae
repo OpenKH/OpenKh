@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<COLLADA version="1.4.1">
+    <library_images>
+        <image id="file0-image" name="file0">
+            <init_from>texture.png</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="lambert" name="lambert">
+            <instance_effect url="#lambert-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="lambert-fx" name="lambert">
+            <profile_COMMON>
+                <technique sid="standard">
+                    <lambert>
+                        <diffuse>
+                            <texture texture="file0-image" texcoord="CHANNEL0">
+                            </texture>
+                        </diffuse>
+                    </lambert>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="polySurface0-lib" name="polySurface0Mesh">
+            <mesh>
+                <source id="polySurface0-POSITION">
+                    <float_array id="polySurface0-POSITION-array" count="9">
+0.000000 0.000000 0.000000
+0.000000 0.000000 -1.000000
+1.000000 0.000000 0.000000
+</float_array>
+                    <technique_common>
+                        <accessor source="#polySurface0-POSITION-array" count="3" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="polySurface0-UV0">
+                    <float_array id="polySurface0-UV0-array" count="6">
+0.000000 0.000000
+1.000000 0.000000
+0.000000 1.000000
+</float_array>
+                    <technique_common>
+                        <accessor source="#polySurface0-UV0-array" count="3" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="polySurface0-VERTEX_COLOR0">
+                    <float_array id="polySurface0-VERTEX_COLOR0-array" count="12">
+1.000000 1.000000 1.000000 1.000000
+1.000000 1.000000 1.000000 1.000000
+1.000000 1.000000 1.000000 1.000000
+</float_array>
+                    <technique_common>
+                        <accessor source="#polySurface0-VERTEX_COLOR0-array" count="3" stride="4">
+                            <param name="R" type="double" />
+                            <param name="G" type="double" />
+                            <param name="B" type="double" />
+                            <param name="A" type="double" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="polySurface0-VERTEX">
+                    <input semantic="POSITION" source="#polySurface0-POSITION" />
+                </vertices>
+                <triangles count="1" material="lambert">
+                    <input semantic="VERTEX" offset="0" source="#polySurface0-VERTEX" />
+                    <input semantic="TEXCOORD" offset="1" set="0" source="#polySurface0-UV0" />
+                    <input semantic="COLOR" offset="2" set="0" source="#polySurface0-VERTEX_COLOR0" />
+                    <p>0 0 0 2 2 1 1 1 2</p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_controllers>
+        <controller id="polySurface0Controller">
+            <skin source="#polySurface0-lib">
+                <bind_shape_matrix>
+				1.000000 -0.000000 0.000000 0.000000 0.000000 1.000000 -0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000
+				</bind_shape_matrix>
+                <source id="polySurface0Controller-Joints">
+                    <Name_array id="polySurface0Controller-Joints-array" count="3">
+ joint0 joint1 joint2</Name_array>
+                    <technique_common>
+                        <accessor source="#polySurface0Controller-Joints-array" count="3">
+                            <param type="name" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="polySurface0Controller-Matrices">
+                    <float_array id="polySurface0Controller-Matrices-array" count="48">
+
+1.000000 0.000000 0.000000 -0.000000 -0.000000 1.000000 0.000000 -0.000000 0.000000 -0.000000 1.000000 -0.000000 0.000000 0.000000 0.000000 1.000000
+1.000000 0.000000 0.000000 -0.000000 -0.000000 1.000000 0.000000 -0.000000 0.000000 -0.000000 1.000000 1.000000 0.000000 0.000000 0.000000 1.000000
+1.000000 0.000000 0.000000 -1.000000 -0.000000 1.000000 0.000000 -0.000000 0.000000 -0.000000 1.000000 -0.000000 0.000000 0.000000 0.000000 1.000000</float_array>
+                    <technique_common>
+                        <accessor source="#polySurface0Controller-Matrices-array" count="3" stride="16">
+                            <param type="float4x4" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="polySurface0Controller-Weights">
+                    <float_array id="polySurface0Controller-Weights-array" count="4">
+
+1.000000 1.000000 1.000000 1.000000</float_array>
+                    <technique_common>
+                        <accessor source="#polySurface0Controller-Weights-array" count="4">
+                            <param type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <joints>
+                    <input semantic="JOINT" source="#polySurface0Controller-Joints" />
+                    <input semantic="INV_BIND_MATRIX" source="#polySurface0Controller-Matrices" />
+                </joints>
+                <vertex_weights count="3">
+                    <input semantic="JOINT" offset="0" source="#polySurface0Controller-Joints" />
+                    <input semantic="WEIGHT" offset="1" source="#polySurface0Controller-Weights" />
+                    <vcount>1 1 1</vcount>
+                    <v>0 1 1 2 2 3</v>
+                </vertex_weights>
+            </skin>
+        </controller>
+    </library_controllers>
+    <library_visual_scenes>
+        <visual_scene id="sample" name="sample">
+            <node name="polySurface0" id="polySurface0" sid="polySurface0">
+                <instance_controller url="#polySurface0Controller">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="lambert" target="#lambert" />
+                        </technique_common>
+                    </bind_material>
+                </instance_controller>
+            </node>
+            <node name="polySurface0" id="polySurface0" sid="polySurface0">
+                <instance_geometry url="#polySurface0-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="lambert" target="#lambert" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+            <node name="joint0" id="joint0" sid="joint0" type="JOINT">
+                <matrix sid="matrix">1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000</matrix>
+            </node>
+            <node name="joint1" id="joint1" sid="joint1" type="JOINT">
+                <matrix sid="matrix">1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 -1.000000 0.000000 0.000000 0.000000 1.000000</matrix>
+            </node>
+            <node name="joint2" id="joint2" sid="joint2" type="JOINT">
+                <matrix sid="matrix">1.000000 0.000000 0.000000 1.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000</matrix>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#sample"></instance_visual_scene>
+    </scene>
+</COLLADA>

@@ -26,8 +26,6 @@ namespace OpenKh.Tools.Kh2SoraikoTools
 
             Size = newSize;
             Location = newLocation;
-
-            
         }
         Model m;
 
@@ -38,7 +36,7 @@ namespace OpenKh.Tools.Kh2SoraikoTools
 
             //Camera.SetTarget(this.Namespace.Models[0]);
 
-            m = new MDLX(@"Content\obj\WM_SYMBOL_TT.mdlx");
+            m = new DAE(@"Content\obj\P_EX100[p_ex].dae");
 
             Camera.Target = m;
 
