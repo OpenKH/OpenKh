@@ -13,7 +13,6 @@ namespace OpenKh.Game
     public class OpenKhGame : Microsoft.Xna.Framework.Game, IStateChange
     {
         private GraphicsDeviceManager graphics;
-        private SpriteBatch spriteBatch;
 
         private readonly IDataContent _dataContent;
         private readonly Kernel _kernel;
@@ -76,7 +75,6 @@ namespace OpenKh.Game
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
         }
@@ -113,6 +111,7 @@ namespace OpenKh.Game
                 ArchiveManager = archiveManager,
                 Kernel = _kernel,
                 InputManager = inputManager,
+                ContentManager = Content,
                 GraphicsDevice = graphics,
                 StateChange = this,
             };

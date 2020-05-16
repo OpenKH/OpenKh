@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
 using Xe.Drawing;
 
@@ -36,13 +37,52 @@ namespace OpenKh.Game
             }
         }
 
-        private readonly BasicEffect _effect;
+        public struct MyVertex : IVertexType
+        {
+            public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration
+            (
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new VertexElement(12, VertexElementFormat.Vector4, VertexElementUsage.Color, 0),
+                new VertexElement(28, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
+            );
 
-        public MonoDrawing(GraphicsDevice graphicsDevice)
+            public xnaf.Vector3 Position;
+            public xnaf.Vector4 Color;
+            public xnaf.Vector2 TextureCoordinate;
+
+            VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
+
+            public MyVertex(xnaf.Vector3 position, xnaf.Vector4 color, xnaf.Vector2 textureCoordinate)
+            {
+                Position = position;
+                Color = color;
+                TextureCoordinate = textureCoordinate;
+            }
+        }
+
+        private readonly Effect _effect;
+        private readonly EffectParameter _parameterWorldViewProjection;
+        private readonly EffectParameter _parameterTexture0;
+
+        public xnaf.Matrix WorldViewProjection
+        {
+            get => _parameterWorldViewProjection.GetValueMatrix();
+            set => _parameterWorldViewProjection.SetValue(value);
+        }
+        public Texture2D Texture0
+        {
+            get => _parameterTexture0.GetValueTexture2D();
+            set => _parameterTexture0.SetValue(value);
+        }
+
+        public MonoDrawing(GraphicsDevice graphicsDevice, ContentManager contentManager)
         {
             GraphicsDevice = graphicsDevice;
             GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-            _effect = new BasicEffect(graphicsDevice);
+
+            _effect = contentManager.Load<Effect>("KingdomShader");
+            _parameterTexture0 = _effect.Parameters["Texture0"];
+            _parameterWorldViewProjection = _effect.Parameters["WorldViewProjection"];
         }
 
         public GraphicsDevice GraphicsDevice { get; }
@@ -108,40 +148,18 @@ namespace OpenKh.Game
             var th = 1.0f / texture.Height;
 
             var indices = new int[] { 0, 1, 2, 1, 2, 3 };
-            var vertices = new VertexPositionColorTexture[]
+            var vertices = new MyVertex[]
             {
-                new VertexPositionColorTexture()
-                {
-                    Position = new xnaf.Vector3(dst.Left, dst.Top, 0.0f),
-                    TextureCoordinate = new xnaf.Vector2(src.Left * tw, src.Top * th),
-                    Color = ToXnaColor(color0)
-                },
-                new VertexPositionColorTexture()
-                {
-                    Position = new xnaf.Vector3(dst.Right, dst.Top, 0.0f),
-                    TextureCoordinate = new xnaf.Vector2(src.Right * tw, src.Top * th),
-                    Color = ToXnaColor(color1)
-                },
-                new VertexPositionColorTexture()
-                {
-                    Position = new xnaf.Vector3(dst.Left, dst.Bottom, 0.0f),
-                    TextureCoordinate = new xnaf.Vector2(src.Left * tw, src.Bottom * th),
-                    Color = ToXnaColor(color2)
-                },
-                new VertexPositionColorTexture()
-                {
-                    Position = new xnaf.Vector3(dst.Right, dst.Bottom, 0.0f),
-                    TextureCoordinate = new xnaf.Vector2(src.Right * tw, src.Bottom * th),
-                    Color = ToXnaColor(color3)
-                },
+                new MyVertex(new xnaf.Vector3(dst.Left, dst.Top, 0.0f), ToXnaColor(color0), new xnaf.Vector2(src.Left * tw, src.Top * th)),
+                new MyVertex(new xnaf.Vector3(dst.Right, dst.Top, 0.0f), ToXnaColor(color1), new xnaf.Vector2(src.Right * tw, src.Top * th)),
+                new MyVertex(new xnaf.Vector3(dst.Left, dst.Bottom, 0.0f), ToXnaColor(color2), new xnaf.Vector2(src.Left * tw, src.Bottom * th)),
+                new MyVertex(new xnaf.Vector3(dst.Right, dst.Bottom, 0.0f), ToXnaColor(color3), new xnaf.Vector2(src.Right * tw, src.Bottom * th)),
             };
 
             foreach (var pass in _effect.CurrentTechnique.Passes)
             {
-                _effect.Texture = texture;
-                _effect.TextureEnabled = true;
-                _effect.VertexColorEnabled = true;
-                _effect.Projection = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
+                Texture0 = texture;
+                WorldViewProjection = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
                 pass.Apply();
 
                 GraphicsDevice.RasterizerState = new RasterizerState()
@@ -170,7 +188,7 @@ namespace OpenKh.Game
             new xnaf.Rectangle((int)rectangle.X, (int)rectangle.Y, (int)rectangle.Width, (int)rectangle.Height);
         private static xnaf.Color ToXnaColor(Color color) =>
             new xnaf.Color(color.R, color.G, color.B, color.A);
-        private static xnaf.Color ToXnaColor(ColorF color) =>
-            new xnaf.Color(color.R, color.G, color.B, color.A);
+        private static xnaf.Vector4 ToXnaColor(ColorF color) =>
+            new xnaf.Vector4(color.R, color.G, color.B, color.A);
     }
 }

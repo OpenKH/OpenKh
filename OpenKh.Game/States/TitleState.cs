@@ -139,7 +139,7 @@ namespace OpenKh.Game.States
             _inputManager = initDesc.InputManager;
             _stateChange = initDesc.StateChange;
 
-            drawing = new MonoDrawing(initDesc.GraphicsDevice.GraphicsDevice);
+            drawing = new MonoDrawing(initDesc.GraphicsDevice.GraphicsDevice, initDesc.ContentManager);
             cachedSurfaces = new Dictionary<string, IEnumerable<ISurface>>();
 
             if (_kernel.IsReMix)
