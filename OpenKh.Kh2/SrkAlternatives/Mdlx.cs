@@ -15,9 +15,8 @@ using OpenKh.Imaging;
 using System.Drawing.Drawing2D;
 using OpenKh.Kh2.Extensions;
 
-namespace OpenKh.Kh2.SrkAlteranatives
+namespace OpenKh.Kh2.SrkAlternatives
 {
-
     public class Mdlx : Bar
     {
         byte[] ikData;

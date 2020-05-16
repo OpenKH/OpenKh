@@ -6,7 +6,7 @@ using System.Text;
 using OpenKh.Common;
 using System.Xml;
 
-namespace OpenKh.Kh2.SrkAlteranatives
+namespace OpenKh.Kh2.SrkAlternatives
 {
     public class Bar : BitConverter
     {

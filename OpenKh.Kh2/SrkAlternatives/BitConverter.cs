@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenKh.Kh2.SrkAlteranatives
+namespace OpenKh.Kh2.SrkAlternatives
 {
     public class BitConverter : IDisposable
     {

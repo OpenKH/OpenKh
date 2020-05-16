@@ -10,7 +10,7 @@ using OpenKh.Imaging;
 using OpenKh.Common.Ps2;
 using TexUt2;
 
-namespace OpenKh.Kh2.SrkAlteranatives
+namespace OpenKh.Kh2.SrkAlternatives
 {
     public class KenunoTim
     {

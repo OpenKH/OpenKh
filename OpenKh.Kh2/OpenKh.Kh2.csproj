@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="SrkAlteranatives\OpenTK.dll" />
+    <None Remove="SrkAlternatives\OpenTK.dll" />
   </ItemGroup>
 
   <ItemGroup>

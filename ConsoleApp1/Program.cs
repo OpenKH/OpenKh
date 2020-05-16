@@ -56,10 +56,10 @@ namespace ConsoleApp1
 				"MAP"
 			};
 			long[] offsets = new long[] {
-			OpenKh.Kh2.SrkAlteranatives.Mdlx.RAM_PARTY_POINTER_PLAYER,
-			OpenKh.Kh2.SrkAlteranatives.Mdlx.RAM_PARTY_POINTER_PARTNER1,
-			OpenKh.Kh2.SrkAlteranatives.Mdlx.RAM_PARTY_POINTER_PARTNER2,
-			OpenKh.Kh2.SrkAlteranatives.Mdlx.RAM_MAP_POINTER
+			OpenKh.Kh2.SrkAlternatives.Mdlx.RAM_PARTY_POINTER_PLAYER,
+			OpenKh.Kh2.SrkAlternatives.Mdlx.RAM_PARTY_POINTER_PARTNER1,
+			OpenKh.Kh2.SrkAlternatives.Mdlx.RAM_PARTY_POINTER_PARTNER2,
+			OpenKh.Kh2.SrkAlternatives.Mdlx.RAM_MAP_POINTER
 			};
 
 			for (int i=0;i<offsets.Length;i++)
@@ -96,7 +96,7 @@ namespace ConsoleApp1
 					if (!Directory.Exists(@"kh2\res\ram_exported\"+ folder_names[i]))
 						Directory.CreateDirectory(@"kh2\res\ram_exported\"+ folder_names[i]);
 
-					OpenKh.Kh2.SrkAlteranatives.Mdlx mdlx = new OpenKh.Kh2.SrkAlteranatives.Mdlx(stream);
+					OpenKh.Kh2.SrkAlternatives.Mdlx mdlx = new OpenKh.Kh2.SrkAlternatives.Mdlx(stream);
 
 					mdlx.Save(@"kh2\res\ram_exported\" + folder_names[i]+@"\"+model_filename + ".mdlx");
 					mdlx.ExportDAE(@"kh2\res\ram_exported\" + folder_names[i]+@"\"+ model_filename + ".dae");

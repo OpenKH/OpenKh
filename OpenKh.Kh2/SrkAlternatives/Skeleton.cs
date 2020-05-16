@@ -5,7 +5,7 @@ using System.Text;
 using OpenKh.Kh2;
 using OpenTK;
 
-namespace OpenKh.Kh2.SrkAlteranatives
+namespace OpenKh.Kh2.SrkAlternatives
 {    
     public class Skeleton
     {

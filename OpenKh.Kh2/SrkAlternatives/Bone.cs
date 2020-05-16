@@ -4,7 +4,7 @@ using System.Text;
 
 using OpenTK;
 
-namespace OpenKh.Kh2.SrkAlteranatives
+namespace OpenKh.Kh2.SrkAlternatives
 {
     public struct Bone
     {
