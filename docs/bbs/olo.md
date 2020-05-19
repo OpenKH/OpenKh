@@ -5,7 +5,7 @@ This file controls what objects and how they're spawned in levels within [Kingdo
 # Header
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | char   | File identifier, always `@OLO`
+| 00     | char[4]   | File identifier, always `@OLO`
 | 04     | short   | Number of Header Extra Info in header
 | 06     | short | Number of Spawner Detail Entries in header
 | 08     | int | Number of unique objects to spawn
