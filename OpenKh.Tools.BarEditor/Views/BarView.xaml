@@ -11,46 +11,75 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_New"
-                          Command="{Binding NewCommand}"/>
-                <MenuItem Header="_Open"
-                          Command="{Binding OpenCommand}"/>
-                <MenuItem Header="_Save"
-                          Command="{Binding SaveCommand}"/>
-                <MenuItem Header="Save _as..."
-                          Command="{Binding SaveAsCommand}"/>
+                <MenuItem Header="_New" Command="{Binding NewCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource NewFile_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Open" Command="{Binding OpenCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource FolderOpen_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Save" Command="{Binding SaveCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Save_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save _as..." Command="{Binding SaveAsCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource SaveAs_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
-                <MenuItem Header="_Search..."
-                          Command="{Binding SearchCommand}"/>
+                <MenuItem Header="_Search..." Command="{Binding SearchCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Search_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
-                <MenuItem Header="E_xit"
-                          Command="{Binding ExitCommand}"/>
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Header="_Add item"
-                          Command="{Binding AddCommand}"/>
+                <MenuItem Header="_Add item" Command="{Binding AddCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource AddFile_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="_Open current item"
-                          Command="{Binding OpenItemCommand}"
-                          CommandParameter="{Binding SelectedItem.Stream}"/>
-                <MenuItem Header="_Remove current item"
-                          Command="{Binding RemoveCommand}"/>
+                    Command="{Binding OpenItemCommand}"
+                    CommandParameter="{Binding SelectedItem.Stream}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource OpenFileDialog_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Remove current item" Command="{Binding RemoveCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Remove_color_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="Import..."
-                          IsEnabled="{Binding IsItemSelected}"
-                          Command="{Binding ImportCommand}">
+                    IsEnabled="{Binding IsItemSelected}"
+                    Command="{Binding ImportCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Import_16x}"/>
+                    </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Export">
                     <MenuItem Header="{Binding ExportFileName}"
-                              IsEnabled="{Binding IsItemSelected}"
-                              Command="{Binding ExportCommand}"
-                              CommandParameter="{Binding ExportFileName}"/>
-                    <MenuItem Header="Export all..."
-                              Command="{Binding ExportAllCommand}"/>
+                        IsEnabled="{Binding IsItemSelected}"
+                        Command="{Binding ExportCommand}"
+                        CommandParameter="{Binding ExportFileName}"/>
+                    <MenuItem Header="Export all..." Command="{Binding ExportAllCommand}"/>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
-                <MenuItem Header="_About"
-                          Command="{Binding AboutCommand}"/>
+                <MenuItem Header="_About" Command="{Binding AboutCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource UIAbout_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 
