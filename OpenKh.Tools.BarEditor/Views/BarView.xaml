@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:OpenKh.Tools.BarEditor.Views"
         xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
         mc:Ignorable="d"
-        Title="BAR editor - OpenKH" Height="300" Width="400">
+        Title="BAR editor - OpenKH" Height="300" Width="400"
+        Drop="Window_Drop" AllowDrop="True">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">

@@ -162,7 +162,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 			SearchCommand = new RelayCommand(x => { }, x => false);
 		}
 
-        private void OpenFileName(string fileName)
+        public void OpenFileName(string fileName)
         {
             using (var stream = File.Open(fileName, FileMode.Open))
             {
@@ -203,7 +203,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
 
-		private string FileName { get; set; }
+		public string FileName { get; set; }
 
 		public RelayCommand NewCommand { get; set; }
 		public RelayCommand OpenCommand { get; set; }
