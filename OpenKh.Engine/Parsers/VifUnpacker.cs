@@ -139,7 +139,7 @@ namespace OpenKh.Engine.Parsers
 
         private Vector4Mask DefaultMask = new Vector4Mask(0);
         private readonly byte[] _code;
-        private readonly uint[] _mem = new uint[16 * 1024 / sizeof(uint)];
+        private readonly byte[] _mem = new byte[16 * 1024];
         private readonly uint[] _vifnCol;
         private readonly uint[] _vifnRow;
         private int _programCounter;
@@ -180,15 +180,7 @@ namespace OpenKh.Engine.Parsers
             };
         }
 
-        public byte[] Memory => _mem
-            .SelectMany(x => new byte[]
-            {
-                (byte)(x & 0xff),
-                (byte)((x >> 8) & 0xff),
-                (byte)((x >> 16) & 0xff),
-                (byte)((x >> 24) & 0xff),
-            })
-            .ToArray();
+        public byte[] Memory => _mem;
 
         public int Vif1_Tops { get; set; }
 
@@ -267,7 +259,7 @@ namespace OpenKh.Engine.Parsers
             _destinationAddress = (int)opcode.UnpackAddress;
             //if (opcode.UnpackAddsTops)
                 _destinationAddress += Vif1_Tops;
-            _destinationAddress *= VertexAlignment / sizeof(int);
+            _destinationAddress *= VertexAlignment;
             _unpackMaskIndex = 0;
 
             var reader = opcode.UnpackIsUnsigned ?
@@ -284,16 +276,16 @@ namespace OpenKh.Engine.Parsers
             _programCounter = Helpers.Align(_programCounter, OpcodeAlignment);
         }
 
-        public uint ReadInt8() => (uint)(sbyte)_code[_programCounter++];
-        public uint ReadUInt8() => _code[_programCounter++];
-        public uint ReadInt16() => (uint)(short)(
+        private uint ReadInt8() => (uint)(sbyte)_code[_programCounter++];
+        private uint ReadUInt8() => _code[_programCounter++];
+        private uint ReadInt16() => (uint)(short)(
             _code[_programCounter++] | (_code[_programCounter++] << 8));
-        public uint ReadUInt16() => (ushort)(
+        private uint ReadUInt16() => (ushort)(
             _code[_programCounter++] | (_code[_programCounter++] << 8));
-        public uint ReadInt32() => (uint)(
+        private uint ReadInt32() => (uint)(
             _code[_programCounter++] | (_code[_programCounter++] << 8) |
             (_code[_programCounter++] << 16) | (_code[_programCounter++] << 24));
-        public uint ReadUInt32() => (uint)(
+        private uint ReadUInt32() => (uint)(
             _code[_programCounter++] | (_code[_programCounter++] << 8) |
             (_code[_programCounter++] << 16) | (_code[_programCounter++] << 24));
 
@@ -302,17 +294,10 @@ namespace OpenKh.Engine.Parsers
             var currentMask = NextMask();
             var value = reader();
 
-            if (currentMask.X == MaskType.Write) _mem[_destinationAddress] = value;
-            _destinationAddress++;
-
-            if (currentMask.Y == MaskType.Write) _mem[_destinationAddress] = value;
-            _destinationAddress++;
-
-            if (currentMask.Z == MaskType.Write) _mem[_destinationAddress] = value;
-            _destinationAddress++;
-
-            if (currentMask.W == MaskType.Write) _mem[_destinationAddress] = value;
-            _destinationAddress++;
+            if (currentMask.X == MaskType.Write) Write(value); Next();
+            if (currentMask.Y == MaskType.Write) Write(value); Next();
+            if (currentMask.Z == MaskType.Write) Write(value); Next();
+            if (currentMask.W == MaskType.Write) Write(value); Next();
         }
 
         public void UnpackVector2(Func<uint> reader)
@@ -321,56 +306,54 @@ namespace OpenKh.Engine.Parsers
             var x = reader();
             var y = reader();
 
-            if (currentMask.X == MaskType.Write) _mem[_destinationAddress] = x;
-            _destinationAddress++;
-
-            if (currentMask.Y == MaskType.Write) _mem[_destinationAddress] = y;
-            _destinationAddress++;
+            if (currentMask.X == MaskType.Write) Write(x); Next();
+            if (currentMask.Y == MaskType.Write) Write(y); Next();
 
             // While PS2 docs says that the following two values will
             // be indeterminate, PCSX2 seems to follow this exact
             // logic. Probably to emulate an undefined behaviour.
             // We are going to do the same, just in case.
-            if (currentMask.Z == MaskType.Write) _mem[_destinationAddress] = x;
-            _destinationAddress++;
-
-            if (currentMask.W == MaskType.Write) _mem[_destinationAddress] = y;
-            _destinationAddress++;
+            if (currentMask.Z == MaskType.Write) Write(x); Next();
+            if (currentMask.W == MaskType.Write) Write(y); Next();
         }
 
-        public void UnpackVector3(Func<uint> reader)
+        private void UnpackVector3(Func<uint> reader)
         {
             var currentMask = NextMask();
 
-            if (currentMask.X == MaskType.Write) _mem[_destinationAddress] = reader();
-            _destinationAddress++;
-
-            if (currentMask.Y == MaskType.Write) _mem[_destinationAddress] = reader();
-            _destinationAddress++;
-
-            if (currentMask.Z == MaskType.Write) _mem[_destinationAddress] = reader();
-            _destinationAddress++;
+            if (currentMask.X == MaskType.Write) Write(reader()); Next();
+            if (currentMask.Y == MaskType.Write) Write(reader()); Next();
+            if (currentMask.Z == MaskType.Write) Write(reader()); Next();
 
             // According to PCSX2, the following logic emulates the
             // behaviour of the real hardware.. Time for some hacks!
             if (currentMask.W == MaskType.Write)
             {
                 var oldProgramCounter = _programCounter;
-                _mem[_destinationAddress] = reader();
+                Write(reader()); // do not call Next() here!
                 _programCounter = oldProgramCounter;
             }
 
-            _destinationAddress++;
+            Next();
         }
 
-        public void UnpackVector4(Func<uint> reader)
+        private void UnpackVector4(Func<uint> reader)
         {
             var currentMask = NextMask();
 
-            if (currentMask.X == MaskType.Write) _mem[_destinationAddress++] = reader();
-            if (currentMask.Y == MaskType.Write) _mem[_destinationAddress++] = reader();
-            if (currentMask.Z == MaskType.Write) _mem[_destinationAddress++] = reader();
-            if (currentMask.W == MaskType.Write) _mem[_destinationAddress++] = reader();
+            if (currentMask.X == MaskType.Write) Write(reader()); Next();
+            if (currentMask.Y == MaskType.Write) Write(reader()); Next();
+            if (currentMask.Z == MaskType.Write) Write(reader()); Next();
+            if (currentMask.W == MaskType.Write) Write(reader()); Next();
         }
+
+        private void Write(uint value)
+        {
+            _mem[_destinationAddress + 0] = (byte)(value & 0xff);
+            _mem[_destinationAddress + 1] = (byte)((value >> 8) & 0xff);
+            _mem[_destinationAddress + 2] = (byte)((value >> 16) & 0xff);
+            _mem[_destinationAddress + 3] = (byte)((value >> 24) & 0xff);
+        }
+        private void Next() => _destinationAddress += 4;
     }
 }
