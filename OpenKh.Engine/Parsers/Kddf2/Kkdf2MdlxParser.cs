@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Maths;
+using OpenKh.Engine.Maths;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -83,10 +83,15 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 var Mv = Matrix.Identity;
                 foreach (Mdlx.DmaVif t13 in submodel.DmaChains.SelectMany(dmaChain => dmaChain.DmaVifs))
                 {
-                    var mem = new VU1Mem();
-                    int tops = 0x40, top2 = 0x220;
-                    new ParseVIF1(mem).Parse(new MemoryStream(t13.VifPacket, false), tops);
-                    var b1 = SimaVU1e.Sima(mem, matrices, tops, top2, t13.TextureIndex, t13.Alaxi, Mv);
+                    const int tops = 0x40, top2 = 0x220;
+
+                    var unpacker = new VifUnpacker(t13.VifPacket)
+                    {
+                        Vif1_Tops = tops
+                    };
+                    unpacker.Run();
+
+                    var b1 = SimaVU1e.Sima(unpacker.Memory, matrices, tops, top2, t13.TextureIndex, t13.Alaxi, Mv);
                     albody1.Add(b1);
                 }
 
@@ -200,15 +205,16 @@ namespace OpenKh.Engine.Parsers.Kddf2
             for (int tari = 0; tari < m4.VifPackets.Count; tari++)
             {
                 var vli = m4.VifPackets[tari];
-                byte[] vifpkt = vli.VifPacket;
-                VU1Mem memo = new VU1Mem();
-                ParseVIF1 pv1 = new ParseVIF1(memo);
-                pv1.Parse(new MemoryStream(vifpkt, false), 0x00);
-                foreach (byte[] ram in pv1.almsmem)
+                
+                VifUnpacker.State state;
+                var unpacker = new VifUnpacker(vli.VifPacket);
+                do
                 {
+                    state = unpacker.Run();
+
                     CI ci = new CI();
 
-                    MemoryStream si = new MemoryStream(ram, false);
+                    MemoryStream si = new MemoryStream(unpacker.Memory, false);
                     BinaryReader br = new BinaryReader(si);
 
                     br.ReadInt32();
@@ -294,7 +300,8 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     ci.texi = texi + vli.TextureId;
                     ci.vifi = tari;
                     alci.Add(ci);
-                }
+
+                } while (state == VifUnpacker.State.Microprogram);
             }
 
             dictModel.Add(0, model);

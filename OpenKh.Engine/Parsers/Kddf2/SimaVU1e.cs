@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Maths;
+using OpenKh.Engine.Maths;
 using System;
 using System.IO;
 
@@ -6,9 +6,9 @@ namespace OpenKh.Engine.Parsers.Kddf2
 {
     public class SimaVU1e
     {
-        public static Body1e Sima(VU1Mem vu1mem, Matrix[] Ma, int tops, int top2, int tsel, int[] alaxi, Matrix Mv)
+        public static Body1e Sima(byte[] vu1mem, Matrix[] Ma, int tops, int top2, int tsel, int[] alaxi, Matrix Mv)
         {
-            MemoryStream si = new MemoryStream(vu1mem.vumem, true);
+            MemoryStream si = new MemoryStream(vu1mem, true);
             BinaryReader br = new BinaryReader(si);
 
             si.Position = 16 * (tops);
