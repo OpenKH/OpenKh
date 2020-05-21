@@ -32,7 +32,7 @@ namespace OpenKh.Tools.LayoutViewer.Views
             this()
         {
             var vm = DataContext as MainViewModel;
-            vm.OpenFile(desc.FileName);
+            vm.OpenToolDesc(desc);
         }
     }
 }

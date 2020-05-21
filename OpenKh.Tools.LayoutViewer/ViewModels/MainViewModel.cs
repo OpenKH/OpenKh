@@ -26,10 +26,20 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private string _fileName;
         private TexturesViewModel _texturesViewModel;
         private LayoutEditorViewModel _layoutEditor;
+        private ToolInvokeDesc _toolInvokeDesc;
 
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
 
-        public string Title => $"{LayoutName ?? DefaultName},{ImagesName ?? DefaultName} | {FileName ?? "untitled"} | {ApplicationName}";
+        public string Title
+        {
+            get
+            {
+                var layoutContentName = $"{LayoutName ?? DefaultName},{ImagesName ?? DefaultName}";
+                var fileName = IsToolDesc ? _toolInvokeDesc.Title : (FileName ?? "untitled");
+
+                return $"{layoutContentName} | {fileName} | {ApplicationName}";
+            }
+        }
         private string FileName
         {
             get => _fileName;
@@ -48,6 +58,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public RelayCommand SaveAsCommand { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AboutCommand { get; set; }
+
+        public bool IsToolDesc => _toolInvokeDesc != null;
 
         public LayoutEditorViewModel LayoutEditor
         {
@@ -109,7 +121,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 {
                     OpenFile(fileName);
                 }, Filters);
-            }, x => true);
+            }, x => !IsToolDesc);
 
             SaveCommand = new RelayCommand(x =>
             {
@@ -130,7 +142,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                     SaveFile(FileName, fileName);
                     FileName = fileName;
                 }, Filters);
-            }, x => true);
+            }, x => !IsToolDesc);
 
             ExitCommand = new RelayCommand(x =>
             {
@@ -154,6 +166,18 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
+        public void OpenToolDesc(ToolInvokeDesc toolInvokeDesc)
+        {
+            _toolInvokeDesc = toolInvokeDesc;
+            OpenFile(_toolInvokeDesc.ActualFileName);
+        }
+
+        public void ToolSaveContent()
+        {
+            if (IsToolDesc)
+                _toolInvokeDesc.ContentChange = ToolInvokeDesc.ContentChangeInfo.File;
+        }
+
         public void OpenFile(string fileName, bool doNotShowLayoutSelectionDialog = false)
         {
             if (OpenBarContent(ReadBarEntriesFromFileName(fileName), doNotShowLayoutSelectionDialog))
@@ -169,6 +193,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
             using (var stream = File.Create(fileName))
                 Bar.Write(stream, existingEntries);
+
+            ToolSaveContent();
         }
 
         private bool OpenBarContent(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)

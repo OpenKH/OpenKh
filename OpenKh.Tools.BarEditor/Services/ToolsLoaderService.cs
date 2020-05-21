@@ -10,7 +10,7 @@ namespace OpenKh.Tools.BarEditor.Services
 {
 	public static class ToolsLoaderService
 	{
-		public static bool? OpenTool(string fileName, Bar.Entry entry)
+		public static ToolInvokeDesc.ContentChangeInfo? OpenTool(string fileName, string temporaryFileName, Bar.Entry entry)
 		{
 			string name;
 
@@ -43,11 +43,17 @@ namespace OpenKh.Tools.BarEditor.Services
 			var tool = Activator.CreateInstance(toolModule.Item2) as IToolModule<ToolInvokeDesc>;
 
 			entry.Stream.Position = 0;
-			return tool?.ShowDialog(new ToolInvokeDesc
-            {
-                FileName = fileName,
-                SelectedEntry = entry
-            });
+			var toolInvokeDesc = new ToolInvokeDesc
+			{
+				Title = $"{entry.Name}@{Path.GetFileName(fileName)}",
+				ActualFileName = temporaryFileName,
+				SelectedEntry = entry,
+				ContentChange = ToolInvokeDesc.ContentChangeInfo.None
+            };
+
+            tool?.ShowDialog(toolInvokeDesc);
+
+			return toolInvokeDesc.ContentChange;
 		}
 
 	}

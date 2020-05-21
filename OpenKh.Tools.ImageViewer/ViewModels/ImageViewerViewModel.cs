@@ -38,7 +38,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         {
             get
             {
-                var fileName = IsTool ? _toolInvokeDesc.FileName : (Path.GetFileName(FileName) ?? "untitled");
+                var fileName = IsTool ? _toolInvokeDesc.Title : (Path.GetFileName(FileName) ?? "untitled");
 
                 return $"{fileName} | {ApplicationName}";
             }

@@ -41,19 +41,12 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 		{
 			Types = new EnumModel<Bar.EntryType>();
 
-			OpenCommand = new RelayCommand(x =>
+            OpenCommand = new RelayCommand(x =>
 			{
 				FileDialog.OnOpen(fileName =>
 				{
-					using (var stream = File.Open(fileName, FileMode.Open))
-					{
-						FileName = fileName;
-						Items.Clear();
-						foreach (var item in Bar.Read(stream))
-						{
-							Items.Add(new BarEntryModel(item));
-						}
-					}
+                    OpenFileName(fileName);
+					FileName = fileName;
 				}, Filters);
 			}, x => true);
 
@@ -72,14 +65,11 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 				}
 			}, x => true);
 
-			SaveAsCommand = new RelayCommand(x =>
+            SaveAsCommand = new RelayCommand(x =>
 			{
 				FileDialog.OnSave(fileName =>
 				{
-					using (var stream = File.Open(fileName, FileMode.Create))
-					{
-						Bar.Write(stream, Items.Select(item => item.Entry));
-					}
+                    SaveToFile(fileName);
 				}, Filters);
 			}, x => true);
 
@@ -97,7 +87,13 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 			{
 				try
 				{
-					ToolsLoaderService.OpenTool(FileName, SelectedItem.Entry);
+					var tempFileName = SaveToTempraryFile();
+					switch (ToolsLoaderService.OpenTool(FileName, tempFileName, SelectedItem.Entry))
+                    {
+						case Common.ToolInvokeDesc.ContentChangeInfo.File:
+							ReloadFromTemporaryFile(tempFileName);
+							break;
+                    }
 				}
 				catch (Exception e)
 				{
@@ -152,6 +148,42 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 			}, x => IsItemSelected);
 			SearchCommand = new RelayCommand(x => { }, x => false);
 		}
+
+        private void OpenFileName(string fileName)
+        {
+            using (var stream = File.Open(fileName, FileMode.Open))
+            {
+                Items.Clear();
+                foreach (var item in Bar.Read(stream))
+                {
+                    Items.Add(new BarEntryModel(item));
+                }
+            }
+        }
+
+        private void SaveToFile(string fileName)
+        {
+            using (var stream = File.Open(fileName, FileMode.Create))
+                Bar.Write(stream, Items.Select(item => item.Entry));
+        }
+
+		private string GetTemporaryFileName(string actualFileName)
+        {
+			return Path.GetTempFileName();
+        }
+
+        private string SaveToTempraryFile()
+		{
+			var tempFileName = GetTemporaryFileName(FileName);
+			SaveToFile(tempFileName);
+
+			return tempFileName;
+		}
+
+		private void ReloadFromTemporaryFile(string tempFileName)
+        {
+			OpenFileName(tempFileName);
+        }
 
         private static string GetSuggestedFileName(Bar.Entry item) =>
             $"{item.Name}_{item.Index}.{Helpers.GetSuggestedExtension(item.Type)}";
