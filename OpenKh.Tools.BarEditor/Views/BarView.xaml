@@ -10,6 +10,8 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
+                <MenuItem Header="_New"
+                          Command="{Binding NewCommand}"/>
                 <MenuItem Header="_Open"
                           Command="{Binding OpenCommand}"/>
                 <MenuItem Header="_Save"

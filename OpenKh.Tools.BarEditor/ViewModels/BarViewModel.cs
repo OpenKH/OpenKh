@@ -1,6 +1,7 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.BarEditor.Models;
 using OpenKh.Tools.BarEditor.Services;
+using OpenKh.Tools.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,19 +18,26 @@ namespace OpenKh.Tools.BarEditor.ViewModels
     public class BarViewModel : GenericListModel<BarEntryModel>
 	{
 		private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
+        private readonly ToolInvokeDesc _toolInvokeDesc;
 
-		public BarViewModel() : this((IEnumerable<BarEntryModel>)null) { }
+        public BarViewModel() : this((IEnumerable<BarEntryModel>)null) { }
 
-		public BarViewModel(Stream stream) :
-			this(Bar.Read(stream))
-		{
+		public BarViewModel(ToolInvokeDesc desc) :
+			this(Bar.Read(desc.SelectedEntry.Stream))
+        {
+			_toolInvokeDesc = desc;
+
+			NewCommand = new RelayCommand(x => { }, x => false);
 			OpenCommand = new RelayCommand(x => { }, x => false);
-			SaveCommand = new RelayCommand(x =>
+            SaveCommand = new RelayCommand(x =>
 			{
-				stream.Position = 0;
+                var stream = _toolInvokeDesc.SelectedEntry.Stream;
+
+                stream.Position = 0;
 				stream.SetLength(0);
-				Bar.Write(stream, Items.Select(item => item.Entry));
+                Bar.Write(stream, Items.Select(item => item.Entry));
 			});
+			SaveAsCommand = new RelayCommand(x => { }, x => false);
 		}
 
 		public BarViewModel(IEnumerable<Bar.Entry> list) :
@@ -41,7 +49,12 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 		{
 			Types = new EnumModel<Bar.EntryType>();
 
-            OpenCommand = new RelayCommand(x =>
+			NewCommand = new RelayCommand(x =>
+			{
+				Items.Clear();
+			}, x => true);
+
+			OpenCommand = new RelayCommand(x =>
 			{
 				FileDialog.OnOpen(fileName =>
 				{
@@ -192,24 +205,16 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 
 		private string FileName { get; set; }
 
+		public RelayCommand NewCommand { get; set; }
 		public RelayCommand OpenCommand { get; set; }
-
 		public RelayCommand SaveCommand { get; set; }
-
 		public RelayCommand SaveAsCommand { get; set; }
-
 		public RelayCommand ExitCommand { get; set; }
-
 		public RelayCommand AboutCommand { get; set; }
-
         public RelayCommand ExportCommand { get; set; }
-
         public RelayCommand ExportAllCommand { get; set; }
-
         public RelayCommand ImportCommand { get; set; }
-
 		public RelayCommand OpenItemCommand { get; set; }
-
 		public RelayCommand SearchCommand { get; set; }
 
 		public EnumModel<Bar.EntryType> Types { get; set; }

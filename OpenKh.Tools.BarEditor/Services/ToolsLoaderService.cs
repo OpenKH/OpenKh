@@ -16,9 +16,10 @@ namespace OpenKh.Tools.BarEditor.Services
 
 			switch (entry.Type)
 			{
-				case Bar.EntryType.Bar:
-					name = "OpenKh.Tools.BarEditor";
-					break;
+				// Disabling it, since it is veeeeeery buggy at the moment.
+				//case Bar.EntryType.Bar:
+				//	name = "OpenKh.Tools.BarEditor";
+				//	break;
 				case Bar.EntryType.Imgd:
 				case Bar.EntryType.Imgz:
 					name = "OpenKh.Tools.ImageViewer";
