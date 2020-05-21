@@ -1,4 +1,4 @@
-using OpenKh.Engine.Maths;
+﻿using OpenKh.Engine.Maths;
 using System;
 using System.IO;
 
@@ -13,26 +13,26 @@ namespace OpenKh.Engine.Parsers.Kddf2
 
             si.Position = 16 * (tops);
 
-            int v00 = br.ReadInt32();
-            if (v00 != 1 && v00 != 2) throw new ProtInvalidTypeException();
-            int v04 = br.ReadInt32();
-            int v08 = br.ReadInt32();
-            int v0c = br.ReadInt32();
-            int v10 = br.ReadInt32(); // cnt box2
-            int v14 = br.ReadInt32(); // off box2 {tx ty vi fl}
-            int v18 = br.ReadInt32(); // off box1
-            int v1c = br.ReadInt32(); // off matrices
-            int v20 = (v00 == 1) ? br.ReadInt32() : 0; // cntvertscolor
-            int v24 = (v00 == 1) ? br.ReadInt32() : 0; // offvertscolor
-            int v28 = (v00 == 1) ? br.ReadInt32() : 0; // cnt spec
-            int v2c = (v00 == 1) ? br.ReadInt32() : 0; // off spec
-            int v30 = br.ReadInt32(); // cnt verts 
-            int v34 = br.ReadInt32(); // off verts
-            int v38 = br.ReadInt32(); // 
-            int v3c = br.ReadInt32(); // cnt box1
+            var vpu = VpuPacket.Header(si);
 
-            si.Position = 16 * (tops + v18);
-            int[] box1 = new int[v3c];
+            if (vpu.Type != 1 && vpu.Type != 2) throw new ProtInvalidTypeException();
+            int v04 = vpu.Unknown04;
+            int v08 = vpu.Unknown08;
+            int v0c = vpu.Unknown1cLocation;
+            int offMatrices = vpu.Unknown1cLocation; // off matrices
+
+            // Shady logic here???? It MIGHT cause problems:
+            // If vpu.Type != 1, those 0x10 bytes will be skipped. Therefore,
+            // stuff that it's at 0x40, will be at 0x30 instead.
+            int cntvertscolor = (vpu.Type == 1) ? vpu.ColorCount : 0; // cntvertscolor
+            int offvertscolor = (vpu.Type == 1) ? vpu.ColorLocation : 0; // offvertscolor
+            int specCnt = (vpu.Type == 1) ? vpu.Unknown28 : 0; // cnt spec
+            int specOff = (vpu.Type == 1) ? vpu.Unknown2c : 0; // off spec
+
+            int v38 = vpu.Unknown38; // 
+
+            si.Position = 16 * (tops + vpu.UnkBoxLocation);
+            int[] box1 = new int[vpu.UnkBoxCount];
             for (int x = 0; x < box1.Length; x++)
             {
                 box1[x] = br.ReadInt32();
@@ -40,14 +40,14 @@ namespace OpenKh.Engine.Parsers.Kddf2
 
             Body1e body1 = new Body1e();
             body1.t = tsel;
-            body1.alvertraw = new Vector4[v30];
-            body1.avail = (v28 == 0) && (v00 == 1);
-            body1.alalni = new MJ1[v30][];
+            body1.alvertraw = new Vector4[vpu.VertexCount];
+            body1.avail = (specCnt == 0) && (vpu.Type == 1);
+            body1.alalni = new MJ1[vpu.VertexCount][];
 
-            MJ1[] alni = new MJ1[v30];
+            MJ1[] alni = new MJ1[vpu.VertexCount];
 
             int vi = 0;
-            si.Position = 16 * (tops + v34);
+            si.Position = 16 * (tops + vpu.VertexLocation);
             for (int x = 0; x < box1.Length; x++)
             {
                 int ct = box1[x];
@@ -63,14 +63,14 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 }
             }
 
-            body1.aluv = new Vector2[v10];
-            body1.alvi = new int[v10];
-            body1.alfl = new int[v10];
+            body1.aluv = new Vector2[vpu.IndexCount];
+            body1.alvi = new int[vpu.IndexCount];
+            body1.alfl = new int[vpu.IndexCount];
 
             int mini = int.MaxValue, maxi = int.MinValue;
 
-            si.Position = 16 * (tops + v14);
-            for (int x = 0; x < v10; x++)
+            si.Position = 16 * (tops + vpu.IndexLocation);
+            for (int x = 0; x < vpu.IndexCount; x++)
             {
                 int tx = br.ReadUInt16() / 16; br.ReadUInt16();
                 int ty = br.ReadUInt16() / 16; br.ReadUInt16();
@@ -82,15 +82,15 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 maxi = Math.Max(maxi, locvi);
             }
 
-            if (v28 != 0)
+            if (specCnt != 0)
             {
-                si.Position = 16 * (tops + v2c);
+                si.Position = 16 * (tops + specOff);
                 int vt0 = br.ReadInt32();
                 int vt1 = br.ReadInt32();
                 int vt2 = br.ReadInt32();
                 int vt3 = br.ReadInt32();
                 int vt4 = 0;
-                if (v28 >= 5)
+                if (specCnt >= 5)
                 {
                     vt4 = br.ReadInt32();
                     br.ReadInt32();
@@ -98,14 +98,14 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     br.ReadInt32();
                 }
 
-                MJ1[][] localalalni = new MJ1[v30][];
+                MJ1[][] localalalni = new MJ1[vpu.VertexCount][];
                 int xi = 0;
                 for (xi = 0; xi < vt0; xi++)
                 {
                     int ai = br.ReadInt32();
                     localalalni[xi] = (new MJ1[] { alni[ai] });
                 }
-                if (v28 >= 2)
+                if (specCnt >= 2)
                 {
                     //Debug.Fail("v28: " + v28);
 
@@ -117,7 +117,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         localalalni[xi] = (new MJ1[] { alni[i0], alni[i1] });
                     }
                 }
-                if (v28 >= 3)
+                if (specCnt >= 3)
                 {
                     //Debug.Fail("v28: " + v28);
 
@@ -130,7 +130,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         localalalni[xi] = (new MJ1[] { alni[i0], alni[i1], alni[i2] });
                     }
                 }
-                if (v28 >= 4)
+                if (specCnt >= 4)
                 {
                     //Debug.Fail("v28: " + v28);
 
@@ -144,7 +144,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         localalalni[xi] = (new MJ1[] { alni[i0], alni[i1], alni[i2], alni[i3] });
                     }
                 }
-                if (v28 >= 5)
+                if (specCnt >= 5)
                 {
                     si.Position = (si.Position + 15) & (~15);
                     for (int x = 0; x < vt4; x++, xi++)
@@ -157,9 +157,9 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         localalalni[xi] = (new MJ1[] { alni[i0], alni[i1], alni[i2], alni[i3], alni[i4] });
                     }
                 }
-                if (v28 >= 6)
+                if (specCnt >= 6)
                 {
-                    throw new Exception("v28: " + v28);
+                    throw new Exception("v28: " + specCnt);
                 }
                 for (int t = mini; t <= maxi; t++)
                 {

@@ -7,52 +7,75 @@ namespace OpenKh.Engine.Parsers
     {
         public MdlxParser(Mdlx mdlx)
         {
-            Kddf2.Kkdf2MdlxParser parser = null;
-
             if (IsEntity(mdlx))
-                parser = FromEntity(mdlx);
-            else if (IsMap(mdlx))
-                parser = FromMap(mdlx);
-
-            Model = new Model
             {
-                Segments = parser.dictModel.Values.Select(x => new Model.Segment
+                var parser = FromEntity(mdlx);
+                Model = new Model
                 {
-                    Vertices = x.alv.Select(vertex => new PositionColoredTextured
+                    Segments = parser.Models.Values.Select(x => new Model.Segment
                     {
-                        X = vertex.X,
-                        Y = vertex.Y,
-                        Z = vertex.Z,
-                        U = vertex.Tu,
-                        V = vertex.Tv,
-                        Color = vertex.Color
+                        Vertices = x.Vertices.Select(vertex => new PositionColoredTextured
+                        {
+                            X = vertex.X,
+                            Y = vertex.Y,
+                            Z = vertex.Z,
+                            U = vertex.Tu,
+                            V = vertex.Tv,
+                            Color = vertex.Color
+                        }).ToArray()
+                    }).ToArray(),
+                    Parts = parser.MeshDescriptors.Select(x => new Model.Part
+                    {
+                        Indices = x.Indices,
+                        SegmentIndex = x.SegmentIndex,
+                        TextureIndex = x.TextureIndex
                     }).ToArray()
-                }).ToArray(),
-                Parts = parser.alci.Select(x => new Model.Part
-                { 
-                    Indices = x.ali.Select(i => (int)i).ToArray(),
-                    SegmentId = x.vifi,
-                    TextureId = x.texi
-                }).ToArray()
-            };
+                };
+            }
+            else if (IsMap(mdlx))
+            {
+                var myParser = new NewModelParser(mdlx);
+                Model = new Model
+                {
+                    Segments = new Model.Segment[]
+                    {
+                        new Model.Segment
+                        {
+                            Vertices = myParser.Vertices.Select(vertex => new PositionColoredTextured
+                            {
+                                X = vertex.X,
+                                Y = vertex.Y,
+                                Z = vertex.Z,
+                                U = vertex.Tu,
+                                V = vertex.Tv,
+                                Color = vertex.Color
+                            }).ToArray()
+                        }
+                    },
+                    Parts = myParser.MeshDescriptors.Select(x => new Model.Part
+                    {
+                        Indices = x.Indices,
+                        SegmentIndex = x.SegmentIndex,
+                        TextureIndex = x.TextureIndex
+                    }).ToArray()
+                };
+            }
         }
 
-        private Kddf2.Kkdf2MdlxParser FromEntity(Mdlx mdlx)
+        private static Kddf2.Kkdf2MdlxParser FromEntity(Mdlx mdlx)
         {
             var parser = new Kddf2.Kkdf2MdlxParser(mdlx.SubModels);
-            var ci = parser.dictModel.Values.Select((model, i) => new Kddf2.Kkdf2MdlxParser.CI
+            var ci = parser.Models.Values.Select((model, i) => new Kddf2.Kkdf2MdlxParser.CI
             {
-                ali = model.alv.Select((_, index) => (uint)index).ToArray(),
-                texi = i,
-                vifi = i
+                Indices = model.Vertices.Select((_, index) => index).ToArray(),
+                TextureIndex = i,
+                SegmentIndex = i
             });
 
-            parser.alci.AddRange(ci);
+            parser.MeshDescriptors.AddRange(ci);
 
             return parser;
         }
-
-        private Kddf2.Kkdf2MdlxParser FromMap(Mdlx mdlx) => new Kddf2.Kkdf2MdlxParser(mdlx.MapModel);
 
         private static bool IsEntity(Mdlx mdlx) => mdlx.SubModels != null;
 

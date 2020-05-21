@@ -4,6 +4,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
 {
     public class Model
     {
-        public List<CustomVertex.PositionColoredTextured> alv = new List<CustomVertex.PositionColoredTextured>();
+        public List<CustomVertex.PositionColoredTextured> Vertices { get; } =
+            new List<CustomVertex.PositionColoredTextured>();
     }
 }

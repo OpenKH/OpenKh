@@ -202,8 +202,8 @@ namespace OpenKh.Game.States
                 Parts = model.Parts.Select(part => new Mesh.Part
                 {
                     Indices = part.Indices,
-                    SegmentId = part.SegmentId,
-                    TextureId = part.TextureId
+                    SegmentId = part.SegmentIndex,
+                    TextureId = part.TextureIndex
                 }).ToArray(),
                 Textures = textures?.Images?.Select(texture => texture.CreateTexture(graphics)).ToArray() ?? new Texture2D[0]
             };

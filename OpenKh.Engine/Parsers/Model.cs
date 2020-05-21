@@ -20,8 +20,8 @@ namespace OpenKh.Engine.Parsers
         public class Part
         {
             public int[] Indices { get; set; }
-            public int TextureId { get; set; }
-            public int SegmentId { get; set; }
+            public int TextureIndex { get; set; }
+            public int SegmentIndex { get; set; }
         }
 
         public Segment[] Segments { get; set; }
