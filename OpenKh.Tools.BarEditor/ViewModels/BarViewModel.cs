@@ -161,7 +161,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
                         SelectedItem.Entry.Stream = memStream;
                     }
 
-                    OnPropertyChanged(nameof(SelectedItem.Size));
+                    OnPropertyChanged(nameof(SelectedItem));
                 }, Filters);
             }, x => IsItemSelected);
             SearchCommand = new RelayCommand(x => { }, x => false);
