@@ -1,4 +1,5 @@
 ﻿using OpenKh.Common;
+using System;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
@@ -71,25 +72,49 @@ namespace OpenKh.Engine.Parsers
         public VertexIndex[] Indices { get; }
         public VertexColor[] Colors { get; }
         public VertexCoord[] Vertices { get; }
-        public int[] alalni { get; }
 
         private VpuPacket(Stream stream)
         {
             var vpu = BinaryMapping.ReadObject<VpuHeader>(stream);
 
-            Indices = Read<VertexIndex>(stream, vpu.IndexLocation, vpu.IndexCount);
-            Colors = Read<VertexColor>(stream, vpu.ColorLocation, vpu.ColorCount);
-            Vertices = Read<VertexCoord>(stream, vpu.VertexLocation, vpu.VertexCount);
-            alalni = Enumerable.Range(0, Indices.Length).ToArray();
+            Indices = Read(stream, vpu.IndexLocation, vpu.IndexCount, ReadIndex);
+            Colors = Read(stream, vpu.ColorLocation, vpu.ColorCount, ReadColor);
+            Vertices = Read(stream, vpu.VertexLocation, vpu.VertexCount, ReadVertex);
         }
 
-        private static T[] Read<T>(Stream stream, int offset, int count)
+        private static VertexIndex ReadIndex(Stream stream) => new VertexIndex
+        {
+            U = stream.ReadInt32(),
+            V = stream.ReadInt32(),
+            Index = stream.ReadInt32(),
+            Function = (VertexFunction)stream.ReadInt32()
+        };
+
+        private static VertexColor ReadColor(Stream stream) => new VertexColor
+        {
+            R = stream.ReadInt32(),
+            G = stream.ReadInt32(),
+            B = stream.ReadInt32(),
+            A = stream.ReadInt32(),
+        };
+
+        private static VertexCoord ReadVertex(Stream stream) => new VertexCoord
+        {
+            X = stream.ReadSingle(),
+            Y = stream.ReadSingle(),
+            Z = stream.ReadSingle(),
+            W = stream.ReadSingle(),
+        };
+
+        private static T[] Read<T>(Stream stream, int offset, int count, Func<Stream, T> func)
             where T : class
         {
             stream.SetPosition(offset * 0x10);
-            return Enumerable.Range(0, count)
-                .Select(x => BinaryMapping.ReadObject<T>(stream))
-                .ToArray();
+            var array = new T[count];
+            for (var i = 0; i < count; i++)
+                array[i] = func(stream);
+
+            return array;
         }
 
         public static VpuPacket Read(Stream stream) =>

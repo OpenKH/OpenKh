@@ -62,22 +62,27 @@ namespace OpenKh.Common
         }
 
         public static short ReadInt16(this Stream stream) =>
-            new BinaryReader(stream).ReadInt16();
+            (short)(stream.ReadByte() | (stream.ReadByte() << 8));
 
         public static ushort ReadUInt16(this Stream stream) =>
-            new BinaryReader(stream).ReadUInt16();
+            (ushort)(stream.ReadByte() | (stream.ReadByte() << 8));
 
         public static int ReadInt32(this Stream stream) =>
-            new BinaryReader(stream).ReadInt32();
+            stream.ReadByte() | (stream.ReadByte() << 8) |
+            (stream.ReadByte() << 16) | (stream.ReadByte() << 24);
 
         public static uint ReadUInt32(this Stream stream) =>
-            new BinaryReader(stream).ReadUInt32();
+            (uint)(stream.ReadByte() | (stream.ReadByte() << 8) |
+            (stream.ReadByte() << 16) | (stream.ReadByte() << 24));
 
         public static long ReadInt64(this Stream stream) =>
             new BinaryReader(stream).ReadInt64();
 
         public static ulong ReadUInt64(this Stream stream) =>
             new BinaryReader(stream).ReadUInt64();
+
+        public static float ReadSingle(this Stream stream) =>
+            new BinaryReader(stream).ReadSingle();
 
         public static List<int> ReadInt32List(this Stream stream, int offset, int count)
         {
