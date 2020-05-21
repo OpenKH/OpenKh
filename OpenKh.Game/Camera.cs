@@ -10,7 +10,8 @@ namespace OpenKh.Game
         private float _nearClipPlane;
         private float _farClipPlane;
         private Vector3 _cameraPosition;
-        private Vector3 _cameraLookAt;
+        private Vector3 _cameraLookAtX;
+        private Vector3 _cameraLookAtY;
         private Vector3 _cameraUp;
         private Matrix _projection;
         private Matrix _world;
@@ -68,12 +69,22 @@ namespace OpenKh.Game
             }
         }
 
-        public Vector3 CameraLookAt
+        public Vector3 CameraLookAtX
         {
-            get => _cameraLookAt;
+            get => _cameraLookAtX;
             set
             {
-                _cameraLookAt = value;
+                _cameraLookAtX = value;
+                InvalidateWorld();
+            }
+        }
+
+        public Vector3 CameraLookAtY
+        {
+            get => _cameraLookAtY;
+            set
+            {
+                _cameraLookAtY = value;
                 InvalidateWorld();
             }
         }
@@ -95,7 +106,8 @@ namespace OpenKh.Game
             {
                 _cameraYpr = value;
                 var matrix = Matrix.CreateFromYawPitchRoll(value.X / 180.0f * 3.14159f, value.Y / 180.0f * 3.14159f, value.Z / 180.0f * 3.14159f);
-                CameraLookAt = Vector3.Transform(new Vector3(1, 0, 0), matrix);
+                CameraLookAtX = Vector3.Transform(new Vector3(1, 0, 0), matrix);
+                CameraLookAtY = Vector3.Transform(new Vector3(0, 0, 1), matrix);
             }
         }
 
@@ -144,7 +156,7 @@ namespace OpenKh.Game
 
         private void CalculateWorld()
         {
-            _world = Matrix.CreateLookAt(CameraPosition, CameraPosition + CameraLookAt, CameraUp);
+            _world = Matrix.CreateLookAt(CameraPosition, CameraPosition + CameraLookAtX, CameraUp);
 
             ValidateWorld();
         }
