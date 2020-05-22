@@ -164,7 +164,6 @@ namespace OpenKh.Tools.BarEditor.ViewModels
                     OnPropertyChanged(nameof(SelectedItem));
                 }, Filters);
             }, x => IsItemSelected);
-            SearchCommand = new RelayCommand(x => { }, x => false);
         }
 
         public void OpenFileName(string fileName)
@@ -228,7 +227,6 @@ namespace OpenKh.Tools.BarEditor.ViewModels
         public RelayCommand ExportAllCommand { get; set; }
         public RelayCommand ImportCommand { get; set; }
         public RelayCommand OpenItemCommand { get; set; }
-        public RelayCommand SearchCommand { get; set; }
 
         public EnumModel<Bar.EntryType> Types { get; set; }
 

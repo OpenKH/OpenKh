@@ -32,12 +32,6 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="_Search..." Command="{Binding SearchCommand}">
-                    <MenuItem.Icon>
-                        <Image Source="{StaticResource Search_16x}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="_Edit">
