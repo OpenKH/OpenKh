@@ -230,7 +230,8 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 
         public EnumModel<Bar.EntryType> Types { get; set; }
 
-        public string ExportFileName => IsItemSelected ? $"{SelectedItem?.DisplayName}.bin" : "(no file selected)";
+        public string ExportFileName => IsItemSelected ?
+            GetSuggestedFileName(SelectedItem.Entry) : string.Empty;
 
         protected override BarEntryModel OnNewItem()
         {
