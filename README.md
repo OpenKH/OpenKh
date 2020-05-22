@@ -19,6 +19,8 @@ New builds of OpenKH are automatically generated every time one of the contribut
 
 All the builds from `master` and from pull requestes are generated from [Azure Pipelines](https://dev.azure.com/xeeynamo/OpenKH/_build).
 
+Our tools require the instllation of the [.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.1). This choice is to maximize compatibility with all platforms possible. Make sure to install the 64-bit version of ".NET Core Runtime" and not "ASP.NET Core Runtime".
+
 ## Additional info
 
 ### Future plans
