@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyTitle>BBS Event table editor</AssemblyTitle>
     <Product>BBS Event table editor - OpenKH</Product>

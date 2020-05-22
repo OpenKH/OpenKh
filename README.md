@@ -19,6 +19,8 @@ New builds of OpenKH are automatically generated every time one of the contribut
 
 All the builds from `master` and from pull requestes are generated from [Azure Pipelines](https://dev.azure.com/xeeynamo/OpenKH/_build).
 
+OpenKH tools require the instllation of the [Desktop Runtime 3.1.x](https://dotnet.microsoft.com/download/dotnet-core/3.1) to run all the UI applications on Windows, or [.NET Core Runtime 3.1.x](https://dotnet.microsoft.com/download/dotnet-core/3.1) to run the CLI tools on Linux and macOS.
+
 ## Additional info
 
 ### Future plans
