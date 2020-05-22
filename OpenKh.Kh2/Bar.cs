@@ -177,13 +177,12 @@ namespace OpenKh.Kh2
 			writer.Write(0);
 			writer.Write(0);
 
-            var entryOffsets = new int[entriesCount];
-
 			var offset = HeaderSize + entriesCount * EntrySize;
-            var myEntries = entries.Select((Entry, Index) => new { Entry, Index });
-            foreach (var e in myEntries)
+            var dicLink = new Dictionary<(string name, EntryType type), (int offset, int length)>();
+            var myEntries = entries.ToList();
+
+            foreach (var entry in myEntries)
 			{
-                var entry = e.Entry;
 				var normalizedName = entry.Name ?? "xxxx";
 				if (normalizedName.Length < 4)
 					normalizedName = $"{entry.Name}\0\0\0\0";
@@ -198,33 +197,32 @@ namespace OpenKh.Kh2
 
                 if (entry.Index != 0)
                 {
-                    var linkIndex = myEntries
-                        .First(x => x.Entry.Offset == entry.Offset).Index;
+                    var linkInfo = dicLink[(entry.Name, entry.Type)];
+                    entry.Offset = linkInfo.offset;
 
-                    var linkOffset = entryOffsets[linkIndex];
-                    writer.Write(linkOffset);
-                    entryOffsets[e.Index] = linkOffset;
+                    writer.Write(linkInfo.offset);
+                    writer.Write(linkInfo.length);
                 }
                 else
                 {
-				    writer.Write(offset);
-                    entryOffsets[e.Index] = offset;
+                    dicLink[(entry.Name, entry.Type)] = (offset, (int)entry.Stream.Length);
+                    entry.Offset = offset;
+
+                    writer.Write(offset);
+                    writer.Write((int)entry.Stream.Length);
+
                     offset += (int)entry.Stream.Length;
                 }
 
-				writer.Write((int)entry.Stream.Length);
             }
 
-            var entryOffsetIndex = 0;
-            Entry lastWrittenEntry = null;
-			foreach (var entry in entries)
+			foreach (var entry in myEntries)
             {
-                writer.BaseStream.Position = entryOffsets[entryOffsetIndex++];
+                writer.BaseStream.Position = entry.Offset;
                 if (entry.Index == 0)
                 {
                     entry.Stream.Position = 0;
                     entry.Stream.CopyTo(writer.BaseStream);
-                    lastWrittenEntry = entry;
                 }
             }
 		}
