@@ -80,7 +80,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ObjentryEditor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2SystemEditor", "OpenKh.Tools.Kh2SystemEditor\OpenKh.Tools.Kh2SystemEditor.csproj", "{6A8C8D2D-33DB-40BB-AD31-162B846BB61D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.Kh2PlaceEditor", "OpenKh.Tools.Kh2PlaceEditor\OpenKh.Tools.Kh2PlaceEditor.csproj", "{CFD7082A-3556-4656-8AE3-7096ABC3979F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2PlaceEditor", "OpenKh.Tools.Kh2PlaceEditor\OpenKh.Tools.Kh2PlaceEditor.csproj", "{CFD7082A-3556-4656-8AE3-7096ABC3979F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.Bar", "OpenKh.Command.Bar\OpenKh.Command.Bar.csproj", "{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -589,6 +591,22 @@ Global
 		{CFD7082A-3556-4656-8AE3-7096ABC3979F}.Release|x64.Build.0 = Release|Any CPU
 		{CFD7082A-3556-4656-8AE3-7096ABC3979F}.Release|x86.ActiveCfg = Release|Any CPU
 		{CFD7082A-3556-4656-8AE3-7096ABC3979F}.Release|x86.Build.0 = Release|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Debug|ARM.Build.0 = Debug|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Debug|x64.Build.0 = Debug|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Debug|x86.Build.0 = Debug|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Release|ARM.Build.0 = Release|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Release|x64.ActiveCfg = Release|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Release|x64.Build.0 = Release|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Release|x86.ActiveCfg = Release|Any CPU
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -625,6 +643,7 @@ Global
 		{361031B7-10FD-438A-8DAF-9F38267EBD11} = {402B2669-D594-4DFA-965B-02A92626ADC6}
 		{6A8C8D2D-33DB-40BB-AD31-162B846BB61D} = {402B2669-D594-4DFA-965B-02A92626ADC6}
 		{CFD7082A-3556-4656-8AE3-7096ABC3979F} = {402B2669-D594-4DFA-965B-02A92626ADC6}
+		{4AEB5DD5-A59E-49F8-8610-7DAA72C2081B} = {9C52D787-9819-4B89-989B-EEA6FEB20731}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}
