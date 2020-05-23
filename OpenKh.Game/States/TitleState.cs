@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine;
+using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
@@ -127,10 +127,12 @@ namespace OpenKh.Game.States
             {
                 var currentSequence = layoutRendererBg.SelectedSequenceGroupIndex;
                 return currentSequence == _titleLayout.Copyright ||
-                    currentSequence == _titleLayout.Intro ||
-                    currentSequence == _titleLayout.NewGame;
+                    currentSequence == _titleLayout.Intro;
             }
         }
+
+        private bool IsNewGameStarting =>
+            layoutRendererBg.SelectedSequenceGroupIndex == _titleLayout.NewGame;
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -177,7 +179,7 @@ namespace OpenKh.Game.States
 
         public void Destroy()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Update(DeltaTimes deltaTimes)
@@ -212,6 +214,10 @@ namespace OpenKh.Game.States
                 if (_inputManager.IsCross || _inputManager.IsCircle)
                     SkipIntro();
             }
+            else if (IsNewGameStarting)
+            {
+
+            }
             else
             {
                 if (_isInTheaterMenu == false)
@@ -225,7 +231,7 @@ namespace OpenKh.Game.States
         {
             layoutRendererBg.Draw();
 
-            if (!IsIntro)
+            if (!(IsIntro || IsNewGameStarting))
                 layoutRendererFg.Draw();
 
             if (_isInTheaterMenu)
