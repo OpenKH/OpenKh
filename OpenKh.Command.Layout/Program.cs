@@ -11,7 +11,9 @@ namespace OpenKh.Command.Layout
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(
         typeof(UnlayoutCommand),
-        typeof(RelayoutCommand))]
+        typeof(RelayoutCommand),
+        typeof(UnsequenceCommand),
+        typeof(ResequenceCommand))]
     class Program
     {
         static int Main(string[] args)
