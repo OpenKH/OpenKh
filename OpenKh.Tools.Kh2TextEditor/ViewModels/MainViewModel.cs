@@ -307,7 +307,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }
         }
 
-        private void OpenFontImageFile(string fileName) => File.OpenRead(fileName).Using(stream =>
+        public void OpenFontImageFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             if (Bar.IsValid(stream))
             {
@@ -321,7 +321,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             throw new NotImplementedException();
         }
 
-        private void OpenFontInfoFile(string fileName) => File.OpenRead(fileName).Using(stream =>
+        public void OpenFontInfoFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             if (Bar.IsValid(stream))
             {
