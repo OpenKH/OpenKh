@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Infrastructure;
@@ -29,8 +29,7 @@ namespace OpenKh.Game.Debugging
         private Texture2D _texFontIcon;
 
         private SpriteBatch _spriteBatch;
-        
-        
+        private IMessageEncoder _encoder;
         private IMessageRenderer _messageRenderer;
         private DrawContext _messageDrawContext;
 
@@ -62,7 +61,10 @@ namespace OpenKh.Game.Debugging
 
             var drawing = new MonoDrawing(
                 initDesc.GraphicsDevice.GraphicsDevice, initDesc.ContentManager);
-            _messageRenderer = new Kh2MessageRenderer(drawing, _kernel.SystemMessageContext);
+            
+            var messageContext = _kernel.SystemMessageContext;
+            _encoder = messageContext.Encoder;
+            _messageRenderer = new Kh2MessageRenderer(drawing, messageContext);
         }
 
         public void Destroy()
@@ -116,7 +118,7 @@ namespace OpenKh.Game.Debugging
 
         public void Print(string text)
         {
-            Print(Encoders.InternationalSystem.Encode(new List<MessageCommandModel>()
+            Print(_encoder.Encode(new List<MessageCommandModel>()
             {
                 new MessageCommandModel()
                 {
@@ -149,7 +151,7 @@ namespace OpenKh.Game.Debugging
 
         private void EmitNewLine()
         {
-            Print(Encoders.InternationalSystem.Encode(new List<MessageCommandModel>()
+            Print(_encoder.Encode(new List<MessageCommandModel>()
             {
                 new MessageCommandModel()
                 {
