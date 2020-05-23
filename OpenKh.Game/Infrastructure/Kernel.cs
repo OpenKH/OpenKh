@@ -1,5 +1,7 @@
 ﻿using OpenKh.Common;
 using OpenKh.Engine;
+using OpenKh.Engine.Extensions;
+using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Kh2.Contextes;
@@ -20,6 +22,8 @@ namespace OpenKh.Game.Infrastructure
         public string Language => Constants.Regions[RegionId == Constants.RegionFinalMix ? 0 : RegionId];
         public string Region => Constants.Regions[RegionId];
         public FontContext FontContext { get; }
+        public RenderingMessageContext SystemMessageContext { get; set; }
+        public RenderingMessageContext EventMessageContext { get; set; }
         public Kh2MessageProvider MessageProvider { get; }
         public BaseTable<Objentry> ObjEntries { get; }
         public Dictionary<string, List<Place>> Places { get; }
@@ -54,6 +58,17 @@ namespace OpenKh.Game.Infrastructure
             Places = LoadFile($"msg/{Language}/place.bin", stream => Place.Read(stream));
             LoadMessage("sys");
             // 15jigsaw
+
+            if (Language == "jp")
+            {
+                SystemMessageContext = FontContext.ToKh2JpSystemTextContext();
+                EventMessageContext = FontContext.ToKh2JpEventTextContext();
+            }
+            else
+            {
+                SystemMessageContext = FontContext.ToKh2EuSystemTextContext();
+                EventMessageContext = FontContext.ToKh2EuEventTextContext();
+            }
         }
 
         private T LoadFile<T>(string fileName, Func<Stream, T> action)

@@ -1,5 +1,4 @@
 ﻿using OpenKh.Kh2.Messages;
-using OpenKh.Tools.Common.Models;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
@@ -10,7 +9,7 @@ namespace OpenKh.Tools.Common.Controls
     public class KingdomTextArea : DrawPanel
     {
         public static DependencyProperty ContextProperty =
-            DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, KingdomTextContext>(
+            DependencyPropertyUtils.GetDependencyProperty<KingdomTextArea, RenderingMessageContext>(
                 nameof(Context), (o, x) => o.SetContext(x));
 
         public static DependencyProperty MessageCommandsProperty =
@@ -23,9 +22,9 @@ namespace OpenKh.Tools.Common.Controls
 
         private Kh2MessageRenderer _messageRenderer;
 
-        public KingdomTextContext Context
+        public RenderingMessageContext Context
         {
-            get => GetValue(ContextProperty) as KingdomTextContext;
+            get => GetValue(ContextProperty) as RenderingMessageContext;
             set => SetValue(ContextProperty, value);
         }
 
@@ -96,9 +95,9 @@ namespace OpenKh.Tools.Common.Controls
             _messageRenderer?.Draw(drawContext, commands);
         }
 
-        private void SetContext(KingdomTextContext context)
+        private void SetContext(RenderingMessageContext context)
         {
-            _messageRenderer = new Kh2MessageRenderer(Drawing, new RenderingMessageContext
+            _messageRenderer = new Kh2MessageRenderer(Drawing, new Engine.Renders.RenderingMessageContext
             {
                 Font = context.Font,
                 Font2 = context.Font2,

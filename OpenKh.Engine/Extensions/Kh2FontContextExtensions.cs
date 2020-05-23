@@ -1,14 +1,14 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
+using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Messages;
-using OpenKh.Tools.Common.Models;
-using kh2 = OpenKh.Kh2.Contextes;
 
-namespace OpenKh.Tools.Common.Extensions
+namespace OpenKh.Engine.Extensions
 {
-    public static class KingdomTextContextExtensions
+    public static class Kh2FontContextExtensions
     {
-        public static KingdomTextContext ToKh2EuSystemTextContext(this kh2.FontContext fontContext) =>
-            new KingdomTextContext
+        public static RenderingMessageContext ToKh2EuSystemTextContext(this FontContext fontContext) =>
+            new RenderingMessageContext
             {
                 Font = fontContext.ImageSystem,
                 Font2 = fontContext.ImageSystem2,
@@ -21,8 +21,8 @@ namespace OpenKh.Tools.Common.Extensions
                 TableHeight = Constants.FontTableSystemHeight,
             };
 
-        public static KingdomTextContext ToKh2EuEventTextContext(this kh2.FontContext fontContext) =>
-            new KingdomTextContext
+        public static RenderingMessageContext ToKh2EuEventTextContext(this FontContext fontContext) =>
+            new RenderingMessageContext
             {
                 Font = fontContext.ImageEvent,
                 Font2 = fontContext.ImageEvent2,
@@ -35,8 +35,8 @@ namespace OpenKh.Tools.Common.Extensions
                 TableHeight = Constants.FontTableEventHeight,
             };
 
-        public static KingdomTextContext ToKh2JpSystemTextContext(this kh2.FontContext fontContext) =>
-            new KingdomTextContext
+        public static RenderingMessageContext ToKh2JpSystemTextContext(this FontContext fontContext) =>
+            new RenderingMessageContext
             {
                 Font = fontContext.ImageSystem,
                 Font2 = fontContext.ImageSystem2,
@@ -49,8 +49,8 @@ namespace OpenKh.Tools.Common.Extensions
                 TableHeight = Constants.FontTableSystemHeight,
             };
 
-        public static KingdomTextContext ToKh2JpEventTextContext(this kh2.FontContext fontContext) =>
-            new KingdomTextContext
+        public static RenderingMessageContext ToKh2JpEventTextContext(this FontContext fontContext) =>
+            new RenderingMessageContext
             {
                 Font = fontContext.ImageEvent,
                 Font2 = fontContext.ImageEvent2,

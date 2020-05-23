@@ -34,11 +34,6 @@ namespace OpenKh.Game.Debugging
         private IMessageRenderer _messageRenderer;
         private DrawContext _messageDrawContext;
 
-
-
-        private const int _fontWidth = Constants.FontEuropeanSystemWidth;
-        private const int _fontHeight = Constants.FontEuropeanSystemHeight;
-
         public DebugOverlay(IStateChange stateChange)
         {
             _stateChange = stateChange;
@@ -67,19 +62,7 @@ namespace OpenKh.Game.Debugging
 
             var drawing = new MonoDrawing(
                 initDesc.GraphicsDevice.GraphicsDevice, initDesc.ContentManager);
-            _messageRenderer = new Kh2MessageRenderer(drawing, new RenderingMessageContext
-            {
-                Font = _kernel.FontContext.ImageSystem,
-                Font2 = _kernel.FontContext.ImageSystem2,
-                Icon = _kernel.FontContext.ImageIcon,
-                FontSpacing = _kernel.FontContext.SpacingSystem,
-                IconSpacing = _kernel.FontContext.SpacingIcon,
-                Encoder = Encoders.InternationalSystem,
-
-                FontWidth = Constants.FontEuropeanSystemWidth,
-                FontHeight = Constants.FontEuropeanSystemHeight,
-                TableHeight = Constants.FontTableSystemHeight,
-            });
+            _messageRenderer = new Kh2MessageRenderer(drawing, _kernel.SystemMessageContext);
         }
 
         public void Destroy()
@@ -166,7 +149,6 @@ namespace OpenKh.Game.Debugging
 
         private void EmitNewLine()
         {
-
             Print(Encoders.InternationalSystem.Encode(new List<MessageCommandModel>()
             {
                 new MessageCommandModel()
