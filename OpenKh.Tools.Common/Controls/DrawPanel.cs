@@ -13,8 +13,14 @@ namespace OpenKh.Tools.Common.Controls
 {
     public class DrawPanel : FrameworkElement
     {
-        [DllImport("kernel32.dll", EntryPoint = nameof(CopyMemory), SetLastError = false)]
-        private static extern void CopyMemory(IntPtr dest, IntPtr src, int count);
+        private static void CopyMemory(IntPtr dest, IntPtr src, int count)
+        {
+            memcpy(dest, src, new UIntPtr(Convert.ToUInt32(count)));
+        }
+
+        [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
+        private static extern IntPtr memcpy(IntPtr dest, IntPtr src, UIntPtr count);
+
 
         public static readonly DependencyProperty DrawingProperty =
             GetDependencyProperty<DrawPanel, IDrawing>(nameof(Drawing),(o, x) => o.SetDrawing(x));
