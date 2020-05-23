@@ -3,11 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
-using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace OpenKh.Game.Debugging
 {
@@ -22,13 +20,7 @@ namespace OpenKh.Game.Debugging
         private readonly IStateChange _stateChange;
         private bool _overrideExternalDebugFeatures = false;
 
-        private Texture2D _texFontSys1;
-        private Texture2D _texFontSys2;
-        private Texture2D _texFontEvt1;
-        private Texture2D _texFontEvt2;
-        private Texture2D _texFontIcon;
-
-        private SpriteBatch _spriteBatch;
+        private MonoDrawing _drawing;
         private IMessageEncoder _encoder;
         private IMessageRenderer _messageRenderer;
         private DrawContext _messageDrawContext;
@@ -45,36 +37,23 @@ namespace OpenKh.Game.Debugging
 
         public void Initialize(StateInitDesc initDesc)
         {
-            _spriteBatch = new SpriteBatch(initDesc.GraphicsDevice.GraphicsDevice);
-
             _dataContent = initDesc.DataContent;
             _archiveManager = initDesc.ArchiveManager;
             _kernel = initDesc.Kernel;
             _inputManager = initDesc.InputManager;
             _graphics = initDesc.GraphicsDevice;
 
-            _texFontSys1 = _kernel.FontContext.ImageSystem.CreateTexture(_graphics.GraphicsDevice);
-            _texFontSys2 = _kernel.FontContext.ImageSystem2.CreateTexture(_graphics.GraphicsDevice);
-            _texFontEvt1 = _kernel.FontContext.ImageEvent.CreateTexture(_graphics.GraphicsDevice);
-            _texFontEvt2 = _kernel.FontContext.ImageEvent2.CreateTexture(_graphics.GraphicsDevice);
-            _texFontIcon = _kernel.FontContext.ImageIcon.CreateTexture(_graphics.GraphicsDevice);
-
-            var drawing = new MonoDrawing(
-                initDesc.GraphicsDevice.GraphicsDevice, initDesc.ContentManager);
+            _drawing = new MonoDrawing(_graphics.GraphicsDevice, initDesc.ContentManager);
             
             var messageContext = _kernel.SystemMessageContext;
             _encoder = messageContext.Encoder;
-            _messageRenderer = new Kh2MessageRenderer(drawing, messageContext);
+            _messageRenderer = new Kh2MessageRenderer(_drawing, messageContext);
         }
 
         public void Destroy()
         {
-            _spriteBatch?.Dispose();
-            _texFontSys1?.Dispose();
-            _texFontSys2?.Dispose();
-            _texFontEvt1?.Dispose();
-            _texFontEvt2?.Dispose();
-            _texFontIcon?.Dispose();
+            _drawing.Dispose();
+            // TODO destroy textures created by Kh2MessageRenderer
         }
 
         public void Update(DeltaTimes deltaTimes)
