@@ -49,6 +49,9 @@ namespace OpenKh.Kh2
         public List<SequenceGroup> SequenceGroups { get; set; }
         public List<Sequence> SequenceItems { get; set; }
 
+        public Layout()
+        { }
+
         internal Layout(Stream stream)
         {
             if (!stream.CanRead || !stream.CanSeek)
