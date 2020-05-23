@@ -34,8 +34,8 @@ namespace OpenKh.Kh2
             [Data] public int Top { get; set; }
             [Data] public int Right { get; set; }
             [Data] public int Bottom { get; set; }
-            [Data] public float Unknown10 { get; set; }
-            [Data] public float Unknown14 { get; set; }
+            [Data] public float UTranslation { get; set; }
+            [Data] public float VTranslation { get; set; }
             [Data] public uint ColorLeft { get; set; }
             [Data] public uint ColorTop { get; set; }
             [Data] public uint ColorRight { get; set; }
