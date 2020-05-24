@@ -1,7 +1,7 @@
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/powershell?view=azure-devops
 
 function Log([string]$text) {
-    Write-Warning $text
+    Write-Debug $text
 }
 
 # If this script is not running on a build server, remind user to
