@@ -35,11 +35,16 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             OpenCommand = new RelayCommand(x => { }, x => false);
             SaveCommand = new RelayCommand(x =>
             {
+                var memoryStream = new MemoryStream();
+
+                Bar.Write(memoryStream, Items.Select(item => item.Entry));
+
                 var stream = _toolInvokeDesc.SelectedEntry.Stream;
 
                 stream.Position = 0;
                 stream.SetLength(0);
-                Bar.Write(stream, Items.Select(item => item.Entry));
+                memoryStream.Position = 0;
+                memoryStream.CopyTo(stream);
             });
             SaveAsCommand = new RelayCommand(x => { }, x => false);
         }
@@ -72,10 +77,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             {
                 if (!string.IsNullOrEmpty(FileName))
                 {
-                    using (var stream = File.Open(FileName, FileMode.Create))
-                    {
-                        Bar.Write(stream, Items.Select(item => item.Entry));
-                    }
+                    SaveToFile(FileName);
                 }
                 else
                 {
@@ -180,8 +182,14 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 
         private void SaveToFile(string fileName)
         {
+            var memoryStream = new MemoryStream();
+            Bar.Write(memoryStream, Items.Select(item => item.Entry));
+
             using (var stream = File.Open(fileName, FileMode.Create))
-                Bar.Write(stream, Items.Select(item => item.Entry));
+            {
+                memoryStream.Position = 0;
+                memoryStream.CopyTo(stream);
+            }
         }
 
         private string GetTemporaryFileName(string actualFileName)
