@@ -138,7 +138,7 @@ namespace OpenKh.Kh2
             public long Data50 { get; set; }
             public long Data60 { get; set; }
             public Tm2.GsTex GsTex0 { get; set; }
-            public long Data78 { get; set; }
+            public long Data80 { get; set; }
             public TextureAddressMode AddressMode { get; set; }
         }
 
@@ -159,23 +159,23 @@ namespace OpenKh.Kh2
             [Data] public long Data60 { get; set; }
             [Data] public long Data68 { get; set; }
             [Data] public Tm2.GsTex GsTex0 { get; set; }
-            [Data] public long Data78 { get; set; }
+            [Data] public long Data80 { get; set; }
             [Data] public _TextureAddressMode AddressMode { get; set; }
             [Data] public long Data88 { get; set; }
             [Data] public long Data90 { get; set; }
             [Data] public long Data98 { get; set; }
         }
 
-        public enum AddressMode
+        public enum TextureWrapMode
         {
-            Repeat, Clamp, Repeat2, Clamp2
+            Repeat, Clamp, RegionClamp, RegionRepeat
         }
 
         private class _TextureAddressMode
         {
             [Data] public long Data { get; set; }
-            public AddressMode AddressU { get => (AddressMode)GetBits(Data, 0, 2); set => Data = SetBits(Data, 0, 2, (int)value); }
-            public AddressMode AddressV { get => (AddressMode)GetBits(Data, 2, 2); set => Data = SetBits(Data, 2, 2, (int)value); }
+            public TextureWrapMode AddressU { get => (TextureWrapMode)GetBits(Data, 0, 2); set => Data = SetBits(Data, 0, 2, (int)value); }
+            public TextureWrapMode AddressV { get => (TextureWrapMode)GetBits(Data, 2, 2); set => Data = SetBits(Data, 2, 2, (int)value); }
             public int Left { get => GetBits(Data, 4, 10); set => Data = SetBits(Data, 4, 10, value); }
             public int Top { get => GetBits(Data, 14, 10); set => Data = SetBits(Data, 14, 10, value); }
             public int Right { get => GetBits(Data, 24, 10); set => Data = SetBits(Data, 24, 10, value); }
@@ -184,8 +184,8 @@ namespace OpenKh.Kh2
 
         internal class TextureAddressMode
         {
-            public AddressMode AddressU { get; set; }
-            public AddressMode AddressV { get; set; }
+            public TextureWrapMode AddressU { get; set; }
+            public TextureWrapMode AddressV { get; set; }
             public int Left { get; set; }
             public int Top { get; set; }
             public int Right { get; set; }
@@ -249,7 +249,7 @@ namespace OpenKh.Kh2
                     Data50 = x.Data50,
                     Data60 = x.Data60,
                     GsTex0 = x.GsTex0,
-                    Data78 = x.Data78,
+                    Data80 = x.Data80,
                     AddressMode = new TextureAddressMode
                     {
                         AddressU = x.AddressMode.AddressU,
@@ -368,7 +368,7 @@ namespace OpenKh.Kh2
                         Right = textureInfo.AddressMode.Right,
                         Bottom = textureInfo.AddressMode.Bottom,
                     },
-                    Data78 = textureInfo.Data78,
+                    Data80 = textureInfo.Data80,
                     Data88 = 0x0000000000000008,
                     Data90 = 0x0000000060000000,
                     Data98 = 0x0000000013000000,

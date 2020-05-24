@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - Raw Texture
+# [Kingdom Hearts II](../index) - Raw Texture
 
 This is used by 3D models of Kingdom Hearts II to give them a texture.
 
@@ -92,8 +92,33 @@ This table is also unknown, but the few information found points to describe how
 | 96     | int64  | 
 | 104    | int64  | Always 0x14
 | 112    | int64  | [GS TEX0 register](../../common/tm2#gstex)
-| 120    | int64  | 
+| 120    | int64  | [Texture Wrap Mode](#texture-wrap-mode)
 | 128    | int64  | 
 | 136    | int64  | Always 8
 | 144    | int64  | Always 0x0000000060000000
 | 152    | int64  | Always 0x0000000013000000
+
+## Texture Wrap Mode
+
+In PlayStation 2 graphics, texture wrapping does not only occur when UV are `<0.0` or `>1.0`, but it is possible to define a custom wrap box. This is done by the Texture Wrap register.
+
+| Bit | Count | Name | Description
+|-----|-------|------|------------
+| 0   | 2     | WMS  | Defines the [wrap mode](#wrap-mode) for the U coordinate
+| 2   | 2     | WMT  | Defines the [wrap mode](#wrap-mode) for the V coordinate
+| 4   | 10    | MINU | Lower clamp value for U coordinate
+| 14  | 10    | MAXU | Upper clamp value for U coordinate
+| 24  | 10    | MINU | Lower clamp value for V coordinate
+| 34  | 10    | MAXU | Upper clamp value for V coordinate
+| 44  | 20    |      | not used
+
+MINx and MAXx are only applied if the [wrap mode](#wrap-mode) is of type `REGION`.
+
+## Wrap Mode (also called WMS and WMT)
+
+| Value | Description
+|-------|------------
+| 0     | REPEAT
+| 1     | CLAMP
+| 2     | REGION_REPEAT
+| 3     | REGION_CLAMP
