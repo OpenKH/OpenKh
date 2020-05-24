@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+    <IsPublishable>false</IsPublishable>
 
     <AssemblyName>OpenKh.Tests</AssemblyName>
     <RootNamespace>OpenKh.Tests</RootNamespace>
