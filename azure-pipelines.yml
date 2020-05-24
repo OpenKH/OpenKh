@@ -62,44 +62,8 @@ steps:
   inputs:
     summaryFileLocation: '**/*.coverage'
 
-- powershell: gci env:* | sort-object name | Format-Table -AutoSize | Out-File $env:BUILD_ARTIFACTSTAGINGDIRECTORY/environment-variables.txt
-  displayName: 'List artifacts to publish'
-
-- task: CopyFiles@2
-  displayName: 'Pack .Net Framework 4 tools and libraries'
-  inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: |
-     OpenKh*/**/$(BuildConfiguration)/net4**/**/?(*.exe|*.dll|*.json|*.config)
-    targetFolder: '$(Build.ArtifactStagingDirectory)/net4'
-    flattenFolders: true
-
-- task: CopyFiles@2
-  displayName: 'Pack .Net Framework 4 resources'
-  inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: |
-     OpenKh*/**/$(BuildConfiguration)/net4**/**/resources/**
-    targetFolder: '$(Build.ArtifactStagingDirectory)/net4/resources'
-    flattenFolders: true
-
-- task: CopyFiles@2
-  displayName: 'Pack .Net Core tools and libraries'
-  inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: |
-     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/?(*.exe|*.dll|*.json|*.config)
-    targetFolder: '$(Build.ArtifactStagingDirectory)/netcore'
-    flattenFolders: true
-
-- task: CopyFiles@2
-  displayName: 'Pack .Net Core resources'
-  inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: |
-     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/resources/**
-    targetFolder: '$(Build.ArtifactStagingDirectory)/netcore/resources'
-    flattenFolders: true
+- script: dotnet publish --configuration $(buildConfiguration) --verbosity normal --framework netcoreapp3.1 --output $(Build.ArtifactStagingDirectory)/openkh /p:DebugType=None /p:DebugSymbols=false
+  displayName: 'Publish project as artifact'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
