@@ -22,155 +22,155 @@ namespace OpenKh.Engine.Parsers.Kddf2
 
         public Kkdf2MdlxParser(List<Mdlx.SubModel> submodels)
         {
-            const float scalf = 1f;
+            const float globalScale = 1f;
 
             foreach (var submodel in submodels)
             {
-                var alaxb = submodel.Bones.ToArray();
-                var matrices = new Matrix[alaxb.Length];
+                var boneList = submodel.Bones.ToArray();
+                var matrices = new Matrix[boneList.Length];
                 {
-                    var Va = new Vector3[matrices.Length];
-                    var Qa = new Quaternion[matrices.Length];
+                    var absTranslationList = new Vector3[matrices.Length];
+                    var absRotationList = new Quaternion[matrices.Length];
                     for (int x = 0; x < matrices.Length; x++)
                     {
-                        Quaternion Qo;
-                        Vector3 Vo;
-                        var axb = alaxb[x];
-                        var parent = axb.Parent;
+                        Quaternion absRotation;
+                        Vector3 absTranslation;
+                        var oneBone = boneList[x];
+                        var parent = oneBone.Parent;
                         if (parent < 0)
                         {
-                            Qo = Quaternion.Identity;
-                            Vo = Vector3.Zero;
+                            absRotation = Quaternion.Identity;
+                            absTranslation = Vector3.Zero;
                         }
                         else
                         {
-                            Qo = Qa[parent];
-                            Vo = Va[parent];
+                            absRotation = absRotationList[parent];
+                            absTranslation = absTranslationList[parent];
                         }
 
-                        var Vt = Vector3.TransformCoordinate(new Vector3(axb.TranslationX, axb.TranslationY, axb.TranslationZ), Matrix.RotationQuaternion(Qo));
-                        Va[x] = Vo + Vt;
+                        var localTranslation = Vector3.TransformCoordinate(new Vector3(oneBone.TranslationX, oneBone.TranslationY, oneBone.TranslationZ), Matrix.RotationQuaternion(absRotation));
+                        absTranslationList[x] = absTranslation + localTranslation;
 
-                        var Qt = Quaternion.Identity;
-                        if (axb.RotationX != 0) Qt *= (Quaternion.RotationAxis(new Vector3(1, 0, 0), axb.RotationX));
-                        if (axb.RotationY != 0) Qt *= (Quaternion.RotationAxis(new Vector3(0, 1, 0), axb.RotationY));
-                        if (axb.RotationZ != 0) Qt *= (Quaternion.RotationAxis(new Vector3(0, 0, 1), axb.RotationZ));
-                        Qa[x] = Qt * Qo;
+                        var localRotation = Quaternion.Identity;
+                        if (oneBone.RotationX != 0) localRotation *= (Quaternion.RotationAxis(new Vector3(1, 0, 0), oneBone.RotationX));
+                        if (oneBone.RotationY != 0) localRotation *= (Quaternion.RotationAxis(new Vector3(0, 1, 0), oneBone.RotationY));
+                        if (oneBone.RotationZ != 0) localRotation *= (Quaternion.RotationAxis(new Vector3(0, 0, 1), oneBone.RotationZ));
+                        absRotationList[x] = localRotation * absRotation;
                     }
                     for (int x = 0; x < matrices.Length; x++)
                     {
-                        var M = Matrix.RotationQuaternion(Qa[x]);
-                        M *= Matrix.Translation(Va[x]);
-                        matrices[x] = M;
+                        var absMatrix = Matrix.RotationQuaternion(absRotationList[x]);
+                        absMatrix *= Matrix.Translation(absTranslationList[x]);
+                        matrices[x] = absMatrix;
                     }
                 }
 
-                var albody1 = new List<Body1e>();
-                var Mv = Matrix.Identity;
-                foreach (Mdlx.DmaVif t13 in submodel.DmaChains.SelectMany(dmaChain => dmaChain.DmaVifs))
+                var middleMeshList = new List<MiddleMesh>();
+                var projectionMatrix = Matrix.Identity;
+                foreach (Mdlx.DmaVif dmaVif in submodel.DmaChains.SelectMany(dmaChain => dmaChain.DmaVifs))
                 {
                     const int tops = 0x40, top2 = 0x220;
 
-                    var unpacker = new VifUnpacker(t13.VifPacket)
+                    var unpacker = new VifUnpacker(dmaVif.VifPacket)
                     {
                         Vif1_Tops = tops
                     };
                     unpacker.Run();
 
-                    var b1 = SimaVU1e.Sima(unpacker.Memory, matrices, tops, top2, t13.TextureIndex, t13.Alaxi, Mv);
-                    albody1.Add(b1);
+                    var middleMesh = VU1Simulation.Run(unpacker.Memory, matrices, tops, top2, dmaVif.TextureIndex, dmaVif.Alaxi, projectionMatrix);
+                    middleMeshList.Add(middleMesh);
                 }
 
                 if (true)
                 {
-                    FfMesh ffmesh = new FfMesh();
+                    ExportedMesh exportedMesh = new ExportedMesh();
                     if (true)
                     {
                         int svi = 0;
                         int sti = 0;
-                        Ff1[] alo1 = new Ff1[4];
-                        int ai = 0;
-                        int[] ord = new int[] { 1, 3, 2 };
-                        foreach (Body1e b1 in albody1)
+                        VertexRef[] ringBuffer = new VertexRef[4];
+                        int ringIndex = 0;
+                        int[] triangleOrder = new int[] { 1, 3, 2 };
+                        foreach (MiddleMesh mesh in middleMeshList)
                         {
-                            for (int x = 0; x < b1.alvi.Length; x++)
+                            for (int x = 0; x < mesh.vertexIndexMappingList.Length; x++)
                             {
-                                Ff1 o1 = new Ff1(svi + b1.alvi[x], sti + x);
-                                alo1[ai] = o1;
-                                ai = (ai + 1) & 3;
-                                int fl = b1.alfl[x];
-                                if (fl == 0x20 || fl == 0x00)
+                                VertexRef vertexRef = new VertexRef(svi + mesh.vertexIndexMappingList[x], sti + x);
+                                ringBuffer[ringIndex] = vertexRef;
+                                ringIndex = (ringIndex + 1) & 3;
+                                int flag = mesh.vertexFlagList[x];
+                                if (flag == 0x20 || flag == 0x00)
                                 {
-                                    Ff3 o3 = new Ff3(b1.t,
-                                        alo1[(ai - ord[0]) & 3],
-                                        alo1[(ai - ord[1]) & 3],
-                                        alo1[(ai - ord[2]) & 3]
+                                    TriangleRef triRef = new TriangleRef(mesh.textureIndex,
+                                        ringBuffer[(ringIndex - triangleOrder[0]) & 3],
+                                        ringBuffer[(ringIndex - triangleOrder[1]) & 3],
+                                        ringBuffer[(ringIndex - triangleOrder[2]) & 3]
                                         );
-                                    ffmesh.al3.Add(o3);
+                                    exportedMesh.triangleRefList.Add(triRef);
                                 }
-                                if (fl == 0x30 || fl == 0x00)
+                                if (flag == 0x30 || flag == 0x00)
                                 {
-                                    Ff3 o3 = new Ff3(b1.t,
-                                        alo1[(ai - ord[0]) & 3],
-                                        alo1[(ai - ord[2]) & 3],
-                                        alo1[(ai - ord[1]) & 3]
+                                    TriangleRef triRef = new TriangleRef(mesh.textureIndex,
+                                        ringBuffer[(ringIndex - triangleOrder[0]) & 3],
+                                        ringBuffer[(ringIndex - triangleOrder[2]) & 3],
+                                        ringBuffer[(ringIndex - triangleOrder[1]) & 3]
                                         );
-                                    ffmesh.al3.Add(o3);
+                                    exportedMesh.triangleRefList.Add(triRef);
                                 }
                             }
-                            for (int x = 0; x < b1.alvertraw.Length; x++)
+                            for (int x = 0; x < mesh.rawPositionList.Length; x++)
                             {
-                                if (b1.alalni[x] == null)
+                                if (mesh.assignedJointsList[x] == null)
                                 {
-                                    ffmesh.alpos.Add(Vector3.Zero);
-                                    ffmesh.almtxuse.Add(new MJ1[0]);
+                                    exportedMesh.positionList.Add(Vector3.Zero);
+                                    exportedMesh.jointList.Add(new JointAssignment[0]);
                                     continue;
                                 }
-                                if (b1.alalni[x].Length == 1)
+                                if (mesh.assignedJointsList[x].Length == 1)
                                 {
-                                    MJ1 mj1 = b1.alalni[x][0];
-                                    mj1.factor = 1.0f;
-                                    Vector3 vpos = Vector3.TransformCoordinate(VCUt.V4To3(b1.alvertraw[mj1.vertexIndex]), matrices[mj1.matrixIndex]);
-                                    ffmesh.alpos.Add(vpos);
+                                    JointAssignment assignment = mesh.assignedJointsList[x][0];
+                                    assignment.factor = 1.0f;
+                                    Vector3 finalPos = Vector3.TransformCoordinate(VCUt.V4To3(mesh.rawPositionList[assignment.vertexIndex]), matrices[assignment.matrixIndex]);
+                                    exportedMesh.positionList.Add(finalPos);
                                 }
                                 else
                                 {
-                                    Vector3 vpos = Vector3.Zero;
-                                    foreach (MJ1 mj1 in b1.alalni[x])
+                                    Vector3 finalPos = Vector3.Zero;
+                                    foreach (JointAssignment assignment in mesh.assignedJointsList[x])
                                     {
-                                        vpos += VCUt.V4To3(Vector4.Transform(b1.alvertraw[mj1.vertexIndex], matrices[mj1.matrixIndex]));
+                                        finalPos += VCUt.V4To3(Vector4.Transform(mesh.rawPositionList[assignment.vertexIndex], matrices[assignment.matrixIndex]));
                                     }
-                                    ffmesh.alpos.Add(vpos);
+                                    exportedMesh.positionList.Add(finalPos);
                                 }
-                                ffmesh.almtxuse.Add(b1.alalni[x]);
+                                exportedMesh.jointList.Add(mesh.assignedJointsList[x]);
                             }
-                            for (int x = 0; x < b1.aluv.Length; x++)
+                            for (int x = 0; x < mesh.uvList.Length; x++)
                             {
-                                Vector2 vst = b1.aluv[x];
+                                Vector2 vst = mesh.uvList[x];
                                 vst.Y = 1.0f - vst.Y; // !
-                                ffmesh.alst.Add(vst);
+                                exportedMesh.uvList.Add(vst);
                             }
-                            svi += b1.alvertraw.Length;
-                            sti += b1.aluv.Length;
+                            svi += mesh.rawPositionList.Length;
+                            sti += mesh.uvList.Length;
                         }
                     }
 
                     {   // position xyz
-                        int ct = ffmesh.al3.Count;
-                        for (int t = 0; t < ct; t++)
+                        int triangleRefCount = exportedMesh.triangleRefList.Count;
+                        for (int triIndex = 0; triIndex < triangleRefCount; triIndex++)
                         {
-                            Ff3 X3 = ffmesh.al3[t];
+                            TriangleRef triRef = exportedMesh.triangleRefList[triIndex];
                             Model model;
-                            if (Models.TryGetValue(X3.texi, out model) == false)
+                            if (Models.TryGetValue(triRef.textureIndex, out model) == false)
                             {
-                                Models[X3.texi] = model = new Model();
+                                Models[triRef.textureIndex] = model = new Model();
                             }
-                            for (int i = 0; i < X3.al1.Length; i++)
+                            for (int i = 0; i < triRef.list.Length; i++)
                             {
-                                Ff1 X1 = X3.al1[i];
-                                Vector3 v = (ffmesh.alpos[X1.vi] * scalf);
-                                Vector2 txy = ffmesh.alst[X1.ti];
-                                model.Vertices.Add(new CustomVertex.PositionColoredTextured(v, -1, txy.X, 1 - txy.Y));
+                                VertexRef vertRef = triRef.list[i];
+                                Vector3 pos = (exportedMesh.positionList[vertRef.vertexIndex] * globalScale);
+                                Vector2 uv = exportedMesh.uvList[vertRef.uvIndex];
+                                model.Vertices.Add(new CustomVertex.PositionColoredTextured(pos, -1, uv.X, 1 - uv.Y));
                             }
                         }
                     }
