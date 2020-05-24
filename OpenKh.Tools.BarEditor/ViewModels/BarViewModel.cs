@@ -1,6 +1,7 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.BarEditor.Models;
 using OpenKh.Tools.BarEditor.Services;
+using OpenKh.Tools.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,189 +16,240 @@ using Xe.Tools.Wpf.Models;
 namespace OpenKh.Tools.BarEditor.ViewModels
 {
     public class BarViewModel : GenericListModel<BarEntryModel>
-	{
-		private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
+    {
+        private static string ApplicationName = Utilities.GetApplicationName();
+        private string _fileName;
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
+        private readonly ToolInvokeDesc _toolInvokeDesc;
 
-		public BarViewModel() : this((IEnumerable<BarEntryModel>)null) { }
+        public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
-		public BarViewModel(Stream stream) :
-			this(Bar.Read(stream))
-		{
-			OpenCommand = new RelayCommand(x => { }, x => false);
-			SaveCommand = new RelayCommand(x =>
-			{
-				stream.Position = 0;
-				stream.SetLength(0);
-				Bar.Write(stream, Items.Select(item => item.Entry));
-			});
-		}
+        public BarViewModel() : this((IEnumerable<BarEntryModel>)null) { }
 
-		public BarViewModel(IEnumerable<Bar.Entry> list) :
-			this(list.Select(x => new BarEntryModel(x)))
-		{ }
+        public BarViewModel(ToolInvokeDesc desc) :
+            this(Bar.Read(desc.SelectedEntry.Stream))
+        {
+            _toolInvokeDesc = desc;
 
-		public BarViewModel(IEnumerable<BarEntryModel> list) :
-			base(list)
-		{
-			Types = new EnumModel<Bar.EntryType>();
+            NewCommand = new RelayCommand(x => { }, x => false);
+            OpenCommand = new RelayCommand(x => { }, x => false);
+            SaveCommand = new RelayCommand(x =>
+            {
+                var stream = _toolInvokeDesc.SelectedEntry.Stream;
 
-			OpenCommand = new RelayCommand(x =>
-			{
-				FileDialog.OnOpen(fileName =>
-				{
-					using (var stream = File.Open(fileName, FileMode.Open))
-					{
-						FileName = fileName;
-						Items.Clear();
-						foreach (var item in Bar.Read(stream))
-						{
-							Items.Add(new BarEntryModel(item));
-						}
-					}
-				}, Filters);
-			}, x => true);
+                stream.Position = 0;
+                stream.SetLength(0);
+                Bar.Write(stream, Items.Select(item => item.Entry));
+            });
+            SaveAsCommand = new RelayCommand(x => { }, x => false);
+        }
 
-			SaveCommand = new RelayCommand(x =>
-			{
-				if (!string.IsNullOrEmpty(FileName))
-				{
-					using (var stream = File.Open(FileName, FileMode.Create))
-					{
-						Bar.Write(stream, Items.Select(item => item.Entry));
-					}
-				}
-				else
-				{
-					SaveAsCommand.Execute(x);
-				}
-			}, x => true);
+        public BarViewModel(IEnumerable<Bar.Entry> list) :
+            this(list.Select(x => new BarEntryModel(x)))
+        { }
 
-			SaveAsCommand = new RelayCommand(x =>
-			{
-				FileDialog.OnSave(fileName =>
-				{
-					using (var stream = File.Open(fileName, FileMode.Create))
-					{
-						Bar.Write(stream, Items.Select(item => item.Entry));
-					}
-				}, Filters);
-			}, x => true);
+        public BarViewModel(IEnumerable<BarEntryModel> list) :
+            base(list)
+        {
+            Types = new EnumModel<Bar.EntryType>();
 
-			ExitCommand = new RelayCommand(x =>
-			{
-				Window.Close();
-			}, x => true);
+            NewCommand = new RelayCommand(x =>
+            {
+                FileName = "untitled.bar";
+                Items.Clear();
+            }, x => true);
 
-			AboutCommand = new RelayCommand(x =>
-			{
-				new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
-			}, x => true);
+            OpenCommand = new RelayCommand(x =>
+            {
+                FileDialog.OnOpen(fileName =>
+                {
+                    OpenFileName(fileName);
+                    FileName = fileName;
+                }, Filters);
+            }, x => true);
 
-			OpenItemCommand = new RelayCommand(x =>
-			{
-				try
-				{
-					ToolsLoaderService.OpenTool(SelectedItem.Entry.Stream, SelectedItem.Type);
-				}
-				catch (Exception e)
-				{
-					MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-				}
-				OnPropertyChanged(nameof(SelectedItem));
-			}, x => true);
+            SaveCommand = new RelayCommand(x =>
+            {
+                if (!string.IsNullOrEmpty(FileName))
+                {
+                    using (var stream = File.Open(FileName, FileMode.Create))
+                    {
+                        Bar.Write(stream, Items.Select(item => item.Entry));
+                    }
+                }
+                else
+                {
+                    SaveAsCommand.Execute(x);
+                }
+            }, x => true);
 
-			ExportCommand = new RelayCommand(x =>
-			{
-                var defaultFileName = $"{SelectedItem.Entry.Name}.bin";
+            SaveAsCommand = new RelayCommand(x =>
+            {
+                FileDialog.OnSave(fileName =>
+                {
+                    SaveToFile(fileName);
+                }, Filters, Path.GetFileName(FileName));
+            }, x => true);
 
-				FileDialog.OnSave(fileName =>
-				{
-					using (var fStream = File.OpenWrite(fileName))
-					{
-						SelectedItem.Entry.Stream.Position = 0;
-						SelectedItem.Entry.Stream.CopyTo(fStream);
-					}
-				}, Filters, defaultFileName);
-			}, x => IsItemSelected);
+            ExitCommand = new RelayCommand(x =>
+            {
+                Window.Close();
+            }, x => true);
+
+            AboutCommand = new RelayCommand(x =>
+            {
+                new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
+            }, x => true);
+
+            OpenItemCommand = new RelayCommand(x =>
+            {
+                try
+                {
+                    var tempFileName = SaveToTempraryFile();
+                    switch (ToolsLoaderService.OpenTool(FileName, tempFileName, SelectedItem.Entry))
+                    {
+                        case Common.ToolInvokeDesc.ContentChangeInfo.File:
+                            ReloadFromTemporaryFile(tempFileName);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                OnPropertyChanged(nameof(SelectedItem));
+            }, x => true);
+
+            ExportCommand = new RelayCommand(x =>
+            {
+                var defaultFileName = GetSuggestedFileName(SelectedItem.Entry);
+
+                FileDialog.OnSave(fileName =>
+                {
+                    using (var fStream = File.OpenWrite(fileName))
+                    {
+                        SelectedItem.Entry.Stream.Position = 0;
+                        SelectedItem.Entry.Stream.CopyTo(fStream);
+                    }
+                }, Filters, defaultFileName);
+            }, x => IsItemSelected);
 
             ExportAllCommand = new RelayCommand(x =>
             {
-				FileDialog.OnFolder(folder =>
-				{
-					foreach (var item in Items.Select(item => item.Entry))
-					{
-						var fileName = $"{item.Name}.bin";
-						using (var fStream = File.OpenWrite(Path.Combine(folder, fileName)))
-						{
-							item.Stream.Position = 0;
-							item.Stream.CopyTo(fStream);
-						}
-					}
-				});
+                FileDialog.OnFolder(folder =>
+                {
+                    foreach (var item in Items.Select(item => item.Entry))
+                    {
+                        var fileName = GetSuggestedFileName(item);
+                        using (var fStream = File.OpenWrite(Path.Combine(folder, fileName)))
+                        {
+                            item.Stream.Position = 0;
+                            item.Stream.CopyTo(fStream);
+                        }
+                    }
+                });
             }, x => true);
 
             ImportCommand = new RelayCommand(x =>
-			{
-				FileDialog.OnOpen(fileName =>
-				{
-					using (var fStream = File.OpenRead(fileName))
-					{
-						var memStream = new MemoryStream((int)fStream.Length);
-						fStream.CopyTo(memStream);
-						SelectedItem.Entry.Stream = memStream;
-					}
+            {
+                FileDialog.OnOpen(fileName =>
+                {
+                    using (var fStream = File.OpenRead(fileName))
+                    {
+                        var memStream = new MemoryStream((int)fStream.Length);
+                        fStream.CopyTo(memStream);
+                        SelectedItem.Entry.Stream = memStream;
+                    }
 
-					OnPropertyChanged(nameof(SelectedItem.Size));
-				}, Filters);
-			}, x => IsItemSelected);
-			SearchCommand = new RelayCommand(x => { }, x => false);
-		}
+                    OnPropertyChanged(nameof(SelectedItem));
+                }, Filters);
+            }, x => IsItemSelected);
+        }
 
-		private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+        public void OpenFileName(string fileName)
+        {
+            using (var stream = File.Open(fileName, FileMode.Open))
+            {
+                Items.Clear();
+                foreach (var item in Bar.Read(stream))
+                {
+                    Items.Add(new BarEntryModel(item));
+                }
+            }
+        }
 
-		private string FileName { get; set; }
+        private void SaveToFile(string fileName)
+        {
+            using (var stream = File.Open(fileName, FileMode.Create))
+                Bar.Write(stream, Items.Select(item => item.Entry));
+        }
 
-		public RelayCommand OpenCommand { get; set; }
+        private string GetTemporaryFileName(string actualFileName)
+        {
+            return Path.GetTempFileName();
+        }
 
-		public RelayCommand SaveCommand { get; set; }
+        private string SaveToTempraryFile()
+        {
+            var tempFileName = GetTemporaryFileName(FileName);
+            SaveToFile(tempFileName);
 
-		public RelayCommand SaveAsCommand { get; set; }
+            return tempFileName;
+        }
 
-		public RelayCommand ExitCommand { get; set; }
+        private void ReloadFromTemporaryFile(string tempFileName)
+        {
+            OpenFileName(tempFileName);
+        }
 
-		public RelayCommand AboutCommand { get; set; }
+        private static string GetSuggestedFileName(Bar.Entry item) =>
+            $"{item.Name}_{item.Index}.{Helpers.GetSuggestedExtension(item.Type)}";
 
+        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+
+        public string FileName
+        {
+            get => _fileName;
+            set
+            {
+                _fileName = value;
+                OnPropertyChanged(nameof(Title));
+            }
+        }
+
+        public RelayCommand NewCommand { get; set; }
+        public RelayCommand OpenCommand { get; set; }
+        public RelayCommand SaveCommand { get; set; }
+        public RelayCommand SaveAsCommand { get; set; }
+        public RelayCommand ExitCommand { get; set; }
+        public RelayCommand AboutCommand { get; set; }
         public RelayCommand ExportCommand { get; set; }
-
         public RelayCommand ExportAllCommand { get; set; }
-
         public RelayCommand ImportCommand { get; set; }
+        public RelayCommand OpenItemCommand { get; set; }
 
-		public RelayCommand OpenItemCommand { get; set; }
+        public EnumModel<Bar.EntryType> Types { get; set; }
 
-		public RelayCommand SearchCommand { get; set; }
+        public string ExportFileName => IsItemSelected ?
+            GetSuggestedFileName(SelectedItem.Entry) : string.Empty;
 
-		public EnumModel<Bar.EntryType> Types { get; set; }
+        protected override BarEntryModel OnNewItem()
+        {
+            return new BarEntryModel(new Bar.Entry()
+            {
+                Stream = new MemoryStream()
+            });
+        }
 
-		public string ExportFileName => IsItemSelected ? $"{SelectedItem?.DisplayName}.bin" : "(no file selected)";
+        protected override void OnSelectedItem(BarEntryModel item)
+        {
+            base.OnSelectedItem(item);
 
-		protected override BarEntryModel OnNewItem()
-		{
-			return new BarEntryModel(new Bar.Entry()
-			{
-				Stream = new MemoryStream()
-			});
-		}
+            ExportCommand.CanExecute(SelectedItem);
+            ImportCommand.CanExecute(SelectedItem);
+            OpenItemCommand.CanExecute(SelectedItem);
 
-		protected override void OnSelectedItem(BarEntryModel item)
-		{
-			base.OnSelectedItem(item);
-
-			ExportCommand.CanExecute(SelectedItem);
-			ImportCommand.CanExecute(SelectedItem);
-			OpenItemCommand.CanExecute(SelectedItem);
-
-			OnPropertyChanged(nameof(ExportFileName));
-		}
-	}
+            OnPropertyChanged(nameof(ExportFileName));
+        }
+    }
 }

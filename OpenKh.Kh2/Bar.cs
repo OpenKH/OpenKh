@@ -15,8 +15,8 @@ namespace OpenKh.Kh2
 
         private static Dictionary<EntryType, int> _alignments = new Dictionary<EntryType, int>
         {
-            [EntryType.Vif] = 0x10,
-            [EntryType.Tim2] = 0x80,
+            [EntryType.Model] = 0x10,
+            [EntryType.ModelTexture] = 0x80,
             [EntryType.AnimationData] = 0x10,
             [EntryType.Texture] = 0x40,
             [EntryType.CameraCollision] = 0x10,
@@ -37,7 +37,7 @@ namespace OpenKh.Kh2
             [EntryType.RawBitmap] = 0x80,
             [EntryType.MemoryCard] = 0x40,
             [EntryType.WrappedCollisionData] = 0x10,
-            [EntryType.Unknown] = 0x10,
+            [EntryType.Unknown39] = 0x10,
             [EntryType.Minigame] = 0x10,
             [EntryType.Progress] = 0x10,
             [EntryType.BarUnknown] = 0x10,
@@ -47,22 +47,29 @@ namespace OpenKh.Kh2
         public enum EntryType
 		{
 			Dummy = 0,
-			Binary = 2,
+			Binary = 1,
+			List = 2,
 			Ai = 3,
-			Vif = 4,
+			Model = 4,
+            MeshOcclusion = 5,
             MapCollision = 6,
-			Tim2 = 7,
+			ModelTexture = 7,
+			Dpx = 8,
 			AnimationData = 9,
 			Texture = 10,
             CameraCollision = 11,
             SpawnPoint = 12,
             SpawnScript = 13,
+            MapColorDiffuse = 14,
             LightData = 15,
+            Anb = 16,
 			Bar = 17,
 			Pax = 18,
             MapCollision2 = 19,
             AnimationLimit = 20,
+            Unknown21 = 21,
             AnimationLoader = 22,
+            ModelCollision = 23,
 			Imgd = 24,
 			Seqd = 25,
             Layout = 28,
@@ -70,13 +77,18 @@ namespace OpenKh.Kh2
 			AnimationMap = 30,
 			Seb = 31,
 			Wd = 32,
+			Unknown33,
 			IopVoice = 34,
             RawBitmap = 36,
             MemoryCard = 37,
             WrappedCollisionData = 38,
-            Unknown = 39,
+            Unknown39,
+            Unknown40,
+            Unknown41,
             Minigame = 42,
+            JimiData,
             Progress = 44,
+            Synthesis,
             BarUnknown = 46,
             Vibration = 47,
 			Vag = 48,
@@ -165,13 +177,12 @@ namespace OpenKh.Kh2
 			writer.Write(0);
 			writer.Write(0);
 
-            var entryOffsets = new int[entriesCount];
-
 			var offset = HeaderSize + entriesCount * EntrySize;
-            var myEntries = entries.Select((Entry, Index) => new { Entry, Index });
-            foreach (var e in myEntries)
+            var dicLink = new Dictionary<(string name, EntryType type), (int offset, int length)>();
+            var myEntries = entries.ToList();
+
+            foreach (var entry in myEntries)
 			{
-                var entry = e.Entry;
 				var normalizedName = entry.Name ?? "xxxx";
 				if (normalizedName.Length < 4)
 					normalizedName = $"{entry.Name}\0\0\0\0";
@@ -186,33 +197,32 @@ namespace OpenKh.Kh2
 
                 if (entry.Index != 0)
                 {
-                    var linkIndex = myEntries
-                        .First(x => x.Entry.Offset == entry.Offset).Index;
+                    var linkInfo = dicLink[(entry.Name, entry.Type)];
+                    entry.Offset = linkInfo.offset;
 
-                    var linkOffset = entryOffsets[linkIndex];
-                    writer.Write(linkOffset);
-                    entryOffsets[e.Index] = linkOffset;
+                    writer.Write(linkInfo.offset);
+                    writer.Write(linkInfo.length);
                 }
                 else
                 {
-				    writer.Write(offset);
-                    entryOffsets[e.Index] = offset;
+                    dicLink[(entry.Name, entry.Type)] = (offset, (int)entry.Stream.Length);
+                    entry.Offset = offset;
+
+                    writer.Write(offset);
+                    writer.Write((int)entry.Stream.Length);
+
                     offset += (int)entry.Stream.Length;
                 }
 
-				writer.Write((int)entry.Stream.Length);
             }
 
-            var entryOffsetIndex = 0;
-            Entry lastWrittenEntry = null;
-			foreach (var entry in entries)
+			foreach (var entry in myEntries)
             {
-                writer.BaseStream.Position = entryOffsets[entryOffsetIndex++];
+                writer.BaseStream.Position = entry.Offset;
                 if (entry.Index == 0)
                 {
                     entry.Stream.Position = 0;
                     entry.Stream.CopyTo(writer.BaseStream);
-                    lastWrittenEntry = entry;
                 }
             }
 		}

@@ -1,13 +1,11 @@
 ﻿using OpenKh.Tools.BarEditor.Views;
+using OpenKh.Tools.Common;
 using Xe.Tools;
 
 namespace OpenKh.Tools.BarEditor
 {
-	public class ToolModule : IToolModule
-	{
-		public bool? ShowDialog(params object[] args)
-		{
-			return new BarView(args).ShowDialog();
-		}
-	}
+	public class ToolModule : IToolModule<ToolInvokeDesc>
+    {
+        public bool? ShowDialog(ToolInvokeDesc args) => new BarView(args).ShowDialog();
+    }
 }
