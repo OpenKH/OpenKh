@@ -69,4 +69,4 @@ chmod +x ./bin/OpenKh.Command.*
 export OPENKH_BIN="$(realpath ./bin)"
 echo "echo 'export OPENKH_BIN=\"$OPENKH_BIN\"' >> ~/.profile"
 echo "echo 'export PATH=\$PATH:\$OPENKH_BIN' >> ~/.profile"
-echo "echo 'source \$OPENKH_BIN/.openkh_alias' >> ~/.profile"
+echo "echo 'source \$OPENKH_BIN/openkh_alias' >> ~/.profile"
