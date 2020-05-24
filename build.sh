@@ -8,7 +8,9 @@
 #                                                                            #
 # The only problem here is that .NET Core 3.1 sdk does not allow to build    #
 # OpenKh.sln because of the Windows-only projects there. So this script      #
-# temporarly creates a solution that only includes OpenKh.Command.* projects #
+# temporarly creates a solution that only includes OpenKh.Command.* projects.#
+#                                                                            #
+# This also print some configuration to easily access CLI tools from a shell.#
 ##############################################################################
 
 export configuration="Release"
@@ -55,3 +57,16 @@ fi
 dotnet publish $solution --configuration $configuration --verbosity $verbosity --framework netcoreapp3.1 --output $output /p:DebugType=None /p:DebugSymbols=false
 
 rm $solution
+
+# Print some potentially useful info
+echo "It is very recommended to append to your '~/.profile' file the path of"
+echo "OpenKH binaries and their alias to run them from any folder. You only"
+echo "need to do it once per user."
+echo "To do so, please execute the following commands:"
+
+awk '{ sub("\r$", ""); print }' ./openkh_alias > ./bin/openkh_alias
+chmod +x ./bin/OpenKh.Command.*
+export OPENKH_BIN="$(realpath ./bin)"
+echo "echo 'export OPENKH_BIN=\"$OPENKH_BIN\"' >> ~/.profile"
+echo "echo 'export PATH=\$PATH:\$OPENKH_BIN' >> ~/.profile"
+echo "echo 'source \$OPENKH_BIN/.openkh_alias' >> ~/.profile"
