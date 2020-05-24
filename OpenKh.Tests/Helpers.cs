@@ -8,7 +8,7 @@ namespace OpenKh.Tests
     public static class Helpers
     {
         public static void Dump(this Stream stream, string path) =>
-            File.OpenWrite(path).Using(outStream =>
+            File.Create(path).Using(outStream =>
             {
                 stream.Position = 0;
                 stream.CopyTo(outStream);

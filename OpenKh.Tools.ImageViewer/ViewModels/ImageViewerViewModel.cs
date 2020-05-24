@@ -34,7 +34,17 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         private static string ApplicationName = Utilities.GetApplicationName();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
 
-        public string Title => $"{Path.GetFileName(FileName) ?? "untitled"} | {ApplicationName}";
+        public string Title
+        {
+            get
+            {
+                var fileName = IsTool ? _toolInvokeDesc.Title : (Path.GetFileName(FileName) ?? "untitled");
+
+                return $"{fileName} | {ApplicationName}";
+            }
+        }
+
+        public bool IsTool => _toolInvokeDesc != null;
 
         public ImageViewerViewModel()
         {
@@ -44,11 +54,15 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 {
                     LoadImage(fileName);
                 }, OpenFilters);
-            }, x => true);
+            }, x => !IsTool);
 
             SaveCommand = new RelayCommand(x =>
             {
-                if (!string.IsNullOrEmpty(FileName))
+                if (IsTool)
+                {
+                    Save(_toolInvokeDesc.SelectedEntry.Stream);
+                }
+                else if (!string.IsNullOrEmpty(FileName))
                 {
                     using (var stream = File.Open(FileName, FileMode.Create))
                     {
@@ -71,7 +85,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                         Save(stream);
                     }
                 }, filter);
-            }, x => ImageFormat != null);
+            }, x => ImageFormat != null && !IsTool);
 
             ExitCommand = new RelayCommand(x =>
             {
@@ -128,6 +142,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         private bool _zoomFit;
         private ImageViewModel _imageViewModel;
         private ImageContainerViewModel _imageContainerItems;
+        private ToolInvokeDesc _toolInvokeDesc;
 
         public string FileName
         {
@@ -238,6 +253,12 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
 
         public Visibility ImageFitVisibility => ZoomFit ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ImageCustomZoomVisibility => ZoomFit ? Visibility.Collapsed : Visibility.Visible;
+
+        public void LoadImage(ToolInvokeDesc toolInvokeDesc)
+        {
+            _toolInvokeDesc = toolInvokeDesc;
+            LoadImage(_toolInvokeDesc.SelectedEntry.Stream);
+        }
 
         public void LoadImage(string fileName)
         {

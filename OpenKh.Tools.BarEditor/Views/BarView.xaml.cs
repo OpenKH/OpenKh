@@ -1,19 +1,10 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.BarEditor.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.IO;
+using OpenKh.Tools.Common;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Windows.Markup;
 
 namespace OpenKh.Tools.BarEditor.Views
 {
@@ -22,38 +13,38 @@ namespace OpenKh.Tools.BarEditor.Views
 	/// </summary>
 	public partial class BarView : Window
 	{
-		public BarView() :
-			this(new object[0])
-		{ }
-
-		public BarView(params object[] args)
+		public BarView()
 		{
 			InitializeComponent();
-			
-			if (args.Length > 0)
-			{
-				if (args[0] is Stream stream)
-				{
-					DataContext = new BarViewModel(stream);
-				}
-				else if (args[0] is string)
-				{
-					using (var fStream = File.Open(args[0].ToString(), FileMode.Open))
-					{
-						DataContext = new BarViewModel(Bar.Read(fStream));
-					}
-				}
-			}
-			else
-			{
-				DataContext = new BarViewModel();
-			}
-		}
+            DataContext = new BarViewModel();
+        }
+
+        public BarView(ToolInvokeDesc desc) :
+            base()
+        {
+            var vm = DataContext as BarViewModel;
+            DataContext = new BarViewModel(desc);
+        }
 
 		private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			var vm = DataContext as BarViewModel;
 			vm.OpenItemCommand.Execute(vm.SelectedItem);
 		}
-	}
+
+        private void Window_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var files = e.Data.GetData(DataFormats.FileDrop) as string[];
+                var fileName = files?.FirstOrDefault();
+                if (string.IsNullOrEmpty(fileName))
+                    return;
+
+                var vm = DataContext as BarViewModel;
+                vm.OpenFileName(fileName);
+                vm.FileName = fileName;
+            }
+        }
+    }
 }
