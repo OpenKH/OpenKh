@@ -11,7 +11,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
         /// </summary>
         /// <param name="matrixIndexList">The limited count of matrices are transferred to VU1 due to memory limitation.</param>
         /// <returns></returns>
-        public static MiddleMesh Run(byte[] vu1mem, Matrix[] matrices, int tops, int top2, int textureIndex, int[] matrixIndexList, Matrix projectionMatrix)
+        public static ImmutableMesh Run(byte[] vu1mem, Matrix[] matrices, int tops, int top2, int textureIndex, int[] matrixIndexList)
         {
             MemoryStream si = new MemoryStream(vu1mem, true);
             BinaryReader br = new BinaryReader(si);
@@ -74,12 +74,11 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 vertexCountPerMatrix[x] = br.ReadInt32();
             }
 
-            MiddleMesh mesh = new MiddleMesh();
+            ImmutableMesh mesh = new ImmutableMesh();
             mesh.textureIndex = textureIndex;
-            mesh.rawPositionList = new Vector4[vpu.VertexCount];
-            mesh.assignedJointsList = new JointAssignment[vpu.VertexCount][];
+            mesh.vertexAssignmentsList = new VertexAssignment[vpu.VertexCount][];
 
-            JointAssignment[] jointAssignmentList = new JointAssignment[vpu.VertexCount];
+            VertexAssignment[] vertexAssignmentList = new VertexAssignment[vpu.VertexCount];
 
             int vertexIndex = 0;
             si.Position = 16 * (tops + vpu.VertexLocation);
@@ -93,20 +92,19 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     float zPos = br.ReadSingle();
                     float weight = br.ReadSingle();
                     Vector4 v4 = new Vector4(xPos, yPos, zPos, weight);
-                    mesh.rawPositionList[vertexIndex] = Vector4.Transform(v4, projectionMatrix);
-                    mesh.assignedJointsList[vertexIndex] = new JointAssignment[] { 
-                        jointAssignmentList[vertexIndex] = new JointAssignment(matrixIndexList[indexToMatrixIndex], vertexIndex, weight)
+                    mesh.vertexAssignmentsList[vertexIndex] = new VertexAssignment[] {
+                        vertexAssignmentList[vertexIndex] = new VertexAssignment{
+                            matrixIndex = matrixIndexList[indexToMatrixIndex],
+                            weight = weight,
+                            rawPos = v4,
+                        }
                     };
 
                     vertexIndex++;
                 }
             }
 
-            mesh.uvList = new Vector2[vpu.IndexCount];
-            mesh.vertexIndexMappingList = new int[vpu.IndexCount];
-            mesh.vertexFlagList = new int[vpu.IndexCount];
-
-            int minIndex = int.MaxValue, maxIndex = int.MinValue;
+            mesh.indexAssignmentList = new IndexAssignment[vpu.IndexCount];
 
             si.Position = 16 * (tops + vpu.IndexLocation);
             for (int x = 0; x < vpu.IndexCount; x++)
@@ -116,15 +114,16 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 int texV = br.ReadUInt16() / 16;
                 br.ReadUInt16(); // skip
 
-                mesh.uvList[x] = new Vector2(texU / 256.0f, texV / 256.0f);
-
-                int localVertexIndex = mesh.vertexIndexMappingList[x] = br.ReadUInt16(); 
+                var localVertexIndex = br.ReadUInt16();
                 br.ReadUInt16(); // skip
-                mesh.vertexFlagList[x] = br.ReadUInt16(); 
+                var vertexFlag = br.ReadUInt16();
                 br.ReadUInt16(); // skip
 
-                minIndex = Math.Min(minIndex, localVertexIndex);
-                maxIndex = Math.Max(maxIndex, localVertexIndex);
+                mesh.indexAssignmentList[x] = new IndexAssignment(
+                    new Vector2(texU / 256.0f, texV / 256.0f),
+                    localVertexIndex,
+                    vertexFlag
+                );
             }
 
             if (cntVertexMixer != 0)
@@ -143,12 +142,12 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     br.ReadInt32();
                 }
 
-                JointAssignment[][] jointAssignmentNewList = new JointAssignment[vpu.VertexCount][];
+                VertexAssignment[][] newVertexAssignList = new VertexAssignment[vpu.VertexCount][];
                 int inputVertexIndex = 0;
-                for (inputVertexIndex = 0; inputVertexIndex < cntSkip; inputVertexIndex++)
+                for (; inputVertexIndex < cntSkip; inputVertexIndex++)
                 {
                     int index = br.ReadInt32();
-                    jointAssignmentNewList[inputVertexIndex] = (new JointAssignment[] { jointAssignmentList[index] });
+                    newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[index] });
                 }
                 if (cntVertexMixer >= 2)
                 {
@@ -160,7 +159,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     {
                         int vertex1 = br.ReadInt32();
                         int vertex2 = br.ReadInt32();
-                        jointAssignmentNewList[inputVertexIndex] = (new JointAssignment[] { jointAssignmentList[vertex1], jointAssignmentList[vertex2] });
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[vertex1], vertexAssignmentList[vertex2] });
                     }
                 }
                 if (cntVertexMixer >= 3)
@@ -174,7 +173,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         int vertex1 = br.ReadInt32();
                         int vertex2 = br.ReadInt32();
                         int vertex3 = br.ReadInt32();
-                        jointAssignmentNewList[inputVertexIndex] = (new JointAssignment[] { jointAssignmentList[vertex1], jointAssignmentList[vertex2], jointAssignmentList[vertex3] });
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[vertex1], vertexAssignmentList[vertex2], vertexAssignmentList[vertex3] });
                     }
                 }
                 if (cntVertexMixer >= 4)
@@ -189,7 +188,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         int vertex2 = br.ReadInt32();
                         int vertex3 = br.ReadInt32();
                         int vertex4 = br.ReadInt32();
-                        jointAssignmentNewList[inputVertexIndex] = (new JointAssignment[] { jointAssignmentList[vertex1], jointAssignmentList[vertex2], jointAssignmentList[vertex3], jointAssignmentList[vertex4] });
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[vertex1], vertexAssignmentList[vertex2], vertexAssignmentList[vertex3], vertexAssignmentList[vertex4] });
                     }
                 }
                 if (cntVertexMixer >= 5)
@@ -203,21 +202,16 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         int vertex3 = br.ReadInt32();
                         int vertex4 = br.ReadInt32();
                         int vertex5 = br.ReadInt32();
-                        jointAssignmentNewList[inputVertexIndex] = (new JointAssignment[] { jointAssignmentList[vertex1], jointAssignmentList[vertex2], jointAssignmentList[vertex3], jointAssignmentList[vertex4], jointAssignmentList[vertex5] });
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[vertex1], vertexAssignmentList[vertex2], vertexAssignmentList[vertex3], vertexAssignmentList[vertex4], vertexAssignmentList[vertex5] });
                     }
                 }
                 if (cntVertexMixer >= 6)
                 {
                     throw new NotSupportedException("cntVertexMixer is too high: " + cntVertexMixer);
                 }
-                for (int index = minIndex; index <= maxIndex; index++)
-                {
-                    if (jointAssignmentNewList[index] == null)
-                    {
-                        throw new Exception($"jointAssignmentMap {index} is null");
-                    }
-                }
-                mesh.assignedJointsList = jointAssignmentNewList;
+
+                // if cntVertexMixer >= 1, replace current vertexAssignmentList with regrouped list.
+                mesh.vertexAssignmentsList = newVertexAssignList;
             }
 
             return mesh;

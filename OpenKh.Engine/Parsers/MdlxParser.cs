@@ -1,4 +1,5 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Engine.Maths;
+using OpenKh.Kh2;
 using System.Linq;
 
 namespace OpenKh.Engine.Parsers
@@ -64,7 +65,10 @@ namespace OpenKh.Engine.Parsers
 
         private static Kddf2.Kkdf2MdlxParser FromEntity(Mdlx mdlx)
         {
-            var parser = new Kddf2.Kkdf2MdlxParser(mdlx.SubModels);
+            var parser = new Kddf2.Kkdf2MdlxParser(mdlx.SubModels.First())
+                .BuildTPoseMatrices(mdlx.SubModels.First(), Matrix.Identity)
+                .ProcessVerticesAndBuildModel();
+
             var ci = parser.Models.Values.Select((model, i) => new Kddf2.Kkdf2MdlxParser.CI
             {
                 Indices = model.Vertices.Select((_, index) => index).ToArray(),
