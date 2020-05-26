@@ -173,7 +173,11 @@ namespace OpenKh.Game.States
 
         private void LoadMap(int worldIndex, int placeIndex)
         {
-            var fileName = $"map/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
+            string fileName;
+            if (_kernel.IsReMix)
+                fileName = $"map/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
+            else
+                fileName = $"map/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
 
             _archiveManager.LoadArchive(fileName);
             AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP", "MAP"));
