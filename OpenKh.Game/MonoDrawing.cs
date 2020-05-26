@@ -67,7 +67,7 @@ namespace OpenKh.Game
         private readonly BlendState _blendState;
         private readonly SamplerState _samplerState;
         private readonly RasterizerState _rasterizerState;
-
+        private readonly DepthStencilState _depthStencilState;
         private readonly VertexBuffer _vertexBuffer;
         private readonly IndexBuffer _indexBuffer;
         private readonly MyVertex[] _vertices;
@@ -101,6 +101,10 @@ namespace OpenKh.Game
                 CullMode = CullMode.None,
                 ScissorTestEnable = false,
                 DepthClipEnable = false,
+            };
+            _depthStencilState = new DepthStencilState()
+            {
+                DepthBufferEnable = false
             };
 
             _effect = contentManager.Load<Effect>("KingdomShader");
@@ -193,6 +197,7 @@ namespace OpenKh.Game
             GraphicsDevice.SamplerStates[0] = _samplerState;
             GraphicsDevice.RasterizerState = _rasterizerState;
             GraphicsDevice.BlendState = _blendState;
+            GraphicsDevice.DepthStencilState = _depthStencilState;
             GraphicsDevice.SetVertexBuffer(_vertexBuffer);
             GraphicsDevice.Indices = _indexBuffer;
 
