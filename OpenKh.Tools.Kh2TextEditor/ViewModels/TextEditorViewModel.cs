@@ -1,17 +1,14 @@
-﻿using OpenKh.Kh2;
-using OpenKh.Kh2.Contextes;
+﻿using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
-using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.Kh2TextEditor.Interfaces;
 using OpenKh.Tools.Kh2TextEditor.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using Xe.Drawing;
 using Xe.Tools;
-using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 {
@@ -23,7 +20,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private MessageModel _selectedItem;
         private string _currentText;
         private string _searchTerm;
-        private KingdomTextContext textContext;
+        private RenderingMessageContext textContext;
         private bool _showErrors;
 
         public List<Msg.Entry> MessageEntries
@@ -84,7 +81,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }
         }
 
-        public KingdomTextContext TextContext
+        public RenderingMessageContext TextContext
         {
             get => textContext;
             set

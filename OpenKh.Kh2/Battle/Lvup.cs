@@ -3,13 +3,13 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
-namespace OpenKh.Kh2
+namespace OpenKh.Kh2.Battle
 {
     public static class Lvup
     {
         private static byte[] _header;
 
-        public static List<PlayableCharacter> Open(Stream stream)
+        public static List<PlayableCharacter> Read(Stream stream)
         {
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
@@ -25,7 +25,7 @@ namespace OpenKh.Kh2
                 .ToList();
         }
 
-        public static void Save(Stream stream, IEnumerable<PlayableCharacter> characters)
+        public static void Write(Stream stream, IEnumerable<PlayableCharacter> characters)
         {
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");

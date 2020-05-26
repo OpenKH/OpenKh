@@ -6,18 +6,6 @@ namespace OpenKh.Kh2.Battle
 {
     public class Fmlv
     {
-        private class Header
-        {
-            [Data] public int MagicCode { get; set; }
-            [Data] public int Count { get => Items.TryGetCount(); set => Items = Items.CreateOrResize(value); }
-            [Data] public List<Level> Items { get; set; }
-        }
-
-        private readonly Header _header;
-
-        public List<Level> Levels => _header.Items;
-        public int Count => _header.Count;
-
         public enum FormVanilla
         {
             Summon,
@@ -37,6 +25,7 @@ namespace OpenKh.Kh2.Battle
             Final,
             AntiForm
         }
+
         public class Level
         {
             [Data] public byte Unk0 { get; set; }
@@ -72,15 +61,12 @@ namespace OpenKh.Kh2.Battle
                 $"{FormFm} {FormLevel}: EXP {Exp}, Ability {Ability:X04} Lv. {LevelMovementAbility}";
         }
 
-        public Fmlv(Stream stream)
-        {
-            BinaryMapping.SetMemberLengthMapping<Header>(nameof(Header.Items), (o, m) => o.Count);
-            _header = BinaryMapping.ReadObject<Header>(stream);
-        }
+        public static List<Level> Read(Stream stream) => BaseTable<Level>.Read(stream).Items;
 
-        public void Write(Stream stream)
+        public static void Write(Stream stream, List<Level> items) => new BaseTable<Level>()
         {
-            BinaryMapping.WriteObject(stream, _header);
-        }
+            Id = 2,
+            Items = items
+        }.Write(stream);
     }
 }

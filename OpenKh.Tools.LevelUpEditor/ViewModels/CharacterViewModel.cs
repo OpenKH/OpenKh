@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Kh2.Battle;
 using System.Collections.ObjectModel;
 using Xe.Tools;
 

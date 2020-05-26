@@ -43,35 +43,35 @@ namespace OpenKh.Tools.LayoutViewer.Models
 
         public float Unknown10
         {
-            get => frame.Unknown10;
-            set => frame.Unknown10 = value;
+            get => frame.UTranslation;
+            set => frame.UTranslation = value;
         }
 
         public float Unknown14
         {
-            get => frame.Unknown14;
-            set => frame.Unknown14 = value;
+            get => frame.VTranslation;
+            set => frame.VTranslation = value;
         }
 
-        public int ColorLeft
+        public uint ColorLeft
         {
             get => frame.ColorLeft;
             set => frame.ColorLeft = value;
         }
 
-        public int ColorTop
+        public uint ColorTop
         {
             get => frame.ColorTop;
             set => frame.ColorTop = value;
         }
 
-        public int ColorRight
+        public uint ColorRight
         {
             get => frame.ColorRight;
             set => frame.ColorRight = value;
         }
 
-        public int ColorBottom
+        public uint ColorBottom
         {
             get => frame.ColorBottom;
             set => frame.ColorBottom = value;

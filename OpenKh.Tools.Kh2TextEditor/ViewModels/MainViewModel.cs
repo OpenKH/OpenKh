@@ -3,8 +3,6 @@ using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Extensions;
-using OpenKh.Tools.Common.Models;
-using OpenKh.Tools.Common.Extensions;
 using OpenKh.Tools.Kh2TextEditor.Types;
 using System;
 using System.Collections.Generic;
@@ -18,6 +16,8 @@ using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using OpenKh.Tools.Kh2TextEditor.Services;
 using System.Text;
+using OpenKh.Engine.Renders;
+using OpenKh.Engine.Extensions;
 
 namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 {
@@ -307,7 +307,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }
         }
 
-        private void OpenFontImageFile(string fileName) => File.OpenRead(fileName).Using(stream =>
+        public void OpenFontImageFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             if (Bar.IsValid(stream))
             {
@@ -321,7 +321,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             throw new NotImplementedException();
         }
 
-        private void OpenFontInfoFile(string fileName) => File.OpenRead(fileName).Using(stream =>
+        public void OpenFontInfoFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             if (Bar.IsValid(stream))
             {
@@ -337,7 +337,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
         private void InvalidateFontContext()
         {
-            KingdomTextContext context;
+            RenderingMessageContext context;
 
             switch (EncodingType)
             {

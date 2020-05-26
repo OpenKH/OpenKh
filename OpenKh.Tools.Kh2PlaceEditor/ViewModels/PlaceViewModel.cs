@@ -45,7 +45,7 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
             set => Place.Name = Encoding.GetBytes(value);
         }
 
-        public string Message => _messageProvider.GetMessage(Place.MessageId);
+        public string Message => _messageProvider.GetString(Place.MessageId);
 
         public void RefreshMessages()
         {

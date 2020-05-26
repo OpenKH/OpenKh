@@ -1,4 +1,5 @@
 ﻿using OpenKh.Kh2;
+using OpenKh.Kh2.Battle;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,7 +49,7 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
                     var lvup = entries?.Where(e => e.Name == "lvup").First() ?? null;
 
                     stream.Position = 0;
-                    Lvup.Save(stream, Characters.Items.Select(c => c.Character));
+                    Lvup.Write(stream, Characters.Items.Select(c => c.Character));
 
                     lvup.Stream = stream;
 
@@ -74,7 +75,7 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
 
         public LvupViewModel(Stream stream)
         {
-            Characters = new CharactersViewModel(Lvup.Open(stream));
+            Characters = new CharactersViewModel(Lvup.Read(stream));
             OnPropertyChanged(nameof(Characters));
         }
 
@@ -92,7 +93,7 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
                     {
                         FileName = fileName;
                         stream = ent.Stream;
-                        Characters = new CharactersViewModel(Lvup.Open(stream));
+                        Characters = new CharactersViewModel(Lvup.Read(stream));
                         Characters.SelectedItem = Characters.Items[0];
                         OnPropertyChanged(nameof(Characters));
 

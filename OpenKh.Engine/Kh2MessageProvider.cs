@@ -7,34 +7,28 @@ namespace OpenKh.Engine
 {
     public class Kh2MessageProvider : IMessageProvider
     {
-        private List<Msg.Entry> _messages;
+        private Dictionary<int, byte[]> _messages = new Dictionary<int, byte[]>();
 
         public IMessageEncoder Encoder { get; set; } = Encoders.InternationalSystem;
 
-        public string GetMessage(ushort id)
+        public byte[] GetMessage(ushort id)
         {
-            var message = _messages?.FirstOrDefault(x => x.Id == (id & 0x7fff));
-            if (message == null)
-            {
-                if (id == Msg.FallbackMessage)
-                    return null;
+            if (_messages.TryGetValue(id & 0x7fff, out var data))
+                return data;
 
-                return GetMessage(Msg.FallbackMessage);
-            }
+            if (_messages.TryGetValue(Msg.FallbackMessage, out data))
+                return data;
 
-            return MsgSerializer.SerializeText(Encoder.Decode(message.Data));
+            return new byte[0];
         }
 
-        public void SetMessage(ushort id, string text)
-        {
-            var message = _messages?.FirstOrDefault(x => x.Id == (id & 0x7fff));
-            if (message == null)
-                return;
+        public string GetString(ushort id) =>
+            MsgSerializer.SerializeText(Encoder.Decode(GetMessage(id)));
 
-            message.Data = Encoder.Encode(MsgSerializer.DeserializeText(text).ToList());
-        }
+        public void SetString(ushort id, string text) =>
+            _messages[id] = Encoder.Encode(MsgSerializer.DeserializeText(text).ToList());
 
         public void Load(List<Msg.Entry> entries) =>
-            _messages = entries;
+            _messages = entries.ToDictionary(x => x.Id, x => x.Data);
     }
 }

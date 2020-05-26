@@ -34,12 +34,12 @@ namespace OpenKh.Kh2
             [Data] public int Top { get; set; }
             [Data] public int Right { get; set; }
             [Data] public int Bottom { get; set; }
-            [Data] public float Unknown10 { get; set; }
-            [Data] public float Unknown14 { get; set; }
-            [Data] public int ColorLeft { get; set; }
-            [Data] public int ColorTop { get; set; }
-            [Data] public int ColorRight { get; set; }
-            [Data] public int ColorBottom { get; set; }
+            [Data] public float UTranslation { get; set; }
+            [Data] public float VTranslation { get; set; }
+            [Data] public uint ColorLeft { get; set; }
+            [Data] public uint ColorTop { get; set; }
+            [Data] public uint ColorRight { get; set; }
+            [Data] public uint ColorBottom { get; set; }
         }
 
         public class FrameEx
@@ -84,17 +84,17 @@ namespace OpenKh.Kh2
             [Data] public float ScaleYStart { get; set; }
             [Data] public float ScaleYEnd { get; set; }
             [Data] public int Unknown60 { get; set; }
-            [Data] public int Unknown64 { get; set; }
+            [Data] public float Unknown64 { get; set; }
             [Data] public int Unknown68 { get; set; }
-            [Data] public int Unknown6c { get; set; }
+            [Data] public float Unknown6c { get; set; }
             [Data] public int BounceXStart { get; set; }
             [Data] public int BounceXEnd { get; set; }
             [Data] public int BounceYStart { get; set; }
             [Data] public int BounceYEnd { get; set; }
             [Data] public int Unknwon80 { get; set; }
             [Data] public int ColorBlend { get; set; }
-            [Data] public int ColorStart { get; set; }
-            [Data] public int ColorEnd { get; set; }
+            [Data] public uint ColorStart { get; set; }
+            [Data] public uint ColorEnd { get; set; }
         }
 
         public class AnimationGroup

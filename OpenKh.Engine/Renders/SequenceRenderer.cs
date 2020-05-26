@@ -37,7 +37,7 @@ namespace OpenKh.Engine.Renderers
             };
         }
 
-        private const int SincInterpolationFlag = 0x00000001;
+        private const int LinearInterpolationFlag = 0x00000001;
         private const int ScalingFlag = 0x00000040;
         private const int ColorMaskingFlag = 0x00000400;
         private const int ColorInterpolationFlag = 0x00000080;
@@ -88,7 +88,7 @@ namespace OpenKh.Engine.Renderers
 
         private void DrawAnimation(Context contextParent, Sequence.Animation animation)
         {
-            // 0000 0001 = (0 = SINC INTERPOLATION, 1 = LINEAR INTERPOLATION)
+            // 0000 0001 = (0 = CUBIC INTERPOLATION, 1 = LINEAR INTERPOLATION)
             // 0000 0008 = (0 = BOUNCING START FROM CENTER, 1 = BOUNCING START FROM X / MOVE FROM Y)
             // 0000 0010 = (0 = ENABLE BOUNCING, 1 = IGNORE BOUNCING)
             // 0000 0020 = (0 = ENABLE ROTATION, 1 = IGNORE ROTATION)
@@ -101,13 +101,15 @@ namespace OpenKh.Engine.Renderers
                 return;
 
             var context = contextParent.Clone();
-            var delta = (float)(context.FrameIndex - animation.FrameStart) / (animation.FrameEnd - animation.FrameStart);
+            var delta = (double)(context.FrameIndex - animation.FrameStart) / (animation.FrameEnd - animation.FrameStart);
+            
             float t;
 
-            if ((animation.Flags & SincInterpolationFlag) != 0)
-                t = delta;
+            // loc_23B030
+            if ((animation.Flags & LinearInterpolationFlag) != 0)
+                t = (float)delta;
             else
-                t = (float)Math.Sin(delta * Math.PI / 2);
+                t = (float)(delta * delta * delta);
 
             context.PositionX += Lerp(t, animation.Xa0, animation.Xa1);
             context.PositionY += Lerp(t, animation.Ya0, animation.Ya1);
@@ -193,11 +195,12 @@ namespace OpenKh.Engine.Renderers
                 a.B * b.B,
                 a.A * b.A);
 
-        private static ColorF ConvertColor(int color) => new ColorF(
+        private static ColorF ConvertColor(uint color) => new ColorF(
             ((color >> 0) & 0xFF) / 128.0f,
             ((color >> 8) & 0xFF) / 128.0f,
             ((color >> 16) & 0xFF) / 128.0f,
             ((color >> 24) & 0xFF) / 128.0f);
+
         private static float Lerp(float m, float x1, float x2) => (x1 * (1.0f - m) + x2 * m);
         private static double Lerp(double m, double x1, double x2) => (x1 * (1.0 - m) + x2 * m);
         private static ColorF Lerp(double m, ColorF x1, ColorF x2) => new ColorF(
