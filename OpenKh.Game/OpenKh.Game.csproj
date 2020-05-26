@@ -26,4 +26,10 @@
     <Folder Include="Content\bin\DesktopGL\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="RawData\ee.mset.ram.bin.gz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
