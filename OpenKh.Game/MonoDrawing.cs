@@ -60,9 +60,16 @@ namespace OpenKh.Game
             }
         }
 
-        private readonly Effect _effect;
+        private const int MaxSpriteCountPerDraw = 8000; // This size should be enough to pack enough 2D graphics at once
         private readonly EffectParameter _parameterWorldViewProjection;
         private readonly EffectParameter _parameterTexture0;
+        private readonly Effect _effect;
+
+        private readonly VertexBuffer _vertexBuffer;
+        private readonly IndexBuffer _indexBuffer;
+        private readonly MyVertex[] _vertices;
+        private Texture2D _texture;
+        private int _currentSpriteIndex;
 
         public xnaf.Matrix WorldViewProjection
         {
@@ -83,6 +90,11 @@ namespace OpenKh.Game
             _effect = contentManager.Load<Effect>("KingdomShader");
             _parameterTexture0 = _effect.Parameters["Texture0"];
             _parameterWorldViewProjection = _effect.Parameters["WorldViewProjection"];
+
+            _vertexBuffer = new VertexBuffer(graphicsDevice, MyVertex.VertexDeclaration, MaxSpriteCountPerDraw * 4, BufferUsage.WriteOnly);
+            _indexBuffer = CreateIndexBufferForSprites(graphicsDevice, MaxSpriteCountPerDraw);
+            _vertices = new MyVertex[MaxSpriteCountPerDraw * 4];
+            _currentSpriteIndex = 0;
         }
 
         public GraphicsDevice GraphicsDevice { get; }
@@ -119,6 +131,8 @@ namespace OpenKh.Game
         
         public void Dispose()
         {
+            _indexBuffer?.Dispose();
+            _effect?.Dispose();
         }
 
         public void DrawRectangle(RectangleF rect, Color color, float width = 1)
@@ -147,18 +161,23 @@ namespace OpenKh.Game
             var tw = 1.0f / texture.Width;
             var th = 1.0f / texture.Height;
 
-            var indices = new int[] { 0, 1, 2, 1, 2, 3 };
-            var vertices = new MyVertex[]
-            {
-                new MyVertex(new xnaf.Vector3(dst.Left, dst.Top, 0.0f), ToXnaColor(color0), new xnaf.Vector2(src.Left * tw, src.Top * th)),
-                new MyVertex(new xnaf.Vector3(dst.Right, dst.Top, 0.0f), ToXnaColor(color1), new xnaf.Vector2(src.Right * tw, src.Top * th)),
-                new MyVertex(new xnaf.Vector3(dst.Left, dst.Bottom, 0.0f), ToXnaColor(color2), new xnaf.Vector2(src.Left * tw, src.Bottom * th)),
-                new MyVertex(new xnaf.Vector3(dst.Right, dst.Bottom, 0.0f), ToXnaColor(color3), new xnaf.Vector2(src.Right * tw, src.Bottom * th)),
-            };
+            var vertexIndex = PrepareVertices(texture);
+            _vertices[vertexIndex + 0] = new MyVertex(new xnaf.Vector3(dst.Left, dst.Top, 0.0f), ToXnaColor(color0), new xnaf.Vector2(src.Left * tw, src.Top * th));
+            _vertices[vertexIndex + 1] = new MyVertex(new xnaf.Vector3(dst.Right, dst.Top, 0.0f), ToXnaColor(color1), new xnaf.Vector2(src.Right * tw, src.Top * th));
+            _vertices[vertexIndex + 2] = new MyVertex(new xnaf.Vector3(dst.Left, dst.Bottom, 0.0f), ToXnaColor(color2), new xnaf.Vector2(src.Left * tw, src.Bottom * th));
+            _vertices[vertexIndex + 3] = new MyVertex(new xnaf.Vector3(dst.Right, dst.Bottom, 0.0f), ToXnaColor(color3), new xnaf.Vector2(src.Right * tw, src.Bottom * th));
+            PushVertices();
+        }
 
+        public void Flush()
+        {
+            if (_currentSpriteIndex <= 0)
+                return;
+
+            _vertexBuffer.SetData(_vertices);
             foreach (var pass in _effect.CurrentTechnique.Passes)
             {
-                Texture0 = texture;
+                Texture0 = _texture;
                 WorldViewProjection = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
                 pass.Apply();
 
@@ -167,19 +186,54 @@ namespace OpenKh.Game
                     CullMode = CullMode.None,
                 };
 
-                GraphicsDevice.DrawUserIndexedPrimitives(
-                    PrimitiveType.TriangleList,
-                    vertices,
-                    0,
-                    vertices.Length,
-                    indices,
-                    0,
-                    indices.Length / 3);
+                GraphicsDevice.SetVertexBuffer(_vertexBuffer);
+                GraphicsDevice.Indices = _indexBuffer;
+                GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _currentSpriteIndex * 2);
             }
+
+            _currentSpriteIndex = 0;
+        }
+        
+        private int PrepareVertices(Texture2D texture)
+        {
+            if (_texture != texture)
+            {
+                Flush();
+                _texture = texture;
+            }
+
+            if (_currentSpriteIndex >= MaxSpriteCountPerDraw)
+                Flush();
+
+            return _currentSpriteIndex++ * 4;
         }
 
-        public void Flush()
+        private void PushVertices()
         {
+            // right now it does not do anything.
+        }
+
+        private static IndexBuffer CreateIndexBufferForSprites(GraphicsDevice graphicsDevice, int spriteCount)
+        {
+            var indexBuffer =  new IndexBuffer(graphicsDevice, IndexElementSize.ThirtyTwoBits, spriteCount * 6, BufferUsage.WriteOnly);
+            var indices = new int[spriteCount * 6];
+            for (
+                int spriteIndex = 0, vertexIndex = 0;
+                spriteIndex < spriteCount;
+                spriteIndex++, vertexIndex += 4)
+            {
+                var i = spriteIndex * 6;
+                indices[i + 0] = vertexIndex + 0;
+                indices[i + 1] = vertexIndex + 1;
+                indices[i + 2] = vertexIndex + 2;
+                indices[i + 3] = vertexIndex + 1;
+                indices[i + 4] = vertexIndex + 2;
+                indices[i + 5] = vertexIndex + 3;
+            }
+
+            indexBuffer.SetData(indices);
+
+            return indexBuffer;
         }
 
         private static xnaf.Rectangle ToXnaRectangle(Rectangle rectangle) =>

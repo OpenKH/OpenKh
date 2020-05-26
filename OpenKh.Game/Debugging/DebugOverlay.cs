@@ -90,6 +90,7 @@ namespace OpenKh.Game.Debugging
             DebugDraw(this);
             if (!_overrideExternalDebugFeatures)
                 OnDraw?.Invoke(this);
+            _drawing.Flush();
 
             // small hack: see first comment of the method
             _graphics.GraphicsDevice.BlendState = blendState;

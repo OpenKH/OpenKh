@@ -236,6 +236,8 @@ namespace OpenKh.Game.States
 
             if (_isInTheaterMenu)
                 layoutRendererTheater.Draw();
+
+            drawing.Flush();
         }
 
         private void ProcessInputMainMenu()
