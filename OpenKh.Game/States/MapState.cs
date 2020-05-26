@@ -99,7 +99,45 @@ namespace OpenKh.Game.States
                             if (_shader.Texture0 != texture.Texture2D)
                             {
                                 _shader.Texture0 = texture.Texture2D;
-                                _shader.TextureRegion = texture.Region;
+                                switch (texture.ModelTexture.TextureAddressMode.AddressU)
+                                {
+                                    case ModelTexture.TextureWrapMode.Clamp:
+                                        _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
+                                        _shader.TextureWrapModeU = TextureWrapMode.Clamp;
+                                        break;
+                                    case ModelTexture.TextureWrapMode.Repeat:
+                                        _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
+                                        _shader.TextureWrapModeU = TextureWrapMode.Repeat;
+                                        break;
+                                    case ModelTexture.TextureWrapMode.RegionClamp:
+                                        _shader.TextureRegionU = texture.RegionU;
+                                        _shader.TextureWrapModeU = TextureWrapMode.Clamp;
+                                        break;
+                                    case ModelTexture.TextureWrapMode.RegionRepeat:
+                                        _shader.TextureRegionU = texture.RegionU;
+                                        _shader.TextureWrapModeU = TextureWrapMode.Repeat;
+                                        break;
+                                }
+                                switch (texture.ModelTexture.TextureAddressMode.AddressV)
+                                {
+                                    case ModelTexture.TextureWrapMode.Clamp:
+                                        _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
+                                        _shader.TextureWrapModeV = TextureWrapMode.Clamp;
+                                        break;
+                                    case ModelTexture.TextureWrapMode.Repeat:
+                                        _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
+                                        _shader.TextureWrapModeV = TextureWrapMode.Repeat;
+                                        break;
+                                    case ModelTexture.TextureWrapMode.RegionClamp:
+                                        _shader.TextureRegionV = texture.RegionU;
+                                        _shader.TextureWrapModeV = TextureWrapMode.Clamp;
+                                        break;
+                                    case ModelTexture.TextureWrapMode.RegionRepeat:
+                                        _shader.TextureRegionV = texture.RegionU;
+                                        _shader.TextureWrapModeV = TextureWrapMode.Repeat;
+                                        break;
+                                }
+
                                 pass.Apply();
                             }
                         }

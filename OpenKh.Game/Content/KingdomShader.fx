@@ -9,7 +9,10 @@
 
 matrix WorldView;
 matrix ProjectionView;
-float4 TextureRegion;
+float2 TextureRegionU;
+float2 TextureRegionV;
+int TextureWrapModeU;
+int TextureWrapModeV;
 Texture2D Texture0;
 
 sampler2D TextureSampler = sampler_state
@@ -31,20 +34,25 @@ struct VertexShaderOutput
 	float2 TextureUv : TEXCOORD0;
 };
 
-float2 RegionClamp(float2 textureCoord)
+float RegionClamp(float value, float valueMin, float valueMax)
 {
-	return float2(
-		min(max(textureCoord.x, TextureRegion.x), TextureRegion.z),
-		min(max(textureCoord.y, TextureRegion.y), TextureRegion.w)
-		);
+	return min(max(value, valueMin), valueMax);
 }
 
-float2 RegionRepeat(float2 textureCoord)
+float RegionRepeat(float value, float min, float max)
 {
-	return float2(
-		((textureCoord.x - TextureRegion.x) % (TextureRegion.z - TextureRegion.x)) + TextureRegion.x,
-		((textureCoord.y - TextureRegion.y) % (TextureRegion.w - TextureRegion.y)) + TextureRegion.y
-		);
+	return ((value - min) % (max - min)) + min;
+}
+
+float ApplyTextureWrap(float value, int mode, float min, float max) {
+	if (mode == 1) {
+		return RegionClamp(value, min, max);
+	}
+	else if (mode == 2) {
+		return RegionRepeat(value, min, max);
+	}
+
+	return 0.0f;
 }
 
 VertexShaderOutput MainVS(in VertexShaderInput input)
@@ -60,8 +68,12 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-	float4 tex = tex2D(TextureSampler, RegionRepeat(input.TextureUv));
-	return tex * input.Color;
+	float2 uv = float2(
+		ApplyTextureWrap(input.TextureUv.x, TextureWrapModeU, TextureRegionU.x, TextureRegionU.y),
+		ApplyTextureWrap(input.TextureUv.y, TextureWrapModeV, TextureRegionV.x, TextureRegionV.y)
+		);
+
+	return tex2D(TextureSampler, uv) * input.Color;
 }
 
 technique BasicColorDrawing

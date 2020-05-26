@@ -205,7 +205,10 @@ namespace OpenKh.Game
                 Texture0 = _texture;
                 ProjectionView = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
                 _shader.WorldView = xnaf.Matrix.Identity;
-                _shader.TextureRegion = new RectangleF(0, 0, 1, 1);
+                _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
+                _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
+                _shader.TextureWrapModeU = TextureWrapMode.Clamp;
+                _shader.TextureWrapModeV = TextureWrapMode.Clamp;
                 pass.Apply();
 
                 GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _currentSpriteIndex * 2);
