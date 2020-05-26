@@ -20,8 +20,6 @@ namespace OpenKh.Engine.Parsers.Kddf2
 
         public SortedDictionary<int, Model> Models { get; } = new SortedDictionary<int, Model>();
 
-        public Matrix[] Matrices;
-
         private readonly List<ImmutableMesh> immultableMeshList;
 
         /// <summary>
@@ -41,64 +39,16 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 };
                 unpacker.Run();
 
-                var mesh = VU1Simulation.Run(unpacker.Memory, Matrices, tops, top2, dmaVif.TextureIndex, dmaVif.Alaxi);
+                var mesh = VU1Simulation.Run(unpacker.Memory, tops, top2, dmaVif.TextureIndex, dmaVif.Alaxi);
                 immultableMeshList.Add(mesh);
             }
-        }
-
-        /// <summary>
-        /// Build intial T-pose matrices.
-        /// </summary>
-        public Kkdf2MdlxParser BuildTPoseMatrices(Mdlx.SubModel model, Matrix initialMatrix)
-        {
-            var boneList = model.Bones.ToArray();
-            Matrices = new Matrix[boneList.Length];
-            {
-                var absTranslationList = new Vector3[Matrices.Length];
-                var absRotationList = new Quaternion[Matrices.Length];
-                for (int x = 0; x < Matrices.Length; x++)
-                {
-                    Quaternion absRotation;
-                    Vector3 absTranslation;
-                    var oneBone = boneList[x];
-                    var parent = oneBone.Parent;
-                    if (parent < 0)
-                    {
-                        absRotation = Quaternion.Identity;
-                        absTranslation = Vector3.Zero;
-                    }
-                    else
-                    {
-                        absRotation = absRotationList[parent];
-                        absTranslation = absTranslationList[parent];
-                    }
-
-                    var localTranslation = Vector3.TransformCoordinate(new Vector3(oneBone.TranslationX, oneBone.TranslationY, oneBone.TranslationZ), Matrix.RotationQuaternion(absRotation));
-                    absTranslationList[x] = absTranslation + localTranslation;
-
-                    var localRotation = Quaternion.Identity;
-                    if (oneBone.RotationX != 0) localRotation *= (Quaternion.RotationAxis(new Vector3(1, 0, 0), oneBone.RotationX));
-                    if (oneBone.RotationY != 0) localRotation *= (Quaternion.RotationAxis(new Vector3(0, 1, 0), oneBone.RotationY));
-                    if (oneBone.RotationZ != 0) localRotation *= (Quaternion.RotationAxis(new Vector3(0, 0, 1), oneBone.RotationZ));
-                    absRotationList[x] = localRotation * absRotation;
-                }
-                for (int x = 0; x < Matrices.Length; x++)
-                {
-                    var absMatrix = initialMatrix;
-                    absMatrix *= Matrix.RotationQuaternion(absRotationList[x]);
-                    absMatrix *= Matrix.Translation(absTranslationList[x]);
-                    Matrices[x] = absMatrix;
-                }
-            }
-
-            return this;
         }
 
         /// <summary>
         /// Build final model using immutable parts and given matrices.
         /// </summary>
         /// <returns></returns>
-        public Kkdf2MdlxParser ProcessVerticesAndBuildModel()
+        public Kkdf2MdlxParser ProcessVerticesAndBuildModel(Matrix[] matrices)
         {
             var exportedMesh = new ExportedMesh();
 
@@ -153,7 +103,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                                     VCUt.V4To3(
                                         vertexAssigns[0].rawPos
                                     ),
-                                    Matrices[vertexAssigns[0].matrixIndex]
+                                    matrices[vertexAssigns[0].matrixIndex]
                                 );
                                 }
                                 else
@@ -164,7 +114,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                                         finalPos += VCUt.V4To3(
                                             Vector4.Transform(
                                                 vertexAssign.rawPos,
-                                                Matrices[vertexAssign.matrixIndex]
+                                                matrices[vertexAssign.matrixIndex]
                                             )
                                         );
                                     }
