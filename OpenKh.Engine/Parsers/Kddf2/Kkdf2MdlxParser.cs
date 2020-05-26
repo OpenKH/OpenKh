@@ -18,8 +18,6 @@ namespace OpenKh.Engine.Parsers.Kddf2
 
         public List<CI> MeshDescriptors { get; } = new List<CI>();
 
-        public SortedDictionary<int, Model> Models { get; } = new SortedDictionary<int, Model>();
-
         private readonly List<ImmutableMesh> immultableMeshList;
 
         /// <summary>
@@ -48,8 +46,10 @@ namespace OpenKh.Engine.Parsers.Kddf2
         /// Build final model using immutable parts and given matrices.
         /// </summary>
         /// <returns></returns>
-        public Kkdf2MdlxParser ProcessVerticesAndBuildModel(Matrix[] matrices)
+        public Kkdf2MdlxBuiltModel ProcessVerticesAndBuildModel(Matrix[] matrices)
         {
+            var models = new SortedDictionary<int, Model>();
+
             var exportedMesh = new ExportedMesh();
 
             {
@@ -135,16 +135,14 @@ namespace OpenKh.Engine.Parsers.Kddf2
             }
 
             {
-                Models.Clear();
-
                 int triangleRefCount = exportedMesh.triangleRefList.Count;
                 for (int triIndex = 0; triIndex < triangleRefCount; triIndex++)
                 {
                     TriangleRef triRef = exportedMesh.triangleRefList[triIndex];
                     Model model;
-                    if (Models.TryGetValue(triRef.textureIndex, out model) == false)
+                    if (models.TryGetValue(triRef.textureIndex, out model) == false)
                     {
-                        Models[triRef.textureIndex] = model = new Model();
+                        models[triRef.textureIndex] = model = new Model();
                     }
                     for (int i = 0; i < triRef.list.Length; i++)
                     {
@@ -156,7 +154,11 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 }
             }
 
-            return this;
+            return new Kkdf2MdlxBuiltModel
+            {
+                textureIndexBasedModelDict = models,
+                parser = this,
+            };
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using OpenKh.Engine.Maths;
 using OpenKh.Engine.Parsers.Kddf2;
 using OpenKh.Kh2;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OpenKh.Engine.Parsers
@@ -11,10 +13,10 @@ namespace OpenKh.Engine.Parsers
         {
             if (IsEntity(mdlx))
             {
-                var parser = FromEntity(mdlx);
+                var builtModel = FromEntity(mdlx);
                 Model = new Model
                 {
-                    Segments = parser.Models.Values.Select(x => new Model.Segment
+                    Segments = builtModel.textureIndexBasedModelDict.Values.Select(x => new Model.Segment
                     {
                         Vertices = x.Vertices.Select(vertex => new PositionColoredTextured
                         {
@@ -26,7 +28,7 @@ namespace OpenKh.Engine.Parsers
                             Color = vertex.Color
                         }).ToArray()
                     }).ToArray(),
-                    Parts = parser.MeshDescriptors.Select(x => new Model.Part
+                    Parts = builtModel.parser.MeshDescriptors.Select(x => new Model.Part
                     {
                         Indices = x.Indices,
                         SegmentIndex = x.SegmentIndex,
@@ -64,14 +66,15 @@ namespace OpenKh.Engine.Parsers
             }
         }
 
-        private static Kddf2.Kkdf2MdlxParser FromEntity(Mdlx mdlx)
+        private static Kkdf2MdlxBuiltModel FromEntity(Mdlx mdlx)
         {
-            var parser = new Kddf2.Kkdf2MdlxParser(mdlx.SubModels.First())
+            var parser = new Kddf2.Kkdf2MdlxParser(mdlx.SubModels.First());
+            var builtModel = parser
                 .ProcessVerticesAndBuildModel(
                     MdlxMatrixUtil.BuildTPoseMatrices(mdlx.SubModels.First(), Matrix.Identity)
                 );
 
-            var ci = parser.Models.Values.Select((model, i) => new Kddf2.Kkdf2MdlxParser.CI
+            var ci = builtModel.textureIndexBasedModelDict.Values.Select((model, i) => new Kddf2.Kkdf2MdlxParser.CI
             {
                 Indices = model.Vertices.Select((_, index) => index).ToArray(),
                 TextureIndex = i,
@@ -80,7 +83,7 @@ namespace OpenKh.Engine.Parsers
 
             parser.MeshDescriptors.AddRange(ci);
 
-            return parser;
+            return builtModel;
         }
 
         private static bool IsEntity(Mdlx mdlx) => mdlx.SubModels != null;
