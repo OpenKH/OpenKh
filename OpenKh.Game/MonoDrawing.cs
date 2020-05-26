@@ -64,6 +64,9 @@ namespace OpenKh.Game
         private readonly EffectParameter _parameterWorldViewProjection;
         private readonly EffectParameter _parameterTexture0;
         private readonly Effect _effect;
+        private readonly BlendState _blendState;
+        private readonly SamplerState _samplerState;
+        private readonly RasterizerState _rasterizerState;
 
         private readonly VertexBuffer _vertexBuffer;
         private readonly IndexBuffer _indexBuffer;
@@ -85,7 +88,20 @@ namespace OpenKh.Game
         public MonoDrawing(GraphicsDevice graphicsDevice, ContentManager contentManager)
         {
             GraphicsDevice = graphicsDevice;
-            GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+            _blendState = BlendState.NonPremultiplied;
+            _samplerState = new SamplerState
+            {
+                AddressU = TextureAddressMode.Clamp,
+                AddressV = TextureAddressMode.Clamp,
+                AddressW = TextureAddressMode.Clamp,
+                Filter = TextureFilter.Linear
+            };
+            _rasterizerState = new RasterizerState()
+            {
+                CullMode = CullMode.None,
+                ScissorTestEnable = false,
+                DepthClipEnable = false,
+            };
 
             _effect = contentManager.Load<Effect>("KingdomShader");
             _parameterTexture0 = _effect.Parameters["Texture0"];
@@ -173,6 +189,12 @@ namespace OpenKh.Game
         {
             if (_currentSpriteIndex <= 0)
                 return;
+            
+            GraphicsDevice.SamplerStates[0] = _samplerState;
+            GraphicsDevice.RasterizerState = _rasterizerState;
+            GraphicsDevice.BlendState = _blendState;
+            GraphicsDevice.SetVertexBuffer(_vertexBuffer);
+            GraphicsDevice.Indices = _indexBuffer;
 
             _vertexBuffer.SetData(_vertices);
             foreach (var pass in _effect.CurrentTechnique.Passes)
@@ -181,13 +203,6 @@ namespace OpenKh.Game
                 WorldViewProjection = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
                 pass.Apply();
 
-                GraphicsDevice.RasterizerState = new RasterizerState()
-                {
-                    CullMode = CullMode.None,
-                };
-
-                GraphicsDevice.SetVertexBuffer(_vertexBuffer);
-                GraphicsDevice.Indices = _indexBuffer;
                 GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _currentSpriteIndex * 2);
             }
 
