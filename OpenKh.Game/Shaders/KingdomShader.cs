@@ -7,22 +7,33 @@ namespace OpenKh.Game.Shaders
 {
     public class KingdomShader : IDisposable
     {
-        private readonly EffectParameter _parameterWorldViewProjection;
+        private readonly EffectParameter _worldViewParameter;
+        private readonly EffectParameter _projectionViewParameter;
         private readonly EffectParameter _parameterTexture0;
 
         public KingdomShader(ContentManager contentManager)
         {
             Effect = contentManager.Load<Effect>("KingdomShader");
+            _worldViewParameter = Effect.Parameters["WorldView"];
+            _projectionViewParameter = Effect.Parameters["ProjectionView"];
             _parameterTexture0 = Effect.Parameters["Texture0"];
-            _parameterWorldViewProjection = Effect.Parameters["WorldViewProjection"];
+
+            WorldView = Matrix.Identity;
+            ProjectionView = Matrix.Identity;
         }
 
         public Effect Effect { get; }
 
-        public Matrix WorldViewProjection
+        public Matrix WorldView
         {
-            get => _parameterWorldViewProjection.GetValueMatrix();
-            set => _parameterWorldViewProjection.SetValue(value);
+            get => _worldViewParameter.GetValueMatrix();
+            set => _worldViewParameter.SetValue(value);
+        }
+
+        public Matrix ProjectionView
+        {
+            get => _projectionViewParameter.GetValueMatrix();
+            set => _projectionViewParameter.SetValue(value);
         }
 
         public Texture2D Texture0

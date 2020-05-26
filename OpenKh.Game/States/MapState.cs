@@ -4,6 +4,7 @@ using OpenKh.Engine.Parsers;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
+using OpenKh.Game.Shaders;
 using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace OpenKh.Game.States
         private GraphicsDeviceManager _graphics;
         private InputManager _input;
         private List<Mesh> _models = new List<Mesh>();
-        private BasicEffect _effect;
+        private KingdomShader _shader;
         private Camera _camera;
 
         private int _worldId = 2;
@@ -31,7 +32,7 @@ namespace OpenKh.Game.States
             _archiveManager = initDesc.ArchiveManager;
             _graphics = initDesc.GraphicsDevice;
             _input = initDesc.InputManager;
-            _effect = new BasicEffect(_graphics.GraphicsDevice);
+            _shader = new KingdomShader(initDesc.ContentManager);
             _camera = new Camera()
             {
                 CameraPosition = new Vector3(0, 100, 200),
@@ -70,19 +71,17 @@ namespace OpenKh.Game.States
         {
             _camera.AspectRatio = _graphics.PreferredBackBufferWidth / (float)_graphics.PreferredBackBufferHeight;
 
-            _effect.VertexColorEnabled = true;
-            _effect.Projection = _camera.Projection;
-            _effect.World = _camera.World;
 
-            _effect.GraphicsDevice.RasterizerState = new RasterizerState()
+            _graphics.GraphicsDevice.RasterizerState = new RasterizerState()
             {
                 CullMode = CullMode.CullClockwiseFace
             };
-            _effect.GraphicsDevice.DepthStencilState = new DepthStencilState();
+            _graphics.GraphicsDevice.DepthStencilState = new DepthStencilState();
 
-
-            foreach (var pass in _effect.CurrentTechnique.Passes)
+            _shader.Pass(pass =>
             {
+                _shader.ProjectionView = _camera.Projection;
+                _shader.WorldView = _camera.World;
                 pass.Apply();
 
                 foreach (var mesh in _models)
@@ -97,10 +96,9 @@ namespace OpenKh.Game.States
                         if (textureIndex < mesh.Textures.Length)
                         {
                             var texture = mesh.Textures[textureIndex];
-                            if (_effect.Texture != texture)
+                            if (_shader.Texture0 != texture)
                             {
-                                _effect.Texture = texture;
-                                _effect.TextureEnabled = _effect.Texture != null;
+                                _shader.Texture0 = texture;
                                 pass.Apply();
                             }
                         }

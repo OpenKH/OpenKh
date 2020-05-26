@@ -74,10 +74,10 @@ namespace OpenKh.Game
         private Texture2D _texture;
         private int _currentSpriteIndex;
 
-        public xnaf.Matrix WorldViewProjection
+        public xnaf.Matrix ProjectionView
         {
-            get => _shader.WorldViewProjection;
-            set => _shader.WorldViewProjection = value;
+            get => _shader.ProjectionView;
+            set => _shader.ProjectionView = value;
         }
         public Texture2D Texture0
         {
@@ -203,7 +203,7 @@ namespace OpenKh.Game
             _shader.Pass(pass =>
             {
                 Texture0 = _texture;
-                WorldViewProjection = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
+                ProjectionView = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
                 pass.Apply();
 
                 GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _currentSpriteIndex * 2);
