@@ -129,11 +129,11 @@ namespace OpenKh.Game.States
                                         _shader.TextureWrapModeV = TextureWrapMode.Repeat;
                                         break;
                                     case ModelTexture.TextureWrapMode.RegionClamp:
-                                        _shader.TextureRegionV = texture.RegionU;
+                                        _shader.TextureRegionV = texture.RegionV;
                                         _shader.TextureWrapModeV = TextureWrapMode.Clamp;
                                         break;
                                     case ModelTexture.TextureWrapMode.RegionRepeat:
-                                        _shader.TextureRegionV = texture.RegionU;
+                                        _shader.TextureRegionV = texture.RegionV;
                                         _shader.TextureWrapModeV = TextureWrapMode.Repeat;
                                         break;
                                 }
