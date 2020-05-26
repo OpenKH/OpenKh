@@ -9,6 +9,7 @@
 
 matrix WorldView;
 matrix ProjectionView;
+float4 TextureRegion;
 Texture2D Texture0;
 
 sampler2D TextureSampler = sampler_state
@@ -30,6 +31,22 @@ struct VertexShaderOutput
 	float2 TextureUv : TEXCOORD0;
 };
 
+float2 RegionClamp(float2 textureCoord)
+{
+	return float2(
+		min(max(textureCoord.x, TextureRegion.x), TextureRegion.z),
+		min(max(textureCoord.y, TextureRegion.y), TextureRegion.w)
+		);
+}
+
+float2 RegionRepeat(float2 textureCoord)
+{
+	return float2(
+		((textureCoord.x - TextureRegion.x) % (TextureRegion.z - TextureRegion.x)) + TextureRegion.x,
+		((textureCoord.y - TextureRegion.y) % (TextureRegion.w - TextureRegion.y)) + TextureRegion.y
+		);
+}
+
 VertexShaderOutput MainVS(in VertexShaderInput input)
 {
 	VertexShaderOutput output = (VertexShaderOutput)0;
@@ -43,7 +60,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-	float4 tex = tex2D(TextureSampler, input.TextureUv);
+	float4 tex = tex2D(TextureSampler, RegionRepeat(input.TextureUv));
 	return tex * input.Color;
 }
 

@@ -96,9 +96,10 @@ namespace OpenKh.Game.States
                         if (textureIndex < mesh.Textures.Length)
                         {
                             var texture = mesh.Textures[textureIndex];
-                            if (_shader.Texture0 != texture)
+                            if (_shader.Texture0 != texture.Texture2D)
                             {
-                                _shader.Texture0 = texture;
+                                _shader.Texture0 = texture.Texture2D;
+                                _shader.TextureRegion = texture.Region;
                                 pass.Apply();
                             }
                         }
@@ -115,14 +116,15 @@ namespace OpenKh.Game.States
                         index = (index + 1) % mesh.Segments.Length;
                     }
                 }
-            }
+            });
         }
 
         private void BasicallyForceToReloadEverything()
         {
             _models.Clear();
             LoadMap(_worldId, _placeId);
-            LoadObjEntry(_objEntryId);
+            //LoadObjEntry("F_LM670_MATSU");
+            LoadObjEntry("P_EX100");
         }
 
         private void LoadObjEntry(string name)
@@ -209,7 +211,7 @@ namespace OpenKh.Game.States
                     SegmentId = part.SegmentIndex,
                     TextureId = part.TextureIndex
                 }).ToArray(),
-                Textures = textures?.Images?.Select(texture => texture.CreateTexture(graphics)).ToArray() ?? new Texture2D[0]
+                Textures = textures?.Images?.Select(texture => new KingdomTexture(texture, graphics)).ToArray() ?? new KingdomTexture[0]
             };
         }
 
