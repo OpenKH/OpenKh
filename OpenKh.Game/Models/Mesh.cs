@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Kh2;
 using System;
-using System.Drawing;
 
 namespace OpenKh.Game.Models
 {
@@ -19,13 +18,11 @@ namespace OpenKh.Game.Models
 
         public Vector2 RegionU => new Vector2(
             (float)Math.Min(ModelTexture.TextureAddressMode.Left, ModelTexture.TextureAddressMode.Right) / Texture2D.Width,
-            (float)Math.Max(ModelTexture.TextureAddressMode.Left, ModelTexture.TextureAddressMode.Right) / Texture2D.Width
-            );
+            (float)Math.Max(ModelTexture.TextureAddressMode.Left, ModelTexture.TextureAddressMode.Right) / Texture2D.Width);
 
         public Vector2 RegionV => new Vector2(
             (float)Math.Min(ModelTexture.TextureAddressMode.Top, ModelTexture.TextureAddressMode.Bottom) / Texture2D.Height,
-            (float)Math.Max(ModelTexture.TextureAddressMode.Top, ModelTexture.TextureAddressMode.Bottom) / Texture2D.Height
-            );
+            (float)Math.Max(ModelTexture.TextureAddressMode.Top, ModelTexture.TextureAddressMode.Bottom) / Texture2D.Height);
 
         public void Dispose()
         {
