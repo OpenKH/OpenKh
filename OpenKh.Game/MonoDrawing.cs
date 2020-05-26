@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Game.Shaders;
 using System.Drawing;
 using Xe.Drawing;
 
@@ -61,9 +62,8 @@ namespace OpenKh.Game
         }
 
         private const int MaxSpriteCountPerDraw = 8000; // This size should be enough to pack enough 2D graphics at once
-        private readonly EffectParameter _parameterWorldViewProjection;
-        private readonly EffectParameter _parameterTexture0;
-        private readonly Effect _effect;
+        private readonly KingdomShader _shader;
+
         private readonly BlendState _blendState;
         private readonly SamplerState _samplerState;
         private readonly RasterizerState _rasterizerState;
@@ -76,13 +76,13 @@ namespace OpenKh.Game
 
         public xnaf.Matrix WorldViewProjection
         {
-            get => _parameterWorldViewProjection.GetValueMatrix();
-            set => _parameterWorldViewProjection.SetValue(value);
+            get => _shader.WorldViewProjection;
+            set => _shader.WorldViewProjection = value;
         }
         public Texture2D Texture0
         {
-            get => _parameterTexture0.GetValueTexture2D();
-            set => _parameterTexture0.SetValue(value);
+            get => _shader.Texture0;
+            set => _shader.Texture0 = value;
         }
 
         public MonoDrawing(GraphicsDevice graphicsDevice, ContentManager contentManager)
@@ -107,9 +107,7 @@ namespace OpenKh.Game
                 DepthBufferEnable = false
             };
 
-            _effect = contentManager.Load<Effect>("KingdomShader");
-            _parameterTexture0 = _effect.Parameters["Texture0"];
-            _parameterWorldViewProjection = _effect.Parameters["WorldViewProjection"];
+            _shader = new KingdomShader(contentManager);
 
             _vertexBuffer = new VertexBuffer(graphicsDevice, MyVertex.VertexDeclaration, MaxSpriteCountPerDraw * 4, BufferUsage.WriteOnly);
             _indexBuffer = CreateIndexBufferForSprites(graphicsDevice, MaxSpriteCountPerDraw);
@@ -152,7 +150,7 @@ namespace OpenKh.Game
         public void Dispose()
         {
             _indexBuffer?.Dispose();
-            _effect?.Dispose();
+            _shader?.Dispose();
         }
 
         public void DrawRectangle(RectangleF rect, Color color, float width = 1)
@@ -202,14 +200,14 @@ namespace OpenKh.Game
             GraphicsDevice.Indices = _indexBuffer;
 
             _vertexBuffer.SetData(_vertices);
-            foreach (var pass in _effect.CurrentTechnique.Passes)
+            _shader.Pass(pass =>
             {
                 Texture0 = _texture;
                 WorldViewProjection = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
                 pass.Apply();
 
                 GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _currentSpriteIndex * 2);
-            }
+            });
 
             _currentSpriteIndex = 0;
         }
