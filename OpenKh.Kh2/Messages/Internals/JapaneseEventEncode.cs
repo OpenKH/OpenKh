@@ -7,10 +7,10 @@ using System.Text;
 
 namespace OpenKh.Kh2.Messages.Internals
 {
-    internal class JapaneseSystemEncode : IMessageEncode
+    internal class JapaneseEventEncode : IMessageEncode
     {
         private static readonly Dictionary<MessageCommand, KeyValuePair<byte, BaseCmdModel>> _tableCommands =
-            JapaneseSystemDecode._table
+            JapaneseEventDecode._table
             .Where(x => x.Value != null && x.Value.Command != MessageCommand.PrintText)
             .GroupBy(x => x.Value.Command)
             .ToDictionary(x => x.Key, x => x.First());
@@ -19,7 +19,7 @@ namespace OpenKh.Kh2.Messages.Internals
             GenerateCharacterDictionary();
 
         private static readonly Dictionary<string, byte[]> _tableComplex =
-            JapaneseSystemDecode._table
+            JapaneseEventDecode._table
             .Where(x => x.Value?.Command == MessageCommand.PrintComplex)
             .Select(x => new
             {
@@ -28,13 +28,13 @@ namespace OpenKh.Kh2.Messages.Internals
             })
             .Concat(new[]
             {
-                new { Key = "XIII", Value = new byte[] { 0x19, 0xb2 } },
-                new { Key = "I", Value = new byte[] { 0x1b, 0x54 } },
-                new { Key = "II", Value = new byte[] { 0x1b, 0x55 } },
-                new { Key = "IV", Value = new byte[] { 0x1b, 0x56 } },
-                new { Key = "V", Value = new byte[] { 0x1b, 0x57 } },
-                new { Key = "VI", Value = new byte[] { 0x1b, 0x58 } },
-                new { Key = "IX", Value = new byte[] { 0x1b, 0x59 } },
+                new { Key = "III", Value = new byte[] { 0x1d, 0x1a} },
+                new { Key = "VII", Value = new byte[] { 0x1d, 0x1b} },
+                new { Key = "VIII", Value = new byte[] { 0x1d, 0x1c } },
+                new { Key = "X", Value = new byte[] { 0x1d, 0x1d } },
+                new { Key = "XIII", Value = new byte[] { 0x1e, 0x50 } },
+                new { Key = "VI", Value = new byte[] { 0x1e, 0xB6 } },
+                new { Key = "IX", Value = new byte[] { 0x1e, 0xB7 } },
             })
             .ToDictionary(x => x.Key, x => x.Value);
 
@@ -96,13 +96,13 @@ namespace OpenKh.Kh2.Messages.Internals
         private static Dictionary<char, (byte, byte)> GenerateCharacterDictionary()
         {
             var pairs = GenerateCharacterKeyValuePair(MessageCommand.PrintText)
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table2, JapaneseSystemTable._table2))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table3, JapaneseSystemTable._table3))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table4, JapaneseSystemTable._table4))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table5, JapaneseSystemTable._table5))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table6, JapaneseSystemTable._table6))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table7, JapaneseSystemTable._table7))
-                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table8, JapaneseSystemTable._table8));
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table2, JapaneseEventTable._table2))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table3, JapaneseEventTable._table3))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table4, JapaneseEventTable._table4))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table5, JapaneseEventTable._table5))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table6, JapaneseEventTable._table6))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table7, JapaneseEventTable._table7))
+                .Concat(GenerateCharacterKeyValuePairFromTable(MessageCommand.Table8, JapaneseEventTable._table8));
 
 #if DEBUG
             var stringBuilder = new StringBuilder();
@@ -127,13 +127,13 @@ namespace OpenKh.Kh2.Messages.Internals
 
         private static IEnumerable<KeyValuePair<char, (byte, byte)>> GenerateCharacterKeyValuePair(
             MessageCommand messageCommand) =>
-            JapaneseSystemDecode._table
+            JapaneseEventDecode._table
                    .Where(x => x.Value?.Command == messageCommand)
                    .Select(x => new KeyValuePair<char, (byte, byte)>(x.Value.Text[0], (0, x.Key)));
 
         private static IEnumerable<KeyValuePair<char, (byte, byte)>> GenerateCharacterKeyValuePairFromTable(
             MessageCommand messageCommand, char[] table) =>
-            JapaneseSystemDecode._table
+            JapaneseEventDecode._table
                 .Where(x => x.Value?.Command == messageCommand)
                 .Select(x => table.Select((ch, i) => new
                 {
