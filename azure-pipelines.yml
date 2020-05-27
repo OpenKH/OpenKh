@@ -55,11 +55,33 @@ steps:
 - task: VSBuild@1
   displayName: 'Build project'
   inputs:
-    solution: '$(solution)'
+    solution: '**/OpenKh.Command.*.csproj'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     vsVersion: 'latest'
-    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/bin'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)'
+    maximumCpuCount: true
+    summaryFileLocation: '**/*.coverage'
+
+- task: VSBuild@1
+  displayName: 'Build project'
+  inputs:
+    solution: '**/OpenKh.Tools.*.csproj'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)'
+    maximumCpuCount: true
+    summaryFileLocation: '**/*.coverage'
+
+- task: VSBuild@1
+  displayName: 'Build project'
+  inputs:
+    solution: '**/OpenKh.Game*.csproj'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)'
     maximumCpuCount: true
 
 - task: PublishBuildArtifacts@1
