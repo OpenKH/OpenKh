@@ -91,7 +91,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0x52] = new TextCmdModel(':'),
             [0x53] = new TextCmdModel('…'),
             [0x54] = new TextCmdModel("-"),
-            [0x55] = new TextCmdModel('–'),
+            [0x55] = new TextCmdModel('ー'),
             [0x56] = new TextCmdModel('〜'),
             [0x57] = new TextCmdModel("'"),
             [0x58] = new TextCmdModel("‟"),

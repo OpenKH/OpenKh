@@ -193,6 +193,18 @@ namespace OpenKh.Tests.kh2
         }
 
         [Theory]
+        [InlineData("\x19\x0a\x19\x1e\x55", "ロビー")]
+        public void DecodeJapaneseSystemTextWordCorrectly(string data, string expected)
+        {
+            var decoded = Encoders.JapaneseSystem.Decode(
+                System.Text.Encoding.GetEncoding("latin1").GetBytes(data)
+            );
+
+            Assert.NotEmpty(decoded);
+            Assert.Equal(expected, decoded.Single().Text);
+        }
+
+        [Theory]
         [InlineData(0x84, 0x00, "III")]
         [InlineData(0x85, 0x00, "VII")]
         [InlineData(0x86, 0x00, "VIII")]
@@ -255,6 +267,19 @@ namespace OpenKh.Tests.kh2
 
             Assert.NotEmpty(decoded);
             Assert.Equal(expected, decoded.Single().Text.Single());
+        }
+
+        [Theory]
+        [InlineData("\x19\x25\x55", "プー")]
+        [InlineData("\x19\x16\xe0\x01\xf8\x55\xf3\x66\x66", "ゼア ノート--")]
+        public void DecodeJapaneseEventTextWordCorrectly(string data, string expected)
+        {
+            var decoded = Encoders.JapaneseEvent.Decode(
+                System.Text.Encoding.GetEncoding("latin1").GetBytes(data)
+            );
+
+            Assert.NotEmpty(decoded);
+            Assert.Equal(expected, decoded.Single().Text);
         }
     }
 }
