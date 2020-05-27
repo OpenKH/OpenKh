@@ -73,17 +73,7 @@ namespace OpenKh.Game
         private readonly MyVertex[] _vertices;
         private Texture2D _texture;
         private int _currentSpriteIndex;
-
-        public xnaf.Matrix ProjectionView
-        {
-            get => _shader.ProjectionView;
-            set => _shader.ProjectionView = value;
-        }
-        public Texture2D Texture0
-        {
-            get => _shader.Texture0;
-            set => _shader.Texture0 = value;
-        }
+        private xnaf.Matrix _projectionView = xnaf.Matrix.Identity;
 
         public MonoDrawing(GraphicsDevice graphicsDevice, ContentManager contentManager)
         {
@@ -113,6 +103,17 @@ namespace OpenKh.Game
             _indexBuffer = CreateIndexBufferForSprites(graphicsDevice, MaxSpriteCountPerDraw);
             _vertices = new MyVertex[MaxSpriteCountPerDraw * 4];
             _currentSpriteIndex = 0;
+        }
+
+        public void SetProjection(float width, float height, float internalWidth, float internalHeight, float ratio)
+        {
+            var heightRatio = internalHeight / height;
+            width *= heightRatio;
+            height *= heightRatio;
+            width *= ratio;
+
+            var left = (internalWidth - width) / 2;
+            _projectionView = xnaf.Matrix.CreateOrthographicOffCenter(left, width + left, height, 0, -1000.0f, +1000.0f);
         }
 
         public GraphicsDevice GraphicsDevice { get; }
@@ -202,8 +203,8 @@ namespace OpenKh.Game
             _vertexBuffer.SetData(_vertices);
             _shader.Pass(pass =>
             {
-                Texture0 = _texture;
-                ProjectionView = xnaf.Matrix.CreateOrthographicOffCenter(0, 512, 416, 0, -1000.0f, +1000.0f);
+                _shader.Texture0 = _texture;
+                _shader.ProjectionView = _projectionView;
                 _shader.WorldView = xnaf.Matrix.Identity;
                 _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
                 _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
