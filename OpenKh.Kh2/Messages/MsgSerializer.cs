@@ -187,7 +187,7 @@ namespace OpenKh.Kh2.Messages
             },
             new SerializerModel
             {
-                Name = "delay&fade",
+                Name = "delayandfade",
                 Command = MessageCommand.DelayAndFade,
                 Serializer = x => ToDelayAndFade(x.Data),
                 Deserializer = x => FromDelayAndFade(x)
