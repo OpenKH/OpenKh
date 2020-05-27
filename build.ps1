@@ -16,6 +16,9 @@ param (
     [string] $output = "bin"
 )
 
+$solutionBase = "OpenKh.Windows"
+$solution = "${solutionBase}.sln"
+
 function Test-Success([int] $exitCode) {
     if ($exitCode -ne 0) {
         Write-Error "Last command returned error $exitCode, therefore the build is canceled."
@@ -35,7 +38,23 @@ Test-Success $LASTEXITCODE
 dotnet test --configuration $configuration --verbosity $verbosity
 Test-Success $LASTEXITCODE
 
-# Publish solution
-dotnet publish --configuration $configuration --verbosity $verbosity --framework netcoreapp3.1 --output $output /p:DebugType=None /p:DebugSymbols=false
-$LASTEXITCODE = 0 # Hack due to a regression at compiling multi-targeting framework projects
+# Create temporary solution
+dotnet new sln -n $solutionBase --force
 Test-Success $LASTEXITCODE
+
+# Add items to solution
+Get-ChildItem -Filter OpenKh.Command.* | ForEach-Object {
+    dotnet sln $solution add $_.FullName
+    Test-Success $LASTEXITCODE
+}
+Get-ChildItem -Filter OpenKh.Tools.* | ForEach-Object {
+    dotnet sln $solution add $_.FullName
+    Test-Success $LASTEXITCODE
+}
+Get-ChildItem -Filter OpenKh.Game* | ForEach-Object {
+    dotnet sln $solution add $_.FullName
+    Test-Success $LASTEXITCODE
+}
+
+# Publish solution
+dotnet publish $solution --configuration $configuration --verbosity $verbosity --framework netcoreapp3.1 --output $output /p:DebugType=None /p:DebugSymbols=false
