@@ -34,7 +34,7 @@ fi
 
 # Add only command line tools to the new solution
 for project in ./OpenKh.Command.*/*.csproj; do
-    dotnet sln OpenKh.Linux.sln add "$project"
+    dotnet sln $solution add "$project"
 done
 
 # Restore NuGet packages
