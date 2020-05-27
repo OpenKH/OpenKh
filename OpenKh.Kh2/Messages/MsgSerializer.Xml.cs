@@ -13,7 +13,7 @@ namespace OpenKh.Kh2.Messages
                 [MessageCommand.PrintText] = (msgCmd, model) => new XElement("text", model.Serializer(msgCmd)),
             };
 
-        public static XElement SerializeXEntries(IEnumerable<Msg.Entry> entries, bool ignoreExceptions = false)
+        public static XElement SerializeXEntries(IEnumerable<Msg.Entry> entries, IMessageDecode decode, bool ignoreExceptions = false)
         {
             return new XElement("messages", entries.Select(x =>
             {
@@ -21,7 +21,7 @@ namespace OpenKh.Kh2.Messages
 
                 try
                 {
-                    messageDecoded = Encoders.InternationalSystem.Decode(x.Data);
+                    messageDecoded = decode.Decode(x.Data);
                 }
                 catch (NotImplementedException ex)
                 {

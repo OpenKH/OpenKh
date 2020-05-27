@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml.Linq;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace OpenKh.Command.MsgTool
 {
@@ -13,6 +14,14 @@ namespace OpenKh.Command.MsgTool
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     class Program
     {
+        private static readonly Dictionary<string, IMessageEncoder> Encoders = new Dictionary<string, IMessageEncoder>()
+        {
+            ["eusys"] = Kh2.Messages.Encoders.InternationalSystem,
+            ["euevt"] = Kh2.Messages.Encoders.InternationalSystem,
+            ["jpsys"] = Kh2.Messages.Encoders.JapaneseSystem,
+            ["jpevt"] = Kh2.Messages.Encoders.JapaneseEvent,
+        };
+
         static void Main(string[] args)
         {
             try
@@ -36,6 +45,11 @@ namespace OpenKh.Command.MsgTool
         [Option(ShortName = "i", LongName = "input", Description = "MSG file (almost all the files inside msg/{language}/ are considered MSGs)")]
         public string Input { get; }
 
+        [Required]
+        [AllowedValues("eusys", "euevt", "jpsys", "jpevt")]
+        [Option(ShortName = "e", LongName = "encoder", Description = "Specify which encoder should be used")]
+        public string Encoder { get; }
+
         private void OnExecute()
         {
             var outputFileName = Input.Replace(".bar", ".xml", StringComparison.InvariantCultureIgnoreCase);
@@ -45,10 +59,10 @@ namespace OpenKh.Command.MsgTool
                 var barEntries = Bar.Read(stream);
                 foreach (Bar.Entry barEntry in barEntries)
                 {
-                    if (barEntry.Type == Bar.EntryType.Binary)
+                    if (barEntry.Type == Bar.EntryType.List)
                     {
                         barEntry.Stream.Position = 0;
-                        ConvertMsgToXml(barEntry.Stream, outputFileName);
+                        ConvertMsgToXml(barEntry.Stream, outputFileName, Encoders[Encoder]);
 
                         break;
                     }
@@ -56,15 +70,15 @@ namespace OpenKh.Command.MsgTool
             }
         }
 
-        private void ConvertMsgToXml(Stream inStream, string fileName)
+        private void ConvertMsgToXml(Stream inStream, string fileName, IMessageEncoder encoder)
         {
             using (var outStream = File.Create(fileName))
-                ConvertMsgToXml(inStream, outStream);
+                ConvertMsgToXml(inStream, outStream, encoder);
         }
 
-        private void ConvertMsgToXml(Stream inStream, Stream outStream)
+        private void ConvertMsgToXml(Stream inStream, Stream outStream, IMessageEncoder encoder)
         {
-            var root = MsgSerializer.SerializeXEntries(Msg.Read(inStream), true);
+            var root = MsgSerializer.SerializeXEntries(Msg.Read(inStream), encoder, true);
             var document = new XDocument(root);
             document.Save(outStream);
         }
