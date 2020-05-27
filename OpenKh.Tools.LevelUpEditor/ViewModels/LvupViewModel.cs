@@ -86,7 +86,7 @@ namespace OpenKh.Tools.LevelUpEditor.ViewModels
                 using (var file = File.Open(fileName, FileMode.Open))
                 {
                     var ent = Bar.Read(file,
-                        (str, type) => str == "lvup" && type == Bar.EntryType.Binary)
+                        (str, type) => str == "lvup" && type == Bar.EntryType.List)
                         .FirstOrDefault();
 
                     if (ent != null)

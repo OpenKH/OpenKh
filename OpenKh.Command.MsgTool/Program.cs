@@ -45,7 +45,7 @@ namespace OpenKh.Command.MsgTool
                 var barEntries = Bar.Read(stream);
                 foreach (Bar.Entry barEntry in barEntries)
                 {
-                    if (barEntry.Type == Bar.EntryType.Binary)
+                    if (barEntry.Type == Bar.EntryType.List)
                     {
                         barEntry.Stream.Position = 0;
                         ConvertMsgToXml(barEntry.Stream, outputFileName);
