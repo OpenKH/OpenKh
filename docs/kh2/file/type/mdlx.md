@@ -1,4 +1,5 @@
 # [Kingdom Hearts II](../../index) - MDLX (MoDeL eXtended)
+
 The MDLX format is an extension of the MDLS format from Kingdom Hearts 1. It
 is a BAR encapsulating the 3D data of the model(0x04), textures(0x07), object
 definition(0x17) and potentially other additional informations such as the AI.
