@@ -61,7 +61,6 @@ steps:
     vsVersion: 'latest'
     msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)'
     maximumCpuCount: true
-    summaryFileLocation: '**/*.coverage'
 
 - task: VSBuild@1
   displayName: 'Build project'
@@ -72,7 +71,6 @@ steps:
     vsVersion: 'latest'
     msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)'
     maximumCpuCount: true
-    summaryFileLocation: '**/*.coverage'
 
 - task: VSBuild@1
   displayName: 'Build project'
