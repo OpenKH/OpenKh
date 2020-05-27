@@ -33,10 +33,10 @@ namespace OpenKh.Tools.Common
             byte[] data;
             switch (image.PixelFormat)
             {
-                case Imaging.PixelFormat.Indexed4:
+                case OpenKh.Imaging.PixelFormat.Indexed4:
                     data = GetDataResource4bpp(image);
                     break;
-                case Imaging.PixelFormat.Indexed8:
+                case OpenKh.Imaging.PixelFormat.Indexed8:
                     data = GetDataResource8bpp(image);
                     break;
                 default:
@@ -104,13 +104,13 @@ namespace OpenKh.Tools.Common
             return dstData;
         }
 
-        private static System.Windows.Media.PixelFormat GetPixelFormat(Imaging.PixelFormat pixelFormat)
+        private static System.Windows.Media.PixelFormat GetPixelFormat(OpenKh.Imaging.PixelFormat pixelFormat)
         {
             switch (pixelFormat)
             {
-                case Imaging.PixelFormat.Indexed4:
+                case OpenKh.Imaging.PixelFormat.Indexed4:
                     return PixelFormats.Indexed4;
-                case Imaging.PixelFormat.Indexed8:
+                case OpenKh.Imaging.PixelFormat.Indexed8:
                     return PixelFormats.Indexed8;
                 default:
                     throw new ArgumentException($"Pixel format {pixelFormat} not supported", nameof(pixelFormat));
@@ -140,12 +140,12 @@ namespace OpenKh.Tools.Common
             A = clut[index + 3],
         };
 
-        private static int GetBpp(Imaging.PixelFormat pixelFormat)
+        private static int GetBpp(OpenKh.Imaging.PixelFormat pixelFormat)
         {
             switch (pixelFormat)
             {
-                case Imaging.PixelFormat.Indexed4: return 4;
-                case Imaging.PixelFormat.Indexed8: return 8;
+                case OpenKh.Imaging.PixelFormat.Indexed4: return 4;
+                case OpenKh.Imaging.PixelFormat.Indexed8: return 8;
                 default:
                     throw new ArgumentException($"Pixel format {pixelFormat} not supported", nameof(pixelFormat));
             }
