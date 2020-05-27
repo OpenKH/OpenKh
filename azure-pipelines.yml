@@ -37,16 +37,6 @@ steps:
 - powershell: .\pre-build.ps1
   displayName: 'Build tools and libraries metadata'
 
-- task: VSBuild@1
-  displayName: 'Build project'
-  inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    vsVersion: 'latest'
-    msbuildArgs: '/t:Build'
-    maximumCpuCount: true
-
 - script: dotnet test --configuration $(buildConfiguration) --logger trx --verbosity normal --collect "Code coverage"
   displayName: 'Run tests'
 
@@ -62,8 +52,15 @@ steps:
   inputs:
     summaryFileLocation: '**/*.coverage'
 
-- script: dotnet publish --configuration $(buildConfiguration) --verbosity normal --framework netcoreapp3.1 --output $(Build.ArtifactStagingDirectory)/openkh /p:DebugType=None /p:DebugSymbols=false
-  displayName: 'Publish project as artifact'
+- task: VSBuild@1
+  displayName: 'Build project'
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/bin'
+    maximumCpuCount: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
