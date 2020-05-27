@@ -36,6 +36,9 @@ fi
 for project in ./OpenKh.Command.*/*.csproj; do
     dotnet sln $solution add "$project"
 done
+for project in ./OpenKh.Game*/*.csproj; do
+    dotnet sln $solution add "$project"
+done
 
 # Restore NuGet packages
 dotnet restore $solution
