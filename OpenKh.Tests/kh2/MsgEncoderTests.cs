@@ -248,7 +248,7 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x1b, 0x00, '竜')]
         [InlineData(0x1c, 0x00, '操')]
         [InlineData(0x1d, 0x00, '猫')]
-        [InlineData(0x1f, 0x00, '捧')]
+        [InlineData(0x1f, 0x00, '漠')]
         public void DecodeJapaneseEventTextCorrectly(byte command, byte data, char expected)
         {
             var decoded = Encoders.JapaneseEvent.Decode(new byte[] { command, data });
