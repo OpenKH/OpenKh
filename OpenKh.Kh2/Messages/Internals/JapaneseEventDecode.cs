@@ -193,7 +193,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xb8] = new TextCmdModel('る'),
             [0xb9] = new TextCmdModel('れ'),
             [0xba] = new TextCmdModel('ろ'),
-            [0xbb] = new TextCmdModel('ゎ'),
+            [0xbb] = new TextCmdModel('わ'),
             [0xbc] = new TextCmdModel('を'),
             [0xbd] = new TextCmdModel('ん'),
             [0xbe] = new TextCmdModel('が'),
