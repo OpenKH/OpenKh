@@ -161,8 +161,7 @@ namespace OpenKh.Game.States
         {
             _models.Clear();
             LoadMap(_worldId, _placeId);
-            //LoadObjEntry("F_LM670_MATSU");
-            LoadObjEntry("P_EX100");
+            LoadObjEntry(_objEntryId);
         }
 
         private void LoadObjEntry(string name)
