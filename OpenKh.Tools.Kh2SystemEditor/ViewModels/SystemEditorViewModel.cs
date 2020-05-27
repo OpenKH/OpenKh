@@ -180,7 +180,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         }
 
         private IEnumerable<Bar.Entry> SaveSystemEntry(IEnumerable<Bar.Entry> entries, ISystemGetChanges battleGetChanges) =>
-            entries.ForEntry(Bar.EntryType.Binary, battleGetChanges.EntryName, 0, entry => entry.Stream = battleGetChanges.CreateStream());
+            entries.ForEntry(Bar.EntryType.List, battleGetChanges.EntryName, 0, entry => entry.Stream = battleGetChanges.CreateStream());
 
 
         private T GetDefaultViewModelInstance<T>()

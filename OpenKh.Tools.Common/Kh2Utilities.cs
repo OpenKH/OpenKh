@@ -65,7 +65,7 @@ namespace OpenKh.Tools.Common
 
             var entries = Bar.Read(stream);
             var entry = entries
-                .FirstOrDefault(x => x.Type == Bar.EntryType.Binary && x.Name == "sys");
+                .FirstOrDefault(x => x.Type == Bar.EntryType.List && x.Name == "sys");
 
             if (entry == null)
                 throw new InvalidFileException<Msg>();
