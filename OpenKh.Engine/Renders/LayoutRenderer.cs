@@ -3,15 +3,14 @@ using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xe.Drawing;
 
 namespace OpenKh.Engine.Renderers
 {
     public class LayoutRenderer
     {
         private readonly Layout layout;
-        private readonly IDrawing drawing;
-        private readonly ISurface[] surfaces;
+        private readonly ISpriteDrawing drawing;
+        private readonly ISpriteTexture[] surfaces;
         private int selectedSequenceGroupIndex;
         private IDebugLayoutRenderer _debugLayoutRenderer;
 
@@ -30,7 +29,7 @@ namespace OpenKh.Engine.Renderers
 
         public int FrameIndex { get; set; }
 
-        public LayoutRenderer(Layout layout, IDrawing drawing, IEnumerable<ISurface> surfaces)
+        public LayoutRenderer(Layout layout, ISpriteDrawing drawing, IEnumerable<ISpriteTexture> surfaces)
         {
             this.layout = layout;
             this.drawing = drawing;

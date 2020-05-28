@@ -31,7 +31,23 @@ namespace OpenKh.Engine.Renders
             A = colorA.A * colorB.A
         };
 
+        public static ColorF FromRgba(int r, int g, int b, int a) => new ColorF
+        {
+            R = r / 255.0f,
+            G = g / 255.0f,
+            B = b / 255.0f,
+            A = a / 255.0f,
+        };
+
         public static ColorF FromRgba(int rgba) => new ColorF
+        {
+            R = ((rgba >> 0) & 0xff) / 255.0f,
+            G = ((rgba >> 8) & 0xff) / 255.0f,
+            B = ((rgba >> 16) & 0xff) / 255.0f,
+            A = ((rgba >> 24) & 0xff) / 255.0f,
+        };
+
+        public static ColorF FromRgba(uint rgba) => new ColorF
         {
             R = ((rgba >> 0) & 0xff) / 255.0f,
             G = ((rgba >> 8) & 0xff) / 255.0f,
@@ -103,6 +119,13 @@ namespace OpenKh.Engine.Renders
             return context;
         }
 
+        public static SpriteDrawingContext DestinationSize(this SpriteDrawingContext context, float width, float height)
+        {
+            context.DestinationWidth = width;
+            context.DestinationHeight = height;
+            return context;
+        }
+
         public static SpriteDrawingContext ScaleSize(this SpriteDrawingContext context, float scale)
         {
             context.DestinationWidth *= scale;
@@ -160,15 +183,30 @@ namespace OpenKh.Engine.Renders
         }
     }
 
+    public interface IMappedResource : IDisposable
+    {
+        IntPtr Data { get; }
+
+        int Stride { get; }
+
+        int Length { get; }
+    }
+
     public interface ISpriteTexture : IDisposable
     {
         int Width { get; }
         int Height { get; }
+
+        IMappedResource Map();
     }
 
     public interface ISpriteDrawing : IDisposable
     {
+        ISpriteTexture DestinationTexture { get; set; }
+
         ISpriteTexture CreateSpriteTexture(IImageRead image);
+
+        ISpriteTexture CreateSpriteTexture(int width, int height);
 
         void SetViewport(float left, float right, float top, float bottom);
 

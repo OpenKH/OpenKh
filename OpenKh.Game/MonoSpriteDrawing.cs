@@ -26,6 +26,11 @@ namespace OpenKh.Game
             {
                 Texture.Dispose();
             }
+
+            public IMappedResource Map()
+            {
+                throw new System.NotImplementedException();
+            }
         }
 
         private struct MyVertex : IVertexType

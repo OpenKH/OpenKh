@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
-    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Drawing\Xe.Drawing.csproj" />
   </ItemGroup>
 
 </Project>

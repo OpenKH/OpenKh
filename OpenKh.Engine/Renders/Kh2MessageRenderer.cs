@@ -3,8 +3,6 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using Xe.Drawing;
 
 namespace OpenKh.Engine.Renders
 {
@@ -27,7 +25,7 @@ namespace OpenKh.Engine.Renders
         private const int IconWidth = Constants.FontIconWidth;
         private const int IconHeight = Constants.FontIconHeight;
 
-        private readonly IDrawing _drawing;
+        private readonly ISpriteDrawing _drawing;
         private readonly RenderingMessageContext _msgContext;
 
         private readonly byte[] _fontSpacing;
@@ -35,9 +33,9 @@ namespace OpenKh.Engine.Renders
         private readonly IImageRead _imageFont;
         private readonly IImageRead _imageFont2;
         private readonly IImageRead _imageIcon;
-        private readonly ISurface _surfaceFont;
-        private readonly ISurface _surfaceFont2;
-        private readonly ISurface _surfaceIcon;
+        private readonly ISpriteTexture _spriteFont;
+        private readonly ISpriteTexture _spriteFont2;
+        private readonly ISpriteTexture _spriteIcon;
         private readonly int _charPerRow;
         private readonly int _iconPerRow;
         private readonly int _tableHeight;
@@ -45,7 +43,7 @@ namespace OpenKh.Engine.Renders
         private readonly IMessageEncode _encode;
 
         public Kh2MessageRenderer(
-            IDrawing drawing,
+            ISpriteDrawing drawing,
             RenderingMessageContext context)
         {
             _drawing = drawing;
@@ -62,9 +60,9 @@ namespace OpenKh.Engine.Renders
             _charTableHeight = context.TableHeight / context.FontHeight * context.FontHeight;
             _encode = context.Encoder;
 
-            if (_imageFont != null) InitializeSurface(ref _surfaceFont, _imageFont);
-            if (_imageFont2 != null) InitializeSurface(ref _surfaceFont2, _imageFont2);
-            if (_imageIcon != null) InitializeSurface(ref _surfaceIcon, _imageIcon);
+            if (_imageFont != null) InitializeSurface(ref _spriteFont, _imageFont);
+            if (_imageFont2 != null) InitializeSurface(ref _spriteFont2, _imageFont2);
+            if (_imageIcon != null) InitializeSurface(ref _spriteIcon, _imageIcon);
         }
 
         public void Draw(DrawContext drawContext,  string message) =>
@@ -101,11 +99,11 @@ namespace OpenKh.Engine.Renders
             {
                 context.NewLine(_msgContext.FontHeight);
                 context.y += 4;
-                _drawing.FillRectangle(new RectangleF(
-                    8,
-                    (float)context.y,
-                    Math.Max(1.0f, (float)(context.WindowWidth - 16)),
-                    2), Color.White);
+                //_drawing.FillRectangle(new RectangleF(
+                //    8,
+                //    (float)context.y,
+                //    Math.Max(1.0f, (float)(context.WindowWidth - 16)),
+                //    2), Color.White);
                 context.y += 4;
             }
             else if (command.Command == MessageCommand.Position)
@@ -183,7 +181,7 @@ namespace OpenKh.Engine.Renders
 
         private void DrawIcon(DrawContext context, byte index)
         {
-            if (_surfaceIcon != null)
+            if (_spriteIcon != null)
                 DrawIcon(context, (index % _iconPerRow) * IconWidth, (index / _iconPerRow) * IconHeight);
 
             context.x += _iconSpacing?[index] ?? IconWidth;
@@ -196,52 +194,51 @@ namespace OpenKh.Engine.Renders
 
         protected void DrawChar(DrawContext context, int sourceX, int sourceY)
         {
-            ISurface surfaceFont;
+            ISpriteTexture spriteTexture;
 
             var tableIndex = sourceY / _charTableHeight;
             sourceY %= _charTableHeight;
 
             if ((tableIndex & 1) != 0)
-                surfaceFont = _surfaceFont2;
+                spriteTexture = _spriteFont2;
             else
-                surfaceFont = _surfaceFont;
+                spriteTexture = _spriteFont;
 
             if ((tableIndex & 2) != 0)
                 sourceY += _tableHeight;
 
-            if (surfaceFont == null)
+            if (spriteTexture == null)
                 return;
 
-            DrawImageScale(context, surfaceFont, sourceX, sourceY, _msgContext.FontWidth, _msgContext.FontHeight);
+            DrawImageScale(context, spriteTexture, sourceX, sourceY, _msgContext.FontWidth, _msgContext.FontHeight);
         }
 
         protected void DrawIcon(DrawContext context, int sourceX, int sourceY) =>
-            DrawImage(_surfaceIcon, context.x, context.y, sourceX, sourceY, IconWidth, IconHeight, 1.0, 1.0, new ColorF(1.0f, 1.0f, 1.0f, 1.0f));
+            DrawImage(_spriteIcon, context.x, context.y, sourceX, sourceY, IconWidth, IconHeight, 1.0, 1.0, new ColorF(1.0f, 1.0f, 1.0f, 1.0f));
 
-        protected void DrawImageScale(DrawContext context, ISurface surface, int sourceX, int sourceY, int width, int height) =>
-            DrawImage(surface, context.x, context.y, sourceX, sourceY, width, height, context.WidthMultiplier * context.Scale, context.Scale, context.Color);
+        protected void DrawImageScale(DrawContext context, ISpriteTexture texture, int sourceX, int sourceY, int width, int height) =>
+            DrawImage(texture, context.x, context.y, sourceX, sourceY, width, height, context.WidthMultiplier * context.Scale, context.Scale, context.Color);
 
-        protected void DrawImage(ISurface surface, double x, double y, int sourceX, int sourceY, int width, int height, double scaleX, double scaleY, ColorF color)
+        protected void DrawImage(ISpriteTexture texture, double x, double y, int sourceX, int sourceY, int width, int height, double scaleX, double scaleY, ColorF color) =>
+            _drawing.AppendSprite(new SpriteDrawingContext()
+                .Source(sourceX, sourceY, width, height)
+                .Position((float)x, (float)y)
+                .MatchSourceSize()
+                .ScaleSize((float)scaleX, (float)scaleY)
+                .Color(color)
+                .SpriteTexture(texture));
+
+        private void InitializeSurface(ref ISpriteTexture spriteTexture, IImageRead image)
         {
-            var dstWidth = width * scaleX;
-            var dstHeight = height * scaleY;
-            var src = new Rectangle(sourceX, sourceY, width, height);
-            var dst = new Rectangle((int)x, (int)y, (int)dstWidth, (int)dstHeight);
-
-            _drawing.DrawSurface(surface, src, dst, color);
-        }
-
-        private void InitializeSurface(ref ISurface surface, IImageRead image)
-        {
-            surface?.Dispose();
-            surface = _drawing?.CreateSurface(image);
+            spriteTexture?.Dispose();
+            spriteTexture = _drawing?.CreateSpriteTexture(image);
         }
 
         public void Dispose()
         {
-            _surfaceFont?.Dispose();
-            _surfaceFont2?.Dispose();
-            _surfaceIcon?.Dispose();
+            _spriteFont?.Dispose();
+            _spriteFont2?.Dispose();
+            _spriteIcon?.Dispose();
         }
     }
 }

@@ -1,7 +1,6 @@
-﻿using OpenKh.Kh2;
-using System;
+﻿using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
 using System.Drawing;
-using Xe.Drawing;
 
 namespace OpenKh.Engine.Renderers
 {
@@ -44,10 +43,10 @@ namespace OpenKh.Engine.Renderers
         private const int TraslateFlag = 0x00004000;
 
         private readonly Sequence sequence;
-        private readonly IDrawing drawing;
-        private readonly ISurface surface;
+        private readonly ISpriteDrawing drawing;
+        private readonly ISpriteTexture surface;
 
-        public SequenceRenderer(Sequence sequence, IDrawing drawing, ISurface surface)
+        public SequenceRenderer(Sequence sequence, ISpriteDrawing drawing, ISpriteTexture surface)
         {
             this.sequence = sequence;
             this.drawing = drawing;
@@ -178,22 +177,20 @@ namespace OpenKh.Engine.Renderers
 
         private void DrawFrame(Context context, Sequence.Frame frame)
         {
-            drawing.DrawSurface(surface,
-                Rectangle.FromLTRB(frame.Left, frame.Top, frame.Right, frame.Bottom),
-                RectangleF.FromLTRB(context.PositionX + context.Left, context.PositionY + context.Top,
-                    context.PositionX + context.Right, context.PositionY + context.Bottom),
-                Multiply(ConvertColor(frame.ColorLeft), context.Color),
-                Multiply(ConvertColor(frame.ColorTop), context.Color),
-                Multiply(ConvertColor(frame.ColorRight), context.Color),
-                Multiply(ConvertColor(frame.ColorBottom), context.Color));
-        }
+            var drawContext = new SpriteDrawingContext()
+                .SpriteTexture(surface)
+                .SourceLTRB(frame.Left, frame.Top, frame.Right, frame.Bottom)
+                .Position(context.PositionX + context.Left, context.PositionY + context.Top)
+                .DestinationSize(context.Right - context.Left, context.Bottom - context.Top);
 
-        public static ColorF Multiply(ColorF a, ColorF b) =>
-            new ColorF(
-                a.R * b.R,
-                a.G * b.G,
-                a.B * b.B,
-                a.A * b.A);
+            drawContext.Color0 = ConvertColor(frame.ColorLeft);
+            drawContext.Color1 = ConvertColor(frame.ColorTop);
+            drawContext.Color2 = ConvertColor(frame.ColorRight);
+            drawContext.Color3 = ConvertColor(frame.ColorBottom);
+            drawContext.ColorMultiply(context.Color);
+
+            drawing.AppendSprite(drawContext);
+        }
 
         private static ColorF ConvertColor(uint color) => new ColorF(
             ((color >> 0) & 0xFF) / 128.0f,

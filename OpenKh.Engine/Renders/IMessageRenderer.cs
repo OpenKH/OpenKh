@@ -1,6 +1,4 @@
-﻿using Xe.Drawing;
-
-namespace OpenKh.Engine.Renders
+﻿namespace OpenKh.Engine.Renders
 {
     public class DrawContext
     {
