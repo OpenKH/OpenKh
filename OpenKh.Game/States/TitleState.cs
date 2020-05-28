@@ -7,9 +7,7 @@ using OpenKh.Game.Shaders;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Xe.Drawing;
 
 namespace OpenKh.Game.States
 {
