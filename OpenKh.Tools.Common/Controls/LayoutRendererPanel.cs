@@ -1,13 +1,10 @@
-﻿using OpenKh.Tools.Common.Controls;
-using OpenKh.Engine;
+﻿using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Windows;
-using Xe.Drawing;
 using static OpenKh.Tools.Common.DependencyPropertyUtils;
 
 namespace OpenKh.Tools.Common.Controls
@@ -35,7 +32,7 @@ namespace OpenKh.Tools.Common.Controls
         public static readonly DependencyProperty DebugLayoutRendererProperty =
             GetDependencyProperty<LayoutRendererPanel, IDebugLayoutRenderer>(nameof(DebugLayoutRenderer), null, (o, x) => o.SetDebugLayoutRenderer(x));
 
-        private Color _backgroundColor;
+        private ColorF _backgroundColor;
         private IDebugLayoutRenderer _debugLayoutRenderer;
 
         public System.Windows.Media.Color Background
@@ -80,7 +77,7 @@ namespace OpenKh.Tools.Common.Controls
             set => SetValue(DebugLayoutRendererProperty, value);
         }
 
-        private ISurface[] surfaces;
+        private ISpriteTexture[] surfaces;
         private LayoutRenderer layoutRenderer;
 
         public LayoutRendererPanel()
@@ -148,14 +145,14 @@ namespace OpenKh.Tools.Common.Controls
         }
 
         private void SetBackgroundColor(System.Windows.Media.Color color) =>
-            _backgroundColor = Color.FromArgb(color.A, color.R, color.G, color.B);
+            _backgroundColor = ColorF.FromRgba(color.R, color.G, color.B, color.A);
 
         private void LoadImages(IEnumerable<Imgd> images)
         {
             DisposeAllSurfaces();
 
             surfaces = images
-                .Select(x => Drawing.CreateSurface(x))
+                .Select(x => Drawing.CreateSpriteTexture(x))
                 .ToArray();
 
             TrySetLayout();
