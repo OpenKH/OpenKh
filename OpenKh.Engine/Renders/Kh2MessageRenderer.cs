@@ -1,4 +1,5 @@
-﻿using OpenKh.Imaging;
+﻿using OpenKh.Engine.Extensions;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System;
@@ -99,11 +100,12 @@ namespace OpenKh.Engine.Renders
             {
                 context.NewLine(_msgContext.FontHeight);
                 context.y += 4;
-                //_drawing.FillRectangle(new RectangleF(
-                //    8,
-                //    (float)context.y,
-                //    Math.Max(1.0f, (float)(context.WindowWidth - 16)),
-                //    2), Color.White);
+                _drawing.FillRectangle(
+                    8,
+                    (float)context.y,
+                    Math.Max(1.0f, (float)(context.WindowWidth - 16)),
+                    2,
+                    ColorF.White);
                 context.y += 4;
             }
             else if (command.Command == MessageCommand.Position)

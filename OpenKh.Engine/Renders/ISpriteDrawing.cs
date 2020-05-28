@@ -5,6 +5,9 @@ namespace OpenKh.Engine.Renders
 {
     public struct ColorF
     {
+        public static readonly ColorF Black = new ColorF(0.0f, 0.0f, 0.0f, 1.0f);
+        public static readonly ColorF White = new ColorF(1.0f, 1.0f, 1.0f, 1.0f);
+
         public float R, G, B, A;
 
         public ColorF(float r, float g, float b, float a)

@@ -1,10 +1,11 @@
 ﻿using OpenKh.Bbs;
-using OpenKh.Tools.Common;
+using OpenKh.Engine.Renders;
+using OpenKh.Tools.Common.Rendering;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.Drawing;
 using System.Linq;
-using Xe.Drawing;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 
@@ -16,8 +17,8 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
         private CharacterViewModel[] _characters;
         private FontEntryViewModel _selectedFont;
         private CharacterViewModel _selectedCharacter;
-        private ISurface _surface1;
-        private ISurface _surface2;
+        private ISpriteTexture _surface1;
+        private ISpriteTexture _surface2;
         private bool orderCharacters;
 
         public FontEditorViewModel(FontsArc fonts)
@@ -32,7 +33,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 new FontEntryViewModel(fonts.FontNumeral)
             };
 
-            DrawingContext = new DrawingDirect3D();
+            DrawingContext = new SpriteDrawingDirect3D();
             DrawBegin = new RelayCommand(_ =>
             {
                 if (_selectedFont?.Font1 == null ||
@@ -45,7 +46,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                 if (_surface1 == null)
                     return;
 
-                DrawingContext.Clear(Color.Black);
+                DrawingContext.Clear(new ColorF(0.0f, 0.0f, 0.0f, 1.0f));
                 PrintCharacter(SelectedCharacter);
                 DrawingContext.Flush();
             });
@@ -93,13 +94,13 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
             }
         }
 
-        public IDrawing DrawingContext { get; }
+        public ISpriteDrawing DrawingContext { get; }
         public RelayCommand DrawBegin { get; }
 
         private void CreateFontSurfaces()
         {
-            _surface1 = DrawingContext.CreateSurface(_selectedFont.Font1);
-            _surface2 = DrawingContext.CreateSurface(_selectedFont.Font2);
+            _surface1 = DrawingContext.CreateSpriteTexture(_selectedFont.Font1);
+            _surface2 = DrawingContext.CreateSpriteTexture(_selectedFont.Font2);
         }
 
         private void DestroyFontSurfaces()
@@ -113,7 +114,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         private void PrintCharacter(CharacterViewModel characterViewModel)
         {
-            ISurface surface;
+            ISpriteTexture surface;
 
             switch (characterViewModel.Palette)
             {
@@ -127,22 +128,11 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
                     return;
             }
 
-            var src = new Rectangle()
-            {
-                X = characterViewModel.PositionX,
-                Y = characterViewModel.PositionY,
-                Width = characterViewModel.Width,
-                Height = SelectedFont.Info.CharacterHeight,
-            };
-            var dst = new Rectangle()
-            {
-                X = 0,
-                Y = 0,
-                Width = src.Width * 2,
-                Height = src.Height * 2
-            };
-
-            DrawingContext.DrawSurface(surface, src, dst);
+            DrawingContext.AppendSprite(new SpriteDrawingContext()
+                .SpriteTexture(surface)
+                .Source(characterViewModel.PositionX, characterViewModel.PositionY, characterViewModel.Width, SelectedFont.Info.CharacterHeight)
+                .MatchSourceSize()
+                .ScaleSize(2));
         }
     }
 }
