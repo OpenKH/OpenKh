@@ -27,6 +27,7 @@
 
 // Took from Xe.Drawing.Direct3D and transported to OpenKH under the same developer
 
+using OpenKh.Engine.Renders;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D;
 using System;
@@ -41,10 +42,15 @@ namespace OpenKh.Tools.Common.Rendering
 
     public partial class SpriteDrawingDirect3D
     {
-        private CDevice _device = new CDevice();
+        private static readonly byte[] WhiteBitmap = Enumerable.Range(0, 2 * 2 * sizeof(int)).Select(x => byte.MaxValue).ToArray();
+
+        private readonly CDevice _device;
+        private readonly ISpriteTexture _defaultTexture;
 
         public SpriteDrawingDirect3D()
         {
+            _device = new CDevice();
+            _defaultTexture = CreateSpriteTexture(2, 2, WhiteBitmap);
         }
 
         public d3d.Device5 Device => _device.Device;

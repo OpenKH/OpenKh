@@ -53,12 +53,12 @@ namespace OpenKh.Tools.Common.Rendering
 
         public void AppendSprite(SpriteDrawingContext context)
         {
-            var width = context.SpriteTexture.Width;
-            var height = context.SpriteTexture.Height;
+            SetTextureToDraw(context.SpriteTexture);
+            var width = _currentTexture.Width;
+            var height = _currentTexture.Height;
             var viewport = _viewportSize;
             var index = RequestVertices(4);
             var buffer = _dataBuffer;
-            SetTextureToDraw(context.SpriteTexture);
 
             buffer[index++] = new Vertex()
             {
@@ -94,15 +94,17 @@ namespace OpenKh.Tools.Common.Rendering
             };
         }
 
-		private CSpriteTexture _prevSurface;
-        private void SetTextureToDraw(ISpriteTexture surface)
+		private CSpriteTexture _currentTexture;
+        private void SetTextureToDraw(ISpriteTexture texture)
         {
-            if (_prevSurface != surface)
+            if (_currentTexture != texture)
             {
                 Flush();
-                var internalSurface = surface as CSpriteTexture;
-                Context.PixelShader.SetShaderResource(0, internalSurface?.ShaderResourceView);
-                _prevSurface = internalSurface;
+
+                texture ??= _defaultTexture;
+                var internalTexture = texture as CSpriteTexture;
+                Context.PixelShader.SetShaderResource(0, internalTexture?.ShaderResourceView);
+                _currentTexture = internalTexture;
             }
         }
 

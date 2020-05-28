@@ -29,6 +29,7 @@
 
 using OpenKh.Engine.Renders;
 using OpenKh.Imaging;
+using SharpDX.D3DCompiler;
 using SharpDX.IO;
 using System;
 using System.Drawing;
@@ -236,35 +237,8 @@ namespace OpenKh.Tools.Common.Rendering
 			}
         }
 
-        public ISpriteTexture CreateSpriteTexture(IImageRead image)
-        {
-            var size = image.Size;
-            if (size.Width <= 0 || size.Width > 65536)
-                throw new ArgumentOutOfRangeException(nameof(size.Width), "Must be between 1 and 65536");
-            if (size.Height <= 0 || size.Height > 65536)
-                throw new ArgumentOutOfRangeException(nameof(size.Height), "Must be between 1 and 65536");
-
-            var desc = new d3d.Texture2DDescription
-            {
-                Width = size.Width,
-                Height = size.Height,
-                MipLevels = 1,
-                ArraySize = 1,
-                Format = dxgi.Format.B8G8R8A8_UNorm,
-                CpuAccessFlags = d3d.CpuAccessFlags.None,
-                OptionFlags = d3d.ResourceOptionFlags.None,
-                SampleDescription = new dxgi.SampleDescription(1, 0)
-            };
-
-            desc.Usage = d3d.ResourceUsage.Immutable;
-            desc.BindFlags = d3d.BindFlags.ShaderResource;
-
-            var srcDataPtr = Marshal.UnsafeAddrOfPinnedArrayElement(image.ToBgra32(), 0);
-            var dataSource = new SharpDX.DataRectangle(srcDataPtr, size.Width * sizeof(int));
-            var texture = new d3d.Texture2D(Device, desc, new[] { dataSource });
-            var shaderResourceView = new d3d.ShaderResourceView(Device, texture);
-            return new CSpriteTexture(texture, shaderResourceView);
-        }
+        public ISpriteTexture CreateSpriteTexture(IImageRead image) =>
+            CreateSpriteTexture(image.Size.Width, image.Size.Height, image.ToBgra32());
         
         public ISpriteTexture CreateSpriteTexture(int width, int height)
         {
@@ -293,12 +267,41 @@ namespace OpenKh.Tools.Common.Rendering
             return new CSpriteTexture(texture, shaderResourceView);
         }
 
-        public ISpriteTexture CreateSurface(string filename, Color[] filterColors = null)
+        public ISpriteTexture CreateSpriteTexture(string filename, Color[] filterColors = null)
         {
             var bitmap = TextureLoader.LoadBitmap(new wic.ImagingFactory2(), filename);
             var texture = TextureLoader.CreateTexture2DFromBitmap(Device, bitmap, filterColors);
             d3d.ShaderResourceView shaderResourceView = new d3d.ShaderResourceView(Device, texture);
             return new CSpriteTexture(texture, shaderResourceView);
         }
-	}
+
+        public ISpriteTexture CreateSpriteTexture(int width, int height, byte[] data)
+        {
+            if (width <= 0 || width > 65536)
+                throw new ArgumentOutOfRangeException(nameof(width), "Must be between 1 and 65536");
+            if (height <= 0 || height > 65536)
+                throw new ArgumentOutOfRangeException(nameof(height), "Must be between 1 and 65536");
+
+            var desc = new d3d.Texture2DDescription
+            {
+                Width = width,
+                Height = height,
+                MipLevels = 1,
+                ArraySize = 1,
+                Format = dxgi.Format.B8G8R8A8_UNorm,
+                CpuAccessFlags = d3d.CpuAccessFlags.None,
+                OptionFlags = d3d.ResourceOptionFlags.None,
+                SampleDescription = new dxgi.SampleDescription(1, 0)
+            };
+
+            desc.Usage = d3d.ResourceUsage.Immutable;
+            desc.BindFlags = d3d.BindFlags.ShaderResource;
+
+            var srcDataPtr = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0);
+            var dataSource = new SharpDX.DataRectangle(srcDataPtr, width * sizeof(int));
+            var texture = new d3d.Texture2D(Device, desc, new[] { dataSource });
+            var shaderResourceView = new d3d.ShaderResourceView(Device, texture);
+            return new CSpriteTexture(texture, shaderResourceView);
+        }
+    }
 }

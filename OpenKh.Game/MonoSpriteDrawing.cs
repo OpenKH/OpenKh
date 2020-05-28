@@ -4,6 +4,7 @@ using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Shaders;
 using OpenKh.Imaging;
+using System.Linq;
 
 namespace OpenKh.Game
 {
@@ -58,10 +59,12 @@ namespace OpenKh.Game
 
         // This size should be enough to pack enough 2D graphics at once
         private const int MaxSpriteCountPerDraw = 8000;
+        private static readonly byte[] WhiteBitmap = Enumerable.Range(0, 2 * 2 * sizeof(int)).Select(x => byte.MaxValue).ToArray();
 
         private readonly GraphicsDevice _graphicsDevice;
         private readonly KingdomShader _shader;
 
+        private readonly Texture2D _defaultTexture;
         private readonly BlendState _blendState;
         private readonly SamplerState _samplerState;
         private readonly RasterizerState _rasterizerState;
@@ -78,6 +81,9 @@ namespace OpenKh.Game
         {
             _graphicsDevice = graphicsDevice;
             _shader = shader;
+
+            _defaultTexture = new Texture2D(_graphicsDevice, 2, 2);
+            _defaultTexture.SetData(WhiteBitmap);
 
             _blendState = BlendState.NonPremultiplied;
             _samplerState = new SamplerState
@@ -110,6 +116,7 @@ namespace OpenKh.Game
 
         public void Dispose()
         {
+            _defaultTexture?.Dispose();
             _vertexBuffer.Dispose();
             _indexBuffer.Dispose();
         }
@@ -139,8 +146,8 @@ namespace OpenKh.Game
             var texture = (context.SpriteTexture as CSpriteTexture)?.Texture;
             var vertexIndex = PrepareVertices(texture);
 
-            var tw = 1.0f / texture.Width;
-            var th = 1.0f / texture.Height;
+            var tw = 1.0f / _lastTextureUsed.Width;
+            var th = 1.0f / _lastTextureUsed.Height;
 
             _vertices[vertexIndex + 0].Position = new Vector3(context.DestinationX, context.DestinationY, 0.0f);
             _vertices[vertexIndex + 0].Color = context.Color0;
@@ -193,6 +200,7 @@ namespace OpenKh.Game
 
         private int PrepareVertices(Texture2D texture)
         {
+            texture ??= _defaultTexture;
             if (_lastTextureUsed != texture)
             {
                 Flush();
