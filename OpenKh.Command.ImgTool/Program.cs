@@ -15,7 +15,7 @@ namespace OpenKh.Command.ImgTool
 {
     [Command("OpenKh.Command.MsgTool")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(UnimdCommand), typeof(UnimzCommand), typeof(PackimdCommand), typeof(PackimzCommand))]
+    [Subcommand(typeof(UnimdCommand), typeof(UnimzCommand), typeof(ImdCommand), typeof(ImzCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -47,15 +47,15 @@ namespace OpenKh.Command.ImgTool
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         [HelpOption]
-        [Command(Description = "Convert an imd file to a png file")]
+        [Command(Description = "imd file -> png file")]
         private class UnimdCommand
         {
             [Required]
             [FileExists]
-            [Argument(0, Description = "Input an imd file path")]
+            [Argument(0, Description = "Input imd")]
             public string ImdFile { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "Save png to file path", ShortName = "o", LongName = "output")]
+            [Option(CommandOptionType.SingleValue, Description = "Output png", ShortName = "o", LongName = "output")]
             public string OutputPng { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
@@ -82,16 +82,19 @@ namespace OpenKh.Command.ImgTool
         }
 
         [HelpOption]
-        [Command(Description = "Convert an imz file to png files")]
+        [Command(Description = "imz file -> png or imd files")]
         private class UnimzCommand
         {
             [Required]
             [FileExists]
-            [Argument(0, Description = "Input an imz file path")]
+            [Argument(0, Description = "Input imz")]
             public string ImzFile { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "Save png files to dir", ShortName = "o", LongName = "output")]
+            [Option(CommandOptionType.SingleValue, Description = "Output dir", ShortName = "o", LongName = "output")]
             public string OutputDir { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Export as imd instead of png", ShortName = "m", LongName = "imd")]
+            public bool ExportImd { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -106,10 +109,21 @@ namespace OpenKh.Command.ImgTool
 
                     foreach (var (imgd, index) in pairs)
                     {
-                        var outputFile = Path.Combine(outputDir, $"{Path.GetFileNameWithoutExtension(inputFile)}-{1 + index}.png");
+                        if (ExportImd)
+                        {
+                            var outputFile = Path.Combine(outputDir, $"{Path.GetFileNameWithoutExtension(inputFile)}-{1 + index}.imd");
 
-                        var bitmap = ImgdBitmapUtil.ToBitmap(imgd);
-                        bitmap.Save(outputFile);
+                            var buffer = new MemoryStream();
+                            imgd.Write(buffer);
+                            File.WriteAllBytes(outputFile, buffer.ToArray());
+                        }
+                        else
+                        {
+                            var outputFile = Path.Combine(outputDir, $"{Path.GetFileNameWithoutExtension(inputFile)}-{1 + index}.png");
+
+                            var bitmap = ImgdBitmapUtil.ToBitmap(imgd);
+                            bitmap.Save(outputFile);
+                        }
                     }
                 }
                 return 0;
@@ -117,19 +131,22 @@ namespace OpenKh.Command.ImgTool
         }
 
         [HelpOption]
-        [Command(Description = "Convert a png file to an imd file")]
-        private class PackimdCommand
+        [Command(Description = "png file -> imd file")]
+        private class ImdCommand
         {
             [Required]
             [FileExists]
-            [Argument(0, Description = "Input an png file path")]
+            [Argument(0, Description = "Input png")]
             public string PngFile { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "Save imd to file path", ShortName = "o", LongName = "output")]
+            [Option(CommandOptionType.SingleValue, Description = "Output imd", ShortName = "o", LongName = "output")]
             public string OutputImd { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "Force bits per pixel: 4, 8, 32", ShortName = "b", LongName = "bpp")]
-            public int BitsPerPixel { get; set; }
+            [Option(CommandOptionType.SingleValue, Description = "Set bits per pixel: 4, 8, or 32", ShortName = "b", LongName = "bpp")]
+            public int BitsPerPixel { get; set; } = 8;
+
+            [Option(CommandOptionType.NoValue, Description = "Try to append to imd", ShortName = "a", LongName = "append")]
+            public bool Append { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -148,40 +165,43 @@ namespace OpenKh.Command.ImgTool
                 using (var bitmap = new Bitmap(inputFile))
                 {
                     var imgd = ImgdBitmapUtil.ToImgd(bitmap, BitsPerPixel);
-                    File.Create(outputFile).Using(stream => imgd.Write(stream));
+
+                    var buffer = new MemoryStream();
+                    imgd.Write(buffer);
+                    File.WriteAllBytes(outputFile, buffer.ToArray());
                 }
                 return 0;
             }
         }
 
         [HelpOption]
-        [Command(Description = "Pack imd file(s) to an imz file")]
-        private class PackimzCommand
+        [Command(Description = "png, imd or imz files -> imz file")]
+        private class ImzCommand
         {
             [Required]
-            [Option(CommandOptionType.MultipleValue, Description = "Input one imd file (multiple acceptable)", ShortName = "i", LongName = "input")]
-            public string[] InputImdFile { get; set; }
+            [Option(CommandOptionType.MultipleValue, Description = "Input png/imd/imz file", ShortName = "i", LongName = "input")]
+            public string[] InputFile { get; set; }
 
             [Required]
-            [Option(CommandOptionType.SingleValue, Description = "Save imz to file path", ShortName = "o", LongName = "output")]
+            [Option(CommandOptionType.SingleValue, Description = "Output imz file", ShortName = "o", LongName = "output")]
             public string OutputImz { get; set; }
+
+            [Option(CommandOptionType.SingleValue, Description = "Set bits per pixel for every png: 4, 8, or 32", ShortName = "b", LongName = "bpp")]
+            public int BitsPerPixel { get; set; } = 8;
 
             protected int OnExecute(CommandLineApplication app)
             {
-                var outputFile = OutputImz;
+                Directory.CreateDirectory(Path.GetDirectoryName(OutputImz));
 
-                Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
-
-                var EmptyImgz = new byte[] { 0x49, 0x4d, 0x47, 0x5a, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
-
-                File.Create(outputFile).Using(
-                    stream =>
-                        Imgz.Write(
-                            stream,
-                            InputImdFile
-                                .Select(imdFile => Imgd.Read(new MemoryStream(File.ReadAllBytes(imdFile))))
-                            )
+                var buffer = new MemoryStream();
+                Imgz.Write(
+                    buffer,
+                    InputFile
+                        .SelectMany(imdFile => ImgdBitmapUtil.FromFileToImgdList(imdFile, BitsPerPixel))
+                        .ToArray()
                 );
+                File.WriteAllBytes(OutputImz, buffer.ToArray());
+
                 return 0;
             }
         }

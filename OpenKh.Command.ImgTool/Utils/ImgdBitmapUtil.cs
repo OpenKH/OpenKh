@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 
@@ -252,6 +254,31 @@ namespace OpenKh.Command.ImgTool.Utils
                     }
             }
             throw new NotSupportedException($"BitsPerPixel {bpp} not recognized!");
+        }
+
+        public static IEnumerable<Imgd> FromFileToImgdList(string anyFile, int bitsPerPixel)
+        {
+            switch (Path.GetExtension(anyFile).ToLowerInvariant())
+            {
+                case ".png":
+                    {
+                        yield return new Bitmap(anyFile).Using(bitmap => ToImgd(bitmap));
+                        break;
+                    }
+                case ".imd":
+                    {
+                        yield return File.OpenRead(anyFile).Using(stream => Imgd.Read(stream));
+                        break;
+                    }
+                case ".imz":
+                    {
+                        foreach (var imgd in File.OpenRead(anyFile).Using(stream => Imgz.Read(stream)))
+                        {
+                            yield return imgd;
+                        }
+                        break;
+                    }
+            }
         }
 
         public static Imgd ToImgd(Bitmap bitmap)
