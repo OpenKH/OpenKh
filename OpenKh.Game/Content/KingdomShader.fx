@@ -41,7 +41,7 @@ float RegionClamp(float value, float valueMin, float valueMax)
 
 float RegionRepeat(float value, float min, float max)
 {
-	return ((value - min) % (max - min)) + min;
+	return (value % (max - min)) + min;
 }
 
 float ApplyTextureWrap(float value, int mode, float min, float max) {
