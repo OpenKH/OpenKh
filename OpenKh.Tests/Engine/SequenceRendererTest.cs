@@ -1,30 +1,16 @@
 ﻿using NSubstitute;
-using NSubstitute.Core;
 using OpenKh.Engine.Renderers;
+using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using Xe.Drawing;
 using Xunit;
 
 namespace OpenKh.Tests.Engine
 {
     public class SequenceRendererTest
     {
-        private class DrawCall
-        {
-            public ICall Call { get; set; }
-            public ISurface Surface => (ISurface)Call.GetArguments()[0];
-            public Rectangle Source => (Rectangle)Call.GetArguments()[1];
-            public RectangleF Destination => (RectangleF)Call.GetArguments()[2];
-            public ColorF Color0 => (ColorF)Call.GetArguments()[3];
-            public ColorF Color1 => (ColorF)Call.GetArguments()[4];
-            public ColorF Color2 => (ColorF)Call.GetArguments()[5];
-            public ColorF Color3 => (ColorF)Call.GetArguments()[6];
-        }
-
         [Theory]
         [InlineData(0, 0, 0, 0, 0)]
         [InlineData(0, 1000, 1, 0, 0)]
@@ -56,7 +42,7 @@ namespace OpenKh.Tests.Engine
 
             AssertDraw(drawing, x =>
             {
-                Assert.Equal(expected, x.Destination.X, 0);
+                Assert.Equal(expected, x.DestinationX, 0);
             });
         }
 
@@ -92,7 +78,7 @@ namespace OpenKh.Tests.Engine
 
             AssertDraw(drawing, x =>
             {
-                Assert.Equal(expected, x.Destination.X, 0);
+                Assert.Equal(expected, x.DestinationX, 0);
             });
         }
 
@@ -124,20 +110,17 @@ namespace OpenKh.Tests.Engine
 
             AssertDraw(drawing, x =>
             {
-                Assert.Equal(419, x.Destination.X, 0);
+                Assert.Equal(419, x.DestinationX, 0);
             });
         }
 
-        private static IDrawing MockDrawing() => Substitute.For<IDrawing>();
+        private static ISpriteDrawing MockDrawing() => Substitute.For<ISpriteDrawing>();
 
-        private static void AssertDraw(IDrawing drawing, Action<DrawCall> assertion)
+        private static void AssertDraw(ISpriteDrawing drawing, Action<SpriteDrawingContext> assertion)
         {
             var call = drawing.ReceivedCalls().FirstOrDefault();
             Assert.NotNull(call);
-            assertion(new DrawCall
-            {
-                Call = call
-            });
+            assertion(call.GetArguments()[0] as SpriteDrawingContext);
         }
 
         private static Sequence MockSequence(Sequence.Animation animation)
