@@ -145,9 +145,6 @@ namespace OpenKh.Command.ImgTool
             [Option(CommandOptionType.SingleValue, Description = "Set bits per pixel: 4, 8, or 32", ShortName = "b", LongName = "bpp")]
             public int BitsPerPixel { get; set; } = 8;
 
-            [Option(CommandOptionType.NoValue, Description = "Try to append to imd", ShortName = "a", LongName = "append")]
-            public bool Append { get; set; }
-
             protected int OnExecute(CommandLineApplication app)
             {
                 var inputFile = PngFile;
@@ -189,15 +186,25 @@ namespace OpenKh.Command.ImgTool
             [Option(CommandOptionType.SingleValue, Description = "Set bits per pixel for every png: 4, 8, or 32", ShortName = "b", LongName = "bpp")]
             public int BitsPerPixel { get; set; } = 8;
 
+            [Option(CommandOptionType.NoValue, Description = "Try to append to imz", ShortName = "a", LongName = "append")]
+            public bool Append { get; set; }
+
             protected int OnExecute(CommandLineApplication app)
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(OutputImz));
 
+                var prependImgdList = (Append && File.Exists(OutputImz))
+                    ? File.OpenRead(OutputImz).Using(stream => Imgz.Read(stream).ToArray())
+                    : new Imgd[0];
+
                 var buffer = new MemoryStream();
                 Imgz.Write(
                     buffer,
-                    InputFile
-                        .SelectMany(imdFile => ImgdBitmapUtil.FromFileToImgdList(imdFile, BitsPerPixel))
+                    prependImgdList
+                        .Concat(
+                            InputFile
+                                .SelectMany(imdFile => ImgdBitmapUtil.FromFileToImgdList(imdFile, BitsPerPixel))
+                        )
                         .ToArray()
                 );
                 File.WriteAllBytes(OutputImz, buffer.ToArray());
