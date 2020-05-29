@@ -157,9 +157,9 @@ namespace OpenKh.Command.ImgTool.Utils
                     {
                         var target = MostUsedPixels[index];
                         var A = (byte)(target >> 0);
-                        var B = (byte)(target >> 0);
-                        var C = (byte)(target >> 0);
-                        var D = (byte)(target >> 0);
+                        var B = (byte)(target >> 8);
+                        var C = (byte)(target >> 16);
+                        var D = (byte)(target >> 24);
                         var distance = Math.Abs((int)a - A) + Math.Abs((int)b - B) + Math.Abs((int)c - C) + Math.Abs((int)d - D);
                         if (distance < minDistance)
                         {
