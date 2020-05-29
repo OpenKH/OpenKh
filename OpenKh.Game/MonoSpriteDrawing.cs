@@ -60,12 +60,47 @@ namespace OpenKh.Game
         // This size should be enough to pack enough 2D graphics at once
         private const int MaxSpriteCountPerDraw = 8000;
         private static readonly byte[] WhiteBitmap = Enumerable.Range(0, 2 * 2 * sizeof(int)).Select(x => byte.MaxValue).ToArray();
+        private static readonly BlendState BlendStateDefault = new BlendState()
+        {
+            ColorSourceBlend = Blend.SourceAlpha,
+            AlphaSourceBlend = Blend.SourceAlpha,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
+            AlphaDestinationBlend = Blend.InverseSourceAlpha,
+            ColorBlendFunction = BlendFunction.Add,
+            AlphaBlendFunction = BlendFunction.Add,
+            BlendFactor = Color.White,
+            MultiSampleMask = int.MaxValue,
+            IndependentBlendEnable = false
+        };
+        private static readonly BlendState BlendStateAdditive = new BlendState()
+        {
+            ColorSourceBlend = Blend.SourceAlpha,
+            AlphaSourceBlend = Blend.SourceAlpha,
+            ColorDestinationBlend = Blend.One,
+            AlphaDestinationBlend = Blend.One,
+            ColorBlendFunction = BlendFunction.Add,
+            AlphaBlendFunction = BlendFunction.Add,
+            BlendFactor = Color.White,
+            MultiSampleMask = int.MaxValue,
+            IndependentBlendEnable = false
+        };
+        private static readonly BlendState BlendStateDifference = new BlendState()
+        {
+            ColorSourceBlend = Blend.SourceAlpha,
+            AlphaSourceBlend = Blend.SourceAlpha,
+            ColorDestinationBlend = Blend.DestinationAlpha,
+            AlphaDestinationBlend = Blend.InverseSourceAlpha,
+            ColorBlendFunction = BlendFunction.ReverseSubtract,
+            AlphaBlendFunction = BlendFunction.ReverseSubtract,
+            BlendFactor = Color.White,
+            MultiSampleMask = int.MaxValue,
+            IndependentBlendEnable = false,
+        };
 
         private readonly GraphicsDevice _graphicsDevice;
         private readonly KingdomShader _shader;
 
         private readonly Texture2D _defaultTexture;
-        private readonly BlendState _blendState;
         private readonly SamplerState _samplerState;
         private readonly RasterizerState _rasterizerState;
         private readonly DepthStencilState _depthStencilState;
@@ -75,6 +110,7 @@ namespace OpenKh.Game
         private int _currentSpriteIndex;
         
         private Texture2D _lastTextureUsed;
+        private BlendState _lastBlendState;
         private Matrix _projectionView;
 
         public MonoSpriteDrawing(GraphicsDevice graphicsDevice, KingdomShader shader)
@@ -85,7 +121,6 @@ namespace OpenKh.Game
             _defaultTexture = new Texture2D(_graphicsDevice, 2, 2);
             _defaultTexture.SetData(WhiteBitmap);
 
-            _blendState = BlendState.NonPremultiplied;
             _samplerState = new SamplerState
             {
                 AddressU = TextureAddressMode.Clamp,
@@ -143,6 +178,22 @@ namespace OpenKh.Game
 
         public void AppendSprite(SpriteDrawingContext context)
         {
+            switch (context.BlendMode)
+            {
+                case BlendMode.Default:
+                    SetBlendState(BlendStateDefault);
+                    break;
+                case BlendMode.Add:
+                    SetBlendState(BlendStateAdditive);
+                    break;
+                case BlendMode.Subtract:
+                    SetBlendState(BlendStateDifference);
+                    break;
+                default:
+                    SetBlendState(BlendStateDefault);
+                    break;
+            }
+
             var texture = (context.SpriteTexture as CSpriteTexture)?.Texture;
             var vertexIndex = PrepareVertices(texture);
 
@@ -175,7 +226,7 @@ namespace OpenKh.Game
 
             _graphicsDevice.SamplerStates[0] = _samplerState;
             _graphicsDevice.RasterizerState = _rasterizerState;
-            _graphicsDevice.BlendState = _blendState;
+            _graphicsDevice.BlendState = _lastBlendState;
             _graphicsDevice.DepthStencilState = _depthStencilState;
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);
             _graphicsDevice.Indices = _indexBuffer;
@@ -216,6 +267,15 @@ namespace OpenKh.Game
         private void PushVertices()
         {
             // right now it does not do anything.
+        }
+
+        private void SetBlendState(BlendState blendState)
+        {
+            if (_lastBlendState != blendState)
+            {
+                Flush();
+                _lastBlendState = blendState;
+            }
         }
 
         private static IndexBuffer CreateIndexBufferForSprites(GraphicsDevice graphicsDevice, int spriteCount)
