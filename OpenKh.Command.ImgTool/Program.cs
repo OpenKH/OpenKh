@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 
@@ -14,7 +15,7 @@ namespace OpenKh.Command.ImgTool
 {
     [Command("OpenKh.Command.MsgTool")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(UnimdCommand), typeof(UnimzCommand), typeof(PackimdCommand))]
+    [Subcommand(typeof(UnimdCommand), typeof(UnimzCommand), typeof(PackimdCommand), typeof(PackimzCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -149,6 +150,38 @@ namespace OpenKh.Command.ImgTool
                     var imgd = ImgdBitmapUtil.ToImgd(bitmap, BitsPerPixel);
                     File.Create(outputFile).Using(stream => imgd.Write(stream));
                 }
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "Pack imd file(s) to an imz file")]
+        private class PackimzCommand
+        {
+            [Required]
+            [Option(CommandOptionType.MultipleValue, Description = "Input one imd file (multiple acceptable)", ShortName = "i", LongName = "input")]
+            public string[] InputImdFile { get; set; }
+
+            [Required]
+            [Option(CommandOptionType.SingleValue, Description = "Save imz to file path", ShortName = "o", LongName = "output")]
+            public string OutputImz { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var outputFile = OutputImz;
+
+                Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
+
+                var EmptyImgz = new byte[] { 0x49, 0x4d, 0x47, 0x5a, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
+
+                File.Create(outputFile).Using(
+                    stream =>
+                        Imgz.Write(
+                            stream,
+                            InputImdFile
+                                .Select(imdFile => Imgd.Read(new MemoryStream(File.ReadAllBytes(imdFile))))
+                            )
+                );
                 return 0;
             }
         }
