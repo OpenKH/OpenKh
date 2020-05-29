@@ -90,6 +90,26 @@ namespace OpenKh.Command.ImgTool.Utils
 
                         return bitmap;
                     }
+                case Imaging.PixelFormat.Rgba8888:
+                    {
+                        var bitmap = new Bitmap(imgd.Size.Width, imgd.Size.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+                        var dest = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
+                        try
+                        {
+                            var sourceBits = imgd.GetData();
+                            var sourceWidth = 4 * imgd.Size.Width;
+                            for (int y = 0; y < bitmap.Height; y++)
+                            {
+                                Marshal.Copy(sourceBits, sourceWidth * y, dest.Scan0 + dest.Stride * y, sourceWidth);
+                            }
+                        }
+                        finally
+                        {
+                            bitmap.UnlockBits(dest);
+                        }
+
+                        return bitmap;
+                    }
             }
             throw new NotSupportedException($"{imgd.PixelFormat} not recognized!");
         }
@@ -251,6 +271,32 @@ namespace OpenKh.Command.ImgTool.Utils
                         }
 
                         return Imgd.Create(bitmap.Size, Imaging.PixelFormat.Indexed8, destBits, clut, false);
+                    }
+                case 32:
+                    {
+                        var src = new ReadAs32bppPixels(bitmap);
+
+                        var destBits = new byte[4 * src.Width * src.Height];
+
+                        var srcPointer = 0;
+                        var destPointer = 0;
+
+                        for (int y = 0; y < src.Height; y++)
+                        {
+                            for (int x = 0; x < src.Width; x++)
+                            {
+                                var pixel = src.Pixels[srcPointer++];
+
+                                destBits[destPointer + 0] = (byte)(pixel >> 16);
+                                destBits[destPointer + 1] = (byte)(pixel >> 8);
+                                destBits[destPointer + 2] = (byte)(pixel >> 0);
+                                destBits[destPointer + 3] = (byte)(pixel >> 24);
+
+                                destPointer += 4;
+                            }
+                        }
+
+                        return Imgd.Create(bitmap.Size, Imaging.PixelFormat.Rgba8888, destBits, new byte[0], false);
                     }
             }
             throw new NotSupportedException($"BitsPerPixel {bpp} not recognized!");
