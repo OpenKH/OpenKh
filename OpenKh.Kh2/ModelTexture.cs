@@ -28,7 +28,6 @@ namespace OpenKh.Kh2
         {
             private readonly byte[] _data;
             private readonly byte[] _palette;
-            private readonly TextureAddressMode _textureAddressMode;
             private readonly int _csp;
             private readonly int _csa;
 
@@ -41,7 +40,7 @@ namespace OpenKh.Kh2
                 PixelFormat = pixelFormat;
                 _data = data;
                 _palette = palette;
-                _textureAddressMode = textureAddressMode;
+                TextureAddressMode = textureAddressMode;
                 _csp = csp;
                 _csa = csa;
             }
@@ -49,6 +48,8 @@ namespace OpenKh.Kh2
             public Size Size { get; }
 
             public PixelFormat PixelFormat { get; }
+
+            public TextureAddressMode TextureAddressMode { get; }
 
             public byte[] GetClut()
             {
@@ -173,16 +174,21 @@ namespace OpenKh.Kh2
 
         private class _TextureAddressMode
         {
+            private const int MinU = 4;
+            private const int MaxU = 14;
+            private const int MinV = 24;
+            private const int MaxV = 34;
+
             [Data] public long Data { get; set; }
             public TextureWrapMode AddressU { get => (TextureWrapMode)GetBits(Data, 0, 2); set => Data = SetBits(Data, 0, 2, (int)value); }
             public TextureWrapMode AddressV { get => (TextureWrapMode)GetBits(Data, 2, 2); set => Data = SetBits(Data, 2, 2, (int)value); }
-            public int Left { get => GetBits(Data, 4, 10); set => Data = SetBits(Data, 4, 10, value); }
-            public int Top { get => GetBits(Data, 14, 10); set => Data = SetBits(Data, 14, 10, value); }
-            public int Right { get => GetBits(Data, 24, 10); set => Data = SetBits(Data, 24, 10, value); }
-            public int Bottom { get => GetBits(Data, 34, 10); set => Data = SetBits(Data, 34, 10, value); }
+            public int Left { get => GetBits(Data, MinU, 10); set => Data = SetBits(Data, MinU, 10, value); }
+            public int Top { get => GetBits(Data, MinV, 10); set => Data = SetBits(Data, MinV, 10, value); }
+            public int Right { get => GetBits(Data, MaxU, 10); set => Data = SetBits(Data, MaxU, 10, value); }
+            public int Bottom { get => GetBits(Data, MaxV, 10); set => Data = SetBits(Data, MaxV, 10, value); }
         }
 
-        internal class TextureAddressMode
+        public class TextureAddressMode
         {
             public TextureWrapMode AddressU { get; set; }
             public TextureWrapMode AddressV { get; set; }
