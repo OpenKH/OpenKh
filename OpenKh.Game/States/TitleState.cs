@@ -142,6 +142,14 @@ namespace OpenKh.Game.States
             _stateChange = initDesc.StateChange;
 
             drawing = new MonoDrawing(initDesc.GraphicsDevice.GraphicsDevice, initDesc.ContentManager);
+            var viewport = initDesc.GraphicsDevice.GraphicsDevice.Viewport;
+            drawing.SetProjection(
+                viewport.Width,
+                viewport.Height,
+                Global.ResolutionWidth,
+                Global.ResolutionHeight,
+                1.0f);
+
             cachedSurfaces = new Dictionary<string, IEnumerable<ISurface>>();
 
             if (_kernel.IsReMix)

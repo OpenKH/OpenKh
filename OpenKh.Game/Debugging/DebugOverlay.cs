@@ -44,7 +44,14 @@ namespace OpenKh.Game.Debugging
             _graphics = initDesc.GraphicsDevice;
 
             _drawing = new MonoDrawing(_graphics.GraphicsDevice, initDesc.ContentManager);
-            
+            var viewport = initDesc.GraphicsDevice.GraphicsDevice.Viewport;
+            _drawing.SetProjection(
+                viewport.Width,
+                viewport.Height,
+                Global.ResolutionWidth,
+                Global.ResolutionHeight,
+                1.0f);
+
             var messageContext = _kernel.SystemMessageContext;
             _encoder = messageContext.Encoder;
             _messageRenderer = new Kh2MessageRenderer(_drawing, messageContext);

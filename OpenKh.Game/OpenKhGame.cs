@@ -1,9 +1,10 @@
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using OpenKh.Common;
 using OpenKh.Game.DataContent;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
+using System;
 using System.IO;
 
 namespace OpenKh.Game
@@ -45,19 +46,23 @@ namespace OpenKh.Game
 
         public OpenKhGame()
         {
+            _dataContent = new SafeDataContent(CreateDataContent(".", "KH2.IDX", "KH2.IMG"));
+            _kernel = new Kernel(_dataContent);
+
+            var resolutionWidth = _kernel.IsReMix ?
+                Global.ResolutionRemixWidth :
+                Global.ResolutionWidth;
+
             graphics = new GraphicsDeviceManager(this)
             {
-                PreferredBackBufferWidth = 512,
-                PreferredBackBufferHeight = 416
+                PreferredBackBufferWidth = (int)Math.Round(resolutionWidth * Global.ResolutionBoostRatio),
+                PreferredBackBufferHeight = (int)Math.Round(Global.ResolutionHeight * Global.ResolutionBoostRatio)
             };
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            _dataContent = new SafeDataContent(CreateDataContent(".", "KH2.IDX", "KH2.IMG"));
-
             archiveManager = new ArchiveManager(_dataContent);
-            _kernel = new Kernel(_dataContent);
             inputManager = new InputManager();
             _debugOverlay = new DebugOverlay(this);
         }
