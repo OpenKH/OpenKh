@@ -1,61 +1,34 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
+using Xe.BinaryMapper;
 
-namespace OpenKh.Kh2
+namespace OpenKh.Kh2.Battle
 {
-    public static class Lvup
+    public class Lvup
     {
-        private static byte[] _header;
+        [Data] public int MagicCode { get; set; }
+        [Data] public int Count { get; set; }
+        [Data(Count = 0x38)] public byte[] Unknown08 { get; set; }
+        [Data(Count = 13)] public List<Character> Characters { get; set; }
 
-        public static List<PlayableCharacter> Open(Stream stream)
+        public class Character
         {
-            if (!stream.CanRead || !stream.CanSeek)
-                throw new InvalidDataException($"Read or seek must be supported.");
+            [Data] public int NumLevels { get; set; }
+            [Data(Count = 99)] public List<Level> Levels { get; set; }
 
-            var reader = new BinaryReader(stream);
-            _header = reader.ReadBytes(0x40);
-
-            return Enumerable.Range(0, 13)
-                .Select(x =>
-                {
-                    return new PlayableCharacter(stream, x);
-                })
-                .ToList();
-        }
-
-        public static void Save(Stream stream, IEnumerable<PlayableCharacter> characters)
-        {
-            if (!stream.CanRead || !stream.CanSeek)
-                throw new InvalidDataException($"Read or seek must be supported.");
-
-            if (CanSave())
+            public class Level
             {
-                var writer = new BinaryWriter(stream);
-                writer.Write(_header);
-
-                foreach (var character in characters)
-                {
-                    writer.Write(character.Unknown0);
-                    foreach (var lvl in character.Levels)
-                    {
-                        writer.Write(lvl.EXP);
-                        writer.Write(lvl.Strength);
-                        writer.Write(lvl.Magic);
-                        writer.Write(lvl.Defense);
-                        writer.Write(lvl.AP);
-
-                        writer.Write(lvl.SwordAbility);
-                        writer.Write(lvl.ShieldAbility);
-                        writer.Write(lvl.StaffAbility);
-                        writer.Write((short)0);
-                    }
-                }
+                [Data] public int Exp { get; set; }
+                [Data] public byte Strength { get; set; }
+                [Data] public byte Magic { get; set; }
+                [Data] public byte Defense { get; set; }
+                [Data] public byte Ap { get; set; }
+                [Data] public short SwordAbility { get; set; }
+                [Data] public short ShieldAbility { get; set; }
+                [Data] public short StaffAbility { get; set; }
+                [Data] public short Padding { get; set; }
             }
         }
-
-        public static bool CanSave() => _header?.Length > 0;
 
         public enum PlayableCharacterType
         {
@@ -74,65 +47,8 @@ namespace OpenKh.Kh2
             Riku
         }
 
-        public class PlayableCharacter
-        {
-            public int Unknown0 { get; }
+        public static Lvup Read(Stream stream) => BinaryMapping.ReadObject<Lvup>(stream);
 
-            public PlayableCharacterType Type { get; }
-            public ObservableCollection<LevelUpEntry> Levels { get; set; }
-            public string Name
-            {
-                get => Type.ToString();
-            }
-
-            public PlayableCharacter(Stream stream, int index)
-            {
-                if (!stream.CanRead || !stream.CanSeek)
-                    throw new InvalidDataException($"Read or seek must be supported.");
-
-                Type = (PlayableCharacterType)index;
-                Levels = new ObservableCollection<LevelUpEntry>();
-
-                var reader = new BinaryReader(stream);
-                Unknown0 = reader.ReadInt32();
-                for (int j = 0; j < 99; j++)
-                {
-                    Levels.Add(new LevelUpEntry
-                    {
-                        Level = j + 1,
-                        EXP = reader.ReadInt32(),
-                        Strength = reader.ReadByte(),
-                        Magic = reader.ReadByte(),
-                        Defense = reader.ReadByte(),
-                        AP = reader.ReadByte(),
-
-                        SwordAbility = reader.ReadInt16(),
-                        ShieldAbility = reader.ReadInt16(),
-                        StaffAbility = reader.ReadInt16()
-                    });
-                    reader.BaseStream.Seek(2, SeekOrigin.Current);
-                }
-            }
-        }
-
-        public class LevelUpEntry
-        {
-            public int Level { get; set; }
-            public int EXP { get; set; }
-
-            public byte Strength { get; set; }
-            public byte Magic { get; set; }
-            public byte Defense { get; set; }
-            public byte AP { get; set; }
-
-            public short SwordAbility { get; set; }
-            public short ShieldAbility { get; set; }
-            public short StaffAbility { get; set; }
-
-            public string Name
-            {
-                get => $"Level {Level}";
-            }
-        }
+        public void Write(Stream stream) => BinaryMapping.WriteObject(stream, this);
     }
 }
