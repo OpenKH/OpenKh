@@ -1,22 +1,12 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.65">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
-    <OutputPath>..\bin\$(Configuration)\</OutputPath>
-    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
-    <AssemblyTitle>KH2 Battle Editor</AssemblyTitle>
-    <Product>KH2 Battle Editor - OpenKh</Product>
-    <LangVersion>7</LangVersion>
+    <AssemblyTitle>KH2 Battle editor</AssemblyTitle>
+    <Product>KH2 Battle editor - OpenKH</Product>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
