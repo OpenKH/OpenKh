@@ -1,4 +1,5 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Common;
+using OpenKh.Kh2;
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
@@ -6,12 +7,16 @@ using System.IO;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Xe.IO;
 
 namespace OpenKh.Command.IdxImg
 {
     [Command("OpenKh.Command.IdxImg")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(ExtractCommand), typeof(ListCommand))]
+    [Subcommand(
+        typeof(ExtractCommand),
+        typeof(ListCommand),
+        typeof(InjectCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -143,6 +148,81 @@ namespace OpenKh.Command.IdxImg
 
                 return 0;
             }
+        }
+
+        [Command(Description = "Patch an ISO by injecting a single file in the IMG, without repacking. Useful for quick testing.")]
+        private class InjectCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Kingdom Hearts II ISO file that contains the game files")]
+            public string InputIso { get; set; }
+
+            [Required]
+            [FileExists]
+            [Argument(1, Description = "File to inject")]
+            public string InputFile { get; set; }
+
+            [Required]
+            [Argument(2, Description = "IDX file path (eg. msg/jp/sys.bar)")]
+            public string FilePath { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Do not compress the file to inject", ShortName = "u", LongName = "--uncompressed")]
+            public bool Uncompressed { get; set; }
+
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IDX. By default is 1417580 for KH2FM", ShortName = "idx", LongName = "--idx-offset")]
+            public long IdxIsoBlock { get; set; } = 1417580;
+
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IMG. By default is 1841 for KH2FM", ShortName = "img", LongName = "--img-offset")]
+            public long ImgIsoBlock { get; set; } = 1841;
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                const long EsitmatedMaximumImgFileSize = 4L * 1024 * 1024 * 1024; // 4GB
+                const int EsitmatedMaximumIdxFileSize = 600 * 1024; // 600KB
+                const int EstimatedMaximumIdxEntryAmountToBeValid = EsitmatedMaximumIdxFileSize / 0x10 - 4;
+
+                using var isoStream = File.Open(InputIso, FileMode.Open, FileAccess.ReadWrite);
+
+                using var idxStream = new SubStream(isoStream, IdxIsoBlock * 0x800, EsitmatedMaximumIdxFileSize);
+                var idxEntryCount = idxStream.ReadInt32();
+                if (idxEntryCount > EstimatedMaximumIdxEntryAmountToBeValid)
+                    throw new Exception("There is a high chance that the IDX block is not valid, therefore the injection will terminate to avoid corruption.");
+
+                var idxEntries = Idx.Read(idxStream.SetPosition(0));
+                var entry = idxEntries.FirstOrDefault(x => x.Hash32 == Idx.GetHash32(FilePath) && x.Hash16 == Idx.GetHash16(FilePath));
+                if (entry == null)
+                    throw new Exception($"The file {FilePath} has not been found inside the KH2.IDX, therefore the injection will terminate.");
+
+                using var imgStream = new SubStream(isoStream, ImgIsoBlock * 0x800, EsitmatedMaximumImgFileSize);
+
+                var inputData = File.ReadAllBytes(InputFile);
+                var decompressedLength = inputData.Length;
+                if (Uncompressed == false)
+                    inputData = Img.Compress(inputData);
+
+                var blockCountRequired = (inputData.Length + 0x7ff) / 0x800 - 1;
+                if (blockCountRequired > entry.BlockLength)
+                    throw new Exception($"The file to inject is too big: the actual is {inputData.Length} but the maximum allowed is {GetLength(entry.BlockLength)}.");
+
+                imgStream.SetPosition(GetOffset(entry.Offset));
+                // Clean completely the content of the previous file to not mess up the decompression
+                imgStream.Write(new byte[GetLength(entry.BlockLength)]);
+
+                imgStream.SetPosition(GetOffset(entry.Offset));
+                imgStream.Write(inputData);
+
+                entry.IsCompressed = !Uncompressed;
+                entry.Length = decompressedLength;
+                // we are intentionally not patching entry.BlockLength because it would not allow to insert back bigger files.
+
+                Idx.Write(idxStream.SetPosition(0), idxEntries);
+
+                return 0;
+            }
+
+            private static long GetOffset(long blockOffset) => blockOffset * 0x800;
+            private static int GetLength(int blockLength) => blockLength * 0x800 + 0x800;
         }
 
         private static IEnumerable<Idx.Entry> OpenIdx(string fileName)
