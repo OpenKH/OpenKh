@@ -36,7 +36,7 @@ namespace OpenKh.Kh2
             /// <summary>
             /// Offset of the file in the archive, divided by the ISO block size
             /// </summary>
-            [Data] public int Offset { get; set; }
+            [Data] public uint Offset { get; set; }
 
             /// <summary>
             /// Length of the file in bytes
