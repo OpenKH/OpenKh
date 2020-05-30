@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
 using System.Linq;
@@ -31,9 +31,9 @@ namespace OpenKh.Tests.kh2
             var entry = MockIdxEntry(1, 2, 3, 4, 5);
             Assert.Equal(1U, entry.Hash32);
             Assert.Equal(2, entry.Hash16);
-            Assert.Equal(3U, entry.BlockLength);
-            Assert.Equal(4U, entry.Offset);
-            Assert.Equal(5U, entry.Length);
+            Assert.Equal(3, entry.BlockLength);
+            Assert.Equal(4, entry.Offset);
+            Assert.Equal(5, entry.Length);
         }
 
         [Theory]

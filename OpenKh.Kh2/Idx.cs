@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,30 +31,30 @@ namespace OpenKh.Kh2
             /// <summary>
             /// Additional info and files
             /// </summary>
-            [Data] public ushort Info { get; set; }
+            [Data] public ushort BlockDescription { get; set; }
 
             /// <summary>
             /// Offset of the file in the archive, divided by the ISO block size
             /// </summary>
-            [Data] public uint Offset { get; set; }
+            [Data] public int Offset { get; set; }
 
             /// <summary>
             /// Length of the file in bytes
             /// </summary>
-            [Data] public uint Length { get; set; }
+            [Data] public int Length { get; set; }
 
             /// <summary>
             /// ISO blocks used in the ISO.
             /// </summary>
-            public uint BlockLength
+            public int BlockLength
             {
-                get => (uint)(Info & MaxBlockLength);
+                get => BlockDescription & MaxBlockLength;
                 set
                 {
                     if (value > MaxBlockLength)
                         throw new ArgumentOutOfRangeException(nameof(BlockLength), $"Cannot exceeds {MaxBlockLength}");
 
-                    Info = (ushort)(value | (Info & 0xC000U));
+                    BlockDescription = (ushort)((ushort)value | (BlockDescription & 0xC000U));
                 }
             }
 
@@ -63,13 +63,13 @@ namespace OpenKh.Kh2
             /// </summary>
             public bool IsCompressed
             {
-                get => (Info & IsCompressedFlag) != 0;
+                get => (BlockDescription & IsCompressedFlag) != 0;
                 set
                 {
                     if (value)
-                        Info |= IsCompressedFlag;
+                        BlockDescription |= IsCompressedFlag;
                     else
-                        Info = (ushort)(Info & ~IsCompressedFlag);
+                        BlockDescription = (ushort)(BlockDescription & ~IsCompressedFlag);
                 }
             }
 
@@ -78,13 +78,13 @@ namespace OpenKh.Kh2
             /// </summary>
             public bool IsStreamed
             {
-                get => (Info & IsStreamedFlag) != 0;
+                get => (BlockDescription & IsStreamedFlag) != 0;
                 set
                 {
                     if (value)
-                        Info |= IsStreamedFlag;
+                        BlockDescription |= IsStreamedFlag;
                     else
-                        Info = (ushort)(Info & ~IsStreamedFlag);
+                        BlockDescription = (ushort)(BlockDescription & ~IsStreamedFlag);
                 }
             }
         }
