@@ -37,6 +37,15 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(5, entry.Length);
         }
 
+        [Fact]
+        public void WriteIdxEntry() => Helpers.AssertStream(CreateMockIdxStream(1, 2, 3, 4, 5), stream =>
+        {
+            var outStream = new MemoryStream();
+            Idx.Write(outStream, Idx.Read(stream));
+
+            return outStream;
+        });
+
         [Theory]
         [InlineData(0x3fff, false, false)]
         [InlineData(0x4000, true, false)]
@@ -74,11 +83,11 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(name, IdxName.Lookup(hash32, hash16));
         }
 
-        private static List<Idx.Entry> MockIdx(uint hash32, ushort hash16, ushort blockDescriptor, int offset, int length)
+        private static Stream CreateMockIdxStream(uint hash32, ushort hash16, ushort blockDescriptor, int offset, int length)
         {
             const int IdxFileCount = 1;
 
-            using var stream = new MemoryStream(0x14);
+            var stream = new MemoryStream(0x14);
             stream.Write(IdxFileCount);
             stream.Write(hash32);
             stream.Write(hash16);
@@ -86,8 +95,11 @@ namespace OpenKh.Tests.kh2
             stream.Write(offset);
             stream.Write(length);
 
-            return Idx.Read(stream.SetPosition(0));
+            return stream.SetPosition(0);
         }
+
+        private static List<Idx.Entry> MockIdx(uint hash32, ushort hash16, ushort blockDescriptor, int offset, int length) =>
+            CreateMockIdxStream(hash32, hash16, blockDescriptor, offset, length).Using(Idx.Read);
 
         private static Idx.Entry MockIdxEntry(uint hash32, ushort hash16, ushort blockDescriptor, int offset, int length) =>
             MockIdx(hash32, hash16, blockDescriptor, offset, length).First();
