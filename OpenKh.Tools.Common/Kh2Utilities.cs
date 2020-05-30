@@ -26,7 +26,7 @@ namespace OpenKh.Tools.Common
         public static List<Msg.Entry> ReadMsgFromIdx(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             if (!Idx.IsValid(stream))
-                throw new InvalidFileException<Idx>();
+                throw new InvalidFileException(typeof(Idx));
 
             var imgFileName = $"{Path.GetFileNameWithoutExtension(fileName)}.img";
             var imgFilePath = Path.Combine(Path.GetDirectoryName(fileName), imgFileName);

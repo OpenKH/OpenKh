@@ -1,5 +1,6 @@
-using OpenKh.Common;
+﻿using OpenKh.Common;
 using OpenKh.Kh2;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -57,6 +58,7 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x4710, 0x13EFFF0, 0x1710)] // the scenario on any KH2.IDX
         [InlineData(0x0710, 0x13EFFF0, 0x0710)] // do not break other stuff
         [InlineData(0x4710, 0xFFFFFF, 0x0710)] // do not break other stuff
+        [InlineData(0x5710, 0x13EFFF0, 0x1710)] // do not break it if it is fixed
         public void IdxBlockSizeBugTest(ushort blockDescriptor, int uncompressedLength, int expectedBlockCount)
         {
             var entry = MockIdxEntry(0, 0, blockDescriptor, 0, uncompressedLength);
@@ -69,11 +71,10 @@ namespace OpenKh.Tests.kh2
         [InlineData(0x01234567, 0xcdef, null)]
         public void GiveRealNames(uint hash32, ushort hash16, string name)
         {
-            var entry = MockIdx(hash32, hash16, 0, 0, 0).GetNameEntries().First();
-            Assert.Equal(name, entry.Name);
+            Assert.Equal(name, IdxName.Lookup(hash32, hash16));
         }
 
-        private static Idx MockIdx(uint hash32, ushort hash16, ushort blockDescriptor, int offset, int length)
+        private static List<Idx.Entry> MockIdx(uint hash32, ushort hash16, ushort blockDescriptor, int offset, int length)
         {
             const int IdxFileCount = 1;
 
@@ -89,6 +90,6 @@ namespace OpenKh.Tests.kh2
         }
 
         private static Idx.Entry MockIdxEntry(uint hash32, ushort hash16, ushort blockDescriptor, int offset, int length) =>
-            MockIdx(hash32, hash16, blockDescriptor, offset, length).Items.First();
+            MockIdx(hash32, hash16, blockDescriptor, offset, length).First();
     }
 }

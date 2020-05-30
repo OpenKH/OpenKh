@@ -68,14 +68,14 @@ namespace OpenKh.Command.IdxImg
                 var inputImg = InputImg ?? InputIdx.Replace(".idx", ".img", StringComparison.InvariantCultureIgnoreCase);
                 var outputDir = OutputDir ?? Path.Combine(Path.GetFullPath(inputImg), "extract");
 
-                Idx idx = OpenIdx(InputIdx);
+                var idxEntries = OpenIdx(InputIdx);
 
                 using (var imgStream = File.OpenRead(inputImg))
                 {
-                    var img = new Img(imgStream, idx, false);
+                    var img = new Img(imgStream, idxEntries, false);
                     var idxName = Path.GetFileNameWithoutExtension(InputIdx);
 
-                    var subIdxPath = ExtractIdx(img, idx, Recursive && Split ? Path.Combine(outputDir, "KH2") : outputDir);
+                    var subIdxPath = ExtractIdx(img, idxEntries, Recursive && Split ? Path.Combine(outputDir, "KH2") : outputDir);
                     if (Recursive)
                     {
                         foreach (var idxFileName in subIdxPath)
@@ -89,15 +89,15 @@ namespace OpenKh.Command.IdxImg
                 return 0;
             }
 
-            public static List<string> ExtractIdx(Img img, Idx idx, string basePath)
+            public static List<string> ExtractIdx(Img img, IEnumerable<Idx.Entry> idxEntries, string basePath)
             {
                 var idxs = new List<string>();
 
-                foreach (var entry in idx.GetNameEntries())
+                foreach (var entry in idxEntries)
                 {
-                    var fileName = entry.Name;
+                    var fileName = IdxName.Lookup(entry);
                     if (fileName == null)
-                        fileName = $"@noname/{entry.Entry.Hash32:X08}-{entry.Entry.Hash16:X04}";
+                        fileName = $"@noname/{entry.Hash32:X08}-{entry.Hash16:X04}";
 
                     Console.WriteLine(fileName);
 
@@ -109,7 +109,7 @@ namespace OpenKh.Command.IdxImg
                     using (var file = File.Create(outputFile))
                     {
                         // TODO handle decompression
-                        img.FileOpen(entry.Entry).CopyTo(file);
+                        img.FileOpen(entry).CopyTo(file);
                     }
 
                     if (Path.GetExtension(fileName) == ".idx")
@@ -134,21 +134,21 @@ namespace OpenKh.Command.IdxImg
 
             protected int OnExecute(CommandLineApplication app)
             {
-                var entries = OpenIdx(InputIdx).GetNameEntries();
+                var entries = OpenIdx(InputIdx);
                 if (Sort)
-                    entries = entries.OrderBy(x => x.Entry.Offset);
+                    entries = entries.OrderBy(x => x.Offset);
 
                 foreach (var entry in entries)
-                    Console.WriteLine(entry.Name);
+                    Console.WriteLine(IdxName.Lookup(entry) ?? $"@{entry.Hash32:X08}-{entry.Hash16:X04}");
 
                 return 0;
             }
         }
 
-        private static Idx OpenIdx(string fileName)
+        private static IEnumerable<Idx.Entry> OpenIdx(string fileName)
         {
-            using (var idxStream = File.OpenRead(fileName))
-                return Idx.Read(idxStream);
+            using var idxStream = File.OpenRead(fileName);
+            return Idx.Read(idxStream);
         }
     }
 }

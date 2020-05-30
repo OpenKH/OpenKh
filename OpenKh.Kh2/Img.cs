@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Xe.IO;
@@ -34,27 +34,55 @@ namespace OpenKh.Kh2
 
         private readonly Stream stream;
 
-        public Img(Stream stream, Idx idx, bool loadAllIdx)
+        public Img(Stream stream, IEnumerable<Idx.Entry> idxEntries, bool loadAllIdx)
         {
             this.stream = stream;
-            Idx = idx;
+            Entries = new IdxDictionary
+            {
+                idxEntries
+            };
+
             if (loadAllIdx)
-                Idx = LoadAllIdx(Idx);
+            {
+                foreach (var fileName in InternalIdxs)
+                {
+                    FileOpen(fileName, entryStream =>
+                    {
+                        Entries.Add(Idx.Read(entryStream));
+                    });
+                }
+            }
         }
 
-        public Idx Idx { get; }
+        public IdxDictionary Entries { get; }
+
+        public bool FileExists(string fileName) => Entries.Exists(fileName);
+
+        public bool TryFileOpen(string fileName, out Stream stream)
+        {
+            bool result;
+            if (result = Entries.TryGetEntry(fileName, out var entry))
+            {
+                stream = FileOpen(entry);
+                return true;
+            }
+
+            stream = null;
+            return false;
+        }
 
         public bool FileOpen(string fileName, Action<Stream> callback)
         {
             bool result;
-            if (result = Idx.TryGetEntry(fileName, out var entry))
+            if (result = Entries.TryGetEntry(fileName, out var entry))
                 callback(FileOpen(entry));
+
             return result;
         }
 
         public Stream FileOpen(string fileName)
         {
-            if (Idx.TryGetEntry(fileName, out var entry))
+            if (Entries.TryGetEntry(fileName, out var entry))
                 return FileOpen(entry);
 
             throw new FileNotFoundException("File not found", fileName);
@@ -118,31 +146,6 @@ namespace OpenKh.Kh2
             }
 
             return dstData;
-        }
-
-        private static byte ReadByteBackward(Stream stream)
-        {
-            stream.Position -= 1;
-            var b = stream.ReadByte();
-            stream.Position -= 1;
-            return (byte)b;
-        }
-
-        private static void WriteByteBackward(Stream stream, byte value)
-        {
-            stream.Position -= 1;
-            stream.WriteByte(value);
-            stream.Position -= 1;
-        }
-
-        private Idx LoadAllIdx(Idx idx)
-        {
-            foreach (var fileName in InternalIdxs)
-            {
-                idx = idx.Merge(Idx.Read(FileOpen(fileName)));
-            }
-
-            return idx;
         }
     }
 }
