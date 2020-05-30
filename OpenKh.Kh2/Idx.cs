@@ -48,7 +48,15 @@ namespace OpenKh.Kh2
             /// </summary>
             public int BlockLength
             {
-                get => BlockDescription & MaxBlockLength;
+                get
+                {
+                    var blockLength = BlockDescription & MaxBlockLength;
+                    if (Length >= 0x1000000 && IsCompressed) // HACK: please refer to IdxBlockSizeBugTest
+                        blockLength += 0x1000;
+
+                    return blockLength;
+                }
+
                 set
                 {
                     if (value > MaxBlockLength)

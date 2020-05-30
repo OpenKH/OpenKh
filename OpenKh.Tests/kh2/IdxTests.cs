@@ -1,4 +1,4 @@
-using OpenKh.Common;
+﻿using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
 using System.Linq;
@@ -46,6 +46,21 @@ namespace OpenKh.Tests.kh2
             var entry = MockIdxEntry(0, 0, blockDescriptor, 0, 0);
             Assert.Equal(expectedIsCompressed, entry.IsCompressed);
             Assert.Equal(expectedIsStreamed, entry.IsStreamed);
+        }
+
+        /// <summary>
+        /// This test addresses a rare bug regarding the file obj/B_LK120_RAW.mset,
+        /// where its block size is stored as 0x710 rather than 0x1710.
+        /// It is the only known file that have this behaviour.
+        /// </summary>
+        [Theory]
+        [InlineData(0x4710, 0x13EFFF0, 0x1710)] // the scenario on any KH2.IDX
+        [InlineData(0x0710, 0x13EFFF0, 0x0710)] // do not break other stuff
+        [InlineData(0x4710, 0xFFFFFF, 0x0710)] // do not break other stuff
+        public void IdxBlockSizeBugTest(ushort blockDescriptor, int uncompressedLength, int expectedBlockCount)
+        {
+            var entry = MockIdxEntry(0, 0, blockDescriptor, 0, uncompressedLength);
+            Assert.Equal(expectedBlockCount, (int)entry.BlockLength);
         }
 
         [Theory]
