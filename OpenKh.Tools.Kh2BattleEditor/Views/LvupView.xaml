@@ -7,6 +7,9 @@
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2BattleEditor.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -33,28 +36,28 @@
                 SelectedItem="{Binding SelectedItem.SelectedItem}"
                 DisplayMemberPath="Name" />
             <controls:TwoColumnsPanel Grid.Column="2" RowSpacing="3" DataContext="{Binding SelectedItem.SelectedItem}">
-                <TextBlock Text="EXP for Level Up" />
+                <TextBlock Text="EXP for Level Up" Margin="{StaticResource LabelMargin}" />
                 <TextBox Text="{Binding Exp, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Text="Strength" />
+                <TextBlock Text="Strength" Margin="{StaticResource LabelMargin}" />
                 <TextBox Text="{Binding Strength, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Text="Magic" />
+                <TextBlock Text="Magic" Margin="{StaticResource LabelMargin}" />
                 <TextBox Text="{Binding Magic, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Text="Defense" />
+                <TextBlock Text="Defense" Margin="{StaticResource LabelMargin}" />
                 <TextBox Text="{Binding Defense, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Text="AP" />
+                <TextBlock Text="AP" Margin="{StaticResource LabelMargin}" />
                 <TextBox Text="{Binding Ap, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Text="Sword ability" />
+                <TextBlock Text="Sword ability" Margin="{StaticResource LabelMargin}" />
                 <TextBox Text="{Binding SwordAbility, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Text="Shield ability" />
+                <TextBlock Text="Shield ability" Margin="{StaticResource LabelMargin}" />
                 <TextBox Text="{Binding ShieldAbility, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Text="Staff ability" />
+                <TextBlock Text="Staff ability" Margin="{StaticResource LabelMargin}" />
                 <TextBox Text="{Binding StaffAbility, UpdateSourceTrigger=PropertyChanged}" />
             </controls:TwoColumnsPanel>
         </Grid>
