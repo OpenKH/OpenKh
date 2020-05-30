@@ -19,6 +19,13 @@ namespace OpenKh.Command.IdxImg
         typeof(InjectCommand))]
     class Program
     {
+        class CustomException : Exception
+        {
+            public CustomException(string message) :
+                base(message)
+            { }
+        }
+
         static int Main(string[] args)
         {
             try
@@ -29,6 +36,11 @@ namespace OpenKh.Command.IdxImg
             {
                 Console.WriteLine($"The file {e.FileName} cannot be found. The program will now exit.");
                 return 2;
+            }
+            catch (CustomException e)
+            {
+                Console.WriteLine(e.Message);
+                return 1;
             }
             catch (Exception e)
             {
@@ -187,12 +199,12 @@ namespace OpenKh.Command.IdxImg
                 using var idxStream = new SubStream(isoStream, IdxIsoBlock * 0x800, EsitmatedMaximumIdxFileSize);
                 var idxEntryCount = idxStream.ReadInt32();
                 if (idxEntryCount > EstimatedMaximumIdxEntryAmountToBeValid)
-                    throw new Exception("There is a high chance that the IDX block is not valid, therefore the injection will terminate to avoid corruption.");
+                    throw new CustomException("There is a high chance that the IDX block is not valid, therefore the injection will terminate to avoid corruption.");
 
                 var idxEntries = Idx.Read(idxStream.SetPosition(0));
                 var entry = idxEntries.FirstOrDefault(x => x.Hash32 == Idx.GetHash32(FilePath) && x.Hash16 == Idx.GetHash16(FilePath));
                 if (entry == null)
-                    throw new Exception($"The file {FilePath} has not been found inside the KH2.IDX, therefore the injection will terminate.");
+                    throw new CustomException($"The file {FilePath} has not been found inside the KH2.IDX, therefore the injection will terminate.");
 
                 using var imgStream = new SubStream(isoStream, ImgIsoBlock * 0x800, EsitmatedMaximumImgFileSize);
 
@@ -203,7 +215,7 @@ namespace OpenKh.Command.IdxImg
 
                 var blockCountRequired = (inputData.Length + 0x7ff) / 0x800 - 1;
                 if (blockCountRequired > entry.BlockLength)
-                    throw new Exception($"The file to inject is too big: the actual is {inputData.Length} but the maximum allowed is {GetLength(entry.BlockLength)}.");
+                    throw new CustomException($"The file to inject is too big: the actual is {inputData.Length} but the maximum allowed is {GetLength(entry.BlockLength)}.");
 
                 imgStream.SetPosition(GetOffset(entry.Offset));
                 // Clean completely the content of the previous file to not mess up the decompression
