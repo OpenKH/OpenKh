@@ -10,6 +10,7 @@ using OpenKh.Kh2.Battle;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
+using OpenKh.Tools.Kh2BattleEditor.Views;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
@@ -20,12 +21,15 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
     {
         private static string ApplicationName = Utilities.GetApplicationName();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+        private static readonly List<FileDialogFilter> BattleFilter = FileDialogFilterComposer.Compose()
+            .AddExtensions("00battle", "bin", "bar").AddAllFiles();
         private string _fileName;
         private IEnumerable<Bar.Entry> _battleItems;
         private EnmpViewModel _enmp;
         private FmlvViewModel _fmlv;
         private BonsViewModel _bons;
         private PrztViewModel _przt;
+        private LvupViewModel _lvup;
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
@@ -69,22 +73,22 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             private set { _przt = value; OnPropertyChanged(); }
         }
 
+        public LvupViewModel Lvup
+        {
+            get => _lvup;
+            private set { _lvup = value; OnPropertyChanged(); }
+        }
+
+
 
         public MainViewModel()
         {
             OpenCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Open, new[]
+                FileDialog.OnOpen(fileName =>
                 {
-                    ("00battle.bin", "bin"),
-                    ("BAR file", "bar"),
-                    ("All files", "*")
-                });
-
-                if (fd.ShowDialog() == true)
-                {
-                    OpenFile(fd.FileName);
-                }
+                    OpenFile(fileName);
+                }, BattleFilter);
             }, x => true);
 
             SaveCommand = new RelayCommand(x =>
@@ -101,12 +105,11 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
             SaveAsCommand = new RelayCommand(x =>
             {
-                var fd = FileDialog.Factory(Window, FileDialog.Behavior.Save);
-                if (fd.ShowDialog() == true)
+                FileDialog.OnSave(fileName =>
                 {
-                    SaveFile(FileName, fd.FileName);
-                    FileName = fd.FileName;
-                }
+                    SaveFile(FileName, fileName);
+                    FileName = fileName;
+                }, BattleFilter);
             }, x => true);
 
             ExitCommand = new RelayCommand(x =>
@@ -161,6 +164,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             "lvpm",
             "bons",
             "przt",
+            "lvup",
         }.Contains(x.Name));
 
         private void CreateBattleItems()
@@ -170,6 +174,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             Fmlv = GetDefaultBattleViewModelInstance<FmlvViewModel>();
             Bons = GetDefaultBattleViewModelInstance<BonsViewModel>();
             Przt = GetDefaultBattleViewModelInstance<PrztViewModel>();
+            Lvup = GetDefaultBattleViewModelInstance<LvupViewModel>();
         }
 
         private void LoadBattleItems(IEnumerable<Bar.Entry> entries)
@@ -179,6 +184,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             Fmlv = GetBattleViewModelInstance<FmlvViewModel>(_battleItems);
             Bons = GetBattleViewModelInstance<BonsViewModel>(_battleItems);
             Przt = GetBattleViewModelInstance<PrztViewModel>(_battleItems);
+            Lvup = GetBattleViewModelInstance<LvupViewModel>(_battleItems);
         }
 
         private void SaveBattleItems()
@@ -187,6 +193,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             _battleItems = SaveBattleItem(_battleItems, Fmlv);
             _battleItems = SaveBattleItem(_battleItems, Bons);
             _battleItems = SaveBattleItem(_battleItems, Przt);
+            _battleItems = SaveBattleItem(_battleItems, Lvup);
         }
 
         private IEnumerable<Bar.Entry> SaveBattleItem(IEnumerable<Bar.Entry> entries, IBattleGetChanges battleGetChanges) =>

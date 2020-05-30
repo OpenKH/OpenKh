@@ -43,6 +43,9 @@
             <TabItem Header="Przt">
                 <local:PrztView DataContext="{Binding Przt}"/>
             </TabItem>
+            <TabItem Header="Lvup">
+                <local:LvupView DataContext="{Binding Lvup}" />
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2BattleEditor.Views.LvupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2BattleEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Center">
+            <TextBlock Text="Character" Margin="0 2 5 0"/>
+            <ComboBox Width="200"
+            ItemsSource="{Binding Items}"
+            SelectedIndex="{Binding SelectedIndex}"
+            SelectedItem="{Binding SelectedItem}"
+            DisplayMemberPath="Name"/>
+        </StackPanel>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ListBox Grid.Column="0" 
+                ItemsSource="{Binding SelectedItem.Items}"
+                SelectedIndex="{Binding SelectedItem.SelectedIndex}"
+                SelectedItem="{Binding SelectedItem.SelectedItem}"
+                DisplayMemberPath="Name" />
+            <controls:TwoColumnsPanel Grid.Column="2" RowSpacing="3" DataContext="{Binding SelectedItem.SelectedItem}">
+                <TextBlock Text="EXP for Level Up" />
+                <TextBox Text="{Binding Exp, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Text="Strength" />
+                <TextBox Text="{Binding Strength, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Text="Magic" />
+                <TextBox Text="{Binding Magic, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Text="Defense" />
+                <TextBox Text="{Binding Defense, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Text="AP" />
+                <TextBox Text="{Binding Ap, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Text="Sword ability" />
+                <TextBox Text="{Binding SwordAbility, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Text="Shield ability" />
+                <TextBox Text="{Binding ShieldAbility, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Text="Staff ability" />
+                <TextBox Text="{Binding StaffAbility, UpdateSourceTrigger=PropertyChanged}" />
+            </controls:TwoColumnsPanel>
+        </Grid>
+    </Grid>
+</UserControl>
