@@ -9,7 +9,7 @@ namespace OpenKh.Kh2
     {
         const int IsoBlockAlign = 0x800;
 
-        private static string[] InternalIdxs =
+        public static string[] InternalIdxs =
         {
             "000al.idx",
             "000bb.idx",

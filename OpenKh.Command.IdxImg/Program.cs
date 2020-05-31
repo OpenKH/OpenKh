@@ -196,7 +196,9 @@ namespace OpenKh.Command.IdxImg
 
                 using var isoStream = File.Open(InputIso, FileMode.Open, FileAccess.ReadWrite);
 
-                using var idxStream = new SubStream(isoStream, IdxIsoBlock * 0x800, EsitmatedMaximumIdxFileSize);
+                var idxStream = OpenIsoSubStream(isoStream, IdxIsoBlock, EsitmatedMaximumIdxFileSize);
+                using var imgStream = OpenIsoSubStream(isoStream, ImgIsoBlock, EsitmatedMaximumImgFileSize);
+
                 var idxEntryCount = idxStream.ReadInt32();
                 if (idxEntryCount > EstimatedMaximumIdxEntryAmountToBeValid)
                     throw new CustomException("There is a high chance that the IDX block is not valid, therefore the injection will terminate to avoid corruption.");
@@ -204,9 +206,14 @@ namespace OpenKh.Command.IdxImg
                 var idxEntries = Idx.Read(idxStream.SetPosition(0));
                 var entry = idxEntries.FirstOrDefault(x => x.Hash32 == Idx.GetHash32(FilePath) && x.Hash16 == Idx.GetHash16(FilePath));
                 if (entry == null)
-                    throw new CustomException($"The file {FilePath} has not been found inside the KH2.IDX, therefore the injection will terminate.");
+                {
+                    idxStream = GetIdxStreamWhichContainsTargetedFile(idxEntries, imgStream, FilePath);
+                    if (idxStream == null)
+                        throw new CustomException($"The file {FilePath} has not been found inside the KH2.IDX, therefore the injection will terminate.");
 
-                using var imgStream = new SubStream(isoStream, ImgIsoBlock * 0x800, EsitmatedMaximumImgFileSize);
+                    idxEntries = Idx.Read(idxStream.SetPosition(0));
+                    entry = idxEntries.FirstOrDefault(x => x.Hash32 == Idx.GetHash32(FilePath) && x.Hash16 == Idx.GetHash16(FilePath));
+                }
 
                 var inputData = File.ReadAllBytes(InputFile);
                 var decompressedLength = inputData.Length;
@@ -233,6 +240,30 @@ namespace OpenKh.Command.IdxImg
                 return 0;
             }
 
+            private Stream GetIdxStreamWhichContainsTargetedFile(List<Idx.Entry> idxEntries, Stream imgStream, string fileName)
+            {
+                var idxDictionary = new IdxDictionary { idxEntries };
+
+                foreach (var innerIdx in Img.InternalIdxs)
+                {
+                    if (idxDictionary.TryGetEntry(innerIdx, out var innerIdxEntry))
+                    {
+                        var innerIdxStream = OpenIsoSubStream(imgStream, innerIdxEntry.Offset, innerIdxEntry.Length);
+                        var innerIdxDictionary = new IdxDictionary
+                        {
+                            Idx.Read(innerIdxStream)
+                        };
+
+                        if (innerIdxDictionary.Exists(fileName))
+                            return innerIdxStream;
+                    }
+                }
+
+                return null;
+            }
+
+            private static Stream OpenIsoSubStream(Stream isoStream, long blockOffset, long length) =>
+                new SubStream(isoStream, blockOffset * 0x800, length);
             private static long GetOffset(long blockOffset) => blockOffset * 0x800;
             private static int GetLength(int blockLength) => blockLength * 0x800 + 0x800;
         }
