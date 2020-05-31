@@ -27,7 +27,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             _lvup = Lvup;
         }
 
-        public LvupViewModel(IEnumerable<Lvup.Character> characters) : 
+        public LvupViewModel(IEnumerable<Lvup.PlayableCharacter> characters) : 
             base(characters.Select((x, i) => new CharacterViewModel(x, i)))
         {
         }
@@ -38,7 +38,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
                 MagicCode = DefaultType,
                 Count = 14,
                 Unknown08 = new byte[0x30],
-                Characters = new List<Lvup.Character>()
+                Characters = new List<Lvup.PlayableCharacter>()
             })
         {
 
@@ -61,10 +61,10 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public class CharacterViewModel : GenericListModel<CharacterViewModel.LevelViewModel>
         {
             private int _index;
-            public Lvup.Character Character { get; set; }
+            public Lvup.PlayableCharacter Character { get; set; }
             public string Name => ((Lvup.PlayableCharacterType)_index).ToString();
 
-            public CharacterViewModel(Lvup.Character character, int index) :
+            public CharacterViewModel(Lvup.PlayableCharacter character, int index) :
                 base(character.Levels.Select((x, i) => new LevelViewModel(x, i)))
             {
                 _index = index;
@@ -73,12 +73,12 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
             public class LevelViewModel
             {
-                private Lvup.Character.Level _level;
+                private Lvup.PlayableCharacter.Level _level;
                 private int _index;
 
                 public string Name => $"Level {_index + 1}";
 
-                public LevelViewModel(Lvup.Character.Level level, int index)
+                public LevelViewModel(Lvup.PlayableCharacter.Level level, int index)
                 {
                     _level = level;
                     _index = index;

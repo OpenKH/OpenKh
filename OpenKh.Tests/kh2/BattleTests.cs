@@ -94,7 +94,7 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void LvupTableTest() => Common.FileOpenRead(@"kh2/res/lvup_fm.bin", x => x.Using(stream =>
         {
-            var table = Lvup2.Read(stream);
+            var table = Lvup.Read(stream);
             Assert.Equal(0xE, table.Count);
         }));
     }

@@ -91,7 +91,7 @@ namespace OpenKh.Game.Infrastructure
             var bar = _dataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
             bar.ForEntry("fmlv", stream => Fmlv = Kh2.Battle.Fmlv.Read(stream));
-            bar.ForEntry("lvup", stream => Lvup = Kh2.Battle.Lvup.Read(stream));
+            bar.ForEntry("lvup", stream => Lvup = Kh2.Battle.Lvup.Read(stream).Characters);
         }
 
         private void LoadFontInfo(string fileName)

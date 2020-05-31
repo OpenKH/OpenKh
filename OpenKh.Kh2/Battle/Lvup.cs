@@ -9,9 +9,9 @@ namespace OpenKh.Kh2.Battle
         [Data] public int MagicCode { get; set; }
         [Data] public int Count { get; set; }
         [Data(Count = 0x38)] public byte[] Unknown08 { get; set; }
-        [Data(Count = 13)] public List<Character> Characters { get; set; }
+        [Data(Count = 13)] public List<PlayableCharacter> Characters { get; set; }
 
-        public class Character
+        public class PlayableCharacter
         {
             [Data] public int NumLevels { get; set; }
             [Data(Count = 99)] public List<Level> Levels { get; set; }
