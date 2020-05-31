@@ -77,14 +77,14 @@ namespace OpenKh.Tests.kh2
         }));
 
         [Fact]
-        public void PrztTableTest() => Common.FileOpenRead(@"E:\HAX\KH Hacking\00battle\przt_fm.bin", x => x.Using(stream =>
+        public void PrztTableTest() => Common.FileOpenRead(@"kh2/res/przt.bin", x => x.Using(stream =>
         {
             var table = BaseBattle<Przt>.Read(stream);
             Assert.Equal(0xB8, table.Count);
         }));
 
         [Fact]
-        public void VtblTableTest() => Common.FileOpenRead(@"E:\HAX\KH Hacking\00battle\vtbl_fm.bin", x => x.Using(stream =>
+        public void VtblTableTest() => Common.FileOpenRead(@"kh2/res/vtbl.bin", x => x.Using(stream =>
         {
             var table = BaseBattle<Vtbl>.Read(stream);
             var characters = table.Items.GroupBy(c => c.CharacterId).ToList();
