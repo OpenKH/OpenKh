@@ -29,10 +29,19 @@ namespace OpenKh.Engine.Parsers.Kddf2.Mset.EmuRunner
                 get
                 {
                     var file = "rawData/ee.mset.ram.bin.gz";
-                    string path = Path.Combine(Environment.CurrentDirectory, file);
-                    if (File.Exists(path))
                     {
-                        return path;
+                        string path = Path.Combine(Environment.CurrentDirectory, file);
+                        if (File.Exists(path))
+                        {
+                            return path;
+                        }
+                    }
+                    {
+                        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, file);
+                        if (File.Exists(path))
+                        {
+                            return path;
+                        }
                     }
                     throw new FileNotFoundException($"Please deploy '{file}' for MSET emulation!");
                 }

@@ -55,7 +55,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
         /// <returns></returns>
         public Kkdf2MdlxBuiltModel ProcessVerticesAndBuildModel(Matrix[] matrices)
         {
-            var models = new SortedDictionary<Tuple<int, bool>, Model>();
+            var models = new SortedDictionary<Tuple<int, bool>, TrianglesMesh>();
 
             var exportedMesh = new ExportedMesh();
 
@@ -147,10 +147,10 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 {
                     TriangleRef triRef = exportedMesh.triangleRefList[triIndex];
                     Tuple<int, bool> modelKey = new Tuple<int, bool>(triRef.textureIndex, triRef.isOpaque);
-                    Model model;
+                    TrianglesMesh model;
                     if (models.TryGetValue(modelKey, out model) == false)
                     {
-                        models[modelKey] = model = new Model();
+                        models[modelKey] = model = new TrianglesMesh();
                     }
                     for (int i = 0; i < triRef.list.Length; i++)
                     {

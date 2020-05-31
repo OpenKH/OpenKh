@@ -60,6 +60,7 @@ namespace OpenKh.Engine.MonoGame
             MeshGroup.Segment[] segments = null;
             MeshGroup.Part[] parts = null;
 
+            model.Model.Update(0);
             segments = model.Model.Segments.Select(segment => new MeshGroup.Segment
             {
                 Vertices = segment.Vertices.Select(vertex => new VertexPositionColorTexture
