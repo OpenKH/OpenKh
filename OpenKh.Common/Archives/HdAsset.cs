@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -68,8 +68,9 @@ namespace OpenKh.Common.Archives
             set => entries = value ?? throw new ArgumentNullException(nameof(Entries));
         }
 
-        private HdAsset()
+        public HdAsset()
         {
+            _header = new Header();
             Stream = new MemoryStream();
             Entries = new List<Entry>();
         }
@@ -129,7 +130,6 @@ namespace OpenKh.Common.Archives
             return outStream;
         }
 
-        public static HdAsset New() => new HdAsset();
         public static HdAsset Read(Stream stream) => new HdAsset(stream);
     }
 }
