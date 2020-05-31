@@ -29,7 +29,7 @@ namespace OpenKh.Kh2.Battle
         public class Level
         {
             [Data] public byte Unk0 { get; set; }
-            [Data] public byte LevelMovementAbility { get; set; }
+            [Data] public byte LevelGrowthAbility { get; set; }
             [Data] public short Ability { get; set; }
             [Data] public int Exp { get; set; }
 
@@ -58,7 +58,7 @@ namespace OpenKh.Kh2.Battle
             }
 
             public override string ToString() =>
-                $"{FormFm} {FormLevel}: EXP {Exp}, Ability {Ability:X04} Lv. {LevelMovementAbility}";
+                $"{FormFm} {FormLevel}: EXP {Exp}, Ability {Ability:X04} Lv. {LevelGrowthAbility}";
         }
 
         public static List<Level> Read(Stream stream) => BaseTable<Level>.Read(stream).Items;

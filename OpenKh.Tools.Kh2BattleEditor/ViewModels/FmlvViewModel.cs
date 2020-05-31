@@ -15,17 +15,10 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         private const int DefaultType = 2;
         private const string entryName = "fmlv";
         
-        
-        private readonly int _type;
-        //private static bool isFinalMix = false;
         public string EntryName => entryName;
         
         public FmlvViewModel() :
-            this(new BaseBattle<Fmlv>
-            {
-                Id = DefaultType,
-                Items = new List<Fmlv>()
-            })
+            this(new List<Fmlv.Level>())
         {}
 
         public FmlvViewModel(IEnumerable<Bar.Entry> entries) :
@@ -33,37 +26,29 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         {}
 
 
-        public FmlvViewModel(BaseBattle<Fmlv> fmlv) :
-            this(fmlv.Id, fmlv.Items, (fmlv.Items.Count == 0x2D))
+        public FmlvViewModel(IEnumerable<Fmlv.Level> levels) :
+            this(levels, (levels.ToList().Count == 0x2D))
         {}
 
-        public FmlvViewModel(int type, IEnumerable<Fmlv> list, bool isFinalMix) :
+        public FmlvViewModel(IEnumerable<Fmlv.Level> list, bool isFinalMix) :
             base(list.GroupBy(x => x.FormId).Select(x => new FmlvFormViewModel(x, isFinalMix)))
-        {
-            _type = type;
-        }
+        {}
 
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            new BaseBattle<Fmlv>
-            {
-                Id = _type,
-                Items = Items.SelectMany(form => form).Select(x => x.Fmlv).ToList()
-
-            }.Write(stream);
-
+            Fmlv.Write(stream, Items.SelectMany(form => form).Select(x => x.Level).ToList());
             return stream;
         }
     }
 
-    public class FmlvFormViewModel : GenericListModel<FmlvFormViewModel.FmlvEntryViewModel>
+    public class FmlvFormViewModel : GenericListModel<FmlvFormViewModel.FmlvLevelViewModel>
     {
-        private readonly IGrouping<int, Fmlv> fmlvGroup;
+        private readonly IGrouping<int, Fmlv.Level> fmlvGroup;
         private readonly bool isFinalMix;
 
-        public FmlvFormViewModel(IGrouping<int, Fmlv> x, bool isFinalMix) :
-            base(x.Select(y => new FmlvEntryViewModel(y)))
+        public FmlvFormViewModel(IGrouping<int, Fmlv.Level> x, bool isFinalMix) :
+            base(x.Select(y => new FmlvLevelViewModel(y)))
             
         {
             fmlvGroup = x;
@@ -72,20 +57,18 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
         public string Name => FormNameProvider.GetFormName(fmlvGroup.Key, isFinalMix);
 
-        public class FmlvEntryViewModel
+        public class FmlvLevelViewModel
         {
-            public Fmlv Fmlv { get; }
-            public FmlvEntryViewModel(Fmlv fmlv)
+            public Fmlv.Level Level { get; }
+            public FmlvLevelViewModel(Fmlv.Level level)
             {
-                Fmlv = fmlv;
+                Level = level;
             }
 
-            public string Name => $"{Fmlv.FormLevel}";
-            public byte LevelOfMovementAbility { get => Fmlv.LevelOfMovementAbility; set => Fmlv.LevelOfMovementAbility = value; }
-            public short AbilityId { get => Fmlv.AbilityId; set => Fmlv.AbilityId = value; }
-            public int Exp { get => Fmlv.Exp; set => Fmlv.Exp = value; }
-
-            public override string ToString() => Name;
+            public string Name => $"Level {Level.FormLevel}";
+            public byte LevelGrowthAbility { get => Level.LevelGrowthAbility; set => Level.LevelGrowthAbility = value; }
+            public short Ability { get => Level.Ability; set => Level.Ability = value; }
+            public int Exp { get => Level.Exp; set => Level.Exp = value; }
         }
     }
 }

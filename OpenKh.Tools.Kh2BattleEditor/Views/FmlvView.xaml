@@ -11,33 +11,34 @@
         <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
     </UserControl.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="0"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Grid.ColumnSpan="3">
-            <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
-                <TextBlock Text="Form" Margin="0 2 5 0"/>
-                <ComboBox Width="200"
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Form" Margin="1 2 0 0" Grid.Column="0"/>
+            <ComboBox 
                 ItemsSource="{Binding Items}"
                 SelectedIndex="{Binding SelectedIndex}"
                 SelectedItem="{Binding SelectedItem}"
-                DisplayMemberPath="Name"/>
-                <!--<CheckBox HorizontalAlignment="Right" Content="Final Mix"/>-->
-            </StackPanel>
+                DisplayMemberPath="Name"
+                Grid.Column="1" Grid.ColumnSpan="2" />
         </Grid>
 
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
             <ListBox
                 Grid.Column="0"
@@ -45,24 +46,22 @@
                 SelectedItem="{Binding SelectedItem.SelectedItem}"
                 DisplayMemberPath="Name">
             </ListBox>
-        </Grid>
 
-        <ScrollViewer
-            Grid.Row="1"
+            <ScrollViewer
             Grid.Column="2"
-            Margin="5"
             VerticalScrollBarVisibility="Auto">
-            <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem.SelectedItem}">
+                <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem.SelectedItem}">
 
-                <TextBlock Text="Lvl Movement Ability" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding LevelOfMovementAbility, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="Level Growth Ability" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Text="{Binding LevelGrowthAbility, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Ability" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding AbilityId, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="Ability" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Text="{Binding Ability, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="EXP" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Exp, UpdateSourceTrigger=PropertyChanged}"/>
-            </controls:TwoColumnsPanel>
-        </ScrollViewer>
+                    <TextBlock Text="EXP" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Text="{Binding Exp, UpdateSourceTrigger=PropertyChanged}"/>
+                </controls:TwoColumnsPanel>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </UserControl>

@@ -1,16 +1,14 @@
-﻿using System;
+﻿using OpenKh.Common;
+using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
+using OpenKh.Tools.Common;
+using OpenKh.Tools.Kh2BattleEditor.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using OpenKh.Common;
-using OpenKh.Kh2;
-using OpenKh.Kh2.Battle;
-using OpenKh.Kh2.Extensions;
-using OpenKh.Tools.Common;
-using OpenKh.Tools.Kh2BattleEditor.Interfaces;
-using OpenKh.Tools.Kh2BattleEditor.Views;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
@@ -78,8 +76,6 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             get => _lvup;
             private set { _lvup = value; OnPropertyChanged(); }
         }
-
-
 
         public MainViewModel()
         {
