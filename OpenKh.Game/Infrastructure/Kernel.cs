@@ -1,4 +1,5 @@
 ﻿using OpenKh.Common;
+using OpenKh.Common.Archives;
 using OpenKh.Engine;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
@@ -40,7 +41,7 @@ namespace OpenKh.Game.Infrastructure
             FontContext = new FontContext();
             MessageProvider = new Kh2MessageProvider();
             RegionId = DetectRegion(dataContent);
-            IsReMix = DetectReMix(dataContent, Region);
+            IsReMix = IsReMixFileExists(dataContent, Region);
 
             // Load files in the same order as KH2 does
             ObjEntries = LoadFile("00objentry.bin", stream => Objentry.Read(stream));
@@ -124,10 +125,21 @@ namespace OpenKh.Game.Infrastructure
             throw new Exception("Unable to detect any region for the game. Some files are potentially missing.");
         }
 
-        private static bool DetectReMix(IDataContent dataContent, string region)
+        public static bool IsReMixFileExists(IDataContent dataContent, string region)
         {
             var testFileName = $"menu/{region}/titlejf.2ld";
             return dataContent.FileExists(testFileName);
+        }
+
+        public static bool IsReMixFileHasHdAssetHeader(IDataContent dataContent, string region)
+        {
+            var testFileName = $"menu/{region}/titlejf.2ld";
+            var stream = dataContent.FileOpen(testFileName);
+            if (stream == null)
+                return false;
+
+            using (stream)
+                return HdAsset.IsValid(stream);
         }
     }
 }
