@@ -13,7 +13,7 @@ using System.Text;
 
 namespace OpenKh.Command.ImgTool
 {
-    [Command("OpenKh.Command.MsgTool")]
+    [Command("OpenKh.Command.ImgTool")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(typeof(UnimdCommand), typeof(UnimzCommand), typeof(ImdCommand), typeof(ImzCommand))]
     class Program
