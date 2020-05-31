@@ -134,8 +134,12 @@ namespace OpenKh.Game.Infrastructure
         public static bool IsReMixFileHasHdAssetHeader(IDataContent dataContent, string region)
         {
             var testFileName = $"menu/{region}/titlejf.2ld";
-            using var stream = dataContent.FileOpen(testFileName);
-            return HdAsset.IsValid(stream);
+            var stream = dataContent.FileOpen(testFileName);
+            if (stream == null)
+                return false;
+
+            using (stream)
+                return HdAsset.IsValid(stream);
         }
     }
 }
