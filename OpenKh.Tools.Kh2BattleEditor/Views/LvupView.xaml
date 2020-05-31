@@ -16,14 +16,19 @@
             <RowDefinition Height="10"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" VerticalAlignment="Center">
-            <TextBlock Text="Character" Margin="0 2 5 0"/>
-            <ComboBox Width="200"
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Character" Margin="0 2 5 0" Grid.Column="0"/>
+            <ComboBox Grid.Column="1" Grid.ColumnSpan="2"
             ItemsSource="{Binding Items}"
             SelectedIndex="{Binding SelectedIndex}"
             SelectedItem="{Binding SelectedItem}"
             DisplayMemberPath="Name"/>
-        </StackPanel>
+        </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
