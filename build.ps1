@@ -21,6 +21,7 @@ $solution = "${solutionBase}.sln"
 
 function Test-Success([int] $exitCode) {
     if ($exitCode -ne 0) {
+        Remove-Item $solution -ErrorAction Ignore
         Write-Error "Last command returned error $exitCode, therefore the build is canceled."
         exit
     }
@@ -29,6 +30,9 @@ function Test-Success([int] $exitCode) {
 # Use submodules
 git submodule update --init --recursive --depth 1
 Test-Success $LASTEXITCODE
+
+# Remove previously created solution file
+Remove-Item $solution -ErrorAction Ignore
 
 # Restore NuGet packages
 dotnet restore
@@ -58,3 +62,6 @@ Get-ChildItem -Filter OpenKh.Game* | ForEach-Object {
 
 # Publish solution
 dotnet publish $solution --configuration $configuration --verbosity $verbosity --framework netcoreapp3.1 --output $output /p:DebugType=None /p:DebugSymbols=false
+
+# Remove the temporary solution after the solution is published
+Remove-Item $solution -ErrorAction Ignore
