@@ -21,17 +21,15 @@ namespace OpenKh.Engine.Parsers.Kddf2.Mset
             this.entries = entries;
         }
 
-        public IAnimMatricesProvider GetAnimProvider(int anbBarOffset, Stream mdlxStream, Stream msetStream)
+        public IAnimMatricesProvider GetAnimProvider(Stream mdlxStream)
         {
             var animEntry = entries
                 .First(it => it.Type == Bar.EntryType.AnimationData); // anb bar should have single 0x09 (AnimationData)
             var animStream = animEntry.Stream;
 
-            var anbAbsOff = (uint)(anbBarOffset + animEntry.Offset);
-
             var animReader = new AnimReader(animStream);
 
-            return new EmuBasedAnimMatricesProvider(animReader, anbAbsOff, mdlxStream, msetStream);
+            return new EmuBasedAnimMatricesProvider(animReader, mdlxStream, animStream);
         }
     }
 }

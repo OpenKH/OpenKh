@@ -1,12 +1,16 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Parsers;
+using OpenKh.Engine.Parsers.Kddf2;
+using OpenKh.Engine.Parsers.Kddf2.Mset;
+using OpenKh.Engine.Parsers.Kddf2.Mset.EmuRunner;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
 using OpenKh.Game.Shaders;
 using OpenKh.Kh2;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace OpenKh.Game.States
@@ -20,7 +24,7 @@ namespace OpenKh.Game.States
         private List<Mesh> _models = new List<Mesh>();
         private KingdomShader _shader;
         private Camera _camera;
-
+        private IDataContent _dataContent;
         private int _worldId = 2;
         private int _placeId = 4;
         private int _objEntryId = 0x236; // PLAYER
@@ -38,6 +42,7 @@ namespace OpenKh.Game.States
                 CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
+            _dataContent = initDesc.DataContent;
 
             _graphics.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
 
@@ -195,8 +200,10 @@ namespace OpenKh.Game.States
             }
 
             var fileName = $"obj/{model.ModelName}.mdlx";
+            var msetFileName = $"obj/{model.AnimationName}";
             _archiveManager.LoadArchive(fileName);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, internalName, "tim_"));
+            _archiveManager.LoadArchive(msetFileName);
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, internalName, "tim_", () => _dataContent.FileOpen(fileName)));
         }
 
         private void LoadObjEntry(int id)
@@ -222,7 +229,9 @@ namespace OpenKh.Game.States
         }
 
         private static Mesh FromMdlx(
-            GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)
+            GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName,
+            Func<Stream> mdlxLoader = null
+        )
         {
             var mdlx = archiveManager.Get<Mdlx>(modelName);
             var textures = archiveManager.Get<ModelTexture>(textureName);
@@ -230,6 +239,18 @@ namespace OpenKh.Game.States
                 return null;
 
             var model = new MdlxParser(mdlx).Model;
+            if (model is MdlxAnimModel animModel)
+            {
+                var mset = archiveManager.Get<List<Bar.Entry>>("A000") ?? archiveManager.Get<List<Bar.Entry>>("B000");
+                if (mset != null && mdlxLoader != null)
+                {
+                    var andIndir = new AnbIndir(mset);
+                    using (var mdlxStream = mdlxLoader())
+                    {
+                        animModel.AnimMatricesProvider = andIndir.GetAnimProvider(mdlxStream);
+                    }
+                }
+            }
             model.Update(0);
 
             return new Mesh
