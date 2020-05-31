@@ -6,6 +6,7 @@ using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 
 namespace OpenKh.Game
 {
@@ -46,7 +47,11 @@ namespace OpenKh.Game
 
         public OpenKhGame()
         {
-            _dataContent = new SafeDataContent(CreateDataContent(".", "KH2.IDX", "KH2.IMG"));
+            _dataContent = CreateDataContent(".", "KH2.IDX", "KH2.IMG");
+            if (Kernel.IsReMixFileExists(_dataContent, "fm") && Kernel.IsReMixFileHasHdAssetHeader(_dataContent, "fm"))
+                _dataContent = new HdAssetContent(_dataContent);
+            _dataContent = new SafeDataContent(_dataContent);
+
             _kernel = new Kernel(_dataContent);
 
             var resolutionWidth = _kernel.IsReMix ?
