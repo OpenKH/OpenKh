@@ -1,6 +1,8 @@
-﻿using OpenKh.Common.Archives;
+﻿using OpenKh.Common;
+using OpenKh.Common.Archives;
 using System;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.Archives
@@ -24,13 +26,13 @@ namespace OpenKh.Tests.Archives
         [Fact]
         public void CannotAssignNullMainStream()
         {
-            Assert.Throws<ArgumentNullException>(() => HdAsset.New().Stream = null);
+            Assert.Throws<ArgumentNullException>(() => new HdAsset().Stream = null);
         }
 
         [Fact]
         public void CannotAssignNullEntriesListStream()
         {
-            Assert.Throws<ArgumentNullException>(() => HdAsset.New().Entries = null);
+            Assert.Throws<ArgumentNullException>(() => new HdAsset().Entries = null);
         }
 
         [Fact]
@@ -40,6 +42,66 @@ namespace OpenKh.Tests.Archives
             {
                 Stream = null
             });
+        }
+
+        [Fact]
+        public void IsValid() => Helpers.UseAsset("ps4archive.bin", stream =>
+        {
+            Assert.True(HdAsset.IsValid(stream));
+        });
+
+        [Fact]
+        public void IsValidWhenTheMinimumNecessaryInformationAreThere()
+        {
+            var hdasset = new HdAsset();
+
+            using var stream = new MemoryStream();
+            hdasset.Write(stream);
+
+            Assert.True(HdAsset.IsValid(stream.SetPosition(0)));
+        }
+
+        [Fact]
+        public void IsNotValidWhenTheHeaderSizeIsTooSmall()
+        {
+            var stream = new MemoryStream(new byte[15]);
+            Assert.False(HdAsset.IsValid(stream));
+        }
+
+        [Fact]
+        public void IsNotValidWhenTheInnerStreamLengthIsTooBig()
+        {
+            var hdasset = new HdAsset();
+            hdasset.Stream = new MemoryStream(new byte[] { 2, 3, 4, 5, 6, 7, 8 });
+
+            using var stream = new MemoryStream();
+            hdasset.Write(stream);
+
+            stream.SetLength(stream.Length - 1);
+
+            Assert.False(HdAsset.IsValid(stream.SetPosition(0)));
+        }
+
+        [Fact]
+        public void IsNotValidIfThereAreTooManyHdAssets()
+        {
+            var hdasset = new HdAsset();
+            hdasset.Stream = new MemoryStream(new byte[] { 2, 3, 4, 5, 6, 7, 8 });
+            hdasset.Entries = Enumerable
+                .Range(0, 1024)
+                .Select(x => new HdAsset.Entry()
+                {
+                    Name = "Test",
+                    Stream = new MemoryStream()
+                })
+                .ToList();
+
+            using var stream = new MemoryStream();
+            hdasset.Write(stream);
+
+            stream.SetLength(stream.Length - 1);
+
+            Assert.False(HdAsset.IsValid(stream.SetPosition(0)));
         }
     }
 }

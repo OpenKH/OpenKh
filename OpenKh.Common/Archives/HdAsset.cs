@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -131,5 +131,33 @@ namespace OpenKh.Common.Archives
         }
 
         public static HdAsset Read(Stream stream) => new HdAsset(stream);
+
+        public static bool IsValid(Stream stream)
+        {
+            const int MinimumPossibleSizeForHeader = 0x10;
+            const int EstimatedMaximumPossibleSizeForOriginalAsset = 32 * 1024 * 1024;
+            const int EstimatedMaximumPossibleRemasteredAssetCount = 1024;
+
+            if (stream.Length < MinimumPossibleSizeForHeader)
+                return false;
+
+            var originalAssetLength = stream.ReadInt32();
+            if (originalAssetLength > EstimatedMaximumPossibleSizeForOriginalAsset)
+                return false;
+
+            var assetCount = stream.ReadInt32();
+            if (assetCount >= EstimatedMaximumPossibleRemasteredAssetCount)
+                return false;
+
+            if (stream.ReadInt32() != 0)
+                return false;
+            if (stream.ReadInt32() != 0)
+                return false;
+
+            if (originalAssetLength + MinimumPossibleSizeForHeader > stream.Length)
+                return false;
+
+            return true;
+        }
     }
 }
