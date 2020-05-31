@@ -75,17 +75,18 @@ namespace OpenKh.Engine.MonoGame
 
             if (model.Model is MdlxAnimModel animModel)
             {
-                var mset = archiveManager.Get<List<Bar.Entry>>("A000") ?? archiveManager.Get<List<Bar.Entry>>("B000");
-                if (mset != null && mdlxLoader != null)
+                var anbEntries = archiveManager.Get<List<Bar.Entry>>("A000") ?? archiveManager.Get<List<Bar.Entry>>("B000");
+                if (anbEntries != null && mdlxLoader != null)
                 {
-                    var andIndir = new AnbIndir(mset);
+                    var anbIndir = new AnbIndir(anbEntries);
                     using (var mdlxStream = mdlxLoader())
                     {
-                        animModel.AnimMatricesProvider = andIndir.GetAnimProvider(mdlxStream);
+                        animModel.AnimMatricesProvider = anbIndir.GetAnimProvider(mdlxStream);
                     }
                 }
             }
             model.Model.Update(0);
+
             segments = model.Model.Segments.Select(segment => new MeshGroup.Segment
             {
                 Vertices = segment.Vertices.Select(vertex => new VertexPositionColorTexture

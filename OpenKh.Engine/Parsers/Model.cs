@@ -28,7 +28,7 @@ namespace OpenKh.Engine.Parsers
         public Segment[] Segments { get; set; }
         public Part[] Parts { get; set; }
 
-        public virtual void Update(double delta)
+        public virtual void Update(double gameTimeDelta)
         {
             // overrided by animatable model
         }
