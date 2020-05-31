@@ -1,11 +1,12 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Engine;
+using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace OpenKh.Game.Infrastructure
 {
-    public class ArchiveManager
+    public class ArchiveManager : IArchiveManager
     {
         private class Entry
         {
@@ -21,6 +22,7 @@ namespace OpenKh.Game.Infrastructure
             [Bar.EntryType.Imgz] = entry => new Imgz(entry.Stream),
             [Bar.EntryType.Model] = entry => Mdlx.Read(entry.Stream),
             [Bar.EntryType.ModelTexture] = entry => ModelTexture.Read(entry.Stream),
+            [Bar.EntryType.Bar] = entry => Bar.Read(entry.Stream), // mset
         };
 
         private readonly Dictionary<(string name, Bar.EntryType type), Entry> archives;
@@ -56,6 +58,7 @@ namespace OpenKh.Game.Infrastructure
             if (typeof(T) == typeof(Imgz)) return GetItem<T>(resourceName, Bar.EntryType.Imgz);
             if (typeof(T) == typeof(Mdlx)) return GetItem<T>(resourceName, Bar.EntryType.Model);
             if (typeof(T) == typeof(ModelTexture)) return GetItem<T>(resourceName, Bar.EntryType.ModelTexture);
+            if (typeof(T) == typeof(List<Bar.Entry>)) return GetItem<T>(resourceName, Bar.EntryType.Bar);
             return null;
         }
 

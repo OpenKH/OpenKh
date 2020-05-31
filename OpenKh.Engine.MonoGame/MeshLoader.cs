@@ -1,26 +1,36 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Parsers;
+using OpenKh.Engine.Parsers.Kddf2;
+using OpenKh.Engine.Parsers.Kddf2.Mset;
 using OpenKh.Kh2;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace OpenKh.Engine.MonoGame
 {
     public static class MeshLoader
     {
-        public static MeshGroup FromKH2(GraphicsDevice graphics, Mdlx model, ModelTexture texture)
+        public static MeshGroup FromKH2(GraphicsDevice graphics, Mdlx model, ModelTexture texture,
+            IArchiveManager archiveManager = null, // legacy
+            Func<Stream> mdlxLoader = null
+        )
         {
             if (model == null || texture == null)
                 return null;
 
-            var meshGroup = FromKH2(model);
+            var meshGroup = FromKH2(model, archiveManager, mdlxLoader);
             meshGroup.Textures = LoadTextures(graphics, texture).ToArray();
 
             return meshGroup;
         }
 
-        public static MeshGroup FromKH2(Mdlx model)
+        public static MeshGroup FromKH2(Mdlx model,
+            IArchiveManager archiveManager = null, // legacy
+            Func<Stream> mdlxLoader = null
+        )
         {
             if (model == null)
                 return null;
@@ -28,7 +38,7 @@ namespace OpenKh.Engine.MonoGame
             var modelParsed = new MdlxParser(model);
             return modelParsed.MeshDescriptors != null ?
                 LoadKH2New(modelParsed) :
-                LoadKH2Legacy(modelParsed);
+                LoadKH2Legacy(modelParsed, archiveManager, mdlxLoader);
         }
 
         private static MeshGroup LoadKH2New(MdlxParser model)
@@ -55,11 +65,26 @@ namespace OpenKh.Engine.MonoGame
             };
         }
 
-        private static MeshGroup LoadKH2Legacy(MdlxParser model)
+        private static MeshGroup LoadKH2Legacy(MdlxParser model,
+            IArchiveManager archiveManager = null, // legacy
+            Func<Stream> mdlxLoader = null
+        )
         {
             MeshGroup.Segment[] segments = null;
             MeshGroup.Part[] parts = null;
 
+            if (model.Model is MdlxAnimModel animModel)
+            {
+                var mset = archiveManager.Get<List<Bar.Entry>>("A000") ?? archiveManager.Get<List<Bar.Entry>>("B000");
+                if (mset != null && mdlxLoader != null)
+                {
+                    var andIndir = new AnbIndir(mset);
+                    using (var mdlxStream = mdlxLoader())
+                    {
+                        animModel.AnimMatricesProvider = andIndir.GetAnimProvider(mdlxStream);
+                    }
+                }
+            }
             model.Model.Update(0);
             segments = model.Model.Segments.Select(segment => new MeshGroup.Segment
             {

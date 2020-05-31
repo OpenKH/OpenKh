@@ -570,7 +570,6 @@ namespace OpenKh.Engine.Parsers.Kddf2.Mset.EmuRunner
         {
             //#Debug.Assert(off <= 32U * 1024 * 1024, "Avail only within 32MB ram");
             sysr((int)(off >> 4));
-            uint v;
             rt.UL[0] = ee.eeRead32(off + 0);
             rt.UL[1] = ee.eeRead32(off + 4);
             rt.UL[2] = ee.eeRead32(off + 8);
@@ -702,8 +701,6 @@ namespace OpenKh.Engine.Parsers.Kddf2.Mset.EmuRunner
         public static void QMFC2(GPR rt, Vec vf)
         {
 #if UseBitConverter
-            float f;
-
             rt.UL[0] = BitConverter.ToUInt32(BitConverter.GetBytes(vf.x), 0);
             rt.UL[1] = BitConverter.ToUInt32(BitConverter.GetBytes(vf.y), 0);
             rt.UL[2] = BitConverter.ToUInt32(BitConverter.GetBytes(vf.z), 0);

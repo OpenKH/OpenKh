@@ -481,54 +481,6 @@ namespace OpenKh.Engine.Parsers.Kddf2.Mset.EmuRunner
                     else throw new RecfnnotFound(ee.pc, "rc2");
                 }
             }
-            // Opt1
-            if (false)
-            {
-                ee.at.UD0 = 0U;
-                ee.v0.UD0 = 0U;
-                ee.v1.UD0 = 0U;
-                ee.a0.UD0 = a0; // mset +0x00
-                ee.a1.UD0 = a1; // info tbl
-                ee.a2.UD0 = 0U;
-                ee.a3.UD0 = 0U;
-                ee.t0.UD0 = 0U;
-                ee.t1.UD0 = 0U;
-                ee.t2.UD0 = 0U;
-                ee.t3.UD0 = 0U;
-                ee.t4.UD0 = 0U;
-                ee.t5.UD0 = 0U;
-                ee.t6.UD0 = 0U;
-                ee.t7.UD0 = 0U;
-                ee.s0.UD0 = s0; // mset +0x90
-                ee.s1.UD0 = 0U;
-                ee.s2.UD0 = 0U;
-                ee.s3.UD0 = 0U;
-                ee.s4.UD0 = s4; // temp?
-                ee.s5.UD0 = 0U;
-                ee.s6.UD0 = 0U;
-                ee.s7.UD0 = 0U;
-                ee.t8.UD0 = 0U;
-                ee.t9.UD0 = 0U;
-                ee.k0.UD0 = 0U;
-                ee.k1.UD0 = 0U;
-                ee.gp.UD0 = 0U;
-                ee.sp.UD0 = 0x2000000U;
-                ee.s8.UD0 = 0U;
-                ee.ra.UD0 = 0xFFFFFFFFU;
-
-                ee.pc = 0x129A18;
-                while (ee.pc != 0xFFFFFFFFU)
-                {
-                    if (o1.pfns.ContainsKey(ee.pc) || MobRecUt.Rec1(ee.pc, o1.pfns, ee))
-                    {
-                        o1.pfns[ee.pc]();
-                    }
-                    else
-                    {
-                        throw new RecfnnotFound(ee.pc, "rc1");
-                    }
-                }
-            }
 
             {
                 MemoryStream si = new MemoryStream(ee.ram, false);

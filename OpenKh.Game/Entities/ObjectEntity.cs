@@ -34,7 +34,7 @@ namespace OpenKh.Game.Entities
 
         public Vector3 Scaling { get; set; }
 
-        public void LoadMesh(GraphicsDevice graphics)
+        public void LoadMesh(GraphicsDevice graphics, ArchiveManager archiveManager)
         {
             var objEntry = Kernel.ObjEntries.FirstOrDefault(x => x.ObjectId == ObjectId);
             if (objEntry == null)
@@ -49,7 +49,7 @@ namespace OpenKh.Game.Entities
             var entries = Bar.Read(stream);
             var model = entries.ForEntry(x => x.Type == Bar.EntryType.Model, Mdlx.Read);
             var texture = entries.ForEntry("tim_", Bar.EntryType.ModelTexture, ModelTexture.Read);
-            Mesh = MeshLoader.FromKH2(graphics, model, texture);
+            Mesh = MeshLoader.FromKH2(graphics, model, texture, archiveManager);
         }
 
         public static ObjectEntity FromSpawnPoint(Kernel kernel, SpawnPoint.Entity spawnPoint) =>

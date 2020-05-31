@@ -26,58 +26,10 @@ namespace OpenKh.Engine.Parsers.Kddf2.Mset.EmuRunner
         }
         public void Run()
         {
-            uint off0 = off;
-            os.Position = off0;
-            Trace.Assert(br.ReadUInt32() == 0x01524142);
-            uint cx = br.ReadUInt32();
-            UtReloc.Rel4(os, off0 + 8U, reloc);
-            SortedDictionary<uint, object> dict = new SortedDictionary<uint, object>();
-            for (uint x = 0; x < cx; x++)
-            {
-                os.Position = off0 + 16U * (1 + x);
-                uint a0 = br.ReadUInt32();
-                uint a1 = br.ReadUInt32();
-                uint a2 = br.ReadUInt32();
-                uint a3 = br.ReadUInt32();
-                if (a3 != 0)
-                {
-                    UtReloc.Rel4(os, off0 + (uint)(16U * (1 + x) + 8), reloc);
-                    if ((a0 & 0xFFFF) == 0x11)
-                    {
-                        uint off1 = off0 + a2;
-
-                        if (dict.ContainsKey(off1) == false)
-                        {
-                            dict[off1] = null;
-
-                            os.Position = off1;
-                            Trace.Assert(br.ReadUInt32() == 0x01524142);
-                            uint cy = br.ReadUInt32();
-                            UtReloc.Rel4(os, off1 + 8U, reloc);
-                            for (uint y = 0; y < cy; y++)
-                            {
-                                os.Position = off1 + 16U * (1 + y);
-                                uint b0 = br.ReadUInt32();
-                                uint b1 = br.ReadUInt32();
-                                uint b2 = br.ReadUInt32();
-                                uint b3 = br.ReadUInt32();
-                                if (b3 != 0)
-                                {
-                                    UtReloc.Rel4(os, off1 + (uint)(16U * (1 + y) + 8), reloc);
-                                    if ((b0 & 0xFFFF) == 0x09)
-                                    {
-                                        uint off2 = off1 + b2;
-                                        ty09(off2);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            relocateAnimData(off);
         }
 
-        void ty09(uint off2)
+        void relocateAnimData(uint off2)
         {
             os.Position = off2;
             wr.Write(ps[0]);

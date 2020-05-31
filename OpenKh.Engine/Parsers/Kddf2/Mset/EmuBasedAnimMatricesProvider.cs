@@ -12,30 +12,27 @@ namespace OpenKh.Engine.Parsers.Kddf2.Mset
     {
         private readonly Mlink emuRunner;
         private readonly AnimReader animReader;
-        private readonly uint anbAbsOff;
         private double absTime = 0;
 
         public EmuBasedAnimMatricesProvider(
             AnimReader animReader,
-            uint anbAbsOff,
             Stream mdlxStream,
-            Stream msetStream
+            Stream animStream
         )
         {
             emuRunner = new Mlink();
             this.animReader = animReader;
-            this.anbAbsOff = anbAbsOff;
 
             var matrixOutStream = new MemoryStream();
 
             mdlxStream.Position = 0;
-            msetStream.Position = 0;
+            animStream.Position = 0;
 
             // initialize emulator memory space
             emuRunner.Permit(
                 mdlxStream, animReader.cntb1,
-                msetStream, animReader.cntb2,
-                anbAbsOff, (float)absTime, matrixOutStream
+                animStream, animReader.cntb2,
+                0, (float)absTime, matrixOutStream
             );
         }
 
@@ -48,7 +45,7 @@ namespace OpenKh.Engine.Parsers.Kddf2.Mset
             emuRunner.Permit(
                 null, animReader.cntb1,
                 null, animReader.cntb2,
-                anbAbsOff, (float)absTime, matrixOutStream
+                0, (float)absTime, matrixOutStream
             );
 
             BinaryReader br = new BinaryReader(matrixOutStream);

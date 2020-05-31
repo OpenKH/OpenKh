@@ -1,11 +1,16 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Engine.Renders;
+using OpenKh.Engine.Parsers.Kddf2;
+using OpenKh.Engine.Parsers.Kddf2.Mset;
+using OpenKh.Engine.Parsers.Kddf2.Mset.EmuRunner;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using OpenKh.Kh2.Models;
 using OpenKh.Game.Entities;
@@ -38,7 +43,6 @@ namespace OpenKh.Game.States
         private List<MeshGroup> _bobModels = new List<MeshGroup>();
         private KingdomShader _shader;
         private Camera _camera;
-
         private int _worldId = 2;
         private int _placeId = 4;
         private int _spawnId = 99;
@@ -61,6 +65,7 @@ namespace OpenKh.Game.States
                 CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
+            _dataContent = initDesc.DataContent;
 
             BasicallyForceToReloadEverything();
         }
@@ -208,6 +213,33 @@ namespace OpenKh.Game.States
 
             LoadMapArd(_worldId, _placeId);
             LoadMap(_worldId, _placeId);
+            LoadObjEntry(_objEntryId);
+        }
+
+        private void LoadObjEntry(string name)
+        {
+            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ModelName == name);
+            if (model == null)
+                return;
+
+            var fileName = $"obj/{model.ModelName}.mdlx";
+            var msetFileName = $"obj/{model.AnimationName}";
+
+            using var stream = _dataContent.FileOpen(fileName);
+            var entries = Bar.Read(stream);
+            var modelEntryName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Model)?.Name;
+            _archiveManager.LoadArchive(entries);
+            _archiveManager.LoadArchive(msetFileName);
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, modelEntryName, "tim_", () => _dataContent.FileOpen(fileName)));
+        }
+
+        private void LoadObjEntry(int id)
+        {
+            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ObjectId == id);
+            if (model == null)
+                return;
+
+            LoadObjEntry(model.ModelName);
         }
 
         private void LoadMap(int worldIndex, int placeIndex)
@@ -233,7 +265,7 @@ namespace OpenKh.Game.States
 
             for (var i = 0; i < bobModels.Count; i++)
             {
-                var bobMesh = MeshLoader.FromKH2(_graphics.GraphicsDevice, bobModels[i], bobTextures[i]);
+                var bobMesh = MeshLoader.FromKH2(_graphics.GraphicsDevice, bobModels[i], bobTextures[i], _archiveManager);
                 if (bobMesh != null)
                     _bobModels.Add(bobMesh);
             }
@@ -289,25 +321,32 @@ namespace OpenKh.Game.States
         private void SpawnEntity(SpawnPoint.Entity entityDesc)
         {
             var entity = ObjectEntity.FromSpawnPoint(_kernel, entityDesc);
-            entity.LoadMesh(_graphics.GraphicsDevice);
+            entity.LoadMesh(_graphics.GraphicsDevice, _archiveManager);
 
             _objectEntities.Add(entity);
         }
 
         private static MeshGroup FromMdlx(
-            GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)
+            GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName,
+            System.Func<Stream> mdlxLoader = null
+        )
         {
             Log.Info($"Load model={modelName} texture={textureName}");
             return MeshLoader.FromKH2(graphics,
                 archiveManager.Get<Mdlx>(modelName),
-                archiveManager.Get<ModelTexture>(textureName));
+                archiveManager.Get<ModelTexture>(textureName),
+                archiveManager,
+                mdlxLoader);
         }
 
-        private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
+        private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name,
+            ArchiveManager archiveManager = null // legacy
+        )
         {
             return MeshLoader.FromKH2(graphics,
                 entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read),
-                entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read));
+                entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read),
+                archiveManager);
         }
 
         private void AddMesh(MeshGroup mesh)
