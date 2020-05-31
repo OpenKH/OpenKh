@@ -138,6 +138,9 @@
     </None>
     <None Update="kh2\res\image.fac">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>    
+    <None Update="kh2\res\lvup_fm.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="kh2\res\item.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

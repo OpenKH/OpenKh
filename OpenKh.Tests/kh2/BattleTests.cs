@@ -11,7 +11,7 @@ namespace OpenKh.Tests.kh2
         public class FmlvTests
         {
             [Fact]
-            public void CheckStandardFile() => Common.FileOpenRead(@"kh2/res/fmlv_de.bin", stream =>
+            public void CheckStandardNewImpl() => Common.FileOpenRead(@"kh2/res/fmlv_de.bin", stream =>
             {
                 var table = Fmlv.Read(stream);
 
@@ -23,7 +23,7 @@ namespace OpenKh.Tests.kh2
             });
 
             [Fact]
-            public void CheckFinalMixFile() => Common.FileOpenRead(@"kh2/res/fmlv_fm.bin", stream =>
+            public void CheckFinalMixNewImpl() => Common.FileOpenRead(@"kh2/res/fmlv_fm.bin", stream =>
             {
                 var table = Fmlv.Read(stream);
 
