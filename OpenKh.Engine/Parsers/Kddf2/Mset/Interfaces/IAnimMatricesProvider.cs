@@ -7,6 +7,6 @@ namespace OpenKh.Engine.Parsers.Kddf2.Mset.Interfaces
 {
     public interface IAnimMatricesProvider
     {
-        Matrix[] ProvideMatrices(double delta);
+        Matrix[] ProvideMatrices(double gameTimeDelta);
     }
 }

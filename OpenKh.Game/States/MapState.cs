@@ -241,13 +241,13 @@ namespace OpenKh.Game.States
             var model = new MdlxParser(mdlx).Model;
             if (model is MdlxAnimModel animModel)
             {
-                var mset = archiveManager.Get<List<Bar.Entry>>("A000") ?? archiveManager.Get<List<Bar.Entry>>("B000");
-                if (mset != null && mdlxLoader != null)
+                var anbEntries = archiveManager.Get<List<Bar.Entry>>("A000") ?? archiveManager.Get<List<Bar.Entry>>("B000");
+                if (anbEntries != null && mdlxLoader != null)
                 {
-                    var andIndir = new AnbIndir(mset);
+                    var anbIndir = new AnbIndir(anbEntries);
                     using (var mdlxStream = mdlxLoader())
                     {
-                        animModel.AnimMatricesProvider = andIndir.GetAnimProvider(mdlxStream);
+                        animModel.AnimMatricesProvider = anbIndir.GetAnimProvider(mdlxStream);
                     }
                 }
             }
