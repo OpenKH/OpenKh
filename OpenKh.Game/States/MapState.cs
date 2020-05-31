@@ -230,6 +230,7 @@ namespace OpenKh.Game.States
                 return null;
 
             var model = new MdlxParser(mdlx).Model;
+            model.Update(0);
 
             return new Mesh
             {
