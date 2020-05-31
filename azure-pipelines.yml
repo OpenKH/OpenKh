@@ -59,7 +59,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     vsVersion: 'latest'
-    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/openkh'
     maximumCpuCount: true
 
 - task: VSBuild@1
@@ -69,7 +69,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     vsVersion: 'latest'
-    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/openkh'
     maximumCpuCount: true
 
 - task: VSBuild@1
@@ -79,7 +79,7 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     vsVersion: 'latest'
-    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/openkh'
     maximumCpuCount: true
 
 - task: PublishBuildArtifacts@1
