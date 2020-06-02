@@ -40,7 +40,7 @@ namespace OpenKh.Kh2.Battle
             PingMulan,
             Aladdin,
             Sparrow,
-            Biest,
+            Beast,
             Jack,
             Simba,
             Tron,
