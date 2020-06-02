@@ -14,7 +14,7 @@ namespace OpenKh.Engine.Renderers
             public float ScaleX { get; set; }
             public float ScaleY { get; set; }
             public ColorF Color { get; set; }
-            public int ColorBlendType { get; set; }
+            public int ColorBlendMode { get; set; }
             public float Left { get; set; }
             public float Top { get; set; }
             public float Right { get; set; }
@@ -28,7 +28,7 @@ namespace OpenKh.Engine.Renderers
                 ScaleX = ScaleX,
                 ScaleY = ScaleY,
                 Color = Color,
-                ColorBlendType = ColorBlendType,
+                ColorBlendMode = ColorBlendMode,
                 Left = Left,
                 Top = Top,
                 Right = Right,
@@ -112,7 +112,7 @@ namespace OpenKh.Engine.Renderers
 
             context.PositionX += Lerp(t, animation.Xa0, animation.Xa1);
             context.PositionY += Lerp(t, animation.Ya0, animation.Ya1);
-            context.ColorBlendType = animation.ColorBlend;
+            context.ColorBlendMode = animation.ColorBlend;
 
             if ((animation.Flags & ScalingFlag) == 0)
             {
@@ -188,6 +188,7 @@ namespace OpenKh.Engine.Renderers
             drawContext.Color2 = ConvertColor(frame.ColorRight);
             drawContext.Color3 = ConvertColor(frame.ColorBottom);
             drawContext.ColorMultiply(context.Color);
+            drawContext.BlendMode = (BlendMode)context.ColorBlendMode;
 
             drawing.AppendSprite(drawContext);
         }

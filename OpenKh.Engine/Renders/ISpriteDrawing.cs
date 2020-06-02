@@ -3,6 +3,13 @@ using System;
 
 namespace OpenKh.Engine.Renders
 {
+    public enum BlendMode
+    {
+        Default,
+        Add,
+        Subtract,
+    }
+
     public struct ColorF
     {
         public static readonly ColorF Black = new ColorF(0.0f, 0.0f, 0.0f, 1.0f);
@@ -77,6 +84,7 @@ namespace OpenKh.Engine.Renders
         public ColorF Color3 { get; set; }
 
         public ISpriteTexture SpriteTexture { get; set; }
+        public BlendMode BlendMode { get; set; }
     }
 
     public static class SpriteDrawingContextExtensions
