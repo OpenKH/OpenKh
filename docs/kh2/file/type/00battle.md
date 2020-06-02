@@ -22,40 +22,41 @@ Contains the level-up table for every playable character.
 | 4 	 | Character[0..13] | Character informations with a fixed sequence
 
 ### Character sequence
- - Sora / Roxas
- - Donald
- - Goofy
- - Mickey
- - Auron
- - Ping / Mulan
- - Aladdin
- - Sparrow
- - Biest
- - Jack
- - Simba
- - Tron
- - Riku
+
+* Sora / Roxas
+* Donald
+* Goofy
+* Mickey
+* Auron
+* Ping / Mulan
+* Aladdin
+* Sparrow
+* Biest
+* Jack
+* Simba
+* Tron
+* Riku
 
 ### Lvup 'Character' Entry
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00 	 | int32 | Number of 'LevelUp' entries
-| 04 	 | LevelUp[0..99] | Holds informations for the level up
+| 00     | int32 | Number of 'LevelUp' entries
+| 04     | LevelUp[0..99] | Holds informations for the level up
 
 ### Lvup 'LevelUp' Entry
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00 	 | int  | Needed EXP
-| 04 	 | byte | Strength of Character
-| 05 	 | byte | Magic of Character
-| 06 	 | byte | Defense of Character
-| 07 	 | byte | AP of Character
-| 08 	 | short | Ability given when using Sword route (03system.bin --> ITEM sub file)
-| 0A 	 | short | Ability given when using Shield route (03system.bin --> ITEM sub file)
-| 0C 	 | short | Ability given when using Staff route (03system.bin --> ITEM sub file)
-| 0E 	 | short | Padding
+| 00     | int  | Needed EXP
+| 04     | byte | Strength of Character
+| 05     | byte | Magic of Character
+| 06     | byte | Defense of Character
+| 07     | byte | AP of Character
+| 08     | short | Ability given when using Sword route (03system.bin --> ITEM sub file)
+| 0A     | short | Ability given when using Shield route (03system.bin --> ITEM sub file)
+| 0C     | short | Ability given when using Staff route (03system.bin --> ITEM sub file)
+| 0E     | short | Padding
 
 ## Lvpm
 
@@ -207,8 +208,8 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00 	 | int32 | Magic number
-| 04 	 | int32 | Number of 'Bons' entries
+| 00     | int32 | Magic number
+| 04     | int32 | Number of 'Bons' entries
 
 ### Bons entry
 
