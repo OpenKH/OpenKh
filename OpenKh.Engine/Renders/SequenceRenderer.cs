@@ -1,6 +1,8 @@
 ﻿using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
+using System;
 using System.Drawing;
+using System.Net.Sockets;
 
 namespace OpenKh.Engine.Renderers
 {
@@ -67,17 +69,19 @@ namespace OpenKh.Engine.Renderers
             var count = animationGroup.Count;
             var context = contextParent.Clone();
 
-            //if (animationGroup.Tick1 == 0)
-            //    context.CurrentFrameIndex = 0;
-            //else if (animationGroup.Tick2 == 0)
-            //    context.CurrentFrameIndex = Math.Min(context.CurrentFrameIndex, animationGroup.Tick1);
-            //else
-            //    context.CurrentFrameIndex = (context.CurrentFrameIndex < animationGroup.Tick1) ? context.CurrentFrameIndex :
-            //        (animationGroup.Tick1 + ((context.CurrentFrameIndex - animationGroup.Tick1) % (animationGroup.Tick2 - animationGroup.Tick1)));
+            if (animationGroup.DoNotLoop == 0)
+            {
+                var frameEnd = animationGroup.LoopEnd;
+                if (frameEnd == 0)
+                {
+                    for (var i = 0; i < count; i++)
+                    {
+                        frameEnd = Math.Max(frameEnd, sequence.Animations[index + i].FrameEnd);
+                    }
+                }
 
-            if (animationGroup.Tick2 != 0)
-                context.FrameIndex = (context.FrameIndex < animationGroup.Tick1) ? context.FrameIndex :
-                (animationGroup.Tick1 + ((context.FrameIndex - animationGroup.Tick1) % (animationGroup.Tick2 - animationGroup.Tick1)));
+                context.FrameIndex = Loop(animationGroup.LoopStart, frameEnd, context.FrameIndex);
+            }
 
             for (var i = 0; i < count; i++)
             {
@@ -206,5 +210,18 @@ namespace OpenKh.Engine.Renderers
             (float)Lerp(m, x1.G, x2.G),
             (float)Lerp(m, x1.B, x2.B),
             (float)Lerp(m, x1.A, x2.A));
+
+        private static int Loop(int min, int max, int val)
+        {
+            if (val < max)
+                return val;
+            if (max <= min)
+                return min;
+
+            var mod = (val - min) % (max - min);
+            if (mod < 0)
+                mod += max - min;
+            return min + mod;
+        }
     }
 }

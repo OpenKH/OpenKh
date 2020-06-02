@@ -101,10 +101,10 @@ namespace OpenKh.Kh2
         {
             [Data] public short AnimationIndex { get; set; }
             [Data] public short Count { get; set; }
-            [Data] public short Unknown04 { get; set; }
+            [Data] public short DoNotLoop { get; set; }
             [Data] public short Unknown06 { get; set; }
-            [Data] public int Tick1 { get; set; }
-            [Data] public int Tick2 { get; set; }
+            [Data] public int LoopStart { get; set; }
+            [Data] public int LoopEnd { get; set; }
             [Data] public int Unknown10 { get; set; }
             [Data] public int Unknown14 { get; set; }
             [Data] public int Unknown18 { get; set; }
