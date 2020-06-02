@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
@@ -113,6 +113,11 @@ namespace OpenKh.Game
         private BlendState _lastBlendState;
         private Matrix _projectionView;
 
+        private Vector2 _textureRegionU;
+        private Vector2 _textureRegionV;
+        private TextureWrapMode _textureWrapU;
+        private TextureWrapMode _textureWrapV;
+
         public MonoSpriteDrawing(GraphicsDevice graphicsDevice, KingdomShader shader)
         {
             _graphicsDevice = graphicsDevice;
@@ -200,21 +205,33 @@ namespace OpenKh.Game
             var tw = 1.0f / _lastTextureUsed.Width;
             var th = 1.0f / _lastTextureUsed.Height;
 
+            var textureRegionU = new Vector2(0, 1);
+            var textureRegionV = new Vector2(0, 1);
+            if (_textureRegionU != textureRegionU ||
+                _textureRegionV != textureRegionV ||
+                _textureWrapU != context.TextureWrapU ||
+                _textureWrapV != context.TextureWrapV)
+                Flush();
+            _textureRegionU = textureRegionU;
+            _textureRegionV = textureRegionV;
+            _textureWrapU = context.TextureWrapU;
+            _textureWrapV = context.TextureWrapV;
+
             _vertices[vertexIndex + 0].Position = new Vector3(context.DestinationX, context.DestinationY, 0.0f);
             _vertices[vertexIndex + 0].Color = context.Color0;
-            _vertices[vertexIndex + 0].TextureCoordinate = new Vector2(context.SourceLeft * tw, context.SourceTop * th);
+            _vertices[vertexIndex + 0].TextureCoordinate = new Vector2(context.SourceLeft * tw + context.TextureHorizontalShift, context.SourceTop * th + context.TextureVerticalShift);
 
             _vertices[vertexIndex + 1].Position = new Vector3(context.DestinationX + context.DestinationWidth, context.DestinationY, 0.0f);
             _vertices[vertexIndex + 1].Color = context.Color1;
-            _vertices[vertexIndex + 1].TextureCoordinate = new Vector2(context.SourceRight * tw, context.SourceTop * th);
+            _vertices[vertexIndex + 1].TextureCoordinate = new Vector2(context.SourceRight * tw + context.TextureHorizontalShift, context.SourceTop * th + context.TextureVerticalShift);
 
             _vertices[vertexIndex + 2].Position = new Vector3(context.DestinationX, context.DestinationY + context.DestinationHeight, 0.0f);
             _vertices[vertexIndex + 2].Color = context.Color2;
-            _vertices[vertexIndex + 2].TextureCoordinate = new Vector2(context.SourceLeft * tw, context.SourceBottom * th);
+            _vertices[vertexIndex + 2].TextureCoordinate = new Vector2(context.SourceLeft * tw + context.TextureHorizontalShift, context.SourceBottom * th + context.TextureVerticalShift);
 
             _vertices[vertexIndex + 3].Position = new Vector3(context.DestinationX + context.DestinationWidth, context.DestinationY + context.DestinationHeight, 0.0f);
             _vertices[vertexIndex + 3].Color = context.Color3;
-            _vertices[vertexIndex + 3].TextureCoordinate = new Vector2(context.SourceRight * tw, context.SourceBottom * th);
+            _vertices[vertexIndex + 3].TextureCoordinate = new Vector2(context.SourceRight * tw + context.TextureHorizontalShift, context.SourceBottom * th + context.TextureVerticalShift);
 
             PushVertices();
         }
@@ -241,6 +258,10 @@ namespace OpenKh.Game
                 _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
                 _shader.TextureWrapModeU = TextureWrapMode.Clamp;
                 _shader.TextureWrapModeV = TextureWrapMode.Clamp;
+                _shader.TextureRegionU = _textureRegionU;
+                _shader.TextureRegionV = _textureRegionV;
+                _shader.TextureWrapModeU = _textureWrapU;
+                _shader.TextureWrapModeV = _textureWrapV;
                 pass.Apply();
 
                 _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _currentSpriteIndex * 2);

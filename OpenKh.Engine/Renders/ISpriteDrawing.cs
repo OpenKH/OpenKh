@@ -1,4 +1,4 @@
-using OpenKh.Imaging;
+﻿using OpenKh.Imaging;
 using System;
 
 namespace OpenKh.Engine.Renders
@@ -91,6 +91,15 @@ namespace OpenKh.Engine.Renders
 
         public ISpriteTexture SpriteTexture { get; set; }
         public BlendMode BlendMode { get; set; }
+
+        public TextureWrapMode TextureWrapU { get; set; } = TextureWrapMode.Repeat;
+        public TextureWrapMode TextureWrapV { get; set; } = TextureWrapMode.Repeat;
+        public float TextureHorizontalShift { get; set; }
+        public float TextureVerticalShift { get; set; }
+        public float TextureRegionLeft { get; set; } = 0.0f;
+        public float TextureRegionRight { get; set; } = 1.0f;
+        public float TextureRegionTop { get; set; } = 0.0f;
+        public float TextureRegionBottom { get; set; } = 1.0f;
     }
 
     public static class SpriteDrawingContextExtensions
@@ -196,6 +205,22 @@ namespace OpenKh.Engine.Renders
         public static SpriteDrawingContext SpriteTexture(this SpriteDrawingContext context, ISpriteTexture spriteTexture)
         {
             context.SpriteTexture = spriteTexture;
+            return context;
+        }
+
+        public static SpriteDrawingContext TextureWrapHorizontal(this SpriteDrawingContext context, TextureWrapMode mode, float left, float right)
+        {
+            context.TextureWrapU = mode;
+            context.TextureRegionLeft = left;
+            context.TextureRegionRight = right;
+            return context;
+        }
+
+        public static SpriteDrawingContext TextureWrapVertical(this SpriteDrawingContext context, TextureWrapMode mode, float top, float bottom)
+        {
+            context.TextureWrapV = mode;
+            context.TextureRegionTop = top;
+            context.TextureRegionBottom = bottom;
             return context;
         }
     }

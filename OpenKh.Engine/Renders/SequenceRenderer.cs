@@ -10,6 +10,7 @@ namespace OpenKh.Engine.Renderers
     {
         private class Context
         {
+            public int GlobalFrameIndex { get; set; }
             public int FrameIndex { get; set; }
             public float PositionX { get; set; }
             public float PositionY { get; set; }
@@ -24,6 +25,7 @@ namespace OpenKh.Engine.Renderers
 
             public Context Clone() => new Context
             {
+                GlobalFrameIndex = GlobalFrameIndex,
                 FrameIndex = FrameIndex,
                 PositionX = PositionX,
                 PositionY = PositionY,
@@ -58,6 +60,7 @@ namespace OpenKh.Engine.Renderers
         public void Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
             DrawAnimationGroup(new Context
             {
+                GlobalFrameIndex = frameIndex,
                 FrameIndex = frameIndex,
                 PositionX = positionX,
                 PositionY = positionY
@@ -193,6 +196,11 @@ namespace OpenKh.Engine.Renderers
             drawContext.Color3 = ConvertColor(frame.ColorBottom);
             drawContext.ColorMultiply(context.Color);
             drawContext.BlendMode = (BlendMode)context.ColorBlendMode;
+
+            drawContext.TextureWrapHorizontal(TextureWrapMode.Repeat, frame.Left, frame.Right);
+            drawContext.TextureWrapVertical(TextureWrapMode.Repeat, frame.Top, frame.Bottom);
+            drawContext.TextureHorizontalShift = frame.UTranslation * context.GlobalFrameIndex;
+            drawContext.TextureVerticalShift = frame.VTranslation * context.GlobalFrameIndex;
 
             drawing.AppendSprite(drawContext);
         }
