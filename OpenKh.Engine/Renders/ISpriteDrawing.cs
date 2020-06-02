@@ -10,6 +10,12 @@ namespace OpenKh.Engine.Renders
         Subtract,
     }
 
+    public enum TextureWrapMode
+    {
+        Clamp = 1,
+        Repeat = 2,
+    }
+
     public struct ColorF
     {
         public static readonly ColorF Black = new ColorF(0.0f, 0.0f, 0.0f, 1.0f);

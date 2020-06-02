@@ -1,17 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Engine.Renders;
 using System;
-using System.Drawing;
 
 namespace OpenKh.Game.Shaders
 {
-    public enum TextureWrapMode
-    {
-        Clamp = 1,
-        Repeat = 2,
-    }
-
     public class KingdomShader : IDisposable
     {
         public static readonly Vector2 DefaultTextureRegion = new Vector2(0, 1);
