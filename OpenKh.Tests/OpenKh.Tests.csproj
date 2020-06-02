@@ -73,7 +73,13 @@
     <None Update="kh2\res\bar_test.bar">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="kh2\res\bons_fm.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="kh2\res\eh_l.layd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\enmp.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="kh2\res\fmlv_de.bin">
@@ -132,6 +138,9 @@
     </None>
     <None Update="kh2\res\image.fac">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>    
+    <None Update="kh2\res\lvup_fm.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="kh2\res\item.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -145,10 +154,16 @@
     <None Update="kh2\res\place.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="kh2\res\przt.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="kh2\res\p_ex.vif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="kh2\res\map.vif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>    
+    <None Update="kh2\res\lvup_fm.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="kh2\res\sys.bin">
@@ -158,6 +173,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="kh2\res\trsr.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\vtbl.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="_Assets\ps4archive.bin">

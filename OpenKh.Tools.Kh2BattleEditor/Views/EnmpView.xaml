@@ -1,0 +1,105 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2BattleEditor.Views.EnmpView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2BattleEditor.Views"
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="0"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ListBox
+                Grid.Column="0"
+                ItemsSource="{Binding Items}"
+                SelectedItem="{Binding SelectedItem}"
+                DisplayMemberPath="Name">
+            </ListBox>
+
+            <Grid Grid.Row="1" Margin="0 5 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{StaticResource Search_16x}"/>
+                <TextBox Grid.Column="2"
+                    Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </Grid>
+
+        <!--<StackPanel
+            Grid.Column="2"
+            Visibility="{Binding IsItemEditMessageVisible}">
+            <TextBlock
+                Text="Please select an item to modify"/>
+        </StackPanel>-->
+
+        <ScrollViewer
+            Grid.Column="2"
+            Margin="5"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="{Binding IsItemEditingVisible}">
+            <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
+                <TextBlock Text="ID" Margin="{StaticResource LabelMargin}"/>
+                <TextBlock Text="{Binding Id}"/>
+
+                <TextBlock Text="Level" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Level, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Health" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Health, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown44, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown46, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Physical weakness" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding PhysicalWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Fire weakness" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding FireWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Ice weakness" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding IceWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Thunder weakness" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding ThunderWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Dark weakness" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding DarkWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown52, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Reflect weakness" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding ReflectWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown56, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown58, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unknown5a, UpdateSourceTrigger=PropertyChanged}"/>
+            </controls:TwoColumnsPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

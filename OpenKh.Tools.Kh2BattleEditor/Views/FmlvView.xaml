@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2BattleEditor.Views.FmlvView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2BattleEditor.Views"
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Form" Margin="1 2 0 0" Grid.Column="0"/>
+            <ComboBox 
+                ItemsSource="{Binding Items}"
+                SelectedIndex="{Binding SelectedIndex}"
+                SelectedItem="{Binding SelectedItem}"
+                DisplayMemberPath="Name"
+                Grid.Column="1" Grid.ColumnSpan="2" />
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <ListBox
+                Grid.Column="0"
+                ItemsSource="{Binding SelectedItem.Items}"
+                SelectedItem="{Binding SelectedItem.SelectedItem}"
+                DisplayMemberPath="Name">
+            </ListBox>
+
+            <ScrollViewer
+            Grid.Column="2"
+            VerticalScrollBarVisibility="Auto">
+                <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem.SelectedItem}">
+
+                    <TextBlock Text="Level Growth Ability" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Text="{Binding LevelGrowthAbility, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Text="Ability" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Text="{Binding Ability, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Text="EXP" Margin="{StaticResource LabelMargin}"/>
+                    <TextBox Text="{Binding Exp, UpdateSourceTrigger=PropertyChanged}"/>
+                </controls:TwoColumnsPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>
