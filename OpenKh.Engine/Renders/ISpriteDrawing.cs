@@ -1,4 +1,4 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using System;
 
 namespace OpenKh.Engine.Renders
@@ -68,10 +68,10 @@ namespace OpenKh.Engine.Renders
 
     public class SpriteDrawingContext
     {
-        public int SourceLeft { get; set; }
-        public int SourceTop { get; set; }
-        public int SourceRight { get; set; }
-        public int SourceBottom { get; set; }
+        public float SourceLeft { get; set; }
+        public float SourceTop { get; set; }
+        public float SourceRight { get; set; }
+        public float SourceBottom { get; set; }
 
         public float DestinationX { get; set; }
         public float DestinationY { get; set; }
@@ -91,7 +91,7 @@ namespace OpenKh.Engine.Renders
     {
         private static readonly ColorF ColorWhite = new ColorF(1.0f, 1.0f, 1.0f, 1.0f);
 
-        public static SpriteDrawingContext SourceLTRB(this SpriteDrawingContext context, int left, int top, int right, int bottom)
+        public static SpriteDrawingContext SourceLTRB(this SpriteDrawingContext context, float left, float top, float right, float bottom)
         {
             context.SourceLeft = left;
             context.SourceTop = top;
@@ -100,7 +100,7 @@ namespace OpenKh.Engine.Renders
             return context;
         }
 
-        public static SpriteDrawingContext Source(this SpriteDrawingContext context, int x, int y, int width, int height)
+        public static SpriteDrawingContext Source(this SpriteDrawingContext context, float x, float y, float width, float height)
         {
             context.SourceLeft = x;
             context.SourceTop = y;
