@@ -343,21 +343,7 @@ namespace OpenKh.Game.States
         {
             var currentSequenceGroupIndex = layout.SelectedSequenceGroupIndex;
 
-            if (currentSequenceGroupIndex == _titleLayout.MenuOptionNewGame ||
-                currentSequenceGroupIndex == _titleLayout.MenuOptionLoad ||
-                currentSequenceGroupIndex == _titleLayout.MenuOptionTheater ||
-                currentSequenceGroupIndex == _titleLayout.MenuOptionBack)
-            {
-                if (layout.FrameIndex > 178)
-                    layout.FrameIndex = 70;
-                layout.FrameIndex++;
-            }
-            else if (currentSequenceGroupIndex == _titleLayout.IntroSkip)
-            {
-                if (layout.FrameIndex < 119)
-                    layout.FrameIndex++;
-            }
-            else if (currentSequenceGroupIndex == _titleLayout.Copyright)
+            if (currentSequenceGroupIndex == _titleLayout.Copyright)
             {
                 if (layout.FrameIndex < 850)
                     layout.FrameIndex++;
