@@ -24,3 +24,9 @@ alias resequence='OpenKh.Command.Layout sequence'
 
 alias khmsg='OpenKh.Command.MsgTool'
 alias unmsg='OpenKh.Command.MsgTool --input'
+
+alias khimg='OpenKh.Command.ImgTool'
+alias khimd='OpenKh.Command.ImgTool imd'
+alias khimz='OpenKh.Command.ImgTool imz'
+alias unimd='OpenKh.Command.ImgTool unimd'
+alias unimz='OpenKh.Command.ImgTool unimz'
