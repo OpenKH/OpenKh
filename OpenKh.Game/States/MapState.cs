@@ -14,6 +14,19 @@ namespace OpenKh.Game.States
 {
     public class MapState : IState
     {
+        private readonly static BlendState DefaultBlendState = new BlendState()
+        {
+            ColorSourceBlend = Blend.SourceAlpha,
+            AlphaSourceBlend = Blend.SourceAlpha,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
+            AlphaDestinationBlend = Blend.InverseSourceAlpha,
+            ColorBlendFunction = BlendFunction.Add,
+            AlphaBlendFunction = BlendFunction.Add,
+            BlendFactor = Color.White,
+            MultiSampleMask = int.MaxValue,
+            IndependentBlendEnable = false
+        };
+
         private Kernel _kernel;
         private ArchiveManager _archiveManager;
         private GraphicsDeviceManager _graphics;
@@ -39,8 +52,6 @@ namespace OpenKh.Game.States
                 CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
-
-            _graphics.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
 
             BasicallyForceToReloadEverything();
         }
@@ -78,6 +89,7 @@ namespace OpenKh.Game.States
                 CullMode = CullMode.CullClockwiseFace
             };
             _graphics.GraphicsDevice.DepthStencilState = new DepthStencilState();
+            _graphics.GraphicsDevice.BlendState = DefaultBlendState;
 
             _shader.Pass(pass =>
             {
