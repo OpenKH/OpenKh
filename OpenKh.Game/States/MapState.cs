@@ -230,8 +230,9 @@ namespace OpenKh.Game.States
                 fileName = $"map/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
 
             _archiveManager.LoadArchive(fileName);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP", "MAP"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK0", "SK0"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK1", "SK1"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP", "MAP"));
         }
 
         private static Mesh FromMdlx(
