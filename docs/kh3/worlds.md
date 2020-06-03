@@ -17,7 +17,7 @@
 | MI | [Monstropolis      ](#monstropolis)| **M**onsters, **I**nc.
 | PO | [100 Acre Wood     ](#100-acre-wood)| **Po**oh
 | RA | [Kingdom of Corona ](#kingdom-of-corona)| **Ra**punzel
-| RG | [Radiant Garden    ](#radiant-garden)| **R**adiang **G**arden
+| RG | [Radiant Garden    ](#radiant-garden)| **R**adiant **G**arden
 | SF | [SF                ](#sf)| **S**ecret **F**orest
 | SP | [SP                ](#sp)|
 | SS | [SS                ](#ss)|
