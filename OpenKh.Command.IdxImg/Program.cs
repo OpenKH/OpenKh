@@ -179,14 +179,14 @@ namespace OpenKh.Command.IdxImg
             [Argument(2, Description = "IDX file path (eg. msg/jp/sys.bar)")]
             public string FilePath { get; set; }
 
-            [Option(CommandOptionType.NoValue, Description = "Do not compress the file to inject", ShortName = "u", LongName = "--uncompressed")]
+            [Option(CommandOptionType.NoValue, Description = "Do not compress the file to inject", ShortName = "u", LongName = "uncompressed")]
             public bool Uncompressed { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IDX. By default is 1417580 for KH2FM", ShortName = "idx", LongName = "--idx-offset")]
-            public long IdxIsoBlock { get; set; } = 1417580;
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IDX. By default is 1840 for KH2FM", ShortName = "idx", LongName = "idx-offset")]
+            public long IdxIsoBlock { get; set; } = 1840;
 
-            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IMG. By default is 1841 for KH2FM", ShortName = "img", LongName = "--img-offset")]
-            public long ImgIsoBlock { get; set; } = 1841;
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IMG. By default is 671693 for KH2FM", ShortName = "img", LongName = "img-offset")]
+            public long ImgIsoBlock { get; set; } = 671693;
 
             protected int OnExecute(CommandLineApplication app)
             {
