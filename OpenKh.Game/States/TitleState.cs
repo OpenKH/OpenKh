@@ -337,6 +337,8 @@ namespace OpenKh.Game.States
                     layoutRendererFg.SelectedSequenceGroupIndex = _titleLayout.MenuOptionBack;
                     break;
             }
+
+            layoutRendererFg.FrameIndex = 0;
         }
 
         private void CheckTitlLoop(LayoutRenderer layout)
