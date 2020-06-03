@@ -200,18 +200,24 @@ namespace OpenKh.Game
             }
 
             var texture = (context.SpriteTexture as CSpriteTexture)?.Texture;
-            var vertexIndex = PrepareVertices(texture);
+            var tw = 1.0f / texture.Width;
+            var th = 1.0f / texture.Height;
 
-            var tw = 1.0f / _lastTextureUsed.Width;
-            var th = 1.0f / _lastTextureUsed.Height;
+            var textureRegionU = new Vector2(context.TextureRegionLeft * tw, context.TextureRegionRight * tw);
+            var textureRegionV = new Vector2(context.TextureRegionTop * th, context.TextureRegionBottom * th);
+            if (context.TextureWrapU == TextureWrapMode.Default)
+                textureRegionU = new Vector2(0, 1);
+            if (context.TextureWrapV == TextureWrapMode.Default)
+                textureRegionV = new Vector2(0, 1);
 
-            var textureRegionU = new Vector2(0, 1);
-            var textureRegionV = new Vector2(0, 1);
             if (_textureRegionU != textureRegionU ||
                 _textureRegionV != textureRegionV ||
                 _textureWrapU != context.TextureWrapU ||
                 _textureWrapV != context.TextureWrapV)
                 Flush();
+
+            var vertexIndex = PrepareVertices(texture);
+
             _textureRegionU = textureRegionU;
             _textureRegionV = textureRegionV;
             _textureWrapU = context.TextureWrapU;
@@ -254,10 +260,6 @@ namespace OpenKh.Game
                 _shader.Texture0 = _lastTextureUsed;
                 _shader.ProjectionView = _projectionView;
                 _shader.WorldView = Matrix.Identity;
-                _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
-                _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
-                _shader.TextureWrapModeU = TextureWrapMode.Clamp;
-                _shader.TextureWrapModeV = TextureWrapMode.Clamp;
                 _shader.TextureRegionU = _textureRegionU;
                 _shader.TextureRegionV = _textureRegionV;
                 _shader.TextureWrapModeU = _textureWrapU;

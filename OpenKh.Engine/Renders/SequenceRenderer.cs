@@ -197,10 +197,17 @@ namespace OpenKh.Engine.Renderers
             drawContext.ColorMultiply(context.Color);
             drawContext.BlendMode = (BlendMode)context.ColorBlendMode;
 
-            drawContext.TextureWrapHorizontal(TextureWrapMode.Repeat, frame.Left, frame.Right);
-            drawContext.TextureWrapVertical(TextureWrapMode.Repeat, frame.Top, frame.Bottom);
-            drawContext.TextureHorizontalShift = frame.UTranslation * context.GlobalFrameIndex;
-            drawContext.TextureVerticalShift = frame.VTranslation * context.GlobalFrameIndex;
+            if (frame.UTranslation != 0) // HACK to increase performance
+            {
+                drawContext.TextureWrapHorizontal(TextureWrapMode.Repeat, Math.Min(frame.Left, frame.Right), Math.Max(frame.Left, frame.Right));
+                drawContext.TextureHorizontalShift = frame.UTranslation * context.GlobalFrameIndex;
+            }
+
+            if (frame.VTranslation != 0) // HACK to increase performance
+            {
+                drawContext.TextureWrapVertical(TextureWrapMode.Repeat, Math.Min(frame.Top, frame.Bottom), Math.Max(frame.Top, frame.Bottom));
+                drawContext.TextureVerticalShift = frame.VTranslation * context.GlobalFrameIndex;
+            }
 
             drawing.AppendSprite(drawContext);
         }

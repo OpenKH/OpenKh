@@ -12,6 +12,7 @@ namespace OpenKh.Engine.Renders
 
     public enum TextureWrapMode
     {
+        Default = 0,
         Clamp = 1,
         Repeat = 2,
     }
@@ -70,6 +71,8 @@ namespace OpenKh.Engine.Renders
             B = ((rgba >> 16) & 0xff) / 255.0f,
             A = ((rgba >> 24) & 0xff) / 255.0f,
         };
+
+        public override string ToString() => $"({R}, {G}, {B}, {A})";
     }
 
     public class SpriteDrawingContext
@@ -92,14 +95,14 @@ namespace OpenKh.Engine.Renders
         public ISpriteTexture SpriteTexture { get; set; }
         public BlendMode BlendMode { get; set; }
 
-        public TextureWrapMode TextureWrapU { get; set; } = TextureWrapMode.Repeat;
-        public TextureWrapMode TextureWrapV { get; set; } = TextureWrapMode.Repeat;
+        public TextureWrapMode TextureWrapU { get; set; } = TextureWrapMode.Default;
+        public TextureWrapMode TextureWrapV { get; set; } = TextureWrapMode.Default;
         public float TextureHorizontalShift { get; set; }
         public float TextureVerticalShift { get; set; }
-        public float TextureRegionLeft { get; set; } = 0.0f;
-        public float TextureRegionRight { get; set; } = 1.0f;
-        public float TextureRegionTop { get; set; } = 0.0f;
-        public float TextureRegionBottom { get; set; } = 1.0f;
+        public float TextureRegionLeft { get; set; }
+        public float TextureRegionRight { get; set; }
+        public float TextureRegionTop { get; set; }
+        public float TextureRegionBottom { get; set; }
     }
 
     public static class SpriteDrawingContextExtensions
