@@ -88,7 +88,7 @@ namespace OpenKh.Game
         {
             ColorSourceBlend = Blend.SourceAlpha,
             AlphaSourceBlend = Blend.SourceAlpha,
-            ColorDestinationBlend = Blend.DestinationAlpha,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
             AlphaDestinationBlend = Blend.InverseSourceAlpha,
             ColorBlendFunction = BlendFunction.ReverseSubtract,
             AlphaBlendFunction = BlendFunction.ReverseSubtract,
