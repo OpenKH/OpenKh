@@ -14,6 +14,7 @@ alias listasset='OpenKh.Command.HdAssets list'
 alias khidx='OpenKh.Command.IdxImg'
 alias unidx='OpenKh.Command.IdxImg extract'
 alias listidx='OpenKh.Command.IdxImg list'
+alias injectiso='OpenKh.Command.IdxImg inject'
 
 alias khlayout='OpenKh.Command.Layout'
 alias unlayout='OpenKh.Command.Layout unlayout'

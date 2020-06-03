@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Xe.IO;
@@ -9,7 +9,7 @@ namespace OpenKh.Kh2
     {
         const int IsoBlockAlign = 0x800;
 
-        private static string[] InternalIdxs =
+        public static string[] InternalIdxs =
         {
             "000al.idx",
             "000bb.idx",
@@ -34,27 +34,55 @@ namespace OpenKh.Kh2
 
         private readonly Stream stream;
 
-        public Img(Stream stream, Idx idx, bool loadAllIdx)
+        public Img(Stream stream, IEnumerable<Idx.Entry> idxEntries, bool loadAllIdx)
         {
             this.stream = stream;
-            Idx = idx;
+            Entries = new IdxDictionary
+            {
+                idxEntries
+            };
+
             if (loadAllIdx)
-                Idx = LoadAllIdx(Idx);
+            {
+                foreach (var fileName in InternalIdxs)
+                {
+                    FileOpen(fileName, entryStream =>
+                    {
+                        Entries.Add(Idx.Read(entryStream));
+                    });
+                }
+            }
         }
 
-        public Idx Idx { get; }
+        public IdxDictionary Entries { get; }
+
+        public bool FileExists(string fileName) => Entries.Exists(fileName);
+
+        public bool TryFileOpen(string fileName, out Stream stream)
+        {
+            bool result;
+            if (result = Entries.TryGetEntry(fileName, out var entry))
+            {
+                stream = FileOpen(entry);
+                return true;
+            }
+
+            stream = null;
+            return false;
+        }
 
         public bool FileOpen(string fileName, Action<Stream> callback)
         {
             bool result;
-            if (result = Idx.TryGetEntry(fileName, out var entry))
+            if (result = Entries.TryGetEntry(fileName, out var entry))
                 callback(FileOpen(entry));
+
             return result;
         }
 
         public Stream FileOpen(string fileName)
         {
-            if (Idx.TryGetEntry(fileName, out var entry))
+            if (Entries.TryGetEntry(fileName, out var entry))
                 return FileOpen(entry);
 
             throw new FileNotFoundException("File not found", fileName);
@@ -120,29 +148,105 @@ namespace OpenKh.Kh2
             return dstData;
         }
 
-        private static byte ReadByteBackward(Stream stream)
+        public static byte[] Compress(byte[] srcData)
         {
-            stream.Position -= 1;
-            var b = stream.ReadByte();
-            stream.Position -= 1;
-            return (byte)b;
-        }
+            const int MaxWindowSize = 0x100;
 
-        private static void WriteByteBackward(Stream stream, byte value)
-        {
-            stream.Position -= 1;
-            stream.WriteByte(value);
-            stream.Position -= 1;
-        }
+            var decompressedLength = srcData.Length;
+            var key = GetLeastUsedByte(srcData);
 
-        private Idx LoadAllIdx(Idx idx)
-        {
-            foreach (var fileName in InternalIdxs)
+            // the following buffer size covers the worst compression scenario possible.
+            var buffer = new byte[decompressedLength + decompressedLength / 2 + 5];
+            var length = 0;
+            int iSrc = 0;
+
+            while (iSrc < decompressedLength)
             {
-                idx = idx.Merge(Idx.Read(FileOpen(fileName)));
+                var ch = srcData[iSrc];
+                if (ch == key)
+                {
+                    buffer[length++] = 0;
+                    buffer[length++] = key;
+                    iSrc++;
+                    continue;
+                }
+
+                int mi = 0;
+                int matches = 0;
+                var windowSize = iSrc + MaxWindowSize < decompressedLength ? MaxWindowSize : (decompressedLength - iSrc);
+                for (var i = 1; i < windowSize; i++)
+                {
+                    for (int j = i, m = 0; j < windowSize; j++)
+                    {
+                        if (srcData[iSrc + j - i] == srcData[iSrc + j])
+                        {
+                            m++;
+                            if (j + 1 == windowSize)
+                            {
+                                if (matches <= m)
+                                {
+                                    matches = m;
+                                    mi = i;
+                                }
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (matches <= m)
+                            {
+                                matches = m;
+                                mi = i;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if (matches > 3)
+                {
+                    buffer[length++] = (byte)(matches - 3);
+                    buffer[length++] = (byte)mi;
+                    buffer[length++] = key;
+                    iSrc += matches;
+                }
+                else
+                {
+                    buffer[length++] = ch;
+                    iSrc++;
+                }
             }
 
-            return idx;
+            buffer[length++] = (byte)(decompressedLength >> 24);
+            buffer[length++] = (byte)(decompressedLength >> 16);
+            buffer[length++] = (byte)(decompressedLength >> 8);
+            buffer[length++] = (byte)(decompressedLength >> 0);
+            buffer[length++] = key;
+
+            var dstData = new byte[length];
+            Array.Copy(buffer, dstData, length);
+
+            return dstData;
+        }
+
+        private static byte GetLeastUsedByte(byte[] data)
+        {
+            var dictionary = new int[0x100];
+            foreach (var ch in data)
+                dictionary[ch]++;
+
+            var elementFound = int.MaxValue;
+            var indexFound = 1; // the least used byte is never zero
+            for (var i = 1; i < 0x100; i++)
+            {
+                if (dictionary[i] < elementFound)
+                {
+                    elementFound = dictionary[i];
+                    indexFound = i;
+                }
+            }
+
+            return (byte)indexFound;
         }
     }
 }

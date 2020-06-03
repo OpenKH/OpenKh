@@ -16,7 +16,7 @@ namespace OpenKh.Common
 
         public static T FromBegin<T>(this T stream) where T : Stream => stream.SetPosition(0);
 
-        public static T SetPosition<T>(this T stream, int position) where T : Stream
+        public static T SetPosition<T>(this T stream, long position) where T : Stream
         {
             stream.Seek(position, SeekOrigin.Begin);
             return stream;

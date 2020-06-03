@@ -6,23 +6,16 @@ namespace OpenKh.Game.DataContent
 {
     public class IdxDataContent : IDataContent
     {
-        private readonly Idx _idx;
         private readonly Img _img;
 
         public IdxDataContent(Stream idxStream, Stream imgStream)
         {
-            _idx = Idx.Read(idxStream);
-            _img = new Img(imgStream, _idx, false);
+            _img = new Img(imgStream, Idx.Read(idxStream), false);
         }
 
-        public bool FileExists(string fileName) => _idx.TryGetEntry(fileName, out var _);
+        public bool FileExists(string fileName) => _img.FileExists(fileName);
 
-        public Stream FileOpen(string path)
-        {
-            if (_idx.TryGetEntry(path, out var entry))
-                return _img.FileOpen(entry);
-
-            return null;
-        }
+        public Stream FileOpen(string path) =>
+            _img.TryFileOpen(path, out var stream) ? stream : null;
     }
 }

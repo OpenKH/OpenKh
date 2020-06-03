@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
 {
-    public partial class Idx
+    public static class Idx
     {
         public class Entry
         {
@@ -31,7 +31,7 @@ namespace OpenKh.Kh2
             /// <summary>
             /// Additional info and files
             /// </summary>
-            [Data] public ushort Info { get; set; }
+            [Data] public ushort BlockDescription { get; set; }
 
             /// <summary>
             /// Offset of the file in the archive, divided by the ISO block size
@@ -41,20 +41,28 @@ namespace OpenKh.Kh2
             /// <summary>
             /// Length of the file in bytes
             /// </summary>
-            [Data] public uint Length { get; set; }
+            [Data] public int Length { get; set; }
 
             /// <summary>
             /// ISO blocks used in the ISO.
             /// </summary>
-            public uint BlockLength
+            public int BlockLength
             {
-                get => (uint)(Info & MaxBlockLength);
+                get
+                {
+                    var blockLength = BlockDescription & MaxBlockLength;
+                    if (Length >= 0x1000000 && IsCompressed) // HACK: please refer to IdxBlockSizeBugTest
+                        blockLength |= 0x1000;
+
+                    return blockLength;
+                }
+
                 set
                 {
                     if (value > MaxBlockLength)
                         throw new ArgumentOutOfRangeException(nameof(BlockLength), $"Cannot exceeds {MaxBlockLength}");
 
-                    Info = (ushort)(value | (Info & 0xC000U));
+                    BlockDescription = (ushort)((ushort)value | (BlockDescription & 0xC000U));
                 }
             }
 
@@ -63,13 +71,13 @@ namespace OpenKh.Kh2
             /// </summary>
             public bool IsCompressed
             {
-                get => (Info & IsCompressedFlag) != 0;
+                get => (BlockDescription & IsCompressedFlag) != 0;
                 set
                 {
                     if (value)
-                        Info |= IsCompressedFlag;
+                        BlockDescription |= IsCompressedFlag;
                     else
-                        Info = (ushort)(Info & ~IsCompressedFlag);
+                        BlockDescription = (ushort)(BlockDescription & ~IsCompressedFlag);
                 }
             }
 
@@ -78,26 +86,16 @@ namespace OpenKh.Kh2
             /// </summary>
             public bool IsStreamed
             {
-                get => (Info & IsStreamedFlag) != 0;
+                get => (BlockDescription & IsStreamedFlag) != 0;
                 set
                 {
                     if (value)
-                        Info |= IsStreamedFlag;
+                        BlockDescription |= IsStreamedFlag;
                     else
-                        Info = (ushort)(Info & ~IsStreamedFlag);
+                        BlockDescription = (ushort)(BlockDescription & ~IsStreamedFlag);
                 }
             }
         }
-
-        private Dictionary<uint, Entry> dictionaryEntries;
-
-        [Data] public int Length
-        {
-            get => Items.TryGetCount();
-            set => Items = Items.CreateOrResize(value);
-        }
-
-        [Data] public List<Entry> Items { get; set; }
 
         public static bool IsValid(Stream stream) =>
             stream.Length == new BinaryReader(stream.SetPosition(0)).ReadInt32() * 0x10 + 4;
@@ -107,72 +105,20 @@ namespace OpenKh.Kh2
         /// </summary>
         /// <param name="stream">Readable stream where the IDX has been serialized.</param>
         /// <returns></returns>
-        public static Idx Read(Stream stream)
-        {
-            BinaryMapping.SetMemberLengthMapping<Idx>(nameof(Items), (o, m) => o.Length);
-            return BinaryMapping.ReadObject<Idx>(stream.SetPosition(0));
-        }
+        public static List<Entry> Read(Stream stream) => Enumerable
+            .Range(0, stream.ReadInt32())
+            .Select(_ => BinaryMapping.ReadObject<Entry>(stream))
+            .ToList();
 
         /// <summary>
         /// Serialize an IDX to a stream
         /// </summary>
         /// <param name="stream">Writable stream that will contain the IDX data</param>
-        public void Write(Stream stream) => BinaryMapping.WriteObject(stream.SetPosition(0), this);
-
-        /// <summary>
-        /// Try to get an entry form a file name 
-        /// </summary>
-        /// <param name="name">file name to search</param>
-        /// <param name="entry">Found entry</param>
-        /// <returns>Return true if the entry has been found</returns>
-        public bool TryGetEntry(string name, out Entry entry)
+        public static void Write(Stream stream, List<Entry> entries)
         {
-            var hash32 = GetHash32(name);
-            var hash16 = GetHash16(name);
-
-            var dictionaryEntries = GetDictionaryEntries();
-            if (dictionaryEntries.TryGetValue(hash32, out entry))
-            {
-                if (entry.Hash16 == hash16)
-                    return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Create a copy of the merge between the current IDX and the specified IDX.
-        /// </summary>
-        /// <param name="idx">Idx to merge in</param>
-        /// <returns></returns>
-        public Idx Merge(Idx idx)
-        {
-            var dictionaryEntries = Items
-                .ToDictionary(x => x.Hash32, x => x);
-
-            foreach (var item in idx.Items)
-            {
-                if (!dictionaryEntries.ContainsKey(item.Hash32))
-                {
-                    dictionaryEntries.Add(item.Hash32, item);
-                }
-            }
-
-            return new Idx
-            {
-                Items = dictionaryEntries
-                    .Values
-                    .OrderBy(x => x.Hash32)
-                    .ToList()
-            };
-        }
-
-        private Dictionary<uint, Entry> GetDictionaryEntries()
-        {
-            if (dictionaryEntries == null)
-                dictionaryEntries = Items.ToDictionary(x => x.Hash32, x => x);
-
-            return dictionaryEntries;
+            stream.Write(entries.Count);
+            foreach (var entry in entries)
+                BinaryMapping.WriteObject(stream, entry);
         }
 
         /// <summary>
@@ -210,7 +156,8 @@ namespace OpenKh.Kh2
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static ushort GetHash16(string text) => GetHash16(Encoding.UTF8.GetBytes(text));
+        public static ushort GetHash16(string text) =>
+            GetHash16(Encoding.UTF8.GetBytes(text));
 
         /// <summary>
         /// Calculate an hash16 from data
