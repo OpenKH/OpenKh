@@ -55,19 +55,13 @@ namespace OpenKh.Command.ImgTool
             [Argument(0, Description = "Input imd")]
             public string ImdFile { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "Output png", ShortName = "o", LongName = "output")]
+            [Option(CommandOptionType.SingleValue, Description = "Output png. Default is current dir, and file extension to png.", ShortName = "o", LongName = "output")]
             public string OutputPng { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
                 var inputFile = ImdFile;
-                var outputFile = OutputPng ?? Path.Combine(
-                    Path.GetDirectoryName(inputFile),
-                    "extracted",
-                    Path.GetFileName(
-                        Path.ChangeExtension(inputFile, ".png")
-                    )
-                );
+                var outputFile = OutputPng ?? Path.GetFullPath(Path.GetFileName(Path.ChangeExtension(inputFile, ".png")));
 
                 Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
 
@@ -90,7 +84,7 @@ namespace OpenKh.Command.ImgTool
             [Argument(0, Description = "Input imz")]
             public string ImzFile { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "Output dir", ShortName = "o", LongName = "output")]
+            [Option(CommandOptionType.SingleValue, Description = "Output dir. Default is current dir.", ShortName = "o", LongName = "output")]
             public string OutputDir { get; set; }
 
             [Option(CommandOptionType.NoValue, Description = "Export as imd instead of png", ShortName = "m", LongName = "imd")]
@@ -99,7 +93,7 @@ namespace OpenKh.Command.ImgTool
             protected int OnExecute(CommandLineApplication app)
             {
                 var inputFile = ImzFile;
-                var outputDir = OutputDir ?? Path.Combine(Path.GetDirectoryName(inputFile), "extracted");
+                var outputDir = OutputDir ?? Environment.CurrentDirectory;
 
                 using (var stream = File.OpenRead(inputFile))
                 {
@@ -139,7 +133,7 @@ namespace OpenKh.Command.ImgTool
             [Argument(0, Description = "Input png")]
             public string PngFile { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "Output imd", ShortName = "o", LongName = "output")]
+            [Option(CommandOptionType.SingleValue, Description = "Output imd. Default is current dir, and file extension to imd.", ShortName = "o", LongName = "output")]
             public string OutputImd { get; set; }
 
             [Option(CommandOptionType.SingleValue, Description = "Set bits per pixel: 4, 8, or 32", ShortName = "b", LongName = "bpp")]
@@ -148,13 +142,7 @@ namespace OpenKh.Command.ImgTool
             protected int OnExecute(CommandLineApplication app)
             {
                 var inputFile = PngFile;
-                var outputFile = OutputImd ?? Path.Combine(
-                    Path.GetDirectoryName(inputFile),
-                    "converted",
-                    Path.GetFileName(
-                        Path.ChangeExtension(inputFile, ".imd")
-                    )
-                );
+                var outputFile = OutputImd ?? Path.GetFullPath(Path.GetFileName(Path.ChangeExtension(inputFile, ".imd")));
 
                 Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
 
@@ -179,8 +167,7 @@ namespace OpenKh.Command.ImgTool
             [Option(CommandOptionType.MultipleValue, Description = "Input png/imd/imz file", ShortName = "i", LongName = "input")]
             public string[] InputFile { get; set; }
 
-            [Required]
-            [Option(CommandOptionType.SingleValue, Description = "Output imz file", ShortName = "o", LongName = "output")]
+            [Option(CommandOptionType.SingleValue, Description = "Output imz file. Default is current dir, and first file extension to imz.", ShortName = "o", LongName = "output")]
             public string OutputImz { get; set; }
 
             [Option(CommandOptionType.SingleValue, Description = "Set bits per pixel for every png: 4, 8, or 32", ShortName = "b", LongName = "bpp")]
@@ -191,6 +178,8 @@ namespace OpenKh.Command.ImgTool
 
             protected int OnExecute(CommandLineApplication app)
             {
+                OutputImz = OutputImz ?? Path.GetFullPath(Path.GetFileName(Path.ChangeExtension(InputFile.First(), ".imz")));
+
                 Directory.CreateDirectory(Path.GetDirectoryName(OutputImz));
 
                 var prependImgdList = (Append && File.Exists(OutputImz))
@@ -212,6 +201,5 @@ namespace OpenKh.Command.ImgTool
                 return 0;
             }
         }
-
     }
 }
