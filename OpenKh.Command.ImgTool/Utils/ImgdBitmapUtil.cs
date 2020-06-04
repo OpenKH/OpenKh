@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using nQuant;
 using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
@@ -160,9 +162,13 @@ namespace OpenKh.Command.ImgTool.Utils
                     .Take(maxColors)
                     .ToArray();
 
+                MaxUsedColors = pixels
+                    .Distinct()
+                    .Count();
             }
 
             public uint[] MostUsedPixels { get; }
+            public int MaxUsedColors { get; }
 
             public int FindNearest(uint pixel)
             {
@@ -194,18 +200,32 @@ namespace OpenKh.Command.ImgTool.Utils
             }
         }
 
-        public static Imgd ToImgd(Bitmap bitmap, int bpp)
+        public static Imgd ToImgd(Bitmap bitmap, int bpp, Func<Bitmap, Bitmap> quantizer)
         {
+            if (quantizer != null)
+            {
+                bitmap = quantizer(bitmap);
+            }
+
             switch (bpp)
             {
                 case 4:
                     {
+                        const int maxColors = 16;
+
                         var src = new ReadAs32bppPixels(bitmap);
 
-                        var newPalette = new PaletteGenerator(src.Pixels, 16);
+                        var newPalette = new PaletteGenerator(src.Pixels, maxColors);
+
+                        if (newPalette.MaxUsedColors > newPalette.MostUsedPixels.Length)
+                        {
+                            Console.WriteLine(
+                                $"Trimming color palette entry count from {newPalette.MaxUsedColors} to ${newPalette.MostUsedPixels.Length}"
+                            );
+                        }
 
                         var destBits = new byte[src.Width * src.Height];
-                        var clut = new byte[4 * 16];
+                        var clut = new byte[4 * maxColors];
 
                         for (int index = 0; index < newPalette.MostUsedPixels.Length; index++)
                         {
@@ -242,12 +262,21 @@ namespace OpenKh.Command.ImgTool.Utils
                     }
                 case 8:
                     {
+                        const int maxColors = 256;
+
                         var src = new ReadAs32bppPixels(bitmap);
 
-                        var newPalette = new PaletteGenerator(src.Pixels, 256);
+                        var newPalette = new PaletteGenerator(src.Pixels, maxColors);
+
+                        if (newPalette.MaxUsedColors > newPalette.MostUsedPixels.Length)
+                        {
+                            Console.WriteLine(
+                                $"Trimming color palette entry count from {newPalette.MaxUsedColors} to ${newPalette.MostUsedPixels.Length}"
+                            );
+                        }
 
                         var destBits = new byte[src.Width * src.Height];
-                        var clut = new byte[4 * 256];
+                        var clut = new byte[4 * maxColors];
 
                         for (int index = 0; index < newPalette.MostUsedPixels.Length; index++)
                         {
@@ -302,13 +331,13 @@ namespace OpenKh.Command.ImgTool.Utils
             throw new NotSupportedException($"BitsPerPixel {bpp} not recognized!");
         }
 
-        public static IEnumerable<Imgd> FromFileToImgdList(string anyFile, int bitsPerPixel)
+        public static IEnumerable<Imgd> FromFileToImgdList(string anyFile, int bitsPerPixel, Func<Bitmap, Bitmap> quantizer)
         {
             switch (Path.GetExtension(anyFile).ToLowerInvariant())
             {
                 case ".png":
                     {
-                        yield return new Bitmap(anyFile).Using(bitmap => ToImgd(bitmap));
+                        yield return new Bitmap(anyFile).Using(bitmap => ToImgd(bitmap, bitsPerPixel, quantizer));
                         break;
                     }
                 case ".imd":

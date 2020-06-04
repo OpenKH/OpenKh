@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\OpenKh.nQuant.Core\OpenKh.nQuant.Core.csproj" />
   </ItemGroup>
 
 </Project>

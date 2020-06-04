@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Command.ImgTool.Interfaces;
 using OpenKh.Command.ImgTool.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2;
@@ -126,7 +127,7 @@ namespace OpenKh.Command.ImgTool
 
         [HelpOption]
         [Command(Description = "png file -> imd file")]
-        private class ImdCommand
+        private class ImdCommand : ICommonQuantizerParam
         {
             [Required]
             [FileExists]
@@ -139,6 +140,12 @@ namespace OpenKh.Command.ImgTool
             [Option(CommandOptionType.SingleValue, Description = "Set bits per pixel: 4, 8, or 32", ShortName = "b", LongName = "bpp")]
             public int BitsPerPixel { get; set; } = 8;
 
+            [Option(CommandOptionType.NoValue, Description = "Use `pngquant.exe` -- lossy PNG compressor. Download `pngquant.exe` and place it beside this program, current directory, or PATH.", ShortName = "p", LongName = "pngquant")]
+            public bool PngQuant { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Use embedded nQuant.Core color quantizer. This is default selection.", ShortName = "n", LongName = "nquant")]
+            public bool nQuant { get; set; }
+
             protected int OnExecute(CommandLineApplication app)
             {
                 var inputFile = PngFile;
@@ -149,7 +156,7 @@ namespace OpenKh.Command.ImgTool
                 // Alpha enabled png → always 32 bpp
                 using (var bitmap = new Bitmap(inputFile))
                 {
-                    var imgd = ImgdBitmapUtil.ToImgd(bitmap, BitsPerPixel);
+                    var imgd = ImgdBitmapUtil.ToImgd(bitmap, BitsPerPixel, QuantizerFactory.MakeFrom(this));
 
                     var buffer = new MemoryStream();
                     imgd.Write(buffer);
@@ -161,7 +168,7 @@ namespace OpenKh.Command.ImgTool
 
         [HelpOption]
         [Command(Description = "png, imd or imz files -> imz file")]
-        private class ImzCommand
+        private class ImzCommand : ICommonQuantizerParam
         {
             [Required]
             [Option(CommandOptionType.MultipleValue, Description = "Input png/imd/imz file", ShortName = "i", LongName = "input")]
@@ -172,6 +179,12 @@ namespace OpenKh.Command.ImgTool
 
             [Option(CommandOptionType.SingleValue, Description = "Set bits per pixel for every png: 4, 8, or 32", ShortName = "b", LongName = "bpp")]
             public int BitsPerPixel { get; set; } = 8;
+
+            [Option(CommandOptionType.NoValue, Description = "Use `pngquant.exe` -- lossy PNG compressor. Download `pngquant.exe` and deploy it beside this program, current directory, or PATH.", ShortName = "p", LongName = "pngquant")]
+            public bool PngQuant { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Use embedded nQuant.Core color quantizer. This is default selection.", ShortName = "n", LongName = "nquant")]
+            public bool nQuant { get; set; }
 
             [Option(CommandOptionType.NoValue, Description = "Try to append to imz", ShortName = "a", LongName = "append")]
             public bool Append { get; set; }
@@ -192,7 +205,7 @@ namespace OpenKh.Command.ImgTool
                     prependImgdList
                         .Concat(
                             InputFile
-                                .SelectMany(imdFile => ImgdBitmapUtil.FromFileToImgdList(imdFile, BitsPerPixel))
+                                .SelectMany(imdFile => ImgdBitmapUtil.FromFileToImgdList(imdFile, BitsPerPixel, QuantizerFactory.MakeFrom(this)))
                         )
                         .ToArray()
                 );
