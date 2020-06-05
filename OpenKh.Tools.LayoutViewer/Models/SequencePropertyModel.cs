@@ -1,5 +1,7 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
 using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Common.Rendering;
 using OpenKh.Tools.LayoutViewer.ViewModels;
 using System;
 using System.Linq;
@@ -121,7 +123,7 @@ namespace OpenKh.Tools.LayoutViewer.Models
             set => editorDebugRenderingService.SetSequencePropertyVisible(Index, value);
         }
 
-        public IDrawing Drawing => new DrawingDirect3D();
+        public ISpriteDrawing Drawing => new SpriteDrawingDirect3D();
         public int FrameIndex => 0;
         public Sequence SelectedSequence => Layout.SequenceItems[SequenceIndex];
         public Imgd SelectedImage => Textures.Items[TextureIndex].Texture;

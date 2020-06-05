@@ -1,5 +1,7 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
+using OpenKh.Tools.Common.Rendering;
 using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Service;
 using System.Collections.Generic;
@@ -21,7 +23,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private readonly IElementNames _elementNames;
         private readonly IEditorSettings _editorSettings;
 
-        public IDrawing Drawing { get; }
+        public ISpriteDrawing Drawing { get; }
 
         public EditorDebugRenderingService EditorDebugRenderingService { get; }
 
@@ -110,7 +112,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         {
             _elementNames = elementNames;
             _editorSettings = editorSettings;
-            Drawing = new DrawingDirect3D();
+            Drawing = new SpriteDrawingDirect3D();
             EditorDebugRenderingService = editorDebugRenderingService;
             IsPlaying = true;
 

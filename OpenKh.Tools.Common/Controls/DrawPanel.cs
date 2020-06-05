@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenKh.Engine.Renders;
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace OpenKh.Tools.Common.Controls
 
 
         public static readonly DependencyProperty DrawingProperty =
-            GetDependencyProperty<DrawPanel, IDrawing>(nameof(Drawing),(o, x) => o.SetDrawing(x));
+            GetDependencyProperty<DrawPanel, ISpriteDrawing>(nameof(Drawing),(o, x) => o.SetDrawing(x));
 
         public static readonly DependencyProperty DrawCreateCommandProperty =
             GetDependencyProperty<DrawPanel, ICommand>(nameof(DrawCreate), (o, x) => o.drawCreateCommand = x);
@@ -40,7 +41,7 @@ namespace OpenKh.Tools.Common.Controls
         public static readonly DependencyProperty FramesPerSecondProperty =
             GetDependencyProperty<DrawPanel, double>(nameof(FramesPerSecond), 30.0f, (o, x) => o.SetFramesPerSecond(x), x => x >= 0.0f);
 
-        private IDrawing drawing;
+        private ISpriteDrawing drawing;
         private ICommand drawCreateCommand;
         private ICommand drawDestroyCommand;
         private ICommand drawBeginCommand;
@@ -53,9 +54,9 @@ namespace OpenKh.Tools.Common.Controls
         private System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
         private System.Diagnostics.Stopwatch _stopwatchDeltaTime = new System.Diagnostics.Stopwatch();
 
-        public IDrawing Drawing
+        public ISpriteDrawing Drawing
         {
-            get => (IDrawing)GetValue(DrawingProperty);
+            get => (ISpriteDrawing)GetValue(DrawingProperty);
             set => SetValue(DrawingProperty, value);
         }
 
@@ -193,7 +194,7 @@ namespace OpenKh.Tools.Common.Controls
         protected virtual void OnDrawBegin() => drawBeginCommand.Invoke(drawing);
         protected virtual void OnDrawEnd() => drawEndCommand.Invoke(drawing);
 
-        private void SetDrawing(IDrawing drawing)
+        private void SetDrawing(ISpriteDrawing drawing)
         {
             if (drawing == null) // HACK
                 return;
@@ -230,10 +231,10 @@ namespace OpenKh.Tools.Common.Controls
 
         private void Present()
         {
-            Present(drawing?.Surface);
+            Present(drawing?.DestinationTexture);
         }
 
-        private void Present(ISurface surface)
+        private void Present(ISpriteTexture surface)
         {
             if (surface != null && surface.Width > 0 && surface.Height > 0)
             {
@@ -246,7 +247,7 @@ namespace OpenKh.Tools.Common.Controls
             }
         }
 
-        private void BlitSutface(ISurface surface)
+        private void BlitSutface(ISpriteTexture surface)
         {
             using (var map = surface.Map())
             {
@@ -293,9 +294,9 @@ namespace OpenKh.Tools.Common.Controls
             width = Math.Min(Math.Max(1, width), 65536);
             height = Math.Min(Math.Max(1, height), 65536);
 
-            drawing.Surface?.Dispose();
-            drawing.Surface = drawing.CreateSurface(
-                width, height, Xe.Drawing.PixelFormat.Format32bppArgb, SurfaceType.InputOutput);
+            drawing.DestinationTexture?.Dispose();
+            drawing.DestinationTexture = drawing.CreateSpriteTexture(width, height);
+            //drawing.SetViewport(0, width, 0, height);
         }
     }
 }

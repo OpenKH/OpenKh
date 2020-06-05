@@ -1,13 +1,13 @@
 ﻿using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
+using OpenKh.Tools.Common.Rendering;
 using OpenKh.Tools.Kh2TextEditor.Interfaces;
 using OpenKh.Tools.Kh2TextEditor.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using Xe.Drawing;
 using Xe.Tools;
 
 namespace OpenKh.Tools.Kh2TextEditor.ViewModels
@@ -33,7 +33,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }
         }
 
-        public IDrawing Drawing { get; }
+        public ISpriteDrawing Drawing { get; }
 
         public MessagesModel Messages
         {
@@ -124,7 +124,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
         public TextEditorViewModel()
         {
-            Drawing = new DrawingDirect3D();
+            Drawing = new SpriteDrawingDirect3D();
             CurrentMessageEncoder = Encoders.InternationalSystem;
             _messages = new MessagesModel(this, this, new Msg.Entry[] { });
         }

@@ -80,13 +80,7 @@ namespace OpenKh.Tools.Common.Controls
         protected void DrawBackground()
         {
             var backgroundColor = Background;
-            var color = Color.FromArgb(
-                backgroundColor.A,
-                backgroundColor.R,
-                backgroundColor.G,
-                backgroundColor.B);
-
-            Drawing.Clear(color);
+            Drawing.Clear(ColorF.FromRgba(backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A));
         }
 
         protected void Draw(DrawContext drawContext, IEnumerable<MessageCommandModel> commands)
@@ -97,7 +91,7 @@ namespace OpenKh.Tools.Common.Controls
 
         private void SetContext(RenderingMessageContext context)
         {
-            _messageRenderer = new Kh2MessageRenderer(Drawing, new Engine.Renders.RenderingMessageContext
+            _messageRenderer = new Kh2MessageRenderer(Drawing, new RenderingMessageContext
             {
                 Font = context.Font,
                 Font2 = context.Font2,

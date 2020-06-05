@@ -1,7 +1,8 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
 using System;
 using System.Drawing;
-using Xe.Drawing;
+using System.Net.Sockets;
 
 namespace OpenKh.Engine.Renderers
 {
@@ -9,13 +10,14 @@ namespace OpenKh.Engine.Renderers
     {
         private class Context
         {
+            public int GlobalFrameIndex { get; set; }
             public int FrameIndex { get; set; }
             public float PositionX { get; set; }
             public float PositionY { get; set; }
             public float ScaleX { get; set; }
             public float ScaleY { get; set; }
             public ColorF Color { get; set; }
-            public int ColorBlendType { get; set; }
+            public int ColorBlendMode { get; set; }
             public float Left { get; set; }
             public float Top { get; set; }
             public float Right { get; set; }
@@ -23,13 +25,14 @@ namespace OpenKh.Engine.Renderers
 
             public Context Clone() => new Context
             {
+                GlobalFrameIndex = GlobalFrameIndex,
                 FrameIndex = FrameIndex,
                 PositionX = PositionX,
                 PositionY = PositionY,
                 ScaleX = ScaleX,
                 ScaleY = ScaleY,
                 Color = Color,
-                ColorBlendType = ColorBlendType,
+                ColorBlendMode = ColorBlendMode,
                 Left = Left,
                 Top = Top,
                 Right = Right,
@@ -44,10 +47,10 @@ namespace OpenKh.Engine.Renderers
         private const int TraslateFlag = 0x00004000;
 
         private readonly Sequence sequence;
-        private readonly IDrawing drawing;
-        private readonly ISurface surface;
+        private readonly ISpriteDrawing drawing;
+        private readonly ISpriteTexture surface;
 
-        public SequenceRenderer(Sequence sequence, IDrawing drawing, ISurface surface)
+        public SequenceRenderer(Sequence sequence, ISpriteDrawing drawing, ISpriteTexture surface)
         {
             this.sequence = sequence;
             this.drawing = drawing;
@@ -57,6 +60,7 @@ namespace OpenKh.Engine.Renderers
         public void Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
             DrawAnimationGroup(new Context
             {
+                GlobalFrameIndex = frameIndex,
                 FrameIndex = frameIndex,
                 PositionX = positionX,
                 PositionY = positionY
@@ -68,17 +72,19 @@ namespace OpenKh.Engine.Renderers
             var count = animationGroup.Count;
             var context = contextParent.Clone();
 
-            //if (animationGroup.Tick1 == 0)
-            //    context.CurrentFrameIndex = 0;
-            //else if (animationGroup.Tick2 == 0)
-            //    context.CurrentFrameIndex = Math.Min(context.CurrentFrameIndex, animationGroup.Tick1);
-            //else
-            //    context.CurrentFrameIndex = (context.CurrentFrameIndex < animationGroup.Tick1) ? context.CurrentFrameIndex :
-            //        (animationGroup.Tick1 + ((context.CurrentFrameIndex - animationGroup.Tick1) % (animationGroup.Tick2 - animationGroup.Tick1)));
+            if (animationGroup.DoNotLoop == 0)
+            {
+                var frameEnd = animationGroup.LoopEnd;
+                if (frameEnd == 0)
+                {
+                    for (var i = 0; i < count; i++)
+                    {
+                        frameEnd = Math.Max(frameEnd, sequence.Animations[index + i].FrameEnd);
+                    }
+                }
 
-            if (animationGroup.Tick2 != 0)
-                context.FrameIndex = (context.FrameIndex < animationGroup.Tick1) ? context.FrameIndex :
-                (animationGroup.Tick1 + ((context.FrameIndex - animationGroup.Tick1) % (animationGroup.Tick2 - animationGroup.Tick1)));
+                context.FrameIndex = Loop(animationGroup.LoopStart, frameEnd, context.FrameIndex);
+            }
 
             for (var i = 0; i < count; i++)
             {
@@ -113,7 +119,7 @@ namespace OpenKh.Engine.Renderers
 
             context.PositionX += Lerp(t, animation.Xa0, animation.Xa1);
             context.PositionY += Lerp(t, animation.Ya0, animation.Ya1);
-            context.ColorBlendType = animation.ColorBlend;
+            context.ColorBlendMode = animation.ColorBlend;
 
             if ((animation.Flags & ScalingFlag) == 0)
             {
@@ -178,22 +184,33 @@ namespace OpenKh.Engine.Renderers
 
         private void DrawFrame(Context context, Sequence.Frame frame)
         {
-            drawing.DrawSurface(surface,
-                Rectangle.FromLTRB(frame.Left, frame.Top, frame.Right, frame.Bottom),
-                RectangleF.FromLTRB(context.PositionX + context.Left, context.PositionY + context.Top,
-                    context.PositionX + context.Right, context.PositionY + context.Bottom),
-                Multiply(ConvertColor(frame.ColorLeft), context.Color),
-                Multiply(ConvertColor(frame.ColorTop), context.Color),
-                Multiply(ConvertColor(frame.ColorRight), context.Color),
-                Multiply(ConvertColor(frame.ColorBottom), context.Color));
-        }
+            var drawContext = new SpriteDrawingContext()
+                .SpriteTexture(surface)
+                .SourceLTRB(frame.Left, frame.Top, frame.Right, frame.Bottom)
+                .Position(context.PositionX + context.Left, context.PositionY + context.Top)
+                .DestinationSize(context.Right - context.Left, context.Bottom - context.Top);
 
-        public static ColorF Multiply(ColorF a, ColorF b) =>
-            new ColorF(
-                a.R * b.R,
-                a.G * b.G,
-                a.B * b.B,
-                a.A * b.A);
+            drawContext.Color0 = ConvertColor(frame.ColorLeft);
+            drawContext.Color1 = ConvertColor(frame.ColorTop);
+            drawContext.Color2 = ConvertColor(frame.ColorRight);
+            drawContext.Color3 = ConvertColor(frame.ColorBottom);
+            drawContext.ColorMultiply(context.Color);
+            drawContext.BlendMode = (BlendMode)context.ColorBlendMode;
+
+            if (frame.UTranslation != 0) // HACK to increase performance
+            {
+                drawContext.TextureWrapHorizontal(TextureWrapMode.Repeat, Math.Min(frame.Left, frame.Right), Math.Max(frame.Left, frame.Right));
+                drawContext.TextureHorizontalShift = frame.UTranslation * context.GlobalFrameIndex;
+            }
+
+            if (frame.VTranslation != 0) // HACK to increase performance
+            {
+                drawContext.TextureWrapVertical(TextureWrapMode.Repeat, Math.Min(frame.Top, frame.Bottom), Math.Max(frame.Top, frame.Bottom));
+                drawContext.TextureVerticalShift = frame.VTranslation * context.GlobalFrameIndex;
+            }
+
+            drawing.AppendSprite(drawContext);
+        }
 
         private static ColorF ConvertColor(uint color) => new ColorF(
             ((color >> 0) & 0xFF) / 128.0f,
@@ -208,5 +225,18 @@ namespace OpenKh.Engine.Renderers
             (float)Lerp(m, x1.G, x2.G),
             (float)Lerp(m, x1.B, x2.B),
             (float)Lerp(m, x1.A, x2.A));
+
+        private static int Loop(int min, int max, int val)
+        {
+            if (val < max)
+                return val;
+            if (max <= min)
+                return min;
+
+            var mod = (val - min) % (max - min);
+            if (mod < 0)
+                mod += max - min;
+            return min + mod;
+        }
     }
 }

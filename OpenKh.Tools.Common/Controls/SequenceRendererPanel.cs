@@ -1,12 +1,10 @@
-﻿using OpenKh.Tools.Common.Controls;
-using OpenKh.Engine;
-using OpenKh.Engine.Renderers;
+﻿using OpenKh.Engine.Renderers;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using System.Drawing;
 using System.Windows;
-using Xe.Drawing;
 using static OpenKh.Tools.Common.DependencyPropertyUtils;
+using OpenKh.Engine.Renders;
 
 namespace OpenKh.Tools.Common.Controls
 {
@@ -67,7 +65,7 @@ namespace OpenKh.Tools.Common.Controls
             set => SetValue(AdjustPositionProperty, value);
         }
 
-        private ISurface surface;
+        private ISpriteTexture surface;
         private SequenceRenderer sequenceRenderer;
 
         protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
@@ -94,7 +92,7 @@ namespace OpenKh.Tools.Common.Controls
 
         protected override void OnDrawBegin()
         {
-            Drawing.Clear(Color.Magenta);
+            Drawing.Clear(new ColorF(1.0f, 0.0f, 1.0f, 1.0f));
 
             int posX = AdjustPosition ? -_sequenceVisibilyRectangle.X : 0;
             int posY = AdjustPosition ? -_sequenceVisibilyRectangle.Y : 0;
@@ -129,7 +127,7 @@ namespace OpenKh.Tools.Common.Controls
         private void LoadImage(Imgd image)
         {
             surface?.Dispose();
-            surface = Drawing?.CreateSurface(image);
+            surface = Drawing?.CreateSpriteTexture(image);
 
             TrySetSequence();
         }

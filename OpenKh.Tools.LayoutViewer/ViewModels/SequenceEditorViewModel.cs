@@ -1,4 +1,6 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
+using OpenKh.Tools.Common.Rendering;
 using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Service;
 using System.Collections.Generic;
@@ -47,7 +49,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         private AnimationGroupListModel animationGroupList;
         private int selectedAnimationGroupIndex;
 
-        public IDrawing Drawing { get; }
+        public ISpriteDrawing Drawing { get; }
         public EditorDebugRenderingService EditorDebugRenderingService { get; }
 
         public object AnimationGroupList
@@ -83,7 +85,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         public SequenceEditorViewModel(EditorDebugRenderingService editorDebugRenderingService)
         {
-            Drawing = new DrawingDirect3D();
+            Drawing = new SpriteDrawingDirect3D();
             EditorDebugRenderingService = editorDebugRenderingService;
         }
     }

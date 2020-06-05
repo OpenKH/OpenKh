@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Parsers;
+using OpenKh.Engine.Renders;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
@@ -13,6 +14,19 @@ namespace OpenKh.Game.States
 {
     public class MapState : IState
     {
+        private readonly static BlendState DefaultBlendState = new BlendState()
+        {
+            ColorSourceBlend = Blend.SourceAlpha,
+            AlphaSourceBlend = Blend.SourceAlpha,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
+            AlphaDestinationBlend = Blend.InverseSourceAlpha,
+            ColorBlendFunction = BlendFunction.Add,
+            AlphaBlendFunction = BlendFunction.Add,
+            BlendFactor = Color.White,
+            MultiSampleMask = int.MaxValue,
+            IndependentBlendEnable = false
+        };
+
         private Kernel _kernel;
         private ArchiveManager _archiveManager;
         private GraphicsDeviceManager _graphics;
@@ -38,8 +52,6 @@ namespace OpenKh.Game.States
                 CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
-
-            _graphics.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
 
             BasicallyForceToReloadEverything();
         }
@@ -77,6 +89,7 @@ namespace OpenKh.Game.States
                 CullMode = CullMode.CullClockwiseFace
             };
             _graphics.GraphicsDevice.DepthStencilState = new DepthStencilState();
+            _graphics.GraphicsDevice.BlendState = DefaultBlendState;
 
             _shader.Pass(pass =>
             {
@@ -217,8 +230,9 @@ namespace OpenKh.Game.States
                 fileName = $"map/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
 
             _archiveManager.LoadArchive(fileName);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP", "MAP"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK0", "SK0"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK1", "SK1"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP", "MAP"));
         }
 
         private static Mesh FromMdlx(

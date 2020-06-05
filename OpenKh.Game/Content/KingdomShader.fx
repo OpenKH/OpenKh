@@ -41,7 +41,10 @@ float RegionClamp(float value, float valueMin, float valueMax)
 
 float RegionRepeat(float value, float min, float max)
 {
-	return (value % (max - min)) + min;
+	float mod = (value - min) % (max - min);
+	if (mod < 0)
+		mod += max - min;
+	return min + mod;
 }
 
 float ApplyTextureWrap(float value, int mode, float min, float max) {
@@ -52,7 +55,7 @@ float ApplyTextureWrap(float value, int mode, float min, float max) {
 		return RegionRepeat(value, min, max);
 	}
 
-	return 0.0f;
+	return value;
 }
 
 VertexShaderOutput MainVS(in VertexShaderInput input)

@@ -1,7 +1,8 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Infrastructure;
+using OpenKh.Game.Shaders;
 using OpenKh.Game.States;
 using OpenKh.Kh2.Messages;
 using System;
@@ -17,10 +18,11 @@ namespace OpenKh.Game.Debugging
         private Kernel _kernel;
         private InputManager _inputManager;
         private GraphicsDeviceManager _graphics;
+        private KingdomShader _shader;
         private readonly IStateChange _stateChange;
         private bool _overrideExternalDebugFeatures = false;
 
-        private MonoDrawing _drawing;
+        private ISpriteDrawing _drawing;
         private IMessageEncoder _encoder;
         private IMessageRenderer _messageRenderer;
         private DrawContext _messageDrawContext;
@@ -43,8 +45,10 @@ namespace OpenKh.Game.Debugging
             _inputManager = initDesc.InputManager;
             _graphics = initDesc.GraphicsDevice;
 
-            _drawing = new MonoDrawing(_graphics.GraphicsDevice, initDesc.ContentManager);
+            _shader = new KingdomShader(initDesc.ContentManager);
+
             var viewport = initDesc.GraphicsDevice.GraphicsDevice.Viewport;
+            _drawing = new MonoSpriteDrawing(_graphics.GraphicsDevice, _shader);
             _drawing.SetProjection(
                 viewport.Width,
                 viewport.Height,
@@ -59,6 +63,7 @@ namespace OpenKh.Game.Debugging
 
         public void Destroy()
         {
+            _shader.Dispose();
             _drawing.Dispose();
             // TODO destroy textures created by Kh2MessageRenderer
         }
@@ -91,7 +96,7 @@ namespace OpenKh.Game.Debugging
 
                 Scale = 1,
                 WidthMultiplier = 1,
-                Color = new Xe.Drawing.ColorF(1.0f, 1.0f, 1.0f, 1.0f)
+                Color = new ColorF(1.0f, 1.0f, 1.0f, 1.0f)
             };
 
             DebugDraw(this);
