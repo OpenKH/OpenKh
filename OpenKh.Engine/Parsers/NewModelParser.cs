@@ -84,7 +84,7 @@ namespace OpenKh.Engine.Parsers
                             (Math.Min(byte.MaxValue, colorA * 2) << 24);
 
                         Vertices.Add(new CustomVertex.PositionColoredTextured(
-                            position, color, vertexIndex.U / 4096.0f, vertexIndex.V / 4096.0f));
+                            position, color, (short)(ushort)vertexIndex.U / 4096.0f, (short)(ushort)vertexIndex.V / 4096.0f));
 
                         indexBuffer[(recenti++) & 3] = baseVertexIndex + i;
                         switch (vertexIndex.Function)
