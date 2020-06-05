@@ -13,6 +13,11 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
         private readonly IMessageProvider _messageProvider;
         private readonly int _index;
 
+        static PlaceViewModel()
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        }
+
         public PlaceViewModel(IMessageProvider messageProvider,
             string world, int index, Place place)
         {
