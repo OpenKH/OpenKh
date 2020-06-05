@@ -135,8 +135,10 @@ No public updates exists
 
 ## Trial version
 
-* [CUSA16864](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA16864_00/1/f_13997c8a061d492b611b1a6fc7d5c4778bcebf76cc02a8ee9bdc28837abd8807/f/EP0082-CUSA16864_00-KINGDOMHEARTS3TR.json)
-* [CUSA10243](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA10243_00/1/f_b2db9742f5054b570b5ac943c59cadcbeaf7c73181477cfed4481bf3446a536e/f/JP0082-CUSA10243_00-TRIALVERSION0000.json)
+* [CUSA16824 JP](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA16824_00/1/f_cd3c70c52151a0abf8562f290067a6dffe070d5a06f632c56d0c1ac33d89bbc3/f/JP0082-CUSA16824_00-KINGDOMHEARTS3TR.json)
+* [CUSA16864 EU](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA16864_00/1/f_13997c8a061d492b611b1a6fc7d5c4778bcebf76cc02a8ee9bdc28837abd8807/f/EP0082-CUSA16864_00-KINGDOMHEARTS3TR.json)
+* [CUSA16884 US](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA16884_00/1/f_8fa17be8ee8dc0aba7bfedc74ef6573ef2658251a6ec39c2580f7ae86f457cc4/f/UP0082-CUSA16884_00-KINGDOMHEARTS3TR.json)
+* [CUSA16838 HK](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA16838_00/1/f_d4b350c5df6cefc5efcdb1e42671ed3aee157b0320503c5f36d70dcb87e31771/f/HP0082-CUSA16838_00-KINGDOMHEARTS3TR.json)
 
 ## Re:Mind DLC english voices
 
