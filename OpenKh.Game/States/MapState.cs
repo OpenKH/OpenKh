@@ -99,6 +99,7 @@ namespace OpenKh.Game.States
             {
                 _shader.ProjectionView = _camera.Projection;
                 _shader.WorldView = _camera.World;
+                _shader.ModelView = Matrix.Identity;
                 pass.Apply();
 
                 foreach (var mesh in _models)
