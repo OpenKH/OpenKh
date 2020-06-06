@@ -139,11 +139,11 @@ namespace OpenKh.Game
                 var imgStream = File.OpenRead(imgFileName);
                 var idxDataContent = File.OpenRead(idxFileName)
                     .Using(stream => new IdxDataContent(stream, imgStream));
-                return new SafeDataContent(new MultipleDataContent(
+                return new MultipleDataContent(
                     new StandardDataContent(basePath),
                     idxDataContent,
                     new IdxMultipleDataContent(idxDataContent, imgStream)
-                ));
+                );
             }
             else
                 return new StandardDataContent(basePath);
