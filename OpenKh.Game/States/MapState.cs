@@ -326,7 +326,7 @@ namespace OpenKh.Game.States
             {
                 Segments = segments,
                 Parts = parts,
-                MeshDescriptors = mdlxParsed.MeshDescriptors
+                MeshDescriptors = mdlxParsed.MeshDescriptors?
                     .Select(x => new MeshDesc
                     {
                         Vertices = x.Vertices
