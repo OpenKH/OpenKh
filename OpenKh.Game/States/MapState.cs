@@ -28,6 +28,7 @@ namespace OpenKh.Game.States
         };
 
         private Kernel _kernel;
+        private IDataContent _dataContent;
         private ArchiveManager _archiveManager;
         private GraphicsDeviceManager _graphics;
         private InputManager _input;
@@ -43,6 +44,7 @@ namespace OpenKh.Game.States
         public void Initialize(StateInitDesc initDesc)
         {
             _kernel = initDesc.Kernel;
+            _dataContent = initDesc.DataContent;
             _archiveManager = initDesc.ArchiveManager;
             _graphics = initDesc.GraphicsDevice;
             _input = initDesc.InputManager;
@@ -183,33 +185,14 @@ namespace OpenKh.Game.States
             if (model == null)
                 return;
 
-            var internalName = "p_ex";
-            switch (model.ObjectType)
-            {
-                case Objentry.Type.ZAKO:
-                    internalName = "m_ex";
-                    break;
-                case Objentry.Type.PLAYER:
-                    internalName = "p_ex";
-                    break;
-                case Objentry.Type.NPC:
-                    internalName = "h_ex";
-                    internalName = "n_ex";
-                    break;
-                case Objentry.Type.WEAPON:
-                    internalName = "w_ex";
-                    break;
-                case Objentry.Type.F_OBJ:
-                    internalName = "f_ex";
-                    break;
-                case Objentry.Type.BOSS:
-                    internalName = "b_ex";
-                    break;
-            }
-
             var fileName = $"obj/{model.ModelName}.mdlx";
-            _archiveManager.LoadArchive(fileName);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, internalName, "tim_"));
+
+            using var stream = _dataContent.FileOpen(fileName);
+            var entries = Bar.Read(stream);
+            var modelEntryName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Model)?.Name;
+
+            _archiveManager.LoadArchive(entries);
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, modelEntryName, "tim_"));
         }
 
         private void LoadObjEntry(int id)
@@ -420,7 +403,7 @@ namespace OpenKh.Game.States
 
             if (_input.IsCross)
             {
-                _objEntryId = _debugObjentryCursor;
+                _objEntryId = _kernel.ObjEntries.Skip(_debugObjentryCursor).FirstOrDefault()?.ObjectId ?? 0;
 
                 BasicallyForceToReloadEverything();
                 DisableDebugMode();

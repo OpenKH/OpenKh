@@ -35,8 +35,11 @@ namespace OpenKh.Game.Infrastructure
         public void LoadArchive(string fileName)
         {
             using var stream = dataContent.FileOpen(fileName);
-            var entries = Bar.Read(stream);
+            LoadArchive(Bar.Read(stream));
+        }
 
+        public void LoadArchive(List<Bar.Entry> entries)
+        {
             foreach (var entry in entries)
                 archives[(entry.Name, entry.Type)] = new Entry
                 {

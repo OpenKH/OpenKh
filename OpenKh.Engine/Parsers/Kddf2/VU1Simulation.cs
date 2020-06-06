@@ -134,20 +134,36 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 int cntVerticesMix3ToOne = br.ReadInt32();
                 int cntVerticesMix4ToOne = br.ReadInt32();
                 int cntVerticesMix5ToOne = 0;
+                int cntVerticesMix6ToOne = 0;
+                int cntVerticesMix7ToOne = 0;
+                int cntVerticesMix8ToOne = 0;
+
                 if (cntVertexMixer >= 5)
                 {
                     cntVerticesMix5ToOne = br.ReadInt32();
-                    br.ReadInt32();
-                    br.ReadInt32();
-                    br.ReadInt32();
+                    cntVerticesMix6ToOne = br.ReadInt32();
+                    cntVerticesMix7ToOne = br.ReadInt32();
+                    cntVerticesMix8ToOne = br.ReadInt32(); // unused in asset models.
                 }
 
-                VertexAssignment[][] newVertexAssignList = new VertexAssignment[vpu.VertexCount][];
+                var vertexAssignmentCount = cntSkip
+                    + cntVerticesMix2ToOne
+                    + cntVerticesMix3ToOne
+                    + cntVerticesMix4ToOne
+                    + cntVerticesMix5ToOne
+                    + cntVerticesMix6ToOne
+                    + cntVerticesMix7ToOne
+                    + cntVerticesMix8ToOne
+                    ;
+
+                VertexAssignment[][] newVertexAssignList = new VertexAssignment[vertexAssignmentCount][];
                 int inputVertexIndex = 0;
                 for (; inputVertexIndex < cntSkip; inputVertexIndex++)
                 {
                     int index = br.ReadInt32();
-                    newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[index] });
+                    newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] {
+                        vertexAssignmentList[index]
+                    });
                 }
                 if (cntVertexMixer >= 2)
                 {
@@ -159,7 +175,10 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     {
                         int vertex1 = br.ReadInt32();
                         int vertex2 = br.ReadInt32();
-                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[vertex1], vertexAssignmentList[vertex2] });
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] {
+                            vertexAssignmentList[vertex1],
+                            vertexAssignmentList[vertex2]
+                        });
                     }
                 }
                 if (cntVertexMixer >= 3)
@@ -173,7 +192,11 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         int vertex1 = br.ReadInt32();
                         int vertex2 = br.ReadInt32();
                         int vertex3 = br.ReadInt32();
-                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[vertex1], vertexAssignmentList[vertex2], vertexAssignmentList[vertex3] });
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] {
+                            vertexAssignmentList[vertex1],
+                            vertexAssignmentList[vertex2],
+                            vertexAssignmentList[vertex3]
+                        });
                     }
                 }
                 if (cntVertexMixer >= 4)
@@ -188,7 +211,12 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         int vertex2 = br.ReadInt32();
                         int vertex3 = br.ReadInt32();
                         int vertex4 = br.ReadInt32();
-                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[vertex1], vertexAssignmentList[vertex2], vertexAssignmentList[vertex3], vertexAssignmentList[vertex4] });
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] {
+                            vertexAssignmentList[vertex1],
+                            vertexAssignmentList[vertex2],
+                            vertexAssignmentList[vertex3],
+                            vertexAssignmentList[vertex4]
+                        });
                     }
                 }
                 if (cntVertexMixer >= 5)
@@ -202,14 +230,87 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         int vertex3 = br.ReadInt32();
                         int vertex4 = br.ReadInt32();
                         int vertex5 = br.ReadInt32();
-                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] { vertexAssignmentList[vertex1], vertexAssignmentList[vertex2], vertexAssignmentList[vertex3], vertexAssignmentList[vertex4], vertexAssignmentList[vertex5] });
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] {
+                            vertexAssignmentList[vertex1],
+                            vertexAssignmentList[vertex2],
+                            vertexAssignmentList[vertex3],
+                            vertexAssignmentList[vertex4],
+                            vertexAssignmentList[vertex5]
+                        });
                     }
                 }
                 if (cntVertexMixer >= 6)
                 {
-                    throw new NotSupportedException("cntVertexMixer is too high: " + cntVertexMixer);
-                }
+                    si.Position = (si.Position + 15) & (~15);  // 16 bytes alignment
 
+                    for (int x = 0; x < cntVerticesMix6ToOne; x++, inputVertexIndex++)
+                    {
+                        int vertex1 = br.ReadInt32();
+                        int vertex2 = br.ReadInt32();
+                        int vertex3 = br.ReadInt32();
+                        int vertex4 = br.ReadInt32();
+                        int vertex5 = br.ReadInt32();
+                        int vertex6 = br.ReadInt32();
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] {
+                            vertexAssignmentList[vertex1],
+                            vertexAssignmentList[vertex2],
+                            vertexAssignmentList[vertex3],
+                            vertexAssignmentList[vertex4],
+                            vertexAssignmentList[vertex5],
+                            vertexAssignmentList[vertex6]
+                        });
+                    }
+                }
+                if (cntVertexMixer >= 7)
+                {
+                    si.Position = (si.Position + 15) & (~15);  // 16 bytes alignment
+
+                    for (int x = 0; x < cntVerticesMix7ToOne; x++, inputVertexIndex++)
+                    {
+                        int vertex1 = br.ReadInt32();
+                        int vertex2 = br.ReadInt32();
+                        int vertex3 = br.ReadInt32();
+                        int vertex4 = br.ReadInt32();
+                        int vertex5 = br.ReadInt32();
+                        int vertex6 = br.ReadInt32();
+                        int vertex7 = br.ReadInt32();
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] {
+                            vertexAssignmentList[vertex1],
+                            vertexAssignmentList[vertex2],
+                            vertexAssignmentList[vertex3],
+                            vertexAssignmentList[vertex4],
+                            vertexAssignmentList[vertex5],
+                            vertexAssignmentList[vertex6],
+                            vertexAssignmentList[vertex7]
+                        });
+                    }
+                }
+                if (cntVertexMixer >= 8)
+                {
+                    si.Position = (si.Position + 15) & (~15);  // 16 bytes alignment
+
+                    for (int x = 0; x < cntVerticesMix8ToOne; x++, inputVertexIndex++)
+                    {
+                        int vertex1 = br.ReadInt32();
+                        int vertex2 = br.ReadInt32();
+                        int vertex3 = br.ReadInt32();
+                        int vertex4 = br.ReadInt32();
+                        int vertex5 = br.ReadInt32();
+                        int vertex6 = br.ReadInt32();
+                        int vertex7 = br.ReadInt32();
+                        int vertex8 = br.ReadInt32();
+                        newVertexAssignList[inputVertexIndex] = (new VertexAssignment[] {
+                            vertexAssignmentList[vertex1],
+                            vertexAssignmentList[vertex2],
+                            vertexAssignmentList[vertex3],
+                            vertexAssignmentList[vertex4],
+                            vertexAssignmentList[vertex5],
+                            vertexAssignmentList[vertex6],
+                            vertexAssignmentList[vertex7],
+                            vertexAssignmentList[vertex8]
+                        });
+                    }
+                }
                 // if cntVertexMixer >= 1, replace current vertexAssignmentList with regrouped list.
                 mesh.vertexAssignmentsList = newVertexAssignList;
             }
