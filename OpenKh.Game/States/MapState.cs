@@ -11,6 +11,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using OpenKh.Kh2.Models;
 
 namespace OpenKh.Game.States
 {
@@ -35,6 +36,7 @@ namespace OpenKh.Game.States
         private GraphicsDeviceManager _graphics;
         private InputManager _input;
         private List<MeshGroup> _models = new List<MeshGroup>();
+        private List<MeshGroup> _bobModels = new List<MeshGroup>();
         private KingdomShader _shader;
         private Camera _camera;
 
@@ -42,6 +44,7 @@ namespace OpenKh.Game.States
         private int _placeId = 4;
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
+        private List<BobDescriptor> _bobDescs = new List<BobDescriptor>();
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -113,6 +116,22 @@ namespace OpenKh.Game.States
                     {
                         RenderMesh(pass, mesh);
                     }
+                }
+
+                foreach (var bobDesc in _bobDescs)
+                {
+                    var modelView = Matrix.CreateRotationX(bobDesc.RotationX) *
+                        Matrix.CreateRotationY(bobDesc.RotationY) *
+                        Matrix.CreateRotationZ(bobDesc.RotationZ) *
+                        Matrix.CreateScale(bobDesc.ScalingX, bobDesc.ScalingY, bobDesc.ScalingZ) *
+                        Matrix.CreateTranslation(bobDesc.PositionX, bobDesc.PositionY, bobDesc.PositionZ);
+
+                    _shader.ProjectionView = _camera.Projection;
+                    _shader.WorldView = _camera.World;
+                    _shader.ModelView = modelView;
+                    pass.Apply();
+
+                    RenderMesh(pass, _bobModels[bobDesc.BobIndex]);
                 }
             });
         }
@@ -245,6 +264,8 @@ namespace OpenKh.Game.States
         private void BasicallyForceToReloadEverything()
         {
             _models.Clear();
+            _bobModels.Clear();
+
             LoadMap(_worldId, _placeId);
             LoadObjEntry(_objEntryId);
         }
@@ -288,6 +309,17 @@ namespace OpenKh.Game.States
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
+
+            _bobDescs = entries.ForEntry("out", Bar.EntryType.BobDescriptor, BobDescriptor.Read) ?? new List<BobDescriptor>();
+            var bobModels = entries.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
+            var bobTextures = entries.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
+
+            for (var i = 0; i < bobModels.Count; i++)
+            {
+                var bobMesh = FromMdlx(_graphics.GraphicsDevice, bobModels[i], bobTextures[i]);
+                if (bobMesh != null)
+                    _bobModels.Add(bobMesh);
+            }
         }
 
         private static MeshGroup FromMdlx(
