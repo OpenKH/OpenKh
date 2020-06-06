@@ -32,7 +32,7 @@ namespace OpenKh.Tools.BarEditor.Services
 			}
 
 			var toolModule = Plugins
-				.GetModules<IToolModule<ToolInvokeDesc>>(null, x => x.Contains(name) && Path.GetExtension(x) == ".exe")
+				.GetModules<IToolModule<ToolInvokeDesc>>(null, x => x.Contains(name) && Path.GetExtension(x) == ".dll")
 				.FirstOrDefault();
 
             if (toolModule.Item1 == null || toolModule.Item2 == null)
