@@ -9,7 +9,7 @@ namespace OpenKh.Kh2.Jiminy
         [Data] public byte Padding { get; set; }
         [Data] public ushort TextTitle { get; set; }
         [Data] public ushort TextSubmenu { get; set; }
-        [Data] public ushort Unk08 { get; set; }
+        [Data] public ushort StoryFlag { get; set; } //this same flag is used in multiple subfiles, probably to determine a world name switch??
         [Data] public ushort TextTitle2 { get; set; } //these 3 fields are only used by hollow bastion, to switch to radiant garden later
         [Data] public ushort TextSubmenu2 { get; set; }
         [Data] public ushort Unk0E { get; set; }
