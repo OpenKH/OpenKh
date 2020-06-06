@@ -14,6 +14,7 @@ namespace OpenKh.Engine.Parsers
         {
             public int[] Indices;
             public int TextureIndex, SegmentIndex;
+            public bool IsOpaque;
         }
 
         public NewModelParser(Mdlx mdlx)
@@ -110,7 +111,8 @@ namespace OpenKh.Engine.Parsers
                     {
                         Indices = indices.ToArray(),
                         TextureIndex = textureIndex + vifPacketDescriptor.TextureId,
-                        SegmentIndex = pdIndex
+                        SegmentIndex = pdIndex,
+                        IsOpaque = vifPacketDescriptor.Unk0a == 0
                     });
 
                 } while (state == VifUnpacker.State.Microprogram);

@@ -60,7 +60,8 @@ namespace OpenKh.Engine.Parsers
                     {
                         Indices = x.Indices,
                         SegmentIndex = x.SegmentIndex,
-                        TextureIndex = x.TextureIndex
+                        TextureIndex = x.TextureIndex,
+                        IsOpaque = x.IsOpaque,
                     }).ToArray()
                 };
             }

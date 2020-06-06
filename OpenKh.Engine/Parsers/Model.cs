@@ -22,6 +22,7 @@ namespace OpenKh.Engine.Parsers
             public int[] Indices { get; set; }
             public int TextureIndex { get; set; }
             public int SegmentIndex { get; set; }
+            public bool IsOpaque { get; set; }
         }
 
         public Segment[] Segments { get; set; }

@@ -101,75 +101,110 @@ namespace OpenKh.Game.States
 
                 foreach (var mesh in _models)
                 {
-                    var index = 0;
-                    foreach (var part in mesh.Parts)
-                    {
-                        if (part.Indices.Length == 0)
-                            continue;
-
-                        var textureIndex = part.TextureId & 0xffff;
-                        if (textureIndex < mesh.Textures.Length)
-                        {
-                            var texture = mesh.Textures[textureIndex];
-                            if (_shader.Texture0 != texture.Texture2D)
-                            {
-                                _shader.Texture0 = texture.Texture2D;
-                                switch (texture.ModelTexture.TextureAddressMode.AddressU)
-                                {
-                                    case ModelTexture.TextureWrapMode.Clamp:
-                                        _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
-                                        _shader.TextureWrapModeU = TextureWrapMode.Clamp;
-                                        break;
-                                    case ModelTexture.TextureWrapMode.Repeat:
-                                        _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
-                                        _shader.TextureWrapModeU = TextureWrapMode.Repeat;
-                                        break;
-                                    case ModelTexture.TextureWrapMode.RegionClamp:
-                                        _shader.TextureRegionU = texture.RegionU;
-                                        _shader.TextureWrapModeU = TextureWrapMode.Clamp;
-                                        break;
-                                    case ModelTexture.TextureWrapMode.RegionRepeat:
-                                        _shader.TextureRegionU = texture.RegionU;
-                                        _shader.TextureWrapModeU = TextureWrapMode.Repeat;
-                                        break;
-                                }
-                                switch (texture.ModelTexture.TextureAddressMode.AddressV)
-                                {
-                                    case ModelTexture.TextureWrapMode.Clamp:
-                                        _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
-                                        _shader.TextureWrapModeV = TextureWrapMode.Clamp;
-                                        break;
-                                    case ModelTexture.TextureWrapMode.Repeat:
-                                        _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
-                                        _shader.TextureWrapModeV = TextureWrapMode.Repeat;
-                                        break;
-                                    case ModelTexture.TextureWrapMode.RegionClamp:
-                                        _shader.TextureRegionV = texture.RegionV;
-                                        _shader.TextureWrapModeV = TextureWrapMode.Clamp;
-                                        break;
-                                    case ModelTexture.TextureWrapMode.RegionRepeat:
-                                        _shader.TextureRegionV = texture.RegionV;
-                                        _shader.TextureWrapModeV = TextureWrapMode.Repeat;
-                                        break;
-                                }
-
-                                pass.Apply();
-                            }
-                        }
-
-                        _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
-                            PrimitiveType.TriangleList,
-                            mesh.Segments[index].Vertices,
-                            0,
-                            mesh.Segments[index].Vertices.Length,
-                            part.Indices,
-                            0,
-                            part.Indices.Length / 3);
-
-                        index = (index + 1) % mesh.Segments.Length;
-                    }
+                    RenderMesh(pass, mesh);
                 }
             });
+        }
+
+        private void RenderMesh(EffectPass pass, Mesh mesh)
+        {
+            var index = 0;
+            foreach (var part in mesh.Parts)
+            {
+                if (part.Indices.Length == 0)
+                    continue;
+
+                if (part.IsOpaque)
+                {
+                    var textureIndex = part.TextureId & 0xffff;
+                    if (textureIndex < mesh.Textures.Length)
+                        SetRenderTexture(pass, mesh.Textures[textureIndex]);
+
+                    _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
+                        PrimitiveType.TriangleList,
+                        mesh.Segments[index].Vertices,
+                        0,
+                        mesh.Segments[index].Vertices.Length,
+                        part.Indices,
+                        0,
+                        part.Indices.Length / 3);
+                }
+
+                index = (index + 1) % mesh.Segments.Length;
+            }
+
+            index = 0;
+            foreach (var part in mesh.Parts)
+            {
+                if (part.Indices.Length == 0)
+                    continue;
+
+                if (!part.IsOpaque)
+                {
+                    var textureIndex = part.TextureId & 0xffff;
+                    if (textureIndex < mesh.Textures.Length)
+                        SetRenderTexture(pass, mesh.Textures[textureIndex]);
+                    
+                    _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
+                        PrimitiveType.TriangleList,
+                        mesh.Segments[index].Vertices,
+                        0,
+                        mesh.Segments[index].Vertices.Length,
+                        part.Indices,
+                        0,
+                        part.Indices.Length / 3);
+                }
+
+                index = (index + 1) % mesh.Segments.Length;
+            }
+        }
+
+        private void SetRenderTexture(EffectPass pass, KingdomTexture texture)
+        {
+            if (_shader.Texture0 != texture.Texture2D)
+            {
+                _shader.Texture0 = texture.Texture2D;
+                switch (texture.ModelTexture.TextureAddressMode.AddressU)
+                {
+                    case ModelTexture.TextureWrapMode.Clamp:
+                        _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
+                        _shader.TextureWrapModeU = TextureWrapMode.Clamp;
+                        break;
+                    case ModelTexture.TextureWrapMode.Repeat:
+                        _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
+                        _shader.TextureWrapModeU = TextureWrapMode.Repeat;
+                        break;
+                    case ModelTexture.TextureWrapMode.RegionClamp:
+                        _shader.TextureRegionU = texture.RegionU;
+                        _shader.TextureWrapModeU = TextureWrapMode.Clamp;
+                        break;
+                    case ModelTexture.TextureWrapMode.RegionRepeat:
+                        _shader.TextureRegionU = texture.RegionU;
+                        _shader.TextureWrapModeU = TextureWrapMode.Repeat;
+                        break;
+                }
+                switch (texture.ModelTexture.TextureAddressMode.AddressV)
+                {
+                    case ModelTexture.TextureWrapMode.Clamp:
+                        _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
+                        _shader.TextureWrapModeV = TextureWrapMode.Clamp;
+                        break;
+                    case ModelTexture.TextureWrapMode.Repeat:
+                        _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
+                        _shader.TextureWrapModeV = TextureWrapMode.Repeat;
+                        break;
+                    case ModelTexture.TextureWrapMode.RegionClamp:
+                        _shader.TextureRegionV = texture.RegionV;
+                        _shader.TextureWrapModeV = TextureWrapMode.Clamp;
+                        break;
+                    case ModelTexture.TextureWrapMode.RegionRepeat:
+                        _shader.TextureRegionV = texture.RegionV;
+                        _shader.TextureWrapModeV = TextureWrapMode.Repeat;
+                        break;
+                }
+
+                pass.Apply();
+            }
         }
 
         private void BasicallyForceToReloadEverything()
@@ -243,7 +278,8 @@ namespace OpenKh.Game.States
                 {
                     Indices = part.Indices,
                     SegmentId = part.SegmentIndex,
-                    TextureId = part.TextureIndex
+                    TextureId = part.TextureIndex,
+                    IsOpaque = part.IsOpaque,
                 }).ToArray(),
                 Textures = textures?.Images?.Select(texture => new KingdomTexture(texture, graphics)).ToArray() ?? new KingdomTexture[0]
             };

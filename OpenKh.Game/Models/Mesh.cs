@@ -42,6 +42,7 @@ namespace OpenKh.Game.Models
             public int[] Indices { get; set; }
             public int TextureId { get; set; }
             public int SegmentId { get; set; }
+            public bool IsOpaque { get; set; }
         }
 
         public Segment[] Segments { get; set; }
