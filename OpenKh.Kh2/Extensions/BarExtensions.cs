@@ -26,5 +26,46 @@ namespace OpenKh.Kh2.Extensions
             funcEntry(entry);
             return entries;
         }
+
+        public static bool ForEntry(this IEnumerable<Bar.Entry> entries, string name, Bar.EntryType type, Action<Stream> action)
+        {
+            var entry = entries.FirstOrDefault(x => x.Type == type && x.Name == name);
+            if (entry == null)
+                return false;
+
+            entry.Stream.Seek(0, SeekOrigin.Begin);
+            action(entry.Stream);
+            return true;
+        }
+
+        public static T ForEntry<T>(this IEnumerable<Bar.Entry> entries, string name, Bar.EntryType type, Func<Stream, T> action)
+        {
+            var entry = entries.FirstOrDefault(x => x.Type == type && x.Name == name);
+            if (entry == null)
+                return default;
+
+            entry.Stream.Seek(0, SeekOrigin.Begin);
+            return action(entry.Stream);
+        }
+
+        public static int ForEntries<T>(this IEnumerable<Bar.Entry> entries, string name, Bar.EntryType type, Action<Stream> action)
+        {
+            var itemFound = 0;
+            foreach (var entry in entries.Where(x => x.Type == type && x.Name == name))
+            {
+                entry.Stream.Seek(0, SeekOrigin.Begin);
+                action(entry.Stream);
+                itemFound++;
+            }
+
+            return itemFound;
+        }
+
+        public static IEnumerable<T> ForEntries<T>(this IEnumerable<Bar.Entry> entries, string name, Bar.EntryType type, Func<Stream, T> action) =>
+            entries.Where(x => x.Type == type && x.Name == name).Select(x =>
+            {
+                x.Stream.Seek(0, SeekOrigin.Begin);
+                return action(x.Stream);
+            });
     }
 }

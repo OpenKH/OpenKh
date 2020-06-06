@@ -6,7 +6,9 @@ using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
 using OpenKh.Game.Shaders;
+using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -281,25 +283,37 @@ namespace OpenKh.Game.States
             else
                 fileName = $"map/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
 
-            _archiveManager.LoadArchive(fileName);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK0", "SK0"));
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "SK1", "SK1"));
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, "MAP", "MAP"));
+            var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
+            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
         }
 
         private static MeshGroup FromMdlx(
             GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)
         {
             Log.Info($"Load model={modelName} texture={textureName}");
-            var mdlx = archiveManager.Get<Mdlx>(modelName);
-            var modelTextures = archiveManager.Get<ModelTexture>(textureName);
+            return FromMdlx(graphics,
+                archiveManager.Get<Mdlx>(modelName),
+                archiveManager.Get<ModelTexture>(textureName));
+        }
+
+        private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
+        {
+            return FromMdlx(graphics,
+                entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read),
+                entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read));
+        }
+
+        private static MeshGroup FromMdlx(GraphicsDevice graphics, Mdlx mdlx, ModelTexture modelTextures)
+        {
             if (mdlx == null)
             {
-                Log.Warn($"model {modelName} is null");
+                Log.Warn($"model is null");
                 return null;
             }
-            if (textureName == null)
-                Log.Warn($"texture {modelName} is null");
+            if (modelTextures == null)
+                Log.Warn($"texture is null");
 
             var textures = modelTextures?.Images?
                 .Select(texture => new KingdomTexture(texture, graphics)).ToArray() ?? new KingdomTexture[0];
