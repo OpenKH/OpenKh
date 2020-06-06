@@ -142,7 +142,14 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     br.ReadInt32();
                 }
 
-                VertexAssignment[][] newVertexAssignList = new VertexAssignment[vpu.VertexCount][];
+                var vertexAssignmentCount = cntSkip
+                    + cntVerticesMix2ToOne
+                    + cntVerticesMix3ToOne
+                    + cntVerticesMix4ToOne
+                    + cntVerticesMix5ToOne
+                    ;
+
+                VertexAssignment[][] newVertexAssignList = new VertexAssignment[vertexAssignmentCount][];
                 int inputVertexIndex = 0;
                 for (; inputVertexIndex < cntSkip; inputVertexIndex++)
                 {
