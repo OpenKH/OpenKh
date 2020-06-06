@@ -139,6 +139,11 @@ namespace OpenKh.Tools.Common.Controls
             }
         }
 
+        protected override void OnRender(DrawingContext dc)
+        {
+            Present(dc, _writeableBitmap);
+        }
+
         /// <summary>
         /// Rendering on demand.
         /// </summary>
@@ -241,10 +246,7 @@ namespace OpenKh.Tools.Common.Controls
                 BlitSutface(surface);
             }
 
-            using (var dc = _visual.RenderOpen())
-            {
-                Present(dc, _writeableBitmap);
-            }
+            InvalidateVisual(); // call Present() from OnRender
         }
 
         private void BlitSutface(ISpriteTexture surface)
