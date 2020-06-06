@@ -1,9 +1,14 @@
-﻿using Xe.BinaryMapper;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Jiminy
 {
     public class Puzz
     {
+        public const int MagicCode = 0x5A504D4A;
+
         public enum Rotation : byte
         {
             Fixed = 0x0,
@@ -33,5 +38,8 @@ namespace OpenKh.Kh2.Jiminy
             get => Unk1 & 0xF;
             set => Unk1 = (byte)((Unk1 & 0xF0) | (value & 0xF));
         }
+
+        public static List<Puzz> Read(Stream stream) => BaseJiminy<Puzz>.Read(stream).Items;
+        public static void Write(Stream stream, IEnumerable<Puzz> items) => BaseJiminy<Puzz>.Write(stream, MagicCode, items.ToList());
     }
 }
