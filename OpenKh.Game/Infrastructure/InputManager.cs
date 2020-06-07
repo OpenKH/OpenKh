@@ -13,8 +13,8 @@ namespace OpenKh.Game.Infrastructure
 
         public bool IsDebug => repeatableKeyboard.IsKeyPressed(Keys.Tab);
         public bool IsShift => repeatableKeyboard.IsKeyPressed(Keys.RightShift);
-        public bool IsDebugRight => repeatableKeyboard.IsKeyPressed(Keys.Right);
-        public bool IsDebugLeft => repeatableKeyboard.IsKeyPressed(Keys.Left);
+        public bool IsDebugRight => keyboard.IsKeyDown(Keys.Right) && !prevKeyboard.IsKeyDown(Keys.Right);
+        public bool IsDebugLeft => keyboard.IsKeyDown(Keys.Left) && !prevKeyboard.IsKeyDown(Keys.Left);
         public bool IsDebugUp => repeatableKeyboard.IsKeyPressed(Keys.Up);
         public bool IsDebugDown => repeatableKeyboard.IsKeyPressed(Keys.Down);
 
