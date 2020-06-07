@@ -10,6 +10,7 @@
   * [IDX/IMG](file/type/idx)
   * [BAR](file/type/bar)
   * [ARD](file/type/ard)
+  * [MAP](file/map.md)
   * [MSG](file/type/msg)
   * [MSN](file/type/msn)
   * [ANB](file/anb/anb)
