@@ -254,7 +254,7 @@ namespace OpenKh.Game
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);
             _graphicsDevice.Indices = _indexBuffer;
 
-            _vertexBuffer.SetData(_vertices);
+            _vertexBuffer.SetData(_vertices, 0, 4 * _currentSpriteIndex);
             _shader.Pass(pass =>
             {
                 _shader.Texture0 = _lastTextureUsed;
