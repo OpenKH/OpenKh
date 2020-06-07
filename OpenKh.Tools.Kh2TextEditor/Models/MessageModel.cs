@@ -77,7 +77,7 @@ namespace OpenKh.Tools.Kh2TextEditor.Models
             get
             {
                 const int MaxTitleLength = 100;
-                var title = $"{Id}: {Text}";
+                var title = $"{Id:X4}: {Text}";
                 return title.Length > MaxTitleLength ? $"{title.Substring(0, MaxTitleLength)}..." : title;
             }
         }
