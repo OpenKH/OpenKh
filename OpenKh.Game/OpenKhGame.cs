@@ -88,7 +88,7 @@ namespace OpenKh.Game
 
         protected override void Update(GameTime gameTime)
         {
-            inputManager.Update();
+            inputManager.Update(gameTime);
             if (inputManager.IsExit)
                 Exit();
 
@@ -108,6 +108,7 @@ namespace OpenKh.Game
             state?.Draw(deltaTimes);
             _debugOverlay.Draw(deltaTimes);
             base.Draw(gameTime);
+            inputManager.UnblockRepeats();
         }
 
         private StateInitDesc GetStateInitDesc()
