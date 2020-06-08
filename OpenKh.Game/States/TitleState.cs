@@ -181,6 +181,7 @@ namespace OpenKh.Game.States
             layoutRendererFg = CreateLayoutRenderer("titl");
             layoutRendererBg.SelectedSequenceGroupIndex = _titleLayout.Copyright;
 
+            Log.Info($"Theater={_titleLayout.HasTheater}");
             if (_titleLayout.HasTheater)
                 layoutRendererTheater = CreateLayoutRenderer("even");
 
@@ -320,6 +321,7 @@ namespace OpenKh.Game.States
 
         private void SetOption(int option)
         {
+            Log.Info($"TitleOption={option} prev={_optionSelected}");
             _optionSelected = option;
 
             switch (_optionSelected)

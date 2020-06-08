@@ -15,11 +15,6 @@ namespace OpenKh.Game.Debugging
         public static void Info(string text) => LogText("INF", text);
         public static void Warn(string text) => LogText("WRN", text);
         public static void Err(string text) => LogText("ERR", text);
-        public static void Throw(Exception ex)
-        {
-            LogText("EX!", ex.Message);
-            throw ex;
-        }
 
         public static void Flush()
         {
@@ -32,7 +27,7 @@ namespace OpenKh.Game.Debugging
     private static void LogText(string tag, string text)
         {
             var ms = _stopwatch.ElapsedMilliseconds;
-            var str = $"[{ms:D6}ms] {tag} {text}";
+            var str = $"[{(ms/1000):D3}.{(ms%1000):D3}] {tag} {text}";
             Task.Run(() =>
             {
                 Console.WriteLine(str);

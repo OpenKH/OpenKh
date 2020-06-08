@@ -273,6 +273,8 @@ namespace OpenKh.Game.States
 
         private void LoadMap(int worldIndex, int placeIndex)
         {
+            Log.Info($"Map={worldIndex},{placeIndex}");
+
             string fileName;
             if (_kernel.IsReMix)
                 fileName = $"map/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
@@ -288,10 +290,16 @@ namespace OpenKh.Game.States
         private static MeshGroup FromMdlx(
             GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)
         {
+            Log.Info($"Load model={modelName} texture={textureName}");
             var mdlx = archiveManager.Get<Mdlx>(modelName);
             var modelTextures = archiveManager.Get<ModelTexture>(textureName);
             if (mdlx == null)
+            {
+                Log.Warn($"model {modelName} is null");
                 return null;
+            }
+            if (textureName == null)
+                Log.Warn($"texture {modelName} is null");
 
             var textures = modelTextures?.Images?
                 .Select(texture => new KingdomTexture(texture, graphics)).ToArray() ?? new KingdomTexture[0];
@@ -347,7 +355,10 @@ namespace OpenKh.Game.States
         private void AddMesh(MeshGroup mesh)
         {
             if (mesh == null)
+            {
+                Log.Warn("AddMesh received null");
                 return;
+            }
 
             _models.Add(mesh);
         }

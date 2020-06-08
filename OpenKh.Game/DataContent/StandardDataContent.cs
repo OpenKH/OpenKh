@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.DataContent
@@ -16,6 +17,7 @@ namespace OpenKh.Game.DataContent
 
         public Stream FileOpen(string path)
         {
+            Log.Info($"Load file {path}");
             var fileName = Path.Combine(_baseDirectory, path);
             if (File.Exists(fileName))
                 return File.OpenRead(fileName);
