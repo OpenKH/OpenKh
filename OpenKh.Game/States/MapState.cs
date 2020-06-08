@@ -275,32 +275,6 @@ namespace OpenKh.Game.States
 
             LoadMapArd(_worldId, _placeId);
             LoadMap(_worldId, _placeId);
-            LoadObjEntry(_objEntryId);
-        }
-
-        private void LoadObjEntry(string name)
-        {
-            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ModelName == name);
-            if (model == null)
-                return;
-
-            var fileName = $"obj/{model.ModelName}.mdlx";
-
-            using var stream = _dataContent.FileOpen(fileName);
-            var entries = Bar.Read(stream);
-            var modelEntryName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Model)?.Name;
-
-            _archiveManager.LoadArchive(entries);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, modelEntryName, "tim_"));
-        }
-
-        private void LoadObjEntry(int id)
-        {
-            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ObjectId == id);
-            if (model == null)
-                return;
-
-            LoadObjEntry(model.ModelName);
         }
 
         private void LoadMap(int worldIndex, int placeIndex)
@@ -434,7 +408,9 @@ namespace OpenKh.Game.States
                 if (_debugType == 0)
                     DebugUpdatePlaceList();
                 else if (_debugType == 1)
-                    DebugUpdateObjentryList();
+                {
+
+                }
                 else if (_debugType == 2)
                     if (_input.IsCross)
                         debug.State = 0;
@@ -448,7 +424,7 @@ namespace OpenKh.Game.States
                 if (_debugType == 0)
                     DebugDrawPlaceList(debug);
                 else if (_debugType == 1)
-                    DebugDrawObjentryList(debug);
+                    debug.Println("PLACEHOLDER");
                 else if (_debugType == 2)
                     debug.Println("Press X to return to title screen");
             }
@@ -523,43 +499,6 @@ namespace OpenKh.Game.States
                 return x;
             })
             .ToArray();
-
-        private void DebugUpdateObjentryList()
-        {
-            if (_input.IsMenuUp) _debugObjentryCursor = Decrement(_debugObjentryCursor);
-            else if (_input.IsMenuDown) _debugObjentryCursor = Increment(_debugObjentryCursor);
-            if (_debugObjentryCursor < 0)
-                _debugObjentryCursor = _kernel.ObjEntries.Count - 1;
-            _debugObjentryCursor %= _kernel.ObjEntries.Count;
-
-            if (_input.IsCross)
-            {
-                _objEntryId = _kernel.ObjEntries.Skip(_debugObjentryCursor).FirstOrDefault()?.ObjectId ?? 0;
-
-                BasicallyForceToReloadEverything();
-                DisableDebugMode();
-            }
-        }
-
-        private void DebugDrawObjentryList(IDebug debug)
-        {
-            debug.Println("OBJENTRY SELECTION");
-            debug.Println("");
-
-            var index = 0;
-            foreach (var entry in _kernel.ObjEntries)
-            {
-                if (index >= _debugObjentryCursor)
-                {
-                    debug.Print($"{(index == _debugObjentryCursor ? '>' : ' ')} ");
-                    debug.Print($"{entry.ObjectId:X04} ");
-                    debug.Println(entry.ModelName.Replace('_', '-'));
-                }
-
-                index++;
-            }
-        }
-
         #endregion
     }
 }
