@@ -19,13 +19,13 @@ namespace OpenKh.Game
             {
                 Log.Err("A fatal error has occurred. Please attach this log to https://github.com/xeeynamo/openkh/issues");
                 Catch(ex);
-                Log.Flush();
+                Log.Close();
 
                 throw ex;
             }
 
             Log.Info("End");
-            Log.Flush();
+            Log.Close();
         }
 
         private static void Catch(Exception ex)
