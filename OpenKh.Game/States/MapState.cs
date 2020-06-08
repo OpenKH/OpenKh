@@ -12,6 +12,7 @@ using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Kh2.Models;
+using OpenKh.Game.Entities;
 
 namespace OpenKh.Game.States
 {
@@ -44,7 +45,7 @@ namespace OpenKh.Game.States
         private int _placeId = 4;
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
-        private List<BobDescriptor> _bobDescs = new List<BobDescriptor>();
+        private List<BobEntity> _bobEntities = new List<BobEntity>();
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -118,20 +119,14 @@ namespace OpenKh.Game.States
                     }
                 }
 
-                foreach (var bobDesc in _bobDescs)
+                foreach (var entity in _bobEntities)
                 {
-                    var modelView = Matrix.CreateRotationX(bobDesc.RotationX) *
-                        Matrix.CreateRotationY(bobDesc.RotationY) *
-                        Matrix.CreateRotationZ(bobDesc.RotationZ) *
-                        Matrix.CreateScale(bobDesc.ScalingX, bobDesc.ScalingY, bobDesc.ScalingZ) *
-                        Matrix.CreateTranslation(bobDesc.PositionX, bobDesc.PositionY, bobDesc.PositionZ);
-
                     _shader.ProjectionView = _camera.Projection;
                     _shader.WorldView = _camera.World;
-                    _shader.ModelView = modelView;
+                    _shader.ModelView = entity.GetMatrix();
                     pass.Apply();
 
-                    RenderMesh(pass, _bobModels[bobDesc.BobIndex]);
+                    RenderMesh(pass, _bobModels[entity.BobIndex]);
                 }
             });
         }
@@ -310,7 +305,9 @@ namespace OpenKh.Game.States
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
 
-            _bobDescs = entries.ForEntry("out", Bar.EntryType.BobDescriptor, BobDescriptor.Read) ?? new List<BobDescriptor>();
+            _bobEntities = entries.ForEntry("out", Bar.EntryType.BobDescriptor, BobDescriptor.Read)?
+                .Select(x => new BobEntity(x))?.ToList() ?? new List<BobEntity>();
+
             var bobModels = entries.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
             var bobTextures = entries.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
 
