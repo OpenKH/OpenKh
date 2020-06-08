@@ -20,7 +20,22 @@ namespace OpenKh.Game.Infrastructure
 
         public bool IsReMix { get; }
         public int RegionId { get; }
-        public string Language => Constants.Regions[RegionId == Constants.RegionFinalMix ? 0 : RegionId];
+        public string Language
+        {
+            get
+            {
+                int languageId;
+                if (RegionId == Constants.RegionFinalMix) // Final mix should load JP assets
+                    languageId = 0;
+                else if (RegionId == 2) // UK region should load US assets
+                    languageId = 1;
+                else
+                    languageId = RegionId;
+
+                return Constants.Regions[languageId];
+            }
+        }
+
         public string Region => Constants.Regions[RegionId];
         public FontContext FontContext { get; }
         public RenderingMessageContext SystemMessageContext { get; set; }
