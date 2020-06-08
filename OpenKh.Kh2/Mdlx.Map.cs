@@ -30,7 +30,8 @@ namespace OpenKh.Kh2
         {
             [Data] public int VifOffset { get; set; }
             [Data] public int TextureIndex { get; set; }
-            [Data] public int Unk08 { get; set; }
+            [Data] public short Unk08 { get; set; }
+            [Data] public short Unk0a { get; set; }
             [Data] public int Unk0c { get; set; }
         }
 
@@ -51,7 +52,8 @@ namespace OpenKh.Kh2
         {
             public byte[] VifPacket { get; set; }
             public int TextureId { get; set; }
-            public int Unk08 { get; set; }
+            public short Unk08 { get; set; }
+            public short IsTransparentFlag { get; set; }
             public int Unk0c { get; set; }
             public ushort[] DmaPerVif { get; set; }
         }
@@ -107,6 +109,7 @@ namespace OpenKh.Kh2
                         VifPacket = packet.ToArray(),
                         TextureId = dmaChain.TextureIndex,
                         Unk08 = dmaChain.Unk08,
+                        IsTransparentFlag = dmaChain.Unk0a,
                         Unk0c = dmaChain.Unk0c,
                         DmaPerVif = sizePerDma.ToArray(),
                     };
@@ -204,6 +207,7 @@ namespace OpenKh.Kh2
                     VifOffset = dmaChainVifOffsets[i],
                     TextureIndex = dmaChainMap.TextureId,
                     Unk08 = dmaChainMap.Unk08,
+                    Unk0a = dmaChainMap.IsTransparentFlag,
                     Unk0c = dmaChainMap.Unk0c
                 });
             }
