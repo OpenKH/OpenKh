@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Kh2.Models;
 using OpenKh.Game.Entities;
+using OpenKh.Kh2.Ard;
 
 namespace OpenKh.Game.States
 {
@@ -45,6 +46,7 @@ namespace OpenKh.Game.States
         private int _placeId = 4;
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
+        private List<ObjectEntity> _objectEntities = new List<ObjectEntity>();
         private List<BobEntity> _bobEntities = new List<BobEntity>();
 
         public void Initialize(StateInitDesc initDesc)
@@ -117,6 +119,16 @@ namespace OpenKh.Game.States
                     {
                         RenderMesh(pass, mesh);
                     }
+                }
+
+                foreach (var entity in _objectEntities.Where(x => x.Mesh != null))
+                {
+                    _shader.ProjectionView = _camera.Projection;
+                    _shader.WorldView = _camera.World;
+                    _shader.ModelView = entity.GetMatrix();
+                    pass.Apply();
+
+                    RenderMesh(pass, entity.Mesh);
                 }
 
                 foreach (var entity in _bobEntities)
@@ -261,6 +273,7 @@ namespace OpenKh.Game.States
             _models.Clear();
             _bobModels.Clear();
 
+            LoadMapArd(_worldId, _placeId);
             LoadMap(_worldId, _placeId);
             LoadObjEntry(_objEntryId);
         }
@@ -318,6 +331,35 @@ namespace OpenKh.Game.States
                     _bobModels.Add(bobMesh);
             }
         }
+
+        private void LoadMapArd(int worldIndex, int placeIndex)
+        {
+            string fileName;
+            if (_kernel.IsReMix)
+                fileName = $"ard/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
+            else
+                fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
+
+            var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
+            var spawnPoints = entries.ForEntry("m_00", Bar.EntryType.SpawnPoint, SpawnPoint.Read);
+            if (spawnPoints != null)
+            {
+                var spawnPoint = LoadSpawnPoint(spawnPoints, -1);
+                if (spawnPoint != null)
+                {
+                    var entities = spawnPoint.Entities
+                        .Select(x => ObjectEntity.FromSpawnPoint(_kernel, x))
+                        .ToList();
+                    foreach (var entity in entities)
+                        entity.LoadMesh(_graphics.GraphicsDevice);
+
+                    _objectEntities.AddRange(entities);
+                }
+            }
+        }
+
+        private SpawnPoint LoadSpawnPoint(IEnumerable<SpawnPoint> spawnPoints, int id) =>
+            spawnPoints.FirstOrDefault();
 
         private static MeshGroup FromMdlx(
             GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)
