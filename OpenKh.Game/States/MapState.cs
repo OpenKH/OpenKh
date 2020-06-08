@@ -316,7 +316,7 @@ namespace OpenKh.Game.States
 
             for (var i = 0; i < bobModels.Count; i++)
             {
-                var bobMesh = FromMdlx(_graphics.GraphicsDevice, bobModels[i], bobTextures[i]);
+                var bobMesh = MeshLoader.FromKH2(_graphics.GraphicsDevice, bobModels[i], bobTextures[i]);
                 if (bobMesh != null)
                     _bobModels.Add(bobMesh);
             }
@@ -326,77 +326,16 @@ namespace OpenKh.Game.States
             GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)
         {
             Log.Info($"Load model={modelName} texture={textureName}");
-            return FromMdlx(graphics,
+            return MeshLoader.FromKH2(graphics,
                 archiveManager.Get<Mdlx>(modelName),
                 archiveManager.Get<ModelTexture>(textureName));
         }
 
         private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
         {
-            return FromMdlx(graphics,
+            return MeshLoader.FromKH2(graphics,
                 entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read),
                 entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read));
-        }
-
-        private static MeshGroup FromMdlx(GraphicsDevice graphics, Mdlx mdlx, ModelTexture modelTextures)
-        {
-            if (mdlx == null)
-            {
-                Log.Warn($"model is null");
-                return null;
-            }
-            if (modelTextures == null)
-                Log.Warn($"texture is null");
-
-            var textures = modelTextures?.Images?
-                .Select(texture => new KingdomTexture(texture, graphics)).ToArray() ?? new KingdomTexture[0];
-
-            var mdlxParsed = new MdlxParser(mdlx);
-
-            MeshGroup.Segment[] segments = null;
-            MeshGroup.Part[] parts = null;
-            var model = new MdlxParser(mdlx).Model;
-            if (model?.Parts != null && model?.Segments != null)
-            { // DEPRECATED
-                segments = model.Segments.Select(segment => new MeshGroup.Segment
-                {
-                    Vertices = segment.Vertices.Select(vertex => new VertexPositionColorTexture
-                    {
-                        Position = new Vector3(vertex.X, vertex.Y, vertex.Z),
-                        TextureCoordinate = new Vector2(vertex.U, vertex.V),
-                        Color = new Color((vertex.Color >> 16) & 0xff, (vertex.Color >> 8) & 0xff, vertex.Color & 0xff, (vertex.Color >> 24) & 0xff)
-                    }).ToArray()
-                }).ToArray();
-
-                parts = model.Parts.Select(part => new MeshGroup.Part
-                {
-                    Indices = part.Indices,
-                    SegmentId = part.SegmentIndex,
-                    TextureId = part.TextureIndex,
-                    IsOpaque = part.IsOpaque,
-                }).ToArray();
-            }
-
-            return new MeshGroup
-            {
-                Segments = segments,
-                Parts = parts,
-                MeshDescriptors = mdlxParsed.MeshDescriptors?
-                    .Select(x => new MeshDesc
-                    {
-                        Vertices = x.Vertices
-                            .Select(v => new VertexPositionColorTexture(
-                                new Vector3(v.X, v.Y, v.Z),
-                                new Color((v.Color >> 16) & 0xff, (v.Color >> 8) & 0xff, v.Color & 0xff, (v.Color >> 24) & 0xff),
-                                new Vector2(v.Tu, v.Tv)))
-                            .ToArray(),
-                        Indices = x.Indices,
-                        TextureIndex = x.TextureIndex,
-                        IsOpaque = x.IsOpaque
-                    })
-                    .ToList(),
-                Textures = textures
-            };
         }
 
         private void AddMesh(MeshGroup mesh)

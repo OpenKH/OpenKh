@@ -61,9 +61,12 @@ namespace OpenKh.Kh2.Extensions
             return true;
         }
 
-        public static T ForEntry<T>(this IEnumerable<Bar.Entry> entries, string name, Bar.EntryType type, Func<Stream, T> action)
+        public static T ForEntry<T>(this IEnumerable<Bar.Entry> entries, string name, Bar.EntryType type, Func<Stream, T> action) =>
+            entries.ForEntry(x => x.Type == type && x.Name == name, action);
+
+        public static T ForEntry<T>(this IEnumerable<Bar.Entry> entries, Func<Bar.Entry, bool> predicate, Func<Stream, T> action)
         {
-            var entry = entries.FirstOrDefault(x => x.Type == type && x.Name == name);
+            var entry = entries.FirstOrDefault(predicate);
             if (entry == null)
                 return default;
 
