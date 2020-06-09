@@ -14,6 +14,7 @@ using System.Windows.Media;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
+using System;
 
 namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
@@ -115,13 +116,13 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             LayoutEditor = new LayoutEditorViewModel(this, this, EditorDebugRenderingService);
             SequenceEditor = new SequenceEditorViewModel(EditorDebugRenderingService);
 
-            OpenCommand = new RelayCommand(x =>
+            OpenCommand = new RelayCommand(x => Utilities.Catch(() =>
             {
                 FileDialog.OnOpen(fileName =>
                 {
                     OpenFile(fileName);
                 }, Filters);
-            }, x => !IsToolDesc);
+            }), x => !IsToolDesc);
 
             SaveCommand = new RelayCommand(x =>
             {
@@ -199,6 +200,19 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         private bool OpenBarContent(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
         {
+            var layoutEntries = entries.Count(x => x.Type == Bar.EntryType.Layout);
+            var sequenceEntries = entries.Count(x => x.Type == Bar.EntryType.Seqd);
+
+            if (sequenceEntries > 0)
+                return Open2dd(entries, doNotShowLayoutSelectionDialog);
+            if (layoutEntries > 0)
+                return Open2ld(entries, doNotShowLayoutSelectionDialog);
+
+            throw new Exception("The specified file does not contain any sequence or layout content to be played.");
+        }
+
+        private bool Open2ld(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
+        {
             LayoutEntryModel layoutEntryModel;
             var layoutEntries = entries.Count(x => x.Type == Bar.EntryType.Layout);
             int imagesEntries = entries.Count(x => x.Type == Bar.EntryType.Imgz);
@@ -252,6 +266,22 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             return true;
         }
 
+        private bool Open2dd(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
+        {
+            var sequenceEntries = entries.Count(x => x.Type == Bar.EntryType.Seqd);
+            int imagesEntries = entries.Count(x => x.Type == Bar.EntryType.Imgd);
+
+            //if (sequenceEntries > 1)
+            //    throw new Exception("Did not expected multiple sequences.");
+            var sequence = Sequence.Read(entries.First(x => x.Type == Bar.EntryType.Seqd).Stream);
+            //if (imagesEntries > 1)
+            //    throw new Exception("Did not expected multiple images for a single sequence.");
+            var image = Imgd.Read(entries.First(x => x.Type == Bar.EntryType.Imgd).Stream);
+
+            OpenSequence(sequence, image);
+            return true;
+        }
+
         private void OpenLayout(LayoutEntryModel layoutEntryModel)
         {
             LayoutName = layoutEntryModel.Layout.Name;
@@ -267,6 +297,11 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 Layout = layoutEntryModel.Layout.Value,
                 Images = layoutEntryModel.Images.Value
             };
+        }
+
+        private void OpenSequence(Sequence sequence, Imgd image)
+        {
+            MessageBox.Show("Sequence");
         }
     }
 }
