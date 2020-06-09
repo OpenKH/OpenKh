@@ -8,30 +8,58 @@
              xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="500">
-    <Grid>
+    <Grid Margin="5">
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="40"/>
-        </Grid.RowDefinitions>
 
-        <controls:SequenceRendererPanel Grid.Column="0" Grid.Row="0"
-            Drawing="{Binding Drawing}"
-            Background="{Binding Background, FallbackValue=#FF00FF}"
-            FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
-            FramesPerSecond="60"
-            SelectedSequence="{Binding SelectedSequence}"
-            SelectedImage="{Binding SelectedImage}"
-            SelectedAnimationGroupIndex="{Binding SelectedAnimationGroupIndex, Mode=TwoWay}"/>
+        <Grid Grid.Column="1" Margin="5 3 5 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
 
-        <controls:Timeline Grid.Column="0" Grid.Row="1"
-            Value="{Binding FrameIndex, Mode=TwoWay}"
-            MaxValue="{Binding MaxFramesCount}"/>
+            <controls:SequenceRendererPanel Grid.Row="0"
+                Drawing="{Binding Drawing}"
+                Background="{Binding Background, FallbackValue=#FF00FF}"
+                FramesPerSecond="60"
+                FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
+                SelectedSequence="{Binding SelectedSequence}"
+                SelectedImage="{Binding SelectedImage}"
+                SelectedAnimationGroupIndex="{Binding SelectedAnimationGroupIndex, Mode=TwoWay}"/>
 
-        <StackPanel Grid.Column="1" Grid.RowSpan="2">
+            <controls:Timeline Grid.Row="1"
+                Value="{Binding FrameIndex, Mode=TwoWay}"
+                MaxValue="{Binding MaxFramesCount}"/>
+        </Grid>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock Text="Sprite list" Margin="0 0 0 3"/>
+            <ListBox Grid.Row="1" ItemsSource="{Binding Sprites}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <controls:SequenceRendererPanel
+                            Drawing="{Binding Drawing}"
+                            FramesPerSecond="1"
+                            AdjustPosition="True"
+                            FrameIndex="0"
+                            SelectedSequence="{Binding Sequence}"
+                            SelectedImage="{Binding Image}"
+                            SelectedAnimationGroupIndex="0"
+                            />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+
+        <StackPanel Grid.Column="2">
             <TextBlock Text="Animation group"/>
             <ComboBox
                 ItemsSource="{Binding AnimationGroupList.Items}"

@@ -284,11 +284,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         private void OpenSequence(Sequence sequence, Imgd image)
         {
-            var sequenceEditorViewModel = new SequenceEditorViewModel(this, this, EditorDebugRenderingService)
-            {
-                SelectedSequence = sequence,
-                SelectedImage = image
-            };
+            var sequenceEditorViewModel = new SequenceEditorViewModel(sequence, image, this, this, EditorDebugRenderingService);
 
             OnControlChanged?.Invoke(new SequenceEditorView()
             {

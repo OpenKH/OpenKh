@@ -5,6 +5,7 @@ using OpenKh.Tools.Common.Rendering;
 using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Service;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Xe.Drawing;
 using Xe.Tools;
@@ -103,15 +104,25 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public int MaxFramesCount => SelectedAnimationGroupIndex >= 0 ?
             SelectedSequence.GetFrameLengthFromAnimationGroup(SelectedAnimationGroupIndex) : 0;
 
+        public GenericListModel<SpriteViewModel> Sprites { get; }
+
         public SequenceEditorViewModel(
+            Sequence sequence,
+            Imgd texture,
             IElementNames elementNames,
             IEditorSettings editorSettings,
             EditorDebugRenderingService editorDebugRenderingService)
         {
+            Drawing = new SpriteDrawingDirect3D();
+
+            SelectedSequence = sequence;
+            SelectedImage = texture;
             _elementNames = elementNames;
             _editorSettings = editorSettings;
-            Drawing = new SpriteDrawingDirect3D();
             EditorDebugRenderingService = editorDebugRenderingService;
+
+            Sprites = new GenericListModel<SpriteViewModel>(SelectedSequence.Frames.Select(x => new SpriteViewModel(x, texture)));
+
         }
     }
 }
