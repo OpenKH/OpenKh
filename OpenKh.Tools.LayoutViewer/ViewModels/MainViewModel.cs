@@ -284,7 +284,16 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         private void OpenSequence(Sequence sequence, Imgd image)
         {
-            MessageBox.Show("Sequence");
+            var sequenceEditorViewModel = new SequenceEditorViewModel(this, this, EditorDebugRenderingService)
+            {
+                SelectedSequence = sequence,
+                SelectedImage = image
+            };
+
+            OnControlChanged?.Invoke(new SequenceEditorView()
+            {
+                DataContext = sequenceEditorViewModel
+            });
         }
 
         private static bool DoesContainSequenceAnimations(IEnumerable<Bar.Entry> entries) =>

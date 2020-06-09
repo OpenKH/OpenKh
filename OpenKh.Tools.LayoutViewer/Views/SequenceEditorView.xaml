@@ -20,15 +20,16 @@
 
         <controls:SequenceRendererPanel Grid.Column="0" Grid.Row="0"
             Drawing="{Binding Drawing}"
-            FrameIndex="{Binding SequencePlayer.FrameIndex, Mode=TwoWay}"
-            FramesPerSecond="{Binding SequencePlayer.ActualFramesPerSecond}"
+            Background="{Binding Background, FallbackValue=#FF00FF}"
+            FrameIndex="{Binding FrameIndex, Mode=TwoWay}"
+            FramesPerSecond="60"
             SelectedSequence="{Binding SelectedSequence}"
             SelectedImage="{Binding SelectedImage}"
             SelectedAnimationGroupIndex="{Binding SelectedAnimationGroupIndex, Mode=TwoWay}"/>
 
         <controls:Timeline Grid.Column="0" Grid.Row="1"
-            Value="{Binding SequencePlayer.FrameIndex, Mode=TwoWay}"
-            MaxValue="500"/>
+            Value="{Binding FrameIndex, Mode=TwoWay}"
+            MaxValue="{Binding MaxFramesCount}"/>
 
         <StackPanel Grid.Column="1" Grid.RowSpan="2">
             <TextBlock Text="Animation group"/>

@@ -1,5 +1,6 @@
 ﻿using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.Common.Rendering;
 using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Service;
@@ -45,12 +46,17 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
+        private readonly IElementNames _elementNames;
+        private readonly IEditorSettings _editorSettings;
+        private int _frameIndex;
         private Sequence selectedSequence;
         private AnimationGroupListModel animationGroupList;
         private int selectedAnimationGroupIndex;
 
+
         public ISpriteDrawing Drawing { get; }
         public EditorDebugRenderingService EditorDebugRenderingService { get; }
+        public System.Windows.Media.Color Background => _editorSettings.EditorBackground;
 
         public object AnimationGroupList
         {
@@ -73,6 +79,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         }
 
         public Imgd SelectedImage { get; set; }
+
         public int SelectedAnimationGroupIndex
         {
             get => selectedAnimationGroupIndex;
@@ -83,8 +90,26 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
-        public SequenceEditorViewModel(EditorDebugRenderingService editorDebugRenderingService)
+        public int FrameIndex
         {
+            get => _frameIndex;
+            set
+            {
+                _frameIndex = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int MaxFramesCount => SelectedAnimationGroupIndex >= 0 ?
+            SelectedSequence.GetFrameLengthFromAnimationGroup(SelectedAnimationGroupIndex) : 0;
+
+        public SequenceEditorViewModel(
+            IElementNames elementNames,
+            IEditorSettings editorSettings,
+            EditorDebugRenderingService editorDebugRenderingService)
+        {
+            _elementNames = elementNames;
+            _editorSettings = editorSettings;
             Drawing = new SpriteDrawingDirect3D();
             EditorDebugRenderingService = editorDebugRenderingService;
         }

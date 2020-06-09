@@ -10,6 +10,9 @@ namespace OpenKh.Tools.Common.Controls
 {
     public class SequenceRendererPanel : DrawPanel
     {
+        public static readonly DependencyProperty BackgroundProperty =
+            GetDependencyProperty<SequenceRendererPanel, System.Windows.Media.Color>(nameof(Background), System.Windows.Media.Colors.Magenta, (o, x) => o.SetBackgroundColor(x));
+
         public static readonly DependencyProperty SelectedSequenceProperty =
             GetDependencyProperty<SequenceRendererPanel, Sequence>(nameof(SelectedSequence), null, (o, x) => o.TrySetSequence(), x => true);
 
@@ -25,7 +28,14 @@ namespace OpenKh.Tools.Common.Controls
         public static readonly DependencyProperty AdjustPositionProperty =
             GetDependencyProperty<SequenceRendererPanel, bool>(nameof(AdjustPosition), false, (o, x) => { });
 
+        private ColorF _backgroundColor;
         private Rectangle _sequenceVisibilyRectangle;
+
+        public System.Windows.Media.Color Background
+        {
+            get => (System.Windows.Media.Color)GetValue(BackgroundProperty);
+            set => SetValue(BackgroundProperty, value);
+        }
 
         public int SelectedAnimationGroupIndex
         {
@@ -68,6 +78,11 @@ namespace OpenKh.Tools.Common.Controls
         private ISpriteTexture surface;
         private SequenceRenderer sequenceRenderer;
 
+        public SequenceRendererPanel()
+        {
+            SetBackgroundColor(Background);
+        }
+
         protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
         {
             var rect = SelectedSequence?.GetVisibilityRectangleFromAnimationGroup(SelectedAnimationGroupIndex);
@@ -106,6 +121,9 @@ namespace OpenKh.Tools.Common.Controls
         {
             base.OnDrawEnd();
         }
+
+        private void SetBackgroundColor(System.Windows.Media.Color color) =>
+            _backgroundColor = ColorF.FromRgba(color.R, color.G, color.B, color.A);
 
         private void SelectSequenceGroup(int index)
         {

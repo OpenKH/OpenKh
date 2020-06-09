@@ -30,6 +30,6 @@
             </MenuItem>
         </Menu>
 
-        <Grid x:Name="content" Grid.Row="1" DataContext="{Binding DataContext}"/>
+        <Grid x:Name="content" Grid.Row="1"/>
     </Grid>
 </Window>
