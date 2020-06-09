@@ -107,7 +107,7 @@ namespace OpenKh.Tools.Common.Controls
 
         protected override void OnDrawBegin()
         {
-            Drawing.Clear(new ColorF(1.0f, 0.0f, 1.0f, 1.0f));
+            Drawing.Clear(_backgroundColor);
 
             var posX = AdjustPosition ? -_sequenceVisibilyRectangle.X : (float)(ActualWidth / 2);
             var posY = AdjustPosition ? -_sequenceVisibilyRectangle.Y : (float)(ActualHeight / 2);
