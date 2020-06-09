@@ -30,7 +30,6 @@
             </MenuItem>
         </Menu>
 
-        <local:LayoutEditorView Grid.Row="1"
-            DataContext="{Binding LayoutEditor}"/>
+        <Grid x:Name="content" Grid.Row="1" DataContext="{Binding DataContext}"/>
     </Grid>
 </Window>

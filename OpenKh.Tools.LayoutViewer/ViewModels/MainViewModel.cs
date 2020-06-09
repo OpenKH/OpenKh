@@ -15,6 +15,7 @@ using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using System;
+using System.Windows.Controls;
 
 namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
@@ -61,6 +62,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public RelayCommand AboutCommand { get; set; }
 
         public bool IsToolDesc => _toolInvokeDesc != null;
+
+        public Action<UserControl> OnControlChanged { get; set; }
 
         public LayoutEditorViewModel LayoutEditor
         {
@@ -291,12 +294,18 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             SequenceEditor.SelectedImage = layoutEntryModel.Images.Value.FirstOrDefault();
 
             _texturesViewModel = new TexturesViewModel(layoutEntryModel.Images.Value);
-            LayoutEditor = new LayoutEditorViewModel(this, this, EditorDebugRenderingService)
+
+            var layoutEditorViewModel = new LayoutEditorViewModel(this, this, EditorDebugRenderingService)
             {
                 SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout.Value, _texturesViewModel, EditorDebugRenderingService),
                 Layout = layoutEntryModel.Layout.Value,
                 Images = layoutEntryModel.Images.Value
             };
+
+            OnControlChanged?.Invoke(new LayoutEditorView()
+            {
+                DataContext = layoutEditorViewModel
+            });
         }
 
         private void OpenSequence(Sequence sequence, Imgd image)
