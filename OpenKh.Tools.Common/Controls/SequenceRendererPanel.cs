@@ -109,8 +109,8 @@ namespace OpenKh.Tools.Common.Controls
         {
             Drawing.Clear(new ColorF(1.0f, 0.0f, 1.0f, 1.0f));
 
-            int posX = AdjustPosition ? -_sequenceVisibilyRectangle.X : 0;
-            int posY = AdjustPosition ? -_sequenceVisibilyRectangle.Y : 0;
+            var posX = AdjustPosition ? -_sequenceVisibilyRectangle.X : (float)(ActualWidth / 2);
+            var posY = AdjustPosition ? -_sequenceVisibilyRectangle.Y : (float)(ActualHeight / 2);
             sequenceRenderer?.Draw(SelectedAnimationGroupIndex, FrameIndex, posX, posY);
             FrameIndex++;
             Drawing.Flush();
