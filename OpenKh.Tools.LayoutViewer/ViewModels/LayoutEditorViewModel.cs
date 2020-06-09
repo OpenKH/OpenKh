@@ -12,7 +12,7 @@ using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
-    public class LayoutEditorViewModel : BaseNotifyPropertyChanged
+    public class LayoutEditorViewModel : BaseNotifyPropertyChanged, ISaveBar
     {
         private Layout _layout;
         private IEnumerable<Imgd> _images;
@@ -85,8 +85,8 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }
         }
 
-        public string LayoutName { get => _elementNames.LayoutName; set => _elementNames.LayoutName = value; }
-        public string ImagesName { get => _elementNames.ImagesName; set => _elementNames.ImagesName = value; }
+        public string LayoutName { get => _elementNames.AnimationName; set => _elementNames.AnimationName = value; }
+        public string ImagesName { get => _elementNames.SpriteName; set => _elementNames.SpriteName = value; }
 
         public SequenceGroupsViewModel SequenceGroups
         {
@@ -131,5 +131,9 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                 FrameIndex = 0;
             }, x => true);
         }
+
+        public IEnumerable<Bar.Entry> Save(IEnumerable<Bar.Entry> barEntries) => barEntries
+            .ForEntry(Bar.EntryType.Layout, LayoutName, 0, entry => Layout.Write(entry.Stream))
+            .ForEntry(Bar.EntryType.Imgz, ImagesName, 0, entry => Imgz.Write(entry.Stream, Images));
     }
 }

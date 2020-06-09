@@ -2,7 +2,7 @@
 {
     public interface IElementNames
     {
-        string LayoutName { get; set; }
-        string ImagesName { get; set; }
+        string AnimationName { get; set; }
+        string SpriteName { get; set; }
     }
 }

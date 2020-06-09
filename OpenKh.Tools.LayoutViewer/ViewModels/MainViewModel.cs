@@ -1,6 +1,6 @@
 using OpenKh.Tools.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
-using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.LayoutViewer.Interfaces;
 using OpenKh.Tools.LayoutViewer.Models;
 using OpenKh.Tools.LayoutViewer.Service;
@@ -23,11 +23,9 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
     {
         private const string DefaultName = "FAKE";
         private static string ApplicationName = Utilities.GetApplicationName();
-        private string _layoutName;
-        private string _imagesName;
+        private string _animationName;
+        private string _spriteName;
         private string _fileName;
-        private TexturesViewModel _texturesViewModel;
-        private LayoutEditorViewModel _layoutEditor;
         private ToolInvokeDesc _toolInvokeDesc;
 
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
@@ -36,12 +34,13 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         {
             get
             {
-                var layoutContentName = $"{LayoutName ?? DefaultName},{ImagesName ?? DefaultName}";
+                var contentName = $"{AnimationName ?? DefaultName},{SpriteName ?? DefaultName}";
                 var fileName = IsToolDesc ? _toolInvokeDesc.Title : (FileName ?? "untitled");
 
-                return $"{layoutContentName} | {fileName} | {ApplicationName}";
+                return $"{contentName} | {fileName} | {ApplicationName}";
             }
         }
+
         private string FileName
         {
             get => _fileName;
@@ -64,40 +63,29 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public bool IsToolDesc => _toolInvokeDesc != null;
 
         public Action<UserControl> OnControlChanged { get; set; }
+        public ISaveBar CurrentEditor { get; private set; }
 
-        public LayoutEditorViewModel LayoutEditor
+        public string AnimationName
         {
-            get => _layoutEditor;
+            get => _animationName;
             set
             {
-                _layoutEditor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string LayoutName
-        {
-            get => _layoutName;
-            set
-            {
-                _layoutName = value.Length > 4 ? value.Substring(0, 4) : value;
+                _animationName = value.Length > 4 ? value.Substring(0, 4) : value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(Title));
             }
         }
 
-        public string ImagesName
+        public string SpriteName
         {
-            get => _imagesName;
+            get => _spriteName;
             set
             {
-                _imagesName = value.Length > 4 ? value.Substring(0, 4) : value;
+                _spriteName = value.Length > 4 ? value.Substring(0, 4) : value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(Title));
             }
         }
-
-        public SequenceEditorViewModel SequenceEditor { get; private set; }
 
         public Color EditorBackground
         {
@@ -116,8 +104,6 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         public MainViewModel()
         {
             EditorDebugRenderingService = new EditorDebugRenderingService();
-            LayoutEditor = new LayoutEditorViewModel(this, this, EditorDebugRenderingService);
-            SequenceEditor = new SequenceEditorViewModel(EditorDebugRenderingService);
 
             OpenCommand = new RelayCommand(x => Utilities.Catch(() =>
             {
@@ -159,27 +145,19 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }, x => true);
         }
 
-        private static IEnumerable<Bar.Entry> ReadBarEntriesFromFileName(string fileName)
-        {
-            using (var stream = File.OpenRead(fileName))
+        private static IEnumerable<Bar.Entry> ReadBarEntriesFromFileName(string fileName) =>
+            File.OpenRead(fileName).Using(stream =>
             {
                 if (!Bar.IsValid(stream))
                     throw new InvalidDataException("Not a bar file");
 
                 return Bar.Read(stream);
-            }
-        }
+            });
 
         public void OpenToolDesc(ToolInvokeDesc toolInvokeDesc)
         {
             _toolInvokeDesc = toolInvokeDesc;
             OpenFile(_toolInvokeDesc.ActualFileName);
-        }
-
-        public void ToolSaveContent()
-        {
-            if (IsToolDesc)
-                _toolInvokeDesc.ContentChange = ToolInvokeDesc.ContentChangeInfo.File;
         }
 
         public void OpenFile(string fileName, bool doNotShowLayoutSelectionDialog = false)
@@ -192,13 +170,11 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         {
             var existingEntries = File.Exists(previousFileName) ? ReadBarEntriesFromFileName(previousFileName) : new List<Bar.Entry>();
 
-            existingEntries = existingEntries.ForEntry(Bar.EntryType.Layout, LayoutName, 0, entry => LayoutEditor.Layout.Write(entry.Stream));
-            existingEntries = existingEntries.ForEntry(Bar.EntryType.Imgz, ImagesName, 0, entry => Imgz.Write(entry.Stream, LayoutEditor.Images));
-
             using (var stream = File.Create(fileName))
-                Bar.Write(stream, existingEntries);
+                Bar.Write(stream, CurrentEditor.Save(existingEntries));
 
-            ToolSaveContent();
+            if (IsToolDesc)
+                _toolInvokeDesc.ContentChange = ToolInvokeDesc.ContentChangeInfo.File;
         }
 
         private bool OpenBarContent(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
@@ -206,9 +182,9 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             var layoutEntries = entries.Count(x => x.Type == Bar.EntryType.Layout);
             var sequenceEntries = entries.Count(x => x.Type == Bar.EntryType.Seqd);
 
-            if (sequenceEntries > 0)
+            if (DoesContainSequenceAnimations(entries))
                 return Open2dd(entries, doNotShowLayoutSelectionDialog);
-            if (layoutEntries > 0)
+            if (DoesContainLayoutAnimations(entries))
                 return Open2ld(entries, doNotShowLayoutSelectionDialog);
 
             throw new Exception("The specified file does not contain any sequence or layout content to be played.");
@@ -287,21 +263,19 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 
         private void OpenLayout(LayoutEntryModel layoutEntryModel)
         {
-            LayoutName = layoutEntryModel.Layout.Name;
-            ImagesName = layoutEntryModel.Images.Name;
+            AnimationName = layoutEntryModel.Layout.Name;
+            SpriteName = layoutEntryModel.Images.Name;
 
-            SequenceEditor.SelectedSequence = layoutEntryModel.Layout.Value.SequenceItems.FirstOrDefault();
-            SequenceEditor.SelectedImage = layoutEntryModel.Images.Value.FirstOrDefault();
-
-            _texturesViewModel = new TexturesViewModel(layoutEntryModel.Images.Value);
+            var texturesViewModel = new TexturesViewModel(layoutEntryModel.Images.Value);
 
             var layoutEditorViewModel = new LayoutEditorViewModel(this, this, EditorDebugRenderingService)
             {
-                SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout.Value, _texturesViewModel, EditorDebugRenderingService),
+                SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout.Value, texturesViewModel, EditorDebugRenderingService),
                 Layout = layoutEntryModel.Layout.Value,
                 Images = layoutEntryModel.Images.Value
             };
 
+            CurrentEditor = layoutEditorViewModel;
             OnControlChanged?.Invoke(new LayoutEditorView()
             {
                 DataContext = layoutEditorViewModel
@@ -312,5 +286,11 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         {
             MessageBox.Show("Sequence");
         }
+
+        private static bool DoesContainSequenceAnimations(IEnumerable<Bar.Entry> entries) =>
+            entries.Any(x => x.Type == Bar.EntryType.Seqd);
+
+        private static bool DoesContainLayoutAnimations(IEnumerable<Bar.Entry> entries) =>
+            entries.Any(x => x.Type == Bar.EntryType.Layout);
     }
 }
