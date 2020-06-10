@@ -1,8 +1,9 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Common.Archives;
 using OpenKh.Engine;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
+using OpenKh.Game.Debugging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Kh2.Contextes;
@@ -51,12 +52,16 @@ namespace OpenKh.Game.Infrastructure
 
         public Kernel(IDataContent dataContent)
         {
+            Log.Info("Initialize kernel");
             _dataContent = dataContent;
 
             FontContext = new FontContext();
             MessageProvider = new Kh2MessageProvider();
             RegionId = DetectRegion(dataContent);
+            Log.Info($"Region={Region} Language={Language}");
+
             IsReMix = IsReMixFileExists(dataContent, Region);
+            Log.Info($"ReMIX={IsReMix}");
 
             // Load files in the same order as KH2 does
             ObjEntries = LoadFile("00objentry.bin", stream => Objentry.Read(stream));
@@ -77,11 +82,13 @@ namespace OpenKh.Game.Infrastructure
 
             if (Language == "jp")
             {
+                Log.Info($"Use Japanese text encoding");
                 SystemMessageContext = FontContext.ToKh2JpSystemTextContext();
                 EventMessageContext = FontContext.ToKh2JpEventTextContext();
             }
             else
             {
+                Log.Info($"Use International text encoding");
                 SystemMessageContext = FontContext.ToKh2EuSystemTextContext();
                 EventMessageContext = FontContext.ToKh2EuEventTextContext();
             }
@@ -134,7 +141,10 @@ namespace OpenKh.Game.Infrastructure
             {
                 var testFileName = $"menu/{Constants.Regions[i]}/title.2ld";
                 if (dataContent.FileExists(testFileName))
+                {
+                    Log.Info($"RegionId={i}");
                     return i;
+                }
             }
 
             throw new Exception("Unable to detect any region for the game. Some files are potentially missing.");

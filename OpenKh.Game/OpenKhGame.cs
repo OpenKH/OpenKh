@@ -4,6 +4,7 @@ using OpenKh.Game.DataContent;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
+using OpenKh.Kh2;
 using System;
 using System.IO;
 
@@ -24,6 +25,7 @@ namespace OpenKh.Game
         {
             set
             {
+                Log.Info($"State={value}");
                 switch (value)
                 {
                     case 0:
@@ -40,6 +42,9 @@ namespace OpenKh.Game
                         _debugOverlay.OnUpdate = state.DebugUpdate;
                         _debugOverlay.OnDraw = state.DebugDraw;
                         break;
+                    default:
+                        Log.Err($"Invalid state {value}");
+                        break;
                 }    
             }
         }
@@ -48,7 +53,11 @@ namespace OpenKh.Game
         {
             _dataContent = CreateDataContent(".", "KH2.IDX", "KH2.IMG");
             if (Kernel.IsReMixFileHasHdAssetHeader(_dataContent, "fm"))
+            {
+                Log.Info("ReMIX files with HD asset header detected");
                 _dataContent = new HdAssetContent(_dataContent);
+            }
+
             _dataContent = new SafeDataContent(_dataContent);
 
             _kernel = new Kernel(_dataContent);
@@ -56,6 +65,7 @@ namespace OpenKh.Game
             var resolutionWidth = _kernel.IsReMix ?
                 Global.ResolutionRemixWidth :
                 Global.ResolutionWidth;
+            Log.Info($"Internal game resolution set to {resolutionWidth}x{Global.ResolutionHeight}");
 
             graphics = new GraphicsDeviceManager(this)
             {
@@ -134,8 +144,11 @@ namespace OpenKh.Game
 
         private static IDataContent CreateDataContent(string basePath, string idxFileName, string imgFileName)
         {
+            Log.Info($"Base directory is {basePath}");
             if (File.Exists(idxFileName) && File.Exists(imgFileName))
             {
+                Log.Info($"{idxFileName} and {imgFileName} has been found");
+
                 var imgStream = File.OpenRead(imgFileName);
                 var idxDataContent = File.OpenRead(idxFileName)
                     .Using(stream => new IdxDataContent(stream, imgStream));
@@ -146,7 +159,10 @@ namespace OpenKh.Game
                 );
             }
             else
+            {
+                Log.Info($"No {idxFileName} or {imgFileName}, loading extracted files");
                 return new StandardDataContent(basePath);
+            }
         }
     }
 }
