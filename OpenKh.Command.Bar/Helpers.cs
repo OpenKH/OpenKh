@@ -31,7 +31,7 @@ namespace OpenKh.Command.Bar
                 [EntryType.Pax] = "pax",
                 [EntryType.MapCollision2] = "coctmap",
                 [EntryType.AnimationLimit] = "animlimit",
-                [EntryType.Unknown21] = "unk21",
+                [EntryType.BobDescriptor] = "bobdesc",
                 [EntryType.AnimationLoader] = "animload",
                 [EntryType.ModelCollision] = "coctmodel",
                 [EntryType.Imgd] = "imd",

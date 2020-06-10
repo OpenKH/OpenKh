@@ -67,7 +67,7 @@ namespace OpenKh.Kh2
 			Pax = 18,
             MapCollision2 = 19,
             AnimationLimit = 20,
-            Unknown21 = 21,
+            BobDescriptor = 21,
             AnimationLoader = 22,
             ModelCollision = 23,
 			Imgd = 24,

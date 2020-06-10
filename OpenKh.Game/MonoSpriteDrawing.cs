@@ -260,6 +260,7 @@ namespace OpenKh.Game
                 _shader.Texture0 = _lastTextureUsed;
                 _shader.ProjectionView = _projectionView;
                 _shader.WorldView = Matrix.Identity;
+                _shader.ModelView = Matrix.Identity;
                 _shader.TextureRegionU = _textureRegionU;
                 _shader.TextureRegionV = _textureRegionV;
                 _shader.TextureWrapModeU = _textureWrapU;

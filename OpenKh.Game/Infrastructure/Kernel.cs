@@ -7,6 +7,7 @@ using OpenKh.Game.Debugging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Kh2.Contextes;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.System;
 using System;
 using System.Collections.Generic;
@@ -104,23 +105,22 @@ namespace OpenKh.Game.Infrastructure
         {
             var bar = _dataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
-            bar.ForEntry("ftst", stream => Ftst = Kh2.System.Ftst.Read(stream));
-            bar.ForEntry("item", stream => Item = Kh2.System.Item.Read(stream));
-            bar.ForEntry("tsrs", stream => Trsr = Kh2.System.Trsr.Read(stream));
+            Ftst = bar.ForEntry("ftst", Bar.EntryType.List, Kh2.System.Ftst.Read);
+            Item = bar.ForEntry("item", Bar.EntryType.List, Kh2.System.Item.Read);
+            Trsr = bar.ForEntry("tsrs", Bar.EntryType.List, Kh2.System.Trsr.Read);
         }
 
         private void LoadBattle(string fileName)
         {
             var bar = _dataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
-            bar.ForEntry("fmlv", stream => Fmlv = Kh2.Battle.Fmlv.Read(stream));
-            bar.ForEntry("lvup", stream => Lvup = Kh2.Battle.Lvup.Read(stream).Characters);
+            Fmlv = bar.ForEntry("fmlv", Bar.EntryType.List, Kh2.Battle.Fmlv.Read);
+            Lvup = bar.ForEntry("lvup", Bar.EntryType.List, Kh2.Battle.Lvup.Read)?.Characters;
         }
 
         private void LoadFontInfo(string fileName)
         {
-            var bar = _dataContent.FileOpen(fileName)
-                .Using(stream => Bar.Read(stream));
+            var bar = _dataContent.FileOpen(fileName).Using(Bar.Read);
             FontContext.Read(bar);
         }
 
@@ -132,7 +132,7 @@ namespace OpenKh.Game.Infrastructure
             var messageBar = _dataContent.FileOpen($"msg/{Language}/sys.bar")
                 .Using(stream => Bar.Read(stream));
 
-            MessageProvider.Load(messageBar.ForEntry(worldId, stream => Msg.Read(stream)));
+            MessageProvider.Load(messageBar.ForEntry(worldId, Bar.EntryType.List, Msg.Read));
         }
 
         private static int DetectRegion(IDataContent dataContent)

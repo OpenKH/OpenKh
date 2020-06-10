@@ -10,6 +10,7 @@ namespace OpenKh.Game.Shaders
     {
         public static readonly Vector2 DefaultTextureRegion = new Vector2(0, 1);
 
+        private readonly EffectParameter _modelViewParameter;
         private readonly EffectParameter _worldViewParameter;
         private readonly EffectParameter _projectionViewParameter;
         private readonly EffectParameter _parameterTextureRegionU;
@@ -21,6 +22,7 @@ namespace OpenKh.Game.Shaders
         public KingdomShader(ContentManager contentManager)
         {
             Effect = contentManager.Load<Effect>("KingdomShader");
+            _modelViewParameter = Effect.Parameters["ModelView"];
             _worldViewParameter = Effect.Parameters["WorldView"];
             _projectionViewParameter = Effect.Parameters["ProjectionView"];
             _parameterTextureRegionU = Effect.Parameters["TextureRegionU"];
@@ -29,6 +31,7 @@ namespace OpenKh.Game.Shaders
             _parameterTextureWrapModeV = Effect.Parameters["TextureWrapModeV"];
             _parameterTexture0 = Effect.Parameters["Texture0"];
 
+            ModelView = Matrix.Identity;
             WorldView = Matrix.Identity;
             ProjectionView = Matrix.Identity;
             TextureRegionU = DefaultTextureRegion;
@@ -38,6 +41,12 @@ namespace OpenKh.Game.Shaders
         }
 
         public Effect Effect { get; }
+
+        public Matrix ModelView
+        {
+            get => _modelViewParameter.GetValueMatrix();
+            set => _modelViewParameter.SetValue(value);
+        }
 
         public Matrix WorldView
         {

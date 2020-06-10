@@ -7,6 +7,7 @@
 	#define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
+matrix ModelView;
 matrix WorldView;
 matrix ProjectionView;
 float2 TextureRegionU;
@@ -62,7 +63,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 {
 	VertexShaderOutput output = (VertexShaderOutput)0;
 
-	output.Position = mul(mul(input.Position, WorldView), ProjectionView);
+	output.Position = mul(mul(mul(input.Position, ModelView), WorldView), ProjectionView);
 	output.TextureUv = input.TextureUv;
 	output.Color = input.Color;
 
