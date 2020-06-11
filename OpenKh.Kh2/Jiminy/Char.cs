@@ -9,7 +9,7 @@ namespace OpenKh.Kh2.Jiminy
     {
         public const int MagicCode = 0x48434D4A;
 
-        [Data] public byte Category { get; set; }
+        [Data] public byte World { get; set; }
         [Data] public byte Picture { get; set; } //index jmface
         [Data] public byte PictureBgColor { get; set; }
         [Data] public byte Padding { get; set; }
@@ -17,7 +17,7 @@ namespace OpenKh.Kh2.Jiminy
         [Data] public ushort Title { get; set; }
         [Data] public ushort Description { get; set; }
         [Data] public ushort SecondTitle { get; set; } //used for disney and ff characters, describes where they come from
-        [Data] public ushort ObjectId { get; set; }
+        [Data] public ushort ObjectId { get; set; } //00objentry
         [Data] public ushort Unk0E { get; set; }
         [Data] public ushort Unk10 { get; set; }
         [Data] public short PositionX { get; set; } //z_un_0029e4c8

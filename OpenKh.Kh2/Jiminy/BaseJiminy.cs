@@ -8,7 +8,7 @@ namespace OpenKh.Kh2.Jiminy
     public class BaseJiminy<T> : IEnumerable<T>
     {
         [Data] public int MagicCode { get; set; }
-        [Data] public int Unk04 { get; set; }
+        [Data] public int Region { get; set; }
         [Data] public int Count { get => Items.TryGetCount(); set => Items = Items.CreateOrResize(value); }
         [Data] public int Padding { get; set; }
         [Data] public List<T> Items { get; set; }
@@ -20,11 +20,10 @@ namespace OpenKh.Kh2.Jiminy
             new BaseJiminy<T>()
             {
                 MagicCode = magic,
-                Unk04 = 12,
+                Region = 12,
                 Padding = 0,
                 Items = items
             }.Write(stream);
-
         public void Write(Stream stream) => BinaryMapping.WriteObject(stream, this);
 
         public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
