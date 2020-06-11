@@ -8,21 +8,23 @@ namespace OpenKh.Game.DataContent
     {
         private readonly string _baseDirectory;
 
-        public StandardDataContent(string baseDirectory = ".")
+        public StandardDataContent(string baseDirectory)
         {
             _baseDirectory = baseDirectory;
         }
 
-        public bool FileExists(string fileName) => File.Exists(fileName);
+        public bool FileExists(string fileName) => File.Exists(GetPath(fileName));
 
         public Stream FileOpen(string path)
         {
             Log.Info($"Load file {path}");
-            var fileName = Path.Combine(_baseDirectory, path);
+            var fileName = GetPath(path);
             if (File.Exists(fileName))
                 return File.OpenRead(fileName);
 
             return null;
         }
+
+        private string GetPath(string path) => Path.Combine(_baseDirectory, path);
     }
 }

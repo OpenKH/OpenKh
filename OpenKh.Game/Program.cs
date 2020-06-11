@@ -6,14 +6,14 @@ namespace OpenKh.Game
     public static class Program
     {
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Log.Info("Boot");
 
             try
             {
-                using (var game = new OpenKhGame())
-                    game.Run();
+                using (var game = new OpenKhGame(args))
+                        game.Run();
             }
             catch (Exception ex)
             {

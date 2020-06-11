@@ -7,11 +7,13 @@ using OpenKh.Game.States;
 using OpenKh.Kh2;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace OpenKh.Game
 {
     public class OpenKhGame : Microsoft.Xna.Framework.Game, IStateChange
     {
+        private const string DefaultContentPath = ".";
         private GraphicsDeviceManager graphics;
 
         private readonly IDataContent _dataContent;
@@ -49,9 +51,11 @@ namespace OpenKh.Game
             }
         }
 
-        public OpenKhGame()
+        public OpenKhGame(string[] args)
         {
-            _dataContent = CreateDataContent(".", "KH2.IDX", "KH2.IMG");
+            var contentPath = args.FirstOrDefault() ?? DefaultContentPath;
+
+            _dataContent = CreateDataContent(contentPath, "KH2.IDX", "KH2.IMG");
             if (Kernel.IsReMixFileHasHdAssetHeader(_dataContent, "fm"))
             {
                 Log.Info("ReMIX files with HD asset header detected");
