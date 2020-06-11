@@ -20,9 +20,9 @@ namespace OpenKh.Kh2.Jiminy
         [Data] public ushort ObjectId { get; set; } //00objentry
         [Data] public ushort Unk0E { get; set; }
         [Data] public ushort Unk10 { get; set; }
-        [Data] public short PositionX { get; set; } //z_un_0029e4c8
-        [Data] public short PositionY { get; set; }
-        [Data] public short RotationX { get; set; }
+        [Data] public short ObjectPositionX { get; set; } //z_un_0029e4c8
+        [Data] public short ObjectPositionY { get; set; }
+        [Data] public short ObjectRotationX { get; set; }
         [Data] public short Unk18 { get; set; }
         [Data] public short Unk1A { get; set; }
         [Data] public float Unk1C { get; set; } //this is read like a float, but the it behaves different?! third byte controls the size
