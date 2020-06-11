@@ -40,6 +40,6 @@ namespace OpenKh.Kh2.Jiminy
         }
 
         public static List<Puzz> Read(Stream stream) => BaseJiminy<Puzz>.Read(stream).Items;
-        public static void Write(Stream stream, IEnumerable<Puzz> items) => BaseJiminy<Puzz>.Write(stream, MagicCode, items.ToList());
+        public static void Write(Stream stream, int version, IEnumerable<Puzz> items) => BaseJiminy<Puzz>.Write(stream, MagicCode, version, items.ToList());
     }
 }

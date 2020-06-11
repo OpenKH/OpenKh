@@ -16,11 +16,11 @@ namespace OpenKh.Kh2.Jiminy
         static BaseJiminy() => BinaryMapping.SetMemberLengthMapping<BaseJiminy<T>>(nameof(Items), (o, m) => o.Count);
 
         public static BaseJiminy<T> Read(Stream stream) => BinaryMapping.ReadObject<BaseJiminy<T>>(stream);
-        public static void Write(Stream stream, int magic, List<T> items) =>
+        public static void Write(Stream stream, int magic, int version, List<T> items) =>
             new BaseJiminy<T>()
             {
                 MagicCode = magic,
-                Version = 12,
+                Version = version,
                 Padding = 0,
                 Items = items
             }.Write(stream);

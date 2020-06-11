@@ -18,6 +18,6 @@ namespace OpenKh.Kh2.Jiminy
         [Data] public ushort Text { get; set; }
 
         public List<Albu> Read(Stream stream) => BaseJiminy<Albu>.Read(stream).Items;
-        public void Write(Stream stream, IEnumerable<Albu> items) => BaseJiminy<Albu>.Write(stream, MagicCode, items.ToList());
+        public void Write(Stream stream, int version, IEnumerable<Albu> items) => BaseJiminy<Albu>.Write(stream, MagicCode, version, items.ToList());
     } 
 }

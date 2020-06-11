@@ -29,7 +29,7 @@ namespace OpenKh.Kh2.Jiminy
         [Data] public float Unk20 { get; set; }
 
         public static List<Char> Read(Stream stream) => BaseJiminy<Char>.Read(stream).Items;
-        public static void Write(Stream stream, IEnumerable<Char> items) => BaseJiminy<Char>.Write(stream, MagicCode, items.ToList());
+        public static void Write(Stream stream, int version, IEnumerable<Char> items) => BaseJiminy<Char>.Write(stream, MagicCode, version, items.ToList());
 
     }
 }

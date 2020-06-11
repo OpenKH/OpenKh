@@ -19,6 +19,6 @@ namespace OpenKh.Kh2.Jiminy
         [Data] public ushort Unk0E { get; set; }
 
         public List<Ques> Read(Stream stream) => BaseJiminy<Ques>.Read(stream).Items;
-        public void Write(Stream stream, IEnumerable<Ques> items) => BaseJiminy<Ques>.Write(stream, MagicCode, items.ToList());
+        public void Write(Stream stream, int version, IEnumerable<Ques> items) => BaseJiminy<Ques>.Write(stream, MagicCode, version, items.ToList());
     }
 }

@@ -15,6 +15,6 @@ namespace OpenKh.Kh2.Jiminy
         [Data] public ushort Padding { get; set; }
 
         public List<Limi> Read(Stream stream) => BaseJiminy<Limi>.Read(stream).Items;
-        public void Write(Stream stream, IEnumerable<Limi> items) => BaseJiminy<Limi>.Write(stream, MagicCode, items.ToList());
+        public void Write(Stream stream, int version, IEnumerable<Limi> items) => BaseJiminy<Limi>.Write(stream, MagicCode, version, items.ToList());
     }
 }
