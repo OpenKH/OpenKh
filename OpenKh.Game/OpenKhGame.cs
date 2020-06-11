@@ -13,7 +13,7 @@ namespace OpenKh.Game
 {
     public class OpenKhGame : Microsoft.Xna.Framework.Game, IStateChange
     {
-        private const string DefaultContentPath = "./data";
+        private const string DefaultContentPath = ".";
         private GraphicsDeviceManager graphics;
 
         private readonly IDataContent _dataContent;
