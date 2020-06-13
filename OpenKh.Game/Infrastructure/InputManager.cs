@@ -1,66 +1,51 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Linq;
+
+using OpenKh.Game.Infrastructure.Input;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OpenKh.Game.Infrastructure
 {
     public class InputManager
     {
-        private GamePadState pad;
-        private KeyboardState keyboard;
-        private KeyboardState prevKeyboard;
-        private RepeatableKeyboard repeatableKeyboard = new RepeatableKeyboard();
+        private List<IInputDevice> _devices;
 
-        public bool IsDebug => repeatableKeyboard.IsKeyRepeat(Keys.Tab);
-        public bool IsShift => repeatableKeyboard.IsKeyRepeat(Keys.RightShift);
-        public bool IsDebugRight => repeatableKeyboard.IsKeyRepeat(Keys.Right);
-        public bool IsDebugLeft => repeatableKeyboard.IsKeyRepeat(Keys.Left);
-        public bool IsDebugUp => repeatableKeyboard.IsKeyRepeat(Keys.Up);
-        public bool IsDebugDown => repeatableKeyboard.IsKeyRepeat(Keys.Down);
+        public bool IsDebug => _devices.Any(x => x.IsDebug);
+        public bool IsShift => _devices.Any(x => x.IsShift);
+        public bool IsDebugRight => _devices.Any(x => x.IsDebugRight);
+        public bool IsDebugLeft => _devices.Any(x => x.IsDebugLeft);
+        public bool IsDebugUp => _devices.Any(x => x.IsDebugUp);
+        public bool IsDebugDown => _devices.Any(x => x.IsDebugDown);
 
-        public bool IsExit => pad.Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape);
-        public bool IsUp => Up && !prevKeyboard.IsKeyDown(Keys.Up);
-        public bool IsDown => Down && !prevKeyboard.IsKeyDown(Keys.Down);
-        public bool IsLeft => Left && !prevKeyboard.IsKeyDown(Keys.Left);
-        public bool IsRight => Right && !prevKeyboard.IsKeyDown(Keys.Right);
-        public bool IsCircle => repeatableKeyboard.IsKeyRepeat(Keys.K);
-        public bool IsCross => repeatableKeyboard.IsKeyRepeat(Keys.L);
+        public bool IsExit => _devices.Any(x => x.IsExit);
+        public bool IsUp => _devices.Any(x => x.IsUp);
+        public bool IsDown => _devices.Any(x => x.IsDown);
+        public bool IsLeft => _devices.Any(x => x.IsLeft);
+        public bool IsRight => _devices.Any(x => x.IsRight);
+        public bool IsCircle => _devices.Any(x => x.IsCircle);
+        public bool IsCross => _devices.Any(x => x.IsCross);
 
-        public bool Up => keyboard.IsKeyDown(Keys.Up);
-        public bool Down => keyboard.IsKeyDown(Keys.Down);
-        public bool Left => keyboard.IsKeyDown(Keys.Left);
-        public bool Right => keyboard.IsKeyDown(Keys.Right);
-        public bool A => keyboard.IsKeyDown(Keys.A);
-        public bool D => keyboard.IsKeyDown(Keys.D);
-        public bool S => keyboard.IsKeyDown(Keys.S);
-        public bool W => keyboard.IsKeyDown(Keys.W);
+        public bool Up => _devices.Any(x => x.Up);
+        public bool Down => _devices.Any(x => x.Down);
+        public bool Left => _devices.Any(x => x.Left);
+        public bool Right => _devices.Any(x => x.Right);
+        public bool A =>_devices.Any(x => x.A);
+        public bool D =>_devices.Any(x => x.D);
+        public bool S =>_devices.Any(x => x.S);
+        public bool W => _devices.Any(x => x.W);
 
-        public void Update(GameTime gameTime)
+        public InputManager()
         {
-            pad = GamePad.GetState(PlayerIndex.One);
-            prevKeyboard = keyboard;
-            keyboard = Keyboard.GetState();
-
-            var pressedKeys = prevKeyboard.GetPressedKeys();
-            var pressingKeys = keyboard.GetPressedKeys();
-
-            foreach (var keyDown in pressingKeys.Except(pressedKeys))
+            _devices = new List<IInputDevice>()
             {
-                repeatableKeyboard.PressKey(keyDown);
-            }
-
-            foreach (var keyUp in pressedKeys.Except(pressingKeys))
-            {
-                repeatableKeyboard.ReleaseKey(keyUp);
-            }
-
-            var seconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            foreach (var keepDown in pressedKeys.Intersect(pressingKeys))
-            {
-                repeatableKeyboard.UpdateKey(keepDown, seconds);
-            }
+                new KeyboardInput(),
+                new GamepadInput(),
+            };
         }
+
+        public void Update() => _devices.ForEach(device => device.Update());
     }
 }
