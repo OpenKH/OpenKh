@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - 00objentry.bin
+# [Kingdom Hearts II](../../index.md) - 00objentry.bin
 
 Contains a definition of every object and it's parameters.
 

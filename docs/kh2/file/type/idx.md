@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - IDX (Index file table)
+# [Kingdom Hearts II](../../index.md) - IDX (Index file table)
 
 Every game file is packed into an IMG file, a big chunk of data that contains everything. The file that contains information on how the files are stored is the IDX.
 

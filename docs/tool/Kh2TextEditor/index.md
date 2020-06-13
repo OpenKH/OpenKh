@@ -1,4 +1,4 @@
-# [OpenKh Tool Documentation](../../../OpenKh.Kh2/Messages) - KH2 Text Editor
+# [OpenKh Tool Documentation](../../../OpenKh.Kh2/Messages.md) - KH2 Text Editor
 
 Welcome to the official OpenKh tool documentation!
 This document assumes you are already familiar with either compiling or acquiring the released version of the KH2 Text Editor bundled with OpenKh and have a dumped copy of the ISO. If you do not know how, consult the nearest Organizer for help.

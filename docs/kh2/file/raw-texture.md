@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../index) - Raw Texture
+# [Kingdom Hearts II](../index.md) - Raw Texture
 
 This is used by 3D models of Kingdom Hearts II to give them a texture.
 
@@ -91,7 +91,7 @@ This table is also unknown, but the few information found points to describe how
 | 88     | int64  | Always 0x16
 | 96     | int64  | 
 | 104    | int64  | Always 0x14
-| 112    | int64  | [GS TEX0 register](../../common/tm2#gstex)
+| 112    | int64  | [GS TEX0 register](../../common/tm2.md#gstex)
 | 120    | int64  | [Texture Wrap Mode](#texture-wrap-mode)
 | 128    | int64  | 
 | 136    | int64  | Always 8

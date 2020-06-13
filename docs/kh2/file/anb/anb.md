@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - ANB
+# [Kingdom Hearts II](../../index.md) - ANB
 
 Okay, so this doc is is for people to look at and think “so that’s what an ANB does”.
 

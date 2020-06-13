@@ -1,4 +1,4 @@
-# [Kingdom Hearts Birth By Sleep](index) - Archive format
+# [Kingdom Hearts Birth By Sleep](index.md) - Archive format
 
 The game loads all the game files from Birth By Sleep Archive, in short `BBSA`.
 
@@ -44,7 +44,7 @@ A typical directory name for a partition is `arc/boss`.
 
 ### Partition file entry
 
-All the file names are stored without extension, but officially they have [`.arc`](arc) extension (source: Birth By Sleep remastered for PS3/PS4).
+All the file names are stored without extension, but officially they have [`.arc`](arc.md) extension (source: Birth By Sleep remastered for PS3/PS4).
 
 | Offset | Type  | Description
 |--------|-------|------------

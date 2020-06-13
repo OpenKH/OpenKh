@@ -1,6 +1,6 @@
-# [Kingdom Hearts Birth By Sleep](index) - ARC format
+# [Kingdom Hearts Birth By Sleep](index.md) - ARC format
 
-The ARC format (presumability a shorten of Archive) is a container of files with a dependency system feature to other files in a [BBSA](bbsa) archive.
+The ARC format (presumability a shorten of Archive) is a container of files with a dependency system feature to other files in a [BBSA](bbsa.md) archive.
 
 ## File format
 

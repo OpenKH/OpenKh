@@ -1,6 +1,6 @@
-# [Kingdom Hearts Birth By Sleep](index) - Font archive
+# [Kingdom Hearts Birth By Sleep](index.md) - Font archive
 
-At the path `arc/system/`, the two files `font.arc` (Japanese font) and `fonten.arc` (European font) can be found. Those files are nothing more than an [archive](arc) with all the information needed to render a character or a font image.
+At the path `arc/system/`, the two files `font.arc` (Japanese font) and `fonten.arc` (European font) can be found. Those files are nothing more than an [archive](arc.md) with all the information needed to render a character or a font image.
 
 ## Font types
 

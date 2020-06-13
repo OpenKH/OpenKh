@@ -1,12 +1,12 @@
-# [Kingdom Hearts II](../../index) - MSN
+# [Kingdom Hearts II](../../index.md) - MSN
 
-Mission file. They are located in `msn/{language}/` and describe how a certain map should behave. Internally they are just [bar](bar) files.
+Mission file. They are located in `msn/{language}/` and describe how a certain map should behave. Internally they are just [bar](bar.md) files.
 
 ## Mission
 
 This is the entry point of the file. It is a binary-type file and it always have as a name `{WORLD_ID}{MAP_INDEX}`
 
-eg. for the file `EH21_MS101`, where `EH` is the [world](../../worlds) and `21` is the map index, the mission name is called `EH21`.
+eg. for the file `EH21_MS101`, where `EH` is the [world](../../worlds.md) and `21` is the map index, the mission name is called `EH21`.
 
 How this file is read is currently unknown.
 
