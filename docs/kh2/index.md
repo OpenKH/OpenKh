@@ -7,24 +7,24 @@
 * [Worlds](worlds.md)
 * [File types](file-type.md)
   
-  * [IDX/IMG](file/type/idx)
-  * [BAR](file/type/bar)
-  * [ARD](file/type/ard)
+  * [IDX/IMG](file/type/idx.md)
+  * [BAR](file/type/bar.md)
+  * [ARD](file/type/ard.md)
   * [MAP](file/map.md)
-  * [MSG](file/type/msg)
-  * [MSN](file/type/msn)
-  * [ANB](file/anb/anb)
-  * [AI](file/ai/index)
-  * [IMD](file/type/image#imgd)
-  * [IMZ](file/type/image#imgz)
-  * [FAC](file/type/image#fac)
-  * [MDLX](file/type/mdlx)
+  * [MSG](file/type/msg.md)
+  * [MSN](file/type/msn.md)
+  * [ANB](file/anb/anb.md)
+  * [AI](file/ai/index.md)
+  * [IMD](file/type/image.md#imgd)
+  * [IMZ](file/type/image.md#imgz)
+  * [FAC](file/type/image.md#fac)
+  * [MDLX](file/type/mdlx.md)
   
 * Other files
 
-    * [00battle.bin](file/type/00battle)
-    * [00objentry.bin](file/type/00objentry)
-    * [03system.bin](file/type/03system)
+    * [00battle.bin](file/type/00battle.md)
+    * [00objentry.bin](file/type/00objentry.md)
+    * [03system.bin](file/type/03system.md)
 
 
 

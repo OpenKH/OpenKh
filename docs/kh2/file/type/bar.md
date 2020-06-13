@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - BAR (Binary ARchives)
+# [Kingdom Hearts II](../../index.md) - BAR (Binary ARchives)
 
 Most of the game's information is stored within these files in order to keep everything organized and easily accessable by the game. These files are kind of like ZIP files, with certain limitations. 
 
@@ -91,7 +91,7 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 4 | 3D Model data (Encapsulated VIF packets containing Vertices, Skinning, Bones for MDLX, etc.) | MDLX - MAP
 | 5 | Mesh Occlusion/Obstruction (Probably Culling) | MAP
 | 6 | Map Collision Data | MAP 
-| 7 | [RAW Texture](../raw-texture) | MDLX - MAP
+| 7 | [RAW Texture](../raw-texture.md) | MDLX - MAP
 | 8 | DPX (A bit unknown) | PAX
 | 9 | Animation Data | ANB
 | 10 | Texture Data | MAP - minigame/xxx.bar

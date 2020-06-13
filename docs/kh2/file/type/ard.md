@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - ARD
+# [Kingdom Hearts II](../../index.md) - ARD
 
 Object disposition in a map. Internally it is a [bar](bar.md) which contains a bunch of information.
 
@@ -19,7 +19,7 @@ Entry
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | int   | [Model ID](./00objentry)
+| 00     | int   | [Model ID](./00objentry.md)
 | 04     | float | Position X  
 | 08     | float | Position Z
 | 0c     | float | Position Y
