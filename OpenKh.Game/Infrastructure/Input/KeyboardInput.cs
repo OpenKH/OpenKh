@@ -32,8 +32,8 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool IsLeft => Left && !prevKeyboard.IsKeyDown(Keys.Left);
         public bool IsRight => Right && !prevKeyboard.IsKeyDown(Keys.Right);
         public bool IsW => W && !prevKeyboard.IsKeyDown(Keys.W);
-        public bool IsA => A && !prevKeyboard.IsKeyDown(Keys.A);
         public bool IsS => S && !prevKeyboard.IsKeyDown(Keys.S);
+        public bool IsA => A && !prevKeyboard.IsKeyDown(Keys.A);
         public bool IsD => D && !prevKeyboard.IsKeyDown(Keys.D);
 
         public bool IsCircle => keyboard.IsKeyDown(Keys.K) && !prevKeyboard.IsKeyDown(Keys.K);
@@ -47,10 +47,10 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool Down => keyboard.IsKeyDown(Keys.Down);
         public bool Left => keyboard.IsKeyDown(Keys.Left);
         public bool Right => keyboard.IsKeyDown(Keys.Right);
+        public bool W => keyboard.IsKeyDown(Keys.W);
+        public bool S => keyboard.IsKeyDown(Keys.S);
         public bool A => keyboard.IsKeyDown(Keys.A);
         public bool D => keyboard.IsKeyDown(Keys.D);
-        public bool S => keyboard.IsKeyDown(Keys.S);
-        public bool W => keyboard.IsKeyDown(Keys.W);
 
         public bool IsDebugUp => IsUp;
         public bool IsDebugDown => IsDown;

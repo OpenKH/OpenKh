@@ -8,8 +8,8 @@
         bool IsRight { get; }
 
         bool IsW { get; }
-        bool IsA { get; }
         bool IsS { get; }
+        bool IsA { get; }
         bool IsD { get; }
 
         bool IsCircle { get; }
@@ -25,8 +25,8 @@
         bool Right { get; }
 
         bool W { get; }
-        bool A { get; }
         bool S { get; }
+        bool A { get; }
         bool D { get; }
 
         bool IsDebugUp { get; }

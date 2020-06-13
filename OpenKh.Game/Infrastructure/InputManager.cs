@@ -32,10 +32,10 @@ namespace OpenKh.Game.Infrastructure
         public bool Down => _devices.Any(x => x.Down);
         public bool Left => _devices.Any(x => x.Left);
         public bool Right => _devices.Any(x => x.Right);
+        public bool W => _devices.Any(x => x.W);
+        public bool S =>_devices.Any(x => x.S);
         public bool A =>_devices.Any(x => x.A);
         public bool D =>_devices.Any(x => x.D);
-        public bool S =>_devices.Any(x => x.S);
-        public bool W => _devices.Any(x => x.W);
 
         public InputManager()
         {

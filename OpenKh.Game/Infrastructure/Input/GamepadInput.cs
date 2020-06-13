@@ -12,8 +12,8 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool IsLeft => Left && prevPad.ThumbSticks.Right.X == 0.0f;
         public bool IsRight => Right && prevPad.ThumbSticks.Right.X == 0.0f;
         public bool IsW => W && prevPad.ThumbSticks.Left.Y == 0.0f;
-        public bool IsA => A && prevPad.ThumbSticks.Left.Y == 0.0f;
-        public bool IsS => S && prevPad.ThumbSticks.Left.X == 0.0f;
+        public bool IsS => S && prevPad.ThumbSticks.Left.Y == 0.0f;
+        public bool IsA => A && prevPad.ThumbSticks.Left.X == 0.0f; 
         public bool IsD => D && prevPad.ThumbSticks.Left.X == 0.0f;
 
         public bool IsCircle => pad.Buttons.B == ButtonState.Pressed && prevPad.Buttons.B != ButtonState.Pressed;
@@ -28,8 +28,8 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool Left => pad.ThumbSticks.Right.X < 0.0f;
         public bool Right => pad.ThumbSticks.Right.X > 0.0f;
         public bool W => pad.ThumbSticks.Left.Y > 0.0f;
-        public bool A => pad.ThumbSticks.Left.X < 0.0f; 
         public bool S => pad.ThumbSticks.Left.Y < 0.0f;
+        public bool A => pad.ThumbSticks.Left.X < 0.0f; 
         public bool D => pad.ThumbSticks.Left.X > 0.0f;
 
         public bool IsDebugUp => pad.DPad.Up == ButtonState.Pressed && prevPad.DPad.Up != ButtonState.Pressed;
