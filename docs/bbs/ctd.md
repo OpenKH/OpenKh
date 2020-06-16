@@ -81,7 +81,7 @@ Describe how a message should be presented on screen
 | 04    | Diamond borders
 | 05    | Invisible box
 
-### Text aligment
+### Text alignment
 
 | Value | Vertical | Horizontal | Text alignment
 |-------|----------|------------|----------------

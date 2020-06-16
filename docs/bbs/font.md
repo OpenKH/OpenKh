@@ -15,7 +15,7 @@ The following font types can be found in both font archives:
 
 ## Character mapping
 
-Internally, the game engine uses UCS as encoding, meaning that all the Shift-JIS text is ingested and converted on-the-fly to 2-bytes for each character. Then it does a look-up to both [INF for FontIcon](#inf-fonticon-variant) and [COD](#cod) to match and print that specific character by searching it using the Character ID.
+Internally, the game engine uses UCS as encoding, meaning that all the Shift-JIS text is ingested and converted on-the-fly to 2-bytes for each character. Then it does a look-up to both [INF for FontIcon](#inf---fonticon-variant) and [COD](#cod) to match and print that specific character by searching it using the Character ID.
 
 Embedded in the executable, a hard-coded switch table is responsible to convert the characters from `0x21` (`'!'`) to `0x7E` (`~`) into a UCS character.
 

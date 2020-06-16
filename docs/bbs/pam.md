@@ -1,4 +1,4 @@
-# Kingdom Hearts Birth by Sleep - PAM (Animation Container)
+# [Kingdom Hearts Birth by Sleep](index.md) - PAM (Animation Container)
 
 ### PAM Header
 

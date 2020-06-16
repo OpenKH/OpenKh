@@ -1,4 +1,4 @@
-# Kingdom Hearts I - Worlds
+# [Kingdom Hearts I](index.md) - Worlds
 
 | Id | World |
 |----|-------|
