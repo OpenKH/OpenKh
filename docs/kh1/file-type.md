@@ -1,4 +1,4 @@
-# Kingdom Hearts I File Types
+# [Kingdom Hearts I](index.md) File Types
 
 | Extension | Description | Tool |
 |-----------|-------------|------|

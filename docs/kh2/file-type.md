@@ -1,4 +1,4 @@
-# Kingdom Hearts II file types
+# [Kingdom Hearts II](index.md) - file types
 
 | Extension | Description | Tool | 
 |-----------|-------------|------|
