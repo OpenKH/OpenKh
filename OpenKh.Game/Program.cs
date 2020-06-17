@@ -10,6 +10,10 @@ namespace OpenKh.Game
         {
             Log.Info("Boot");
 
+#if DEBUG
+            using (var game = new OpenKhGame(args))
+                game.Run();
+#else
             try
             {
                 using (var game = new OpenKhGame(args))
@@ -23,6 +27,7 @@ namespace OpenKh.Game
 
                 throw ex;
             }
+#endif
 
             Log.Info("End");
             Log.Close();
