@@ -1,14 +1,18 @@
 ﻿using OpenKh.Game.Debugging;
 using System;
+using System.Reflection;
 
 namespace OpenKh.Game
 {
     public static class Program
     {
+        public static readonly string ProductVersion = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
         [STAThread]
         static void Main(string[] args)
         {
             Log.Info("Boot");
+            Log.Info($"Version {ProductVersion}");
 
 #if DEBUG
             using (var game = new OpenKhGame(args))
