@@ -149,12 +149,15 @@ namespace OpenKh.Game
         private static IDataContent CreateDataContent(string basePath, string idxFileName, string imgFileName)
         {
             Log.Info($"Base directory is {basePath}");
-            if (File.Exists(idxFileName) && File.Exists(imgFileName))
-            {
-                Log.Info($"{idxFileName} and {imgFileName} has been found");
 
-                var imgStream = File.OpenRead(imgFileName);
-                var idxDataContent = File.OpenRead(idxFileName)
+            var idxFullPath = Path.Combine(basePath, idxFileName);
+            var imgFullPath = Path.Combine(basePath, imgFileName);
+            if (File.Exists(idxFullPath) && File.Exists(imgFullPath))
+            {
+                Log.Info($"{idxFullPath} and {imgFullPath} has been found");
+
+                var imgStream = File.OpenRead(imgFullPath);
+                var idxDataContent = File.OpenRead(idxFullPath)
                     .Using(stream => new IdxDataContent(stream, imgStream));
                 return new MultipleDataContent(
                     new StandardDataContent(basePath),
@@ -164,7 +167,7 @@ namespace OpenKh.Game
             }
             else
             {
-                Log.Info($"No {idxFileName} or {imgFileName}, loading extracted files");
+                Log.Info($"No {idxFullPath} or {imgFullPath}, loading extracted files");
                 return new StandardDataContent(basePath);
             }
         }
