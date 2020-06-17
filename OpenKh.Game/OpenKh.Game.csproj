@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <InformationalVersion>0.0.0.0-local</InformationalVersion>
     <ApplicationIcon />
     <StartupObject />
   </PropertyGroup>
