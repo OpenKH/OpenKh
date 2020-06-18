@@ -1,4 +1,5 @@
 ﻿using OpenKh.Game.Debugging;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,7 +70,15 @@ namespace OpenKh.Game
             else
             {
                 Log.Info($"Load configuration file from {ActualConfigFilePath}");
-                _config = ActualConfig.ReadFromFile(ActualConfigFilePath) ?? ActualConfig.Default();
+                try
+                {
+                    _config = ActualConfig.ReadFromFile(ActualConfigFilePath) ?? ActualConfig.Default();
+                }
+                catch (Exception ex)
+                {
+                    // Do not close the entire game for silly reasons
+                    Log.Err(ex.Message);
+                }
             }
         }
 
