@@ -1,4 +1,4 @@
-using OpenKh.Game.Debugging;
+﻿using OpenKh.Game.Debugging;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,7 +39,7 @@ namespace OpenKh.Game
 
         private const string ConfigFilePath = "./config.yml";
         private static readonly string ActualConfigFilePath = Path.GetFullPath("./config.yml");
-        private static ActualConfig _config = new ActualConfig();
+        private static ActualConfig _config = ActualConfig.Default();
         private static CancellationTokenSource _tokenSource;
 
         public delegate void ConfigurationChange();
@@ -65,7 +65,7 @@ namespace OpenKh.Game
             else
             {
                 Log.Info($"Load configuration file from {ActualConfigFilePath}");
-                _config = ActualConfig.ReadFromFile(ActualConfigFilePath);
+                _config = ActualConfig.ReadFromFile(ActualConfigFilePath) ?? ActualConfig.Default();
             }
         }
 
