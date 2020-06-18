@@ -19,6 +19,7 @@ namespace OpenKh.Game
             public bool enforceInternationalTextEncoding { get; set; } = false;
             public string idxFilePath { get; set; } = "KH2.IDX";
             public string imgFilePath { get; set; } = "KH2.IMG";
+            public bool debugMode { get; set; } = true;
 
             internal static ActualConfig Default() => new ActualConfig();
 
@@ -54,6 +55,7 @@ namespace OpenKh.Game
         public static bool EnforceInternationalTextEncoding { get => _config.enforceInternationalTextEncoding; set => _config.enforceInternationalTextEncoding = value; }
         public static string IdxFilePath { get => _config.idxFilePath; set => _config.idxFilePath = value; }
         public static string ImgFilePath { get => _config.imgFilePath; set => _config.imgFilePath = value; }
+        public static bool DebugMode { get => _config.debugMode; set => _config.debugMode = value; }
 
         private static void InternalOpen()
         {

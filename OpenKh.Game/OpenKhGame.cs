@@ -128,7 +128,8 @@ namespace OpenKh.Game
 
             var deltaTimes = GetDeltaTimes(gameTime);
 
-            _debugOverlay.Update(deltaTimes);
+            if (Config.DebugMode)
+                _debugOverlay.Update(deltaTimes);
             state?.Update(deltaTimes);
             base.Update(gameTime);
         }
@@ -146,7 +147,8 @@ namespace OpenKh.Game
             var deltaTimes = GetDeltaTimes(gameTime);
 
             state?.Draw(deltaTimes);
-            _debugOverlay.Draw(deltaTimes);
+            if (Config.DebugMode)
+                _debugOverlay.Draw(deltaTimes);
             base.Draw(gameTime);
         }
 
