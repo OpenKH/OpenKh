@@ -170,7 +170,7 @@ namespace OpenKh.Game
         {
             return new DeltaTimes
             {
-                DeltaTime = 1.0 / 60.0
+                DeltaTime = 1.0 / 60.0 * Config.GameSpeed
             };
         }
 
