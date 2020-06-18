@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Linq;
 
 namespace OpenKh.Game.Infrastructure
 {
@@ -40,12 +41,26 @@ namespace OpenKh.Game.Infrastructure
             pad = GamePad.GetState(PlayerIndex.One);
             prevKeyboard = keyboard;
             keyboard = Keyboard.GetState();
-            repeatableKeyboard.UpdateWith(keyboard, gameTime);
-        }
 
-        public void UnblockRepeats()
-        {
-            repeatableKeyboard.UnblockRepeats();
+            var pressedKeys = prevKeyboard.GetPressedKeys();
+            var pressingKeys = keyboard.GetPressedKeys();
+
+            foreach (var keyDown in pressingKeys.Except(pressedKeys))
+            {
+                repeatableKeyboard.PressKey(keyDown);
+            }
+
+            foreach (var keyUp in pressedKeys.Except(pressingKeys))
+            {
+                repeatableKeyboard.ReleaseKey(keyUp);
+            }
+
+            var seconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            foreach (var keepDown in pressedKeys.Intersect(pressingKeys))
+            {
+                repeatableKeyboard.UpdateKey(keepDown, seconds);
+            }
         }
     }
 }

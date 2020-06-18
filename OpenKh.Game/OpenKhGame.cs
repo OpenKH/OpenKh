@@ -108,7 +108,6 @@ namespace OpenKh.Game
             state?.Draw(deltaTimes);
             _debugOverlay.Draw(deltaTimes);
             base.Draw(gameTime);
-            inputManager.UnblockRepeats();
         }
 
         private StateInitDesc GetStateInitDesc()
