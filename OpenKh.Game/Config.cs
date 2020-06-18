@@ -13,6 +13,7 @@ namespace OpenKh.Game
             public int resolutionWidth { get; set; } = 0;
             public int resolutionHeight { get; set; } = 0;
             public float resolutionBoost { get; set; } = 2.0f;
+            public bool isFullScreen { get; set; } = false;
 
             internal static ActualConfig Default() => new ActualConfig();
 
@@ -42,8 +43,9 @@ namespace OpenKh.Game
         public static int ResolutionWidth { get => _config.resolutionWidth; set => _config.resolutionWidth = value; }
         public static int ResolutionHeight { get => _config.resolutionHeight; set => _config.resolutionHeight = value; }
         public static float ResolutionBoost { get => _config.resolutionBoost; set => _config.resolutionBoost = value; }
+        public static bool IsFullScreen { get => _config.isFullScreen; set => _config.isFullScreen = value; }
 
-        public static void Open()
+        private static void InternalOpen()
         {
             if (!File.Exists(ConfigFilePath))
             {
@@ -55,6 +57,17 @@ namespace OpenKh.Game
                 Log.Info($"Load configuration file from {ActualConfigFilePath}");
                 _config = ActualConfig.ReadFromFile(ActualConfigFilePath);
             }
+        }
+
+        private static void InternalSave()
+        {
+            _config.WriteToFile(ActualConfigFilePath);
+        }
+
+        public static void Open()
+        {
+            InternalOpen();
+            InternalSave(); // expand the config with the new structure
         }
 
         public static void Listen()
@@ -90,7 +103,7 @@ namespace OpenKh.Game
         public static void Save()
         {
             Log.Info($"Save configuration file to {ActualConfigFilePath}");
-            _config.WriteToFile(ActualConfigFilePath);
+            InternalSave();
         }
 
         public static void Close()
