@@ -16,6 +16,7 @@ namespace OpenKh.Game
             public bool isFullScreen { get; set; } = false;
             public string dataPath { get; set; } = "./data";
             public int regionId { get; set; } = -1;
+            public bool enforceInternationalTextEncoding { get; set; } = false;
 
             internal static ActualConfig Default() => new ActualConfig();
 
@@ -48,6 +49,7 @@ namespace OpenKh.Game
         public static bool IsFullScreen { get => _config.isFullScreen; set => _config.isFullScreen = value; }
         public static string DataPath { get => _config.dataPath; set => _config.dataPath = value; }
         public static int RegionId { get => _config.regionId; set => _config.regionId = value; }
+        public static bool EnforceInternationalTextEncoding { get => _config.enforceInternationalTextEncoding; set => _config.enforceInternationalTextEncoding = value; }
 
         private static void InternalOpen()
         {

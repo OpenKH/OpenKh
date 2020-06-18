@@ -85,7 +85,7 @@ namespace OpenKh.Game.Infrastructure
             LoadMessage("sys");
             // 15jigsaw
 
-            if (Language == "jp")
+            if (Language == "jp" && Config.EnforceInternationalTextEncoding == false)
             {
                 Log.Info($"Use Japanese text encoding");
                 SystemMessageContext = FontContext.ToKh2JpSystemTextContext();
