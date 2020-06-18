@@ -22,6 +22,7 @@ namespace OpenKh.Game
         private readonly InputManager inputManager;
         private readonly DebugOverlay _debugOverlay;
         private IState state;
+        private bool _isResolutionChanged;
 
         public int State
         {
@@ -65,13 +66,8 @@ namespace OpenKh.Game
             _dataContent = new SafeDataContent(_dataContent);
 
             _kernel = new Kernel(_dataContent);
-
-            var resolutionWidth = Config.ResolutionWidth;
-            var resolutionHeight = Config.ResolutionHeight;
-            if (resolutionWidth == 0)
-                resolutionWidth = _kernel.IsReMix ? Global.ResolutionRemixWidth : Global.ResolutionWidth;
-            if (resolutionHeight == 0)
-                resolutionHeight = Global.ResolutionHeight;
+            var resolutionWidth = GetResolutionWidth();
+            var resolutionHeight = GetResolutionHeight();
 
             Log.Info($"Internal game resolution set to {resolutionWidth}x{resolutionHeight}");
 
@@ -87,6 +83,24 @@ namespace OpenKh.Game
             archiveManager = new ArchiveManager(_dataContent);
             inputManager = new InputManager();
             _debugOverlay = new DebugOverlay(this);
+
+            Config.OnConfigurationChange += () =>
+            {
+                var resolutionWidth = GetResolutionWidth();
+                var resolutionHeight = GetResolutionHeight();
+
+                Log.Info($"Internal game resolution set to {resolutionWidth}x{resolutionHeight}");
+                var backBufferWidth = (int)Math.Round(resolutionWidth * Config.ResolutionBoost);
+                var backBufferHeight = (int)Math.Round(resolutionHeight * Config.ResolutionBoost);
+
+                if (graphics.PreferredBackBufferWidth != backBufferWidth ||
+                    graphics.PreferredBackBufferHeight != backBufferHeight)
+                {
+                    graphics.PreferredBackBufferWidth = backBufferWidth;
+                    graphics.PreferredBackBufferHeight = backBufferHeight;
+                    _isResolutionChanged = true;
+                }
+            };
         }
 
         protected override void Initialize()
@@ -119,6 +133,12 @@ namespace OpenKh.Game
 
         protected override void Draw(GameTime gameTime)
         {
+            if (_isResolutionChanged)
+            {
+                graphics.ApplyChanges();
+                _isResolutionChanged = false;
+            }
+
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
             var deltaTimes = GetDeltaTimes(gameTime);
@@ -174,6 +194,22 @@ namespace OpenKh.Game
                 Log.Info($"No {idxFullPath} or {imgFullPath}, loading extracted files");
                 return new StandardDataContent(basePath);
             }
+        }
+
+        private static int GetResolutionHeight()
+        {
+            var resolutionHeight = Config.ResolutionHeight;
+            if (resolutionHeight == 0)
+                resolutionHeight = Global.ResolutionHeight;
+            return resolutionHeight;
+        }
+
+        private int GetResolutionWidth()
+        {
+            var resolutionWidth = Config.ResolutionWidth;
+            if (resolutionWidth == 0)
+                resolutionWidth = _kernel.IsReMix ? Global.ResolutionRemixWidth : Global.ResolutionWidth;
+            return resolutionWidth;
         }
     }
 }
