@@ -13,7 +13,6 @@ namespace OpenKh.Game
 {
     public class OpenKhGame : Microsoft.Xna.Framework.Game, IStateChange
     {
-        private const string DefaultContentPath = ".";
         private GraphicsDeviceManager graphics;
 
         private readonly IDataContent _dataContent;
@@ -54,7 +53,7 @@ namespace OpenKh.Game
 
         public OpenKhGame(string[] args)
         {
-            var contentPath = args.FirstOrDefault() ?? DefaultContentPath;
+            var contentPath = args.FirstOrDefault() ?? Config.DataPath;
 
             _dataContent = CreateDataContent(contentPath, "KH2.IDX", "KH2.IMG");
             if (Kernel.IsReMixFileHasHdAssetHeader(_dataContent, "fm"))
