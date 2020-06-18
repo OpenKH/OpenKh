@@ -1,4 +1,4 @@
-﻿using OpenKh.Game.Debugging;
+using OpenKh.Game.Debugging;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +17,8 @@ namespace OpenKh.Game
             public string dataPath { get; set; } = "./data";
             public int regionId { get; set; } = -1;
             public bool enforceInternationalTextEncoding { get; set; } = false;
+            public string idxFilePath { get; set; } = "KH2.IDX";
+            public string imgFilePath { get; set; } = "KH2.IMG";
 
             internal static ActualConfig Default() => new ActualConfig();
 
@@ -50,6 +52,8 @@ namespace OpenKh.Game
         public static string DataPath { get => _config.dataPath; set => _config.dataPath = value; }
         public static int RegionId { get => _config.regionId; set => _config.regionId = value; }
         public static bool EnforceInternationalTextEncoding { get => _config.enforceInternationalTextEncoding; set => _config.enforceInternationalTextEncoding = value; }
+        public static string IdxFilePath { get => _config.idxFilePath; set => _config.idxFilePath = value; }
+        public static string ImgFilePath { get => _config.imgFilePath; set => _config.imgFilePath = value; }
 
         private static void InternalOpen()
         {
