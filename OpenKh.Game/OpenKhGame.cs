@@ -74,7 +74,8 @@ namespace OpenKh.Game
             graphics = new GraphicsDeviceManager(this)
             {
                 PreferredBackBufferWidth = (int)Math.Round(resolutionWidth * Config.ResolutionBoost),
-                PreferredBackBufferHeight = (int)Math.Round(resolutionHeight * Config.ResolutionBoost)
+                PreferredBackBufferHeight = (int)Math.Round(resolutionHeight * Config.ResolutionBoost),
+                IsFullScreen = Config.IsFullScreen,
             };
 
             Content.RootDirectory = "Content";
@@ -94,10 +95,12 @@ namespace OpenKh.Game
                 var backBufferHeight = (int)Math.Round(resolutionHeight * Config.ResolutionBoost);
 
                 if (graphics.PreferredBackBufferWidth != backBufferWidth ||
-                    graphics.PreferredBackBufferHeight != backBufferHeight)
+                    graphics.PreferredBackBufferHeight != backBufferHeight ||
+                    graphics.IsFullScreen != Config.IsFullScreen)
                 {
                     graphics.PreferredBackBufferWidth = backBufferWidth;
                     graphics.PreferredBackBufferHeight = backBufferHeight;
+                    graphics.IsFullScreen = Config.IsFullScreen;
                     _isResolutionChanged = true;
                 }
             };
