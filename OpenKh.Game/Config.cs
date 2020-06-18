@@ -15,6 +15,7 @@ namespace OpenKh.Game
             public float resolutionBoost { get; set; } = 2.0f;
             public bool isFullScreen { get; set; } = false;
             public string dataPath { get; set; } = "./data";
+            public int regionId { get; set; } = -1;
 
             internal static ActualConfig Default() => new ActualConfig();
 
@@ -46,6 +47,7 @@ namespace OpenKh.Game
         public static float ResolutionBoost { get => _config.resolutionBoost; set => _config.resolutionBoost = value; }
         public static bool IsFullScreen { get => _config.isFullScreen; set => _config.isFullScreen = value; }
         public static string DataPath { get => _config.dataPath; set => _config.dataPath = value; }
+        public static int RegionId { get => _config.regionId; set => _config.regionId = value; }
 
         private static void InternalOpen()
         {
