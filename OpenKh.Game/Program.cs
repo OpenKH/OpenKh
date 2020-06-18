@@ -13,6 +13,8 @@ namespace OpenKh.Game
         {
             Log.Info("Boot");
             Log.Info($"Version {ProductVersion}");
+            Config.Open();
+            Config.Listen();
 
 #if DEBUG
             using (var game = new OpenKhGame(args))
@@ -33,6 +35,7 @@ namespace OpenKh.Game
             }
 #endif
 
+            Config.Close();
             Log.Info("End");
             Log.Close();
         }

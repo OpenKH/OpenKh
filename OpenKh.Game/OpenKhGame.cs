@@ -66,15 +66,19 @@ namespace OpenKh.Game
 
             _kernel = new Kernel(_dataContent);
 
-            var resolutionWidth = _kernel.IsReMix ?
-                Global.ResolutionRemixWidth :
-                Global.ResolutionWidth;
-            Log.Info($"Internal game resolution set to {resolutionWidth}x{Global.ResolutionHeight}");
+            var resolutionWidth = Config.ResolutionWidth;
+            var resolutionHeight = Config.ResolutionHeight;
+            if (resolutionWidth == 0)
+                resolutionWidth = _kernel.IsReMix ? Global.ResolutionRemixWidth : Global.ResolutionWidth;
+            if (resolutionHeight == 0)
+                resolutionHeight = Global.ResolutionHeight;
+
+            Log.Info($"Internal game resolution set to {resolutionWidth}x{resolutionHeight}");
 
             graphics = new GraphicsDeviceManager(this)
             {
-                PreferredBackBufferWidth = (int)Math.Round(resolutionWidth * Global.ResolutionBoostRatio),
-                PreferredBackBufferHeight = (int)Math.Round(Global.ResolutionHeight * Global.ResolutionBoostRatio)
+                PreferredBackBufferWidth = (int)Math.Round(resolutionWidth * Config.ResolutionBoost),
+                PreferredBackBufferHeight = (int)Math.Round(resolutionHeight * Config.ResolutionBoost)
             };
 
             Content.RootDirectory = "Content";
