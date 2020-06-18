@@ -111,9 +111,9 @@ namespace OpenKh.Game
 
                 fsWatcher.Changed += (object sender, FileSystemEventArgs e) =>
                 {
-                    Log.Info("Configuration file has been changed");
+                    Log.Info("Configuration file has changed");
                     Thread.Sleep(50);
-                    Open();
+                    InternalOpen();
                     OnConfigurationChange?.Invoke();
                 };
 
