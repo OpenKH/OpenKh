@@ -89,7 +89,6 @@ namespace OpenKh.Game
                 var resolutionWidth = GetResolutionWidth();
                 var resolutionHeight = GetResolutionHeight();
 
-                Log.Info($"Internal game resolution set to {resolutionWidth}x{resolutionHeight}");
                 var backBufferWidth = (int)Math.Round(resolutionWidth * Config.ResolutionBoost);
                 var backBufferHeight = (int)Math.Round(resolutionHeight * Config.ResolutionBoost);
 
@@ -101,6 +100,7 @@ namespace OpenKh.Game
                     graphics.PreferredBackBufferHeight = backBufferHeight;
                     graphics.IsFullScreen = Config.IsFullScreen;
                     _isResolutionChanged = true;
+                    Log.Info($"Internal game resolution set to {resolutionWidth}x{resolutionHeight}");
                 }
             };
         }
