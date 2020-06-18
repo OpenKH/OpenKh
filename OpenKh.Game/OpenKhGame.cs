@@ -102,7 +102,7 @@ namespace OpenKh.Game
 
         protected override void Update(GameTime gameTime)
         {
-            inputManager.Update();
+            inputManager.Update(gameTime);
             if (inputManager.IsExit)
                 Exit();
 

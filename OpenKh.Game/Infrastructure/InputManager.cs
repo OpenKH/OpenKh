@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Linq;
 
 namespace OpenKh.Game.Infrastructure
 {
@@ -8,21 +10,22 @@ namespace OpenKh.Game.Infrastructure
         private GamePadState pad;
         private KeyboardState keyboard;
         private KeyboardState prevKeyboard;
+        private RepeatableKeyboard repeatableKeyboard = new RepeatableKeyboard();
 
-        public bool IsDebug => keyboard.IsKeyDown(Keys.Tab) && !prevKeyboard.IsKeyDown(Keys.Tab);
-        public bool IsShift => keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
-        public bool IsDebugRight => keyboard.IsKeyDown(Keys.Right) && !prevKeyboard.IsKeyDown(Keys.Right);
-        public bool IsDebugLeft => keyboard.IsKeyDown(Keys.Left) && !prevKeyboard.IsKeyDown(Keys.Left);
-        public bool IsDebugUp => keyboard.IsKeyDown(Keys.Up) && !prevKeyboard.IsKeyDown(Keys.Up);
-        public bool IsDebugDown => keyboard.IsKeyDown(Keys.Down) && !prevKeyboard.IsKeyDown(Keys.Down);
+        public bool IsDebug => repeatableKeyboard.IsKeyRepeat(Keys.Tab);
+        public bool IsShift => repeatableKeyboard.IsKeyRepeat(Keys.RightShift);
+        public bool IsDebugRight => repeatableKeyboard.IsKeyRepeat(Keys.Right);
+        public bool IsDebugLeft => repeatableKeyboard.IsKeyRepeat(Keys.Left);
+        public bool IsDebugUp => repeatableKeyboard.IsKeyRepeat(Keys.Up);
+        public bool IsDebugDown => repeatableKeyboard.IsKeyRepeat(Keys.Down);
 
         public bool IsExit => pad.Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape);
         public bool IsUp => Up && !prevKeyboard.IsKeyDown(Keys.Up);
         public bool IsDown => Down && !prevKeyboard.IsKeyDown(Keys.Down);
         public bool IsLeft => Left && !prevKeyboard.IsKeyDown(Keys.Left);
         public bool IsRight => Right && !prevKeyboard.IsKeyDown(Keys.Right);
-        public bool IsCircle => keyboard.IsKeyDown(Keys.K) && !prevKeyboard.IsKeyDown(Keys.K);
-        public bool IsCross => keyboard.IsKeyDown(Keys.L) && !prevKeyboard.IsKeyDown(Keys.L);
+        public bool IsCircle => repeatableKeyboard.IsKeyRepeat(Keys.K);
+        public bool IsCross => repeatableKeyboard.IsKeyRepeat(Keys.L);
 
         public bool Up => keyboard.IsKeyDown(Keys.Up);
         public bool Down => keyboard.IsKeyDown(Keys.Down);
@@ -33,11 +36,31 @@ namespace OpenKh.Game.Infrastructure
         public bool S => keyboard.IsKeyDown(Keys.S);
         public bool W => keyboard.IsKeyDown(Keys.W);
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             pad = GamePad.GetState(PlayerIndex.One);
             prevKeyboard = keyboard;
             keyboard = Keyboard.GetState();
+
+            var pressedKeys = prevKeyboard.GetPressedKeys();
+            var pressingKeys = keyboard.GetPressedKeys();
+
+            foreach (var keyDown in pressingKeys.Except(pressedKeys))
+            {
+                repeatableKeyboard.PressKey(keyDown);
+            }
+
+            foreach (var keyUp in pressedKeys.Except(pressingKeys))
+            {
+                repeatableKeyboard.ReleaseKey(keyUp);
+            }
+
+            var seconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            foreach (var keepDown in pressedKeys.Intersect(pressingKeys))
+            {
+                repeatableKeyboard.UpdateKey(keepDown, seconds);
+            }
         }
     }
 }
