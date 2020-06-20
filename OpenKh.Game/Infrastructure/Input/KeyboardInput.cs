@@ -1,31 +1,14 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using System.Linq;
 
 namespace OpenKh.Game.Infrastructure.Input
 {
     public class KeyboardInput : IInputDevice
     {
-        private GamePadState pad;
         private KeyboardState keyboard;
         private KeyboardState prevKeyboard;
         private RepeatableKeyboard repeatableKeyboard = new RepeatableKeyboard();
-
-        public bool IsDebug => repeatableKeyboard.IsKeyRepeat(Keys.Tab);
-        public bool IsShift => repeatableKeyboard.IsKeyRepeat(Keys.RightShift);
-        public bool IsDebugRight => repeatableKeyboard.IsKeyRepeat(Keys.Right);
-        public bool IsDebugLeft => repeatableKeyboard.IsKeyRepeat(Keys.Left);
-        public bool IsDebugUp => repeatableKeyboard.IsKeyRepeat(Keys.Up);
-        public bool IsDebugDown => repeatableKeyboard.IsKeyRepeat(Keys.Down);
-
-        public bool IsExit => pad.Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape);
-        public bool IsUp => Up && !prevKeyboard.IsKeyDown(Keys.Up);
-        public bool IsDown => Down && !prevKeyboard.IsKeyDown(Keys.Down);
-        public bool IsLeft => Left && !prevKeyboard.IsKeyDown(Keys.Left);
-        public bool IsRight => Right && !prevKeyboard.IsKeyDown(Keys.Right);
-        public bool IsCircle => repeatableKeyboard.IsKeyRepeat(Keys.K);
-        public bool IsCross => repeatableKeyboard.IsKeyRepeat(Keys.L);
-
-        private KeyboardState keyboard;
-        private KeyboardState prevKeyboard;
 
         public bool IsUp => Up && !prevKeyboard.IsKeyDown(Keys.Up);
         public bool IsDown => Down && !prevKeyboard.IsKeyDown(Keys.Down);
@@ -57,7 +40,7 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool IsDebugLeft => IsLeft;
         public bool IsDebugRight => IsRight;
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             prevKeyboard = keyboard;
             keyboard = Keyboard.GetState();

@@ -1,4 +1,6 @@
-﻿namespace OpenKh.Game.Infrastructure.Input
+﻿using Microsoft.Xna.Framework;
+
+namespace OpenKh.Game.Infrastructure.Input
 {
     public interface IInputDevice
     {

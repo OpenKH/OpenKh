@@ -42,7 +42,7 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool IsDebugLeft => pad.DPad.Left == ButtonState.Pressed && prevPad.DPad.Left != ButtonState.Pressed;
         public bool IsDebugRight => pad.DPad.Right == ButtonState.Pressed && prevPad.DPad.Right != ButtonState.Pressed;
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             prevPad = pad;
             pad = GamePad.GetState(PlayerIndex.One);
