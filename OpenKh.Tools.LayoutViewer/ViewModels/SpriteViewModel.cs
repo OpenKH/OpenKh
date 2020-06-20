@@ -3,7 +3,6 @@ using OpenKh.Kh2;
 using OpenKh.Tools.Common.Rendering;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.Xml;
 using System.Windows.Media;
 using Xe.Tools;
 
@@ -19,7 +18,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         }
 
         public ISpriteDrawing Drawing { get; }
-        public Sequence.Frame Sprite { get; }
+        public Sequence.Frame Sprite { get; set; }
         public Imgd Image { get; }
         public Sequence Sequence => MockSequence();
 
@@ -109,7 +108,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                     LoopStart = 0,
                     LoopEnd = 10,
                 }
-},
+            },
             Animations = new List<Sequence.Animation>
             {
                 new Sequence.Animation

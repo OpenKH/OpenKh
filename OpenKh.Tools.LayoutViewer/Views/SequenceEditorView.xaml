@@ -39,10 +39,15 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
             <TextBlock Text="Sprite list" Margin="0 0 0 3"/>
-            <ListBox Grid.Row="1" ItemsSource="{Binding Sprites}">
+            <ListBox
+                Grid.Row="1"
+                ItemsSource="{Binding Sprites.Items}"
+                SelectedValue="{Binding SelectedSprite}"
+                SelectedIndex="{Binding SelectedSpriteIndex}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <controls:SequenceRendererPanel
@@ -57,6 +62,26 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0 3 0 0">
+                <Button Command="{Binding AddSpriteCommand}" Margin="0 0 3 0">
+                    <Image Source="{StaticResource Add_16x}"/>
+                </Button>
+                <Button Command="{Binding RemoveSpriteCommand}" Margin="0 0 3 0">
+                    <Image Source="{StaticResource Remove_color_16x}"/>
+                </Button>
+                <Button Command="{Binding DuplicateSpriteCommand}" Margin="0 0 3 0">
+                    <Image Source="{StaticResource Copy_16x}"/>
+                </Button>
+                <Button Command="{Binding EditSpriteCommand}" Margin="0 0 3 0">
+                    <Image Source="{StaticResource EditWindow_16x}"/>
+                </Button>
+                <Button Command="{Binding MoveUpCommand}" Margin="0 0 3 0">
+                    <Image Source="{StaticResource AddRowToAbove_16x}"/>
+                </Button>
+                <Button Command="{Binding MoveDownCommand}" Margin="0 0 3 0">
+                    <Image Source="{StaticResource AddRowToBelow_16x}"/>
+                </Button>
+            </StackPanel>
         </Grid>
 
         <StackPanel Grid.Column="2">
