@@ -46,6 +46,6 @@ namespace OpenKh.Game.Infrastructure
             };
         }
 
-        public void Update() => _devices.ForEach(device => device.Update());
+        public void Update(GameTime gameTime) => _devices.ForEach(device => device.Update(gameTime));
     }
 }

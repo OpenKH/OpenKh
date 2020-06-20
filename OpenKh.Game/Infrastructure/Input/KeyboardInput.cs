@@ -35,10 +35,10 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool A => keyboard.IsKeyDown(Keys.A);
         public bool D => keyboard.IsKeyDown(Keys.D);
 
-        public bool IsDebugUp => IsUp;
-        public bool IsDebugDown => IsDown;
-        public bool IsDebugLeft => IsLeft;
-        public bool IsDebugRight => IsRight;
+        public bool IsDebugUp => repeatableKeyboard.IsKeyRepeat(Keys.Up);
+        public bool IsDebugDown => repeatableKeyboard.IsKeyRepeat(Keys.Down);
+        public bool IsDebugLeft => repeatableKeyboard.IsKeyRepeat(Keys.Left);
+        public bool IsDebugRight => repeatableKeyboard.IsKeyRepeat(Keys.Right);
 
         public void Update(GameTime gameTime)
         {
