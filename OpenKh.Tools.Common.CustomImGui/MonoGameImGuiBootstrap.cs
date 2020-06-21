@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -37,6 +38,12 @@ namespace OpenKh.Tools.Common.CustomImGui
             Title = ApplicationName;
             _initFunc = initFunc;
         }
+
+        public IntPtr BindTexture(Texture2D texture) =>
+            _imGuiRenderer.BindTexture(texture);
+
+        public void UnbindTexture(IntPtr textureId) =>
+            _imGuiRenderer.UnbindTexture(textureId);
 
         protected unsafe override void Initialize()
         {

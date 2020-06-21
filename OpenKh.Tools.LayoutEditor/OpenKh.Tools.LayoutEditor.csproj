@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Engine.MonoGame\OpenKh.Engine.MonoGame.csproj" />
     <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common.CustomImGui\OpenKh.Tools.Common.CustomImGui.csproj" />

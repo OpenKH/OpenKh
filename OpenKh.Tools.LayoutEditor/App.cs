@@ -68,6 +68,7 @@ namespace OpenKh.Tools.LayoutEditor
         {
             _bootstrap = bootstrap;
             _bootstrap.Title = Title;
+            OpenFile(@"D:\Hacking\KH2\export_fm\field2d\jp\zz0command.2dd");
         }
 
         public bool MainLoop()
@@ -257,7 +258,7 @@ namespace OpenKh.Tools.LayoutEditor
             var imageEntry = entries.First(x => x.Type == Bar.EntryType.Imgd);
             SpriteName = imageEntry.Name;
 
-            _app = new AppSequenceEditor(
+            _app = new AppSequenceEditor(_bootstrap,
                 Sequence.Read(sequenceEntry.Stream),
                 Imgd.Read(imageEntry.Stream));
             UpdateTitle();
