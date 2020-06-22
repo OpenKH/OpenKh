@@ -110,6 +110,7 @@ namespace OpenKh.Tools.LayoutEditor
                     ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
                 });
+                _app?.Menu();
                 ForMenu("Help", () =>
                 {
                     ForMenuItem("About", ShowAboutDialog);

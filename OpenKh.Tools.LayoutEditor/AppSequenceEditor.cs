@@ -11,124 +11,31 @@ using OpenKh.Engine.Renderers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
+using OpenKh.Tools.LayoutEditor.Models;
 
 namespace OpenKh.Tools.LayoutEditor
 {
-    public class AppSequenceEditor : IApp, IDisposable
+    public class AppSequenceEditor : IApp, ITextureBinder, IDisposable
     {
-        private class SpriteProperty
-        {
-            private readonly ISpriteDrawing _drawing;
-            private readonly Sequence _sequence;
-            private readonly SequenceRenderer _renderer;
-            private int _frameIndex;
-
-            public Sequence.Frame Sprite { get; }
-            public ISpriteTexture SpriteTexture { get; set; }
-            public IntPtr TextureId { get; set; }
-            public int Width { get; }
-            public int Height { get; }
-
-            public SpriteProperty(
-                Sequence.Frame sprite,
-                ISpriteDrawing drawing,
-                ISpriteTexture texture)
-            {
-                Sprite = sprite;
-                Width = Math.Max(sprite.Left, sprite.Right) -
-                    Math.Min(sprite.Left, sprite.Right);
-                Height = Math.Max(sprite.Top, sprite.Bottom) -
-                    Math.Min(sprite.Top, sprite.Bottom);
-
-                SpriteTexture = drawing.CreateSpriteTexture(Width, Height);
-                _drawing = drawing;
-                _sequence = MockSequence();
-                _renderer = new SequenceRenderer(_sequence, drawing, texture);
-            }
-
-            public IntPtr Draw(float x, float y)
-            {
-                _drawing.SetViewport(0, Width, 0, Height);
-                _drawing.DestinationTexture = SpriteTexture;
-                _drawing.Clear(new ColorF(1, 0, 1, 1));
-                _renderer.Draw(0, _frameIndex++, x, y);
-                _drawing.Flush();
-                _drawing.DestinationTexture = null;
-
-                return TextureId;
-            }
-            
-            private Sequence MockSequence() => new Sequence
-            {
-                AnimationGroups = new List<Sequence.AnimationGroup>
-                {
-                    new Sequence.AnimationGroup
-                    {
-                        AnimationIndex = 0,
-                        Count = 1,
-                        LoopStart = 0,
-                        LoopEnd = 10,
-                    }
-                },
-                Animations = new List<Sequence.Animation>
-                {
-                    new Sequence.Animation
-                    {
-                        FrameGroupIndex = 0,
-                        FrameStart = 0,
-                        FrameEnd = 10,
-                        ScaleStart = 1,
-                        ScaleEnd = 1,
-                        ScaleXStart = 1,
-                        ScaleXEnd = 1,
-                        ScaleYStart = 1,
-                        ScaleYEnd = 1,
-                        ColorStart = 0x80808080U,
-                        ColorEnd = 0x80808080U,
-                    }
-                },
-                FrameGroups = new List<Sequence.FrameGroup>
-                {
-                    new Sequence.FrameGroup
-                    {
-                        Start = 0,
-                        Count = 1,
-                    }
-                },
-                FramesEx = new List<Sequence.FrameEx>
-                {
-                    new Sequence.FrameEx
-                    {
-                        Left = 0,
-                        Top = 0,
-                        Right = Width,
-                        Bottom = Height,
-                        FrameIndex = 0
-                    }
-                },
-                Frames = new List<Sequence.Frame>
-                {
-                    Sprite
-                }
-            };
-        }
-
+        private const string FrameEditDialogTitle = "Frame edit";
         private readonly Sequence _sequence;
         private readonly Imgd _image;
         private readonly MonoGameImGuiBootstrap _bootStrap;
         private readonly GraphicsDevice _graphics;
         private readonly KingdomShader _shader;
         private readonly MonoSpriteDrawing _drawing;
-        private readonly ISpriteTexture _texture;
-        private readonly IntPtr _textureId;
+        private readonly ISpriteTexture _atlasTexture;
+        private readonly IntPtr _atlasTextureId;
         private readonly SequenceRenderer _renderer;
+
+        private bool _isFrameEditDialogOpen;
+        private FrameEditDialog _frameEditDialog;
 
         private int _selectedSprite = 0;
         private int _selectedAnimGroup = 1;
         private ISpriteTexture _destinationTexture;
         private IntPtr _destinationTextureId;
-        private List<SpriteProperty> _sprites;
+        private List<SpriteModel> _sprites;
 
         public AppSequenceEditor(MonoGameImGuiBootstrap bootstrap, Sequence sequence, Imgd image)
         {
@@ -139,30 +46,62 @@ namespace OpenKh.Tools.LayoutEditor
             _graphics = bootstrap.GraphicsDevice;
             _shader = new KingdomShader(bootstrap.Content);
             _drawing = new MonoSpriteDrawing(_graphics, _shader);
-            _texture = _drawing.CreateSpriteTexture(_image);
-            _renderer = new SequenceRenderer(_sequence, _drawing, _texture);
+            _atlasTexture = _drawing.CreateSpriteTexture(_image);
+            _renderer = new SequenceRenderer(_sequence, _drawing, _atlasTexture);
 
             _destinationTexture = _drawing.CreateSpriteTexture(1024, 1024);
-            _textureId = BindTexture(_texture);
-            _destinationTextureId = BindTexture(_destinationTexture);
+            _atlasTextureId = this.BindTexture(_atlasTexture);
+            _destinationTextureId = this.BindTexture(_destinationTexture);
 
             _sprites = sequence.Frames
                 .Select(x => AsSpriteProperty(x))
                 .ToList();
+
+            _isFrameEditDialogOpen = false;
+        }
+
+        public void Menu()
+        {
+            ForMenu("Sprite", () =>
+            {
+                ForMenuItem("Edit...", () => _isFrameEditDialogOpen = true);
+            });
         }
 
         public bool Run()
         {
+            bool dummy = true;
+            if (ImGui.BeginPopupModal(FrameEditDialogTitle, ref dummy,
+                ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal))
+            {
+                _frameEditDialog.Run();
+                ImGui.EndPopup();
+            }
+
             ForGrid(
                 new GridElement("SpriteList", 1, 256, true, DrawSpriteList),
                 new GridElement("Animation", 2, 0, false, DrawAnimation),
                 new GridElement("Right", 1.5f, 256, true, DrawRight));
+
+            if (_isFrameEditDialogOpen)
+            {
+                ImGui.OpenPopup(FrameEditDialogTitle);
+                _isFrameEditDialogOpen = false;
+                _frameEditDialog = new FrameEditDialog(
+                    _sprites[_selectedSprite],
+                    _atlasTexture,
+                    _atlasTextureId);
+            }
 
             return true;
         }
 
         private void DrawSpriteList()
         {
+            // Animate only the selected sprite
+            if (_selectedSprite >= 0)
+                _sprites[_selectedSprite].Draw(0, 0);
+
             for (int i = 0; i < _sprites.Count; i++)
             {
                 var sprite = _sprites[i];
@@ -190,7 +129,7 @@ namespace OpenKh.Tools.LayoutEditor
             _drawing.DestinationTexture = null;
 
             ImGui.Image(_destinationTextureId, new Vector2(1024, 1024),
-                GetUv(_texture, 0, 0), new Vector2(1, 1));
+                GetUv(_atlasTexture, 0, 0), new Vector2(1, 1));
         }
 
         private void DrawRight()
@@ -210,10 +149,7 @@ namespace OpenKh.Tools.LayoutEditor
         public void Dispose()
         {
             foreach (var sprite in _sprites)
-            {
-                _bootStrap.UnbindTexture(sprite.TextureId);
-                sprite.SpriteTexture.Dispose();
-            }
+                sprite.Dispose();
 
             _bootStrap.UnbindTexture(_destinationTextureId);
             _destinationTexture.Dispose();
@@ -370,41 +306,26 @@ namespace OpenKh.Tools.LayoutEditor
                 { "Normal", "Additive", "Subtractive" }, 3))
                 animation.ColorBlend = blendMode;
 
-            var colorStart = ConvertColor(animation.ColorStart);
+            var colorStart = Utilities.ConvertColor(animation.ColorStart);
             if (ImGui.ColorPicker4("Mask start", ref colorStart))
-                animation.ColorStart = ConvertColor(colorStart);
+                animation.ColorStart = Utilities.ConvertColor(colorStart);
 
-            var colorEnd = ConvertColor(animation.ColorEnd);
+            var colorEnd = Utilities.ConvertColor(animation.ColorEnd);
             if (ImGui.ColorPicker4("Mask end", ref colorEnd))
-                animation.ColorEnd = ConvertColor(colorEnd);
+                animation.ColorEnd = Utilities.ConvertColor(colorEnd);
 
         }
 
-        private SpriteProperty AsSpriteProperty(Sequence.Frame sprite)
-        {
-            var spriteProperty = new SpriteProperty(sprite, _drawing, _texture);
-            spriteProperty.TextureId = BindTexture(spriteProperty.SpriteTexture);
-            spriteProperty.Draw(0, 0);
-
-            return spriteProperty;
-        }
-
-        private IntPtr BindTexture(ISpriteTexture sprite) => _bootStrap.BindTexture(
-            (sprite as MonoSpriteDrawing.CSpriteTexture).Texture);
+        private SpriteModel AsSpriteProperty(Sequence.Frame sprite) =>
+            new SpriteModel(sprite, _drawing, _atlasTexture, this);
 
         private static Vector2 GetUv(ISpriteTexture texture, int x, int y) =>
             new Vector2((float)x / texture.Width, (float)y / texture.Height);
 
-        private static Vector4 ConvertColor(uint color) => new Vector4(
-            ((color >> 0) & 0xFF) / 128.0f,
-            ((color >> 8) & 0xFF) / 128.0f,
-            ((color >> 16) & 0xFF) / 128.0f,
-            ((color >> 24) & 0xFF) / 128.0f);
+        public IntPtr BindTexture(Texture2D texture) =>
+            _bootStrap.BindTexture(texture);
 
-        private static uint ConvertColor(Vector4 color) =>
-            ((uint)(color.X * 128f) << 0) |
-            ((uint)(color.Y * 128f) << 8) |
-            ((uint)(color.Z * 128f) << 16) |
-            ((uint)(color.W * 128f) << 24);
+        public void UnbindTexture(IntPtr id) =>
+            _bootStrap.UnbindTexture(id);
     }
 }
