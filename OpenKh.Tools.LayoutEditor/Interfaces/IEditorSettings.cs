@@ -1,9 +1,13 @@
-﻿using System.Windows.Media;
+﻿using OpenKh.Engine.Renders;
 
 namespace OpenKh.Tools.LayoutEditor.Interfaces
 {
     public interface IEditorSettings
     {
-        Color EditorBackground { get; }
+        delegate void ChangeBackground(object sender, IEditorSettings settings);
+        public event ChangeBackground OnChangeBackground;
+
+        public bool CheckerboardBackground { get; }
+        ColorF EditorBackground { get; }
     }
 }

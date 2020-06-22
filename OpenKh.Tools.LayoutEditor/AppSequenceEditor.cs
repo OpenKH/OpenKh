@@ -18,6 +18,7 @@ namespace OpenKh.Tools.LayoutEditor
 {
     public class AppSequenceEditor : IApp, ITextureBinder, IDisposable
     {
+        private readonly IEditorSettings _settings;
         private readonly Sequence _sequence;
         private readonly Imgd _image;
         private readonly MonoGameImGuiBootstrap _bootStrap;
@@ -52,8 +53,13 @@ namespace OpenKh.Tools.LayoutEditor
             }
         }
 
-        public AppSequenceEditor(MonoGameImGuiBootstrap bootstrap, Sequence sequence, Imgd image)
+        public AppSequenceEditor(
+            MonoGameImGuiBootstrap bootstrap,
+            IEditorSettings settings,
+            Sequence sequence,
+            Imgd image)
         {
+            _settings = settings;
             _sequence = sequence;
             _image = image;
 
@@ -103,7 +109,7 @@ namespace OpenKh.Tools.LayoutEditor
                     _sprites[_selectedSprite],
                     _drawing,
                     _atlasTexture,
-                    this);
+                    this, _settings);
             }
 
             return true;
@@ -161,7 +167,7 @@ namespace OpenKh.Tools.LayoutEditor
             var height = ImGui.GetWindowHeight();
 
             _drawing.DestinationTexture = _destinationTexture;
-            _drawing.Clear(new ColorF(1, 0, 1, 1));
+            _drawing.Clear(_settings.EditorBackground);
             _drawing.SetViewport(0, 1024, 0, 1024);
             _renderer.Draw(_selectedAnimGroup, _animationFrameCurrent++, width / 2.0f, height / 2.0f);
             _drawing.Flush();
@@ -355,7 +361,7 @@ namespace OpenKh.Tools.LayoutEditor
         }
 
         private SpriteModel AsSpriteProperty(Sequence.Frame sprite) =>
-            new SpriteModel(sprite, _drawing, _atlasTexture, this);
+            new SpriteModel(sprite, _drawing, _atlasTexture, this, _settings);
 
         private static Vector2 GetUv(ISpriteTexture texture, int x, int y) =>
             new Vector2((float)x / texture.Width, (float)y / texture.Height);

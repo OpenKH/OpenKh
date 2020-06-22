@@ -14,6 +14,7 @@ namespace OpenKh.Tools.LayoutEditor.Models
         private readonly Sequence _sequence;
         private readonly SequenceRenderer _renderer;
         private readonly ITextureBinder _textureBinder;
+        private readonly IEditorSettings _settings;
         private ISpriteTexture _spriteTexture;
         private int _frameIndex;
 
@@ -26,7 +27,8 @@ namespace OpenKh.Tools.LayoutEditor.Models
             Sequence.Frame sprite,
             ISpriteDrawing drawing,
             ISpriteTexture atlasTexture,
-            ITextureBinder textureBinder)
+            ITextureBinder textureBinder,
+            IEditorSettings settings)
         {
             Sprite = sprite;
 
@@ -34,6 +36,8 @@ namespace OpenKh.Tools.LayoutEditor.Models
             _sequence = MockSequence();
             _renderer = new SequenceRenderer(_sequence, drawing, atlasTexture);
             _textureBinder = textureBinder;
+            _settings = settings;
+            _settings.OnChangeBackground += (o, e) => Draw(0, 0);
 
             SizeChanged();
         }
@@ -42,7 +46,7 @@ namespace OpenKh.Tools.LayoutEditor.Models
         {
             _drawing.SetViewport(0, Width, 0, Height);
             _drawing.DestinationTexture = _spriteTexture;
-            _drawing.Clear(new ColorF(1, 0, 1, 1));
+            _drawing.Clear(_settings.EditorBackground);
             _renderer.Draw(0, _frameIndex++, x, y);
             _drawing.Flush();
             _drawing.DestinationTexture = null;

@@ -1,5 +1,6 @@
 using ImGuiNET;
 using OpenKh.Common;
+using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.CustomImGui;
@@ -8,13 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Windows;
 using Xe.Tools.Wpf.Dialogs;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.LayoutEditor
 {
-    public class App : IDisposable
+    public class App : IEditorSettings, IDisposable
     {
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer
             .Compose()
@@ -30,6 +32,8 @@ namespace OpenKh.Tools.LayoutEditor
         private string _fileName;
         private ToolInvokeDesc _toolInvokeDesc;
         private IApp _app;
+
+        public event IEditorSettings.ChangeBackground OnChangeBackground;
 
         public string Title
         {
@@ -67,6 +71,8 @@ namespace OpenKh.Tools.LayoutEditor
             set => _spriteName = value.Length > 4 ? value.Substring(0, 4) : value;
         }
 
+        public bool CheckerboardBackground { get; set; }
+        public ColorF EditorBackground { get; set; }
         public App(MonoGameImGuiBootstrap bootstrap)
         {
             _bootstrap = bootstrap;
@@ -109,6 +115,25 @@ namespace OpenKh.Tools.LayoutEditor
                     ForMenuItem("Open...", MenuFileOpen);
                     ForMenuItem("Save", MenuFileSave);
                     ForMenuItem("Save as...", MenuFileSaveAs);
+                    ImGui.Separator();
+                    ForMenu("Preferences", () =>
+                    {
+                        var checkerboardBackground = CheckerboardBackground;
+                        if (ImGui.Checkbox("Checkerboard background", ref checkerboardBackground))
+                        {
+                            CheckerboardBackground = false;
+                            OnChangeBackground?.Invoke(this, this);
+                        }
+
+                        var editorBackground = new Vector3(EditorBackground.R,
+                            EditorBackground.G, EditorBackground.B);
+                        if (ImGui.ColorEdit3("Background color", ref editorBackground))
+                        {
+                            EditorBackground = new ColorF(editorBackground.X,
+                                editorBackground.Y, editorBackground.Z, 1f);
+                            OnChangeBackground?.Invoke(this, this);
+                        }
+                    });
                     ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
                 });
@@ -262,6 +287,7 @@ namespace OpenKh.Tools.LayoutEditor
             SpriteName = imageEntry.Name;
 
             _app = new AppSequenceEditor(_bootstrap,
+                this,
                 Sequence.Read(sequenceEntry.Stream),
                 Imgd.Read(imageEntry.Stream));
             UpdateTitle();

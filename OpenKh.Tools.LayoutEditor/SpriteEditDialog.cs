@@ -14,6 +14,7 @@ namespace OpenKh.Tools.LayoutEditor
         private readonly ISpriteDrawing _spriteDrawing;
         private readonly ISpriteTexture _atlasTexture;
         private readonly ITextureBinder _textureBinder;
+        private readonly IEditorSettings _settings;
         private readonly ISpriteTexture _cropAtlasTexture;
         private readonly IntPtr _cropAtlasTextureId;
 
@@ -21,12 +22,15 @@ namespace OpenKh.Tools.LayoutEditor
             SpriteModel spriteModel,
             ISpriteDrawing spriteDrawing,
             ISpriteTexture atlasTexture,
-            ITextureBinder textureBinder)
+            ITextureBinder textureBinder,
+            IEditorSettings settings)
         {
             _spriteModel = spriteModel;
             _spriteDrawing = spriteDrawing;
             _atlasTexture = atlasTexture;
             _textureBinder = textureBinder;
+            _settings = settings;
+            _settings.OnChangeBackground += (o, e) => DrawCropAtlasTexture();
 
             _cropAtlasTexture = _spriteDrawing.CreateSpriteTexture(atlasTexture.Width, atlasTexture.Height);
             _cropAtlasTextureId = _textureBinder.BindTexture(_cropAtlasTexture);
@@ -96,7 +100,8 @@ namespace OpenKh.Tools.LayoutEditor
             var sTop = _spriteModel.Sprite.Top;
             var sRight = _spriteModel.Sprite.Right;
             var sBottom = _spriteModel.Sprite.Bottom;
-            var cropColor = new ColorF(1, 0, 1, 0.75f);
+            var cropColor = _settings.EditorBackground;
+            cropColor.A = 0.75f;
 
             var context = new SpriteDrawingContext()
                 .SpriteTexture(_atlasTexture)
@@ -109,7 +114,7 @@ namespace OpenKh.Tools.LayoutEditor
 
             _spriteDrawing.DestinationTexture = _cropAtlasTexture;
             _spriteDrawing.SetViewport(0, _cropAtlasTexture.Width, 0, _cropAtlasTexture.Height);
-            _spriteDrawing.Clear(new ColorF(1, 0, 1, 1));
+            _spriteDrawing.Clear(_settings.EditorBackground);
             _spriteDrawing.AppendSprite(context);
 
             _spriteDrawing.FillRectangle(0, 0, _cropAtlasTexture.Width, sTop, cropColor);
