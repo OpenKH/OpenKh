@@ -29,7 +29,7 @@ namespace OpenKh.Tools.LayoutEditor
         private bool _isFrameEditDialogOpen;
         private SpriteEditDialog _frameEditDialog;
 
-        private int _selectedSprite = 61;
+        private int _selectedSprite = 0;
         private int _selectedAnimGroup = 1;
         private ISpriteTexture _destinationTexture;
         private IntPtr _destinationTextureId;
@@ -55,8 +55,6 @@ namespace OpenKh.Tools.LayoutEditor
             _sprites = sequence.Frames
                 .Select(x => AsSpriteProperty(x))
                 .ToList();
-
-            _isFrameEditDialogOpen = true;
         }
 
         public void Menu()
@@ -116,8 +114,32 @@ namespace OpenKh.Tools.LayoutEditor
             }
         }
 
+        private void DrawAnimationGroupList()
+        {
+            for (int i = 0; i < _sequence.AnimationGroups.Count; i++)
+            {
+                if (ImGui.Selectable($"Animation Group {i}\n",
+                    _selectedAnimGroup == i))
+                    _selectedAnimGroup = i;
+            }
+        }
+
         private unsafe void DrawAnimation()
         {
+            if (ImGui.BeginCombo("", $"Animation Group {_selectedAnimGroup}",
+                ImGuiComboFlags.PopupAlignLeft))
+            {
+                DrawAnimationGroupList();
+                ImGui.EndCombo();
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("-", new Vector2(30, 0)) && _selectedAnimGroup > 0)
+                _selectedAnimGroup--;
+            ImGui.SameLine();
+            if (ImGui.Button("+", new Vector2(30, 0)) &&
+                _selectedAnimGroup < _sequence.AnimationGroups.Count - 1)
+                _selectedAnimGroup++;
+
             var width = ImGui.GetWindowContentRegionWidth();
             var height = ImGui.GetWindowHeight();
 
@@ -313,7 +335,6 @@ namespace OpenKh.Tools.LayoutEditor
             var colorEnd = Utilities.ConvertColor(animation.ColorEnd);
             if (ImGui.ColorPicker4("Mask end", ref colorEnd))
                 animation.ColorEnd = Utilities.ConvertColor(colorEnd);
-
         }
 
         private SpriteModel AsSpriteProperty(Sequence.Frame sprite) =>
