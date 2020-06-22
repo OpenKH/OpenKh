@@ -5,14 +5,11 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyTitle>Layout editor</AssemblyTitle>
     <Product>Layout editor - OpenKh</Product>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon />
     <StartupObject />
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
+  
   <ItemGroup>
     <MonoGameContentReference Include="**\*.mgcb" />
   </ItemGroup>
