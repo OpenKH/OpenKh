@@ -106,8 +106,6 @@ namespace OpenKh.Tools.LayoutEditor
                     this);
             }
 
-            ImGui.ShowDemoWindow();
-
             return true;
         }
 
