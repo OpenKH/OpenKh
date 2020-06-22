@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common;
@@ -16,7 +16,10 @@ namespace OpenKh.Tools.LayoutEditor
 {
     public class App : IDisposable
     {
-        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("2DD Sequence container file", "2dd")
+            .AddAllFiles();
         private const string DefaultName = "FAKE";
 
         private readonly MonoGameImGuiBootstrap _bootstrap;
