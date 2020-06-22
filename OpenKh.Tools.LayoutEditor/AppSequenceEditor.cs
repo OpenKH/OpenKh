@@ -24,7 +24,6 @@ namespace OpenKh.Tools.LayoutEditor
         private readonly KingdomShader _shader;
         private readonly MonoSpriteDrawing _drawing;
         private readonly ISpriteTexture _atlasTexture;
-        private readonly IntPtr _atlasTextureId;
         private readonly SequenceRenderer _renderer;
 
         private bool _isFrameEditDialogOpen;
@@ -51,7 +50,6 @@ namespace OpenKh.Tools.LayoutEditor
             _renderer = new SequenceRenderer(_sequence, _drawing, _atlasTexture);
 
             _destinationTexture = _drawing.CreateSpriteTexture(1024, 1024);
-            _atlasTextureId = this.BindTexture(_atlasTexture);
             _destinationTextureId = this.BindTexture(_destinationTexture);
 
             _sprites = sequence.Frames
