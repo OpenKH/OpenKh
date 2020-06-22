@@ -17,7 +17,6 @@ namespace OpenKh.Tools.LayoutEditor
 {
     public class AppSequenceEditor : IApp, ITextureBinder, IDisposable
     {
-        private const string FrameEditDialogTitle = "Frame edit";
         private readonly Sequence _sequence;
         private readonly Imgd _image;
         private readonly MonoGameImGuiBootstrap _bootStrap;
@@ -31,11 +30,13 @@ namespace OpenKh.Tools.LayoutEditor
         private bool _isFrameEditDialogOpen;
         private FrameEditDialog _frameEditDialog;
 
-        private int _selectedSprite = 0;
+        private int _selectedSprite = 61;
         private int _selectedAnimGroup = 1;
         private ISpriteTexture _destinationTexture;
         private IntPtr _destinationTextureId;
         private List<SpriteModel> _sprites;
+
+        private string FrameEditDialogTitle => $"Frame edit #{_selectedSprite}";
 
         public AppSequenceEditor(MonoGameImGuiBootstrap bootstrap, Sequence sequence, Imgd image)
         {
@@ -57,7 +58,7 @@ namespace OpenKh.Tools.LayoutEditor
                 .Select(x => AsSpriteProperty(x))
                 .ToList();
 
-            _isFrameEditDialogOpen = false;
+            _isFrameEditDialogOpen = true;
         }
 
         public void Menu()
@@ -72,7 +73,7 @@ namespace OpenKh.Tools.LayoutEditor
         {
             bool dummy = true;
             if (ImGui.BeginPopupModal(FrameEditDialogTitle, ref dummy,
-                ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal))
+                ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
             {
                 _frameEditDialog.Run();
                 ImGui.EndPopup();
@@ -89,8 +90,9 @@ namespace OpenKh.Tools.LayoutEditor
                 _isFrameEditDialogOpen = false;
                 _frameEditDialog = new FrameEditDialog(
                     _sprites[_selectedSprite],
+                    _drawing,
                     _atlasTexture,
-                    _atlasTextureId);
+                    this);
             }
 
             return true;

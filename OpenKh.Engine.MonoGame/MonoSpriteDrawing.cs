@@ -214,8 +214,8 @@ namespace OpenKh.Engine.MonoGame
             }
 
             var texture = (context.SpriteTexture as CSpriteTexture)?.Texture;
-            var tw = 1.0f / texture.Width;
-            var th = 1.0f / texture.Height;
+            var tw = 1f / texture?.Width ?? 1f;
+            var th = 1f / texture?.Height ?? 1f;
 
             var textureRegionU = new Vector2(context.TextureRegionLeft * tw, context.TextureRegionRight * tw);
             var textureRegionV = new Vector2(context.TextureRegionTop * th, context.TextureRegionBottom * th);
