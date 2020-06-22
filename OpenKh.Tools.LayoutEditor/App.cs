@@ -130,12 +130,12 @@ namespace OpenKh.Tools.LayoutEditor
                     ImGui.Separator();
                     ForMenu("Preferences", () =>
                     {
-                        var checkerboardBackground = CheckerboardBackground;
-                        if (ImGui.Checkbox("Checkerboard background", ref checkerboardBackground))
-                        {
-                            CheckerboardBackground = false;
-                            OnChangeBackground?.Invoke(this, this);
-                        }
+                        //var checkerboardBackground = CheckerboardBackground;
+                        //if (ImGui.Checkbox("Checkerboard background", ref checkerboardBackground))
+                        //{
+                        //    CheckerboardBackground = false;
+                        //    OnChangeBackground?.Invoke(this, this);
+                        //}
 
                         var editorBackground = new Vector3(EditorBackground.R,
                             EditorBackground.G, EditorBackground.B);

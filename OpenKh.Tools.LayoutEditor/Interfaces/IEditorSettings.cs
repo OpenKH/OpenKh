@@ -7,7 +7,7 @@ namespace OpenKh.Tools.LayoutEditor.Interfaces
         delegate void ChangeBackground(object sender, IEditorSettings settings);
         public event ChangeBackground OnChangeBackground;
 
-        public bool CheckerboardBackground { get; }
+        //public bool CheckerboardBackground { get; }
         ColorF EditorBackground { get; }
     }
 }
