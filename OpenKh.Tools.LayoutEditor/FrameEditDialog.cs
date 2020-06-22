@@ -88,9 +88,6 @@ namespace OpenKh.Tools.LayoutEditor
 
             _spriteModel.Draw(0, 0);
             ImGui.Image(_spriteModel.TextureId, SuggestSpriteSize());
-
-            if (ImGui.Button("Close"))
-                ImGui.CloseCurrentPopup();
         }
 
         private void DrawCropAtlasTexture()
