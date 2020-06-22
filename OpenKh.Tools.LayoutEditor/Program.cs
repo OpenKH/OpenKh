@@ -12,8 +12,8 @@ namespace OpenKh.Tools.LayoutEditor
             program.Run();
         }
 
-        const int InitialWindowWidth = 800;
-        const int InitialWindowHeight = 600;
+        const int InitialWindowWidth = 1000;
+        const int InitialWindowHeight = 800;
         private readonly MonoGameImGuiBootstrap _bootstrap;
         private App _app;
 

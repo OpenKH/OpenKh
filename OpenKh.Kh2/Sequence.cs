@@ -83,9 +83,9 @@ namespace OpenKh.Kh2
             [Data] public float ScaleXEnd { get; set; }
             [Data] public float ScaleYStart { get; set; }
             [Data] public float ScaleYEnd { get; set; }
-            [Data] public int Unknown60 { get; set; }
+            [Data] public float Unknown60 { get; set; }
             [Data] public float Unknown64 { get; set; }
-            [Data] public int Unknown68 { get; set; }
+            [Data] public float Unknown68 { get; set; }
             [Data] public float Unknown6c { get; set; }
             [Data] public int BounceXStart { get; set; }
             [Data] public int BounceXEnd { get; set; }
