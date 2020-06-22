@@ -72,7 +72,19 @@ namespace OpenKh.Tools.LayoutEditor
         }
 
         public bool CheckerboardBackground { get; set; }
-        public ColorF EditorBackground { get; set; }
+        public ColorF EditorBackground
+        {
+            get => new ColorF(Settings.Default.BgColorR, Settings.Default.BgColorG,
+                Settings.Default.BgColorB, 1f);
+            set
+            {
+                Settings.Default.BgColorR = value.R;
+                Settings.Default.BgColorG = value.G;
+                Settings.Default.BgColorB = value.B;
+                Settings.Default.Save();
+            }
+        }
+
         public App(MonoGameImGuiBootstrap bootstrap)
         {
             _bootstrap = bootstrap;
