@@ -68,7 +68,6 @@ namespace OpenKh.Tools.LayoutEditor
         {
             _bootstrap = bootstrap;
             _bootstrap.Title = Title;
-            OpenFile(@"D:\Hacking\KH2\export_fm\field2d\jp\zz0command.2dd");
         }
 
         public bool MainLoop()
