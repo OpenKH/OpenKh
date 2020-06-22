@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace OpenKh.Tools.LayoutEditor
 {
-    class FrameEditDialog : IDisposable
+    class SpriteEditDialog : IDisposable
     {
         private readonly SpriteModel _spriteModel;
         private readonly ISpriteDrawing _spriteDrawing;
@@ -17,7 +17,7 @@ namespace OpenKh.Tools.LayoutEditor
         private readonly ISpriteTexture _cropAtlasTexture;
         private readonly IntPtr _cropAtlasTextureId;
 
-        public FrameEditDialog(
+        public SpriteEditDialog(
             SpriteModel spriteModel,
             ISpriteDrawing spriteDrawing,
             ISpriteTexture atlasTexture,

@@ -28,7 +28,7 @@ namespace OpenKh.Tools.LayoutEditor
         private readonly SequenceRenderer _renderer;
 
         private bool _isFrameEditDialogOpen;
-        private FrameEditDialog _frameEditDialog;
+        private SpriteEditDialog _frameEditDialog;
 
         private int _selectedSprite = 61;
         private int _selectedAnimGroup = 1;
@@ -36,7 +36,7 @@ namespace OpenKh.Tools.LayoutEditor
         private IntPtr _destinationTextureId;
         private List<SpriteModel> _sprites;
 
-        private string FrameEditDialogTitle => $"Frame edit #{_selectedSprite}";
+        private string FrameEditDialogTitle => $"Sprite edit #{_selectedSprite}";
 
         public AppSequenceEditor(MonoGameImGuiBootstrap bootstrap, Sequence sequence, Imgd image)
         {
@@ -88,7 +88,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 ImGui.OpenPopup(FrameEditDialogTitle);
                 _isFrameEditDialogOpen = false;
-                _frameEditDialog = new FrameEditDialog(
+                _frameEditDialog = new SpriteEditDialog(
                     _sprites[_selectedSprite],
                     _drawing,
                     _atlasTexture,
