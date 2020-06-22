@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.LayoutEditor.Interfaces;
 using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,11 +32,25 @@ namespace OpenKh.Tools.LayoutEditor
 
         private int _selectedSprite = 0;
         private int _selectedAnimGroup = 1;
+        private int _animationFrameCurrent;
+        private int _animationFrameCount;
         private ISpriteTexture _destinationTexture;
         private IntPtr _destinationTextureId;
         private List<SpriteModel> _sprites;
 
         private string FrameEditDialogTitle => $"Sprite edit #{_selectedSprite}";
+
+        public int SelectedAnimGroup
+        {
+            get => _selectedAnimGroup;
+            set
+            {
+                _selectedAnimGroup = value;
+                _animationFrameCurrent = 0;
+                _animationFrameCount = SequenceExtensions
+                    .GetFrameLengthFromAnimationGroup(_sequence, _selectedAnimGroup);
+            }
+        }
 
         public AppSequenceEditor(MonoGameImGuiBootstrap bootstrap, Sequence sequence, Imgd image)
         {
@@ -91,6 +106,8 @@ namespace OpenKh.Tools.LayoutEditor
                     this);
             }
 
+            ImGui.ShowDemoWindow();
+
             return true;
         }
 
@@ -119,26 +136,28 @@ namespace OpenKh.Tools.LayoutEditor
             for (int i = 0; i < _sequence.AnimationGroups.Count; i++)
             {
                 if (ImGui.Selectable($"Animation Group {i}\n",
-                    _selectedAnimGroup == i))
-                    _selectedAnimGroup = i;
+                    SelectedAnimGroup == i))
+                    SelectedAnimGroup = i;
             }
         }
 
         private unsafe void DrawAnimation()
         {
-            if (ImGui.BeginCombo("", $"Animation Group {_selectedAnimGroup}",
+            if (ImGui.BeginCombo("", $"Animation Group {SelectedAnimGroup}",
                 ImGuiComboFlags.PopupAlignLeft))
             {
                 DrawAnimationGroupList();
                 ImGui.EndCombo();
             }
             ImGui.SameLine();
-            if (ImGui.Button("-", new Vector2(30, 0)) && _selectedAnimGroup > 0)
-                _selectedAnimGroup--;
+            if (ImGui.Button("-", new Vector2(30, 0)) && SelectedAnimGroup > 0)
+                SelectedAnimGroup--;
             ImGui.SameLine();
             if (ImGui.Button("+", new Vector2(30, 0)) &&
-                _selectedAnimGroup < _sequence.AnimationGroups.Count - 1)
-                _selectedAnimGroup++;
+                SelectedAnimGroup < _sequence.AnimationGroups.Count - 1)
+                SelectedAnimGroup++;
+
+            ImGui.SliderInt("Frame", ref _animationFrameCurrent, 0, _animationFrameCount);
 
             var width = ImGui.GetWindowContentRegionWidth();
             var height = ImGui.GetWindowHeight();
@@ -146,7 +165,7 @@ namespace OpenKh.Tools.LayoutEditor
             _drawing.DestinationTexture = _destinationTexture;
             _drawing.Clear(new ColorF(1, 0, 1, 1));
             _drawing.SetViewport(0, 1024, 0, 1024);
-            _renderer.Draw(_selectedAnimGroup, 0, width / 2.0f, height / 2.0f);
+            _renderer.Draw(_selectedAnimGroup, _animationFrameCurrent++, width / 2.0f, height / 2.0f);
             _drawing.Flush();
             _drawing.DestinationTexture = null;
 
