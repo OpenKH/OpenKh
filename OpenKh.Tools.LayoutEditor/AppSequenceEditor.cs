@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Tools.LayoutEditor.Models;
 using System.IO;
+using OpenKh.Tools.LayoutEditor.Dialogs;
 
 namespace OpenKh.Tools.LayoutEditor
 {

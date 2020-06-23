@@ -6,7 +6,7 @@ using OpenKh.Tools.LayoutEditor.Models;
 using System;
 using System.Numerics;
 
-namespace OpenKh.Tools.LayoutEditor
+namespace OpenKh.Tools.LayoutEditor.Dialogs
 {
     class SpriteEditDialog : IDisposable
     {
