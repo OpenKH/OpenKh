@@ -147,21 +147,8 @@ namespace OpenKh.Tools.LayoutEditor
 
         private unsafe void DrawAnimation()
         {
-            if (ImGui.BeginCombo("", $"Animation Group {SelectedAnimGroup}",
-                ImGuiComboFlags.PopupAlignLeft))
-            {
-                DrawAnimationGroupList();
-                ImGui.EndCombo();
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("-", new Vector2(30, 0)) && SelectedAnimGroup > 0)
-                SelectedAnimGroup--;
-            ImGui.SameLine();
-            if (ImGui.Button("+", new Vector2(30, 0)) &&
-                SelectedAnimGroup < _sequence.AnimationGroups.Count - 1)
-                SelectedAnimGroup++;
-
-            ImGui.SliderInt("Frame", ref _animationFrameCurrent, 0, _animationFrameCount);
+            AnimationGroupSelector();
+            Timeline();
 
             var width = ImGui.GetWindowContentRegionWidth();
             var height = ImGui.GetWindowHeight();
@@ -358,6 +345,32 @@ namespace OpenKh.Tools.LayoutEditor
             var colorEnd = Utilities.ConvertColor(animation.ColorEnd);
             if (ImGui.ColorPicker4("Mask end", ref colorEnd))
                 animation.ColorEnd = Utilities.ConvertColor(colorEnd);
+        }
+
+        private unsafe void AnimationGroupSelector()
+        {
+            ImGui.ShowDemoWindow();
+
+            if (ImGui.BeginCombo("", $"Animation Group {SelectedAnimGroup}",
+                ImGuiComboFlags.PopupAlignLeft))
+            {
+                DrawAnimationGroupList();
+                ImGui.EndCombo();
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("-", new Vector2(30, 0)) && SelectedAnimGroup > 0)
+                SelectedAnimGroup--;
+            ImGui.SameLine();
+            if (ImGui.Button("+", new Vector2(30, 0)) &&
+                SelectedAnimGroup < _sequence.AnimationGroups.Count - 1)
+                SelectedAnimGroup++;
+        }
+
+        private unsafe void Timeline()
+        {
+            ImGui.SliderInt("Frame", ref _animationFrameCurrent, 0, _animationFrameCount,
+                $"%i/{_animationFrameCount}");
+
         }
 
         private SpriteModel AsSpriteProperty(Sequence.Frame sprite) =>
