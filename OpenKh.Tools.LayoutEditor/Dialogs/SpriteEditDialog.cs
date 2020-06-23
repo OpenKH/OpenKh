@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
+using OpenKh.Kh2;
 using OpenKh.Tools.LayoutEditor.Interfaces;
 using OpenKh.Tools.LayoutEditor.Models;
 using System;
@@ -53,7 +54,13 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 _spriteModel.Sprite.Left, _spriteModel.Sprite.Top,
                 _spriteModel.Sprite.Right, _spriteModel.Sprite.Bottom
             };
-            if (ImGui.DragInt4("Source", ref source[0]))
+
+            ImGui.Columns(4);
+            bool sourceChanged = ImGui.DragInt("UA", ref source[0]); ImGui.NextColumn();
+            sourceChanged |= ImGui.DragInt("VA", ref source[1]); ImGui.NextColumn();
+            sourceChanged |= ImGui.DragInt("UB", ref source[2]); ImGui.NextColumn();
+            sourceChanged |= ImGui.DragInt("VB", ref source[3]);
+            if (sourceChanged)
             {
                 _spriteModel.Sprite.Left = source[0];
                 _spriteModel.Sprite.Top = source[1];
@@ -62,6 +69,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 _spriteModel.SizeChanged();
                 DrawCropAtlasTexture();
             }
+            ImGui.Columns(1);
 
             var colorTopLeft = Utilities.ConvertColor(_spriteModel.Sprite.ColorLeft);
             if (ImGui.ColorEdit4("Top left", ref colorTopLeft))
