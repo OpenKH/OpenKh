@@ -4,6 +4,7 @@ using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using OpenKh.Tools.LayoutEditor.Interfaces;
 using OpenKh.Tools.LayoutEditor.Models;
+using SharpDX.Direct2D1.Effects;
 using System;
 using System.Numerics;
 
@@ -55,7 +56,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 _spriteModel.Sprite.Right, _spriteModel.Sprite.Bottom
             };
 
-            ImGui.Columns(4);
+            ImGui.Columns(4, "ltrb", false);
             bool sourceChanged = ImGui.DragInt("UA", ref source[0]); ImGui.NextColumn();
             sourceChanged |= ImGui.DragInt("VA", ref source[1]); ImGui.NextColumn();
             sourceChanged |= ImGui.DragInt("UB", ref source[2]); ImGui.NextColumn();
@@ -110,6 +111,9 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             var sBottom = _spriteModel.Sprite.Bottom;
             var cropColor = _settings.EditorBackground;
             cropColor.A = 0.75f;
+            var invertedCropColor = new ColorF(
+                1f - cropColor.R, 1f - cropColor.G,
+                1f - cropColor.G, 1.0f);
 
             var context = new SpriteDrawingContext()
                 .SpriteTexture(_atlasTexture)
@@ -129,6 +133,8 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             _spriteDrawing.FillRectangle(0, sTop, sLeft, sBottom - sTop, cropColor);
             _spriteDrawing.FillRectangle(sRight, sTop, _cropAtlasTexture.Width, sBottom - sTop, cropColor);
             _spriteDrawing.FillRectangle(0, sBottom, _cropAtlasTexture.Width, _cropAtlasTexture.Height, cropColor);
+            _spriteDrawing.DrawRectangle(sLeft - 1, sTop - 1,
+                sRight - sLeft + 2, sBottom - sTop + 2, invertedCropColor);
 
             _spriteDrawing.Flush();
             _spriteDrawing.DestinationTexture = null;
