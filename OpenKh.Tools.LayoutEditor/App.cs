@@ -5,6 +5,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.CustomImGui;
+using OpenKh.Tools.LayoutEditor.Dialogs;
 using OpenKh.Tools.LayoutEditor.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,10 @@ namespace OpenKh.Tools.LayoutEditor
         private string _fileName;
         private ToolInvokeDesc _toolInvokeDesc;
         private IApp _app;
+
+        private const string ResourceSelectionDialogTitle = "Resource selection";
+        private bool _isResourceSelectionDialogOpening;
+        private ResourceSelectionDialog _resourceSelectionDialog;
 
         public event IEditorSettings.ChangeBackground OnChangeBackground;
 
@@ -94,11 +99,31 @@ namespace OpenKh.Tools.LayoutEditor
 
         public bool MainLoop()
         {
+            bool dummy = true;
+            if (ImGui.BeginPopupModal(ResourceSelectionDialogTitle, ref dummy,
+                ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                _resourceSelectionDialog.Run();
+                ImGui.EndPopup();
+
+                if (_resourceSelectionDialog.HasResourceBeenSelected)
+                {
+                    OpenSequenceEditor(_resourceSelectionDialog.SelectedAnimation,
+                        _resourceSelectionDialog.SelectedTexture);
+                }
+            }
+
             ImGuiEx.MainWindow(() =>
             {
                 MainMenu();
                 MainWindow();
             });
+
+            if (_isResourceSelectionDialogOpening)
+            {
+                ImGui.OpenPopup(ResourceSelectionDialogTitle);
+                _isResourceSelectionDialogOpening = false;
+            }
 
             return _exitFlag;
         }
@@ -226,7 +251,7 @@ namespace OpenKh.Tools.LayoutEditor
             var sequenceEntries = entries.Count(x => x.Type == Bar.EntryType.Seqd);
 
             if (DoesContainSequenceAnimations(entries))
-                return Open2dd(entries, doNotShowLayoutSelectionDialog);
+                return Open2dd(entries);
             if (DoesContainLayoutAnimations(entries))
                 return Open2ld(entries, doNotShowLayoutSelectionDialog);
 
@@ -283,34 +308,46 @@ namespace OpenKh.Tools.LayoutEditor
             return true;
         }
 
-        private bool Open2dd(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
+        private bool Open2dd(IEnumerable<Bar.Entry> entries)
         {
             var sequenceEntries = entries.Count(x => x.Type == Bar.EntryType.Seqd);
             int imagesEntries = entries.Count(x => x.Type == Bar.EntryType.Imgd);
 
             if (sequenceEntries == 0)
                 throw new Exception("No sequence found.");
-            if (sequenceEntries > 1)
-                throw new Exception("Did not expected multiple sequences.");
-            var sequenceEntry = entries.First(x => x.Type == Bar.EntryType.Seqd);
-            AnimationName = sequenceEntry.Name;
-
             if (imagesEntries == 0)
                 throw new Exception("No image found.");
-            if (imagesEntries > 1)
-                throw new Exception("Did not expected multiple images for a single sequence.");
-            var imageEntry = entries.First(x => x.Type == Bar.EntryType.Imgd);
-            TextureName = imageEntry.Name;
+            if (sequenceEntries > 1 || imagesEntries > 1)
+            {
+                OpenResourceSelectionDialog(entries, Bar.EntryType.Seqd, Bar.EntryType.Imgd);
+                return true;
+            }
+
+            var sequenceEntry = entries.First(x => x.Type == Bar.EntryType.Seqd);
+            var textureEntry = entries.First(x => x.Type == Bar.EntryType.Imgd);
+            OpenSequenceEditor(sequenceEntry, textureEntry);
+            return true;
+        }
+
+        private void OpenResourceSelectionDialog(IEnumerable<Bar.Entry> entries,
+            Bar.EntryType animationType, Bar.EntryType textureType)
+        {
+            _resourceSelectionDialog = new ResourceSelectionDialog(
+                entries, animationType, textureType);
+            _isResourceSelectionDialogOpening = true;
+        }
+
+        private void OpenSequenceEditor(Bar.Entry sequenceEntry, Bar.Entry textureEntry)
+        {
+            AnimationName = sequenceEntry.Name;
+            TextureName = textureEntry.Name;
 
             var app = new AppSequenceEditor(_bootstrap,
                 this,
                 Sequence.Read(sequenceEntry.Stream),
-                Imgd.Read(imageEntry.Stream));
+                Imgd.Read(textureEntry.Stream));
             _app = app;
             CurrentEditor = app;
-            UpdateTitle();
-
-            return true;
         }
 
         private void UpdateTitle()

@@ -377,8 +377,6 @@ namespace OpenKh.Tools.LayoutEditor
 
         private unsafe void AnimationGroupSelector()
         {
-            ImGui.ShowDemoWindow();
-
             if (ImGui.BeginCombo("", $"Animation Group {SelectedAnimGroup}",
                 ImGuiComboFlags.PopupAlignLeft))
             {
