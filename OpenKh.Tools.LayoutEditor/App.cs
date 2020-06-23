@@ -2,6 +2,7 @@ using ImGuiNET;
 using OpenKh.Common;
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.LayoutEditor.Interfaces;
@@ -39,7 +40,7 @@ namespace OpenKh.Tools.LayoutEditor
         {
             get
             {
-                var contentName = $"{AnimationName ?? DefaultName},{SpriteName ?? DefaultName}";
+                var contentName = $"{AnimationName ?? DefaultName},{TextureName ?? DefaultName}";
                 var fileName = IsToolDesc ? _toolInvokeDesc.Title : (FileName ?? "untitled");
 
                 return $"{contentName} | {fileName} | {MonoGameImGuiBootstrap.ApplicationName}";
@@ -65,7 +66,7 @@ namespace OpenKh.Tools.LayoutEditor
             set => _animationName = value.Length > 4 ? value.Substring(0, 4) : value;
         }
 
-        public string SpriteName
+        public string TextureName
         {
             get => _spriteName;
             set => _spriteName = value.Length > 4 ? value.Substring(0, 4) : value;
@@ -125,8 +126,8 @@ namespace OpenKh.Tools.LayoutEditor
                 ForMenu("File", () =>
                 {
                     ForMenuItem("Open...", MenuFileOpen);
-                    ForMenuItem("Save", MenuFileSave);
-                    ForMenuItem("Save as...", MenuFileSaveAs);
+                    ForMenuItem("Save", MenuFileSave, CurrentEditor != null);
+                    ForMenuItem("Save as...", MenuFileSaveAs, CurrentEditor != null);
                     ImGui.Separator();
                     ForMenu("Preferences", () =>
                     {
@@ -198,10 +199,13 @@ namespace OpenKh.Tools.LayoutEditor
 
         public void SaveFile(string previousFileName, string fileName)
         {
-            var existingEntries = File.Exists(previousFileName) ? ReadBarEntriesFromFileName(previousFileName) : new List<Bar.Entry>();
+            var existingEntries = File.Exists(previousFileName) ?
+                ReadBarEntriesFromFileName(previousFileName) : new List<Bar.Entry>();
 
-            using (var stream = File.Create(fileName))
-                Bar.Write(stream, CurrentEditor.Save(existingEntries));
+            var newEntries = existingEntries
+                .AddOrReplace(CurrentEditor.SaveAnimation(AnimationName))
+                .AddOrReplace(CurrentEditor.SaveTexture(TextureName));
+            File.Create(fileName).Using(stream => Bar.Write(stream, newEntries));
 
             if (IsToolDesc)
                 _toolInvokeDesc.ContentChange = ToolInvokeDesc.ContentChangeInfo.File;
@@ -296,12 +300,14 @@ namespace OpenKh.Tools.LayoutEditor
             if (imagesEntries > 1)
                 throw new Exception("Did not expected multiple images for a single sequence.");
             var imageEntry = entries.First(x => x.Type == Bar.EntryType.Imgd);
-            SpriteName = imageEntry.Name;
+            TextureName = imageEntry.Name;
 
-            _app = new AppSequenceEditor(_bootstrap,
+            var app = new AppSequenceEditor(_bootstrap,
                 this,
                 Sequence.Read(sequenceEntry.Stream),
                 Imgd.Read(imageEntry.Stream));
+            _app = app;
+            CurrentEditor = app;
             UpdateTitle();
 
             return true;

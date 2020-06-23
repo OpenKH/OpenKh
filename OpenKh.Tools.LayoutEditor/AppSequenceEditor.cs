@@ -13,10 +13,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Tools.LayoutEditor.Models;
+using System.IO;
 
 namespace OpenKh.Tools.LayoutEditor
 {
-    public class AppSequenceEditor : IApp, ITextureBinder, IDisposable
+    public class AppSequenceEditor : IApp, ISaveBar, ITextureBinder, IDisposable
     {
         private readonly IEditorSettings _settings;
         private readonly Sequence _sequence;
@@ -176,6 +177,32 @@ namespace OpenKh.Tools.LayoutEditor
                     AnimationEdit(_sequence.Animations[animationGroup.AnimationIndex + i]);
                 }
             }
+        }
+
+        public Bar.Entry SaveAnimation(string name)
+        {
+            var stream = new MemoryStream();
+            _sequence.Write(stream);
+
+            return new Bar.Entry
+            {
+                Name = name,
+                Stream = stream,
+                Type = Bar.EntryType.Seqd
+            };
+        }
+
+        public Bar.Entry SaveTexture(string name)
+        {
+            var stream = new MemoryStream();
+            _image.Write(stream);
+
+            return new Bar.Entry
+            {
+                Name = name,
+                Stream = stream,
+                Type = Bar.EntryType.Imgd
+            };
         }
 
         public void Dispose()
