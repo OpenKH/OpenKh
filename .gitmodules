@@ -3,4 +3,4 @@
 	url = https://github.com/Xeeynamo/XeEngine.Tools.Public
 [submodule "nQuant"]
 	path = nQuant
-	url = git@github.com:OpenKH/nQuant.git
+	url = https://github.com/OpenKH/nQuant.git
