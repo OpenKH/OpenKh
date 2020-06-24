@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using nQuant;
 using OpenKh.Common;
-using OpenKh.Imaging;
 using OpenKh.Kh2;
 
 namespace OpenKh.Command.ImgTool.Utils

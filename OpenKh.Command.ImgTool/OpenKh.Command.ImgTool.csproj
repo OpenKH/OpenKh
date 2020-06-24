@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\nQuant\nQuant.Core\nQuant.Core.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
-    <ProjectReference Include="..\OpenKh.nQuant.Core\OpenKh.nQuant.Core.csproj" />
   </ItemGroup>
 
 </Project>
