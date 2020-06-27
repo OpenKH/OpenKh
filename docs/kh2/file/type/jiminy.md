@@ -17,7 +17,7 @@ This file contains different informations about Jiminy's Journal. Internally it 
 
 ## Header
 
-Each sub-file starts with a header. The structure for all is the same, aside from the Magic Code.
+Each sub-file starts with the same header. Only the Magic Code differs.
 
 | Offset | Type   | Description |
 |--------|--------|-------------|

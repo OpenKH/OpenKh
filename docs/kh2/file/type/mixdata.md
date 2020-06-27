@@ -1,6 +1,6 @@
 # [Kingdom Hearts II](../../index) - mixdata.bar
 
-This file contains different informations about the moogle shop. Internally it is a [bar](bar.md) file.
+This file contains informations about the moogle shop. Internally it is a [bar](bar.md) file.
 
 * [Sub-file Header](#header)
 * Entries
