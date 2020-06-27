@@ -22,7 +22,7 @@ Each sub-file starts with a header. The structure for all is the same, aside fro
 | Offset | Type   | Description |
 |--------|--------|-------------|
 | 00     | int    | Magic Code
-| 04     | int    | Unknown. Seems to be related to the game version
+| 04     | int    | Version
 | 08     | int    | Entries count
 | 0C     | int    | Padding
 
@@ -170,7 +170,7 @@ Magic Code `JMMG`
 
 ## Ques
 
-Contains informations about the secion "Missions".
+Contains informations about the section "Missions".
 
 Magic Code `JMQU`
 

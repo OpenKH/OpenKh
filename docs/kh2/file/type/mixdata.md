@@ -50,7 +50,7 @@ Magic Code `MIRE`
 
 ## Cond
 
-Unlockable upgrades for moogle (collect 50 of etc.)
+Contains the table from Synthesize -> Lists (Get n types of materials etc.)
 
 Magic Code `MICO`
 
@@ -82,5 +82,3 @@ Magic Code `MILV`
 
 
 ## Exp
-
-???
