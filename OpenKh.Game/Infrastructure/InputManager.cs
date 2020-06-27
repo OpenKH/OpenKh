@@ -1,8 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using System;
-using System.Linq;
-
 using OpenKh.Game.Infrastructure.Input;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,21 +17,21 @@ namespace OpenKh.Game.Infrastructure
         public bool IsDebugDown => _devices.Any(x => x.IsDebugDown);
 
         public bool IsExit => _devices.Any(x => x.IsExit);
-        public bool IsUp => _devices.Any(x => x.IsUp);
-        public bool IsDown => _devices.Any(x => x.IsDown);
-        public bool IsLeft => _devices.Any(x => x.IsLeft);
-        public bool IsRight => _devices.Any(x => x.IsRight);
+        public bool IsUp => _devices.Any(x => x.IsDPadUp);
+        public bool IsDown => _devices.Any(x => x.IsDPadDown);
+        public bool IsLeft => _devices.Any(x => x.IsDPadLeft);
+        public bool IsRight => _devices.Any(x => x.IsDPadRight);
         public bool IsCircle => _devices.Any(x => x.IsCircle);
         public bool IsCross => _devices.Any(x => x.IsCross);
 
-        public bool Up => _devices.Any(x => x.Up);
-        public bool Down => _devices.Any(x => x.Down);
-        public bool Left => _devices.Any(x => x.Left);
-        public bool Right => _devices.Any(x => x.Right);
-        public bool W => _devices.Any(x => x.W);
-        public bool S =>_devices.Any(x => x.S);
-        public bool A =>_devices.Any(x => x.A);
-        public bool D =>_devices.Any(x => x.D);
+        public bool Up => _devices.Any(x => x.RightStickUp);
+        public bool Down => _devices.Any(x => x.RightStickDown);
+        public bool Left => _devices.Any(x => x.RightStickLeft);
+        public bool Right => _devices.Any(x => x.RightStickRight);
+        public bool W => _devices.Any(x => x.LeftStickUp);
+        public bool S => _devices.Any(x => x.LeftStickDown);
+        public bool A => _devices.Any(x => x.LeftStickLeft);
+        public bool D => _devices.Any(x => x.LeftStickRight);
 
         public InputManager()
         {
@@ -46,6 +42,10 @@ namespace OpenKh.Game.Infrastructure
             };
         }
 
-        public void Update(GameTime gameTime) => _devices.ForEach(device => device.Update(gameTime));
+        public void Update(GameTime gameTime)
+        {
+            foreach (var device in _devices)
+                device.Update(gameTime);
+        }
     }
 }

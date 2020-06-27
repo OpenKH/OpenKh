@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Linq;
 
 namespace OpenKh.Game.Infrastructure.Input
@@ -10,35 +11,68 @@ namespace OpenKh.Game.Infrastructure.Input
         private KeyboardState prevKeyboard;
         private RepeatableKeyboard repeatableKeyboard = new RepeatableKeyboard();
 
-        public bool IsUp => Up && !prevKeyboard.IsKeyDown(Keys.Up);
-        public bool IsDown => Down && !prevKeyboard.IsKeyDown(Keys.Down);
-        public bool IsLeft => Left && !prevKeyboard.IsKeyDown(Keys.Left);
-        public bool IsRight => Right && !prevKeyboard.IsKeyDown(Keys.Right);
-        public bool IsW => W && !prevKeyboard.IsKeyDown(Keys.W);
-        public bool IsS => S && !prevKeyboard.IsKeyDown(Keys.S);
-        public bool IsA => A && !prevKeyboard.IsKeyDown(Keys.A);
-        public bool IsD => D && !prevKeyboard.IsKeyDown(Keys.D);
+        public bool IsDPadUp => DPadUp && !prevKeyboard.IsKeyDown(Keys.Up);
+        public bool IsDPadDown => DPadDown && !prevKeyboard.IsKeyDown(Keys.Down);
+        public bool IsDPadLeft => DPadLeft && !prevKeyboard.IsKeyDown(Keys.Left);
+        public bool IsDPadRight => DPadRight && !prevKeyboard.IsKeyDown(Keys.Right);
+
+        public bool IsLeftStickUp => LeftStickUp && !prevKeyboard.IsKeyDown(Keys.W);
+        public bool IsLeftStickDown => LeftStickDown && !prevKeyboard.IsKeyDown(Keys.S);
+        public bool IsLeftStickLeft => LeftStickLeft && !prevKeyboard.IsKeyDown(Keys.A);
+        public bool IsLeftStickRight => LeftStickRight && !prevKeyboard.IsKeyDown(Keys.D);
+
+        public bool IsRightStickUp => RightStickUp && !prevKeyboard.IsKeyDown(Keys.Up);
+        public bool IsRightStickDown => RightStickDown && !prevKeyboard.IsKeyDown(Keys.Down);
+        public bool IsRightStickLeft => RightStickLeft && !prevKeyboard.IsKeyDown(Keys.Left);
+        public bool IsRightStickRight => RightStickDown && !prevKeyboard.IsKeyDown(Keys.Right);
 
         public bool IsCircle => keyboard.IsKeyDown(Keys.K) && !prevKeyboard.IsKeyDown(Keys.K);
         public bool IsCross => keyboard.IsKeyDown(Keys.L) && !prevKeyboard.IsKeyDown(Keys.L);
+        public bool IsSquare => throw new NotImplementedException();
+        public bool IsTriangle => throw new NotImplementedException();
 
-        public bool IsDebug => keyboard.IsKeyDown(Keys.Tab) && !prevKeyboard.IsKeyDown(Keys.Tab);
-        public bool IsShift => keyboard.IsKeyDown(Keys.LeftShift) /*&& !prevKeyboard.IsKeyDown(Keys.LeftShift)*/;
-        public bool IsExit => keyboard.IsKeyDown(Keys.Escape) && !prevKeyboard.IsKeyDown(Keys.Escape);
+        public bool IsStart => throw new NotImplementedException();
+        public bool IsSelect => throw new NotImplementedException();
+        public bool IsHome => throw new NotImplementedException();
 
-        public bool Up => keyboard.IsKeyDown(Keys.Up);
-        public bool Down => keyboard.IsKeyDown(Keys.Down);
-        public bool Left => keyboard.IsKeyDown(Keys.Left);
-        public bool Right => keyboard.IsKeyDown(Keys.Right);
-        public bool W => keyboard.IsKeyDown(Keys.W);
-        public bool S => keyboard.IsKeyDown(Keys.S);
-        public bool A => keyboard.IsKeyDown(Keys.A);
-        public bool D => keyboard.IsKeyDown(Keys.D);
+        public bool IsLeftShoulder => throw new NotImplementedException();
+        public bool IsRightShoulder => RightShoulder && !prevKeyboard.IsKeyDown(Keys.Tab);
+
+        public bool IsLeftTrigger => throw new NotImplementedException();
+        public bool IsRightTrigger => throw new NotImplementedException();
+
+        public bool IsLeftStickButton => throw new NotImplementedException();
+        public bool IsRightStickButton => throw new NotImplementedException();
+
+        public bool IsDebug => IsRightShoulder;
+        public bool IsShift => LeftShoulder;
+        public bool IsExit => keyboard.IsKeyDown(Keys.Escape);
 
         public bool IsDebugUp => repeatableKeyboard.IsKeyRepeat(Keys.Up);
         public bool IsDebugDown => repeatableKeyboard.IsKeyRepeat(Keys.Down);
         public bool IsDebugLeft => repeatableKeyboard.IsKeyRepeat(Keys.Left);
         public bool IsDebugRight => repeatableKeyboard.IsKeyRepeat(Keys.Right);
+
+        public bool DPadUp => keyboard.IsKeyDown(Keys.Up);
+        public bool DPadDown => keyboard.IsKeyDown(Keys.Down);
+        public bool DPadLeft => keyboard.IsKeyDown(Keys.Left);
+        public bool DPadRight => keyboard.IsKeyDown(Keys.Right);
+
+        public bool LeftStickUp => keyboard.IsKeyDown(Keys.W);
+        public bool LeftStickDown => keyboard.IsKeyDown(Keys.S);
+        public bool LeftStickLeft => keyboard.IsKeyDown(Keys.A);
+        public bool LeftStickRight => keyboard.IsKeyDown(Keys.D);
+
+        public bool RightStickUp => keyboard.IsKeyDown(Keys.Up);
+        public bool RightStickDown => keyboard.IsKeyDown(Keys.Down);
+        public bool RightStickLeft => keyboard.IsKeyDown(Keys.Left);
+        public bool RightStickRight => keyboard.IsKeyDown(Keys.Right);
+
+        public bool LeftShoulder => keyboard.IsKeyDown(Keys.LeftShift);
+        public bool RightShoulder => keyboard.IsKeyDown(Keys.Tab);
+
+        public bool LeftTrigger => throw new NotImplementedException();
+        public bool RightTrigger => throw new NotImplementedException();
 
         public void Update(GameTime gameTime)
         {
