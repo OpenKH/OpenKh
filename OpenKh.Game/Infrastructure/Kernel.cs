@@ -12,16 +12,20 @@ using OpenKh.Kh2.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace OpenKh.Game.Infrastructure
 {
     public class Kernel : ILanguage
     {
         private readonly IDataContent _dataContent;
+        private int _regionId;
 
         public bool IsReMix { get; }
-        public int RegionId { get; }
+        public int RegionId
+        {
+            get => Config.RegionId == -1 ? _regionId : Config.RegionId;
+            set => Config.RegionId = value;
+        }
         public string Language
         {
             get
@@ -58,7 +62,7 @@ namespace OpenKh.Game.Infrastructure
 
             FontContext = new FontContext();
             MessageProvider = new Kh2MessageProvider();
-            RegionId = DetectRegion(dataContent);
+            _regionId = DetectRegion(dataContent);
             Log.Info($"Region={Region} Language={Language}");
 
             IsReMix = IsReMixFileExists(dataContent, Region);
@@ -81,7 +85,7 @@ namespace OpenKh.Game.Infrastructure
             LoadMessage("sys");
             // 15jigsaw
 
-            if (Language == "jp")
+            if (Language == "jp" && Config.EnforceInternationalTextEncoding == false)
             {
                 Log.Info($"Use Japanese text encoding");
                 SystemMessageContext = FontContext.ToKh2JpSystemTextContext();
@@ -142,7 +146,7 @@ namespace OpenKh.Game.Infrastructure
                 var testFileName = $"menu/{Constants.Regions[i]}/title.2ld";
                 if (dataContent.FileExists(testFileName))
                 {
-                    Log.Info($"RegionId={i}");
+                    Log.Info($"Region ID candidate: {i}");
                     return i;
                 }
             }
