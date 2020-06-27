@@ -4,37 +4,74 @@ namespace OpenKh.Game.Infrastructure.Input
 {
     public interface IInputDevice
     {
-        bool IsUp { get; }
-        bool IsDown { get; }
-        bool IsLeft { get; }
-        bool IsRight { get; }
+        #region Button Press
+        bool IsDPadUp { get; }
+        bool IsDPadDown { get; }
+        bool IsDPadLeft { get; }
+        bool IsDPadRight { get; }
 
-        bool IsW { get; }
-        bool IsS { get; }
-        bool IsA { get; }
-        bool IsD { get; }
+        bool IsLeftStickUp { get; }
+        bool IsLeftStickDown { get; }
+        bool IsLeftStickLeft { get; }
+        bool IsLeftStickRight { get; }
+
+        bool IsRightStickUp { get; }
+        bool IsRightStickDown { get; }
+        bool IsRightStickLeft { get; }
+        bool IsRightStickRight { get; }
 
         bool IsCircle { get; }
         bool IsCross { get; }
+        bool IsSquare { get; }
+        bool IsTriangle { get; }
+
+        bool IsStart { get; }
+        bool IsSelect { get; }
+        bool IsHome { get; }
+
+        bool IsLeftShoulder { get; }
+        bool IsRightShoulder { get; }
+
+        bool IsLeftTrigger { get; }
+        bool IsRightTrigger { get; }
+
+        bool IsLeftStickButton { get; }
+        bool IsRightStickButton { get; }
 
         bool IsDebug { get; }
         bool IsShift { get; }
         bool IsExit { get; }
 
-        bool Up { get; }
-        bool Down { get; }
-        bool Left { get; }
-        bool Right { get; }
-
-        bool W { get; }
-        bool S { get; }
-        bool A { get; }
-        bool D { get; }
-
         bool IsDebugUp { get; }
         bool IsDebugDown { get; }
         bool IsDebugLeft { get; }
         bool IsDebugRight { get; }
+
+        #endregion
+
+        #region Button Hold
+        bool DPadUp { get; }
+        bool DPadDown { get; }
+        bool DPadLeft { get; }
+        bool DPadRight { get; }
+
+        bool LeftStickUp { get; }
+        bool LeftStickDown { get; }
+        bool LeftStickLeft { get; }
+        bool LeftStickRight { get; }
+
+        bool RightStickUp { get; }
+        bool RightStickDown { get; }
+        bool RightStickLeft { get; }
+        bool RightStickRight { get; }
+
+        bool LeftShoulder { get; }
+        bool RightShoulder { get; }
+
+        bool LeftTrigger { get; }
+        bool RightTrigger { get; }
+
+        #endregion
 
         void Update(GameTime gameTime);
     }

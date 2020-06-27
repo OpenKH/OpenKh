@@ -8,39 +8,73 @@ namespace OpenKh.Game.Infrastructure.Input
     {
         private const float leftThumbDeadZone = 0.1f;
         private const float rightThumbDeadZone = 0.1f;
+        private const float triggersDeadZone = 0.1f;
 
         private GamePadState pad;
         private GamePadState prevPad;
 
-        public bool IsUp => Up && ExcludeAxesDeadZone(prevPad.ThumbSticks.Right.Y, rightThumbDeadZone) == 0.0f;
-        public bool IsDown => Down && ExcludeAxesDeadZone(prevPad.ThumbSticks.Right.Y, rightThumbDeadZone) == 0.0f;
-        public bool IsLeft => Left && ExcludeAxesDeadZone(prevPad.ThumbSticks.Right.X, rightThumbDeadZone) == 0.0f;
-        public bool IsRight => Right && ExcludeAxesDeadZone(prevPad.ThumbSticks.Right.X, rightThumbDeadZone) == 0.0f;
-        public bool IsW => W && ExcludeAxesDeadZone(prevPad.ThumbSticks.Left.Y, leftThumbDeadZone) == 0.0f;
-        public bool IsS => S && ExcludeAxesDeadZone(prevPad.ThumbSticks.Left.Y, leftThumbDeadZone) == 0.0f;
-        public bool IsA => A && ExcludeAxesDeadZone(prevPad.ThumbSticks.Left.X, leftThumbDeadZone) == 0.0f; 
-        public bool IsD => D && ExcludeAxesDeadZone(prevPad.ThumbSticks.Left.X, leftThumbDeadZone) == 0.0f;
+        public bool IsDPadUp => DPadUp && prevPad.DPad.Up != ButtonState.Pressed;
+        public bool IsDPadDown => DPadDown && prevPad.DPad.Down != ButtonState.Pressed;
+        public bool IsDPadLeft => DPadLeft && prevPad.DPad.Left != ButtonState.Pressed;
+        public bool IsDPadRight => DPadRight && prevPad.DPad.Right != ButtonState.Pressed;
+
+        public bool IsLeftStickUp => LeftStickUp && ExcludeAxesDeadZone(prevPad.ThumbSticks.Left.Y, leftThumbDeadZone) == 0.0f;
+        public bool IsLeftStickDown => LeftStickDown && ExcludeAxesDeadZone(prevPad.ThumbSticks.Left.Y, leftThumbDeadZone) == 0.0f;
+        public bool IsLeftStickLeft => LeftStickLeft && ExcludeAxesDeadZone(prevPad.ThumbSticks.Left.X, leftThumbDeadZone) == 0.0f;
+        public bool IsLeftStickRight => LeftStickRight && ExcludeAxesDeadZone(prevPad.ThumbSticks.Left.X, leftThumbDeadZone) == 0.0f;
+
+        public bool IsRightStickUp => RightStickUp && ExcludeAxesDeadZone(prevPad.ThumbSticks.Right.Y, rightThumbDeadZone) == 0.0f;
+        public bool IsRightStickDown => RightStickDown && ExcludeAxesDeadZone(prevPad.ThumbSticks.Right.Y, rightThumbDeadZone) == 0.0f;
+        public bool IsRightStickLeft => RightStickLeft && ExcludeAxesDeadZone(prevPad.ThumbSticks.Right.X, rightThumbDeadZone) == 0.0f;
+        public bool IsRightStickRight => RightStickDown && ExcludeAxesDeadZone(prevPad.ThumbSticks.Right.X, rightThumbDeadZone) == 0.0f;
 
         public bool IsCircle => pad.Buttons.B == ButtonState.Pressed && prevPad.Buttons.B != ButtonState.Pressed;
         public bool IsCross => pad.Buttons.A == ButtonState.Pressed && prevPad.Buttons.A != ButtonState.Pressed;
+        public bool IsSquare => pad.Buttons.X == ButtonState.Pressed && prevPad.Buttons.X != ButtonState.Pressed;
+        public bool IsTriangle => pad.Buttons.Y == ButtonState.Pressed && prevPad.Buttons.Y != ButtonState.Pressed;
 
-        public bool IsDebug => pad.Buttons.RightShoulder == ButtonState.Pressed && prevPad.Buttons.RightShoulder != ButtonState.Pressed;
-        public bool IsShift => pad.Buttons.LeftShoulder == ButtonState.Pressed /*&& prevPad.Buttons.LeftShoulder != ButtonState.Pressed*/;
-        public bool IsExit => pad.Buttons.Back == ButtonState.Pressed && prevPad.Buttons.Back != ButtonState.Pressed;
+        public bool IsStart => pad.Buttons.Start == ButtonState.Pressed && prevPad.Buttons.Start != ButtonState.Pressed;
+        public bool IsSelect => pad.Buttons.Back == ButtonState.Pressed && prevPad.Buttons.Back != ButtonState.Pressed;
+        public bool IsHome => pad.Buttons.BigButton == ButtonState.Pressed && prevPad.Buttons.BigButton != ButtonState.Pressed;
 
-        public bool Up => ExcludeAxesDeadZone(pad.ThumbSticks.Right.Y, rightThumbDeadZone) > 0.0f;
-        public bool Down => ExcludeAxesDeadZone(pad.ThumbSticks.Right.Y, rightThumbDeadZone) < 0.0f;
-        public bool Left => ExcludeAxesDeadZone(pad.ThumbSticks.Right.X, rightThumbDeadZone) < 0.0f;
-        public bool Right => ExcludeAxesDeadZone(pad.ThumbSticks.Right.X, rightThumbDeadZone) > 0.0f;
-        public bool W => ExcludeAxesDeadZone(pad.ThumbSticks.Left.Y, leftThumbDeadZone) > 0.0f;
-        public bool S => ExcludeAxesDeadZone(pad.ThumbSticks.Left.Y, leftThumbDeadZone) < 0.0f;
-        public bool A => ExcludeAxesDeadZone(pad.ThumbSticks.Left.X, leftThumbDeadZone) < 0.0f;
-        public bool D => ExcludeAxesDeadZone(pad.ThumbSticks.Left.X, leftThumbDeadZone) > 0.0f;
+        public bool IsLeftShoulder => LeftShoulder && prevPad.Buttons.LeftShoulder != ButtonState.Pressed;
+        public bool IsRightShoulder => RightShoulder && prevPad.Buttons.RightShoulder != ButtonState.Pressed;
 
-        public bool IsDebugUp => pad.DPad.Up == ButtonState.Pressed && prevPad.DPad.Up != ButtonState.Pressed;
-        public bool IsDebugDown => pad.DPad.Down == ButtonState.Pressed && prevPad.DPad.Down != ButtonState.Pressed;
-        public bool IsDebugLeft => pad.DPad.Left == ButtonState.Pressed && prevPad.DPad.Left != ButtonState.Pressed;
-        public bool IsDebugRight => pad.DPad.Right == ButtonState.Pressed && prevPad.DPad.Right != ButtonState.Pressed;
+        public bool IsLeftTrigger => LeftTrigger && ExcludeAxesDeadZone(prevPad.Triggers.Left, triggersDeadZone) == 0.0f;
+        public bool IsRightTrigger => RightTrigger && ExcludeAxesDeadZone(prevPad.Triggers.Right, triggersDeadZone) == 0.0f;
+
+        public bool IsLeftStickButton => pad.Buttons.LeftStick == ButtonState.Pressed && prevPad.Buttons.LeftStick != ButtonState.Pressed;
+        public bool IsRightStickButton => pad.Buttons.RightStick == ButtonState.Pressed && prevPad.Buttons.RightStick != ButtonState.Pressed;
+
+        public bool IsDebug => IsRightShoulder;
+        public bool IsShift => LeftShoulder;
+        public bool IsExit => IsSelect;
+
+        public bool IsDebugUp => IsDPadUp;
+        public bool IsDebugDown => IsDPadDown;
+        public bool IsDebugLeft => IsDPadLeft;
+        public bool IsDebugRight => IsDPadRight;
+
+        public bool DPadUp => pad.DPad.Up == ButtonState.Pressed;
+        public bool DPadDown => pad.DPad.Down == ButtonState.Pressed;
+        public bool DPadLeft => pad.DPad.Left == ButtonState.Pressed;
+        public bool DPadRight => pad.DPad.Right == ButtonState.Pressed;
+
+        public bool LeftStickUp => ExcludeAxesDeadZone(pad.ThumbSticks.Left.Y, leftThumbDeadZone) > 0.0f;
+        public bool LeftStickDown => ExcludeAxesDeadZone(pad.ThumbSticks.Left.Y, leftThumbDeadZone) < 0.0f;
+        public bool LeftStickLeft => ExcludeAxesDeadZone(pad.ThumbSticks.Left.X, leftThumbDeadZone) < 0.0f;
+        public bool LeftStickRight => ExcludeAxesDeadZone(pad.ThumbSticks.Left.X, leftThumbDeadZone) > 0.0f;
+
+        public bool RightStickUp => ExcludeAxesDeadZone(pad.ThumbSticks.Right.Y, rightThumbDeadZone) > 0.0f;
+        public bool RightStickDown => ExcludeAxesDeadZone(pad.ThumbSticks.Right.Y, rightThumbDeadZone) < 0.0f;
+        public bool RightStickLeft => ExcludeAxesDeadZone(pad.ThumbSticks.Right.X, rightThumbDeadZone) < 0.0f;
+        public bool RightStickRight => ExcludeAxesDeadZone(pad.ThumbSticks.Right.X, rightThumbDeadZone) > 0.0f;
+
+        public bool LeftShoulder => pad.Buttons.LeftShoulder == ButtonState.Pressed;
+        public bool RightShoulder => pad.Buttons.RightShoulder == ButtonState.Pressed;
+
+        public bool LeftTrigger => ExcludeAxesDeadZone(pad.Triggers.Left, triggersDeadZone) > 0.0f;
+        public bool RightTrigger => ExcludeAxesDeadZone(pad.Triggers.Right, triggersDeadZone) > 0.0f;
 
         public void Update(GameTime gameTime)
         {
