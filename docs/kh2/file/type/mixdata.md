@@ -30,7 +30,7 @@ Magic Code `MIRE`
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
-| 00     | ushort | [Item ID of Recipe](./03system#item)
+| 00     | ushort | [Item ID of Recipe](./03system.md#item)
 | 02     | byte   | 
 | 03     | byte   |
 | 04     | ushort | Obtained Item

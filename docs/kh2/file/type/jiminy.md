@@ -96,7 +96,7 @@ Magic Code `JMCH`
 | 06     | ushort | Title
 | 08     | ushort | Description
 | 0A     | ushort | Second Title (used for Disney and FF characters)
-| 0C     | ushort | [Object ID](./00objentry#structure)
+| 0C     | ushort | [Object ID](./00objentry.md#structure)
 | 0E     | ushort |
 | 10     | ushort |
 | 12     | short  | Object Position X
@@ -115,7 +115,7 @@ Magic Code `JMAN`
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
-| 00     | ushort | [Item ID](./03system#item)
+| 00     | ushort | [Item ID](./03system.md#item)
 | 02     | ushort | Title
 | 04     | ushort | Text
 | 06     | ushort | Padding
@@ -197,7 +197,7 @@ Magic Code `JMPZ`
 | 01     | byte : 0-3 | Piece Count
 | 01     | byte : 4-7 | Are pieces rotatable?
 | 02     | ushort | Name
-| 04     | ushort | [Reward Item](./03system#item)
+| 04     | ushort | [Reward Item](./03system.md#item)
 | 06     | char[10] | File Name (menu/"region"/jm_puzzle/"filename".bin)
 
 ### Piece Sizes

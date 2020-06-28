@@ -14,10 +14,10 @@ This file is exclusive to the Final Mix releases and it defines which puzzle pie
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
-| 00     | byte   | [Picture](jiminy#puzz)
+| 00     | byte   | [Picture](jiminy.md#puzz)
 | 01     | byte   | Piece
 | 02     | ushort | Text which gets displayed when picking up
-| 04     | byte   | [World](../../worlds)
+| 04     | byte   | [World](../../worlds.md)
 | 05     | byte   | Room
 | 06     | byte   | World Piece Id 
 | 07     | byte   | 
