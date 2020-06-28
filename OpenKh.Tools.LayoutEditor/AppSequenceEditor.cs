@@ -15,6 +15,7 @@ using System.Linq;
 using OpenKh.Tools.LayoutEditor.Models;
 using System.IO;
 using OpenKh.Tools.LayoutEditor.Dialogs;
+using OpenKh.Tools.LayoutEditor.Controls;
 
 namespace OpenKh.Tools.LayoutEditor
 {
@@ -34,12 +35,17 @@ namespace OpenKh.Tools.LayoutEditor
         private SpriteEditDialog _frameEditDialog;
 
         private int _selectedSprite = 0;
-        private int _selectedAnimGroup = 1;
+        private int _selectedAnimGroup;
         private int _animationFrameCurrent;
         private int _animationFrameCount;
         private ISpriteTexture _destinationTexture;
         private IntPtr _destinationTextureId;
         private List<SpriteModel> _sprites;
+
+        private MySequencer _sequencer;
+        bool _sequenceExpanded = true;
+        int _sequencerSelectedEntry = 0;
+        int _sequencerFirstFrame = 0;
 
         private string FrameEditDialogTitle => $"Sprite edit #{_selectedSprite}";
 
@@ -52,6 +58,7 @@ namespace OpenKh.Tools.LayoutEditor
                 _animationFrameCurrent = 0;
                 _animationFrameCount = SequenceExtensions
                     .GetFrameLengthFromAnimationGroup(_sequence, _selectedAnimGroup);
+                _sequencer.SelectedAnimationGroup = value;
             }
         }
 
@@ -78,6 +85,9 @@ namespace OpenKh.Tools.LayoutEditor
             _sprites = sequence.Frames
                 .Select(x => AsSpriteProperty(x))
                 .ToList();
+
+            _sequencer = new MySequencer(sequence);
+            SelectedAnimGroup = 1;
         }
 
         public void Menu()
@@ -97,7 +107,6 @@ namespace OpenKh.Tools.LayoutEditor
                 _frameEditDialog.Run();
                 ImGui.EndPopup();
             }
-
             ForGrid(
                 new GridElement("SpriteList", 1, 256, true, DrawSpriteList),
                 new GridElement("Animation", 2, 0, false, DrawAnimation),
@@ -150,7 +159,12 @@ namespace OpenKh.Tools.LayoutEditor
         private unsafe void DrawAnimation()
         {
             AnimationGroupSelector();
-            Timeline();
+
+            if (ImGui.BeginChild("timeline", new Vector2(0, 200)))
+            {
+                Timeline();
+                ImGui.EndChild();
+            }
 
             var width = ImGui.GetWindowContentRegionWidth();
             var height = ImGui.GetWindowHeight();
@@ -396,6 +410,12 @@ namespace OpenKh.Tools.LayoutEditor
         {
             ImGui.SliderInt("Frame", ref _animationFrameCurrent, 0, _animationFrameCount,
                 $"%i/{_animationFrameCount}");
+            ImSequencer.Sequencer(_sequencer, ref _animationFrameCurrent, ref _sequenceExpanded, ref _sequencerSelectedEntry, ref _sequencerFirstFrame,
+                ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_EDIT_STARTEND |
+                ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_ADD |
+                ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_DEL |
+                //ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_COPYPASTE |
+                ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_CHANGE_FRAME);
 
         }
 
