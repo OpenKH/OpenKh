@@ -69,7 +69,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             IsExpanded = false
         });
 
-        public void Del(int index) => myItems.RemoveAt(index);
+        public void Remove(int index) => myItems.RemoveAt(index);
 
         public void Duplicate(int index) => myItems.Add(myItems[index]);
 

@@ -89,7 +89,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
             IAnimation GetAnimation(int index);
             void Add(int type);
-            void Del(int index);
+            void Remove(int index);
             void Duplicate(int index);
 
             void Copy();
@@ -155,16 +155,30 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             return overDel;
         }
 
+        private static bool SequencerButton(ImDrawListPtr draw_list, Vector2 pos, char ch, bool isSelected = false, uint color = 0xffffffffu)
+        {
+            var io = ImGui.GetIO();
+            var rect = new ImRect(pos, new Vector2(pos.X + 16, pos.Y + 16));
+            var isMouseOver = rect.Contains(io.MousePos);
+            if (!isSelected)
+                color = isMouseOver ? 0xFFFFFFFFu : 0x50FFFFFFu;
+            
+            draw_list.AddRect(rect.Min, rect.Max, color, 4);
+            draw_list.AddText(new Vector2(pos.X + 4, pos.Y - 1), color, $"{ch}");
+
+            return isMouseOver;
+        }
+
         public static bool Sequencer(SequenceInterface sequence, ref int currentFrame, ref bool expanded, ref int selectedEntry, ref int firstFrame, SEQUENCER_OPTIONS sequenceOptions)
         {
             var ret = false;
             var io = ImGui.GetIO();
             var cx = (int)(io.MousePos.X);
             var cy = (int)(io.MousePos.Y);
-            var legendWidth = 100;
+            var legendWidth = 120;
 
-            var delEntry = -1;
-            var dupEntry = -1;
+            var deleteAnimationEntry = -1;
+            var duplicateAnimationEntry = -1;
             var ItemHeight = 20;
 
             var popupOpened = false;
@@ -358,13 +372,28 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
                     if (sequenceOptions.HasFlag(SEQUENCER_OPTIONS.SEQUENCER_DEL))
                     {
-                        bool overDel = SequencerAddDelButton(draw_list, new Vector2(contentMin.X + legendWidth - ItemHeight + 2 - 10, tPos.Y + 2), false);
-                        if (overDel && io.MouseReleased[0])
-                            delEntry = i;
-
-                        bool overDup = SequencerAddDelButton(draw_list, new Vector2(contentMin.X + legendWidth - ItemHeight - ItemHeight + 2 - 10, tPos.Y + 2), true);
-                        if (overDup && io.MouseReleased[0])
-                            dupEntry = i;
+                        if (SequencerButton(draw_list, new Vector2(contentMin.X + legendWidth - (ItemHeight * 1) + 2 - 10, tPos.Y + 2), 'H',
+                            i == 0, 0xff15208f) && io.MouseReleased[0])
+                        {
+                            // Hide animation
+                        }
+                        if (SequencerButton(draw_list, new Vector2(contentMin.X + legendWidth - (ItemHeight * 2) + 2 - 10, tPos.Y + 2), 'S',
+                            i == 0, 0xff69992f) && io.MouseReleased[0])
+                        {
+                            // Hide all animations but this
+                        }
+                        if (SequencerButton(draw_list, new Vector2(contentMin.X + legendWidth - (ItemHeight * 3) + 2 - 10, tPos.Y + 2), 'D')
+                            && io.MouseReleased[0])
+                        {
+                            // Duplicate animation
+                            duplicateAnimationEntry = i;
+                        }
+                        if (SequencerButton(draw_list, new Vector2(contentMin.X + legendWidth - (ItemHeight * 4) + 2 - 10, tPos.Y + 2), '-')
+                            && io.MouseReleased[0])
+                        {
+                            // Delete animation
+                            deleteAnimationEntry = i;
+                        }
                     }
                     customHeight += sequence.GetCustomHeight(i);
                 }
@@ -787,16 +816,16 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                     expanded = !expanded;
             }
 
-            if (delEntry != -1)
+            if (deleteAnimationEntry != -1)
             {
-                sequence.Del(delEntry);
-                if ((selectedEntry == delEntry || selectedEntry >= sequence.ItemCount))
+                sequence.Remove(deleteAnimationEntry);
+                if ((selectedEntry == deleteAnimationEntry || selectedEntry >= sequence.ItemCount))
                     selectedEntry = -1;
             }
 
-            if (dupEntry != -1)
+            if (duplicateAnimationEntry != -1)
             {
-                sequence.Duplicate(dupEntry);
+                sequence.Duplicate(duplicateAnimationEntry);
             }
             return ret;
         }
