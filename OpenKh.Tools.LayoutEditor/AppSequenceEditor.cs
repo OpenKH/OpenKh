@@ -44,7 +44,7 @@ namespace OpenKh.Tools.LayoutEditor
 
         private MySequencer _sequencer;
         bool _sequenceExpanded = true;
-        int _sequencerSelectedEntry = 0;
+        int _sequencerSelectedAnimation = 0;
         int _sequencerFirstFrame = 0;
 
         private string FrameEditDialogTitle => $"Sprite edit #{_selectedSprite}";
@@ -56,6 +56,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 _selectedAnimGroup = value;
                 _animationFrameCurrent = 0;
+                _sequencerSelectedAnimation = 0;
                 _animationFrameCount = SequenceExtensions
                     .GetFrameLengthFromAnimationGroup(_sequence, _selectedAnimGroup);
                 _sequencer.SelectedAnimationGroup = value;
@@ -410,7 +411,7 @@ namespace OpenKh.Tools.LayoutEditor
         {
             ImGui.SliderInt("Frame", ref _animationFrameCurrent, 0, _animationFrameCount,
                 $"%i/{_animationFrameCount}");
-            ImSequencer.Sequencer(_sequencer, ref _animationFrameCurrent, ref _sequenceExpanded, ref _sequencerSelectedEntry, ref _sequencerFirstFrame,
+            ImSequencer.Sequencer(_sequencer, ref _animationFrameCurrent, ref _sequenceExpanded, ref _sequencerSelectedAnimation, ref _sequencerFirstFrame,
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_EDIT_STARTEND |
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_ADD |
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_DEL |
