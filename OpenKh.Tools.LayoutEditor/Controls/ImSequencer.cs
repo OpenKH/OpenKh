@@ -348,16 +348,21 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                 for (int i = 0, customHeight = 0; i < sequenceCount; i++)
                 {
                     var animation = sequence.GetAnimation(i);
-                    var tpos = new Vector2(contentMin.X + 3, contentMin.Y + i * ItemHeight + 2 + customHeight);
-                    draw_list.AddText(tpos, 0xFFFFFFFF, animation.Name ?? $"#{i + 1}");
+                    var tPos = new Vector2(contentMin.X + 3, contentMin.Y + i * ItemHeight + 2 + customHeight);
+                    var tEndPos = new Vector2(contentMin.X + 3 + legendWidth, contentMin.Y + (i + 1) * ItemHeight + 2 + customHeight);
+                    var rect = new ImRect(tPos, tEndPos);
+                    if (rect.Contains(io.MousePos) && io.MouseDown[0])
+                        selectedEntry = i;
+
+                    draw_list.AddText(tPos, 0xFFFFFFFF, animation.Name ?? $"#{i + 1}");
 
                     if (sequenceOptions.HasFlag(SEQUENCER_OPTIONS.SEQUENCER_DEL))
                     {
-                        bool overDel = SequencerAddDelButton(draw_list, new Vector2(contentMin.X + legendWidth - ItemHeight + 2 - 10, tpos.Y + 2), false);
+                        bool overDel = SequencerAddDelButton(draw_list, new Vector2(contentMin.X + legendWidth - ItemHeight + 2 - 10, tPos.Y + 2), false);
                         if (overDel && io.MouseReleased[0])
                             delEntry = i;
 
-                        bool overDup = SequencerAddDelButton(draw_list, new Vector2(contentMin.X + legendWidth - ItemHeight - ItemHeight + 2 - 10, tpos.Y + 2), true);
+                        bool overDup = SequencerAddDelButton(draw_list, new Vector2(contentMin.X + legendWidth - ItemHeight - ItemHeight + 2 - 10, tPos.Y + 2), true);
                         if (overDup && io.MouseReleased[0])
                             dupEntry = i;
                     }
