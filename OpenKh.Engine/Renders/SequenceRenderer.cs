@@ -2,6 +2,7 @@
 using OpenKh.Kh2;
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Net.Sockets;
 
 namespace OpenKh.Engine.Renderers
@@ -68,8 +69,6 @@ namespace OpenKh.Engine.Renderers
 
         private void DrawAnimationGroup(Context contextParent, Sequence.AnimationGroup animationGroup)
         {
-            var index = animationGroup.AnimationIndex;
-            var count = animationGroup.Count;
             var context = contextParent.Clone();
 
             if (animationGroup.DoNotLoop == 0)
@@ -77,18 +76,15 @@ namespace OpenKh.Engine.Renderers
                 var frameEnd = animationGroup.LoopEnd;
                 if (frameEnd == 0)
                 {
-                    for (var i = 0; i < count; i++)
-                    {
-                        frameEnd = Math.Max(frameEnd, sequence.Animations[index + i].FrameEnd);
-                    }
+                    frameEnd = animationGroup.Animations.Max(x => x.FrameEnd);
                 }
 
                 context.FrameIndex = Loop(animationGroup.LoopStart, frameEnd, context.FrameIndex);
             }
 
-            for (var i = 0; i < count; i++)
+            foreach (var animation in animationGroup.Animations)
             {
-                DrawAnimation(context, sequence.Animations[index + i]);
+                DrawAnimation(context, animation);
             }
         }
 

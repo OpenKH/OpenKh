@@ -103,27 +103,25 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             {
                 new Sequence.AnimationGroup
                 {
-                    AnimationIndex = 0,
-                    Count = 1,
+                    Animations = new List<Sequence.Animation>
+                    {
+                        new Sequence.Animation
+                        {
+                            FrameGroupIndex = 0,
+                            FrameStart = 0,
+                            FrameEnd = 10,
+                            ScaleStart = 1,
+                            ScaleEnd = 1,
+                            ScaleXStart = 1,
+                            ScaleXEnd = 1,
+                            ScaleYStart = 1,
+                            ScaleYEnd = 1,
+                            ColorStart = 0x80808080U,
+                            ColorEnd = 0x80808080U,
+                        }
+                    },
                     LoopStart = 0,
                     LoopEnd = 10,
-                }
-            },
-            Animations = new List<Sequence.Animation>
-            {
-                new Sequence.Animation
-                {
-                    FrameGroupIndex = 0,
-                    FrameStart = 0,
-                    FrameEnd = 10,
-                    ScaleStart = 1,
-                    ScaleEnd = 1,
-                    ScaleXStart = 1,
-                    ScaleXEnd = 1,
-                    ScaleYStart = 1,
-                    ScaleYEnd = 1,
-                    ColorStart = 0x80808080U,
-                    ColorEnd = 0x80808080U,
                 }
             },
             FrameGroups = new List<Sequence.FrameGroup>

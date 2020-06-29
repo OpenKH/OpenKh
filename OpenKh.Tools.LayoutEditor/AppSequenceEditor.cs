@@ -58,7 +58,7 @@ namespace OpenKh.Tools.LayoutEditor
                 _animationFrameCurrent = 0;
                 _sequencerSelectedAnimation = 0;
                 _animationFrameCount = SequenceExtensions
-                    .GetFrameLengthFromAnimationGroup(_sequence, _selectedAnimGroup);
+                    .GetFrameLength(_sequence.AnimationGroups[_selectedAnimGroup]);
                 _sequencer.SelectedAnimationGroup = value;
             }
         }
@@ -186,11 +186,11 @@ namespace OpenKh.Tools.LayoutEditor
             var animationGroup = _sequence.AnimationGroups[_selectedAnimGroup];
             AnimationGroupEdit(animationGroup);
 
-            for (var i = 0; i < animationGroup.Count; i++)
+            for (var i = 0; i < animationGroup.Animations.Count; i++)
             {
                 if (ImGui.CollapsingHeader($"Animation {i + 1}"))
                 {
-                    AnimationEdit(_sequence.Animations[animationGroup.AnimationIndex + i]);
+                    AnimationEdit(animationGroup.Animations[i]);
                 }
             }
         }

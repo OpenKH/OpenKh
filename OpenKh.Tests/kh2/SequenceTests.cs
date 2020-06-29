@@ -2,6 +2,7 @@
 using OpenKh.Kh2;
 using System;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -60,8 +61,8 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(3, sequence.Frames.Count);
             Assert.Equal(15, sequence.FramesEx.Count);
             Assert.Equal(3, sequence.FrameGroups.Count);
-            Assert.Equal(10, sequence.Animations.Count);
             Assert.Equal(2, sequence.AnimationGroups.Count);
+            Assert.Equal(10, sequence.AnimationGroups.Sum(x => x.Animations.Count));
         });
 
         [Fact]

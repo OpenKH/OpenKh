@@ -104,7 +104,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         }
 
         public int MaxFramesCount => SelectedAnimationGroupIndex >= 0 ?
-            SelectedSequence.GetFrameLengthFromAnimationGroup(SelectedAnimationGroupIndex) : 0;
+            SelectedSequence.AnimationGroups[SelectedAnimationGroupIndex].GetFrameLength() : 0;
 
         public GenericListModel<SpriteViewModel> Sprites { get; }
         public SpriteViewModel SelectedSprite

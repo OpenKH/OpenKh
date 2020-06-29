@@ -133,8 +133,14 @@ namespace OpenKh.Tests.Engine
         {
             var sequence = MockSequence(new Sequence.AnimationGroup
             {
-                AnimationIndex = 0,
-                Count = 1,
+                Animations = new List<Sequence.Animation>()
+                {
+                    new Sequence.Animation
+                    {
+                        FrameStart = AnimationFirstFrame,
+                        FrameEnd = AnimationLastFrame,
+                    }
+                },
                 DoNotLoop = (short)(loopEnabled ? 0 : 1),
                 LoopStart = loopStart,
                 LoopEnd = loopEnd
@@ -177,14 +183,12 @@ namespace OpenKh.Tests.Engine
                 {
                     new Sequence.AnimationGroup
                     {
-                        AnimationIndex = 0,
-                        Count = 1,
+                        Animations = new List<Sequence.Animation>()
+                        {
+                            animation
+                        },
                         DoNotLoop = 1,
                     }
-                },
-            Animations = new List<Sequence.Animation>()
-                {
-                    animation
                 },
             FrameGroups = new List<Sequence.FrameGroup>()
                 {
@@ -228,14 +232,6 @@ namespace OpenKh.Tests.Engine
             AnimationGroups = new List<Sequence.AnimationGroup>()
                 {
                     animationGroup,
-                },
-            Animations = new List<Sequence.Animation>()
-                {
-                    new Sequence.Animation
-                    {
-                        FrameStart = AnimationFirstFrame,
-                        FrameEnd = AnimationLastFrame,
-                    }
                 },
             FrameGroups = new List<Sequence.FrameGroup>()
                 {

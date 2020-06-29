@@ -49,9 +49,8 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             {
                 _selectedAnimationGroup = value;
                 var animationGroup = _sequence.AnimationGroups[_selectedAnimationGroup];
-                myItems = Enumerable
-                    .Range(animationGroup.AnimationIndex, animationGroup.Count)
-                    .Select(index => new MySequenceItem(_sequence.Animations[index])
+                myItems = animationGroup.Animations
+                    .Select((x, index) => new MySequenceItem(x)
                     {
                         Type = index
                     })

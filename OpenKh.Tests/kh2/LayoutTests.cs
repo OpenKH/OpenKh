@@ -1,7 +1,11 @@
-﻿using OpenKh.Common;
+﻿using NSubstitute.Extensions;
+using OpenKh.Common;
 using OpenKh.Kh2;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xunit;
+using Xunit.Sdk;
 
 namespace OpenKh.Tests.kh2
 {

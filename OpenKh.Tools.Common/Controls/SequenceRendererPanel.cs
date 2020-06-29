@@ -85,7 +85,7 @@ namespace OpenKh.Tools.Common.Controls
 
         protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
         {
-            var rect = SelectedSequence?.GetVisibilityRectangleFromAnimationGroup(SelectedAnimationGroupIndex);
+            var rect = SelectedSequence?.GetVisibilityRectangleFromAnimationGroup(SelectedSequence.AnimationGroups[SelectedAnimationGroupIndex]);
             if (rect == null)
                 return base.MeasureOverride(availableSize);
 

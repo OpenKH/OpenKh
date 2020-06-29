@@ -36,8 +36,9 @@ namespace OpenKh.Kh2.Extensions
         {
             var sequenceProperty = layout.SequenceProperties[sequencePropertyIndex];
             var sequence = layout.SequenceItems[sequenceProperty.SequenceIndex];
+            var animGroup = sequence.AnimationGroups[sequenceProperty.AnimationGroup];
 
-            return sequence.GetVisibilityRectangleFromAnimationGroup(sequenceProperty.AnimationGroup)
+            return sequence.GetVisibilityRectangleFromAnimationGroup(animGroup)
                 .Traslate(sequenceProperty.PositionX, sequenceProperty.PositionY);
         }
 
@@ -46,9 +47,9 @@ namespace OpenKh.Kh2.Extensions
         {
             var sequenceProperty = layout.SequenceProperties[sequencePropertyIndex];
             var sequence = layout.SequenceItems[sequenceProperty.SequenceIndex];
+            var animGroup = sequence.AnimationGroups[sequenceProperty.AnimationGroup];
 
-            return sequence.GetFrameLengthFromAnimationGroup(sequenceProperty.AnimationGroup) +
-                sequenceProperty.ShowAtFrame;
+            return animGroup.GetFrameLength() + sequenceProperty.ShowAtFrame;
         }
     }
 }
