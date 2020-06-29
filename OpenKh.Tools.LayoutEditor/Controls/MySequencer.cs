@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using OpenKh.Kh2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +8,15 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 {
     class MySequencer : ImSequencer.SequenceInterface
     {
-        static uint[] ColorType = new uint[] { 0xFFAA8080, 0xFF8080AA, 0xFF80AA80 };
+        static uint[] ColorType = new uint[]
+        {
+            0xfff09124, 0xffdebd00, 0xff85cf44, 0xff4cc25f,
+            0xff35ab84, 0xff25b3b8, 0xff4c9ef5, 0xff8282f5,
+            0xffa874e8, 0xffdc57eb, 0xffeb5bad,
+            0xff2491f0, 0xff00bdde, 0xff44cf85, 0xff5fc24c,
+            0xff84ab35, 0xffb8b325, 0xfff59e4c, 0xfff58282,
+            0xffe874a8, 0xffeb57dc, 0xffad5beb,
+        };
 
         private class MySequenceItem : ImSequencer.IAnimation
         {
@@ -42,7 +51,10 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                 var animationGroup = _sequence.AnimationGroups[_selectedAnimationGroup];
                 myItems = Enumerable
                     .Range(animationGroup.AnimationIndex, animationGroup.Count)
-                    .Select(index => new MySequenceItem(_sequence.Animations[index]))
+                    .Select(index => new MySequenceItem(_sequence.Animations[index])
+                    {
+                        Type = index
+                    })
                     .ToList();
             }
         }
@@ -63,7 +75,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
         public void Add(int type) => myItems.Add(new MySequenceItem
         {
-            Type = type,
+            Type = new Random().Next(),
             FrameStart = 0,
             FrameEnd = 10,
             IsExpanded = false
