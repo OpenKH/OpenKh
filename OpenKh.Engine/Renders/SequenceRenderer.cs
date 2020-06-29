@@ -1,6 +1,7 @@
 ﻿using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Net.Sockets;
@@ -157,13 +158,11 @@ namespace OpenKh.Engine.Renderers
             DrawFrameGroup(context, sequence.FrameGroups[animation.FrameGroupIndex]);
         }
 
-        private void DrawFrameGroup(Context context, Sequence.FrameGroup frameGroup)
+        private void DrawFrameGroup(Context context, List<Sequence.FrameEx> spriteGroup)
         {
-            var index = frameGroup.Start;
-            var count = frameGroup.Count;
-            for (var i = 0; i < count; i++)
+            foreach (var spritePart in spriteGroup)
             {
-                DrawFrameExtended(context, sequence.FramesEx[index + i]);
+                DrawFrameExtended(context, spritePart);
             }
         }
 

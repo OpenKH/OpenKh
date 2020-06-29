@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using OpenKh.Engine.Renderers;
+﻿using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using OpenKh.Tools.LayoutEditor.Interfaces;
@@ -72,8 +71,6 @@ namespace OpenKh.Tools.LayoutEditor.Models
             _spriteTexture = _drawing.CreateSpriteTexture(Width, Height);
             TextureId = _textureBinder.BindTexture(_spriteTexture);
 
-            _sequence.FramesEx[0].Right = Width;
-            _sequence.FramesEx[0].Bottom = Height;
             Draw(0, 0);
         }
 
@@ -111,23 +108,18 @@ namespace OpenKh.Tools.LayoutEditor.Models
                         LoopEnd = 10,
                     }
                 },
-            FrameGroups = new List<Sequence.FrameGroup>
+            FrameGroups = new List<List<Sequence.FrameEx>>
                 {
-                    new Sequence.FrameGroup
+                    new List<Sequence.FrameEx>
                     {
-                        Start = 0,
-                        Count = 1,
-                    }
-                },
-            FramesEx = new List<Sequence.FrameEx>
-                {
-                    new Sequence.FrameEx
-                    {
-                        Left = 0,
-                        Top = 0,
-                        Right = Width,
-                        Bottom = Height,
-                        FrameIndex = 0
+                        new Sequence.FrameEx
+                        {
+                            Left = 0,
+                            Top = 0,
+                            Right = Width,
+                            Bottom = Height,
+                            FrameIndex = 0
+                        }
                     }
                 },
             Frames = new List<Sequence.Frame>

@@ -152,7 +152,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             }, x => SelectedSequence != null);
             RemoveSpriteCommand = new RelayCommand(_ =>
             {
-                var spriteIndexReference = SelectedSequence.FramesEx
+                var spriteIndexReference = SelectedSequence.FrameGroups.SelectMany(x => x)
                     .Where(x => x.FrameIndex == SelectedSpriteIndex)
                     .Select((_, i) => i)
                     .ToList();
@@ -210,7 +210,7 @@ Are you sure to delete the sprite?",
 
         private void RemoveSprite(int selectedSpriteIndex)
         {
-            foreach (var spritePart in SelectedSequence.FramesEx)
+            foreach (var spritePart in SelectedSequence.FrameGroups.SelectMany(x => x))
             {
                 if (spritePart.FrameIndex >= selectedSpriteIndex)
                 {

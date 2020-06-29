@@ -7,21 +7,6 @@ namespace OpenKh.Kh2.Extensions
 {
     public static class SequenceExtensions
     {
-        public static T AggregateFrameGroup<T>(
-            this Sequence sequence,
-            int frameGroupIndex,
-            Func<T, int, T> aggregator,
-            T initialValue = default)
-        {
-            T value = initialValue;
-            var frameGroup = sequence.FrameGroups[frameGroupIndex];
-
-            for (var i = 0; i < frameGroup.Count; i++)
-                value = aggregator(value, frameGroup.Start + i);
-
-            return value;
-        }
-
         public static Rectangle GetVisibilityRectangleFromAnimationGroup(
             this Sequence sequence, Sequence.AnimationGroup animGroup) =>
             animGroup.Animations.Aggregate(new Rectangle(), (rect, x) => rect.Union(sequence.GetVisibilityRectangleFromAnimation(x)));
@@ -54,11 +39,8 @@ namespace OpenKh.Kh2.Extensions
             return minRect.Union(maxRect);
         }
 
-        public static Rectangle GetVisibilityRectangleForFrameGroup(
-            this Sequence sequence, int frameGroupIndex) =>
-            sequence.AggregateFrameGroup<Rectangle>(frameGroupIndex, (x, i) =>
-                x.Union(sequence.FramesEx[i].GetVisibilityRectangle()));
-
+        public static Rectangle GetVisibilityRectangleForFrameGroup(this Sequence sequence, int frameGroupIndex) =>
+            sequence.FrameGroups[frameGroupIndex].Aggregate(new Rectangle(), (rect, x) => rect.Union(x.GetVisibilityRectangle()));
 
         public static Rectangle GetVisibilityRectangle(
             this Sequence.FrameEx frameEx) => Rectangle.FromLTRB(

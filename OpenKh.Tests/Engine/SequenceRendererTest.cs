@@ -190,22 +190,17 @@ namespace OpenKh.Tests.Engine
                         DoNotLoop = 1,
                     }
                 },
-            FrameGroups = new List<Sequence.FrameGroup>()
+            FrameGroups = new List<List<Sequence.FrameEx>>()
                 {
-                    new Sequence.FrameGroup
+                    new List<Sequence.FrameEx>()
                     {
-                        Start = 0,
-                        Count = 1
-                    }
-                },
-            FramesEx = new List<Sequence.FrameEx>()
-                {
-                    new Sequence.FrameEx
-                    {
-                        Left = 0,
-                        Top = 0,
-                        Right = 512,
-                        Bottom = 512,
+                        new Sequence.FrameEx
+                        {
+                            Left = 0,
+                            Top = 0,
+                            Right = 512,
+                            Bottom = 512,
+                        }
                     }
                 },
             Frames = new List<Sequence.Frame>()
@@ -233,22 +228,17 @@ namespace OpenKh.Tests.Engine
                 {
                     animationGroup,
                 },
-            FrameGroups = new List<Sequence.FrameGroup>()
+            FrameGroups = new List<List<Sequence.FrameEx>>()
                 {
-                    new Sequence.FrameGroup
+                    new List<Sequence.FrameEx>()
                     {
-                        Start = 0,
-                        Count = 1
-                    }
-                },
-            FramesEx = new List<Sequence.FrameEx>()
-                {
-                    new Sequence.FrameEx
-                    {
-                        Left = 0,
-                        Top = 0,
-                        Right = 512,
-                        Bottom = 512,
+                        new Sequence.FrameEx
+                        {
+                            Left = 0,
+                            Top = 0,
+                            Right = 512,
+                            Bottom = 512,
+                        }
                     }
                 },
             Frames = new List<Sequence.Frame>()

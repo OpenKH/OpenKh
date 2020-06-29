@@ -59,7 +59,7 @@ namespace OpenKh.Tests.kh2
         {
             var sequence = Sequence.Read(stream);
             Assert.Equal(3, sequence.Frames.Count);
-            Assert.Equal(15, sequence.FramesEx.Count);
+            Assert.Equal(15, sequence.FrameGroups.Sum(x => x.Count));
             Assert.Equal(3, sequence.FrameGroups.Count);
             Assert.Equal(2, sequence.AnimationGroups.Count);
             Assert.Equal(10, sequence.AnimationGroups.Sum(x => x.Animations.Count));
@@ -75,7 +75,14 @@ namespace OpenKh.Tests.kh2
                 sequence.Write(x);
                 x.Position = 0;
                 var actual = new BinaryReader(x).ReadBytes((int)x.Length);
-                Assert.Equal(expected, actual);
+
+                Assert.Equal(expected.Length, actual.Length);
+                for (var i = 0; i < expected.Length; i++)
+                {
+                    var ch1 = expected[i];
+                    var ch2 = actual[i];
+                    Assert.True(ch1 == ch2, $"Expected {ch1:X02} but found {ch2:X02} at {i:X}");
+                }
             });
         });
 

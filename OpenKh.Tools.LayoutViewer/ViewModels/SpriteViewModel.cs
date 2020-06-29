@@ -124,25 +124,20 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                     LoopEnd = 10,
                 }
             },
-            FrameGroups = new List<Sequence.FrameGroup>
-            {
-                new Sequence.FrameGroup
+            FrameGroups = new List<List<Sequence.FrameEx>>
                 {
-                    Start = 0,
-                    Count = 1,
-                }
-            },
-            FramesEx = new List<Sequence.FrameEx>
-            {
-                new Sequence.FrameEx
-                {
-                    Left = 0,
-                    Top = 0,
-                    Right = Math.Max(Left, Right) - Math.Min(Left, Right),
-                    Bottom = Math.Max(Top, Bottom) - Math.Min(Top, Bottom),
-                    FrameIndex = 0
-                }
-            },
+                    new List<Sequence.FrameEx>
+                    {
+                        new Sequence.FrameEx
+                        {
+                            Left = 0,
+                            Top = 0,
+                            Right = Math.Max(Left, Right) - Math.Min(Left, Right),
+                            Bottom = Math.Max(Top, Bottom) - Math.Min(Top, Bottom),
+                            FrameIndex = 0
+                        }
+                    }
+                },
             Frames = new List<Sequence.Frame>
             {
                 Sprite

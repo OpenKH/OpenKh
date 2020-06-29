@@ -1,6 +1,7 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -46,21 +47,16 @@ namespace OpenKh.Tests.kh2
         {
             var sequence = new Sequence()
             {
-                FrameGroups = new List<Sequence.FrameGroup>
+                FrameGroups = new List<List<Sequence.FrameEx>>
                 {
-                    new Sequence.FrameGroup
+                    new List<Sequence.FrameEx>
                     {
-                        Start = frameExIndex,
-                        Count = frameExCount
-                    }
-                },
-                FramesEx = new List<Sequence.FrameEx>
-                {
-                    new Sequence.FrameEx() { Left = 10, Top = 20, Right = 30, Bottom = 25 },
-                    new Sequence.FrameEx() { Left = 20, Top = 20, Right = 25, Bottom = 25 },
-                    new Sequence.FrameEx() { Left = 10, Top = 50, Right = 30, Bottom = 10 },
-                    new Sequence.FrameEx() { Left = -20, Top = 0, Right = 0, Bottom = 10 },
-                    new Sequence.FrameEx() { Left = 0, Top = 0, Right = 0, Bottom = 100 },
+                        new Sequence.FrameEx() { Left = 10, Top = 20, Right = 30, Bottom = 25 },
+                        new Sequence.FrameEx() { Left = 20, Top = 20, Right = 25, Bottom = 25 },
+                        new Sequence.FrameEx() { Left = 10, Top = 50, Right = 30, Bottom = 10 },
+                        new Sequence.FrameEx() { Left = -20, Top = 0, Right = 0, Bottom = 10 },
+                        new Sequence.FrameEx() { Left = 0, Top = 0, Right = 0, Bottom = 100 },
+                    }.Skip(frameExIndex).Take(frameExCount).ToList()
                 }
             };
 
