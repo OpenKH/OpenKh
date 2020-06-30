@@ -155,10 +155,10 @@ namespace OpenKh.Engine.Renderers
             }
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS
-            DrawFrameGroup(context, sequence.FrameGroups[animation.FrameGroupIndex]);
+            DrawFrameGroup(context, sequence.SpriteGroups[animation.SpriteGroupIndex]);
         }
 
-        private void DrawFrameGroup(Context context, List<Sequence.FrameEx> spriteGroup)
+        private void DrawFrameGroup(Context context, List<Sequence.SpritePart> spriteGroup)
         {
             foreach (var spritePart in spriteGroup)
             {
@@ -166,7 +166,7 @@ namespace OpenKh.Engine.Renderers
             }
         }
 
-        private void DrawFrameExtended(Context contextParent, Sequence.FrameEx frameEx)
+        private void DrawFrameExtended(Context contextParent, Sequence.SpritePart frameEx)
         {
             var context = contextParent.Clone();
             context.Left = frameEx.Left * context.ScaleX;
@@ -174,10 +174,10 @@ namespace OpenKh.Engine.Renderers
             context.Right = frameEx.Right * context.ScaleX;
             context.Bottom = frameEx.Bottom * context.ScaleY;
 
-            DrawFrame(context, sequence.Frames[frameEx.FrameIndex]);
+            DrawFrame(context, sequence.Sprites[frameEx.SpriteIndex]);
         }
 
-        private void DrawFrame(Context context, Sequence.Frame frame)
+        private void DrawFrame(Context context, Sequence.Sprite frame)
         {
             var drawContext = new SpriteDrawingContext()
                 .SpriteTexture(surface)

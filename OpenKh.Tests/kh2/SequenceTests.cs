@@ -58,9 +58,9 @@ namespace OpenKh.Tests.kh2
         public void ValidateSequenceHeader() => StartTest(stream =>
         {
             var sequence = Sequence.Read(stream);
-            Assert.Equal(3, sequence.Frames.Count);
-            Assert.Equal(15, sequence.FrameGroups.Sum(x => x.Count));
-            Assert.Equal(3, sequence.FrameGroups.Count);
+            Assert.Equal(3, sequence.Sprites.Count);
+            Assert.Equal(15, sequence.SpriteGroups.Sum(x => x.Count));
+            Assert.Equal(3, sequence.SpriteGroups.Count);
             Assert.Equal(2, sequence.AnimationGroups.Count);
             Assert.Equal(10, sequence.AnimationGroups.Sum(x => x.Animations.Count));
         });

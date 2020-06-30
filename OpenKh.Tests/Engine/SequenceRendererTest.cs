@@ -190,11 +190,11 @@ namespace OpenKh.Tests.Engine
                         DoNotLoop = 1,
                     }
                 },
-            FrameGroups = new List<List<Sequence.FrameEx>>()
+            SpriteGroups = new List<List<Sequence.SpritePart>>()
                 {
-                    new List<Sequence.FrameEx>()
+                    new List<Sequence.SpritePart>()
                     {
-                        new Sequence.FrameEx
+                        new Sequence.SpritePart
                         {
                             Left = 0,
                             Top = 0,
@@ -203,9 +203,9 @@ namespace OpenKh.Tests.Engine
                         }
                     }
                 },
-            Frames = new List<Sequence.Frame>()
+            Sprites = new List<Sequence.Sprite>()
                 {
-                    new Sequence.Frame
+                    new Sequence.Sprite
                     {
                         Left = 0,
                         Top = 0,
@@ -227,11 +227,11 @@ namespace OpenKh.Tests.Engine
                 {
                     animationGroup,
                 },
-            FrameGroups = new List<List<Sequence.FrameEx>>()
+            SpriteGroups = new List<List<Sequence.SpritePart>>()
                 {
-                    new List<Sequence.FrameEx>()
+                    new List<Sequence.SpritePart>()
                     {
-                        new Sequence.FrameEx
+                        new Sequence.SpritePart
                         {
                             Left = 0,
                             Top = 0,
@@ -240,9 +240,9 @@ namespace OpenKh.Tests.Engine
                         }
                     }
                 },
-            Frames = new List<Sequence.Frame>()
+            Sprites = new List<Sequence.Sprite>()
                 {
-                    new Sequence.Frame
+                    new Sequence.Sprite
                     {
                         Left = 0,
                         Top = 0,

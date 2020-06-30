@@ -83,7 +83,7 @@ namespace OpenKh.Tools.LayoutEditor
             _destinationTexture = _drawing.CreateSpriteTexture(1024, 1024);
             _destinationTextureId = this.BindTexture(_destinationTexture);
 
-            _sprites = sequence.Frames
+            _sprites = sequence.Sprites
                 .Select(x => AsSpriteProperty(x))
                 .ToList();
 
@@ -420,7 +420,7 @@ namespace OpenKh.Tools.LayoutEditor
 
         }
 
-        private SpriteModel AsSpriteProperty(Sequence.Frame sprite) =>
+        private SpriteModel AsSpriteProperty(Sequence.Sprite sprite) =>
             new SpriteModel(sprite, _drawing, _atlasTexture, this, _settings);
 
         private static Vector2 GetUv(ISpriteTexture texture, int x, int y) =>

@@ -4,9 +4,9 @@ namespace OpenKh.Tools.LayoutViewer.Models
 {
     public class FrameModel
     {
-        private readonly Sequence.Frame frame;
+        private readonly Sequence.Sprite frame;
 
-        public FrameModel(Sequence.Frame frame)
+        public FrameModel(Sequence.Sprite frame)
         {
             this.frame = frame;
         }

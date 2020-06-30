@@ -17,13 +17,13 @@ namespace OpenKh.Tools.LayoutEditor.Models
         private ISpriteTexture _spriteTexture;
         private int _frameIndex;
 
-        public Sequence.Frame Sprite { get; }
+        public Sequence.Sprite Sprite { get; }
         public IntPtr TextureId { get; set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
 
         public SpriteModel(
-            Sequence.Frame sprite,
+            Sequence.Sprite sprite,
             ISpriteDrawing drawing,
             ISpriteTexture atlasTexture,
             ITextureBinder textureBinder,
@@ -91,7 +91,7 @@ namespace OpenKh.Tools.LayoutEditor.Models
                         {
                             new Sequence.Animation
                             {
-                                FrameGroupIndex = 0,
+                                SpriteGroupIndex = 0,
                                 FrameStart = 0,
                                 FrameEnd = 10,
                                 ScaleStart = 1,
@@ -108,21 +108,21 @@ namespace OpenKh.Tools.LayoutEditor.Models
                         LoopEnd = 10,
                     }
                 },
-            FrameGroups = new List<List<Sequence.FrameEx>>
+            SpriteGroups = new List<List<Sequence.SpritePart>>
                 {
-                    new List<Sequence.FrameEx>
+                    new List<Sequence.SpritePart>
                     {
-                        new Sequence.FrameEx
+                        new Sequence.SpritePart
                         {
                             Left = 0,
                             Top = 0,
                             Right = Width,
                             Bottom = Height,
-                            FrameIndex = 0
+                            SpriteIndex = 0
                         }
                     }
                 },
-            Frames = new List<Sequence.Frame>
+            Sprites = new List<Sequence.Sprite>
                 {
                     Sprite
                 }

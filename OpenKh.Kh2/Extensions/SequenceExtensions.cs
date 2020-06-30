@@ -17,7 +17,7 @@ namespace OpenKh.Kh2.Extensions
         public static Rectangle GetVisibilityRectangleFromAnimation(
             this Sequence sequence, Sequence.Animation animation)
         {
-            var rect = sequence.GetVisibilityRectangleForFrameGroup(animation.FrameGroupIndex);
+            var rect = sequence.GetVisibilityRectangleForFrameGroup(animation.SpriteGroupIndex);
 
             var minXPos = animation.Xa0;
             int maxXPos = animation.Xa1;
@@ -40,10 +40,10 @@ namespace OpenKh.Kh2.Extensions
         }
 
         public static Rectangle GetVisibilityRectangleForFrameGroup(this Sequence sequence, int frameGroupIndex) =>
-            sequence.FrameGroups[frameGroupIndex].Aggregate(new Rectangle(), (rect, x) => rect.Union(x.GetVisibilityRectangle()));
+            sequence.SpriteGroups[frameGroupIndex].Aggregate(new Rectangle(), (rect, x) => rect.Union(x.GetVisibilityRectangle()));
 
         public static Rectangle GetVisibilityRectangle(
-            this Sequence.FrameEx frameEx) => Rectangle.FromLTRB(
+            this Sequence.SpritePart frameEx) => Rectangle.FromLTRB(
                 frameEx.Left,
                 frameEx.Top,
                 frameEx.Right,

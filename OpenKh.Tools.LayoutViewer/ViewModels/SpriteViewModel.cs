@@ -10,7 +10,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
 {
     public class SpriteViewModel : BaseNotifyPropertyChanged
     {
-        public SpriteViewModel(Sequence.Frame sprite, Imgd image)
+        public SpriteViewModel(Sequence.Sprite sprite, Imgd image)
         {
             Drawing = new SpriteDrawingDirect3D();
             Sprite = sprite;
@@ -18,7 +18,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
         }
 
         public ISpriteDrawing Drawing { get; }
-        public Sequence.Frame Sprite { get; set; }
+        public Sequence.Sprite Sprite { get; set; }
         public Imgd Image { get; }
         public Sequence Sequence => MockSequence();
 
@@ -107,7 +107,7 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                     {
                         new Sequence.Animation
                         {
-                            FrameGroupIndex = 0,
+                            SpriteGroupIndex = 0,
                             FrameStart = 0,
                             FrameEnd = 10,
                             ScaleStart = 1,
@@ -124,21 +124,21 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
                     LoopEnd = 10,
                 }
             },
-            FrameGroups = new List<List<Sequence.FrameEx>>
+            SpriteGroups = new List<List<Sequence.SpritePart>>
                 {
-                    new List<Sequence.FrameEx>
+                    new List<Sequence.SpritePart>
                     {
-                        new Sequence.FrameEx
+                        new Sequence.SpritePart
                         {
                             Left = 0,
                             Top = 0,
                             Right = Math.Max(Left, Right) - Math.Min(Left, Right),
                             Bottom = Math.Max(Top, Bottom) - Math.Min(Top, Bottom),
-                            FrameIndex = 0
+                            SpriteIndex = 0
                         }
                     }
                 },
-            Frames = new List<Sequence.Frame>
+            Sprites = new List<Sequence.Sprite>
             {
                 Sprite
             }

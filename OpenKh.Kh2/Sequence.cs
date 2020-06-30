@@ -28,7 +28,7 @@ namespace OpenKh.Kh2
             [Data] public Section AnimationGroupDesc { get; set; }
         }
 
-        public class RawFrame
+        public class RawSprite
         {
             [Data] public int Unknown00 { get; set; }
             [Data] public int Left { get; set; }
@@ -43,7 +43,7 @@ namespace OpenKh.Kh2
             [Data] public uint ColorBottom { get; set; }
         }
 
-        public class RawFrameGroup
+        public class RawSpriteGroup
         {
             [Data] public short Start { get; set; }
             [Data] public short Count { get; set; }
@@ -64,7 +64,7 @@ namespace OpenKh.Kh2
             [Data] public int Unknown20 { get; set; }
         }
 
-        public class Frame
+        public class Sprite
         {
             public int Left { get; set; }
             public int Top { get; set; }
@@ -78,19 +78,19 @@ namespace OpenKh.Kh2
             public uint ColorBottom { get; set; }
         }
 
-        public class FrameEx
+        public class SpritePart
         {
             [Data] public int Left { get; set; }
             [Data] public int Top { get; set; }
             [Data] public int Right { get; set; }
             [Data] public int Bottom { get; set; }
-            [Data] public int FrameIndex { get; set; }
+            [Data] public int SpriteIndex { get; set; }
         }
 
         public class Animation
         {
             [Data] public int Flags { get; set; }
-            [Data] public int FrameGroupIndex { get; set; }
+            [Data] public int SpriteGroupIndex { get; set; }
             [Data] public int FrameStart { get; set; }
             [Data] public int FrameEnd { get; set; }
             [Data] public int Xa0 { get; set; }
@@ -142,8 +142,8 @@ namespace OpenKh.Kh2
         }
 
         public int Unknown04 { get; set; }
-        public List<Frame> Frames { get; set; }
-        public List<List<FrameEx>> FrameGroups { get; set; }
+        public List<Sprite> Sprites { get; set; }
+        public List<List<SpritePart>> SpriteGroups { get; set; }
         public List<AnimationGroup> AnimationGroups { get; set; }
 
         public Sequence()
@@ -164,8 +164,8 @@ namespace OpenKh.Kh2
                 throw new InvalidDataException("Invalid header");
 
             Unknown04 = header.Unknown04;
-            Frames = stream.ReadList<RawFrame>(header.SpriteDesc.Offset, header.SpriteDesc.Count)
-                .Select(x => new Frame
+            Sprites = stream.ReadList<RawSprite>(header.SpriteDesc.Offset, header.SpriteDesc.Count)
+                .Select(x => new Sprite
                 {
                     Left = x.Left,
                     Top = x.Top,
@@ -179,9 +179,9 @@ namespace OpenKh.Kh2
                     ColorBottom = x.ColorBottom,
                 }).ToList();
 
-            var framesEx = stream.ReadList<FrameEx>(header.SpritePartDesc.Offset, header.SpritePartDesc.Count);
-            FrameGroups = stream.ReadList<RawFrameGroup>(header.SpriteGroupDesc.Offset, header.SpriteGroupDesc.Count)
-                .Select(x => framesEx.Skip(x.Start).Take(x.Count).ToList()).ToList();
+            var spritePart = stream.ReadList<SpritePart>(header.SpritePartDesc.Offset, header.SpritePartDesc.Count);
+            SpriteGroups = stream.ReadList<RawSpriteGroup>(header.SpriteGroupDesc.Offset, header.SpriteGroupDesc.Count)
+                .Select(x => spritePart.Skip(x.Start).Take(x.Count).ToList()).ToList();
 
             var animations = stream.ReadList<Animation>(header.AnimationDesc.Offset, header.AnimationDesc.Count);
             AnimationGroups = stream.ReadList<RawAnimationGroup>(header.AnimationGroupDesc.Offset, header.AnimationGroupDesc.Count)
@@ -209,9 +209,9 @@ namespace OpenKh.Kh2
             {
                 MagicCode = MagicCodeValidator,
                 Unknown04 = Unknown04,
-                SpriteDesc = new Section() { Count = Frames.Count },
-                SpritePartDesc = new Section() { Count = FrameGroups.Sum(x => x.Count) },
-                SpriteGroupDesc = new Section() { Count = FrameGroups.Count },
+                SpriteDesc = new Section() { Count = Sprites.Count },
+                SpritePartDesc = new Section() { Count = SpriteGroups.Sum(x => x.Count) },
+                SpriteGroupDesc = new Section() { Count = SpriteGroups.Count },
                 AnimationDesc = new Section() { Count = AnimationGroups.Sum(x => x.Animations.Count) },
                 AnimationGroupDesc = new Section() { Count = AnimationGroups.Count },
             };
@@ -222,7 +222,7 @@ namespace OpenKh.Kh2
             stream.Position = basePosition + MinimumLength;
             header.SpriteDesc.Offset = (int)(stream.Position - basePosition);
 
-            header.SpritePartDesc.Offset = stream.WriteList(Frames.Select(x => new RawFrame
+            header.SpritePartDesc.Offset = stream.WriteList(Sprites.Select(x => new RawSprite
             {
                 Left = x.Left,
                 Top = x.Top,
@@ -235,12 +235,12 @@ namespace OpenKh.Kh2
                 ColorRight = x.ColorRight,
                 ColorBottom = x.ColorBottom,
             })) + header.SpriteDesc.Offset;
-            header.SpriteGroupDesc.Offset = stream.WriteList(FrameGroups.SelectMany(x => x)) + header.SpritePartDesc.Offset;
+            header.SpriteGroupDesc.Offset = stream.WriteList(SpriteGroups.SelectMany(x => x)) + header.SpritePartDesc.Offset;
 
             index = 0;
-            foreach (var spriteGroup in FrameGroups)
+            foreach (var spriteGroup in SpriteGroups)
             {
-                BinaryMapping.WriteObject(stream, new RawFrameGroup
+                BinaryMapping.WriteObject(stream, new RawSpriteGroup
                 {
                     Start = (short)index,
                     Count = (short)spriteGroup.Count
@@ -248,7 +248,7 @@ namespace OpenKh.Kh2
 
                 index += spriteGroup.Count;
             }
-            header.AnimationDesc.Offset = FrameGroups.Count * 4 + header.SpriteGroupDesc.Offset;
+            header.AnimationDesc.Offset = SpriteGroups.Count * 4 + header.SpriteGroupDesc.Offset;
             header.AnimationGroupDesc.Offset = stream.WriteList(AnimationGroups.SelectMany(x => x.Animations)) + header.AnimationDesc.Offset;
             index = 0;
             foreach (var animGroup in AnimationGroups)

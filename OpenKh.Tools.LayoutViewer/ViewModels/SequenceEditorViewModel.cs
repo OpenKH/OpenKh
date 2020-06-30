@@ -145,15 +145,15 @@ namespace OpenKh.Tools.LayoutViewer.ViewModels
             _editorSettings = editorSettings;
             EditorDebugRenderingService = editorDebugRenderingService;
 
-            Sprites = new GenericListModel<SpriteViewModel>(SelectedSequence.Frames.Select(x => new SpriteViewModel(x, texture)));
+            Sprites = new GenericListModel<SpriteViewModel>(SelectedSequence.Sprites.Select(x => new SpriteViewModel(x, texture)));
             AddSpriteCommand = new RelayCommand(_ =>
             {
-                SelectedSequence.Frames.Add(new Sequence.Frame());
+                SelectedSequence.Sprites.Add(new Sequence.Sprite());
             }, x => SelectedSequence != null);
             RemoveSpriteCommand = new RelayCommand(_ =>
             {
-                var spriteIndexReference = SelectedSequence.FrameGroups.SelectMany(x => x)
-                    .Where(x => x.FrameIndex == SelectedSpriteIndex)
+                var spriteIndexReference = SelectedSequence.SpriteGroups.SelectMany(x => x)
+                    .Where(x => x.SpriteIndex == SelectedSpriteIndex)
                     .Select((_, i) => i)
                     .ToList();
                 if (spriteIndexReference.Count > 0)
@@ -177,7 +177,7 @@ Are you sure to delete the sprite?",
             DuplicateSpriteCommand = new RelayCommand(_ =>
             {
                 var sprite = SelectedSprite;
-                SelectedSequence.Frames.Add(new Sequence.Frame
+                SelectedSequence.Sprites.Add(new Sequence.Sprite
                 {
                     Unknown00 = sprite.Unknown,
                     Left = sprite.Left,
@@ -210,19 +210,19 @@ Are you sure to delete the sprite?",
 
         private void RemoveSprite(int selectedSpriteIndex)
         {
-            foreach (var spritePart in SelectedSequence.FrameGroups.SelectMany(x => x))
+            foreach (var spritePart in SelectedSequence.SpriteGroups.SelectMany(x => x))
             {
-                if (spritePart.FrameIndex >= selectedSpriteIndex)
+                if (spritePart.SpriteIndex >= selectedSpriteIndex)
                 {
-                    if (spritePart.FrameIndex > selectedSpriteIndex)
-                        spritePart.FrameIndex--;
+                    if (spritePart.SpriteIndex > selectedSpriteIndex)
+                        spritePart.SpriteIndex--;
                     else
-                        spritePart.FrameIndex = 0;
+                        spritePart.SpriteIndex = 0;
                 }
             }
 
             Sprites.Items.RemoveAt(SelectedSpriteIndex);
-            SelectedSequence.Frames.RemoveAt(selectedSpriteIndex);
+            SelectedSequence.Sprites.RemoveAt(selectedSpriteIndex);
         }
 
         private void SwapSprite(int i, int j)
