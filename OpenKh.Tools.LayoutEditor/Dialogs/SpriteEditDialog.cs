@@ -95,10 +95,6 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 _spriteModel.Sprite.VTranslation = uvAnim.Y;
             }
 
-            var unknown00 = _spriteModel.Sprite.Unknown00;
-            if (ImGui.DragInt("Unknown00", ref unknown00))
-                _spriteModel.Sprite.Unknown00 = unknown00;
-
             _spriteModel.Draw(0, 0);
             ImGui.Image(_spriteModel.TextureId, SuggestSpriteSize());
         }
