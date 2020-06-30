@@ -29,6 +29,7 @@ namespace OpenKh.Tools.LayoutEditor
         private readonly KingdomShader _shader;
         private readonly MonoSpriteDrawing _drawing;
         private readonly ISpriteTexture _atlasTexture;
+        private DebugSequenceRenderer _debugSequenceRenderer;
         private readonly SequenceRenderer _renderer;
 
         private bool _isFrameEditDialogOpen;
@@ -57,8 +58,10 @@ namespace OpenKh.Tools.LayoutEditor
                 _selectedAnimGroup = value;
                 _animationFrameCurrent = 0;
                 _sequencerSelectedAnimation = 0;
-                _animationFrameCount = SequenceExtensions
-                    .GetFrameLength(_sequence.AnimationGroups[_selectedAnimGroup]);
+                
+                var animationGroup = _sequence.AnimationGroups[_selectedAnimGroup];
+                _animationFrameCount = SequenceExtensions.GetFrameLength(animationGroup);
+                _debugSequenceRenderer.AnimationGroup = animationGroup;
                 _sequencer.SelectedAnimationGroup = value;
             }
         }
@@ -78,7 +81,11 @@ namespace OpenKh.Tools.LayoutEditor
             _shader = new KingdomShader(bootstrap.Content);
             _drawing = new MonoSpriteDrawing(_graphics, _shader);
             _atlasTexture = _drawing.CreateSpriteTexture(_image);
-            _renderer = new SequenceRenderer(_sequence, _drawing, _atlasTexture);
+            _debugSequenceRenderer = new DebugSequenceRenderer();
+            _renderer = new SequenceRenderer(_sequence, _drawing, _atlasTexture)
+            {
+                DebugSequenceRenderer = _debugSequenceRenderer
+            };
 
             _destinationTexture = _drawing.CreateSpriteTexture(1024, 1024);
             _destinationTextureId = this.BindTexture(_destinationTexture);
@@ -87,7 +94,7 @@ namespace OpenKh.Tools.LayoutEditor
                 .Select(x => AsSpriteProperty(x))
                 .ToList();
 
-            _sequencer = new MySequencer(sequence);
+            _sequencer = new MySequencer(sequence, _debugSequenceRenderer);
             SelectedAnimGroup = 1;
         }
 

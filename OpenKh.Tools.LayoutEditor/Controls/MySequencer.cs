@@ -40,6 +40,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         };
 
         private readonly Sequence _sequence;
+        private readonly DebugSequenceRenderer _debugSequenceRenderer;
         private int _selectedAnimationGroup;
 
         public int SelectedAnimationGroup
@@ -84,11 +85,19 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
         public void Duplicate(int index) => myItems.Add(myItems[index]);
 
+        public bool IsFocus(int index) => _debugSequenceRenderer.FocusOnAnimation == index;
+        public void SetFocus(int index) => _debugSequenceRenderer.FocusOnAnimation = index;
+        public void ResetFocus() => _debugSequenceRenderer.FocusOnAnimation = -1;
+
+        public bool IsVisible(int index) => _debugSequenceRenderer.IsAnimationVisible(index);
+        public void SetVisibility(int index, bool isVisible) => _debugSequenceRenderer.ShowAnimation(index, isVisible);
+
         public int GetCustomHeight(int index) => myItems[index].Height;
 
-        public MySequencer(Sequence sequence)
+        public MySequencer(Sequence sequence, DebugSequenceRenderer debugSequenceRenderer)
         {
             _sequence = sequence;
+            _debugSequenceRenderer = debugSequenceRenderer;
 
             FrameMin = 0;
             FrameMax = 500;

@@ -92,6 +92,12 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             void Remove(int index);
             void Duplicate(int index);
 
+            bool IsFocus(int index);
+            void SetFocus(int index);
+            void ResetFocus();
+            bool IsVisible(int index);
+            void SetVisibility(int index, bool isVisible);
+
             void Copy();
             void Paste();
 
@@ -372,15 +378,21 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
                     if (sequenceOptions.HasFlag(SEQUENCER_OPTIONS.SEQUENCER_DEL))
                     {
+                        var isAnimationVisible = sequence.IsVisible(i);
                         if (SequencerButton(draw_list, new Vector2(contentMin.X + legendWidth - (ItemHeight * 1) + 2 - 10, tPos.Y + 2), 'H',
-                            i == 0, 0xff15208f) && io.MouseReleased[0])
+                            !isAnimationVisible, 0xff15208f) && io.MouseReleased[0])
                         {
-                            // Hide animation
+                            sequence.SetVisibility(i, !isAnimationVisible);
                         }
+
+                        var isFocused = sequence.IsFocus(i);
                         if (SequencerButton(draw_list, new Vector2(contentMin.X + legendWidth - (ItemHeight * 2) + 2 - 10, tPos.Y + 2), 'S',
-                            i == 0, 0xff69992f) && io.MouseReleased[0])
+                            isFocused, 0xff69992f) && io.MouseReleased[0])
                         {
-                            // Hide all animations but this
+                            if (isFocused)
+                                sequence.ResetFocus();
+                            else
+                                sequence.SetFocus(i);
                         }
                         if (SequencerButton(draw_list, new Vector2(contentMin.X + legendWidth - (ItemHeight * 3) + 2 - 10, tPos.Y + 2), 'D')
                             && io.MouseReleased[0])

@@ -2,9 +2,8 @@
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
-using System.Net.Sockets;
 
 namespace OpenKh.Engine.Renderers
 {
@@ -57,7 +56,10 @@ namespace OpenKh.Engine.Renderers
             this.sequence = sequence;
             this.drawing = drawing;
             this.surface = surface;
+            DebugSequenceRenderer = new DefaultDebugSequenceRenderer();
         }
+
+        public IDebugSequenceRenderer DebugSequenceRenderer { get; set; }
 
         public void Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
             DrawAnimationGroup(new Context
@@ -83,13 +85,13 @@ namespace OpenKh.Engine.Renderers
                 context.FrameIndex = Loop(animationGroup.LoopStart, frameEnd, context.FrameIndex);
             }
 
-            foreach (var animation in animationGroup.Animations)
+            for (int i = 0; i < animationGroup.Animations.Count; i++)
             {
-                DrawAnimation(context, animation);
+                DrawAnimation(context, animationGroup.Animations[i], i);
             }
         }
 
-        private void DrawAnimation(Context contextParent, Sequence.Animation animation)
+        private void DrawAnimation(Context contextParent, Sequence.Animation animation, int index)
         {
             // 0000 0001 = (0 = CUBIC INTERPOLATION, 1 = LINEAR INTERPOLATION)
             // 0000 0008 = (0 = BOUNCING START FROM CENTER, 1 = BOUNCING START FROM X / MOVE FROM Y)
@@ -153,6 +155,8 @@ namespace OpenKh.Engine.Renderers
                 context.PositionX += Lerp(t, animation.Xb0, animation.Xb1);
                 context.PositionY += Lerp(t, animation.Yb0, animation.Yb1);
             }
+
+            context.Color *= DebugSequenceRenderer.GetAnimationBlendColor(index);
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS
             DrawFrameGroup(context, sequence.SpriteGroups[animation.SpriteGroupIndex]);
