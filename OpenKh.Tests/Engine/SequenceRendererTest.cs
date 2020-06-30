@@ -207,7 +207,6 @@ namespace OpenKh.Tests.Engine
                 {
                     new Sequence.Frame
                     {
-                        Unknown00 = 0,
                         Left = 0,
                         Top = 0,
                         Right = 512,
@@ -245,7 +244,6 @@ namespace OpenKh.Tests.Engine
                 {
                     new Sequence.Frame
                     {
-                        Unknown00 = 0,
                         Left = 0,
                         Top = 0,
                         Right = 512,

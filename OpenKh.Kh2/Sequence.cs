@@ -28,6 +28,21 @@ namespace OpenKh.Kh2
             [Data] public Section AnimationGroupDesc { get; set; }
         }
 
+        public class RawFrame
+        {
+            [Data] public int Unknown00 { get; set; }
+            [Data] public int Left { get; set; }
+            [Data] public int Top { get; set; }
+            [Data] public int Right { get; set; }
+            [Data] public int Bottom { get; set; }
+            [Data] public float UTranslation { get; set; }
+            [Data] public float VTranslation { get; set; }
+            [Data] public uint ColorLeft { get; set; }
+            [Data] public uint ColorTop { get; set; }
+            [Data] public uint ColorRight { get; set; }
+            [Data] public uint ColorBottom { get; set; }
+        }
+
         public class RawFrameGroup
         {
             [Data] public short Start { get; set; }
@@ -51,17 +66,16 @@ namespace OpenKh.Kh2
 
         public class Frame
         {
-            [Data] public int Unknown00 { get; set; }
-            [Data] public int Left { get; set; }
-            [Data] public int Top { get; set; }
-            [Data] public int Right { get; set; }
-            [Data] public int Bottom { get; set; }
-            [Data] public float UTranslation { get; set; }
-            [Data] public float VTranslation { get; set; }
-            [Data] public uint ColorLeft { get; set; }
-            [Data] public uint ColorTop { get; set; }
-            [Data] public uint ColorRight { get; set; }
-            [Data] public uint ColorBottom { get; set; }
+            public int Left { get; set; }
+            public int Top { get; set; }
+            public int Right { get; set; }
+            public int Bottom { get; set; }
+            public float UTranslation { get; set; }
+            public float VTranslation { get; set; }
+            public uint ColorLeft { get; set; }
+            public uint ColorTop { get; set; }
+            public uint ColorRight { get; set; }
+            public uint ColorBottom { get; set; }
         }
 
         public class FrameEx
@@ -150,7 +164,20 @@ namespace OpenKh.Kh2
                 throw new InvalidDataException("Invalid header");
 
             Unknown04 = header.Unknown04;
-            Frames = stream.ReadList<Frame>(header.SpriteDesc.Offset, header.SpriteDesc.Count);
+            Frames = stream.ReadList<RawFrame>(header.SpriteDesc.Offset, header.SpriteDesc.Count)
+                .Select(x => new Frame
+                {
+                    Left = x.Left,
+                    Top = x.Top,
+                    Right = x.Right,
+                    Bottom = x.Bottom,
+                    UTranslation = x.UTranslation,
+                    VTranslation = x.VTranslation,
+                    ColorLeft = x.ColorLeft,
+                    ColorTop = x.ColorTop,
+                    ColorRight = x.ColorRight,
+                    ColorBottom = x.ColorBottom,
+                }).ToList();
 
             var framesEx = stream.ReadList<FrameEx>(header.SpritePartDesc.Offset, header.SpritePartDesc.Count);
             FrameGroups = stream.ReadList<RawFrameGroup>(header.SpriteGroupDesc.Offset, header.SpriteGroupDesc.Count)
@@ -195,7 +222,19 @@ namespace OpenKh.Kh2
             stream.Position = basePosition + MinimumLength;
             header.SpriteDesc.Offset = (int)(stream.Position - basePosition);
 
-            header.SpritePartDesc.Offset = stream.WriteList(Frames) + header.SpriteDesc.Offset;
+            header.SpritePartDesc.Offset = stream.WriteList(Frames.Select(x => new RawFrame
+            {
+                Left = x.Left,
+                Top = x.Top,
+                Right = x.Right,
+                Bottom = x.Bottom,
+                UTranslation = x.UTranslation,
+                VTranslation = x.VTranslation,
+                ColorLeft = x.ColorLeft,
+                ColorTop = x.ColorTop,
+                ColorRight = x.ColorRight,
+                ColorBottom = x.ColorBottom,
+            })) + header.SpriteDesc.Offset;
             header.SpriteGroupDesc.Offset = stream.WriteList(FrameGroups.SelectMany(x => x)) + header.SpritePartDesc.Offset;
 
             index = 0;
