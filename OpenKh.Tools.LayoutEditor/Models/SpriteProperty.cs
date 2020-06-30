@@ -68,6 +68,8 @@ namespace OpenKh.Tools.LayoutEditor.Models
 
             Width = newWidth;
             Height = newHeight;
+            _sequence.SpriteGroups[0][0].Right = Width;
+            _sequence.SpriteGroups[0][0].Bottom = Height;
             _spriteTexture = _drawing.CreateSpriteTexture(Width, Height);
             TextureId = _textureBinder.BindTexture(_spriteTexture);
 
