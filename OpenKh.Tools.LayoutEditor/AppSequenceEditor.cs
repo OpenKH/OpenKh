@@ -49,6 +49,8 @@ namespace OpenKh.Tools.LayoutEditor
         int _sequencerFirstFrame = 0;
 
         private string FrameEditDialogTitle => $"Sprite edit #{_selectedSprite}";
+        private Sequence.AnimationGroup SelectedAnimationGroup =>
+            _debugSequenceRenderer.AnimationGroup;
 
         public int SelectedAnimGroup
         {
@@ -131,6 +133,7 @@ namespace OpenKh.Tools.LayoutEditor
                     this, _settings);
             }
 
+            _animationFrameCurrent++;
             return true;
         }
 
@@ -180,7 +183,7 @@ namespace OpenKh.Tools.LayoutEditor
             _drawing.DestinationTexture = _destinationTexture;
             _drawing.Clear(_settings.EditorBackground);
             _drawing.SetViewport(0, 1024, 0, 1024);
-            _renderer.Draw(_selectedAnimGroup, _animationFrameCurrent++, width / 2.0f, height / 2.0f);
+            _renderer.Draw(_selectedAnimGroup, _animationFrameCurrent, width / 2.0f, height / 2.0f);
             _drawing.Flush();
             _drawing.DestinationTexture = null;
 
@@ -416,15 +419,20 @@ namespace OpenKh.Tools.LayoutEditor
 
         private unsafe void Timeline()
         {
+            var frameIndex = _renderer.GetActualFrame(SelectedAnimationGroup, _animationFrameCurrent);
+            var frameIndexRef = _renderer.GetActualFrame(SelectedAnimationGroup, _animationFrameCurrent);
+
             ImGui.SliderInt("Frame", ref _animationFrameCurrent, 0, _animationFrameCount,
                 $"%i/{_animationFrameCount}");
-            ImSequencer.Sequencer(_sequencer, ref _animationFrameCurrent, ref _sequenceExpanded, ref _sequencerSelectedAnimation, ref _sequencerFirstFrame,
+            var isChanged = ImSequencer.Sequencer(_sequencer, ref frameIndexRef, ref _sequenceExpanded, ref _sequencerSelectedAnimation, ref _sequencerFirstFrame,
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_EDIT_STARTEND |
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_ADD |
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_DEL |
                 //ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_COPYPASTE |
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_CHANGE_FRAME);
 
+            if (frameIndex != frameIndexRef)
+                _animationFrameCurrent = frameIndexRef;
         }
 
         private SpriteModel AsSpriteProperty(Sequence.Sprite sprite) =>

@@ -70,20 +70,22 @@ namespace OpenKh.Engine.Renderers
                 PositionY = positionY
             }, sequence.AnimationGroups[animationGroupIndex]);
 
+        public int GetActualFrame(Sequence.AnimationGroup animationGroup, int frameIndex)
+        {
+            if (animationGroup.DoNotLoop != 0)
+                return frameIndex;
+
+            var frameEnd = animationGroup.LoopEnd;
+            if (frameEnd == 0)
+                frameEnd = animationGroup.Animations.Max(x => x.FrameEnd);
+
+            return Loop(animationGroup.LoopStart, frameEnd, frameIndex);
+        }
+
         private void DrawAnimationGroup(Context contextParent, Sequence.AnimationGroup animationGroup)
         {
             var context = contextParent.Clone();
-
-            if (animationGroup.DoNotLoop == 0)
-            {
-                var frameEnd = animationGroup.LoopEnd;
-                if (frameEnd == 0)
-                {
-                    frameEnd = animationGroup.Animations.Max(x => x.FrameEnd);
-                }
-
-                context.FrameIndex = Loop(animationGroup.LoopStart, frameEnd, context.FrameIndex);
-            }
+            context.FrameIndex = GetActualFrame(animationGroup, context.FrameIndex);
 
             for (int i = 0; i < animationGroup.Animations.Count; i++)
             {
