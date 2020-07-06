@@ -332,7 +332,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                         sequence.IsPaused = !sequence.IsPaused;
 
                     nextButtonPosition.X -= ButtonDistance;
-                    if (SequencerButton(draw_list, nextButtonPosition, 'A', sequence.IsPaused, PauseColor, "Add new animation") && io.MouseReleased[0])
+                    if (SequencerButton(draw_list, nextButtonPosition, 'A', false, ColorWhite, "Add new animation") && io.MouseReleased[0])
                         insertAnimationEntry = sequence.ItemCount;
                 }
 
