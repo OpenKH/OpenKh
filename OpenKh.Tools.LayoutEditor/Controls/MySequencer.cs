@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             return null;
         }
 
-        public void Add()
+        public void AddAnimation()
         {
             SelectedAnimationGroup.Animations.Add(new Sequence.Animation
             {
@@ -81,10 +82,18 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             });
             InvalidateAnimationList();
         }
-            
-        public void Remove(int index) => _animationList.RemoveAt(index);
 
-        public void Duplicate(int index) => _animationList.Add(_animationList[index]);
+        public void RemoveAnimation(int index)
+        {
+            SelectedAnimationGroup.Animations.RemoveAt(index);
+            InvalidateAnimationList();
+        }
+
+        public void DuplicateAnimation(int index)
+        {
+            SelectedAnimationGroup.Animations.Add(SelectedAnimationGroup.Animations[index].Clone());
+            InvalidateAnimationList();
+        }
 
         public bool IsFocus(int index) => _debugSequenceRenderer.FocusOnAnimation == index;
         public void SetFocus(int index) => _debugSequenceRenderer.FocusOnAnimation = index;

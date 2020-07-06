@@ -89,9 +89,9 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             string GetItemTypeName(int typeIndex);
 
             IAnimation GetAnimation(int index);
-            void Add();
-            void Remove(int index);
-            void Duplicate(int index);
+            void AddAnimation();
+            void RemoveAnimation(int index);
+            void DuplicateAnimation(int index);
 
             bool IsFocus(int index);
             void SetFocus(int index);
@@ -851,19 +851,19 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
             if (deleteAnimationEntry >= 0)
             {
-                sequence.Remove(deleteAnimationEntry);
+                sequence.RemoveAnimation(deleteAnimationEntry);
                 if ((selectedEntry == deleteAnimationEntry || selectedEntry >= sequence.ItemCount))
                     selectedEntry = -1;
             }
 
             if (duplicateAnimationEntry >= 0)
             {
-                sequence.Duplicate(duplicateAnimationEntry);
+                sequence.DuplicateAnimation(duplicateAnimationEntry);
             }
 
             if (insertAnimationEntry >= 0)
             {
-                sequence.Add();
+                sequence.AddAnimation();
             }
 
             return ret;
