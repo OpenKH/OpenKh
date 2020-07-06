@@ -133,7 +133,8 @@ namespace OpenKh.Tools.LayoutEditor
                     this, _settings);
             }
 
-            _animationFrameCurrent++;
+            if (!_sequencer.IsPaused)
+                _animationFrameCurrent++;
             return true;
         }
 

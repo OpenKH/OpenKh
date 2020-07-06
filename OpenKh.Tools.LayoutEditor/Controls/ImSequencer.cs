@@ -80,6 +80,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             bool focused { get; set; }
             int FrameMin { get; }
             int FrameMax { get;  }
+            bool IsPaused { get; set; }
             int ItemCount { get; }
 
             void BeginEdit(int index);
@@ -298,25 +299,15 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                         MovingCurrentFrame = false;
                 }
 
-                //header
+                // Draw header controls on the left
                 draw_list.AddRectFilled(canvas_pos, new Vector2(canvas_size.X + canvas_pos.X, canvas_pos.Y + ItemHeight), 0xFF3D3837, 0);
                 if (sequenceOptions.HasFlag(SEQUENCER_OPTIONS.SEQUENCER_ADD))
                 {
-                    if (SequencerAddDelButton(draw_list, new Vector2(canvas_pos.X + legendWidth - ItemHeight, canvas_pos.Y + 2), true) && io.MouseReleased[0])
-                        ImGui.OpenPopup("addEntry");
+                    const uint PauseColor = 0xFFf1c40f;
+                    var nextButtonPosition = new Vector2(canvas_pos.X + legendWidth - ItemHeight, canvas_pos.Y + 2);
 
-                    if (ImGui.BeginPopup("addEntry"))
-                    {
-                        for (int i = 0; i < sequence.GetItemTypeCount(); i++)
-                            if (ImGui.Selectable(sequence.GetItemTypeName(i)))
-                            {
-                                sequence.Add(i);
-                                selectedEntry = sequence.ItemCount - 1;
-                            }
-
-                        ImGui.EndPopup();
-                        popupOpened = true;
-                    }
+                    if (SequencerButton(draw_list, nextButtonPosition, 'P', sequence.IsPaused, PauseColor) && io.MouseReleased[0]) 
+                        sequence.IsPaused = !sequence.IsPaused;
                 }
 
                 //header frame number and lines

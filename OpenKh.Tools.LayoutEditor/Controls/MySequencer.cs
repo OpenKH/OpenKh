@@ -61,6 +61,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         public int FrameMin { get; set; }
         public int FrameMax { get; set; }
         public int ItemCount => myItems.Count;
+        public bool IsPaused { get; set; }
 
         public int GetItemTypeCount() => ColorType.Length;
         public string GetItemTypeName(int typeIndex) => $"type {typeIndex}";
