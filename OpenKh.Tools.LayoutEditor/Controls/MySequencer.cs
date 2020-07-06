@@ -43,24 +43,22 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         private readonly DebugSequenceRenderer _debugSequenceRenderer;
         private int _selectedAnimationGroup;
 
-        public int SelectedAnimationGroup
+        private Sequence.AnimationGroup SelectedAnimationGroup =>
+            _sequence.AnimationGroups[_selectedAnimationGroup];
+
+        public int SelectedAnimationGroupIndex
         {
             get => _selectedAnimationGroup;
             set
             {
                 _selectedAnimationGroup = value;
-                var animationGroup = _sequence.AnimationGroups[_selectedAnimationGroup];
-                myItems = animationGroup.Animations
-                    .Select((x, index) => new MySequenceItem(x)
-                    {
-                        Type = index
-                    })
-                    .ToList();
+                InvalidateAnimationList();
             }
         }
+
         public int FrameMin { get; set; }
         public int FrameMax { get; set; }
-        public int ItemCount => myItems.Count;
+        public int ItemCount => _animationList.Count;
         public bool IsPaused { get; set; }
 
         public int GetItemTypeCount() => ColorType.Length;
@@ -68,23 +66,25 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
         public ImSequencer.IAnimation GetAnimation(int index)
         {
-            if (index >= 0 && index < myItems.Count)
-                return myItems[index];
+            if (index >= 0 && index < _animationList.Count)
+                return _animationList[index];
 
             return null;
         }
 
-        public void Add(int type) => myItems.Add(new MySequenceItem
+        public void Add()
         {
-            Type = new Random().Next(),
-            FrameStart = 0,
-            FrameEnd = 10,
-            IsExpanded = false
-        });
+            SelectedAnimationGroup.Animations.Add(new Sequence.Animation
+            {
+                FrameStart = 0,
+                FrameEnd = 10,
+            });
+            InvalidateAnimationList();
+        }
+            
+        public void Remove(int index) => _animationList.RemoveAt(index);
 
-        public void Remove(int index) => myItems.RemoveAt(index);
-
-        public void Duplicate(int index) => myItems.Add(myItems[index]);
+        public void Duplicate(int index) => _animationList.Add(_animationList[index]);
 
         public bool IsFocus(int index) => _debugSequenceRenderer.FocusOnAnimation == index;
         public void SetFocus(int index) => _debugSequenceRenderer.FocusOnAnimation = index;
@@ -93,7 +93,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         public bool IsVisible(int index) => _debugSequenceRenderer.IsAnimationVisible(index);
         public void SetVisibility(int index, bool isVisible) => _debugSequenceRenderer.ShowAnimation(index, isVisible);
 
-        public int GetCustomHeight(int index) => myItems[index].Height;
+        public int GetCustomHeight(int index) => _animationList[index].Height;
 
         public MySequencer(Sequence sequence, DebugSequenceRenderer debugSequenceRenderer)
         {
@@ -102,10 +102,10 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
             FrameMin = 0;
             FrameMax = 500;
-            myItems = new List<MySequenceItem>();
+            _animationList = new List<MySequenceItem>();
         }
 
-        List<MySequenceItem> myItems;
+        private List<MySequenceItem> _animationList;
 
         public bool focused { get; set; }
 
@@ -113,14 +113,14 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
         public void DoubleClick(int index)
         {
-            if (myItems[index].IsExpanded)
+            if (_animationList[index].IsExpanded)
             {
-                myItems[index].IsExpanded = false;
+                _animationList[index].IsExpanded = false;
                 return;
             }
-            foreach (var item in myItems)
+            foreach (var item in _animationList)
                 item.IsExpanded = false;
-            myItems[index].IsExpanded = !myItems[index].IsExpanded;
+            _animationList[index].IsExpanded = !_animationList[index].IsExpanded;
         }
 
         public void CustomDraw(int index, ImDrawListPtr draw_list, ImRect rc, ImRect legendRect, ImRect clippingRect, ImRect legendClippingRect)
@@ -178,6 +178,16 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
         public void Paste()
         {
+        }
+
+        private void InvalidateAnimationList()
+        {
+            _animationList = SelectedAnimationGroup.Animations
+                .Select((x, index) => new MySequenceItem(x)
+                {
+                    Type = index
+                })
+                .ToList();
         }
     };
 }

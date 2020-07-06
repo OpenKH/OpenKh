@@ -64,7 +64,7 @@ namespace OpenKh.Tools.LayoutEditor
                 var animationGroup = _sequence.AnimationGroups[_selectedAnimGroup];
                 _animationFrameCount = SequenceExtensions.GetFrameLength(animationGroup);
                 _debugSequenceRenderer.AnimationGroup = animationGroup;
-                _sequencer.SelectedAnimationGroup = value;
+                _sequencer.SelectedAnimationGroupIndex = value;
             }
         }
 
