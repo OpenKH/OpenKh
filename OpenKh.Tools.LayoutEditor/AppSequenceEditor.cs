@@ -183,26 +183,35 @@ namespace OpenKh.Tools.LayoutEditor
 
         private unsafe void DrawAnimation()
         {
+            const float TimelineControlWidth = 200f;
+
             AnimationGroupSelector();
 
-            if (ImGui.BeginChild("timeline", new Vector2(0, 200)))
+            if (ImGui.BeginChild("timeline", new Vector2(0, TimelineControlWidth)))
             {
                 Timeline();
                 ImGui.EndChild();
             }
 
-            var width = ImGui.GetWindowContentRegionWidth();
-            var height = ImGui.GetWindowHeight();
+            ForChild("Preview", 0, 0, false, () =>
+            {
+                const float ViewportWidth = 1024f;
+                const float ViewportHeight = 1024f;
+                var width = ImGui.GetWindowContentRegionWidth();
+                var height = ImGui.GetWindowHeight();
 
-            _drawing.DestinationTexture = _destinationTexture;
-            _drawing.Clear(_settings.EditorBackground);
-            _drawing.SetViewport(0, 1024, 0, 1024);
-            _renderer.Draw(_selectedAnimGroup, _animationFrameCurrent, width / 2.0f, height / 2.0f);
-            _drawing.Flush();
-            _drawing.DestinationTexture = null;
+                _drawing.DestinationTexture = _destinationTexture;
+                _drawing.Clear(_settings.EditorBackground);
+                _drawing.SetViewport(0, ViewportWidth, 0, ViewportHeight);
+                _renderer.Draw(_selectedAnimGroup, _animationFrameCurrent, width / 2.0f, height / 2.0f);
+                _drawing.Flush();
+                _drawing.DestinationTexture = null;
 
-            ImGui.Image(_destinationTextureId, new Vector2(1024, 1024),
-                GetUv(_atlasTexture, 0, 0), new Vector2(1, 1));
+                float maxU = 1f / ViewportWidth * width;
+                float maxV = 1f / ViewportHeight * height;
+                ImGui.Image(_destinationTextureId, new Vector2(width, height),
+                    GetUv(_atlasTexture, 0, 0), new Vector2(maxU, maxV));
+            });
         }
 
         private void DrawRight()
