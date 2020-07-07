@@ -117,10 +117,23 @@ namespace OpenKh.Tools.LayoutEditor
                 _frameEditDialog.Run();
                 ImGui.EndPopup();
             }
-            ForGrid(
-                new GridElement("SpriteList", 1, 256, true, DrawSpriteList),
-                new GridElement("Animation", 2, 0, false, DrawAnimation),
-                new GridElement("Right", 1.5f, 256, true, DrawRight));
+
+            const float SpriteListWidthMul = 1f;
+            const float SpriteListWidthMax = 192f;
+            const float RightWidthMul = 1.5f;
+            const float RightWidthMax = 384f;
+            const float PreviewWidthMul = 2f;
+            const float TotalWidthMul = SpriteListWidthMul + RightWidthMul + PreviewWidthMul;
+            var windowSize = ImGui.GetIO().DisplaySize.X;
+            var spriteListWidth = Math.Min(windowSize / TotalWidthMul * SpriteListWidthMul, SpriteListWidthMax);
+            var rightWidth = Math.Min(windowSize / TotalWidthMul * RightWidthMul, RightWidthMax);
+            var previewWidth = windowSize - spriteListWidth - rightWidth;
+
+            ForChild("SpriteList", spriteListWidth, 0, true, DrawSpriteList);
+            ImGui.SameLine();
+            ForChild("Animation", previewWidth, 0, false, DrawAnimation);
+            ImGui.SameLine();
+            ForChild("Right", rightWidth, 0, true, DrawRight);
 
             if (_isFrameEditDialogOpen)
             {

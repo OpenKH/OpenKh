@@ -184,25 +184,5 @@ namespace OpenKh.Tools.Common.CustomImGui
 
             return ret;
         }
-
-        public static void ForGrid(params GridElement[] elements)
-        {
-            var windowSize = ImGui.GetIO().DisplaySize.X;
-            var totalSize = elements.Sum(x => x.Size);
-
-            for (var i = 0; i < elements.Length; i++)
-            {
-                var element = elements[i];
-                var actualSize = windowSize / totalSize * element.Size;
-                ForChild(
-                    element.Name,
-                    actualSize, 0,
-                    element.Border,
-                    element.Action);
-
-                if (i < elements.Length - 1)
-                    ImGui.SameLine();
-            }
-        }
     }
 }
