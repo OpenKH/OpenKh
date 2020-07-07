@@ -5,6 +5,7 @@ using OpenKh.Tools.LayoutEditor.Interfaces;
 using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Tools.Common.CustomImGui;
+using OpenKh.Engine.Extensions;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renders;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
@@ -197,13 +198,27 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 const float ViewportWidth = 1024f;
                 const float ViewportHeight = 1024f;
+                const float Infinite = 65536f;
                 var width = ImGui.GetWindowContentRegionWidth();
                 var height = ImGui.GetWindowHeight();
+                var originX = width / 2.0f;
+                var originY = height / 2.0f;
+                var backgroundColorInverse = new ColorF(
+                    1f - _settings.EditorBackground.R,
+                    1f - _settings.EditorBackground.G,
+                    1f - _settings.EditorBackground.B,
+                    1f);
 
                 _drawing.DestinationTexture = _destinationTexture;
                 _drawing.Clear(_settings.EditorBackground);
                 _drawing.SetViewport(0, ViewportWidth, 0, ViewportHeight);
-                _renderer.Draw(_selectedAnimGroup, _animationFrameCurrent, width / 2.0f, height / 2.0f);
+
+                // This draws the origin
+                _drawing.FillRectangle(originX - 1, 0, 1, Infinite, backgroundColorInverse);
+                _drawing.FillRectangle(0, originY - 1, Infinite, 1, backgroundColorInverse);
+                _drawing.Flush();
+
+                _renderer.Draw(_selectedAnimGroup, _animationFrameCurrent, originX, originY);
                 _drawing.Flush();
                 _drawing.DestinationTexture = null;
 
