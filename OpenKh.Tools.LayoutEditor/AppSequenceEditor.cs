@@ -201,8 +201,8 @@ namespace OpenKh.Tools.LayoutEditor
                 const float Infinite = 65536f;
                 var width = ImGui.GetWindowContentRegionWidth();
                 var height = ImGui.GetWindowHeight();
-                var originX = width / 2.0f;
-                var originY = height / 2.0f;
+                var originX = width / 4.0f;
+                var originY = height / 4.0f;
                 var backgroundColorInverse = new ColorF(
                     1f - _settings.EditorBackground.R,
                     1f - _settings.EditorBackground.G,
