@@ -83,7 +83,7 @@ namespace OpenKh.Command.IdxImg
             protected int OnExecute(CommandLineApplication app)
             {
                 var inputImg = InputImg ?? InputIdx.Replace(".idx", ".img", StringComparison.InvariantCultureIgnoreCase);
-                var outputDir = OutputDir ?? Path.Combine(Path.GetFullPath(inputImg), "extract");
+                var outputDir = OutputDir ?? Path.Combine(Path.GetDirectoryName(inputImg), "extract");
 
                 var idxEntries = OpenIdx(InputIdx);
 
