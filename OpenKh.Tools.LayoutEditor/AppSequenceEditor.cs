@@ -54,7 +54,7 @@ namespace OpenKh.Tools.LayoutEditor
 
         private bool _isSpriteGroupEditDialogOpen;
         private SpriteGroupEditDialog _spriteGroupEditDialog;
-        private string SpriteGroupEditDialogTitle => $"Sprite group edit #{_selectedSprite}";
+        private string SpriteGroupEditDialogTitle => $"Sprite group edit";
 
         private Sequence.AnimationGroup SelectedAnimationGroup =>
             _debugSequenceRenderer.AnimationGroup;
@@ -160,7 +160,8 @@ namespace OpenKh.Tools.LayoutEditor
                 ImGui.OpenPopup(SpriteGroupEditDialogTitle);
                 _isSpriteGroupEditDialogOpen = false;
                 _spriteGroupEditDialog = new SpriteGroupEditDialog(
-                    _spriteGroups[_selectedSpriteGroup],
+                    _spriteGroups,
+                    _selectedSpriteGroup,
                     _drawing,
                     _atlasTexture,
                     this, _settings);

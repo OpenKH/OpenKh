@@ -9,26 +9,32 @@ using System.Numerics;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace OpenKh.Tools.LayoutEditor.Dialogs
 {
     class SpriteGroupEditDialog : IDisposable
     {
-        private readonly SpriteGroupModel _spriteGroupModel;
+        private readonly List<SpriteGroupModel> _spriteGroupModels;
         private readonly ISpriteDrawing _spriteDrawing;
         private readonly ISpriteTexture _atlasTexture;
         private readonly ITextureBinder _textureBinder;
         private readonly IEditorSettings _settings;
         private bool _isPivotVisible = true;
 
+        private int _selectedSpriteGroupModel;
+        private SpriteGroupModel SpriteGroupModel => _spriteGroupModels[_selectedSpriteGroupModel];
+
         public SpriteGroupEditDialog(
-            SpriteGroupModel spriteGroupModel,
+            List<SpriteGroupModel> spriteGroupModels,
+            int selectedSpriteGroupModel,
             ISpriteDrawing spriteDrawing,
             ISpriteTexture atlasTexture,
             ITextureBinder textureBinder,
             IEditorSettings settings)
         {
-            _spriteGroupModel = spriteGroupModel;
+            _spriteGroupModels = spriteGroupModels;
+            _selectedSpriteGroupModel = selectedSpriteGroupModel;
             _spriteDrawing = spriteDrawing;
             _atlasTexture = atlasTexture;
             _textureBinder = textureBinder;
@@ -58,8 +64,8 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
 
         private void SpriteGroupPreview()
         {
-            _spriteGroupModel.Draw(0, 0, PreDraw, PostDraw);
-            ImGui.Image(_spriteGroupModel.TextureId, SuggestSpriteSize());
+            SpriteGroupModel.Draw(0, 0, PreDraw, PostDraw);
+            ImGui.Image(SpriteGroupModel.TextureId, SuggestSpriteSize());
         }
 
         private void PreDraw(ISpriteDrawing drawing)
@@ -82,15 +88,16 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
 
         private void SptiteGroupEditor()
         {
+            ImGui.InputInt("Selected", ref _selectedSpriteGroupModel);
             ImGui.Checkbox("Show pivot", ref _isPivotVisible);
 
-            var origin = GetOrigin(_spriteGroupModel);
+            var origin = GetOrigin(SpriteGroupModel);
             var originValues = new int[] { origin.X, origin.Y };
             if (ImGui.DragInt2("Pivot", ref originValues[0]))
             {
                 var diffX = originValues[0] - origin.X;
                 var diffY = originValues[1] - origin.Y;
-                foreach (var item in _spriteGroupModel.SpriteGroup)
+                foreach (var item in SpriteGroupModel.SpriteGroup)
                 {
                     item.Left -= diffX;
                     item.Right -= diffX;
@@ -99,14 +106,14 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 }
             }
 
-            var size = _spriteGroupModel.SpriteGroup.GetVisibilityRectangleForFrameGroup();
+            var size = SpriteGroupModel.SpriteGroup.GetVisibilityRectangleForFrameGroup();
             ImGui.Text($"Width: {size.Width}, Heigth: {size.Height}");
 
-            for (var i = 0; i < _spriteGroupModel.SpriteGroup.Count; i++)
+            for (var i = 0; i < SpriteGroupModel.SpriteGroup.Count; i++)
             {
                 if (ImGui.CollapsingHeader($"Sprite part {i + 1}"))
                 {
-                    SpritePartEdit(_spriteGroupModel.SpriteGroup[i], i);
+                    SpritePartEdit(SpriteGroupModel.SpriteGroup[i], i);
                 }
             }
         }
@@ -136,24 +143,24 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 spritePart.Top = position[1];
                 spritePart.Right = position[0] + size[0];
                 spritePart.Bottom = position[1] + size[1];
-                _spriteGroupModel.SizeChanged();
+                SpriteGroupModel.SizeChanged();
             }
             if (ImGui.DragInt2($"Size##{index}", ref size[0]))
             {
                 spritePart.Right = position[0] + size[0];
                 spritePart.Bottom = position[1] + size[1];
-                _spriteGroupModel.SizeChanged();
+                SpriteGroupModel.SizeChanged();
             }
         }
 
         private Vector2 SuggestSpriteSize()
         {
             const int MaxZoomLevel = 8;
-            var zoomLevelX = 512 / _spriteGroupModel.Width;
-            var zoomLevelY = 512 / _spriteGroupModel.Height;
+            var zoomLevelX = 512 / SpriteGroupModel.Width;
+            var zoomLevelY = 512 / SpriteGroupModel.Height;
             var zoomLevel = Math.Max(1, Math.Min(MaxZoomLevel, Math.Min(zoomLevelX, zoomLevelY)));
 
-            return new Vector2(_spriteGroupModel.Width * zoomLevel, _spriteGroupModel.Height * zoomLevel);
+            return new Vector2(SpriteGroupModel.Width * zoomLevel, SpriteGroupModel.Height * zoomLevel);
         }
 
         private void DrawCenter(ISpriteDrawing drawing, float alpha)
@@ -162,7 +169,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 return;
 
             const float Infinite = 65535f;
-            var origin = GetOrigin(_spriteGroupModel);
+            var origin = GetOrigin(SpriteGroupModel);
             var backgroundColorInverse = new ColorF(
                 1f - _settings.EditorBackground.R,
                 1f - _settings.EditorBackground.G,
