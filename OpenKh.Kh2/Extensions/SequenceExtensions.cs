@@ -1,5 +1,6 @@
 ﻿using OpenKh.Common;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -40,7 +41,10 @@ namespace OpenKh.Kh2.Extensions
         }
 
         public static Rectangle GetVisibilityRectangleForFrameGroup(this Sequence sequence, int frameGroupIndex) =>
-            sequence.SpriteGroups[frameGroupIndex].Aggregate(new Rectangle(), (rect, x) => rect.Union(x.GetVisibilityRectangle()));
+            sequence.SpriteGroups[frameGroupIndex].GetVisibilityRectangleForFrameGroup();
+
+        public static Rectangle GetVisibilityRectangleForFrameGroup(this List<Sequence.SpritePart> spriteGroup) =>
+            spriteGroup.Aggregate(new Rectangle(), (rect, x) => rect.Union(x.GetVisibilityRectangle()));
 
         public static Rectangle GetVisibilityRectangle(
             this Sequence.SpritePart frameEx) => Rectangle.FromLTRB(

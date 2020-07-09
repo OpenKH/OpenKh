@@ -37,12 +37,14 @@ namespace OpenKh.Tools.LayoutEditor
         private SpriteEditDialog _frameEditDialog;
 
         private int _selectedSprite = 0;
+        private int _selectedSpriteGroup = 0;
         private int _selectedAnimGroup;
         private int _animationFrameCurrent;
         private int _animationFrameCount;
         private ISpriteTexture _destinationTexture;
         private IntPtr _destinationTextureId;
         private List<SpriteModel> _sprites;
+        private List<SpriteGroupModel> _spriteGroups;
 
         private MySequencer _sequencer;
         bool _sequenceExpanded = true;
@@ -94,11 +96,14 @@ namespace OpenKh.Tools.LayoutEditor
             _destinationTextureId = this.BindTexture(_destinationTexture);
 
             _sprites = sequence.Sprites
-                .Select(x => AsSpriteProperty(x))
+                .Select(x => AsSpriteModel(x))
+                .ToList();
+            _spriteGroups = sequence.SpriteGroups
+                .Select((_, i) => AsSpriteGroupModel(i))
                 .ToList();
 
             _sequencer = new MySequencer(sequence, _debugSequenceRenderer);
-            SelectedAnimGroup = 1;
+            SelectedAnimGroup = 6;
         }
 
         public void Menu()
@@ -130,7 +135,7 @@ namespace OpenKh.Tools.LayoutEditor
             var rightWidth = Math.Min(windowSize / TotalWidthMul * RightWidthMul, RightWidthMax);
             var previewWidth = windowSize - spriteListWidth - rightWidth;
 
-            ForChild("SpriteList", spriteListWidth, 0, true, DrawSpriteList);
+            ForChild("SpriteGroupList", spriteListWidth, 0, true, DrawSpriteGroupList);
             ImGui.SameLine();
             ForChild("Animation", previewWidth, 0, false, DrawAnimation);
             ImGui.SameLine();
@@ -150,6 +155,26 @@ namespace OpenKh.Tools.LayoutEditor
             if (!_sequencer.IsPaused)
                 _animationFrameCurrent++;
             return true;
+        }
+
+        private void DrawSpriteGroupList()
+        {
+            // Animate only the selected sprite
+            if (_selectedSpriteGroup >= 0)
+                _spriteGroups[_selectedSpriteGroup].Draw(0, 0);
+
+            for (int i = 0; i < _spriteGroups.Count; i++)
+            {
+                var sprite = _spriteGroups[i];
+                if (ImGui.Selectable($"##spriteGroup{i}",
+                    _selectedSpriteGroup == i,
+                    ImGuiSelectableFlags.None,
+                    new Vector2(0, sprite.Height)))
+                    _selectedSpriteGroup = i;
+
+                ImGui.SameLine();
+                ImGui.Image(sprite.TextureId, new Vector2(sprite.Width, sprite.Height));
+            }
         }
 
         private void DrawSpriteList()
@@ -503,8 +528,10 @@ namespace OpenKh.Tools.LayoutEditor
             return isSet;
         }
 
-        private SpriteModel AsSpriteProperty(Sequence.Sprite sprite) =>
+        private SpriteModel AsSpriteModel(Sequence.Sprite sprite) =>
             new SpriteModel(sprite, _drawing, _atlasTexture, this, _settings);
+        private SpriteGroupModel AsSpriteGroupModel(int index) =>
+            new SpriteGroupModel(_sequence, index, _drawing, _atlasTexture, this, _settings);
 
         private static Vector2 GetUv(ISpriteTexture texture, int x, int y) =>
             new Vector2((float)x / texture.Width, (float)y / texture.Height);
