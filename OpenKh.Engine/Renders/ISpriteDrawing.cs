@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Maths;
+using OpenKh.Engine.Maths;
 using OpenKh.Imaging;
 using System;
 using System.Numerics;
@@ -172,6 +172,16 @@ namespace OpenKh.Engine.Renders
         public static SpriteDrawingContext ScaleSize(this SpriteDrawingContext context, float scaleX, float scaleY)
         {
             // TODO
+            return context;
+        }
+
+        public static SpriteDrawingContext RotateZ(this SpriteDrawingContext context, float rotation)
+        {
+            var matrix = Matrix4x4.CreateRotationZ(rotation);
+            context.Vec0 = Vector2.Transform(context.Vec0, matrix);
+            context.Vec1 = Vector2.Transform(context.Vec1, matrix);
+            context.Vec2 = Vector2.Transform(context.Vec2, matrix);
+            context.Vec3 = Vector2.Transform(context.Vec3, matrix);
             return context;
         }
 

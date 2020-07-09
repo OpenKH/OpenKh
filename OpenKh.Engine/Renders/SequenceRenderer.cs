@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Renders;
+using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,7 @@ namespace OpenKh.Engine.Renderers
             public float PositionY { get; set; }
             public float ScaleX { get; set; }
             public float ScaleY { get; set; }
+            public float Rotation { get; set; }
             public ColorF Color { get; set; }
             public int ColorBlendMode { get; set; }
             public float Left { get; set; }
@@ -32,6 +33,7 @@ namespace OpenKh.Engine.Renderers
                 PositionY = PositionY,
                 ScaleX = ScaleX,
                 ScaleY = ScaleY,
+                Rotation = Rotation,
                 Color = Color,
                 ColorBlendMode = ColorBlendMode,
                 Left = Left,
@@ -42,10 +44,11 @@ namespace OpenKh.Engine.Renderers
         }
 
         private const int LinearInterpolationFlag = 0x00000001;
+        private const int RotationFlag = 0x00000020;
         private const int ScalingFlag = 0x00000040;
         private const int ColorMaskingFlag = 0x00000400;
         private const int ColorInterpolationFlag = 0x00000080;
-        private const int TraslateFlag = 0x00004000;
+        private const int TranslateFlag = 0x00004000;
 
         private readonly Sequence sequence;
         private readonly ISpriteDrawing drawing;
@@ -150,9 +153,14 @@ namespace OpenKh.Engine.Renderers
                 }
             }
             else
-                context.Color = ConvertColor(animation.ColorStart);
+                context.Color = new ColorF(1, 1, 1, 1);
 
-            if ((animation.Flags & TraslateFlag) == 0)
+            if ((animation.Flags & RotationFlag) == 0)
+            {
+                context.Rotation = Lerp(t, animation.RotationStart, animation.RotationEnd);
+            }
+
+            if ((animation.Flags & TranslateFlag) == 0)
             {
                 context.PositionX += Lerp(t, animation.Xb0, animation.Xb1);
                 context.PositionY += Lerp(t, animation.Yb0, animation.Yb1);
@@ -188,8 +196,10 @@ namespace OpenKh.Engine.Renderers
             var drawContext = new SpriteDrawingContext()
                 .SpriteTexture(surface)
                 .SourceLTRB(frame.Left, frame.Top, frame.Right, frame.Bottom)
-                .Position(context.PositionX + context.Left, context.PositionY + context.Top)
-                .DestinationSize(context.Right - context.Left, context.Bottom - context.Top);
+                .Position(context.Left, context.Top)
+                .DestinationSize(context.Right - context.Left, context.Bottom - context.Top)
+                .RotateZ(-context.Rotation)
+                .Traslate(context.PositionX, context.PositionY);
 
             drawContext.Color0 = ConvertColor(frame.ColorLeft);
             drawContext.Color1 = ConvertColor(frame.ColorTop);
