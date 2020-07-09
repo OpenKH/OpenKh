@@ -52,7 +52,7 @@ namespace OpenKh.Tools.LayoutEditor
         private SpriteEditDialog _frameEditDialog;
         private string FrameEditDialogTitle => $"Sprite edit #{_selectedSprite}";
 
-        private bool _isSpriteGroupEditDialogOpen = true;
+        private bool _isSpriteGroupEditDialogOpen;
         private SpriteGroupEditDialog _spriteGroupEditDialog;
         private string SpriteGroupEditDialogTitle => $"Sprite group edit #{_selectedSprite}";
 
@@ -288,7 +288,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 if (ImGui.CollapsingHeader($"Animation {i + 1}"))
                 {
-                    AnimationEdit(animationGroup.Animations[i]);
+                    AnimationEdit(animationGroup.Animations[i], i);
                 }
             }
         }
@@ -366,46 +366,46 @@ namespace OpenKh.Tools.LayoutEditor
                 animationGroup.Unknown20 = unknown20;
         }
 
-        private void AnimationEdit(Sequence.Animation animation)
+        private void AnimationEdit(Sequence.Animation animation, int index)
         {
             int flags = animation.Flags;
-            if (ImGui.InputInt("Flags", ref flags))
+            if (ImGui.InputInt($"Flags##{index}", ref flags))
                 animation.Flags = flags;
 
-            ImGuiFlagBox(animation, "Use cubic interpolation instead of linear", Sequence.LinearInterpolationFlag);
+            ImGuiFlagBox(animation, $"Use cubic interpolation instead of linear##{index}", Sequence.LinearInterpolationFlag);
 
             var framePair = new int[] { animation.FrameStart, animation.FrameEnd };
-            if (ImGui.DragInt2("Frame lifespan", ref framePair[0]))
+            if (ImGui.DragInt2($"Frame lifespan##{index}", ref framePair[0]))
             {
                 animation.FrameStart = framePair[0];
                 animation.FrameEnd = framePair[1];
             }
 
             var xaPair = new int[] { animation.Xa0, animation.Xa1 };
-            if (ImGui.DragInt2("Translation X", ref xaPair[0]))
+            if (ImGui.DragInt2($"Translation X##{index}", ref xaPair[0]))
             {
                 animation.Xa0 = xaPair[0];
                 animation.Xa1 = xaPair[1];
             }
 
             var yaPair = new int[] { animation.Ya0, animation.Ya1 };
-            if (ImGui.DragInt2("Translation Y", ref yaPair[0]))
+            if (ImGui.DragInt2($"Translation Y##{index}", ref yaPair[0]))
             {
                 animation.Ya0 = yaPair[0];
                 animation.Ya1 = yaPair[1];
             }
 
-            if (ImGuiFlagBox(animation, "Enable extra translation", Sequence.TranslateFlag))
+            if (ImGuiFlagBox(animation, $"Enable extra translation##{index}", Sequence.TranslateFlag))
             {
                 var xbPair = new int[] { animation.Xb0, animation.Xb1 };
-                if (ImGui.DragInt2("Translation X2", ref xbPair[0]))
+                if (ImGui.DragInt2($"Translation X2##{index}", ref xbPair[0]))
                 {
                     animation.Xb0 = xbPair[0];
                     animation.Xb1 = xbPair[1];
                 }
 
                 var ybPair = new int[] { animation.Yb0, animation.Yb1 };
-                if (ImGui.DragInt2("Translation Y2", ref ybPair[0]))
+                if (ImGui.DragInt2($"Translation Y2##{index}", ref ybPair[0]))
                 {
                     animation.Yb0 = ybPair[0];
                     animation.Yb1 = ybPair[1];
@@ -415,7 +415,7 @@ namespace OpenKh.Tools.LayoutEditor
             var unk3xPair = new int[] {
                 animation.Unknown30, animation.Unknown34, animation.Unknown38, animation.Unknown3c
             };
-            if (ImGui.DragInt4("Unknown3x", ref unk3xPair[0]))
+            if (ImGui.DragInt4($"Unknown3x##{index}", ref unk3xPair[0]))
             {
                 animation.Unknown30 = unk3xPair[0];
                 animation.Unknown34 = unk3xPair[1];
@@ -423,35 +423,35 @@ namespace OpenKh.Tools.LayoutEditor
                 animation.Unknown3c = unk3xPair[3];
             }
 
-            if (ImGuiFlagBox(animation, "Enable rotation", Sequence.RotationFlag, true))
+            if (ImGuiFlagBox(animation, $"Enable rotation##{index}", Sequence.RotationFlag, true))
             {
                 ImGui.SameLine();
                 var rotationPair = new Vector2(animation.RotationStart, animation.RotationEnd);
-                if (ImGui.DragFloat2("Rotation", ref rotationPair))
+                if (ImGui.DragFloat2($"Rotation##{index}", ref rotationPair))
                 {
                     animation.RotationStart = rotationPair.X;
                     animation.RotationEnd = rotationPair.Y;
                 }
             }
 
-            if  (ImGuiFlagBox(animation, "Enable scaling", Sequence.ScalingFlag))
+            if  (ImGuiFlagBox(animation, $"Enable scaling##{index}", Sequence.ScalingFlag))
             {
                 var scalePair = new Vector2(animation.ScaleStart, animation.ScaleEnd);
-                if (ImGui.DragFloat2("Scale", ref scalePair, 0.05f))
+                if (ImGui.DragFloat2($"Scale##{index}", ref scalePair, 0.05f))
                 {
                     animation.ScaleStart = scalePair.X;
                     animation.ScaleEnd = scalePair.Y;
                 }
 
                 var scaleXPair = new Vector2(animation.ScaleXStart, animation.ScaleXEnd);
-                if (ImGui.DragFloat2("Scale X", ref scaleXPair, 0.05f))
+                if (ImGui.DragFloat2($"Scale X##{index}", ref scaleXPair, 0.05f))
                 {
                     animation.ScaleXStart = scaleXPair.X;
                     animation.ScaleXEnd = scaleXPair.Y;
                 }
 
                 var scaleYPair = new Vector2(animation.ScaleYStart, animation.ScaleYEnd);
-                if (ImGui.DragFloat2("Scale Y", ref scaleYPair, 0.05f))
+                if (ImGui.DragFloat2($"Scale Y##{index}", ref scaleYPair, 0.05f))
                 {
                     animation.ScaleYStart = scaleYPair.X;
                     animation.ScaleYEnd = scaleYPair.Y;
@@ -460,7 +460,7 @@ namespace OpenKh.Tools.LayoutEditor
 
             var unk6xPair = new Vector4(
                 animation.Unknown60, animation.Unknown64, animation.Unknown68, animation.Unknown6c);
-            if (ImGui.DragFloat4("Unknown6x", ref unk6xPair, 0.05f))
+            if (ImGui.DragFloat4($"Unknown6x##{index}", ref unk6xPair, 0.05f))
             {
                 animation.Unknown60 = unk6xPair.X;
                 animation.Unknown64 = unk6xPair.Y;
@@ -469,38 +469,38 @@ namespace OpenKh.Tools.LayoutEditor
             }
 
             var bounceXPair = new int[] { animation.BounceXStart, animation.BounceXEnd };
-            if (ImGui.DragInt2("Bounce X", ref bounceXPair[0]))
+            if (ImGui.DragInt2($"Bounce X##{index}", ref bounceXPair[0]))
             {
                 animation.BounceXStart = bounceXPair[0];
                 animation.BounceXEnd = bounceXPair[1];
             }
 
             var bounceYPair = new int[] { animation.BounceYStart, animation.BounceYEnd };
-            if (ImGui.DragInt2("Bounce Y", ref bounceYPair[0]))
+            if (ImGui.DragInt2($"Bounce Y##{index}", ref bounceYPair[0]))
             {
                 animation.BounceYStart = bounceYPair[0];
                 animation.BounceYEnd = bounceYPair[1];
             }
 
             int unk80 = animation.Unknwon80;
-            if (ImGui.DragInt("Unknown80", ref unk80))
+            if (ImGui.DragInt($"Unknown80##{index}", ref unk80))
                 animation.Unknwon80 = unk80;
 
             int blendMode = animation.ColorBlend;
-            if (ImGui.Combo("Blend mode", ref blendMode, new string[]
+            if (ImGui.Combo($"Blend mode##{index}", ref blendMode, new string[]
                 { "Normal", "Additive", "Subtractive" }, 3))
                 animation.ColorBlend = blendMode;
 
-            if (ImGuiFlagBox(animation, "Enable color mask", Sequence.ColorMaskingFlag))
+            if (ImGuiFlagBox(animation, $"Enable color mask##{index}", Sequence.ColorMaskingFlag))
             {
                 var colorStart = Utilities.ConvertColor(animation.ColorStart);
-                if (ImGui.ColorPicker4("Mask start", ref colorStart))
+                if (ImGui.ColorPicker4($"Mask start##{index}", ref colorStart))
                     animation.ColorStart = Utilities.ConvertColor(colorStart);
 
-                if (ImGuiFlagBox(animation, "Enable color mask animation", Sequence.ColorInterpolationFlag))
+                if (ImGuiFlagBox(animation, $"Enable color mask animation##{index}", Sequence.ColorInterpolationFlag))
                 {
                     var colorEnd = Utilities.ConvertColor(animation.ColorEnd);
-                    if (ImGui.ColorPicker4("Mask end", ref colorEnd))
+                    if (ImGui.ColorPicker4($"Mask end##{index}", ref colorEnd))
                         animation.ColorEnd = Utilities.ConvertColor(colorEnd);
                 }
             }
