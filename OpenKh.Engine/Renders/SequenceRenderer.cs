@@ -43,13 +43,6 @@ namespace OpenKh.Engine.Renderers
             };
         }
 
-        private const int LinearInterpolationFlag = 0x00000001;
-        private const int RotationFlag = 0x00000020;
-        private const int ScalingFlag = 0x00000040;
-        private const int ColorMaskingFlag = 0x00000400;
-        private const int ColorInterpolationFlag = 0x00000080;
-        private const int TranslateFlag = 0x00004000;
-
         private readonly Sequence sequence;
         private readonly ISpriteDrawing drawing;
         private readonly ISpriteTexture surface;
@@ -116,7 +109,7 @@ namespace OpenKh.Engine.Renderers
             float t;
 
             // loc_23B030
-            if ((animation.Flags & LinearInterpolationFlag) != 0)
+            if ((animation.Flags & Sequence.LinearInterpolationFlag) != 0)
                 t = (float)delta;
             else
                 t = (float)(delta * delta * delta);
@@ -125,7 +118,7 @@ namespace OpenKh.Engine.Renderers
             context.PositionY += Lerp(t, animation.Ya0, animation.Ya1);
             context.ColorBlendMode = animation.ColorBlend;
 
-            if ((animation.Flags & ScalingFlag) == 0)
+            if ((animation.Flags & Sequence.ScalingFlag) == 0)
             {
                 var scale = Lerp(t, animation.ScaleStart, animation.ScaleEnd);
                 var scaleX = Lerp(t, animation.ScaleXStart, animation.ScaleXEnd);
@@ -139,9 +132,9 @@ namespace OpenKh.Engine.Renderers
                 context.ScaleY = 1.0f;
             }
 
-            if ((animation.Flags & ColorMaskingFlag) == 0)
+            if ((animation.Flags & Sequence.ColorMaskingFlag) == 0)
             {
-                if ((animation.Flags & ColorInterpolationFlag) == 0)
+                if ((animation.Flags & Sequence.ColorInterpolationFlag) == 0)
                 {
                     context.Color = Lerp(t,
                         ConvertColor(animation.ColorStart),
@@ -155,12 +148,12 @@ namespace OpenKh.Engine.Renderers
             else
                 context.Color = new ColorF(1, 1, 1, 1);
 
-            if ((animation.Flags & RotationFlag) == 0)
+            if ((animation.Flags & Sequence.RotationFlag) == 0)
             {
                 context.Rotation = Lerp(t, animation.RotationStart, animation.RotationEnd);
             }
 
-            if ((animation.Flags & TranslateFlag) == 0)
+            if ((animation.Flags & Sequence.TranslateFlag) == 0)
             {
                 context.PositionX += Lerp(t, animation.Xb0, animation.Xb1);
                 context.PositionY += Lerp(t, animation.Yb0, animation.Yb1);

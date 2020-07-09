@@ -12,6 +12,13 @@ namespace OpenKh.Kh2
         private static readonly uint MagicCodeValidator = 0x44514553U;
         private static readonly long MinimumLength = 48L;
 
+        public const int LinearInterpolationFlag = 0x00000001;
+        public const int RotationFlag = 0x00000020;
+        public const int ScalingFlag = 0x00000040;
+        public const int ColorInterpolationFlag = 0x00000080;
+        public const int ColorMaskingFlag = 0x00000400;
+        public const int TranslateFlag = 0x00004000;
+
         private class Section
         {
             [Data] public int Count { get; set; }
