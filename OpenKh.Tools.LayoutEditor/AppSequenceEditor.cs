@@ -427,11 +427,13 @@ namespace OpenKh.Tools.LayoutEditor
             if (ImGuiFlagBox(animation, $"Enable rotation##{index}", Sequence.RotationFlag, true))
             {
                 ImGui.SameLine();
-                var rotationPair = new Vector2(animation.RotationStart, animation.RotationEnd);
+                var rotationPair = new Vector2(
+                    (float)(animation.RotationStart * 180f / Math.PI),
+                    (float)(animation.RotationEnd * 180f / Math.PI));
                 if (ImGui.DragFloat2($"Rotation##{index}", ref rotationPair))
                 {
-                    animation.RotationStart = rotationPair.X;
-                    animation.RotationEnd = rotationPair.Y;
+                    animation.RotationStart = (float)(rotationPair.X * Math.PI / 180f);
+                    animation.RotationEnd = (float)(rotationPair.Y * Math.PI / 180f);
                 }
             }
 
