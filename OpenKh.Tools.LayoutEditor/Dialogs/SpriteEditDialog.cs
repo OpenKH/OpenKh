@@ -4,28 +4,34 @@ using OpenKh.Engine.Renders;
 using OpenKh.Tools.LayoutEditor.Interfaces;
 using OpenKh.Tools.LayoutEditor.Models;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace OpenKh.Tools.LayoutEditor.Dialogs
 {
     class SpriteEditDialog : IDisposable
     {
-        private readonly SpriteModel _spriteModel;
+        private readonly List<SpriteModel> _spriteModels;
         private readonly ISpriteDrawing _spriteDrawing;
         private readonly ISpriteTexture _atlasTexture;
         private readonly ITextureBinder _textureBinder;
         private readonly IEditorSettings _settings;
         private readonly ISpriteTexture _cropAtlasTexture;
         private readonly IntPtr _cropAtlasTextureId;
+        
+        private int _selectedSpriteModel;
+        private SpriteModel SpriteModel => _spriteModels[_selectedSpriteModel];
 
         public SpriteEditDialog(
-            SpriteModel spriteModel,
+            List<SpriteModel> spriteModels,
+            int selectedSpriteModel,
             ISpriteDrawing spriteDrawing,
             ISpriteTexture atlasTexture,
             ITextureBinder textureBinder,
             IEditorSettings settings)
         {
-            _spriteModel = spriteModel;
+            _spriteModels = spriteModels;
+            _selectedSpriteModel = selectedSpriteModel;
             _spriteDrawing = spriteDrawing;
             _atlasTexture = atlasTexture;
             _textureBinder = textureBinder;
@@ -46,12 +52,18 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
 
         public void Run()
         {
+            if (ImGui.InputInt("Selected sprite to edit", ref _selectedSpriteModel))
+            {
+                _selectedSpriteModel = Math.Min(Math.Max(_selectedSpriteModel, 0), _spriteModels.Count - 1);
+                DrawCropAtlasTexture();
+            }
+
             ImGui.Image(_cropAtlasTextureId, new Vector2(_atlasTexture.Width, _atlasTexture.Height));
 
             var source = new int[]
             {
-                _spriteModel.Sprite.Left, _spriteModel.Sprite.Top,
-                _spriteModel.Sprite.Right, _spriteModel.Sprite.Bottom
+                SpriteModel.Sprite.Left, SpriteModel.Sprite.Top,
+                SpriteModel.Sprite.Right, SpriteModel.Sprite.Bottom
             };
 
             ImGui.Columns(4, "ltrb", false);
@@ -61,48 +73,48 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             sourceChanged |= ImGui.DragInt("VB", ref source[3]);
             if (sourceChanged)
             {
-                _spriteModel.Sprite.Left = source[0];
-                _spriteModel.Sprite.Top = source[1];
-                _spriteModel.Sprite.Right = source[2];
-                _spriteModel.Sprite.Bottom = source[3];
-                _spriteModel.SizeChanged();
+                SpriteModel.Sprite.Left = source[0];
+                SpriteModel.Sprite.Top = source[1];
+                SpriteModel.Sprite.Right = source[2];
+                SpriteModel.Sprite.Bottom = source[3];
+                SpriteModel.SizeChanged();
                 DrawCropAtlasTexture();
             }
             ImGui.Columns(1);
 
-            var colorTopLeft = Utilities.ConvertColor(_spriteModel.Sprite.ColorLeft);
+            var colorTopLeft = Utilities.ConvertColor(SpriteModel.Sprite.ColorLeft);
             if (ImGui.ColorEdit4("Top left", ref colorTopLeft))
-                _spriteModel.Sprite.ColorLeft = Utilities.ConvertColor(colorTopLeft);
+                SpriteModel.Sprite.ColorLeft = Utilities.ConvertColor(colorTopLeft);
 
-            var colorTopRight = Utilities.ConvertColor(_spriteModel.Sprite.ColorTop);
+            var colorTopRight = Utilities.ConvertColor(SpriteModel.Sprite.ColorTop);
             if (ImGui.ColorEdit4("Top right", ref colorTopRight))
-                _spriteModel.Sprite.ColorTop = Utilities.ConvertColor(colorTopRight);
+                SpriteModel.Sprite.ColorTop = Utilities.ConvertColor(colorTopRight);
 
-            var colorBottomLeft = Utilities.ConvertColor(_spriteModel.Sprite.ColorRight);
+            var colorBottomLeft = Utilities.ConvertColor(SpriteModel.Sprite.ColorRight);
             if (ImGui.ColorEdit4("Bottom left", ref colorBottomLeft))
-                _spriteModel.Sprite.ColorRight = Utilities.ConvertColor(colorBottomLeft);
+                SpriteModel.Sprite.ColorRight = Utilities.ConvertColor(colorBottomLeft);
 
-            var colorBottomRight = Utilities.ConvertColor(_spriteModel.Sprite.ColorBottom);
+            var colorBottomRight = Utilities.ConvertColor(SpriteModel.Sprite.ColorBottom);
             if (ImGui.ColorEdit4("Bottom right", ref colorBottomRight))
-                _spriteModel.Sprite.ColorBottom = Utilities.ConvertColor(colorBottomRight);
+                SpriteModel.Sprite.ColorBottom = Utilities.ConvertColor(colorBottomRight);
 
-            var uvAnim = new Vector2(_spriteModel.Sprite.UTranslation, _spriteModel.Sprite.VTranslation);
+            var uvAnim = new Vector2(SpriteModel.Sprite.UTranslation, SpriteModel.Sprite.VTranslation);
             if (ImGui.DragFloat2("UV animation", ref uvAnim, 0.0001f))
             {
-                _spriteModel.Sprite.UTranslation = uvAnim.X;
-                _spriteModel.Sprite.VTranslation = uvAnim.Y;
+                SpriteModel.Sprite.UTranslation = uvAnim.X;
+                SpriteModel.Sprite.VTranslation = uvAnim.Y;
             }
 
-            _spriteModel.Draw(0, 0);
-            ImGui.Image(_spriteModel.TextureId, SuggestSpriteSize());
+            SpriteModel.Draw(0, 0);
+            ImGui.Image(SpriteModel.TextureId, SuggestSpriteSize());
         }
 
         private void DrawCropAtlasTexture()
         {
-            var sLeft = _spriteModel.Sprite.Left;
-            var sTop = _spriteModel.Sprite.Top;
-            var sRight = _spriteModel.Sprite.Right;
-            var sBottom = _spriteModel.Sprite.Bottom;
+            var sLeft = SpriteModel.Sprite.Left;
+            var sTop = SpriteModel.Sprite.Top;
+            var sRight = SpriteModel.Sprite.Right;
+            var sBottom = SpriteModel.Sprite.Bottom;
             var cropColor = _settings.EditorBackground;
             cropColor.A = 0.75f;
             var invertedCropColor = new ColorF(
@@ -137,11 +149,11 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
         private Vector2 SuggestSpriteSize()
         {
             const int MaxZoomLevel = 8;
-            var zoomLevelX = _atlasTexture.Width / _spriteModel.Width;
-            var zoomLevelY = _atlasTexture.Height / _spriteModel.Height;
+            var zoomLevelX = _atlasTexture.Width / SpriteModel.Width;
+            var zoomLevelY = _atlasTexture.Height / SpriteModel.Height;
             var zoomLevel = Math.Max(1, Math.Min(MaxZoomLevel, Math.Min(zoomLevelX, zoomLevelY)));
 
-            return new Vector2(_spriteModel.Width * zoomLevel, _spriteModel.Height * zoomLevel);
+            return new Vector2(SpriteModel.Width * zoomLevel, SpriteModel.Height * zoomLevel);
         }
     }
 }

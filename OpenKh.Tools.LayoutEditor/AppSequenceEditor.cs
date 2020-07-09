@@ -48,9 +48,9 @@ namespace OpenKh.Tools.LayoutEditor
         int _sequencerSelectedAnimation = 0;
         int _sequencerFirstFrame = 0;
 
-        private bool _isFrameEditDialogOpen;
-        private SpriteEditDialog _frameEditDialog;
-        private string FrameEditDialogTitle => $"Sprite edit #{_selectedSprite}";
+        private bool _isSpriteEditDialogOpen;
+        private SpriteEditDialog _spriteEditDialog;
+        private string SpriteEditDialogTitle => $"Sprite edit";
 
         private bool _isSpriteGroupEditDialogOpen;
         private SpriteGroupEditDialog _spriteGroupEditDialog;
@@ -118,17 +118,17 @@ namespace OpenKh.Tools.LayoutEditor
             });
             ForMenu("Sprite", () =>
             {
-                ForMenuItem("Edit...", () => _isFrameEditDialogOpen = true);
+                ForMenuItem("Edit...", () => _isSpriteEditDialogOpen = true);
             });
         }
 
         public bool Run()
         {
             bool dummy = true;
-            if (ImGui.BeginPopupModal(FrameEditDialogTitle, ref dummy,
+            if (ImGui.BeginPopupModal(SpriteEditDialogTitle, ref dummy,
                 ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
             {
-                _frameEditDialog.Run();
+                _spriteEditDialog.Run();
                 ImGui.EndPopup();
             }
             if (ImGui.BeginPopupModal(SpriteGroupEditDialogTitle, ref dummy,
@@ -167,12 +167,13 @@ namespace OpenKh.Tools.LayoutEditor
                     this, _settings);
             }
 
-            if (_isFrameEditDialogOpen)
+            if (_isSpriteEditDialogOpen)
             {
-                ImGui.OpenPopup(FrameEditDialogTitle);
-                _isFrameEditDialogOpen = false;
-                _frameEditDialog = new SpriteEditDialog(
-                    _sprites[_selectedSprite],
+                ImGui.OpenPopup(SpriteEditDialogTitle);
+                _isSpriteEditDialogOpen = false;
+                _spriteEditDialog = new SpriteEditDialog(
+                    _sprites,
+                    _selectedSprite,
                     _drawing,
                     _atlasTexture,
                     this, _settings);
