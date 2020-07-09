@@ -88,7 +88,9 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
 
         private void SptiteGroupEditor()
         {
-            ImGui.InputInt("Selected", ref _selectedSpriteGroupModel);
+            if (ImGui.InputInt("Selected", ref _selectedSpriteGroupModel))
+                _selectedSpriteGroupModel = Math.Min(Math.Max(_selectedSpriteGroupModel, 0), _spriteGroupModels.Count - 1);
+
             ImGui.Checkbox("Show pivot", ref _isPivotVisible);
 
             var origin = GetOrigin(SpriteGroupModel);
@@ -120,12 +122,6 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
 
         private void SpritePartEdit(Sequence.SpritePart spritePart, int index)
         {
-            var source = new int[]
-            {
-                spritePart.Left, spritePart.Top,
-                spritePart.Right, spritePart.Bottom
-            };
-
             var position = new int[]
             {
                 spritePart.Left,
