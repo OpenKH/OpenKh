@@ -152,8 +152,8 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
         private Vector2 SuggestSpriteSize()
         {
             const int MaxZoomLevel = 8;
-            var zoomLevelX = 512 / SpriteGroupModel.Width;
-            var zoomLevelY = 512 / SpriteGroupModel.Height;
+            var zoomLevelX = 512f / SpriteGroupModel.Width;
+            var zoomLevelY = 512f / SpriteGroupModel.Height;
             var zoomLevel = Math.Max(1, Math.Min(MaxZoomLevel, Math.Min(zoomLevelX, zoomLevelY)));
 
             return new Vector2(SpriteGroupModel.Width * zoomLevel, SpriteGroupModel.Height * zoomLevel);
