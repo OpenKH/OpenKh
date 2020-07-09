@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
+using Xe.IO;
 
 namespace OpenKh.Kh2
 {
@@ -151,14 +152,13 @@ namespace OpenKh.Kh2
             Unknown04 = 0x100; // assuming that this value is constant
         }
 
-        private Sequence(Stream stream)
+        private Sequence(Stream inputStream)
         {
-            if (!stream.CanRead || !stream.CanSeek)
-                throw new InvalidDataException($"Read or seek must be supported.");
-
-            if (stream.Length < MinimumLength)
+            inputStream.MustReadAndSeek();
+            if (inputStream.Length < MinimumLength)
                 throw new InvalidDataException("Invalid header length");
 
+            var stream = new SubStream(inputStream, inputStream.Position, inputStream.Length - inputStream.Position);
             var header = BinaryMapping.ReadObject<Header>(stream);
             if (header.MagicCode != MagicCodeValidator)
                 throw new InvalidDataException("Invalid header");
@@ -202,8 +202,7 @@ namespace OpenKh.Kh2
 
         public void Write(Stream stream)
         {
-            if (!stream.CanWrite || !stream.CanSeek)
-                throw new InvalidDataException($"Write and seek must be supported.");
+            stream.MustWriteAndSeek();
 
             var header = new Header
             {
