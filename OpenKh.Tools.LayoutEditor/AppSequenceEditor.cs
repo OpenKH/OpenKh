@@ -44,7 +44,6 @@ namespace OpenKh.Tools.LayoutEditor
         private List<SpriteGroupModel> _spriteGroups;
 
         private MySequencer _sequencer;
-        bool _sequenceExpanded;
         int _sequencerSelectedAnimation = 0;
         int _sequencerFirstFrame = 0;
 
@@ -532,7 +531,8 @@ namespace OpenKh.Tools.LayoutEditor
 
             ImGui.SliderInt("Frame", ref _animationFrameCurrent, 0, _animationFrameCount,
                 $"%i/{_animationFrameCount}");
-            var isChanged = ImSequencer.Sequencer(_sequencer, ref frameIndexRef, ref _sequenceExpanded, ref _sequencerSelectedAnimation, ref _sequencerFirstFrame,
+            var isSequenceExpanded = true;
+            var isChanged = ImSequencer.Sequencer(_sequencer, ref frameIndexRef, ref isSequenceExpanded, ref _sequencerSelectedAnimation, ref _sequencerFirstFrame,
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_EDIT_STARTEND |
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_ADD |
                 ImSequencer.SEQUENCER_OPTIONS.SEQUENCER_DEL |
