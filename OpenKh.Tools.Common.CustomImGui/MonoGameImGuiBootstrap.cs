@@ -45,6 +45,9 @@ namespace OpenKh.Tools.Common.CustomImGui
         public void UnbindTexture(IntPtr textureId) =>
             _imGuiRenderer.UnbindTexture(textureId);
 
+        public void RebindTexture(IntPtr textureId, Texture2D texture) =>
+            _imGuiRenderer.RebindTexture(textureId, texture);
+
         protected unsafe override void Initialize()
         {
             _imGuiRenderer = new MonoGameImGui(this);

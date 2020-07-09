@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace OpenKh.Tools.Common.CustomImGui
@@ -147,6 +148,14 @@ namespace OpenKh.Tools.Common.CustomImGui
         public virtual void UnbindTexture(IntPtr textureId)
         {
             _loadedTextures.Remove(textureId);
+        }
+
+        /// <summary>
+        /// Removes a previously created texture pointer, releasing its reference and allowing it to be deallocated
+        /// </summary>
+        public virtual void RebindTexture(IntPtr textureId, Texture2D texture)
+        {
+            _loadedTextures[textureId] = texture;
         }
 
         /// <summary>

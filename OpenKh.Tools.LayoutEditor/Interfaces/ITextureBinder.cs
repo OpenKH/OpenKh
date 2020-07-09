@@ -9,6 +9,7 @@ namespace OpenKh.Tools.LayoutEditor.Interfaces
     {
         IntPtr BindTexture(Texture2D texture);
         void UnbindTexture(IntPtr id);
+        void RebindTexture(IntPtr id, Texture2D texture);
     }
 
     public static class TextureBuilderExtensions
@@ -18,6 +19,13 @@ namespace OpenKh.Tools.LayoutEditor.Interfaces
         {
             var realSpriteTexture = (MonoSpriteDrawing.CSpriteTexture)spriteTexture;
             return textureBinder.BindTexture(realSpriteTexture.Texture);
+        }
+
+        public static void RebindTexture(
+            this ITextureBinder textureBinder, IntPtr id, ISpriteTexture spriteTexture)
+        {
+            var realSpriteTexture = (MonoSpriteDrawing.CSpriteTexture)spriteTexture;
+            textureBinder.RebindTexture(id, realSpriteTexture.Texture);
         }
     }
 }

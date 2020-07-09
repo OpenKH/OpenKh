@@ -46,17 +46,19 @@ namespace OpenKh.Tools.LayoutEditor.Models
             SizeChanged();
         }
 
-        public IntPtr Draw(float x, float y)
+        public IntPtr Draw(float x, float y, Action<ISpriteDrawing> pre = null, Action<ISpriteDrawing> post = null)
         {
             _drawing.SetViewport(0, Width, 0, Height);
             _drawing.DestinationTexture = _spriteTexture;
             _drawing.Clear(_settings.EditorBackground);
+            pre?.Invoke(_drawing);
 
             var posX = -SpriteGroup.Min(x => Math.Min(x.Left, x.Right));
             var posY = -SpriteGroup.Min(x => Math.Min(x.Top, x.Bottom));
             _renderer.Draw(0, _frameIndex++, posX + x, posY + y);
-
             _drawing.Flush();
+
+            post?.Invoke(_drawing);
             _drawing.DestinationTexture = null;
 
             return TextureId;
@@ -68,14 +70,16 @@ namespace OpenKh.Tools.LayoutEditor.Models
             if (rect.Width == Width && rect.Height == Height)
                 return;
 
-            if (TextureId != IntPtr.Zero)
-                _textureBinder.UnbindTexture(TextureId);
-            _spriteTexture?.Dispose();
-
             Width = rect.Width;
             Height = rect.Height;
+
+            _spriteTexture?.Dispose();
             _spriteTexture = _drawing.CreateSpriteTexture(Width, Height);
-            TextureId = _textureBinder.BindTexture(_spriteTexture);
+
+            if (TextureId == IntPtr.Zero)
+                TextureId = _textureBinder.BindTexture(_spriteTexture);
+            else
+                _textureBinder.RebindTexture(TextureId, _spriteTexture);
 
             Draw(0, 0);
         }

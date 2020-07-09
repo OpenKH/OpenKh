@@ -33,9 +33,6 @@ namespace OpenKh.Tools.LayoutEditor
         private DebugSequenceRenderer _debugSequenceRenderer;
         private readonly SequenceRenderer _renderer;
 
-        private bool _isFrameEditDialogOpen;
-        private SpriteEditDialog _frameEditDialog;
-
         private int _selectedSprite = 0;
         private int _selectedSpriteGroup = 0;
         private int _selectedAnimGroup;
@@ -47,11 +44,18 @@ namespace OpenKh.Tools.LayoutEditor
         private List<SpriteGroupModel> _spriteGroups;
 
         private MySequencer _sequencer;
-        bool _sequenceExpanded = true;
+        bool _sequenceExpanded;
         int _sequencerSelectedAnimation = 0;
         int _sequencerFirstFrame = 0;
 
+        private bool _isFrameEditDialogOpen;
+        private SpriteEditDialog _frameEditDialog;
         private string FrameEditDialogTitle => $"Sprite edit #{_selectedSprite}";
+
+        private bool _isSpriteGroupEditDialogOpen = true;
+        private SpriteGroupEditDialog _spriteGroupEditDialog;
+        private string SpriteGroupEditDialogTitle => $"Sprite group edit #{_selectedSprite}";
+
         private Sequence.AnimationGroup SelectedAnimationGroup =>
             _debugSequenceRenderer.AnimationGroup;
 
@@ -108,6 +112,10 @@ namespace OpenKh.Tools.LayoutEditor
 
         public void Menu()
         {
+            ForMenu("Sprite group", () =>
+            {
+                ForMenuItem("Edit...", () => _isSpriteGroupEditDialogOpen = true);
+            });
             ForMenu("Sprite", () =>
             {
                 ForMenuItem("Edit...", () => _isFrameEditDialogOpen = true);
@@ -121,6 +129,12 @@ namespace OpenKh.Tools.LayoutEditor
                 ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
             {
                 _frameEditDialog.Run();
+                ImGui.EndPopup();
+            }
+            if (ImGui.BeginPopupModal(SpriteGroupEditDialogTitle, ref dummy,
+                ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                _spriteGroupEditDialog.Run();
                 ImGui.EndPopup();
             }
 
@@ -141,6 +155,17 @@ namespace OpenKh.Tools.LayoutEditor
             ImGui.SameLine();
             ForChild("Right", rightWidth, 0, true, DrawRight);
 
+            if (_isSpriteGroupEditDialogOpen)
+            {
+                ImGui.OpenPopup(SpriteGroupEditDialogTitle);
+                _isSpriteGroupEditDialogOpen = false;
+                _spriteGroupEditDialog = new SpriteGroupEditDialog(
+                    _spriteGroups[_selectedSpriteGroup],
+                    _drawing,
+                    _atlasTexture,
+                    this, _settings);
+            }
+
             if (_isFrameEditDialogOpen)
             {
                 ImGui.OpenPopup(FrameEditDialogTitle);
@@ -160,8 +185,8 @@ namespace OpenKh.Tools.LayoutEditor
         private void DrawSpriteGroupList()
         {
             // Animate only the selected sprite
-            if (_selectedSpriteGroup >= 0)
-                _spriteGroups[_selectedSpriteGroup].Draw(0, 0);
+            //if (_selectedSpriteGroup >= 0)
+            //    _spriteGroups[_selectedSpriteGroup].Draw(0, 0);
 
             for (int i = 0; i < _spriteGroups.Count; i++)
             {
@@ -541,5 +566,8 @@ namespace OpenKh.Tools.LayoutEditor
 
         public void UnbindTexture(IntPtr id) =>
             _bootStrap.UnbindTexture(id);
+
+        public void RebindTexture(IntPtr id, Texture2D texture) =>
+            _bootStrap.RebindTexture(id, texture);
     }
 }

@@ -1,10 +1,8 @@
 ﻿using ImGuiNET;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
-using OpenKh.Kh2;
 using OpenKh.Tools.LayoutEditor.Interfaces;
 using OpenKh.Tools.LayoutEditor.Models;
-using SharpDX.Direct2D1.Effects;
 using System;
 using System.Numerics;
 
