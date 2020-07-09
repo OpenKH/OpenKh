@@ -1,5 +1,7 @@
-﻿using OpenKh.Imaging;
+﻿using OpenKh.Engine.Maths;
+using OpenKh.Imaging;
 using System;
+using System.Numerics;
 
 namespace OpenKh.Engine.Renders
 {
@@ -82,10 +84,10 @@ namespace OpenKh.Engine.Renders
         public float SourceRight { get; set; }
         public float SourceBottom { get; set; }
 
-        public float DestinationX { get; set; }
-        public float DestinationY { get; set; }
-        public float DestinationWidth { get; set; }
-        public float DestinationHeight { get; set; }
+        public Vector2 Vec0 { get; set;}
+        public Vector2 Vec1 { get; set;}
+        public Vector2 Vec2 { get; set;}
+        public Vector2 Vec3 { get; set; }
 
         public ColorF Color0 { get; set; }
         public ColorF Color1 { get; set; }
@@ -129,43 +131,47 @@ namespace OpenKh.Engine.Renders
 
         public static SpriteDrawingContext Position(this SpriteDrawingContext context, float x, float y)
         {
-            context.DestinationX = x;
-            context.DestinationY = y;
+            var width = context.Vec3.X - context.Vec0.X;
+            var height = context.Vec3.Y - context.Vec0.Y;
+            context.Vec0 = new Vector2(x, y);
+            context.Vec1 = new Vector2(x + width, y);
+            context.Vec2 = new Vector2(x, y + height);
+            context.Vec3 = new Vector2(x + width, y + height);
             return context;
         }
 
         public static SpriteDrawingContext Traslate(this SpriteDrawingContext context, float x, float y)
         {
-            context.DestinationX += x;
-            context.DestinationY += y;
+            var v = new Vector2(x, y);
+            context.Vec0 += v;
+            context.Vec1 += v;
+            context.Vec2 += v;
+            context.Vec3 += v;
             return context;
         }
 
-        public static SpriteDrawingContext MatchSourceSize(this SpriteDrawingContext context)
-        {
-            context.DestinationWidth = Math.Abs(context.SourceRight - context.SourceLeft);
-            context.DestinationHeight = Math.Abs(context.SourceBottom - context.SourceTop);
-            return context;
-        }
+        public static SpriteDrawingContext MatchSourceSize(this SpriteDrawingContext context) =>
+            context.DestinationSize(
+                Math.Abs(context.SourceRight - context.SourceLeft),
+                Math.Abs(context.SourceBottom - context.SourceTop));
 
         public static SpriteDrawingContext DestinationSize(this SpriteDrawingContext context, float width, float height)
         {
-            context.DestinationWidth = width;
-            context.DestinationHeight = height;
+            context.Vec1 = new Vector2(context.Vec0.X + width, context.Vec0.Y);
+            context.Vec2 = new Vector2(context.Vec0.X, context.Vec0.Y + height);
+            context.Vec3 = new Vector2(context.Vec0.X + width, context.Vec0.Y + height);
             return context;
         }
 
         public static SpriteDrawingContext ScaleSize(this SpriteDrawingContext context, float scale)
         {
-            context.DestinationWidth *= scale;
-            context.DestinationHeight *= scale;
+            // TODO
             return context;
         }
 
         public static SpriteDrawingContext ScaleSize(this SpriteDrawingContext context, float scaleX, float scaleY)
         {
-            context.DestinationWidth *= scaleX;
-            context.DestinationHeight *= scaleY;
+            // TODO
             return context;
         }
 

@@ -46,7 +46,7 @@ namespace OpenKh.Tests.Engine
 
             AssertDraw(drawing, x =>
             {
-                Assert.Equal(expected, x.DestinationX, 0);
+                Assert.Equal(expected, x.Vec0.X, 0);
             });
         }
 
@@ -82,7 +82,7 @@ namespace OpenKh.Tests.Engine
 
             AssertDraw(drawing, x =>
             {
-                Assert.Equal(expected, x.DestinationX, 0);
+                Assert.Equal(expected, x.Vec0.X, 0);
             });
         }
 
@@ -114,7 +114,7 @@ namespace OpenKh.Tests.Engine
 
             AssertDraw(drawing, x =>
             {
-                Assert.Equal(419, x.DestinationX, 0);
+                Assert.Equal(419, x.Vec0.X, 0);
             });
         }
 

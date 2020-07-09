@@ -223,19 +223,19 @@ namespace OpenKh.Game
             _textureWrapU = context.TextureWrapU;
             _textureWrapV = context.TextureWrapV;
 
-            _vertices[vertexIndex + 0].Position = new Vector3(context.DestinationX, context.DestinationY, 0.0f);
+            _vertices[vertexIndex + 0].Position = new Vector3(context.Vec0.X, context.Vec0.Y, 0.0f);
             _vertices[vertexIndex + 0].Color = context.Color0;
             _vertices[vertexIndex + 0].TextureCoordinate = new Vector2(context.SourceLeft * tw + context.TextureHorizontalShift, context.SourceTop * th + context.TextureVerticalShift);
 
-            _vertices[vertexIndex + 1].Position = new Vector3(context.DestinationX + context.DestinationWidth, context.DestinationY, 0.0f);
+            _vertices[vertexIndex + 1].Position = new Vector3(context.Vec1.X, context.Vec1.Y, 0.0f);
             _vertices[vertexIndex + 1].Color = context.Color1;
             _vertices[vertexIndex + 1].TextureCoordinate = new Vector2(context.SourceRight * tw + context.TextureHorizontalShift, context.SourceTop * th + context.TextureVerticalShift);
 
-            _vertices[vertexIndex + 2].Position = new Vector3(context.DestinationX, context.DestinationY + context.DestinationHeight, 0.0f);
+            _vertices[vertexIndex + 2].Position = new Vector3(context.Vec2.X, context.Vec2.Y, 0.0f);
             _vertices[vertexIndex + 2].Color = context.Color2;
             _vertices[vertexIndex + 2].TextureCoordinate = new Vector2(context.SourceLeft * tw + context.TextureHorizontalShift, context.SourceBottom * th + context.TextureVerticalShift);
 
-            _vertices[vertexIndex + 3].Position = new Vector3(context.DestinationX + context.DestinationWidth, context.DestinationY + context.DestinationHeight, 0.0f);
+            _vertices[vertexIndex + 3].Position = new Vector3(context.Vec3.X, context.Vec3.Y, 0.0f);
             _vertices[vertexIndex + 3].Color = context.Color3;
             _vertices[vertexIndex + 3].TextureCoordinate = new Vector2(context.SourceRight * tw + context.TextureHorizontalShift, context.SourceBottom * th + context.TextureVerticalShift);
 
