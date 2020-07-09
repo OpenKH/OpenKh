@@ -351,7 +351,7 @@ namespace OpenKh.Tools.LayoutEditor
                 if (ImGui.DragInt2("Translation X2", ref xbPair[0]))
                 {
                     animation.Xb1 = xbPair[0];
-                    animation.Xb1 = xbPair[1];
+                    animation.Yb1 = xbPair[1];
                 }
 
                 var ybPair = new int[] { animation.Yb0, animation.Yb1 };
