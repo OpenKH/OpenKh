@@ -106,7 +106,9 @@ namespace OpenKh.Tools.LayoutEditor
                 .ToList();
 
             _sequencer = new MySequencer(sequence, _debugSequenceRenderer);
-            SelectedAnimGroup = 6;
+#if DEBUG
+            SelectedAnimGroup = Math.Min(6, sequence.AnimationGroups.Count - 1);
+#endif
         }
 
         public void Menu()
