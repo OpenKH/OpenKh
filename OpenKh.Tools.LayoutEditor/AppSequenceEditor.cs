@@ -159,6 +159,7 @@ namespace OpenKh.Tools.LayoutEditor
                 ImGui.OpenPopup(SpriteGroupEditDialogTitle);
                 _isSpriteGroupEditDialogOpen = false;
                 _spriteGroupEditDialog = new SpriteGroupEditDialog(
+                    _sequence,
                     _spriteGroups,
                     _selectedSpriteGroup,
                     _drawing,

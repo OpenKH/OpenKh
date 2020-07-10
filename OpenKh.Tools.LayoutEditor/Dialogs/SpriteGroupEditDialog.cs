@@ -15,6 +15,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
 {
     class SpriteGroupEditDialog : IDisposable
     {
+        private readonly Sequence _sequence;
         private readonly List<SpriteGroupModel> _spriteGroupModels;
         private readonly ISpriteDrawing _spriteDrawing;
         private readonly ISpriteTexture _atlasTexture;
@@ -26,6 +27,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
         private SpriteGroupModel SpriteGroupModel => _spriteGroupModels[_selectedSpriteGroupModel];
 
         public SpriteGroupEditDialog(
+            Sequence sequence,
             List<SpriteGroupModel> spriteGroupModels,
             int selectedSpriteGroupModel,
             ISpriteDrawing spriteDrawing,
@@ -33,6 +35,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             ITextureBinder textureBinder,
             IEditorSettings settings)
         {
+            _sequence = sequence;
             _spriteGroupModels = spriteGroupModels;
             _selectedSpriteGroupModel = selectedSpriteGroupModel;
             _spriteDrawing = spriteDrawing;
@@ -110,6 +113,8 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
 
             var size = SpriteGroupModel.SpriteGroup.GetVisibilityRectangleForFrameGroup();
             ImGui.Text($"Width: {size.Width}, Heigth: {size.Height}");
+            if (ImGui.SmallButton("Add new sprite part"))
+                SpriteGroupModel.SpriteGroup.Add(new Sequence.SpritePart());
 
             for (var i = 0; i < SpriteGroupModel.SpriteGroup.Count; i++)
             {
@@ -133,6 +138,10 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 spritePart.Bottom - spritePart.Top
             };
 
+            var spriteIndex = spritePart.SpriteIndex;
+            if (ImGui.InputInt("Sprite index", ref spriteIndex))
+                spritePart.SpriteIndex = Math.Min(Math.Max(spriteIndex, 0), _sequence.Sprites.Count - 1);
+
             if (ImGui.DragInt2($"Position##{index}", ref position[0]))
             {
                 spritePart.Left = position[0];
@@ -145,6 +154,13 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             {
                 spritePart.Right = position[0] + size[0];
                 spritePart.Bottom = position[1] + size[1];
+                SpriteGroupModel.SizeChanged();
+            }
+            if (ImGui.Button($"Make sprite pixel perfect##{index}"))
+            {
+                var innerSprite = _sequence.Sprites[spritePart.SpriteIndex];
+                spritePart.Right = position[0] + Math.Abs(innerSprite.Left - innerSprite.Right);
+                spritePart.Bottom = position[1] + Math.Abs(innerSprite.Top - innerSprite.Bottom);
                 SpriteGroupModel.SizeChanged();
             }
         }
