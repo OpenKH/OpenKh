@@ -106,7 +106,7 @@ namespace OpenKh.Kh2
         /// <param name="stream">Readable stream where the IDX has been serialized.</param>
         /// <returns></returns>
         public static List<Entry> Read(Stream stream) => Enumerable
-            .Range(0, stream.ReadInt32())
+            .Range(0, stream.SetPosition(0).ReadInt32())
             .Select(_ => BinaryMapping.ReadObject<Entry>(stream))
             .ToList();
 

@@ -64,7 +64,7 @@ namespace OpenKh.Command.IdxImg
 
             [Required]
             [FileExists]
-            [Argument(0, Description = "Kingdom Hearts II IDX file, paired with a IMG")]
+            [Argument(0, Description = "Kingdom Hearts II IDX file")]
             public string InputIdx { get; set; }
 
             [FileExists]
@@ -83,7 +83,7 @@ namespace OpenKh.Command.IdxImg
             protected int OnExecute(CommandLineApplication app)
             {
                 var inputImg = InputImg ?? InputIdx.Replace(".idx", ".img", StringComparison.InvariantCultureIgnoreCase);
-                var outputDir = OutputDir ?? Path.Combine(Path.GetFullPath(inputImg), "extract");
+                var outputDir = OutputDir ?? Path.Combine(Path.GetDirectoryName(inputImg), "extract");
 
                 var idxEntries = OpenIdx(InputIdx);
 
@@ -271,6 +271,9 @@ namespace OpenKh.Command.IdxImg
         private static IEnumerable<Idx.Entry> OpenIdx(string fileName)
         {
             using var idxStream = File.OpenRead(fileName);
+            if (!Idx.IsValid(idxStream))
+                throw new CustomException($"The IDX {fileName} is invalid or not recognized.");
+
             return Idx.Read(idxStream);
         }
     }

@@ -10,6 +10,7 @@
 
 | File | Tool name
 |------|-----------
+|[IDX](../kh2/file/type/idx.md) | OpenKh.Command.IdxImg
 |[msg/*](../kh2/file/type/msg.md) | OpenKh.Command.MsgTool
 |[msg/*](../kh2/file/type/msg.md) | [OpenKh.Tools.Kh2TextEditor](./Kh2TextEditor/index.md)
 |[BAR](../kh2/file/type/bar.md) | OpenKh.Tools.BarEditor
