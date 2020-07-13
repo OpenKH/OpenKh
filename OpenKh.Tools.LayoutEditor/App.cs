@@ -15,7 +15,6 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Windows;
-using System.Windows.Controls;
 using Xe.Tools.Wpf.Dialogs;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
@@ -25,6 +24,7 @@ namespace OpenKh.Tools.LayoutEditor
     {
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer
             .Compose()
+            .AddExtensions("2LD Layout container file", "2ld")
             .AddExtensions("2DD Sequence container file", "2dd")
             .AddAllFiles();
         private const string DefaultName = "FAKE";
@@ -308,51 +308,22 @@ namespace OpenKh.Tools.LayoutEditor
 
         private bool Open2ld(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
         {
-            //LayoutEntryModel layoutEntryModel;
             var layoutEntries = entries.Count(x => x.Type == Bar.EntryType.Layout);
             int imagesEntries = entries.Count(x => x.Type == Bar.EntryType.Imgz);
 
-            if (!doNotShowLayoutSelectionDialog && (layoutEntries > 1 || imagesEntries > 1))
+            if (layoutEntries == 0)
+                throw new Exception("No layout found.");
+            if (imagesEntries == 0)
+                throw new Exception("No image container found.");
+            if (layoutEntries > 1 || imagesEntries > 1)
             {
-                //var dialog = new AppElementSelection(entries);
-                //layoutEntryModel = dialog.Run() == true ? dialog.SelectedLayoutEntry : null;
-            }
-            else if (layoutEntries > 0 && imagesEntries > 0)
-            {
-                var layoutName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Layout);
-                var imagesName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Imgz);
-                var layout = layoutName != null ? Layout.Read(layoutName.Stream) : null;
-                var images = entries.Where(x => x.Type == Bar.EntryType.Imgz).Select(x => Imgz.Read(x.Stream)).First();
-
-                //layoutEntryModel = new LayoutEntryModel
-                //{
-                //    Layout = new LayoutEntryPropertyModel<Layout>
-                //    {
-                //        Name = layoutName.Name,
-                //        Value = layout
-                //    },
-                //    Images = new LayoutEntryPropertyModel<List<Imgd>>
-                //    {
-                //        Name = imagesName.Name,
-                //        Value = images.ToList()
-                //    },
-                //};
-            }
-            else
-            {
-                if (layoutEntries == 0)
-                    ShowError("No Layout data found.");
-                else if (imagesEntries == 0)
-                    ShowError("No IMGZ data found.");
-                else
-                    ShowError("Unspecified error. Please report this.");
-                return false;
+                OpenResourceSelectionDialog(entries, Bar.EntryType.Layout, Bar.EntryType.Imgz);
+                return true;
             }
 
-            //if (layoutEntryModel == null)
-            //    return false;
-
-            //OpenLayout(layoutEntryModel);
+            var layoutEntry = entries.First(x => x.Type == Bar.EntryType.Layout);
+            var textureContainerEntry = entries.First(x => x.Type == Bar.EntryType.Imgz);
+            OpenLayoutEditor(layoutEntry, textureContainerEntry);
             return true;
         }
 
@@ -401,6 +372,27 @@ namespace OpenKh.Tools.LayoutEditor
                 this,
                 Sequence.Read(sequenceEntry.Stream.SetPosition(0)),
                 Imgd.Read(textureEntry.Stream));
+            _app = app;
+            CurrentEditor = app;
+        }
+
+        private void OpenLayoutEditor(Bar.Entry layoutEntry, Bar.Entry textureContainerEntry)
+        {
+            AnimationName = layoutEntry.Name;
+            TextureName = textureContainerEntry.Name;
+
+            if (_linkToPcsx2)
+            {
+                ShowError("Link to PCSX2 with 2LD files is not yet supported.");
+                _linkToPcsx2 = false;
+                //if (!LinkLaydToPcs2(layoutEntry.Stream))
+                //    return;
+            }
+
+            var app = new AppLayoutEditor(_bootstrap,
+                this,
+                Layout.Read(layoutEntry.Stream.SetPosition(0)),
+                Imgz.Read(textureContainerEntry.Stream));
             _app = app;
             CurrentEditor = app;
         }
