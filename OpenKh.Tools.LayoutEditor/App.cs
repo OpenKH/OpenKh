@@ -54,6 +54,8 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 var contentName = $"{AnimationName ?? DefaultName},{TextureName ?? DefaultName}";
                 var fileName = IsToolDesc ? _toolInvokeDesc.Title : (FileName ?? "untitled");
+                if (_processStream != null)
+                    fileName = $"{fileName}@pcsx2:{_processOffset}";
 
                 return $"{contentName} | {fileName} | {MonoGameImGuiBootstrap.ApplicationName}";
             }
