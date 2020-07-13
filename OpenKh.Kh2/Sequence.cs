@@ -9,7 +9,7 @@ namespace OpenKh.Kh2
 {
     public class Sequence
     {
-        private static readonly uint MagicCodeValidator = 0x44514553U;
+        public static readonly uint MagicCodeValidator = 0x44514553U;
         private static readonly long MinimumLength = 48L;
 
         public const int LinearInterpolationFlag = 0x00000001;

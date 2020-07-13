@@ -7,8 +7,10 @@ using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.LayoutEditor.Dialogs;
 using OpenKh.Tools.LayoutEditor.Interfaces;
+using OpenKh.Tools.LayoutEditor.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -35,6 +37,11 @@ namespace OpenKh.Tools.LayoutEditor
         private ToolInvokeDesc _toolInvokeDesc;
         private IApp _app;
 
+        private bool _linkToPcsx2;
+        private ProcessStream _processStream;
+        private int _processOffset;
+
+        private const string LinkToPcsx2ActionName = "Open file and link it to PCSX2";
         private const string ResourceSelectionDialogTitle = "Resource selection";
         private bool _isResourceSelectionDialogOpening;
         private ResourceSelectionDialog _resourceSelectionDialog;
@@ -130,6 +137,7 @@ namespace OpenKh.Tools.LayoutEditor
 
         public void Dispose()
         {
+            CloseProcessStream();
         }
 
         private void MainWindow()
@@ -150,7 +158,13 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 ForMenu("File", () =>
                 {
-                    ForMenuItem("Open...", MenuFileOpen);
+                    ForMenuItem("Open...", () =>
+                    {
+                        _linkToPcsx2 = false;
+                        CloseProcessStream();
+                        MenuFileOpen();
+                    });
+                    ForMenuItem($"{LinkToPcsx2ActionName}...", MenuFileOpenPcsx2);
                     ForMenuItem("Save", MenuFileSave, CurrentEditor != null);
                     ForMenuItem("Save as...", MenuFileSaveAs, CurrentEditor != null);
                     ImGui.Separator();
@@ -191,6 +205,19 @@ namespace OpenKh.Tools.LayoutEditor
             }, Filters);
         }
 
+        private void MenuFileOpenPcsx2()
+        {
+            var processes = Process.GetProcessesByName("pcsx2");
+            if (processes.Length == 0)
+            {
+                ShowLinkPcsx2ErrorProcessNotFound();
+                return;
+            }
+
+            _linkToPcsx2 = true;
+            MenuFileOpen();
+        }
+
         private void MenuFileSave()
         {
             if (!string.IsNullOrEmpty(FileName))
@@ -227,8 +254,17 @@ namespace OpenKh.Tools.LayoutEditor
             var existingEntries = File.Exists(previousFileName) ?
                 ReadBarEntriesFromFileName(previousFileName) : new List<Bar.Entry>();
 
+            var animationEntry = CurrentEditor.SaveAnimation(AnimationName);
+            if (_processStream != null)
+            {
+                animationEntry.Stream.SetPosition(0);
+                _processStream.SetPosition(_processOffset);
+                animationEntry.Stream.CopyTo(_processStream);
+                animationEntry.Stream.SetPosition(0);
+            }
+
             var newEntries = existingEntries
-                .AddOrReplace(CurrentEditor.SaveAnimation(AnimationName))
+                .AddOrReplace(animationEntry)
                 .AddOrReplace(CurrentEditor.SaveTexture(TextureName));
             File.Create(fileName).Using(stream => Bar.Write(stream, newEntries));
 
@@ -342,9 +378,16 @@ namespace OpenKh.Tools.LayoutEditor
             AnimationName = sequenceEntry.Name;
             TextureName = textureEntry.Name;
 
+            if (_linkToPcsx2)
+            {
+                _linkToPcsx2 = false;
+                if (!LinkSeqdToPcs2(sequenceEntry.Stream))
+                    return;
+            }
+
             var app = new AppSequenceEditor(_bootstrap,
                 this,
-                Sequence.Read(sequenceEntry.Stream),
+                Sequence.Read(sequenceEntry.Stream.SetPosition(0)),
                 Imgd.Read(textureEntry.Stream));
             _app = app;
             CurrentEditor = app;
@@ -376,6 +419,46 @@ namespace OpenKh.Tools.LayoutEditor
         //    });
         //}
 
+        private bool LinkSeqdToPcs2(Stream stream) =>
+            LinkToPcs2(stream, Sequence.MagicCodeValidator, 0x2c);
+
+        private bool LinkToPcs2(Stream stream, uint magicCode, int headerLength)
+        {
+            var process = Process.GetProcessesByName("pcsx2").FirstOrDefault();
+            if (process == null)
+            {
+                ShowLinkPcsx2ErrorProcessNotFound();
+                return false;
+            }
+
+            var processStream = new ProcessStream(process, ToolConstants.Pcsx2BaseAddress, ToolConstants.Ps2MemoryLength);
+            var bufferedStream = new BufferedStream(processStream, 0x10000);
+
+            var header = stream.SetPosition(sizeof(uint)).ReadBytes(headerLength);
+            while (bufferedStream.Position < bufferedStream.Length)
+            {
+                if (bufferedStream.ReadUInt32() == magicCode)
+                {
+                    // header matches. Check if the rest of 0x2c SEQD header matches as well...
+                    if (header.SequenceEqual(bufferedStream.ReadBytes(headerLength)))
+                    {
+                        _processStream = processStream;
+                        _processOffset = (int)(bufferedStream.Position - headerLength - sizeof(uint));
+                        return true;
+                    }
+                }
+            }
+
+            ShowLinkPcsx2ErrorFileNotFound();
+            CloseProcessStream();
+            return false;
+        }
+
+        private void CloseProcessStream()
+        {
+            _processStream?.Dispose();
+            _processStream = null;
+        }
 
         private static bool DoesContainSequenceAnimations(IEnumerable<Bar.Entry> entries) =>
             entries.Any(x => x.Type == Bar.EntryType.Seqd);
@@ -383,8 +466,14 @@ namespace OpenKh.Tools.LayoutEditor
         private static bool DoesContainLayoutAnimations(IEnumerable<Bar.Entry> entries) =>
             entries.Any(x => x.Type == Bar.EntryType.Layout);
 
+        private static void ShowLinkPcsx2ErrorProcessNotFound() =>
+            ShowError("No PCSX2 process found.\nPlease run PCSX2 with Kingdom Hearts II/Re:CoM first and try again.", LinkToPcsx2ActionName);
+
+        private static void ShowLinkPcsx2ErrorFileNotFound() =>
+            ShowError("The file you specified can not be found on the running game.", LinkToPcsx2ActionName);
+
         public static void ShowError(string message, string title = "Error") =>
-            MessageBox.Show(null, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
 
         private void ShowAboutDialog() =>
             MessageBox.Show("OpenKH is amazing.");
