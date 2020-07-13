@@ -173,6 +173,9 @@ namespace OpenKh.Tools.Common.CustomImGui
         public static bool ForMenuItem(string name, Action action, bool enabled = true) =>
             ForControl(() => ImGui.MenuItem(name, enabled), action);
 
+        public static bool ForMenuItem(string name, string shortcut, Action action, bool enabled = true) =>
+            ForControl(() => ImGui.MenuItem(name, shortcut, false, enabled), action);
+
         public static bool ForPopup(string name, Action action) =>
             ForControl(() => ImGui.BeginPopup(name), ImGui.EndPopup, action);
 

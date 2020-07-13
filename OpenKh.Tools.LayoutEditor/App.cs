@@ -1,4 +1,5 @@
 using ImGuiNET;
+using Microsoft.Xna.Framework.Input;
 using OpenKh.Common;
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
@@ -7,7 +8,6 @@ using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.LayoutEditor.Dialogs;
 using OpenKh.Tools.LayoutEditor.Interfaces;
-using OpenKh.Tools.LayoutEditor.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Windows;
+using System.Windows.Controls;
 using Xe.Tools.Wpf.Dialogs;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
@@ -45,6 +46,7 @@ namespace OpenKh.Tools.LayoutEditor
         private const string ResourceSelectionDialogTitle = "Resource selection";
         private bool _isResourceSelectionDialogOpening;
         private ResourceSelectionDialog _resourceSelectionDialog;
+        private Dictionary<Keys, Action> _keyMapping = new Dictionary<Keys, Action>();
 
         public event IEditorSettings.ChangeBackground OnChangeBackground;
 
@@ -104,10 +106,15 @@ namespace OpenKh.Tools.LayoutEditor
         {
             _bootstrap = bootstrap;
             _bootstrap.Title = Title;
+            AddKeyMapping(Keys.O, MenuFileOpenWithoutPcsx2);
+            AddKeyMapping(Keys.A, MenuFileOpenPcsx2);
+            AddKeyMapping(Keys.S, MenuFileSave);
         }
 
         public bool MainLoop()
         {
+            ProcessKeyMapping();
+
             bool dummy = true;
             if (ImGui.BeginPopupModal(ResourceSelectionDialogTitle, ref dummy,
                 ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.AlwaysAutoResize))
@@ -160,14 +167,9 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 ForMenu("File", () =>
                 {
-                    ForMenuItem("Open...", () =>
-                    {
-                        _linkToPcsx2 = false;
-                        CloseProcessStream();
-                        MenuFileOpen();
-                    });
-                    ForMenuItem($"{LinkToPcsx2ActionName}...", MenuFileOpenPcsx2);
-                    ForMenuItem("Save", MenuFileSave, CurrentEditor != null);
+                    ForMenuItem("Open...", "CTRL+O", MenuFileOpenWithoutPcsx2);
+                    ForMenuItem($"{LinkToPcsx2ActionName}...", "CTRL+A", MenuFileOpenPcsx2);
+                    ForMenuItem("Save", "CTRL+S", MenuFileSave, CurrentEditor != null);
                     ForMenuItem("Save as...", MenuFileSaveAs, CurrentEditor != null);
                     ImGui.Separator();
                     ForMenu("Preferences", () =>
@@ -207,8 +209,16 @@ namespace OpenKh.Tools.LayoutEditor
             }, Filters);
         }
 
+        private void MenuFileOpenWithoutPcsx2()
+        {
+            _linkToPcsx2 = false;
+            CloseProcessStream();
+            MenuFileOpen();
+        }
+
         private void MenuFileOpenPcsx2()
         {
+            CloseProcessStream();
             var processes = Process.GetProcessesByName("pcsx2");
             if (processes.Length == 0)
             {
@@ -398,6 +408,25 @@ namespace OpenKh.Tools.LayoutEditor
         private void UpdateTitle()
         {
             _bootstrap.Title = Title;
+        }
+
+        private void AddKeyMapping(Keys key, Action action)
+        {
+            _keyMapping[key] = action;
+        }
+
+        private void ProcessKeyMapping()
+        {
+            var k = Keyboard.GetState();
+            if (k.IsKeyDown(Keys.LeftControl))
+            {
+                var keys = k.GetPressedKeys();
+                foreach (var key in keys)
+                {
+                    if (_keyMapping.TryGetValue(key, out var action))
+                        action();
+                }
+            }
         }
 
         //private void OpenLayout(LayoutEntryModel layoutEntryModel)
