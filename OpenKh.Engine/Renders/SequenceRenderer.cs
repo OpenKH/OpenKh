@@ -159,6 +159,15 @@ namespace OpenKh.Engine.Renderers
                 context.PositionY += Lerp(t, animation.Yb0, animation.Yb1);
             }
 
+            if ((animation.Flags & Sequence.BouncingFlag) == 0)
+            {
+                var bounceXValue = (float)Math.Sin(Lerp(delta * animation.BounceXSpeed, 0, Math.PI));
+                var bounceYValue = (float)Math.Sin(Lerp(delta * animation.BounceYSpeed, 0, Math.PI));
+
+                context.PositionX += bounceXValue * Lerp(t, animation.BounceXStart, animation.BounceXEnd);
+                context.PositionY += bounceYValue * Lerp(t, animation.BounceYStart, animation.BounceYEnd);
+            }
+
             context.Color *= DebugSequenceRenderer.GetAnimationBlendColor(index);
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS

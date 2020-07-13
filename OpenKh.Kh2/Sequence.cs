@@ -13,6 +13,7 @@ namespace OpenKh.Kh2
         private static readonly long MinimumLength = 48L;
 
         public const int LinearInterpolationFlag = 0x00000001;
+        public const int BouncingFlag = 0x00000010;
         public const int RotationFlag = 0x00000020;
         public const int ScalingFlag = 0x00000040;
         public const int ColorInterpolationFlag = 0x00000080;
@@ -125,11 +126,12 @@ namespace OpenKh.Kh2
             [Data] public float Unknown64 { get; set; }
             [Data] public float Unknown68 { get; set; }
             [Data] public float Unknown6c { get; set; }
-            [Data] public int BounceXStart { get; set; }
-            [Data] public int BounceXEnd { get; set; }
-            [Data] public int BounceYStart { get; set; }
-            [Data] public int BounceYEnd { get; set; }
-            [Data] public int Unknwon80 { get; set; }
+            [Data] public float BounceXStart { get; set; }
+            [Data] public float BounceXEnd { get; set; }
+            [Data] public float BounceYStart { get; set; }
+            [Data] public float BounceYEnd { get; set; }
+            [Data] public short BounceXSpeed { get; set; }
+            [Data] public short BounceYSpeed { get; set; }
             [Data] public int ColorBlend { get; set; }
             [Data] public uint ColorStart { get; set; }
             [Data] public uint ColorEnd { get; set; }

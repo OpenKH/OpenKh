@@ -474,23 +474,29 @@ namespace OpenKh.Tools.LayoutEditor
                 animation.Unknown6c = unk6xPair.W;
             }
 
-            var bounceXPair = new int[] { animation.BounceXStart, animation.BounceXEnd };
-            if (ImGui.DragInt2($"Bounce X##{index}", ref bounceXPair[0]))
+            if (ImGuiFlagBox(animation, "Enable bouncing", Sequence.BouncingFlag))
             {
-                animation.BounceXStart = bounceXPair[0];
-                animation.BounceXEnd = bounceXPair[1];
-            }
+                var bounceXPair = new Vector2(animation.BounceXStart, animation.BounceXEnd);
+                if (ImGui.DragFloat2($"Bounce X##{index}", ref bounceXPair))
+                {
+                    animation.BounceXStart = bounceXPair.X;
+                    animation.BounceXEnd = bounceXPair.Y;
+                }
 
-            var bounceYPair = new int[] { animation.BounceYStart, animation.BounceYEnd };
-            if (ImGui.DragInt2($"Bounce Y##{index}", ref bounceYPair[0]))
-            {
-                animation.BounceYStart = bounceYPair[0];
-                animation.BounceYEnd = bounceYPair[1];
-            }
+                var bounceYPair = new Vector2(animation.BounceYStart, animation.BounceYEnd);
+                if (ImGui.DragFloat2($"Bounce Y##{index}", ref bounceYPair))
+                {
+                    animation.BounceYStart = bounceYPair.X;
+                    animation.BounceYEnd = bounceYPair.Y;
+                }
 
-            int unk80 = animation.Unknwon80;
-            if (ImGui.DragInt($"Unknown80##{index}", ref unk80))
-                animation.Unknwon80 = unk80;
+                var bounceSpeed = new int[] { animation.BounceXSpeed, animation.BounceYSpeed };
+                if (ImGui.DragInt2($"Bounce speed##{index}", ref bounceSpeed[0]))
+                {
+                    animation.BounceXSpeed = (short)bounceSpeed[0];
+                    animation.BounceYSpeed = (short)bounceSpeed[1];
+                }
+            }
 
             int blendMode = animation.ColorBlend;
             if (ImGui.Combo($"Blend mode##{index}", ref blendMode, new string[]
