@@ -19,6 +19,7 @@ namespace OpenKh.Tools.LayoutEditor
 {
     public class AppLayoutEditor : IApp, ISaveBar, ITextureBinder, IDisposable
     {
+        private const string SequenceEditorDialogName = "Sequence editor";
         private readonly MonoGameImGuiBootstrap _bootStrap;
         private readonly IEditorSettings _settings;
         private readonly Layout _layout;
@@ -34,6 +35,8 @@ namespace OpenKh.Tools.LayoutEditor
 
         private int _selectedLayoutIndex;
         private int _animationFrameCurrent;
+        private bool _isOpeningSequenceEditor;
+        private AppSequenceEditor _sequenceEditor;
 
         public int SelectedLayoutIndex
         {
@@ -93,6 +96,22 @@ namespace OpenKh.Tools.LayoutEditor
             ForChild(nameof(LayoutPreview), previewWidth, 0, false, LayoutPreview);
             ImGui.SameLine();
             ForChild(nameof(LayoutEditing), editorWidth, 0, true, LayoutEditing);
+
+            if (_sequenceEditor != null)
+            {
+                bool dummy = true;
+                if (ImGui.BeginPopupModal(SequenceEditorDialogName, ref dummy))
+                {
+                    _sequenceEditor.Run();
+                    ImGui.EndPopup();
+                }
+            }
+
+            if (_isOpeningSequenceEditor)
+            {
+                _isOpeningSequenceEditor = false;
+                ImGui.OpenPopup(SequenceEditorDialogName);
+            }
 
             _animationFrameCurrent++;
             return true;
@@ -198,6 +217,21 @@ namespace OpenKh.Tools.LayoutEditor
                 sequenceProperty.PositionX = position[0];
                 sequenceProperty.PositionY = position[1];
             }
+
+            if (ImGui.Button("Modify inner sequence##{index}"))
+                OpenInnerSequence(
+                    sequenceProperty.SequenceIndex,
+                    sequenceProperty.TextureIndex,
+                    sequenceProperty.AnimationGroup);
+        }
+
+        private void OpenInnerSequence(int sequenceIndex, int textureIndex, int animationGroup)
+        {
+            _sequenceEditor?.Dispose();
+            _sequenceEditor = new AppSequenceEditor(_bootStrap, _settings,
+                _layout.SequenceItems[sequenceIndex],
+                _images[textureIndex]);
+            _isOpeningSequenceEditor = true;
         }
 
         public Bar.Entry SaveAnimation(string name)
@@ -228,6 +262,7 @@ namespace OpenKh.Tools.LayoutEditor
 
         public void Dispose()
         {
+            _sequenceEditor?.Dispose();
         }
 
         public IntPtr BindTexture(Texture2D texture) =>
