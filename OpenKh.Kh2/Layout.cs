@@ -9,7 +9,7 @@ namespace OpenKh.Kh2
 {
     public class Layout
     {
-        private const uint MagicCodeValidator = 0x4459414CU;
+        public const uint MagicCodeValidator = 0x4459414CU;
         private const int SupportedVersion = 0x100;
         private static readonly long MinimumLength = 32L;
 

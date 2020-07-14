@@ -45,6 +45,7 @@ namespace OpenKh.Tools.LayoutEditor
         private const string LinkToPcsx2ActionName = "Open file and link it to PCSX2";
         private const string ResourceSelectionDialogTitle = "Resource selection";
         private bool _isResourceSelectionDialogOpening;
+        private bool _isResourceSelectingLayout;
         private ResourceSelectionDialog _resourceSelectionDialog;
         private Dictionary<Keys, Action> _keyMapping = new Dictionary<Keys, Action>();
 
@@ -124,8 +125,12 @@ namespace OpenKh.Tools.LayoutEditor
 
                 if (_resourceSelectionDialog.HasResourceBeenSelected)
                 {
-                    OpenSequenceEditor(_resourceSelectionDialog.SelectedAnimation,
-                        _resourceSelectionDialog.SelectedTexture);
+                    if (_isResourceSelectingLayout)
+                        OpenLayoutEditor(_resourceSelectionDialog.SelectedAnimation,
+                            _resourceSelectionDialog.SelectedTexture);
+                    else
+                        OpenSequenceEditor(_resourceSelectionDialog.SelectedAnimation,
+                            _resourceSelectionDialog.SelectedTexture);
                 }
             }
 
@@ -354,6 +359,7 @@ namespace OpenKh.Tools.LayoutEditor
             _resourceSelectionDialog = new ResourceSelectionDialog(
                 entries, animationType, textureType);
             _isResourceSelectionDialogOpening = true;
+            _isResourceSelectingLayout = animationType == Bar.EntryType.Layout;
         }
 
         private void OpenSequenceEditor(Bar.Entry sequenceEntry, Bar.Entry textureEntry)
@@ -383,10 +389,9 @@ namespace OpenKh.Tools.LayoutEditor
 
             if (_linkToPcsx2)
             {
-                ShowError("Link to PCSX2 with 2LD files is not yet supported.");
                 _linkToPcsx2 = false;
-                //if (!LinkLaydToPcs2(layoutEntry.Stream))
-                //    return;
+                if (!LinkLaydToPcs2(layoutEntry.Stream))
+                    return;
             }
 
             var app = new AppLayoutEditor(_bootstrap,
@@ -441,6 +446,9 @@ namespace OpenKh.Tools.LayoutEditor
         //        DataContext = layoutEditorViewModel
         //    });
         //}
+
+        private bool LinkLaydToPcs2(Stream stream) =>
+            LinkToPcs2(stream, Layout.MagicCodeValidator, 0x1c);
 
         private bool LinkSeqdToPcs2(Stream stream) =>
             LinkToPcs2(stream, Sequence.MagicCodeValidator, 0x2c);
