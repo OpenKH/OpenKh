@@ -164,7 +164,40 @@ namespace OpenKh.Tools.LayoutEditor
 
         private void LayoutEditing()
         {
-            ImGui.Text("Here will go editor controls");
+            var sequenceGroup = _layout.SequenceGroups[SelectedLayoutIndex];
+            for (var i = 0; i < sequenceGroup.Sequences.Count; i++)
+            {
+                if (ImGui.CollapsingHeader($"Sequence property {i + 1}"))
+                {
+                    SequencePropertyEdit(sequenceGroup.Sequences[i], i);
+                }
+            }
+        }
+
+        private void SequencePropertyEdit(Layout.SequenceProperty sequenceProperty, int index)
+        {
+            var textureIndex = sequenceProperty.TextureIndex;
+            if (ImGui.DragInt($"Texture index##{index}", ref textureIndex))
+                sequenceProperty.TextureIndex = Math.Min(Math.Max(textureIndex, 0), _images.Count - 1);
+
+            var sequenceIndex = sequenceProperty.SequenceIndex;
+            if (ImGui.DragInt($"Sequence index##{index}", ref sequenceIndex))
+                sequenceProperty.SequenceIndex = Math.Min(Math.Max(sequenceIndex, 0), _layout.SequenceItems.Count - 1);
+
+            var animGroupIndex = sequenceProperty.AnimationGroup;
+            if (ImGui.DragInt($"Animation group index##{index}", ref animGroupIndex))
+                sequenceProperty.AnimationGroup = sequenceProperty.AnimationGroup;
+
+            var frameStart = sequenceProperty.ShowAtFrame;
+            if (ImGui.DragInt($"Show at frame##{index}", ref animGroupIndex))
+                sequenceProperty.ShowAtFrame = frameStart;
+
+            var position = new int[] { sequenceProperty.PositionX, sequenceProperty.PositionY };
+            if (ImGui.DragInt2($"Position##{index}", ref position[0]))
+            {
+                sequenceProperty.PositionX = position[0];
+                sequenceProperty.PositionY = position[1];
+            }
         }
 
         public Bar.Entry SaveAnimation(string name)
