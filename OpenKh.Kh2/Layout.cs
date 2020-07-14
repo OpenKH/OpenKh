@@ -25,6 +25,16 @@ namespace OpenKh.Kh2
             [Data] public int SequenceOffset { get; set; }
         }
 
+        private class RawSequenceGroup
+        {
+            [Data] public short L1Index { get; set; }
+            [Data] public short L1Count { get; set; }
+            [Data] public int Unknown04 { get; set; }
+            [Data] public int Unknown08 { get; set; }
+            [Data] public int Unknown0c { get; set; }
+            [Data] public int Unknown10 { get; set; }
+        }
+
         public class SequenceProperty
         {
             [Data] public int TextureIndex { get; set; }
@@ -37,15 +47,13 @@ namespace OpenKh.Kh2
 
         public class SequenceGroup
         {
-            [Data] public short L1Index { get; set; }
-            [Data] public short L1Count { get; set; }
-            [Data] public int Unknown04 { get; set; }
-            [Data] public int Unknown08 { get; set; }
-            [Data] public int Unknown0c { get; set; }
-            [Data] public int Unknown10 { get; set; }
+            public List<SequenceProperty> Sequences { get; set; }
+            public int Unknown04 { get; set; }
+            public int Unknown08 { get; set; }
+            public int Unknown0c { get; set; }
+            public int Unknown10 { get; set; }
         }
 
-        public List<SequenceProperty> SequenceProperties { get; set; }
         public List<SequenceGroup> SequenceGroups { get; set; }
         public List<Sequence> SequenceItems { get; set; }
 
@@ -66,8 +74,19 @@ namespace OpenKh.Kh2
             if (header.Version != SupportedVersion)
                 throw new InvalidDataException($"Unsupported version {header.Version}");
 
-            SequenceProperties = stream.ReadList<SequenceProperty>(header.L1Offset, header.L1Count);
-            SequenceGroups = stream.ReadList<SequenceGroup>(header.L2Offset, header.L2Count);
+            var sequenceProperties = stream.ReadList<SequenceProperty>(header.L1Offset, header.L1Count);
+            SequenceGroups = stream
+                .ReadList<RawSequenceGroup>(header.L2Offset, header.L2Count)
+                .Select(x => new SequenceGroup
+                {
+                    Sequences = sequenceProperties.Skip(x.L1Index).Take(x.L1Count).ToList(),
+                    Unknown04 = x.Unknown04,
+                    Unknown08 = x.Unknown08,
+                    Unknown0c = x.Unknown0c,
+                    Unknown10 = x.Unknown10
+                })
+                .ToList();
+
             SequenceItems = new List<Sequence>();
 
             var sequenceOffsets = stream.ReadInt32List(header.SequenceOffset, header.SequenceCount);
@@ -87,19 +106,39 @@ namespace OpenKh.Kh2
             if (!stream.CanWrite || !stream.CanSeek)
                 throw new InvalidDataException($"Write and seek must be supported.");
 
+            var sequenceProperties = SequenceGroups
+                .SelectMany(x => x.Sequences)
+                .ToList();
             var header = new Header
             {
                 MagicCode = MagicCodeValidator,
                 Version = SupportedVersion,
-                L1Count = SequenceProperties.Count,
+                L1Count = sequenceProperties.Count,
                 L2Count = SequenceGroups.Count,
                 SequenceCount = SequenceItems.Count,
             };
 
             stream.Position = MinimumLength;
             header.L1Offset = (int)stream.Position;
-            header.L2Offset = stream.WriteList(SequenceProperties) + header.L1Offset;
-            header.SequenceOffset = stream.WriteList(SequenceGroups) + header.L2Offset;
+            header.L2Offset = stream.WriteList(sequenceProperties) + header.L1Offset;
+
+            var oldPosition = stream.Position;
+            var index = 0;
+            foreach (var item in SequenceGroups)
+            {
+                BinaryMapping.WriteObject(stream, new RawSequenceGroup
+                {
+                    L1Index = (short)index,
+                    L1Count = (short)item.Sequences.Count,
+                    Unknown04 = item.Unknown04,
+                    Unknown08 = item.Unknown08,
+                    Unknown0c = item.Unknown0c,
+                    Unknown10 = item.Unknown10,
+                });
+
+                index += item.Sequences.Count;
+            }
+            header.SequenceOffset = (int)(stream.Position - oldPosition + header.L2Offset);
             WriteSequences(stream);
 
             stream.Position = 0;

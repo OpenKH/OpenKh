@@ -1,11 +1,8 @@
-﻿using NSubstitute.Extensions;
-using OpenKh.Common;
+﻿using OpenKh.Common;
 using OpenKh.Kh2;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
-using Xunit.Sdk;
 
 namespace OpenKh.Tests.kh2
 {
@@ -58,53 +55,26 @@ namespace OpenKh.Tests.kh2
         public void ValidateLayoutHeader() => Common.FileOpenRead(FilePath, stream =>
         {
             var layout = Layout.Read(stream);
-            Assert.Equal(32, layout.SequenceProperties.Count);
+            Assert.Equal(32, layout.SequenceGroups.SelectMany(x => x.Sequences).Count());
             Assert.Equal(32, layout.SequenceGroups.Count);
             Assert.Equal(5, layout.SequenceItems.Count);
-        });
-
-        [Fact]
-        public void ValidateL1() => Common.FileOpenRead(FilePath, stream =>
-        {
-            var layout = Layout.Read(stream);
-            Assert.Equal(0, layout.SequenceProperties[0].TextureIndex);
-            Assert.Equal(0, layout.SequenceProperties[0].SequenceIndex);
-            Assert.Equal(0, layout.SequenceProperties[0].AnimationGroup);
-            Assert.Equal(0, layout.SequenceProperties[0].ShowAtFrame);
-            Assert.Equal(0, layout.SequenceProperties[0].PositionX);
-            Assert.Equal(0, layout.SequenceProperties[0].PositionY);
-            Assert.Equal(0, layout.SequenceProperties[1].TextureIndex);
-            Assert.Equal(0, layout.SequenceProperties[1].SequenceIndex);
-            Assert.Equal(1, layout.SequenceProperties[1].AnimationGroup);
-            Assert.Equal(0, layout.SequenceProperties[1].ShowAtFrame);
-            Assert.Equal(0, layout.SequenceProperties[1].PositionX);
-            Assert.Equal(0, layout.SequenceProperties[1].PositionY);
-            Assert.Equal(1, layout.SequenceProperties[2].TextureIndex);
-            Assert.Equal(1, layout.SequenceProperties[2].SequenceIndex);
-            Assert.Equal(0, layout.SequenceProperties[2].AnimationGroup);
-            Assert.Equal(0, layout.SequenceProperties[2].ShowAtFrame);
-            Assert.Equal(0, layout.SequenceProperties[2].PositionX);
-            Assert.Equal(0, layout.SequenceProperties[2].PositionY);
         });
 
         [Fact]
         public void ValidateL2() => Common.FileOpenRead(FilePath, stream =>
         {
             var layout = Layout.Read(stream);
-            Assert.Equal(0, layout.SequenceGroups[0].L1Index);
-            Assert.Equal(1, layout.SequenceGroups[0].L1Count);
+            Assert.Equal(1, layout.SequenceGroups[0].Sequences.Count);
             Assert.Equal(0, layout.SequenceGroups[0].Unknown04);
             Assert.Equal(0, layout.SequenceGroups[0].Unknown08);
             Assert.Equal(0, layout.SequenceGroups[0].Unknown0c);
             Assert.Equal(0, layout.SequenceGroups[0].Unknown10);
-            Assert.Equal(1, layout.SequenceGroups[1].L1Index);
-            Assert.Equal(1, layout.SequenceGroups[1].L1Count);
+            Assert.Equal(1, layout.SequenceGroups[1].Sequences.Count);
             Assert.Equal(0, layout.SequenceGroups[1].Unknown04);
             Assert.Equal(0, layout.SequenceGroups[1].Unknown08);
             Assert.Equal(0, layout.SequenceGroups[1].Unknown0c);
             Assert.Equal(0, layout.SequenceGroups[1].Unknown10);
-            Assert.Equal(2, layout.SequenceGroups[2].L1Index);
-            Assert.Equal(1, layout.SequenceGroups[2].L1Count);
+            Assert.Equal(1, layout.SequenceGroups[2].Sequences.Count);
             Assert.Equal(0, layout.SequenceGroups[2].Unknown04);
             Assert.Equal(0, layout.SequenceGroups[2].Unknown08);
             Assert.Equal(0, layout.SequenceGroups[2].Unknown0c);
