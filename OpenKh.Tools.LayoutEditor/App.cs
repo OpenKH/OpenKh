@@ -24,8 +24,11 @@ namespace OpenKh.Tools.LayoutEditor
     {
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer
             .Compose()
+            .AddExtensions("All supported files", "2ld", "2dd", "map", "a.*")
             .AddExtensions("2LD Layout container file", "2ld")
             .AddExtensions("2DD Sequence container file", "2dd")
+            .AddExtensions("MAP file", "map")
+            .AddExtensions("Character file", "a.*")
             .AddAllFiles();
         private const string DefaultName = "FAKE";
 
