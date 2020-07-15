@@ -106,9 +106,7 @@ namespace OpenKh.Tools.LayoutEditor
                 .ToList();
 
             _sequencer = new MySequencer(sequence, _debugSequenceRenderer);
-#if DEBUG
-            SelectedAnimGroup = Math.Min(6, sequence.AnimationGroups.Count - 1);
-#endif
+            SelectedAnimGroup = 0;
         }
 
         public void Menu()
@@ -537,6 +535,9 @@ namespace OpenKh.Tools.LayoutEditor
 
         private unsafe void Timeline()
         {
+            if (SelectedAnimationGroup == null)
+                return;
+
             var frameIndex = _renderer.GetActualFrame(SelectedAnimationGroup, _animationFrameCurrent);
             var frameIndexRef = _renderer.GetActualFrame(SelectedAnimationGroup, _animationFrameCurrent);
 
