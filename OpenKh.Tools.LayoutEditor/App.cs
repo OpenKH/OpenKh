@@ -265,8 +265,15 @@ namespace OpenKh.Tools.LayoutEditor
 
         public void OpenFile(string fileName, bool doNotShowLayoutSelectionDialog = false)
         {
-            if (OpenBarContent(ReadBarEntriesFromFileName(fileName), doNotShowLayoutSelectionDialog))
-                FileName = fileName;
+            try
+            {
+                if (OpenBarContent(ReadBarEntriesFromFileName(fileName), doNotShowLayoutSelectionDialog))
+                    FileName = fileName;
+            }
+            catch (Exception ex)
+            {
+                ShowError(ex.Message);
+            }
         }
 
         public void SaveFile(string previousFileName, string fileName)
