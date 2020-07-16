@@ -53,8 +53,8 @@ namespace OpenKh.Tools.Common.Rendering
             _defaultTexture = CreateSpriteTexture(2, 2, WhiteBitmap);
         }
 
-        public d3d.Device2 Device => _device.Device;
-        public d3d.DeviceContext2 Context => _device.Context;
+        public d3d.Device1 Device => _device.Device;
+        public d3d.DeviceContext1 Context => _device.Context;
 
         private class CDevice : IDisposable
         {
@@ -68,7 +68,6 @@ namespace OpenKh.Tools.Common.Rendering
             private List<IDisposable> _disposables = new List<IDisposable>();
 			
             private d3d.Device d3dDevice;
-            private d3d.Device1 d3dDevice1;
             private dxgi.Device dxgiDevice;
             private dxgi.Device1 dxgiDevice1;
             private dxgi.Adapter dxgiAdapter;
@@ -79,16 +78,15 @@ namespace OpenKh.Tools.Common.Rendering
             private d3d.PixelShader pixelShader;
             private d3d.InputLayout inputLayout;
 
-            public d3d.Device2 Device { get; }
-            public d3d.DeviceContext2 Context => Device.ImmediateContext2;
+            public d3d.Device1 Device { get; }
+            public d3d.DeviceContext1 Context => Device.ImmediateContext1;
 
             internal CDevice()
             {
                 var flags = d3d.DeviceCreationFlags.BgraSupport;
 
                 d3dDevice = new d3d.Device(DriverType.Hardware, flags);
-                d3dDevice1 = d3dDevice.QueryInterface<d3d.Device1>();
-                Device = d3dDevice.QueryInterface<d3d.Device2>();
+                Device = d3dDevice.QueryInterface<d3d.Device1>();
                 dxgiDevice = d3dDevice.QueryInterface<dxgi.Device>();
 				dxgiDevice1 = dxgiDevice.QueryInterface<dxgi.Device1>();
                 dxgiAdapter = dxgiDevice.Adapter.QueryInterface<dxgi.Adapter>();
@@ -257,7 +255,6 @@ namespace OpenKh.Tools.Common.Rendering
                 dxgiDevice1.Dispose();
                 dxgiDevice.Dispose();
                 Device.Dispose();
-                d3dDevice1.Dispose();
                 d3dDevice.Dispose();
             }
         }
