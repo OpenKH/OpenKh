@@ -139,7 +139,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             };
 
             var spriteIndex = spritePart.SpriteIndex;
-            if (ImGui.InputInt("Sprite index", ref spriteIndex))
+            if (ImGui.InputInt($"Sprite index##{index}", ref spriteIndex))
                 spritePart.SpriteIndex = Math.Min(Math.Max(spriteIndex, 0), _sequence.Sprites.Count - 1);
 
             if (ImGui.DragInt2($"Position##{index}", ref position[0]))
