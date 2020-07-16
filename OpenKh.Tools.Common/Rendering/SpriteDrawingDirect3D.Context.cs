@@ -53,8 +53,8 @@ namespace OpenKh.Tools.Common.Rendering
             _defaultTexture = CreateSpriteTexture(2, 2, WhiteBitmap);
         }
 
-        public d3d.Device3 Device => _device.Device;
-        public d3d.DeviceContext3 Context => _device.Context;
+        public d3d.Device2 Device => _device.Device;
+        public d3d.DeviceContext2 Context => _device.Context;
 
         private class CDevice : IDisposable
         {
@@ -79,8 +79,8 @@ namespace OpenKh.Tools.Common.Rendering
             private d3d.PixelShader pixelShader;
             private d3d.InputLayout inputLayout;
 
-            public d3d.Device3 Device { get; }
-            public d3d.DeviceContext3 Context => Device.ImmediateContext3;
+            public d3d.Device2 Device { get; }
+            public d3d.DeviceContext2 Context => Device.ImmediateContext2;
 
             internal CDevice()
             {
@@ -88,7 +88,7 @@ namespace OpenKh.Tools.Common.Rendering
 
                 d3dDevice = new d3d.Device(DriverType.Hardware, flags);
                 d3dDevice1 = d3dDevice.QueryInterface<d3d.Device1>();
-                Device = d3dDevice.QueryInterface<d3d.Device3>();
+                Device = d3dDevice.QueryInterface<d3d.Device2>();
                 dxgiDevice = d3dDevice.QueryInterface<dxgi.Device>();
 				dxgiDevice1 = dxgiDevice.QueryInterface<dxgi.Device1>();
                 dxgiAdapter = dxgiDevice.Adapter.QueryInterface<dxgi.Adapter>();
