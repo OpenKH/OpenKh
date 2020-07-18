@@ -242,13 +242,13 @@ namespace OpenKh.Command.ImgTool.Utils
                                 var newPixel = newPalette.FindNearest(src.Pixels[srcPointer++]) & 15;
                                 if (0 == (x & 1))
                                 {
-                                    // hi byte
-                                    destBits[destPointer] = (byte)(newPixel << 4);
+                                    // first pixel: lo byte
+                                    destBits[destPointer] = (byte)(newPixel);
                                 }
                                 else
                                 {
-                                    // lo byte
-                                    destBits[destPointer++] |= (byte)(newPixel);
+                                    // second pixel: hi byte
+                                    destBits[destPointer++] |= (byte)(newPixel << 4);
                                 }
                             }
                         }
