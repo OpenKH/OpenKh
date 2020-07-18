@@ -219,7 +219,7 @@ namespace OpenKh.Command.ImgTool.Utils
                             );
                         }
 
-                        var destBits = new byte[src.Width * src.Height];
+                        var destBits = new byte[(src.Width * src.Height + 1) / 2];
                         var clut = new byte[4 * maxColors];
 
                         for (int index = 0; index < newPalette.MostUsedPixels.Length; index++)
