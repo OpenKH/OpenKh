@@ -25,8 +25,8 @@ namespace OpenKh.Imaging
             for (int i = 0; i < data.Length; i++)
             {
                 var subData = data[i];
-                var clutIndex1 = subData >> 4;
-                var clutIndex2 = subData & 0x0F;
+                var clutIndex1 = subData & 0x0F;
+                var clutIndex2 = subData >> 4;
                 bitmap[i * 8 + 0] = clut[clutIndex1 * 4 + 2];
                 bitmap[i * 8 + 1] = clut[clutIndex1 * 4 + 1];
                 bitmap[i * 8 + 2] = clut[clutIndex1 * 4 + 0];
