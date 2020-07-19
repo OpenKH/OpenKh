@@ -11,7 +11,8 @@ namespace OpenKh.Command.DoctChanger
 {
     [Command("OpenKh.Command.DoctChanger")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(NoDoctCommand), typeof(UseThisDoctCommand))]
+    [Subcommand(typeof(UseThisDoctCommand), typeof(CreateEmptyDoctCommand)
+        , typeof(ReadDoctCommand), typeof(ReadMapDoctCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -44,39 +45,7 @@ namespace OpenKh.Command.DoctChanger
 
 
         [HelpOption]
-        [Command(Description = "map file: remove doct")]
-        private class NoDoctCommand
-        {
-            [Required]
-            [DirectoryExists]
-            [Argument(0, Description = "Input map dir")]
-            public string Input { get; set; }
-
-            [Required]
-            [DirectoryExists]
-            [Argument(1, Description = "Output map dir")]
-            public string Output { get; set; }
-
-            protected int OnExecute(CommandLineApplication app)
-            {
-                foreach (var mapIn in Directory.GetFiles(Input, "*.map"))
-                {
-                    Console.WriteLine(mapIn);
-
-                    var mapOut = Path.Combine(Output, Path.GetFileName(mapIn));
-
-                    var entries = File.OpenRead(mapIn).Using(s => Bar.Read(s))
-                        .Where(it => it.Type != Bar.EntryType.MeshOcclusion)
-                        .ToArray();
-
-                    File.Create(mapOut).Using(s => Bar.Write(s, entries));
-                }
-                return 0;
-            }
-        }
-
-        [HelpOption]
-        [Command(Description = "map file: use your doct")]
+        [Command(Description = "map file: replace doct with your doct")]
         private class UseThisDoctCommand
         {
             [Required]
@@ -124,5 +93,98 @@ namespace OpenKh.Command.DoctChanger
             }
         }
 
+        private static void SummaryDoct(Doct doct, string file, TextWriter writer)
+        {
+            writer.WriteLine($"# DOCT ({Path.GetFileName(file)})");
+            writer.WriteLine();
+            writer.WriteLine($"- Version: {doct.Header.Version}");
+            writer.WriteLine($"- Unk2: {doct.Header.Unk2}");
+            writer.WriteLine();
+
+            writer.WriteLine("## Entry1");
+            writer.WriteLine();
+            writer.WriteLine("```");
+
+            foreach (var pair in doct.Entry1List.Select((it, index) => (it, index)))
+            {
+                writer.WriteLine($"{pair.index,4}:{pair.it}");
+            }
+            writer.WriteLine("```");
+
+            writer.WriteLine();
+
+            writer.WriteLine("## Entry2");
+            writer.WriteLine();
+            writer.WriteLine("```");
+
+            foreach (var pair in doct.Entry2List.Select((it, index) => (it, index)))
+            {
+                writer.WriteLine($"{pair.index,4}:{pair.it}");
+            }
+
+            writer.WriteLine("```");
+        }
+
+        [HelpOption]
+        [Command(Description = "doct file: read")]
+        private class ReadDoctCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "DOCT file input")]
+            public string DoctIn { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var doct = File.OpenRead(DoctIn).Using(s => Doct.Read(s));
+
+                SummaryDoct(doct, DoctIn, Console.Out);
+
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "map file: read doct")]
+        private class ReadMapDoctCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Map file input")]
+            public string MapIn { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var doctBin = File.ReadAllBytes(MapIn);
+
+                var entries = File.OpenRead(MapIn).Using(s => Bar.Read(s));
+
+                var doctEntry = entries.Single(it => it.Type == Bar.EntryType.MeshOcclusion);
+
+                var doct = Doct.Read(doctEntry.Stream);
+
+                SummaryDoct(doct, MapIn, Console.Out);
+
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "doct file: create empty")]
+        private class CreateEmptyDoctCommand
+        {
+            [Required]
+            [Argument(0, Description = "DOCT file output")]
+            public string DoctOut { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var doct = new Doct();
+
+                File.Create(DoctOut).Using(s => Doct.Write(s, doct));
+
+                return 0;
+            }
+        }
     }
 }
