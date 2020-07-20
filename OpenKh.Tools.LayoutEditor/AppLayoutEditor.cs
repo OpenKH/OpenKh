@@ -101,7 +101,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 bool dummy = true;
                 if (ImGui.BeginPopupModal(SequenceEditorDialogName, ref dummy,
-                    ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal))
+                    ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal | ImGuiWindowFlags.MenuBar))
                 {
                     const float ChildWindowScale = 0.75f;
                     var RecommendedWidth = windowSize.X * ChildWindowScale;
@@ -111,7 +111,10 @@ namespace OpenKh.Tools.LayoutEditor
                     ImGui.SetCursorPosY(RecommendedHeight);
                     ImGui.SetCursorPosX(cursor.X);
                     ImGui.SetCursorPosY(cursor.Y);
+
+                    ForMenuBar(_sequenceEditor.Menu);
                     _sequenceEditor.Run();
+                    
                     ImGui.EndPopup();
                 }
             }
