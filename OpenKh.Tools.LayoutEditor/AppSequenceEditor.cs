@@ -111,13 +111,10 @@ namespace OpenKh.Tools.LayoutEditor
 
         public void Menu()
         {
-            ForMenu("Sprite group", () =>
+            ForMenu("Edit", () =>
             {
-                ForMenuItem("Edit...", () => _isSpriteGroupEditDialogOpen = true);
-            });
-            ForMenu("Sprite", () =>
-            {
-                ForMenuItem("Edit...", () => _isSpriteEditDialogOpen = true);
+                ForMenuItem("Sprite groups...", () => _isSpriteGroupEditDialogOpen = true);
+                ForMenuItem("Sprites...", () => _isSpriteEditDialogOpen = true);
             });
         }
 
