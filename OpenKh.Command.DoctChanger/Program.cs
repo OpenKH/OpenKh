@@ -11,7 +11,7 @@ namespace OpenKh.Command.DoctChanger
 {
     [Command("OpenKh.Command.DoctChanger")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(UseThisDoctCommand)
+    [Subcommand(typeof(UseThisDoctCommand), typeof(CreateDoctForMapCommand)
         , typeof(CreateDummyDoctCommand)
         , typeof(ReadDoctCommand), typeof(ReadMapDoctCommand))]
     class Program
@@ -187,6 +187,85 @@ namespace OpenKh.Command.DoctChanger
 
                 File.Create(DoctOut).Using(s => Doct.Write(s, doct));
 
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "map file: create and set unoptimized doct for rendering entire map")]
+        private class CreateDoctForMapCommand
+        {
+            [Required]
+            [Argument(0, Description = "Map file input")]
+            public string MapIn { get; set; }
+
+            [Argument(1, Description = "Map file output. Default output is same file name at current folder")]
+            public string MapOut { get; set; }
+
+            private static bool IsMapModel(Bar.Entry entry) => entry.Type == Bar.EntryType.Model && entry.Name == "MAP";
+            private static bool IsDoct(Bar.Entry entry) => entry.Type == Bar.EntryType.MeshOcclusion;
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                MapOut = Path.GetFullPath(MapOut ?? Path.GetFileName(MapIn));
+
+                Console.WriteLine($"Output map file: {MapOut}");
+
+                var entries = File.OpenRead(MapIn).Using(s => Bar.Read(s).ToArray());
+
+                var mapModel = Mdlx.Read(entries.Single(IsMapModel).Stream);
+
+                var numVifPackets = mapModel.MapModel.VifPackets.Count;
+                var numAlb2Groups = mapModel.MapModel.alb2.Count;
+
+                Console.WriteLine($"numVifPackets: {numVifPackets:#,##0}");
+                Console.WriteLine($"numAlb2Groups: {numAlb2Groups:#,##0}");
+
+                Console.WriteLine($"Note: this tool will build a unoptimized doct that renders all ALB2 {numAlb2Groups:#,##0} groups.");
+
+                var doctStream = new MemoryStream();
+                {
+                    var doct = new Doct();
+
+                    doct.Entry1List.Add(
+                        new Doct.Entry1
+                        {
+                            Entry2Index = 0,
+                            Entry2LastIndex = Convert.ToUInt16(numAlb2Groups), // max 65535
+                        }
+                    );
+
+                    const float WorldBounds = 18000;
+
+                    doct.Entry2List.AddRange(
+                        Enumerable.Range(0, numAlb2Groups)
+                            .Select(
+                                index => new Doct.Entry2
+                                {
+                                    MinX = -WorldBounds,
+                                    MinY = -WorldBounds,
+                                    MinZ = -WorldBounds,
+                                    MaxX = WorldBounds,
+                                    MaxY = WorldBounds,
+                                    MaxZ = WorldBounds,
+                                }
+                            )
+                    );
+
+                    Doct.Write(doctStream, doct);
+
+                    doctStream.Position = 0;
+                }
+
+                foreach (var entry in entries.Where(IsDoct))
+                {
+                    Console.WriteLine("DOCT entry replaced.");
+                    entry.Stream = doctStream;
+                }
+
+                File.Create(MapOut).Using(s => Bar.Write(s, entries));
+
+                Console.WriteLine("Output map file is written successfully.");
                 return 0;
             }
         }
