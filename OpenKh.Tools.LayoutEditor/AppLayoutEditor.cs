@@ -218,7 +218,7 @@ namespace OpenKh.Tools.LayoutEditor
                 sequenceProperty.PositionY = position[1];
             }
 
-            if (ImGui.Button("Modify inner sequence##{index}"))
+            if (ImGui.Button($"Modify inner sequence##{index}"))
                 OpenInnerSequence(
                     sequenceProperty.SequenceIndex,
                     sequenceProperty.TextureIndex,
