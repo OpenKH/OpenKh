@@ -11,7 +11,8 @@ namespace OpenKh.Command.DoctChanger
 {
     [Command("OpenKh.Command.DoctChanger")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(UseThisDoctCommand), typeof(CreateEmptyDoctCommand)
+    [Subcommand(typeof(UseThisDoctCommand)
+        , typeof(CreateEmptyDoctCommand), typeof(CreateDummyDoctCommand)
         , typeof(ReadDoctCommand), typeof(ReadMapDoctCommand))]
     class Program
     {
@@ -180,6 +181,27 @@ namespace OpenKh.Command.DoctChanger
             protected int OnExecute(CommandLineApplication app)
             {
                 var doct = new Doct();
+
+                File.Create(DoctOut).Using(s => Doct.Write(s, doct));
+
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "doct file: create dummy")]
+        private class CreateDummyDoctCommand
+        {
+            [Required]
+            [Argument(0, Description = "DOCT file output")]
+            public string DoctOut { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var doct = new Doct();
+
+                doct.Entry1List.Add(new Doct.Entry1 { });
+                doct.Entry2List.Add(new Doct.Entry2 { });
 
                 File.Create(DoctOut).Using(s => Doct.Write(s, doct));
 

@@ -59,14 +59,14 @@ namespace OpenKh.Kh2
 
         public class Entry1
         {
-            [Data] public short Child1 { get; set; }
-            [Data] public short Child2 { get; set; }
-            [Data] public short Child3 { get; set; }
-            [Data] public short Child4 { get; set; }
-            [Data] public short Child5 { get; set; }
-            [Data] public short Child6 { get; set; }
-            [Data] public short Child7 { get; set; }
-            [Data] public short Child8 { get; set; }
+            [Data] public short Child1 { get; set; } = -1;
+            [Data] public short Child2 { get; set; } = -1;
+            [Data] public short Child3 { get; set; } = -1;
+            [Data] public short Child4 { get; set; } = -1;
+            [Data] public short Child5 { get; set; } = -1;
+            [Data] public short Child6 { get; set; } = -1;
+            [Data] public short Child7 { get; set; } = -1;
+            [Data] public short Child8 { get; set; } = -1;
             [Data] public float MinX { get; set; }
             [Data] public float MinY { get; set; }
             [Data] public float MinZ { get; set; }
@@ -134,6 +134,12 @@ namespace OpenKh.Kh2
                 };
 
                 BinaryMapping.WriteObject(writer, newHeader);
+
+                entry1Data.Position = 0;
+                entry1Data.CopyTo(stream);
+
+                entry2Data.Position = 0;
+                entry2Data.CopyTo(stream);
             }
         }
 
