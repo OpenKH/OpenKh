@@ -20,10 +20,10 @@ namespace OpenKh.Kh2.Extensions
         {
             var rect = sequence.GetVisibilityRectangleForFrameGroup(animation.SpriteGroupIndex);
 
-            var minXPos = animation.Xa0;
-            int maxXPos = animation.Xa1;
-            var minYPos = animation.Ya0;
-            int maxYPos = animation.Ya1;
+            var minXPos = animation.TranslateXStart;
+            int maxXPos = animation.TranslateXEnd;
+            var minYPos = animation.TranslateYStart;
+            int maxYPos = animation.TranslateYEnd;
             var minXScale = animation.ScaleStart * animation.ScaleXStart;
             var maxXScale = animation.ScaleEnd * animation.ScaleXEnd;
             var minYScale = animation.ScaleStart * animation.ScaleYStart;
@@ -59,14 +59,14 @@ namespace OpenKh.Kh2.Extensions
             SpriteGroupIndex = anim.SpriteGroupIndex,
             FrameStart = anim.FrameStart,
             FrameEnd = anim.FrameEnd,
-            Xa0 = anim.Xa0,
-            Xa1 = anim.Xa1,
-            Ya0 = anim.Ya0,
-            Ya1 = anim.Ya1,
-            Xb0 = anim.Xb0,
-            Xb1 = anim.Xb1,
-            Yb0 = anim.Yb0,
-            Yb1 = anim.Yb1,
+            TranslateXStart = anim.TranslateXStart,
+            TranslateXEnd = anim.TranslateXEnd,
+            TranslateYStart = anim.TranslateYStart,
+            TranslateYEnd = anim.TranslateYEnd,
+            PivotXStart = anim.PivotXStart,
+            PivotXEnd = anim.PivotXEnd,
+            PivotYStart = anim.PivotYStart,
+            PivotYEnd = anim.PivotYEnd,
             Unknown30 = anim.Unknown30,
             Unknown34 = anim.Unknown34,
             Unknown38 = anim.Unknown38,

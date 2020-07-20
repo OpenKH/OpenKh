@@ -18,7 +18,7 @@ namespace OpenKh.Kh2
         public const int ScalingFlag = 0x00000040;
         public const int ColorInterpolationFlag = 0x00000080;
         public const int ColorMaskingFlag = 0x00000400;
-        public const int TranslateFlag = 0x00004000;
+        public const int PivotFlag = 0x00004000;
 
         private class Section
         {
@@ -102,14 +102,14 @@ namespace OpenKh.Kh2
             [Data] public int SpriteGroupIndex { get; set; }
             [Data] public int FrameStart { get; set; }
             [Data] public int FrameEnd { get; set; }
-            [Data] public int Xa0 { get; set; }
-            [Data] public int Xa1 { get; set; }
-            [Data] public int Ya0 { get; set; }
-            [Data] public int Ya1 { get; set; }
-            [Data] public int Xb0 { get; set; }
-            [Data] public int Xb1 { get; set; }
-            [Data] public int Yb0 { get; set; }
-            [Data] public int Yb1 { get; set; }
+            [Data] public int TranslateXStart { get; set; }
+            [Data] public int TranslateXEnd { get; set; }
+            [Data] public int TranslateYStart { get; set; }
+            [Data] public int TranslateYEnd { get; set; }
+            [Data] public int PivotXStart { get; set; }
+            [Data] public int PivotXEnd { get; set; }
+            [Data] public int PivotYStart { get; set; }
+            [Data] public int PivotYEnd { get; set; }
             [Data] public int Unknown30 { get; set; }
             [Data] public int Unknown34 { get; set; }
             [Data] public int Unknown38 { get; set; }

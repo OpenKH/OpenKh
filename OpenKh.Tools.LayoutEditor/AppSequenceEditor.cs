@@ -383,34 +383,34 @@ namespace OpenKh.Tools.LayoutEditor
                 animation.FrameEnd = framePair[1];
             }
 
-            var xaPair = new int[] { animation.Xa0, animation.Xa1 };
+            var xaPair = new int[] { animation.TranslateXStart, animation.TranslateXEnd };
             if (ImGui.DragInt2($"Translation X##{index}", ref xaPair[0]))
             {
-                animation.Xa0 = xaPair[0];
-                animation.Xa1 = xaPair[1];
+                animation.TranslateXStart = xaPair[0];
+                animation.TranslateXEnd = xaPair[1];
             }
 
-            var yaPair = new int[] { animation.Ya0, animation.Ya1 };
+            var yaPair = new int[] { animation.TranslateYStart, animation.TranslateYEnd };
             if (ImGui.DragInt2($"Translation Y##{index}", ref yaPair[0]))
             {
-                animation.Ya0 = yaPair[0];
-                animation.Ya1 = yaPair[1];
+                animation.TranslateYStart = yaPair[0];
+                animation.TranslateYEnd = yaPair[1];
             }
 
-            if (ImGuiFlagBox(animation, $"Enable extra translation##{index}", Sequence.TranslateFlag))
+            if (ImGuiFlagBox(animation, $"Enable pivot translation##{index}", Sequence.PivotFlag))
             {
-                var xbPair = new int[] { animation.Xb0, animation.Xb1 };
-                if (ImGui.DragInt2($"Translation X2##{index}", ref xbPair[0]))
+                var xbPair = new int[] { animation.PivotXStart, animation.PivotXEnd };
+                if (ImGui.DragInt2($"Pivot X##{index}", ref xbPair[0]))
                 {
-                    animation.Xb0 = xbPair[0];
-                    animation.Xb1 = xbPair[1];
+                    animation.PivotXStart = xbPair[0];
+                    animation.PivotXEnd = xbPair[1];
                 }
 
-                var ybPair = new int[] { animation.Yb0, animation.Yb1 };
-                if (ImGui.DragInt2($"Translation Y2##{index}", ref ybPair[0]))
+                var ybPair = new int[] { animation.PivotYStart, animation.PivotYEnd };
+                if (ImGui.DragInt2($"Pivot Y##{index}", ref ybPair[0]))
                 {
-                    animation.Yb0 = ybPair[0];
-                    animation.Yb1 = ybPair[1];
+                    animation.PivotYStart = ybPair[0];
+                    animation.PivotYEnd = ybPair[1];
                 }
             }
 

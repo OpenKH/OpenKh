@@ -26,8 +26,8 @@ namespace OpenKh.Tests.Engine
             var sequence = MockSequence(new Sequence.Animation
             {
                 Flags = flags,
-                Xa0 = x0,
-                Xa1 = x1,
+                TranslateXStart = x0,
+                TranslateXEnd = x1,
                 FrameStart = AnimationFirstFrame,
                 FrameEnd = AnimationLastFrame,
                 ScaleStart = 1,
@@ -62,8 +62,8 @@ namespace OpenKh.Tests.Engine
             var sequence = MockSequence(new Sequence.Animation
             {
                 Flags = flags,
-                Xb0 = x0,
-                Xb1 = x1,
+                PivotXStart = x0,
+                PivotXEnd = x1,
                 FrameStart = AnimationFirstFrame,
                 FrameEnd = AnimationLastFrame,
                 ScaleStart = 1,
@@ -92,10 +92,10 @@ namespace OpenKh.Tests.Engine
             var sequence = MockSequence(new Sequence.Animation
             {
                 Flags = 0,
-                Xa0 = 200,
-                Xa1 = 500,
-                Xb0 = 150,
-                Xb1 = 400,
+                TranslateXStart = 200,
+                TranslateXEnd = 500,
+                PivotXStart = 150,
+                PivotXEnd = 400,
                 FrameStart = AnimationFirstFrame,
                 FrameEnd = AnimationLastFrame,
                 ScaleStart = 1,

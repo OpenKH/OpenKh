@@ -15,6 +15,8 @@ namespace OpenKh.Engine.Renderers
             public int FrameIndex { get; set; }
             public float PositionX { get; set; }
             public float PositionY { get; set; }
+            public float PivotX { get; set; }
+            public float PivotY { get; set; }
             public float ScaleX { get; set; }
             public float ScaleY { get; set; }
             public float Rotation { get; set; }
@@ -31,6 +33,8 @@ namespace OpenKh.Engine.Renderers
                 FrameIndex = FrameIndex,
                 PositionX = PositionX,
                 PositionY = PositionY,
+                PivotX = PivotX,
+                PivotY = PivotY,
                 ScaleX = ScaleX,
                 ScaleY = ScaleY,
                 Rotation = Rotation,
@@ -114,8 +118,8 @@ namespace OpenKh.Engine.Renderers
             else
                 t = (float)(delta * delta * delta);
 
-            context.PositionX += Lerp(t, animation.Xa0, animation.Xa1);
-            context.PositionY += Lerp(t, animation.Ya0, animation.Ya1);
+            context.PositionX += Lerp(t, animation.TranslateXStart, animation.TranslateXEnd);
+            context.PositionY += Lerp(t, animation.TranslateYStart, animation.TranslateYEnd);
             context.ColorBlendMode = animation.ColorBlend;
 
             if ((animation.Flags & Sequence.ScalingFlag) == 0)
@@ -153,10 +157,10 @@ namespace OpenKh.Engine.Renderers
                 context.Rotation = Lerp(t, animation.RotationStart, animation.RotationEnd);
             }
 
-            if ((animation.Flags & Sequence.TranslateFlag) == 0)
+            if ((animation.Flags & Sequence.PivotFlag) == 0)
             {
-                context.PositionX += Lerp(t, animation.Xb0, animation.Xb1);
-                context.PositionY += Lerp(t, animation.Yb0, animation.Yb1);
+                context.PivotX += Lerp(t, animation.PivotXStart, animation.PivotXEnd);
+                context.PivotY += Lerp(t, animation.PivotYStart, animation.PivotYEnd);
             }
 
             if ((animation.Flags & Sequence.BouncingFlag) == 0)
@@ -200,6 +204,7 @@ namespace OpenKh.Engine.Renderers
                 .SourceLTRB(frame.Left, frame.Top, frame.Right, frame.Bottom)
                 .Position(context.Left, context.Top)
                 .DestinationSize(context.Right - context.Left, context.Bottom - context.Top)
+                .Traslate(context.PivotX, context.PivotY)
                 .RotateZ(-context.Rotation)
                 .Traslate(context.PositionX, context.PositionY);
 
