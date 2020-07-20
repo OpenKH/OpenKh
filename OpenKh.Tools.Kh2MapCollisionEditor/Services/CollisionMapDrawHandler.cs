@@ -25,7 +25,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
         private int _width;
         private int _height;
 
-        public Coct Coct { get; set; }
+        public CoctLogical Coct { get; set; }
         public Camera Camera { get; private set; }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -101,7 +101,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
             _graphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, v, 0, v.Length / 3);
         }
 
-        private void DrawCoct(Coct coct)
+        private void DrawCoct(CoctLogical coct)
         {
             var paletteIndex = 0;
 

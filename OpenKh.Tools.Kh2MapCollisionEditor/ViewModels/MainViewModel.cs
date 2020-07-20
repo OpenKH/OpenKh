@@ -112,7 +112,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
                 return false;
             }
 
-            CollisionEditor.Coct = Coct.Read(stream);
+            CollisionEditor.Coct = new CoctLogical(Coct.Read(stream));
             return true;
         }
 
@@ -122,7 +122,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
             FileName = fileName;
         }
 
-        private void SaveStream(Stream stream) => CollisionEditor.Coct.Write(stream);
+        private void SaveStream(Stream stream) => CollisionEditor.Coct.CreateCoct().Write(stream);
 
         private void OpenProcess()
         {

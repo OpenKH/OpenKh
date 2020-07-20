@@ -18,11 +18,11 @@
         <TextBox Text="{Binding Vertex3, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="Vtx4"/>
         <TextBox Text="{Binding Vertex4, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v0a"/>
-        <TextBox Text="{Binding v0a, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v0c"/>
-        <TextBox Text="{Binding v0c, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBlock Text="v0e"/>
-        <TextBox Text="{Binding v0e, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Co5Index"/>
+        <TextBox Text="{Binding Co5Index, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Co6Index"/>
+        <TextBox Text="{Binding Co6Index, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Co7Index"/>
+        <TextBox Text="{Binding Co7Index, UpdateSourceTrigger=PropertyChanged}"/>
     </controls:TwoColumnsPanel>
 </UserControl>
