@@ -24,11 +24,19 @@ namespace OpenKh.Tools.LayoutEditor
     {
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer
             .Compose()
-            .AddExtensions("All supported files", "2ld", "2dd", "map", "a.*")
-            .AddExtensions("2LD Layout container file", "2ld")
+            .AddExtensions("All supported files", "2ld", "lad", "2dd", "map", "a.*")
+            .AddExtensions("2LD Layout container file", "2ld", "lad")
             .AddExtensions("2DD Sequence container file", "2dd")
             .AddExtensions("MAP file", "map")
             .AddExtensions("Character file", "a.*")
+            .AddAllFiles();
+        private static readonly List<FileDialogFilter> ImzFilter = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("Image container IMGZ", "imz")
+            .AddAllFiles();
+        private static readonly List<FileDialogFilter> ImdFilter = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("Image IMGD", "imd")
             .AddAllFiles();
         private const string DefaultName = "FAKE";
 
@@ -58,12 +66,12 @@ namespace OpenKh.Tools.LayoutEditor
         {
             get
             {
-                var contentName = $"{AnimationName ?? DefaultName},{TextureName ?? DefaultName}";
+                var contentName = IsBar ? $"{AnimationName ?? DefaultName},{TextureName ?? DefaultName} | " : string.Empty;
                 var fileName = IsToolDesc ? _toolInvokeDesc.Title : (FileName ?? "untitled");
                 if (_processStream != null)
                     fileName = $"{fileName}@pcsx2:{_processOffset}";
 
-                return $"{contentName} | {fileName} | {MonoGameImGuiBootstrap.ApplicationName}";
+                return $"{contentName}{fileName} | {MonoGameImGuiBootstrap.ApplicationName}";
             }
         }
 
@@ -79,6 +87,8 @@ namespace OpenKh.Tools.LayoutEditor
 
         public bool IsToolDesc => _toolInvokeDesc != null;
         public ISaveBar CurrentEditor { get; private set; }
+
+        public bool IsBar { get; set; }
 
         public string AnimationName
         {
@@ -267,7 +277,43 @@ namespace OpenKh.Tools.LayoutEditor
         {
             try
             {
-                if (OpenBarContent(ReadBarEntriesFromFileName(fileName), doNotShowLayoutSelectionDialog))
+                bool isSuccess;
+                if (File.OpenRead(fileName).Using(Layout.IsValid))
+                {
+                    IEnumerable<Imgd> imgd = null;
+                    FileDialog.OnOpen(texFileName =>
+                    {
+                        imgd = File.OpenRead(texFileName).Using(Imgz.Read);
+                    }, ImzFilter);
+
+                    if (imgd != null)
+                    {
+                        using var layoutStream = File.OpenRead(fileName);
+                        OpenLayoutEditor(layoutStream, imgd);
+                        isSuccess = true;
+                        IsBar = false;
+                    }
+                    else
+                        isSuccess = false;
+                }
+                else if (File.OpenRead(fileName).Using(Sequence.IsValid))
+                {
+                    ShowError("SED files can not be opened directly.");
+                    isSuccess = false;
+                    IsBar = false;
+                }
+                else if (File.OpenRead(fileName).Using(Bar.IsValid))
+                {
+                    isSuccess = OpenBarContent(ReadBarEntriesFromFileName(fileName), doNotShowLayoutSelectionDialog);
+                    IsBar = true;
+                }
+                else
+                {
+                    ShowError("File not recognized.");
+                    isSuccess = false;
+                }
+
+                if (isSuccess)
                     FileName = fileName;
             }
             catch (Exception ex)
@@ -277,6 +323,20 @@ namespace OpenKh.Tools.LayoutEditor
         }
 
         public void SaveFile(string previousFileName, string fileName)
+        {
+            if (!IsBar)
+            {
+                var entry = CurrentEditor.SaveAnimation("dummy");
+                using var stream = File.Create(fileName);
+                entry.Stream.SetPosition(0).CopyTo(stream);
+            }
+            else
+            {
+                SaveFileAsBar(previousFileName, fileName);
+            }
+        }
+
+        public void SaveFileAsBar(string previousFileName, string fileName)
         {
             var existingEntries = File.Exists(previousFileName) ?
                 ReadBarEntriesFromFileName(previousFileName) : new List<Bar.Entry>();
@@ -396,18 +456,22 @@ namespace OpenKh.Tools.LayoutEditor
         {
             AnimationName = layoutEntry.Name;
             TextureName = textureContainerEntry.Name;
+            OpenLayoutEditor(layoutEntry.Stream, Imgz.Read(textureContainerEntry.Stream));
+        }
 
+        private void OpenLayoutEditor(Stream layoutStream, IEnumerable<Imgd> images)
+        {
             if (_linkToPcsx2)
             {
                 _linkToPcsx2 = false;
-                if (!LinkLaydToPcs2(layoutEntry.Stream))
+                if (!LinkLaydToPcs2(layoutStream))
                     return;
             }
 
             var app = new AppLayoutEditor(_bootstrap,
                 this,
-                Layout.Read(layoutEntry.Stream.SetPosition(0)),
-                Imgz.Read(textureContainerEntry.Stream));
+                Layout.Read(layoutStream.SetPosition(0)),
+                images);
             _app = app;
             CurrentEditor = app;
         }
