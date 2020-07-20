@@ -41,14 +41,14 @@ namespace OpenKh.Kh2
 
         public class Co1 : IData
         {
-            [Data] public short Child1 { get; set; }
-            [Data] public short Child2 { get; set; }
-            [Data] public short Child3 { get; set; }
-            [Data] public short Child4 { get; set; }
-            [Data] public short Child5 { get; set; }
-            [Data] public short Child6 { get; set; }
-            [Data] public short Child7 { get; set; }
-            [Data] public short Child8 { get; set; }
+            [Data] public short Child1 { get; set; } = -1;
+            [Data] public short Child2 { get; set; } = -1;
+            [Data] public short Child3 { get; set; } = -1;
+            [Data] public short Child4 { get; set; } = -1;
+            [Data] public short Child5 { get; set; } = -1;
+            [Data] public short Child6 { get; set; } = -1;
+            [Data] public short Child7 { get; set; } = -1;
+            [Data] public short Child8 { get; set; } = -1;
             [Data] public short MinX { get; set; }
             [Data] public short MinY { get; set; }
             [Data] public short MinZ { get; set; }
@@ -76,10 +76,10 @@ namespace OpenKh.Kh2
         public class Co3 : IData
         {
             [Data] public short v00 { get; set; }
-            [Data] public short Vertex1 { get; set; }
-            [Data] public short Vertex2 { get; set; }
-            [Data] public short Vertex3 { get; set; }
-            [Data] public short Vertex4 { get; set; }
+            [Data] public short Vertex1 { get; set; } = -1;
+            [Data] public short Vertex2 { get; set; } = -1;
+            [Data] public short Vertex3 { get; set; } = -1;
+            [Data] public short Vertex4 { get; set; } = -1;
             [Data] public short Co5Index { get; set; }
             [Data] public short Co6Index { get; set; }
             [Data] public short Co7Index { get; set; }
