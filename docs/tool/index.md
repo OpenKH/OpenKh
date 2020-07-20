@@ -18,8 +18,8 @@
 |[IMZ](../kh2/file/type/image.md#imgz) | OpenKh.Tools.ImageViewer
 |[FAC](../kh2/file/type/image.md#fac) | OpenKh.Tools.ImageViewer
 |[DPD](../kh2/file/type/dpd.md) | OpenKh.Tools.DpdViewer (incomplete)
-|[2LD](../kh2/file/type/2ld.md) | [OpenKh.Tools.LayoutEditor](./LayoutEditor/index.md)
-|[2DD](../kh2/file/type/2ld.md) | [OpenKh.Tools.LayoutEditor](./LayoutEditor/index.md)
+|[2LD](../kh2/file/type/2ld.md#layout) | [OpenKh.Tools.LayoutEditor](./LayoutEditor/index.md)
+|[2DD](../kh2/file/type/2ld.md#sequence) | [OpenKh.Tools.LayoutEditor](./LayoutEditor/index.md)
 |[00battle](../kh2/file/type/00battle.md) | OpenKh.Tools.LevelUpEditor
 |[00objentry](../kh2/file/type/00objentry.md) | OpenKh.Tools.ObjentryEditor
 |[00place](../kh2/file/type/place.md) | OpenKh.Tools.Kh2PlaceEditor
