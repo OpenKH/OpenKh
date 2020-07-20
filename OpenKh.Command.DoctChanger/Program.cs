@@ -12,7 +12,7 @@ namespace OpenKh.Command.DoctChanger
     [Command("OpenKh.Command.DoctChanger")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(typeof(UseThisDoctCommand)
-        , typeof(CreateEmptyDoctCommand), typeof(CreateDummyDoctCommand)
+        , typeof(CreateDummyDoctCommand)
         , typeof(ReadDoctCommand), typeof(ReadMapDoctCommand))]
     class Program
     {
