@@ -109,10 +109,10 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 22 | Animation Loader | ARD - A.FM - limit/*
 | 23 | Model Collision | MDLX
 | 24 | Image Data (IMGD) | Varies
-| 25 | [Sequence animation](./2ld.md#sequence) | 2DD, MAP, A.FM, fontinfo.bar
+| 25 | [Sequence animation (SED)](./2ld.md#sequence) | 2DD, MAP, A.FM, fontinfo.bar
 | 26 | Unknown | Unknown
 | 27 | Unknown | Unknown
-| 28 | [Layout animation](./2ld.md#layout) | menu/* - gumi/sprite/*
+| 28 | [Layout animation (LAD)](./2ld.md#layout) | menu/* - gumi/sprite/*
 | 29 | Multi-Image Data Archive (IMGZ) | Varies.
 | 30 | Binary Archive | MAP
 | 31 | Sound Effect Block (SEB) | MDLX - A.FM

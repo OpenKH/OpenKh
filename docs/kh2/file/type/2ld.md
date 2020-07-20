@@ -8,7 +8,7 @@ A [BAR](./bar.md) container that usually only holds [IMGZ](./image.md#imgz) and 
 
 A [BAR](./bar.md) container that usually only holds [IMGD](./image.md#imgd) and [Sequence](#sequence) files.
 
-## Layout
+## Layout (LAD)
 
 Used to draw window animations, like menus and the title screen. Layout files are responsible to fill the entire screen and they uses [sequences](#sequence) by repositioning them to give a proper graphics feedback.
 
@@ -16,11 +16,15 @@ Since a layout includes embeds sequences, they can be used to also draw GUI elem
 
 The logic of a layout is to render multiple sequences by associating them a texture from a [IMGZ](./image.md#imgz), move them to a specific screen location and start to play them from a specific frame.
 
-## Sequence
+According to Kingdom Hearts RE: Chain of Memories, the extension of this file is LAD.
+
+## Sequence (SED)
 
 Used to draw element animations, like HUD elements, fonts and floating menu. This is the core of the entire 2D animation system.
 
 The three essential parts of a sequence are [animation group](#animation-group), [sprite group](#sprite-group) and [sprite](#sprite). Since a sequence is always linked to a specific texture, sprites uses it when drawing on screen.
+
+Following the pattern of other file formats such as LAD and IMD, it is safe to assume that the extension of this file format might be SED.
 
 ### Animation group
 
