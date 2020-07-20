@@ -414,27 +414,28 @@ namespace OpenKh.Tools.LayoutEditor
                 }
             }
 
-            var unk3xPair = new int[] {
-                animation.Unknown30, animation.Unknown34, animation.Unknown38, animation.Unknown3c
-            };
-            if (ImGui.DragInt4($"Unknown3x##{index}", ref unk3xPair[0]))
+            if (ImGuiFlagBox(animation, $"Enable rotation##{index}", Sequence.RotationFlag))
             {
-                animation.Unknown30 = unk3xPair[0];
-                animation.Unknown34 = unk3xPair[1];
-                animation.Unknown38 = unk3xPair[2];
-                animation.Unknown3c = unk3xPair[3];
-            }
+                var rotationStart = new Vector3(
+                    (float)(animation.RotationXStart * 180f / Math.PI),
+                    (float)(animation.RotationYStart * 180f / Math.PI),
+                    (float)(animation.RotationZStart * 180f / Math.PI));
+                var rotationEnd = new Vector3(
+                    (float)(animation.RotationXEnd * 180f / Math.PI),
+                    (float)(animation.RotationYEnd * 180f / Math.PI),
+                    (float)(animation.RotationZEnd * 180f / Math.PI));
 
-            if (ImGuiFlagBox(animation, $"Enable rotation##{index}", Sequence.RotationFlag, true))
-            {
-                ImGui.SameLine();
-                var rotationPair = new Vector2(
-                    (float)(animation.RotationStart * 180f / Math.PI),
-                    (float)(animation.RotationEnd * 180f / Math.PI));
-                if (ImGui.DragFloat2($"Rotation##{index}", ref rotationPair))
+                if (ImGui.DragFloat3($"Rotation Start##{index}", ref rotationStart))
                 {
-                    animation.RotationStart = (float)(rotationPair.X * Math.PI / 180f);
-                    animation.RotationEnd = (float)(rotationPair.Y * Math.PI / 180f);
+                    animation.RotationXStart = (float)(rotationStart.X * Math.PI / 180f);
+                    animation.RotationYStart = (float)(rotationStart.Y * Math.PI / 180f);
+                    animation.RotationZStart = (float)(rotationStart.Z * Math.PI / 180f);
+                }
+                if (ImGui.DragFloat3($"Rotation End##{index}", ref rotationEnd))
+                {
+                    animation.RotationXEnd = (float)(rotationEnd.X * Math.PI / 180f);
+                    animation.RotationYEnd = (float)(rotationEnd.Y * Math.PI / 180f);
+                    animation.RotationZEnd = (float)(rotationEnd.Z * Math.PI / 180f);
                 }
             }
 

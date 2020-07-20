@@ -110,12 +110,12 @@ namespace OpenKh.Kh2
             [Data] public int PivotXEnd { get; set; }
             [Data] public int PivotYStart { get; set; }
             [Data] public int PivotYEnd { get; set; }
-            [Data] public int Unknown30 { get; set; }
-            [Data] public int Unknown34 { get; set; }
-            [Data] public int Unknown38 { get; set; }
-            [Data] public int Unknown3c { get; set; }
-            [Data] public float RotationStart { get; set; }
-            [Data] public float RotationEnd { get; set; }
+            [Data] public float RotationXStart { get; set; }
+            [Data] public float RotationXEnd { get; set; }
+            [Data] public float RotationYStart { get; set; }
+            [Data] public float RotationYEnd { get; set; }
+            [Data] public float RotationZStart { get; set; }
+            [Data] public float RotationZEnd { get; set; }
             [Data] public float ScaleStart { get; set; }
             [Data] public float ScaleEnd { get; set; }
             [Data] public float ScaleXStart { get; set; }

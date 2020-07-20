@@ -19,7 +19,9 @@ namespace OpenKh.Engine.Renderers
             public float PivotY { get; set; }
             public float ScaleX { get; set; }
             public float ScaleY { get; set; }
-            public float Rotation { get; set; }
+            public float RotationX { get; set; }
+            public float RotationY { get; set; }
+            public float RotationZ { get; set; }
             public ColorF Color { get; set; }
             public int ColorBlendMode { get; set; }
             public float Left { get; set; }
@@ -37,7 +39,9 @@ namespace OpenKh.Engine.Renderers
                 PivotY = PivotY,
                 ScaleX = ScaleX,
                 ScaleY = ScaleY,
-                Rotation = Rotation,
+                RotationX = RotationX,
+                RotationY = RotationY,
+                RotationZ = RotationZ,
                 Color = Color,
                 ColorBlendMode = ColorBlendMode,
                 Left = Left,
@@ -154,7 +158,9 @@ namespace OpenKh.Engine.Renderers
 
             if ((animation.Flags & Sequence.RotationFlag) == 0)
             {
-                context.Rotation = Lerp(t, animation.RotationStart, animation.RotationEnd);
+                context.RotationX = Lerp(t, animation.RotationXStart, animation.RotationXEnd);
+                context.RotationY = Lerp(t, animation.RotationYStart, animation.RotationYEnd);
+                context.RotationZ = Lerp(t, animation.RotationZStart, animation.RotationZEnd);
             }
 
             if ((animation.Flags & Sequence.PivotFlag) == 0)
@@ -205,7 +211,9 @@ namespace OpenKh.Engine.Renderers
                 .Position(context.Left, context.Top)
                 .DestinationSize(context.Right - context.Left, context.Bottom - context.Top)
                 .Traslate(context.PivotX, context.PivotY)
-                .RotateZ(-context.Rotation)
+                .RotateX(-context.RotationX)
+                .RotateY(-context.RotationY)
+                .RotateZ(-context.RotationZ)
                 .Traslate(context.PositionX, context.PositionY);
 
             drawContext.Color0 = ConvertColor(frame.ColorLeft);
