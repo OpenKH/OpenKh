@@ -106,10 +106,11 @@ namespace OpenKh.Tools.LayoutEditor
                     const float ChildWindowScale = 0.75f;
                     var RecommendedWidth = windowSize.X * ChildWindowScale;
                     var RecommendedHeight = windowSize.Y * ChildWindowScale;
+                    var cursor = ImGui.GetCursorPos();
                     ImGui.SetCursorPosX(RecommendedWidth);
                     ImGui.SetCursorPosY(RecommendedHeight);
-                    ImGui.SetCursorPosX(0.0f);
-                    ImGui.SetCursorPosY(0.0f);
+                    ImGui.SetCursorPosX(cursor.X);
+                    ImGui.SetCursorPosY(cursor.Y);
                     _sequenceEditor.Run();
                     ImGui.EndPopup();
                 }
