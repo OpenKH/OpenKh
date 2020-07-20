@@ -171,24 +171,6 @@ namespace OpenKh.Command.DoctChanger
         }
 
         [HelpOption]
-        [Command(Description = "doct file: create empty")]
-        private class CreateEmptyDoctCommand
-        {
-            [Required]
-            [Argument(0, Description = "DOCT file output")]
-            public string DoctOut { get; set; }
-
-            protected int OnExecute(CommandLineApplication app)
-            {
-                var doct = new Doct();
-
-                File.Create(DoctOut).Using(s => Doct.Write(s, doct));
-
-                return 0;
-            }
-        }
-
-        [HelpOption]
         [Command(Description = "doct file: create dummy")]
         private class CreateDummyDoctCommand
         {
