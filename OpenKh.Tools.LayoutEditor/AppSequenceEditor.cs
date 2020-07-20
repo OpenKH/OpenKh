@@ -143,7 +143,7 @@ namespace OpenKh.Tools.LayoutEditor
             const float RightWidthMax = 384f;
             const float PreviewWidthMul = 2f;
             const float TotalWidthMul = SpriteListWidthMul + RightWidthMul + PreviewWidthMul;
-            var windowSize = ImGui.GetIO().DisplaySize.X;
+            var windowSize = ImGui.GetWindowSize().X;
             var spriteListWidth = Math.Min(windowSize / TotalWidthMul * SpriteListWidthMul, SpriteListWidthMax);
             var rightWidth = Math.Min(windowSize / TotalWidthMul * RightWidthMul, RightWidthMax);
             var previewWidth = windowSize - spriteListWidth - rightWidth;
