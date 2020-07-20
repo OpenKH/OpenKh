@@ -88,10 +88,10 @@ namespace OpenKh.Tools.LayoutEditor
             const float EditorWidthMax = 512f;
             const float TotalWidthMul = PreviewWidthMul + EditorWidthMul;
 
-            var windowSize = ImGui.GetIO().DisplaySize.X;
-            var previewWidth = Math.Min(windowSize / TotalWidthMul * PreviewWidthMul, PreviewWidthMax);
-            var editorWidth = Math.Min(windowSize / TotalWidthMul * EditorWidthMul, EditorWidthMax);
-            previewWidth = windowSize - editorWidth;
+            var windowSize = ImGui.GetWindowSize();
+            var previewWidth = Math.Min(windowSize.X / TotalWidthMul * PreviewWidthMul, PreviewWidthMax);
+            var editorWidth = Math.Min(windowSize.X / TotalWidthMul * EditorWidthMul, EditorWidthMax);
+            previewWidth = windowSize.X - editorWidth;
 
             ForChild(nameof(LayoutPreview), previewWidth, 0, false, LayoutPreview);
             ImGui.SameLine();
@@ -100,8 +100,16 @@ namespace OpenKh.Tools.LayoutEditor
             if (_sequenceEditor != null)
             {
                 bool dummy = true;
-                if (ImGui.BeginPopupModal(SequenceEditorDialogName, ref dummy))
+                if (ImGui.BeginPopupModal(SequenceEditorDialogName, ref dummy,
+                    ImGuiWindowFlags.Popup | ImGuiWindowFlags.Modal))
                 {
+                    const float ChildWindowScale = 0.75f;
+                    var RecommendedWidth = windowSize.X * ChildWindowScale;
+                    var RecommendedHeight = windowSize.Y * ChildWindowScale;
+                    ImGui.SetCursorPosX(RecommendedWidth);
+                    ImGui.SetCursorPosY(RecommendedHeight);
+                    ImGui.SetCursorPosX(0.0f);
+                    ImGui.SetCursorPosY(0.0f);
                     _sequenceEditor.Run();
                     ImGui.EndPopup();
                 }
