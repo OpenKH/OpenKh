@@ -154,6 +154,8 @@ namespace OpenKh.Tools.LayoutEditor
 
             ForChild("Preview", 0, 0, false, () =>
             {
+                const float PositionX = 128f;
+                const float PositionY = 32f;
                 const float ViewportWidth = 1024f;
                 const float ViewportHeight = 1024f;
                 var width = ImGui.GetWindowContentRegionWidth();
@@ -166,14 +168,12 @@ namespace OpenKh.Tools.LayoutEditor
 
                 _drawing.DestinationTexture = _destinationTexture;
                 _drawing.Clear(_settings.EditorBackground);
-                _drawing.SetViewport(0, ViewportWidth, 0, ViewportHeight);
+                _drawing.SetViewport(-PositionX, ViewportWidth - PositionX, -PositionY, ViewportHeight - PositionY);
 
-                // This draws the screen border
-                _drawing.DrawRectangle(-1, -1, 512f + 2, 416f + 2, backgroundColorInverse);
-                _drawing.Flush();
 
                 _renderer.FrameIndex = _animationFrameCurrent;
                 _renderer.SelectedSequenceGroupIndex = SelectedLayoutIndex;
+                DrawGameViewport(backgroundColorInverse);
                 _renderer.Draw();
                 _drawing.Flush();
                 _drawing.DestinationTexture = null;
@@ -183,6 +183,18 @@ namespace OpenKh.Tools.LayoutEditor
                 ImGui.Image(_destinationTextureId, new Vector2(width, height),
                     GetUv(_destinationTexture, 0, 0), new Vector2(maxU, maxV));
             });
+        }
+
+        private void DrawGameViewport(ColorF backgroundColorInverse)
+        {
+            const float OriginalViewportWidth = 512f;
+            const float RemixViewportWidth = 684f;
+
+            _drawing.DrawRectangle(-1, -1, OriginalViewportWidth + 2, 416f + 2, backgroundColorInverse);
+            _drawing.DrawRectangle(
+                -(RemixViewportWidth - OriginalViewportWidth) / 2 - 1, -1,
+                RemixViewportWidth + 2, 416f + 2, backgroundColorInverse);
+            _drawing.Flush();
         }
 
         private unsafe void Timeline()
