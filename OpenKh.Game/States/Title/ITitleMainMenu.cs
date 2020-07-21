@@ -8,11 +8,19 @@ namespace OpenKh.Game.States.Title
         StartNewGame
     }
 
+    public enum TextAlignment
+    {
+        Left,
+        Center,
+        Right
+    }
+
     interface ITitleMainMenu
     {
         InputManager InputManager { get; }
         MainMenuState State { set; }
 
-        void Print(ushort messageId, float x, float y);
+        void Print(ushort messageId, float left, float top, float right = 0,
+            TextAlignment alignment = TextAlignment.Left);
     }
 }

@@ -362,16 +362,38 @@ namespace OpenKh.Game.States.Title
             return (layout, images);
         }
 
-        public void Print(ushort messageId, float x, float y)
+        public void Print(ushort messageId, float left, float top,
+            float right, TextAlignment alignment)
         {
             if (!_cachedText.TryGetValue(messageId, out var data))
                 _cachedText[messageId] = data = _kernel.MessageProvider.GetMessage(messageId);
+            
+            var x = alignment switch
+            {
+                TextAlignment.Left => left,
+                TextAlignment.Center => ((right - left) / 2) - (GetTextWidth(data) / 2),
+                TextAlignment.Right => right - GetTextWidth(data),
+                _ => left,
+            };
+            _messageRenderer.Draw(new DrawContext
+            {
+                xStart = x,
+                x = x,
+                y = top,
+                Scale = 0.8f
+            }, data);
+        }
 
-            _messageDrawContext.Reset();
-            _messageDrawContext.x = x;
-            _messageDrawContext.y = y;
-            _messageDrawContext.Scale = 0.8f;
-            _messageRenderer.Draw(_messageDrawContext, data);
+        private float GetTextWidth(byte[] text)
+        {
+            var ctx = new DrawContext
+            {
+                IgnoreDraw = true,
+                Scale = 0.8f
+            };
+            _messageRenderer.Draw(ctx, text);
+
+            return (float)ctx.Width;
         }
 
         public void DebugUpdate(IDebug debug)
