@@ -11,10 +11,10 @@ namespace OpenKh.Game.Infrastructure
 
         public bool IsDebug => _devices.Any(x => x.IsDebug);
         public bool IsShift => _devices.Any(x => x.IsShift);
-        public bool IsDebugRight => _devices.Any(x => x.IsDebugRight);
-        public bool IsDebugLeft => _devices.Any(x => x.IsDebugLeft);
-        public bool IsDebugUp => _devices.Any(x => x.IsDebugUp);
-        public bool IsDebugDown => _devices.Any(x => x.IsDebugDown);
+        public bool IsMenuRight => _devices.Any(x => x.IsRepetableRight);
+        public bool IsMenuLeft => _devices.Any(x => x.IsRepetableLeft);
+        public bool IsMenuUp => _devices.Any(x => x.IsRepetableUp);
+        public bool IsMenuDown => _devices.Any(x => x.IsRepetableDown);
 
         public bool IsExit => _devices.Any(x => x.IsExit);
         public bool IsUp => _devices.Any(x => x.IsDPadUp);

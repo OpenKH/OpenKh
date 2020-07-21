@@ -447,9 +447,9 @@ namespace OpenKh.Game.States
 
             if (IsDebugMode())
             {
-                if (_input.IsDebugLeft)
+                if (_input.IsMenuLeft)
                     _debugType--;
-                else if (_input.IsDebugRight)
+                else if (_input.IsMenuRight)
                     _debugType++;
                 _debugType %= 3;
 
@@ -490,8 +490,8 @@ namespace OpenKh.Game.States
 
         private void DebugUpdatePlaceList()
         {
-            if (_input.IsDebugUp) _debugPlaceCursor = Decrement(_debugPlaceCursor);
-            else if (_input.IsDebugDown) _debugPlaceCursor = Increment(_debugPlaceCursor);
+            if (_input.IsMenuUp) _debugPlaceCursor = Decrement(_debugPlaceCursor);
+            else if (_input.IsMenuDown) _debugPlaceCursor = Increment(_debugPlaceCursor);
             if (_debugPlaceCursor < 0)
                 _debugPlaceCursor = _places.Length - 1;
             _debugPlaceCursor %= _places.Length;
@@ -548,8 +548,8 @@ namespace OpenKh.Game.States
 
         private void DebugUpdateObjentryList()
         {
-            if (_input.IsDebugUp) _debugObjentryCursor = Decrement(_debugObjentryCursor);
-            else if (_input.IsDebugDown) _debugObjentryCursor = Increment(_debugObjentryCursor);
+            if (_input.IsMenuUp) _debugObjentryCursor = Decrement(_debugObjentryCursor);
+            else if (_input.IsMenuDown) _debugObjentryCursor = Increment(_debugObjentryCursor);
             if (_debugObjentryCursor < 0)
                 _debugObjentryCursor = _kernel.ObjEntries.Count - 1;
             _debugObjentryCursor %= _kernel.ObjEntries.Count;
