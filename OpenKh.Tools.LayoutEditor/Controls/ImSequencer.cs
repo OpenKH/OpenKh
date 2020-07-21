@@ -334,7 +334,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                         sequence.IsPaused = !sequence.IsPaused;
 
                     nextButtonPosition.X -= ButtonDistance;
-                    if (SequencerButton(draw_list, nextButtonPosition, 'L', false, LoopColor, "Force loop") && io.MouseReleased[0])
+                    if (SequencerButton(draw_list, nextButtonPosition, 'L', sequence.ForceLoop, LoopColor, "Force loop") && io.MouseReleased[0])
                         sequence.ForceLoop = !sequence.ForceLoop;
 
                     nextButtonPosition.X -= ButtonDistance;
