@@ -165,13 +165,21 @@ namespace OpenKh.Engine.Renders
 
         public static SpriteDrawingContext ScaleSize(this SpriteDrawingContext context, float scale)
         {
-            // TODO
+            var matrix = Matrix4x4.CreateScale(scale);
+            context.Vec0 = Vector2.Transform(context.Vec0, matrix);
+            context.Vec1 = Vector2.Transform(context.Vec1, matrix);
+            context.Vec2 = Vector2.Transform(context.Vec2, matrix);
+            context.Vec3 = Vector2.Transform(context.Vec3, matrix);
             return context;
         }
 
         public static SpriteDrawingContext ScaleSize(this SpriteDrawingContext context, float scaleX, float scaleY)
         {
-            // TODO
+            var matrix = Matrix4x4.CreateScale(scaleX, scaleY, 1.0f);
+            context.Vec0 = Vector2.Transform(context.Vec0, matrix);
+            context.Vec1 = Vector2.Transform(context.Vec1, matrix);
+            context.Vec2 = Vector2.Transform(context.Vec2, matrix);
+            context.Vec3 = Vector2.Transform(context.Vec3, matrix);
             return context;
         }
 
