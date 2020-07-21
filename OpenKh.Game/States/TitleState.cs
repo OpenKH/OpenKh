@@ -345,13 +345,11 @@ namespace OpenKh.Game.States
 
         private void CheckTitlLoop(LayoutRenderer layout)
         {
+            layout.FrameIndex++;
             var currentSequenceGroupIndex = layout.SelectedSequenceGroupIndex;
-
             if (currentSequenceGroupIndex == _titleLayout.Copyright)
             {
-                if (layout.FrameIndex < 850)
-                    layout.FrameIndex++;
-                else
+                if (layout.IsLastFrame)
                 {
                     layout.SelectedSequenceGroupIndex = _titleLayout.Intro;
                     layout.FrameIndex = 0;
@@ -359,9 +357,7 @@ namespace OpenKh.Game.States
             }
             else if (currentSequenceGroupIndex == _titleLayout.Intro)
             {
-                if (layout.FrameIndex < 478)
-                    layout.FrameIndex++;
-                else
+                if (layout.FrameIndex >= 480)
                 {
                     layout.SelectedSequenceGroupIndex = _titleLayout.IntroSkip;
                     layout.FrameIndex = 0;
@@ -369,9 +365,7 @@ namespace OpenKh.Game.States
             }
             else if (currentSequenceGroupIndex == _titleLayout.NewGame)
             {
-                if (layout.FrameIndex < 250)
-                    layout.FrameIndex++;
-                else
+                if (layout.IsLastFrame)
                     SetStateToGameplay();
             }
             else
