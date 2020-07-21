@@ -115,9 +115,11 @@ namespace OpenKh.Game.States
         private LayoutRenderer layoutRendererFg;
         private LayoutRenderer layoutRendererBg;
         private LayoutRenderer layoutRendererTheater;
+        private Layout _titleLayout;
+        private Layout _theaterLayout;
         private Dictionary<string, IEnumerable<ISpriteTexture>> cachedSurfaces;
 
-        private TitleLayout _titleLayout;
+        private TitleLayout _titleLayoutDesc;
         private bool _isTheaterModeUnlocked;
         private int _optionSelected;
         private bool _isInTheaterMenu;
@@ -127,13 +129,13 @@ namespace OpenKh.Game.States
             get
             {
                 var currentSequence = layoutRendererBg.SelectedSequenceGroupIndex;
-                return currentSequence == _titleLayout.Copyright ||
-                    currentSequence == _titleLayout.Intro;
+                return currentSequence == _titleLayoutDesc.Copyright ||
+                    currentSequence == _titleLayoutDesc.Intro;
             }
         }
 
         private bool IsNewGameStarting =>
-            layoutRendererBg.SelectedSequenceGroupIndex == _titleLayout.NewGame;
+            layoutRendererBg.SelectedSequenceGroupIndex == _titleLayoutDesc.NewGame;
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -163,27 +165,33 @@ namespace OpenKh.Game.States
             if (_kernel.IsReMix)
             {
                 if (_isTheaterModeUnlocked)
-                    _titleLayout = ReMixTheaterTitleLayout;
+                    _titleLayoutDesc = ReMixTheaterTitleLayout;
                 else
-                    _titleLayout = ReMixTitleLayout;
+                    _titleLayoutDesc = ReMixTitleLayout;
             }
             else if (_kernel.RegionId == Constants.RegionFinalMix)
             {
                 if (_isTheaterModeUnlocked)
-                    _titleLayout = FinalMixTheaterTitleLayout;
+                    _titleLayoutDesc = FinalMixTheaterTitleLayout;
                 else
-                    _titleLayout = FinalMixTitleLayout;
+                    _titleLayoutDesc = FinalMixTitleLayout;
             }
             else
-                _titleLayout = VanillaTitleLayout;
+                _titleLayoutDesc = VanillaTitleLayout;
 
-            layoutRendererBg = CreateLayoutRenderer("titl");
-            layoutRendererFg = CreateLayoutRenderer("titl");
-            layoutRendererBg.SelectedSequenceGroupIndex = _titleLayout.Copyright;
+            IEnumerable<ISpriteTexture> images;
+            (_titleLayout, images) = GetLayoutResources("titl", "titl");
 
-            Log.Info($"Theater={_titleLayout.HasTheater}");
-            if (_titleLayout.HasTheater)
-                layoutRendererTheater = CreateLayoutRenderer("even");
+            layoutRendererBg = new LayoutRenderer(_titleLayout, drawing, images);
+            layoutRendererFg = new LayoutRenderer(_titleLayout, drawing, images);
+            layoutRendererBg.SelectedSequenceGroupIndex = _titleLayoutDesc.Copyright;
+
+            Log.Info($"Theater={_titleLayoutDesc.HasTheater}");
+            if (_titleLayoutDesc.HasTheater)
+            {
+                (_theaterLayout, images) = GetLayoutResources("even", "even");
+                layoutRendererTheater = new LayoutRenderer(_theaterLayout, drawing, images);
+            }
 
             SetOption(0);
         }
@@ -260,17 +268,17 @@ namespace OpenKh.Game.States
                 if (currentOption < 0)
                     currentOption = MainMenuBackOption;
 
-                if (currentOption == MainMenuBackOption && !_titleLayout.HasBack)
+                if (currentOption == MainMenuBackOption && !_titleLayoutDesc.HasBack)
                     currentOption = MainMenuTheaterOption;
-                if (currentOption == MainMenuTheaterOption && !_titleLayout.HasTheater)
+                if (currentOption == MainMenuTheaterOption && !_titleLayoutDesc.HasTheater)
                     currentOption = MainMenuLoadOption;
             }
             else if (_inputManager.IsDown)
             {
                 currentOption++;
-                if (currentOption == MainMenuTheaterOption && !_titleLayout.HasTheater)
+                if (currentOption == MainMenuTheaterOption && !_titleLayoutDesc.HasTheater)
                     currentOption++;
-                if (currentOption == MainMenuBackOption && !_titleLayout.HasBack)
+                if (currentOption == MainMenuBackOption && !_titleLayoutDesc.HasBack)
                     currentOption++;
                 if (currentOption >= MainMenuMaxOptionCount)
                     currentOption = 0;
@@ -280,7 +288,7 @@ namespace OpenKh.Game.States
                 switch (currentOption)
                 {
                     case MainMenuNewGameOption:
-                        layoutRendererBg.SelectedSequenceGroupIndex = _titleLayout.NewGame;
+                        layoutRendererBg.SelectedSequenceGroupIndex = _titleLayoutDesc.NewGame;
                         layoutRendererBg.FrameIndex = 0;
                         break;
                     case MainMenuLoadOption:
@@ -310,7 +318,7 @@ namespace OpenKh.Game.States
 
         private void SkipIntro()
         {
-            layoutRendererBg.SelectedSequenceGroupIndex = _titleLayout.IntroSkip;
+            layoutRendererBg.SelectedSequenceGroupIndex = _titleLayoutDesc.IntroSkip;
             layoutRendererBg.FrameIndex = 0;
         }
 
@@ -327,16 +335,16 @@ namespace OpenKh.Game.States
             switch (_optionSelected)
             {
                 case MainMenuNewGameOption:
-                    layoutRendererFg.SelectedSequenceGroupIndex = _titleLayout.MenuOptionNewGame;
+                    layoutRendererFg.SelectedSequenceGroupIndex = _titleLayoutDesc.MenuOptionNewGame;
                     break;
                 case MainMenuLoadOption:
-                    layoutRendererFg.SelectedSequenceGroupIndex = _titleLayout.MenuOptionLoad;
+                    layoutRendererFg.SelectedSequenceGroupIndex = _titleLayoutDesc.MenuOptionLoad;
                     break;
                 case MainMenuTheaterOption:
-                    layoutRendererFg.SelectedSequenceGroupIndex = _titleLayout.MenuOptionTheater;
+                    layoutRendererFg.SelectedSequenceGroupIndex = _titleLayoutDesc.MenuOptionTheater;
                     break;
                 case MainMenuBackOption:
-                    layoutRendererFg.SelectedSequenceGroupIndex = _titleLayout.MenuOptionBack;
+                    layoutRendererFg.SelectedSequenceGroupIndex = _titleLayoutDesc.MenuOptionBack;
                     break;
             }
 
@@ -347,23 +355,23 @@ namespace OpenKh.Game.States
         {
             layout.FrameIndex++;
             var currentSequenceGroupIndex = layout.SelectedSequenceGroupIndex;
-            if (currentSequenceGroupIndex == _titleLayout.Copyright)
+            if (currentSequenceGroupIndex == _titleLayoutDesc.Copyright)
             {
                 if (layout.IsLastFrame)
                 {
-                    layout.SelectedSequenceGroupIndex = _titleLayout.Intro;
+                    layout.SelectedSequenceGroupIndex = _titleLayoutDesc.Intro;
                     layout.FrameIndex = 0;
                 }
             }
-            else if (currentSequenceGroupIndex == _titleLayout.Intro)
+            else if (currentSequenceGroupIndex == _titleLayoutDesc.Intro)
             {
                 if (layout.FrameIndex >= 480)
                 {
-                    layout.SelectedSequenceGroupIndex = _titleLayout.IntroSkip;
+                    layout.SelectedSequenceGroupIndex = _titleLayoutDesc.IntroSkip;
                     layout.FrameIndex = 0;
                 }
             }
-            else if (currentSequenceGroupIndex == _titleLayout.NewGame)
+            else if (currentSequenceGroupIndex == _titleLayoutDesc.NewGame)
             {
                 if (layout.IsLastFrame)
                     SetStateToGameplay();
@@ -372,16 +380,14 @@ namespace OpenKh.Game.States
                 layout.FrameIndex++;
         }
 
-        private LayoutRenderer CreateLayoutRenderer(string resourceName) => CreateLayoutRenderer(resourceName, resourceName);
-
-        private LayoutRenderer CreateLayoutRenderer(string layoutResourceName, string imagesResourceName)
+        private (Layout layout, IEnumerable<ISpriteTexture> textures) GetLayoutResources(string layoutResourceName, string imagesResourceName)
         {
             var layout = _archiveManager.Get<Layout>(layoutResourceName);
             if (!cachedSurfaces.TryGetValue(imagesResourceName, out var images))
                 images = cachedSurfaces[imagesResourceName] = _archiveManager.Get<Imgz>(imagesResourceName)
-                    ?.Images?.Select(x => drawing.CreateSpriteTexture(x));
+                    ?.Images?.Select(x => drawing.CreateSpriteTexture(x)).ToList();
 
-            return new LayoutRenderer(layout, drawing, images);
+            return (layout, images);
         }
 
         public void DebugUpdate(IDebug debug)
