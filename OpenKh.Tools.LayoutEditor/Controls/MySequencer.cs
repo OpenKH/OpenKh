@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using System;
@@ -110,7 +110,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             _debugSequenceRenderer = debugSequenceRenderer;
 
             FrameMin = 0;
-            FrameMax = 500;
+            FrameMax = (int)(sequence.AnimationGroups.Max(x => x.GetFrameLength()) * 1.25);
             _animationList = new List<MySequenceItem>();
         }
 
