@@ -24,11 +24,12 @@ namespace OpenKh.Tools.LayoutEditor
     {
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer
             .Compose()
-            .AddExtensions("All supported files", "2ld", "lad", "2dd", "map", "a.*")
+            .AddPatterns("All supported files", "2ld;*.lad;*.2dd;*.map;P_*.a.*;00font.bar;10font.bar")
             .AddExtensions("2LD Layout container file", "2ld", "lad")
             .AddExtensions("2DD Sequence container file", "2dd")
             .AddExtensions("MAP file", "map")
             .AddExtensions("Character file", "a.*")
+            .AddPatterns("00font and 10font", "00font.bar", "10font.bar")
             .AddAllFiles();
         private static readonly List<FileDialogFilter> ImzFilter = FileDialogFilterComposer
             .Compose()
