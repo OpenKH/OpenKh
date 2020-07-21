@@ -380,7 +380,6 @@ namespace OpenKh.Game.States.Title
 
         public void DebugDraw(IDebug debug)
         {
-            debug.Println("TITLE SCREEN");
         }
     }
 }
