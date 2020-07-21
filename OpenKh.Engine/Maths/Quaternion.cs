@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace OpenKh.Engine.Maths
 {
@@ -23,7 +24,7 @@ namespace OpenKh.Engine.Maths
         public static Quaternion RotationAxis(Vector3 axis, float angle)
         {
             Quaternion quaternion = new Quaternion();
-            Vector3.Normalize(ref axis, out axis);
+            axis = Vector3.Normalize(axis);
             float num1 = angle * 0.5f;
             float num2 = (float)Math.Sin((double)num1);
             float num3 = (float)Math.Cos((double)num1);

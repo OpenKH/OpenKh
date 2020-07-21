@@ -26,8 +26,8 @@ namespace OpenKh.Tests.Engine
             var sequence = MockSequence(new Sequence.Animation
             {
                 Flags = flags,
-                Xa0 = x0,
-                Xa1 = x1,
+                TranslateXStart = x0,
+                TranslateXEnd = x1,
                 FrameStart = AnimationFirstFrame,
                 FrameEnd = AnimationLastFrame,
                 ScaleStart = 1,
@@ -46,7 +46,7 @@ namespace OpenKh.Tests.Engine
 
             AssertDraw(drawing, x =>
             {
-                Assert.Equal(expected, x.DestinationX, 0);
+                Assert.Equal(expected, x.Vec0.X, 0);
             });
         }
 
@@ -62,8 +62,8 @@ namespace OpenKh.Tests.Engine
             var sequence = MockSequence(new Sequence.Animation
             {
                 Flags = flags,
-                Xb0 = x0,
-                Xb1 = x1,
+                PivotXStart = x0,
+                PivotXEnd = x1,
                 FrameStart = AnimationFirstFrame,
                 FrameEnd = AnimationLastFrame,
                 ScaleStart = 1,
@@ -82,7 +82,7 @@ namespace OpenKh.Tests.Engine
 
             AssertDraw(drawing, x =>
             {
-                Assert.Equal(expected, x.DestinationX, 0);
+                Assert.Equal(expected, x.Vec0.X, 0);
             });
         }
 
@@ -92,10 +92,10 @@ namespace OpenKh.Tests.Engine
             var sequence = MockSequence(new Sequence.Animation
             {
                 Flags = 0,
-                Xa0 = 200,
-                Xa1 = 500,
-                Xb0 = 150,
-                Xb1 = 400,
+                TranslateXStart = 200,
+                TranslateXEnd = 500,
+                PivotXStart = 150,
+                PivotXEnd = 400,
                 FrameStart = AnimationFirstFrame,
                 FrameEnd = AnimationLastFrame,
                 ScaleStart = 1,
@@ -114,7 +114,7 @@ namespace OpenKh.Tests.Engine
 
             AssertDraw(drawing, x =>
             {
-                Assert.Equal(419, x.DestinationX, 0);
+                Assert.Equal(419, x.Vec0.X, 0);
             });
         }
 
@@ -133,8 +133,14 @@ namespace OpenKh.Tests.Engine
         {
             var sequence = MockSequence(new Sequence.AnimationGroup
             {
-                AnimationIndex = 0,
-                Count = 1,
+                Animations = new List<Sequence.Animation>()
+                {
+                    new Sequence.Animation
+                    {
+                        FrameStart = AnimationFirstFrame,
+                        FrameEnd = AnimationLastFrame,
+                    }
+                },
                 DoNotLoop = (short)(loopEnabled ? 0 : 1),
                 LoopStart = loopStart,
                 LoopEnd = loopEnd
@@ -177,38 +183,30 @@ namespace OpenKh.Tests.Engine
                 {
                     new Sequence.AnimationGroup
                     {
-                        AnimationIndex = 0,
-                        Count = 1,
+                        Animations = new List<Sequence.Animation>()
+                        {
+                            animation
+                        },
                         DoNotLoop = 1,
                     }
                 },
-            Animations = new List<Sequence.Animation>()
+            SpriteGroups = new List<List<Sequence.SpritePart>>()
                 {
-                    animation
-                },
-            FrameGroups = new List<Sequence.FrameGroup>()
-                {
-                    new Sequence.FrameGroup
+                    new List<Sequence.SpritePart>()
                     {
-                        Start = 0,
-                        Count = 1
+                        new Sequence.SpritePart
+                        {
+                            Left = 0,
+                            Top = 0,
+                            Right = 512,
+                            Bottom = 512,
+                        }
                     }
                 },
-            FramesEx = new List<Sequence.FrameEx>()
+            Sprites = new List<Sequence.Sprite>()
                 {
-                    new Sequence.FrameEx
+                    new Sequence.Sprite
                     {
-                        Left = 0,
-                        Top = 0,
-                        Right = 512,
-                        Bottom = 512,
-                    }
-                },
-            Frames = new List<Sequence.Frame>()
-                {
-                    new Sequence.Frame
-                    {
-                        Unknown00 = 0,
                         Left = 0,
                         Top = 0,
                         Right = 512,
@@ -229,37 +227,23 @@ namespace OpenKh.Tests.Engine
                 {
                     animationGroup,
                 },
-            Animations = new List<Sequence.Animation>()
+            SpriteGroups = new List<List<Sequence.SpritePart>>()
                 {
-                    new Sequence.Animation
+                    new List<Sequence.SpritePart>()
                     {
-                        FrameStart = AnimationFirstFrame,
-                        FrameEnd = AnimationLastFrame,
+                        new Sequence.SpritePart
+                        {
+                            Left = 0,
+                            Top = 0,
+                            Right = 512,
+                            Bottom = 512,
+                        }
                     }
                 },
-            FrameGroups = new List<Sequence.FrameGroup>()
+            Sprites = new List<Sequence.Sprite>()
                 {
-                    new Sequence.FrameGroup
+                    new Sequence.Sprite
                     {
-                        Start = 0,
-                        Count = 1
-                    }
-                },
-            FramesEx = new List<Sequence.FrameEx>()
-                {
-                    new Sequence.FrameEx
-                    {
-                        Left = 0,
-                        Top = 0,
-                        Right = 512,
-                        Bottom = 512,
-                    }
-                },
-            Frames = new List<Sequence.Frame>()
-                {
-                    new Sequence.Frame
-                    {
-                        Unknown00 = 0,
                         Left = 0,
                         Top = 0,
                         Right = 512,

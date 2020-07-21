@@ -10,6 +10,11 @@ namespace OpenKh.Engine.Renders
         Color GetSequencePropertyBlendColor(int index);
     }
 
+    public interface IDebugSequenceRenderer
+    {
+        ColorF GetAnimationBlendColor(int index);
+    }
+
     public class DefaultDebugLayoutRenderer : IDebugLayoutRenderer
     {
         private static readonly Color DefaultColor = Color.White;
@@ -19,5 +24,10 @@ namespace OpenKh.Engine.Renders
 
         public Color GetSequenceGroupBlendColor(int index) => DefaultColor;
         public Color GetSequencePropertyBlendColor(int index) => DefaultColor;
+    }
+
+    public class DefaultDebugSequenceRenderer : IDebugSequenceRenderer
+    {
+        public ColorF GetAnimationBlendColor(int index) => ColorF.White;
     }
 }

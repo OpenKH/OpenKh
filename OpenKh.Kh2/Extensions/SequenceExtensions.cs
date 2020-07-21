@@ -1,62 +1,29 @@
 ﻿using OpenKh.Common;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace OpenKh.Kh2.Extensions
 {
     public static class SequenceExtensions
     {
-        public static T AggregateAnimationGroup<T>(
-            this Sequence sequence,
-            int animationGroupIndex,
-            Func<T, int, T> aggregator,
-            T initialValue = default)
-        {
-            var value = initialValue;
-            var animGroup = sequence.AnimationGroups[animationGroupIndex];
-
-
-            for (var i = 0; i < animGroup.Count; i++)
-                value = aggregator(value, animGroup.AnimationIndex + i);
-
-            return value;
-        }
-
-        public static T AggregateFrameGroup<T>(
-            this Sequence sequence,
-            int frameGroupIndex,
-            Func<T, int, T> aggregator,
-            T initialValue = default)
-        {
-            T value = initialValue;
-            var frameGroup = sequence.FrameGroups[frameGroupIndex];
-
-            for (var i = 0; i < frameGroup.Count; i++)
-                value = aggregator(value, frameGroup.Start + i);
-
-            return value;
-        }
-
         public static Rectangle GetVisibilityRectangleFromAnimationGroup(
-            this Sequence sequence, int animationGroupIndex) =>
-            sequence.AggregateAnimationGroup<Rectangle>(animationGroupIndex, (x, i) =>
-                x.Union(sequence.GetVisibilityRectangleFromAnimation(i)));
+            this Sequence sequence, Sequence.AnimationGroup animGroup) =>
+            animGroup.Animations.Aggregate(new Rectangle(), (rect, x) => rect.Union(sequence.GetVisibilityRectangleFromAnimation(x)));
 
-        public static int GetFrameLengthFromAnimationGroup(
-            this Sequence sequence, int animationGroupIndex) =>
-            sequence.AggregateAnimationGroup<int>(animationGroupIndex, (x, i) =>
-                Math.Max(x, sequence.GetFrameLengthFromAnimation(i)));
+        public static int GetFrameLength(this Sequence.AnimationGroup animGroup) =>
+            animGroup.Animations.Aggregate(0, (length, anim) => Math.Max(length, anim.FrameEnd));
 
         public static Rectangle GetVisibilityRectangleFromAnimation(
-            this Sequence sequence, int animationIndex)
+            this Sequence sequence, Sequence.Animation animation)
         {
-            var animation = sequence.Animations[animationIndex];
-            var rect = sequence.GetVisibilityRectangleForFrameGroup(animation.FrameGroupIndex);
+            var rect = sequence.GetVisibilityRectangleForFrameGroup(animation.SpriteGroupIndex);
 
-            var minXPos = animation.Xa0;
-            int maxXPos = animation.Xa1;
-            var minYPos = animation.Ya0;
-            int maxYPos = animation.Ya1;
+            var minXPos = animation.TranslateXStart;
+            int maxXPos = animation.TranslateXEnd;
+            var minYPos = animation.TranslateYStart;
+            int maxYPos = animation.TranslateYEnd;
             var minXScale = animation.ScaleStart * animation.ScaleXStart;
             var maxXScale = animation.ScaleEnd * animation.ScaleXEnd;
             var minYScale = animation.ScaleStart * animation.ScaleYStart;
@@ -73,21 +40,58 @@ namespace OpenKh.Kh2.Extensions
             return minRect.Union(maxRect);
         }
 
-        public static int GetFrameLengthFromAnimation(
-            this Sequence sequence, int animationIndex) =>
-            sequence.Animations[animationIndex].FrameEnd;
+        public static Rectangle GetVisibilityRectangleForFrameGroup(this Sequence sequence, int frameGroupIndex) =>
+            sequence.SpriteGroups[frameGroupIndex].GetVisibilityRectangleForFrameGroup();
 
-        public static Rectangle GetVisibilityRectangleForFrameGroup(
-            this Sequence sequence, int frameGroupIndex) =>
-            sequence.AggregateFrameGroup<Rectangle>(frameGroupIndex, (x, i) =>
-                x.Union(sequence.FramesEx[i].GetVisibilityRectangle()));
-
+        public static Rectangle GetVisibilityRectangleForFrameGroup(this List<Sequence.SpritePart> spriteGroup) =>
+            spriteGroup.Aggregate(new Rectangle(), (rect, x) => rect.Union(x.GetVisibilityRectangle()));
 
         public static Rectangle GetVisibilityRectangle(
-            this Sequence.FrameEx frameEx) => Rectangle.FromLTRB(
+            this Sequence.SpritePart frameEx) => Rectangle.FromLTRB(
                 frameEx.Left,
                 frameEx.Top,
                 frameEx.Right,
                 frameEx.Bottom);
+
+        public static Sequence.Animation Clone(this Sequence.Animation anim) => new Sequence.Animation
+        {
+            Flags = anim.Flags,
+            SpriteGroupIndex = anim.SpriteGroupIndex,
+            FrameStart = anim.FrameStart,
+            FrameEnd = anim.FrameEnd,
+            TranslateXStart = anim.TranslateXStart,
+            TranslateXEnd = anim.TranslateXEnd,
+            TranslateYStart = anim.TranslateYStart,
+            TranslateYEnd = anim.TranslateYEnd,
+            PivotXStart = anim.PivotXStart,
+            PivotXEnd = anim.PivotXEnd,
+            PivotYStart = anim.PivotYStart,
+            PivotYEnd = anim.PivotYEnd,
+            RotationXStart = anim.RotationXStart,
+            RotationXEnd = anim.RotationXEnd,
+            RotationYStart = anim.RotationYStart,
+            RotationYEnd = anim.RotationYEnd,
+            RotationZStart = anim.RotationZStart,
+            RotationZEnd = anim.RotationZEnd,
+            ScaleStart = anim.ScaleStart,
+            ScaleEnd = anim.ScaleEnd,
+            ScaleXStart = anim.ScaleXStart,
+            ScaleXEnd = anim.ScaleXEnd,
+            ScaleYStart = anim.ScaleYStart,
+            ScaleYEnd = anim.ScaleYEnd,
+            Unknown60 = anim.Unknown60,
+            Unknown64 = anim.Unknown64,
+            Unknown68 = anim.Unknown68,
+            Unknown6c = anim.Unknown6c,
+            BounceXStart = anim.BounceXStart,
+            BounceXEnd = anim.BounceXEnd,
+            BounceYStart = anim.BounceYStart,
+            BounceYEnd = anim.BounceYEnd,
+            BounceXSpeed = anim.BounceXSpeed,
+            BounceYSpeed = anim.BounceYSpeed,
+            ColorBlend = anim.ColorBlend,
+            ColorStart = anim.ColorStart,
+            ColorEnd = anim.ColorEnd,
+        };
     }
 }

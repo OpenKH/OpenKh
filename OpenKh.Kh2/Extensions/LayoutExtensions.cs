@@ -1,54 +1,45 @@
 ﻿using OpenKh.Common;
 using System;
 using System.Drawing;
+using System.Linq;
 
 namespace OpenKh.Kh2.Extensions
 {
     public static class LayoutExtensions
     {
-        public static T AggregateSequenceGroup<T>(
-            this Layout layout,
-            int sequenceGroupIndex,
-            Func<T, int, T> aggregator,
-            T initialValue = default)
+        public static Rectangle GetVisibilityRectangleFromSequenceGroup(
+            this Layout layout, int sequenceGroupIndex)
         {
-            var value = initialValue;
-            var animGroup = layout.SequenceGroups[sequenceGroupIndex];
-
-            for (var i = 0; i < animGroup.L1Count; i++)
-                value = aggregator(value, animGroup.L1Index + i);
-
-            return value;
+            var sgi = layout.SequenceGroups[sequenceGroupIndex];
+            return sgi.Sequences.Aggregate(new Rectangle(),
+                (rect, x) => rect.Union(layout.GetVisibilityRectangleFromSequenceProperty(x)));
         }
 
-        public static Rectangle GetVisibilityRectangleFromSequenceGroup(
-            this Layout layout, int sequenceGroupIndex) =>
-            layout.AggregateSequenceGroup<Rectangle>(sequenceGroupIndex, (x, i) =>
-                x.Union(layout.GetVisibilityRectangleFromSequenceProperty(i)));
-
         public static int GetFrameLengthFromSequenceGroup(
-            this Layout layout, int sequenceGroupIndex) =>
-            layout.AggregateSequenceGroup<int>(sequenceGroupIndex, (x, i) =>
-                Math.Max(x, layout.GetFrameLengthFromSequenceProperty(i)));
+            this Layout layout, int sequenceGroupIndex)
+        {
+            var sgi = layout.SequenceGroups[sequenceGroupIndex];
+            return sgi.Sequences.Aggregate(0,
+                (len, x) => Math.Max(len, layout.GetFrameLengthFromSequenceProperty(x)));
+        }
 
         public static Rectangle GetVisibilityRectangleFromSequenceProperty(
-            this Layout layout, int sequencePropertyIndex)
+            this Layout layout, Layout.SequenceProperty sequenceProperty)
         {
-            var sequenceProperty = layout.SequenceProperties[sequencePropertyIndex];
             var sequence = layout.SequenceItems[sequenceProperty.SequenceIndex];
+            var animGroup = sequence.AnimationGroups[sequenceProperty.AnimationGroup];
 
-            return sequence.GetVisibilityRectangleFromAnimationGroup(sequenceProperty.AnimationGroup)
+            return sequence.GetVisibilityRectangleFromAnimationGroup(animGroup)
                 .Traslate(sequenceProperty.PositionX, sequenceProperty.PositionY);
         }
 
         public static int GetFrameLengthFromSequenceProperty(
-            this Layout layout, int sequencePropertyIndex)
+            this Layout layout, Layout.SequenceProperty sequenceProperty)
         {
-            var sequenceProperty = layout.SequenceProperties[sequencePropertyIndex];
             var sequence = layout.SequenceItems[sequenceProperty.SequenceIndex];
+            var animGroup = sequence.AnimationGroups[sequenceProperty.AnimationGroup];
 
-            return sequence.GetFrameLengthFromAnimationGroup(sequenceProperty.AnimationGroup) +
-                sequenceProperty.ShowAtFrame;
+            return animGroup.GetFrameLength() + sequenceProperty.ShowAtFrame;
         }
     }
 }

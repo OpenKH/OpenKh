@@ -19,6 +19,8 @@
   * [IMZ](file/type/image.md#imgz)
   * [FAC](file/type/image.md#fac)
   * [MDLX](file/type/mdlx.md)
+  * [2LD](file/type/2ld.md)
+  * [2DD](file/type/2ld.md#2dd)
   
 * Other files
 
