@@ -82,6 +82,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             int FrameMax { get;  }
             bool IsPaused { get; set; }
             int ItemCount { get; }
+            bool ForceLoop { get; set; }
 
             void BeginEdit(int index);
             void EndEdit();
@@ -326,10 +327,15 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                 if (sequenceOptions.HasFlag(SEQUENCER_OPTIONS.SEQUENCER_ADD))
                 {
                     const uint PauseColor = 0xFFf1c40f;
+                    const uint LoopColor = 0xFF0fc4f1;
 
                     var nextButtonPosition = new Vector2(canvas_pos.X + legendWidth - ItemHeight, canvas_pos.Y + 2);
                     if (SequencerButton(draw_list, nextButtonPosition, 'P', sequence.IsPaused, PauseColor, sequence.IsPaused ? "Resume" : "Pause") && io.MouseReleased[0])
                         sequence.IsPaused = !sequence.IsPaused;
+
+                    nextButtonPosition.X -= ButtonDistance;
+                    if (SequencerButton(draw_list, nextButtonPosition, 'L', false, LoopColor, "Force loop") && io.MouseReleased[0])
+                        sequence.ForceLoop = !sequence.ForceLoop;
 
                     nextButtonPosition.X -= ButtonDistance;
                     if (SequencerButton(draw_list, nextButtonPosition, 'A', false, ColorWhite, "Add new animation") && io.MouseReleased[0])

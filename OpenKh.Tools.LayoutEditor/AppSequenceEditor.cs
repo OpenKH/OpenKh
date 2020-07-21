@@ -177,7 +177,11 @@ namespace OpenKh.Tools.LayoutEditor
             }
 
             if (!_sequencer.IsPaused)
+            {
                 _animationFrameCurrent++;
+                if (_sequencer.ForceLoop && _animationFrameCurrent > SelectedAnimationGroup.GetFrameLength())
+                    _animationFrameCurrent = 0;
+            }
             return true;
         }
 

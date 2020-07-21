@@ -1,4 +1,4 @@
-using ImGuiNET;
+﻿using ImGuiNET;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using System;
@@ -61,6 +61,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         public int FrameMax { get; set; }
         public int ItemCount => _animationList.Count;
         public bool IsPaused { get; set; }
+        public bool ForceLoop { get; set; }
 
         public int GetItemTypeCount() => ColorType.Length;
         public string GetItemTypeName(int typeIndex) => $"type {typeIndex}";
