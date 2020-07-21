@@ -19,6 +19,11 @@ namespace OpenKh.Game.States
         private const int MainMenuBackOption = 3;
         private const int MainMenuMaxOptionCount = 4;
 
+        private const int MainMenuSequence = 0;
+        private const int NewGameTitle = 22;
+        private const int NewGameWindow = 28;
+        private const int NewGameOption = 15;
+
         private class TitleLayout
         {
             public int FadeIn { get; set; }
@@ -106,6 +111,94 @@ namespace OpenKh.Game.States
             HasBack = true,
         };
 
+        private class AnimatedSequenceRenderer
+        {
+            private readonly SequenceRenderer _renderer;
+            private readonly int _animStart;
+            private readonly int _animLoop;
+            private readonly int _animEnd;
+            private int _anim;
+            private int _frame;
+            private bool _isRunning;
+            public bool IsEnd { get; set; }
+
+            public AnimatedSequenceRenderer(SequenceRenderer renderer, int anim) :
+                this(renderer, anim, anim + 1, anim + 2)
+            { }
+
+            public AnimatedSequenceRenderer(SequenceRenderer renderer,
+                int animStart, int animLoop, int animEnd)
+            {
+                _renderer = renderer;
+                _animStart = animStart;
+                _animLoop = animLoop;
+                _animEnd = animEnd;
+                IsEnd = true;
+            }
+
+            public void Update(double deltaTime)
+            {
+                _frame++;
+            }
+
+            public void Draw(float x, float y)
+            {
+                if (IsEnd)
+                    return;
+
+                if (!_renderer.Draw(_anim, _frame, x, y))
+                {
+                    if (_isRunning)
+                    {
+                        _anim = _animLoop;
+                        _frame = 0;
+                    }
+                    else
+                        IsEnd = true;
+                }
+            }
+
+            public void Begin()
+            {
+                _anim = _animStart;
+                _isRunning = true;
+                IsEnd = false;
+                _frame = 0;
+            }
+
+            public void Skip()
+            {
+                if (_isRunning)
+                {
+                    if (_anim == _animStart)
+                    {
+                        _anim = _animLoop;
+                        _frame = 0;
+                    }
+                }
+                else
+                    IsEnd = true;
+            }
+
+            public void End()
+            {
+                _anim = _animEnd;
+                _isRunning = false;
+                IsEnd = false;
+                _frame = 0;
+            }
+        }
+
+        private const int DifficultyCount = 4;
+        private static readonly ushort[] DifficultyTitle = new ushort[DifficultyCount]
+        {
+            0x4331, 0x4332, 0x4333, 0x4e33
+        };
+        private static readonly ushort[] DifficultyDescription = new ushort[DifficultyCount]
+        {
+            0x4334, 0x4335, 0x4336, 0x4e34
+        };
+
         private Kernel _kernel;
         private ArchiveManager _archiveManager;
         private InputManager _inputManager;
@@ -115,14 +208,30 @@ namespace OpenKh.Game.States
         private LayoutRenderer layoutRendererFg;
         private LayoutRenderer layoutRendererBg;
         private LayoutRenderer layoutRendererTheater;
+        private SequenceRenderer _sequenceRendererMenu;
+        private Kh2MessageRenderer _messageRenderer;
+        private DrawContext _messageDrawContext;
         private Layout _titleLayout;
         private Layout _theaterLayout;
-        private Dictionary<string, IEnumerable<ISpriteTexture>> cachedSurfaces;
+        private Dictionary<string, IEnumerable<ISpriteTexture>> cachedSurfaces = new Dictionary<string, IEnumerable<ISpriteTexture>>();
+        private Dictionary<ushort, byte[]> _cachedText = new Dictionary<ushort, byte[]>();
 
         private TitleLayout _titleLayoutDesc;
-        private bool _isTheaterModeUnlocked;
         private int _optionSelected;
+
+        private bool _isInNewGameMenu;
+        private int _subMenuOptionSelected;
+
+        private bool _isTheaterModeUnlocked;
         private bool _isInTheaterMenu;
+
+        private AnimatedSequenceRenderer _animMenuBg;
+        private AnimatedSequenceRenderer _animMenuWindow;
+        private AnimatedSequenceRenderer _animMenuOption1;
+        private AnimatedSequenceRenderer _animMenuOption2;
+        private AnimatedSequenceRenderer _animMenuOption3;
+        private AnimatedSequenceRenderer _animMenuOption4;
+        private AnimatedSequenceRenderer _animMenuOptionSelected;
 
         private bool IsIntro
         {
@@ -154,8 +263,6 @@ namespace OpenKh.Game.States
                 Global.ResolutionHeight,
                 1.0f);
 
-            cachedSurfaces = new Dictionary<string, IEnumerable<ISpriteTexture>>();
-
             if (_kernel.IsReMix)
                 _archiveManager.LoadArchive($"menu/{_kernel.Region}/titlejf.2ld");
             _archiveManager.LoadArchive($"menu/{_kernel.Region}/title.2ld");
@@ -179,12 +286,17 @@ namespace OpenKh.Game.States
             else
                 _titleLayoutDesc = VanillaTitleLayout;
 
+            var messageContext = _kernel.SystemMessageContext;
+            _messageRenderer = new Kh2MessageRenderer(drawing, messageContext);
+            _messageDrawContext = new DrawContext();
+
             IEnumerable<ISpriteTexture> images;
             (_titleLayout, images) = GetLayoutResources("titl", "titl");
 
             layoutRendererBg = new LayoutRenderer(_titleLayout, drawing, images);
             layoutRendererFg = new LayoutRenderer(_titleLayout, drawing, images);
             layoutRendererBg.SelectedSequenceGroupIndex = _titleLayoutDesc.Copyright;
+            _sequenceRendererMenu = new SequenceRenderer(_titleLayout.SequenceItems[MainMenuSequence], drawing, images.First());
 
             Log.Info($"Theater={_titleLayoutDesc.HasTheater}");
             if (_titleLayoutDesc.HasTheater)
@@ -192,6 +304,14 @@ namespace OpenKh.Game.States
                 (_theaterLayout, images) = GetLayoutResources("even", "even");
                 layoutRendererTheater = new LayoutRenderer(_theaterLayout, drawing, images);
             }
+
+            _animMenuBg = new AnimatedSequenceRenderer(_sequenceRendererMenu, NewGameTitle);
+            _animMenuWindow = new AnimatedSequenceRenderer(_sequenceRendererMenu, NewGameWindow);
+            _animMenuOption1 = new AnimatedSequenceRenderer(_sequenceRendererMenu, NewGameOption);
+            _animMenuOption2 = new AnimatedSequenceRenderer(_sequenceRendererMenu, NewGameOption);
+            _animMenuOption3 = new AnimatedSequenceRenderer(_sequenceRendererMenu, NewGameOption);
+            _animMenuOption4 = new AnimatedSequenceRenderer(_sequenceRendererMenu, NewGameOption);
+            _animMenuOptionSelected = new AnimatedSequenceRenderer(_sequenceRendererMenu, 15, 14, 14);
 
             SetOption(0);
         }
@@ -239,11 +359,22 @@ namespace OpenKh.Game.States
             }
             else
             {
-                if (_isInTheaterMenu == false)
-                    ProcessInputMainMenu();
-                else
+                if (_isInNewGameMenu)
+                    ProcessNewGameMenu();
+                else if (_isInTheaterMenu)
                     ProcessInputTheaterMenu();
+                else
+                    ProcessInputMainMenu();
             }
+
+            var deltaTime = deltaTimes.DeltaTime;
+            _animMenuBg.Update(deltaTime);
+            _animMenuWindow.Update(deltaTime);
+            _animMenuOption1.Update(deltaTime);
+            _animMenuOption2.Update(deltaTime);
+            _animMenuOption3.Update(deltaTime);
+            _animMenuOption4.Update(deltaTime);
+            _animMenuOptionSelected.Update(deltaTime);
         }
 
         public void Draw(DeltaTimes deltaTimes)
@@ -255,8 +386,34 @@ namespace OpenKh.Game.States
 
             if (_isInTheaterMenu)
                 layoutRendererTheater.Draw();
+            
+            if (_isInNewGameMenu) DrawNewGameMenu();
 
             drawing.Flush();
+        }
+
+        private void DrawNewGameMenu()
+        {
+            const int OptionY = 120;
+            const int OptionHDistance = 30;
+
+            if (_animMenuBg.IsEnd)
+                _isInNewGameMenu = false;
+
+            _animMenuBg.Draw(0, 0);
+            Print(0x432e, 0, 32);
+            _animMenuWindow.Draw(0, 0);
+            _sequenceRendererMenu.Draw(25, 0, 64, 180);
+            Print(0x4330, 0, 82);
+
+            for (var i = 0; i < DifficultyCount; i++)
+            {
+                _animMenuOption1.Draw(256, OptionY + OptionHDistance * i);
+                Print(DifficultyTitle[i], 0, OptionY + OptionHDistance * i);
+            }
+
+            _animMenuOptionSelected.Draw(256, OptionY + OptionHDistance * _subMenuOptionSelected);
+            Print(DifficultyDescription[_subMenuOptionSelected], 0, 256);
         }
 
         private void ProcessInputMainMenu()
@@ -283,13 +440,20 @@ namespace OpenKh.Game.States
                 if (currentOption >= MainMenuMaxOptionCount)
                     currentOption = 0;
             }
-            else if (_inputManager.IsCircle || _inputManager.IsCross)
+            else if (_inputManager.IsCircle)
             {
                 switch (currentOption)
                 {
                     case MainMenuNewGameOption:
-                        layoutRendererBg.SelectedSequenceGroupIndex = _titleLayoutDesc.NewGame;
-                        layoutRendererBg.FrameIndex = 0;
+                        _animMenuBg.Begin();
+                        _animMenuWindow.Begin();
+                        _animMenuOption1.Begin();
+                        _animMenuOption2.Begin();
+                        _animMenuOption3.Begin();
+                        _animMenuOption4.Begin();
+                        _animMenuOptionSelected.Begin();
+                        _isInNewGameMenu = true;
+                        _subMenuOptionSelected = 1;
                         break;
                     case MainMenuLoadOption:
                         SetStateToGameplay();
@@ -305,6 +469,57 @@ namespace OpenKh.Game.States
 
             if (currentOption != _optionSelected)
                 SetOption(currentOption);
+        }
+
+        private void ProcessNewGameMenu()
+        {
+            bool isOptionChanged = false;
+            if (_inputManager.IsCross)
+            {
+                _animMenuBg.End();
+                _animMenuWindow.End();
+                _animMenuOption1.End();
+                _animMenuOption2.End();
+                _animMenuOption3.End();
+                _animMenuOption4.End();
+                _animMenuOptionSelected.End();
+            }
+            else if (_inputManager.IsCircle)
+            {
+                _animMenuBg.End();
+                _animMenuWindow.End();
+                _animMenuOption1.End();
+                _animMenuOption2.End();
+                _animMenuOption3.End();
+                _animMenuOption4.End();
+                _animMenuOptionSelected.End();
+                _isInNewGameMenu = false;
+
+                layoutRendererBg.SelectedSequenceGroupIndex = _titleLayoutDesc.NewGame;
+                layoutRendererBg.FrameIndex = 0;
+            }
+            else if (_inputManager.IsDebugUp)
+            {
+                _subMenuOptionSelected--;
+                if (_subMenuOptionSelected < 0)
+                    _subMenuOptionSelected = DifficultyCount - 1;
+                isOptionChanged = true;
+            }
+            else if (_inputManager.IsDebugDown)
+            {
+                _subMenuOptionSelected = (_subMenuOptionSelected + 1) % DifficultyCount;
+                isOptionChanged = true;
+            }
+
+            if (isOptionChanged)
+            {
+                _animMenuWindow.Skip();
+                _animMenuOption1.Skip();
+                _animMenuOption2.Skip();
+                _animMenuOption3.Skip();
+                _animMenuOption4.Skip();
+                _animMenuOptionSelected.Skip();
+            }
         }
 
         private void ProcessInputTheaterMenu()
@@ -388,6 +603,18 @@ namespace OpenKh.Game.States
                     ?.Images?.Select(x => drawing.CreateSpriteTexture(x)).ToList();
 
             return (layout, images);
+        }
+
+        private void Print(ushort messageId, float x, float y)
+        {
+            if (!_cachedText.TryGetValue(messageId, out var data))
+                _cachedText[messageId] = data = _kernel.MessageProvider.GetMessage(messageId);
+
+            _messageDrawContext.Reset();
+            _messageDrawContext.x = x;
+            _messageDrawContext.y = y;
+            _messageDrawContext.Scale = 0.8f;
+            _messageRenderer.Draw(_messageDrawContext, data);
         }
 
         public void DebugUpdate(IDebug debug)
