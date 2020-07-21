@@ -21,6 +21,7 @@
   * [MDLX](file/type/mdlx.md)
   * [2LD](file/type/2ld.md)
   * [2DD](file/type/2ld.md#2dd)
+  * [COCT](file/type/coct.md)
   
 * Other files
 
