@@ -23,6 +23,31 @@
         WorldThatNeverWas
     }
 
+    public enum JiminyWorld
+    {
+        TwilightTown,
+        HollowBastion,
+        BeastCastle,
+        OlympusColiseum,
+        Agrabah,
+        LandOfDragons,
+        HundredAcreWood,
+        PrideLands,
+        Atlantica,
+        DisneyCastle,
+        TimelessRiver,
+        HalloweenTown,
+        PortRoyal,
+        SpaceParanoids,
+        WorldThatNeverWas,
+        Collection,
+
+        //used in the character section
+        Other = 0x10,
+        Heartless = 0x11,
+        Nobody = 0x12,
+    }
+
     public static class Constants
     {
         public const int FontEuropeanSystemWidth = 18;
@@ -41,6 +66,7 @@
 
         public const int PaletteCount = 9;
         public const int WorldCount = (int)World.WorldThatNeverWas + 1;
+        public const int JiminyWorldCount = (int)JiminyWorld.Nobody + 1;
 
         public static readonly string[] WorldIds = new string[WorldCount]
         {

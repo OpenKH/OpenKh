@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - 03system.bin
+# [Kingdom Hearts II](../../index.md) - 03system.bin
 
 This is an essential file to boot the game engine.
 
@@ -12,7 +12,7 @@ This is a table that contains the font palette for each world.
 
 The FTST is a binary file that contains N amount of palettes (9 for FM version), where every palette contain an unique ID (or key) and exactly 19 different colors.
 
-Each color correspond to the [world index](../../worlds) and it is loaded based on the current world.
+Each color correspond to the [world index](../../worlds.md) and it is loaded based on the current world.
 
 ## ITEM
 
@@ -106,7 +106,7 @@ The treasure table describes what item cam be retrieved from a specific chest or
 | 0      | uint16 | ID
 | 2      | uint16 | [Item ID](#item-descriptor)
 | 4      | uint8  | [Type](#treasure-type)
-| 5      | uint8  | [World ID](../../worlds)
+| 5      | uint8  | [World ID](../../worlds.md)
 | 6      | uint8  | Room index
 | 7      | uint8  | Room chest index
 | 8      | uint16 | Event ID

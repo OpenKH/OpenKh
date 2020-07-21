@@ -1,4 +1,6 @@
-﻿namespace OpenKh.Engine.Maths
+﻿using System.Numerics;
+
+namespace OpenKh.Engine.Maths
 {
     public struct Matrix
     {

@@ -13,7 +13,6 @@ namespace OpenKh.Game
 {
     public class OpenKhGame : Microsoft.Xna.Framework.Game, IStateChange
     {
-        private const string DefaultContentPath = ".";
         private GraphicsDeviceManager graphics;
 
         private readonly IDataContent _dataContent;
@@ -22,6 +21,7 @@ namespace OpenKh.Game
         private readonly InputManager inputManager;
         private readonly DebugOverlay _debugOverlay;
         private IState state;
+        private bool _isResolutionChanged;
 
         public int State
         {
@@ -53,9 +53,9 @@ namespace OpenKh.Game
 
         public OpenKhGame(string[] args)
         {
-            var contentPath = args.FirstOrDefault() ?? DefaultContentPath;
+            var contentPath = args.FirstOrDefault() ?? Config.DataPath;
 
-            _dataContent = CreateDataContent(contentPath, "KH2.IDX", "KH2.IMG");
+            _dataContent = CreateDataContent(contentPath, Config.IdxFilePath, Config.ImgFilePath);
             if (Kernel.IsReMixFileHasHdAssetHeader(_dataContent, "fm"))
             {
                 Log.Info("ReMIX files with HD asset header detected");
@@ -65,16 +65,16 @@ namespace OpenKh.Game
             _dataContent = new SafeDataContent(_dataContent);
 
             _kernel = new Kernel(_dataContent);
+            var resolutionWidth = GetResolutionWidth();
+            var resolutionHeight = GetResolutionHeight();
 
-            var resolutionWidth = _kernel.IsReMix ?
-                Global.ResolutionRemixWidth :
-                Global.ResolutionWidth;
-            Log.Info($"Internal game resolution set to {resolutionWidth}x{Global.ResolutionHeight}");
+            Log.Info($"Internal game resolution set to {resolutionWidth}x{resolutionHeight}");
 
             graphics = new GraphicsDeviceManager(this)
             {
-                PreferredBackBufferWidth = (int)Math.Round(resolutionWidth * Global.ResolutionBoostRatio),
-                PreferredBackBufferHeight = (int)Math.Round(Global.ResolutionHeight * Global.ResolutionBoostRatio)
+                PreferredBackBufferWidth = (int)Math.Round(resolutionWidth * Config.ResolutionBoost),
+                PreferredBackBufferHeight = (int)Math.Round(resolutionHeight * Config.ResolutionBoost),
+                IsFullScreen = Config.IsFullScreen,
             };
 
             Content.RootDirectory = "Content";
@@ -83,6 +83,26 @@ namespace OpenKh.Game
             archiveManager = new ArchiveManager(_dataContent);
             inputManager = new InputManager();
             _debugOverlay = new DebugOverlay(this);
+
+            Config.OnConfigurationChange += () =>
+            {
+                var resolutionWidth = GetResolutionWidth();
+                var resolutionHeight = GetResolutionHeight();
+
+                var backBufferWidth = (int)Math.Round(resolutionWidth * Config.ResolutionBoost);
+                var backBufferHeight = (int)Math.Round(resolutionHeight * Config.ResolutionBoost);
+
+                if (graphics.PreferredBackBufferWidth != backBufferWidth ||
+                    graphics.PreferredBackBufferHeight != backBufferHeight ||
+                    graphics.IsFullScreen != Config.IsFullScreen)
+                {
+                    graphics.PreferredBackBufferWidth = backBufferWidth;
+                    graphics.PreferredBackBufferHeight = backBufferHeight;
+                    graphics.IsFullScreen = Config.IsFullScreen;
+                    _isResolutionChanged = true;
+                    Log.Info($"Internal game resolution set to {resolutionWidth}x{resolutionHeight}");
+                }
+            };
         }
 
         protected override void Initialize()
@@ -102,25 +122,33 @@ namespace OpenKh.Game
 
         protected override void Update(GameTime gameTime)
         {
-            inputManager.Update();
+            inputManager.Update(gameTime);
             if (inputManager.IsExit)
                 Exit();
 
             var deltaTimes = GetDeltaTimes(gameTime);
 
-            _debugOverlay.Update(deltaTimes);
+            if (Config.DebugMode)
+                _debugOverlay.Update(deltaTimes);
             state?.Update(deltaTimes);
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
+            if (_isResolutionChanged)
+            {
+                graphics.ApplyChanges();
+                _isResolutionChanged = false;
+            }
+
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
             var deltaTimes = GetDeltaTimes(gameTime);
 
             state?.Draw(deltaTimes);
-            _debugOverlay.Draw(deltaTimes);
+            if (Config.DebugMode)
+                _debugOverlay.Draw(deltaTimes);
             base.Draw(gameTime);
         }
 
@@ -142,19 +170,22 @@ namespace OpenKh.Game
         {
             return new DeltaTimes
             {
-                DeltaTime = 1.0 / 60.0
+                DeltaTime = 1.0 / 60.0 * Config.GameSpeed
             };
         }
 
         private static IDataContent CreateDataContent(string basePath, string idxFileName, string imgFileName)
         {
             Log.Info($"Base directory is {basePath}");
-            if (File.Exists(idxFileName) && File.Exists(imgFileName))
-            {
-                Log.Info($"{idxFileName} and {imgFileName} has been found");
 
-                var imgStream = File.OpenRead(imgFileName);
-                var idxDataContent = File.OpenRead(idxFileName)
+            var idxFullPath = Path.Combine(basePath, idxFileName);
+            var imgFullPath = Path.Combine(basePath, imgFileName);
+            if (File.Exists(idxFullPath) && File.Exists(imgFullPath))
+            {
+                Log.Info($"{idxFullPath} and {imgFullPath} has been found");
+
+                var imgStream = File.OpenRead(imgFullPath);
+                var idxDataContent = File.OpenRead(idxFullPath)
                     .Using(stream => new IdxDataContent(stream, imgStream));
                 return new MultipleDataContent(
                     new StandardDataContent(basePath),
@@ -164,9 +195,25 @@ namespace OpenKh.Game
             }
             else
             {
-                Log.Info($"No {idxFileName} or {imgFileName}, loading extracted files");
+                Log.Info($"No {idxFullPath} or {imgFullPath}, loading extracted files");
                 return new StandardDataContent(basePath);
             }
+        }
+
+        private static int GetResolutionHeight()
+        {
+            var resolutionHeight = Config.ResolutionHeight;
+            if (resolutionHeight == 0)
+                resolutionHeight = Global.ResolutionHeight;
+            return resolutionHeight;
+        }
+
+        private int GetResolutionWidth()
+        {
+            var resolutionWidth = Config.ResolutionWidth;
+            if (resolutionWidth == 0)
+                resolutionWidth = _kernel.IsReMix ? Global.ResolutionRemixWidth : Global.ResolutionWidth;
+            return resolutionWidth;
         }
     }
 }

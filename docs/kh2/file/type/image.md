@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - Image
+# [Kingdom Hearts II](../../index.md) - Image
 
 The game engine uses a custom texture format for all the 2D images to render.
 

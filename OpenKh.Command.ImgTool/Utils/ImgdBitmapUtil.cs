@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using nQuant;
 using OpenKh.Common;
-using OpenKh.Imaging;
 using OpenKh.Kh2;
 
 namespace OpenKh.Command.ImgTool.Utils
@@ -224,7 +219,7 @@ namespace OpenKh.Command.ImgTool.Utils
                             );
                         }
 
-                        var destBits = new byte[src.Width * src.Height];
+                        var destBits = new byte[(src.Width * src.Height + 1) / 2];
                         var clut = new byte[4 * maxColors];
 
                         for (int index = 0; index < newPalette.MostUsedPixels.Length; index++)
@@ -247,13 +242,13 @@ namespace OpenKh.Command.ImgTool.Utils
                                 var newPixel = newPalette.FindNearest(src.Pixels[srcPointer++]) & 15;
                                 if (0 == (x & 1))
                                 {
-                                    // hi byte
-                                    destBits[destPointer] = (byte)(newPixel << 4);
+                                    // first pixel: lo byte
+                                    destBits[destPointer] = (byte)(newPixel);
                                 }
                                 else
                                 {
-                                    // lo byte
-                                    destBits[destPointer++] |= (byte)(newPixel);
+                                    // second pixel: hi byte
+                                    destBits[destPointer++] |= (byte)(newPixel << 4);
                                 }
                             }
                         }

@@ -90,7 +90,7 @@ namespace OpenKh.Kh2
             [Data] public float X { get; set; }
             [Data] public float Y { get; set; }
             [Data] public float Z { get; set; }
-            [Data] public float W { get; set; }
+            [Data] public float W { get; set; } = 1;
 
             public override string ToString() =>
                 $"V({X}, {Y}, {Z}, {W})";

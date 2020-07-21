@@ -31,9 +31,6 @@ namespace OpenKh.Kh2
             var bpp = is8bit ? 8 : 4;
             _data = reader.ReadBytes(width * height * bpp / 8);
 
-            if (is8bit == false)
-                _data = SwapBitOrder(_data);
-
             // If we did not reached the end of the stream, then it does mean that there is a palette
             if (stream.Position < stream.Length)
             {

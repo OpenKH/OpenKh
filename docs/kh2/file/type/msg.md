@@ -1,8 +1,8 @@
-# [Kingdom Hearts II](../../index) - MSG (Message)
+# [Kingdom Hearts II](../../index.md) - MSG (Message)
 
 Store localized text into a key-value pair, where the key is the Message ID and the value is the text itself.
 
-A MSG is a [BAR](bar) file always contains a binary file, representing the [MSG](#msg-structure) itself and a `md_m`, which is an [IMGD](imgd) that contains the HUD for that specific world.
+A MSG is a [BAR](bar.md) file always contains a binary file, representing the [MSG](#msg-structure) itself and a `md_m`, which is an [IMGD](image.md#imgd) that contains the HUD for that specific world.
 
 ## MSG Structure
 

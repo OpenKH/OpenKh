@@ -12,6 +12,9 @@
 First version of the game
 
 * [CUSA11060](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA11060_00/4/f_b9b1ac26b93406ae5f5df44dc7dd3cba4df880a64cbb5084d9266bcd94f34fab/f/JP0082-CUSA11060_00-KINGDOMHEARTSX30.json)
+* [CUSA12025](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA12025_00/4/f_10855069c37587a40292438b0ef66bf6bbc9f89268ee981ec30916d67294b27c/f/EP0082-CUSA12025_00-KINGDOMHEARTSX30.json)
+* [CUSA12031](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA12031_00/4/f_0f2cfa901fb249f2aaed292129b5ed4b3d46d0cb742db5e0233414a91967fe35/f/UP0082-CUSA12031_00-KINGDOMHEARTSX30.json)
+* [CUSA15072](http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA15072_00/2/f_b6bc3ae6c32459f86339ac3e6206f1c6694c70e13ad0f90ba02132193eaf7bd8/f/HP0082-CUSA15072_00-KINGDOMHEARTSX30.json)
 
 ## Version 1.01
 
@@ -123,6 +126,7 @@ No public updates exists
 ## Version 1.10
 
 ### Changelog
+
 * After turning on EZ Codes (Battle Codes) and PRO Codes in the Premium Menu, the number of active codes will appear on-screen during play.
 * Various issues have been fixed.
 
@@ -143,7 +147,6 @@ No public updates exists
 ## Re:Mind DLC english voices
 
 * [CUSA11060](http://gs2.ww.prod.dl.playstation.net/gs2/acpkgo/prod/CUSA11060_00/13/f_718619081b1abeb73870057eacfb40858399207ee3d3f73c77c948cf93f38cc2/f/JP0082-CUSA11060_00-KHX30DLC00000003.json)
-
 
 ## Orchestra DLC
 

@@ -1,6 +1,6 @@
-# [Kingdom Hearts Birth By Sleep](index) - Font archive
+# [Kingdom Hearts Birth By Sleep](index.md) - Font archive
 
-At the path `arc/system/`, the two files `font.arc` (Japanese font) and `fonten.arc` (European font) can be found. Those files are nothing more than an [archive](arc) with all the information needed to render a character or a font image.
+At the path `arc/system/`, the two files `font.arc` (Japanese font) and `fonten.arc` (European font) can be found. Those files are nothing more than an [archive](arc.md) with all the information needed to render a character or a font image.
 
 ## Font types
 
@@ -15,7 +15,7 @@ The following font types can be found in both font archives:
 
 ## Character mapping
 
-Internally, the game engine uses UCS as encoding, meaning that all the Shift-JIS text is ingested and converted on-the-fly to 2-bytes for each character. Then it does a look-up to both [INF for FontIcon](#inf-fonticon-variant) and [COD](#cod) to match and print that specific character by searching it using the Character ID.
+Internally, the game engine uses UCS as encoding, meaning that all the Shift-JIS text is ingested and converted on-the-fly to 2-bytes for each character. Then it does a look-up to both [INF for FontIcon](#inf---fonticon-variant) and [COD](#cod) to match and print that specific character by searching it using the Character ID.
 
 Embedded in the executable, a hard-coded switch table is responsible to convert the characters from `0x21` (`'!'`) to `0x7E` (`~`) into a UCS character.
 

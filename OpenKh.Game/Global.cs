@@ -6,7 +6,5 @@
         public const int ResolutionHeight = 416;
         public const int ResolutionRemixWidth = 684;
         public const float ResolutionReMixRatio = 0.925f;
-
-        public const float ResolutionBoostRatio = 2;
     }
 }

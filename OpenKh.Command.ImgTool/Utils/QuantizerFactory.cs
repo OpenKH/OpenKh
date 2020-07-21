@@ -1,12 +1,10 @@
 ﻿using nQuant;
 using OpenKh.Command.ImgTool.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Text;
 
 namespace OpenKh.Command.ImgTool.Utils
 {

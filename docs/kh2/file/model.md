@@ -1,6 +1,6 @@
-# [Kingdom Hearts II](../index) - Models
+# [Kingdom Hearts II](../index.md) - Models
 
-Found inside [MDLX](type/mdlx) or MAP files as a [BAR](type/bar) type 4, it contains 3d meshes and texture pointers to render a full 3D model.
+Found inside [MDLX](type/mdlx.md) or MAP files as a [BAR](type/bar.md) type 4, it contains 3d meshes and texture pointers to render a full 3D model.
 
 There are two type of models, one for [objects](#object-model) and another one for [maps](#map-model). They comes with minor differences and they can be identified by their first byte in the header.
 

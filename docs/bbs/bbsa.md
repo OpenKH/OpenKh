@@ -1,4 +1,4 @@
-# [Kingdom Hearts Birth By Sleep](index) - Archive format
+# [Kingdom Hearts Birth By Sleep](index.md) - Archive format
 
 The game loads all the game files from Birth By Sleep Archive, in short `BBSA`.
 
@@ -6,7 +6,7 @@ All the BBSA are located in `PSP_GAME/USRDIR/` and they have the name of `BBS0.D
 
 Birth By Sleep comes with a Data Install option, where based on the level of installation it will copy `BBS1`, `BBS2` and `BBS3`. The files are stored in those archives in a way where `BBS1` contains the most used files, `BBS0` contains the common files loaded only once and `BBS4` just few PMF movies that is useless to store in a installation file.
 
-Since `BBS1`, `BBS2` and `BBS3` are copied to the PSP Memory Stick, those are encrypted to prevent modification. The encryption system used is [PDG](#pdg) and it is the one that PSP firmware provides to game developers.
+Since `BBS1`, `BBS2` and `BBS3` are copied to the PSP Memory Stick, those are encrypted to prevent modification. The encryption system used is [PDG](#pdg-keys) and it is the one that PSP firmware provides to game developers.
 
 ## BBSA format
 
@@ -44,7 +44,7 @@ A typical directory name for a partition is `arc/boss`.
 
 ### Partition file entry
 
-All the file names are stored without extension, but officially they have [`.arc`](arc) extension (source: Birth By Sleep remastered for PS3/PS4).
+All the file names are stored without extension, but officially they have [`.arc`](arc.md) extension (source: Birth By Sleep remastered for PS3/PS4).
 
 | Offset | Type  | Description
 |--------|-------|------------

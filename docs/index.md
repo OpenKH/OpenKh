@@ -6,6 +6,7 @@ Every contribution is more than welcome!
 
 Right now the documentation contains info about the following games:
 
+* [Kingdom Hearts I](kh1/index.md)
 * [Kingdom Hearts II](kh2/index.md)
 * [Kingdom Hearts Birth By Sleep](bbs/index.md)
 * [Kingdom Hearts III](kh3/index.md)
@@ -17,4 +18,4 @@ Right now the documentation contains info about the following games:
 * Common
     * [TM2 PlayStation 2 textures](common/tm2.md)
     * [PS4 HD assets](common/hdassets.md)
- * [Tools](tool/index)
+ * [Tools](tool/index.md)

@@ -50,11 +50,15 @@ There is a [guide](CONTRIBUTING.md) describing how to contact the team and contr
 
 ### License
 
-The entire content of the repository is protected by the GPLv3 license. Some of the key points of the license are:
+The entire content of the repository is protected by the Apache 2.0 license. Some of the key points of the license are:
 
 * You **can** copy, modify, and distribute the software.
-* You **must** include the license and copyright notice with each and every distribution.
 * You **can** use this software privately.
 * You **can** use this software for commercial purposes.
-* If you modify it, you **must** indicate changes made to the code.
-* Any modifications of this code base **ABSOLUTELY MUST** be distributed with the same license, GPLv3.
+* You **can** append to the "NOTICE" file, if said file exists in the main repository.
+* You **cannot** hold any contributor to the repository liable for damages.
+* You **cannot** change or otherwise modify any patent, trademark, and attribution notices from the source repository.
+* You **must** indicate changes made to the code, if any.
+* You **must** include the same NOTICE file in every distribution, if included within the original repository.
+* You **must** include the license and copyright notice with each and every distribution and fork.
+* Any modifications of this code base **ABSOLUTELY MUST** be distributed with the same license, Apache 2.0.

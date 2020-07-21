@@ -53,7 +53,7 @@ namespace OpenKh.Command.CoctChanger
             public string CoctOut { get; set; }
 
             [Option(CommandOptionType.SingleValue, Description = "bbox: minX,Y,Z,maxX,Y,Z (default: ...)", ShortName = "b", LongName = "bbox")]
-            public string BBox { get; set; } = "-18000,-1500,-18000,18000,500,18000";
+            public string BBox { get; set; } = "-3000,-100,-3000,3000,1500,3000";
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -69,6 +69,15 @@ namespace OpenKh.Command.CoctChanger
                 var maxX = bbox[3];
                 var maxY = bbox[4];
                 var maxZ = bbox[5];
+
+                // COCT and DOCT: model view (X,Y,Z) → (-X,-Y,-Z)
+
+                var invMinX = -maxX;
+                var invMinY = -maxY;
+                var invMinZ = -maxZ;
+                var invMaxX = -minX;
+                var invMaxY = -minY;
+                var invMaxZ = -minZ;
 
                 var ent1 = new Coct.Co1
                 {
@@ -93,7 +102,7 @@ namespace OpenKh.Command.CoctChanger
                     MaxZ = maxZ,
                     Collision3Start = 0,
                     Collision3End = 1,
-                    v10 = 0x0100,
+                    v10 = 0,
                     v12 = 0,
                 };
                 coct.Collision2.Add(ent2);
@@ -114,10 +123,10 @@ namespace OpenKh.Command.CoctChanger
                 coct.CollisionVertices.AddRange(
                     new Coct.Vector4[]
                     {
-                        new Coct.Vector4 { X = minX, Y = minY, Z = minZ, },
-                        new Coct.Vector4 { X = maxX, Y = minY, Z = minZ, },
-                        new Coct.Vector4 { X = maxX, Y = minY, Z = maxZ, },
-                        new Coct.Vector4 { X = minX, Y = minY, Z = maxZ, },
+                        new Coct.Vector4 { X = minX, Y = -minY, Z = minZ, W = 1, },
+                        new Coct.Vector4 { X = maxX, Y = -minY, Z = minZ, W = 1, },
+                        new Coct.Vector4 { X = maxX, Y = -minY, Z = maxZ, W = 1, },
+                        new Coct.Vector4 { X = minX, Y = -minY, Z = maxZ, W = 1, },
                     }
                 );
 
@@ -126,7 +135,7 @@ namespace OpenKh.Command.CoctChanger
                     X = 0,
                     Y = -1,
                     Z = 0,
-                    D = -minY,
+                    D = maxY - 10,
                 };
                 coct.Collision5.Add(ent5);
 
@@ -143,7 +152,7 @@ namespace OpenKh.Command.CoctChanger
 
                 var ent7 = new Coct.Co7
                 {
-                    Unknown = 0x000003F1,
+                    Unknown = 0x3f1,
                 };
                 coct.Collision7.Add(ent7);
 

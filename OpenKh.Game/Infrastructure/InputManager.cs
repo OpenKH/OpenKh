@@ -1,43 +1,51 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
+using OpenKh.Game.Infrastructure.Input;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenKh.Game.Infrastructure
 {
     public class InputManager
     {
-        private GamePadState pad;
-        private KeyboardState keyboard;
-        private KeyboardState prevKeyboard;
+        private List<IInputDevice> _devices;
 
-        public bool IsDebug => keyboard.IsKeyDown(Keys.Tab) && !prevKeyboard.IsKeyDown(Keys.Tab);
-        public bool IsShift => keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
-        public bool IsDebugRight => keyboard.IsKeyDown(Keys.Right) && !prevKeyboard.IsKeyDown(Keys.Right);
-        public bool IsDebugLeft => keyboard.IsKeyDown(Keys.Left) && !prevKeyboard.IsKeyDown(Keys.Left);
-        public bool IsDebugUp => keyboard.IsKeyDown(Keys.Up) && !prevKeyboard.IsKeyDown(Keys.Up);
-        public bool IsDebugDown => keyboard.IsKeyDown(Keys.Down) && !prevKeyboard.IsKeyDown(Keys.Down);
+        public bool IsDebug => _devices.Any(x => x.IsDebug);
+        public bool IsShift => _devices.Any(x => x.IsShift);
+        public bool IsDebugRight => _devices.Any(x => x.IsDebugRight);
+        public bool IsDebugLeft => _devices.Any(x => x.IsDebugLeft);
+        public bool IsDebugUp => _devices.Any(x => x.IsDebugUp);
+        public bool IsDebugDown => _devices.Any(x => x.IsDebugDown);
 
-        public bool IsExit => pad.Buttons.Back == ButtonState.Pressed || keyboard.IsKeyDown(Keys.Escape);
-        public bool IsUp => Up && !prevKeyboard.IsKeyDown(Keys.Up);
-        public bool IsDown => Down && !prevKeyboard.IsKeyDown(Keys.Down);
-        public bool IsLeft => Left && !prevKeyboard.IsKeyDown(Keys.Left);
-        public bool IsRight => Right && !prevKeyboard.IsKeyDown(Keys.Right);
-        public bool IsCircle => keyboard.IsKeyDown(Keys.K) && !prevKeyboard.IsKeyDown(Keys.K);
-        public bool IsCross => keyboard.IsKeyDown(Keys.L) && !prevKeyboard.IsKeyDown(Keys.L);
+        public bool IsExit => _devices.Any(x => x.IsExit);
+        public bool IsUp => _devices.Any(x => x.IsDPadUp);
+        public bool IsDown => _devices.Any(x => x.IsDPadDown);
+        public bool IsLeft => _devices.Any(x => x.IsDPadLeft);
+        public bool IsRight => _devices.Any(x => x.IsDPadRight);
+        public bool IsCircle => _devices.Any(x => x.IsCircle);
+        public bool IsCross => _devices.Any(x => x.IsCross);
 
-        public bool Up => keyboard.IsKeyDown(Keys.Up);
-        public bool Down => keyboard.IsKeyDown(Keys.Down);
-        public bool Left => keyboard.IsKeyDown(Keys.Left);
-        public bool Right => keyboard.IsKeyDown(Keys.Right);
-        public bool A => keyboard.IsKeyDown(Keys.A);
-        public bool D => keyboard.IsKeyDown(Keys.D);
-        public bool S => keyboard.IsKeyDown(Keys.S);
-        public bool W => keyboard.IsKeyDown(Keys.W);
+        public bool Up => _devices.Any(x => x.RightStickUp);
+        public bool Down => _devices.Any(x => x.RightStickDown);
+        public bool Left => _devices.Any(x => x.RightStickLeft);
+        public bool Right => _devices.Any(x => x.RightStickRight);
+        public bool W => _devices.Any(x => x.LeftStickUp);
+        public bool S => _devices.Any(x => x.LeftStickDown);
+        public bool A => _devices.Any(x => x.LeftStickLeft);
+        public bool D => _devices.Any(x => x.LeftStickRight);
 
-        public void Update()
+        public InputManager()
         {
-            pad = GamePad.GetState(PlayerIndex.One);
-            prevKeyboard = keyboard;
-            keyboard = Keyboard.GetState();
+            _devices = new List<IInputDevice>()
+            {
+                new KeyboardInput(),
+                new GamepadInput(),
+            };
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            foreach (var device in _devices)
+                device.Update(gameTime);
         }
     }
 }

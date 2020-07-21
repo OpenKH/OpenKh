@@ -1,4 +1,4 @@
-# [Kingdom Hearts Birth By Sleep](index) - CTD format
+# [Kingdom Hearts Birth By Sleep](index.md) - CTD format
 
 CTD is used to display text messages in game. It does not only contain the text to write on screen, but also the layout, font type, position and more.
 
@@ -81,7 +81,7 @@ Describe how a message should be presented on screen
 | 04    | Diamond borders
 | 05    | Invisible box
 
-### Text aligment
+### Text alignment
 
 | Value | Vertical | Horizontal | Text alignment
 |-------|----------|------------|----------------

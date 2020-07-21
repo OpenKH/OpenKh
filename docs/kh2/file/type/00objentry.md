@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - 00objentry.bin
+# [Kingdom Hearts II](../../index.md) - 00objentry.bin
 
 Contains a definition of every object and it's parameters.
 
@@ -23,7 +23,7 @@ Contains a definition of every object and it's parameters.
 | 54     | byte | Spawn Limiter
 | 55     | byte | Unknown
 | 56     | byte | Unknown
-| 57     | byte | [Command Menu Options](#command-menu-options-(fm))
+| 57     | byte | [Command Menu Options](#command-menu-options-fm)
 | 58     | ushort | Spawn additional object 1
 | 5A     | ushort | Spawn additional object 2
 | 5C     | ushort | Spawn additional object 3
