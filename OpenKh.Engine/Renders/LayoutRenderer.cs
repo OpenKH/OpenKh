@@ -47,15 +47,13 @@ namespace OpenKh.Engine.Renderers
             DrawLayoutGroup(layout.SequenceGroups[selectedSequenceGroupIndex]);
         }
 
-        private void DrawLayoutGroup(Layout.SequenceGroup l2)
+        private void DrawLayoutGroup(Layout.SequenceGroup sequencGroup)
         {
-            var index = l2.L1Index;
-            var count = l2.L1Count;
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < sequencGroup.Sequences.Count; i++)
             {
-                if (!_debugLayoutRenderer.IsSequencePropertyVisible(index + i))
+                if (!_debugLayoutRenderer.IsSequencePropertyVisible(i))
                     continue;
-                DrawLayout(layout.SequenceProperties[index + i]);
+                DrawLayout(sequencGroup.Sequences[i]);
             }
         }
 
