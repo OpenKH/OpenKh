@@ -149,10 +149,12 @@ namespace OpenKh.Game.States.Title
             for (var i = 0; i < DifficultyCount; i++)
             {
                 _animMenuOption1.Draw(256, OptionY + OptionHDistance * i);
+                if (i == _difficultyOption)
+                    _animMenuOptionSelected.Draw(256, OptionY + OptionHDistance * i);
+
                 _mainMenu.Print(DifficultyTitle[i], 0, OptionY + OptionHDistance * i, 512, TextAlignment.Center);
             }
 
-            _animMenuOptionSelected.Draw(256, OptionY + OptionHDistance * _difficultyOption);
             _mainMenu.Print(DifficultyDescription[_difficultyOption], 0, 256, 512, TextAlignment.Center);
         }
     }
