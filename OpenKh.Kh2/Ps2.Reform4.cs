@@ -60,13 +60,13 @@
 									byte num16 = buffer[num15 / 2];
 									if ((num15 & 1) == 0)
 									{
-										num16 = (byte)(num16 & 15);
-										num16 = (byte)(num16 | ((byte)(num12 << 4)));
+										num16 = (byte)(num16 & 240);
+										num16 = (byte)(num16 | num12);
 									}
 									else
 									{
-										num16 = (byte)(num16 & 240);
-										num16 = (byte)(num16 | num12);
+										num16 = (byte)(num16 & 15);
+										num16 = (byte)(num16 | ((byte)(num12 << 4)));
 									}
 									buffer[num15 / 2] = num16;
 								}
@@ -103,11 +103,11 @@
 									byte num13 = bin[num12 / 2];
 									if ((num12 & 1) != 0)
 									{
-										num13 = (byte)(num13 & 15);
+										num13 = (byte)(num13 >> 4);
 									}
 									else
 									{
-										num13 = (byte)(num13 >> 4);
+										num13 = (byte)(num13 & 15);
 									}
 									int num14 = numArray[num9] / 8;
 									int num15 = numArray[num9] % 8;
