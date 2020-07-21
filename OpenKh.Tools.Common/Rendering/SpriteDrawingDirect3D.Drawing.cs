@@ -71,7 +71,7 @@ namespace OpenKh.Tools.Common.Rendering
             buffer[index++] = new Vertex()
             {
                 X = context.Vec1.X / viewport.Width * +2.0f - 1.0f,
-                Y = context.Vec1.Y * -2.0f + 1.0f,
+                Y = context.Vec1.Y / viewport.Height * -2.0f + 1.0f,
                 U = (float)context.SourceRight / width,
                 V = (float)context.SourceTop / height,
                 Color = context.Color1
