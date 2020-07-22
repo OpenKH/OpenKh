@@ -17,6 +17,7 @@ namespace OpenKh.Game.States.Title
 
     interface ITitleMainMenu
     {
+        Kernel Kernel { get; }
         InputManager InputManager { get; }
         MainMenuState State { set; }
 

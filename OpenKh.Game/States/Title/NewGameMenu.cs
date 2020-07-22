@@ -9,12 +9,11 @@ namespace OpenKh.Game.States.Title
         private const int NewGameWindow = 28;
         private const int NewGameOption = 15;
 
-        private const int DifficultyCount = 4;
-        private static readonly ushort[] DifficultyTitle = new ushort[DifficultyCount]
+        private static readonly ushort[] DifficultyTitle = new ushort[]
         {
             0x4331, 0x4332, 0x4333, 0x4e33
         };
-        private static readonly ushort[] DifficultyDescription = new ushort[DifficultyCount]
+        private static readonly ushort[] DifficultyDescription = new ushort[]
         {
             0x4334, 0x4335, 0x4336, 0x4e34
         };
@@ -29,6 +28,7 @@ namespace OpenKh.Game.States.Title
         private readonly AnimatedSequenceRenderer _animMenuOption4;
         private readonly AnimatedSequenceRenderer _animMenuOptionSelected;
 
+        private int _difficultyCount;
         private int _difficultyOption;
         private MainMenuState _stateToSet;
 
@@ -36,6 +36,8 @@ namespace OpenKh.Game.States.Title
 
         public NewGameMenu(SequenceRenderer sequenceRendererMenu, ITitleMainMenu mainMenu)
         {
+            _difficultyCount = mainMenu.Kernel.IsFinalMix ? 4 : 3;
+
             _mainMenu = mainMenu;
             _seqRenderer = sequenceRendererMenu;
             _animMenuBg = new AnimatedSequenceRenderer(_seqRenderer, NewGameTitle);
@@ -115,12 +117,12 @@ namespace OpenKh.Game.States.Title
             {
                 _difficultyOption--;
                 if (_difficultyOption < 0)
-                    _difficultyOption = DifficultyCount - 1;
+                    _difficultyOption = _difficultyCount - 1;
                 isOptionChanged = true;
             }
             else if (inputManager.IsMenuDown)
             {
-                _difficultyOption = (_difficultyOption + 1) % DifficultyCount;
+                _difficultyOption = (_difficultyOption + 1) % _difficultyCount;
                 isOptionChanged = true;
             }
 
@@ -137,22 +139,26 @@ namespace OpenKh.Game.States.Title
 
         private void DrawNewGameMenu()
         {
-            const int OptionY = 120;
             const int OptionHDistance = 30;
+            var titleY = _mainMenu.Kernel.IsFinalMix ? 32 : 58;
+            var subTitleBgY = _mainMenu.Kernel.IsFinalMix ? 180 : 188;
+            var subTitleY = _mainMenu.Kernel.IsFinalMix ? 82 : 104;
+            var optionY = _mainMenu.Kernel.IsFinalMix ? 120 : 144;
+            var descY = _mainMenu.Kernel.IsFinalMix ? 256 : 240;
 
             _animMenuBg.Draw(0, 0);
-            _mainMenu.Print(0x432e, 0, 32, 512, TextAlignment.Center);
+            _mainMenu.Print(0x432e, 0, titleY, 512, TextAlignment.Center);
             _animMenuWindow.Draw(0, 0);
-            _seqRenderer.Draw(25, 0, 64, 180);
-            _mainMenu.Print(0x4330, 0, 82, 512, TextAlignment.Center);
+            _seqRenderer.Draw(25, 0, 64, subTitleBgY);
+            _mainMenu.Print(0x4330, 0, subTitleY, 512, TextAlignment.Center);
 
-            for (var i = 0; i < DifficultyCount; i++)
+            for (var i = 0; i < _difficultyCount; i++)
             {
-                _animMenuOption1.Draw(256, OptionY + OptionHDistance * i);
+                _animMenuOption1.Draw(256, optionY + OptionHDistance * i);
                 if (i == _difficultyOption)
-                    _animMenuOptionSelected.Draw(256, OptionY + OptionHDistance * i);
+                    _animMenuOptionSelected.Draw(256, optionY + OptionHDistance * i);
 
-                _mainMenu.Print(DifficultyTitle[i], 0, OptionY + OptionHDistance * i, 512, TextAlignment.Center);
+                _mainMenu.Print(DifficultyTitle[i], 0, optionY + OptionHDistance * i, 512, TextAlignment.Center);
             }
 
             _mainMenu.Print(DifficultyDescription[_difficultyOption], 0, 256, 512, TextAlignment.Center);

@@ -25,7 +25,6 @@ namespace OpenKh.Game.States.Title
         private const int MainMenuBackOption = 3;
         private const int MainMenuMaxOptionCount = 4;
 
-        private Kernel _kernel;
         private ArchiveManager _archiveManager;
         private IStateChange _stateChange;
         private KingdomShader _shader;
@@ -35,7 +34,6 @@ namespace OpenKh.Game.States.Title
         private LayoutRenderer layoutRendererTheater;
         private SequenceRenderer _sequenceRendererMenu;
         private Kh2MessageRenderer _messageRenderer;
-        private DrawContext _messageDrawContext;
         private Layout _titleLayout;
         private Layout _theaterLayout;
         private Dictionary<string, IEnumerable<ISpriteTexture>> cachedSurfaces = new Dictionary<string, IEnumerable<ISpriteTexture>>();
@@ -49,6 +47,7 @@ namespace OpenKh.Game.States.Title
         private bool _isTheaterModeUnlocked;
         private bool _isInTheaterMenu;
 
+        public Kernel Kernel { get; private set; }
         public InputManager InputManager { get; private set; }
 
         public MainMenuState State
@@ -97,7 +96,7 @@ namespace OpenKh.Game.States.Title
 
         public void Initialize(StateInitDesc initDesc)
         {
-            _kernel = initDesc.Kernel;
+            Kernel = initDesc.Kernel;
             _archiveManager = initDesc.ArchiveManager;
             InputManager = initDesc.InputManager;
             _stateChange = initDesc.StateChange;
@@ -112,20 +111,20 @@ namespace OpenKh.Game.States.Title
                 Global.ResolutionHeight,
                 1.0f);
 
-            if (_kernel.IsReMix)
-                _archiveManager.LoadArchive($"menu/{_kernel.Region}/titlejf.2ld");
-            _archiveManager.LoadArchive($"menu/{_kernel.Region}/title.2ld");
-            _archiveManager.LoadArchive($"menu/{_kernel.Region}/save.2ld");
+            if (Kernel.IsReMix)
+                _archiveManager.LoadArchive($"menu/{Kernel.Region}/titlejf.2ld");
+            _archiveManager.LoadArchive($"menu/{Kernel.Region}/title.2ld");
+            _archiveManager.LoadArchive($"menu/{Kernel.Region}/save.2ld");
 
             _isTheaterModeUnlocked = false;
-            if (_kernel.IsReMix)
+            if (Kernel.IsReMix)
             {
                 if (_isTheaterModeUnlocked)
                     _titleLayoutDesc = ReMixTheaterTitleLayout;
                 else
                     _titleLayoutDesc = ReMixTitleLayout;
             }
-            else if (_kernel.RegionId == Kh2.Constants.RegionFinalMix)
+            else if (Kernel.RegionId == Kh2.Constants.RegionFinalMix)
             {
                 if (_isTheaterModeUnlocked)
                     _titleLayoutDesc = FinalMixTheaterTitleLayout;
@@ -135,9 +134,8 @@ namespace OpenKh.Game.States.Title
             else
                 _titleLayoutDesc = VanillaTitleLayout;
 
-            var messageContext = _kernel.SystemMessageContext;
+            var messageContext = Kernel.SystemMessageContext;
             _messageRenderer = new Kh2MessageRenderer(drawing, messageContext);
-            _messageDrawContext = new DrawContext();
 
             IEnumerable<ISpriteTexture> images;
             (_titleLayout, images) = GetLayoutResources("titl", "titl");
@@ -366,7 +364,7 @@ namespace OpenKh.Game.States.Title
             float right, TextAlignment alignment)
         {
             if (!_cachedText.TryGetValue(messageId, out var data))
-                _cachedText[messageId] = data = _kernel.MessageProvider.GetMessage(messageId);
+                _cachedText[messageId] = data = Kernel.MessageProvider.GetMessage(messageId);
             
             var x = alignment switch
             {
