@@ -3,6 +3,7 @@ using OpenKh.Command.ImgTool.Interfaces;
 using OpenKh.Command.ImgTool.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

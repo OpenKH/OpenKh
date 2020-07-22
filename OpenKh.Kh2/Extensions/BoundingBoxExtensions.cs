@@ -6,14 +6,14 @@ using System.Text;
 
 namespace OpenKh.Kh2.Extensions
 {
-    public static class BoundingBoxInt16Extensions
+    public static class BoundingBoxExtensions
     {
-        public static BoundingBoxInt16 MergeAll(this IEnumerable<BoundingBoxInt16> list)
+        public static BoundingBox MergeAll(this IEnumerable<BoundingBox> list)
         {
             return list
                 .Aggregate(
-                    BoundingBoxInt16.Invalid,
-                    BoundingBoxInt16.Merge
+                    BoundingBox.Invalid,
+                    BoundingBox.Merge
                 );
         }
     }

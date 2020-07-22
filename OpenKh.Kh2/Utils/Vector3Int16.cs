@@ -11,6 +11,13 @@ namespace OpenKh.Kh2.Utils
         [Data] public short Y { get; set; }
         [Data] public short Z { get; set; }
 
+        public Vector3Int16(short value)
+        {
+            X = value;
+            Y = value;
+            Z = value;
+        }
+
         public Vector3Int16(short x, short y, short z)
         {
             X = x;
@@ -35,5 +42,18 @@ namespace OpenKh.Kh2.Utils
                 Math.Max(vec1.Z, vec2.Z)
             );
         }
+
+        public bool Equals(Vector3Int16 that)
+            => X == that.X
+            && Y == that.Y
+            && Z == that.Z;
+
+        public override bool Equals(object obj) => Equals((Vector3Int16)obj);
+
+        public override int GetHashCode() => X + Y + Z;
+
+        public static bool operator ==(Vector3Int16 left, Vector3Int16 right) => left.Equals(right);
+
+        public static bool operator !=(Vector3Int16 left, Vector3Int16 right) => !(left == right);
     }
 }

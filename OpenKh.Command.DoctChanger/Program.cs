@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 using System.Linq;
+using OpenKh.Kh2.Utils;
 
 namespace OpenKh.Command.DoctChanger
 {
@@ -216,7 +217,7 @@ namespace OpenKh.Command.DoctChanger
                 var mapModel = Mdlx.Read(entries.Single(IsMapModel).Stream);
 
                 var numVifPackets = mapModel.MapModel.VifPackets.Count;
-                var numAlb2Groups = mapModel.MapModel.alb2.Count;
+                var numAlb2Groups = mapModel.MapModel.vifPacketRenderingGroup.Count;
 
                 Console.WriteLine($"numVifPackets: {numVifPackets:#,##0}");
                 Console.WriteLine($"numAlb2Groups: {numAlb2Groups:#,##0}");
@@ -242,12 +243,10 @@ namespace OpenKh.Command.DoctChanger
                             .Select(
                                 index => new Doct.Entry2
                                 {
-                                    MinX = -WorldBounds,
-                                    MinY = -WorldBounds,
-                                    MinZ = -WorldBounds,
-                                    MaxX = WorldBounds,
-                                    MaxY = WorldBounds,
-                                    MaxZ = WorldBounds,
+                                    BoundingBox = new BoundingBox(
+                                        new System.Numerics.Vector3(-WorldBounds),
+                                        new System.Numerics.Vector3(WorldBounds)
+                                    )
                                 }
                             )
                     );
