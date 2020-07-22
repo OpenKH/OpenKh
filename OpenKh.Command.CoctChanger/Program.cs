@@ -54,9 +54,7 @@ namespace OpenKh.Command.CoctChanger
             public string CoctOut { get; set; }
 
             [Option(CommandOptionType.SingleValue, Description = "bbox in model 3D space: minX,Y,Z,maxX,Y,Z (default: ...)", ShortName = "b", LongName = "bbox")]
-            public string BBox { get; set; } = "-1000,-200,-1000,1000,1500,1000";
-
-            const short CalcLater = 12345;
+            public string BBox { get; set; } = "-1000,-1000,-1000,1000,1500,1000";
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -139,55 +137,55 @@ namespace OpenKh.Command.CoctChanger
                     {0,4,5,1}, //north
                 };
 
-                var table3FirstIdx = coct.Collision3.Count;
+                var table3FirstIdx = coct.CollisionList.Count;
 
                 for (var side = 0; side < 6; side++)
                 {
-                    var ent3 = new Coct.Co3
+                    var ent3 = new Coct.Collision
                     {
                         v00 = 0,
                         Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
                         Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
                         Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
                         Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
-                        Co5Index = table5Idxes[side],
-                        Co6Index = -1, // set later
-                        Co7Index = table7Idx,
+                        PlaneIndex = table5Idxes[side],
+                        BoundingBoxIndex = -1, // set later
+                        SurfaceFlagsIndex = table7Idx,
                     };
 
                     builder.CompletePlane(ent3);
                     builder.CompleteBBox(ent3);
 
-                    coct.Collision3.Add(ent3);
+                    coct.CollisionList.Add(ent3);
                 }
 
-                var table3LastIdx = coct.Collision3.Count;
+                var table3LastIdx = coct.CollisionList.Count;
 
-                var table2FirstIdx = coct.Collision2.Count;
+                var table2FirstIdx = coct.CollisionMeshList.Count;
 
                 var ent2 = new Coct.CollisionMesh
                 {
-                    Collision3Start = Convert.ToUInt16(table3FirstIdx),
-                    Collision3End = Convert.ToUInt16(table3LastIdx),
+                    CollisionStart = Convert.ToUInt16(table3FirstIdx),
+                    CollisionEnd = Convert.ToUInt16(table3LastIdx),
                     v10 = 0,
                     v12 = 0,
                 };
 
                 builder.CompleteBBox(ent2);
 
-                coct.Collision2.Add(ent2);
+                coct.CollisionMeshList.Add(ent2);
 
-                var table2LastIdx = coct.Collision2.Count;
+                var table2LastIdx = coct.CollisionMeshList.Count;
 
-                var ent1 = new Coct.Co1
+                var ent1 = new Coct.CollisionMeshGroup
                 {
-                    Collision2Start = Convert.ToUInt16(table2FirstIdx),
-                    Collision2End = Convert.ToUInt16(table2LastIdx),
+                    CollisionMeshStart = Convert.ToUInt16(table2FirstIdx),
+                    CollisionMeshEnd = Convert.ToUInt16(table2LastIdx),
                 };
 
                 builder.CompleteBBox(ent1);
 
-                coct.Collision1.Add(ent1);
+                coct.CollisionMeshGroupList.Add(ent1);
 
                 var buff = new MemoryStream();
                 coct.Write(buff);

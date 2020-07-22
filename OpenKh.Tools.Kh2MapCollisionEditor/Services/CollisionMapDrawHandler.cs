@@ -105,22 +105,22 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
         {
             var paletteIndex = 0;
 
-            for (int i1 = 0; i1 < coct.Collision1.Count; i1++)
+            for (int i1 = 0; i1 < coct.CollisionMeshGroupList.Count; i1++)
             {
-                var c1 = coct.Collision1[i1];
+                var c1 = coct.CollisionMeshGroupList[i1];
                 foreach (var c2 in c1.Meshes)
                 {
                     var color = ColorPalette[paletteIndex++ % ColorPalette.Length];
                     foreach (var c3 in c2.Items)
                     {
                         VertexPositionColorTexture[] vertices;
-                        var v1 = coct.CollisionVertices[c3.Vertex1];
-                        var v2 = coct.CollisionVertices[c3.Vertex2];
-                        var v3 = coct.CollisionVertices[c3.Vertex3];
+                        var v1 = coct.VertexList[c3.Vertex1];
+                        var v2 = coct.VertexList[c3.Vertex2];
+                        var v3 = coct.VertexList[c3.Vertex3];
 
                         if (c3.Vertex4 >= 0)
                         {
-                            var v4 = coct.CollisionVertices[c3.Vertex4];
+                            var v4 = coct.VertexList[c3.Vertex4];
                             vertices = GenerateVertex(
                                 color,
                                 v1.X, v1.Y, v1.Z,

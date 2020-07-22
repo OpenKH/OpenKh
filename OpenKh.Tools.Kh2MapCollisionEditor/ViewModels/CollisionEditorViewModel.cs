@@ -12,13 +12,13 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
     public class CollisionEditorViewModel : BaseNotifyPropertyChanged
     {
         private CoctLogical _coct;
-        private CoctLogical.Co1 c1Item;
-        private CoctLogical.CollisionMesh c2Item;
-        private CoctLogical.Co3 c3Item;
+        private CoctLogical.CoctCollisionMeshGroup c1Item;
+        private CoctLogical.CoctCollisionMesh c2Item;
+        private CoctLogical.CoctCollision c3Item;
         private CoctLogical.CoctVector4 c4Item;
-        private CoctLogical.Co5 c5Item;
-        private CoctLogical.Co6 c6Item;
-        private CoctLogical.Co7 c7Item;
+        private CoctLogical.CoctPlane c5Item;
+        private CoctLogical.CoctBoundingBox c6Item;
+        private CoctLogical.CoctSurfaceFlags c7Item;
         private bool _allC2;
         private bool _allC3;
         private readonly CollisionMapDrawHandler _drawHandler;
@@ -40,29 +40,29 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
             }
         }
 
-        public List<CoctLogical.Co1> C1 => _coct?.Collision1;
-        public IEnumerable<CoctLogical.CollisionMesh> C2 => !AllC2 ? C1Item?.Meshes : C1.SelectMany(c1 => c1.Meshes);
-        public IEnumerable<CoctLogical.Co3> C3 => !AllC3 ? C2Item?.Items : C1.SelectMany(c1 => c1.Meshes.SelectMany(c2 => c2.Items));
+        public List<CoctLogical.CoctCollisionMeshGroup> C1 => _coct?.CollisionMeshGroupList;
+        public IEnumerable<CoctLogical.CoctCollisionMesh> C2 => !AllC2 ? C1Item?.Meshes : C1.SelectMany(c1 => c1.Meshes);
+        public IEnumerable<CoctLogical.CoctCollision> C3 => !AllC3 ? C2Item?.Items : C1.SelectMany(c1 => c1.Meshes.SelectMany(c2 => c2.Items));
         public IEnumerable<CoctLogical.CoctVector4> C4 { get
             {
                 if (C3Item == null) yield break;
-                yield return _coct?.CollisionVertices[C3Item.Vertex1];
-                yield return _coct?.CollisionVertices[C3Item.Vertex2];
-                yield return _coct?.CollisionVertices[C3Item.Vertex3];
+                yield return _coct?.VertexList[C3Item.Vertex1];
+                yield return _coct?.VertexList[C3Item.Vertex2];
+                yield return _coct?.VertexList[C3Item.Vertex3];
                 if (C3Item.Vertex4 >= 0)
-                    yield return _coct?.CollisionVertices[C3Item.Vertex4];
+                    yield return _coct?.VertexList[C3Item.Vertex4];
             } }
-        public List<CoctLogical.Co5> C5 => _coct?.Collision5;
-        public List<CoctLogical.Co6> C6 => _coct?.Collision6;
-        public List<CoctLogical.Co7> C7 => _coct?.Collision7;
+        public List<CoctLogical.CoctPlane> C5 => _coct?.PlaneList;
+        public List<CoctLogical.CoctBoundingBox> C6 => _coct?.BoundingBoxList;
+        public List<CoctLogical.CoctSurfaceFlags> C7 => _coct?.SurfaceFlagsList;
 
-        public CoctLogical.Co1 C1Item { get => c1Item; set { c1Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C2)); } }
-        public CoctLogical.CollisionMesh C2Item { get => c2Item; set { c2Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C3)); } }
-        public CoctLogical.Co3 C3Item { get => c3Item; set { c3Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C4)); } }
+        public CoctLogical.CoctCollisionMeshGroup C1Item { get => c1Item; set { c1Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C2)); } }
+        public CoctLogical.CoctCollisionMesh C2Item { get => c2Item; set { c2Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C3)); } }
+        public CoctLogical.CoctCollision C3Item { get => c3Item; set { c3Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C4)); } }
         public CoctLogical.CoctVector4 C4Item { get => c4Item; set { c4Item = value; OnPropertyChanged(); } }
-        public CoctLogical.Co5 C5Item { get => c5Item; set { c5Item = value; OnPropertyChanged(); } }
-        public CoctLogical.Co6 C6Item { get => c6Item; set { c6Item = value; OnPropertyChanged(); } }
-        public CoctLogical.Co7 C7Item { get => c7Item; set { c7Item = value; OnPropertyChanged(); } }
+        public CoctLogical.CoctPlane C5Item { get => c5Item; set { c5Item = value; OnPropertyChanged(); } }
+        public CoctLogical.CoctBoundingBox C6Item { get => c6Item; set { c6Item = value; OnPropertyChanged(); } }
+        public CoctLogical.CoctSurfaceFlags C7Item { get => c7Item; set { c7Item = value; OnPropertyChanged(); } }
 
         public bool AllC2 { get => _allC2; set { _allC2 = value; OnPropertyChanged(nameof(C2)); } }
         public bool AllC3 { get => _allC3; set { _allC3 = value; OnPropertyChanged(nameof(C3)); } }
