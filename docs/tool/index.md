@@ -21,6 +21,7 @@
 |[2LD](../kh2/file/type/2ld.md#layout) | [OpenKh.Tools.LayoutEditor](./LayoutEditor/index.md)
 |[2DD](../kh2/file/type/2ld.md#sequence) | [OpenKh.Tools.LayoutEditor](./LayoutEditor/index.md)
 |[DOCT](../kh2/file/type/doct) | [OpenKh.Command.DoctChanger](./DoctChanger/index.md)
+|[COCT](../kh2/file/type/coct) | [OpenKh.Command.CoctChanger](./CoctChanger/index.md)
 |[00battle](../kh2/file/type/00battle.md) | OpenKh.Tools.LevelUpEditor
 |[00objentry](../kh2/file/type/00objentry.md) | OpenKh.Tools.ObjentryEditor
 |[00place](../kh2/file/type/place.md) | OpenKh.Tools.Kh2PlaceEditor
