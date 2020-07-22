@@ -125,16 +125,5 @@ namespace OpenKh.Kh2
 
             return palette;
         }
-
-        private static byte[] SwapBitOrder(byte[] data)
-        {
-            for (var i = 0; i < data.Length; i++)
-            {
-                var ch = data[i];
-                data[i] = (byte)((ch >> 4) | (ch << 4));
-            }
-
-            return data;
-        }
     }
 }
