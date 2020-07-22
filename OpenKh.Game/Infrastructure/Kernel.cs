@@ -20,6 +20,7 @@ namespace OpenKh.Game.Infrastructure
         private readonly IDataContent _dataContent;
         private int _regionId;
 
+        public bool IsFinalMix { get; }
         public bool IsReMix { get; }
         public int RegionId
         {
@@ -67,6 +68,9 @@ namespace OpenKh.Game.Infrastructure
 
             IsReMix = IsReMixFileExists(dataContent, Region);
             Log.Info($"ReMIX={IsReMix}");
+
+            IsFinalMix = IsReMix || RegionId == Constants.RegionFinalMix;
+            Log.Info($"Final Mix={IsFinalMix}");
 
             // Load files in the same order as KH2 does
             ObjEntries = LoadFile("00objentry.bin", stream => Objentry.Read(stream));
