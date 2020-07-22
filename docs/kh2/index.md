@@ -22,6 +22,7 @@
   * [2LD](file/type/2ld.md)
   * [2DD](file/type/2ld.md#2dd)
   * [DOCT](file/type/doct.md)
+  * [COCT](file/type/coct.md)
   
 * Other files
 

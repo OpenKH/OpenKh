@@ -1,5 +1,6 @@
 ﻿using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Tools.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,7 +27,8 @@ namespace ConsoleApp1
 			Directory.SetCurrentDirectory(OpenKhSolutionDirectory + @"\OpenKh.Tests");
 
 
-			Stream stream = ProcessStream.SearchProcess("pcsx2"); /* For RAM-related tests. */
+			var process = ProcessStream.TryGetProcess(x => x.ProcessName == "pcsx2"); /* For RAM-related tests. */
+			using var stream = new ProcessStream(process, 0x20000000, 0x2000000);
 
 			//stream.Position = 0x00964c10;
 			//var dpd = new OpenKh.Kh2.Dpd(stream);
