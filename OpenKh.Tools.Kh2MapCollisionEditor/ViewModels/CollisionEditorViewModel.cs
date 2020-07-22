@@ -15,7 +15,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         private CoctLogical.Co1 c1Item;
         private CoctLogical.CollisionMesh c2Item;
         private CoctLogical.Co3 c3Item;
-        private CoctLogical.Vector4 c4Item;
+        private CoctLogical.CoctVector4 c4Item;
         private CoctLogical.Co5 c5Item;
         private CoctLogical.Co6 c6Item;
         private CoctLogical.Co7 c7Item;
@@ -43,7 +43,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         public List<CoctLogical.Co1> C1 => _coct?.Collision1;
         public IEnumerable<CoctLogical.CollisionMesh> C2 => !AllC2 ? C1Item?.Meshes : C1.SelectMany(c1 => c1.Meshes);
         public IEnumerable<CoctLogical.Co3> C3 => !AllC3 ? C2Item?.Items : C1.SelectMany(c1 => c1.Meshes.SelectMany(c2 => c2.Items));
-        public IEnumerable<CoctLogical.Vector4> C4 { get
+        public IEnumerable<CoctLogical.CoctVector4> C4 { get
             {
                 if (C3Item == null) yield break;
                 yield return _coct?.CollisionVertices[C3Item.Vertex1];
@@ -59,7 +59,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         public CoctLogical.Co1 C1Item { get => c1Item; set { c1Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C2)); } }
         public CoctLogical.CollisionMesh C2Item { get => c2Item; set { c2Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C3)); } }
         public CoctLogical.Co3 C3Item { get => c3Item; set { c3Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C4)); } }
-        public CoctLogical.Vector4 C4Item { get => c4Item; set { c4Item = value; OnPropertyChanged(); } }
+        public CoctLogical.CoctVector4 C4Item { get => c4Item; set { c4Item = value; OnPropertyChanged(); } }
         public CoctLogical.Co5 C5Item { get => c5Item; set { c5Item = value; OnPropertyChanged(); } }
         public CoctLogical.Co6 C6Item { get => c6Item; set { c6Item = value; OnPropertyChanged(); } }
         public CoctLogical.Co7 C7Item { get => c7Item; set { c7Item = value; OnPropertyChanged(); } }

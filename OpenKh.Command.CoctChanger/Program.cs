@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 
@@ -14,7 +15,7 @@ namespace OpenKh.Command.CoctChanger
 {
     [Command("OpenKh.Command.CoctChanger")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(CreateDummyCoctCommand), typeof(UseThisCoctCommand))]
+    [Subcommand(typeof(CreateRoomCoctCommand), typeof(UseThisCoctCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -45,15 +46,17 @@ namespace OpenKh.Command.CoctChanger
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         [HelpOption]
-        [Command(Description = "coct file: create single room")]
-        private class CreateDummyCoctCommand
+        [Command(Description = "coct file: create single closed room")]
+        private class CreateRoomCoctCommand
         {
             [Required]
             [Argument(0, Description = "Output coct")]
             public string CoctOut { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "bbox: minX,Y,Z,maxX,Y,Z (default: ...)", ShortName = "b", LongName = "bbox")]
-            public string BBox { get; set; } = "-3000,-100,-3000,3000,1500,3000";
+            [Option(CommandOptionType.SingleValue, Description = "bbox in model 3D space: minX,Y,Z,maxX,Y,Z (default: ...)", ShortName = "b", LongName = "bbox")]
+            public string BBox { get; set; } = "-1000,-200,-1000,1000,1500,1000";
+
+            const short CalcLater = 12345;
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -63,98 +66,128 @@ namespace OpenKh.Command.CoctChanger
                     .Select(one => short.Parse(one))
                     .ToArray();
 
-                var minX = bbox[0];
-                var minY = bbox[1];
-                var minZ = bbox[2];
-                var maxX = bbox[3];
-                var maxY = bbox[4];
-                var maxZ = bbox[5];
+                var invMinX = bbox[0];
+                var invMinY = bbox[1];
+                var invMinZ = bbox[2];
+                var invMaxX = bbox[3];
+                var invMaxY = bbox[4];
+                var invMaxZ = bbox[5];
 
-                // COCT and DOCT: model view (X,Y,Z) → (-X,-Y,-Z)
+                var minX = -invMinX;
+                var minY = -invMinY;
+                var minZ = -invMinZ;
+                var maxX = -invMaxX;
+                var maxY = -invMaxY;
+                var maxZ = -invMaxZ;
 
-                var invMinX = -maxX;
-                var invMinY = -maxY;
-                var invMinZ = -maxZ;
-                var invMaxX = -minX;
-                var invMaxY = -minY;
-                var invMaxZ = -minZ;
+                var builder = new Coct.BuildHelper(coct);
 
-                var ent1 = new Coct.Co1
+                var table7Idx = builder.AllocateSurfaceFlags(0x3F1);
+
+                // (forwardVec)
+                // +Z
+                // A  / +Y (upVec)
+                // | / 
+                // |/
+                // +--> +X (rightVec)
+
+                //   7 == 6  top
+                //   |    |  top
+                //   4 == 5  top
+                //
+                // 3 == 2  bottom
+                // |    |  bottom
+                // 0 == 1  bottom
+
+                var table4Idxes = new short[]
                 {
-                    MinX = minX,
-                    MinY = minY,
-                    MinZ = minZ,
-                    MaxX = maxX,
-                    MaxY = maxY,
-                    MaxZ = maxZ,
-                    Collision2Start = 0,
-                    Collision2End = 1,
+                    builder.AllocateVertex(minX, minY, minZ, 1),
+                    builder.AllocateVertex(maxX, minY, minZ, 1),
+                    builder.AllocateVertex(maxX, minY, maxZ, 1),
+                    builder.AllocateVertex(minX, minY, maxZ, 1),
+                    builder.AllocateVertex(minX, maxY, minZ, 1),
+                    builder.AllocateVertex(maxX, maxY, minZ, 1),
+                    builder.AllocateVertex(maxX, maxY, maxZ, 1),
+                    builder.AllocateVertex(minX, maxY, maxZ, 1),
                 };
-                coct.Collision1.Add(ent1);
+
+                // side:
+                // 0 bottom
+                // 1 top
+                // 2 west
+                // 3 east
+                // 4 south
+                // 5 north
+
+                var table5Idxes = new short[]
+                {
+                    builder.AllocatePlane( 0,-1, 0,+minY), //bottom
+                    builder.AllocatePlane( 0,+1, 0,-maxY), //up
+                    builder.AllocatePlane(-1, 0, 0,+minX), //west
+                    builder.AllocatePlane(+1, 0, 0,-maxX), //east
+                    builder.AllocatePlane( 0, 0,-1,+minZ), //south
+                    builder.AllocatePlane( 0, 0,+1,-maxZ), //north
+                };
+
+                var faceVertexOrders = new int[,]
+                {
+                    {0,1,2,3}, //bottom
+                    {4,7,6,5}, //top
+                    {3,7,4,0}, //west
+                    {1,5,6,2}, //east
+                    {2,6,7,3}, //south
+                    {0,4,5,1}, //north
+                };
+
+                var table3FirstIdx = coct.Collision3.Count;
+
+                for (var side = 0; side < 6; side++)
+                {
+                    var ent3 = new Coct.Co3
+                    {
+                        v00 = 0,
+                        Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
+                        Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
+                        Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
+                        Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
+                        Co5Index = table5Idxes[side],
+                        Co6Index = -1, // set later
+                        Co7Index = table7Idx,
+                    };
+
+                    builder.CompletePlane(ent3);
+                    builder.CompleteBBox(ent3);
+
+                    coct.Collision3.Add(ent3);
+                }
+
+                var table3LastIdx = coct.Collision3.Count;
+
+                var table2FirstIdx = coct.Collision2.Count;
 
                 var ent2 = new Coct.CollisionMesh
                 {
-                    MinX = minX,
-                    MinY = minY,
-                    MinZ = minZ,
-                    MaxX = maxX,
-                    MaxY = maxY,
-                    MaxZ = maxZ,
-                    Collision3Start = 0,
-                    Collision3End = 1,
+                    Collision3Start = Convert.ToUInt16(table3FirstIdx),
+                    Collision3End = Convert.ToUInt16(table3LastIdx),
                     v10 = 0,
                     v12 = 0,
                 };
+
+                builder.CompleteBBox(ent2);
+
                 coct.Collision2.Add(ent2);
 
-                var ent3 = new Coct.Co3
-                {
-                    v00 = 0,
-                    Vertex1 = 0,
-                    Vertex2 = 1,
-                    Vertex3 = 2,
-                    Vertex4 = 3,
-                    Co5Index = 0,
-                    Co6Index = 0,
-                    Co7Index = 0,
-                };
-                coct.Collision3.Add(ent3);
+                var table2LastIdx = coct.Collision2.Count;
 
-                coct.CollisionVertices.AddRange(
-                    new Coct.Vector4[]
-                    {
-                        new Coct.Vector4 { X = minX, Y = -minY, Z = minZ, W = 1, },
-                        new Coct.Vector4 { X = maxX, Y = -minY, Z = minZ, W = 1, },
-                        new Coct.Vector4 { X = maxX, Y = -minY, Z = maxZ, W = 1, },
-                        new Coct.Vector4 { X = minX, Y = -minY, Z = maxZ, W = 1, },
-                    }
-                );
-
-                var ent5 = new Coct.Co5
+                var ent1 = new Coct.Co1
                 {
-                    X = 0,
-                    Y = -1,
-                    Z = 0,
-                    D = maxY - 10,
+                    Collision2Start = Convert.ToUInt16(table2FirstIdx),
+                    Collision2End = Convert.ToUInt16(table2LastIdx),
                 };
-                coct.Collision5.Add(ent5);
 
-                var ent6 = new Coct.Co6
-                {
-                    MinX = minX,
-                    MinY = minY,
-                    MinZ = minZ,
-                    MaxX = maxX,
-                    MaxY = maxY,
-                    MaxZ = maxZ,
-                };
-                coct.Collision6.Add(ent6);
+                builder.CompleteBBox(ent1);
 
-                var ent7 = new Coct.Co7
-                {
-                    Unknown = 0x3f1,
-                };
-                coct.Collision7.Add(ent7);
+                coct.Collision1.Add(ent1);
 
                 var buff = new MemoryStream();
                 coct.Write(buff);
@@ -163,6 +196,19 @@ namespace OpenKh.Command.CoctChanger
 
                 return 0;
             }
+        }
+
+        class ShortVertex3
+        {
+            public short X { get; set; }
+            public short Y { get; set; }
+            public short Z { get; set; }
+        }
+
+        class ShortBBox
+        {
+            public ShortVertex3 Min { get; set; }
+            public ShortVertex3 Max { get; set; }
         }
 
         [HelpOption]

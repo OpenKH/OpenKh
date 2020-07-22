@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Numerics;
+using OpenKh.Kh2.Utils;
 
 namespace OpenKh.Kh2
 {
@@ -73,9 +75,9 @@ namespace OpenKh.Kh2
                 .ToList();
         }
 
-        private static Vector4 Map4(Coct.Vector4 source)
+        private static CoctVector4 Map4(Vector4 source)
         {
-            return new Vector4
+            return new CoctVector4
             {
                 X = source.X,
                 Y = source.Y,
@@ -92,29 +94,27 @@ namespace OpenKh.Kh2
             };
         }
 
-        private static Co6 Map6(Coct.Co6 source)
+        private static Co6 Map6(BoundingBoxInt16 source)
         {
             return new Co6
             {
-                MinX = source.MinX,
-                MinY = source.MinY,
-                MinZ = source.MinZ,
-                MaxX = source.MaxX,
-                MaxY = source.MaxY,
-                MaxZ = source.MaxZ,
+                MinX = source.Minimum.X,
+                MinY = source.Minimum.Y,
+                MinZ = source.Minimum.Z,
+                MaxX = source.Maximum.X,
+                MaxY = source.Maximum.Y,
+                MaxZ = source.Maximum.Z,
             };
         }
 
-        private static Co5 Map5(Coct.Co5 source)
-        {
-            return new Co5
+        private static Co5 Map5(Plane source) =>
+            new Co5
             {
-                X = source.X,
-                Y = source.Y,
-                Z = source.Z,
+                X = source.Normal.X,
+                Y = source.Normal.Y,
+                Z = source.Normal.Z,
                 D = source.D,
             };
-        }
 
         private static Co3 Map3(Coct.Co3 source)
         {
@@ -135,12 +135,12 @@ namespace OpenKh.Kh2
         {
             return new CollisionMesh
             {
-                MinX = source.MinX,
-                MinY = source.MinY,
-                MinZ = source.MinZ,
-                MaxX = source.MaxX,
-                MaxY = source.MaxY,
-                MaxZ = source.MaxZ,
+                MinX = source.BoundingBox.Minimum.X,
+                MinY = source.BoundingBox.Minimum.Y,
+                MinZ = source.BoundingBox.Minimum.Z,
+                MaxX = source.BoundingBox.Maximum.X,
+                MaxY = source.BoundingBox.Maximum.Y,
+                MaxZ = source.BoundingBox.Maximum.Z,
                 v10 = source.v10,
                 v12 = source.v12,
             };
@@ -158,17 +158,17 @@ namespace OpenKh.Kh2
                 Child6 = source.Child6,
                 Child7 = source.Child7,
                 Child8 = source.Child8,
-                MinX = source.MinX,
-                MinY = source.MinY,
-                MinZ = source.MinZ,
-                MaxX = source.MaxX,
-                MaxY = source.MaxY,
-                MaxZ = source.MaxZ,
+                MinX = source.BoundingBox.Minimum.X,
+                MinY = source.BoundingBox.Minimum.Y,
+                MinZ = source.BoundingBox.Minimum.Z,
+                MaxX = source.BoundingBox.Maximum.X,
+                MaxY = source.BoundingBox.Maximum.Y,
+                MaxZ = source.BoundingBox.Maximum.Z,
             };
         }
 
         public List<Co1> Collision1 { get; }
-        public List<Vector4> CollisionVertices { get; }
+        public List<CoctVector4> CollisionVertices { get; }
         public List<Co5> Collision5 { get; }
         public List<Co6> Collision6 { get; }
         public List<Co7> Collision7 { get; }
@@ -219,7 +219,7 @@ namespace OpenKh.Kh2
             public short Co7Index { get; set; }
         }
 
-        public class Vector4
+        public class CoctVector4
         {
             public float X { get; set; }
             public float Y { get; set; }
@@ -347,40 +347,19 @@ namespace OpenKh.Kh2
             };
         }
 
-        private static Coct.Co6 Unmap6(Co6 source)
+        private static BoundingBoxInt16 Unmap6(Co6 source)
         {
-            return new Coct.Co6
-            {
-                MinX = source.MinX,
-                MinY = source.MinY,
-                MinZ = source.MinZ,
-                MaxX = source.MaxX,
-                MaxY = source.MaxY,
-                MaxZ = source.MaxZ,
-            };
+            return new BoundingBoxInt16(
+                new Vector3Int16(source.MinX, source.MinY, source.MinZ),
+                new Vector3Int16(source.MaxX, source.MaxY, source.MaxZ)
+            );
         }
 
-        private static Coct.Co5 Unmap5(Co5 source)
-        {
-            return new Coct.Co5
-            {
-                X = source.X,
-                Y = source.Y,
-                Z = source.Z,
-                D = source.D,
-            };
-        }
+        private static Plane Unmap5(Co5 source) =>
+            new Plane(source.X, source.Y, source.Z, source.D);
 
-        private static Coct.Vector4 Unmap4(Vector4 source)
-        {
-            return new Coct.Vector4
-            {
-                X = source.X,
-                Y = source.Y,
-                Z = source.Z,
-                W = source.W,
-            };
-        }
+        private static Vector4 Unmap4(CoctVector4 source) =>
+            new Vector4(source.X, source.Y, source.Z, source.W);
 
         private static Coct.Co3 Unmap3(Co3 source)
         {
@@ -401,12 +380,10 @@ namespace OpenKh.Kh2
         {
             return new Coct.CollisionMesh
             {
-                MinX = source.MinX,
-                MinY = source.MinY,
-                MinZ = source.MinZ,
-                MaxX = source.MaxX,
-                MaxY = source.MaxY,
-                MaxZ = source.MaxZ,
+                BoundingBox = new BoundingBoxInt16(
+                    new Vector3Int16(source.MinX, source.MinY, source.MinZ),
+                    new Vector3Int16(source.MaxX, source.MaxY, source.MaxZ)
+                ),
                 v10 = source.v10,
                 v12 = source.v12,
             };
@@ -424,12 +401,10 @@ namespace OpenKh.Kh2
                 Child6 = collision1.Child6,
                 Child7 = collision1.Child7,
                 Child8 = collision1.Child8,
-                MinX = collision1.MinX,
-                MinY = collision1.MinY,
-                MinZ = collision1.MinZ,
-                MaxX = collision1.MaxX,
-                MaxY = collision1.MaxY,
-                MaxZ = collision1.MaxZ,
+                BoundingBox = new BoundingBoxInt16(
+                    new Vector3Int16(collision1.MinX, collision1.MinY, collision1.MinZ),
+                    new Vector3Int16(collision1.MaxX, collision1.MaxY, collision1.MaxZ)
+                ),
             };
         }
     }
