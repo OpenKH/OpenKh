@@ -116,8 +116,11 @@ _Note :_ (X,Y,Z) are inverted (-X,-Y,-Z).
 | 6 | int16_t | Vertex3
 | 8 | int16_t | Vertex4: can be `-1` in case of triangle
 | 10 | int16_t | Index to Plane (Table5)
-| 12 | int16_t | Index to BBox (Table6), otherwise use -1 is to apply Table2's BBox
+| 12 | int16_t | Index to BBox (Table6), otherwise use `-1` is to apply Table2's BBox
 | 14 | uint16_t | Index to SurfaceFlags (Table7)
+
+_Note :_ Vertex1,2,3 composes one triangle.
+_Note :_ Vertex1,2,3,4 composes one triangle fan (usually its shape is quadrangle).
 
 
 ### Vertex
