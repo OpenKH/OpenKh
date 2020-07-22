@@ -196,7 +196,7 @@ namespace OpenKh.Kh2.Utils
             }
         }
 
-        public static Imgd ToImgd(Bitmap bitmap, int bpp, Func<Bitmap, Bitmap> quantizer)
+        public static Imgd ToImgd(Bitmap bitmap, int bpp, Func<Bitmap, Bitmap> quantizer, bool swizzle = false)
         {
             if (quantizer != null)
             {
@@ -254,7 +254,7 @@ namespace OpenKh.Kh2.Utils
                             }
                         }
 
-                        return Imgd.Create(bitmap.Size, Imaging.PixelFormat.Indexed4, destBits, clut, false);
+                        return Imgd.Create(bitmap.Size, Imaging.PixelFormat.Indexed4, destBits, clut, swizzle);
                     }
                 case 8:
                     {
@@ -295,7 +295,7 @@ namespace OpenKh.Kh2.Utils
                             }
                         }
 
-                        return Imgd.Create(bitmap.Size, Imaging.PixelFormat.Indexed8, destBits, clut, false);
+                        return Imgd.Create(bitmap.Size, Imaging.PixelFormat.Indexed8, destBits, clut, swizzle);
                     }
                 case 32:
                     {
@@ -321,19 +321,19 @@ namespace OpenKh.Kh2.Utils
                             }
                         }
 
-                        return Imgd.Create(bitmap.Size, Imaging.PixelFormat.Rgba8888, destBits, new byte[0], false);
+                        return Imgd.Create(bitmap.Size, Imaging.PixelFormat.Rgba8888, destBits, new byte[0], swizzle);
                     }
             }
             throw new NotSupportedException($"BitsPerPixel {bpp} not recognized!");
         }
 
-        public static IEnumerable<Imgd> FromFileToImgdList(string anyFile, int bitsPerPixel, Func<Bitmap, Bitmap> quantizer)
+        public static IEnumerable<Imgd> FromFileToImgdList(string anyFile, int bitsPerPixel, Func<Bitmap, Bitmap> quantizer, bool swizzle)
         {
             switch (Path.GetExtension(anyFile).ToLowerInvariant())
             {
                 case ".png":
                     {
-                        yield return new Bitmap(anyFile).Using(bitmap => ToImgd(bitmap, bitsPerPixel, quantizer));
+                        yield return new Bitmap(anyFile).Using(bitmap => ToImgd(bitmap, bitsPerPixel, quantizer, swizzle));
                         break;
                     }
                 case ".imd":
