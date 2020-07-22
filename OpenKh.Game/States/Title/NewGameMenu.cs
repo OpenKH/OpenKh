@@ -139,18 +139,20 @@ namespace OpenKh.Game.States.Title
 
         private void DrawNewGameMenu()
         {
+            const uint White = uint.MaxValue;
+            const uint Blue = 0xff00b8eb;
             const int OptionHDistance = 30;
             var titleY = _mainMenu.Kernel.IsFinalMix ? 32 : 58;
             var subTitleBgY = _mainMenu.Kernel.IsFinalMix ? 180 : 188;
             var subTitleY = _mainMenu.Kernel.IsFinalMix ? 82 : 104;
             var optionY = _mainMenu.Kernel.IsFinalMix ? 120 : 144;
-            var descY = _mainMenu.Kernel.IsFinalMix ? 256 : 240;
+            var descY = _mainMenu.Kernel.IsFinalMix ? 256 : 248;
 
             _animMenuBg.Draw(0, 0);
-            _mainMenu.Print(0x432e, 0, titleY, 512, TextAlignment.Center);
+            _mainMenu.Print(0x432e, 0, titleY, Blue, 512, TextAlignment.Center);
             _animMenuWindow.Draw(0, 0);
             _seqRenderer.Draw(25, 0, 64, subTitleBgY);
-            _mainMenu.Print(0x4330, 0, subTitleY, 512, TextAlignment.Center);
+            _mainMenu.Print(0x4330, 0, subTitleY, White, 512, TextAlignment.Center);
 
             for (var i = 0; i < _difficultyCount; i++)
             {
@@ -158,10 +160,10 @@ namespace OpenKh.Game.States.Title
                 if (i == _difficultyOption)
                     _animMenuOptionSelected.Draw(256, optionY + OptionHDistance * i);
 
-                _mainMenu.Print(DifficultyTitle[i], 0, optionY + OptionHDistance * i, 512, TextAlignment.Center);
+                _mainMenu.Print(DifficultyTitle[i], 0, optionY + OptionHDistance * i, White, 512, TextAlignment.Center);
             }
 
-            _mainMenu.Print(DifficultyDescription[_difficultyOption], 0, 256, 512, TextAlignment.Center);
+            _mainMenu.Print(DifficultyDescription[_difficultyOption], 0, descY, Blue, 512, TextAlignment.Center);
         }
     }
 }

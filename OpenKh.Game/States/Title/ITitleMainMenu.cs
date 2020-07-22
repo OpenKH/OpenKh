@@ -21,7 +21,8 @@ namespace OpenKh.Game.States.Title
         InputManager InputManager { get; }
         MainMenuState State { set; }
 
-        void Print(ushort messageId, float left, float top, float right = 0,
+        void Print(ushort messageId, float left, float top,
+            uint color = 0xffffffff, float right = 0,
             TextAlignment alignment = TextAlignment.Left);
     }
 }
