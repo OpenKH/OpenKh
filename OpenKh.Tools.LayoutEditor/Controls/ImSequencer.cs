@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Windows.Controls;
 
 namespace OpenKh.Tools.LayoutEditor.Controls
 {
@@ -172,8 +173,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             Vector2 pos,
             char ch,
             bool isSelected = false,
-            uint color = ColorWhite,
-            string description = null)
+            uint color = ColorWhite)
         {
             var io = ImGui.GetIO();
             var rect = new ImRect(pos, new Vector2(pos.X + 16, pos.Y + 16));
@@ -183,7 +183,13 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             
             draw_list.AddRect(rect.Min, rect.Max, color, 4);
             draw_list.AddText(new Vector2(pos.X + 4, pos.Y - 1), color, $"{ch}");
-            if (!string.IsNullOrEmpty(description) && rect.Contains(io.MousePos))
+
+            return isMouseOver;
+        }
+
+        private static void Tooltip(string description)
+        {
+            if (!string.IsNullOrEmpty(description))
             {
                 bool isOpen = false;
                 ImGui.Begin("Child Tooltip?", ref isOpen, ImGuiWindowFlags.Tooltip |
@@ -194,8 +200,6 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                 ImGui.Text(description);
                 ImGui.EndChild();
             }
-
-            return isMouseOver;
         }
 
         public static bool Sequencer(SequenceInterface sequence, ref int currentFrame, ref bool expanded, ref int selectedEntry, ref int firstFrame, SEQUENCER_OPTIONS sequenceOptions)
@@ -330,16 +334,28 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                     const uint LoopColor = 0xFF0fc4f1;
 
                     var nextButtonPosition = new Vector2(canvas_pos.X + legendWidth - ItemHeight, canvas_pos.Y + 2);
-                    if (SequencerButton(draw_list, nextButtonPosition, 'P', sequence.IsPaused, PauseColor, sequence.IsPaused ? "Resume" : "Pause") && io.MouseReleased[0])
-                        sequence.IsPaused = !sequence.IsPaused;
+                    if (SequencerButton(draw_list, nextButtonPosition, 'P', sequence.IsPaused, PauseColor))
+                    {
+                        Tooltip(sequence.IsPaused ? "Resume" : "Pause");
+                        if (io.MouseReleased[0])
+                            sequence.IsPaused = !sequence.IsPaused;
+                    }
 
                     nextButtonPosition.X -= ButtonDistance;
-                    if (SequencerButton(draw_list, nextButtonPosition, 'L', sequence.ForceLoop, LoopColor, "Force loop") && io.MouseReleased[0])
-                        sequence.ForceLoop = !sequence.ForceLoop;
+                    if (SequencerButton(draw_list, nextButtonPosition, 'L', sequence.ForceLoop, LoopColor))
+                    {
+                        Tooltip("Force loop");
+                        if (io.MouseReleased[0])
+                            sequence.ForceLoop = !sequence.ForceLoop;
+                    }
 
                     nextButtonPosition.X -= ButtonDistance;
-                    if (SequencerButton(draw_list, nextButtonPosition, 'A', false, ColorWhite, "Add new animation") && io.MouseReleased[0])
-                        insertAnimationEntry = sequence.ItemCount;
+                    if (SequencerButton(draw_list, nextButtonPosition, 'A', false, ColorWhite))
+                    {
+                        Tooltip("Add new animation");
+                        if (io.MouseReleased[0])
+                            insertAnimationEntry = sequence.ItemCount;
+                    }
                 }
 
                 //header frame number and lines
@@ -393,8 +409,9 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                     var animation = sequence.GetAnimation(i);
                     var tPos = new Vector2(contentMin.X + 3, contentMin.Y + i * ItemHeight + 2 + customHeight);
                     var tEndPos = new Vector2(contentMin.X + 3 + legendWidth, contentMin.Y + (i + 1) * ItemHeight + 2 + customHeight);
-                    var rect = new ImRect(tPos, tEndPos);
-                    if (rect.Contains(io.MousePos) && io.MouseDown[0])
+                    var canMouseClickOnRow = new ImRect(tPos, tEndPos).Contains(io.MousePos) &&
+                        io.MousePos.Y > childFramePos.Y && io.MousePos.Y <= childFramePos.Y + childFrameSize.Y;
+                    if (canMouseClickOnRow && io.MouseDown[0])
                         selectedEntry = i;
 
                     draw_list.AddText(tPos, 0xFFFFFFFF, animation.Name ?? $"#{i + 1}");
@@ -403,35 +420,41 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                     {
                         var isAnimationVisible = sequence.IsVisible(i);
                         var buttonPos = new Vector2(contentMin.X + legendWidth - ButtonDistance + 2 - 10, tPos.Y + 2);
-                        if (SequencerButton(draw_list, buttonPos, 'H', !isAnimationVisible, 0xff15208f, "Hide animation") && io.MouseReleased[0])
+                        if (SequencerButton(draw_list, buttonPos, 'H', !isAnimationVisible, 0xff15208f) && canMouseClickOnRow)
                         {
-                            sequence.SetVisibility(i, !isAnimationVisible);
+                            Tooltip("Hide animation");
+                            if (io.MouseDown[0])
+                                sequence.SetVisibility(i, !isAnimationVisible);
                         }
 
                         var isFocused = sequence.IsFocus(i);
                         buttonPos.X -= ButtonDistance;
-                        if (SequencerButton(draw_list, buttonPos, 'S', isFocused, 0xff69992f, "Display only this animation") && io.MouseReleased[0])
+                        if (SequencerButton(draw_list, buttonPos, 'S', isFocused, 0xff69992f) && canMouseClickOnRow)
                         {
-                            if (isFocused)
-                                sequence.ResetFocus();
-                            else
-                                sequence.SetFocus(i);
+                            Tooltip("Display only this animation");
+                            if (io.MouseDown[0])
+                            {
+                                if (isFocused)
+                                    sequence.ResetFocus();
+                                else
+                                    sequence.SetFocus(i);
+                            }
                         }
 
                         buttonPos.X -= ButtonDistance;
-                        if (SequencerButton(draw_list, buttonPos, 'D', false, ColorWhite, "Duplicate animation")
-                            && io.MouseReleased[0])
+                        if (SequencerButton(draw_list, buttonPos, 'D', false, ColorWhite) && canMouseClickOnRow)
                         {
-                            // Duplicate animation
-                            duplicateAnimationEntry = i;
+                            Tooltip("Duplicate animation");
+                            if (io.MouseDown[0])
+                                duplicateAnimationEntry = i;
                         }
 
                         buttonPos.X -= ButtonDistance;
-                        if (SequencerButton(draw_list, buttonPos, '-', false, ColorWhite, "Remove animation")
-                            && io.MouseReleased[0])
+                        if (SequencerButton(draw_list, buttonPos, 'R', false, ColorWhite) && canMouseClickOnRow)
                         {
-                            // Delete animation
-                            deleteAnimationEntry = i;
+                            Tooltip("Remove animation");
+                            if (io.MouseDown[0])
+                                deleteAnimationEntry = i;
                         }
                     }
                     customHeight += sequence.GetCustomHeight(i);
