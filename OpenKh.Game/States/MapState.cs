@@ -436,11 +436,9 @@ namespace OpenKh.Game.States
                 _debugType %= 3;
 
                 if (_debugType == 0)
-                    DebugUpdatePlaceList();
+                { }
                 else if (_debugType == 1)
-                {
-
-                }
+                    DebugUpdatePlaceList();
                 else if (_debugType == 2)
                     if (_input.IsCross)
                         debug.State = 0;
@@ -452,9 +450,9 @@ namespace OpenKh.Game.States
             if (IsDebugMode())
             {
                 if (_debugType == 0)
-                    DebugDrawPlaceList(debug);
+                    DebugDrawEntities(debug);
                 else if (_debugType == 1)
-                    debug.Println("PLACEHOLDER");
+                    DebugDrawPlaceList(debug);
                 else if (_debugType == 2)
                     debug.Println("Press X to return to title screen");
             }
@@ -488,6 +486,14 @@ namespace OpenKh.Game.States
 
                 BasicallyForceToReloadEverything();
                 DisableDebugMode();
+            }
+        }
+
+        public void DebugDrawEntities(IDebug debug)
+        {
+            foreach (var entity in _objectEntities)
+            {
+
             }
         }
 
