@@ -56,7 +56,7 @@ namespace OpenKh.Game.Entities
         public static ObjectEntity FromSpawnPoint(Kernel kernel, SpawnPoint.Entity spawnPoint) =>
             new ObjectEntity(kernel, spawnPoint.ObjectId)
             {
-                Position = new Vector3(spawnPoint.PositionX, spawnPoint.PositionY, spawnPoint.PositionZ),
+                Position = new Vector3(spawnPoint.PositionX, spawnPoint.PositionY, -spawnPoint.PositionZ),
                 Rotation = new Vector3(spawnPoint.RotationX, spawnPoint.RotationY, spawnPoint.RotationZ),
             };
     }
