@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,14 +16,22 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Length { get; set; }
         }
 
+        public enum Operation
+        {
+            Spawn,
+            MapOcclusion,
+        }
+
         public class Function
         {
-            public ushort Opcode { get; set; }
+            public Operation Opcode { get; set; }
             public List<int> Parameters { get; set; }
+
+            public string AsString(int index) => ReadString(Parameters[index]);
 
             public override string ToString()
             {
-                switch (Opcode)
+                switch ((int)Opcode)
                 {
                     case 0x00:
                         return $"Spawn({ReadString(Parameters[0])})";
@@ -94,7 +102,7 @@ namespace OpenKh.Kh2.Ard
                 stream.Write((short)(scriptLength));
                 foreach (var function in script.Functions)
                 {
-                    stream.Write(function.Opcode);
+                    stream.Write((ushort)function.Opcode);
                     stream.Write((ushort)function.Parameters.Count);
                     foreach (var parameter in function.Parameters)
                         stream.Write(parameter);
@@ -139,7 +147,7 @@ namespace OpenKh.Kh2.Ard
 
                 functions.Add(new Function
                 {
-                    Opcode = opcode,
+                    Opcode = (Operation)opcode,
                     Parameters = parameters
                 });
             }

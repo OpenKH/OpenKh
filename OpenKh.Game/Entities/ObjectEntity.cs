@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
 using OpenKh.Kh2;
@@ -23,6 +24,9 @@ namespace OpenKh.Game.Entities
 
         public int ObjectId { get; }
 
+        public string ObjectName => Kernel.ObjEntries.Items
+            .FirstOrDefault(x => x.ObjectId == ObjectId)?.ModelName;
+
         public MeshGroup Mesh { get; private set; }
 
         public Vector3 Position { get; set; }
@@ -33,11 +37,13 @@ namespace OpenKh.Game.Entities
 
         public void LoadMesh(GraphicsDevice graphics)
         {
-            if (ObjectId < 0 || ObjectId >= Kernel.ObjEntries.Count)
-                throw new ArgumentOutOfRangeException(nameof(ObjectId),
-                    $"Object ID {ObjectId:X)} is out of range.");
-
             var objEntry = Kernel.ObjEntries.Items.FirstOrDefault(x => x.ObjectId == ObjectId);
+            if (objEntry == null)
+            {
+                Log.Warn($"Object ID {ObjectId} not found.");
+                return;
+            }
+
             var fileName = $"obj/{objEntry.ModelName}.mdlx";
 
             using var stream = Kernel.DataContent.FileOpen(fileName);

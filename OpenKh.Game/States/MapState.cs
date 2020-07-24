@@ -14,6 +14,8 @@ using System.Linq;
 using OpenKh.Kh2.Models;
 using OpenKh.Game.Entities;
 using OpenKh.Kh2.Ard;
+using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace OpenKh.Game.States
 {
@@ -44,6 +46,8 @@ namespace OpenKh.Game.States
 
         private int _worldId = 2;
         private int _placeId = 4;
+        private int _spawnId = 99;
+
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
         private List<ObjectEntity> _objectEntities = new List<ObjectEntity>();
@@ -315,25 +319,51 @@ namespace OpenKh.Game.States
                 fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
 
             var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
-            var spawnPoints = entries.ForEntry("m_00", Bar.EntryType.SpawnPoint, SpawnPoint.Read);
-            if (spawnPoints != null)
-            {
-                var spawnPoint = LoadSpawnPoint(spawnPoints, -1);
-                if (spawnPoint != null)
-                {
-                    var entities = spawnPoint.Entities
-                        .Select(x => ObjectEntity.FromSpawnPoint(_kernel, x))
-                        .ToList();
-                    foreach (var entity in entities)
-                        entity.LoadMesh(_graphics.GraphicsDevice);
+            RunSpawnScript(entries, "map", 4);
+        }
 
-                    _objectEntities.AddRange(entities);
+        private void RunSpawnScript(IEnumerable<Bar.Entry> barEntries, string spawnScriptName, int programId)
+        {
+            var spawnScript = barEntries.ForEntry(spawnScriptName, Bar.EntryType.SpawnScript, SpawnScript.Read);
+            if (spawnScript == null)
+                return;
+
+            var program = spawnScript.FirstOrDefault(x => x.ProgramId == programId);
+            if (program == null)
+                return;
+
+            foreach (var function in program.Functions)
+            {
+                switch (function.Opcode)
+                {
+                    case SpawnScript.Operation.Spawn:
+                        var spawn = function.AsString(0);
+                        Log.Info($"Loading spawn {spawn}");
+                        var spawnPoints = barEntries.ForEntry(spawn, Bar.EntryType.SpawnPoint, SpawnPoint.Read);
+                        if (spawnPoints != null)
+                        {
+                            foreach (var spawnPoint in spawnPoints)
+                            {
+                                foreach (var desc in spawnPoint.SpawnEntiyGroup)
+                                    SpawnEntity(desc);
+                                foreach (var desc in spawnPoint.EntityGroup2)
+                                    SpawnEntity(desc);
+                            }
+                        }
+                        else
+                            Log.Warn($"Unable to find spawn \"{spawn}\".");
+                        break;
                 }
             }
         }
 
-        private SpawnPoint LoadSpawnPoint(IEnumerable<SpawnPoint> spawnPoints, int id) =>
-            spawnPoints.FirstOrDefault();
+        private void SpawnEntity(SpawnPoint.Entity entityDesc)
+        {
+            var entity = ObjectEntity.FromSpawnPoint(_kernel, entityDesc);
+            entity.LoadMesh(_graphics.GraphicsDevice);
+
+            _objectEntities.Add(entity);
+        }
 
         private static MeshGroup FromMdlx(
             GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)

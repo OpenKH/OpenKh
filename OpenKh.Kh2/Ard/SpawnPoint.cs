@@ -41,7 +41,8 @@ namespace OpenKh.Kh2.Ard
 
         [Data] public short Unk00 { get; set; }
         [Data] public short Unk02 { get; set; }
-        [Data] public int EntityCount { get; set; }
+        [Data] public short SpawnEntityGroupCount { get; set; }
+        [Data] public short EntityGroup2Count { get; set; }
         [Data] public int Unk08 { get; set; }
         [Data] public int Unk0c { get; set; }
         [Data] public int Unk10 { get; set; }
@@ -52,10 +53,11 @@ namespace OpenKh.Kh2.Ard
         [Data] public int Unk24 { get; set; }
         [Data] public int Unk28 { get; set; }
 
-        public List<Entity> Entities { get; set; }
+        public List<Entity> SpawnEntiyGroup { get; set; }
+        public List<Entity> EntityGroup2 { get; set; }
 
         public override string ToString() =>
-            $"{Unk00:X} {Unk02:X}\n{string.Join("\n", Entities.Select(x => x.ToString()))}";
+            $"{Unk00:X} {Unk02:X}\n{string.Join("\n", SpawnEntiyGroup.Select(x => x.ToString()))}";
 
         public static List<SpawnPoint> Read(Stream stream)
         {
@@ -72,9 +74,13 @@ namespace OpenKh.Kh2.Ard
             stream.Write(items.Count);
             foreach (var item in items)
             {
-                item.EntityCount = item.Entities.Count;
+                item.SpawnEntityGroupCount = (short)item.SpawnEntiyGroup.Count;
+                item.EntityGroup2Count = (short)item.EntityGroup2.Count;
+
                 BinaryMapping.WriteObject(stream, item);
-                foreach (var spawnPoint in item.Entities)
+                foreach (var spawnPoint in item.SpawnEntiyGroup)
+                    Entity.Write(stream, spawnPoint);
+                foreach (var spawnPoint in item.EntityGroup2)
                     Entity.Write(stream, spawnPoint);
             }
         }
@@ -82,7 +88,10 @@ namespace OpenKh.Kh2.Ard
         private static SpawnPoint ReadSingle(Stream stream)
         {
             var spawn = BinaryMapping.ReadObject<SpawnPoint>(stream);
-            spawn.Entities = Enumerable.Range(0, spawn.EntityCount)
+            spawn.SpawnEntiyGroup = Enumerable.Range(0, spawn.SpawnEntityGroupCount)
+                .Select(x => Entity.Read(stream))
+                .ToList();
+            spawn.EntityGroup2 = Enumerable.Range(0, spawn.EntityGroup2Count)
                 .Select(x => Entity.Read(stream))
                 .ToList();
 
