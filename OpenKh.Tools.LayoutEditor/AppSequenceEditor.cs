@@ -384,6 +384,10 @@ namespace OpenKh.Tools.LayoutEditor
                 animation.FrameEnd = framePair[1];
             }
 
+            int spriteGroupIndex = animation.SpriteGroupIndex;
+            if (ImGui.InputInt($"Sprite group##{index}", ref spriteGroupIndex))
+                animation.SpriteGroupIndex = spriteGroupIndex;
+
             var xaPair = new int[] { animation.TranslateXStart, animation.TranslateXEnd };
             if (ImGui.DragInt2($"Translation X##{index}", ref xaPair[0]))
             {

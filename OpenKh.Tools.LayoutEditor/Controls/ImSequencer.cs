@@ -177,7 +177,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         {
             var io = ImGui.GetIO();
             var rect = new ImRect(pos, new Vector2(pos.X + 16, pos.Y + 16));
-            var isMouseOver = rect.Contains(io.MousePos) && ImGui.IsWindowFocused();
+            var isMouseOver = rect.Contains(io.MousePos);
             if (!isSelected)
                 color = isMouseOver ? 0xFFFFFFFFu : 0x50FFFFFFu;
 
