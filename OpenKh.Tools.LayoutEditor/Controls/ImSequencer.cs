@@ -80,7 +80,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         {
             bool focused { get; set; }
             int FrameMin { get; }
-            int FrameMax { get;  }
+            int FrameMax { get; }
             bool IsPaused { get; set; }
             int ItemCount { get; }
             bool ForceLoop { get; set; }
@@ -177,10 +177,10 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         {
             var io = ImGui.GetIO();
             var rect = new ImRect(pos, new Vector2(pos.X + 16, pos.Y + 16));
-            var isMouseOver = rect.Contains(io.MousePos);
+            var isMouseOver = rect.Contains(io.MousePos) && ImGui.IsWindowFocused();
             if (!isSelected)
                 color = isMouseOver ? 0xFFFFFFFFu : 0x50FFFFFFu;
-            
+
             draw_list.AddRect(rect.Min, rect.Max, color, 4);
             draw_list.AddText(new Vector2(pos.X + 4, pos.Y - 1), color, $"{ch}");
 
@@ -372,7 +372,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
                 Action<int, int> drawLine = (int i, int regionHeight) => {
                     const uint TextColor = 0xFFBBBBBB;
-                    
+
                     bool baseIndex = ((i % modFrameCount) == 0) || (i == sequence.FrameMax || i == sequence.FrameMin);
                     bool halfIndex = (i % halfModFrameCount) == 0;
                     int px = (int)canvas_pos.X + (int)(i * framePixelWidth) + legendWidth - (int)(firstFrameUsed * framePixelWidth);
@@ -411,7 +411,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                     var tEndPos = new Vector2(contentMin.X + 3 + legendWidth, contentMin.Y + (i + 1) * ItemHeight + 2 + customHeight);
                     var canMouseClickOnRow = new ImRect(tPos, tEndPos).Contains(io.MousePos) &&
                         io.MousePos.Y > childFramePos.Y && io.MousePos.Y <= childFramePos.Y + childFrameSize.Y;
-                    if (canMouseClickOnRow && io.MouseDown[0])
+                    if (canMouseClickOnRow && io.MouseDown[0] && ImGui.IsWindowHovered())
                         selectedEntry = i;
 
                     draw_list.AddText(tPos, 0xFFFFFFFF, animation.Name ?? $"#{i + 1}");
