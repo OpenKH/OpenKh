@@ -225,11 +225,19 @@ namespace OpenKh.Tools.LayoutEditor
 
             var sequenceIndex = sequenceProperty.SequenceIndex;
             if (ImGui.DragInt($"Sequence index##{index}", ref sequenceIndex))
+            {
                 sequenceProperty.SequenceIndex = Math.Min(Math.Max(sequenceIndex, 0), _layout.SequenceItems.Count - 1);
+                var sequence = _layout.SequenceItems[sequenceProperty.SequenceIndex];
+                sequenceProperty.AnimationGroup = Math.Min(Math.Max(sequenceProperty.AnimationGroup, 0), sequence.AnimationGroups.Count - 1);
+
+            }
 
             var animGroupIndex = sequenceProperty.AnimationGroup;
             if (ImGui.DragInt($"Animation group index##{index}", ref animGroupIndex))
-                sequenceProperty.AnimationGroup = sequenceProperty.AnimationGroup;
+            {
+                var sequence = _layout.SequenceItems[sequenceProperty.SequenceIndex];
+                sequenceProperty.AnimationGroup = Math.Min(Math.Max(sequenceProperty.AnimationGroup, 0), sequence.AnimationGroups.Count - 1);
+            }
 
             var frameStart = sequenceProperty.ShowAtFrame;
             if (ImGui.DragInt($"Show at frame##{index}", ref frameStart))
