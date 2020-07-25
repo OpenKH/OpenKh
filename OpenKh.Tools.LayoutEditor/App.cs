@@ -122,7 +122,7 @@ namespace OpenKh.Tools.LayoutEditor
             _bootstrap = bootstrap;
             _bootstrap.Title = Title;
             AddKeyMapping(Keys.O, MenuFileOpenWithoutPcsx2);
-            AddKeyMapping(Keys.A, MenuFileOpenPcsx2);
+            AddKeyMapping(Keys.L, MenuFileOpenPcsx2);
             AddKeyMapping(Keys.S, MenuFileSave);
         }
 
@@ -187,7 +187,7 @@ namespace OpenKh.Tools.LayoutEditor
                 ForMenu("File", () =>
                 {
                     ForMenuItem("Open...", "CTRL+O", MenuFileOpenWithoutPcsx2);
-                    ForMenuItem($"{LinkToPcsx2ActionName}...", "CTRL+A", MenuFileOpenPcsx2);
+                    ForMenuItem($"{LinkToPcsx2ActionName}...", "CTRL+L", MenuFileOpenPcsx2);
                     ForMenuItem("Save", "CTRL+S", MenuFileSave, CurrentEditor != null);
                     ForMenuItem("Save as...", MenuFileSaveAs, CurrentEditor != null);
                     ImGui.Separator();
