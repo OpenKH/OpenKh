@@ -13,6 +13,9 @@ using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using OpenKh.Engine;
+using OpenKh.Tools.Kh2SystemEditor.Utils;
+using OpenKh.Kh2.System;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 
 namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
@@ -25,6 +28,11 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             .AddExtensions("KH2.IDX", "idx").AddAllFiles();
         private static readonly List<FileDialogFilter> MsgFilter = FileDialogFilterComposer.Compose()
             .AddExtensions("sys.bar", "bar", "msg", "bin").AddAllFiles();
+        private static readonly List<FileDialogFilter> TableExportFilter = FileDialogFilterComposer.Compose()
+            .AddExtensions("yml", "yml")
+            .AddExtensions("xlsx", "xlsx")
+            .AddExtensions("csv", "csv")
+            .AddAllFiles();
 
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
@@ -49,6 +57,8 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         public RelayCommand OpenCommand { get; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAsCommand { get; }
+        public RelayCommand ExportItemListCommand { get; }
+        public RelayCommand ExportTrsrListCommand { get; }
         public RelayCommand ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
         public RelayCommand LoadSupportIdxCommand { get; }
@@ -94,6 +104,30 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 FileName = fileName;
             }, SystemFilter, defaultFileName: FileName, parent: Window));
 
+            ExportItemListCommand = new RelayCommand(
+                _ => FileDialog.OnSave(
+                    fileName =>
+                    {
+                        ExportTable(fileName, Item);
+                    },
+                    TableExportFilter,
+                    defaultFileName: "ItemList.yml",
+                    parent: Window
+                )
+            );
+
+            ExportTrsrListCommand = new RelayCommand(
+                _ => FileDialog.OnSave(
+                    fileName =>
+                    {
+                        ExportTable(fileName, Trsr);
+                    },
+                    TableExportFilter,
+                    defaultFileName: "TrsrList.yml",
+                    parent: Window
+                )
+            );
+
             ExitCommand = new RelayCommand(x => Window.Close());
 
             AboutCommand = new RelayCommand(x => new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog());
@@ -109,6 +143,14 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
             _messageProvider = new Kh2MessageProvider();
             CreateSystem();
+        }
+
+        private void ExportTable<T>(string fileName, IEnumerable<T> list)
+        {
+            DictListWriteUtil.Write(
+                fileName,
+                DictionalizeUtil.ToDictList(list)
+            );
         }
 
         private void LoadMessages(List<Msg.Entry> msgs)

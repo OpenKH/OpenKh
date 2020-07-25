@@ -6,6 +6,7 @@ using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Kh2.System;
 using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Kh2SystemEditor.Attributes;
 using OpenKh.Tools.Kh2SystemEditor.Extensions;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using Xe.Tools;
@@ -29,14 +30,22 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
             public Item.Entry Item { get; }
 
+            [ExportTarget]
             public string Title => $"{Item.Id:X02} {_messageProvider.GetString(Item.Name)}";
 
+            [ExportTarget]
             public ushort Id { get => Item.Id; set => Item.Id = value; }
+            [ExportTarget]
             public Item.Type Type  { get => Item.Type; set => Item.Type = value; }
+            [ExportTarget]
             public byte Flag0  { get => Item.Flag0; set => Item.Flag0 = value; }
+            [ExportTarget]
             public byte Flag1  { get => Item.Flag1; set => Item.Flag1 = value; }
+            [ExportTarget]
             public Item.Rank Rank { get => Item.Rank; set => Item.Rank = value; }
+            [ExportTarget]
             public ushort StatEntry  { get => Item.StatEntry; set => Item.StatEntry = value; }
+            [ExportTarget]
             public ushort NameId
             {
                 get => Item.Name;
@@ -46,6 +55,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                     OnPropertyChanged(nameof(Name));
                 }
             }
+            [ExportTarget]
             public ushort DescriptionId
             {
                 get => Item.Description;
@@ -55,16 +65,26 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                     OnPropertyChanged(nameof(Description));
                 }
             }
+            [ExportTarget]
             public ushort ShopBuy { get => Item.ShopBuy; set => Item.ShopBuy = value; }
+            [ExportTarget]
             public ushort ShopSell { get => Item.ShopSell; set => Item.ShopSell = value; }
+            [ExportTarget]
             public ushort Command  { get => Item.Command; set => Item.Command = value; }
+            [ExportTarget]
             public ushort Slot  { get => Item.Slot; set => Item.Slot = value; }
+            [ExportTarget]
             public short Picture  { get => Item.Picture; set => Item.Picture = value; }
+            [ExportTarget]
             public byte Icon1  { get => Item.Icon1; set => Item.Icon1 = value; }
+            [ExportTarget]
             public byte Icon2  { get => Item.Icon1; set => Item.Icon1 = value; }
 
+            [ExportTarget]
             public string IdText => $"{Id} (0x{Id:X})";
+            [ExportTarget]
             public string Name { get => _messageProvider.GetString(Item.Name); set => _messageProvider.SetString(Item.Name, value); }
+            [ExportTarget]
             public string Description { get => _messageProvider.GetString(Item.Description); set => _messageProvider.SetString(Item.Description, value); }
             public EnumModel<Item.Type> Types { get; }
             public EnumModel<Item.Rank> Ranks { get; }

@@ -18,6 +18,9 @@
                 <MenuItem Header="_Save 03system" Command="{Binding SaveCommand}"/>
                 <MenuItem Header="Save 03system _as..." Command="{Binding SaveAsCommand}"/>
                 <Separator/>
+                <MenuItem Header="Export _Item list as..." Command="{Binding ExportItemListCommand}"/>
+                <MenuItem Header="Export _Trsr list as..." Command="{Binding ExportTrsrListCommand}"/>
+                <Separator/>
                 <MenuItem Header="Su_pport files">
                     <MenuItem Header="Load _IDX/IMG" Command="{Binding LoadSupportIdxCommand}"/>
                     <MenuItem Header="Load MSG only" Command="{Binding LoadSupportMsgCommand}"/>

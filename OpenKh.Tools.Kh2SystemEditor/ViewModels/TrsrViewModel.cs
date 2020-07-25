@@ -5,6 +5,7 @@ using System.Windows;
 using OpenKh.Kh2;
 using OpenKh.Kh2.System;
 using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Kh2SystemEditor.Attributes;
 using OpenKh.Tools.Kh2SystemEditor.Extensions;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using Xe.Tools;
@@ -27,11 +28,14 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public Trsr Treasure { get; }
             public IItemProvider ItemProvider { get; }
 
+            [ExportTarget]
             public string Title => $"{Treasure.Id:X03} {MapName} {ItemName}";
             public string Query => $"{Id} {Title} {Type} {World} {RoomChestIndex} {EventId}";
 
+            [ExportTarget]
             public ushort Id { get => Treasure.Id; set => Treasure.Id = value; }
 
+            [ExportTarget]
             public ushort ItemId
             {
                 get => Treasure.ItemId;
@@ -41,7 +45,9 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                     OnPropertyChanged(nameof(Title));
                 }
             }
+            [ExportTarget]
             public Trsr.TrsrType Type { get => Treasure.Type; set => Treasure.Type = value; }
+            [ExportTarget]
             public World World
             {
                 get => (World)Treasure.World;
@@ -52,6 +58,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                     OnPropertyChanged(nameof(MapName));
                 }
             }
+            [ExportTarget]
             public byte Room
             {
                 get => Treasure.Room;
@@ -62,12 +69,18 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                     OnPropertyChanged(nameof(MapName));
                 }
             }
+            [ExportTarget]
             public byte RoomChestIndex { get => Treasure.RoomChestIndex; set => Treasure.RoomChestIndex = value; }
+            [ExportTarget]
             public short EventId { get => Treasure.EventId; set => Treasure.EventId = value; }
+            [ExportTarget]
             public short OverallChestIndex { get => Treasure.OverallChestIndex; set => Treasure.OverallChestIndex = value; }
 
+            [ExportTarget]
             public string IdText => $"{Id} (0x{Id:X})";
+            [ExportTarget]
             public string MapName => $"{Constants.WorldIds[(int)World]}_{Room:D02}";
+            [ExportTarget]
             public string ItemName => ItemProvider.GetItemName(ItemId);
 
             public Kh2WorldsList Worlds { get; }
