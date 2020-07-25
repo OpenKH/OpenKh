@@ -27,9 +27,7 @@
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Windows.Controls;
 
 namespace OpenKh.Tools.LayoutEditor.Controls
 {
@@ -129,7 +127,6 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         }
 
         private const float AnimationBarSideSelectionWidth = 8f;
-        private const int scrollBarHeight = 14;
         private const float MinBarWidth = 44f;
         private const float FLT_EPSILON = 1.192092896e-07F;
         private const uint ColorWhite = 0xffffffff;
@@ -236,7 +233,6 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             var customDraws = new List<CustomDraw>();
             var compactCustomDraws = new List<CustomDraw>();
             // zoom in/out
-            int frameOverCursor = 0;
             int visibleFrameCount = (int)Math.Floor((canvas_size.X - legendWidth) / framePixelWidth);
             float barWidthRatio = Math.Min(visibleFrameCount / (float)frameCount, 1f);
             float barWidthInPixels = barWidthRatio * (canvas_size.X - legendWidth);
