@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -7,6 +8,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.System;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Kh2SystemEditor.Dialogs;
 using OpenKh.Tools.Kh2SystemEditor.Extensions;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using Xe.Tools;
@@ -15,41 +17,38 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
     public class FtstViewModel : MyGenericListModel<FtstViewModel.Entry>, ISystemGetChanges
     {
-        public class Entry : BaseNotifyPropertyChanged
+        public class ColorItem : BaseNotifyPropertyChanged
         {
-            internal Entry(World world, int[] palette)
-            {
-                World = world;
-                Palette = palette;
-                ChangeColor = new RelayCommand<string>(strIndex =>
-                {
-                    var index = int.Parse(strIndex);
-                    var color = ToColor(palette[index]);
-                    // INSERT COLOR PICKER HERE
-                    palette[index] = FromColor(color);
-                    OnAllPropertiesChanged();
-                }, strIndex =>
-                {
-                    var index = int.Parse(strIndex);
-                    return index >= 0 && index < palette.Length;
-                });
-            }
-
-            public World World { get; }
-            public int[] Palette { get; }
-            public string Name => Constants.WorldNames[(int)World];
-
-            public Brush Color1 => ToBrush(Palette[0]);
-            public Brush Color2 => ToBrush(Palette[1]);
-            public Brush Color3 => ToBrush(Palette[2]);
-            public Brush Color4 => ToBrush(Palette[3]);
-            public Brush Color5 => ToBrush(Palette[4]);
-            public Brush Color6 => ToBrush(Palette[5]);
-            public Brush Color7 => ToBrush(Palette[6]);
-            public Brush Color8 => ToBrush(Palette[7]);
-            public Brush Color9 => ToBrush(Palette[8]);
+            public Brush CurrentColor => ToBrush(GetColor());
 
             public ICommand ChangeColor { get; }
+
+            internal Func<int> GetColor;
+            internal Action<int> SetColor;
+
+            public ColorItem()
+            {
+                ChangeColor = new RelayCommand<string>(
+                    _ =>
+                    {
+                        try
+                        {
+                            var newValue = TextInputDialog.Ask(GetColor().ToString("X8"));
+
+                            SetColor((int)Convert.ToUInt32(newValue, 16));
+                            OnAllPropertiesChanged();
+                        }
+                        catch (ArgumentOutOfRangeException)
+                        {
+                            // ignore
+                        }
+                        catch (FormatException)
+                        {
+                            // ignore
+                        }
+                    }
+                );
+            }
 
             private static int FromColor(Color color)
             {
@@ -71,11 +70,40 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             private static Brush ToBrush(int color) => new SolidColorBrush(ToColor(color));
         }
 
+        public class Entry : BaseNotifyPropertyChanged
+        {
+            internal Entry(World world, int numColors, Func<int, int> getter, Action<int, int> setter)
+            {
+                World = world;
+
+                for (var loop = 0; loop < numColors; loop++)
+                {
+                    var colorIndex = loop;
+
+                    ColorItems.Add(
+                        new ColorItem
+                        {
+                            GetColor = () => getter(colorIndex),
+                            SetColor = (value) => setter(colorIndex, value)
+                        }
+                    );
+                }
+            }
+
+            public World World { get; }
+
+            public string Name => Constants.WorldNames[(int)World];
+
+            public List<ColorItem> ColorItems { get; } = new List<ColorItem>();
+        }
+
+        private List<Ftst.Entry> _entries = new List<Ftst.Entry>();
+
         private const string _entryName = "ftst";
 
         public string EntryName => _entryName;
 
-        public IEnumerable<Ftst.Entry> Palette => Map(this.ToArray());
+        public IEnumerable<Ftst.Entry> Palette => _entries;
 
         public FtstViewModel() :
             this(Enumerable.Range(0, Constants.PaletteCount).Select(x => new Ftst.Entry
@@ -90,9 +118,25 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         { }
 
         public FtstViewModel(IEnumerable<Ftst.Entry> ftsts) :
-            base(Map(ftsts.ToArray()))
+            base(new Entry[0])
         {
+            _entries.AddRange(ftsts);
 
+            var maxCount = ftsts.Count();
+
+            for (var loop = 0; loop < Constants.WorldCount; loop++)
+            {
+                var worldIndex = loop;
+
+                Items.Add(
+                    new Entry(
+                        (World)worldIndex,
+                        maxCount,
+                        (index) => _entries[index].Colors[worldIndex],
+                        (index, value) => _entries[index].Colors[worldIndex] = value
+                    )
+                );
+            }
         }
 
         public Stream CreateStream()
@@ -104,15 +148,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
         private static IEnumerable<Entry> Map(Ftst.Entry[] entries) =>
             Enumerable.Range(0, Constants.WorldCount)
-                .Select(x => new Entry((World)x, GetPalette(x, entries)));
-
-        private static IEnumerable<Ftst.Entry> Map(Entry[] entries) =>
-            Enumerable.Range(0, Constants.PaletteCount)
-                .Select(x => new Ftst.Entry
-                {
-                    Id = x,
-                    Colors = entries.Select(worldPalette => worldPalette.Palette[x]).ToArray()
-                });
+                .Select(x => new Entry((World)x, 9, index => 0, (index, color) => { }));
 
         private static int[] GetPalette(int index, Ftst.Entry[] entries) =>
             entries.Select(x => x.Colors[index]).ToArray();
