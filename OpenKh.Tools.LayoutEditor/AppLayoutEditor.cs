@@ -232,7 +232,7 @@ namespace OpenKh.Tools.LayoutEditor
                 sequenceProperty.AnimationGroup = sequenceProperty.AnimationGroup;
 
             var frameStart = sequenceProperty.ShowAtFrame;
-            if (ImGui.DragInt($"Show at frame##{index}", ref animGroupIndex))
+            if (ImGui.DragInt($"Show at frame##{index}", ref frameStart))
                 sequenceProperty.ShowAtFrame = frameStart;
 
             var position = new int[] { sequenceProperty.PositionX, sequenceProperty.PositionY };
