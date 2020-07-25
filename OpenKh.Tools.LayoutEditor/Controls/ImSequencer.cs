@@ -406,7 +406,8 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                     var tPos = new Vector2(contentMin.X + 3, contentMin.Y + i * ItemHeight + 2 + customHeight);
                     var tEndPos = new Vector2(contentMin.X + 3 + legendWidth, contentMin.Y + (i + 1) * ItemHeight + 2 + customHeight);
                     var canMouseClickOnRow = new ImRect(tPos, tEndPos).Contains(io.MousePos) &&
-                        io.MousePos.Y > childFramePos.Y && io.MousePos.Y <= childFramePos.Y + childFrameSize.Y;
+                        io.MousePos.Y > childFramePos.Y && io.MousePos.Y <= childFramePos.Y + childFrameSize.Y &&
+                        ImGui.IsWindowFocused();
                     if (canMouseClickOnRow && io.MouseDown[0] && ImGui.IsWindowHovered())
                         selectedEntry = i;
 
