@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenKh.Engine.Parsers;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
@@ -14,8 +13,6 @@ using System.Linq;
 using OpenKh.Kh2.Models;
 using OpenKh.Game.Entities;
 using OpenKh.Kh2.Ard;
-using System.ComponentModel.DataAnnotations;
-using System;
 
 namespace OpenKh.Game.States
 {
@@ -319,7 +316,9 @@ namespace OpenKh.Game.States
                 fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
 
             var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
-            RunSpawnScript(entries, "map", 4);
+            RunSpawnScript(entries, "map", 0x06);
+            RunSpawnScript(entries, "btl", 0x01);
+            RunSpawnScript(entries, "evt", 0x16);
         }
 
         private void RunSpawnScript(IEnumerable<Bar.Entry> barEntries, string spawnScriptName, int programId)
