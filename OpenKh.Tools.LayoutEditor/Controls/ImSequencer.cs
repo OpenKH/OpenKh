@@ -423,7 +423,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                         if (SequencerButton(draw_list, buttonPos, 'H', !isAnimationVisible, 0xff15208f) && canMouseClickOnRow)
                         {
                             Tooltip("Hide animation");
-                            if (io.MouseDown[0])
+                            if (io.MouseReleased[0])
                                 sequence.SetVisibility(i, !isAnimationVisible);
                         }
 
@@ -432,7 +432,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                         if (SequencerButton(draw_list, buttonPos, 'S', isFocused, 0xff69992f) && canMouseClickOnRow)
                         {
                             Tooltip("Display only this animation");
-                            if (io.MouseDown[0])
+                            if (io.MouseReleased[0])
                             {
                                 if (isFocused)
                                     sequence.ResetFocus();
@@ -445,7 +445,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                         if (SequencerButton(draw_list, buttonPos, 'D', false, ColorWhite) && canMouseClickOnRow)
                         {
                             Tooltip("Duplicate animation");
-                            if (io.MouseDown[0])
+                            if (io.MouseReleased[0])
                                 duplicateAnimationEntry = i;
                         }
 
@@ -453,7 +453,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                         if (SequencerButton(draw_list, buttonPos, 'R', false, ColorWhite) && canMouseClickOnRow)
                         {
                             Tooltip("Remove animation");
-                            if (io.MouseDown[0])
+                            if (io.MouseReleased[0])
                                 deleteAnimationEntry = i;
                         }
                     }
