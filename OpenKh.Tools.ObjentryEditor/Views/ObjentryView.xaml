@@ -140,16 +140,46 @@
                 </Grid>
 
                 <TextBlock Text="Spawn Object 1" Margin="{StaticResource LabelMargin}"/>
-                <ComboBox ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                           DisplayMemberPath="Name" SelectedValuePath="ObjectId" />
+                    <Button Grid.Column="2" Width="25" ToolTip="Clear selection" Command="{Binding ClearObject1}">
+                        <Image Source="{StaticResource CleanData_16x}" />
+                    </Button>
+                </Grid>
 
                 <TextBlock Text="Spawn Object 2" Margin="{StaticResource LabelMargin}"/>
-                <ComboBox ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                           DisplayMemberPath="Name" SelectedValuePath="ObjectId" />
+                    <Button Grid.Column="2" Width="25" ToolTip="Clear selection" Command="{Binding ClearObject2}">
+                        <Image Source="{StaticResource CleanData_16x}" />
+                    </Button>
+                </Grid>
 
                 <TextBlock Text="Spawn Object 3" Margin="{StaticResource LabelMargin}"/>
-                <ComboBox ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" ItemsSource="{Binding UnfilteredItems}" SelectedValue="{Binding SelectedItem.SpawnObject3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                           DisplayMemberPath="Name" SelectedValuePath="ObjectId" />
+                    <Button Grid.Column="2" Width="25" ToolTip="Clear selection" Command="{Binding ClearObject3}">
+                        <Image Source="{StaticResource CleanData_16x}" />
+                    </Button>
+                </Grid>
 
                 <TextBlock Text="Unknown5e" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding SelectedItem.Unknown5e, UpdateSourceTrigger=PropertyChanged}"/>
