@@ -103,7 +103,7 @@ namespace OpenKh.Tools.LayoutEditor.Controls
         public bool IsVisible(int index) => _debugSequenceRenderer.IsAnimationVisible(index);
         public void SetVisibility(int index, bool isVisible) => _debugSequenceRenderer.ShowAnimation(index, isVisible);
 
-        public int GetCustomHeight(int index) => _animationList[index].Height;
+        public int GetCustomHeight(int index) => _animationList.Skip(index).FirstOrDefault()?.Height ?? 0;
 
         public MySequencer(Sequence sequence, DebugSequenceRenderer debugSequenceRenderer)
         {
