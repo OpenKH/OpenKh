@@ -9,7 +9,6 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.System;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.Models;
-using OpenKh.Tools.Kh2SystemEditor.Dialogs;
 using OpenKh.Tools.Kh2SystemEditor.Extensions;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using Xe.Tools;
@@ -20,57 +19,14 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
     {
         public class ColorItem : BaseNotifyPropertyChanged
         {
-            public Brush CurrentColor => ToBrush(GetColor());
-
-            public ICommand ChangeColor { get; }
+            public Color? CurrentColor
+            {
+                get => ToColor(GetColor());
+                set => SetColor(FromColor(value ?? Colors.Black));
+            }
 
             internal Func<int> GetColor;
             internal Action<int> SetColor;
-
-            class ByteValue
-            {
-                public byte Value { get; set; }
-            }
-
-            public ColorItem()
-            {
-                ChangeColor = new RelayCommand<string>(
-                    _ =>
-                    {
-                        try
-                        {
-                            var dialog = new ColorDialog();
-                            var argb = GetColor();
-                            dialog.Color = System.Drawing.Color.FromArgb(argb);
-                            if(dialog.ShowDialog() == DialogResult.OK)
-                            {
-                                var it = new ByteValue
-                                {
-                                    Value = (byte)(argb >> 24),
-                                };
-
-                                if (ValueInputDialog.Ask(it))
-                                {
-                                    var newArgb = dialog.Color.ToArgb();
-                                    newArgb &= 0x00FFFFFF;
-                                     newArgb |= it.Value << 24;
-
-                                    SetColor(newArgb);
-                                    OnAllPropertiesChanged();
-                                }
-                            }
-                        }
-                        catch (ArgumentOutOfRangeException)
-                        {
-                            // ignore
-                        }
-                        catch (FormatException)
-                        {
-                            // ignore
-                        }
-                    }
-                );
-            }
 
             private static int FromColor(Color color)
             {
@@ -89,7 +45,6 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 var ch4 = (byte)(((color >> 24) & 0xFF) * 2 - 1);
                 return Color.FromArgb(ch4, ch1, ch2, ch3);
             }
-            private static Brush ToBrush(int color) => new SolidColorBrush(ToColor(color));
         }
 
         public class Entry : BaseNotifyPropertyChanged

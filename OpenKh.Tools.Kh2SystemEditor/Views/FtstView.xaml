@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2SystemEditor.Views"
+             xmlns:wpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="500">
     <UserControl.Resources>
@@ -27,20 +28,19 @@
             <ItemsControl ItemsSource="{Binding ColorItems}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" />
+                        <StackPanel Orientation="Vertical" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button
+                        <wpftoolkit:ColorPicker
                             Margin="{StaticResource ButtonMargin}"
-                            Background="{Binding CurrentColor}"
-                            Command="{Binding ChangeColor}" CommandParameter="0"
-                            Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}">
-                            <Button.Content>
-                                <Control Background="{Binding Color}"/>
-                            </Button.Content>
-                        </Button>
+                            SelectedColor="{Binding CurrentColor}"
+                            Width="100"
+                            ColorMode="ColorCanvas"
+                            ShowDropDownButton="True"
+                            DisplayColorAndName="False"
+                            />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
