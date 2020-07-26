@@ -81,7 +81,7 @@ namespace OpenKh.Engine.Renderers
                 return frameIndex;
 
             var frameEnd = animationGroup.LoopEnd;
-            if (frameEnd == 0)
+            if (frameEnd == 0 && animationGroup.Animations.Count > 0)
                 frameEnd = animationGroup.Animations.Max(x => x.FrameEnd);
 
             return Loop(animationGroup.LoopStart, frameEnd, frameIndex);
