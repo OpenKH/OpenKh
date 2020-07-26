@@ -146,10 +146,10 @@ namespace OpenKh.Kh2
             public int LoopStart { get; set; }
             public int LoopEnd { get; set; }
             public int Unknown10 { get; set; }
-            public int Unknown14 { get; set; }
-            public int Unknown18 { get; set; }
+            public int TextPositionY { get; set; }
+            public int TextScale { get; set; }
             public int Unknown1C { get; set; }
-            public int Unknown20 { get; set; }
+            public int TextPositionX { get; set; }
         }
 
         public int Unknown04 { get; set; }
@@ -203,10 +203,10 @@ namespace OpenKh.Kh2
                     LoopStart = x.LoopStart,
                     LoopEnd = x.LoopEnd,
                     Unknown10 = x.Unknown10,
-                    Unknown14 = x.Unknown14,
-                    Unknown18 = x.Unknown18,
+                    TextPositionY = x.Unknown14,
+                    TextScale = x.Unknown18,
                     Unknown1C = x.Unknown1C,
-                    Unknown20 = x.Unknown20,
+                    TextPositionX = x.Unknown20,
                 }).ToList();
         }
 
@@ -271,10 +271,10 @@ namespace OpenKh.Kh2
                     LoopStart = animGroup.LoopStart,
                     LoopEnd = animGroup.LoopEnd,
                     Unknown10 = animGroup.Unknown10,
-                    Unknown14 = animGroup.Unknown14,
-                    Unknown18 = animGroup.Unknown18,
+                    Unknown14 = animGroup.TextPositionY,
+                    Unknown18 = animGroup.TextScale,
                     Unknown1C = animGroup.Unknown1C,
-                    Unknown20 = animGroup.Unknown20,
+                    Unknown20 = animGroup.TextPositionX,
                 });
 
                 index += animGroup.Animations.Count;

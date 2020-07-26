@@ -352,21 +352,21 @@ namespace OpenKh.Tools.LayoutEditor
             if (ImGui.InputInt("Unknown10", ref unknown10))
                 animationGroup.Unknown10 = unknown10;
 
-            int unknown14 = animationGroup.Unknown14;
-            if (ImGui.InputInt("Unknown14", ref unknown14))
-                animationGroup.Unknown14 = unknown14;
+            int unknown14 = animationGroup.TextPositionY;
+            if (ImGui.InputInt("Text position Y", ref unknown14))
+                animationGroup.TextPositionY = unknown14;
 
-            int unknown18 = animationGroup.Unknown18;
-            if (ImGui.InputInt("Unknown18", ref unknown18))
-                animationGroup.Unknown18 = unknown18;
+            int unknown18 = animationGroup.TextScale;
+            if (ImGui.InputInt("Text scale", ref unknown18))
+                animationGroup.TextScale = unknown18;
 
             int unknown1c = animationGroup.Unknown1C;
             if (ImGui.InputInt("Unknown1c", ref unknown1c))
                 animationGroup.Unknown1C = unknown1c;
 
-            int unknown20 = animationGroup.Unknown20;
-            if (ImGui.InputInt("Unknown20", ref unknown20))
-                animationGroup.Unknown20 = unknown20;
+            int unknown20 = animationGroup.TextPositionX;
+            if (ImGui.InputInt("Text position X", ref unknown20))
+                animationGroup.TextPositionX = unknown20;
         }
 
         private void AnimationEdit(Sequence.Animation animation, int index)
@@ -383,7 +383,7 @@ namespace OpenKh.Tools.LayoutEditor
                 animation.Flags = (animation.Flags & ~flag) | (interpolationMode == 0 ? 0 : flag);
             }
 
-            ImGuiFlagBox(animation, $"Attach text##{index}", Sequence.AttachTextFlag);
+            ImGuiFlagBox(animation, $"Attach text##{index}", Sequence.AttachTextFlag, true);
 
             var framePair = new int[] { animation.FrameStart, animation.FrameEnd };
             if (ImGui.DragInt2($"Frame lifespan##{index}", ref framePair[0]))
@@ -569,14 +569,14 @@ namespace OpenKh.Tools.LayoutEditor
                 _animationFrameCurrent = frameIndexRef;
         }
 
-        private bool ImGuiFlagBox(Sequence.Animation animation, string label, int flag, bool hideLabelWhenEnabled = false)
+        private bool ImGuiFlagBox(Sequence.Animation animation, string label, int flag, bool negate = false)
         {
-            bool isSet = (animation.Flags & flag) == 0;
-            if (isSet && hideLabelWhenEnabled)
-                label = string.Empty;
+            var setFlag = negate ? 0 : flag;
+            var unsetFlag = negate ? flag : 0;
 
+            bool isSet = (animation.Flags & flag) == unsetFlag;
             if (ImGui.Checkbox(label, ref isSet))
-                animation.Flags = (animation.Flags & ~flag) | (isSet ? 0 : flag);
+                animation.Flags = (animation.Flags & ~flag) | (isSet ? unsetFlag : setFlag);
 
             return isSet;
         }
