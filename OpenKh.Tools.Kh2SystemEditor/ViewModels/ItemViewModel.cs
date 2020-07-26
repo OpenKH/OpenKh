@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -90,6 +91,13 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public EnumModel<Item.Rank> Ranks { get; }
 
             public override string ToString() => Title;
+
+            public void RefreshMessages()
+            {
+                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(Description));
+            }
         }
 
         private const string entryName = "item";
@@ -192,5 +200,13 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
         private bool FilterByName(Entry arg) =>
             arg.Title.ToUpper().Contains(SearchTerm.ToUpper());
+
+        public void RefreshAllMessages()
+        {
+            foreach (var item in Items)
+            {
+                item.RefreshMessages();
+            }
+        }
     }
 }

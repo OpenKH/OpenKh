@@ -16,11 +16,18 @@ using OpenKh.Engine;
 using OpenKh.Tools.Kh2SystemEditor.Utils;
 using OpenKh.Kh2.System;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
+using OpenKh.Kh2.Messages;
 
 namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
     public class SystemEditorViewModel : BaseNotifyPropertyChanged
     {
+        public enum EncodingType
+        {
+            European,
+            Japanese
+        }
+
         private static string ApplicationName = Utilities.GetApplicationName();
         private static readonly List<FileDialogFilter> SystemFilter = FileDialogFilterComposer.Compose()
             .AddExtensions("03system", "bin", "bar").AddAllFiles();
@@ -34,8 +41,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             .AddExtensions("csv", "csv")
             .AddAllFiles();
 
+
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private string _fileName;
+        private EncodingType _encoding;
         private IEnumerable<Bar.Entry> _barItems;
         private Kh2MessageProvider _messageProvider;
         private ItemViewModel _item;
@@ -80,6 +89,26 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         {
             get => _ftst;
             private set { _ftst = value; OnPropertyChanged(); }
+        }
+
+        public EncodingType Encoding
+        {
+            get => _encoding;
+            set
+            {
+                switch (_encoding = value)
+                {
+                    case EncodingType.European:
+                        _messageProvider.Encoder = Encoders.InternationalSystem;
+                        break;
+                    case EncodingType.Japanese:
+                        _messageProvider.Encoder = Encoders.JapaneseSystem;
+                        break;
+                }
+
+                Item.RefreshAllMessages();
+                Trsr.RefreshAllMessages();
+            }
         }
 
         public SystemEditorViewModel()
