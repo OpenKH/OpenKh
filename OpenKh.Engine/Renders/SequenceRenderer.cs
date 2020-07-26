@@ -53,6 +53,7 @@ namespace OpenKh.Engine.Renderers
 
         private readonly ISpriteDrawing drawing;
         private readonly ISpriteTexture surface;
+        private Context _textContext;
 
         public Sequence Sequence { get; }
 
@@ -65,6 +66,40 @@ namespace OpenKh.Engine.Renderers
         }
 
         public IDebugSequenceRenderer DebugSequenceRenderer { get; set; }
+
+        public bool Draw(IMessageRenderer msgRenderer, byte[] data, int animationGroupIndex, int frameIndex, float positionX, float positionY)
+        {
+            _textContext = null;
+            var isAnimationEnd = Draw(animationGroupIndex, frameIndex, positionX, positionY);
+
+            if (_textContext != null && msgRenderer != null && data != null)
+            {
+                const float UiTextScale = 0.75f;
+                var seqGroup = Sequence.AnimationGroups[animationGroupIndex];
+                float textScale = seqGroup.TextScale == 0 ? UiTextScale : (seqGroup.TextScale / 24f);
+
+                var fakeTextDrawContext = new DrawContext
+                {
+                    Scale = textScale,
+                    IgnoreDraw = true,
+                };
+                msgRenderer.Draw(fakeTextDrawContext, data);
+                var width = (float)fakeTextDrawContext.Width;
+
+                var xPos = _textContext.PositionX - width / 2 + seqGroup.TextPositionX;
+                msgRenderer.Draw(new DrawContext
+                {
+                    xStart = xPos,
+                    x = xPos,
+                    y = _textContext.PositionY + seqGroup.TextPositionY,
+                    Color = _textContext.Color,
+                    Scale = textScale,
+                    WidthMultiplier = 1.0f,
+                }, data);
+            }
+
+            return isAnimationEnd;
+        }
 
         public bool Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
             DrawAnimationGroup(new Context
@@ -183,6 +218,12 @@ namespace OpenKh.Engine.Renderers
             }
 
             context.Color *= DebugSequenceRenderer.GetAnimationBlendColor(index);
+
+            if ((animation.Flags & Sequence.AttachTextFlag) != 0)
+            {
+                if (_textContext == null)
+                    _textContext = context.Clone();
+            }
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS
             DrawFrameGroup(context, Sequence.SpriteGroups[animation.SpriteGroupIndex]);

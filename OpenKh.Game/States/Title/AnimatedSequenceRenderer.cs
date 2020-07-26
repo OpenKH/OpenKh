@@ -1,4 +1,5 @@
 ﻿using OpenKh.Engine.Renderers;
+using OpenKh.Engine.Renders;
 
 namespace OpenKh.Game.States.Title
 {
@@ -11,10 +12,13 @@ namespace OpenKh.Game.States.Title
         private int _anim;
         private int _frame;
         private bool _isRunning;
+        private IMessageRenderer _messageRenderer;
+        private byte[] _message;
 
         public bool IsEnd { get; set; }
 
-        public AnimatedSequenceRenderer(SequenceRenderer renderer, int anim) :
+        public AnimatedSequenceRenderer(
+            SequenceRenderer renderer, int anim) :
             this(renderer, anim, anim + 1, anim + 2)
         { }
 
@@ -26,6 +30,13 @@ namespace OpenKh.Game.States.Title
             _animLoop = animLoop;
             _animEnd = animEnd;
             IsEnd = true;
+
+        }
+
+        public void SetMessage(IMessageRenderer messageRenderer, byte[] message)
+        {
+            _messageRenderer = messageRenderer;
+            _message = message;
         }
 
         public void Update(double deltaTime)
@@ -38,7 +49,7 @@ namespace OpenKh.Game.States.Title
             if (IsEnd)
                 return;
 
-            if (!_renderer.Draw(_anim, _frame, x, y))
+            if (!_renderer.Draw(_messageRenderer, _message, _anim, _frame, x, y))
             {
                 if (_isRunning)
                 {

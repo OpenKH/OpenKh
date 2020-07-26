@@ -49,6 +49,7 @@ namespace OpenKh.Game.States.Title
 
         public Kernel Kernel { get; private set; }
         public InputManager InputManager { get; private set; }
+        public IMessageRenderer MessageRenderer => _messageRenderer;
 
         public MainMenuState State
         {
@@ -360,23 +361,30 @@ namespace OpenKh.Game.States.Title
             return (layout, images);
         }
 
-        public void Print(ushort messageId, float left, float top,
-            uint color, float right, TextAlignment alignment)
+        public byte[] GetMessage(ushort messageId)
         {
             if (!_cachedText.TryGetValue(messageId, out var data))
                 _cachedText[messageId] = data = Kernel.MessageProvider.GetMessage(messageId);
-            
+
+            return data;
+        }
+
+        public void Print(ushort messageId, float left, float top,
+            uint color, TextAlignment alignment)
+        {
+            var data = GetMessage(messageId);
+
             var x = alignment switch
             {
-                TextAlignment.Left => left,
-                TextAlignment.Center => ((right - left) / 2) - (GetTextWidth(data) / 2),
-                TextAlignment.Right => right - GetTextWidth(data),
-                _ => left,
+                TextAlignment.Left => 0,
+                TextAlignment.Center => -(GetTextWidth(data) / 2),
+                TextAlignment.Right => -GetTextWidth(data),
+                _ => 0,
             };
             _messageRenderer.Draw(new DrawContext
             {
-                xStart = x,
-                x = x,
+                xStart = left + x,
+                x = left + x,
                 y = top,
                 Scale = 0.8f,
                 Color = new ColorF(
