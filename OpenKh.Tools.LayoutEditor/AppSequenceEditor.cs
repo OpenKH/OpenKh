@@ -383,6 +383,8 @@ namespace OpenKh.Tools.LayoutEditor
                 animation.Flags = (animation.Flags & ~flag) | (interpolationMode == 0 ? 0 : flag);
             }
 
+            ImGuiFlagBox(animation, $"Attach text##{index}", Sequence.AttachTextFlag);
+
             var framePair = new int[] { animation.FrameStart, animation.FrameEnd };
             if (ImGui.DragInt2($"Frame lifespan##{index}", ref framePair[0]))
             {
