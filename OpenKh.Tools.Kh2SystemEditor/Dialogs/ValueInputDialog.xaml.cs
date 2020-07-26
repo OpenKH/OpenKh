@@ -16,9 +16,9 @@ namespace OpenKh.Tools.Kh2SystemEditor.Dialogs
     /// <summary>
     /// ColorPickerDialog.xaml の相互作用ロジック
     /// </summary>
-    public partial class TextInputDialog : Window
+    public partial class ValueInputDialog : Window
     {
-        public TextInputDialog()
+        public ValueInputDialog()
         {
             InitializeComponent();
         }
@@ -28,16 +28,16 @@ namespace OpenKh.Tools.Kh2SystemEditor.Dialogs
             DialogResult = true;
         }
 
-        public static string Ask(string defaultValue)
+        public static bool Ask(object objectWithValueProperty)
         {
-            var window = new TextInputDialog();
+            var window = new ValueInputDialog();
             window.Owner = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
-            window.textBox.Text = defaultValue;
+            window.textBox.DataContext = objectWithValueProperty;
             if (window.ShowDialog() ?? false)
             {
-                return window.textBox.Text;
+                return true;
             }
-            return "";
+            return false;
         }
     }
 }

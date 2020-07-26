@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using OpenKh.Kh2;
@@ -26,6 +27,11 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             internal Func<int> GetColor;
             internal Action<int> SetColor;
 
+            class ByteValue
+            {
+                public byte Value { get; set; }
+            }
+
             public ColorItem()
             {
                 ChangeColor = new RelayCommand<string>(
@@ -33,10 +39,26 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                     {
                         try
                         {
-                            var newValue = TextInputDialog.Ask(GetColor().ToString("X8"));
+                            var dialog = new ColorDialog();
+                            var argb = GetColor();
+                            dialog.Color = System.Drawing.Color.FromArgb(argb);
+                            if(dialog.ShowDialog() == DialogResult.OK)
+                            {
+                                var it = new ByteValue
+                                {
+                                    Value = (byte)(argb >> 24),
+                                };
 
-                            SetColor((int)Convert.ToUInt32(newValue, 16));
-                            OnAllPropertiesChanged();
+                                if (ValueInputDialog.Ask(it))
+                                {
+                                    var newArgb = dialog.Color.ToArgb();
+                                    newArgb &= 0x00FFFFFF;
+                                     newArgb |= it.Value << 24;
+
+                                    SetColor(newArgb);
+                                    OnAllPropertiesChanged();
+                                }
+                            }
                         }
                         catch (ArgumentOutOfRangeException)
                         {
