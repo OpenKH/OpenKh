@@ -333,9 +333,9 @@ namespace OpenKh.Tools.LayoutEditor
 
         private void AnimationGroupEdit(Sequence.AnimationGroup animationGroup)
         {
-            var doNotLoop = animationGroup.DoNotLoop != 0;
-            if (ImGui.Checkbox("Do not loop", ref doNotLoop))
-                animationGroup.DoNotLoop = (short)(doNotLoop ? 1 : 0);
+            var canAnimationLoop = animationGroup.DoNotLoop == 0;
+            if (ImGui.Checkbox("Loop animation", ref canAnimationLoop))
+                animationGroup.DoNotLoop = (short)(canAnimationLoop ? 0 : 1);
 
             int unknown06 = animationGroup.Unknown06;
             if (ImGui.InputInt("Unknown06", ref unknown06))
