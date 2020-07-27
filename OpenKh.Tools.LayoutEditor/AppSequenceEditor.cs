@@ -372,7 +372,7 @@ namespace OpenKh.Tools.LayoutEditor
         private void AnimationEdit(Sequence.Animation animation, int index)
         {
             int flags = animation.Flags;
-            if (ImGui.InputInt($"Flags##{index}", ref flags))
+            if (ImGui.InputInt($"Flags (for debugging)##{index}", ref flags))
                 animation.Flags = flags;
 
             int interpolationMode = (animation.Flags & Sequence.LinearInterpolationFlag) != 0 ? 1 : 0;
