@@ -145,7 +145,7 @@ namespace OpenKh.Kh2
             public short Unknown06 { get; set; }
             public int LoopStart { get; set; }
             public int LoopEnd { get; set; }
-            public int LightPositionY { get; set; }
+            public int LightPositionX { get; set; }
             public int TextPositionY { get; set; }
             public int TextScale { get; set; }
             public int UiPadding { get; set; }
@@ -202,7 +202,7 @@ namespace OpenKh.Kh2
                     Unknown06 = x.Unknown06,
                     LoopStart = x.LoopStart,
                     LoopEnd = x.LoopEnd,
-                    LightPositionY = x.Unknown10,
+                    LightPositionX = x.Unknown10,
                     TextPositionY = x.Unknown14,
                     TextScale = x.Unknown18,
                     UiPadding = x.Unknown1C,
@@ -270,7 +270,7 @@ namespace OpenKh.Kh2
                     Unknown06 = animGroup.Unknown06,
                     LoopStart = animGroup.LoopStart,
                     LoopEnd = animGroup.LoopEnd,
-                    Unknown10 = animGroup.LightPositionY,
+                    Unknown10 = animGroup.LightPositionX,
                     Unknown14 = animGroup.TextPositionY,
                     Unknown18 = animGroup.TextScale,
                     Unknown1C = animGroup.UiPadding,

@@ -349,9 +349,9 @@ namespace OpenKh.Tools.LayoutEditor
                 animationGroup.LoopEnd = loopPair[1];
             }
 
-            int lightPosY = animationGroup.LightPositionY;
-            if (ImGui.InputInt("Light pos. Y", ref lightPosY))
-                animationGroup.LightPositionY = lightPosY;
+            int lightPosX = animationGroup.LightPositionX;
+            if (ImGui.InputInt("Light pos. X", ref lightPosX))
+                animationGroup.LightPositionX = lightPosX;
 
             int textPosY = animationGroup.TextPositionY;
             if (ImGui.InputInt("Text position Y", ref textPosY))
