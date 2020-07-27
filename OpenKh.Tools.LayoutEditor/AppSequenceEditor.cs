@@ -285,7 +285,8 @@ namespace OpenKh.Tools.LayoutEditor
         private void DrawRight()
         {
             var animationGroup = _sequence.AnimationGroups[_selectedAnimGroup];
-            AnimationGroupEdit(animationGroup);
+            if (ImGui.CollapsingHeader($"Properties"))
+                AnimationGroupEdit(animationGroup);
 
             for (var i = 0; i < animationGroup.Animations.Count; i++)
             {
