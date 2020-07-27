@@ -145,10 +145,10 @@ namespace OpenKh.Kh2
             public short Unknown06 { get; set; }
             public int LoopStart { get; set; }
             public int LoopEnd { get; set; }
-            public int Unknown10 { get; set; }
+            public int LightPositionY { get; set; }
             public int TextPositionY { get; set; }
             public int TextScale { get; set; }
-            public int Unknown1C { get; set; }
+            public int UiPadding { get; set; }
             public int TextPositionX { get; set; }
         }
 
@@ -202,10 +202,10 @@ namespace OpenKh.Kh2
                     Unknown06 = x.Unknown06,
                     LoopStart = x.LoopStart,
                     LoopEnd = x.LoopEnd,
-                    Unknown10 = x.Unknown10,
+                    LightPositionY = x.Unknown10,
                     TextPositionY = x.Unknown14,
                     TextScale = x.Unknown18,
-                    Unknown1C = x.Unknown1C,
+                    UiPadding = x.Unknown1C,
                     TextPositionX = x.Unknown20,
                 }).ToList();
         }
@@ -270,10 +270,10 @@ namespace OpenKh.Kh2
                     Unknown06 = animGroup.Unknown06,
                     LoopStart = animGroup.LoopStart,
                     LoopEnd = animGroup.LoopEnd,
-                    Unknown10 = animGroup.Unknown10,
+                    Unknown10 = animGroup.LightPositionY,
                     Unknown14 = animGroup.TextPositionY,
                     Unknown18 = animGroup.TextScale,
-                    Unknown1C = animGroup.Unknown1C,
+                    Unknown1C = animGroup.UiPadding,
                     Unknown20 = animGroup.TextPositionX,
                 });
 

@@ -348,25 +348,25 @@ namespace OpenKh.Tools.LayoutEditor
                 animationGroup.LoopEnd = loopPair[1];
             }
 
-            int unknown10 = animationGroup.Unknown10;
-            if (ImGui.InputInt("Unknown10", ref unknown10))
-                animationGroup.Unknown10 = unknown10;
+            int lightPosY = animationGroup.LightPositionY;
+            if (ImGui.InputInt("Light pos. Y", ref lightPosY))
+                animationGroup.LightPositionY = lightPosY;
 
-            int unknown14 = animationGroup.TextPositionY;
-            if (ImGui.InputInt("Text position Y", ref unknown14))
-                animationGroup.TextPositionY = unknown14;
+            int textPosY = animationGroup.TextPositionY;
+            if (ImGui.InputInt("Text position Y", ref textPosY))
+                animationGroup.TextPositionY = textPosY;
 
-            int unknown18 = animationGroup.TextScale;
-            if (ImGui.InputInt("Text scale", ref unknown18))
-                animationGroup.TextScale = unknown18;
+            int textScale = animationGroup.TextScale;
+            if (ImGui.InputInt("Text scale", ref textScale))
+                animationGroup.TextScale = textScale;
 
-            int unknown1c = animationGroup.Unknown1C;
-            if (ImGui.InputInt("Unknown1c", ref unknown1c))
-                animationGroup.Unknown1C = unknown1c;
+            int uiPadding = animationGroup.UiPadding;
+            if (ImGui.InputInt("UI padding", ref uiPadding))
+                animationGroup.UiPadding = uiPadding;
 
-            int unknown20 = animationGroup.TextPositionX;
-            if (ImGui.InputInt("Text position X", ref unknown20))
-                animationGroup.TextPositionX = unknown20;
+            int textPosX = animationGroup.TextPositionX;
+            if (ImGui.InputInt("Text position X", ref textPosX))
+                animationGroup.TextPositionX = textPosX;
         }
 
         private void AnimationEdit(Sequence.Animation animation, int index)
