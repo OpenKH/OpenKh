@@ -2,7 +2,6 @@ using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace OpenKh.Engine.Renderers
@@ -240,10 +239,10 @@ namespace OpenKh.Engine.Renderers
         private void DrawFrameExtended(Context contextParent, Sequence.SpritePart frameEx)
         {
             var context = contextParent.Clone();
-            context.Left = frameEx.Left * context.ScaleX;
-            context.Top = frameEx.Top * context.ScaleY;
-            context.Right = frameEx.Right * context.ScaleX;
-            context.Bottom = frameEx.Bottom * context.ScaleY;
+            context.Left = frameEx.Left;
+            context.Top = frameEx.Top;
+            context.Right = frameEx.Right;
+            context.Bottom = frameEx.Bottom;
 
             DrawFrame(context, Sequence.Sprites[frameEx.SpriteIndex]);
         }
@@ -256,6 +255,7 @@ namespace OpenKh.Engine.Renderers
                 .Position(context.Left, context.Top)
                 .DestinationSize(context.Right - context.Left, context.Bottom - context.Top)
                 .Traslate(context.PivotX, context.PivotY)
+                .ScaleSize(context.ScaleX, context.ScaleY)
                 .RotateX(-context.RotationX)
                 .RotateY(-context.RotationY)
                 .RotateZ(-context.RotationZ)
