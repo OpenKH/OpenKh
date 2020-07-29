@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2.Ard;
 using System.Collections.Generic;
 using System.IO;
@@ -30,6 +30,47 @@ namespace OpenKh.Tests.kh2
 
                 return outStream;
             }));
+
+            [Theory]
+            [InlineData("Spawn \"ABcd\"", SpawnScript.Operation.Spawn, 0x64634241)]
+            [InlineData("MapOcclusion 0xffffffff 0x00000001", SpawnScript.Operation.MapOcclusion, -1, 1)]
+            [InlineData("Bgm 123 456", SpawnScript.Operation.Bgm, 0x01c8007b)]
+            [InlineData("BgmDefault", SpawnScript.Operation.Bgm, 0)]
+            [InlineData("ff 0x1234567 0x1ccccccc", (SpawnScript.Operation)0xff, 0x1234567, 0x1ccccccc)]
+            public void ParseScriptAsText(string expected, SpawnScript.Operation operation, params int[] parameters) =>
+                Assert.Equal(expected, SpawnScriptParser.AsText(new SpawnScript.Function
+                {
+                    Opcode = operation,
+                    Parameters = parameters.ToList()
+                }));
+
+            //[Fact]
+            //public void ForAllFiles()
+            //{
+            //    File.WriteAllText("D:\\out.csv", "MAP,00,01,02,03,04,05,06,07,08,09,0a,0b,0c,0d,0e,0f,10,11,12,13,14,15,16,17,18,19,1a,1b,1c,1d,1e,1f\n");
+            //    foreach (var fileName in Directory.GetFiles(@"D:\Hacking\KH2\export_fm\ard\", "*.ard", SearchOption.AllDirectories))
+            //    {
+            //        var map = Path.GetFileNameWithoutExtension(fileName);
+            //        var bar = File.OpenRead(fileName).Using(Kh2.Bar.Read);
+            //        foreach (var entry in bar.Where(x => x.Type == Kh2.Bar.EntryType.SpawnScript).OrderBy(x => x.Name))
+            //        {
+            //            ForSpawnScript($"{map}_{entry.Name}", SpawnScript.Read(entry.Stream));
+            //        }
+
+            //    }
+            //}
+
+            //private static void ForSpawnScript(string prefix, List<SpawnScript> spawnScript)
+            //{
+            //    var opcodeCount = new int[0x20];
+            //    foreach (var script in spawnScript)
+            //    {
+            //        File.WriteAllText($"D:\\KH2FM_map_scripts\\{prefix}_{script.ProgramId:X04}.txt", script.ToString());
+            //        foreach (var function in script.Functions)
+            //            opcodeCount[(ushort)function.Opcode]++;
+            //    }
+            //    File.AppendAllText("D:\\out.csv", $"{prefix}," + string.Join(",", opcodeCount.Select(x => x.ToString())) + "\n");
+            //}
         }
 
         public class SpawnPointTests
