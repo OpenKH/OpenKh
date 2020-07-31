@@ -1,5 +1,5 @@
 ﻿using OpenKh.Common;
-using OpenKh.Command.MapTool.Models;
+using OpenKh.Command.MapGen.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +9,7 @@ using OpenKh.Kh2;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils.Conventions;
 
-namespace OpenKh.Command.MapTool.Utils
+namespace OpenKh.Command.MapGen.Utils
 {
     class MapVifPacketBuilder
     {

@@ -9,21 +9,19 @@ using OpenKh.Common.Exceptions;
 using System.Linq;
 using OpenKh.Engine.Parsers;
 using System.Xml.Serialization;
-using OpenKh.Command.MapTool.Models;
+using OpenKh.Command.MapGen.Models;
 using Assimp;
 using System.Numerics;
 using Xe.Graphics;
-using OpenKh.Command.MapTool.Utils;
+using OpenKh.Command.MapGen.Utils;
 using static OpenKh.Kh2.Mdlx;
 using System.Collections.Generic;
-using OpenKh.Command.MapGen.Utils;
-using OpenKh.Command.MapGen.Models;
 using System.Diagnostics;
 using NLog;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace OpenKh.Command.MapTool
+namespace OpenKh.Command.MapGen
 {
     [Command("OpenKh.Command.MapGen")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]

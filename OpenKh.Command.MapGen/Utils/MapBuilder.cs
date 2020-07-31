@@ -1,8 +1,8 @@
 ﻿using Assimp;
 using NLog;
 using OpenKh.Command.MapGen.Models;
-using OpenKh.Command.MapTool.Models;
-using OpenKh.Command.MapTool.Utils;
+using OpenKh.Command.MapGen.Models;
+using OpenKh.Command.MapGen.Utils;
 using OpenKh.Common;
 using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;

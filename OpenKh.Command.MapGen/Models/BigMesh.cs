@@ -7,7 +7,7 @@ using System.Text;
 using Xe.Graphics;
 using static OpenKh.Command.MapGen.Models.MapGenConfig;
 
-namespace OpenKh.Command.MapTool.Models
+namespace OpenKh.Command.MapGen.Models
 {
     /// <summary>
     /// 

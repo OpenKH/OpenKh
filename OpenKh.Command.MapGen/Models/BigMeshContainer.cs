@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using static OpenKh.Command.MapGen.Models.MapGenConfig;
 
-namespace OpenKh.Command.MapTool.Models
+namespace OpenKh.Command.MapGen.Models
 {
     public class BigMeshContainer
     {
