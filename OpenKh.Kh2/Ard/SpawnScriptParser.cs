@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -50,14 +50,72 @@ namespace OpenKh.Kh2.Ard
                     if (p[0] == 0)
                         return "BgmDefault";
                     return $"Bgm {p[0] & 0xffff} {(p[0] >> 16) & 0xffff}";
+                case SpawnScript.Operation.Mission:
+                    return $"Mission 0x{p[0]:x} \"" + string.Join(string.Empty,
+                        ReadString(p[1]),
+                        ReadString(p[2]),
+                        ReadString(p[3]),
+                        ReadString(p[4]),
+                        ReadString(p[5]),
+                        ReadString(p[6]),
+                        ReadString(p[7]),
+                        ReadString(p[8]) + "\"");
+                case SpawnScript.Operation.BattleLevel:
+                    return $"BattleLevel {p[0]}";
                 default:
-                    return $"{(int)(function.Opcode):x02} {string.Join(" ", p.Select(x => $"0x{x:x}"))}";
+                    return $"Unk{(int)(function.Opcode):x02} {string.Join(" ", p.Select(x => $"0x{x:x}"))}";
             }
         }
 
-        private static string ReadString(int parameter) =>
-            Encoding.ASCII.GetString(new byte[]
+        private static string RunAsText(List<int> parameters) // 00182280
+        {
+            var code = new List<string>();
+
+            var i = 0;
+            var a0 = parameters[i] & 0xffff;
+            var a1 = parameters[i] >> 16;
+            // 00198c28
+            var head = $"Run 0x{a0:x} 0x{a1:x}";
+            i++;
+
+            while (i < parameters.Count)
             {
+                var op = parameters[i] & 0xffff;
+                var extraParam = (parameters[i] >> 16) & 0x7;
+                var unknown = parameters[i++] >> 19;
+                switch (op)
+                {
+                    case 0:
+                        code.Add($"Cutscene \"{ReadString(parameters[i++])}\" {parameters[i++]}");
+                        break;
+                    case 2:
+                        code.Add($"UnkRun02 0x{parameters[i++]:x} 0x{parameters[i++]:x}");
+                        break;
+                    case 5:
+                        code.Add($"UnkRun05 {extraParam}");
+                        break;
+                    case 6:
+                        var itemList = parameters.Skip(i).Take(extraParam).Select(x => $"{x}");
+                        code.Add($"GetItem {string.Join(" ", itemList)}");
+                        i += extraParam;
+                        break;
+                    case 7:
+                        code.Add("End");
+                        break;
+                    default:
+                        code.Add($"UnkRun{op:x02} DUMP {string.Join(" ", parameters.Select(p => $"0x{p:x}"))}");
+                        i = int.MaxValue;
+                        break;
+                }
+            }
+
+            return $"{head}\n\t{string.Join("\n\t", code)}";
+        }
+
+        private static void sub_00198c28(int a0, int a1)
+        {
+        }
+
         private static string ReadString(int parameter)
         {
             var data = new byte[]

@@ -58,18 +58,20 @@ namespace OpenKh.Tests.kh2
                     Parameters = parameters.ToList()
                 }));
 
-            //[Fact]
-            //public void ForAllFiles()
-            //{
-            //    File.WriteAllText("D:\\out.csv", "MAP,00,01,02,03,04,05,06,07,08,09,0a,0b,0c,0d,0e,0f,10,11,12,13,14,15,16,17,18,19,1a,1b,1c,1d,1e,1f\n");
-            //    foreach (var fileName in Directory.GetFiles(@"D:\Hacking\KH2\export_fm\ard\", "*.ard", SearchOption.AllDirectories))
-            //    {
-            //        var map = Path.GetFileNameWithoutExtension(fileName);
-            //        var bar = File.OpenRead(fileName).Using(Kh2.Bar.Read);
-            //        foreach (var entry in bar.Where(x => x.Type == Kh2.Bar.EntryType.SpawnScript).OrderBy(x => x.Name))
-            //        {
-            //            ForSpawnScript($"{map}_{entry.Name}", SpawnScript.Read(entry.Stream));
-            //        }
+            [Theory]
+            [InlineData("Cutscene \"666\" 1", 0x20000, 0x363636, 1)]
+            [InlineData("GetItem 666", 0x10006, 0x29a)]
+            [InlineData("GetItem 666 777", 0x20006, 0x29a, 0x309)]
+            [InlineData("End", 7)]
+            public void ParseScriptRunAsText(string expected, params int[] parameters)
+            {
+                var aaa = SpawnScriptParser.AsText(new SpawnScript.Function
+                {
+                    Opcode = SpawnScript.Operation.Run,
+                    Parameters = parameters.ToList()
+                });
+                Assert.Equal($"\t{expected}", aaa.Split('\n').LastOrDefault());
+            }
 
             //    }
             //}
