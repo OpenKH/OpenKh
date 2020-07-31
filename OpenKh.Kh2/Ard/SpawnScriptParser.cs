@@ -22,14 +22,14 @@ namespace OpenKh.Kh2.Ard
                     return $"Spawn \"{ReadString(p[0])}\"";
                 case SpawnScript.Operation.MapOcclusion:
                     return $"MapOcclusion 0x{p[0]:x08} 0x{p[1]:x08}";
+                case SpawnScript.Operation.MultipleSpawn:
+                    var spawns = function.Parameters.Select(ReadString).Select(s => $"\"{s}\"");
                 case (SpawnScript.Operation)5: // 0034ecd0
                     return $"Set05 {p[0]}";
                 case (SpawnScript.Operation)6: // 0034ecd8
                     return $"Set06 {p[0]}";
                 case (SpawnScript.Operation)7: // 0034ecdc
                     return $"Set07 {p[0]}";
-                case SpawnScript.Operation.MultipleSpawn:
-                    var spawns = function.Parameters.Select(ReadString).Select(s => $"\"{s}\"");
                     return $"MultipleSpawn {string.Join(" ", spawns)}";
                 case SpawnScript.Operation.Run:
                     return RunAsText(function.Parameters);
