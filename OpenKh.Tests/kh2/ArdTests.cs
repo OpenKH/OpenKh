@@ -34,9 +34,15 @@ namespace OpenKh.Tests.kh2
             [Theory]
             [InlineData("Spawn \"ABcd\"", SpawnScript.Operation.Spawn, 0x64634241)]
             [InlineData("MapOcclusion 0xffffffff 0x00000001", SpawnScript.Operation.MapOcclusion, -1, 1)]
+            [InlineData("MultipleSpawn \"0123\" \"4567\"", SpawnScript.Operation.MultipleSpawn, 0x33323130, 0x37363534)]
+            [InlineData("Set05 123", (SpawnScript.Operation)5, 123)]
+            [InlineData("Set06 123", (SpawnScript.Operation)6, 123)]
+            [InlineData("Set07 123", (SpawnScript.Operation)7, 123)]
             [InlineData("Bgm 123 456", SpawnScript.Operation.Bgm, 0x01c8007b)]
             [InlineData("BgmDefault", SpawnScript.Operation.Bgm, 0)]
-            [InlineData("ff 0x1234567 0x1ccccccc", (SpawnScript.Operation)0xff, 0x1234567, 0x1ccccccc)]
+            [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Mission, 0x1234,
+                0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
+            [InlineData("Unkff 0x1234567 0x1ccccccc", (SpawnScript.Operation)0xff, 0x1234567, 0x1ccccccc)]
             public void ParseScriptAsText(string expected, SpawnScript.Operation operation, params int[] parameters) =>
                 Assert.Equal(expected, SpawnScriptParser.AsText(new SpawnScript.Function
                 {

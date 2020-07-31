@@ -19,7 +19,10 @@ namespace OpenKh.Kh2.Ard
         {
             Spawn,
             MapOcclusion,
+            MultipleSpawn,
+            Run = 0xc,
             Bgm = 0x10,
+            Mission = 0x15,
         }
 
         public class Function
