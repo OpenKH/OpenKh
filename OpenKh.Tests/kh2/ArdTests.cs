@@ -38,10 +38,18 @@ namespace OpenKh.Tests.kh2
             [InlineData("Set05 123", (SpawnScript.Operation)5, 123)]
             [InlineData("Set06 123", (SpawnScript.Operation)6, 123)]
             [InlineData("Set07 123", (SpawnScript.Operation)7, 123)]
+            [InlineData("Party NO_FRIEND", (SpawnScript.Operation)15, 0)]
+            [InlineData("Party DEFAULT", (SpawnScript.Operation)15, 1)]
+            [InlineData("Party W_FRIEND", (SpawnScript.Operation)15, 2)]
+            [InlineData("Party W_FRIEND_IN", (SpawnScript.Operation)15, 3)]
+            [InlineData("Party W_FRIEND_FIX", (SpawnScript.Operation)15, 4)]
+            [InlineData("Party W_FRIEND_ONLY", (SpawnScript.Operation)15, 5)]
+            [InlineData("Party DONALD_ONLY", (SpawnScript.Operation)15, 6)]
             [InlineData("Bgm 123 456", SpawnScript.Operation.Bgm, 0x01c8007b)]
             [InlineData("BgmDefault", SpawnScript.Operation.Bgm, 0)]
             [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Mission, 0x1234,
                 0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
+            [InlineData("BattleLevel 99", SpawnScript.Operation.BattleLevel, 99)]
             [InlineData("Unkff 0x1234567 0x1ccccccc", (SpawnScript.Operation)0xff, 0x1234567, 0x1ccccccc)]
             public void ParseScriptAsText(string expected, SpawnScript.Operation operation, params int[] parameters) =>
                 Assert.Equal(expected, SpawnScriptParser.AsText(new SpawnScript.Function

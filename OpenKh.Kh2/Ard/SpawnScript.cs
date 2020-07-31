@@ -21,8 +21,10 @@ namespace OpenKh.Kh2.Ard
             MapOcclusion,
             MultipleSpawn,
             Run = 0xc,
+            Party = 0x0f,
             Bgm = 0x10,
             Mission = 0x15,
+            BattleLevel = 0x1e,
         }
 
         public class Function

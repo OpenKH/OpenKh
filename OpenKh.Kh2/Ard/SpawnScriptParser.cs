@@ -6,6 +6,17 @@ namespace OpenKh.Kh2.Ard
 {
     public static class SpawnScriptParser
     {
+        private static readonly string[] PARTY = new string[]
+        {
+            "NO_FRIEND",
+            "DEFAULT",
+            "W_FRIEND",
+            "W_FRIEND_IN",
+            "W_FRIEND_FIX",
+            "W_FRIEND_ONLY",
+            "DONALD_ONLY",
+        };
+
         public static IEnumerable<string> AsText(SpawnScript script)
         {
             yield return $"Program 0x{script.ProgramId}";
@@ -24,15 +35,17 @@ namespace OpenKh.Kh2.Ard
                     return $"MapOcclusion 0x{p[0]:x08} 0x{p[1]:x08}";
                 case SpawnScript.Operation.MultipleSpawn:
                     var spawns = function.Parameters.Select(ReadString).Select(s => $"\"{s}\"");
+                    return $"MultipleSpawn {string.Join(" ", spawns)}";
                 case (SpawnScript.Operation)5: // 0034ecd0
                     return $"Set05 {p[0]}";
                 case (SpawnScript.Operation)6: // 0034ecd8
                     return $"Set06 {p[0]}";
                 case (SpawnScript.Operation)7: // 0034ecdc
                     return $"Set07 {p[0]}";
-                    return $"MultipleSpawn {string.Join(" ", spawns)}";
                 case SpawnScript.Operation.Run:
                     return RunAsText(function.Parameters);
+                case SpawnScript.Operation.Party:
+                    return $"Party {PARTY[p[0]]}";
                 case SpawnScript.Operation.Bgm:
                     if (p[0] == 0)
                         return "BgmDefault";
