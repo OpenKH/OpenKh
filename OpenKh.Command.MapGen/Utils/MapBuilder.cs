@@ -345,7 +345,7 @@ namespace OpenKh.Command.MapGen.Utils
                 entries.Add(
                     new Bar.Entry
                     {
-                        Name = config.bar?.model?.name ?? "ID_e",
+                        Name = config.bar?.coct?.name ?? "ID_e",
                         Type = Bar.EntryType.MapCollision,
                         Stream = coctBin,
                     }
