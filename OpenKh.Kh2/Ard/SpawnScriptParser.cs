@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -82,6 +82,8 @@ namespace OpenKh.Kh2.Ard
                     return $"$SetFlag_0034f240_To10";
                 case SpawnScript.Operation.BattleLevel:
                     return $"BattleLevel {p[0]}";
+                case (SpawnScript.Operation)0x1f:
+                    return $"$Unk1f \"{ReadString(p[0])}\"";
                 default:
                     return $"$Unk{(int)(function.Opcode):x02} {string.Join(" ", p.Select(x => $"0x{x:x}"))}";
             }

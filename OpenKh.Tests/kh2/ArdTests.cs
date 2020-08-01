@@ -57,6 +57,7 @@ namespace OpenKh.Tests.kh2
                 0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
             [InlineData("$SetFlag_0034f240_To10", SpawnScript.Operation.SetFlag10)]
             [InlineData("BattleLevel 99", SpawnScript.Operation.BattleLevel, 99)]
+            [InlineData("$Unk1f \"666\"", (SpawnScript.Operation)0x1f, 0x363636)]
             [InlineData("$Unkff 0x1234567 0x1ccccccc", (SpawnScript.Operation)0xff, 0x1234567, 0x1ccccccc)]
             public void ParseScriptAsText(string expected, SpawnScript.Operation operation, params int[] parameters) =>
                 Assert.Equal(expected, SpawnScriptParser.AsText(new SpawnScript.Function
