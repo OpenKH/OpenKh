@@ -76,7 +76,7 @@ namespace OpenKh.Tests.kh2
                 var aaa = SpawnScriptParser.AsText(new SpawnScript.Function
                 {
                     Opcode = SpawnScript.Operation.Run,
-                    Parameters = parameters.ToList()
+                    Parameters = new int[] { 0 }.Concat(parameters).ToList()
                 });
                 Assert.Equal($"\t{expected}", aaa.Split('\n').LastOrDefault());
             }

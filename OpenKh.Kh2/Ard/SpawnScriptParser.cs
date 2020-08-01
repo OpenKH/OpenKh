@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -103,26 +103,37 @@ namespace OpenKh.Kh2.Ard
             while (i < parameters.Count)
             {
                 var op = parameters[i] & 0xffff;
-                var extraParam = (parameters[i] >> 16) & 0x7;
-                var unknown = parameters[i++] >> 19;
+                var extraParam = parameters[i] >> 16;
+                i++;
                 switch (op)
                 {
                     case 0:
                         code.Add($"Cutscene \"{ReadString(parameters[i++])}\" {parameters[i++]}");
                         break;
+                    //case 1:
+                    //    code.Add($"Unk01 0x{parameters[i++]:x} 0x{parameters[i++]:x} 0x{parameters[i++]:x}");
+                    //    break;
                     case 2:
-                        code.Add($"UnkRun02 0x{parameters[i++]:x} 0x{parameters[i++]:x}");
+                        code.Add($"Op02 P:{extraParam} 0x{parameters[i++]:x} 0x{parameters[i++]:x} 0x{parameters[i++]:x}");
+                        break;
+                    case 4:
+                        code.Add($"Op04 P:{extraParam} 0x{parameters[i++]:x} 0x{parameters[i++]:x}");
                         break;
                     case 5:
-                        code.Add($"UnkRun05 {extraParam}");
+                        code.Add($"Op05 P:{extraParam} 0x{parameters[i++]:x} 0x{parameters[i++]:x}");
                         break;
                     case 6:
+                        var itemCount = extraParam & 7;
                         var itemList = parameters.Skip(i).Take(extraParam).Select(x => $"{x}");
                         code.Add($"GetItem {string.Join(" ", itemList)}");
-                        i += extraParam;
+                        i += itemCount;
                         break;
                     case 7:
                         code.Add("End");
+                        break;
+                    case 8:
+                        code.Add($"Op08 P:{extraParam} 0x{parameters[i++]:x}");
+                        i++;
                         break;
                     default:
                         code.Add($"UnkRun{op:x02} DUMP {string.Join(" ", parameters.Select(p => $"0x{p:x}"))}");
