@@ -97,7 +97,7 @@ namespace OpenKh.Game.States
 
             _graphics.GraphicsDevice.RasterizerState = new RasterizerState()
             {
-                CullMode = CullMode.CullCounterClockwiseFace
+                CullMode = CullMode.CullClockwiseFace
             };
             _graphics.GraphicsDevice.DepthStencilState = new DepthStencilState();
             _graphics.GraphicsDevice.BlendState = DefaultBlendState;
