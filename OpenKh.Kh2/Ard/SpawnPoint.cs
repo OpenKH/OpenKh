@@ -22,8 +22,8 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk1e { get; set; }
             [Data] public int Unk20 { get; set; }
             [Data] public int Unk24 { get; set; }
-            [Data] public int Unk28 { get; set; }
-            [Data] public int Unk2c { get; set; }
+            [Data] public int TalkMessage { get; set; }
+            [Data] public int ReactionCommand { get; set; }
             [Data] public int Unk30 { get; set; }
             [Data] public int Unk34 { get; set; }
             [Data] public int Unk38 { get; set; }
@@ -37,7 +37,7 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"ID {ObjectId} POS({PositionX:F0}, {PositionY:F0}, {PositionZ:F0}) ROT({RotationX:F0}, {RotationY:F0}, {RotationZ:F0}) " + 
-                $"UNK {Unk1c:X} {Unk1e:X} {Unk20:X} {Unk24:X} {Unk28:X} {Unk2c:X} {Unk30:X} {Unk34:X} {Unk38:X} {Unk3c:X}";
+                $"UNK {Unk1c:X} {Unk1e:X} {Unk20:X} {Unk24:X} {TalkMessage:X} {ReactionCommand:X} {Unk30:X} {Unk34:X} {Unk38:X} {Unk3c:X}";
         }
 
         public class Unknown08
