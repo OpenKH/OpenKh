@@ -37,11 +37,11 @@ namespace OpenKh.Kh2.Ard
                     var spawns = function.Parameters.Select(ReadString).Select(s => $"\"{s}\"");
                     return $"MultipleSpawn {string.Join(" ", spawns)}";
                 case (SpawnScript.Operation)5: // 0034ecd0
-                    return $"Set05 {p[0]}";
+                    return $"$Set_0034ecd0 {p[0]}";
                 case (SpawnScript.Operation)6: // 0034ecd8
-                    return $"Set06 {p[0]}";
+                    return $"$Set_0034ecd8 {p[0]}";
                 case (SpawnScript.Operation)7: // 0034ecdc
-                    return $"Set07 {p[0]}";
+                    return $"$Set_0034ecdc {p[0]}";
                 case SpawnScript.Operation.Run:
                     return RunAsText(function.Parameters);
                 case SpawnScript.Operation.Party:
@@ -50,6 +50,8 @@ namespace OpenKh.Kh2.Ard
                     if (p[0] == 0)
                         return "BgmDefault";
                     return $"Bgm {p[0] & 0xffff} {(p[0] >> 16) & 0xffff}";
+                case SpawnScript.Operation.SetFlag4:
+                    return $"$SetFlag_0034f240_To4";
                 case SpawnScript.Operation.Mission:
                     return $"Mission 0x{p[0]:x} \"" + string.Join(string.Empty,
                         ReadString(p[1]),
@@ -60,10 +62,12 @@ namespace OpenKh.Kh2.Ard
                         ReadString(p[6]),
                         ReadString(p[7]),
                         ReadString(p[8]) + "\"");
+                case SpawnScript.Operation.SetFlag10:
+                    return $"$SetFlag_0034f240_To10";
                 case SpawnScript.Operation.BattleLevel:
                     return $"BattleLevel {p[0]}";
                 default:
-                    return $"Unk{(int)(function.Opcode):x02} {string.Join(" ", p.Select(x => $"0x{x:x}"))}";
+                    return $"$Unk{(int)(function.Opcode):x02} {string.Join(" ", p.Select(x => $"0x{x:x}"))}";
             }
         }
 
