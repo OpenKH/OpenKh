@@ -25,6 +25,7 @@ namespace OpenKh.Kh2.Ard
             Bgm = 0x10,
             SetFlag4 = 0x14, // DAT_0034f240 |= 0x4
             Mission = 0x15,
+            Layout = 0x16,
             SetFlag10 = 0x17, // DAT_0034f240 |= 0x10
             BattleLevel = 0x1e,
         }

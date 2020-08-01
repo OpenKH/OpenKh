@@ -35,9 +35,12 @@ namespace OpenKh.Tests.kh2
             [InlineData("Spawn \"ABcd\"", SpawnScript.Operation.Spawn, 0x64634241)]
             [InlineData("MapOcclusion 0xffffffff 0x00000001", SpawnScript.Operation.MapOcclusion, -1, 1)]
             [InlineData("MultipleSpawn \"0123\" \"4567\"", SpawnScript.Operation.MultipleSpawn, 0x33323130, 0x37363534)]
+            [InlineData("$Unk03 123 \"666\"", (SpawnScript.Operation)3, 123, 0x363636)]
+            [InlineData("$Set_01c6053c 123", (SpawnScript.Operation)4, 123)]
             [InlineData("$Set_0034ecd0 123", (SpawnScript.Operation)5, 123)]
             [InlineData("$Set_0034ecd8 123", (SpawnScript.Operation)6, 123)]
             [InlineData("$Set_0034ecdc 123", (SpawnScript.Operation)7, 123)]
+            [InlineData("$Unk09 \"666\"", (SpawnScript.Operation)9, 0x363636)]
             [InlineData("Party NO_FRIEND", SpawnScript.Operation.Party, 0)]
             [InlineData("Party DEFAULT", SpawnScript.Operation.Party, 1)]
             [InlineData("Party W_FRIEND", SpawnScript.Operation.Party, 2)]
@@ -50,9 +53,11 @@ namespace OpenKh.Tests.kh2
             [InlineData("$SetFlag_0034f240_To4", SpawnScript.Operation.SetFlag4)]
             [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Mission, 0x1234,
                 0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
+            [InlineData("Layout \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Layout,
+                0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
             [InlineData("$SetFlag_0034f240_To10", SpawnScript.Operation.SetFlag10)]
             [InlineData("BattleLevel 99", SpawnScript.Operation.BattleLevel, 99)]
-            [InlineData("Unkff 0x1234567 0x1ccccccc", (SpawnScript.Operation)0xff, 0x1234567, 0x1ccccccc)]
+            [InlineData("$Unkff 0x1234567 0x1ccccccc", (SpawnScript.Operation)0xff, 0x1234567, 0x1ccccccc)]
             public void ParseScriptAsText(string expected, SpawnScript.Operation operation, params int[] parameters) =>
                 Assert.Equal(expected, SpawnScriptParser.AsText(new SpawnScript.Function
                 {

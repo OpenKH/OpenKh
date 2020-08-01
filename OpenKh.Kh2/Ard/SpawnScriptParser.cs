@@ -36,12 +36,18 @@ namespace OpenKh.Kh2.Ard
                 case SpawnScript.Operation.MultipleSpawn:
                     var spawns = function.Parameters.Select(ReadString).Select(s => $"\"{s}\"");
                     return $"MultipleSpawn {string.Join(" ", spawns)}";
+                case (SpawnScript.Operation)3:
+                    return $"$Unk03 {p[0]} \"{ReadString(p[1])}\"";
+                case (SpawnScript.Operation)4: // 01c6053c
+                    return $"$Set_01c6053c {p[0]}";
                 case (SpawnScript.Operation)5: // 0034ecd0
                     return $"$Set_0034ecd0 {p[0]}";
                 case (SpawnScript.Operation)6: // 0034ecd8
                     return $"$Set_0034ecd8 {p[0]}";
                 case (SpawnScript.Operation)7: // 0034ecdc
                     return $"$Set_0034ecdc {p[0]}";
+                case (SpawnScript.Operation)9:
+                    return $"$Unk09 \"{ReadString(p[0])}\"";
                 case SpawnScript.Operation.Run:
                     return RunAsText(function.Parameters);
                 case SpawnScript.Operation.Party:
@@ -62,6 +68,16 @@ namespace OpenKh.Kh2.Ard
                         ReadString(p[6]),
                         ReadString(p[7]),
                         ReadString(p[8]) + "\"");
+                case SpawnScript.Operation.Layout:
+                    return $"Layout \"" + string.Join(string.Empty,
+                        ReadString(p[0]),
+                        ReadString(p[1]),
+                        ReadString(p[2]),
+                        ReadString(p[3]),
+                        ReadString(p[4]),
+                        ReadString(p[5]),
+                        ReadString(p[6]),
+                        ReadString(p[7]) + "\"");
                 case SpawnScript.Operation.SetFlag10:
                     return $"$SetFlag_0034f240_To10";
                 case SpawnScript.Operation.BattleLevel:
