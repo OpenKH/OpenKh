@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
+using Xe.IO;
 
 namespace OpenKh.Kh2.Ard
 {
@@ -42,25 +43,42 @@ namespace OpenKh.Kh2.Ard
 
         public class Unknown08
         {
-            [Data] public short Unk00 { get; set; }
-            [Data] public short Count { get; set; }
-            [Data] public short Unk04 { get; set; }
-            [Data] public short Unk06 { get; set; }
+            private class Raw
+            {
+                [Data] public short Unk00 { get; set; }
+                [Data] public short Count { get; set; }
+                [Data] public short Unk04 { get; set; }
+                [Data] public short Unk06 { get; set; }
+            }
+
+            public short Unk00 { get; set; }
+            public short Unk04 { get; set; }
+            public short Unk06 { get; set; }
             public List<Position> Positions { get; set; }
 
             public static Unknown08 Read(Stream stream)
             {
-                var table = BinaryMapping.ReadObject<Unknown08>(stream);
-                table.Positions = Enumerable.Range(0, table.Count)
+                var header = BinaryMapping.ReadObject<Raw>(stream);
+                return new Unknown08
+                {
+                    Unk00 = header.Unk00,
+                    Unk04 = header.Unk04,
+                    Unk06 = header.Unk06,
+                    Positions = Enumerable.Range(0, header.Count)
                     .Select(_ => BinaryMapping.ReadObject<Position>(stream))
-                    .ToList();
-
-                return table;
+                    .ToList()
+                };
             }
 
             public static void Write(Stream stream, Unknown08 entity)
             {
-                BinaryMapping.WriteObject(stream, entity);
+                BinaryMapping.WriteObject(stream, new Raw
+                {
+                    Unk00 = entity.Unk00,
+                    Count = (short)entity.Positions.Count,
+                    Unk04 = entity.Unk04,
+                    Unk06 = entity.Unk06,
+                });
                 foreach (var position in entity.Positions)
                     BinaryMapping.WriteObject(stream, position);
             }
@@ -110,20 +128,29 @@ namespace OpenKh.Kh2.Ard
 
         // loader 00199AA0
         
-        [Data] public short Unk00 { get; set; }
-        [Data] public short Unk02 { get; set; }
-        [Data] public short SpawnEntityGroupCount { get; set; }
-        [Data] public short EntityGroup2Count { get; set; }
-        [Data] public short Unk08Count { get; set; }
-        [Data] public short Unk0aCount { get; set; }
-        [Data] public int Unk0cCount { get; set; }
-        [Data] public int Unk10 { get; set; }
-        [Data] public int Unk14 { get; set; }
-        [Data] public int Unk18 { get; set; }
-        [Data] public int Unk1c { get; set; }
-        [Data] public int Unk20 { get; set; }
-        [Data] public int Unk24 { get; set; }
-        [Data] public int Unk28 { get; set; }
+        private class Raw
+        {
+            [Data] public short Unk00 { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public short SpawnEntityGroupCount { get; set; }
+            [Data] public short EntityGroup2Count { get; set; }
+            [Data] public short Unk08Count { get; set; }
+            [Data] public short Unk0aCount { get; set; }
+            [Data] public int Unk0cCount { get; set; }
+            [Data] public int Unk10 { get; set; }
+            [Data] public int Unk14 { get; set; }
+            [Data] public int Unk18 { get; set; }
+            [Data] public int Unk1c { get; set; }
+            [Data] public int Unk20 { get; set; }
+            [Data] public int Unk24 { get; set; }
+            [Data] public int Unk28 { get; set; }
+        }
+
+        public short Unk00 { get; set; }
+        public short Unk02 { get; set; }
+        public int Unk1c { get; set; }
+        public int Unk20 { get; set; }
+        public int Unk24 { get; set; }
 
         public List<Entity> SpawnEntiyGroup { get; set; }
         public List<Entity> EntityGroup2 { get; set; }
@@ -149,17 +176,24 @@ namespace OpenKh.Kh2.Ard
             stream.Write(items.Count);
             foreach (var item in items)
             {
-                item.SpawnEntityGroupCount = (short)item.SpawnEntiyGroup.Count;
-                item.EntityGroup2Count = (short)item.EntityGroup2.Count;
-                item.Unk08Count = (short)item.Unknown08Table.Count;
-                item.Unk0aCount = (short)item.Unknown0aTable.Count;
-                item.Unk0cCount = (short)item.Unknown0cTable.Count;
-                item.Unk10 = 0;
-                item.Unk14 = 0;
-                item.Unk18 = 0;
-                item.Unk28 = 0;
+                BinaryMapping.WriteObject(stream, new Raw
+                {
+                    Unk00 = item.Unk00,
+                    Unk02 = item.Unk02,
+                    SpawnEntityGroupCount = (short)item.SpawnEntiyGroup.Count,
+                    EntityGroup2Count = (short)item.EntityGroup2.Count,
+                    Unk08Count = (short)item.Unknown08Table.Count,
+                    Unk0aCount = (short)item.Unknown0aTable.Count,
+                    Unk0cCount = (short)item.Unknown0cTable.Count,
+                    Unk10 = 0,
+                    Unk14 = 0,
+                    Unk18 = 0,
+                    Unk1c = item.Unk1c,
+                    Unk20 = item.Unk20,
+                    Unk24 = item.Unk24,
+                    Unk28 = 0,
+                });
 
-                BinaryMapping.WriteObject(stream, item);
                 foreach (var spawnPoint in item.SpawnEntiyGroup)
                     Entity.Write(stream, spawnPoint);
                 foreach (var spawnPoint in item.EntityGroup2)
@@ -175,12 +209,21 @@ namespace OpenKh.Kh2.Ard
 
         private static SpawnPoint ReadSingle(Stream stream)
         {
-            var spawn = BinaryMapping.ReadObject<SpawnPoint>(stream);
-            spawn.SpawnEntiyGroup = ReadList(stream, spawn.SpawnEntityGroupCount, Entity.Read);
-            spawn.EntityGroup2 = ReadList(stream, spawn.EntityGroup2Count, Entity.Read);
-            spawn.Unknown08Table = ReadList(stream, spawn.Unk08Count, Unknown08.Read);
-            spawn.Unknown0aTable = ReadList(stream, spawn.Unk0aCount, Unknown0a.Read);
-            spawn.Unknown0cTable = ReadList(stream, spawn.Unk0cCount, Unknown0c.Read);
+            var raw = BinaryMapping.ReadObject<Raw>(stream);
+            var spawn = new SpawnPoint
+            {
+                Unk00 = raw.Unk00,
+                Unk02 = raw.Unk02,
+                Unk1c = raw.Unk1c,
+                Unk20 = raw.Unk20,
+                Unk24 = raw.Unk24,
+            };
+
+            spawn.SpawnEntiyGroup = ReadList(stream, raw.SpawnEntityGroupCount, Entity.Read);
+            spawn.EntityGroup2 = ReadList(stream, raw.EntityGroup2Count, Entity.Read);
+            spawn.Unknown08Table = ReadList(stream, raw.Unk08Count, Unknown08.Read);
+            spawn.Unknown0aTable = ReadList(stream, raw.Unk0aCount, Unknown0a.Read);
+            spawn.Unknown0cTable = ReadList(stream, raw.Unk0cCount, Unknown0c.Read);
 
             return spawn;
         }
