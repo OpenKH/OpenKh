@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OpenKh.Kh2.Ard
 {
-    public static class SpawnScriptParser
+    public static partial class SpawnScriptParser
     {
         private static readonly string[] PARTY = new string[]
         {

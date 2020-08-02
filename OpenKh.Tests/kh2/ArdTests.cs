@@ -1,6 +1,5 @@
 ﻿using OpenKh.Common;
 using OpenKh.Kh2.Ard;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -65,6 +64,70 @@ namespace OpenKh.Tests.kh2
                     Opcode = operation,
                     Parameters = parameters.ToList()
                 }));
+
+            [Fact]
+            public void CreateProgramsCorrectly()
+            {
+                const string Input = @"
+# This is a comment!
+  Program     123 # This is our program entry
+Unk14
+
+Program 0x123
+Unk17";
+                var script = SpawnScriptParser.AsScript(Input).ToArray();
+                Assert.Equal(2, script.Length);
+
+                Assert.Equal(123, script[0].ProgramId);
+                Assert.Single(script[0].Functions);
+                Assert.Equal((SpawnScript.Operation)0x14, script[0].Functions[0].Opcode);
+
+                Assert.Equal(0x123, script[1].ProgramId);
+                Assert.Single(script[1].Functions);
+                Assert.Equal((SpawnScript.Operation)0x17, script[1].Functions[0].Opcode);
+            }
+
+            [Theory]
+            [InlineData("Spawn \"ABcd\"", SpawnScript.Operation.Spawn, 0x64634241)]
+            [InlineData("MapOcclusion 0xffffffff 0x00000001", SpawnScript.Operation.MapOcclusion, -1, 1)]
+            [InlineData("MultipleSpawn \"0123\" \"4567\"", SpawnScript.Operation.MultipleSpawn, 0x33323130, 0x37363534)]
+            [InlineData("Unk03 123 \"666\"", (SpawnScript.Operation)3, 123, 0x363636)]
+            [InlineData("Unk04 123", (SpawnScript.Operation)4, 123)]
+            [InlineData("Unk05 123", (SpawnScript.Operation)5, 123)]
+            [InlineData("Unk06 123", (SpawnScript.Operation)6, 123)]
+            [InlineData("Unk07 123", (SpawnScript.Operation)7, 123)]
+            [InlineData("Unk09 \"666\"", (SpawnScript.Operation)9, 0x363636)]
+            [InlineData("Party NO_FRIEND", SpawnScript.Operation.Party, 0)]
+            [InlineData("Party DEFAULT", SpawnScript.Operation.Party, 1)]
+            [InlineData("Party W_FRIEND", SpawnScript.Operation.Party, 2)]
+            [InlineData("Party W_FRIEND_IN", SpawnScript.Operation.Party, 3)]
+            [InlineData("Party W_FRIEND_FIX", SpawnScript.Operation.Party, 4)]
+            [InlineData("Party W_FRIEND_ONLY", SpawnScript.Operation.Party, 5)]
+            [InlineData("Party DONALD_ONLY", SpawnScript.Operation.Party, 6)]
+            [InlineData("Bgm 123 456", SpawnScript.Operation.Bgm, 0x01c8007b)]
+            [InlineData("BgmDefault", SpawnScript.Operation.Bgm, 0)]
+            [InlineData("Unk14", (SpawnScript.Operation)0x14)]
+            [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Mission, 0x1234,
+                0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
+            [InlineData("Layout \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Layout,
+                0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
+            [InlineData("Unk17", (SpawnScript.Operation)0x17)]
+            [InlineData("BattleLevel 99", SpawnScript.Operation.BattleLevel, 99)]
+            [InlineData("Unk1f \"666\"", (SpawnScript.Operation)0x1f, 0x363636)]
+            [InlineData("Unk0c 0x1234567 0x1ccccccc", (SpawnScript.Operation)0x0c, 0x1234567, 0x1ccccccc)]
+            [InlineData("Unk0c 0x1234567 0x1ccccccc 0x1ccccccc", (SpawnScript.Operation)0x0c, 0x1234567, 0x1ccccccc, 0x1ccccccc)]
+            public void ParseTextAsScript(string input, SpawnScript.Operation expectedOp, params int[] expectedParams)
+            {
+                var script = SpawnScriptParser.AsScript($"Program 0\n{input}\n").ToArray();
+                Assert.Single(script);
+
+                var program = script.First();
+                Assert.Single(program.Functions);
+
+                var function = program.Functions.First();
+                Assert.Equal(expectedOp, function.Opcode);
+                Assert.Equal(expectedParams, function.Parameters.ToArray());
+            }
 
             //[Theory]
             //[InlineData("Cutscene \"666\" 1", 0x20000, 0x363636, 1)]
