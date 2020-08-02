@@ -204,8 +204,13 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             drawing.Flush();
         }
 
-        private static (int X, int Y) GetOrigin(SpriteGroupModel spriteGroupModel) =>
-            (-spriteGroupModel.SpriteGroup.Min(x => Math.Min(x.Left, x.Right)),
-             -spriteGroupModel.SpriteGroup.Min(x => Math.Min(x.Top, x.Bottom)));
+        private static (int X, int Y) GetOrigin(SpriteGroupModel spriteGroupModel)
+        {
+            if (spriteGroupModel.SpriteGroup.Count == 0)
+                return (0, 0);
+
+            return (-spriteGroupModel.SpriteGroup.Min(x => Math.Min(x.Left, x.Right)),
+                    -spriteGroupModel.SpriteGroup.Min(x => Math.Min(x.Top, x.Bottom)));
+        }
     }
 }
