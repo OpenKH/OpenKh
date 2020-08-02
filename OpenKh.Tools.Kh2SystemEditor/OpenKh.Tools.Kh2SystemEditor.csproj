@@ -18,6 +18,9 @@
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.1" />
+    <PackageReference Include="CsvHelper" Version="15.0.0" />
+    <PackageReference Include="YamlDotNet" Version="8.1.0" />
+    <PackageReference Include="EPPlus" Version="4.5.3.3" />
   </ItemGroup>
 
 </Project>

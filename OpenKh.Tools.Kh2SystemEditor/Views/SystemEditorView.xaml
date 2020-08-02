@@ -4,8 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2SystemEditor.Views"
+        xmlns:converters="clr-namespace:OpenKh.Tools.Kh2SystemEditor.Converters"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="450" Width="800">
+    <Window.Resources>
+        <converters:EnumMatchToBooleanConverter x:Key="enumConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,12 +22,27 @@
                 <MenuItem Header="_Save 03system" Command="{Binding SaveCommand}"/>
                 <MenuItem Header="Save 03system _as..." Command="{Binding SaveAsCommand}"/>
                 <Separator/>
+                <MenuItem Header="Export _Item list as..." Command="{Binding ExportItemListCommand}"/>
+                <MenuItem Header="Export _Trsr list as..." Command="{Binding ExportTrsrListCommand}"/>
+                <Separator/>
                 <MenuItem Header="Su_pport files">
                     <MenuItem Header="Load _IDX/IMG" Command="{Binding LoadSupportIdxCommand}"/>
                     <MenuItem Header="Load MSG only" Command="{Binding LoadSupportMsgCommand}"/>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Encoding">
+                <RadioButton
+                        Content="US/EU encoder"
+                        IsChecked="{Binding Path=Encoding, Mode=TwoWay, 
+                            Converter={StaticResource enumConverter},
+                            ConverterParameter=European}"/>
+                <RadioButton
+                        Content="JP encoder"
+                        IsChecked="{Binding Path=Encoding, Mode=TwoWay, 
+                            Converter={StaticResource enumConverter},
+                            ConverterParameter=Japanese}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About"
