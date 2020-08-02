@@ -23,7 +23,7 @@ namespace OpenKh.Kh2.Ard
                 [Data] public short Unk1c { get; set; }
                 [Data] public short Unk1e { get; set; }
                 [Data] public int Unk20 { get; set; }
-                [Data] public int Unk24 { get; set; }
+                [Data] public int AiParameter { get; set; }
                 [Data] public int TalkMessage { get; set; }
                 [Data] public int ReactionCommand { get; set; }
                 [Data] public int Unk30 { get; set; }
@@ -42,7 +42,7 @@ namespace OpenKh.Kh2.Ard
             public short Unk1c { get; set; }
             public short Unk1e { get; set; }
             public int Unk20 { get; set; }
-            public int Unk24 { get; set; }
+            public int AiParameter { get; set; }
             public int TalkMessage { get; set; }
             public int ReactionCommand { get; set; }
             public int Unk30 { get; set; }
@@ -62,7 +62,7 @@ namespace OpenKh.Kh2.Ard
                     Unk1c = raw.Unk1c,
                     Unk1e = raw.Unk1e,
                     Unk20 = raw.Unk20,
-                    Unk24 = raw.Unk24,
+                    AiParameter = raw.AiParameter,
                     TalkMessage = raw.TalkMessage,
                     ReactionCommand = raw.ReactionCommand,
                     Unk30 = raw.Unk30,
@@ -82,7 +82,7 @@ namespace OpenKh.Kh2.Ard
                     Unk1c = entity.Unk1c,
                     Unk1e = entity.Unk1e,
                     Unk20 = entity.Unk20,
-                    Unk24 = entity.Unk24,
+                    AiParameter = entity.AiParameter,
                     TalkMessage = entity.TalkMessage,
                     ReactionCommand = entity.ReactionCommand,
                     Unk30 = entity.Unk30,
@@ -90,7 +90,7 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"ID {ObjectId} POS({PositionX:F0}, {PositionY:F0}, {PositionZ:F0}) ROT({RotationX:F0}, {RotationY:F0}, {RotationZ:F0}) " +
-                $"UNK {Unk1c:X} {Unk1e:X} {Unk20:X} {Unk24:X} {TalkMessage:X} {ReactionCommand:X} {Unk30:X}";
+                $"UNK {Unk1c:X} {Unk1e:X} {Unk20:X} {AiParameter:X} {TalkMessage:X} {ReactionCommand:X} {Unk30:X}";
         }
 
         public class EventActivator
@@ -261,8 +261,8 @@ namespace OpenKh.Kh2.Ard
         {
             [Data] public short Unk00 { get; set; }
             [Data] public short Unk02 { get; set; }
-            [Data] public short SpawnEntityGroupCount { get; set; }
-            [Data] public short Unk04Count { get; set; }
+            [Data] public short EntityCount { get; set; }
+            [Data] public short EventActivatorCount { get; set; }
             [Data] public short Unk08Count { get; set; }
             [Data] public short Unk0aCount { get; set; }
             [Data] public int Unk0cCount { get; set; }
@@ -320,8 +320,8 @@ namespace OpenKh.Kh2.Ard
                 {
                     Unk00 = item.Unk00,
                     Unk02 = item.Unk02,
-                    SpawnEntityGroupCount = (short)item.Entities.Count,
-                    Unk04Count = (short)item.EventActivators.Count,
+                    EntityCount = (short)item.Entities.Count,
+                    EventActivatorCount = (short)item.EventActivators.Count,
                     Unk08Count = (short)item.WalkPath.Count,
                     Unk0aCount = (short)item.Unknown0aTable.Count,
                     Unk0cCount = (short)item.Unknown0cTable.Count,
@@ -368,8 +368,8 @@ namespace OpenKh.Kh2.Ard
                 Unk24 = raw.Unk24,
             };
 
-            spawn.Entities = ReadList(stream, raw.SpawnEntityGroupCount, Entity.Read);
-            spawn.EventActivators = ReadList(stream, raw.Unk04Count, EventActivator.Read);
+            spawn.Entities = ReadList(stream, raw.EntityCount, Entity.Read);
+            spawn.EventActivators = ReadList(stream, raw.EventActivatorCount, EventActivator.Read);
             spawn.WalkPath = ReadList(stream, raw.Unk08Count, WalkPathDesc.Read);
             spawn.Unknown0aTable = ReadList(stream, raw.Unk0aCount, Unknown0a.Read);
             spawn.Unknown0cTable = ReadList(stream, raw.Unk0cCount, Unknown0c.Read);
