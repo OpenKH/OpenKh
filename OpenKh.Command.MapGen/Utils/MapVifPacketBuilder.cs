@@ -53,8 +53,8 @@ namespace OpenKh.Command.MapGen.Utils
                     writer.Write((int)(0x65008000 | off | (num << 16))); // unpack V2-16 c 14 a 004 usn 0 flg 1 m 0
                     foreach (var one in mesh.triangleStripList.SelectMany(it => it.uvList))
                     {
-                        writer.Write(Convert.ToUInt16(one.X * 4096));
-                        writer.Write(Convert.ToUInt16(one.Y * 4096));
+                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.X * 4096)))));
+                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.Y * 4096)))));
                     }
                 }
 
