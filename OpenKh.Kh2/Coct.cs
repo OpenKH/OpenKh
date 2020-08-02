@@ -7,6 +7,7 @@ using Xe.BinaryMapper;
 using System.Numerics;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Utils;
+using System.Collections;
 
 namespace OpenKh.Kh2
 {
@@ -275,6 +276,9 @@ namespace OpenKh.Kh2
         public class BuildHelper
         {
             private readonly Coct coct;
+            private readonly SortedDictionary<string, int> boundingBoxIndexMap = new SortedDictionary<string, int>();
+            private readonly SortedDictionary<string, int> planeIndexMap = new SortedDictionary<string, int>();
+            private readonly SortedDictionary<string, int> vertexIndexMap = new SortedDictionary<string, int>();
 
             public BuildHelper(Coct coct)
             {
@@ -285,12 +289,15 @@ namespace OpenKh.Kh2
                 BoundingBoxInt16 bbox
             )
             {
-                int index = coct.BoundingBoxList.FindIndex(it => it == bbox);
-                if (index < 0)
+                var key = bbox.ToString();
+
+                if (!boundingBoxIndexMap.TryGetValue(key, out int index))
                 {
                     index = coct.BoundingBoxList.Count;
 
                     coct.BoundingBoxList.Add(bbox);
+
+                    boundingBoxIndexMap[key] = index;
                 }
 
                 return Convert.ToInt16(index);
@@ -301,12 +308,15 @@ namespace OpenKh.Kh2
 
             public short AllocatePlane(Plane plane)
             {
-                var index = coct.PlaneList.FindIndex(it => it == plane);
-                if (index < 0)
+                var key = plane.ToString();
+
+                if (!planeIndexMap.TryGetValue(key, out int index))
                 {
                     index = coct.PlaneList.Count;
 
                     coct.PlaneList.Add(plane);
+
+                    planeIndexMap[key] = index;
                 }
 
                 return Convert.ToInt16(index);
@@ -339,12 +349,15 @@ namespace OpenKh.Kh2
                     W = w
                 };
 
-                var index = coct.VertexList.FindIndex(it => it == ent4);
-                if (index < 0)
+                var key = ent4.ToString();
+
+                if (!vertexIndexMap.TryGetValue(key, out int index))
                 {
                     index = Convert.ToInt16(coct.VertexList.Count);
 
                     coct.VertexList.Add(ent4);
+
+                    vertexIndexMap[key] = index;
                 }
 
                 return Convert.ToInt16(index);
@@ -398,6 +411,13 @@ namespace OpenKh.Kh2
                     .Select(index => coct.CollisionMeshList[index].BoundingBox)
                     .MergeAll();
             }
+
+            public void FlushCache()
+            {
+                boundingBoxIndexMap.Clear();
+                planeIndexMap.Clear();
+                vertexIndexMap.Clear();
+            }
         }
 
         public static Coct Read(Stream stream) =>
@@ -424,5 +444,7 @@ namespace OpenKh.Kh2
             CollisionMeshGroupList.Add(it);
             return it;
         }
+
+        public void FlushCache() => buildHelper.FlushCache();
     }
 }

@@ -55,5 +55,7 @@ namespace OpenKh.Kh2.Utils
         public static bool operator ==(Vector3Int16 left, Vector3Int16 right) => left.Equals(right);
 
         public static bool operator !=(Vector3Int16 left, Vector3Int16 right) => !(left == right);
+
+        public override string ToString() => $"({X}, {Y}, {Z})";
     }
 }
