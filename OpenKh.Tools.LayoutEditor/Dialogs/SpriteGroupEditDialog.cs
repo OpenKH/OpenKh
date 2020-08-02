@@ -24,6 +24,8 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
         private bool _isPivotVisible = true;
 
         private int _selectedSpriteGroupModel;
+        private int _removeSpritePart = -1;
+
         private SpriteGroupModel SpriteGroupModel => _spriteGroupModels[_selectedSpriteGroupModel];
 
         public SpriteGroupEditDialog(
@@ -63,6 +65,12 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             ForChild(nameof(SpriteGroupPreview), previewWidth, 512, true, SpriteGroupPreview);
             ImGui.SameLine();
             ForChild(nameof(SptiteGroupEditor), editorWidth, 512, false, SptiteGroupEditor);
+
+            if (_removeSpritePart >= 0)
+            {
+                SpriteGroupModel.SpriteGroup.RemoveAt(_removeSpritePart);
+                _removeSpritePart = -1;
+            }
         }
 
         private void SpriteGroupPreview()
@@ -163,6 +171,9 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 spritePart.Bottom = position[1] + Math.Abs(innerSprite.Top - innerSprite.Bottom);
                 SpriteGroupModel.SizeChanged();
             }
+
+            if (ImGui.SmallButton("Remove from the sprite group"))
+                _removeSpritePart = index;
         }
 
         private Vector2 SuggestSpriteSize()
