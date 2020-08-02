@@ -17,6 +17,7 @@ using OpenKh.Tools.Kh2SystemEditor.Utils;
 using OpenKh.Kh2.System;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using OpenKh.Kh2.Messages;
+using OpenKh.Tools.Kh2SystemEditor.Models.Export;
 
 namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 {
@@ -137,7 +138,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 _ => FileDialog.OnSave(
                     fileName =>
                     {
-                        ExportTable(fileName, Item);
+                        ExportTable(
+                            fileName, 
+                            Item.Select(viewModel => new ItemExport(_messageProvider, viewModel.Item))
+                        );
                     },
                     TableExportFilter,
                     defaultFileName: "ItemList.yml",
@@ -149,7 +153,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 _ => FileDialog.OnSave(
                     fileName =>
                     {
-                        ExportTable(fileName, Trsr);
+                        ExportTable(
+                            fileName, 
+                            Trsr.Select(viewModel => new TrsrExport(Item, viewModel.Treasure))
+                        );
                     },
                     TableExportFilter,
                     defaultFileName: "TrsrList.yml",
