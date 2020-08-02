@@ -344,9 +344,7 @@ namespace OpenKh.Game.States
                         {
                             foreach (var spawnPoint in spawnPoints)
                             {
-                                foreach (var desc in spawnPoint.SpawnEntiyGroup)
-                                    SpawnEntity(desc);
-                                foreach (var desc in spawnPoint.EntityGroup2)
+                                foreach (var desc in spawnPoint.Entities)
                                     SpawnEntity(desc);
                             }
                         }

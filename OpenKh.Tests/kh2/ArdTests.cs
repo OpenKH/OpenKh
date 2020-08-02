@@ -109,8 +109,8 @@ namespace OpenKh.Tests.kh2
                 var spawns = File.OpenRead(FileNameM00).Using(SpawnPoint.Read);
 
                 Assert.Equal(4, spawns.Count);
-                Assert.Equal(3, spawns[0].SpawnEntiyGroup.Count);
-                Assert.Equal(0x236, spawns[0].SpawnEntiyGroup[0].ObjectId);
+                Assert.Equal(3, spawns[0].Entities.Count);
+                Assert.Equal(0x236, spawns[0].Entities[0].ObjectId);
             }
 
             [Theory]
