@@ -34,7 +34,11 @@ namespace OpenKh.Command.MapGen.Utils
 
             ConvertModelIntoMapModel(modelFile, config);
 
+            logger.Debug($"Starting collision plane builder.");
+
             collisionBuilder = new CollisionBuilder(bigMeshContainer.MeshList);
+
+            logger.Debug($"Output: {collisionBuilder.coct.CollisionList.Count:#,##0} collision planes");
 
             {
                 var matDefList = bigMeshContainer.AllocatedMaterialDefs;
