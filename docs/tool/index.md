@@ -14,6 +14,7 @@
 |[msg/*](../kh2/file/type/msg.md) | OpenKh.Command.MsgTool
 |[msg/*](../kh2/file/type/msg.md) | [OpenKh.Tools.Kh2TextEditor](./Kh2TextEditor/index.md)
 |[BAR](../kh2/file/type/bar.md) | OpenKh.Tools.BarEditor
+|[ARD](../kh2/file/type/ard.md) | OpenKh.Command.SpawnScript
 |[IMD](../kh2/file/type/image.md#imgd) | OpenKh.Tools.ImageViewer
 |[IMZ](../kh2/file/type/image.md#imgz) | OpenKh.Tools.ImageViewer
 |[FAC](../kh2/file/type/image.md#fac) | OpenKh.Tools.ImageViewer
