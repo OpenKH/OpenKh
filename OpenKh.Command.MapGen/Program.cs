@@ -268,7 +268,7 @@ namespace OpenKh.Command.MapGen
 
             if (FileExtUtil.IsExtension(filePath, ".imd"))
             {
-                return File.OpenRead(filePath).Using(s => Imgd.Read(s));
+                return ImageResizer.NormalizeImageSize(File.OpenRead(filePath).Using(s => Imgd.Read(s)));
             }
             if (FileExtUtil.IsExtension(filePath, ".png"))
             {
