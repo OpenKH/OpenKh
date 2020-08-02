@@ -21,7 +21,7 @@ namespace OpenKh.Command.MapGen.Models
 
         public float scale { get; set; } = 1;
 
-        public string[] imageDirs { get; set; }
+        public string[] imageDirs { get; set; } = new string[] { "images" };
 
         /// <summary>
         /// options for imgtool if needed
