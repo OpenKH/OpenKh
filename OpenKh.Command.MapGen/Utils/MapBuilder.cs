@@ -78,6 +78,13 @@ namespace OpenKh.Command.MapGen.Utils
 
                 var kh2Mesh = bigMeshContainer.AllocateBigMeshForMaterial(matDef);
 
+                var diffuseTextureFile = modelMat.TextureDiffuse.FilePath;
+                if (!string.IsNullOrEmpty(diffuseTextureFile))
+                {
+                    logger.Debug($"The mesh \"{inputMesh.Name}\" material \"{matDef.name}\" has filepath \"{diffuseTextureFile}\" for diffuse texture. It will be associated with material's fromFile2.");
+                    matDef.fromFile2 = diffuseTextureFile;
+                }
+
                 var kh2BaseVert = kh2Mesh.vertexList.Count;
 
                 List<int> vertexToLocal = new List<int>();

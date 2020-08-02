@@ -274,25 +274,32 @@ namespace OpenKh.Command.MapGen
             {
                 var imdFile = Path.ChangeExtension(filePath, ".imd");
 
-                try
+                if (config.skipConversionIfExists && File.Exists(imdFile))
                 {
-                    logger.Debug($"Using ImgTool for png to imd conversion.");
-
-                    var imgtoolOptions = matDef.imgtoolOptions ?? config.imgtoolOptions ?? "-b 8";
-
-                    var result = new RunCmd(
-                        "OpenKh.Command.ImgTool.exe",
-                        $"imd \"{filePath}\" -o \"{imdFile}\" {imgtoolOptions}"
-                    );
-
-                    if (result.ExitCode != 0)
-                    {
-                        throw new Exception($"ImgTool failed ({result.ExitCode})");
-                    }
+                    logger.Debug($"Skipping png to imd conversion, due to imd file existence and skipConversionIfExists option.");
                 }
-                catch (Win32Exception ex)
+                else
                 {
-                    throw new Exception("ImgTool failed.", ex);
+                    try
+                    {
+                        logger.Debug($"Using ImgTool for png to imd conversion.");
+
+                        var imgtoolOptions = matDef.imgtoolOptions ?? config.imgtoolOptions ?? "-b 8";
+
+                        var result = new RunCmd(
+                            "OpenKh.Command.ImgTool.exe",
+                            $"imd \"{filePath}\" -o \"{imdFile}\" {imgtoolOptions}"
+                        );
+
+                        if (result.ExitCode != 0)
+                        {
+                            throw new Exception($"ImgTool failed ({result.ExitCode})");
+                        }
+                    }
+                    catch (Win32Exception ex)
+                    {
+                        throw new Exception("ImgTool failed.", ex);
+                    }
                 }
 
                 return FileLoader(imdFile, matDef, config);
@@ -326,6 +333,7 @@ namespace OpenKh.Command.MapGen
 
                 var fileNames = new string[] {
                     matDef.fromFile,
+                    matDef.fromFile2,
                     matDef.name + ".imd",
                     matDef.name + ".png",
                 }

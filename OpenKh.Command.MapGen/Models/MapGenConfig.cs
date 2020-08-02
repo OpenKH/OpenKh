@@ -35,6 +35,8 @@ namespace OpenKh.Command.MapGen.Models
 
         public List<AddFile> addFiles { get; set; } = new List<AddFile>();
 
+        public bool skipConversionIfExists { get; set; }
+
         public class AddFile
         {
             public string name { get; set; }

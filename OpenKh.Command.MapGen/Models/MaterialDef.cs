@@ -23,6 +23,11 @@ namespace OpenKh.Command.MapGen.Models
         public string fromFile { get; set; }
 
         /// <summary>
+        /// texture from png file (diffuse map with texture file source)
+        /// </summary>
+        public string fromFile2 { get; set; }
+
+        /// <summary>
         /// Have not collision
         /// </summary>
         public bool noclip { get; set; } = false;
