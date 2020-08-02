@@ -4,6 +4,7 @@ using OpenKh.Game.DataContent;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
+using OpenKh.Game.States.Title;
 using OpenKh.Kh2;
 using System;
 using System.IO;
@@ -56,6 +57,7 @@ namespace OpenKh.Game
             var contentPath = args.FirstOrDefault() ?? Config.DataPath;
 
             _dataContent = CreateDataContent(contentPath, Config.IdxFilePath, Config.ImgFilePath);
+            _dataContent = new MultipleDataContent(new ModDataContent(), _dataContent);
             if (Kernel.IsReMixFileHasHdAssetHeader(_dataContent, "fm"))
             {
                 Log.Info("ReMIX files with HD asset header detected");

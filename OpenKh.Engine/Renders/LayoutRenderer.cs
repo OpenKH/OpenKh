@@ -1,5 +1,6 @@
 ﻿using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace OpenKh.Engine.Renderers
         }
 
         public int FrameIndex { get; set; }
+        public bool IsLastFrame => FrameIndex > layout.GetFrameLengthFromSequenceGroup(selectedSequenceGroupIndex);
 
         public LayoutRenderer(Layout layout, ISpriteDrawing drawing, IEnumerable<ISpriteTexture> surfaces)
         {

@@ -42,10 +42,10 @@ namespace OpenKh.Game.Infrastructure.Input
         bool IsShift { get; }
         bool IsExit { get; }
 
-        bool IsDebugUp { get; }
-        bool IsDebugDown { get; }
-        bool IsDebugLeft { get; }
-        bool IsDebugRight { get; }
+        bool IsRepetableUp { get; }
+        bool IsRepetableDown { get; }
+        bool IsRepetableLeft { get; }
+        bool IsRepetableRight { get; }
 
         #endregion
 

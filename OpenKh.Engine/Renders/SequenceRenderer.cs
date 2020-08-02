@@ -51,13 +51,14 @@ namespace OpenKh.Engine.Renderers
             };
         }
 
-        private readonly Sequence sequence;
         private readonly ISpriteDrawing drawing;
         private readonly ISpriteTexture surface;
 
+        public Sequence Sequence { get; }
+
         public SequenceRenderer(Sequence sequence, ISpriteDrawing drawing, ISpriteTexture surface)
         {
-            this.sequence = sequence;
+            this.Sequence = sequence;
             this.drawing = drawing;
             this.surface = surface;
             DebugSequenceRenderer = new DefaultDebugSequenceRenderer();
@@ -65,14 +66,14 @@ namespace OpenKh.Engine.Renderers
 
         public IDebugSequenceRenderer DebugSequenceRenderer { get; set; }
 
-        public void Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
+        public bool Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
             DrawAnimationGroup(new Context
             {
                 GlobalFrameIndex = frameIndex,
                 FrameIndex = frameIndex,
                 PositionX = positionX,
                 PositionY = positionY
-            }, sequence.AnimationGroups[animationGroupIndex]);
+            }, Sequence.AnimationGroups[animationGroupIndex]);
 
         public int GetActualFrame(Sequence.AnimationGroup animationGroup, int frameIndex)
         {
@@ -80,13 +81,13 @@ namespace OpenKh.Engine.Renderers
                 return frameIndex;
 
             var frameEnd = animationGroup.LoopEnd;
-            if (frameEnd == 0)
+            if (frameEnd == 0 && animationGroup.Animations.Count > 0)
                 frameEnd = animationGroup.Animations.Max(x => x.FrameEnd);
 
             return Loop(animationGroup.LoopStart, frameEnd, frameIndex);
         }
 
-        private void DrawAnimationGroup(Context contextParent, Sequence.AnimationGroup animationGroup)
+        private bool DrawAnimationGroup(Context contextParent, Sequence.AnimationGroup animationGroup)
         {
             var context = contextParent.Clone();
             context.FrameIndex = GetActualFrame(animationGroup, context.FrameIndex);
@@ -95,6 +96,9 @@ namespace OpenKh.Engine.Renderers
             {
                 DrawAnimation(context, animationGroup.Animations[i], i);
             }
+
+            return animationGroup.DoNotLoop == 0 ||
+                context.FrameIndex < animationGroup.Animations.Max(x => x.FrameEnd);
         }
 
         private void DrawAnimation(Context contextParent, Sequence.Animation animation, int index)
@@ -181,7 +185,7 @@ namespace OpenKh.Engine.Renderers
             context.Color *= DebugSequenceRenderer.GetAnimationBlendColor(index);
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS
-            DrawFrameGroup(context, sequence.SpriteGroups[animation.SpriteGroupIndex]);
+            DrawFrameGroup(context, Sequence.SpriteGroups[animation.SpriteGroupIndex]);
         }
 
         private void DrawFrameGroup(Context context, List<Sequence.SpritePart> spriteGroup)
@@ -200,7 +204,7 @@ namespace OpenKh.Engine.Renderers
             context.Right = frameEx.Right * context.ScaleX;
             context.Bottom = frameEx.Bottom * context.ScaleY;
 
-            DrawFrame(context, sequence.Sprites[frameEx.SpriteIndex]);
+            DrawFrame(context, Sequence.Sprites[frameEx.SpriteIndex]);
         }
 
         private void DrawFrame(Context context, Sequence.Sprite frame)

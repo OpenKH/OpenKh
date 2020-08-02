@@ -48,10 +48,10 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool IsShift => LeftShoulder;
         public bool IsExit => keyboard.IsKeyDown(Keys.Escape);
 
-        public bool IsDebugUp => repeatableKeyboard.IsKeyRepeat(Keys.Up);
-        public bool IsDebugDown => repeatableKeyboard.IsKeyRepeat(Keys.Down);
-        public bool IsDebugLeft => repeatableKeyboard.IsKeyRepeat(Keys.Left);
-        public bool IsDebugRight => repeatableKeyboard.IsKeyRepeat(Keys.Right);
+        public bool IsRepetableUp => repeatableKeyboard.IsKeyRepeat(Keys.Up);
+        public bool IsRepetableDown => repeatableKeyboard.IsKeyRepeat(Keys.Down);
+        public bool IsRepetableLeft => repeatableKeyboard.IsKeyRepeat(Keys.Left);
+        public bool IsRepetableRight => repeatableKeyboard.IsKeyRepeat(Keys.Right);
 
         public bool DPadUp => keyboard.IsKeyDown(Keys.Up);
         public bool DPadDown => keyboard.IsKeyDown(Keys.Down);
