@@ -157,7 +157,7 @@ Each program is a list of functions, defined as followed:
 
 ### Operation code
 
-There is a total of 30 operation codes for the spawn script. The parser can be found in [sub_181d30](#notes).
+There is a total of 30 operation codes for the spawn script. The parser can be found at [sub_181d30](#notes).
 
 - 00: [Spawn](#spawn)
 - 01: [MapOcclusion](#mapocclusion)
@@ -171,7 +171,7 @@ There is a total of 30 operation codes for the spawn script. The parser can be f
 - 0a: [unknown](#unknown0a)
 - 0b: [unknown](#unknown0b)
 - 0c: [Scene](#scene)
-- 0e: [unknown](#unknown07e
+- 0e: [unknown](#unknown07e)
 - 0f: [Bgm](#bgm)
 - 10: [Party](#party)
 - 11: [unknown](#unknown11)
