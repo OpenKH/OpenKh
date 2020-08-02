@@ -34,6 +34,7 @@ What is known about this file is as follows:
 This file uses Bit Arrays to store boolean flags for use during the missions. Known arrays/flags are as follows:
 
 #### Boolean Flag Array 3
+
 | Bit | Description |
 |-----|-------------|
 | 1 | Is Boss Battle?
@@ -46,6 +47,7 @@ This file uses Bit Arrays to store boolean flags for use during the missions. Kn
 | 128 | ???
 
 #### Boolean Flag Array 4
+
 | Bit | Description |
 |-----|-------------|
 | 1 | ???
