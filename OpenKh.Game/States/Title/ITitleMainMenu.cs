@@ -1,4 +1,5 @@
-﻿using OpenKh.Game.Infrastructure;
+﻿using OpenKh.Engine.Renders;
+using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.States.Title
 {
@@ -19,10 +20,12 @@ namespace OpenKh.Game.States.Title
     {
         Kernel Kernel { get; }
         InputManager InputManager { get; }
+        IMessageRenderer MessageRenderer { get; }
         MainMenuState State { set; }
 
+        byte[] GetMessage(ushort messageId);
+
         void Print(ushort messageId, float left, float top,
-            uint color = 0xffffffff, float right = 0,
-            TextAlignment alignment = TextAlignment.Left);
+            uint color = 0xffffffff, TextAlignment alignment = TextAlignment.Left);
     }
 }
