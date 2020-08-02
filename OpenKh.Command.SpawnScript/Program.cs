@@ -1,5 +1,6 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Common;
+using OpenKh.Kh2.Ard;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,8 +12,8 @@ namespace OpenKh.Command.SpawnScript
     [Command("OpenKh.Command.SpawnScript")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(
-        typeof(UnscriptCommand),
-        typeof(RescriptCommand),
+        typeof(DecompileCommand),
+        typeof(CompileCommand),
         typeof(UnpointCommand),
         typeof(RepointCommand))]
     class Program
@@ -44,39 +45,39 @@ namespace OpenKh.Command.SpawnScript
         private static string GetVersion()
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
-        private class UnscriptCommand
+        private class DecompileCommand
         {
             [Required]
             [FileExists]
-            [Argument(0, Description = "File of a spawnscript file")]
+            [Argument(0, Description = "Spawnscript to decompile")]
             public string InputPath { get; set; }
 
-            [Required]
-            [Argument(1, Description = "Output file name as YAML")]
+            [Option(CommandOptionType.SingleValue, ShortName = "o", LongName = "output", Description = "Output file as text")]
             public string OutputPath { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
+                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.txt");
                 var spawnScript = File.OpenRead(InputPath).Using(Kh2.Ard.SpawnScript.Read);
-                File.WriteAllText(OutputPath, Helpers.YamlSerialize(spawnScript));
+                File.WriteAllText(OutputPath, SpawnScriptParser.Decompile(spawnScript));
                 return 0;
             }
         }
 
-        private class RescriptCommand
+        private class CompileCommand
         {
             [Required]
             [FileExists]
-            [Argument(0, Description = "File of a YAML spawnscript file")]
+            [Argument(0, Description = "Spawnscript source code to compile")]
             public string InputPath { get; set; }
 
-            [Required]
-            [Argument(1, Description = "Output file name")]
+            [Option(CommandOptionType.SingleValue, ShortName = "o", LongName = "output", Description = "Output file as spawnscript")]
             public string OutputPath { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
-                var spawnScript = Helpers.YamlDeserialize<List<Kh2.Ard.SpawnScript>>(File.ReadAllText(InputPath));
+                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.spawnscript");
+                var spawnScript = SpawnScriptParser.Compile(File.ReadAllText(InputPath));
                 File.Create(OutputPath).Using(stream => Kh2.Ard.SpawnScript.Write(stream, spawnScript));
                 return 0;
             }
@@ -86,15 +87,15 @@ namespace OpenKh.Command.SpawnScript
         {
             [Required]
             [FileExists]
-            [Argument(0, Description = "File of a spawnpoint file")]
+            [Argument(0, Description = "Spawnpoint file to deserialize")]
             public string InputPath { get; set; }
 
-            [Required]
-            [Argument(1, Description = "Output file name as YAML")]
+            [Option(CommandOptionType.SingleValue, ShortName = "o", LongName = "output", Description = "Output file as YAML")]
             public string OutputPath { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
+                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.yml");
                 var spawnPoint = File.OpenRead(InputPath).Using(Kh2.Ard.SpawnPoint.Read);
                 File.WriteAllText(OutputPath, Helpers.YamlSerialize(spawnPoint));
                 return 0;
@@ -105,15 +106,15 @@ namespace OpenKh.Command.SpawnScript
         {
             [Required]
             [FileExists]
-            [Argument(0, Description = "File of a YAML spawnpoint file")]
+            [Argument(0, Description = "Spawnpoint file previously deserialized as YAML")]
             public string InputPath { get; set; }
 
-            [Required]
-            [Argument(1, Description = "Output file name")]
+            [Option(CommandOptionType.SingleValue, ShortName = "o", LongName = "output", Description = "Output file as spawnpoint")]
             public string OutputPath { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
+                OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.spawnpoint");
                 var spawnPoint = Helpers.YamlDeserialize<List<Kh2.Ard.SpawnPoint>>(File.ReadAllText(InputPath));
                 File.Create(OutputPath).Using(stream => Kh2.Ard.SpawnPoint.Write(stream, spawnPoint));
                 return 0;
