@@ -23,7 +23,7 @@ What is known about this file is as follows:
 | 0x08   | Unknown (Either uint16 or BitArray) | Pause Menu Controller
 | 0x0A   | uint16 | Pause Menu Information Text
 | 0x0C   | BitArray | Boolean Flag Array [5]
-| 0x0D   | BitArray | Boolean Flag Array [6]
+| 0x0D   | byte | [Bonus Reward](00battle.md#bons)
 | 0x0E   | uint16 | Antiform Multiplier
 | - | - | -
 | 0x1C | uint16 | Intro Camera Controller
