@@ -278,7 +278,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public int Unk28 { get; set; }
         }
 
-        public struct TeleportDesc
+        public class TeleportDesc
         {
             public byte Place { get; set; }
             public byte Door { get; set; }
