@@ -129,6 +129,218 @@ Just a 12-byte structure, read as Vector3f.
 | 00     | int   | Unknown
 | 04     | int   | Unknown
 
+## Spawn Script
+
+This is a micro-code that is responsible to change the behaviour of a specific loaded map.
+
+Every map have three spawn script files: `map`, `btl` and `evt`, loaded in this very speicfic order. Each file have a list of programs, where every program is represented by an unique ID. When a map loads, the game instructs the map loader which program to load ([sub_181cc0](#notes)). A map can load only a single program per spawn script file, but a script can load multiple programs.
+
+### Structure
+
+The file begins with a list of programs, defined as followed:
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | short | [Program](#program) ID
+| 02     | short | [Program](#program) length in bytes
+| 04     | byte[] | Program data
+
+### Program
+
+Each program is a list of functions, defined as followed:
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | short | [Operation code](#operation-code)
+| 02     | short | Parameter count for the operation
+| 04     | int[] | Parameters
+
+### Operation code
+
+There is a total of 30 operation codes for the spawn script. The parser can be found in [sub_181d30](#notes).
+
+- 00: [Spawn](#spawn)
+- 01: [MapOcclusion](#mapocclusion)
+- 02: [MultipleSpawn](#multiplespawn)
+- 03: [unknown](#unknown03)
+- 04: [unknown](#unknown04)
+- 05: [unknown](#unknown05)
+- 06: [unknown](#unknown06)
+- 07: [unknown](#unknown07)
+- 09: [unknown](#unknown09)
+- 0a: [unknown](#unknown0a)
+- 0b: [unknown](#unknown0b)
+- 0c: [Scene](#scene)
+- 0e: [unknown](#unknown07e
+- 0f: [Bgm](#bgm)
+- 10: [Party](#party)
+- 11: [unknown](#unknown11)
+- 12: [unknown](#unknown12)
+- 13: [unknown](#unknown13)
+- 14: [unknown](#unknown14)
+- 15: [Mission](#mission)
+- 16: [Bar](#bar)
+- 17: [unknown](#unknown17)
+- 18: [unknown](#unknown18)
+- 19: [unknown](#unknown19)
+- 1a: [unknown](#unknown1a)
+- 1b: [unknown](#unknown1b)
+- 1c: [unknown](#unknown1c)
+- 1d: [unknown](#unknown1d)
+- 1e: [BattleLevel](#battlelevel)
+- 1f: [unknown](#unknown1f)
+
+#### Spawn
+
+Loads a [Spawn Point](#spawn-point) file. The parameter is a 4-byte string with the name of the spawn script of the ARD's BAR file. This is the most used opcode, with a usage count of 11949.
+
+#### MapOcclusion
+
+Specify a 64-bit mask that is responsible to enable or disable specific map meshes and collisions. This is very common and used 2186 times.
+
+#### MultipleSpawn
+
+This is a bit unknown, but it seems to be used to only load `b_xx` type of spawnpoint. It is probably used to chain multiple battles (eg. spawn more enemies when the current enemeies are all defeated). There are multiple parameter specified based on the function's parameter count, where each one of them looks like [Spawn](#spawn) parameter.
+
+Not common (25 times), used in maps like `bb00`, `bb06`, `ca14`, etc. .
+
+#### Unknown03
+
+This apparently loads only `b_xx` type of spawnpoints. The first parameter is an unknown integer, while the second one is a 4-byte string.
+Very uncommon, used 17 times and only in the worlds BB, CA, LK and MU.
+
+#### Unknown04
+
+Set the memory area `01c6053c` with the 4-byte parameter. The purpose of that memory area is unknown. It's found 465 times and only in `btl`.
+
+#### Unknown05
+
+Set the memory area `0034ecd0` with the 4-byte parameter. The purpose of that memory area is unknown. Found 34 times almost every time in `btl`.
+
+#### Unknown06
+
+Set the memory area `0034ecd8` with the 4-byte parameter. The purpose of that memory area is unknown. Found 64 times and only in `btl`.
+
+#### Unknown07
+
+Set the memory area `0034ecdc` with the 4-byte parameter. The purpose of that memory area is unknown. Very uncommon as it's ony found 7 times in the maps `ca12` and `nm02` in `btl`.
+
+#### Unknown09
+
+Looks like similar to [Spawn](#spawn), but it's way less used. Found 210 times, mostly in `map` and just once in `wi00` as `evt`.
+
+#### Unknown0a
+
+Found 73 times. Purpose unknown.
+
+#### Unknown0b
+
+Set the memory area `0034ecc8` with the first 4-byte parameter. But it always seems to have 2 parameters. The purpose of that memory area is unknown. Found 203 times and only in `map`.
+
+#### Scene
+
+This is the most compelx op-code, since internally it process something we would call [scene script](#scene-script). There is currently no way to entirely parse this opcode. This is commonly used, as the usage count tops 2408 times. It is only found in `evt` scripts.
+
+#### Unknown0e
+
+Set the memory area `0034ece0` with the first 4-byte parameter. The purpose of that memory area is unknown. Used 323 times and only in `map`.
+
+#### Party
+
+Set how the party member needs to be structured. According to `dbg/member.bin`, those are the only allowed values as a parameter:
+
+| Value | Name          | Description
+|-------|---------------|-------------
+| 0     | NO_FRIEND     | Allow only Sora
+| 1     | DEFAULT       | Allow Donald and Goofy
+| 2     | W_FRIEND      | Allow Donald, Goofy and world guest.
+| 3     | W_FRIEND_IN   | Same as `W_FRIEND` but forces the world guest to be in at the beginning.
+| 4     | W_FRIEND_FIX  | Same as `W_FRIEND_IN`, but you can not swap the world guest.
+| 5     | W_FRIEND_ONLY | Allow only with Sora and the world guest.
+| 6     | DONALD_ONLY   | Only allow Sora and Donald.
+
+#### Bgm
+
+Set the map's background musics. The single 4-byte parameter can be read as two 2-byte integers, which represents the field and battle music ID that can be found in `bgm/music_xxx`. This overrides the default field and battle music used in the current map.
+
+#### Unknown11
+
+Set the memory area `0034ece4` with the first 4-byte parameter. Found 80 times and only in `map`.
+
+#### Unknown12
+
+Set the memory area `0034ecd4` with the first 4-byte parameter. This opcode works but it is not used by any program.
+
+#### Unknown13
+
+Set the memory area `0034ece8` with the first 4-byte parameter. Found 39 times and only in `map` for `hb17`, `lk13`, `mu07` and `po00`, with a parameter of `1` or `2`.
+
+#### Unknown14
+
+Set the 3rd bit of the memory area `0034f240`. Used 89 times.
+
+#### Mission
+
+Loads a [mission](msn.md) file by specifying its MSN file name without path and extension.
+
+#### Bar
+
+Loads a [BAR](bar.md) file by specifying the entire path. The `%s` symbol can be specified in the path to not hard-code the script to work just for a single language. The BAR file can be a [layout](2ld.md) or a `minigame` file.
+
+#### Unknown17
+
+Set the 5th bit of the memory area `0034f240`. This is only used twice in `mu07` and might be related to the mechanic of Sora entering in the tornado.
+
+#### Unknown18
+
+Set the memory area `0034ecec` and `0034ecf0` with the first two parameters. It is only used by `hb33`, `hb34`, `hb38` and `he15` in `btl`.
+
+#### Unknown19
+
+Unknown.
+
+#### Unknown1a
+
+It seems to do something with `01c60548`. It is only used 3 times in `hb13` by `evt`.
+
+#### Unknown1b
+
+It seems to do something with `01c60550`. It is only used 3 times in `hb13` by `evt` and in the same programs used by [Unknown1a](#unknown1a).
+
+#### Unknown1c
+
+Seems to recursively call the spawn script parser, but it is only used in `he09` for 130 times. Purpose unknown.
+
+#### Unknown1d
+
+Purpose unknown. Used 196 times.
+
+#### BattleLevel
+
+Override the battle level of the playing map. Usually used for special boss battle only.
+
+#### Unknown1f
+
+Purpose unknown. Very similar to [Unknown03](#unknown03)
+
+### Scene script
+
+The scene script contains functions with a variable amount of parameters.
+
+| Opcode | Name     | Description
+|--------|----------|-------------
+| 00     | Cutscene | Play a cutscene. param1 cutscene file, param2 unknown
+| 01     |          |
+| 02     |          |
+| 03     |          |
+| 04     |          |
+| 05     |          |
+| 06     | GetItem  | Obtain an item. It is possible to obtain up to 7 items in a row.
+| 07     |          |
+| 08     |          |
+
 ## Notes
 
 *¹ When referred as _always 0_ means that there are no game files that set it as a value different than that. Still it is unknown if the field is actually used in-game, which would potentially lead to unused functionalities.
+
+*² When `sub_`_`xxxxxx`_ or a memory address is read, they refer to the values found in the retail version of Kingdom Hearts II: Final Mix, executable `SLPM_66675.elf`.
