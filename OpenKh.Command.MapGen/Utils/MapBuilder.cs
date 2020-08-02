@@ -13,6 +13,7 @@ using System.Numerics;
 using System.Text;
 using Xe.Graphics;
 using static OpenKh.Kh2.Mdlx;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 
 namespace OpenKh.Command.MapGen.Utils
 {
@@ -60,6 +61,29 @@ namespace OpenKh.Command.MapGen.Utils
 
             var scale = config.scale;
 
+            Matrix4x4 matrix = Matrix4x4.Identity;
+
+            if (config.applyMatrix != null)
+            {
+                var m = config.applyMatrix;
+
+                if (m.Length == 16)
+                {
+                    matrix = new Matrix4x4(
+                        m[0], m[1], m[2], m[3],
+                        m[4], m[5], m[6], m[7],
+                        m[8], m[9], m[10], m[11],
+                        m[12], m[13], m[14], m[15]
+                    );
+
+                    logger.Debug($"Apply matrix: {matrix}");
+                }
+            }
+            else
+            {
+                matrix *= scale;
+            }
+
             logger.Debug($"Starting triangle strip conversion for {scene.Meshes.Count} meshes.");
 
             foreach (var inputMesh in scene.Meshes)
@@ -90,7 +114,10 @@ namespace OpenKh.Command.MapGen.Utils
 
                 foreach (var inputVertex in inputMesh.Vertices)
                 {
-                    var vertex = new Vector3(inputVertex.X * scale, inputVertex.Y * scale, inputVertex.Z * scale);
+                    var vertex = Vector3.Transform(
+                        new Vector3(inputVertex.X, inputVertex.Y, inputVertex.Z),
+                        matrix
+                    );
 
                     var index = kh2Mesh.vertexList.IndexOf(vertex);
                     if (index < 0)

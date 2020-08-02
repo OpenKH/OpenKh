@@ -37,6 +37,8 @@ namespace OpenKh.Command.MapGen.Models
 
         public bool skipConversionIfExists { get; set; }
 
+        public float[] applyMatrix { get; set; }
+
         public class AddFile
         {
             public string name { get; set; }
