@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2.Ard;
 using System.IO;
 using System.Linq;
@@ -75,7 +75,7 @@ Unk14
 
 Program 0x123
 Unk17";
-                var script = SpawnScriptParser.AsScript(Input).ToArray();
+                var script = SpawnScriptParser.Compile(Input).ToArray();
                 Assert.Equal(2, script.Length);
 
                 Assert.Equal(123, script[0].ProgramId);
@@ -118,7 +118,7 @@ Unk17";
             [InlineData("Unk0c 0x1234567 0x1ccccccc 0x1ccccccc", (SpawnScript.Operation)0x0c, 0x1234567, 0x1ccccccc, 0x1ccccccc)]
             public void ParseTextAsScript(string input, SpawnScript.Operation expectedOp, params int[] expectedParams)
             {
-                var script = SpawnScriptParser.AsScript($"Program 0\n{input}\n").ToArray();
+                var script = SpawnScriptParser.Compile($"Program 0\n{input}\n").ToArray();
                 Assert.Single(script);
 
                 var program = script.First();

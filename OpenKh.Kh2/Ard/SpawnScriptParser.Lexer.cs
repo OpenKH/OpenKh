@@ -58,7 +58,7 @@ namespace OpenKh.Kh2.Ard
             Code,
         }
 
-        public static IEnumerable<SpawnScript> AsScript(string text)
+        public static IEnumerable<SpawnScript> Compile(string text)
         {
             const char Comment = '#';
 

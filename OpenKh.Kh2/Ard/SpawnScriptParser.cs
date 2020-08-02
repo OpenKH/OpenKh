@@ -17,9 +17,26 @@ namespace OpenKh.Kh2.Ard
             "DONALD_ONLY",
         };
 
+        public static string Decompile(IEnumerable<SpawnScript> scripts)
+        {
+            var sb = new StringBuilder();
+            foreach (var script in scripts)
+            {
+                foreach (var line in AsText(script))
+                {
+                    sb.Append(line);
+                    sb.Append('\n');
+                }
+
+                sb.Append('\n');
+            }
+
+            return sb.ToString();
+        }
+
         public static IEnumerable<string> AsText(SpawnScript script)
         {
-            yield return $"Program 0x{script.ProgramId}";
+            yield return $"Program 0x{script.ProgramId:X02}";
             foreach (var f in script.Functions)
                 yield return AsText(f);
         }
