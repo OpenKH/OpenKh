@@ -53,7 +53,7 @@ namespace OpenKh.Tools.Common.Rendering
 
         public void AppendSprite(SpriteDrawingContext context)
         {
-            SetTextureToDraw(context.SpriteTexture);
+            SetTextureToDraw(context.SpriteTexture ?? _defaultTexture);
             var width = _currentTexture.Width;
             var height = _currentTexture.Height;
             var viewport = _viewportSize;
