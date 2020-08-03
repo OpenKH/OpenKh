@@ -202,7 +202,7 @@ namespace OpenKh.Command.MapGen.Utils
                         }
                         else
                         {
-                            triStripOut.vertexColorList.Add(new Color(maxIntensity, maxIntensity, maxIntensity, 255));
+                            triStripOut.vertexColorList.Add(new Color(maxIntensity, maxIntensity, maxIntensity, maxIntensity));
                         }
                     }
 

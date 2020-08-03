@@ -120,12 +120,12 @@ namespace OpenKh.Command.MapGen.Utils
                     writer.Write(0x3f3f3f3f);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x6E00C000 | off | (num << 16))); // unpack V4-8 c 14 a 012 usn 1 flg 1 m 0
-                    foreach (var one in mesh.triangleStripList.SelectMany(it => it.vertexColorList))
+                    foreach (var color in mesh.triangleStripList.SelectMany(it => it.vertexColorList))
                     {
-                        writer.Write(one.r);
-                        writer.Write(one.g);
-                        writer.Write(one.b);
-                        writer.Write(ToPs2Alpha(one.a));
+                        writer.Write(color.r);
+                        writer.Write(color.g);
+                        writer.Write(color.b);
+                        writer.Write(color.a);
                     }
                 }
 

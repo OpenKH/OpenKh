@@ -31,6 +31,11 @@ namespace OpenKh.Command.MapGen.Models
         {
             public List<int> vertexIndices = new List<int>();
             public List<Vector2> uvList = new List<Vector2>();
+
+            /// <summary>
+            /// vertex color rgba is directly written.
+            /// 128 is PS2's max. 255 is doubled intensity.
+            /// </summary>
             public List<Color> vertexColorList = new List<Color>();
         }
     }
