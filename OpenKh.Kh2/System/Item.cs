@@ -79,27 +79,14 @@ namespace OpenKh.Kh2.System
             [Data] public byte Unknown { get; set; }
         }
 
-        private class SubItemReader<T>
-        {
-            [Data] public int Id { get; set; }
-            [Data] public int Count { get => Items.TryGetCount(); set => Items = Items.CreateOrResize(value); }
-            [Data] public List<T> Items { get; set; }
-
-            static SubItemReader() => BinaryMapping.SetMemberLengthMapping<SubItemReader<T>>(nameof(Items), (o, m) => o.Count);
-
-            public static SubItemReader<T> Read(Stream stream) => BinaryMapping.ReadObject<SubItemReader<T>>(stream);
-
-            public void Write(Stream stream) => BinaryMapping.WriteObject(stream, this);
-        }
-
         [Data] public List<Entry> Items1 { get; set; }
         [Data] public List<Stat> Items2 { get; set; }
 
         public static Item Read(Stream stream)
         {
             stream.Position = 0;
-            var one = SubItemReader<Entry>.Read(stream);
-            var two = SubItemReader<Stat>.Read(stream);
+            var one = BaseTable<Entry>.Read(stream);
+            var two = BaseTable<Stat>.Read(stream);
 
             return new Item
             {
@@ -110,17 +97,8 @@ namespace OpenKh.Kh2.System
 
         public void Write(Stream stream)
         {
-            new SubItemReader<Entry>
-            {
-                Id = 6,
-                Items = Items1
-            }.Write(stream);
-
-            new SubItemReader<Stat>
-            {
-                Id = 0,
-                Items = Items2
-            }.Write(stream);
+            BaseTable<Entry>.Write(stream, 6, Items1);
+            BaseTable<Stat>.Write(stream, 0, Items2);
         }
     }
 }

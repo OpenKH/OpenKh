@@ -10,7 +10,7 @@ namespace OpenKh.Kh2.Battle
         [Data] public byte ActionId { get; set; }
         [Data] public byte Priority { get; set; }
         [Data] public byte Unknown03 { get; set; } //Padding?
-        [Data(offset: 4, count: 5)] public List<Voice> Voices { get; set; }
+        [Data(Count = 5)] public List<Voice> Voices { get; set; }
 
         public class Voice
         {
