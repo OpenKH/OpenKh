@@ -74,18 +74,35 @@ DEBUG Done
 Thus write `mapdef.yml` file as needed, and place it to the same folder having 3D model data.
 
 ```yml
-# Apply xyz uniform scale to every mesh vertex
+# Apply xyz uniform scale to every mesh vertex. Skipped if applyMatrix exists.
 scale: 1
 
-# Specify path to image files can be used by `fromFile`
+# Apply matrix for each input vertex position. This is useful for exported map from KH1.
+# Default is null and assume identity matrix.
+applyMatrix: [
+    1, 0, 0, 0, 
+    0,-1, 0, 0, 
+    0, 0,-1, 0, 
+    0, 0, 0, 1
+]
+
+# Specify parent directory path to image files that can be used by `fromFile`
 # The path accepts both absolute path, and relative path from folder having `mapdef.yml`.
+# Default is `images`. If you define imageDirs, The default `images` will be lost.
 imageDirs:
 - 'images'
 - 'images2'
 - 'images3'
 
 # `OpenKh.Command.ImgTool.exe` will be used if `.png` file is passed to `fromFile`
-imgtoolOptions: '-b 4'
+imgtoolOptions: '-b 8'
+
+# Apply textureOptions globally. The individual property of textureOptions will be adopted.
+textureOptions:
+  # addressU
+  # addressV are one of: 'Repeat', 'Clamp', 'RegionClamp', 'RegionRepeat'
+  addressU: null
+  addressV: null
 
 # Declare supplemental info per material of any associated meshes in 3D model data
 materials:
@@ -127,7 +144,7 @@ materials:
   surfaceFlags: 0x3f1
 
 # Specify maxIntensity to this material.
-# Apply to alpha component of vertex color.
+# Apply max value to each rgba color component of vertex color.
 - name: 'four'
   maxIntensity: 128
 
@@ -136,11 +153,15 @@ materials:
 - name: 'fallbackMaterial'
   ignore: false
   fromFile: null
+  fromFile2: null
   noclip: false
   nodraw: false
   surfaceFlags: 0x3f1
   maxIntensity: 128
   imgtoolOptions: null
+  textureOptions:
+    addressU: null
+    addressV: null
 
 # Customize output bar entries for output `.map` file.
 bar:
@@ -153,6 +174,40 @@ bar:
   doct:
     name: "eh_1"
 ```
+
+### imageDirs and fromFile
+
+You can specify imageDirs like:
+
+```
+imageDirs:
+- 'images'
+- 'images2'
+- 'images3'
+```
+
+The image file associated with material will be located in this rule:
+
+`{baseDir}/{eachInputDir}/{eachFileName}`
+
+baseDir:
+
+- The folder having `mapdef.yml` file.
+
+eachInputDir:
+
+- `images` (from `imageDirs:` section)
+- `images2` (from `imageDirs:` section)
+- `images3` (from `imageDirs:` section)
+- The folder having `mapdef.yml` file.
+
+eachFileName:
+
+- `fromFile` of material (you can specify)
+- `fromFile2` of material (extracted from material's diffuse texture file path)
+- material name + ".imd"
+- material name + ".png"
+
 
 ## Example of designer tools usage
 
