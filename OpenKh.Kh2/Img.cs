@@ -155,9 +155,7 @@ namespace OpenKh.Kh2
             var decompressedLength = srcData.Length;
             var key = GetLeastUsedByte(srcData);
 
-            // the following buffer size covers the worst compression scenario possible.
-            var buffer = new byte[decompressedLength + decompressedLength / 2 + 5];
-            var length = 0;
+            var buffer = new List<byte>(decompressedLength);
             int iSrc = 0;
 
             while (iSrc < decompressedLength)
@@ -165,8 +163,8 @@ namespace OpenKh.Kh2
                 var ch = srcData[iSrc];
                 if (ch == key)
                 {
-                    buffer[length++] = 0;
-                    buffer[length++] = key;
+                    buffer.Add(0);
+                    buffer.Add(key);
                     iSrc++;
                     continue;
                 }
@@ -205,28 +203,25 @@ namespace OpenKh.Kh2
 
                 if (matches > 3)
                 {
-                    buffer[length++] = (byte)(matches - 3);
-                    buffer[length++] = (byte)mi;
-                    buffer[length++] = key;
+                    buffer.Add((byte)(matches - 3));
+                    buffer.Add((byte)mi);
+                    buffer.Add(key);
                     iSrc += matches;
                 }
                 else
                 {
-                    buffer[length++] = ch;
+                    buffer.Add(ch);
                     iSrc++;
                 }
             }
 
-            buffer[length++] = (byte)(decompressedLength >> 24);
-            buffer[length++] = (byte)(decompressedLength >> 16);
-            buffer[length++] = (byte)(decompressedLength >> 8);
-            buffer[length++] = (byte)(decompressedLength >> 0);
-            buffer[length++] = key;
+            buffer.Add((byte)(decompressedLength >> 24));
+            buffer.Add((byte)(decompressedLength >> 16));
+            buffer.Add((byte)(decompressedLength >> 8));
+            buffer.Add((byte)(decompressedLength >> 0));
+            buffer.Add(key);
 
-            var dstData = new byte[length];
-            Array.Copy(buffer, dstData, length);
-
-            return dstData;
+            return buffer.ToArray();
         }
 
         private static byte GetLeastUsedByte(byte[] data)
