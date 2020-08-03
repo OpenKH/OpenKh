@@ -30,7 +30,8 @@ namespace OpenKh.Tools.Kh2MapStudio
         private readonly GraphicsDevice _graphics;
         private readonly KingdomShader _shader;
         private readonly List<MeshGroupModel> _meshs;
-        private readonly Camera _camera;
+
+        public Camera Camera { get; }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
@@ -38,7 +39,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             _graphics = graphics.GraphicsDevice;
             _shader = new KingdomShader(content);
             _meshs = new List<MeshGroupModel>();
-            _camera = new Camera()
+            Camera = new Camera()
             {
                 CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
@@ -70,7 +71,7 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public void Draw()
         {
-            _camera.AspectRatio = _graphicsManager.PreferredBackBufferWidth / (float)_graphicsManager.PreferredBackBufferHeight;
+            Camera.AspectRatio = _graphicsManager.PreferredBackBufferWidth / (float)_graphicsManager.PreferredBackBufferHeight;
 
             _graphics.RasterizerState = new RasterizerState()
             {
@@ -81,8 +82,8 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             _shader.Pass(pass =>
             {
-                _shader.ProjectionView = _camera.Projection;
-                _shader.WorldView = _camera.World;
+                _shader.ProjectionView = Camera.Projection;
+                _shader.WorldView = Camera.World;
                 _shader.ModelView = Matrix.Identity;
                 pass.Apply();
 

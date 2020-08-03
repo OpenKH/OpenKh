@@ -180,6 +180,30 @@ namespace OpenKh.Tools.Common.CustomImGui
         public static bool ForPopup(string name, Action action) =>
             ForControl(() => ImGui.BeginPopup(name), ImGui.EndPopup, action);
 
+        public static bool ForWindow(string name, Action action) =>
+            ForControl(() => ImGui.Begin(name), ImGui.End, action);
+
+        public static void ForEdit(string name, Func<float> getter, Action<float> setter)
+        {
+            var value = getter();
+            if (ImGui.DragFloat(name, ref value))
+                setter(value);
+        }
+
+        public static void ForEdit2(string name, Func<Vector2> getter, Action<Vector2> setter)
+        {
+            var value = getter();
+            if (ImGui.DragFloat2(name, ref value))
+                setter(value);
+        }
+
+        public static void ForEdit3(string name, Func<Vector3> getter, Action<Vector3> setter)
+        {
+            var value = getter();
+            if (ImGui.DragFloat3(name, ref value))
+                setter(value);
+        }
+
         public static bool ForChild(string name, float w, float h, bool border, Action action)
         {
             var ret = ImGui.BeginChild(name, new Vector2(w, h), border);

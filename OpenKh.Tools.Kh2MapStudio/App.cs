@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.CustomImGui;
+using OpenKh.Tools.Kh2MapStudio.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -91,6 +92,8 @@ namespace OpenKh.Tools.Kh2MapStudio
                 MainWindow();
                 ImGui.PopStyleColor();
             }, true);
+
+            CameraWindow.Run(_mapRenderer.Camera);
 
             return _exitFlag;
         }
