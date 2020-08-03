@@ -52,6 +52,8 @@ namespace OpenKh.Command.MapGen.Models
         /// </summary>
         public string imgtoolOptions { get; set; }
 
+        public TextureOptions textureOptions { get; set; } = new TextureOptions();
+
 
         public static MaterialDef CreateFallbackFor(string name) =>
             new MaterialDef

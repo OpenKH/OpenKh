@@ -2,6 +2,7 @@ using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -141,7 +142,7 @@ namespace OpenKh.Kh2
 
         }
 
-        private class GsInfo
+        public class GsInfo
         {
             public MIPTBP1 MipTbp1 { get; set; }
             public MIPTBP2 MipTbp2 { get; set; }
@@ -467,11 +468,86 @@ namespace OpenKh.Kh2
             }
         }
 
-        public ModelTexture(IList<Imgd> images)
+        public class Build
+        {
+            public IList<Imgd> images;
+            public byte[] offsetData;
+            public IList<UserDataTransferInfo> textureTransfer;
+            public IList<UserGsInfo> gsInfo;
+        }
+
+        public class UserDataTransferInfo
+        {
+            public BITBLTBUF BitBltBuf { get; set; } = new BITBLTBUF();
+            public TRXPOS TrxPos { get; set; } = new TRXPOS();
+            public TRXREG TrxReg { get; set; } = new TRXREG();
+            public TRXDIR TrxDir { get; set; } = new TRXDIR();
+
+            public UserDataTransferInfo()
+            {
+
+            }
+
+            public UserDataTransferInfo(int width, int height)
+            {
+                BitBltBuf.DBW = width / 128;
+                BitBltBuf.DPSM = (int)Tm2.GsPSM.GS_PSMCT32;
+                TrxReg.RRW = width / 2;
+                TrxReg.RRH = height / 2;
+            }
+        }
+
+        public class UserGsInfo
+        {
+            public MIPTBP1 MipTbp1 { get; set; } = new MIPTBP1();
+            public MIPTBP2 MipTbp2 { get; set; } = new MIPTBP2();
+            public Tm2.GsTex Tex2 { get; set; } = new Tm2.GsTex();
+            public TEX1 Tex1 { get; set; } = new TEX1();
+            public Tm2.GsTex Tex0 { get; set; } = new Tm2.GsTex();
+            public TextureAddressMode AddressMode { get; set; } = new TextureAddressMode();
+
+            public UserGsInfo()
+            {
+
+            }
+
+            public UserGsInfo(Imgd imageInfo)
+                : this(imageInfo.Size.Width, imageInfo.Size.Height, ToPSM(imageInfo.PixelFormat))
+            {
+
+            }
+
+            public UserGsInfo(int width, int height, Tm2.GsPSM psm)
+            {
+                Tex2.CPSM = Tm2.GsCPSM.GS_PSMCT32; // RGBA palette
+                Tex2.CPSM = Tm2.GsCPSM.GS_PSMCT32; // RGBA palette
+                Tex2.CSA = 0; // always 0
+                Tex2.CLD = 4;
+
+                Tex1.MMAG = 1;
+
+                Tex0.TBW = width / 64;
+                Tex0.PSM = psm;
+                Tex0.TW = GetSizeRegister(width);
+                Tex0.TH = GetSizeRegister(height);
+                Tex0.TCC = true;
+                Tex0.CPSM = Tm2.GsCPSM.GS_PSMCT32; // RGBA palette
+                Tex0.CSM = false;
+
+                AddressMode.AddressU = TextureWrapMode.RegionClamp;
+                AddressMode.AddressV = TextureWrapMode.RegionClamp;
+                AddressMode.Left = 0;
+                AddressMode.Right = width - 1;
+                AddressMode.Top = 0;
+                AddressMode.Bottom = height - 1;
+            }
+        }
+
+        public ModelTexture(Build build)
         {
             _useRelativeOffset = true;
 
-            OffsetData = Enumerable.Range(0, images.Count)
+            OffsetData = build.offsetData ?? Enumerable.Range(0, build.images.Count)
                 .Select(it => Convert.ToByte(it))
                 .ToArray();
 
@@ -483,90 +559,86 @@ namespace OpenKh.Kh2
 
             var clutBuilder = new ClutBuilder(ClutBasePtr);
 
-            foreach (var image in images)
-            {
-                var imgd = new Imgd(image.Size, image.PixelFormat, image.GetData(), image.GetClut(), true);
-                var imageQWC = imgd.Data.Length / 16;
+            var clutAllocList = new List<ClutAlloc>();
 
-                var clutAlloc = clutBuilder.Allocate(imgd.PixelFormat == PixelFormat.Indexed4);
+            var encodedImageList = new List<Imgd>();
+
+            var userTextureTransfer = build.textureTransfer
+                ?? build.images
+                    .Select(image => new UserDataTransferInfo(image.Size.Width, image.Size.Height))
+                    .ToArray();
+
+            var userGsInfo = build.gsInfo
+                ?? OffsetData
+                    .Select(index => build.images[index])
+                    .Select(image => new UserGsInfo(image))
+                    .ToArray();
+
+            foreach (var (image, imageIndex) in build.images.Select((image, imageIn) => (image, imageIn)))
+            {
+                var encodedImage = new Imgd(image.Size, image.PixelFormat, image.GetData(), image.GetClut(), true);
+                var imageQWC = encodedImage.Data.Length / 16;
+
+                encodedImageList.Add(encodedImage);
+
+                clutAllocList.Add(clutBuilder.Allocate(encodedImage.PixelFormat == PixelFormat.Indexed4));
+
+                var source = userTextureTransfer[imageIndex];
 
                 texTransList.Add(
                     new DataTransferInfo
                     {
-                        BitBltBuf = new BITBLTBUF
+                        BitBltBuf = new BITBLTBUF(source.BitBltBuf.Data)
                         {
                             DBP = TexBasePtr,
-                            DBW = image.Size.Width / 128,
-                            DPSM = (int)Tm2.GsPSM.GS_PSMCT32,
                         },
-                        TrxPos = new TRXPOS
-                        {
+                        TrxPos = source.TrxPos,
+                        TrxReg = source.TrxReg,
+                        TrxDir = source.TrxDir,
 
-                        },
-                        TrxReg = new TRXREG
-                        {
-                            RRW = image.Size.Width / 2,
-                            RRH = image.Size.Height / 2,
-                        },
-                        TrxDir = new TRXDIR
-                        {
-
-                        },
                         QuadWordCount = imageQWC,
                         DataOffset = Convert.ToInt32(picData.Position), // relative
                     }
                 );
+            }
+
+            foreach (var (imageIndex, gsIndex) in OffsetData.Select((imageIndex, gsIndex) => (imageIndex, gsIndex)))
+            {
+                var clutAlloc = clutAllocList[imageIndex];
+                var image = build.images[imageIndex];
+
+                var source = userGsInfo[gsIndex];
+
+                var tex2 = new Tm2.GsTex();
+                tex2.Data = source.Tex2.Data;
+                tex2.PSM = Tm2.GsPSM.GS_PSMT8; // PSMT8 will load 256 clut entries starts at CBP
+                tex2.CBP = clutAlloc.CBP;
+                tex2.CPSM = Tm2.GsCPSM.GS_PSMCT32; // RGBA palette
+                tex2.CSM = false;
+                tex2.CSA = 0; // always 0
+                tex2.CLD = 4;
+
+                var tex0 = new Tm2.GsTex();
+                tex0.Data = source.Tex0.Data;
+                tex0.TBP0 = TexBasePtr;
+                tex0.CBP = clutAlloc.CBP;
+                tex0.CPSM = Tm2.GsCPSM.GS_PSMCT32; // RGBA palette
+                tex0.CSM = false;
+                tex0.CSA = clutAlloc.CSA;
 
                 gsInfoList.Add(
                     new GsInfo
                     {
-                        MipTbp1 = new MIPTBP1
-                        {
-
-                        },
-                        MipTbp2 = new MIPTBP2
-                        {
-
-                        },
-                        Tex2 = new Tm2.GsTex
-                        {
-                            PSM = Tm2.GsPSM.GS_PSMT8, // PSMT8 will load 256 clut entries starts at CBP
-                            CBP = clutAlloc.CBP,
-                            CPSM = Tm2.GsCPSM.GS_PSMCT32, // RGBA palette
-                            CSM = false,
-                            CSA = 0, // always 0
-                            CLD = 4,
-                        },
-                        Tex1 = new TEX1
-                        {
-                            MMAG = 1,
-                        },
-                        Tex0 = new Tm2.GsTex
-                        {
-                            TBP0 = TexBasePtr,
-                            TBW = image.Size.Width / 64,
-                            PSM = ToPSM(image.PixelFormat),
-                            TW = GetSizeRegister(image.Size.Width),
-                            TH = GetSizeRegister(image.Size.Height),
-                            TCC = true,
-                            CBP = clutAlloc.CBP,
-                            CPSM = Tm2.GsCPSM.GS_PSMCT32, // RGBA palette
-                            CSM = false,
-                            CSA = clutAlloc.CSA,
-                        },
-                        AddressMode = new TextureAddressMode
-                        {
-                            AddressU = TextureWrapMode.RegionClamp,
-                            AddressV = TextureWrapMode.RegionClamp,
-                            Left = 0,
-                            Right = image.Size.Width - 1,
-                            Top = 0,
-                            Bottom = image.Size.Height - 1,
-                        },
+                        MipTbp1 = source.MipTbp1,
+                        MipTbp2 = source.MipTbp2,
+                        Tex2 = tex2,
+                        Tex1 = source.Tex1,
+                        Tex0 = tex0,
+                        AddressMode = source.AddressMode,
                     }
                 );
 
-                picData.Write(imgd.Data);
+                picData.Write(encodedImageList[imageIndex].Data);
 
                 clutAlloc.Write(palData, image.GetClut());
             }
@@ -606,7 +678,7 @@ namespace OpenKh.Kh2
 
         private static int GetSizeRegister(int realSize) => (int)Math.Ceiling(Math.Log(realSize, 2));
 
-        private Tm2.GsPSM ToPSM(PixelFormat pixelFormat)
+        private static Tm2.GsPSM ToPSM(PixelFormat pixelFormat)
         {
             switch (pixelFormat)
             {

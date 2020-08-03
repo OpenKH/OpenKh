@@ -1,5 +1,4 @@
-﻿using Assimp;
-using NLog;
+﻿using NLog;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Command.MapGen.Utils;
 using OpenKh.Common;
@@ -12,7 +11,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using Xe.Graphics;
-using static OpenKh.Kh2.Mdlx;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 
 namespace OpenKh.Command.MapGen.Utils
@@ -42,20 +40,59 @@ namespace OpenKh.Command.MapGen.Utils
 
             {
                 var matDefList = bigMeshContainer.AllocatedMaterialDefs;
-                modelTex = new ModelTexture(
-                    matDefList
-                        .Select(matDef => imageLoader(matDef))
-                        .ToArray()
-                );
+                var imageSets = matDefList
+                    .Select(matDef => new ImageSet { image = imageLoader(matDef), matDef = matDef, })
+                    .ToArray();
+
+                var build = new ModelTexture.Build
+                {
+                    images = imageSets
+                        .Select(set => set.image)
+                        .ToArray(),
+
+                    offsetData = null, // auto serial number map
+
+                    textureTransfer = null, // auto create
+
+                    gsInfo = imageSets
+                        .Select(
+                            set =>
+                            {
+                                var gsInfo = new ModelTexture.UserGsInfo(set.image);
+                                gsInfo.AddressMode.AddressU =
+                                    Enum.Parse<ModelTexture.TextureWrapMode>(
+                                        set.matDef.textureOptions.addressU
+                                        ?? config.textureOptions.addressU
+                                        ?? "RegionRepeat"
+                                    );
+                                gsInfo.AddressMode.AddressV =
+                                    Enum.Parse<ModelTexture.TextureWrapMode>(
+                                        set.matDef.textureOptions.addressV
+                                        ?? config.textureOptions.addressV
+                                        ?? "RegionRepeat"
+                                    );
+                                return gsInfo;
+                            }
+                        )
+                        .ToArray(),
+                };
+
+                modelTex = new ModelTexture(build);
             }
+        }
+
+        class ImageSet
+        {
+            public Imgd image;
+            public MaterialDef matDef;
         }
 
         private void ConvertModelIntoMapModel(string modelFile, MapGenConfig config)
         {
             logger.Debug($"Loading 3D model file \"{modelFile}\" using Assimp.");
 
-            var assimp = new AssimpContext();
-            var scene = assimp.ImportFile(modelFile, PostProcessSteps.PreTransformVertices);
+            var assimp = new Assimp.AssimpContext();
+            var scene = assimp.ImportFile(modelFile, Assimp.PostProcessSteps.PreTransformVertices);
 
             bigMeshContainer = new BigMeshContainer();
 
@@ -176,7 +213,7 @@ namespace OpenKh.Command.MapGen.Utils
 
             mapModel = new Mdlx.M4
             {
-                VifPackets = new List<VifPacketDescriptor>(),
+                VifPackets = new List<Mdlx.VifPacketDescriptor>(),
             };
 
             foreach (var bigMesh in bigMeshContainer.MeshList
@@ -188,7 +225,7 @@ namespace OpenKh.Command.MapGen.Utils
                     var dmaPack = new MapVifPacketBuilder(smallMesh);
 
                     mapModel.VifPackets.Add(
-                        new VifPacketDescriptor
+                        new Mdlx.VifPacketDescriptor
                         {
                             VifPacket = dmaPack.vifPacket.ToArray(),
                             TextureId = smallMesh.textureIndex,
@@ -315,14 +352,14 @@ namespace OpenKh.Command.MapGen.Utils
             }
         }
 
-        private static Color ConvertVertexColor(Color4D clr, byte max) => new Color(
+        private static Color ConvertVertexColor(Assimp.Color4D clr, byte max) => new Color(
             (byte)(clr.R * max),
             (byte)(clr.G * max),
             (byte)(clr.B * max),
             (byte)(clr.A * max)
         );
 
-        private static Vector2 Get2DCoord(Vector3D vector3D) => new Vector2(vector3D.X, 1 - vector3D.Y);
+        private static Vector2 Get2DCoord(Assimp.Vector3D vector3D) => new Vector2(vector3D.X, 1 - vector3D.Y);
 
 
         public List<Bar.Entry> GetBarEntries()

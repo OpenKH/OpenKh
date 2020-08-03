@@ -39,6 +39,8 @@ namespace OpenKh.Command.MapGen.Models
 
         public float[] applyMatrix { get; set; }
 
+        public TextureOptions textureOptions { get; set; } = new TextureOptions();
+
         public class AddFile
         {
             public string name { get; set; }
