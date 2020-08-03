@@ -2,7 +2,7 @@
 
 namespace OpenKh.Tools.Kh2MapStudio.Models
 {
-    public class MeshGroupModel
+    class MeshGroupModel
     {
         public MeshGroupModel(string name, MeshGroup meshGroup)
         {

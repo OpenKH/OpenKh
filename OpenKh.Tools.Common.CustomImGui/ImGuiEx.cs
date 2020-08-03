@@ -181,7 +181,18 @@ namespace OpenKh.Tools.Common.CustomImGui
             ForControl(() => ImGui.BeginPopup(name), ImGui.EndPopup, action);
 
         public static bool ForWindow(string name, Action action) =>
-            ForControl(() => ImGui.Begin(name), ImGui.End, action);
+            ForControl(() =>
+            {
+                var dummy = true;
+                return ImGui.Begin(name, ref dummy);
+            }, ImGui.End, action);
+
+        public static void ForEdit(string name, Func<bool> getter, Action<bool> setter)
+        {
+            var value = getter();
+            if (ImGui.Checkbox(name, ref value))
+                setter(value);
+        }
 
         public static void ForEdit(string name, Func<float> getter, Action<float> setter)
         {

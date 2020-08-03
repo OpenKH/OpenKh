@@ -5,7 +5,7 @@ using static OpenKh.Tools.Kh2MapStudio.ImGuiExHelpers;
 
 namespace OpenKh.Tools.Kh2MapStudio.Windows
 {
-    public static class CameraWindow
+    static class CameraWindow
     {
         public static void Run(Camera camera) => ForWindow("Camera", () =>
         {

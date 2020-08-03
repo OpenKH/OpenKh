@@ -5,7 +5,7 @@ using OpenKh.Tools.Common.CustomImGui;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
-    public static class ImGuiExHelpers
+    static class ImGuiExHelpers
     {
         public static void ForEdit2(string name, Func<xna.Vector2> getter, Action<xna.Vector2> setter)
         {

@@ -13,8 +13,7 @@ using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
-
-    public class App : IDisposable
+    class App : IDisposable
     {
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
         private readonly MonoGameImGuiBootstrap _bootstrap;
@@ -94,6 +93,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             }, true);
 
             CameraWindow.Run(_mapRenderer.Camera);
+            LayerControllerWindow.Run(_mapRenderer);
 
             return _exitFlag;
         }

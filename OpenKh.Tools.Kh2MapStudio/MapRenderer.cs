@@ -5,6 +5,7 @@ using OpenKh.Common;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
+using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using OpenKh.Tools.Kh2MapStudio.Models;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +13,7 @@ using System.Linq;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
-    class MapRenderer
+    class MapRenderer : ILayerController
     {
         private readonly static BlendState DefaultBlendState = new BlendState()
         {
@@ -32,6 +33,39 @@ namespace OpenKh.Tools.Kh2MapStudio
         private readonly List<MeshGroupModel> _meshs;
 
         public Camera Camera { get; }
+
+        public bool? ShowMap
+        {
+            get => _meshs.FirstOrDefault(x => x.Name == "MAP")?.IsVisible;
+            set
+            {
+                var mesh = _meshs.FirstOrDefault(x => x.Name == "MAP");
+                if (mesh != null)
+                    mesh.IsVisible = value ?? true;
+            }
+        }
+
+        public bool? ShowSk0
+        {
+            get => _meshs.FirstOrDefault(x => x.Name == "SK0")?.IsVisible;
+            set
+            {
+                var mesh = _meshs.FirstOrDefault(x => x.Name == "SK0");
+                if (mesh != null)
+                    mesh.IsVisible = value ?? true;
+            }
+        }
+
+        public bool? ShowSk1
+        {
+            get => _meshs.FirstOrDefault(x => x.Name == "SK1")?.IsVisible;
+            set
+            {
+                var mesh = _meshs.FirstOrDefault(x => x.Name == "SK1");
+                if (mesh != null)
+                    mesh.IsVisible = value ?? true;
+            }
+        }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
