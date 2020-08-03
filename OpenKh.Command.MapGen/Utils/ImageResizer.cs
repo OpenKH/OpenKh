@@ -34,7 +34,7 @@ namespace OpenKh.Command.MapGen.Utils
                 var width = imgd.Size.Width;
                 var height = imgd.Size.Height;
 
-                logger.Warn($"This image will be resized due to comformance of texture size. Resizing from ({width}, {height}) to ({newWidth}, {newHeight}).");
+                logger.Info($"This image will be resized due to comformance of texture size. Resizing from ({width}, {height}) to ({newWidth}, {newHeight}).");
 
                 if (imgd.PixelFormat == Imaging.PixelFormat.Indexed8)
                 {
