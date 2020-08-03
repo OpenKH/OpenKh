@@ -104,6 +104,9 @@ textureOptions:
   addressU: null
   addressV: null
 
+# Disable triangleStrips optimization. Every output shape becomes triangle.
+disableTriangleStripsOptimization: true
+
 # Declare supplemental info per material of any associated meshes in 3D model data
 materials:
 

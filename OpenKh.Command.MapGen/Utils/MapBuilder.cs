@@ -181,7 +181,12 @@ namespace OpenKh.Command.MapGen.Utils
 
                 var maxIntensity = matDef.maxIntensity;
 
-                foreach (var triStripInput in TriangleFansToTriangleStrips(localFaces))
+                var triConverter =
+                    config.disableTriangleStripsOptimization
+                    ? (TriangleFansToTriangleStripsConverter)TriangleFansToTriangleStripsNoOpts
+                    : (TriangleFansToTriangleStripsConverter)TriangleFansToTriangleStripsOptimized;
+
+                foreach (var triStripInput in triConverter(localFaces))
                 {
                     var triStripOut = new BigMesh.TriangleStrip();
 
@@ -278,7 +283,11 @@ namespace OpenKh.Command.MapGen.Utils
             public override string ToString() => $"{vertexIndex}";
         }
 
-        private IEnumerable<IEnumerable<VertPair>> TriangleFansToTriangleStrips(VertPair[][] faces)
+        private delegate IEnumerable<IEnumerable<VertPair>> TriangleFansToTriangleStripsConverter(VertPair[][] faces);
+
+        private IEnumerable<IEnumerable<VertPair>> TriangleFansToTriangleStripsNoOpts(VertPair[][] faces) => faces;
+
+        private IEnumerable<IEnumerable<VertPair>> TriangleFansToTriangleStripsOptimized(VertPair[][] faces)
         {
             var list = faces
                 .SelectMany(face => TriangleFanToTriangleStrips(face))

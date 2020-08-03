@@ -64,6 +64,8 @@ namespace OpenKh.Command.MapGen.Models
             public string name { get; set; }
         }
 
+        public bool disableTriangleStripsOptimization { get; set; }
+
         public MaterialDef FindMaterial(string name)
         {
             return materials
