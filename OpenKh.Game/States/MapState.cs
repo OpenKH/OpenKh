@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
-using OpenKh.Game.Models;
-using OpenKh.Game.Shaders;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
@@ -13,6 +11,7 @@ using System.Linq;
 using OpenKh.Kh2.Models;
 using OpenKh.Game.Entities;
 using OpenKh.Kh2.Ard;
+using OpenKh.Engine.MonoGame;
 
 namespace OpenKh.Game.States
 {
@@ -156,7 +155,7 @@ namespace OpenKh.Game.States
                 {
                     var textureIndex = part.TextureId & 0xffff;
                     if (textureIndex < mesh.Textures.Length)
-                        SetRenderTexture(pass, mesh.Textures[textureIndex]);
+                        _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
 
                     _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
                         PrimitiveType.TriangleList,
@@ -181,7 +180,7 @@ namespace OpenKh.Game.States
                 {
                     var textureIndex = part.TextureId & 0xffff;
                     if (textureIndex < mesh.Textures.Length)
-                        SetRenderTexture(pass, mesh.Textures[textureIndex]);
+                        _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
                     
                     _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
                         PrimitiveType.TriangleList,
@@ -208,7 +207,7 @@ namespace OpenKh.Game.States
 
                 var textureIndex = meshDescriptor.TextureIndex & 0xffff;
                 if (textureIndex < mesh.Textures.Length)
-                    SetRenderTexture(pass, mesh.Textures[textureIndex]);
+                    _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
 
                 _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
                     PrimitiveType.TriangleList,
@@ -221,53 +220,6 @@ namespace OpenKh.Game.States
             }
         }
 
-        private void SetRenderTexture(EffectPass pass, KingdomTexture texture)
-        {
-            if (_shader.Texture0 != texture.Texture2D)
-            {
-                _shader.Texture0 = texture.Texture2D;
-                switch (texture.ModelTexture.TextureAddressMode.AddressU)
-                {
-                    case ModelTexture.TextureWrapMode.Clamp:
-                        _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
-                        _shader.TextureWrapModeU = TextureWrapMode.Clamp;
-                        break;
-                    case ModelTexture.TextureWrapMode.Repeat:
-                        _shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
-                        _shader.TextureWrapModeU = TextureWrapMode.Repeat;
-                        break;
-                    case ModelTexture.TextureWrapMode.RegionClamp:
-                        _shader.TextureRegionU = texture.RegionU;
-                        _shader.TextureWrapModeU = TextureWrapMode.Clamp;
-                        break;
-                    case ModelTexture.TextureWrapMode.RegionRepeat:
-                        _shader.TextureRegionU = texture.RegionU;
-                        _shader.TextureWrapModeU = TextureWrapMode.Repeat;
-                        break;
-                }
-                switch (texture.ModelTexture.TextureAddressMode.AddressV)
-                {
-                    case ModelTexture.TextureWrapMode.Clamp:
-                        _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
-                        _shader.TextureWrapModeV = TextureWrapMode.Clamp;
-                        break;
-                    case ModelTexture.TextureWrapMode.Repeat:
-                        _shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
-                        _shader.TextureWrapModeV = TextureWrapMode.Repeat;
-                        break;
-                    case ModelTexture.TextureWrapMode.RegionClamp:
-                        _shader.TextureRegionV = texture.RegionV;
-                        _shader.TextureWrapModeV = TextureWrapMode.Clamp;
-                        break;
-                    case ModelTexture.TextureWrapMode.RegionRepeat:
-                        _shader.TextureRegionV = texture.RegionV;
-                        _shader.TextureWrapModeV = TextureWrapMode.Repeat;
-                        break;
-                }
-
-                pass.Apply();
-            }
-        }
 
         private void BasicallyForceToReloadEverything()
         {

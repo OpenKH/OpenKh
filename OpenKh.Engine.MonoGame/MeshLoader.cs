@@ -5,7 +5,7 @@ using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OpenKh.Game.Models
+namespace OpenKh.Engine.MonoGame
 {
     public static class MeshLoader
     {

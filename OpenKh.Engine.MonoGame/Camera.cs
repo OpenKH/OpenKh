@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 
-namespace OpenKh.Game
+namespace OpenKh.Engine.MonoGame
 {
     public class Camera
     {
