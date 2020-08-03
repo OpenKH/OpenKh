@@ -62,6 +62,7 @@ namespace OpenKh.Command.MapGen.Models
         public class BarEntryConfig
         {
             public string name { get; set; }
+            public string toFile { get; set; }
         }
 
         public bool disableTriangleStripsOptimization { get; set; }

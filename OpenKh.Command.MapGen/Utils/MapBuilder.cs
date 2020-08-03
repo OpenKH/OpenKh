@@ -371,7 +371,7 @@ namespace OpenKh.Command.MapGen.Utils
         private static Vector2 Get2DCoord(Assimp.Vector3D vector3D) => new Vector2(vector3D.X, 1 - vector3D.Y);
 
 
-        public List<Bar.Entry> GetBarEntries()
+        public List<Bar.Entry> GetBarEntries(Action<string, MemoryStream> trySaveTo = null)
         {
             var entries = new List<Bar.Entry>();
 
@@ -388,6 +388,8 @@ namespace OpenKh.Command.MapGen.Utils
                         Stream = mapBin,
                     }
                 );
+
+                trySaveTo?.Invoke(config.bar?.model?.toFile, mapBin);
             }
 
             {
@@ -403,6 +405,8 @@ namespace OpenKh.Command.MapGen.Utils
                         Stream = texBin,
                     }
                 );
+
+                trySaveTo?.Invoke(config.bar?.texture?.toFile, texBin);
             }
 
             {
@@ -418,6 +422,8 @@ namespace OpenKh.Command.MapGen.Utils
                         Stream = doctBin,
                     }
                 );
+
+                trySaveTo?.Invoke(config.bar?.doct?.toFile, doctBin);
             }
 
             {
@@ -433,9 +439,12 @@ namespace OpenKh.Command.MapGen.Utils
                         Stream = coctBin,
                     }
                 );
+
+                trySaveTo?.Invoke(config.bar?.coct?.toFile, coctBin);
             }
 
             return entries;
         }
+
     }
 }

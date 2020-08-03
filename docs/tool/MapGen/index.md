@@ -167,15 +167,20 @@ materials:
     addressV: null
 
 # Customize output bar entries for output `.map` file.
+# toFile is option in case of needs to save raw data individually.
 bar:
   model:
     name: "MAP"
+    toFile: 'MAP_0.model'
   texture:
     name: "MAP"
+    toFile: 'MAP_0.modeltexture'
   coct:
     name: "ID_e"
+    toFile: 'ID_e_0.coct'
   doct:
     name: "eh_1"
+    toFile: 'eh_1_0.doct'
 ```
 
 ### imageDirs and fromFile

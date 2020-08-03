@@ -214,9 +214,23 @@ namespace OpenKh.Command.MapGen
 
                 var buff = new MemoryStream();
 
+                void trySaveTo(string toFile, MemoryStream stream)
+                {
+                    if (!string.IsNullOrWhiteSpace(toFile))
+                    {
+                        toFile = Path.Combine(baseDir, toFile);
+
+                        logger.Debug($"Writing raw data to \"{toFile}\".");
+
+                        Directory.CreateDirectory(Path.GetDirectoryName(toFile));
+
+                        File.WriteAllBytes(toFile, stream.ToArray());
+                    }
+                }
+
                 Bar.Write(
                     buff,
-                    builder.GetBarEntries()
+                    builder.GetBarEntries(trySaveTo)
                         .Concat(LoadAdditionalBarEntries(config, CreateRawFileLoader(baseDir)))
                         .ToArray()
                 );
