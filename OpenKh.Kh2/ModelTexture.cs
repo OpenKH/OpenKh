@@ -567,8 +567,6 @@ namespace OpenKh.Kh2
 
             var clutAllocList = new List<ClutAlloc>();
 
-            var encodedImageList = new List<Imgd>();
-
             var userTextureTransfer = build.textureTransfer
                 ?? build.images
                     .Select(image => new UserDataTransferInfo(image.Size.Width, image.Size.Height))
@@ -584,8 +582,6 @@ namespace OpenKh.Kh2
             {
                 var encodedImage = new Imgd(image.Size, image.PixelFormat, image.GetData(), image.GetClut(), true);
                 var imageQWC = encodedImage.Data.Length / 16;
-
-                encodedImageList.Add(encodedImage);
 
                 clutAllocList.Add(clutBuilder.Allocate(encodedImage.PixelFormat == PixelFormat.Indexed4));
 
@@ -606,6 +602,8 @@ namespace OpenKh.Kh2
                         DataOffset = Convert.ToInt32(picData.Position), // relative
                     }
                 );
+
+                picData.Write(encodedImage.Data);
             }
 
             foreach (var (imageIndex, gsIndex) in OffsetData.Select((imageIndex, gsIndex) => (imageIndex, gsIndex)))
@@ -643,8 +641,6 @@ namespace OpenKh.Kh2
                         AddressMode = source.AddressMode,
                     }
                 );
-
-                picData.Write(encodedImageList[imageIndex].Data);
 
                 clutAlloc.Write(palData, image.GetClut());
             }
