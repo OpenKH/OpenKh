@@ -1,6 +1,7 @@
 ﻿using OpenKh.Engine.Maths;
 using System;
 using System.IO;
+using System.Numerics;
 
 namespace OpenKh.Engine.Parsers.Kddf2
 {

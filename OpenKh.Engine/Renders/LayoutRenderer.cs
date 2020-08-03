@@ -1,5 +1,6 @@
 ﻿using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace OpenKh.Engine.Renderers
         }
 
         public int FrameIndex { get; set; }
+        public bool IsLastFrame => FrameIndex > layout.GetFrameLengthFromSequenceGroup(selectedSequenceGroupIndex);
 
         public LayoutRenderer(Layout layout, ISpriteDrawing drawing, IEnumerable<ISpriteTexture> surfaces)
         {
@@ -47,15 +49,13 @@ namespace OpenKh.Engine.Renderers
             DrawLayoutGroup(layout.SequenceGroups[selectedSequenceGroupIndex]);
         }
 
-        private void DrawLayoutGroup(Layout.SequenceGroup l2)
+        private void DrawLayoutGroup(Layout.SequenceGroup sequencGroup)
         {
-            var index = l2.L1Index;
-            var count = l2.L1Count;
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < sequencGroup.Sequences.Count; i++)
             {
-                if (!_debugLayoutRenderer.IsSequencePropertyVisible(index + i))
+                if (!_debugLayoutRenderer.IsSequencePropertyVisible(i))
                     continue;
-                DrawLayout(layout.SequenceProperties[index + i]);
+                DrawLayout(sequencGroup.Sequences[i]);
             }
         }
 

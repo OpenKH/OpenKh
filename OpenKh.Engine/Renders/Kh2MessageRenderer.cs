@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Extensions;
+using OpenKh.Engine.Extensions;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
@@ -224,9 +224,9 @@ namespace OpenKh.Engine.Renders
         protected void DrawImage(ISpriteTexture texture, double x, double y, int sourceX, int sourceY, int width, int height, double scaleX, double scaleY, ColorF color) =>
             _drawing.AppendSprite(new SpriteDrawingContext()
                 .Source(sourceX, sourceY, width, height)
-                .Position((float)x, (float)y)
                 .MatchSourceSize()
                 .ScaleSize((float)scaleX, (float)scaleY)
+                .Traslate((float)x, (float)y)
                 .Color(color)
                 .SpriteTexture(texture));
 

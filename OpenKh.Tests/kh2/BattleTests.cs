@@ -70,32 +70,47 @@ namespace OpenKh.Tests.kh2
         }));
 
         [Fact]
-        public void BonsTableTest() => Common.FileOpenRead(@"kh2/res/bons_fm.bin", x => x.Using(stream =>
+        public void BonsTableTest() => File.OpenRead(@"kh2/res/bons_fm.bin").Using(stream =>
         {
-            var table = BaseBattle<Bons>.Read(stream);
-            Assert.Equal(0xB3, table.Count);
-        }));
+            Helpers.AssertStream(stream, inStream =>
+            {
+                var outStream = new MemoryStream();
+                BaseBattle<Bons>.Read(inStream).Write(outStream);
+                return outStream;
+            });
+        });
 
         [Fact]
-        public void PrztTableTest() => Common.FileOpenRead(@"kh2/res/przt.bin", x => x.Using(stream =>
+        public void PrztTableTest() => File.OpenRead(@"kh2/res/przt.bin").Using(stream =>
         {
-            var table = BaseBattle<Przt>.Read(stream);
-            Assert.Equal(0xB8, table.Count);
-        }));
+            Helpers.AssertStream(stream, inStream =>
+            {
+                var outStream = new MemoryStream();
+                BaseBattle<Przt>.Read(inStream).Write(outStream);
+                return outStream;
+            });
+        });
 
         [Fact]
-        public void VtblTableTest() => Common.FileOpenRead(@"kh2/res/vtbl.bin", x => x.Using(stream =>
+        public void VtblTableTest() => File.OpenRead(@"kh2/res/vtbl.bin").Using(stream =>
         {
-            var table = BaseBattle<Vtbl>.Read(stream);
-            var characters = table.Items.GroupBy(c => c.CharacterId).ToList();
-            Assert.Equal(0xF1, table.Items.Count);
-        }));
+            Helpers.AssertStream(stream, inStream =>
+            {
+                var outStream = new MemoryStream();
+                BaseBattle<Vtbl>.Read(inStream).Write(outStream);
+                return outStream;
+            });
+        });
 
         [Fact]
-        public void LvupTableTest() => Common.FileOpenRead(@"kh2/res/lvup_fm.bin", x => x.Using(stream =>
+        public void LvupTableTest() => File.OpenRead(@"kh2/res/lvup_fm.bin").Using(stream =>
         {
-            var table = Lvup.Read(stream);
-            Assert.Equal(0xE, table.Count);
-        }));
+            Helpers.AssertStream(stream, inStream =>
+            {
+                var outStream = new MemoryStream();
+                Lvup.Read(inStream).Write(outStream);
+                return outStream;
+            });
+        });
     }
 }

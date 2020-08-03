@@ -30,3 +30,5 @@ alias khimd='OpenKh.Command.ImgTool imd'
 alias khimz='OpenKh.Command.ImgTool imz'
 alias unimd='OpenKh.Command.ImgTool unimd'
 alias unimz='OpenKh.Command.ImgTool unimz'
+
+alias doctchg='OpenKh.Command.DoctChanger'

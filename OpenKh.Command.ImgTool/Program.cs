@@ -4,6 +4,7 @@ using OpenKh.Command.ImgTool.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.IO;
@@ -11,12 +12,17 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks.Dataflow;
 
 namespace OpenKh.Command.ImgTool
 {
     [Command("OpenKh.Command.ImgTool")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(UnimdCommand), typeof(UnimzCommand), typeof(ImdCommand), typeof(ImzCommand))]
+    [Subcommand(typeof(UnimdCommand), typeof(UnimzCommand), typeof(ImdCommand), typeof(ImzCommand)
+        , typeof(ScanImdCommand), typeof(ScanImzCommand)
+        , typeof(FixImzCommand), typeof(SwapImzPixelCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -214,5 +220,260 @@ namespace OpenKh.Command.ImgTool
                 return 0;
             }
         }
+
+        [HelpOption]
+        [Command(Description = "imd file -> display summary")]
+        private class ScanImdCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Input imd file")]
+            public string InputFile { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var target = File.OpenRead(InputFile).Using(stream => Imgd.Read(stream));
+
+                Console.WriteLine(
+                    FormatterFactory.GetFormatterPairs()
+                        .First()
+                        .FormatToString(ImgdSummary.From(target))
+                );
+
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "imz file -> display summary")]
+        private class ScanImzCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Input imz file")]
+            public string InputFile { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var targets = File.OpenRead(InputFile).Using(stream => Imgz.Read(stream).ToArray());
+
+                Console.WriteLine(
+                    FormatterFactory.GetFormatterPairs()
+                        .First()
+                        .FormatToString(
+                            targets
+                                .Select(one => ImgdSummary.From(one))
+                                .Select((one, index) => (one, index))
+                                .ToDictionary(
+                                    pair => pair.index.ToString(),
+                                    pair => pair.one
+                                )
+                        )
+                );
+
+                return 0;
+            }
+        }
+
+        class FormatterPair
+        {
+            internal string Type;
+            internal Func<object, string> FormatToString;
+        }
+
+        class FormatterFactory
+        {
+            internal static IEnumerable<FormatterPair> GetFormatterPairs() => new FormatterPair[]
+            {
+                new FormatterPair
+                {
+                    Type = "yaml",
+                    FormatToString =
+                        (obj) => new YamlDotNet.Serialization.SerializerBuilder()
+                            .Build()
+                            .Serialize(obj),
+                },
+                new FormatterPair
+                {
+                    Type = "json",
+                    FormatToString =
+                        (obj) => JsonSerializer.Serialize(
+                            obj,
+                            new JsonSerializerOptions
+                            {
+                                WriteIndented = true
+                            }
+                        ),
+                },
+            };
+        }
+
+        class ImgdSanityChecking
+        {
+            internal static int? GetExpectedDataLen(Imgd it)
+            {
+                switch (it.PixelFormat)
+                {
+                    case Imaging.PixelFormat.Indexed4:
+                        return (it.Size.Width * it.Size.Height + 1) / 2;
+                    case Imaging.PixelFormat.Indexed8:
+                        return (it.Size.Width * it.Size.Height);
+                    case Imaging.PixelFormat.Rgb888:
+                        return (3 * it.Size.Width * it.Size.Height);
+                    case Imaging.PixelFormat.Rgba8888:
+                    case Imaging.PixelFormat.Rgbx8888:
+                        return (4 * it.Size.Width * it.Size.Height);
+                }
+                return null;
+            }
+        }
+
+        class ImgdSummary
+        {
+            public string PixelFormat { get; private set; }
+            public int Width { get; private set; }
+            public int Height { get; private set; }
+            public bool IsSwizzled { get; private set; }
+            public int? ExpectedDataLen { get; private set; }
+            public int ActualDataLen { get; private set; }
+            public int? ActualClutLen { get; private set; }
+
+            internal static ImgdSummary From(Imgd it)
+            {
+                return new ImgdSummary
+                {
+                    PixelFormat = it.PixelFormat.ToString(),
+                    Width = it.Size.Width,
+                    Height = it.Size.Height,
+                    IsSwizzled = it.IsSwizzled,
+                    ExpectedDataLen = ImgdSanityChecking.GetExpectedDataLen(it),
+                    ActualDataLen = it.Data.Length,
+                    ActualClutLen = it.Clut?.Length,
+                };
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "imz file -> imz file (fix 4-bpp doubled bitmap size)")]
+        private class FixImzCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Input (and output) imz file")]
+            public string InputFile { get; set; }
+
+            [Option(CommandOptionType.SingleOrNoValue, Description = "Output imz file. Default is input imz.", ShortName = "o", LongName = "output")]
+            public string OutputImz { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                OutputImz = OutputImz ?? InputFile;
+
+                Directory.CreateDirectory(Path.GetDirectoryName(OutputImz));
+
+                var images = File.OpenRead(OutputImz).Using(stream => Imgz.Read(stream).ToArray());
+
+                var fixedCount = 0;
+
+                var fixedImages = images
+                    .Select(
+                        image =>
+                        {
+                            var expetectedLen = ImgdSanityChecking.GetExpectedDataLen(image);
+                            if (true
+                                && expetectedLen != null
+                                && expetectedLen < image.Data.Length
+                                && Imaging.PixelFormat.Indexed4 == image.PixelFormat
+                            )
+                            {
+                                var fixedData = new byte[expetectedLen.Value];
+
+                                Buffer.BlockCopy(image.Data, 0, fixedData, 0, expetectedLen.Value);
+
+                                fixedCount++;
+
+                                return new Imgd(
+                                    image.Size,
+                                    image.PixelFormat,
+                                    fixedData,
+                                    image.Clut,
+                                    isSwizzled: false
+                                );
+                            }
+                            else
+                            {
+                                return image;
+                            }
+                        }
+                    )
+                    .ToArray();
+
+                var buffer = new MemoryStream();
+
+                Imgz.Write(buffer, fixedImages);
+
+                File.WriteAllBytes(OutputImz, buffer.ToArray());
+
+                Console.WriteLine($"Fixed {fixedCount} images.");
+
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "imz file -> imz file (swap 4-bpp hi/lo pixel)")]
+        private class SwapImzPixelCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Input (and output) imz file")]
+            public string InputFile { get; set; }
+
+            [Option(CommandOptionType.SingleOrNoValue, Description = "Output imz file. Default is input imz.", ShortName = "o", LongName = "output")]
+            public string OutputImz { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                OutputImz = OutputImz ?? InputFile;
+
+                Directory.CreateDirectory(Path.GetDirectoryName(OutputImz));
+
+                var images = File.OpenRead(OutputImz).Using(stream => Imgz.Read(stream).ToArray());
+
+                var fixedCount = 0;
+
+                var fixedImages = images
+                    .Select(
+                        image =>
+                        {
+                            if (Imaging.PixelFormat.Indexed4 == image.PixelFormat)
+                            {
+                                var data = image.Data;
+
+                                for (var x = 0; x < data.Length; x++)
+                                {
+                                    var swap = data[x];
+                                    data[x] = (byte)((swap << 4) | (swap >> 4));
+                                }
+
+                                fixedCount++;
+                            }
+                            return image;
+                        }
+                    )
+                    .ToArray();
+
+                var buffer = new MemoryStream();
+
+                Imgz.Write(buffer, fixedImages);
+
+                File.WriteAllBytes(OutputImz, buffer.ToArray());
+
+                Console.WriteLine($"Applied to {fixedCount} images.");
+
+                return 0;
+            }
+        }
+
     }
 }

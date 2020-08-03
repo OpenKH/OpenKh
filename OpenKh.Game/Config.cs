@@ -16,6 +16,7 @@ namespace OpenKh.Game
             public float resolutionBoost { get; set; } = 2.0f;
             public bool isFullScreen { get; set; } = false;
             public string dataPath { get; set; } = "./data";
+            public string modPath { get; set; } = "./mod";
             public int regionId { get; set; } = -1;
             public bool enforceInternationalTextEncoding { get; set; } = false;
             public string idxFilePath { get; set; } = "KH2.IDX";
@@ -53,6 +54,7 @@ namespace OpenKh.Game
         public static float ResolutionBoost { get => _config.resolutionBoost; set => _config.resolutionBoost = value; }
         public static bool IsFullScreen { get => _config.isFullScreen; set => _config.isFullScreen = value; }
         public static string DataPath { get => _config.dataPath; set => _config.dataPath = value; }
+        public static string ModPath { get => _config.modPath; set => _config.modPath = value; }
         public static int RegionId { get => _config.regionId; set => _config.regionId = value; }
         public static bool EnforceInternationalTextEncoding { get => _config.enforceInternationalTextEncoding; set => _config.enforceInternationalTextEncoding = value; }
         public static string IdxFilePath { get => _config.idxFilePath; set => _config.idxFilePath = value; }

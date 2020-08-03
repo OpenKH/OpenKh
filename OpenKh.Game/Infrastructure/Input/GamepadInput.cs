@@ -50,10 +50,10 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool IsShift => LeftShoulder;
         public bool IsExit => IsSelect;
 
-        public bool IsDebugUp => IsDPadUp;
-        public bool IsDebugDown => IsDPadDown;
-        public bool IsDebugLeft => IsDPadLeft;
-        public bool IsDebugRight => IsDPadRight;
+        public bool IsRepetableUp => IsDPadUp;
+        public bool IsRepetableDown => IsDPadDown;
+        public bool IsRepetableLeft => IsDPadLeft;
+        public bool IsRepetableRight => IsDPadRight;
 
         public bool DPadUp => pad.DPad.Up == ButtonState.Pressed;
         public bool DPadDown => pad.DPad.Down == ButtonState.Pressed;

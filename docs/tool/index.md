@@ -10,6 +10,7 @@
 
 | File | Tool name
 |------|-----------
+|[IDX](../kh2/file/type/idx.md) | OpenKh.Command.IdxImg
 |[msg/*](../kh2/file/type/msg.md) | OpenKh.Command.MsgTool
 |[msg/*](../kh2/file/type/msg.md) | [OpenKh.Tools.Kh2TextEditor](./Kh2TextEditor/index.md)
 |[BAR](../kh2/file/type/bar.md) | OpenKh.Tools.BarEditor
@@ -17,8 +18,10 @@
 |[IMZ](../kh2/file/type/image.md#imgz) | OpenKh.Tools.ImageViewer
 |[FAC](../kh2/file/type/image.md#fac) | OpenKh.Tools.ImageViewer
 |[DPD](../kh2/file/type/dpd.md) | OpenKh.Tools.DpdViewer (incomplete)
-|[2LD](../kh2/file/type/2ld.md) | OpenKh.Tools.LayoutViewer (incomplete)
-|[2DD](../kh2/file/type/2ld.md) | OpenKh.Tools.LayoutViewer (incomplete)
+|[2LD](../kh2/file/type/2ld.md#layout) | [OpenKh.Tools.LayoutEditor](./LayoutEditor/index.md)
+|[2DD](../kh2/file/type/2ld.md#sequence) | [OpenKh.Tools.LayoutEditor](./LayoutEditor/index.md)
+|[DOCT](../kh2/file/type/doct.md) | [OpenKh.Command.DoctChanger](./DoctChanger/index.md)
+|[COCT](../kh2/file/type/coct.md) | [OpenKh.Command.CoctChanger](./CoctChanger/index.md)
 |[00battle](../kh2/file/type/00battle.md) | OpenKh.Tools.LevelUpEditor
 |[00objentry](../kh2/file/type/00objentry.md) | OpenKh.Tools.ObjentryEditor
 |[00place](../kh2/file/type/place.md) | OpenKh.Tools.Kh2PlaceEditor

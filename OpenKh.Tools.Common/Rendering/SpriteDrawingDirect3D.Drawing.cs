@@ -53,7 +53,7 @@ namespace OpenKh.Tools.Common.Rendering
 
         public void AppendSprite(SpriteDrawingContext context)
         {
-            SetTextureToDraw(context.SpriteTexture);
+            SetTextureToDraw(context.SpriteTexture ?? _defaultTexture);
             var width = _currentTexture.Width;
             var height = _currentTexture.Height;
             var viewport = _viewportSize;
@@ -62,32 +62,32 @@ namespace OpenKh.Tools.Common.Rendering
 
             buffer[index++] = new Vertex()
             {
-                X = context.DestinationX / viewport.Width * +2.0f - 1.0f,
-                Y = context.DestinationY / viewport.Height * -2.0f + 1.0f,
+                X = context.Vec0.X / viewport.Width * +2.0f - 1.0f,
+                Y = context.Vec0.Y / viewport.Height * -2.0f + 1.0f,
                 U = (float)context.SourceLeft / width,
                 V = (float)context.SourceTop / height,
                 Color = context.Color0
             };
             buffer[index++] = new Vertex()
             {
-                X = (context.DestinationX + context.DestinationWidth) / viewport.Width * +2.0f - 1.0f,
-                Y = context.DestinationY / viewport.Height * -2.0f + 1.0f,
+                X = context.Vec1.X / viewport.Width * +2.0f - 1.0f,
+                Y = context.Vec1.Y / viewport.Height * -2.0f + 1.0f,
                 U = (float)context.SourceRight / width,
                 V = (float)context.SourceTop / height,
                 Color = context.Color1
             };
             buffer[index++] = new Vertex()
             {
-                X = context.DestinationX / viewport.Width * +2.0f - 1.0f,
-                Y = (context.DestinationY + context.DestinationHeight) / viewport.Height * -2.0f + 1.0f,
+                X = context.Vec2.X / viewport.Width * +2.0f - 1.0f,
+                Y = context.Vec2.Y / viewport.Height * -2.0f + 1.0f,
                 U = (float)context.SourceLeft / width,
                 V = (float)context.SourceBottom / height,
                 Color = context.Color2
             };
             buffer[index++] = new Vertex()
             {
-                X = (context.DestinationX + context.DestinationWidth) / viewport.Width * +2.0f - 1.0f,
-                Y = (context.DestinationY + context.DestinationHeight) / viewport.Height * -2.0f + 1.0f,
+                X = context.Vec3.X / viewport.Width * +2.0f - 1.0f,
+                Y = context.Vec3.Y / viewport.Height * -2.0f + 1.0f,
                 U = (float)context.SourceRight / width,
                 V = (float)context.SourceBottom / height,
                 Color = context.Color3

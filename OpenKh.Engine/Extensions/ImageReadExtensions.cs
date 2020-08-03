@@ -14,6 +14,7 @@ namespace OpenKh.Engine.Extensions
             {
                 case PixelFormat.Indexed4: return image.From4bpp(Bgra);
                 case PixelFormat.Indexed8: return image.From8bpp(Bgra);
+                case PixelFormat.Rgba8888: return image.From32bpp(Rgba);
                 default:
                     throw new ArgumentException($"The pixel format {image.PixelFormat} is not supported.");
             }
@@ -25,6 +26,7 @@ namespace OpenKh.Engine.Extensions
             {
                 case PixelFormat.Indexed4: return image.From4bpp(Rgba);
                 case PixelFormat.Indexed8: return image.From8bpp(Rgba);
+                case PixelFormat.Rgba8888: return image.From32bpp(Bgra);
                 default:
                     throw new ArgumentException($"The pixel format {image.PixelFormat} is not supported.");
             }
@@ -44,8 +46,8 @@ namespace OpenKh.Engine.Extensions
                 for (var i = 0; i < size.Width / 2; i++)
                 {
                     var ch = data[srcIndex++];
-                    var palIndex1 = (ch >> 4);
-                    var palIndex2 = (ch & 15);
+                    var palIndex1 = (ch & 15);
+                    var palIndex2 = (ch >> 4);
                     dstData[dstIndex++] = clut[palIndex1 * 4 + channelOrder[0]];
                     dstData[dstIndex++] = clut[palIndex1 * 4 + channelOrder[1]];
                     dstData[dstIndex++] = clut[palIndex1 * 4 + channelOrder[2]];
@@ -79,6 +81,22 @@ namespace OpenKh.Engine.Extensions
                     dstData[dstIndex++] = clut[palIndex * 4 + channelOrder[2]];
                     dstData[dstIndex++] = clut[palIndex * 4 + channelOrder[3]];
                 }
+            }
+
+            return dstData;
+        }
+
+        private static byte[] From32bpp(this IImageRead image, byte[] channelOrder)
+        {
+            var srcData = image.GetData();
+            var dstData = new byte[srcData.Length];
+
+            for (var i = 0; i < srcData.Length; i += 4)
+            {
+                dstData[i + 0] = srcData[i + channelOrder[0]];
+                dstData[i + 1] = srcData[i + channelOrder[1]];
+                dstData[i + 2] = srcData[i + channelOrder[2]];
+                dstData[i + 3] = srcData[i + channelOrder[3]];
             }
 
             return dstData;

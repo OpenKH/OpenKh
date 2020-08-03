@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 
 namespace OpenKh.Engine.Parsers
 {
@@ -30,7 +31,7 @@ namespace OpenKh.Engine.Parsers
                     {
                         Vertices = x.Vertices.Select(vertex => new PositionColoredTextured
                         {
-                            X = vertex.X,
+                            X = -vertex.X,
                             Y = vertex.Y,
                             Z = vertex.Z,
                             U = vertex.Tu,
@@ -103,7 +104,7 @@ namespace OpenKh.Engine.Parsers
                 {
                     var vertexIndex = vpu.Indices[i];
                     var position = new Vector3(
-                        -vpu.Vertices[vertexIndex.Index].X,
+                        vpu.Vertices[vertexIndex.Index].X,
                         vpu.Vertices[vertexIndex.Index].Y,
                         vpu.Vertices[vertexIndex.Index].Z);
 
