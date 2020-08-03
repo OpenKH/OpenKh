@@ -101,11 +101,7 @@ namespace OpenKh.Common.Archives
                 Unused = 0
             }).ToList();
 
-            BinaryMapping.WriteObject(stream, _header);
-            foreach (var entry in entries)
-                BinaryMapping.WriteObject(stream, entry);
-
-            Stream.SetPosition(0).CopyTo(stream);
+            Stream.SetPosition(0).CopyTo(stream.SetPosition(0x10 + Entries.Count * 0x30));
             for (var i = 0; i < Entries.Count; i++)
             {
                 entries[i].Offset = (int)stream.Position;
