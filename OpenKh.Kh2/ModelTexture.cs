@@ -543,6 +543,12 @@ namespace OpenKh.Kh2
             }
         }
 
+        public ModelTexture(IEnumerable<Imgd> images)
+            : this(new Build { images = images.ToArray(), })
+        {
+
+        }
+
         public ModelTexture(Build build)
         {
             _useRelativeOffset = true;
