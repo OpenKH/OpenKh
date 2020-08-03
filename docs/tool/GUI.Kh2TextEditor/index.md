@@ -1,9 +1,10 @@
 # [OpenKh Tool Documentation](../index.md) - KH2 Text Editor
 
 Welcome to the official OpenKh tool documentation!
-This document assumes you are already familiar with either compiling or acquiring the released version of the KH2 Text Editor bundled with OpenKh and have a dumped copy of the ISO. If you do not know how, consult the other documentation necessary for help.
+This document assumes you are already familiar with either compiling or acquiring the released version of the KH2 Text Editor bundled with OpenKH and have a dumped copy of the ISO. 
+If you have neither, you can download the release builds of OpenKH [here](https://github.com/Xeeynamo/OpenKh/releases) and then dump your ISO using [this tutorial](../CLI.IdxImg/index.md).
 
-In this particular tool document, we will be taking a look at the first fully functional text editor program for Kingdom Hearts II.
+This document will focus on teaching you how to use the first fully functional text editor for KH2.
 
 ## Navigating the Tool
 
