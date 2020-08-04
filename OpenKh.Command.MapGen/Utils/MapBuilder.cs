@@ -34,9 +34,9 @@ namespace OpenKh.Command.MapGen.Utils
 
             logger.Debug($"Starting collision plane builder.");
 
-            collisionBuilder = new CollisionBuilder(bigMeshContainer.MeshList);
+            collisionBuilder = new CollisionBuilder(bigMeshContainer.MeshList, config.disableBSPCollisionBuilder);
 
-            logger.Debug($"Output: {collisionBuilder.coct.CollisionList.Count:#,##0} collision planes");
+            logger.Debug($"Output: {collisionBuilder.coct.CollisionList.Count:#,##0} collision planes, {collisionBuilder.coct.CollisionMeshList.Count:#,##0} collision meshes, {collisionBuilder.coct.CollisionMeshGroupList.Count:#,##0} collision mesh groups");
 
             {
                 var matDefList = bigMeshContainer.AllocatedMaterialDefs;

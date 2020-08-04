@@ -67,6 +67,8 @@ namespace OpenKh.Command.MapGen.Models
 
         public bool disableTriangleStripsOptimization { get; set; }
 
+        public bool disableBSPCollisionBuilder { get; set; }
+
         public MaterialDef FindMaterial(string name)
         {
             return materials

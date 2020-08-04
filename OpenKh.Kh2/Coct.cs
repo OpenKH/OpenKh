@@ -409,7 +409,51 @@ namespace OpenKh.Kh2
                     ent1.CollisionMeshEnd - ent1.CollisionMeshStart
                 )
                     .Select(index => coct.CollisionMeshList[index].BoundingBox)
+                    .Concat(SelectBoundingBoxList(ent1))
                     .MergeAll();
+            }
+
+            private IEnumerable<BoundingBoxInt16> SelectBoundingBoxList(CollisionMeshGroup ent1)
+            {
+                if (ent1.Child1 != -1)
+                {
+                    yield return coct.CollisionMeshGroupList[ent1.Child1].BoundingBox;
+
+                    if (ent1.Child2 != -1)
+                    {
+                        yield return coct.CollisionMeshGroupList[ent1.Child2].BoundingBox;
+
+                        if (ent1.Child3 != -1)
+                        {
+                            yield return coct.CollisionMeshGroupList[ent1.Child3].BoundingBox;
+
+                            if (ent1.Child4 != -1)
+                            {
+                                yield return coct.CollisionMeshGroupList[ent1.Child4].BoundingBox;
+
+                                if (ent1.Child5 != -1)
+                                {
+                                    yield return coct.CollisionMeshGroupList[ent1.Child5].BoundingBox;
+
+                                    if (ent1.Child6 != -1)
+                                    {
+                                        yield return coct.CollisionMeshGroupList[ent1.Child6].BoundingBox;
+
+                                        if (ent1.Child7 != -1)
+                                        {
+                                            yield return coct.CollisionMeshGroupList[ent1.Child7].BoundingBox;
+
+                                            if (ent1.Child8 != -1)
+                                            {
+                                                yield return coct.CollisionMeshGroupList[ent1.Child8].BoundingBox;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             public void FlushCache()
@@ -417,6 +461,34 @@ namespace OpenKh.Kh2
                 boundingBoxIndexMap.Clear();
                 planeIndexMap.Clear();
                 vertexIndexMap.Clear();
+            }
+        }
+
+        public void ReverseMeshGroup()
+        {
+            var maxIndex = CollisionMeshGroupList.Count - 1;
+
+            CollisionMeshGroupList.Reverse();
+
+            short ReverseChildIndex(short child)
+            {
+                if (child != -1)
+                {
+                    child = Convert.ToInt16(maxIndex - child);
+                }
+                return child;
+            }
+
+            foreach (var one in CollisionMeshGroupList)
+            {
+                one.Child1 = ReverseChildIndex(one.Child1);
+                one.Child2 = ReverseChildIndex(one.Child2);
+                one.Child3 = ReverseChildIndex(one.Child3);
+                one.Child4 = ReverseChildIndex(one.Child4);
+                one.Child5 = ReverseChildIndex(one.Child5);
+                one.Child6 = ReverseChildIndex(one.Child6);
+                one.Child7 = ReverseChildIndex(one.Child7);
+                one.Child8 = ReverseChildIndex(one.Child8);
             }
         }
 

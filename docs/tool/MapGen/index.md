@@ -107,6 +107,9 @@ textureOptions:
 # Disable triangleStrips optimization. Every output shape becomes triangle.
 disableTriangleStripsOptimization: true
 
+# Disable BSP collision builder. Compose single huge collision table.
+disableBSPCollisionBuilder: true
+
 # Declare supplemental info per material of any associated meshes in 3D model data
 materials:
 
