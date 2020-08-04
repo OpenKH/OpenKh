@@ -150,78 +150,77 @@ namespace OpenKh.Kh2
 
         public static byte[] Compress(byte[] srcData)
         {
-            const int MaxWindowSize = 0x100;
+            const int MaxWindowSize = 0x102;
+            const int MaxSlidingIndex = 0xff;
 
             var decompressedLength = srcData.Length;
             var key = GetLeastUsedByte(srcData);
-
             var buffer = new List<byte>(decompressedLength);
-            int iSrc = 0;
 
-            while (iSrc < decompressedLength)
+            buffer.Add(key);
+            buffer.Add((byte)(decompressedLength >> 0));
+            buffer.Add((byte)(decompressedLength >> 8));
+            buffer.Add((byte)(decompressedLength >> 16));
+            buffer.Add((byte)(decompressedLength >> 24));
+
+            int sourceIndex = decompressedLength - 1;
+
+            while (sourceIndex >= 0)
             {
-                var ch = srcData[iSrc];
+                var ch = srcData[sourceIndex];
                 if (ch == key)
                 {
-                    buffer.Add(0);
                     buffer.Add(key);
-                    iSrc++;
+                    buffer.Add(0);
+                    sourceIndex--;
                     continue;
                 }
 
-                int mi = 0;
-                int matches = 0;
-                var windowSize = iSrc + MaxWindowSize < decompressedLength ? MaxWindowSize : (decompressedLength - iSrc);
-                for (var i = 1; i < windowSize; i++)
+                var windowSizeCandidate = 0;
+                var slidingIndexCandidate = -1;
+                for (var slidingIndex = MaxSlidingIndex; slidingIndex > 0; slidingIndex--)
                 {
-                    for (int j = i, m = 0; j < windowSize; j++)
+                    if (slidingIndex + sourceIndex >= decompressedLength)
+                        continue;
+
+                    int windowSize;
+                    var maxWindowSize = Math.Min(sourceIndex, MaxWindowSize);
+                    for (windowSize = 0; windowSize < maxWindowSize; windowSize++)
                     {
-                        if (srcData[iSrc + j - i] == srcData[iSrc + j])
-                        {
-                            m++;
-                            if (j + 1 == windowSize)
-                            {
-                                if (matches <= m)
-                                {
-                                    matches = m;
-                                    mi = i;
-                                }
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if (matches <= m)
-                            {
-                                matches = m;
-                                mi = i;
-                            }
+                        var startWindow = sourceIndex + slidingIndex - windowSize;
+                        if (srcData[startWindow] != srcData[sourceIndex - windowSize])
                             break;
-                        }
+                    }
+
+                    if (windowSize > windowSizeCandidate)
+                    {
+                        windowSizeCandidate = windowSize;
+                        slidingIndexCandidate = slidingIndex;
                     }
                 }
 
-                if (matches > 3)
+                if (windowSizeCandidate > 3)
                 {
-                    buffer.Add((byte)(matches - 3));
-                    buffer.Add((byte)mi);
                     buffer.Add(key);
-                    iSrc += matches;
+                    buffer.Add((byte)slidingIndexCandidate);
+                    buffer.Add((byte)(windowSizeCandidate - 3));
+                    sourceIndex -= windowSizeCandidate;
                 }
                 else
                 {
                     buffer.Add(ch);
-                    iSrc++;
+                    sourceIndex--;
                 }
             }
 
-            buffer.Add((byte)(decompressedLength >> 24));
-            buffer.Add((byte)(decompressedLength >> 16));
-            buffer.Add((byte)(decompressedLength >> 8));
-            buffer.Add((byte)(decompressedLength >> 0));
-            buffer.Add(key);
+            var compressedLength = buffer.Count;
+            var cmp = new byte[compressedLength];
+            for (var i = 0; i < compressedLength; i++)
+            {
+                cmp[i] = buffer[compressedLength - i - 1];
+            }
 
-            return buffer.ToArray();
+            return cmp;
         }
 
         private static byte GetLeastUsedByte(byte[] data)
