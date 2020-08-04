@@ -31,9 +31,9 @@ namespace OpenKh.Kh2.Msn
             [Data] public byte BonsRewardId { get; set; }
             [Data] public byte AntiFormMultiplier { get; set; }
             [Data] public byte Unk0F { get; set; }
-            [Data] public uint Unk10 { get; set; }
-            [Data] public uint Unk14 { get; set; }
-            [Data] public uint Unk18 { get; set; }
+            [Data] public int SoundEffectStart { get; set; }
+            [Data] public int SoundEffectFinish { get; set; }
+            [Data] public int SoundEffectFail { get; set; }
         }
 
         public _Header Header { get; set; }
@@ -41,8 +41,9 @@ namespace OpenKh.Kh2.Msn
 
         public enum Operation
         {
-            StartCamera = 1,
-            EndCamera = 2,
+            StartEvent = 1,
+            EndEvent = 2,
+            FailEvent = 3,
             Timer = 4,
             EnemyCount = 5,
         }
