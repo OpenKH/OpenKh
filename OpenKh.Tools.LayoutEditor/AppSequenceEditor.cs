@@ -285,7 +285,8 @@ namespace OpenKh.Tools.LayoutEditor
         private void DrawRight()
         {
             var animationGroup = _sequence.AnimationGroups[_selectedAnimGroup];
-            AnimationGroupEdit(animationGroup);
+            if (ImGui.CollapsingHeader($"Properties"))
+                AnimationGroupEdit(animationGroup);
 
             for (var i = 0; i < animationGroup.Animations.Count; i++)
             {
@@ -333,9 +334,9 @@ namespace OpenKh.Tools.LayoutEditor
 
         private void AnimationGroupEdit(Sequence.AnimationGroup animationGroup)
         {
-            var doNotLoop = animationGroup.DoNotLoop != 0;
-            if (ImGui.Checkbox("Do not loop", ref doNotLoop))
-                animationGroup.DoNotLoop = (short)(doNotLoop ? 1 : 0);
+            var canAnimationLoop = animationGroup.DoNotLoop == 0;
+            if (ImGui.Checkbox("Loop animation", ref canAnimationLoop))
+                animationGroup.DoNotLoop = (short)(canAnimationLoop ? 0 : 1);
 
             int unknown06 = animationGroup.Unknown06;
             if (ImGui.InputInt("Unknown06", ref unknown06))
@@ -348,34 +349,42 @@ namespace OpenKh.Tools.LayoutEditor
                 animationGroup.LoopEnd = loopPair[1];
             }
 
-            int unknown10 = animationGroup.Unknown10;
-            if (ImGui.InputInt("Unknown10", ref unknown10))
-                animationGroup.Unknown10 = unknown10;
+            int lightPosX = animationGroup.LightPositionX;
+            if (ImGui.InputInt("Light pos. X", ref lightPosX))
+                animationGroup.LightPositionX = lightPosX;
 
-            int unknown14 = animationGroup.Unknown14;
-            if (ImGui.InputInt("Unknown14", ref unknown14))
-                animationGroup.Unknown14 = unknown14;
+            int textPosY = animationGroup.TextPositionY;
+            if (ImGui.InputInt("Text position Y", ref textPosY))
+                animationGroup.TextPositionY = textPosY;
 
-            int unknown18 = animationGroup.Unknown18;
-            if (ImGui.InputInt("Unknown18", ref unknown18))
-                animationGroup.Unknown18 = unknown18;
+            int textScale = animationGroup.TextScale;
+            if (ImGui.InputInt("Text scale", ref textScale))
+                animationGroup.TextScale = textScale;
 
-            int unknown1c = animationGroup.Unknown1C;
-            if (ImGui.InputInt("Unknown1c", ref unknown1c))
-                animationGroup.Unknown1C = unknown1c;
+            int uiPadding = animationGroup.UiPadding;
+            if (ImGui.InputInt("UI padding", ref uiPadding))
+                animationGroup.UiPadding = uiPadding;
 
-            int unknown20 = animationGroup.Unknown20;
-            if (ImGui.InputInt("Unknown20", ref unknown20))
-                animationGroup.Unknown20 = unknown20;
+            int textPosX = animationGroup.TextPositionX;
+            if (ImGui.InputInt("Text position X", ref textPosX))
+                animationGroup.TextPositionX = textPosX;
         }
 
         private void AnimationEdit(Sequence.Animation animation, int index)
         {
             int flags = animation.Flags;
-            if (ImGui.InputInt($"Flags##{index}", ref flags))
+            if (ImGui.InputInt($"Flags (debug)##{index}", ref flags))
                 animation.Flags = flags;
 
-            ImGuiFlagBox(animation, $"Use cubic interpolation instead of linear##{index}", Sequence.LinearInterpolationFlag);
+            int interpolationMode = (animation.Flags & Sequence.LinearInterpolationFlag) != 0 ? 1 : 0;
+            if (ImGui.Combo($"Interpolation##{index}", ref interpolationMode, new string[]
+                { "Cubic", "Linear" }, 2))
+            {
+                var flag = Sequence.LinearInterpolationFlag;
+                animation.Flags = (animation.Flags & ~flag) | (interpolationMode == 0 ? 0 : flag);
+            }
+
+            ImGuiFlagBox(animation, $"Attach text##{index}", Sequence.AttachTextFlag, true);
 
             var framePair = new int[] { animation.FrameStart, animation.FrameEnd };
             if (ImGui.DragInt2($"Frame lifespan##{index}", ref framePair[0]))
@@ -383,6 +392,10 @@ namespace OpenKh.Tools.LayoutEditor
                 animation.FrameStart = framePair[0];
                 animation.FrameEnd = framePair[1];
             }
+
+            int spriteGroupIndex = animation.SpriteGroupIndex;
+            if (ImGui.InputInt($"Sprite group##{index}", ref spriteGroupIndex))
+                animation.SpriteGroupIndex = Math.Min(Math.Max(spriteGroupIndex, 0), _sequence.SpriteGroups.Count - 1);
 
             var xaPair = new int[] { animation.TranslateXStart, animation.TranslateXEnd };
             if (ImGui.DragInt2($"Translation X##{index}", ref xaPair[0]))
@@ -557,14 +570,14 @@ namespace OpenKh.Tools.LayoutEditor
                 _animationFrameCurrent = frameIndexRef;
         }
 
-        private bool ImGuiFlagBox(Sequence.Animation animation, string label, int flag, bool hideLabelWhenEnabled = false)
+        private bool ImGuiFlagBox(Sequence.Animation animation, string label, int flag, bool negate = false)
         {
-            bool isSet = (animation.Flags & flag) == 0;
-            if (isSet && hideLabelWhenEnabled)
-                label = string.Empty;
+            var setFlag = negate ? 0 : flag;
+            var unsetFlag = negate ? flag : 0;
 
+            bool isSet = (animation.Flags & flag) == unsetFlag;
             if (ImGui.Checkbox(label, ref isSet))
-                animation.Flags = (animation.Flags & ~flag) | (isSet ? 0 : flag);
+                animation.Flags = (animation.Flags & ~flag) | (isSet ? unsetFlag : setFlag);
 
             return isSet;
         }

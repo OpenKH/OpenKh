@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2SystemEditor.Views"
+             xmlns:wpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="500">
     <UserControl.Resources>
@@ -24,55 +25,25 @@
             DisplayMemberPath="Name"/>
 
         <WrapPanel Grid.Column="1" Margin="10" DataContext="{Binding SelectedItem}">
-            <Button
-                Margin="{StaticResource ButtonMargin}"
-                Background="{Binding Color1}"
-                Command="{Binding ChangeColor}" CommandParameter="0"
-                Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}">
-                <Button.Content>
-                    <Control Background="{Binding Color1}"/>
-                </Button.Content>
-            </Button>
-            <Button
-                Margin="{StaticResource ButtonMargin}"
-                Background="{Binding Color2}"
-                Command="{Binding ChangeColor}" CommandParameter="1"
-                Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}"/>
-            <Button
-                Margin="{StaticResource ButtonMargin}"
-                Background="{Binding Color3}"
-                Command="{Binding ChangeColor}" CommandParameter="2"
-                Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}"/>
-            <Button
-                Margin="{StaticResource ButtonMargin}"
-                Background="{Binding Color4}"
-                Command="{Binding ChangeColor}" CommandParameter="3"
-                Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}"/>
-            <Button
-                Margin="{StaticResource ButtonMargin}"
-                Background="{Binding Color5}"
-                Command="{Binding ChangeColor}" CommandParameter="4"
-                Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}"/>
-            <Button
-                Margin="{StaticResource ButtonMargin}"
-                Background="{Binding Color6}"
-                Command="{Binding ChangeColor}" CommandParameter="5"
-                Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}"/>
-            <Button
-                Margin="{StaticResource ButtonMargin}"
-                Background="{Binding Color7}"
-                Command="{Binding ChangeColor}" CommandParameter="6"
-                Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}"/>
-            <Button
-                Margin="{StaticResource ButtonMargin}"
-                Background="{Binding Color8}"
-                Command="{Binding ChangeColor}" CommandParameter="7"
-                Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}"/>
-            <Button
-                Margin="{StaticResource ButtonMargin}"
-                Background="{Binding Color9}"
-                Command="{Binding ChangeColor}" CommandParameter="8"
-                Width="{StaticResource ButtonSize}" Height="{StaticResource ButtonSize}"/>
+            <ItemsControl ItemsSource="{Binding ColorItems}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <wpftoolkit:ColorPicker
+                            Margin="{StaticResource ButtonMargin}"
+                            SelectedColor="{Binding CurrentColor}"
+                            Width="100"
+                            ColorMode="ColorCanvas"
+                            ShowDropDownButton="True"
+                            DisplayColorAndName="False"
+                            />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </WrapPanel>
     </Grid>
 </UserControl>

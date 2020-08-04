@@ -17,8 +17,8 @@
   </ItemGroup>
     
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="15.0.0" />
-    <PackageReference Include="YamlDotNet" Version="8.1.0" />
+    <PackageReference Include="CsvHelper" Version="15.0.5" />
+    <PackageReference Include="YamlDotNet" Version="8.1.2" />
   </ItemGroup>
       
 </Project>

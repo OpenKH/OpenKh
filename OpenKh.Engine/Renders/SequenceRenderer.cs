@@ -2,7 +2,6 @@ using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace OpenKh.Engine.Renderers
@@ -51,13 +50,15 @@ namespace OpenKh.Engine.Renderers
             };
         }
 
-        private readonly Sequence sequence;
         private readonly ISpriteDrawing drawing;
         private readonly ISpriteTexture surface;
+        private Context _textContext;
+
+        public Sequence Sequence { get; }
 
         public SequenceRenderer(Sequence sequence, ISpriteDrawing drawing, ISpriteTexture surface)
         {
-            this.sequence = sequence;
+            this.Sequence = sequence;
             this.drawing = drawing;
             this.surface = surface;
             DebugSequenceRenderer = new DefaultDebugSequenceRenderer();
@@ -65,14 +66,48 @@ namespace OpenKh.Engine.Renderers
 
         public IDebugSequenceRenderer DebugSequenceRenderer { get; set; }
 
-        public void Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
+        public bool Draw(IMessageRenderer msgRenderer, byte[] data, int animationGroupIndex, int frameIndex, float positionX, float positionY)
+        {
+            _textContext = null;
+            var isAnimationEnd = Draw(animationGroupIndex, frameIndex, positionX, positionY);
+
+            if (_textContext != null && msgRenderer != null && data != null)
+            {
+                const float UiTextScale = 0.75f;
+                var seqGroup = Sequence.AnimationGroups[animationGroupIndex];
+                float textScale = seqGroup.TextScale == 0 ? UiTextScale : (seqGroup.TextScale / 24f);
+
+                var fakeTextDrawContext = new DrawContext
+                {
+                    Scale = textScale,
+                    IgnoreDraw = true,
+                };
+                msgRenderer.Draw(fakeTextDrawContext, data);
+                var width = (float)fakeTextDrawContext.Width;
+
+                var xPos = _textContext.PositionX - width / 2 + seqGroup.TextPositionX;
+                msgRenderer.Draw(new DrawContext
+                {
+                    xStart = xPos,
+                    x = xPos,
+                    y = _textContext.PositionY + seqGroup.TextPositionY,
+                    Color = _textContext.Color,
+                    Scale = textScale,
+                    WidthMultiplier = 1.0f,
+                }, data);
+            }
+
+            return isAnimationEnd;
+        }
+
+        public bool Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
             DrawAnimationGroup(new Context
             {
                 GlobalFrameIndex = frameIndex,
                 FrameIndex = frameIndex,
                 PositionX = positionX,
                 PositionY = positionY
-            }, sequence.AnimationGroups[animationGroupIndex]);
+            }, Sequence.AnimationGroups[animationGroupIndex]);
 
         public int GetActualFrame(Sequence.AnimationGroup animationGroup, int frameIndex)
         {
@@ -80,13 +115,13 @@ namespace OpenKh.Engine.Renderers
                 return frameIndex;
 
             var frameEnd = animationGroup.LoopEnd;
-            if (frameEnd == 0)
+            if (frameEnd == 0 && animationGroup.Animations.Count > 0)
                 frameEnd = animationGroup.Animations.Max(x => x.FrameEnd);
 
             return Loop(animationGroup.LoopStart, frameEnd, frameIndex);
         }
 
-        private void DrawAnimationGroup(Context contextParent, Sequence.AnimationGroup animationGroup)
+        private bool DrawAnimationGroup(Context contextParent, Sequence.AnimationGroup animationGroup)
         {
             var context = contextParent.Clone();
             context.FrameIndex = GetActualFrame(animationGroup, context.FrameIndex);
@@ -95,6 +130,9 @@ namespace OpenKh.Engine.Renderers
             {
                 DrawAnimation(context, animationGroup.Animations[i], i);
             }
+
+            return animationGroup.DoNotLoop == 0 ||
+                context.FrameIndex < animationGroup.Animations.Max(x => x.FrameEnd);
         }
 
         private void DrawAnimation(Context contextParent, Sequence.Animation animation, int index)
@@ -180,8 +218,14 @@ namespace OpenKh.Engine.Renderers
 
             context.Color *= DebugSequenceRenderer.GetAnimationBlendColor(index);
 
+            if ((animation.Flags & Sequence.AttachTextFlag) != 0)
+            {
+                if (_textContext == null)
+                    _textContext = context.Clone();
+            }
+
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS
-            DrawFrameGroup(context, sequence.SpriteGroups[animation.SpriteGroupIndex]);
+            DrawFrameGroup(context, Sequence.SpriteGroups[animation.SpriteGroupIndex]);
         }
 
         private void DrawFrameGroup(Context context, List<Sequence.SpritePart> spriteGroup)
@@ -195,12 +239,12 @@ namespace OpenKh.Engine.Renderers
         private void DrawFrameExtended(Context contextParent, Sequence.SpritePart frameEx)
         {
             var context = contextParent.Clone();
-            context.Left = frameEx.Left * context.ScaleX;
-            context.Top = frameEx.Top * context.ScaleY;
-            context.Right = frameEx.Right * context.ScaleX;
-            context.Bottom = frameEx.Bottom * context.ScaleY;
+            context.Left = frameEx.Left;
+            context.Top = frameEx.Top;
+            context.Right = frameEx.Right;
+            context.Bottom = frameEx.Bottom;
 
-            DrawFrame(context, sequence.Sprites[frameEx.SpriteIndex]);
+            DrawFrame(context, Sequence.Sprites[frameEx.SpriteIndex]);
         }
 
         private void DrawFrame(Context context, Sequence.Sprite frame)
@@ -211,6 +255,7 @@ namespace OpenKh.Engine.Renderers
                 .Position(context.Left, context.Top)
                 .DestinationSize(context.Right - context.Left, context.Bottom - context.Top)
                 .Traslate(context.PivotX, context.PivotY)
+                .ScaleSize(context.ScaleX, context.ScaleY)
                 .RotateX(-context.RotationX)
                 .RotateY(-context.RotationY)
                 .RotateZ(-context.RotationZ)
