@@ -54,6 +54,7 @@ namespace OpenKh.Command.MapGen.Models
 
         public TextureOptions textureOptions { get; set; } = new TextureOptions();
 
+        public short? transparentFlag { get; set; }
 
         public static MaterialDef CreateFallbackFor(string name) =>
             new MaterialDef

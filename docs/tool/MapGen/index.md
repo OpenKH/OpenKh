@@ -151,6 +151,11 @@ materials:
 - name: 'four'
   maxIntensity: 128
 
+# Specify maxIntensity to this material.
+# Set `transparentFlag: 1` to use transparency texture.
+- name: 'five'
+  transparentFlag: 0
+
 # This is default declaration of each material.
 # And also this is used for fallback purpose.
 - name: 'fallbackMaterial'

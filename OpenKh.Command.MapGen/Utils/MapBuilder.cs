@@ -237,7 +237,8 @@ namespace OpenKh.Command.MapGen.Utils
                             DmaPerVif = new ushort[] {
                                 dmaPack.firstVifPacketQwc,
                                 0,
-                            }
+                            },
+                            IsTransparentFlag = smallMesh.matDef.transparentFlag ?? 0,
                         }
                     );
                 }
