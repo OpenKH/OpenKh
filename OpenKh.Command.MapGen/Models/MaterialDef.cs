@@ -45,7 +45,12 @@ namespace OpenKh.Command.MapGen.Models
         /// <summary>
         /// Intensity: PS2'S 128 is Windows's 255.
         /// </summary>
-        public byte maxIntensity { get; set; } = 128;
+        public byte? maxColorIntensity { get; set; }
+
+        /// <summary>
+        /// Intensity: PS2'S 128 is Windows's 255.
+        /// </summary>
+        public byte? maxAlpha { get; set; }
 
         /// <summary>
         /// options for imgtool if needed

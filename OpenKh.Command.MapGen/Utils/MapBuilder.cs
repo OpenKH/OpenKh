@@ -179,7 +179,12 @@ namespace OpenKh.Command.MapGen.Utils
 
                 var hasVertexColor = inputMesh.VertexColorChannelCount >= 1;
 
-                var maxIntensity = matDef.maxIntensity;
+                var maxIntensity = matDef.maxColorIntensity
+                    ?? config.maxColorIntensity
+                    ?? 128;
+                var maxAlpha = matDef.maxAlpha
+                    ?? config.maxAlpha
+                    ?? 128;
 
                 var triConverter =
                     config.disableTriangleStripsOptimization
@@ -198,11 +203,11 @@ namespace OpenKh.Command.MapGen.Utils
 
                         if (hasVertexColor)
                         {
-                            triStripOut.vertexColorList.Add(ConvertVertexColor(inputVertexColorList[vertPair.uvColorIndex], maxIntensity));
+                            triStripOut.vertexColorList.Add(ConvertVertexColor(inputVertexColorList[vertPair.uvColorIndex], maxIntensity, maxAlpha));
                         }
                         else
                         {
-                            triStripOut.vertexColorList.Add(new Color(maxIntensity, maxIntensity, maxIntensity, maxIntensity));
+                            triStripOut.vertexColorList.Add(new Color(maxIntensity, maxIntensity, maxIntensity, maxAlpha));
                         }
                     }
 
@@ -362,11 +367,11 @@ namespace OpenKh.Command.MapGen.Utils
             }
         }
 
-        private static Color ConvertVertexColor(Assimp.Color4D clr, byte max) => new Color(
-            (byte)(clr.R * max),
-            (byte)(clr.G * max),
-            (byte)(clr.B * max),
-            (byte)(clr.A * max)
+        private static Color ConvertVertexColor(Assimp.Color4D clr, byte maxColorIntensity, byte maxAlpha) => new Color(
+            (byte)Math.Min(255, clr.R * maxColorIntensity),
+            (byte)Math.Min(255, clr.G * maxColorIntensity),
+            (byte)Math.Min(255, clr.B * maxColorIntensity),
+            (byte)Math.Min(255, clr.A * maxAlpha)
         );
 
         private static Vector2 Get2DCoord(Assimp.Vector3D vector3D) => new Vector2(vector3D.X, 1 - vector3D.Y);
