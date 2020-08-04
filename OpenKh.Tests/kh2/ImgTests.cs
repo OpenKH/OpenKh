@@ -75,22 +75,6 @@ namespace OpenKh.Tests.kh2
                     new MemoryStream(Img.Decompress(Img.Compress(inStream.ReadAllBytes()))));
             });
 
-        [Fact]
-        public void CompressChunkSimple()
-        {
-            const int HeaderSize = 5;
-            var dec = new byte[0x29];
-            var cmp = Img.Compress(dec);
-
-            var expected = new byte[]
-            {
-                0x25, 0x01, 0x01, 0x00
-            };
-
-            Assert.Equal(expected.Length, cmp.Length - HeaderSize);
-            Assert.Equal(expected, cmp.Take(cmp.Length - HeaderSize));
-        }
-
         public void AlwaysCompressCorrectly()
         {
             using var imgStream = File.OpenRead("G:\\KH2.IMG");
