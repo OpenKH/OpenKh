@@ -63,13 +63,13 @@ namespace OpenKh.Command.MapGen.Utils
                                     Enum.Parse<ModelTexture.TextureWrapMode>(
                                         set.matDef.textureOptions.addressU
                                         ?? config.textureOptions.addressU
-                                        ?? "RegionRepeat"
+                                        ?? "Repeat"
                                     );
                                 gsInfo.AddressMode.AddressV =
                                     Enum.Parse<ModelTexture.TextureWrapMode>(
                                         set.matDef.textureOptions.addressV
                                         ?? config.textureOptions.addressV
-                                        ?? "RegionRepeat"
+                                        ?? "Repeat"
                                     );
                                 return gsInfo;
                             }
