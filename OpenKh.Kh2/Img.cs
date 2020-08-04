@@ -178,13 +178,13 @@ namespace OpenKh.Kh2
 
                 var windowSizeCandidate = 0;
                 var slidingIndexCandidate = -1;
+                var maxWindowSize = Math.Min(sourceIndex, MaxWindowSize);
                 for (var slidingIndex = MaxSlidingIndex; slidingIndex > 0; slidingIndex--)
                 {
                     if (slidingIndex + sourceIndex >= decompressedLength)
                         continue;
 
                     int windowSize;
-                    var maxWindowSize = Math.Min(sourceIndex, MaxWindowSize);
                     for (windowSize = 0; windowSize < maxWindowSize; windowSize++)
                     {
                         var startWindow = sourceIndex + slidingIndex - windowSize;
