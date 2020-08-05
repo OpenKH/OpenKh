@@ -8,7 +8,7 @@ namespace OpenKh.Tools.IdxImg
     /// </summary>
     public partial class MainWindow : Window
     {
-        public IdxImgViewModel ViewModel
+        internal IdxImgViewModel ViewModel
         {
             get => DataContext as IdxImgViewModel;
             set => DataContext = value;

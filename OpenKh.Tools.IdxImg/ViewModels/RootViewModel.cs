@@ -1,22 +1,26 @@
 ﻿using OpenKh.Kh2;
+using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace OpenKh.Tools.IdxImg.ViewModels
 {
-    public class RootViewModel
+    class RootViewModel
     {
-        public RootViewModel(string name, IEnumerable<Idx.Entry> entries)
+        private readonly IIdxManager _idxManager;
+
+        public RootViewModel(string name, IEnumerable<Idx.Entry> entries, IIdxManager idxManager)
         {
             var myEntries = entries
                 .Select(x => new EntryParserModel(x))
                 .OrderBy(x => x.Path)
                 .ToList();
 
+            _idxManager = idxManager;
             Name = name;
             Children = new ObservableCollection<EntryViewModel>(
-                EntryParserModel.GetEntries(myEntries, 0));
+                EntryParserModel.GetEntries(myEntries, 0, idxManager));
         }
 
         public string Name { get; }
