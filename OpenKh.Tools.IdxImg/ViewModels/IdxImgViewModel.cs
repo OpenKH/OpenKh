@@ -1,16 +1,32 @@
-using OpenKh.Common;
-using OpenKh.Kh2;
+﻿using OpenKh.Kh2;
 using OpenKh.Tools.IdxImg.Interfaces;
 using OpenKh.Tools.IdxImg.Views;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Controls;
+using forms = System.Windows.Forms;
 using Xe.Tools;
+using Xe.Tools.Wpf.Commands;
+using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.IdxImg.ViewModels
 {
     class IdxImgViewModel : BaseNotifyPropertyChanged, IIdxManager, ITreeSelectedItem
     {
+        private static readonly IEnumerable<FileDialogFilter> Filter =
+            FileDialogFilterComposer.Compose()
+            .AddExtensions("KH2.IDX or KH2.IMG from the ISO or game disc", "IDX", "IMG")
+            .AddAllFiles();
+        private static readonly IEnumerable<FileDialogFilter> IdxFilter =
+            FileDialogFilterComposer.Compose()
+            .AddExtensions("KH2.IDX from the ISO or game disc", "IDX")
+            .AddAllFiles();
+        private static readonly IEnumerable<FileDialogFilter> ImgFilter =
+            FileDialogFilterComposer.Compose()
+            .AddExtensions("KH2.IMG from the ISO or game disc", "IMG")
+            .AddAllFiles();
+
         private Panel _itemPropertyPanel;
         private Stream _imgStream;
         private Img _img;
@@ -19,7 +35,35 @@ namespace OpenKh.Tools.IdxImg.ViewModels
         public IdxImgViewModel(Panel itemPropertyPanel)
         {
             _itemPropertyPanel = itemPropertyPanel;
+
+            OpenCommand = new RelayCommand(_ =>
+            {
+                try
+                {
+                    FileDialog.OnOpen(fileName =>
+                    {
+                        var baseName = Path.Combine(
+                            Path.GetDirectoryName(fileName),
+                            Path.GetFileNameWithoutExtension(fileName));
+                        var idxFileName = baseName + ".idx";
+                        var imgFileName = baseName + ".img";
+                        if (!File.Exists(idxFileName))
+                            FileDialog.OnOpen(fileName => idxFileName = fileName, IdxFilter);
+                        if (!File.Exists(imgFileName))
+                            FileDialog.OnOpen(fileName => imgFileName = fileName, ImgFilter);
+                        OpenIdxImg(idxFileName, imgFileName);
+
+                    }, Filter, "KH2.IDX");
+                }
+                catch (Exception ex)
+                {
+                    forms.MessageBox.Show(ex.Message, "Error",
+                        forms.MessageBoxButtons.OK, forms.MessageBoxIcon.Error);
+                }
+            });
         }
+
+        public RelayCommand OpenCommand { get; }
 
         public List<RootViewModel> Root { get; private set; }
         public object TreeSelectedItem
@@ -46,7 +90,10 @@ namespace OpenKh.Tools.IdxImg.ViewModels
 
         public void OpenIdxImg(string idxFileName, string imgFileName)
         {
-            var idx = File.OpenRead(idxFileName).Using(Idx.Read);
+            using var idxStream = File.OpenRead(idxFileName);
+            if (!Idx.IsValid(idxStream))
+                throw new ArgumentException($"The file '{idxFileName}' is not a valid IDX file.");
+            var idx = Idx.Read(idxStream);
 
             _imgStream?.Dispose();
             _imgStream = File.OpenRead(imgFileName);
@@ -56,6 +103,7 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             {
                 new RootViewModel("KH2.IDX", idx, this)
             };
+            OnPropertyChanged(nameof(Root));
         }
 
         public Stream OpenFileFromIdx(string fileName) =>
