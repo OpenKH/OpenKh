@@ -21,9 +21,9 @@ namespace OpenKh.Kh2
             [Data] public int NextOffset { get; set; }
             [Data] public int DmaChainMapCount { get; set; }
             [Data] public short va4 { get; set; }
-            [Data] public short Count1 { get; set; }
-            [Data] public int Offset1 { get; set; }
-            [Data] public int Offset2 { get; set; }
+            [Data] public short CountVifPacketRenderingGroup { get; set; }
+            [Data] public int OffsetVifPacketRenderingGroup { get; set; }
+            [Data] public int OffsetToOffsetDmaChainIndexRemapTable { get; set; }
         }
 
         private class DmaChainMap
@@ -41,10 +41,8 @@ namespace OpenKh.Kh2
             public int unk08;
             public int nextOffset;
             public short va4;
-            public short count1;
-            public List<ushort> alb1t2;
-            public List<ushort[]> alb2;
-            public int[] unknownTable;
+            public List<ushort> DmaChainIndexRemapTable;
+            public List<ushort[]> vifPacketRenderingGroup;
             public List<VifPacketDescriptor> VifPackets;
         }
 
@@ -65,24 +63,21 @@ namespace OpenKh.Kh2
 
             var dmaChainMaps = For(header.DmaChainMapCount, () => BinaryMapping.ReadObject<DmaChainMap>(stream));
 
-            stream.Position = header.Offset1;
+            stream.Position = header.OffsetVifPacketRenderingGroup;
 
             // The original game engine ignores header.Count1 for some reason
-            var count1 = (short)((stream.ReadInt32() - header.Offset1) / 4);
+            var count1 = (short)((stream.ReadInt32() - header.OffsetVifPacketRenderingGroup) / 4);
             stream.Position -= 4;
 
-            var alb2 = For(count1, () => stream.ReadInt32())
-                .Select(offset => ReadAlb2t2(stream.SetPosition(offset)).ToArray())
+            var vifPacketRenderingGroup = For(count1, () => stream.ReadInt32())
+                .Select(offset => ReadUInt16List(stream.SetPosition(offset)).ToArray())
                 .ToList();
 
-            stream.Position = header.Offset2;
-            var offb1t2t2 = stream.ReadInt32();
-            var unknownTableCount = (offb1t2t2 - header.Offset2) / 4 - 1;
-            var unknownTable = For(unknownTableCount, () => stream.ReadInt32())
-                .ToArray();
-
-            stream.Position = offb1t2t2;
-            var alb1t2 = ReadAlb2t2(stream).ToList();
+            stream.Position = header.OffsetToOffsetDmaChainIndexRemapTable;
+            var offsetDmaChainIndexRemapTable = stream.ReadInt32();
+            stream.Position = offsetDmaChainIndexRemapTable;
+            var dmaChainIndexRemapTable = ReadUInt16List(stream)
+                .ToList();
 
             var vifPackets = dmaChainMaps
                 .Select(dmaChain =>
@@ -122,11 +117,9 @@ namespace OpenKh.Kh2
                 unk08 = header.Unk08,
                 nextOffset = header.NextOffset,
                 va4 = header.va4,
-                count1 = header.Count1,
 
-                alb1t2 = alb1t2.ToList(),
-                alb2 = alb2,
-                unknownTable = unknownTable,
+                vifPacketRenderingGroup = vifPacketRenderingGroup,
+                DmaChainIndexRemapTable = dmaChainIndexRemapTable,
                 VifPackets = vifPackets
             };
         }
@@ -142,7 +135,7 @@ namespace OpenKh.Kh2
                 Unk08 = mapModel.unk08,
                 NextOffset = mapModel.nextOffset,
                 va4 = mapModel.va4,
-                Count1 = mapModel.count1, // in a form, ignored by the game engine
+                CountVifPacketRenderingGroup = Convert.ToInt16(mapModel.vifPacketRenderingGroup.Count),
             };
 
             BinaryMapping.WriteObject(stream, mapHeader);
@@ -150,25 +143,29 @@ namespace OpenKh.Kh2
             var dmaChainMapDescriptorOffset = (int)stream.Position;
             stream.Position += mapModel.VifPackets.Count * 0x10;
 
-            mapHeader.Offset1 = (int)stream.Position;
-            stream.Position += mapModel.alb2.Count * 4;
-            var alb2Offsets = new List<int>();
-            foreach (var alb2 in mapModel.alb2)
+            mapHeader.OffsetVifPacketRenderingGroup = (int)stream.Position;
+            stream.Position += mapModel.vifPacketRenderingGroup.Count * 4;
+            var groupOffsets = new List<int>();
+            foreach (var group in mapModel.vifPacketRenderingGroup)
             {
-                alb2Offsets.Add((int)stream.Position);
-                WriteAlb2(stream, alb2);
+                groupOffsets.Add((int)stream.Position);
+                WriteUInt16List(stream, group);
             }
 
-            var endAlb2Offset = Helpers.Align((int)stream.Position, 4);
-            stream.Position = mapHeader.Offset1;
-            foreach (var alb2Offset in alb2Offsets)
-                stream.Write(alb2Offset);
-            stream.Position = endAlb2Offset;
+            // capture remapTable offset here
+            var remapTableOffsetToOffset = Helpers.Align((int)stream.Position, 4);
 
-            mapHeader.Offset2 = endAlb2Offset;
-            stream.Write(endAlb2Offset + 4 + mapModel.unknownTable.Length * 4);
-            stream.Write(mapModel.unknownTable);
-            WriteAlb2(stream, mapModel.alb1t2);
+            // seek back and fill offsets
+            stream.Position = mapHeader.OffsetVifPacketRenderingGroup;
+            foreach (var offset in groupOffsets)
+                stream.Write(offset);
+
+            // write remapTable here
+            stream.Position = remapTableOffsetToOffset;
+            mapHeader.OffsetToOffsetDmaChainIndexRemapTable = remapTableOffsetToOffset;
+            var remapTableOffset = remapTableOffsetToOffset + 4;
+            stream.Write(remapTableOffset);
+            WriteUInt16List(stream, mapModel.DmaChainIndexRemapTable);
 
             stream.AlignPosition(0x10);
 
@@ -216,7 +213,7 @@ namespace OpenKh.Kh2
             BinaryMapping.WriteObject(stream, mapHeader);
         }
 
-        private static IEnumerable<ushort> ReadAlb2t2(Stream stream)
+        private static IEnumerable<ushort> ReadUInt16List(Stream stream)
         {
             while (true)
             {
@@ -226,7 +223,7 @@ namespace OpenKh.Kh2
             }
         }
 
-        private static void WriteAlb2(Stream stream, IEnumerable<ushort> alb2t2)
+        private static void WriteUInt16List(Stream stream, IEnumerable<ushort> alb2t2)
         {
             foreach (var data in alb2t2)
                 stream.Write(data);

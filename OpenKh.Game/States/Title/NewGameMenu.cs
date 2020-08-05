@@ -22,6 +22,7 @@ namespace OpenKh.Game.States.Title
         private readonly SequenceRenderer _seqRenderer;
         private readonly AnimatedSequenceRenderer _animMenuBg;
         private readonly AnimatedSequenceRenderer _animMenuWindow;
+        private readonly AnimatedSequenceRenderer _animMenuTitle;
         private readonly AnimatedSequenceRenderer _animMenuOption1;
         private readonly AnimatedSequenceRenderer _animMenuOption2;
         private readonly AnimatedSequenceRenderer _animMenuOption3;
@@ -42,11 +43,16 @@ namespace OpenKh.Game.States.Title
             _seqRenderer = sequenceRendererMenu;
             _animMenuBg = new AnimatedSequenceRenderer(_seqRenderer, NewGameTitle);
             _animMenuWindow = new AnimatedSequenceRenderer(_seqRenderer, NewGameWindow);
+            _animMenuTitle = new AnimatedSequenceRenderer(_seqRenderer, 25, 25, 25);
             _animMenuOption1 = new AnimatedSequenceRenderer(_seqRenderer, NewGameOption);
             _animMenuOption2 = new AnimatedSequenceRenderer(_seqRenderer, NewGameOption);
             _animMenuOption3 = new AnimatedSequenceRenderer(_seqRenderer, NewGameOption);
             _animMenuOption4 = new AnimatedSequenceRenderer(_seqRenderer, NewGameOption);
+
             _animMenuOptionSelected = new AnimatedSequenceRenderer(_seqRenderer, 15, 14, 14);
+            _animMenuOptionSelected.AddChild(new AnimatedSequenceRenderer(_seqRenderer, 7));
+            _animMenuOptionSelected.AddChild(new AnimatedSequenceRenderer(_seqRenderer, 10), true);
+            _animMenuOptionSelected.ChildPositionX = -110;
         }
 
         public void Invoke()
@@ -55,11 +61,18 @@ namespace OpenKh.Game.States.Title
             _difficultyOption = 1;
 
             _animMenuBg.Begin();
+            _animMenuBg.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(0x432e));
             _animMenuWindow.Begin();
+            _animMenuTitle.Begin();
+            _animMenuTitle.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(0x4330));
             _animMenuOption1.Begin();
+            _animMenuOption1.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[0]));
             _animMenuOption2.Begin();
+            _animMenuOption2.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[1]));
             _animMenuOption3.Begin();
+            _animMenuOption3.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[2]));
             _animMenuOption4.Begin();
+            _animMenuOption4.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[3]));
             _animMenuOptionSelected.Begin();
         }
 
@@ -67,6 +80,7 @@ namespace OpenKh.Game.States.Title
         {
             _animMenuBg.Update(deltaTime);
             _animMenuWindow.Update(deltaTime);
+            _animMenuTitle.Update(deltaTime);
             _animMenuOption1.Update(deltaTime);
             _animMenuOption2.Update(deltaTime);
             _animMenuOption3.Update(deltaTime);
@@ -95,6 +109,7 @@ namespace OpenKh.Game.States.Title
             {
                 _animMenuBg.End();
                 _animMenuWindow.End();
+                _animMenuTitle.End();
                 _animMenuOption1.End();
                 _animMenuOption2.End();
                 _animMenuOption3.End();
@@ -106,6 +121,7 @@ namespace OpenKh.Game.States.Title
             {
                 _animMenuBg.End();
                 _animMenuWindow.End();
+                _animMenuTitle.End();
                 _animMenuOption1.End();
                 _animMenuOption2.End();
                 _animMenuOption3.End();
@@ -139,31 +155,25 @@ namespace OpenKh.Game.States.Title
 
         private void DrawNewGameMenu()
         {
-            const uint White = uint.MaxValue;
-            const uint Blue = 0xff00b8eb;
             const int OptionHDistance = 30;
-            var titleY = _mainMenu.Kernel.IsFinalMix ? 32 : 58;
             var subTitleBgY = _mainMenu.Kernel.IsFinalMix ? 180 : 188;
-            var subTitleY = _mainMenu.Kernel.IsFinalMix ? 82 : 104;
             var optionY = _mainMenu.Kernel.IsFinalMix ? 120 : 144;
-            var descY = _mainMenu.Kernel.IsFinalMix ? 256 : 248;
 
             _animMenuBg.Draw(0, 0);
-            _mainMenu.Print(0x432e, 0, titleY, Blue, 512, TextAlignment.Center);
+
+            _animMenuWindow.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyDescription[_difficultyOption]));
             _animMenuWindow.Draw(0, 0);
-            _seqRenderer.Draw(25, 0, 64, subTitleBgY);
-            _mainMenu.Print(0x4330, 0, subTitleY, White, 512, TextAlignment.Center);
 
-            for (var i = 0; i < _difficultyCount; i++)
-            {
-                _animMenuOption1.Draw(256, optionY + OptionHDistance * i);
-                if (i == _difficultyOption)
-                    _animMenuOptionSelected.Draw(256, optionY + OptionHDistance * i);
+            _animMenuTitle.Draw(256, subTitleBgY);
 
-                _mainMenu.Print(DifficultyTitle[i], 0, optionY + OptionHDistance * i, White, 512, TextAlignment.Center);
-            }
+            _animMenuOption1.Draw(256, optionY + OptionHDistance * 0);
+            _animMenuOption2.Draw(256, optionY + OptionHDistance * 1);
+            _animMenuOption3.Draw(256, optionY + OptionHDistance * 2);
+            if (_difficultyCount >= 4)
+                _animMenuOption4.Draw(256, optionY + OptionHDistance * 3);
 
-            _mainMenu.Print(DifficultyDescription[_difficultyOption], 0, descY, Blue, 512, TextAlignment.Center);
+            _animMenuOptionSelected.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[_difficultyOption]));
+            _animMenuOptionSelected.Draw(256, optionY + OptionHDistance * _difficultyOption);
         }
     }
 }

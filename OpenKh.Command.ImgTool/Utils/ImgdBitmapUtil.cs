@@ -7,8 +7,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using OpenKh.Common;
 using OpenKh.Kh2;
+using static System.Drawing.Imaging.PixelFormat;
 
-namespace OpenKh.Command.ImgTool.Utils
+namespace OpenKh.Kh2.Utils
 {
     class ImgdBitmapUtil
     {
@@ -18,7 +19,7 @@ namespace OpenKh.Command.ImgTool.Utils
             {
                 case Imaging.PixelFormat.Indexed4:
                     {
-                        var bitmap = new Bitmap(imgd.Size.Width, imgd.Size.Height, System.Drawing.Imaging.PixelFormat.Format4bppIndexed);
+                        var bitmap = new Bitmap(imgd.Size.Width, imgd.Size.Height, PixelFormat.Format4bppIndexed);
                         var dest = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
                         try
                         {
@@ -54,7 +55,7 @@ namespace OpenKh.Command.ImgTool.Utils
                     }
                 case Imaging.PixelFormat.Indexed8:
                     {
-                        var bitmap = new Bitmap(imgd.Size.Width, imgd.Size.Height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+                        var bitmap = new Bitmap(imgd.Size.Width, imgd.Size.Height, PixelFormat.Format8bppIndexed);
                         var dest = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
                         try
                         {
@@ -89,7 +90,7 @@ namespace OpenKh.Command.ImgTool.Utils
                     }
                 case Imaging.PixelFormat.Rgba8888:
                     {
-                        var bitmap = new Bitmap(imgd.Size.Width, imgd.Size.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+                        var bitmap = new Bitmap(imgd.Size.Width, imgd.Size.Height, PixelFormat.Format32bppPArgb);
                         var dest = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
                         try
                         {
@@ -118,7 +119,7 @@ namespace OpenKh.Command.ImgTool.Utils
                 Width = bitmap.Width;
                 Height = bitmap.Height;
 
-                var src = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                var src = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                 var srcBits = new byte[src.Stride * src.Height];
                 try
                 {
@@ -355,7 +356,7 @@ namespace OpenKh.Command.ImgTool.Utils
         {
             switch (bitmap.PixelFormat)
             {
-                case System.Drawing.Imaging.PixelFormat.Format4bppIndexed:
+                case PixelFormat.Format4bppIndexed:
                     {
                         var destHeight = bitmap.Height;
                         var destStride = (bitmap.Width + 1) & (~1);
@@ -390,7 +391,7 @@ namespace OpenKh.Command.ImgTool.Utils
 
                         return Imgd.Create(bitmap.Size, Imaging.PixelFormat.Indexed4, destBits, clut, false);
                     }
-                case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:
+                case PixelFormat.Format8bppIndexed:
                     {
                         var destHeight = bitmap.Height;
                         var destStride = bitmap.Width;

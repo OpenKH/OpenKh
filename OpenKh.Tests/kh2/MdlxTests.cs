@@ -77,30 +77,30 @@ namespace OpenKh.Tests.kh2
         });
 
         [Fact]
-        public void ReadAlb1t2Table() => File.OpenRead(MapFileName).Using(stream =>
+        public void ReadRemapTable() => File.OpenRead(MapFileName).Using(stream =>
         {
-            var alb1t2 = Mdlx.Read(stream).MapModel.alb1t2;
-            Assert.Equal(97, alb1t2.Count);
+            var remapTable = Mdlx.Read(stream).MapModel.DmaChainIndexRemapTable;
+            Assert.Equal(97, remapTable.Count);
 
-            Assert.Equal(0, alb1t2[0]);
-            Assert.Equal(1, alb1t2[1]);
-            Assert.Equal(2, alb1t2[2]);
-            Assert.Equal(96, alb1t2[96]);
+            Assert.Equal(0, remapTable[0]);
+            Assert.Equal(1, remapTable[1]);
+            Assert.Equal(2, remapTable[2]);
+            Assert.Equal(96, remapTable[96]);
         });
 
         [Fact]
-        public void ReadAlb2() => File.OpenRead(MapFileName).Using(stream =>
+        public void ReadRenderingGroup() => File.OpenRead(MapFileName).Using(stream =>
         {
-            var alb2 = Mdlx.Read(stream).MapModel.alb2;
-            Assert.Equal(9, alb2.Count);
+            var renderingGroup = Mdlx.Read(stream).MapModel.vifPacketRenderingGroup;
+            Assert.Equal(9, renderingGroup.Count);
 
-            Assert.Equal(20, alb2[0].Length);
-            Assert.Equal(1, alb2[0][0]);
-            Assert.Equal(91, alb2[0][19]);
+            Assert.Equal(20, renderingGroup[0].Length);
+            Assert.Equal(1, renderingGroup[0][0]);
+            Assert.Equal(91, renderingGroup[0][19]);
 
-            Assert.Equal(3, alb2[8].Length);
-            Assert.Equal(30, alb2[8][0]);
-            Assert.Equal(68, alb2[8][2]);
+            Assert.Equal(3, renderingGroup[8].Length);
+            Assert.Equal(30, renderingGroup[8][0]);
+            Assert.Equal(68, renderingGroup[8][2]);
         });
 
         [Fact]

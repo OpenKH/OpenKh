@@ -53,8 +53,20 @@ namespace OpenKh.Tools.LayoutEditor.Models
             _drawing.Clear(_settings.EditorBackground);
             pre?.Invoke(_drawing);
 
-            var posX = -SpriteGroup.Min(x => Math.Min(x.Left, x.Right));
-            var posY = -SpriteGroup.Min(x => Math.Min(x.Top, x.Bottom));
+            int posX;
+            int posY;
+            if (SpriteGroup.Count > 0)
+            {
+                posX = -SpriteGroup.Min(x => Math.Min(x.Left, x.Right));
+                posY = -SpriteGroup.Min(x => Math.Min(x.Top, x.Bottom));
+            }
+            else
+            {
+                posX = 0;
+                posY = 0;
+            }
+
+
             _renderer.Draw(0, _frameIndex++, posX + x, posY + y);
             _drawing.Flush();
 

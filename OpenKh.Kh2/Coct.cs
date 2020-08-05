@@ -7,6 +7,7 @@ using Xe.BinaryMapper;
 using System.Numerics;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Utils;
+using System.Collections;
 
 namespace OpenKh.Kh2
 {
@@ -93,12 +94,15 @@ namespace OpenKh.Kh2
         public List<BoundingBoxInt16> BoundingBoxList { get; } = new List<BoundingBoxInt16>();
         public List<SurfaceFlags> SurfaceFlagsList { get; } = new List<SurfaceFlags>();
 
+        private readonly BuildHelper buildHelper;
+
         public Coct()
         {
-
+            buildHelper = new BuildHelper(this);
         }
 
         private Coct(Stream stream)
+            : this()
         {
             if (!IsValid(stream))
                 throw new InvalidDataException("Invalid header");
@@ -272,6 +276,9 @@ namespace OpenKh.Kh2
         public class BuildHelper
         {
             private readonly Coct coct;
+            private readonly SortedDictionary<string, int> boundingBoxIndexMap = new SortedDictionary<string, int>();
+            private readonly SortedDictionary<string, int> planeIndexMap = new SortedDictionary<string, int>();
+            private readonly SortedDictionary<string, int> vertexIndexMap = new SortedDictionary<string, int>();
 
             public BuildHelper(Coct coct)
             {
@@ -282,48 +289,58 @@ namespace OpenKh.Kh2
                 BoundingBoxInt16 bbox
             )
             {
-                var index = Convert.ToInt16(coct.BoundingBoxList.Count);
+                var key = bbox.ToString();
 
-                coct.BoundingBoxList.Add(bbox);
+                if (!boundingBoxIndexMap.TryGetValue(key, out int index))
+                {
+                    index = coct.BoundingBoxList.Count;
 
-                return index;
+                    coct.BoundingBoxList.Add(bbox);
+
+                    boundingBoxIndexMap[key] = index;
+                }
+
+                return Convert.ToInt16(index);
             }
 
-            public short AllocatePlane(float x, float y, float z, float d)
-            {
-                var index = Convert.ToInt16(coct.PlaneList.Count);
-
-                coct.PlaneList.Add(new Plane(x, y, z, d));
-
-                return index;
-            }
+            public short AllocatePlane(float x, float y, float z, float d) =>
+                AllocatePlane(new Plane(x, y, z, d));
 
             public short AllocatePlane(Plane plane)
             {
-                var index = Convert.ToInt16(coct.PlaneList.Count);
+                var key = plane.ToString();
 
-                coct.PlaneList.Add(plane);
+                if (!planeIndexMap.TryGetValue(key, out int index))
+                {
+                    index = coct.PlaneList.Count;
 
-                return index;
+                    coct.PlaneList.Add(plane);
+
+                    planeIndexMap[key] = index;
+                }
+
+                return Convert.ToInt16(index);
             }
 
             public short AllocateSurfaceFlags(int flags)
             {
-                var index = Convert.ToInt16(coct.SurfaceFlagsList.Count);
-
-                var ent7 = new SurfaceFlags
+                var index = coct.SurfaceFlagsList.FindIndex(it => it.Flags == flags);
+                if (index < 0)
                 {
-                    Flags = flags,
-                };
-                coct.SurfaceFlagsList.Add(ent7);
+                    index = coct.SurfaceFlagsList.Count;
 
-                return index;
+                    var ent7 = new SurfaceFlags
+                    {
+                        Flags = flags,
+                    };
+                    coct.SurfaceFlagsList.Add(ent7);
+                }
+
+                return Convert.ToInt16(index);
             }
 
             public short AllocateVertex(float x, float y, float z, float w = 1)
             {
-                var index = Convert.ToInt16(coct.VertexList.Count);
-
                 var ent4 = new Vector4
                 {
                     X = x,
@@ -331,9 +348,19 @@ namespace OpenKh.Kh2
                     Z = z,
                     W = w
                 };
-                coct.VertexList.Add(ent4);
 
-                return index;
+                var key = ent4.ToString();
+
+                if (!vertexIndexMap.TryGetValue(key, out int index))
+                {
+                    index = Convert.ToInt16(coct.VertexList.Count);
+
+                    coct.VertexList.Add(ent4);
+
+                    vertexIndexMap[key] = index;
+                }
+
+                return Convert.ToInt16(index);
             }
 
             public void CompletePlane(Collision ent3)
@@ -342,19 +369,22 @@ namespace OpenKh.Kh2
                 var v1 = coct.VertexList[ent3.Vertex2].ToVector3();
                 var v2 = coct.VertexList[ent3.Vertex3].ToVector3();
 
-                ent3.PlaneIndex = AllocatePlane(Plane.CreateFromVertices(v0, v1, v2));
+                var plane = Plane.CreateFromVertices(v0, v1, v2);
+
+                ent3.PlaneIndex = AllocatePlane(plane);
             }
 
-            public void CompleteBBox(Collision ent3)
+            public void CompleteBBox(Collision ent3, int inflate = 0)
             {
                 var index = AllocateBoundingBox(
                     BoundingBox.FromPoints(
                         coct.VertexList[ent3.Vertex1].ToVector3(),
                         coct.VertexList[ent3.Vertex2].ToVector3(),
                         coct.VertexList[ent3.Vertex3].ToVector3(),
-                        coct.VertexList[ent3.Vertex4].ToVector3()
+                        coct.VertexList[(ent3.Vertex4 == -1) ? ent3.Vertex3 : ent3.Vertex4].ToVector3()
                     )
                         .ToBoundingBoxInt16()
+                        .InflateWith(Convert.ToInt16(inflate))
                 );
 
                 ent3.BoundingBoxIndex = index;
@@ -379,11 +409,114 @@ namespace OpenKh.Kh2
                     ent1.CollisionMeshEnd - ent1.CollisionMeshStart
                 )
                     .Select(index => coct.CollisionMeshList[index].BoundingBox)
+                    .Concat(SelectBoundingBoxList(ent1))
                     .MergeAll();
+            }
+
+            private IEnumerable<BoundingBoxInt16> SelectBoundingBoxList(CollisionMeshGroup ent1)
+            {
+                if (ent1.Child1 != -1)
+                {
+                    yield return coct.CollisionMeshGroupList[ent1.Child1].BoundingBox;
+
+                    if (ent1.Child2 != -1)
+                    {
+                        yield return coct.CollisionMeshGroupList[ent1.Child2].BoundingBox;
+
+                        if (ent1.Child3 != -1)
+                        {
+                            yield return coct.CollisionMeshGroupList[ent1.Child3].BoundingBox;
+
+                            if (ent1.Child4 != -1)
+                            {
+                                yield return coct.CollisionMeshGroupList[ent1.Child4].BoundingBox;
+
+                                if (ent1.Child5 != -1)
+                                {
+                                    yield return coct.CollisionMeshGroupList[ent1.Child5].BoundingBox;
+
+                                    if (ent1.Child6 != -1)
+                                    {
+                                        yield return coct.CollisionMeshGroupList[ent1.Child6].BoundingBox;
+
+                                        if (ent1.Child7 != -1)
+                                        {
+                                            yield return coct.CollisionMeshGroupList[ent1.Child7].BoundingBox;
+
+                                            if (ent1.Child8 != -1)
+                                            {
+                                                yield return coct.CollisionMeshGroupList[ent1.Child8].BoundingBox;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            public void FlushCache()
+            {
+                boundingBoxIndexMap.Clear();
+                planeIndexMap.Clear();
+                vertexIndexMap.Clear();
+            }
+        }
+
+        public void ReverseMeshGroup()
+        {
+            var maxIndex = CollisionMeshGroupList.Count - 1;
+
+            CollisionMeshGroupList.Reverse();
+
+            short ReverseChildIndex(short child)
+            {
+                if (child != -1)
+                {
+                    child = Convert.ToInt16(maxIndex - child);
+                }
+                return child;
+            }
+
+            foreach (var one in CollisionMeshGroupList)
+            {
+                one.Child1 = ReverseChildIndex(one.Child1);
+                one.Child2 = ReverseChildIndex(one.Child2);
+                one.Child3 = ReverseChildIndex(one.Child3);
+                one.Child4 = ReverseChildIndex(one.Child4);
+                one.Child5 = ReverseChildIndex(one.Child5);
+                one.Child6 = ReverseChildIndex(one.Child6);
+                one.Child7 = ReverseChildIndex(one.Child7);
+                one.Child8 = ReverseChildIndex(one.Child8);
             }
         }
 
         public static Coct Read(Stream stream) =>
             new Coct(stream.SetPosition(0));
+
+        public Collision CompleteAndAdd(Collision it, int inflate = 0)
+        {
+            buildHelper.CompleteBBox(it, inflate);
+            buildHelper.CompletePlane(it);
+            CollisionList.Add(it);
+            return it;
+        }
+
+        public CollisionMesh CompleteAndAdd(CollisionMesh it)
+        {
+            buildHelper.CompleteBBox(it);
+            CollisionMeshList.Add(it);
+            return it;
+        }
+
+        public CollisionMeshGroup CompleteAndAdd(CollisionMeshGroup it)
+        {
+            buildHelper.CompleteBBox(it);
+            CollisionMeshGroupList.Add(it);
+            return it;
+        }
+
+        public void FlushCache() => buildHelper.FlushCache();
     }
 }

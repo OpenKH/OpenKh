@@ -141,51 +141,44 @@ namespace OpenKh.Command.CoctChanger
 
                 for (var side = 0; side < 6; side++)
                 {
-                    var ent3 = new Coct.Collision
-                    {
-                        v00 = 0,
-                        Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
-                        Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
-                        Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
-                        Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
-                        PlaneIndex = table5Idxes[side],
-                        BoundingBoxIndex = -1, // set later
-                        SurfaceFlagsIndex = table7Idx,
-                    };
-
-                    builder.CompletePlane(ent3);
-                    builder.CompleteBBox(ent3);
-
-                    coct.CollisionList.Add(ent3);
+                    coct.CompleteAndAdd(
+                        new Coct.Collision
+                        {
+                            v00 = 0,
+                            Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
+                            Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
+                            Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
+                            Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
+                            PlaneIndex = table5Idxes[side],
+                            BoundingBoxIndex = -1, // set later
+                            SurfaceFlagsIndex = table7Idx,
+                        }
+                    );
                 }
 
                 var table3LastIdx = coct.CollisionList.Count;
 
                 var table2FirstIdx = coct.CollisionMeshList.Count;
 
-                var ent2 = new Coct.CollisionMesh
-                {
-                    CollisionStart = Convert.ToUInt16(table3FirstIdx),
-                    CollisionEnd = Convert.ToUInt16(table3LastIdx),
-                    v10 = 0,
-                    v12 = 0,
-                };
-
-                builder.CompleteBBox(ent2);
-
-                coct.CollisionMeshList.Add(ent2);
+                coct.CompleteAndAdd(
+                    new Coct.CollisionMesh
+                    {
+                        CollisionStart = Convert.ToUInt16(table3FirstIdx),
+                        CollisionEnd = Convert.ToUInt16(table3LastIdx),
+                        v10 = 0,
+                        v12 = 0,
+                    }
+                );
 
                 var table2LastIdx = coct.CollisionMeshList.Count;
 
-                var ent1 = new Coct.CollisionMeshGroup
-                {
-                    CollisionMeshStart = Convert.ToUInt16(table2FirstIdx),
-                    CollisionMeshEnd = Convert.ToUInt16(table2LastIdx),
-                };
-
-                builder.CompleteBBox(ent1);
-
-                coct.CollisionMeshGroupList.Add(ent1);
+                coct.CompleteAndAdd(
+                    new Coct.CollisionMeshGroup
+                    {
+                        CollisionMeshStart = Convert.ToUInt16(table2FirstIdx),
+                        CollisionMeshEnd = Convert.ToUInt16(table2LastIdx),
+                    }
+                );
 
                 var buff = new MemoryStream();
                 coct.Write(buff);

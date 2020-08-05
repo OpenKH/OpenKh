@@ -154,6 +154,16 @@ namespace OpenKh.Common
             return (int)stream.Position - oldPosition;
         }
 
+        public static int Write(this Stream stream, IEnumerable<ushort> items)
+        {
+            var oldPosition = (int)stream.Position;
+            var writer = new BinaryWriter(stream);
+            foreach (var item in items)
+                writer.Write(item);
+
+            return (int)stream.Position - oldPosition;
+        }
+
         public static void Write(this Stream stream, byte value) => new BinaryWriter(stream).Write(value);
         public static void Write(this Stream stream, sbyte value) => new BinaryWriter(stream).Write(value);
         public static void Write(this Stream stream, char value) => new BinaryWriter(stream).Write(value);

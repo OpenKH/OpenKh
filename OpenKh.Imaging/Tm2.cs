@@ -181,7 +181,7 @@ namespace OpenKh.Imaging
 			public int TW
             {
                 get => GetBits(Data, 26, 4);
-                set => SetBits(Data, 26, 4, value);
+                set => Data = SetBits(Data, 26, 4, value);
             }
 
             /// <summary>
@@ -190,7 +190,7 @@ namespace OpenKh.Imaging
             public int TH
             {
                 get => GetBits(Data, 30, 4);
-                set => SetBits(Data, 30, 4, value);
+                set => Data = SetBits(Data, 30, 4, value);
             }
 
 			public bool TCC

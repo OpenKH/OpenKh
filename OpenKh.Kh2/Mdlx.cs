@@ -69,5 +69,12 @@ namespace OpenKh.Kh2
 
         private static T[] For<T>(int count, Func<T> func) =>
             Enumerable.Range(0, count).Select(_ => func()).ToArray();
+
+        private Mdlx(M4 mapModel)
+        {
+            this.MapModel = mapModel;
+        }
+
+        public static Mdlx CreateFromMapModel(M4 mapModel) => new Mdlx(mapModel);
     }
 }

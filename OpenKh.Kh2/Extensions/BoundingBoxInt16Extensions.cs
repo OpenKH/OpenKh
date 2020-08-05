@@ -12,7 +12,7 @@ namespace OpenKh.Kh2.Extensions
         {
             return list
                 .Aggregate(
-                    new BoundingBoxInt16(),
+                    BoundingBoxInt16.Invalid,
                     BoundingBoxInt16.Merge
                 );
         }
