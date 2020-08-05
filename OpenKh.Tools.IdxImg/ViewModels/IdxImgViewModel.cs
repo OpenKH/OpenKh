@@ -9,6 +9,7 @@ using forms = System.Windows.Forms;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
+using OpenKh.Tools.Common;
 
 namespace OpenKh.Tools.IdxImg.ViewModels
 {
@@ -26,11 +27,16 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             FileDialogFilterComposer.Compose()
             .AddExtensions("KH2.IMG from the ISO or game disc", "IMG")
             .AddAllFiles();
+        private static string ApplicationName = Utilities.GetApplicationName();
+
+        public string Title => $"{_idxFileName ?? "no file loaded"} | {ApplicationName}";
 
         private Panel _itemPropertyPanel;
         private Stream _imgStream;
         private Img _img;
         private object _treeSelectedItem;
+        private string _idxFileName;
+        private string _imgFileName;
 
         public IdxImgViewModel(Panel itemPropertyPanel)
         {
@@ -101,9 +107,14 @@ namespace OpenKh.Tools.IdxImg.ViewModels
 
             Root = new List<RootViewModel>()
             {
-                new RootViewModel("KH2.IDX", idx, this)
+                new RootViewModel(Path.GetFileName(idxFileName), idx, this)
             };
+
+            _idxFileName = idxFileName;
+            _imgFileName = imgFileName;
+
             OnPropertyChanged(nameof(Root));
+            OnPropertyChanged(nameof(Title));
         }
 
         public Stream OpenFileFromIdx(string fileName) =>
