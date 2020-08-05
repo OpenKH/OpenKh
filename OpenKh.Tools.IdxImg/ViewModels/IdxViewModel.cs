@@ -39,5 +39,11 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             foreach (var child in Children)
                 child.Extract(Path.Combine(outputPath, ShortName));
         }
+
+        public void ExtractAndMerge(string outputPath)
+        {
+            foreach (var child in Children)
+                child.Extract(outputPath);
+        }
     }
 }

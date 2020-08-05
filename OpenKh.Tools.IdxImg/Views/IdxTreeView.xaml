@@ -20,6 +20,11 @@
                                     <Run Text="{Binding Name, StringFormat='Export all files from {0}', Mode=OneWay}"/>
                                 </MenuItem.Header>
                             </MenuItem>
+                            <MenuItem Command="{Binding ExportAndMergeCommand}">
+                                <MenuItem.Header>
+                                    <Run Text="{Binding Name, StringFormat='Export and merge all files from {0}', Mode=OneWay}"/>
+                                </MenuItem.Header>
+                            </MenuItem>
                         </ContextMenu>
                     </StackPanel.ContextMenu>
                     <Image Source="{StaticResource Assembly_16x}"/>
