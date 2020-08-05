@@ -13,7 +13,7 @@ If you have never used the command line before or have used it very little, fear
 
 | File | Tool name
 |------|-----------
-|[IDX](../kh2/file/type/idx.md) | [OpenKh.Command.IdxImg](./CLI.IdxImg./index.md)
+|[IDX](../kh2/file/type/idx.md) | [OpenKh.Command.IdxImg](./CLI.IdxImg/index.md)
 |[msg/*](../kh2/file/type/msg.md) | OpenKh.Command.MsgTool
 |[msg/*](../kh2/file/type/msg.md) | [OpenKh.Tools.Kh2TextEditor](./GUI.Kh2TextEditor/index.md)
 |[BAR](../kh2/file/type/bar.md) | OpenKh.Tools.BarEditor
