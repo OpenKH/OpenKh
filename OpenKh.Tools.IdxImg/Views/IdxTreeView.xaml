@@ -75,17 +75,17 @@
                                     <Run Text="{Binding Name, StringFormat='Export {0}', Mode=OneWay}"/>
                                 </MenuItem.Header>
                             </MenuItem>
-                            <MenuItem Command="{Binding InjectCommand}">
+                            <MenuItem Command="{Binding InjectCommand}" Visibility="Collapsed">
                                 <MenuItem.Header>
                                     <Run Text="{Binding Name, StringFormat='Inject {0} (faster but limited)', Mode=OneWay}"/>
                                 </MenuItem.Header>
                             </MenuItem>
-                            <MenuItem Command="{Binding AppendCommand}">
+                            <MenuItem Command="{Binding AppendCommand}" Visibility="Collapsed">
                                 <MenuItem.Header>
                                     <Run Text="{Binding Name, StringFormat='Inject {0} (faster but affects loading speed)', Mode=OneWay}"/>
                                 </MenuItem.Header>
                             </MenuItem>
-                            <MenuItem Command="{Binding ImportCommand}">
+                            <MenuItem Command="{Binding ImportCommand}" Visibility="Collapsed">
                                 <MenuItem.Header>
                                     <Run Text="{Binding Name, StringFormat='Inject {0} (slower but preserve loading speed)', Mode=OneWay}"/>
                                 </MenuItem.Header>

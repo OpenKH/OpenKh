@@ -15,7 +15,7 @@
         <TextBox Margin="0 0 0 5" IsReadOnly="True" Text="{Binding PhysicalLength, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBlock Text="Uncompressed size"/>
         <TextBox Margin="0 0 0 5" IsReadOnly="True" Text="{Binding UncompressedLength, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <CheckBox Margin="0 0 0 5" Content="Compress" IsChecked="{Binding IsCompressed}"/>
-        <CheckBox Margin="0 0 0 5" Content="Stream" IsChecked="{Binding IsStream}"/>
+        <CheckBox Margin="0 0 0 5" Content="Compress" IsChecked="{Binding IsCompressed}" IsHitTestVisible="False"/>
+        <CheckBox Margin="0 0 0 5" Content="Stream" IsChecked="{Binding IsStream}" IsHitTestVisible="False"/>
     </StackPanel>
 </UserControl>

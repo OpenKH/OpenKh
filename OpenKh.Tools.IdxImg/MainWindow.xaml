@@ -12,65 +12,23 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_New" Command="{Binding NewCommand}">
-                    <MenuItem.Icon>
-                        <Image Source="{StaticResource NewFile_16x}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
                 <MenuItem Header="_Open" Command="{Binding OpenCommand}">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource FolderOpen_16x}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_Save" Command="{Binding SaveCommand}">
+                <MenuItem Header="_Save" Command="{Binding SaveCommand}" IsEnabled="False">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource Save_16x}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Save _as..." Command="{Binding SaveAsCommand}">
+                <MenuItem Header="Save _as..." Command="{Binding SaveAsCommand}" IsEnabled="False">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource SaveAs_16x}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
-            </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="_New item" Command="{Binding AddCommand}">
-                    <MenuItem.Icon>
-                        <Image Source="{StaticResource AddFile_16x}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="{Binding ExportFileName}" HeaderStringFormat="_Open {0}"
-                    Command="{Binding OpenItemCommand}" CommandParameter="{Binding SelectedItem.Stream}"
-                    IsEnabled="{Binding IsItemSelected}">
-                    <MenuItem.Icon>
-                        <Image Source="{StaticResource OpenFileDialog_16x}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="{Binding ExportFileName}" HeaderStringFormat="_Remove {0}"
-                    Command="{Binding RemoveCommand}"
-                    IsEnabled="{Binding IsItemSelected}">
-                    <MenuItem.Icon>
-                        <Image Source="{StaticResource Remove_color_16x}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <Separator/>
-                <MenuItem Header="{Binding ExportFileName}" HeaderStringFormat="_Import {0}..."
-                    IsEnabled="{Binding IsItemSelected}"
-                    Command="{Binding ImportCommand}">
-                    <MenuItem.Icon>
-                        <Image Source="{StaticResource Import_16x}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="{Binding ExportFileName}" HeaderStringFormat="_Export {0}..."
-                    Command="{Binding ExportCommand}" CommandParameter="{Binding ExportFileName}"
-                    IsEnabled="{Binding IsItemSelected}">
-                    <MenuItem.Icon>
-                        <Image Source="{StaticResource Export_16x}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="Export _all..." Command="{Binding ExportAllCommand}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" Command="{Binding AboutCommand}">
