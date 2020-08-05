@@ -3,6 +3,7 @@ using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.IdxImg.ViewModels
 {
@@ -26,5 +27,7 @@ namespace OpenKh.Tools.IdxImg.ViewModels
         public string Name { get; }
 
         public ObservableCollection<EntryViewModel> Children { get; }
+
+        public RelayCommand ExportCommand { get; }
     }
 }

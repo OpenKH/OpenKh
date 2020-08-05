@@ -13,6 +13,15 @@
                 DataType="{x:Type vm:RootViewModel}"
                 ItemsSource="{Binding Children}">
                 <StackPanel Orientation="Horizontal">
+                    <StackPanel.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{Binding ExportCommand}">
+                                <MenuItem.Header>
+                                    <Run Text="{Binding Name, StringFormat='Export all files from {0}', Mode=OneWay}"/>
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </ContextMenu>
+                    </StackPanel.ContextMenu>
                     <Image Source="{StaticResource Assembly_16x}"/>
                     <TextBlock Text="{Binding Name}"/>
                 </StackPanel>
@@ -21,6 +30,15 @@
                 DataType="{x:Type vm:IdxViewModel}"
                 ItemsSource="{Binding Children}">
                 <StackPanel Orientation="Horizontal">
+                    <StackPanel.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{Binding ExportCommand}">
+                                <MenuItem.Header>
+                                    <Run Text="{Binding Name, StringFormat='Export all files from {0}', Mode=OneWay}"/>
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </ContextMenu>
+                    </StackPanel.ContextMenu>
                     <Image Source="{StaticResource Assembly_16x}"/>
                     <TextBlock Text="{Binding Name}"/>
                 </StackPanel>
@@ -29,6 +47,15 @@
                 DataType="{x:Type vm:FolderViewModel}"
                 ItemsSource="{Binding Children}">
                 <StackPanel Orientation="Horizontal">
+                    <StackPanel.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{Binding ExportCommand}">
+                                <MenuItem.Header>
+                                    <Run Text="{Binding Name, StringFormat='Export folder {0}', Mode=OneWay}"/>
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </ContextMenu>
+                    </StackPanel.ContextMenu>
                     <Image Source="{StaticResource Folder_16x}"/>
                     <TextBlock Text="{Binding Name}"/>
                 </StackPanel>
@@ -36,6 +63,30 @@
             <DataTemplate
                 DataType="{x:Type vm:FileViewModel}">
                 <StackPanel Orientation="Horizontal">
+                    <StackPanel.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{Binding ExportCommand}">
+                                <MenuItem.Header>
+                                    <Run Text="{Binding Name, StringFormat='Export {0}', Mode=OneWay}"/>
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem Command="{Binding InjectCommand}">
+                                <MenuItem.Header>
+                                    <Run Text="{Binding Name, StringFormat='Inject {0} (faster but limited)', Mode=OneWay}"/>
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem Command="{Binding AppendCommand}">
+                                <MenuItem.Header>
+                                    <Run Text="{Binding Name, StringFormat='Inject {0} (faster but affects loading speed)', Mode=OneWay}"/>
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem Command="{Binding ImportCommand}">
+                                <MenuItem.Header>
+                                    <Run Text="{Binding Name, StringFormat='Inject {0} (slower but preserve loading speed)', Mode=OneWay}"/>
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </ContextMenu>
+                    </StackPanel.ContextMenu>
                     <Image Source="{StaticResource Document_16x}"/>
                     <TextBlock Text="{Binding Name}"/>
                 </StackPanel>

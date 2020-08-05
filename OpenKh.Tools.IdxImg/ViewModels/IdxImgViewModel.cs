@@ -32,5 +32,8 @@ namespace OpenKh.Tools.IdxImg.ViewModels
 
         public Stream OpenFileFromIdx(string fileName) =>
             _img.FileOpen(fileName);
+
+        public Stream OpenFileFromIdx(Idx.Entry idxEntry) =>
+            _img.FileOpen(idxEntry);
     }
 }

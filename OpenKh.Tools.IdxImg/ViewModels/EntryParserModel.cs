@@ -1,7 +1,6 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace OpenKh.Tools.IdxImg.ViewModels
@@ -11,7 +10,7 @@ namespace OpenKh.Tools.IdxImg.ViewModels
         internal EntryParserModel(Idx.Entry entry)
         {
             Entry = entry;
-            Path = IdxName.Lookup(entry) ?? $"@{entry.Hash32:X08}_{entry.Hash16:X04}";
+            Path = entry.GetFullName();
             SplitPath = Path.Split('/');
         }
 

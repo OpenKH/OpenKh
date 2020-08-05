@@ -2,6 +2,7 @@
 using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.IdxImg.ViewModels
 {
@@ -14,6 +15,8 @@ namespace OpenKh.Tools.IdxImg.ViewModels
         {
             _idxManager = idxManager;
         }
+
+        public RelayCommand ExportCommand { get; }
 
         private static IEnumerable<EntryViewModel> GetChildren(string idxName, IIdxManager idxManager)
         {
