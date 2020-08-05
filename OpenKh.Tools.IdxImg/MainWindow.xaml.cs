@@ -17,7 +17,7 @@ namespace OpenKh.Tools.IdxImg
         public MainWindow()
         {
             InitializeComponent();
-            ViewModel = new IdxImgViewModel();
+            ViewModel = new IdxImgViewModel(ItemPropertyContent);
         }
 
         private void Window_Drop(object sender, DragEventArgs e)

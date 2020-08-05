@@ -7,7 +7,7 @@ namespace OpenKh.Kh2
 {
     public class Img
     {
-        const int IsoBlockAlign = 0x800;
+        public const int IsoBlockAlign = 0x800;
 
         public static string[] InternalIdxs =
         {

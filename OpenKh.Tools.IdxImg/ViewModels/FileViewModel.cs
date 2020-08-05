@@ -13,6 +13,19 @@ namespace OpenKh.Tools.IdxImg.ViewModels
 
         public Idx.Entry Entry { get; }
         public string FullName => Entry.GetFullName();
+        public bool IsCompressed
+        {
+            get => Entry.IsCompressed;
+            set { }
+        }
+        public bool IsStream
+        {
+            get => Entry.IsStreamed;
+            set { }
+        }
+        public long PhysicalOffset => Entry.Offset * Img.IsoBlockAlign;
+        public long PhysicalLength => (Entry.BlockLength + 1) * Img.IsoBlockAlign;
+        public long UncompressedLength => Entry.Length;
 
         internal FileViewModel(EntryParserModel entry, IIdxManager idxManager) :
             base(entry.Name)

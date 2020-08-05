@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.IdxImg"
         xmlns:views="clr-namespace:OpenKh.Tools.IdxImg.Views"
+        xmlns:vm="clr-namespace:OpenKh.Tools.IdxImg.ViewModels"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="300" Width="400"
         Drop="Window_Drop" AllowDrop="True">
@@ -86,16 +87,9 @@
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
-            <views:IdxTreeView DataContext="{Binding Root}" Grid.Column="0"/>
-            <StackPanel Grid.Column="1" Margin="5 0 0 0"
-                        IsEnabled="{Binding IsItemSelected}">
-                <TextBlock Text="Full path"/>
-                <TextBox Margin="0 0 0 5"
-                    Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <CheckBox Margin="0 0 0 5" Content="Compress"
-                    IsChecked="{Binding IsCompressed}"/>
-                <CheckBox Margin="0 0 0 5" Content="Stream"
-                    IsChecked="{Binding IsStream}"/>
+            <views:IdxTreeView DataContext="{Binding}" Grid.Column="0"/>
+            <StackPanel Grid.Column="1" Margin="5 0 0 0" IsEnabled="{Binding IsItemSelected}">
+                <StackPanel x:Name="ItemPropertyContent" DataContext="{Binding TreeSelectedItem}"/>
             </StackPanel>
         </Grid>
     </DockPanel>
