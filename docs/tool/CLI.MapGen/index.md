@@ -37,6 +37,7 @@ See also: https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
 - Vertex UV component (s, t)
 - Vertex color (r, g, b, a)
 - Material name
+- Material's diffuse texture file path
 
 ### Example: fbx to map
 
@@ -73,11 +74,33 @@ DEBUG Done
 3D model data cannot hold all of extra data needed for map conversion.
 Thus write `mapdef.yml` file as needed, and place it to the same folder having 3D model data.
 
+### Material definition
+
+```yml
+# Declare supplemental info per material of any associated meshes in 3D model data
+materials:
+# Pattern matching to hit a material. It ignores case.
+# Accept like: `*clip`, `*old*`, `material???`
+# It respects only first matched material. If there are 2 or more hits, later ones will be ignored.
+- name: '*'
+  fromFile: 'floor.imd'
+
+# This never reach.
+- name: 'ceil'
+  fromFile: 'ceil.imd'
+```
+
+### scale
+
 ```yml
 # Apply xyz uniform scale to every mesh vertex. Skipped if applyMatrix exists.
 scale: 1
+```
 
-# Apply matrix for each input vertex position. This is useful for exported map from KH1.
+### applyMatrix
+
+```yml
+# Apply matrix for each input vertex position.
 # Default is null and assume identity matrix.
 applyMatrix: [
     1, 0, 0, 0, 
@@ -86,6 +109,12 @@ applyMatrix: [
     0, 0, 0, 1
 ]
 
+# This matrix is useful for maps exported from KH1.
+```
+
+### imageDirs
+
+```yml
 # Specify parent directory path to image files that can be used by `fromFile`
 # The path accepts both absolute path, and relative path from folder having `mapdef.yml`.
 # Default is `images`. If you define imageDirs, The default `images` will be lost.
@@ -93,87 +122,139 @@ imageDirs:
 - 'images'
 - 'images2'
 - 'images3'
+```
 
-# `OpenKh.Command.ImgTool.exe` will be used if `.png` file is passed to `fromFile`
+### imgtoolOptions
+
+`OpenKh.Command.ImgTool.exe` will be used if `.png` file is passed to `fromFile`.
+
+```yml
+# Apply globally
 imgtoolOptions: '-b 8'
 
+# Apply to specific material, and override global settings.
+- name: `floor`
+  imgtoolOptions: '-b 8 -p'
+```
+
+### textureOptions
+
+```yml
 # Apply textureOptions globally. The individual property of textureOptions will be adopted.
 textureOptions:
   # addressU
   # addressV are one of: 'Repeat', 'Clamp', 'RegionClamp', 'RegionRepeat'
-  addressU: null
-  addressV: null
+  addressU: 'Repeat'
+  addressV: 'Repeat'
 
+# Apply to specific material. This overrides global setting.
+- name: `floor`
+  textureOptions:
+    addressU: 'Repeat'
+    addressV: 'Repeat'
+```
+
+### disableTriangleStripsOptimization
+
+```yml
 # Disable triangleStrips optimization. Every output shape becomes triangle.
 disableTriangleStripsOptimization: true
+```
 
+### disableBSPCollisionBuilder
+
+```yml
 # Disable BSP collision builder. Compose single huge collision table.
 disableBSPCollisionBuilder: true
+```
 
-# Declare supplemental info per material of any associated meshes in 3D model data
-materials:
+### ignore
 
-# Pattern matching to hit a material. It ignores case.
-# Accept like: `*clip`, `*old*`, `material???`
-- name: 'Material'
-
+```yml
 # The mesh having this material is skipped.
 - name: 'Material'
   ignore: true
+```
 
+### nodraw
+
+```yml
 # The mesh having this material is not rendered.
 # But collision plane is generated.
 - name: 'clip'
   nodraw: true
+```
 
+### noclip
+
+```yml
 # The mesh having this material is rendered.
 # But collision plane is not generated.
 - name: 'falsewall'
   noclip: true
+```
 
+### fromFile
+
+```yml
 # Specify one image file for this material.
 # It uses material name as part of file name if omitted.
-# For `one`:
-# - `one.imd`
-# - `one.png`
-- name: 'one'
-  fromFile: '1.imd'
+# For `floor`:
+# - `floor.imd`
+# - `floor.png`
+- name: 'floor'
+  fromFile: 'floor_texture.imd'
+```
 
-# Apply specific `imgtoolOptions` to this material.
-- name: `two`
-  fromFile: '2.png'
-  imgtoolOptions: '-b 8'
+### surfaceFlags
 
+```yml
 # Specify `surfaceFlags` to this material.
 # `0x3f1` is one of floor representation.
-- name: 'three'
+- name: 'floor'
   surfaceFlags: 0x3f1
+```
 
-# Specify maxIntensity to this material.
-# Apply max value to each rgba color component of vertex color.
-- name: 'four'
-  maxIntensity: 128
+### maxColorIntensity
 
+maxColorIntensity: from 0 to 255
+
+```yml
+# Set maxColorIntensity globally.
+maxColorIntensity: 128
+
+# Specify maxColorIntensity to the material for overriding global settings.
+# Apply max value to each RGB color component of vertex color.
+- name: 'floor'
+  maxColorIntensity: 128
+```
+
+### maxAlpha
+
+maxAlpha: from 0 to 255
+
+```yml
+# Set maxAlpha globally.
+maxAlpha: 128
+
+# Specify maxAlpha to the material for overriding global settings.
+# Apply max value to each Alpha color component of vertex color.
+- name: 'floor'
+  maxAlpha: 128
+```
+
+### transparentFlag
+
+```yml
 # Specify maxIntensity to this material.
 # Set `transparentFlag: 1` to use transparency texture.
 - name: 'five'
   transparentFlag: 0
+```
 
-# This is default declaration of each material.
-# And also this is used for fallback purpose.
-- name: 'fallbackMaterial'
-  ignore: false
-  fromFile: null
-  fromFile2: null
-  noclip: false
-  nodraw: false
-  surfaceFlags: 0x3f1
-  maxIntensity: 128
-  imgtoolOptions: null
-  textureOptions:
-    addressU: null
-    addressV: null
+### bar
 
+```yml
 # Customize output bar entries for output `.map` file.
 # toFile is option in case of needs to save raw data individually.
 bar:
@@ -189,6 +270,26 @@ bar:
   doct:
     name: "eh_1"
     toFile: 'eh_1_0.doct'
+```
+
+### default
+
+```yml
+# This is default declaration of each material.
+# And also this is used for fallback purpose.
+- name: 'fallbackMaterial'
+  ignore: false
+  fromFile: null
+  fromFile2: null
+  noclip: false
+  nodraw: false
+  surfaceFlags: 0x3f1
+  maxColorIntensity: null
+  maxAlpha: null
+  imgtoolOptions: null
+  textureOptions:
+    addressU: null
+    addressV: null
 ```
 
 ### imageDirs and fromFile
