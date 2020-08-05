@@ -12,10 +12,10 @@ When GS is mentioned, it refers to the Playstation 2 GPU.
 |--------|--------|-------------
 | 0      | uint32 | Magic code. Always 0.
 | 4      | int32  | Color count. How many individual colors are stored in the CLUT.
-| 8      | int32  | [Texture info](#texture-info) count. 16 bytes aligned.
+| 8      | int32  | [Texture transfer info](#texture-transfer-info) count. 16 bytes aligned.
 | 12     | int32  | [GS Info](#gs-info) count.
 | 16     | int32  | [Offset data](#offset-data) count.
-| 20     | int32  | [Texture info](#texture-info) offset.
+| 20     | int32  | [CLUT transfer info](#clut-transfer-info) offset. And then [Texture transfer info](#texture-transfer-info) follows.
 | 24     | int32  | [GS Info](#gs-info) offset.
 | 28     | int32  | Picture offset, where all the pixels are located. 128 bytes aligned.
 | 32     | int32  | Palette offset, where the whole palette is located.
@@ -26,11 +26,33 @@ The offset data tells what Texture Info is associated to a specific GS Info.
 
 The algorithm is `textureInfo = textureInfoTable[OffsetData[gsInfoIndex]]`.
 
-## Texture info
+## CLUT transfer info
 
-This table is mostly unknown, but most of the data does not change anyway between textures. It is supposed to be used to interpret picture information on the process to upload them to the GS VRAM.
+CLUT (color lookup table) is a Playstation 2 term. It is same as _color palette_.
 
-All the fields in the table are for unknown purpose unless specified.
+CLUT transfer info is used to transfer entire CLUT data to GS VRAM.
+
+The data structure is: [Data transfer info](#data-transfer-info).
+
+## Texture transfer info
+
+It is supposed to be used to interpret picture information on the process to upload them to the GS VRAM.
+
+The data structure is: [Data transfer info](#data-transfer-info).
+
+## Data transfer info
+
+Before the expected data reaches to GS VRAM, it needs to pass over several peripherals: EE → DMA → VIF → GIF → GS
+
+- EE (Playstation 2 CPU)
+- DMA (Direct Memory Access)
+- VIF (VPU1 interface)
+- GIF (GS interface)
+- GS (Playstation 2 GPU)
+
+Thus final data is encapsulated some times with their tags.
+
+![texinf1 table](raw-texture/texinf1.png)
 
 | Offset | Type   | Descriptor
 |--------|--------|------------
@@ -63,7 +85,7 @@ All the fields in the table are for unknown purpose unless specified.
 | 104    | int32  | Always 0
 | 108    | int32  | Always 0
 | 112    | int32  | 
-| 116    | int32  | Picture offset, where the texture is stored
+| 116    | int32  | Data offset, where either clut or texture is stored
 | 120    | int32  | Always 0
 | 124    | int32  | 
 | 128    | int32  | 
@@ -73,7 +95,9 @@ All the fields in the table are for unknown purpose unless specified.
 
 ## GS info
 
-This table is also unknown, but the few information found points to describe how the pictures stored into GS VRAM are supposed to be used by GS.
+GS info describes how the pictures stored into GS VRAM are supposed to be used by GS.
+
+![texinf2 table](raw-texture/texinf2.png)
 
 | Offset | Type   | Descriptor
 |--------|--------|------------
@@ -97,6 +121,16 @@ This table is also unknown, but the few information found points to describe how
 | 136    | int64  | Always 8
 | 144    | int64  | Always 0x0000000060000000
 | 152    | int64  | Always 0x0000000013000000
+
+_Note for 4-bpp images:_
+
+- Utilize `TEX2_1` register for:
+  - set PSMT8 to PSM for uploading 1KB (256 color entries) clut table into GS clut buffer.
+  - set 4 to CLD for clut buffer upload.
+- And then use `TEX0_1` register for:
+  - set CSA (0 to 31) for index offseting.
+  - set PSMT4 to PSM for indexed 4-bpp texture.
+  - set 0 to CLD for refrain clut upload.
 
 ## Texture Wrap Mode
 
