@@ -35,11 +35,8 @@ namespace OpenKh.Tools.IdxImg.ViewModels
 
             ExportCommand = new RelayCommand(_ =>
             {
-                FileDialog.OnSave(fileName =>
-                {
-                    File.Create(fileName).Using(stream =>
-                        _idxManager.OpenFileFromIdx(Entry).CopyTo(stream));
-                }, FileDialogFilterComposer.Compose().AddAllFiles(), Name);
+                FileDialog.OnSave(ExtractForReal,
+                    FileDialogFilterComposer.Compose().AddAllFiles(), Name);
             });
         }
 
@@ -47,5 +44,12 @@ namespace OpenKh.Tools.IdxImg.ViewModels
         public RelayCommand InjectCommand { get; }
         public RelayCommand AppendCommand { get; }
         public RelayCommand ImportCommand { get; }
+
+        public override void Extract(string outputPath) =>
+            ExtractForReal(Path.Combine(outputPath, Name));
+
+        private void ExtractForReal(string fileName) =>
+            File.Create(fileName).Using(stream =>
+                _idxManager.OpenFileFromIdx(Entry).CopyTo(stream));
     }
 }

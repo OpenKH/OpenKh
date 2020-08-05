@@ -1,8 +1,10 @@
 ﻿using OpenKh.Kh2;
 using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Xe.Tools.Wpf.Commands;
+using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.IdxImg.ViewModels
 {
@@ -14,6 +16,10 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             base(name, GetChildren(name, idxManager))
         {
             _idxManager = idxManager;
+            ExportCommand = new RelayCommand(_ =>
+            {
+                FileDialog.OnFolder(Extract, Name);
+            });
         }
 
         public RelayCommand ExportCommand { get; }
@@ -33,6 +39,12 @@ namespace OpenKh.Tools.IdxImg.ViewModels
 
                 return EntryParserModel.GetEntries(myEntries, 0, idxManager);
             }
+        }
+
+        public override void Extract(string outputPath)
+        {
+            foreach (var child in Children)
+                child.Extract(Path.Combine(outputPath, Name));
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace OpenKh.Tools.IdxImg.ViewModels
 {
-    public class EntryViewModel
+    public abstract class EntryViewModel
     {
         public string Name { get; }
 
@@ -8,5 +8,7 @@
         {
             Name = name;
         }
+
+        public abstract void Extract(string outputPath);
     }
 }

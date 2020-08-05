@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace OpenKh.Tools.IdxImg.ViewModels
 {
-    public class NodeViewModel : EntryViewModel
+    public abstract class NodeViewModel : EntryViewModel
     {
         public ObservableCollection<EntryViewModel> Children { get; }
 
