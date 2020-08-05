@@ -45,5 +45,16 @@ namespace OpenKh.Tools.IdxImg.ViewModels
 
             return tree;
         }
+
+        public static IEnumerable<EntryViewModel> GetChildren(
+            List<Idx.Entry> idxEntries, IIdxManager idxManager)
+        {
+            var entries = idxEntries
+                .Select(x => new EntryParserModel(x))
+                .OrderBy(x => x.Path)
+                .ToList();
+
+            return GetEntries(entries, 0, idxManager);
+        }
     }
 }

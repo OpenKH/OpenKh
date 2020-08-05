@@ -18,7 +18,7 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             _idxManager = idxManager;
             ExportCommand = new RelayCommand(_ =>
             {
-                FileDialog.OnFolder(Extract, Name);
+                FileDialog.OnFolder(Extract);
             });
         }
 

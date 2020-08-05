@@ -16,12 +16,10 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             base(name, GetChildren(name, idxManager))
         {
             _idxManager = idxManager;
-            ExportCommand = new RelayCommand(_ =>
-            {
-                FileDialog.OnFolder(Extract, Name);
-            });
+            ExportCommand = new RelayCommand(_ => FileDialog.OnFolder(Extract));
         }
 
+        public string ShortName => Path.GetFileNameWithoutExtension(Name);
         public RelayCommand ExportCommand { get; }
 
         private static IEnumerable<EntryViewModel> GetChildren(string idxName, IIdxManager idxManager)
@@ -32,19 +30,14 @@ namespace OpenKh.Tools.IdxImg.ViewModels
 
             using (idxStream)
             {
-                var myEntries = Idx.Read(idxStream)
-                    .Select(x => new EntryParserModel(x))
-                    .OrderBy(x => x.Path)
-                    .ToList();
-
-                return EntryParserModel.GetEntries(myEntries, 0, idxManager);
+                return EntryParserModel.GetChildren(Idx.Read(idxStream), idxManager);
             }
         }
 
         public override void Extract(string outputPath)
         {
             foreach (var child in Children)
-                child.Extract(Path.Combine(outputPath, Name));
+                child.Extract(Path.Combine(outputPath, ShortName));
         }
     }
 }
