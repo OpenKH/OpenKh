@@ -84,9 +84,9 @@ namespace OpenKh.Tools.Kh2MapStudio
         public void OpenMap(string fileName)
         {
             var entries = File.OpenRead(fileName).Using(Bar.Read);
-            LoadMapComponent(entries, "MAP");
             LoadMapComponent(entries, "SK0");
             LoadMapComponent(entries, "SK1");
+            LoadMapComponent(entries, "MAP");
         }
 
         public void OpenArd(string fileName)
