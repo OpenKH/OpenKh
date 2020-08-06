@@ -81,19 +81,18 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool MainLoop()
         {
+            _bootstrap.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
             ProcessKeyMapping();
 
-            ImGuiEx.MainWindow(() =>
-            {
-                MainMenu();
 
-                ImGui.PushStyleColor(ImGuiCol.WindowBg, BgUiColor);
-                MainWindow();
-                ImGui.PopStyleColor();
-            }, true);
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, BgUiColor);
+            ForControl(ImGui.BeginMainMenuBar, ImGui.EndMainMenuBar, MainMenu);
 
+            MainWindow();
             CameraWindow.Run(_mapRenderer.Camera);
             LayerControllerWindow.Run(_mapRenderer);
+
+            ImGui.PopStyleColor();
 
             return _exitFlag;
         }
@@ -120,7 +119,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 ImGui.SetWindowPos(nextPos);
                 ImGui.SetWindowSize(new Vector2(64, 0));
                 return ret;
-            }, ImGui.End, () =>
+            }, () => { }, () =>
             {
                 foreach (var map in _mapList)
                 {
