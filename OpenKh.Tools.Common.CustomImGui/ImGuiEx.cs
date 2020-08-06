@@ -180,6 +180,9 @@ namespace OpenKh.Tools.Common.CustomImGui
         public static bool ForPopup(string name, Action action) =>
             ForControl(() => ImGui.BeginPopup(name), ImGui.EndPopup, action);
 
+        public static bool ForTreeNode(string name, Action action) =>
+            ForControl(() => ImGui.TreeNode(name), ImGui.TreePop, action);
+
         public static bool ForWindow(string name, Action action) =>
             ForControl(() =>
             {
@@ -191,6 +194,16 @@ namespace OpenKh.Tools.Common.CustomImGui
         {
             var value = getter();
             if (ImGui.Checkbox(name, ref value))
+                setter(value);
+        }
+
+        public static void ForEdit(string name, Func<short> getter, Action<short> setter) =>
+            ForEdit(name, () => (int)getter(), x => setter((short)x));
+
+        public static void ForEdit(string name, Func<int> getter, Action<int> setter)
+        {
+            var value = getter();
+            if (ImGui.DragInt(name, ref value))
                 setter(value);
         }
 

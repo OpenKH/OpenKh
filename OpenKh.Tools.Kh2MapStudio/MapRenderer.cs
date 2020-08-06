@@ -30,16 +30,15 @@ namespace OpenKh.Tools.Kh2MapStudio
         private readonly GraphicsDeviceManager _graphicsManager;
         private readonly GraphicsDevice _graphics;
         private readonly KingdomShader _shader;
-        private readonly List<MeshGroupModel> _meshs;
 
         public Camera Camera { get; }
 
         public bool? ShowMap
         {
-            get => _meshs.FirstOrDefault(x => x.Name == "MAP")?.IsVisible;
+            get => MeshGroups.FirstOrDefault(x => x.Name == "MAP")?.IsVisible;
             set
             {
-                var mesh = _meshs.FirstOrDefault(x => x.Name == "MAP");
+                var mesh = MeshGroups.FirstOrDefault(x => x.Name == "MAP");
                 if (mesh != null)
                     mesh.IsVisible = value ?? true;
             }
@@ -47,10 +46,10 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool? ShowSk0
         {
-            get => _meshs.FirstOrDefault(x => x.Name == "SK0")?.IsVisible;
+            get => MeshGroups.FirstOrDefault(x => x.Name == "SK0")?.IsVisible;
             set
             {
-                var mesh = _meshs.FirstOrDefault(x => x.Name == "SK0");
+                var mesh = MeshGroups.FirstOrDefault(x => x.Name == "SK0");
                 if (mesh != null)
                     mesh.IsVisible = value ?? true;
             }
@@ -58,21 +57,23 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool? ShowSk1
         {
-            get => _meshs.FirstOrDefault(x => x.Name == "SK1")?.IsVisible;
+            get => MeshGroups.FirstOrDefault(x => x.Name == "SK1")?.IsVisible;
             set
             {
-                var mesh = _meshs.FirstOrDefault(x => x.Name == "SK1");
+                var mesh = MeshGroups.FirstOrDefault(x => x.Name == "SK1");
                 if (mesh != null)
                     mesh.IsVisible = value ?? true;
             }
         }
+
+        internal List<MeshGroupModel> MeshGroups { get; }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
             _graphicsManager = graphics;
             _graphics = graphics.GraphicsDevice;
             _shader = new KingdomShader(content);
-            _meshs = new List<MeshGroupModel>();
+            MeshGroups = new List<MeshGroupModel>();
             Camera = new Camera()
             {
                 CameraPosition = new Vector3(0, 100, 200),
@@ -95,7 +96,7 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public void Close()
         {
-            _meshs.Clear();
+            MeshGroups.Clear();
         }
 
         public void Update(float deltaTime)
@@ -121,7 +122,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 _shader.ModelView = Matrix.Identity;
                 pass.Apply();
 
-                foreach (var mesh in _meshs.Where(x => x.IsVisible))
+                foreach (var mesh in MeshGroups.Where(x => x.IsVisible))
                 {
                     RenderMeshNew(pass, mesh.MeshGroup, true);
                     RenderMeshNew(pass, mesh.MeshGroup, false);
@@ -178,7 +179,7 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             var model = Mdlx.Read(modelEntry.Stream);
             var textures = ModelTexture.Read(textureEntry.Stream).Images;
-            _meshs.Add(new MeshGroupModel(_graphics, componentName, model, textures));
+            MeshGroups.Add(new MeshGroupModel(_graphics, componentName, model, textures));
         }
     }
 }
