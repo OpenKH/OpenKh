@@ -176,32 +176,9 @@ namespace OpenKh.Tools.Kh2MapStudio
             if (modelEntry == null || textureEntry == null)
                 return;
 
-            var model = new MdlxParser(Mdlx.Read(modelEntry.Stream));
-            var textures = ModelTexture.Read(textureEntry.Stream).Images
-                .Select(texture => new KingdomTexture(texture, _graphics)).ToArray() ?? new KingdomTexture[0]; ;
-
-            var meshGroup = new MeshGroup
-            {
-                Segments = null,
-                Parts = null,
-                MeshDescriptors = model.MeshDescriptors?
-                    .Select(x => new MeshDesc
-                    {
-                        Vertices = x.Vertices
-                            .Select(v => new VertexPositionColorTexture(
-                                new Vector3(v.X, v.Y, v.Z),
-                                new Color((v.Color >> 16) & 0xff, (v.Color >> 8) & 0xff, v.Color & 0xff, (v.Color >> 24) & 0xff),
-                                new Vector2(v.Tu, v.Tv)))
-                            .ToArray(),
-                        Indices = x.Indices,
-                        TextureIndex = x.TextureIndex,
-                        IsOpaque = x.IsOpaque
-                    })
-                    .ToList(),
-                Textures = textures
-            };
-
-            _meshs.Add(new MeshGroupModel(componentName, meshGroup));
+            var model = Mdlx.Read(modelEntry.Stream);
+            var textures = ModelTexture.Read(textureEntry.Stream).Images;
+            _meshs.Add(new MeshGroupModel(_graphics, componentName, model, textures));
         }
     }
 }
