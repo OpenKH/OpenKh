@@ -31,7 +31,7 @@ namespace OpenKh.Engine.Parsers
                     {
                         Vertices = x.Vertices.Select(vertex => new PositionColoredTextured
                         {
-                            X = -vertex.X,
+                            X = vertex.X,
                             Y = vertex.Y,
                             Z = vertex.Z,
                             U = vertex.Tu,
@@ -141,13 +141,13 @@ namespace OpenKh.Engine.Parsers
                             break;
                         case VpuPacket.VertexFunction.DrawTriangle:
                             indices.Add(indexBuffer[(recentIndex - 1) & 3]);
-                            indices.Add(indexBuffer[(recentIndex - 2) & 3]);
                             indices.Add(indexBuffer[(recentIndex - 3) & 3]);
+                            indices.Add(indexBuffer[(recentIndex - 2) & 3]);
                             break;
                         case VpuPacket.VertexFunction.DrawTriangleInverse:
                             indices.Add(indexBuffer[(recentIndex - 1) & 3]);
-                            indices.Add(indexBuffer[(recentIndex - 3) & 3]);
                             indices.Add(indexBuffer[(recentIndex - 2) & 3]);
+                            indices.Add(indexBuffer[(recentIndex - 3) & 3]);
                             break;
                     }
                 }

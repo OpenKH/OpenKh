@@ -32,3 +32,8 @@ alias unimd='OpenKh.Command.ImgTool unimd'
 alias unimz='OpenKh.Command.ImgTool unimz'
 
 alias doctchg='OpenKh.Command.DoctChanger'
+
+alias unspawnscript='OpenKh.Command.SpawnScript decompile'
+alias respawnscript='OpenKh.Command.SpawnScript compile'
+alias unspawnpoint='OpenKh.Command.SpawnScript unpoint'
+alias respawnpoint='OpenKh.Command.SpawnScript repoint'

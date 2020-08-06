@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenKh.Engine.Parsers;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
@@ -12,6 +11,8 @@ using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Kh2.Models;
+using OpenKh.Game.Entities;
+using OpenKh.Kh2.Ard;
 
 namespace OpenKh.Game.States
 {
@@ -42,9 +43,12 @@ namespace OpenKh.Game.States
 
         private int _worldId = 2;
         private int _placeId = 4;
+        private int _spawnId = 99;
+
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
-        private List<BobDescriptor> _bobDescs = new List<BobDescriptor>();
+        private List<ObjectEntity> _objectEntities = new List<ObjectEntity>();
+        private List<BobEntity> _bobEntities = new List<BobEntity>();
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -93,7 +97,7 @@ namespace OpenKh.Game.States
 
             _graphics.GraphicsDevice.RasterizerState = new RasterizerState()
             {
-                CullMode = CullMode.CullCounterClockwiseFace
+                CullMode = CullMode.CullClockwiseFace
             };
             _graphics.GraphicsDevice.DepthStencilState = new DepthStencilState();
             _graphics.GraphicsDevice.BlendState = DefaultBlendState;
@@ -118,20 +122,24 @@ namespace OpenKh.Game.States
                     }
                 }
 
-                foreach (var bobDesc in _bobDescs)
+                foreach (var entity in _objectEntities.Where(x => x.Mesh != null))
                 {
-                    var modelView = Matrix.CreateRotationX(bobDesc.RotationX) *
-                        Matrix.CreateRotationY(bobDesc.RotationY) *
-                        Matrix.CreateRotationZ(bobDesc.RotationZ) *
-                        Matrix.CreateScale(bobDesc.ScalingX, bobDesc.ScalingY, bobDesc.ScalingZ) *
-                        Matrix.CreateTranslation(bobDesc.PositionX, bobDesc.PositionY, bobDesc.PositionZ);
-
                     _shader.ProjectionView = _camera.Projection;
                     _shader.WorldView = _camera.World;
-                    _shader.ModelView = modelView;
+                    _shader.ModelView = entity.GetMatrix();
                     pass.Apply();
 
-                    RenderMesh(pass, _bobModels[bobDesc.BobIndex]);
+                    RenderMesh(pass, entity.Mesh);
+                }
+
+                foreach (var entity in _bobEntities)
+                {
+                    _shader.ProjectionView = _camera.Projection;
+                    _shader.WorldView = _camera.World;
+                    _shader.ModelView = entity.GetMatrix();
+                    pass.Apply();
+
+                    RenderMesh(pass, _bobModels[entity.BobIndex]);
                 }
             });
         }
@@ -265,34 +273,10 @@ namespace OpenKh.Game.States
         {
             _models.Clear();
             _bobModels.Clear();
+            _objectEntities.Clear();
 
+            LoadMapArd(_worldId, _placeId);
             LoadMap(_worldId, _placeId);
-            LoadObjEntry(_objEntryId);
-        }
-
-        private void LoadObjEntry(string name)
-        {
-            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ModelName == name);
-            if (model == null)
-                return;
-
-            var fileName = $"obj/{model.ModelName}.mdlx";
-
-            using var stream = _dataContent.FileOpen(fileName);
-            var entries = Bar.Read(stream);
-            var modelEntryName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Model)?.Name;
-
-            _archiveManager.LoadArchive(entries);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, modelEntryName, "tim_"));
-        }
-
-        private void LoadObjEntry(int id)
-        {
-            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ObjectId == id);
-            if (model == null)
-                return;
-
-            LoadObjEntry(model.ModelName);
         }
 
         private void LoadMap(int worldIndex, int placeIndex)
@@ -310,93 +294,89 @@ namespace OpenKh.Game.States
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
 
-            _bobDescs = entries.ForEntry("out", Bar.EntryType.BobDescriptor, BobDescriptor.Read) ?? new List<BobDescriptor>();
+            _bobEntities = entries.ForEntry("out", Bar.EntryType.BobDescriptor, BobDescriptor.Read)?
+                .Select(x => new BobEntity(x))?.ToList() ?? new List<BobEntity>();
+
             var bobModels = entries.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
             var bobTextures = entries.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
 
             for (var i = 0; i < bobModels.Count; i++)
             {
-                var bobMesh = FromMdlx(_graphics.GraphicsDevice, bobModels[i], bobTextures[i]);
+                var bobMesh = MeshLoader.FromKH2(_graphics.GraphicsDevice, bobModels[i], bobTextures[i]);
                 if (bobMesh != null)
                     _bobModels.Add(bobMesh);
             }
+        }
+
+        private void LoadMapArd(int worldIndex, int placeIndex)
+        {
+            string fileName;
+            if (_kernel.IsReMix)
+                fileName = $"ard/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
+            else
+                fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
+
+            var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
+            RunSpawnScript(entries, "map", 0x06);
+            RunSpawnScript(entries, "btl", 0x01);
+            RunSpawnScript(entries, "evt", 0x16);
+        }
+
+        private void RunSpawnScript(IEnumerable<Bar.Entry> barEntries, string spawnScriptName, int programId)
+        {
+            var spawnScript = barEntries.ForEntry(spawnScriptName, Bar.EntryType.SpawnScript, SpawnScript.Read);
+            if (spawnScript == null)
+                return;
+
+            var program = spawnScript.FirstOrDefault(x => x.ProgramId == programId);
+            if (program == null)
+                return;
+
+            foreach (var function in program.Functions)
+            {
+                switch (function.Opcode)
+                {
+                    case SpawnScript.Operation.Spawn:
+                        var spawn = function.AsString(0);
+                        Log.Info($"Loading spawn {spawn}");
+                        var spawnPoints = barEntries.ForEntry(spawn, Bar.EntryType.SpawnPoint, SpawnPoint.Read);
+                        if (spawnPoints != null)
+                        {
+                            foreach (var spawnPoint in spawnPoints)
+                            {
+                                foreach (var desc in spawnPoint.Entities)
+                                    SpawnEntity(desc);
+                            }
+                        }
+                        else
+                            Log.Warn($"Unable to find spawn \"{spawn}\".");
+                        break;
+                }
+            }
+        }
+
+        private void SpawnEntity(SpawnPoint.Entity entityDesc)
+        {
+            var entity = ObjectEntity.FromSpawnPoint(_kernel, entityDesc);
+            entity.LoadMesh(_graphics.GraphicsDevice);
+
+            _objectEntities.Add(entity);
         }
 
         private static MeshGroup FromMdlx(
             GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)
         {
             Log.Info($"Load model={modelName} texture={textureName}");
-            return FromMdlx(graphics,
+            return MeshLoader.FromKH2(graphics,
                 archiveManager.Get<Mdlx>(modelName),
                 archiveManager.Get<ModelTexture>(textureName));
         }
 
         private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
         {
-            return FromMdlx(graphics,
+            return MeshLoader.FromKH2(graphics,
                 entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read),
                 entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read));
-        }
-
-        private static MeshGroup FromMdlx(GraphicsDevice graphics, Mdlx mdlx, ModelTexture modelTextures)
-        {
-            if (mdlx == null)
-            {
-                Log.Warn($"model is null");
-                return null;
-            }
-            if (modelTextures == null)
-                Log.Warn($"texture is null");
-
-            var textures = modelTextures?.Images?
-                .Select(texture => new KingdomTexture(texture, graphics)).ToArray() ?? new KingdomTexture[0];
-
-            var mdlxParsed = new MdlxParser(mdlx);
-
-            MeshGroup.Segment[] segments = null;
-            MeshGroup.Part[] parts = null;
-            var model = new MdlxParser(mdlx).Model;
-            if (model?.Parts != null && model?.Segments != null)
-            { // DEPRECATED
-                segments = model.Segments.Select(segment => new MeshGroup.Segment
-                {
-                    Vertices = segment.Vertices.Select(vertex => new VertexPositionColorTexture
-                    {
-                        Position = new Vector3(vertex.X, vertex.Y, vertex.Z),
-                        TextureCoordinate = new Vector2(vertex.U, vertex.V),
-                        Color = new Color((vertex.Color >> 16) & 0xff, (vertex.Color >> 8) & 0xff, vertex.Color & 0xff, (vertex.Color >> 24) & 0xff)
-                    }).ToArray()
-                }).ToArray();
-
-                parts = model.Parts.Select(part => new MeshGroup.Part
-                {
-                    Indices = part.Indices,
-                    SegmentId = part.SegmentIndex,
-                    TextureId = part.TextureIndex,
-                    IsOpaque = part.IsOpaque,
-                }).ToArray();
-            }
-
-            return new MeshGroup
-            {
-                Segments = segments,
-                Parts = parts,
-                MeshDescriptors = mdlxParsed.MeshDescriptors?
-                    .Select(x => new MeshDesc
-                    {
-                        Vertices = x.Vertices
-                            .Select(v => new VertexPositionColorTexture(
-                                new Vector3(v.X, v.Y, v.Z),
-                                new Color((v.Color >> 16) & 0xff, (v.Color >> 8) & 0xff, v.Color & 0xff, (v.Color >> 24) & 0xff),
-                                new Vector2(v.Tu, v.Tv)))
-                            .ToArray(),
-                        Indices = x.Indices,
-                        TextureIndex = x.TextureIndex,
-                        IsOpaque = x.IsOpaque
-                    })
-                    .ToList(),
-                Textures = textures
-            };
         }
 
         private void AddMesh(MeshGroup mesh)
@@ -454,9 +434,9 @@ namespace OpenKh.Game.States
                 _debugType %= 3;
 
                 if (_debugType == 0)
-                    DebugUpdatePlaceList();
+                { }
                 else if (_debugType == 1)
-                    DebugUpdateObjentryList();
+                    DebugUpdatePlaceList();
                 else if (_debugType == 2)
                     if (_input.IsCross)
                         debug.State = 0;
@@ -468,9 +448,9 @@ namespace OpenKh.Game.States
             if (IsDebugMode())
             {
                 if (_debugType == 0)
-                    DebugDrawPlaceList(debug);
+                    DebugDrawEntities(debug);
                 else if (_debugType == 1)
-                    DebugDrawObjentryList(debug);
+                    DebugDrawPlaceList(debug);
                 else if (_debugType == 2)
                     debug.Println("Press X to return to title screen");
             }
@@ -504,6 +484,14 @@ namespace OpenKh.Game.States
 
                 BasicallyForceToReloadEverything();
                 DisableDebugMode();
+            }
+        }
+
+        public void DebugDrawEntities(IDebug debug)
+        {
+            foreach (var entity in _objectEntities)
+            {
+
             }
         }
 
@@ -545,43 +533,6 @@ namespace OpenKh.Game.States
                 return x;
             })
             .ToArray();
-
-        private void DebugUpdateObjentryList()
-        {
-            if (_input.IsMenuUp) _debugObjentryCursor = Decrement(_debugObjentryCursor);
-            else if (_input.IsMenuDown) _debugObjentryCursor = Increment(_debugObjentryCursor);
-            if (_debugObjentryCursor < 0)
-                _debugObjentryCursor = _kernel.ObjEntries.Count - 1;
-            _debugObjentryCursor %= _kernel.ObjEntries.Count;
-
-            if (_input.IsCross)
-            {
-                _objEntryId = _kernel.ObjEntries.Skip(_debugObjentryCursor).FirstOrDefault()?.ObjectId ?? 0;
-
-                BasicallyForceToReloadEverything();
-                DisableDebugMode();
-            }
-        }
-
-        private void DebugDrawObjentryList(IDebug debug)
-        {
-            debug.Println("OBJENTRY SELECTION");
-            debug.Println("");
-
-            var index = 0;
-            foreach (var entry in _kernel.ObjEntries)
-            {
-                if (index >= _debugObjentryCursor)
-                {
-                    debug.Print($"{(index == _debugObjentryCursor ? '>' : ' ')} ");
-                    debug.Print($"{entry.ObjectId:X04} ");
-                    debug.Println(entry.ModelName.Replace('_', '-'));
-                }
-
-                index++;
-            }
-        }
-
         #endregion
     }
 }

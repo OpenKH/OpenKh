@@ -44,6 +44,7 @@ namespace OpenKh.Game.Infrastructure
         }
 
         public string Region => Constants.Regions[RegionId];
+        public IDataContent DataContent { get; }
         public FontContext FontContext { get; }
         public RenderingMessageContext SystemMessageContext { get; set; }
         public RenderingMessageContext EventMessageContext { get; set; }
@@ -59,7 +60,7 @@ namespace OpenKh.Game.Infrastructure
         public Kernel(IDataContent dataContent)
         {
             Log.Info("Initialize kernel");
-            _dataContent = dataContent;
+            DataContent = dataContent;
 
             FontContext = new FontContext();
             MessageProvider = new Kh2MessageProvider();
@@ -105,13 +106,13 @@ namespace OpenKh.Game.Infrastructure
 
         private T LoadFile<T>(string fileName, Func<Stream, T> action)
         {
-            using var stream = _dataContent.FileOpen(fileName);
+            using var stream = DataContent.FileOpen(fileName);
             return action(stream);
         }
 
         private void LoadSystem(string fileName)
         {
-            var bar = _dataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
+            var bar = DataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
             Ftst = bar.ForEntry("ftst", Bar.EntryType.List, Kh2.System.Ftst.Read);
             Item = bar.ForEntry("item", Bar.EntryType.List, Kh2.System.Item.Read);
@@ -120,7 +121,7 @@ namespace OpenKh.Game.Infrastructure
 
         private void LoadBattle(string fileName)
         {
-            var bar = _dataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
+            var bar = DataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
             Fmlv = bar.ForEntry("fmlv", Bar.EntryType.List, Kh2.Battle.Fmlv.Read);
             Lvup = bar.ForEntry("lvup", Bar.EntryType.List, Kh2.Battle.Lvup.Read)?.Characters;
@@ -128,7 +129,7 @@ namespace OpenKh.Game.Infrastructure
 
         private void LoadFontInfo(string fileName)
         {
-            var bar = _dataContent.FileOpen(fileName).Using(Bar.Read);
+            var bar = DataContent.FileOpen(fileName).Using(Bar.Read);
             FontContext.Read(bar);
         }
 
@@ -137,7 +138,7 @@ namespace OpenKh.Game.Infrastructure
 
         private void LoadMessage(string worldId)
         {
-            var messageBar = _dataContent.FileOpen($"msg/{Language}/sys.bar")
+            var messageBar = DataContent.FileOpen($"msg/{Language}/sys.bar")
                 .Using(stream => Bar.Read(stream));
 
             MessageProvider.Load(messageBar.ForEntry(worldId, Bar.EntryType.List, Msg.Read));
