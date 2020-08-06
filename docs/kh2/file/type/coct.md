@@ -11,7 +11,7 @@ Collision: (Has: Unk1)
 Vertex: Single triangle or quad represents shape of Collision
 Plane: xyzd
 BBox: minXYZ, maxXYZ
-SurfaceFlags: uint32 (0x3F1 for floor?, 0x3F2 for wall/ceil?)
+SurfaceFlags: uint32
 
 .
 └── CollisionMeshGroup (Has one or more CollisionMesh)
@@ -23,7 +23,7 @@ SurfaceFlags: uint32 (0x3F1 for floor?, 0x3F2 for wall/ceil?)
             └── SurfaceFlags
 ```
 
-_Note :_ BBox is short for bounding-box.
+_Note:_ BBox is short for bounding-box.
 
 Here is association of table number and named tables:
 
@@ -83,9 +83,10 @@ Table7: SurfaceFlags
 | 28 | uint16_t | First index to CollisionMesh (Table2)
 | 30 | uint16_t | Last index to CollisionMesh (Table2)
 
-_Note :_ ChildX: `-1` to mean nothing to point.
+_Notes:_
 
-_Note :_ (X,Y,Z) are inverted (-X,-Y,-Z).
+- ChildX: `-1` to mean nothing to point.
+- (X,Y,Z) are inverted (-X,-Y,-Z).
 
 
 ### CollisionMesh (Table2)
@@ -103,7 +104,7 @@ _Note :_ (X,Y,Z) are inverted (-X,-Y,-Z).
 | 16 | uint16_t | Unknown
 | 18 | uint16_t | Unknown
 
-_Note :_ (X,Y,Z) are inverted (-X,-Y,-Z).
+_Note:_ (X,Y,Z) are inverted (-X,-Y,-Z).
 
 
 ### Collision (Table3)
@@ -119,8 +120,10 @@ _Note :_ (X,Y,Z) are inverted (-X,-Y,-Z).
 | 12 | int16_t | Index to BBox (Table6), otherwise use `-1` is to apply Table2's BBox
 | 14 | uint16_t | Index to SurfaceFlags (Table7)
 
-_Note :_ Vertex1,2,3 composes one triangle.
-_Note :_ Vertex1,2,3,4 composes one triangle fan (usually its shape is quadrangle).
+_Notes:_
+
+- Vertex1,2,3 composes one triangle.
+- Vertex1,2,3,4 composes one triangle fan (usually its shape is quadrangle).
 
 
 ### Vertex
@@ -132,7 +135,7 @@ _Note :_ Vertex1,2,3,4 composes one triangle fan (usually its shape is quadrangl
 | 8 | float | Z
 | 12 | float | W: always `1`
 
-_Note :_ (X,Y,Z) are inverted (-X,-Y,-Z).
+_Note:_ (X,Y,Z) are inverted (-X,-Y,-Z).
 
 
 ### Plane
@@ -144,7 +147,7 @@ _Note :_ (X,Y,Z) are inverted (-X,-Y,-Z).
 | 8 | float | Z
 | 12 | float | D
 
-_Note :_ (X,Y,Z,D) are inverted (-X,-Y,-Z,-D).
+_Note:_ (X,Y,Z,D) are inverted (-X,-Y,-Z,-D).
 
 
 ### BBox
@@ -158,7 +161,7 @@ _Note :_ (X,Y,Z,D) are inverted (-X,-Y,-Z,-D).
 | 8 | int16_t | MaxY
 | 10 | int16_t | MaxZ
 
-_Note :_ (X,Y,Z) are inverted (-X,-Y,-Z).
+_Note:_ (X,Y,Z) are inverted (-X,-Y,-Z).
 
 
 ### SurfaceFlags
@@ -167,4 +170,40 @@ _Note :_ (X,Y,Z) are inverted (-X,-Y,-Z).
 |--------|---------------|-------------|
 | 0 | uint32_t | Surface Flags
 
-_Note :_ Currently usage is unknown.
+Bit fields:
+
+| Bit | Working | Description |
+|--:|---|---|
+| 0 | partyStand | 
+| 1 | entityFallOverride | 
+| 2 | unkFallFlag1 | seems to only affect the player
+| 3 | unkFallFlag2 | 
+| 4 | partyCollide | 
+| 5 | objectCollide | affects enemies and field objects like the skateboard
+| 6 | unk01_1 | 
+| 7 | attackCollide | 
+| 8 | unk02_1 | 
+| 9 | unk02_2 | 
+| 10 | ledgeGrab | 
+| 11 | dispBarrier | 
+| 12 | dispMessage | 
+| 13 | unk02_3 | 
+| 14 | unk02_4 | 
+| 15 | unk02_5 | 
+| 16 | unk03_1 | 
+| 17 | unk03_2 | 
+| 18 | unk03_3 | 
+| 19 | unk03_4 | 
+| 20 | unk03_5 | 
+| 21 | unk03_6 | 
+| 22 | unk03_7 | 
+| 23 | unk03_8 | 
+| 24 | unk04_1 | 
+| 25 | unk04_2 | 
+| 26 | unk04_3 | 
+| 27 | unk04_4 | 
+| 28 | unk04_5 | 
+| 29 | unk04_6 | 
+| 30 | unk04_7 | 
+| 31 | unk04_8 | 
+
