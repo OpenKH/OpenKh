@@ -30,7 +30,7 @@ namespace OpenKh.Command.ImgTool.Utils
                                     RedirectStandardInput = true,
                                     RedirectStandardOutput = true,
                                 };
-                                var p = Process.Start(psi);
+                                using var p = Process.Start(psi);
                                 using (var temp = new MemoryStream())
                                 {
                                     bitmap.Save(temp, ImageFormat.Png);
