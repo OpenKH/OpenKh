@@ -56,26 +56,8 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
 
         public void Invalidate()
         {
-            MeshGroup = new MeshGroup
-            {
-                Segments = null,
-                Parts = null,
-                MeshDescriptors = new MdlxParser(_model).MeshDescriptors?
-                    .Select(x => new MeshDesc
-                    {
-                        Vertices = x.Vertices
-                            .Select(v => new VertexPositionColorTexture(
-                                new Vector3(v.X, v.Y, v.Z),
-                                new Color((v.Color >> 16) & 0xff, (v.Color >> 8) & 0xff, v.Color & 0xff, (v.Color >> 24) & 0xff),
-                                new Vector2(v.Tu, v.Tv)))
-                            .ToArray(),
-                        Indices = x.Indices,
-                        TextureIndex = x.TextureIndex,
-                        IsOpaque = x.IsOpaque
-                    })
-                    .ToList(),
-                Textures = _kingdomTextures
-            };
+            MeshGroup = MeshLoader.FromKH2(_model);
+            MeshGroup.Textures = _kingdomTextures;
         }
     }
 }

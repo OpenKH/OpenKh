@@ -1,9 +1,8 @@
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.MonoGame;
-using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using OpenKh.Tools.Kh2MapStudio.Models;
@@ -89,6 +88,16 @@ namespace OpenKh.Tools.Kh2MapStudio
             LoadMapComponent(entries, "SK0");
             LoadMapComponent(entries, "SK1");
             LoadMapComponent(entries, "MAP");
+
+            var bobModel = entries.Where(x => x.Name == "BOB" && x.Type == Bar.EntryType.Model).ToArray();
+            var bobTexture = entries.Where(x => x.Name == "BOB" && x.Type == Bar.EntryType.ModelTexture).ToArray();
+            var bobCount = Math.Min(bobModel.Length, bobTexture.Length);
+            for (var i = 0; i < bobCount; i++)
+            {
+                var model = Mdlx.Read(bobModel[i].Stream);
+                var textures = ModelTexture.Read(bobTexture[i].Stream).Images;
+                MeshGroups.Add(new MeshGroupModel(_graphics, "BOB", model, textures, i));
+            }
         }
 
         public void OpenArd(string fileName)
@@ -128,25 +137,16 @@ namespace OpenKh.Tools.Kh2MapStudio
 
                 foreach (var mesh in MeshGroups.Where(x => x.IsVisible))
                 {
-                    RenderMeshNew(pass, mesh.MeshGroup, true);
-                    RenderMeshNew(pass, mesh.MeshGroup, false);
+                    if (mesh.MeshGroup.MeshDescriptors != null)
+                        RenderMeshNew(pass, mesh.MeshGroup, true);
                 }
-
-                //foreach (var bobDesc in _bobDescs)
-                //{
-                //    var modelView = Matrix.CreateRotationX(bobDesc.RotationX) *
-                //        Matrix.CreateRotationY(bobDesc.RotationY) *
-                //        Matrix.CreateRotationZ(bobDesc.RotationZ) *
-                //        Matrix.CreateScale(bobDesc.ScalingX, bobDesc.ScalingY, bobDesc.ScalingZ) *
-                //        Matrix.CreateTranslation(bobDesc.PositionX, bobDesc.PositionY, bobDesc.PositionZ);
-
-                //    _shader.ProjectionView = _camera.Projection;
-                //    _shader.WorldView = _camera.World;
-                //    _shader.ModelView = modelView;
-                //    pass.Apply();
-
-                //    RenderMesh(pass, _bobModels[bobDesc.BobIndex]);
-                //}
+                foreach (var mesh in MeshGroups.Where(x => x.IsVisible))
+                {
+                    if (mesh.MeshGroup.MeshDescriptors != null)
+                        RenderMeshNew(pass, mesh.MeshGroup, false);
+                    else
+                        RenderMeshLegacy(pass, mesh.MeshGroup);
+                }
             });
         }
 
@@ -171,6 +171,59 @@ namespace OpenKh.Tools.Kh2MapStudio
                     meshDescriptor.Indices,
                     0,
                     meshDescriptor.Indices.Length / 3);
+            }
+        }
+
+        private void RenderMeshLegacy(EffectPass pass, MeshGroup mesh)
+        {
+            var index = 0;
+            foreach (var part in mesh.Parts)
+            {
+                if (part.Indices.Length == 0)
+                    continue;
+
+                if (part.IsOpaque)
+                {
+                    var textureIndex = part.TextureId & 0xffff;
+                    if (textureIndex < mesh.Textures.Length)
+                        _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
+
+                    _graphics.DrawUserIndexedPrimitives(
+                        PrimitiveType.TriangleList,
+                        mesh.Segments[index].Vertices,
+                        0,
+                        mesh.Segments[index].Vertices.Length,
+                        part.Indices,
+                        0,
+                        part.Indices.Length / 3);
+                }
+
+                index = (index + 1) % mesh.Segments.Length;
+            }
+
+            index = 0;
+            foreach (var part in mesh.Parts)
+            {
+                if (part.Indices.Length == 0)
+                    continue;
+
+                if (!part.IsOpaque)
+                {
+                    var textureIndex = part.TextureId & 0xffff;
+                    if (textureIndex < mesh.Textures.Length)
+                        _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
+
+                    _graphics.DrawUserIndexedPrimitives(
+                        PrimitiveType.TriangleList,
+                        mesh.Segments[index].Vertices,
+                        0,
+                        mesh.Segments[index].Vertices.Length,
+                        part.Indices,
+                        0,
+                        part.Indices.Length / 3);
+                }
+
+                index = (index + 1) % mesh.Segments.Length;
             }
         }
 
