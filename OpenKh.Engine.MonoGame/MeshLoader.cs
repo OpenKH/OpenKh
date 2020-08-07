@@ -14,13 +14,24 @@ namespace OpenKh.Engine.MonoGame
             if (model == null || texture == null)
                 return null;
 
-            var modelParsed = new MdlxParser(model);
-            return modelParsed.MeshDescriptors != null ?
-                LoadNew(graphics, modelParsed, texture) :
-                LoadLegacy(graphics, modelParsed, texture);
+            var meshGroup = FromKH2(model);
+            meshGroup.Textures = LoadTextures(graphics, texture).ToArray();
+
+            return meshGroup;
         }
 
-        private static MeshGroup LoadNew(GraphicsDevice graphics, MdlxParser model, ModelTexture texture)
+        public static MeshGroup FromKH2(Mdlx model)
+        {
+            if (model == null)
+                return null;
+
+            var modelParsed = new MdlxParser(model);
+            return modelParsed.MeshDescriptors != null ?
+                LoadKH2New(modelParsed) :
+                LoadKH2Legacy(modelParsed);
+        }
+
+        private static MeshGroup LoadKH2New(MdlxParser model)
         {
             return new MeshGroup
             {
@@ -40,11 +51,11 @@ namespace OpenKh.Engine.MonoGame
                         IsOpaque = x.IsOpaque
                     })
                     .ToList(),
-                Textures = LoadTextures(graphics, texture).ToArray()
+                Textures = null
             };
         }
 
-        private static MeshGroup LoadLegacy(GraphicsDevice graphics, MdlxParser model, ModelTexture texture)
+        private static MeshGroup LoadKH2Legacy(MdlxParser model)
         {
             MeshGroup.Segment[] segments = null;
             MeshGroup.Part[] parts = null;
@@ -71,7 +82,7 @@ namespace OpenKh.Engine.MonoGame
             {
                 Segments = segments,
                 Parts = parts,
-                Textures = LoadTextures(graphics, texture).ToArray()
+                Textures = null
             };
         }
 
