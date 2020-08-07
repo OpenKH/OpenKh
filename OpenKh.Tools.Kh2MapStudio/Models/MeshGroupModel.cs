@@ -16,12 +16,13 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
         private readonly Mdlx _model;
 
         public MeshGroupModel(GraphicsDevice g, string name,
-            Mdlx map, List<ModelTexture.Texture> texture)
+            Mdlx map, List<ModelTexture.Texture> texture, int index)
         {
             _graphics = g;
             _model = map;
             Name = name;
             Texture = texture;
+            Index = index;
             IsVisible = true;
             InvalidateTextures();
             Invalidate();
@@ -30,12 +31,14 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
         public string Name { get; }
         public Mdlx.M4 Map => _model.MapModel;
         public List<ModelTexture.Texture> Texture { get; }
+        public int Index { get; }
         public MeshGroup MeshGroup { get; private set; }
         public bool IsVisible { get; set; }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            foreach (var texture in _kingdomTextures)
+                texture?.Dispose();
         }
 
         public void InvalidateTextures()

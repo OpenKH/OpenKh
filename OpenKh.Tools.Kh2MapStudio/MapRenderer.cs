@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
@@ -7,6 +7,7 @@ using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using OpenKh.Tools.Kh2MapStudio.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -83,6 +84,7 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public void OpenMap(string fileName)
         {
+            Close();
             var entries = File.OpenRead(fileName).Using(Bar.Read);
             LoadMapComponent(entries, "SK0");
             LoadMapComponent(entries, "SK1");
@@ -96,6 +98,8 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public void Close()
         {
+            foreach (var meshGroup in MeshGroups)
+                meshGroup?.Dispose();
             MeshGroups.Clear();
         }
 
@@ -179,7 +183,7 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             var model = Mdlx.Read(modelEntry.Stream);
             var textures = ModelTexture.Read(textureEntry.Stream).Images;
-            MeshGroups.Add(new MeshGroupModel(_graphics, componentName, model, textures));
+            MeshGroups.Add(new MeshGroupModel(_graphics, componentName, model, textures, 0));
         }
     }
 }
