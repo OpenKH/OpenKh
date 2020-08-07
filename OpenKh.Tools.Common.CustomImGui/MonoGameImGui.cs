@@ -63,6 +63,10 @@ namespace OpenKh.Tools.Common.CustomImGui
 
         private List<int> _keys = new List<int>();
 
+        public bool ImGuiWantCaptureKeyboard => ImGui.GetIO().WantCaptureKeyboard;
+        public bool ImGuiWantCaptureMouse => ImGui.GetIO().WantCaptureMouse;
+        public bool ImGuiWantTextInput => ImGui.GetIO().WantTextInput;
+
         public MonoGameImGui(Game game)
         {
             var context = ImGui.CreateContext();

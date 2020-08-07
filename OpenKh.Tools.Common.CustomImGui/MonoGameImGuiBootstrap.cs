@@ -21,6 +21,10 @@ namespace OpenKh.Tools.Common.CustomImGui
             set => Window.Title = value;
         }
 
+        public bool ImGuiWantCaptureKeyboard => _imGuiRenderer.ImGuiWantCaptureKeyboard;
+        public bool ImGuiWantCaptureMouse => _imGuiRenderer.ImGuiWantCaptureMouse;
+        public bool ImGuiWantTextInput => _imGuiRenderer.ImGuiWantTextInput;
+
         public Action<MonoGameImGuiBootstrap> MainLoop { get; set; }
 
         public GraphicsDeviceManager GraphicsDeviceManager { get; }

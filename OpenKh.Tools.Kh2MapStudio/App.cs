@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using xna = Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.CustomImGui;
@@ -28,6 +29,8 @@ namespace OpenKh.Tools.Kh2MapStudio
         private string _mapPath;
         private string _objPath;
         private List<string> _mapList = new List<string>();
+
+        private xna.Point _previousMousePosition;
 
         public string Title
         {
@@ -81,9 +84,10 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool MainLoop()
         {
-            _bootstrap.GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
+            _bootstrap.GraphicsDevice.Clear(xna.Color.CornflowerBlue);
             ProcessKeyMapping();
-
+            if (!_bootstrap.ImGuiWantTextInput) ProcessKeyboardInput(Keyboard.GetState(), 1f / 60);
+            if (!_bootstrap.ImGuiWantCaptureMouse) ProcessMouseInput(Mouse.GetState());
 
             ImGui.PushStyleColor(ImGuiCol.WindowBg, BgUiColor);
             ForControl(ImGui.BeginMainMenuBar, ImGui.EndMainMenuBar, MainMenu);
@@ -257,6 +261,40 @@ namespace OpenKh.Tools.Kh2MapStudio
                         action();
                 }
             }
+        }
+
+        private void ProcessKeyboardInput(KeyboardState keyboard, float deltaTime)
+        {
+            const float Speed = 50.0f;
+            var speed = (float)(deltaTime * Speed);
+            if (keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift))
+                speed *= 2.5f;
+
+            var camera = _mapRenderer.Camera;
+            if (keyboard.IsKeyDown(Keys.W)) camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtX, speed * 5);
+            if (keyboard.IsKeyDown(Keys.S)) camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtX, speed * 5);
+            if (keyboard.IsKeyDown(Keys.A)) camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtY, speed * 5);
+            if (keyboard.IsKeyDown(Keys.D)) camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtY, speed * 5);
+
+            if (keyboard.IsKeyDown(Keys.Up)) camera.CameraRotationYawPitchRoll += new xna.Vector3(0, 0, 1 * speed);
+            if (keyboard.IsKeyDown(Keys.Down)) camera.CameraRotationYawPitchRoll -= new xna.Vector3(0, 0, 1 * speed);
+            if (keyboard.IsKeyDown(Keys.Left)) camera.CameraRotationYawPitchRoll += new xna.Vector3(1 * speed, 0, 0);
+            if (keyboard.IsKeyDown(Keys.Right)) camera.CameraRotationYawPitchRoll -= new xna.Vector3(1 * speed, 0, 0);
+        }
+
+        private void ProcessMouseInput(MouseState mouse)
+        {
+            const float Speed = 0.25f;
+            if (mouse.LeftButton == ButtonState.Pressed)
+            {
+                var camera = _mapRenderer.Camera;
+                var xSpeed = (_previousMousePosition.X - mouse.Position.X) * Speed;
+                var ySpeed = (_previousMousePosition.Y - mouse.Position.Y) * Speed;
+                camera.CameraRotationYawPitchRoll += new xna.Vector3(1 * xSpeed, 0, 0);
+                camera.CameraRotationYawPitchRoll += new xna.Vector3(0, 0, 1 * ySpeed);
+            }
+
+            _previousMousePosition = mouse.Position;
         }
 
         public static void ShowError(string message, string title = "Error") =>
