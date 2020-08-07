@@ -12,7 +12,6 @@ namespace OpenKh.Tools.Common.CustomImGui
         public static string ApplicationName = GetApplicationName();
 
         private readonly Action<MonoGameImGuiBootstrap> _initFunc;
-        private GraphicsDeviceManager _graphics;
         private MonoGameImGui _imGuiRenderer;
         private ImFontPtr _imSegoeUiFont;
 
@@ -24,11 +23,13 @@ namespace OpenKh.Tools.Common.CustomImGui
 
         public Action<MonoGameImGuiBootstrap> MainLoop { get; set; }
 
+        public GraphicsDeviceManager GraphicsDeviceManager { get; }
+
         public MonoGameImGuiBootstrap(
             int initialWindowWidth, int initialWindowHeight,
             Action<MonoGameImGuiBootstrap> initFunc)
         {
-            _graphics = new GraphicsDeviceManager(this)
+            GraphicsDeviceManager = new GraphicsDeviceManager(this)
             {
                 PreferredBackBufferWidth = initialWindowWidth,
                 PreferredBackBufferHeight = initialWindowHeight
@@ -65,7 +66,7 @@ namespace OpenKh.Tools.Common.CustomImGui
 
         protected override void Draw(GameTime gameTime)
         {
-            _graphics.GraphicsDevice.Clear(Color.White);
+            GraphicsDeviceManager.GraphicsDevice.Clear(Color.White);
 
             _imGuiRenderer.BeforeLayout(gameTime);
             ImGui.PushFont(_imSegoeUiFont);

@@ -134,14 +134,15 @@ namespace OpenKh.Tools.Common.CustomImGui
         public static ImFontPtr OpenFontSegoeUi(IImGuiRenderer renderer, float fontSize = 16.0f) =>
             OpenFont(renderer, "segoeui", fontSize);
 
-        public static bool MainWindow(Action action) =>
+        public static bool MainWindow(Action action, bool noBackground = false) =>
             ForControl(() =>
             {
                 var ret = ImGui.Begin("MainWindow",
                     ImGuiWindowFlags.MenuBar |
                     ImGuiWindowFlags.NoDecoration |
                     ImGuiWindowFlags.NoCollapse |
-                    ImGuiWindowFlags.NoMove);
+                    ImGuiWindowFlags.NoMove |
+                    (noBackground ? ImGuiWindowFlags.NoBackground : ImGuiWindowFlags.None));
                 ImGui.SetWindowPos(new System.Numerics.Vector2(0, 0));
                 ImGui.SetWindowSize(ImGui.GetIO().DisplaySize);
                 return ret;

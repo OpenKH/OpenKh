@@ -15,10 +15,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Content\**" />
-	  <EmbeddedResource Remove="Content\**" />
-	  <MonoGameContentReference Remove="Content\**" />
-	  <None Remove="Content\**" />
+		<Compile Remove="Content\bin\**" />
+		<EmbeddedResource Remove="Content\bin\**" />
+		<MonoGameContentReference Remove="Content\bin\**" />
+		<None Remove="Content\bin\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -33,6 +33,10 @@
 		<ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
 		<ProjectReference Include="..\OpenKh.Tools.Common.CustomImGui\OpenKh.Tools.Common.CustomImGui.csproj" />
 		<ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Content\" />
 	</ItemGroup>
 
 	<ItemGroup>
