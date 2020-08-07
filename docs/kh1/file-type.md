@@ -23,7 +23,7 @@
 | DAT (3) | Sound Effect Data, somewhat similar to SE file; example: eventse/al\_002.dat
 | DAT (4) | TARC Binary Archive; example: worldmap/challe.dat
 | DBT | Unknown; example: xs\_bambi.dbt
-| DPP | Unknown; example: eveffect/al/al\_000.dpp
+| DPP | Special Effects Header; example: eveffect/al/al\_000.dpp
 | DPX | Special Effects; example: nm08.dpx
 | EV | Unknown; example: gameover.ev
 | EVM | Unknown; example: al01\_al011.evm
