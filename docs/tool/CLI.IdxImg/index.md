@@ -6,6 +6,12 @@ If you have the ISO but no toolset, you can download the release builds of OpenK
 
 This document will focus on teaching you how to dump your copy of KH2.
 
+## Using the GUI tool
+
+If your objective is to just extract the game's content without performing any kind of automation, or if you just need to extract a single file or folder, `OpenKh.Tools.IdxImg` is the tool for you.
+
+![GUI sample 1](./images/gui01.png)
+
 ## Using Command Prompt and Extracting KH2.IMG + IDX
 
 This guide is specialized toward Windows users, as the assumption (for now) is, if you're on Linux, you're already familiar with using the terminal. As such, we'll begin teaching new CLI users the basics. If you're already familiar with using the terminal / command prompt / cmd, skip ahead to the next section.

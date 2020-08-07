@@ -1,0 +1,54 @@
+﻿<Window x:Class="OpenKh.Tools.IdxImg.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.IdxImg"
+        xmlns:views="clr-namespace:OpenKh.Tools.IdxImg.Views"
+        xmlns:vm="clr-namespace:OpenKh.Tools.IdxImg.ViewModels"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="300" Width="400"
+        Drop="Window_Drop" AllowDrop="True">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Command="{Binding OpenCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource FolderOpen_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Save" Command="{Binding SaveCommand}" IsEnabled="False">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Save_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save _as..." Command="{Binding SaveAsCommand}" IsEnabled="False">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource SaveAs_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Command="{Binding AboutCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource UIAbout_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <views:IdxTreeView DataContext="{Binding}" Grid.Column="0"/>
+            <StackPanel Grid.Column="1" Margin="5 0 0 0" IsEnabled="{Binding IsItemSelected}">
+                <StackPanel x:Name="ItemPropertyContent" DataContext="{Binding TreeSelectedItem}"/>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>
