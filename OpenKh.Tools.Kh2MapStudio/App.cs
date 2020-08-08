@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using xna = Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using OpenKh.Kh2;
@@ -103,6 +103,7 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             MainWindow();
             CameraWindow.Run(_mapRenderer.Camera);
+            CollisionWindow.Run(_mapRenderer.CharacterCollision);
             LayerControllerWindow.Run(_mapRenderer);
             MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
             BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
