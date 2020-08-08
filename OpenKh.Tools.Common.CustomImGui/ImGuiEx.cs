@@ -207,24 +207,24 @@ namespace OpenKh.Tools.Common.CustomImGui
                 setter(value);
         }
 
-        public static void ForEdit(string name, Func<float> getter, Action<float> setter)
+        public static void ForEdit(string name, Func<float> getter, Action<float> setter, float speed = 1f)
         {
             var value = getter();
-            if (ImGui.DragFloat(name, ref value))
+            if (ImGui.DragFloat(name, ref value, speed))
                 setter(value);
         }
 
-        public static void ForEdit2(string name, Func<Vector2> getter, Action<Vector2> setter)
+        public static void ForEdit2(string name, Func<Vector2> getter, Action<Vector2> setter, float speed = 1f)
         {
             var value = getter();
-            if (ImGui.DragFloat2(name, ref value))
+            if (ImGui.DragFloat2(name, ref value, speed))
                 setter(value);
         }
 
-        public static void ForEdit3(string name, Func<Vector3> getter, Action<Vector3> setter)
+        public static void ForEdit3(string name, Func<Vector3> getter, Action<Vector3> setter, float speed = 1f)
         {
             var value = getter();
-            if (ImGui.DragFloat3(name, ref value))
+            if (ImGui.DragFloat3(name, ref value, speed))
                 setter(value);
         }
 

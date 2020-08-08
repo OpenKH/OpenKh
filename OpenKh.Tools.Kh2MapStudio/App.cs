@@ -96,6 +96,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             CameraWindow.Run(_mapRenderer.Camera);
             LayerControllerWindow.Run(_mapRenderer);
             MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
+            BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
 
             ImGui.PopStyleColor();
 

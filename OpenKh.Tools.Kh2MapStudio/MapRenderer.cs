@@ -28,9 +28,11 @@ namespace OpenKh.Tools.Kh2MapStudio
             MultiSampleMask = int.MaxValue,
             IndependentBlendEnable = false
         };
+
         private readonly GraphicsDeviceManager _graphicsManager;
         private readonly GraphicsDevice _graphics;
         private readonly KingdomShader _shader;
+        private bool _showBobs;
 
         public Camera Camera { get; }
 
@@ -65,6 +67,12 @@ namespace OpenKh.Tools.Kh2MapStudio
                 if (mesh != null)
                     mesh.IsVisible = value ?? true;
             }
+        }
+
+        public bool? ShowBobs
+        {
+            get => BobDescriptors.Any() ? (bool?)_showBobs : null;
+            set => _showBobs = value ?? true;
         }
 
         internal List<MeshGroupModel> MapMeshGroups { get; }
@@ -118,6 +126,8 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public void Close()
         {
+            _showBobs = true;
+
             foreach (var meshGroup in MapMeshGroups)
                 meshGroup?.Dispose();
             MapMeshGroups.Clear();
@@ -156,14 +166,17 @@ namespace OpenKh.Tools.Kh2MapStudio
                 foreach (var mesh in MapMeshGroups.Where(x => x.IsVisible))
                     RenderMeshNew(pass, mesh.MeshGroup, false);
 
-                foreach (var entity in BobDescriptors ?? new List<BobDescriptor>())
+                if (_showBobs)
                 {
-                    _shader.ModelView = Matrix.CreateRotationX(entity.RotationX) *
-                        Matrix.CreateRotationY(entity.RotationY) *
-                        Matrix.CreateRotationZ(entity.RotationZ) *
-                        Matrix.CreateScale(entity.ScalingX, entity.ScalingY, entity.ScalingZ) *
-                        Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
-                    RenderMeshLegacy(pass, BobMeshGroups[entity.BobIndex].MeshGroup);
+                    foreach (var entity in BobDescriptors ?? new List<BobDescriptor>())
+                    {
+                        _shader.ModelView = Matrix.CreateRotationX(entity.RotationX) *
+                            Matrix.CreateRotationY(entity.RotationY) *
+                            Matrix.CreateRotationZ(entity.RotationZ) *
+                            Matrix.CreateScale(entity.ScalingX, entity.ScalingY, entity.ScalingZ) *
+                            Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
+                        RenderMeshLegacy(pass, BobMeshGroups[entity.BobIndex].MeshGroup);
+                    }
                 }
             });
         }
