@@ -16,6 +16,15 @@ namespace OpenKh.Tools.Kh2MapStudio
 {
     class App : IDisposable
     {
+        private static readonly List<FileDialogFilter> MapFilter =
+            FileDialogFilterComposer.Compose()
+            .AddExtensions("MAP file", "map")
+            .AddAllFiles();
+        private static readonly List<FileDialogFilter> ArdFilter =
+            FileDialogFilterComposer.Compose()
+            .AddExtensions("ARD file", "ard")
+            .AddAllFiles();
+
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
         private readonly MonoGameImGuiBootstrap _bootstrap;
         private bool _exitFlag = false;
@@ -154,8 +163,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                 ForMenu("File", () =>
                 {
                     ForMenuItem("Open extracted game folder...", "CTRL+O", MenuFileOpen);
-                    ForMenuItem("Save map", "CTRL+S", MenuFileSave, IsOpen);
-                    ForMenuItem("Save as...", MenuFileSaveAs, IsOpen);
+                    ForMenuItem("Save map+ard", "CTRL+S", MenuFileSave, IsOpen);
+                    ForMenuItem("Save map as...", MenuFileSaveMapAs, IsOpen);
+                    ForMenuItem("Save ard as...", MenuFileSaveArdAs, IsOpen);
                     ImGui.Separator();
                     ForMenu("Preferences", () =>
                     {
@@ -174,19 +184,19 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         private void MenuFileSave()
         {
-            //if (!string.IsNullOrEmpty(FileName))
-            //    SaveFile(FileName, FileName);
-            //else
-            //    MenuFileSaveAs();
+            _mapRenderer.SaveMap(Path.Combine(_mapPath, MapName + ".map"));
         }
 
-        private void MenuFileSaveAs()
+        private void MenuFileSaveMapAs()
         {
-            //FileDialog.OnSave(fileName =>
-            //{
-            //    SaveFile(FileName, fileName);
-            //    FileName = fileName;
-            //}, Filters);
+            var defaultName = MapName + ".map";
+            FileDialog.OnSave(_mapRenderer.SaveMap, MapFilter, defaultName);
+        }
+
+        private void MenuFileSaveArdAs()
+        {
+            var defaultName = MapName + ".ard";
+            FileDialog.OnSave(_mapRenderer.SaveArd, ArdFilter, defaultName);
         }
 
         private void MenuFileExit() => _exitFlag = true;
@@ -207,10 +217,6 @@ namespace OpenKh.Tools.Kh2MapStudio
             {
                 ShowError(ex.Message);
             }
-        }
-
-        public void SaveFile(string previousFileName, string fileName)
-        {
         }
 
         private void UpdateTitle()

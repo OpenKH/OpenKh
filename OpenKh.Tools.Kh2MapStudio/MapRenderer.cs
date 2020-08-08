@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Models;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using OpenKh.Tools.Kh2MapStudio.Models;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Controls;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
@@ -74,7 +76,8 @@ namespace OpenKh.Tools.Kh2MapStudio
             get => BobDescriptors.Any() ? (bool?)_showBobs : null;
             set => _showBobs = value ?? true;
         }
-
+        public List<Bar.Entry> MapBarEntries { get; private set; }
+        public List<Bar.Entry> ArdBarEntries { get; private set; }
         internal List<MeshGroupModel> MapMeshGroups { get; }
         internal List<MeshGroupModel> BobMeshGroups { get; }
         public List<BobDescriptor> BobDescriptors { get; }
@@ -97,19 +100,19 @@ namespace OpenKh.Tools.Kh2MapStudio
         public void OpenMap(string fileName)
         {
             Close();
-            var entries = File.OpenRead(fileName).Using(Bar.Read);
-            LoadMapComponent(entries, "SK0");
-            LoadMapComponent(entries, "SK1");
-            LoadMapComponent(entries, "MAP");
+            MapBarEntries = File.OpenRead(fileName).Using(Bar.Read);
+            LoadMapComponent(MapBarEntries, "SK0");
+            LoadMapComponent(MapBarEntries, "SK1");
+            LoadMapComponent(MapBarEntries, "MAP");
 
-            var bobDescEntry = entries
+            var bobDescEntry = MapBarEntries
                 .Where(x => x.Name == "out" && x.Type == Bar.EntryType.BobDescriptor)
                 .FirstOrDefault();
             if (bobDescEntry != null)
                 BobDescriptors.AddRange(BobDescriptor.Read(bobDescEntry.Stream));
 
-            var bobModel = entries.Where(x => x.Name == "BOB" && x.Type == Bar.EntryType.Model).ToArray();
-            var bobTexture = entries.Where(x => x.Name == "BOB" && x.Type == Bar.EntryType.ModelTexture).ToArray();
+            var bobModel = MapBarEntries.Where(x => x.Name == "BOB" && x.Type == Bar.EntryType.Model).ToArray();
+            var bobTexture = MapBarEntries.Where(x => x.Name == "BOB" && x.Type == Bar.EntryType.ModelTexture).ToArray();
             var bobCount = Math.Min(bobModel.Length, bobTexture.Length);
             for (var i = 0; i < bobCount; i++)
             {
@@ -119,9 +122,29 @@ namespace OpenKh.Tools.Kh2MapStudio
             }
         }
 
+        public void SaveMap(string fileName)
+        {
+            var memStream = new MemoryStream();
+            BobDescriptor.Write(memStream, BobDescriptors);
+
+            MapBarEntries.AddOrReplace(new Bar.Entry
+            {
+                Name = "out",
+                Type = Bar.EntryType.BobDescriptor,
+                Stream = memStream
+            });
+
+            File.Create(fileName).Using(stream => Bar.Write(stream, MapBarEntries));
+        }
+
         public void OpenArd(string fileName)
         {
-            var entries = File.OpenRead(fileName).Using(Bar.Read);
+            ArdBarEntries = File.OpenRead(fileName).Using(Bar.Read);
+        }
+
+        public void SaveArd(string fileName)
+        {
+            File.Create(fileName).Using(stream => Bar.Write(stream, ArdBarEntries));
         }
 
         public void Close()
