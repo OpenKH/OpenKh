@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Models;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using OpenKh.Tools.Kh2MapStudio.Models;
 using System;
@@ -35,10 +36,10 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool? ShowMap
         {
-            get => MeshGroups.FirstOrDefault(x => x.Name == "MAP")?.IsVisible;
+            get => MapMeshGroups.FirstOrDefault(x => x.Name == "MAP")?.IsVisible;
             set
             {
-                var mesh = MeshGroups.FirstOrDefault(x => x.Name == "MAP");
+                var mesh = MapMeshGroups.FirstOrDefault(x => x.Name == "MAP");
                 if (mesh != null)
                     mesh.IsVisible = value ?? true;
             }
@@ -46,10 +47,10 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool? ShowSk0
         {
-            get => MeshGroups.FirstOrDefault(x => x.Name == "SK0")?.IsVisible;
+            get => MapMeshGroups.FirstOrDefault(x => x.Name == "SK0")?.IsVisible;
             set
             {
-                var mesh = MeshGroups.FirstOrDefault(x => x.Name == "SK0");
+                var mesh = MapMeshGroups.FirstOrDefault(x => x.Name == "SK0");
                 if (mesh != null)
                     mesh.IsVisible = value ?? true;
             }
@@ -57,23 +58,27 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool? ShowSk1
         {
-            get => MeshGroups.FirstOrDefault(x => x.Name == "SK1")?.IsVisible;
+            get => MapMeshGroups.FirstOrDefault(x => x.Name == "SK1")?.IsVisible;
             set
             {
-                var mesh = MeshGroups.FirstOrDefault(x => x.Name == "SK1");
+                var mesh = MapMeshGroups.FirstOrDefault(x => x.Name == "SK1");
                 if (mesh != null)
                     mesh.IsVisible = value ?? true;
             }
         }
 
-        internal List<MeshGroupModel> MeshGroups { get; }
+        internal List<MeshGroupModel> MapMeshGroups { get; }
+        internal List<MeshGroupModel> BobMeshGroups { get; }
+        public List<BobDescriptor> BobDescriptors { get; }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
             _graphicsManager = graphics;
             _graphics = graphics.GraphicsDevice;
             _shader = new KingdomShader(content);
-            MeshGroups = new List<MeshGroupModel>();
+            MapMeshGroups = new List<MeshGroupModel>();
+            BobMeshGroups = new List<MeshGroupModel>();
+            BobDescriptors = new List<BobDescriptor>();
             Camera = new Camera()
             {
                 CameraPosition = new Vector3(0, 100, 200),
@@ -89,6 +94,12 @@ namespace OpenKh.Tools.Kh2MapStudio
             LoadMapComponent(entries, "SK1");
             LoadMapComponent(entries, "MAP");
 
+            var bobDescEntry = entries
+                .Where(x => x.Name == "out" && x.Type == Bar.EntryType.BobDescriptor)
+                .FirstOrDefault();
+            if (bobDescEntry != null)
+                BobDescriptors.AddRange(BobDescriptor.Read(bobDescEntry.Stream));
+
             var bobModel = entries.Where(x => x.Name == "BOB" && x.Type == Bar.EntryType.Model).ToArray();
             var bobTexture = entries.Where(x => x.Name == "BOB" && x.Type == Bar.EntryType.ModelTexture).ToArray();
             var bobCount = Math.Min(bobModel.Length, bobTexture.Length);
@@ -96,7 +107,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             {
                 var model = Mdlx.Read(bobModel[i].Stream);
                 var textures = ModelTexture.Read(bobTexture[i].Stream).Images;
-                MeshGroups.Add(new MeshGroupModel(_graphics, "BOB", model, textures, i));
+                BobMeshGroups.Add(new MeshGroupModel(_graphics, "BOB", model, textures, i));
             }
         }
 
@@ -107,9 +118,14 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public void Close()
         {
-            foreach (var meshGroup in MeshGroups)
+            foreach (var meshGroup in MapMeshGroups)
                 meshGroup?.Dispose();
-            MeshGroups.Clear();
+            MapMeshGroups.Clear();
+
+            foreach (var meshGroup in BobMeshGroups)
+                meshGroup?.Dispose();
+            BobMeshGroups.Clear();
+            BobDescriptors.Clear();
         }
 
         public void Update(float deltaTime)
@@ -135,17 +151,19 @@ namespace OpenKh.Tools.Kh2MapStudio
                 _shader.ModelView = Matrix.Identity;
                 pass.Apply();
 
-                foreach (var mesh in MeshGroups.Where(x => x.IsVisible))
+                foreach (var mesh in MapMeshGroups.Where(x => x.IsVisible))
+                    RenderMeshNew(pass, mesh.MeshGroup, true);
+                foreach (var mesh in MapMeshGroups.Where(x => x.IsVisible))
+                    RenderMeshNew(pass, mesh.MeshGroup, false);
+
+                foreach (var entity in BobDescriptors ?? new List<BobDescriptor>())
                 {
-                    if (mesh.MeshGroup.MeshDescriptors != null)
-                        RenderMeshNew(pass, mesh.MeshGroup, true);
-                }
-                foreach (var mesh in MeshGroups.Where(x => x.IsVisible))
-                {
-                    if (mesh.MeshGroup.MeshDescriptors != null)
-                        RenderMeshNew(pass, mesh.MeshGroup, false);
-                    else
-                        RenderMeshLegacy(pass, mesh.MeshGroup);
+                    _shader.ModelView = Matrix.CreateRotationX(entity.RotationX) *
+                        Matrix.CreateRotationY(entity.RotationY) *
+                        Matrix.CreateRotationZ(entity.RotationZ) *
+                        Matrix.CreateScale(entity.ScalingX, entity.ScalingY, entity.ScalingZ) *
+                        Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
+                    RenderMeshLegacy(pass, BobMeshGroups[entity.BobIndex].MeshGroup);
                 }
             });
         }
@@ -236,7 +254,7 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             var model = Mdlx.Read(modelEntry.Stream);
             var textures = ModelTexture.Read(textureEntry.Stream).Images;
-            MeshGroups.Add(new MeshGroupModel(_graphics, componentName, model, textures, 0));
+            MapMeshGroups.Add(new MeshGroupModel(_graphics, componentName, model, textures, 0));
         }
     }
 }
