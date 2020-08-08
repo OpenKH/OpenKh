@@ -46,8 +46,12 @@ namespace OpenKh.Tools.Kh2MapStudio
         private readonly GraphicsDevice _graphics;
         private readonly KingdomShader _shader;
         private bool _showBobs;
-        private bool _showCollisions;
+        private bool _showMapCollisions;
+        private bool _showCameraCollisions;
+        private bool _showLightCollisions;
         private VertexBuffer _vbMapCollision;
+        private VertexBuffer _vbCameraCollision;
+        private VertexBuffer _vbLightCollision;
 
         public Camera Camera { get; }
 
@@ -92,8 +96,20 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool? ShowMapCollision
         {
-            get => CharacterCollision != null ? (bool?)_showCollisions : null;
-            set => _showCollisions = value ?? false;
+            get => CharacterCollision != null ? (bool?)_showMapCollisions : null;
+            set => _showMapCollisions = value ?? false;
+        }
+
+        public bool? ShowCameraCollision
+        {
+            get => CameraCollision != null ? (bool?)_showCameraCollisions : null;
+            set => _showCameraCollisions = value ?? false;
+        }
+
+        public bool? ShowLightCollision
+        {
+            get => LightCollision != null ? (bool?)_showLightCollisions : null;
+            set => _showLightCollisions = value ?? false;
         }
 
         internal List<Bar.Entry> MapBarEntries { get; private set; }
@@ -102,6 +118,8 @@ namespace OpenKh.Tools.Kh2MapStudio
         internal List<MeshGroupModel> BobMeshGroups { get; }
         internal List<BobDescriptor> BobDescriptors { get; }
         internal Coct CharacterCollision { get; private set; }
+        internal Coct CameraCollision { get; private set; }
+        internal Coct LightCollision { get; private set; }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
@@ -150,6 +168,24 @@ namespace OpenKh.Tools.Kh2MapStudio
                 CharacterCollision = Coct.Read(characterCollisionEntry.Stream);
                 _vbMapCollision = CreateVertexBufferForCollision(CharacterCollision);
             }
+
+            var cameraCollisionEntry = MapBarEntries
+                .Where(x => x.Name.StartsWith("CH_") && x.Type == Bar.EntryType.CameraCollision)
+                .FirstOrDefault();
+            if (cameraCollisionEntry != null)
+            {
+                CameraCollision = Coct.Read(cameraCollisionEntry.Stream);
+                _vbCameraCollision = CreateVertexBufferForCollision(CameraCollision);
+            }
+
+            var lightCollisionEntry = MapBarEntries
+                .Where(x => x.Name == "COL_" && x.Type == Bar.EntryType.LightData)
+                .FirstOrDefault();
+            if (lightCollisionEntry != null)
+            {
+                LightCollision = Coct.Read(lightCollisionEntry.Stream);
+                _vbLightCollision = CreateVertexBufferForCollision(LightCollision);
+            }
         }
 
         public void SaveMap(string fileName)
@@ -179,9 +215,6 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public void Close()
         {
-            _showBobs = true;
-            _showCollisions = true;
-
             foreach (var meshGroup in MapMeshGroups)
                 meshGroup?.Dispose();
             MapMeshGroups.Clear();
@@ -192,6 +225,8 @@ namespace OpenKh.Tools.Kh2MapStudio
             BobDescriptors.Clear();
 
             _vbMapCollision?.Dispose();
+            _vbCameraCollision?.Dispose();
+            _vbLightCollision?.Dispose();
         }
 
         public void Update(float deltaTime)
@@ -222,8 +257,12 @@ namespace OpenKh.Tools.Kh2MapStudio
                 foreach (var mesh in MapMeshGroups.Where(x => x.IsVisible))
                     RenderMeshNew(pass, mesh.MeshGroup, false);
 
-                if (_showCollisions && _vbMapCollision != null)
+                if (_showMapCollisions && _vbMapCollision != null)
                     DrawVertexBuffer(_vbMapCollision);
+                if (_showCameraCollisions && _vbCameraCollision != null)
+                    DrawVertexBuffer(_vbCameraCollision);
+                if (_showLightCollisions && _vbLightCollision != null)
+                    DrawVertexBuffer(_vbLightCollision);
 
                 if (_showBobs)
                 {

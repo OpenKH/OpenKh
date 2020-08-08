@@ -17,6 +17,10 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                 ForEdit("Show BOBs", () => layerController.ShowBobs.Value, x => layerController.ShowBobs = x);
             if (layerController.ShowMapCollision.HasValue)
                 ForEdit("Show map collisions", () => layerController.ShowMapCollision.Value, x => layerController.ShowMapCollision = x);
+            if (layerController.ShowCameraCollision.HasValue)
+                ForEdit("Show camera collisions", () => layerController.ShowCameraCollision.Value, x => layerController.ShowCameraCollision = x);
+            if (layerController.ShowCameraCollision.HasValue)
+                ForEdit("Show light collisions", () => layerController.ShowLightCollision.Value, x => layerController.ShowLightCollision = x);
         });
     }
 }
