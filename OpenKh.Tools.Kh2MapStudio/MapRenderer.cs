@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
@@ -193,6 +193,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                 {
                     foreach (var entity in BobDescriptors ?? new List<BobDescriptor>())
                     {
+                        if (entity.BobIndex < 0 || entity.BobIndex >= BobMeshGroups.Count)
+                            continue;
+
                         _shader.ModelView = Matrix.CreateRotationX(entity.RotationX) *
                             Matrix.CreateRotationY(entity.RotationY) *
                             Matrix.CreateRotationZ(entity.RotationZ) *

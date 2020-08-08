@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using OpenKh.Engine.MonoGame;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using static OpenKh.Tools.Kh2MapStudio.ImGuiExHelpers;
