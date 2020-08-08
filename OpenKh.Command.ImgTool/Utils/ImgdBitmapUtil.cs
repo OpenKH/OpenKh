@@ -147,6 +147,16 @@ namespace OpenKh.Kh2.Utils
             public int Height { get; }
         }
 
+        static class PaletteColorUsageCounter
+        {
+            public static bool IfMaxColorCountIsOver(List<uint> pixels, int maxColors)
+            {
+                return pixels
+                    .GroupBy(pixel => pixel)
+                    .Count() > maxColors;
+            }
+        }
+
         class PaletteGenerator
         {
             public PaletteGenerator(List<uint> pixels, int maxColors)
@@ -200,7 +210,12 @@ namespace OpenKh.Kh2.Utils
         {
             if (quantizer != null)
             {
-                bitmap = quantizer(bitmap);
+                var firstSrc = new ReadAs32bppPixels(bitmap);
+
+                if (PaletteColorUsageCounter.IfMaxColorCountIsOver(firstSrc.Pixels, 1 << bpp))
+                {
+                    bitmap = quantizer(bitmap);
+                }
             }
 
             switch (bpp)

@@ -45,8 +45,8 @@ namespace OpenKh.Command.ImgTool.Utils
                             {
                                 return (Bitmap)new WuQuantizer().QuantizeImage(
                                     new Bitmap(bitmap), // make sure it is 32 bpp, not 24 bpp
-                                    alphaThreshold: 10, // default
-                                    alphaFader: 70, // default
+                                    alphaThreshold: -1,
+                                    alphaFader: 1,
                                     maxColors
                                 );
                                 // I believe that nQuant never throws exception.
