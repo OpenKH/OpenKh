@@ -65,5 +65,18 @@ namespace OpenKh.Engine.MonoGame
                 pass.Apply();
             }
         }
+
+        public static void SetRenderTexture(this KingdomShader shader, EffectPass pass, Texture2D texture)
+        {
+            if (shader.Texture0 != texture)
+            {
+                shader.Texture0 = texture;
+                shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
+                shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
+                shader.TextureWrapModeU = TextureWrapMode.Clamp;
+                shader.TextureWrapModeV = TextureWrapMode.Clamp;
+                pass.Apply();
+            }
+        }
     }
 }

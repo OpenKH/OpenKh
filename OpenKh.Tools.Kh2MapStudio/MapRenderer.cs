@@ -30,28 +30,14 @@ namespace OpenKh.Tools.Kh2MapStudio
             IndependentBlendEnable = false
         };
 
-        private static readonly Color[] ColorPalette = new Color[]
-        {
-            Color.Red,
-            Color.Green,
-            Color.Blue,
-            Color.Green,
-            Color.Blue,
-            Color.Yellow,
-            Color.Cyan,
-            Color.Fuchsia,
-        };
-
         private readonly GraphicsDeviceManager _graphicsManager;
         private readonly GraphicsDevice _graphics;
         private readonly KingdomShader _shader;
+        private readonly Texture2D _whiteTexture;
         private bool _showBobs;
-        private bool _showMapCollisions;
-        private bool _showCameraCollisions;
-        private bool _showLightCollisions;
-        private VertexBuffer _vbMapCollision;
-        private VertexBuffer _vbCameraCollision;
-        private VertexBuffer _vbLightCollision;
+        private CollisionModel _mapCollision;
+        private CollisionModel _cameraCollision;
+        private CollisionModel _lightCollision;
 
         public Camera Camera { get; }
 
@@ -96,20 +82,20 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool? ShowMapCollision
         {
-            get => CharacterCollision != null ? (bool?)_showMapCollisions : null;
-            set => _showMapCollisions = value ?? false;
+            get => _mapCollision != null ? (bool?)_mapCollision.IsVisible : null;
+            set => _mapCollision.IsVisible = value ?? false;
         }
 
         public bool? ShowCameraCollision
         {
-            get => CameraCollision != null ? (bool?)_showCameraCollisions : null;
-            set => _showCameraCollisions = value ?? false;
+            get => _cameraCollision != null ? (bool?)_cameraCollision.IsVisible : null;
+            set => _cameraCollision.IsVisible = value ?? false;
         }
 
         public bool? ShowLightCollision
         {
-            get => LightCollision != null ? (bool?)_showLightCollisions : null;
-            set => _showLightCollisions = value ?? false;
+            get => _lightCollision != null ? (bool?)_lightCollision.IsVisible : null;
+            set => _lightCollision.IsVisible = value ?? false;
         }
 
         internal List<Bar.Entry> MapBarEntries { get; private set; }
@@ -117,9 +103,6 @@ namespace OpenKh.Tools.Kh2MapStudio
         internal List<MeshGroupModel> MapMeshGroups { get; }
         internal List<MeshGroupModel> BobMeshGroups { get; }
         internal List<BobDescriptor> BobDescriptors { get; }
-        internal Coct CharacterCollision { get; private set; }
-        internal Coct CameraCollision { get; private set; }
-        internal Coct LightCollision { get; private set; }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
@@ -134,6 +117,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                 CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
+
+            _whiteTexture = new Texture2D(_graphics, 2, 2);
+            _whiteTexture.SetData(Enumerable.Range(0, 2 * 2 * sizeof(int)).Select(_ => (byte)0xff).ToArray());
         }
 
         public void OpenMap(string fileName)
@@ -160,32 +146,23 @@ namespace OpenKh.Tools.Kh2MapStudio
                 BobMeshGroups.Add(new MeshGroupModel(_graphics, "BOB", model, textures, i));
             }
 
-            var characterCollisionEntry = MapBarEntries
+            var mapCollisionEntry = MapBarEntries
                 .Where(x => x.Name.StartsWith("ID_") && x.Type == Bar.EntryType.MapCollision)
                 .FirstOrDefault();
-            if (characterCollisionEntry != null)
-            {
-                CharacterCollision = Coct.Read(characterCollisionEntry.Stream);
-                _vbMapCollision = CreateVertexBufferForCollision(CharacterCollision);
-            }
+            if (mapCollisionEntry != null)
+                _mapCollision = new CollisionModel(Coct.Read(mapCollisionEntry.Stream));
 
             var cameraCollisionEntry = MapBarEntries
                 .Where(x => x.Name.StartsWith("CH_") && x.Type == Bar.EntryType.CameraCollision)
                 .FirstOrDefault();
             if (cameraCollisionEntry != null)
-            {
-                CameraCollision = Coct.Read(cameraCollisionEntry.Stream);
-                _vbCameraCollision = CreateVertexBufferForCollision(CameraCollision);
-            }
+                _cameraCollision = new CollisionModel(Coct.Read(cameraCollisionEntry.Stream));
 
             var lightCollisionEntry = MapBarEntries
                 .Where(x => x.Name == "COL_" && x.Type == Bar.EntryType.LightData)
                 .FirstOrDefault();
             if (lightCollisionEntry != null)
-            {
-                LightCollision = Coct.Read(lightCollisionEntry.Stream);
-                _vbLightCollision = CreateVertexBufferForCollision(LightCollision);
-            }
+                _lightCollision = new CollisionModel(Coct.Read(lightCollisionEntry.Stream));
         }
 
         public void SaveMap(string fileName)
@@ -224,9 +201,9 @@ namespace OpenKh.Tools.Kh2MapStudio
             BobMeshGroups.Clear();
             BobDescriptors.Clear();
 
-            _vbMapCollision?.Dispose();
-            _vbCameraCollision?.Dispose();
-            _vbLightCollision?.Dispose();
+            _mapCollision?.Dispose();
+            _cameraCollision?.Dispose();
+            _lightCollision?.Dispose();
         }
 
         public void Update(float deltaTime)
@@ -257,12 +234,10 @@ namespace OpenKh.Tools.Kh2MapStudio
                 foreach (var mesh in MapMeshGroups.Where(x => x.IsVisible))
                     RenderMeshNew(pass, mesh.MeshGroup, false);
 
-                if (_showMapCollisions && _vbMapCollision != null)
-                    DrawVertexBuffer(_vbMapCollision);
-                if (_showCameraCollisions && _vbCameraCollision != null)
-                    DrawVertexBuffer(_vbCameraCollision);
-                if (_showLightCollisions && _vbLightCollision != null)
-                    DrawVertexBuffer(_vbLightCollision);
+                _shader.SetRenderTexture(pass, _whiteTexture);
+                _mapCollision?.Draw(_graphics);
+                _cameraCollision.Draw(_graphics);
+                _lightCollision?.Draw(_graphics);
 
                 if (_showBobs)
                 {
@@ -284,9 +259,6 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         private void DrawVertexBuffer(VertexBuffer vb)
         {
-            _graphics.SetVertexBuffer(vb);
-            _graphics.DrawPrimitives(PrimitiveType.TriangleList, 0, vb.VertexCount);
-            _graphics.SetVertexBuffer(null);
         }
 
         private void RenderMeshNew(EffectPass pass, MeshGroup mesh, bool passRenderOpaque)
@@ -376,70 +348,6 @@ namespace OpenKh.Tools.Kh2MapStudio
             var model = Mdlx.Read(modelEntry.Stream);
             var textures = ModelTexture.Read(textureEntry.Stream).Images;
             MapMeshGroups.Add(new MeshGroupModel(_graphics, componentName, model, textures, 0));
-        }
-
-        private VertexBuffer CreateVertexBufferForCollision(Coct rawCoct)
-        {
-            var vertices = new List<VertexPositionColorTexture>();
-
-            var paletteIndex = 0;
-            var coct = new CoctLogical(rawCoct);
-            for (int i1 = 0; i1 < coct.CollisionMeshGroupList.Count; i1++)
-            {
-                var c1 = coct.CollisionMeshGroupList[i1];
-                foreach (var c2 in c1.Meshes)
-                {
-                    var color = ColorPalette[paletteIndex++ % ColorPalette.Length];
-                    foreach (var c3 in c2.Items)
-                    {
-                        var v1 = coct.VertexList[c3.Vertex1];
-                        var v2 = coct.VertexList[c3.Vertex2];
-                        var v3 = coct.VertexList[c3.Vertex3];
-
-                        if (c3.Vertex4 >= 0)
-                        {
-                            var v4 = coct.VertexList[c3.Vertex4];
-                            vertices.AddRange(GenerateVertex(
-                                color,
-                                v1.X, v1.Y, v1.Z,
-                                v2.X, v2.Y, v2.Z,
-                                v3.X, v3.Y, v3.Z,
-                                v1.X, v1.Y, v1.Z,
-                                v3.X, v3.Y, v3.Z,
-                                v4.X, v4.Y, v4.Z));
-                        }
-                        else
-                        {
-                            vertices.AddRange(GenerateVertex(
-                                color,
-                                v1.X, v1.Y, v1.Z,
-                                v2.X, v2.Y, v2.Z,
-                                v3.X, v3.Y, v3.Z));
-                        }
-                    }
-                }
-            }
-
-            var vb = new VertexBuffer(
-                _graphics,
-                VertexPositionColorTexture.VertexDeclaration,
-                vertices.Count,
-                BufferUsage.WriteOnly);
-            vb.SetData(vertices.ToArray());
-
-            return vb;
-        }
-
-        private static IEnumerable<VertexPositionColorTexture> GenerateVertex(Color color, params float[] n)
-        {
-            for (var i = 0; i < n.Length - 2; i += 3)
-            {
-                yield return new VertexPositionColorTexture
-                {
-                    Position = new Vector3 { X = n[i], Y = -n[i + 1], Z = -n[i + 2] },
-                    Color = color
-                };
-            }
         }
     }
 }
