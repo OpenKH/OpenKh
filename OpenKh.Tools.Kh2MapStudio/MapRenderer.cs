@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows.Controls;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
@@ -31,10 +30,24 @@ namespace OpenKh.Tools.Kh2MapStudio
             IndependentBlendEnable = false
         };
 
+        private static readonly Color[] ColorPalette = new Color[]
+        {
+            Color.Red,
+            Color.Green,
+            Color.Blue,
+            Color.Green,
+            Color.Blue,
+            Color.Yellow,
+            Color.Cyan,
+            Color.Fuchsia,
+        };
+
         private readonly GraphicsDeviceManager _graphicsManager;
         private readonly GraphicsDevice _graphics;
         private readonly KingdomShader _shader;
         private bool _showBobs;
+        private bool _showCollisions;
+        private VertexBuffer _vbMapCollision;
 
         public Camera Camera { get; }
 
@@ -76,11 +89,19 @@ namespace OpenKh.Tools.Kh2MapStudio
             get => BobDescriptors.Any() ? (bool?)_showBobs : null;
             set => _showBobs = value ?? true;
         }
-        public List<Bar.Entry> MapBarEntries { get; private set; }
-        public List<Bar.Entry> ArdBarEntries { get; private set; }
+
+        public bool? ShowMapCollision
+        {
+            get => CharacterCollision != null ? (bool?)_showCollisions : null;
+            set => _showCollisions = value ?? false;
+        }
+
+        internal List<Bar.Entry> MapBarEntries { get; private set; }
+        internal List<Bar.Entry> ArdBarEntries { get; private set; }
         internal List<MeshGroupModel> MapMeshGroups { get; }
         internal List<MeshGroupModel> BobMeshGroups { get; }
-        public List<BobDescriptor> BobDescriptors { get; }
+        internal List<BobDescriptor> BobDescriptors { get; }
+        internal Coct CharacterCollision { get; private set; }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
@@ -120,6 +141,15 @@ namespace OpenKh.Tools.Kh2MapStudio
                 var textures = ModelTexture.Read(bobTexture[i].Stream).Images;
                 BobMeshGroups.Add(new MeshGroupModel(_graphics, "BOB", model, textures, i));
             }
+
+            var characterCollisionEntry = MapBarEntries
+                .Where(x => x.Name.StartsWith("ID_") && x.Type == Bar.EntryType.MapCollision)
+                .FirstOrDefault();
+            if (characterCollisionEntry != null)
+            {
+                CharacterCollision = Coct.Read(characterCollisionEntry.Stream);
+                _vbMapCollision = CreateVertexBufferForCollision(CharacterCollision);
+            }
         }
 
         public void SaveMap(string fileName)
@@ -150,6 +180,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         public void Close()
         {
             _showBobs = true;
+            _showCollisions = true;
 
             foreach (var meshGroup in MapMeshGroups)
                 meshGroup?.Dispose();
@@ -159,6 +190,8 @@ namespace OpenKh.Tools.Kh2MapStudio
                 meshGroup?.Dispose();
             BobMeshGroups.Clear();
             BobDescriptors.Clear();
+
+            _vbMapCollision?.Dispose();
         }
 
         public void Update(float deltaTime)
@@ -189,6 +222,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                 foreach (var mesh in MapMeshGroups.Where(x => x.IsVisible))
                     RenderMeshNew(pass, mesh.MeshGroup, false);
 
+                if (_showCollisions && _vbMapCollision != null)
+                    DrawVertexBuffer(_vbMapCollision);
+
                 if (_showBobs)
                 {
                     foreach (var entity in BobDescriptors ?? new List<BobDescriptor>())
@@ -205,6 +241,13 @@ namespace OpenKh.Tools.Kh2MapStudio
                     }
                 }
             });
+        }
+
+        private void DrawVertexBuffer(VertexBuffer vb)
+        {
+            _graphics.SetVertexBuffer(vb);
+            _graphics.DrawPrimitives(PrimitiveType.TriangleList, 0, vb.VertexCount);
+            _graphics.SetVertexBuffer(null);
         }
 
         private void RenderMeshNew(EffectPass pass, MeshGroup mesh, bool passRenderOpaque)
@@ -294,6 +337,70 @@ namespace OpenKh.Tools.Kh2MapStudio
             var model = Mdlx.Read(modelEntry.Stream);
             var textures = ModelTexture.Read(textureEntry.Stream).Images;
             MapMeshGroups.Add(new MeshGroupModel(_graphics, componentName, model, textures, 0));
+        }
+
+        private VertexBuffer CreateVertexBufferForCollision(Coct rawCoct)
+        {
+            var vertices = new List<VertexPositionColorTexture>();
+
+            var paletteIndex = 0;
+            var coct = new CoctLogical(rawCoct);
+            for (int i1 = 0; i1 < coct.CollisionMeshGroupList.Count; i1++)
+            {
+                var c1 = coct.CollisionMeshGroupList[i1];
+                foreach (var c2 in c1.Meshes)
+                {
+                    var color = ColorPalette[paletteIndex++ % ColorPalette.Length];
+                    foreach (var c3 in c2.Items)
+                    {
+                        var v1 = coct.VertexList[c3.Vertex1];
+                        var v2 = coct.VertexList[c3.Vertex2];
+                        var v3 = coct.VertexList[c3.Vertex3];
+
+                        if (c3.Vertex4 >= 0)
+                        {
+                            var v4 = coct.VertexList[c3.Vertex4];
+                            vertices.AddRange(GenerateVertex(
+                                color,
+                                v1.X, v1.Y, v1.Z,
+                                v2.X, v2.Y, v2.Z,
+                                v3.X, v3.Y, v3.Z,
+                                v1.X, v1.Y, v1.Z,
+                                v3.X, v3.Y, v3.Z,
+                                v4.X, v4.Y, v4.Z));
+                        }
+                        else
+                        {
+                            vertices.AddRange(GenerateVertex(
+                                color,
+                                v1.X, v1.Y, v1.Z,
+                                v2.X, v2.Y, v2.Z,
+                                v3.X, v3.Y, v3.Z));
+                        }
+                    }
+                }
+            }
+
+            var vb = new VertexBuffer(
+                _graphics,
+                VertexPositionColorTexture.VertexDeclaration,
+                vertices.Count,
+                BufferUsage.WriteOnly);
+            vb.SetData(vertices.ToArray());
+
+            return vb;
+        }
+
+        private static IEnumerable<VertexPositionColorTexture> GenerateVertex(Color color, params float[] n)
+        {
+            for (var i = 0; i < n.Length - 2; i += 3)
+            {
+                yield return new VertexPositionColorTexture
+                {
+                    Position = new Vector3 { X = n[i], Y = -n[i + 1], Z = -n[i + 2] },
+                    Color = color
+                };
+            }
         }
     }
 }

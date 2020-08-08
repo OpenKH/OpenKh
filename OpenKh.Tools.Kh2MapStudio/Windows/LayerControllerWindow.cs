@@ -15,6 +15,8 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                 ForEdit("Show SK1", () => layerController.ShowSk1.Value, x => layerController.ShowSk1 = x);
             if (layerController.ShowBobs.HasValue)
                 ForEdit("Show BOBs", () => layerController.ShowBobs.Value, x => layerController.ShowBobs = x);
+            if (layerController.ShowMapCollision.HasValue)
+                ForEdit("Show map collisions", () => layerController.ShowMapCollision.Value, x => layerController.ShowMapCollision = x);
         });
     }
 }
