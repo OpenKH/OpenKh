@@ -35,9 +35,6 @@ namespace OpenKh.Tools.Kh2MapStudio
         private readonly KingdomShader _shader;
         private readonly Texture2D _whiteTexture;
         private bool _showBobs;
-        private CollisionModel _mapCollision;
-        private CollisionModel _cameraCollision;
-        private CollisionModel _lightCollision;
 
         public Camera Camera { get; }
 
@@ -82,20 +79,20 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public bool? ShowMapCollision
         {
-            get => _mapCollision != null ? (bool?)_mapCollision.IsVisible : null;
-            set => _mapCollision.IsVisible = value ?? false;
+            get => MapCollision != null ? (bool?)MapCollision.IsVisible : null;
+            set => MapCollision.IsVisible = value ?? false;
         }
 
         public bool? ShowCameraCollision
         {
-            get => _cameraCollision != null ? (bool?)_cameraCollision.IsVisible : null;
-            set => _cameraCollision.IsVisible = value ?? false;
+            get => CameraCollision != null ? (bool?)CameraCollision.IsVisible : null;
+            set => CameraCollision.IsVisible = value ?? false;
         }
 
         public bool? ShowLightCollision
         {
-            get => _lightCollision != null ? (bool?)_lightCollision.IsVisible : null;
-            set => _lightCollision.IsVisible = value ?? false;
+            get => LightCollision != null ? (bool?)LightCollision.IsVisible : null;
+            set => LightCollision.IsVisible = value ?? false;
         }
 
         internal List<Bar.Entry> MapBarEntries { get; private set; }
@@ -103,6 +100,9 @@ namespace OpenKh.Tools.Kh2MapStudio
         internal List<MeshGroupModel> MapMeshGroups { get; }
         internal List<MeshGroupModel> BobMeshGroups { get; }
         internal List<BobDescriptor> BobDescriptors { get; }
+        internal CollisionModel MapCollision { get; set; }
+        internal CollisionModel CameraCollision { get; set; }
+        internal CollisionModel LightCollision { get; set; }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
@@ -150,19 +150,19 @@ namespace OpenKh.Tools.Kh2MapStudio
                 .Where(x => x.Name.StartsWith("ID_") && x.Type == Bar.EntryType.MapCollision)
                 .FirstOrDefault();
             if (mapCollisionEntry != null)
-                _mapCollision = new CollisionModel(Coct.Read(mapCollisionEntry.Stream));
+                MapCollision = new CollisionModel(Coct.Read(mapCollisionEntry.Stream));
 
             var cameraCollisionEntry = MapBarEntries
                 .Where(x => x.Name.StartsWith("CH_") && x.Type == Bar.EntryType.CameraCollision)
                 .FirstOrDefault();
             if (cameraCollisionEntry != null)
-                _cameraCollision = new CollisionModel(Coct.Read(cameraCollisionEntry.Stream));
+                CameraCollision = new CollisionModel(Coct.Read(cameraCollisionEntry.Stream));
 
             var lightCollisionEntry = MapBarEntries
                 .Where(x => x.Name == "COL_" && x.Type == Bar.EntryType.LightData)
                 .FirstOrDefault();
             if (lightCollisionEntry != null)
-                _lightCollision = new CollisionModel(Coct.Read(lightCollisionEntry.Stream));
+                LightCollision = new CollisionModel(Coct.Read(lightCollisionEntry.Stream));
         }
 
         public void SaveMap(string fileName)
@@ -201,9 +201,9 @@ namespace OpenKh.Tools.Kh2MapStudio
             BobMeshGroups.Clear();
             BobDescriptors.Clear();
 
-            _mapCollision?.Dispose();
-            _cameraCollision?.Dispose();
-            _lightCollision?.Dispose();
+            MapCollision?.Dispose();
+            CameraCollision?.Dispose();
+            LightCollision?.Dispose();
         }
 
         public void Update(float deltaTime)
@@ -235,9 +235,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                     RenderMeshNew(pass, mesh.MeshGroup, false);
 
                 _shader.SetRenderTexture(pass, _whiteTexture);
-                _mapCollision?.Draw(_graphics);
-                _cameraCollision.Draw(_graphics);
-                _lightCollision?.Draw(_graphics);
+                MapCollision?.Draw(_graphics);
+                CameraCollision.Draw(_graphics);
+                LightCollision?.Draw(_graphics);
 
                 if (_showBobs)
                 {
@@ -255,10 +255,6 @@ namespace OpenKh.Tools.Kh2MapStudio
                     }
                 }
             });
-        }
-
-        private void DrawVertexBuffer(VertexBuffer vb)
-        {
         }
 
         private void RenderMeshNew(EffectPass pass, MeshGroup mesh, bool passRenderOpaque)

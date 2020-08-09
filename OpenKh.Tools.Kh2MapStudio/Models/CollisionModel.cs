@@ -43,6 +43,8 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
 
         public Coct Coct { get; }
 
+        public Assimp.Scene Scene => GetScene(Coct);
+
         public bool IsVisible { get; set; }
 
         public void Dispose()
@@ -64,26 +66,108 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
             graphics.SetVertexBuffer(null);
         }
 
-        private VertexBuffer CreateVertexBufferForCollision(GraphicsDevice graphics, Coct rawCoct)
+        private static VertexBuffer CreateVertexBufferForCollision(GraphicsDevice graphics, Coct rawCoct)
         {
-            var vertices = new List<VertexPositionColorTexture>();
+            var vb = new VertexBuffer(
+                graphics,
+                VertexPositionColorTexture.VertexDeclaration,
+                GetVertices(rawCoct).Count,
+                BufferUsage.WriteOnly);
+            vb.SetData(GetVertices(rawCoct).ToArray());
 
+            return vb;
+        }
+
+        private static Assimp.Scene GetScene(Coct rawCoct)
+        {
+            var scene = new Assimp.Scene();
+            scene.RootNode = new Assimp.Node("root");
             var coct = new CoctLogical(rawCoct);
+
+            for (int i = 0; i < coct.CollisionMeshGroupList.Count; i++)
+            {
+                var j = 0;
+                var meshGroup = coct.CollisionMeshGroupList[i];
+                foreach (var mesh in meshGroup.Meshes)
+                {
+                    var faceIndex = 0;
+                    var sceneMesh = new Assimp.Mesh($"Mesh{i}_{j}", Assimp.PrimitiveType.Triangle);
+
+                    foreach (var item in mesh.Items)
+                    {
+                        var color = ColorPalette[item.Co5Index % ColorPalette.Length];
+                        var v1 = coct.VertexList[item.Vertex1];
+                        var v2 = coct.VertexList[item.Vertex2];
+                        var v3 = coct.VertexList[item.Vertex3];
+
+                        List<VertexPositionColorTexture> vertices;
+                        if (item.Vertex4 >= 0)
+                        {
+                            var v4 = coct.VertexList[item.Vertex4];
+                            vertices = GenerateVertex(
+                                color,
+                                v1.X, v1.Y, v1.Z,
+                                v2.X, v2.Y, v2.Z,
+                                v3.X, v3.Y, v3.Z,
+                                v1.X, v1.Y, v1.Z,
+                                v3.X, v3.Y, v3.Z,
+                                v4.X, v4.Y, v4.Z).ToList();
+                            sceneMesh.Faces.Add(new Assimp.Face(new int[]
+                            {
+                                faceIndex++, faceIndex++, faceIndex++,
+                                faceIndex++, faceIndex++, faceIndex++
+                            }));
+                        }
+                        else
+                        {
+                            vertices = GenerateVertex(
+                                color,
+                                v1.X, v1.Y, v1.Z,
+                                v2.X, v2.Y, v2.Z,
+                                v3.X, v3.Y, v3.Z).ToList();
+                            sceneMesh.Faces.Add(new Assimp.Face(new int[]
+                            {
+                                faceIndex++, faceIndex++, faceIndex++
+                            }));
+                        }
+
+                        sceneMesh.Vertices.AddRange(vertices
+                            .Select(x => new Assimp.Vector3D
+                            {
+                                X = x.Position.X,
+                                Y = x.Position.Y,
+                                Z = x.Position.Z,
+                            }));
+                    }
+
+                    j++;
+                    scene.Meshes.Add(sceneMesh);
+                }
+            }
+
+            scene.RootNode.MeshIndices.AddRange(Enumerable.Range(0, scene.MeshCount));
+            return scene;
+        }
+
+        private static List<VertexPositionColorTexture> GetVertices(Coct rawCoct)
+        {
+            var coct = new CoctLogical(rawCoct);
+            var vertices = new List<VertexPositionColorTexture>();
             for (int i1 = 0; i1 < coct.CollisionMeshGroupList.Count; i1++)
             {
-                var c1 = coct.CollisionMeshGroupList[i1];
-                foreach (var c2 in c1.Meshes)
+                var meshGroup = coct.CollisionMeshGroupList[i1];
+                foreach (var mesh in meshGroup.Meshes)
                 {
-                    foreach (var c3 in c2.Items)
+                    foreach (var item in mesh.Items)
                     {
-                        var color = ColorPalette[c3.Co5Index % ColorPalette.Length];
-                        var v1 = coct.VertexList[c3.Vertex1];
-                        var v2 = coct.VertexList[c3.Vertex2];
-                        var v3 = coct.VertexList[c3.Vertex3];
+                        var color = ColorPalette[item.Co5Index % ColorPalette.Length];
+                        var v1 = coct.VertexList[item.Vertex1];
+                        var v2 = coct.VertexList[item.Vertex2];
+                        var v3 = coct.VertexList[item.Vertex3];
 
-                        if (c3.Vertex4 >= 0)
+                        if (item.Vertex4 >= 0)
                         {
-                            var v4 = coct.VertexList[c3.Vertex4];
+                            var v4 = coct.VertexList[item.Vertex4];
                             vertices.AddRange(GenerateVertex(
                                 color,
                                 v1.X, v1.Y, v1.Z,
@@ -105,14 +189,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
                 }
             }
 
-            var vb = new VertexBuffer(
-                graphics,
-                VertexPositionColorTexture.VertexDeclaration,
-                vertices.Count,
-                BufferUsage.WriteOnly);
-            vb.SetData(vertices.ToArray());
-
-            return vb;
+            return vertices;
         }
 
         private static IEnumerable<VertexPositionColorTexture> GenerateVertex(Color color, params float[] n)

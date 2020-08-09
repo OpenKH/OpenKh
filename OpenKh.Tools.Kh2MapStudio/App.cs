@@ -11,6 +11,7 @@ using System.Numerics;
 using System.Windows;
 using Xe.Tools.Wpf.Dialogs;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
+using Assimp;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
@@ -23,6 +24,10 @@ namespace OpenKh.Tools.Kh2MapStudio
         private static readonly List<FileDialogFilter> ArdFilter =
             FileDialogFilterComposer.Compose()
             .AddExtensions("ARD file", "ard")
+            .AddAllFiles();
+        private static readonly List<FileDialogFilter> DaeFilter =
+            FileDialogFilterComposer.Compose()
+            .AddExtensions("DAE file (Collada)", "dae")
             .AddAllFiles();
 
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
@@ -172,6 +177,13 @@ namespace OpenKh.Tools.Kh2MapStudio
                     ForMenuItem("Save map as...", MenuFileSaveMapAs, IsOpen);
                     ForMenuItem("Save ard as...", MenuFileSaveArdAs, IsOpen);
                     ImGui.Separator();
+                    ForMenu("Export", () =>
+                    {
+                        ForMenuItem("Map Collision", ExportMapCollision, _mapRenderer.ShowMapCollision.HasValue);
+                        ForMenuItem("Camera Collision", ExportCameraCollision, _mapRenderer.ShowCameraCollision.HasValue);
+                        ForMenuItem("Light Collision", ExportLightCollision, _mapRenderer.ShowLightCollision.HasValue);
+                    });
+                    ImGui.Separator();
                     ForMenu("Preferences", () =>
                     {
                     });
@@ -207,8 +219,22 @@ namespace OpenKh.Tools.Kh2MapStudio
             FileDialog.OnSave(_mapRenderer.SaveArd, ArdFilter, defaultName);
         }
 
-        private void MenuFileExit() => _exitFlag = true;
+        private void ExportMapCollision() => FileDialog.OnSave(fileName =>
+        {
+            ExportScene(fileName, _mapRenderer.MapCollision.Scene);
+        }, DaeFilter, $"{MapName}_map-collision.dae");
 
+        private void ExportCameraCollision() => FileDialog.OnSave(fileName =>
+        {
+            ExportScene(fileName, _mapRenderer.CameraCollision.Scene);
+        }, DaeFilter, $"{MapName}_camera-collision.dae");
+
+        private void ExportLightCollision() => FileDialog.OnSave(fileName =>
+        {
+            ExportScene(fileName, _mapRenderer.LightCollision.Scene);
+        }, DaeFilter, $"{MapName}_light-collision.dae");
+
+        private void MenuFileExit() => _exitFlag = true;
 
         public void OpenFolder(string gamePath)
         {
@@ -310,6 +336,27 @@ namespace OpenKh.Tools.Kh2MapStudio
             }
 
             _previousMousePosition = mouse.Position;
+        }
+
+        private static void ExportScene(string fileName, Scene scene)
+        {
+            using var ctx = new AssimpContext();
+            var extension = Path.GetExtension(fileName).ToLower();
+            var exportFormat = ctx.GetSupportedExportFormats();
+            foreach (var format in exportFormat)
+            {
+                if ($".{format.FileExtension}" == extension)
+                {
+                    var material = new Material();
+                    material.Clear();
+
+                    scene.Materials.Add(material);
+                    ctx.ExportFile(scene, fileName, format.FormatId);
+                    return;
+                }
+            }
+
+            ShowError($"Unable to export with '{extension}' extension.");
         }
 
         public static void ShowError(string message, string title = "Error") =>
