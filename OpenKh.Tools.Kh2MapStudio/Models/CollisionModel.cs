@@ -80,6 +80,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
 
         private static Assimp.Scene GetScene(Coct rawCoct)
         {
+            var color = new Color(1f, 1f, 1f, 1f);
             var scene = new Assimp.Scene();
             scene.RootNode = new Assimp.Node("root");
             var coct = new CoctLogical(rawCoct);
@@ -95,7 +96,6 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
 
                     foreach (var item in mesh.Items)
                     {
-                        var color = ColorPalette[item.Co5Index % ColorPalette.Length];
                         var v1 = coct.VertexList[item.Vertex1];
                         var v2 = coct.VertexList[item.Vertex2];
                         var v3 = coct.VertexList[item.Vertex3];
@@ -160,7 +160,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
                 {
                     foreach (var item in mesh.Items)
                     {
-                        var color = ColorPalette[item.Co5Index % ColorPalette.Length];
+                        var color = ColorPalette[(int)Math.Abs((item.PlaneD * ColorPalette.Length)) % ColorPalette.Length];
                         var v1 = coct.VertexList[item.Vertex1];
                         var v2 = coct.VertexList[item.Vertex2];
                         var v3 = coct.VertexList[item.Vertex3];

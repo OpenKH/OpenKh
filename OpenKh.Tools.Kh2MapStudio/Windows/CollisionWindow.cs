@@ -28,28 +28,22 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                 Node(coct, node.Child7);
                 Node(coct, node.Child8);
 
-                for (int i = node.CollisionMeshStart; i < node.CollisionMeshEnd; i++)
+                foreach (var mesh in node.Meshes)
                 {
-                    ForTreeNode($"Mesh {i}", () =>
+                    ForTreeNode($"Mesh {mesh.GetHashCode()}", () =>
                     {
-                        var mesh = coct.CollisionMeshList[i];
                         ImGui.Text($"Box {mesh.BoundingBox}");
                         ImGui.Text($"Unk10 {mesh.v10}");
                         ImGui.Text($"Unk12 {mesh.v12}");
 
-                        for (int j = mesh.CollisionStart; j < mesh.CollisionEnd; j++)
+                        foreach (var collision in mesh.Collisions)
                         {
-                            ForTreeNode($"Collision {j}", () =>
+                            ForTreeNode($"Collision {collision.GetHashCode()}", () =>
                             {
-                                var collision = coct.CollisionList[j];
                                 ImGui.Text($"Unk00 {collision.v00}");
-                                ImGui.Text($"Plane {collision.PlaneIndex}");
-                                ImGui.Text($"Bound Box {collision.BoundingBoxIndex}");
-                                ImGui.Text($"Flags {collision.SurfaceFlagsIndex}");
-
-                                var plane = coct.PlaneList[collision.PlaneIndex];
-                                var bbox = coct.BoundingBoxList[collision.BoundingBoxIndex];
-                                var flags = coct.SurfaceFlagsList[collision.SurfaceFlagsIndex];
+                                ImGui.Text($"Plane {collision.Plane}");
+                                ImGui.Text($"Bound Box {collision.BoundingBox}");
+                                ImGui.Text($"Flags {collision.SurfaceFlags:X08}");
                             });
                         }
                     });
