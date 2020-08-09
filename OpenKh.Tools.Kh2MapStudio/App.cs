@@ -86,6 +86,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             _mapRenderer = new MapRenderer(bootstrap.Content, bootstrap.GraphicsDeviceManager);
             AddKeyMapping(Keys.O, MenuFileOpen);
             AddKeyMapping(Keys.S, MenuFileSave);
+            AddKeyMapping(Keys.Q, MenuFileUnload);
             OpenFolder(@"D:\Hacking\KH2\export_fm");
             
             ImGui.PushStyleColor(ImGuiCol.MenuBarBg, BgUiColor);
@@ -164,6 +165,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                 ForMenu("File", () =>
                 {
                     ForMenuItem("Open extracted game folder...", "CTRL+O", MenuFileOpen);
+                    ForMenuItem("Unload current map+ard", "CTRL+Q", MenuFileUnload, IsOpen);
+                    ForMenuItem("Import extern MAP file", MenuFileOpenMap);
+                    ForMenuItem("Import extern ARD file", MenuFileOpenArd);
                     ForMenuItem("Save map+ard", "CTRL+S", MenuFileSave, IsOpen);
                     ForMenuItem("Save map as...", MenuFileSaveMapAs, IsOpen);
                     ForMenuItem("Save ard as...", MenuFileSaveArdAs, IsOpen);
@@ -182,6 +186,9 @@ namespace OpenKh.Tools.Kh2MapStudio
         }
 
         private void MenuFileOpen() => FileDialog.OnFolder(OpenFolder);
+        private void MenuFileUnload() => _mapRenderer.Close();
+        private void MenuFileOpenMap() => FileDialog.OnOpen(_mapRenderer.OpenMap, MapFilter);
+        private void MenuFileOpenArd() => FileDialog.OnOpen(_mapRenderer.OpenArd, ArdFilter);
 
         private void MenuFileSave()
         {
