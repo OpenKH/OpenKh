@@ -243,7 +243,8 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public void Draw()
         {
-            Camera.AspectRatio = _graphicsManager.PreferredBackBufferWidth / (float)_graphicsManager.PreferredBackBufferHeight;
+            var viewport = _graphics.Viewport;
+            Camera.AspectRatio = viewport.Width / (float)viewport.Height;
 
             _graphics.RasterizerState = new RasterizerState()
             {
