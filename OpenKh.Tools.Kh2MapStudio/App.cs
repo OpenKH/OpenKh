@@ -46,6 +46,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         private string _mapPath;
         private string _objPath;
         private List<string> _mapList = new List<string>();
+        private ObjEntryController _objEntryController;
 
         private xna.Point _previousMousePosition;
 
@@ -66,6 +67,14 @@ namespace OpenKh.Tools.Kh2MapStudio
                 _gamePath = value;
                 UpdateTitle();
                 EnumerateMapList();
+
+                _objEntryController?.Dispose();
+                _objEntryController = new ObjEntryController(
+                    _bootstrap.GraphicsDevice,
+                    _objPath,
+                    Path.Combine(_gamePath, "00objentry.bin"));
+                _mapRenderer.ObjEntryController = _objEntryController;
+
             }
         }
 
@@ -124,6 +133,7 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public void Dispose()
         {
+            _objEntryController?.Dispose();
         }
 
         private void MainWindow()
@@ -187,10 +197,6 @@ namespace OpenKh.Tools.Kh2MapStudio
                         ForMenuItem("Light Collision", ExportLightCollision, _mapRenderer.ShowLightCollision.HasValue);
                     });
                     ImGui.Separator();
-                    ForMenu("Preferences", () =>
-                    {
-                    });
-                    ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
                 });
                 ForMenu("Help", () =>
@@ -248,6 +254,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                     !Directory.Exists(_objPath = Path.Combine(gamePath, "obj")))
                     throw new DirectoryNotFoundException(
                         "The specified directory must contain the full extracted copy of the game.");
+
                 GamePath = gamePath;
             }
             catch (Exception ex)

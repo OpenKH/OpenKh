@@ -1,0 +1,69 @@
+﻿using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Common;
+using OpenKh.Engine.MonoGame;
+using OpenKh.Kh2;
+using OpenKh.Tools.Kh2MapStudio.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace OpenKh.Tools.Kh2MapStudio
+{
+    class ObjEntryController : IObjEntryController, IDisposable
+    {
+        private readonly Dictionary<int, MeshGroup> _meshGroups = new Dictionary<int, MeshGroup>();
+        private readonly Dictionary<string, int> _objEntryLookup;
+        private readonly Dictionary<int, string> _objEntryLookupReversed;
+        private readonly GraphicsDevice _graphics;
+        private BaseTable<Objentry> _objEntries;
+        private readonly string _objPath;
+
+        public ObjEntryController(GraphicsDevice graphics, string objPath, string objEntryFileName) :
+            this(File.OpenRead(objEntryFileName).Using(Objentry.Read))
+        {
+            _graphics = graphics;
+            _objPath = objPath;
+        }
+
+        public ObjEntryController(BaseTable<Objentry> objEntries)
+        {
+            _objEntries = objEntries;
+            _objEntryLookup = _objEntries
+                .ToDictionary(x => x.ModelName, x => (int)x.ObjectId);
+            _objEntryLookupReversed = _objEntries
+                .ToDictionary(x => (int)x.ObjectId, x => x.ModelName);
+        }
+
+        public IEnumerable<Objentry> ObjectEntries => _objEntries;
+
+        public void Dispose()
+        {
+            foreach (var meshGroup in _meshGroups)
+                foreach (var texture in meshGroup.Value.Textures)
+                    texture.Dispose();
+        }
+
+        public MeshGroup this[int objId]
+        {
+            get
+            {
+                if (_meshGroups.TryGetValue(objId, out var meshGroup))
+                    return meshGroup;
+
+                var objEntryName = _objEntryLookupReversed[objId];
+
+                var modelPath = Path.Combine(_objPath, objEntryName);
+                var mdlxEntries = File.OpenRead(modelPath).Using(Bar.Read);
+                var model = Mdlx.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.Model).Stream);
+                var textures = ModelTexture.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.ModelTexture).Stream);
+                meshGroup = MeshLoader.FromKH2(_graphics, model, textures);
+                _meshGroups[objId] = meshGroup;
+
+                return meshGroup;
+            }
+        }
+
+        public MeshGroup this[string objName] => this[_objEntryLookup[objName]];
+    }
+}

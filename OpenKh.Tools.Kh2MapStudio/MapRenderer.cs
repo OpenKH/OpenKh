@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Models;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
@@ -37,6 +38,8 @@ namespace OpenKh.Tools.Kh2MapStudio
         private bool _showBobs;
 
         public Camera Camera { get; }
+
+        public IObjEntryController ObjEntryController { get; set; }
 
         public bool? ShowMap
         {
@@ -103,6 +106,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         internal CollisionModel MapCollision { get; set; }
         internal CollisionModel CameraCollision { get; set; }
         internal CollisionModel LightCollision { get; set; }
+        internal List<SpawnPointModel> SpawnPoints { get; set; }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
@@ -183,10 +187,27 @@ namespace OpenKh.Tools.Kh2MapStudio
         public void OpenArd(string fileName)
         {
             ArdBarEntries = File.OpenRead(fileName).Using(Bar.Read);
+            SpawnPoints = ArdBarEntries
+                .Where(x => x.Type == Bar.EntryType.SpawnPoint && x.Stream.Length > 0)
+                .Select(x =>
+                new SpawnPointModel(ObjEntryController, x.Name, SpawnPoint.Read(x.Stream.SetPosition(0))))
+                .ToList();
         }
 
         public void SaveArd(string fileName)
         {
+            foreach (var spawnPointModel in SpawnPoints)
+            {
+                var memStream = new MemoryStream();
+                SpawnPoint.Write(memStream, spawnPointModel.SpawnPoints);
+
+                ArdBarEntries.AddOrReplace(new Bar.Entry
+                {
+                    Name = spawnPointModel.Name,
+                    Stream = memStream
+                });
+            }
+
             File.Create(fileName).Using(stream => Bar.Write(stream, ArdBarEntries));
         }
 

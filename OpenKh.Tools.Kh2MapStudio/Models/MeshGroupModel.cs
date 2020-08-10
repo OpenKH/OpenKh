@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.MonoGame;
-using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
