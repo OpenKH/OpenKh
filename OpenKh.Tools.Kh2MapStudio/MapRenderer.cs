@@ -298,6 +298,45 @@ namespace OpenKh.Tools.Kh2MapStudio
                                 Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
                             RenderMeshLegacy(pass, CurrentSpawnPoint.ObjEntryCtrl[entity.ObjectId]);
                         }
+
+                        _graphics.RasterizerState = new RasterizerState()
+                        {
+                            CullMode = CullMode.None
+                        };
+                        _shader.SetRenderTexture(pass, _whiteTexture);
+                        foreach (var item in spawnPoint.EventActivators)
+                        {
+                            _shader.ModelView = Matrix.CreateRotationX(item.RotationX) *
+                                Matrix.CreateRotationY(item.RotationY) *
+                                Matrix.CreateRotationZ(item.RotationZ) *
+                            Matrix.CreateScale(item.ScaleX, item.ScaleY, item.ScaleZ) *
+                                Matrix.CreateTranslation(item.PositionX, -item.PositionY, -item.PositionZ);
+                            pass.Apply();
+
+                            var color = new Color(1f, 0f, 0f, .5f);
+                            var texCoord = new Vector2();
+                            var vertices = new VertexPositionColorTexture[]
+                            {
+                                new VertexPositionColorTexture(new Vector3(-1, -1, -1), color, texCoord),
+                                new VertexPositionColorTexture(new Vector3(+1, -1, -1), color, texCoord),
+                                new VertexPositionColorTexture(new Vector3(+1, +1, -1), color, texCoord),
+                                new VertexPositionColorTexture(new Vector3(-1, +1, -1), color, texCoord),
+                                new VertexPositionColorTexture(new Vector3(-1, -1, +1), color, texCoord),
+                                new VertexPositionColorTexture(new Vector3(+1, -1, +1), color, texCoord),
+                                new VertexPositionColorTexture(new Vector3(+1, +1, +1), color, texCoord),
+                                new VertexPositionColorTexture(new Vector3(-1, +1, +1), color, texCoord),
+                            };
+                            var indices = new int[]
+                            {
+                                0, 1, 3, 3, 1, 2,
+                                1, 5, 2, 2, 5, 6,
+                                5, 4, 6, 6, 4, 7,
+                                4, 0, 7, 7, 0, 3,
+                                3, 2, 7, 7, 2, 6,
+                                4, 5, 0, 0, 5, 1
+                            };
+                            _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 8, indices, 0, 12);
+                        }
                     }
                 }
             });

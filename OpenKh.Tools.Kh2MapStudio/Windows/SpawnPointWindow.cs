@@ -135,7 +135,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                     item.ScaleX = x.X;
                     item.ScaleY = x.Y;
                     item.ScaleZ = x.Z;
-                }, 0.01f);
+                }, 1f);
 
             ForEdit3("Rotation", () =>
                 new Vector3(
