@@ -197,6 +197,9 @@ namespace OpenKh.Tools.Common.CustomImGui
                 setter(value);
         }
 
+        public static void ForEdit(string name, Func<byte> getter, Action<byte> setter) =>
+            ForEdit(name, () => (int)getter(), x => setter((byte)x));
+
         public static void ForEdit(string name, Func<short> getter, Action<short> setter) =>
             ForEdit(name, () => (int)getter(), x => setter((short)x));
 

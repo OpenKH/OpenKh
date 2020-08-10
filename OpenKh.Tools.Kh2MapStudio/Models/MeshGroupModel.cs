@@ -45,7 +45,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
             foreach (var texture in _kingdomTextures)
                 texture?.Dispose();
 
-            _kingdomTextures = Texture
+            _kingdomTextures = Texture?
                 .Select(texture => new KingdomTexture(texture, _graphics))
                 .ToArray() ?? new KingdomTexture[0];
 

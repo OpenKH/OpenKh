@@ -10,5 +10,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Interfaces
 
         MeshGroup this[int objId] { get; }
         MeshGroup this[string objName] { get; }
+
+        string GetName(int objectId);
     }
 }

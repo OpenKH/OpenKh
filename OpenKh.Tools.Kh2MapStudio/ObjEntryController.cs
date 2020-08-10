@@ -52,6 +52,8 @@ namespace OpenKh.Tools.Kh2MapStudio
                     texture.Dispose();
         }
 
+        public string GetName(int objectId) => _objEntryLookupReversed[objectId];
+
         public MeshGroup this[int objId]
         {
             get
