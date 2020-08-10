@@ -123,6 +123,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             CameraWindow.Run(_mapRenderer.Camera);
             //CollisionWindow.Run(_mapRenderer.);
             LayerControllerWindow.Run(_mapRenderer);
+            SpawnPointWindow.Run(_mapRenderer);
             MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
             BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
 

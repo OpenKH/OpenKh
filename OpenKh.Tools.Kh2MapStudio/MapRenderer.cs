@@ -16,7 +16,7 @@ using System.Linq;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
-    class MapRenderer : ILayerController
+    class MapRenderer : ILayerController, ISpawnPointController
     {
         private readonly static BlendState DefaultBlendState = new BlendState()
         {
@@ -98,7 +98,8 @@ namespace OpenKh.Tools.Kh2MapStudio
             set => LightCollision.IsVisible = value ?? false;
         }
 
-        internal List<Bar.Entry> MapBarEntries { get; private set; }
+
+        internal List<Bar.Entry> MapBarEntries { get; private set; } 
         internal List<Bar.Entry> ArdBarEntries { get; private set; }
         internal List<MeshGroupModel> MapMeshGroups { get; }
         internal List<MeshGroupModel> BobMeshGroups { get; }
@@ -106,7 +107,14 @@ namespace OpenKh.Tools.Kh2MapStudio
         internal CollisionModel MapCollision { get; set; }
         internal CollisionModel CameraCollision { get; set; }
         internal CollisionModel LightCollision { get; set; }
-        internal List<SpawnPointModel> SpawnPoints { get; set; }
+
+        public List<SpawnPointModel> SpawnPoints { get; private set; }
+        public SpawnPointModel CurrentSpawnPoint { get; private set; }
+        public string SelectSpawnPoint
+        {
+            get => CurrentSpawnPoint.Name;
+            set => CurrentSpawnPoint = SpawnPoints.FirstOrDefault(x => x.Name == value);
+        }
 
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
@@ -192,6 +200,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 .Select(x =>
                 new SpawnPointModel(ObjEntryController, x.Name, SpawnPoint.Read(x.Stream.SetPosition(0))))
                 .ToList();
+            SelectSpawnPoint = "m_00";
         }
 
         public void SaveArd(string fileName)
@@ -273,6 +282,21 @@ namespace OpenKh.Tools.Kh2MapStudio
                             Matrix.CreateScale(entity.ScalingX, entity.ScalingY, entity.ScalingZ) *
                             Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
                         RenderMeshLegacy(pass, BobMeshGroups[entity.BobIndex].MeshGroup);
+                    }
+                }
+
+                if (CurrentSpawnPoint != null)
+                {
+                    foreach (var spawnPoint in CurrentSpawnPoint.SpawnPoints)
+                    {
+                        foreach (var entity in spawnPoint.Entities)
+                        {
+                            _shader.ModelView = Matrix.CreateRotationX(entity.RotationX) *
+                                Matrix.CreateRotationY(entity.RotationY) *
+                                Matrix.CreateRotationZ(entity.RotationZ) *
+                                Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
+                            RenderMeshLegacy(pass, CurrentSpawnPoint.ObjEntryCtrl[entity.ObjectId]);
+                        }
                     }
                 }
             });

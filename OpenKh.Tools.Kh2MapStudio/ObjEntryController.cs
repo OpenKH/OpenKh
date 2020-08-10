@@ -12,6 +12,14 @@ namespace OpenKh.Tools.Kh2MapStudio
 {
     class ObjEntryController : IObjEntryController, IDisposable
     {
+        private static readonly MeshGroup EmptyMeshGroup = new MeshGroup
+        {
+            Parts = new MeshGroup.Part[0],
+            Segments = new MeshGroup.Segment[0],
+            Textures = new KingdomTexture[0],
+            MeshDescriptors = new List<MeshDesc>(0)
+        };
+
         private readonly Dictionary<int, MeshGroup> _meshGroups = new Dictionary<int, MeshGroup>();
         private readonly Dictionary<string, int> _objEntryLookup;
         private readonly Dictionary<int, string> _objEntryLookupReversed;
@@ -54,12 +62,18 @@ namespace OpenKh.Tools.Kh2MapStudio
                 var objEntryName = _objEntryLookupReversed[objId];
 
                 var modelPath = Path.Combine(_objPath, objEntryName);
-                var mdlxEntries = File.OpenRead(modelPath).Using(Bar.Read);
-                var model = Mdlx.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.Model).Stream);
-                var textures = ModelTexture.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.ModelTexture).Stream);
-                meshGroup = MeshLoader.FromKH2(_graphics, model, textures);
-                _meshGroups[objId] = meshGroup;
+                var mdlxEntries = File.OpenRead(modelPath + ".mdlx").Using(Bar.Read);
+                var modelEntry = mdlxEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Model);
+                if (modelEntry != null)
+                {
+                    var model = Mdlx.Read(modelEntry.Stream);
+                    var textures = ModelTexture.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.ModelTexture).Stream);
+                    meshGroup = MeshLoader.FromKH2(_graphics, model, textures);
+                }
+                else
+                    meshGroup = EmptyMeshGroup;
 
+                _meshGroups[objId] = meshGroup;
                 return meshGroup;
             }
         }
