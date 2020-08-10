@@ -25,7 +25,7 @@
 		<PackageReference Include="ImGui.NET" Version="1.75.0" />
 		<PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
 		<PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.7" />
-		<PackageReference Include="AssimpNet" Version="4.1.0" />
+		<PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
 	</ItemGroup>
 
 	<ItemGroup>

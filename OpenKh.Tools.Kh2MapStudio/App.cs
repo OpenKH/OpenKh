@@ -25,9 +25,12 @@ namespace OpenKh.Tools.Kh2MapStudio
             FileDialogFilterComposer.Compose()
             .AddExtensions("ARD file", "ard")
             .AddAllFiles();
-        private static readonly List<FileDialogFilter> DaeFilter =
+        private static readonly List<FileDialogFilter> ModelFilter =
             FileDialogFilterComposer.Compose()
-            .AddExtensions("DAE file (Collada)", "dae")
+            .AddExtensions("glTF file (GL Transmission Format)", "gltf")
+            .AddExtensions("FBX file", "fbx")
+            .AddExtensions("DAE file (Collada)  (might be unaccurate)", "dae")
+            .AddExtensions("OBJ file (Wavefront)  (might lose some information)", "obj")
             .AddAllFiles();
 
         private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
@@ -222,17 +225,17 @@ namespace OpenKh.Tools.Kh2MapStudio
         private void ExportMapCollision() => FileDialog.OnSave(fileName =>
         {
             ExportScene(fileName, _mapRenderer.MapCollision.Scene);
-        }, DaeFilter, $"{MapName}_map-collision.dae");
+        }, ModelFilter, $"{MapName}_map-collision.dae");
 
         private void ExportCameraCollision() => FileDialog.OnSave(fileName =>
         {
             ExportScene(fileName, _mapRenderer.CameraCollision.Scene);
-        }, DaeFilter, $"{MapName}_camera-collision.dae");
+        }, ModelFilter, $"{MapName}_camera-collision.dae");
 
         private void ExportLightCollision() => FileDialog.OnSave(fileName =>
         {
             ExportScene(fileName, _mapRenderer.LightCollision.Scene);
-        }, DaeFilter, $"{MapName}_light-collision.dae");
+        }, ModelFilter, $"{MapName}_light-collision.dae");
 
         private void MenuFileExit() => _exitFlag = true;
 
