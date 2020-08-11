@@ -187,7 +187,8 @@ namespace OpenKh.Tools.Common.CustomImGui
             ForControl(() =>
             {
                 var dummy = true;
-                return ImGui.Begin(name, ref dummy);
+                ImGui.Begin(name, ref dummy);
+                return dummy;
             }, ImGui.End, action);
 
         public static void ForEdit(string name, Func<bool> getter, Action<bool> setter)

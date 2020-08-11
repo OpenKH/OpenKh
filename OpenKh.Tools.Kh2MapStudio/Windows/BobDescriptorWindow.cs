@@ -10,7 +10,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
 {
     public class BobDescriptorWindow
     {
-        public static void Run(List<BobDescriptor> bobDescs, int bobCount) => ForWindow("BOB descriptors", () =>
+        public static bool Run(List<BobDescriptor> bobDescs, int bobCount) => ForWindow("BOB descriptors", () =>
         {
             var bobToRemove = -1;
             for (int i = 0; i < bobDescs.Count; i++)

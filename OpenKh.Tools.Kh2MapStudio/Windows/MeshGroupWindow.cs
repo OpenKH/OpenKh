@@ -9,7 +9,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
 {
     class MeshGroupWindow
     {
-        public static void Run(List<MeshGroupModel> meshGroups) => ForWindow("Mesh groups", () =>
+        public static bool Run(List<MeshGroupModel> meshGroups) => ForWindow("Mesh groups", () =>
         {
             for (var i = 0; i < meshGroups.Count; i++)
             {

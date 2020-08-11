@@ -7,7 +7,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
 {
     static class CameraWindow
     {
-        public static void Run(Camera camera) => ForWindow("Camera", () =>
+        public static bool Run(Camera camera) => ForWindow("Camera", () =>
         {
             ForEdit3("Position", () => camera.CameraPosition, x => camera.CameraPosition = x);
             ForEdit2("Rotation",

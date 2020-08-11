@@ -48,6 +48,12 @@ namespace OpenKh.Tools.Kh2MapStudio
         private List<string> _mapList = new List<string>();
         private ObjEntryController _objEntryController;
 
+        private bool _viewCamera = true;
+        private bool _viewLayerControl = true;
+        private bool _viewSpawnPoint = true;
+        private bool _viewMeshGroup = true;
+        private bool _viewBobDescriptor = true;
+
         private xna.Point _previousMousePosition;
 
         public string Title
@@ -120,12 +126,11 @@ namespace OpenKh.Tools.Kh2MapStudio
             ForControl(ImGui.BeginMainMenuBar, ImGui.EndMainMenuBar, MainMenu);
 
             MainWindow();
-            CameraWindow.Run(_mapRenderer.Camera);
-            //CollisionWindow.Run(_mapRenderer.);
-            LayerControllerWindow.Run(_mapRenderer);
-            SpawnPointWindow.Run(_mapRenderer);
-            MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
-            BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
+            if (_viewCamera) _viewCamera = CameraWindow.Run(_mapRenderer.Camera);
+            if (_viewLayerControl) _viewLayerControl = LayerControllerWindow.Run(_mapRenderer);
+            if (_viewSpawnPoint) _viewSpawnPoint = SpawnPointWindow.Run(_mapRenderer);
+            if (_viewMeshGroup) _viewMeshGroup = MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
+            if (_viewBobDescriptor) _viewBobDescriptor = BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
 
             ImGui.PopStyleColor();
 
@@ -199,6 +204,14 @@ namespace OpenKh.Tools.Kh2MapStudio
                     });
                     ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
+                });
+                ForMenu("View", () =>
+                {
+                    ImGui.MenuItem("Camera", "", ref _viewCamera);
+                    ImGui.MenuItem("Layer control", "", ref _viewLayerControl);
+                    ImGui.MenuItem("Spawn points", "", ref _viewSpawnPoint);
+                    ImGui.MenuItem("BOB descriptors", "", ref _viewBobDescriptor);
+                    ImGui.MenuItem("Mesh group", "", ref _viewMeshGroup);
                 });
                 ForMenu("Help", () =>
                 {
