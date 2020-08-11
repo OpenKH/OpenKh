@@ -112,7 +112,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         public SpawnPointModel CurrentSpawnPoint { get; private set; }
         public string SelectSpawnPoint
         {
-            get => CurrentSpawnPoint.Name;
+            get => CurrentSpawnPoint?.Name ?? string.Empty;
             set => CurrentSpawnPoint = SpawnPoints.FirstOrDefault(x => x.Name == value);
         }
 
