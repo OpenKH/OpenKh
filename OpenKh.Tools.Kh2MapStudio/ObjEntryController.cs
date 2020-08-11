@@ -24,7 +24,6 @@ namespace OpenKh.Tools.Kh2MapStudio
         private readonly Dictionary<string, int> _objEntryLookup;
         private readonly Dictionary<int, string> _objEntryLookupReversed;
         private readonly GraphicsDevice _graphics;
-        private BaseTable<Objentry> _objEntries;
         private readonly string _objPath;
 
         public ObjEntryController(GraphicsDevice graphics, string objPath, string objEntryFileName) :
@@ -36,14 +35,14 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public ObjEntryController(BaseTable<Objentry> objEntries)
         {
-            _objEntries = objEntries;
-            _objEntryLookup = _objEntries
+            ObjectEntries = objEntries.OrderBy(x => x.ModelName).ToArray();
+            _objEntryLookup = ObjectEntries
                 .ToDictionary(x => x.ModelName, x => (int)x.ObjectId);
-            _objEntryLookupReversed = _objEntries
+            _objEntryLookupReversed = ObjectEntries
                 .ToDictionary(x => (int)x.ObjectId, x => x.ModelName);
         }
 
-        public IEnumerable<Objentry> ObjectEntries => _objEntries;
+        public IEnumerable<Objentry> ObjectEntries { get; }
 
         public void Dispose()
         {
