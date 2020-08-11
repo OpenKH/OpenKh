@@ -63,13 +63,19 @@ namespace OpenKh.Tools.Kh2MapStudio
                 var objEntryName = _objEntryLookupReversed[objId];
 
                 var modelPath = Path.Combine(_objPath, objEntryName);
-                var mdlxEntries = File.OpenRead(modelPath + ".mdlx").Using(Bar.Read);
-                var modelEntry = mdlxEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Model);
-                if (modelEntry != null)
+                var modelFileName = modelPath + ".mdlx";
+                if (File.Exists(modelFileName))
                 {
-                    var model = Mdlx.Read(modelEntry.Stream);
-                    var textures = ModelTexture.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.ModelTexture).Stream);
-                    meshGroup = MeshLoader.FromKH2(_graphics, model, textures);
+                    var mdlxEntries = File.OpenRead(modelFileName).Using(Bar.Read);
+                    var modelEntry = mdlxEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Model);
+                    if (modelEntry != null)
+                    {
+                        var model = Mdlx.Read(modelEntry.Stream);
+                        var textures = ModelTexture.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.ModelTexture).Stream);
+                        meshGroup = MeshLoader.FromKH2(_graphics, model, textures);
+                    }
+                    else
+                        meshGroup = EmptyMeshGroup;
                 }
                 else
                     meshGroup = EmptyMeshGroup;
