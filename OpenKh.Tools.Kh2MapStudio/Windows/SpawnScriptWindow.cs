@@ -25,7 +25,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                 ImGui.TextColored(model.IsError ? ErrorColor : SuccessColor, model.LastError);
 
             var code = model.Decompiled;
-            if (ImGui.InputTextMultiline($"code##{type}", ref code, int.MaxValue, new Vector2(0, 0)))
+            if (ImGui.InputTextMultiline($"code##{type}", ref code, 0x100000, new Vector2(0, 0)))
                 model.Decompiled = code;
         });
     }
