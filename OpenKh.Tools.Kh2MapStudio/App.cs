@@ -197,8 +197,8 @@ namespace OpenKh.Tools.Kh2MapStudio
                 {
                     ForMenuItem("Open extracted game folder...", "CTRL+O", MenuFileOpen);
                     ForMenuItem("Unload current map+ard", "CTRL+Q", MenuFileUnload, IsOpen);
-                    ForMenuItem("Import extern MAP file", MenuFileOpenMap);
-                    ForMenuItem("Import extern ARD file", MenuFileOpenArd);
+                    ForMenuItem("Import extern MAP file", MenuFileOpenMap, IsGameOpen);
+                    ForMenuItem("Import extern ARD file", MenuFileOpenArd, IsGameOpen);
                     ForMenuItem("Save map+ard", "CTRL+S", MenuFileSave, IsOpen);
                     ForMenuItem("Save map as...", MenuFileSaveMapAs, IsOpen);
                     ForMenuItem("Save ard as...", MenuFileSaveArdAs, IsOpen);
