@@ -3,6 +3,7 @@ using OpenKh.Kh2.Ard;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using OpenKh.Tools.Kh2MapStudio.Models;
 using System;
+using System.Linq;
 using System.Numerics;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
@@ -10,6 +11,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
 {
     static class SpawnPointWindow
     {
+        private static string ObjectFilter = "";
         private static ISpawnPointController _ctrl;
 
         public static void Run(ISpawnPointController ctrl) => ForWindow("Spawn point editor", () =>
@@ -80,11 +82,17 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
             var objs = _ctrl.CurrentSpawnPoint.ObjEntryCtrl;
             if (ImGui.BeginCombo("Object", objs.GetName(entity.ObjectId)))
             {
-                foreach (var obj in objs.ObjectEntries)
+                var filter = ObjectFilter;
+                if (ImGui.InputText("Filter", ref filter, 16))
+                    ObjectFilter = filter;
+
+                foreach (var obj in objs.ObjectEntries.Where(x => filter.Length == 0 || x.ModelName.Contains(filter)))
                 {
                     if (ImGui.Selectable(obj.ModelName, obj.ObjectId == entity.ObjectId))
                         entity.ObjectId = obj.ObjectId;
                 }
+
+                ImGui.EndCombo();
             }
 
             ForEdit3("Position", () =>
