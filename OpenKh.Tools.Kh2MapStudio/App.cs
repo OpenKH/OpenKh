@@ -12,6 +12,7 @@ using System.Windows;
 using Xe.Tools.Wpf.Dialogs;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using Assimp;
+using OpenKh.Kh2.Ard;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
@@ -53,6 +54,9 @@ namespace OpenKh.Tools.Kh2MapStudio
         private bool _viewSpawnPoint = true;
         private bool _viewMeshGroup = true;
         private bool _viewBobDescriptor = true;
+        private bool _viewSpawnScriptMap = true;
+        private bool _viewSpawnScriptBtl = true;
+        private bool _viewSpawnScriptEvt = true;
 
         private xna.Point _previousMousePosition;
 
@@ -131,6 +135,9 @@ namespace OpenKh.Tools.Kh2MapStudio
             if (_viewSpawnPoint) _viewSpawnPoint = SpawnPointWindow.Run(_mapRenderer);
             if (_viewMeshGroup) _viewMeshGroup = MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
             if (_viewBobDescriptor) _viewBobDescriptor = BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
+            if (_viewSpawnScriptMap) _viewSpawnScriptMap = SpawnScriptWindow.Run("map", _mapRenderer.SpawnScriptMap);
+            if (_viewSpawnScriptBtl) _viewSpawnScriptBtl = SpawnScriptWindow.Run("btl", _mapRenderer.SpawnScriptBattle);
+            if (_viewSpawnScriptEvt) _viewSpawnScriptEvt = SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
 
             ImGui.PopStyleColor();
 
@@ -212,6 +219,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                     ImGui.MenuItem("Spawn points", "", ref _viewSpawnPoint);
                     ImGui.MenuItem("BOB descriptors", "", ref _viewBobDescriptor);
                     ImGui.MenuItem("Mesh group", "", ref _viewMeshGroup);
+                    ImGui.MenuItem("Spawn script MAP", "", ref _viewSpawnScriptMap);
+                    ImGui.MenuItem("Spawn script BTL", "", ref _viewSpawnScriptBtl);
+                    ImGui.MenuItem("Spawn script EVT", "", ref _viewSpawnScriptEvt);
                 });
                 ForMenu("Help", () =>
                 {

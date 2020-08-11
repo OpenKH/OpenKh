@@ -116,6 +116,10 @@ namespace OpenKh.Tools.Kh2MapStudio
             set => CurrentSpawnPoint = SpawnPoints.FirstOrDefault(x => x.Name == value);
         }
 
+        public SpawnScriptModel SpawnScriptMap { get; private set; }
+        public SpawnScriptModel SpawnScriptBattle { get; private set; }
+        public SpawnScriptModel SpawnScriptEvent { get; private set; }
+
         public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
         {
             _graphicsManager = graphics;
@@ -201,6 +205,10 @@ namespace OpenKh.Tools.Kh2MapStudio
                 new SpawnPointModel(ObjEntryController, x.Name, SpawnPoint.Read(x.Stream.SetPosition(0))))
                 .ToList();
             SelectSpawnPoint = "m_00";
+
+            SpawnScriptMap = SpawnScriptModel.Create(ArdBarEntries, "map");
+            SpawnScriptBattle = SpawnScriptModel.Create(ArdBarEntries, "btl");
+            SpawnScriptEvent = SpawnScriptModel.Create(ArdBarEntries, "evt");
         }
 
         public void SaveArd(string fileName)
@@ -216,6 +224,10 @@ namespace OpenKh.Tools.Kh2MapStudio
                     Stream = memStream
                 });
             }
+
+            SpawnScriptMap?.SaveToBar(ArdBarEntries);
+            SpawnScriptBattle?.SaveToBar(ArdBarEntries);
+            SpawnScriptEvent?.SaveToBar(ArdBarEntries);
 
             File.Create(fileName).Using(stream => Bar.Write(stream, ArdBarEntries));
         }
