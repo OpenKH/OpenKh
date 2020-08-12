@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
@@ -63,10 +64,11 @@ namespace OpenKh.Kh2.Battle
 
         public static List<Level> Read(Stream stream) => BaseTable<Level>.Read(stream).Items;
 
-        public static void Write(Stream stream, List<Level> items) => new BaseTable<Level>()
-        {
-            Id = 2,
-            Items = items
-        }.Write(stream);
+        public static void Write(Stream stream, IEnumerable<Level> items) =>
+            new BaseTable<Level>
+            {
+                Id = 2,
+                Items = items.ToList()
+            }.Write(stream);
     }
 }

@@ -115,7 +115,7 @@ namespace OpenKh.Kh2
         [Data] public ushort SpawnObject3 { get; set; }
         [Data] public ushort Unknown5e { get; set; }
 
-        public static BaseTable<Objentry> Read(Stream stream) => BaseTable<Objentry>.Read(stream);
+        public static List<Objentry> Read(Stream stream) => BaseTable<Objentry>.Read(stream).Items;
         public static void Write(Stream stream, IEnumerable<Objentry> entries) =>
             BaseTable<Objentry>.Write(stream, 3, entries.ToList());
     }

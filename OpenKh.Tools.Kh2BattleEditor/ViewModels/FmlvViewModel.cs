@@ -12,7 +12,6 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 {
     public class FmlvViewModel : GenericListModel<FmlvFormViewModel>, IBattleGetChanges
     {
-        private const int DefaultType = 2;
         private const string entryName = "fmlv";
         
         public string EntryName => entryName;

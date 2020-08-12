@@ -24,7 +24,7 @@ namespace OpenKh.Game.Entities
 
         public int ObjectId { get; }
 
-        public string ObjectName => Kernel.ObjEntries.Items
+        public string ObjectName => Kernel.ObjEntries
             .FirstOrDefault(x => x.ObjectId == ObjectId)?.ModelName;
 
         public MeshGroup Mesh { get; private set; }
@@ -37,7 +37,7 @@ namespace OpenKh.Game.Entities
 
         public void LoadMesh(GraphicsDevice graphics)
         {
-            var objEntry = Kernel.ObjEntries.Items.FirstOrDefault(x => x.ObjectId == ObjectId);
+            var objEntry = Kernel.ObjEntries.FirstOrDefault(x => x.ObjectId == ObjectId);
             if (objEntry == null)
             {
                 Log.Warn($"Object ID {ObjectId} not found.");

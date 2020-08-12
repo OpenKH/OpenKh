@@ -41,10 +41,8 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             public override string ToString() => Name;
         }
 
-        private const int DefaultType = 2;
         private const string entryName = "bons";
 
-        private readonly int _type;
         private string _searchTerm;
 
         public BonsViewModel(IEnumerable<Bar.Entry> entries) :
@@ -52,21 +50,12 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         { }
 
         public BonsViewModel() :
-            this(new BaseTable<Bons>
-            {
-                Id = DefaultType,
-                Items = new List<Bons>()
-            })
+            this(new List<Bons>())
         { }
 
-        private BonsViewModel(BaseTable<Bons> enmp) :
-            this(enmp.Id, enmp.Items)
-        { }
-
-        private BonsViewModel(int type, IEnumerable<Bons> items) :
+        private BonsViewModel(IEnumerable<Bons> items) :
             base(items.Select(Map))
         {
-            _type = type;
         }
         public string EntryName => entryName;
 
@@ -86,11 +75,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            new BaseTable<Bons>
-            {
-                Id = _type,
-                Items = UnfilteredItems.Select(x => x.Bons).ToList()
-            }.Write(stream);
+            Bons.Write(stream, UnfilteredItems.Select(x => x.Bons));
 
             return stream;
         }

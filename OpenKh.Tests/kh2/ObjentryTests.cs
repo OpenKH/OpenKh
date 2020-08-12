@@ -11,7 +11,7 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void HasRightEntryCount() => File.OpenRead("kh2/res/00objentry.bin").Using(stream =>
         {
-            var table = BaseTable<Objentry>.Read(stream);
+            var table = Objentry.Read(stream);
             Assert.Equal(0x076C, table.Count);
         });
 
@@ -30,8 +30,8 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void GroupByUnknown02() => File.OpenRead("kh2/res/00objentry.bin").Using(stream =>
         {
-            var table = BaseTable<Objentry>.Read(stream);
-            var grouped = table.Items.GroupBy(x => x.Unknown5e).ToList();
+            var table = Objentry.Read(stream);
+            var grouped = table.GroupBy(x => x.Unknown5e).ToList();
             Assert.Equal(0x076C, table.Count);
         });
     }

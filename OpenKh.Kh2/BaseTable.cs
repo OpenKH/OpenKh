@@ -6,7 +6,7 @@ using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
 {
-    public class BaseTable<T> : IEnumerable<T>
+    internal class BaseTable<T> : IEnumerable<T>
         where T : class
     {
         [Data] public int Id { get; set; }

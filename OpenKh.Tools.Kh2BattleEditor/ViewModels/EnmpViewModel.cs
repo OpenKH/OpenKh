@@ -44,10 +44,8 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             public override string ToString() => Name;
         }
 
-        private const int DefaultType = 2;
         private const string entryName = "enmp";
 
-        private readonly int _type;
         private string _searchTerm;
 
         public EnmpViewModel(IEnumerable<Bar.Entry> entries) :
@@ -55,21 +53,12 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         { }
 
         public EnmpViewModel() :
-            this(new BaseTable<Enmp>
-            {
-                Id = DefaultType,
-                Items = new List<Enmp>()
-            })
+            this(new List<Enmp>())
         { }
 
-        private EnmpViewModel(BaseTable<Enmp> enmp) :
-            this(enmp.Id, enmp.Items)
-        { }
-
-        private EnmpViewModel(int type, IEnumerable<Enmp> items) :
+        private EnmpViewModel(IEnumerable<Enmp> items) :
             base(items.Select(Map))
         {
-            _type = type;
         }
 
         public string EntryName => entryName;
@@ -90,11 +79,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            new BaseTable<Enmp>
-            {
-                Id = _type,
-                Items = UnfilteredItems.Select(x => x.Enmp).ToList()
-            }.Write(stream);
+            Enmp.Write(stream, UnfilteredItems.Select(x => x.Enmp));
 
             return stream;
         }

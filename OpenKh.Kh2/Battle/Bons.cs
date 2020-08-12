@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
@@ -21,6 +23,13 @@ namespace OpenKh.Kh2.Battle
             $"HP: {HpIncrease}, MP: {MpIncrease}, ItemSlot: {ItemSlotUpgrade}, " +
             $"Acc.Slot: {AccessorySlotUpgrade}, Bonus 1: {BonusItem1}, Bonus 2: {BonusItem2}";
 
-        public static BaseTable<Bons> Read(Stream stream) => BaseTable<Bons>.Read(stream);
+        public static List<Bons> Read(Stream stream) => BaseTable<Bons>.Read(stream).Items;
+
+        public static void Write(Stream stream, IEnumerable<Bons> items) =>
+            new BaseTable<Bons>
+            {
+                Id = 2,
+                Items = items.ToList()
+            }.Write(stream);
     }
 }

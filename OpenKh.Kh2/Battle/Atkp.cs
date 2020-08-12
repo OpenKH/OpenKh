@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace OpenKh.Kh2.Battle
 {
@@ -30,6 +31,6 @@ namespace OpenKh.Kh2.Battle
         public short Unknown2c { get; set; }
         public short Unknown2e { get; set; }
 
-        public static BaseTable<Atkp> Read(Stream stream) => BaseTable<Atkp>.Read(stream);
+        public static List<Atkp> Read(Stream stream) => BaseTable<Atkp>.Read(stream).Items;
     }
 }

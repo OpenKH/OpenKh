@@ -49,7 +49,7 @@ namespace OpenKh.Game.Infrastructure
         public RenderingMessageContext SystemMessageContext { get; set; }
         public RenderingMessageContext EventMessageContext { get; set; }
         public Kh2MessageProvider MessageProvider { get; }
-        public BaseTable<Objentry> ObjEntries { get; }
+        public List<Objentry> ObjEntries { get; }
         public Dictionary<string, List<Place>> Places { get; }
         public List<Ftst.Entry> Ftst { get; private set; }
         public Item Item { get; private set; }

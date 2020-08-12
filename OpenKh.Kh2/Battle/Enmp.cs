@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
@@ -21,6 +23,13 @@ namespace OpenKh.Kh2.Battle
         [Data] public short Unknown58 { get; set; }
         [Data] public short Unknown5a { get; set; }
 
-        public static BaseTable<Enmp> Read(Stream stream) => BaseTable<Enmp>.Read(stream);
+        public static List<Enmp> Read(Stream stream) => BaseTable<Enmp>.Read(stream).Items;
+
+        public static void Write(Stream stream, IEnumerable<Enmp> items) =>
+            new BaseTable<Enmp>
+            {
+                Id = 2,
+                Items = items.ToList()
+            }.Write(stream);
     }
 }

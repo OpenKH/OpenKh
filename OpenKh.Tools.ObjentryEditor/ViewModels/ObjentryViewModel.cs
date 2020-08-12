@@ -74,20 +74,14 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         }
 
 
-        private readonly int _type;
         private string _searchTerm;
 
         public EnumModel<Objentry.Type> ObjEntryTypes { get; }
         public EnumModel<Objentry.CommandMenuOptions> CommandMenuOptions { get; }
 
-        public ObjentryViewModel(BaseTable<Objentry> objentry) :
-            this(objentry.Id, objentry.Items)
-        { }
-
-        public ObjentryViewModel(int type, IEnumerable<Objentry> items) :
+        public ObjentryViewModel(IEnumerable<Objentry> items) :
             base(items.Select(Map))
         {
-            _type = type;
             ObjEntryTypes = new EnumModel<Objentry.Type>();
             CommandMenuOptions = new EnumModel<Objentry.CommandMenuOptions>();
             AddAndSelectCommand = new RelayCommand(x =>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
@@ -19,6 +20,13 @@ namespace OpenKh.Kh2.Battle
         [Data] public short Unknown0a { get; set; }
         [Data(Count = 58)] public List<short> Objects { get; set; }
 
-        public static BaseTable<Plrp> Read(Stream stream) => BaseTable<Plrp>.Read(stream);
+        public static List<Plrp> Read(Stream stream) => BaseTable<Plrp>.Read(stream).Items;
+
+        public static void Write(Stream stream, IEnumerable<Plrp> items) =>
+            new BaseTable<Plrp>
+            {
+                Id = 2,
+                Items = items.ToList()
+            }.Write(stream);
     }
 }
