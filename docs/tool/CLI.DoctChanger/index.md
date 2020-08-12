@@ -136,3 +136,15 @@ OpenKh.Command.DoctChanger.exe read-map-doct H:\Proj\pcsx2\bin\inject.f266b00b\m
  724:00000000 (  -18000,  -18000,  -18000) (   18000,   18000,   18000)
 '''
 ```
+
+### `show-stats` command
+
+Specify: `.map` file, otherwise treated as `.doct` file.
+
+```bat
+OpenKh.Command.DoctChanger.exe show-stats tt05.map
+
+# tt_0:0 (MeshOcclusion)
+   1,320 drawing mesh groups.
+   1,330 drawing meshes.
+```

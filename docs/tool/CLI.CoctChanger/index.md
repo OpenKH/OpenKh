@@ -63,3 +63,38 @@ OpenKh.Command.CoctChanger.exe use-this-coct C:\A\eh18 H:\Proj\pcsx2\bin\inject.
 
 C:\A\eh18\eh18.map
 ```
+
+### `show-stats` command
+
+Specify: `.map` file, otherwise treated as `.coct` file.
+
+```bat
+OpenKh.Command.CoctChanger.exe show-stats tt05.map
+
+# ID_t:0 (MapCollision)
+     352 collision mesh groups.
+     306 collision meshes.
+   1,076 collisions.
+   1,968 vertices.
+     869 planes.
+     943 bounding boxes.
+      11 surface flags.
+
+# CH_t:0 (CameraCollision)
+     205 collision mesh groups.
+     151 collision meshes.
+     250 collisions.
+     492 vertices.
+     236 planes.
+     151 bounding boxes.
+       3 surface flags.
+
+# COL_:0 (LightData)
+      55 collision mesh groups.
+      33 collision meshes.
+      41 collisions.
+     114 vertices.
+      17 planes.
+      14 bounding boxes.
+       1 surface flags.
+```
