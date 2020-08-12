@@ -14,7 +14,8 @@ namespace OpenKh.Command.DoctChanger
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(typeof(UseThisDoctCommand), typeof(CreateDoctForMapCommand)
         , typeof(CreateDummyDoctCommand)
-        , typeof(ReadDoctCommand), typeof(ReadMapDoctCommand))]
+        , typeof(ReadDoctCommand), typeof(ReadMapDoctCommand)
+        , typeof(ShowStatsCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -266,6 +267,47 @@ namespace OpenKh.Command.DoctChanger
 
                 Console.WriteLine("Output map file is written successfully.");
                 return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "doct file: show stats")]
+        private class ShowStatsCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Input map/doct file (decided by file extension: `.map` or not)")]
+            public string InputFile { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var isMap = Path.GetExtension(InputFile).ToLowerInvariant() == ".map";
+
+                if (isMap)
+                {
+                    foreach (var entry in File.OpenRead(InputFile).Using(Bar.Read)
+                        .Where(entry => false
+                            || entry.Type == Bar.EntryType.MeshOcclusion
+                        )
+                    )
+                    {
+                        Console.WriteLine($"# {entry.Name}:{entry.Index} ({entry.Type})");
+                        PrintSummary(Doct.Read(entry.Stream));
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    PrintSummary(File.OpenRead(InputFile).Using(Doct.Read));
+                }
+
+                return 0;
+            }
+
+            private void PrintSummary(Doct coct)
+            {
+                Console.WriteLine($"{coct.Entry1List.Count,8:#,##0} collision mesh groups.");
+                Console.WriteLine($"{coct.Entry2List.Count,8:#,##0} collision meshes.");
             }
         }
     }
