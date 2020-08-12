@@ -238,6 +238,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         private void MenuFileSave()
         {
             _mapRenderer.SaveMap(Path.Combine(_mapPath, MapName + ".map"));
+            _mapRenderer.SaveArd(Path.Combine(_ardPath, MapName + ".ard"));
         }
 
         private void MenuFileSaveMapAs()
