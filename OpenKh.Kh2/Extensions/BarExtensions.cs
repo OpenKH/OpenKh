@@ -32,7 +32,7 @@ namespace OpenKh.Kh2.Extensions
         {
             var existingEntry = entries
                 .FirstOrDefault(x => x.Type == entry.Type && x.Name == entry.Name && x.Index == 0);
-            if (entry == null)
+            if (existingEntry == null)
             {
                 entries = entries.Concat(new Bar.Entry[] {
                     new Bar.Entry

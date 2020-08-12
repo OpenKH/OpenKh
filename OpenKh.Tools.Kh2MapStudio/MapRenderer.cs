@@ -221,6 +221,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 ArdBarEntries.AddOrReplace(new Bar.Entry
                 {
                     Name = spawnPointModel.Name,
+                    Type = Bar.EntryType.SpawnPoint,
                     Stream = memStream
                 });
             }
