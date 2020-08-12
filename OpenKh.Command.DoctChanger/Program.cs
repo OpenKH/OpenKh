@@ -306,8 +306,8 @@ namespace OpenKh.Command.DoctChanger
 
             private void PrintSummary(Doct coct)
             {
-                Console.WriteLine($"{coct.Entry1List.Count,8:#,##0} collision mesh groups.");
-                Console.WriteLine($"{coct.Entry2List.Count,8:#,##0} collision meshes.");
+                Console.WriteLine($"{coct.Entry1List.Count,8:#,##0} drawing mesh groups.");
+                Console.WriteLine($"{coct.Entry2List.Count,8:#,##0} drawing meshes.");
             }
         }
     }
