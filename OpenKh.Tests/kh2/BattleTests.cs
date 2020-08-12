@@ -12,7 +12,7 @@ namespace OpenKh.Tests.kh2
         public class FmlvTests
         {
             [Fact]
-            public void CheckStandardNewImpl() => Common.FileOpenRead(@"kh2/res/fmlv_de.bin", stream =>
+            public void CheckStandardNewImpl() => File.OpenRead(@"kh2/res/fmlv_de.bin").Using(stream =>
             {
                 var table = Fmlv.Read(stream);
 
@@ -24,7 +24,7 @@ namespace OpenKh.Tests.kh2
             });
 
             [Fact]
-            public void CheckFinalMixNewImpl() => Common.FileOpenRead(@"kh2/res/fmlv_fm.bin", stream =>
+            public void CheckFinalMixNewImpl() => File.OpenRead(@"kh2/res/fmlv_fm.bin").Using(stream =>
             {
                 var table = Fmlv.Read(stream);
 
@@ -36,7 +36,7 @@ namespace OpenKh.Tests.kh2
             });
 
             [Fact]
-            public void WriteTest() => Common.FileOpenRead(@"kh2/res/fmlv_fm.bin", stream =>
+            public void WriteTest() => File.OpenRead(@"kh2/res/fmlv_fm.bin").Using(stream =>
                 Helpers.AssertStream(stream, inStream =>
                 {
                     var outStream = new MemoryStream();
@@ -48,7 +48,7 @@ namespace OpenKh.Tests.kh2
         }
 
         [Fact]
-        public void EnemyTableTest() => Common.FileOpenRead(@"kh2/res/enmp.bin", x => x.Using(stream =>
+        public void EnemyTableTest() => File.OpenRead(@"kh2/res/enmp.bin").Using(stream =>
         {
             var table = BaseTable<Enmp>.Read(stream);
 
@@ -68,7 +68,7 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(25, roxas.DarkWeakness);
             Assert.Equal(25, roxas.Unknown52);
             Assert.Equal(100, roxas.ReflectWeakness);
-        }));
+        });
 
         [Fact]
         public void BonsTableTest() => File.OpenRead(@"kh2/res/bons_fm.bin").Using(stream =>

@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.System;
 using System.IO;
@@ -11,14 +11,14 @@ namespace OpenKh.Tests.kh2
         public class FtstTests
         {
             [Fact]
-            public void CheckForLength() => Common.FileOpenRead("kh2/res/ftst.bin", stream =>
+            public void CheckForLength() => File.OpenRead("kh2/res/ftst.bin").Using(stream =>
             {
                 var entries = Ftst.Read(stream);
                 Assert.Equal(8, entries.Count);
             });
 
             [Fact]
-            public void ShouldWriteTheExactSameFile() => Common.FileOpenRead("kh2/res/ftst.bin", stream =>
+            public void ShouldWriteTheExactSameFile() => File.OpenRead("kh2/res/ftst.bin").Using(stream =>
             {
                 Helpers.AssertStream(stream, x =>
                 {
@@ -34,7 +34,7 @@ namespace OpenKh.Tests.kh2
         public class ItemTests
         {
             [Fact]
-            public void CheckForLength() => Common.FileOpenRead("kh2/res/item.bin", stream =>
+            public void CheckForLength() => File.OpenRead("kh2/res/item.bin").Using(stream =>
             {
                 var entries = Item.Read(stream);
                 Assert.Equal(535, entries.Items1.Count);
@@ -42,7 +42,7 @@ namespace OpenKh.Tests.kh2
             });
 
             [Fact]
-            public void ShouldWriteTheExactSameFile() => Common.FileOpenRead("kh2/res/item.bin", stream =>
+            public void ShouldWriteTheExactSameFile() => File.OpenRead("kh2/res/item.bin").Using(stream =>
             {
                 Helpers.AssertStream(stream, x =>
                 {
@@ -58,11 +58,11 @@ namespace OpenKh.Tests.kh2
         public class TrsrTests
         {
             [Fact]
-            public void CheckNewTrsr() => Common.FileOpenRead(@"kh2/res/trsr.bin", x => x.Using(stream =>
+            public void CheckNewTrsr() => File.OpenRead(@"kh2/res/trsr.bin").Using(stream =>
             {
-                var table = BaseTable<Trsr>.Read(stream);
+                var table = Trsr.Read(stream);
                 Assert.Equal(0x1AE, table.Count);
-            }));
+            });
         }
     }
 }

@@ -2,13 +2,12 @@ using OpenKh.Common;
 using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Xunit;
 using Xunit.Sdk;
 
 namespace OpenKh.Tests.kh2
 {
-    public class MsgTests : Common
+    public class MsgTests
     {
         private readonly string FilePath = "kh2/res/titl.bin";
 
@@ -56,7 +55,7 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ReadsRightAmountOfEntries() =>
-            FileOpenRead(FilePath, stream =>
+            File.OpenRead(FilePath).Using(stream =>
             {
                 var entries = Msg.Read(stream);
                 Assert.Equal(694, entries.Count);
@@ -64,7 +63,7 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ReadsIdCorrectly() =>
-            FileOpenRead(FilePath, stream =>
+            File.OpenRead(FilePath).Using(stream =>
             {
                 var entries = Msg.Read(stream);
                 Assert.Equal(20233, entries[0].Id);
@@ -73,7 +72,7 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ReadsTextDataCorrectly() =>
-            FileOpenRead(FilePath, stream =>
+            File.OpenRead(FilePath).Using(stream =>
             {
                 var entries = Msg.Read(stream);
                 Assert.Equal(19, entries[0].Data.Length);
@@ -82,7 +81,7 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void WriteAndReadCorrecty() =>
-            FileOpenRead(FilePath, stream =>
+            File.OpenRead(FilePath).Using(stream =>
             {
                 var expected = new BinaryReader(stream).ReadBytes((int)stream.Length);
                 var entries = Msg.Read(new MemoryStream(expected));

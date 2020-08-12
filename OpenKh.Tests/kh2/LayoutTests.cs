@@ -52,7 +52,7 @@ namespace OpenKh.Tests.kh2
             });
 
         [Fact]
-        public void ValidateLayoutHeader() => Common.FileOpenRead(FilePath, stream =>
+        public void ValidateLayoutHeader() => File.OpenRead(FilePath).Using(stream =>
         {
             var layout = Layout.Read(stream);
             Assert.Equal(32, layout.SequenceGroups.SelectMany(x => x.Sequences).Count());
@@ -61,7 +61,7 @@ namespace OpenKh.Tests.kh2
         });
 
         [Fact]
-        public void ValidateL2() => Common.FileOpenRead(FilePath, stream =>
+        public void ValidateL2() => File.OpenRead(FilePath).Using(stream =>
         {
             var layout = Layout.Read(stream);
             Assert.Equal(1, layout.SequenceGroups[0].Sequences.Count);
@@ -82,7 +82,7 @@ namespace OpenKh.Tests.kh2
         });
 
         [Fact]
-        public void WriteLayoutTest() => Common.FileOpenRead(FilePath, stream =>
+        public void WriteLayoutTest() => File.OpenRead(FilePath).Using(stream =>
         {
             Helpers.AssertStream(stream, inStream =>
             {

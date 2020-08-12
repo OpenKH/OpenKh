@@ -1,4 +1,5 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Common;
+using OpenKh.Kh2;
 using System.IO;
 using Xunit;
 
@@ -9,13 +10,13 @@ namespace OpenKh.Tests.kh2
         private const string FileName = "kh2/res/15jigsaw.bin";
 
         [Fact]
-        public void HasRightAmountOfEntries() => Common.FileOpenRead(FileName, stream =>
+        public void HasRightAmountOfEntries() => File.OpenRead(FileName).Using(stream =>
         {
             Assert.Equal(0x9E, Jigsaw.Read(stream).Count);
         });
 
         [Fact]
-        public void WriteBackTheSameFile() => Common.FileOpenRead(FileName, stream =>
+        public void WriteBackTheSameFile() => File.OpenRead(FileName).Using(stream =>
         {
             Helpers.AssertStream(stream, inStream =>
             {

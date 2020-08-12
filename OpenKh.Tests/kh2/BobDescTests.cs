@@ -28,7 +28,7 @@ namespace OpenKh.Tests.kh2
         }
 
         [Fact]
-        public void WriteTest() => Common.FileOpenRead(FileName, stream =>
+        public void WriteTest() => File.OpenRead(FileName).Using(stream =>
         {
             Helpers.AssertStream(stream, inStream =>
             {

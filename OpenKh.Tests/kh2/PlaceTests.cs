@@ -1,4 +1,5 @@
-﻿using OpenKh.Kh2;
+﻿using OpenKh.Common;
+using OpenKh.Kh2;
 using System.IO;
 using Xunit;
 
@@ -12,7 +13,7 @@ namespace OpenKh.Tests.kh2
         [Theory]
         [InlineData(PlaceFileName)]
         [InlineData(OldPlaceFileName)]
-        public void HasTheRightAmountOfWorlds(string fileName) => Common.FileOpenRead(fileName, stream =>
+        public void HasTheRightAmountOfWorlds(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             Assert.Equal(19, Place.Read(stream).Count);
         });
@@ -20,7 +21,7 @@ namespace OpenKh.Tests.kh2
         [Theory]
         [InlineData(PlaceFileName)]
         [InlineData(OldPlaceFileName)]
-        public void HasTheRightWorldNames(string fileName) => Common.FileOpenRead(fileName, stream =>
+        public void HasTheRightWorldNames(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             var places = Place.Read(stream);
             Assert.Contains(places, x => x.Key == "al");
@@ -32,13 +33,13 @@ namespace OpenKh.Tests.kh2
         [Theory]
         [InlineData(PlaceFileName)]
         [InlineData(OldPlaceFileName)]
-        public void HasWorldTheRightAmountOfPlaces(string fileName) => Common.FileOpenRead(fileName, stream =>
+        public void HasWorldTheRightAmountOfPlaces(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             Assert.Equal(16, Place.Read(stream)["bb"].Count);
         });
 
         [Fact]
-        public void ReadPlaceName() => Common.FileOpenRead(OldPlaceFileName, stream =>
+        public void ReadPlaceName() => File.OpenRead(OldPlaceFileName).Using(stream =>
         {
             var places = Place.Read(stream)["bb"];
             Assert.Equal(18, places[0].Name.Length);
@@ -49,7 +50,7 @@ namespace OpenKh.Tests.kh2
         [Theory]
         [InlineData(PlaceFileName)]
         [InlineData(OldPlaceFileName)]
-        public void WriteBackTheSameFile(string fileName) => Common.FileOpenRead(fileName, stream =>
+        public void WriteBackTheSameFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             Helpers.AssertStream(stream, inStream =>
             {

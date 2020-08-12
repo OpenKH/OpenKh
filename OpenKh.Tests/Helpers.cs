@@ -50,12 +50,4 @@ namespace OpenKh.Tests
         public static void Dump(this byte[] data, string path) =>
             new MemoryStream(data).Using(x => x.Dump(path));
     }
-
-    public class Common
-    {
-        public static void FileOpenRead(string path, Action<Stream> action)
-        {
-            File.OpenRead(path).Using(x => action(x));
-        }
-    }
 }
