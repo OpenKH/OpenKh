@@ -187,7 +187,7 @@ Provides a single pair of U and V speed factors for texture scrolling. Entries i
 
 Provides parameters and image data for rendering sprite animations for a single texture. Consists of one or more frame tables for animations as well as raw image data for individual sprites.
 
-Most of the GS register fields used to upload the base image texture, including the base pointer, buffer width and pixel storage format, are used to upload sprite image data for the active animation frame to GS memory (see [texture info](#texture-info)). The pixel offset and size of the transmission area (dsax, dsay, rrw, rrh) are set such that the upload overwrites the base image at the given region with image data for the sprite. All sprites under a single TEXA tag are the same size and pixel format, which means that these parameters are constant across all animations.
+Most of the GS register fields used to upload the base image texture, including the base pointer, buffer width and pixel storage format, are used to upload sprite image data for the active animation frame to GS memory (see [Texture transfer info](#texture-transfer-info)). The pixel offset and size of the transmission area (dsax, dsay, rrw, rrh) are set such that the upload overwrites the base image at the given region with image data for the sprite. All sprites under a single TEXA tag are the same size and pixel format, which means that these parameters are constant across all animations.
 
 Image data for sprites is stored contiguously. Starting offsets for each image are calculated using a sprite index as well as the sprite dimensions and bits per pixel specified in the tag header.
 
@@ -196,7 +196,7 @@ Image data for sprites is stored contiguously. Starting offsets for each image a
 | 0      | char[4] | "TEXA"
 | 4      | uint32  | Total byte size of data.
 | 8      | uint16  | 
-| 10     | uint16  | Texture index to apply the animation.
+| 10     | uint16  | Texture index (GS Info index) to apply the animation.
 | 12     | uint16  | Frame stride in halfwords for entries in the [frame table](#frame-table-entry).
 | 14     | uint16  | Bits per pixel of sprite image data.
 | 16     | uint16  | Base slot index. Applies to entries in the [slot table](#animation-slot-table).
@@ -212,6 +212,39 @@ Image data for sprites is stored contiguously. Starting offsets for each image a
 | 40     | uint32  | Offset of sprite image data.
 | 44     | uint32  | Default animation index (idle).
 
+_Note:_ The offsets in TEXA are based on offset 8 (not offset 0), where heading 8 bytes are part of common header of metadata.
+
+This is sample placement of TEXA metadata.
+
+```txt
+14:93C0h: 5F 44 4D 59 00 00 00 00 54 45 58 41 50 12 00 00  _DMY....TEXAP... 
+14:93D0h: <--   TEXA header                              
+14:93E0h:                                                
+14:93F0h:                     --> <--   Slot table       
+...
+14:95F0h:                     --> <--   A --> <--   F      // A is anim table (4 bytes)
+14:9600h:                                                  // F is frame table (30 bytes)
+14:9610h:         --> 00 00 00 00 00 00 00 00 00 00 00 00
+14:9620h: <--   Sprite image data                        
+...
+14:A610h:                                             -->
+14:A620h: 5F 44 4D 59 00 00 00 00 54 45 58 41 50 12 00 00  _DMY....TEXAP... 
+```
+
+Sample: TEXA header from _nm07.map_:
+
+```
+14:93D0h: 1C 00 0B 00 00 00 08 00 00 00 FF 00 01 00 01 00  ..........ÿ..... 
+14:93E0h: C0 00 A0 00 40 00 40 00 28 00 00 00 28 02 00 00  À. .@.@.(...(... 
+14:93F0h: 50 02 00 00 00 00 00 00                          P.......
+```
+
+_Notes:_
+
+- Slot table seems to have fixed 512 bytes length.
+- Number of animations seems to be always 1 on asset maps. And anim table is 4 bytes length.
+- Frame table can be considered as a script block rather than simple data array, because it has relative jump feature.
+
 #### Animation Slot Table
 
 This table contains animation slots where each slot may optionally be assigned an animation index. An external source can enable one of these slots to trigger a certain animation for the texture. The exact interaction with these external files is currently unknown.
@@ -220,23 +253,125 @@ This table contains animation slots where each slot may optionally be assigned a
 |--------|--------|------------
 | 0      | uint32 | Animation index assigned to the slot (actual index is `value - 1`). If `0`, the slot is empty.
 
+Sample: animation slot table from _nm07.map_:
+
+```txt
+14:93F0h:                         00 00 00 00 00 00 00 00          ........ 
+14:9400h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9410h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9420h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9430h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9440h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9450h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9460h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9470h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9480h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9490h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:94A0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:94B0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:94C0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:94D0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:94E0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:94F0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9500h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9510h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9520h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9530h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9540h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9550h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9560h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9570h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9580h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:9590h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:95A0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:95B0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:95C0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:95D0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:95E0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................ 
+14:95F0h: 00 00 00 00 00 00 00 00                          ........         
+```
+
 #### Animation Table Entry
 
 | Offset | Type   | Descriptor
 |--------|--------|------------
 | 0      | uint32 | Offset of first frame in the [frame table](#frame-table-entry).
 
+Sample: animation table entry from _nm07.map_:
+
+```txt
+14:95F0h:                         2C 02 00 00                      ,...     
+```
+
+_Note:_ 0x22C points first Frame Table entry.
+
 #### Frame Table Entry
 
 | Offset | Type         | Descriptor
 |--------|--------------|------------
 | 0      | uint16 : 0-3 | Frame control. <br> `0`: Enable sprite <br> `1`: Disable sprite (use the base image) <br> `2`: Jump to given frame offset (loop) <br> `3`: Stop the animation
-| 0      | int16 : 4-15 | Loop offset in number of frames. Usually < 0 if present.
+| 0      | int16 : 4-15 | Loop offset in number of frames. Need sign extended using MSB (most significant bit). Usually < 0 if present, and moving to start of this table.
 | 2      | uint16       | Minimum length of frame.
 | 4      | uint16       | Maximum length of frame.
 | 6      | uint16       | Sprite image index.
 
 If minimum length < maximum length, a random number between [minimum, maximum] is selected as the length the frame. Random intervals are used in cases such as blinking animations for characters.
+
+Sample: frame table entry from _nm07.map_:
+
+```txt
+14:95F0h:                                     01 00 3C 00              ..<. 
+14:9600h: 3C 00 00 00 00 00 3C 00 3C 00 00 00 E2 FF 00 00  <.....<.<...âÿ.. 
+14:9610h: 00 00 00 00                                      ....             
+```
+
+Sample reading:
+
+| Frame control | Loop offset | Min | Max | Sprite Index
+|---------------|:-----------:|:---:|:---:|--------------
+| DisableSprite | 0           | 60  | 60  | 0
+| EnableSprite  | 0           | 60  | 60  | 0
+| Jump          | -2          | 0   | 0   | 0
+
+#### Sample TEXA representation
+
+From _nm07.map_ decoded by using 010 Editor's Binary Template:
+
+| Name | Value | Start | Size |
+|---|---|---|---|
+| struct texAnimTexa texa |  | 1493D0h | 28h |
+| ushort unk1 | 28 | 1493D0h | 2h |
+| ushort texIndex | 11 | 1493D2h | 2h |
+| ushort frameStride | 0 | 1493D4h | 2h |
+| ushort bitsPerPixel | 8 | 1493D6h | 2h |
+| ushort minSlotIdx | 0 | 1493D8h | 2h |
+| ushort maxSlotIdx | 255 | 1493DAh | 2h |
+| ushort numAnims | 1 | 1493DCh | 2h |
+| ushort numSprites | 1 | 1493DEh | 2h |
+| ushort uOff | 192 | 1493E0h | 2h |
+| ushort vOff | 160 | 1493E2h | 2h |
+| ushort rrw | 64 | 1493E4h | 2h |
+| ushort rrh | 64 | 1493E6h | 2h |
+| uint slotTableOffset | 40 | 1493E8h | 4h |
+| uint animTableOffset | 552 | 1493ECh | 4h |
+| uint spriteImageOffset | 592 | 1493F0h | 4h |
+| uint defAnimIdx | 0 | 1493F4h | 4h |
+
+`tex11` is 12th GS Info in _nm07.map_. And `tex11` is the target texture pointed from first TEXA metadata. This TEXA is same metadata as described at previous sections.
+
+![texture 11 in nm07.map](./raw-texture/nm07_tex11.png)
+
+The left texture is base 256x256 image. The color palette looks wrong entirely, because this single image consists of at least 7 individual sub parts. It means that seven GS Infos refer this single image.
+
+The right texture is a region-clamped 64x64 texture image using UV offset (192, 160), with proper palette.
+
+The image generated with frame:
+
+| Frame index | Output sprite image | Applied effect
+|-------------|---------------------|------------
+| 0           | ![frame 0](./raw-texture/nm07-0-0-0.png) | Renders part (192, 160, 255, 223) of original texture
+| 1           | ![frame 1](./raw-texture/nm07-0-0-1.png) | Replace part (192, 160, 255, 223) with embedded sprite image.
+| 2           | No image | Immediately jump to frame index 0 (due to loopOffset = -2)
 
 ### _DMY
 
@@ -246,6 +381,16 @@ Dummy tag used for padding.
 |--------|---------|------------
 | 0      | char[4] | "_DMY"
 | 4      | uint32  | Total byte size of data. Always `0`.
+
+This is sample placement of `_DMY` found in _nm07.map_. The following `TEXA` metadata can be aligned on 16 bytes boundary.
+
+```txt
+14:93C0h: 5F 44 4D 59 00 00 00 00 54 45 58 41 50 12 00 00  _DMY....TEXAP... 
+14:93D0h: <--             TEXA metadata
+14:93B0h:                                             -->
+14:A620h: 5F 44 4D 59 00 00 00 00 54 45 58 41 50 12 00 00  _DMY....TEXAP... 
+14:A630h: ...
+```
 
 ### _KN5
 
