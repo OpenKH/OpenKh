@@ -15,7 +15,7 @@ namespace OpenKh.Command.CoctChanger
 {
     [Command("OpenKh.Command.CoctChanger")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(CreateRoomCoctCommand), typeof(UseThisCoctCommand))]
+    [Subcommand(typeof(CreateRoomCoctCommand), typeof(UseThisCoctCommand), typeof(ShowStatsCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -248,6 +248,56 @@ namespace OpenKh.Command.CoctChanger
                     File.Create(mapOut).Using(s => Bar.Write(s, entries));
                 }
                 return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "coct file: show stats")]
+        private class ShowStatsCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Input map/coct file (decided by file extension: `.map` or not)")]
+            public string InputFile { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var isMap = Path.GetExtension(InputFile).ToLowerInvariant() == ".map";
+
+                if (isMap)
+                {
+                    foreach (var entry in File.OpenRead(InputFile).Using(Bar.Read)
+                        .Where(entry => false
+                            || entry.Type == Bar.EntryType.MapCollision
+                            || entry.Type == Bar.EntryType.CameraCollision
+                            || entry.Type == Bar.EntryType.LightData
+                            || entry.Type == Bar.EntryType.MapCollision2
+                            || entry.Type == Bar.EntryType.ModelCollision
+                        )
+                    )
+                    {
+                        Console.WriteLine($"# {entry.Name}:{entry.Index} ({entry.Type})");
+                        PrintSummary(Coct.Read(entry.Stream));
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    PrintSummary(File.OpenRead(InputFile).Using(Coct.Read));
+                }
+
+                return 0;
+            }
+
+            private void PrintSummary(Coct coct)
+            {
+                Console.WriteLine($"{coct.CollisionMeshGroupList.Count,8:#,##0} collision mesh groups.");
+                Console.WriteLine($"{coct.CollisionMeshList.Count,8:#,##0} collision meshes.");
+                Console.WriteLine($"{coct.CollisionList.Count,8:#,##0} collisions.");
+                Console.WriteLine($"{coct.VertexList.Count,8:#,##0} vertices.");
+                Console.WriteLine($"{coct.PlaneList.Count,8:#,##0} planes.");
+                Console.WriteLine($"{coct.BoundingBoxList.Count,8:#,##0} bounding boxes.");
+                Console.WriteLine($"{coct.SurfaceFlagsList.Count,8:#,##0} surface flags.");
             }
         }
     }
