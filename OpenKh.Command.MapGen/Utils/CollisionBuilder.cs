@@ -15,6 +15,8 @@ namespace OpenKh.Command.MapGen.Utils
         public readonly Coct coct = new Coct();
         public readonly Doct doct = new Doct();
 
+        public List<ushort[]> vifPacketRenderingGroup { get; } = new List<ushort[]>();
+
         public CollisionBuilder(IEnumerable<BigMesh> bigMeshes, bool disableBSPCollisionBuilder)
         {
             if (disableBSPCollisionBuilder)
@@ -30,17 +32,16 @@ namespace OpenKh.Command.MapGen.Utils
         class CenterPointedMesh
         {
             public BigMesh bigMesh;
-            public BigMesh.TriangleStrip triangleStrip;
 
             public Vector3 centerPoint;
 
-            public CenterPointedMesh(BigMesh bigMesh, BigMesh.TriangleStrip triangleStrip)
+            public CenterPointedMesh(BigMesh bigMesh)
             {
                 this.bigMesh = bigMesh;
-                this.triangleStrip = triangleStrip;
 
                 centerPoint = GetCenter(
-                    triangleStrip.vertexIndices
+                    bigMesh.triangleStripList
+                        .SelectMany(triangleStrip => triangleStrip.vertexIndices)
                         .Select(index => bigMesh.vertexList[index])
                 );
             }
@@ -160,13 +161,13 @@ namespace OpenKh.Command.MapGen.Utils
 
         class BSPWalker
         {
-            private BSP bsp;
             private Coct coct;
             private BuildHelper helper;
 
+            public List<ushort[]> vifPacketRenderingGroup = new List<ushort[]>();
+
             public BSPWalker(BSP bsp, Coct coct, BuildHelper helper)
             {
-                this.bsp = bsp;
                 this.coct = coct;
                 this.helper = helper;
 
@@ -198,11 +199,15 @@ namespace OpenKh.Command.MapGen.Utils
                 {
                     var firstIdx3 = coct.CollisionList.Count;
 
+                    var vifPacketIndices = new List<ushort>();
+
                     foreach (var point in pair[0].Points)
                     {
                         var mesh = point.bigMesh;
 
-                        foreach (var set in TriangleStripsToTriangleFans(new BigMesh.TriangleStrip[] { point.triangleStrip }))
+                        vifPacketIndices.AddRange(mesh.vifPacketIndices);
+
+                        foreach (var set in TriangleStripsToTriangleFans(mesh.triangleStripList))
                         {
                             var quad = set.Count == 4;
 
@@ -235,6 +240,12 @@ namespace OpenKh.Command.MapGen.Utils
                             CollisionStart = Convert.ToUInt16(firstIdx3),
                             CollisionEnd = Convert.ToUInt16(lastIdx3),
                         }
+                    );
+
+                    vifPacketRenderingGroup.Add(
+                        vifPacketIndices
+                            .Distinct()
+                            .ToArray()
                     );
 
                     return new WalkResult
@@ -310,40 +321,59 @@ namespace OpenKh.Command.MapGen.Utils
             var bsp = new BSP(
                 bigMeshes
                     .Where(mesh => !mesh.matDef.noclip)
-                    .SelectMany(
-                        mesh => mesh.triangleStripList
-                            .Select(
-                                triangleStrip => new CenterPointedMesh(mesh, triangleStrip)
-                            )
-                    )
+                    .Select(mesh => new CenterPointedMesh(mesh))
                     .ToArray()
             );
 
             var helper = new BuildHelper(coct);
             var walker = new BSPWalker(bsp, coct, helper);
 
+            vifPacketRenderingGroup.AddRange(walker.vifPacketRenderingGroup);
+
             coct.ReverseMeshGroup();
 
             // Entry2 index is tightly coupled to vifPacketRenderingGroup's index.
             // Thus do not add Entry2 unplanned.
 
-            var firstGroup = coct.CollisionMeshGroupList.First();
+            CreateDoctFromCoct();
+        }
 
-            doct.Add(
-                new Doct.Entry2
-                {
-                    BoundingBox = firstGroup.BoundingBox
-                        .ToBoundingBox(),
-                }
-            );
+        private void CreateDoctFromCoct()
+        {
+            // directly mapping:
+            // coctMesh → doct.Entry2
+            // coctMeshGroup → doct.Entry1
 
-            doct.CompleteAndAdd(
-                new Doct.Entry1
-                {
-                    Entry2Index = Convert.ToUInt16(0),
-                    Entry2LastIndex = Convert.ToUInt16(1),
-                }
-            );
+            foreach (var coctMesh in coct.CollisionMeshList)
+            {
+                doct.Add(
+                    new Doct.Entry2
+                    {
+                        BoundingBox = coctMesh.BoundingBox
+                            .ToBoundingBox(),
+                    }
+                );
+            }
+
+            foreach (var coctMeshGroup in coct.CollisionMeshGroupList)
+            {
+                doct.Entry1List.Add(
+                    new Doct.Entry1
+                    {
+                        Child1 = coctMeshGroup.Child1,
+                        Child2 = coctMeshGroup.Child2,
+                        Child3 = coctMeshGroup.Child3,
+                        Child4 = coctMeshGroup.Child4,
+                        Child5 = coctMeshGroup.Child5,
+                        Child6 = coctMeshGroup.Child6,
+                        Child7 = coctMeshGroup.Child7,
+                        Child8 = coctMeshGroup.Child8,
+                        BoundingBox = coctMeshGroup.BoundingBox.ToBoundingBox(),
+                        Entry2Index = coctMeshGroup.CollisionMeshStart,
+                        Entry2LastIndex = coctMeshGroup.CollisionMeshEnd,
+                    }
+                );
+            }
         }
 
         private void PerMeshClipRendering(IEnumerable<BigMesh> bigMeshes)
@@ -357,6 +387,8 @@ namespace OpenKh.Command.MapGen.Utils
             )
             {
                 var firstIdx3 = coct.CollisionList.Count;
+
+                var vifPacketIndices = new List<ushort>(mesh.vifPacketIndices);
 
                 foreach (var set in TriangleStripsToTriangleFans(mesh.triangleStripList))
                 {
@@ -382,6 +414,12 @@ namespace OpenKh.Command.MapGen.Utils
 
                 var lastIdx3 = coct.CollisionList.Count;
 
+                vifPacketRenderingGroup.Add(
+                    vifPacketIndices
+                        .Distinct()
+                        .ToArray()
+                );
+
                 var collisionMesh = coct.CompleteAndAdd(
                     new CollisionMesh
                     {
@@ -393,7 +431,7 @@ namespace OpenKh.Command.MapGen.Utils
 
             var lastIdx2 = coct.CollisionMeshList.Count;
 
-            var firstGroup = coct.CompleteAndAdd(
+            coct.CompleteAndAdd(
                 new CollisionMeshGroup
                 {
                     CollisionMeshStart = Convert.ToUInt16(firstIdx2),
@@ -401,25 +439,10 @@ namespace OpenKh.Command.MapGen.Utils
                 }
             );
 
-
             // Entry2 index is tightly coupled to vifPacketRenderingGroup's index.
             // Thus do not add Entry2 unplanned.
 
-            doct.Add(
-                new Doct.Entry2
-                {
-                    BoundingBox = firstGroup.BoundingBox
-                        .ToBoundingBox(),
-                }
-            );
-
-            doct.CompleteAndAdd(
-                new Doct.Entry1
-                {
-                    Entry2Index = Convert.ToUInt16(0),
-                    Entry2LastIndex = Convert.ToUInt16(1),
-                }
-            );
+            CreateDoctFromCoct();
         }
 
         private static IEnumerable<IList<int>> TriangleStripsToTriangleFans(IList<BigMesh.TriangleStrip> list)

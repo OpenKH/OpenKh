@@ -243,6 +243,7 @@ namespace OpenKh.Command.MapGen
                 var fileNames = new string[] {
                     matDef.fromFile,
                     matDef.fromFile2,
+                    matDef.fromFile3,
                     matDef.name + ".imd",
                     matDef.name + ".png",
                 }

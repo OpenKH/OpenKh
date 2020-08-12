@@ -21,6 +21,7 @@ namespace OpenKh.Command.MapGen.Utils
 
         private Mdlx.M4 mapModel;
         private BigMeshContainer bigMeshContainer;
+        private List<BigMesh> smallMeshList = new List<BigMesh>();
         private ModelTexture modelTex;
         private CollisionBuilder collisionBuilder;
         private Logger logger = LogManager.GetCurrentClassLogger();
@@ -34,7 +35,16 @@ namespace OpenKh.Command.MapGen.Utils
 
             logger.Debug($"Starting collision plane builder.");
 
-            collisionBuilder = new CollisionBuilder(bigMeshContainer.MeshList, config.disableBSPCollisionBuilder);
+            collisionBuilder = new CollisionBuilder(smallMeshList, config.disableBSPCollisionBuilder);
+
+            if (collisionBuilder.vifPacketRenderingGroup != null)
+            {
+                logger.Debug($"Updating vifPacketRenderingGroup builder.");
+
+                mapModel.vifPacketRenderingGroup = collisionBuilder.vifPacketRenderingGroup;
+
+                logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups.");
+            }
 
             logger.Debug($"Output: {collisionBuilder.coct.CollisionList.Count:#,##0} collision planes, {collisionBuilder.coct.CollisionMeshList.Count:#,##0} collision meshes, {collisionBuilder.coct.CollisionMeshGroupList.Count:#,##0} collision mesh groups");
 
@@ -141,8 +151,19 @@ namespace OpenKh.Command.MapGen.Utils
                 var diffuseTextureFile = modelMat.TextureDiffuse.FilePath;
                 if (!string.IsNullOrEmpty(diffuseTextureFile))
                 {
-                    logger.Debug($"The mesh \"{inputMesh.Name}\" material \"{matDef.name}\" has filepath \"{diffuseTextureFile}\" for diffuse texture. It will be associated with material's fromFile2.");
-                    matDef.fromFile2 = diffuseTextureFile;
+                    if (config.reuseImd)
+                    {
+                        logger.Debug($"The mesh \"{inputMesh.Name}\" material \"{matDef.name}\" has filepath \"{diffuseTextureFile}\" for diffuse texture. It will be associated with material's fromFile3. Setting preferable imd file to fromFile2 due to reuseImd flag.");
+
+                        matDef.fromFile2 = Path.ChangeExtension(diffuseTextureFile, ".imd");
+                        matDef.fromFile3 = diffuseTextureFile;
+                    }
+                    else
+                    {
+                        logger.Debug($"The mesh \"{inputMesh.Name}\" material \"{matDef.name}\" has filepath \"{diffuseTextureFile}\" for diffuse texture. It will be associated with material's fromFile2.");
+
+                        matDef.fromFile3 = diffuseTextureFile;
+                    }
                 }
 
                 var kh2BaseVert = kh2Mesh.vertexList.Count;
@@ -233,6 +254,11 @@ namespace OpenKh.Command.MapGen.Utils
                 foreach (var smallMesh in BigMeshSplitter.Split(bigMesh))
                 {
                     var dmaPack = new MapVifPacketBuilder(smallMesh);
+
+                    smallMeshList.Add(smallMesh);
+
+                    bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.VifPackets.Count));
+                    smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.VifPackets.Count));
 
                     mapModel.VifPackets.Add(
                         new Mdlx.VifPacketDescriptor

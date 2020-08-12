@@ -27,6 +27,8 @@ namespace OpenKh.Command.MapGen.Models
 
         public MaterialDef matDef;
 
+        public List<ushort> vifPacketIndices = new List<ushort>();
+
         public class TriangleStrip
         {
             public List<int> vertexIndices = new List<int>();
