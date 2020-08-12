@@ -26,8 +26,23 @@
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Header="Import..." Command="{Binding ImportCommand}"/>
-                <MenuItem Header="Export..." Command="{Binding ExportCommand}"/>
+                <MenuItem Header="Create _new IMGZ" Command="{Binding CreateNewImgzCommand}"/>
+                <MenuItem Header="Convert to IMGZ" Command="{Binding ConvertToImgzCommand}"/>
+                <Separator/>
+                <MenuItem Header="Insert empty image" Command="{Binding InsertEmptyImageCommand}"/>
+                <Separator/>
+                <MenuItem Header="Replace current image..." Command="{Binding ImportCommand}" CommandParameter="ReplaceCurrent"/>
+                <MenuItem Header="Insert image..." Command="{Binding ImportCommand}" CommandParameter="BeforeCurrent"/>
+                <MenuItem Header="Append image..." Command="{Binding ImportCommand}" CommandParameter="Last"/>
+                <Separator/>
+                <MenuItem Header="Convert to 4-bpp image" Command="{Binding ConvertBitsPerPixelCommand}" CommandParameter="-b 4"/>
+                <MenuItem Header="Convert to 8-bpp image" Command="{Binding ConvertBitsPerPixelCommand}" CommandParameter="-b 8"/>
+                <Separator/>
+                <MenuItem Header="Use pngquant" IsChecked="{Binding UsePngquant}" IsCheckable="True" />
+                <Separator/>
+                <MenuItem Header="Remove current image" Command="{Binding RemoveImageCommand}"/>
+                <Separator/>
+                <MenuItem Header="Export current image..." Command="{Binding ExportCommand}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
@@ -70,7 +85,7 @@
                 </DrawingBrush>
             </Canvas.Background>
         </Canvas>
-        
+
         <Image
             Grid.Row="1"
             HorizontalAlignment="Left"

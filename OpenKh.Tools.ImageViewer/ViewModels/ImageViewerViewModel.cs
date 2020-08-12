@@ -1,8 +1,15 @@
 ﻿using OpenKh.Common;
+using OpenKh.Imaging;
+using OpenKh.Kh2;
 using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Imaging;
+using OpenKh.Tools.ImageViewer.Models;
 using OpenKh.Tools.ImageViewer.Services;
+using OpenKh.Tools.ImageViewer.Utils;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -114,20 +121,147 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 }, ExportFilters);
             }, x => true);
 
-            ImportCommand = new RelayCommand(x =>
-            {
-                var defaultFileName = $"{Path.GetFileNameWithoutExtension(FileName)}.png";
-                FileDialog.OnOpen(fileName =>
+            ImportCommand = new RelayCommand(
+                parameter =>
                 {
-                    using (var fStream = File.OpenRead(fileName))
+                    AddImage(Enum.Parse<AddPosition>($"{parameter}"));
+                },
+                x => IsMultipleImageFormat
+            );
+
+            CreateNewImgzCommand = new RelayCommand(
+                x =>
+                {
+                    if (IsSingleImageFormat || IsMultipleImageFormat)
                     {
-                        throw new NotImplementedException();
+                        if (MessageBoxResult.OK != MessageBox.Show("This will discard all of existing images.", null, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation))
+                        {
+                            return;
+                        }
                     }
-                }, new List<FileDialogFilter>().AddExtensions("PNG image", "png"));
-            }, x => false);
+
+                    FileName = null;
+
+                    EditImageList(
+                        currentImageList =>
+                        {
+                            var newImage = CreateDummyImage();
+                            return new EditResult
+                            {
+                                imageList = new IImageRead[] { newImage },
+                                selection = newImage,
+                            };
+                        }
+                    );
+                }
+            );
+
+            ConvertToImgzCommand = new RelayCommand(
+                x =>
+                {
+                    FileName = null;
+
+                    EditImageList(
+                        currentImageList =>
+                        {
+                            return new EditResult
+                            {
+                                imageList = new IImageRead[] { Image.Source },
+                                selection = Image.Source
+                            };
+                        }
+                    );
+                },
+                x => IsSingleImageFormat
+            );
+
+            InsertEmptyImageCommand = new RelayCommand(
+                x =>
+                {
+                    AddEmptyImage(AddPosition.BeforeCurrent);
+                },
+                x => IsMultipleImageFormat
+            );
+
+            RemoveImageCommand = new RelayCommand(
+                x =>
+                {
+                    EditImageList(
+                        currentImageList =>
+                        {
+                            return new EditResult
+                            {
+                                imageList = currentImageList.Except(new IImageRead[] { Image?.Source })
+                            };
+                        }
+                    );
+                },
+                x => IsMultipleImageFormat && ImageContainer.Count >= 1
+            );
+
+            ConvertBitsPerPixelCommand = new RelayCommand(
+                parameter =>
+                {
+                    try
+                    {
+                        EditImageList(
+                            currentImageList =>
+                            {
+                                using var tempFileProvider = new TempFileProvider();
+                                var pngFile = tempFileProvider.NewFile(".png");
+                                var sourceImage = Image.Source;
+                                sourceImage.SaveImage(pngFile);
+
+                                var imdFile = Path.ChangeExtension(pngFile, ".imd");
+
+                                var imgtoolOptions = $"{parameter} {((UsePngquant ?? false) ? "-p" : "")}";
+
+                                try
+                                {
+                                    var result = new RunCmd(
+                                        "OpenKh.Command.ImgTool.exe",
+                                        $"imd \"{pngFile}\" -o \"{imdFile}\" {imgtoolOptions}"
+                                    );
+
+                                    if (result.ExitCode == 0)
+                                    {
+                                        var newImage = File.OpenRead(imdFile).Using(Imgd.Read);
+
+                                        return new EditResult
+                                        {
+                                            imageList = currentImageList
+                                                .Select(it => ReferenceEquals(it, sourceImage) ? newImage : it),
+
+                                            selection = newImage,
+                                        };
+                                    }
+
+                                    throw new Exception($"ImgTool failed ({result.ExitCode})");
+                                }
+                                catch (Win32Exception ex)
+                                {
+                                    throw new Exception($"Launching ImgTool failed: {ex.Message}", ex);
+                                }
+                            }
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"{ex.Message}",
+                            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                },
+                x => IsMultipleImageFormat && ImageContainer.Count >= 1
+            );
 
             ZoomLevel = ZoomLevelFit;
         }
+
+        public bool IsMultipleImageFormat => _imageFormat != null ? _imageFormat.IsContainer : false;
+        public bool IsSingleImageFormat => _imageFormat != null ? !_imageFormat.IsContainer : false;
+
+        public bool? UsePngquant { get; set; }
+
 
         public ImageViewerViewModel(Stream stream) :
             this()
@@ -161,7 +295,11 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         public RelayCommand AboutCommand { get; set; }
         public RelayCommand ExportCommand { get; set; }
         public RelayCommand ImportCommand { get; set; }
-
+        public RelayCommand CreateNewImgzCommand { get; }
+        public RelayCommand ConvertToImgzCommand { get; private set; }
+        public RelayCommand InsertEmptyImageCommand { get; private set; }
+        public RelayCommand RemoveImageCommand { get; private set; }
+        public RelayCommand ConvertBitsPerPixelCommand { get; private set; }
         public IEnumerable<KeyValuePair<string, double>> ZoomLevels { get; } =
             new double[]
             {
@@ -173,6 +311,17 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 new KeyValuePair<string, double>("Fit", ZoomLevelFit)
             })
             .ToArray();
+
+        IEnumerable<ActionDef> _actionDefs;
+        public IEnumerable<ActionDef> ActionDefs
+        {
+            get => _actionDefs;
+            set
+            {
+                _actionDefs = value;
+                OnPropertyChanged(nameof(ActionDefs));
+            }
+        }
 
         private IImageFormat ImageFormat
         {
@@ -288,6 +437,143 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             }
         }
 
+        private IImageRead CreateDummyImage()
+            => Imgd.Create(
+                new System.Drawing.Size(128, 128),
+                PixelFormat.Indexed8,
+                new byte[128 * 128],
+                Enumerable.Repeat((byte)0x80, 4 * 256).ToArray(), // gray color palette
+                false
+            );
+
+        class EditResult
+        {
+            internal IEnumerable<IImageRead> imageList;
+            internal IImageRead selection;
+        }
+
+        private void EditImageList(Func<List<IImageRead>, EditResult> editor)
+        {
+            var currentImageList = (ImageContainer?.Images.ToList()) ?? new List<IImageRead>();
+            var currentIndex = currentImageList.IndexOf(Image?.Source);
+
+            var editResult = editor(currentImageList);
+
+            ImageContainer = new ImageFormatService.ImageContainer(editResult.imageList);
+
+            if (ImageContainerItems.Any())
+            {
+                if (editResult.selection != null)
+                {
+                    Image = ImageContainerItems
+                        .FirstOrDefault(it => ReferenceEquals(editResult.selection, it.Source));
+                }
+                else
+                {
+                    Image = ImageContainerItems
+                        .Skip(currentIndex)
+                        .FirstOrDefault() ?? ImageContainerItems.Last();
+                }
+            }
+            else
+            {
+                Image = null;
+            }
+
+            ImageFormat = _imageFormatService.Formats.Single(it => it.Name == "IMGZ");
+        }
+
+        enum AddPosition
+        {
+            BeforeCurrent,
+            ReplaceCurrent,
+            AfterCurrent,
+            Last,
+        }
+
+        private void AddEmptyImage(AddPosition addPosition)
+        {
+            EditImageList(
+                imageList =>
+                {
+                    var incomingImages = new IImageRead[] { CreateDummyImage() };
+                    var position = Math.Max(0, imageList.IndexOf(Image?.Source));
+
+                    switch (addPosition)
+                    {
+                        case AddPosition.BeforeCurrent:
+                            imageList.InsertRange(position, incomingImages);
+                            break;
+                        case AddPosition.AfterCurrent:
+                            imageList.InsertRange(position + 1, incomingImages);
+                            break;
+                        case AddPosition.Last:
+                        default:
+                            imageList.AddRange(incomingImages);
+                            break;
+                    }
+
+                    return new EditResult
+                    {
+                        imageList = imageList,
+                        selection = incomingImages.LastOrDefault(),
+                    };
+                }
+            );
+        }
+
+        private void AddImage(AddPosition addPosition)
+        {
+            FileDialog.OnOpen(fileName =>
+            {
+                using (var stream = File.OpenRead(fileName))
+                {
+                    var imageFormat = _imageFormatService.GetFormatByContent(stream);
+                    if (imageFormat == null)
+                        throw new Exception("Image format not found for the given stream.");
+
+                    var incomingImages = imageFormat.IsContainer
+                        ? imageFormat.As<IImageMultiple>().Read(stream).Images
+                        : new IImageRead[] { imageFormat.As<IImageSingle>().Read(stream) };
+
+                    EditImageList(
+                        imageList =>
+                        {
+                            var position = Math.Max(0, imageList.IndexOf(Image?.Source));
+
+                            var selectedImage = Image?.Source;
+
+                            switch (addPosition)
+                            {
+                                case AddPosition.BeforeCurrent:
+                                case AddPosition.ReplaceCurrent:
+                                    imageList.InsertRange(position, incomingImages);
+                                    break;
+                                case AddPosition.AfterCurrent:
+                                    imageList.InsertRange(position + 1, incomingImages);
+                                    break;
+                                case AddPosition.Last:
+                                default:
+                                    imageList.AddRange(incomingImages);
+                                    break;
+                            }
+
+                            if (addPosition == AddPosition.ReplaceCurrent)
+                            {
+                                imageList.Remove(selectedImage);
+                            }
+
+                            return new EditResult
+                            {
+                                imageList = imageList,
+                                selection = incomingImages.LastOrDefault(),
+                            };
+                        }
+                    );
+                }
+            }, OpenFilters);
+        }
+
         public void Save(Stream stream) => Save(stream, ImageFormat);
 
         public void Save(Stream stream, IImageFormat imageFormat)
@@ -306,6 +592,26 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         {
             var extensions = _imageFormatService.Formats.Select(x => $"*.{x.Extension}");
             return string.Join(";", extensions).Substring(2);
+        }
+
+        class RunCmd
+        {
+            private Process p;
+
+            public string App => p.StartInfo.FileName;
+            public int ExitCode => p.ExitCode;
+
+            public RunCmd(string app, string arg)
+            {
+                var psi = new ProcessStartInfo(app, arg)
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                };
+                var p = Process.Start(psi);
+                p.WaitForExit();
+                this.p = p;
+            }
         }
     }
 }
