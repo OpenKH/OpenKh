@@ -4,6 +4,9 @@ using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
 {
+    /// <summary>
+    /// Unfinished
+    /// </summary>
     public class Plrp
     {
         [Data] public short Difficulty { get; set; } //???

@@ -23,7 +23,6 @@ namespace OpenKh.Tests.kh2
                 Helpers.AssertStream(stream, x =>
                 {
                     var outStream = new MemoryStream();
-
                     Ftst.Write(outStream, Ftst.Read(x));
 
                     return outStream;
@@ -47,9 +46,7 @@ namespace OpenKh.Tests.kh2
                 Helpers.AssertStream(stream, x =>
                 {
                     var outStream = new MemoryStream();
-
                     Item.Read(x).Write(outStream);
-
                     return outStream;
                 });
             });
@@ -62,6 +59,18 @@ namespace OpenKh.Tests.kh2
             {
                 var table = Trsr.Read(stream);
                 Assert.Equal(0x1AE, table.Count);
+            });
+
+            [Fact]
+            public void ShouldWriteTheExactSameFile() => File.OpenRead("kh2/res/trsr.bin").Using(stream =>
+            {
+                Helpers.AssertStream(stream, x =>
+                {
+                    var outStream = new MemoryStream();
+                    Trsr.Write(outStream, Trsr.Read(x));
+
+                    return outStream;
+                });
             });
         }
     }

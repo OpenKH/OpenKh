@@ -2,6 +2,9 @@
 
 namespace OpenKh.Kh2.Battle
 {
+    /// <summary>
+    /// Unfinished
+    /// </summary>
     public class Atkp
     {
         public int Id { get; set; }
