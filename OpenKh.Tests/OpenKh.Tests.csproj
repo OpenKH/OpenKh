@@ -189,6 +189,12 @@
     </None>    
     <None Update="kh2\res\lvup_fm.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>    
+    <None Update="kh2\res\sample2.cmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>    
+    <None Update="kh2\res\sample2.dec">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="kh2\res\sys.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
