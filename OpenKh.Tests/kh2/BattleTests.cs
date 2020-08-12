@@ -3,6 +3,7 @@ using OpenKh.Common;
 using OpenKh.Kh2.Battle;
 using System.Linq;
 using Xunit;
+using OpenKh.Kh2;
 
 namespace OpenKh.Tests.kh2
 {
@@ -49,7 +50,7 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void EnemyTableTest() => Common.FileOpenRead(@"kh2/res/enmp.bin", x => x.Using(stream =>
         {
-            var table = BaseBattle<Enmp>.Read(stream);
+            var table = BaseTable<Enmp>.Read(stream);
 
             Assert.Equal(2, table.Id);
             Assert.Equal(229, table.Count);
@@ -75,7 +76,7 @@ namespace OpenKh.Tests.kh2
             Helpers.AssertStream(stream, inStream =>
             {
                 var outStream = new MemoryStream();
-                BaseBattle<Bons>.Read(inStream).Write(outStream);
+                BaseTable<Bons>.Read(inStream).Write(outStream);
                 return outStream;
             });
         });
@@ -86,7 +87,7 @@ namespace OpenKh.Tests.kh2
             Helpers.AssertStream(stream, inStream =>
             {
                 var outStream = new MemoryStream();
-                BaseBattle<Przt>.Read(inStream).Write(outStream);
+                BaseTable<Przt>.Read(inStream).Write(outStream);
                 return outStream;
             });
         });
@@ -97,7 +98,7 @@ namespace OpenKh.Tests.kh2
             Helpers.AssertStream(stream, inStream =>
             {
                 var outStream = new MemoryStream();
-                BaseBattle<Vtbl>.Read(inStream).Write(outStream);
+                BaseTable<Vtbl>.Read(inStream).Write(outStream);
                 return outStream;
             });
         });

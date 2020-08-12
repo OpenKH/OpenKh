@@ -21,6 +21,6 @@ namespace OpenKh.Kh2.Battle
             $"HP: {HpIncrease}, MP: {MpIncrease}, ItemSlot: {ItemSlotUpgrade}, " +
             $"Acc.Slot: {AccessorySlotUpgrade}, Bonus 1: {BonusItem1}, Bonus 2: {BonusItem2}";
 
-        public static BaseBattle<Bons> Read(Stream stream) => BaseBattle<Bons>.Read(stream);
+        public static BaseTable<Bons> Read(Stream stream) => BaseTable<Bons>.Read(stream);
     }
 }

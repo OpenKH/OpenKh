@@ -55,14 +55,14 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         { }
 
         public EnmpViewModel() :
-            this(new BaseBattle<Enmp>
+            this(new BaseTable<Enmp>
             {
                 Id = DefaultType,
                 Items = new List<Enmp>()
             })
         { }
 
-        private EnmpViewModel(BaseBattle<Enmp> enmp) :
+        private EnmpViewModel(BaseTable<Enmp> enmp) :
             this(enmp.Id, enmp.Items)
         { }
 
@@ -90,7 +90,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            new BaseBattle<Enmp>
+            new BaseTable<Enmp>
             {
                 Id = _type,
                 Items = UnfilteredItems.Select(x => x.Enmp).ToList()

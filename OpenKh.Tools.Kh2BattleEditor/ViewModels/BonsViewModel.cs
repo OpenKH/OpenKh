@@ -52,14 +52,14 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         { }
 
         public BonsViewModel() :
-            this(new BaseBattle<Bons>
+            this(new BaseTable<Bons>
             {
                 Id = DefaultType,
                 Items = new List<Bons>()
             })
         { }
 
-        private BonsViewModel(BaseBattle<Bons> enmp) :
+        private BonsViewModel(BaseTable<Bons> enmp) :
             this(enmp.Id, enmp.Items)
         { }
 
@@ -86,7 +86,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            new BaseBattle<Bons>
+            new BaseTable<Bons>
             {
                 Id = _type,
                 Items = UnfilteredItems.Select(x => x.Bons).ToList()

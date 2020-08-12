@@ -23,6 +23,6 @@ namespace OpenKh.Kh2.Battle
         [Data] public ushort Item3 { get; set; }
         [Data] public short Item3Percentage { get; set; }
 
-        public static BaseBattle<Przt> Read(Stream stream) => BaseBattle<Przt>.Read(stream);
+        public static BaseTable<Przt> Read(Stream stream) => BaseTable<Przt>.Read(stream);
     }
 }

@@ -21,6 +21,6 @@ namespace OpenKh.Kh2.Battle
         [Data] public short Unknown58 { get; set; }
         [Data] public short Unknown5a { get; set; }
 
-        public static BaseBattle<Enmp> Read(Stream stream) => BaseBattle<Enmp>.Read(stream);
+        public static BaseTable<Enmp> Read(Stream stream) => BaseTable<Enmp>.Read(stream);
     }
 }

@@ -55,14 +55,14 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         { }
 
         public PrztViewModel() :
-            this(new BaseBattle<Przt>
+            this(new BaseTable<Przt>
             {
                 Id = DefaultType,
                 Items = new List<Przt>()
             })
         { }
 
-        private PrztViewModel(BaseBattle<Przt> przt) :
+        private PrztViewModel(BaseTable<Przt> przt) :
             this(przt.Id, przt.Items)
         { }
 
@@ -89,7 +89,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            new BaseBattle<Przt>
+            new BaseTable<Przt>
             {
                 Id = _type,
                 Items = UnfilteredItems.Select(x => x.Przt).ToList()

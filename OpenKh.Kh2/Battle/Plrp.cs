@@ -16,6 +16,6 @@ namespace OpenKh.Kh2.Battle
         [Data] public short Unknown0a { get; set; }
         [Data(Count = 58)] public List<short> Objects { get; set; }
 
-        public static BaseBattle<Plrp> Read(Stream stream) => BaseBattle<Plrp>.Read(stream);
+        public static BaseTable<Plrp> Read(Stream stream) => BaseTable<Plrp>.Read(stream);
     }
 }

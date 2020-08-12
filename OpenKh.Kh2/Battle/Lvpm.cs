@@ -11,6 +11,6 @@ namespace OpenKh.Kh2.Battle
         public short Attack { get; set; }
         public short Unknown0a { get; set; }
 
-        public static BaseBattle<Lvpm> Read(Stream stream) => BaseBattle<Lvpm>.Read(stream);
+        public static BaseTable<Lvpm> Read(Stream stream) => BaseTable<Lvpm>.Read(stream);
     }
 }
