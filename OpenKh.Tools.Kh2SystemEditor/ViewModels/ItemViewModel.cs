@@ -129,7 +129,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             var stream = new MemoryStream();
             new Item
             {
-                Items1 = this.Select(x => x.Item).ToList(),
+                Items1 = UnfilteredItems.Select(x => x.Item).ToList(),
                 Items2 = _item2
             }.Write(stream);
 

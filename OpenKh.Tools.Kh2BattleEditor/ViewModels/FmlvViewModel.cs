@@ -37,7 +37,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            Fmlv.Write(stream, Items.SelectMany(form => form).Select(x => x.Level).ToList());
+            Fmlv.Write(stream, UnfilteredItems.SelectMany(form => form).Select(x => x.Level).ToList());
             return stream;
         }
     }

@@ -121,7 +121,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            Trsr.Write(stream, this.Select(x => x.Treasure));
+            Trsr.Write(stream, UnfilteredItems.Select(x => x.Treasure));
 
             return stream;
         }
