@@ -80,9 +80,9 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         }
 
         private const string entryName = "item";
+        private readonly IMessageProvider _messageProvider;
+        private readonly List<Item.Stat> _item2;
         private string _searchTerm;
-        private IMessageProvider _messageProvider;
-        private List<Item.Stat> _item2;
 
         public ItemViewModel(IMessageProvider messageProvider, IEnumerable<Bar.Entry> entries) :
             this(messageProvider, Item.Read(entries.GetBinaryStream(entryName)))

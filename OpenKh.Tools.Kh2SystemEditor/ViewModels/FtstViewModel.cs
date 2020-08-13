@@ -74,7 +74,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public List<ColorItem> ColorItems { get; } = new List<ColorItem>();
         }
 
-        private List<Ftst.Entry> _entries = new List<Ftst.Entry>();
+        private readonly List<Ftst.Entry> _entries = new List<Ftst.Entry>();
 
         private const string _entryName = "ftst";
 
@@ -122,12 +122,5 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             Ftst.Write(stream, Palette.ToList());
             return stream;
         }
-
-        private static IEnumerable<Entry> Map(Ftst.Entry[] entries) =>
-            Enumerable.Range(0, Constants.WorldCount)
-                .Select(x => new Entry((World)x, 9, index => 0, (index, color) => { }));
-
-        private static int[] GetPalette(int index, Ftst.Entry[] entries) =>
-            entries.Select(x => x.Colors[index]).ToArray();
     }
 }

@@ -8,8 +8,6 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
 {
     public class EventsViewModel : GenericListModel<EventViewModel>
     {
-        private EventViewModel _selectedItem;
-
         public EventsViewModel() :
             this(new Event[0])
         { }

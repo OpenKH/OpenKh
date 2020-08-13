@@ -17,8 +17,7 @@ namespace OpenKh.Game.Infrastructure
 {
     public class Kernel : ILanguage
     {
-        private readonly IDataContent _dataContent;
-        private int _regionId;
+        private readonly int _regionId;
 
         public bool IsFinalMix { get; }
         public bool IsReMix { get; }

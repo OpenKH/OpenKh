@@ -103,10 +103,10 @@ namespace OpenKh.Kh2
             var palette = new byte[16 * 4];
             for (int i = 0, index = 0; i < 16; i++)
             {
-                palette[index++] = (byte)((FontColors[i & 3] >> 0) & 0xFF);
-                palette[index++] = (byte)((FontColors[i & 3] >> 8) & 0xFF);
-                palette[index++] = (byte)((FontColors[i & 3] >> 16) & 0xFF);
-                palette[index++] = (byte)((((FontColors[i & 3] >> 24) & 0xFF) + 1) / 2);
+                palette[index++] = (byte)((fontColors[i & 3] >> 0) & 0xFF);
+                palette[index++] = (byte)((fontColors[i & 3] >> 8) & 0xFF);
+                palette[index++] = (byte)((fontColors[i & 3] >> 16) & 0xFF);
+                palette[index++] = (byte)((((fontColors[i & 3] >> 24) & 0xFF) + 1) / 2);
             }
 
             return palette;
@@ -117,10 +117,10 @@ namespace OpenKh.Kh2
             var palette = new byte[16 * 4];
             for (int i = 0, index = 0; i < 16; i++)
             {
-                palette[index++] = (byte)((FontColors[i / 4] >> 0) & 0xFF);
-                palette[index++] = (byte)((FontColors[i / 4] >> 8) & 0xFF);
-                palette[index++] = (byte)((FontColors[i / 4] >> 16) & 0xFF);
-                palette[index++] = (byte)((((FontColors[i / 4] >> 24) & 0xFF) + 1) / 2);
+                palette[index++] = (byte)((fontColors[i / 4] >> 0) & 0xFF);
+                palette[index++] = (byte)((fontColors[i / 4] >> 8) & 0xFF);
+                palette[index++] = (byte)((fontColors[i / 4] >> 16) & 0xFF);
+                palette[index++] = (byte)((((fontColors[i / 4] >> 24) & 0xFF) + 1) / 2);
             }
 
             return palette;
