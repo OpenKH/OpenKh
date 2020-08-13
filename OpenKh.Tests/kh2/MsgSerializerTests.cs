@@ -1,5 +1,4 @@
 ﻿using OpenKh.Common.Exceptions;
-using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System.IO;
 using System.Linq;

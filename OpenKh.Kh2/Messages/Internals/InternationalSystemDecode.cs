@@ -247,7 +247,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xeb] = new TextCmdModel('`'),
             [0xec] = new TextCmdModel('´'),
             [0xed] = new TextCmdModel('"'),
-            [0xee] = new TextCmdModel('\''), 
+            [0xee] = new TextCmdModel('\''),
             [0xef] = new TextCmdModel('★'),
             [0xf0] = new TextCmdModel('☆'),
             [0xf1] = new TextCmdModel('■'),

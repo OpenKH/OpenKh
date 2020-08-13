@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xe.BinaryMapper;
+﻿using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Jiminy
 {

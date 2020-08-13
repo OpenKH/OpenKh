@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace OpenKh.Kh2.Messages.Internals
+﻿namespace OpenKh.Kh2.Messages.Internals
 {
     internal class DataCmdModel : BaseCmdModel
     {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2

@@ -1,9 +1,8 @@
-using System.IO;
 using OpenKh.Common;
 using OpenKh.Kh2.Battle;
+using System.IO;
 using System.Linq;
 using Xunit;
-using OpenKh.Kh2;
 
 namespace OpenKh.Tests.kh2
 {
