@@ -52,7 +52,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
                 MagicCode = _lvup.MagicCode,
                 Count = _lvup.Count,
                 Unknown08 = _lvup.Unknown08,
-                Characters = Items.Select(x => x.Character).ToList()
+                Characters = UnfilteredItems.Select(x => x.Character).ToList()
             }.Write(stream);
 
             return stream;

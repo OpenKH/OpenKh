@@ -89,7 +89,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             new BaseBattle<Bons>
             {
                 Id = _type,
-                Items = Items.Select(x => x.Bons).ToList()
+                Items = UnfilteredItems.Select(x => x.Bons).ToList()
             }.Write(stream);
 
             return stream;

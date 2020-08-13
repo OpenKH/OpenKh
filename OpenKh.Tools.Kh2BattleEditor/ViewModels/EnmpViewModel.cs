@@ -93,7 +93,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             new BaseBattle<Enmp>
             {
                 Id = _type,
-                Items = Items.Select(x => x.Enmp).ToList()
+                Items = UnfilteredItems.Select(x => x.Enmp).ToList()
             }.Write(stream);
 
             return stream;
