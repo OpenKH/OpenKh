@@ -1,6 +1,5 @@
 ﻿using OpenKh.Common;
 using OpenKh.Engine.Parsers;
-using OpenKh.Kh2;
 using System.IO;
 using Xunit;
 

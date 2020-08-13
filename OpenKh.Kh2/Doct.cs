@@ -117,8 +117,6 @@ namespace OpenKh.Kh2
             }
 
             {
-                var writer = new BinaryWriter(stream);
-
                 var newHeader = new HeaderDef
                 {
                     MagicCode = MagicCode,
@@ -134,7 +132,7 @@ namespace OpenKh.Kh2
                     Entry3TotalLength = 0,
                 };
 
-                BinaryMapping.WriteObject(writer, newHeader);
+                BinaryMapping.WriteObject(stream, newHeader);
 
                 entry1Data.Position = 0;
                 entry1Data.CopyTo(stream);

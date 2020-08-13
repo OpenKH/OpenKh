@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
@@ -23,6 +24,9 @@ namespace OpenKh.Kh2.Battle
         [Data] public ushort Item3 { get; set; }
         [Data] public short Item3Percentage { get; set; }
 
-        public static BaseBattle<Przt> Read(Stream stream) => BaseBattle<Przt>.Read(stream);
+        public static List<Przt> Read(Stream stream) => BaseTable<Przt>.Read(stream);
+
+        public static void Write(Stream stream, IEnumerable<Przt> items) =>
+            BaseTable<Przt>.Write(stream, 2, items);
     }
 }

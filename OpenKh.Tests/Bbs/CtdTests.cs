@@ -1,28 +1,24 @@
 ﻿using OpenKh.Bbs;
 using OpenKh.Common;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.Bbs
 {
-    public class CtdTests : Common
+    public class CtdTests
     {
         private static readonly string FileName = "Bbs/res/ctdtest.ctd";
 
         [Fact]
         public void IsValidTest()
         {
-            using (var stream = new MemoryStream())
-            {
-                stream.WriteByte(0x40);
-                stream.WriteByte(0x43);
-                stream.WriteByte(0x54);
-                stream.WriteByte(0x44);
-                stream.Position = 0;
-                Assert.True(Ctd.IsValid(stream));
-            }
+            using var stream = new MemoryStream();
+            stream.WriteByte(0x40);
+            stream.WriteByte(0x43);
+            stream.WriteByte(0x54);
+            stream.WriteByte(0x44);
+            stream.Position = 0;
+            Assert.True(Ctd.IsValid(stream));
         }
 
         [Fact]
@@ -40,14 +36,14 @@ namespace OpenKh.Tests.Bbs
         }
 
         [Fact]
-        public void ReadCorrectAmountOfEntry1() => FileOpenRead(FileName, stream =>
+        public void ReadCorrectAmountOfEntry1() => File.OpenRead(FileName).Using(stream =>
         {
             var ctd = Ctd.Read(stream);
             Assert.Equal(41, ctd.Messages.Count);
         });
 
         [Fact]
-        public void ReadCorrectAmountOfEntry2() => FileOpenRead(FileName, stream =>
+        public void ReadCorrectAmountOfEntry2() => File.OpenRead(FileName).Using(stream =>
         {
             var ctd = Ctd.Read(stream);
             Assert.Equal(14, ctd.Layouts.Count);
@@ -57,7 +53,7 @@ namespace OpenKh.Tests.Bbs
         [InlineData(0, "Command Deck")]
         [InlineData(1, "Action Commands")]
         [InlineData(12345678, null)]
-        public void ReadStringCorrectly(int id, string expected) => FileOpenRead(FileName, stream =>
+        public void ReadStringCorrectly(int id, string expected) => File.OpenRead(FileName).Using(stream =>
         {
             var ctd = Ctd.Read(stream);
             var str = ctd.GetString(id);
@@ -66,7 +62,7 @@ namespace OpenKh.Tests.Bbs
         });
 
         [Fact]
-        public void WritesBackCorrectly() => FileOpenRead(FileName, stream =>
+        public void WritesBackCorrectly() => File.OpenRead(FileName).Using(stream =>
             Helpers.AssertStream(stream, x =>
             {
                 var ctd = Ctd.Read(stream);

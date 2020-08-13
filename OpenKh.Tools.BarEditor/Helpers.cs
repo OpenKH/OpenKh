@@ -1,6 +1,6 @@
 ﻿using OpenKh.Kh2;
-using static OpenKh.Kh2.Bar;
 using System.Collections.Generic;
+using static OpenKh.Kh2.Bar;
 
 namespace OpenKh.Tools.BarEditor
 {

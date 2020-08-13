@@ -1,5 +1,4 @@
 ﻿using OpenKh.Kh2.Messages.Internals;
-using System;
 using System.Collections.Generic;
 
 namespace OpenKh.Kh2.Messages

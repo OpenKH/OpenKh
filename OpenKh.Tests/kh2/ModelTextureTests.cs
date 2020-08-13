@@ -3,7 +3,6 @@ using OpenKh.Imaging;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -95,7 +94,7 @@ namespace OpenKh.Tests.kh2
         public void Read8bitPaletteCorrectly() => File.OpenRead(FileName2).Using(stream =>
         {
             var images = ModelTexture.Read(stream).Images;
-            
+
             AssertPalette(images, 0, 0, 0, 0, 0);
             AssertPalette(images, 0, 4, 10, 10, 10);
             AssertPalette(images, 0, 8, 11, 15, 23);

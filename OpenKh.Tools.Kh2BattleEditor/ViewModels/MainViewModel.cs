@@ -17,7 +17,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 {
     public class MainViewModel : BaseNotifyPropertyChanged
     {
-        private static string ApplicationName = Utilities.GetApplicationName();
+        private static readonly string ApplicationName = Utilities.GetApplicationName();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
         private static readonly List<FileDialogFilter> BattleFilter = FileDialogFilterComposer.Compose()
             .AddExtensions("00battle", "bin", "bar").AddAllFiles();

@@ -28,7 +28,7 @@ namespace OpenKh.Tests.kh2
         }
 
         [Fact]
-        public void ReadHeaderTest() => Common.FileOpenRead(FilePath, stream =>
+        public void ReadHeaderTest() => File.OpenRead(FilePath).Using(stream =>
         {
             var image = Imgd.Read(stream);
             Assert.Equal(128, image.Size.Width);
@@ -53,7 +53,7 @@ namespace OpenKh.Tests.kh2
         [InlineData("8bit-64-64")]
         [InlineData("32bit-512-512")]
         public void IsWritingBackCorrectly(string baseName) =>
-            Common.FileOpenRead($"kh2/res/image-{baseName}.imd", stream =>
+            File.OpenRead($"kh2/res/image-{baseName}.imd").Using(stream =>
         {
             var expectedData = new byte[stream.Length];
             stream.Read(expectedData, 0, expectedData.Length);
@@ -87,7 +87,7 @@ namespace OpenKh.Tests.kh2
         [InlineData("8bit-512-512")]
         [InlineData("8bit-64-64")]
         public void IsCreatingCorrectlyTest(string baseName) =>
-            Common.FileOpenRead($"kh2/res/image-{baseName}.imd", stream =>
+            File.OpenRead($"kh2/res/image-{baseName}.imd").Using(stream =>
         {
             var expectedData = new byte[stream.Length];
             stream.Read(expectedData, 0, expectedData.Length);

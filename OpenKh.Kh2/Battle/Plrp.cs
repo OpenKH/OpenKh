@@ -4,6 +4,9 @@ using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
 {
+    /// <summary>
+    /// Unfinished
+    /// </summary>
     public class Plrp
     {
         [Data] public short Difficulty { get; set; } //???
@@ -16,6 +19,9 @@ namespace OpenKh.Kh2.Battle
         [Data] public short Unknown0a { get; set; }
         [Data(Count = 58)] public List<short> Objects { get; set; }
 
-        public static BaseBattle<Plrp> Read(Stream stream) => BaseBattle<Plrp>.Read(stream);
+        public static List<Plrp> Read(Stream stream) => BaseTable<Plrp>.Read(stream);
+
+        public static void Write(Stream stream, IEnumerable<Plrp> items) =>
+            BaseTable<Plrp>.Write(stream, 2, items);
     }
 }

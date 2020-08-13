@@ -1,13 +1,12 @@
 using OpenKh.Common;
 using OpenKh.Bbs;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.Bbs
 {
-    public class ArcTests : Common
+    public class ArcTests
     {
         private static readonly string FileName = "Bbs/res/arctest.arc";
 
@@ -50,14 +49,14 @@ namespace OpenKh.Tests.Bbs
         }
 
         [Fact]
-        public void ReadCorrectAmountOfEntries() => FileOpenRead(FileName, stream =>
+        public void ReadCorrectAmountOfEntries() => File.OpenRead(FileName).Using(stream =>
         {
             var entries = Arc.Read(stream);
             Assert.Equal(3, entries.Count());
         });
 
         [Fact]
-        public void ReadEntryNamesCorrectly() => FileOpenRead(FileName, stream =>
+        public void ReadEntryNamesCorrectly() => File.OpenRead(FileName).Using(stream =>
         {
             var entries = Arc.Read(stream).ToArray();
             Assert.Equal("TBoxDtTe.itb", entries[0].Name);
@@ -66,7 +65,7 @@ namespace OpenKh.Tests.Bbs
         });
 
         [Fact]
-        public void ReadEntryFullPathCorrectly() => FileOpenRead(FileName, stream =>
+        public void ReadEntryFullPathCorrectly() => File.OpenRead(FileName).Using(stream =>
         {
             var entries = Arc.Read(stream).ToArray();
             Assert.Equal("TBoxDtTe.itb", entries[0].Path);
@@ -75,7 +74,7 @@ namespace OpenKh.Tests.Bbs
         });
 
         [Fact]
-        public void ReadEntryLengthCorrectly() => FileOpenRead(FileName, stream =>
+        public void ReadEntryLengthCorrectly() => File.OpenRead(FileName).Using(stream =>
         {
             var entries = Arc.Read(stream).ToArray();
             Assert.Equal(0x3ec, entries[0].Data.Length);
@@ -83,7 +82,7 @@ namespace OpenKh.Tests.Bbs
         });
 
         [Fact]
-        public void ReadEntryContentCorrectly() => FileOpenRead(FileName, stream =>
+        public void ReadEntryContentCorrectly() => File.OpenRead(FileName).Using(stream =>
         {
             var entries = Arc.Read(stream).ToArray();
             Assert.Equal(0x42, entries[0].Data[2]);
@@ -91,7 +90,7 @@ namespace OpenKh.Tests.Bbs
         });
 
         [Fact]
-        public void IsPointerFieldShouldBeCorrectlyPopulated() => FileOpenRead(FileName, stream =>
+        public void IsPointerFieldShouldBeCorrectlyPopulated() => File.OpenRead(FileName).Using(stream =>
         {
             var entries = Arc.Read(stream).ToArray();
             Assert.False(entries[0].IsLink);
@@ -100,14 +99,14 @@ namespace OpenKh.Tests.Bbs
         });
 
         [Fact]
-        public void PointersShouldHaveNullData() => FileOpenRead(FileName, stream =>
+        public void PointersShouldHaveNullData() => File.OpenRead(FileName).Using(stream =>
         {
             var entries = Arc.Read(stream).ToArray();
             Assert.Null(entries[2].Data);
         });
 
         [Fact]
-        public void WritesBackCorrectly() => FileOpenRead(FileName, stream =>
+        public void WritesBackCorrectly() => File.OpenRead(FileName).Using(stream =>
             Helpers.AssertStream(stream, x =>
             {
                 var entries = Arc.Read(stream);

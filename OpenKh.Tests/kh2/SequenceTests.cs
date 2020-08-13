@@ -87,7 +87,7 @@ namespace OpenKh.Tests.kh2
         });
 
         private void StartTest(Action<Stream> action) =>
-            Common.FileOpenRead(FilePath, x =>
+            File.OpenRead(FilePath).Using(x =>
                 action(new Xe.IO.SubStream(x, Offset, Length)));
     }
 }

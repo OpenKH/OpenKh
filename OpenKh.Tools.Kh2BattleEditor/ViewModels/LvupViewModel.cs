@@ -13,7 +13,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
     {
         private const int DefaultType = 2;
         private const string entryName = "lvup";
-        private Lvup _lvup;
+        private readonly Lvup _lvup;
         public string EntryName => entryName;
 
         public LvupViewModel(IEnumerable<Bar.Entry> entries) :
@@ -60,7 +60,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
         public class CharacterViewModel : GenericListModel<CharacterViewModel.LevelViewModel>
         {
-            private int _index;
+            private readonly int _index;
             public Lvup.PlayableCharacter Character { get; set; }
             public string Name => ((Lvup.PlayableCharacterType)_index).ToString();
 
@@ -73,8 +73,8 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
             public class LevelViewModel
             {
-                private Lvup.PlayableCharacter.Level _level;
-                private int _index;
+                private readonly Lvup.PlayableCharacter.Level _level;
+                private readonly int _index;
 
                 public string Name => $"Level {_index + 1}";
 

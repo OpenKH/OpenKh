@@ -43,10 +43,8 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             public override string ToString() => Name;
         }
 
-        private const int DefaultType = 2;
         private const string entryName = "przt";
 
-        private readonly int _type;
         private string _searchTerm;
         public string EntryName => entryName;
 
@@ -55,21 +53,12 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         { }
 
         public PrztViewModel() :
-            this(new BaseBattle<Przt>
-            {
-                Id = DefaultType,
-                Items = new List<Przt>()
-            })
+            this(new List<Przt>())
         { }
 
-        private PrztViewModel(BaseBattle<Przt> przt) :
-            this(przt.Id, przt.Items)
-        { }
-
-        private PrztViewModel(int type, IEnumerable<Przt> items) :
+        private PrztViewModel(IEnumerable<Przt> items) :
             base(items.Select(Map))
         {
-            _type = type;
         }
 
         public Visibility IsItemEditingVisible => IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
@@ -89,11 +78,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            new BaseBattle<Przt>
-            {
-                Id = _type,
-                Items = UnfilteredItems.Select(x => x.Przt).ToList()
-            }.Write(stream);
+            Przt.Write(stream, UnfilteredItems.Select(x => x.Przt));
 
             return stream;
         }

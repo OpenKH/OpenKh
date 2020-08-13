@@ -10,7 +10,6 @@ namespace OpenKh.Tools.Common.Models
         {
         }
 
-        public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => Items.GetEnumerator();
         protected override T OnNewItem() => throw new System.NotImplementedException();
     }

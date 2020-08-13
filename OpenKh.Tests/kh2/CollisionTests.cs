@@ -1,7 +1,6 @@
 ﻿using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
-using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
