@@ -20,13 +20,9 @@ namespace OpenKh.Kh2.Battle
         [Data] public short Unknown0a { get; set; }
         [Data(Count = 58)] public List<short> Objects { get; set; }
 
-        public static List<Plrp> Read(Stream stream) => BaseTable<Plrp>.Read(stream).Items;
+        public static List<Plrp> Read(Stream stream) => BaseTable<Plrp>.Read(stream);
 
         public static void Write(Stream stream, IEnumerable<Plrp> items) =>
-            new BaseTable<Plrp>
-            {
-                Id = 2,
-                Items = items.ToList()
-            }.Write(stream);
+            BaseTable<Plrp>.Write(stream, 2, items);
     }
 }

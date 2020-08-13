@@ -90,8 +90,8 @@ namespace OpenKh.Kh2.System
 
             return new Item
             {
-                Items1 = one.Items,
-                Items2 = two.Items
+                Items1 = one,
+                Items2 = two
             };
         }
 

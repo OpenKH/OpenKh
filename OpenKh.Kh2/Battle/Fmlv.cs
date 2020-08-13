@@ -62,13 +62,9 @@ namespace OpenKh.Kh2.Battle
                 $"{FormFm} {FormLevel}: EXP {Exp}, Ability {Ability:X04} Lv. {LevelGrowthAbility}";
         }
 
-        public static List<Level> Read(Stream stream) => BaseTable<Level>.Read(stream).Items;
+        public static List<Level> Read(Stream stream) => BaseTable<Level>.Read(stream);
 
         public static void Write(Stream stream, IEnumerable<Level> items) =>
-            new BaseTable<Level>
-            {
-                Id = 2,
-                Items = items.ToList()
-            }.Write(stream);
+            BaseTable<Level>.Write(stream, 2, items);
     }
 }

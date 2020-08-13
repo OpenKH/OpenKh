@@ -13,13 +13,9 @@ namespace OpenKh.Kh2.Battle
         public short Attack { get; set; }
         public short Unknown0a { get; set; }
 
-        public static List<Lvpm> Read(Stream stream) => BaseTable<Lvpm>.Read(stream).Items;
+        public static List<Lvpm> Read(Stream stream) => BaseTable<Lvpm>.Read(stream);
 
         public static void Write(Stream stream, IEnumerable<Lvpm> items) =>
-            new BaseTable<Lvpm>
-            {
-                Id = 2,
-                Items = items.ToList()
-            }.Write(stream);
+            BaseTable<Lvpm>.Write(stream, 2, items);
     }
 }

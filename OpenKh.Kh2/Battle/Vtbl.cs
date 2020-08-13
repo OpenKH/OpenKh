@@ -19,13 +19,9 @@ namespace OpenKh.Kh2.Battle
             [Data] public sbyte Weight { get; set; } //(0 = normal random; 100 = guaranteed run)
         }
 
-        public static List<Vtbl> Read(Stream stream) => BaseTable<Vtbl>.Read(stream).Items;
+        public static List<Vtbl> Read(Stream stream) => BaseTable<Vtbl>.Read(stream);
 
         public static void Write(Stream stream, IEnumerable<Vtbl> items) =>
-            new BaseTable<Vtbl>
-            {
-                Id = 1,
-                Items = items.ToList()
-            }.Write(stream);
+            BaseTable<Vtbl>.Write(stream, 1, items);
     }
 }

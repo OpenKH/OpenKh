@@ -13,7 +13,7 @@ namespace OpenKh.Kh2.System
         }
 
         public static List<Entry> Read(Stream stream) =>
-            BaseTable<Entry>.Read(stream).Items;
+            BaseTable<Entry>.Read(stream);
 
         public static void Write(Stream stream, List<Entry> entries) =>
             BaseTable<Entry>.Write(stream, 1, entries);
