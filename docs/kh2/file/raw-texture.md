@@ -179,9 +179,15 @@ Provides a single pair of U and V speed factors for texture scrolling. Entries i
 |--------|---------|------------
 | 0      | char[4] | "UVSC"
 | 4      | uint32  | Total byte size of data. Always `0xC`.
-| 8      | uint32  | Index of entry.
+| 8      | uint32  | UVSC entry target index.
 | 12     | float   | U scroll speed.
 | 16     | float   | V scroll speed.
+
+_Notes:_
+
+- The engine can manage up to 16 UVSC entries simultaneously.
+- 6,400,000 will be enough to scroll 1 round per 1 second.
+- Negative scroll speed is acceptable too.
 
 ### TEXA (Texture Animation)
 
@@ -212,7 +218,10 @@ Image data for sprites is stored contiguously. Starting offsets for each image a
 | 40     | uint32  | Offset of sprite image data.
 | 44     | uint32  | Default animation index (idle).
 
-_Note:_ The offsets in TEXA are based on offset 8 (not offset 0), where heading 8 bytes are part of common header of metadata.
+_Notes:_
+
+- The offsets in TEXA are based on offset 8 (not offset 0), where heading 8 bytes are part of common header of metadata.
+- GS Info vs TEXA is 1:N. One texture pointed by GS info may be updated by two or more TEXA entries simultaneously.
 
 This is sample placement of TEXA metadata.
 

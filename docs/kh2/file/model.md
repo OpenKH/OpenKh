@@ -54,8 +54,22 @@ Stored straight after the model [header](#header).
 |--------|------|-------------|
 | 0x00   | uint32 | First [Source chain DMA tag](#source-chain-dma-tag) offset
 | 0x04   | uint32 | Texture Index
-| 0x08   | uint32 | Unknown
-| 0x0c   | uint32 | Unknown
+| 0x08   | uint16 | Unknown
+| 0x0a   | uint16 | Transparent flag. `1`: Enable, `0`: Disable.
+| 0x0c   | uint8 | UVSC option
+| 0x0d   | uint8 | Unknown
+| 0x0e   | uint8 | Unknown
+| 0x0f   | uint8 | Unknown
+
+UVSC option:
+
+| Bit | Description |
+|-----|-------------|
+| 0   | Unknown     |
+| 1   | `1`: Enable UVSC |
+| 2, 3, 4, 5 | UVSC source index (0 to 15) |
+| 6   | Unknown     |
+| 7   | Unknown     |
 
 ### vifPacketRenderingGroup
 
