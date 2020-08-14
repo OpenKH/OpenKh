@@ -12,7 +12,6 @@ using System.Windows;
 using Xe.Tools.Wpf.Dialogs;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 using Assimp;
-using OpenKh.Kh2.Ard;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
@@ -210,6 +209,12 @@ namespace OpenKh.Tools.Kh2MapStudio
                         ForMenuItem("Light Collision", ExportLightCollision, _mapRenderer.ShowLightCollision.HasValue);
                     });
                     ImGui.Separator();
+                    ForMenu("Preferences", () =>
+                    {
+                        ForEdit("Movement speed", () => EditorSettings.MoveSpeed, x => EditorSettings.MoveSpeed = x);
+                        ForEdit("Movement speed (shift)", () => EditorSettings.MoveSpeedShift, x => EditorSettings.MoveSpeedShift = x);
+                    });
+                    ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);
                 });
                 ForMenu("View", () =>
@@ -341,16 +346,16 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         private void ProcessKeyboardInput(KeyboardState keyboard, float deltaTime)
         {
-            const float Speed = 50.0f;
-            var speed = (float)(deltaTime * Speed);
+            var speed = (float)(deltaTime * EditorSettings.MoveSpeed);
+            var moveSpeed = speed;
             if (keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift))
-                speed *= 2.5f;
+                moveSpeed = (float)(deltaTime * EditorSettings.MoveSpeedShift);
 
             var camera = _mapRenderer.Camera;
-            if (keyboard.IsKeyDown(Keys.W)) camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtX, speed * 5);
-            if (keyboard.IsKeyDown(Keys.S)) camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtX, speed * 5);
-            if (keyboard.IsKeyDown(Keys.A)) camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtY, speed * 5);
-            if (keyboard.IsKeyDown(Keys.D)) camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtY, speed * 5);
+            if (keyboard.IsKeyDown(Keys.W)) camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.S)) camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.A)) camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.D)) camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
 
             if (keyboard.IsKeyDown(Keys.Up)) camera.CameraRotationYawPitchRoll += new xna.Vector3(0, 0, 1 * speed);
             if (keyboard.IsKeyDown(Keys.Down)) camera.CameraRotationYawPitchRoll -= new xna.Vector3(0, 0, 1 * speed);
