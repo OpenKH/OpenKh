@@ -11,6 +11,7 @@ namespace OpenKh.Engine.MonoGame
         private Vector3 _cameraPosition;
         private Vector3 _cameraLookAtX;
         private Vector3 _cameraLookAtY;
+        private Vector3 _cameraLookAtZ;
         private Vector3 _cameraUp;
         private Matrix _projection;
         private Matrix _world;
@@ -88,6 +89,16 @@ namespace OpenKh.Engine.MonoGame
             }
         }
 
+        public Vector3 CameraLookAtZ
+        {
+            get => _cameraLookAtZ;
+            set
+            {
+                _cameraLookAtZ = value;
+                InvalidateWorld();
+            }
+        }
+
         public Vector3 CameraUp
         {
             get => _cameraUp;
@@ -107,6 +118,7 @@ namespace OpenKh.Engine.MonoGame
                 var matrix = Matrix.CreateFromYawPitchRoll(value.X / 180.0f * 3.14159f, value.Y / 180.0f * 3.14159f, value.Z / 180.0f * 3.14159f);
                 CameraLookAtX = Vector3.Transform(new Vector3(1, 0, 0), matrix);
                 CameraLookAtY = Vector3.Transform(new Vector3(0, 0, 1), matrix);
+                CameraLookAtZ = Vector3.Transform(new Vector3(0, 1, 0), matrix);
             }
         }
 
