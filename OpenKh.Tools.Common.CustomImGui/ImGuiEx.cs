@@ -232,6 +232,13 @@ namespace OpenKh.Tools.Common.CustomImGui
                 setter(value);
         }
 
+        public static void ForMenuCheck(string name, Func<bool> getter, Action<bool> setter)
+        {
+            var value = getter();
+            if (ImGui.MenuItem(name, "", ref value))
+                setter(value);
+        }
+
         public static bool ForChild(string name, float w, float h, bool border, Action action)
         {
             var ret = ImGui.BeginChild(name, new Vector2(w, h), border);

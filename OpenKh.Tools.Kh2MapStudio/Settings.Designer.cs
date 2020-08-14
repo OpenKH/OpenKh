@@ -46,5 +46,101 @@ namespace OpenKh.Tools.Kh2MapStudio {
                 this["MoveSpeedShift"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewCamera {
+            get {
+                return ((bool)(this["ViewCamera"]));
+            }
+            set {
+                this["ViewCamera"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewLayerControl {
+            get {
+                return ((bool)(this["ViewLayerControl"]));
+            }
+            set {
+                this["ViewLayerControl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewSpawnPoint {
+            get {
+                return ((bool)(this["ViewSpawnPoint"]));
+            }
+            set {
+                this["ViewSpawnPoint"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewMeshGroup {
+            get {
+                return ((bool)(this["ViewMeshGroup"]));
+            }
+            set {
+                this["ViewMeshGroup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewBobDescriptors {
+            get {
+                return ((bool)(this["ViewBobDescriptors"]));
+            }
+            set {
+                this["ViewBobDescriptors"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewSpawnScriptMap {
+            get {
+                return ((bool)(this["ViewSpawnScriptMap"]));
+            }
+            set {
+                this["ViewSpawnScriptMap"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewSpawnScriptBattle {
+            get {
+                return ((bool)(this["ViewSpawnScriptBattle"]));
+            }
+            set {
+                this["ViewSpawnScriptBattle"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ViewSpawnScriptEvent {
+            get {
+                return ((bool)(this["ViewSpawnScriptEvent"]));
+            }
+            set {
+                this["ViewSpawnScriptEvent"] = value;
+            }
+        }
     }
 }

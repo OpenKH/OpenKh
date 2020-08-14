@@ -48,15 +48,6 @@ namespace OpenKh.Tools.Kh2MapStudio
         private List<string> _mapList = new List<string>();
         private ObjEntryController _objEntryController;
 
-        private bool _viewCamera = true;
-        private bool _viewLayerControl = true;
-        private bool _viewSpawnPoint = true;
-        private bool _viewMeshGroup = true;
-        private bool _viewBobDescriptor = true;
-        private bool _viewSpawnScriptMap = true;
-        private bool _viewSpawnScriptBtl = true;
-        private bool _viewSpawnScriptEvt = true;
-
         private xna.Point _previousMousePosition;
 
         public string Title
@@ -129,14 +120,22 @@ namespace OpenKh.Tools.Kh2MapStudio
             ForControl(ImGui.BeginMainMenuBar, ImGui.EndMainMenuBar, MainMenu);
 
             MainWindow();
-            if (_viewCamera) _viewCamera = CameraWindow.Run(_mapRenderer.Camera);
-            if (_viewLayerControl) _viewLayerControl = LayerControllerWindow.Run(_mapRenderer);
-            if (_viewSpawnPoint) _viewSpawnPoint = SpawnPointWindow.Run(_mapRenderer);
-            if (_viewMeshGroup) _viewMeshGroup = MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
-            if (_viewBobDescriptor) _viewBobDescriptor = BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
-            if (_viewSpawnScriptMap) _viewSpawnScriptMap = SpawnScriptWindow.Run("map", _mapRenderer.SpawnScriptMap);
-            if (_viewSpawnScriptBtl) _viewSpawnScriptBtl = SpawnScriptWindow.Run("btl", _mapRenderer.SpawnScriptBattle);
-            if (_viewSpawnScriptEvt) _viewSpawnScriptEvt = SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
+            if (EditorSettings.ViewCamera)
+                EditorSettings.ViewCamera = CameraWindow.Run(_mapRenderer.Camera);
+            if (EditorSettings.ViewLayerControl)
+                EditorSettings.ViewLayerControl = LayerControllerWindow.Run(_mapRenderer);
+            if (EditorSettings.ViewSpawnPoint)
+                EditorSettings.ViewSpawnPoint = SpawnPointWindow.Run(_mapRenderer);
+            if (EditorSettings.ViewMeshGroup)
+                EditorSettings.ViewMeshGroup = MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
+            if (EditorSettings.ViewBobDescriptor)
+                EditorSettings.ViewBobDescriptor = BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
+            if (EditorSettings.ViewSpawnScriptMap)
+                EditorSettings.ViewSpawnScriptMap = SpawnScriptWindow.Run("map", _mapRenderer.SpawnScriptMap);
+            if (EditorSettings.ViewSpawnScriptBattle)
+                EditorSettings.ViewSpawnScriptBattle = SpawnScriptWindow.Run("btl", _mapRenderer.SpawnScriptBattle);
+            if (EditorSettings.ViewSpawnScriptEvent)
+                EditorSettings.ViewSpawnScriptEvent = SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
 
             ImGui.PopStyleColor();
 
@@ -219,14 +218,14 @@ namespace OpenKh.Tools.Kh2MapStudio
                 });
                 ForMenu("View", () =>
                 {
-                    ImGui.MenuItem("Camera", "", ref _viewCamera);
-                    ImGui.MenuItem("Layer control", "", ref _viewLayerControl);
-                    ImGui.MenuItem("Spawn points", "", ref _viewSpawnPoint);
-                    ImGui.MenuItem("BOB descriptors", "", ref _viewBobDescriptor);
-                    ImGui.MenuItem("Mesh group", "", ref _viewMeshGroup);
-                    ImGui.MenuItem("Spawn script MAP", "", ref _viewSpawnScriptMap);
-                    ImGui.MenuItem("Spawn script BTL", "", ref _viewSpawnScriptBtl);
-                    ImGui.MenuItem("Spawn script EVT", "", ref _viewSpawnScriptEvt);
+                    ForMenuCheck("Camera", () => EditorSettings.ViewCamera, x => EditorSettings.ViewCamera = x);
+                    ForMenuCheck("Layer control", () => EditorSettings.ViewLayerControl, x => EditorSettings.ViewLayerControl = x);
+                    ForMenuCheck("Spawn points", () => EditorSettings.ViewSpawnPoint, x => EditorSettings.ViewSpawnPoint = x);
+                    ForMenuCheck("BOB descriptors", () => EditorSettings.ViewBobDescriptor, x => EditorSettings.ViewBobDescriptor = x);
+                    ForMenuCheck("Mesh group", () => EditorSettings.ViewMeshGroup, x => EditorSettings.ViewMeshGroup = x);
+                    ForMenuCheck("Spawn script MAP", () => EditorSettings.ViewSpawnScriptMap, x => EditorSettings.ViewSpawnScriptMap = x);
+                    ForMenuCheck("Spawn script BTL", () => EditorSettings.ViewSpawnScriptBattle, x => EditorSettings.ViewSpawnScriptBattle = x);
+                    ForMenuCheck("Spawn script EVT", () => EditorSettings.ViewSpawnScriptEvent, x => EditorSettings.ViewSpawnScriptEvent = x);
                 });
                 ForMenu("Help", () =>
                 {
