@@ -1,6 +1,5 @@
 ﻿using ImGuiNET;
 using OpenKh.Kh2;
-using System.Windows.Controls;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.Kh2MapStudio.Windows

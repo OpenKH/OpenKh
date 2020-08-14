@@ -35,7 +35,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         private readonly GraphicsDevice _graphics;
         private readonly KingdomShader _shader;
         private readonly Texture2D _whiteTexture;
-        private bool _showBobs;
+        private bool _showBobs = true;
 
         public Camera Camera { get; }
 
