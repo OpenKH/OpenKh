@@ -33,7 +33,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             _objPath = objPath;
         }
 
-        public ObjEntryController(BaseTable<Objentry> objEntries)
+        public ObjEntryController(List<Objentry> objEntries)
         {
             ObjectEntries = objEntries.OrderBy(x => x.ModelName).ToArray();
             _objEntryLookup = ObjectEntries
