@@ -1,5 +1,5 @@
+using Assimp;
 using ImGuiNET;
-using xna = Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.CustomImGui;
@@ -11,7 +11,7 @@ using System.Numerics;
 using System.Windows;
 using Xe.Tools.Wpf.Dialogs;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
-using Assimp;
+using xna = Microsoft.Xna.Framework;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
@@ -105,7 +105,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             AddKeyMapping(Keys.S, MenuFileSave);
             AddKeyMapping(Keys.Q, MenuFileUnload);
             OpenFolder(@"D:\Hacking\KH2\export_fm");
-            
+
             ImGui.PushStyleColor(ImGuiCol.MenuBarBg, BgUiColor);
         }
 

@@ -99,7 +99,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         }
 
 
-        internal List<Bar.Entry> MapBarEntries { get; private set; } 
+        internal List<Bar.Entry> MapBarEntries { get; private set; }
         internal List<Bar.Entry> ArdBarEntries { get; private set; }
         internal List<MeshGroupModel> MapMeshGroups { get; }
         internal List<MeshGroupModel> BobMeshGroups { get; }

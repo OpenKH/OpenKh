@@ -1,7 +1,7 @@
-﻿using System;
+﻿using OpenKh.Tools.Common.CustomImGui;
+using System;
 using System.Numerics;
 using xna = Microsoft.Xna.Framework;
-using OpenKh.Tools.Common.CustomImGui;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
