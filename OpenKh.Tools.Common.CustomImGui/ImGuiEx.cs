@@ -2,6 +2,7 @@ using ImGuiNET;
 using System;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 
 namespace OpenKh.Tools.Common.CustomImGui
 {
@@ -190,6 +191,9 @@ namespace OpenKh.Tools.Common.CustomImGui
                 ImGui.Begin(name, ref dummy);
                 return dummy;
             }, ImGui.End, action);
+
+        public static bool ForHeader(string name, Action action) =>
+            ForControl(() => ImGui.CollapsingHeader(name), action);
 
         public static void ForEdit(string name, Func<bool> getter, Action<bool> setter)
         {

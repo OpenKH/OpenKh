@@ -14,7 +14,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
         private static string ObjectFilter = "";
         private static ISpawnPointController _ctrl;
 
-        public static bool Run(ISpawnPointController ctrl) => ForWindow("Spawn point editor", () =>
+        public static bool Run(ISpawnPointController ctrl) => ForHeader("Spawn point editor", () =>
         {
             _ctrl = ctrl;
             if (ImGui.BeginCombo("Spawn point", ctrl.SelectSpawnPoint))

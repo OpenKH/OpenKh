@@ -5,7 +5,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
 {
     static class LayerControllerWindow
     {
-        public static bool Run(ILayerController layerController) => ForWindow("Layer control", () =>
+        public static bool Run(ILayerController layerController) => ForHeader("Layer control", () =>
         {
             if (layerController.ShowMap.HasValue)
                 ForEdit("Show MAP", () => layerController.ShowMap.Value, x => layerController.ShowMap = x);

@@ -6,7 +6,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
 {
     static class CollisionWindow
     {
-        public static void Run(Coct coct) => ForWindow("Collision", () =>
+        public static void Run(Coct coct) => ForHeader("Collision", () =>
         {
             Node(coct, 0);
         });
