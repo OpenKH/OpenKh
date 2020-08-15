@@ -115,7 +115,7 @@ namespace OpenKh.Kh2
                 Vertex3 = source.Vertex3,
                 Vertex4 = source.Vertex4,
                 Co5Index = source.PlaneIndex,
-                Co6Index = source.BoundingBoxIndex,
+                BoundingBox = Map6(source.BoundingBox),
                 Co7Index = source.SurfaceFlagsIndex,
             };
 
@@ -204,7 +204,7 @@ namespace OpenKh.Kh2
             public short Vertex3 { get; set; }
             public short Vertex4 { get; set; }
             public short Co5Index { get; set; }
-            public short Co6Index { get; set; }
+            public CoctBoundingBox BoundingBox { get; set; }
             public short Co7Index { get; set; }
         }
 
@@ -355,7 +355,7 @@ namespace OpenKh.Kh2
                 Vertex3 = source.Vertex3,
                 Vertex4 = source.Vertex4,
                 PlaneIndex = source.Co5Index,
-                BoundingBoxIndex = source.Co6Index,
+                BoundingBox = Unmap6(source.BoundingBox),
                 SurfaceFlagsIndex = source.Co7Index,
             };
 

@@ -1,6 +1,7 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Utils;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
@@ -150,7 +151,7 @@ namespace OpenKh.Command.CoctChanger
                             Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
                             Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
                             PlaneIndex = table5Idxes[side],
-                            BoundingBoxIndex = -1, // set later
+                            BoundingBox = BoundingBoxInt16.Invalid,
                             SurfaceFlagsIndex = table7Idx,
                         }
                     );

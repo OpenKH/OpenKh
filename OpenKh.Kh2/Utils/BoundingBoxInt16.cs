@@ -1,8 +1,4 @@
-﻿using OpenKh.Kh2.Jiminy;
-using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Text;
+﻿using System.Numerics;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Utils

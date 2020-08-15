@@ -25,7 +25,7 @@ namespace OpenKh.Kh2
         private const int Col3Size = 0x10;
         private const int Col4Size = 0x10;
         private const int Col5Size = 0x10;
-        private const int Col6Size = 0xC;
+        private const int BoundingBoxSize = 0xC;
         private const int Col7Size = 0x4;
 
         private class Header
@@ -41,6 +41,18 @@ namespace OpenKh.Kh2
         {
             [Data] public int Offset { get; set; }
             [Data] public int Length { get; set; }
+        }
+
+        private class RawCollision : IData
+        {
+            [Data] public short v00 { get; set; }
+            [Data] public short Vertex1 { get; set; }
+            [Data] public short Vertex2 { get; set; }
+            [Data] public short Vertex3 { get; set; }
+            [Data] public short Vertex4 { get; set; }
+            [Data] public short PlaneIndex { get; set; }
+            [Data] public short BoundingBoxIndex { get; set; }
+            [Data] public short SurfaceFlagsIndex { get; set; }
         }
 
         public class CollisionMeshGroup : IData
@@ -69,14 +81,14 @@ namespace OpenKh.Kh2
 
         public class Collision : IData
         {
-            [Data] public short v00 { get; set; }
-            [Data] public short Vertex1 { get; set; } = -1;
-            [Data] public short Vertex2 { get; set; } = -1;
-            [Data] public short Vertex3 { get; set; } = -1;
-            [Data] public short Vertex4 { get; set; } = -1;
-            [Data] public short PlaneIndex { get; set; }
-            [Data] public short BoundingBoxIndex { get; set; }
-            [Data] public short SurfaceFlagsIndex { get; set; }
+            public short v00 { get; set; }
+            public short Vertex1 { get; set; } = -1;
+            public short Vertex2 { get; set; } = -1;
+            public short Vertex3 { get; set; } = -1;
+            public short Vertex4 { get; set; } = -1;
+            public short PlaneIndex { get; set; }
+            public BoundingBoxInt16 BoundingBox { get; set; }
+            public short SurfaceFlagsIndex { get; set; }
         }
 
         public class SurfaceFlags : IData
@@ -113,11 +125,25 @@ namespace OpenKh.Kh2
 
             CollisionMeshGroupList = ReactCoctEntry<CollisionMeshGroup>(stream, header.Entries[1], Col1Size);
             CollisionMeshList = ReactCoctEntry<CollisionMesh>(stream, header.Entries[2], Col2Size);
-            CollisionList = ReactCoctEntry<Collision>(stream, header.Entries[3], Col3Size);
+            var collisionList = ReactCoctEntry<RawCollision>(stream, header.Entries[3], Col3Size);
             VertexList = ReadValueEntry<Vector4>(stream, header.Entries[4], Col4Size, ReadVector4);
             PlaneList = ReadValueEntry<Plane>(stream, header.Entries[5], Col5Size, ReadPlane);
-            BoundingBoxList = ReadValueEntry<BoundingBoxInt16>(stream, header.Entries[6], Col6Size, ReadBoundingBoxInt16);
+            BoundingBoxList = ReadValueEntry(stream, header.Entries[6], BoundingBoxSize, ReadBoundingBoxInt16);
             SurfaceFlagsList = ReactCoctEntry<SurfaceFlags>(stream, header.Entries[7], Col7Size);
+
+            CollisionList = collisionList
+                .Select(x => new Collision
+                {
+                    v00 = x.v00,
+                    Vertex1 = x.Vertex1,
+                    Vertex2 = x.Vertex2,
+                    Vertex3 = x.Vertex3,
+                    Vertex4 = x.Vertex4,
+                    PlaneIndex = x.PlaneIndex,
+                    BoundingBox = x.BoundingBoxIndex >= 0 ? BoundingBoxList[x.BoundingBoxIndex] : BoundingBoxInt16.Invalid,
+                    SurfaceFlagsIndex = x.SurfaceFlagsIndex,
+                })
+                .ToList();
         }
 
         private BoundingBoxInt16 ReadBoundingBoxInt16(Stream arg)
@@ -158,6 +184,18 @@ namespace OpenKh.Kh2
 
         public void Write(Stream stream)
         {
+            var bbDictionary = new Dictionary<string, short>
+            {
+                [BoundingBoxInt16.Invalid.ToString()] = -1
+            };
+
+            foreach (var item in CollisionList)
+            {
+                var key = item.BoundingBox.ToString();
+                if (!bbDictionary.ContainsKey(key))
+                    bbDictionary[key] = (short)(bbDictionary.Count - 1);
+            }
+
             var entries = new List<Entry>(8);
             AddEntry(entries, HeaderSize, 1);
             AddEntry(entries, CollisionMeshGroupList.Count * Col1Size, 0x10);
@@ -165,7 +203,7 @@ namespace OpenKh.Kh2
             AddEntry(entries, CollisionList.Count * Col3Size, 4);
             AddEntry(entries, VertexList.Count * Col4Size, 0x10);
             AddEntry(entries, PlaneList.Count * Col5Size, 0x10);
-            AddEntry(entries, BoundingBoxList.Count * Col6Size, 0x10);
+            AddEntry(entries, BoundingBoxList.Count * BoundingBoxSize, 0x10);
             AddEntry(entries, SurfaceFlagsList.Count * Col7Size, 4);
 
             stream.Position = 0;
@@ -180,7 +218,18 @@ namespace OpenKh.Kh2
 
             WriteCoctEntry(stream, CollisionMeshGroupList);
             WriteCoctEntry(stream, CollisionMeshList);
-            WriteCoctEntry(stream, CollisionList);
+            WriteCoctEntry(stream, CollisionList
+                .Select(x => new RawCollision
+                {
+                    v00 = x.v00,
+                    Vertex1 = x.Vertex1,
+                    Vertex2 = x.Vertex2,
+                    Vertex3 = x.Vertex3,
+                    Vertex4 = x.Vertex4,
+                    PlaneIndex = x.PlaneIndex,
+                    BoundingBoxIndex = bbDictionary[x.BoundingBox.ToString()],
+                    SurfaceFlagsIndex = x.SurfaceFlagsIndex,
+                }));
             stream.AlignPosition(0x10);
             WriteValueEntry(stream, VertexList, WriteVector4);
             WriteValueEntry(stream, PlaneList, WritePlane);
@@ -276,7 +325,6 @@ namespace OpenKh.Kh2
         public class BuildHelper
         {
             private readonly Coct coct;
-            private readonly SortedDictionary<string, int> boundingBoxIndexMap = new SortedDictionary<string, int>();
             private readonly SortedDictionary<string, int> planeIndexMap = new SortedDictionary<string, int>();
             private readonly SortedDictionary<string, int> vertexIndexMap = new SortedDictionary<string, int>();
 
@@ -284,25 +332,6 @@ namespace OpenKh.Kh2
             {
                 this.coct = coct;
             }
-
-            public short AllocateBoundingBox(
-                BoundingBoxInt16 bbox
-            )
-            {
-                var key = bbox.ToString();
-
-                if (!boundingBoxIndexMap.TryGetValue(key, out int index))
-                {
-                    index = coct.BoundingBoxList.Count;
-
-                    coct.BoundingBoxList.Add(bbox);
-
-                    boundingBoxIndexMap[key] = index;
-                }
-
-                return Convert.ToInt16(index);
-            }
-
             public short AllocatePlane(float x, float y, float z, float d) =>
                 AllocatePlane(new Plane(x, y, z, d));
 
@@ -376,29 +405,24 @@ namespace OpenKh.Kh2
 
             public void CompleteBBox(Collision ent3, int inflate = 0)
             {
-                var index = AllocateBoundingBox(
-                    BoundingBox.FromPoints(
-                        coct.VertexList[ent3.Vertex1].ToVector3(),
-                        coct.VertexList[ent3.Vertex2].ToVector3(),
-                        coct.VertexList[ent3.Vertex3].ToVector3(),
-                        coct.VertexList[(ent3.Vertex4 == -1) ? ent3.Vertex3 : ent3.Vertex4].ToVector3()
-                    )
-                        .ToBoundingBoxInt16()
-                        .InflateWith(Convert.ToInt16(inflate))
-                );
-
-                ent3.BoundingBoxIndex = index;
+                ent3.BoundingBox = BoundingBox.FromPoints(
+                    coct.VertexList[ent3.Vertex1].ToVector3(),
+                    coct.VertexList[ent3.Vertex2].ToVector3(),
+                    coct.VertexList[ent3.Vertex3].ToVector3(),
+                    coct.VertexList[(ent3.Vertex4 == -1) ? ent3.Vertex3 : ent3.Vertex4].ToVector3()
+                )
+                .ToBoundingBoxInt16()
+                .InflateWith(Convert.ToInt16(inflate));
             }
 
             public void CompleteBBox(CollisionMesh ent2)
             {
                 ent2.BoundingBox = Enumerable.Range(
                     ent2.CollisionStart,
-                    ent2.CollisionEnd - ent2.CollisionStart
-                )
-                    .Select(index => coct.CollisionList[index].BoundingBoxIndex)
-                    .Where(co6Index => co6Index != -1)
-                    .Select(co6Index => coct.BoundingBoxList[co6Index])
+                    ent2.CollisionEnd - ent2.CollisionStart)
+                    .Select(index => coct.CollisionList[index])
+                    .Where(collision => collision.BoundingBox != BoundingBoxInt16.Invalid)
+                    .Select(x => x.BoundingBox)
                     .MergeAll();
             }
 
@@ -458,7 +482,6 @@ namespace OpenKh.Kh2
 
             public void FlushCache()
             {
-                boundingBoxIndexMap.Clear();
                 planeIndexMap.Clear();
                 vertexIndexMap.Clear();
             }
