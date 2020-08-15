@@ -222,10 +222,10 @@ namespace OpenKh.Command.MapGen.Utils
                             collisionMesh.Collisions.Add(coct.Complete(
                                 new Collision
                                 {
-                                    Vertex1 = helper.AllocateVertex(v1.X, -v1.Y, -v1.Z), // why -Y and -Z ?
-                                    Vertex2 = helper.AllocateVertex(v2.X, -v2.Y, -v2.Z),
-                                    Vertex3 = helper.AllocateVertex(v3.X, -v3.Y, -v3.Z),
-                                    Vertex4 = Convert.ToInt16(quad ? helper.AllocateVertex(v4.X, -v4.Y, -v4.Z) : -1),
+                                    Vertex1 = new Vector4(v1.X, -v1.Y, -v1.Z, 1f), // why -Y and -Z ?
+                                    Vertex2 = new Vector4(v2.X, -v2.Y, -v2.Z, 1f),
+                                    Vertex3 = new Vector4(v3.X, -v3.Y, -v3.Z, 1f),
+                                    Vertex4 = quad ? new Vector4(v4.X, -v4.Y, -v4.Z, 1f) : Vector4.Zero,
                                     SurfaceFlags = new SurfaceFlags() { Flags = mesh.matDef.surfaceFlags }
                                 },
                                 inflate: 1
@@ -398,10 +398,10 @@ namespace OpenKh.Command.MapGen.Utils
                     collisionMesh.Collisions.Add(coct.Complete(
                         new Collision
                         {
-                            Vertex1 = helper.AllocateVertex(v1.X, -v1.Y, -v1.Z), // why -Y and -Z ?
-                            Vertex2 = helper.AllocateVertex(v2.X, -v2.Y, -v2.Z),
-                            Vertex3 = helper.AllocateVertex(v3.X, -v3.Y, -v3.Z),
-                            Vertex4 = Convert.ToInt16(quad ? helper.AllocateVertex(v4.X, -v4.Y, -v4.Z) : -1),
+                            Vertex1 = new Vector4(v1.X, -v1.Y, -v1.Z, 1f), // why -Y and -Z ?
+                            Vertex2 = new Vector4(v2.X, -v2.Y, -v2.Z, 1f),
+                            Vertex3 = new Vector4(v3.X, -v3.Y, -v3.Z, 1f),
+                            Vertex4 = quad ? new Vector4(v4.X, -v4.Y, -v4.Z, 1f) : Vector4.Zero,
                             SurfaceFlags = new SurfaceFlags() { Flags = mesh.matDef.surfaceFlags }
                         },
                         inflate: 1

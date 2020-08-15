@@ -114,13 +114,13 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
                     foreach (var c3 in c2.Items)
                     {
                         VertexPositionColorTexture[] vertices;
-                        var v1 = coct.VertexList[c3.Vertex1];
-                        var v2 = coct.VertexList[c3.Vertex2];
-                        var v3 = coct.VertexList[c3.Vertex3];
+                        var v1 = c3.Vertex1;
+                        var v2 = c3.Vertex2;
+                        var v3 = c3.Vertex3;
 
-                        if (c3.Vertex4 >= 0)
+                        if (c3.Vertex4 != System.Numerics.Vector4.Zero)
                         {
-                            var v4 = coct.VertexList[c3.Vertex4];
+                            var v4 = c3.Vertex4;
                             vertices = GenerateVertex(
                                 color,
                                 v1.X, v1.Y, v1.Z,

@@ -1,4 +1,4 @@
-using OpenKh.Common;
+﻿using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Utils;
 using System.IO;
@@ -31,13 +31,6 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(99, collision.CollisionMeshGroupList[6].Meshes[0].MinY);
             Assert.Equal(-3449, collision.CollisionMeshGroupList[6].Meshes[0].MaxX);
             Assert.Equal(1, collision.CollisionMeshGroupList[6].Meshes[0].Items.Count);
-
-            Assert.Equal(24, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex1);
-            Assert.Equal(25, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex2);
-            Assert.Equal(14, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex3);
-            Assert.Equal(18, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex4);
-
-            Assert.Equal(549, collision.VertexList.Count);
         });
 
         [Fact]
@@ -91,13 +84,6 @@ namespace OpenKh.Tests.kh2
                         Assert.Equal(99, collision.CollisionMeshGroupList[6].Meshes[0].MinY);
                         Assert.Equal(-3449, collision.CollisionMeshGroupList[6].Meshes[0].MaxX);
                         Assert.Equal(1, collision.CollisionMeshGroupList[6].Meshes[0].Items.Count);
-
-                        Assert.Equal(24, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex1);
-                        Assert.Equal(25, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex2);
-                        Assert.Equal(14, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex3);
-                        Assert.Equal(18, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex4);
-
-                        Assert.Equal(549, collision.VertexList.Count);
                     }
                 }
             );

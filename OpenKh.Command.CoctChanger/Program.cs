@@ -97,16 +97,16 @@ namespace OpenKh.Command.CoctChanger
                 // |    |  bottom
                 // 0 == 1  bottom
 
-                var table4Idxes = new short[]
+                var vertices = new Vector4[]
                 {
-                    builder.AllocateVertex(minX, minY, minZ, 1),
-                    builder.AllocateVertex(maxX, minY, minZ, 1),
-                    builder.AllocateVertex(maxX, minY, maxZ, 1),
-                    builder.AllocateVertex(minX, minY, maxZ, 1),
-                    builder.AllocateVertex(minX, maxY, minZ, 1),
-                    builder.AllocateVertex(maxX, maxY, minZ, 1),
-                    builder.AllocateVertex(maxX, maxY, maxZ, 1),
-                    builder.AllocateVertex(minX, maxY, maxZ, 1),
+                    new Vector4(minX, minY, minZ, 1),
+                    new Vector4(maxX, minY, minZ, 1),
+                    new Vector4(maxX, minY, maxZ, 1),
+                    new Vector4(minX, minY, maxZ, 1),
+                    new Vector4(minX, maxY, minZ, 1),
+                    new Vector4(maxX, maxY, minZ, 1),
+                    new Vector4(maxX, maxY, maxZ, 1),
+                    new Vector4(minX, maxY, maxZ, 1),
                 };
 
                 // side:
@@ -149,10 +149,10 @@ namespace OpenKh.Command.CoctChanger
                     var collision = new Coct.Collision
                     {
                         v00 = 0,
-                        Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
-                        Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
-                        Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
-                        Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
+                        Vertex1 = vertices[faceVertexOrders[side, 0]],
+                        Vertex2 = vertices[faceVertexOrders[side, 1]],
+                        Vertex3 = vertices[faceVertexOrders[side, 2]],
+                        Vertex4 = vertices[faceVertexOrders[side, 3]],
                         Plane = planes[side],
                         BoundingBox = BoundingBoxInt16.Invalid,
                         SurfaceFlags = new Coct.SurfaceFlags() { Flags = 0x3F1 },
@@ -289,7 +289,7 @@ namespace OpenKh.Command.CoctChanger
                 Console.WriteLine($"{coct.CollisionMeshGroupList.Count,8:#,##0} collision mesh groups.");
                 Console.WriteLine($"{coct.CollisionMeshList.Count,8:#,##0} collision meshes.");
                 //Console.WriteLine($"{coct.CollisionList.Count,8:#,##0} collisions.");
-                Console.WriteLine($"{coct.VertexList.Count,8:#,##0} vertices.");
+                //Console.WriteLine($"{coct.VertexList.Count,8:#,##0} vertices.");
                 //Console.WriteLine($"{coct.planeList.Count,8:#,##0} planes.");
                 //Console.WriteLine($"{coct.BoundingBoxList.Count,8:#,##0} bounding boxes.");
                 //Console.WriteLine($"{coct.SurfaceFlagsList.Count,8:#,##0} surface flags.");
