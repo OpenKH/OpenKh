@@ -88,7 +88,7 @@ namespace OpenKh.Kh2
             public short Vertex4 { get; set; } = -1;
             public short PlaneIndex { get; set; }
             public BoundingBoxInt16 BoundingBox { get; set; }
-            public short SurfaceFlagsIndex { get; set; }
+            public SurfaceFlags SurfaceFlags { get; set; }
         }
 
         public class SurfaceFlags : IData
@@ -103,8 +103,6 @@ namespace OpenKh.Kh2
         public List<Collision> CollisionList { get; } = new List<Collision>();
         public List<Vector4> VertexList { get; } = new List<Vector4>();
         public List<Plane> PlaneList { get; } = new List<Plane>();
-        public List<BoundingBoxInt16> BoundingBoxList { get; } = new List<BoundingBoxInt16>();
-        public List<SurfaceFlags> SurfaceFlagsList { get; } = new List<SurfaceFlags>();
 
         private readonly BuildHelper buildHelper;
 
@@ -128,8 +126,8 @@ namespace OpenKh.Kh2
             var collisionList = ReactCoctEntry<RawCollision>(stream, header.Entries[3], Col3Size);
             VertexList = ReadValueEntry<Vector4>(stream, header.Entries[4], Col4Size, ReadVector4);
             PlaneList = ReadValueEntry<Plane>(stream, header.Entries[5], Col5Size, ReadPlane);
-            BoundingBoxList = ReadValueEntry(stream, header.Entries[6], BoundingBoxSize, ReadBoundingBoxInt16);
-            SurfaceFlagsList = ReactCoctEntry<SurfaceFlags>(stream, header.Entries[7], Col7Size);
+            var boundingBoxes = ReadValueEntry(stream, header.Entries[6], BoundingBoxSize, ReadBoundingBoxInt16);
+            var surfaceFlagsList = ReactCoctEntry<SurfaceFlags>(stream, header.Entries[7], Col7Size);
 
             CollisionList = collisionList
                 .Select(x => new Collision
@@ -140,8 +138,8 @@ namespace OpenKh.Kh2
                     Vertex3 = x.Vertex3,
                     Vertex4 = x.Vertex4,
                     PlaneIndex = x.PlaneIndex,
-                    BoundingBox = x.BoundingBoxIndex >= 0 ? BoundingBoxList[x.BoundingBoxIndex] : BoundingBoxInt16.Invalid,
-                    SurfaceFlagsIndex = x.SurfaceFlagsIndex,
+                    BoundingBox = x.BoundingBoxIndex >= 0 ? boundingBoxes[x.BoundingBoxIndex] : BoundingBoxInt16.Invalid,
+                    SurfaceFlags = surfaceFlagsList[x.SurfaceFlagsIndex],
                 })
                 .ToList();
         }
@@ -184,6 +182,7 @@ namespace OpenKh.Kh2
 
         public void Write(Stream stream)
         {
+            var bbList = new List<BoundingBoxInt16>();
             var bbDictionary = new Dictionary<string, short>
             {
                 [BoundingBoxInt16.Invalid.ToString()] = -1
@@ -193,7 +192,22 @@ namespace OpenKh.Kh2
             {
                 var key = item.BoundingBox.ToString();
                 if (!bbDictionary.ContainsKey(key))
-                    bbDictionary[key] = (short)(bbDictionary.Count - 1);
+                {
+                    bbDictionary[key] = (short)(bbList.Count);
+                    bbList.Add(item.BoundingBox);
+                }
+            }
+
+            var surfaceFlagsList = new List<SurfaceFlags>();
+            var surfaceFlagsDictionary = new Dictionary<int, short>();
+            foreach (var item in CollisionList)
+            {
+                var key = item.SurfaceFlags.Flags;
+                if (!surfaceFlagsDictionary.ContainsKey(key))
+                {
+                    surfaceFlagsDictionary[key] = (short)(surfaceFlagsList.Count);
+                    surfaceFlagsList.Add(item.SurfaceFlags);
+                }
             }
 
             var entries = new List<Entry>(8);
@@ -203,8 +217,8 @@ namespace OpenKh.Kh2
             AddEntry(entries, CollisionList.Count * Col3Size, 4);
             AddEntry(entries, VertexList.Count * Col4Size, 0x10);
             AddEntry(entries, PlaneList.Count * Col5Size, 0x10);
-            AddEntry(entries, BoundingBoxList.Count * BoundingBoxSize, 0x10);
-            AddEntry(entries, SurfaceFlagsList.Count * Col7Size, 4);
+            AddEntry(entries, bbList.Count * BoundingBoxSize, 0x10);
+            AddEntry(entries, surfaceFlagsList.Count * Col7Size, 4);
 
             stream.Position = 0;
             BinaryMapping.WriteObject(stream, new Header
@@ -228,13 +242,13 @@ namespace OpenKh.Kh2
                     Vertex4 = x.Vertex4,
                     PlaneIndex = x.PlaneIndex,
                     BoundingBoxIndex = bbDictionary[x.BoundingBox.ToString()],
-                    SurfaceFlagsIndex = x.SurfaceFlagsIndex,
+                    SurfaceFlagsIndex = surfaceFlagsDictionary[x.SurfaceFlags.Flags],
                 }));
             stream.AlignPosition(0x10);
             WriteValueEntry(stream, VertexList, WriteVector4);
             WriteValueEntry(stream, PlaneList, WritePlane);
-            WriteValueEntry(stream, BoundingBoxList, WriteBoundingBoxInt16);
-            WriteCoctEntry(stream, SurfaceFlagsList);
+            WriteValueEntry(stream, bbList, WriteBoundingBoxInt16);
+            WriteCoctEntry(stream, surfaceFlagsList);
         }
 
         private void WriteBoundingBoxInt16(Stream arg1, BoundingBoxInt16 arg2)
@@ -346,23 +360,6 @@ namespace OpenKh.Kh2
                     coct.PlaneList.Add(plane);
 
                     planeIndexMap[key] = index;
-                }
-
-                return Convert.ToInt16(index);
-            }
-
-            public short AllocateSurfaceFlags(int flags)
-            {
-                var index = coct.SurfaceFlagsList.FindIndex(it => it.Flags == flags);
-                if (index < 0)
-                {
-                    index = coct.SurfaceFlagsList.Count;
-
-                    var ent7 = new SurfaceFlags
-                    {
-                        Flags = flags,
-                    };
-                    coct.SurfaceFlagsList.Add(ent7);
                 }
 
                 return Convert.ToInt16(index);

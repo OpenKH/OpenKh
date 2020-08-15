@@ -17,8 +17,6 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         private CoctLogical.CoctCollision c3Item;
         private CoctLogical.CoctVector4 c4Item;
         private CoctLogical.CoctPlane c5Item;
-        private CoctLogical.CoctBoundingBox c6Item;
-        private CoctLogical.CoctSurfaceFlags c7Item;
         private bool _allC2;
         private bool _allC3;
         private readonly CollisionMapDrawHandler _drawHandler;
@@ -53,16 +51,12 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
                     yield return _coct?.VertexList[C3Item.Vertex4];
             } }
         public List<CoctLogical.CoctPlane> C5 => _coct?.PlaneList;
-        public List<CoctLogical.CoctBoundingBox> C6 => _coct?.BoundingBoxList;
-        public List<CoctLogical.CoctSurfaceFlags> C7 => _coct?.SurfaceFlagsList;
 
         public CoctLogical.CoctCollisionMeshGroup C1Item { get => c1Item; set { c1Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C2)); } }
         public CoctLogical.CoctCollisionMesh C2Item { get => c2Item; set { c2Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C3)); } }
         public CoctLogical.CoctCollision C3Item { get => c3Item; set { c3Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C4)); } }
         public CoctLogical.CoctVector4 C4Item { get => c4Item; set { c4Item = value; OnPropertyChanged(); } }
         public CoctLogical.CoctPlane C5Item { get => c5Item; set { c5Item = value; OnPropertyChanged(); } }
-        public CoctLogical.CoctBoundingBox C6Item { get => c6Item; set { c6Item = value; OnPropertyChanged(); } }
-        public CoctLogical.CoctSurfaceFlags C7Item { get => c7Item; set { c7Item = value; OnPropertyChanged(); } }
 
         public bool AllC2 { get => _allC2; set { _allC2 = value; OnPropertyChanged(nameof(C2)); } }
         public bool AllC3 { get => _allC3; set { _allC3 = value; OnPropertyChanged(nameof(C3)); } }

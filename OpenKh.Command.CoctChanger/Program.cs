@@ -81,8 +81,6 @@ namespace OpenKh.Command.CoctChanger
 
                 var builder = new Coct.BuildHelper(coct);
 
-                var table7Idx = builder.AllocateSurfaceFlags(0x3F1);
-
                 // (forwardVec)
                 // +Z
                 // A  / +Y (upVec)
@@ -152,7 +150,7 @@ namespace OpenKh.Command.CoctChanger
                             Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
                             PlaneIndex = table5Idxes[side],
                             BoundingBox = BoundingBoxInt16.Invalid,
-                            SurfaceFlagsIndex = table7Idx,
+                            SurfaceFlags = new Coct.SurfaceFlags() { Flags = 0x3F1 },
                         }
                     );
                 }
@@ -297,8 +295,8 @@ namespace OpenKh.Command.CoctChanger
                 Console.WriteLine($"{coct.CollisionList.Count,8:#,##0} collisions.");
                 Console.WriteLine($"{coct.VertexList.Count,8:#,##0} vertices.");
                 Console.WriteLine($"{coct.PlaneList.Count,8:#,##0} planes.");
-                Console.WriteLine($"{coct.BoundingBoxList.Count,8:#,##0} bounding boxes.");
-                Console.WriteLine($"{coct.SurfaceFlagsList.Count,8:#,##0} surface flags.");
+                //Console.WriteLine($"{coct.BoundingBoxList.Count,8:#,##0} bounding boxes.");
+                //Console.WriteLine($"{coct.SurfaceFlagsList.Count,8:#,##0} surface flags.");
             }
         }
     }

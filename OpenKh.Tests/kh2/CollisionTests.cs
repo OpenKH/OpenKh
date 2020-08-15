@@ -1,6 +1,8 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Utils;
 using System.IO;
+using System.Text;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -35,23 +37,33 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(14, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex3);
             Assert.Equal(18, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex4);
             Assert.Equal(6, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Co5Index);
-            Assert.Equal(2, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Co7Index);
 
             Assert.Equal(549, collision.VertexList.Count);
             Assert.Equal(233, collision.PlaneList.Count);
-            Assert.Equal(240, collision.BoundingBoxList.Count);
-            Assert.Equal(9, collision.SurfaceFlagsList.Count);
         });
 
         [Fact]
         public void WriteCollision() => File.OpenRead(FileName).Using(x =>
         Helpers.AssertStream(x, inStream =>
+        {
+            var outStream = new MemoryStream();
+            Coct.Read(inStream).Write(outStream);
+
+            return outStream;
+        }));
+
+        [Theory]
+        [InlineData(Bar.EntryType.MapCollision)]
+        [InlineData(Bar.EntryType.MapCollision2)]
+        [InlineData(Bar.EntryType.CameraCollision)]
+        // [InlineData(Bar.EntryType.LightData)] BoundingBoxIndex = 32767
+        public void PreserveCollision(Bar.EntryType type) =>
+            Helpers.AssertAllBarEntries(@"D:\Hacking\KH2\export_fm", type, stream =>
             {
                 var outStream = new MemoryStream();
-                Coct.Read(inStream).Write(outStream);
-
+                Coct.Read(stream).Write(outStream);
                 return outStream;
-            }));
+            });
 
         [Fact]
         public void TestLogicalReadWrite()
@@ -87,12 +99,9 @@ namespace OpenKh.Tests.kh2
                         Assert.Equal(14, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex3);
                         Assert.Equal(18, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex4);
                         Assert.Equal(6, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Co5Index);
-                        Assert.Equal(2, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Co7Index);
 
                         Assert.Equal(549, collision.VertexList.Count);
                         Assert.Equal(233, collision.PlaneList.Count);
-                        Assert.Equal(240, collision.BoundingBoxList.Count);
-                        Assert.Equal(9, collision.SurfaceFlagsList.Count);
                     }
                 }
             );

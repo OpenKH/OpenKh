@@ -65,14 +65,6 @@ namespace OpenKh.Kh2
             PlaneList = coct.PlaneList
                 .Select(collision5 => Map5(collision5))
                 .ToList();
-
-            BoundingBoxList = coct.BoundingBoxList
-                .Select(collision6 => Map6(collision6))
-                .ToList();
-
-            SurfaceFlagsList = coct.SurfaceFlagsList
-                .Select(collision7 => Map7(collision7))
-                .ToList();
         }
         private static CoctCollisionMeshGroup Map1(Coct.CollisionMeshGroup source) =>
             new CoctCollisionMeshGroup
@@ -116,7 +108,7 @@ namespace OpenKh.Kh2
                 Vertex4 = source.Vertex4,
                 Co5Index = source.PlaneIndex,
                 BoundingBox = Map6(source.BoundingBox),
-                Co7Index = source.SurfaceFlagsIndex,
+                Flags = Map7(source.SurfaceFlags),
             };
 
         private static CoctVector4 Map4(Vector4 source) =>
@@ -159,8 +151,6 @@ namespace OpenKh.Kh2
         public List<CoctCollisionMeshGroup> CollisionMeshGroupList { get; }
         public List<CoctVector4> VertexList { get; }
         public List<CoctPlane> PlaneList { get; }
-        public List<CoctBoundingBox> BoundingBoxList { get; }
-        public List<CoctSurfaceFlags> SurfaceFlagsList { get; }
 
         public class CoctCollisionMeshGroup
         {
@@ -205,7 +195,7 @@ namespace OpenKh.Kh2
             public short Vertex4 { get; set; }
             public short Co5Index { get; set; }
             public CoctBoundingBox BoundingBox { get; set; }
-            public short Co7Index { get; set; }
+            public CoctSurfaceFlags Flags { get; set; }
         }
 
         public class CoctVector4
@@ -315,16 +305,6 @@ namespace OpenKh.Kh2
                     .Select(Unmap5)
             );
 
-            coct.BoundingBoxList.AddRange(
-                BoundingBoxList
-                    .Select(Unmap6)
-            );
-
-            coct.SurfaceFlagsList.AddRange(
-                SurfaceFlagsList
-                    .Select(Unmap7)
-            );
-
             return coct;
         }
 
@@ -356,7 +336,7 @@ namespace OpenKh.Kh2
                 Vertex4 = source.Vertex4,
                 PlaneIndex = source.Co5Index,
                 BoundingBox = Unmap6(source.BoundingBox),
-                SurfaceFlagsIndex = source.Co7Index,
+                SurfaceFlags = Unmap7(source.Flags),
             };
 
         private Coct.CollisionMesh Unmap2(CoctCollisionMesh source) =>
