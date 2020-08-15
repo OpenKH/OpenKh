@@ -66,6 +66,7 @@ namespace OpenKh.Tools.Common
 
             public void Dispose()
             {
+                BufferedStream.Dispose();
                 ProcessStream.Dispose();
             }
         }
