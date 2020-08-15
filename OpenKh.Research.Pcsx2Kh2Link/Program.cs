@@ -64,36 +64,22 @@ namespace OpenKh.Research.Pcsx2Kh2Link
         {
             protected int OnExecute(CommandLineApplication app)
             {
-                var processes = Process.GetProcessesByName("pcsx2");
-                if (processes.Length == 0)
+                using var search = new LinkToPcsx2();
+
+                foreach (var pcsx2 in search.Pcsx2Refs)
                 {
-                    return 1;
-                }
+                    using var stream = pcsx2.OpenStream();
 
-                foreach (var process in processes)
-                {
-                    Console.WriteLine(process);
-
-                    var processStream = new ProcessStream(process, ToolConstants.Pcsx2BaseAddress, ToolConstants.Ps2MemoryLength);
-                    var bufferedStream = new BufferedStream(processStream, 0x10000);
-
-                    bufferedStream.Position = 0x100130;
-                    var part = Encoding.GetEncoding("latin1").GetString(bufferedStream.ReadBytes(16));
-                    if (part != "\xFE\x01\x02\x3C\x00\x02\x03\x3C\x00\x00\x42\x24\x00\x00\x63\x24")
+                    try
                     {
-                        Console.WriteLine("This is not pcsx2 we are looking for.");
-                        continue;
+                        foreach (var entry in stream.GetKH2FMLoadedEntries())
+                        {
+                            Console.WriteLine(entry);
+                        }
                     }
-
-                    bufferedStream.Position = 0x4F6480;
-                    var list = Enumerable.Range(0, 200)
-                        .Select(_ => BinaryMapping.ReadObject<LoadedEntry>(bufferedStream))
-                        .Where(it => it.Addr1 != 0)
-                        .ToArray();
-
-                    foreach (var entry in list)
+                    catch (LinkToPcsx2.KH2fmNotFoundException)
                     {
-                        Console.WriteLine(entry);
+                        // ignore
                     }
                 }
 
