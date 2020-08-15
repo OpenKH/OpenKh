@@ -41,19 +41,6 @@ namespace OpenKh.Research.Pcsx2Kh2Link
         private static string GetVersion()
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
-        class LoadedEntry
-        {
-            [Data] public uint Unk0 { get; set; }
-            [Data(Count = 24)] public string FileName { get; set; }
-            [Data(Count = 16)] public byte[] Unk1 { get; set; }
-            [Data] public int Len { get; set; }
-            [Data] public int Addr1 { get; set; }
-            [Data] public int Addr2 { get; set; }
-            [Data(Count = 24)] public byte[] Unk2 { get; set; }
-
-            public override string ToString() => $"{Addr1:X8}-{Addr1 + Len - 1:X8} {FileName}";
-        }
-
         [Command("list", Description = "list KH2fm loaded files")]
         private class ListCommand
         {
