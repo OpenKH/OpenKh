@@ -50,6 +50,8 @@ namespace OpenKh.Research.Pcsx2Kh2Link
 
                 foreach (var pcsx2 in search.Pcsx2Refs)
                 {
+                    Console.WriteLine(pcsx2);
+
                     using var stream = pcsx2.OpenStream();
 
                     try
@@ -59,9 +61,9 @@ namespace OpenKh.Research.Pcsx2Kh2Link
                             Console.WriteLine(entry);
                         }
                     }
-                    catch (LinkToPcsx2.KH2fmNotFoundException)
+                    catch (LinkToPcsx2.KH2fmNotFoundException ex)
                     {
-                        // ignore
+                        Console.Error.WriteLine(ex);
                     }
                 }
 

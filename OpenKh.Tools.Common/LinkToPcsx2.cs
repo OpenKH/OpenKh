@@ -17,6 +17,8 @@ namespace OpenKh.Tools.Common
         {
             public Process Process { get; }
 
+            public override string ToString() => $"PID={Process.Id}, Name={Process.ProcessName}";
+
             public ProcessRef(Process p)
             {
                 Process = p;
@@ -43,6 +45,7 @@ namespace OpenKh.Tools.Common
 
             public LoadedEntry[] GetKH2FMLoadedEntries()
             {
+                // Check if this is pcsx2 KH2fm instance, by reading part of `SLPM_666.75` (1130h-113fh)
                 BufferedStream.Position = 0x100130;
                 var part = Encoding.GetEncoding("latin1").GetString(BufferedStream.ReadBytes(16));
                 if (part != "\xFE\x01\x02\x3C\x00\x02\x03\x3C\x00\x00\x42\x24\x00\x00\x63\x24")
@@ -73,7 +76,7 @@ namespace OpenKh.Tools.Common
 
         public class KH2fmNotFoundException : Exception
         {
-            public KH2fmNotFoundException() : base("This is not pcsx2 we are looking for.")
+            public KH2fmNotFoundException() : base("KH2fm is not found in this PCSX2.")
             {
 
             }
