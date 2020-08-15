@@ -36,21 +36,19 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(25, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex2);
             Assert.Equal(14, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex3);
             Assert.Equal(18, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex4);
-            Assert.Equal(6, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Co5Index);
 
             Assert.Equal(549, collision.VertexList.Count);
-            Assert.Equal(233, collision.PlaneList.Count);
         });
 
         [Fact]
         public void WriteCollision() => File.OpenRead(FileName).Using(x =>
-        Helpers.AssertStream(x, inStream =>
-        {
-            var outStream = new MemoryStream();
-            Coct.Read(inStream).Write(outStream);
+            Helpers.AssertStream(x, inStream =>
+            {
+                var outStream = new MemoryStream();
+                Coct.Read(inStream).Write(outStream);
 
-            return outStream;
-        }));
+                return outStream;
+            }));
 
         [Theory]
         [InlineData(Bar.EntryType.MapCollision)]
@@ -98,10 +96,8 @@ namespace OpenKh.Tests.kh2
                         Assert.Equal(25, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex2);
                         Assert.Equal(14, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex3);
                         Assert.Equal(18, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex4);
-                        Assert.Equal(6, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Co5Index);
 
                         Assert.Equal(549, collision.VertexList.Count);
-                        Assert.Equal(233, collision.PlaneList.Count);
                     }
                 }
             );

@@ -16,6 +16,40 @@ namespace OpenKh.Kh2
     /// </summary>
     public class Coct
     {
+        private class WriteCache<TValue, TKey> : IEnumerable<TValue>
+        {
+            private readonly List<TValue> _list = new List<TValue>();
+            private readonly Dictionary<TKey, short> _dictionary = new Dictionary<TKey, short>();
+            private readonly Func<TValue, TKey> _getKey;
+
+            public int Count => _list.Count;
+
+            public WriteCache(Func<TValue, TKey> getKey)
+            {
+                _getKey = getKey;
+            }
+
+            public void AddConstant(TValue item, short value)
+            {
+                _dictionary[_getKey(item)] = value;
+            }
+
+            public void Add(TValue item)
+            {
+                var key = _getKey(item);
+                if (!_dictionary.ContainsKey(key))
+                {
+                    _dictionary[key] = (short)(_list.Count);
+                    _list.Add(item);
+                }
+            }
+
+            public short this[TValue item] => _dictionary[_getKey(item)];
+
+            public IEnumerator<TValue> GetEnumerator() => _list.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
+        }
+
         private interface IData { }
 
         private const uint MagicCode = 0x54434F43;
@@ -86,7 +120,7 @@ namespace OpenKh.Kh2
             public short Vertex2 { get; set; } = -1;
             public short Vertex3 { get; set; } = -1;
             public short Vertex4 { get; set; } = -1;
-            public short PlaneIndex { get; set; }
+            public Plane Plane { get; set; }
             public BoundingBoxInt16 BoundingBox { get; set; }
             public SurfaceFlags SurfaceFlags { get; set; }
         }
@@ -102,7 +136,6 @@ namespace OpenKh.Kh2
         public List<CollisionMesh> CollisionMeshList { get; } = new List<CollisionMesh>();
         public List<Collision> CollisionList { get; } = new List<Collision>();
         public List<Vector4> VertexList { get; } = new List<Vector4>();
-        public List<Plane> PlaneList { get; } = new List<Plane>();
 
         private readonly BuildHelper buildHelper;
 
@@ -125,7 +158,7 @@ namespace OpenKh.Kh2
             CollisionMeshList = ReactCoctEntry<CollisionMesh>(stream, header.Entries[2], Col2Size);
             var collisionList = ReactCoctEntry<RawCollision>(stream, header.Entries[3], Col3Size);
             VertexList = ReadValueEntry<Vector4>(stream, header.Entries[4], Col4Size, ReadVector4);
-            PlaneList = ReadValueEntry<Plane>(stream, header.Entries[5], Col5Size, ReadPlane);
+            var planeList = ReadValueEntry<Plane>(stream, header.Entries[5], Col5Size, ReadPlane);
             var boundingBoxes = ReadValueEntry(stream, header.Entries[6], BoundingBoxSize, ReadBoundingBoxInt16);
             var surfaceFlagsList = ReactCoctEntry<SurfaceFlags>(stream, header.Entries[7], Col7Size);
 
@@ -137,7 +170,7 @@ namespace OpenKh.Kh2
                     Vertex2 = x.Vertex2,
                     Vertex3 = x.Vertex3,
                     Vertex4 = x.Vertex4,
-                    PlaneIndex = x.PlaneIndex,
+                    Plane = planeList[x.PlaneIndex],
                     BoundingBox = x.BoundingBoxIndex >= 0 ? boundingBoxes[x.BoundingBoxIndex] : BoundingBoxInt16.Invalid,
                     SurfaceFlags = surfaceFlagsList[x.SurfaceFlagsIndex],
                 })
@@ -182,33 +215,18 @@ namespace OpenKh.Kh2
 
         public void Write(Stream stream)
         {
-            var bbList = new List<BoundingBoxInt16>();
-            var bbDictionary = new Dictionary<string, short>
-            {
-                [BoundingBoxInt16.Invalid.ToString()] = -1
-            };
-
+            var bbCache = new WriteCache<BoundingBoxInt16, string>(x => x.ToString());
+            bbCache.AddConstant(BoundingBoxInt16.Invalid, -1);
             foreach (var item in CollisionList)
-            {
-                var key = item.BoundingBox.ToString();
-                if (!bbDictionary.ContainsKey(key))
-                {
-                    bbDictionary[key] = (short)(bbList.Count);
-                    bbList.Add(item.BoundingBox);
-                }
-            }
+                bbCache.Add(item.BoundingBox);
 
-            var surfaceFlagsList = new List<SurfaceFlags>();
-            var surfaceFlagsDictionary = new Dictionary<int, short>();
+            var surfaceCache = new WriteCache<SurfaceFlags, int>(x => x.Flags);
             foreach (var item in CollisionList)
-            {
-                var key = item.SurfaceFlags.Flags;
-                if (!surfaceFlagsDictionary.ContainsKey(key))
-                {
-                    surfaceFlagsDictionary[key] = (short)(surfaceFlagsList.Count);
-                    surfaceFlagsList.Add(item.SurfaceFlags);
-                }
-            }
+                surfaceCache.Add(item.SurfaceFlags);
+
+            var planeCache = new WriteCache<Plane, string>(x => x.ToString());
+            foreach (var item in CollisionList)
+                planeCache.Add(item.Plane);
 
             var entries = new List<Entry>(8);
             AddEntry(entries, HeaderSize, 1);
@@ -216,9 +234,9 @@ namespace OpenKh.Kh2
             AddEntry(entries, CollisionMeshList.Count * Col2Size, 0x10);
             AddEntry(entries, CollisionList.Count * Col3Size, 4);
             AddEntry(entries, VertexList.Count * Col4Size, 0x10);
-            AddEntry(entries, PlaneList.Count * Col5Size, 0x10);
-            AddEntry(entries, bbList.Count * BoundingBoxSize, 0x10);
-            AddEntry(entries, surfaceFlagsList.Count * Col7Size, 4);
+            AddEntry(entries, planeCache.Count * Col5Size, 0x10);
+            AddEntry(entries, bbCache.Count * BoundingBoxSize, 0x10);
+            AddEntry(entries, surfaceCache.Count * Col7Size, 4);
 
             stream.Position = 0;
             BinaryMapping.WriteObject(stream, new Header
@@ -240,15 +258,15 @@ namespace OpenKh.Kh2
                     Vertex2 = x.Vertex2,
                     Vertex3 = x.Vertex3,
                     Vertex4 = x.Vertex4,
-                    PlaneIndex = x.PlaneIndex,
-                    BoundingBoxIndex = bbDictionary[x.BoundingBox.ToString()],
-                    SurfaceFlagsIndex = surfaceFlagsDictionary[x.SurfaceFlags.Flags],
+                    PlaneIndex = planeCache[x.Plane],
+                    BoundingBoxIndex = bbCache[x.BoundingBox],
+                    SurfaceFlagsIndex = surfaceCache[x.SurfaceFlags],
                 }));
             stream.AlignPosition(0x10);
             WriteValueEntry(stream, VertexList, WriteVector4);
-            WriteValueEntry(stream, PlaneList, WritePlane);
-            WriteValueEntry(stream, bbList, WriteBoundingBoxInt16);
-            WriteCoctEntry(stream, surfaceFlagsList);
+            WriteValueEntry(stream, planeCache, WritePlane);
+            WriteValueEntry(stream, bbCache, WriteBoundingBoxInt16);
+            WriteCoctEntry(stream, surfaceCache);
         }
 
         private void WriteBoundingBoxInt16(Stream arg1, BoundingBoxInt16 arg2)
@@ -339,30 +357,11 @@ namespace OpenKh.Kh2
         public class BuildHelper
         {
             private readonly Coct coct;
-            private readonly SortedDictionary<string, int> planeIndexMap = new SortedDictionary<string, int>();
             private readonly SortedDictionary<string, int> vertexIndexMap = new SortedDictionary<string, int>();
 
             public BuildHelper(Coct coct)
             {
                 this.coct = coct;
-            }
-            public short AllocatePlane(float x, float y, float z, float d) =>
-                AllocatePlane(new Plane(x, y, z, d));
-
-            public short AllocatePlane(Plane plane)
-            {
-                var key = plane.ToString();
-
-                if (!planeIndexMap.TryGetValue(key, out int index))
-                {
-                    index = coct.PlaneList.Count;
-
-                    coct.PlaneList.Add(plane);
-
-                    planeIndexMap[key] = index;
-                }
-
-                return Convert.ToInt16(index);
             }
 
             public short AllocateVertex(float x, float y, float z, float w = 1)
@@ -394,10 +393,7 @@ namespace OpenKh.Kh2
                 var v0 = coct.VertexList[ent3.Vertex1].ToVector3();
                 var v1 = coct.VertexList[ent3.Vertex2].ToVector3();
                 var v2 = coct.VertexList[ent3.Vertex3].ToVector3();
-
-                var plane = Plane.CreateFromVertices(v0, v1, v2);
-
-                ent3.PlaneIndex = AllocatePlane(plane);
+                ent3.Plane = Plane.CreateFromVertices(v0, v1, v2);
             }
 
             public void CompleteBBox(Collision ent3, int inflate = 0)
@@ -479,7 +475,6 @@ namespace OpenKh.Kh2
 
             public void FlushCache()
             {
-                planeIndexMap.Clear();
                 vertexIndexMap.Clear();
             }
         }

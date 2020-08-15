@@ -116,14 +116,14 @@ namespace OpenKh.Command.CoctChanger
                 // 4 south
                 // 5 north
 
-                var table5Idxes = new short[]
+                var planes = new Plane[]
                 {
-                    builder.AllocatePlane( 0,-1, 0,+minY), //bottom
-                    builder.AllocatePlane( 0,+1, 0,-maxY), //up
-                    builder.AllocatePlane(-1, 0, 0,+minX), //west
-                    builder.AllocatePlane(+1, 0, 0,-maxX), //east
-                    builder.AllocatePlane( 0, 0,-1,+minZ), //south
-                    builder.AllocatePlane( 0, 0,+1,-maxZ), //north
+                    new Plane( 0,-1, 0,+minY), //bottom
+                    new Plane( 0,+1, 0,-maxY), //up
+                    new Plane(-1, 0, 0,+minX), //west
+                    new Plane(+1, 0, 0,-maxX), //east
+                    new Plane( 0, 0,-1,+minZ), //south
+                    new Plane( 0, 0,+1,-maxZ), //north
                 };
 
                 var faceVertexOrders = new int[,]
@@ -148,7 +148,7 @@ namespace OpenKh.Command.CoctChanger
                             Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
                             Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
                             Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
-                            PlaneIndex = table5Idxes[side],
+                            Plane = planes[side],
                             BoundingBox = BoundingBoxInt16.Invalid,
                             SurfaceFlags = new Coct.SurfaceFlags() { Flags = 0x3F1 },
                         }
@@ -294,7 +294,7 @@ namespace OpenKh.Command.CoctChanger
                 Console.WriteLine($"{coct.CollisionMeshList.Count,8:#,##0} collision meshes.");
                 Console.WriteLine($"{coct.CollisionList.Count,8:#,##0} collisions.");
                 Console.WriteLine($"{coct.VertexList.Count,8:#,##0} vertices.");
-                Console.WriteLine($"{coct.PlaneList.Count,8:#,##0} planes.");
+                //Console.WriteLine($"{coct.planeList.Count,8:#,##0} planes.");
                 //Console.WriteLine($"{coct.BoundingBoxList.Count,8:#,##0} bounding boxes.");
                 //Console.WriteLine($"{coct.SurfaceFlagsList.Count,8:#,##0} surface flags.");
             }

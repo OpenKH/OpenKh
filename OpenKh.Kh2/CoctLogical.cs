@@ -61,10 +61,6 @@ namespace OpenKh.Kh2
             VertexList = coct.VertexList
                 .Select(collision4 => Map4(collision4))
                 .ToList();
-
-            PlaneList = coct.PlaneList
-                .Select(collision5 => Map5(collision5))
-                .ToList();
         }
         private static CoctCollisionMeshGroup Map1(Coct.CollisionMeshGroup source) =>
             new CoctCollisionMeshGroup
@@ -106,7 +102,7 @@ namespace OpenKh.Kh2
                 Vertex2 = source.Vertex2,
                 Vertex3 = source.Vertex3,
                 Vertex4 = source.Vertex4,
-                Co5Index = source.PlaneIndex,
+                Plane = source.Plane,
                 BoundingBox = Map6(source.BoundingBox),
                 Flags = Map7(source.SurfaceFlags),
             };
@@ -118,15 +114,6 @@ namespace OpenKh.Kh2
                 Y = source.Y,
                 Z = source.Z,
                 W = source.W,
-            };
-
-        private static CoctPlane Map5(Plane source) =>
-            new CoctPlane
-            {
-                X = source.Normal.X,
-                Y = source.Normal.Y,
-                Z = source.Normal.Z,
-                D = source.D,
             };
 
         private static CoctBoundingBox Map6(BoundingBoxInt16 source) =>
@@ -150,7 +137,6 @@ namespace OpenKh.Kh2
 
         public List<CoctCollisionMeshGroup> CollisionMeshGroupList { get; }
         public List<CoctVector4> VertexList { get; }
-        public List<CoctPlane> PlaneList { get; }
 
         public class CoctCollisionMeshGroup
         {
@@ -193,7 +179,7 @@ namespace OpenKh.Kh2
             public short Vertex2 { get; set; }
             public short Vertex3 { get; set; }
             public short Vertex4 { get; set; }
-            public short Co5Index { get; set; }
+            public Plane Plane { get; set; }
             public CoctBoundingBox BoundingBox { get; set; }
             public CoctSurfaceFlags Flags { get; set; }
         }
@@ -300,11 +286,6 @@ namespace OpenKh.Kh2
                     .Select(Unmap4)
             );
 
-            coct.PlaneList.AddRange(
-                PlaneList
-                    .Select(Unmap5)
-            );
-
             return coct;
         }
 
@@ -320,9 +301,6 @@ namespace OpenKh.Kh2
                 new Vector3Int16(source.MaxX, source.MaxY, source.MaxZ)
             );
 
-        private static Plane Unmap5(CoctPlane source) =>
-            new Plane(source.X, source.Y, source.Z, source.D);
-
         private static Vector4 Unmap4(CoctVector4 source) =>
             new Vector4(source.X, source.Y, source.Z, source.W);
 
@@ -334,7 +312,7 @@ namespace OpenKh.Kh2
                 Vertex2 = source.Vertex2,
                 Vertex3 = source.Vertex3,
                 Vertex4 = source.Vertex4,
-                PlaneIndex = source.Co5Index,
+                Plane = source.Plane,
                 BoundingBox = Unmap6(source.BoundingBox),
                 SurfaceFlags = Unmap7(source.Flags),
             };
