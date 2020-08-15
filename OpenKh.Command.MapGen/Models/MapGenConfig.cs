@@ -73,6 +73,8 @@ namespace OpenKh.Command.MapGen.Models
 
         public byte? maxAlpha { get; set; }
 
+        public bool reuseImd { get; set; }
+
         public MaterialDef FindMaterial(string name)
         {
             return materials

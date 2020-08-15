@@ -252,6 +252,21 @@ maxAlpha: 128
   transparentFlag: 0
 ```
 
+### skipConversionIfExists
+
+```yml
+# Specify true if you want to skip png to imd conversion.
+skipConversionIfExists: true
+```
+
+### reuseImd
+
+```yml
+# Specify true if you want to reuse `.imd` file converted by ImgTool.
+# This is useful if diffuse texture file path is `images/tex.png`, and omit re-conversion.
+reuseImd: true
+```
+
 ### bar
 
 ```yml
@@ -321,7 +336,8 @@ eachInputDir:
 eachFileName:
 
 - `fromFile` of material (you can specify)
-- `fromFile2` of material (extracted from material's diffuse texture file path)
+- `fromFile2` of material (extracted from material's diffuse texture file path as imd extension, if reuseImd set)
+- `fromFile3` of material (extracted from material's diffuse texture file path)
 - material name + ".imd"
 - material name + ".png"
 

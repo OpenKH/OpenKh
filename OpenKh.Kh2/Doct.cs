@@ -153,9 +153,81 @@ namespace OpenKh.Kh2
                 it.Entry2LastIndex - it.Entry2Index
             )
                 .Select(index => Entry2List[index].BoundingBox)
+                .Concat(SelectBoundingBoxList(it))
                 .MergeAll();
 
             return it;
+        }
+
+        private IEnumerable<BoundingBox> SelectBoundingBoxList(Entry1 ent1)
+        {
+            if (ent1.Child1 != -1)
+            {
+                yield return Entry1List[ent1.Child1].BoundingBox;
+
+                if (ent1.Child2 != -1)
+                {
+                    yield return Entry1List[ent1.Child2].BoundingBox;
+
+                    if (ent1.Child3 != -1)
+                    {
+                        yield return Entry1List[ent1.Child3].BoundingBox;
+
+                        if (ent1.Child4 != -1)
+                        {
+                            yield return Entry1List[ent1.Child4].BoundingBox;
+
+                            if (ent1.Child5 != -1)
+                            {
+                                yield return Entry1List[ent1.Child5].BoundingBox;
+
+                                if (ent1.Child6 != -1)
+                                {
+                                    yield return Entry1List[ent1.Child6].BoundingBox;
+
+                                    if (ent1.Child7 != -1)
+                                    {
+                                        yield return Entry1List[ent1.Child7].BoundingBox;
+
+                                        if (ent1.Child8 != -1)
+                                        {
+                                            yield return Entry1List[ent1.Child8].BoundingBox;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void ReverseEntry1()
+        {
+            var maxIndex = Entry1List.Count - 1;
+
+            Entry1List.Reverse();
+
+            short ReverseChildIndex(short child)
+            {
+                if (child != -1)
+                {
+                    child = Convert.ToInt16(maxIndex - child);
+                }
+                return child;
+            }
+
+            foreach (var one in Entry1List)
+            {
+                one.Child1 = ReverseChildIndex(one.Child1);
+                one.Child2 = ReverseChildIndex(one.Child2);
+                one.Child3 = ReverseChildIndex(one.Child3);
+                one.Child4 = ReverseChildIndex(one.Child4);
+                one.Child5 = ReverseChildIndex(one.Child5);
+                one.Child6 = ReverseChildIndex(one.Child6);
+                one.Child7 = ReverseChildIndex(one.Child7);
+                one.Child8 = ReverseChildIndex(one.Child8);
+            }
         }
     }
 }

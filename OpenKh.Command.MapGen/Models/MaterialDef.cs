@@ -23,9 +23,14 @@ namespace OpenKh.Command.MapGen.Models
         public string fromFile { get; set; }
 
         /// <summary>
-        /// texture from png file (diffuse map with texture file source)
+        /// use if reuseImd: Path.ChangeExtension(fromFile3, ".imd")
         /// </summary>
         public string fromFile2 { get; set; }
+
+        /// <summary>
+        /// texture from png file (diffuse map with texture file source)
+        /// </summary>
+        public string fromFile3 { get; set; }
 
         /// <summary>
         /// Have not collision
