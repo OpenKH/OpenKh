@@ -52,7 +52,14 @@ namespace OpenKh.Tools.Common
 
                 BufferedStream.Position = 0x4F6480;
                 return Enumerable.Range(0, 200)
-                    .Select(_ => BinaryMapping.ReadObject<LoadedEntry>(BufferedStream))
+                    .Select(
+                        _ =>
+                        {
+                            var it = BinaryMapping.ReadObject<LoadedEntry>(BufferedStream);
+                            it.FileName = it.FileName.Split('\0').First();
+                            return it;
+                        }
+                    )
                     .Where(it => it.Addr1 != 0)
                     .ToArray();
             }

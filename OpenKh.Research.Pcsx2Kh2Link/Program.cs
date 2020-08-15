@@ -25,11 +25,6 @@ namespace OpenKh.Research.Pcsx2Kh2Link
             {
                 return CommandLineApplication.Execute<Program>(args);
             }
-            catch (FileNotFoundException e)
-            {
-                Console.WriteLine($"The file {e.FileName} cannot be found. The program will now exit.");
-                return 2;
-            }
             catch (Exception e)
             {
                 Console.WriteLine($"FATAL ERROR: {e.Message}\n{e.StackTrace}");
@@ -59,7 +54,7 @@ namespace OpenKh.Research.Pcsx2Kh2Link
             public override string ToString() => $"{Addr1:X8}-{Addr1 + Len - 1:X8} {FileName}";
         }
 
-        [Command("list", Description = "list KH2 loaded items")]
+        [Command("list", Description = "list KH2fm loaded files")]
         private class ListCommand
         {
             protected int OnExecute(CommandLineApplication app)
