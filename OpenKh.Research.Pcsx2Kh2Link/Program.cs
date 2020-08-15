@@ -44,8 +44,16 @@ namespace OpenKh.Research.Pcsx2Kh2Link
         [Command("list", Description = "list KH2fm loaded files")]
         private class ListCommand
         {
+            [Option(CommandOptionType.SingleValue, Description = "Export files to this directory", ShortName = "o", LongName = "output")]
+            public string OutputDir { get; set; }
+
             protected int OnExecute(CommandLineApplication app)
             {
+                if (!string.IsNullOrEmpty(OutputDir))
+                {
+                    OutputDir = Path.GetFullPath(OutputDir);
+                }
+
                 using var search = new LinkToPcsx2();
 
                 foreach (var pcsx2 in search.Pcsx2Refs)
@@ -59,6 +67,18 @@ namespace OpenKh.Research.Pcsx2Kh2Link
                         foreach (var entry in stream.GetKH2FMLoadedEntries())
                         {
                             Console.WriteLine(entry);
+
+                            if (!string.IsNullOrEmpty(OutputDir))
+                            {
+                                var outFile = Path.Combine(OutputDir, entry.FileName);
+                                Directory.CreateDirectory(Path.GetDirectoryName(outFile));
+
+                                File.Create(outFile).Using(outStream => 
+                                    stream.BufferedStream
+                                        .SetPosition(entry.Addr1)
+                                        .Copy(outStream, Convert.ToInt32(entry.Len))
+                                );
+                            }
                         }
                     }
                     catch (LinkToPcsx2.KH2fmNotFoundException ex)
