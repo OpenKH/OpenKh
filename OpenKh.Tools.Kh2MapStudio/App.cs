@@ -123,22 +123,14 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             ForWindow("Tools", () =>
             {
-                if (EditorSettings.ViewCamera)
-                    EditorSettings.ViewCamera = CameraWindow.Run(_mapRenderer.Camera);
-                if (EditorSettings.ViewLayerControl)
-                    EditorSettings.ViewLayerControl = LayerControllerWindow.Run(_mapRenderer);
-                if (EditorSettings.ViewSpawnPoint)
-                    EditorSettings.ViewSpawnPoint = SpawnPointWindow.Run(_mapRenderer);
-                if (EditorSettings.ViewMeshGroup)
-                    EditorSettings.ViewMeshGroup = MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
-                if (EditorSettings.ViewBobDescriptor)
-                    EditorSettings.ViewBobDescriptor = BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
-                if (EditorSettings.ViewSpawnScriptMap)
-                    EditorSettings.ViewSpawnScriptMap = SpawnScriptWindow.Run("map", _mapRenderer.SpawnScriptMap);
-                if (EditorSettings.ViewSpawnScriptBattle)
-                    EditorSettings.ViewSpawnScriptBattle = SpawnScriptWindow.Run("btl", _mapRenderer.SpawnScriptBattle);
-                if (EditorSettings.ViewSpawnScriptEvent)
-                    EditorSettings.ViewSpawnScriptEvent = SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
+                if (EditorSettings.ViewCamera) CameraWindow.Run(_mapRenderer.Camera);
+                if (EditorSettings.ViewLayerControl) LayerControllerWindow.Run(_mapRenderer);
+                if (EditorSettings.ViewSpawnPoint) SpawnPointWindow.Run(_mapRenderer);
+                if (EditorSettings.ViewMeshGroup) MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
+                if (EditorSettings.ViewBobDescriptor) BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
+                if (EditorSettings.ViewSpawnScriptMap) SpawnScriptWindow.Run("map", _mapRenderer.SpawnScriptMap);
+                if (EditorSettings.ViewSpawnScriptBattle) SpawnScriptWindow.Run("btl", _mapRenderer.SpawnScriptBattle);
+                if (EditorSettings.ViewSpawnScriptEvent) SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
             });
 
             ImGui.PopStyleColor();
