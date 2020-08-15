@@ -98,11 +98,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2MapCollisio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.CoctChanger", "OpenKh.Command.CoctChanger\OpenKh.Command.CoctChanger.csproj", "{08487D2A-8091-4DC9-AC31-3130CE0842D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.SpawnScript", "OpenKh.Command.SpawnScript\OpenKh.Command.SpawnScript.csproj", "{696CDCFC-6AC4-4062-82A0-CAD2EB4EB2CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.SpawnScript", "OpenKh.Command.SpawnScript\OpenKh.Command.SpawnScript.csproj", "{696CDCFC-6AC4-4062-82A0-CAD2EB4EB2CE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.MapGen", "OpenKh.Command.MapGen\OpenKh.Command.MapGen.csproj", "{340458E3-FE2B-470E-9C4F-D3E58F218670}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.IdxImg", "OpenKh.Tools.IdxImg\OpenKh.Tools.IdxImg.csproj", "{1B89F510-3B9A-4A3B-A08F-4FFB5C5B817B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.IdxImg", "OpenKh.Tools.IdxImg\OpenKh.Tools.IdxImg.csproj", "{1B89F510-3B9A-4A3B-A08F-4FFB5C5B817B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Research.Pcsx2Kh2Link", "OpenKh.Research.Pcsx2Kh2Link\OpenKh.Research.Pcsx2Kh2Link.csproj", "{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -787,6 +789,22 @@ Global
 		{1B89F510-3B9A-4A3B-A08F-4FFB5C5B817B}.Release|x64.Build.0 = Release|Any CPU
 		{1B89F510-3B9A-4A3B-A08F-4FFB5C5B817B}.Release|x86.ActiveCfg = Release|Any CPU
 		{1B89F510-3B9A-4A3B-A08F-4FFB5C5B817B}.Release|x86.Build.0 = Release|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Debug|ARM.Build.0 = Debug|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Debug|x64.Build.0 = Debug|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Debug|x86.Build.0 = Debug|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Release|ARM.Build.0 = Release|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Release|x64.ActiveCfg = Release|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Release|x64.Build.0 = Release|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Release|x86.ActiveCfg = Release|Any CPU
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -834,6 +852,7 @@ Global
 		{696CDCFC-6AC4-4062-82A0-CAD2EB4EB2CE} = {9C52D787-9819-4B89-989B-EEA6FEB20731}
 		{340458E3-FE2B-470E-9C4F-D3E58F218670} = {9C52D787-9819-4B89-989B-EEA6FEB20731}
 		{1B89F510-3B9A-4A3B-A08F-4FFB5C5B817B} = {402B2669-D594-4DFA-965B-02A92626ADC6}
+		{4FD4E3C9-C9C8-412E-9298-A9A4C4F6D7B1} = {9AEB4887-7C23-4992-A26D-A1E73DC4FE53}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}
