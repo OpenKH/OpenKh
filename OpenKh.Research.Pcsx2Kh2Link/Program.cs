@@ -73,7 +73,7 @@ namespace OpenKh.Research.Pcsx2Kh2Link
                                 var outFile = Path.Combine(OutputDir, entry.FileName);
                                 Directory.CreateDirectory(Path.GetDirectoryName(outFile));
 
-                                File.Create(outFile).Using(outStream => 
+                                File.Create(outFile).Using(outStream =>
                                     stream.BufferedStream
                                         .SetPosition(entry.Addr1)
                                         .Copy(outStream, Convert.ToInt32(entry.Len))
