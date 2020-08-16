@@ -180,9 +180,9 @@ namespace OpenKh.Command.MapGen.Utils
             class WalkResult
             {
                 internal int? groupIndex;
-                internal int? meshIndex;
+                internal CollisionMesh? mesh;
 
-                public override string ToString() => $"group({groupIndex}) mesh({meshIndex})";
+                public override string ToString() => $"group({groupIndex}) mesh({mesh})";
             }
 
             private WalkResult Walk(BSP bsp)
@@ -233,9 +233,7 @@ namespace OpenKh.Command.MapGen.Utils
                         }
                     }
 
-                    var firstIdx2 = coct.CollisionMeshList.Count;
-
-                    coct.CompleteAndAdd(collisionMesh);
+                    coct.Complete(collisionMesh);
 
                     vifPacketRenderingGroup.Add(
                         vifPacketIndices
@@ -245,7 +243,7 @@ namespace OpenKh.Command.MapGen.Utils
 
                     return new WalkResult
                     {
-                        meshIndex = firstIdx2,
+                        mesh = collisionMesh,
                     };
                 }
             }
@@ -254,15 +252,14 @@ namespace OpenKh.Command.MapGen.Utils
             {
                 var groupChildren = new List<int>();
 
-                if (left.meshIndex.HasValue)
+                if (left.mesh != null)
                 {
                     groupChildren.Add(coct.CollisionMeshGroupList.Count);
 
                     coct.CompleteAndAdd(
                         new CollisionMeshGroup
                         {
-                            CollisionMeshStart = Convert.ToUInt16(left.meshIndex.Value),
-                            CollisionMeshEnd = Convert.ToUInt16(left.meshIndex.Value + 1),
+                            Meshes = new List<CollisionMesh> { left.mesh }
                         }
                     );
                 }
@@ -275,15 +272,14 @@ namespace OpenKh.Command.MapGen.Utils
                 {
                     // skip
                 }
-                else if (right.meshIndex.HasValue)
+                else if (right.mesh != null)
                 {
                     groupChildren.Add(coct.CollisionMeshGroupList.Count);
 
                     coct.CompleteAndAdd(
                         new CollisionMeshGroup
                         {
-                            CollisionMeshStart = Convert.ToUInt16(right.meshIndex.Value),
-                            CollisionMeshEnd = Convert.ToUInt16(right.meshIndex.Value + 1),
+                            Meshes = new List<CollisionMesh> { right.mesh }
                         }
                     );
                 }
@@ -297,8 +293,7 @@ namespace OpenKh.Command.MapGen.Utils
                 coct.CompleteAndAdd(
                     new CollisionMeshGroup
                     {
-                        CollisionMeshStart = 0,
-                        CollisionMeshEnd = 0,
+                        Meshes = new List<CollisionMesh>(),
                         Child1 = Convert.ToInt16((groupChildren.Count >= 1) ? groupChildren[0] : -1),
                         Child2 = Convert.ToInt16((groupChildren.Count >= 2) ? groupChildren[1] : -1),
                     }
@@ -339,17 +334,6 @@ namespace OpenKh.Command.MapGen.Utils
             // coctMesh → doct.Entry2
             // coctMeshGroup → doct.Entry1
 
-            foreach (var coctMesh in coct.CollisionMeshList)
-            {
-                doct.Add(
-                    new Doct.Entry2
-                    {
-                        BoundingBox = coctMesh.BoundingBox
-                            .ToBoundingBox(),
-                    }
-                );
-            }
-
             foreach (var coctMeshGroup in coct.CollisionMeshGroupList)
             {
                 doct.Entry1List.Add(
@@ -364,16 +348,27 @@ namespace OpenKh.Command.MapGen.Utils
                         Child7 = coctMeshGroup.Child7,
                         Child8 = coctMeshGroup.Child8,
                         BoundingBox = coctMeshGroup.BoundingBox.ToBoundingBox(),
-                        Entry2Index = coctMeshGroup.CollisionMeshStart,
-                        Entry2LastIndex = coctMeshGroup.CollisionMeshEnd,
+                        Entry2Index = (ushort)doct.Entry2List.Count,
+                        Entry2LastIndex = (ushort)(doct.Entry2List.Count + coctMeshGroup.Meshes.Count),
                     }
                 );
+
+                foreach (var coctMesh in coctMeshGroup.Meshes)
+                {
+                    doct.Add(
+                        new Doct.Entry2
+                        {
+                            BoundingBox = coctMesh.BoundingBox
+                                .ToBoundingBox(),
+                        }
+                    );
+                }
             }
         }
 
         private void PerMeshClipRendering(IEnumerable<BigMesh> bigMeshes)
         {
-            var firstIdx2 = coct.CollisionMeshList.Count;
+            var meshList = new List<CollisionMesh>();
 
             var helper = new BuildHelper(coct);
 
@@ -414,16 +409,14 @@ namespace OpenKh.Command.MapGen.Utils
                         .ToArray()
                 );
 
-                coct.CompleteAndAdd(collisionMesh);
+                coct.Complete(collisionMesh);
+                meshList.Add(collisionMesh);
             }
-
-            var lastIdx2 = coct.CollisionMeshList.Count;
 
             coct.CompleteAndAdd(
                 new CollisionMeshGroup
                 {
-                    CollisionMeshStart = Convert.ToUInt16(firstIdx2),
-                    CollisionMeshEnd = Convert.ToUInt16(lastIdx2),
+                    Meshes = meshList
                 }
             );
 

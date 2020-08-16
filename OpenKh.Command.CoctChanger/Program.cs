@@ -161,17 +161,12 @@ namespace OpenKh.Command.CoctChanger
                     collisionMesh.Collisions.Add(collision);
                 }
 
-                var table2FirstIdx = coct.CollisionMeshList.Count;
-
-                coct.CompleteAndAdd(collisionMesh);
-
-                var table2LastIdx = coct.CollisionMeshList.Count;
+                coct.Complete(collisionMesh);
 
                 coct.CompleteAndAdd(
                     new Coct.CollisionMeshGroup
                     {
-                        CollisionMeshStart = Convert.ToUInt16(table2FirstIdx),
-                        CollisionMeshEnd = Convert.ToUInt16(table2LastIdx),
+                        Meshes = new List<Coct.CollisionMesh>() { collisionMesh }
                     }
                 );
 
@@ -287,7 +282,7 @@ namespace OpenKh.Command.CoctChanger
             private void PrintSummary(Coct coct)
             {
                 Console.WriteLine($"{coct.CollisionMeshGroupList.Count,8:#,##0} collision mesh groups.");
-                Console.WriteLine($"{coct.CollisionMeshList.Count,8:#,##0} collision meshes.");
+                //Console.WriteLine($"{coct.CollisionMeshList.Count,8:#,##0} collision meshes.");
                 //Console.WriteLine($"{coct.CollisionList.Count,8:#,##0} collisions.");
                 Console.WriteLine($"{coct.VertexList.Count,8:#,##0} vertices.");
                 //Console.WriteLine($"{coct.planeList.Count,8:#,##0} planes.");

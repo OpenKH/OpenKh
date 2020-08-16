@@ -46,7 +46,7 @@ namespace OpenKh.Command.MapGen.Utils
                 logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups.");
             }
 
-            logger.Debug($"Output: {collisionBuilder.coct.CollisionMeshList.Count:#,##0} collision meshes, {collisionBuilder.coct.CollisionMeshGroupList.Count:#,##0} collision mesh groups");
+            logger.Debug($"Output: {collisionBuilder.coct.CollisionMeshGroupList.Count:#,##0} collision mesh groups");
 
             {
                 var matDefList = bigMeshContainer.AllocatedMaterialDefs;
