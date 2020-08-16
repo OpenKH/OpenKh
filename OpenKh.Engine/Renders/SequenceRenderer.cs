@@ -220,8 +220,7 @@ namespace OpenKh.Engine.Renderers
 
             if ((animation.Flags & Sequence.AttachTextFlag) != 0)
             {
-                if (_textContext == null)
-                    _textContext = context.Clone();
+                _textContext = context.Clone();
             }
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS

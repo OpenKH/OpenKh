@@ -15,26 +15,61 @@ namespace OpenKh.Game.States
     {
         private const int MaxCharacterCount = 4;
         private const int MenuElementCount = 7;
+        private const int MenuOptionSelectedSeq = 132;
+        private static readonly ushort[] MenuOptions = new ushort[MenuElementCount]
+        {
+            0x844b,
+            0x844d,
+            0x8451,
+            0x844e,
+            0x844f,
+            0x8450,
+            0xb617,
+        };
 
         private Kernel _kernel;
         private IDataContent _content;
         private ArchiveManager _archiveManager;
+        private InputManager _inputManager;
         private KingdomShader _shader;
         private MonoSpriteDrawing _drawing;
         private Layout _campLayout;
         private LayoutRenderer _layoutRenderer;
         private List<ISpriteTexture> _textures = new List<ISpriteTexture>();
+        private Dictionary<ushort, byte[]> _cachedText = new Dictionary<ushort, byte[]>();
 
         private List<AnimatedSequenceRenderer> _mainSeqGroup;
         private List<AnimatedSequenceRenderer> _menuOptionSeqs;
         private AnimatedSequenceRenderer _backgroundSeq;
         private List<AnimatedSequenceRenderer> _characterDescSeqs;
+        private AnimatedSequenceRenderer _menuOptionSelectedSeq;
+        private AnimatedSequenceRenderer _menuOptionCursorSeq;
+        private AnimatedSequenceRenderer _menuOptionLumSeq;
+
+        private int _selectedOption = 0;
+        private Kh2MessageRenderer _messageRenderer;
+
+        public int MenuOption
+        {
+            get => _selectedOption;
+            set
+            {
+                _selectedOption = value;
+                if (_selectedOption < 0)
+                    _selectedOption += MenuElementCount;
+                _selectedOption %= MenuElementCount;
+
+                _menuOptionSelectedSeq.SetMessage(_messageRenderer,
+                    GetMessage(MenuOptions[_selectedOption]));
+            }
+        }
 
         public void Initialize(StateInitDesc initDesc)
         {
             _kernel = initDesc.Kernel;
             _content = initDesc.DataContent;
             _archiveManager = initDesc.ArchiveManager;
+            _inputManager = initDesc.InputManager;
 
             var viewport = initDesc.GraphicsDevice.GraphicsDevice.Viewport;
             _shader = new KingdomShader(initDesc.ContentManager);
@@ -51,6 +86,9 @@ namespace OpenKh.Game.States
                 StencilEnable = false,
             };
 
+            var messageContext = _kernel.SystemMessageContext;
+            _messageRenderer = new Kh2MessageRenderer(_drawing, messageContext);
+
             _archiveManager.LoadArchive($"menu/{_kernel.Region}/camp.2ld");
             (_campLayout, _textures) = GetLayoutResources("camp", "camp");
             _layoutRenderer = new LayoutRenderer(_campLayout, _drawing, _textures)
@@ -64,9 +102,20 @@ namespace OpenKh.Game.States
             _characterDescSeqs = Enumerable.Range(0, MaxCharacterCount)
                 .Select(_ => CreateAnimationSequence(93, 93, 93))
                 .ToList();
-            _menuOptionSeqs = Enumerable.Range(0, MenuElementCount)
-                .Select(_ => CreateAnimationSequence(133))
-                .ToList();
+
+            _menuOptionSeqs = new List<AnimatedSequenceRenderer>();
+            for (var i = 0; i < MenuElementCount; i++)
+            {
+                var animSequence = CreateAnimationSequence(133);
+                animSequence.SetMessage(_messageRenderer, GetMessage(MenuOptions[i]));
+                _menuOptionSeqs.Add(animSequence);
+            }
+
+            _menuOptionSelectedSeq = CreateAnimationSequence(MenuOptionSelectedSeq);
+            _menuOptionCursorSeq = CreateAnimationSequence(25, 25, 25);
+            _menuOptionLumSeq = CreateAnimationSequence(27);
+
+            MenuOption = 0;
         }
 
         public void Destroy()
@@ -80,6 +129,8 @@ namespace OpenKh.Game.States
         public void Update(DeltaTimes deltaTimes)
         {
             var deltaTime = deltaTimes.DeltaTime;
+
+            ProcessInput(_inputManager);
             
             _layoutRenderer.FrameIndex++;
             foreach (var animSequence in _mainSeqGroup)
@@ -87,6 +138,9 @@ namespace OpenKh.Game.States
             foreach (var animSequence in _menuOptionSeqs)
                 animSequence.Update(deltaTime);
             _backgroundSeq.Update(deltaTime);
+            _menuOptionSelectedSeq.Update(deltaTime);
+            _menuOptionCursorSeq.Update(deltaTime);
+            _menuOptionLumSeq.Update(deltaTime);
         }
 
         public void Draw(DeltaTimes deltaTimes)
@@ -102,11 +156,19 @@ namespace OpenKh.Game.States
 
             for (int i = 0; i < _menuOptionSeqs.Count; i++)
             {
-                const float PosX = 0;
-                const float PosY = 0;
-                const float Distance = 96;
+                const float PosX = 48;
+                const float PosY = 82;
+                const float Distance = 26;
                 var item = _menuOptionSeqs[i];
-                item.Draw(PosX, PosY + i * Distance);
+
+                if (i == _selectedOption)
+                {
+                    _menuOptionSelectedSeq.Draw(0, i * Distance);
+                    _menuOptionCursorSeq.Draw(PosX, PosY + i * Distance);
+                    _menuOptionLumSeq.Draw(PosX + 100, PosY + i * Distance);
+                }
+                else
+                    item.Draw(0, i * Distance);
             }
 
             for (int i = 0; i < _characterDescSeqs.Count; i++)
@@ -120,7 +182,15 @@ namespace OpenKh.Game.States
 
             _drawing.Flush();
         }
-        
+
+        private void ProcessInput(InputManager inputManager)
+        {
+            if (inputManager.IsMenuUp)
+                MenuOption--;
+            if (inputManager.IsMenuDown)
+                MenuOption++;
+        }
+
         private (Layout layout, List<ISpriteTexture> textures) GetLayoutResources(string layoutResourceName, string imagesResourceName)
         {
             var layout = _archiveManager.Get<Layout>(layoutResourceName);
@@ -164,6 +234,14 @@ namespace OpenKh.Game.States
             item.Begin();
 
             return item;
+        }
+
+        public byte[] GetMessage(ushort messageId)
+        {
+            if (!_cachedText.TryGetValue(messageId, out var data))
+                _cachedText[messageId] = data = _kernel.MessageProvider.GetMessage(messageId);
+
+            return data;
         }
 
         public void DebugDraw(IDebug debug)
