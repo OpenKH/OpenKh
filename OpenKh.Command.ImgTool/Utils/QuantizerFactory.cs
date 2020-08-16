@@ -8,8 +8,24 @@ using System.IO;
 
 namespace OpenKh.Command.ImgTool.Utils
 {
-    static class QuantizerFactory
+    public class QuantizerFactory
     {
+        private class CommonQuantizerParam : ICommonQuantizerParam
+        {
+            public int BitsPerPixel { get; set; }
+
+            public bool PngQuant { get; set; }
+        }
+
+        public static Func<Bitmap, Bitmap> MakeFrom(int BitsPerPixel, bool InvokePngquant) =>
+            MakeFrom(
+                new CommonQuantizerParam
+                {
+                    BitsPerPixel = BitsPerPixel,
+                    PngQuant = InvokePngquant,
+                }
+            );
+
         public static Func<Bitmap, Bitmap> MakeFrom(ICommonQuantizerParam param)
         {
             return bitmap =>

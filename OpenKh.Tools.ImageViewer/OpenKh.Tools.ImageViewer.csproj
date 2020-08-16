@@ -14,6 +14,7 @@
     <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
+    <ProjectReference Include="..\OpenKh.Command.ImgTool\OpenKh.Command.ImgTool.csproj" />
   </ItemGroup>
   
 </Project>

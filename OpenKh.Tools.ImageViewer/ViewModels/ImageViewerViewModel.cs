@@ -1,6 +1,8 @@
-﻿using OpenKh.Common;
+﻿using OpenKh.Command.ImgTool.Utils;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Utils;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.Imaging;
 using OpenKh.Tools.ImageViewer.Models;
@@ -207,41 +209,26 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                         EditImageList(
                             currentImageList =>
                             {
-                                using var tempFileProvider = new TempFileProvider();
-                                var pngFile = tempFileProvider.NewFile(".png");
                                 var sourceImage = Image.Source;
-                                sourceImage.SaveImage(pngFile);
 
-                                var imdFile = Path.ChangeExtension(pngFile, ".imd");
+                                var bpp = Convert.ToInt32(parameter);
 
-                                var imgtoolOptions = $"{parameter} {((UsePngquant ?? false) ? "-p" : "")}";
+                                var newImage = ImgdBitmapUtil.ToImgd(
+                                    sourceImage.CreateBitmap(),
+                                    bpp,
+                                    QuantizerFactory.MakeFrom(
+                                        bpp,
+                                        UsePngquant ?? false
+                                    )
+                                );
 
-                                try
+                                return new EditResult
                                 {
-                                    var result = new RunCmd(
-                                        "OpenKh.Command.ImgTool.exe",
-                                        $"imd \"{pngFile}\" -o \"{imdFile}\" {imgtoolOptions}"
-                                    );
+                                    imageList = currentImageList
+                                        .Select(it => ReferenceEquals(it, sourceImage) ? newImage : it),
 
-                                    if (result.ExitCode == 0)
-                                    {
-                                        var newImage = File.OpenRead(imdFile).Using(Imgd.Read);
-
-                                        return new EditResult
-                                        {
-                                            imageList = currentImageList
-                                                .Select(it => ReferenceEquals(it, sourceImage) ? newImage : it),
-
-                                            selection = newImage,
-                                        };
-                                    }
-
-                                    throw new Exception($"ImgTool failed ({result.ExitCode})");
-                                }
-                                catch (Win32Exception ex)
-                                {
-                                    throw new Exception($"Launching ImgTool failed: {ex.Message}", ex);
-                                }
+                                    selection = newImage,
+                                };
                             }
                         );
                     }
