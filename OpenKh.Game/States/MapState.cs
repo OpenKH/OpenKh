@@ -4,7 +4,6 @@ using OpenKh.Engine.Renders;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Models;
-using OpenKh.Game.Shaders;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
@@ -13,6 +12,7 @@ using System.Linq;
 using OpenKh.Kh2.Models;
 using OpenKh.Game.Entities;
 using OpenKh.Kh2.Ard;
+using OpenKh.Engine.MonoGame;
 
 namespace OpenKh.Game.States
 {
