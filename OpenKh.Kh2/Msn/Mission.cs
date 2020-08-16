@@ -45,7 +45,13 @@ namespace OpenKh.Kh2.Msn
             EndEvent = 2,
             FailEvent = 3,
             Timer = 4,
-            EnemyCount = 5,
+            GenericCounter = 5,
+            HpGate = 6, //something gauge related, but can also be used for hp wtf, probably controlled in ai?
+            HitCounter = 7,
+            Unk08 = 8,
+            TimerRecord = 9,
+            //ComboCounter = 0xA,
+
         }
 
         public class Function
