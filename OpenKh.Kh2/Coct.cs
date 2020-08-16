@@ -445,13 +445,10 @@ namespace OpenKh.Kh2
 
             public void CompleteBBox(CollisionMesh ent2)
             {
-                //ent2.BoundingBox = Enumerable.Range(
-                //    ent2.CollisionStart,
-                //    ent2.CollisionEnd - ent2.CollisionStart)
-                //    .Select(index => coct.CollisionList[index])
-                //    .Where(collision => collision.BoundingBox != BoundingBoxInt16.Invalid)
-                //    .Select(x => x.BoundingBox)
-                //    .MergeAll();
+                ent2.BoundingBox = ent2.Collisions
+                    .Where(collision => collision.BoundingBox != BoundingBoxInt16.Invalid)
+                    .Select(x => x.BoundingBox)
+                    .MergeAll();
             }
 
             public void CompleteBBox(CollisionMeshGroup ent1)
