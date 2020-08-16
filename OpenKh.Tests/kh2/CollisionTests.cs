@@ -50,18 +50,18 @@ namespace OpenKh.Tests.kh2
                 return outStream;
             }));
 
-        [Theory]
-        [InlineData(Bar.EntryType.MapCollision)]
-        [InlineData(Bar.EntryType.MapCollision2)]
-        [InlineData(Bar.EntryType.CameraCollision)]
-        // [InlineData(Bar.EntryType.LightData)] BoundingBoxIndex = 32767
-        public void PreserveCollision(Bar.EntryType type) =>
-            Helpers.AssertAllBarEntries(@"D:\Hacking\KH2\export_fm", type, stream =>
-            {
-                var outStream = new MemoryStream();
-                Coct.Read(stream).Write(outStream);
-                return outStream;
-            });
+        //[Theory]
+        //[InlineData(Bar.EntryType.MapCollision)]
+        //[InlineData(Bar.EntryType.MapCollision2)]
+        //[InlineData(Bar.EntryType.CameraCollision)]
+        //// [InlineData(Bar.EntryType.LightData)] BoundingBoxIndex = 32767
+        //public void PreserveCollision(Bar.EntryType type) =>
+        //    Helpers.AssertAllBarEntries(@"D:\Hacking\KH2\export_fm", type, stream =>
+        //    {
+        //        var outStream = new MemoryStream();
+        //        Coct.Read(stream).Write(outStream);
+        //        return outStream;
+        //    });
 
         [Fact]
         public void TestLogicalReadWrite()
