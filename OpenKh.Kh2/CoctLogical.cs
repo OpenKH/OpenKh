@@ -65,7 +65,10 @@ namespace OpenKh.Kh2
                 Vertex2 = source.Vertex2,
                 Vertex3 = source.Vertex3,
                 Vertex4 = source.Vertex4,
-                Plane = source.Plane,
+                PlaneX = source.Plane.Normal.X,
+                PlaneY = source.Plane.Normal.Y,
+                PlaneZ = source.Plane.Normal.Z,
+                PlaneD = source.Plane.D,
                 BoundingBox = Map6(source.BoundingBox),
                 Flags = Map7(source.SurfaceFlags),
             };
@@ -142,7 +145,10 @@ namespace OpenKh.Kh2
             public short Vertex2 { get; set; }
             public short Vertex3 { get; set; }
             public short Vertex4 { get; set; }
-            public Plane Plane { get; set; }
+            public float PlaneX { get; set; }
+            public float PlaneY { get; set; }
+            public float PlaneZ { get; set; }
+            public float PlaneD { get; set; }
             public CoctBoundingBox BoundingBox { get; set; }
             public CoctSurfaceFlags Flags { get; set; }
         }
@@ -227,7 +233,7 @@ namespace OpenKh.Kh2
                 Vertex2 = source.Vertex2,
                 Vertex3 = source.Vertex3,
                 Vertex4 = source.Vertex4,
-                Plane = source.Plane,
+                Plane = new Plane(source.PlaneX, source.PlaneY, source.PlaneZ, source.PlaneD),
                 BoundingBox = Unmap6(source.BoundingBox),
                 SurfaceFlags = Unmap7(source.Flags),
             };

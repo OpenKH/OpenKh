@@ -19,9 +19,6 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="C1"/>
@@ -39,20 +36,6 @@
         <TextBlock Grid.Row="0" Grid.Column="3" Text="C4"/>
         <ListBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding C4}" SelectedItem="{Binding C4Item}"/>
         <local:VertexView Grid.Row="2" Grid.Column="3" DataContext="{Binding C4Item}"/>
-
-        <TextBlock Grid.Row="0" Grid.Column="4" Text="C5"/>
-        <ListBox Grid.Row="1" Grid.Column="4" ItemsSource="{Binding C5}" SelectedItem="{Binding C5Item}"/>
-        <local:Collision5View Grid.Row="2" Grid.Column="4" DataContext="{Binding C5Item}"/>
-
-        <TextBlock Grid.Row="0" Grid.Column="5" Text="C6"/>
-        <ListBox Grid.Row="1" Grid.Column="5" ItemsSource="{Binding C6}" SelectedItem="{Binding C6Item}"/>
-        <local:Collision6View Grid.Row="2" Grid.Column="5" DataContext="{Binding C6Item}"/>
-
-        <TextBlock Grid.Row="0" Grid.Column="6" Text="C7"/>
-        <ListBox Grid.Row="1" Grid.Column="6" ItemsSource="{Binding C7}" SelectedItem="{Binding C7Item}"/>
-        <StackPanel Grid.Row="2" Grid.Column="6" DataContext="{Binding C7Item}">
-            <TextBox Text="{Binding Unknown}"/>
-        </StackPanel>
 
         <controls:DrawPanel
             Grid.Row="3"
