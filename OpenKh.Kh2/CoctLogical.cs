@@ -30,25 +30,7 @@ namespace OpenKh.Kh2
                                 {
                                     var collision2 = coct.CollisionMeshList[collision2Index];
 
-                                    var newCollision2 = Map2(collision2);
-
-                                    newCollision2.Items = Enumerable.Range(
-                                        collision2.CollisionStart,
-                                        collision2.CollisionEnd - collision2.CollisionStart
-                                    )
-                                        .Select(
-                                            collision3Index =>
-                                            {
-                                                var collision3 = coct.CollisionList[collision3Index];
-
-                                                var newCollision3 = Map3(collision3);
-
-                                                return newCollision3;
-                                            }
-                                        )
-                                        .ToList();
-
-                                    return newCollision2;
+                                    return Map2(collision2);
                                 }
                             )
                             .ToList();
@@ -92,6 +74,7 @@ namespace OpenKh.Kh2
                 MaxZ = source.BoundingBox.Maximum.Z,
                 v10 = source.v10,
                 v12 = source.v12,
+                Items = source.Collisions.Select(Map3).ToList()
             };
 
         private static CoctCollision Map3(Coct.Collision source) =>
@@ -242,34 +225,7 @@ namespace OpenKh.Kh2
 
                             coct.CollisionMeshList.AddRange(
                                 collision1.Meshes
-                                    .Select(
-                                        collision2 =>
-                                        {
-                                            var newCollision2 = Unmap2(collision2);
-
-                                            newCollision2.CollisionStart = Convert.ToUInt16(
-                                                coct.CollisionList.Count
-                                            );
-
-                                            coct.CollisionList.AddRange(
-                                                collision2.Items
-                                                    .Select(
-                                                        collision3 =>
-                                                        {
-                                                            var newCollision3 = Unmap3(collision3);
-
-                                                            return newCollision3;
-                                                        }
-                                                    )
-                                            );
-
-                                            newCollision2.CollisionEnd = Convert.ToUInt16(
-                                                coct.CollisionList.Count
-                                            );
-
-                                            return newCollision2;
-                                        }
-                                    )
+                                    .Select(Unmap2)
                             );
 
                             newCollision1.CollisionMeshEnd = Convert.ToUInt16(
@@ -324,6 +280,7 @@ namespace OpenKh.Kh2
                     new Vector3Int16(source.MinX, source.MinY, source.MinZ),
                     new Vector3Int16(source.MaxX, source.MaxY, source.MaxZ)
                 ),
+                Collisions = source.Items.Select(Unmap3).ToList(),
                 v10 = source.v10,
                 v12 = source.v12,
             };

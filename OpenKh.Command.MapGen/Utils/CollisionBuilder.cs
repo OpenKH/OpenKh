@@ -197,7 +197,10 @@ namespace OpenKh.Command.MapGen.Utils
                 }
                 else
                 {
-                    var firstIdx3 = coct.CollisionList.Count;
+                    var collisionMesh = new CollisionMesh
+                    {
+                        Collisions = new List<Collision>()
+                    };
 
                     var vifPacketIndices = new List<ushort>();
 
@@ -216,7 +219,7 @@ namespace OpenKh.Command.MapGen.Utils
                             var v3 = mesh.vertexList[set[2]];
                             var v4 = quad ? mesh.vertexList[set[3]] : Vector3.Zero;
 
-                            coct.CompleteAndAdd(
+                            collisionMesh.Collisions.Add(coct.Complete(
                                 new Collision
                                 {
                                     Vertex1 = helper.AllocateVertex(v1.X, -v1.Y, -v1.Z), // why -Y and -Z ?
@@ -226,21 +229,13 @@ namespace OpenKh.Command.MapGen.Utils
                                     SurfaceFlags = new SurfaceFlags() { Flags = mesh.matDef.surfaceFlags }
                                 },
                                 inflate: 1
-                            );
+                            ));
                         }
                     }
 
-                    var lastIdx3 = coct.CollisionList.Count;
-
                     var firstIdx2 = coct.CollisionMeshList.Count;
 
-                    var collisionMesh = coct.CompleteAndAdd(
-                        new CollisionMesh
-                        {
-                            CollisionStart = Convert.ToUInt16(firstIdx3),
-                            CollisionEnd = Convert.ToUInt16(lastIdx3),
-                        }
-                    );
+                    coct.CompleteAndAdd(collisionMesh);
 
                     vifPacketRenderingGroup.Add(
                         vifPacketIndices
@@ -382,11 +377,12 @@ namespace OpenKh.Command.MapGen.Utils
 
             var helper = new BuildHelper(coct);
 
-            foreach (var mesh in bigMeshes
-                .Where(it => !it.matDef.noclip)
-            )
+            foreach (var mesh in bigMeshes.Where(it => !it.matDef.noclip))
             {
-                var firstIdx3 = coct.CollisionList.Count;
+                var collisionMesh = new CollisionMesh
+                {
+                    Collisions = new List<Collision>()
+                };
 
                 var vifPacketIndices = new List<ushort>(mesh.vifPacketIndices);
 
@@ -399,7 +395,7 @@ namespace OpenKh.Command.MapGen.Utils
                     var v3 = mesh.vertexList[set[2]];
                     var v4 = quad ? mesh.vertexList[set[3]] : Vector3.Zero;
 
-                    coct.CompleteAndAdd(
+                    collisionMesh.Collisions.Add(coct.Complete(
                         new Collision
                         {
                             Vertex1 = helper.AllocateVertex(v1.X, -v1.Y, -v1.Z), // why -Y and -Z ?
@@ -409,10 +405,8 @@ namespace OpenKh.Command.MapGen.Utils
                             SurfaceFlags = new SurfaceFlags() { Flags = mesh.matDef.surfaceFlags }
                         },
                         inflate: 1
-                    );
+                    ));
                 }
-
-                var lastIdx3 = coct.CollisionList.Count;
 
                 vifPacketRenderingGroup.Add(
                     vifPacketIndices
@@ -420,13 +414,7 @@ namespace OpenKh.Command.MapGen.Utils
                         .ToArray()
                 );
 
-                var collisionMesh = coct.CompleteAndAdd(
-                    new CollisionMesh
-                    {
-                        CollisionStart = Convert.ToUInt16(firstIdx3),
-                        CollisionEnd = Convert.ToUInt16(lastIdx3),
-                    }
-                );
+                coct.CompleteAndAdd(collisionMesh);
             }
 
             var lastIdx2 = coct.CollisionMeshList.Count;

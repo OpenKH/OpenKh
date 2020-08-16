@@ -3,6 +3,7 @@ using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Utils;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.IO;
@@ -136,38 +137,33 @@ namespace OpenKh.Command.CoctChanger
                     {0,4,5,1}, //north
                 };
 
-                var table3FirstIdx = coct.CollisionList.Count;
+                var collisionMesh = new Coct.CollisionMesh
+                {
+                    Collisions = new List<Coct.Collision>(),
+                    v10 = 0,
+                    v12 = 0,
+                };
 
                 for (var side = 0; side < 6; side++)
                 {
-                    coct.CompleteAndAdd(
-                        new Coct.Collision
-                        {
-                            v00 = 0,
-                            Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
-                            Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
-                            Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
-                            Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
-                            Plane = planes[side],
-                            BoundingBox = BoundingBoxInt16.Invalid,
-                            SurfaceFlags = new Coct.SurfaceFlags() { Flags = 0x3F1 },
-                        }
-                    );
+                    var collision = new Coct.Collision
+                    {
+                        v00 = 0,
+                        Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
+                        Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
+                        Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
+                        Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
+                        Plane = planes[side],
+                        BoundingBox = BoundingBoxInt16.Invalid,
+                        SurfaceFlags = new Coct.SurfaceFlags() { Flags = 0x3F1 },
+                    };
+                    coct.Complete(collision);
+                    collisionMesh.Collisions.Add(collision);
                 }
-
-                var table3LastIdx = coct.CollisionList.Count;
 
                 var table2FirstIdx = coct.CollisionMeshList.Count;
 
-                coct.CompleteAndAdd(
-                    new Coct.CollisionMesh
-                    {
-                        CollisionStart = Convert.ToUInt16(table3FirstIdx),
-                        CollisionEnd = Convert.ToUInt16(table3LastIdx),
-                        v10 = 0,
-                        v12 = 0,
-                    }
-                );
+                coct.CompleteAndAdd(collisionMesh);
 
                 var table2LastIdx = coct.CollisionMeshList.Count;
 
@@ -292,7 +288,7 @@ namespace OpenKh.Command.CoctChanger
             {
                 Console.WriteLine($"{coct.CollisionMeshGroupList.Count,8:#,##0} collision mesh groups.");
                 Console.WriteLine($"{coct.CollisionMeshList.Count,8:#,##0} collision meshes.");
-                Console.WriteLine($"{coct.CollisionList.Count,8:#,##0} collisions.");
+                //Console.WriteLine($"{coct.CollisionList.Count,8:#,##0} collisions.");
                 Console.WriteLine($"{coct.VertexList.Count,8:#,##0} vertices.");
                 //Console.WriteLine($"{coct.planeList.Count,8:#,##0} planes.");
                 //Console.WriteLine($"{coct.BoundingBoxList.Count,8:#,##0} bounding boxes.");
