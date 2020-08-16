@@ -33,22 +33,21 @@ namespace OpenKh.Game
                 {
                     case 0:
                         state = new TitleState();
-                        state.Initialize(GetStateInitDesc());
-
-                        _debugOverlay.OnUpdate = state.DebugUpdate;
-                        _debugOverlay.OnDraw = state.DebugDraw;
                         break;
                     case 1:
                         state = new MapState();
-                        state.Initialize(GetStateInitDesc());
-
-                        _debugOverlay.OnUpdate = state.DebugUpdate;
-                        _debugOverlay.OnDraw = state.DebugDraw;
+                        break;
+                    case 2:
+                        state = new MenuState();
                         break;
                     default:
                         Log.Err($"Invalid state {value}");
-                        break;
-                }    
+                        return;
+                }
+
+                state.Initialize(GetStateInitDesc());
+                _debugOverlay.OnUpdate = state.DebugUpdate;
+                _debugOverlay.OnDraw = state.DebugDraw;
             }
         }
 
