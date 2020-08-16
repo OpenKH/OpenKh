@@ -5,9 +5,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Utils;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.Imaging;
-using OpenKh.Tools.ImageViewer.Models;
 using OpenKh.Tools.ImageViewer.Services;
-using OpenKh.Tools.ImageViewer.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -298,17 +296,6 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 new KeyValuePair<string, double>("Fit", ZoomLevelFit)
             })
             .ToArray();
-
-        IEnumerable<ActionDef> _actionDefs;
-        public IEnumerable<ActionDef> ActionDefs
-        {
-            get => _actionDefs;
-            set
-            {
-                _actionDefs = value;
-                OnPropertyChanged(nameof(ActionDefs));
-            }
-        }
 
         private IImageFormat ImageFormat
         {
