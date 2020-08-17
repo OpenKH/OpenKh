@@ -31,7 +31,7 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool IsSquare => throw new NotImplementedException();
         public bool IsTriangle => throw new NotImplementedException();
 
-        public bool IsStart => throw new NotImplementedException();
+        public bool IsStart => keyboard.IsKeyDown(Keys.Enter) && !prevKeyboard.IsKeyDown(Keys.Enter);
         public bool IsSelect => throw new NotImplementedException();
         public bool IsHome => throw new NotImplementedException();
 
