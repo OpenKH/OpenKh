@@ -6,6 +6,13 @@ using System.Linq;
 
 namespace OpenKh.Engine.Renderers
 {
+    public enum TextAnchor
+    {
+        Left,
+        Center,
+        Right
+    }
+
     public class SequenceRenderer
     {
         private class Context
@@ -66,7 +73,7 @@ namespace OpenKh.Engine.Renderers
 
         public IDebugSequenceRenderer DebugSequenceRenderer { get; set; }
 
-        public bool Draw(IMessageRenderer msgRenderer, byte[] data, int animationGroupIndex, int frameIndex, float positionX, float positionY)
+        public bool Draw(IMessageRenderer msgRenderer, byte[] data, int animationGroupIndex, int frameIndex, float positionX, float positionY, TextAnchor anchor)
         {
             _textContext = null;
             var isAnimationEnd = Draw(animationGroupIndex, frameIndex, positionX, positionY);
@@ -85,7 +92,21 @@ namespace OpenKh.Engine.Renderers
                 msgRenderer.Draw(fakeTextDrawContext, data);
                 var width = (float)fakeTextDrawContext.Width;
 
-                var xPos = _textContext.PositionX - width / 2 + seqGroup.TextPositionX;
+                float xPos;
+                switch (anchor)
+                {
+                    default:
+                    case TextAnchor.Left:
+                        xPos = _textContext.PositionX + seqGroup.TextPositionX;
+                        break;
+                    case TextAnchor.Center:
+                        xPos = _textContext.PositionX - width / 2 + seqGroup.TextPositionX;
+                        break;
+                    case TextAnchor.Right:
+                        throw new NotImplementedException("TextAnchor.Right is not implemented yet.");
+                        break;
+                }
+
                 msgRenderer.Draw(new DrawContext
                 {
                     xStart = xPos,

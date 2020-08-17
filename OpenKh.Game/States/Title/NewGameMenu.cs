@@ -61,18 +61,24 @@ namespace OpenKh.Game.States.Title
             _difficultyOption = 1;
 
             _animMenuBg.Begin();
-            _animMenuBg.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(0x432e));
+            _animMenuBg.SetMessage(_mainMenu.MessageRenderer,
+                _mainMenu.GetMessage(0x432e), TextAnchor.Center);
             _animMenuWindow.Begin();
             _animMenuTitle.Begin();
-            _animMenuTitle.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(0x4330));
+            _animMenuTitle.SetMessage(_mainMenu.MessageRenderer,
+                _mainMenu.GetMessage(0x4330), TextAnchor.Center);
             _animMenuOption1.Begin();
-            _animMenuOption1.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[0]));
+            _animMenuOption1.SetMessage(_mainMenu.MessageRenderer,
+                _mainMenu.GetMessage(DifficultyTitle[0]), TextAnchor.Center);
             _animMenuOption2.Begin();
-            _animMenuOption2.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[1]));
+            _animMenuOption2.SetMessage(_mainMenu.MessageRenderer,
+                _mainMenu.GetMessage(DifficultyTitle[1]), TextAnchor.Center);
             _animMenuOption3.Begin();
-            _animMenuOption3.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[2]));
+            _animMenuOption3.SetMessage(_mainMenu.MessageRenderer,
+                _mainMenu.GetMessage(DifficultyTitle[2]), TextAnchor.Center);
             _animMenuOption4.Begin();
-            _animMenuOption4.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[3]));
+            _animMenuOption4.SetMessage(_mainMenu.MessageRenderer,
+                _mainMenu.GetMessage(DifficultyTitle[3]), TextAnchor.Center);
             _animMenuOptionSelected.Begin();
         }
 
@@ -161,7 +167,8 @@ namespace OpenKh.Game.States.Title
 
             _animMenuBg.Draw(0, 0);
 
-            _animMenuWindow.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyDescription[_difficultyOption]));
+            _animMenuWindow.SetMessage(_mainMenu.MessageRenderer,
+                _mainMenu.GetMessage(DifficultyDescription[_difficultyOption]), TextAnchor.Center);
             _animMenuWindow.Draw(0, 0);
 
             _animMenuTitle.Draw(256, subTitleBgY);
@@ -172,7 +179,8 @@ namespace OpenKh.Game.States.Title
             if (_difficultyCount >= 4)
                 _animMenuOption4.Draw(256, optionY + OptionHDistance * 3);
 
-            _animMenuOptionSelected.SetMessage(_mainMenu.MessageRenderer, _mainMenu.GetMessage(DifficultyTitle[_difficultyOption]));
+            _animMenuOptionSelected.SetMessage(_mainMenu.MessageRenderer,
+                _mainMenu.GetMessage(DifficultyTitle[_difficultyOption]), TextAnchor.Center);
             _animMenuOptionSelected.Draw(256, optionY + OptionHDistance * _difficultyOption);
         }
     }
