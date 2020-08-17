@@ -60,7 +60,7 @@ namespace OpenKh.Game.States
                 _selectedOption %= MenuElementCount;
 
                 _menuOptionSelectedSeq.SetMessage(_messageRenderer,
-                    GetMessage(MenuOptions[_selectedOption]));
+                    GetMessage(MenuOptions[_selectedOption]), TextAnchor.Left);
             }
         }
 
@@ -107,7 +107,7 @@ namespace OpenKh.Game.States
             for (var i = 0; i < MenuElementCount; i++)
             {
                 var animSequence = CreateAnimationSequence(133);
-                animSequence.SetMessage(_messageRenderer, GetMessage(MenuOptions[i]));
+                animSequence.SetMessage(_messageRenderer, GetMessage(MenuOptions[i]), TextAnchor.Left);
                 _menuOptionSeqs.Add(animSequence);
             }
 

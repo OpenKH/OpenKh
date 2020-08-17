@@ -2,7 +2,6 @@
 using OpenKh.Engine.Renders;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace OpenKh.Game.States.Title
 {
@@ -17,6 +16,7 @@ namespace OpenKh.Game.States.Title
         private bool _isRunning;
         private IMessageRenderer _messageRenderer;
         private byte[] _message;
+        private TextAnchor _anchor;
         private List<AnimatedSequenceRenderer> _children = new List<AnimatedSequenceRenderer>();
         private int _attachedChildIndex = -1;
 
@@ -39,10 +39,11 @@ namespace OpenKh.Game.States.Title
 
         }
 
-        public void SetMessage(IMessageRenderer messageRenderer, byte[] message)
+        public void SetMessage(IMessageRenderer messageRenderer, byte[] message, TextAnchor anchor)
         {
             _messageRenderer = messageRenderer;
             _message = message;
+            _anchor = anchor;
         }
 
         public void Update(double deltaTime)
@@ -54,7 +55,7 @@ namespace OpenKh.Game.States.Title
 
         public void Draw(float x, float y)
         {
-            if (!IsEnd && !_renderer.Draw(_messageRenderer, _message, _anim, _frame, x, y))
+            if (!IsEnd && !_renderer.Draw(_messageRenderer, _message, _anim, _frame, x, y, _anchor))
             {
                 if (_isRunning)
                 {
