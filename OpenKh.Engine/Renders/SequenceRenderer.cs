@@ -104,7 +104,6 @@ namespace OpenKh.Engine.Renderers
                         break;
                     case TextAnchor.Right:
                         throw new NotImplementedException("TextAnchor.Right is not implemented yet.");
-                        break;
                 }
 
                 msgRenderer.Draw(new DrawContext

@@ -17,15 +17,27 @@ namespace OpenKh.Game.States
         private const int MaxCharacterCount = 4;
         private const int MenuElementCount = 7;
         private const int MenuOptionSelectedSeq = 132;
+        private const int CharacterHpBar = 98;
+        private const int CharacterMpBar = 99;
+        private const int MsgLv = 0x39FC;
+        private const int MsgHp = 0x39FD;
+        private const int MsgMp = 0x39FE;
         private static readonly ushort[] MenuOptions = new ushort[MenuElementCount]
         {
-            0x844b,
-            0x844d,
-            0x8451,
-            0x844e,
-            0x844f,
-            0x8450,
-            0xb617,
+            0x844b, // Items
+            0x844d, // Abilities
+            0x8451, // Customize
+            0x844e, // Party
+            0x844f, // Status
+            0x8450, // Journal
+            0xb617, // Config
+        };
+        private static readonly ushort[] CharacterNames = new ushort[MaxCharacterCount]
+        {
+            0x851f, // Sora
+            0x8520, // Donald
+            0x8521, // Goofy
+            0x852c, // Riku
         };
 
         private Kernel _kernel;
@@ -46,6 +58,8 @@ namespace OpenKh.Game.States
         private AnimatedSequenceRenderer _menuOptionSelectedSeq;
         private AnimatedSequenceRenderer _menuOptionCursorSeq;
         private AnimatedSequenceRenderer _menuOptionLumSeq;
+        private AnimatedSequenceRenderer _charHpBarSeq;
+        private AnimatedSequenceRenderer _charMpBarSeq;
 
         private int _selectedOption = 0;
         private Kh2MessageRenderer _messageRenderer;
@@ -117,6 +131,9 @@ namespace OpenKh.Game.States
             _menuOptionSelectedSeq = CreateAnimationSequence(MenuOptionSelectedSeq);
             _menuOptionCursorSeq = CreateAnimationSequence(25, 25, 25);
             _menuOptionLumSeq = CreateAnimationSequence(27);
+
+            _charHpBarSeq = CreateAnimationSequence(CharacterHpBar);
+            _charMpBarSeq = CreateAnimationSequence(CharacterMpBar);
 
             MenuOption = 0;
         }
@@ -222,12 +239,29 @@ namespace OpenKh.Game.States
             {
                 const float PosX = 164;
                 const float PosY = 300;
-                const float Distance = 96; 
-                var item = _characterDescSeqs[i];
-                item.Draw(PosX + i * Distance, PosY);
+                const float Distance = 96;
+                DrawCharacterDesc(_characterDescSeqs[i], PosX + i * Distance, PosY, i);
             }
 
             _drawing.Flush();
+        }
+
+        private void DrawCharacterDesc(AnimatedSequenceRenderer seqd, float x, float y, int index)
+        {
+            const int BarX = 42;
+            // poorly optimized... never called SetMessage at every frame.
+
+            seqd.SetMessage(_messageRenderer,
+                GetMessage(CharacterNames[index]), TextAnchor.Center);
+            seqd.Draw(x, y);
+
+            _charHpBarSeq.SetMessage(_messageRenderer,
+                GetMessage(MsgHp), TextAnchor.Left);
+            _charHpBarSeq.Draw(x - BarX, y);
+
+            _charMpBarSeq.SetMessage(_messageRenderer,
+                GetMessage(MsgMp), TextAnchor.Left);
+            _charMpBarSeq.Draw(x - BarX, y + 20);
         }
 
         private void ProcessInput(InputManager inputManager)
