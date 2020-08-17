@@ -6,6 +6,7 @@ using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States.Title;
 using OpenKh.Kh2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -130,12 +131,28 @@ namespace OpenKh.Game.States
 
         public void OpenMenu()
         {
+            _layoutRenderer.FrameIndex = 0;
+            _layoutRenderer.SelectedSequenceGroupIndex = 0;
+
+            _backgroundSeq.Begin();
+            ForAll(_characterDescSeqs, x => x.Begin());
+            ForAll(_menuOptionSeqs, x => x.Begin());
+            ForAll(_mainSeqGroup, x => x.Begin());
+            _menuOptionSelectedSeq.Begin();
+
             IsMenuOpen = true;
         }
 
         public void CloseMenu()
         {
-            IsMenuOpen = false;
+            _layoutRenderer.FrameIndex = 0;
+            _layoutRenderer.SelectedSequenceGroupIndex = 2;
+
+            _backgroundSeq.End();
+            ForAll(_characterDescSeqs, x => x.End());
+            ForAll(_menuOptionSeqs, x => x.End());
+            ForAll(_mainSeqGroup, x => x.End());
+            _menuOptionSelectedSeq.End();
         }
 
         public void Update(DeltaTimes deltaTimes)
@@ -157,6 +174,24 @@ namespace OpenKh.Game.States
 
         public void Draw(DeltaTimes deltaTimes)
         {
+            switch (_layoutRenderer.SelectedSequenceGroupIndex)
+            {
+                case 0:
+                    if (_layoutRenderer.IsLastFrame)
+                    {
+                        _layoutRenderer.FrameIndex = 0;
+                        _layoutRenderer.SelectedSequenceGroupIndex = 1;
+                    }
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    if (_layoutRenderer.IsLastFrame)
+                    {
+                        IsMenuOpen = false;
+                    }
+                    break;
+            }
             if (_layoutRenderer.SelectedSequenceGroupIndex == 0 && _layoutRenderer.IsLastFrame)
                 _layoutRenderer.SelectedSequenceGroupIndex = 1;
 
@@ -257,6 +292,13 @@ namespace OpenKh.Game.States
 
             return data;
         }
+
+        private static void ForAll<T>(IEnumerable<T> list, Action<T> action)
+        {
+            foreach (var item in list)
+                action(item);
+        }
+
 
         public void DebugDraw(IDebug debug)
         {
