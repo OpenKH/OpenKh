@@ -49,6 +49,8 @@ namespace OpenKh.Game.States
         private int _selectedOption = 0;
         private Kh2MessageRenderer _messageRenderer;
 
+        public bool IsMenuOpen { get; private set; }
+
         public int MenuOption
         {
             get => _selectedOption;
@@ -126,6 +128,16 @@ namespace OpenKh.Game.States
             _drawing.Dispose();
         }
 
+        public void OpenMenu()
+        {
+            IsMenuOpen = true;
+        }
+
+        public void CloseMenu()
+        {
+            IsMenuOpen = false;
+        }
+
         public void Update(DeltaTimes deltaTimes)
         {
             var deltaTime = deltaTimes.DeltaTime;
@@ -189,6 +201,8 @@ namespace OpenKh.Game.States
                 MenuOption--;
             if (inputManager.IsMenuDown)
                 MenuOption++;
+            if (inputManager.IsStart)
+                CloseMenu();
         }
 
         private (Layout layout, List<ISpriteTexture> textures) GetLayoutResources(string layoutResourceName, string imagesResourceName)
