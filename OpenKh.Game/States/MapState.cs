@@ -50,6 +50,8 @@ namespace OpenKh.Game.States
         private List<ObjectEntity> _objectEntities = new List<ObjectEntity>();
         private List<BobEntity> _bobEntities = new List<BobEntity>();
 
+        private MenuState _menuState = new MenuState();
+
         public void Initialize(StateInitDesc initDesc)
         {
             _kernel = initDesc.Kernel;
@@ -65,15 +67,27 @@ namespace OpenKh.Game.States
             };
 
             BasicallyForceToReloadEverything();
+            _menuState.Initialize(initDesc);
         }
 
         public void Destroy()
         {
+            _menuState.Destroy();
         }
 
         public void Update(DeltaTimes deltaTimes)
         {
-            if (_enableCameraMovement)
+            if (_menuState.IsMenuOpen)
+            {
+                _menuState.Update(deltaTimes);
+                return;
+            }
+
+            if (_input.IsStart)
+            {
+                _menuState.OpenMenu();
+            }
+            else if (_enableCameraMovement)
             {
                 const double Speed = 100.0;
                 var speed = (float)(deltaTimes.DeltaTime * Speed);
@@ -142,6 +156,11 @@ namespace OpenKh.Game.States
                     RenderMesh(pass, _bobModels[entity.BobIndex]);
                 }
             });
+
+            if (_menuState.IsMenuOpen)
+            {
+                _menuState.Draw(deltaTimes);
+            }
         }
 
         private void RenderMesh(EffectPass pass, MeshGroup mesh)
@@ -445,6 +464,9 @@ namespace OpenKh.Game.States
 
         public void DebugDraw(IDebug debug)
         {
+            if (_menuState.IsMenuOpen)
+                return;
+
             if (IsDebugMode())
             {
                 if (_debugType == 0)
