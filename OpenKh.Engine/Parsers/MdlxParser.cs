@@ -2,6 +2,7 @@
 using OpenKh.Engine.Maths;
 using OpenKh.Engine.Parsers.Kddf2;
 using OpenKh.Kh2;
+using OpenKh.Ps2;
 using System;
 using System.Collections.Generic;
 using System.IO;

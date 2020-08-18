@@ -1,10 +1,9 @@
 ﻿using OpenKh.Common;
 using System;
 using System.IO;
-using System.Linq;
 using Xe.BinaryMapper;
 
-namespace OpenKh.Engine.Parsers
+namespace OpenKh.Ps2
 {
     public class VpuPacket
     {

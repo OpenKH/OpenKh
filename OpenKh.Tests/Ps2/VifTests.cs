@@ -1,14 +1,14 @@
 ﻿using OpenKh.Common;
-using OpenKh.Engine.Parsers;
+using OpenKh.Ps2;
 using System.IO;
 using Xunit;
 
-namespace OpenKh.Tests.Engine
+namespace OpenKh.Tests.Ps2
 {
     public class VifTests
     {
-        const string VifFileName = "./engine/res/VifPacked.bin";
-        const string Vu1FileName = "./engine/res/Vu1memory.bin";
+        const string VifFileName = "./Ps2/res/VifPacked.bin";
+        const string Vu1FileName = "./Ps2/res/Vu1memory.bin";
 
         [Fact]
         public void UnpackVifPacketToVu1() => File.OpenRead(Vu1FileName).Using(stream =>
