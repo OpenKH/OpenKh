@@ -165,6 +165,7 @@ namespace OpenKh.Command.MapGen.Utils
             private BuildHelper helper;
 
             public List<ushort[]> vifPacketRenderingGroup = new List<ushort[]>();
+            public List<CollisionMesh> collisionMeshList = new List<CollisionMesh>();
 
             public BSPWalker(BSP bsp, Coct coct, BuildHelper helper)
             {
@@ -235,7 +236,7 @@ namespace OpenKh.Command.MapGen.Utils
 
                     coct.Complete(collisionMesh);
 
-                    collisionMesh.vifPacketRenderingGroupIndex = vifPacketRenderingGroup.Count;
+                    collisionMeshList.Add(collisionMesh);
 
                     vifPacketRenderingGroup.Add(
                         vifPacketIndices
@@ -327,18 +328,23 @@ namespace OpenKh.Command.MapGen.Utils
             // Entry2 index is tightly coupled to vifPacketRenderingGroup's index.
             // Thus do not add Entry2 unplanned.
 
-            CreateDoctFromCoct();
+            CreateDoctFromCoct(walker.collisionMeshList);
         }
 
-        private void CreateDoctFromCoct()
+        private void CreateDoctFromCoct(IList<CollisionMesh> vifPacketRenderingGroupIndexMatched)
         {
             // directly mapping:
             // coctMesh → doct.Entry2
             // coctMeshGroup → doct.Entry1
 
+            var coctMeshList = new List<CollisionMesh>();
+
             foreach (var coctMeshGroup in coct.CollisionMeshGroupList)
             {
-                var vifPacketIndices = coctMeshGroup.Meshes.Select(it => it.vifPacketRenderingGroupIndex).ToArray();
+                var vifPacketIndices = coctMeshGroup.Meshes
+                    .Select(it => vifPacketRenderingGroupIndexMatched.IndexOf(it))
+                    .ToArray();
+
                 var minIdx = 0;
                 var maxIdx = 0;
                 if (vifPacketIndices.Length != 0)
@@ -363,17 +369,17 @@ namespace OpenKh.Command.MapGen.Utils
                         Entry2LastIndex = (ushort)maxIdx,
                     }
                 );
+            }
 
-                foreach (var coctMesh in coctMeshGroup.Meshes)
-                {
-                    doct.Add(
-                        new Doct.Entry2
-                        {
-                            BoundingBox = coctMesh.BoundingBox
-                                .ToBoundingBox(),
-                        }
-                    );
-                }
+            foreach (var coctMesh in vifPacketRenderingGroupIndexMatched)
+            {
+                doct.Add(
+                    new Doct.Entry2
+                    {
+                        BoundingBox = coctMesh.BoundingBox
+                            .ToBoundingBox(),
+                    }
+                );
             }
         }
 
@@ -434,7 +440,7 @@ namespace OpenKh.Command.MapGen.Utils
             // Entry2 index is tightly coupled to vifPacketRenderingGroup's index.
             // Thus do not add Entry2 unplanned.
 
-            CreateDoctFromCoct();
+            CreateDoctFromCoct(meshList);
         }
 
         private static IEnumerable<IList<int>> TriangleStripsToTriangleFans(IList<BigMesh.TriangleStrip> list)
