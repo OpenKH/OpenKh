@@ -1,15 +1,11 @@
 ﻿using NLog;
 using OpenKh.Command.MapGen.Models;
-using OpenKh.Command.MapGen.Utils;
-using OpenKh.Common;
-using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 using Xe.Graphics;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 
