@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using OpenKh.Command.MapGen.Utils;
 using OpenKh.Command.DoctChanger.Utils;
+using OpenKh.Command.CoctChanger.Utils;
 
 namespace OpenKh.Tests.kh2
 {
@@ -37,6 +38,20 @@ namespace OpenKh.Tests.kh2
                     actual: writer.ToString()
                 );
                 //File.WriteAllText(doctDumpFile, writer.ToString());
+            }
+
+            {
+                var coct = Coct.Read(barEntries.Single(it => it.Type == Bar.EntryType.MapCollision).Stream);
+                var writer = new StringWriter();
+                new DumpCoctUtil(coct, writer);
+
+                var coctDumpFile = Path.ChangeExtension(inputModel, ".coct.dump");
+
+                Assert.Equal(
+                    expected: File.ReadAllText(coctDumpFile),
+                    actual: writer.ToString()
+                );
+                //File.WriteAllText(coctDumpFile, writer.ToString());
             }
         }
     }

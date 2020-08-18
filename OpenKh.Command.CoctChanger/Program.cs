@@ -1,5 +1,6 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.Conventions;
+using OpenKh.Command.CoctChanger.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Utils;
@@ -18,7 +19,8 @@ namespace OpenKh.Command.CoctChanger
 {
     [Command("OpenKh.Command.CoctChanger")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(CreateRoomCoctCommand), typeof(UseThisCoctCommand), typeof(ShowStatsCommand))]
+    [Subcommand(typeof(CreateRoomCoctCommand), typeof(UseThisCoctCommand), typeof(ShowStatsCommand)
+        , typeof(DumpCoctCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -336,6 +338,25 @@ namespace OpenKh.Command.CoctChanger
                             report.VertexCount++;
                     }
                 }
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "coct file: dump")]
+        private class DumpCoctCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "COCT file input")]
+            public string CoctIn { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var coct = File.OpenRead(CoctIn).Using(Coct.Read);
+
+                new DumpCoctUtil(coct, Console.Out);
+
+                return 0;
             }
         }
     }
