@@ -45,7 +45,7 @@ namespace OpenKh.Tests
             ForAllBarEntries(gamePath, entryType, entry => AssertStream(entry.Stream, assertion));
 
         public static void UseAsset(string assetName, Action<Stream> action) =>
-            File.OpenRead(Path.Combine($"_Assets/res/", assetName)).Using(x => action(x));
+            File.OpenRead(Path.Combine($"Common/res/", assetName)).Using(x => action(x));
 
         public static void Dump(this byte[] data, string path) =>
             new MemoryStream(data).Using(x => x.Dump(path));
