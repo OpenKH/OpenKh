@@ -19,8 +19,8 @@ namespace OpenKh.Tests.Engine
         [InlineData(0, 0, 0, 0, 0)]
         [InlineData(0, 1000, 1, 0, 0)]
         [InlineData(0, 1000, 1, 500, 500)]
-        [InlineData(0, 1000, 0, 500, 125)]
-        [InlineData(0, 1000, 0, 750, 422)]
+        [InlineData(0, 1000, 0, 500, 500)]
+        [InlineData(0, 1000, 0, 750, 854)]
         public void TraslateXAnimationTest(int x0, int x1, int flags, int frameIndex, float expected)
         {
             var sequence = MockSequence(new Sequence.Animation
@@ -54,8 +54,8 @@ namespace OpenKh.Tests.Engine
         [InlineData(0, 0, 0, 0, 0)]
         [InlineData(0, 1000, 1, 0, 0)]
         [InlineData(0, 1000, 1, 500, 500)]
-        [InlineData(0, 1000, 0, 500, 125)]
-        [InlineData(0, 1000, 0, 750, 422)]
+        [InlineData(0, 1000, 0, 500, 500)]
+        [InlineData(0, 1000, 0, 750, 854)]
         [InlineData(0, 1000, 0x4000, 500, 0)]
         public void TraslateXBAnimationTest(int x0, int x1, int flags, int frameIndex, float expected)
         {
