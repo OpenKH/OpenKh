@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection;
 using System.Linq;
 using OpenKh.Kh2.Utils;
+using OpenKh.Command.DoctChanger.Utils;
 
 namespace OpenKh.Command.DoctChanger
 {
@@ -15,7 +16,8 @@ namespace OpenKh.Command.DoctChanger
     [Subcommand(typeof(UseThisDoctCommand), typeof(CreateDoctForMapCommand)
         , typeof(CreateDummyDoctCommand)
         , typeof(ReadDoctCommand), typeof(ReadMapDoctCommand)
-        , typeof(ShowStatsCommand))]
+        , typeof(ShowStatsCommand)
+        , typeof(DumpDoctCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -142,6 +144,25 @@ namespace OpenKh.Command.DoctChanger
                 var doct = File.OpenRead(DoctIn).Using(s => Doct.Read(s));
 
                 SummaryDoct(doct, DoctIn, Console.Out);
+
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "doct file: dump")]
+        private class DumpDoctCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "DOCT file input")]
+            public string DoctIn { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var doct = File.OpenRead(DoctIn).Using(s => Doct.Read(s));
+
+                new DumpDoctUtil(doct, Console.Out);
 
                 return 0;
             }
