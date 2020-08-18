@@ -137,7 +137,7 @@ namespace OpenKh.Engine.Renderers
 
         private void DrawAnimation(Context contextParent, Sequence.Animation animation, int index)
         {
-            // 0000 0001 = (0 = CUBIC INTERPOLATION, 1 = LINEAR INTERPOLATION)
+            // 0000 0001 = (0 = EASE IN/OUT INTERPOLATION, 1 = LINEAR INTERPOLATION)
             // 0000 0008 = (0 = BOUNCING START FROM CENTER, 1 = BOUNCING START FROM X / MOVE FROM Y)
             // 0000 0010 = (0 = ENABLE BOUNCING, 1 = IGNORE BOUNCING)
             // 0000 0020 = (0 = ENABLE ROTATION, 1 = IGNORE ROTATION)
