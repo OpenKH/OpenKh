@@ -133,6 +133,8 @@ namespace OpenKh.Kh2
             public List<Collision> Collisions { get; set; }
             public short v10 { get; set; }
             public short v12 { get; set; }
+
+            public int vifPacketRenderingGroupIndex;
         }
 
         public class Collision : IData

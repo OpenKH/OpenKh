@@ -235,6 +235,8 @@ namespace OpenKh.Command.MapGen.Utils
 
                     coct.Complete(collisionMesh);
 
+                    collisionMesh.vifPacketRenderingGroupIndex = vifPacketRenderingGroup.Count;
+
                     vifPacketRenderingGroup.Add(
                         vifPacketIndices
                             .Distinct()
@@ -336,6 +338,15 @@ namespace OpenKh.Command.MapGen.Utils
 
             foreach (var coctMeshGroup in coct.CollisionMeshGroupList)
             {
+                var vifPacketIndices = coctMeshGroup.Meshes.Select(it => it.vifPacketRenderingGroupIndex).ToArray();
+                var minIdx = 0;
+                var maxIdx = 0;
+                if (vifPacketIndices.Length != 0)
+                {
+                    minIdx = vifPacketIndices.Min();
+                    maxIdx = vifPacketIndices.Max() + 1;
+                }
+
                 doct.Entry1List.Add(
                     new Doct.Entry1
                     {
@@ -348,8 +359,8 @@ namespace OpenKh.Command.MapGen.Utils
                         Child7 = coctMeshGroup.Child7,
                         Child8 = coctMeshGroup.Child8,
                         BoundingBox = coctMeshGroup.BoundingBox.ToBoundingBox(),
-                        Entry2Index = (ushort)doct.Entry2List.Count,
-                        Entry2LastIndex = (ushort)(doct.Entry2List.Count + coctMeshGroup.Meshes.Count),
+                        Entry2Index = (ushort)minIdx,
+                        Entry2LastIndex = (ushort)maxIdx,
                     }
                 );
 
