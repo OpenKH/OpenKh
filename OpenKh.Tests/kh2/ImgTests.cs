@@ -59,7 +59,6 @@ namespace OpenKh.Tests.kh2
             File.OpenRead($"kh2/res/{fileName}.dec").Using(stream =>
             {
                 var compress = Img.Compress(stream.ReadAllBytes());
-                File.WriteAllBytes($"D:\\{fileName}.openkh", compress);
                 if (compress.Length > expectLength)
                 {
                     throw new XunitException($"Compressed file is {compress.Length} byte, but the official one is {expectLength}.\n" +

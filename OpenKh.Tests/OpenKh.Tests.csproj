@@ -25,6 +25,9 @@
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe\Xe.csproj" />
+    <ProjectReference Include="..\OpenKh.Command.MapGen\OpenKh.Command.MapGen.csproj" />
+    <ProjectReference Include="..\OpenKh.Command.DoctChanger\OpenKh.Command.DoctChanger.csproj" />
+    <ProjectReference Include="..\OpenKh.Command.CoctChanger\OpenKh.Command.CoctChanger.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -161,6 +164,42 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="kh2\res\map.spawnscript">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\diagnoal\diagnoal.coct.dump">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\diagnoal\diagnoal.doct.dump">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\diagnoal\diagnoal.fbx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\multi-4bpp\multi-4bpp.coct.dump">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\multi-4bpp\multi-4bpp.doct.dump">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\multi-4bpp\multi-4bpp.fbx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\multi-8bpp\multi-8bpp.coct.dump">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\multi-8bpp\multi-8bpp.doct.dump">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\multi-8bpp\multi-8bpp.fbx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\terrain\terrain.coct.dump">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\terrain\terrain.doct.dump">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="kh2\res\mapgen\terrain\terrain.fbx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="kh2\res\model_texture1.tex">
