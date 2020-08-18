@@ -1,7 +1,10 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils.Conventions;
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Utils;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.IO;
@@ -80,8 +83,6 @@ namespace OpenKh.Command.CoctChanger
 
                 var builder = new Coct.BuildHelper(coct);
 
-                var table7Idx = builder.AllocateSurfaceFlags(0x3F1);
-
                 // (forwardVec)
                 // +Z
                 // A  / +Y (upVec)
@@ -117,14 +118,14 @@ namespace OpenKh.Command.CoctChanger
                 // 4 south
                 // 5 north
 
-                var table5Idxes = new short[]
+                var planes = new Plane[]
                 {
-                    builder.AllocatePlane( 0,-1, 0,+minY), //bottom
-                    builder.AllocatePlane( 0,+1, 0,-maxY), //up
-                    builder.AllocatePlane(-1, 0, 0,+minX), //west
-                    builder.AllocatePlane(+1, 0, 0,-maxX), //east
-                    builder.AllocatePlane( 0, 0,-1,+minZ), //south
-                    builder.AllocatePlane( 0, 0,+1,-maxZ), //north
+                    new Plane( 0,-1, 0,+minY), //bottom
+                    new Plane( 0,+1, 0,-maxY), //up
+                    new Plane(-1, 0, 0,+minX), //west
+                    new Plane(+1, 0, 0,-maxX), //east
+                    new Plane( 0, 0,-1,+minZ), //south
+                    new Plane( 0, 0,+1,-maxZ), //north
                 };
 
                 var faceVertexOrders = new int[,]
@@ -137,46 +138,36 @@ namespace OpenKh.Command.CoctChanger
                     {0,4,5,1}, //north
                 };
 
-                var table3FirstIdx = coct.CollisionList.Count;
+                var collisionMesh = new Coct.CollisionMesh
+                {
+                    Collisions = new List<Coct.Collision>(),
+                    v10 = 0,
+                    v12 = 0,
+                };
 
                 for (var side = 0; side < 6; side++)
                 {
-                    coct.CompleteAndAdd(
-                        new Coct.Collision
-                        {
-                            v00 = 0,
-                            Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
-                            Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
-                            Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
-                            Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
-                            PlaneIndex = table5Idxes[side],
-                            BoundingBoxIndex = -1, // set later
-                            SurfaceFlagsIndex = table7Idx,
-                        }
-                    );
+                    var collision = new Coct.Collision
+                    {
+                        v00 = 0,
+                        Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
+                        Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
+                        Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
+                        Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
+                        Plane = planes[side],
+                        BoundingBox = BoundingBoxInt16.Invalid,
+                        SurfaceFlags = new Coct.SurfaceFlags() { Flags = 0x3F1 },
+                    };
+                    coct.Complete(collision);
+                    collisionMesh.Collisions.Add(collision);
                 }
 
-                var table3LastIdx = coct.CollisionList.Count;
-
-                var table2FirstIdx = coct.CollisionMeshList.Count;
-
-                coct.CompleteAndAdd(
-                    new Coct.CollisionMesh
-                    {
-                        CollisionStart = Convert.ToUInt16(table3FirstIdx),
-                        CollisionEnd = Convert.ToUInt16(table3LastIdx),
-                        v10 = 0,
-                        v12 = 0,
-                    }
-                );
-
-                var table2LastIdx = coct.CollisionMeshList.Count;
+                coct.Complete(collisionMesh);
 
                 coct.CompleteAndAdd(
                     new Coct.CollisionMeshGroup
                     {
-                        CollisionMeshStart = Convert.ToUInt16(table2FirstIdx),
-                        CollisionMeshEnd = Convert.ToUInt16(table2LastIdx),
+                        Meshes = new List<Coct.CollisionMesh>() { collisionMesh }
                     }
                 );
 
@@ -255,6 +246,16 @@ namespace OpenKh.Command.CoctChanger
         [Command(Description = "coct file: show stats")]
         private class ShowStatsCommand
         {
+            private class Report
+            {
+                public int NodeCount;
+                public int LeafCount;
+                public int TreeDepth;
+                public int MeshCount;
+                public int CollisionCount;
+                public int VertexCount;
+            }
+
             [Required]
             [FileExists]
             [Argument(0, Description = "Input map/coct file (decided by file extension: `.map` or not)")]
@@ -291,13 +292,50 @@ namespace OpenKh.Command.CoctChanger
 
             private void PrintSummary(Coct coct)
             {
-                Console.WriteLine($"{coct.CollisionMeshGroupList.Count,8:#,##0} collision mesh groups.");
-                Console.WriteLine($"{coct.CollisionMeshList.Count,8:#,##0} collision meshes.");
-                Console.WriteLine($"{coct.CollisionList.Count,8:#,##0} collisions.");
-                Console.WriteLine($"{coct.VertexList.Count,8:#,##0} vertices.");
-                Console.WriteLine($"{coct.PlaneList.Count,8:#,##0} planes.");
-                Console.WriteLine($"{coct.BoundingBoxList.Count,8:#,##0} bounding boxes.");
-                Console.WriteLine($"{coct.SurfaceFlagsList.Count,8:#,##0} surface flags.");
+                var report = new Report();
+                GenerateReport(coct, 1, 0, report);
+
+                Console.WriteLine($"Node count: {report.NodeCount,8:#,##0}");
+                Console.WriteLine($"Leaf count: {report.LeafCount,8:#,##0}");
+                Console.WriteLine($"Tree depth: {report.TreeDepth,8:#,##0}");
+                Console.WriteLine($"Mesh count: {report.MeshCount,8:#,##0}");
+                Console.WriteLine($"Coll count: {report.CollisionCount,8:#,##0}");
+                Console.WriteLine($"Vert count: {report.VertexCount,8:#,##0}");
+            }
+
+            private static void GenerateReport(Coct coct, int depth, int index, Report report)
+            {
+                if (index == -1) return;
+
+                report.NodeCount++;
+                report.TreeDepth = Math.Max(report.TreeDepth, depth);
+                var meshGroup = coct.CollisionMeshGroupList[index];
+                if (meshGroup.Child1 >= 0)
+                {
+                    var childDepth = depth + 1;
+                    GenerateReport(coct, childDepth, meshGroup.Child1, report);
+                    GenerateReport(coct, childDepth, meshGroup.Child2, report);
+                    GenerateReport(coct, childDepth, meshGroup.Child3, report);
+                    GenerateReport(coct, childDepth, meshGroup.Child4, report);
+                    GenerateReport(coct, childDepth, meshGroup.Child5, report);
+                    GenerateReport(coct, childDepth, meshGroup.Child6, report);
+                    GenerateReport(coct, childDepth, meshGroup.Child7, report);
+                    GenerateReport(coct, childDepth, meshGroup.Child8, report);
+                }
+                else
+                    report.LeafCount++;
+
+                foreach (var mesh in meshGroup.Meshes)
+                {
+                    report.MeshCount++;
+                    foreach (var collision in mesh.Collisions)
+                    {
+                        report.CollisionCount++;
+                        report.VertexCount += 3;
+                        if (collision.Vertex4 >= 0)
+                            report.VertexCount++;
+                    }
+                }
             }
         }
     }

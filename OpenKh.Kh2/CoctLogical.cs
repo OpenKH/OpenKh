@@ -16,62 +16,11 @@ namespace OpenKh.Kh2
         public CoctLogical(Coct coct)
         {
             CollisionMeshGroupList = coct.CollisionMeshGroupList
-                .Select(
-                    collision1 =>
-                    {
-                        var newCollision1 = Map1(collision1);
-
-                        newCollision1.Meshes = Enumerable.Range(
-                            collision1.CollisionMeshStart,
-                            collision1.CollisionMeshEnd - collision1.CollisionMeshStart
-                        )
-                            .Select(
-                                collision2Index =>
-                                {
-                                    var collision2 = coct.CollisionMeshList[collision2Index];
-
-                                    var newCollision2 = Map2(collision2);
-
-                                    newCollision2.Items = Enumerable.Range(
-                                        collision2.CollisionStart,
-                                        collision2.CollisionEnd - collision2.CollisionStart
-                                    )
-                                        .Select(
-                                            collision3Index =>
-                                            {
-                                                var collision3 = coct.CollisionList[collision3Index];
-
-                                                var newCollision3 = Map3(collision3);
-
-                                                return newCollision3;
-                                            }
-                                        )
-                                        .ToList();
-
-                                    return newCollision2;
-                                }
-                            )
-                            .ToList();
-
-                        return newCollision1;
-                    }
-                )
+                .Select(Map1)
                 .ToList();
 
             VertexList = coct.VertexList
                 .Select(collision4 => Map4(collision4))
-                .ToList();
-
-            PlaneList = coct.PlaneList
-                .Select(collision5 => Map5(collision5))
-                .ToList();
-
-            BoundingBoxList = coct.BoundingBoxList
-                .Select(collision6 => Map6(collision6))
-                .ToList();
-
-            SurfaceFlagsList = coct.SurfaceFlagsList
-                .Select(collision7 => Map7(collision7))
                 .ToList();
         }
         private static CoctCollisionMeshGroup Map1(Coct.CollisionMeshGroup source) =>
@@ -91,6 +40,7 @@ namespace OpenKh.Kh2
                 MaxX = source.BoundingBox.Maximum.X,
                 MaxY = source.BoundingBox.Maximum.Y,
                 MaxZ = source.BoundingBox.Maximum.Z,
+                Meshes = source.Meshes.Select(Map2).ToList()
             };
 
         private static CoctCollisionMesh Map2(Coct.CollisionMesh source) =>
@@ -104,6 +54,7 @@ namespace OpenKh.Kh2
                 MaxZ = source.BoundingBox.Maximum.Z,
                 v10 = source.v10,
                 v12 = source.v12,
+                Items = source.Collisions.Select(Map3).ToList()
             };
 
         private static CoctCollision Map3(Coct.Collision source) =>
@@ -114,9 +65,12 @@ namespace OpenKh.Kh2
                 Vertex2 = source.Vertex2,
                 Vertex3 = source.Vertex3,
                 Vertex4 = source.Vertex4,
-                Co5Index = source.PlaneIndex,
-                Co6Index = source.BoundingBoxIndex,
-                Co7Index = source.SurfaceFlagsIndex,
+                PlaneX = source.Plane.Normal.X,
+                PlaneY = source.Plane.Normal.Y,
+                PlaneZ = source.Plane.Normal.Z,
+                PlaneD = source.Plane.D,
+                BoundingBox = Map6(source.BoundingBox),
+                Flags = Map7(source.SurfaceFlags),
             };
 
         private static CoctVector4 Map4(Vector4 source) =>
@@ -126,15 +80,6 @@ namespace OpenKh.Kh2
                 Y = source.Y,
                 Z = source.Z,
                 W = source.W,
-            };
-
-        private static CoctPlane Map5(Plane source) =>
-            new CoctPlane
-            {
-                X = source.Normal.X,
-                Y = source.Normal.Y,
-                Z = source.Normal.Z,
-                D = source.D,
             };
 
         private static CoctBoundingBox Map6(BoundingBoxInt16 source) =>
@@ -158,9 +103,6 @@ namespace OpenKh.Kh2
 
         public List<CoctCollisionMeshGroup> CollisionMeshGroupList { get; }
         public List<CoctVector4> VertexList { get; }
-        public List<CoctPlane> PlaneList { get; }
-        public List<CoctBoundingBox> BoundingBoxList { get; }
-        public List<CoctSurfaceFlags> SurfaceFlagsList { get; }
 
         public class CoctCollisionMeshGroup
         {
@@ -203,9 +145,12 @@ namespace OpenKh.Kh2
             public short Vertex2 { get; set; }
             public short Vertex3 { get; set; }
             public short Vertex4 { get; set; }
-            public short Co5Index { get; set; }
-            public short Co6Index { get; set; }
-            public short Co7Index { get; set; }
+            public float PlaneX { get; set; }
+            public float PlaneY { get; set; }
+            public float PlaneZ { get; set; }
+            public float PlaneD { get; set; }
+            public CoctBoundingBox BoundingBox { get; set; }
+            public CoctSurfaceFlags Flags { get; set; }
         }
 
         public class CoctVector4
@@ -254,75 +199,12 @@ namespace OpenKh.Kh2
             var coct = new Coct();
 
             coct.CollisionMeshGroupList.AddRange(
-                CollisionMeshGroupList
-                    .Select(
-                        collision1 =>
-                        {
-                            var newCollision1 = Ummap1(collision1);
-
-                            newCollision1.CollisionMeshStart = Convert.ToUInt16(
-                                coct.CollisionMeshList.Count
-                            );
-
-                            coct.CollisionMeshList.AddRange(
-                                collision1.Meshes
-                                    .Select(
-                                        collision2 =>
-                                        {
-                                            var newCollision2 = Unmap2(collision2);
-
-                                            newCollision2.CollisionStart = Convert.ToUInt16(
-                                                coct.CollisionList.Count
-                                            );
-
-                                            coct.CollisionList.AddRange(
-                                                collision2.Items
-                                                    .Select(
-                                                        collision3 =>
-                                                        {
-                                                            var newCollision3 = Unmap3(collision3);
-
-                                                            return newCollision3;
-                                                        }
-                                                    )
-                                            );
-
-                                            newCollision2.CollisionEnd = Convert.ToUInt16(
-                                                coct.CollisionList.Count
-                                            );
-
-                                            return newCollision2;
-                                        }
-                                    )
-                            );
-
-                            newCollision1.CollisionMeshEnd = Convert.ToUInt16(
-                                coct.CollisionMeshList.Count
-                            );
-
-                            return newCollision1;
-                        }
-                    )
+                CollisionMeshGroupList.Select(Unmap1)
             );
 
             coct.VertexList.AddRange(
                 VertexList
                     .Select(Unmap4)
-            );
-
-            coct.PlaneList.AddRange(
-                PlaneList
-                    .Select(Unmap5)
-            );
-
-            coct.BoundingBoxList.AddRange(
-                BoundingBoxList
-                    .Select(Unmap6)
-            );
-
-            coct.SurfaceFlagsList.AddRange(
-                SurfaceFlagsList
-                    .Select(Unmap7)
             );
 
             return coct;
@@ -340,9 +222,6 @@ namespace OpenKh.Kh2
                 new Vector3Int16(source.MaxX, source.MaxY, source.MaxZ)
             );
 
-        private static Plane Unmap5(CoctPlane source) =>
-            new Plane(source.X, source.Y, source.Z, source.D);
-
         private static Vector4 Unmap4(CoctVector4 source) =>
             new Vector4(source.X, source.Y, source.Z, source.W);
 
@@ -354,23 +233,24 @@ namespace OpenKh.Kh2
                 Vertex2 = source.Vertex2,
                 Vertex3 = source.Vertex3,
                 Vertex4 = source.Vertex4,
-                PlaneIndex = source.Co5Index,
-                BoundingBoxIndex = source.Co6Index,
-                SurfaceFlagsIndex = source.Co7Index,
+                Plane = new Plane(source.PlaneX, source.PlaneY, source.PlaneZ, source.PlaneD),
+                BoundingBox = Unmap6(source.BoundingBox),
+                SurfaceFlags = Unmap7(source.Flags),
             };
 
-        private Coct.CollisionMesh Unmap2(CoctCollisionMesh source) =>
+        private static Coct.CollisionMesh Unmap2(CoctCollisionMesh source) =>
             new Coct.CollisionMesh
             {
                 BoundingBox = new BoundingBoxInt16(
                     new Vector3Int16(source.MinX, source.MinY, source.MinZ),
                     new Vector3Int16(source.MaxX, source.MaxY, source.MaxZ)
                 ),
+                Collisions = source.Items.Select(Unmap3).ToList(),
                 v10 = source.v10,
                 v12 = source.v12,
             };
 
-        private static Coct.CollisionMeshGroup Ummap1(CoctCollisionMeshGroup collision1) =>
+        private static Coct.CollisionMeshGroup Unmap1(CoctCollisionMeshGroup collision1) =>
             new Coct.CollisionMeshGroup
             {
                 Child1 = collision1.Child1,
@@ -385,6 +265,7 @@ namespace OpenKh.Kh2
                     new Vector3Int16(collision1.MinX, collision1.MinY, collision1.MinZ),
                     new Vector3Int16(collision1.MaxX, collision1.MaxY, collision1.MaxZ)
                 ),
+                Meshes = collision1.Meshes.Select(Unmap2).ToList()
             };
     }
 }
