@@ -158,7 +158,7 @@ namespace OpenKh.Engine.Renderers
             if ((animation.Flags & Sequence.LinearInterpolationFlag) != 0)
                 t = (float)delta;
             else
-                t = (float)(delta * delta * delta);
+                t = (float)((Math.Sin(delta * Math.PI - Math.PI / 2.0) + 1.0) / 2.0);
 
             context.PositionX += Lerp(t, animation.TranslateXStart, animation.TranslateXEnd);
             context.PositionY += Lerp(t, animation.TranslateYStart, animation.TranslateYEnd);
