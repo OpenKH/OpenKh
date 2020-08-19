@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using OpenKh.Common;
 using OpenKh.Game.DataContent;
 using OpenKh.Game.Debugging;
@@ -109,7 +109,7 @@ namespace OpenKh.Game
         protected override void Initialize()
         {
             _debugOverlay.Initialize(GetStateInitDesc());
-            State = 0;
+            State = 1;
 
             base.Initialize();
         }

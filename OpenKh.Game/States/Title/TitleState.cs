@@ -32,7 +32,7 @@ namespace OpenKh.Game.States.Title
         private LayoutRenderer layoutRendererFg;
         private LayoutRenderer layoutRendererBg;
         private LayoutRenderer layoutRendererTheater;
-        private SequenceRenderer _sequenceRendererMenu;
+        private AnimatedSequenceFactory _animatedSequenceFactory;
         private Kh2MessageRenderer _messageRenderer;
         private Layout _titleLayout;
         private Layout _theaterLayout;
@@ -71,7 +71,7 @@ namespace OpenKh.Game.States.Title
                 switch (value)
                 {
                     case TitleSubMenu.NewGame:
-                        _subMenu = new NewGameMenu(_sequenceRendererMenu, this);
+                        _subMenu = new NewGameMenu(_animatedSequenceFactory, this);
                         break;
                     default:
                         Log.Warn($"Submenu {value.ToString()} not implemented.");
@@ -144,7 +144,14 @@ namespace OpenKh.Game.States.Title
             layoutRendererBg = new LayoutRenderer(_titleLayout, drawing, images);
             layoutRendererFg = new LayoutRenderer(_titleLayout, drawing, images);
             layoutRendererBg.SelectedSequenceGroupIndex = _titleLayoutDesc.Copyright;
-            _sequenceRendererMenu = new SequenceRenderer(_titleLayout.SequenceItems[0], drawing, images.First());
+
+            _animatedSequenceFactory = new AnimatedSequenceFactory(
+                drawing,
+                initDesc.Kernel.MessageProvider,
+                _messageRenderer,
+                initDesc.Kernel.SystemMessageContext.Encoder,
+                _titleLayout.SequenceItems[0],
+                images.First());
 
             Log.Info($"Theater={_titleLayoutDesc.HasTheater}");
             if (_titleLayoutDesc.HasTheater)
@@ -152,7 +159,6 @@ namespace OpenKh.Game.States.Title
                 (_theaterLayout, images) = GetLayoutResources("even", "even");
                 layoutRendererTheater = new LayoutRenderer(_theaterLayout, drawing, images);
             }
-
 
             SetOption(0);
         }
