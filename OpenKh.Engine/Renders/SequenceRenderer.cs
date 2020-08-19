@@ -137,7 +137,7 @@ namespace OpenKh.Engine.Renderers
 
         private void DrawAnimation(Context contextParent, Sequence.Animation animation, int index)
         {
-            // 0000 0001 = (0 = CUBIC INTERPOLATION, 1 = LINEAR INTERPOLATION)
+            // 0000 0001 = (0 = EASE IN/OUT INTERPOLATION, 1 = LINEAR INTERPOLATION)
             // 0000 0008 = (0 = BOUNCING START FROM CENTER, 1 = BOUNCING START FROM X / MOVE FROM Y)
             // 0000 0010 = (0 = ENABLE BOUNCING, 1 = IGNORE BOUNCING)
             // 0000 0020 = (0 = ENABLE ROTATION, 1 = IGNORE ROTATION)
@@ -158,7 +158,7 @@ namespace OpenKh.Engine.Renderers
             if ((animation.Flags & Sequence.LinearInterpolationFlag) != 0)
                 t = (float)delta;
             else
-                t = (float)(delta * delta * delta);
+                t = (float)((Math.Sin(delta * Math.PI - Math.PI / 2.0) + 1.0) / 2.0);
 
             context.PositionX += Lerp(t, animation.TranslateXStart, animation.TranslateXEnd);
             context.PositionY += Lerp(t, animation.TranslateYStart, animation.TranslateYEnd);

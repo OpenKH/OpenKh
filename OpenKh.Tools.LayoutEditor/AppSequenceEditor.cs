@@ -378,7 +378,7 @@ namespace OpenKh.Tools.LayoutEditor
 
             int interpolationMode = (animation.Flags & Sequence.LinearInterpolationFlag) != 0 ? 1 : 0;
             if (ImGui.Combo($"Interpolation##{index}", ref interpolationMode, new string[]
-                { "Cubic", "Linear" }, 2))
+                { "Ease in/out", "Linear" }, 2))
             {
                 var flag = Sequence.LinearInterpolationFlag;
                 animation.Flags = (animation.Flags & ~flag) | (interpolationMode == 0 ? 0 : flag);
