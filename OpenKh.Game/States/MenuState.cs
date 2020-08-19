@@ -51,15 +51,18 @@ namespace OpenKh.Game.States
         private List<ISpriteTexture> _textures = new List<ISpriteTexture>();
         private Dictionary<ushort, byte[]> _cachedText = new Dictionary<ushort, byte[]>();
 
-        private List<AnimatedSequenceRenderer> _mainSeqGroup;
-        private List<AnimatedSequenceRenderer> _menuOptionSeqs;
-        private AnimatedSequenceRenderer _backgroundSeq;
-        private List<AnimatedSequenceRenderer> _characterDescSeqs;
-        private AnimatedSequenceRenderer _menuOptionSelectedSeq;
-        private AnimatedSequenceRenderer _menuOptionCursorSeq;
-        private AnimatedSequenceRenderer _menuOptionLumSeq;
-        private AnimatedSequenceRenderer _charHpBarSeq;
-        private AnimatedSequenceRenderer _charMpBarSeq;
+        private List<IAnimatedSequence> _mainSeqGroup;
+        private List<IAnimatedSequence> _menuOptionSeqs;
+        private IAnimatedSequence _backgroundSeq;
+        private List<IAnimatedSequence> _characterDescSeqs;
+        private IAnimatedSequence _menuOptionSelectedSeq;
+        private IAnimatedSequence _menuOptionCursorSeq;
+        private IAnimatedSequence _menuOptionLumSeq;
+        private IAnimatedSequence _charHpBarSeq;
+        private IAnimatedSequence _charMpBarSeq;
+
+        private AnimatedSequenceFactory _animSeqFactory;
+        private IAnimatedSequence _characterDescSample;
 
         private int _selectedOption = 0;
         private Kh2MessageRenderer _messageRenderer;
@@ -76,8 +79,8 @@ namespace OpenKh.Game.States
                     _selectedOption += MenuElementCount;
                 _selectedOption %= MenuElementCount;
 
-                _menuOptionSelectedSeq.SetMessage(_messageRenderer,
-                    GetMessage(MenuOptions[_selectedOption]), TextAnchor.Left);
+                _menuOptionSelectedSeq.TextAnchor = TextAnchor.Left;
+                _menuOptionSelectedSeq.SetMessage(MenuOptions[_selectedOption]);
             }
         }
 
@@ -113,6 +116,15 @@ namespace OpenKh.Game.States
                 SelectedSequenceGroupIndex = 0
             };
 
+            _animSeqFactory = new AnimatedSequenceFactory(
+                _drawing,
+                initDesc.Kernel.MessageProvider,
+                _messageRenderer,
+                _kernel.SystemMessageContext.Encoder,
+                _campLayout.SequenceItems[1],
+                _textures.First());
+            InitializeMenu();
+
             _mainSeqGroup = CreateMultipleAnimatedSequences(107, 110, 113);
 
             _backgroundSeq = CreateAnimationSequence(46);
@@ -120,11 +132,12 @@ namespace OpenKh.Game.States
                 .Select(_ => CreateAnimationSequence(93, 93, 93))
                 .ToList();
 
-            _menuOptionSeqs = new List<AnimatedSequenceRenderer>();
+            _menuOptionSeqs = new List<IAnimatedSequence>();
             for (var i = 0; i < MenuElementCount; i++)
             {
                 var animSequence = CreateAnimationSequence(133);
-                animSequence.SetMessage(_messageRenderer, GetMessage(MenuOptions[i]), TextAnchor.Left);
+                animSequence.TextAnchor = TextAnchor.Left;
+                animSequence.SetMessage(MenuOptions[i]);
                 _menuOptionSeqs.Add(animSequence);
             }
 
@@ -136,6 +149,82 @@ namespace OpenKh.Game.States
             _charMpBarSeq = CreateAnimationSequence(CharacterMpBar);
 
             MenuOption = 0;
+        }
+
+        private void InitializeMenu()
+        {
+            const float X = -43;
+            const float Y = 8;
+            const float Distance = 15;
+            _characterDescSample = _animSeqFactory.Create(new AnimatedSequenceDesc
+            {
+                X = 300,
+                Y = 120,
+                SequenceIndexLoop = 93,
+                Children = new List<AnimatedSequenceDesc>()
+                {
+                    new AnimatedSequenceDesc
+                    {
+                        X = X,
+                        Y = Y + 1 * Distance - 3,
+                        SequenceIndexLoop = 124,
+                        MessageId = MsgLv,
+                        TextAnchor = TextAnchor.Left,
+                    },
+                    new AnimatedSequenceDesc
+                    {
+                        X = X,
+                        Y = Y + 1 * Distance - 3,
+                        SequenceIndexLoop = 124,
+                        MessageText = "99",
+                        TextAnchor = TextAnchor.Right,
+                    },
+                    new AnimatedSequenceDesc
+                    {
+                        X = X,
+                        Y = Y + 2 * Distance,
+                        SequenceIndexLoop = CharacterHpBar,
+                    },
+                    new AnimatedSequenceDesc
+                    {
+                        X = X,
+                        Y = Y + 2 * Distance - 4,
+                        SequenceIndexLoop = 121,
+                        MessageId = MsgHp,
+                        TextAnchor = TextAnchor.Left,
+                    },
+                    new AnimatedSequenceDesc
+                    {
+                        X = X,
+                        Y = Y + 2 * Distance - 4,
+                        SequenceIndexLoop = 121,
+                        MessageText = "60/60",
+                        TextAnchor = TextAnchor.Right,
+                    },
+                    new AnimatedSequenceDesc
+                    {
+                        X = X,
+                        Y = Y + 3 * Distance,
+                        SequenceIndexLoop = CharacterMpBar,
+                    },
+                    new AnimatedSequenceDesc
+                    {
+                        X = X,
+                        Y = Y + 3 * Distance - 4,
+                        SequenceIndexLoop = 118,
+                        MessageId = MsgMp,
+                        TextAnchor = TextAnchor.Left,
+                    },
+                    new AnimatedSequenceDesc
+                    {
+                        X = X,
+                        Y = Y + 3 * Distance - 4,
+                        SequenceIndexLoop = 118,
+                        MessageText = "120/120",
+                        TextAnchor = TextAnchor.Right,
+                    },
+                }
+            });
         }
 
         public void Destroy()
@@ -156,6 +245,7 @@ namespace OpenKh.Game.States
             ForAll(_menuOptionSeqs, x => x.Begin());
             ForAll(_mainSeqGroup, x => x.Begin());
             _menuOptionSelectedSeq.Begin();
+            _characterDescSample.Begin();
 
             IsMenuOpen = true;
         }
@@ -170,6 +260,7 @@ namespace OpenKh.Game.States
             ForAll(_menuOptionSeqs, x => x.End());
             ForAll(_mainSeqGroup, x => x.End());
             _menuOptionSelectedSeq.End();
+            _characterDescSample.End();
         }
 
         public void Update(DeltaTimes deltaTimes)
@@ -187,6 +278,7 @@ namespace OpenKh.Game.States
             _menuOptionSelectedSeq.Update(deltaTime);
             _menuOptionCursorSeq.Update(deltaTime);
             _menuOptionLumSeq.Update(deltaTime);
+            _characterDescSample.Update(deltaTime);
         }
 
         public void Draw(DeltaTimes deltaTimes)
@@ -243,24 +335,26 @@ namespace OpenKh.Game.States
                 DrawCharacterDesc(_characterDescSeqs[i], PosX + i * Distance, PosY, i);
             }
 
+            _characterDescSample.Draw();
+
             _drawing.Flush();
         }
 
-        private void DrawCharacterDesc(AnimatedSequenceRenderer seqd, float x, float y, int index)
+        private void DrawCharacterDesc(IAnimatedSequence seqd, float x, float y, int index)
         {
             const int BarX = 42;
             // poorly optimized... never called SetMessage at every frame.
 
-            seqd.SetMessage(_messageRenderer,
-                GetMessage(CharacterNames[index]), TextAnchor.Center);
+            seqd.TextAnchor = TextAnchor.Center;
+            seqd.SetMessage(CharacterNames[index]);
             seqd.Draw(x, y);
 
-            _charHpBarSeq.SetMessage(_messageRenderer,
-                GetMessage(MsgHp), TextAnchor.Left);
+            _charHpBarSeq.TextAnchor = TextAnchor.Left;
+            _charHpBarSeq.SetMessage(MsgHp);
             _charHpBarSeq.Draw(x - BarX, y);
 
-            _charMpBarSeq.SetMessage(_messageRenderer,
-                GetMessage(MsgMp), TextAnchor.Left);
+            _charMpBarSeq.TextAnchor = TextAnchor.Left;
+            _charMpBarSeq.SetMessage(MsgMp);
             _charMpBarSeq.Draw(x - BarX, y + 20);
         }
 
@@ -283,37 +377,28 @@ namespace OpenKh.Game.States
             return (layout, _textures);
         }
 
-        private List<AnimatedSequenceRenderer> CreateMultipleAnimatedSequences(params int[] anims)
+        private List<IAnimatedSequence> CreateMultipleAnimatedSequences(params int[] anims)
         {
-            var sequences = new List<AnimatedSequenceRenderer>();
+            var sequences = new List<IAnimatedSequence>();
             foreach (var animationIndex in anims)
             {
-                var item = new AnimatedSequenceRenderer(
-                    new SequenceRenderer(_campLayout.SequenceItems[1], _drawing, _textures[0]),
-                    animationIndex);
-                item.Begin();
-
-                sequences.Add(item);
+                sequences.Add(CreateAnimationSequence(animationIndex));
             }
 
             return sequences;
         }
 
-        private AnimatedSequenceRenderer CreateAnimationSequence(int anim)
-        {
-            var item = new AnimatedSequenceRenderer(
-                new SequenceRenderer(_campLayout.SequenceItems[1], _drawing, _textures[0]),
-                anim);
-            item.Begin();
+        private IAnimatedSequence CreateAnimationSequence(int anim) =>
+            CreateAnimationSequence(anim, anim + 1, anim + 2);
 
-            return item;
-        }
-
-        private AnimatedSequenceRenderer CreateAnimationSequence(int start, int loop, int end)
+        private IAnimatedSequence CreateAnimationSequence(int start, int loop, int end)
         {
-            var item = new AnimatedSequenceRenderer(
-                new SequenceRenderer(_campLayout.SequenceItems[1], _drawing, _textures[0]),
-                start, loop, end);
+            var item = _animSeqFactory.Create(new AnimatedSequenceDesc
+            {
+                SequenceIndexLoop = loop,
+                SequenceIndexStart = start,
+                SequenceIndexEnd = end
+            });
             item.Begin();
 
             return item;

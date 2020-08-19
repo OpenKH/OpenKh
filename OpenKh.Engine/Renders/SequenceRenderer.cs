@@ -15,6 +15,16 @@ namespace OpenKh.Engine.Renderers
 
     public class SequenceRenderer
     {
+        public class ChildContext
+        {
+            public float PositionX { get; set; }
+            public float PositionY { get; set; }
+            public ColorF Color { get; set; }
+            public float TextPositionX { get; set; }
+            public float TextPositionY { get; set; }
+            public float TextScale { get; set; }
+        }
+
         private class Context
         {
             public int GlobalFrameIndex { get; set; }
@@ -59,66 +69,19 @@ namespace OpenKh.Engine.Renderers
 
         private readonly ISpriteDrawing drawing;
         private readonly ISpriteTexture surface;
-        private Context _textContext;
 
         public Sequence Sequence { get; }
+        public ChildContext CurrentChildContext { get; } = new ChildContext();
 
         public SequenceRenderer(Sequence sequence, ISpriteDrawing drawing, ISpriteTexture surface)
         {
-            this.Sequence = sequence;
             this.drawing = drawing;
             this.surface = surface;
+            Sequence = sequence;
             DebugSequenceRenderer = new DefaultDebugSequenceRenderer();
         }
 
         public IDebugSequenceRenderer DebugSequenceRenderer { get; set; }
-
-        public bool Draw(IMessageRenderer msgRenderer, byte[] data, int animationGroupIndex, int frameIndex, float positionX, float positionY, TextAnchor anchor)
-        {
-            _textContext = null;
-            var isAnimationEnd = Draw(animationGroupIndex, frameIndex, positionX, positionY);
-
-            if (_textContext != null && msgRenderer != null && data != null)
-            {
-                const float UiTextScale = 0.75f;
-                var seqGroup = Sequence.AnimationGroups[animationGroupIndex];
-                float textScale = seqGroup.TextScale == 0 ? UiTextScale : (seqGroup.TextScale / 24f);
-
-                var fakeTextDrawContext = new DrawContext
-                {
-                    Scale = textScale,
-                    IgnoreDraw = true,
-                };
-                msgRenderer.Draw(fakeTextDrawContext, data);
-                var width = (float)fakeTextDrawContext.Width;
-
-                float xPos;
-                switch (anchor)
-                {
-                    default:
-                    case TextAnchor.Left:
-                        xPos = _textContext.PositionX + seqGroup.TextPositionX;
-                        break;
-                    case TextAnchor.Center:
-                        xPos = _textContext.PositionX - width / 2 + seqGroup.TextPositionX;
-                        break;
-                    case TextAnchor.Right:
-                        throw new NotImplementedException("TextAnchor.Right is not implemented yet.");
-                }
-
-                msgRenderer.Draw(new DrawContext
-                {
-                    xStart = xPos,
-                    x = xPos,
-                    y = _textContext.PositionY + seqGroup.TextPositionY,
-                    Color = _textContext.Color,
-                    Scale = textScale,
-                    WidthMultiplier = 1.0f,
-                }, data);
-            }
-
-            return isAnimationEnd;
-        }
 
         public bool Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
             DrawAnimationGroup(new Context
@@ -133,6 +96,10 @@ namespace OpenKh.Engine.Renderers
         {
             if (animationGroup.DoNotLoop != 0)
                 return frameIndex;
+
+            CurrentChildContext.TextPositionX = animationGroup.TextPositionX;
+            CurrentChildContext.TextPositionY = animationGroup.TextPositionY;
+            CurrentChildContext.TextScale = animationGroup.TextScale;
 
             var frameEnd = animationGroup.LoopEnd;
             if (frameEnd == 0 && animationGroup.Animations.Count > 0)
@@ -240,7 +207,9 @@ namespace OpenKh.Engine.Renderers
 
             if ((animation.Flags & Sequence.AttachTextFlag) != 0)
             {
-                _textContext = context.Clone();
+                CurrentChildContext.PositionX = context.PositionX;
+                CurrentChildContext.PositionY = context.PositionY;
+                CurrentChildContext.Color = context.Color;
             }
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS
