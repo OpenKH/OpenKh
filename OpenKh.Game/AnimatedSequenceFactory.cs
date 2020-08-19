@@ -24,7 +24,7 @@ namespace OpenKh.Game
         public ChildStacking ChildStacking { get; set; }
 
         void Update(double deltaTime);
-        void Draw(float x = 0, float y = 0, float opacity = 1);
+        void Draw(float x, float y);
 
         void Begin();
         void Skip();
@@ -45,6 +45,7 @@ namespace OpenKh.Game
         public int SequenceIndexLoop { get; set; }
         public int SequenceIndexStart { get; set; } = -1;
         public int SequenceIndexEnd { get; set; } = -1;
+        public int StackIndex { get; set; }
         public List<AnimatedSequenceDesc> Children { get; set; }
     }
 
@@ -70,6 +71,7 @@ namespace OpenKh.Game
 
             public float PositionX { get; set; }
             public float PositionY { get; set; }
+            public int StackIndex { get; set; }
             public TextAnchor TextAnchor { get; set; }
             public ChildStacking ChildStacking { get; set; }
 
@@ -99,13 +101,20 @@ namespace OpenKh.Game
                     child.Update(deltaTime);
             }
 
-            public void Draw(float x, float y, float opacity)
+            public void Draw(float x, float y) =>
+                Draw(new SequenceRenderer.ChildContext
+                {
+                    PositionX = x,
+                    PositionY = y
+                });
+
+            private void Draw(SequenceRenderer.ChildContext context)
             {
                 if (!IsEnd && !_renderer.Draw(
                     _anim,
                     _frame,
-                    PositionX + x,
-                    PositionY + y))
+                    PositionX + context.PositionX,
+                    PositionY + context.PositionY))
                 {
                     if (_isRunning)
                     {
@@ -117,18 +126,19 @@ namespace OpenKh.Game
                 }
 
                 var childContext = _renderer.CurrentChildContext;
+                var originalPosY = childContext.PositionY;
                 for (var i = 0; i < Children.Count; i++)
                 {
-                    var child = Children[i];
-                    //if (i == _attachedChildIndex)
-                    //    childX += curAnimGroup?.LightPositionX ?? 0;
-                    child.Draw(childContext.PositionX, childContext.PositionY);
+                    var child = Children[i] as AnimatedSequence;
+                    childContext.PositionX += childContext.TextPositionX;
+                    childContext.PositionY = originalPosY + childContext.UiPadding * child.StackIndex;
+                    child.Draw(childContext);
                 }
 
                 if (_message != null)
                 {
                     const float UiTextScale = 0.75f;
-                    float textScale = childContext.TextScale == 0 ? UiTextScale : (childContext.TextScale / 24f);
+                    float textScale = context.TextScale == 0 ? UiTextScale : (context.TextScale / 16f);
 
                     var fakeTextDrawContext = new DrawContext
                     {
@@ -143,19 +153,19 @@ namespace OpenKh.Game
                     {
                         default:
                         case TextAnchor.Left:
-                            xPos = childContext.PositionX + childContext.TextPositionX;
+                            xPos = childContext.PositionX;
                             break;
                         case TextAnchor.Center:
-                            xPos = childContext.PositionX - width / 2 + childContext.TextPositionX;
+                            xPos = childContext.PositionX - width / 2;
                             break;
                         case TextAnchor.Right:
-                            xPos = childContext.PositionX - width + childContext.TextPositionX;
+                            xPos = childContext.PositionX + context.UiSize - width;
                             break;
                     }
 
                     _messageRenderer.Draw(new DrawContext
                     {
-                        xStart = xPos,
+                        xStart = childContext.TextPositionX + xPos,
                         x = xPos,
                         y = childContext.PositionY + childContext.TextPositionY,
                         Color = childContext.Color,
@@ -257,6 +267,7 @@ namespace OpenKh.Game
             {
                 PositionX = desc.X,
                 PositionY = desc.Y,
+                StackIndex = desc.StackIndex,
                 TextAnchor = desc.TextAnchor,
                 ChildStacking = desc.ChildStacking,
                 Children = desc.Children?

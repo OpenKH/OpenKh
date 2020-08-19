@@ -23,6 +23,8 @@ namespace OpenKh.Engine.Renderers
             public float TextPositionX { get; set; }
             public float TextPositionY { get; set; }
             public float TextScale { get; set; }
+            public float UiSize { get; set; }
+            public float UiPadding { get; set; }
         }
 
         private class Context
@@ -100,6 +102,8 @@ namespace OpenKh.Engine.Renderers
             CurrentChildContext.TextPositionX = animationGroup.TextPositionX;
             CurrentChildContext.TextPositionY = animationGroup.TextPositionY;
             CurrentChildContext.TextScale = animationGroup.TextScale;
+            CurrentChildContext.UiSize = animationGroup.LightPositionX;
+            CurrentChildContext.UiPadding = animationGroup.UiPadding;
 
             var frameEnd = animationGroup.LoopEnd;
             if (frameEnd == 0 && animationGroup.Animations.Count > 0)

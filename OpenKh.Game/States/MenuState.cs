@@ -4,7 +4,6 @@ using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
-using OpenKh.Game.States.Title;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -54,7 +53,6 @@ namespace OpenKh.Game.States
         private List<IAnimatedSequence> _mainSeqGroup;
         private List<IAnimatedSequence> _menuOptionSeqs;
         private IAnimatedSequence _backgroundSeq;
-        private List<IAnimatedSequence> _characterDescSeqs;
         private IAnimatedSequence _menuOptionSelectedSeq;
         private IAnimatedSequence _menuOptionCursorSeq;
         private IAnimatedSequence _menuOptionLumSeq;
@@ -128,9 +126,6 @@ namespace OpenKh.Game.States
             _mainSeqGroup = CreateMultipleAnimatedSequences(107, 110, 113);
 
             _backgroundSeq = CreateAnimationSequence(46);
-            _characterDescSeqs = Enumerable.Range(0, MaxCharacterCount)
-                .Select(_ => CreateAnimationSequence(93, 93, 93))
-                .ToList();
 
             _menuOptionSeqs = new List<IAnimatedSequence>();
             for (var i = 0; i < MenuElementCount; i++)
@@ -153,78 +148,88 @@ namespace OpenKh.Game.States
 
         private void InitializeMenu()
         {
-            const float X = -43;
-            const float Y = 8;
-            const float Distance = 15;
-            _characterDescSample = _animSeqFactory.Create(new AnimatedSequenceDesc
+            var root = new AnimatedSequenceDesc
             {
-                X = 300,
-                Y = 120,
-                SequenceIndexLoop = 93,
-                Children = new List<AnimatedSequenceDesc>()
-                {
-                    new AnimatedSequenceDesc
+                SequenceIndexStart = 101,
+                SequenceIndexLoop = 102,
+                SequenceIndexEnd = 103,
+                Children = Enumerable.Range(0, 5)
+                    .Select(i => new AnimatedSequenceDesc
                     {
-                        X = X,
-                        Y = Y + 1 * Distance - 3,
-                        SequenceIndexLoop = 124,
-                        MessageId = MsgLv,
-                        TextAnchor = TextAnchor.Left,
-                    },
-                    new AnimatedSequenceDesc
-                    {
-                        X = X,
-                        Y = Y + 1 * Distance - 3,
-                        SequenceIndexLoop = 124,
-                        MessageText = "99",
-                        TextAnchor = TextAnchor.Right,
-                    },
-                    new AnimatedSequenceDesc
-                    {
-                        X = X,
-                        Y = Y + 2 * Distance,
-                        SequenceIndexLoop = CharacterHpBar,
-                    },
-                    new AnimatedSequenceDesc
-                    {
-                        X = X,
-                        Y = Y + 2 * Distance - 4,
-                        SequenceIndexLoop = 121,
-                        MessageId = MsgHp,
-                        TextAnchor = TextAnchor.Left,
-                    },
-                    new AnimatedSequenceDesc
-                    {
-                        X = X,
-                        Y = Y + 2 * Distance - 4,
-                        SequenceIndexLoop = 121,
-                        MessageText = "60/60",
-                        TextAnchor = TextAnchor.Right,
-                    },
-                    new AnimatedSequenceDesc
-                    {
-                        X = X,
-                        Y = Y + 3 * Distance,
-                        SequenceIndexLoop = CharacterMpBar,
-                    },
-                    new AnimatedSequenceDesc
-                    {
-                        X = X,
-                        Y = Y + 3 * Distance - 4,
-                        SequenceIndexLoop = 118,
-                        MessageId = MsgMp,
-                        TextAnchor = TextAnchor.Left,
-                    },
-                    new AnimatedSequenceDesc
-                    {
-                        X = X,
-                        Y = Y + 3 * Distance - 4,
-                        SequenceIndexLoop = 118,
-                        MessageText = "120/120",
-                        TextAnchor = TextAnchor.Right,
-                    },
-                }
-            });
+                        SequenceIndexLoop = 93,
+                        Children = new List<AnimatedSequenceDesc>()
+                        {
+                            new AnimatedSequenceDesc
+                            {
+                                SequenceIndexLoop = 124,
+                                MessageText = "Donald",
+                                TextAnchor = TextAnchor.Center,
+                            },
+                            new AnimatedSequenceDesc()
+                            {
+                                SequenceIndexLoop = 90,
+                                Children = new List<AnimatedSequenceDesc>()
+                                {
+                                    new AnimatedSequenceDesc
+                                    {
+                                        SequenceIndexLoop = 124,
+                                        MessageId = MsgLv,
+                                        TextAnchor = TextAnchor.Left,
+                                    },
+                                    new AnimatedSequenceDesc
+                                    {
+                                        SequenceIndexLoop = 124,
+                                        MessageText = "99",
+                                        TextAnchor = TextAnchor.Right,
+                                    },
+                                    new AnimatedSequenceDesc()
+                                    {
+                                        StackIndex = 1,
+                                        SequenceIndexLoop = 121,
+                                        MessageId = MsgHp,
+                                        TextAnchor = TextAnchor.Left,
+                                    },
+                                    new AnimatedSequenceDesc()
+                                    {
+                                        StackIndex = 1,
+                                        SequenceIndexLoop = 121,
+                                        MessageText = "60/60",
+                                        TextAnchor = TextAnchor.Right,
+                                    },
+                                    new AnimatedSequenceDesc()
+                                    {
+                                        StackIndex = 1,
+                                        SequenceIndexLoop = CharacterHpBar,
+                                        TextAnchor = TextAnchor.Left,
+                                    },
+                                    new AnimatedSequenceDesc()
+                                    {
+                                        StackIndex = 2,
+                                        SequenceIndexLoop = 118,
+                                        MessageId = MsgMp,
+                                        TextAnchor = TextAnchor.Left,
+                                    },
+                                    new AnimatedSequenceDesc()
+                                    {
+                                        StackIndex = 2,
+                                        SequenceIndexLoop = 118,
+                                        MessageText = "120/120",
+                                        TextAnchor = TextAnchor.Right,
+                                    },
+                                    new AnimatedSequenceDesc()
+                                    {
+                                        StackIndex = 2,
+                                        SequenceIndexLoop = CharacterMpBar,
+                                        TextAnchor = TextAnchor.Left,
+                                    },
+                                }
+                            },
+                        }
+                    })
+                    .ToList()
+            };
+
+            _characterDescSample = _animSeqFactory.Create(root);
         }
 
         public void Destroy()
@@ -241,7 +246,6 @@ namespace OpenKh.Game.States
             _layoutRenderer.SelectedSequenceGroupIndex = 0;
 
             _backgroundSeq.Begin();
-            ForAll(_characterDescSeqs, x => x.Begin());
             ForAll(_menuOptionSeqs, x => x.Begin());
             ForAll(_mainSeqGroup, x => x.Begin());
             _menuOptionSelectedSeq.Begin();
@@ -256,7 +260,6 @@ namespace OpenKh.Game.States
             _layoutRenderer.SelectedSequenceGroupIndex = 2;
 
             _backgroundSeq.End();
-            ForAll(_characterDescSeqs, x => x.End());
             ForAll(_menuOptionSeqs, x => x.End());
             ForAll(_mainSeqGroup, x => x.End());
             _menuOptionSelectedSeq.End();
@@ -327,35 +330,9 @@ namespace OpenKh.Game.States
                     item.Draw(0, i * Distance);
             }
 
-            for (int i = 0; i < _characterDescSeqs.Count; i++)
-            {
-                const float PosX = 164;
-                const float PosY = 300;
-                const float Distance = 96;
-                DrawCharacterDesc(_characterDescSeqs[i], PosX + i * Distance, PosY, i);
-            }
-
-            _characterDescSample.Draw();
+            _characterDescSample.Draw(0, 0);
 
             _drawing.Flush();
-        }
-
-        private void DrawCharacterDesc(IAnimatedSequence seqd, float x, float y, int index)
-        {
-            const int BarX = 42;
-            // poorly optimized... never called SetMessage at every frame.
-
-            seqd.TextAnchor = TextAnchor.Center;
-            seqd.SetMessage(CharacterNames[index]);
-            seqd.Draw(x, y);
-
-            _charHpBarSeq.TextAnchor = TextAnchor.Left;
-            _charHpBarSeq.SetMessage(MsgHp);
-            _charHpBarSeq.Draw(x - BarX, y);
-
-            _charMpBarSeq.TextAnchor = TextAnchor.Left;
-            _charMpBarSeq.SetMessage(MsgMp);
-            _charMpBarSeq.Draw(x - BarX, y + 20);
         }
 
         private void ProcessInput(InputManager inputManager)
