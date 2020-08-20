@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace OpenKh.Tests.Archives
+namespace OpenKh.Tests.Common
 {
     public class HdAssetTests
     {

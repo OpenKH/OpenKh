@@ -1,8 +1,7 @@
 ﻿using OpenKh.Common;
 using System;
-using System.Linq;
 
-namespace OpenKh.Engine.Parsers
+namespace OpenKh.Ps2
 {
     /// <summary>
     /// EE_Users_Manual
