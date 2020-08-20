@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine;
+using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
@@ -45,7 +45,8 @@ namespace OpenKh.Game
         public int SequenceIndexLoop { get; set; }
         public int SequenceIndexStart { get; set; } = -1;
         public int SequenceIndexEnd { get; set; } = -1;
-        public int StackIndex { get; set; }
+        public int HorizontalStackIndex { get; set; }
+        public int VerticalStackIndex { get; set; }
         public List<AnimatedSequenceDesc> Children { get; set; }
     }
 
@@ -71,7 +72,8 @@ namespace OpenKh.Game
 
             public float PositionX { get; set; }
             public float PositionY { get; set; }
-            public int StackIndex { get; set; }
+            public int HorizontalStackIndex { get; set; }
+            public int VerticalStackIndex { get; set; }
             public TextAnchor TextAnchor { get; set; }
             public ChildStacking ChildStacking { get; set; }
 
@@ -126,19 +128,11 @@ namespace OpenKh.Game
                 }
 
                 var childContext = _renderer.CurrentChildContext;
-                var originalPosY = childContext.PositionY;
-                for (var i = 0; i < Children.Count; i++)
-                {
-                    var child = Children[i] as AnimatedSequence;
-                    childContext.PositionX += childContext.TextPositionX;
-                    childContext.PositionY = originalPosY + childContext.UiPadding * child.StackIndex;
-                    child.Draw(childContext);
-                }
 
                 if (_message != null)
                 {
                     const float UiTextScale = 0.75f;
-                    float textScale = context.TextScale == 0 ? UiTextScale : (context.TextScale / 20f);
+                    float textScale = context.TextScale == 0 ? UiTextScale : (context.TextScale / 22f);
 
                     var fakeTextDrawContext = new DrawContext
                     {
@@ -172,6 +166,15 @@ namespace OpenKh.Game
                         Scale = textScale,
                         WidthMultiplier = 1.0f,
                     }, _message);
+                }
+
+                var originalPosY = childContext.PositionY;
+                for (var i = 0; i < Children.Count; i++)
+                {
+                    var child = Children[i] as AnimatedSequence;
+                    childContext.PositionY = originalPosY + childContext.UiPadding * child.VerticalStackIndex;
+                    child.Draw(childContext);
+                    childContext.PositionX += childContext.TextPositionX;
                 }
             }
 
@@ -267,7 +270,8 @@ namespace OpenKh.Game
             {
                 PositionX = desc.X,
                 PositionY = desc.Y,
-                StackIndex = desc.StackIndex,
+                HorizontalStackIndex = desc.HorizontalStackIndex,
+                VerticalStackIndex = desc.VerticalStackIndex,
                 TextAnchor = desc.TextAnchor,
                 ChildStacking = desc.ChildStacking,
                 Children = desc.Children?
