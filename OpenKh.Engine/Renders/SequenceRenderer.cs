@@ -211,8 +211,8 @@ namespace OpenKh.Engine.Renderers
 
             if ((animation.Flags & Sequence.AttachTextFlag) != 0)
             {
-                CurrentChildContext.PositionX = context.PositionX;
-                CurrentChildContext.PositionY = context.PositionY;
+                CurrentChildContext.PositionX = context.PositionX + context.PivotX;
+                CurrentChildContext.PositionY = context.PositionY + context.PivotY;
                 CurrentChildContext.Color = context.Color;
             }
 
