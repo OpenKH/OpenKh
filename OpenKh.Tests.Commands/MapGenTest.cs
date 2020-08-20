@@ -34,7 +34,8 @@ namespace OpenKh.Tests.Commands
 
                 Assert.Equal(
                     expected: File.ReadAllText(doctDumpFile),
-                    actual: writer.ToString()
+                    actual: writer.ToString(),
+                    ignoreLineEndingDifferences: true
                 );
             }
 
@@ -47,7 +48,8 @@ namespace OpenKh.Tests.Commands
 
                 Assert.Equal(
                     expected: File.ReadAllText(coctDumpFile),
-                    actual: writer.ToString()
+                    actual: writer.ToString(),
+                    ignoreLineEndingDifferences: true
                 );
             }
         }
