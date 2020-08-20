@@ -54,10 +54,6 @@ namespace OpenKh.Game.States
         private List<IAnimatedSequence> _menuOptionSeqs;
         private IAnimatedSequence _backgroundSeq;
         private IAnimatedSequence _menuOptionSelectedSeq;
-        private IAnimatedSequence _menuOptionCursorSeq;
-        private IAnimatedSequence _menuOptionLumSeq;
-        private IAnimatedSequence _charHpBarSeq;
-        private IAnimatedSequence _charMpBarSeq;
 
         private AnimatedSequenceFactory _animSeqFactory;
         private IAnimatedSequence _characterDescSample;
@@ -79,6 +75,7 @@ namespace OpenKh.Game.States
 
                 _menuOptionSelectedSeq.TextAnchor = TextAnchor.Left;
                 _menuOptionSelectedSeq.SetMessage(MenuOptions[_selectedOption]);
+                _menuOptionSelectedSeq.Begin();
             }
         }
 
@@ -136,19 +133,33 @@ namespace OpenKh.Game.States
                 _menuOptionSeqs.Add(animSequence);
             }
 
-            _menuOptionSelectedSeq = CreateAnimationSequence(MenuOptionSelectedSeq);
-            _menuOptionCursorSeq = CreateAnimationSequence(25, 25, 25);
-            _menuOptionLumSeq = CreateAnimationSequence(27);
-
-            _charHpBarSeq = CreateAnimationSequence(CharacterHpBar);
-            _charMpBarSeq = CreateAnimationSequence(CharacterMpBar);
+            _menuOptionSelectedSeq = _animSeqFactory.Create(new AnimatedSequenceDesc
+            {
+                SequenceIndexLoop = MenuOptionSelectedSeq,
+                Children = new List<AnimatedSequenceDesc>
+                {
+                    new AnimatedSequenceDesc
+                    {
+                        SequenceIndexLoop = 25,
+                        TextAnchor = TextAnchor.Left,
+                    },
+                    new AnimatedSequenceDesc
+                    {
+                        SequenceIndexStart = 27,
+                        SequenceIndexLoop = 28,
+                        SequenceIndexEnd = 29,
+                        TextAnchor = TextAnchor.Right,
+                        HorizontalStackIndex = 1,
+                    },
+                }
+            });
 
             MenuOption = 0;
         }
 
         private void InitializeMenu()
         {
-            var root = new AnimatedSequenceDesc
+            _characterDescSample = _animSeqFactory.Create(new AnimatedSequenceDesc
             {
                 SequenceIndexStart = 101,
                 SequenceIndexLoop = 102,
@@ -184,41 +195,41 @@ namespace OpenKh.Game.States
                                     },
                                     new AnimatedSequenceDesc()
                                     {
-                                        StackIndex = 1,
+                                        VerticalStackIndex = 1,
                                         SequenceIndexLoop = 121,
                                         MessageId = MsgHp,
                                         TextAnchor = TextAnchor.Left,
                                     },
                                     new AnimatedSequenceDesc()
                                     {
-                                        StackIndex = 1,
+                                        VerticalStackIndex = 1,
                                         SequenceIndexLoop = 121,
                                         MessageText = "60/60",
                                         TextAnchor = TextAnchor.Right,
                                     },
                                     new AnimatedSequenceDesc()
                                     {
-                                        StackIndex = 1,
+                                        VerticalStackIndex = 1,
                                         SequenceIndexLoop = CharacterHpBar,
                                         TextAnchor = TextAnchor.Left,
                                     },
                                     new AnimatedSequenceDesc()
                                     {
-                                        StackIndex = 2,
+                                        VerticalStackIndex = 2,
                                         SequenceIndexLoop = 118,
                                         MessageId = MsgMp,
                                         TextAnchor = TextAnchor.Left,
                                     },
                                     new AnimatedSequenceDesc()
                                     {
-                                        StackIndex = 2,
+                                        VerticalStackIndex = 2,
                                         SequenceIndexLoop = 118,
                                         MessageText = "120/120",
                                         TextAnchor = TextAnchor.Right,
                                     },
                                     new AnimatedSequenceDesc()
                                     {
-                                        StackIndex = 2,
+                                        VerticalStackIndex = 2,
                                         SequenceIndexLoop = CharacterMpBar,
                                         TextAnchor = TextAnchor.Left,
                                     },
@@ -227,9 +238,7 @@ namespace OpenKh.Game.States
                         }
                     })
                     .ToList()
-            };
-
-            _characterDescSample = _animSeqFactory.Create(root);
+            });
         }
 
         public void Destroy()
@@ -279,8 +288,6 @@ namespace OpenKh.Game.States
                 animSequence.Update(deltaTime);
             _backgroundSeq.Update(deltaTime);
             _menuOptionSelectedSeq.Update(deltaTime);
-            _menuOptionCursorSeq.Update(deltaTime);
-            _menuOptionLumSeq.Update(deltaTime);
             _characterDescSample.Update(deltaTime);
         }
 
@@ -315,16 +322,12 @@ namespace OpenKh.Game.States
 
             for (int i = 0; i < _menuOptionSeqs.Count; i++)
             {
-                const float PosX = 48;
-                const float PosY = 82;
                 const float Distance = 26;
                 var item = _menuOptionSeqs[i];
 
                 if (i == _selectedOption)
                 {
                     _menuOptionSelectedSeq.Draw(0, i * Distance);
-                    _menuOptionCursorSeq.Draw(PosX, PosY + i * Distance);
-                    _menuOptionLumSeq.Draw(PosX + 100, PosY + i * Distance);
                 }
                 else
                     item.Draw(0, i * Distance);
