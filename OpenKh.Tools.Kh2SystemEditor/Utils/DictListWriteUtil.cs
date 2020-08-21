@@ -26,6 +26,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.Utils
             }
             else if (fileExt == ".xlsx")
             {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 using var xlsx = new ExcelPackage();
                 var book = xlsx.Workbook;
                 var sheet = book.Worksheets.Add("Item");
