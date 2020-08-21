@@ -165,7 +165,8 @@ namespace OpenKh.Game
                 Draw(new SequenceRenderer.ChildContext
                 {
                     PositionX = x,
-                    PositionY = y
+                    PositionY = y,
+                    Color = new ColorF(1f, 1f, 1f, 1f)
                 });
 
             private void Draw(SequenceRenderer.ChildContext context)
@@ -179,7 +180,8 @@ namespace OpenKh.Game
                     _anim,
                     _frame,
                     PositionX + anotherPosX + context.PositionX,
-                    PositionY + anotherPosY + context.PositionY))
+                    PositionY + anotherPosY + context.PositionY,
+                    context.Color.A))
                 {
                     if (_isRunning)
                     {

@@ -88,13 +88,14 @@ namespace OpenKh.Engine.Renderers
 
         public IDebugSequenceRenderer DebugSequenceRenderer { get; set; }
 
-        public bool Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
+        public bool Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY, float alpha = 1f) =>
             DrawAnimationGroup(new Context
             {
                 GlobalFrameIndex = frameIndex,
                 FrameIndex = frameIndex,
                 PositionX = positionX,
-                PositionY = positionY
+                PositionY = positionY,
+                Color = new ColorF(1f, 1f, 1f, alpha)
             }, Sequence.AnimationGroups[animationGroupIndex]);
 
         public int GetActualFrame(Sequence.AnimationGroup animationGroup, int frameIndex)
@@ -176,17 +177,17 @@ namespace OpenKh.Engine.Renderers
             {
                 if ((animation.Flags & Sequence.ColorInterpolationFlag) == 0)
                 {
-                    context.Color = Lerp(t,
+                    context.Color *= Lerp(t,
                         ConvertColor(animation.ColorStart),
                         ConvertColor(animation.ColorEnd));
                 }
                 else
                 {
-                    context.Color = ConvertColor(animation.ColorStart);
+                    context.Color *= ConvertColor(animation.ColorStart);
                 }
             }
             else
-                context.Color = new ColorF(1, 1, 1, 1);
+                context.Color *= new ColorF(1, 1, 1, 1);
 
             if ((animation.Flags & Sequence.RotationFlag) == 0)
             {
