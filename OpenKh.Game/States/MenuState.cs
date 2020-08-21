@@ -149,7 +149,7 @@ namespace OpenKh.Game.States
                         SequenceIndexLoop = 28,
                         SequenceIndexEnd = 29,
                         TextAnchor = TextAnchor.Right,
-                        HorizontalStackIndex = 1,
+                        StackIndex = 1,
                     },
                 }
             });
@@ -159,86 +159,91 @@ namespace OpenKh.Game.States
 
         private void InitializeMenu()
         {
-            _characterDescSample = _animSeqFactory.Create(new AnimatedSequenceDesc
-            {
-                SequenceIndexStart = 101,
-                SequenceIndexLoop = 102,
-                SequenceIndexEnd = 103,
-                Children = Enumerable.Range(0, 5)
-                    .Select(i => new AnimatedSequenceDesc
+            _characterDescSample = _animSeqFactory.Create(Enumerable.Range(0, 5)
+                .Select(i => new AnimatedSequenceDesc
+                {
+                    SequenceIndexStart = 101,
+                    SequenceIndexLoop = 102,
+                    SequenceIndexEnd = 103,
+                    StackIndex = i + 1,
+                    StackWidth = AnimatedSequenceDesc.DefaultStacking,
+                    Children = new List<AnimatedSequenceDesc>()
                     {
-                        SequenceIndexLoop = 93,
-                        Children = new List<AnimatedSequenceDesc>()
+                        new AnimatedSequenceDesc
                         {
-                            new AnimatedSequenceDesc
+                            SequenceIndexLoop = 93,
+                            Children = new List<AnimatedSequenceDesc>()
                             {
-                                SequenceIndexLoop = 124,
-                                MessageText = "Donald",
-                                TextAnchor = TextAnchor.Center,
-                            },
-                            new AnimatedSequenceDesc()
-                            {
-                                SequenceIndexLoop = 90,
-                                Children = new List<AnimatedSequenceDesc>()
+                                new AnimatedSequenceDesc
                                 {
-                                    new AnimatedSequenceDesc
+                                    SequenceIndexLoop = 124,
+                                    MessageText = "Donald",
+                                    TextAnchor = TextAnchor.Center,
+                                },
+                                new AnimatedSequenceDesc()
+                                {
+                                    SequenceIndexLoop = 90,
+                                    Children = new List<AnimatedSequenceDesc>()
                                     {
-                                        SequenceIndexLoop = 124,
-                                        MessageId = MsgLv,
-                                        TextAnchor = TextAnchor.Left,
-                                    },
-                                    new AnimatedSequenceDesc
-                                    {
-                                        SequenceIndexLoop = 124,
-                                        MessageText = "99",
-                                        TextAnchor = TextAnchor.Right,
-                                    },
-                                    new AnimatedSequenceDesc()
-                                    {
-                                        VerticalStackIndex = 1,
-                                        SequenceIndexLoop = 121,
-                                        MessageId = MsgHp,
-                                        TextAnchor = TextAnchor.Left,
-                                    },
-                                    new AnimatedSequenceDesc()
-                                    {
-                                        VerticalStackIndex = 1,
-                                        SequenceIndexLoop = 121,
-                                        MessageText = "60/60",
-                                        TextAnchor = TextAnchor.Right,
-                                    },
-                                    new AnimatedSequenceDesc()
-                                    {
-                                        VerticalStackIndex = 1,
-                                        SequenceIndexLoop = CharacterHpBar,
-                                        TextAnchor = TextAnchor.Left,
-                                    },
-                                    new AnimatedSequenceDesc()
-                                    {
-                                        VerticalStackIndex = 2,
-                                        SequenceIndexLoop = 118,
-                                        MessageId = MsgMp,
-                                        TextAnchor = TextAnchor.Left,
-                                    },
-                                    new AnimatedSequenceDesc()
-                                    {
-                                        VerticalStackIndex = 2,
-                                        SequenceIndexLoop = 118,
-                                        MessageText = "120/120",
-                                        TextAnchor = TextAnchor.Right,
-                                    },
-                                    new AnimatedSequenceDesc()
-                                    {
-                                        VerticalStackIndex = 2,
-                                        SequenceIndexLoop = CharacterMpBar,
-                                        TextAnchor = TextAnchor.Left,
-                                    },
-                                }
-                            },
+                                        new AnimatedSequenceDesc
+                                        {
+                                            SequenceIndexLoop = 124,
+                                            MessageId = MsgLv,
+                                            TextAnchor = TextAnchor.Left,
+                                        },
+                                        new AnimatedSequenceDesc
+                                        {
+                                            SequenceIndexLoop = 124,
+                                            MessageText = "99",
+                                            TextAnchor = TextAnchor.Right,
+                                        },
+                                        new AnimatedSequenceDesc()
+                                        {
+                                            StackIndex = 1,
+                                            SequenceIndexLoop = 121,
+                                            MessageId = MsgHp,
+                                            TextAnchor = TextAnchor.Left,
+                                        },
+                                        new AnimatedSequenceDesc()
+                                        {
+                                            StackIndex = 1,
+                                            SequenceIndexLoop = 121,
+                                            MessageText = "60/60",
+                                            TextAnchor = TextAnchor.Right,
+                                        },
+                                        new AnimatedSequenceDesc()
+                                        {
+                                            StackIndex = 1,
+                                            SequenceIndexLoop = CharacterHpBar,
+                                            TextAnchor = TextAnchor.Left,
+                                        },
+                                        new AnimatedSequenceDesc()
+                                        {
+                                            StackIndex = 2,
+                                            SequenceIndexLoop = 118,
+                                            MessageId = MsgMp,
+                                            TextAnchor = TextAnchor.Left,
+                                        },
+                                        new AnimatedSequenceDesc()
+                                        {
+                                            StackIndex = 2,
+                                            SequenceIndexLoop = 118,
+                                            MessageText = "120/120",
+                                            TextAnchor = TextAnchor.Right,
+                                        },
+                                        new AnimatedSequenceDesc()
+                                        {
+                                            StackIndex = 2,
+                                            SequenceIndexLoop = CharacterMpBar,
+                                            TextAnchor = TextAnchor.Left,
+                                        },
+                                    }
+                                },
+                            }
                         }
-                    })
-                    .ToList()
-            });
+                    }
+                })
+            );
         }
 
         public void Destroy()

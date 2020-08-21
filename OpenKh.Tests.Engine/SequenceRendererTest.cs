@@ -40,11 +40,11 @@ namespace OpenKh.Tests.Engine
                 ColorEnd = 0x80808080,
             });
 
-            var drawing = MockDrawing();
+            var drawing = Extensions.MockDrawing();
             var renderer = new SequenceRenderer(sequence, drawing, null);
             renderer.Draw(0, frameIndex, 0, 0);
 
-            AssertDraw(drawing, x =>
+            drawing.AssertDraw(x =>
             {
                 Assert.Equal(expected, x.Vec0.X, 0);
             });
@@ -76,11 +76,11 @@ namespace OpenKh.Tests.Engine
                 ColorEnd = 0x80808080,
             });
 
-            var drawing = MockDrawing();
+            var drawing = Extensions.MockDrawing();
             var renderer = new SequenceRenderer(sequence, drawing, null);
             renderer.Draw(0, frameIndex, 0, 0);
 
-            AssertDraw(drawing, x =>
+            drawing.AssertDraw(x =>
             {
                 Assert.Equal(expected, x.Vec0.X, 0);
             });
@@ -108,11 +108,11 @@ namespace OpenKh.Tests.Engine
                 ColorEnd = 0x80808080,
             });
 
-            var drawing = MockDrawing();
+            var drawing = Extensions.MockDrawing();
             var renderer = new SequenceRenderer(sequence, drawing, null);
             renderer.Draw(0, 500, 0, 0);
 
-            AssertDraw(drawing, x =>
+            drawing.AssertDraw(x =>
             {
                 Assert.Equal(625, x.Vec0.X, 0);
             });
@@ -146,35 +146,14 @@ namespace OpenKh.Tests.Engine
                 LoopEnd = loopEnd
             });
 
-            var drawing = MockDrawing();
+            var drawing = Extensions.MockDrawing();
             var renderer = new SequenceRenderer(sequence, drawing, null);
             renderer.Draw(0, frameIndex, 0, 0);
 
             if (doesDrawAnyFrame)
-                AssertAtLeastOneCall(drawing);
+                drawing.AssertAtLeastOneCall();
             else
-                AssertNoCall(drawing);
-        }
-
-        private static ISpriteDrawing MockDrawing() => Substitute.For<ISpriteDrawing>();
-
-        private static void AssertDraw(ISpriteDrawing drawing, Action<SpriteDrawingContext> assertion)
-        {
-            var call = drawing.ReceivedCalls().FirstOrDefault();
-            Assert.NotNull(call);
-            assertion(call.GetArguments()[0] as SpriteDrawingContext);
-        }
-
-        private static void AssertAtLeastOneCall(ISpriteDrawing drawing)
-        {
-            if (!drawing.ReceivedCalls().Any())
-                throw new Xunit.Sdk.XunitException("Expected at least draw but no draw has been performed.");
-        }
-
-        private static void AssertNoCall(ISpriteDrawing drawing)
-        {
-            if (drawing.ReceivedCalls().Any())
-                throw new Xunit.Sdk.XunitException("Expected no draws but at least once has been performed.");
+                drawing.AssertNoCall();
         }
 
         private static Sequence MockSequence(Sequence.Animation animation) => new Sequence
