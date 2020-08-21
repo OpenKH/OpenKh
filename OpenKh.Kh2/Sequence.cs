@@ -19,6 +19,7 @@ namespace OpenKh.Kh2
         public const int ScalingFlag = 0x00000040;
         public const int ColorInterpolationFlag = 0x00000080;
         public const int ColorMaskingFlag = 0x00000400;
+        public const int TranslationFlag = 0x00001000;
         public const int PivotFlag = 0x00004000;
 
         private class Section
