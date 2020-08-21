@@ -155,9 +155,20 @@ namespace OpenKh.Engine.Renderers
             else
                 t = (float)((Math.Sin(delta * Math.PI - Math.PI / 2.0) + 1.0) / 2.0);
 
-            context.PositionX += Lerp(t, animation.TranslateXStart, animation.TranslateXEnd);
-            context.PositionY += Lerp(t, animation.TranslateYStart, animation.TranslateYEnd);
             context.ColorBlendMode = animation.ColorBlend;
+
+            var translateX = Lerp(t, animation.TranslateXStart, animation.TranslateXEnd);
+            var translateY = Lerp(t, animation.TranslateYStart, animation.TranslateYEnd);
+            if ((animation.Flags & Sequence.TranslationFlag) == 0)
+            {
+                context.PositionX += translateX;
+                context.PositionY += translateY;
+            }
+            else
+            {
+                context.PositionX += animation.TranslateXStart;
+                context.PositionY += animation.TranslateYStart;
+            }
 
             if ((animation.Flags & Sequence.ScalingFlag) == 0)
             {
@@ -218,6 +229,15 @@ namespace OpenKh.Engine.Renderers
                 CurrentChildContext.PositionX = context.PositionX + context.PivotX;
                 CurrentChildContext.PositionY = context.PositionY + context.PivotY;
                 CurrentChildContext.Color = context.Color;
+
+                // Horrible hack. Basically if TranslationFlag disallow to us the translation
+                // animation, the frame group just uses Translate*Start, but the attached
+                // child context still needs to use the animation.
+                if ((animation.Flags & Sequence.TranslationFlag) != 0)
+                {
+                    CurrentChildContext.PositionX += translateX - animation.TranslateXStart;
+                    CurrentChildContext.PositionY += translateY - animation.TranslateYStart;
+                }
             }
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS

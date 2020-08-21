@@ -396,19 +396,31 @@ namespace OpenKh.Tools.LayoutEditor
             int spriteGroupIndex = animation.SpriteGroupIndex;
             if (ImGui.InputInt($"Sprite group##{index}", ref spriteGroupIndex))
                 animation.SpriteGroupIndex = Math.Min(Math.Max(spriteGroupIndex, 0), _sequence.SpriteGroups.Count - 1);
-
-            var xaPair = new int[] { animation.TranslateXStart, animation.TranslateXEnd };
-            if (ImGui.DragInt2($"Translation X##{index}", ref xaPair[0]))
+            
+            if (ImGuiFlagBox(animation, $"Enable translation animation##{index}", Sequence.PivotFlag))
             {
-                animation.TranslateXStart = xaPair[0];
-                animation.TranslateXEnd = xaPair[1];
+                var xaPair = new int[] { animation.TranslateXStart, animation.TranslateXEnd };
+                if (ImGui.DragInt2($"Translation X##{index}", ref xaPair[0]))
+                {
+                    animation.TranslateXStart = xaPair[0];
+                    animation.TranslateXEnd = xaPair[1];
+                }
+
+                var yaPair = new int[] { animation.TranslateYStart, animation.TranslateYEnd };
+                if (ImGui.DragInt2($"Translation Y##{index}", ref yaPair[0]))
+                {
+                    animation.TranslateYStart = yaPair[0];
+                    animation.TranslateYEnd = yaPair[1];
+                }
             }
-
-            var yaPair = new int[] { animation.TranslateYStart, animation.TranslateYEnd };
-            if (ImGui.DragInt2($"Translation Y##{index}", ref yaPair[0]))
+            else
             {
-                animation.TranslateYStart = yaPair[0];
-                animation.TranslateYEnd = yaPair[1];
+                var xaPair = new int[] { animation.TranslateXStart, animation.TranslateYStart };
+                if (ImGui.DragInt2($"Translation##{index}", ref xaPair[0]))
+                {
+                    animation.TranslateXStart = xaPair[0];
+                    animation.TranslateYStart = xaPair[1];
+                }
             }
 
             if (ImGuiFlagBox(animation, $"Enable pivot translation##{index}", Sequence.PivotFlag))
