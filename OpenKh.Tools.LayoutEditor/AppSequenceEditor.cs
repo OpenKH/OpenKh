@@ -499,7 +499,7 @@ namespace OpenKh.Tools.LayoutEditor
                 animation.Unknown6c = unk6xPair.W;
             }
 
-            if (ImGuiFlagBox(animation, "Enable bouncing", Sequence.BouncingFlag))
+            if (ImGuiFlagBox(animation, $"Enable bouncing##{index}", Sequence.BouncingFlag))
             {
                 var bounceXPair = new Vector2(animation.BounceXStart, animation.BounceXEnd);
                 if (ImGui.DragFloat2($"Bounce X##{index}", ref bounceXPair))
