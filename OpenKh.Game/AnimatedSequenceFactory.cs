@@ -8,20 +8,10 @@ using System.Linq;
 
 namespace OpenKh.Game
 {
-    public enum ChildStacking
-    {
-        None,
-        Left,
-        Top,
-        Right,
-        Bottom
-    }
-
     public interface IAnimatedSequence
     {
         bool IsEnd { get; }
         TextAnchor TextAnchor { get; set; }
-        public ChildStacking ChildStacking { get; set; }
 
         void Update(double deltaTime);
         void Draw(float x, float y);
@@ -41,7 +31,6 @@ namespace OpenKh.Game
         public float X { get; set; }
         public float Y { get; set; }
         public TextAnchor TextAnchor { get; set; }
-        public ChildStacking ChildStacking { get; set; }
         public ushort MessageId { get; set; }
         public string MessageText { get; set; }
         public int SequenceIndexLoop { get; set; }
@@ -61,7 +50,6 @@ namespace OpenKh.Game
 
             public bool IsEnd => Children.All(x => x.IsEnd);
             public TextAnchor TextAnchor { get; set; }
-            public ChildStacking ChildStacking { get; set; }
 
             public void Update(double deltaTime)
             {
@@ -129,7 +117,6 @@ namespace OpenKh.Game
             public int StackWidth { get; set; }
             public int StackHeight { get; set; }
             public TextAnchor TextAnchor { get; set; }
-            public ChildStacking ChildStacking { get; set; }
 
             public Sequence.AnimationGroup AnimGroup =>
                 _sequence.AnimationGroups[_anim];
@@ -361,7 +348,6 @@ namespace OpenKh.Game
                 StackWidth = desc.StackWidth,
                 StackHeight = desc.StackHeight,
                 TextAnchor = desc.TextAnchor,
-                ChildStacking = desc.ChildStacking,
                 Children = desc.Children?
                     .Select(Create)
                     .Cast<IAnimatedSequence>()
