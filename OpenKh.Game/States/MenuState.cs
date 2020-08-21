@@ -14,7 +14,7 @@ namespace OpenKh.Game.States
     public class MenuState : IState
     {
         private const int MaxCharacterCount = 4;
-        private const int MenuElementCount = 7;
+        private const int MenuElementCount = 8;
         private const int MenuOptionSelectedSeq = 132;
         private const int CharacterHpBar = 98;
         private const int CharacterMpBar = 99;
@@ -28,6 +28,7 @@ namespace OpenKh.Game.States
             0x8451, // Customize
             0x844e, // Party
             0x844f, // Status
+            0x8450, // Journal
             0x8450, // Journal
             0xb617, // Config
         };
@@ -51,12 +52,12 @@ namespace OpenKh.Game.States
         private Dictionary<ushort, byte[]> _cachedText = new Dictionary<ushort, byte[]>();
 
         private List<IAnimatedSequence> _mainSeqGroup;
-        private List<IAnimatedSequence> _menuOptionSeqs;
         private IAnimatedSequence _backgroundSeq;
         private IAnimatedSequence _menuOptionSelectedSeq;
 
         private AnimatedSequenceFactory _animSeqFactory;
-        private IAnimatedSequence _characterDescSample;
+        private IAnimatedSequence _menuSeq;
+        private IAnimatedSequence _characterSeq;
 
         private int _selectedOption = 0;
         private Kh2MessageRenderer _messageRenderer;
@@ -73,7 +74,7 @@ namespace OpenKh.Game.States
                     _selectedOption += MenuElementCount;
                 _selectedOption %= MenuElementCount;
 
-                _menuOptionSelectedSeq.TextAnchor = TextAnchor.Left;
+                _menuOptionSelectedSeq.TextAnchor = TextAnchor.BottomLeft;
                 _menuOptionSelectedSeq.SetMessage(MenuOptions[_selectedOption]);
                 _menuOptionSelectedSeq.Begin();
             }
@@ -124,15 +125,6 @@ namespace OpenKh.Game.States
 
             _backgroundSeq = CreateAnimationSequence(46);
 
-            _menuOptionSeqs = new List<IAnimatedSequence>();
-            for (var i = 0; i < MenuElementCount; i++)
-            {
-                var animSequence = CreateAnimationSequence(133);
-                animSequence.TextAnchor = TextAnchor.Left;
-                animSequence.SetMessage(MenuOptions[i]);
-                _menuOptionSeqs.Add(animSequence);
-            }
-
             _menuOptionSelectedSeq = _animSeqFactory.Create(new AnimatedSequenceDesc
             {
                 SequenceIndexLoop = MenuOptionSelectedSeq,
@@ -141,14 +133,14 @@ namespace OpenKh.Game.States
                     new AnimatedSequenceDesc
                     {
                         SequenceIndexLoop = 25,
-                        TextAnchor = TextAnchor.Left,
+                        TextAnchor = TextAnchor.BottomLeft,
                     },
                     new AnimatedSequenceDesc
                     {
                         SequenceIndexStart = 27,
                         SequenceIndexLoop = 28,
                         SequenceIndexEnd = 29,
-                        TextAnchor = TextAnchor.Right,
+                        TextAnchor = TextAnchor.BottomRight,
                         StackIndex = 1,
                     },
                 }
@@ -159,7 +151,34 @@ namespace OpenKh.Game.States
 
         private void InitializeMenu()
         {
-            _characterDescSample = _animSeqFactory.Create(Enumerable.Range(0, 5)
+            const int MenuOptionsBitfields = 0xbf;
+            var menuDesc = new List<AnimatedSequenceDesc>();
+            var menuOptions = MenuOptionsBitfields;
+            for (int bitIndex = 0, optionIndex = 0; menuOptions > 0; bitIndex++)
+            {
+                var bitMask = 1 << bitIndex;
+                if ((menuOptions & bitMask) == 0)
+                    continue;
+                menuOptions -= bitMask;
+                if (optionIndex >= MenuOptions.Length)
+                    break;
+
+                menuDesc.Add(new AnimatedSequenceDesc
+                {
+                    SequenceIndexStart = 133,
+                    SequenceIndexLoop = 134,
+                    SequenceIndexEnd = 135,
+                    StackIndex = optionIndex,
+                    StackWidth = 0,
+                    StackHeight = AnimatedSequenceDesc.DefaultStacking,
+                    MessageId = MenuOptions[bitIndex]
+                });
+
+                optionIndex++;
+            }
+            _menuSeq = _animSeqFactory.Create(menuDesc);
+
+            _characterSeq = _animSeqFactory.Create(Enumerable.Range(0, 5)
                 .Select(i => new AnimatedSequenceDesc
                 {
                     SequenceIndexStart = 101,
@@ -178,7 +197,7 @@ namespace OpenKh.Game.States
                                 {
                                     SequenceIndexLoop = 124,
                                     MessageText = "Donald",
-                                    TextAnchor = TextAnchor.Center,
+                                    TextAnchor = TextAnchor.BottomCenter,
                                 },
                                 new AnimatedSequenceDesc()
                                 {
@@ -189,53 +208,53 @@ namespace OpenKh.Game.States
                                         {
                                             SequenceIndexLoop = 124,
                                             MessageId = MsgLv,
-                                            TextAnchor = TextAnchor.Left,
+                                            TextAnchor = TextAnchor.BottomLeft,
                                         },
                                         new AnimatedSequenceDesc
                                         {
                                             SequenceIndexLoop = 124,
                                             MessageText = "99",
-                                            TextAnchor = TextAnchor.Right,
+                                            TextAnchor = TextAnchor.BottomRight,
                                         },
                                         new AnimatedSequenceDesc()
                                         {
                                             StackIndex = 1,
                                             SequenceIndexLoop = 121,
                                             MessageId = MsgHp,
-                                            TextAnchor = TextAnchor.Left,
+                                            TextAnchor = TextAnchor.BottomLeft,
                                         },
                                         new AnimatedSequenceDesc()
                                         {
                                             StackIndex = 1,
                                             SequenceIndexLoop = 121,
                                             MessageText = "60/60",
-                                            TextAnchor = TextAnchor.Right,
+                                            TextAnchor = TextAnchor.BottomRight,
                                         },
                                         new AnimatedSequenceDesc()
                                         {
                                             StackIndex = 1,
                                             SequenceIndexLoop = CharacterHpBar,
-                                            TextAnchor = TextAnchor.Left,
+                                            TextAnchor = TextAnchor.BottomLeft,
                                         },
                                         new AnimatedSequenceDesc()
                                         {
                                             StackIndex = 2,
                                             SequenceIndexLoop = 118,
                                             MessageId = MsgMp,
-                                            TextAnchor = TextAnchor.Left,
+                                            TextAnchor = TextAnchor.BottomLeft,
                                         },
                                         new AnimatedSequenceDesc()
                                         {
                                             StackIndex = 2,
                                             SequenceIndexLoop = 118,
                                             MessageText = "120/120",
-                                            TextAnchor = TextAnchor.Right,
+                                            TextAnchor = TextAnchor.BottomRight,
                                         },
                                         new AnimatedSequenceDesc()
                                         {
                                             StackIndex = 2,
                                             SequenceIndexLoop = CharacterMpBar,
-                                            TextAnchor = TextAnchor.Left,
+                                            TextAnchor = TextAnchor.BottomLeft,
                                         },
                                     }
                                 },
@@ -260,10 +279,10 @@ namespace OpenKh.Game.States
             _layoutRenderer.SelectedSequenceGroupIndex = 0;
 
             _backgroundSeq.Begin();
-            ForAll(_menuOptionSeqs, x => x.Begin());
             ForAll(_mainSeqGroup, x => x.Begin());
             _menuOptionSelectedSeq.Begin();
-            _characterDescSample.Begin();
+            _menuSeq.Begin();
+            _characterSeq.Begin();
 
             IsMenuOpen = true;
         }
@@ -274,10 +293,10 @@ namespace OpenKh.Game.States
             _layoutRenderer.SelectedSequenceGroupIndex = 2;
 
             _backgroundSeq.End();
-            ForAll(_menuOptionSeqs, x => x.End());
             ForAll(_mainSeqGroup, x => x.End());
             _menuOptionSelectedSeq.End();
-            _characterDescSample.End();
+            _menuSeq.End();
+            _characterSeq.End();
         }
 
         public void Update(DeltaTimes deltaTimes)
@@ -289,11 +308,10 @@ namespace OpenKh.Game.States
             _layoutRenderer.FrameIndex++;
             foreach (var animSequence in _mainSeqGroup)
                 animSequence.Update(deltaTime);
-            foreach (var animSequence in _menuOptionSeqs)
-                animSequence.Update(deltaTime);
             _backgroundSeq.Update(deltaTime);
             _menuOptionSelectedSeq.Update(deltaTime);
-            _characterDescSample.Update(deltaTime);
+            _menuSeq.Update(deltaTime);
+            _characterSeq.Update(deltaTime);
         }
 
         public void Draw(DeltaTimes deltaTimes)
@@ -325,20 +343,8 @@ namespace OpenKh.Game.States
 
             _backgroundSeq.Draw(0, 0);
 
-            for (int i = 0; i < _menuOptionSeqs.Count; i++)
-            {
-                const float Distance = 26;
-                var item = _menuOptionSeqs[i];
-
-                if (i == _selectedOption)
-                {
-                    _menuOptionSelectedSeq.Draw(0, i * Distance);
-                }
-                else
-                    item.Draw(0, i * Distance);
-            }
-
-            _characterDescSample.Draw(0, 0);
+            _menuSeq.Draw(0, 0);
+            _characterSeq.Draw(0, 0);
 
             _drawing.Flush();
         }

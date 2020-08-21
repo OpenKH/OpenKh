@@ -8,9 +8,12 @@ namespace OpenKh.Engine.Renderers
 {
     public enum TextAnchor
     {
-        Left,
+        BottomLeft,
+        BottomCenter,
+        BottomRight,
         Center,
-        Right
+        TopCenter,
+        TopLeft
     }
 
     public class SequenceRenderer

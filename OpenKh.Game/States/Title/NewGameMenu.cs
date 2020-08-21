@@ -68,23 +68,23 @@ namespace OpenKh.Game.States.Title
             _animMenuWindow.Begin();
 
             _animMenuTitle.Begin();
-            _animMenuTitle.TextAnchor = TextAnchor.Center;
+            _animMenuTitle.TextAnchor = TextAnchor.BottomCenter;
             _animMenuTitle.SetMessage(0x4330);
 
             _animMenuOption1.Begin();
-            _animMenuOption1.TextAnchor = TextAnchor.Center;
+            _animMenuOption1.TextAnchor = TextAnchor.BottomCenter;
             _animMenuOption1.SetMessage(DifficultyTitle[0]);
 
             _animMenuOption2.Begin();
-            _animMenuOption2.TextAnchor = TextAnchor.Center;
+            _animMenuOption2.TextAnchor = TextAnchor.BottomCenter;
             _animMenuOption2.SetMessage(DifficultyTitle[1]);
 
             _animMenuOption3.Begin();
-            _animMenuOption3.TextAnchor = TextAnchor.Center;
+            _animMenuOption3.TextAnchor = TextAnchor.BottomCenter;
             _animMenuOption3.SetMessage(DifficultyTitle[2]);
 
             _animMenuOption4.Begin();
-            _animMenuOption4.TextAnchor = TextAnchor.Center;
+            _animMenuOption4.TextAnchor = TextAnchor.BottomCenter;
             _animMenuOption4.SetMessage(DifficultyTitle[3]);
 
             _animMenuOptionSelected.Begin();
@@ -175,7 +175,7 @@ namespace OpenKh.Game.States.Title
 
             _animMenuBg.Draw(0, 0);
 
-            _animMenuWindow.TextAnchor = TextAnchor.Center;
+            _animMenuWindow.TextAnchor = TextAnchor.BottomCenter;
             _animMenuWindow.SetMessage(DifficultyDescription[_difficultyOption]);
             _animMenuWindow.Draw(0, 0);
 
@@ -187,7 +187,7 @@ namespace OpenKh.Game.States.Title
             if (_difficultyCount >= 4)
                 _animMenuOption4.Draw(256, optionY + OptionHDistance * 3);
 
-            _animMenuOptionSelected.TextAnchor = TextAnchor.Center;
+            _animMenuOptionSelected.TextAnchor = TextAnchor.BottomCenter;
             _animMenuOptionSelected.SetMessage(DifficultyTitle[_difficultyOption]);
             _animMenuOptionSelected.Draw(256, optionY + OptionHDistance * _difficultyOption);
         }

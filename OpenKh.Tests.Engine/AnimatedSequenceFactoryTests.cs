@@ -1,5 +1,7 @@
-﻿using NSubstitute;
+﻿using Castle.DynamicProxy.Generators;
+using NSubstitute;
 using OpenKh.Engine;
+using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Game;
 using OpenKh.Kh2;
@@ -13,6 +15,31 @@ namespace OpenKh.Tests.Engine
 {
     public class AnimatedSequenceFactoryTests
     {
+        private class MockMessageRenderer : IMessageRenderer
+        {
+            public bool HasBeenCalled { get; private set; }
+            public double LastPosX { get; private set; }
+            public double LastPosY { get; private set; }
+
+            public void Draw(DrawContext context, string message) => 
+                throw new NotImplementedException();
+
+            public void Draw(DrawContext context, byte[] data)
+            {
+                if (context.IgnoreDraw)
+                {
+                    context.Width = 20;
+                    context.Height = 10;
+                }
+                else
+                {
+                    HasBeenCalled = true;
+                    LastPosX = context.x;
+                    LastPosY = context.y;
+                }
+            }
+        }
+
         public AnimatedSequenceFactoryTests()
         {
 
@@ -101,6 +128,62 @@ namespace OpenKh.Tests.Engine
                 Assert.Equal(expectedThirdChildPosX, x.Vec0.X);
                 Assert.Equal(expectedThirdChildPosY, x.Vec0.Y);
             });
+        }
+
+        [Theory]
+        [InlineData(TextAnchor.BottomLeft, 0, 0)]
+        [InlineData(TextAnchor.BottomRight, -20, 0)]
+        [InlineData(TextAnchor.BottomCenter, -10, 0)]
+        [InlineData(TextAnchor.Center, -10, -5)]
+        [InlineData(TextAnchor.TopCenter, -10, -10)]
+        [InlineData(TextAnchor.TopLeft, 0, -10)]
+        public void AnchorTextCorrectly(TextAnchor anchor, int expectedX, int expectedY)
+        {
+            var sequence = new Sequence
+            {
+                AnimationGroups = new List<Sequence.AnimationGroup>
+                {
+                    new Sequence.AnimationGroup
+                    {
+                        Animations = new List<Sequence.Animation>()
+                    }
+                },
+                SpriteGroups = new List<List<Sequence.SpritePart>>(),
+                Sprites = new List<Sequence.Sprite>()
+            };
+
+            var drawing = Extensions.MockDrawing();
+            var messageProvider = Substitute.For<IMessageProvider>();
+            var messageRenderer = new MockMessageRenderer();
+            var messageEncode = Substitute.For<IMessageEncode>();
+            var spriteTexture = Substitute.For<ISpriteTexture>();
+            var factory = new AnimatedSequenceFactory(
+                drawing,
+                messageProvider,
+                messageRenderer,
+                messageEncode,
+                sequence,
+                spriteTexture);
+
+            messageEncode.Encode(Arg.Is<List<MessageCommandModel>>(x => true))
+                .Returns(new byte[] { 0x21 });
+
+            var animation = factory.Create(new AnimatedSequenceDesc
+            {
+                TextAnchor = anchor,
+                MessageText = "test"
+            });
+
+            animation.Draw(0, 0);
+
+            Assert.True(messageRenderer.HasBeenCalled);
+            Assert.Equal(expectedX, messageRenderer.LastPosX);
+            Assert.Equal(expectedY, messageRenderer.LastPosY);
+            //drawing.AssertDraw(2, x =>
+            //{
+            //    Assert.Equal(expectedThirdChildPosX, x.Vec0.X);
+            //    Assert.Equal(expectedThirdChildPosY, x.Vec0.Y);
+            //});
         }
     }
 }

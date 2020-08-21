@@ -204,27 +204,43 @@ namespace OpenKh.Game
                     };
                     _messageRenderer.Draw(fakeTextDrawContext, _message);
                     var width = (float)fakeTextDrawContext.Width;
+                    var height = (float)fakeTextDrawContext.Height;
 
-                    float xPos;
+                    float xPos, yPos;
                     switch (TextAnchor)
                     {
                         default:
-                        case TextAnchor.Left:
-                            xPos = childContext.PositionX;
+                        case TextAnchor.BottomLeft:
+                            xPos = 0;
+                            yPos = 0;
+                            break;
+                        case TextAnchor.BottomCenter:
+                            xPos = -width / 2;
+                            yPos = 0;
+                            break;
+                        case TextAnchor.BottomRight:
+                            xPos = context.UiSize - width;
+                            yPos = 0;
                             break;
                         case TextAnchor.Center:
-                            xPos = childContext.PositionX - width / 2;
+                            xPos = -width / 2;
+                            yPos = -height / 2;
                             break;
-                        case TextAnchor.Right:
-                            xPos = childContext.PositionX + context.UiSize - width;
+                        case TextAnchor.TopCenter:
+                            xPos = -width / 2;
+                            yPos = -height;
+                            break;
+                        case TextAnchor.TopLeft:
+                            xPos = 0;
+                            yPos = -height;
                             break;
                     }
 
                     _messageRenderer.Draw(new DrawContext
                     {
-                        xStart = childContext.TextPositionX + xPos,
-                        x = xPos,
-                        y = childContext.PositionY + childContext.TextPositionY,
+                        xStart = childContext.PositionX + childContext.TextPositionX + xPos,
+                        x = childContext.PositionX + childContext.TextPositionX + xPos,
+                        y = childContext.PositionY + childContext.TextPositionY + yPos,
                         Color = childContext.Color,
                         Scale = textScale,
                         WidthMultiplier = 1.0f,
