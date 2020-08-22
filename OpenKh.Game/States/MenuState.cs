@@ -14,14 +14,14 @@ namespace OpenKh.Game.States
     public class MenuState : IState
     {
         private const int MaxCharacterCount = 4;
-        private const int MenuElementCount = 8;
+        private const int MaxMenuElementCount = 8;
         private const int MenuOptionSelectedSeq = 132;
         private const int CharacterHpBar = 98;
         private const int CharacterMpBar = 99;
         private const int MsgLv = 0x39FC;
         private const int MsgHp = 0x39FD;
         private const int MsgMp = 0x39FE;
-        private static readonly ushort[] MenuOptions = new ushort[MenuElementCount]
+        private static readonly ushort[] MenuOptions = new ushort[MaxMenuElementCount]
         {
             0x844b, // Items
             0x844d, // Abilities
@@ -59,23 +59,27 @@ namespace OpenKh.Game.States
         private IAnimatedSequence _menuSeq;
         private IAnimatedSequence _characterSeq;
 
-        private int _selectedOption = 0;
+        private int _optionCount = 0;
+        private int _optionSelected = 0;
         private Kh2MessageRenderer _messageRenderer;
 
         public bool IsMenuOpen { get; private set; }
 
         public int MenuOption
         {
-            get => _selectedOption;
+            get => _optionSelected;
             set
             {
-                _selectedOption = value;
-                if (_selectedOption < 0)
-                    _selectedOption += MenuElementCount;
-                _selectedOption %= MenuElementCount;
+                if (_optionCount == 0)
+                    return;
+
+                _optionSelected = value;
+                if (_optionSelected < 0)
+                    _optionSelected += _optionCount;
+                _optionSelected %= _optionCount;
 
                 _menuOptionSelectedSeq.TextAnchor = TextAnchor.BottomLeft;
-                _menuOptionSelectedSeq.SetMessage(MenuOptions[_selectedOption]);
+                _menuOptionSelectedSeq.SetMessage(MenuOptions[_optionSelected]);
                 _menuOptionSelectedSeq.Begin();
             }
         }
@@ -154,13 +158,15 @@ namespace OpenKh.Game.States
             const int MenuOptionsBitfields = 0xbf;
             var menuDesc = new List<AnimatedSequenceDesc>();
             var menuOptions = MenuOptionsBitfields;
-            for (int bitIndex = 0, optionIndex = 0; menuOptions > 0; bitIndex++)
+
+            _optionCount = 0;
+            for (int bitIndex = 0; menuOptions > 0; bitIndex++)
             {
                 var bitMask = 1 << bitIndex;
                 if ((menuOptions & bitMask) == 0)
                     continue;
                 menuOptions -= bitMask;
-                if (optionIndex >= MenuOptions.Length)
+                if (_optionCount >= MenuOptions.Length)
                     break;
 
                 menuDesc.Add(new AnimatedSequenceDesc
@@ -168,13 +174,13 @@ namespace OpenKh.Game.States
                     SequenceIndexStart = 133,
                     SequenceIndexLoop = 134,
                     SequenceIndexEnd = 135,
-                    StackIndex = optionIndex,
+                    StackIndex = _optionCount,
                     StackWidth = 0,
                     StackHeight = AnimatedSequenceDesc.DefaultStacking,
                     MessageId = MenuOptions[bitIndex]
                 });
 
-                optionIndex++;
+                _optionCount++;
             }
             _menuSeq = _animSeqFactory.Create(menuDesc);
 
