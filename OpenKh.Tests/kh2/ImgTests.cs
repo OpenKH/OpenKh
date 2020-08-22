@@ -74,6 +74,13 @@ namespace OpenKh.Tests.kh2
                     new MemoryStream(Img.Decompress(Img.Compress(inStream.ReadAllBytes()))));
             });
 
+        [Fact]
+        public void CreateEmptyFileIfCompressedSourceIsEmpty()
+        {
+            var input = Enumerable.Range(0, 0x1000).Select(_ => (byte)0).ToArray();
+            Assert.Empty(Img.Decompress(input));
+        }
+
         public void AlwaysCompressCorrectly()
         {
             using var imgStream = File.OpenRead("G:\\KH2.IMG");
