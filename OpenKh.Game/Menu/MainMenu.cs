@@ -36,12 +36,15 @@ namespace OpenKh.Game.Menu
 
         private readonly AnimatedSequenceFactory _animSeqFactory;
         private readonly InputManager _inputManager;
+        private bool _isClosing;
+        private IMenu _subMenu;
         private IAnimatedSequence _menuSeq;
         private IAnimatedSequence _characterSeq;
 
         private int _optionCount = 0;
         private int _optionSelected = 0;
 
+        public bool IsClosed { get; private set; }
         public int SelectedOption
         {
             get => _optionSelected;
@@ -164,10 +167,17 @@ namespace OpenKh.Game.Menu
 
         private void ProcessInput(InputManager inputManager)
         {
+            if (_isClosing)
+                return;
+
             if (inputManager.IsMenuUp)
                 SelectedOption--;
             if (inputManager.IsMenuDown)
                 SelectedOption++;
+            if (inputManager.IsCircle)
+            {
+                Push(new MenuTemplate(_animSeqFactory, _inputManager, 0));
+            }
         }
 
         private IAnimatedSequence InitializeMenuOptions(bool skipIntro = false)
@@ -231,27 +241,53 @@ namespace OpenKh.Game.Menu
 
         public void Open()
         {
+            _isClosing = false;
             _menuSeq.Begin();
             _characterSeq.Begin();
         }
 
         public void Close()
         {
+            _isClosing = true;
             _menuSeq.End();
             _characterSeq.End();
         }
 
+        public void Push(IMenu menu)
+        {
+            _subMenu = menu;
+            _subMenu.Open();
+        }
+
         public void Update(double deltaTime)
         {
-            _menuSeq.Update(deltaTime);
-            _characterSeq.Update(deltaTime);
-            ProcessInput(_inputManager);
+            if (_subMenu == null)
+            {
+                _menuSeq.Update(deltaTime);
+                _characterSeq.Update(deltaTime);
+                ProcessInput(_inputManager);
+            }
+            else
+            {
+                _subMenu.Update(deltaTime);
+                if (_subMenu.IsClosed)
+                {
+                    _subMenu = null;
+                    Open();
+                }
+            }
+
         }
 
         public void Draw()
         {
-            _menuSeq.Draw(0, 0);
-            _characterSeq.Draw(0, 0);
+            if (_subMenu == null)
+            {
+                _menuSeq.Draw(0, 0);
+                _characterSeq.Draw(0, 0);
+            }
+            else
+                _subMenu.Draw();
         }
     }
 }

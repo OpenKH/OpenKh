@@ -148,6 +148,8 @@
 
         public int SelectedOption { get; private set; }
 
+        public bool IsClosed { get; private set; }
+
         public void Open()
         {
 
@@ -156,6 +158,9 @@
         public void Close()
         {
         }
+
+        public void Push(IMenu menu)
+        { }
 
         public void Update(double deltaTime)
         {
