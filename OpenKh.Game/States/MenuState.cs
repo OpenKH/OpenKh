@@ -53,7 +53,6 @@ namespace OpenKh.Game.States
 
         private List<IAnimatedSequence> _mainSeqGroup;
         private IAnimatedSequence _backgroundSeq;
-        private IAnimatedSequence _menuOptionSelectedSeq;
 
         private AnimatedSequenceFactory _animSeqFactory;
         private IAnimatedSequence _menuSeq;
@@ -78,9 +77,10 @@ namespace OpenKh.Game.States
                     _optionSelected += _optionCount;
                 _optionSelected %= _optionCount;
 
-                _menuOptionSelectedSeq.TextAnchor = TextAnchor.BottomLeft;
-                _menuOptionSelectedSeq.SetMessage(MenuOptions[_optionSelected]);
-                _menuOptionSelectedSeq.Begin();
+                var frame = _menuSeq.FrameIndex;
+                _menuSeq = InitializeMenuOptions(true);
+                _menuSeq.Begin();
+                _menuSeq.FrameIndex = frame;
             }
         }
 
@@ -129,60 +129,12 @@ namespace OpenKh.Game.States
 
             _backgroundSeq = CreateAnimationSequence(46);
 
-            _menuOptionSelectedSeq = _animSeqFactory.Create(new AnimatedSequenceDesc
-            {
-                SequenceIndexLoop = MenuOptionSelectedSeq,
-                Children = new List<AnimatedSequenceDesc>
-                {
-                    new AnimatedSequenceDesc
-                    {
-                        SequenceIndexLoop = 25,
-                        TextAnchor = TextAnchor.BottomLeft,
-                    },
-                    new AnimatedSequenceDesc
-                    {
-                        SequenceIndexStart = 27,
-                        SequenceIndexLoop = 28,
-                        SequenceIndexEnd = 29,
-                        TextAnchor = TextAnchor.BottomRight,
-                        StackIndex = 1,
-                    },
-                }
-            });
-
             MenuOption = 0;
         }
 
         private void InitializeMenu()
         {
-            const int MenuOptionsBitfields = 0xbf;
-            var menuDesc = new List<AnimatedSequenceDesc>();
-            var menuOptions = MenuOptionsBitfields;
-
-            _optionCount = 0;
-            for (int bitIndex = 0; menuOptions > 0; bitIndex++)
-            {
-                var bitMask = 1 << bitIndex;
-                if ((menuOptions & bitMask) == 0)
-                    continue;
-                menuOptions -= bitMask;
-                if (_optionCount >= MenuOptions.Length)
-                    break;
-
-                menuDesc.Add(new AnimatedSequenceDesc
-                {
-                    SequenceIndexStart = 133,
-                    SequenceIndexLoop = 134,
-                    SequenceIndexEnd = 135,
-                    StackIndex = _optionCount,
-                    StackWidth = 0,
-                    StackHeight = AnimatedSequenceDesc.DefaultStacking,
-                    MessageId = MenuOptions[bitIndex]
-                });
-
-                _optionCount++;
-            }
-            _menuSeq = _animSeqFactory.Create(menuDesc);
+            _menuSeq = InitializeMenuOptions();
 
             _characterSeq = _animSeqFactory.Create(Enumerable.Range(0, 5)
                 .Select(i => new AnimatedSequenceDesc
@@ -271,6 +223,65 @@ namespace OpenKh.Game.States
             );
         }
 
+        private IAnimatedSequence InitializeMenuOptions(bool skipIntro = false)
+        {
+            const int MenuOptionsBitfields = 0xbf;
+            var menuDesc = new List<AnimatedSequenceDesc>();
+            var menuOptions = MenuOptionsBitfields;
+
+            _optionCount = 0;
+            for (int bitIndex = 0; menuOptions > 0; bitIndex++)
+            {
+                var bitMask = 1 << bitIndex;
+                if ((menuOptions & bitMask) == 0)
+                    continue;
+                menuOptions -= bitMask;
+                if (_optionCount >= MenuOptions.Length)
+                    break;
+
+                AnimatedSequenceDesc desc = _optionCount != _optionSelected
+                    ? new AnimatedSequenceDesc
+                    {
+                        SequenceIndexStart = skipIntro ? -1 : 133,
+                        SequenceIndexLoop = 134,
+                        SequenceIndexEnd = 135,
+                        StackIndex = _optionCount,
+                        StackWidth = 0,
+                        StackHeight = AnimatedSequenceDesc.DefaultStacking,
+                        MessageId = MenuOptions[bitIndex]
+                    }
+                    : new AnimatedSequenceDesc
+                    {
+                        SequenceIndexLoop = MenuOptionSelectedSeq,
+                        StackIndex = _optionCount,
+                        StackWidth = 0,
+                        StackHeight = AnimatedSequenceDesc.DefaultStacking,
+                        MessageId = MenuOptions[bitIndex],
+                        Children = new List<AnimatedSequenceDesc>
+                        {
+                            new AnimatedSequenceDesc
+                            {
+                                SequenceIndexLoop = 25,
+                                TextAnchor = TextAnchor.BottomLeft,
+                            },
+                            new AnimatedSequenceDesc
+                            {
+                                SequenceIndexStart = skipIntro ? -1 : 27,
+                                SequenceIndexLoop = 28,
+                                SequenceIndexEnd = 29,
+                                TextAnchor = TextAnchor.BottomRight,
+                                StackIndex = 1,
+                            }
+                        }
+                    };
+                menuDesc.Add(desc);
+
+                _optionCount++;
+            }
+
+            return _animSeqFactory.Create(menuDesc);
+        }
+
         public void Destroy()
         {
             foreach (var texture in _textures)
@@ -286,7 +297,6 @@ namespace OpenKh.Game.States
 
             _backgroundSeq.Begin();
             ForAll(_mainSeqGroup, x => x.Begin());
-            _menuOptionSelectedSeq.Begin();
             _menuSeq.Begin();
             _characterSeq.Begin();
 
@@ -300,7 +310,6 @@ namespace OpenKh.Game.States
 
             _backgroundSeq.End();
             ForAll(_mainSeqGroup, x => x.End());
-            _menuOptionSelectedSeq.End();
             _menuSeq.End();
             _characterSeq.End();
         }
@@ -315,7 +324,6 @@ namespace OpenKh.Game.States
             foreach (var animSequence in _mainSeqGroup)
                 animSequence.Update(deltaTime);
             _backgroundSeq.Update(deltaTime);
-            _menuOptionSelectedSeq.Update(deltaTime);
             _menuSeq.Update(deltaTime);
             _characterSeq.Update(deltaTime);
         }

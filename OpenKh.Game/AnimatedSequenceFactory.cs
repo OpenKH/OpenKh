@@ -12,6 +12,7 @@ namespace OpenKh.Game
     {
         bool IsEnd { get; }
         TextAnchor TextAnchor { get; set; }
+        int FrameIndex { get; set; }
 
         void Update(double deltaTime);
         void Draw(float x, float y);
@@ -46,13 +47,26 @@ namespace OpenKh.Game
     {
         private class RootAnimatedSequence : IAnimatedSequence
         {
+            private int _frameIndex;
+
             public List<AnimatedSequence> Children { get; set; }
 
             public bool IsEnd => Children.All(x => x.IsEnd);
             public TextAnchor TextAnchor { get; set; }
+            public int FrameIndex
+            {
+                get => _frameIndex;
+                set
+                {
+                    _frameIndex = value;
+                    foreach (var item in Children)
+                        item.FrameIndex = value;
+                }
+            }
 
             public void Update(double deltaTime)
             {
+                _frameIndex++;
                 foreach (var item in Children)
                     item.Update(deltaTime);
             }
@@ -117,6 +131,16 @@ namespace OpenKh.Game
             public int StackWidth { get; set; }
             public int StackHeight { get; set; }
             public TextAnchor TextAnchor { get; set; }
+            public int FrameIndex
+            {
+                get => _frame;
+                set
+                {
+                    _frame = value;
+                    foreach (var item in Children)
+                        item.FrameIndex = value;
+                }
+            }
 
             public Sequence.AnimationGroup AnimGroup =>
                 _sequence.AnimationGroups[_anim];
