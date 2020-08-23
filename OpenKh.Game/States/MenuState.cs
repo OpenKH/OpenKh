@@ -6,7 +6,6 @@ using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Menu;
 using OpenKh.Kh2;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,7 +24,6 @@ namespace OpenKh.Game.States
         private List<ISpriteTexture> _textures = new List<ISpriteTexture>();
         private Dictionary<ushort, byte[]> _cachedText = new Dictionary<ushort, byte[]>();
 
-        private List<IAnimatedSequence> _mainSeqGroup;
         private IAnimatedSequence _backgroundSeq;
 
         private AnimatedSequenceFactory _animSeqFactory;
@@ -74,8 +72,33 @@ namespace OpenKh.Game.States
                 _campLayout.SequenceItems[1],
                 _textures.First());
 
-            _mainSeqGroup = CreateMultipleAnimatedSequences(107, 110, 113);
-            _backgroundSeq = CreateAnimationSequence(46);
+            _backgroundSeq = _animSeqFactory.Create(new List<AnimatedSequenceDesc>
+            {
+                new AnimatedSequenceDesc
+                {
+                    SequenceIndexStart = 46,
+                    SequenceIndexLoop = 47,
+                    SequenceIndexEnd = 48,
+                },
+                new AnimatedSequenceDesc
+                {
+                    SequenceIndexStart = 107,
+                    SequenceIndexLoop = 108,
+                    SequenceIndexEnd = 109,
+                },
+                new AnimatedSequenceDesc
+                {
+                    SequenceIndexStart = 110,
+                    SequenceIndexLoop = 111,
+                    SequenceIndexEnd = 112,
+                },
+                new AnimatedSequenceDesc
+                {
+                    SequenceIndexStart = 113,
+                    SequenceIndexLoop = 114,
+                    SequenceIndexEnd = 115,
+                }
+            });
 
             _subMenu = new MainMenu(_animSeqFactory, _inputManager);
         }
@@ -94,7 +117,6 @@ namespace OpenKh.Game.States
             _layoutRenderer.SelectedSequenceGroupIndex = 0;
 
             _backgroundSeq.Begin();
-            ForAll(_mainSeqGroup, x => x.Begin());
             _subMenu.Open();
 
             IsMenuOpen = true;
@@ -106,7 +128,6 @@ namespace OpenKh.Game.States
             _layoutRenderer.SelectedSequenceGroupIndex = 2;
 
             _backgroundSeq.End();
-            ForAll(_mainSeqGroup, x => x.End());
             _subMenu.Close();
         }
 
@@ -117,8 +138,6 @@ namespace OpenKh.Game.States
             ProcessInput(_inputManager);
             
             _layoutRenderer.FrameIndex++;
-            foreach (var animSequence in _mainSeqGroup)
-                animSequence.Update(deltaTime);
             _backgroundSeq.Update(deltaTime);
             _subMenu.Update(deltaTime);
         }
@@ -147,9 +166,6 @@ namespace OpenKh.Game.States
                 _layoutRenderer.SelectedSequenceGroupIndex = 1;
 
             _layoutRenderer.Draw();
-            foreach (var animSequence in _mainSeqGroup)
-                animSequence.Draw(0, 0);
-
             _backgroundSeq.Draw(0, 0);
             _subMenu.Draw();
 
@@ -170,48 +186,6 @@ namespace OpenKh.Game.States
 
             return (layout, _textures);
         }
-
-        private List<IAnimatedSequence> CreateMultipleAnimatedSequences(params int[] anims)
-        {
-            var sequences = new List<IAnimatedSequence>();
-            foreach (var animationIndex in anims)
-            {
-                sequences.Add(CreateAnimationSequence(animationIndex));
-            }
-
-            return sequences;
-        }
-
-        private IAnimatedSequence CreateAnimationSequence(int anim) =>
-            CreateAnimationSequence(anim, anim + 1, anim + 2);
-
-        private IAnimatedSequence CreateAnimationSequence(int start, int loop, int end)
-        {
-            var item = _animSeqFactory.Create(new AnimatedSequenceDesc
-            {
-                SequenceIndexLoop = loop,
-                SequenceIndexStart = start,
-                SequenceIndexEnd = end
-            });
-            item.Begin();
-
-            return item;
-        }
-
-        public byte[] GetMessage(ushort messageId)
-        {
-            if (!_cachedText.TryGetValue(messageId, out var data))
-                _cachedText[messageId] = data = _kernel.MessageProvider.GetMessage(messageId);
-
-            return data;
-        }
-
-        private static void ForAll<T>(IEnumerable<T> list, Action<T> action)
-        {
-            foreach (var item in list)
-                action(item);
-        }
-
 
         public void DebugDraw(IDebug debug)
         {
