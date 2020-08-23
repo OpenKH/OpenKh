@@ -4,6 +4,7 @@ using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
+using OpenKh.Game.Menu;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -13,33 +14,6 @@ namespace OpenKh.Game.States
 {
     public class MenuState : IState
     {
-        private const int MaxCharacterCount = 4;
-        private const int MaxMenuElementCount = 8;
-        private const int MenuOptionSelectedSeq = 132;
-        private const int CharacterHpBar = 98;
-        private const int CharacterMpBar = 99;
-        private const int MsgLv = 0x39FC;
-        private const int MsgHp = 0x39FD;
-        private const int MsgMp = 0x39FE;
-        private static readonly ushort[] MenuOptions = new ushort[MaxMenuElementCount]
-        {
-            0x844b, // Items
-            0x844d, // Abilities
-            0x8451, // Customize
-            0x844e, // Party
-            0x844f, // Status
-            0x8450, // Journal
-            0x8450, // Journal
-            0xb617, // Config
-        };
-        private static readonly ushort[] CharacterNames = new ushort[MaxCharacterCount]
-        {
-            0x851f, // Sora
-            0x8520, // Donald
-            0x8521, // Goofy
-            0x852c, // Riku
-        };
-
         private Kernel _kernel;
         private IDataContent _content;
         private ArchiveManager _archiveManager;
@@ -55,34 +29,10 @@ namespace OpenKh.Game.States
         private IAnimatedSequence _backgroundSeq;
 
         private AnimatedSequenceFactory _animSeqFactory;
-        private IAnimatedSequence _menuSeq;
-        private IAnimatedSequence _characterSeq;
-
-        private int _optionCount = 0;
-        private int _optionSelected = 0;
         private Kh2MessageRenderer _messageRenderer;
+        private IMenu _subMenu;
 
         public bool IsMenuOpen { get; private set; }
-
-        public int MenuOption
-        {
-            get => _optionSelected;
-            set
-            {
-                if (_optionCount == 0)
-                    return;
-
-                _optionSelected = value;
-                if (_optionSelected < 0)
-                    _optionSelected += _optionCount;
-                _optionSelected %= _optionCount;
-
-                var frame = _menuSeq.FrameIndex;
-                _menuSeq = InitializeMenuOptions(true);
-                _menuSeq.Begin();
-                _menuSeq.FrameIndex = frame;
-            }
-        }
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -123,163 +73,11 @@ namespace OpenKh.Game.States
                 _kernel.SystemMessageContext.Encoder,
                 _campLayout.SequenceItems[1],
                 _textures.First());
-            InitializeMenu();
 
             _mainSeqGroup = CreateMultipleAnimatedSequences(107, 110, 113);
-
             _backgroundSeq = CreateAnimationSequence(46);
 
-            MenuOption = 0;
-        }
-
-        private void InitializeMenu()
-        {
-            _menuSeq = InitializeMenuOptions();
-
-            _characterSeq = _animSeqFactory.Create(Enumerable.Range(0, 5)
-                .Select(i => new AnimatedSequenceDesc
-                {
-                    SequenceIndexStart = 101,
-                    SequenceIndexLoop = 102,
-                    SequenceIndexEnd = 103,
-                    StackIndex = i + 1,
-                    StackWidth = AnimatedSequenceDesc.DefaultStacking,
-                    Children = new List<AnimatedSequenceDesc>()
-                    {
-                        new AnimatedSequenceDesc
-                        {
-                            SequenceIndexLoop = 93,
-                            Children = new List<AnimatedSequenceDesc>()
-                            {
-                                new AnimatedSequenceDesc
-                                {
-                                    SequenceIndexLoop = 124,
-                                    MessageText = "Donald",
-                                    TextAnchor = TextAnchor.BottomCenter,
-                                },
-                                new AnimatedSequenceDesc()
-                                {
-                                    SequenceIndexLoop = 90,
-                                    Children = new List<AnimatedSequenceDesc>()
-                                    {
-                                        new AnimatedSequenceDesc
-                                        {
-                                            SequenceIndexLoop = 124,
-                                            MessageId = MsgLv,
-                                            TextAnchor = TextAnchor.BottomLeft,
-                                        },
-                                        new AnimatedSequenceDesc
-                                        {
-                                            SequenceIndexLoop = 124,
-                                            MessageText = "99",
-                                            TextAnchor = TextAnchor.BottomRight,
-                                        },
-                                        new AnimatedSequenceDesc()
-                                        {
-                                            StackIndex = 1,
-                                            SequenceIndexLoop = 121,
-                                            MessageId = MsgHp,
-                                            TextAnchor = TextAnchor.BottomLeft,
-                                        },
-                                        new AnimatedSequenceDesc()
-                                        {
-                                            StackIndex = 1,
-                                            SequenceIndexLoop = 121,
-                                            MessageText = "60/60",
-                                            TextAnchor = TextAnchor.BottomRight,
-                                        },
-                                        new AnimatedSequenceDesc()
-                                        {
-                                            StackIndex = 1,
-                                            SequenceIndexLoop = CharacterHpBar,
-                                            TextAnchor = TextAnchor.BottomLeft,
-                                        },
-                                        new AnimatedSequenceDesc()
-                                        {
-                                            StackIndex = 2,
-                                            SequenceIndexLoop = 118,
-                                            MessageId = MsgMp,
-                                            TextAnchor = TextAnchor.BottomLeft,
-                                        },
-                                        new AnimatedSequenceDesc()
-                                        {
-                                            StackIndex = 2,
-                                            SequenceIndexLoop = 118,
-                                            MessageText = "120/120",
-                                            TextAnchor = TextAnchor.BottomRight,
-                                        },
-                                        new AnimatedSequenceDesc()
-                                        {
-                                            StackIndex = 2,
-                                            SequenceIndexLoop = CharacterMpBar,
-                                            TextAnchor = TextAnchor.BottomLeft,
-                                        },
-                                    }
-                                },
-                            }
-                        }
-                    }
-                })
-            );
-        }
-
-        private IAnimatedSequence InitializeMenuOptions(bool skipIntro = false)
-        {
-            const int MenuOptionsBitfields = 0xbf;
-            var menuDesc = new List<AnimatedSequenceDesc>();
-            var menuOptions = MenuOptionsBitfields;
-
-            _optionCount = 0;
-            for (int bitIndex = 0; menuOptions > 0; bitIndex++)
-            {
-                var bitMask = 1 << bitIndex;
-                if ((menuOptions & bitMask) == 0)
-                    continue;
-                menuOptions -= bitMask;
-                if (_optionCount >= MenuOptions.Length)
-                    break;
-
-                AnimatedSequenceDesc desc = _optionCount != _optionSelected
-                    ? new AnimatedSequenceDesc
-                    {
-                        SequenceIndexStart = skipIntro ? -1 : 133,
-                        SequenceIndexLoop = 134,
-                        SequenceIndexEnd = 135,
-                        StackIndex = _optionCount,
-                        StackWidth = 0,
-                        StackHeight = AnimatedSequenceDesc.DefaultStacking,
-                        MessageId = MenuOptions[bitIndex]
-                    }
-                    : new AnimatedSequenceDesc
-                    {
-                        SequenceIndexLoop = MenuOptionSelectedSeq,
-                        StackIndex = _optionCount,
-                        StackWidth = 0,
-                        StackHeight = AnimatedSequenceDesc.DefaultStacking,
-                        MessageId = MenuOptions[bitIndex],
-                        Children = new List<AnimatedSequenceDesc>
-                        {
-                            new AnimatedSequenceDesc
-                            {
-                                SequenceIndexLoop = 25,
-                                TextAnchor = TextAnchor.BottomLeft,
-                            },
-                            new AnimatedSequenceDesc
-                            {
-                                SequenceIndexStart = skipIntro ? -1 : 27,
-                                SequenceIndexLoop = 28,
-                                SequenceIndexEnd = 29,
-                                TextAnchor = TextAnchor.BottomRight,
-                                StackIndex = 1,
-                            }
-                        }
-                    };
-                menuDesc.Add(desc);
-
-                _optionCount++;
-            }
-
-            return _animSeqFactory.Create(menuDesc);
+            _subMenu = new MainMenu(_animSeqFactory, _inputManager);
         }
 
         public void Destroy()
@@ -297,8 +95,7 @@ namespace OpenKh.Game.States
 
             _backgroundSeq.Begin();
             ForAll(_mainSeqGroup, x => x.Begin());
-            _menuSeq.Begin();
-            _characterSeq.Begin();
+            _subMenu.Open();
 
             IsMenuOpen = true;
         }
@@ -310,8 +107,7 @@ namespace OpenKh.Game.States
 
             _backgroundSeq.End();
             ForAll(_mainSeqGroup, x => x.End());
-            _menuSeq.End();
-            _characterSeq.End();
+            _subMenu.Close();
         }
 
         public void Update(DeltaTimes deltaTimes)
@@ -324,8 +120,7 @@ namespace OpenKh.Game.States
             foreach (var animSequence in _mainSeqGroup)
                 animSequence.Update(deltaTime);
             _backgroundSeq.Update(deltaTime);
-            _menuSeq.Update(deltaTime);
-            _characterSeq.Update(deltaTime);
+            _subMenu.Update(deltaTime);
         }
 
         public void Draw(DeltaTimes deltaTimes)
@@ -356,19 +151,13 @@ namespace OpenKh.Game.States
                 animSequence.Draw(0, 0);
 
             _backgroundSeq.Draw(0, 0);
-
-            _menuSeq.Draw(0, 0);
-            _characterSeq.Draw(0, 0);
+            _subMenu.Draw();
 
             _drawing.Flush();
         }
 
         private void ProcessInput(InputManager inputManager)
         {
-            if (inputManager.IsMenuUp)
-                MenuOption--;
-            if (inputManager.IsMenuDown)
-                MenuOption++;
             if (inputManager.IsStart)
                 CloseMenu();
         }
