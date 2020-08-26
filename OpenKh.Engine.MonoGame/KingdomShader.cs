@@ -18,6 +18,7 @@ namespace OpenKh.Engine.MonoGame
         private readonly EffectParameter _parameterTextureWrapModeU;
         private readonly EffectParameter _parameterTextureWrapModeV;
         private readonly EffectParameter _parameterTexture0;
+        private readonly EffectParameter _parameterUseAlphaMask;
 
         public KingdomShader(ContentManager contentManager)
         {
@@ -30,6 +31,7 @@ namespace OpenKh.Engine.MonoGame
             _parameterTextureWrapModeU = Effect.Parameters["TextureWrapModeU"];
             _parameterTextureWrapModeV = Effect.Parameters["TextureWrapModeV"];
             _parameterTexture0 = Effect.Parameters["Texture0"];
+            _parameterUseAlphaMask = Effect.Parameters["UseAlphaMask"];
 
             ModelView = Matrix.Identity;
             WorldView = Matrix.Identity;
@@ -87,6 +89,12 @@ namespace OpenKh.Engine.MonoGame
         {
             get => (TextureWrapMode)_parameterTextureWrapModeV.GetValueInt32();
             set => _parameterTextureWrapModeV.SetValue((int)value);
+        }
+
+        public bool UseAlphaMask
+        {
+            get => _parameterUseAlphaMask.GetValueBoolean();
+            set => _parameterUseAlphaMask.SetValue(value);
         }
 
         public void Pass(Action<EffectPass> action)

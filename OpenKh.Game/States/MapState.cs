@@ -16,7 +16,7 @@ namespace OpenKh.Game.States
 {
     public class MapState : IState
     {
-        private readonly static BlendState DefaultBlendState = new BlendState()
+        private readonly static BlendState AlphaBlendState = new BlendState()
         {
             ColorSourceBlend = Blend.SourceAlpha,
             AlphaSourceBlend = Blend.SourceAlpha,
@@ -27,6 +27,10 @@ namespace OpenKh.Game.States
             BlendFactor = Color.White,
             MultiSampleMask = int.MaxValue,
             IndependentBlendEnable = false
+        };
+        private readonly static DepthStencilState AlphaDepthStencilState = new DepthStencilState()
+        {
+            DepthBufferWriteEnable = false
         };
 
         private Kernel _kernel;
@@ -92,54 +96,65 @@ namespace OpenKh.Game.States
         {
             _camera.AspectRatio = _graphics.PreferredBackBufferWidth / (float)_graphics.PreferredBackBufferHeight;
 
-
-            _graphics.GraphicsDevice.RasterizerState = new RasterizerState()
-            {
-                CullMode = CullMode.CullClockwiseFace
-            };
-            _graphics.GraphicsDevice.DepthStencilState = new DepthStencilState();
-            _graphics.GraphicsDevice.BlendState = DefaultBlendState;
-
+            _graphics.GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
+            
             _shader.Pass(pass =>
+            {
+                _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                _graphics.GraphicsDevice.BlendState = BlendState.Opaque;
+                _shader.UseAlphaMask = true;
+
+                DrawAllMeshes(pass, /*passRenderOpaque=*/true);
+
+                _graphics.GraphicsDevice.DepthStencilState = AlphaDepthStencilState;
+                _graphics.GraphicsDevice.BlendState = AlphaBlendState;
+                _shader.UseAlphaMask = false;
+
+                DrawAllMeshes(pass, /*passRenderOpaque=*/false);
+            });
+        }
+
+        private void DrawAllMeshes(EffectPass pass, bool passRenderOpaque)
+        {
+            _shader.ProjectionView = _camera.Projection;
+            _shader.WorldView = _camera.World;
+            _shader.ModelView = Matrix.Identity;
+            pass.Apply();
+
+            foreach (var mesh in _models)
+            {
+                if (mesh.MeshDescriptors != null)
+                {
+                    RenderMeshNew(pass, mesh, passRenderOpaque);
+                }
+                else if (passRenderOpaque)
+                {
+                    RenderMesh(pass, mesh);
+                }
+            }
+
+            if (!passRenderOpaque)
+                return;
+
+            foreach (var entity in _objectEntities.Where(x => x.Mesh != null))
             {
                 _shader.ProjectionView = _camera.Projection;
                 _shader.WorldView = _camera.World;
-                _shader.ModelView = Matrix.Identity;
+                _shader.ModelView = entity.GetMatrix();
                 pass.Apply();
 
-                foreach (var mesh in _models)
-                {
-                    if (mesh.MeshDescriptors != null)
-                    {
-                        RenderMeshNew(pass, mesh, true);
-                        RenderMeshNew(pass, mesh, false);
-                    }
-                    else
-                    {
-                        RenderMesh(pass, mesh);
-                    }
-                }
+                RenderMesh(pass, entity.Mesh);
+            }
 
-                foreach (var entity in _objectEntities.Where(x => x.Mesh != null))
-                {
-                    _shader.ProjectionView = _camera.Projection;
-                    _shader.WorldView = _camera.World;
-                    _shader.ModelView = entity.GetMatrix();
-                    pass.Apply();
+            foreach (var entity in _bobEntities)
+            {
+                _shader.ProjectionView = _camera.Projection;
+                _shader.WorldView = _camera.World;
+                _shader.ModelView = entity.GetMatrix();
+                pass.Apply();
 
-                    RenderMesh(pass, entity.Mesh);
-                }
-
-                foreach (var entity in _bobEntities)
-                {
-                    _shader.ProjectionView = _camera.Projection;
-                    _shader.WorldView = _camera.World;
-                    _shader.ModelView = entity.GetMatrix();
-                    pass.Apply();
-
-                    RenderMesh(pass, _bobModels[entity.BobIndex]);
-                }
-            });
+                RenderMesh(pass, _bobModels[entity.BobIndex]);
+            }
         }
 
         private void RenderMesh(EffectPass pass, MeshGroup mesh)
