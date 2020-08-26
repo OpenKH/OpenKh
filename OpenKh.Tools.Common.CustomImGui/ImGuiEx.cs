@@ -1,7 +1,8 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using System;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 
 namespace OpenKh.Tools.Common.CustomImGui
 {
@@ -134,14 +135,15 @@ namespace OpenKh.Tools.Common.CustomImGui
         public static ImFontPtr OpenFontSegoeUi(IImGuiRenderer renderer, float fontSize = 16.0f) =>
             OpenFont(renderer, "segoeui", fontSize);
 
-        public static bool MainWindow(Action action) =>
+        public static bool MainWindow(Action action, bool noBackground = false) =>
             ForControl(() =>
             {
                 var ret = ImGui.Begin("MainWindow",
                     ImGuiWindowFlags.MenuBar |
                     ImGuiWindowFlags.NoDecoration |
                     ImGuiWindowFlags.NoCollapse |
-                    ImGuiWindowFlags.NoMove);
+                    ImGuiWindowFlags.NoMove |
+                    (noBackground ? ImGuiWindowFlags.NoBackground : ImGuiWindowFlags.None));
                 ImGui.SetWindowPos(new System.Numerics.Vector2(0, 0));
                 ImGui.SetWindowSize(ImGui.GetIO().DisplaySize);
                 return ret;
@@ -178,6 +180,68 @@ namespace OpenKh.Tools.Common.CustomImGui
 
         public static bool ForPopup(string name, Action action) =>
             ForControl(() => ImGui.BeginPopup(name), ImGui.EndPopup, action);
+
+        public static bool ForTreeNode(string name, Action action) =>
+            ForControl(() => ImGui.TreeNode(name), ImGui.TreePop, action);
+
+        public static bool ForWindow(string name, Action action) =>
+            ForControl(() =>
+            {
+                var dummy = true;
+                ImGui.Begin(name, ref dummy);
+                return dummy;
+            }, ImGui.End, action);
+
+        public static bool ForHeader(string name, Action action) =>
+            ForControl(() => ImGui.CollapsingHeader(name), action);
+
+        public static void ForEdit(string name, Func<bool> getter, Action<bool> setter)
+        {
+            var value = getter();
+            if (ImGui.Checkbox(name, ref value))
+                setter(value);
+        }
+
+        public static void ForEdit(string name, Func<byte> getter, Action<byte> setter) =>
+            ForEdit(name, () => (int)getter(), x => setter((byte)x));
+
+        public static void ForEdit(string name, Func<short> getter, Action<short> setter) =>
+            ForEdit(name, () => (int)getter(), x => setter((short)x));
+
+        public static void ForEdit(string name, Func<int> getter, Action<int> setter)
+        {
+            var value = getter();
+            if (ImGui.DragInt(name, ref value))
+                setter(value);
+        }
+
+        public static void ForEdit(string name, Func<float> getter, Action<float> setter, float speed = 1f)
+        {
+            var value = getter();
+            if (ImGui.DragFloat(name, ref value, speed))
+                setter(value);
+        }
+
+        public static void ForEdit2(string name, Func<Vector2> getter, Action<Vector2> setter, float speed = 1f)
+        {
+            var value = getter();
+            if (ImGui.DragFloat2(name, ref value, speed))
+                setter(value);
+        }
+
+        public static void ForEdit3(string name, Func<Vector3> getter, Action<Vector3> setter, float speed = 1f)
+        {
+            var value = getter();
+            if (ImGui.DragFloat3(name, ref value, speed))
+                setter(value);
+        }
+
+        public static void ForMenuCheck(string name, Func<bool> getter, Action<bool> setter)
+        {
+            var value = getter();
+            if (ImGui.MenuItem(name, "", ref value))
+                setter(value);
+        }
 
         public static bool ForChild(string name, float w, float h, bool border, Action action)
         {

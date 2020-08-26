@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 
-namespace OpenKh.Game
+namespace OpenKh.Engine.MonoGame
 {
     public class Camera
     {
@@ -12,6 +11,7 @@ namespace OpenKh.Game
         private Vector3 _cameraPosition;
         private Vector3 _cameraLookAtX;
         private Vector3 _cameraLookAtY;
+        private Vector3 _cameraLookAtZ;
         private Vector3 _cameraUp;
         private Matrix _projection;
         private Matrix _world;
@@ -89,6 +89,16 @@ namespace OpenKh.Game
             }
         }
 
+        public Vector3 CameraLookAtZ
+        {
+            get => _cameraLookAtZ;
+            set
+            {
+                _cameraLookAtZ = value;
+                InvalidateWorld();
+            }
+        }
+
         public Vector3 CameraUp
         {
             get => _cameraUp;
@@ -108,6 +118,7 @@ namespace OpenKh.Game
                 var matrix = Matrix.CreateFromYawPitchRoll(value.X / 180.0f * 3.14159f, value.Y / 180.0f * 3.14159f, value.Z / 180.0f * 3.14159f);
                 CameraLookAtX = Vector3.Transform(new Vector3(1, 0, 0), matrix);
                 CameraLookAtY = Vector3.Transform(new Vector3(0, 0, 1), matrix);
+                CameraLookAtZ = Vector3.Transform(new Vector3(0, 1, 0), matrix);
             }
         }
 

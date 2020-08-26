@@ -1,8 +1,8 @@
 using Microsoft.Xna.Framework;
 using OpenKh.Engine.Extensions;
+using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Infrastructure;
-using OpenKh.Game.Shaders;
 using OpenKh.Game.States;
 using OpenKh.Kh2.Messages;
 using System;

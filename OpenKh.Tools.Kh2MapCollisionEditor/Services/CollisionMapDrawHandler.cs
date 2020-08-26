@@ -107,10 +107,10 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
 
             for (int i1 = 0; i1 < coct.CollisionMeshGroupList.Count; i1++)
             {
+                var color = ColorPalette[paletteIndex++ % ColorPalette.Length];
                 var c1 = coct.CollisionMeshGroupList[i1];
                 foreach (var c2 in c1.Meshes)
                 {
-                    var color = ColorPalette[paletteIndex++ % ColorPalette.Length];
                     foreach (var c3 in c2.Items)
                     {
                         VertexPositionColorTexture[] vertices;
