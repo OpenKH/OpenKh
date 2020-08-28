@@ -251,8 +251,8 @@ namespace OpenKh.Game
 
                     _messageRenderer.Draw(new DrawContext
                     {
-                        xStart = childContext.PositionX + childContext.TextPositionX + xPos,
-                        x = childContext.PositionX + childContext.TextPositionX + xPos,
+                        xStart = childContext.PositionX + xPos,
+                        x = childContext.PositionX + xPos,
                         y = childContext.PositionY + childContext.TextPositionY + yPos,
                         Color = childContext.Color,
                         Scale = textScale,
