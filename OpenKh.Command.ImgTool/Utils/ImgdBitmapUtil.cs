@@ -11,7 +11,7 @@ using static System.Drawing.Imaging.PixelFormat;
 
 namespace OpenKh.Kh2.Utils
 {
-    class ImgdBitmapUtil
+    public class ImgdBitmapUtil
     {
         public static Bitmap ToBitmap(Imgd imgd)
         {

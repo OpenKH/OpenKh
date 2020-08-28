@@ -4,10 +4,16 @@ using System.Text;
 
 namespace OpenKh.Command.ImgTool.Interfaces
 {
-    interface ICommonQuantizerParam
+    public interface ICommonQuantizerParam
     {
+        /// <summary>
+        /// 4 or 8
+        /// </summary>
         public int BitsPerPixel { get; }
 
+        /// <summary>
+        /// Invoke pngquant.exe, if true
+        /// </summary>
         public bool PngQuant { get; }
     }
 }
