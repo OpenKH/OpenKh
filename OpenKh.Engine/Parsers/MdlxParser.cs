@@ -92,11 +92,8 @@ namespace OpenKh.Engine.Parsers
 
             var indexBuffer = new int[4];
             var recentIndex = 0;
-            VifUnpacker.State state;
-            do
+            while (unpacker.Run() != VifUnpacker.State.End)
             {
-                state = unpacker.Run();
-
                 var vpu = new MemoryStream(unpacker.Memory, false)
                     .Using(stream => VpuPacket.Read(stream));
 
@@ -152,7 +149,7 @@ namespace OpenKh.Engine.Parsers
                             break;
                     }
                 }
-            } while (state == VifUnpacker.State.Microprogram);
+            }
 
             return new MeshDescriptor
             {
