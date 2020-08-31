@@ -1,5 +1,6 @@
 ﻿using Castle.DynamicProxy.Generators;
 using NSubstitute;
+using NSubstitute.Extensions;
 using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
@@ -20,6 +21,7 @@ namespace OpenKh.Tests.Engine
             public bool HasBeenCalled { get; private set; }
             public double LastPosX { get; private set; }
             public double LastPosY { get; private set; }
+            public ColorF LastColor { get; private set; }
 
             public void Draw(DrawContext context, string message) => 
                 throw new NotImplementedException();
@@ -36,6 +38,7 @@ namespace OpenKh.Tests.Engine
                     HasBeenCalled = true;
                     LastPosX = context.x;
                     LastPosY = context.y;
+                    LastColor = context.Color;
                 }
             }
         }
@@ -179,11 +182,80 @@ namespace OpenKh.Tests.Engine
             Assert.True(messageRenderer.HasBeenCalled);
             Assert.Equal(expectedX, messageRenderer.LastPosX);
             Assert.Equal(expectedY, messageRenderer.LastPosY);
-            //drawing.AssertDraw(2, x =>
-            //{
-            //    Assert.Equal(expectedThirdChildPosX, x.Vec0.X);
-            //    Assert.Equal(expectedThirdChildPosY, x.Vec0.Y);
-            //});
+        }
+
+        [Fact]
+        public void DrawTextWithCorrectColor()
+        {
+            var colorTest = new ColorF(0.5f, 0.75f, 0.25f, 0.125f);
+            AssertDrawTextWithCorrectColor(colorTest, colorTest, AnimationFlags.None);
+        }
+
+        [Fact]
+        public void DrawTextWithDefaultColor()
+        {
+            var colorTest = new ColorF(0.5f, 0.75f, 0.25f, 0.125f);
+            AssertDrawTextWithCorrectColor(ColorF.White, colorTest, AnimationFlags.TextIgnoreColor);
+        }
+
+        private void AssertDrawTextWithCorrectColor(ColorF expected, ColorF colorValue, AnimationFlags flags)
+        {
+            const float Divisor = 255f / 128f;
+            var sequence = new Sequence
+            {
+                AnimationGroups = new List<Sequence.AnimationGroup>
+                {
+                    new Sequence.AnimationGroup
+                    {
+                        Animations = new List<Sequence.Animation>
+                        {
+                            new Sequence.Animation
+                            {
+                                FrameEnd = 100,
+                                Flags =  Sequence.AttachTextFlag,
+                                ColorStart = (colorValue / Divisor).ToRgba(),
+                                ColorEnd = (colorValue / Divisor).ToRgba(),
+                            }
+                        }
+                    }
+                },
+                SpriteGroups = new List<List<Sequence.SpritePart>>
+                {
+                    new List<Sequence.SpritePart>()
+                },
+                Sprites = new List<Sequence.Sprite>()
+            };
+
+            var drawing = Extensions.MockDrawing();
+            var messageProvider = Substitute.For<IMessageProvider>();
+            var messageRenderer = new MockMessageRenderer();
+            var messageEncode = Substitute.For<IMessageEncode>();
+            var spriteTexture = Substitute.For<ISpriteTexture>();
+            var factory = new AnimatedSequenceFactory(
+                drawing,
+                messageProvider,
+                messageRenderer,
+                messageEncode,
+                sequence,
+                spriteTexture);
+
+            messageEncode.Encode(Arg.Is<List<MessageCommandModel>>(x => true))
+                .Returns(new byte[] { 0x21 });
+
+            var animation = factory.Create(new AnimatedSequenceDesc
+            {
+                Flags = flags,
+                MessageText = "test"
+            });
+
+            animation.Draw(0, 0);
+
+            expected = ColorF.FromRgba(expected.ToRgba());
+            Assert.True(messageRenderer.HasBeenCalled);
+            Assert.Equal(expected.R, messageRenderer.LastColor.R, 2);
+            Assert.Equal(expected.G, messageRenderer.LastColor.G, 2);
+            Assert.Equal(expected.B, messageRenderer.LastColor.B, 2);
+            Assert.Equal(expected.A, messageRenderer.LastColor.A, 2);
         }
     }
 }

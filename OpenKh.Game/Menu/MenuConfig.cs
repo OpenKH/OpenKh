@@ -1,4 +1,8 @@
-﻿namespace OpenKh.Game.Menu
+﻿using OpenKh.Game.Infrastructure;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace OpenKh.Game.Menu
 {
     public class MenuConfig : IMenu
     {
@@ -146,28 +150,107 @@
             },
         };
 
+        private readonly AnimatedSequenceFactory _animSeqFactory;
+        private readonly InputManager _inputManager;
+        private IAnimatedSequence _menuSeq;
+        private bool _isClosing;
+
         public int SelectedOption { get; private set; }
 
         public bool IsClosed { get; private set; }
 
+        public MenuConfig(
+            AnimatedSequenceFactory animatedSequenceFactory,
+            InputManager inputManager)
+        {
+            _animSeqFactory = animatedSequenceFactory;
+            _inputManager = inputManager;
+            _menuSeq = InitializeMenu();
+            _menuSeq.Begin();
+        }
+
+        private IAnimatedSequence InitializeMenu()
+        {
+            var list = new List<AnimatedSequenceDesc>();
+            for (var i = 0; i < Rows.Length; i++)
+            {
+                list.Add(new AnimatedSequenceDesc
+                {
+                    SequenceIndexLoop = 279
+                });
+                list.Add(new AnimatedSequenceDesc
+                {
+                    SequenceIndexLoop = OptionAnimations[2].SelectedOption,
+                    StackIndex = 0,
+                    //Children = new List<AnimatedSequenceDesc>
+                    //{
+                    //    new AnimatedSequenceDesc
+                    //    {
+                    //        SequenceIndexLoop = OptionAnimations[2].SelectedOption,
+                    //        StackWidth = AnimatedSequenceDesc.DefaultStacking,
+                    //        StackHeight = 0,
+                    //    },
+                    //    new AnimatedSequenceDesc
+                    //    {
+                    //        SequenceIndexLoop = OptionAnimations[2].SelectedOption,
+                    //        StackWidth = AnimatedSequenceDesc.DefaultStacking,
+                    //        StackHeight = 0,
+                    //    },
+                    //}
+                });
+            }
+
+            return _animSeqFactory.Create(new AnimatedSequenceDesc
+            {
+                SequenceIndexStart = 233,
+                SequenceIndexLoop = 234,
+                SequenceIndexEnd = 235,
+                Children = list
+            });
+        }
+
+        private void ProcessInput(InputManager inputManager)
+        {
+            if (_isClosing)
+                return;
+
+            if (inputManager.IsMenuUp)
+                SelectedOption--;
+            else if (inputManager.IsMenuDown)
+                SelectedOption++;
+            else if (inputManager.IsCircle)
+            {
+                // ignore
+            }
+            else if (inputManager.IsCross)
+                Close();
+        }
+
         public void Open()
         {
-
+            _menuSeq.Begin();
         }
 
         public void Close()
         {
+            _isClosing = true;
+            _menuSeq.End();
         }
 
-        public void Push(IMenu menu)
-        { }
+        public void Push(IMenu subMenu)
+        {
+        }
 
         public void Update(double deltaTime)
         {
+            IsClosed = _menuSeq.IsEnd;
+            _menuSeq.Update(deltaTime);
+            ProcessInput(_inputManager);
         }
 
         public void Draw()
         {
+            _menuSeq.Draw(0, 0);
         }
     }
 }

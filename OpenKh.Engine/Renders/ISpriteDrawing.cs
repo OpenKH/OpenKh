@@ -74,7 +74,32 @@ namespace OpenKh.Engine.Renders
             A = ((rgba >> 24) & 0xff) / 255.0f,
         };
 
+        public static ColorF operator *(ColorF color, float scalar) => new ColorF
+        (
+            color.R * scalar,
+            color.G * scalar,
+            color.B * scalar,
+            color.A * scalar
+        );
+
+        public static ColorF operator /(ColorF color, float scalar) => new ColorF
+        (
+            color.R / scalar,
+            color.G / scalar,
+            color.B / scalar,
+            color.A / scalar
+        );
+
         public override string ToString() => $"({R}, {G}, {B}, {A})";
+    }
+
+    public static class ColorFExtensions
+    {
+        public static uint ToRgba(this ColorF rgba) =>
+            ((uint)(rgba.R * 255f) << 0) |
+            ((uint)(rgba.G * 255f) << 8) |
+            ((uint)(rgba.B * 255f) << 16) |
+            ((uint)(rgba.A * 255f) << 24);
     }
 
     public class SpriteDrawingContext

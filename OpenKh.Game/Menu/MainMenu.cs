@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Renderers;
+using OpenKh.Engine.Renderers;
 using OpenKh.Game.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,6 +97,7 @@ namespace OpenKh.Game.Menu
                                 {
                                     SequenceIndexLoop = 124,
                                     MessageText = "Donald",
+                                    Flags = AnimationFlags.TextIgnoreColor,
                                     TextAnchor = TextAnchor.BottomCenter,
                                 },
                                 new AnimatedSequenceDesc()

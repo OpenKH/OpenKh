@@ -5,7 +5,6 @@ using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
 using OpenKh.Game.States.Title;
-using OpenKh.Kh2;
 using System;
 using System.IO;
 using System.Linq;

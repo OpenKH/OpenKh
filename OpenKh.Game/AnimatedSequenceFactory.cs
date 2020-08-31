@@ -3,11 +3,28 @@ using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace OpenKh.Game
 {
+    internal enum AnimationFlagsDefinitions
+    {
+        ChildTranslateX,
+        ChildStackHorizontally,
+        TextIgnoreColor,
+    }
+
+    [Flags]
+    public enum AnimationFlags
+    {
+        None,
+        ChildTranslateX = 1 << AnimationFlagsDefinitions.ChildTranslateX,
+        ChildStackHorizontally = 1 << AnimationFlagsDefinitions.ChildStackHorizontally,
+        TextIgnoreColor = 1 << AnimationFlagsDefinitions.TextIgnoreColor,
+    }
+
     public interface IAnimatedSequence
     {
         bool IsEnd { get; }
@@ -31,6 +48,7 @@ namespace OpenKh.Game
 
         public float X { get; set; }
         public float Y { get; set; }
+        public AnimationFlags Flags { get; set; }
         public TextAnchor TextAnchor { get; set; }
         public ushort MessageId { get; set; }
         public string MessageText { get; set; }
@@ -131,6 +149,7 @@ namespace OpenKh.Game
             public int StackWidth { get; set; }
             public int StackHeight { get; set; }
             public TextAnchor TextAnchor { get; set; }
+            public AnimationFlags Flags { get; set; }
             public int FrameIndex
             {
                 get => _frame;
@@ -249,12 +268,16 @@ namespace OpenKh.Game
                             break;
                     }
 
+                    var textColor = childContext.Color;
+                    if (Flags.HasFlag(AnimationFlags.TextIgnoreColor))
+                        textColor = ColorF.White;
+
                     _messageRenderer.Draw(new DrawContext
                     {
                         xStart = childContext.PositionX + xPos,
                         x = childContext.PositionX + xPos,
                         y = childContext.PositionY + childContext.TextPositionY + yPos,
-                        Color = childContext.Color,
+                        Color = textColor,
                         Scale = textScale,
                         WidthMultiplier = 1.0f,
                     }, _message);
@@ -368,6 +391,7 @@ namespace OpenKh.Game
             {
                 PositionX = desc.X,
                 PositionY = desc.Y,
+                Flags = desc.Flags,
                 StackIndex = desc.StackIndex,
                 StackWidth = desc.StackWidth,
                 StackHeight = desc.StackHeight,
