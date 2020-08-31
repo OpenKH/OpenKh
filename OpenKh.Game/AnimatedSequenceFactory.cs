@@ -11,7 +11,8 @@ namespace OpenKh.Game
 {
     internal enum AnimationFlagsDefinitions
     {
-        ChildTranslateX,
+        TextTranslateX,
+        NoChildTranslationX,
         ChildStackHorizontally,
         TextIgnoreColor,
     }
@@ -20,7 +21,8 @@ namespace OpenKh.Game
     public enum AnimationFlags
     {
         None,
-        ChildTranslateX = 1 << AnimationFlagsDefinitions.ChildTranslateX,
+        TextTranslateX = 1 << AnimationFlagsDefinitions.TextTranslateX,
+        NoChildTranslationX = 1 << AnimationFlagsDefinitions.NoChildTranslationX,
         ChildStackHorizontally = 1 << AnimationFlagsDefinitions.ChildStackHorizontally,
         TextIgnoreColor = 1 << AnimationFlagsDefinitions.TextIgnoreColor,
     }
@@ -268,6 +270,9 @@ namespace OpenKh.Game
                             break;
                     }
 
+                    if (!Flags.HasFlag(AnimationFlags.TextTranslateX))
+                        xPos += childContext.TextPositionX;
+
                     var textColor = childContext.Color;
                     if (Flags.HasFlag(AnimationFlags.TextIgnoreColor))
                         textColor = ColorF.White;
@@ -283,13 +288,21 @@ namespace OpenKh.Game
                     }, _message);
                 }
 
+                var originalPosX = Flags.HasFlag(AnimationFlags.NoChildTranslationX) ?
+                    0 : childContext.PositionX;
+
                 var originalPosY = childContext.PositionY;
                 for (var i = 0; i < Children.Count; i++)
                 {
                     var child = Children[i] as AnimatedSequence;
+                    childContext.PositionX = originalPosX;
                     childContext.PositionY = originalPosY + childContext.UiPadding * child.StackIndex;
+
+                    if (Flags.HasFlag(AnimationFlags.ChildStackHorizontally))
+                        childContext.PositionX += context.UiSize;
                     child.Draw(childContext);
-                    childContext.PositionX += childContext.TextPositionX;
+
+                    originalPosX += childContext.TextPositionX;
                 }
             }
 

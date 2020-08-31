@@ -206,7 +206,8 @@ namespace OpenKh.Game.Menu
                         StackIndex = _optionCount,
                         StackWidth = 0,
                         StackHeight = AnimatedSequenceDesc.DefaultStacking,
-                        MessageId = MenuOptions[bitIndex]
+                        MessageId = MenuOptions[bitIndex],
+                        Flags = AnimationFlags.TextTranslateX,
                     }
                     : new AnimatedSequenceDesc
                     {
@@ -215,20 +216,21 @@ namespace OpenKh.Game.Menu
                         StackWidth = 0,
                         StackHeight = AnimatedSequenceDesc.DefaultStacking,
                         MessageId = MenuOptions[bitIndex],
+                        Flags = AnimationFlags.TextTranslateX,
                         Children = new List<AnimatedSequenceDesc>
                         {
                             new AnimatedSequenceDesc
                             {
                                 SequenceIndexLoop = 25,
                                 TextAnchor = TextAnchor.BottomLeft,
+                                Flags = AnimationFlags.NoChildTranslationX,
                             },
                             new AnimatedSequenceDesc
                             {
                                 SequenceIndexStart = skipIntro ? -1 : 27,
                                 SequenceIndexLoop = 28,
                                 SequenceIndexEnd = 29,
-                                TextAnchor = TextAnchor.BottomRight,
-                                StackIndex = 1,
+                                Flags = AnimationFlags.ChildStackHorizontally,
                             }
                         }
                     };
