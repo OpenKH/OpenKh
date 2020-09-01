@@ -185,6 +185,75 @@ namespace OpenKh.Tests.Engine
         }
 
         [Fact]
+        public void StackChildrenHorizontally()
+        {
+            var sequence = new Sequence
+            {
+                AnimationGroups = new List<Sequence.AnimationGroup>
+                {
+                    new Sequence.AnimationGroup
+                    {
+                        LightPositionX = 100,
+                        Animations = new List<Sequence.Animation>
+                        {
+                            new Sequence.Animation
+                            {
+                                FrameEnd = 100,
+                                Flags =  Sequence.AttachTextFlag,
+                            }
+                        }
+                    }
+                },
+                SpriteGroups = new List<List<Sequence.SpritePart>>
+                {
+                    new List<Sequence.SpritePart>
+                    {
+                        new Sequence.SpritePart
+                        {
+                            Right = 50,
+                            Bottom = 30,
+                        }
+                    }
+                },
+                Sprites = new List<Sequence.Sprite>()
+                {
+                    new Sequence.Sprite()
+                }
+            };
+
+            var drawing = Extensions.MockDrawing();
+            var messageProvider = Substitute.For<IMessageProvider>();
+            var messageRenderer = new MockMessageRenderer();
+            var messageEncode = Substitute.For<IMessageEncode>();
+            var spriteTexture = Substitute.For<ISpriteTexture>();
+            var factory = new AnimatedSequenceFactory(
+                drawing,
+                messageProvider,
+                messageRenderer,
+                messageEncode,
+                sequence,
+                spriteTexture);
+
+            var animation = factory.Create(new AnimatedSequenceDesc
+            {
+                Flags = AnimationFlags.ChildStackHorizontally,
+                Children = Enumerable.Range(0, 3)
+                    .Select(x => new AnimatedSequenceDesc())
+                    .ToList()
+            });
+
+            animation.Draw(0, 0);
+
+            drawing.AssertAtLeastOneCall();
+            drawing.AssertCallCount(4);
+            drawing.AssertDraw(3, x =>
+            {
+                Assert.Equal(200, x.Vec0.X);
+                Assert.Equal(0, x.Vec0.Y);
+            });
+        }
+
+        [Fact]
         public void DrawTextWithCorrectColor()
         {
             var colorTest = new ColorF(0.5f, 0.75f, 0.25f, 0.125f);

@@ -288,21 +288,19 @@ namespace OpenKh.Game
                     }, _message);
                 }
 
-                var originalPosX = Flags.HasFlag(AnimationFlags.NoChildTranslationX) ?
+                childContext.PositionX = Flags.HasFlag(AnimationFlags.NoChildTranslationX) ?
                     0 : childContext.PositionX;
 
                 var originalPosY = childContext.PositionY;
                 for (var i = 0; i < Children.Count; i++)
                 {
                     var child = Children[i] as AnimatedSequence;
-                    childContext.PositionX = originalPosX;
                     childContext.PositionY = originalPosY + childContext.UiPadding * child.StackIndex;
 
-                    if (Flags.HasFlag(AnimationFlags.ChildStackHorizontally))
-                        childContext.PositionX += context.UiSize;
                     child.Draw(childContext);
 
-                    originalPosX += childContext.TextPositionX;
+                    if (Flags.HasFlag(AnimationFlags.ChildStackHorizontally))
+                        childContext.PositionX += childContext.UiSize;
                 }
             }
 

@@ -25,7 +25,7 @@ namespace OpenKh.Tests.Engine
         public static void AssertCallCount(this ISpriteDrawing drawing, int count)
         {
             var actual = drawing.ReceivedCalls().Count();
-            if (actual == count)
+            if (actual != count)
                 throw new Xunit.Sdk.XunitException($"Expected {count} draw counts, but got {actual}.");
         }
 
