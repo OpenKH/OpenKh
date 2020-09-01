@@ -44,7 +44,8 @@ namespace OpenKh.Engine.Parsers
                     {
                         Indices = x.Indices,
                         SegmentIndex = x.SegmentIndex,
-                        TextureIndex = x.TextureIndex
+                        TextureIndex = x.TextureIndex,
+                        IsOpaque = x.IsOpaque
                     }).ToArray()
                 };
             }
@@ -64,10 +65,11 @@ namespace OpenKh.Engine.Parsers
                     MdlxMatrixUtil.BuildTPoseMatrices(mdlx.SubModels.First(), Matrix.Identity)
                 );
 
-            var ci = builtModel.textureIndexBasedModelDict.Values.Select((model, i) => new Kddf2.Kkdf2MdlxParser.CI
+            var ci = builtModel.textureIndexBasedModelDict.Select((kv, i) => new Kddf2.Kkdf2MdlxParser.CI
             {
-                Indices = model.Vertices.Select((_, index) => index).ToArray(),
-                TextureIndex = i,
+                Indices = kv.Value.Vertices.Select((_, index) => index).ToArray(),
+                TextureIndex = kv.Key.Item1,
+                IsOpaque = kv.Key.Item2,
                 SegmentIndex = i
             });
 
