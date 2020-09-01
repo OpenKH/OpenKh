@@ -128,6 +128,7 @@ namespace OpenKh.Game
 
         private class AnimatedSequence : IAnimatedSequence
         {
+            private static ColorF DefaultColor = new ColorF(1f, 1f, 1f, 1f);
             private readonly Sequence _sequence;
             private readonly SequenceRenderer _renderer;
             private readonly IMessageProvider _messageProvider;
@@ -198,7 +199,7 @@ namespace OpenKh.Game
                 {
                     PositionX = x,
                     PositionY = y,
-                    Color = new ColorF(1f, 1f, 1f, 1f)
+                    Color = DefaultColor
                 });
 
             private void Draw(SequenceRenderer.ChildContext context)
