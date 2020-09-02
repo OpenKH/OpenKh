@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace OpenKh.Game.Menu
 {
-    public class MainMenu : IMenu
+    public class MainMenu : MenuBase
     {
         private const int MaxCharacterCount = 4;
         private const int MaxMenuElementCount = 8;
@@ -34,10 +34,6 @@ namespace OpenKh.Game.Menu
             0x852c, // Riku
         };
 
-        private readonly AnimatedSequenceFactory _animSeqFactory;
-        private readonly InputManager _inputManager;
-        private bool _isClosing;
-        private IMenu _subMenu;
         private IAnimatedSequence _backgroundSeq;
         private IAnimatedSequence _menuSeq;
         private IAnimatedSequence _characterSeq;
@@ -45,7 +41,11 @@ namespace OpenKh.Game.Menu
         private int _optionCount = 0;
         private int _optionSelected = 0;
 
-        public bool IsClosed { get; private set; }
+        protected override bool IsEnd =>
+            _backgroundSeq.IsEnd &&
+            _menuSeq.IsEnd &&
+            _characterSeq.IsEnd;
+
         public int SelectedOption
         {
             get => _optionSelected;
@@ -68,16 +68,15 @@ namespace OpenKh.Game.Menu
 
         public MainMenu(
             AnimatedSequenceFactory animatedSequenceFactory,
-            InputManager inputManager)
+            InputManager inputManager) :
+            base(animatedSequenceFactory, inputManager)
         {
-            _animSeqFactory = animatedSequenceFactory;
-            _inputManager = inputManager;
             InitializeMenu();
         }
 
         private void InitializeMenu()
         {
-            _backgroundSeq = _animSeqFactory.Create(new AnimatedSequenceDesc
+            _backgroundSeq = SequenceFactory.Create(new AnimatedSequenceDesc
             {
                 SequenceIndexStart = 46,
                 SequenceIndexLoop = 47,
@@ -85,7 +84,7 @@ namespace OpenKh.Game.Menu
             });
             _menuSeq = InitializeMenuOptions();
 
-            _characterSeq = _animSeqFactory.Create(Enumerable.Range(0, 5)
+            _characterSeq = SequenceFactory.Create(Enumerable.Range(0, 5)
                 .Select(i => new AnimatedSequenceDesc
                 {
                     SequenceIndexStart = 101,
@@ -173,11 +172,8 @@ namespace OpenKh.Game.Menu
             );
         }
 
-        private void ProcessInput(InputManager inputManager)
+        protected override void ProcessInput(InputManager inputManager)
         {
-            if (_isClosing)
-                return;
-
             if (inputManager.IsMenuUp)
                 SelectedOption--;
             if (inputManager.IsMenuDown)
@@ -187,10 +183,12 @@ namespace OpenKh.Game.Menu
                 switch (SelectedOption)
                 {
                     case 6:
-                        Push(new MenuConfig(_animSeqFactory, _inputManager));
+                        Push(new MenuConfig(
+                            SequenceFactory, InputManager));
                         break;
                     default:
-                        Push(new MenuTemplate(_animSeqFactory, _inputManager, 0));
+                        Push(new MenuTemplate(
+                            SequenceFactory, InputManager, 0));
                         break;
                 }
             }
@@ -254,62 +252,37 @@ namespace OpenKh.Game.Menu
                 _optionCount++;
             }
 
-            return _animSeqFactory.Create(menuDesc);
+            return SequenceFactory.Create(menuDesc);
         }
 
-        public void Open()
+        public override void Open()
         {
-            _isClosing = false;
             _backgroundSeq.Begin();
             _menuSeq.Begin();
             _characterSeq.Begin();
+            base.Open();
         }
 
-        public void Close()
+        public override void Close()
         {
-            _isClosing = true;
             _backgroundSeq.End();
             _menuSeq.End();
             _characterSeq.End();
+            base.Close();
         }
 
-        public void Push(IMenu menu)
+        protected override void MyUpdate(double deltaTime)
         {
-            _subMenu = menu;
-            _subMenu.Open();
+            _backgroundSeq.Update(deltaTime);
+            _menuSeq.Update(deltaTime);
+            _characterSeq.Update(deltaTime);
         }
 
-        public void Update(double deltaTime)
+        protected override void MyDraw()
         {
-            if (_subMenu == null)
-            {
-                _backgroundSeq.Update(deltaTime);
-                _menuSeq.Update(deltaTime);
-                _characterSeq.Update(deltaTime);
-                ProcessInput(_inputManager);
-            }
-            else
-            {
-                _subMenu.Update(deltaTime);
-                if (_subMenu.IsClosed)
-                {
-                    _subMenu = null;
-                    Open();
-                }
-            }
-
-        }
-
-        public void Draw()
-        {
-            if (_subMenu == null)
-            {
-                _backgroundSeq.Draw(0, 0);
-                _menuSeq.Draw(0, 0);
-                _characterSeq.Draw(0, 0);
-            }
-            else
-                _subMenu.Draw();
+            _backgroundSeq.Draw(0, 0);
+            _menuSeq.Draw(0, 0);
+            _characterSeq.Draw(0, 0);
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace OpenKh.Game.Menu
 {
-    public class MenuConfig : IMenu
+    public class MenuConfig : MenuBase
     {
         private const int MaimumOptionPerLine = 3;
         private const int MaimumSettingsPerScreen = 9;
@@ -155,12 +155,11 @@ namespace OpenKh.Game.Menu
             },
         };
 
-        private readonly AnimatedSequenceFactory _animSeqFactory;
-        private readonly InputManager _inputManager;
         private readonly int[] _optionValues = new int[SettingCount];
         private IAnimatedSequence _menuSeq;
-        private bool _isClosing;
         private int _selectedOption;
+
+        protected override bool IsEnd => _menuSeq.IsEnd;
 
         public int SelectedSettingIndex
         {
@@ -176,15 +175,13 @@ namespace OpenKh.Game.Menu
             }
         }
 
-        public bool IsClosed { get; private set; }
-
         public MenuConfig(
             AnimatedSequenceFactory animatedSequenceFactory,
-            InputManager inputManager)
+            InputManager inputManager) :
+            base(animatedSequenceFactory, inputManager)
         {
-            _animSeqFactory = animatedSequenceFactory;
-            _inputManager = inputManager;
-            InvalidateMenu();
+            _menuSeq = InitializeMenu(false);
+            _menuSeq.Begin();
         }
 
         public int GetOptionCount(int settingIndex) => Rows[settingIndex].Options.Length;
@@ -302,7 +299,7 @@ namespace OpenKh.Game.Menu
                 });
             }
 
-            var anim = _animSeqFactory.Create(new AnimatedSequenceDesc
+            var anim = SequenceFactory.Create(new AnimatedSequenceDesc
             {
                 SequenceIndexStart = skipIntro ? -1 : 233,
                 SequenceIndexLoop = 234,
@@ -315,11 +312,8 @@ namespace OpenKh.Game.Menu
             return anim;
         }
 
-        private void ProcessInput(InputManager inputManager)
+        protected override void ProcessInput(InputManager inputManager)
         {
-            if (_isClosing)
-                return;
-
             if (inputManager.IsMenuUp)
                 SelectedSettingIndex--;
             else if (inputManager.IsMenuDown)
@@ -332,35 +326,26 @@ namespace OpenKh.Game.Menu
             {
                 // ignore
             }
-            else if (inputManager.IsCross)
-                Close();
+            else
+                base.ProcessInput(inputManager);
         }
 
-        public void Open()
+        public override void Open()
         {
             _menuSeq.Begin();
+            base.Open();
         }
 
-        public void Close()
+        public override void Close()
         {
-            _isClosing = true;
             _menuSeq.End();
+            base.Close();
         }
 
-        public void Push(IMenu subMenu)
-        {
-        }
-
-        public void Update(double deltaTime)
-        {
-            IsClosed = _menuSeq.IsEnd;
+        protected override void MyUpdate(double deltaTime) =>
             _menuSeq.Update(deltaTime);
-            ProcessInput(_inputManager);
-        }
 
-        public void Draw()
-        {
+        protected override void MyDraw() =>
             _menuSeq.Draw(0, 0);
-        }
     }
 }

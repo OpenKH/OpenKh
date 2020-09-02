@@ -2,34 +2,28 @@ using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.Menu
 {
-    public class MenuTemplate : IMenu
+    public class MenuTemplate : MenuBase
     {
-        private readonly AnimatedSequenceFactory _animSeqFactory;
-        private readonly InputManager _inputManager;
         private readonly int _stackIndex;
-        private bool _isClosing;
-        private IMenu _subMenu;
         private IAnimatedSequence _menuSeq;
 
-        public bool IsClosed { get; private set; }
-        public int SelectedSettingIndex { get; set; }
+        public int SelectedIndex { get; set; }
+        protected override bool IsEnd => _menuSeq.IsEnd;
 
         public MenuTemplate(
             AnimatedSequenceFactory animatedSequenceFactory,
             InputManager inputManager,
-            int stackIndex)
+            int stackIndex) : base(animatedSequenceFactory, inputManager)
         {
-            _animSeqFactory = animatedSequenceFactory;
-            _inputManager = inputManager;
             _stackIndex = stackIndex;
-            _menuSeq = InitializeMenu();
+            _menuSeq = InitializeMenu(false);
         }
 
-        private IAnimatedSequence InitializeMenu()
+        private IAnimatedSequence InitializeMenu(bool skipIntro)
         {
-            return _animSeqFactory.Create(new AnimatedSequenceDesc
+            return SequenceFactory.Create(new AnimatedSequenceDesc
             {
-                SequenceIndexStart = 133,
+                SequenceIndexStart = skipIntro ? -1 : 133,
                 SequenceIndexLoop = 134,
                 SequenceIndexEnd = 135,
                 Flags = AnimationFlags.TextTranslateX |
@@ -38,70 +32,37 @@ namespace OpenKh.Game.Menu
             });
         }
 
-        private void ProcessInput(InputManager inputManager)
+        protected override void ProcessInput(InputManager inputManager)
         {
-            if (_isClosing)
-                return;
-
             if (inputManager.IsMenuUp)
-                SelectedSettingIndex--;
+                SelectedIndex--;
             else if (inputManager.IsMenuDown)
-                SelectedSettingIndex++;
+                SelectedIndex++;
             else if (inputManager.IsCircle)
             {
                 Push(new MenuTemplate(
-                    _animSeqFactory, _inputManager, _stackIndex + 1));
+                    SequenceFactory, InputManager, _stackIndex + 1));
             }
-            else if (inputManager.IsCross)
-                Close();
+            else
+                base.ProcessInput(inputManager);
         }
 
-        public void Open()
+        public override void Open()
         {
             _menuSeq.Begin();
-            _isClosing = false;
+            base.Open();
         }
 
-        public void Close()
+        public override void Close()
         {
-            _isClosing = true;
             _menuSeq.End();
+            base.Close();
         }
 
-        public void Push(IMenu subMenu)
-        {
-            _subMenu = subMenu;
-            _subMenu.Open();
-            Close();
-        }
+        protected override void MyUpdate(double deltaTime) =>
+            _menuSeq.Update(deltaTime);
 
-        public void Update(double deltaTime)
-        {
-            if (!_menuSeq.IsEnd)
-                _menuSeq.Update(deltaTime);
-
-            if (_subMenu == null)
-            {
-                ProcessInput(_inputManager);
-                IsClosed = _menuSeq.IsEnd;
-            }
-            else
-            {
-                _subMenu.Update(deltaTime);
-                if (_subMenu.IsClosed)
-                {
-                    _subMenu = null;
-                    Open();
-                }
-            }
-        }
-
-        public void Draw()
-        {
-            if (_subMenu == null || !_menuSeq.IsEnd)
-                _menuSeq.Draw(0, 0);
-            else
-                _subMenu.Draw();
-        }
+        protected override void MyDraw() => 
+            _menuSeq.Draw(0, 0);
     }
 }
