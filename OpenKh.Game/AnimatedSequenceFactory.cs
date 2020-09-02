@@ -235,7 +235,7 @@ namespace OpenKh.Game
 
                 if (_message != null)
                 {
-                    const float UiTextScale = 0.75f;
+                    const float UiTextScale = 0.7f;
                     float textScale = context.TextScale == 0 ? UiTextScale : (context.TextScale / 22f);
 
                     var fakeTextDrawContext = new DrawContext

@@ -177,7 +177,7 @@ namespace OpenKh.Engine.Renders
                     spacing = 0;
                 }
 
-                context.x += spacing * context.WidthMultiplier * context.Scale;
+                context.x += spacing * context.ScaleX;
             }
         }
 
@@ -219,7 +219,7 @@ namespace OpenKh.Engine.Renders
             DrawImage(_spriteIcon, context.x, context.y, sourceX, sourceY, IconWidth, IconHeight, 1.0, 1.0, new ColorF(1.0f, 1.0f, 1.0f, 1.0f));
 
         protected void DrawImageScale(DrawContext context, ISpriteTexture texture, int sourceX, int sourceY, int width, int height) =>
-            DrawImage(texture, context.x, context.y, sourceX, sourceY, width, height, context.WidthMultiplier * context.Scale, context.Scale, context.Color);
+            DrawImage(texture, context.x, context.y, sourceX, sourceY, width, height, context.ScaleX, context.Scale, context.Color);
 
         protected void DrawImage(ISpriteTexture texture, double x, double y, int sourceX, int sourceY, int width, int height, double scaleX, double scaleY, ColorF color) =>
             _drawing.AppendSprite(new SpriteDrawingContext()
