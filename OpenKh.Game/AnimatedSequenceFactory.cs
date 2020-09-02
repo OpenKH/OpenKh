@@ -17,6 +17,7 @@ namespace OpenKh.Game
         StackNextChildHorizontally,
         StackNextChildVertically,
         TextIgnoreColor,
+        TextIgnoreScaling,
     }
 
     [Flags]
@@ -29,6 +30,7 @@ namespace OpenKh.Game
         StackNextChildHorizontally = 1 << AnimationFlagsDefinitions.StackNextChildHorizontally,
         StackNextChildVertically = 1 << AnimationFlagsDefinitions.StackNextChildVertically,
         TextIgnoreColor = 1 << AnimationFlagsDefinitions.TextIgnoreColor,
+        TextIgnoreScaling = 1 << AnimationFlagsDefinitions.TextIgnoreScaling,
     }
 
     public interface IAnimatedSequence
@@ -236,7 +238,8 @@ namespace OpenKh.Game
                 if (_message != null)
                 {
                     const float UiTextScale = 0.7f;
-                    float textScale = context.TextScale == 0 ? UiTextScale : (context.TextScale / 22f);
+                    float textScale = context.TextScale == 0 || Flags.HasFlag(AnimationFlags.TextIgnoreScaling) ?
+                        UiTextScale : (context.TextScale / 22f);
 
                     var fakeTextDrawContext = new DrawContext
                     {

@@ -296,6 +296,7 @@ namespace OpenKh.Game.Menu
                     Flags = AnimationFlags.NoChildTranslationX |
                         AnimationFlags.TextTranslateX |
                         AnimationFlags.TextIgnoreColor |
+                        AnimationFlags.TextIgnoreScaling |
                         AnimationFlags.StackNextChildHorizontally,
                     Children = optionList
                 });
