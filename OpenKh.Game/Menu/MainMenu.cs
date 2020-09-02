@@ -9,7 +9,6 @@ namespace OpenKh.Game.Menu
     {
         private const int MaxCharacterCount = 4;
         private const int MaxMenuElementCount = 8;
-        private const int MenuOptionSelectedSeq = 132;
         private const int CharacterHpBar = 98;
         private const int CharacterMpBar = 99;
         private const int MsgLv = 0x39FC;
@@ -224,7 +223,8 @@ namespace OpenKh.Game.Menu
                     }
                     : new AnimatedSequenceDesc
                     {
-                        SequenceIndexLoop = MenuOptionSelectedSeq,
+                        SequenceIndexLoop = 132,
+                        SequenceIndexEnd = 135,
                         StackIndex = _optionCount,
                         StackWidth = 0,
                         StackHeight = AnimatedSequenceDesc.DefaultStacking,
