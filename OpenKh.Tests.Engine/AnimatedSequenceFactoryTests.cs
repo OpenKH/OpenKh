@@ -343,7 +343,8 @@ namespace OpenKh.Tests.Engine
         public void DrawTextWithDefaultColor()
         {
             var colorTest = new ColorF(0.5f, 0.75f, 0.25f, 0.125f);
-            AssertDrawTextWithCorrectColor(ColorF.White, colorTest, AnimationFlags.TextIgnoreColor);
+            var expectedColor = new ColorF(1f, 1f, 1f, colorTest.A);
+            AssertDrawTextWithCorrectColor(expectedColor, colorTest, AnimationFlags.TextIgnoreColor);
         }
 
         private void AssertDrawTextWithCorrectColor(ColorF expected, ColorF colorValue, AnimationFlags flags)

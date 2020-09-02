@@ -285,7 +285,7 @@ namespace OpenKh.Game
 
                     var textColor = childContext.Color;
                     if (Flags.HasFlag(AnimationFlags.TextIgnoreColor))
-                        textColor = ColorF.White;
+                        textColor = new ColorF(1f, 1f, 1f, textColor.A);
 
                     _messageRenderer.Draw(new DrawContext
                     {
