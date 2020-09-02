@@ -293,7 +293,8 @@ namespace OpenKh.Game.Menu
                     MessageId = setting.Title,
                     TextAnchor = TextAnchor.BottomCenter,
                     StackIndex = i,
-                    Flags = AnimationFlags.TextTranslateX |
+                    Flags = AnimationFlags.NoChildTranslationX |
+                        AnimationFlags.TextTranslateX |
                         AnimationFlags.TextIgnoreColor |
                         AnimationFlags.StackNextChildHorizontally,
                     Children = optionList

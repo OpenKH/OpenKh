@@ -296,7 +296,7 @@ namespace OpenKh.Game
                 }
 
                 childContext.PositionX = Flags.HasFlag(AnimationFlags.NoChildTranslationX) ?
-                    0 : childContext.PositionX;
+                    context.PositionX : childContext.PositionX;
 
                 var originalPosY = childContext.PositionY;
                 for (var i = 0; i < Children.Count; i++)
