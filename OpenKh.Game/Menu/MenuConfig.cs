@@ -1,13 +1,15 @@
-﻿using OpenKh.Game.Infrastructure;
+﻿using OpenKh.Engine.Renderers;
+using OpenKh.Game.Infrastructure;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace OpenKh.Game.Menu
 {
     public class MenuConfig : IMenu
     {
         private const int MaimumOptionPerLine = 3;
-        private const int OptionCount = 10;
+        private const int MaimumSettingsPerScreen = 9;
+        private const int SettingCount = 10;
 
         private struct OptionAnimation
         {
@@ -18,16 +20,16 @@ namespace OpenKh.Game.Menu
 
         private struct OptionRow
         {
-            public int Title;
+            public ushort Title;
             public OptionEntry[] Options;
         }
 
         private struct OptionEntry
         {
-            public int Name;
-            public int Desc;
+            public ushort Name;
+            public ushort Desc;
 
-            public OptionEntry(int name, int desc)
+            public OptionEntry(ushort name, ushort desc)
             {
                 Name = name;
                 Desc = desc;
@@ -55,7 +57,7 @@ namespace OpenKh.Game.Menu
             new OptionAnimation { UnselectedOption = 257, SelectedOption = 258, Cursor = 256 },
         };
 
-        private static readonly OptionRow[] Rows = new OptionRow[OptionCount]
+        private static readonly OptionRow[] Rows = new OptionRow[SettingCount]
         {
             new OptionRow
             {
@@ -118,7 +120,7 @@ namespace OpenKh.Game.Menu
                 Options = new OptionEntry[]
                 {
                     new OptionEntry(0x372a, 0x372c),
-                    new OptionEntry(0x372b, 0x372d),
+                    new OptionEntry(0x3752, 0x372d),
                 }
             },
             new OptionRow
@@ -136,8 +138,8 @@ namespace OpenKh.Game.Menu
                 Title = 0x371c,
                 Options = new OptionEntry[]
                 {
-                    new OptionEntry(0x3724, 0x3736),
-                    new OptionEntry(0x3725, 0x3737),
+                    new OptionEntry(0x3734, 0x3736),
+                    new OptionEntry(0x3735, 0x3737),
                 }
             },
             new OptionRow
@@ -145,6 +147,9 @@ namespace OpenKh.Game.Menu
                 Title = 0x371d,
                 Options = new OptionEntry[]
                 {
+                    new OptionEntry(0x3738, 0x373b),
+                    new OptionEntry(0x3739, 0x373c),
+                    new OptionEntry(0x373a, 0x373d),
                     new OptionEntry(0x4e30, 0x4e31),
                 }
             },
@@ -152,10 +157,24 @@ namespace OpenKh.Game.Menu
 
         private readonly AnimatedSequenceFactory _animSeqFactory;
         private readonly InputManager _inputManager;
+        private readonly int[] _optionValues = new int[SettingCount];
         private IAnimatedSequence _menuSeq;
         private bool _isClosing;
+        private int _selectedOption;
 
-        public int SelectedOption { get; private set; }
+        public int SelectedSettingIndex
+        {
+            get => _selectedOption;
+            private set
+            {
+                value = value < 0 ? SettingCount - 1 : value % SettingCount;
+                if (_selectedOption != value)
+                {
+                    _selectedOption = value;
+                    InvalidateMenu();
+                }
+            }
+        }
 
         public bool IsClosed { get; private set; }
 
@@ -165,48 +184,133 @@ namespace OpenKh.Game.Menu
         {
             _animSeqFactory = animatedSequenceFactory;
             _inputManager = inputManager;
-            _menuSeq = InitializeMenu();
+            InvalidateMenu();
+        }
+
+        public int GetOptionCount(int settingIndex) => Rows[settingIndex].Options.Length;
+        public int GetSelectedOption(int settingIndex) => _optionValues[settingIndex];
+        public void SetSelectedOption(int settingIndex, int value)
+        {
+            var optionCount = GetOptionCount(settingIndex);
+            if (value < 0)
+                value = optionCount - 1;
+            else
+                value %= optionCount;
+
+            if (_optionValues[settingIndex] != value)
+            {
+                _optionValues[settingIndex] = value;
+                InvalidateMenu();
+            }
+        }
+
+        private void InvalidateMenu()
+        {
+            _menuSeq = InitializeMenu(true);
             _menuSeq.Begin();
         }
 
-        private IAnimatedSequence InitializeMenu()
+        private IAnimatedSequence InitializeMenu(bool skipIntro = false)
         {
-            var list = new List<AnimatedSequenceDesc>();
-            for (var i = 0; i < Rows.Length; i++)
+            var settingList = new List<AnimatedSequenceDesc>();
+            var displaySettingStart = Math.Max(SelectedSettingIndex - MaimumSettingsPerScreen + 1, 0);
+            var displaySettingCount = Math.Min(SettingCount, MaimumSettingsPerScreen);
+
+            for (var i = displaySettingStart; i < displaySettingStart + displaySettingCount; i++)
             {
-                list.Add(new AnimatedSequenceDesc
+                var setting = Rows[i];
+                var optionAnimations = OptionAnimations[setting.Options.Length switch
                 {
-                    SequenceIndexLoop = 279
-                });
-                list.Add(new AnimatedSequenceDesc
+                    2 => 1,
+                    3 => 2,
+                    _ => 0,
+                }];
+                var displayOptionCount = setting.Options.Length <= MaimumOptionPerLine ?
+                    setting.Options.Length : 1;
+
+                var optionList = new List<AnimatedSequenceDesc>();
+                for (var j = 0; j < displayOptionCount; j++)
                 {
-                    SequenceIndexLoop = OptionAnimations[2].SelectedOption,
-                    StackIndex = 0,
-                    //Children = new List<AnimatedSequenceDesc>
-                    //{
-                    //    new AnimatedSequenceDesc
-                    //    {
-                    //        SequenceIndexLoop = OptionAnimations[2].SelectedOption,
-                    //        StackWidth = AnimatedSequenceDesc.DefaultStacking,
-                    //        StackHeight = 0,
-                    //    },
-                    //    new AnimatedSequenceDesc
-                    //    {
-                    //        SequenceIndexLoop = OptionAnimations[2].SelectedOption,
-                    //        StackWidth = AnimatedSequenceDesc.DefaultStacking,
-                    //        StackHeight = 0,
-                    //    },
-                    //}
+                    if (j == GetSelectedOption(i))
+                    {
+                        if (i == SelectedSettingIndex)
+                        {
+                            optionList.Add(new AnimatedSequenceDesc
+                            {
+                                SequenceIndexLoop = optionAnimations.SelectedOption,
+                                TextAnchor = TextAnchor.BottomCenter,
+                                MessageId = setting.Options[j].Name,
+                                Children = new List<AnimatedSequenceDesc>
+                                {
+                                    new AnimatedSequenceDesc
+                                    {
+                                        SequenceIndexLoop = optionAnimations.Cursor,
+                                        Flags = AnimationFlags.TextTranslateX |
+                                            AnimationFlags.ChildStackHorizontally,
+                                        Children = new List<AnimatedSequenceDesc>
+                                        {
+                                            new AnimatedSequenceDesc
+                                            {
+                                                SequenceIndexLoop = 25,
+                                                TextAnchor = TextAnchor.BottomLeft,
+                                                Flags = AnimationFlags.NoChildTranslationX,
+                                            },
+                                            new AnimatedSequenceDesc
+                                            {
+                                                SequenceIndexStart = skipIntro ? -1 : 27,
+                                                SequenceIndexLoop = 28,
+                                                SequenceIndexEnd = 29,
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            optionList.Add(new AnimatedSequenceDesc
+                            {
+                                SequenceIndexLoop = optionAnimations.SelectedOption,
+                                TextAnchor = TextAnchor.BottomCenter,
+                                MessageId = setting.Options[j].Name,
+                            });
+                        }
+                    }
+                    else
+                    {
+                        optionList.Add(new AnimatedSequenceDesc
+                        {
+                            SequenceIndexLoop = optionAnimations.UnselectedOption,
+                            TextAnchor = TextAnchor.BottomCenter,
+                            MessageId = setting.Options[j].Name,
+                        });
+                    }
+                }
+
+                settingList.Add(new AnimatedSequenceDesc
+                {
+                    SequenceIndexLoop = 279,
+                    MessageId = setting.Title,
+                    TextAnchor = TextAnchor.BottomCenter,
+                    StackIndex = i,
+                    Flags = AnimationFlags.TextTranslateX |
+                        AnimationFlags.TextIgnoreColor |
+                        AnimationFlags.StackNextChildHorizontally,
+                    Children = optionList
                 });
             }
 
-            return _animSeqFactory.Create(new AnimatedSequenceDesc
+            var anim = _animSeqFactory.Create(new AnimatedSequenceDesc
             {
-                SequenceIndexStart = 233,
+                SequenceIndexStart = skipIntro ? -1 : 233,
                 SequenceIndexLoop = 234,
                 SequenceIndexEnd = 235,
-                Children = list
+                Flags = AnimationFlags.StackNextChildVertically,
+                Children = settingList
             });
+            anim.Begin();
+
+            return anim;
         }
 
         private void ProcessInput(InputManager inputManager)
@@ -215,9 +319,13 @@ namespace OpenKh.Game.Menu
                 return;
 
             if (inputManager.IsMenuUp)
-                SelectedOption--;
+                SelectedSettingIndex--;
             else if (inputManager.IsMenuDown)
-                SelectedOption++;
+                SelectedSettingIndex++;
+            else if (inputManager.IsMenuLeft)
+                SetSelectedOption(SelectedSettingIndex, GetSelectedOption(SelectedSettingIndex) - 1);
+            else if (inputManager.IsMenuRight)
+                SetSelectedOption(SelectedSettingIndex, GetSelectedOption(SelectedSettingIndex) + 1);
             else if (inputManager.IsCircle)
             {
                 // ignore

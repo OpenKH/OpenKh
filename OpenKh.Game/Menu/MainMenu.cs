@@ -177,7 +177,15 @@ namespace OpenKh.Game.Menu
                 SelectedOption++;
             if (inputManager.IsCircle)
             {
-                Push(new MenuTemplate(_animSeqFactory, _inputManager, 0));
+                switch (SelectedOption)
+                {
+                    case 6:
+                        Push(new MenuConfig(_animSeqFactory, _inputManager));
+                        break;
+                    default:
+                        Push(new MenuTemplate(_animSeqFactory, _inputManager, 0));
+                        break;
+                }
             }
         }
 

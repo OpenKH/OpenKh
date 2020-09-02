@@ -3,7 +3,6 @@
     public interface IMenu
     {
         bool IsClosed { get; }
-        int SelectedOption { get; }
 
         void Open();
         void Close();

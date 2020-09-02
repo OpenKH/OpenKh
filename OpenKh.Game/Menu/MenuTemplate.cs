@@ -12,7 +12,7 @@ namespace OpenKh.Game.Menu
         private IAnimatedSequence _menuSeq;
 
         public bool IsClosed { get; private set; }
-        public int SelectedOption { get; set; }
+        public int SelectedSettingIndex { get; set; }
 
         public MenuTemplate(
             AnimatedSequenceFactory animatedSequenceFactory,
@@ -42,9 +42,9 @@ namespace OpenKh.Game.Menu
                 return;
 
             if (inputManager.IsMenuUp)
-                SelectedOption--;
+                SelectedSettingIndex--;
             else if (inputManager.IsMenuDown)
-                SelectedOption++;
+                SelectedSettingIndex++;
             else if (inputManager.IsCircle)
             {
                 Push(new MenuTemplate(
