@@ -38,6 +38,7 @@ namespace OpenKh.Game.Menu
         private readonly InputManager _inputManager;
         private bool _isClosing;
         private IMenu _subMenu;
+        private IAnimatedSequence _backgroundSeq;
         private IAnimatedSequence _menuSeq;
         private IAnimatedSequence _characterSeq;
 
@@ -76,6 +77,12 @@ namespace OpenKh.Game.Menu
 
         private void InitializeMenu()
         {
+            _backgroundSeq = _animSeqFactory.Create(new AnimatedSequenceDesc
+            {
+                SequenceIndexStart = 46,
+                SequenceIndexLoop = 47,
+                SequenceIndexEnd = 48,
+            });
             _menuSeq = InitializeMenuOptions();
 
             _characterSeq = _animSeqFactory.Create(Enumerable.Range(0, 5)
@@ -253,6 +260,7 @@ namespace OpenKh.Game.Menu
         public void Open()
         {
             _isClosing = false;
+            _backgroundSeq.Begin();
             _menuSeq.Begin();
             _characterSeq.Begin();
         }
@@ -260,6 +268,7 @@ namespace OpenKh.Game.Menu
         public void Close()
         {
             _isClosing = true;
+            _backgroundSeq.End();
             _menuSeq.End();
             _characterSeq.End();
         }
@@ -274,6 +283,7 @@ namespace OpenKh.Game.Menu
         {
             if (_subMenu == null)
             {
+                _backgroundSeq.Update(deltaTime);
                 _menuSeq.Update(deltaTime);
                 _characterSeq.Update(deltaTime);
                 ProcessInput(_inputManager);
@@ -294,6 +304,7 @@ namespace OpenKh.Game.Menu
         {
             if (_subMenu == null)
             {
+                _backgroundSeq.Draw(0, 0);
                 _menuSeq.Draw(0, 0);
                 _characterSeq.Draw(0, 0);
             }

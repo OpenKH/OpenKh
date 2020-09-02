@@ -76,12 +76,6 @@ namespace OpenKh.Game.States
             {
                 new AnimatedSequenceDesc
                 {
-                    SequenceIndexStart = 46,
-                    SequenceIndexLoop = 47,
-                    SequenceIndexEnd = 48,
-                },
-                new AnimatedSequenceDesc
-                {
                     SequenceIndexStart = 107,
                     SequenceIndexLoop = 108,
                     SequenceIndexEnd = 109,
