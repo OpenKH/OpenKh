@@ -197,7 +197,9 @@ namespace OpenKh.Game
             
             public void Update(double deltaTime)
             {
-                _frame++;
+                if (!IsEnd)
+                    _frame++;
+
                 foreach (var child in Children)
                     child.Update(deltaTime);
             }
@@ -217,7 +219,7 @@ namespace OpenKh.Game
                 var anotherPosY = (StackHeight != AnimatedSequenceDesc.DefaultStacking ?
                     StackHeight : AnimGroup.TextPositionX) * StackIndex;
 
-                if (!IsEnd && !_renderer.Draw(
+                if (!_renderer.Draw(
                     _anim,
                     _frame,
                     PositionX + anotherPosX + context.PositionX,
