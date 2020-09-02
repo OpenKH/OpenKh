@@ -32,6 +32,8 @@ namespace OpenKh.Game.Menu
                 SequenceIndexStart = 133,
                 SequenceIndexLoop = 134,
                 SequenceIndexEnd = 135,
+                Flags = AnimationFlags.TextTranslateX |
+                    AnimationFlags.ChildStackHorizontally,
                 MessageText = $"Template {_stackIndex}"
             });
         }
