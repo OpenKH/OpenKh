@@ -1,4 +1,4 @@
-﻿using OpenKh.Game.Infrastructure;
+using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.Menu
 {
@@ -59,6 +59,7 @@ namespace OpenKh.Game.Menu
         public void Open()
         {
             _menuSeq.Begin();
+            _isClosing = false;
         }
 
         public void Close()
@@ -71,16 +72,18 @@ namespace OpenKh.Game.Menu
         {
             _subMenu = subMenu;
             _subMenu.Open();
+            Close();
         }
 
         public void Update(double deltaTime)
         {
-            IsClosed = _menuSeq.IsEnd;
+            if (!_menuSeq.IsEnd)
+                _menuSeq.Update(deltaTime);
 
             if (_subMenu == null)
             {
-                _menuSeq.Update(deltaTime);
                 ProcessInput(_inputManager);
+                IsClosed = _menuSeq.IsEnd;
             }
             else
             {
@@ -95,7 +98,7 @@ namespace OpenKh.Game.Menu
 
         public void Draw()
         {
-            if (_subMenu == null)
+            if (_subMenu == null || !_menuSeq.IsEnd)
                 _menuSeq.Draw(0, 0);
             else
                 _subMenu.Draw();
