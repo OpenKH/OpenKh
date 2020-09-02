@@ -1,6 +1,4 @@
-﻿using Castle.DynamicProxy.Generators;
-using NSubstitute;
-using NSubstitute.Extensions;
+﻿using NSubstitute;
 using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
@@ -250,6 +248,87 @@ namespace OpenKh.Tests.Engine
             {
                 Assert.Equal(200, x.Vec0.X);
                 Assert.Equal(0, x.Vec0.Y);
+            });
+        }
+
+        [Theory]
+        [InlineData(AnimationFlags.None, 100, 4, 0, 0)]
+        [InlineData(AnimationFlags.StackNextChildHorizontally, 100, 4, 300, 0)]
+        [InlineData(AnimationFlags.StackNextChildVertically, 120, 4, 0, 360)]
+        public void StackItemsFromChildSize(AnimationFlags flags, int uiPadding,
+            int elementCount, int expectedLastPosX, int expectedLastPosY)
+        {
+            var sequence = new Sequence
+            {
+                AnimationGroups = new List<Sequence.AnimationGroup>
+                {
+                    new Sequence.AnimationGroup
+                    {
+                        UiPadding = 0,
+                        Animations = new List<Sequence.Animation>()
+                    },
+                    new Sequence.AnimationGroup
+                    {
+                        UiPadding = uiPadding,
+                        Animations = new List<Sequence.Animation>
+                        {
+                            new Sequence.Animation
+                            {
+                                FrameEnd = 100,
+                                Flags =  Sequence.AttachTextFlag,
+                            }
+                        }
+                    },
+                },
+                SpriteGroups = new List<List<Sequence.SpritePart>>
+                {
+                    new List<Sequence.SpritePart>
+                    {
+                        new Sequence.SpritePart
+                        {
+                            Right = 50,
+                            Bottom = 30,
+                        }
+                    }
+                },
+                Sprites = new List<Sequence.Sprite>()
+                {
+                    new Sequence.Sprite()
+                }
+            };
+
+            var drawing = Extensions.MockDrawing();
+            var messageProvider = Substitute.For<IMessageProvider>();
+            var messageRenderer = new MockMessageRenderer();
+            var messageEncode = Substitute.For<IMessageEncode>();
+            var spriteTexture = Substitute.For<ISpriteTexture>();
+            var factory = new AnimatedSequenceFactory(
+                drawing,
+                messageProvider,
+                messageRenderer,
+                messageEncode,
+                sequence,
+                spriteTexture);
+
+            var animation = factory.Create(new AnimatedSequenceDesc
+            {
+                Flags = flags,
+                Children = Enumerable.Range(0, elementCount)
+                    .Select(x => new AnimatedSequenceDesc
+                    {
+                        SequenceIndexLoop = 1,
+                    })
+                    .ToList()
+            });
+
+            animation.Begin();
+            animation.Draw(0, 0);
+
+            drawing.AssertCallCount(4);
+            drawing.AssertDraw(3, x =>
+            {
+                Assert.Equal(expectedLastPosX, x.Vec0.X);
+                Assert.Equal(expectedLastPosY, x.Vec0.Y);
             });
         }
 

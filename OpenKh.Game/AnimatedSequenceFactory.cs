@@ -14,6 +14,8 @@ namespace OpenKh.Game
         TextTranslateX,
         NoChildTranslationX,
         ChildStackHorizontally,
+        StackNextChildHorizontally,
+        StackNextChildVertically,
         TextIgnoreColor,
     }
 
@@ -24,6 +26,8 @@ namespace OpenKh.Game
         TextTranslateX = 1 << AnimationFlagsDefinitions.TextTranslateX,
         NoChildTranslationX = 1 << AnimationFlagsDefinitions.NoChildTranslationX,
         ChildStackHorizontally = 1 << AnimationFlagsDefinitions.ChildStackHorizontally,
+        StackNextChildHorizontally = 1 << AnimationFlagsDefinitions.StackNextChildHorizontally,
+        StackNextChildVertically = 1 << AnimationFlagsDefinitions.StackNextChildVertically,
         TextIgnoreColor = 1 << AnimationFlagsDefinitions.TextIgnoreColor,
     }
 
@@ -167,6 +171,8 @@ namespace OpenKh.Game
             public Sequence.AnimationGroup AnimGroup =>
                 _sequence.AnimationGroups[_anim];
 
+            public float UiSize => AnimGroup.UiPadding;
+
             public AnimatedSequence(
                 ISpriteDrawing drawing,
                 IMessageProvider messageProvider,
@@ -302,6 +308,11 @@ namespace OpenKh.Game
 
                     if (Flags.HasFlag(AnimationFlags.ChildStackHorizontally))
                         childContext.PositionX += childContext.UiSize;
+
+                    if (Flags.HasFlag(AnimationFlags.StackNextChildHorizontally))
+                        childContext.PositionX += child.UiSize;
+                    if (Flags.HasFlag(AnimationFlags.StackNextChildVertically))
+                        originalPosY += child.UiSize;
                 }
             }
 
