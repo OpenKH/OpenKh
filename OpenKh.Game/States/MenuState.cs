@@ -30,9 +30,15 @@ namespace OpenKh.Game.States
         private Kh2MessageRenderer _messageRenderer;
         private IMenu _subMenu;
 
+        public IGameContext GameContext { get; }
         public AnimatedSequenceFactory SequenceFactory { get; private set; }
         public InputManager InputManager { get; private set; }
         public bool IsMenuOpen { get; private set; }
+
+        public MenuState(IGameContext gameContext)
+        {
+            GameContext = gameContext;
+        }
 
         public void Initialize(StateInitDesc initDesc)
         {
@@ -212,6 +218,11 @@ namespace OpenKh.Game.States
 
         public void SetElementDescription(ushort messageId)
         {
+        }
+
+        public void CloseAllMenu()
+        {
+            _subMenu.Close();
         }
 
         public void Update(DeltaTimes deltaTimes)

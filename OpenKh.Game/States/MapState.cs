@@ -14,7 +14,7 @@ using OpenKh.Engine.MonoGame;
 
 namespace OpenKh.Game.States
 {
-    public class MapState : IState
+    public class MapState : IState, IGameContext
     {
         private readonly static BlendState DefaultBlendState = new BlendState()
         {
@@ -29,11 +29,12 @@ namespace OpenKh.Game.States
             IndependentBlendEnable = false
         };
 
-        private Kernel _kernel;
+        public Kernel Kernel { get; private set; }
         private IDataContent _dataContent;
         private ArchiveManager _archiveManager;
         private GraphicsDeviceManager _graphics;
         private InputManager _input;
+        private IStateChange _stateChange;
         private List<MeshGroup> _models = new List<MeshGroup>();
         private List<MeshGroup> _bobModels = new List<MeshGroup>();
         private KingdomShader _shader;
@@ -48,21 +49,23 @@ namespace OpenKh.Game.States
         private List<ObjectEntity> _objectEntities = new List<ObjectEntity>();
         private List<BobEntity> _bobEntities = new List<BobEntity>();
 
-        private MenuState _menuState = new MenuState();
+        private MenuState _menuState;
 
         public void Initialize(StateInitDesc initDesc)
         {
-            _kernel = initDesc.Kernel;
+            Kernel = initDesc.Kernel;
             _dataContent = initDesc.DataContent;
             _archiveManager = initDesc.ArchiveManager;
             _graphics = initDesc.GraphicsDevice;
             _input = initDesc.InputManager;
+            _stateChange = initDesc.StateChange;
             _shader = new KingdomShader(initDesc.ContentManager);
             _camera = new Camera()
             {
                 CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
+            _menuState = new MenuState(this);
 
             BasicallyForceToReloadEverything();
             _menuState.Initialize(initDesc);
@@ -253,12 +256,7 @@ namespace OpenKh.Game.States
         {
             Log.Info($"Map={worldIndex},{placeIndex}");
 
-            string fileName;
-            if (_kernel.IsReMix)
-                fileName = $"map/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
-            else
-                fileName = $"map/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
-
+            var fileName = Kernel.GetMapFileName(worldIndex, placeIndex);
             var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
@@ -281,8 +279,8 @@ namespace OpenKh.Game.States
         private void LoadMapArd(int worldIndex, int placeIndex)
         {
             string fileName;
-            if (_kernel.IsReMix)
-                fileName = $"ard/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
+            if (Kernel.IsReMix)
+                fileName = $"ard/{Kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
             else
                 fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
 
@@ -327,7 +325,7 @@ namespace OpenKh.Game.States
 
         private void SpawnEntity(SpawnPoint.Entity entityDesc)
         {
-            var entity = ObjectEntity.FromSpawnPoint(_kernel, entityDesc);
+            var entity = ObjectEntity.FromSpawnPoint(Kernel, entityDesc);
             entity.LoadMesh(_graphics.GraphicsDevice);
 
             _objectEntities.Add(entity);
@@ -360,6 +358,16 @@ namespace OpenKh.Game.States
             _models.Add(mesh);
         }
 
+        public void LoadTitleScreen() => _stateChange.State = 0;
+
+        public void LoadPlace(int worldId, int placeId, int spawnIndex)
+        {
+            _worldId = worldId;
+            _placeId = placeId;
+            _spawnId = spawnIndex;
+
+            BasicallyForceToReloadEverything();
+        }
 
         #region DEBUG
 
@@ -387,7 +395,7 @@ namespace OpenKh.Game.States
                     if (_places == null)
                         _places = DebugLoadPlaceList();
 
-                    _debugObjentryCursor = _kernel.ObjEntries
+                    _debugObjentryCursor = Kernel.ObjEntries
                         .Select((entry, i) => new { entry, i })
                         .FirstOrDefault(x => x.entry.ObjectId == _objEntryId)?.i ?? 0;
                 }
@@ -481,7 +489,7 @@ namespace OpenKh.Game.States
             }
         }
 
-        private DebugPlace[] DebugLoadPlaceList() => _kernel.Places
+        private DebugPlace[] DebugLoadPlaceList() => Kernel.Places
             .Select(x => new
             {
                 World = x.Key,

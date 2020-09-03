@@ -103,6 +103,10 @@ namespace OpenKh.Game.Infrastructure
             }
         }
 
+        public string GetMapFileName(int worldIndex, int placeIndex) => IsReMix
+            ? $"map/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map"
+            : $"map/{Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
+
         private T LoadFile<T>(string fileName, Func<Stream, T> action)
         {
             using var stream = DataContent.FileOpen(fileName);

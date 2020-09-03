@@ -4,6 +4,7 @@ namespace OpenKh.Game.Menu
 {
     public interface IMenuManager
     {
+        IGameContext GameContext { get; }
         AnimatedSequenceFactory SequenceFactory { get; }
         InputManager InputManager { get; }
 
@@ -11,5 +12,6 @@ namespace OpenKh.Game.Menu
         void PushSubMenuDescription(string message);
         void PopSubMenuDescription();
         void SetElementDescription(ushort messageId);
+        void CloseAllMenu();
     }
 }

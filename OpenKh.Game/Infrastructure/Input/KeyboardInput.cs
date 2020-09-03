@@ -71,8 +71,8 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool LeftShoulder => keyboard.IsKeyDown(Keys.LeftShift);
         public bool RightShoulder => keyboard.IsKeyDown(Keys.Tab);
 
-        public bool LeftTrigger => throw new NotImplementedException();
-        public bool RightTrigger => throw new NotImplementedException();
+        public bool LeftTrigger => keyboard.IsKeyDown(Keys.U);
+        public bool RightTrigger => keyboard.IsKeyDown(Keys.I);
 
         public void Update(GameTime gameTime)
         {

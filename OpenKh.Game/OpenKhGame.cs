@@ -39,7 +39,9 @@ namespace OpenKh.Game
                         state.Initialize(GetStateInitDesc());
                         break;
                     case 2:
-                        var myState = new MenuState();
+                        // WARNING: this is quite buggy since no game context will be passed to
+                        // the menu, but it useful for quick menu testing.
+                        var myState = new MenuState(null);
                         myState.Initialize(GetStateInitDesc());
                         myState.OpenMenu();
                         state = myState;

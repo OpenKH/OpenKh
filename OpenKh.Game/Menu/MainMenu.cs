@@ -39,6 +39,7 @@ namespace OpenKh.Game.Menu
 
         private int _optionCount = 0;
         private int _optionSelected = 0;
+        private bool _isDebugMenuVisible;
 
         public override ushort MenuNameId => 0;
         protected override bool IsEnd =>
@@ -59,16 +60,34 @@ namespace OpenKh.Game.Menu
                     _optionSelected += _optionCount;
                 _optionSelected %= _optionCount;
 
-                var frame = _menuSeq.FrameIndex;
-                _menuSeq = InitializeMenuOptions(true);
-                _menuSeq.Begin();
-                _menuSeq.FrameIndex = frame;
+                InvalidateMenu();
+            }
+        }
+
+        public bool IsDebugMenuVisible
+        {
+            get => _isDebugMenuVisible;
+            set
+            {
+                if (_isDebugMenuVisible != value)
+                {
+                    _isDebugMenuVisible = value;
+                    InvalidateMenu();
+                }
             }
         }
 
         public MainMenu(IMenuManager menuManager) : base(menuManager)
         {
             InitializeMenu();
+        }
+
+        private void InvalidateMenu()
+        {
+            var frame = _menuSeq.FrameIndex;
+            _menuSeq = InitializeMenuOptions(true);
+            _menuSeq.Begin();
+            _menuSeq.FrameIndex = frame;
         }
 
         private void InitializeMenu()
@@ -180,13 +199,18 @@ namespace OpenKh.Game.Menu
                 switch (SelectedOption)
                 {
                     case 6:
-                        Push(new MenuConfig(MenuManager));
+                        if (_isDebugMenuVisible)
+                            Push(new MenuDebug(MenuManager));
+                        else
+                            Push(new MenuConfig(MenuManager));
                         break;
                     default:
                         Push(new MenuTemplate(MenuManager, 0));
                         break;
                 }
             }
+
+            IsDebugMenuVisible = inputManager.RightTrigger;
         }
 
         private IAnimatedSequence InitializeMenuOptions(bool skipIntro = false)
@@ -205,6 +229,10 @@ namespace OpenKh.Game.Menu
                 if (_optionCount >= MenuOptions.Length)
                     break;
 
+                string overrideTextField = null;
+                if (bitIndex == 7 && _isDebugMenuVisible)
+                    overrideTextField = MenuDebug.Name;
+
                 AnimatedSequenceDesc desc = _optionCount != _optionSelected
                     ? new AnimatedSequenceDesc
                     {
@@ -215,6 +243,7 @@ namespace OpenKh.Game.Menu
                         StackWidth = 0,
                         StackHeight = AnimatedSequenceDesc.DefaultStacking,
                         MessageId = MenuOptions[bitIndex],
+                        MessageText = overrideTextField,
                         Flags = AnimationFlags.TextTranslateX,
                     }
                     : new AnimatedSequenceDesc
@@ -225,6 +254,7 @@ namespace OpenKh.Game.Menu
                         StackWidth = 0,
                         StackHeight = AnimatedSequenceDesc.DefaultStacking,
                         MessageId = MenuOptions[bitIndex],
+                        MessageText = overrideTextField,
                         Flags = AnimationFlags.TextTranslateX |
                             AnimationFlags.ChildStackHorizontally,
                         Children = new List<AnimatedSequenceDesc>
