@@ -100,14 +100,14 @@ namespace OpenKh.Engine.Renderers
 
         public int GetActualFrame(Sequence.AnimationGroup animationGroup, int frameIndex)
         {
-            if (animationGroup.DoNotLoop != 0)
-                return frameIndex;
-
             CurrentChildContext.TextPositionX = animationGroup.TextPositionX;
             CurrentChildContext.TextPositionY = animationGroup.TextPositionY;
             CurrentChildContext.TextScale = animationGroup.TextScale;
             CurrentChildContext.UiSize = animationGroup.LightPositionX;
             CurrentChildContext.UiPadding = animationGroup.UiPadding;
+
+            if (animationGroup.DoNotLoop != 0)
+                return frameIndex;
 
             var frameEnd = animationGroup.LoopEnd;
             if (frameEnd == 0 && animationGroup.Animations.Count > 0)
