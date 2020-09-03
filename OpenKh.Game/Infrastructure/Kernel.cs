@@ -101,6 +101,7 @@ namespace OpenKh.Game.Infrastructure
                 SystemMessageContext = FontContext.ToKh2EuSystemTextContext();
                 EventMessageContext = FontContext.ToKh2EuEventTextContext();
             }
+            MessageProvider.Encoder = SystemMessageContext.Encoder;
         }
 
         public string GetMapFileName(int worldIndex, int placeIndex) => IsReMix
