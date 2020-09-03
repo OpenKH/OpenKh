@@ -33,10 +33,12 @@ namespace OpenKh.Game.Menu
         virtual public void Close()
         {
             _isClosing = true;
+            _subMenu?.Close();
         }
 
         virtual public void Push(IMenu subMenu)
         {
+            Close();
             _subMenu = subMenu;
             _subMenu.Open();
 
@@ -44,8 +46,6 @@ namespace OpenKh.Game.Menu
                 MenuManager.PushSubMenuDescription(subMenu.ToString());
             else
                 MenuManager.PushSubMenuDescription(subMenu.MenuNameId);
-
-            Close();
         }
 
         public void Update(double deltaTime)
