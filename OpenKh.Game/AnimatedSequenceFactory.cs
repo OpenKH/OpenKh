@@ -60,7 +60,7 @@ namespace OpenKh.Game
         public TextAnchor TextAnchor { get; set; }
         public ushort MessageId { get; set; }
         public string MessageText { get; set; }
-        public int SequenceIndexLoop { get; set; }
+        public int SequenceIndexLoop { get; set; } = -1;
         public int SequenceIndexStart { get; set; } = -1;
         public int SequenceIndexEnd { get; set; } = -1;
         public int StackIndex { get; set; }
@@ -214,6 +214,9 @@ namespace OpenKh.Game
 
             private void Draw(SequenceRenderer.ChildContext context)
             {
+                if (_anim == -1)
+                    return;
+
                 var anotherPosX = (StackWidth != AnimatedSequenceDesc.DefaultStacking ?
                     StackWidth : AnimGroup.TextPositionX) * StackIndex;
                 var anotherPosY = (StackHeight != AnimatedSequenceDesc.DefaultStacking ?
@@ -325,12 +328,23 @@ namespace OpenKh.Game
             {
                 foreach (var child in Children)
                     child.Begin();
+
                 _anim = SequenceIndexStart >= 0 ?
                     SequenceIndexStart :
                     SequenceIndexLoop;
-                _isRunning = true;
-                IsEnd = false;
+
                 _frame = 0;
+                if (_anim < 0)
+                {
+                    _anim = SequenceIndexEnd;
+                    _isRunning = false;
+                    IsEnd = _anim < 0;
+                }
+                else
+                {
+                    _isRunning = true;
+                    IsEnd = false;
+                }
             }
 
             public void End()
