@@ -158,7 +158,7 @@ namespace OpenKh.Game.States
                     Flags = AnimationFlags.TextIgnoreColor |
                         AnimationFlags.TextTranslateX |
                         AnimationFlags.ChildStackHorizontally,
-                    TextAnchor = TextAnchor.BottomCenter,
+                    TextAnchor = TextAnchor.BottomLeft,
                     Children = new List<AnimatedSequenceDesc>
                     {
                         new AnimatedSequenceDesc { },
@@ -193,7 +193,7 @@ namespace OpenKh.Game.States
                     Flags = AnimationFlags.TextIgnoreColor |
                         AnimationFlags.TextTranslateX |
                         AnimationFlags.ChildStackHorizontally,
-                    TextAnchor = TextAnchor.BottomCenter,
+                    TextAnchor = TextAnchor.BottomLeft,
                     Children = new List<AnimatedSequenceDesc>
                     {
                         new AnimatedSequenceDesc { },
