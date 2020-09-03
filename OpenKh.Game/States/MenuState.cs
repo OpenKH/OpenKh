@@ -25,7 +25,7 @@ namespace OpenKh.Game.States
 
         private IAnimatedSequence _backgroundSeq;
         private IAnimatedSequence _subMenuDescriptionSeq;
-        private List<ushort> _subMenuDescriptionInfo = new List<ushort>();
+        private List<object> _subMenuDescriptionInfo = new List<object>();
 
         private Kh2MessageRenderer _messageRenderer;
         private IMenu _subMenu;
@@ -132,7 +132,17 @@ namespace OpenKh.Game.States
         public void PushSubMenuDescription(ushort messageId)
         {
             _subMenuDescriptionInfo.Add(messageId);
-            
+            SubMenuDescriptionInvalidateByPush();
+        }
+
+        public void PushSubMenuDescription(string message)
+        {
+            _subMenuDescriptionInfo.Add(message);
+            SubMenuDescriptionInvalidateByPush();
+        }
+
+        private void SubMenuDescriptionInvalidateByPush()
+        {
             var count = _subMenuDescriptionInfo.Count;
             _subMenuDescriptionSeq = SequenceFactory.Create(Enumerable.Range(0, count)
                 .Select(i => new AnimatedSequenceDesc
@@ -143,7 +153,8 @@ namespace OpenKh.Game.States
                     StackIndex = i,
                     StackWidth = AnimatedSequenceDesc.DefaultStacking,
                     StackHeight = 0,
-                    MessageId = _subMenuDescriptionInfo[i],
+                    MessageId = _subMenuDescriptionInfo[i] is ushort id ? id : (ushort)0,
+                    MessageText = _subMenuDescriptionInfo[i] as string,
                     Flags = AnimationFlags.TextIgnoreColor |
                         AnimationFlags.TextTranslateX |
                         AnimationFlags.ChildStackHorizontally,
@@ -177,7 +188,8 @@ namespace OpenKh.Game.States
                     StackIndex = i,
                     StackWidth = AnimatedSequenceDesc.DefaultStacking,
                     StackHeight = 0,
-                    MessageId = _subMenuDescriptionInfo[i],
+                    MessageId = _subMenuDescriptionInfo[i] is ushort id ? id : (ushort)0,
+                    MessageText = _subMenuDescriptionInfo[i] as string,
                     Flags = AnimationFlags.TextIgnoreColor |
                         AnimationFlags.TextTranslateX |
                         AnimationFlags.ChildStackHorizontally,

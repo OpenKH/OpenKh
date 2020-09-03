@@ -39,7 +39,12 @@ namespace OpenKh.Game.Menu
         {
             _subMenu = subMenu;
             _subMenu.Open();
-            MenuManager.PushSubMenuDescription(subMenu.MenuNameId);
+
+            if (subMenu.MenuNameId == 0)
+                MenuManager.PushSubMenuDescription(subMenu.ToString());
+            else
+                MenuManager.PushSubMenuDescription(subMenu.MenuNameId);
+
             Close();
         }
 

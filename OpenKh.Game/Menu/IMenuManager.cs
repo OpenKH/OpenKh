@@ -8,6 +8,7 @@ namespace OpenKh.Game.Menu
         InputManager InputManager { get; }
 
         void PushSubMenuDescription(ushort messageId);
+        void PushSubMenuDescription(string message);
         void PopSubMenuDescription();
         void SetElementDescription(ushort messageId);
     }

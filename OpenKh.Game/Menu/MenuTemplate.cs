@@ -51,7 +51,7 @@ namespace OpenKh.Game.Menu
                     StackHeight = AnimatedSequenceDesc.DefaultStacking,
                     Flags = AnimationFlags.TextTranslateX |
                         AnimationFlags.ChildStackHorizontally,
-                    MessageText = $"Template {_stackIndex}-{i}",
+                    MessageText = $"TEMPLATE {_stackIndex}-{i}",
                     Children = SelectedOption == i ? new List<AnimatedSequenceDesc>
                     {
                         new AnimatedSequenceDesc
@@ -101,5 +101,7 @@ namespace OpenKh.Game.Menu
 
         protected override void MyDraw() =>
             _menuSeq.Draw(0, 0);
+
+        public override string ToString() => "TEMPLATE";
     }
 }
