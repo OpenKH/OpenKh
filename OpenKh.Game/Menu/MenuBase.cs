@@ -7,17 +7,16 @@ namespace OpenKh.Game.Menu
         private bool _isClosing;
         private IMenu _subMenu;
 
-        protected AnimatedSequenceFactory SequenceFactory { get; }
-        protected InputManager InputManager { get; }
+        protected IMenuManager MenuManager { get; }
+        protected AnimatedSequenceFactory SequenceFactory => MenuManager.SequenceFactory;
+        protected InputManager InputManager => MenuManager.InputManager;
         abstract protected bool IsEnd { get; }
+        abstract public ushort MenuNameId { get; }
         public bool IsClosed { get; private set; }
 
-        public MenuBase(
-            AnimatedSequenceFactory animatedSequenceFactory,
-            InputManager inputManager)
+        public MenuBase(IMenuManager menuManager)
         {
-            SequenceFactory = animatedSequenceFactory;
-            InputManager = inputManager;
+            MenuManager = menuManager;
         }
 
         virtual protected void ProcessInput(InputManager inputManager)
@@ -40,6 +39,7 @@ namespace OpenKh.Game.Menu
         {
             _subMenu = subMenu;
             _subMenu.Open();
+            MenuManager.PushSubMenuDescription(subMenu.MenuNameId);
             Close();
         }
 
@@ -61,6 +61,7 @@ namespace OpenKh.Game.Menu
                 if (_subMenu.IsClosed)
                 {
                     _subMenu = null;
+                    MenuManager.PopSubMenuDescription();
                     Open();
                 }
             }

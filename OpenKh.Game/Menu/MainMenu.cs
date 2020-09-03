@@ -40,6 +40,7 @@ namespace OpenKh.Game.Menu
         private int _optionCount = 0;
         private int _optionSelected = 0;
 
+        public override ushort MenuNameId => 0;
         protected override bool IsEnd =>
             _backgroundSeq.IsEnd &&
             _menuSeq.IsEnd &&
@@ -65,10 +66,7 @@ namespace OpenKh.Game.Menu
             }
         }
 
-        public MainMenu(
-            AnimatedSequenceFactory animatedSequenceFactory,
-            InputManager inputManager) :
-            base(animatedSequenceFactory, inputManager)
+        public MainMenu(IMenuManager menuManager) : base(menuManager)
         {
             InitializeMenu();
         }
@@ -182,12 +180,10 @@ namespace OpenKh.Game.Menu
                 switch (SelectedOption)
                 {
                     case 6:
-                        Push(new MenuConfig(
-                            SequenceFactory, InputManager));
+                        Push(new MenuConfig(MenuManager));
                         break;
                     default:
-                        Push(new MenuTemplate(
-                            SequenceFactory, InputManager, 0));
+                        Push(new MenuTemplate(MenuManager, 0));
                         break;
                 }
             }

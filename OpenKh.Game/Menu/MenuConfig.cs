@@ -159,6 +159,7 @@ namespace OpenKh.Game.Menu
         private IAnimatedSequence _menuSeq;
         private int _selectedOption;
 
+        public override ushort MenuNameId => 0xb617;
         protected override bool IsEnd => _menuSeq.IsEnd;
 
         public int SelectedSettingIndex
@@ -175,10 +176,7 @@ namespace OpenKh.Game.Menu
             }
         }
 
-        public MenuConfig(
-            AnimatedSequenceFactory animatedSequenceFactory,
-            InputManager inputManager) :
-            base(animatedSequenceFactory, inputManager)
+        public MenuConfig(IMenuManager menuManager) : base(menuManager)
         {
             _menuSeq = InitializeMenu(false);
             _menuSeq.Begin();

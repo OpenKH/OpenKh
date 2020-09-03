@@ -2,6 +2,7 @@
 {
     public interface IMenu
     {
+        ushort MenuNameId { get; }
         bool IsClosed { get; }
 
         void Open();

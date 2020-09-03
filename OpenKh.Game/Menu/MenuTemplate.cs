@@ -8,6 +8,7 @@ namespace OpenKh.Game.Menu
     public class MenuTemplate : MenuBase
     {
         private const int OptionCount = 3;
+        private readonly IMenuManager _menuManager;
         private readonly int _stackIndex;
         private IAnimatedSequence _menuSeq;
         private int _selectedOption;
@@ -26,13 +27,13 @@ namespace OpenKh.Game.Menu
                 }
             }
         }
+
+        public override ushort MenuNameId => 0;
         protected override bool IsEnd => _menuSeq.IsEnd;
 
-        public MenuTemplate(
-            AnimatedSequenceFactory animatedSequenceFactory,
-            InputManager inputManager,
-            int stackIndex) : base(animatedSequenceFactory, inputManager)
+        public MenuTemplate(IMenuManager menuManager, int stackIndex) : base(menuManager)
         {
+            _menuManager = menuManager;
             _stackIndex = stackIndex;
             _menuSeq = InitializeMenu(false);
         }
@@ -77,8 +78,7 @@ namespace OpenKh.Game.Menu
                 SelectedOption++;
             else if (inputManager.IsCircle)
             {
-                Push(new MenuTemplate(
-                    SequenceFactory, InputManager, _stackIndex + 1));
+                Push(new MenuTemplate(_menuManager, _stackIndex + 1));
             }
             else
                 base.ProcessInput(inputManager);

@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Extensions;
+using OpenKh.Engine.Extensions;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
@@ -11,12 +11,11 @@ using System.Linq;
 
 namespace OpenKh.Game.States
 {
-    public class MenuState : IState
+    public class MenuState : IMenuManager, IState
     {
         private Kernel _kernel;
         private IDataContent _content;
         private ArchiveManager _archiveManager;
-        private InputManager _inputManager;
         private KingdomShader _shader;
         private MonoSpriteDrawing _drawing;
         private Layout _campLayout;
@@ -25,11 +24,14 @@ namespace OpenKh.Game.States
         private Dictionary<ushort, byte[]> _cachedText = new Dictionary<ushort, byte[]>();
 
         private IAnimatedSequence _backgroundSeq;
+        private IAnimatedSequence _subMenuDescriptionSeq;
+        private List<ushort> _subMenuDescriptionInfo = new List<ushort>();
 
-        private AnimatedSequenceFactory _animSeqFactory;
         private Kh2MessageRenderer _messageRenderer;
         private IMenu _subMenu;
 
+        public AnimatedSequenceFactory SequenceFactory { get; private set; }
+        public InputManager InputManager { get; private set; }
         public bool IsMenuOpen { get; private set; }
 
         public void Initialize(StateInitDesc initDesc)
@@ -37,7 +39,7 @@ namespace OpenKh.Game.States
             _kernel = initDesc.Kernel;
             _content = initDesc.DataContent;
             _archiveManager = initDesc.ArchiveManager;
-            _inputManager = initDesc.InputManager;
+            InputManager = initDesc.InputManager;
 
             var viewport = initDesc.GraphicsDevice.GraphicsDevice.Viewport;
             _shader = new KingdomShader(initDesc.ContentManager);
@@ -64,7 +66,7 @@ namespace OpenKh.Game.States
                 SelectedSequenceGroupIndex = 0
             };
 
-            _animSeqFactory = new AnimatedSequenceFactory(
+            SequenceFactory = new AnimatedSequenceFactory(
                 _drawing,
                 initDesc.Kernel.MessageProvider,
                 _messageRenderer,
@@ -72,7 +74,7 @@ namespace OpenKh.Game.States
                 _campLayout.SequenceItems[1],
                 _textures.First());
 
-            _backgroundSeq = _animSeqFactory.Create(new List<AnimatedSequenceDesc>
+            _backgroundSeq = SequenceFactory.Create(new List<AnimatedSequenceDesc>
             {
                 new AnimatedSequenceDesc
                 {
@@ -93,8 +95,8 @@ namespace OpenKh.Game.States
                     SequenceIndexEnd = 115,
                 }
             });
-
-            _subMenu = new MainMenu(_animSeqFactory, _inputManager);
+            _subMenuDescriptionSeq = SequenceFactory.Create(new List<AnimatedSequenceDesc>());
+            _subMenu = new MainMenu(this);
         }
 
         public void Destroy()
@@ -111,6 +113,7 @@ namespace OpenKh.Game.States
             _layoutRenderer.SelectedSequenceGroupIndex = 0;
 
             _backgroundSeq.Begin();
+            _subMenuDescriptionSeq.Begin();
             _subMenu.Open();
 
             IsMenuOpen = true;
@@ -122,17 +125,92 @@ namespace OpenKh.Game.States
             _layoutRenderer.SelectedSequenceGroupIndex = 2;
 
             _backgroundSeq.End();
+            _subMenuDescriptionSeq.End();
             _subMenu.Close();
+        }
+
+        public void PushSubMenuDescription(ushort messageId)
+        {
+            _subMenuDescriptionInfo.Add(messageId);
+            
+            var count = _subMenuDescriptionInfo.Count;
+            _subMenuDescriptionSeq = SequenceFactory.Create(Enumerable.Range(0, count)
+                .Select(i => new AnimatedSequenceDesc
+                {
+                    SequenceIndexStart = i + 1 < count ? -1 : 75,
+                    SequenceIndexLoop = 76,
+                    SequenceIndexEnd = 77,
+                    StackIndex = i,
+                    StackWidth = AnimatedSequenceDesc.DefaultStacking,
+                    StackHeight = 0,
+                    MessageId = _subMenuDescriptionInfo[i],
+                    Flags = AnimationFlags.TextIgnoreColor |
+                        AnimationFlags.TextTranslateX |
+                        AnimationFlags.ChildStackHorizontally,
+                    TextAnchor = TextAnchor.BottomCenter,
+                    Children = new List<AnimatedSequenceDesc>
+                    {
+                        new AnimatedSequenceDesc { },
+                        new AnimatedSequenceDesc
+                        {
+                            SequenceIndexStart = i + 1 < count ? -1 : 27,
+                            SequenceIndexLoop = 28,
+                            SequenceIndexEnd = 29,
+                        }
+                    }
+                })
+                .ToList());
+            _subMenuDescriptionSeq.Begin();
+        }
+
+        public void PopSubMenuDescription()
+        {
+            var count = _subMenuDescriptionInfo.Count;
+            if (count == 0)
+                return;
+
+            _subMenuDescriptionSeq = SequenceFactory.Create(Enumerable.Range(0, count)
+                .Select(i => new AnimatedSequenceDesc
+                {
+                    SequenceIndexLoop = i + 1 < count ? 76 : -1,
+                    SequenceIndexEnd = 77,
+                    StackIndex = i,
+                    StackWidth = AnimatedSequenceDesc.DefaultStacking,
+                    StackHeight = 0,
+                    MessageId = _subMenuDescriptionInfo[i],
+                    Flags = AnimationFlags.TextIgnoreColor |
+                        AnimationFlags.TextTranslateX |
+                        AnimationFlags.ChildStackHorizontally,
+                    TextAnchor = TextAnchor.BottomCenter,
+                    Children = new List<AnimatedSequenceDesc>
+                    {
+                        new AnimatedSequenceDesc { },
+                        new AnimatedSequenceDesc
+                        {
+                            SequenceIndexLoop = i + 1 < count ? 28 : -1,
+                            SequenceIndexEnd = 29,
+                        },
+                    }
+                })
+                .ToList());
+            _subMenuDescriptionSeq.Begin();
+
+            _subMenuDescriptionInfo.RemoveAt(_subMenuDescriptionInfo.Count - 1);
+        }
+
+        public void SetElementDescription(ushort messageId)
+        {
         }
 
         public void Update(DeltaTimes deltaTimes)
         {
             var deltaTime = deltaTimes.DeltaTime;
 
-            ProcessInput(_inputManager);
+            ProcessInput(InputManager);
             
             _layoutRenderer.FrameIndex++;
             _backgroundSeq.Update(deltaTime);
+            _subMenuDescriptionSeq.Update(deltaTime);
             _subMenu.Update(deltaTime);
         }
 
@@ -161,6 +239,7 @@ namespace OpenKh.Game.States
 
             _layoutRenderer.Draw();
             _backgroundSeq.Draw(0, 0);
+            _subMenuDescriptionSeq.Draw(0, 0);
             _subMenu.Draw();
 
             _drawing.Flush();
