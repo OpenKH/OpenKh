@@ -248,7 +248,7 @@ namespace OpenKh.Game.States
             _bobModels.Clear();
             _objectEntities.Clear();
 
-            //LoadMapArd(_worldId, _placeId);
+            LoadMapArd(_worldId, _placeId);
             LoadMap(_worldId, _placeId);
         }
 
