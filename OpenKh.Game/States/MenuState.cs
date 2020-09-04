@@ -102,7 +102,6 @@ namespace OpenKh.Game.States
                 }
             });
             _subMenuDescriptionSeq = SequenceFactory.Create(new List<AnimatedSequenceDesc>());
-            _subMenu = new MainMenu(this);
         }
 
         public void Destroy()
@@ -119,8 +118,12 @@ namespace OpenKh.Game.States
             _layoutRenderer.SelectedSequenceGroupIndex = 0;
 
             _backgroundSeq.Begin();
-            _subMenuDescriptionSeq.Begin();
+            _subMenu = new MainMenu(this);
             _subMenu.Open();
+
+            _subMenuDescriptionInfo.Clear();
+            _subMenuDescriptionSeq = SequenceFactory.Create(new List<AnimatedSequenceDesc>());
+            _subMenuDescriptionSeq.Begin();
 
             IsMenuOpen = true;
         }
