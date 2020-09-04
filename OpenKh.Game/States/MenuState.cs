@@ -125,7 +125,7 @@ namespace OpenKh.Game.States
             IsMenuOpen = true;
         }
 
-        public void CloseMenu()
+        public void CloseAllMenu()
         {
             _layoutRenderer.FrameIndex = 0;
             _layoutRenderer.SelectedSequenceGroupIndex = 2;
@@ -220,11 +220,6 @@ namespace OpenKh.Game.States
         {
         }
 
-        public void CloseAllMenu()
-        {
-            _subMenu.Close();
-        }
-
         public void Update(DeltaTimes deltaTimes)
         {
             var deltaTime = deltaTimes.DeltaTime;
@@ -271,7 +266,7 @@ namespace OpenKh.Game.States
         private void ProcessInput(InputManager inputManager)
         {
             if (inputManager.IsStart)
-                CloseMenu();
+                CloseAllMenu();
         }
 
         private (Layout layout, List<ISpriteTexture> textures) GetLayoutResources(string layoutResourceName, string imagesResourceName)

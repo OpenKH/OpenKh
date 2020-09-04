@@ -209,6 +209,8 @@ namespace OpenKh.Game.Menu
                         break;
                 }
             }
+            else if (inputManager.IsCross)
+                MenuManager.CloseAllMenu();
 
             IsDebugMenuVisible = inputManager.RightTrigger;
         }
