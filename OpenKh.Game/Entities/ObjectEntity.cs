@@ -44,12 +44,16 @@ namespace OpenKh.Game.Entities
             }
 
             var fileName = $"obj/{objEntry.ModelName}.mdlx";
+            var msetFileName = $"obj/{objEntry.AnimationName}";
 
             using var stream = Kernel.DataContent.FileOpen(fileName);
             var entries = Bar.Read(stream);
             var model = entries.ForEntry(x => x.Type == Bar.EntryType.Model, Mdlx.Read);
             var texture = entries.ForEntry("tim_", Bar.EntryType.ModelTexture, ModelTexture.Read);
-            Mesh = MeshLoader.FromKH2(graphics, model, texture, archiveManager);
+
+            if (!string.IsNullOrEmpty(objEntry.AnimationName))
+                archiveManager.LoadArchive(msetFileName);
+            Mesh = MeshLoader.FromKH2(graphics, model, texture, archiveManager, () => Kernel.DataContent.FileOpen(fileName));
         }
 
         public static ObjectEntity FromSpawnPoint(Kernel kernel, SpawnPoint.Entity spawnPoint) =>
