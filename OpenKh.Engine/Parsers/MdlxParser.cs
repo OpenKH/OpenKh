@@ -44,7 +44,8 @@ namespace OpenKh.Engine.Parsers
                     {
                         Indices = x.Indices,
                         SegmentIndex = x.SegmentIndex,
-                        TextureIndex = x.TextureIndex
+                        TextureIndex = x.TextureIndex,
+                        IsOpaque = x.IsOpaque
                     }).ToArray()
                 };
             }
@@ -64,10 +65,11 @@ namespace OpenKh.Engine.Parsers
                     MdlxMatrixUtil.BuildTPoseMatrices(mdlx.SubModels.First(), Matrix.Identity)
                 );
 
-            var ci = builtModel.textureIndexBasedModelDict.Values.Select((model, i) => new Kddf2.Kkdf2MdlxParser.CI
+            var ci = builtModel.textureIndexBasedModelDict.Select((kv, i) => new Kddf2.Kkdf2MdlxParser.CI
             {
-                Indices = model.Vertices.Select((_, index) => index).ToArray(),
-                TextureIndex = i,
+                Indices = kv.Value.Vertices.Select((_, index) => index).ToArray(),
+                TextureIndex = kv.Key.Item1,
+                IsOpaque = kv.Key.Item2,
                 SegmentIndex = i
             });
 
@@ -92,11 +94,8 @@ namespace OpenKh.Engine.Parsers
 
             var indexBuffer = new int[4];
             var recentIndex = 0;
-            VifUnpacker.State state;
-            do
+            while (unpacker.Run() != VifUnpacker.State.End)
             {
-                state = unpacker.Run();
-
                 var vpu = new MemoryStream(unpacker.Memory, false)
                     .Using(stream => VpuPacket.Read(stream));
 
@@ -136,7 +135,13 @@ namespace OpenKh.Engine.Parsers
                     indexBuffer[(recentIndex++) & 3] = baseVertexIndex + i;
                     switch (vertexIndex.Function)
                     {
-                        case VpuPacket.VertexFunction.None:
+                        case VpuPacket.VertexFunction.DrawTriangleDoubleSided:
+                            indices.Add(indexBuffer[(recentIndex - 1) & 3]);
+                            indices.Add(indexBuffer[(recentIndex - 3) & 3]);
+                            indices.Add(indexBuffer[(recentIndex - 2) & 3]);
+                            indices.Add(indexBuffer[(recentIndex - 1) & 3]);
+                            indices.Add(indexBuffer[(recentIndex - 2) & 3]);
+                            indices.Add(indexBuffer[(recentIndex - 3) & 3]);
                             break;
                         case VpuPacket.VertexFunction.Stock:
                             break;
@@ -152,7 +157,7 @@ namespace OpenKh.Engine.Parsers
                             break;
                     }
                 }
-            } while (state == VifUnpacker.State.Microprogram);
+            }
 
             return new MeshDescriptor
             {

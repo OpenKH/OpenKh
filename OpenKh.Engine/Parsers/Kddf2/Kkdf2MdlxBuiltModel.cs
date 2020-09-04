@@ -6,7 +6,8 @@ namespace OpenKh.Engine.Parsers.Kddf2
 {
     public class Kkdf2MdlxBuiltModel
     {
-        public SortedDictionary<int, Model> textureIndexBasedModelDict;
+        // <textureIndex, isOpaque> -> Model
+        public SortedDictionary<Tuple<int, bool>, Model> textureIndexBasedModelDict;
         public Kkdf2MdlxParser parser;
     }
 }

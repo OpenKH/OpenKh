@@ -31,14 +31,16 @@ namespace OpenKh.Kh2
             private readonly byte[] _palette;
             private readonly int _cbp;
             private readonly int _csa;
+            private readonly Tm2.GsPSM _uploadPixelFormat;
 
             internal Texture(
-                int width, int height, PixelFormat pixelFormat,
+                int width, int height, PixelFormat pixelFormat, Tm2.GsPSM uploadPixelFormat,
                 byte[] data, byte[] palette,
                 TextureAddressMode textureAddressMode, int cbp, int csa)
             {
                 Size = new Size(width, height);
                 PixelFormat = pixelFormat;
+                _uploadPixelFormat = uploadPixelFormat;
                 _data = data;
                 _palette = palette;
                 TextureAddressMode = textureAddressMode;
@@ -71,9 +73,13 @@ namespace OpenKh.Kh2
                     case PixelFormat.Rgbx8888:
                         return GetData32bpp(_data);
                     case PixelFormat.Indexed8:
-                        return Ps2.Decode8(Ps2.Encode32(_data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64);
+                        if (_uploadPixelFormat == Tm2.GsPSM.GS_PSMCT32)
+                            return Ps2.Decode8(Ps2.Encode32(_data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64);
+                        return _data;
                     case PixelFormat.Indexed4:
-                        return Ps2.Decode4(Ps2.Encode32(_data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128);
+                        if (_uploadPixelFormat == Tm2.GsPSM.GS_PSMCT32)
+                            return Ps2.Decode4(Ps2.Encode32(_data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128);
+                        return _data;
                     default:
                         throw new NotSupportedException($"The format {PixelFormat} is not supported.");
                 }
@@ -460,10 +466,11 @@ namespace OpenKh.Kh2
                 var width = 1 << gsTex.TW;
                 var height = 1 << gsTex.TH;
                 var pixelFormat = GetPixelFormat(gsTex.PSM);
+                var uploadPixelFormat = (Tm2.GsPSM)texInfo.BitBltBuf.DPSM;
                 var dataLength = width * height / (pixelFormat == PixelFormat.Indexed4 ? 2 : 1);
                 var data = stream.SetPosition(texInfo.DataOffset).ReadBytes(dataLength);
 
-                Images.Add(new Texture(width, height, pixelFormat, data, PaletteData, gsInfo.AddressMode, gsTex.CBP - paletteBaseOffset, gsTex.CSA));
+                Images.Add(new Texture(width, height, pixelFormat, uploadPixelFormat, data, PaletteData, gsInfo.AddressMode, gsTex.CBP - paletteBaseOffset, gsTex.CSA));
             }
         }
 

@@ -9,7 +9,7 @@ namespace OpenKh.Ps2
     {
         public enum VertexFunction
         {
-            None = 0x00,
+            DrawTriangleDoubleSided = 0x00,
             Stock = 0x10,
             DrawTriangle = 0x20,
             DrawTriangleInverse = 0x30

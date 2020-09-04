@@ -16,6 +16,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
         {
             public int[] Indices;
             public int TextureIndex, SegmentIndex;
+            public bool IsOpaque;
         }
 
         public List<CI> MeshDescriptors { get; } = new List<CI>();
@@ -29,18 +30,22 @@ namespace OpenKh.Engine.Parsers.Kddf2
         public Kkdf2MdlxParser(Mdlx.SubModel submodel)
         {
             immultableMeshList = new List<ImmutableMesh>();
-            foreach (Mdlx.DmaVif dmaVif in submodel.DmaChains.SelectMany(dmaChain => dmaChain.DmaVifs))
+            foreach (Mdlx.DmaChain dmaChain in submodel.DmaChains)
             {
-                const int tops = 0x40, top2 = 0x220;
-
-                var unpacker = new VifUnpacker(dmaVif.VifPacket)
+                foreach (Mdlx.DmaVif dmaVif in dmaChain.DmaVifs)
                 {
-                    Vif1_Tops = tops
-                };
-                unpacker.Run();
+                    const int tops = 0x40, top2 = 0x220;
 
-                var mesh = VU1Simulation.Run(unpacker.Memory, tops, top2, dmaVif.TextureIndex, dmaVif.Alaxi);
-                immultableMeshList.Add(mesh);
+                    var unpacker = new VifUnpacker(dmaVif.VifPacket)
+                    {
+                        Vif1_Tops = tops
+                    };
+                    unpacker.Run();
+
+                    var mesh = VU1Simulation.Run(unpacker.Memory, tops, top2, dmaVif.TextureIndex, dmaVif.Alaxi);
+                    mesh.isOpaque = (dmaChain.Unk00 & 1) == 0;
+                    immultableMeshList.Add(mesh);
+                }
             }
         }
 
@@ -50,7 +55,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
         /// <returns></returns>
         public Kkdf2MdlxBuiltModel ProcessVerticesAndBuildModel(Matrix[] matrices)
         {
-            var models = new SortedDictionary<int, Model>();
+            var models = new SortedDictionary<Tuple<int, bool>, Model>();
 
             var exportedMesh = new ExportedMesh();
 
@@ -75,7 +80,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         int flag = indexAssign.vertexFlag;
                         if (flag == 0x20 || flag == 0x00)
                         {
-                            var triRef = new TriangleRef(mesh.textureIndex,
+                            var triRef = new TriangleRef(mesh.textureIndex, mesh.isOpaque,
                                 ringBuffer[(ringIndex - triangleOrder[0]) & 3],
                                 ringBuffer[(ringIndex - triangleOrder[1]) & 3],
                                 ringBuffer[(ringIndex - triangleOrder[2]) & 3]
@@ -84,7 +89,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         }
                         if (flag == 0x30 || flag == 0x00)
                         {
-                            var triRef = new TriangleRef(mesh.textureIndex,
+                            var triRef = new TriangleRef(mesh.textureIndex, mesh.isOpaque,
                                 ringBuffer[(ringIndex - triangleOrder[0]) & 3],
                                 ringBuffer[(ringIndex - triangleOrder[2]) & 3],
                                 ringBuffer[(ringIndex - triangleOrder[1]) & 3]
@@ -141,10 +146,11 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 for (int triIndex = 0; triIndex < triangleRefCount; triIndex++)
                 {
                     TriangleRef triRef = exportedMesh.triangleRefList[triIndex];
+                    Tuple<int, bool> modelKey = new Tuple<int, bool>(triRef.textureIndex, triRef.isOpaque);
                     Model model;
-                    if (models.TryGetValue(triRef.textureIndex, out model) == false)
+                    if (models.TryGetValue(modelKey, out model) == false)
                     {
-                        models[triRef.textureIndex] = model = new Model();
+                        models[modelKey] = model = new Model();
                     }
                     for (int i = 0; i < triRef.list.Length; i++)
                     {
