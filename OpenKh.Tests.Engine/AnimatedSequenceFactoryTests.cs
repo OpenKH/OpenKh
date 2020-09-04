@@ -312,6 +312,7 @@ namespace OpenKh.Tests.Engine
 
             var animation = factory.Create(new AnimatedSequenceDesc
             {
+                SequenceIndexLoop = 0,
                 Flags = flags,
                 Children = Enumerable.Range(0, elementCount)
                     .Select(x => new AnimatedSequenceDesc
