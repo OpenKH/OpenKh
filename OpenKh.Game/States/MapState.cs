@@ -213,35 +213,8 @@ namespace OpenKh.Game.States
 
             LoadMapArd(_worldId, _placeId);
             LoadMap(_worldId, _placeId);
-            LoadObjEntry(_objEntryId);
         }
-
-        private void LoadObjEntry(string name)
-        {
-            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ModelName == name);
-            if (model == null)
-                return;
-
-            var fileName = $"obj/{model.ModelName}.mdlx";
-            var msetFileName = $"obj/{model.AnimationName}";
-
-            using var stream = _dataContent.FileOpen(fileName);
-            var entries = Bar.Read(stream);
-            var modelEntryName = entries.FirstOrDefault(x => x.Type == Bar.EntryType.Model)?.Name;
-            _archiveManager.LoadArchive(entries);
-            _archiveManager.LoadArchive(msetFileName);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, _archiveManager, modelEntryName, "tim_", () => _dataContent.FileOpen(fileName)));
-        }
-
-        private void LoadObjEntry(int id)
-        {
-            var model = _kernel.ObjEntries.FirstOrDefault(x => x.ObjectId == id);
-            if (model == null)
-                return;
-
-            LoadObjEntry(model.ModelName);
-        }
-
+        
         private void LoadMap(int worldIndex, int placeIndex)
         {
             Log.Info($"Map={worldIndex},{placeIndex}");
