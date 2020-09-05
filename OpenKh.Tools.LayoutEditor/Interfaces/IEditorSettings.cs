@@ -9,5 +9,8 @@ namespace OpenKh.Tools.LayoutEditor.Interfaces
 
         //public bool CheckerboardBackground { get; }
         ColorF EditorBackground { get; }
+        bool ShowViewportOriginal { get; }
+        bool ShowViewportRemix { get; }
+        bool IsViewportOnTop { get; }
     }
 }

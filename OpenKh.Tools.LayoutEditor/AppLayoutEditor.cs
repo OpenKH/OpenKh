@@ -173,8 +173,13 @@ namespace OpenKh.Tools.LayoutEditor
 
                 _renderer.FrameIndex = _animationFrameCurrent;
                 _renderer.SelectedSequenceGroupIndex = SelectedLayoutIndex;
-                DrawGameViewport(backgroundColorInverse);
+
+                if (!_settings.IsViewportOnTop)
+                    DrawGameViewport(backgroundColorInverse);
                 _renderer.Draw();
+                if (_settings.IsViewportOnTop)
+                    DrawGameViewport(backgroundColorInverse);
+
                 _drawing.Flush();
                 _drawing.DestinationTexture = null;
 
@@ -189,11 +194,16 @@ namespace OpenKh.Tools.LayoutEditor
         {
             const float OriginalViewportWidth = 512f;
             const float RemixViewportWidth = 684f;
+            const float ViewportHeight = 416f;
 
-            _drawing.DrawRectangle(-1, -1, OriginalViewportWidth + 2, 416f + 2, backgroundColorInverse);
-            _drawing.DrawRectangle(
+            if (_settings.ShowViewportOriginal)
+                _drawing.DrawRectangle(-1, -1, OriginalViewportWidth + 2, ViewportHeight + 2, backgroundColorInverse);
+
+            if (_settings.ShowViewportRemix)
+                _drawing.DrawRectangle(
                 -(RemixViewportWidth - OriginalViewportWidth) / 2 - 1, -1,
-                RemixViewportWidth + 2, 416f + 2, backgroundColorInverse);
+                RemixViewportWidth + 2, ViewportHeight + 2, backgroundColorInverse);
+
             _drawing.Flush();
         }
 
