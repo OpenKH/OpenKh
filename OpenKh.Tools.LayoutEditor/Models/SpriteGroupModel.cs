@@ -82,8 +82,8 @@ namespace OpenKh.Tools.LayoutEditor.Models
             if (rect.Width == Width && rect.Height == Height)
                 return;
 
-            Width = rect.Width;
-            Height = rect.Height;
+            Width = Math.Max(rect.Width, 1);
+            Height = Math.Max(rect.Height, 1);
 
             _spriteTexture?.Dispose();
             _spriteTexture = _drawing.CreateSpriteTexture(Width, Height);
