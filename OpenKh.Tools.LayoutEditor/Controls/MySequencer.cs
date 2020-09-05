@@ -79,7 +79,15 @@ namespace OpenKh.Tools.LayoutEditor.Controls
             SelectedAnimationGroup.Animations.Add(new Sequence.Animation
             {
                 FrameStart = 0,
-                FrameEnd = 10,
+                FrameEnd = 50,
+                ScaleStart = 1,
+                ScaleEnd = 1,
+                ScaleXStart = 1,
+                ScaleXEnd = 1,
+                ScaleYStart = 1,
+                ScaleYEnd = 1,
+                ColorStart = 0x80808080u,
+                ColorEnd = 0x80808080u,
             });
             InvalidateAnimationList();
         }
