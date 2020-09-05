@@ -58,6 +58,9 @@ namespace OpenKh.Tools.LayoutEditor
         private Sequence.AnimationGroup SelectedAnimationGroup =>
             _debugSequenceRenderer.AnimationGroup;
 
+        private bool CanAnimGroupHostChildAnims => SelectedAnimationGroup
+            .Animations.Any(x => (x.Flags & Sequence.CanHostChildFlag) != 0);
+
         public int SelectedAnimGroup
         {
             get => _selectedAnimGroup;
@@ -349,25 +352,31 @@ namespace OpenKh.Tools.LayoutEditor
                 animationGroup.LoopEnd = loopPair[1];
             }
 
-            int lightPosX = animationGroup.LightPositionX;
-            if (ImGui.InputInt("Light pos. X", ref lightPosX))
-                animationGroup.LightPositionX = lightPosX;
+            if (CanAnimGroupHostChildAnims)
+            {
+                ImGui.Separator();
+                ImGui.Text("Child animation properties");
 
-            int textPosY = animationGroup.TextPositionY;
-            if (ImGui.InputInt("Text position Y", ref textPosY))
-                animationGroup.TextPositionY = textPosY;
+                int lightPosX = animationGroup.LightPositionX;
+                if (ImGui.InputInt("Light pos. X", ref lightPosX))
+                    animationGroup.LightPositionX = lightPosX;
 
-            int textScale = animationGroup.TextScale;
-            if (ImGui.InputInt("Text scale", ref textScale))
-                animationGroup.TextScale = textScale;
+                int textPosY = animationGroup.TextPositionY;
+                if (ImGui.InputInt("Text position Y", ref textPosY))
+                    animationGroup.TextPositionY = textPosY;
 
-            int uiPadding = animationGroup.UiPadding;
-            if (ImGui.InputInt("UI padding", ref uiPadding))
-                animationGroup.UiPadding = uiPadding;
+                int textScale = animationGroup.TextScale;
+                if (ImGui.InputInt("Text scale", ref textScale))
+                    animationGroup.TextScale = textScale;
 
-            int textPosX = animationGroup.TextPositionX;
-            if (ImGui.InputInt("Text position X", ref textPosX))
-                animationGroup.TextPositionX = textPosX;
+                int uiPadding = animationGroup.UiPadding;
+                if (ImGui.InputInt("UI padding", ref uiPadding))
+                    animationGroup.UiPadding = uiPadding;
+
+                int textPosX = animationGroup.TextPositionX;
+                if (ImGui.InputInt("Text position X", ref textPosX))
+                    animationGroup.TextPositionX = textPosX;
+            }
         }
 
         private void AnimationEdit(Sequence.Animation animation, int index)
@@ -384,7 +393,7 @@ namespace OpenKh.Tools.LayoutEditor
                 animation.Flags = (animation.Flags & ~flag) | (interpolationMode == 0 ? 0 : flag);
             }
 
-            ImGuiFlagBox(animation, $"Attach text##{index}", Sequence.AttachTextFlag, true);
+            ImGuiFlagBox(animation, $"Can host child animation##{index}", Sequence.CanHostChildFlag, true);
 
             var framePair = new int[] { animation.FrameStart, animation.FrameEnd };
             if (ImGui.DragInt2($"Frame lifespan##{index}", ref framePair[0]))

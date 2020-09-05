@@ -224,7 +224,7 @@ namespace OpenKh.Engine.Renderers
 
             context.Color *= DebugSequenceRenderer.GetAnimationBlendColor(index);
 
-            if ((animation.Flags & Sequence.AttachTextFlag) != 0)
+            if ((animation.Flags & Sequence.CanHostChildFlag) != 0)
             {
                 CurrentChildContext.PositionX = context.PositionX + context.PivotX;
                 CurrentChildContext.PositionY = context.PositionY + context.PivotY;
