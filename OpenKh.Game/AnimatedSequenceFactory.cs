@@ -292,7 +292,7 @@ namespace OpenKh.Game
                     if (Flags.HasFlag(AnimationFlags.TextIgnoreColor))
                         textColor = new ColorF(1f, 1f, 1f, textColor.A);
 
-                    const float ShadowDistance = 3f;
+                    const float ShadowDistance = 1.5f;
                     const float ShadowOpacity = 0.75f;
                     _messageRenderer.Draw(new DrawContext
                     {
