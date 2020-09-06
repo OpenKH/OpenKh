@@ -246,7 +246,7 @@ namespace OpenKh.Tools.LayoutEditor
             if (ImGui.DragInt($"Animation group index##{index}", ref animGroupIndex))
             {
                 var sequence = _layout.SequenceItems[sequenceProperty.SequenceIndex];
-                sequenceProperty.AnimationGroup = Math.Min(Math.Max(sequenceProperty.AnimationGroup, 0), sequence.AnimationGroups.Count - 1);
+                sequenceProperty.AnimationGroup = Math.Min(Math.Max(animGroupIndex, 0), sequence.AnimationGroups.Count - 1);
             }
 
             var frameStart = sequenceProperty.ShowAtFrame;
