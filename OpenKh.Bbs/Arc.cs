@@ -105,8 +105,12 @@ namespace OpenKh.Bbs
             foreach (var entry in myEntries.Where(x => !x.IsLink))
             {
                 stream.Write(entry.Data, 0, entry.Data.Length);
-                stream.AlignPosition(Alignment);
+                
+                if (stream.Length % Alignment != 0)
+                    stream.AlignPosition(Alignment);
             }
+
+            stream.AlignPosition(0x800);
         }
 
         public static bool IsValid(Stream stream) =>
