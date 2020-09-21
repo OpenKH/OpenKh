@@ -6,8 +6,30 @@ using System.Linq;
 
 namespace OpenKh.Engine.Renderers
 {
+    public enum TextAnchor
+    {
+        BottomLeft,
+        BottomCenter,
+        BottomRight,
+        Center,
+        TopCenter,
+        TopLeft
+    }
+
     public class SequenceRenderer
     {
+        public class ChildContext
+        {
+            public float PositionX { get; set; }
+            public float PositionY { get; set; }
+            public ColorF Color { get; set; }
+            public float TextPositionX { get; set; }
+            public float TextPositionY { get; set; }
+            public float TextScale { get; set; }
+            public float UiSize { get; set; }
+            public float UiPadding { get; set; }
+        }
+
         private class Context
         {
             public int GlobalFrameIndex { get; set; }
@@ -52,65 +74,38 @@ namespace OpenKh.Engine.Renderers
 
         private readonly ISpriteDrawing drawing;
         private readonly ISpriteTexture surface;
-        private Context _textContext;
 
         public Sequence Sequence { get; }
+        public ChildContext CurrentChildContext { get; } = new ChildContext();
 
         public SequenceRenderer(Sequence sequence, ISpriteDrawing drawing, ISpriteTexture surface)
         {
-            this.Sequence = sequence;
             this.drawing = drawing;
             this.surface = surface;
+            Sequence = sequence;
             DebugSequenceRenderer = new DefaultDebugSequenceRenderer();
         }
 
         public IDebugSequenceRenderer DebugSequenceRenderer { get; set; }
 
-        public bool Draw(IMessageRenderer msgRenderer, byte[] data, int animationGroupIndex, int frameIndex, float positionX, float positionY)
-        {
-            _textContext = null;
-            var isAnimationEnd = Draw(animationGroupIndex, frameIndex, positionX, positionY);
-
-            if (_textContext != null && msgRenderer != null && data != null)
-            {
-                const float UiTextScale = 0.75f;
-                var seqGroup = Sequence.AnimationGroups[animationGroupIndex];
-                float textScale = seqGroup.TextScale == 0 ? UiTextScale : (seqGroup.TextScale / 24f);
-
-                var fakeTextDrawContext = new DrawContext
-                {
-                    Scale = textScale,
-                    IgnoreDraw = true,
-                };
-                msgRenderer.Draw(fakeTextDrawContext, data);
-                var width = (float)fakeTextDrawContext.Width;
-
-                var xPos = _textContext.PositionX - width / 2 + seqGroup.TextPositionX;
-                msgRenderer.Draw(new DrawContext
-                {
-                    xStart = xPos,
-                    x = xPos,
-                    y = _textContext.PositionY + seqGroup.TextPositionY,
-                    Color = _textContext.Color,
-                    Scale = textScale,
-                    WidthMultiplier = 1.0f,
-                }, data);
-            }
-
-            return isAnimationEnd;
-        }
-
-        public bool Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY) =>
+        public bool Draw(int animationGroupIndex, int frameIndex, float positionX, float positionY, float alpha = 1f) =>
             DrawAnimationGroup(new Context
             {
                 GlobalFrameIndex = frameIndex,
                 FrameIndex = frameIndex,
                 PositionX = positionX,
-                PositionY = positionY
+                PositionY = positionY,
+                Color = new ColorF(1f, 1f, 1f, alpha)
             }, Sequence.AnimationGroups[animationGroupIndex]);
 
         public int GetActualFrame(Sequence.AnimationGroup animationGroup, int frameIndex)
         {
+            CurrentChildContext.TextPositionX = animationGroup.TextPositionX;
+            CurrentChildContext.TextPositionY = animationGroup.TextPositionY;
+            CurrentChildContext.TextScale = animationGroup.TextScale;
+            CurrentChildContext.UiSize = animationGroup.LightPositionX;
+            CurrentChildContext.UiPadding = animationGroup.UiPadding;
+
             if (animationGroup.DoNotLoop != 0)
                 return frameIndex;
 
@@ -160,9 +155,20 @@ namespace OpenKh.Engine.Renderers
             else
                 t = (float)((Math.Sin(delta * Math.PI - Math.PI / 2.0) + 1.0) / 2.0);
 
-            context.PositionX += Lerp(t, animation.TranslateXStart, animation.TranslateXEnd);
-            context.PositionY += Lerp(t, animation.TranslateYStart, animation.TranslateYEnd);
             context.ColorBlendMode = animation.ColorBlend;
+
+            var translateX = Lerp(t, animation.TranslateXStart, animation.TranslateXEnd);
+            var translateY = Lerp(t, animation.TranslateYStart, animation.TranslateYEnd);
+            if ((animation.Flags & Sequence.TranslationFlag) == 0)
+            {
+                context.PositionX += translateX;
+                context.PositionY += translateY;
+            }
+            else
+            {
+                context.PositionX += animation.TranslateXStart;
+                context.PositionY += animation.TranslateYStart;
+            }
 
             if ((animation.Flags & Sequence.ScalingFlag) == 0)
             {
@@ -182,17 +188,17 @@ namespace OpenKh.Engine.Renderers
             {
                 if ((animation.Flags & Sequence.ColorInterpolationFlag) == 0)
                 {
-                    context.Color = Lerp(t,
+                    context.Color *= Lerp(t,
                         ConvertColor(animation.ColorStart),
                         ConvertColor(animation.ColorEnd));
                 }
                 else
                 {
-                    context.Color = ConvertColor(animation.ColorStart);
+                    context.Color *= ConvertColor(animation.ColorStart);
                 }
             }
             else
-                context.Color = new ColorF(1, 1, 1, 1);
+                context.Color *= new ColorF(1, 1, 1, 1);
 
             if ((animation.Flags & Sequence.RotationFlag) == 0)
             {
@@ -220,8 +226,18 @@ namespace OpenKh.Engine.Renderers
 
             if ((animation.Flags & Sequence.AttachTextFlag) != 0)
             {
-                if (_textContext == null)
-                    _textContext = context.Clone();
+                CurrentChildContext.PositionX = context.PositionX + context.PivotX;
+                CurrentChildContext.PositionY = context.PositionY + context.PivotY;
+                CurrentChildContext.Color = context.Color;
+
+                // Horrible hack. Basically if TranslationFlag disallow to us the translation
+                // animation, the frame group just uses Translate*Start, but the attached
+                // child context still needs to use the animation.
+                if ((animation.Flags & Sequence.TranslationFlag) != 0)
+                {
+                    CurrentChildContext.PositionX += translateX - animation.TranslateXStart;
+                    CurrentChildContext.PositionY += translateY - animation.TranslateYStart;
+                }
             }
 
             // CALCULATE TRANSOFRMATIONS AND INTERPOLATIONS

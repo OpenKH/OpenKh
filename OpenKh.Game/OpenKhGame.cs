@@ -1,11 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using OpenKh.Common;
 using OpenKh.Game.DataContent;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
 using OpenKh.Game.States.Title;
-using OpenKh.Kh2;
 using System;
 using System.IO;
 using System.Linq;
@@ -34,21 +33,26 @@ namespace OpenKh.Game
                     case 0:
                         state = new TitleState();
                         state.Initialize(GetStateInitDesc());
-
-                        _debugOverlay.OnUpdate = state.DebugUpdate;
-                        _debugOverlay.OnDraw = state.DebugDraw;
                         break;
                     case 1:
                         state = new MapState();
                         state.Initialize(GetStateInitDesc());
-
-                        _debugOverlay.OnUpdate = state.DebugUpdate;
-                        _debugOverlay.OnDraw = state.DebugDraw;
+                        break;
+                    case 2:
+                        // WARNING: this is quite buggy since no game context will be passed to
+                        // the menu, but it useful for quick menu testing.
+                        var myState = new MenuState(null);
+                        myState.Initialize(GetStateInitDesc());
+                        myState.OpenMenu();
+                        state = myState;
                         break;
                     default:
                         Log.Err($"Invalid state {value}");
-                        break;
-                }    
+                        return;
+                }
+
+                _debugOverlay.OnUpdate = state.DebugUpdate;
+                _debugOverlay.OnDraw = state.DebugDraw;
             }
         }
 

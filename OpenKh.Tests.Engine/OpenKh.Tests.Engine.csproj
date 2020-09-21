@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
+    <ProjectReference Include="..\OpenKh.Game\OpenKh.Game.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
   </ItemGroup>
 

@@ -13,6 +13,8 @@
         public double Height;
         public double WindowWidth;
 
+        public float ScaleX => (float)(WidthMultiplier * Scale * 0.85);
+
         public DrawContext()
         {
             Reset();

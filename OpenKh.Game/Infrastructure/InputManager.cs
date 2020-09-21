@@ -23,6 +23,10 @@ namespace OpenKh.Game.Infrastructure
         public bool IsRight => _devices.Any(x => x.IsDPadRight);
         public bool IsCircle => _devices.Any(x => x.IsCircle);
         public bool IsCross => _devices.Any(x => x.IsCross);
+        public bool IsSquare => _devices.Any(x => x.IsSquare);
+        public bool IsTriangle => _devices.Any(x => x.IsTriangle);
+        public bool IsStart => _devices.Any(x => x.IsStart);
+        public bool IsSelect => _devices.Any(x => x.IsSelect);
 
         public bool Up => _devices.Any(x => x.RightStickUp);
         public bool Down => _devices.Any(x => x.RightStickDown);
@@ -32,6 +36,7 @@ namespace OpenKh.Game.Infrastructure
         public bool S => _devices.Any(x => x.LeftStickDown);
         public bool A => _devices.Any(x => x.LeftStickLeft);
         public bool D => _devices.Any(x => x.LeftStickRight);
+        public bool RightTrigger => _devices.Any(x => x.RightTrigger);
 
         public InputManager()
         {

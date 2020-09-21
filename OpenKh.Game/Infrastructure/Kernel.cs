@@ -101,7 +101,12 @@ namespace OpenKh.Game.Infrastructure
                 SystemMessageContext = FontContext.ToKh2EuSystemTextContext();
                 EventMessageContext = FontContext.ToKh2EuEventTextContext();
             }
+            MessageProvider.Encoder = SystemMessageContext.Encoder;
         }
+
+        public string GetMapFileName(int worldIndex, int placeIndex) => IsReMix
+            ? $"map/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map"
+            : $"map/{Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
 
         private T LoadFile<T>(string fileName, Func<Stream, T> action)
         {

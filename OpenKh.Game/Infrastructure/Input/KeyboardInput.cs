@@ -31,7 +31,7 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool IsSquare => throw new NotImplementedException();
         public bool IsTriangle => throw new NotImplementedException();
 
-        public bool IsStart => throw new NotImplementedException();
+        public bool IsStart => keyboard.IsKeyDown(Keys.Enter) && !prevKeyboard.IsKeyDown(Keys.Enter);
         public bool IsSelect => throw new NotImplementedException();
         public bool IsHome => throw new NotImplementedException();
 
@@ -71,8 +71,8 @@ namespace OpenKh.Game.Infrastructure.Input
         public bool LeftShoulder => keyboard.IsKeyDown(Keys.LeftShift);
         public bool RightShoulder => keyboard.IsKeyDown(Keys.Tab);
 
-        public bool LeftTrigger => throw new NotImplementedException();
-        public bool RightTrigger => throw new NotImplementedException();
+        public bool LeftTrigger => keyboard.IsKeyDown(Keys.U);
+        public bool RightTrigger => keyboard.IsKeyDown(Keys.I);
 
         public void Update(GameTime gameTime)
         {
