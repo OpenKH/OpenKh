@@ -1,3 +1,5 @@
+# [Kingdom Hearts Re:Chain of Memories](index.md) - Worlds
+
 | Id | World           |
 |----|-----------------|
 | AG | Agrabah         |
