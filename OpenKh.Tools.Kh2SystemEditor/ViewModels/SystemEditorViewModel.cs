@@ -15,7 +15,6 @@ using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using OpenKh.Engine;
 using OpenKh.Tools.Kh2SystemEditor.Utils;
 using OpenKh.Kh2.System;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Kh2SystemEditor.Models.Export;
 
