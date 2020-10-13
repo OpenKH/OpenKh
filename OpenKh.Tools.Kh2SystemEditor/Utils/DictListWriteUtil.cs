@@ -1,11 +1,15 @@
-﻿using CsvHelper;
-using OfficeOpenXml;
-using System;
+﻿using OpenKh.Common;
+using CsvHelper;
+using NPOI.XSSF.UserModel;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System;
+using NPOI.SS.UserModel;
+using CsvHelper.TypeConversion;
+using System.ComponentModel;
 
 namespace OpenKh.Tools.Kh2SystemEditor.Utils
 {
@@ -26,36 +30,72 @@ namespace OpenKh.Tools.Kh2SystemEditor.Utils
             }
             else if (fileExt == ".xlsx")
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                using var xlsx = new ExcelPackage();
-                var book = xlsx.Workbook;
-                var sheet = book.Worksheets.Add("Item");
+                var book = new XSSFWorkbook();
+                var sheet = book.CreateSheet("Item");
 
                 var columnNames = lists.First().Keys.ToArray();
 
-                var x = 0;
-                var y = 1;
+                Func<int, int, ICell> prepareCell = (y, x) =>
+                {
+                    var row = sheet.GetRow(y) ?? sheet.CreateRow(y);
+                    var cell = row.GetCell(x) ?? row.CreateCell(x);
+                    return cell;
+                };
+
+                var x = -1;
+                var y = 0;
                 foreach (var name in columnNames)
                 {
                     ++x;
-                    sheet.Cells[y, x].Value = name;
+                    prepareCell(y, x).SetCellValue(name);
                 }
                 foreach (var list in lists)
                 {
                     ++y;
-                    x = 0;
+                    x = -1;
                     foreach (var name in columnNames)
                     {
                         ++x;
-                        sheet.Cells[y, x].Value = list[name];
+                        var cell = prepareCell(y, x);
+                        var cellValue = list[name];
+                        if (cellValue is int)
+                        {
+                            cell.SetCellValue((int)cellValue);
+                        }
+                        if (cellValue is uint)
+                        {
+                            cell.SetCellValue((uint)cellValue);
+                        }
+                        else if (cellValue is byte)
+                        {
+                            cell.SetCellValue((byte)cellValue);
+                        }
+                        else if (cellValue is short)
+                        {
+                            cell.SetCellValue((short)cellValue);
+                        }
+                        else if (cellValue is ushort)
+                        {
+                            cell.SetCellValue((ushort)cellValue);
+                        }
+                        else if (cellValue is float)
+                        {
+                            cell.SetCellValue((float)cellValue);
+                        }
+                        else if (cellValue is double)
+                        {
+                            cell.SetCellValue((double)cellValue);
+                        }
+                        else
+                        {
+                            cell.SetCellValue("" + cellValue);
+                        }
                     }
                 }
 
-                if (File.Exists(fileName))
-                {
-                    File.Delete(fileName);
-                }
-                xlsx.SaveAs(new FileInfo(fileName));
+                sheet.CreateFreezePane(0, 1);
+
+                File.Create(fileName).Using(book.Write);
             }
             else
             {
