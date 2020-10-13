@@ -330,8 +330,14 @@ namespace OpenKh.Imaging
                 throw new NotImplementedException("Mipmaps are not currently supported.");
             }
 
-			_imageData = stream.ReadBytes(picture.ImageSize);
-			_clutData = stream.ReadBytes(picture.ClutSize);
+            var clutDataSize = (picture.ClutSize < 0)
+                // KH2 map radar TM2
+                ? -16 * picture.ClutSize
+                // Common usage
+                : picture.ClutSize;
+
+            _imageData = stream.ReadBytes(picture.ImageSize);
+            _clutData = stream.ReadBytes(clutDataSize);
             if (IsClutSwizzled)
                 _clutData = SortClut(_clutData, ClutFormat, picture.ClutColorCount);
 
