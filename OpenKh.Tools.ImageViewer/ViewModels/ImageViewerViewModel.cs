@@ -31,10 +31,17 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             .ToList()
             .AddAllFiles();
 
-        private static readonly List<FileDialogFilter> ExportFilters = FileDialogFilterComposer
+        private static readonly List<FileDialogFilter> ExportMultiImagesFilters = FileDialogFilterComposer
             .Compose()
-            .AddExtensions("All supported images for export", GetAllSupportedExtensions())
-            .Concat(_imageFormatService.Formats.Where(x => x.IsCreationSupported).Select(x => FileDialogFilter.ByExtensions($"{x.Name} image", x.Extension)))
+            .AddExtensions("All supported images for export", GetAllSupportedExtensions(x => x.IsCreationSupported && x.IsContainer))
+            .Concat(_imageFormatService.Formats.Where(x => x.IsCreationSupported && x.IsContainer).Select(x => FileDialogFilter.ByExtensions($"{x.Name} image", x.Extension)))
+            .ToList()
+            .AddAllFiles();
+
+        private static readonly List<FileDialogFilter> ExportSingleImageFilters = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("All supported images for export", GetAllSupportedExtensions(x => x.IsCreationSupported && !x.IsContainer))
+            .Concat(_imageFormatService.Formats.Where(x => x.IsCreationSupported && !x.IsContainer).Select(x => FileDialogFilter.ByExtensions($"{x.Name} image", x.Extension)))
             .ToList()
             .AddAllFiles();
 
@@ -104,21 +111,48 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
             }, x => true);
 
-            ExportCommand = new RelayCommand(x =>
+            ExportCurrentCommand = new RelayCommand(x =>
             {
-                FileDialog.OnSave(fileName =>
+                var singleImage = Image?.Source;
+                if (singleImage != null)
                 {
-                    var imageFormat = _imageFormatService.GetFormatByFileName(fileName);
-                    if (imageFormat == null)
+                    FileDialog.OnSave(fileName =>
                     {
-                        var extension = Path.GetExtension(fileName);
-                        MessageBox.Show($"The format with extension {extension} is not supported for export.",
-                            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
+                        var imageFormat = _imageFormatService.GetFormatByFileName(fileName);
+                        if (imageFormat == null)
+                        {
+                            var extension = Path.GetExtension(fileName);
+                            MessageBox.Show($"The format with extension {extension} is not supported for export.",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
 
-                    File.OpenWrite(fileName).Using(stream => Save(stream, imageFormat));
-                }, ExportFilters);
+                        File.OpenWrite(fileName).Using(stream => imageFormat.As<IImageSingle>().Write(stream, singleImage));
+                    }, ExportSingleImageFilters);
+                }
+            }, x => true);
+
+            ExportAllCommand = new RelayCommand(x =>
+            {
+                var multiImages = GetImagesForExport();
+                if (multiImages.Any())
+                {
+                    FileDialog.OnSave(fileName =>
+                    {
+                        var imageFormat = _imageFormatService.GetFormatByFileName(fileName);
+                        if (imageFormat == null)
+                        {
+                            var extension = Path.GetExtension(fileName);
+                            MessageBox.Show($"The format with extension {extension} is not supported for export.",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+
+                        var imageContainer = new ImageFormatService.ImageContainer(multiImages);
+
+                        File.OpenWrite(fileName).Using(stream => imageFormat.As<IImageMultiple>().Write(stream, imageContainer));
+                    }, ExportMultiImagesFilters);
+                }
             }, x => true);
 
             ImportCommand = new RelayCommand(
@@ -278,7 +312,8 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         public RelayCommand SaveAsCommand { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AboutCommand { get; set; }
-        public RelayCommand ExportCommand { get; set; }
+        public RelayCommand ExportCurrentCommand { get; set; }
+        public RelayCommand ExportAllCommand { get; set; }
         public RelayCommand ImportCommand { get; set; }
         public RelayCommand CreateNewImgzCommand { get; }
         public RelayCommand ConvertToImgzCommand { get; private set; }
@@ -562,9 +597,10 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             }
         }
 
-        private static string GetAllSupportedExtensions()
+        private static string GetAllSupportedExtensions(Func<IImageFormat, bool> filter = null)
         {
-            var extensions = _imageFormatService.Formats.Select(x => $"*.{x.Extension}");
+            filter = filter ?? (it => true);
+            var extensions = _imageFormatService.Formats.Where(filter).Select(x => $"*.{x.Extension}");
             return string.Join(";", extensions).Substring(2);
         }
 
@@ -586,6 +622,22 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 p.WaitForExit();
                 this.p = p;
             }
+        }
+
+        private IEnumerable<IImageRead> GetImagesForExport()
+        {
+            if (ImageContainer != null)
+            {
+                // currently container (multiple images) format
+                return ImageContainer.Images.ToArray();
+            }
+            if (Image?.Source != null)
+            {
+                // currently single image format
+                return new IImageRead[] { Image.Source };
+            }
+            // no image loaded
+            return new IImageRead[0];
         }
     }
 }
