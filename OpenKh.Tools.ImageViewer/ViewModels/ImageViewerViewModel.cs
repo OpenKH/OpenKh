@@ -31,17 +31,17 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             .ToList()
             .AddAllFiles();
 
-        private static readonly List<FileDialogFilter> ExportMultiImagesFilters = FileDialogFilterComposer
+        private static readonly List<FileDialogFilter> ExportToContainerFilters = FileDialogFilterComposer
             .Compose()
             .AddExtensions("All supported images for export", GetAllSupportedExtensions(x => x.IsCreationSupported && x.IsContainer))
             .Concat(_imageFormatService.Formats.Where(x => x.IsCreationSupported && x.IsContainer).Select(x => FileDialogFilter.ByExtensions($"{x.Name} image", x.Extension)))
             .ToList()
             .AddAllFiles();
 
-        private static readonly List<FileDialogFilter> ExportSingleImageFilters = FileDialogFilterComposer
+        private static readonly List<FileDialogFilter> ExportToSingleImageFilters = FileDialogFilterComposer
             .Compose()
-            .AddExtensions("All supported images for export", GetAllSupportedExtensions(x => x.IsCreationSupported && !x.IsContainer))
-            .Concat(_imageFormatService.Formats.Where(x => x.IsCreationSupported && !x.IsContainer).Select(x => FileDialogFilter.ByExtensions($"{x.Name} image", x.Extension)))
+            .AddExtensions("All supported images for export", GetAllSupportedExtensions(x => x.IsCreationSupported))
+            .Concat(_imageFormatService.Formats.Where(x => x.IsCreationSupported).Select(x => FileDialogFilter.ByExtensions($"{x.Name} image", x.Extension)))
             .ToList()
             .AddAllFiles();
 
@@ -127,8 +127,26 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                             return;
                         }
 
-                        File.OpenWrite(fileName).Using(stream => imageFormat.As<IImageSingle>().Write(stream, singleImage));
-                    }, ExportSingleImageFilters);
+                        File.OpenWrite(fileName).Using(
+                            stream =>
+                            {
+                                if (imageFormat.IsContainer)
+                                {
+                                    imageFormat.As<IImageMultiple>().Write(
+                                        stream,
+                                        new ImageFormatService.ImageContainer(new IImageRead[] { singleImage })
+                                    );
+                                }
+                                else
+                                {
+                                    imageFormat.As<IImageSingle>().Write(
+                                       stream,
+                                       singleImage
+                                   );
+                                }
+                            }
+                        );
+                    }, ExportToSingleImageFilters);
                 }
             }, x => true);
 
@@ -151,7 +169,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                         var imageContainer = new ImageFormatService.ImageContainer(multiImages);
 
                         File.OpenWrite(fileName).Using(stream => imageFormat.As<IImageMultiple>().Write(stream, imageContainer));
-                    }, ExportMultiImagesFilters);
+                    }, ExportToContainerFilters);
                 }
             }, x => true);
 
