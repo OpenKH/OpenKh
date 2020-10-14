@@ -1,6 +1,7 @@
 ﻿using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 
@@ -39,10 +40,10 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     absTranslationList[x] = absTranslation + localTranslation;
 
                     var localRotation = Quaternion.Identity;
-                    if (oneBone.RotationX != 0) localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitX, oneBone.RotationX));
-                    if (oneBone.RotationY != 0) localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitY, oneBone.RotationY));
                     if (oneBone.RotationZ != 0) localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitZ, oneBone.RotationZ));
-                    absRotationList[x] = localRotation * absRotation;
+                    if (oneBone.RotationY != 0) localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitY, oneBone.RotationY));
+                    if (oneBone.RotationX != 0) localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitX, oneBone.RotationX));
+                    absRotationList[x] = absRotation * localRotation;
                 }
                 for (int x = 0; x < matrices.Length; x++)
                 {
