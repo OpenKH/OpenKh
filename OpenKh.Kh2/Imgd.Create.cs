@@ -31,7 +31,15 @@ namespace OpenKh.Kh2
             }
             else
             {
-                Data = data;
+                switch (format)
+                {
+                    case Format4bpp:
+                        Data = GetSwappedPixelData(data);
+                        break;
+                    case Format8bpp:
+                        Data = data;
+                        break;
+                }
             }
 
             switch (format)
@@ -100,6 +108,17 @@ namespace OpenKh.Kh2
             }
 
             return newClut;
+        }
+
+        private byte[] GetSwappedPixelData(byte[] data)
+        {
+            var newData = new byte[data.Length];
+            for (var i = 0; i < data.Length; i++)
+            {
+                var pixel = data[i];
+                newData[i] = (byte)((pixel >> 4) | (pixel << 4));
+            }
+            return newData;
         }
 
         private static byte ToPs2Alpha(byte data) => (byte)((data + 1) / 2);
