@@ -107,7 +107,17 @@ namespace OpenKh.Kh2
             public Stream Stream { get; set; }
         }
 
-        public static List<Entry> Read(Stream stream, Func<string, EntryType, bool> filter)
+        public class BarContainer
+        {
+            /// <summary>
+            /// Used by p_ex msets.
+            /// </summary>
+            public int Flags = 0;
+
+            public List<Entry> Entries { get; set; } = new List<Entry>();
+        }
+
+        public static BarContainer ReadBarContainer(Stream stream, Func<string, EntryType, bool> filter)
         {
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
@@ -118,9 +128,12 @@ namespace OpenKh.Kh2
 
             int filesCount = reader.ReadInt32();
             reader.ReadInt32(); // always zero
-            reader.ReadInt32(); // unknown
+            int flags = reader.ReadInt32(); // used by P_EX mset
 
-            return Enumerable.Range(0, filesCount)
+            return new BarContainer
+            {
+                Flags = flags,
+                Entries = Enumerable.Range(0, filesCount)
                 .Select(x => new
                 {
                     Type = (EntryType)reader.ReadUInt16(),
@@ -151,7 +164,18 @@ namespace OpenKh.Kh2
                         Stream = fileStream
                     };
                 })
-                .ToList();
+                .ToList()
+            };
+        }
+
+        public static BarContainer ReadBarContainer(Stream stream)
+        {
+            return ReadBarContainer(stream, (name, type) => true);
+        }
+
+        public static List<Entry> Read(Stream stream, Func<string, EntryType, bool> filter)
+        {
+            return ReadBarContainer(stream, filter).Entries;
         }
 
         public static List<Entry> Read(Stream stream)
@@ -164,7 +188,7 @@ namespace OpenKh.Kh2
 			return Read(stream, filter).Count;
 		}
 
-		public static void Write(Stream stream, IEnumerable<Entry> entries)
+		public static void Write(Stream stream, IEnumerable<Entry> entries, int flags = 0)
 		{
 			if (!stream.CanWrite || !stream.CanSeek)
 				throw new InvalidDataException($"Write or seek must be supported.");
@@ -175,7 +199,7 @@ namespace OpenKh.Kh2
 			writer.Write(MagicCode);
 			writer.Write(entriesCount);
 			writer.Write(0);
-			writer.Write(0);
+			writer.Write(flags);
 
 			var offset = HeaderSize + entriesCount * EntrySize;
             var dicLink = new Dictionary<(string name, EntryType type), (int offset, int length)>();
