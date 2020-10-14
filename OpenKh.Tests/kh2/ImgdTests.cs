@@ -205,7 +205,7 @@ namespace OpenKh.Tests.kh2
                 PixelFormat.Indexed8,
                 pixelData,
                 new byte[4 * 256],
-                false
+                true
             )
         );
     }
