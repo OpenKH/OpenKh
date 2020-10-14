@@ -133,6 +133,7 @@ namespace OpenKh.Research.Kh2AnimTest
 
         public static void Close()
         {
+            _tokenSource?.Cancel();
             _tokenSource?.Dispose();
         }
     }
