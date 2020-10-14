@@ -119,11 +119,11 @@ namespace OpenKh.Engine.Parsers.Kddf2
                                     // multiple joints, using rawPos.W as blend weights
                                     foreach (VertexAssignment vertexAssign in vertexAssigns)
                                     {
-                                        finalPos += Vector3.Transform(
-                                            VCUt.V4To3(
-                                                vertexAssign.rawPos
-                                            ),
-                                            matrices[vertexAssign.matrixIndex]
+                                        finalPos += VCUt.V4To3(
+                                            Vector4.Transform(
+                                                vertexAssign.rawPos,
+                                                matrices[vertexAssign.matrixIndex]
+                                            )
                                         );
                                     }
                                 }

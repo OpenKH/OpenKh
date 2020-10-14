@@ -79,7 +79,8 @@ namespace OpenKh.Research.Kh2AnimTest.States
             SpawnEntity(
                 new SpawnPoint.Entity
                 {
-                    ObjectId = 0x236, // PLAYER
+                    //ObjectId = 0x236, // PLAYER
+                    ObjectId = 0x23C, // ACTOR_SORA_H
                 }
             );
         }
