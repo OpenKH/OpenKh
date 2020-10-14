@@ -173,6 +173,18 @@ namespace OpenKh.Kh2
 
         public Size Size { get; }
 
+        /// <summary>
+        /// Bitmap data
+        /// </summary>
+        /// <remarks>
+        /// In the following case, this `Data` is not same bitmap data stored in imgd file.
+        /// 
+        /// In OpenKh:
+        /// - NOT IsSwizzled && Format4bpp = storing Windows pixel order ([1, 2] to 0x12)
+        /// 
+        /// In IMGD file:
+        /// - NOT IsSwizzled && Format4bpp = storing reversed pixel order ([1, 2] to 0x21)
+        /// </remarks>
 		public byte[] Data { get; }
 
         public byte[] Clut { get; }
@@ -190,7 +202,7 @@ namespace OpenKh.Kh2
                 case Format8bpp:
                     return IsSwizzled ? Ps2.Decode8(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data;
                 case Format4bpp:
-					return IsSwizzled ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : GetSwappedPixelData(Data);
+					return IsSwizzled ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data;
 				default:
 					throw new NotSupportedException($"The format {format} is not supported.");
 			}
