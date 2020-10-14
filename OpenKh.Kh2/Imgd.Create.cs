@@ -31,15 +31,7 @@ namespace OpenKh.Kh2
             }
             else
             {
-                switch (format)
-                {
-                    case Format4bpp:
-                        Data = GetSwappedPixelData(data);
-                        break;
-                    case Format8bpp:
-                        Data = data;
-                        break;
-                }
+                Data = data;
             }
 
             switch (format)

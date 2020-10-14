@@ -180,7 +180,7 @@ namespace OpenKh.Kh2
                 case Format8bpp:
                     return IsSwizzled ? Ps2.Decode8(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data;
                 case Format4bpp:
-					return IsSwizzled ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data;
+					return IsSwizzled ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : GetSwappedPixelData(Data);
 				default:
 					throw new NotSupportedException($"The format {format} is not supported.");
 			}
