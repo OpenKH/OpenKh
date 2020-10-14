@@ -20,7 +20,6 @@ namespace OpenKh.Research.Kh2AnimTest
         private readonly ArchiveManager archiveManager;
         private readonly InputManager inputManager;
         private readonly DebugOverlay _debugOverlay;
-        private readonly Func<ModelViewerState> ModelViewerStateFactory;
         private IState state;
         private bool _isResolutionChanged;
 
@@ -48,7 +47,7 @@ namespace OpenKh.Research.Kh2AnimTest
                         state = myState;
                         break;
                     case 3:
-                        state = ModelViewerStateFactory();
+                        state = new ModelViewerState();
                         state.Initialize(GetStateInitDesc());
                         break;
                     default:
@@ -61,13 +60,8 @@ namespace OpenKh.Research.Kh2AnimTest
             }
         }
 
-        public OpenKhGame(
-            string[] args,
-            Func<ModelViewerState> ModelViewerStateFactory
-        )
+        public OpenKhGame(string[] args)
         {
-            this.ModelViewerStateFactory = ModelViewerStateFactory;
-
             var contentPath = args.FirstOrDefault() ?? Config.DataPath;
 
             _dataContent = CreateDataContent(contentPath, Config.IdxFilePath, Config.ImgFilePath);

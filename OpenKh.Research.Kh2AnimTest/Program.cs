@@ -21,7 +21,6 @@ namespace OpenKh.Research.Kh2AnimTest
 
             var services = new ContainerBuilder();
             services.RegisterType<OpenKhGame>();
-            services.RegisterType<ModelViewerState>();
 
 #if DEBUG
             using (var provider = services.Build())
