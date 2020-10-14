@@ -256,36 +256,15 @@ namespace OpenKh.Kh2.Utils
                             for (int x = 0; x < src.Width; x++)
                             {
                                 var newPixel = newPalette.FindNearest(src.Pixels[srcPointer++]) & 15;
-
-                                if (swizzle)
+                                if (0 == (x & 1))
                                 {
-                                    // no pixel swapping is required
-
-                                    if (0 == (x & 1))
-                                    {
-                                        // first pixel: hi byte
-                                        destBits[destPointer] |= (byte)(newPixel << 4);
-                                    }
-                                    else
-                                    {
-                                        // second pixel: lo byte
-                                        destBits[destPointer++] = (byte)(newPixel);
-                                    }
+                                    // first pixel: hi byte
+                                    destBits[destPointer] = (byte)(newPixel << 4);
                                 }
                                 else
                                 {
-                                    // pixel swapping is required.
-
-                                    if (0 == (x & 1))
-                                    {
-                                        // first pixel: lo byte
-                                        destBits[destPointer] = (byte)(newPixel);
-                                    }
-                                    else
-                                    {
-                                        // second pixel: hi byte
-                                        destBits[destPointer++] |= (byte)(newPixel << 4);
-                                    }
+                                    // second pixel: lo byte
+                                    destBits[destPointer++] |= (byte)(newPixel);
                                 }
                             }
                         }
