@@ -62,7 +62,7 @@ namespace OpenKh.Engine.Parsers
             var parser = new Kddf2.Kkdf2MdlxParser(mdlx.SubModels.First());
             var builtModel = parser
                 .ProcessVerticesAndBuildModel(
-                    MdlxMatrixUtil.BuildTPoseMatrices(mdlx.SubModels.First(), Matrix.Identity)
+                    MdlxMatrixUtil.BuildTPoseMatrices(mdlx.SubModels.First(), Matrix4x4.Identity)
                 );
 
             var ci = builtModel.textureIndexBasedModelDict.Select((kv, i) => new Kddf2.Kkdf2MdlxParser.CI

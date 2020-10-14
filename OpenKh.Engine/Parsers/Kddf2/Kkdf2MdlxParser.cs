@@ -4,6 +4,7 @@ using OpenKh.Kh2;
 using OpenKh.Ps2;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -53,9 +54,9 @@ namespace OpenKh.Engine.Parsers.Kddf2
         /// Build final model using immutable parts and given matrices.
         /// </summary>
         /// <returns></returns>
-        public Kkdf2MdlxBuiltModel ProcessVerticesAndBuildModel(Matrix[] matrices)
+        public Kkdf2MdlxBuiltModel ProcessVerticesAndBuildModel(Matrix4x4[] matrices)
         {
-            var models = new SortedDictionary<Tuple<int, bool>, Model>();
+            var models = new SortedDictionary<Tuple<int, bool>, TrianglesMesh>();
 
             var exportedMesh = new ExportedMesh();
 
@@ -106,23 +107,23 @@ namespace OpenKh.Engine.Parsers.Kddf2
                                 if (vertexAssigns.Length == 1)
                                 {
                                     // single joint
-                                    finalPos = TransformCoordinate(
-                                    VCUt.V4To3(
-                                        vertexAssigns[0].rawPos
-                                    ),
-                                    matrices[vertexAssigns[0].matrixIndex]
-                                );
+                                    finalPos = Vector3.Transform(
+                                        VCUt.V4To3(
+                                            vertexAssigns[0].rawPos
+                                        ),
+                                        matrices[vertexAssigns[0].matrixIndex]
+                                    );
                                 }
                                 else
                                 {
                                     // multiple joints, using rawPos.W as blend weights
                                     foreach (VertexAssignment vertexAssign in vertexAssigns)
                                     {
-                                        finalPos += VCUt.V4To3(
-                                            Transform(
-                                                vertexAssign.rawPos,
-                                                matrices[vertexAssign.matrixIndex]
-                                            )
+                                        finalPos += Vector3.Transform(
+                                            VCUt.V4To3(
+                                                vertexAssign.rawPos
+                                            ),
+                                            matrices[vertexAssign.matrixIndex]
                                         );
                                     }
                                 }
@@ -147,10 +148,10 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 {
                     TriangleRef triRef = exportedMesh.triangleRefList[triIndex];
                     Tuple<int, bool> modelKey = new Tuple<int, bool>(triRef.textureIndex, triRef.isOpaque);
-                    Model model;
+                    TrianglesMesh model;
                     if (models.TryGetValue(modelKey, out model) == false)
                     {
-                        models[modelKey] = model = new Model();
+                        models[modelKey] = model = new TrianglesMesh();
                     }
                     for (int i = 0; i < triRef.list.Length; i++)
                     {
@@ -169,27 +170,6 @@ namespace OpenKh.Engine.Parsers.Kddf2
             };
         }
 
-        private static Vector3 TransformCoordinate(Vector3 coordinate, Matrix transformation)
-        {
-            Vector4 vector4 = new Vector4();
-            vector4.X = (float)((double)transformation.M21 * (double)coordinate.Y + (double)transformation.M11 * (double)coordinate.X + (double)transformation.M31 * (double)coordinate.Z) + transformation.M41;
-            vector4.Y = (float)((double)transformation.M22 * (double)coordinate.Y + (double)transformation.M12 * (double)coordinate.X + (double)transformation.M32 * (double)coordinate.Z) + transformation.M42;
-            vector4.Z = (float)((double)transformation.M23 * (double)coordinate.Y + (double)transformation.M13 * (double)coordinate.X + (double)transformation.M33 * (double)coordinate.Z) + transformation.M43;
-            float num = (float)(1.0 / ((double)transformation.M24 * (double)coordinate.Y + (double)transformation.M14 * (double)coordinate.X + (double)transformation.M34 * (double)coordinate.Z + (double)transformation.M44));
-            vector4.W = num;
-            Vector3 vector3 = new Vector3(vector4.X * num, vector4.Y * num, vector4.Z * num);
-            return vector3;
-        }
-
-        public static Vector4 Transform(Vector4 vector, Matrix transformation)
-        {
-            return new Vector4()
-            {
-                X = (float)((double)transformation.M21 * vector.Y + transformation.M11 * vector.X + transformation.M31 * vector.Z + transformation.M41 * vector.W),
-                Y = (float)((double)transformation.M22 * vector.Y + transformation.M12 * vector.X + transformation.M32 * vector.Z + transformation.M42 * vector.W),
-                Z = (float)((double)transformation.M23 * vector.Y + transformation.M13 * vector.X + transformation.M33 * vector.Z + transformation.M43 * vector.W),
-                W = (float)((double)transformation.M24 * vector.Y + transformation.M14 * vector.X + transformation.M34 * vector.Z + transformation.M44 * vector.W)
-            };
-        }
+        public IEnumerable<ImmutableMesh> GetUnprocessedMeshList() => new ReadOnlyCollection<ImmutableMesh>(immultableMeshList);
     }
 }
