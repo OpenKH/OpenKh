@@ -133,7 +133,7 @@ namespace OpenKh.Game.States
         private void DrawAllMeshes(EffectPass pass, bool passRenderOpaque)
         {
             _graphics.GraphicsDevice.DepthStencilState = passRenderOpaque ? DepthStencilState.Default : DepthStencilState.DepthRead;
-            
+
             _shader.ProjectionView = _camera.Projection;
             _shader.WorldView = _camera.World;
             _shader.ModelView = Matrix.Identity;
@@ -141,14 +141,7 @@ namespace OpenKh.Game.States
 
             foreach (var mesh in _models)
             {
-                if (mesh.MeshDescriptors != null)
-                {
-                    RenderMeshNew(pass, mesh, passRenderOpaque);
-                }
-                else
-                {
-                    RenderMesh(pass, mesh, passRenderOpaque);
-                }
+                RenderMeshNew(pass, mesh, passRenderOpaque);
             }
 
             _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -160,7 +153,7 @@ namespace OpenKh.Game.States
                 _shader.ModelView = entity.GetMatrix();
                 pass.Apply();
 
-                RenderMesh(pass, entity.Mesh, passRenderOpaque);
+                RenderMeshNew(pass, entity.Mesh, passRenderOpaque);
             }
 
             foreach (var entity in _bobEntities)
@@ -170,32 +163,7 @@ namespace OpenKh.Game.States
                 _shader.ModelView = entity.GetMatrix();
                 pass.Apply();
 
-                RenderMesh(pass, _bobModels[entity.BobIndex], passRenderOpaque);
-            }
-        }
-
-        private void RenderMesh(EffectPass pass, MeshGroup mesh, bool passRenderOpaque)
-        {
-            for (int index = 0; index < mesh.Parts.Length && index < mesh.Segments.Length; index++)
-            {
-                MeshGroup.Part part = mesh.Parts[index];
-                MeshGroup.Segment segment = mesh.Segments[index];
-
-                if (part.Indices.Length == 0 || part.IsOpaque != passRenderOpaque)
-                    continue;
-
-                var textureIndex = part.TextureId & 0xffff;
-                if (textureIndex < mesh.Textures.Length)
-                    _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
-
-                _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
-                    PrimitiveType.TriangleList,
-                    segment.Vertices,
-                    0,
-                    segment.Vertices.Length,
-                    part.Indices,
-                    0,
-                    part.Indices.Length / 3);
+                RenderMeshNew(pass, _bobModels[entity.BobIndex], passRenderOpaque);
             }
         }
 

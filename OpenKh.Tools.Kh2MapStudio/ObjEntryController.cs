@@ -14,8 +14,6 @@ namespace OpenKh.Tools.Kh2MapStudio
     {
         private static readonly MeshGroup EmptyMeshGroup = new MeshGroup
         {
-            Parts = new MeshGroup.Part[0],
-            Segments = new MeshGroup.Segment[0],
             Textures = new KingdomTexture[0],
             MeshDescriptors = new List<MeshDesc>(0)
         };

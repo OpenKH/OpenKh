@@ -26,17 +26,13 @@ namespace OpenKh.Engine.MonoGame
                 return null;
 
             var modelParsed = new MdlxParser(model);
-            return modelParsed.MeshDescriptors != null ?
-                LoadKH2New(modelParsed) :
-                LoadKH2Legacy(modelParsed);
+            return LoadKH2New(modelParsed);
         }
 
         private static MeshGroup LoadKH2New(MdlxParser model)
         {
             return new MeshGroup
             {
-                Segments = null,
-                Parts = null,
                 MeshDescriptors = model.MeshDescriptors?
                     .Select(x => new MeshDesc
                     {
@@ -51,37 +47,6 @@ namespace OpenKh.Engine.MonoGame
                         IsOpaque = x.IsOpaque
                     })
                     .ToList(),
-                Textures = null
-            };
-        }
-
-        private static MeshGroup LoadKH2Legacy(MdlxParser model)
-        {
-            MeshGroup.Segment[] segments = null;
-            MeshGroup.Part[] parts = null;
-
-            segments = model.Model.Segments.Select(segment => new MeshGroup.Segment
-            {
-                Vertices = segment.Vertices.Select(vertex => new VertexPositionColorTexture
-                {
-                    Position = new Vector3(vertex.X, vertex.Y, vertex.Z),
-                    TextureCoordinate = new Vector2(vertex.U, vertex.V),
-                    Color = new Color((vertex.Color >> 16) & 0xff, (vertex.Color >> 8) & 0xff, vertex.Color & 0xff, (vertex.Color >> 24) & 0xff)
-                }).ToArray()
-            }).ToArray();
-
-            parts = model.Model.Parts.Select(part => new MeshGroup.Part
-            {
-                Indices = part.Indices,
-                SegmentId = part.SegmentIndex,
-                TextureId = part.TextureIndex,
-                IsOpaque = part.IsOpaque,
-            }).ToArray();
-
-            return new MeshGroup
-            {
-                Segments = segments,
-                Parts = parts,
                 Textures = null
             };
         }
