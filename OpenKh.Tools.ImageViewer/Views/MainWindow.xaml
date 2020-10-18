@@ -43,7 +43,7 @@
                 <MenuItem Header="Remove current image" Command="{Binding RemoveImageCommand}"/>
                 <Separator/>
                 <MenuItem Header="Export current image..." Command="{Binding ExportCurrentCommand}"/>
-                <MenuItem Header="Export all image..." Command="{Binding ExportAllCommand}"/>
+                <MenuItem Header="Export all images..." Command="{Binding ExportAllCommand}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
