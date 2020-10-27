@@ -5,10 +5,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Kh2", "OpenKh.Kh2\OpenKh.Kh2.csproj", "{D5B36CD1-5B5D-4CE9-A673-209AD386D68A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DC4CA2F6-9A43-4112-92A8-8ACFF5E6C5A2}"
-	ProjectSection(SolutionItems) = preProject
-		LICENSE = LICENSE
-		README.md = README.md
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.BarEditor", "OpenKh.Tools.BarEditor\OpenKh.Tools.BarEditor.csproj", "{5A6A483A-527E-4B96-9174-F0E648BCA950}"
 EndProject
@@ -108,9 +104,42 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tests.Commands", "Op
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tests.Engine", "OpenKh.Tests.Engine\OpenKh.Tests.Engine.csproj", "{198657C3-DC06-4AA6-A594-6D4D82218CA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Ps2", "OpenKh.Ps2\OpenKh.Ps2.csproj", "{8D0CBCCA-3F3E-4775-B001-2DDA4D962A8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Ps2", "OpenKh.Ps2\OpenKh.Ps2.csproj", "{8D0CBCCA-3F3E-4775-B001-2DDA4D962A8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.Kh2MapStudio", "OpenKh.Tools.Kh2MapStudio\OpenKh.Tools.Kh2MapStudio.csproj", "{77ADD488-0297-4EB7-9884-2068F84A9C67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2MapStudio", "OpenKh.Tools.Kh2MapStudio\OpenKh.Tools.Kh2MapStudio.csproj", "{77ADD488-0297-4EB7-9884-2068F84A9C67}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{78098226-72BC-4492-9BA6-0283B4B9D2AB}"
+	ProjectSection(SolutionItems) = preProject
+		build.ps1 = build.ps1
+		build.sh = build.sh
+		openkh_alias = openkh_alias
+		pre-build.ps1 = pre-build.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{0C9861ED-5DCA-4DED-98B8-109031DE471B}"
+	ProjectSection(SolutionItems) = preProject
+		CNAME = CNAME
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{E74CBCC4-B979-44FD-AFFA-A89693483BF2}"
+	ProjectSection(SolutionItems) = preProject
+		CODE_GUIDELINE.md = CODE_GUIDELINE.md
+		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		LICENSE = LICENSE
+		NOTICE = NOTICE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{6B47410F-F5F8-4F79-B4D7-936C698E6805}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipelines", "Pipelines", "{064EB64F-FAFF-4FE8-8711-EC2CF260669C}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -910,6 +939,11 @@ Global
 		{198657C3-DC06-4AA6-A594-6D4D82218CA8} = {939E8104-3A37-41FC-A411-CAEE67A803B6}
 		{8D0CBCCA-3F3E-4775-B001-2DDA4D962A8A} = {0FB7CD6A-EE31-467D-A590-267DCD028618}
 		{77ADD488-0297-4EB7-9884-2068F84A9C67} = {402B2669-D594-4DFA-965B-02A92626ADC6}
+		{78098226-72BC-4492-9BA6-0283B4B9D2AB} = {DC4CA2F6-9A43-4112-92A8-8ACFF5E6C5A2}
+		{0C9861ED-5DCA-4DED-98B8-109031DE471B} = {DC4CA2F6-9A43-4112-92A8-8ACFF5E6C5A2}
+		{E74CBCC4-B979-44FD-AFFA-A89693483BF2} = {DC4CA2F6-9A43-4112-92A8-8ACFF5E6C5A2}
+		{6B47410F-F5F8-4F79-B4D7-936C698E6805} = {DC4CA2F6-9A43-4112-92A8-8ACFF5E6C5A2}
+		{064EB64F-FAFF-4FE8-8711-EC2CF260669C} = {DC4CA2F6-9A43-4112-92A8-8ACFF5E6C5A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}
