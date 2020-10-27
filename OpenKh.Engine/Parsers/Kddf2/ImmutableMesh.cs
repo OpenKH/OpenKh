@@ -1,6 +1,4 @@
-﻿using OpenKh.Engine.Maths;
-
-namespace OpenKh.Engine.Parsers.Kddf2
+﻿namespace OpenKh.Engine.Parsers.Kddf2
 {
     public class ImmutableMesh
     {

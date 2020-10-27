@@ -1,5 +1,4 @@
-﻿using OpenKh.Engine.Maths;
-using OpenKh.Ps2;
+﻿using OpenKh.Ps2;
 using System;
 using System.IO;
 using System.Numerics;
