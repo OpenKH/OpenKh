@@ -2,24 +2,158 @@
 
 This is an essential file for booting [Kingdom Hearts II](../../index.md) and it contains everything related to the battle system.
 
-* [LVUP](#lvup)
-* [LVPM](#lvpm)
-* [ENMP](#enmp)
-* [FMLV](#fmlv)
-* [PRZT](#przt)
-* [BONS](#bons)
-* [PLRP](#plrp)
+It is a [BAR](bar.md) file and contains the following subfiles:
+
+* [ATKP](#atkp) - Attack Params
+* [PTYA](#ptya) - ???
+* [PRZT](#przt) - Prize Table
+* [VTBL](#vtbl) - ???
+* [LVUP](#lvup) - Level Up
+* [BONS](#bons) - Bonus
+* [BTLV](#btlv) - Battle Level
+* [LVPM](#lvpm) - Level Params
+* [ENMP](#enmp) - Enemy Params
+* [PATN](#patn) - Partners
+* [PLRP](#plrp) - ???
+* [LIMT](#limt) - Limits
+* [SUMN](#sumn) - Summons
+* [MAGC](#magc) - Magic
+* [VBRT](#vbrt) - ???
+* [FMLV](#fmlv) - Form Levels
+* [STOP](#stop) - ???
+* [0A](#0a) - ??? (3 entries)
+
+## Atkp
+
+Contains the parameters for the various actions in the game.
+The damage effects' values on MSET files point to this table.
+
+### Atkp Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Atkp header
+| 2713 	 | Atkp entries
+
+### Atkp Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (6)
+| 4 	 | uint | Entry Count
+
+### Atkp Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | ushort | SubId
+| 2 	 | ushort | Id
+| 4 	 | byte | Pierce (0 normal, 1 pierces armor)
+| 5 	 | byte | Damage reduction (0 normal, 01 half damage, 2 no damage) (Needs confirmation)
+| 6 	 | ushort | Power
+| 8 	 | byte | Target (0/1/2 Enemies, 3/4/5 Enemies and allies) (Needs confirmation)
+| 9 	 | byte | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
+| 10 	 | byte | Knockback Type (Check below)
+| 11 	 | byte | Effect on hit (0 none, other values = different effects)
+| 12 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
+| 14 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
+| 16 	 | short | ???
+| 18 	 | byte | Attack type (Eg: 20/22 can defeat bosses)
+| 19 	 | short | ???
+| 21 	 | byte | Reflected motion (Points to the slot in the MSET to be triggered when the attack is reflected)
+| 22 	 | short | ???
+| 24 	 | short | ???
+| 26 	 | short | ???
+| 28 	 | uint | ID of the sound effect 28
+| 32 	 | short | ???
+| 34 	 | 4B | ??? (Single byte flags)
+| 38 	 | byte | Multihit (1 hit every X frames)
+| 39 	 | short | ???
+| 41 	 | byte | Drive drain (Adds on normal state, reduces when in a form)
+| 42 	 | byte | Revenge damage
+| 43 	 | 4B | ??? (Single byte flags)
+| 47 	 | byte | HP drain (Adds on normal state, reduces when in a form)
+
+## Ptya
+
+Unknown.
+
+### Ptya Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Entry Count
+
+## Przt
+
+Contains the item drop table.
+The ID of the entry is assigned in the AI of the object.
+
+### Przt Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Przt header
+| 184 	 | Przt entries
+
+### Przt Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Entry Count
+
+### Przt Entry
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 00     | ushort | ID
+| 02     | byte  | Small HP orbs
+| 03     | byte  | Big HP orbs
+| 04     | byte  | Big Money orbs
+| 05     | byte  | Medium Money orbs
+| 06     | byte  | Small Money orbs
+| 07     | byte  | Small MP orbs
+| 08     | byte  | Big MP orbs
+| 09     | byte  | Small Drive orbs
+| 0A     | byte  | Big Drive orbs
+| 0B     | byte  | Unknown
+| 0C     | ushort  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0E     | short  | Item 1 Drop Percentage
+| 10     | ushort  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 12     | short  | Item 2 Drop Percentage
+| 14     | ushort  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 16     | short  | Item 3 Drop Percentage
+
+## Vtbl
+
+??? ( entries of 14 bytes each)
+
+### Vtbl Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Vtbl header
+| 241 	 | Vtbl entries
+
+### Vtbl Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (1)
+| 4 	 | uint | Entry Count
+
+### Vtbl Entry
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 0 	 | 14B | ??? 
 
 ## Lvup
 
 Contains the level-up table for every playable character.
-
-### Lvup Structure
-
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | byte[64] | Header. Currently unknown.
-| 4 	 | Character[0..13] | Character informations with a fixed sequence
+The Lvup entries follow this sequence:
 
 ### Character sequence
 
@@ -37,39 +171,129 @@ Contains the level-up table for every playable character.
 * Tron
 * Riku
 
-### Lvup 'Character' Entry
+### Lvup Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Lvup header
+| 13 	 | Lvup Table Header
+| 13 	 | Lvup Table
+
+### Lvup Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Lvup Table Count
+| 8 	 | uint | Padding
+| 16 	 | uint | Lvup Entry byte size
+
+### Lvup Table Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | ???
+| 4 	 | uint | Padding
+
+### Lvup Table Structure
+
+| Amount | Description |
+|--------|---------------|
+| 99 	 | Lvup Entry
+
+### Lvup Entry
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00     | int32 | Number of 'LevelUp' entries
-| 04     | LevelUp[0..99] | Holds informations for the level up
-
-### Lvup 'LevelUp' Entry
-
-| Offset | Type | Description |
-|--------|------|-------------|
-| 00     | int  | Needed EXP
+| 00     | int  | Needed EXP for next level
 | 04     | byte | Strength of Character
 | 05     | byte | Magic of Character
 | 06     | byte | Defense of Character
 | 07     | byte | AP of Character
-| 08     | short | Ability given when using Sword route (03system.bin --> ITEM sub file)
-| 0A     | short | Ability given when using Shield route (03system.bin --> ITEM sub file)
-| 0C     | short | Ability given when using Staff route (03system.bin --> ITEM sub file)
+| 08     | short | Ability given when using Sword route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0A     | short | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0C     | short | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 0E     | short | Padding
+
+## Bons
+
+Contains reward items (GET! BONUS).
+The ID is assigned in the msn file (first sub file, offset 0xD).
+
+### Bons Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Bons header
+| 179 	 | Bons entries
+
+### Bons header
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 00     | int32 | File type (2)
+| 04     | int32 | Number of 'Bons' entries
+
+### Bons entry
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 00     | byte  | ID - [EVENT LIST](../../dictionary/events.md)
+| 01     | byte  | Character Id
+| 02     | byte  | HP Increase
+| 03     | byte  | MP Increase
+| 04     | byte  | Drive Gauge Upgrade
+| 05     | byte  | Item Slot Upgrade
+| 06     | byte  | Accessory Slot Upgrade
+| 07     | byte  | Armor Slot Upgrade
+| 08     | short | Bonus Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 10     | short | Bonus Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 12     | int   | Unknown
+
+## Btlv
+
+???
+
+### Btlv Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Btlv header
+| 20 	 | Btlv entries
+
+### Btlv Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (1)
+| 4 	 | uint | Entry Count
+
+### Btlv Entry
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 0 	 | 32B | ??? 
 
 ## Lvpm
 
 Contains the level-up table for the enemies. Based on the level of an enemy, a specific level, containing multiplying values, will be applied over the base statistics of an enemy.
 
+### Lvpm Structure
+
+| Amount | Description |
+|--------|---------------|
+| 99 	 | Lvpm entries
+
+### Lvpm Entry
+
 | Offset | Type  | Description
 |--------|------ |--------------
 | 00     | short | HP level. The formula is `(EnemyHp * LevelHp + 99) / 100`.
-| 02     | short | Unknown
-| 04     | short | Unknown
-| 06     | short | Unknown
-| 08     | short | Attack strength.
-| 0A     | short | Unknown
+| 02     | short | Strength
+| 04     | short | Defense
+| 06     | short | ???
+| 08     | short | ???
+| 0A     | short | Exp
 
 ## Enmp
 
@@ -79,74 +303,230 @@ All the weaknesses are represented in percentage unit. So a weakness with the va
 
 A single enemy has also 32 different HP units, where the first one is the HP of the main entity. Some enemies uses the other 31 entries too, but their purpose is currently unknown.
 
+Every enemy is associated to one or more IDs (eg. Organization members have different ID based if they are in their first fight or they are their data version). Different enemies can use the same ID. The way the game associates an ID to a specific MDLX is done by AI scripting.
+
+### Enmp Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Enmp header
+| 229 	 | Enmp entries
+
+### Enmp Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Entry Count
+
+### Enmp Entry
+
 | Offset | Type  | Description
 |--------|------|--------------
-| 00     | short | Identifies the enemy. Refer to [Enemy list](#enemy-list) for more details.
-| 02     | short | Level of the enemy. Must be between 1 and 99.
+| 00     | short | Identifies the enemy. - [Enemy LIST](../../dictionary/enemy.md)
+| 02     | short | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
 | 04     | short[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
-| 44     | short | Unknown
-| 46     | short | Unknown
+| 44     | short | Damage Cap. (The higher, the less damage received)
+| 46     | short | ???
 | 48     | short | Physical weakness.
 | 4A     | short | Fire weakness.
-| 4C     | short | Ice weakness.
+| 4C     | short | Blizzard weakness.
 | 4E     | short | Thunder weakness.
 | 50     | short | Dark weakness.
-| 52     | short | Unknown
-| 54     | short | Reflect weakness.
-| 54     | short | Reflect weakness.
-| 56     | short | Unknown
+| 52     | short | Neutral weakness.
+| 54     | short | General weakness.
+| 56     | short | Exp multiplier.
 | 58     | short | Unknown
 | 5A     | short | Unknown
 
-### Enemy list
+## Patn
 
-Every enemy is associated to one or more IDs (eg. Organization members have different ID based if they are in their first fight or they are their data version). Different enemies can use the same ID. The way the game associates an ID to a specific MDLX is done by AI scripting.
+Data on partner allies.
 
-| Id | Description
-|----|-------------
-| 0B | Morning Star
-| A1 | Luxord Data cards
-| C8 | Vexen Data
-| D6 | Lexaeus Data
-| D7 | Marluxia Data
-| D9 | Zexion Data
-| DA | Vexen Anti Sora LV1
-| DB | Vexen Anti Sora LV2
-| DC | Vexen Anti Sora LV3
-| DD | Vexen Anti Sora LV4
-| DE | Vexen Anti Sora LV5
-| DF | Zexion Data book illusion
-| E0 | Zexion Data book trap
-| EF | Xemnas Data
-| F0 | Demyx Data
-| F1 | Demyx Data minions
-| F2 | Roxas Data
-| F3 | Luxord Data
-| F4 | Terra
-| F5 | Axel Data
-| F6 | Xaldin Data
-| FC | Xigbar Data
-| FD | Saix Data
+### Patn Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Patn header
+| 18 	 | Patn entries
+
+### Patn Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Entry Count
+
+### Patn Entry
+
+| Offset | Type  | Description
+|--------|------|--------------
+| 00     | byte | Id
+| 01     | byte [19] | ???
+
+## Plrp
+
+Contains informations about starting Character statistics, starting Abilities etc.
+
+### Plrp Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Plrp header
+| 64 	 | Plrp entries
+
+### Plrp Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Entry Count
+
+### Plrp Entry
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 00     | short | Unknown
+| 02     | byte  | Unknown
+| 03     | byte  | HP
+| 04     | byte  | MP
+| 05     | byte  | AP
+| 06     | short | Unknown
+| 08     | short | Unknown
+| 0A     | short | Unknown
+| 0C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+
+## Limt
+
+Data on limits.
+
+### Limt Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Limt header
+| 64 	 | Limt entries
+
+### Limt Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Entry Count
+
+### Limt Entry
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 00     | byte | ID
+| 01     | byte  | Character - [Character/Summon LIST](../../dictionary/characters.md)
+| 02     | byte  | Summon - [Character/Summon LIST](../../dictionary/characters.md)
+| 03     | byte  | Group (3 requires all of the characters to be alive)
+| 04     | char[32]  | Name
+| 36     | 4B | ???
+| 40     | 4B | ???
+| 44     | 4B | ???
+| 48     | 16B | Padding
+
+## Sumn
+
+Data on summons.
+
+### Sumn Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Sumn header
+| 4 	 | Sumn entries
+
+### Sumn Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Entry Count
+
+### Sumn Entry
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 00     | 2B[7] | ???
+| 14     | 50B | Padding
+
+## Magc
+
+Data on magic.
+
+### Magc Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Magc header
+| 4 	 | Magc entries
+
+### Magc Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (1)
+| 4 	 | uint | Entry Count
+
+### Magc Entry
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 0     | byte | Type
+| 1     | byte | Level
+| 2     | 2B | ???
+| 4     | char[32] | Filename
+| 36     | 2B | ???
+| 38     | short | Data - [Command LIST](../../dictionary/commands.md)
+| 40     | short | Ground animation
+| 42     | short | Ground ???
+| 44     | short | Air animation
+| 46     | short | Air ???
+| 48     | short | Finisher animation
+| 50     | short | Finisher ???
+| 52     | byte | ???
+| 53     | byte | ???
+| 54     | byte | ???
+| 55     | byte | Padding
+
+## Vbrt
+
+[BAR](bar.md) file containing unknown data
+
+* vibr
+* auto
+* bliz
+* v0lo
+* l_bo (2 entries)
 
 ## Fmlv
 
 Contains the level-up table for summons and drive forms.
 
-### Header
+### Fmlv Structure
 
-| Offset | Type  | Description
-|--------|-------|-------------
-| 00     | int   | File type; always 2
-| 04     | int   | Entries count
-| 08     | Entry[Count] | Entries
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Fmlv header
+| 4 	 | Fmlv entries
 
-### Entry
+### Fmlv Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Entry Count
+
+### Fmlv Entry
 
 | Offset | Type  | Description
 |--------|-------|-------------
 | 00     | byte  | First digit is the Form id, second digit is the Form level (e.g. 0x13 is Valor Form Level 3)
 | 01     | byte  | Level of the movement ability in the form (High Jump, Quick Run etc.)
-| 02     | short | Ability obtained through level up
+| 02     | short | Ability obtained through level up - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 04     | int   | EXP needed for level up
 
 ### Forms
@@ -174,71 +554,32 @@ Final Mix (JP/PS3/PS4)
 | 05 | Final
 | 06 | Anti
 
-## Przt
+## Stop
 
-Contains the item drop table.
-The ID of the entry is assigned in the AI of the object.
+Data on unknown
 
-| Offset | Type  | Description
-|--------|-------|--------------
-| 00     | ushort | ID
-| 02     | byte  | Small HP orbs
-| 03     | byte  | Big HP orbs
-| 04     | byte  | Big Money orbs
-| 05     | byte  | Medium Money orbs
-| 06     | byte  | Small Money orbs
-| 07     | byte  | Small MP orbs
-| 08     | byte  | Big MP orbs
-| 09     | byte  | Small Drive orbs
-| 0A     | byte  | Big Drive orbs
-| 0B     | byte  | Unknown
-| 0C     | ushort  | Item 1 (Refer to ITEM from 03system)
-| 0E     | short  | Item 1 Drop Percentage
-| 10     | ushort  | Item 2 (Refer to ITEM from 03system)
-| 12     | short  | Item 2 Drop Percentage
-| 14     | ushort  | Item 3 (Refer to ITEM from 03system)
-| 16     | short  | Item 3 Drop Percentage
+### Stop Structure
 
-## Bons
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Stop header
+| 4 	 | Stop entries
 
-Contains reward items (GET! BONUS).
-The ID is assigned in the msn file (first sub file, offset 0xD).
+### Stop Header
 
-### Bons header
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (1)
+| 4 	 | uint | Entry Count
 
-| Offset | Type | Description |
-|--------|------|-------------|
-| 00     | int32 | Magic number
-| 04     | int32 | Number of 'Bons' entries
-
-### Bons entry
+### Stop Entry
 
 | Offset | Type  | Description
-|--------|-------|--------------
-| 00     | byte  | ID
-| 01     | byte  | Character Id
-| 02     | byte  | HP Increase
-| 03     | byte  | MP Increase
-| 04     | byte  | Drive Gauge Upgrade
-| 05     | byte  | Item Slot Upgrade
-| 06     | byte  | Accessory Slot Upgrade
-| 07     | byte  | Armor Slot Upgrade
-| 08     | short | Bonus Item 1 (Refer to ITEM from 03system)
-| 10     | short | Bonus Item 2 (Refer to ITEM from 03system)
-| 12     | int   | Unknown
+|--------|-------|-------------
+| 00     | ushort  | ID
+| 02     | ushort  | ???
 
-## Plrp
 
-Contains informations about starting Character statistics, starting Abilities etc.
+## 0A
 
-| Offset | Type  | Description
-|--------|-------|--------------
-| 00     | short | Unknown
-| 02     | byte  | Unknown
-| 03     | byte  | HP
-| 04     | byte  | MP
-| 05     | byte  | AP
-| 06     | short | Unknown
-| 08     | short | Unknown
-| 0A     | short | Unknown
-| 0C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system). These are obtained after the dusks fight in Station of Awakening.
+Unknown.
