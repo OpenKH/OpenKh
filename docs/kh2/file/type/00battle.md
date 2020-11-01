@@ -171,35 +171,43 @@ The Lvup entries follow this sequence:
 * Tron
 * Riku
 
+NOTE: The first character pointer doesn't point to any character. May be some kind of padding.
+
 ### Lvup Structure
 
 | Amount | Description |
 |--------|---------------|
 | 1 	 | Lvup header
-| 13 	 | Lvup Table Header
-| 13 	 | Lvup Table
+| 13 	 | Character pointer
+| 13 	 | Character
 
 ### Lvup Header
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | uint | File type (2)
-| 4 	 | uint | Lvup Table Count
-| 8 	 | uint | Padding
-| 16 	 | uint | Lvup Entry byte size
+| 4 	 | uint | Character pointer count
 
-### Lvup Table Header
+### Character pointer
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | ???
+| 0 	 | uint | Offset of the character (Measured in 4 bytes, so 10 means offset 40)
 | 4 	 | uint | Padding
 
-### Lvup Table Structure
+### Character Structure
 
 | Amount | Description |
 |--------|---------------|
+| 1 	 | Character header
 | 99 	 | Lvup Entry
+
+### Character header
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 00     | uint  | Lvup entry count
+| 04     | uint  | Padding
 
 ### Lvup Entry
 
@@ -462,7 +470,7 @@ Data on magic.
 | Amount | Description |
 |--------|---------------|
 | 1 	 | Magc header
-| 4 	 | Magc entries
+| 36 	 | Magc entries
 
 ### Magc Header
 
@@ -511,7 +519,7 @@ Contains the level-up table for summons and drive forms.
 | Amount | Description |
 |--------|---------------|
 | 1 	 | Fmlv header
-| 4 	 | Fmlv entries
+| 45 	 | Fmlv entries
 
 ### Fmlv Header
 
