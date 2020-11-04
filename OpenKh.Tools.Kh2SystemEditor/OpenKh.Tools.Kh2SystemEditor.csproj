@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.1" />
-    <PackageReference Include="CsvHelper" Version="15.0.8" />
+    <PackageReference Include="CsvHelper" Version="15.0.9" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" />
     <PackageReference Include="NPOI" Version="2.5.1" />
   </ItemGroup>
