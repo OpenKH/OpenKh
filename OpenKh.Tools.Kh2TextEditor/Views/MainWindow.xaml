@@ -68,7 +68,7 @@
                         Content="US/EU encoder"
                         IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
                             Converter={StaticResource enumConverter},
-                            ConverterParameter=European}" Margin="0,0,-5,0"/>
+                            ConverterParameter=European}"/>
                     <RadioButton
                         Content="JP encoder"
                         IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
@@ -77,7 +77,7 @@
                     <RadioButton Content="TR Encoder"
                             IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
                             Converter={StaticResource enumConverter},
-                            ConverterParameter=Turkish}"/>/>
+                            ConverterParameter=Turkish}"/>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
