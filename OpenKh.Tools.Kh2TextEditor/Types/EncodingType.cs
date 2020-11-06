@@ -1,8 +1,9 @@
-﻿namespace OpenKh.Tools.Kh2TextEditor.Types
+namespace OpenKh.Tools.Kh2TextEditor.Types
 {
     public enum EncodingType
     {
         European,
-        Japanese
+        Japanese,
+        Turkish
     }
 }

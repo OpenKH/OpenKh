@@ -1,4 +1,4 @@
-﻿<Window x:Class="OpenKh.Tools.Kh2TextEditor.Views.MainWindow"
+<Window x:Class="OpenKh.Tools.Kh2TextEditor.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -68,12 +68,16 @@
                         Content="US/EU encoder"
                         IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
                             Converter={StaticResource enumConverter},
-                            ConverterParameter=European}"/>
+                            ConverterParameter=European}" Margin="0,0,-5,0"/>
                     <RadioButton
                         Content="JP encoder"
                         IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
                             Converter={StaticResource enumConverter},
                             ConverterParameter=Japanese}"/>
+                    <RadioButton Content="TR Encoder"
+                            IsChecked="{Binding Path=EncodingType, Mode=TwoWay, 
+                            Converter={StaticResource enumConverter},
+                            ConverterParameter=Turkish}"/>/>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
