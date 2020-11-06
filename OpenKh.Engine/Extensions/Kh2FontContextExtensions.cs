@@ -36,18 +36,18 @@ namespace OpenKh.Engine.Extensions
             };
 
         public static RenderingMessageContext ToKh2TRSystemTextContext(this FontContext fontContext) =>
-    new RenderingMessageContext
-    {
-        Font = fontContext.ImageSystem,
-        Font2 = fontContext.ImageSystem2,
-        Icon = fontContext.ImageIcon,
-        FontSpacing = fontContext.SpacingSystem,
-        IconSpacing = fontContext.SpacingIcon,
-        Encoder = Encoders.TurkishSystem,
-        FontWidth = Constants.FontEuropeanSystemWidth,
-        FontHeight = Constants.FontEuropeanSystemHeight,
-        TableHeight = Constants.FontTableSystemHeight,
-    };
+            new RenderingMessageContext
+            {
+                Font = fontContext.ImageSystem,
+                Font2 = fontContext.ImageSystem2,
+                Icon = fontContext.ImageIcon,
+                FontSpacing = fontContext.SpacingSystem,
+                IconSpacing = fontContext.SpacingIcon,
+                Encoder = Encoders.TurkishSystem,
+                FontWidth = Constants.FontEuropeanSystemWidth,
+                FontHeight = Constants.FontEuropeanSystemHeight,
+                TableHeight = Constants.FontTableSystemHeight,
+            };
 
         public static RenderingMessageContext ToKh2TREventTextContext(this FontContext fontContext) =>
             new RenderingMessageContext
