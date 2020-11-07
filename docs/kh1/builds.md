@@ -13,6 +13,9 @@
 | SLPS 25197 | Playstation 2 | JP     | 2002-11-09 | Final Mix       |                           | http://redump.org/disc/60141/ |
 | SLPS 25198 | Playstation 2 | JP     | 2002-11-09 | Final Mix       | Ultimate Hits             | http://redump.org/disc/7734/  |
 | SLPM 61025 | Playstation 2 | JP     | 2002-02-16 | Trial Demo      |                           |                               |
+|            | Playstation 2 | EU     | 2002       | August 178 Preview PAL |                           |                               |
+|            | Playstation 2 | EU     | 2002       | August 246 Preview PAL | Same as 178 Preview       |                               |
+|            | Playstation 2 | JP     | 2001       | TGS 2001 Demo   |                           |                               |
 | BLJM 60589 | Playstation 3 | JP     | 2013-03-14 | Remaster        |                           |                               |
 | BLUS 31212 | Playstation 3 | US     | 2013-09-10 | Remaster        |                           |                               |
 | BLES 01897 | Playstation 3 | EU     | 2013-09-12 | Remaster        |                           |                               |
