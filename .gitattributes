@@ -1,3 +1,2 @@
-*.cs     text diff=csharp
 *.sln    text merge=union
 *.csproj text merge=union
