@@ -1,34 +1,53 @@
-﻿using OpenKh.Tools.Common.CustomImGui;
+using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Tools.Common.CustomImGui;
 using System;
+using System.Reflection;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
+    [Command("OpenKh.Tools.Kh2MapStudio")]
+    [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     class Program : IDisposable
     {
         [STAThread]
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            using var program = new Program(args);
-            program.Run();
+            return CommandLineApplication.Execute<Program>(args);
         }
+
+        protected int OnExecute(CommandLineApplication app)
+        {
+            Run();
+            return 0;
+        }
+
+        #region CommandLine
+        private static string GetVersion()
+            => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+        [Argument(0, "KH2 GamePath")]
+        public string GamePath { get; }
+        #endregion
 
         const int InitialWindowWidth = 1000;
         const int InitialWindowHeight = 800;
         private readonly MonoGameImGuiBootstrap _bootstrap;
         private App _app;
 
-        public Program(string[] args)
+        public Program()
         {
             _bootstrap = new MonoGameImGuiBootstrap(
                 InitialWindowWidth,
                 InitialWindowHeight,
                 Initialize);
             _bootstrap.MainLoop = MainLoop;
+
+
         }
 
         private void Initialize(MonoGameImGuiBootstrap bootstrap)
         {
-            _app = new App(bootstrap);
+            _app = new App(bootstrap, GamePath);
         }
 
         public void Run()
