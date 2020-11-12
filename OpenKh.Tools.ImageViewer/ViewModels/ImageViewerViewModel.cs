@@ -1,4 +1,4 @@
-﻿using OpenKh.Command.ImgTool.Utils;
+using OpenKh.Command.ImgTool.Utils;
 using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
@@ -74,6 +74,9 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
             {
                 if (IsTool)
                 {
+                    // Clear current bar entry content before saving.
+                    _toolInvokeDesc.SelectedEntry.Stream.SetLength(0);
+
                     Save(_toolInvokeDesc.SelectedEntry.Stream);
                 }
                 else if (!string.IsNullOrEmpty(FileName))
