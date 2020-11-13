@@ -1,10 +1,14 @@
-﻿using OpenKh.Game.Debugging;
+using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Game.Debugging;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace OpenKh.Game
 {
-    public static class Program
+    [Command("OpenKh.Game")]
+    [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
+    public class Program
     {
         public static readonly string ProductVersion = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
@@ -13,17 +17,23 @@ namespace OpenKh.Game
         {
             Log.Info("Boot");
             Log.Info($"Version {ProductVersion}");
-            Config.Open();
-            Config.Listen();
+            void run()
+            {
+                Config.Open();
+                Config.Listen();
+
+                CommandLineApplication.Execute<Program>(args);
+
+                Config.Close();
+                Log.Info("End");
+            }
 
 #if DEBUG
-            using (var game = new OpenKhGame(args))
-                game.Run();
+            run();
 #else
             try
             {
-                using (var game = new OpenKhGame(args))
-                        game.Run();
+                run();
             }
             catch (Exception ex)
             {
@@ -34,10 +44,24 @@ namespace OpenKh.Game
                 throw ex;
             }
 #endif
-
-            Config.Close();
-            Log.Info("End");
             Log.Close();
+        }
+
+        private static string GetVersion() => ProductVersion;
+
+
+        [Required]
+        [Argument(0, "Content path", "Location of game's data")]
+        public string ContentPath { get; }
+
+        private void OnExecute()
+        {
+            using var game = new OpenKhGame(new OpenKhGameStartup
+            {
+                ContentPath = ContentPath
+            });
+
+            game.Run();
         }
 
         private static void Catch(Exception ex)

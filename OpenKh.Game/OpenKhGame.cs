@@ -11,6 +11,11 @@ using System.Linq;
 
 namespace OpenKh.Game
 {
+    public class OpenKhGameStartup
+    {
+        public string ContentPath { get; set; }
+    }
+
     public class OpenKhGame : Microsoft.Xna.Framework.Game, IStateChange
     {
         private GraphicsDeviceManager graphics;
@@ -56,9 +61,9 @@ namespace OpenKh.Game
             }
         }
 
-        public OpenKhGame(string[] args)
+        public OpenKhGame(OpenKhGameStartup startup)
         {
-            var contentPath = args.FirstOrDefault() ?? Config.DataPath;
+            var contentPath = startup.ContentPath ?? Config.DataPath;
 
             _dataContent = CreateDataContent(contentPath, Config.IdxFilePath, Config.ImgFilePath);
             _dataContent = new MultipleDataContent(new ModDataContent(), _dataContent);
