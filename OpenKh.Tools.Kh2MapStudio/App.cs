@@ -104,7 +104,9 @@ namespace OpenKh.Tools.Kh2MapStudio
             AddKeyMapping(Keys.O, MenuFileOpen);
             AddKeyMapping(Keys.S, MenuFileSave);
             AddKeyMapping(Keys.Q, MenuFileUnload);
-            OpenFolder(gamePath ?? @"D:\Hacking\KH2\export_fm");
+
+            if (!string.IsNullOrEmpty(gamePath))
+                OpenFolder(gamePath);
 
             ImGui.PushStyleColor(ImGuiCol.MenuBarBg, BgUiColor);
         }
