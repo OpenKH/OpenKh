@@ -69,22 +69,22 @@ namespace OpenKh.Game
         [Option(CommandOptionType.NoValue, ShortName = "v", LongName = "console", Description = "Show the console output (Windows only)")]
         public bool ShowConsole { get; set; }
 
-        [Option(ShortName = "state", Description = "Boot the game into a specific state (0 = Title, 1 = Map, 2 = Menu)")]
+        [Option("--state <ID>", "Boot the game into a specific state (0 = Title, 1 = Map, 2 = Menu)", CommandOptionType.SingleValue)]
         public int InitialState { get; set; }
 
-        [Option(ShortName = "world", Description = "Boot the game into a specific world ID (eg. 'dc')")]
+        [Option("--world <ID>", "Boot the game into a specific world ID (eg. 'dc')", CommandOptionType.SingleValue)]
         public string InitialWorld { get; set; }
 
-        [Option(ShortName = "place", Description = "Boot the game into a specific place ID (eg. for dc06 specify '6')")]
+        [Option("--place <INDEX>", "Boot the game into a specific place ID (eg. for dc06 specify '6')", CommandOptionType.SingleValue)]
         public int InitialPlace { get; set; }
 
-        [Option(ShortName = "spawn-map", Description = "Force the boot map to use a specific spawn script program ID for MAP")]
+        [Option("--spawn-map <PROGRAM_ID>", "Force the boot map to use a specific spawn script program ID for MAP", CommandOptionType.SingleValue)]
         public int InitialSpawnScriptMap { get; set; }
 
-        [Option(ShortName = "spawn-btl", Description = "Force the boot map to use a specific spawn script program ID for BTL")]
+        [Option("--spawn-btl <PROGRAM_ID>", "Force the boot map to use a specific spawn script program ID for BTL", CommandOptionType.SingleValue)]
         public int InitialSpawnScriptBtl { get; set; }
 
-        [Option(ShortName = "spawn-evt", Description = "Force the boot map to use a specific spawn script program ID for EVT")]
+        [Option("--spawn-evt <PROGRAM_ID>", "Force the boot map to use a specific spawn script program ID for EVT", CommandOptionType.SingleValue)]
         public int InitialSpawnScriptEvt { get; set; }
 
         private void OnExecute()
