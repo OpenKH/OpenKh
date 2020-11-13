@@ -2,6 +2,7 @@ using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Game.Debugging;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenKh.Game
@@ -54,11 +55,43 @@ namespace OpenKh.Game
         [Argument(0, "Content path", "Location of game's data")]
         public string ContentPath { get; }
 
+        [Option(ShortName = "state", Description = "Boot the game into a specific state (0 = Title, 1 = Map, 2 = Menu)")]
+        public int InitialState { get; set; }
+
+        [Option(ShortName = "world", Description = "Boot the game into a specific world ID (eg. 'dc')")]
+        public string InitialWorld { get; set; }
+
+        [Option(ShortName = "place", Description = "Boot the game into a specific place ID (eg. for dc06 specify '6')")]
+        public int InitialPlace { get; set; }
+
+        [Option(ShortName = "spawn-map", Description = "Force the boot map to use a specific spawn script program ID for MAP")]
+        public int InitialSpawnScriptMap { get; set; }
+
+        [Option(ShortName = "spawn-btl", Description = "Force the boot map to use a specific spawn script program ID for BTL")]
+        public int InitialSpawnScriptBtl { get; set; }
+
+        [Option(ShortName = "spawn-evt", Description = "Force the boot map to use a specific spawn script program ID for EVT")]
+        public int InitialSpawnScriptEvt { get; set; }
+
         private void OnExecute()
         {
             using var game = new OpenKhGame(new OpenKhGameStartup
             {
-                ContentPath = ContentPath
+                ContentPath = ContentPath,
+                InitialState = InitialState,
+                InitialMap = Kh2.Constants.WorldIds
+                    .Select((world, index) => (world, index))
+                    .Concat(new (string world, int index)[]
+                    {
+                        (InitialWorld, -1)
+                    })
+                    .Where(x => x.world == InitialWorld)
+                    .Select(x => x.index)
+                    .FirstOrDefault(),
+                InitialPlace = InitialPlace,
+                InitialSpawnScriptMap = InitialSpawnScriptMap,
+                InitialSpawnScriptBtl = InitialSpawnScriptBtl,
+                InitialSpawnScriptEvt = InitialSpawnScriptEvt,
             });
 
             game.Run();
