@@ -13,7 +13,7 @@ namespace OpenKh.Kh2
         private static readonly long MinimumLength = 48L;
 
         public const int LinearInterpolationFlag = 0x00000001;
-        public const int AttachTextFlag = 0x00000002;
+        public const int CanHostChildFlag = 0x00000002;
         public const int BouncingFlag = 0x00000010;
         public const int RotationFlag = 0x00000020;
         public const int ScalingFlag = 0x00000040;

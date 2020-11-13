@@ -12,7 +12,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
         /// </summary>
         /// <param name="matrixIndexList">The limited count of matrices are transferred to VU1 due to memory limitation.</param>
         /// <returns></returns>
-        public static ImmutableMesh Run(byte[] vu1mem, int tops, int top2, int textureIndex, int[] matrixIndexList)
+        public static ImmutableMesh Run(byte[] vu1mem, int tops, int textureIndex, int[] matrixIndexList)
         {
             MemoryStream si = new MemoryStream(vu1mem, true);
             BinaryReader br = new BinaryReader(si);
