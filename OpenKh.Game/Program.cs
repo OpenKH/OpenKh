@@ -1,9 +1,13 @@
 using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Win32.SafeHandles;
 using OpenKh.Game.Debugging;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace OpenKh.Game
 {
@@ -11,6 +15,13 @@ namespace OpenKh.Game
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     public class Program
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr GetStdHandle(int nStdHandle);
+
         public static readonly string ProductVersion = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         [STAThread]
@@ -55,6 +66,9 @@ namespace OpenKh.Game
         [Argument(0, "Content path", "Location of game's data")]
         public string ContentPath { get; }
 
+        [Option(CommandOptionType.NoValue, ShortName = "v", LongName = "console", Description = "Show the console output (Windows only)")]
+        public bool ShowConsole { get; set; }
+
         [Option(ShortName = "state", Description = "Boot the game into a specific state (0 = Title, 1 = Map, 2 = Menu)")]
         public int InitialState { get; set; }
 
@@ -75,6 +89,20 @@ namespace OpenKh.Game
 
         private void OnExecute()
         {
+            if (ShowConsole && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                const int STD_OUTPUT_HANDLE = -11;
+                AllocConsole();
+                
+                var stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+                var safeFileHandle = new SafeFileHandle(stdHandle, true);
+                var fileStream = new FileStream(safeFileHandle, FileAccess.Write);
+                var standardOutput = new StreamWriter(fileStream, Encoding.UTF8);
+                standardOutput.AutoFlush = true;
+
+                Console.SetOut(standardOutput);
+            }
+
             using var game = new OpenKhGame(new OpenKhGameStartup
             {
                 ContentPath = ContentPath,
