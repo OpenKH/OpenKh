@@ -1,4 +1,3 @@
-using OpenKh.Engine.Maths;
 using OpenKh.Imaging;
 using System;
 using System.Numerics;
