@@ -12,14 +12,73 @@ namespace OpenKh.Engine.Parsers.Kddf2
 {
     public class Kkdf2MdlxParser
     {
-        public class CI
+        private class ImmutableMesh
         {
-            public int[] Indices;
-            public int TextureIndex, SegmentIndex;
-            public bool IsOpaque;
+            public Mdlx.DmaChain DmaChain { get; }
+            public List<VpuPacket> VpuPackets { get; }
+
+            public int TextureIndex => DmaChain.TextureIndex;
+            public bool IsOpaque => (DmaChain.RenderFlags & 1) == 0;
+
+            public ImmutableMesh(Mdlx.DmaChain dmaChain)
+            {
+                DmaChain = dmaChain;
+                VpuPackets = dmaChain.DmaVifs
+                    .Select(dmaVif =>
+                    {
+                        var unpacker = new VifUnpacker(dmaVif.VifPacket);
+                        unpacker.Run();
+
+                        using (var stream = new MemoryStream(unpacker.Memory))
+                            return VpuPacket.Read(stream);
+                    })
+                    .ToList();
+            }
         }
 
-        public List<CI> MeshDescriptors { get; } = new List<CI>();
+        private class VertexAssignment
+        {
+            public int matrixIndex;
+            public float weight = 1f;
+            public Vector4 rawPos;
+        }
+
+        private class VertexRef
+        {
+            public int vertexIndex, uvIndex;
+
+            public VertexRef(int vertexIndex, int uvIndex)
+            {
+                this.vertexIndex = vertexIndex;
+                this.uvIndex = uvIndex;
+            }
+        }
+
+        private class TriangleRef
+        {
+            public TriangleRef(VertexRef one, VertexRef two, VertexRef three)
+            {
+                list = new VertexRef[] { one, two, three };
+            }
+
+            public VertexRef[] list;
+            public int textureIndex;
+            public bool isOpaque;
+        }
+
+        private class ExportedMesh
+        {
+            public class Part
+            {
+                public int TextureIndex;
+                public bool IsOpaque;
+                public List<TriangleRef> triangleRefList = new List<TriangleRef>();
+            }
+
+            public List<Part> partList = new List<Part>();
+            public List<Vector3> positionList = new List<Vector3>();
+            public List<Vector2> uvList = new List<Vector2>();
+        }
 
         private readonly List<ImmutableMesh> immultableMeshList;
 
@@ -29,24 +88,9 @@ namespace OpenKh.Engine.Parsers.Kddf2
         /// <param name="submodel"></param>
         public Kkdf2MdlxParser(Mdlx.SubModel submodel)
         {
-            immultableMeshList = new List<ImmutableMesh>();
-            foreach (Mdlx.DmaChain dmaChain in submodel.DmaChains)
-            {
-                foreach (Mdlx.DmaVif dmaVif in dmaChain.DmaVifs)
-                {
-                    const int tops = 0x00;
-
-                    var unpacker = new VifUnpacker(dmaVif.VifPacket)
-                    {
-                        Vif1_Tops = tops
-                    };
-                    unpacker.Run();
-
-                    var mesh = VU1Simulation.Run(unpacker.Memory, tops, dmaVif.TextureIndex, dmaVif.Alaxi);
-                    mesh.isOpaque = (dmaChain.RenderFlags & 1) == 0;
-                    immultableMeshList.Add(mesh);
-                }
-            }
+            immultableMeshList = submodel.DmaChains
+                .Select(x => new ImmutableMesh(x))
+                .ToList();
         }
 
         /// <summary>
@@ -57,31 +101,35 @@ namespace OpenKh.Engine.Parsers.Kddf2
         {
             var exportedMesh = new ExportedMesh();
 
+            int vertexBaseIndex = 0;
+            int uvBaseIndex = 0;
+            VertexRef[] ringBuffer = new VertexRef[4];
+            int ringIndex = 0;
+            int[] triangleOrder = new int[] { 1, 3, 2 };
+            foreach (ImmutableMesh meshRoot in immultableMeshList)
             {
-                int vertexBaseIndex = 0;
-                int uvBaseIndex = 0;
-                VertexRef[] ringBuffer = new VertexRef[4];
-                int ringIndex = 0;
-                int[] triangleOrder = new int[] { 1, 3, 2 };
-                foreach (ImmutableMesh mesh in immultableMeshList)
+                for (int i = 0; i < meshRoot.VpuPackets.Count; i++)
                 {
+                    VpuPacket mesh = meshRoot.VpuPackets[i];
                     var part = new ExportedMesh.Part
                     {
-                        meshRef = mesh,
+                        TextureIndex = meshRoot.TextureIndex,
+                        IsOpaque = meshRoot.IsOpaque,
                     };
 
-                    for (int x = 0; x < mesh.indexAssignmentList.Length; x++)
+                    for (int x = 0; x < mesh.Indices.Length; x++)
                     {
-                        var indexAssign = mesh.indexAssignmentList[x];
+                        var indexAssign = mesh.Indices[x];
 
                         VertexRef vertexRef = new VertexRef(
-                            vertexBaseIndex + indexAssign.indexToVertexAssignment,
+                            vertexBaseIndex + indexAssign.Index,
                             uvBaseIndex + x
                         );
                         ringBuffer[ringIndex] = vertexRef;
                         ringIndex = (ringIndex + 1) & 3;
-                        int flag = indexAssign.vertexFlag;
-                        if (flag == 0x20 || flag == 0x00)
+                        var flag = indexAssign.Function;
+                        if (flag == VpuPacket.VertexFunction.DrawTriangle ||
+                            flag == VpuPacket.VertexFunction.DrawTriangleDoubleSided)
                         {
                             var triRef = new TriangleRef(
                                 ringBuffer[(ringIndex - triangleOrder[0]) & 3],
@@ -90,7 +138,8 @@ namespace OpenKh.Engine.Parsers.Kddf2
                                 );
                             part.triangleRefList.Add(triRef);
                         }
-                        if (flag == 0x30 || flag == 0x00)
+                        if (flag == VpuPacket.VertexFunction.DrawTriangleInverse ||
+                            flag == VpuPacket.VertexFunction.DrawTriangleDoubleSided)
                         {
                             var triRef = new TriangleRef(
                                 ringBuffer[(ringIndex - triangleOrder[0]) & 3],
@@ -101,8 +150,30 @@ namespace OpenKh.Engine.Parsers.Kddf2
                         }
                     }
 
+                    var matrixIndexList = meshRoot.DmaChain.DmaVifs[i].Alaxi;
+                    var vertexIndex = 0;
+                    var vertexAssignmentList = new VertexAssignment[mesh.Vertices.Length];
+                    for (var indexToMatrixIndex = 0; indexToMatrixIndex < mesh.VertexRange.Length; indexToMatrixIndex++)
+                    {
+                        var verticesCount = mesh.VertexRange[indexToMatrixIndex];
+                        for (var t = 0; t < verticesCount; t++)
+                        {
+                            var vertex = mesh.Vertices[vertexIndex];
+                            vertexAssignmentList[vertexIndex++] = new VertexAssignment
+                            {
+                                matrixIndex = matrixIndexList[indexToMatrixIndex],
+                                weight = vertex.W,
+                                rawPos = new Vector4(vertex.X, vertex.Y, vertex.Z, vertex.W)
+                            };
+                        };
+                    }
+
+                    var vertexAssignmentsList = vertexAssignmentList
+                        .Select(x => new VertexAssignment[] { x })
+                        .ToArray();
+
                     exportedMesh.positionList.AddRange(
-                        mesh.vertexAssignmentsList.Select(
+                        vertexAssignmentsList.Select(
                             vertexAssigns =>
                             {
                                 Vector3 finalPos = Vector3.Zero;
@@ -110,18 +181,16 @@ namespace OpenKh.Engine.Parsers.Kddf2
                                 {
                                     // single joint
                                     finalPos = Vector3.Transform(
-                                        VCUt.V4To3(
-                                            vertexAssigns[0].rawPos
-                                        ),
-                                        matrices[vertexAssigns[0].matrixIndex]
-                                    );
+                                            ToVector3(vertexAssigns[0].rawPos),
+                                            matrices[vertexAssigns[0].matrixIndex]
+                                        );
                                 }
                                 else
                                 {
                                     // multiple joints, using rawPos.W as blend weights
                                     foreach (VertexAssignment vertexAssign in vertexAssigns)
                                     {
-                                        finalPos += VCUt.V4To3(
+                                        finalPos += ToVector3(
                                             Vector4.Transform(
                                                 vertexAssign.rawPos,
                                                 matrices[vertexAssign.matrixIndex]
@@ -135,14 +204,14 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     );
 
                     exportedMesh.uvList.AddRange(
-                        mesh.indexAssignmentList
-                            .Select(indexAssign => indexAssign.uv)
+                        mesh.Indices.Select(x =>
+                            new Vector2(x.U / 16 / 256.0f, x.V / 16 / 256.0f))
                     );
 
                     exportedMesh.partList.Add(part);
 
-                    vertexBaseIndex += mesh.vertexAssignmentsList.Length;
-                    uvBaseIndex += mesh.indexAssignmentList.Length;
+                    vertexBaseIndex += vertexAssignmentsList.Length;
+                    uvBaseIndex += mesh.Indices.Length;
                 }
             }
 
@@ -170,8 +239,8 @@ namespace OpenKh.Engine.Parsers.Kddf2
                 newList.Add(
                     new MeshDescriptor
                     {
-                        IsOpaque = part.meshRef.isOpaque,
-                        TextureIndex = part.meshRef.textureIndex,
+                        IsOpaque = part.IsOpaque,
+                        TextureIndex = part.TextureIndex,
                         Vertices = vertices.ToArray(),
                         Indices = indices.ToArray(),
                     }
@@ -181,6 +250,6 @@ namespace OpenKh.Engine.Parsers.Kddf2
             return newList;
         }
 
-        public IEnumerable<ImmutableMesh> GetUnprocessedMeshList() => new ReadOnlyCollection<ImmutableMesh>(immultableMeshList);
+        private static Vector3 ToVector3(Vector4 pos) => new Vector3(pos.X, pos.Y, pos.Z);
     }
 }
