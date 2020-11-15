@@ -40,9 +40,12 @@ namespace OpenKh.Game.States
         private KingdomShader _shader;
         private Camera _camera;
 
-        private int _worldId = 2;
-        private int _placeId = 4;
-        private int _spawnId = 99;
+        private int _worldId;
+        private int _placeId;
+        private int _spawnId;
+        private int _spawnScriptMap;
+        private int _spawnScriptBtl;
+        private int _spawnScriptEvt;
 
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
@@ -66,6 +69,12 @@ namespace OpenKh.Game.States
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
             _menuState = new MenuState(this);
+            _worldId = initDesc.StateSettings.GetInt("WorldId", 2);
+            _placeId = initDesc.StateSettings.GetInt("PlaceId", 4);
+            _spawnId = initDesc.StateSettings.GetInt("SpawnId", 99);
+            _spawnScriptMap = initDesc.StateSettings.GetInt("SpawnScriptMap", 0x06);
+            _spawnScriptBtl = initDesc.StateSettings.GetInt("SpawnScriptBtl", 0x01);
+            _spawnScriptEvt = initDesc.StateSettings.GetInt("SpawnScriptEvt", 0x16);
 
             BasicallyForceToReloadEverything();
             _menuState.Initialize(initDesc);
@@ -233,9 +242,9 @@ namespace OpenKh.Game.States
                 fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
 
             var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
-            RunSpawnScript(entries, "map", 0x06);
-            RunSpawnScript(entries, "btl", 0x01);
-            RunSpawnScript(entries, "evt", 0x16);
+            RunSpawnScript(entries, "map", _spawnScriptMap);
+            RunSpawnScript(entries, "btl", _spawnScriptBtl);
+            RunSpawnScript(entries, "evt", _spawnScriptEvt);
         }
 
         private void RunSpawnScript(IEnumerable<Bar.Entry> barEntries, string spawnScriptName, int programId)

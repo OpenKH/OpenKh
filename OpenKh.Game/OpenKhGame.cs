@@ -6,20 +6,33 @@ using OpenKh.Game.Infrastructure;
 using OpenKh.Game.States;
 using OpenKh.Game.States.Title;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace OpenKh.Game
 {
+    public class OpenKhGameStartup
+    {
+        public string ContentPath { get; internal set; }
+        public int InitialState { get; internal set; }
+        public int InitialMap { get; internal set; }
+        public int InitialPlace { get; internal set; }
+        public int InitialSpawnScriptMap { get; internal set; }
+        public int InitialSpawnScriptBtl { get; internal set; }
+        public int InitialSpawnScriptEvt { get; internal set; }
+    }
+
     public class OpenKhGame : Microsoft.Xna.Framework.Game, IStateChange
     {
         private GraphicsDeviceManager graphics;
 
+        private readonly Dictionary<string, string> GlobalSettings;
         private readonly IDataContent _dataContent;
         private readonly Kernel _kernel;
         private readonly ArchiveManager archiveManager;
         private readonly InputManager inputManager;
         private readonly DebugOverlay _debugOverlay;
+        private readonly OpenKhGameStartup _startup;
         private IState state;
         private bool _isResolutionChanged;
 
@@ -56,9 +69,18 @@ namespace OpenKh.Game
             }
         }
 
-        public OpenKhGame(string[] args)
+        public OpenKhGame(OpenKhGameStartup startup)
         {
-            var contentPath = args.FirstOrDefault() ?? Config.DataPath;
+            _startup = startup;
+            GlobalSettings = new Dictionary<string, string>();
+            TryAddSetting("WorldId", startup.InitialMap);
+            TryAddSetting("PlaceId", startup.InitialPlace);
+            //TryAddSetting("SpawnId", );
+            TryAddSetting("SpawnScriptMap", startup.InitialSpawnScriptMap);
+            TryAddSetting("SpawnScriptBtl", startup.InitialSpawnScriptBtl);
+            TryAddSetting("SpawnScriptEvt", startup.InitialSpawnScriptEvt);
+
+            var contentPath = startup.ContentPath ?? Config.DataPath;
 
             _dataContent = CreateDataContent(contentPath, Config.IdxFilePath, Config.ImgFilePath);
             _dataContent = new MultipleDataContent(new ModDataContent(), _dataContent);
@@ -114,7 +136,7 @@ namespace OpenKh.Game
         protected override void Initialize()
         {
             _debugOverlay.Initialize(GetStateInitDesc());
-            State = 0;
+            State = _startup.InitialState;
 
             base.Initialize();
         }
@@ -158,6 +180,18 @@ namespace OpenKh.Game
             base.Draw(gameTime);
         }
 
+        private void TryAddSetting(string key, string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+                GlobalSettings.Add(key, value);
+        }
+
+        private void TryAddSetting(string key, int value)
+        {
+            if (value >= 0)
+                GlobalSettings.Add(key, value.ToString());
+        }
+
         private StateInitDesc GetStateInitDesc()
         {
             return new StateInitDesc
@@ -169,6 +203,7 @@ namespace OpenKh.Game
                 ContentManager = Content,
                 GraphicsDevice = graphics,
                 StateChange = this,
+                StateSettings = GlobalSettings,
             };
         }
 
