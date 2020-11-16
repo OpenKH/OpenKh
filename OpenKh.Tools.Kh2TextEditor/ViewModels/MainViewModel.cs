@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.Common;
+using OpenKh.Tools.Common;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Contextes;
@@ -363,6 +363,20 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                             break;
                         case FontType.Event:
                             context = _fontContext.ToKh2JpEventTextContext();
+                            break;
+                        default:
+                            context = null;
+                            break;
+                    }
+                    break;
+                case EncodingType.Turkish:
+                    switch (FontType)
+                    {
+                        case FontType.System:
+                            context = _fontContext.ToKh2TRSystemTextContext();
+                            break;
+                        case FontType.Event:
+                            context = _fontContext.ToKh2TREventTextContext();
                             break;
                         default:
                             context = null;

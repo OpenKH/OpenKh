@@ -54,7 +54,7 @@ namespace OpenKh.Tools.ImageViewer.Services
                 GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
                     throw new NotImplementedException()),
 
-                GetImageFormat("KH2TIM", "tex", true, _ => true,
+                GetImageFormat("KH2TIM", "tex", false, _ => true,
                     s => ModelTexture.Read(s).Images.Cast<IImageRead>(),
                     (stream, images) => throw new NotImplementedException()),
             };

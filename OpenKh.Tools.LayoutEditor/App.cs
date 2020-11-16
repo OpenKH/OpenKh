@@ -117,6 +117,36 @@ namespace OpenKh.Tools.LayoutEditor
             }
         }
 
+        public bool ShowViewportOriginal
+        {
+            get => Settings.Default.ShowViewportOriginal;
+            set
+            {
+                Settings.Default.ShowViewportOriginal = value;
+                Settings.Default.Save();
+            }
+        }
+
+        public bool ShowViewportRemix
+        {
+            get => Settings.Default.ShowViewportRemix;
+            set
+            {
+                Settings.Default.ShowViewportRemix = value;
+                Settings.Default.Save();
+            }
+        }
+
+        public bool IsViewportOnTop
+        {
+            get => Settings.Default.IsViewportOnTop;
+            set
+            {
+                Settings.Default.IsViewportOnTop = value;
+                Settings.Default.Save();
+            }
+        }
+
         public App(MonoGameImGuiBootstrap bootstrap)
         {
             _bootstrap = bootstrap;
@@ -208,6 +238,10 @@ namespace OpenKh.Tools.LayoutEditor
                                 editorBackground.Y, editorBackground.Z, 1f);
                             OnChangeBackground?.Invoke(this, this);
                         }
+
+                        ForMenuCheck("Show PS2 viewport", () => ShowViewportOriginal, x => ShowViewportOriginal = x);
+                        ForMenuCheck("Show ReMIX viewport", () => ShowViewportRemix, x => ShowViewportRemix = x);
+                        ForMenuCheck("Viewport always on top", () => IsViewportOnTop, x => IsViewportOnTop = x);
                     });
                     ImGui.Separator();
                     ForMenuItem("Exit", MenuFileExit);

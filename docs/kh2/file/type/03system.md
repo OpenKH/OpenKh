@@ -2,17 +2,120 @@
 
 This is an essential file to boot the game engine.
 
-* [ITEM](#item)
-* [FTST](#ftst)
-* [TRSR](#trsr)
+* [RCCT](#rcct) - ???
+* [CMD](#cmd) - Commands
+* [WENT](#went) - Weapon Entities
+* [WMST](#wmst) - Weapon Movesets
+* [ARIF](#arif) - ???
+* [ITEM](#item) - Items
+* [TRSR](#trsr) - Treasure
+* [MEMT](#memt) - ???
+* [FTST](#ftst) - ???
+* [SHOP](#shop) - Shops
+* [SKLT](#sklt) - ???
+* [PREF](#pref) - Preferences?
+* [EVTP](#evtp) - ???
+* [IPIC](#ipic) - ???
 
-## FTST
+## Rcct
 
-This is a table that contains the font palette for each world.
+Unknown table.
 
-The FTST is a binary file that contains N amount of palettes (9 for FM version), where every palette contain an unique ID (or key) and exactly 19 different colors.
+### Rcct Structure
 
-Each color correspond to the [world index](../../worlds.md) and it is loaded based on the current world.
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Rcct header
+| 35 	 | Rcct entries
+
+### Rcct Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (1)
+| 4 	 | uint | Entry Count
+
+### Rcct Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | short | Unk0
+| 2 	 | short | Unk2
+| 4 	 | short | Unk4
+| 6 	 | short | Unk6
+| 8 	 | short | Unk8
+| 10 	 | short | Unk10 (Padding?)
+
+## Cmd
+
+Commands table.
+
+### Cmd Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Cmd header
+| 751 	 | Cmd entries
+
+### Cmd Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (2)
+| 4 	 | uint | Entry Count
+
+### Cmd Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | short | Id - [COMMAND LIST](../../dictionary/commands.md)
+| 2 	 | short | Unk2
+| 4 	 | short | Unk4
+| 6 	 | byte | Unk6
+| 7 	 | byte | Unk7
+| 8 	 | short | Unk8
+| 10 	 | short | Unk10
+| 12 	 | int | Unk12
+| 16 	 | short | Unk16
+| 18 	 | short | Unk18
+| 20 	 | int | Unk20
+| 24 	 | byte | Unk24
+| 25 	 | byte | Unk25
+| 26 	 | short | Unk26
+| 28 	 | short | Mp cost
+| 30 	 | int | Unk30
+| 34 	 | short | Unk34
+| 36 	 | byte | Unk36
+| 37 	 | byte | Unk37
+| 38 	 | short | Unk38
+| 40 	 | short | Unk40
+| 42 	 | short | Unk42
+| 44 	 | short | Unk44
+| 46 	 | short | Unk46
+
+## Went
+
+Weapon entity table. Unknown format.
+
+## Wmst
+
+Weapon moveset list.
+
+### Wmst Structure
+
+| Amount | Description |
+|--------|---------------|
+| 140 	 | Wmst entries
+
+### Wmst Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | char[32] | Weapon moveset filename
+
+## Arif
+
+Unknown.
 
 ## ITEM
 
@@ -20,20 +123,34 @@ Describe an item, that could be anything from a consumable, to a weapon or mater
 
 There are two tables. The first one is the Item descriptor itself, the second one is for the statistics the item is affecting.
 
-### Table header
+### Item Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Item table
+| 1 	 | Status table
+
+### Item table Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Item header
+| 535 	 | Item entries
+
+### Item Header
 
 Every table has the following header
 
 | Offset | Type | Description |
 |--------|---------------|-------------|
-| 0      | uint32 | The identifier of the file, 6 for the first table and 0 for the second. |
+| 0      | uint32 | File type (6)
 | 4      | uint32 | Descriptor count for the specified table. |
 
-### Item descriptor
+### Item Entry
 
 | Offset | Type | Description |
 |--------|---------------|-------------|
-| 0      | uint16 | Unique item identifier, used from the game engine to refer to a specific item. |
+| 0      | uint16 | Id - [ITEM LIST](../../dictionary/inventory.md)
 | 2      | uint8  | Category. Refer to the table below to know what categories are recognized. |
 | 3      | uint8  | Unknown |
 | 4      | uint8  | Unknown |
@@ -41,10 +158,10 @@ Every table has the following header
 | 6      | uint16 | [Status ID](#status-descriptor). Used to assign a certain status change to an item when equipped. |
 | 8      | uint16 | Name message ID |
 | 10     | uint16 | Description message ID |
-| 12     | uint16 | Shop buy ID |
-| 14     | uint16 | Shop sell ID |
-| 16     | uint16 | Command. Purpose unknown. |
-| 18     | uint16 | Slot. Purpose unknown. |
+| 12     | uint16 | Shop buy price |
+| 14     | uint16 | Shop sell price |
+| 16     | uint16 | Command. | - [COMMAND LIST](../../dictionary/commands.md)
+| 18     | uint16 | Slot (Order in the menu) |
 | 20     | uint16 | Picture linked to the image. |
 | 22     | uint8  | Unknown |
 | 23     | uint8  | Unknown |
@@ -78,11 +195,27 @@ Every table has the following header
 | 22   | Map
 | 23   | Report
 
-### Status descriptor
+### Status table Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Status header
+| 151 	 | Status entries
+
+### Status Header
+
+Every table has the following header
+
+| Offset | Type | Description |
+|--------|---------------|-------------|
+| 0      | uint32 | File type (0)
+| 4      | uint32 | Descriptor count for the specified table. |
+
+### Status Entry
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
-| 0      | uint16 | Unique status identifier. |
+| 0      | uint16 | Id - [EQUIPMENT LIST](../../dictionary/equipment.md)
 | 2      | uint16 | Ability ID |
 | 4      | uint8  | Attack boost |
 | 5      | uint8  | Magic boost |
@@ -100,6 +233,22 @@ Every table has the following header
 ## TRSR
 
 The treasure table describes what item cam be retrieved from a specific chest or event to a given map.
+
+### Trsr Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Trsr header
+| 430 	 | Trsr entries
+
+### Trsr Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | ushort | File type (3)
+| 2 	 | ushort | Entry Count
+
+### Trsr Entry
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
@@ -120,3 +269,92 @@ World ID and room index combined, gives the name of the map. (eg. for world ID =
 |------|------|
 | 0    | Chest
 | 1    | Event
+
+## Arif
+
+Unknown.
+
+## FTST
+
+This is a table that contains the font palette for each world.
+
+The FTST is a binary file that contains N amount of palettes (9 for FM version), where every palette contain an unique ID (or key) and exactly 19 different colors.
+
+Each color correspond to the [world index](../../worlds.md) and it is loaded based on the current world.
+
+## Shop
+
+This file contains data for the shops.
+There's a list of products available. Products are grouped in Inventories. Shops sell products in their inventories.
+Each inventory has the product on its "Product offset" and the following "Product count" products.
+Each shop has the inventory on its "Inventory offset" and the following "Inventory count" products.
+
+### Shop Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Shop header
+| 21 	 | Shop entries
+| 333 	 | Inventory entries
+| 536 	 | Product entries
+
+NOTE: there are 464 products + 72 empty (There may be padding)
+
+### Shop Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | char[4] | File ID (TZSH)
+| 4 	 | ushort | File type (7)
+| 6 	 | ushort | Shop List count
+| 8 	 | 4B | Unk8
+| 12 	 | 4B | Unk12
+
+### Shop Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | short | Id?
+| 2 	 | short | Unlock (The items that will be unlocked in TT & HB)
+| 4 	 | short | Name Id
+| 6 	 | short | Shop keeper entity - [OBJ LIST](../../dictionary/obj.md)
+| 8 	 | short | PosX
+| 10 	 | short | PosY
+| 12 	 | short | PosZ
+| 14 	 | short | Sound Id (When the shop is open)
+| 16 	 | short | Inventory count
+| 18 	 | byte | Unk18 (Id?) - [SHOP LIST](../../dictionary/shops.md)
+| 19 	 | byte | Unk19
+| 20 	 | short | Inventory Offset
+| 22 	 | short | Padding
+
+### Inventory Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | short | Unlock event Id (FFFF means always unlocked)
+| 2 	 | short | Product count
+| 4 	 | short | Product size
+| 6 	 | short | Padding
+
+### Product Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | Item Id - [Item LIST](../../dictionary/inventory.md)
+
+## Sklt
+
+Unknown.
+
+## Pref
+
+Unknown.
+
+## Evtp
+
+Unknown.
+
+## Ipic
+
+Unknown.

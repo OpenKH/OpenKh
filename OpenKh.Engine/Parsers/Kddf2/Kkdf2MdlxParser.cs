@@ -34,7 +34,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
             {
                 foreach (Mdlx.DmaVif dmaVif in dmaChain.DmaVifs)
                 {
-                    const int tops = 0x40, top2 = 0x220;
+                    const int tops = 0x40;
 
                     var unpacker = new VifUnpacker(dmaVif.VifPacket)
                     {
@@ -42,7 +42,7 @@ namespace OpenKh.Engine.Parsers.Kddf2
                     };
                     unpacker.Run();
 
-                    var mesh = VU1Simulation.Run(unpacker.Memory, tops, top2, dmaVif.TextureIndex, dmaVif.Alaxi);
+                    var mesh = VU1Simulation.Run(unpacker.Memory, tops, dmaVif.TextureIndex, dmaVif.Alaxi);
                     mesh.isOpaque = (dmaChain.Unk00 & 1) == 0;
                     immultableMeshList.Add(mesh);
                 }

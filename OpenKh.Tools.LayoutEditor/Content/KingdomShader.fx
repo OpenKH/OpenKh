@@ -15,6 +15,7 @@ float2 TextureRegionV;
 int TextureWrapModeU;
 int TextureWrapModeV;
 Texture2D Texture0;
+bool UseAlphaMask;
 
 sampler2D TextureSampler = sampler_state
 {
@@ -76,8 +77,11 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 		ApplyTextureWrap(input.TextureUv.x, TextureWrapModeU, TextureRegionU.x, TextureRegionU.y),
 		ApplyTextureWrap(input.TextureUv.y, TextureWrapModeV, TextureRegionV.x, TextureRegionV.y)
 		);
-
-	return tex2D(TextureSampler, uv) * input.Color;
+	float4 color = tex2D(TextureSampler, uv) * input.Color;
+	if (UseAlphaMask && color.a <= 0.125) {
+		clip(-1);
+	}
+	return color;
 }
 
 technique BasicColorDrawing
