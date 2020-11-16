@@ -305,6 +305,8 @@ namespace OpenKh.Kh2.Ard
         {
             var typeId = stream.ReadInt32();
             var itemCount = stream.ReadInt32();
+            if (itemCount <= 0)
+                return new List<SpawnPoint>();
             return Enumerable.Range(0, itemCount)
                 .Select(x => ReadSingle(stream))
                 .ToList();
