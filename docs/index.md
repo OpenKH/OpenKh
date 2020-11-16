@@ -12,6 +12,7 @@ Right now the documentation contains info about the following games:
 * [Kingdom Hearts Birth By Sleep](bbs/index.md)
 * [Kingdom Hearts Dream Drop Distance](ddd/index.md)
 * [Kingdom Hearts III](kh3/index.md)
+* [Kingdom Hearts Melody of Memory](mom/index.md)
 
 * Remasters
     * [Kingdom Hearts HD 1.5 + 2.5 ReMIX](remasters/15plus25/index.md)
