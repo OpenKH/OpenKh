@@ -8,6 +8,7 @@ Most of the game logic is able to be manipulated using a SQLite database located
 |---|---|
 | GameSceneFlowTable | Defines menu layout, eg. Title>Tutorial>Main Screen, comments describe what each flow does, translation required however |
 | MusicTable | Defines music track properties, like difficulty values, item drops and drop rates |
+| PartyTable | Defines which characters are in each team, and if they're selectable by the player or not. |
 
 ## Noteworthy Details
 
@@ -36,4 +37,20 @@ The trigger still happens automatically after finishing a few songs but drops yo
 UPDATE GameSceneFlowTable
 SET NextGameSceneID = 10000000
 WHERE GameSceneID=10000003 AND NextGameSceneID=11000000;
+```
+
+### Changing Team Classic to contain Sora, Roxas, and Ventus.
+
+Can be done with other characters with varying success.
+
+```sql
+UPDATE PartyTable
+SET Character1 = 110000000 
+WHERE PartyID=120000000;
+UPDATE PartyTable
+SET Character2 = 110000006 
+WHERE PartyID=120000000;
+UPDATE PartyTable
+SET Character3 = 110000009 
+WHERE PartyID=120000000;
 ```
