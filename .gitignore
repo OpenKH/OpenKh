@@ -328,3 +328,6 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+OpenKh.Command.MapGen/OpenKh.Command.MapGen.csproj
+OpenKh.Command.DoctChanger/OpenKh.Command.DoctChanger.csproj
+OpenKh.Command.CoctChanger/OpenKh.Command.CoctChanger.csproj
