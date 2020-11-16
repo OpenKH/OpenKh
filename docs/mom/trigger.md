@@ -7,4 +7,3 @@ Each AssetBundle contains 3 different trigger maps labeled `trigger_std_0#01`, w
 Each entry in a trigger map represents one object, either an enemy, box, jump, ability, glide note or performer target, with metadata such as defining their horizontal position or if they are "linked" with other triggers requiring multiple buttons be pressed at once to activated and possibly more.
 
 Enemy Hex Layout:
-
