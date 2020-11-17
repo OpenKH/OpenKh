@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -18,6 +18,12 @@
     <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
     <ProjectReference Include="..\OpenKh.Game\OpenKh.Game.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="res/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
