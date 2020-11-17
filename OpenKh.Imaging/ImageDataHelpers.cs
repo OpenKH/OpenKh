@@ -25,8 +25,8 @@ namespace OpenKh.Imaging
             for (int i = 0; i < data.Length; i++)
             {
                 var subData = data[i];
-                var clutIndex1 = subData & 0x0F;
-                var clutIndex2 = subData >> 4;
+                var clutIndex1 = subData >> 4;
+                var clutIndex2 = subData & 0x0F;
                 bitmap[i * 8 + 0] = clut[clutIndex1 * 4 + 2];
                 bitmap[i * 8 + 1] = clut[clutIndex1 * 4 + 1];
                 bitmap[i * 8 + 2] = clut[clutIndex1 * 4 + 0];
@@ -63,10 +63,7 @@ namespace OpenKh.Imaging
                 case PixelFormat.Indexed8:
                     break;
                 case PixelFormat.Indexed4:
-                    for (var i = 0; i < length / 2; i++)
-                    {
-                        data[i] = (byte)(((data[i] & 0x0F) << 4) | (data[i] >> 4));
-                    }
+                    // no pixel swapping is required
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"The format {pixelFormat} is invalid or not supported.");
@@ -100,11 +97,8 @@ namespace OpenKh.Imaging
                 case PixelFormat.Indexed8:
                     return data;
                 case PixelFormat.Indexed4:
-                    for (var i = 0; i < length / 2; i++)
-                    {
-                        dst[i] = (byte)(((data[i] & 0x0F) << 4) | (data[i] >> 4));
-                    }
-                    break;
+                    // no pixel swapping is required
+                    return data;
                 default:
                     throw new ArgumentOutOfRangeException($"The format {pixelFormat} is invalid or not supported.");
             }

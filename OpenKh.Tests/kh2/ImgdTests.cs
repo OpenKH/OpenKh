@@ -1,6 +1,7 @@
 ﻿using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -135,6 +136,79 @@ namespace OpenKh.Tests.kh2
 
                 return outStream;
             }));
+
+        void CreateImgdAndComparePixelData(
+            byte[] pixelData,
+            Func<byte[], Imgd> imgdFactory
+        )
+        {
+            var imgd = imgdFactory(pixelData);
+
+            var temp = new MemoryStream();
+
+            imgd.Write(temp);
+
+            temp.Position = 0;
+
+            var loaded = Imgd.Read(temp);
+
+            Assert.Equal(
+                pixelData,
+                loaded.GetData()
+                );
+        }
+
+        [Fact]
+        public void TestPixelOrder4() => CreateImgdAndComparePixelData(
+            new byte[] { 0x12, 0x34, },
+            pixelData => Imgd.Create(
+                new System.Drawing.Size(2, 2),
+                PixelFormat.Indexed4,
+                pixelData,
+                new byte[4 * 16],
+                false
+            )
+        );
+
+        [Fact]
+        public void TestPixelOrder4Swizzled() => CreateImgdAndComparePixelData(
+            new byte[] { 0x12, 0x34, }
+                .Concat(new byte[128 * 128 / 2 - 2])
+                .ToArray(),
+            pixelData => Imgd.Create(
+                new System.Drawing.Size(128, 128),
+                PixelFormat.Indexed4,
+                pixelData,
+                new byte[4 * 16],
+                true
+            )
+        );
+
+        [Fact]
+        public void TestPixelOrder8() => CreateImgdAndComparePixelData(
+            new byte[] { 0x12, 0x34, 0x56, 0x78, },
+            pixelData => Imgd.Create(
+                new System.Drawing.Size(2, 2),
+                PixelFormat.Indexed8,
+                pixelData,
+                new byte[4 * 256],
+                false
+            )
+        );
+
+        [Fact]
+        public void TestPixelOrder8Swizzled() => CreateImgdAndComparePixelData(
+            new byte[] { 0x12, 0x34, 0x56, 0x78, }
+                .Concat(new byte[128 * 64 - 4])
+                .ToArray(),
+            pixelData => Imgd.Create(
+                new System.Drawing.Size(128, 64),
+                PixelFormat.Indexed8,
+                pixelData,
+                new byte[4 * 256],
+                true
+            )
+        );
 
         [Fact]
         public void ReadRgba8888PixelOrder()
