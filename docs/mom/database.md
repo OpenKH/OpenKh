@@ -39,18 +39,18 @@ SET NextGameSceneID = 10000000
 WHERE GameSceneID=10000003 AND NextGameSceneID=11000000;
 ```
 
-### Changing Team Classic to contain Sora, Roxas, and Ventus.
+### Changing Team Classic to contain Sora, Roxas, and Ventus
 
 Can be done with other characters, however you will need to assign them DeformedChara and Ability values in CharacterTable.
 
 ```sql
 UPDATE PartyTable
-SET Character1 = 110000000 
+SET Character1 = 110000000
 WHERE PartyID=120000000;
 UPDATE PartyTable
-SET Character2 = 110000006 
+SET Character2 = 110000006
 WHERE PartyID=120000000;
 UPDATE PartyTable
-SET Character3 = 110000009 
+SET Character3 = 110000009
 WHERE PartyID=120000000;
 ```

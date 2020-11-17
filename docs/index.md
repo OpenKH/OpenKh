@@ -13,12 +13,10 @@ Right now the documentation contains info about the following games:
 * [Kingdom Hearts Dream Drop Distance](ddd/index.md)
 * [Kingdom Hearts III](kh3/index.md)
 * [Kingdom Hearts Melody of Memory](mom/index.md)
-
 * Remasters
-    * [Kingdom Hearts HD 1.5 + 2.5 ReMIX](remasters/15plus25/index.md)
-    * [Kingdom Hearts HD 2.8 Final Chapter Prologue](remasters/28fcp/index.md)
-    
+  * [Kingdom Hearts HD 1.5 + 2.5 ReMIX](remasters/15plus25/index.md)
+  * [Kingdom Hearts HD 2.8 Final Chapter Prologue](remasters/28fcp/index.md)
 * Common
-    * [TM2 PlayStation 2 textures](common/tm2.md)
-    * [PS4 HD assets](common/hdassets.md)
- * [Tools](tool/index.md)
+  * [TM2 PlayStation 2 textures](common/tm2.md)
+  * [PS4 HD assets](common/hdassets.md)
+  * [Tools](tool/index.md)
