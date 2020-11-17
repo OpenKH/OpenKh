@@ -40,9 +40,12 @@ namespace OpenKh.Game.States
         private KingdomShader _shader;
         private Camera _camera;
 
-        private int _worldId = 2;
-        private int _placeId = 4;
-        private int _spawnId = 99;
+        private int _worldId;
+        private int _placeId;
+        private int _spawnId;
+        private int _spawnScriptMap;
+        private int _spawnScriptBtl;
+        private int _spawnScriptEvt;
 
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
@@ -66,6 +69,12 @@ namespace OpenKh.Game.States
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
             _menuState = new MenuState(this);
+            _worldId = initDesc.StateSettings.GetInt("WorldId", 2);
+            _placeId = initDesc.StateSettings.GetInt("PlaceId", 4);
+            _spawnId = initDesc.StateSettings.GetInt("SpawnId", 99);
+            _spawnScriptMap = initDesc.StateSettings.GetInt("SpawnScriptMap", 0x06);
+            _spawnScriptBtl = initDesc.StateSettings.GetInt("SpawnScriptBtl", 0x01);
+            _spawnScriptEvt = initDesc.StateSettings.GetInt("SpawnScriptEvt", 0x16);
 
             BasicallyForceToReloadEverything();
             _menuState.Initialize(initDesc);
@@ -133,7 +142,7 @@ namespace OpenKh.Game.States
         private void DrawAllMeshes(EffectPass pass, bool passRenderOpaque)
         {
             _graphics.GraphicsDevice.DepthStencilState = passRenderOpaque ? DepthStencilState.Default : DepthStencilState.DepthRead;
-            
+
             _shader.ProjectionView = _camera.Projection;
             _shader.WorldView = _camera.World;
             _shader.ModelView = Matrix.Identity;
@@ -141,14 +150,7 @@ namespace OpenKh.Game.States
 
             foreach (var mesh in _models)
             {
-                if (mesh.MeshDescriptors != null)
-                {
-                    RenderMeshNew(pass, mesh, passRenderOpaque);
-                }
-                else
-                {
-                    RenderMesh(pass, mesh, passRenderOpaque);
-                }
+                RenderMeshNew(pass, mesh, passRenderOpaque);
             }
 
             _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -160,7 +162,7 @@ namespace OpenKh.Game.States
                 _shader.ModelView = entity.GetMatrix();
                 pass.Apply();
 
-                RenderMesh(pass, entity.Mesh, passRenderOpaque);
+                RenderMeshNew(pass, entity.Mesh, passRenderOpaque);
             }
 
             foreach (var entity in _bobEntities)
@@ -170,32 +172,7 @@ namespace OpenKh.Game.States
                 _shader.ModelView = entity.GetMatrix();
                 pass.Apply();
 
-                RenderMesh(pass, _bobModels[entity.BobIndex], passRenderOpaque);
-            }
-        }
-
-        private void RenderMesh(EffectPass pass, MeshGroup mesh, bool passRenderOpaque)
-        {
-            for (int index = 0; index < mesh.Parts.Length && index < mesh.Segments.Length; index++)
-            {
-                MeshGroup.Part part = mesh.Parts[index];
-                MeshGroup.Segment segment = mesh.Segments[index];
-
-                if (part.Indices.Length == 0 || part.IsOpaque != passRenderOpaque)
-                    continue;
-
-                var textureIndex = part.TextureId & 0xffff;
-                if (textureIndex < mesh.Textures.Length)
-                    _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
-
-                _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
-                    PrimitiveType.TriangleList,
-                    segment.Vertices,
-                    0,
-                    segment.Vertices.Length,
-                    part.Indices,
-                    0,
-                    part.Indices.Length / 3);
+                RenderMeshNew(pass, _bobModels[entity.BobIndex], passRenderOpaque);
             }
         }
 
@@ -265,9 +242,9 @@ namespace OpenKh.Game.States
                 fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
 
             var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
-            RunSpawnScript(entries, "map", 0x06);
-            RunSpawnScript(entries, "btl", 0x01);
-            RunSpawnScript(entries, "evt", 0x16);
+            RunSpawnScript(entries, "map", _spawnScriptMap);
+            RunSpawnScript(entries, "btl", _spawnScriptBtl);
+            RunSpawnScript(entries, "evt", _spawnScriptEvt);
         }
 
         private void RunSpawnScript(IEnumerable<Bar.Entry> barEntries, string spawnScriptName, int programId)

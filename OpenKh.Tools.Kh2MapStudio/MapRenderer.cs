@@ -295,7 +295,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                             Matrix.CreateRotationZ(entity.RotationZ) *
                             Matrix.CreateScale(entity.ScalingX, entity.ScalingY, entity.ScalingZ) *
                             Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
-                        RenderMeshLegacy(pass, BobMeshGroups[entity.BobIndex].MeshGroup);
+                        RenderMeshNew(pass, BobMeshGroups[entity.BobIndex].MeshGroup, true);
                     }
                 }
 
@@ -309,7 +309,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                                 Matrix.CreateRotationY(entity.RotationY) *
                                 Matrix.CreateRotationZ(entity.RotationZ) *
                                 Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
-                            RenderMeshLegacy(pass, CurrentSpawnPoint.ObjEntryCtrl[entity.ObjectId]);
+                            RenderMeshNew(pass, CurrentSpawnPoint.ObjEntryCtrl[entity.ObjectId], true);
                         }
 
                         _graphics.RasterizerState = new RasterizerState()
@@ -376,59 +376,6 @@ namespace OpenKh.Tools.Kh2MapStudio
                     meshDescriptor.Indices,
                     0,
                     meshDescriptor.Indices.Length / 3);
-            }
-        }
-
-        private void RenderMeshLegacy(EffectPass pass, MeshGroup mesh)
-        {
-            var index = 0;
-            foreach (var part in mesh.Parts)
-            {
-                if (part.Indices.Length == 0)
-                    continue;
-
-                if (part.IsOpaque)
-                {
-                    var textureIndex = part.TextureId & 0xffff;
-                    if (textureIndex < mesh.Textures.Length)
-                        _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
-
-                    _graphics.DrawUserIndexedPrimitives(
-                        PrimitiveType.TriangleList,
-                        mesh.Segments[index].Vertices,
-                        0,
-                        mesh.Segments[index].Vertices.Length,
-                        part.Indices,
-                        0,
-                        part.Indices.Length / 3);
-                }
-
-                index = (index + 1) % mesh.Segments.Length;
-            }
-
-            index = 0;
-            foreach (var part in mesh.Parts)
-            {
-                if (part.Indices.Length == 0)
-                    continue;
-
-                if (!part.IsOpaque)
-                {
-                    var textureIndex = part.TextureId & 0xffff;
-                    if (textureIndex < mesh.Textures.Length)
-                        _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
-
-                    _graphics.DrawUserIndexedPrimitives(
-                        PrimitiveType.TriangleList,
-                        mesh.Segments[index].Vertices,
-                        0,
-                        mesh.Segments[index].Vertices.Length,
-                        part.Indices,
-                        0,
-                        part.Indices.Length / 3);
-                }
-
-                index = (index + 1) % mesh.Segments.Length;
             }
         }
 

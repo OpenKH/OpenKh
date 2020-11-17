@@ -25,29 +25,10 @@ namespace OpenKh.Engine.Parsers
         {
             if (IsEntity(mdlx))
             {
-                var builtModel = FromEntity(mdlx);
-                Model = new Model
-                {
-                    Segments = builtModel.textureIndexBasedModelDict.Values.Select(x => new Model.Segment
-                    {
-                        Vertices = x.Vertices.Select(vertex => new PositionColoredTextured
-                        {
-                            X = vertex.X,
-                            Y = vertex.Y,
-                            Z = vertex.Z,
-                            U = vertex.Tu,
-                            V = vertex.Tv,
-                            Color = vertex.Color
-                        }).ToArray()
-                    }).ToArray(),
-                    Parts = builtModel.parser.MeshDescriptors.Select(x => new Model.Part
-                    {
-                        Indices = x.Indices,
-                        SegmentIndex = x.SegmentIndex,
-                        TextureIndex = x.TextureIndex,
-                        IsOpaque = x.IsOpaque
-                    }).ToArray()
-                };
+                MeshDescriptors = new Kkdf2MdlxParser(mdlx.SubModels.First())
+                    .ProcessVerticesAndBuildModel(
+                        MdlxMatrixUtil.BuildTPoseMatrices(mdlx.SubModels.First(), Matrix4x4.Identity)
+                    );
             }
             else if (IsMap(mdlx))
             {
@@ -57,32 +38,9 @@ namespace OpenKh.Engine.Parsers
             }
         }
 
-        private static Kkdf2MdlxBuiltModel FromEntity(Mdlx mdlx)
-        {
-            var parser = new Kddf2.Kkdf2MdlxParser(mdlx.SubModels.First());
-            var builtModel = parser
-                .ProcessVerticesAndBuildModel(
-                    MdlxMatrixUtil.BuildTPoseMatrices(mdlx.SubModels.First(), Matrix.Identity)
-                );
-
-            var ci = builtModel.textureIndexBasedModelDict.Select((kv, i) => new Kddf2.Kkdf2MdlxParser.CI
-            {
-                Indices = kv.Value.Vertices.Select((_, index) => index).ToArray(),
-                TextureIndex = kv.Key.Item1,
-                IsOpaque = kv.Key.Item2,
-                SegmentIndex = i
-            });
-
-            parser.MeshDescriptors.AddRange(ci);
-
-            return builtModel;
-        }
-
         private static bool IsEntity(Mdlx mdlx) => mdlx.SubModels != null;
 
         private static bool IsMap(Mdlx mdlx) => mdlx.MapModel != null;
-
-        public Model Model { get; }
 
         public List<MeshDescriptor> MeshDescriptors { get; }
 

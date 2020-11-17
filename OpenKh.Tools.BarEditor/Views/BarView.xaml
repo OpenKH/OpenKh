@@ -104,6 +104,12 @@
                         Content="Remove"/>
                 </Grid>
 
+                <DockPanel DockPanel.Dock="Bottom">
+                    <Label>Bar flags</Label>
+                    <TextBox Text="{Binding BarFlags,UpdateSourceTrigger=PropertyChanged}"
+                             Margin="5,5,0,5" />
+                </DockPanel>
+
                 <ListBox
                     ItemsSource="{Binding Items}"
                     SelectedItem="{Binding SelectedItem, Mode=TwoWay}"

@@ -37,3 +37,14 @@
 
 * [Game files](files.md)
 * [Undiscovered game files](files-unknown.md)
+
+## Dictionaries
+
+  * [Characters](dictionary/characters.md)
+  * [Commands](dictionary/commands.md)
+  * [Enemies](dictionary/enemy.md)
+  * [Equipment](dictionary/equipment.md)
+  * [Events](dictionary/events.md)
+  * [Inventory](dictionary/inventory.md)
+  * [Obj](dictionary/obj.md)
+  * [Shops](dictionary/shops.md)

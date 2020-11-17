@@ -21,6 +21,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
         private string _fileName;
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
         private readonly ToolInvokeDesc _toolInvokeDesc;
+        private int _barFlags;
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
@@ -37,7 +38,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             {
                 var memoryStream = new MemoryStream();
 
-                Bar.Write(memoryStream, Items.Select(item => item.Entry));
+                Bar.Write(memoryStream, Items.Select(item => item.Entry), BarFlags);
 
                 var stream = _toolInvokeDesc.SelectedEntry.Stream;
 
@@ -62,6 +63,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             {
                 FileName = "untitled.bar";
                 Items.Clear();
+                BarFlags = 0;
             }, x => true);
 
             OpenCommand = new RelayCommand(x =>
@@ -173,7 +175,9 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             using (var stream = File.Open(fileName, FileMode.Open))
             {
                 Items.Clear();
-                foreach (var item in Bar.Read(stream))
+                var barContainer = Bar.ReadBarContainer(stream);
+                BarFlags = barContainer.Flags;
+                foreach (var item in barContainer.Entries)
                 {
                     Items.Add(new BarEntryModel(item));
                 }
@@ -183,7 +187,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
         private void SaveToFile(string fileName)
         {
             var memoryStream = new MemoryStream();
-            Bar.Write(memoryStream, Items.Select(item => item.Entry));
+            Bar.Write(memoryStream, Items.Select(item => item.Entry), BarFlags);
 
             using (var stream = File.Open(fileName, FileMode.Create))
             {
@@ -222,6 +226,16 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             {
                 _fileName = value;
                 OnPropertyChanged(nameof(Title));
+            }
+        }
+
+        public int BarFlags
+        {
+            get => _barFlags;
+            set
+            {
+                _barFlags = value;
+                OnPropertyChanged(nameof(BarFlags));
             }
         }
 
