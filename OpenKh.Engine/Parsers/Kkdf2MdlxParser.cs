@@ -34,13 +34,6 @@ namespace OpenKh.Engine.Parsers
             }
         }
 
-        private class VertexAssignment
-        {
-            public int matrixIndex;
-            public float weight = 1f;
-            public Vector4 rawPos;
-        }
-
         private class VertexRef
         {
             public int vertexIndex, uvIndex;
@@ -148,27 +141,12 @@ namespace OpenKh.Engine.Parsers
                         }
                     }
 
-                    var matrixIndexList = meshRoot.DmaChain.DmaVifs[i].Alaxi;
-                    var vertexIndex = 0;
-                    var vertexAssignmentList = new VertexAssignment[mesh.Vertices.Length];
-                    for (var indexToMatrixIndex = 0; indexToMatrixIndex < mesh.VertexRange.Length; indexToMatrixIndex++)
-                    {
-                        var verticesCount = mesh.VertexRange[indexToMatrixIndex];
-                        for (var t = 0; t < verticesCount; t++)
-                        {
-                            var vertex = mesh.Vertices[vertexIndex];
-                            vertexAssignmentList[vertexIndex++] = new VertexAssignment
-                            {
-                                matrixIndex = matrixIndexList[indexToMatrixIndex],
-                                weight = vertex.W,
-                                rawPos = new Vector4(vertex.X, vertex.Y, vertex.Z, vertex.W)
-                            };
-                        };
-                    }
-
-                    var vertexAssignmentsList = vertexAssignmentList
-                        .Select(x => new VertexAssignment[] { x })
+                    var vertices = mesh.Vertices
+                        .Select(vertex => new Vector4(vertex.X, vertex.Y, vertex.Z, vertex.W))
                         .ToArray();
+
+                    var matrixIndexList = meshRoot.DmaChain.DmaVifs[i].Alaxi;
+                    var vertexAssignmentsList = mesh.GetWeightedVertices(mesh.GetFromMatrixIndices(matrixIndexList));
 
                     exportedMesh.positionList.AddRange(
                         vertexAssignmentsList.Select(
@@ -179,19 +157,19 @@ namespace OpenKh.Engine.Parsers
                                 {
                                     // single joint
                                     finalPos = Vector3.Transform(
-                                            ToVector3(vertexAssigns[0].rawPos),
-                                            matrices[vertexAssigns[0].matrixIndex]
+                                            ToVector3(vertices[vertexAssigns[0].VertexIndex]),
+                                            matrices[vertexAssigns[0].MatrixIndex]
                                         );
                                 }
                                 else
                                 {
                                     // multiple joints, using rawPos.W as blend weights
-                                    foreach (VertexAssignment vertexAssign in vertexAssigns)
+                                    foreach (var vertexAssign in vertexAssigns)
                                     {
                                         finalPos += ToVector3(
                                             Vector4.Transform(
-                                                vertexAssign.rawPos,
-                                                matrices[vertexAssign.matrixIndex]
+                                                vertices[vertexAssign.VertexIndex],
+                                                matrices[vertexAssign.MatrixIndex]
                                             )
                                         );
                                     }
