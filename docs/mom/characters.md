@@ -34,7 +34,7 @@ Most of the game logic is able to be manipulated using a SQLite database located
 
 ## Issues with Characters
 
-[All default party leads show large headshot image when put in non-lead position](https://i.imgur.com/z7n5PUx.jpg)
-Multiple of same character causes weird jumping physics, and only one copy visible/exists
-Characters w/o abilities cause infinite level loading screen as party lead.
-Characters w/o a DeformedChara assigned will crash the game in the level loading screen. Can be worked around by assigning one in CharacterTable.
+* [All default party leads show large headshot image when put in non-lead position](https://i.imgur.com/z7n5PUx.jpg)
+* Multiple of same character causes weird jumping physics, and only one copy visible/exists
+* Characters without abilities cause infinite level loading screen as party lead.
+* Characters without a DeformedChara assigned will crash the game in the level loading screen. Can be worked around by assigning one in CharacterTable.
