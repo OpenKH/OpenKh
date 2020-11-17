@@ -9,6 +9,7 @@ This documentation is ***also*** based on the "World" Nintendo Switch version of
 ## General documentation
 
 * [Database](database.md)
+* [Characters](characters.md)
 * Music Tracks
   * [File Types Overview](files.md)
   * [Audio Tracks](sed.md)
