@@ -1,6 +1,6 @@
 # [Kingdom Hearts Melody of Memory](index.md) Characters
 
-Most of the game logic is able to be manipulated using a SQLite database located in: `StreamingAssets\SQLite\Table.db`
+Most of the character and party data can be manipulated using a SQLite database located in: `StreamingAssets\SQLite\Table.db`
 
 ## Documented IDs
 
