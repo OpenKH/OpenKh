@@ -13,7 +13,7 @@ The following steps are recommended to improve useability:
 2. Click `CONFIG > EDIT` and check to see if `SHOW VERSION` is enabled (it is enabled if the check box on the left is dark grey instead of light grey). If enabled, a handful of game functionality is limited to the `Premium Showcase` aspect of the demo. Disabling this option allows you to access the Camp menu when pausing, for example. Re-enabling this feature will restore the demo functions to as intended.
 
 3. At the top of the debug menus, clicking the red (right) button will close said menu. Clicking the blue (left) button will minimize the current menu and place it at the bottom left of the screen to be quickly accessed again. Simply click that menu to maximize it.
-<img src="./images/menu_buttons.jpg" width="720">
+<img src="./images/menu_buttons.jpg" width="960">
 
 ## Detailed Breakdown of Debug Menu (Top-level)
 
@@ -109,7 +109,54 @@ An inventory editor with seemingly only one functionality: to add and remove thi
 
 Opens a menu allowing the user to change playable characters and party members and spawn objects/enemies/bosses etc. More documentation to come soon.
 
+* `PLAYER`: Points to the current player model and allows the user to switch which model is currently loaded. Probably used just to test if models will load properly.
+* `FRIEND`: Points to Sora's allies and allows the user to switch the character loaded in. Probably used just to test if models will load properly, but tends to crash.
+* `CAPTURE`: Peems to point to Sora primarily. Changing this will force him into a Drive Form state and update all appropriate files loaded in RAM, including the necessary a.fm and MSET files. Can crash if not careful.
+* `1 OBJ`: Spawn one (1) of a selected object around Sora. Can be used to spawn enemies, other allies, field objects such as chests, etc.
+* `3 OBJ`: Ditto, three (3).
+* `5 OBJ`: Ditto, five (5).
+* `10 OBJ`: Ditto, ten (10). - There is a hardcoded limit to how many objects can spawn in a map at once on a per-map basis, so this setting and the following ones will not always, if rarely spawn the determined amount of objects.
+* `20 OBJ`: Ditto, twenty (20).
+* `30 OBJ`: Ditto, thirty (30).
+* `50 OBJ`: Ditto, fifty (50).
+* `ACTOR`: Spawns the selected actor/object in the default T-stance.
+  * At the top of the `ACTOR` spawn list, there are two buttons to narrow down the search for a specific model. By default it is set to `ZAKO` and `ALL`.
+    * `ZAKO` means "small fry", and thus usually refers to regular enemies such as Shadow and Hook Bat.
+    * `L_ZAKO` refers to large enemies, such as the Morningstar or Large Body.
+    * `BOSS` will spawn regular/medium boss enemies.
+    * `L_BOSS` will spawn large boss enemies, such as Twilight Thorn.
+    * `PLAYER` will spawn player characters, such as Sora's various forms, Roxas, and Mickey.
+    * `FRIEND` will spawn allies to Sora, such as Donald, Goofy, and world-specific characters.
+    * `SUMMON` will spawn all four Summon characters, including Stitch during the Hollow Bastion cutscene.
+    * `BTLNPC` will spawn in non-party allies, such as Axel, Tifa, and Squall.
+    * `F_OBJ` will spawn in field objects, such as miscellaneous decor around various maps and chests.
+    * `G_OBJ` will spawn in general objects. Typically more decor.
+    * `E_OBJ` will spawn enemy objects, things that enemies use to attack the player, such as Dragoon Xemnas' towers or Jafar's building chunks.
+    * `NPC` will spawn non-player characters. This basically encompasses every character that doesn't belong in any other category, including enemy/boss models used only for cutscenes.
+    * `WEAPON` will spawn weapon models.
+    * `E_WEAPON` will spawn equipped(?) weapon models. Seems inconsistent sometimes.
+    * `SP` will spawn a regular save point or world point. The latter allows the player to return to the world map.
+    * `TREASURE` will spawn specific chest models.
+    * `SUBMENU` will spawn a moogle and shop. Doesn't appear to work fully, however.
+    * `MEMO` will spawn `_GM` suffixed models, which are specific to Jiminy's Journal.
+    * `RTN` will spawn models that usually have a Reaction Command attached to it. Since only the model is loaded without its MSET or AI, only the dummy `-` Reaction Command is called, which does nothing.
+    * `MINIGAME` will spawn various minigame models, such as Sora's many Pooh models and Agrabah's carpet Sora.
+    * `WORLDMAP` will spawn the specified world models on the world map.
+    * `PRIZEBOX` will spawn the prize boxes enemies drop, though functionless.
+    * `SHOP` will spawn the holographic shop Moogle instead of the real one listen in `SUBMENU`.
+    * `MASSEFFECT` supposedly spawns in large effects(?)
+    * `JIGSAW` spawns in dummy puzzle pieces.
+* `RELOAD`: Clears all models from the buffer and respawns the last model introduced.
+* `LEAVE ALL`: Clears all models from the buffer.
+
 ### CHECK CACHEBUFFER >>
+
+This feature appears to have the game run through all currently cached events, depending on the option selected.
+
+* `ALL AREA` probably runs through all maps in the world.
+* `ALL SET` probably runs through all event sets in the current map.
+* `PROGRESS` does... something, I'm sure.
+* `REPEAT` self-explanatory; repeats the process after completing.
 
 ### CASH SAVE
 
@@ -117,11 +164,44 @@ Opens a menu allowing the user to change playable characters and party members a
 
 ### DEBUG
 
+* `HIDE DEBUG`: Self-explantory.
+* `STATUS`: Show's realtime statistics.
+* `CONFIG`: Includes two menus with various settings (some of which are listed near the top of this page) and two options that appear to do nothing. (`EDIT, EDIT 2` & `SAVE, SAVE START AREA`, respectively.)
+
 ### SYSTEM
+
+* `CACHE BUFF`: Shows the realtime memory buffer of objects loaded. The table is messed up usually, but the number reading appears to be accurate.
+* `SAVERAM`: A save/load menu for fast RAM states. Investigation needed; doesn't appear to work fully.
+* `SYSTEM`: Includes a few useful items.
+  * `VSYNC TYPE`: Variable or Fixed.
+  * `VSYNC LIMIT`: Frame limiter. Setting this to `60` enables smoother debug menu navigation, but obviously comes with pre-PS4 game fixes.
+  * `GAME SPEED`: Presets that the game uses at various points, such as the slowdown effect after beating a forced fight.
+  * `SHOW MODE`: Show Mode or Work Mode. Presumably used either for showcasing or development. Changing this appears to do nothing.
+  * `PLAY TIME`: Set the game's play time to predetermined amounts.
+* `FM PATCH`: Does nothing, presents KH2's `error` sound when selecting it. Probably used by development to test new fixes on the fly.
 
 ### FIELD
 
+* `SETINFO`: Shows a table where all values are `AAA`. Cannot be changed(?)
+* `MAPJUMP`: The same `MAPJUMP` feature explained above.
+* `LOCALSET`: The same `LOCALSET` feature explained above.
+* `PROGRESS`: ???
+* `SIGNAL`: ???
+* `ITEM`: The same `ITEM` feature explained above.
+* `DEBUG DRAW`: The same `DEBUG DRAW` feature explained above.
+* `MISSION`: The same `MISSION` feature explained above.
+* `OBJENTRY`: The same `OBJENTRY` feature explained above.
+* `CHECK CACHEBUFF`: The same `CHECK CACHEBUFF` feature explained above.
+* `CASH SAVE`: ???
+
 ### BATTLE
+
+* `MOTION INFO`: Hide or Show. Doesn't appear to work. Probably requires development utility that we do not have.
+* `BATTLE REPORT`: Crash!
+* `CHG WEAPON`: Crash!
+* `BONUSLEVEL`: Crash!
+* `BATTLE LEVEL`: Crash?
+* `STOP`: Weirdly named, but has `START` and `END` options, with `LIMIT` and `SUMMON` following. None appear to do anything.
 
 ### EVENT
 
