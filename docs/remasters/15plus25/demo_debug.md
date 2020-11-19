@@ -164,9 +164,35 @@ This feature appears to have the game run through all currently cached events, d
 
 ### DEBUG
 
+* `HIDE DEBUG`: Self-explantory.
+* `STATUS`: Show's realtime statistics.
+* `CONFIG`: Includes two menus with various settings (some of which are listed near the top of this page) and two options that appear to do nothing. (`EDIT, EDIT 2` & `SAVE, SAVE START AREA`, respectively.)
+
 ### SYSTEM
 
+* `CACHE BUFF`: Shows the realtime memory buffer of objects loaded. The table is messed up usually, but the number reading appears to be accurate.
+* `SAVERAM`: A save/load menu for fast RAM states. Investigation needed; doesn't appear to work fully.
+* `SYSTEM`: Includes a few useful items.
+  * `VSYNC TYPE`: Variable or Fixed.
+  * `VSYNC LIMIT`: Frame limiter. Setting this to `60` enables smoother debug menu navigation, but obviously comes with pre-PS4 game fixes.
+  * `GAME SPEED`: Presets that the game uses at various points, such as the slowdown effect after beating a forced fight.
+  * `SHOW MODE`: Show Mode or Work Mode. Presumably used either for showcasing or development. Changing this appears to do nothing.
+  * `PLAY TIME`: Set the game's play time to predetermined amounts.
+* `FM PATCH`: Does nothing, presents KH2's `error` sound when selecting it. Probably used by development to test new fixes on the fly.
+
 ### FIELD
+
+* `SETINFO`: Shows a table where all values are `AAA`. Cannot be changed(?)
+* `MAPJUMP`: The same `MAPJUMP` feature explained above.
+* `LOCALSET`: The same `LOCALSET` feature explained above.
+* `PROGRESS`: ???
+* `SIGNAL`: ???
+* `ITEM`: The same `ITEM` feature explained above.
+* `DEBUG DRAW`: The same `DEBUG DRAW` feature explained above.
+* `MISSION`: The same `MISSION` feature explained above.
+* `OBJENTRY`: The same `OBJENTRY` feature explained above.
+* `CHECK CACHEBUFF`: The same `CHECK CACHEBUFF` feature explained above.
+* `CASH SAVE`: ???
 
 ### BATTLE
 
