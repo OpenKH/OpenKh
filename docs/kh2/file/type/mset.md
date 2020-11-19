@@ -50,19 +50,19 @@ Each motion is a BAR file with 2 entries, the model animation and the effects.
 
 | ID | Effect | Parameter | Size
 |--------|---------------|-------------|-------------|
-| 0 	 | Allows controls (But brings to idle animaiton) | 
-| 1 	 | Allows controls (But blocks the animation) | 
-| 2 	 | Allows controls | 
-| 3 	 | Blocks the animation (But disables gravity) | 
-| 4 	 | Blocks controls (But allows gravity) | 
+| 0 	 | Allows controls (But brings to idle animaiton) | |
+| 1 	 | Allows controls (But blocks the animation) | |
+| 2 	 | Allows controls | |
+| 3 	 | Blocks the animation (But disables gravity) | |
+| 4 	 | Blocks controls (But allows gravity) | |
 | 10 	 | Activates hitbox | ? | ?
 | 20 	 | Performs a reaction command (On current model) | ? | ?
 | 23 	 | Draws an additional texture | ? | ?
 | 25 	 | Performs a reaction command (On another model) | ? | ?
-| 27 	 | Makes invincible | 
-| 30 	 | Blocks everything | 
-| 34 	 | Blocks reaction command | 
-| 41 	 | Allows controls (But disables model rotation) | 
+| 27 	 | Makes invincible | |
+| 30 	 | Blocks everything | |
+| 34 	 | Blocks reaction command | |
+| 41 	 | Allows controls (But disables model rotation) | |
 
 ## Effect B list
 
@@ -70,7 +70,7 @@ Each motion is a BAR file with 2 entries, the model animation and the effects.
 |--------|---------------|-------------|-------------|
 | 1 	 | Plays PAX sprite | PAX sprite ID | ?
 | 2 	 | Plays footstep sound | Sound ID | ?
-| 3 	 | Plays animation in slot 628 | 
+| 3 	 | Plays animation in slot 628 | |
 | 13 	 | Plays an enemy vsb voice | vsb ID | ?
 | 14 	 | Plays an ally vsb voice | vsb ID | ?
 | 22 	 | Makes the keyblade appear | ? | ?
@@ -78,4 +78,4 @@ Each motion is a BAR file with 2 entries, the model animation and the effects.
 | 24 	 | Makes model opacity increase | ? | ?
 | 26 	 | Makes a mesh disappear | ? | ?
 | 27 	 | Makes a mesh appear | ? | ?
-| 29 	 | Plays a Keyblade appearance sprite | 
+| 29 	 | Plays a Keyblade appearance sprite | |
