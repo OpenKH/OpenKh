@@ -13,7 +13,7 @@ The following steps are recommended to improve useability:
 2. Click `CONFIG > EDIT` and check to see if `SHOW VERSION` is enabled (it is enabled if the check box on the left is dark grey instead of light grey). If enabled, a handful of game functionality is limited to the `Premium Showcase` aspect of the demo. Disabling this option allows you to access the Camp menu when pausing, for example. Re-enabling this feature will restore the demo functions to as intended.
 
 3. At the top of the debug menus, clicking the red (right) button will close said menu. Clicking the blue (left) button will minimize the current menu and place it at the bottom left of the screen to be quickly accessed again. Simply click that menu to maximize it.
-<img src="./images/menu_buttons.jpg" width="720">
+<img src="./images/menu_buttons.jpg" width="960">
 
 ## Detailed Breakdown of Debug Menu (Top-level)
 
