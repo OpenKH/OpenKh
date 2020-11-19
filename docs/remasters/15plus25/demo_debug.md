@@ -1,9 +1,10 @@
-# [Kingdom Hearts 2.5 HD Remix](remasters/15plus25/index.md) - KH2FM+ Debug Menu
+# [Kingdom Hearts 2.5 HD Remix](index.md) - KH2FM+ Debug Menu
 
 The E3 2014 Kiosk Demo for Kingdom Hearts 2.5 HD Remix has the developer debug menu enabled for KH2FM+. The menu works but causes crashes when attempting to use most functions intended for use with the complete game data.
 By replacing the demo `index.dat` and `kingdom2.mself` with the files from a retail copy of the game it is possible to restore most missing functionality.
 
 # Debug Menu Controls and Setup
+
 To access the debug menu on a PS3 devkit or emulator right-click on the screen with a connected mouse. To select an option left-click it in the menu. It is recommended to only use the debug menu _after_ the title screen to avoid crashes.
 The following steps are recommended to improve useability: 
 
@@ -13,20 +14,25 @@ The following steps are recommended to improve useability:
 		
 # Detailed Breakdown of Debug Menu (Top-level)
 ## HIDE DEBUG
+
 * Self-explanatory.
 	
 ## STATUS
+
 * Displays various realtime diagnostics.
 		
 ## CONFIG >>
+
 * Various useful settings under ``EDIT``.
 	
 ## SUBMENU ON/OFF >>
+
 * Allows docking of submenus in the top-level menu.
 		
 ## SETINFO
 	
 ## MAPJUMP 
+
 * This can be used to warp to any map in the game. More documentation to come. 
 * For internal map names refer to [KH2 Worlds](../kh2/worlds.md)
 * By changing ``EVENT`` user can warp to various boss fights, scripted fights, and cutscenes.
@@ -38,14 +44,17 @@ The following steps are recommended to improve useability:
 ## SIGNAL
 	
 ## ITEM
+
 * Inventory editor. More documentation to come.
 		
 ## DEBUG DRAW >>
+
 * Disabled graphics debugging functions. These were used for developing the PS2 version but seem to have not been used for the PS3 port.
 		
 ## MISSION >>
 	
 ## OBJENTRY >>
+
 * Opens a menu allowing the user to change playable characters and party members and spawn objects/enemies/bosses etc.
 
 ## CHECK CACHEBUFFER >>
@@ -64,6 +73,7 @@ The following steps are recommended to improve useability:
 ## EVENT
 
 ## MAP
+
 * Free camera mode can be activated here. Free camera will cause a crash in battles if game is not paused. Right analog controls camera angle, left stick moves camera horizontally. Hold L1 to switch to vertical movement.
 
 ## WORLD
@@ -71,11 +81,13 @@ The following steps are recommended to improve useability:
 ## GUMI BATTLE
 
 ## GUMI EDIT
+
 * Nothing
 
 ## MENU
 
 ## EFFECT
+
 * Allows user to center camera on active visual effects. Contains menus for effect editors. These crash when attempting to load an effect file.
 
 ## SOUND
@@ -83,15 +95,19 @@ The following steps are recommended to improve useability:
 ## ETC
 
 ## YASUI
+
 * Mostly unknown options at this point. ``TEST`` will kill Sora.
 
 ## SUGI
+
 * Nothing.
 
 ## TOZAWA
+
 * For testing menus. Options include opening the ``SAVE``, ``LOAD``, and ``PARTY`` menus, changing game difficulty, giving oneself max synthesis materials, and max munny. 
 
 ## ITO
+
 * Allows user to play various minigames. 
 
 ## SAVE POINT
