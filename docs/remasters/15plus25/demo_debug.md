@@ -109,6 +109,10 @@ An inventory editor with seemingly only one functionality: to add and remove thi
 
 Opens a menu allowing the user to change playable characters and party members and spawn objects/enemies/bosses etc. More documentation to come soon.
 
+### TEXANM
+
+Opens a menu that allows the user to cycle through the selected model's texture patches (TEXA).
+
 ### CHECK CACHEBUFFER >>
 
 ### CASH SAVE
