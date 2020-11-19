@@ -196,6 +196,13 @@ This feature appears to have the game run through all currently cached events, d
 
 ### BATTLE
 
+* `MOTION INFO`: Hide or Show. Doesn't appear to work. Probably requires development utility that we do not have.
+* `BATTLE REPORT`: Crash!
+* `CHG WEAPON`: Crash!
+* `BONUSLEVEL`: Crash!
+* `BATTLE LEVEL`: Crash?
+* `STOP`: Weirdly named, but has `START` and `END` options, with `LIMIT` and `SUMMON` following. None appear to do anything.
+
 ### EVENT
 
 ### MAP
