@@ -111,6 +111,11 @@ namespace OpenKh.Game.States
                 if (_input.Down) _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
                 if (_input.Left) _camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
                 if (_input.Right) _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
+
+                foreach (var entity in _objectEntities.Where(x => x.Mesh != null))
+                {
+                    entity.Update((float)deltaTimes.DeltaTime);
+                }
             }
         }
 
