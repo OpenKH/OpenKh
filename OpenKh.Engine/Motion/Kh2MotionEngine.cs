@@ -56,7 +56,7 @@ namespace OpenKh.Engine.Motion
 
             var rawDesc = CurrentMotion.Raw;
             var absoluteFrame = (int)Math.Floor(rawDesc.FramePerSecond * time);
-            var actualFrame = absoluteFrame % rawDesc.TotalFrameCount;
+            var actualFrame = absoluteFrame % rawDesc.Matrices.Count;
             model.ApplyMotion(rawDesc.Matrices[actualFrame]);
         }
     }
