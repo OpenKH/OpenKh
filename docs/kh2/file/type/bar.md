@@ -87,7 +87,7 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 0 | Temporary File (Should not be used) | gummiblock/pxl.bar |
 | 1 | Binary Archive | Varies.
 | 2 | Independent Format (ItemList, TreasureList, StringList, etc.) | 03system.bin (Varies) - msg/jp/xxx.bar (Always StringList)
-| 3 | AI Code (Also should not be used, unless you can code an AI) | MDLX - ARD - MAG
+| 3 | [BTX scripting](../ai/index.md) | `MDLX`, `ARD`, `MAG`
 | 4 | 3D Model data (Encapsulated VIF packets containing Vertices, Skinning, Bones for MDLX, etc.) | MDLX - MAP
 | 5 | Mesh Occlusion/Obstruction (Probably Culling) | MAP
 | 6 | Map Collision Data | MAP
@@ -109,7 +109,7 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 22 | Animation Loader | ARD - A.FM - limit/*
 | 23 | Model Collision | MDLX
 | 24 | Image Data (IMGD) | Varies
-| 25 | [Sequence animation (SED)](./2ld.md#sequence) | 2DD, MAP, A.FM, fontinfo.bar
+| 25 | [Sequence animation (SQD)](./2ld.md#sequence) | 2DD, MAP, A.FM, fontinfo.bar
 | 26 | Unknown | Unknown
 | 27 | Unknown | Unknown
 | 28 | [Layout animation (LAD)](./2ld.md#layout) | `menu/*`, `gumi/sprite/*`
