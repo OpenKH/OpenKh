@@ -87,40 +87,40 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 0 | Temporary File (Should not be used) | gummiblock/pxl.bar |
 | 1 | Binary Archive | Varies.
 | 2 | Independent Format (ItemList, TreasureList, StringList, etc.) | 03system.bin (Varies) - msg/jp/xxx.bar (Always StringList)
-| 3 | [BTX scripting](../ai/index.md) | `MDLX`, `ARD`, `MAG`
+| 3 | [`BDX` scripting](../ai/index.md) | `MDLX`, `ARD`, `MAG`
 | 4 | 3D Model data (Encapsulated VIF packets containing Vertices, Skinning, Bones for MDLX, etc.) | MDLX - MAP
-| 5 | Mesh Occlusion/Obstruction (Probably Culling) | MAP
-| 6 | Map Collision Data | MAP
+| 5 | [`OCD` Mesh Occlusion for Culling](../map.md#ocd) | MAP
+| 6 | [`OCC` Collision Data](../map.md#occ) | MAP
 | 7 | [RAW Texture](../raw-texture.md) | MDLX - MAP
-| 8 | DPX (A bit unknown) | PAX
+| 8 | `DPX` effect container | PAX
 | 9 | [Motion Data](../anb/anb.md#motion-data) | Animation
-| 10 | Texture Data | MAP - minigame/xxx.bar
-| 11 | Camera Collision Data | MAP
+| 10 | [`TM2` texture](../../../common/tm2.md) | MAP - minigame/xxx.bar
+| 11 | `OCH` Camera Collision | MAP
 | 12 | Spawn Point Data | MAP
 | 13 | Spawn Point Script | ARD
-| 14 | Map Color Array/Diffuse Maps | MAP
-| 15 | Lighting Data | MAP
+| 14 | `FOG` for Diffuse object coloring | MAP
+| 15 | [`OCL` light collision](../map.md#ocl) | MAP
 | 16 | [Animation triggers](../anb/anb.md#effect-data) | `ANB`
 | 17 | [Animation Binary Archive (ANB)](../anb/anb.md) | `obj/*.mset`, `anm/*`
-| 18 | PAX Effect | A.FM - MAG - MDLX
-| 19 | Map Collision Data | MAP
+| 18 | `PAX` Effect | A.FM - MAG - MDLX
+| 19 | `OWA` Map Collision Data | MAP
 | 20 | Moveset | MSET - limit/*
-| 21 | Unknown | MAP
+| 21 | [`BOP` Background Object Placement](../map.md#bop) | MAP
 | 22 | Animation Loader | ARD - A.FM - limit/*
 | 23 | Model Collision | MDLX
-| 24 | Image Data (IMGD) | Varies
+| 24 | [`IMD` image](image.md#imgd) | Varies
 | 25 | [Sequence animation (SQD)](./2ld.md#sequence) | 2DD, MAP, A.FM, fontinfo.bar
 | 26 | Unknown | Unknown
 | 27 | Unknown | Unknown
 | 28 | [Layout animation (LAD)](./2ld.md#layout) | `menu/*`, `gumi/sprite/*`
-| 29 | Multi-Image Data Archive (IMGZ) | Varies.
+| 29 | [`IMZ` multi-image archive](image.md#imgz) | Varies.
 | 30 | Binary Archive | MAP
 | 31 | Sound Effect Block (SEB) | MDLX - A.FM
 | 32 | BGM Instrument Data (WD) | BGM - MDLX - A.FM
 | 33 | Unknown | Unknown
 | 34 | IopVoice Sound (VSB) | Varies.
 | 35 | SPRD (This is also a bit unknown) | mg_heft.2ld
-| 36 | RAW Bitmap | fontimage.bar
+| 36 | `rgb` raw bitmap | fontimage.bar
 | 37 | PS2 Memory Card Icon | menu/save.2ld
 | 38 | Wrapped Collision Data (Whatever that is) | Unknown
 | 39 | Unknown | Unknown

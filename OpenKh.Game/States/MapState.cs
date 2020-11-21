@@ -224,7 +224,7 @@ namespace OpenKh.Game.States
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
 
-            _bobEntities = entries.ForEntry("out", Bar.EntryType.BobDescriptor, BobDescriptor.Read)?
+            _bobEntities = entries.ForEntry("out", Bar.EntryType.BgObjPlacement, BobDescriptor.Read)?
                 .Select(x => new BobEntity(x))?.ToList() ?? new List<BobEntity>();
 
             var bobModels = entries.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
