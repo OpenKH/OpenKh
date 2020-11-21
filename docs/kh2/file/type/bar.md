@@ -1,6 +1,6 @@
 # [Kingdom Hearts II](../../index.md) - BAR (Binary ARchives)
 
-Most of the game's information is stored within these files in order to keep everything organized and easily accessable by the game. These files are kind of like ZIP files, with certain limitations. 
+Most of the game's information is stored within these files in order to keep everything organized and easily accessable by the game. These files are kind of like ZIP files, with certain limitations.
 
 Those limitations include the file's limitations, like the 4 character file names, file types having to be declared within the header, not all file types being declareable, but it also includes PS2's limitations, like the offsets of the files within having to be divisible by 16, even though the size of the previous file is not, file names being unable to contain some characters, etc.
 
@@ -8,7 +8,7 @@ Those limitations include the file's limitations, like the 4 character file name
 
 BARs can come in all shapes and sizes and forms. Some have the ".bin" extension, meaning it is a system file. Some have the ".mset" extension, meaning it is a moveset file. Some have the ".mdlx" extension, meaning it is a model file. However, no matter the type, it still follows the basic file structure of the BAR.
 
-In this structure, the names do not matter. They can be whatever as long as the PS2 is OK with it. They are just there in order to identify what file it is. This may or may not be the case in 03system, however. 
+In this structure, the names do not matter. They can be whatever as long as the PS2 is OK with it. They are just there in order to identify what file it is. This may or may not be the case in 03system, however.
 
 The game seeks the files by their index numbers. For example: An MDLX-BAR seeks index 0 for the VIF information, index 1 for IMGD information, index 2 for the AI and index 3 for the collision in case the MDLX-BAR has 4 files within.
 
@@ -20,7 +20,7 @@ All the values are Little Endian in the PS2/PS4 Versions, while they are Big End
 |--------|---------------|-------------|
 | 0 | char[4] | The identifier of the file (Should be always 0x01524142) |
 | 4 | uint32_t | The sub-file count of the BAR File. |
-| 8 | uint32_t | Always zero. Padding for a lookup address at runtime. 
+| 8 | uint32_t | Always zero. Padding for a lookup address at runtime.
 | 12 | int32_t | Unknown. Often 0. Some [MSET](../anb/mset.md) files set it to 1 or 2.
 
 ### BAR Entry
@@ -41,7 +41,7 @@ All the values are Little Endian in the PS2/PS4 Versions, while they are Big End
 
 ### Kaitai file structure
 
-```
+```yml
 meta:
   id: kh2_bar
   endian: le
@@ -93,15 +93,15 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 6 | Map Collision Data | MAP
 | 7 | [RAW Texture](../raw-texture.md) | MDLX - MAP
 | 8 | DPX (A bit unknown) | PAX
-| 9 | [Motion Data](../anb/anb.md) | Animation
+| 9 | [Motion Data](../anb/anb.md#motion-data) | Animation
 | 10 | Texture Data | MAP - minigame/xxx.bar
 | 11 | Camera Collision Data | MAP
 | 12 | Spawn Point Data | MAP
 | 13 | Spawn Point Script | ARD
 | 14 | Map Color Array/Diffuse Maps | MAP
 | 15 | Lighting Data | MAP
-| 16 | Moveset Instructions | ANB
-| 17 | Animation Binary Archive (ANB) | MSET, anm/*
+| 16 | [Animation triggers](../anb/anb.md#effect-data) | `ANB`
+| 17 | [Animation Binary Archive (ANB)](../anb/anb.md) | `obj/*.mset`, `anm/*`
 | 18 | PAX Effect | A.FM - MAG - MDLX
 | 19 | Map Collision Data | MAP
 | 20 | Moveset | MSET - limit/*
@@ -112,7 +112,7 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 25 | [Sequence animation (SED)](./2ld.md#sequence) | 2DD, MAP, A.FM, fontinfo.bar
 | 26 | Unknown | Unknown
 | 27 | Unknown | Unknown
-| 28 | [Layout animation (LAD)](./2ld.md#layout) | menu/* - gumi/sprite/*
+| 28 | [Layout animation (LAD)](./2ld.md#layout) | `menu/*`, `gumi/sprite/*`
 | 29 | Multi-Image Data Archive (IMGZ) | Varies.
 | 30 | Binary Archive | MAP
 | 31 | Sound Effect Block (SEB) | MDLX - A.FM
@@ -133,5 +133,3 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 46 | Binary Archive | Unknown
 | 47 | Vibration Data | vibration.bar
 | 48 | Sony Audio Format (VAG) | Varies.
-
-
