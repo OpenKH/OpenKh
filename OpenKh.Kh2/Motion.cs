@@ -24,7 +24,7 @@ namespace OpenKh.Kh2
             [Data] public int Unk14 { get; set; }
             [Data] public int Unk18 { get; set; }
             [Data] public int Unk1c { get; set; }
-            [Data] public int Unk20 { get; set; }
+            [Data] public int FrameCountPerLoop { get; set; }
             [Data] public int TotalFrameCount { get; set; }
             [Data] public int Unk28 { get; set; }
             [Data] public int Unk2c { get; set; }
@@ -47,9 +47,6 @@ namespace OpenKh.Kh2
         public class RawMotion
         {
             public int BoneCount { get; set; }
-            public int Unk14 { get; set; }
-            public int Unk18 { get; set; }
-            public int Unk1c { get; set; }
             public int Unk28 { get; set; }
             public int Unk2c { get; set; }
             public float BoundingBoxMinX { get; set; }
@@ -69,7 +66,7 @@ namespace OpenKh.Kh2
             public Matrix4x4[] Matrices2 { get; set; }
         }
 
-        private int _04;
+        public bool UnkFlag { get; set; }
         public bool IsRaw { get; }
 
         public RawMotion Raw { get; }
@@ -80,7 +77,7 @@ namespace OpenKh.Kh2
 
             var header = BinaryMapping.ReadObject<Header>(stream);
             IsRaw = header.Version == 1;
-            _04 = header.Unk04;
+            UnkFlag = header.Unk04 != 0;
 
             if (IsRaw)
             {
@@ -88,9 +85,6 @@ namespace OpenKh.Kh2
                 Raw = new RawMotion
                 {
                     BoneCount = raw.BoneCount,
-                    Unk14 = raw.Unk14,
-                    Unk18 = raw.Unk18,
-                    Unk1c = raw.Unk1c,
                     Unk28 = raw.Unk28,
                     Unk2c = raw.Unk2c,
                     BoundingBoxMinX = raw.BoundingBoxMinX,
@@ -138,12 +132,12 @@ namespace OpenKh.Kh2
         public static void Write(Stream stream, Motion motion)
         {
             if (motion.IsRaw)
-                Write(stream, motion.Raw, motion._04);
+                Write(stream, motion.Raw, motion.UnkFlag);
             else
                 throw new NotImplementedException();
         }
 
-        private static void Write(Stream stream, RawMotion rawMotion, int _04)
+        private static void Write(Stream stream, RawMotion rawMotion, bool unkFlag)
         {
             const int HeaderSize = 0x60;
             const int Matrix4x4Size = 0x40;
@@ -152,7 +146,7 @@ namespace OpenKh.Kh2
             BinaryMapping.WriteObject(stream, new Header
             {
                 Version = 1,
-                Unk04 = _04,
+                Unk04 = unkFlag ? 1 : 0,
                 ByteCount = HeaderSize +
                     rawMotion.BoneCount * rawMotion.Matrices.Count * Matrix4x4Size +
                     rawMotion.Matrices2.Length * Matrix4x4Size,
@@ -162,10 +156,10 @@ namespace OpenKh.Kh2
             BinaryMapping.WriteObject(stream, new RawMotionInternal
             {
                 BoneCount = rawMotion.BoneCount,
-                Unk14 = rawMotion.Unk14,
-                Unk18 = rawMotion.Unk18,
-                Unk1c = rawMotion.Unk1c, // Maybe always 0????
-                Unk20 = (rawMotion.Matrices.Count - 1) * 2,
+                Unk14 = 0,
+                Unk18 = 0,
+                Unk1c = 0,
+                FrameCountPerLoop = (int)(rawMotion.FrameEnd - rawMotion.FrameLoop) * 2,
                 TotalFrameCount = rawMotion.Matrices.Count,
                 Unk28 = rawMotion.Unk28,
                 Unk2c = rawMotion.Matrices2.Length > 0 ? HeaderSize +
