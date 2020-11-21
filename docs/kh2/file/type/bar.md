@@ -21,7 +21,7 @@ All the values are Little Endian in the PS2/PS4 Versions, while they are Big End
 | 0 | char[4] | The identifier of the file (Should be always 0x01524142) |
 | 4 | uint32_t | The sub-file count of the BAR File. |
 | 8 | uint32_t | Always zero. Padding for a lookup address at runtime. 
-| 12 | int32_t | Unknown. Often 0. Some mset files set it to 1 or 2.
+| 12 | int32_t | Unknown. Often 0. Some [MSET](../anb/mset.md) files set it to 1 or 2.
 
 ### BAR Entry
 
@@ -90,10 +90,10 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 3 | AI Code (Also should not be used, unless you can code an AI) | MDLX - ARD - MAG
 | 4 | 3D Model data (Encapsulated VIF packets containing Vertices, Skinning, Bones for MDLX, etc.) | MDLX - MAP
 | 5 | Mesh Occlusion/Obstruction (Probably Culling) | MAP
-| 6 | Map Collision Data | MAP 
+| 6 | Map Collision Data | MAP
 | 7 | [RAW Texture](../raw-texture.md) | MDLX - MAP
 | 8 | DPX (A bit unknown) | PAX
-| 9 | Animation Data | ANB
+| 9 | [Motion Data](../anb/anb.md) | Animation
 | 10 | Texture Data | MAP - minigame/xxx.bar
 | 11 | Camera Collision Data | MAP
 | 12 | Spawn Point Data | MAP
@@ -101,9 +101,9 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 14 | Map Color Array/Diffuse Maps | MAP
 | 15 | Lighting Data | MAP
 | 16 | Moveset Instructions | ANB
-| 17 | Animation Binary Archive (ANB) | MSET
+| 17 | Animation Binary Archive (ANB) | MSET, anm/*
 | 18 | PAX Effect | A.FM - MAG - MDLX
-| 19 | Map Collision Data | MAP 
+| 19 | Map Collision Data | MAP
 | 20 | Moveset | MSET - limit/*
 | 21 | Unknown | MAP
 | 22 | Animation Loader | ARD - A.FM - limit/*
