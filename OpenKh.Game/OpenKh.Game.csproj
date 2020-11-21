@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <InformationalVersion>0.0.0.0-local</InformationalVersion>
     <ApplicationIcon />
     <StartupObject />
@@ -24,10 +25,6 @@
     <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Content\bin\DesktopGL\" />
   </ItemGroup>
 
 </Project>
