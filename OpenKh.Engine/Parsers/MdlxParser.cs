@@ -58,6 +58,21 @@ namespace OpenKh.Engine.Parsers
             }
         }
 
+        public MdlxParser(Mdlx mdlx, Matrix4x4[] matrices)
+        {
+            if (IsEntity(mdlx))
+            {
+                MeshDescriptors = new Kkdf2MdlxParser(mdlx.SubModels.First())
+                    .ProcessVerticesAndBuildModel(matrices);
+            }
+            else if (IsMap(mdlx))
+            {
+                MeshDescriptors = mdlx.MapModel.VifPackets
+                    .Select(vifPacket => Parse(vifPacket))
+                    .ToList();
+            }
+        }
+
         private static bool IsEntity(Mdlx mdlx) => mdlx.SubModels != null;
 
         private static bool IsMap(Mdlx mdlx) => mdlx.MapModel != null;

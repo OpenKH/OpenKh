@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
@@ -18,6 +18,15 @@ namespace OpenKh.Engine.MonoGame
             meshGroup.Textures = LoadTextures(graphics, texture).ToArray();
 
             return meshGroup;
+        }
+
+        public static MeshGroup FromKH2(Mdlx model, System.Numerics.Matrix4x4[] matrices)
+        {
+            if (model == null)
+                return null;
+
+            var modelParsed = new MdlxParser(model, matrices);
+            return LoadKH2New(modelParsed);
         }
 
         public static MeshGroup FromKH2(Mdlx model)
