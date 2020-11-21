@@ -22,12 +22,12 @@ namespace OpenKh.Kh2Anim.Mset
         }
 
         public bool HasAnimationData => entries
-                .Any(it => it.Type == Bar.EntryType.AnimationData);
+                .Any(it => it.Type == Bar.EntryType.Motion);
 
         public IAnimMatricesProvider GetAnimProvider(Stream mdlxStream)
         {
             var animEntry = entries
-                .First(it => it.Type == Bar.EntryType.AnimationData); // anb bar should have single 0x09 (AnimationData)
+                .First(it => it.Type == Bar.EntryType.Motion); // anb bar should have single 0x09 (AnimationData)
             var animStream = animEntry.Stream;
 
             var animReader = new AnimReader(animStream);

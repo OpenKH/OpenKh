@@ -28,19 +28,19 @@ namespace OpenKh.Engine.Motion
                 _animationIndex = value;
                 var entry = _animEntries[_animationIndex];
                 var subEntries = Bar.Read(entry.Stream.SetPosition(0));
-                var animationDataEntry = subEntries.FirstOrDefault(x => x.Type == Bar.EntryType.AnimationData);
+                var animationDataEntry = subEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Motion);
                 if (animationDataEntry != null)
                     _motion = Kh2.Motion.Read(animationDataEntry.Stream.SetPosition(0));
                 else
-                    Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) does not contain any {Bar.EntryType.AnimationData}");
+                    Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) does not contain any {Bar.EntryType.Motion}");
 
-                var animationBinaryEntry = subEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Anb);
+                var animationBinaryEntry = subEntries.FirstOrDefault(x => x.Type == Bar.EntryType.MotionTriggers);
                 if (animationDataEntry != null)
                 {
                     // We do not have any ANB parser
                 }
                 else
-                    Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) does not contain any {Bar.EntryType.Anb}");
+                    Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) does not contain any {Bar.EntryType.MotionTriggers}");
             }
         }
 

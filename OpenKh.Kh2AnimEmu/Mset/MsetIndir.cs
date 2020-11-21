@@ -23,7 +23,7 @@ namespace OpenKh.Kh2Anim.Mset
         {
             var anbBar = entries
                 .Skip(barEntryIndex)
-                .First(it => it.Type == Bar.EntryType.Bar);
+                .First(it => it.Type == Bar.EntryType.Anb);
 
             return new AnbIndir(Bar.Read(anbBar.Stream));
         }
