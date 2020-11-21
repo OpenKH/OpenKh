@@ -5,26 +5,26 @@ It is a [BAR file](bar.md) that contains a list of "slots". Each slot may or may
 The various actions in the game point to a specific motion by a slot position in this list, thus many of the motions are dummies, since the characters only use some of them.
 Eg: For Sora, slot 0 is idle, slot 4 is walking and slot 604 is the basic attack.
 
-Each motion is a BAR file with 2 entries, the model animation and the effects.
+Each motion is a BAR file with 2 entries, the model [animation](#Animation-structure) followed by the [effects](#Effects-structure).
 
 ## Animation structure
 
-???
+See [ANB](../anb/anb.md) documentation.
 
 ## Effects structure
 
 | Amount | Description |
 |--------|---------------|
-| 1 	 |  Header
-| X 	 |  Type A effect (Happens during X frames)
-| X 	 |  Type B effect (Triggered on a specific frame)
+| Single 	 |  [Header](#Effects-header)
+| Array 	 |  [Type A effect](#Type-A-effect) (Happens during X frames)
+| Array 	 |  [Type B effect](#Type-B-effect) (Triggered on a specific frame)
 
 ### Effects header
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | byte | Type A effect count
-| 1 	 | byte | Type B effect count
+| 0 	 | byte | [Type A effect](#Type-A-effect) count
+| 1 	 | byte | [Type B effect](#Type-B-effect) count
 | 2 	 | short | Start offset of the type B effects
 
 ### Type A effect
@@ -33,7 +33,7 @@ Each motion is a BAR file with 2 entries, the model animation and the effects.
 |--------|---------------|-------------|
 | 0 	 | short | Start frame
 | 2 	 | short | End frame
-| 4 	 | byte | Effect A ID
+| 4 	 | byte | [Effect A ID](#Type-A-list)
 | 5 	 | byte | Param size as shorts
 | 6 	 | short[] | Param
 
@@ -42,7 +42,7 @@ Each motion is a BAR file with 2 entries, the model animation and the effects.
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | short | Trigger frame
-| 2 	 | byte | Effect B ID
+| 2 	 | byte | [Effect B ID](#Type-B-list)
 | 3 	 | byte | Param size as shorts
 | 4 	 | short[] | Param
 
