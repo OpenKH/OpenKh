@@ -28,14 +28,14 @@ namespace OpenKh.Kh2
             [Data] public int TotalFrameCount { get; set; }
             [Data] public int Unk28 { get; set; }
             [Data] public int Unk2c { get; set; }
-            [Data] public float Unk30 { get; set; }
-            [Data] public float Unk34 { get; set; }
-            [Data] public float Unk38 { get; set; }
-            [Data] public float Unk3c { get; set; }
-            [Data] public float Unk40 { get; set; }
-            [Data] public float Unk44 { get; set; }
-            [Data] public float Unk48 { get; set; }
-            [Data] public float Unk4c { get; set; }
+            [Data] public float BoundingBoxMinX { get; set; }
+            [Data] public float BoundingBoxMinY { get; set; }
+            [Data] public float BoundingBoxMinZ { get; set; }
+            [Data] public float BoundingBoxMinW { get; set; }
+            [Data] public float BoundingBoxMaxX { get; set; }
+            [Data] public float BoundingBoxMaxY { get; set; }
+            [Data] public float BoundingBoxMaxZ { get; set; }
+            [Data] public float BoundingBoxMaxW { get; set; }
             [Data] public float FrameLoop { get; set; }
             [Data] public float FrameEnd { get; set; }
             [Data] public float FramePerSecond { get; set; }
@@ -52,14 +52,14 @@ namespace OpenKh.Kh2
             public int Unk1c { get; set; }
             public int Unk28 { get; set; }
             public int Unk2c { get; set; }
-            public float Unk30 { get; set; }
-            public float Unk34 { get; set; }
-            public float Unk38 { get; set; }
-            public float Unk3c { get; set; }
-            public float Unk40 { get; set; }
-            public float Unk44 { get; set; }
-            public float Unk48 { get; set; }
-            public float Unk4c { get; set; }
+            public float BoundingBoxMinX { get; set; }
+            public float BoundingBoxMinY { get; set; }
+            public float BoundingBoxMinZ { get; set; }
+            public float BoundingBoxMinW { get; set; }
+            public float BoundingBoxMaxX { get; set; }
+            public float BoundingBoxMaxY { get; set; }
+            public float BoundingBoxMaxZ { get; set; }
+            public float BoundingBoxMaxW { get; set; }
             public float FrameLoop { get; set; }
             public float FrameEnd { get; set; }
             public float FramePerSecond { get; set; }
@@ -93,14 +93,14 @@ namespace OpenKh.Kh2
                     Unk1c = raw.Unk1c,
                     Unk28 = raw.Unk28,
                     Unk2c = raw.Unk2c,
-                    Unk30 = raw.Unk30,
-                    Unk34 = raw.Unk34,
-                    Unk38 = raw.Unk38,
-                    Unk3c = raw.Unk3c,
-                    Unk40 = raw.Unk40,
-                    Unk44 = raw.Unk44,
-                    Unk48 = raw.Unk48,
-                    Unk4c = raw.Unk4c,
+                    BoundingBoxMinX = raw.BoundingBoxMinX,
+                    BoundingBoxMinY = raw.BoundingBoxMinY,
+                    BoundingBoxMinZ = raw.BoundingBoxMinZ,
+                    BoundingBoxMinW = raw.BoundingBoxMinW,
+                    BoundingBoxMaxX = raw.BoundingBoxMaxX,
+                    BoundingBoxMaxY = raw.BoundingBoxMaxY,
+                    BoundingBoxMaxZ = raw.BoundingBoxMaxZ,
+                    BoundingBoxMaxW = raw.BoundingBoxMaxW,
                     FrameLoop = raw.FrameLoop,
                     FrameEnd = raw.FrameEnd,
                     FramePerSecond = raw.FramePerSecond,
@@ -170,14 +170,14 @@ namespace OpenKh.Kh2
                 Unk28 = rawMotion.Unk28,
                 Unk2c = rawMotion.Matrices2.Length > 0 ? HeaderSize +
                     rawMotion.BoneCount * rawMotion.Matrices.Count * Matrix4x4Size : 0,
-                Unk30 = rawMotion.Unk30,
-                Unk34 = rawMotion.Unk34,
-                Unk38 = rawMotion.Unk38,
-                Unk3c = rawMotion.Unk3c,
-                Unk40 = rawMotion.Unk40,
-                Unk44 = rawMotion.Unk44,
-                Unk48 = rawMotion.Unk48,
-                Unk4c = rawMotion.Unk4c,
+                BoundingBoxMinX = rawMotion.BoundingBoxMinX,
+                BoundingBoxMinY = rawMotion.BoundingBoxMinY,
+                BoundingBoxMinZ = rawMotion.BoundingBoxMinZ,
+                BoundingBoxMinW = rawMotion.BoundingBoxMinW,
+                BoundingBoxMaxX = rawMotion.BoundingBoxMaxX,
+                BoundingBoxMaxY = rawMotion.BoundingBoxMaxY,
+                BoundingBoxMaxZ = rawMotion.BoundingBoxMaxZ,
+                BoundingBoxMaxW = rawMotion.BoundingBoxMaxW,
                 FrameLoop = rawMotion.FrameLoop,
                 FrameEnd = rawMotion.FrameEnd,
                 FramePerSecond = rawMotion.FramePerSecond,
