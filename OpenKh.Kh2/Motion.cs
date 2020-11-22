@@ -1,6 +1,7 @@
-using System;
+using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using Xe.BinaryMapper;
 
@@ -9,6 +10,7 @@ namespace OpenKh.Kh2
     public class Motion
     {
         private const int ReservedSize = 0x90;
+        private const int Matrix4x4Size = 0x40;
 
         private class Header
         {
@@ -66,10 +68,168 @@ namespace OpenKh.Kh2
             public Matrix4x4[] Matrices2 { get; set; }
         }
 
+        private class InterpolatedMotionInternal
+        {
+            [Data] public short BoneCount { get; set; }
+            [Data] public short TotalBoneCount { get; set; }
+            [Data] public int Unk04 { get; set; }
+            [Data] public int SecondaryBoneOffset { get; set; }
+            [Data] public int JointIndicesOffset { get; set; }
+            [Data] public int FrameTimeCount { get; set; }
+            [Data] public int InitialPoseTableOffset { get; set; }
+            [Data] public int InitialPoseTableCount { get; set; }
+            [Data] public int FooterOffset { get; set; }
+            [Data] public int AnimationBonePrimaryTableOffset { get; set; }
+            [Data] public int AnimationBonePrimaryTableCount { get; set; }
+            [Data] public int AnimationBoneSecondaryTableOffset { get; set; }
+            [Data] public int AnimationBoneSecondaryTableCount { get; set; }
+            [Data] public int TimelineTableOffset { get; set; }
+            [Data] public int FrameTimeOffset { get; set; }
+            [Data] public int KeyFramesOffset { get; set; }
+            [Data] public int TangentValueTableOffset { get; set; }
+            [Data] public int InverseKinematicTableOffset { get; set; }
+            [Data] public int InverseKinematicTableCount { get; set; }
+            [Data] public int Unk48 { get; set; }
+            [Data] public int Table8Offset { get; set; }
+            [Data] public int Table7Offset { get; set; }
+            [Data] public int Table7Count { get; set; }
+            [Data] public int Table6Offset { get; set; }
+            [Data] public int Table6Count { get; set; }
+            [Data] public float BoundingBoxMinX { get; set; }
+            [Data] public float BoundingBoxMinY { get; set; }
+            [Data] public float BoundingBoxMinZ { get; set; }
+            [Data] public float BoundingBoxMinW { get; set; }
+            [Data] public float BoundingBoxMaxX { get; set; }
+            [Data] public float BoundingBoxMaxY { get; set; }
+            [Data] public float BoundingBoxMaxZ { get; set; }
+            [Data] public float BoundingBoxMaxW { get; set; }
+            [Data] public float FrameLoop { get; set; }
+            [Data] public float FrameEnd { get; set; }
+            [Data] public float FramePerSecond { get; set; }
+            [Data] public float FrameCount { get; set; }
+            [Data] public int UnknownTable1Offset { get; set; }
+            [Data] public int UnknownTable1Count { get; set; }
+            [Data] public int UnkA8 { get; set; }
+            [Data] public int UnkAc { get; set; }
+        }
+
+        public class InterpolatedMotion
+        {
+            public short BoneCount { get; set; }
+            public int Unk04 { get; set; }
+            public int Unk48 { get; set; }
+            public int Table8Offset { get; set; }
+            public int Table7Offset { get; set; }
+            public int Table7Count { get; set; }
+            public int Table6Offset { get; set; }
+            public int Table6Count { get; set; }
+            public float BoundingBoxMinX { get; set; }
+            public float BoundingBoxMinY { get; set; }
+            public float BoundingBoxMinZ { get; set; }
+            public float BoundingBoxMinW { get; set; }
+            public float BoundingBoxMaxX { get; set; }
+            public float BoundingBoxMaxY { get; set; }
+            public float BoundingBoxMaxZ { get; set; }
+            public float BoundingBoxMaxW { get; set; }
+            public float FrameLoop { get; set; }
+            public float FrameEnd { get; set; }
+            public float FramePerSecond { get; set; }
+            public float FrameCount { get; set; }
+            public int UnkA8 { get; set; }
+            public int UnkAc { get; set; }
+
+            public List<InitialPoseTable> InitialPose { get; set; }
+            public List<AnimationBoneTable> AnimationBonePrimary { get; set; }
+            public List<AnimationBoneTable> AnimationBoneSecondary { get; set; }
+            public List<TimelineTable> Timeline { get; set; }
+            public List<float> FrameTimes { get; set; }
+            public List<float> KeyFrame { get; set; }
+            public List<InverseKinematicTable> InverseKinematic { get; set; }
+            public List<SecondaryBoneTable> SecondaryBones { get; set; }
+            public List<int> JointIndices { get; set; }
+            public FooterTable Footer { get; internal set; }
+            public List<float> TangentValues { get; set; }
+        }
+
+        public class InitialPoseTable
+        {
+            [Data] public short JointIndex { get; set; }
+            [Data] public short Transform { get; set; }
+            [Data] public float Value { get; set; }
+
+            public override string ToString() =>
+                $"{JointIndex:X4} {Transform:X4} {Value}";
+        }
+
+        public class AnimationBoneTable
+        {
+            [Data] public short JointIndex { get; set; }
+            [Data] public byte Channel { get; set; }
+            [Data] public byte TimelineCount { get; set; }
+            [Data] public short TimelineStartIndex { get; set; }
+        }
+
+        public class TimelineTable
+        {
+            [Data] public short Time { get; set; }
+            [Data] public short ValueIndex { get; set; }
+            [Data] public short TangentInIndex { get; set; }
+            [Data] public short TangentOutIndex { get; set; }
+        }
+
+        public class InverseKinematicTable
+        {
+            [Data] public byte Unk00 { get; set; }
+            [Data] public byte Unk01 { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public short Unk04 { get; set; }
+            [Data] public short Unk06 { get; set; }
+            [Data] public int Unk08 { get; set; }
+        }
+
+        public class SecondaryBoneTable
+        {
+            [Data] public int BoneIndex { get; set; }
+            [Data] public int ParentBoneIndex { get; set; }
+            [Data] public int Unk08 { get; set; }
+            [Data] public int Unk0c { get; set; }
+            [Data] public float ScaleX { get; set; }
+            [Data] public float ScaleY { get; set; }
+            [Data] public float ScaleZ { get; set; }
+            [Data] public float ScaleW { get; set; }
+            [Data] public float RotateX { get; set; }
+            [Data] public float RotateY { get; set; }
+            [Data] public float RotateZ { get; set; }
+            [Data] public float RotateW { get; set; }
+            [Data] public float TranslateX { get; set; }
+            [Data] public float TranslateY { get; set; }
+            [Data] public float TranslateZ { get; set; }
+            [Data] public float TranslateW { get; set; }
+        }
+
+        public class FooterTable
+        {
+            [Data] public float ScaleX { get; set; }
+            [Data] public float ScaleY { get; set; }
+            [Data] public float ScaleZ { get; set; }
+            [Data] public float ScaleW { get; set; }
+            [Data] public float RotateX { get; set; }
+            [Data] public float RotateY { get; set; }
+            [Data] public float RotateZ { get; set; }
+            [Data] public float RotateW { get; set; }
+            [Data] public float TranslateX { get; set; }
+            [Data] public float TranslateY { get; set; }
+            [Data] public float TranslateZ { get; set; }
+            [Data] public float TranslateW { get; set; }
+            [Data(Count = 9)] public int[] Unknown { get; set; }
+        }
+
+
         public bool UnkFlag { get; set; }
         public bool IsRaw { get; }
 
         public RawMotion Raw { get; }
+        public InterpolatedMotion Interpolated { get; }
 
         private Motion(Stream stream)
         {
@@ -123,7 +283,100 @@ namespace OpenKh.Kh2
                     Raw.Matrices2 = new Matrix4x4[0];
             }
             else
-                throw new NotImplementedException();
+            {
+                var reader = new BinaryReader(stream);
+                var motion = BinaryMapping.ReadObject<InterpolatedMotionInternal>(stream);
+                Interpolated = new InterpolatedMotion
+                {
+                    BoneCount = motion.BoneCount,
+                    Unk04 = motion.Unk04,
+                    Unk48 = motion.Unk48,
+                    Table8Offset = motion.Table8Offset,
+                    Table7Offset = motion.Table7Offset,
+                    Table7Count = motion.Table7Count,
+                    Table6Offset = motion.Table6Offset,
+                    Table6Count = motion.Table6Count,
+                    BoundingBoxMinX = motion.BoundingBoxMinX,
+                    BoundingBoxMinY = motion.BoundingBoxMinY,
+                    BoundingBoxMinZ = motion.BoundingBoxMinZ,
+                    BoundingBoxMinW = motion.BoundingBoxMinW,
+                    BoundingBoxMaxX = motion.BoundingBoxMaxX,
+                    BoundingBoxMaxY = motion.BoundingBoxMaxY,
+                    BoundingBoxMaxZ = motion.BoundingBoxMaxZ,
+                    BoundingBoxMaxW = motion.BoundingBoxMaxW,
+                    FrameLoop = motion.FrameLoop,
+                    FrameEnd = motion.FrameEnd,
+                    FramePerSecond = motion.FramePerSecond,
+                    FrameCount = motion.FrameCount,
+                    UnkA8 = motion.UnkA8,
+                    UnkAc = motion.UnkAc,
+                };
+
+                stream.Position = ReservedSize + motion.InitialPoseTableOffset;
+                Interpolated.InitialPose = Enumerable
+                    .Range(0, motion.InitialPoseTableCount)
+                    .Select(x => BinaryMapping.ReadObject<InitialPoseTable>(stream))
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.AnimationBonePrimaryTableOffset;
+                Interpolated.AnimationBonePrimary = Enumerable
+                    .Range(0, motion.AnimationBonePrimaryTableCount)
+                    .Select(x => BinaryMapping.ReadObject<AnimationBoneTable>(stream))
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.AnimationBoneSecondaryTableOffset;
+                Interpolated.AnimationBoneSecondary = Enumerable
+                    .Range(0, motion.AnimationBoneSecondaryTableCount)
+                    .Select(x => BinaryMapping.ReadObject<AnimationBoneTable>(stream))
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.TimelineTableOffset;
+                Interpolated.Timeline = Enumerable
+                    .Range(0, (motion.FrameTimeOffset - motion.TimelineTableOffset) / 8)
+                    .Select(x => BinaryMapping.ReadObject<TimelineTable>(stream))
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.FrameTimeOffset;
+                Interpolated.FrameTimes = Enumerable
+                    .Range(0, motion.FrameTimeCount)
+                    .Select(x => reader.ReadSingle())
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.KeyFramesOffset;
+                Interpolated.KeyFrame = Enumerable
+                    .Range(0, (motion.TangentValueTableOffset - motion.KeyFramesOffset) / 4)
+                    .Select(x => reader.ReadSingle())
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.TangentValueTableOffset;
+                Interpolated.TangentValues = Enumerable
+                    .Range(0, (motion.InverseKinematicTableOffset - motion.TangentValueTableOffset) / 4)
+                    .Select(x => reader.ReadSingle())
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.InverseKinematicTableOffset;
+                Interpolated.InverseKinematic = Enumerable
+                    .Range(0, motion.InverseKinematicTableCount)
+                    .Select(x => BinaryMapping.ReadObject<InverseKinematicTable>(stream))
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.SecondaryBoneOffset;
+                Interpolated.SecondaryBones = Enumerable
+                    .Range(0, motion.TotalBoneCount - motion.BoneCount)
+                    .Select(x => BinaryMapping.ReadObject<SecondaryBoneTable>(stream))
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.JointIndicesOffset;
+                Interpolated.JointIndices = Enumerable
+                    .Range(0, motion.TotalBoneCount + 1)
+                    .Select(x => reader.ReadInt32())
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.FooterOffset;
+                Interpolated.Footer = BinaryMapping.ReadObject<FooterTable>(stream);
+
+                stream.Position = ReservedSize + motion.UnknownTable1Offset;
+            }
         }
 
         public static Motion Read(Stream stream) =>
@@ -134,13 +387,12 @@ namespace OpenKh.Kh2
             if (motion.IsRaw)
                 Write(stream, motion.Raw, motion.UnkFlag);
             else
-                throw new NotImplementedException();
+                Write(stream, motion.Interpolated, motion.UnkFlag);
         }
 
         private static void Write(Stream stream, RawMotion rawMotion, bool unkFlag)
         {
             const int HeaderSize = 0x60;
-            const int Matrix4x4Size = 0x40;
 
             stream.Write(new byte[ReservedSize], 0, ReservedSize);
             BinaryMapping.WriteObject(stream, new Header
@@ -187,6 +439,106 @@ namespace OpenKh.Kh2
                 WriteMatrix(writer, rawMotion.Matrices2[i]);
 
             writer.Flush();
+        }
+
+        private static void Write(Stream stream, InterpolatedMotion motion, bool unkFlag)
+        {
+            var writer = new BinaryWriter(stream);
+            var header = new InterpolatedMotionInternal
+            {
+                BoneCount = motion.BoneCount,
+                Unk04 = motion.Unk04,
+                Unk48 = motion.Unk48,
+                Table8Offset = motion.Table8Offset,
+                Table7Offset = motion.Table7Offset,
+                Table7Count = motion.Table7Count,
+                Table6Offset = motion.Table6Offset,
+                Table6Count = motion.Table6Count,
+                BoundingBoxMinX = motion.BoundingBoxMinX,
+                BoundingBoxMinY = motion.BoundingBoxMinY,
+                BoundingBoxMinZ = motion.BoundingBoxMinZ,
+                BoundingBoxMinW = motion.BoundingBoxMinW,
+                BoundingBoxMaxX = motion.BoundingBoxMaxX,
+                BoundingBoxMaxY = motion.BoundingBoxMaxY,
+                BoundingBoxMaxZ = motion.BoundingBoxMaxZ,
+                BoundingBoxMaxW = motion.BoundingBoxMaxW,
+                FrameLoop = motion.FrameLoop,
+                FrameEnd = motion.FrameEnd,
+                FramePerSecond = motion.FramePerSecond,
+                FrameCount = motion.FrameCount,
+                UnkA8 = motion.UnkA8,
+                UnkAc = motion.UnkAc,
+            };
+
+            stream.Write(new byte[ReservedSize], 0, ReservedSize);
+            BinaryMapping.WriteObject(stream, new Header { });
+            BinaryMapping.WriteObject(stream, new InterpolatedMotionInternal { });
+
+            header.InitialPoseTableCount = motion.InitialPose.Count;
+            header.InitialPoseTableOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.InitialPose)
+                BinaryMapping.WriteObject(stream, item);
+
+            header.AnimationBonePrimaryTableCount = motion.AnimationBonePrimary.Count;
+            header.AnimationBonePrimaryTableOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.AnimationBonePrimary)
+                BinaryMapping.WriteObject(stream, item);
+
+            header.AnimationBoneSecondaryTableCount = motion.AnimationBoneSecondary.Count;
+            header.AnimationBoneSecondaryTableOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.AnimationBoneSecondary)
+                BinaryMapping.WriteObject(stream, item);
+
+            header.TimelineTableOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.Timeline)
+                BinaryMapping.WriteObject(stream, item);
+
+            header.FrameTimeCount = motion.FrameTimes.Count;
+            header.FrameTimeOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.FrameTimes)
+                writer.Write(item);
+
+            header.KeyFramesOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.KeyFrame)
+                writer.Write(item);
+
+            header.TangentValueTableOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.TangentValues)
+                writer.Write(item);
+
+            header.InverseKinematicTableCount = motion.InverseKinematic.Count;
+            header.InverseKinematicTableOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.InverseKinematic)
+                BinaryMapping.WriteObject(stream, item);
+
+            stream.AlignPosition(0x10);
+            header.TotalBoneCount = (short)(motion.BoneCount + motion.SecondaryBones.Count);
+            header.SecondaryBoneOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.SecondaryBones)
+                BinaryMapping.WriteObject(stream, item);
+
+            header.JointIndicesOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.JointIndices)
+                writer.Write(item);
+
+            header.FooterOffset = (int)(stream.Position - ReservedSize);
+            BinaryMapping.WriteObject(stream, motion.Footer);
+
+            header.UnknownTable1Offset = (int)(stream.Position - ReservedSize);
+            header.UnknownTable1Count = 0;
+
+            stream.AlignPosition(0x10);
+            stream.SetLength(stream.Position);
+
+            stream.SetPosition(ReservedSize);
+            BinaryMapping.WriteObject(stream, new Header
+            {
+                Version = 0,
+                Unk04 = unkFlag ? 1 : 0,
+                ByteCount = (int)(stream.Length - ReservedSize),
+                Unk0c = 0,
+            });
+            BinaryMapping.WriteObject(stream, header);
         }
 
         private static Matrix4x4 ReadMatrix(BinaryReader reader) => new Matrix4x4(
