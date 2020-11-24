@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Engine.Motion;
 using OpenKh.Kh2;
 using OpenKh.Ps2;
 using System;
@@ -39,16 +40,17 @@ namespace OpenKh.Engine.Parsers
         public bool IsOpaque;
     }
 
-    public class MdlxParser
+    public class MdlxParser : IModelMotion
     {
+        private readonly Kkdf2MdlxParser _parsedModel;
+
         public MdlxParser(Mdlx mdlx)
         {
             if (IsEntity(mdlx))
             {
-                MeshDescriptors = new Kkdf2MdlxParser(mdlx.SubModels.First())
-                    .ProcessVerticesAndBuildModel(
-                        BuildTPoseMatrices(mdlx.SubModels.First(), Matrix4x4.Identity)
-                    );
+                InitialPose = BuildTPoseMatrices(mdlx.SubModels.First(), Matrix4x4.Identity);
+                _parsedModel = new Kkdf2MdlxParser(mdlx.SubModels.First());
+                MeshDescriptors = _parsedModel.ProcessVerticesAndBuildModel(InitialPose);
             }
             else if (IsMap(mdlx))
             {
@@ -58,26 +60,16 @@ namespace OpenKh.Engine.Parsers
             }
         }
 
-        public MdlxParser(Mdlx mdlx, Matrix4x4[] matrices)
-        {
-            if (IsEntity(mdlx))
-            {
-                MeshDescriptors = new Kkdf2MdlxParser(mdlx.SubModels.First())
-                    .ProcessVerticesAndBuildModel(matrices);
-            }
-            else if (IsMap(mdlx))
-            {
-                MeshDescriptors = mdlx.MapModel.VifPackets
-                    .Select(vifPacket => Parse(vifPacket))
-                    .ToList();
-            }
-        }
+        public void ApplyMotion(Matrix4x4[] matrices) =>
+            MeshDescriptors = _parsedModel.ProcessVerticesAndBuildModel(matrices);
 
         private static bool IsEntity(Mdlx mdlx) => mdlx.SubModels != null;
 
         private static bool IsMap(Mdlx mdlx) => mdlx.MapModel != null;
 
-        public List<MeshDescriptor> MeshDescriptors { get; }
+        public List<MeshDescriptor> MeshDescriptors { get; private set; }
+
+        public Matrix4x4[] InitialPose { get; set; }
 
         private static MeshDescriptor Parse(Mdlx.VifPacketDescriptor vifPacketDescriptor)
         {
@@ -161,9 +153,6 @@ namespace OpenKh.Engine.Parsers
             };
         }
 
-        /// <summary>
-        /// Build intial T-pose matrices.
-        /// </summary>
         private static Matrix4x4[] BuildTPoseMatrices(Mdlx.SubModel model, Matrix4x4 initialMatrix)
         {
             var boneList = model.Bones.ToArray();
