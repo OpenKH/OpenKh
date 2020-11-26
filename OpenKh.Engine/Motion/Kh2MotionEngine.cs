@@ -2,7 +2,9 @@ using OpenKh.Common;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Numerics;
 
 namespace OpenKh.Engine.Motion
 {
@@ -50,14 +52,23 @@ namespace OpenKh.Engine.Motion
         public Kh2.Motion CurrentMotion => _motion;
 
         public void ApplyMotion(IModelMotion model, float time)
-        {
-            if (!CurrentMotion.IsRaw)
-                throw new NotSupportedException();
+        {   
+            if (CurrentMotion.IsRaw)
+                ApplyRawMotion(model, CurrentMotion.Raw, time);
+            else
+                ApplyInterpolatedMotion(model, CurrentMotion.Interpolated, time);
+        }
 
-            var rawDesc = CurrentMotion.Raw;
-            var absoluteFrame = (int)Math.Floor(rawDesc.FramePerSecond * time);
-            var actualFrame = absoluteFrame % rawDesc.Matrices.Count;
-            model.ApplyMotion(rawDesc.Matrices[actualFrame]);
+        private void ApplyRawMotion(IModelMotion model, Kh2.Motion.RawMotion motion, float time)
+        {
+            var absoluteFrame = (int)Math.Floor(motion.FramePerSecond * time);
+            var actualFrame = absoluteFrame % motion.Matrices.Count;
+            model.ApplyMotion(motion.Matrices[actualFrame]);
+        }
+
+        public static void ApplyInterpolatedMotion(IModelMotion model, Kh2.Motion.InterpolatedMotion motion, float time)
+        {
+            model.ApplyMotion(model.InitialPose);
         }
     }
 }
