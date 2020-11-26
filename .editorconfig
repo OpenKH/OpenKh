@@ -18,7 +18,7 @@ end_of_line = crlf
 end_of_line = crlf
 
 [*.cs]
-end_of_line = crlf
+end_of_line = lf
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
 csharp_new_line_before_catch = true
