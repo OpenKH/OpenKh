@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2.Messages;
+using OpenKh.Kh2.Messages;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
@@ -68,7 +68,10 @@ namespace OpenKh.Tools.Common.Controls
 
             DrawBackground();
 
-            Draw(new DrawContext(), MessageCommands);
+            Draw(new DrawContext()
+            {
+                GlobalScale = 1.0
+            }, MessageCommands);
             Drawing.Flush();
         }
 
