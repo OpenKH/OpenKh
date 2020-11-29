@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,6 +30,8 @@ namespace OpenKh.Tools.ImageViewer.Services
 
                 GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, images) =>
                     Imgz.Write(stream, images.Select(x => x.AsImgd()))),
+
+                GetImageFormat("KH2 Font", "bar", true, IsKh2Font, ReadKh2Font, WriteKh2Font),
 
                 GetImageFormat("Font ARC", "arc", false, FontsArc.IsValid, s =>
                 {
