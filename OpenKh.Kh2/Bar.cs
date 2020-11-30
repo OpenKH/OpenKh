@@ -49,7 +49,7 @@ namespace OpenKh.Kh2
 			Dummy = 0,
 			Binary = 1,
 			List = 2,
-			Btx = 3,
+			Bdx = 3,
 			Model = 4,
             MeshOcclusion = 5,
             MapCollision = 6,

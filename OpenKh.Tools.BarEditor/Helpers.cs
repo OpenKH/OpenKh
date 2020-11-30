@@ -14,7 +14,7 @@ namespace OpenKh.Tools.BarEditor
                 [EntryType.Dummy] = "dummy",
                 [EntryType.Binary] = "bin",
                 [EntryType.List] = "list",
-                [EntryType.Btx] = "btx",
+                [EntryType.Bdx] = "bdx",
                 [EntryType.Model] = "model",
                 [EntryType.MeshOcclusion] = "ocd",
                 [EntryType.MapCollision] = "occ",
