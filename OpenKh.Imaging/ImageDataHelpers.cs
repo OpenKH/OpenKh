@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 
 namespace OpenKh.Imaging
@@ -104,6 +104,12 @@ namespace OpenKh.Imaging
             }
 
             return dst;
+        }
+
+        public static void SwapEndianIndexed4(byte[] data)
+        {
+            for (var i = 0; i < data.Length; i++)
+                data[i] = (byte)(((data[i] & 0x0F) << 4) | (data[i] >> 4));
         }
     }
 }
