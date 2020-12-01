@@ -71,7 +71,7 @@ namespace OpenKh.Research.Kh2Anim
 
             var unkBarEntries = File.OpenRead(InputAnim).Using(Bar.Read);
 
-            var anbBarEntriesList = unkBarEntries.Any(entry => entry.Type == Bar.EntryType.AnimationData)
+            var anbBarEntriesList = unkBarEntries.Any(entry => entry.Type == Bar.EntryType.Motion)
                 // Input is `.anb`
                 ? new AnbBarWrapper[] {
                     new AnbBarWrapper {

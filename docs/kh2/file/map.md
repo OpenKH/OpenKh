@@ -20,9 +20,9 @@ Object without logic that are embedded into a map, like the train in Twilight To
 
 Always paired with a [models](model.md), [textures](raw-texture.md) and a stripped version of an [ANB](anb/anb.md). If there are no animations for the BOB model, the animation file will just be 0KB long.
 
-## out
+## BOP
 
-Also called BOB descriptor, it is found in every map that contains [BOB](#bob) files. It is responsible to let the game know how to place BOB objects to the map.
+Better known as Background Object Placement, it is found in every map that contains [BOB](#bob) files names as `out.bop`. It is responsible to let the game know how to place BOB objects to the map.
 
 ### Header
 
@@ -67,4 +67,3 @@ Also called BOB descriptor, it is found in every map that contains [BOB](#bob) f
 A [tim2](../../common/tm2.md) file used to show the mini-map on the top-right angle of the screen.
 
 ## xx_0
-
