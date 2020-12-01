@@ -6,18 +6,18 @@
 | [IMG](file//type/idx.md) | Contains a bunch of un/compressed files; they are indexed by IDX | [kh.cmd.idximg](../tool/kh.cmd.idximg.md)
 | DBG | Binary file; probably used by a debug menu
 | [BAR](file/type/bar.md) | Primary file and data container
-| 2DD | A sub-tybe of BAR; usually for menus on the 2D screen buffer
-| 2LD | A sub-tybe of BAR; usually for menus on the 3D screen buffer
-| ANB | Raw animation data (bone manipulations, positions, etc.)
+| [2DD](file/type/2ld.md#2D-sequence-(2DD)) | A sub-tybe of BAR; usually for menus on the 2D screen buffer
+| [2LD](file/type/2ld.md) | A sub-tybe of BAR; usually for menus on the 3D screen buffer
+| [ANB](file/anb/anb.md) | Raw animation data (bone manipulations, positions, etc.)
 | DPD | Excuted by the graphical effects engine; contains images, 3D models and scripts
 | DPX | Contains various DPD files
 | PAX | Graphical effect; contains inside DPX entries
 | GBX | Gummiship mission map
-| IMGD | Images rendered on the 2D screen buffer
-| FAC | A sub-type of IMGD
-| IMGZ | A container housing multiple IMGDs with separation layers
-| ARD | Event files containing all sorts of miscellaneous information
-| MAP | Game map
+| [IMGD](file/type/image.md#imgd) | Images rendered on the 2D screen buffer
+| [FAC](file/type/image.md#fac) | A sub-type of IMGD
+| [IMGZ](file/type/image.md#imgz) | A container housing multiple IMGDs with separation layers
+| [ARD](file/type/ard.md) | Event files containing all sorts of miscellaneous information
+| [MAP](file/map.md) | Game map
 | MAG | A descriptor for magic; contains a PAX inside
 | MDLX | Container for VIF packets; model data and files like textures
 | MSET | Moveset; contains effect casters, references ANBs, etc.
