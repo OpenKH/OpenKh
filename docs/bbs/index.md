@@ -8,6 +8,7 @@
 * [Animation Container](pam.md)
 * [CTD text format](ctd.md)
 * [Events](events.md)
+* [Game builds](builds.md)
 * Other files
     * [font.arc, fonten.arc](font.md)
 
