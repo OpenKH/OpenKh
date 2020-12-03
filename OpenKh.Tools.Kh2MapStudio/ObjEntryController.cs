@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Kh2;
@@ -71,7 +71,14 @@ namespace OpenKh.Tools.Kh2MapStudio
                     {
                         var model = Mdlx.Read(modelEntry.Stream);
                         var textures = ModelTexture.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.ModelTexture).Stream);
-                        meshGroup = MeshLoader.FromKH2(_graphics, model, textures);
+
+                        var modelMotion = MeshLoader.FromKH2(model);
+                        modelMotion.ApplyMotion(modelMotion.InitialPose);
+                        meshGroup = new MeshGroup
+                        {
+                            MeshDescriptors = modelMotion.MeshDescriptors.ToMeshDescs().ToList(),
+                            Textures = textures.LoadTextures(_graphics).ToArray()
+                        };
                     }
                     else
                         meshGroup = EmptyMeshGroup;

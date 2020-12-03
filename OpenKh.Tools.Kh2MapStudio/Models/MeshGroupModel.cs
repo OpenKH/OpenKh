@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Kh2;
 using System;
@@ -54,8 +54,11 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
 
         public void Invalidate()
         {
-            MeshGroup = MeshLoader.FromKH2(_model);
-            MeshGroup.Textures = _kingdomTextures;
+            MeshGroup = new MeshGroup
+            {
+                MeshDescriptors = MeshLoader.FromKH2(_model).MeshDescriptors.ToMeshDescs().ToList(),
+                Textures = _kingdomTextures
+            };
         }
     }
 }
