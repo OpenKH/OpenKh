@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Engine.Parsers;
 
 namespace OpenKh.Engine.MonoGame
 {
     public class MeshDesc
     {
-        public VertexPositionColorTexture[] Vertices;
+        public PositionColoredTextured[] Vertices;
         public int[] Indices;
         public int TextureIndex;
         public bool IsOpaque;

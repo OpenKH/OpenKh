@@ -207,7 +207,8 @@ namespace OpenKh.Game.States
                     meshDescriptor.Vertices.Length,
                     meshDescriptor.Indices,
                     0,
-                    meshDescriptor.Indices.Length / 3);
+                    meshDescriptor.Indices.Length / 3,
+                    MeshLoader.PositionColoredTexturedVertexDeclaration);
             }
         }
 

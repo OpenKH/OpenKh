@@ -11,30 +11,30 @@ using System.Runtime.InteropServices;
 
 namespace OpenKh.Engine.Parsers
 {
-    public class CustomVertex
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PositionColoredTextured
     {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct PositionColoredTextured
-        {
-            public float X, Y, Z;
-            public int Color;
-            public float Tu, Tv;
+        public float X, Y, Z;
+        public float Tu, Tv;
+        public byte R, G, B, A;
 
-            public PositionColoredTextured(Vector3 v, int clr, float tu, float tv)
-            {
-                X = v.X;
-                Y = v.Y;
-                Z = v.Z;
-                Color = clr;
-                Tu = tu;
-                Tv = tv;
-            }
+        public PositionColoredTextured(Vector3 v, int clr, float tu, float tv)
+        {
+            X = v.X;
+            Y = v.Y;
+            Z = v.Z;
+            Tu = tu;
+            Tv = tv;
+            R = (byte)(clr >> 16);
+            G = (byte)(clr >> 8);
+            B = (byte)clr;
+            A = (byte)(clr >> 24);
         }
     }
 
     public class MeshDescriptor
     {
-        public CustomVertex.PositionColoredTextured[] Vertices;
+        public PositionColoredTextured[] Vertices;
         public int[] Indices;
         public int TextureIndex;
         public bool IsOpaque;
@@ -73,7 +73,7 @@ namespace OpenKh.Engine.Parsers
 
         private static MeshDescriptor Parse(Mdlx.VifPacketDescriptor vifPacketDescriptor)
         {
-            var vertices = new List<CustomVertex.PositionColoredTextured>();
+            var vertices = new List<PositionColoredTextured>();
             var indices = new List<int>();
             var unpacker = new VifUnpacker(vifPacketDescriptor.VifPacket);
 
@@ -114,7 +114,7 @@ namespace OpenKh.Engine.Parsers
                         (Math.Min(byte.MaxValue, colorR * 2) << 16) |
                         (Math.Min(byte.MaxValue, colorA * 2) << 24);
 
-                    vertices.Add(new CustomVertex.PositionColoredTextured(
+                    vertices.Add(new PositionColoredTextured(
                         position, color, (short)(ushort)vertexIndex.U / 4096.0f, (short)(ushort)vertexIndex.V / 4096.0f));
 
                     indexBuffer[(recentIndex++) & 3] = baseVertexIndex + i;

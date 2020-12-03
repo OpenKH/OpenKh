@@ -10,6 +10,14 @@ namespace OpenKh.Engine.MonoGame
 {
     public static class MeshLoader
     {
+        public static VertexDeclaration PositionColoredTexturedVertexDeclaration =
+            new VertexDeclaration(24, new VertexElement[]
+            {
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+                new VertexElement(20, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+            });
+
         public static IModelMotion FromKH2(Mdlx model) =>
             model != null ? new MdlxParser(model) : null;
 
@@ -21,12 +29,7 @@ namespace OpenKh.Engine.MonoGame
         public static IEnumerable<MeshDesc> ToMeshDescs(this List<MeshDescriptor> meshDescriptors) =>
             meshDescriptors.Select(x => new MeshDesc
             {
-                Vertices = x.Vertices
-                    .Select(v => new VertexPositionColorTexture(
-                        new Vector3(v.X, v.Y, v.Z),
-                        new Color((v.Color >> 16) & 0xff, (v.Color >> 8) & 0xff, v.Color & 0xff, (v.Color >> 24) & 0xff),
-                        new Vector2(v.Tu, v.Tv)))
-                    .ToArray(),
+                Vertices = x.Vertices,
                 Indices = x.Indices,
                 TextureIndex = x.TextureIndex,
                 IsOpaque = x.IsOpaque

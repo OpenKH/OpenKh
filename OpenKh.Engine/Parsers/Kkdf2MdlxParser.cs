@@ -210,7 +210,7 @@ namespace OpenKh.Engine.Parsers
             var newList = new List<MeshDescriptor>();
             foreach (var part in immutableExportedMesh.partList)
             {
-                var vertices = new List<CustomVertex.PositionColoredTextured>();
+                var vertices = new List<PositionColoredTextured>();
                 var indices = new List<int>();
 
                 int triangleRefCount = part.triangleRefList.Count;
@@ -223,7 +223,7 @@ namespace OpenKh.Engine.Parsers
                         Vector3 pos = immutableExportedMesh.positionList[vertRef.vertexIndex];
                         Vector2 uv = immutableExportedMesh.uvList[vertRef.uvIndex];
                         indices.Add(vertices.Count);
-                        vertices.Add(new CustomVertex.PositionColoredTextured(pos, -1, uv.X, uv.Y));
+                        vertices.Add(new PositionColoredTextured(pos, -1, uv.X, uv.Y));
                     }
                 }
 
