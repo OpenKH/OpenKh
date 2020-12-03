@@ -56,7 +56,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
         {
             MeshGroup = new MeshGroup
             {
-                MeshDescriptors = MeshLoader.FromKH2(_model).MeshDescriptors.ToMeshDescs().ToList(),
+                MeshDescriptors = MeshLoader.FromKH2(_model).MeshDescriptors,
                 Textures = _kingdomTextures
             };
         }

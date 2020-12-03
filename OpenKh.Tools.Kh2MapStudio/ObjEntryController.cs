@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.MonoGame;
+using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using System;
@@ -15,7 +16,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         private static readonly MeshGroup EmptyMeshGroup = new MeshGroup
         {
             Textures = new KingdomTexture[0],
-            MeshDescriptors = new List<MeshDesc>(0)
+            MeshDescriptors = new List<MeshDescriptor>(0)
         };
 
         private readonly Dictionary<int, MeshGroup> _meshGroups = new Dictionary<int, MeshGroup>();
@@ -76,7 +77,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                         modelMotion.ApplyMotion(modelMotion.InitialPose);
                         meshGroup = new MeshGroup
                         {
-                            MeshDescriptors = modelMotion.MeshDescriptors.ToMeshDescs().ToList(),
+                            MeshDescriptors = modelMotion.MeshDescriptors,
                             Textures = textures.LoadTextures(_graphics).ToArray()
                         };
                     }

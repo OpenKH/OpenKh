@@ -5,7 +5,7 @@ namespace OpenKh.Engine.MonoGame
 {
     public interface IMonoGameModel
     {
-        List<MeshDesc> MeshDescriptors { get; }
+        List<MeshDescriptor> MeshDescriptors { get; }
 
         IKingdomTexture[] Textures { get; }
     }

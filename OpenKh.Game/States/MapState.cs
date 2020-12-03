@@ -243,7 +243,7 @@ namespace OpenKh.Game.States
             {
                 _bobModels.Add(new MeshGroup
                 {
-                    MeshDescriptors = MeshLoader.FromKH2(bobModels[i]).MeshDescriptors.ToMeshDescs().ToList(),
+                    MeshDescriptors = MeshLoader.FromKH2(bobModels[i]).MeshDescriptors,
                     Textures = bobTextures[i].LoadTextures(_graphics.GraphicsDevice).ToArray()
                 });
             }
@@ -316,7 +316,7 @@ namespace OpenKh.Game.States
 
             return new MeshGroup
             {
-                MeshDescriptors = MeshLoader.FromKH2(model).MeshDescriptors.ToMeshDescs().ToList(),
+                MeshDescriptors = MeshLoader.FromKH2(model).MeshDescriptors,
                 Textures = textures.LoadTextures(graphics).ToArray()
             };
         }

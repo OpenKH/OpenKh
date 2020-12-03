@@ -39,7 +39,7 @@ namespace OpenKh.Game.Entities
 
         public Kh2MotionEngine Motion { get; set; }
 
-        public List<MeshDesc> MeshDescriptors { get; private set; }
+        public List<MeshDescriptor> MeshDescriptors => Model.MeshDescriptors;
 
         public IKingdomTexture[] Textures { get; private set; }
 
@@ -65,8 +65,6 @@ namespace OpenKh.Game.Entities
             var entries = Bar.Read(stream);
             _model = entries.ForEntry(x => x.Type == Bar.EntryType.Model, Mdlx.Read);
             Model = MeshLoader.FromKH2(_model);
-            if (Model != null)
-                MeshDescriptors = Model.MeshDescriptors.ToMeshDescs().ToList();
 
             var texture = entries.ForEntry("tim_", Bar.EntryType.ModelTexture, ModelTexture.Read);
             Textures = texture.LoadTextures(graphics).ToArray();
@@ -97,12 +95,7 @@ namespace OpenKh.Game.Entities
         public void Update(float deltaTime)
         {
             Time += deltaTime;
-
-            if (Motion != null)
-            {
-                Motion.ApplyMotion(Model, Time);
-                MeshDescriptors = Model.MeshDescriptors.ToMeshDescs().ToList();
-            }
+            Motion?.ApplyMotion(Model, Time);
         }
 
         public static MeshGroup FromFbx(GraphicsDevice graphics, string filePath)
@@ -131,7 +124,7 @@ namespace OpenKh.Game.Entities
                             vertices[i].A = 0xFF;
                         }
 
-                        return new MeshDesc
+                        return new MeshDescriptor
                         {
                             Vertices = vertices,
                             Indices = x.Faces.SelectMany(f => f.Indices).ToArray(),

@@ -25,14 +25,5 @@ namespace OpenKh.Engine.MonoGame
             this ModelTexture texture, GraphicsDevice graphics) => texture?.Images?
                 .Select(texture => new KingdomTexture(texture, graphics)).ToArray() ??
                 new KingdomTexture[0];
-
-        public static IEnumerable<MeshDesc> ToMeshDescs(this List<MeshDescriptor> meshDescriptors) =>
-            meshDescriptors.Select(x => new MeshDesc
-            {
-                Vertices = x.Vertices,
-                Indices = x.Indices,
-                TextureIndex = x.TextureIndex,
-                IsOpaque = x.IsOpaque
-            });
     }
 }
