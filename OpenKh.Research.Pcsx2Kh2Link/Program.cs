@@ -16,7 +16,9 @@ namespace OpenKh.Research.Pcsx2Kh2Link
     [Command("OpenKh.Research.Pcsx2Kh2Link")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(
-        typeof(ListCommand))]
+        typeof(ListCommand), 
+        typeof(DumpCommand)
+    )]
     class Program
     {
         static int Main(string[] args)
@@ -80,6 +82,45 @@ namespace OpenKh.Research.Pcsx2Kh2Link
                                 );
                             }
                         }
+                    }
+                    catch (LinkToPcsx2.KH2fmNotFoundException ex)
+                    {
+                        Console.Error.WriteLine(ex);
+                    }
+                }
+
+                return 0;
+            }
+        }
+
+        [Command("dump", Description = "dump 32MB EE memory")]
+        private class DumpCommand
+        {
+            [Argument(0, Description = "file path: memory_PID.dmp")]
+            public string MemoryDmp { get; set; } = "memory_PID.dmp";
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                using var search = new LinkToPcsx2();
+
+                foreach (var pcsx2 in search.Pcsx2Refs)
+                {
+                    Console.WriteLine(pcsx2);
+
+                    using var stream = pcsx2.OpenStream();
+
+                    try
+                    {
+                        var saveTo = MemoryDmp.Replace("PID", $"{pcsx2.Process.Id}");
+
+                        File.Create(saveTo).Using(
+                            outStream =>
+                                stream.BufferedStream
+                                    .SetPosition(0)
+                                    .Copy(outStream, 32 * 1024 * 1024)
+                        );
+
+                        Console.WriteLine($"  Saved to: {saveTo}");
                     }
                     catch (LinkToPcsx2.KH2fmNotFoundException ex)
                     {
