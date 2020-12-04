@@ -102,17 +102,25 @@ namespace OpenKh.Game.States
                 const double Speed = 100.0;
                 var speed = (float)(deltaTimes.DeltaTime * Speed);
 
-                if (_input.W) _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtX, speed * 5);
-                if (_input.S) _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtX, speed * 5);
-                if (_input.A) _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtY, speed * 5);
-                if (_input.D) _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtY, speed * 5);
+                if (_input.W)
+                    _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtX, speed * 5);
+                if (_input.S)
+                    _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtX, speed * 5);
+                if (_input.A)
+                    _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtY, speed * 5);
+                if (_input.D)
+                    _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtY, speed * 5);
 
-                if (_input.Up) _camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
-                if (_input.Down) _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
-                if (_input.Left) _camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
-                if (_input.Right) _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
+                if (_input.Up)
+                    _camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
+                if (_input.Down)
+                    _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
+                if (_input.Left)
+                    _camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
+                if (_input.Right)
+                    _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
 
-                foreach (var entity in _objectEntities.Where(x => x.Mesh != null))
+                foreach (var entity in _objectEntities.Where(x => x.IsMeshLoaded))
                 {
                     entity.Update((float)deltaTimes.DeltaTime);
                 }
@@ -160,14 +168,14 @@ namespace OpenKh.Game.States
 
             _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            foreach (var entity in _objectEntities.Where(x => x.Mesh != null))
+            foreach (var entity in _objectEntities.Where(x => x.IsMeshLoaded))
             {
                 _shader.ProjectionView = _camera.Projection;
                 _shader.WorldView = _camera.World;
                 _shader.ModelView = entity.GetMatrix();
                 pass.Apply();
 
-                RenderMeshNew(pass, entity.Mesh, passRenderOpaque);
+                RenderMeshNew(pass, entity, passRenderOpaque);
             }
 
             foreach (var entity in _bobEntities)
@@ -181,16 +189,16 @@ namespace OpenKh.Game.States
             }
         }
 
-        private void RenderMeshNew(EffectPass pass, MeshGroup mesh, bool passRenderOpaque)
+        private void RenderMeshNew(EffectPass pass, IMonoGameModel model, bool passRenderOpaque)
         {
-            foreach (var meshDescriptor in mesh.MeshDescriptors)
+            foreach (var meshDescriptor in model.MeshDescriptors)
             {
                 if (meshDescriptor.Indices.Length == 0 || meshDescriptor.IsOpaque != passRenderOpaque)
                     continue;
 
                 var textureIndex = meshDescriptor.TextureIndex & 0xffff;
-                if (textureIndex < mesh.Textures.Length)
-                    _shader.SetRenderTexture(pass, mesh.Textures[textureIndex]);
+                if (textureIndex < model.Textures.Length)
+                    _shader.SetRenderTexture(pass, model.Textures[textureIndex]);
 
                 _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
                     PrimitiveType.TriangleList,
@@ -199,7 +207,8 @@ namespace OpenKh.Game.States
                     meshDescriptor.Vertices.Length,
                     meshDescriptor.Indices,
                     0,
-                    meshDescriptor.Indices.Length / 3);
+                    meshDescriptor.Indices.Length / 3,
+                    MeshLoader.PositionColoredTexturedVertexDeclaration);
             }
         }
 
@@ -232,9 +241,11 @@ namespace OpenKh.Game.States
 
             for (var i = 0; i < bobModels.Count; i++)
             {
-                var bobMesh = MeshLoader.FromKH2(_graphics.GraphicsDevice, bobModels[i], bobTextures[i]);
-                if (bobMesh != null)
-                    _bobModels.Add(bobMesh);
+                _bobModels.Add(new MeshGroup
+                {
+                    MeshDescriptors = MeshLoader.FromKH2(bobModels[i]).MeshDescriptors,
+                    Textures = bobTextures[i].LoadTextures(_graphics.GraphicsDevice).ToArray()
+                });
             }
         }
 
@@ -293,20 +304,21 @@ namespace OpenKh.Game.States
             _objectEntities.Add(entity);
         }
 
-        private static MeshGroup FromMdlx(
-            GraphicsDevice graphics, ArchiveManager archiveManager, string modelName, string textureName)
-        {
-            Log.Info($"Load model={modelName} texture={textureName}");
-            return MeshLoader.FromKH2(graphics,
-                archiveManager.Get<Mdlx>(modelName),
-                archiveManager.Get<ModelTexture>(textureName));
-        }
-
         private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
         {
-            return MeshLoader.FromKH2(graphics,
-                entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read),
-                entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read));
+            var model = entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read);
+            if (model == null)
+                return null;
+
+            var textures = entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read);
+            if (model == null)
+                return null;
+
+            return new MeshGroup
+            {
+                MeshDescriptors = MeshLoader.FromKH2(model).MeshDescriptors,
+                Textures = textures.LoadTextures(graphics).ToArray()
+            };
         }
 
         private void AddMesh(MeshGroup mesh)
@@ -413,8 +425,10 @@ namespace OpenKh.Game.States
 
         private void DebugUpdatePlaceList()
         {
-            if (_input.IsMenuUp) _debugPlaceCursor = Decrement(_debugPlaceCursor);
-            else if (_input.IsMenuDown) _debugPlaceCursor = Increment(_debugPlaceCursor);
+            if (_input.IsMenuUp)
+                _debugPlaceCursor = Decrement(_debugPlaceCursor);
+            else if (_input.IsMenuDown)
+                _debugPlaceCursor = Increment(_debugPlaceCursor);
             if (_debugPlaceCursor < 0)
                 _debugPlaceCursor = _places.Length - 1;
             _debugPlaceCursor %= _places.Length;

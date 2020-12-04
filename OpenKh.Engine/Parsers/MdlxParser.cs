@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Engine.Motion;
 using OpenKh.Kh2;
 using OpenKh.Ps2;
 using System;
@@ -10,45 +11,46 @@ using System.Runtime.InteropServices;
 
 namespace OpenKh.Engine.Parsers
 {
-    public class CustomVertex
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PositionColoredTextured
     {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct PositionColoredTextured
-        {
-            public float X, Y, Z;
-            public int Color;
-            public float Tu, Tv;
+        public float X, Y, Z;
+        public float Tu, Tv;
+        public byte R, G, B, A;
 
-            public PositionColoredTextured(Vector3 v, int clr, float tu, float tv)
-            {
-                X = v.X;
-                Y = v.Y;
-                Z = v.Z;
-                Color = clr;
-                Tu = tu;
-                Tv = tv;
-            }
+        public PositionColoredTextured(Vector3 v, int clr, float tu, float tv)
+        {
+            X = v.X;
+            Y = v.Y;
+            Z = v.Z;
+            Tu = tu;
+            Tv = tv;
+            R = (byte)(clr >> 16);
+            G = (byte)(clr >> 8);
+            B = (byte)clr;
+            A = (byte)(clr >> 24);
         }
     }
 
     public class MeshDescriptor
     {
-        public CustomVertex.PositionColoredTextured[] Vertices;
+        public PositionColoredTextured[] Vertices;
         public int[] Indices;
         public int TextureIndex;
         public bool IsOpaque;
     }
 
-    public class MdlxParser
+    public class MdlxParser : IModelMotion
     {
+        private readonly Kkdf2MdlxParser _parsedModel;
+
         public MdlxParser(Mdlx mdlx)
         {
             if (IsEntity(mdlx))
             {
-                MeshDescriptors = new Kkdf2MdlxParser(mdlx.SubModels.First())
-                    .ProcessVerticesAndBuildModel(
-                        BuildTPoseMatrices(mdlx.SubModels.First(), Matrix4x4.Identity)
-                    );
+                InitialPose = BuildTPoseMatrices(mdlx.SubModels.First(), Matrix4x4.Identity);
+                _parsedModel = new Kkdf2MdlxParser(mdlx.SubModels.First());
+                MeshDescriptors = _parsedModel.ProcessVerticesAndBuildModel(InitialPose);
             }
             else if (IsMap(mdlx))
             {
@@ -58,30 +60,20 @@ namespace OpenKh.Engine.Parsers
             }
         }
 
-        public MdlxParser(Mdlx mdlx, Matrix4x4[] matrices)
-        {
-            if (IsEntity(mdlx))
-            {
-                MeshDescriptors = new Kkdf2MdlxParser(mdlx.SubModels.First())
-                    .ProcessVerticesAndBuildModel(matrices);
-            }
-            else if (IsMap(mdlx))
-            {
-                MeshDescriptors = mdlx.MapModel.VifPackets
-                    .Select(vifPacket => Parse(vifPacket))
-                    .ToList();
-            }
-        }
+        public void ApplyMotion(Matrix4x4[] matrices) =>
+            MeshDescriptors = _parsedModel.ProcessVerticesAndBuildModel(matrices);
 
         private static bool IsEntity(Mdlx mdlx) => mdlx.SubModels != null;
 
         private static bool IsMap(Mdlx mdlx) => mdlx.MapModel != null;
 
-        public List<MeshDescriptor> MeshDescriptors { get; }
+        public List<MeshDescriptor> MeshDescriptors { get; private set; }
+
+        public Matrix4x4[] InitialPose { get; set; }
 
         private static MeshDescriptor Parse(Mdlx.VifPacketDescriptor vifPacketDescriptor)
         {
-            var vertices = new List<CustomVertex.PositionColoredTextured>();
+            var vertices = new List<PositionColoredTextured>();
             var indices = new List<int>();
             var unpacker = new VifUnpacker(vifPacketDescriptor.VifPacket);
 
@@ -122,7 +114,7 @@ namespace OpenKh.Engine.Parsers
                         (Math.Min(byte.MaxValue, colorR * 2) << 16) |
                         (Math.Min(byte.MaxValue, colorA * 2) << 24);
 
-                    vertices.Add(new CustomVertex.PositionColoredTextured(
+                    vertices.Add(new PositionColoredTextured(
                         position, color, (short)(ushort)vertexIndex.U / 4096.0f, (short)(ushort)vertexIndex.V / 4096.0f));
 
                     indexBuffer[(recentIndex++) & 3] = baseVertexIndex + i;
@@ -161,9 +153,6 @@ namespace OpenKh.Engine.Parsers
             };
         }
 
-        /// <summary>
-        /// Build intial T-pose matrices.
-        /// </summary>
         private static Matrix4x4[] BuildTPoseMatrices(Mdlx.SubModel model, Matrix4x4 initialMatrix)
         {
             var boneList = model.Bones.ToArray();

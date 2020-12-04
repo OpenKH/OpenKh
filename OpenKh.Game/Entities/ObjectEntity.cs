@@ -10,10 +10,12 @@ using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
+using OpenKh.Engine.Parsers;
 
 namespace OpenKh.Game.Entities
 {
-    public class ObjectEntity : IEntity, IModelMotion
+    public class ObjectEntity : IEntity, IMonoGameModel
     {
         private Mdlx _model;
 
@@ -31,9 +33,15 @@ namespace OpenKh.Game.Entities
         public string ObjectName => Kernel.ObjEntries
             .FirstOrDefault(x => x.ObjectId == ObjectId)?.ModelName;
 
-        public MeshGroup Mesh { get; private set; }
+        public bool IsMeshLoaded => Model != null;
+
+        public IModelMotion Model { get; private set; }
 
         public Kh2MotionEngine Motion { get; set; }
+
+        public List<MeshDescriptor> MeshDescriptors => Model.MeshDescriptors;
+
+        public IKingdomTexture[] Textures { get; private set; }
 
         public Vector3 Position { get; set; }
 
@@ -56,8 +64,10 @@ namespace OpenKh.Game.Entities
             using var stream = Kernel.DataContent.FileOpen(modelName);
             var entries = Bar.Read(stream);
             _model = entries.ForEntry(x => x.Type == Bar.EntryType.Model, Mdlx.Read);
+            Model = MeshLoader.FromKH2(_model);
+
             var texture = entries.ForEntry("tim_", Bar.EntryType.ModelTexture, ModelTexture.Read);
-            Mesh = MeshLoader.FromKH2(graphics, _model, texture);
+            Textures = texture.LoadTextures(graphics).ToArray();
 
             try
             {
@@ -85,12 +95,7 @@ namespace OpenKh.Game.Entities
         public void Update(float deltaTime)
         {
             Time += deltaTime;
-            Motion?.ApplyMotion(this, Time);
-        }
-
-        public void ApplyMotion(System.Numerics.Matrix4x4[] matrices)
-        {
-            Mesh.MeshDescriptors = MeshLoader.FromKH2(_model, matrices).MeshDescriptors;
+            Motion?.ApplyMotion(Model, Time);
         }
 
         public static MeshGroup FromFbx(GraphicsDevice graphics, string filePath)
@@ -105,18 +110,21 @@ namespace OpenKh.Game.Entities
                 MeshDescriptors = scene.Meshes
                     .Select(x =>
                     {
-                        var vertices = new VertexPositionColorTexture[x.Vertices.Count];
+                        var vertices = new PositionColoredTextured[x.Vertices.Count];
                         for (var i = 0; i < vertices.Length; i++)
                         {
-                            vertices[i].Position.X = x.Vertices[i].X * Scale;
-                            vertices[i].Position.Y = x.Vertices[i].Y * Scale;
-                            vertices[i].Position.Z = x.Vertices[i].Z * Scale;
-                            vertices[i].TextureCoordinate.X = x.TextureCoordinateChannels[0][i].X;
-                            vertices[i].TextureCoordinate.Y = 1.0f - x.TextureCoordinateChannels[0][i].Y;
-                            vertices[i].Color = Color.White;
+                            vertices[i].X = x.Vertices[i].X * Scale;
+                            vertices[i].Y = x.Vertices[i].Y * Scale;
+                            vertices[i].Z = x.Vertices[i].Z * Scale;
+                            vertices[i].Tu = x.TextureCoordinateChannels[0][i].X;
+                            vertices[i].Tv = 1.0f - x.TextureCoordinateChannels[0][i].Y;
+                            vertices[i].R = 0xFF;
+                            vertices[i].G = 0xFF;
+                            vertices[i].B = 0xFF;
+                            vertices[i].A = 0xFF;
                         }
 
-                        return new MeshDesc
+                        return new MeshDescriptor
                         {
                             Vertices = vertices,
                             Indices = x.Faces.SelectMany(f => f.Indices).ToArray(),

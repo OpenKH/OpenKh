@@ -375,7 +375,8 @@ namespace OpenKh.Tools.Kh2MapStudio
                     meshDescriptor.Vertices.Length,
                     meshDescriptor.Indices,
                     0,
-                    meshDescriptor.Indices.Length / 3);
+                    meshDescriptor.Indices.Length / 3,
+                    MeshLoader.PositionColoredTexturedVertexDeclaration);
             }
         }
 

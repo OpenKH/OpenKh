@@ -69,9 +69,13 @@ namespace OpenKh.Engine.Parsers
             public List<Part> partList = new List<Part>();
             public List<Vector3> positionList = new List<Vector3>();
             public List<Vector2> uvList = new List<Vector2>();
+
+            public List<Vector4[]> vertices;
+            public List<VertexIndexWeighted[][]> vertexAssignments;
         }
 
         private readonly List<ImmutableMesh> immultableMeshList;
+        private readonly ExportedMesh immutableExportedMesh;
 
         /// <summary>
         /// Build immutable parts from a submodel.
@@ -82,15 +86,15 @@ namespace OpenKh.Engine.Parsers
             immultableMeshList = submodel.DmaChains
                 .Select(x => new ImmutableMesh(x))
                 .ToList();
+
+            immutableExportedMesh = PreProcessVerticesAndBuildModel();
         }
 
-        /// <summary>
-        /// Build final model using immutable parts and given matrices.
-        /// </summary>
-        /// <returns></returns>
-        public List<MeshDescriptor> ProcessVerticesAndBuildModel(Matrix4x4[] matrices)
+        private ExportedMesh PreProcessVerticesAndBuildModel()
         {
             var exportedMesh = new ExportedMesh();
+            exportedMesh.vertexAssignments = new List<VertexIndexWeighted[][]>();
+            exportedMesh.vertices = new List<Vector4[]>();
 
             int vertexBaseIndex = 0;
             int uvBaseIndex = 0;
@@ -144,40 +148,11 @@ namespace OpenKh.Engine.Parsers
                     var vertices = mesh.Vertices
                         .Select(vertex => new Vector4(vertex.X, vertex.Y, vertex.Z, vertex.W))
                         .ToArray();
+                    exportedMesh.vertices.Add(vertices);
 
                     var matrixIndexList = meshRoot.DmaChain.DmaVifs[i].Alaxi;
                     var vertexAssignmentsList = mesh.GetWeightedVertices(mesh.GetFromMatrixIndices(matrixIndexList));
-
-                    exportedMesh.positionList.AddRange(
-                        vertexAssignmentsList.Select(
-                            vertexAssigns =>
-                            {
-                                Vector3 finalPos = Vector3.Zero;
-                                if (vertexAssigns.Length == 1)
-                                {
-                                    // single joint
-                                    finalPos = Vector3.Transform(
-                                            ToVector3(vertices[vertexAssigns[0].VertexIndex]),
-                                            matrices[vertexAssigns[0].MatrixIndex]
-                                        );
-                                }
-                                else
-                                {
-                                    // multiple joints, using rawPos.W as blend weights
-                                    foreach (var vertexAssign in vertexAssigns)
-                                    {
-                                        finalPos += ToVector3(
-                                            Vector4.Transform(
-                                                vertices[vertexAssign.VertexIndex],
-                                                matrices[vertexAssign.MatrixIndex]
-                                            )
-                                        );
-                                    }
-                                }
-                                return finalPos;
-                            }
-                        )
-                    );
+                    exportedMesh.vertexAssignments.Add(vertexAssignmentsList);
 
                     exportedMesh.uvList.AddRange(
                         mesh.Indices.Select(x =>
@@ -191,11 +166,51 @@ namespace OpenKh.Engine.Parsers
                 }
             }
 
-            var newList = new List<MeshDescriptor>();
+            return exportedMesh;
+        }
 
-            foreach (var part in exportedMesh.partList)
+        public List<MeshDescriptor> ProcessVerticesAndBuildModel(Matrix4x4[] matrices)
+        {
+            immutableExportedMesh.positionList.Clear();
+            for (var i = 0; i < immutableExportedMesh.vertexAssignments.Count; i++)
             {
-                var vertices = new List<CustomVertex.PositionColoredTextured>();
+                var vertexAssignments = immutableExportedMesh.vertexAssignments[i];
+                var vertices = immutableExportedMesh.vertices[i];
+
+                immutableExportedMesh.positionList.AddRange(
+                    vertexAssignments.Select(
+                        vertexAssigns =>
+                        {
+                            Vector3 finalPos = Vector3.Zero;
+                            if (vertexAssigns.Length == 1)
+                            {
+                                // single joint
+                                finalPos = Vector3.Transform(
+                                ToVector3(vertices[vertexAssigns[0].VertexIndex]),
+                                matrices[vertexAssigns[0].MatrixIndex]);
+                            }
+                            else
+                            {
+                                // multiple joints, using rawPos.W as blend weights
+                                foreach (var vertexAssign in vertexAssigns)
+                                {
+                                    finalPos += ToVector3(
+                                        Vector4.Transform(
+                                            vertices[vertexAssign.VertexIndex],
+                                            matrices[vertexAssign.MatrixIndex]
+                                        ));
+                                }
+                            }
+                            return finalPos;
+                        }
+                    )
+                );
+            }
+
+            var newList = new List<MeshDescriptor>();
+            foreach (var part in immutableExportedMesh.partList)
+            {
+                var vertices = new List<PositionColoredTextured>();
                 var indices = new List<int>();
 
                 int triangleRefCount = part.triangleRefList.Count;
@@ -205,10 +220,10 @@ namespace OpenKh.Engine.Parsers
                     for (int i = 0; i < triRef.list.Length; i++)
                     {
                         VertexRef vertRef = triRef.list[i];
-                        Vector3 pos = exportedMesh.positionList[vertRef.vertexIndex];
-                        Vector2 uv = exportedMesh.uvList[vertRef.uvIndex];
+                        Vector3 pos = immutableExportedMesh.positionList[vertRef.vertexIndex];
+                        Vector2 uv = immutableExportedMesh.uvList[vertRef.uvIndex];
                         indices.Add(vertices.Count);
-                        vertices.Add(new CustomVertex.PositionColoredTextured(pos, -1, uv.X, uv.Y));
+                        vertices.Add(new PositionColoredTextured(pos, -1, uv.X, uv.Y));
                     }
                 }
 
