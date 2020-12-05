@@ -9,6 +9,41 @@ namespace OpenKh.Kh2
 {
     public class Motion
     {
+        private class PoolValues<T>
+        {
+            private readonly Dictionary<T, int> _valuePool = new Dictionary<T, int>();
+            private readonly List<T> _valueList = new List<T>();
+
+            public List<T> Values => _valueList;
+
+            public PoolValues()
+            {
+
+            }
+
+            public PoolValues(IEnumerable<T> values)
+            {
+                var index = 0;
+                foreach (var value in values)
+                {
+                    _valuePool.Add(value, index++);
+                    _valueList.Add(value);
+                }
+            }
+
+            public int GetIndex(T value)
+            {
+                if (_valuePool.TryGetValue(value, out var index))
+                    return index;
+
+                index = _valueList.Count;
+                _valuePool.Add(value, index);
+                _valueList.Add(value);
+
+                return index;
+            }
+        }
+
         private const int ReservedSize = 0x90;
         private const int Matrix4x4Size = 0x40;
         private static readonly string[] Transforms = new[]
@@ -157,8 +192,6 @@ namespace OpenKh.Kh2
             public List<BoneAnimationTable> ModelBoneAnimation { get; set; }
             public List<BoneAnimationTable> IKHelperAnimation { get; set; }
             public List<TimelineTable> Timeline { get; set; }
-            public List<float> KeyFrames { get; set; }
-            public List<float> TangentValues { get; set; }
             public List<IKChainTable> IKChains { get; set; }
             public List<IKHelperTable> IKHelpers { get; set; }
             public List<JointTable> Joints { get; set; }
@@ -197,10 +230,13 @@ namespace OpenKh.Kh2
         public class TimelineTable
         {
             public Interpolation Interpolation { get; set; }
-            public int KeyFrameIndex { get; set; }
+            public float KeyFrame { get; set; }
             public float Value { get; set; }
-            public float TangentStartIndex { get; set; }
-            public float TangentEndIndex { get; set; }
+            public float TangentEaseIn { get; set; }
+            public float TangentEaseOut { get; set; }
+
+            public override string ToString() =>
+                $"{KeyFrame} {Value} {Interpolation}:({TangentEaseIn},{TangentEaseOut})";
         }
 
         public class IKChainTable
@@ -370,7 +406,7 @@ namespace OpenKh.Kh2
                     .ToList();
 
                 stream.Position = ReservedSize + motion.KeyFrameOffset;
-                Interpolated.KeyFrames = Enumerable
+                var keyFrames = Enumerable
                     .Range(0, motion.KeyFrameCount)
                     .Select(x => reader.ReadSingle())
                     .ToList();
@@ -384,7 +420,7 @@ namespace OpenKh.Kh2
 
                 stream.Position = ReservedSize + motion.TangentOffset;
                 var estimatedTangentCount = (motion.IKChainOffset - motion.TangentOffset) / 4;
-                Interpolated.TangentValues = Enumerable
+                var tangentValues = Enumerable
                     .Range(0, estimatedTangentCount)
                     .Select(x => reader.ReadSingle())
                     .ToList();
@@ -411,10 +447,10 @@ namespace OpenKh.Kh2
                     .Select(x => new TimelineTable
                     {
                         Interpolation = (Interpolation)(x.Time & 3),
-                        KeyFrameIndex = x.Time >> 2,
+                        KeyFrame = keyFrames[x.Time >> 2],
                         Value = transformationValues[x.ValueIndex],
-                        TangentStartIndex = x.TangentIndexEaseIn,
-                        TangentEndIndex = x.TangentIndexEaseOut,
+                        TangentEaseIn = tangentValues[x.TangentIndexEaseIn],
+                        TangentEaseOut = tangentValues[x.TangentIndexEaseOut],
                     })
                     .ToList();
 
@@ -489,29 +525,19 @@ namespace OpenKh.Kh2
 
         private static void Write(Stream stream, InterpolatedMotion motion, bool unkFlag)
         {
-            var keyFrameDictionary = new Dictionary<float, short>();
-            var keyFrames = new List<float>();
-
+            var valuePool = new PoolValues<float>();
+            var keyFramePool = new PoolValues<float>(motion.Timeline.Select(x => x.KeyFrame).Distinct().OrderBy(x => x));
+            var tangentPool = new PoolValues<float>();
             var rawTimeline = new List<TimelineTableInternal>(motion.Timeline.Count);
             foreach (var item in motion.Timeline)
             {
-                var rawItem = new TimelineTableInternal
+                rawTimeline.Add(new TimelineTableInternal
                 {
-                    Time = (short)(((int)item.Interpolation & 3) | (item.KeyFrameIndex << 2)),
-                    TangentIndexEaseIn = (short)item.TangentStartIndex,
-                    TangentIndexEaseOut = (short)item.TangentEndIndex
-                };
-
-                if (!keyFrameDictionary.TryGetValue(item.Value, out var keyFrameIndex))
-                {
-                    rawItem.ValueIndex = (short)keyFrames.Count;
-                    keyFrameDictionary.Add(item.Value, rawItem.ValueIndex);
-                    keyFrames.Add(item.Value);
-                }
-                else
-                    rawItem.ValueIndex = keyFrameIndex;
-
-                rawTimeline.Add(rawItem);
+                    Time = (short)(((int)item.Interpolation & 3) | (keyFramePool.GetIndex(item.KeyFrame) << 2)),
+                    ValueIndex = (short)valuePool.GetIndex(item.Value),
+                    TangentIndexEaseIn = (short)tangentPool.GetIndex(item.TangentEaseIn),
+                    TangentIndexEaseOut = (short)tangentPool.GetIndex(item.TangentEaseOut),
+                });
             }
 
             var writer = new BinaryWriter(stream);
@@ -565,17 +591,17 @@ namespace OpenKh.Kh2
                 BinaryMapping.WriteObject(stream, item);
 
             stream.AlignPosition(4);
-            header.KeyFrameCount = motion.KeyFrames.Count;
+            header.KeyFrameCount = keyFramePool.Values.Count;
             header.KeyFrameOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.KeyFrames)
+            foreach (var item in keyFramePool.Values)
                 writer.Write(item);
 
             header.TransformationValueOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in keyFrames)
+            foreach (var item in valuePool.Values)
                 writer.Write(item);
 
             header.TangentOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.TangentValues)
+            foreach (var item in tangentPool.Values)
                 writer.Write(item);
 
             header.IKChainCount = motion.IKChains.Count;
