@@ -11,6 +11,13 @@ namespace OpenKh.Kh2
     {
         private const int ReservedSize = 0x90;
         private const int Matrix4x4Size = 0x40;
+        private static readonly string[] Transforms = new[]
+        {
+                "Scale.X", "Scale.Y", "Scale.Z",
+                "Rotation.X", "Rotation.Y", "Rotation.Z",
+                "Translation.X", "Translation.Y", "Translation.Z",
+                "Unk9", "Unk10", "Unk11", "Unk12",
+            };
 
         public enum Interpolation
         {
@@ -80,23 +87,23 @@ namespace OpenKh.Kh2
         {
             [Data] public short BoneCount { get; set; }
             [Data] public short TotalBoneCount { get; set; }
-            [Data] public int Unk04 { get; set; }
-            [Data] public int SecondaryBoneOffset { get; set; }
-            [Data] public int JointIndicesOffset { get; set; }
+            [Data] public int TotalFrameCount { get; set; }
+            [Data] public int IKHelperOffset { get; set; }
+            [Data] public int JointIndexOffset { get; set; }
             [Data] public int FrameTimeCount { get; set; }
-            [Data] public int InitialPoseTableOffset { get; set; }
-            [Data] public int InitialPoseTableCount { get; set; }
+            [Data] public int StaticPoseOffset { get; set; }
+            [Data] public int StaticPoseCount { get; set; }
             [Data] public int FooterOffset { get; set; }
-            [Data] public int AnimationBonePrimaryTableOffset { get; set; }
-            [Data] public int AnimationBonePrimaryTableCount { get; set; }
-            [Data] public int AnimationBoneSecondaryTableOffset { get; set; }
-            [Data] public int AnimationBoneSecondaryTableCount { get; set; }
-            [Data] public int TimelineTableOffset { get; set; }
+            [Data] public int ModelBoneAnimationOffset { get; set; }
+            [Data] public int ModelBoneAnimationCount { get; set; }
+            [Data] public int IKHelperAnimationOffset { get; set; }
+            [Data] public int IKHelperAnimationCount { get; set; }
+            [Data] public int TimelineOffset { get; set; }
             [Data] public int FrameTimeOffset { get; set; }
-            [Data] public int KeyFramesOffset { get; set; }
-            [Data] public int TangentValueTableOffset { get; set; }
-            [Data] public int InverseKinematicTableOffset { get; set; }
-            [Data] public int InverseKinematicTableCount { get; set; }
+            [Data] public int KeyFrameOffset { get; set; }
+            [Data] public int TangentOffset { get; set; }
+            [Data] public int IKChainOffset { get; set; }
+            [Data] public int IKChainCount { get; set; }
             [Data] public int Unk48 { get; set; }
             [Data] public int Table8Offset { get; set; }
             [Data] public int Table7Offset { get; set; }
@@ -117,14 +124,14 @@ namespace OpenKh.Kh2
             [Data] public float FrameCount { get; set; }
             [Data] public int UnknownTable1Offset { get; set; }
             [Data] public int UnknownTable1Count { get; set; }
-            [Data] public int UnkA8 { get; set; }
-            [Data] public int UnkAc { get; set; }
+            [Data] public int Unk98 { get; set; }
+            [Data] public int Unk9c { get; set; }
         }
 
         public class InterpolatedMotion
         {
             public short BoneCount { get; set; }
-            public int Unk04 { get; set; }
+            public int TotalFrameCount { get; set; }
             public int Unk48 { get; set; }
             public int Table8Offset { get; set; }
             public int Table7Offset { get; set; }
@@ -143,42 +150,46 @@ namespace OpenKh.Kh2
             public float FrameEnd { get; set; }
             public float FramePerSecond { get; set; }
             public float FrameCount { get; set; }
-            public int UnkA8 { get; set; }
-            public int UnkAc { get; set; }
+            public int Unk98 { get; set; }
+            public int Unk9c { get; set; }
 
-            public List<InitialPoseTable> InitialPose { get; set; }
-            public List<AnimationBoneTable> AnimationBonePrimary { get; set; }
-            public List<AnimationBoneTable> AnimationBoneSecondary { get; set; }
+            public List<InitialPoseTable> StaticPose { get; set; }
+            public List<BoneAnimationTable> ModelBoneAnimation { get; set; }
+            public List<BoneAnimationTable> IKHelperAnimation { get; set; }
             public List<TimelineTable> Timeline { get; set; }
             public List<float> FrameTimes { get; set; }
-            public List<InverseKinematicTable> InverseKinematic { get; set; }
-            public List<SecondaryBoneTable> SecondaryBones { get; set; }
-            public List<int> JointIndices { get; set; }
+            public List<float> TangentValues { get; set; }
+            public List<IKChainTable> IKChains { get; set; }
+            public List<IKHelperTable> IKHelpers { get; set; }
+            public List<JointTable> Joints { get; set; }
             public FooterTable Footer { get; internal set; }
         }
 
         public class InitialPoseTable
         {
-            [Data] public short JointIndex { get; set; }
-            [Data] public short Transform { get; set; }
+            [Data] public short BoneIndex { get; set; }
+            [Data] public short Channel { get; set; }
             [Data] public float Value { get; set; }
 
             public override string ToString() =>
-                $"{JointIndex:X4} {Transform:X4} {Value}";
+                $"{BoneIndex} {Transforms[Channel]} {Value}";
         }
 
-        public class AnimationBoneTable
+        public class BoneAnimationTable
         {
             [Data] public short JointIndex { get; set; }
             [Data] public byte Channel { get; set; }
             [Data] public byte TimelineCount { get; set; }
             [Data] public short TimelineStartIndex { get; set; }
+
+            public override string ToString() =>
+                $"{JointIndex} {Transforms[Channel]} ({TimelineStartIndex},{TimelineCount})";
         }
 
         private class TimelineTableInternal
         {
             [Data] public short Time { get; set; }
-            [Data] public short KeyFrameIndex { get; set; }
+            [Data] public short ValueIndex { get; set; }
             [Data] public short TangentStartIndex { get; set; }
             [Data] public short TangentEndIndex { get; set; }
         }
@@ -186,12 +197,13 @@ namespace OpenKh.Kh2
         public class TimelineTable
         {
             public Interpolation Interpolation { get; set; }
-            public int FrameTimeIndex { get; set; }
-            public float KeyFrame { get; set; }
-            public float[] Tangents { get; set; }
+            public int KeyFrameIndex { get; set; }
+            public float Value { get; set; }
+            public float TangentStartIndex { get; set; }
+            public float TangentEndIndex { get; set; }
         }
 
-        public class InverseKinematicTable
+        public class IKChainTable
         {
             [Data] public byte Unk00 { get; set; }
             [Data] public byte Unk01 { get; set; }
@@ -201,10 +213,16 @@ namespace OpenKh.Kh2
             [Data] public int Unk08 { get; set; }
         }
 
-        public class SecondaryBoneTable
+        public class JointTable
         {
-            [Data] public int BoneIndex { get; set; }
-            [Data] public int ParentBoneIndex { get; set; }
+            [Data] public short JointIndex { get; set; }
+            [Data] public short Flag { get; set; }
+        }
+
+        public class IKHelperTable
+        {
+            [Data] public int Index { get; set; }
+            [Data] public int ParentIndex { get; set; }
             [Data] public int Unk08 { get; set; }
             [Data] public int Unk0c { get; set; }
             [Data] public float ScaleX { get; set; }
@@ -303,7 +321,7 @@ namespace OpenKh.Kh2
                 Interpolated = new InterpolatedMotion
                 {
                     BoneCount = motion.BoneCount,
-                    Unk04 = motion.Unk04,
+                    TotalFrameCount = motion.TotalFrameCount,
                     Unk48 = motion.Unk48,
                     Table8Offset = motion.Table8Offset,
                     Table7Offset = motion.Table7Offset,
@@ -322,31 +340,32 @@ namespace OpenKh.Kh2
                     FrameEnd = motion.FrameEnd,
                     FramePerSecond = motion.FramePerSecond,
                     FrameCount = motion.FrameCount,
-                    UnkA8 = motion.UnkA8,
-                    UnkAc = motion.UnkAc,
+                    Unk98 = motion.Unk98,
+                    Unk9c = motion.Unk9c,
                 };
 
-                stream.Position = ReservedSize + motion.InitialPoseTableOffset;
-                Interpolated.InitialPose = Enumerable
-                    .Range(0, motion.InitialPoseTableCount)
+                stream.Position = ReservedSize + motion.StaticPoseOffset;
+                Interpolated.StaticPose = Enumerable
+                    .Range(0, motion.StaticPoseCount)
                     .Select(x => BinaryMapping.ReadObject<InitialPoseTable>(stream))
                     .ToList();
 
-                stream.Position = ReservedSize + motion.AnimationBonePrimaryTableOffset;
-                Interpolated.AnimationBonePrimary = Enumerable
-                    .Range(0, motion.AnimationBonePrimaryTableCount)
-                    .Select(x => BinaryMapping.ReadObject<AnimationBoneTable>(stream))
+                stream.Position = ReservedSize + motion.ModelBoneAnimationOffset;
+                Interpolated.ModelBoneAnimation = Enumerable
+                    .Range(0, motion.ModelBoneAnimationCount)
+                    .Select(x => BinaryMapping.ReadObject<BoneAnimationTable>(stream))
                     .ToList();
 
-                stream.Position = ReservedSize + motion.AnimationBoneSecondaryTableOffset;
-                Interpolated.AnimationBoneSecondary = Enumerable
-                    .Range(0, motion.AnimationBoneSecondaryTableCount)
-                    .Select(x => BinaryMapping.ReadObject<AnimationBoneTable>(stream))
+                stream.Position = ReservedSize + motion.IKHelperAnimationOffset;
+                Interpolated.IKHelperAnimation = Enumerable
+                    .Range(0, motion.IKHelperAnimationCount)
+                    .Select(x => BinaryMapping.ReadObject<BoneAnimationTable>(stream))
                     .ToList();
 
-                stream.Position = ReservedSize + motion.TimelineTableOffset;
+                stream.Position = ReservedSize + motion.TimelineOffset;
+                var estimatedTimelineCount = (motion.FrameTimeOffset - motion.TimelineOffset) / 8;
                 var rawTimeline = Enumerable
-                    .Range(0, (motion.FrameTimeOffset - motion.TimelineTableOffset) / 8)
+                    .Range(0, estimatedTimelineCount)
                     .Select(x => BinaryMapping.ReadObject<TimelineTableInternal>(stream))
                     .ToList();
 
@@ -356,46 +375,46 @@ namespace OpenKh.Kh2
                     .Select(x => reader.ReadSingle())
                     .ToList();
 
-                stream.Position = ReservedSize + motion.KeyFramesOffset;
-                var keyFrames = Enumerable
-                    .Range(0, (motion.TangentValueTableOffset - motion.KeyFramesOffset) / 4)
+                stream.Position = ReservedSize + motion.KeyFrameOffset;
+                var estimatedKeyFrameCount = (motion.TangentOffset - motion.KeyFrameOffset) / 4;
+                var transformationValues = Enumerable
+                    .Range(0, estimatedKeyFrameCount)
                     .Select(x => reader.ReadSingle())
                     .ToList();
 
-                stream.Position = ReservedSize + motion.TangentValueTableOffset;
-                var tangentValues = Enumerable
-                    .Range(0, (motion.InverseKinematicTableOffset - motion.TangentValueTableOffset) / 4)
+                stream.Position = ReservedSize + motion.TangentOffset;
+                var estimatedTangentCount = (motion.IKChainOffset - motion.TangentOffset) / 4;
+                Interpolated.TangentValues = Enumerable
+                    .Range(0, estimatedTangentCount)
                     .Select(x => reader.ReadSingle())
                     .ToList();
 
-                stream.Position = ReservedSize + motion.InverseKinematicTableOffset;
-                Interpolated.InverseKinematic = Enumerable
-                    .Range(0, motion.InverseKinematicTableCount)
-                    .Select(x => BinaryMapping.ReadObject<InverseKinematicTable>(stream))
+                stream.Position = ReservedSize + motion.IKChainOffset;
+                Interpolated.IKChains = Enumerable
+                    .Range(0, motion.IKChainCount)
+                    .Select(x => BinaryMapping.ReadObject<IKChainTable>(stream))
                     .ToList();
 
-                stream.Position = ReservedSize + motion.SecondaryBoneOffset;
-                Interpolated.SecondaryBones = Enumerable
+                stream.Position = ReservedSize + motion.IKHelperOffset;
+                Interpolated.IKHelpers = Enumerable
                     .Range(0, motion.TotalBoneCount - motion.BoneCount)
-                    .Select(x => BinaryMapping.ReadObject<SecondaryBoneTable>(stream))
+                    .Select(x => BinaryMapping.ReadObject<IKHelperTable>(stream))
                     .ToList();
 
-                stream.Position = ReservedSize + motion.JointIndicesOffset;
-                Interpolated.JointIndices = Enumerable
+                stream.Position = ReservedSize + motion.JointIndexOffset;
+                Interpolated.Joints = Enumerable
                     .Range(0, motion.TotalBoneCount + 1)
-                    .Select(x => reader.ReadInt32())
+                    .Select(x => BinaryMapping.ReadObject<JointTable>(stream))
                     .ToList();
 
                 Interpolated.Timeline = rawTimeline
                     .Select(x => new TimelineTable
                     {
                         Interpolation = (Interpolation)(x.Time & 3),
-                        FrameTimeIndex = x.Time >> 2,
-                        KeyFrame = keyFrames[x.KeyFrameIndex],
-                        Tangents = Enumerable
-                            .Range(0, x.TangentEndIndex - x.TangentStartIndex + 1)
-                            .Select(i => tangentValues[x.TangentStartIndex + i])
-                            .ToArray(),
+                        KeyFrameIndex = x.Time >> 2,
+                        Value = transformationValues[x.ValueIndex],
+                        TangentStartIndex = x.TangentStartIndex,
+                        TangentEndIndex = x.TangentEndIndex,
                     })
                     .ToList();
 
@@ -472,36 +491,26 @@ namespace OpenKh.Kh2
         {
             var keyFrameDictionary = new Dictionary<float, short>();
             var keyFrames = new List<float>();
-            var tangentDictionary = new Dictionary<float, short>();
-            var tangents = new List<float>();
 
             var rawTimeline = new List<TimelineTableInternal>(motion.Timeline.Count);
             foreach (var item in motion.Timeline)
             {
                 var rawItem = new TimelineTableInternal
                 {
-                    Time = (short)(((int)item.Interpolation & 3) | (item.FrameTimeIndex << 2)),
+                    Time = (short)(((int)item.Interpolation & 3) | (item.KeyFrameIndex << 2)),
+                    TangentStartIndex = (short)item.TangentStartIndex,
+                    TangentEndIndex = (short)item.TangentEndIndex
                 };
 
-                if (!keyFrameDictionary.TryGetValue(item.KeyFrame, out var keyFrameIndex))
+                if (!keyFrameDictionary.TryGetValue(item.Value, out var keyFrameIndex))
                 {
-                    rawItem.KeyFrameIndex = (short)keyFrames.Count;
-                    keyFrameDictionary.Add(item.KeyFrame, rawItem.KeyFrameIndex);
-                    keyFrames.Add(item.KeyFrame);
+                    rawItem.ValueIndex = (short)keyFrames.Count;
+                    keyFrameDictionary.Add(item.Value, rawItem.ValueIndex);
+                    keyFrames.Add(item.Value);
                 }
                 else
-                    rawItem.KeyFrameIndex = keyFrameIndex;
+                    rawItem.ValueIndex = keyFrameIndex;
 
-                if (!tangentDictionary.TryGetValue(item.Tangents[0], out var tangentIndex))
-                {
-                    rawItem.TangentStartIndex = (short)tangents.Count;
-                    tangentDictionary.Add(item.Tangents[0], (short)tangents.Count);
-                    tangents.AddRange(item.Tangents);
-                }
-                else
-                    rawItem.TangentStartIndex = tangentIndex;
-
-                rawItem.TangentEndIndex = (short)(rawItem.TangentStartIndex + item.Tangents.Length - 1);
                 rawTimeline.Add(rawItem);
             }
 
@@ -509,7 +518,7 @@ namespace OpenKh.Kh2
             var header = new InterpolatedMotionInternal
             {
                 BoneCount = motion.BoneCount,
-                Unk04 = motion.Unk04,
+                TotalFrameCount = motion.TotalFrameCount,
                 Unk48 = motion.Unk48,
                 Table8Offset = motion.Table8Offset,
                 Table7Offset = motion.Table7Offset,
@@ -528,61 +537,63 @@ namespace OpenKh.Kh2
                 FrameEnd = motion.FrameEnd,
                 FramePerSecond = motion.FramePerSecond,
                 FrameCount = motion.FrameCount,
-                UnkA8 = motion.UnkA8,
-                UnkAc = motion.UnkAc,
+                Unk98 = motion.Unk98,
+                Unk9c = motion.Unk9c,
             };
 
             stream.Write(new byte[ReservedSize], 0, ReservedSize);
             BinaryMapping.WriteObject(stream, new Header { });
             BinaryMapping.WriteObject(stream, new InterpolatedMotionInternal { });
 
-            header.InitialPoseTableCount = motion.InitialPose.Count;
-            header.InitialPoseTableOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.InitialPose)
+            header.StaticPoseCount = motion.StaticPose.Count;
+            header.StaticPoseOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.StaticPose)
                 BinaryMapping.WriteObject(stream, item);
 
-            header.AnimationBonePrimaryTableCount = motion.AnimationBonePrimary.Count;
-            header.AnimationBonePrimaryTableOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.AnimationBonePrimary)
+            header.ModelBoneAnimationCount = motion.ModelBoneAnimation.Count;
+            header.ModelBoneAnimationOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.ModelBoneAnimation)
                 BinaryMapping.WriteObject(stream, item);
 
-            header.AnimationBoneSecondaryTableCount = motion.AnimationBoneSecondary.Count;
-            header.AnimationBoneSecondaryTableOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.AnimationBoneSecondary)
+            header.IKHelperAnimationCount = motion.IKHelperAnimation.Count;
+            header.IKHelperAnimationOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.IKHelperAnimation)
                 BinaryMapping.WriteObject(stream, item);
 
-            header.TimelineTableOffset = (int)(stream.Position - ReservedSize);
+            header.TimelineOffset = (int)(stream.Position - ReservedSize);
             foreach (var item in rawTimeline)
                 BinaryMapping.WriteObject(stream, item);
 
+            stream.AlignPosition(4);
             header.FrameTimeCount = motion.FrameTimes.Count;
             header.FrameTimeOffset = (int)(stream.Position - ReservedSize);
             foreach (var item in motion.FrameTimes)
                 writer.Write(item);
 
-            header.KeyFramesOffset = (int)(stream.Position - ReservedSize);
+            header.KeyFrameOffset = (int)(stream.Position - ReservedSize);
             foreach (var item in keyFrames)
                 writer.Write(item);
 
-            header.TangentValueTableOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in tangents)
+            header.TangentOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.TangentValues)
                 writer.Write(item);
 
-            header.InverseKinematicTableCount = motion.InverseKinematic.Count;
-            header.InverseKinematicTableOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.InverseKinematic)
+            header.IKChainCount = motion.IKChains.Count;
+            header.IKChainOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.IKChains)
                 BinaryMapping.WriteObject(stream, item);
 
             stream.AlignPosition(0x10);
-            header.TotalBoneCount = (short)(motion.BoneCount + motion.SecondaryBones.Count);
-            header.SecondaryBoneOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.SecondaryBones)
+            header.TotalBoneCount = (short)(motion.BoneCount + motion.IKHelpers.Count);
+            header.IKHelperOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.IKHelpers)
                 BinaryMapping.WriteObject(stream, item);
 
-            header.JointIndicesOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.JointIndices)
-                writer.Write(item);
+            header.JointIndexOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.Joints)
+                BinaryMapping.WriteObject(stream, item);
 
+            stream.AlignPosition(0x10);
             header.FooterOffset = (int)(stream.Position - ReservedSize);
             BinaryMapping.WriteObject(stream, motion.Footer);
 
