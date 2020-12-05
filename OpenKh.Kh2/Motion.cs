@@ -90,7 +90,7 @@ namespace OpenKh.Kh2
             [Data] public int TotalFrameCount { get; set; }
             [Data] public int IKHelperOffset { get; set; }
             [Data] public int JointIndexOffset { get; set; }
-            [Data] public int FrameTimeCount { get; set; }
+            [Data] public int KeyFrameCount { get; set; }
             [Data] public int StaticPoseOffset { get; set; }
             [Data] public int StaticPoseCount { get; set; }
             [Data] public int FooterOffset { get; set; }
@@ -99,8 +99,8 @@ namespace OpenKh.Kh2
             [Data] public int IKHelperAnimationOffset { get; set; }
             [Data] public int IKHelperAnimationCount { get; set; }
             [Data] public int TimelineOffset { get; set; }
-            [Data] public int FrameTimeOffset { get; set; }
             [Data] public int KeyFrameOffset { get; set; }
+            [Data] public int TransformationValueOffset { get; set; }
             [Data] public int TangentOffset { get; set; }
             [Data] public int IKChainOffset { get; set; }
             [Data] public int IKChainCount { get; set; }
@@ -157,7 +157,7 @@ namespace OpenKh.Kh2
             public List<BoneAnimationTable> ModelBoneAnimation { get; set; }
             public List<BoneAnimationTable> IKHelperAnimation { get; set; }
             public List<TimelineTable> Timeline { get; set; }
-            public List<float> FrameTimes { get; set; }
+            public List<float> KeyFrames { get; set; }
             public List<float> TangentValues { get; set; }
             public List<IKChainTable> IKChains { get; set; }
             public List<IKHelperTable> IKHelpers { get; set; }
@@ -190,8 +190,8 @@ namespace OpenKh.Kh2
         {
             [Data] public short Time { get; set; }
             [Data] public short ValueIndex { get; set; }
-            [Data] public short TangentStartIndex { get; set; }
-            [Data] public short TangentEndIndex { get; set; }
+            [Data] public short TangentIndexEaseIn { get; set; }
+            [Data] public short TangentIndexEaseOut { get; set; }
         }
 
         public class TimelineTable
@@ -363,20 +363,20 @@ namespace OpenKh.Kh2
                     .ToList();
 
                 stream.Position = ReservedSize + motion.TimelineOffset;
-                var estimatedTimelineCount = (motion.FrameTimeOffset - motion.TimelineOffset) / 8;
+                var estimatedTimelineCount = (motion.KeyFrameOffset - motion.TimelineOffset) / 8;
                 var rawTimeline = Enumerable
                     .Range(0, estimatedTimelineCount)
                     .Select(x => BinaryMapping.ReadObject<TimelineTableInternal>(stream))
                     .ToList();
 
-                stream.Position = ReservedSize + motion.FrameTimeOffset;
-                Interpolated.FrameTimes = Enumerable
-                    .Range(0, motion.FrameTimeCount)
+                stream.Position = ReservedSize + motion.KeyFrameOffset;
+                Interpolated.KeyFrames = Enumerable
+                    .Range(0, motion.KeyFrameCount)
                     .Select(x => reader.ReadSingle())
                     .ToList();
 
-                stream.Position = ReservedSize + motion.KeyFrameOffset;
-                var estimatedKeyFrameCount = (motion.TangentOffset - motion.KeyFrameOffset) / 4;
+                stream.Position = ReservedSize + motion.TransformationValueOffset;
+                var estimatedKeyFrameCount = (motion.TangentOffset - motion.TransformationValueOffset) / 4;
                 var transformationValues = Enumerable
                     .Range(0, estimatedKeyFrameCount)
                     .Select(x => reader.ReadSingle())
@@ -413,8 +413,8 @@ namespace OpenKh.Kh2
                         Interpolation = (Interpolation)(x.Time & 3),
                         KeyFrameIndex = x.Time >> 2,
                         Value = transformationValues[x.ValueIndex],
-                        TangentStartIndex = x.TangentStartIndex,
-                        TangentEndIndex = x.TangentEndIndex,
+                        TangentStartIndex = x.TangentIndexEaseIn,
+                        TangentEndIndex = x.TangentIndexEaseOut,
                     })
                     .ToList();
 
@@ -498,8 +498,8 @@ namespace OpenKh.Kh2
                 var rawItem = new TimelineTableInternal
                 {
                     Time = (short)(((int)item.Interpolation & 3) | (item.KeyFrameIndex << 2)),
-                    TangentStartIndex = (short)item.TangentStartIndex,
-                    TangentEndIndex = (short)item.TangentEndIndex
+                    TangentIndexEaseIn = (short)item.TangentStartIndex,
+                    TangentIndexEaseOut = (short)item.TangentEndIndex
                 };
 
                 if (!keyFrameDictionary.TryGetValue(item.Value, out var keyFrameIndex))
@@ -565,12 +565,12 @@ namespace OpenKh.Kh2
                 BinaryMapping.WriteObject(stream, item);
 
             stream.AlignPosition(4);
-            header.FrameTimeCount = motion.FrameTimes.Count;
-            header.FrameTimeOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.FrameTimes)
+            header.KeyFrameCount = motion.KeyFrames.Count;
+            header.KeyFrameOffset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.KeyFrames)
                 writer.Write(item);
 
-            header.KeyFrameOffset = (int)(stream.Position - ReservedSize);
+            header.TransformationValueOffset = (int)(stream.Position - ReservedSize);
             foreach (var item in keyFrames)
                 writer.Write(item);
 

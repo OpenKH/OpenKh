@@ -1,6 +1,7 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -44,6 +45,31 @@ namespace OpenKh.Tests.kh2
                 Motion.Write(outStream, Motion.Read(inStream));
 
                 return outStream;
+            });
+        });
+
+        [SkippableFact]
+        public void Full_WriteBackTheSameFiles() =>
+            Helpers.ForAllFiles(".tests/kh2_data", fileName =>
+        {
+            Helpers.ForBarEntries(fileName,
+                x => x.Type == Bar.EntryType.Anb && x.Stream.Length > 0, (fileName, entry) =>
+            {
+                if (!Bar.IsValid(entry.Stream))
+                    return;
+
+                var motionEntry = Bar.Read(entry.Stream)
+                    .FirstOrDefault(x => x.Type == Bar.EntryType.Motion);
+                if (motionEntry == null)
+                    return;
+
+                Helpers.AssertStream(motionEntry.Stream, inStream =>
+                {
+                    var outStream = new MemoryStream();
+                    Motion.Write(outStream, Motion.Read(inStream));
+
+                    return outStream;
+                });
             });
         });
     }
