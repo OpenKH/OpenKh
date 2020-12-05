@@ -243,8 +243,8 @@ namespace OpenKh.Kh2
         {
             [Data] public byte Unk00 { get; set; }
             [Data] public byte Unk01 { get; set; }
-            [Data] public short Unk02 { get; set; }
-            [Data] public short Unk04 { get; set; }
+            [Data] public short ModelBoneIndex { get; set; }
+            [Data] public short IKHelperIndex { get; set; }
             [Data] public short Unk06 { get; set; }
             [Data] public int Unk08 { get; set; }
         }
