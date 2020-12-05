@@ -62,8 +62,7 @@ namespace OpenKh.Game
         private static string GetVersion() => ProductVersion;
 
 
-        [Required]
-        [Argument(0, "Content path", "Location of game's data")]
+        [Option("--data <GAME_PATH>", "Location of game's data", CommandOptionType.SingleValue)]
         public string ContentPath { get; }
 
         [Option(CommandOptionType.NoValue, ShortName = "v", LongName = "console", Description = "Show the console output (Windows only)")]
