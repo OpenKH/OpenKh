@@ -48,11 +48,10 @@ namespace OpenKh.Kh2
         private const int Matrix4x4Size = 0x40;
         private static readonly string[] Transforms = new[]
         {
-                "Scale.X", "Scale.Y", "Scale.Z",
-                "Rotation.X", "Rotation.Y", "Rotation.Z",
-                "Translation.X", "Translation.Y", "Translation.Z",
-                "Unk9", "Unk10", "Unk11", "Unk12",
-            };
+            "Scale.X", "Scale.Y", "Scale.Z",
+            "Rotation.X", "Rotation.Y", "Rotation.Z",
+            "Translation.X", "Translation.Y", "Translation.Z",
+        };
 
         public enum Interpolation
         {
@@ -188,7 +187,7 @@ namespace OpenKh.Kh2
             public int Unk98 { get; set; }
             public int Unk9c { get; set; }
 
-            public List<InitialPoseTable> StaticPose { get; set; }
+            public List<StaticPoseTable> StaticPose { get; set; }
             public List<BoneAnimationTable> ModelBoneAnimation { get; set; }
             public List<BoneAnimationTable> IKHelperAnimation { get; set; }
             public List<TimelineTable> Timeline { get; set; }
@@ -198,7 +197,7 @@ namespace OpenKh.Kh2
             public FooterTable Footer { get; internal set; }
         }
 
-        public class InitialPoseTable
+        public class StaticPoseTable
         {
             [Data] public short BoneIndex { get; set; }
             [Data] public short Channel { get; set; }
@@ -208,7 +207,7 @@ namespace OpenKh.Kh2
                 $"{BoneIndex} {Transforms[Channel]} {Value}";
         }
 
-        public class BoneAnimationTable
+        public class BoneAnimationTableInternal
         {
             [Data] public short JointIndex { get; set; }
             [Data] public byte Channel { get; set; }
@@ -217,6 +216,19 @@ namespace OpenKh.Kh2
 
             public override string ToString() =>
                 $"{JointIndex} {Transforms[Channel]} ({TimelineStartIndex},{TimelineCount})";
+        }
+
+        public class BoneAnimationTable
+        {
+            public short JointIndex { get; set; }
+            public byte Channel { get; set; }
+            public byte Pre { get; set; }
+            public byte Post { get; set; }
+            public byte TimelineCount { get; set; }
+            public short TimelineStartIndex { get; set; }
+
+            public override string ToString() =>
+                $"{JointIndex} {Transforms[Channel]} ({Pre},{Post}) ({TimelineStartIndex},{TimelineCount})";
         }
 
         private class TimelineTableInternal
@@ -383,19 +395,21 @@ namespace OpenKh.Kh2
                 stream.Position = ReservedSize + motion.StaticPoseOffset;
                 Interpolated.StaticPose = Enumerable
                     .Range(0, motion.StaticPoseCount)
-                    .Select(x => BinaryMapping.ReadObject<InitialPoseTable>(stream))
+                    .Select(x => BinaryMapping.ReadObject<StaticPoseTable>(stream))
                     .ToList();
 
                 stream.Position = ReservedSize + motion.ModelBoneAnimationOffset;
                 Interpolated.ModelBoneAnimation = Enumerable
                     .Range(0, motion.ModelBoneAnimationCount)
-                    .Select(x => BinaryMapping.ReadObject<BoneAnimationTable>(stream))
+                    .Select(x => BinaryMapping.ReadObject<BoneAnimationTableInternal>(stream))
+                    .Select(Map)
                     .ToList();
 
                 stream.Position = ReservedSize + motion.IKHelperAnimationOffset;
                 Interpolated.IKHelperAnimation = Enumerable
                     .Range(0, motion.IKHelperAnimationCount)
-                    .Select(x => BinaryMapping.ReadObject<BoneAnimationTable>(stream))
+                    .Select(x => BinaryMapping.ReadObject<BoneAnimationTableInternal>(stream))
+                    .Select(Map)
                     .ToList();
 
                 stream.Position = ReservedSize + motion.TimelineOffset;
@@ -578,12 +592,12 @@ namespace OpenKh.Kh2
 
             header.ModelBoneAnimationCount = motion.ModelBoneAnimation.Count;
             header.ModelBoneAnimationOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.ModelBoneAnimation)
+            foreach (var item in motion.ModelBoneAnimation.Select(Map))
                 BinaryMapping.WriteObject(stream, item);
 
             header.IKHelperAnimationCount = motion.IKHelperAnimation.Count;
             header.IKHelperAnimationOffset = (int)(stream.Position - ReservedSize);
-            foreach (var item in motion.IKHelperAnimation)
+            foreach (var item in motion.IKHelperAnimation.Select(Map))
                 BinaryMapping.WriteObject(stream, item);
 
             header.TimelineOffset = (int)(stream.Position - ReservedSize);
@@ -639,6 +653,24 @@ namespace OpenKh.Kh2
             });
             BinaryMapping.WriteObject(stream, header);
         }
+
+        private static BoneAnimationTable Map(BoneAnimationTableInternal obj) => new BoneAnimationTable
+        {
+            JointIndex = obj.JointIndex,
+            Channel = (byte)(obj.Channel & 0xF),
+            Pre = (byte)((obj.Channel >> 4) & 3),
+            Post = (byte)((obj.Channel >> 6) & 3),
+            TimelineStartIndex = obj.TimelineStartIndex,
+            TimelineCount = obj.TimelineCount,
+        };
+
+        private static BoneAnimationTableInternal Map(BoneAnimationTable obj) => new BoneAnimationTableInternal
+        {
+            JointIndex = obj.JointIndex,
+            Channel = (byte)((obj.Channel & 0xF) | ((obj.Pre & 3) << 4) | ((obj.Post & 3) << 6)),
+            TimelineStartIndex = obj.TimelineStartIndex,
+            TimelineCount = obj.TimelineCount,
+        };
 
         private static Matrix4x4 ReadMatrix(BinaryReader reader) => new Matrix4x4(
             reader.ReadSingle(),

@@ -106,7 +106,9 @@ Formerly known as `T2`. Specifies how a specific bone should animate over the ti
 | Offset | Type | Description
 |--------|------|--------------
 | 0x00   | short| Bone index
-| 0x02   | byte | [Channel](#channels) ID
+| 0x02   | 4-bit| [Channel](#channels) ID
+| 0x02   | 2-bit| [Pre-type](#cycle-type)
+| 0x02   | 2-bit| [Post-type](#cycle-type)
 | 0x03   | byte | [Timeline](#timeline) count
 | 0x04   | short| [Timeline](#timeline) index
 
@@ -209,6 +211,15 @@ Its purpose it's unknown.
 | 7       | Modify `translate.y`
 | 8       | Modify `translate.z`
 | ...     | unresearched
+
+### Cycle type
+
+| Channel | Description
+|---------|---------------
+| 0       | First / Last key
+| 1       | Subtractive / Additive
+| 2       | Repeat
+| 3       | Zero
 
 ### Interpolations
 
