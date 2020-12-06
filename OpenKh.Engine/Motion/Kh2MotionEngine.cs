@@ -82,8 +82,111 @@ namespace OpenKh.Engine.Motion
 
             var boneList = model.Bones;
             var matrices = new Matrix4x4[boneList.Count];
-            var absTranslationList = new Vector3[matrices.Length];
-            var absRotationList = new Quaternion[matrices.Length];
+
+            var totalBoneCount = motion.BoneCount + motion.IKHelpers.Count;
+            var sourceTranslations = new Vector3[totalBoneCount];
+            var sourceRotations = new Quaternion[totalBoneCount];
+            var absTranslationList = new Vector3[totalBoneCount];
+            var absRotationList = new Quaternion[totalBoneCount];
+
+            for (var i = 0; i < model.Bones.Count; i++)
+            {
+                var bone = model.Bones[i];
+                sourceRotations[i].X = bone.RotationX;
+                sourceRotations[i].Y = bone.RotationY;
+                sourceRotations[i].Z = bone.RotationZ;
+                sourceTranslations[i].X = bone.TranslationX;
+                sourceTranslations[i].Y = bone.TranslationY;
+                sourceTranslations[i].Z = bone.TranslationZ;
+            }
+
+            foreach (var pose in motion.StaticPose)
+            {
+                switch (pose.Channel)
+                {
+                    case 3:
+                        sourceRotations[pose.BoneIndex].X = pose.Value;
+                        break;
+                    case 4:
+                        sourceRotations[pose.BoneIndex].Y = pose.Value;
+                        break;
+                    case 5:
+                        sourceRotations[pose.BoneIndex].Z = pose.Value;
+                        break;
+                    case 6:
+                        sourceTranslations[pose.BoneIndex].X = pose.Value;
+                        break;
+                    case 7:
+                        sourceTranslations[pose.BoneIndex].Y = pose.Value;
+                        break;
+                    case 8:
+                        sourceTranslations[pose.BoneIndex].Z = pose.Value;
+                        break;
+                }
+            }
+
+            foreach (var animation in motion.ModelBoneAnimation)
+            {
+                for (var i = animation.TimelineCount - 1; i >= 0; i--)
+                {
+                    var timeline = motion.Timeline[animation.TimelineStartIndex + i];
+
+                    if (actualFrame >= timeline.KeyFrame)
+                    {
+                        Kh2.Motion.TimelineTable nextTimeline;
+                        if (i < animation.TimelineCount - 1)
+                            nextTimeline = motion.Timeline[animation.TimelineStartIndex + i + 1];
+                        else
+                            nextTimeline = motion.Timeline[animation.TimelineStartIndex];
+
+                        var timeDiff = nextTimeline.KeyFrame - timeline.KeyFrame;
+                        var n = (actualFrame - timeline.KeyFrame) / timeDiff;
+                        float value;
+                        switch (timeline.Interpolation)
+                        {
+                            case Kh2.Motion.Interpolation.Nearest:
+                                value = timeline.Value;
+                                break;
+                            case Kh2.Motion.Interpolation.Linear:
+                                value = Lerp(timeline.Value, nextTimeline.Value, n);
+                                break;
+                            case Kh2.Motion.Interpolation.Hermite:
+                                value = CubicHermite(n, timeline.Value, nextTimeline.Value,
+                                    timeline.TangentEaseIn, timeline.TangentEaseOut);
+                                break;
+                            case Kh2.Motion.Interpolation.Zero:
+                                value = 0; // EVIL!!1!
+                                break;
+                            default:
+                                value = timeline.Value;
+                                break;
+                        }
+
+                        switch (animation.Channel)
+                        {
+                            case 3:
+                                sourceRotations[animation.JointIndex].X = value;
+                                break;
+                            case 4:
+                                sourceRotations[animation.JointIndex].Y = value;
+                                break;
+                            case 5:
+                                sourceRotations[animation.JointIndex].Z = value;
+                                break;
+                            case 6:
+                                sourceTranslations[animation.JointIndex].X = value;
+                                break;
+                            case 7:
+                                sourceTranslations[animation.JointIndex].Y = value;
+                                break;
+                            case 8:
+                                sourceTranslations[animation.JointIndex].Z = value;
+                                break;
+                        }
+                        break;
+                    }
+                }
+            }
 
             for (int x = 0; x < matrices.Length; x++)
             {
@@ -102,129 +205,13 @@ namespace OpenKh.Engine.Motion
                     absTranslation = absTranslationList[parent];
                 }
 
-                var TranslationX = oneBone.TranslationX;
-                var TranslationY = oneBone.TranslationY;
-                var TranslationZ = oneBone.TranslationZ;
-
-                var RotationX = oneBone.RotationX;
-                var RotationY = oneBone.RotationY;
-                var RotationZ = oneBone.RotationZ;
-
-                motion.StaticPose.Where(it => it.BoneIndex == x).ToList().ForEach(
-                    pose =>
-                    {
-                        switch (pose.Channel)
-                        {
-                            case 3:
-                                RotationX = pose.Value;
-                                break;
-                            case 4:
-                                RotationY = pose.Value;
-                                break;
-                            case 5:
-                                RotationZ = pose.Value;
-                                break;
-
-                            case 6:
-                                TranslationX = pose.Value;
-                                break;
-                            case 7:
-                                TranslationY = pose.Value;
-                                break;
-                            case 8:
-                                TranslationZ = pose.Value;
-                                break;
-                        }
-                    }
-                );
-
-                foreach (var boneAnim in motion.ModelBoneAnimation)
-                {
-                    if (x != boneAnim.JointIndex)
-                        continue;
-
-                    for (var i = boneAnim.TimelineCount - 1; i >= 0; i--)
-                    {
-                        var timeline = motion.Timeline[boneAnim.TimelineStartIndex + i];
-
-                        if (actualFrame >= timeline.KeyFrame)
-                        {
-                            Kh2.Motion.TimelineTable nextTimeline;
-                            if (i < boneAnim.TimelineCount - 1)
-                                nextTimeline = motion.Timeline[boneAnim.TimelineStartIndex + i + 1];
-                            else
-                                nextTimeline = motion.Timeline[boneAnim.TimelineStartIndex];
-
-                            var timeDiff = nextTimeline.KeyFrame - timeline.KeyFrame;
-                            var n = (actualFrame - timeline.KeyFrame) / timeDiff;
-                            float value;
-                            switch (timeline.Interpolation)
-                            {
-                                case Kh2.Motion.Interpolation.Nearest:
-                                    value = timeline.Value;
-                                    break;
-                                case Kh2.Motion.Interpolation.Linear:
-                                    value = Lerp(timeline.Value, nextTimeline.Value, n);
-                                    break;
-                                case Kh2.Motion.Interpolation.Hermite:
-                                    value = CubicHermite(n, timeline.Value, nextTimeline.Value,
-                                        timeline.TangentEaseIn, timeline.TangentEaseOut);
-                                    break;
-                                case Kh2.Motion.Interpolation.Zero:
-                                    value = 0; // EVIL!!1!
-                                    break;
-                                default:
-                                    value = timeline.Value;
-                                    break;
-                            }
-
-                            switch (boneAnim.Channel)
-                            {
-                                //case 0: // DUMMY - Replace with Scaling
-                                //    TranslationX = value;
-                                //    break;
-                                //case 1: // DUMMY - Replace with Scaling
-                                //    TranslationY = value;
-                                //    break;
-                                //case 2: // DUMMY - Replace with Scaling
-                                //    TranslationZ = value;
-                                //    break;
-
-                                case 3:
-                                    RotationX = value;
-                                    break;
-                                case 4:
-                                    RotationY = value;
-                                    break;
-                                case 5:
-                                    RotationZ = value;
-                                    break;
-
-                                case 6:
-                                    TranslationX = value;
-                                    break;
-                                case 7:
-                                    TranslationY = value;
-                                    break;
-                                case 8:
-                                    TranslationZ = value;
-                                    break;
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                var localTranslation = Vector3.Transform(new Vector3(TranslationX, TranslationY, TranslationZ), Matrix4x4.CreateFromQuaternion(absRotation));
+                var localTranslation = Vector3.Transform(sourceTranslations[x], Matrix4x4.CreateFromQuaternion(absRotation));
                 absTranslationList[x] = absTranslation + localTranslation;
 
                 var localRotation = Quaternion.Identity;
-                if (RotationZ != 0)
-                    localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitZ, RotationZ));
-                if (RotationY != 0)
-                    localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitY, RotationY));
-                if (RotationX != 0)
-                    localRotation *= (Quaternion.CreateFromAxisAngle(Vector3.UnitX, RotationX));
+                localRotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitZ, sourceRotations[x].Z);
+                localRotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitY, sourceRotations[x].Y);
+                localRotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitX, sourceRotations[x].X);
                 absRotationList[x] = absRotation * localRotation;
             }
 
