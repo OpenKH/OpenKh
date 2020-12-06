@@ -27,9 +27,16 @@ namespace OpenKh.Engine.Motion
             set
             {
                 _animationIndex = value;
-                //_animationIndex = 211;
-                var entry = _animEntries[_animationIndex];
-                var subEntries = Bar.Read(entry.Stream.SetPosition(0));
+                if (_animEntries == null ||  value < 0 || value >= _animEntries.Count ||
+                    !Bar.IsValid(_animEntries[value].Stream))
+                {
+                    // If it's not valid, just t-pose
+                    _motion = null;
+                    Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) not found. Using T-pose as default.");
+                    return;
+                }
+
+                var subEntries = Bar.Read(_animEntries[value].Stream.SetPosition(0));
                 var animationDataEntry = subEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Motion);
                 if (animationDataEntry != null)
                     _motion = Kh2.Motion.Read(animationDataEntry.Stream.SetPosition(0));
@@ -53,7 +60,9 @@ namespace OpenKh.Engine.Motion
 
         public void ApplyMotion(IModelMotion model, float time)
         {
-            if (CurrentMotion.IsRaw)
+            if (CurrentMotion == null)
+                model.ApplyMotion(model.InitialPose);
+            else if (CurrentMotion.IsRaw)
                 ApplyRawMotion(model, CurrentMotion.Raw, time);
             else
                 ApplyInterpolatedMotion(model, CurrentMotion.Interpolated, time);
