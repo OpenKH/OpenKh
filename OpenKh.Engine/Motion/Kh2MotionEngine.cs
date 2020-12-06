@@ -148,7 +148,26 @@ namespace OpenKh.Engine.Motion
 
                             var timeDiff = nextTimeline.KeyFrame - timeline.KeyFrame;
                             var n = (actualFrame - timeline.KeyFrame) / timeDiff;
-                            var value = Lerp(timeline.Value, nextTimeline.Value, n);
+                            float value;
+                            switch (timeline.Interpolation)
+                            {
+                                case Kh2.Motion.Interpolation.Nearest:
+                                    value = timeline.Value;
+                                    break;
+                                case Kh2.Motion.Interpolation.Linear:
+                                    value = Lerp(timeline.Value, nextTimeline.Value, n);
+                                    break;
+                                case Kh2.Motion.Interpolation.Hermite:
+                                    value = CubicHermite(n, timeline.Value, nextTimeline.Value,
+                                        timeline.TangentEaseIn, timeline.TangentEaseOut);
+                                    break;
+                                case Kh2.Motion.Interpolation.Zero:
+                                    value = 0; // EVIL!!1!
+                                    break;
+                                default:
+                                    value = timeline.Value;
+                                    break;
+                            }
 
                             switch (boneAnim.Channel)
                             {
@@ -214,6 +233,13 @@ namespace OpenKh.Engine.Motion
         private static float Lerp(float firstFloat, float secondFloat, float by)
         {
             return firstFloat * (1 - by) + secondFloat * by;
+        }
+
+        private static float CubicHermite(float t, float p0, float p1, float m0, float m1)
+        {
+            var t2 = t * t;
+            var t3 = t2 * t;
+            return (2 * t3 - 3 * t2 + 1) * p0 + (t3 - 2 * t2 + t) * m0 + (-2 * t3 + 3 * t2) * p1 + (t3 - t2) * m1;
         }
     }
 }
