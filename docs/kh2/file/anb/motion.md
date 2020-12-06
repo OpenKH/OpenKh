@@ -133,8 +133,8 @@ Formerly known as `T3`. This is responsible to link the [IK helpers](#inverse-ki
 | 0x00   | byte | Unknown
 | 0x01   | byte | Unknown
 | 0x02   | short| Model bone index
-| 0x04   | short| IK helper index
-| 0x06   | short| Unknown
+| 0x04   | short| [IK helper](#inverse-kinematic-helper) index
+| 0x06   | short| [Table 8](#table-8) index; -1 when not used
 | 0x08   | short| Unknown
 
 ### Joint definition
@@ -172,15 +172,34 @@ Formerly known as `T12`. Pool of values used to define a curve in a timeline. Ea
 
 ### Table 6
 
-Formerly known as `T6`. Purpose unknown. It seems to be always 0 length for most of the ANBs.
+Formerly known as `T6`. Purpose unknown. It seems to be a graph, where every node can point to multiple nodes.
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 0x00   | short |
+| 0x02   | short | Table 6 index or -1 when unused
+| 0x04   | float |
+| 0x08   | short | Table 6 index or -1 when unused
+| 0x0a   | short | Table 6 index or -1 when unused
 
 ### Table 7
 
-Formerly known as `T7`. Purpose unknown. It seems to be always 0 length for most of the ANBs.
+Formerly known as `T7`. Purpose unknown.
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 0x00   | short | [Table 6](#table-6) index
+| 0x02   | short |
+| 0x04   | short |
 
 ### Table 8
 
-Formerly known as `T8`. Purpose unknown. It seems to be always 0 length for most of the ANBs.
+Formerly known as `T8`. Purpose unknown. It is used by [IK Chain](#inverse-kinematic-chain).
+
+| Offset | Type    | Description
+|--------|---------|--------------
+| 0x00   | int     |
+| 0x04   | float[9]|
 
 ### Unknown table
 

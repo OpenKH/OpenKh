@@ -167,11 +167,6 @@ namespace OpenKh.Kh2
             public short BoneCount { get; set; }
             public int TotalFrameCount { get; set; }
             public int Unk48 { get; set; }
-            public int Table8Offset { get; set; }
-            public int Table7Offset { get; set; }
-            public int Table7Count { get; set; }
-            public int Table6Offset { get; set; }
-            public int Table6Count { get; set; }
             public float BoundingBoxMinX { get; set; }
             public float BoundingBoxMinY { get; set; }
             public float BoundingBoxMinZ { get; set; }
@@ -192,6 +187,9 @@ namespace OpenKh.Kh2
             public List<BoneAnimationTable> IKHelperAnimation { get; set; }
             public List<TimelineTable> Timeline { get; set; }
             public List<IKChainTable> IKChains { get; set; }
+            public List<UnknownTable8> Table8 { get; internal set; }
+            public List<UnknownTable7> Table7 { get; internal set; }
+            public List<UnknownTable6> Table6 { get; internal set; }
             public List<IKHelperTable> IKHelpers { get; set; }
             public List<JointTable> Joints { get; set; }
             public FooterTable Footer { get; internal set; }
@@ -257,8 +255,40 @@ namespace OpenKh.Kh2
             [Data] public byte Unk01 { get; set; }
             [Data] public short ModelBoneIndex { get; set; }
             [Data] public short IKHelperIndex { get; set; }
-            [Data] public short Unk06 { get; set; }
+            [Data] public short Table8Index { get; set; }
             [Data] public int Unk08 { get; set; }
+        }
+
+        public class UnknownTable8
+        {
+            [Data] public int Unk00 { get; set; }
+            [Data] public float Unk04 { get; set; }
+            [Data] public float Unk08 { get; set; }
+            [Data] public float Unk0c { get; set; }
+            [Data] public float Unk10 { get; set; }
+            [Data] public float Unk14 { get; set; }
+            [Data] public float Unk18 { get; set; }
+            [Data] public float Unk1c { get; set; }
+            [Data] public float Unk20 { get; set; }
+            [Data] public float Unk24 { get; set; }
+            [Data] public float Unk28 { get; set; }
+            [Data] public float Unk2c { get; set; }
+        }
+
+        public class UnknownTable7
+        {
+            [Data] public short Unk00 { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public float Unk04 { get; set; }
+        }
+
+        public class UnknownTable6
+        {
+            [Data] public short Unk00 { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public float Unk04 { get; set; }
+            [Data] public short Unk08 { get; set; }
+            [Data] public short Unk0a { get; set; }
         }
 
         public class JointTable
@@ -371,11 +401,6 @@ namespace OpenKh.Kh2
                     BoneCount = motion.BoneCount,
                     TotalFrameCount = motion.TotalFrameCount,
                     Unk48 = motion.Unk48,
-                    Table8Offset = motion.Table8Offset,
-                    Table7Offset = motion.Table7Offset,
-                    Table7Count = motion.Table7Count,
-                    Table6Offset = motion.Table6Offset,
-                    Table6Count = motion.Table6Count,
                     BoundingBoxMinX = motion.BoundingBoxMinX,
                     BoundingBoxMinY = motion.BoundingBoxMinY,
                     BoundingBoxMinZ = motion.BoundingBoxMinZ,
@@ -443,6 +468,25 @@ namespace OpenKh.Kh2
                 Interpolated.IKChains = Enumerable
                     .Range(0, motion.IKChainCount)
                     .Select(x => BinaryMapping.ReadObject<IKChainTable>(stream))
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.Table8Offset;
+                var estimatedTable8Count = (motion.Table7Offset - motion.Table8Offset) / 0x30;
+                Interpolated.Table8 = Enumerable
+                    .Range(0, estimatedTable8Count)
+                    .Select(x => BinaryMapping.ReadObject<UnknownTable8>(stream))
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.Table7Offset;
+                Interpolated.Table7 = Enumerable
+                    .Range(0, motion.Table7Count)
+                    .Select(x => BinaryMapping.ReadObject<UnknownTable7>(stream))
+                    .ToList();
+
+                stream.Position = ReservedSize + motion.Table6Offset;
+                Interpolated.Table6 = Enumerable
+                    .Range(0, motion.Table6Count)
+                    .Select(x => BinaryMapping.ReadObject<UnknownTable6>(stream))
                     .ToList();
 
                 stream.Position = ReservedSize + motion.IKHelperOffset;
@@ -560,11 +604,6 @@ namespace OpenKh.Kh2
                 BoneCount = motion.BoneCount,
                 TotalFrameCount = motion.TotalFrameCount,
                 Unk48 = motion.Unk48,
-                Table8Offset = motion.Table8Offset,
-                Table7Offset = motion.Table7Offset,
-                Table7Count = motion.Table7Count,
-                Table6Offset = motion.Table6Offset,
-                Table6Count = motion.Table6Count,
                 BoundingBoxMinX = motion.BoundingBoxMinX,
                 BoundingBoxMinY = motion.BoundingBoxMinY,
                 BoundingBoxMinZ = motion.BoundingBoxMinZ,
@@ -621,6 +660,24 @@ namespace OpenKh.Kh2
             header.IKChainCount = motion.IKChains.Count;
             header.IKChainOffset = (int)(stream.Position - ReservedSize);
             foreach (var item in motion.IKChains)
+                BinaryMapping.WriteObject(stream, item);
+
+            header.Unk48 = (int)(stream.Position - ReservedSize);
+
+            stream.AlignPosition(0x10);
+            header.Table8Offset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.Table8)
+                BinaryMapping.WriteObject(stream, item);
+
+            stream.AlignPosition(0x10);
+            header.Table7Count = motion.Table7.Count;
+            header.Table7Offset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.Table7)
+                BinaryMapping.WriteObject(stream, item);
+
+            header.Table6Count = motion.Table6.Count;
+            header.Table6Offset = (int)(stream.Position - ReservedSize);
+            foreach (var item in motion.Table6)
                 BinaryMapping.WriteObject(stream, item);
 
             stream.AlignPosition(0x10);
