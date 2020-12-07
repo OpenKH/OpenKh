@@ -143,7 +143,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipelines", "Pipelines", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Kh2AnimEmu", "OpenKh.Kh2AnimEmu\OpenKh.Kh2AnimEmu.csproj", "{DBDBCB21-AD60-4344-9E9A-600E1D36C845}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Research.Kh2Anim", "OpenKh.Research.Kh2Anim\OpenKh.Research.Kh2Anim.csproj", "{D4AF702B-145A-4052-B347-15166C43AB3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Research.Kh2Anim", "OpenKh.Research.Kh2Anim\OpenKh.Research.Kh2Anim.csproj", "{D4AF702B-145A-4052-B347-15166C43AB3F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

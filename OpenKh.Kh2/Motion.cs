@@ -187,12 +187,12 @@ namespace OpenKh.Kh2
             public List<BoneAnimationTable> IKHelperAnimation { get; set; }
             public List<TimelineTable> Timeline { get; set; }
             public List<IKChainTable> IKChains { get; set; }
-            public List<UnknownTable8> Table8 { get; internal set; }
-            public List<UnknownTable7> Table7 { get; internal set; }
-            public List<UnknownTable6> Table6 { get; internal set; }
+            public List<UnknownTable8> Table8 { get; set; }
+            public List<UnknownTable7> Table7 { get; set; }
+            public List<UnknownTable6> Table6 { get; set; }
             public List<IKHelperTable> IKHelpers { get; set; }
             public List<JointTable> Joints { get; set; }
-            public FooterTable Footer { get; internal set; }
+            public FooterTable Footer { get; set; }
         }
 
         public class StaticPoseTable
@@ -766,5 +766,36 @@ namespace OpenKh.Kh2
             writer.Write(matrix.M43);
             writer.Write(matrix.M44);
         }
+
+        private Motion(bool isRaw)
+        {
+            IsRaw = isRaw;
+            if (isRaw)
+            {
+                Raw = new RawMotion
+                {
+                    Matrices = new List<Matrix4x4[]>(),
+                };
+            }
+            else
+            {
+                Interpolated = new InterpolatedMotion
+                {
+                    Footer = new FooterTable(),
+                    IKChains = new List<IKChainTable>(),
+                    IKHelperAnimation = new List<BoneAnimationTable>(),
+                    IKHelpers = new List<IKHelperTable>(),
+                    Joints = new List<JointTable>(),
+                    ModelBoneAnimation = new List<BoneAnimationTable>(),
+                    StaticPose = new List<StaticPoseTable>(),
+                    Table6 = new List<UnknownTable6>(),
+                    Table7 = new List<UnknownTable7>(),
+                    Table8 = new List<UnknownTable8>(),
+                    Timeline = new List<TimelineTable>(),
+                };
+            }
+        }
+
+        public static Motion CreateInterpolatedFromScratch() => new Motion(false);
     }
 }
