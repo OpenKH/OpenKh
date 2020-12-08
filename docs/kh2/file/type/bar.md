@@ -104,7 +104,7 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 17 | [Animation Binary Archive (ANB)](../anb/anb.md) | `obj/*.mset`, `anm/*`
 | 18 | `PAX` Effect | A.FM - MAG - MDLX
 | 19 | `OWA` Map Collision Data | MAP
-| 20 | Moveset | MSET - limit/*
+| 20 | Motionset | MSET - limit/*
 | 21 | [`BOP` Background Object Placement](../map.md#bop) | MAP
 | 22 | Animation Loader | ARD - A.FM - limit/*
 | 23 | Model Collision | MDLX
