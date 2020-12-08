@@ -21,7 +21,7 @@ All the values are Little Endian in the PS2/PS4 Versions, while they are Big End
 | 0 | char[4] | The identifier of the file (Should be always 0x01524142) |
 | 4 | uint32_t | The sub-file count of the BAR File. |
 | 8 | uint32_t | Always zero. Padding for a lookup address at runtime.
-| 12 | int32_t | Unknown. Often 0. Some [MSET](../anb/mset.md) files set it to 1 or 2.
+| 12 | int32_t | [MSET type](../anb/mset.md#slot-system). Can be 0, 1 or 2.
 
 ### BAR Entry
 

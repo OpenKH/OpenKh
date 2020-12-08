@@ -1,12 +1,40 @@
-# [Kingdom Hearts II](../../index.md) - MSET (Moveset)
+# [Kingdom Hearts II](../../index.md) - MSET (Motion Set)
 
 An MSET file is a collection of [moves](anb.md), which contains animations and effects (I-frames, hitboxes, effects...).
-Internally it is a [BAR file](../type/bar.md) that contains a list of "slots". Each slot may or may not have a "motion".
-The various actions in the game point to a specific motion by a slot position in this list, thus many of the motions are dummies, since the characters only use some of them. Please refer to [slot names](#slot-names) to know more.
+Internally it is a [BAR file](../type/bar.md) that contains a list of "slots". Each slot may or may not have a "motion". The slot is the Nth entry, starting from 0, of a BAR entry. Keep in mind that the BAR's tag is ignored by the motion set system.
+The various actions in the game point to a specific motion by a slot position in this list, thus many of the motions are dummies, since the characters only use some of them. Please refer to [slot names](#motion-id-table) to know more.
 
-## Slot names
+## Slot system
 
-The following table has been dumped from the file `dbg/motion.bin`, used by the debug menu. The order on how those slots are load is influenced by the unknown flag in the [BAR Header](../type/bar.md#bar-header). For instance, Sora MSET P_EX100's slot 0 is idle, slot 4 is walking and slot 604 is the basic attack. The order of the following table is the one when the unknown BAR flag is set to `0` and it is currently not known how the slots are mapped with `1` or `2`.
+There is a very specific way on how a [Motion ID](#motion-id-table) is mapped to a specific slot inside a MSET. The mapping is defined by the MSET type, found in the [BAR Header](../type/bar.md#bar-header):
+
+| MSET Type | Description
+|-----------|-------------
+| 0         | Default
+| 1         | Player
+| 2         | RAW
+
+`Default` and `RAW` will map the motion ID table to a slot in order, meaning that when the game wants to load `RUN` it will load the 2nd slot in the MSET file. Although for `Player` it will act very differently. To understand it, it is necessary to know how the gameplay works for a player (used by playable characters and party members). A player can have four states:
+
+| In battle | Has weapon | Relative slot index
+|-----------|------------|---------------------
+| true      | true       | 0
+| true      | false      | 1
+| false     | false      | 2
+| false     | true       | 3
+
+The relative slot index will be added to the Motion ID multipled by 4: `relativeSlotIndex + motionId * 4`. Meaning that if the game wants to load `RUN` for a player that is not in battle but it is holding a weapon, the slot index will be 11 (`3 + 2 * 4`). But a player not always have a specific animation for every state and motion combination. They are called `DUMM` and they always have a file length of `0`. The game have a very clever fallback mechanic. One clear example is the motion `JUMP`, that always fall back to `18` regardles the state. This is the following fallback system, where each number is the relative slot index and the symbol `->` is the fallback when a dummy slot is found:
+
+* `3` -> `2` -> `0` -> `1`
+* `2` -> `3` -> `1` -> `0`
+* `1` -> `0` -> `2` -> `3`
+* `0` -> `1` -> `3` -> `2`
+
+If after those four attempts no slot with an actual animation is found, the game will internally return the slot index `-1`, that will T-pose the model rather than just crashing the game.
+
+## Motion ID table
+
+The following table, extracted from `dbg/motion.bin` is not compelte as it seems to not be updated with the Final Mix version of the game. For instance, `209` is the Roll aniamtion, but it's not present in this list. The list is used by the game's [debug menu](../../../remasters/15plus25/demo_debug.md).
 
 | Index | Name | Description
 |-------|------|-------------
