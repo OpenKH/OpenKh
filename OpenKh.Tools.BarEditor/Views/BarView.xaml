@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpenKh.Tools.BarEditor.Views"
         xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="300" Width="400"
+        Title="{Binding Title}" Height="340" Width="500"
         Drop="Window_Drop" AllowDrop="True">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -71,6 +71,14 @@
                 </MenuItem>
                 <MenuItem Header="Export _all..." Command="{Binding ExportAllCommand}"/>
             </MenuItem>
+            <MenuItem Header="_View">
+                <CheckBox
+                    Content="Show slot number"
+                    IsChecked="{Binding ShowSlotNumber}"/>
+                <CheckBox
+                    Content="Show moveset name"
+                    IsChecked="{Binding ShowMovesetName}"/>
+            </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" Command="{Binding AboutCommand}">
                     <MenuItem.Icon>
@@ -82,8 +90,8 @@
 
         <Grid Margin="10">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="5*"/>
-                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
             <DockPanel Grid.Column="0">
@@ -105,7 +113,7 @@
                 </Grid>
 
                 <DockPanel DockPanel.Dock="Bottom">
-                    <TextBlock VerticalAlignment="Center">Motionset</TextBlock>
+                    <TextBlock VerticalAlignment="Center">Motionset type</TextBlock>
                     <ComboBox Margin="5,5,0,5" 
                         ItemsSource="{Binding MotionsetTypes, Mode=OneTime}"
                         SelectedValue="{Binding MotionsetType, UpdateSourceTrigger=PropertyChanged}"
@@ -123,9 +131,9 @@
 
             <StackPanel Grid.Column="1" Margin="5 0 0 0"
                         IsEnabled="{Binding IsItemSelected}">
-                <TextBlock Text="Name"/>
+                <TextBlock Text="Tag"/>
                 <TextBox Margin="0 0 0 5"
-                         Text="{Binding SelectedItem.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                         Text="{Binding SelectedItem.Tag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Index"/>
                 <controls:NumericUpDown Margin="0 0 0 5"
                          Value="{Binding SelectedItem.Index, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -151,6 +159,12 @@
                               IsEnabled="{Binding IsItemSelected}"
                               Command="{Binding ExportCommand}"
                               CommandParameter="{Binding ExportFileName}"/>
+                </StackPanel>
+                <StackPanel Margin="10" Visibility="{Binding IsMsetInfoVisible}">
+                    <TextBlock>BW: In battle, Has weapon</TextBlock>
+                    <TextBlock>B_: In battle, No weapon</TextBlock>
+                    <TextBlock>__: Out battle, No weapon</TextBlock>
+                    <TextBlock>_W: Out battle, Has weapon</TextBlock>
                 </StackPanel>
             </StackPanel>
         </Grid>

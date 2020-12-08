@@ -1,4 +1,5 @@
 using OpenKh.Kh2;
+using OpenKh.Tools.BarEditor.Interfaces;
 using OpenKh.Tools.BarEditor.Models;
 using OpenKh.Tools.BarEditor.Services;
 using OpenKh.Tools.Common;
@@ -15,24 +16,24 @@ using Xe.Tools.Wpf.Models;
 
 namespace OpenKh.Tools.BarEditor.ViewModels
 {
-    public class BarViewModel : GenericListModel<BarEntryModel>
+    public class BarViewModel : GenericListModel<BarEntryModel>, IViewSettings
     {
         private static string ApplicationName = Utilities.GetApplicationName();
         private string _fileName;
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
         private readonly ToolInvokeDesc _toolInvokeDesc;
         private Bar.MotionsetType _motionsetType;
+        private bool _showSlotNumber;
+        private bool _showMovesetName;
 
         public static EnumModel<Bar.MotionsetType> MotionsetTypes { get; } = new EnumModel<Bar.MotionsetType>();
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
-        public BarViewModel() : this((IEnumerable<BarEntryModel>)null) { }
-
-        public BarViewModel(ToolInvokeDesc desc) :
-            this(Bar.Read(desc.SelectedEntry.Stream))
+        public BarViewModel(ToolInvokeDesc desc) : this()
         {
             _toolInvokeDesc = desc;
+            OpenStream(desc.SelectedEntry.Stream);
 
             NewCommand = new RelayCommand(x => { }, x => false);
             OpenCommand = new RelayCommand(x => { }, x => false);
@@ -52,12 +53,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             SaveAsCommand = new RelayCommand(x => { }, x => false);
         }
 
-        public BarViewModel(IEnumerable<Bar.Entry> list) :
-            this(list.Select(x => new BarEntryModel(x)))
-        { }
-
-        public BarViewModel(IEnumerable<BarEntryModel> list) :
-            base(list)
+        public BarViewModel() : base(new BarEntryModel[0])
         {
             Types = new EnumModel<Bar.EntryType>();
 
@@ -132,11 +128,9 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 
                 FileDialog.OnSave(fileName =>
                 {
-                    using (var fStream = File.OpenWrite(fileName))
-                    {
-                        SelectedItem.Entry.Stream.Position = 0;
-                        SelectedItem.Entry.Stream.CopyTo(fStream);
-                    }
+                    using var fStream = File.OpenWrite(fileName);
+                    SelectedItem.Entry.Stream.Position = 0;
+                    SelectedItem.Entry.Stream.CopyTo(fStream);
                 }, Filters, defaultFileName);
             }, x => IsItemSelected);
 
@@ -147,11 +141,9 @@ namespace OpenKh.Tools.BarEditor.ViewModels
                     foreach (var item in Items.Select(item => item.Entry))
                     {
                         var fileName = GetSuggestedFileName(item);
-                        using (var fStream = File.OpenWrite(Path.Combine(folder, fileName)))
-                        {
-                            item.Stream.Position = 0;
-                            item.Stream.CopyTo(fStream);
-                        }
+                        using var fStream = File.OpenWrite(Path.Combine(folder, fileName));
+                        item.Stream.Position = 0;
+                        item.Stream.CopyTo(fStream);
                     }
                 });
             }, x => true);
@@ -160,12 +152,10 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             {
                 FileDialog.OnOpen(fileName =>
                 {
-                    using (var fStream = File.OpenRead(fileName))
-                    {
-                        var memStream = new MemoryStream((int)fStream.Length);
-                        fStream.CopyTo(memStream);
-                        SelectedItem.Entry.Stream = memStream;
-                    }
+                    var fStream = File.OpenRead(fileName);
+                    var memStream = new MemoryStream((int)fStream.Length);
+                    fStream.CopyTo(memStream);
+                    SelectedItem.Entry.Stream = memStream;
 
                     OnPropertyChanged(nameof(SelectedItem));
                 }, Filters);
@@ -174,15 +164,23 @@ namespace OpenKh.Tools.BarEditor.ViewModels
 
         public void OpenFileName(string fileName)
         {
-            using (var stream = File.Open(fileName, FileMode.Open))
+            using var stream = File.Open(fileName, FileMode.Open);
+            OpenStream(stream);
+        }
+
+        private void OpenStream(Stream stream)
+        {
+            Items.Clear();
+
+            var binarc = Bar.Read(stream);
+            ShowMovesetName = AutodetectMsetFile(binarc);
+            ShowSlotNumber = ShowMovesetName;
+
+            MotionsetType = binarc.Motionset;
+
+            foreach (var item in binarc)
             {
-                Items.Clear();
-                var binarc = Bar.Read(stream);
-                MotionsetType = binarc.Motionset;
-                foreach (var item in binarc)
-                {
-                    Items.Add(new BarEntryModel(item));
-                }
+                Items.Add(new BarEntryModel(item, this));
             }
         }
 
@@ -191,11 +189,9 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             var memoryStream = new MemoryStream();
             Bar.Write(memoryStream, Items.Select(item => item.Entry), MotionsetType);
 
-            using (var stream = File.Open(fileName, FileMode.Create))
-            {
-                memoryStream.Position = 0;
-                memoryStream.CopyTo(stream);
-            }
+            using var stream = File.Open(fileName, FileMode.Create);
+            memoryStream.Position = 0;
+            memoryStream.CopyTo(stream);
         }
 
         private string GetTemporaryFileName(string actualFileName)
@@ -237,9 +233,15 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             set
             {
                 _motionsetType = value;
+                InvalidateBarEntryTags();
                 OnPropertyChanged(nameof(MotionsetType));
+                OnPropertyChanged(nameof(IsMsetInfoVisible));
             }
         }
+
+        public Visibility IsMsetInfoVisible =>
+            MotionsetType == Bar.MotionsetType.Player &&
+            ShowMovesetName == true ? Visibility.Visible : Visibility.Collapsed;
 
         public RelayCommand NewCommand { get; set; }
         public RelayCommand OpenCommand { get; set; }
@@ -257,12 +259,45 @@ namespace OpenKh.Tools.BarEditor.ViewModels
         public string ExportFileName => IsItemSelected ?
             GetSuggestedFileName(SelectedItem.Entry) : string.Empty;
 
+        public bool IsPlayer => MotionsetType != Bar.MotionsetType.Default;
+
+        public bool ShowSlotNumber
+        {
+            get => _showSlotNumber;
+            set
+            {
+                _showSlotNumber = value;
+                InvalidateBarEntryTags();
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ShowMovesetName
+        {
+            get => _showMovesetName;
+            set
+            {
+                _showMovesetName = value;
+                InvalidateBarEntryTags();
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsMsetInfoVisible));
+            }
+        }
+
+        public int GetSlotIndex(BarEntryModel item) => Items.IndexOf(item);
+
+        private void InvalidateBarEntryTags()
+        {
+            foreach (var item in Items)
+                item.InvalidateTag();
+        }
+
         protected override BarEntryModel OnNewItem()
         {
             return new BarEntryModel(new Bar.Entry()
             {
                 Stream = new MemoryStream()
-            });
+            }, this);
         }
 
         protected override void OnSelectedItem(BarEntryModel item)
@@ -274,6 +309,19 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             OpenItemCommand.CanExecute(SelectedItem);
 
             OnPropertyChanged(nameof(ExportFileName));
+        }
+
+        private static bool AutodetectMsetFile(Bar binarc)
+        {
+            // When the motionset type is not default, it's easy to assume it's a MSET.
+            if (binarc.Motionset != Bar.MotionsetType.Default)
+                return true;
+
+            // When not, we need to make an assumption. For example a MSET usually
+            // contains a bunch of ANB. We can say that if we find mroe tha N ANB
+            // entries then it's a MSET.
+            const int AnbCountAssumption = 4;
+            return binarc.Count(x => x.Type == Bar.EntryType.Anb) >= AnbCountAssumption;
         }
     }
 }
