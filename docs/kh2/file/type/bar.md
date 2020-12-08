@@ -21,7 +21,7 @@ All the values are Little Endian in the PS2/PS4 Versions, while they are Big End
 | 0 | char[4] | The identifier of the file (Should be always 0x01524142) |
 | 4 | uint32_t | The sub-file count of the BAR File. |
 | 8 | uint32_t | Always zero. Padding for a lookup address at runtime.
-| 12 | int32_t | Unknown. Often 0. Some [MSET](../anb/mset.md) files set it to 1 or 2.
+| 12 | int32_t | [MSET type](../anb/mset.md#slot-system). Can be 0, 1 or 2.
 
 ### BAR Entry
 
@@ -104,7 +104,7 @@ Keep in mind that this list is still incomplete and will be changed over the cou
 | 17 | [Animation Binary Archive (ANB)](../anb/anb.md) | `obj/*.mset`, `anm/*`
 | 18 | `PAX` Effect | A.FM - MAG - MDLX
 | 19 | `OWA` Map Collision Data | MAP
-| 20 | Moveset | MSET - limit/*
+| 20 | Motionset | MSET - limit/*
 | 21 | [`BOP` Background Object Placement](../map.md#bop) | MAP
 | 22 | Animation Loader | ARD - A.FM - limit/*
 | 23 | Model Collision | MDLX

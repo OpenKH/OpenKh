@@ -30,7 +30,7 @@ namespace OpenKh.Command.Bar
                 [EntryType.Anb] = "anb",
                 [EntryType.Pax] = "pax",
                 [EntryType.MapCollision2] = "owa",
-                [EntryType.AnimationLimit] = "animlimit",
+                [EntryType.Motionset] = "mset",
                 [EntryType.BgObjPlacement] = "bop",
                 [EntryType.AnimationLoader] = "animload",
                 [EntryType.ModelCollision] = "coctmodel",
