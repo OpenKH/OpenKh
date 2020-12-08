@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +11,7 @@ namespace OpenKh.Command.Bar
         internal class BarRoot
         {
             [JsonProperty] public string OriginalFileName { get; set; }
-
+            [JsonProperty] public  Kh2.Bar.MotionsetType Motionset { get; set; }
             [JsonProperty] public List<BarDesc> Entries { get; set; }
         }
 
@@ -29,7 +29,7 @@ namespace OpenKh.Command.Bar
         private const string InvalidBarText = "The specified file is not a BAR file.";
         internal static readonly Exception InvalidBarFileException = new InvalidDataException(InvalidBarText);
 
-        public static List<Kh2.Bar.Entry> ReadEntries(string fileName)
+        public static Kh2.Bar ReadEntries(string fileName)
         {
             using var stream = File.OpenRead(fileName);
             if (!Kh2.Bar.IsValid(stream))
@@ -41,11 +41,12 @@ namespace OpenKh.Command.Bar
 
         public static void ExportProject(string inputFileName, string outputFolder, bool suppress = false)
         {
-            var barEntries = ReadEntries(inputFileName);
+            var binarc = ReadEntries(inputFileName);
             var project = new BarRoot
             {
                 OriginalFileName = Path.GetFileName(inputFileName),
-                Entries = barEntries
+                Motionset = binarc.Motionset,
+                Entries = binarc
                     .Select(x => new BarDesc
                     {
                         FileName = $"{x.Name}.{Helpers.GetSuggestedExtension(x.Type)}",
@@ -92,7 +93,7 @@ namespace OpenKh.Command.Bar
             }
         }
 
-        public static IEnumerable<Kh2.Bar.Entry> ImportProject(string inputProjectName, out string originalFileName)
+        public static Kh2.Bar ImportProject(string inputProjectName, out string originalFileName)
         {
             var baseDirectory = Path.GetDirectoryName(inputProjectName);
             var project = JsonConvert.DeserializeObject<BarRoot>(File.ReadAllText(inputProjectName));
@@ -103,14 +104,20 @@ namespace OpenKh.Command.Bar
                 .ToDictionary(x => x.FileName,
                     x => File.OpenRead(Path.Combine(baseDirectory, x.FileName)));
 
-            return project.Entries
+            var binarc = new Kh2.Bar
+            {
+                Motionset = project.Motionset
+            };
+            binarc.AddRange(project.Entries
                 .Select(x => new Kh2.Bar.Entry
                 {
                     Name = x.InternalName,
                     Type = (Kh2.Bar.EntryType)x.TypeId,
                     Index = x.LinkIndex,
                     Stream = x.LinkIndex == 0 ? streams[x.FileName] : null
-                });
+                }));
+
+            return binarc;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Tools.BarEditor.Models;
 using OpenKh.Tools.BarEditor.Services;
 using OpenKh.Tools.Common;
@@ -21,7 +21,9 @@ namespace OpenKh.Tools.BarEditor.ViewModels
         private string _fileName;
         private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
         private readonly ToolInvokeDesc _toolInvokeDesc;
-        private int _barFlags;
+        private Bar.MotionsetType _motionsetType;
+
+        public static EnumModel<Bar.MotionsetType> MotionsetTypes { get; } = new EnumModel<Bar.MotionsetType>();
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
@@ -38,7 +40,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             {
                 var memoryStream = new MemoryStream();
 
-                Bar.Write(memoryStream, Items.Select(item => item.Entry), BarFlags);
+                Bar.Write(memoryStream, Items.Select(item => item.Entry), MotionsetType);
 
                 var stream = _toolInvokeDesc.SelectedEntry.Stream;
 
@@ -63,7 +65,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             {
                 FileName = "untitled.bar";
                 Items.Clear();
-                BarFlags = 0;
+                MotionsetType = 0;
             }, x => true);
 
             OpenCommand = new RelayCommand(x =>
@@ -175,9 +177,9 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             using (var stream = File.Open(fileName, FileMode.Open))
             {
                 Items.Clear();
-                var barContainer = Bar.ReadBarContainer(stream);
-                BarFlags = barContainer.Flags;
-                foreach (var item in barContainer.Entries)
+                var binarc = Bar.Read(stream);
+                MotionsetType = binarc.Motionset;
+                foreach (var item in binarc)
                 {
                     Items.Add(new BarEntryModel(item));
                 }
@@ -187,7 +189,7 @@ namespace OpenKh.Tools.BarEditor.ViewModels
         private void SaveToFile(string fileName)
         {
             var memoryStream = new MemoryStream();
-            Bar.Write(memoryStream, Items.Select(item => item.Entry), BarFlags);
+            Bar.Write(memoryStream, Items.Select(item => item.Entry), MotionsetType);
 
             using (var stream = File.Open(fileName, FileMode.Create))
             {
@@ -229,13 +231,13 @@ namespace OpenKh.Tools.BarEditor.ViewModels
             }
         }
 
-        public int BarFlags
+        public Bar.MotionsetType MotionsetType
         {
-            get => _barFlags;
+            get => _motionsetType;
             set
             {
-                _barFlags = value;
-                OnPropertyChanged(nameof(BarFlags));
+                _motionsetType = value;
+                OnPropertyChanged(nameof(MotionsetType));
             }
         }
 
