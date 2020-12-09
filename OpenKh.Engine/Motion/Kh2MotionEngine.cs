@@ -1,7 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -9,17 +8,18 @@ namespace OpenKh.Engine.Motion
 {
     public class Kh2MotionEngine : IMotionEngine
     {
-        private readonly List<Bar.Entry> _animEntries;
+        private readonly Bar _binarc;
         private int _animationIndex;
+        private int _slotIndex;
         private Kh2.Motion _motion;
 
-        public Kh2MotionEngine(List<Bar.Entry> entries)
+        public Kh2MotionEngine(Bar binarc)
         {
-            _animEntries = entries;
+            _binarc = binarc;
             _animationIndex = -1;
         }
 
-        public int AnimationCount => _animEntries.Count;
+        public int AnimationCount => _binarc.Count;
 
         public int CurrentAnimationIndex
         {
@@ -27,34 +27,38 @@ namespace OpenKh.Engine.Motion
             set
             {
                 _animationIndex = value;
-                if (_animEntries == null ||  value < 0 || value >= _animEntries.Count ||
-                    !Bar.IsValid(_animEntries[value].Stream))
+                _slotIndex = _binarc.Motionset == Bar.MotionsetType.Default ? _animationIndex :
+                    MotionSet.GetMotionSetIndex(_binarc, (MotionSet.MotionName)_animationIndex, false, false);
+                if (_slotIndex >= 0 && _binarc[_slotIndex].Stream.Length > 0)
                 {
-                    // If it's not valid, just t-pose
+                    var subEntries = Bar.Read(_binarc[_slotIndex].Stream.SetPosition(0));
+                    var animationDataEntry = subEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Motion);
+                    if (animationDataEntry != null)
+                        _motion = Kh2.Motion.Read(animationDataEntry.Stream.SetPosition(0));
+                    else
+                        Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) does not contain any {Bar.EntryType.Motion}");
+
+                    var animationBinaryEntry = subEntries.FirstOrDefault(x => x.Type == Bar.EntryType.MotionTriggers);
+                    if (animationDataEntry != null)
+                    {
+                        // We do not have any ANB parser
+                    }
+                    else
+                        Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) does not contain any {Bar.EntryType.MotionTriggers}");
+                }
+                else
+                {
+                    Console.Error.WriteLine($"MSET animation {_animationIndex} ({CurrentAnimationShortName}) not found. Falling back to T-pose.");
+                    _slotIndex = -1;
                     _motion = null;
-                    Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) not found. Using T-pose as default.");
-                    return;
                 }
-
-                var subEntries = Bar.Read(_animEntries[value].Stream.SetPosition(0));
-                var animationDataEntry = subEntries.FirstOrDefault(x => x.Type == Bar.EntryType.Motion);
-                if (animationDataEntry != null)
-                    _motion = Kh2.Motion.Read(animationDataEntry.Stream.SetPosition(0));
-                else
-                    Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) does not contain any {Bar.EntryType.Motion}");
-
-                var animationBinaryEntry = subEntries.FirstOrDefault(x => x.Type == Bar.EntryType.MotionTriggers);
-                if (animationDataEntry != null)
-                {
-                    // We do not have any ANB parser
-                }
-                else
-                    Console.Error.WriteLine($"MSET animation {CurrentAnimationIndex} ({CurrentAnimationShortName}) does not contain any {Bar.EntryType.MotionTriggers}");
             }
         }
 
+        public int CurrentSlotIndex => _slotIndex;
+
         public string CurrentAnimationShortName =>
-            _animEntries[_animationIndex].Name;
+            _animationIndex >= 0 ? ((MotionSet.MotionName)_animationIndex).ToString() : "dummy";
 
         public Kh2.Motion CurrentMotion => _motion;
 
