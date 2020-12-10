@@ -21,3 +21,10 @@ Right now the documentation contains info about the following games:
     * [TM2 PlayStation 2 textures](common/tm2.md)
     * [PS4 HD assets](common/hdassets.md)
  * [Tools](tool/index.md)
+
+* Other
+    * [Kingdom Hearts Chain of Memories](com/index.md)
+    * [Kingdom Hearts Coded](other/coded/index.md)
+    * [Kingdom Hearts Ds games](khds/common/index.md)
+    * [Kingdom Hearts V-Cast](other/vcast/index.md)
+    * [Kingdom Hearts VR](other/vr/index.md)
