@@ -1,6 +1,7 @@
-﻿using NLog;
+using NLog;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Kh2;
+using OpenKh.Kh2.TextureFooter;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -50,6 +51,23 @@ namespace OpenKh.Command.MapGen.Utils
                     .Select(matDef => new ImageSet { image = imageLoader(matDef), matDef = matDef, })
                     .ToArray();
 
+                var footerData = new MemoryStream();
+                {
+                    var footer = new TextureFooterData();
+                    foreach (var uvscItem in config.uvscList)
+                    {
+                        footer.UvscList.Add(
+                            new UvScroll
+                            {
+                                TextureIndex = uvscItem.index,
+                                UScrollSpeed = uvscItem.u,
+                                VScrollSpeed = uvscItem.v,
+                            }
+                        );
+                    }
+                    footer.Write(footerData);
+                }
+
                 var build = new ModelTexture.Build
                 {
                     images = imageSets
@@ -81,6 +99,8 @@ namespace OpenKh.Command.MapGen.Utils
                             }
                         )
                         .ToArray(),
+
+                    footerData = footerData.ToArray(),
                 };
 
                 modelTex = new ModelTexture(build);
@@ -266,6 +286,8 @@ namespace OpenKh.Command.MapGen.Utils
                                 0,
                             },
                             IsTransparentFlag = smallMesh.matDef.transparentFlag ?? 0,
+                            EnableUvsc = smallMesh.matDef.uvscIndex.HasValue,
+                            UvscIndex = smallMesh.matDef.uvscIndex ?? 0,
                         }
                     );
                 }

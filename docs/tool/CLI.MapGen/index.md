@@ -154,6 +154,15 @@ textureOptions:
     addressV: 'Repeat'
 ```
 
+### uvscList
+
+```yml
+uvscList:
+  - index: 0
+    u: 64000000
+    v: 64000000
+```
+
 ### disableTriangleStripsOptimization
 
 ```yml
@@ -265,6 +274,13 @@ skipConversionIfExists: true
 # Specify true if you want to reuse `.imd` file converted by ImgTool.
 # This is useful if diffuse texture file path is `images/tex.png`, and omit re-conversion.
 reuseImd: true
+```
+
+### uvscIndex
+
+```yml
+- name: 'six'
+  uvscIndex: 0
 ```
 
 ### bar

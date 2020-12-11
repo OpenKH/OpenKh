@@ -66,6 +66,8 @@ namespace OpenKh.Command.MapGen.Models
 
         public short? transparentFlag { get; set; }
 
+        public int? uvscIndex { get; set; }
+
         public static MaterialDef CreateFallbackFor(string name) =>
             new MaterialDef
             {

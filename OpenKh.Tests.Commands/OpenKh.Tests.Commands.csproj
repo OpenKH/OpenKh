@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -17,6 +17,7 @@
     <ProjectReference Include="..\OpenKh.Command.CoctChanger\OpenKh.Command.CoctChanger.csproj" />
     <ProjectReference Include="..\OpenKh.Command.DoctChanger\OpenKh.Command.DoctChanger.csproj" />
     <ProjectReference Include="..\OpenKh.Command.MapGen\OpenKh.Command.MapGen.csproj" />
+    <ProjectReference Include="..\OpenKh.Command.TexFooter\OpenKh.Command.TexFooter.csproj" />
   </ItemGroup>
 
   <ItemGroup>

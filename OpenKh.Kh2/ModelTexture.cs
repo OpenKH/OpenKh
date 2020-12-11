@@ -58,8 +58,10 @@ namespace OpenKh.Kh2
             {
                 switch (PixelFormat)
                 {
-                    case PixelFormat.Indexed8: return GetClut8(_palette, _cbp, _csa);
-                    case PixelFormat.Indexed4: return GetClut4(_palette, _cbp, _csa);
+                    case PixelFormat.Indexed8:
+                        return GetClut8(_palette, _cbp, _csa);
+                    case PixelFormat.Indexed4:
+                        return GetClut4(_palette, _cbp, _csa);
                     default:
                         throw new NotSupportedException($"The format {PixelFormat} is not supported or does not contain any palette.");
                 }
@@ -404,7 +406,10 @@ namespace OpenKh.Kh2
         private byte[] OffsetData { get; }
         private byte[] PictureData { get; }
         private byte[] PaletteData { get; }
-        private byte[] FooterData { get; }
+        private byte[] FooterData { get; set; }
+
+        public byte[] GetFooterData() => FooterData ?? new byte[0];
+        public void SetFooterData(byte[] data) => FooterData = data;
 
         private const int ClutBasePtr = 0x2C00;
         private const int TexBasePtr = 0x3000;
@@ -480,6 +485,7 @@ namespace OpenKh.Kh2
             public byte[] offsetData;
             public IList<UserDataTransferInfo> textureTransfer;
             public IList<UserGsInfo> gsInfo;
+            public byte[] footerData;
         }
 
         public class UserDataTransferInfo
@@ -653,7 +659,7 @@ namespace OpenKh.Kh2
 
             PictureData = picData.ToArray();
             PaletteData = palData.ToArray();
-            FooterData = Encoding.ASCII.GetBytes("_KN5");
+            FooterData = build.footerData ?? Encoding.ASCII.GetBytes("_KN5");
 
             var clutQWC = Convert.ToInt32(palData.Length / 16);
 
@@ -690,8 +696,10 @@ namespace OpenKh.Kh2
         {
             switch (pixelFormat)
             {
-                case PixelFormat.Indexed4: return Tm2.GsPSM.GS_PSMT4;
-                case PixelFormat.Indexed8: return Tm2.GsPSM.GS_PSMT8;
+                case PixelFormat.Indexed4:
+                    return Tm2.GsPSM.GS_PSMT4;
+                case PixelFormat.Indexed8:
+                    return Tm2.GsPSM.GS_PSMT8;
             }
             throw new NotSupportedException();
         }
@@ -777,7 +785,7 @@ namespace OpenKh.Kh2
             var paletteOffset = (int)stream.Position;
             stream.Write(PaletteData);
 
-            stream.Write(FooterData);
+            stream.Write(FooterData ?? new byte[0]);
 
             var writer = new BinaryWriter(stream.SetPosition(0));
             writer.Write(MagicCode);
@@ -856,8 +864,10 @@ namespace OpenKh.Kh2
         {
             switch (psm)
             {
-                case Tm2.GsPSM.GS_PSMT8: return PixelFormat.Indexed8;
-                case Tm2.GsPSM.GS_PSMT4: return PixelFormat.Indexed4;
+                case Tm2.GsPSM.GS_PSMT8:
+                    return PixelFormat.Indexed8;
+                case Tm2.GsPSM.GS_PSMT4:
+                    return PixelFormat.Indexed4;
                 default:
                     throw new NotSupportedException($"GsPSM format {psm} not supported");
             }
