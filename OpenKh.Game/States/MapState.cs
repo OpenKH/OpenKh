@@ -69,6 +69,7 @@ namespace OpenKh.Game.States
             _spawnId = initDesc.StateSettings.GetInt("SpawnId", 99);
             _field = new Kh2Field(
                 Kernel,
+                _camera,
                 initDesc.StateSettings,
                 _graphics.GraphicsDevice,
                 _shader);

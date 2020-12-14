@@ -83,7 +83,7 @@ namespace OpenKh.Game.Entities
                 }
                 else
                 {
-                    Motion = null;
+                    Motion = new Kh2MotionEngine();
                     Log.Warn($"MSET {objEntry.AnimationName} does not exist");
                 }
             }

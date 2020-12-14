@@ -1,6 +1,7 @@
 using OpenKh.Engine;
 using OpenKh.Engine.MonoGame;
 using System;
+using System.Numerics;
 
 namespace OpenKh.Game.Infrastructure
 {
@@ -10,12 +11,16 @@ namespace OpenKh.Game.Infrastructure
         void Draw();
 
         void ForEveryModel(Action<IEntity, IMonoGameModel> action);
-        void AddActor(int objectId);
+        void AddActor(int actorId, int objectId);
+        void SetActorPosition(int actorId, float x, float y, float z, float rotation);
+        void SetActorAnimation(int actorId, string path);
         void RemoveAllActors();
+
+        void SetCamera(Vector3 position, Vector3 something, float a, float b);
 
         void FadeToBlack(float seconds);
         void FadeToWhite(float seconds);
         void FadeFromBlack(float seconds);
-        void FrameFromWhite(float seconds);
+        void FadeFromWhite(float seconds);
     }
 }

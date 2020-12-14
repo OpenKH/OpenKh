@@ -12,15 +12,18 @@ using OpenKh.Kh2.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using n = System.Numerics;
 
 namespace OpenKh.Game.Infrastructure
 {
     public class Kh2Field : IField
     {
         private readonly Kernel _kernel;
+        private readonly Camera _camera;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly KingdomShader _shader;
         private readonly List<ObjectEntity> _actors = new List<ObjectEntity>();
+        private readonly Dictionary<int, ObjectEntity> _actorIds = new Dictionary<int, ObjectEntity>();
 
         private Bar _binarcArd;
         private EventPlayer _eventPlayer;
@@ -37,11 +40,13 @@ namespace OpenKh.Game.Infrastructure
 
         public Kh2Field(
             Kernel kernel,
+            Camera camera,
             Dictionary<string, string> settings,
             GraphicsDevice graphicsDevice,
             KingdomShader shader)
         {
             _kernel = kernel;
+            _camera = camera;
             _graphicsDevice = graphicsDevice;
             _shader = shader;
 
@@ -75,6 +80,8 @@ namespace OpenKh.Game.Infrastructure
             {
                 _eventPlayer = new EventPlayer(this, Event.Read(stream));
                 RemoveAllActors();
+
+                _eventPlayer.Initialize();
             });
         }
 
@@ -102,9 +109,38 @@ namespace OpenKh.Game.Infrastructure
                 action(actor, actor);
         }
 
-        public void AddActor(int objectId)
+        public void AddActor(int actorId, int objectId)
         {
+            var entity = new ObjectEntity(_kernel, objectId);
+            entity.LoadMesh(_graphicsDevice);
 
+            _actors.Add(entity);
+            _actorIds[actorId] = entity;
+        }
+
+        public void SetActorPosition(int actorId, float x, float y, float z, float rotation)
+        {
+            var actor = _actorIds[actorId];
+            actor.Position = new n.Vector3(x, y, z);
+            actor.Rotation = new n.Vector3(0, (float)(rotation * Math.PI / 180) , 0);
+        }
+
+        public void SetActorAnimation(int actorId, string path)
+        {
+            var realPath = GetAnbPath(path);
+            if (_kernel.DataContent.FileExists(realPath))
+            {
+                var binarc = _kernel.DataContent.FileOpen(realPath).Using(Bar.Read);
+                binarc.ForEntry(x => x.Type == Bar.EntryType.Motion, stream =>
+                {
+                    _actorIds[actorId].Motion.UseCustomMotion(Motion.Read(stream));
+                    return true;
+                });
+            }
+            else
+            {
+                _actorIds[actorId].Motion.UseCustomMotion(null);
+            }
         }
 
         public void AddActor(SpawnPoint.Entity entityDesc)
@@ -117,7 +153,20 @@ namespace OpenKh.Game.Infrastructure
 
         public void RemoveAllActors()
         {
+            foreach (var actor in _actors)
+            {
+                foreach (var texture in actor.Textures)
+                    texture.Dispose();
+            }
+
+            _actorIds.Clear();
             _actors.Clear();
+        }
+
+        public void SetCamera(n.Vector3 position, n.Vector3 something, float a, float b)
+        {
+            //_camera.CameraPosition =
+            //    new Vector3(position.X, position.Y, position.Z);
         }
 
         public void FadeToBlack(float seconds)
@@ -148,7 +197,7 @@ namespace OpenKh.Game.Infrastructure
             _fadeEndColor = new Color(0, 0, 0, 0.0f);
         }
 
-        public void FrameFromWhite(float seconds)
+        public void FadeFromWhite(float seconds)
         {
             _isFading = true;
             _fadeCurrent = 0;
@@ -245,6 +294,23 @@ namespace OpenKh.Game.Infrastructure
                         break;
                 }
             }
+        }
+
+        private string GetAnbPath(string path)
+        {
+            if (_kernel.IsReMix)
+            {
+                switch (_kernel.RegionId)
+                {
+                    case 0: // jp
+                    case Constants.RegionFinalMix: // fm
+                        return $"anm/fm/{path}.anb";
+                    default:
+                        return $"anm/us/{path}.anb";
+                }
+            }
+            else
+                return $"anm/{path}.anb";
         }
     }
 }

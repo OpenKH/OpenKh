@@ -419,7 +419,8 @@ namespace OpenKh.Kh2.Ard
                     var startPosition = stream.Position;
                     var type = stream.ReadInt16();
                     var blockLength = stream.ReadInt16();
-                    Loads.Add(_loadType[type](stream));
+                    if (_loadType.TryGetValue(type, out var read))
+                        Loads.Add(read(stream));
                     stream.Position = startPosition + blockLength;
                 }
             }

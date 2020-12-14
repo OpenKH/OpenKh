@@ -13,13 +13,19 @@ namespace OpenKh.Engine.Motion
         private int _slotIndex;
         private Kh2.Motion _motion;
 
+        public Kh2MotionEngine()
+        {
+            _binarc = null;
+            _animationIndex = -1;
+        }
+
         public Kh2MotionEngine(Bar binarc)
         {
             _binarc = binarc;
             _animationIndex = -1;
         }
 
-        public int AnimationCount => _binarc.Count;
+        public int AnimationCount => _binarc?.Count ?? 0;
 
         public int CurrentAnimationIndex
         {
@@ -27,6 +33,12 @@ namespace OpenKh.Engine.Motion
             set
             {
                 _animationIndex = value;
+                if (_binarc == null)
+                {
+                    Console.Error.WriteLine($"Does not have a MSET.");
+                    return;
+                }
+
                 _slotIndex = _binarc.Motionset == Bar.MotionsetType.Default ? _animationIndex :
                     MotionSet.GetMotionSetIndex(_binarc, (MotionSet.MotionName)_animationIndex, false, false);
                 if (_slotIndex >= 0 && _binarc[_slotIndex].Stream.Length > 0)
@@ -230,5 +242,7 @@ namespace OpenKh.Engine.Motion
 
             model.ApplyMotion(matrices);
         }
+
+        public void UseCustomMotion(Kh2.Motion motion) => _motion = motion;
     }
 }
