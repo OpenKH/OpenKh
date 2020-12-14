@@ -26,7 +26,7 @@
 | DPP | Special Effects Header; example: eveffect/al/al\_000.dpp
 | DPX | Special Effects; example: nm08.dpx
 | EV | Unknown; example: gameover.ev
-| EVM | Unknown; example: al01\_al011.evm
+| EVM | Event Motion Data (Cutscene Animations); example: al01\_al011.evm
 | IMG | World Image Data; example: aw00\_01.img
 | IMG (1) | Raw (TIM2) Image Archive; example: title/title.img
 | KMB | Unknown; example: menu/md\_anthem.kmb
