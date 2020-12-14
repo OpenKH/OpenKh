@@ -14,6 +14,7 @@ namespace OpenKh.Game.Infrastructure
         void AddActor(int actorId, int objectId);
         void SetActorPosition(int actorId, float x, float y, float z, float rotation);
         void SetActorAnimation(int actorId, string path);
+        void SetActorVisibility(int actorId, bool visibility);
         void RemoveAllActors();
 
         void SetCamera(Vector3 position, Vector3 lookAt, float fieldOfView, float roll);

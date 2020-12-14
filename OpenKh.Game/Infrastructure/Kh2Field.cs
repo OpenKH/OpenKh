@@ -129,7 +129,7 @@ namespace OpenKh.Game.Infrastructure
         public void Update(double deltaTime)
         {
             _eventPlayer?.Update(deltaTime);
-            foreach (var entity in _actors.Where(x => x.IsMeshLoaded))
+            foreach (var entity in _actors.Where(x => x.IsMeshLoaded && x.IsVisible))
                 entity.Update((float)deltaTime);
 
             if (_isFading)
@@ -150,7 +150,7 @@ namespace OpenKh.Game.Infrastructure
 
         public void ForEveryModel(Action<IEntity, IMonoGameModel> action)
         {
-            foreach (var actor in _actors)
+            foreach (var actor in _actors.Where(x => x.IsVisible))
                 action(actor, actor);
         }
 
@@ -186,6 +186,11 @@ namespace OpenKh.Game.Infrastructure
             {
                 _actorIds[actorId].Motion.UseCustomMotion(null);
             }
+        }
+
+        public void SetActorVisibility(int actorId, bool visibility)
+        {
+            _actorIds[actorId].IsVisible = visibility;
         }
 
         public void AddActor(SpawnPoint.Entity entityDesc)

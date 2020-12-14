@@ -44,6 +44,8 @@ namespace OpenKh.Game.Entities
 
         public IKingdomTexture[] Textures { get; private set; }
 
+        public bool IsVisible { get; set; } = true;
+
         public Vector3 Position { get; set; }
 
         public Vector3 Rotation { get; set; }
