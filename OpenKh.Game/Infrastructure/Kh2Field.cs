@@ -2,7 +2,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine;
+using OpenKh.Engine.Extensions;
 using OpenKh.Engine.MonoGame;
+using OpenKh.Engine.Renders;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Entities;
 using OpenKh.Game.Events;
@@ -22,9 +24,13 @@ namespace OpenKh.Game.Infrastructure
         private readonly Camera _camera;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly KingdomShader _shader;
+        private readonly Kh2MessageRenderer _messageRenderer;
+        private readonly DrawContext _messageDrawContext;
+        private readonly Kh2MessageProvider _eventMessageProvider;
         private readonly List<ObjectEntity> _actors = new List<ObjectEntity>();
         private readonly Dictionary<int, ObjectEntity> _actorIds = new Dictionary<int, ObjectEntity>();
-
+        private readonly Dictionary<int, byte[]> _subtitleData = new Dictionary<int, byte[]>();
+        private readonly MonoSpriteDrawing _drawing;
         private Bar _binarcArd;
         private EventPlayer _eventPlayer;
         private int _spawnScriptMap;
@@ -50,6 +56,32 @@ namespace OpenKh.Game.Infrastructure
             _graphicsDevice = graphicsDevice;
             _shader = shader;
 
+            var viewport = graphicsDevice.Viewport;
+            _drawing = new MonoSpriteDrawing(graphicsDevice, _shader);
+            _drawing.SetProjection(
+                viewport.Width,
+                viewport.Height,
+                Global.ResolutionWidth,
+                Global.ResolutionHeight,
+                1.0f);
+            _messageRenderer = new Kh2MessageRenderer(_drawing, _kernel.EventMessageContext);
+            _messageDrawContext = new DrawContext
+            {
+                IgnoreDraw = false,
+
+                x = 0,
+                y = 0,
+                xStart = 0,
+                Width = 0,
+                Height = 0,
+                WindowWidth = 512,
+
+                Scale = 1,
+                WidthMultiplier = 1,
+                Color = new ColorF(1.0f, 1.0f, 1.0f, 1.0f)
+            };
+            _eventMessageProvider = new Kh2MessageProvider();
+
             _spawnScriptMap = settings.GetInt("SpawnScriptMap", 0x06);
             _spawnScriptBtl = settings.GetInt("SpawnScriptBtl", 0x01);
             _spawnScriptEvt = settings.GetInt("SpawnScriptEvt", 0x16);
@@ -58,6 +90,15 @@ namespace OpenKh.Game.Infrastructure
 
         public void LoadMapArd(int worldIndex, int placeIndex)
         {
+            _kernel.DataContent
+                .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[worldIndex]}.bar")
+                .Using(stream => Bar.Read(stream))
+                .ForEntry(x => x.Type == Bar.EntryType.List, stream =>
+                {
+                    _eventMessageProvider.Load(Msg.Read(stream));
+                    return true;
+                });
+
             string fileName;
             if (_kernel.IsReMix)
                 fileName = $"ard/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
@@ -99,6 +140,10 @@ namespace OpenKh.Game.Infrastructure
 
         public void Draw()
         {
+            foreach (var subtitle in _subtitleData)
+                if (subtitle.Value != null)
+                    DrawSubtitle(subtitle.Value);
+
             if (_fadeCurrentColor.A > 0)
                 DrawFade();
         }
@@ -265,6 +310,38 @@ namespace OpenKh.Game.Infrastructure
                         },
                     }, 0, 2);
             });
+        }
+
+        public void ShowSubtitle(int subtitleId, ushort messageId)
+        {
+            var msgProvider = messageId < 0x8000 ?
+                _eventMessageProvider : _kernel.MessageProvider;
+            _subtitleData[subtitleId] = msgProvider.GetMessage(messageId);
+        }
+
+        public void HideSubtitle(int subtitleId)
+        {
+            _subtitleData[subtitleId] = null;
+        }
+
+        private void DrawSubtitle(byte[] data)
+        {
+            _messageDrawContext.GlobalScale = 1.0f;
+            _messageDrawContext.WidthMultiplier = 1.2f;
+            _messageDrawContext.IgnoreDraw = true;
+            _messageDrawContext.x = 0;
+            _messageDrawContext.y = 0;
+            _messageDrawContext.Width = 0;
+            _messageRenderer.Draw(_messageDrawContext, data);
+
+            _messageDrawContext.GlobalScale = 1.0f;
+            _messageDrawContext.WidthMultiplier = 1.2f;
+            _messageDrawContext.x = (_messageDrawContext.WindowWidth  - _messageDrawContext.Width) / 2f;
+            _messageDrawContext.y = 350;
+            _messageDrawContext.IgnoreDraw = false;
+            _messageRenderer.Draw(_messageDrawContext, data);
+
+            _drawing.Flush();
         }
 
         private void RunSpawnScript(

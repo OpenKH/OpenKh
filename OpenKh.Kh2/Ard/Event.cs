@@ -25,6 +25,7 @@ namespace OpenKh.Kh2.Ard
             [0x12] = EntryFade.Read,
             [0x13] = EntryCamera.Read,
             [0x14] = EntryUnk14.Read,
+            [0x15] = EntrySubtitle.Read,
             [0x1A] = EntryUnk1A.Read,
             [0x24] = EntryLoadAssets.Read,
             [0x2A] = EntryUnk2A.Read,
@@ -199,7 +200,28 @@ namespace OpenKh.Kh2.Ard
 
             public static IEventEntry Read(Stream stream) => new EntryUnk14(stream);
         }
-        
+
+        public class EntrySubtitle : IEventEntry
+        {
+            public int FrameStart { get; set; }
+            public int Index { get; set; }
+            public int MessageId { get; set; }
+            public int HideFlag { get; set; }
+
+            private EntrySubtitle(Stream stream)
+            {
+                FrameStart = stream.ReadInt16();
+                Index = stream.ReadInt16();
+                MessageId = stream.ReadInt16();
+                HideFlag = stream.ReadInt16();
+            }
+
+            public override string ToString() =>
+                $"Subtitle: Frame {FrameStart}, MsgId {MessageId}, Index {Index}, Hide {HideFlag != 0}";
+
+            public static IEventEntry Read(Stream stream) => new EntrySubtitle(stream);
+        }
+
         public class EntryUnk1A : IEventEntry
         {
             public int Unk00 { get; set; }
@@ -631,6 +653,8 @@ namespace OpenKh.Kh2.Ard
                 var type = stream.ReadInt16();
                 if (_entryType.TryGetValue(type, out var read))
                     entries.Add(read(stream));
+                else
+                    Console.Error.WriteLine($"No Event implementation for {type:X02}");
 
                 if (stream.Position != startPosition + blockLength)
                     stream.Position = stream.Position;

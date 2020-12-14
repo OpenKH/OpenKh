@@ -22,5 +22,8 @@ namespace OpenKh.Game.Infrastructure
         void FadeToWhite(float seconds);
         void FadeFromBlack(float seconds);
         void FadeFromWhite(float seconds);
+
+        void ShowSubtitle(int subtitleId, ushort messageId);
+        void HideSubtitle(int subtitleId);
     }
 }

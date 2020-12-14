@@ -18,6 +18,7 @@ namespace OpenKh.Game.Events
         private readonly IList<EntryCameraTimeline> _cameraTimeline = new List<EntryCameraTimeline>();
         private readonly IList<EntryRunAnimation> _runAnimations = new List<EntryRunAnimation>();
         private readonly IList<EntryFade> _fades = new List<EntryFade>();
+        private readonly IList<EntrySubtitle> _subtitles = new List<EntrySubtitle>();
         private readonly Dictionary<int, string> _actors = new Dictionary<int, string>();
 
         private double _secondsPrev;
@@ -76,6 +77,9 @@ namespace OpenKh.Game.Events
                     case EntryFade item:
                         _fades.Add(item);
                         break;
+                    case EntrySubtitle item:
+                        _subtitles.Add(item);
+                        break;
                 }
             }
 
@@ -127,6 +131,16 @@ namespace OpenKh.Game.Events
                             _field.FadeToWhite(item.Duration * TimeMul);
                             break;
                     }
+                }
+            }
+            foreach (var item in _subtitles)
+            {
+                if (nSeconds >= item.FrameStart && nPrevSeconds < item.FrameStart)
+                {
+                    if (item.HideFlag == 0)
+                        _field.ShowSubtitle(item.Index, (ushort)item.MessageId);
+                    else if (item.HideFlag != 0)
+                        _field.HideSubtitle(item.Index);
                 }
             }
 
