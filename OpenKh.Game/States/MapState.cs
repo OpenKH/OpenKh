@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Kh2.Models;
 using OpenKh.Game.Entities;
-using OpenKh.Kh2.Ard;
 using OpenKh.Engine.MonoGame;
+using OpenKh.Engine;
 
 namespace OpenKh.Game.States
 {
@@ -40,14 +40,11 @@ namespace OpenKh.Game.States
         private KingdomShader _shader;
         private Camera _camera;
 
+        private IField _field;
         private int _spawnId;
-        private int _spawnScriptMap;
-        private int _spawnScriptBtl;
-        private int _spawnScriptEvt;
 
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
-        private List<ObjectEntity> _objectEntities = new List<ObjectEntity>();
         private List<BobEntity> _bobEntities = new List<BobEntity>();
 
         private MenuState _menuState;
@@ -70,9 +67,7 @@ namespace OpenKh.Game.States
             Kernel.World = initDesc.StateSettings.GetInt("WorldId", 2);
             Kernel.Area = initDesc.StateSettings.GetInt("PlaceId", 4);
             _spawnId = initDesc.StateSettings.GetInt("SpawnId", 99);
-            _spawnScriptMap = initDesc.StateSettings.GetInt("SpawnScriptMap", 0x06);
-            _spawnScriptBtl = initDesc.StateSettings.GetInt("SpawnScriptBtl", 0x01);
-            _spawnScriptEvt = initDesc.StateSettings.GetInt("SpawnScriptEvt", 0x16);
+            _field = new Kh2Field(Kernel, initDesc.StateSettings, _graphics.GraphicsDevice);
 
             BasicallyForceToReloadEverything();
             _menuState.Initialize(initDesc);
@@ -118,10 +113,7 @@ namespace OpenKh.Game.States
                 if (_input.Right)
                     _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
 
-                foreach (var entity in _objectEntities.Where(x => x.IsMeshLoaded))
-                {
-                    entity.Update((float)deltaTimes.DeltaTime);
-                }
+                _field.Update(deltaTimes.DeltaTime);
             }
         }
 
@@ -166,21 +158,21 @@ namespace OpenKh.Game.States
 
             _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            foreach (var entity in _objectEntities.Where(x => x.IsMeshLoaded))
+            _field.ForEveryModel((entity, model) =>
             {
                 _shader.ProjectionView = _camera.Projection;
                 _shader.WorldView = _camera.World;
-                _shader.ModelView = entity.GetMatrix();
+                _shader.ModelView = entity.GetMatrix().ToXna();
                 pass.Apply();
 
-                RenderMeshNew(pass, entity, passRenderOpaque);
-            }
+                RenderMeshNew(pass, model, passRenderOpaque);
+            });
 
             foreach (var entity in _bobEntities)
             {
                 _shader.ProjectionView = _camera.Projection;
                 _shader.WorldView = _camera.World;
-                _shader.ModelView = entity.GetMatrix();
+                _shader.ModelView = entity.GetMatrix().ToXna();
                 pass.Apply();
 
                 RenderMeshNew(pass, _bobModels[entity.BobIndex], passRenderOpaque);
@@ -210,15 +202,18 @@ namespace OpenKh.Game.States
             }
         }
 
-
         private void BasicallyForceToReloadEverything()
         {
             _models.Clear();
             _bobModels.Clear();
-            _objectEntities.Clear();
 
-            LoadMapArd(Kernel.World, Kernel.Area);
-            LoadMap(Kernel.World, Kernel.Area);
+            switch (_field)
+            {
+                case Kh2Field kh2Field:
+                    kh2Field.LoadMapArd(Kernel.World, Kernel.Area);
+                    LoadMap(Kernel.World, Kernel.Area);
+                    break;
+            }
         }
 
         private void LoadMap(int worldIndex, int placeIndex)
@@ -245,61 +240,6 @@ namespace OpenKh.Game.States
                     Textures = bobTextures[i].LoadTextures(_graphics.GraphicsDevice).ToArray()
                 });
             }
-        }
-
-        private void LoadMapArd(int worldIndex, int placeIndex)
-        {
-            string fileName;
-            if (Kernel.IsReMix)
-                fileName = $"ard/{Kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
-            else
-                fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
-
-            var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
-            RunSpawnScript(entries, "map", _spawnScriptMap);
-            RunSpawnScript(entries, "btl", _spawnScriptBtl);
-            RunSpawnScript(entries, "evt", _spawnScriptEvt);
-        }
-
-        private void RunSpawnScript(IEnumerable<Bar.Entry> barEntries, string spawnScriptName, int programId)
-        {
-            var spawnScript = barEntries.ForEntry(spawnScriptName, Bar.EntryType.SpawnScript, SpawnScript.Read);
-            if (spawnScript == null)
-                return;
-
-            var program = spawnScript.FirstOrDefault(x => x.ProgramId == programId);
-            if (program == null)
-                return;
-
-            foreach (var function in program.Functions)
-            {
-                switch (function.Opcode)
-                {
-                    case SpawnScript.Operation.Spawn:
-                        var spawn = function.AsString(0);
-                        Log.Info($"Loading spawn {spawn}");
-                        var spawnPoints = barEntries.ForEntry(spawn, Bar.EntryType.SpawnPoint, SpawnPoint.Read);
-                        if (spawnPoints != null)
-                        {
-                            foreach (var spawnPoint in spawnPoints)
-                            {
-                                foreach (var desc in spawnPoint.Entities)
-                                    SpawnEntity(desc);
-                            }
-                        }
-                        else
-                            Log.Warn($"Unable to find spawn \"{spawn}\".");
-                        break;
-                }
-            }
-        }
-
-        private void SpawnEntity(SpawnPoint.Entity entityDesc)
-        {
-            var entity = ObjectEntity.FromSpawnPoint(Kernel, entityDesc);
-            entity.LoadMesh(_graphics.GraphicsDevice);
-
-            _objectEntities.Add(entity);
         }
 
         private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
@@ -340,6 +280,7 @@ namespace OpenKh.Game.States
 
             BasicallyForceToReloadEverything();
         }
+
 
         #region DEBUG
 
@@ -444,10 +385,6 @@ namespace OpenKh.Game.States
 
         public void DebugDrawEntities(IDebug debug)
         {
-            foreach (var entity in _objectEntities)
-            {
-
-            }
         }
 
         private void DebugDrawPlaceList(IDebug debug)

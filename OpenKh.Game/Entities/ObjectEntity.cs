@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Motion;
@@ -12,7 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using OpenKh.Engine.Parsers;
-using OpenKh.Kh2.SystemData;
+using OpenKh.Engine;
+using System.Numerics;
 
 namespace OpenKh.Game.Entities
 {
