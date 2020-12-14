@@ -163,10 +163,15 @@ namespace OpenKh.Game.Infrastructure
             _actors.Clear();
         }
 
-        public void SetCamera(n.Vector3 position, n.Vector3 something, float a, float b)
+        public void SetCamera(
+            n.Vector3 position,
+            n.Vector3 lookAt,
+            float fieldOfView,
+            float roll)
         {
-            //_camera.CameraPosition =
-            //    new Vector3(position.X, position.Y, position.Z);
+            _camera.CameraPosition = new Vector3(position.X, position.Y, position.Z);
+            _camera.CameraLookAt = new Vector3(lookAt.X, lookAt.Y, lookAt.Z);
+            _camera.FieldOfView = (float)(fieldOfView * Math.PI / 180);
         }
 
         public void FadeToBlack(float seconds)

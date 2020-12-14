@@ -358,7 +358,7 @@ namespace OpenKh.Game.States
             {
                 debug.Println($"MAP: {Constants.WorldIds[Kernel.World]}{Kernel.Area:D02}");
                 debug.Println($"POS ({_camera.CameraPosition.X:F0}, {_camera.CameraPosition.Y:F0}, {_camera.CameraPosition.Z:F0})");
-                debug.Println($"YPR ({_camera.CameraRotationYawPitchRoll.X:F0}, {_camera.CameraRotationYawPitchRoll.Y:F0}, {_camera.CameraRotationYawPitchRoll.Z:F0})");
+                debug.Println($"LKT ({_camera.CameraLookAt.X:F0}, {_camera.CameraLookAt.Y:F0}, {_camera.CameraLookAt.Z:F0})");
             }
         }
 

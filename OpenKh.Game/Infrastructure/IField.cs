@@ -16,7 +16,7 @@ namespace OpenKh.Game.Infrastructure
         void SetActorAnimation(int actorId, string path);
         void RemoveAllActors();
 
-        void SetCamera(Vector3 position, Vector3 something, float a, float b);
+        void SetCamera(Vector3 position, Vector3 lookAt, float fieldOfView, float roll);
 
         void FadeToBlack(float seconds);
         void FadeToWhite(float seconds);

@@ -1,3 +1,4 @@
+using OpenKh.Engine;
 using OpenKh.Game.Infrastructure;
 using System.Collections.Generic;
 using System.Numerics;
@@ -66,8 +67,8 @@ namespace OpenKh.Game.Events
                             item.ActorId,
                             item.PositionX,
                             item.PositionY,
-                            item.PositionZ,
-                            item.Rotation);
+                            -item.PositionZ,
+                            item.Rotation - 45f);
                         break;
                     case EntryRunAnimation item:
                         _runAnimations.Add(item);
@@ -87,6 +88,7 @@ namespace OpenKh.Game.Events
 
             var nSeconds = (int)(_seconds * FramesPerSecond);
             var nPrevSeconds = (int)(_secondsPrev * FramesPerSecond);
+            var cameraInterpolationM = 0f;
             foreach (var item in _runAnimations)
             {
                 if (item.FrameStart > nPrevSeconds && item.FrameStart <= nSeconds)
@@ -95,8 +97,12 @@ namespace OpenKh.Game.Events
             }
             foreach (var item in _cameraTimeline)
             {
-                if (item.FrameStart > nPrevSeconds && item.FrameEnd <= nSeconds)
+                if (nSeconds > item.FrameStart && nSeconds < item.FrameEnd)
+                {
                     _cameraId = item.CameraId;
+                    var frameLength = item.FrameEnd - item.FrameStart;
+                    cameraInterpolationM = (float)((_seconds * FramesPerSecond - item.FrameStart) / frameLength);
+                }
             }
             foreach (var item in _fades)
             {
@@ -127,15 +133,15 @@ namespace OpenKh.Game.Events
             var curCamera = _cameras[_cameraId];
             _field.SetCamera(
                 new Vector3(
-                    curCamera.PositionX[0].Value,
-                    -curCamera.PositionZ[0].Value,
-                    curCamera.PositionY[0].Value),
+                    GetCameraValue(curCamera.PositionX, cameraInterpolationM),
+                    GetCameraValue(curCamera.PositionY, cameraInterpolationM),
+                    GetCameraValue(curCamera.PositionZ, cameraInterpolationM)),
                 new Vector3(
-                    curCamera.Channel3[0].Value,
-                    curCamera.Channel4[0].Value,
-                    curCamera.Channel5[0].Value),
-                curCamera.Channel6[0].Value,
-                curCamera.Channel7[0].Value);
+                    GetCameraValue(curCamera.LookAtX, cameraInterpolationM),
+                    GetCameraValue(curCamera.LookAtY, cameraInterpolationM),
+                    GetCameraValue(curCamera.LookAtZ, cameraInterpolationM)),
+                GetCameraValue(curCamera.FieldOfView, cameraInterpolationM),
+                GetCameraValue(curCamera.Roll, cameraInterpolationM));
 
             _secondsPrev = _seconds;
         }
@@ -151,6 +157,18 @@ namespace OpenKh.Game.Events
             sb.Append("/");
             sb.Append(split[1]);
             return sb.ToString();
+        }
+
+        private static float GetCameraValue(IList<EntryCamera.CameraValue> values, float m)
+        {
+            if (values.Count == 0)
+                return 0f;
+            if (values.Count == 1)
+                return values[0].Value;
+
+            var valSrc = values[0];
+            var valDst = values[1];
+            return MathEx.Lerp(valSrc.Value, valDst.Value, m);
         }
     }
 }

@@ -339,14 +339,14 @@ namespace OpenKh.Kh2.Ard
             }
 
             public int CameraId { get; set; }
-            public List<CameraValue> PositionX { get; set; }
             public List<CameraValue> PositionY { get; set; }
             public List<CameraValue> PositionZ { get; set; }
-            public List<CameraValue> Channel3 { get; set; }
-            public List<CameraValue> Channel4 { get; set; }
-            public List<CameraValue> Channel5 { get; set; }
-            public List<CameraValue> Channel6 { get; set; }
-            public List<CameraValue> Channel7 { get; set; }
+            public List<CameraValue> LookAtX { get; set; }
+            public List<CameraValue> LookAtY { get; set; }
+            public List<CameraValue> LookAtZ { get; set; }
+            public List<CameraValue> Roll { get; set; }
+            public List<CameraValue> FieldOfView { get; set; }
+            public List<CameraValue> PositionX { get; set; }
 
             private EntryCamera(Stream stream)
             {
@@ -361,14 +361,14 @@ namespace OpenKh.Kh2.Ard
                     .Select(x => BinaryMapping.ReadObject<CameraValue>(stream))
                     .ToList();
 
-                PositionX = AssignValues(headers[0], values);
-                PositionY = AssignValues(headers[1], values);
-                PositionZ = AssignValues(headers[2], values);
-                Channel3 = AssignValues(headers[3], values);
-                Channel4 = AssignValues(headers[4], values);
-                Channel5 = AssignValues(headers[5], values);
-                Channel6 = AssignValues(headers[6], values);
-                Channel7 = AssignValues(headers[7], values);
+                PositionY = AssignValues(headers[0], values);
+                PositionZ = AssignValues(headers[1], values);
+                LookAtX = AssignValues(headers[2], values);
+                LookAtY = AssignValues(headers[3], values);
+                LookAtZ = AssignValues(headers[4], values);
+                Roll = AssignValues(headers[5], values);
+                FieldOfView = AssignValues(headers[6], values);
+                PositionX = AssignValues(headers[7], values);
             }
 
             private static List<CameraValue> AssignValues(Header header, IList<CameraValue> values) =>
@@ -378,14 +378,14 @@ namespace OpenKh.Kh2.Ard
             {
                 var sb = new StringBuilder();
                 sb.AppendLine($"Camera: ID {CameraId}");
-                sb.AppendLine($"\tPositionX: {ToString(PositionX)}");
-                sb.AppendLine($"\tPositionY: {ToString(PositionY)}");
-                sb.AppendLine($"\tPositionZ: {ToString(PositionZ)}");
-                sb.AppendLine($"\tChannel3: {ToString(Channel3)}");
-                sb.AppendLine($"\tChannel4: {ToString(Channel4)}");
-                sb.AppendLine($"\tChannel5: {ToString(Channel5)}");
-                sb.AppendLine($"\tChannel6: {ToString(Channel6)}");
-                sb.AppendLine($"\tChannel7: {ToString(Channel7)}");
+                sb.AppendLine($"\tPositionX: {ToString(PositionY)}");
+                sb.AppendLine($"\tPositionY: {ToString(PositionZ)}");
+                sb.AppendLine($"\tPositionZ: {ToString(LookAtX)}");
+                sb.AppendLine($"\tChannel3: {ToString(LookAtY)}");
+                sb.AppendLine($"\tChannel4: {ToString(LookAtZ)}");
+                sb.AppendLine($"\tChannel5: {ToString(Roll)}");
+                sb.AppendLine($"\tChannel6: {ToString(FieldOfView)}");
+                sb.AppendLine($"\tChannel7: {ToString(PositionX)}");
                 return sb.ToString();
             }
 
@@ -629,7 +629,8 @@ namespace OpenKh.Kh2.Ard
             {
                 var startPosition = stream.Position - 2;
                 var type = stream.ReadInt16();
-                entries.Add(_entryType[type](stream));
+                if (_entryType.TryGetValue(type, out var read))
+                    entries.Add(read(stream));
 
                 if (stream.Position != startPosition + blockLength)
                     stream.Position = stream.Position;
