@@ -173,18 +173,21 @@ namespace OpenKh.Game.Events
                 }
             }
 
-            var curCamera = _cameras[_cameraId];
-            _field.SetCamera(
-                new Vector3(
-                    GetCameraValue(curCamera.PositionX, cameraInterpolationM),
-                    GetCameraValue(curCamera.PositionY, cameraInterpolationM),
-                    GetCameraValue(curCamera.PositionZ, cameraInterpolationM)),
-                new Vector3(
-                    GetCameraValue(curCamera.LookAtX, cameraInterpolationM),
-                    GetCameraValue(curCamera.LookAtY, cameraInterpolationM),
-                    GetCameraValue(curCamera.LookAtZ, cameraInterpolationM)),
-                GetCameraValue(curCamera.FieldOfView, cameraInterpolationM),
-                GetCameraValue(curCamera.Roll, cameraInterpolationM));
+            if (_cameraId < _cameras.Count)
+            {
+                var curCamera = _cameras[_cameraId];
+                _field.SetCamera(
+                    new Vector3(
+                        GetCameraValue(curCamera.PositionX, cameraInterpolationM),
+                        GetCameraValue(curCamera.PositionY, cameraInterpolationM),
+                        GetCameraValue(curCamera.PositionZ, cameraInterpolationM)),
+                    new Vector3(
+                        GetCameraValue(curCamera.LookAtX, cameraInterpolationM),
+                        GetCameraValue(curCamera.LookAtY, cameraInterpolationM),
+                        GetCameraValue(curCamera.LookAtZ, cameraInterpolationM)),
+                    GetCameraValue(curCamera.FieldOfView, cameraInterpolationM),
+                    GetCameraValue(curCamera.Roll, cameraInterpolationM));
+            }
 
             foreach (var item in visibleEntries)
                 _field.SetActorVisibility(item.Key, item.Value);
