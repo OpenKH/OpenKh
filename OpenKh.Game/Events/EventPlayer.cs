@@ -24,6 +24,9 @@ namespace OpenKh.Game.Events
         private double _secondsPrev;
         private double _seconds;
         private int _cameraId;
+        private int _eventDuration;
+
+        public bool IsEnd { get; private set; }
 
         public EventPlayer(IField field, IList<IEventEntry> eventEntries)
         {
@@ -33,10 +36,14 @@ namespace OpenKh.Game.Events
 
         public void Initialize()
         {
+            IsEnd = false;
             foreach (var entry in _eventEntries)
             {
                 switch (entry)
                 {
+                    case EntryUnk08 item:
+                        _eventDuration = item.FrameDuration;
+                        break;
                     case EntryLoadAssets assets:
                         foreach (var assetEntry in assets.Loads)
                         {
@@ -102,6 +109,13 @@ namespace OpenKh.Game.Events
 
             var nSeconds = (int)(_seconds * FramesPerSecond);
             var nPrevSeconds = (int)(_secondsPrev * FramesPerSecond);
+
+            if (nSeconds >= _eventDuration)
+            {
+                IsEnd = true;
+                return;
+            }
+
             var cameraInterpolationM = 0f;
             foreach (var item in _runAnimations)
             {

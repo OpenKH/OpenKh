@@ -128,7 +128,17 @@ namespace OpenKh.Game.Infrastructure
 
         public void Update(double deltaTime)
         {
-            _eventPlayer?.Update(deltaTime);
+            if (_eventPlayer != null)
+            {
+                _eventPlayer.Update(deltaTime);
+                if (_eventPlayer.IsEnd)
+                {
+                    FadeFromBlack(1);
+                    _eventPlayer = null;
+                }
+            }
+
+
             foreach (var entity in _actors.Where(x => x.IsMeshLoaded && x.IsVisible))
                 entity.Update((float)deltaTime);
 

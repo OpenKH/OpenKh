@@ -368,17 +368,17 @@ namespace OpenKh.Kh2.Ard
 
         public class EntryUnk08 : IEventEntry // sub_22D3B8
         {
-            public int Unk00 { get; set; } // dword_35DE28
+            public int FrameDuration { get; set; } // dword_35DE28
             public int Unk02 { get; set; } // ignored
 
             private EntryUnk08(Stream stream)
             {
-                Unk00 = stream.ReadInt16();
+                FrameDuration = stream.ReadInt16();
                 Unk02 = stream.ReadInt16();
             }
 
             public override string ToString() =>
-                $"Unk08: {Unk00} {Unk02}";
+                $"Unk08: Frame duration {FrameDuration}, {Unk02}";
 
             public static IEventEntry Read(Stream stream) => new EntryUnk08(stream);
         }
