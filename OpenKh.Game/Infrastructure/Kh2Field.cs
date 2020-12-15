@@ -44,6 +44,8 @@ namespace OpenKh.Game.Infrastructure
         private Color _fadeStartColor;
         private Color _fadeEndColor;
 
+        public List<string> Events { get; private set; }
+
         public Kh2Field(
             Kernel kernel,
             Camera camera,
@@ -105,18 +107,24 @@ namespace OpenKh.Game.Infrastructure
             else
                 fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
 
+            _eventPlayer = null;
             RemoveAllActors();
 
             _binarcArd = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
+            Events = _binarcArd
+                .Where(x => x.Type == Bar.EntryType.AnimationLoader)
+                .Select(x => x.Name)
+                .ToList();
+
             RunSpawnScript(_binarcArd, "map", _spawnScriptMap);
             RunSpawnScript(_binarcArd, "btl", _spawnScriptBtl);
             RunSpawnScript(_binarcArd, "evt", _spawnScriptEvt);
-
-            RunEvent("203");
         }
 
-        public void RunEvent(string eventName)
+        public void PlayEvent(string eventName)
         {
+            _actorIds.Clear();
+            _subtitleData.Clear();
             _binarcArd.ForEntry(eventName, Bar.EntryType.AnimationLoader, stream =>
             {
                 _eventPlayer = new EventPlayer(this, Event.Read(stream));

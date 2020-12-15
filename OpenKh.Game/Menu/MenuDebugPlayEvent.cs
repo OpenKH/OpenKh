@@ -1,36 +1,26 @@
 using OpenKh.Engine.Renderers;
 using OpenKh.Game.Infrastructure;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace OpenKh.Game.Menu
 {
-    public class DebugMenuEntry
+    public class MenuDebugPlayEvent : MenuBase
     {
-        public string Name { get; }
-        public Action Action { get; }
-
-        public DebugMenuEntry(string name, Action action)
-        {
-            Name = name;
-            Action = action;
-        }
-    }
-
-    public class MenuDebug : MenuBase
-    {
-        public static string Name = "DEBUG";
-        private readonly DebugMenuEntry[] Entries;
+        const int MaxOptionPerColumn = 10;
+        public static string Name = "PLAY EVENT";
         private IAnimatedSequence _menuSeq;
         private int _selectedOption;
+
+        private IList<string> Events => MenuManager.GameContext.Field.Events;
+        private int OptionCount => Events.Count;
 
         public int SelectedOption
         {
             get => _selectedOption;
             set
             {
-                value = value < 0 ? Entries.Length - 1 : value % Entries.Length;
+                value = value < 0 ? OptionCount - 1 : value % OptionCount;
                 if (_selectedOption != value)
                 {
                     _selectedOption = value;
@@ -43,47 +33,27 @@ namespace OpenKh.Game.Menu
         public override ushort MenuNameId => 0;
         protected override bool IsEnd => _menuSeq.IsEnd;
 
-        public MenuDebug(IMenuManager menuManager) : base(menuManager)
+        public MenuDebugPlayEvent(IMenuManager menuManager) :
+            base(menuManager)
         {
-            Entries = new DebugMenuEntry[]
-            {
-                new DebugMenuEntry("PLAY EVENT", OpenPlayEventMenu),
-                new DebugMenuEntry(MenuDebugChangePlace.Name, OpenChangePlaceMenu),
-                new DebugMenuEntry("TITLE SCREEN", ReturnToTitleScreen),
-            };
             _menuSeq = InitializeMenu(false);
-        }
-
-        private void ReturnToTitleScreen()
-        {
-            MenuManager.GameContext.LoadTitleScreen();
-            MenuManager.CloseAllMenu();
-        }
-
-        private void OpenChangePlaceMenu() =>
-            Push(new MenuDebugChangePlace(MenuManager));
-
-        private void OpenPlayEventMenu() =>
-            Push(new MenuDebugPlayEvent(MenuManager));
-
-        private void OpenResolutionMenu()
-        {
         }
 
         private IAnimatedSequence InitializeMenu(bool skipIntro)
         {
-            return SequenceFactory.Create(Enumerable.Range(0, Entries.Length)
-                .Select(i => new AnimatedSequenceDesc
+            return SequenceFactory.Create(Events
+                .Select((name, i) => new AnimatedSequenceDesc
                 {
+                    X = i / MaxOptionPerColumn * 140,
                     SequenceIndexStart = skipIntro ? -1 : 133,
                     SequenceIndexLoop = SelectedOption == i ? 132 : 134,
                     SequenceIndexEnd = 135,
-                    StackIndex = i,
+                    StackIndex = i % MaxOptionPerColumn,
                     StackWidth = 0,
                     StackHeight = AnimatedSequenceDesc.DefaultStacking,
                     Flags = AnimationFlags.TextTranslateX |
                         AnimationFlags.ChildStackHorizontally,
-                    MessageText = Entries[i].Name,
+                    MessageText = name.ToUpper(),
                     Children = SelectedOption == i ? new List<AnimatedSequenceDesc>
                     {
                         new AnimatedSequenceDesc
@@ -108,8 +78,12 @@ namespace OpenKh.Game.Menu
                 SelectedOption--;
             else if (inputManager.IsMenuDown)
                 SelectedOption++;
+            if (inputManager.IsMenuLeft)
+                SelectedOption -= MaxOptionPerColumn;
+            if (inputManager.IsMenuRight)
+                SelectedOption += MaxOptionPerColumn;
             else if (inputManager.IsCircle)
-                Entries[SelectedOption].Action();
+                MenuManager.GameContext.Field.PlayEvent(Events[SelectedOption]);
             else
                 base.ProcessInput(inputManager);
         }

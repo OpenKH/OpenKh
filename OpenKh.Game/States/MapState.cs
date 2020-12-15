@@ -40,7 +40,7 @@ namespace OpenKh.Game.States
         private KingdomShader _shader;
         private Camera _camera;
 
-        private IField _field;
+        public IField Field { get; private set; }
         private int _spawnId;
 
         private int _objEntryId = 0x236; // PLAYER
@@ -67,7 +67,7 @@ namespace OpenKh.Game.States
             Kernel.World = initDesc.StateSettings.GetInt("WorldId", 2);
             Kernel.Area = initDesc.StateSettings.GetInt("PlaceId", 4);
             _spawnId = initDesc.StateSettings.GetInt("SpawnId", 99);
-            _field = new Kh2Field(
+            Field = new Kh2Field(
                 Kernel,
                 _camera,
                 initDesc.StateSettings,
@@ -118,7 +118,7 @@ namespace OpenKh.Game.States
                 if (_input.Right)
                     _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
 
-                _field.Update(deltaTimes.DeltaTime);
+                Field.Update(deltaTimes.DeltaTime);
             }
         }
 
@@ -140,7 +140,7 @@ namespace OpenKh.Game.States
 
                 DrawAllMeshes(pass, /*passRenderOpaque=*/false);
             });
-            _field.Draw();
+            Field.Draw();
 
             if (_menuState.IsMenuOpen)
             {
@@ -164,7 +164,7 @@ namespace OpenKh.Game.States
 
             _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            _field.ForEveryModel((entity, model) =>
+            Field.ForEveryModel((entity, model) =>
             {
                 _shader.ProjectionView = _camera.Projection;
                 _shader.WorldView = _camera.World;
@@ -213,7 +213,7 @@ namespace OpenKh.Game.States
             _models.Clear();
             _bobModels.Clear();
 
-            switch (_field)
+            switch (Field)
             {
                 case Kh2Field kh2Field:
                     kh2Field.LoadMapArd(Kernel.World, Kernel.Area);

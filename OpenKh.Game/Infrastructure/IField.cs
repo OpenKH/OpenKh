@@ -1,14 +1,19 @@
 using OpenKh.Engine;
 using OpenKh.Engine.MonoGame;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace OpenKh.Game.Infrastructure
 {
     public interface IField
     {
+        List<string> Events { get; }
+
         void Update(double deltaTime);
         void Draw();
+
+        void PlayEvent(string eventName);
 
         void ForEveryModel(Action<IEntity, IMonoGameModel> action);
         void AddActor(int actorId, int objectId);
