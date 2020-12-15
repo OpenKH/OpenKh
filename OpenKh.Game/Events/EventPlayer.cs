@@ -46,6 +46,15 @@ namespace OpenKh.Game.Events
                                     _actors[item.ActorId] = item.Name;
                                     _field.AddActor(item.ActorId, item.ObjectId);
                                     break;
+                            }
+                        }
+
+                        // Double for-loop to ensure to load actors first, then
+                        // animations to prevent crashes.
+                        foreach (var assetEntry in assets.Loads)
+                        {
+                            switch (assetEntry)
+                            {
                                 case LoadAnimation item:
                                     _field.SetActorAnimation(
                                         item.ActorId,
@@ -88,6 +97,7 @@ namespace OpenKh.Game.Events
 
         public void Update(double deltaTime)
         {
+            var visibleEntries = new Dictionary<int, bool>();
             _seconds += deltaTime;
 
             var nSeconds = (int)(_seconds * FramesPerSecond);
@@ -98,6 +108,11 @@ namespace OpenKh.Game.Events
                 if (item.FrameStart > nPrevSeconds && item.FrameStart <= nSeconds)
                     _field.SetActorAnimation(
                         item.ActorId, GetAnmPath(item.ActorId, item.Path));
+
+                if (nSeconds >= item.FrameStart && nSeconds < item.FrameEnd)
+                    visibleEntries[item.ActorId] = true;
+                else if (!visibleEntries.ContainsKey(item.ActorId))
+                    visibleEntries[item.ActorId] = false;
             }
             foreach (var item in _cameraTimeline)
             {
@@ -156,6 +171,9 @@ namespace OpenKh.Game.Events
                     GetCameraValue(curCamera.LookAtZ, cameraInterpolationM)),
                 GetCameraValue(curCamera.FieldOfView, cameraInterpolationM),
                 GetCameraValue(curCamera.Roll, cameraInterpolationM));
+
+            foreach (var item in visibleEntries)
+                _field.SetActorVisibility(item.Key, item.Value);
 
             _secondsPrev = _seconds;
         }
