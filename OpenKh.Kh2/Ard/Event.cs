@@ -18,6 +18,7 @@ namespace OpenKh.Kh2.Ard
             [0x03] = EntryMap.Read,
             [0x06] = EntryCameraTimeline.Read,
             [0x08] = EntryUnk08.Read,
+            [0x09] = EntryUnk09.Read,
             [0x0A] = EntryUnk0A.Read,
             [0x0C] = EntryUnk0C.Read,
             [0x0F] = EntryUnk0F.Read,
@@ -26,7 +27,11 @@ namespace OpenKh.Kh2.Ard
             [0x13] = EntryCamera.Read,
             [0x14] = EntryUnk14.Read,
             [0x15] = EntrySubtitle.Read,
+            [0x16] = EntryUnk16.Read,
+            [0x17] = EntryUnk17.Read,
             [0x1A] = EntryUnk1A.Read,
+            [0x22] = EntryUnk22.Read,
+            [0x23] = EntryVoices.Read,
             [0x24] = EntryLoadAssets.Read,
             [0x2A] = EntryUnk2A.Read,
             [0x2B] = EntryPlayBgm.Read,
@@ -40,7 +45,9 @@ namespace OpenKh.Kh2.Ard
         private static readonly Dictionary<int, Func<Stream, IEventLoad>> _loadType = new Dictionary<int, Func<Stream, IEventLoad>>()
         {
             [0x25] = LoadAnimation.Read,
+            [0x26] = LoadVoice.Read,
             [0x38] = LoadObject.Read,
+            [0x39] = LoadPax.Read,
         };
 
         public interface IEventEntry
@@ -222,6 +229,52 @@ namespace OpenKh.Kh2.Ard
             public static IEventEntry Read(Stream stream) => new EntrySubtitle(stream);
         }
 
+        public class EntryUnk16 : IEventEntry
+        {
+            public int Unk00 { get; set; }
+            public int Unk02 { get; set; }
+
+            private EntryUnk16(Stream stream)
+            {
+                Unk00 = stream.ReadInt16();
+                Unk02 = stream.ReadInt16();
+            }
+
+            public override string ToString() =>
+                $"Unk16: {Unk00} {Unk02}";
+
+            public static IEventEntry Read(Stream stream) => new EntryUnk16(stream);
+        }
+
+        public class EntryUnk17 : IEventEntry
+        {
+            public int Unk00 { get; set; }
+            public int Unk02 { get; set; }
+            public int Unk04 { get; set; }
+            public int Unk06 { get; set; }
+            public int Unk08 { get; set; }
+            public int Unk0A { get; set; }
+            public int Unk0C { get; set; }
+            public int Unk0E { get; set; }
+
+            private EntryUnk17(Stream stream)
+            {
+                Unk00 = stream.ReadInt16();
+                Unk02 = stream.ReadInt16();
+                Unk04 = stream.ReadInt16();
+                Unk06 = stream.ReadInt16();
+                Unk08 = stream.ReadInt16();
+                Unk0A = stream.ReadInt16();
+                Unk0C = stream.ReadInt16();
+                Unk0E = stream.ReadInt16();
+            }
+
+            public override string ToString() =>
+                $"Unk17: {Unk00}, {Unk02} {Unk04} {Unk06} {Unk08} {Unk0A} {Unk0C} {Unk0E}";
+
+            public static IEventEntry Read(Stream stream) => new EntryUnk17(stream);
+        }
+
         public class EntryUnk1A : IEventEntry
         {
             public int Unk00 { get; set; }
@@ -237,6 +290,59 @@ namespace OpenKh.Kh2.Ard
                 $"Unk1A: {Unk00} {Unk02}";
 
             public static IEventEntry Read(Stream stream) => new EntryUnk1A(stream);
+        }
+
+        public class EntryUnk22 : IEventEntry
+        {
+            public int Unk00 { get; set; }
+            public int Unk02 { get; set; }
+
+            private EntryUnk22(Stream stream)
+            {
+                Unk00 = stream.ReadInt16();
+                Unk02 = stream.ReadInt16();
+            }
+
+            public override string ToString() =>
+                $"Unk22: {Unk00} {Unk02}";
+
+            public static IEventEntry Read(Stream stream) => new EntryUnk22(stream);
+        }
+
+        public class EntryVoices : IEventEntry
+        {
+            public class Voice
+            {
+                public int FrameStart { get; set; }
+                public string Name { get; set; }
+
+                public override string ToString() =>
+                    $"Frame {FrameStart}, {Name}";
+            }
+
+            public List<Voice> Voices { get; set; }
+
+            private EntryVoices(Stream stream)
+            {
+                var voiceCount = stream.ReadInt32();
+                Voices = new List<Voice>(voiceCount);
+                for (var i = 0; i < voiceCount; i++)
+                {
+                    var voice = new Voice();
+                    var startPos = stream.Position;
+                    stream.ReadInt32(); // It always supposed to be 0
+                    voice.FrameStart = stream.ReadInt16();
+                    stream.ReadByte();
+                    voice.Name = ReadCStyleString(stream);
+                    Voices.Add(voice);
+                    stream.Position = startPos + 0x20;
+                }
+            }
+
+            public override string ToString() =>
+                $"Voices:{string.Join("\n\t", Voices)}";
+
+            public static IEventEntry Read(Stream stream) => new EntryVoices(stream);
         }
 
         public class EntryCameraTimeline : IEventEntry // ignored
@@ -275,6 +381,33 @@ namespace OpenKh.Kh2.Ard
                 $"Unk08: {Unk00} {Unk02}";
 
             public static IEventEntry Read(Stream stream) => new EntryUnk08(stream);
+        }
+
+        public class EntryUnk09 : IEventEntry
+        {
+            public int Unk00 { get; set; }
+            public int Unk02 { get; set; }
+            public int Unk04 { get; set; }
+            public int Unk06 { get; set; }
+            public int Unk08 { get; set; }
+            public int Unk0A { get; set; }
+            public int Unk0C { get; set; }
+
+            private EntryUnk09(Stream stream)
+            {
+                Unk00 = stream.ReadInt16();
+                Unk02 = stream.ReadInt16();
+                Unk04 = stream.ReadInt16();
+                Unk06 = stream.ReadInt16();
+                Unk08 = stream.ReadInt16();
+                Unk0A = stream.ReadInt16();
+                Unk0C = stream.ReadInt16();
+            }
+
+            public override string ToString() =>
+                $"Unk09: {Unk00}, {Unk02}, {Unk04}, {Unk06}, {Unk08}, {Unk0A}, {Unk0C}";
+
+            public static IEventEntry Read(Stream stream) => new EntryUnk09(stream);
         }
 
         public class EntryUnk0A : IEventEntry // unused
@@ -443,6 +576,8 @@ namespace OpenKh.Kh2.Ard
                     var blockLength = stream.ReadInt16();
                     if (_loadType.TryGetValue(type, out var read))
                         Loads.Add(read(stream));
+                    else
+                        Console.Error.WriteLine($"No Load implementation for {type:X02}");
                     stream.Position = startPosition + blockLength;
                 }
             }
@@ -621,6 +756,23 @@ namespace OpenKh.Kh2.Ard
             public static IEventLoad Read(Stream stream) => new LoadObject(stream);
         }
 
+        public class LoadPax : IEventLoad
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+
+            private LoadPax(Stream stream)
+            {
+                Id = stream.ReadInt16();
+                Name = ReadCStyleString(stream);
+            }
+
+            public override string ToString() =>
+                $"PAX: Id {Id}, Name {Name}";
+
+            public static IEventLoad Read(Stream stream) => new LoadPax(stream);
+        }
+
         public class LoadAnimation : IEventLoad
         {
             public int ObjectId { get; set; }
@@ -640,6 +792,20 @@ namespace OpenKh.Kh2.Ard
                 $"Animation: ObjectEntry {ObjectId:X04}, ActorID {ActorId}, Unk? {UnknownIndex}, Path {Name}";
 
             public static IEventLoad Read(Stream stream) => new LoadAnimation(stream);
+        }
+
+        public class LoadVoice : IEventLoad
+        {
+            public string Name { get; set; }
+
+            private LoadVoice(Stream stream)
+            {
+                Name = ReadCStyleString(stream);
+            }
+
+            public override string ToString() =>  $"Voice {Name}";
+
+            public static IEventLoad Read(Stream stream) => new LoadVoice(stream);
         }
 
         public static List<IEventEntry> Read(Stream stream)
