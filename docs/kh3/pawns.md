@@ -275,7 +275,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex039 | Parasol Beauty
 | e_ex041 | 
 | e_ex042 | Anchor Raider
-| e_ex043 | Darkside?
+| e_ex043 | Dark Inferno
 | e_ex044 | Pole Cannon
 | e_ex045 | Winterhorn
 | e_ex046 | Frost Serpent
@@ -388,7 +388,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex341 | Luxord (Hooded)
 | e_ex407 | Darkside
 | e_ex408 | Xehanort's Guardian
-| e_ex701 | 
+| e_ex701 | Lump of Horror
 | e_ex702 | 
 | e_ex703 | 
 | e_ex711 | King of Toys
