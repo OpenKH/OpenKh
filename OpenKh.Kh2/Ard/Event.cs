@@ -17,14 +17,13 @@ namespace OpenKh.Kh2.Ard
             [0x02] = EntryActorPosition.Read,
             [0x03] = EntryMap.Read,
             [0x06] = EntryCameraTimeline.Read,
-            [0x08] = EntryUnk08.Read,
-            [0x09] = EntryUnk09.Read,
-            [0x0A] = EntryUnk0A.Read,
-            [0x0C] = EntryUnk0C.Read,
-            [0x0F] = EntryUnk0F.Read,
-            [0x10] = EntryFadeIn.Read,
-            [0x12] = EntryFade.Read,
-            [0x13] = EntryCamera.Read,
+            [0x08] = SetEndFrame.Read,
+            [0x09] = SeqEffect.Read,
+            [0x0A] = AttachEffect.Read,
+            [0x0F] = SetupEvent.Read,
+            [0x10] = EventStart.Read,
+            [0x12] = SeqFade.Read,
+            [0x13] = SetCameraData.Read,
             [0x14] = EntryUnk14.Read,
             [0x15] = EntrySubtitle.Read,
             [0x16] = EntryUnk16.Read,
@@ -60,19 +59,21 @@ namespace OpenKh.Kh2.Ard
         {
             public int Unk00 { get; set; }
             public int Unk02 { get; set; }
-            public int Unk04 { get; set; }
+            public int Version { get; set; }
+            public int ObjCameraType { get; set; }
             public string Name { get; set; }
 
             private EntryProject(Stream stream)
             {
                 Unk00 = stream.ReadInt16();
                 Unk02 = stream.ReadInt16();
-                Unk04 = stream.ReadInt16();
-                Name = ReadCStyleString(stream);
+                Version = stream.ReadByte(); // Always PS2_BIN_VER (2)
+                ObjCameraType = stream.ReadByte();
+                Name = ReadCStyleString(stream); // Can't be larger than 32 bytes
             }
 
             public override string ToString() =>
-                $"Project: {Name} ({Unk00:X}, {Unk02:X}, {Unk04:X})";
+                $"Project: {Name}, Version {Version}, Camera type {ObjCameraType}, ({Unk00:X}, {Unk02:X})";
 
             public static IEventEntry Read(Stream stream) => new EntryProject(stream);
         }
@@ -102,12 +103,12 @@ namespace OpenKh.Kh2.Ard
             public float PositionX { get; set; }
             public float PositionY { get; set; }
             public float PositionZ { get; set; }
-            public float Unk10 { get; set; }
-            public float Rotation { get; set; }
-            public float Unk18 { get; set; }
+            public float RotationX { get; set; }
+            public float RotationY { get; set; }
+            public float RotationZ { get; set; }
             public float Unk1C { get; set; }
             public int ActorId { get; set; }
-            public int Unk22 { get; set; }
+            public int Frame { get; set; }
 
             private EntryActorPosition(Stream stream)
             {
@@ -115,16 +116,16 @@ namespace OpenKh.Kh2.Ard
                 PositionX = stream.ReadSingle();
                 PositionY = stream.ReadSingle();
                 PositionZ = stream.ReadSingle();
-                Unk10 = stream.ReadSingle();
-                Rotation = stream.ReadSingle();
-                Unk18 = stream.ReadSingle();
+                RotationX = stream.ReadSingle();
+                RotationY = stream.ReadSingle();
+                RotationZ = stream.ReadSingle();
                 Unk1C = stream.ReadSingle();
                 ActorId = stream.ReadInt16();
-                Unk22 = stream.ReadInt16();
+                Frame = stream.ReadInt16();
             }
 
             public override string ToString() =>
-                $"ActorPosition: ActorID {ActorId}, Pos({PositionX}, {PositionY}, {PositionZ}) Rot({Rotation}) Unk({Unk00}, {Unk10}, {Unk18}, {Unk1C}, {Unk22})";
+                $"ActorPosition: Frame {Frame}, ActorID {ActorId}, Pos({PositionX}, {PositionY}, {PositionZ}) Rot({RotationX}, {RotationY}, {RotationZ}) Unk({Unk00}, {Unk1C})";
 
             public static IEventEntry Read(Stream stream) => new EntryActorPosition(stream);
         }
@@ -146,23 +147,23 @@ namespace OpenKh.Kh2.Ard
             public static IEventEntry Read(Stream stream) => new EntryMap(stream);
         }
 
-        public class EntryFadeIn : IEventEntry // sub_22D3A8
+        public class EventStart : IEventEntry // sub_22D3A8
         {
             public int FadeIn { get; set; } // dword_35DE40
 
-            private EntryFadeIn(Stream stream)
+            private EventStart(Stream stream)
             {
                 FadeIn = stream.ReadInt16();
                 stream.ReadInt16();
             }
 
             public override string ToString() =>
-                $"FadeIn: {FadeIn} frames";
+                $"FadeIn: Fade in for {FadeIn} frames";
 
-            public static IEventEntry Read(Stream stream) => new EntryFadeIn(stream);
+            public static IEventEntry Read(Stream stream) => new EventStart(stream);
         }
 
-        public class EntryFade: IEventEntry
+        public class SeqFade: IEventEntry
         {
             public enum FadeType
             {
@@ -180,7 +181,7 @@ namespace OpenKh.Kh2.Ard
             public int Duration { get; set; }
             public FadeType Type { get; set; }
 
-            private EntryFade(Stream stream)
+            private SeqFade(Stream stream)
             {
                 FrameIndex = stream.ReadInt16();
                 Duration = stream.ReadInt16();
@@ -190,7 +191,7 @@ namespace OpenKh.Kh2.Ard
             public override string ToString() =>
                 $"Fade: Frame {FrameIndex}, Duration {Duration}, {Type}";
 
-            public static IEventEntry Read(Stream stream) => new EntryFade(stream);
+            public static IEventEntry Read(Stream stream) => new SeqFade(stream);
         }
 
         public class EntryUnk14 : IEventEntry
@@ -366,115 +367,89 @@ namespace OpenKh.Kh2.Ard
             public static IEventEntry Read(Stream stream) => new EntryCameraTimeline(stream);
         }
 
-        public class EntryUnk08 : IEventEntry // sub_22D3B8
+        public class SetEndFrame : IEventEntry // sub_22D3B8
         {
-            public int FrameDuration { get; set; } // dword_35DE28
-            public int Unk02 { get; set; } // ignored
+            public int EndFrame { get; set; } // dword_35DE28
 
-            private EntryUnk08(Stream stream)
+            private SetEndFrame(Stream stream)
             {
-                FrameDuration = stream.ReadInt16();
-                Unk02 = stream.ReadInt16();
+                EndFrame = stream.ReadInt16();
+                stream.ReadInt16();
             }
 
             public override string ToString() =>
-                $"Unk08: Frame duration {FrameDuration}, {Unk02}";
+                $"End frame: {EndFrame}";
 
-            public static IEventEntry Read(Stream stream) => new EntryUnk08(stream);
+            public static IEventEntry Read(Stream stream) => new SetEndFrame(stream);
         }
 
-        public class EntryUnk09 : IEventEntry
+        public class SeqEffect : IEventEntry
         {
-            public int Unk00 { get; set; }
-            public int Unk02 { get; set; }
-            public int Unk04 { get; set; }
-            public int Unk06 { get; set; }
-            public int Unk08 { get; set; }
-            public int Unk0A { get; set; }
-            public int Unk0C { get; set; }
+            public int FrameStart { get; set; }
+            public int FrameLoop { get; set; }
+            public int EffectId { get; set; }
+            public int PaxId { get; set; }
+            public int PaxEntryIndex { get; set; }
+            public int EndType { get; set; }
+            public int FadeFrame { get; set; }
 
-            private EntryUnk09(Stream stream)
+            private SeqEffect(Stream stream)
             {
-                Unk00 = stream.ReadInt16();
-                Unk02 = stream.ReadInt16();
-                Unk04 = stream.ReadInt16();
-                Unk06 = stream.ReadInt16();
-                Unk08 = stream.ReadInt16();
-                Unk0A = stream.ReadInt16();
-                Unk0C = stream.ReadInt16();
+                FrameStart = stream.ReadInt16();
+                FrameLoop = stream.ReadInt16();
+                EffectId = stream.ReadInt16();
+                PaxId = stream.ReadInt16();
+                PaxEntryIndex = stream.ReadInt16();
+                EndType = stream.ReadInt16();
+                FadeFrame = stream.ReadInt16();
             }
 
             public override string ToString() =>
-                $"Unk09: {Unk00}, {Unk02}, {Unk04}, {Unk06}, {Unk08}, {Unk0A}, {Unk0C}";
+                $"Effect: Frame start {FrameStart}, Frame loop {FrameLoop}, Effect ID {EffectId}, PAX ID {PaxId}, PAX entry index {PaxEntryIndex}, End type {EndType}, Frame fade {FadeFrame}";
 
-            public static IEventEntry Read(Stream stream) => new EntryUnk09(stream);
+            public static IEventEntry Read(Stream stream) => new SeqEffect(stream);
         }
 
-        public class EntryUnk0A : IEventEntry // unused
+        public class AttachEffect : IEventEntry // unused
         {
-            public int Unk00 { get; set; }
-            public int Unk02 { get; set; }
-            public int Unk04 { get; set; }
+            public int FrameStart { get; set; }
+            public int FrameEnd { get; set; } // maybe unused?
+            public int AttachEffectId { get; set; }
             public short ActorId { get; set; }
-            public short WeaponId { get; set; }
-            public short Unk0A { get; set; }
-            public short Unk0C { get; set; }
+            public short BoneIndex { get; set; }
+            public short PaxEntryIndex { get; set; }
+            public short Type { get; set; }
 
-            private EntryUnk0A(Stream stream)
+            private AttachEffect(Stream stream)
             {
-                Unk00 = stream.ReadInt16();
-                Unk02 = stream.ReadInt16();
-                Unk04 = stream.ReadInt16();
+                FrameStart = stream.ReadInt16();
+                FrameEnd = stream.ReadInt16();
+                AttachEffectId = stream.ReadInt16();
                 ActorId = stream.ReadInt16();
-                WeaponId = stream.ReadInt16();
-                Unk0A = stream.ReadInt16();
-                Unk0C = stream.ReadInt16();
+                BoneIndex = stream.ReadInt16();
+                PaxEntryIndex = stream.ReadInt16();
+                Type = stream.ReadInt16();
             }
 
             public override string ToString() =>
-                $"Unk0A: {Unk00}, {Unk02}, ActorID {ActorId}, WeaponID {WeaponId}, {Unk0A}, {Unk0C}";
+                $"Attach effect: Frame start {FrameStart}, Frame end {FrameEnd}, Attach effect ID {AttachEffectId}, ActorID {ActorId}, Bone index {BoneIndex}, PAX entry {PaxEntryIndex}, Type {Type}";
 
-            public static IEventEntry Read(Stream stream) => new EntryUnk0A(stream);
+            public static IEventEntry Read(Stream stream) => new AttachEffect(stream);
         }
 
-        public class EntryUnk0C : IEventEntry // ignored
+        public class SetupEvent : IEventEntry // sub_22d358
         {
-            public int Unk00 { get; set; }
-            public int Unk02 { get; set; }
-            public int Unk04 { get; set; }
-            public int Unk06 { get; set; }
-            public int Unk08 { get; set; }
-            public int Unk0A { get; set; }
-
-            private EntryUnk0C(Stream stream)
-            {
-                Unk00 = stream.ReadInt16();
-                Unk02 = stream.ReadInt16();
-                Unk04 = stream.ReadInt16();
-                Unk06 = stream.ReadInt16();
-                Unk08 = stream.ReadInt16();
-                Unk0A = stream.ReadInt16();
-            }
-
-            public override string ToString() =>
-                $"Unk0C: {Unk00} {Unk02} {Unk04} {Unk06} {Unk08} {Unk0A}";
-
-            public static IEventEntry Read(Stream stream) => new EntryUnk0C(stream);
-        }
-
-        public class EntryUnk0F : IEventEntry // sub_22d358
-        {
-            private EntryUnk0F(Stream stream)
+            private SetupEvent(Stream stream)
             {
             }
 
             public override string ToString() =>
-                $"Unk0F";
+                $"Setup event";
 
-            public static IEventEntry Read(Stream stream) => new EntryUnk0F(stream);
+            public static IEventEntry Read(Stream stream) => new SetupEvent(stream);
         }
 
-        public class EntryCamera : IEventEntry
+        public class SetCameraData : IEventEntry
         {
             private class Header
             {
@@ -503,7 +478,7 @@ namespace OpenKh.Kh2.Ard
             public List<CameraValue> FieldOfView { get; set; }
             public List<CameraValue> PositionX { get; set; }
 
-            private EntryCamera(Stream stream)
+            private SetCameraData(Stream stream)
             {
                 CameraId = stream.ReadInt32();
                 var headers = Enumerable
@@ -551,7 +526,7 @@ namespace OpenKh.Kh2.Ard
                 return string.Join("\n\t\t", values.Select(x => x.ToString()));
             }
 
-            public static IEventEntry Read(Stream stream) => new EntryCamera(stream);
+            public static IEventEntry Read(Stream stream) => new SetCameraData(stream);
         }
 
         public class EntryLoadAssets : IEventEntry

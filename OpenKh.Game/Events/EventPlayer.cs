@@ -14,10 +14,10 @@ namespace OpenKh.Game.Events
 
         private readonly IField _field;
         private readonly IList<IEventEntry> _eventEntries;
-        private readonly IList<EntryCamera> _cameras = new List<EntryCamera>();
+        private readonly IList<SetCameraData> _cameras = new List<SetCameraData>();
         private readonly IList<EntryCameraTimeline> _cameraTimeline = new List<EntryCameraTimeline>();
         private readonly IList<EntryRunAnimation> _runAnimations = new List<EntryRunAnimation>();
-        private readonly IList<EntryFade> _fades = new List<EntryFade>();
+        private readonly IList<SeqFade> _fades = new List<SeqFade>();
         private readonly IList<EntrySubtitle> _subtitles = new List<EntrySubtitle>();
         private readonly Dictionary<int, string> _actors = new Dictionary<int, string>();
 
@@ -41,8 +41,8 @@ namespace OpenKh.Game.Events
             {
                 switch (entry)
                 {
-                    case EntryUnk08 item:
-                        _eventDuration = item.FrameDuration;
+                    case SetEndFrame item:
+                        _eventDuration = item.EndFrame;
                         break;
                     case EntryLoadAssets assets:
                         foreach (var assetEntry in assets.Loads)
@@ -70,10 +70,10 @@ namespace OpenKh.Game.Events
                             }
                         }
                         break;
-                    case EntryFadeIn item:
+                    case EventStart item:
                         _field.FadeFromBlack(item.FadeIn * TimeMul);
                         break;
-                    case EntryCamera item:
+                    case SetCameraData item:
                         _cameras.Add(item);
                         break;
                     case EntryCameraTimeline item:
@@ -85,12 +85,12 @@ namespace OpenKh.Game.Events
                             item.PositionX,
                             item.PositionY,
                             -item.PositionZ,
-                            item.Rotation - 45f);
+                            item.RotationY - 45f);
                         break;
                     case EntryRunAnimation item:
                         _runAnimations.Add(item);
                         break;
-                    case EntryFade item:
+                    case SeqFade item:
                         _fades.Add(item);
                         break;
                     case EntrySubtitle item:
@@ -143,20 +143,20 @@ namespace OpenKh.Game.Events
                 {
                     switch (item.Type)
                     {
-                        case EntryFade.FadeType.FromBlack:
-                        case EntryFade.FadeType.FromBlackVariant:
+                        case SeqFade.FadeType.FromBlack:
+                        case SeqFade.FadeType.FromBlackVariant:
                             _field.FadeFromBlack(item.Duration * TimeMul);
                             break;
-                        case EntryFade.FadeType.FromWhite:
-                        case EntryFade.FadeType.FromWhiteVariant:
+                        case SeqFade.FadeType.FromWhite:
+                        case SeqFade.FadeType.FromWhiteVariant:
                             _field.FadeFromWhite(item.Duration * TimeMul);
                             break;
-                        case EntryFade.FadeType.ToBlack:
-                        case EntryFade.FadeType.ToBlackVariant:
+                        case SeqFade.FadeType.ToBlack:
+                        case SeqFade.FadeType.ToBlackVariant:
                             _field.FadeToBlack(item.Duration * TimeMul);
                             break;
-                        case EntryFade.FadeType.ToWhite:
-                        case EntryFade.FadeType.ToWhiteVariant:
+                        case SeqFade.FadeType.ToWhite:
+                        case SeqFade.FadeType.ToWhiteVariant:
                             _field.FadeToWhite(item.Duration * TimeMul);
                             break;
                     }
@@ -208,7 +208,7 @@ namespace OpenKh.Game.Events
             return sb.ToString();
         }
 
-        private static float GetCameraValue(IList<EntryCamera.CameraValue> values, float m)
+        private static float GetCameraValue(IList<SetCameraData.CameraValue> values, float m)
         {
             if (values.Count == 0)
                 return 0f;
