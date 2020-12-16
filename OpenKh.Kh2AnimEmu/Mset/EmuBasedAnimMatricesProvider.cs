@@ -60,8 +60,8 @@ namespace OpenKh.Kh2Anim.Mset
 
             var br = new BinaryReader(matrixOutStream);
             matrixOutStream.Position = 0;
-            var matrixOut = new Matrix4x4[animReader.cntb1];
-            for (int t = 0; t < animReader.cntb1; t++)
+            var matrixOut = new Matrix4x4[animReader.cntb2];
+            for (int t = 0; t < matrixOut.Length; t++)
             {
                 var m = new Matrix4x4();
                 m.M11 = br.ReadSingle();

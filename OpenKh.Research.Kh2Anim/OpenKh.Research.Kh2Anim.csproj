@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -15,10 +15,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="rawData\" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <None Update="rawData\5_Nodes.mdlx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="rawData\ee.mset.ram.bin.gz">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

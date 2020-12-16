@@ -251,6 +251,11 @@ namespace OpenKh.Kh2
 
         public class IKChainTable
         {
+            /// <summary>
+            /// 0=CopyAbsPosition
+            /// 1=CopyAbsScale?
+            /// 2=CopyAbsRotation
+            /// </summary>
             [Data] public byte Unk00 { get; set; }
             [Data] public byte Unk01 { get; set; }
             [Data] public short ModelBoneIndex { get; set; }

@@ -21,8 +21,11 @@ namespace OpenKh.Research.Kh2Anim
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(
         typeof(BakeCommand),
+        typeof(BakeryCommand),
         typeof(FryCommand),
-        typeof(SimpleMdlxCommand)
+        typeof(BurnCommand),
+        typeof(SimpleMdlxCommand),
+        typeof(SummaryMdlxsCommand)
     )]
     class Program
     {
@@ -34,17 +37,17 @@ namespace OpenKh.Research.Kh2Anim
             }
             catch (InvalidFileException e)
             {
-                Console.WriteLine(e.Message);
+                Console.Error.WriteLine(e.Message);
                 return 3;
             }
             catch (FileNotFoundException e)
             {
-                Console.WriteLine($"The file {e.FileName} cannot be found. The program will now exit.");
+                Console.Error.WriteLine($"The file {e.FileName} cannot be found. The program will now exit.");
                 return 2;
             }
             catch (Exception e)
             {
-                Console.WriteLine($"FATAL ERROR: {e.Message}\n{e.StackTrace}");
+                Console.Error.WriteLine($"FATAL ERROR: {e.Message}\n{e.StackTrace}");
                 return -1;
             }
         }

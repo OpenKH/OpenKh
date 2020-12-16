@@ -1,4 +1,4 @@
-﻿//#define UsePressed_eeram
+//#define UsePressed_eeram
 //#define AllowRec1
 //#define Allow_DEB_eeram01
 
@@ -287,6 +287,7 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             }
 
             os.Write(ee.ram, (int)tmp4, 0x40 * cnt1);
+            os.Write(ee.ram, (int)tmpa, 0x40 * (cnt2 - cnt1));
 
             cntPass++;
 
