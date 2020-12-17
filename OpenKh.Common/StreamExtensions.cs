@@ -173,6 +173,7 @@ namespace OpenKh.Common
         public static void Write(this Stream stream, uint value) => new BinaryWriter(stream).Write(value);
         public static void Write(this Stream stream, long value) => new BinaryWriter(stream).Write(value);
         public static void Write(this Stream stream, ulong value) => new BinaryWriter(stream).Write(value);
+        public static void Write(this Stream stream, float value) => new BinaryWriter(stream).Write(value);
 
         public static void Copy(this Stream source, Stream destination, int length, int bufferSize = 65536)
         {

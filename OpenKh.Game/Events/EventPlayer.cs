@@ -15,10 +15,10 @@ namespace OpenKh.Game.Events
         private readonly IField _field;
         private readonly IList<IEventEntry> _eventEntries;
         private readonly IList<SetCameraData> _cameras = new List<SetCameraData>();
-        private readonly IList<EntryCameraTimeline> _cameraTimeline = new List<EntryCameraTimeline>();
-        private readonly IList<EntryRunAnimation> _runAnimations = new List<EntryRunAnimation>();
+        private readonly IList<SeqCamera> _cameraTimeline = new List<SeqCamera>();
+        private readonly IList<SeqPlayAnimation> _runAnimations = new List<SeqPlayAnimation>();
         private readonly IList<SeqFade> _fades = new List<SeqFade>();
-        private readonly IList<EntrySubtitle> _subtitles = new List<EntrySubtitle>();
+        private readonly IList<SeqSubtitle> _subtitles = new List<SeqSubtitle>();
         private readonly Dictionary<int, string> _actors = new Dictionary<int, string>();
 
         private double _secondsPrev;
@@ -44,12 +44,12 @@ namespace OpenKh.Game.Events
                     case SetEndFrame item:
                         _eventDuration = item.EndFrame;
                         break;
-                    case EntryLoadAssets assets:
-                        foreach (var assetEntry in assets.Loads)
+                    case ReadAssets assets:
+                        foreach (var assetEntry in assets.Set)
                         {
                             switch (assetEntry)
                             {
-                                case LoadObject item:
+                                case ReadActor item:
                                     _actors[item.ActorId] = item.Name;
                                     _field.AddActor(item.ActorId, item.ObjectId);
                                     break;
@@ -58,11 +58,11 @@ namespace OpenKh.Game.Events
 
                         // Double for-loop to ensure to load actors first, then
                         // animations to prevent crashes.
-                        foreach (var assetEntry in assets.Loads)
+                        foreach (var assetEntry in assets.Set)
                         {
                             switch (assetEntry)
                             {
-                                case LoadAnimation item:
+                                case ReadMotion item:
                                     _field.SetActorAnimation(
                                         item.ActorId,
                                         GetAnmPath(item.ActorId, item.Name));
@@ -76,10 +76,10 @@ namespace OpenKh.Game.Events
                     case SetCameraData item:
                         _cameras.Add(item);
                         break;
-                    case EntryCameraTimeline item:
+                    case SeqCamera item:
                         _cameraTimeline.Add(item);
                         break;
-                    case EntryActorPosition item:
+                    case SeqActorPosition item:
                         _field.SetActorPosition(
                             item.ActorId,
                             item.PositionX,
@@ -87,13 +87,13 @@ namespace OpenKh.Game.Events
                             -item.PositionZ,
                             item.RotationY - 45f);
                         break;
-                    case EntryRunAnimation item:
+                    case SeqPlayAnimation item:
                         _runAnimations.Add(item);
                         break;
                     case SeqFade item:
                         _fades.Add(item);
                         break;
-                    case EntrySubtitle item:
+                    case SeqSubtitle item:
                         _subtitles.Add(item);
                         break;
                 }
