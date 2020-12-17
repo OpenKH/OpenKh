@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace OpenKh.Research.Kh2Anim.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     public class HomeController : ControllerBase
     {
         public IActionResult Index()
         {
-            return Ok(new { message = "We will be running now." });
+            return Ok(new { Message = "We will be running now." });
         }
     }
 }
