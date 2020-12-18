@@ -29,6 +29,8 @@ namespace OpenKh.Kh2.Ard
             [0x08] = typeof(SetEndFrame),
             [0x09] = typeof(SeqEffect),
             [0x0A] = typeof(AttachEffect),
+            [0x0C] = typeof(Unk0C),
+            [0x0D] = typeof(Unk0D),
             [0x0F] = typeof(SetupEvent),
             [0x10] = typeof(EventStart),
             [0x12] = typeof(SeqFade),
@@ -37,21 +39,31 @@ namespace OpenKh.Kh2.Ard
             [0x15] = typeof(SeqSubtitle),
             [0x16] = typeof(EntryUnk16),
             [0x17] = typeof(EntryUnk17),
+            [0x18] = typeof(EntryUnk18),
+            [0x19] = typeof(SeqTextureAnim),
             [0x1A] = typeof(EntryUnk1A),
+            [0x1B] = typeof(SeqCrossFade),
+            [0x20] = typeof(SeqGameSpeed),
             [0x22] = typeof(EntryUnk22),
             [0x23] = typeof(SeqVoices),
             [0x24] = typeof(ReadAssets),
             [0x25] = typeof(ReadMotion),
             [0x26] = typeof(ReadAudio),
+            [0x27] = typeof(SetShake),
             [0x2A] = typeof(EntryUnk2A),
             [0x2B] = typeof(SeqPlayAudio),
             [0x2C] = typeof(SeqPlayAnimation),
             [0x2D] = typeof(SeqDialog),
-            [0x2E] = typeof(EntryUnk2E),
-            [0x2F] = typeof(EntryUnk2F),
-            [0x30] = typeof(EntryUnk30),
+            [0x2E] = typeof(SeqPlayBgm),
+            [0x2F] = typeof(ReadBgm),
+            [0x30] = typeof(SetBgm),
+            [0x36] = typeof(EntryUnk36),
             [0x38] = typeof(ReadActor),
             [0x39] = typeof(ReadEffect),
+            [0x3F] = typeof(StopEffect),
+            [0x44] = typeof(RunMovie),
+            [0x47] = typeof(EntryUnk47),
+            [0x4D] = typeof(SeqHideObject),
         };
 
         private static readonly Dictionary<Type, int> _typeId =
@@ -59,8 +71,8 @@ namespace OpenKh.Kh2.Ard
 
         private class SetCameraDataHeader
         {
-            [Data] public short Count { get; set; }
             [Data] public short Index { get; set; }
+            [Data] public short Count { get; set; }
         }
 
         public interface IEventEntry
@@ -212,7 +224,7 @@ namespace OpenKh.Kh2.Ard
                     $"Value {Value}, Speed {Speed}, {Unk08}, {Unk0C}";
             }
 
-            public int CameraId { get; set; }
+            public short CameraId { get; set; }
             public List<CameraValue> PositionY { get; set; }
             public List<CameraValue> PositionZ { get; set; }
             public List<CameraValue> LookAtX { get; set; }
@@ -226,14 +238,14 @@ namespace OpenKh.Kh2.Ard
             {
                 var sb = new StringBuilder();
                 sb.AppendLine($"{typeof(SetCameraData)}: ID {CameraId}");
-                sb.AppendLine($"\tPositionX: {ToString(PositionY)}");
-                sb.AppendLine($"\tPositionY: {ToString(PositionZ)}");
-                sb.AppendLine($"\tPositionZ: {ToString(LookAtX)}");
-                sb.AppendLine($"\tChannel3: {ToString(LookAtY)}");
-                sb.AppendLine($"\tChannel4: {ToString(LookAtZ)}");
-                sb.AppendLine($"\tChannel5: {ToString(Roll)}");
-                sb.AppendLine($"\tChannel6: {ToString(FieldOfView)}");
-                sb.AppendLine($"\tChannel7: {ToString(PositionX)}");
+                sb.AppendLine($"\tPositionX: {ToString(PositionX)}");
+                sb.AppendLine($"\tPositionY: {ToString(PositionY)}");
+                sb.AppendLine($"\tPositionZ: {ToString(PositionZ)}");
+                sb.AppendLine($"\tLookAtX: {ToString(LookAtX)}");
+                sb.AppendLine($"\tLookAtY: {ToString(LookAtY)}");
+                sb.AppendLine($"\tLookAtZ: {ToString(LookAtZ)}");
+                sb.AppendLine($"\tRoll: {ToString(Roll)}");
+                sb.AppendLine($"\tFOV: {ToString(FieldOfView)}");
                 return sb.ToString();
             }
 
@@ -289,6 +301,28 @@ namespace OpenKh.Kh2.Ard
                 $"{typeof(EntryUnk17)}: {Unk00}, {Unk02} {Unk04} {Unk06} {Unk08} {Unk0A} {Unk0C} {Unk0E}";
         }
 
+        public class EntryUnk18 : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public short Unk04 { get; set; }
+            [Data] public short Unk06 { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(EntryUnk18)}: Frame {Frame}, {Unk02} {Unk04} {Unk06}";
+        }
+
+        public class SeqTextureAnim : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public short Unk04 { get; set; }
+            [Data] public short Unk06 { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(SeqTextureAnim)}: Frame {Frame}, {Unk02}, {Unk04}, {Unk06}";
+        }
+
         public class EntryUnk1A : IEventEntry
         {
             [Data] public short Unk00 { get; set; }
@@ -296,6 +330,25 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"{typeof(EntryUnk1A)}: {Unk00} {Unk02}";
+        }
+
+        public class SeqCrossFade : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public short Duration { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(SeqCrossFade)}: {Frame}, {Duration}";
+        }
+
+        public class SeqGameSpeed : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public short Unused { get; set; }
+            [Data] public float Speed { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(SeqGameSpeed)}: {Frame} {Speed}";
         }
 
         public class EntryUnk22 : IEventEntry
@@ -322,6 +375,27 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"{typeof(SeqVoices)}:\n\t{string.Join("\n\t", Voices)}";
+        }
+
+        public class Unk0C : IEventEntry
+        {
+            [Data] public short StartFrame { get; set; }
+            [Data] public short EndFrame { get; set; }
+            [Data] public short Unk04 { get; set; }
+            [Data] public short Unk08 { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(Unk0C)}: Frame {StartFrame}, {Unk04}, {Unk08}";
+        }
+
+        public class Unk0D : IEventEntry
+        {
+            [Data] public short StartFrame { get; set; }
+            [Data] public short EndFrame { get; set; }
+            [Data(Count = 34)] public short[] Unk { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(Unk0D)}: Frame {StartFrame}, ({string.Join(", ", Unk)})";
         }
 
         public class SetupEvent : IEventEntry // sub_22d358
@@ -391,34 +465,48 @@ namespace OpenKh.Kh2.Ard
                 $"{typeof(SeqDialog)}: Frame index {FrameIndex}, {Unk02}, MsgID {MessageId}, {Unk06}, {Unk08}";
         }
 
-        public class EntryUnk2E : IEventEntry
+        public class SeqPlayBgm : IEventEntry
         {
-            [Data] public short Unk00 { get; set; }
-            [Data] public short Unk02 { get; set; }
-            [Data] public short Unk04 { get; set; }
-            [Data] public short Unk06 { get; set; }
+            [Data] public short Frame { get; set; }
+            [Data] public short BankIndex { get; set; }
+            [Data] public byte VolumeStartIndex { get; set; }
+            [Data] public byte VolumeEndIndex { get; set; }
+            [Data] public byte FadeType { get; set; }
+            [Data] public byte Unused { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk2E)}: {Unk00} {Unk02} {Unk04} {Unk06}";
+                $"{typeof(SeqPlayBgm)}: Frame {Frame}, Bank {BankIndex}, Volume start {VolumeStartIndex}, Volume end {VolumeEndIndex}, Fade type {FadeType}";
         }
 
-        public class EntryUnk2F : IEventEntry
+        public class ReadBgm : IEventEntry
         {
             [Data] public short Unk00 { get; set; }
-            [Data] public short Unk02 { get; set; }
+            [Data] public short BgmId { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk2F)}: {Unk00} {Unk02}";
+                $"{typeof(ReadBgm)}: BGM ID {BgmId}, {Unk00}";
         }
 
-        public class EntryUnk30 : IEventEntry
+        public class SetBgm : IEventEntry
         {
-            [Data] public short Unk00 { get; set; }
-            [Data] public short Unk02 { get; set; }
-            [Data] public short Unk04 { get; set; }
+            [Data] public short Frame { get; set; }
+            [Data] public short BankIndex { get; set; }
+            [Data] public short BgmId { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk2F)}: {Unk00} {Unk02} {Unk04}";
+                $"{typeof(SetBgm)}: BGM ID {BgmId}, {Frame} {BankIndex}";
+        }
+
+        public class EntryUnk36 : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public float Unk04 { get; set; }
+            [Data] public float Unk08 { get; set; }
+            [Data] public float Unk0c { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(EntryUnk36)}: Frame {Frame}, {Unk02}, {Unk04}, {Unk08}, {Unk0c}";
         }
 
         public class ReadActor : IEventEntry
@@ -449,19 +537,73 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"{typeof(ReadMotion)}: ObjectEntry {ObjectId:X04}, ActorID {ActorId}, Unk? {UnknownIndex}, Path {Name}";
-
-            public static ReadMotion Read(Stream stream) =>
-                Mapping.ReadObject<ReadMotion>(stream);
         }
 
         public class ReadAudio : IEventEntry
         {
             [Data] public string Name { get; set; }
 
-            public override string ToString() =>  $"{typeof(ReadAudio)} {Name}";
+            public override string ToString() => $"{typeof(ReadAudio)} {Name}";
+        }
 
-            public static ReadAudio Read(Stream stream) =>
-                Mapping.ReadObject<ReadAudio>(stream);
+        public class SetShake : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public short Type { get; set; }
+            [Data] public short Width { get; set; }
+            [Data] public short Height { get; set; }
+            [Data] public short Depth { get; set; }
+            [Data] public short Duration { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(SetShake)}: Frame {Frame}, Type {Type}, Width {Width}, Height {Height}, Depth {Depth}, Duration {Duration}";
+        }
+
+        public class StopEffect : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public short Unused { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(StopEffect)}: Frame {Frame}";
+        }
+
+        public class RunMovie : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public string Name { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(RunMovie)}: Frame {Frame}, Name {Name}";
+        }
+
+        public class EntryUnk47 : IEventEntry
+        {
+            [Data] public short Unk00 { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public float StartPositionX { get; set; }
+            [Data] public float StartPositionY { get; set; }
+            [Data] public float StartPositionZ { get; set; }
+            [Data] public float EndPositionX { get; set; }
+            [Data] public float EndPositionY { get; set; }
+            [Data] public float EndPositionZ { get; set; }
+            [Data] public float RotationX { get; set; }
+            [Data] public float RotationY { get; set; }
+            [Data] public float RotationZ { get; set; }
+            [Data] public short Unk28 { get; set; }
+            [Data] public short Unk2A { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(EntryUnk47)}: {Unk00}, {Unk02}, {Unk28}, {Unk2A}, StartPos({StartPositionX}, {StartPositionY}, {StartPositionZ}), EndPos({EndPositionX}, {EndPositionY}, {EndPositionZ}), Rot({RotationX}, {RotationY}, {RotationZ})";
+        }
+
+        public class SeqHideObject : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public short Type { get; set; }
+
+            public override string ToString() =>
+                $"{typeof(SeqHideObject)}: Frame {Frame}, Type {Type}";
         }
 
         public static List<IEventEntry> Read(Stream stream)
@@ -586,11 +728,12 @@ namespace OpenKh.Kh2.Ard
             List<SetCameraData.CameraValue> AssignValues(SetCameraDataHeader header, IList<SetCameraData.CameraValue> values) =>
                 Enumerable.Range(0, header.Count).Select(i => values[header.Index + i]).ToList();
 
-            var cameraId = args.Reader.ReadInt32();
+            var cameraId = args.Reader.ReadInt16();
             var headers = Enumerable
                 .Range(0, 8)
                 .Select(x => BinaryMapping.ReadObject<SetCameraDataHeader>(args.Reader.BaseStream))
                 .ToList();
+            args.Reader.BaseStream.AlignPosition(4);
             var valueCount = headers.Max(x => x.Index + x.Count);
             var values = Enumerable
                 .Range(0, valueCount)
@@ -600,14 +743,14 @@ namespace OpenKh.Kh2.Ard
             return new SetCameraData
             {
                 CameraId = cameraId,
-                PositionY = AssignValues(headers[0], values),
-                PositionZ = AssignValues(headers[1], values),
-                LookAtX = AssignValues(headers[2], values),
-                LookAtY = AssignValues(headers[3], values),
-                LookAtZ = AssignValues(headers[4], values),
-                Roll = AssignValues(headers[5], values),
-                FieldOfView = AssignValues(headers[6], values),
-                PositionX = AssignValues(headers[7], values),
+                PositionX = AssignValues(headers[0], values),
+                PositionY = AssignValues(headers[1], values),
+                PositionZ = AssignValues(headers[2], values),
+                LookAtX = AssignValues(headers[3], values),
+                LookAtY = AssignValues(headers[4], values),
+                LookAtZ = AssignValues(headers[5], values),
+                Roll = AssignValues(headers[6], values),
+                FieldOfView = AssignValues(headers[7], values),
             };
         }
 
@@ -631,9 +774,12 @@ namespace OpenKh.Kh2.Ard
 
             var item = args.Item as SetCameraData;
             args.Writer.Write(item.CameraId);
+            if (item.CameraId == 10)
+                item = item;
 
             var channelCountList = new List<int>(8)
             {
+                item.PositionX.Count,
                 item.PositionY.Count,
                 item.PositionZ.Count,
                 item.LookAtX.Count,
@@ -641,7 +787,6 @@ namespace OpenKh.Kh2.Ard
                 item.LookAtZ.Count,
                 item.Roll.Count,
                 item.FieldOfView.Count,
-                item.PositionX.Count,
             };
             var indexList = new List<int>(8);
             var startIndex = 0;
@@ -651,6 +796,7 @@ namespace OpenKh.Kh2.Ard
                 startIndex += channelCount;
             }
 
+            WriteHeader(args.Writer.BaseStream, item.PositionX, indexList[0]);
             WriteHeader(args.Writer.BaseStream, item.PositionY, indexList[1]);
             WriteHeader(args.Writer.BaseStream, item.PositionZ, indexList[2]);
             WriteHeader(args.Writer.BaseStream, item.LookAtX, indexList[3]);
@@ -658,8 +804,8 @@ namespace OpenKh.Kh2.Ard
             WriteHeader(args.Writer.BaseStream, item.LookAtZ, indexList[5]);
             WriteHeader(args.Writer.BaseStream, item.Roll, indexList[6]);
             WriteHeader(args.Writer.BaseStream, item.FieldOfView, indexList[7]);
-            WriteHeader(args.Writer.BaseStream, item.PositionX, indexList[0]);
 
+            args.Writer.BaseStream.AlignPosition(4);
             WriteData(args.Writer.BaseStream, item.PositionX);
             WriteData(args.Writer.BaseStream, item.PositionY);
             WriteData(args.Writer.BaseStream, item.PositionZ);

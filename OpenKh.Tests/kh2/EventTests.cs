@@ -1,3 +1,4 @@
+using OpenKh.Common;
 using OpenKh.Kh2.Ard;
 using System.Collections.Generic;
 using System.IO;
@@ -39,6 +40,22 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ParseAttachEffect() =>
             AssertEvent<Event.AttachEffect>();
+
+        [Fact]
+        public void ParseUnk0C() =>
+            AssertEvent<Event.Unk0C>();
+
+        [Fact]
+        public void ParseUnk0D() =>
+            AssertEvent(new Event.Unk0D
+            {
+                StartFrame = 123,
+                EndFrame = 456,
+                Unk = new short[]
+                {
+                    11, 22, 33, 44
+                }
+            });
 
         [Fact]
         public void ParseSetupEvent() =>
@@ -114,8 +131,24 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.EntryUnk17>();
 
         [Fact]
+        public void ParseEntryUnk18() =>
+            AssertEvent<Event.EntryUnk18>();
+
+        [Fact]
+        public void ParseSeqTextureAnim() =>
+            AssertEvent<Event.SeqTextureAnim>();
+
+        [Fact]
         public void ParseEntryUnk1A() =>
             AssertEvent<Event.EntryUnk1A>();
+
+        [Fact]
+        public void ParseSeqCrossFade() =>
+            AssertEvent<Event.SeqCrossFade>();
+
+        [Fact]
+        public void ParseSeqGameSpeed() =>
+            AssertEvent<Event.SeqGameSpeed>();
 
         [Fact]
         public void ParseEntryUnk22() =>
@@ -165,6 +198,10 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.ReadAudio>();
 
         [Fact]
+        public void ParseSetRumble() =>
+            AssertEvent<Event.SetShake>();
+
+        [Fact]
         public void ParseEntryUnk2A() =>
             AssertEvent<Event.EntryUnk2A>();
 
@@ -181,16 +218,20 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SeqDialog>();
 
         [Fact]
-        public void ParseEntryUnk2E() =>
-            AssertEvent<Event.EntryUnk2E>();
+        public void ParseSeqPlayBgm() =>
+            AssertEvent<Event.SeqPlayBgm>();
 
         [Fact]
-        public void ParseEntryUnk2F() =>
-            AssertEvent<Event.EntryUnk2F>();
+        public void ParseReadBgm() =>
+            AssertEvent<Event.ReadBgm>();
 
         [Fact]
-        public void ParseEntryUnk30() =>
-            AssertEvent<Event.EntryUnk30>();
+        public void ParseSetBgm() =>
+            AssertEvent<Event.SetBgm>();
+
+        [Fact]
+        public void ParseEntryUnk36() =>
+            AssertEvent<Event.EntryUnk36>();
 
         [Fact]
         public void ParseReadActor() =>
@@ -199,6 +240,22 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ParseReadEffect() =>
             AssertEvent<Event.ReadEffect>();
+
+        [Fact]
+        public void ParseStopEffect() =>
+            AssertEvent<Event.StopEffect>();
+
+        [Fact]
+        public void ParseRunMovie() =>
+            AssertEvent<Event.RunMovie>();
+
+        [Fact]
+        public void ParseEntryUnk47() =>
+            AssertEvent<Event.EntryUnk47>();
+
+        [Fact]
+        public void ParseHideObject() =>
+            AssertEvent<Event.SeqHideObject>();
 
         private static void AssertEvent<T>()
             where T : class, Event.IEventEntry =>
