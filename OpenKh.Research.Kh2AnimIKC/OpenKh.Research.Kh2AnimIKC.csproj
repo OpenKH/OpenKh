@@ -1,9 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+        <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+        <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
+        <ProjectReference Include="..\OpenKh.Kh2AnimEmu\OpenKh.Kh2AnimEmu.csproj" />
+
+        <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="rawData\ee.mset.ram.bin.gz">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 </Project>

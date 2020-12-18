@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Research.Kh2AnimIKC"
+        xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
         mc:Ignorable="d"
-        Title="OpenKh.Research.Kh2AnimIKC" Height="450" Width="800">
+        Title="OpenKh.Research.Kh2AnimIKC" Height="542" Width="999">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -13,24 +14,76 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
             <MenuItem Header="_Quit" />
+            <MenuItem Header="_Build" Name="build" Click="build_Click" />
         </Menu>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <Grid>
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="0" />
                     </Grid.RowDefinitions>
-                    <FrameworkElement Grid.Row="0" Name="upper" />
-                    <FrameworkElement Grid.Row="1" Name="lower" />
+                    <Canvas Grid.Row="0" Name="upperView" Background="AliceBlue" SizeChanged="upperView_SizeChanged">
+                    </Canvas>
+                    <Canvas Grid.Row="1" Name="lowerView" />
                 </Grid>
             </Grid>
-            <Grid Grid.Column="1" Background="LightGoldenrodYellow">
-                
+            <Grid Grid.Column="1" Background="LightGoldenrodYellow" Width="500">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <GroupBox VerticalAlignment="Top" Grid.Row="0" Header="Bones">
+                    <DataGrid Grid.Row="1" Name="boneGrid" ItemsSource="{Binding}"
+                              AutoGenerateColumns="False"
+                              KeyDown="boneGrid_KeyDown"
+                              >
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Disp" Binding="{Binding Display}" />
+                            <DataGridTextColumn Header="#" Binding="{Binding Idx}" />
+                            <DataGridTextColumn Header="Parent" Binding="{Binding Parent}" />
+                            <DataGridTextColumn Header="Unk2" Binding="{Binding Unk2}" />
+                            <DataGridTextColumn Header="Unk3" Binding="{Binding Unk3}" />
+
+                            <DataGridTextColumn Header="Sx" Binding="{Binding Sx}" />
+                            <DataGridTextColumn Header="Sy" Binding="{Binding Sy}" />
+                            <DataGridTextColumn Header="Sz" Binding="{Binding Sz}" />
+                            <DataGridTextColumn Header="Sw" Binding="{Binding Sw}" />
+
+                            <DataGridTextColumn Header="Rx" Binding="{Binding Rx}" />
+                            <DataGridTextColumn Header="Ry" Binding="{Binding Ry}" />
+                            <DataGridTextColumn Header="Rz" Binding="{Binding Rz}" />
+                            <DataGridTextColumn Header="Rw" Binding="{Binding Rw}" />
+
+                            <DataGridTextColumn Header="Tx" Binding="{Binding Tx}" />
+                            <DataGridTextColumn Header="Ty" Binding="{Binding Ty}" />
+                            <DataGridTextColumn Header="Tz" Binding="{Binding Tz}" />
+                            <DataGridTextColumn Header="Tw" Binding="{Binding Tw}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+                <Grid VerticalAlignment="Top" Grid.Row="2">
+                    <Grid Height="200">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <GroupBox Grid.Column="0" Header="Joints">
+                            <TextBox AcceptsReturn="True" Width="100" Name="jointsText"
+                                     FontFamily="Lucida Console" />
+                        </GroupBox>
+                        <GroupBox Grid.Column="1" Header="IKC">
+                            <TextBox AcceptsReturn="True" Width="160" Name="ikcText" 
+                                     FontFamily="Lucida Console" />
+                        </GroupBox>
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
