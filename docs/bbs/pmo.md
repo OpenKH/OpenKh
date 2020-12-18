@@ -30,11 +30,11 @@ The Header is followed by `Texture Count` Texture Info records
 | 0x4    | char[0xC] | Texture Name |
 | 0x10   | int32[4] | unknown |
 
-See also: [TIM2]()
+See also: [TIM2](../common/tm2.md)
 
 ## Mesh Sections
 
-`Mesh Offset 0` and `Mesh Offset 1` both point to the start of a list of `Mesh Section Header`s. You keep reading headers + their verts until you encounter a 0 `Vertex Count`
+`Mesh Offset 0` and `Mesh Offset 1` both point to the start of a list of `Mesh Section Header`s. You keep reading headers + their verts until you encounter a 0 `Vertex Count`. This structure must be aligned on a 4 byte boundry.
 
 | Offset | Type | Description |
 |--------|------|-------------|
