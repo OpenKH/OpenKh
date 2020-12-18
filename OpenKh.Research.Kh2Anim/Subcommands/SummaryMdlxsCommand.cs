@@ -58,6 +58,9 @@ namespace OpenKh.Research.Kh2Anim.Subcommands
                         string hitMotionName = null;
                         int numHits = 0;
                         int maxIKType = 0;
+                        int numT6 = 0;
+                        int numT7 = 0;
+                        int numT8 = 0;
 
                         msetBarEntries
                             .Where(it => it.Type == Bar.EntryType.Anb && it.Stream.Length >= 32)
@@ -75,6 +78,10 @@ namespace OpenKh.Research.Kh2Anim.Subcommands
                                                     var motion = Motion.Read(motionEntry.Stream);
                                                     if (motion.Interpolated != null)
                                                     {
+                                                        numT6 = Math.Max(numT6, motion.Interpolated.Table6.Count);
+                                                        numT7 = Math.Max(numT7, motion.Interpolated.Table7.Count);
+                                                        numT8 = Math.Max(numT8, motion.Interpolated.Table8.Count);
+
                                                         motion.Interpolated.IKChains
                                                             .Where(it => it.Unk00 >= 4)
                                                             .ForEach(
@@ -102,7 +109,7 @@ namespace OpenKh.Research.Kh2Anim.Subcommands
 
                         if (hitMset != null)
                         {
-                            Console.WriteLine($"{mdlxFile},{subModel.BoneCount},{maxIKType},{numHits},{hitMset},{hitMotionName}");
+                            Console.WriteLine($"{mdlxFile},{subModel.BoneCount},{maxIKType},{numT6},{numT7},{numT8},{numHits},{hitMset},{hitMotionName}");
                         }
                     }
                 );

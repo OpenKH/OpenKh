@@ -112,8 +112,6 @@ namespace OpenKh.Research.Kh2AnimIKC
             }
         }
 
-        Action parentUpdater;
-
         private void build_Click(object sender, RoutedEventArgs e)
         {
             var model = Mdlx.CreateModelFromScratch();
