@@ -12,4 +12,19 @@
         <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Ram.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Ram.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Ram.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Ram.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
 </Project>

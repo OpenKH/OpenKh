@@ -18,9 +18,6 @@
       <None Update="rawData\5_Nodes.mdlx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="rawData\ee.mset.ram.bin.gz">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 </Project>

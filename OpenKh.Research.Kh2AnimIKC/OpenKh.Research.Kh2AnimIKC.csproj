@@ -15,10 +15,4 @@
         <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.1" />
     </ItemGroup>
 
-    <ItemGroup>
-        <None Update="rawData\ee.mset.ram.bin.gz">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
-
 </Project>
