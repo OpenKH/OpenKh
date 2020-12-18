@@ -92,7 +92,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public string Name { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SetProject)}: {Name}, Version {Version}, Camera type {ObjCameraType}, ({Unk00:X}, {Unk02:X})";
+                $"{nameof(SetProject)}: {Name}, Version {Version}, Camera type {ObjCameraType}, ({Unk00:X}, {Unk02:X})";
         }
 
         public class SetActor : IEventEntry // sub_22F528
@@ -102,7 +102,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public string Name { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SetActor)}: ObjEntry {ObjectEntry:X}, Name {Name}, ActorID {ActorId}";
+                $"{nameof(SetActor)}: ObjEntry {ObjectEntry:X}, Name {Name}, ActorID {ActorId}";
         }
         
         public class SeqActorPosition : IEventEntry
@@ -120,7 +120,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Frame { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqActorPosition)}: Frame {Frame}, ActorID {ActorId}, Pos({PositionX}, {PositionY}, {PositionZ}) Rot({RotationX}, {RotationY}, {RotationZ}) Unk({Unk00}, {Unk02}, {Unk1C})";
+                $"{nameof(SeqActorPosition)}: Frame {Frame}, ActorID {ActorId}, Pos({PositionX}, {PositionY}, {PositionZ}) Rot({RotationX}, {RotationY}, {RotationZ}) Unk({Unk00}, {Unk02}, {Unk1C})";
         }
 
         public class SetMap : IEventEntry // unused
@@ -129,7 +129,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public string World { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SetMap)}: {World}{Place:D02}";
+                $"{nameof(SetMap)}: {World}{Place:D02}";
         }
 
         public class SeqCamera : IEventEntry // ignored
@@ -140,7 +140,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk06 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqCamera)}: CameraID {CameraId}, Frame start {FrameStart}, Frame end {FrameEnd}, {Unk06}";
+                $"{nameof(SeqCamera)}: CameraID {CameraId}, Frame start {FrameStart}, Frame end {FrameEnd}, {Unk06}";
         }
 
         public class SetEndFrame : IEventEntry // sub_22D3B8
@@ -149,7 +149,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unused { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SetEndFrame)}: {EndFrame}";
+                $"{nameof(SetEndFrame)}: {EndFrame}";
         }
 
         public class SeqEffect : IEventEntry
@@ -163,7 +163,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short FadeFrame { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqEffect)}: Frame start {FrameStart}, Frame loop {FrameLoop}, Effect ID {EffectId}, PAX ID {PaxId}, PAX entry index {PaxEntryIndex}, End type {EndType}, Frame fade {FadeFrame}";
+                $"{nameof(SeqEffect)}: Frame start {FrameStart}, Frame loop {FrameLoop}, Effect ID {EffectId}, PAX ID {PaxId}, PAX entry index {PaxEntryIndex}, End type {EndType}, Frame fade {FadeFrame}";
         }
 
         public class AttachEffect : IEventEntry
@@ -177,7 +177,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Type { get; set; }
 
             public override string ToString() =>
-                $"{typeof(AttachEffect)}: Frame start {FrameStart}, Frame end {FrameEnd}, Attach effect ID {AttachEffectId}, ActorID {ActorId}, Bone index {BoneIndex}, PAX entry {PaxEntryIndex}, Type {Type}";
+                $"{nameof(AttachEffect)}: Frame start {FrameStart}, Frame end {FrameEnd}, Attach effect ID {AttachEffectId}, ActorID {ActorId}, Bone index {BoneIndex}, PAX entry {PaxEntryIndex}, Type {Type}";
         }
 
         public class EventStart : IEventEntry // sub_22D3A8
@@ -186,7 +186,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unused { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EventStart)}: Fade in for {FadeIn} frames";
+                $"{nameof(EventStart)}: Fade in for {FadeIn} frames";
         }
 
         public class SeqFade: IEventEntry
@@ -208,7 +208,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public FadeType Type { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqFade)}: Frame {FrameIndex}, Duration {Duration}, {Type}";
+                $"{nameof(SeqFade)}: Frame {FrameIndex}, Duration {Duration}, {Type}";
         }
 
         public class SetCameraData : IEventEntry
@@ -237,7 +237,7 @@ namespace OpenKh.Kh2.Ard
             public override string ToString()
             {
                 var sb = new StringBuilder();
-                sb.AppendLine($"{typeof(SetCameraData)}: ID {CameraId}");
+                sb.AppendLine($"{nameof(SetCameraData)}: ID {CameraId}");
                 sb.AppendLine($"\tPositionX: {ToString(PositionX)}");
                 sb.AppendLine($"\tPositionY: {ToString(PositionY)}");
                 sb.AppendLine($"\tPositionZ: {ToString(PositionZ)}");
@@ -253,7 +253,7 @@ namespace OpenKh.Kh2.Ard
             {
                 if (values.Count == 1)
                     return values[0].ToString();
-                return string.Join("\n\t\t", values.Select(x => x.ToString()));
+                return string.Join("\n\t\t", values);
             }
 
         }
@@ -263,7 +263,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk00 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk14)}: {Unk00}";
+                $"{nameof(EntryUnk14)}: {Unk00}";
         }
 
         public class SeqSubtitle : IEventEntry
@@ -274,7 +274,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short HideFlag { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqSubtitle)}: Frame {FrameStart}, MsgId {MessageId}, Index {Index}, Hide {HideFlag != 0}";
+                $"{nameof(SeqSubtitle)}: Frame {FrameStart}, MsgId {MessageId}, Index {Index}, Hide {HideFlag != 0}";
         }
 
         public class EntryUnk16 : IEventEntry
@@ -283,7 +283,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk02 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk16)}: {Unk00} {Unk02}";
+                $"{nameof(EntryUnk16)}: {Unk00} {Unk02}";
         }
 
         public class EntryUnk17 : IEventEntry
@@ -298,7 +298,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk0E { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk17)}: {Unk00}, {Unk02} {Unk04} {Unk06} {Unk08} {Unk0A} {Unk0C} {Unk0E}";
+                $"{nameof(EntryUnk17)}: {Unk00}, {Unk02} {Unk04} {Unk06} {Unk08} {Unk0A} {Unk0C} {Unk0E}";
         }
 
         public class EntryUnk18 : IEventEntry
@@ -309,7 +309,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk06 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk18)}: Frame {Frame}, {Unk02} {Unk04} {Unk06}";
+                $"{nameof(EntryUnk18)}: Frame {Frame}, {Unk02} {Unk04} {Unk06}";
         }
 
         public class SeqTextureAnim : IEventEntry
@@ -320,7 +320,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk06 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqTextureAnim)}: Frame {Frame}, {Unk02}, {Unk04}, {Unk06}";
+                $"{nameof(SeqTextureAnim)}: Frame {Frame}, {Unk02}, {Unk04}, {Unk06}";
         }
 
         public class EntryUnk1A : IEventEntry
@@ -329,7 +329,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk02 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk1A)}: {Unk00} {Unk02}";
+                $"{nameof(EntryUnk1A)}: {Unk00} {Unk02}";
         }
 
         public class SeqCrossFade : IEventEntry
@@ -338,7 +338,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Duration { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqCrossFade)}: {Frame}, {Duration}";
+                $"{nameof(SeqCrossFade)}: {Frame}, {Duration}";
         }
 
         public class SeqGameSpeed : IEventEntry
@@ -348,7 +348,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public float Speed { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqGameSpeed)}: {Frame} {Speed}";
+                $"{nameof(SeqGameSpeed)}: {Frame} {Speed}";
         }
 
         public class EntryUnk22 : IEventEntry
@@ -357,7 +357,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk02 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk22)}: {Unk00} {Unk02}";
+                $"{nameof(EntryUnk22)}: {Unk00} {Unk02}";
         }
 
         public class SeqVoices : IEventEntry
@@ -374,7 +374,7 @@ namespace OpenKh.Kh2.Ard
             public List<Voice> Voices { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqVoices)}:\n\t{string.Join("\n\t", Voices)}";
+                $"{nameof(SeqVoices)}:\n\t{string.Join("\n\t", Voices)}";
         }
 
         public class Unk0C : IEventEntry
@@ -385,7 +385,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk08 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(Unk0C)}: Frame {StartFrame}, {Unk04}, {Unk08}";
+                $"{nameof(Unk0C)}: Frame {StartFrame}, {Unk04}, {Unk08}";
         }
 
         public class Unk0D : IEventEntry
@@ -395,13 +395,13 @@ namespace OpenKh.Kh2.Ard
             [Data(Count = 34)] public short[] Unk { get; set; }
 
             public override string ToString() =>
-                $"{typeof(Unk0D)}: Frame {StartFrame}, ({string.Join(", ", Unk)})";
+                $"{nameof(Unk0D)}: Frame {StartFrame}, ({string.Join(", ", Unk)})";
         }
 
         public class SetupEvent : IEventEntry // sub_22d358
         {
             public override string ToString() =>
-                $"{typeof(SetupEvent)}";
+                $"{nameof(SetupEvent)}";
         }
 
         public class ReadAssets : IEventEntry
@@ -412,7 +412,7 @@ namespace OpenKh.Kh2.Ard
             public List<IEventEntry> Set { get; set; }
 
             public override string ToString() =>
-                $"{typeof(ReadAssets)}:\n\t{string.Join("\n\t", Set.Select(x => x.ToString()))}";
+                $"{nameof(ReadAssets)}:\n\t{string.Join("\n\t", Set)}";
         }
 
         public class EntryUnk2A : IEventEntry // sub_232A48
@@ -422,7 +422,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk04 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk2A)}: {Unk00} {Unk02} {Unk04}";
+                $"{nameof(EntryUnk2A)}: {Unk00} {Unk02} {Unk04}";
         }
 
         public class SeqPlayAudio : IEventEntry
@@ -435,7 +435,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk0A { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqPlayAudio)}: {Unk00}, {Unk02}, {Unk04}, {Unk06}, Frame {FrameStart}, {Unk0A}";
+                $"{nameof(SeqPlayAudio)}: {Unk00}, {Unk02}, {Unk04}, {Unk06}, Frame {FrameStart}, {Unk0A}";
         }
 
         public class SeqPlayAnimation : IEventEntry
@@ -450,7 +450,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public string Path { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqPlayAnimation)}: Frame start {FrameStart}, Frame end {FrameEnd}, {Unk04}, {Unk06}, {Unk08}, ActorID {ActorId}, {Unk0C}, {Path}";
+                $"{nameof(SeqPlayAnimation)}: Frame start {FrameStart}, Frame end {FrameEnd}, {Unk04}, {Unk06}, {Unk08}, ActorID {ActorId}, {Unk0C}, {Path}";
         }
 
         public class SeqDialog : IEventEntry
@@ -462,7 +462,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk08 { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqDialog)}: Frame index {FrameIndex}, {Unk02}, MsgID {MessageId}, {Unk06}, {Unk08}";
+                $"{nameof(SeqDialog)}: Frame index {FrameIndex}, {Unk02}, MsgID {MessageId}, {Unk06}, {Unk08}";
         }
 
         public class SeqPlayBgm : IEventEntry
@@ -475,7 +475,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public byte Unused { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqPlayBgm)}: Frame {Frame}, Bank {BankIndex}, Volume start {VolumeStartIndex}, Volume end {VolumeEndIndex}, Fade type {FadeType}";
+                $"{nameof(SeqPlayBgm)}: Frame {Frame}, Bank {BankIndex}, Volume start {VolumeStartIndex}, Volume end {VolumeEndIndex}, Fade type {FadeType}";
         }
 
         public class ReadBgm : IEventEntry
@@ -484,7 +484,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short BgmId { get; set; }
 
             public override string ToString() =>
-                $"{typeof(ReadBgm)}: BGM ID {BgmId}, {Unk00}";
+                $"{nameof(ReadBgm)}: BGM ID {BgmId}, {Unk00}";
         }
 
         public class SetBgm : IEventEntry
@@ -494,7 +494,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short BgmId { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SetBgm)}: BGM ID {BgmId}, {Frame} {BankIndex}";
+                $"{nameof(SetBgm)}: BGM ID {BgmId}, {Frame} {BankIndex}";
         }
 
         public class EntryUnk36 : IEventEntry
@@ -506,7 +506,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public float Unk0c { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk36)}: Frame {Frame}, {Unk02}, {Unk04}, {Unk08}, {Unk0c}";
+                $"{nameof(EntryUnk36)}: Frame {Frame}, {Unk02}, {Unk04}, {Unk08}, {Unk0c}";
         }
 
         public class ReadActor : IEventEntry
@@ -516,7 +516,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public string Name { get; set; }
 
             public override string ToString() =>
-                $"{typeof(ReadActor)}: ObjectEntry {ObjectId:X04}, Name {Name}, ActorID {ActorId}";
+                $"{nameof(ReadActor)}: ObjectEntry {ObjectId:X04}, Name {Name}, ActorID {ActorId}";
         }
 
         public class ReadEffect : IEventEntry
@@ -525,7 +525,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public string Name { get; set; }
 
             public override string ToString() =>
-                $"{typeof(ReadEffect)}: Id {Id}, Name {Name}";
+                $"{nameof(ReadEffect)}: Id {Id}, Name {Name}";
         }
 
         public class ReadMotion : IEventEntry
@@ -536,14 +536,14 @@ namespace OpenKh.Kh2.Ard
             [Data] public string Name { get; set; }
 
             public override string ToString() =>
-                $"{typeof(ReadMotion)}: ObjectEntry {ObjectId:X04}, ActorID {ActorId}, Unk? {UnknownIndex}, Path {Name}";
+                $"{nameof(ReadMotion)}: ObjectEntry {ObjectId:X04}, ActorID {ActorId}, Unk? {UnknownIndex}, Path {Name}";
         }
 
         public class ReadAudio : IEventEntry
         {
             [Data] public string Name { get; set; }
 
-            public override string ToString() => $"{typeof(ReadAudio)} {Name}";
+            public override string ToString() => $"{nameof(ReadAudio)} {Name}";
         }
 
         public class SetShake : IEventEntry
@@ -556,7 +556,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Duration { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SetShake)}: Frame {Frame}, Type {Type}, Width {Width}, Height {Height}, Depth {Depth}, Duration {Duration}";
+                $"{nameof(SetShake)}: Frame {Frame}, Type {Type}, Width {Width}, Height {Height}, Depth {Depth}, Duration {Duration}";
         }
 
         public class StopEffect : IEventEntry
@@ -565,7 +565,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unused { get; set; }
 
             public override string ToString() =>
-                $"{typeof(StopEffect)}: Frame {Frame}";
+                $"{nameof(StopEffect)}: Frame {Frame}";
         }
 
         public class RunMovie : IEventEntry
@@ -574,7 +574,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public string Name { get; set; }
 
             public override string ToString() =>
-                $"{typeof(RunMovie)}: Frame {Frame}, Name {Name}";
+                $"{nameof(RunMovie)}: Frame {Frame}, Name {Name}";
         }
 
         public class EntryUnk47 : IEventEntry
@@ -594,7 +594,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Unk2A { get; set; }
 
             public override string ToString() =>
-                $"{typeof(EntryUnk47)}: {Unk00}, {Unk02}, {Unk28}, {Unk2A}, StartPos({StartPositionX}, {StartPositionY}, {StartPositionZ}), EndPos({EndPositionX}, {EndPositionY}, {EndPositionZ}), Rot({RotationX}, {RotationY}, {RotationZ})";
+                $"{nameof(EntryUnk47)}: {Unk00}, {Unk02}, {Unk28}, {Unk2A}, StartPos({StartPositionX}, {StartPositionY}, {StartPositionZ}), EndPos({EndPositionX}, {EndPositionY}, {EndPositionZ}), Rot({RotationX}, {RotationY}, {RotationZ})";
         }
 
         public class SeqHideObject : IEventEntry
@@ -603,7 +603,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Type { get; set; }
 
             public override string ToString() =>
-                $"{typeof(SeqHideObject)}: Frame {Frame}, Type {Type}";
+                $"{nameof(SeqHideObject)}: Frame {Frame}, Type {Type}";
         }
 
         public static List<IEventEntry> Read(Stream stream)
@@ -629,7 +629,6 @@ namespace OpenKh.Kh2.Ard
                 stream.Position = startPosition + blockLength;
             }
 
-            var str = string.Join("\n", entries.Select(x => x.ToString()));
             return entries;
         }
 
@@ -653,6 +652,9 @@ namespace OpenKh.Kh2.Ard
 
             stream.Write(Terminator);
         }
+
+        public static string ToString(IEnumerable<IEventEntry> eventSet) =>
+            string.Join("\n", eventSet);
 
         private static string ReadCStyleString(Stream stream)
         {
@@ -774,8 +776,6 @@ namespace OpenKh.Kh2.Ard
 
             var item = args.Item as SetCameraData;
             args.Writer.Write(item.CameraId);
-            if (item.CameraId == 10)
-                item = item;
 
             var channelCountList = new List<int>(8)
             {
