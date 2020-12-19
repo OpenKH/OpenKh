@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpenKh.Research.Kh2AnimIKC"
         xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
         mc:Ignorable="d"
-        Title="OpenKh.Research.Kh2AnimIKC" Height="542" Width="999">
+        Title="OpenKh.Research.Kh2AnimIKC" Height="888" Width="999">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -15,6 +15,7 @@
         <Menu Grid.Row="0">
             <MenuItem Header="_Quit" />
             <MenuItem Header="_Build" Name="build" Click="build_Click" />
+            <MenuItem Header="_Open" Name="openModel" Click="openModel_Click" />
         </Menu>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -37,52 +38,65 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <GroupBox VerticalAlignment="Top" Grid.Row="0" Header="Bones">
-                    <DataGrid Grid.Row="1" Name="boneGrid" ItemsSource="{Binding}"
-                              AutoGenerateColumns="False"
-                              KeyDown="boneGrid_KeyDown"
-                              >
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Disp" Binding="{Binding Display}" />
-                            <DataGridTextColumn Header="#" Binding="{Binding Idx}" />
-                            <DataGridTextColumn Header="Parent" Binding="{Binding Parent}" />
-                            <DataGridTextColumn Header="Unk2" Binding="{Binding Unk2}" />
-                            <DataGridTextColumn Header="Unk3" Binding="{Binding Unk3}" />
+                <Grid Grid.Row="0" VerticalAlignment="Top" Height="150">
+                    <GroupBox Header="Bones 1">
+                        <DataGrid Name="bone1Grid" ItemsSource="{Binding}">
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Row="1" VerticalAlignment="Top" Height="150">
+                    <GroupBox Header="Bones 2">
+                        <DataGrid Name="bone2Grid" ItemsSource="{Binding}">
 
-                            <DataGridTextColumn Header="Sx" Binding="{Binding Sx}" />
-                            <DataGridTextColumn Header="Sy" Binding="{Binding Sy}" />
-                            <DataGridTextColumn Header="Sz" Binding="{Binding Sz}" />
-                            <DataGridTextColumn Header="Sw" Binding="{Binding Sw}" />
-
-                            <DataGridTextColumn Header="Rx" Binding="{Binding Rx}" />
-                            <DataGridTextColumn Header="Ry" Binding="{Binding Ry}" />
-                            <DataGridTextColumn Header="Rz" Binding="{Binding Rz}" />
-                            <DataGridTextColumn Header="Rw" Binding="{Binding Rw}" />
-
-                            <DataGridTextColumn Header="Tx" Binding="{Binding Tx}" />
-                            <DataGridTextColumn Header="Ty" Binding="{Binding Ty}" />
-                            <DataGridTextColumn Header="Tz" Binding="{Binding Tz}" />
-                            <DataGridTextColumn Header="Tw" Binding="{Binding Tw}" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </GroupBox>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
                 <Grid VerticalAlignment="Top" Grid.Row="2">
                     <Grid Height="200">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
                         <GroupBox Grid.Column="0" Header="Joints">
-                            <TextBox AcceptsReturn="True" Width="100" Name="jointsText"
-                                     FontFamily="Lucida Console" />
+                            <DataGrid Name="jointsGrid" ItemsSource="{Binding}">
+
+                            </DataGrid>
                         </GroupBox>
                         <GroupBox Grid.Column="1" Header="IKC">
-                            <TextBox AcceptsReturn="True" Width="160" Name="ikcText" 
-                                     FontFamily="Lucida Console" />
+                            <DataGrid Name="ikcGrid" ItemsSource="{Binding}">
+
+                            </DataGrid>
                         </GroupBox>
                     </Grid>
+                </Grid>
+                <Grid Grid.Row="3" VerticalAlignment="Top" Height="150">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="T6" Grid.Column="0">
+                            <DataGrid Name="t6Grid" ItemsSource="{Binding}">
+
+                            </DataGrid>
+                        </GroupBox>
+                        <GroupBox Header="T7" Grid.Column="1">
+                            <DataGrid Name="t7Grid" ItemsSource="{Binding}">
+
+                            </DataGrid>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="4" VerticalAlignment="Top" Height="200">
+                    <GroupBox Header="T8">
+                        <DataGrid Name="t8Grid" ItemsSource="{Binding}">
+
+                        </DataGrid>
+                    </GroupBox>
                 </Grid>
             </Grid>
         </Grid>

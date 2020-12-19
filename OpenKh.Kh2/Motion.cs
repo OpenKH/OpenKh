@@ -261,13 +261,14 @@ namespace OpenKh.Kh2
             [Data] public short ModelBoneIndex { get; set; }
             [Data] public short IKHelperIndex { get; set; }
             [Data] public short Table8Index { get; set; }
-            [Data] public int Unk08 { get; set; }
+            [Data] public short Unk08 { get; set; }
+            [Data] public short Unk0a { get; set; }
         }
 
         public class UnknownTable8
         {
             [Data] public int Unk00 { get; set; }
-            [Data] public float Unk04 { get; set; }
+            [Data] public int Unk04 { get; set; }
             [Data] public float Unk08 { get; set; }
             [Data] public float Unk0c { get; set; }
             [Data] public float Unk10 { get; set; }
@@ -284,7 +285,8 @@ namespace OpenKh.Kh2
         {
             [Data] public short Unk00 { get; set; }
             [Data] public short Unk02 { get; set; }
-            [Data] public float Unk04 { get; set; }
+            [Data] public short Unk04 { get; set; }
+            [Data] public short Unk06 { get; set; }
         }
 
         public class UnknownTable6
@@ -502,7 +504,7 @@ namespace OpenKh.Kh2
 
                 stream.Position = ReservedSize + motion.JointIndexOffset;
                 Interpolated.Joints = Enumerable
-                    .Range(0, motion.TotalBoneCount + 1)
+                    .Range(0, motion.TotalBoneCount)
                     .Select(x => BinaryMapping.ReadObject<JointTable>(stream))
                     .ToList();
 

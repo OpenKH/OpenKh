@@ -14,7 +14,7 @@ using static OpenKh.Kh2.Motion;
 namespace OpenKh.Research.Kh2Anim.Subcommands
 {
     [HelpOption]
-    [Command(Description = "Burn")]
+    [Command(Description = "Burn hard coded motion and print computed (x, y) of bones.")]
     public class BurnCommand
     {
         [Option(CommandOptionType.SingleValue, ShortName = "o", Description = "Output file: model.mset")]

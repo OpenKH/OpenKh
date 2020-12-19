@@ -1,9 +1,13 @@
+using Microsoft.Win32;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2Anim.Mset;
+using OpenKh.Research.Kh2AnimIKC.Extensions;
 using OpenKh.Research.Kh2AnimIKC.Models;
 using OpenKh.Research.Kh2AnimIKC.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -17,7 +21,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+using static OpenKh.Kh2.Motion;
 using Vector = System.Windows.Vector;
 
 namespace OpenKh.Research.Kh2AnimIKC
@@ -27,10 +31,17 @@ namespace OpenKh.Research.Kh2AnimIKC
     /// </summary>
     public partial class MainWindow : Window
     {
-        private List<BoneDef> boneDefs = new List<BoneDef>();
         private int numA = 5;
         private int numB = 5;
         private Matrix4x4[] matricesOut;
+
+        private readonly ObservableCollection<Mdlx.Bone> bone1List = new ObservableCollection<Mdlx.Bone>();
+        private readonly ObservableCollection<IKHelperTable> bone2List = new ObservableCollection<IKHelperTable>();
+        private readonly ObservableCollection<UnknownTable6> t6List = new ObservableCollection<UnknownTable6>();
+        private readonly ObservableCollection<UnknownTable7> t7List = new ObservableCollection<UnknownTable7>();
+        private readonly ObservableCollection<UnknownTable8> t8List = new ObservableCollection<UnknownTable8>();
+        private readonly ObservableCollection<JointTable> jointsList = new ObservableCollection<JointTable>();
+        private readonly ObservableCollection<IKChainTable> ikcList = new ObservableCollection<IKChainTable>();
 
         public MainWindow()
         {
@@ -42,104 +53,106 @@ namespace OpenKh.Research.Kh2AnimIKC
                 int x = 0;
                 for (; x < numA; x++)
                 {
-                    boneDefs.Add(new BoneDef
+                    bone1List.Add(new Mdlx.Bone
                     {
-                        Display = $"A{x}",
                         Parent = x - 1,
-                        Idx = x,
+                        Index = x,
 
-                        Sw = (x == (numA - 4) || x == (numA - 4)) ? 20 : 0,
-                        Unk3 = ((x == numA - 100) || (x == numA - 2)) ? 3 : 0,
+                        ScaleX = 1,
+                        ScaleY = 1,
+                        ScaleZ = 1,
 
-                        Tx = (x != 0) ? 50 : 0
+                        ScaleW = (x == (numA - 4) || x == (numA - 4)) ? 20 : 0,
+                        Unk0c = ((x == numA - 100) || (x == numA - 2)) ? 3 : 0,
+
+                        TranslationX = (x != 0) ? 50 : 0
                     });
                 }
                 for (; x < numA + numB; x++)
                 {
-                    boneDefs.Add(new BoneDef
+                    bone2List.Add(new IKHelperTable
                     {
-                        Display = $"B{x}",
-                        Parent = (x == numA) ? 0 : x - 1,
-                        Idx = x,
+                        ParentIndex = (x == numA) ? 0 : x - 1,
+                        Index = x,
 
-                        Ty = (x != numA) ? 50 : 0
+                        ScaleX = 1,
+                        ScaleY = 1,
+                        ScaleZ = 1,
+
+                        TranslateY = (x != numA) ? 50 : 0
                     });
                 }
             }
 
             {
-                var writer = new StringWriter();
-
                 for (int x = 0; x < numB; x++)
                 {
-                    writer.WriteLine($"{numA + x,3} 00");
+                    jointsList.Add(new JointTable { JointIndex = (short)(numA + x), Flag = 0 });
                 }
                 for (int x = 0; x < numA; x++)
                 {
                     if (UseIt && x == numA - 4)
                     {
-                        writer.WriteLine($"{x,3} 03");
+                        jointsList.Add(new JointTable { JointIndex = (short)(x), Flag = 3 });
                     }
                     else if (UseIt && x == numA - 3)
                     {
-                        writer.WriteLine($"{x,3} 20");
+                        jointsList.Add(new JointTable { JointIndex = (short)(x), Flag = 0x20 });
                     }
                     else if (UseIt && x == numA - 2)
                     {
-                        writer.WriteLine($"{x,3} 04");
+                        jointsList.Add(new JointTable { JointIndex = (short)(x), Flag = 4 });
                     }
                     else
                     {
-                        writer.WriteLine($"{x,3} 00");
+                        jointsList.Add(new JointTable { JointIndex = (short)(x), Flag = 0 });
                     }
                 }
-
-                jointsText.Text = writer.ToString();
             }
 
-            {
-                var writer = new StringWriter();
-
-                writer.WriteLine($"{numA + numB - 1,3} {numA - 1,3} 03 01 -1 0");
-
-                ikcText.Text = writer.ToString();
-            }
+            ikcList.Add(new IKChainTable { Unk00 = 3, Unk01 = 1, IKHelperIndex = (short)(numA + numB - 1), ModelBoneIndex = (short)(numA - 1), Table8Index = -1 });
 
             {
                 var view = new CollectionViewSource();
-                view.Source = boneDefs;
-                boneGrid.DataContext = view;
+                view.Source = bone1List;
+                bone1Grid.DataContext = view;
+            }
+            {
+                var view = new CollectionViewSource();
+                view.Source = bone2List;
+                bone2Grid.DataContext = view;
+            }
+            {
+                var view = new CollectionViewSource();
+                view.Source = jointsList;
+                jointsGrid.DataContext = view;
+            }
+            {
+                var view = new CollectionViewSource();
+                view.Source = ikcList;
+                ikcGrid.DataContext = view;
+            }
+            {
+                var view = new CollectionViewSource();
+                view.Source = t6List;
+                t6Grid.DataContext = view;
+            }
+            {
+                var view = new CollectionViewSource();
+                view.Source = t7List;
+                t7Grid.DataContext = view;
+            }
+            {
+                var view = new CollectionViewSource();
+                view.Source = t8List;
+                t8Grid.DataContext = view;
             }
         }
 
         private void build_Click(object sender, RoutedEventArgs e)
         {
             var model = Mdlx.CreateModelFromScratch();
-            model.SubModels[0].Bones.AddRange(
-                boneDefs
-                    .Take(numA)
-                    .Select(
-                        it => new Mdlx.Bone
-                        {
-                            Index = it.Idx,
-                            Parent = it.Parent,
-                            Unk08 = it.Unk2,
-                            Unk0c = it.Unk3,
-                            ScaleX = it.Sx,
-                            ScaleY = it.Sy,
-                            ScaleZ = it.Sz,
-                            ScaleW = it.Sw,
-                            RotationX = it.Rx,
-                            RotationY = it.Ry,
-                            RotationZ = it.Rz,
-                            RotationW = it.Rw,
-                            TranslationX = it.Tx,
-                            TranslationY = it.Ty,
-                            TranslationZ = it.Tz,
-                            TranslationW = it.Tw,
-                        }
-                    )
-            );
+            model.SubModels[0].Bones.AddRange(bone1List);
 
             var mot = Motion.CreateInterpolatedFromScratch();
             var i = mot.Interpolated;
@@ -151,59 +164,12 @@ namespace OpenKh.Research.Kh2AnimIKC
             i.FrameEnd = 1;
             i.FramePerSecond = 30;
             i.TotalFrameCount = 1;
-            i.IKHelpers.AddRange(
-                boneDefs
-                    .Skip(numA)
-                    .Select(
-                        it => new Motion.IKHelperTable
-                        {
-                            Index = it.Idx,
-                            ParentIndex = it.Parent,
-                            Unk08 = it.Unk2,
-                            Unk0c = it.Unk3,
-                            ScaleX = it.Sx,
-                            ScaleY = it.Sy,
-                            ScaleZ = it.Sz,
-                            ScaleW = it.Sw,
-                            RotateX = it.Rx,
-                            RotateY = it.Ry,
-                            RotateZ = it.Rz,
-                            RotateW = it.Rw,
-                            TranslateX = it.Tx,
-                            TranslateY = it.Ty,
-                            TranslateZ = it.Tz,
-                            TranslateW = it.Tw,
-                        }
-                    )
-            );
-            i.Joints.AddRange(
-                jointsText.Text.Split('\n')
-                    .Select(text => text.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
-                    .Where(cells => cells.Length == 2)
-                    .Select(
-                        cells => new Motion.JointTable
-                        {
-                            JointIndex = short.Parse(cells[0]),
-                            Flag = Convert.ToInt16(cells[1], 16),
-                        }
-                    )
-            );
-            i.IKChains.AddRange(
-                ikcText.Text.Split('\n')
-                    .Select(text => text.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
-                    .Where(cells => cells.Length == 6)
-                    .Select(
-                        cells => new Motion.IKChainTable
-                        {
-                            IKHelperIndex = short.Parse(cells[0]),
-                            ModelBoneIndex = short.Parse(cells[1]),
-                            Unk00 = Convert.ToByte(cells[2], 16),
-                            Unk01 = Convert.ToByte(cells[3], 16),
-                            Table8Index = short.Parse(cells[4]),
-                            Unk08 = short.Parse(cells[5]),
-                        }
-                    )
-            );
+            i.IKHelpers.AddRange(bone2List);
+            i.Joints.AddRange(jointsList);
+            i.IKChains.AddRange(ikcList);
+            i.Table6.AddRange(t6List);
+            i.Table7.AddRange(t7List);
+            i.Table8.AddRange(t8List);
 
             var modelStream = new MemoryStream();
             model.Write(modelStream);
@@ -293,14 +259,25 @@ namespace OpenKh.Research.Kh2AnimIKC
                 var visual = new DrawingVisual();
                 var c = visual.RenderOpen();
 
-                foreach (var bone in boneDefs)
+                foreach (var bone in bone1List)
                 {
                     if (bone.Parent != -1)
                     {
                         var pos0 = Conv(Vector2.Transform(Vector2.Zero, matricesOut[bone.Parent]));
-                        var pos1 = Conv(Vector2.Transform(Vector2.Zero, matricesOut[bone.Idx]));
+                        var pos1 = Conv(Vector2.Transform(Vector2.Zero, matricesOut[bone.Index]));
 
-                        c.DrawLine((bone.Idx < numA) ? primaryPen : secondaryPen, pos0, pos1);
+                        c.DrawLine(primaryPen , pos0, pos1);
+                        c.DrawRectangle(null, boxPen, new Rect(pos1 - new Vector(2, 2), pos1 + new Vector(2, 2)));
+                    }
+                }
+                foreach (var bone in bone2List)
+                {
+                    if (bone.ParentIndex != -1)
+                    {
+                        var pos0 = Conv(Vector2.Transform(Vector2.Zero, matricesOut[bone.ParentIndex]));
+                        var pos1 = Conv(Vector2.Transform(Vector2.Zero, matricesOut[bone.Index]));
+
+                        c.DrawLine(secondaryPen, pos0, pos1);
                         c.DrawRectangle(null, boxPen, new Rect(pos1 - new Vector(2, 2), pos1 + new Vector(2, 2)));
                     }
                 }
@@ -315,26 +292,49 @@ namespace OpenKh.Research.Kh2AnimIKC
             Render();
         }
 
-        private void boneGrid_KeyDown(object sender, KeyEventArgs e)
+        private void openModel_Click(object sender, RoutedEventArgs e)
         {
-            return;
-            int delta = (e.Key == Key.F3) ? 1 : (e.Key == Key.F4) ? -1 : 0;
-            if (delta != 0)
+            var ofd = new OpenFileDialog
             {
-                var item = boneGrid.CurrentItem;
-                var col = boneGrid.CurrentColumn;
-                if (item != null && col != null)
-                {
-                    var type = item.GetType();
-                    var propInfo = type.GetProperty(col.Header + "");
-                    if (propInfo != null && propInfo.PropertyType == typeof(float))
-                    {
-                        float val = (float)propInfo.GetValue(item);
-                        propInfo.SetValue(item, val + delta * 0.1f);
-                    }
-                }
-                e.Handled = true;
+                CheckFileExists = true,
+                Filter = "*.mdlx|*.mdlx",
+                ShowReadOnly = true,
+                ReadOnlyChecked = true,
+            };
+            if (!ofd.ShowDialog() ?? false)
+            {
+                return;
             }
+            var mdlxFile = ofd.FileName;
+            var msetFile = Path.ChangeExtension(mdlxFile, ".mset");
+            if (!File.Exists(msetFile))
+            {
+                MessageBox.Show($"It assumes you have also corresponding mset \"{msetFile}\"!");
+                return;
+            }
+            var mdlxBarEnts = File.OpenRead(mdlxFile).Using(Bar.Read);
+            var model = Mdlx.Read(mdlxBarEnts.First(it => it.Type == Bar.EntryType.Model).Stream);
+
+            var msetBarEnts = File.OpenRead(msetFile).Using(Bar.Read);
+            var anbEnt = msetBarEnts.First(it => it.Type == Bar.EntryType.Anb);
+            var anbEnts = Bar.Read(anbEnt.Stream);
+            var motion = Motion.Read(anbEnts.Single(it => it.Type == Bar.EntryType.Motion).Stream);
+
+            var subModel = model.SubModels.First();
+
+            bone1List.ClearAndAddItems(subModel.Bones);
+            numA = bone1List.Count;
+
+            var i = motion.Interpolated;
+
+            bone2List.ClearAndAddItems(i.IKHelpers);
+            numB = bone2List.Count;
+
+            jointsList.ClearAndAddItems(i.Joints);
+            ikcList.ClearAndAddItems(i.IKChains);
+            t6List.ClearAndAddItems(i.Table6);
+            t7List.ClearAndAddItems(i.Table7);
+            t8List.ClearAndAddItems(i.Table8);
         }
     }
 }
