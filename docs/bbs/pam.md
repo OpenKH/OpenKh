@@ -1,5 +1,7 @@
 # [Kingdom Hearts Birth by Sleep](index.md) - PAM (Animation Container)
 
+## File format
+
 ### PAM Header
 
 | Offset | Variable Type | Description |
@@ -49,7 +51,7 @@ The meanings of the set bits are as follows:
 | Bit Set | Description
 |---------|---------------
 | 0       | `translation.x` exists
-| 1       | `translation.y` exists`
+| 1       | `translation.y` exists
 | 2       | `translation.z` exists
 | 3       | `rotation.x` exists
 | 4       | `rotation.y` exists
@@ -85,7 +87,7 @@ This channel uses a constant value throughout the animation. The maximum and min
 
 This channel has a key for every frame of this animation. So the frame ids of keyframes will not be stored. Frame id will start from 0 and will be incremented after each entry.
 
-#### Keyframe Entry
+#### Keyframe Index Entry
 
 | Variable Type | Description |
 |---------------|-------------|
