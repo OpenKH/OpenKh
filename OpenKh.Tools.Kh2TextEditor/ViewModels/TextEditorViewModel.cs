@@ -80,6 +80,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
                 _currentText = value;
                 selectedItem.Text = value;
+                OnPropertyChanged();
             }
         }
 
@@ -143,7 +144,6 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             HandleReturn = new RelayCommand(x =>
             {
                 Text += "{:newline}";                
-                SelectedItem = SelectedItem;
             });
 
             HandleRemoval = new RelayCommand(x =>
@@ -154,8 +154,8 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
             HandleAddition = new RelayCommand(x =>
             {
-                int _id = MessageEntries[MessageEntries.Count - 1].Id;
-                MessageEntries.Add(new Msg.Entry() { Id = _id + 1, Data = new byte[] { 0x33, 0x2E, 0x38, 0x32, 0x00 } });
+                int _id = MessageEntries.Max(x => x.Id);
+                MessageEntries.Add(new Msg.Entry() { Id = _id + 1, Data = CurrentMessageEncoder.Encode(MsgSerializer.DeserializeText("FAKE").ToList()) });
                 ResetMessagesView();
             });
 
@@ -190,14 +190,11 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                         Text += "{:position 0,0}";
                         break;
                 }
-
-                SelectedItem = SelectedItem;
             });
 
             HandleIcon = new RelayCommand(x =>
             {
                 Text += "{:icon " + x + "}";
-                SelectedItem = SelectedItem;
             });
         }
 
