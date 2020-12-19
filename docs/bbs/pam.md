@@ -17,6 +17,7 @@
 | 04 | char[12] | Animation name.|
 
 ## Animations
+
 Animations in Birth by Sleep do not need to be aligned in any way.
 
 ### Animation Header
@@ -32,6 +33,7 @@ Animations in Birth by Sleep do not need to be aligned in any way.
 | 0A | uint16_t | Loop to frame, determines the point the animation loops to.|
 
 ## Animation Data
+
 The animation data consists of separate channels for each animated property. There can be maximum 9 channels for every bone: Translation X/Y/Z, Rotation (radians) X/Y/Z, Scale X/Y/Z.
 
 There are 9 flags (1 bit) for every bone to tell if that bone uses a channel or not. This will be explained below in more detail.
@@ -57,6 +59,7 @@ The meanings of the set bits are as follows:
 | 8       | `scale.z` exists
 
 ## Channel Data
+
 After the flags comes the actual animation data. It is ordered by bones, meaning first all channels for Bone0, then all channels for Bone1 and so on. The channels are also ordered as the table in channel flags section. If a flag for a channel was not set, then it is skipped and there is no data for it.
 
 The keyframe data (if exists) is quantized and stored as unsigned shorts. The maximum and minimum values are stored for each channel which are used for dequantization.
@@ -71,12 +74,15 @@ The keyframe data (if exists) is quantized and stored as unsigned shorts. The ma
 | 08 | ushort | Keyframe count (animation frame count > 255) |
 
 ## Keyframe Data
+
 After the channel header the keyframe data starts. The data storage also changes here depending on keyframe counts. So it will be divided into 3 categories for ease of understanding.
 
-### Keyframe Count = 0
+### Keyframe Count = 1
+
 This channel uses a constant value throughout the animation. The maximum and minimum values in the channel header will be the same. Either one of these can be used as the constant value of this channel. There will be no keyframe data.
 
 ### Keyframe Count = Animation Frame Count
+
 This channel has a key for every frame of this animation. So the frame ids of keyframes will not be stored. Frame id will start from 0 and will be incremented after each entry.
 
 #### Keyframe Entry
@@ -86,6 +92,7 @@ This channel has a key for every frame of this animation. So the frame ids of ke
 | ushort | Quantized value of this keyframe|
 
 ### Keyframe Count < Animation Frame Count
+
 This channel has only keys for specific frames. Therefore the frame id is also stored before the value for each entry.
 
 #### Keyframe Entry
@@ -97,6 +104,7 @@ This channel has only keys for specific frames. Therefore the frame id is also s
 | ushort | Quantized value of this keyframe|
 
 ## Implementation and Other Uses
-An animation parser/viewer can be made using the documentation above. Although all the information was gathered from BBS, it seems to hold true for DDD. I have implemented this in my [tool for DDD](https://forum.xentax.com/viewtopic.php?p=169270&sid=51dbc614987b03be478bbcb5b90665a4#p169270) remaster on PS4.
+
+An animation parser/viewer can be made using the documentation above. Although all the information was gathered from BBS, it seems to hold true for DDD. There is a [tool](https://forum.xentax.com/viewtopic.php?p=169270&sid=51dbc614987b03be478bbcb5b90665a4#p169270) by akderebur which implements animation support for DDD remaster on PS4.
 
 ![image](./images/sora_anim.gif)
