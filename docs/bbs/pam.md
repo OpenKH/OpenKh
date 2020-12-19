@@ -85,7 +85,7 @@ This channel has a key for every frame of this animation. So the frame ids of ke
 |---------------|-------------|
 | ushort | Quantized value of this keyframe|
 
-### Keyframe Count = Animation Frame Count
+### Keyframe Count < Animation Frame Count
 This channel has only keys for specific frames. Therefore the frame id is also stored before the value for each entry.
 
 #### Keyframe Entry
