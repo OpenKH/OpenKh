@@ -266,7 +266,7 @@ namespace OpenKh.Research.Kh2AnimIKC
                         var pos0 = Conv(Vector2.Transform(Vector2.Zero, matricesOut[bone.Parent]));
                         var pos1 = Conv(Vector2.Transform(Vector2.Zero, matricesOut[bone.Index]));
 
-                        c.DrawLine(primaryPen , pos0, pos1);
+                        c.DrawLine(primaryPen, pos0, pos1);
                         c.DrawRectangle(null, boxPen, new Rect(pos1 - new Vector(2, 2), pos1 + new Vector(2, 2)));
                     }
                 }
@@ -309,17 +309,58 @@ namespace OpenKh.Research.Kh2AnimIKC
             var msetFile = Path.ChangeExtension(mdlxFile, ".mset");
             if (!File.Exists(msetFile))
             {
-                MessageBox.Show($"It assumes you have also corresponding mset \"{msetFile}\"!");
+                MessageBox.Show($"It excepts that you have also corresponding mset file:\n\n{msetFile}");
                 return;
             }
             var mdlxBarEnts = File.OpenRead(mdlxFile).Using(Bar.Read);
             var model = Mdlx.Read(mdlxBarEnts.First(it => it.Type == Bar.EntryType.Model).Stream);
 
             var msetBarEnts = File.OpenRead(msetFile).Using(Bar.Read);
-            var anbEnt = msetBarEnts.First(it => it.Type == Bar.EntryType.Anb);
-            var anbEnts = Bar.Read(anbEnt.Stream);
-            var motion = Motion.Read(anbEnts.Single(it => it.Type == Bar.EntryType.Motion).Stream);
 
+            motions.Items.Clear();
+
+            foreach (var anbEnt in msetBarEnts.Where(it => it.Type == Bar.EntryType.Anb && it.Stream.Length != 0))
+            {
+                var anbEnts = Bar.Read(anbEnt.Stream);
+                var motion = Motion.Read(anbEnts.Single(it => it.Type == Bar.EntryType.Motion).Stream);
+
+                var item = new MenuItem
+                {
+                    Header = anbEnt.Name,
+                };
+
+                item.Command = new CommandProxy
+                {
+                    OnExecute = () =>
+                    {
+                        ResetWith(model, motion);
+
+                        motions.Items.Cast<MenuItem>().ForEach(it => it.IsChecked = ReferenceEquals(it, item));
+                    }
+                };
+
+                motions.Items.Add(item);
+            }
+
+            motions.Items.Cast<MenuItem>().Take(1).ForEach(it => it.Command.Execute(null));
+        }
+
+        class CommandProxy : ICommand
+        {
+            public event EventHandler CanExecuteChanged;
+
+            public bool CanExecute(object parameter) => true;
+
+            public void Execute(object parameter)
+            {
+                OnExecute?.Invoke();
+            }
+
+            public Action OnExecute { get; set; }
+        }
+
+        void ResetWith(Mdlx model, Motion motion)
+        {
             var subModel = model.SubModels.First();
 
             bone1List.ClearAndAddItems(subModel.Bones);

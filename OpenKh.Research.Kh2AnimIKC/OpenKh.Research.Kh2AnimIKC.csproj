@@ -13,6 +13,7 @@
         <ProjectReference Include="..\OpenKh.Kh2AnimEmu\OpenKh.Kh2AnimEmu.csproj" />
 
         <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.1" />
+        <PackageReference Include="System.Interactive" Version="5.0.0" />
     </ItemGroup>
 
 </Project>

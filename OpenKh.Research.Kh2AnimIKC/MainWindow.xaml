@@ -13,9 +13,9 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
-            <MenuItem Header="_Quit" />
+            <MenuItem Header="_Open mdlx and mset" Name="openModel" Click="openModel_Click" />
             <MenuItem Header="_Build" Name="build" Click="build_Click" />
-            <MenuItem Header="_Open" Name="openModel" Click="openModel_Click" />
+            <MenuItem Header="Load another _motion ∇" Name="motions" />
         </Menu>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
