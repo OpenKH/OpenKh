@@ -16,7 +16,7 @@ using static OpenKh.Kh2.Motion;
 namespace OpenKh.Research.Kh2Anim.Subcommands
 {
     [HelpOption]
-    [Command(Description = "Fry fake motion")]
+    [Command(Description = "Fry motion and write down gnuplot script")]
     class FryCommand
     {
         [Option(CommandOptionType.SingleValue, ShortName = "o", Description = "Output file: model.mset")]
@@ -55,6 +55,9 @@ namespace OpenKh.Research.Kh2Anim.Subcommands
         [Option(CommandOptionType.SingleValue, ShortName = "m", Description = "The value directly set to matrix")]
         public float MatrixValue { get; set; } = 0;
 
+        [Option(CommandOptionType.MultipleValue, ShortName = "g", Description = "Insert gnuplot commands")]
+        public string[] GnuplotInsert { get; set; }
+
         protected int OnExecute(CommandLineApplication app)
         {
             FramePerSecond = Math.Max(1, FramePerSecond);
@@ -72,7 +75,9 @@ namespace OpenKh.Research.Kh2Anim.Subcommands
                 new BoneAnimationTable
                 {
                     JointIndex = 1,
-                    Channel = (byte)(6 | ((3 & Pre) << 4) | ((3 & Post) << 6)),
+                    Channel = 6,
+                    Pre = Pre,
+                    Post = Post,
                     TimelineStartIndex = 0,
                     TimelineCount = Convert.ToByte(Timeline.Length),
                 }
@@ -163,6 +168,7 @@ namespace OpenKh.Research.Kh2Anim.Subcommands
                 gnuplot.WriteLine($"set terminal png");
                 gnuplot.WriteLine($"set title '{Prefix}'");
                 gnuplot.WriteLine($"set output '{Prefix}.png'");
+                GnuplotInsert?.ForEach(it => gnuplot.WriteLine(it));
                 gnuplot.WriteLine($"plot '{Prefix}.dat' index 0 title 'out' with lines, \\");
                 gnuplot.WriteLine($"     '' index 1 title 'in' with points");
 
