@@ -49,6 +49,7 @@ namespace OpenKh.Engine.Parsers
             if (IsEntity(mdlx))
             {
                 InitialPose = BuildTPoseMatrices(mdlx.SubModels.First(), Matrix4x4.Identity);
+                Bones = mdlx.SubModels.First().Bones;
                 _parsedModel = new Kkdf2MdlxParser(mdlx.SubModels.First());
                 MeshDescriptors = _parsedModel.ProcessVerticesAndBuildModel(InitialPose);
             }
@@ -68,6 +69,8 @@ namespace OpenKh.Engine.Parsers
         private static bool IsMap(Mdlx mdlx) => mdlx.MapModel != null;
 
         public List<MeshDescriptor> MeshDescriptors { get; private set; }
+
+        public List<Mdlx.Bone> Bones { get; private set; }
 
         public Matrix4x4[] InitialPose { get; set; }
 
