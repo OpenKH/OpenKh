@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
 using OpenKh.Imaging;
@@ -12,8 +12,7 @@ namespace OpenKh.Engine.MonoGame
         {
             var size = image.Size;
             var texture = new Texture2D(graphicsDevice, size.Width, size.Height);
-
-            texture.SetData(image.AsRgba8888());
+            texture.SetData(image.AsBgra8888());
 
             return texture;
         }

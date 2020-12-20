@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Imaging
+namespace OpenKh.Imaging
 {
     public interface IImageRead : IImage
     {
