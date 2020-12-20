@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Kh2
+namespace OpenKh.Kh2
 {
     public partial class Ps2
 	{
@@ -58,7 +58,7 @@
 									int num14 = ((i + k) + (4 * n)) + (num9 / 0x20);
 									int num15 = num13 + ((0x80 * bw) * num14);
 									byte num16 = buffer[num15 / 2];
-									if ((num15 & 1) == 0)
+									if ((num15 & 1) == 1)
 									{
 										num16 = (byte)(num16 & 240);
 										num16 = (byte)(num16 | num12);
@@ -101,7 +101,7 @@
 									int num11 = ((i + k) + (4 * n)) + (num9 / 0x20);
 									int num12 = num10 + ((0x80 * bw) * num11);
 									byte num13 = bin[num12 / 2];
-									if ((num12 & 1) != 0)
+									if ((num12 & 1) == 0)
 									{
 										num13 = (byte)(num13 >> 4);
 									}

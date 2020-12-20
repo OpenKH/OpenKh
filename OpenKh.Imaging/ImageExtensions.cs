@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace OpenKh.Imaging
 {
@@ -9,9 +9,11 @@ namespace OpenKh.Imaging
             switch (imageRead.PixelFormat)
             {
                 case PixelFormat.Indexed4:
-                    return ImageDataHelpers.FromIndexed4ToBgra(imageRead.GetData(), imageRead.GetClut());
+                    return ImageDataHelpers.FromIndexed4ToBitmap32(imageRead.GetData(), imageRead.GetClut(),
+                        ImageDataHelpers.RGBA);
                 case PixelFormat.Indexed8:
-                    return ImageDataHelpers.FromIndexed8ToBgra(imageRead.GetData(), imageRead.GetClut());
+                    return ImageDataHelpers.FromIndexed8ToBitmap32(imageRead.GetData(), imageRead.GetClut(),
+                        ImageDataHelpers.RGBA);
                 case PixelFormat.Rgba8888:
                     return imageRead.GetData();
                 default:
