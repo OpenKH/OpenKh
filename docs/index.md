@@ -25,6 +25,6 @@ Right now the documentation contains info about the following games:
 * Other
     * [Kingdom Hearts Chain of Memories](com/index.md)
     * [Kingdom Hearts Coded](other/coded/index.md)
-    * [Kingdom Hearts Ds games](khds/common/index.md)
+    * [Kingdom Hearts DS games](khds/common/index.md)
     * [Kingdom Hearts V-Cast](other/vcast/index.md)
     * [Kingdom Hearts VR](other/vr/index.md)

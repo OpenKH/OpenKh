@@ -2,4 +2,4 @@
 
 ## General Documentation
 
-* [Game builds](builds.md)
+* [File Types](file-type.md)
