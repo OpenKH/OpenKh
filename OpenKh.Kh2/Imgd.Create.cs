@@ -1,4 +1,4 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using System;
 using System.Drawing;
 
@@ -67,12 +67,9 @@ namespace OpenKh.Kh2
 
         private static byte[] GetKh2Clut4(byte[] rawClut)
         {
+            var inputColorCount = rawClut.Length / 4;
             var newClut = new byte[16 * 4];
-            if (rawClut.Length < newClut.Length)
-                throw new ArgumentException(
-                    $"The clut must be at least {newClut.Length} bytes long.");
-
-            for (var i = 0; i < 16; i++)
+            for (var i = 0; i < inputColorCount; i++)
             {
                 newClut[i * 4 + 0] = rawClut[i * 4 + 0];
                 newClut[i * 4 + 1] = rawClut[i * 4 + 1];
@@ -85,12 +82,10 @@ namespace OpenKh.Kh2
 
         private static byte[] GetKh2Clut8(byte[] rawClut)
         {
+            var inputColorCount = rawClut.Length / 4;
             var newClut = new byte[256 * 4];
-            if (rawClut.Length < newClut.Length)
-                throw new ArgumentException(
-                    $"The clut must be at least {newClut.Length} bytes long.");
 
-            for (var i = 0; i < 256; i++)
+            for (var i = 0; i < inputColorCount; i++)
             {
                 var dstIndex = Ps2.Repl(i);
                 newClut[dstIndex * 4 + 0] = rawClut[i * 4 + 0];
