@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+
+        <PackageReference Include="CsvHelper" Version="18.0.0" />
+        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
+        <PackageReference Include="System.Interactive" Version="5.0.0" />
+        <PackageReference Include="KaitaiStruct.Runtime.CSharp" Version="0.9.0" />
+    </ItemGroup>
+
+</Project>
