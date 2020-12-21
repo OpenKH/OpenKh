@@ -1,6 +1,7 @@
 // This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
 using Kaitai;
+using System.Collections.Generic;
 
 namespace OpenKh.Research.GenGhidraComments.Ksy
 {
@@ -36,6 +37,243 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 break;
             }
             }
+        }
+        public partial class IkHelperTable : KaitaiStruct
+        {
+            public static IkHelperTable FromFile(string fileName)
+            {
+                return new IkHelperTable(new KaitaiStream(fileName));
+            }
+
+            public IkHelperTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _index = m_io.ReadU4le();
+                _parentIndex = m_io.ReadU4le();
+                _unk08 = m_io.ReadU4le();
+                _unk0c = m_io.ReadU4le();
+                _scaleX = m_io.ReadF4le();
+                _scaleY = m_io.ReadF4le();
+                _scaleZ = m_io.ReadF4le();
+                _scaleW = m_io.ReadF4le();
+                _rotateX = m_io.ReadF4le();
+                _rotateY = m_io.ReadF4le();
+                _rotateZ = m_io.ReadF4le();
+                _rotateW = m_io.ReadF4le();
+                _translateX = m_io.ReadF4le();
+                _translateY = m_io.ReadF4le();
+                _translateZ = m_io.ReadF4le();
+                _translateW = m_io.ReadF4le();
+            }
+            private uint _index;
+            private uint _parentIndex;
+            private uint _unk08;
+            private uint _unk0c;
+            private float _scaleX;
+            private float _scaleY;
+            private float _scaleZ;
+            private float _scaleW;
+            private float _rotateX;
+            private float _rotateY;
+            private float _rotateZ;
+            private float _rotateW;
+            private float _translateX;
+            private float _translateY;
+            private float _translateZ;
+            private float _translateW;
+            private Kh2Motion m_root;
+            private Kh2Motion.Interpolated m_parent;
+            public uint Index { get { return _index; } }
+            public uint ParentIndex { get { return _parentIndex; } }
+            public uint Unk08 { get { return _unk08; } }
+            public uint Unk0c { get { return _unk0c; } }
+            public float ScaleX { get { return _scaleX; } }
+            public float ScaleY { get { return _scaleY; } }
+            public float ScaleZ { get { return _scaleZ; } }
+            public float ScaleW { get { return _scaleW; } }
+            public float RotateX { get { return _rotateX; } }
+            public float RotateY { get { return _rotateY; } }
+            public float RotateZ { get { return _rotateZ; } }
+            public float RotateW { get { return _rotateW; } }
+            public float TranslateX { get { return _translateX; } }
+            public float TranslateY { get { return _translateY; } }
+            public float TranslateZ { get { return _translateZ; } }
+            public float TranslateW { get { return _translateW; } }
+            public Kh2Motion M_Root { get { return m_root; } }
+            public Kh2Motion.Interpolated M_Parent { get { return m_parent; } }
+        }
+        public partial class UnknownTable8 : KaitaiStruct
+        {
+            public static UnknownTable8 FromFile(string fileName)
+            {
+                return new UnknownTable8(new KaitaiStream(fileName));
+            }
+
+            public UnknownTable8(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _unk00 = m_io.ReadU4le();
+                _unk04 = m_io.ReadU4le();
+                _unk08 = m_io.ReadF4le();
+                _unk0c = m_io.ReadF4le();
+                _unk10 = m_io.ReadF4le();
+                _unk14 = m_io.ReadF4le();
+                _unk18 = m_io.ReadF4le();
+                _unk1c = m_io.ReadF4le();
+                _unk20 = m_io.ReadF4le();
+                _unk24 = m_io.ReadF4le();
+                _unk28 = m_io.ReadF4le();
+                _unk2c = m_io.ReadF4le();
+            }
+            private uint _unk00;
+            private uint _unk04;
+            private float _unk08;
+            private float _unk0c;
+            private float _unk10;
+            private float _unk14;
+            private float _unk18;
+            private float _unk1c;
+            private float _unk20;
+            private float _unk24;
+            private float _unk28;
+            private float _unk2c;
+            private Kh2Motion m_root;
+            private Kh2Motion.Interpolated m_parent;
+            public uint Unk00 { get { return _unk00; } }
+            public uint Unk04 { get { return _unk04; } }
+            public float Unk08 { get { return _unk08; } }
+            public float Unk0c { get { return _unk0c; } }
+            public float Unk10 { get { return _unk10; } }
+            public float Unk14 { get { return _unk14; } }
+            public float Unk18 { get { return _unk18; } }
+            public float Unk1c { get { return _unk1c; } }
+            public float Unk20 { get { return _unk20; } }
+            public float Unk24 { get { return _unk24; } }
+            public float Unk28 { get { return _unk28; } }
+            public float Unk2c { get { return _unk2c; } }
+            public Kh2Motion M_Root { get { return m_root; } }
+            public Kh2Motion.Interpolated M_Parent { get { return m_parent; } }
+        }
+        public partial class IkChainTable : KaitaiStruct
+        {
+            public static IkChainTable FromFile(string fileName)
+            {
+                return new IkChainTable(new KaitaiStream(fileName));
+            }
+
+            public IkChainTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _unk00 = m_io.ReadU1();
+                _unk01 = m_io.ReadU1();
+                _modelBoneIndex = m_io.ReadS2le();
+                _ikHelperIndex = m_io.ReadS2le();
+                _table8Index = m_io.ReadS2le();
+                _unk08 = m_io.ReadS2le();
+                _unk0a = m_io.ReadS2le();
+            }
+            private byte _unk00;
+            private byte _unk01;
+            private short _modelBoneIndex;
+            private short _ikHelperIndex;
+            private short _table8Index;
+            private short _unk08;
+            private short _unk0a;
+            private Kh2Motion m_root;
+            private Kh2Motion.Interpolated m_parent;
+            public byte Unk00 { get { return _unk00; } }
+            public byte Unk01 { get { return _unk01; } }
+            public short ModelBoneIndex { get { return _modelBoneIndex; } }
+            public short IkHelperIndex { get { return _ikHelperIndex; } }
+            public short Table8Index { get { return _table8Index; } }
+            public short Unk08 { get { return _unk08; } }
+            public short Unk0a { get { return _unk0a; } }
+            public Kh2Motion M_Root { get { return m_root; } }
+            public Kh2Motion.Interpolated M_Parent { get { return m_parent; } }
+        }
+        public partial class TimelineTable : KaitaiStruct
+        {
+            public static TimelineTable FromFile(string fileName)
+            {
+                return new TimelineTable(new KaitaiStream(fileName));
+            }
+
+            public TimelineTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _time = m_io.ReadS2le();
+                _valueIndex = m_io.ReadS2le();
+                _tangentIndexEaseIn = m_io.ReadS2le();
+                _tangentIndexEaseOut = m_io.ReadS2le();
+            }
+            private short _time;
+            private short _valueIndex;
+            private short _tangentIndexEaseIn;
+            private short _tangentIndexEaseOut;
+            private Kh2Motion m_root;
+            private Kh2Motion.Interpolated m_parent;
+            public short Time { get { return _time; } }
+            public short ValueIndex { get { return _valueIndex; } }
+            public short TangentIndexEaseIn { get { return _tangentIndexEaseIn; } }
+            public short TangentIndexEaseOut { get { return _tangentIndexEaseOut; } }
+            public Kh2Motion M_Root { get { return m_root; } }
+            public Kh2Motion.Interpolated M_Parent { get { return m_parent; } }
+        }
+        public partial class UnknownTable6 : KaitaiStruct
+        {
+            public static UnknownTable6 FromFile(string fileName)
+            {
+                return new UnknownTable6(new KaitaiStream(fileName));
+            }
+
+            public UnknownTable6(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _unk00 = m_io.ReadS2le();
+                _unk02 = m_io.ReadS2le();
+                _unk04 = m_io.ReadF4le();
+                _unk08 = m_io.ReadS2le();
+                _unk0a = m_io.ReadS2le();
+            }
+            private short _unk00;
+            private short _unk02;
+            private float _unk04;
+            private short _unk08;
+            private short _unk0a;
+            private Kh2Motion m_root;
+            private Kh2Motion.Interpolated m_parent;
+            public short Unk00 { get { return _unk00; } }
+            public short Unk02 { get { return _unk02; } }
+            public float Unk04 { get { return _unk04; } }
+            public short Unk08 { get { return _unk08; } }
+            public short Unk0a { get { return _unk0a; } }
+            public Kh2Motion M_Root { get { return m_root; } }
+            public Kh2Motion.Interpolated M_Parent { get { return m_parent; } }
         }
         public partial class Interpolated : KaitaiStruct
         {
@@ -108,8 +346,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 _unk9c = m_io.ReadU4le();
             }
             private bool f_joints;
-            private byte[] _joints;
-            public byte[] Joints
+            private List<JointTable> _joints;
+            public List<JointTable> Joints
             {
                 get
                 {
@@ -117,15 +355,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _joints;
                     long _pos = m_io.Pos;
                     m_io.Seek(JointIndexOffset);
-                    _joints = m_io.ReadBytes((4 * TotalBoneCount));
+                    _joints = new List<JointTable>((int) (TotalBoneCount));
+                    for (var i = 0; i < TotalBoneCount; i++)
+                    {
+                        _joints.Add(new JointTable(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_joints = true;
                     return _joints;
                 }
             }
             private bool f_tangentValues;
-            private byte[] _tangentValues;
-            public byte[] TangentValues
+            private List<float> _tangentValues;
+            public List<float> TangentValues
             {
                 get
                 {
@@ -133,15 +375,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _tangentValues;
                     long _pos = m_io.Pos;
                     m_io.Seek(TangentOffset);
-                    _tangentValues = m_io.ReadBytes((IkChainOffset - TangentOffset));
+                    _tangentValues = new List<float>((int) (((IkChainOffset - TangentOffset) / 4)));
+                    for (var i = 0; i < ((IkChainOffset - TangentOffset) / 4); i++)
+                    {
+                        _tangentValues.Add(m_io.ReadF4le());
+                    }
                     m_io.Seek(_pos);
                     f_tangentValues = true;
                     return _tangentValues;
                 }
             }
             private bool f_table8;
-            private byte[] _table8;
-            public byte[] Table8
+            private List<UnknownTable8> _table8;
+            public List<UnknownTable8> Table8
             {
                 get
                 {
@@ -149,15 +395,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _table8;
                     long _pos = m_io.Pos;
                     m_io.Seek(Table8Offset);
-                    _table8 = m_io.ReadBytes((Table7Offset - Table8Offset));
+                    _table8 = new List<UnknownTable8>((int) (((Table7Offset - Table8Offset) / 48)));
+                    for (var i = 0; i < ((Table7Offset - Table8Offset) / 48); i++)
+                    {
+                        _table8.Add(new UnknownTable8(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_table8 = true;
                     return _table8;
                 }
             }
             private bool f_staticPose;
-            private byte[] _staticPose;
-            public byte[] StaticPose
+            private List<StaticPose> _staticPose;
+            public List<StaticPose> StaticPose
             {
                 get
                 {
@@ -165,15 +415,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _staticPose;
                     long _pos = m_io.Pos;
                     m_io.Seek(StaticPoseOffset);
-                    _staticPose = m_io.ReadBytes((8 * StaticPoseCount));
+                    _staticPose = new List<StaticPose>((int) (StaticPoseCount));
+                    for (var i = 0; i < StaticPoseCount; i++)
+                    {
+                        _staticPose.Add(new StaticPose(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_staticPose = true;
                     return _staticPose;
                 }
             }
             private bool f_ikHelperAnimation;
-            private byte[] _ikHelperAnimation;
-            public byte[] IkHelperAnimation
+            private List<BoneAnimationTable> _ikHelperAnimation;
+            public List<BoneAnimationTable> IkHelperAnimation
             {
                 get
                 {
@@ -181,15 +435,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _ikHelperAnimation;
                     long _pos = m_io.Pos;
                     m_io.Seek(IkHelperAnimationOffset);
-                    _ikHelperAnimation = m_io.ReadBytes((4 * IkHelperAnimationCount));
+                    _ikHelperAnimation = new List<BoneAnimationTable>((int) (IkHelperAnimationCount));
+                    for (var i = 0; i < IkHelperAnimationCount; i++)
+                    {
+                        _ikHelperAnimation.Add(new BoneAnimationTable(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_ikHelperAnimation = true;
                     return _ikHelperAnimation;
                 }
             }
             private bool f_ikChains;
-            private byte[] _ikChains;
-            public byte[] IkChains
+            private List<IkChainTable> _ikChains;
+            public List<IkChainTable> IkChains
             {
                 get
                 {
@@ -197,15 +455,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _ikChains;
                     long _pos = m_io.Pos;
                     m_io.Seek(IkChainOffset);
-                    _ikChains = m_io.ReadBytes((12 * IkChainCount));
+                    _ikChains = new List<IkChainTable>((int) (IkChainCount));
+                    for (var i = 0; i < IkChainCount; i++)
+                    {
+                        _ikChains.Add(new IkChainTable(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_ikChains = true;
                     return _ikChains;
                 }
             }
             private bool f_ikHelpers;
-            private byte[] _ikHelpers;
-            public byte[] IkHelpers
+            private List<IkHelperTable> _ikHelpers;
+            public List<IkHelperTable> IkHelpers
             {
                 get
                 {
@@ -213,15 +475,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _ikHelpers;
                     long _pos = m_io.Pos;
                     m_io.Seek(IkHelperOffset);
-                    _ikHelpers = m_io.ReadBytes((64 * (TotalBoneCount - BoneCount)));
+                    _ikHelpers = new List<IkHelperTable>((int) ((TotalBoneCount - BoneCount)));
+                    for (var i = 0; i < (TotalBoneCount - BoneCount); i++)
+                    {
+                        _ikHelpers.Add(new IkHelperTable(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_ikHelpers = true;
                     return _ikHelpers;
                 }
             }
             private bool f_rawTimeline;
-            private byte[] _rawTimeline;
-            public byte[] RawTimeline
+            private List<TimelineTable> _rawTimeline;
+            public List<TimelineTable> RawTimeline
             {
                 get
                 {
@@ -229,15 +495,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _rawTimeline;
                     long _pos = m_io.Pos;
                     m_io.Seek(TimelineOffset);
-                    _rawTimeline = m_io.ReadBytes((KeyFrameOffset - TimelineOffset));
+                    _rawTimeline = new List<TimelineTable>((int) (((KeyFrameOffset - TimelineOffset) / 8)));
+                    for (var i = 0; i < ((KeyFrameOffset - TimelineOffset) / 8); i++)
+                    {
+                        _rawTimeline.Add(new TimelineTable(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_rawTimeline = true;
                     return _rawTimeline;
                 }
             }
             private bool f_modelBoneAnimation;
-            private byte[] _modelBoneAnimation;
-            public byte[] ModelBoneAnimation
+            private List<BoneAnimationTable> _modelBoneAnimation;
+            public List<BoneAnimationTable> ModelBoneAnimation
             {
                 get
                 {
@@ -245,15 +515,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _modelBoneAnimation;
                     long _pos = m_io.Pos;
                     m_io.Seek(ModelBoneAnimationOffset);
-                    _modelBoneAnimation = m_io.ReadBytes((6 * ModelBoneAnimationCount));
+                    _modelBoneAnimation = new List<BoneAnimationTable>((int) (ModelBoneAnimationCount));
+                    for (var i = 0; i < ModelBoneAnimationCount; i++)
+                    {
+                        _modelBoneAnimation.Add(new BoneAnimationTable(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_modelBoneAnimation = true;
                     return _modelBoneAnimation;
                 }
             }
             private bool f_table7;
-            private byte[] _table7;
-            public byte[] Table7
+            private List<UnknownTable7> _table7;
+            public List<UnknownTable7> Table7
             {
                 get
                 {
@@ -261,15 +535,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _table7;
                     long _pos = m_io.Pos;
                     m_io.Seek(Table7Offset);
-                    _table7 = m_io.ReadBytes((8 * Table7Count));
+                    _table7 = new List<UnknownTable7>((int) (Table7Count));
+                    for (var i = 0; i < Table7Count; i++)
+                    {
+                        _table7.Add(new UnknownTable7(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_table7 = true;
                     return _table7;
                 }
             }
             private bool f_keyFrames;
-            private byte[] _keyFrames;
-            public byte[] KeyFrames
+            private List<float> _keyFrames;
+            public List<float> KeyFrames
             {
                 get
                 {
@@ -277,15 +555,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _keyFrames;
                     long _pos = m_io.Pos;
                     m_io.Seek(KeyFrameOffset);
-                    _keyFrames = m_io.ReadBytes((4 * KeyFrameCount));
+                    _keyFrames = new List<float>((int) (KeyFrameCount));
+                    for (var i = 0; i < KeyFrameCount; i++)
+                    {
+                        _keyFrames.Add(m_io.ReadF4le());
+                    }
                     m_io.Seek(_pos);
                     f_keyFrames = true;
                     return _keyFrames;
                 }
             }
             private bool f_transformationValues;
-            private byte[] _transformationValues;
-            public byte[] TransformationValues
+            private List<float> _transformationValues;
+            public List<float> TransformationValues
             {
                 get
                 {
@@ -293,15 +575,19 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _transformationValues;
                     long _pos = m_io.Pos;
                     m_io.Seek(TransformationValueOffset);
-                    _transformationValues = m_io.ReadBytes((TangentOffset - TransformationValueOffset));
+                    _transformationValues = new List<float>((int) (((TangentOffset - TransformationValueOffset) / 4)));
+                    for (var i = 0; i < ((TangentOffset - TransformationValueOffset) / 4); i++)
+                    {
+                        _transformationValues.Add(m_io.ReadF4le());
+                    }
                     m_io.Seek(_pos);
                     f_transformationValues = true;
                     return _transformationValues;
                 }
             }
             private bool f_table6;
-            private byte[] _table6;
-            public byte[] Table6
+            private List<UnknownTable6> _table6;
+            public List<UnknownTable6> Table6
             {
                 get
                 {
@@ -309,7 +595,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _table6;
                     long _pos = m_io.Pos;
                     m_io.Seek(Table6Count);
-                    _table6 = m_io.ReadBytes((12 * Table6Count));
+                    _table6 = new List<UnknownTable6>((int) (Table6Count));
+                    for (var i = 0; i < Table6Count; i++)
+                    {
+                        _table6.Add(new UnknownTable6(m_io, this, m_root));
+                    }
                     m_io.Seek(_pos);
                     f_table6 = true;
                     return _table6;
@@ -401,6 +691,129 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             public uint Unk9c { get { return _unk9c; } }
             public Kh2Motion M_Root { get { return m_root; } }
             public Kh2Motion M_Parent { get { return m_parent; } }
+        }
+        public partial class UnknownTable7 : KaitaiStruct
+        {
+            public static UnknownTable7 FromFile(string fileName)
+            {
+                return new UnknownTable7(new KaitaiStream(fileName));
+            }
+
+            public UnknownTable7(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _unk00 = m_io.ReadS2le();
+                _unk02 = m_io.ReadS2le();
+                _unk04 = m_io.ReadS2le();
+                _unk06 = m_io.ReadS2le();
+            }
+            private short _unk00;
+            private short _unk02;
+            private short _unk04;
+            private short _unk06;
+            private Kh2Motion m_root;
+            private Kh2Motion.Interpolated m_parent;
+            public short Unk00 { get { return _unk00; } }
+            public short Unk02 { get { return _unk02; } }
+            public short Unk04 { get { return _unk04; } }
+            public short Unk06 { get { return _unk06; } }
+            public Kh2Motion M_Root { get { return m_root; } }
+            public Kh2Motion.Interpolated M_Parent { get { return m_parent; } }
+        }
+        public partial class JointTable : KaitaiStruct
+        {
+            public static JointTable FromFile(string fileName)
+            {
+                return new JointTable(new KaitaiStream(fileName));
+            }
+
+            public JointTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _jointIndex = m_io.ReadS2le();
+                _flag = m_io.ReadS2le();
+            }
+            private short _jointIndex;
+            private short _flag;
+            private Kh2Motion m_root;
+            private Kh2Motion.Interpolated m_parent;
+            public short JointIndex { get { return _jointIndex; } }
+            public short Flag { get { return _flag; } }
+            public Kh2Motion M_Root { get { return m_root; } }
+            public Kh2Motion.Interpolated M_Parent { get { return m_parent; } }
+        }
+        public partial class BoneAnimationTable : KaitaiStruct
+        {
+            public static BoneAnimationTable FromFile(string fileName)
+            {
+                return new BoneAnimationTable(new KaitaiStream(fileName));
+            }
+
+            public BoneAnimationTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _jointIndex = m_io.ReadS2le();
+                _channel = m_io.ReadU1();
+                _timelineCount = m_io.ReadU1();
+                _timelineStartIndex = m_io.ReadS2le();
+            }
+            private short _jointIndex;
+            private byte _channel;
+            private byte _timelineCount;
+            private short _timelineStartIndex;
+            private Kh2Motion m_root;
+            private Kh2Motion.Interpolated m_parent;
+            public short JointIndex { get { return _jointIndex; } }
+            public byte Channel { get { return _channel; } }
+            public byte TimelineCount { get { return _timelineCount; } }
+            public short TimelineStartIndex { get { return _timelineStartIndex; } }
+            public Kh2Motion M_Root { get { return m_root; } }
+            public Kh2Motion.Interpolated M_Parent { get { return m_parent; } }
+        }
+        public partial class StaticPose : KaitaiStruct
+        {
+            public static StaticPose FromFile(string fileName)
+            {
+                return new StaticPose(new KaitaiStream(fileName));
+            }
+
+            public StaticPose(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            {
+                m_parent = p__parent;
+                m_root = p__root;
+                _read();
+            }
+            private void _read()
+            {
+                _boneIndex = m_io.ReadS2le();
+                _channel = m_io.ReadS2le();
+                _value = m_io.ReadF4le();
+            }
+            private short _boneIndex;
+            private short _channel;
+            private float _value;
+            private Kh2Motion m_root;
+            private Kh2Motion.Interpolated m_parent;
+            public short BoneIndex { get { return _boneIndex; } }
+            public short Channel { get { return _channel; } }
+            public float Value { get { return _value; } }
+            public Kh2Motion M_Root { get { return m_root; } }
+            public Kh2Motion.Interpolated M_Parent { get { return m_parent; } }
         }
         private byte[] _empty;
         private uint _version;
