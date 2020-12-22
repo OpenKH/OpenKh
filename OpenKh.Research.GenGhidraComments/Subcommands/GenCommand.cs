@@ -81,7 +81,6 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                 .ToArray();
 
             var ofs2Name = new SortedDictionary<int, string>();
-            var tracer = new Tracer(ofs2Name);
 
             loadedList
                 .ForEach(
@@ -90,6 +89,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                         //if (loaded.file == "obj/P_EH000_MEMO.mset")
                         if (loaded.file.EndsWith(".mset"))
                         {
+                            var tracer = new Tracer(ofs2Name, loaded.adr);
                             var model = new Kh2Bar(new KaitaiStream(File.ReadAllBytes(loaded.fullPath)), tracer: tracer);
                             //File.WriteAllText(Path.GetFileNameWithoutExtension(loaded.file) + ".txt", tracer.writer.ToString());
                         }
@@ -161,7 +161,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                 .GroupBy(it => it.pc)
             )
             {
-                var cnt = group.Count();
+                var cnt = group.Select(it => it.comment).Distinct().Count();
                 if (cnt >= 4)
                 {
                     Console.WriteLine($"{group.Key:X8}|{cnt:#,##0} usages.");

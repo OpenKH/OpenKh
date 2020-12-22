@@ -23,11 +23,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         private int posPick = -1;
         private IDictionary<int, string> ofs2Member;
 
-        public Tracer(IDictionary<int, string> ofs2Member)
+        public Tracer(IDictionary<int, string> ofs2Member, int baseAdr)
         {
             this.ofs2Member = ofs2Member;
 
-            posStack.Push(0);
+            posStack.Push(baseAdr);
             prefixStack.Push("");
         }
 
