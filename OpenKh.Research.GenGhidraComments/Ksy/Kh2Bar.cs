@@ -115,6 +115,14 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                             M_Tracer.EndMember();
                             break;
                         }
+                        case 13: {
+                            __raw_file = io.ReadBytes(Size);
+                            var io___raw_file = new KaitaiStream(__raw_file);
+                            M_Tracer.BeginMember(nameof(File));
+                            _file = new Kh2SpawnScript(io___raw_file, tracer: M_Tracer);
+                            M_Tracer.EndMember();
+                            break;
+                        }
                         case 12: {
                             __raw_file = io.ReadBytes(Size);
                             var io___raw_file = new KaitaiStream(__raw_file);
