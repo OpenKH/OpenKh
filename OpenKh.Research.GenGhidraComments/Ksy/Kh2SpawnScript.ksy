@@ -14,5 +14,7 @@ types:
       - id: length
         type: s2
       - id: byte_code
-        size: length - 4
+        type: u1
+        repeat: expr
+        repeat-expr: length - 4
         if: id != -1

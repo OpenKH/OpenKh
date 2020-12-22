@@ -67,19 +67,23 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 _length = m_io.ReadS2le();
                 M_Tracer.EndMember();
                 if (Id != -1) {
-                    M_Tracer.BeginMember(nameof(ByteCode));
-                    _byteCode = m_io.ReadBytes((Length - 4));
-                    M_Tracer.EndMember();
+                    _byteCode = new List<byte>((int) ((Length - 4)));
+                    for (var i = 0; i < (Length - 4); i++)
+                    {
+                        M_Tracer.BeginArrayMember(nameof(ByteCode));
+                        _byteCode.Add(m_io.ReadU1());
+                        M_Tracer.EndArrayMember();
+                    }
                 }
             }
             private short _id;
             private short _length;
-            private byte[] _byteCode;
+            private List<byte> _byteCode;
             private Kh2SpawnScript m_root;
             private Kh2SpawnScript m_parent;
             public short Id { get { return _id; } }
             public short Length { get { return _length; } }
-            public byte[] ByteCode { get { return _byteCode; } }
+            public List<byte> ByteCode { get { return _byteCode; } }
             public Kh2SpawnScript M_Root { get { return m_root; } }
             public Kh2SpawnScript M_Parent { get { return m_parent; } }
         }
