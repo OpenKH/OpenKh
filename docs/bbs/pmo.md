@@ -78,8 +78,8 @@ Texture Format, Normal Format, Position Format and Weight Format are as follows:
 | Value | Meaning |
 |-------|---------|
 | 0x0 | Not Present In Vertex |
-| 0x1 | 8-bit fixed |
-| 0x2 | 16-bit fixed |
+| 0x1 | 8-bit normalized |
+| 0x2 | 16-bit normalized |
 | 0x3 | 32-bit float |
 
 Weight format has only been observed to use 8-bit fixed in actual PMO blobs.
@@ -135,7 +135,16 @@ The vertex properties are written in the following order. Note that only positio
 | Color |
 | Position |
 
-The PSP is only capable of aligned reads. This means a 16-bit value must lay on a 2-byte alignment and a 32-bit value must lay on a 4-byte alignment. Actual PMO blobs seem to have no problems with this, the types used appear to have been selected to preserve the alignment of later fields. Additionally the actual vertex data can take up less space than the vertexSize field in the header. If this is the case the vertex is followed by one or more padding bytes. This is presumably also to preserve alignment.
+### Reading 'Normalized' values
+
+Vertex properties which are in the format `8-bit normalized` or `16-bit normalized` need to be converted to floating point values before rendering. Note that position values should read as **signed** values, the others as **unsigned** values. The conversion is as follows:
+
+```c++
+	// uint8
+	float value = (float)data / 127.0f;
+	// uint16
+	float value = (float)data / 32767.0f;
+```
 
 ## Skeleton Header
 
@@ -149,24 +158,13 @@ The PSP is only capable of aligned reads. This means a 16-bit value must lay on 
 
 ### Joint Definition
 
-```
-struct PMO_JOINT
-{
-	uint16 index;
-	uint16 padding0;
-
-	uint16 parent;
-	uint16 padding1;
-
-	uint16 unknown0x08; // skinning index?
-	uint16 padding2;
-
-	uint32 unknown0x0C;
-
-	// 0x10
-	char   name[0x10];
-	// 0x20
-	float  transform[16];
-	float  transformInverse[16];
-};
-```
+| Offset | Type | Description |
+|--------|------|-------------|
+| 0x0 | uint16 | Joint Index |
+| 0x2 | uint16 | Padding |
+| 0x4 | uint16 | Parent Joint Index - 0xFFFF indicates no parent|
+| 0x6 | uint16 | Padding |
+| 0x8 | uint32 | Unknown, possibly skinning index |
+| 0x10 | char[0x10] | Joint Name |
+| 0x20 | float[4][4] | Transform |
+| 0x60 | float[4][4] | Inverse Transform |
