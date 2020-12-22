@@ -39,3 +39,5 @@ types:
           cases:
             0x11: kh2_bar
             0x09: kh2_motion
+            0x04: kh2_model
+            0x0c: kh2_spawn_point

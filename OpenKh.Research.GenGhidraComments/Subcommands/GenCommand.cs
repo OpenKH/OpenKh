@@ -26,7 +26,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
         public string KH2Dir { get; set; } = @"H:\KH2fm.OpenKH";
 
         [Option(CommandOptionType.SingleValue)]
-        public string IncludeExtensions { get; set; } = ".mset";
+        public string IncludeExtensions { get; set; } = ".ard";
 
         protected int OnExecute(CommandLineApplication app)
         {
@@ -88,7 +88,8 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                     loaded =>
                     {
                         //if (loaded.file == "obj/P_EH000_MEMO.mset")
-                        if (loaded.file.EndsWith(".mset"))
+                        if (loaded.file.EndsWith(".mset") || loaded.file.EndsWith(".mdlx") || loaded.file.EndsWith(".map")
+                            || loaded.file.EndsWith(".ard"))
                         {
                             var tracer = new Tracer(ofs2Name, loaded.adr, $"{Path.GetExtension(loaded.file).TrimStart('.')}:");
                             var model = new Kh2Bar(new KaitaiStream(File.ReadAllBytes(loaded.fullPath)), tracer: tracer);
