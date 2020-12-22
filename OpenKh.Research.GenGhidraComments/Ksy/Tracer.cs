@@ -10,11 +10,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
     {
         internal TextWriter writer = TextWriter.Null; //new StringWriter();
 
-        private string entityName;
         private KaitaiStruct self;
         private KaitaiStream io;
-        private KaitaiStruct parent;
-        private KaitaiStruct root;
         private Stack<string> readStack = new Stack<string>();
         private Stack<string> memberStack = new Stack<string>();
         private Stack<string> arrayStack = new Stack<string>();
@@ -23,12 +20,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         private int posPick = -1;
         private IDictionary<int, string> ofs2Member;
 
-        public Tracer(IDictionary<int, string> ofs2Member, int baseAdr)
+        /// <param name="fileExtAndDelim">"mset:" or such.</param>
+        public Tracer(IDictionary<int, string> ofs2Member, int baseAdr, string fileExtAndDelim)
         {
             this.ofs2Member = ofs2Member;
 
             posStack.Push(baseAdr);
-            prefixStack.Push("");
+            prefixStack.Push(fileExtAndDelim);
         }
 
         private string Indent => new string(' ', readStack.Count + memberStack.Count + arrayStack.Count);
@@ -37,11 +35,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
 
         public void BeginRead(string entityName, KaitaiStruct self, KaitaiStream io, KaitaiStruct parent, KaitaiStruct root)
         {
-            this.entityName = entityName;
             this.self = self;
             this.io = io;
-            this.parent = parent;
-            this.root = root;
 
             prefixStack.Push(prefixStack.Peek() + "." + entityName);
             var pos = (int)io.Pos;

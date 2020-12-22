@@ -16,13 +16,13 @@ using System.Text.RegularExpressions;
 namespace OpenKh.Research.GenGhidraComments.Subcommands
 {
     [HelpOption]
-    [Command(Description = "Gen csv")]
+    [Command(Description = "Generate comments data")]
     class GenCommand
     {
-        [Option(CommandOptionType.SingleValue, ShortName = "d")]
+        [Option(CommandOptionType.SingleValue, ShortName = "d", Description = "Dir having pcsx2.log and readmemfrm.txt")]
         public string InputDir { get; set; } = @"H:\Proj\khkh_xldM\MEMO\expSim\1220";
 
-        [Option(CommandOptionType.SingleValue)]
+        [Option(CommandOptionType.SingleValue, Description = "KH2 game dir having extracted contents")]
         public string KH2Dir { get; set; } = @"H:\KH2fm.OpenKH";
 
         [Option(CommandOptionType.SingleValue)]
@@ -34,6 +34,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
 
             var selectIndexer = new Regex("\\[[0-9]+\\]", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+            // From csv output of: 010 Editor binary template result
             Directory.GetFiles(InputDir, "*.csv")
                 .ForEach(
                     csv =>
@@ -89,7 +90,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                         //if (loaded.file == "obj/P_EH000_MEMO.mset")
                         if (loaded.file.EndsWith(".mset"))
                         {
-                            var tracer = new Tracer(ofs2Name, loaded.adr);
+                            var tracer = new Tracer(ofs2Name, loaded.adr, $"{Path.GetExtension(loaded.file).TrimStart('.')}:");
                             var model = new Kh2Bar(new KaitaiStream(File.ReadAllBytes(loaded.fullPath)), tracer: tracer);
                             //File.WriteAllText(Path.GetFileNameWithoutExtension(loaded.file) + ".txt", tracer.writer.ToString());
                         }
@@ -128,13 +129,18 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                         );
                     }
 
-                    if (ofs2Name.TryGetValue(readMem.target, out string hitName))
+                    if (ofs2Name.TryGetValue(readMem.target, out string hitBody))
                     {
+                        // "mset:.Kh2Bar.Files.FileEntry.File.Kh2Bar.Files.FileEntry.File.Kh2Motion.Motion.Interpolated.IkHelpers.IkHelperTable.RotateX"
+                        var hitPairs = (hitBody.Contains(":") ? hitBody : ":" + hitBody).Split(':');
+                        var hitFileExt = hitPairs[0]; // "mset"
+                        var hitMemberPath = hitPairs[1]; // ".Kh2Bar.Files.FileEntry.File.Kh2Bar.Files.FileEntry.File.Kh2Motion.Motion.Interpolated.IkHelpers.IkHelperTable.RotateX"
+
                         comments.Add(
                             new Comment
                             {
                                 pc = group.Key,
-                                comment = string.Join(".", hitName.Split('.').TakeLast(2)),
+                                comment = $"{hitFileExt}:{string.Join(".", hitMemberPath.Split('.').TakeLast(2))}",
                             }
                         );
                     }
@@ -177,7 +183,14 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
 
         class Comment
         {
+            /// <summary>
+            /// program counter, reading memory from.
+            /// </summary>
             public int pc;
+
+            /// <summary>
+            /// "mset:IkHelperTable.RotateX"
+            /// </summary>
             public string comment;
         }
 
@@ -197,9 +210,18 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
 
         class LoadedFile
         {
+            /// <summary>
+            /// 0x003b8bc0
+            /// </summary>
             public int adr;
+
+            /// <summary>
+            /// field2d/jp/eh0field.2dd
+            /// </summary>
             public string file;
+
             public string fullPath;
+
             public int size;
 
             public HitResult TryTest(int target)
