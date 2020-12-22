@@ -33,6 +33,7 @@ types:
         io: _root._io
         pos: offset
         size: size
+        if: size != 0
         type:
           switch-on: type
           cases:

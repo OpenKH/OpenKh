@@ -1,7 +1,9 @@
 using CsvHelper;
+using Kaitai;
 using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Common;
 using OpenKh.Research.GenGhidraComments.Extensions;
+using OpenKh.Research.GenGhidraComments.Ksy;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,7 +19,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
     [Command(Description = "Gen csv")]
     class GenCommand
     {
-        [Option(CommandOptionType.SingleValue)]
+        [Option(CommandOptionType.SingleValue, ShortName = "d")]
         public string InputDir { get; set; } = @"H:\Proj\khkh_xldM\MEMO\expSim\1220";
 
         [Option(CommandOptionType.SingleValue)]
@@ -69,13 +71,30 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                     {
                         adr = Convert.ToInt32(match.Groups["adr"].Value, 16),
                         file = match.Groups["file"].Value,
+                        fullPath = Path.Combine(KH2Dir, match.Groups["file"].Value),
                     }
                         .Also(
-                            it => it.size = new FileInfo(Path.Combine(KH2Dir, it.file))
+                            it => it.size = new FileInfo(it.fullPath)
                                 .Let(info => info.Exists ? Convert.ToInt32(info.Length) : 0)
                         )
                 )
                 .ToArray();
+
+            var ofs2Name = new SortedDictionary<int, string>();
+            var tracer = new Tracer(ofs2Name);
+
+            loadedList
+                .ForEach(
+                    loaded =>
+                    {
+                        //if (loaded.file == "obj/P_EH000_MEMO.mset")
+                        if (loaded.file.EndsWith(".mset"))
+                        {
+                            var model = new Kh2Bar(new KaitaiStream(File.ReadAllBytes(loaded.fullPath)), tracer: tracer);
+                            //File.WriteAllText(Path.GetFileNameWithoutExtension(loaded.file) + ".txt", tracer.writer.ToString());
+                        }
+                    }
+                );
 
             var readFromMemList = File.ReadAllLines(Path.Combine(InputDir, "readmemfrm.txt"))
                 .Select(line => Regex.Match(line, "^(?<pc>[0-9A-F]{8})(?<target>[0-9A-F]{8})"))
@@ -109,6 +128,17 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                         );
                     }
 
+                    if (ofs2Name.TryGetValue(readMem.target, out string hitName))
+                    {
+                        comments.Add(
+                            new Comment
+                            {
+                                pc = group.Key,
+                                comment = string.Join(".", hitName.Split('.').TakeLast(2)),
+                            }
+                        );
+                    }
+
                     foreach (var hit in loadedList
                         .Select(it => it.TryTest(readMem.target))
                         .Where(it => it != null)
@@ -131,7 +161,15 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                 .GroupBy(it => it.pc)
             )
             {
-                Console.WriteLine($"{group.Key:X8}|{string.Join(", ", group.Select(it => it.comment).Distinct()).CutBy(80)}");
+                var cnt = group.Count();
+                if (cnt >= 4)
+                {
+                    Console.WriteLine($"{group.Key:X8}|{cnt:#,##0} usages.");
+                }
+                else
+                {
+                    Console.WriteLine($"{group.Key:X8}|{string.Join(", ", group.Select(it => it.comment).Distinct()).CutBy(60)}");
+                }
             }
 
             return 0;
@@ -161,6 +199,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
         {
             public int adr;
             public string file;
+            public string fullPath;
             public int size;
 
             public HitResult TryTest(int target)

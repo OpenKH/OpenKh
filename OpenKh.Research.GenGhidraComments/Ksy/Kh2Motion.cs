@@ -7,68 +7,127 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
 {
     public partial class Kh2Motion : KaitaiStruct
     {
+        public Tracer M_Tracer;
+
         public static Kh2Motion FromFile(string fileName)
         {
             return new Kh2Motion(new KaitaiStream(fileName));
         }
 
-        public Kh2Motion(KaitaiStream p__io, KaitaiStruct p__parent = null, Kh2Motion p__root = null) : base(p__io)
+        public Kh2Motion(KaitaiStream p__io, KaitaiStruct p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
         {
+            M_Tracer = tracer;
+            var entityName = nameof(Kh2Motion);
             m_parent = p__parent;
             m_root = p__root ?? this;
+            M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
             _read();
+            M_Tracer.EndRead();
         }
         private void _read()
         {
+            M_Tracer.BeginMember(nameof(Empty));
             _empty = m_io.ReadBytes(144);
+            M_Tracer.EndMember();
+            M_Tracer.BeginMember(nameof(Version));
             _version = m_io.ReadU4le();
+            M_Tracer.EndMember();
+            M_Tracer.BeginMember(nameof(Unk04));
             _unk04 = m_io.ReadU4le();
+            M_Tracer.EndMember();
+            M_Tracer.BeginMember(nameof(ByteCount));
             _byteCount = m_io.ReadU4le();
+            M_Tracer.EndMember();
+            M_Tracer.BeginMember(nameof(Unk0c));
             _unk0c = m_io.ReadU4le();
+            M_Tracer.EndMember();
+            M_Tracer.SwitchStart();
             switch (Version) {
             case 0: {
                 __raw_motion = m_io.ReadBytes((ByteCount - 16));
                 var io___raw_motion = new KaitaiStream(__raw_motion);
-                _motion = new Interpolated(io___raw_motion, this, m_root);
+                M_Tracer.BeginMember(nameof(Motion));
+                _motion = new Interpolated(io___raw_motion, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
                 break;
             }
             default: {
+                M_Tracer.BeginMember(nameof(Motion));
                 _motion = m_io.ReadBytes((ByteCount - 16));
+                M_Tracer.EndMember();
                 break;
             }
             }
         }
         public partial class IkHelperTable : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static IkHelperTable FromFile(string fileName)
             {
                 return new IkHelperTable(new KaitaiStream(fileName));
             }
 
-            public IkHelperTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public IkHelperTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(IkHelperTable);
                 m_parent = p__parent;
                 m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(Index));
                 _index = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(ParentIndex));
                 _parentIndex = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk08));
                 _unk08 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk0c));
                 _unk0c = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(ScaleX));
                 _scaleX = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(ScaleY));
                 _scaleY = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(ScaleZ));
                 _scaleZ = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(ScaleW));
                 _scaleW = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(RotateX));
                 _rotateX = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(RotateY));
                 _rotateY = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(RotateZ));
                 _rotateZ = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(RotateW));
                 _rotateW = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TranslateX));
                 _translateX = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TranslateY));
                 _translateY = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TranslateZ));
                 _translateZ = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TranslateW));
                 _translateW = m_io.ReadF4le();
+                M_Tracer.EndMember();
             }
             private uint _index;
             private uint _parentIndex;
@@ -109,31 +168,61 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         }
         public partial class UnknownTable8 : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static UnknownTable8 FromFile(string fileName)
             {
                 return new UnknownTable8(new KaitaiStream(fileName));
             }
 
-            public UnknownTable8(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public UnknownTable8(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(UnknownTable8);
                 m_parent = p__parent;
                 m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(Unk00));
                 _unk00 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk04));
                 _unk04 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk08));
                 _unk08 = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk0c));
                 _unk0c = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk10));
                 _unk10 = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk14));
                 _unk14 = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk18));
                 _unk18 = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk1c));
                 _unk1c = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk20));
                 _unk20 = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk24));
                 _unk24 = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk28));
                 _unk28 = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk2c));
                 _unk2c = m_io.ReadF4le();
+                M_Tracer.EndMember();
             }
             private uint _unk00;
             private uint _unk04;
@@ -166,26 +255,46 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         }
         public partial class IkChainTable : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static IkChainTable FromFile(string fileName)
             {
                 return new IkChainTable(new KaitaiStream(fileName));
             }
 
-            public IkChainTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public IkChainTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(IkChainTable);
                 m_parent = p__parent;
                 m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(Unk00));
                 _unk00 = m_io.ReadU1();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk01));
                 _unk01 = m_io.ReadU1();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(ModelBoneIndex));
                 _modelBoneIndex = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(IkHelperIndex));
                 _ikHelperIndex = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Table8Index));
                 _table8Index = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk08));
                 _unk08 = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk0a));
                 _unk0a = m_io.ReadS2le();
+                M_Tracer.EndMember();
             }
             private byte _unk00;
             private byte _unk01;
@@ -208,23 +317,37 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         }
         public partial class TimelineTable : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static TimelineTable FromFile(string fileName)
             {
                 return new TimelineTable(new KaitaiStream(fileName));
             }
 
-            public TimelineTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public TimelineTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(TimelineTable);
                 m_parent = p__parent;
                 m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(Time));
                 _time = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(ValueIndex));
                 _valueIndex = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TangentIndexEaseIn));
                 _tangentIndexEaseIn = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TangentIndexEaseOut));
                 _tangentIndexEaseOut = m_io.ReadS2le();
+                M_Tracer.EndMember();
             }
             private short _time;
             private short _valueIndex;
@@ -241,24 +364,40 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         }
         public partial class UnknownTable6 : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static UnknownTable6 FromFile(string fileName)
             {
                 return new UnknownTable6(new KaitaiStream(fileName));
             }
 
-            public UnknownTable6(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public UnknownTable6(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(UnknownTable6);
                 m_parent = p__parent;
                 m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(Unk00));
                 _unk00 = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk02));
                 _unk02 = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk04));
                 _unk04 = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk08));
                 _unk08 = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk0a));
                 _unk0a = m_io.ReadS2le();
+                M_Tracer.EndMember();
             }
             private short _unk00;
             private short _unk02;
@@ -277,13 +416,17 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         }
         public partial class Interpolated : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static Interpolated FromFile(string fileName)
             {
                 return new Interpolated(new KaitaiStream(fileName));
             }
 
-            public Interpolated(KaitaiStream p__io, Kh2Motion p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public Interpolated(KaitaiStream p__io, Kh2Motion p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(Interpolated);
                 m_parent = p__parent;
                 m_root = p__root;
                 f_joints = false;
@@ -299,51 +442,135 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 f_keyFrames = false;
                 f_transformationValues = false;
                 f_table6 = false;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(BoneCount));
                 _boneCount = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TotalBoneCount));
                 _totalBoneCount = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TotalFrameCount));
                 _totalFrameCount = m_io.ReadS4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(IkHelperOffset));
                 _ikHelperOffset = m_io.ReadS4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(JointIndexOffset));
                 _jointIndexOffset = m_io.ReadS4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(KeyFrameCount));
                 _keyFrameCount = m_io.ReadS4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(StaticPoseOffset));
                 _staticPoseOffset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(StaticPoseCount));
                 _staticPoseCount = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(FooterOffset));
                 _footerOffset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(ModelBoneAnimationOffset));
                 _modelBoneAnimationOffset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(ModelBoneAnimationCount));
                 _modelBoneAnimationCount = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(IkHelperAnimationOffset));
                 _ikHelperAnimationOffset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(IkHelperAnimationCount));
                 _ikHelperAnimationCount = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TimelineOffset));
                 _timelineOffset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(KeyFrameOffset));
                 _keyFrameOffset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TransformationValueOffset));
                 _transformationValueOffset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TangentOffset));
                 _tangentOffset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(IkChainOffset));
                 _ikChainOffset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(IkChainCount));
                 _ikChainCount = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk48));
                 _unk48 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Table8Offset));
                 _table8Offset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Table7Offset));
                 _table7Offset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Table7Count));
                 _table7Count = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Table6Offset));
                 _table6Offset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Table6Count));
                 _table6Count = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(BoundingBoxMinX));
                 _boundingBoxMinX = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(BoundingBoxMinY));
                 _boundingBoxMinY = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(BoundingBoxMinZ));
                 _boundingBoxMinZ = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(BoundingBoxMinW));
                 _boundingBoxMinW = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(BoundingBoxMaxX));
                 _boundingBoxMaxX = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(BoundingBoxMaxY));
                 _boundingBoxMaxY = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(BoundingBoxMaxZ));
                 _boundingBoxMaxZ = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(BoundingBoxMaxW));
                 _boundingBoxMaxW = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(FrameLoop));
                 _frameLoop = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(FrameEnd));
                 _frameEnd = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(FramePerSecond));
                 _framePerSecond = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(FrameCount));
                 _frameCount = m_io.ReadF4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(UnknownTable1Offset));
                 _unknownTable1Offset = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(UnknownTable1Count));
                 _unknownTable1Count = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk98));
                 _unk98 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk9c));
                 _unk9c = m_io.ReadU4le();
+                M_Tracer.EndMember();
             }
             private bool f_joints;
             private List<JointTable> _joints;
@@ -354,11 +581,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_joints)
                         return _joints;
                     long _pos = m_io.Pos;
-                    m_io.Seek(JointIndexOffset);
+                    m_io.Seek((JointIndexOffset - 16));
                     _joints = new List<JointTable>((int) (TotalBoneCount));
                     for (var i = 0; i < TotalBoneCount; i++)
                     {
-                        _joints.Add(new JointTable(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(Joints));
+                        _joints.Add(new JointTable(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_joints = true;
@@ -374,11 +603,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_tangentValues)
                         return _tangentValues;
                     long _pos = m_io.Pos;
-                    m_io.Seek(TangentOffset);
+                    m_io.Seek((TangentOffset - 16));
                     _tangentValues = new List<float>((int) (((IkChainOffset - TangentOffset) / 4)));
                     for (var i = 0; i < ((IkChainOffset - TangentOffset) / 4); i++)
                     {
+                        M_Tracer.BeginArrayMember(nameof(TangentValues));
                         _tangentValues.Add(m_io.ReadF4le());
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_tangentValues = true;
@@ -394,11 +625,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_table8)
                         return _table8;
                     long _pos = m_io.Pos;
-                    m_io.Seek(Table8Offset);
+                    m_io.Seek((Table8Offset - 16));
                     _table8 = new List<UnknownTable8>((int) (((Table7Offset - Table8Offset) / 48)));
                     for (var i = 0; i < ((Table7Offset - Table8Offset) / 48); i++)
                     {
-                        _table8.Add(new UnknownTable8(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(Table8));
+                        _table8.Add(new UnknownTable8(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_table8 = true;
@@ -414,11 +647,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_staticPose)
                         return _staticPose;
                     long _pos = m_io.Pos;
-                    m_io.Seek(StaticPoseOffset);
+                    m_io.Seek((StaticPoseOffset - 16));
                     _staticPose = new List<StaticPose>((int) (StaticPoseCount));
                     for (var i = 0; i < StaticPoseCount; i++)
                     {
-                        _staticPose.Add(new StaticPose(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(StaticPose));
+                        _staticPose.Add(new StaticPose(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_staticPose = true;
@@ -434,11 +669,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_ikHelperAnimation)
                         return _ikHelperAnimation;
                     long _pos = m_io.Pos;
-                    m_io.Seek(IkHelperAnimationOffset);
+                    m_io.Seek((IkHelperAnimationOffset - 16));
                     _ikHelperAnimation = new List<BoneAnimationTable>((int) (IkHelperAnimationCount));
                     for (var i = 0; i < IkHelperAnimationCount; i++)
                     {
-                        _ikHelperAnimation.Add(new BoneAnimationTable(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(IkHelperAnimation));
+                        _ikHelperAnimation.Add(new BoneAnimationTable(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_ikHelperAnimation = true;
@@ -454,11 +691,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_ikChains)
                         return _ikChains;
                     long _pos = m_io.Pos;
-                    m_io.Seek(IkChainOffset);
+                    m_io.Seek((IkChainOffset - 16));
                     _ikChains = new List<IkChainTable>((int) (IkChainCount));
                     for (var i = 0; i < IkChainCount; i++)
                     {
-                        _ikChains.Add(new IkChainTable(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(IkChains));
+                        _ikChains.Add(new IkChainTable(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_ikChains = true;
@@ -474,11 +713,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_ikHelpers)
                         return _ikHelpers;
                     long _pos = m_io.Pos;
-                    m_io.Seek(IkHelperOffset);
+                    m_io.Seek((IkHelperOffset - 16));
                     _ikHelpers = new List<IkHelperTable>((int) ((TotalBoneCount - BoneCount)));
                     for (var i = 0; i < (TotalBoneCount - BoneCount); i++)
                     {
-                        _ikHelpers.Add(new IkHelperTable(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(IkHelpers));
+                        _ikHelpers.Add(new IkHelperTable(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_ikHelpers = true;
@@ -494,11 +735,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_rawTimeline)
                         return _rawTimeline;
                     long _pos = m_io.Pos;
-                    m_io.Seek(TimelineOffset);
+                    m_io.Seek((TimelineOffset - 16));
                     _rawTimeline = new List<TimelineTable>((int) (((KeyFrameOffset - TimelineOffset) / 8)));
                     for (var i = 0; i < ((KeyFrameOffset - TimelineOffset) / 8); i++)
                     {
-                        _rawTimeline.Add(new TimelineTable(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(RawTimeline));
+                        _rawTimeline.Add(new TimelineTable(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_rawTimeline = true;
@@ -514,11 +757,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_modelBoneAnimation)
                         return _modelBoneAnimation;
                     long _pos = m_io.Pos;
-                    m_io.Seek(ModelBoneAnimationOffset);
+                    m_io.Seek((ModelBoneAnimationOffset - 16));
                     _modelBoneAnimation = new List<BoneAnimationTable>((int) (ModelBoneAnimationCount));
                     for (var i = 0; i < ModelBoneAnimationCount; i++)
                     {
-                        _modelBoneAnimation.Add(new BoneAnimationTable(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(ModelBoneAnimation));
+                        _modelBoneAnimation.Add(new BoneAnimationTable(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_modelBoneAnimation = true;
@@ -534,11 +779,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_table7)
                         return _table7;
                     long _pos = m_io.Pos;
-                    m_io.Seek(Table7Offset);
+                    m_io.Seek((Table7Offset - 16));
                     _table7 = new List<UnknownTable7>((int) (Table7Count));
                     for (var i = 0; i < Table7Count; i++)
                     {
-                        _table7.Add(new UnknownTable7(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(Table7));
+                        _table7.Add(new UnknownTable7(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_table7 = true;
@@ -554,11 +801,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_keyFrames)
                         return _keyFrames;
                     long _pos = m_io.Pos;
-                    m_io.Seek(KeyFrameOffset);
+                    m_io.Seek((KeyFrameOffset - 16));
                     _keyFrames = new List<float>((int) (KeyFrameCount));
                     for (var i = 0; i < KeyFrameCount; i++)
                     {
+                        M_Tracer.BeginArrayMember(nameof(KeyFrames));
                         _keyFrames.Add(m_io.ReadF4le());
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_keyFrames = true;
@@ -574,11 +823,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_transformationValues)
                         return _transformationValues;
                     long _pos = m_io.Pos;
-                    m_io.Seek(TransformationValueOffset);
+                    m_io.Seek((TransformationValueOffset - 16));
                     _transformationValues = new List<float>((int) (((TangentOffset - TransformationValueOffset) / 4)));
                     for (var i = 0; i < ((TangentOffset - TransformationValueOffset) / 4); i++)
                     {
+                        M_Tracer.BeginArrayMember(nameof(TransformationValues));
                         _transformationValues.Add(m_io.ReadF4le());
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_transformationValues = true;
@@ -594,11 +845,13 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_table6)
                         return _table6;
                     long _pos = m_io.Pos;
-                    m_io.Seek(Table6Count);
+                    m_io.Seek((Table6Offset - 16));
                     _table6 = new List<UnknownTable6>((int) (Table6Count));
                     for (var i = 0; i < Table6Count; i++)
                     {
-                        _table6.Add(new UnknownTable6(m_io, this, m_root));
+                        M_Tracer.BeginArrayMember(nameof(Table6));
+                        _table6.Add(new UnknownTable6(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
                     }
                     m_io.Seek(_pos);
                     f_table6 = true;
@@ -694,23 +947,37 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         }
         public partial class UnknownTable7 : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static UnknownTable7 FromFile(string fileName)
             {
                 return new UnknownTable7(new KaitaiStream(fileName));
             }
 
-            public UnknownTable7(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public UnknownTable7(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(UnknownTable7);
                 m_parent = p__parent;
                 m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(Unk00));
                 _unk00 = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk02));
                 _unk02 = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk04));
                 _unk04 = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk06));
                 _unk06 = m_io.ReadS2le();
+                M_Tracer.EndMember();
             }
             private short _unk00;
             private short _unk02;
@@ -727,21 +994,31 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         }
         public partial class JointTable : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static JointTable FromFile(string fileName)
             {
                 return new JointTable(new KaitaiStream(fileName));
             }
 
-            public JointTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public JointTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(JointTable);
                 m_parent = p__parent;
                 m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(JointIndex));
                 _jointIndex = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Flag));
                 _flag = m_io.ReadS2le();
+                M_Tracer.EndMember();
             }
             private short _jointIndex;
             private short _flag;
@@ -754,23 +1031,37 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         }
         public partial class BoneAnimationTable : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static BoneAnimationTable FromFile(string fileName)
             {
                 return new BoneAnimationTable(new KaitaiStream(fileName));
             }
 
-            public BoneAnimationTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public BoneAnimationTable(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(BoneAnimationTable);
                 m_parent = p__parent;
                 m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(JointIndex));
                 _jointIndex = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Channel));
                 _channel = m_io.ReadU1();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TimelineCount));
                 _timelineCount = m_io.ReadU1();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TimelineStartIndex));
                 _timelineStartIndex = m_io.ReadS2le();
+                M_Tracer.EndMember();
             }
             private short _jointIndex;
             private byte _channel;
@@ -787,22 +1078,34 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         }
         public partial class StaticPose : KaitaiStruct
         {
+            public Tracer M_Tracer;
+
             public static StaticPose FromFile(string fileName)
             {
                 return new StaticPose(new KaitaiStream(fileName));
             }
 
-            public StaticPose(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null) : base(p__io)
+            public StaticPose(KaitaiStream p__io, Kh2Motion.Interpolated p__parent = null, Kh2Motion p__root = null, Tracer tracer = null) : base(p__io)
             {
+                M_Tracer = tracer;
+                var entityName = nameof(StaticPose);
                 m_parent = p__parent;
                 m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
+                M_Tracer.EndRead();
             }
             private void _read()
             {
+                M_Tracer.BeginMember(nameof(BoneIndex));
                 _boneIndex = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Channel));
                 _channel = m_io.ReadS2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Value));
                 _value = m_io.ReadF4le();
+                M_Tracer.EndMember();
             }
             private short _boneIndex;
             private short _channel;

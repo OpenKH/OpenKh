@@ -107,67 +107,67 @@ types:
         type: u4
     instances:
       static_pose:
-        pos: static_pose_offset
+        pos: static_pose_offset -16
         type: static_pose
         repeat: expr
         repeat-expr: static_pose_count
       model_bone_animation:
-        pos: model_bone_animation_offset
+        pos: model_bone_animation_offset -16
         type: bone_animation_table
         repeat: expr
         repeat-expr: model_bone_animation_count
       ik_helper_animation:
-        pos: ik_helper_animation_offset
+        pos: ik_helper_animation_offset -16
         type: bone_animation_table
         repeat: expr
         repeat-expr: ik_helper_animation_count
       raw_timeline:
-        pos: timeline_offset
+        pos: timeline_offset -16
         type: timeline_table
         repeat: expr
         repeat-expr: (key_frame_offset - timeline_offset) / 8
       key_frames:
-        pos: key_frame_offset
+        pos: key_frame_offset -16
         type: f4
         repeat: expr
         repeat-expr: key_frame_count
       transformation_values:
-        pos: transformation_value_offset
+        pos: transformation_value_offset -16
         type: f4
         repeat: expr
         repeat-expr: (tangent_offset - transformation_value_offset) / 4
       tangent_values:
-        pos: tangent_offset
+        pos: tangent_offset -16
         type: f4
         repeat: expr
         repeat-expr: (ik_chain_offset - tangent_offset) / 4
       ik_chains:
-        pos: ik_chain_offset
+        pos: ik_chain_offset -16
         type: ik_chain_table
         repeat: expr
         repeat-expr: ik_chain_count
       table8:
-        pos: table8_offset
+        pos: table8_offset -16
         type: unknown_table8
         repeat: expr
         repeat-expr: (table7_offset - table8_offset) / 0x30
       table7:
-        pos: table7_offset
+        pos: table7_offset -16
         type: unknown_table7
         repeat: expr
         repeat-expr: table7_count
       table6:
-        pos: table6_count
+        pos: table6_offset -16
         type: unknown_table6
         repeat: expr
         repeat-expr: table6_count
       ik_helpers:
-        pos: ik_helper_offset
+        pos: ik_helper_offset -16
         type: ik_helper_table
         repeat: expr
         repeat-expr: total_bone_count - bone_count
       joints:
-        pos: joint_index_offset
+        pos: joint_index_offset -16
         type: joint_table
         repeat: expr
         repeat-expr: total_bone_count
