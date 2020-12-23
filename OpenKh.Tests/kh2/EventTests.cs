@@ -79,39 +79,42 @@ namespace OpenKh.Tests.kh2
             AssertEvent(new Event.SetCameraData
             {
                 CameraId = 123,
-                PositionX = new List<Event.SetCameraData.CameraValue>
+                PositionX = new List<Event.SetCameraData.CameraKeys>
                 {
-                    new Event.SetCameraData.CameraValue
+                    new Event.SetCameraData.CameraKeys
                     {
+                        Interpolation = Kh2.Motion.Interpolation.Hermite,
+                        KeyFrame = 1234,
                         Value = 1,
-                        Speed = 2,
-                        Unk08 = 3,
-                        Unk0C = 4
+                        TangentEaseIn = 3,
+                        TangentEaseOut = 4
                     },
-                    new Event.SetCameraData.CameraValue
+                    new Event.SetCameraData.CameraKeys
                     {
+                        Interpolation = Kh2.Motion.Interpolation.Linear,
+                        KeyFrame = 5678,
                         Value = 5,
-                        Speed = 6,
-                        Unk08 = 7,
-                        Unk0C = 8
+                        TangentEaseIn = 7,
+                        TangentEaseOut = 8
                     },
                 },
-                PositionY = new List<Event.SetCameraData.CameraValue>()
+                PositionY = new List<Event.SetCameraData.CameraKeys>()
                 {
-                    new Event.SetCameraData.CameraValue
+                    new Event.SetCameraData.CameraKeys
                     {
+                        Interpolation = Kh2.Motion.Interpolation.Nearest,
+                        KeyFrame = 32767,
                         Value = 11,
-                        Speed = 22,
-                        Unk08 = 33,
-                        Unk0C = 44
+                        TangentEaseIn = 33,
+                        TangentEaseOut = 44
                     },
                 },
-                PositionZ = new List<Event.SetCameraData.CameraValue>(),
-                LookAtX = new List<Event.SetCameraData.CameraValue>(),
-                LookAtY = new List<Event.SetCameraData.CameraValue>(),
-                LookAtZ = new List<Event.SetCameraData.CameraValue>(),
-                FieldOfView = new List<Event.SetCameraData.CameraValue>(),
-                Roll = new List<Event.SetCameraData.CameraValue>(),
+                PositionZ = new List<Event.SetCameraData.CameraKeys>(),
+                LookAtX = new List<Event.SetCameraData.CameraKeys>(),
+                LookAtY = new List<Event.SetCameraData.CameraKeys>(),
+                LookAtZ = new List<Event.SetCameraData.CameraKeys>(),
+                FieldOfView = new List<Event.SetCameraData.CameraKeys>(),
+                Roll = new List<Event.SetCameraData.CameraKeys>(),
             });
 
         [Fact]

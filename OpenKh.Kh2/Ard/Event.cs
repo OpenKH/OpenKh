@@ -75,6 +75,14 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Count { get; set; }
         }
 
+        public class CameraValueInternal
+        {
+            [Data] public uint FlagData { get; set; }
+            [Data] public float Value { get; set; }
+            [Data] public float TangentEaseIn { get; set; }
+            [Data] public float TangentEaseOut { get; set; }
+        }
+
         public interface IEventEntry
         {
         }
@@ -213,26 +221,27 @@ namespace OpenKh.Kh2.Ard
 
         public class SetCameraData : IEventEntry
         {
-            public class CameraValue
+            public class CameraKeys
             {
-                [Data] public float Speed { get; set; }
-                [Data] public float Value { get; set; }
-                [Data] public float Unk08 { get; set; }
-                [Data] public float Unk0C { get; set; }
+                public Motion.Interpolation Interpolation { get; set; }
+                public int KeyFrame { get; set; }
+                public float Value { get; set; }
+                public float TangentEaseIn { get; set; }
+                public float TangentEaseOut { get; set; }
 
                 public override string ToString() =>
-                    $"Value {Value}, Speed {Speed}, {Unk08}, {Unk0C}";
+                    $"Key frame {KeyFrame}, Value {Value}, {TangentEaseIn}, {TangentEaseOut}, Interpolation {Interpolation}";
             }
 
             public short CameraId { get; set; }
-            public List<CameraValue> PositionY { get; set; }
-            public List<CameraValue> PositionZ { get; set; }
-            public List<CameraValue> LookAtX { get; set; }
-            public List<CameraValue> LookAtY { get; set; }
-            public List<CameraValue> LookAtZ { get; set; }
-            public List<CameraValue> Roll { get; set; }
-            public List<CameraValue> FieldOfView { get; set; }
-            public List<CameraValue> PositionX { get; set; }
+            public List<CameraKeys> PositionY { get; set; }
+            public List<CameraKeys> PositionZ { get; set; }
+            public List<CameraKeys> LookAtX { get; set; }
+            public List<CameraKeys> LookAtY { get; set; }
+            public List<CameraKeys> LookAtZ { get; set; }
+            public List<CameraKeys> Roll { get; set; }
+            public List<CameraKeys> FieldOfView { get; set; }
+            public List<CameraKeys> PositionX { get; set; }
 
             public override string ToString()
             {
@@ -249,7 +258,7 @@ namespace OpenKh.Kh2.Ard
                 return sb.ToString();
             }
 
-            private string ToString(IList<CameraValue> values)
+            private string ToString(IList<CameraKeys> values)
             {
                 if (values.Count == 1)
                     return values[0].ToString();
@@ -727,7 +736,7 @@ namespace OpenKh.Kh2.Ard
 
         private static object ReadSetCameraData(MappingReadArgs args)
         {
-            List<SetCameraData.CameraValue> AssignValues(SetCameraDataHeader header, IList<SetCameraData.CameraValue> values) =>
+            List<SetCameraData.CameraKeys> AssignValues(SetCameraDataHeader header, IList<SetCameraData.CameraKeys> values) =>
                 Enumerable.Range(0, header.Count).Select(i => values[header.Index + i]).ToList();
 
             var cameraId = args.Reader.ReadInt16();
@@ -739,7 +748,15 @@ namespace OpenKh.Kh2.Ard
             var valueCount = headers.Max(x => x.Index + x.Count);
             var values = Enumerable
                 .Range(0, valueCount)
-                .Select(x => BinaryMapping.ReadObject<SetCameraData.CameraValue>(args.Reader.BaseStream))
+                .Select(x => BinaryMapping.ReadObject<CameraValueInternal>(args.Reader.BaseStream))
+                .Select(x => new SetCameraData.CameraKeys
+                {
+                    Interpolation = (Motion.Interpolation)(x.FlagData >> 29),
+                    KeyFrame = (int)((x.FlagData & 0x1FFFFFFF ^ 0x10000000) - 0x10000000),
+                    Value = x.Value,
+                    TangentEaseIn = x.TangentEaseIn,
+                    TangentEaseOut = x.TangentEaseOut
+                })
                 .ToList();
 
             return new SetCameraData
@@ -759,7 +776,7 @@ namespace OpenKh.Kh2.Ard
         private static void WriteSetCameraData(MappingWriteArgs args)
         {
             void WriteHeader(Stream stream,
-                List<SetCameraData.CameraValue> values,
+                List<SetCameraData.CameraKeys> values,
                 int startIndex) =>
                 Mapping.WriteObject(stream, new SetCameraDataHeader
                 {
@@ -767,9 +784,16 @@ namespace OpenKh.Kh2.Ard
                     Count = (short)values.Count
                 });
 
-            void WriteData(Stream stream, List<SetCameraData.CameraValue> values)
+            void WriteData(Stream stream, List<SetCameraData.CameraKeys> values)
             {
-                foreach (var value in values)
+                foreach (var value in values.Select(x => new CameraValueInternal
+                {
+                    FlagData = (uint)((((x.KeyFrame + 0x10000000) ^ 0x10000000) & 0x1FFFFFFF) |
+                        ((int)x.Interpolation << 29)),
+                    Value = x.Value,
+                    TangentEaseIn = x.TangentEaseIn,
+                    TangentEaseOut = x.TangentEaseOut
+                }))
                     Mapping.WriteObject(stream, value);
             }
 
