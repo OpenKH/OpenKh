@@ -148,6 +148,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                         );
                     }
 
+#if false
                     foreach (var hit in loadedList
                         .Select(it => it.TryTest(readMem.target))
                         .Where(it => it != null)
@@ -162,6 +163,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                             }
                         );
                     }
+#endif
                 }
             }
 
@@ -170,14 +172,15 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                 .GroupBy(it => it.pc)
             )
             {
-                var cnt = group.Select(it => it.comment).Distinct().Count();
+                var filteredComments = group.Select(it => it.comment).Distinct().ToArray();
+                var cnt = filteredComments.Count();
                 if (cnt >= 4)
                 {
-                    Console.WriteLine($"{group.Key:X8}|{cnt:#,##0} usages.");
+                    Console.WriteLine($"{group.Key:X8}|{cnt:#,##0} usages. |{string.Join("|", filteredComments)}");
                 }
                 else
                 {
-                    Console.WriteLine($"{group.Key:X8}|{string.Join(", ", group.Select(it => it.comment).Distinct()).CutBy(60)}");
+                    Console.WriteLine($"{group.Key:X8}|{string.Join(", ", filteredComments).CutBy(80)}");
                 }
             }
 
@@ -190,18 +193,8 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
             {
                 return true;
             }
-            KeyValuePair<int, string> prev = new KeyValuePair<int, string>(0, "");
-            foreach (var pair in ofs2Name)
-            {
-                if (target < pair.Key)
-                {
-                    hitBody = $"{prev.Value}+{target - prev.Key} {helper(target)}";
-                    return true;
-                }
-                prev = pair;
-            }
-            hitBody = "";
-            return false;
+            hitBody = helper(target);
+            return true;
         }
 
         private string DescribeFromNearestFile(LoadedFile[] loadedFiles, int target)
@@ -211,7 +204,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                 var ofs = (uint)target - (uint)file.adr;
                 if (ofs < (uint)file.size)
                 {
-                    return $"({file.file}+{ofs})";
+                    return $"{Path.GetExtension(file.file).TrimStart('.')}:{file.file}+ {ofs} ";
                 }
             }
             return "?";
