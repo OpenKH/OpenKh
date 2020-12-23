@@ -93,7 +93,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                         {
                             var tracer = new Tracer(ofs2Name, loaded.adr, $"{Path.GetExtension(loaded.file).TrimStart('.')}:");
                             var model = new Kh2Bar(new KaitaiStream(File.ReadAllBytes(loaded.fullPath)), tracer: tracer);
-                            //File.WriteAllText(Path.GetFileNameWithoutExtension(loaded.file) + ".txt", tracer.writer.ToString());
+                            File.WriteAllText(Path.GetFileNameWithoutExtension(loaded.file) + ".txt", tracer.writer.ToString());
                         }
                     }
                 );

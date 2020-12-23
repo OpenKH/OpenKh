@@ -8,7 +8,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
 {
     public class Tracer
     {
-        internal TextWriter writer = TextWriter.Null; //new StringWriter();
+        //internal TextWriter writer = TextWriter.Null; //new StringWriter();
+        internal TextWriter writer = new StringWriter();
 
         private KaitaiStruct self;
         private KaitaiStream io;
@@ -99,6 +100,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             var pos = (int)io.Pos;
             writer.WriteLine($"{tailPos:X6} {pos:X6} {tailPos + pos:X6} {Indent}>A {memberName} //{prefixStack.Peek()}");
             arrayStack.Push(memberName);
+
+            ofs2Member[tailPos + pos] = prefixStack.Peek();
         }
 
         public void EndArrayMember()
