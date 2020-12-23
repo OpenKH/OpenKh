@@ -98,8 +98,10 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                     }
                 );
 
+            var readMemFrmPattern = new Regex("^(?<pc>[0-9A-F]{8})\\s?(?<target>[0-9A-F]{8})");
+
             var readFromMemList = File.ReadAllLines(Path.Combine(InputDir, "readmemfrm.txt"))
-                .Select(line => Regex.Match(line, "^(?<pc>[0-9A-F]{8})(?<target>[0-9A-F]{8})"))
+                .Select(line => readMemFrmPattern.Match(line))
                 .Where(match => match.Success)
                 .Select(
                     match => new ReadMem
@@ -130,7 +132,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                         );
                     }
 
-                    if (ofs2Name.TryGetValue(readMem.target, out string hitBody))
+                    if (LookupJustAndAlsoNearest(ofs2Name, readMem.target, target => DescribeFromNearestFile(loadedList, target), out string hitBody))
                     {
                         // "mset:.Kh2Bar.Files.FileEntry.File.Kh2Bar.Files.FileEntry.File.Kh2Motion.Motion.Interpolated.IkHelpers.IkHelperTable.RotateX"
                         var hitPairs = (hitBody.Contains(":") ? hitBody : ":" + hitBody).Split(':');
@@ -180,6 +182,39 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
             }
 
             return 0;
+        }
+
+        private bool LookupJustAndAlsoNearest(SortedDictionary<int, string> ofs2Name, int target, Func<int, string> helper, out string hitBody)
+        {
+            if (ofs2Name.TryGetValue(target, out hitBody))
+            {
+                return true;
+            }
+            KeyValuePair<int, string> prev = new KeyValuePair<int, string>(0, "");
+            foreach (var pair in ofs2Name)
+            {
+                if (target < pair.Key)
+                {
+                    hitBody = $"{prev.Value}+{target - prev.Key} {helper(target)}";
+                    return true;
+                }
+                prev = pair;
+            }
+            hitBody = "";
+            return false;
+        }
+
+        private string DescribeFromNearestFile(LoadedFile[] loadedFiles, int target)
+        {
+            foreach (var file in loadedFiles)
+            {
+                var ofs = (uint)target - (uint)file.adr;
+                if (ofs < (uint)file.size)
+                {
+                    return $"({file.file}+{ofs})";
+                }
+            }
+            return "?";
         }
 
         class Comment
