@@ -31,6 +31,7 @@ namespace OpenKh.Kh2.Ard
             [0x0A] = typeof(AttachEffect),
             [0x0C] = typeof(Unk0C),
             [0x0D] = typeof(Unk0D),
+            [0x0E] = typeof(Unk0E),
             [0x0F] = typeof(SetupEvent),
             [0x10] = typeof(EventStart),
             [0x12] = typeof(SeqFade),
@@ -43,6 +44,7 @@ namespace OpenKh.Kh2.Ard
             [0x19] = typeof(SeqTextureAnim),
             [0x1A] = typeof(EntryUnk1A),
             [0x1B] = typeof(SeqCrossFade),
+            [0x1D] = typeof(EntryUnk1D),
             [0x20] = typeof(SeqGameSpeed),
             [0x22] = typeof(EntryUnk22),
             [0x23] = typeof(SeqVoices),
@@ -50,6 +52,7 @@ namespace OpenKh.Kh2.Ard
             [0x25] = typeof(ReadMotion),
             [0x26] = typeof(ReadAudio),
             [0x27] = typeof(SetShake),
+            [0x29] = typeof(EntryUnk29),
             [0x2A] = typeof(EntryUnk2A),
             [0x2B] = typeof(SeqPlayAudio),
             [0x2C] = typeof(SeqPlayAnimation),
@@ -60,7 +63,10 @@ namespace OpenKh.Kh2.Ard
             [0x36] = typeof(EntryUnk36),
             [0x38] = typeof(ReadActor),
             [0x39] = typeof(ReadEffect),
+            [0x3D] = typeof(SeqLayout),
+            [0x3E] = typeof(ReadLayout),
             [0x3F] = typeof(StopEffect),
+            [0x42] = typeof(Unk42),
             [0x44] = typeof(RunMovie),
             [0x47] = typeof(EntryUnk47),
             [0x4D] = typeof(SeqHideObject),
@@ -350,6 +356,30 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(SeqCrossFade)}: {Frame}, {Duration}";
         }
 
+        public class EntryUnk1D : IEventEntry
+        {
+            [Data] public short Channel { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public short Unk04 { get; set; }
+            [Data] public short Unk06 { get; set; }
+            [Data] public short Unk08 { get; set; }
+            [Data] public short Unk0a { get; set; }
+            [Data] public short Unk0c { get; set; }
+            [Data] public short Unk0e { get; set; }
+            [Data] public short Unk10 { get; set; }
+            [Data] public short Unk12 { get; set; }
+            [Data] public short Unk14 { get; set; }
+            [Data] public short Unk16 { get; set; }
+            [Data] public short Unk18 { get; set; }
+            [Data] public short Unk1a { get; set; }
+            [Data] public float Unk1c { get; set; }
+            [Data] public float Unk20 { get; set; }
+            [Data] public float Unk24 { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(EntryUnk1D)}: Channel {Channel}, {Unk02} {Unk04} {Unk06} {Unk08} {Unk0a} {Unk0c} {Unk0e} {Unk10} {Unk12} {Unk14} {Unk16} {Unk18} {Unk1a} {Unk1c} {Unk20} {Unk24}";
+        }
+
         public class SeqGameSpeed : IEventEntry
         {
             [Data] public short Frame { get; set; }
@@ -407,6 +437,18 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(Unk0D)}: Frame {StartFrame}, ({string.Join(", ", Unk)})";
         }
 
+        public class Unk0E : IEventEntry
+        {
+            [Data] public short StartFrame { get; set; }
+            [Data] public short EndFrame { get; set; }
+            [Data] public short Unk04 { get; set; }
+            [Data] public short Unk06 { get; set; }
+            [Data] public short Unk08 { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(Unk0E)}: Frame {StartFrame}, {Unk04}, {Unk06}, {Unk08}";
+        }
+
         public class SetupEvent : IEventEntry // sub_22d358
         {
             public override string ToString() =>
@@ -422,6 +464,18 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"{nameof(ReadAssets)}:\n\t{string.Join("\n\t", Set)}";
+        }
+
+        public class EntryUnk29 : IEventEntry
+        {
+            [Data] public short StartFrame { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public short Unk04 { get; set; }
+            [Data] public short Unk06 { get; set; }
+            [Data] public float Unk08 { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(EntryUnk29)}: {StartFrame} {Unk02} {Unk04} {Unk06} {Unk08}";
         }
 
         public class EntryUnk2A : IEventEntry // sub_232A48
@@ -537,6 +591,24 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(ReadEffect)}: Id {Id}, Name {Name}";
         }
 
+        public class SeqLayout : IEventEntry
+        {
+            [Data] public short Frame { get; set; }
+            [Data] public short LayoutIndex { get; set; }
+            [Data] public string LayoutName { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(ReadEffect)}: Start frame {Frame}, Layout {LayoutName} Index {LayoutIndex}";
+        }
+
+        public class ReadLayout : IEventEntry
+        {
+            [Data] public string Name { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(ReadLayout)}: {Name}";
+        }
+
         public class ReadMotion : IEventEntry
         {
             [Data] public short ObjectId { get; set; }
@@ -575,6 +647,15 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"{nameof(StopEffect)}: Frame {Frame}";
+        }
+
+        public class Unk42 : IEventEntry
+        {
+            [Data] public short Unk00 { get; set; }
+            [Data] public short Unk02 { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(Unk42)}: {Unk00}, {Unk02}";
         }
 
         public class RunMovie : IEventEntry
@@ -852,13 +933,11 @@ namespace OpenKh.Kh2.Ard
             for (var i = 0; i < itemCount; i++)
             {
                 var startPosition = reader.BaseStream.Position;
-                var type = reader.ReadInt16();
+                var typeId = reader.ReadInt16();
                 var length = reader.ReadInt16();
-                if (_idType.TryGetValue(type, out var entryType))
-                    loadSet.Add(Mapping.ReadObject(reader.BaseStream,
-                        (IEventEntry)Activator.CreateInstance(entryType)));
-                else
-                    Console.Error.WriteLine($"No Load implementation for {type:X02}");
+                var entryType = _idType[typeId];
+                loadSet.Add(Mapping.ReadObject(reader.BaseStream,
+                    (IEventEntry)Activator.CreateInstance(entryType)));
                 reader.BaseStream.Position = startPosition + length;
             }
 

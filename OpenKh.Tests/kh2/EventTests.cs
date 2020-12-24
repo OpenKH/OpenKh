@@ -58,6 +58,10 @@ namespace OpenKh.Tests.kh2
             });
 
         [Fact]
+        public void ParseUnk0E() =>
+            AssertEvent<Event.Unk0E>();
+
+        [Fact]
         public void ParseSetupEvent() =>
             AssertEvent<Event.SetupEvent>();
 
@@ -150,6 +154,10 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SeqCrossFade>();
 
         [Fact]
+        public void ParseEntryUnk1D() =>
+            AssertEvent<Event.EntryUnk1D>();
+
+        [Fact]
         public void ParseSeqGameSpeed() =>
             AssertEvent<Event.SeqGameSpeed>();
 
@@ -189,6 +197,7 @@ namespace OpenKh.Tests.kh2
                     Helpers.CreateDummyObject<Event.ReadAudio>(),
                     Helpers.CreateDummyObject<Event.ReadActor>(),
                     Helpers.CreateDummyObject<Event.ReadEffect>(),
+                    Helpers.CreateDummyObject<Event.ReadLayout>(),
                 }
             });
 
@@ -245,12 +254,24 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.ReadEffect>();
 
         [Fact]
+        public void ParseSeqLayout() =>
+            AssertEvent<Event.SeqLayout>();
+
+        [Fact]
+        public void ParseReadLayout() =>
+            AssertEvent<Event.ReadLayout>();
+
+        [Fact]
         public void ParseStopEffect() =>
             AssertEvent<Event.StopEffect>();
 
         [Fact]
         public void ParseRunMovie() =>
             AssertEvent<Event.RunMovie>();
+
+        [Fact]
+        public void ParseUnk42() =>
+            AssertEvent<Event.Unk42>();
 
         [Fact]
         public void ParseEntryUnk47() =>
