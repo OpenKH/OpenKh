@@ -196,13 +196,13 @@ namespace OpenKh.Game.Infrastructure
                 var binarc = _kernel.DataContent.FileOpen(realPath).Using(Bar.Read);
                 binarc.ForEntry(x => x.Type == Bar.EntryType.Motion, stream =>
                 {
-                    _actorIds[actorId].Motion.UseCustomMotion(Motion.Read(stream));
+                    _actorIds[actorId].SetMotion(Motion.Read(stream));
                     return true;
                 });
             }
             else
             {
-                _actorIds[actorId].Motion.UseCustomMotion(null);
+                _actorIds[actorId].SetMotion(null);
             }
         }
 

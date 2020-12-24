@@ -54,6 +54,8 @@ namespace OpenKh.Game.Entities
 
         public float Time { get; set; }
 
+        public float MotionTime { get; set; }
+
         public void LoadMesh(GraphicsDevice graphics)
         {
             var objEntry = Kernel.ObjEntries.FirstOrDefault(x => x.ObjectId == ObjectId);
@@ -98,7 +100,14 @@ namespace OpenKh.Game.Entities
         public void Update(float deltaTime)
         {
             Time += deltaTime;
-            Motion?.ApplyMotion(Model, Time);
+            MotionTime += deltaTime;
+            Motion?.ApplyMotion(Model, MotionTime);
+        }
+
+        public void SetMotion(Motion motion)
+        {
+            MotionTime = 0;
+            Motion?.UseCustomMotion(motion);
         }
 
         public static MeshGroup FromFbx(GraphicsDevice graphics, string filePath)
