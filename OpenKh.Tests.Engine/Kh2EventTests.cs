@@ -230,6 +230,7 @@ namespace OpenKh.Tests.Engine
             Assert.Equal(0f, actualRoll, 0);
             Assert.Equal(48.41f, actualFov, 0);
         }
+        
         [Theory]
         [InlineData(122, -123.61f, -122.43f)]
         [InlineData(140, -123.68f, -122.80f)]
@@ -343,6 +344,76 @@ namespace OpenKh.Tests.Engine
             Assert.Equal(217.77927f, -actualCenter.Z, 0);
             Assert.Equal(0f, actualRoll, 0);
             Assert.Equal(42.026005f, actualFov, 0);
+        }
+
+        [Theory]
+        [InlineData(30, false)]
+        [InlineData(60, true)]
+        [InlineData(120, true)]
+        [InlineData(180, false)]
+        public void ActorSceneVisibility(float time, bool expectedActorVisibility)
+        {
+            const int ActorId = 0;
+            const int FrameActorAppear = 50;
+            const string MotionPath = "anm_ex/motion";
+
+            var fakeField = Substitute.For<IField>();
+            var eventPlayer = new EventPlayer(fakeField, new List<Event.IEventEntry>
+            {
+                new Event.SetEndFrame
+                {
+                    EndFrame = 1000
+                },
+                new Event.ReadAssets
+                {
+                    FrameStart = -32767,
+                    FrameEnd = 0,
+                    Unk06 = 0,
+                    Set = new List<Event.IEventEntry>
+                    {
+                        new Event.ReadActor
+                        {
+                            ObjectId = 123,
+                            ActorId = ActorId,
+                            Name = "main_actor"
+                        },
+                        new Event.ReadMotion
+                        {
+                            ObjectId = 123,
+                            ActorId = ActorId,
+                            Name = MotionPath,
+                            UnknownIndex = 1,
+                        },
+                    }
+                },
+                new Event.SetActor
+                {
+                    ObjectEntry = 123,
+                    ActorId = ActorId,
+                    Name = "main_actor"
+                },
+                new Event.SeqPlayAnimation
+                {
+                    FrameStart = FrameActorAppear,
+                    FrameEnd = 100,
+                    ActorId = ActorId,
+                    Path = MotionPath
+                },
+                new Event.SeqActorLeave
+                {
+                    Frame = 150,
+                    ActorId = ActorId
+                }
+            });
+
+            bool? lastVisibility = null;
+
+            fakeField.SetActorVisibility(Arg.Is(ActorId), Arg.Do<bool>(x => lastVisibility = x));
+            eventPlayer.Initialize();
+            for (var i = 0; i < time; i++)
+                eventPlayer.Update(1f / 30.0f);
+
+            Assert.Equal(expectedActorVisibility, lastVisibility);
         }
 
         private static Event.SetCameraData.CameraKeys CameraDataValue(

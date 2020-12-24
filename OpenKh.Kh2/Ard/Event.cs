@@ -42,7 +42,7 @@ namespace OpenKh.Kh2.Ard
             [0x17] = typeof(EntryUnk17),
             [0x18] = typeof(EntryUnk18),
             [0x19] = typeof(SeqTextureAnim),
-            [0x1A] = typeof(EntryUnk1A),
+            [0x1A] = typeof(SeqActorLeave),
             [0x1B] = typeof(SeqCrossFade),
             [0x1D] = typeof(EntryUnk1D),
             [0x20] = typeof(SeqGameSpeed),
@@ -338,13 +338,13 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(SeqTextureAnim)}: Frame {Frame}, {Unk02}, {Unk04}, {Unk06}";
         }
 
-        public class EntryUnk1A : IEventEntry
+        public class SeqActorLeave : IEventEntry
         {
-            [Data] public short Unk00 { get; set; }
-            [Data] public short Unk02 { get; set; }
+            [Data] public short Frame { get; set; }
+            [Data] public short ActorId { get; set; }
 
             public override string ToString() =>
-                $"{nameof(EntryUnk1A)}: {Unk00} {Unk02}";
+                $"{nameof(SeqActorLeave)}: {Frame} {ActorId}";
         }
 
         public class SeqCrossFade : IEventEntry
@@ -457,13 +457,13 @@ namespace OpenKh.Kh2.Ard
 
         public class ReadAssets : IEventEntry
         {
-            public short Unk02 { get; set; }
-            public short Unk04 { get; set; }
+            public short FrameStart { get; set; }
+            public short FrameEnd { get; set; }
             public short Unk06 { get; set; }
             public List<IEventEntry> Set { get; set; }
 
             public override string ToString() =>
-                $"{nameof(ReadAssets)}:\n\t{string.Join("\n\t", Set)}";
+                $"{nameof(ReadAssets)}: {FrameStart} {FrameEnd} {Unk06}\n\t{string.Join("\n\t", Set)}";
         }
 
         public class EntryUnk29 : IEventEntry
@@ -943,8 +943,8 @@ namespace OpenKh.Kh2.Ard
 
             return new ReadAssets
             {
-                Unk02 = unk02,
-                Unk04 = unk04,
+                FrameStart = unk02,
+                FrameEnd = unk04,
                 Unk06 = unk06,
                 Set = loadSet
             };
@@ -954,8 +954,8 @@ namespace OpenKh.Kh2.Ard
         {
             var item = args.Item as ReadAssets;
             args.Writer.Write((short)item.Set.Count);
-            args.Writer.Write(item.Unk02);
-            args.Writer.Write(item.Unk04);
+            args.Writer.Write(item.FrameStart);
+            args.Writer.Write(item.FrameEnd);
             args.Writer.Write(item.Unk06);
 
             var stream = args.Writer.BaseStream;

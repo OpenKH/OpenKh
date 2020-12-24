@@ -147,7 +147,7 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ParseEntryUnk1A() =>
-            AssertEvent<Event.EntryUnk1A>();
+            AssertEvent<Event.SeqActorLeave>();
 
         [Fact]
         public void ParseSeqCrossFade() =>
@@ -188,8 +188,8 @@ namespace OpenKh.Tests.kh2
         public void ParseReadAssets() =>
             AssertEvent(new Event.ReadAssets
             {
-                Unk02 = 123,
-                Unk04 = 456,
+                FrameStart = 123,
+                FrameEnd = 456,
                 Unk06 = 789,
                 Set = new List<Event.IEventEntry>
                 {

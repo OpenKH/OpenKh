@@ -18,6 +18,7 @@ namespace OpenKh.Game.Events
         private readonly IList<SeqPlayAnimation> _runAnimations = new List<SeqPlayAnimation>();
         private readonly IList<SeqFade> _fades = new List<SeqFade>();
         private readonly IList<SeqSubtitle> _subtitles = new List<SeqSubtitle>();
+        private readonly IList<SeqActorLeave> _actorLeave = new List<SeqActorLeave>();
         private readonly Dictionary<int, string> _actors = new Dictionary<int, string>();
 
         private double _secondsPrev;
@@ -51,6 +52,7 @@ namespace OpenKh.Game.Events
                                 case ReadActor item:
                                     _actors[item.ActorId] = item.Name;
                                     _field.AddActor(item.ActorId, item.ObjectId);
+                                    _field.SetActorVisibility(item.ActorId, false);
                                     break;
                             }
                         }
@@ -65,6 +67,7 @@ namespace OpenKh.Game.Events
                                     _field.SetActorAnimation(
                                         item.ActorId,
                                         GetAnmPath(item.ActorId, item.Name));
+                                    _field.SetActorVisibility(item.ActorId, item.UnknownIndex == 0);
                                     break;
                             }
                         }
@@ -95,6 +98,9 @@ namespace OpenKh.Game.Events
                     case SeqSubtitle item:
                         _subtitles.Add(item);
                         break;
+                    case SeqActorLeave item:
+                        _actorLeave.Add(item);
+                        break;
                 }
             }
 
@@ -103,7 +109,6 @@ namespace OpenKh.Game.Events
 
         public void Update(double deltaTime)
         {
-            var visibleEntries = new Dictionary<int, bool>();
             _seconds += deltaTime;
 
             var nFrame = (int)(_seconds * FramesPerSecond);
@@ -119,13 +124,16 @@ namespace OpenKh.Game.Events
             foreach (var item in _runAnimations)
             {
                 if (item.FrameStart > nPrevFrame && item.FrameStart <= nFrame)
+                {
                     _field.SetActorAnimation(
                         item.ActorId, GetAnmPath(item.ActorId, item.Path));
-
-                if (nFrame >= item.FrameStart && nFrame < item.FrameEnd)
-                    visibleEntries[item.ActorId] = true;
-                else if (!visibleEntries.ContainsKey(item.ActorId))
-                    visibleEntries[item.ActorId] = false;
+                    _field.SetActorVisibility(item.ActorId, true);
+                }
+            }
+            foreach (var item in _actorLeave)
+            {
+                if (item.Frame > nPrevFrame && item.Frame <= nFrame)
+                    _field.SetActorVisibility(item.ActorId, false);
             }
             foreach (var item in _cameraTimeline)
             {
@@ -187,9 +195,6 @@ namespace OpenKh.Game.Events
                     (float)GetCameraValue(cameraFrameTime, curCamera.FieldOfView, null),
                     (float)GetCameraValue(cameraFrameTime, curCamera.Roll, null));
             }
-
-            foreach (var item in visibleEntries)
-                _field.SetActorVisibility(item.Key, item.Value);
 
             _secondsPrev = _seconds;
         }
