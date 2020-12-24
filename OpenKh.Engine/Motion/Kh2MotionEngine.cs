@@ -93,8 +93,8 @@ namespace OpenKh.Engine.Motion
 
         public static void ApplyInterpolatedMotion(IModelMotion model, Kh2.Motion.InterpolatedMotion motion, float time)
         {
-            var absoluteFrame = (int)Math.Floor(30.0f * time);
-            var actualFrame = absoluteFrame % motion.FrameEnd * 2;
+            var absoluteFrame = (float)Math.Floor(30.0f * time);
+            var actualFrame = (int)Loop(motion.FrameCount * 2, motion.FrameEnd * 2, absoluteFrame);
 
             var boneList = model.Bones;
             var matrices = new Matrix4x4[boneList.Count];
@@ -244,5 +244,18 @@ namespace OpenKh.Engine.Motion
         }
 
         public void UseCustomMotion(Kh2.Motion motion) => _motion = motion;
+
+        private static float Loop(float min, float max, float val)
+        {
+            if (val < max)
+                return val;
+            if (max <= min)
+                return min;
+
+            var mod = (val - min) % (max - min);
+            if (mod < 0)
+                mod += max - min;
+            return min + mod;
+        }
     }
 }
