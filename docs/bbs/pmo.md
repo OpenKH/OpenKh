@@ -1,4 +1,4 @@
-# [Kingdom Hearts: Birth By Sleep](../index.md) - Models
+# [Kingdom Hearts: Birth By Sleep](./index.md) - Models
 
 Found inside PMP files or as raw PMO files, BBS stores it's models in PMO blobs.
 
@@ -8,7 +8,7 @@ The format supports varying vertex types and has support for animation bones and
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 0x0    | uint32 | Magic Value. Always "PMP\0" (0x504D4F00) |
+| 0x0    | uint32 | Magic Value. Always "PMO\0" (0x004F4D50) |
 | 0x4    | uint8[4] | unknown |
 | 0x8    | uint16 | Texture Count |
 | 0xA    | uint16 | unknown |

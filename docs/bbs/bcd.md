@@ -1,4 +1,4 @@
-# [Kingdom Hearts: Birth By Sleep](../index.md) - BCD
+# [Kingdom Hearts: Birth By Sleep](./index.md) - BCD
 
 Found inside map `.arc`s the details of much of the file format remain unkown, however it does contain the collision data for the map.
 
@@ -50,6 +50,7 @@ List of `header.face_count` of the following structure, found at `face list offs
 * Faces are assumed to be quads unless `Vertex Index 4` is `0xFF`/`-1`, in which case it's a triangle.
 
 ## Unknown data
+
 The last 4 values in the header point to regions in the file after the Face List. Nothing is yet known about this data, except that it's size seems to be proportional to the complexity of the associated map. The current working theory is that it is some kind of tree structure for optimizing collision queries.
 
 Somewhere in the unknown data in the face structure should be flags that indicate if a face is a wall or floor, or if it's a trigger, as the level exit triggers seem to be present in the collision data. How the game decides what to do when you walk into them is currently unknown.
