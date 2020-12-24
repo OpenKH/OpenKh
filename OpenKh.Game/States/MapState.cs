@@ -187,6 +187,9 @@ namespace OpenKh.Game.States
 
         private void RenderMeshNew(EffectPass pass, IMonoGameModel model, bool passRenderOpaque)
         {
+            if (model?.MeshDescriptors == null)
+                return;
+
             foreach (var meshDescriptor in model.MeshDescriptors)
             {
                 if (meshDescriptor.Indices.Length == 0 || meshDescriptor.IsOpaque != passRenderOpaque)

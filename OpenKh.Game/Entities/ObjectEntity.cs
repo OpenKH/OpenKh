@@ -40,7 +40,7 @@ namespace OpenKh.Game.Entities
 
         public Kh2MotionEngine Motion { get; set; }
 
-        public List<MeshDescriptor> MeshDescriptors => Model.MeshDescriptors;
+        public List<MeshDescriptor> MeshDescriptors => Model?.MeshDescriptors;
 
         public IKingdomTexture[] Textures { get; private set; }
 
