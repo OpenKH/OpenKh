@@ -14,11 +14,6 @@ namespace OpenKh.Game.Events
         private readonly IField _field;
         private readonly IList<IEventEntry> _eventEntries;
         private readonly IList<SetCameraData> _cameras = new List<SetCameraData>();
-        private readonly IList<SeqCamera> _cameraTimeline = new List<SeqCamera>();
-        private readonly IList<SeqPlayAnimation> _runAnimations = new List<SeqPlayAnimation>();
-        private readonly IList<SeqFade> _fades = new List<SeqFade>();
-        private readonly IList<SeqSubtitle> _subtitles = new List<SeqSubtitle>();
-        private readonly IList<SeqActorLeave> _actorLeave = new List<SeqActorLeave>();
         private readonly Dictionary<int, string> _actors = new Dictionary<int, string>();
 
         private double _secondsPrev;
@@ -78,29 +73,6 @@ namespace OpenKh.Game.Events
                     case SetCameraData item:
                         _cameras.Add(item);
                         break;
-                    case SeqCamera item:
-                        _cameraTimeline.Add(item);
-                        break;
-                    case SeqActorPosition item:
-                        _field.SetActorPosition(
-                            item.ActorId,
-                            item.PositionX,
-                            item.PositionY,
-                            -item.PositionZ,
-                            item.RotationY - 45f);
-                        break;
-                    case SeqPlayAnimation item:
-                        _runAnimations.Add(item);
-                        break;
-                    case SeqFade item:
-                        _fades.Add(item);
-                        break;
-                    case SeqSubtitle item:
-                        _subtitles.Add(item);
-                        break;
-                    case SeqActorLeave item:
-                        _actorLeave.Add(item);
-                        break;
                 }
             }
 
@@ -121,62 +93,74 @@ namespace OpenKh.Game.Events
                 return;
             }
 
-            foreach (var item in _runAnimations)
+            foreach (var entry in _eventEntries)
             {
-                if (item.FrameStart > nPrevFrame && item.FrameStart <= nFrame)
+                switch (entry)
                 {
-                    _field.SetActorAnimation(
-                        item.ActorId, GetAnmPath(item.ActorId, item.Path));
-                    _field.SetActorVisibility(item.ActorId, true);
-                }
-            }
-            foreach (var item in _actorLeave)
-            {
-                if (item.Frame > nPrevFrame && item.Frame <= nFrame)
-                    _field.SetActorVisibility(item.ActorId, false);
-            }
-            foreach (var item in _cameraTimeline)
-            {
-                if (nFrame >= item.FrameStart && nFrame < item.FrameEnd)
-                {
-                    _cameraId = item.CameraId;
-                    var frameLength = item.FrameEnd - item.FrameStart;
-                    cameraFrameTime = (_seconds * FramesPerSecond - item.FrameStart) / 30f;
-                }
-            }
-            foreach (var item in _fades)
-            {
-                if (item.FrameIndex > nPrevFrame && item.FrameIndex <= nFrame)
-                {
-                    switch (item.Type)
-                    {
-                        case SeqFade.FadeType.FromBlack:
-                        case SeqFade.FadeType.FromBlackVariant:
-                            _field.FadeFromBlack(item.Duration * TimeMul);
-                            break;
-                        case SeqFade.FadeType.FromWhite:
-                        case SeqFade.FadeType.FromWhiteVariant:
-                            _field.FadeFromWhite(item.Duration * TimeMul);
-                            break;
-                        case SeqFade.FadeType.ToBlack:
-                        case SeqFade.FadeType.ToBlackVariant:
-                            _field.FadeToBlack(item.Duration * TimeMul);
-                            break;
-                        case SeqFade.FadeType.ToWhite:
-                        case SeqFade.FadeType.ToWhiteVariant:
-                            _field.FadeToWhite(item.Duration * TimeMul);
-                            break;
-                    }
-                }
-            }
-            foreach (var item in _subtitles)
-            {
-                if (nFrame >= item.FrameStart && nPrevFrame < item.FrameStart)
-                {
-                    if (item.HideFlag == 0)
-                        _field.ShowSubtitle(item.Index, (ushort)item.MessageId);
-                    else if (item.HideFlag != 0)
-                        _field.HideSubtitle(item.Index);
+                    case SeqActorPosition item:
+                        if (item.Frame > nPrevFrame && item.Frame <= nFrame)
+                        {
+                            _field.SetActorPosition(
+                                item.ActorId,
+                                item.PositionX,
+                                item.PositionY,
+                                -item.PositionZ,
+                                item.RotationY);
+                        }
+                        break;
+                    case SeqPlayAnimation item:
+                        if (item.FrameStart > nPrevFrame && item.FrameStart <= nFrame)
+                        {
+                            _field.SetActorAnimation(
+                                item.ActorId, GetAnmPath(item.ActorId, item.Path));
+                            _field.SetActorVisibility(item.ActorId, true);
+                        }
+                        break;
+                    case SeqActorLeave item:
+                        if (item.Frame > nPrevFrame && item.Frame <= nFrame)
+                            _field.SetActorVisibility(item.ActorId, false);
+                        break;
+                    case SeqCamera item:
+                        if (nFrame >= item.FrameStart && nFrame < item.FrameEnd)
+                        {
+                            _cameraId = item.CameraId;
+                            var frameLength = item.FrameEnd - item.FrameStart;
+                            cameraFrameTime = (_seconds * FramesPerSecond - item.FrameStart) / 30f;
+                        }
+                        break;
+                    case SeqFade item:
+                        if (item.FrameIndex > nPrevFrame && item.FrameIndex <= nFrame)
+                        {
+                            switch (item.Type)
+                            {
+                                case SeqFade.FadeType.FromBlack:
+                                case SeqFade.FadeType.FromBlackVariant:
+                                    _field.FadeFromBlack(item.Duration * TimeMul);
+                                    break;
+                                case SeqFade.FadeType.FromWhite:
+                                case SeqFade.FadeType.FromWhiteVariant:
+                                    _field.FadeFromWhite(item.Duration * TimeMul);
+                                    break;
+                                case SeqFade.FadeType.ToBlack:
+                                case SeqFade.FadeType.ToBlackVariant:
+                                    _field.FadeToBlack(item.Duration * TimeMul);
+                                    break;
+                                case SeqFade.FadeType.ToWhite:
+                                case SeqFade.FadeType.ToWhiteVariant:
+                                    _field.FadeToWhite(item.Duration * TimeMul);
+                                    break;
+                            }
+                        }
+                        break;
+                    case SeqSubtitle item:
+                        if (nFrame >= item.FrameStart && nPrevFrame < item.FrameStart)
+                        {
+                            if (item.HideFlag == 0)
+                                _field.ShowSubtitle(item.Index, (ushort)item.MessageId);
+                            else if (item.HideFlag != 0)
+                                _field.HideSubtitle(item.Index);
+                        }
+                        break;
                 }
             }
 
