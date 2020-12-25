@@ -56,10 +56,12 @@ namespace OpenKh.Kh2
 
         public enum Interpolation
         {
+            Zero = -1, // default
             Nearest,
             Linear,
             Hermite,
-            Zero,
+            Hermite3, // unused?
+            Hermite4, // unused?
         }
 
         private class Header

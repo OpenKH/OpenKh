@@ -1,6 +1,7 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -143,64 +144,52 @@ namespace OpenKh.Engine.Motion
 
             foreach (var animation in motion.ModelBoneAnimation)
             {
-                for (var i = animation.TimelineCount - 1; i >= 0; i--)
+                // Check if it would be better to use a linear or binary search
+                if (true || animation.TimelineCount < 4)
                 {
-                    var timeline = motion.Timeline[animation.TimelineStartIndex + i];
-
-                    if (actualFrame >= timeline.KeyFrame)
+                    for (var index = animation.TimelineCount - 1; index >= 0; index--)
                     {
-                        Kh2.Motion.TimelineTable nextTimeline;
-                        if (i < animation.TimelineCount - 1)
-                            nextTimeline = motion.Timeline[animation.TimelineStartIndex + i + 1];
+
+                        if (actualFrame >= motion.Timeline[animation.TimelineStartIndex + index].KeyFrame)
+                        {
+                            PerformInterpolation(motion.Timeline, animation, sourceTranslations, sourceRotations, actualFrame, index);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // If there are two keyframes, just interpolate between 0 and 1
+                    if (animation.TimelineCount < 3)
+                    {
+                        PerformInterpolation(motion.Timeline, animation, sourceTranslations, sourceRotations, actualFrame, 0);
+                        continue;
+                    }
+
+                    var left = 0;
+                    var right = animation.TimelineCount - 1;
+                    while (true)
+                    {
+                        var mid = (left + right) / 2;
+                        var keyFrame = motion.Timeline[animation.TimelineStartIndex + mid].KeyFrame;
+                        if (actualFrame >= keyFrame)
+                        {
+                            if (actualFrame <= keyFrame)
+                            {
+                                PerformInterpolation(motion.Timeline, animation, sourceTranslations, sourceRotations, actualFrame, mid);
+                                break;
+                            }
+
+                            left = mid;
+                        }
                         else
-                            nextTimeline = motion.Timeline[animation.TimelineStartIndex];
+                            right = mid;
 
-                        var timeDiff = nextTimeline.KeyFrame - timeline.KeyFrame;
-                        var n = (actualFrame - timeline.KeyFrame) / timeDiff;
-                        float value;
-                        switch (timeline.Interpolation)
+                        if (right - left <= 1)
                         {
-                            case Kh2.Motion.Interpolation.Nearest:
-                                value = timeline.Value;
-                                break;
-                            case Kh2.Motion.Interpolation.Linear:
-                                value = MathEx.Lerp(timeline.Value, nextTimeline.Value, n);
-                                break;
-                            case Kh2.Motion.Interpolation.Hermite:
-                                value = MathEx.CubicHermite(
-                                    n, timeline.Value, nextTimeline.Value,
-                                    timeline.TangentEaseIn, timeline.TangentEaseOut);
-                                break;
-                            case Kh2.Motion.Interpolation.Zero:
-                                value = 0; // EVIL!!1!
-                                break;
-                            default:
-                                value = timeline.Value;
-                                break;
+                            PerformInterpolation(motion.Timeline, animation, sourceTranslations, sourceRotations, actualFrame, right - 1);
+                            break;
                         }
-
-                        switch (animation.Channel)
-                        {
-                            case 3:
-                                sourceRotations[animation.JointIndex].X = value;
-                                break;
-                            case 4:
-                                sourceRotations[animation.JointIndex].Y = value;
-                                break;
-                            case 5:
-                                sourceRotations[animation.JointIndex].Z = value;
-                                break;
-                            case 6:
-                                sourceTranslations[animation.JointIndex].X = value;
-                                break;
-                            case 7:
-                                sourceTranslations[animation.JointIndex].Y = value;
-                                break;
-                            case 8:
-                                sourceTranslations[animation.JointIndex].Z = value;
-                                break;
-                        }
-                        break;
                     }
                 }
             }
@@ -241,6 +230,65 @@ namespace OpenKh.Engine.Motion
             }
 
             model.ApplyMotion(matrices);
+        }
+
+        private static void PerformInterpolation(
+            IList<Kh2.Motion.TimelineTable> timelines,
+            Kh2.Motion.BoneAnimationTable animation,
+            Vector3[] sourceTranslations,
+            Quaternion[] sourceRotations,
+            int actualFrame,
+            int currentIndex)
+        {
+            var left = timelines[animation.TimelineStartIndex + currentIndex];
+            var right = currentIndex < animation.TimelineCount - 1
+                ? timelines[animation.TimelineStartIndex + currentIndex + 1]
+                : timelines[animation.TimelineStartIndex];
+
+            var timeDiff = right.KeyFrame - left.KeyFrame;
+            var n = (actualFrame - left.KeyFrame) / timeDiff;
+            float value;
+            switch (left.Interpolation)
+            {
+                case Kh2.Motion.Interpolation.Nearest:
+                    value = left.Value;
+                    break;
+                case Kh2.Motion.Interpolation.Linear:
+                    value = MathEx.Lerp(left.Value, right.Value, n);
+                    break;
+                case Kh2.Motion.Interpolation.Hermite:
+                case Kh2.Motion.Interpolation.Hermite3: // Unknown why (and where) it is used
+                case Kh2.Motion.Interpolation.Hermite4: // Unknown why (and where) it is used
+                    value = MathEx.CubicHermite(
+                        n, left.Value, right.Value,
+                        left.TangentEaseIn, left.TangentEaseOut);
+                    break;
+                default:
+                    value = 0;
+                    break;
+            }
+
+            switch (animation.Channel)
+            {
+                case 3:
+                    sourceRotations[animation.JointIndex].X = value;
+                    break;
+                case 4:
+                    sourceRotations[animation.JointIndex].Y = value;
+                    break;
+                case 5:
+                    sourceRotations[animation.JointIndex].Z = value;
+                    break;
+                case 6:
+                    sourceTranslations[animation.JointIndex].X = value;
+                    break;
+                case 7:
+                    sourceTranslations[animation.JointIndex].Y = value;
+                    break;
+                case 8:
+                    sourceTranslations[animation.JointIndex].Z = value;
+                    break;
+            }
         }
 
         public void UseCustomMotion(Kh2.Motion motion) => _motion = motion;
