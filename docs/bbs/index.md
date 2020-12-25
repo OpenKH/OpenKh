@@ -6,7 +6,7 @@
 * [Archive format](bbsa.md)
 * [ARC format](arc.md)
 * [Maps](maps.md)
-* [Models](models.md)
+* [Models](pmo.md)
 * [Animation Container](pam.md)
 * [CTD text format](ctd.md)
 * [Events](events.md)
