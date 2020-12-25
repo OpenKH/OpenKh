@@ -72,7 +72,8 @@ namespace OpenKh.Game.States
                 _camera,
                 initDesc.StateSettings,
                 _graphics.GraphicsDevice,
-                _shader);
+                _shader,
+                _input);
 
             BasicallyForceToReloadEverything();
             _menuState.Initialize(initDesc);

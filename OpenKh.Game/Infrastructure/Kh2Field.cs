@@ -24,6 +24,7 @@ namespace OpenKh.Game.Infrastructure
         private readonly Camera _camera;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly KingdomShader _shader;
+        private readonly InputManager _inputManager;
         private readonly Kh2MessageRenderer _messageRenderer;
         private readonly DrawContext _messageDrawContext;
         private readonly Kh2MessageProvider _eventMessageProvider;
@@ -36,6 +37,8 @@ namespace OpenKh.Game.Infrastructure
         private int _spawnScriptMap;
         private int _spawnScriptBtl;
         private int _spawnScriptEvt;
+        private bool _isFreeCam;
+        private bool _isEventPause;
 
         private bool _isFading;
         private float _fadeCurrent;
@@ -51,12 +54,14 @@ namespace OpenKh.Game.Infrastructure
             Camera camera,
             Dictionary<string, string> settings,
             GraphicsDevice graphicsDevice,
-            KingdomShader shader)
+            KingdomShader shader,
+            InputManager inputManager)
         {
             _kernel = kernel;
             _camera = camera;
             _graphicsDevice = graphicsDevice;
             _shader = shader;
+            _inputManager = inputManager;
 
             var viewport = graphicsDevice.Viewport;
             _drawing = new MonoSpriteDrawing(graphicsDevice, _shader);
@@ -136,7 +141,10 @@ namespace OpenKh.Game.Infrastructure
 
         public void Update(double deltaTime)
         {
-            if (_eventPlayer != null)
+            _isEventPause = _inputManager.RightTrigger;
+            _isFreeCam = _inputManager.LeftTrigger;
+
+            if (_eventPlayer != null && _isEventPause == false)
             {
                 _eventPlayer.Update(deltaTime);
                 if (_eventPlayer.IsEnd)
@@ -237,6 +245,9 @@ namespace OpenKh.Game.Infrastructure
             float fieldOfView,
             float roll)
         {
+            if (_isFreeCam == true)
+                return;
+
             _camera.CameraPosition = new Vector3(position.X, position.Y, position.Z);
             _camera.CameraLookAt = new Vector3(lookAt.X, lookAt.Y, lookAt.Z);
             _camera.FieldOfView = (float)(fieldOfView * Math.PI / 180);
