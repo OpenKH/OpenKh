@@ -94,7 +94,7 @@ namespace OpenKh.Engine.Motion
 
         public static void ApplyInterpolatedMotion(IModelMotion model, Kh2.Motion.InterpolatedMotion motion, float time)
         {
-            var absoluteFrame = (float)Math.Floor(30.0f * time);
+            var absoluteFrame = (float)Math.Floor(60.0f * time);
             var actualFrame = (int)Loop(motion.FrameCount * 2, motion.FrameEnd * 2, absoluteFrame);
 
             var boneList = model.Bones;
