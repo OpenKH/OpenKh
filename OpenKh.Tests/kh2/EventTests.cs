@@ -158,6 +158,29 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.EntryUnk1D>();
 
         [Fact]
+        public void ParseEntryUnk1E() =>
+            AssertEvent(new Event.Unk1E
+            {
+                Id = 123,
+                UnkG = 456,
+                UnkH = 789,
+                Entries = new List<Event.Unk1E.Entry>()
+                {
+                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
+                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
+                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
+                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
+                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
+                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
+                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
+                }
+            });
+
+        [Fact]
+        public void ParseEntryUnk1F() =>
+            AssertEvent<Event.Unk1F>();
+
+        [Fact]
         public void ParseSeqGameSpeed() =>
             AssertEvent<Event.SeqGameSpeed>();
 

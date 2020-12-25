@@ -17,6 +17,7 @@ namespace OpenKh.Kh2.Ard
                 .ForType<SeqVoices>(ReadVoices, WriteVoices)
                 .ForType<SetCameraData>(ReadSetCameraData, WriteSetCameraData)
                 .ForType<ReadAssets>(ReadLoadAssets, WriteLoadAssets)
+                .ForType<Unk1E>(ReadUnk1E, WriteUnk1E)
                 .Build();
 
         private static readonly Dictionary<int, Type> _idType = new Dictionary<int, Type>()
@@ -45,6 +46,8 @@ namespace OpenKh.Kh2.Ard
             [0x1A] = typeof(SeqActorLeave),
             [0x1B] = typeof(SeqCrossFade),
             [0x1D] = typeof(EntryUnk1D),
+            [0x1E] = typeof(Unk1E),
+            [0x1F] = typeof(Unk1F),
             [0x20] = typeof(SeqGameSpeed),
             [0x22] = typeof(EntryUnk22),
             [0x23] = typeof(SeqVoices),
@@ -378,6 +381,42 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"{nameof(EntryUnk1D)}: Channel {Channel}, {Unk02} {Unk04} {Unk06} {Unk08} {Unk0a} {Unk0c} {Unk0e} {Unk10} {Unk12} {Unk14} {Unk16} {Unk18} {Unk1a} {Unk1c} {Unk20} {Unk24}";
+        }
+
+        public class Unk1E : IEventEntry
+        {
+            public class Entry
+            {
+                [Data] public float Unk00 { get; set; }
+                [Data] public float Unk04 { get; set; }
+                [Data] public float Unk08 { get; set; }
+                [Data] public float Unk0C { get; set; }
+                [Data] public float Unk10 { get; set; }
+                [Data] public float Unk14 { get; set; }
+                [Data] public float Unk18 { get; set; }
+                [Data] public float Unk1C { get; set; }
+                [Data] public float Unk20 { get; set; }
+                [Data] public float Unk24 { get; set; }
+            }
+
+            public short Id { get; set; }
+            public List<Entry> Entries { get; set; }
+            public short UnkG { get; set; }
+            public short UnkH { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(Unk1E)}: Id {Id}";
+        }
+
+        public class Unk1F : IEventEntry
+        {
+            [Data] public short Unk00 { get; set; }
+            [Data] public short Unk02 { get; set; }
+            [Data] public short Unk04 { get; set; }
+            [Data] public short Unk06 { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(Unk1F)}: {Unk00}, {Unk02} {Unk04} {Unk06}";
         }
 
         public class SeqGameSpeed : IEventEntry
@@ -973,6 +1012,41 @@ namespace OpenKh.Kh2.Ard
                 stream.Write((short)length);
                 stream.Position = nextPosition;
             }
+        }
+
+        private static object ReadUnk1E(MappingReadArgs args)
+        {
+            var id = args.Reader.ReadInt16();
+            var count = args.Reader.ReadInt16();
+            var unk04 = args.Reader.ReadInt16();
+            var unk06 = args.Reader.ReadInt16();
+            var entries = Enumerable
+                .Range(0, count)
+                .Select(x => Mapping.ReadObject<Unk1E.Entry>(args.Reader.BaseStream))
+                .ToList();
+            var unkG = args.Reader.ReadInt16();
+            var unkH = args.Reader.ReadInt16();
+
+            return new Unk1E
+            {
+                Id = id,
+                UnkG = unkG,
+                UnkH = unkH,
+                Entries = entries
+            };
+        }
+
+        private static void WriteUnk1E(MappingWriteArgs args)
+        {
+            var item = args.Item as Unk1E;
+            args.Writer.Write(item.Id);
+            args.Writer.Write((short)item.Entries.Count);
+            args.Writer.Write((short)3);
+            args.Writer.Write((short)0);
+            foreach (var entry in item.Entries)
+                Mapping.WriteObject(args.Writer.BaseStream, entry);
+            args.Writer.Write(item.UnkG);
+            args.Writer.Write(item.UnkH);
         }
     }
 }
