@@ -13,8 +13,8 @@ It is a [BAR](bar.md) file and contains the following subfiles:
 * [BTLV](#btlv) - Battle Level
 * [LVPM](#lvpm) - Level Params
 * [ENMP](#enmp) - Enemy Params
-* [PATN](#patn) - Partners
-* [PLRP](#plrp) - ???
+* [PATN](#patn) - ???
+* [PLRP](#plrp) - Player Params
 * [LIMT](#limt) - Limits
 * [SUMN](#sumn) - Summons
 * [MAGC](#magc) - Magic
@@ -349,7 +349,8 @@ Every enemy is associated to one or more IDs (eg. Organization members have diff
 
 ## Patn
 
-Data on partner allies.
+Defines multiple parameters per group of entities. How an entity is assigned to a group is unknown.
+EG: 05 is Mad Rider, 14 is Reckless, Xaldin, 15 is Morning Star, Assault Rider, Living Bones, Berserker...
 
 ### Patn Structure
 
@@ -370,7 +371,27 @@ Data on partner allies.
 | Offset | Type  | Description
 |--------|------|--------------
 | 00     | byte | Id
-| 01     | byte [19] | ???
+| 01     | byte | ???
+| 02     | byte | ???
+| 03     | byte | ???
+| 04     | byte | ???
+| 05     | byte | Magnet Burst effect\*
+| 06     | byte | Magnet\*
+| 07     | byte | ???
+| 08     | byte | ???
+| 09     | byte | ???
+| 10     | byte | ???
+| 11     | byte | ???
+| 12     | byte | ???
+| 13     | byte | ???
+| 14     | byte | ???
+| 15     | byte | ???
+| 16     | byte | ???
+| 17     | byte | ???
+| 18     | byte | ???
+| 19     | byte | ???
+
+\* (00 is immune, 01/0C/0D draws in, 02/03 flinches, 04/07/09/0B knocks out, 05 pulls in(magnet), 06/08/0A is flinch + draw, 0E is flinch + insta revenge...)
 
 ## Plrp
 
@@ -395,14 +416,16 @@ Contains informations about starting Character statistics, starting Abilities et
 | Offset | Type  | Description
 |--------|-------|--------------
 | 00     | short | Unknown
-| 02     | byte  | Unknown
+| 02     | byte  | Character ID - [Character LIST](../../dictionary/characters.md)
 | 03     | byte  | HP
 | 04     | byte  | MP
 | 05     | byte  | AP
 | 06     | short | Unknown
 | 08     | short | Unknown
 | 0A     | short | Unknown
-| 0C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+
+NOTE: Abilities that are enabled by default begin with an 8.
 
 ## Limt
 
@@ -488,13 +511,13 @@ Data on magic.
 | 2     | 2B | ???
 | 4     | char[32] | Filename
 | 36     | 2B | ???
-| 38     | short | Data - [Command LIST](../../dictionary/commands.md)
-| 40     | short | Ground animation
+| 38     | short | Command - [Command LIST](../../dictionary/commands.md)
+| 40     | short | Ground motion - [Motion LIST](../../file/anb/mset.html)
 | 42     | short | Ground ???
-| 44     | short | Air animation
-| 46     | short | Air ???
-| 48     | short | Finisher animation
-| 50     | short | Finisher ???
+| 44     | short | Finish motion
+| 46     | short | Finish ???
+| 48     | short | Air motion
+| 50     | short | Air ???
 | 52     | byte | ???
 | 53     | byte | ???
 | 54     | byte | ???
@@ -502,7 +525,7 @@ Data on magic.
 
 ## Vbrt
 
-[BAR](bar.md) file containing unknown data
+[BAR](bar.md) file containing unknown data.
 
 * vibr
 * auto
