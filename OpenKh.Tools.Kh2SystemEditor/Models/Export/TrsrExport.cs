@@ -1,5 +1,5 @@
-﻿using OpenKh.Kh2;
-using OpenKh.Kh2.System;
+using OpenKh.Kh2;
+using OpenKh.Kh2.SystemData;
 using OpenKh.Tools.Kh2SystemEditor.Attributes;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using System;

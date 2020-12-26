@@ -70,7 +70,12 @@ namespace OpenKh.Kh2
             swizzled = header.Swizzled;
 
             stream.SetPosition(header.BitmapOffset);
-            Data = reader.ReadBytes(header.BitmapLength);
+            var data = reader.ReadBytes(header.BitmapLength);
+
+            // Swap pixel order for only unswizzled 4-bpp IMGD.
+            Data = (format == Format4bpp && (swizzled & 4) == 0)
+                ? GetSwappedPixelData(data)
+                : data;
 
             stream.SetPosition(header.ClutOffset);
             Clut = reader.ReadBytes(header.ClutLength);
@@ -108,7 +113,12 @@ namespace OpenKh.Kh2
                 Swizzled = swizzled,
             });
 
-            stream.Write(Data, 0, Data.Length);
+            // Swap pixel order for only unswizzled 4-bpp IMGD.
+            var data = (format == Format4bpp && (swizzled & 4) == 0)
+                ? GetSwappedPixelData(Data)
+                : Data;
+
+            stream.Write(data, 0, data.Length);
 
             if (Clut != null)
                 stream.Write(Clut, 0, Clut.Length);
@@ -163,6 +173,18 @@ namespace OpenKh.Kh2
 
         public Size Size { get; }
 
+        /// <summary>
+        /// Bitmap data
+        /// </summary>
+        /// <remarks>
+        /// In the following case, this `Data` is not same bitmap data stored in imgd file.
+        /// 
+        /// In OpenKh:
+        /// - NOT IsSwizzled && Format4bpp = storing Windows pixel order ([1, 2] to 0x12)
+        /// 
+        /// In IMGD file:
+        /// - NOT IsSwizzled && Format4bpp = storing reversed pixel order ([1, 2] to 0x21)
+        /// </remarks>
 		public byte[] Data { get; }
 
         public byte[] Clut { get; }

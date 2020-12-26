@@ -1,5 +1,7 @@
 using OpenKh.Common;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
+using OpenKh.Tests.Imaging;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -79,6 +81,23 @@ namespace OpenKh.Tests.kh2
         {
             var input = Enumerable.Range(0, 0x1000).Select(_ => (byte)0).ToArray();
             Assert.Empty(Img.Decompress(input));
+        }
+
+        [Fact]
+        public void CreateAndRead4bppSuccessfully()
+        {
+            var imgd = Imgd.Create(
+                new System.Drawing.Size(ImageDecodeTests.Width, ImageDecodeTests.Height),
+                PixelFormat.Indexed4,
+                ImageDecodeTests.Data4bpp, ImageDecodeTests.Clut4bpp, false);
+
+            Assert.Equal(ImageDecodeTests.ExpectedFrom4bpp, imgd.ToBgra32());
+
+            using var stream = new MemoryStream();
+            imgd.Write(stream);
+            imgd = Imgd.Read(stream.SetPosition(0));
+
+            Assert.Equal(ImageDecodeTests.ExpectedFrom4bpp, imgd.ToBgra32());
         }
 
         public void AlwaysCompressCorrectly()

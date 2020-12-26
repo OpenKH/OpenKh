@@ -1,5 +1,5 @@
-﻿using OpenKh.Imaging;
-using OpenKh.Kh2.System;
+using OpenKh.Imaging;
+using OpenKh.Kh2.SystemData;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using OpenKh.Kh2;
-using OpenKh.Kh2.System;
+using OpenKh.Kh2.SystemData;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.Kh2SystemEditor.Extensions;

@@ -1,20 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations;
+using OpenKh.Kh2;
+using OpenKh.Tools.BarEditor.Interfaces;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
 using Xe.Tools;
-using Xe.Tools.Wpf;
 using static OpenKh.Kh2.Bar;
 
 namespace OpenKh.Tools.BarEditor.Models
 {
     public class BarEntryModel : BaseNotifyPropertyChanged
     {
-		public BarEntryModel(Entry entry)
+        private readonly string[] MotionsetMode = new string[]
+        {
+            "BW", "B_", "__", "_W"
+        };
+        private readonly IViewSettings _viewSettings;
+
+		public BarEntryModel(Entry entry, IViewSettings viewSettings)
 		{
-			Entry = entry;
+            Entry = entry;
+            _viewSettings = viewSettings;
 		}
 
 		public Entry Entry { get; }
 
-		public EntryType Type
+        public EntryType Type
 		{
 			get => Entry.Type;
 			set
@@ -24,10 +33,38 @@ namespace OpenKh.Tools.BarEditor.Models
 			}
 		}
 
-		public string DisplayName =>
-			$"{Name} {Index} {Type}";
+        public string DisplayName
+        {
+            get
+            {
+                var sb = new StringBuilder(0x30);
+                if (_viewSettings.ShowSlotNumber || _viewSettings.ShowMovesetName)
+                {
+                    var slotIndex = _viewSettings.GetSlotIndex(this);
 
-		public short Index
+                    if (_viewSettings.ShowSlotNumber)
+                        sb.Append($"{slotIndex:D02} ");
+
+                    if (_viewSettings.ShowMovesetName)
+                    {
+                        var motionId = slotIndex;
+                        if (_viewSettings.IsPlayer)
+                        {
+                            motionId /= 4;
+                            sb.Append($"{MotionsetMode[slotIndex & 3]} ");
+                        }
+
+                        sb.Append($"{(MotionSet.MotionName)motionId} {Tag}");
+                        return sb.ToString();
+                    }
+                }
+
+                sb.Append($"{Tag} {Index} {Type}");
+                return sb.ToString();
+            }
+        }
+
+        public short Index
 		{
 			get => (short)Entry.Index;
 			set
@@ -39,7 +76,7 @@ namespace OpenKh.Tools.BarEditor.Models
 
 		[Required]
 		[StringLength(4, MinimumLength = 4, ErrorMessage = "Must be 4 characters long.")]
-		public string Name
+		public string Tag
 		{
 			get => Entry.Name;
 			set
@@ -54,7 +91,7 @@ namespace OpenKh.Tools.BarEditor.Models
 			get
 			{
 				string unit = "byte";
-				int divisor = 1;
+				int divisor;
 
 				if (Entry.Stream.Length >= 1024 * 1024)
 				{
@@ -71,8 +108,10 @@ namespace OpenKh.Tools.BarEditor.Models
 					return $"{Entry.Stream.Length} {unit}";
 				}
 
-				return $"{((float)Entry.Stream.Length / divisor).ToString("0.00")} {unit}";
+				return $"{(float)Entry.Stream.Length / divisor:0.00} {unit}";
 			}
 		}
-	}
+
+        internal void InvalidateTag() => OnPropertyChanged(nameof(DisplayName));
+    }
 }

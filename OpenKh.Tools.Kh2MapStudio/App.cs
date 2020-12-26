@@ -75,6 +75,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                     Path.Combine(_gamePath, "00objentry.bin"));
                 _mapRenderer.ObjEntryController = _objEntryController;
 
+                Settings.Default.GamePath = value;
+                Settings.Default.Save();
+
             }
         }
 
@@ -96,7 +99,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         private bool IsMapOpen => !string.IsNullOrEmpty(_mapName);
         private bool IsOpen => IsGameOpen && IsMapOpen;
 
-        public App(MonoGameImGuiBootstrap bootstrap)
+        public App(MonoGameImGuiBootstrap bootstrap, string gamePath = null)
         {
             _bootstrap = bootstrap;
             _bootstrap.Title = Title;
@@ -104,7 +107,12 @@ namespace OpenKh.Tools.Kh2MapStudio
             AddKeyMapping(Keys.O, MenuFileOpen);
             AddKeyMapping(Keys.S, MenuFileSave);
             AddKeyMapping(Keys.Q, MenuFileUnload);
-            OpenFolder(@"D:\Hacking\KH2\export_fm");
+
+            if (string.IsNullOrEmpty(gamePath))
+                gamePath = Settings.Default.GamePath;
+
+            if (!string.IsNullOrEmpty(gamePath))
+                OpenFolder(gamePath);
 
             ImGui.PushStyleColor(ImGuiCol.MenuBarBg, BgUiColor);
         }

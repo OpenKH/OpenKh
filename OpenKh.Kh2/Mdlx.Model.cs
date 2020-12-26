@@ -108,7 +108,7 @@ namespace OpenKh.Kh2
 
         public class DmaChain
         {
-            public int Unk00 { get; set; }
+            public int RenderFlags { get; set; }
             public int TextureIndex { get; set; }
             public int Unk08 { get; set; }
             public int DmaLength { get; set; }
@@ -226,7 +226,7 @@ namespace OpenKh.Kh2
 
             return new DmaChain
             {
-                Unk00 = dmaChainHeader.Unk00,
+                RenderFlags = dmaChainHeader.Unk00,
                 TextureIndex = dmaChainHeader.TextureIndex,
                 Unk08 = dmaChainHeader.Unk08,
                 DmaLength = dmaChainHeader.DmaLength,
@@ -294,7 +294,7 @@ namespace OpenKh.Kh2
         {
             var dmaChainHeader = new DmaChainHeader
             {
-                Unk00 = dmaChain.Unk00,
+                Unk00 = dmaChain.RenderFlags,
                 TextureIndex = dmaChain.TextureIndex,
                 Unk08 = dmaChain.Unk08,
                 DmaLength = dmaChain.DmaLength,

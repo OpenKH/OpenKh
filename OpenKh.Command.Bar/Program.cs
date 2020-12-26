@@ -1,10 +1,8 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace OpenKh.Command.Bar
@@ -50,16 +48,6 @@ namespace OpenKh.Command.Bar
         private static string GetVersion()
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
-        private static List<Kh2.Bar.Entry> ReadEntries(string fileName)
-        {
-            using var stream = File.OpenRead(fileName);
-            if (!Kh2.Bar.IsValid(stream))
-                throw Core.InvalidBarFileException;
-
-            stream.Position = 0;
-            return Kh2.Bar.Read(stream);
-        }
-
         [Command(Description = "Unpack the content of a BAR file and generate a project")]
         private class UnpackCommand
         {
@@ -102,7 +90,7 @@ namespace OpenKh.Command.Bar
             protected int OnExecute(CommandLineApplication app)
             {
                 var baseDirectory = Path.GetDirectoryName(InputProject);
-                var bar = Core.ImportProject(InputProject, out var originalFileName);
+                var binarc = Core.ImportProject(InputProject, out var originalFileName);
 
                 if (string.IsNullOrEmpty(OutputFile))
                     OutputFile = Path.Combine(baseDirectory, originalFileName);
@@ -112,9 +100,9 @@ namespace OpenKh.Command.Bar
                     OutputFile = Path.Combine(OutputFile, originalFileName);
 
                 using var outputStream = File.Create(OutputFile);
-                Kh2.Bar.Write(outputStream, bar);
+                Kh2.Bar.Write(outputStream, binarc);
 
-                foreach (var entry in bar)
+                foreach (var entry in binarc)
                     entry.Stream?.Dispose();
 
                 return 0;

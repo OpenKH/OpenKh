@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using OpenKh.Game.States;
+using System.Collections.Generic;
 
 namespace OpenKh.Game.Infrastructure
 {
@@ -13,5 +14,6 @@ namespace OpenKh.Game.Infrastructure
         public ContentManager ContentManager { get; set; }
         public GraphicsDeviceManager GraphicsDevice { get; set; }
         public IStateChange StateChange { get; set; }
+        public Dictionary<string, string> StateSettings { get; set; }
     }
 }

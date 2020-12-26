@@ -7,7 +7,7 @@ using System.Text;
 
 namespace OpenKh.Kh2
 {
-	public static class Bar
+	public class Bar : List<Bar.Entry>
 	{
 		private const uint MagicCode = 0x01524142U;
         private const int HeaderSize = 0x10;
@@ -17,15 +17,15 @@ namespace OpenKh.Kh2
         {
             [EntryType.Model] = 0x10,
             [EntryType.ModelTexture] = 0x80,
-            [EntryType.AnimationData] = 0x10,
-            [EntryType.Texture] = 0x40,
+            [EntryType.Motion] = 0x10,
+            [EntryType.Tim2] = 0x40,
             [EntryType.CameraCollision] = 0x10,
             [EntryType.MapCollision] = 0x10,
             [EntryType.LightData] = 0x10,
-            [EntryType.Bar] = 0x10,
+            [EntryType.Anb] = 0x10,
             [EntryType.Pax] = 0x10,
             [EntryType.MapCollision2] = 0x10,
-            [EntryType.AnimationLimit] = 0x10,
+            [EntryType.Motionset] = 0x10,
             [EntryType.Imgd] = 0x10,
             [EntryType.Seqd] = 0x10,
             [EntryType.Layout] = 0x10,
@@ -49,25 +49,25 @@ namespace OpenKh.Kh2
 			Dummy = 0,
 			Binary = 1,
 			List = 2,
-			Ai = 3,
+			Bdx = 3,
 			Model = 4,
             MeshOcclusion = 5,
             MapCollision = 6,
 			ModelTexture = 7,
 			Dpx = 8,
-			AnimationData = 9,
-			Texture = 10,
+			Motion = 9,
+			Tim2 = 10,
             CameraCollision = 11,
             SpawnPoint = 12,
             SpawnScript = 13,
-            MapColorDiffuse = 14,
+            FogColor = 14,
             LightData = 15,
-            Anb = 16,
-			Bar = 17,
+            MotionTriggers = 16,
+			Anb = 17,
 			Pax = 18,
             MapCollision2 = 19,
-            AnimationLimit = 20,
-            BobDescriptor = 21,
+            Motionset = 20,
+            BgObjPlacement = 21,
             AnimationLoader = 22,
             ModelCollision = 23,
 			Imgd = 24,
@@ -94,6 +94,13 @@ namespace OpenKh.Kh2
 			Vag = 48,
 		}
 
+        public enum MotionsetType
+        {
+            Default,
+            Player,
+            Raw
+        }
+
 		public class Entry
 		{
 			public EntryType Type { get; set; }
@@ -107,6 +114,8 @@ namespace OpenKh.Kh2
             public Stream Stream { get; set; }
         }
 
+        public MotionsetType Motionset { get; set; }
+
         public class BarContainer
         {
             /// <summary>
@@ -117,7 +126,7 @@ namespace OpenKh.Kh2
             public List<Entry> Entries { get; set; } = new List<Entry>();
         }
 
-        public static BarContainer ReadBarContainer(Stream stream, Func<string, EntryType, bool> filter)
+        public static Bar Read(Stream stream, Func<string, EntryType, bool> predicate)
         {
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
@@ -126,14 +135,16 @@ namespace OpenKh.Kh2
             if (stream.Length < 16L || reader.ReadUInt32() != MagicCode)
                 throw new InvalidDataException("Invalid header");
 
-            int filesCount = reader.ReadInt32();
+            int entryCount = reader.ReadInt32();
             reader.ReadInt32(); // always zero
-            int flags = reader.ReadInt32(); // used by P_EX mset
-
-            return new BarContainer
+            
+            var motionsetType = (MotionsetType)reader.ReadInt32();
+            var binarc = new Bar()
             {
-                Flags = flags,
-                Entries = Enumerable.Range(0, filesCount)
+                Motionset = motionsetType
+            };
+
+            binarc.AddRange(Enumerable.Range(0, entryCount)
                 .Select(x => new
                 {
                     Type = (EntryType)reader.ReadUInt16(),
@@ -143,7 +154,7 @@ namespace OpenKh.Kh2
                     Size = reader.ReadInt32()
                 })
                 .ToList() // Needs to be consumed
-                .Where(x => filter(x.Name, x.Type))
+                .Where(x => predicate(x.Name, x.Type))
                 .Select(x =>
                 {
                     reader.BaseStream.Position = x.Offset;
@@ -163,32 +174,17 @@ namespace OpenKh.Kh2
                         Offset = x.Offset,
                         Stream = fileStream
                     };
-                })
-                .ToList()
-            };
+                }));
+
+            return binarc;
         }
 
-        public static BarContainer ReadBarContainer(Stream stream)
-        {
-            return ReadBarContainer(stream, (name, type) => true);
-        }
+        public static Bar Read(Stream stream) => Read(stream, (name, type) => true);
 
-        public static List<Entry> Read(Stream stream, Func<string, EntryType, bool> filter)
-        {
-            return ReadBarContainer(stream, filter).Entries;
-        }
+        public static void Write(Stream stream, Bar binarc) =>
+            Write(stream, binarc, binarc.Motionset);
 
-        public static List<Entry> Read(Stream stream)
-		{
-			return Read(stream, (name, type) => true);
-		}
-
-		public static int Count(Stream stream, Func<string, EntryType, bool> filter)
-		{
-			return Read(stream, filter).Count;
-		}
-
-		public static void Write(Stream stream, IEnumerable<Entry> entries, int flags = 0)
+        public static void Write(Stream stream, IEnumerable<Entry> entries, MotionsetType motionset = MotionsetType.Default)
 		{
 			if (!stream.CanWrite || !stream.CanSeek)
 				throw new InvalidDataException($"Write or seek must be supported.");
@@ -199,7 +195,7 @@ namespace OpenKh.Kh2
 			writer.Write(MagicCode);
 			writer.Write(entriesCount);
 			writer.Write(0);
-			writer.Write(flags);
+			writer.Write((int)motionset);
 
 			var offset = HeaderSize + entriesCount * EntrySize;
             var dicLink = new Dictionary<(string name, EntryType type), (int offset, int length)>();

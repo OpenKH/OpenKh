@@ -172,7 +172,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 SpriteGroupModel.SizeChanged();
             }
 
-            if (ImGui.SmallButton("Remove from the sprite group"))
+            if (ImGui.SmallButton($"Remove from the sprite group##{index}"))
                 _removeSpritePart = index;
         }
 

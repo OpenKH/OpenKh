@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Engine.Renders
+namespace OpenKh.Engine.Renders
 {
     public class DrawContext
     {
@@ -13,7 +13,10 @@
         public double Height;
         public double WindowWidth;
 
-        public float ScaleX => (float)(WidthMultiplier * Scale * 0.85);
+        public float ScaleX => (float)(WidthMultiplier * Scale * GlobalScale);
+
+        // A scale of 0.85 is the one that is apparently used in-game
+        public double GlobalScale { get; set; } = 0.85;
 
         public DrawContext()
         {
