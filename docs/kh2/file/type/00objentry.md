@@ -15,7 +15,7 @@ Contains a definition of every object and it's parameters.
 | 08     | char[32] | Model Name
 | 28     | char[32] | Animation Name
 | 48     | ushort | Unknown
-| 4A     | ushort | Unknown
+| 4A     | ushort | Ally damage cap (0100 for normal damage, 02 for chip damage...)
 | 4C     | ushort | Neo Status
 | 4E     | ushort | Neo Moveset
 | 50     | ushort | Unknown

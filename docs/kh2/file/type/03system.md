@@ -9,8 +9,8 @@ This is an essential file to boot the game engine.
 * [ARIF](#arif) - ???
 * [ITEM](#item) - Items
 * [TRSR](#trsr) - Treasure
-* [MEMT](#memt) - ???
-* [FTST](#ftst) - ???
+* [MEMT](#memt) - Member Table
+* [FTST](#ftst) - Font Style
 * [SHOP](#shop) - Shops
 * [SKLT](#sklt) - ???
 * [PREF](#pref) - Preferences?
@@ -69,11 +69,11 @@ Commands table.
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | short | Id - [COMMAND LIST](../../dictionary/commands.md)
-| 2 	 | short | Unk2
-| 4 	 | short | Unk4
-| 6 	 | byte | Unk6
-| 7 	 | byte | Unk7
-| 8 	 | short | Unk8
+| 2 	 | short | Unk Id 1
+| 4 	 | short | Unk Id 2
+| 6 	 | byte | Submenu
+| 7 	 | byte | Icon
+| 8 	 | short | Text
 | 10 	 | short | Unk10
 | 12 	 | int | Unk12
 | 16 	 | short | Unk16
@@ -82,7 +82,7 @@ Commands table.
 | 24 	 | byte | Unk24
 | 25 	 | byte | Unk25
 | 26 	 | short | Unk26
-| 28 	 | short | Mp cost
+| 28 	 | short | Mp/Drive cost
 | 30 	 | int | Unk30
 | 34 	 | short | Unk34
 | 36 	 | byte | Unk36
@@ -95,7 +95,58 @@ Commands table.
 
 ## Went
 
-Weapon entity table. Unknown format.
+Weapon entity table.
+Contains a list of pointers that point to the offset of a weapon set. There are multiple pointers for multiple sets.
+Weapon sets contain the list of weapon models a character use in certain situations.
+
+### Went Structure
+
+| Amount | Description |
+|--------|---------------|
+| 70 	 | Went pointers
+| 24 	 | Went sets
+
+### Went pointer
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | Points to the offset of a Went set
+
+### Went set structure
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | Set size in 4 bytes length. (Including itself)
+| 4 	 | uint[Set size - 1] | Weapon model. - [OBJ LIST](../../dictionary/obj.md)
+
+### Went set order
+
+<ul>
+<li>Sora</li>
+<li>Sora NM</li>
+<li>Donald</li>
+<li>Donald NM</li>
+<li>Goofy</li>
+<li>Goofy 2</li>
+<li>Goofy NM</li>
+<li>Aladdin</li>
+<li>Auron</li>
+<li>Mulan</li>
+<li>Tron</li>
+<li>Mickey</li>
+<li>Beast</li>
+<li>Jack</li>
+<li>Simba</li>
+<li>Sparrow</li>
+<li>Riku</li>
+<li>Sparrow Human</li>
+<li>Sora TR</li>
+<li>Sora WI</li>
+<li>Donald TR</li>
+<li>Donald WI</li>
+<li>Goofy TR</li>
+<li>Goofy WI</li>
+</ul>
 
 ## Wmst
 
@@ -274,6 +325,50 @@ World ID and room index combined, gives the name of the map. (eg. for world ID =
 
 Unknown.
 
+## Memt
+
+Defines which character [objects](../../obj.md) to load in certain situations.
+
+### Memt Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Memt header
+| 37 	 | Memt entries
+| 1 	 | 28 unknown bytes
+
+### Memt Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (5)
+| 4 	 | uint | Entry Count
+
+### Memt Entry
+
+| Offset | Type   | Description |
+|--------|--------|-------------|
+| 0      | ushort | [World ID](../../worlds.md)
+| 2      | ushort[7] | Unknown
+| 16      | ushort  | Player (Sora)
+| 18      | ushort  | Party 1 (Donald)
+| 20      | ushort  | Party 2 (Goofy)
+| 22      | ushort  | Party 3 (World character)
+| 24      | ushort  | Player (Valor)
+| 26      | ushort  | Player (Wisdom)
+| 28      | ushort  | Player (Limit)
+| 30      | ushort  | Player (Master)
+| 32      | ushort  | Player (Final)
+| 34      | ushort  | Player (Anti)
+| 36      | ushort  | Player (Mickey)
+| 38      | ushort  | Player (Sora H)
+| 40      | ushort  | Player (Valor H)
+| 42      | ushort  | Player (Wisdom H)
+| 44      | ushort  | Player (Limit H)
+| 46      | ushort  | Player (Master H)
+| 48      | ushort  | Player (Final H)
+| 50      | ushort  | Player (Sora H)
+
 ## FTST
 
 This is a table that contains the font palette for each world.
@@ -349,7 +444,86 @@ Unknown.
 
 ## Pref
 
-Unknown.
+Defines preferences. It is a [BAR](bar.md) file containing the following subfiles:
+
+| File | Description |
+|--------|---------------|
+| plyr 	 | Player
+| fmab 	 | Form Abilities
+| prty 	 | Party
+| sstm 	 | System
+| magi 	 | Magic
+
+### plyr
+Each pointer leads to a specific entry's offset.
+
+### plyr Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Pointer count [uint]
+| 59 	 | Pointers [uint]
+| 10 	 | Plyr entries
+
+### plyr Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | byte[116] | Unknown
+
+### fmab
+Each pointer leads to a specific entry's offset.
+
+### fmab Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Pointer count [uint]
+| 5 	 | Pointers [uint]
+| 5 	 | fmab entries
+
+### fmab Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | byte[68] | Unknown
+
+### prty
+Each pointer leads to a specific entry's offset.
+
+### prty Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Pointer count [uint]
+| 70 	 | Pointers [uint]
+| 5 	 | prty entries
+
+### prty Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | byte[68] | Unknown
+
+### sstm
+It looks like it uses the common structure file type + file size. Other than that, the structure is unknown.
+
+### magi
+Each pointer leads to a specific entry's offset.
+
+### magi Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Pointer count [uint]
+| 36 	 | Pointers [uint]
+| 5 	 | magi entries
+
+### magi Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | byte[124] | Unknown
 
 ## Evtp
 
