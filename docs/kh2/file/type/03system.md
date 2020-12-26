@@ -9,7 +9,7 @@ This is an essential file to boot the game engine.
 * [ARIF](#arif) - ???
 * [ITEM](#item) - Items
 * [TRSR](#trsr) - Treasure
-* [MEMT](#memt) - Member Model Table
+* [MEMT](#memt) - Member Table
 * [FTST](#ftst) - Font Style
 * [SHOP](#shop) - Shops
 * [SKLT](#sklt) - ???
@@ -327,7 +327,7 @@ Unknown.
 
 ## Memt
 
-Defines which character models to load in certain situations.
+Defines which character [objects](../../obj.md) to load in certain situations.
 
 ### Memt Structure
 
@@ -350,24 +350,24 @@ Defines which character models to load in certain situations.
 |--------|--------|-------------|
 | 0      | ushort | [World ID](../../worlds.md)
 | 2      | ushort[7] | Unknown
-| 16      | ushort  | Player model (Sora)
-| 18      | ushort  | Party 1 model (Donald)
-| 20      | ushort  | Party 2 model (Goofy)
-| 22      | ushort  | Party 3 model (World character)
-| 24      | ushort  | Player model (Valor)
-| 26      | ushort  | Player model (Wisdom)
-| 28      | ushort  | Player model (Limit)
-| 30      | ushort  | Player model (Master)
-| 32      | ushort  | Player model (Final)
-| 34      | ushort  | Player model (Anti)
-| 36      | ushort  | Player model (Mickey)
-| 38      | ushort  | Player model (Sora H)
-| 40      | ushort  | Player model (Valor H)
-| 42      | ushort  | Player model (Wisdom H)
-| 44      | ushort  | Player model (Limit H)
-| 46      | ushort  | Player model (Master H)
-| 48      | ushort  | Player model (Final H)
-| 50      | ushort  | Player model (Sora H)
+| 16      | ushort  | Player (Sora)
+| 18      | ushort  | Party 1 (Donald)
+| 20      | ushort  | Party 2 (Goofy)
+| 22      | ushort  | Party 3 (World character)
+| 24      | ushort  | Player (Valor)
+| 26      | ushort  | Player (Wisdom)
+| 28      | ushort  | Player (Limit)
+| 30      | ushort  | Player (Master)
+| 32      | ushort  | Player (Final)
+| 34      | ushort  | Player (Anti)
+| 36      | ushort  | Player (Mickey)
+| 38      | ushort  | Player (Sora H)
+| 40      | ushort  | Player (Valor H)
+| 42      | ushort  | Player (Wisdom H)
+| 44      | ushort  | Player (Limit H)
+| 46      | ushort  | Player (Master H)
+| 48      | ushort  | Player (Final H)
+| 50      | ushort  | Player (Sora H)
 
 ## FTST
 
@@ -444,7 +444,7 @@ Unknown.
 
 ## Pref
 
-Contains preferences. It is a BAR file containing the following subfiles:
+Defines preferences. It is a [BAR](bar.md) file containing the following subfiles:
 
 | File | Description |
 |--------|---------------|
