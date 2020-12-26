@@ -25,14 +25,14 @@ namespace OpenKh.Bbs
             [Data] public ushort VertexCount { get; set; }
             [Data] public float ModelScale { get; set; }
             [Data] public UInt32 MeshOffset1 { get; set; }
-            [Data(Count = 32)] public float BoundingBox { get; set; }
+            [Data(Count = 32)] public float[] BoundingBox { get; set; }
         }
 
         public class TextureInfo
         {
             [Data] public UInt32 TextureOffset { get; set; }
             [Data(Count = 12)] public string TextureName { get; set; }
-            [Data] public UInt32 Unk1 { get; set; }
+            [Data(Count = 4)] public UInt32[] Unkown { get; set; }
         }
 
         public class MeshSection
@@ -43,12 +43,34 @@ namespace OpenKh.Bbs
             [Data] public UInt32 VertexFlags { get; set; }
             [Data] public byte Unknown1 { get; set; }
             [Data] public byte TriangleStripCount { get; set; }
-            [Data(Count = 2)] public byte Unknown2 { get; set; }
+            [Data(Count = 2)] public byte[] Unknown2 { get; set; }
+        }
+
+        // Fields starting with _ have a temporary name.
+        public class SkeletonHeader
+        {
+            [Data] public UInt32 MagicValue { get; set; }
+            [Data] public UInt32 Unknown { get; set; }
+            [Data] public UInt32 JointCount { get; set; }
+            [Data] public ushort _SkinnedJoints { get; set; }
+            [Data] public ushort _SkinningStartIndex { get; set; }
+        }
+
+        public class JointData
+        {
+            [Data] public ushort JointIndex { get; set; }
+            [Data] public ushort Padding { get; set; }
+            [Data] public ushort ParentJointIndex { get; set; }
+            [Data] public ushort Padding2 { get; set; }
+            [Data] public UInt32 _SkinningIndex { get; set; }
+            [Data(Count = 16)] public string JointName { get; set; }
+            [Data(Count = 16)] public float Transform { get; set; }
+            [Data(Count = 16)] public float InverseTransform { get; set; }
         }
 
         public class MeshSectionOptional1
         {
-            [Data(Count = 8)] public byte SectionBoneIndices { get; set; } // Only present if header.SkeletonOffset != 0
+            [Data(Count = 8)] public byte[] SectionBoneIndices { get; set; } // Only present if header.SkeletonOffset != 0
         }
         public class MeshSectionOptional2
         {
@@ -115,6 +137,7 @@ namespace OpenKh.Bbs
         public List<float> jointWeights = new List<float>();
         public List<float> textureCoordinates = new List<float>();
         public List<float> vertices = new List<float>();
+        public List<byte[]> Textures = new List<byte[]>();
 
         public static Pmo Read(Stream stream)
         {
@@ -124,7 +147,7 @@ namespace OpenKh.Bbs
             };
 
             pmo.textureInfo = new TextureInfo[pmo.header.TextureCount];
-            for (ushort i = 0; i < pmo.header.TextureCount; i++) pmo.textureInfo[i] = BinaryMapping.ReadObject<TextureInfo>(stream.SetPosition(0xA0 + i * 0x20));
+            for (ushort i = 0; i < pmo.header.TextureCount; i++) pmo.textureInfo[i] = BinaryMapping.ReadObject<TextureInfo>(stream);
 
             // Get Mesh Sections.
             UInt16 VertCnt = 0xFFFF;
@@ -216,6 +239,19 @@ namespace OpenKh.Bbs
                         pmo.vertices.Add(stream.ReadFloat());
                         break;
                 }
+            }
+
+            // Read textures.
+            for(int i = 0; i < pmo.textureInfo.Length; i++)
+            {
+                stream.Seek(pmo.textureInfo[i].TextureOffset + 0x10, SeekOrigin.Begin);
+                uint tm2size = stream.ReadUInt32() + 0x10;
+                stream.Seek(pmo.textureInfo[i].TextureOffset, SeekOrigin.Begin);
+
+                byte[] TextureBuffer = new byte[tm2size];
+                TextureBuffer = stream.ReadBytes((int)tm2size);
+
+                pmo.Textures.Add(TextureBuffer);
             }
 
             return pmo;
