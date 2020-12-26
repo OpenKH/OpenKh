@@ -188,9 +188,33 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             );
         }
 
+        public void LoadSupportFiles(string basePath)
+        {
+            // Try to load MSG, giving priority to the English language
+            foreach (var region in Constants.Regions.OrderBy(x => x == "us" ? 0 : 1))
+            {
+                var tryPath = Path.Combine(basePath, $"msg/{region}/sys.bar");
+                if (File.Exists(tryPath))
+                {
+                    LoadMessages(File.OpenRead(tryPath).Using(Kh2Utilities.ReadMsgFromBar));
+                    break;
+                }
+            }
+        }
+
         private void LoadMessages(List<Msg.Entry> msgs)
         {
             _messageProvider.Load(msgs);
+            switch (IsMsgJapanese(_messageProvider))
+            {
+                case true:
+                    Encoding = EncodingType.Japanese;
+                    break;
+                case false:
+                    Encoding = EncodingType.European;
+                    break;
+            }
+
             SaveSystem();
             LoadSystem(_barItems);
         }
@@ -212,6 +236,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             }
 
             LoadSystem(items);
+            LoadSupportFiles(Path.GetDirectoryName(fileName));
 
             FileName = fileName;
             return true;
@@ -262,5 +287,18 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
         private T GetDefaultViewModelInstance<T>()
             where T : ISystemGetChanges => Activator.CreateInstance<T>();
+
+        private static bool? IsMsgJapanese(Kh2MessageProvider messageProvider)
+        {
+            const ushort FakeTextId = 0x0ADC;
+            if (messageProvider == null)
+                return null;
+
+            var data = messageProvider.GetMessage(FakeTextId);
+            if (data == null || data.Length == 0)
+                return null;
+
+            return data.Length != 5;
+        }
     }
 }
