@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using OpenKh.Engine;
 using OpenKh.Kh2;
-using OpenKh.Kh2.System;
+using OpenKh.Kh2.SystemData;
 using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.Kh2SystemEditor.Extensions;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;

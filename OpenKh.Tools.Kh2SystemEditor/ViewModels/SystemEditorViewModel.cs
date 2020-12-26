@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +14,7 @@ using Xe.Tools.Wpf.Dialogs;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using OpenKh.Engine;
 using OpenKh.Tools.Kh2SystemEditor.Utils;
-using OpenKh.Kh2.System;
+using OpenKh.Kh2.SystemData;
 using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Kh2SystemEditor.Models.Export;
 

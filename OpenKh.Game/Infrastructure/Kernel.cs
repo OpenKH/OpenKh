@@ -8,7 +8,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Extensions;
-using OpenKh.Kh2.System;
+using OpenKh.Kh2.SystemData;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -118,9 +118,9 @@ namespace OpenKh.Game.Infrastructure
         {
             var bar = DataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
-            Ftst = bar.ForEntry("ftst", Bar.EntryType.List, Kh2.System.Ftst.Read);
-            Item = bar.ForEntry("item", Bar.EntryType.List, Kh2.System.Item.Read);
-            Trsr = bar.ForEntry("tsrs", Bar.EntryType.List, Kh2.System.Trsr.Read);
+            Ftst = bar.ForEntry("ftst", Bar.EntryType.List, Kh2.SystemData.Ftst.Read);
+            Item = bar.ForEntry("item", Bar.EntryType.List, Kh2.SystemData.Item.Read);
+            Trsr = bar.ForEntry("tsrs", Bar.EntryType.List, Kh2.SystemData.Trsr.Read);
         }
 
         private void LoadBattle(string fileName)
