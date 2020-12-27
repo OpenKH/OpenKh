@@ -17,6 +17,8 @@ namespace OpenKh.Tests
 
     public static class Helpers
     {
+        public const string Kh2DataPath = ".tests/kh2_data/";
+
         private class AssertFileNameException : XunitException
         {
             public AssertFileNameException(string fileName, Exception innerException) :

@@ -1,0 +1,69 @@
+name: Test with game data
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/dotnet/sdk:3.1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Checkout data
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ secrets.REPO_DATA_PATH }}
+          token: ${{ secrets.REPO_DATA_TOKEN }}
+          persist-credentials: false
+          path: 'OpenKh.Tests/.tests/kh2_data'
+      - name: Execute tests
+        run: |
+          dotnet test OpenKh.Tests --filter Batch_ --logger "trx;LogFileName=result.trx" --logger "html;LogFileName=result.html" || true
+          dotnet test OpenKh.Tests.Engine --filter Batch_ --logger "trx;LogFileName=result.trx" --logger "html;LogFileName=result.html" || true
+      - name: Prepare result folder
+        run: |
+          mkdir TestResults
+          cd TestResults
+
+          mv ../OpenKh.Tests/TestResults/result.* ./
+          mv result.trx result-unit.trx
+          mv result.html result-unit.html
+
+          mv ../OpenKh.Tests.Engine/TestResults/result.* ./
+          mv result.trx result-engine.trx
+          mv result.html result-engine.html
+      - name: Publish artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: TestResults
+          path: |
+            result-*.trx
+            result-*.html
+  publish-tests-result:
+    needs: run-tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download test result artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: TestResults
+          path: /docs/compatibility-report
+      - name: Remove TRX files
+        run: rm /docs/compatibility-report/*.trx
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: Update compatibility report
+          title: Compatibility report update
+          branch: docs/compatibility-report
+          delete-branch: true

@@ -32,11 +32,16 @@
     <ProjectReference Include="..\OpenKh.Command.CoctChanger\OpenKh.Command.CoctChanger.csproj" />
   </ItemGroup>
 
+
   <ItemGroup>
-    <None Update="*\res\**">
+    <None Include=".tests\**" />
+    <None Update=".tests\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="*\.tests\**">
+  </ItemGroup>
+    
+  <ItemGroup>
+    <None Update="*\res\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
