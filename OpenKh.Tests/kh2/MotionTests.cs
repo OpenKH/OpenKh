@@ -1,5 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -72,5 +73,85 @@ namespace OpenKh.Tests.kh2
                 });
             });
         });
+
+        public class UseAssetAnbFiles
+        {
+            private static string KH2Dir = @"H:\KH2fm.OpenKh\";
+
+            public static IEnumerable<object[]> Source()
+            {
+                foreach (var anbFile in Directory.GetFiles(KH2Dir, "anm/*.anb", SearchOption.AllDirectories))
+                {
+                    foreach (var entry in File.OpenRead(anbFile).Using(Bar.Read)
+                        .Where(it => it.Type == Bar.EntryType.Motion)
+                    )
+                    {
+                        yield return new object[] { anbFile.Substring(KH2Dir.Length).Replace("\\", "/"), entry.Name };
+                    }
+                }
+            }
+
+            //[Theory, MemberData(nameof(Source))]
+            public void MotionTests(string anbFile, string motionName)
+            {
+                var entry = File.OpenRead(Path.Combine(KH2Dir, anbFile))
+                    .Using(Bar.Read)
+                    .SingleOrDefault(it => it.Name == motionName && it.Type == Bar.EntryType.AnimationLoader);
+
+                if (entry != null)
+                {
+                    Motion.Read(entry.Stream);
+                }
+            }
+        }
+
+        public class UseAssetMsetFiles
+        {
+            private static string KH2Dir = @"H:\KH2fm.OpenKh\";
+
+            public static IEnumerable<object[]> Source()
+            {
+                foreach (var msetFile in Directory.GetFiles(KH2Dir, "obj/*.mset", SearchOption.AllDirectories))
+                {
+                    foreach (var (msetEntry, index) in File.OpenRead(msetFile).Using(Bar.Read)
+                        .Select((msetEntry, index) => (msetEntry, index))
+                        .Where(pair => pair.msetEntry.Type == Bar.EntryType.Anb && pair.msetEntry.Stream.Length != 0)
+                    )
+                    {
+                        foreach (var anbEntry in Bar.Read(msetEntry.Stream)
+                            .Where(it => it.Type == Bar.EntryType.Motion)
+                        )
+                        {
+                            if (anbEntry.Stream.Length != 0)
+                            {
+                                yield return new object[] {
+                                    msetFile.Substring(KH2Dir.Length).Replace("\\", "/"),
+                                    index,
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+
+            //[Theory, MemberData(nameof(Source))]
+            public void MotionTests(string msetFile, int index)
+            {
+                var msetEntry = File.OpenRead(Path.Combine(KH2Dir, msetFile))
+                    .Using(Bar.Read)
+                    .Skip(index)
+                    .First();
+
+                Assert.Equal(Bar.EntryType.Anb, msetEntry.Type);
+
+                if (msetEntry != null)
+                {
+                    var anbEntry = Bar.Read(msetEntry.Stream)
+                        .Single(it => it.Type == Bar.EntryType.Motion);
+
+                    Motion.Read(anbEntry.Stream);
+                }
+            }
+        }
     }
 }
