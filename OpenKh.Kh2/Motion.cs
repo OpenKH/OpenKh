@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -505,8 +506,8 @@ namespace OpenKh.Kh2
                     .Select(x => new TimelineTable
                     {
                         Interpolation = (Interpolation)(x.Time & 3),
-                        KeyFrame = keyFrames[x.Time >> 2],
-                        Value = transformationValues[x.ValueIndex],
+                        KeyFrame = keyFrames[Math.Min(keyFrames.Count - 1, x.Time >> 2)],
+                        Value = transformationValues[Math.Min(transformationValues.Count - 1, x.ValueIndex)],
                         TangentEaseIn = tangentValues[x.TangentIndexEaseIn],
                         TangentEaseOut = tangentValues[x.TangentIndexEaseOut],
                     })
