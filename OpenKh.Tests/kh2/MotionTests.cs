@@ -76,7 +76,7 @@ namespace OpenKh.Tests.kh2
 
         public class UseAssetAnbFiles
         {
-            private static string KH2Dir = @"H:\KH2fm.OpenKh\";
+            private static string KH2Dir = ".tests/kh2_data/";
 
             public static IEnumerable<object[]> Source()
             {
@@ -107,7 +107,7 @@ namespace OpenKh.Tests.kh2
 
         public class UseAssetMsetFiles
         {
-            private static string KH2Dir = @"H:\KH2fm.OpenKh\";
+            private static string KH2Dir = ".tests/kh2_data/";
 
             public static IEnumerable<object[]> Source()
             {
