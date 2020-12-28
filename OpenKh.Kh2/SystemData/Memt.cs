@@ -55,6 +55,21 @@ namespace OpenKh.Kh2.SystemData
         public List<Entry> Entries { get; }
         public MemberIndices[] MemberIndexCollection { get; }
 
+        public Memt()
+        {
+            Entries = new List<Entry>();
+            MemberIndexCollection = new MemberIndices[1]
+            {
+                new MemberIndices
+                {
+                    Player = 0,
+                    Friend1 = 1,
+                    Friend2 = 2,
+                    FriendWorld = 3
+                }
+            };
+        }
+
         internal Memt(Stream stream)
         {
             Entries = BaseTable<Entry>.Read(stream);

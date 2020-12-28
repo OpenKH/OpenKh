@@ -74,6 +74,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             }
         }
 
+        private readonly Memt _memberTable;
         private readonly List<Memt.Entry> _entries = new List<Memt.Entry>();
         private readonly IObjectProvider _objectProvider;
         private const string _entryName = "memt";
@@ -83,17 +84,18 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         public IEnumerable<Memt.Entry> Members => _entries;
 
         public MemtViewModel(IObjectProvider objectProvider) :
-            this(objectProvider, new Memt.Entry[0])
+            this(objectProvider, new Memt())
         { }
 
         public MemtViewModel(IObjectProvider objectProvider, IEnumerable<Bar.Entry> entries) :
             this(objectProvider, Memt.Read(entries.GetBinaryStream(_entryName)))
         { }
 
-        public MemtViewModel(IObjectProvider objectProvider, IEnumerable<Memt.Entry> entries) :
-            base(entries.Select(x => new Entry(x, objectProvider)))
+        public MemtViewModel(IObjectProvider objectProvider, Memt memberTable) :
+            base(memberTable.Entries.Select(x => new Entry(x, objectProvider)))
         {
             _objectProvider = objectProvider;
+            _memberTable = memberTable;
         }
 
         protected override Entry OnNewItem() => new Entry(new Memt.Entry
@@ -104,7 +106,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
-            Memt.Write(stream, Members.ToList());
+            Memt.Write(stream, _memberTable);
             return stream;
         }
     }
