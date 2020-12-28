@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.IO;
 using OpenKh.Imaging;
@@ -30,6 +30,9 @@ namespace OpenKh.Kh2
             var reader = new BinaryReader(stream);
             var bpp = is8bit ? 8 : 4;
             _data = reader.ReadBytes(width * height * bpp / 8);
+
+            if (bpp == 4)
+                ImageDataHelpers.SwapEndianIndexed4(_data);
 
             // If we did not reached the end of the stream, then it does mean that there is a palette
             if (stream.Position < stream.Length)

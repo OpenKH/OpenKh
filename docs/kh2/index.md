@@ -19,6 +19,7 @@
   * [IMZ](file/type/image.md#imgz)
   * [FAC](file/type/image.md#fac)
   * [MDLX](file/type/mdlx.md)
+  * [MSET](file/anb/mset.md)
   * [2LD](file/type/2ld.md)
   * [2DD](file/type/2ld.md#2D-sequence-(2DD))
   * [DOCT](file/type/doct.md)

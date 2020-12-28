@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using System;
@@ -64,7 +64,7 @@ namespace OpenKh.Tests.Imaging
         /// </remarks>
         [Theory]
         [InlineData("Imaging/res")]
-        //[InlineData(@"H:\KH2fm.OpenKH\map\jp")]
+        //[InlineData(".tests/kh2_data/map/jp")]
         public void ValidateAllKH2MapRadarImages(string mapFilesDir)
         {
             Directory.GetFiles(mapFilesDir, "*.map").ToList().ForEach(
@@ -78,7 +78,7 @@ namespace OpenKh.Tests.Imaging
                                 .Where(
                                     entry => true
                                         && entry.Name == "rada"
-                                        && entry.Type == Bar.EntryType.Texture
+                                        && entry.Type == Bar.EntryType.Tim2
                                 )
                                 .ToList()
                                 .ForEach(

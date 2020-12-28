@@ -26,7 +26,7 @@ steps:
 - script: git submodule update --init --recursive --depth 1
   displayName: 'Download dependencies'
 
-- task: NuGetToolInstaller@0
+- task: NuGetToolInstaller@1
   displayName: 'Install build tools'
 
 - task: NuGetCommand@2

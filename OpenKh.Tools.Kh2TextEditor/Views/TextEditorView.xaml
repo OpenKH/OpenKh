@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="OpenKh.Tools.Kh2TextEditor.Views.TextEditorView"
+<UserControl x:Class="OpenKh.Tools.Kh2TextEditor.Views.TextEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -24,6 +24,12 @@
                 Grid.Column="0"
                 ItemsSource="{Binding Messages.Items}"
                 SelectedItem="{Binding SelectedItem}">
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Add" Command="{Binding HandleAddition}"/>
+                        <MenuItem Header="Delete"  Command="{Binding HandleRemoval}"/>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -71,9 +77,98 @@
             </Grid.RowDefinitions>
 
             <TextBox
+                x:Name="textInputField"
                 Grid.Row="0"
                 MaxLines="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
+                Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Icons">
+                            <MenuItem Header="Generic Icons">
+                                <MenuItem Header="Ability (Equipped)" Command="{Binding HandleIcon}" CommandParameter="ability-equip"/>
+                                <MenuItem Header="Ability" Command="{Binding HandleIcon}" CommandParameter="ability-unequip"/>
+                                <MenuItem Header="Accessory" Command="{Binding HandleIcon}" CommandParameter="accessory"/>
+                                <MenuItem Header="Frequent" Command="{Binding HandleIcon}" CommandParameter="ai-mode-frequent"/>
+                                <MenuItem Header="Moderate" Command="{Binding HandleIcon}" CommandParameter="ai-mode-moderate"/>
+                                <MenuItem Header="Rare" Command="{Binding HandleIcon}" CommandParameter="ai-mode-rare"/>
+                                <MenuItem Header="Heart" Command="{Binding HandleIcon}" CommandParameter="ai-settings"/>
+                                <MenuItem Header="Armor" Command="{Binding HandleIcon}" CommandParameter="armor"/>
+                                <MenuItem Header="Auto-Reload" Command="{Binding HandleIcon}" CommandParameter="auto-equip"/>
+                                <MenuItem Header="Exclamation" Command="{Binding HandleIcon}" CommandParameter="exclamation-mark"/>
+                                <MenuItem Header="Question" Command="{Binding HandleIcon}" CommandParameter="question-mark"/>
+                                <MenuItem Header="Form" Command="{Binding HandleIcon}" CommandParameter="form"/>
+                                <MenuItem Header="Usable Item" Command="{Binding HandleIcon}" CommandParameter="item-consumable"/>
+                                <MenuItem Header="Key Item" Command="{Binding HandleIcon}" CommandParameter="item-key"/>
+                                <MenuItem Header="Camp Item" Command="{Binding HandleIcon}" CommandParameter="item-tent"/>
+                                <MenuItem Header="Magic" Command="{Binding HandleIcon}" CommandParameter="magic"/>
+                                <MenuItem Header="Magic (No Recharge)" Command="{Binding HandleIcon}" CommandParameter="magic-nocharge"/>
+                                <MenuItem Header="Material" Command="{Binding HandleIcon}" CommandParameter="material"/>
+                                <MenuItem Header="Party" Command="{Binding HandleIcon}" CommandParameter="party"/>
+                                <MenuItem Header="Keyblade" Command="{Binding HandleIcon}" CommandParameter="weapon-keyblade"/>
+                                <MenuItem Header="Keyblade (Equipped)" Command="{Binding HandleIcon}" CommandParameter="weapon-keyblade-equip"/>
+                                <MenuItem Header="Shield" Command="{Binding HandleIcon}" CommandParameter="weapon-shield"/>
+                                <MenuItem Header="Shield (Equipped)" Command="{Binding HandleIcon}" CommandParameter="weapon-shield-equip"/>
+                                <MenuItem Header="Staff" Command="{Binding HandleIcon}" CommandParameter="weapon-staff"/>
+                                <MenuItem Header="Staff (Equipped)" Command="{Binding HandleIcon}" CommandParameter="weapon-staff-equip"/>
+                            </MenuItem>
+                            <MenuItem Header="Gem Icons">
+                                <MenuItem Header="Blazing Gem" Command="{Binding HandleIcon}" CommandParameter="gem-blazing"/>
+                                <MenuItem Header="Bright Gem" Command="{Binding HandleIcon}" CommandParameter="gem-bright"/>
+                                <MenuItem Header="Dark Gem" Command="{Binding HandleIcon}" CommandParameter="gem-dark"/>
+                                <MenuItem Header="Dense Gem" Command="{Binding HandleIcon}" CommandParameter="gem-dense"/>
+                                <MenuItem Header="Energy Gem" Command="{Binding HandleIcon}" CommandParameter="gem-energy"/>
+                                <MenuItem Header="Frost Gem" Command="{Binding HandleIcon}" CommandParameter="gem-frost"/>
+                                <MenuItem Header="Lightning Gem" Command="{Binding HandleIcon}" CommandParameter="gem-lightning"/>
+                                <MenuItem Header="Lucid Gem" Command="{Binding HandleIcon}" CommandParameter="gem-lucid"/>
+                                <MenuItem Header="Mythril Gem" Command="{Binding HandleIcon}" CommandParameter="gem-mythril"/>
+                                <MenuItem Header="Orichalcum Gem" Command="{Binding HandleIcon}" CommandParameter="gem-orichalcum"/>
+                                <MenuItem Header="Power Gem" Command="{Binding HandleIcon}" CommandParameter="gem-power"/>
+                                <MenuItem Header="Serenity Gem" Command="{Binding HandleIcon}" CommandParameter="gem-serenity"/>
+                                <MenuItem Header="Twilight Gem" Command="{Binding HandleIcon}" CommandParameter="gem-twilight"/>
+                                <MenuItem Header="Remembrance Gem" Command="{Binding HandleIcon}" CommandParameter="remembrance"/>
+                                <MenuItem Header="Tranquil Gem" Command="{Binding HandleIcon}" CommandParameter="tranquil"/>
+                            </MenuItem>
+                            <MenuItem Header="Button Icons">
+                                <MenuItem Header="Circle" Command="{Binding HandleIcon}" CommandParameter="button-circle"/>
+                                <MenuItem Header="Cross" Command="{Binding HandleIcon}" CommandParameter="button-cross"/>
+                                <MenuItem Header="Square" Command="{Binding HandleIcon}" CommandParameter="button-square"/>
+                                <MenuItem Header="Triangle" Command="{Binding HandleIcon}" CommandParameter="button-triangle"/>
+                                <MenuItem Header="D-Pad" Command="{Binding HandleIcon}" CommandParameter="button-dpad"/>
+                                <MenuItem Header="L1" Command="{Binding HandleIcon}" CommandParameter="button-l1"/>
+                                <MenuItem Header="L2" Command="{Binding HandleIcon}" CommandParameter="button-l2"/>
+                                <MenuItem Header="R1" Command="{Binding HandleIcon}" CommandParameter="button-r1"/>
+                                <MenuItem Header="R2" Command="{Binding HandleIcon}" CommandParameter="button-r2"/>
+                                <MenuItem Header="SELECT" Command="{Binding HandleIcon}" CommandParameter="button-select"/>
+                                <MenuItem Header="START" Command="{Binding HandleIcon}" CommandParameter="button-start"/>
+                            </MenuItem>
+                            <MenuItem Header="Gummi Icons">
+                                <MenuItem Header="Gummi Block" Command="{Binding HandleIcon}" CommandParameter="gumi-block"/>
+                                <MenuItem Header="Gummi Blueprint" Command="{Binding HandleIcon}" CommandParameter="gumi-blueprint"/>
+                                <MenuItem Header="Gummi Brush" Command="{Binding HandleIcon}" CommandParameter="gumi-brush"/>
+                                <MenuItem Header="Gummi Gear" Command="{Binding HandleIcon}" CommandParameter="gumi-gear"/>
+                                <MenuItem Header="Gummi Ship" Command="{Binding HandleIcon}" CommandParameter="gumi-ship"/>
+                            </MenuItem>
+                            <MenuItem Header="Rank Icons">
+                                <MenuItem Header="Rank A" Command="{Binding HandleIcon}" CommandParameter="rank-a"/>
+                                <MenuItem Header="Rank B" Command="{Binding HandleIcon}" CommandParameter="rank-b"/>
+                                <MenuItem Header="Rank C" Command="{Binding HandleIcon}" CommandParameter="rank-c"/>
+                                <MenuItem Header="Rank S" Command="{Binding HandleIcon}" CommandParameter="rank-s"/>
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Header="Commands">
+                            <MenuItem Header="Reset" Command="{Binding HandleComm}" CommandParameter="0"/>
+                            <MenuItem Header="Color" Command="{Binding HandleComm}" CommandParameter="1"/>
+                            <MenuItem Header="Scale" Command="{Binding HandleComm}" CommandParameter="2"/>
+                            <MenuItem Header="Width" Command="{Binding HandleComm}" CommandParameter="3"/>
+                            <MenuItem Header="Clear" Command="{Binding HandleComm}" CommandParameter="4"/>
+                            <MenuItem Header="Position" Command="{Binding HandleComm}" CommandParameter="5"/>
+                        </MenuItem>
+                    </ContextMenu>
+                </TextBox.ContextMenu>
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding HandleReturn}" />
+                </TextBox.InputBindings>
+            </TextBox>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <controls:KingdomTextArea

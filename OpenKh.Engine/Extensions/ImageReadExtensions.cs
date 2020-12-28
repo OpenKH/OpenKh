@@ -1,4 +1,4 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using System;
 
 namespace OpenKh.Engine.Extensions
@@ -12,9 +12,14 @@ namespace OpenKh.Engine.Extensions
         {
             switch (image.PixelFormat)
             {
-                case PixelFormat.Indexed4: return image.From4bpp(Bgra);
-                case PixelFormat.Indexed8: return image.From8bpp(Bgra);
-                case PixelFormat.Rgba8888: return image.From32bpp(Rgba);
+                case PixelFormat.Indexed4:
+                    return ImageDataHelpers.FromIndexed4ToBitmap32(
+                        image.GetData(), image.GetClut(), Bgra);
+                case PixelFormat.Indexed8:
+                    return ImageDataHelpers.FromIndexed8ToBitmap32(
+                        image.GetData(), image.GetClut(), Bgra);
+                case PixelFormat.Rgba8888:
+                    return ImageDataHelpers.FromBitmap32(image.GetData(), Rgba);
                 default:
                     throw new ArgumentException($"The pixel format {image.PixelFormat} is not supported.");
             }
@@ -24,82 +29,17 @@ namespace OpenKh.Engine.Extensions
         {
             switch (image.PixelFormat)
             {
-                case PixelFormat.Indexed4: return image.From4bpp(Rgba);
-                case PixelFormat.Indexed8: return image.From8bpp(Rgba);
-                case PixelFormat.Rgba8888: return image.From32bpp(Bgra);
+                case PixelFormat.Indexed4:
+                    return ImageDataHelpers.FromIndexed4ToBitmap32(
+                        image.GetData(), image.GetClut(), Rgba);
+                case PixelFormat.Indexed8:
+                    return ImageDataHelpers.FromIndexed8ToBitmap32(
+                        image.GetData(), image.GetClut(), Rgba);
+                case PixelFormat.Rgba8888:
+                    return ImageDataHelpers.FromBitmap32(image.GetData(), Bgra);
                 default:
                     throw new ArgumentException($"The pixel format {image.PixelFormat} is not supported.");
             }
-        }
-
-        private static byte[] From4bpp(this IImageRead image, byte[] channelOrder)
-        {
-            var size = image.Size;
-            var data = image.GetData();
-            var clut = image.GetClut();
-            var dstData = new byte[size.Width * size.Height * sizeof(uint)];
-            var srcIndex = 0;
-            var dstIndex = 0;
-
-            for (var y = 0; y < size.Height; y++)
-            {
-                for (var i = 0; i < size.Width / 2; i++)
-                {
-                    var ch = data[srcIndex++];
-                    var palIndex1 = (ch & 15);
-                    var palIndex2 = (ch >> 4);
-                    dstData[dstIndex++] = clut[palIndex1 * 4 + channelOrder[0]];
-                    dstData[dstIndex++] = clut[palIndex1 * 4 + channelOrder[1]];
-                    dstData[dstIndex++] = clut[palIndex1 * 4 + channelOrder[2]];
-                    dstData[dstIndex++] = clut[palIndex1 * 4 + channelOrder[3]];
-                    dstData[dstIndex++] = clut[palIndex2 * 4 + channelOrder[0]];
-                    dstData[dstIndex++] = clut[palIndex2 * 4 + channelOrder[1]];
-                    dstData[dstIndex++] = clut[palIndex2 * 4 + channelOrder[2]];
-                    dstData[dstIndex++] = clut[palIndex2 * 4 + channelOrder[3]];
-                }
-            }
-
-            return dstData;
-        }
-
-        private static byte[] From8bpp(this IImageRead image, byte[] channelOrder)
-        {
-            var size = image.Size;
-            var data = image.GetData();
-            var clut = image.GetClut();
-            var dstData = new byte[size.Width * size.Height * sizeof(uint)];
-            var srcIndex = 0;
-            var dstIndex = 0;
-
-            for (var y = 0; y < size.Height; y++)
-            {
-                for (var i = 0; i < size.Width; i++)
-                {
-                    var palIndex = data[srcIndex++];
-                    dstData[dstIndex++] = clut[palIndex * 4 + channelOrder[0]];
-                    dstData[dstIndex++] = clut[palIndex * 4 + channelOrder[1]];
-                    dstData[dstIndex++] = clut[palIndex * 4 + channelOrder[2]];
-                    dstData[dstIndex++] = clut[palIndex * 4 + channelOrder[3]];
-                }
-            }
-
-            return dstData;
-        }
-
-        private static byte[] From32bpp(this IImageRead image, byte[] channelOrder)
-        {
-            var srcData = image.GetData();
-            var dstData = new byte[srcData.Length];
-
-            for (var i = 0; i < srcData.Length; i += 4)
-            {
-                dstData[i + 0] = srcData[i + channelOrder[0]];
-                dstData[i + 1] = srcData[i + channelOrder[1]];
-                dstData[i + 2] = srcData[i + channelOrder[2]];
-                dstData[i + 3] = srcData[i + channelOrder[3]];
-            }
-
-            return dstData;
         }
     }
 }

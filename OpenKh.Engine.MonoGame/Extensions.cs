@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
 using OpenKh.Imaging;
@@ -12,18 +12,17 @@ namespace OpenKh.Engine.MonoGame
         {
             var size = image.Size;
             var texture = new Texture2D(graphicsDevice, size.Width, size.Height);
-
-            texture.SetData(image.AsRgba8888());
+            texture.SetData(image.AsBgra8888());
 
             return texture;
         }
 
-        public static void SetRenderTexture(this KingdomShader shader, EffectPass pass, KingdomTexture texture)
+        public static void SetRenderTexture(this KingdomShader shader, EffectPass pass, IKingdomTexture texture)
         {
             if (shader.Texture0 != texture.Texture2D)
             {
                 shader.Texture0 = texture.Texture2D;
-                switch (texture.ModelTexture.TextureAddressMode.AddressU)
+                switch (texture.AddressU)
                 {
                     case ModelTexture.TextureWrapMode.Clamp:
                         shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
@@ -42,7 +41,7 @@ namespace OpenKh.Engine.MonoGame
                         shader.TextureWrapModeU = TextureWrapMode.Repeat;
                         break;
                 }
-                switch (texture.ModelTexture.TextureAddressMode.AddressV)
+                switch (texture.AddressV)
                 {
                     case ModelTexture.TextureWrapMode.Clamp:
                         shader.TextureRegionV = KingdomShader.DefaultTextureRegion;

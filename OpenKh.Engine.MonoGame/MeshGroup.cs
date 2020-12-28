@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Engine.Parsers;
 using System.Collections.Generic;
 
 namespace OpenKh.Engine.MonoGame
 {
-    public class MeshGroup
+    public class MeshGroup : IMonoGameModel
     {
-        public KingdomTexture[] Textures { get; set; }
-        public List<MeshDesc> MeshDescriptors { get; set; }
+        public IKingdomTexture[] Textures { get; set; }
+        public List<MeshDescriptor> MeshDescriptors { get; set; }
     }
 }

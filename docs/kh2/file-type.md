@@ -29,6 +29,7 @@
 | a.fr | French localized a.fm
 | a.it | Italian localized a.fm
 | a.jp | Non-Final Mix a.fm; used only in the JP PS2 Version
+| apdx | stripped down version of the a.jp; used in localization builds of KH2 
 | SEB | Sound effect
 | VAG | Streamed music or voice (monaural audio)
 | VAS | Streamed music or voice (stereo audio)

@@ -1,5 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using OpenKh.Engine.Motion;
 using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using System.Collections.Generic;
@@ -9,50 +10,19 @@ namespace OpenKh.Engine.MonoGame
 {
     public static class MeshLoader
     {
-        public static MeshGroup FromKH2(GraphicsDevice graphics, Mdlx model, ModelTexture texture)
-        {
-            if (model == null || texture == null)
-                return null;
-
-            var meshGroup = FromKH2(model);
-            meshGroup.Textures = LoadTextures(graphics, texture).ToArray();
-
-            return meshGroup;
-        }
-
-        public static MeshGroup FromKH2(Mdlx model)
-        {
-            if (model == null)
-                return null;
-
-            var modelParsed = new MdlxParser(model);
-            return LoadKH2New(modelParsed);
-        }
-
-        private static MeshGroup LoadKH2New(MdlxParser model)
-        {
-            return new MeshGroup
+        public static VertexDeclaration PositionColoredTexturedVertexDeclaration =
+            new VertexDeclaration(24, new VertexElement[]
             {
-                MeshDescriptors = model.MeshDescriptors?
-                    .Select(x => new MeshDesc
-                    {
-                        Vertices = x.Vertices
-                            .Select(v => new VertexPositionColorTexture(
-                                new Vector3(v.X, v.Y, v.Z),
-                                new Color((v.Color >> 16) & 0xff, (v.Color >> 8) & 0xff, v.Color & 0xff, (v.Color >> 24) & 0xff),
-                                new Vector2(v.Tu, v.Tv)))
-                            .ToArray(),
-                        Indices = x.Indices,
-                        TextureIndex = x.TextureIndex,
-                        IsOpaque = x.IsOpaque
-                    })
-                    .ToList(),
-                Textures = null
-            };
-        }
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+                new VertexElement(20, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+            });
+
+        public static IModelMotion FromKH2(Mdlx model) =>
+            model != null ? new MdlxParser(model) : null;
 
         public static IEnumerable<KingdomTexture> LoadTextures(
-            GraphicsDevice graphics, ModelTexture texture) => texture?.Images?
+            this ModelTexture texture, GraphicsDevice graphics) => texture?.Images?
                 .Select(texture => new KingdomTexture(texture, graphics)).ToArray() ??
                 new KingdomTexture[0];
     }

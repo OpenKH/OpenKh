@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +20,7 @@ namespace OpenKh.Tools.Kh2TextEditor.Views
     /// </summary>
     public partial class TextEditorView : UserControl
     {
-        public TextEditorView()
+       public TextEditorView()
         {
             InitializeComponent();
         }

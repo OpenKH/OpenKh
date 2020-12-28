@@ -147,7 +147,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             LoadMapComponent(MapBarEntries, "MAP");
 
             var bobDescEntry = MapBarEntries
-                .Where(x => x.Name == "out" && x.Type == Bar.EntryType.BobDescriptor)
+                .Where(x => x.Name == "out" && x.Type == Bar.EntryType.BgObjPlacement)
                 .FirstOrDefault();
             if (bobDescEntry != null)
                 BobDescriptors.AddRange(BobDescriptor.Read(bobDescEntry.Stream));
@@ -189,7 +189,7 @@ namespace OpenKh.Tools.Kh2MapStudio
             MapBarEntries.AddOrReplace(new Bar.Entry
             {
                 Name = "out",
-                Type = Bar.EntryType.BobDescriptor,
+                Type = Bar.EntryType.BgObjPlacement,
                 Stream = memStream
             });
 
@@ -375,7 +375,8 @@ namespace OpenKh.Tools.Kh2MapStudio
                     meshDescriptor.Vertices.Length,
                     meshDescriptor.Indices,
                     0,
-                    meshDescriptor.Indices.Length / 3);
+                    meshDescriptor.Indices.Length / 3,
+                    MeshLoader.PositionColoredTexturedVertexDeclaration);
             }
         }
 

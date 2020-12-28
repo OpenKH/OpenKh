@@ -76,5 +76,24 @@ namespace OpenKh.Kh2
         }
 
         public static Mdlx CreateFromMapModel(M4 mapModel) => new Mdlx(mapModel);
+
+        private Mdlx()
+        {
+            SubModels = new List<SubModel>();
+            SubModels.Add(new SubModel
+            {
+                Type = Entity,
+                Bones = new List<Bone>(),
+                DmaChains = new List<DmaChain>(),
+            });
+            SubModels.Add(new SubModel
+            {
+                Type = Shadow,
+                Bones = new List<Bone>(),
+                DmaChains = new List<DmaChain>(),
+            });
+        }
+
+        public static Mdlx CreateModelFromScratch() => new Mdlx();
     }
 }
