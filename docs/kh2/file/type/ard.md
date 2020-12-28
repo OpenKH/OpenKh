@@ -57,7 +57,8 @@ When referring to _place's door_ it means that is the index where to spawn the c
 | 10     | float | Rotation X
 | 14     | float | Rotation Y
 | 18     | float | Rotation Z
-| 1c     | short | Unknown
+| 1c     | byte  | Unknown
+| 1d     | byte  | Entrance index. 99 for save point.
 | 1e     | short | Unknown
 | 20     | int   | Unknown
 | 24     | int   | AI parameter

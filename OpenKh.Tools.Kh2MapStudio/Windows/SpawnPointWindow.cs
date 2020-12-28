@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using OpenKh.Kh2.Ard;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using OpenKh.Tools.Kh2MapStudio.Models;
@@ -117,6 +117,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                 });
 
             ForEdit("Unk1c", () => entity.Unk1c, x => entity.Unk1c = x);
+            ForEdit("Unk1d", () => entity.Entrance, x => entity.Entrance = x);
             ForEdit("Unk1e", () => entity.Unk1e, x => entity.Unk1e = x);
             ForEdit("Unk20", () => entity.Unk20, x => entity.Unk20 = x);
             ForEdit("Ai Parameter", () => entity.AiParameter, x => entity.AiParameter = x);
