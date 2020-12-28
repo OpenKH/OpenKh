@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
@@ -8,7 +8,7 @@ namespace OpenKh.Kh2
     internal class BaseTable<T>
         where T : class
     {
-        [Data] public int Id { get; set; }
+        [Data] public int Version { get; set; }
         [Data] public int Count { get; set; }
 
         public static List<T> Read(Stream stream)
@@ -19,12 +19,12 @@ namespace OpenKh.Kh2
                 .ToList();
         }
 
-        public static void Write(Stream stream, int id, IEnumerable<T> items)
+        public static void Write(Stream stream, int version, IEnumerable<T> items)
         {
             var itemList = items as IList<T> ?? items.ToList();
             BinaryMapping.WriteObject(stream, new BaseTable<T>
             {
-                Id = id,
+                Version = version,
                 Count = itemList.Count,
             });
 

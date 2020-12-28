@@ -51,6 +51,29 @@ namespace OpenKh.Tests.kh2
             });
         }
 
+        public class MemtTests
+        {
+            [Fact]
+            public void Read() => File.OpenRead(@"kh2/res/memt.bin").Using(stream =>
+            {
+                var table = Memt.Read(stream);
+                Assert.Equal(0x5, table.Entries.Count);
+                Assert.Equal(0x7, table.MemberIndexCollection.Length);
+            });
+
+            [Fact]
+            public void Write() => File.OpenRead("kh2/res/memt.bin").Using(stream =>
+            {
+                Helpers.AssertStream(stream, x =>
+                {
+                    var outStream = new MemoryStream();
+                    Memt.Write(outStream, Memt.Read(x));
+
+                    return outStream;
+                });
+            });
+        }
+
         public class TrsrTests
         {
             [Fact]

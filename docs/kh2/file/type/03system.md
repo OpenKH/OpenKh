@@ -9,8 +9,8 @@ This is an essential file to boot the game engine.
 * [ARIF](#arif) - ???
 * [ITEM](#item) - Items
 * [TRSR](#trsr) - Treasure
-* [MEMT](#memt) - Member Table
-* [FTST](#ftst) - Font Style
+* [MEMT](#memt) - Member table
+* [FTST](#ftst) - ???
 * [SHOP](#shop) - Shops
 * [SKLT](#sklt) - ???
 * [PREF](#pref) - Preferences?
@@ -320,6 +320,10 @@ World ID and room index combined, gives the name of the map. (eg. for world ID =
 |------|------|
 | 0    | Chest
 | 1    | Event
+
+## MEMT
+
+Also known as Member Table.
 
 ## Arif
 
