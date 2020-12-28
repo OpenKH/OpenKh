@@ -8,6 +8,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Extensions;
+using OpenKh.Kh2.SaveData;
 using OpenKh.Kh2.SystemData;
 using System;
 using System.Collections.Generic;
@@ -49,11 +50,38 @@ namespace OpenKh.Game.Infrastructure
         public RenderingMessageContext SystemMessageContext { get; set; }
         public RenderingMessageContext EventMessageContext { get; set; }
         public Kh2MessageProvider MessageProvider { get; }
+
+        public ISaveData SaveData { get; private set; }
         public List<Objentry> ObjEntries { get; }
         public Dictionary<string, List<Place>> Places { get; }
 
-        public int World { get; set; }
-        public int Area { get; set; }
+        public int World
+        {
+            get => SaveData.WorldId;
+            set => SaveData.WorldId = (byte)value;
+        }
+        public int Area
+        {
+            get => SaveData.RoomId;
+            set => SaveData.RoomId = (byte)value;
+        }
+
+        public int SpawnMap => GetPlaceScript()?.Map ?? 0;
+        public int SpawnBtl => GetPlaceScript()?.Battle ?? 0;
+        public int SpawnEvt => GetPlaceScript()?.Event ?? 0;
+        public string SpawnName
+        {
+            get
+            {
+                var map = SpawnMap;
+                var btl = SpawnBtl;
+                var evt = SpawnEvt;
+                var strMap = map >= 0x19 ? map.ToString() : $"{(char)(map + 0x41)}";
+                var strBtl = btl >= 0x19 ? map.ToString() : $"{(char)(btl + 0x41)}";
+                var strEvt = evt >= 0x19 ? map.ToString() : $"{(char)(evt + 0x41)}";
+                return $"{strMap}/{strBtl}/{strEvt}";
+            }
+        }
 
         // System
         public List<Ftst.Entry> Ftst { get; private set; }
@@ -119,6 +147,19 @@ namespace OpenKh.Game.Infrastructure
         public string GetMapFileName(int worldIndex, int placeIndex) => IsReMix
             ? $"map/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map"
             : $"map/{Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
+
+        public bool LoadSaveData(Stream stream)
+        {
+            if (!SaveDataFactory.IsValid(stream))
+            {
+                Log.Warn("Specified save game is not valid");
+                return false;
+            }
+
+            SaveData = SaveDataFactory.Read(stream);
+            Log.Info($"Save read successful. IsFinalMix={SaveData.IsFinalMix}");
+            return true;
+        }
 
         private T LoadFile<T>(string fileName, Func<Stream, T> action)
         {
@@ -261,6 +302,17 @@ namespace OpenKh.Game.Infrastructure
                 return defaultMemberTableEntry.Members[memberIndex];
 
             return objectId;
+        }
+
+        private IPlaceScript GetPlaceScript()
+        {
+            var index = World * Constants.MaxAreaPerWorldCount + Area;
+            if (SaveData == null ||
+                Area >= Constants.MaxAreaPerWorldCount ||
+                index >= SaveData.PlaceScripts.Length)
+                return null;
+
+            return SaveData.PlaceScripts[index];
         }
     }
 }

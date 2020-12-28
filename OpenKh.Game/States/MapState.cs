@@ -64,8 +64,8 @@ namespace OpenKh.Game.States
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
             _menuState = new MenuState(this);
-            Kernel.World = initDesc.StateSettings.GetInt("WorldId", 2);
-            Kernel.Area = initDesc.StateSettings.GetInt("PlaceId", 4);
+            Kernel.World = initDesc.StateSettings.GetInt("WorldId", Kernel.World);
+            Kernel.Area = initDesc.StateSettings.GetInt("PlaceId", Kernel.Area);
             _spawnId = initDesc.StateSettings.GetInt("SpawnId", 99);
             Field = new Kh2Field(
                 Kernel,

@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Kh2
+namespace OpenKh.Kh2
 {
     public enum World
     {
@@ -66,6 +66,7 @@
 
         public const int PaletteCount = 9;
         public const int WorldCount = (int)World.WorldThatNeverWas + 1;
+        public const int MaxAreaPerWorldCount = 64;
         public const int JiminyWorldCount = (int)JiminyWorld.Nobody + 1;
 
         public static readonly string[] WorldIds = new string[WorldCount]

@@ -89,9 +89,9 @@ namespace OpenKh.Game.Infrastructure
             };
             _eventMessageProvider = new Kh2MessageProvider();
 
-            _spawnScriptMap = settings.GetInt("SpawnScriptMap", 0x06);
-            _spawnScriptBtl = settings.GetInt("SpawnScriptBtl", 0x01);
-            _spawnScriptEvt = settings.GetInt("SpawnScriptEvt", 0x16);
+            _spawnScriptMap = settings.GetInt("SpawnScriptMap", -1);
+            _spawnScriptBtl = settings.GetInt("SpawnScriptBtl", -1);
+            _spawnScriptEvt = settings.GetInt("SpawnScriptEvt", -1);
             FadeFromBlack(1.0f);
         }
 
@@ -121,9 +121,10 @@ namespace OpenKh.Game.Infrastructure
                 .Select(x => x.Name)
                 .ToList();
 
-            RunSpawnScript(_binarcArd, "map", _spawnScriptMap);
-            RunSpawnScript(_binarcArd, "btl", _spawnScriptBtl);
-            RunSpawnScript(_binarcArd, "evt", _spawnScriptEvt);
+            Log.Info($"Loading spawn {_kernel.SpawnName}");
+            RunSpawnScript(_binarcArd, "map", _spawnScriptMap >= 0 ? _spawnScriptMap : _kernel.SpawnMap);
+            RunSpawnScript(_binarcArd, "btl", _spawnScriptBtl >= 0 ? _spawnScriptBtl : _kernel.SpawnBtl);
+            RunSpawnScript(_binarcArd, "evt", _spawnScriptEvt >= 0 ? _spawnScriptEvt : _kernel.SpawnEvt);
         }
 
         public void PlayEvent(string eventName)
