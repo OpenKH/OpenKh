@@ -87,7 +87,7 @@ namespace OpenKh.Engine.Motion
             var boneList = model.Bones;
             var matrices = new Matrix4x4[boneList.Count];
 
-            var totalBoneCount = motion.BoneCount + motion.IKHelpers.Count;
+            var totalBoneCount = Math.Max(motion.BoneCount, model.Bones.Count) + motion.IKHelpers.Count;
             var sourceTranslations = new Vector3[totalBoneCount];
             var sourceRotations = new Quaternion[totalBoneCount];
             var absTranslationList = new Vector3[totalBoneCount];

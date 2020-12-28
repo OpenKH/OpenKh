@@ -12,6 +12,7 @@ using OpenKh.Kh2.SystemData;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace OpenKh.Game.Infrastructure
 {
@@ -50,9 +51,17 @@ namespace OpenKh.Game.Infrastructure
         public Kh2MessageProvider MessageProvider { get; }
         public List<Objentry> ObjEntries { get; }
         public Dictionary<string, List<Place>> Places { get; }
+
+        public int World { get; set; }
+        public int Area { get; set; }
+
+        // System
         public List<Ftst.Entry> Ftst { get; private set; }
         public Item Item { get; private set; }
+        public Memt MemberTable { get; private set; }
         public List<Trsr> Trsr { get; private set; }
+
+        // Battle
         public List<Fmlv.Level> Fmlv { get; private set; }
         public List<Lvup.PlayableCharacter> Lvup { get; private set; }
 
@@ -120,6 +129,7 @@ namespace OpenKh.Game.Infrastructure
 
             Ftst = bar.ForEntry("ftst", Bar.EntryType.List, Kh2.SystemData.Ftst.Read);
             Item = bar.ForEntry("item", Bar.EntryType.List, Kh2.SystemData.Item.Read);
+            MemberTable = bar.ForEntry("memt", Bar.EntryType.List, Kh2.SystemData.Memt.Read);
             Trsr = bar.ForEntry("tsrs", Bar.EntryType.List, Kh2.SystemData.Trsr.Read);
         }
 
@@ -178,6 +188,52 @@ namespace OpenKh.Game.Infrastructure
 
             using (stream)
                 return HdAsset.IsValid(stream);
+        }
+
+        public int GetRealObjectId(int objectId)
+        {
+            const int PLAYER = 0x236;
+            const int FRIEND_1 = 0x237;
+            const int FRIEND_2 = 0x238;
+            const int ACTOR_SORA = 0x23B;
+            const int ACTOR_SORA_H = 0x23C;
+
+            switch (objectId)
+            {
+                case PLAYER:
+                case ACTOR_SORA:
+                    return GetRealObjectId(objectId, Member.Sora);
+                case FRIEND_1:
+                    return GetRealObjectId(objectId, Member.Donald);
+                case FRIEND_2:
+                    return GetRealObjectId(objectId, Member.Goofy);
+                case ACTOR_SORA_H:
+                    return GetRealObjectId(objectId, Member.SoraHighPoly);
+                default:
+                    return objectId;
+            }
+        }
+
+        private int GetRealObjectId(int objectId, Member member)
+        {
+            if ((MemberTable?.Entries?.Count ?? 0) == 0)
+                return objectId;
+
+            var memberIndex = (int)member;
+            var defaultMemberTableEntry = MemberTable.Entries[0];
+            var memberTableEntry = MemberTable.Entries
+                .FirstOrDefault(x => x.WorldId == World);
+
+            if (memberIndex >= memberTableEntry.Members.Length)
+                return objectId;
+
+            if (memberTableEntry.Members[memberIndex] != 0)
+                return memberTableEntry.Members[memberIndex];
+
+            if (defaultMemberTableEntry.Members[memberIndex] != 0)
+                return defaultMemberTableEntry.Members[memberIndex];
+
+            return objectId;
         }
     }
 }

@@ -40,8 +40,6 @@ namespace OpenKh.Game.States
         private KingdomShader _shader;
         private Camera _camera;
 
-        private int _worldId;
-        private int _placeId;
         private int _spawnId;
         private int _spawnScriptMap;
         private int _spawnScriptBtl;
@@ -69,8 +67,8 @@ namespace OpenKh.Game.States
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
             _menuState = new MenuState(this);
-            _worldId = initDesc.StateSettings.GetInt("WorldId", 2);
-            _placeId = initDesc.StateSettings.GetInt("PlaceId", 4);
+            Kernel.World = initDesc.StateSettings.GetInt("WorldId", 2);
+            Kernel.Area = initDesc.StateSettings.GetInt("PlaceId", 4);
             _spawnId = initDesc.StateSettings.GetInt("SpawnId", 99);
             _spawnScriptMap = initDesc.StateSettings.GetInt("SpawnScriptMap", 0x06);
             _spawnScriptBtl = initDesc.StateSettings.GetInt("SpawnScriptBtl", 0x01);
@@ -219,8 +217,8 @@ namespace OpenKh.Game.States
             _bobModels.Clear();
             _objectEntities.Clear();
 
-            LoadMapArd(_worldId, _placeId);
-            LoadMap(_worldId, _placeId);
+            LoadMapArd(Kernel.World, Kernel.Area);
+            LoadMap(Kernel.World, Kernel.Area);
         }
 
         private void LoadMap(int worldIndex, int placeIndex)
@@ -336,8 +334,8 @@ namespace OpenKh.Game.States
 
         public void LoadPlace(int worldId, int placeId, int spawnIndex)
         {
-            _worldId = worldId;
-            _placeId = placeId;
+            Kernel.World = worldId;
+            Kernel.Area = placeId;
             _spawnId = spawnIndex;
 
             BasicallyForceToReloadEverything();
@@ -411,7 +409,7 @@ namespace OpenKh.Game.States
             }
             else
             {
-                debug.Println($"MAP: {Constants.WorldIds[_worldId]}{_placeId:D02}");
+                debug.Println($"MAP: {Constants.WorldIds[Kernel.World]}{Kernel.Area:D02}");
                 debug.Println($"POS ({_camera.CameraPosition.X:F0}, {_camera.CameraPosition.Y:F0}, {_camera.CameraPosition.Z:F0})");
                 debug.Println($"YPR ({_camera.CameraRotationYawPitchRoll.X:F0}, {_camera.CameraRotationYawPitchRoll.Y:F0}, {_camera.CameraRotationYawPitchRoll.Z:F0})");
             }
@@ -436,8 +434,8 @@ namespace OpenKh.Game.States
             if (_input.IsCross)
             {
                 var map = _places[_debugPlaceCursor];
-                _worldId = map.WorldId;
-                _placeId = map.PlaceId;
+                Kernel.World = map.WorldId;
+                Kernel.Area = map.PlaceId;
 
                 BasicallyForceToReloadEverything();
                 DisableDebugMode();
