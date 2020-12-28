@@ -196,7 +196,6 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
             _messageProvider = new Kh2MessageProvider();
             CreateSystem();
-            OpenFile(@"D:\Hacking\KH2\export_ps4\03system.bin");
         }
 
         private void ExportTable<T>(string fileName, IEnumerable<T> list)
