@@ -182,7 +182,7 @@ namespace OpenKh.Game.Infrastructure
 
         public void AddActor(int actorId, int objectId)
         {
-            var entity = new ObjectEntity(_kernel, objectId);
+            var entity = new ObjectEntity(_kernel, _kernel.GetRealObjectId(objectId));
             entity.LoadMesh(_graphicsDevice);
 
             _actors.Add(entity);
