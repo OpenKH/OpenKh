@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using OpenKh.Engine.Parsers;
+using OpenKh.Kh2.SystemData;
 
 namespace OpenKh.Game.Entities
 {
@@ -141,7 +142,7 @@ namespace OpenKh.Game.Entities
         }
 
         public static ObjectEntity FromSpawnPoint(Kernel kernel, SpawnPoint.Entity spawnPoint) =>
-            new ObjectEntity(kernel, spawnPoint.ObjectId)
+            new ObjectEntity(kernel, kernel.GetRealObjectId(spawnPoint.ObjectId))
             {
                 Position = new Vector3(spawnPoint.PositionX, -spawnPoint.PositionY, -spawnPoint.PositionZ),
                 Rotation = new Vector3(spawnPoint.RotationX, spawnPoint.RotationY, spawnPoint.RotationZ),
