@@ -95,10 +95,10 @@ namespace OpenKh.Game.Infrastructure
             FadeFromBlack(1.0f);
         }
 
-        public void LoadMapArd(int worldIndex, int placeIndex)
+        public void LoadMapArd(int world, int area)
         {
             _kernel.DataContent
-                .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[worldIndex]}.bar")
+                .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[world]}.bar")
                 .Using(stream => Bar.Read(stream))
                 .ForEntry(x => x.Type == Bar.EntryType.List, stream =>
                 {
@@ -108,9 +108,9 @@ namespace OpenKh.Game.Infrastructure
 
             string fileName;
             if (_kernel.IsReMix)
-                fileName = $"ard/{_kernel.Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
+                fileName = $"ard/{_kernel.Language}/{Constants.WorldIds[world]}{area:D02}.ard";
             else
-                fileName = $"ard/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.ard";
+                fileName = $"ard/{Constants.WorldIds[world]}{area:D02}.ard";
 
             _eventPlayer = null;
             RemoveAllActors();
@@ -403,7 +403,10 @@ namespace OpenKh.Game.Infrastructure
                             foreach (var spawnPoint in spawnPoints)
                             {
                                 foreach (var desc in spawnPoint.Entities)
-                                    AddActor(desc);
+                                {
+                                    if (desc.UseEntrance == 0 || desc.Entrance == _kernel.Entrance)
+                                        AddActor(desc);
+                                }
                             }
                         }
                         else

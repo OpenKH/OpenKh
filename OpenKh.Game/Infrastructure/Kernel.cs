@@ -65,6 +65,11 @@ namespace OpenKh.Game.Infrastructure
             get => SaveData.RoomId;
             set => SaveData.RoomId = (byte)value;
         }
+        public int Entrance
+        {
+            get => SaveData.SpawnId;
+            set => SaveData.SpawnId = (byte)value;
+        }
 
         public int SpawnMap => GetPlaceScript()?.Map ?? 0;
         public int SpawnBtl => GetPlaceScript()?.Battle ?? 0;
@@ -142,6 +147,7 @@ namespace OpenKh.Game.Infrastructure
                 EventMessageContext = FontContext.ToKh2EuEventTextContext();
             }
             MessageProvider.Encoder = SystemMessageContext.Encoder;
+            SaveData = new SaveFinalMix();
         }
 
         public string GetMapFileName(int worldIndex, int placeIndex) => IsReMix
