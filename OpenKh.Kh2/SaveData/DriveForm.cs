@@ -21,7 +21,7 @@ namespace OpenKh.Kh2.SaveData
     {
         short Weapon { get; set; }
         byte Level { get; set; }
-        byte Unknown { get; set; }
+        byte AbilityLevel { get; set; }
         int Experience { get; set; }
         ushort[] Abilities { get; set; }
     }
@@ -30,7 +30,7 @@ namespace OpenKh.Kh2.SaveData
     {
         [Data(0)] public short Weapon { get; set; }
         [Data] public byte Level { get; set; }
-        [Data] public byte Unknown { get; set; }
+        [Data] public byte AbilityLevel { get; set; }
         [Data] public int Experience { get; set; }
         [Data(Count = 0x10)] public ushort[] Abilities { get; set; }
     }
@@ -39,7 +39,7 @@ namespace OpenKh.Kh2.SaveData
     {
         [Data(0)] public short Weapon { get; set; }
         [Data] public byte Level { get; set; }
-        [Data] public byte Unknown { get; set; }
+        [Data] public byte AbilityLevel { get; set; }
         [Data] public int Experience { get; set; }
         [Data(Count = 0x18)] public ushort[] Abilities { get; set; }
     }
