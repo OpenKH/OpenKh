@@ -15,10 +15,10 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
     {
         public class Entry : BaseNotifyPropertyChanged
         {
-            private readonly Memt.Entry _entry;
+            private readonly Memt.IEntry _entry;
             private readonly IObjectProvider _objectProvider;
 
-            internal Entry(Memt.Entry entry, IObjectProvider objectProvider)
+            internal Entry(Memt.IEntry entry, IObjectProvider objectProvider)
             {
                 _entry = entry;
                 _objectProvider = objectProvider;
@@ -75,13 +75,13 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         }
 
         private readonly Memt _memberTable;
-        private readonly List<Memt.Entry> _entries = new List<Memt.Entry>();
+        private readonly List<Memt.IEntry> _entries = new List<Memt.IEntry>();
         private readonly IObjectProvider _objectProvider;
         private const string _entryName = "memt";
 
         public string EntryName => _entryName;
 
-        public IEnumerable<Memt.Entry> Members => _entries;
+        public IEnumerable<Memt.IEntry> Members => _entries;
 
         public MemtViewModel(IObjectProvider objectProvider) :
             this(objectProvider, new Memt())
@@ -98,10 +98,20 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             _memberTable = memberTable;
         }
 
-        protected override Entry OnNewItem() => new Entry(new Memt.Entry
+        protected override Entry OnNewItem()
         {
-            Members = new short[18]
-        }, _objectProvider);
+            var item = _entries.FirstOrDefault();
+            if (item is Memt.EntryVanilla)
+                return new Entry(new Memt.EntryVanilla
+                {
+                    Members = new short[Memt.MemberCountVanilla]
+                }, _objectProvider);
+            else
+                return new Entry(new Memt.EntryFinalMix
+                {
+                    Members = new short[Memt.MemberCountFinalMix]
+                }, _objectProvider);
+        }
 
         public Stream CreateStream()
         {

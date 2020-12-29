@@ -202,19 +202,19 @@ namespace OpenKh.Game.Infrastructure
             {
                 case PLAYER:
                 case ACTOR_SORA:
-                    return GetRealObjectId(objectId, Member.Sora);
+                    return GetRealObjectId(objectId, MemberFinalMix.Sora);
                 case FRIEND_1:
-                    return GetRealObjectId(objectId, Member.Donald);
+                    return GetRealObjectId(objectId, MemberFinalMix.Donald);
                 case FRIEND_2:
-                    return GetRealObjectId(objectId, Member.Goofy);
+                    return GetRealObjectId(objectId, MemberFinalMix.Goofy);
                 case ACTOR_SORA_H:
-                    return GetRealObjectId(objectId, Member.SoraHighPoly);
+                    return GetRealObjectId(objectId, MemberFinalMix.SoraHighPoly);
                 default:
                     return objectId;
             }
         }
 
-        private int GetRealObjectId(int objectId, Member member)
+        private int GetRealObjectId(int objectId, MemberFinalMix member)
         {
             if ((MemberTable?.Entries?.Count ?? 0) == 0)
                 return objectId;
