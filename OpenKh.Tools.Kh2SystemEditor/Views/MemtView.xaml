@@ -99,7 +99,7 @@
                 <Separator/>
                 <TextBlock Text="PLAYER"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[0]}"
+                    SelectedValue="{Binding PLAYER}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -107,7 +107,7 @@
                     />
                 <TextBlock Text="FRIEND_1"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[1]}"
+                    SelectedValue="{Binding FRIEND_1}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -115,7 +115,7 @@
                     />
                 <TextBlock Text="FRIEND_2"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[2]}"
+                    SelectedValue="{Binding FRIEND_2}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -123,7 +123,7 @@
                     />
                 <TextBlock Text="FRIEND_W"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[3]}"
+                    SelectedValue="{Binding FRIEND_W}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -131,7 +131,7 @@
                     />
                 <TextBlock Text="PLAYER_BTLF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[4]}"
+                    SelectedValue="{Binding PLAYER_BTLF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -139,7 +139,7 @@
                     />
                 <TextBlock Text="PLAYER_MAGF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[5]}"
+                    SelectedValue="{Binding PLAYER_MAGF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -147,15 +147,16 @@
                     />
                 <TextBlock Text="PLAYER_KH1F"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[6]}"
+                    SelectedValue="{Binding PLAYER_KH1F}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
                     IsEditable="True"
+                    IsEnabled="{Binding MemberEditEnabled[6]}"
                     />
                 <TextBlock Text="PLAYER_TRIF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[7]}"
+                    SelectedValue="{Binding PLAYER_TRIF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -163,7 +164,7 @@
                     />
                 <TextBlock Text="PLAYER_ULTF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[8]}"
+                    SelectedValue="{Binding PLAYER_ULTF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -171,7 +172,7 @@
                     />
                 <TextBlock Text="PLAYER_HTLF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[9]}"
+                    SelectedValue="{Binding PLAYER_HTLF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -179,7 +180,7 @@
                     />
                 <TextBlock Text="MICKEY"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[10]}"
+                    SelectedValue="{Binding MICKEY}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -187,7 +188,7 @@
                     />
                 <TextBlock Text="PLAYER_H"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[11]}"
+                    SelectedValue="{Binding PLAYER_H}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -195,7 +196,7 @@
                     />
                 <TextBlock Text="PLAYER_H_BTLF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[12]}"
+                    SelectedValue="{Binding PLAYER_H_BTLF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -203,7 +204,7 @@
                     />
                 <TextBlock Text="PLAYER_H_MAGF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[13]}"
+                    SelectedValue="{Binding PLAYER_H_MAGF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -211,15 +212,16 @@
                     />
                 <TextBlock Text="PLAYER_H_KH1F"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[14]}"
+                    SelectedValue="{Binding PLAYER_H_KH1F}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
                     IsEditable="True"
+                    IsEnabled="{Binding MemberEditEnabled[14]}"
                     />
                 <TextBlock Text="PLAYER_H_TRIF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[15]}"
+                    SelectedValue="{Binding PLAYER_H_TRIF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -227,7 +229,7 @@
                     />
                 <TextBlock Text="PLAYER_H_ULTF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[16]}"
+                    SelectedValue="{Binding PLAYER_H_ULTF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"
@@ -235,7 +237,7 @@
                     />
                 <TextBlock Text="PLAYER_H_HTLF"/>
                 <ComboBox
-                    SelectedValue="{Binding Members[17]}"
+                    SelectedValue="{Binding PLAYER_H_HTLF}"
                     ItemsSource="{Binding Objects}"
                     DisplayMemberPath="Name"
                     SelectedValuePath="Value"

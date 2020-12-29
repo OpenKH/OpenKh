@@ -242,6 +242,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         {
             var objEntry = Objentry.Read(stream);
             Objects.Clear();
+            Objects.Add(new ObjectModel(-1, "Disabled"));
             Objects.Add(new ObjectModel(0, "Ignore"));
             foreach (var obj in objEntry.OrderBy(x =>
             {
