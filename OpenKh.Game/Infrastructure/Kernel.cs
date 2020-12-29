@@ -239,7 +239,6 @@ namespace OpenKh.Game.Infrastructure
             if ((MemberTable?.Entries?.Count ?? 0) == 0)
                 return objectId;
 
-            var memberIndex = (int)member;
             var defaultMemberTableEntry = MemberTable.Entries[0];
             var memberTableEntry = MemberTable.Entries
                 .FirstOrDefault(x => x.WorldId == World);
