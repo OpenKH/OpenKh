@@ -65,6 +65,9 @@ namespace OpenKh.Game.Infrastructure
         public List<Fmlv.Level> Fmlv { get; private set; }
         public List<Lvup.PlayableCharacter> Lvup { get; private set; }
 
+        // 00worldpoint
+        public List<WorldPoint> WorldPoints { get; private set; }
+
         public Kernel(IDataContent dataContent)
         {
             Log.Info("Initialize kernel");
@@ -87,7 +90,7 @@ namespace OpenKh.Game.Infrastructure
             LoadSystem("03system.bin");
             LoadBattle("00battle.bin");
             // 00common
-            // 00worldpoint
+            LoadWorldPoint("00worldpoint.bin");
             // 07localset
             // 12soundinfo
             // 14mission
@@ -139,6 +142,11 @@ namespace OpenKh.Game.Infrastructure
 
             Fmlv = bar.ForEntry("fmlv", Bar.EntryType.List, Kh2.Battle.Fmlv.Read);
             Lvup = bar.ForEntry("lvup", Bar.EntryType.List, Kh2.Battle.Lvup.Read)?.Characters;
+        }
+
+        private void LoadWorldPoint(string fileName)
+        {
+            WorldPoints = DataContent.FileOpen(fileName).Using(stream => WorldPoint.Read(stream));
         }
 
         private void LoadFontInfo(string fileName)

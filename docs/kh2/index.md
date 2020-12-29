@@ -28,6 +28,7 @@
 * Other files
 
   * [00battle.bin](file/type/00battle.md)
+  * [00worldpoint.bin](file/type/00worldpoint.md)
   * [00objentry.bin](file/type/00objentry.md)
   * [03system.bin](file/type/03system.md)
   * [15jigsaw.bin](file/type/15jigsaw.md)
