@@ -26,6 +26,10 @@ The PlayStation 4 assets uses high-definition textures, but they are currently u
 
 The engine creates a file called `openkh.log`, where it stores a high degree of debugging information helpful to understand how the game internally works or to understand what caused a crash.
 
+## Debug menu
+
+When you access to the CAMP menu by pressing Start you can access to the debug menu by pressing the R2 button, that will convert the option _"Config"_ to _"DEBUG"_. You can access few useful features such as returning to the title screen, teleporting into a different map or play a cutscene.
+
 ## Configuration
 
 The engine configuration is stored in `config.yml`, stored in the same directory where the engine's executable is. If you can not find the file, run the game engine executable once to create it.
