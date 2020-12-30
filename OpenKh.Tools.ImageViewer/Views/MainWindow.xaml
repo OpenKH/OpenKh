@@ -38,7 +38,7 @@
                 <MenuItem Header="Convert to 4-bpp image" Command="{Binding ConvertBitsPerPixelCommand}" CommandParameter="4"/>
                 <MenuItem Header="Convert to 8-bpp image" Command="{Binding ConvertBitsPerPixelCommand}" CommandParameter="8"/>
                 <Separator/>
-                <MenuItem Header="Use pngquant" IsChecked="{Binding UsePngquant}" IsCheckable="True" />
+                <MenuItem Header="Use pngquant" IsChecked="{Binding UsePngquant}" Command="{Binding CheckQuant}" IsCheckable="True" />
                 <Separator/>
                 <MenuItem Header="Remove current image" Command="{Binding RemoveImageCommand}"/>
                 <Separator/>
