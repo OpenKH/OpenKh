@@ -2,6 +2,7 @@ using OpenKh.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Bbs
@@ -203,9 +204,9 @@ namespace OpenKh.Bbs
         public List<MeshSectionOptional1> meshSectionOpt1 = new List<MeshSectionOptional1>();
         public List<MeshSectionOptional2> meshSectionOpt2 = new List<MeshSectionOptional2>();
         public List<float> jointWeights = new List<float>();
-        public List<float> textureCoordinates = new List<float>();
+        public List<Vector2> textureCoordinates = new List<Vector2>();
         public List<UInt32> colors = new List<UInt32>();
-        public List<float> vertices = new List<float>();
+        public List<Vector3> vertices = new List<Vector3>();
         public List<byte[]> Textures = new List<byte[]>();
         public SkeletonHeader skeletonHeader { get; set; }
         public JointData[] jointList;
@@ -273,31 +274,35 @@ namespace OpenKh.Bbs
                             switch (WeightFormat)
                             {
                                 case CoordinateFormat.NORMALIZED_8_BITS:
-                                    pmo.textureCoordinates.Add(stream.ReadByte() / 127.0f);
+                                    pmo.jointWeights.Add(stream.ReadByte() / 127.0f);
                                     break;
                                 case CoordinateFormat.NORMALIZED_16_BITS:
-                                    pmo.textureCoordinates.Add(stream.ReadUInt16() / 32767.0f);
+                                    pmo.jointWeights.Add(stream.ReadUInt16() / 32767.0f);
                                     break;
                                 case CoordinateFormat.FLOAT_32_BITS:
-                                    pmo.textureCoordinates.Add(stream.ReadFloat());
+                                    pmo.jointWeights.Add(stream.ReadFloat());
                                     break;
                             }
                         }
                     }
 
+                    Vector2 currentTexCoord;
+
                     switch (TexCoordFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            pmo.textureCoordinates.Add(stream.ReadByte() / 127.0f);
-                            pmo.textureCoordinates.Add(stream.ReadByte() / 127.0f);
+                            currentTexCoord.X = stream.ReadByte() / 127.0f;
+                            currentTexCoord.Y = stream.ReadByte() / 127.0f;
+                            pmo.textureCoordinates.Add(currentTexCoord);
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
-                            pmo.textureCoordinates.Add(stream.ReadUInt16() / 32767.0f);
-                            pmo.textureCoordinates.Add(stream.ReadUInt16() / 32767.0f);
+                            currentTexCoord.X = stream.ReadUInt16() / 32767.0f;
+                            currentTexCoord.Y = stream.ReadUInt16() / 32767.0f;
+                            pmo.textureCoordinates.Add(currentTexCoord);
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
-                            pmo.textureCoordinates.Add(stream.ReadFloat());
-                            pmo.textureCoordinates.Add(stream.ReadFloat());
+                            currentTexCoord.X = stream.ReadFloat();
+                            currentTexCoord.Y = stream.ReadFloat();
                             break;
                     }
 
@@ -316,23 +321,28 @@ namespace OpenKh.Bbs
                             break;
                     }
 
+                    Vector3 currentVertex;
+
                     // Handle triangles and triangle strips.
                     switch (VertexPositionFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            pmo.vertices.Add(r.ReadSByte() / 127.0f);
-                            pmo.vertices.Add(r.ReadSByte() / 127.0f);
-                            pmo.vertices.Add(r.ReadSByte() / 127.0f);
+                            currentVertex.X = r.ReadSByte() / 127.0f;
+                            currentVertex.Y = r.ReadSByte() / 127.0f;
+                            currentVertex.Z = r.ReadSByte() / 127.0f;
+                            pmo.vertices.Add(currentVertex);
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
-                            pmo.vertices.Add(stream.ReadInt16() / 32767.0f);
-                            pmo.vertices.Add(stream.ReadInt16() / 32767.0f);
-                            pmo.vertices.Add(stream.ReadInt16() / 32767.0f);
+                            currentVertex.X = stream.ReadInt16() / 32767.0f;
+                            currentVertex.Y = stream.ReadInt16() / 32767.0f;
+                            currentVertex.Z = stream.ReadInt16() / 32767.0f;
+                            pmo.vertices.Add(currentVertex);
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
-                            pmo.vertices.Add(stream.ReadFloat());
-                            pmo.vertices.Add(stream.ReadFloat());
-                            pmo.vertices.Add(stream.ReadFloat());
+                            currentVertex.X = stream.ReadFloat();
+                            currentVertex.Y = stream.ReadFloat();
+                            currentVertex.Z = stream.ReadFloat();
+                            pmo.vertices.Add(currentVertex);
                             break;
                     }
 
