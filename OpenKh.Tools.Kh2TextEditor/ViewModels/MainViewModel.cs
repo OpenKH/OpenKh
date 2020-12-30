@@ -246,6 +246,9 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }
 
             FileName = fileName;
+            LoadSupportFiles(Path.GetDirectoryName(fileName));
+            AutodetectRegion();
+
             return true;
         });
 
@@ -430,6 +433,46 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 .ForEntry(Bar.EntryType.List, _barEntryName, 0, entry => WriteMsg(entry.Stream));
 
             Bar.Write(stream, newEntries);
+        }
+
+        private void LoadSupportFiles(string basePath)
+        {
+            const string FontImageFileName = "fontimage.bar";
+            var fontImageFileName = Path.Combine(basePath, FontImageFileName);
+            if (File.Exists(fontImageFileName))
+                OpenFontImageFile(fontImageFileName);
+
+            const string FontInfoFileName = "fontinfo.bar";
+            var fontInfoFileName = Path.Combine(basePath, FontInfoFileName);
+            if (File.Exists(fontInfoFileName))
+                OpenFontImageFile(fontInfoFileName);
+        }
+
+        private void AutodetectRegion()
+        {
+            switch (IsMsgJapanese())
+            {
+                case true:
+                    EncodingType = EncodingType.Japanese;
+                    break;
+                case false:
+                    EncodingType = EncodingType.European;
+                    break;
+            }
+        }
+
+        private bool? IsMsgJapanese()
+        {
+            const ushort FakeTextId = 0x0ADC;
+            if (TextEditor?.MessageEntries == null)
+                return null;
+
+            var messageEntry = TextEditor.MessageEntries.FirstOrDefault(x => x.Id == FakeTextId);
+            var data = messageEntry?.Data;
+            if (data == null || data.Length == 0)
+                return null;
+
+            return data.Length != 5;
         }
     }
 }
