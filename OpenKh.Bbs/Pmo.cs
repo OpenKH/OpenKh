@@ -1,7 +1,7 @@
-﻿using System;
+using OpenKh.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using OpenKh.Common;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Bbs
@@ -63,9 +63,10 @@ namespace OpenKh.Bbs
             [Data] public ushort ParentJointIndex { get; set; }
             [Data] public ushort Padding2 { get; set; }
             [Data] public UInt32 _SkinningIndex { get; set; }
+            [Data] public UInt32 Padding3 { get; set; }
             [Data(Count = 16)] public string JointName { get; set; }
-            [Data(Count = 16)] public float Transform { get; set; }
-            [Data(Count = 16)] public float InverseTransform { get; set; }
+            [Data(Count = 16)] public float[] Transform { get; set; }
+            [Data(Count = 16)] public float[] InverseTransform { get; set; }
         }
 
         public class MeshSectionOptional1
@@ -126,7 +127,74 @@ namespace OpenKh.Bbs
 
         public static UInt32 GetBitFieldRange(UInt32 value, int start = 0, int length = 1)
         {
-            return ( (value << start) >> (32 - length) );
+            UInt32 bit = value << 32 - (start+length);
+            bit >>= 32 - length;
+            return bit;
+        }
+
+        public static int GetVertexSize(CoordinateFormat TexCoordFormat, CoordinateFormat VertexPositionFormat, CoordinateFormat WeightFormat, ColorFormat ColorFormat, int numWeights = 0)
+        {
+            int vertexSize = 0;
+
+            switch (TexCoordFormat)
+            {
+                case CoordinateFormat.NORMALIZED_8_BITS:
+                    vertexSize += 2;
+                    break;
+                case CoordinateFormat.NORMALIZED_16_BITS:
+                    vertexSize += 4;
+                    break;
+                case CoordinateFormat.FLOAT_32_BITS:
+                    vertexSize += 8;
+                    break;
+            }
+
+            switch (VertexPositionFormat)
+            {
+                case CoordinateFormat.NORMALIZED_8_BITS:
+                    vertexSize += 3;
+                    break;
+                case CoordinateFormat.NORMALIZED_16_BITS:
+                    vertexSize += 6;
+                    break;
+                case CoordinateFormat.FLOAT_32_BITS:
+                    vertexSize += 12;
+                    break;
+            }
+
+            switch (WeightFormat)
+            {
+                case CoordinateFormat.NORMALIZED_8_BITS:
+                    if(numWeights > 0 )
+                        vertexSize += (numWeights + 1);
+                    break;
+                case CoordinateFormat.NORMALIZED_16_BITS:
+                    if (numWeights > 0)
+                        vertexSize += (numWeights + 1) * 2;
+                    break;
+                case CoordinateFormat.FLOAT_32_BITS:
+                    if (numWeights > 0)
+                        vertexSize += (numWeights + 1) * 4;
+                    break;
+            }
+
+            switch (ColorFormat)
+            {
+                case ColorFormat.BGR_5650_16BITS:
+                    vertexSize += 2;
+                    break;
+                case ColorFormat.ABGR_5551_16BITS:
+                    vertexSize += 2;
+                    break;
+                case ColorFormat.ABGR_4444_16BITS:
+                    vertexSize += 2;
+                    break;
+                case ColorFormat.ABGR_8888_32BITS:
+                    vertexSize += 4;
+                    break;
+            }
+
+            return vertexSize;
         }
 
         public Header header { get; set; }
@@ -136,8 +204,11 @@ namespace OpenKh.Bbs
         public List<MeshSectionOptional2> meshSectionOpt2 = new List<MeshSectionOptional2>();
         public List<float> jointWeights = new List<float>();
         public List<float> textureCoordinates = new List<float>();
+        public List<UInt32> colors = new List<UInt32>();
         public List<float> vertices = new List<float>();
         public List<byte[]> Textures = new List<byte[]>();
+        public SkeletonHeader skeletonHeader { get; set; }
+        public JointData[] jointList;
 
         public static Pmo Read(Stream stream)
         {
@@ -149,100 +220,140 @@ namespace OpenKh.Bbs
             pmo.textureInfo = new TextureInfo[pmo.header.TextureCount];
             for (ushort i = 0; i < pmo.header.TextureCount; i++) pmo.textureInfo[i] = BinaryMapping.ReadObject<TextureInfo>(stream);
 
-            // Get Mesh Sections.
+            // Read all data
             UInt16 VertCnt = 0xFFFF;
 
-            while(VertCnt != 0)
+            while(VertCnt > 0)
             {
                 MeshSection meshSec = new MeshSection();
                 MeshSectionOptional1 meshSecOpt1 = new MeshSectionOptional1();
                 MeshSectionOptional2 meshSecOpt2 = new MeshSectionOptional2();
+                UInt16[] TriangleStripValues;
+
+                long positionBeforeHeader = stream.Position;
 
                 meshSec = BinaryMapping.ReadObject<MeshSection>(stream);
+                if (meshSec.VertexCount <= 0) break;
+                UInt32 isColorFlagRisen = GetBitFieldRange(meshSec.VertexFlags, 24, 1);
 
                 if (pmo.header.SkeletonOffset != 0) meshSecOpt1 = BinaryMapping.ReadObject<MeshSectionOptional1>(stream);
-                if (GetBitFieldRange(meshSec.VertexFlags, 24, 1)  == 1) meshSecOpt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
+                if (isColorFlagRisen  == 1) meshSecOpt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
+                if (meshSec.TriangleStripCount > 0)
+                {
+                    TriangleStripValues = new UInt16[meshSec.TriangleStripCount];
+                    for(int i = 0; i < meshSec.TriangleStripCount; i++)
+                    {
+                        TriangleStripValues[i] = stream.ReadUInt16();
+                    }
+                }
 
                 pmo.meshSection.Add(meshSec);
                 pmo.meshSectionOpt1.Add(meshSecOpt1);
                 pmo.meshSectionOpt2.Add(meshSecOpt2);
-                VertCnt = meshSec.VertexCount;
-            }
 
-            // Get Vertices
-            for(ushort v = 0; v < pmo.meshSection.Count; v++)
-            {
-                CoordinateFormat TexCoordFormat = (CoordinateFormat)GetBitFieldRange(pmo.meshSection[v].VertexFlags, 0, 2);
-                CoordinateFormat VertexPositionFormat = (CoordinateFormat)GetBitFieldRange(pmo.meshSection[v].VertexFlags, 7, 2);
-                CoordinateFormat WeightFormat = (CoordinateFormat)GetBitFieldRange(pmo.meshSection[v].VertexFlags, 9, 2);
-                UInt32 SkinningWeightsCount = GetBitFieldRange(pmo.meshSection[v].VertexFlags, 14, 3);
+                // Get Vertices
+                CoordinateFormat TexCoordFormat = (CoordinateFormat)GetBitFieldRange(meshSec.VertexFlags, 0, 2);
+                CoordinateFormat VertexPositionFormat = (CoordinateFormat)GetBitFieldRange(meshSec.VertexFlags, 7, 2);
+                CoordinateFormat WeightFormat = (CoordinateFormat)GetBitFieldRange(meshSec.VertexFlags, 9, 2);
+                ColorFormat ColorFormat = (ColorFormat)GetBitFieldRange(meshSec.VertexFlags, 2, 3);
+                UInt32 SkinningWeightsCount = GetBitFieldRange(meshSec.VertexFlags, 14, 3);
+                BinaryReader r = new BinaryReader(stream);
 
-                // Read all skin weights.
-                for (int i = 0; i < (SkinningWeightsCount + 1); i++)
+                int currentVertexSize = GetVertexSize(TexCoordFormat, VertexPositionFormat, WeightFormat, ColorFormat, (int)SkinningWeightsCount);
+                int vertexSizeDifference = meshSec.VertexSize - currentVertexSize;
+                long positionAfterHeader = stream.Position;
+
+                for (int v = 0; v < meshSec.VertexCount; v++)
                 {
-                    switch (WeightFormat)
+                    // Read all skin weights.
+                    if (SkinningWeightsCount > 0)
                     {
+                        for (int i = 0; i < (SkinningWeightsCount + 1); i++)
+                        {
+                            switch (WeightFormat)
+                            {
+                                case CoordinateFormat.NORMALIZED_8_BITS:
+                                    pmo.textureCoordinates.Add(stream.ReadByte() / 127.0f);
+                                    break;
+                                case CoordinateFormat.NORMALIZED_16_BITS:
+                                    pmo.textureCoordinates.Add(stream.ReadUInt16() / 32767.0f);
+                                    break;
+                                case CoordinateFormat.FLOAT_32_BITS:
+                                    pmo.textureCoordinates.Add(stream.ReadFloat());
+                                    break;
+                            }
+                        }
+                    }
 
-                        case CoordinateFormat.NO_VERTEX:
-                            break;
+                    switch (TexCoordFormat)
+                    {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            pmo.textureCoordinates.Add((float)stream.ReadByte() / 127.0f);
-                            pmo.textureCoordinates.Add((float)stream.ReadByte() / 127.0f);
+                            pmo.textureCoordinates.Add(stream.ReadByte() / 127.0f);
+                            pmo.textureCoordinates.Add(stream.ReadByte() / 127.0f);
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
-                            pmo.textureCoordinates.Add((float)stream.ReadUInt16() / 32767.0f);
-                            pmo.textureCoordinates.Add((float)stream.ReadUInt16() / 32767.0f);
+                            pmo.textureCoordinates.Add(stream.ReadUInt16() / 32767.0f);
+                            pmo.textureCoordinates.Add(stream.ReadUInt16() / 32767.0f);
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
                             pmo.textureCoordinates.Add(stream.ReadFloat());
                             pmo.textureCoordinates.Add(stream.ReadFloat());
                             break;
+                    }
 
+                    switch (ColorFormat)
+                    {
+                        case Pmo.ColorFormat.NO_COLOR:
+                            break;
+                        case Pmo.ColorFormat.BGR_5650_16BITS:
+                            break;
+                        case Pmo.ColorFormat.ABGR_5551_16BITS:
+                            break;
+                        case Pmo.ColorFormat.ABGR_4444_16BITS:
+                            break;
+                        case Pmo.ColorFormat.ABGR_8888_32BITS:
+                            pmo.colors.Add(stream.ReadUInt32());
+                            break;
+                    }
+
+                    // Handle triangles and triangle strips.
+                    switch (VertexPositionFormat)
+                    {
+                        case CoordinateFormat.NORMALIZED_8_BITS:
+                            pmo.vertices.Add(r.ReadSByte() / 127.0f);
+                            pmo.vertices.Add(r.ReadSByte() / 127.0f);
+                            pmo.vertices.Add(r.ReadSByte() / 127.0f);
+                            break;
+                        case CoordinateFormat.NORMALIZED_16_BITS:
+                            pmo.vertices.Add(stream.ReadInt16() / 32767.0f);
+                            pmo.vertices.Add(stream.ReadInt16() / 32767.0f);
+                            pmo.vertices.Add(stream.ReadInt16() / 32767.0f);
+                            break;
+                        case CoordinateFormat.FLOAT_32_BITS:
+                            pmo.vertices.Add(stream.ReadFloat());
+                            pmo.vertices.Add(stream.ReadFloat());
+                            pmo.vertices.Add(stream.ReadFloat());
+                            break;
+                    }
+
+                    if(vertexSizeDifference > 0)
+                    {
+                        stream.Seek(vertexSizeDifference, SeekOrigin.Current);
                     }
                 }
 
-                switch (TexCoordFormat)
+                uint remainder = ((uint)stream.Position % 4);
+
+                if (remainder != 0)
                 {
-                    case CoordinateFormat.NO_VERTEX:
-                        break;
-                    case CoordinateFormat.NORMALIZED_8_BITS:
-                        pmo.textureCoordinates.Add((float)stream.ReadByte() / 127.0f);
-                        pmo.textureCoordinates.Add((float)stream.ReadByte() / 127.0f);
-                        break;
-                    case CoordinateFormat.NORMALIZED_16_BITS:
-                        pmo.textureCoordinates.Add((float)stream.ReadUInt16() / 32767.0f);
-                        pmo.textureCoordinates.Add((float)stream.ReadUInt16() / 32767.0f);
-                        break;
-                    case CoordinateFormat.FLOAT_32_BITS:
-                        pmo.textureCoordinates.Add(stream.ReadFloat());
-                        pmo.textureCoordinates.Add(stream.ReadFloat());
-                        break;
+                    stream.Seek(remainder, SeekOrigin.Current);
                 }
 
-                switch (VertexPositionFormat)
-                {
-                    case CoordinateFormat.NO_VERTEX:
-                        break;
-                    case CoordinateFormat.NORMALIZED_8_BITS:
-                        pmo.vertices.Add((float)Convert.ToSByte(stream.ReadByte()) / 127.0f);
-                        pmo.vertices.Add((float)Convert.ToSByte(stream.ReadByte()) / 127.0f);
-                        pmo.vertices.Add((float)Convert.ToSByte(stream.ReadByte()) / 127.0f);
-                        break;
-                    case CoordinateFormat.NORMALIZED_16_BITS:
-                        pmo.vertices.Add((float)stream.ReadInt16() / 32767.0f);
-                        pmo.vertices.Add((float)stream.ReadInt16() / 32767.0f);
-                        pmo.vertices.Add((float)stream.ReadInt16() / 32767.0f);
-                        break;
-                    case CoordinateFormat.FLOAT_32_BITS:
-                        pmo.vertices.Add(stream.ReadFloat());
-                        pmo.vertices.Add(stream.ReadFloat());
-                        pmo.vertices.Add(stream.ReadFloat());
-                        break;
-                }
+                VertCnt = meshSec.VertexCount;
             }
 
             // Read textures.
-            for(int i = 0; i < pmo.textureInfo.Length; i++)
+            for (int i = 0; i < pmo.textureInfo.Length; i++)
             {
                 stream.Seek(pmo.textureInfo[i].TextureOffset + 0x10, SeekOrigin.Begin);
                 uint tm2size = stream.ReadUInt32() + 0x10;
@@ -252,6 +363,15 @@ namespace OpenKh.Bbs
                 TextureBuffer = stream.ReadBytes((int)tm2size);
 
                 pmo.Textures.Add(TextureBuffer);
+            }
+
+            // Read Skeleton.
+            stream.Seek(pmo.header.SkeletonOffset, SeekOrigin.Begin);
+            pmo.skeletonHeader = BinaryMapping.ReadObject<SkeletonHeader>(stream);
+            pmo.jointList = new JointData[pmo.skeletonHeader.JointCount];
+            for(int j = 0; j < pmo.skeletonHeader.JointCount; j++)
+            {
+                pmo.jointList[j] = BinaryMapping.ReadObject<JointData>(stream);
             }
 
             return pmo;

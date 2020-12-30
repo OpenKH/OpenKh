@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Bbs;
 using System.IO;
 using Xunit;
@@ -32,8 +32,14 @@ namespace OpenKh.Tests.Bbs
         public void ReadCorrectMeshGroup() => File.OpenRead(FileName).Using(stream =>
         {
             var TestPmo = Pmo.Read(stream);
-            Assert.True(TestPmo.meshSection[0].VertexCount == 585);
-            Assert.True(TestPmo.meshSection[0].TriangleStripCount == 0);
+
+            // mesh header 1
+            Assert.Equal("585", TestPmo.meshSection[0].VertexCount.ToString());
+            Assert.Equal("0", TestPmo.meshSection[0].TriangleStripCount.ToString());
+
+            // mesh header 2
+            Assert.Equal("141", TestPmo.meshSection[1].VertexCount.ToString());
+            Assert.Equal("0", TestPmo.meshSection[1].TriangleStripCount.ToString());
         });
 
         [Fact]
@@ -60,6 +66,22 @@ namespace OpenKh.Tests.Bbs
             }
 
             Assert.True(hasTriangleStrips);
+        });
+
+        [Fact]
+        public void ReadBoneHeader() => File.OpenRead(FileName).Using(stream =>
+        {
+            var TestPmo = Pmo.Read(stream);
+            Assert.Equal((uint)0x4e4f42, TestPmo.skeletonHeader.MagicValue);
+            Assert.Equal((uint)0x35, TestPmo.skeletonHeader.JointCount);
+        });
+
+        [Fact]
+        public void ReadJoints() => File.OpenRead(FileName).Using(stream =>
+        {
+            var TestPmo = Pmo.Read(stream);
+            Assert.Equal("Root", TestPmo.jointList[0].JointName);
+            Assert.Equal(0x1, TestPmo.jointList[1].JointIndex);
         });
     }
 }
