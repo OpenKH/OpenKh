@@ -28,7 +28,6 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private RenderingMessageContext textContext;
         private bool _showErrors;
 
-        public RelayCommand HandleReturn { get; }
         public RelayCommand HandleAddition { get; }
         public RelayCommand HandleRemoval { get; }
         public RelayCommand HandleComm { get; }
@@ -140,11 +139,6 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             Drawing = new SpriteDrawingDirect3D();
             CurrentMessageEncoder = Encoders.InternationalSystem;
             _messages = new MessagesModel(this, this, new Msg.Entry[] { });
-
-            HandleReturn = new RelayCommand(x =>
-            {
-                Text += "{:newline}";                
-            });
 
             HandleRemoval = new RelayCommand(x =>
             {

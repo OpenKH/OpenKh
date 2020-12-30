@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2.Messages;
+using OpenKh.Kh2.Messages;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -7,6 +7,14 @@ namespace OpenKh.Tests.kh2
 {
     public class MsgEncoderTests
     {
+        public enum EncoderType
+        {
+            InternationalSystem,
+            JapaneseEvent,
+            JapaneseSystem,
+            TurkishSystem
+        };
+
         [Fact]
         public void DecodeTextCorrectly()
         {
@@ -69,7 +77,6 @@ namespace OpenKh.Tests.kh2
         }
 
         [Theory]
-        [InlineData(0x02, "0123456789")]
         [InlineData(0x03, "0123456789")]
         [InlineData(0x04, "123456789")]
         [InlineData(0x05, "6789")]
@@ -253,6 +260,52 @@ namespace OpenKh.Tests.kh2
                 Assert.Equal(new byte[] { command }, encoded);
             else
                 Assert.Equal(new byte[] { command, data }, encoded);
+        }
+
+        [Theory]
+        [InlineData(EncoderType.InternationalSystem)]
+        [InlineData(EncoderType.JapaneseEvent)]
+        [InlineData(EncoderType.JapaneseSystem)]
+        [InlineData(EncoderType.TurkishSystem)]
+        public void EncodeNewLineCharacterCorrectly(EncoderType encoderType)
+        {
+            var encoder = new IMessageEncode[]
+            {
+                Encoders.InternationalSystem,
+                Encoders.JapaneseEvent,
+                Encoders.JapaneseSystem,
+                Encoders.TurkishSystem
+            }[(int)encoderType];
+
+            var encoded = encoder.Encode(new List<MessageCommandModel>
+            {
+                new MessageCommandModel
+                {
+                    Command = MessageCommand.PrintText,
+                    Text = "HE\nLLO",
+                }
+            });
+            Assert.Equal(new byte[] { 0x35, 0x32, 0x02, 0x39, 0x39, 0x3C }, encoded);
+        }
+
+        [Theory]
+        [InlineData(EncoderType.InternationalSystem)]
+        [InlineData(EncoderType.JapaneseEvent)]
+        [InlineData(EncoderType.JapaneseSystem)]
+        [InlineData(EncoderType.TurkishSystem)]
+        public void DecodeNewLineCharacterCorrectly(EncoderType encoderType)
+        {
+            var decoder = new IMessageDecode[]
+            {
+                Encoders.InternationalSystem,
+                Encoders.JapaneseEvent,
+                Encoders.JapaneseSystem,
+                Encoders.TurkishSystem
+            }[(int)encoderType];
+
+            var models = decoder.Decode(new byte[] { 0x35, 0x32, 0x02, 0x39, 0x39, 0x3C });
+            Assert.Single(models);
+            Assert.Equal("HE\nLLO", models[0].Text);
         }
 
         [Theory]

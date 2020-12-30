@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Kh2.Messages
+namespace OpenKh.Kh2.Messages
 {
     public enum MessageCommand
     {
@@ -6,7 +6,6 @@
         PrintText,
         PrintComplex,
         Tabulation,
-        NewLine,
         Reset,
         Theme,
         Unknown05,

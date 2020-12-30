@@ -11,7 +11,7 @@ namespace OpenKh.Kh2.Messages.Internals
         {
             [0x00] = new SimpleCmdModel(MessageCommand.End),
             [0x01] = new TextCmdModel(' '),
-            [0x02] = new SimpleCmdModel(MessageCommand.NewLine),
+            [0x02] = new TextCmdModel('\n'),
             [0x03] = new SimpleCmdModel(MessageCommand.Reset),
             [0x04] = new SingleDataCmdModel(MessageCommand.Theme),
             [0x05] = new DataCmdModel(MessageCommand.Unknown05, 6),
