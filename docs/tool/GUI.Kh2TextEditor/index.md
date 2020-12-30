@@ -44,7 +44,6 @@ For now, let's list all the primary functions you will be likely to use, their t
 
 | Type | Human-Readable Format 	| Description
 |------|------------------------|------------------------
-| 02   | {:newline}             | Feeds a new line to the current selected text string. This argument becomes invisible upon reopening the string, but that is intended; it is still working.
 | 03   | {:reset}               | Resets all text afterwards to be argument-less.
 | 07   | {:color #RRGGBBAA}     | Forces all text after this argument to appear as the specified color in Hex. An AA value higher than 80 (default) will make your text appear bold, while values lower than 80 will make it appear less bold. The default color value for most text in the game is #F0F0F080.
 | 09   | {:icon icon-name}      | Displays the named icon within the text string. A list of all icons resides at the end of this document.
@@ -71,7 +70,7 @@ Let's test some more arguments for various texts in our sys.bar.
 | 482         | Items                                  | {:width 64}{:color 219542FF}Consumables
 | 483         | Drive                                  | {:width 50}{:color 218995FF}Transformations
 | 14133       | Kingdom Hearts                         | {:icon form}{:color D3D971FF}Classic Menu{:icon form}
-| 14135       | Keep the look of the original command menu. | {:scale 24}{:color D3D971FF}Use this if you prefer the classic{:newline}Command Menu.
+| 14135       | Keep the look of the original command menu. | {:scale 24}{:color D3D971FF}Use this if you prefer the classic Command Menu.
 
 <img src="./images/image03.png" width="640">
 
