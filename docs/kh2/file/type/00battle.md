@@ -481,7 +481,11 @@ Data on summons.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 00     | 2B[7] | ???
+| 0     | 2B | ???
+| 2     | ushort | Item
+| 4     | uint | Entity Spawned 1
+| 8     | uint | Entity Spawned 2
+| 12     | 2B | ???
 | 14     | 50B | Padding
 
 ## Magc
