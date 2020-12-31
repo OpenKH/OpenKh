@@ -482,9 +482,9 @@ Data on summons.
 | Offset | Type  | Description
 |--------|-------|--------------
 | 0     | 2B | ???
-| 2     | ushort | Item
-| 4     | uint | Entity Spawned 1
-| 8     | uint | Entity Spawned 2
+| 2     | ushort | Item - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 4     | uint | Entity Spawned 1 - [OBJ LIST](../../dictionary/obj.md)
+| 8     | uint | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
 | 12     | 2B | ???
 | 14     | 50B | Padding
 
