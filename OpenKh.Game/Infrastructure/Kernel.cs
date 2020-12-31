@@ -206,28 +206,47 @@ namespace OpenKh.Game.Infrastructure
             const int ACTOR_SORA = 0x23B;
             const int ACTOR_SORA_H = 0x23C;
 
-            switch (objectId)
+            if (IsFinalMix)
             {
-                case PLAYER:
-                case ACTOR_SORA:
-                    return GetRealObjectId(objectId, Member.Sora);
-                case FRIEND_1:
-                    return GetRealObjectId(objectId, Member.Donald);
-                case FRIEND_2:
-                    return GetRealObjectId(objectId, Member.Goofy);
-                case ACTOR_SORA_H:
-                    return GetRealObjectId(objectId, Member.SoraHighPoly);
-                default:
-                    return objectId;
+                switch (objectId)
+                {
+                    case PLAYER:
+                    case ACTOR_SORA:
+                        return GetRealObjectId(objectId, (int)MemberFinalMix.Sora);
+                    case FRIEND_1:
+                        return GetRealObjectId(objectId, (int)MemberFinalMix.Donald);
+                    case FRIEND_2:
+                        return GetRealObjectId(objectId, (int)MemberFinalMix.Goofy);
+                    case ACTOR_SORA_H:
+                        return GetRealObjectId(objectId, (int)MemberFinalMix.SoraHighPoly);
+                    default:
+                        return objectId;
+                }
+            }
+            else
+            {
+                switch (objectId)
+                {
+                    case PLAYER:
+                    case ACTOR_SORA:
+                        return GetRealObjectId(objectId, (int)MemberVanilla.Sora);
+                    case FRIEND_1:
+                        return GetRealObjectId(objectId, (int)MemberVanilla.Donald);
+                    case FRIEND_2:
+                        return GetRealObjectId(objectId, (int)MemberVanilla.Goofy);
+                    case ACTOR_SORA_H:
+                        return GetRealObjectId(objectId, (int)MemberVanilla.SoraHighPoly);
+                    default:
+                        return objectId;
+                }
             }
         }
 
-        private int GetRealObjectId(int objectId, Member member)
+        private int GetRealObjectId(int objectId, int memberIndex)
         {
             if ((MemberTable?.Entries?.Count ?? 0) == 0)
                 return objectId;
 
-            var memberIndex = (int)member;
             var defaultMemberTableEntry = MemberTable.Entries[0];
             var memberTableEntry = MemberTable.Entries
                 .FirstOrDefault(x => x.WorldId == World);

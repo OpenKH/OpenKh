@@ -53,16 +53,23 @@ namespace OpenKh.Tests.kh2
 
         public class MemtTests
         {
-            [Fact]
-            public void Read() => File.OpenRead(@"kh2/res/memt.bin").Using(stream =>
+            private const string MemtVanilla = @"kh2/res/memt_eu.bin";
+            private const string MemtFinalMix = @"kh2/res/memt_fm.bin";
+
+            [Theory]
+            [InlineData(MemtVanilla)]
+            [InlineData(MemtFinalMix)]
+            public void Read(string fileName) => File.OpenRead(fileName).Using(stream =>
             {
                 var table = Memt.Read(stream);
                 Assert.Equal(0x5, table.Entries.Count);
                 Assert.Equal(0x7, table.MemberIndexCollection.Length);
             });
 
-            [Fact]
-            public void Write() => File.OpenRead("kh2/res/memt.bin").Using(stream =>
+            [Theory]
+            [InlineData(MemtVanilla)]
+            [InlineData(MemtFinalMix)]
+            public void Write(string fileName) => File.OpenRead(fileName).Using(stream =>
             {
                 Helpers.AssertStream(stream, x =>
                 {

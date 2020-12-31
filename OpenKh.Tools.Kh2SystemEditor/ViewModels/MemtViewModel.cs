@@ -15,15 +15,33 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
     {
         public class Entry : BaseNotifyPropertyChanged
         {
-            private readonly Memt.Entry _entry;
-            private readonly IObjectProvider _objectProvider;
+            private readonly int[] MemberLookupVanilla =
+            {
+                0, 1, 2, 3, 4, 5, -1, 6, 7, 8, 9, 10, 11, 12, -1, 13, 14, 15
+            };
+            private readonly int[] MemberLookupFinalMix =
+            {
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+            };
 
-            internal Entry(Memt.Entry entry, IObjectProvider objectProvider)
+            private readonly Memt.IEntry _entry;
+            private readonly IObjectProvider _objectProvider;
+            private readonly int[] _memberLookup;
+
+            internal Entry(Memt.IEntry entry, IObjectProvider objectProvider)
             {
                 _entry = entry;
                 _objectProvider = objectProvider;
+                _memberLookup = entry switch
+                {
+                    Memt.EntryVanilla _ => MemberLookupVanilla,
+                    Memt.EntryFinalMix _ => MemberLookupFinalMix,
+                    _ => MemberLookupFinalMix,
+                };
+
                 Worlds = new Kh2WorldsList();
                 Worlds.First().Name = "Ignore";
+                MemberEditEnabled = _memberLookup.Select(x => x >= 0).ToArray();
             }
 
             public string Title => WorldId == World.WorldZz ? "For any world" :
@@ -31,6 +49,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
             public Kh2WorldsList Worlds { get; }
             public IEnumerable<ObjectModel> Objects => _objectProvider.Objects;
+            public bool[] MemberEditEnabled { get; }
 
             public World WorldId
             {
@@ -72,16 +91,51 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                 get => _entry.CheckStoryFlagNegation & 0x3ff;
                 set => _entry.CheckStoryFlagNegation = (short)((_entry.CheckStoryFlag & ~0x3FF) | (value & 0x3ff));
             }
+
+            public short PLAYER { get => GetMember(0); set => SetMember(0, value); }
+            public short FRIEND_1 { get => GetMember(1); set => SetMember(1, value); }
+            public short FRIEND_2 { get => GetMember(2); set => SetMember(2, value); }
+            public short FRIEND_W { get => GetMember(3); set => SetMember(3, value); }
+            public short PLAYER_BTLF { get => GetMember(4); set => SetMember(4, value); }
+            public short PLAYER_MAGF { get => GetMember(5); set => SetMember(5, value); }
+            public short PLAYER_KH1F { get => GetMember(6); set => SetMember(6, value); }
+            public short PLAYER_TRIF { get => GetMember(7); set => SetMember(7, value); }
+            public short PLAYER_ULTF { get => GetMember(8); set => SetMember(8, value); }
+            public short PLAYER_HTLF { get => GetMember(9); set => SetMember(9, value); }
+            public short MICKEY { get => GetMember(10); set => SetMember(10, value); }
+            public short PLAYER_H { get => GetMember(11); set => SetMember(11, value); }
+            public short PLAYER_H_BTLF { get => GetMember(12); set => SetMember(12, value); }
+            public short PLAYER_H_MAGF { get => GetMember(13); set => SetMember(13, value); }
+            public short PLAYER_H_KH1F { get => GetMember(14); set => SetMember(14, value); }
+            public short PLAYER_H_TRIF { get => GetMember(15); set => SetMember(15, value); }
+            public short PLAYER_H_ULTF { get => GetMember(16); set => SetMember(16, value); }
+            public short PLAYER_H_HTLF { get => GetMember(17); set => SetMember(17, value); }
+
+            private short GetMember(int index)
+            {
+                var actualIndex = _memberLookup[index];
+                if (actualIndex == -1)
+                    return -1;
+                return Members[actualIndex];
+            }
+
+            private void SetMember(int index, short value)
+            {
+                var actualIndex = _memberLookup[index];
+                if (actualIndex == -1)
+                    return;
+                Members[actualIndex] = value;
+            }
         }
 
         private readonly Memt _memberTable;
-        private readonly List<Memt.Entry> _entries = new List<Memt.Entry>();
+        private readonly List<Memt.IEntry> _entries = new List<Memt.IEntry>();
         private readonly IObjectProvider _objectProvider;
         private const string _entryName = "memt";
 
         public string EntryName => _entryName;
 
-        public IEnumerable<Memt.Entry> Members => _entries;
+        public IEnumerable<Memt.IEntry> Members => _entries;
 
         public MemtViewModel(IObjectProvider objectProvider) :
             this(objectProvider, new Memt())
@@ -98,10 +152,20 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             _memberTable = memberTable;
         }
 
-        protected override Entry OnNewItem() => new Entry(new Memt.Entry
+        protected override Entry OnNewItem()
         {
-            Members = new short[18]
-        }, _objectProvider);
+            var item = _entries.FirstOrDefault();
+            if (item is Memt.EntryVanilla)
+                return new Entry(new Memt.EntryVanilla
+                {
+                    Members = new short[Memt.MemberCountVanilla]
+                }, _objectProvider);
+            else
+                return new Entry(new Memt.EntryFinalMix
+                {
+                    Members = new short[Memt.MemberCountFinalMix]
+                }, _objectProvider);
+        }
 
         public Stream CreateStream()
         {
