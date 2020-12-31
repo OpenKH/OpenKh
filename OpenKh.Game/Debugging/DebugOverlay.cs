@@ -147,7 +147,8 @@ namespace OpenKh.Game.Debugging
             {
                 new MessageCommandModel()
                 {
-                    Command = MessageCommand.NewLine,
+                    Command = MessageCommand.PrintText,
+                    Text = "\n"
                 }
             }));
         }

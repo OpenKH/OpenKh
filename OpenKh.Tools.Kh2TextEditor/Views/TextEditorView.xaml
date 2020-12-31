@@ -79,6 +79,7 @@
             <TextBox
                 x:Name="textInputField"
                 Grid.Row="0"
+                AcceptsReturn="True"
                 MaxLines="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
                 Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}">
                 <TextBox.ContextMenu>
@@ -165,9 +166,6 @@
                         </MenuItem>
                     </ContextMenu>
                 </TextBox.ContextMenu>
-                <TextBox.InputBindings>
-                    <KeyBinding Key="Return" Command="{Binding HandleReturn}" />
-                </TextBox.InputBindings>
             </TextBox>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">

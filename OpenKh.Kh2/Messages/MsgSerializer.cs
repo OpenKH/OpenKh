@@ -44,11 +44,6 @@ namespace OpenKh.Kh2.Messages
             },
             new SerializerModel
             {
-                Name = "newline",
-                Command = MessageCommand.NewLine,
-            },
-            new SerializerModel
-            {
                 Name = "reset",
                 Command = MessageCommand.Reset,
             },

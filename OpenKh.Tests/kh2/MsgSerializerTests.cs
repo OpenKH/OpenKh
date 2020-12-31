@@ -1,4 +1,4 @@
-﻿using OpenKh.Common.Exceptions;
+using OpenKh.Common.Exceptions;
 using OpenKh.Kh2.Messages;
 using System.IO;
 using System.Linq;
@@ -43,12 +43,7 @@ namespace OpenKh.Tests.kh2
                 new MessageCommandModel
                 {
                     Command = MessageCommand.PrintText,
-                    Text = " complex!"
-                },
-                new MessageCommandModel
-                {
-                    Command = MessageCommand.NewLine,
-                    Text = " complex!"
+                    Text = " complex!\n"
                 },
             };
 
@@ -181,10 +176,7 @@ namespace OpenKh.Tests.kh2
         {
             var commands = MsgSerializer.DeserializeText("hello\nworld!").ToArray();
             Assert.Equal(MessageCommand.PrintText, commands[0].Command);
-            Assert.Equal("hello", commands[0].Text);
-            Assert.Equal(MessageCommand.NewLine, commands[1].Command);
-            Assert.Equal(MessageCommand.PrintText, commands[2].Command);
-            Assert.Equal("world!", commands[2].Text);
+            Assert.Equal("hello\nworld!", commands[0].Text);
         }
 
         [Fact]

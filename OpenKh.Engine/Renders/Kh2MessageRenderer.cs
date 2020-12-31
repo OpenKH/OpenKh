@@ -119,8 +119,6 @@ namespace OpenKh.Engine.Renders
                 context.Scale = command.TextScale;
             else if (command.Command == MessageCommand.Tabulation)
                 context.x += 16; // TODO this is not the real tabulation size
-            else if (command.Command == MessageCommand.NewLine)
-                context.NewLine(_msgContext.FontHeight);
 
             context.Width = Math.Max(context.Width, context.x);
             context.Height = Math.Max(context.Height, context.y + _msgContext.FontHeight * context.Scale);
@@ -171,6 +169,11 @@ namespace OpenKh.Engine.Renders
                 else if (ch == 1)
                 {
                     spacing = 6;
+                }
+                else if (ch == 2)
+                {
+                    context.NewLine(_msgContext.FontHeight);
+                    spacing = 0;
                 }
                 else
                 {
