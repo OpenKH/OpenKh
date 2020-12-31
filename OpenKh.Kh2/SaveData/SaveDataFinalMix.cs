@@ -16,6 +16,7 @@
 using OpenKh.Common;
 using System;
 using System.IO;
+using System.Linq;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.SaveData
@@ -102,9 +103,9 @@ namespace OpenKh.Kh2.SaveData
         [Data(0x4274)] public bool NewStatusSummonPeterPan { get; set; }
         [Data(0x4275)] public bool NewStatusSummonChickenLittle { get; set; }
 
-        IPlaceScript[] ISaveData.PlaceScripts => Array.ConvertAll(PlaceScripts, x => (IPlaceScript)x);
-        ICharacter[] ISaveData.Characters => Array.ConvertAll(Characters, x => (ICharacter)x);
-        IDriveForm[] ISaveData.DriveForms => Array.ConvertAll(DriveForms, x => (IDriveForm)x);
+        IPlaceScript[] ISaveData.PlaceScripts => PlaceScripts?.Cast<IPlaceScript>().ToArray() ?? new IPlaceScript[0];
+        ICharacter[] ISaveData.Characters => Characters?.Cast<ICharacter>().ToArray() ?? new ICharacter[0];
+        IDriveForm[] ISaveData.DriveForms => DriveForms?.Cast<IDriveForm>().ToArray() ?? new IDriveForm[0];
 
         public void Write(Stream stream) =>
             BinaryMapping.WriteObject(stream.FromBegin(), this);
