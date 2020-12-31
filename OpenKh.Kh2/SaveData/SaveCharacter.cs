@@ -77,11 +77,9 @@ namespace OpenKh.Kh2.SaveData
         [Data(Count = 8)] public short[] Accessories { get; set; }
         [Data(Count = 8)] public short[] Items { get; set; }
         [Data(Count = 8)] public short[] ItemAutoReload { get; set; }
-
-        [Data(0x54, Count = 0x28)] public ushort[] Abilities { get; set; }
-
-        [Data(0xd4)] public byte BattleStyle { get; set; }
-        [Data(0xdc)] public byte AbilityStyle1 { get; set; }
+        [Data(0x54, Count = 0x30)] public ushort[] Abilities { get; set; }
+        [Data] public byte BattleStyle { get; set; }
+        [Data] public byte AbilityStyle1 { get; set; }
         [Data] public byte AbilityStyle2 { get; set; }
         [Data] public byte AbilityStyle3 { get; set; }
         [Data] public byte AbilityStyle4 { get; set; }
@@ -113,11 +111,9 @@ namespace OpenKh.Kh2.SaveData
         [Data(Count = 8)] public short[] Accessories { get; set; }
         [Data(Count = 8)] public short[] Items { get; set; }
         [Data(Count = 8)] public short[] ItemAutoReload { get; set; }
-
-        [Data(0x54, Count = 0x48)] public ushort[] Abilities { get; set; }
-
-        [Data(0xf4)] public byte BattleStyle { get; set; }
-        [Data(0xfc)] public byte AbilityStyle1 { get; set; }
+        [Data(0x54, Count = 0x50)] public ushort[] Abilities { get; set; }
+        [Data] public byte BattleStyle { get; set; }
+        [Data] public byte AbilityStyle1 { get; set; }
         [Data] public byte AbilityStyle2 { get; set; }
         [Data] public byte AbilityStyle3 { get; set; }
         [Data] public byte AbilityStyle4 { get; set; }
