@@ -97,5 +97,61 @@ namespace OpenKh.Tests
 
         public static void Dump(this byte[] data, string path) =>
             new MemoryStream(data).Using(x => x.Dump(path));
+
+        public static T CreateDummyObject<T>()
+            where T : class
+        {
+            var dummyByte = (byte)12;
+            var dummyShort = (short)123;
+            var dummyInt = 1234;
+            var dummyFloat = 12.5f;
+            var dummyString = "dumy";
+
+            var instance = Activator.CreateInstance<T>();
+            foreach (var property in typeof(T).GetProperties())
+            {
+                var propType = property.PropertyType;
+                if (propType == typeof(byte))
+                {
+                    property.SetValue(instance, dummyByte);
+                    dummyByte *= 2;
+                }
+                else if (propType == typeof(short))
+                {
+                    property.SetValue(instance, dummyShort);
+                    dummyShort *= 2;
+                }
+                else if (propType == typeof(ushort))
+                {
+                    property.SetValue(instance, (ushort)dummyShort);
+                    dummyShort *= 2;
+                }
+                else if (propType == typeof(int))
+                {
+                    property.SetValue(instance, dummyInt);
+                    dummyInt *= 2;
+                }
+                else if (propType == typeof(uint))
+                {
+                    property.SetValue(instance, dummyInt);
+                    dummyInt *= 2;
+                }
+                else if (propType == typeof(float))
+                {
+                    property.SetValue(instance, dummyFloat);
+                    dummyFloat *= 2;
+                }
+                else if (propType == typeof(string))
+                {
+                    property.SetValue(instance, dummyString);
+                    dummyString += dummyString;
+                }
+                else
+                    throw new NotImplementedException(
+                        $"Type {propType.FullName} can not be mocked.");
+            }
+
+            return instance;
+        }
     }
 }

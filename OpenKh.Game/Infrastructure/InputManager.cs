@@ -36,6 +36,7 @@ namespace OpenKh.Game.Infrastructure
         public bool S => _devices.Any(x => x.LeftStickDown);
         public bool A => _devices.Any(x => x.LeftStickLeft);
         public bool D => _devices.Any(x => x.LeftStickRight);
+        public bool LeftTrigger => _devices.Any(x => x.LeftTrigger);
         public bool RightTrigger => _devices.Any(x => x.RightTrigger);
 
         public InputManager()

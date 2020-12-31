@@ -1,6 +1,7 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -13,13 +14,19 @@ namespace OpenKh.Engine.Motion
         private int _slotIndex;
         private Kh2.Motion _motion;
 
+        public Kh2MotionEngine()
+        {
+            _binarc = null;
+            _animationIndex = -1;
+        }
+
         public Kh2MotionEngine(Bar binarc)
         {
             _binarc = binarc;
             _animationIndex = -1;
         }
 
-        public int AnimationCount => _binarc.Count;
+        public int AnimationCount => _binarc?.Count ?? 0;
 
         public int CurrentAnimationIndex
         {
@@ -27,6 +34,12 @@ namespace OpenKh.Engine.Motion
             set
             {
                 _animationIndex = value;
+                if (_binarc == null)
+                {
+                    Console.Error.WriteLine($"Does not have a MSET.");
+                    return;
+                }
+
                 _slotIndex = _binarc.Motionset == Bar.MotionsetType.Default ? _animationIndex :
                     MotionSet.GetMotionSetIndex(_binarc, (MotionSet.MotionName)_animationIndex, false, false);
                 if (_slotIndex >= 0 && _binarc[_slotIndex].Stream.Length > 0)
@@ -81,8 +94,8 @@ namespace OpenKh.Engine.Motion
 
         public static void ApplyInterpolatedMotion(IModelMotion model, Kh2.Motion.InterpolatedMotion motion, float time)
         {
-            var absoluteFrame = (int)Math.Floor(30.0f * time);
-            var actualFrame = absoluteFrame % motion.FrameEnd * 2;
+            var absoluteFrame = (float)Math.Floor(60.0f * time);
+            var actualFrame = (int)Loop(motion.FrameCount * 2, motion.FrameEnd * 2, absoluteFrame);
 
             var boneList = model.Bones;
             var matrices = new Matrix4x4[boneList.Count];
@@ -131,63 +144,52 @@ namespace OpenKh.Engine.Motion
 
             foreach (var animation in motion.ModelBoneAnimation)
             {
-                for (var i = animation.TimelineCount - 1; i >= 0; i--)
+                // Check if it would be better to use a linear or binary search
+                if (true || animation.TimelineCount < 4)
                 {
-                    var timeline = motion.Timeline[animation.TimelineStartIndex + i];
-
-                    if (actualFrame >= timeline.KeyFrame)
+                    for (var index = animation.TimelineCount - 1; index >= 0; index--)
                     {
-                        Kh2.Motion.TimelineTable nextTimeline;
-                        if (i < animation.TimelineCount - 1)
-                            nextTimeline = motion.Timeline[animation.TimelineStartIndex + i + 1];
+
+                        if (actualFrame >= motion.Timeline[animation.TimelineStartIndex + index].KeyFrame)
+                        {
+                            PerformInterpolation(motion.Timeline, animation, sourceTranslations, sourceRotations, actualFrame, index);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // If there are two keyframes, just interpolate between 0 and 1
+                    if (animation.TimelineCount < 3)
+                    {
+                        PerformInterpolation(motion.Timeline, animation, sourceTranslations, sourceRotations, actualFrame, 0);
+                        continue;
+                    }
+
+                    var left = 0;
+                    var right = animation.TimelineCount - 1;
+                    while (true)
+                    {
+                        var mid = (left + right) / 2;
+                        var keyFrame = motion.Timeline[animation.TimelineStartIndex + mid].KeyFrame;
+                        if (actualFrame >= keyFrame)
+                        {
+                            if (actualFrame <= keyFrame)
+                            {
+                                PerformInterpolation(motion.Timeline, animation, sourceTranslations, sourceRotations, actualFrame, mid);
+                                break;
+                            }
+
+                            left = mid;
+                        }
                         else
-                            nextTimeline = motion.Timeline[animation.TimelineStartIndex];
+                            right = mid;
 
-                        var timeDiff = nextTimeline.KeyFrame - timeline.KeyFrame;
-                        var n = (actualFrame - timeline.KeyFrame) / timeDiff;
-                        float value;
-                        switch (timeline.Interpolation)
+                        if (right - left <= 1)
                         {
-                            case Kh2.Motion.Interpolation.Nearest:
-                                value = timeline.Value;
-                                break;
-                            case Kh2.Motion.Interpolation.Linear:
-                                value = Lerp(timeline.Value, nextTimeline.Value, n);
-                                break;
-                            case Kh2.Motion.Interpolation.Hermite:
-                                value = CubicHermite(n, timeline.Value, nextTimeline.Value,
-                                    timeline.TangentEaseIn, timeline.TangentEaseOut);
-                                break;
-                            case Kh2.Motion.Interpolation.Zero:
-                                value = 0; // EVIL!!1!
-                                break;
-                            default:
-                                value = timeline.Value;
-                                break;
+                            PerformInterpolation(motion.Timeline, animation, sourceTranslations, sourceRotations, actualFrame, right - 1);
+                            break;
                         }
-
-                        switch (animation.Channel)
-                        {
-                            case 3:
-                                sourceRotations[animation.JointIndex].X = value;
-                                break;
-                            case 4:
-                                sourceRotations[animation.JointIndex].Y = value;
-                                break;
-                            case 5:
-                                sourceRotations[animation.JointIndex].Z = value;
-                                break;
-                            case 6:
-                                sourceTranslations[animation.JointIndex].X = value;
-                                break;
-                            case 7:
-                                sourceTranslations[animation.JointIndex].Y = value;
-                                break;
-                            case 8:
-                                sourceTranslations[animation.JointIndex].Z = value;
-                                break;
-                        }
-                        break;
                     }
                 }
             }
@@ -230,16 +232,78 @@ namespace OpenKh.Engine.Motion
             model.ApplyMotion(matrices);
         }
 
-        private static float Lerp(float firstFloat, float secondFloat, float by)
+        private static void PerformInterpolation(
+            IList<Kh2.Motion.TimelineTable> timelines,
+            Kh2.Motion.BoneAnimationTable animation,
+            Vector3[] sourceTranslations,
+            Quaternion[] sourceRotations,
+            int actualFrame,
+            int currentIndex)
         {
-            return firstFloat * (1 - by) + secondFloat * by;
+            var left = timelines[animation.TimelineStartIndex + currentIndex];
+            var right = currentIndex < animation.TimelineCount - 1
+                ? timelines[animation.TimelineStartIndex + currentIndex + 1]
+                : timelines[animation.TimelineStartIndex];
+
+            var timeDiff = right.KeyFrame - left.KeyFrame;
+            var n = (actualFrame - left.KeyFrame) / timeDiff;
+            float value;
+            switch (left.Interpolation)
+            {
+                case Kh2.Motion.Interpolation.Nearest:
+                    value = left.Value;
+                    break;
+                case Kh2.Motion.Interpolation.Linear:
+                    value = MathEx.Lerp(left.Value, right.Value, n);
+                    break;
+                case Kh2.Motion.Interpolation.Hermite:
+                case Kh2.Motion.Interpolation.Hermite3: // Unknown why (and where) it is used
+                case Kh2.Motion.Interpolation.Hermite4: // Unknown why (and where) it is used
+                    value = MathEx.CubicHermite(
+                        n, left.Value, right.Value,
+                        left.TangentEaseIn, left.TangentEaseOut);
+                    break;
+                default:
+                    value = 0;
+                    break;
+            }
+
+            switch (animation.Channel)
+            {
+                case 3:
+                    sourceRotations[animation.JointIndex].X = value;
+                    break;
+                case 4:
+                    sourceRotations[animation.JointIndex].Y = value;
+                    break;
+                case 5:
+                    sourceRotations[animation.JointIndex].Z = value;
+                    break;
+                case 6:
+                    sourceTranslations[animation.JointIndex].X = value;
+                    break;
+                case 7:
+                    sourceTranslations[animation.JointIndex].Y = value;
+                    break;
+                case 8:
+                    sourceTranslations[animation.JointIndex].Z = value;
+                    break;
+            }
         }
 
-        private static float CubicHermite(float t, float p0, float p1, float m0, float m1)
+        public void UseCustomMotion(Kh2.Motion motion) => _motion = motion;
+
+        private static float Loop(float min, float max, float val)
         {
-            var t2 = t * t;
-            var t3 = t2 * t;
-            return (2 * t3 - 3 * t2 + 1) * p0 + (t3 - 2 * t2 + t) * m0 + (-2 * t3 + 3 * t2) * p1 + (t3 - t2) * m1;
+            if (val < max)
+                return val;
+            if (max <= min)
+                return min;
+
+            var mod = (val - min) % (max - min);
+            if (mod < 0)
+                mod += max - min;
+            return min + mod;
         }
     }
 }

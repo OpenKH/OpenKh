@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Motion;
@@ -12,7 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using OpenKh.Engine.Parsers;
-using OpenKh.Kh2.SystemData;
+using OpenKh.Engine;
+using System.Numerics;
 
 namespace OpenKh.Game.Entities
 {
@@ -40,9 +40,11 @@ namespace OpenKh.Game.Entities
 
         public Kh2MotionEngine Motion { get; set; }
 
-        public List<MeshDescriptor> MeshDescriptors => Model.MeshDescriptors;
+        public List<MeshDescriptor> MeshDescriptors => Model?.MeshDescriptors;
 
         public IKingdomTexture[] Textures { get; private set; }
+
+        public bool IsVisible { get; set; } = true;
 
         public Vector3 Position { get; set; }
 
@@ -51,6 +53,8 @@ namespace OpenKh.Game.Entities
         public Vector3 Scaling { get; set; }
 
         public float Time { get; set; }
+
+        public float MotionTime { get; set; }
 
         public void LoadMesh(GraphicsDevice graphics)
         {
@@ -83,7 +87,7 @@ namespace OpenKh.Game.Entities
                 }
                 else
                 {
-                    Motion = null;
+                    Motion = new Kh2MotionEngine();
                     Log.Warn($"MSET {objEntry.AnimationName} does not exist");
                 }
             }
@@ -96,7 +100,14 @@ namespace OpenKh.Game.Entities
         public void Update(float deltaTime)
         {
             Time += deltaTime;
-            Motion?.ApplyMotion(Model, Time);
+            MotionTime += deltaTime;
+            Motion?.ApplyMotion(Model, MotionTime);
+        }
+
+        public void SetMotion(Motion motion)
+        {
+            MotionTime = 0;
+            Motion?.UseCustomMotion(motion);
         }
 
         public static MeshGroup FromFbx(GraphicsDevice graphics, string filePath)

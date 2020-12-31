@@ -9,6 +9,7 @@ namespace OpenKh.Engine.MonoGame
         private float _nearClipPlane;
         private float _farClipPlane;
         private Vector3 _cameraPosition;
+        private Vector3 _cameraLookAt;
         private Vector3 _cameraLookAtX;
         private Vector3 _cameraLookAtY;
         private Vector3 _cameraLookAtZ;
@@ -65,6 +66,16 @@ namespace OpenKh.Engine.MonoGame
             set
             {
                 _cameraPosition = value;
+                CameraLookAt = CameraPosition + CameraLookAtX;
+            }
+        }
+
+        public Vector3 CameraLookAt
+        {
+            get => _cameraLookAt;
+            set
+            {
+                _cameraLookAt = value;
                 InvalidateWorld();
             }
         }
@@ -75,7 +86,7 @@ namespace OpenKh.Engine.MonoGame
             set
             {
                 _cameraLookAtX = value;
-                InvalidateWorld();
+                CameraLookAt = CameraPosition + CameraLookAtX;
             }
         }
 
@@ -167,7 +178,7 @@ namespace OpenKh.Engine.MonoGame
 
         private void CalculateWorld()
         {
-            _world = Matrix.CreateLookAt(CameraPosition, CameraPosition + CameraLookAtX, CameraUp);
+            _world = Matrix.CreateLookAt(CameraPosition, CameraLookAt, CameraUp);
 
             ValidateWorld();
         }
