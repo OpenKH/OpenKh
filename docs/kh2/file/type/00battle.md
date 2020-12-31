@@ -481,12 +481,12 @@ Data on summons.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0     | 2B | ???
+| 0     | short | ???
 | 2     | ushort | Item - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 4     | uint | Entity Spawned 1 - [OBJ LIST](../../dictionary/obj.md)
 | 8     | uint | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
-| 12     | 2B | ???
-| 14     | 50B | Padding
+| 12     | short | ???
+| 14     | byte[50] | Padding
 
 ## Magc
 
