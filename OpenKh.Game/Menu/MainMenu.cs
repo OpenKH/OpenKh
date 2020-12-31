@@ -198,6 +198,9 @@ namespace OpenKh.Game.Menu
             {
                 switch (SelectedOption)
                 {
+                    case 4:
+                        Push(new MenuStatus(MenuManager));
+                        break;
                     case 6:
                         if (_isDebugMenuVisible)
                             Push(new MenuDebug(MenuManager));
