@@ -2,12 +2,30 @@ using OpenKh.Common;
 using OpenKh.Bbs;
 using System.IO;
 using Xunit;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System;
 
 namespace OpenKh.Tests.Bbs
 {
     public class PmoTests
     {
         private static readonly string FileName = "Bbs/res/p01ex00.pmo";
+
+        [Fact]
+        public void ReadGeometryType() => File.OpenRead(FileName).Using(stream =>
+        {
+            var TestPmo = Pmo.Read(stream);
+            List<string> Primitive = new List<string>();
+            for(int i = 0; i < TestPmo.meshSection.Count; i++)
+            {
+                uint flag = TestPmo.meshSection[i].VertexFlags;
+                flag >>= 28;
+                Pmo.PrimitiveType type = (Pmo.PrimitiveType)flag;
+                Primitive.Add(i + ": " + type.ToString());
+            }
+            Console.WriteLine(Primitive.Count);
+        });
 
         [Fact]
         public void ReadCorrectHeader() => File.OpenRead(FileName).Using(stream =>

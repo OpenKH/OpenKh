@@ -10,32 +10,36 @@ namespace OpenKh.Engine.Parsers
 {
     public class PmoParser : IModelMotion
     {
-        public PmoParser(Pmo pmo)
+        public PmoParser(Pmo pmo, float Scale)
         {
             var vertices = new PositionColoredTextured[pmo.vertices.Count];
             for (var i = 0; i < vertices.Length; i++)
             {
-                vertices[i].X = pmo.vertices[i].X;
-                vertices[i].Y = pmo.vertices[i].Y;
-                vertices[i].Z = pmo.vertices[i].Z;
+                byte maxX = 0xff;
+                byte maxY = 0xff;
+                byte maxZ = 0xff;
+                byte maxW = 0xff;
+                maxX -= (byte)pmo.colors[i].X;
+                maxY -= (byte)pmo.colors[i].Y;
+                maxZ -= (byte)pmo.colors[i].Z;
+                maxW -= (byte)pmo.colors[i].W;
+                vertices[i].X = pmo.vertices[i].X * Scale;
+                vertices[i].Y = pmo.vertices[i].Y * Scale;
+                vertices[i].Z = pmo.vertices[i].Z * Scale;
                 vertices[i].Tu = pmo.textureCoordinates[i].X;
                 vertices[i].Tv = pmo.textureCoordinates[i].Y;
-                vertices[i].R = 0xFF;
-                vertices[i].G = 0xFF;
-                vertices[i].B = 0xFF;
-                vertices[i].A = 0xFF;
+                vertices[i].R = maxX;
+                vertices[i].G = maxY;
+                vertices[i].B = maxZ;
+                vertices[i].A = maxW;
             }
-
-            int[] indices = new int[pmo.vertices.Count];
-            for (int i = 0; i < indices.Length; i++)
-                indices[i] = i;
 
             MeshDescriptor meshDescriptor;
 
             meshDescriptor = new MeshDescriptor()
             {
                 Vertices = vertices,
-                Indices = indices,
+                Indices = pmo.Indices.ToArray(),
                 TextureIndex = 0,
                 IsOpaque = true
             };
