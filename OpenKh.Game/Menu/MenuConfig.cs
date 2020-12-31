@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Renderers;
+using OpenKh.Engine.Renderers;
 using OpenKh.Game.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -7,9 +7,25 @@ namespace OpenKh.Game.Menu
 {
     public class MenuConfig : MenuBase
     {
+        private enum Options : int
+        {
+            FieldCamera,
+            RightStick,
+            CameraUpDown,
+            CameraLeftRight,
+            SummonEffects,
+            NavigationalMap,
+            Vibration,
+            Sound,
+            CommandMenu,
+            GameMode,
+
+            END
+        }
+
         private const int MaimumOptionPerLine = 3;
         private const int MaimumSettingsPerScreen = 9;
-        private const int SettingCount = 10;
+        private const int SettingCount = (int)Options.END;
 
         private struct OptionAnimation
         {
@@ -180,6 +196,17 @@ namespace OpenKh.Game.Menu
         {
             _menuSeq = InitializeMenu(false);
             _menuSeq.Begin();
+
+            SetSelectedOption((int)Options.FieldCamera, menuManager.GameContext.Kernel.SaveData.FieldCameraManual ? 1 : 0);
+            SetSelectedOption((int)Options.RightStick, menuManager.GameContext.Kernel.SaveData.RightAnalogStickCommand ? 1 : 0);
+            SetSelectedOption((int)Options.CameraUpDown, menuManager.GameContext.Kernel.SaveData.CameraUpDownReversed ? 1 : 0);
+            SetSelectedOption((int)Options.CameraLeftRight, menuManager.GameContext.Kernel.SaveData.CameraLeftRightReversed ? 1 : 0);
+            SetSelectedOption((int)Options.SummonEffects, 0); // TODO not implemented
+            SetSelectedOption((int)Options.NavigationalMap, menuManager.GameContext.Kernel.SaveData.NavigationalMap ? 0 : 1);
+            SetSelectedOption((int)Options.Vibration, menuManager.GameContext.Kernel.SaveData.Vibration ? 0 : 1);
+            SetSelectedOption((int)Options.Sound, 0); // TODO not implemented
+            SetSelectedOption((int)Options.CommandMenu, menuManager.GameContext.Kernel.SaveData.CommandMenuClassic ? 1 : 0);
+            SetSelectedOption((int)Options.GameMode, menuManager.GameContext.Kernel.SaveData.Difficulty);
         }
 
         public int GetOptionCount(int settingIndex) => Rows[settingIndex].Options.Length;
