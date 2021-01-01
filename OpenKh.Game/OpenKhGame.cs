@@ -94,14 +94,7 @@ namespace OpenKh.Game
 
             _kernel = new Kernel(_dataContent);
             if (startup.InitialState != 0)
-            {
-                var savePath = Path.Combine(Config.SavePath, Config.LastSave);
-                Log.Info($"Initial state is not 0. Attempting to load save {savePath}...");
-                if (File.Exists(savePath))
-                    File.OpenRead(savePath).Using(_kernel.LoadSaveData);
-                else
-                    Log.Warn($"Save {savePath} not found");
-            }
+                _kernel.LoadSaveData(Config.LastSave);
 
             var resolutionWidth = GetResolutionWidth();
             var resolutionHeight = GetResolutionHeight();

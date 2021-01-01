@@ -164,6 +164,16 @@ namespace OpenKh.Game.Infrastructure
             ? $"map/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map"
             : $"map/{Language}/{Constants.WorldIds[worldIndex]}{placeIndex:D02}.map";
 
+        public void LoadSaveData(string fileName)
+        {
+            var savePath = Path.Combine(Config.SavePath, fileName);
+            Log.Info($"Attempting to load save {savePath}...");
+            if (File.Exists(savePath))
+                File.OpenRead(savePath).Using(LoadSaveData);
+            else
+                Log.Warn($"Save {savePath} not found");
+        }
+
         public bool LoadSaveData(Stream stream)
         {
             if (!SaveDataFactory.IsValid(stream))

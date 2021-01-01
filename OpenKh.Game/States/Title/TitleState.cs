@@ -263,6 +263,7 @@ namespace OpenKh.Game.States.Title
                         SubMenu = TitleSubMenu.NewGame;
                         break;
                     case MainMenuLoadOption:
+                        Kernel.LoadSaveData(Config.LastSave);
                         SetStateToGameplay();
                         break;
                     case MainMenuTheaterOption:
