@@ -149,6 +149,9 @@ namespace OpenKh.Game.Infrastructure
             MessageProvider.Encoder = SystemMessageContext.Encoder;
             SaveData = new SaveFinalMix()
             {
+                WorldId = 2,
+                RoomId = 0,
+                SpawnId = 0,
                 Characters = Enumerable.Range(0, 13).Select(x => new CharacterFinalMix
                 {
                     Abilities = Enumerable.Range(0, 80).Select(x => (ushort)0).ToArray()
