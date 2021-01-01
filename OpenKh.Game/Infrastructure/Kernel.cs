@@ -147,7 +147,17 @@ namespace OpenKh.Game.Infrastructure
                 EventMessageContext = FontContext.ToKh2EuEventTextContext();
             }
             MessageProvider.Encoder = SystemMessageContext.Encoder;
-            SaveData = new SaveFinalMix();
+            SaveData = new SaveFinalMix()
+            {
+                Characters = Enumerable.Range(0, 13).Select(x => new CharacterFinalMix
+                {
+                    Abilities = Enumerable.Range(0, 80).Select(x => (ushort)0).ToArray()
+                }).ToArray(),
+                DriveForms = Enumerable.Range(0, 10).Select(x => new DriveFormFinalMix
+                {
+                    Abilities = Enumerable.Range(0, 24).Select(x => (ushort)0).ToArray()
+                }).ToArray(),
+            };
         }
 
         public string GetMapFileName(int worldIndex, int placeIndex) => IsReMix
