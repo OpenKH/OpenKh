@@ -71,14 +71,18 @@ namespace OpenKh.Tools.Kh2MapStudio
                     if (modelEntry != null)
                     {
                         var model = Mdlx.Read(modelEntry.Stream);
-                        var textures = ModelTexture.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.ModelTexture).Stream);
+                        ModelTexture textures = null;
+
+                        var textureEntry = mdlxEntries.FirstOrDefault(x => x.Type == Bar.EntryType.ModelTexture);
+                        if (textureEntry != null)
+                            textures = ModelTexture.Read(textureEntry.Stream);
 
                         var modelMotion = MeshLoader.FromKH2(model);
                         modelMotion.ApplyMotion(modelMotion.InitialPose);
                         meshGroup = new MeshGroup
                         {
                             MeshDescriptors = modelMotion.MeshDescriptors,
-                            Textures = textures.LoadTextures(_graphics).ToArray()
+                            Textures = textures == null ? new IKingdomTexture[0] : textures.LoadTextures(_graphics).ToArray()
                         };
                     }
                     else
