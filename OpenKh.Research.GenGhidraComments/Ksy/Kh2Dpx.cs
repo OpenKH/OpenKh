@@ -103,8 +103,10 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _dpd;
                     long _pos = m_io.Pos;
                     m_io.Seek(DpdOffset);
+                    M_Tracer.Seek(DpdOffset);
                     __raw_dpd = m_io.ReadBytesFull();
                     var io___raw_dpd = new KaitaiStream(__raw_dpd);
+                    M_Tracer.DeclareNewIo();
                     M_Tracer.BeginMember(nameof(Dpd));
                     _dpd = new Kh2Dpd(io___raw_dpd, tracer: M_Tracer);
                     M_Tracer.EndMember();

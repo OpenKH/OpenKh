@@ -16,31 +16,112 @@ seq:
   - id: num_textures
     type: u4
   - id: off_textures
-    type: u4
+    type: effects_texture_parent
     repeat: expr
     repeat-expr: num_textures
 
   - id: num_tab3
     type: u4
   - id: off_tab3
-    type: u4
+    type: effects_tab3_parent
     repeat: expr
     repeat-expr: num_tab3
 
   - id: num_tab4
     type: u4
   - id: off_tab4
-    type: u4
+    type: effects_tab4_parent
     repeat: expr
     repeat-expr: num_tab4
 
   - id: num_tab5
     type: u4
   - id: off_tab5
-    type: u4
+    type: effects_tab5_parent
     repeat: expr
     repeat-expr: num_tab5
 types:
+  effects_tab3_parent:
+    seq:
+      - id: ofs
+        type: u4
+    instances:
+      item:
+        pos: ofs
+        size-eos: true
+        type: effects_tab3
+  effects_tab3:
+    seq:
+      - id: mark
+        type: u4
+
+  effects_tab4_parent:
+    seq:
+      - id: ofs
+        type: u4
+    instances:
+      item:
+        pos: ofs
+        size-eos: true
+        type: effects_tab4
+  effects_tab4:
+    seq:
+      - id: mark
+        type: u4
+
+  effects_tab5_parent:
+    seq:
+      - id: ofs
+        type: u4
+    instances:
+      item:
+        pos: ofs
+        size-eos: true
+        type: effects_tab5
+  effects_tab5:
+    seq:
+      - id: mark
+        type: u4
+        
+  effects_texture_parent:
+    seq:
+      - id: ofs
+        type: u4
+    instances:
+      item:
+        pos: ofs
+        size-eos: true
+        type: effects_texture
+        
+  effects_texture:
+    seq:
+      - id: unk0
+        type: u4
+      - id: unk4
+        type: u2
+      - id: fmt
+        type: u2
+      - id: unk8
+        type: u4
+      - id: width
+        type: u2
+      - id: height
+        type: u2
+      - id: unk10
+        type: u4
+      - id: unk14
+        type: u4
+      - id: unk18
+        type: u4
+      - id: unk1c
+        type: u4
+        
+      - id: bitmap
+        size: width * height
+        if: fmt == 19
+      - id: palette
+        size: 1024
+        if: fmt == 19
   effects_group_parent:
     seq:
       - id: ofs

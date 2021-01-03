@@ -97,11 +97,12 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         KaitaiStream io = M_Root.M_Io;
                         long _pos = io.Pos;
                         io.Seek(Offset);
-                        M_Tracer.SwitchStart();
+                        M_Tracer.Seek(Offset);
                         switch (Type) {
                         case 17: {
                             __raw_file = io.ReadBytes(Size);
                             var io___raw_file = new KaitaiStream(__raw_file);
+                            M_Tracer.DeclareNewIo();
                             M_Tracer.BeginMember(nameof(File));
                             _file = new Kh2Bar(io___raw_file, tracer: M_Tracer);
                             M_Tracer.EndMember();
@@ -110,6 +111,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         case 4: {
                             __raw_file = io.ReadBytes(Size);
                             var io___raw_file = new KaitaiStream(__raw_file);
+                            M_Tracer.DeclareNewIo();
                             M_Tracer.BeginMember(nameof(File));
                             _file = new Kh2Model(io___raw_file, tracer: M_Tracer);
                             M_Tracer.EndMember();
@@ -118,6 +120,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         case 13: {
                             __raw_file = io.ReadBytes(Size);
                             var io___raw_file = new KaitaiStream(__raw_file);
+                            M_Tracer.DeclareNewIo();
                             M_Tracer.BeginMember(nameof(File));
                             _file = new Kh2SpawnScript(io___raw_file, tracer: M_Tracer);
                             M_Tracer.EndMember();
@@ -126,6 +129,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         case 12: {
                             __raw_file = io.ReadBytes(Size);
                             var io___raw_file = new KaitaiStream(__raw_file);
+                            M_Tracer.DeclareNewIo();
                             M_Tracer.BeginMember(nameof(File));
                             _file = new Kh2SpawnPoint(io___raw_file, tracer: M_Tracer);
                             M_Tracer.EndMember();
@@ -134,6 +138,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         case 9: {
                             __raw_file = io.ReadBytes(Size);
                             var io___raw_file = new KaitaiStream(__raw_file);
+                            M_Tracer.DeclareNewIo();
                             M_Tracer.BeginMember(nameof(File));
                             _file = new Kh2Motion(io___raw_file, tracer: M_Tracer);
                             M_Tracer.EndMember();
@@ -142,6 +147,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         case 18: {
                             __raw_file = io.ReadBytes(Size);
                             var io___raw_file = new KaitaiStream(__raw_file);
+                            M_Tracer.DeclareNewIo();
                             M_Tracer.BeginMember(nameof(File));
                             _file = new Kh2Pax(io___raw_file, tracer: M_Tracer);
                             M_Tracer.EndMember();

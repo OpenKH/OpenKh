@@ -195,6 +195,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     return _name;
                 long _pos = m_io.Pos;
                 m_io.Seek(OffsetName);
+                M_Tracer.Seek(OffsetName);
                 M_Tracer.BeginMember(nameof(Name));
                 _name = m_io.ReadBytes(128);
                 M_Tracer.EndMember();
@@ -213,8 +214,10 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     return _dpx;
                 long _pos = m_io.Pos;
                 m_io.Seek(OffsetDpx);
+                M_Tracer.Seek(OffsetDpx);
                 __raw_dpx = m_io.ReadBytesFull();
                 var io___raw_dpx = new KaitaiStream(__raw_dpx);
+                M_Tracer.DeclareNewIo();
                 M_Tracer.BeginMember(nameof(Dpx));
                 _dpx = new Kh2Dpx(io___raw_dpx, tracer: M_Tracer);
                 M_Tracer.EndMember();

@@ -213,6 +213,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _dmaTags;
                     long _pos = m_io.Pos;
                     m_io.Seek(DmaTagOff);
+                    M_Tracer.Seek(DmaTagOff);
                     M_Tracer.BeginMember(nameof(DmaTags));
                     _dmaTags = new DmaTagArrayMap(m_io, this, m_root, tracer: M_Tracer);
                     M_Tracer.EndMember();
@@ -290,8 +291,10 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (NextOff != 0) {
                         long _pos = m_io.Pos;
                         m_io.Seek(NextOff);
+                        M_Tracer.Seek(NextOff);
                         __raw_subModel = m_io.ReadBytesFull();
                         var io___raw_subModel = new KaitaiStream(__raw_subModel);
+                        M_Tracer.DeclareNewIo();
                         M_Tracer.BeginMember(nameof(SubModel));
                         _subModel = new Model(io___raw_subModel, this, m_root, tracer: M_Tracer);
                         M_Tracer.EndMember();
@@ -647,6 +650,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (OffAxbone != 0) {
                         long _pos = m_io.Pos;
                         m_io.Seek(OffAxbone);
+                        M_Tracer.Seek(OffAxbone);
                         _axBone = new List<AxBone>((int) (NumAxbone));
                         for (var i = 0; i < NumAxbone; i++)
                         {
@@ -778,8 +782,10 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _dmaTags;
                     long _pos = m_io.Pos;
                     m_io.Seek(OffFirstDmaTag);
+                    M_Tracer.Seek(OffFirstDmaTag);
                     __raw_dmaTags = m_io.ReadBytes((16 * NumDmaQwcPackets));
                     var io___raw_dmaTags = new KaitaiStream(__raw_dmaTags);
+                    M_Tracer.DeclareNewIo();
                     M_Tracer.BeginMember(nameof(DmaTags));
                     _dmaTags = new DmaTagArrayObject(io___raw_dmaTags, this, m_root, tracer: M_Tracer);
                     M_Tracer.EndMember();
@@ -798,6 +804,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _indicesOfAxbone;
                     long _pos = m_io.Pos;
                     m_io.Seek(OffIndicesOfAxbone);
+                    M_Tracer.Seek(OffIndicesOfAxbone);
                     M_Tracer.BeginMember(nameof(IndicesOfAxbone));
                     _indicesOfAxbone = new IndicesOfAxbone(m_io, this, m_root, tracer: M_Tracer);
                     M_Tracer.EndMember();
@@ -866,6 +873,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     KaitaiStream io = M_Parent.M_Io;
                     long _pos = io.Pos;
                     io.Seek(OffsetToGroup);
+                    M_Tracer.Seek(OffsetToGroup);
                     _list = new List<ushort>();
                     {
                         var i = 0;
@@ -987,6 +995,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _vifPacketRenderingGroup;
                     long _pos = m_io.Pos;
                     m_io.Seek(OffVifPacketRenderingGroup);
+                    M_Tracer.Seek(OffVifPacketRenderingGroup);
                     __raw_vifPacketRenderingGroup = new List<byte[]>((int) (NumVifPacketRenderingGroup));
                     _vifPacketRenderingGroup = new List<VifPacketRenderingGroup>((int) (NumVifPacketRenderingGroup));
                     for (var i = 0; i < NumVifPacketRenderingGroup; i++)
@@ -995,6 +1004,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         __raw_vifPacketRenderingGroup.Add(m_io.ReadBytes(4));
                         M_Tracer.EndArrayMember();
                         var io___raw_vifPacketRenderingGroup = new KaitaiStream(__raw_vifPacketRenderingGroup[__raw_vifPacketRenderingGroup.Count - 1]);
+                        M_Tracer.DeclareNewIo();
                         M_Tracer.BeginArrayMember(nameof(VifPacketRenderingGroup));
                         _vifPacketRenderingGroup.Add(new VifPacketRenderingGroup(io___raw_vifPacketRenderingGroup, this, m_root, tracer: M_Tracer));
                         M_Tracer.EndArrayMember();
@@ -1014,6 +1024,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _dmaChainIndexRemapTable;
                     long _pos = m_io.Pos;
                     m_io.Seek(OffDmaChainIndexRemapTable);
+                    M_Tracer.Seek(OffDmaChainIndexRemapTable);
                     M_Tracer.BeginMember(nameof(DmaChainIndexRemapTable));
                     _dmaChainIndexRemapTable = new DmaChainIndexRemapTable(m_io, this, m_root, tracer: M_Tracer);
                     M_Tracer.EndMember();
@@ -1132,8 +1143,10 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     return _modelInst;
                 long _pos = m_io.Pos;
                 m_io.Seek(144);
+                M_Tracer.Seek(144);
                 __raw_modelInst = m_io.ReadBytesFull();
                 var io___raw_modelInst = new KaitaiStream(__raw_modelInst);
+                M_Tracer.DeclareNewIo();
                 M_Tracer.BeginMember(nameof(ModelInst));
                 _modelInst = new Model(io___raw_modelInst, this, m_root, tracer: M_Tracer);
                 M_Tracer.EndMember();

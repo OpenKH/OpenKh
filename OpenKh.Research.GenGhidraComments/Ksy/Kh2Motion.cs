@@ -41,11 +41,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             M_Tracer.BeginMember(nameof(Unk0c));
             _unk0c = m_io.ReadU4le();
             M_Tracer.EndMember();
-            M_Tracer.SwitchStart();
             switch (Version) {
             case 0: {
                 __raw_motion = m_io.ReadBytes((ByteCount - 16));
                 var io___raw_motion = new KaitaiStream(__raw_motion);
+                M_Tracer.DeclareNewIo();
                 M_Tracer.BeginMember(nameof(Motion));
                 _motion = new Interpolated(io___raw_motion, this, m_root, tracer: M_Tracer);
                 M_Tracer.EndMember();
@@ -582,6 +582,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _joints;
                     long _pos = m_io.Pos;
                     m_io.Seek((JointIndexOffset - 16));
+                    M_Tracer.Seek((JointIndexOffset - 16));
                     _joints = new List<JointTable>((int) (TotalBoneCount));
                     for (var i = 0; i < TotalBoneCount; i++)
                     {
@@ -604,6 +605,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _tangentValues;
                     long _pos = m_io.Pos;
                     m_io.Seek((TangentOffset - 16));
+                    M_Tracer.Seek((TangentOffset - 16));
                     _tangentValues = new List<float>((int) (((IkChainOffset - TangentOffset) / 4)));
                     for (var i = 0; i < ((IkChainOffset - TangentOffset) / 4); i++)
                     {
@@ -626,6 +628,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _table8;
                     long _pos = m_io.Pos;
                     m_io.Seek((Table8Offset - 16));
+                    M_Tracer.Seek((Table8Offset - 16));
                     _table8 = new List<UnknownTable8>((int) (((Table7Offset - Table8Offset) / 48)));
                     for (var i = 0; i < ((Table7Offset - Table8Offset) / 48); i++)
                     {
@@ -648,6 +651,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _staticPose;
                     long _pos = m_io.Pos;
                     m_io.Seek((StaticPoseOffset - 16));
+                    M_Tracer.Seek((StaticPoseOffset - 16));
                     _staticPose = new List<StaticPose>((int) (StaticPoseCount));
                     for (var i = 0; i < StaticPoseCount; i++)
                     {
@@ -670,6 +674,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _ikHelperAnimation;
                     long _pos = m_io.Pos;
                     m_io.Seek((IkHelperAnimationOffset - 16));
+                    M_Tracer.Seek((IkHelperAnimationOffset - 16));
                     _ikHelperAnimation = new List<BoneAnimationTable>((int) (IkHelperAnimationCount));
                     for (var i = 0; i < IkHelperAnimationCount; i++)
                     {
@@ -692,6 +697,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _ikChains;
                     long _pos = m_io.Pos;
                     m_io.Seek((IkChainOffset - 16));
+                    M_Tracer.Seek((IkChainOffset - 16));
                     _ikChains = new List<IkChainTable>((int) (IkChainCount));
                     for (var i = 0; i < IkChainCount; i++)
                     {
@@ -714,6 +720,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _ikHelpers;
                     long _pos = m_io.Pos;
                     m_io.Seek((IkHelperOffset - 16));
+                    M_Tracer.Seek((IkHelperOffset - 16));
                     _ikHelpers = new List<IkHelperTable>((int) ((TotalBoneCount - BoneCount)));
                     for (var i = 0; i < (TotalBoneCount - BoneCount); i++)
                     {
@@ -736,6 +743,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _rawTimeline;
                     long _pos = m_io.Pos;
                     m_io.Seek((TimelineOffset - 16));
+                    M_Tracer.Seek((TimelineOffset - 16));
                     _rawTimeline = new List<TimelineTable>((int) (((KeyFrameOffset - TimelineOffset) / 8)));
                     for (var i = 0; i < ((KeyFrameOffset - TimelineOffset) / 8); i++)
                     {
@@ -758,6 +766,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _modelBoneAnimation;
                     long _pos = m_io.Pos;
                     m_io.Seek((ModelBoneAnimationOffset - 16));
+                    M_Tracer.Seek((ModelBoneAnimationOffset - 16));
                     _modelBoneAnimation = new List<BoneAnimationTable>((int) (ModelBoneAnimationCount));
                     for (var i = 0; i < ModelBoneAnimationCount; i++)
                     {
@@ -780,6 +789,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _table7;
                     long _pos = m_io.Pos;
                     m_io.Seek((Table7Offset - 16));
+                    M_Tracer.Seek((Table7Offset - 16));
                     _table7 = new List<UnknownTable7>((int) (Table7Count));
                     for (var i = 0; i < Table7Count; i++)
                     {
@@ -802,6 +812,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _keyFrames;
                     long _pos = m_io.Pos;
                     m_io.Seek((KeyFrameOffset - 16));
+                    M_Tracer.Seek((KeyFrameOffset - 16));
                     _keyFrames = new List<float>((int) (KeyFrameCount));
                     for (var i = 0; i < KeyFrameCount; i++)
                     {
@@ -824,6 +835,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _transformationValues;
                     long _pos = m_io.Pos;
                     m_io.Seek((TransformationValueOffset - 16));
+                    M_Tracer.Seek((TransformationValueOffset - 16));
                     _transformationValues = new List<float>((int) (((TangentOffset - TransformationValueOffset) / 4)));
                     for (var i = 0; i < ((TangentOffset - TransformationValueOffset) / 4); i++)
                     {
@@ -846,6 +858,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                         return _table6;
                     long _pos = m_io.Pos;
                     m_io.Seek((Table6Offset - 16));
+                    M_Tracer.Seek((Table6Offset - 16));
                     _table6 = new List<UnknownTable6>((int) (Table6Count));
                     for (var i = 0; i < Table6Count; i++)
                     {

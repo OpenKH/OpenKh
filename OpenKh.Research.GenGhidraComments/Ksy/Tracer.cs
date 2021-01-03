@@ -16,7 +16,6 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         private Stack<string> arrayStack = new Stack<string>();
         private Stack<string> prefixStack = new Stack<string>();
         private Stack<int> posStack = new Stack<int>();
-        private int posPick = -1;
         private IDictionary<int, string> ofs2Member;
         private Stack<ReadStack2> readStack2 = new Stack<ReadStack2>();
 
@@ -24,6 +23,18 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         {
             internal KaitaiStruct self;
             internal KaitaiStream io;
+            internal int seek = -1;
+            internal int lastPos = -1;
+            internal bool newIo = false;
+            internal List<string> members = new List<string>();
+
+            internal void MarkMember(string name)
+            {
+                if (!members.Contains(name))
+                {
+                    members.Add(name);
+                }
+            }
         }
 
         /// <param name="fileExtAndDelim">"mset:" or such.</param>
@@ -57,14 +68,30 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
 
         public void EndRead()
         {
-            var pop = readStack2.Pop();
+            var pop = readStack2.Peek();
             var self = pop.self;
 
             // Complete preemptive scans.
             foreach (var prop in self.GetType().GetProperties())
             {
-                prop.GetValue(self);
+                var obj = prop.GetValue(self);
+
+                if (pop.members.Contains(prop.Name))
+                {
+                    if (obj is IEnumerable<KaitaiStruct> subItems)
+                    {
+                        foreach (var sub in subItems)
+                        {
+                            foreach (var propSub in sub.GetType().GetProperties())
+                            {
+                                propSub.GetValue(sub);
+                            }
+                        }
+                    }
+                }
             }
+
+            readStack2.Pop();
 
             var entityName = readStack.Pop();
             writer.WriteLine($"                     {Indent1}<C {entityName}");
@@ -72,23 +99,33 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             prefixStack.Pop();
         }
 
+        public void Seek(long pos)
+        {
+            readStack2.Peek().seek = (int)pos;
+        }
+
+        public void DeclareNewIo()
+        {
+            var peek = readStack2.Peek();
+            peek.newIo = true;
+        }
+
         public void BeginMember(string memberName)
         {
-            var pos = (int)readStack2.Peek().io.Pos;
+            var peek = readStack2.Peek();
+            var pos = (peek.seek != -1) ? peek.seek : (peek.lastPos != -1) ? peek.lastPos : (int)peek.io.Pos;
+
+            peek.MarkMember(memberName);
 
             prefixStack.Push(prefixStack.Peek() + "." + memberName);
 
-            if (posPick != -1)
-            {
-                posStack.Push(posStack.Peek() + posPick);
-                writer.WriteLine($"{tailPos:X6}               {Indent}>M {memberName}");
-            }
-            else
-            {
-                posStack.Push(posStack.Peek());
-                writer.WriteLine($"{tailPos:X6} {pos:X6} {tailPos + pos:X6} {Indent}>M {memberName} //{prefixStack.Peek()}");
-            }
-            posPick = -1;
+            writer.WriteLine($"{tailPos:X6} {pos:X6} {tailPos + pos:X6} {Indent}>M {memberName} //{prefixStack.Peek()}");
+
+            posStack.Push(peek.newIo ? posStack.Peek() + pos : posStack.Peek());
+
+            peek.lastPos = -1;
+            peek.seek = -1;
+            peek.newIo = false;
 
             ofs2Member[tailPos + pos] = prefixStack.Peek();
 
@@ -103,10 +140,15 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             posStack.Pop();
 
             prefixStack.Pop();
+
+            readStack2.Peek().lastPos = (int)readStack2.Peek().io.Pos;
         }
 
         public void BeginArrayMember(string memberName)
         {
+            var peek = readStack2.Peek();
+            peek.MarkMember(memberName);
+
             prefixStack.Push(prefixStack.Peek() + "." + memberName);
             var pos = (int)readStack2.Peek().io.Pos;
             writer.WriteLine($"{tailPos:X6} {pos:X6} {tailPos + pos:X6} {Indent}>A {memberName} //{prefixStack.Peek()}");
@@ -125,7 +167,6 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
         public void SwitchStart()
         {
             var pos = (int)readStack2.Peek().io.Pos;
-            posPick = pos;
             writer.WriteLine($"{tailPos:X6} {pos:X6} {tailPos + pos:X6} {Indent}*");
         }
     }
