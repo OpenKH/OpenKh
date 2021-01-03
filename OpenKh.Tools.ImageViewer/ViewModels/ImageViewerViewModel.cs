@@ -294,6 +294,24 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
                 x => IsMultipleImageFormat && ImageContainer.Count >= 1
             );
 
+            CheckQuant = new RelayCommand(x =>
+            {
+                if (UsePngquant == true)
+                {
+                    if (!File.Exists("pngquant.exe"))
+                    {
+                        UsePngquant = false;
+
+                        string _msg = "PNGQuant was not located in OpenKH's root folder.\n" +
+                                       "Please acquire PNGQuant from the link below and\n" +
+                                       "place it in the same folder as this viewer.";
+
+                        new MessageDialog(_msg, "https://pngquant.org/pngquant-windows.zip").ShowDialog();
+                        OnPropertyChanged(nameof(UsePngquant));
+                    }
+                }
+            });
+
             ZoomLevel = ZoomLevelFit;
         }
 
@@ -329,6 +347,7 @@ namespace OpenKh.Tools.ImageViewer.ViewModels
         }
 
         public RelayCommand OpenCommand { get; set; }
+        public RelayCommand CheckQuant { get; set; }
         public RelayCommand SaveCommand { get; set; }
         public RelayCommand SaveAsCommand { get; set; }
         public RelayCommand ExitCommand { get; set; }
