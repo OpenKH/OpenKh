@@ -42,3 +42,4 @@ types:
             0x04: kh2_model
             0x0c: kh2_spawn_point
             0x0d: kh2_spawn_script
+            0x12: kh2_pax
