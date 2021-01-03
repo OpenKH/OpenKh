@@ -73,8 +73,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                         var model = Mdlx.Read(modelEntry.Stream);
                         ModelTexture textures = null;
 
-                        try { textures = ModelTexture.Read(mdlxEntries.First(x => x.Type == Bar.EntryType.ModelTexture).Stream); }
-                        catch (System.InvalidOperationException) { }
+                        var textureEntry = mdlxEntries.FirstOrDefault(x => x.Type == Bar.EntryType.ModelTexture);
+                        if (textureEntry != null)
+                            textures = ModelTexture.Read(textureEntry.Stream);
 
                         var modelMotion = MeshLoader.FromKH2(model);
                         modelMotion.ApplyMotion(modelMotion.InitialPose);
