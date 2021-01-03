@@ -80,7 +80,7 @@ types:
       - id: skip_unk_data
         size: 0x50
       - id: dpd_effect
-        type: dpd_effect
+        type: dpd_effect_parent
         size-eos: true
         
   dpd_effect_command:
@@ -103,16 +103,15 @@ types:
         pos: offset2
         size: 4
 
+  dpd_effect_parent:
+    seq:
+      - id: skip
+        size: 16
+      - id: item
+        type: dpd_effect
+
   dpd_effect:
     seq:
-      - id: unk0
-        type: u4
-      - id: unk4
-        type: u4
-      - id: unk8
-        type: u4
-      - id: unk_c
-        type: u4
       - id: offset_next
         type: u4
       - id: unk04

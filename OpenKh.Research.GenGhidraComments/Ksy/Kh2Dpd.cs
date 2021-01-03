@@ -80,6 +80,43 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 M_Tracer.EndArrayMember();
             }
         }
+        public partial class DpdEffectParent : KaitaiStruct
+        {
+            public Tracer M_Tracer;
+
+            public static DpdEffectParent FromFile(string fileName)
+            {
+                return new DpdEffectParent(new KaitaiStream(fileName));
+            }
+
+            public DpdEffectParent(KaitaiStream p__io, Kh2Dpd.EffectsGroup p__parent = null, Kh2Dpd p__root = null, Tracer tracer = null) : base(p__io)
+            {
+                M_Tracer = tracer;
+                var entityName = nameof(DpdEffectParent);
+                m_parent = p__parent;
+                m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
+                _read();
+                M_Tracer.EndRead();
+            }
+            private void _read()
+            {
+                M_Tracer.BeginMember(nameof(Skip));
+                _skip = m_io.ReadBytes(16);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Item));
+                _item = new DpdEffect(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+            }
+            private byte[] _skip;
+            private DpdEffect _item;
+            private Kh2Dpd m_root;
+            private Kh2Dpd.EffectsGroup m_parent;
+            public byte[] Skip { get { return _skip; } }
+            public DpdEffect Item { get { return _item; } }
+            public Kh2Dpd M_Root { get { return m_root; } }
+            public Kh2Dpd.EffectsGroup M_Parent { get { return m_parent; } }
+        }
         public partial class EffectsGroupParent : KaitaiStruct
         {
             public Tracer M_Tracer;
@@ -204,7 +241,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 __raw_dpdEffect = m_io.ReadBytesFull();
                 var io___raw_dpdEffect = new KaitaiStream(__raw_dpdEffect);
                 M_Tracer.BeginMember(nameof(DpdEffect));
-                _dpdEffect = new DpdEffect(io___raw_dpdEffect, this, m_root, tracer: M_Tracer);
+                _dpdEffect = new DpdEffectParent(io___raw_dpdEffect, this, m_root, tracer: M_Tracer);
                 M_Tracer.EndMember();
             }
             private List<float> _matrix1;
@@ -214,7 +251,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             private List<float> _scaling;
             private List<float> _dummy;
             private byte[] _skipUnkData;
-            private DpdEffect _dpdEffect;
+            private DpdEffectParent _dpdEffect;
             private Kh2Dpd m_root;
             private Kh2Dpd.EffectsGroupParent m_parent;
             private byte[] __raw_dpdEffect;
@@ -225,7 +262,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             public List<float> Scaling { get { return _scaling; } }
             public List<float> Dummy { get { return _dummy; } }
             public byte[] SkipUnkData { get { return _skipUnkData; } }
-            public DpdEffect DpdEffect { get { return _dpdEffect; } }
+            public DpdEffectParent DpdEffect { get { return _dpdEffect; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd.EffectsGroupParent M_Parent { get { return m_parent; } }
             public byte[] M_RawDpdEffect { get { return __raw_dpdEffect; } }
@@ -342,18 +379,6 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             }
             private void _read()
             {
-                M_Tracer.BeginMember(nameof(Unk0));
-                _unk0 = m_io.ReadU4le();
-                M_Tracer.EndMember();
-                M_Tracer.BeginMember(nameof(Unk4));
-                _unk4 = m_io.ReadU4le();
-                M_Tracer.EndMember();
-                M_Tracer.BeginMember(nameof(Unk8));
-                _unk8 = m_io.ReadU4le();
-                M_Tracer.EndMember();
-                M_Tracer.BeginMember(nameof(UnkC));
-                _unkC = m_io.ReadU4le();
-                M_Tracer.EndMember();
                 M_Tracer.BeginMember(nameof(OffsetNext));
                 _offsetNext = m_io.ReadU4le();
                 M_Tracer.EndMember();
@@ -415,10 +440,6 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     return _next;
                 }
             }
-            private uint _unk0;
-            private uint _unk4;
-            private uint _unk8;
-            private uint _unkC;
             private uint _offsetNext;
             private uint _unk04;
             private uint _unk08;
@@ -433,10 +454,6 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             private List<DpdEffectCommand> _commands;
             private Kh2Dpd m_root;
             private KaitaiStruct m_parent;
-            public uint Unk0 { get { return _unk0; } }
-            public uint Unk4 { get { return _unk4; } }
-            public uint Unk8 { get { return _unk8; } }
-            public uint UnkC { get { return _unkC; } }
             public uint OffsetNext { get { return _offsetNext; } }
             public uint Unk04 { get { return _unk04; } }
             public uint Unk08 { get { return _unk08; } }

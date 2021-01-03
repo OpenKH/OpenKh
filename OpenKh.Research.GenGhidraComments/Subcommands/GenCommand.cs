@@ -26,7 +26,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
         public string KH2Dir { get; set; } = @"H:\KH2fm.OpenKH";
 
         [Option(CommandOptionType.SingleValue)]
-        public string IncludeExtensions { get; set; } = ".ard";
+        public string IncludeExtensions { get; set; } = ".fm";
 
         protected int OnExecute(CommandLineApplication app)
         {
@@ -65,7 +65,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
 
             // # py.S_IEXPA: 003b8bc0  field2d/jp/eh0field.2dd 
             var loadedList = File.ReadAllLines(Path.Combine(InputDir, "pcsx2.log"))
-                .Select(line => Regex.Match(line, "^# py\\.S_IEXPA:\\s+(?<adr>[0-9a-f]{8})\\s+(?<file>[\\S]+)"))
+                .Select(line => Regex.Match(line, "^# py\\.S_IEXPA:\\s+(?<adr>[0-9a-fA-F]{8})\\s+(?<file>[\\S]+)"))
                 .Where(match => match.Success && IncludeExtensions.Contains(Path.GetExtension(match.Groups["file"].Value), StringComparison.OrdinalIgnoreCase))
                 .Select(
                     match => new LoadedFile
@@ -89,7 +89,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                     {
                         //if (loaded.file == "obj/P_EH000_MEMO.mset")
                         if (loaded.file.EndsWith(".mset") || loaded.file.EndsWith(".mdlx") || loaded.file.EndsWith(".map")
-                            || loaded.file.EndsWith(".ard"))
+                            || loaded.file.EndsWith(".ard") || loaded.file.EndsWith(".fm"))
                         {
                             var tracer = new Tracer(ofs2Name, loaded.adr, $"{Path.GetExtension(loaded.file).TrimStart('.')}:");
                             var model = new Kh2Bar(new KaitaiStream(File.ReadAllBytes(loaded.fullPath)), tracer: tracer);
@@ -98,7 +98,7 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                     }
                 );
 
-            var readMemFrmPattern = new Regex("^(?<pc>[0-9A-F]{8})\\s?(?<target>[0-9A-F]{8})");
+            var readMemFrmPattern = new Regex("^(?<pc>[0-9A-F]{8})\\s?(?<target>[0-9A-F]{8})", RegexOptions.Compiled);
 
             var readFromMemList = File.ReadAllLines(Path.Combine(InputDir, "readmemfrm.txt"))
                 .Select(line => readMemFrmPattern.Match(line))
@@ -132,7 +132,10 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
                         );
                     }
 
-                    if (LookupJustAndAlsoNearest(ofs2Name, readMem.target, target => DescribeFromNearestFile(loadedList, target), out string hitBody))
+                    Func<int, string> helper = target => DescribeFromNearestFile(loadedList, target);
+                    //Func<int, string> helper = target => DescribeFromNearestItem(ofs2Name, target);
+
+                    if (LookupJustAndAlsoNearest(ofs2Name, readMem.target, helper, out string hitBody))
                     {
                         // "mset:.Kh2Bar.Files.FileEntry.File.Kh2Bar.Files.FileEntry.File.Kh2Motion.Motion.Interpolated.IkHelpers.IkHelperTable.RotateX"
                         var hitPairs = (hitBody.Contains(":") ? hitBody : ":" + hitBody).Split(':');
@@ -195,6 +198,27 @@ namespace OpenKh.Research.GenGhidraComments.Subcommands
             }
             hitBody = helper(target);
             return true;
+        }
+
+        private string DescribeFromNearestItem(SortedDictionary<int, string> ofs2Name, int target)
+        {
+            int lastOfs = 0;
+            string lastName;
+            if (ofs2Name.TryGetValue(target, out lastName))
+            {
+                return lastName;
+            }
+            foreach (var pair in ofs2Name)
+            {
+                var ofs = (int)target - (int)pair.Key;
+                if (ofs < 0)
+                {
+                    return $"{lastName}+ {lastOfs} ";
+                }
+                lastOfs = ofs;
+                lastName = pair.Value;
+            }
+            return "?";
         }
 
         private string DescribeFromNearestFile(LoadedFile[] loadedFiles, int target)
