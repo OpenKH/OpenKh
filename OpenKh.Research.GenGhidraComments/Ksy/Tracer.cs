@@ -162,6 +162,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             var memberName = arrayStack.Pop();
             writer.WriteLine($"                     {Indent1}<A {memberName}");
             prefixStack.Pop();
+
+            readStack2.Peek().lastPos = (int)readStack2.Peek().io.Pos;
         }
 
         public void SwitchStart()

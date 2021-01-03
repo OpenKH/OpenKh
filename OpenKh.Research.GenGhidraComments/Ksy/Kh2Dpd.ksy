@@ -54,6 +54,37 @@ types:
     seq:
       - id: mark
         type: u4
+        
+  effects_tab4_vert_set:
+    seq:
+      - id: vert_format
+        type: u2
+      - id: num_verts
+        type: u2
+      - id: unk34
+        type: u4
+      - id: unk38
+        type: u4
+      - id: unk3c
+        type: u4
+      - id: verts
+        repeat: expr
+        repeat-expr: num_verts
+        type:
+          switch-on: vert_format
+          cases:
+            0x0600: effects_tab4_vtx6
+            0x0400: effects_tab4_vtx4
+            0x0000: effects_tab4_vtx0
+      - id: pad6
+        if: "vert_format == 0x0600"
+        size: (16 - (0x28 * num_verts)) & 15
+      - id: pad4
+        if: "vert_format == 0x0400"
+        size: (16 - (0x18 * num_verts)) & 15
+      - id: pad0
+        if: "vert_format == 0x0000"
+        size: (16 - (0x14 * num_verts)) & 15
 
   effects_tab4_parent:
     seq:
@@ -68,6 +99,128 @@ types:
     seq:
       - id: mark
         type: u4
+      - id: unk04
+        type: u4
+      - id: unk08
+        type: u4
+      - id: unk0c
+        type: u4
+      - id: unk10
+        type: u4
+      - id: unk14
+        type: u4
+      - id: off_points
+        type: u4
+      - id: off_norms
+        type: u4
+      - id: total_verts
+        type: u2
+      - id: num_points
+        type: u2
+      - id: unk24
+        type: u2
+      - id: unk26
+        type: u2
+      - id: unk28
+        type: u4
+      - id: unk2c
+        type: u4
+      - id: set
+        type: effects_tab4_vert_set
+        repeat: until
+        repeat-until: "(_index == 0) ? false : (_index == 1) ? (total_verts == _.num_verts) : true"
+    instances:
+      norms:
+        pos: off_points
+        type: s2
+        repeat: expr
+        repeat-expr: 3 * num_points
+      points:
+        pos: off_norms
+        type: s2
+        repeat: expr
+        repeat-expr: 3 * num_points
+
+  effect_rgba:
+    seq:
+      - id: red
+        type: u1
+      - id: green
+        type: u1
+      - id: blue
+        type: u1
+      - id: alpha
+        type: u1
+        
+  effect_uv:
+    seq:
+      - id: u
+        type: u2
+      - id: v
+        type: u2
+
+  effects_tab4_vtx6:
+    seq:
+      - id: clr0
+        type: effect_rgba
+      - id: clr1
+        type: effect_rgba
+      - id: clr2
+        type: effect_rgba
+      - id: clr3
+        type: effect_rgba
+      - id: vert0
+        type: u2
+      - id: vert1
+        type: u2
+      - id: vert2
+        type: u2
+      - id: vert3
+        type: u2
+      - id: uv0
+        type: effect_uv
+      - id: uv1
+        type: effect_uv
+      - id: uv2
+        type: effect_uv
+      - id: uv3
+        type: effect_uv
+
+  effects_tab4_vtx4:
+    seq:
+      - id: clr0
+        type: effect_rgba
+      - id: clr1
+        type: effect_rgba
+      - id: clr2
+        type: effect_rgba
+      - id: clr3
+        type: effect_rgba
+      - id: vert0
+        type: u2
+      - id: vert1
+        type: u2
+      - id: vert2
+        type: u2
+      - id: vert3
+        type: u2
+
+  effects_tab4_vtx0:
+    seq:
+      - id: clr0
+        type: effect_rgba
+      - id: clr1
+        type: effect_rgba
+      - id: clr2
+        type: effect_rgba
+      - id: vert0
+        type: u2
+      - id: vert1
+        type: u2
+      - id: vert2
+        type: u2
+      - id: pad
+        type: u2
 
   effects_tab5_parent:
     seq:
@@ -122,6 +275,7 @@ types:
       - id: palette
         size: 1024
         if: fmt == 19
+        
   effects_group_parent:
     seq:
       - id: offset

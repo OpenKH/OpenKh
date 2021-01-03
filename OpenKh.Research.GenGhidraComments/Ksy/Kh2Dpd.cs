@@ -80,6 +80,134 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 M_Tracer.EndArrayMember();
             }
         }
+        public partial class DpdEffectSub : KaitaiStruct
+        {
+            public Tracer M_Tracer;
+
+            public static DpdEffectSub FromFile(string fileName)
+            {
+                return new DpdEffectSub(new KaitaiStream(fileName));
+            }
+
+            public DpdEffectSub(KaitaiStream p__io, Kh2Dpd.DpdEffectParent p__parent = null, Kh2Dpd p__root = null, Tracer tracer = null) : base(p__io)
+            {
+                M_Tracer = tracer;
+                var entityName = nameof(DpdEffectSub);
+                m_parent = p__parent;
+                m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
+                _read();
+                M_Tracer.EndRead();
+            }
+            private void _read()
+            {
+                M_Tracer.BeginMember(nameof(Count));
+                _count = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                _items = new List<uint>((int) (Count));
+                for (var i = 0; i < Count; i++)
+                {
+                    M_Tracer.BeginArrayMember(nameof(Items));
+                    _items.Add(m_io.ReadU4le());
+                    M_Tracer.EndArrayMember();
+                }
+            }
+            private uint _count;
+            private List<uint> _items;
+            private Kh2Dpd m_root;
+            private Kh2Dpd.DpdEffectParent m_parent;
+            public uint Count { get { return _count; } }
+            public List<uint> Items { get { return _items; } }
+            public Kh2Dpd M_Root { get { return m_root; } }
+            public Kh2Dpd.DpdEffectParent M_Parent { get { return m_parent; } }
+        }
+        public partial class EffectsTab4Vtx6 : KaitaiStruct
+        {
+            public Tracer M_Tracer;
+
+            public static EffectsTab4Vtx6 FromFile(string fileName)
+            {
+                return new EffectsTab4Vtx6(new KaitaiStream(fileName));
+            }
+
+            public EffectsTab4Vtx6(KaitaiStream p__io, Kh2Dpd.EffectsTab4VertSet p__parent = null, Kh2Dpd p__root = null, Tracer tracer = null) : base(p__io)
+            {
+                M_Tracer = tracer;
+                var entityName = nameof(EffectsTab4Vtx6);
+                m_parent = p__parent;
+                m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
+                _read();
+                M_Tracer.EndRead();
+            }
+            private void _read()
+            {
+                M_Tracer.BeginMember(nameof(Clr0));
+                _clr0 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Clr1));
+                _clr1 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Clr2));
+                _clr2 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Clr3));
+                _clr3 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert0));
+                _vert0 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert1));
+                _vert1 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert2));
+                _vert2 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert3));
+                _vert3 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Uv0));
+                _uv0 = new EffectUv(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Uv1));
+                _uv1 = new EffectUv(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Uv2));
+                _uv2 = new EffectUv(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Uv3));
+                _uv3 = new EffectUv(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+            }
+            private EffectRgba _clr0;
+            private EffectRgba _clr1;
+            private EffectRgba _clr2;
+            private EffectRgba _clr3;
+            private ushort _vert0;
+            private ushort _vert1;
+            private ushort _vert2;
+            private ushort _vert3;
+            private EffectUv _uv0;
+            private EffectUv _uv1;
+            private EffectUv _uv2;
+            private EffectUv _uv3;
+            private Kh2Dpd m_root;
+            private Kh2Dpd.EffectsTab4VertSet m_parent;
+            public EffectRgba Clr0 { get { return _clr0; } }
+            public EffectRgba Clr1 { get { return _clr1; } }
+            public EffectRgba Clr2 { get { return _clr2; } }
+            public EffectRgba Clr3 { get { return _clr3; } }
+            public ushort Vert0 { get { return _vert0; } }
+            public ushort Vert1 { get { return _vert1; } }
+            public ushort Vert2 { get { return _vert2; } }
+            public ushort Vert3 { get { return _vert3; } }
+            public EffectUv Uv0 { get { return _uv0; } }
+            public EffectUv Uv1 { get { return _uv1; } }
+            public EffectUv Uv2 { get { return _uv2; } }
+            public EffectUv Uv3 { get { return _uv3; } }
+            public Kh2Dpd M_Root { get { return m_root; } }
+            public Kh2Dpd.EffectsTab4VertSet M_Parent { get { return m_parent; } }
+        }
         public partial class EffectsTab4Parent : KaitaiStruct
         {
             public Tracer M_Tracer;
@@ -102,8 +230,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             }
             private void _read()
             {
-                M_Tracer.BeginMember(nameof(Ofs));
-                _ofs = m_io.ReadU4le();
+                M_Tracer.BeginMember(nameof(Offset));
+                _offset = m_io.ReadU4le();
                 M_Tracer.EndMember();
             }
             private bool f_item;
@@ -115,8 +243,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_item)
                         return _item;
                     long _pos = m_io.Pos;
-                    m_io.Seek(Ofs);
-                    M_Tracer.Seek(Ofs);
+                    m_io.Seek(Offset);
+                    M_Tracer.Seek(Offset);
                     __raw_item = m_io.ReadBytesFull();
                     var io___raw_item = new KaitaiStream(__raw_item);
                     M_Tracer.DeclareNewIo();
@@ -128,11 +256,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     return _item;
                 }
             }
-            private uint _ofs;
+            private uint _offset;
             private Kh2Dpd m_root;
             private Kh2Dpd m_parent;
             private byte[] __raw_item;
-            public uint Ofs { get { return _ofs; } }
+            public uint Offset { get { return _offset; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd M_Parent { get { return m_parent; } }
             public byte[] M_RawItem { get { return __raw_item; } }
@@ -152,24 +280,79 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 var entityName = nameof(DpdEffectParent);
                 m_parent = p__parent;
                 m_root = p__root;
+                f_sub8 = false;
+                f_subc = false;
                 M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
                 M_Tracer.EndRead();
             }
             private void _read()
             {
-                M_Tracer.BeginMember(nameof(Skip));
-                _skip = m_io.ReadBytes(16);
+                M_Tracer.BeginMember(nameof(Unk0));
+                _unk0 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk4));
+                _unk4 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Offset8));
+                _offset8 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Offsetc));
+                _offsetc = m_io.ReadU4le();
                 M_Tracer.EndMember();
                 M_Tracer.BeginMember(nameof(Item));
                 _item = new DpdEffect(m_io, this, m_root, tracer: M_Tracer);
                 M_Tracer.EndMember();
             }
-            private byte[] _skip;
+            private bool f_sub8;
+            private DpdEffectSub _sub8;
+            public DpdEffectSub Sub8
+            {
+                get
+                {
+                    if (f_sub8)
+                        return _sub8;
+                    long _pos = m_io.Pos;
+                    m_io.Seek(Offset8);
+                    M_Tracer.Seek(Offset8);
+                    M_Tracer.BeginMember(nameof(Sub8));
+                    _sub8 = new DpdEffectSub(m_io, this, m_root, tracer: M_Tracer);
+                    M_Tracer.EndMember();
+                    m_io.Seek(_pos);
+                    f_sub8 = true;
+                    return _sub8;
+                }
+            }
+            private bool f_subc;
+            private DpdEffectSub _subc;
+            public DpdEffectSub Subc
+            {
+                get
+                {
+                    if (f_subc)
+                        return _subc;
+                    long _pos = m_io.Pos;
+                    m_io.Seek(Offsetc);
+                    M_Tracer.Seek(Offsetc);
+                    M_Tracer.BeginMember(nameof(Subc));
+                    _subc = new DpdEffectSub(m_io, this, m_root, tracer: M_Tracer);
+                    M_Tracer.EndMember();
+                    m_io.Seek(_pos);
+                    f_subc = true;
+                    return _subc;
+                }
+            }
+            private uint _unk0;
+            private uint _unk4;
+            private uint _offset8;
+            private uint _offsetc;
             private DpdEffect _item;
             private Kh2Dpd m_root;
             private Kh2Dpd.EffectsGroup m_parent;
-            public byte[] Skip { get { return _skip; } }
+            public uint Unk0 { get { return _unk0; } }
+            public uint Unk4 { get { return _unk4; } }
+            public uint Offset8 { get { return _offset8; } }
+            public uint Offsetc { get { return _offsetc; } }
             public DpdEffect Item { get { return _item; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd.EffectsGroup M_Parent { get { return m_parent; } }
@@ -196,8 +379,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             }
             private void _read()
             {
-                M_Tracer.BeginMember(nameof(Ofs));
-                _ofs = m_io.ReadU4le();
+                M_Tracer.BeginMember(nameof(Offset));
+                _offset = m_io.ReadU4le();
                 M_Tracer.EndMember();
             }
             private bool f_item;
@@ -209,8 +392,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_item)
                         return _item;
                     long _pos = m_io.Pos;
-                    m_io.Seek(Ofs);
-                    M_Tracer.Seek(Ofs);
+                    m_io.Seek(Offset);
+                    M_Tracer.Seek(Offset);
                     __raw_item = m_io.ReadBytesFull();
                     var io___raw_item = new KaitaiStream(__raw_item);
                     M_Tracer.DeclareNewIo();
@@ -222,11 +405,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     return _item;
                 }
             }
-            private uint _ofs;
+            private uint _offset;
             private Kh2Dpd m_root;
             private Kh2Dpd m_parent;
             private byte[] __raw_item;
-            public uint Ofs { get { return _ofs; } }
+            public uint Offset { get { return _offset; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd M_Parent { get { return m_parent; } }
             public byte[] M_RawItem { get { return __raw_item; } }
@@ -253,8 +436,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             }
             private void _read()
             {
-                M_Tracer.BeginMember(nameof(Ofs));
-                _ofs = m_io.ReadU4le();
+                M_Tracer.BeginMember(nameof(Offset));
+                _offset = m_io.ReadU4le();
                 M_Tracer.EndMember();
             }
             private bool f_item;
@@ -266,8 +449,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_item)
                         return _item;
                     long _pos = m_io.Pos;
-                    m_io.Seek(Ofs);
-                    M_Tracer.Seek(Ofs);
+                    m_io.Seek(Offset);
+                    M_Tracer.Seek(Offset);
                     __raw_item = m_io.ReadBytesFull();
                     var io___raw_item = new KaitaiStream(__raw_item);
                     M_Tracer.DeclareNewIo();
@@ -279,11 +462,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     return _item;
                 }
             }
-            private uint _ofs;
+            private uint _offset;
             private Kh2Dpd m_root;
             private Kh2Dpd m_parent;
             private byte[] __raw_item;
-            public uint Ofs { get { return _ofs; } }
+            public uint Offset { get { return _offset; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd M_Parent { get { return m_parent; } }
             public byte[] M_RawItem { get { return __raw_item; } }
@@ -342,8 +525,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             }
             private void _read()
             {
-                M_Tracer.BeginMember(nameof(Ofs));
-                _ofs = m_io.ReadU4le();
+                M_Tracer.BeginMember(nameof(Offset));
+                _offset = m_io.ReadU4le();
                 M_Tracer.EndMember();
             }
             private bool f_item;
@@ -355,8 +538,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_item)
                         return _item;
                     long _pos = m_io.Pos;
-                    m_io.Seek(Ofs);
-                    M_Tracer.Seek(Ofs);
+                    m_io.Seek(Offset);
+                    M_Tracer.Seek(Offset);
                     __raw_item = m_io.ReadBytesFull();
                     var io___raw_item = new KaitaiStream(__raw_item);
                     M_Tracer.DeclareNewIo();
@@ -368,11 +551,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     return _item;
                 }
             }
-            private uint _ofs;
+            private uint _offset;
             private Kh2Dpd m_root;
             private Kh2Dpd m_parent;
             private byte[] __raw_item;
-            public uint Ofs { get { return _ofs; } }
+            public uint Offset { get { return _offset; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd M_Parent { get { return m_parent; } }
             public byte[] M_RawItem { get { return __raw_item; } }
@@ -440,9 +623,41 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     _dummy.Add(m_io.ReadF4le());
                     M_Tracer.EndArrayMember();
                 }
-                M_Tracer.BeginMember(nameof(SkipUnkData));
-                _skipUnkData = m_io.ReadBytes(80);
-                M_Tracer.EndMember();
+                _dummy1 = new List<uint>((int) (4));
+                for (var i = 0; i < 4; i++)
+                {
+                    M_Tracer.BeginArrayMember(nameof(Dummy1));
+                    _dummy1.Add(m_io.ReadU4le());
+                    M_Tracer.EndArrayMember();
+                }
+                _dummy2 = new List<uint>((int) (4));
+                for (var i = 0; i < 4; i++)
+                {
+                    M_Tracer.BeginArrayMember(nameof(Dummy2));
+                    _dummy2.Add(m_io.ReadU4le());
+                    M_Tracer.EndArrayMember();
+                }
+                _dummy3 = new List<uint>((int) (4));
+                for (var i = 0; i < 4; i++)
+                {
+                    M_Tracer.BeginArrayMember(nameof(Dummy3));
+                    _dummy3.Add(m_io.ReadU4le());
+                    M_Tracer.EndArrayMember();
+                }
+                _dummy4 = new List<uint>((int) (4));
+                for (var i = 0; i < 4; i++)
+                {
+                    M_Tracer.BeginArrayMember(nameof(Dummy4));
+                    _dummy4.Add(m_io.ReadU4le());
+                    M_Tracer.EndArrayMember();
+                }
+                _dummy5 = new List<uint>((int) (4));
+                for (var i = 0; i < 4; i++)
+                {
+                    M_Tracer.BeginArrayMember(nameof(Dummy5));
+                    _dummy5.Add(m_io.ReadU4le());
+                    M_Tracer.EndArrayMember();
+                }
                 __raw_dpdEffect = m_io.ReadBytesFull();
                 var io___raw_dpdEffect = new KaitaiStream(__raw_dpdEffect);
                 M_Tracer.DeclareNewIo();
@@ -456,7 +671,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             private List<float> _rotation;
             private List<float> _scaling;
             private List<float> _dummy;
-            private byte[] _skipUnkData;
+            private List<uint> _dummy1;
+            private List<uint> _dummy2;
+            private List<uint> _dummy3;
+            private List<uint> _dummy4;
+            private List<uint> _dummy5;
             private DpdEffectParent _dpdEffect;
             private Kh2Dpd m_root;
             private Kh2Dpd.EffectsGroupParent m_parent;
@@ -467,7 +686,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             public List<float> Rotation { get { return _rotation; } }
             public List<float> Scaling { get { return _scaling; } }
             public List<float> Dummy { get { return _dummy; } }
-            public byte[] SkipUnkData { get { return _skipUnkData; } }
+            public List<uint> Dummy1 { get { return _dummy1; } }
+            public List<uint> Dummy2 { get { return _dummy2; } }
+            public List<uint> Dummy3 { get { return _dummy3; } }
+            public List<uint> Dummy4 { get { return _dummy4; } }
+            public List<uint> Dummy5 { get { return _dummy5; } }
             public DpdEffectParent DpdEffect { get { return _dpdEffect; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd.EffectsGroupParent M_Parent { get { return m_parent; } }
@@ -495,8 +718,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             }
             private void _read()
             {
-                M_Tracer.BeginMember(nameof(Ofs));
-                _ofs = m_io.ReadU4le();
+                M_Tracer.BeginMember(nameof(Offset));
+                _offset = m_io.ReadU4le();
                 M_Tracer.EndMember();
             }
             private bool f_item;
@@ -508,8 +731,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     if (f_item)
                         return _item;
                     long _pos = m_io.Pos;
-                    m_io.Seek(Ofs);
-                    M_Tracer.Seek(Ofs);
+                    m_io.Seek(Offset);
+                    M_Tracer.Seek(Offset);
                     __raw_item = m_io.ReadBytesFull();
                     var io___raw_item = new KaitaiStream(__raw_item);
                     M_Tracer.DeclareNewIo();
@@ -521,11 +744,11 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     return _item;
                 }
             }
-            private uint _ofs;
+            private uint _offset;
             private Kh2Dpd m_root;
             private Kh2Dpd m_parent;
             private byte[] __raw_item;
-            public uint Ofs { get { return _ofs; } }
+            public uint Offset { get { return _offset; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd M_Parent { get { return m_parent; } }
             public byte[] M_RawItem { get { return __raw_item; } }
@@ -620,6 +843,256 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             public byte[] Palette { get { return _palette; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd.EffectsTextureParent M_Parent { get { return m_parent; } }
+        }
+        public partial class EffectUv : KaitaiStruct
+        {
+            public Tracer M_Tracer;
+
+            public static EffectUv FromFile(string fileName)
+            {
+                return new EffectUv(new KaitaiStream(fileName));
+            }
+
+            public EffectUv(KaitaiStream p__io, Kh2Dpd.EffectsTab4Vtx6 p__parent = null, Kh2Dpd p__root = null, Tracer tracer = null) : base(p__io)
+            {
+                M_Tracer = tracer;
+                var entityName = nameof(EffectUv);
+                m_parent = p__parent;
+                m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
+                _read();
+                M_Tracer.EndRead();
+            }
+            private void _read()
+            {
+                M_Tracer.BeginMember(nameof(U));
+                _u = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(V));
+                _v = m_io.ReadU2le();
+                M_Tracer.EndMember();
+            }
+            private ushort _u;
+            private ushort _v;
+            private Kh2Dpd m_root;
+            private Kh2Dpd.EffectsTab4Vtx6 m_parent;
+            public ushort U { get { return _u; } }
+            public ushort V { get { return _v; } }
+            public Kh2Dpd M_Root { get { return m_root; } }
+            public Kh2Dpd.EffectsTab4Vtx6 M_Parent { get { return m_parent; } }
+        }
+        public partial class EffectsTab4VertSet : KaitaiStruct
+        {
+            public Tracer M_Tracer;
+
+            public static EffectsTab4VertSet FromFile(string fileName)
+            {
+                return new EffectsTab4VertSet(new KaitaiStream(fileName));
+            }
+
+            public EffectsTab4VertSet(KaitaiStream p__io, Kh2Dpd.EffectsTab4 p__parent = null, Kh2Dpd p__root = null, Tracer tracer = null) : base(p__io)
+            {
+                M_Tracer = tracer;
+                var entityName = nameof(EffectsTab4VertSet);
+                m_parent = p__parent;
+                m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
+                _read();
+                M_Tracer.EndRead();
+            }
+            private void _read()
+            {
+                M_Tracer.BeginMember(nameof(VertFormat));
+                _vertFormat = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(NumVerts));
+                _numVerts = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk34));
+                _unk34 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk38));
+                _unk38 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk3c));
+                _unk3c = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                _verts = new List<KaitaiStruct>((int) (NumVerts));
+                for (var i = 0; i < NumVerts; i++)
+                {
+                    switch (VertFormat) {
+                    case 1536: {
+                        M_Tracer.BeginArrayMember(nameof(Verts));
+                        _verts.Add(new EffectsTab4Vtx6(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
+                        break;
+                    }
+                    case 1024: {
+                        M_Tracer.BeginArrayMember(nameof(Verts));
+                        _verts.Add(new EffectsTab4Vtx4(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
+                        break;
+                    }
+                    case 0: {
+                        M_Tracer.BeginArrayMember(nameof(Verts));
+                        _verts.Add(new EffectsTab4Vtx0(m_io, this, m_root, tracer: M_Tracer));
+                        M_Tracer.EndArrayMember();
+                        break;
+                    }
+                    }
+                }
+                if (VertFormat == 1536) {
+                    M_Tracer.BeginMember(nameof(Pad6));
+                    _pad6 = m_io.ReadBytes(((16 - (40 * NumVerts)) & 15));
+                    M_Tracer.EndMember();
+                }
+                if (VertFormat == 1024) {
+                    M_Tracer.BeginMember(nameof(Pad4));
+                    _pad4 = m_io.ReadBytes(((16 - (24 * NumVerts)) & 15));
+                    M_Tracer.EndMember();
+                }
+                if (VertFormat == 0) {
+                    M_Tracer.BeginMember(nameof(Pad0));
+                    _pad0 = m_io.ReadBytes(((16 - (20 * NumVerts)) & 15));
+                    M_Tracer.EndMember();
+                }
+            }
+            private ushort _vertFormat;
+            private ushort _numVerts;
+            private uint _unk34;
+            private uint _unk38;
+            private uint _unk3c;
+            private List<KaitaiStruct> _verts;
+            private byte[] _pad6;
+            private byte[] _pad4;
+            private byte[] _pad0;
+            private Kh2Dpd m_root;
+            private Kh2Dpd.EffectsTab4 m_parent;
+            public ushort VertFormat { get { return _vertFormat; } }
+            public ushort NumVerts { get { return _numVerts; } }
+            public uint Unk34 { get { return _unk34; } }
+            public uint Unk38 { get { return _unk38; } }
+            public uint Unk3c { get { return _unk3c; } }
+            public List<KaitaiStruct> Verts { get { return _verts; } }
+            public byte[] Pad6 { get { return _pad6; } }
+            public byte[] Pad4 { get { return _pad4; } }
+            public byte[] Pad0 { get { return _pad0; } }
+            public Kh2Dpd M_Root { get { return m_root; } }
+            public Kh2Dpd.EffectsTab4 M_Parent { get { return m_parent; } }
+        }
+        public partial class EffectsTab4Vtx4 : KaitaiStruct
+        {
+            public Tracer M_Tracer;
+
+            public static EffectsTab4Vtx4 FromFile(string fileName)
+            {
+                return new EffectsTab4Vtx4(new KaitaiStream(fileName));
+            }
+
+            public EffectsTab4Vtx4(KaitaiStream p__io, Kh2Dpd.EffectsTab4VertSet p__parent = null, Kh2Dpd p__root = null, Tracer tracer = null) : base(p__io)
+            {
+                M_Tracer = tracer;
+                var entityName = nameof(EffectsTab4Vtx4);
+                m_parent = p__parent;
+                m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
+                _read();
+                M_Tracer.EndRead();
+            }
+            private void _read()
+            {
+                M_Tracer.BeginMember(nameof(Clr0));
+                _clr0 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Clr1));
+                _clr1 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Clr2));
+                _clr2 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Clr3));
+                _clr3 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert0));
+                _vert0 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert1));
+                _vert1 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert2));
+                _vert2 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert3));
+                _vert3 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+            }
+            private EffectRgba _clr0;
+            private EffectRgba _clr1;
+            private EffectRgba _clr2;
+            private EffectRgba _clr3;
+            private ushort _vert0;
+            private ushort _vert1;
+            private ushort _vert2;
+            private ushort _vert3;
+            private Kh2Dpd m_root;
+            private Kh2Dpd.EffectsTab4VertSet m_parent;
+            public EffectRgba Clr0 { get { return _clr0; } }
+            public EffectRgba Clr1 { get { return _clr1; } }
+            public EffectRgba Clr2 { get { return _clr2; } }
+            public EffectRgba Clr3 { get { return _clr3; } }
+            public ushort Vert0 { get { return _vert0; } }
+            public ushort Vert1 { get { return _vert1; } }
+            public ushort Vert2 { get { return _vert2; } }
+            public ushort Vert3 { get { return _vert3; } }
+            public Kh2Dpd M_Root { get { return m_root; } }
+            public Kh2Dpd.EffectsTab4VertSet M_Parent { get { return m_parent; } }
+        }
+        public partial class EffectRgba : KaitaiStruct
+        {
+            public Tracer M_Tracer;
+
+            public static EffectRgba FromFile(string fileName)
+            {
+                return new EffectRgba(new KaitaiStream(fileName));
+            }
+
+            public EffectRgba(KaitaiStream p__io, KaitaiStruct p__parent = null, Kh2Dpd p__root = null, Tracer tracer = null) : base(p__io)
+            {
+                M_Tracer = tracer;
+                var entityName = nameof(EffectRgba);
+                m_parent = p__parent;
+                m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
+                _read();
+                M_Tracer.EndRead();
+            }
+            private void _read()
+            {
+                M_Tracer.BeginMember(nameof(Red));
+                _red = m_io.ReadU1();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Green));
+                _green = m_io.ReadU1();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Blue));
+                _blue = m_io.ReadU1();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Alpha));
+                _alpha = m_io.ReadU1();
+                M_Tracer.EndMember();
+            }
+            private byte _red;
+            private byte _green;
+            private byte _blue;
+            private byte _alpha;
+            private Kh2Dpd m_root;
+            private KaitaiStruct m_parent;
+            public byte Red { get { return _red; } }
+            public byte Green { get { return _green; } }
+            public byte Blue { get { return _blue; } }
+            public byte Alpha { get { return _alpha; } }
+            public Kh2Dpd M_Root { get { return m_root; } }
+            public KaitaiStruct M_Parent { get { return m_parent; } }
         }
         public partial class DpdEffectCommand : KaitaiStruct
         {
@@ -760,6 +1233,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 var entityName = nameof(DpdEffect);
                 m_parent = p__parent;
                 m_root = p__root;
+                f_checkNextExistence = false;
                 f_next = false;
                 M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
@@ -808,6 +1282,25 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                     M_Tracer.EndArrayMember();
                 }
             }
+            private bool f_checkNextExistence;
+            private uint _checkNextExistence;
+            public uint CheckNextExistence
+            {
+                get
+                {
+                    if (f_checkNextExistence)
+                        return _checkNextExistence;
+                    long _pos = m_io.Pos;
+                    m_io.Seek(OffsetNext);
+                    M_Tracer.Seek(OffsetNext);
+                    M_Tracer.BeginMember(nameof(CheckNextExistence));
+                    _checkNextExistence = m_io.ReadU4le();
+                    M_Tracer.EndMember();
+                    m_io.Seek(_pos);
+                    f_checkNextExistence = true;
+                    return _checkNextExistence;
+                }
+            }
             private bool f_next;
             private DpdEffect _next;
             public DpdEffect Next
@@ -816,7 +1309,7 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 {
                     if (f_next)
                         return _next;
-                    if (OffsetNext != 0) {
+                    if (CheckNextExistence != 0) {
                         long _pos = m_io.Pos;
                         m_io.Seek(OffsetNext);
                         M_Tracer.Seek(OffsetNext);
@@ -858,6 +1351,68 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
             public Kh2Dpd M_Root { get { return m_root; } }
             public KaitaiStruct M_Parent { get { return m_parent; } }
         }
+        public partial class EffectsTab4Vtx0 : KaitaiStruct
+        {
+            public Tracer M_Tracer;
+
+            public static EffectsTab4Vtx0 FromFile(string fileName)
+            {
+                return new EffectsTab4Vtx0(new KaitaiStream(fileName));
+            }
+
+            public EffectsTab4Vtx0(KaitaiStream p__io, Kh2Dpd.EffectsTab4VertSet p__parent = null, Kh2Dpd p__root = null, Tracer tracer = null) : base(p__io)
+            {
+                M_Tracer = tracer;
+                var entityName = nameof(EffectsTab4Vtx0);
+                m_parent = p__parent;
+                m_root = p__root;
+                M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
+                _read();
+                M_Tracer.EndRead();
+            }
+            private void _read()
+            {
+                M_Tracer.BeginMember(nameof(Clr0));
+                _clr0 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Clr1));
+                _clr1 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Clr2));
+                _clr2 = new EffectRgba(m_io, this, m_root, tracer: M_Tracer);
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert0));
+                _vert0 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert1));
+                _vert1 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Vert2));
+                _vert2 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Pad));
+                _pad = m_io.ReadU2le();
+                M_Tracer.EndMember();
+            }
+            private EffectRgba _clr0;
+            private EffectRgba _clr1;
+            private EffectRgba _clr2;
+            private ushort _vert0;
+            private ushort _vert1;
+            private ushort _vert2;
+            private ushort _pad;
+            private Kh2Dpd m_root;
+            private Kh2Dpd.EffectsTab4VertSet m_parent;
+            public EffectRgba Clr0 { get { return _clr0; } }
+            public EffectRgba Clr1 { get { return _clr1; } }
+            public EffectRgba Clr2 { get { return _clr2; } }
+            public ushort Vert0 { get { return _vert0; } }
+            public ushort Vert1 { get { return _vert1; } }
+            public ushort Vert2 { get { return _vert2; } }
+            public ushort Pad { get { return _pad; } }
+            public Kh2Dpd M_Root { get { return m_root; } }
+            public Kh2Dpd.EffectsTab4VertSet M_Parent { get { return m_parent; } }
+        }
         public partial class EffectsTab4 : KaitaiStruct
         {
             public Tracer M_Tracer;
@@ -873,6 +1428,8 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 var entityName = nameof(EffectsTab4);
                 m_parent = p__parent;
                 m_root = p__root;
+                f_norms = false;
+                f_points = false;
                 M_Tracer.BeginRead(entityName, this, p__io, p__parent, p__root);
                 _read();
                 M_Tracer.EndRead();
@@ -882,11 +1439,136 @@ namespace OpenKh.Research.GenGhidraComments.Ksy
                 M_Tracer.BeginMember(nameof(Mark));
                 _mark = m_io.ReadU4le();
                 M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk04));
+                _unk04 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk08));
+                _unk08 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk0c));
+                _unk0c = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk10));
+                _unk10 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk14));
+                _unk14 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(OffPoints));
+                _offPoints = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(OffNorms));
+                _offNorms = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(TotalVerts));
+                _totalVerts = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(NumPoints));
+                _numPoints = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk24));
+                _unk24 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk26));
+                _unk26 = m_io.ReadU2le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk28));
+                _unk28 = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                M_Tracer.BeginMember(nameof(Unk2c));
+                _unk2c = m_io.ReadU4le();
+                M_Tracer.EndMember();
+                _set = new List<EffectsTab4VertSet>();
+                {
+                    var i = 0;
+                    EffectsTab4VertSet M_;
+                    do {
+                        M_Tracer.BeginArrayMember(nameof(Set));
+                        M_ = new EffectsTab4VertSet(m_io, this, m_root, tracer: M_Tracer);
+                        _set.Add(M_);
+                        M_Tracer.EndArrayMember();
+                        i++;
+                    } while (!((i == 0 ? false : (i == 1 ? TotalVerts == M_.NumVerts : true))));
+                }
+            }
+            private bool f_norms;
+            private List<short> _norms;
+            public List<short> Norms
+            {
+                get
+                {
+                    if (f_norms)
+                        return _norms;
+                    long _pos = m_io.Pos;
+                    m_io.Seek(OffPoints);
+                    M_Tracer.Seek(OffPoints);
+                    _norms = new List<short>((int) ((3 * NumPoints)));
+                    for (var i = 0; i < (3 * NumPoints); i++)
+                    {
+                        M_Tracer.BeginArrayMember(nameof(Norms));
+                        _norms.Add(m_io.ReadS2le());
+                        M_Tracer.EndArrayMember();
+                    }
+                    m_io.Seek(_pos);
+                    f_norms = true;
+                    return _norms;
+                }
+            }
+            private bool f_points;
+            private List<short> _points;
+            public List<short> Points
+            {
+                get
+                {
+                    if (f_points)
+                        return _points;
+                    long _pos = m_io.Pos;
+                    m_io.Seek(OffNorms);
+                    M_Tracer.Seek(OffNorms);
+                    _points = new List<short>((int) ((3 * NumPoints)));
+                    for (var i = 0; i < (3 * NumPoints); i++)
+                    {
+                        M_Tracer.BeginArrayMember(nameof(Points));
+                        _points.Add(m_io.ReadS2le());
+                        M_Tracer.EndArrayMember();
+                    }
+                    m_io.Seek(_pos);
+                    f_points = true;
+                    return _points;
+                }
             }
             private uint _mark;
+            private uint _unk04;
+            private uint _unk08;
+            private uint _unk0c;
+            private uint _unk10;
+            private uint _unk14;
+            private uint _offPoints;
+            private uint _offNorms;
+            private ushort _totalVerts;
+            private ushort _numPoints;
+            private ushort _unk24;
+            private ushort _unk26;
+            private uint _unk28;
+            private uint _unk2c;
+            private List<EffectsTab4VertSet> _set;
             private Kh2Dpd m_root;
             private Kh2Dpd.EffectsTab4Parent m_parent;
             public uint Mark { get { return _mark; } }
+            public uint Unk04 { get { return _unk04; } }
+            public uint Unk08 { get { return _unk08; } }
+            public uint Unk0c { get { return _unk0c; } }
+            public uint Unk10 { get { return _unk10; } }
+            public uint Unk14 { get { return _unk14; } }
+            public uint OffPoints { get { return _offPoints; } }
+            public uint OffNorms { get { return _offNorms; } }
+            public ushort TotalVerts { get { return _totalVerts; } }
+            public ushort NumPoints { get { return _numPoints; } }
+            public ushort Unk24 { get { return _unk24; } }
+            public ushort Unk26 { get { return _unk26; } }
+            public uint Unk28 { get { return _unk28; } }
+            public uint Unk2c { get { return _unk2c; } }
+            public List<EffectsTab4VertSet> Set { get { return _set; } }
             public Kh2Dpd M_Root { get { return m_root; } }
             public Kh2Dpd.EffectsTab4Parent M_Parent { get { return m_parent; } }
         }
