@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using McMaster.Extensions.CommandLineUtils;
 using System;
@@ -199,11 +199,24 @@ namespace OpenKh.Command.IdxImg
             [Option(CommandOptionType.NoValue, Description = "Do not compress the file to inject", ShortName = "u", LongName = "uncompressed")]
             public bool Uncompressed { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IDX. By default is 1840 for KH2FM", ShortName = "idx", LongName = "idx-offset")]
-            public long IdxIsoBlock { get; set; } = 1840;
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IDX. Determined automatically by default.", ShortName = "idx", LongName = "idx-offset")]
+            public int IdxIsoBlock { get; set; } = -1;
 
-            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IMG. By default is 671693 for KH2FM", ShortName = "img", LongName = "img-offset")]
-            public long ImgIsoBlock { get; set; } = 671693;
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IMG. Determined automatically by default", ShortName = "img", LongName = "img-offset")]
+            public int ImgIsoBlock { get; set; } = -1;
+
+            bool CompareArrays(byte[] input1, byte[] input2)
+            {
+                bool _return = true;
+
+                for (int i = 0; i < input1.Length; i++)
+                {
+                    if (input1[i] != input2[i])
+                        _return = false;
+                }
+
+                return _return;
+            }
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -212,6 +225,49 @@ namespace OpenKh.Command.IdxImg
                 const int EstimatedMaximumIdxEntryAmountToBeValid = EsitmatedMaximumIdxFileSize / 0x10 - 4;
 
                 using var isoStream = File.Open(InputIso, FileMode.Open, FileAccess.ReadWrite);
+
+                // Begin being hacky.
+
+                if (IdxIsoBlock == -1 || ImgIsoBlock == -1)
+                {
+                    byte[] imgNeedle = new byte[] { 0x01, 0x09, 0x4B, 0x48, 0x32, 0x2E, 0x49, 0x4D, 0x47, 0x3B, 0x31 };
+                    byte[] idxNeedle = new byte[] { 0x01, 0x09, 0x4B, 0x48, 0x32, 0x2E, 0x49, 0x44, 0x58, 0x3B, 0x31 };
+
+                    isoStream.Position = (uint)(0x105 * 0x800);
+                    byte[] haystack = isoStream.ReadBytes(0x500);
+
+                    using (BinaryReader reader = new BinaryReader(new MemoryStream(haystack)))
+                    {
+                        for (int i = 0; i < 0x500; i++)
+                        {
+                            reader.BaseStream.Position = i;
+
+                            byte[] hayRead = reader.ReadBytes(0x0B);
+
+                            bool imgCmp = CompareArrays(hayRead, imgNeedle);
+                            bool idxCmp = CompareArrays(hayRead, idxNeedle);
+
+                            if (imgCmp || idxCmp)
+                            {
+                                reader.BaseStream.Position -= 0x24;
+
+                                byte[] blockStack = reader.ReadBytes(4);
+                                byte[] blockCorrect = new byte[] { blockStack[3], blockStack[2], blockStack[1], blockStack[0] };
+
+                                if (idxCmp && IdxIsoBlock == -1)
+                                    IdxIsoBlock = BitConverter.ToInt32(blockCorrect);
+
+                                else if (imgCmp && ImgIsoBlock == -1)
+                                    ImgIsoBlock = BitConverter.ToInt32(blockCorrect);
+                            }
+                        }
+                    }
+
+                    if (IdxIsoBlock == -1 || ImgIsoBlock == -1)
+                        throw new IOException("Could not determine the LBA Offsets of KH2.IDX or KH2.IMG, is this ISO valid?");
+                }
+
+                // End being hacky.
 
                 var idxStream = OpenIsoSubStream(isoStream, IdxIsoBlock, EsitmatedMaximumIdxFileSize);
                 using var imgStream = OpenIsoSubStream(isoStream, ImgIsoBlock, EsitmatedMaximumImgFileSize);
