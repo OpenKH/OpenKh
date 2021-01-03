@@ -2,8 +2,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Imaging;
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenKh.Engine.MonoGame
 {
@@ -24,6 +27,30 @@ namespace OpenKh.Engine.MonoGame
         {
             Texture2D = File.OpenRead(filePath)
                 .Using(x => Texture2D.FromStream(graphics, x));
+        }
+
+        public Texture2D Texture2D { get; }
+
+        public ModelTexture.TextureWrapMode AddressU => ModelTexture.TextureWrapMode.Repeat;
+        public ModelTexture.TextureWrapMode AddressV => ModelTexture.TextureWrapMode.Repeat;
+
+        public Vector2 RegionU => DefaultRegion;
+        public Vector2 RegionV => DefaultRegion;
+
+        public void Dispose()
+        {
+            Texture2D?.Dispose();
+        }
+    }
+
+    public class Tim2KingdomTexture : IKingdomTexture
+    {
+        private static readonly Vector2 DefaultRegion = new Vector2(0, 1);
+
+        public Tim2KingdomTexture(byte[] texture, GraphicsDevice graphics)
+        {
+            List<Tm2> tm2 = Tm2.Read(new MemoryStream(texture)).ToList();
+            Texture2D = tm2[0].CreateTexture(graphics);
         }
 
         public Texture2D Texture2D { get; }

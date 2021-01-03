@@ -12,40 +12,43 @@ namespace OpenKh.Engine.Parsers
     {
         public PmoParser(Pmo pmo, float Scale)
         {
-            var vertices = new PositionColoredTextured[pmo.vertices.Count];
-            for (var i = 0; i < vertices.Length; i++)
-            {
-                byte maxX = 0xff;
-                byte maxY = 0xff;
-                byte maxZ = 0xff;
-                byte maxW = 0xff;
-                maxX -= (byte)pmo.colors[i].X;
-                maxY -= (byte)pmo.colors[i].Y;
-                maxZ -= (byte)pmo.colors[i].Z;
-                maxW -= (byte)pmo.colors[i].W;
-                vertices[i].X = pmo.vertices[i].X * Scale;
-                vertices[i].Y = pmo.vertices[i].Y * Scale;
-                vertices[i].Z = pmo.vertices[i].Z * Scale;
-                vertices[i].Tu = pmo.textureCoordinates[i].X;
-                vertices[i].Tv = pmo.textureCoordinates[i].Y;
-                vertices[i].R = maxX;
-                vertices[i].G = maxY;
-                vertices[i].B = maxZ;
-                vertices[i].A = maxW;
-            }
-
-            MeshDescriptor meshDescriptor;
-
-            meshDescriptor = new MeshDescriptor()
-            {
-                Vertices = vertices,
-                Indices = pmo.Indices.ToArray(),
-                TextureIndex = 0,
-                IsOpaque = true
-            };
-
             MeshDescriptors = new List<MeshDescriptor>();
-            MeshDescriptors.Add(meshDescriptor);
+            MeshDescriptor currentMesh = new MeshDescriptor();
+
+            for (int x = 0; x < pmo.Meshes.Count; x++)
+            {
+                var vertices = new PositionColoredTextured[pmo.Meshes[x].vertices.Count];
+                for (var i = 0; i < vertices.Length; i++)
+                {
+                    byte maxX = 0xff;
+                    byte maxY = 0xff;
+                    byte maxZ = 0xff;
+                    byte maxW = 0xff;
+                    maxX -= (byte)pmo.Meshes[x].colors[i].X;
+                    maxY -= (byte)pmo.Meshes[x].colors[i].Y;
+                    maxZ -= (byte)pmo.Meshes[x].colors[i].Z;
+                    maxW -= (byte)pmo.Meshes[x].colors[i].W;
+                    vertices[i].X = pmo.Meshes[x].vertices[i].X * Scale;
+                    vertices[i].Y = pmo.Meshes[x].vertices[i].Y * Scale;
+                    vertices[i].Z = pmo.Meshes[x].vertices[i].Z * Scale;
+                    vertices[i].Tu = pmo.Meshes[x].textureCoordinates[i].X;
+                    vertices[i].Tv = pmo.Meshes[x].textureCoordinates[i].Y;
+                    vertices[i].R = maxX;
+                    vertices[i].G = maxY;
+                    vertices[i].B = maxZ;
+                    vertices[i].A = maxW;
+                }
+
+                currentMesh = new MeshDescriptor()
+                {
+                    Vertices = vertices,
+                    Indices = pmo.Meshes[x].Indices.ToArray(),
+                    TextureIndex = pmo.Meshes[x].TextureID,
+                    IsOpaque = true
+                };
+
+                MeshDescriptors.Add(currentMesh);
+            }
         }
 
         public List<MeshDescriptor> MeshDescriptors { get; private set; }

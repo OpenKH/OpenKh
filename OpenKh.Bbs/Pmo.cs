@@ -188,15 +188,12 @@ namespace OpenKh.Bbs
             switch (WeightFormat)
             {
                 case CoordinateFormat.NORMALIZED_8_BITS:
-                    if(numWeights > 0 )
                         vertexSize += (numWeights + 1);
                     break;
                 case CoordinateFormat.NORMALIZED_16_BITS:
-                    if (numWeights > 0)
                         vertexSize += (numWeights + 1) * 2;
                     break;
                 case CoordinateFormat.FLOAT_32_BITS:
-                    if (numWeights > 0)
                         vertexSize += (numWeights + 1) * 4;
                     break;
             }
@@ -220,6 +217,24 @@ namespace OpenKh.Bbs
             return vertexSize;
         }
 
+        public class MeshChunks
+        {
+            public int TextureID;
+            public List<Vector3> vertices;
+            public List<int> Indices;
+            public List<Vector4> colors;
+            public List<Vector2> textureCoordinates;
+
+            public MeshChunks()
+            {
+                TextureID = 0;
+                vertices = new List<Vector3>();
+                Indices = new List<int>();
+                colors = new List<Vector4>();
+                textureCoordinates = new List<Vector2>();
+            }
+        }
+
         public Header header { get; set; }
         public TextureInfo[] textureInfo { get; set; }
         public List<MeshSection> meshSection = new List<MeshSection>();
@@ -234,6 +249,8 @@ namespace OpenKh.Bbs
         public List<byte> TextureIndices = new List<byte>();
         public SkeletonHeader skeletonHeader { get; set; }
         public JointData[] jointList;
+
+        public List<MeshChunks> Meshes = new List<MeshChunks>();
 
         public static Pmo Read(Stream stream)
         {
@@ -253,6 +270,7 @@ namespace OpenKh.Bbs
             // Mesh body 1.
             while(VertCnt > 0)
             {
+                MeshChunks meshChunk = new MeshChunks();
                 MeshSection meshSec = new MeshSection();
                 MeshSectionOptional1 meshSecOpt1 = new MeshSectionOptional1();
                 MeshSectionOptional2 meshSecOpt2 = new MeshSectionOptional2();
@@ -262,11 +280,14 @@ namespace OpenKh.Bbs
                 long positionBeforeHeader = stream.Position;
 
                 meshSec = BinaryMapping.ReadObject<MeshSection>(stream);
+                meshChunk.TextureID = meshSec.TextureID;
+                VertexFlags flags = GetFlags(meshSec);
+
                 if (meshSec.VertexCount <= 0) break;
-                UInt32 isColorFlagRisen = GetBitFieldRange(meshSec.VertexFlags, 24, 1);
+                bool isColorFlagRisen = flags.UniformDiffuseFlag;
 
                 if (pmo.header.SkeletonOffset != 0) meshSecOpt1 = BinaryMapping.ReadObject<MeshSectionOptional1>(stream);
-                if (isColorFlagRisen  == 1) meshSecOpt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
+                if (isColorFlagRisen) meshSecOpt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
                 if (meshSec.TriangleStripCount > 0)
                 {
                     TriangleStripValues = new UInt16[meshSec.TriangleStripCount];
@@ -279,190 +300,6 @@ namespace OpenKh.Bbs
                 pmo.meshSection.Add(meshSec);
                 pmo.meshSectionOpt1.Add(meshSecOpt1);
                 pmo.meshSectionOpt2.Add(meshSecOpt2);
-
-                VertexFlags flags = GetFlags(meshSec);
-
-                // Get Vertices
-                CoordinateFormat TexCoordFormat = flags.TextureCoordinateFormat;
-                CoordinateFormat VertexPositionFormat = flags.PositionFormat;
-                CoordinateFormat WeightFormat = flags.WeightFormat;
-                ColorFormat ColorFormat = flags.ColorFormat;
-                UInt32 SkinningWeightsCount = flags.SkinningWeightsCount;
-                BinaryReader r = new BinaryReader(stream);
-
-                int currentVertexSize = GetVertexSize(TexCoordFormat, VertexPositionFormat, WeightFormat, ColorFormat, (int)SkinningWeightsCount);
-                int vertexSizeDifference = meshSec.VertexSize - currentVertexSize;
-                long positionAfterHeader = stream.Position;
-
-                if(meshSec.TriangleStripCount > 0 || flags.Primitive == PrimitiveType.PRIMITIVE_TRIANGLE_STRIP)
-                {
-                    for(int p = 0; p < meshSec.TriangleStripCount; p++)
-                    {
-                        for(int s = 0; s < (TriangleStripValues[p] - 2); s++)
-                        {
-                            if((s & 1) != 0)
-                            {
-                                pmo.Indices.Add(VertNumber + s);
-                                pmo.Indices.Add(VertNumber + s + 2);
-                                pmo.Indices.Add(VertNumber + s + 1);
-                            }
-                            else
-                            {
-                                pmo.Indices.Add(VertNumber + s);
-                                pmo.Indices.Add(VertNumber + s + 1);
-                                pmo.Indices.Add(VertNumber + s + 2);
-                            }
-                        }
-
-                        VertNumber += TriangleStripValues[p];
-                    }
-                }
-
-                for (int v = 0; v < meshSec.VertexCount; v++)
-                {
-                    // Read all skin weights.
-                    if (SkinningWeightsCount > 0)
-                    {
-                        for (int i = 0; i < (SkinningWeightsCount + 1); i++)
-                        {
-                            switch (WeightFormat)
-                            {
-                                case CoordinateFormat.NORMALIZED_8_BITS:
-                                    pmo.jointWeights.Add(stream.ReadByte() / 127.0f);
-                                    break;
-                                case CoordinateFormat.NORMALIZED_16_BITS:
-                                    pmo.jointWeights.Add(stream.ReadUInt16() / 32767.0f);
-                                    break;
-                                case CoordinateFormat.FLOAT_32_BITS:
-                                    pmo.jointWeights.Add(stream.ReadFloat());
-                                    break;
-                            }
-                        }
-
-                        
-                    }
-
-                    if (vertexSizeDifference > 0)
-                    {
-                        stream.Seek(vertexSizeDifference, SeekOrigin.Current);
-                    }
-
-                    Vector2 currentTexCoord;
-
-                    switch (TexCoordFormat)
-                    {
-                        case CoordinateFormat.NORMALIZED_8_BITS:
-                            currentTexCoord.X = stream.ReadByte() / 127.0f;
-                            currentTexCoord.Y = stream.ReadByte() / 127.0f;
-                            pmo.textureCoordinates.Add(currentTexCoord);
-                            break;
-                        case CoordinateFormat.NORMALIZED_16_BITS:
-                            currentTexCoord.X = stream.ReadUInt16() / 32767.0f;
-                            currentTexCoord.Y = stream.ReadUInt16() / 32767.0f;
-                            pmo.textureCoordinates.Add(currentTexCoord);
-                            break;
-                        case CoordinateFormat.FLOAT_32_BITS:
-                            currentTexCoord.X = stream.ReadFloat();
-                            currentTexCoord.Y = stream.ReadFloat();
-                            break;
-                    }
-
-                    switch (ColorFormat)
-                    {
-                        case Pmo.ColorFormat.NO_COLOR:
-                            pmo.colors.Add(new Vector4(0, 0, 0, 0));
-                            break;
-                        case Pmo.ColorFormat.BGR_5650_16BITS:
-                            break;
-                        case Pmo.ColorFormat.ABGR_5551_16BITS:
-                            break;
-                        case Pmo.ColorFormat.ABGR_4444_16BITS:
-                            break;
-                        case Pmo.ColorFormat.ABGR_8888_32BITS:
-                            pmo.colors.Add(new Vector4(stream.ReadByte(), stream.ReadByte(), stream.ReadByte(), stream.ReadByte()));
-                            break;
-                    }
-
-                    Vector3 currentVertex;
-
-                    // Handle triangles and triangle strips.
-                    switch (VertexPositionFormat)
-                    {
-                        case CoordinateFormat.NORMALIZED_8_BITS:
-                            currentVertex.X = r.ReadSByte() / 127.0f;
-                            currentVertex.Y = r.ReadSByte() / 127.0f;
-                            currentVertex.Z = r.ReadSByte() / 127.0f;
-                            pmo.vertices.Add(currentVertex);
-                            break;
-                        case CoordinateFormat.NORMALIZED_16_BITS:
-                            currentVertex.X = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
-                            currentVertex.Y = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
-                            currentVertex.Z = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
-                            pmo.vertices.Add(currentVertex);
-                            break;
-                        case CoordinateFormat.FLOAT_32_BITS:
-                            currentVertex.X = (float)stream.ReadFloat() * pmo.header.ModelScale;
-                            currentVertex.Y = (float)stream.ReadFloat() * pmo.header.ModelScale;
-                            currentVertex.Z = (float)stream.ReadFloat() * pmo.header.ModelScale;
-                            pmo.vertices.Add(currentVertex);
-                            break;
-                    }
-
-                    pmo.TextureIndices.Add(meshSec.TextureID);
-
-                    if (meshSec.TriangleStripCount <= 0)
-                    {
-                        pmo.Indices.Add(VertNumber);
-                        VertNumber++;
-                    }
-                }
-
-                uint remainder = ((uint)stream.Position % 4);
-
-                if (remainder != 0)
-                {
-                    stream.Seek(remainder, SeekOrigin.Current);
-                }
-
-                VertCnt = meshSec.VertexCount;
-            }
-
-            stream.Seek(pmo.header.MeshOffset1, SeekOrigin.Begin);
-
-            // Mesh body 2.
-            while (VertCnt > 0 && pmo.header.MeshOffset1 != 0)
-            {
-                MeshSection meshSec = new MeshSection();
-                MeshSectionOptional1 meshSecOpt1 = new MeshSectionOptional1();
-                MeshSectionOptional2 meshSecOpt2 = new MeshSectionOptional2();
-                UInt16[] TriangleStripValues = new UInt16[0];
-                meshSecCount++;
-
-                long positionBeforeHeader = stream.Position;
-
-                meshSec = BinaryMapping.ReadObject<MeshSection>(stream);
-                if (meshSec.VertexCount <= 0)
-                    break;
-                UInt32 isColorFlagRisen = GetBitFieldRange(meshSec.VertexFlags, 24, 1);
-
-                if (pmo.header.SkeletonOffset != 0)
-                    meshSecOpt1 = BinaryMapping.ReadObject<MeshSectionOptional1>(stream);
-                if (isColorFlagRisen == 1)
-                    meshSecOpt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
-                if (meshSec.TriangleStripCount > 0)
-                {
-                    TriangleStripValues = new UInt16[meshSec.TriangleStripCount];
-                    for (int i = 0; i < meshSec.TriangleStripCount; i++)
-                    {
-                        TriangleStripValues[i] = stream.ReadUInt16();
-                    }
-                }
-
-                pmo.meshSection.Add(meshSec);
-                pmo.meshSectionOpt1.Add(meshSecOpt1);
-                pmo.meshSectionOpt2.Add(meshSecOpt2);
-
-                VertexFlags flags = GetFlags(meshSec);
 
                 // Get Vertices
                 CoordinateFormat TexCoordFormat = flags.TextureCoordinateFormat;
@@ -478,55 +315,50 @@ namespace OpenKh.Bbs
 
                 if (meshSec.TriangleStripCount > 0 || flags.Primitive == PrimitiveType.PRIMITIVE_TRIANGLE_STRIP)
                 {
-                    for (int p = 0; p < meshSec.TriangleStripCount; p++)
+                    int vertInd = 0;
+                    for(int p = 0; p < meshSec.TriangleStripCount; p++)
                     {
-                        for (int s = 0; s < (TriangleStripValues[p] - 2); s++)
+                        for(int s = 0; s < (TriangleStripValues[p] - 2); s++)
                         {
-                            if ((s & 1) != 0)
+                            if(s % 2 == 0)
                             {
-                                pmo.Indices.Add(VertNumber + s);
-                                pmo.Indices.Add(VertNumber + s + 2);
-                                pmo.Indices.Add(VertNumber + s + 1);
+                                meshChunk.Indices.Add(vertInd + s + 0);
+                                meshChunk.Indices.Add(vertInd + s + 1);
+                                meshChunk.Indices.Add(vertInd + s + 2);
                             }
                             else
                             {
-                                pmo.Indices.Add(VertNumber + s);
-                                pmo.Indices.Add(VertNumber + s + 1);
-                                pmo.Indices.Add(VertNumber + s + 2);
+                                meshChunk.Indices.Add(vertInd + s + 1);
+                                meshChunk.Indices.Add(vertInd + s + 0);
+                                meshChunk.Indices.Add(vertInd + s + 2);
                             }
                         }
 
                         VertNumber += TriangleStripValues[p];
+                        vertInd += TriangleStripValues[p];
                     }
                 }
 
                 for (int v = 0; v < meshSec.VertexCount; v++)
                 {
-                    // Read all skin weights.
-                    if (SkinningWeightsCount > 0)
+                    int vertDiff = vertexSizeDifference;
+                    long vertexStartPos = stream.Position;
+                    int vertexIncreaseAmount = 0;
+
+                    for (int i = 0; i < (SkinningWeightsCount + 1); i++)
                     {
-                        for (int i = 0; i < (SkinningWeightsCount + 1); i++)
+                        switch (WeightFormat)
                         {
-                            switch (WeightFormat)
-                            {
-                                case CoordinateFormat.NORMALIZED_8_BITS:
-                                    pmo.jointWeights.Add(stream.ReadByte() / 127.0f);
-                                    break;
-                                case CoordinateFormat.NORMALIZED_16_BITS:
-                                    pmo.jointWeights.Add(stream.ReadUInt16() / 32767.0f);
-                                    break;
-                                case CoordinateFormat.FLOAT_32_BITS:
-                                    pmo.jointWeights.Add(stream.ReadFloat());
-                                    break;
-                            }
+                            case CoordinateFormat.NORMALIZED_8_BITS:
+                                pmo.jointWeights.Add(stream.ReadByte() / 127.0f);
+                                break;
+                            case CoordinateFormat.NORMALIZED_16_BITS:
+                                pmo.jointWeights.Add(stream.ReadUInt16() / 32767.0f);
+                                break;
+                            case CoordinateFormat.FLOAT_32_BITS:
+                                pmo.jointWeights.Add(stream.ReadFloat());
+                                break;
                         }
-
-
-                    }
-
-                    if (vertexSizeDifference > 0)
-                    {
-                        stream.Seek(vertexSizeDifference, SeekOrigin.Current);
                     }
 
                     Vector2 currentTexCoord;
@@ -536,32 +368,48 @@ namespace OpenKh.Bbs
                         case CoordinateFormat.NORMALIZED_8_BITS:
                             currentTexCoord.X = stream.ReadByte() / 127.0f;
                             currentTexCoord.Y = stream.ReadByte() / 127.0f;
-                            pmo.textureCoordinates.Add(currentTexCoord);
+                            meshChunk.textureCoordinates.Add(currentTexCoord);
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
+                            vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
                             currentTexCoord.X = stream.ReadUInt16() / 32767.0f;
                             currentTexCoord.Y = stream.ReadUInt16() / 32767.0f;
-                            pmo.textureCoordinates.Add(currentTexCoord);
+                            meshChunk.textureCoordinates.Add(currentTexCoord);
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
+                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
                             currentTexCoord.X = stream.ReadFloat();
                             currentTexCoord.Y = stream.ReadFloat();
+                            meshChunk.textureCoordinates.Add(currentTexCoord);
                             break;
                     }
 
                     switch (ColorFormat)
                     {
                         case Pmo.ColorFormat.NO_COLOR:
-                            pmo.colors.Add(new Vector4(0, 0, 0, 0));
+                            meshChunk.colors.Add(new Vector4(0, 0, 0, 0));
                             break;
                         case Pmo.ColorFormat.BGR_5650_16BITS:
+                            stream.ReadUInt16();
                             break;
                         case Pmo.ColorFormat.ABGR_5551_16BITS:
+                            stream.ReadUInt16();
                             break;
                         case Pmo.ColorFormat.ABGR_4444_16BITS:
+                            stream.ReadUInt16();
                             break;
                         case Pmo.ColorFormat.ABGR_8888_32BITS:
-                            pmo.colors.Add(new Vector4(stream.ReadByte(), stream.ReadByte(), stream.ReadByte(), stream.ReadByte()));
+                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
+                            meshChunk.colors.Add(new Vector4(stream.ReadByte(), stream.ReadByte(), stream.ReadByte(), stream.ReadByte()));
                             break;
                     }
 
@@ -571,30 +419,40 @@ namespace OpenKh.Bbs
                     switch (VertexPositionFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            currentVertex.X = r.ReadSByte() / 127.0f;
-                            currentVertex.Y = r.ReadSByte() / 127.0f;
-                            currentVertex.Z = r.ReadSByte() / 127.0f;
-                            pmo.vertices.Add(currentVertex);
+                            currentVertex.X = r.ReadSByte() / 127.0f * pmo.header.ModelScale;
+                            currentVertex.Y = r.ReadSByte() / 127.0f * pmo.header.ModelScale;
+                            currentVertex.Z = r.ReadSByte() / 127.0f * pmo.header.ModelScale;
+                            meshChunk.vertices.Add(currentVertex);
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
+                            vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
                             currentVertex.X = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
                             currentVertex.Y = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
                             currentVertex.Z = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
-                            pmo.vertices.Add(currentVertex);
+                            meshChunk.vertices.Add(currentVertex);
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
-                            currentVertex.X = (float)stream.ReadFloat() * pmo.header.ModelScale;
-                            currentVertex.Y = (float)stream.ReadFloat() * pmo.header.ModelScale;
-                            currentVertex.Z = (float)stream.ReadFloat() * pmo.header.ModelScale;
-                            pmo.vertices.Add(currentVertex);
+                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
+                            currentVertex.X = stream.ReadFloat() * pmo.header.ModelScale;
+                            currentVertex.Y = stream.ReadFloat() * pmo.header.ModelScale;
+                            currentVertex.Z = stream.ReadFloat() * pmo.header.ModelScale;
+                            meshChunk.vertices.Add(currentVertex);
                             break;
                     }
+
+                    stream.Seek(vertDiff, SeekOrigin.Current);
 
                     pmo.TextureIndices.Add(meshSec.TextureID);
 
                     if (meshSec.TriangleStripCount <= 0)
                     {
-                        pmo.Indices.Add(VertNumber);
+                        meshChunk.Indices.Add(v);
                         VertNumber++;
                     }
                 }
@@ -607,6 +465,214 @@ namespace OpenKh.Bbs
                 }
 
                 VertCnt = meshSec.VertexCount;
+                pmo.Meshes.Add(meshChunk);
+            }
+
+            stream.Seek(pmo.header.MeshOffset1, SeekOrigin.Begin);
+            VertCnt = 0xFFFF;
+
+            // Mesh body 2.
+            while (VertCnt > 0)
+            {
+                MeshChunks meshChunk = new MeshChunks();
+                MeshSection meshSec = new MeshSection();
+                MeshSectionOptional1 meshSecOpt1 = new MeshSectionOptional1();
+                MeshSectionOptional2 meshSecOpt2 = new MeshSectionOptional2();
+                UInt16[] TriangleStripValues = new UInt16[0];
+                meshSecCount++;
+
+                long positionBeforeHeader = stream.Position;
+
+                meshSec = BinaryMapping.ReadObject<MeshSection>(stream);
+                meshChunk.TextureID = meshSec.TextureID;
+                VertexFlags flags = GetFlags(meshSec);
+
+                if (meshSec.VertexCount <= 0)
+                    break;
+                bool isColorFlagRisen = flags.UniformDiffuseFlag;
+
+                if (pmo.header.SkeletonOffset != 0)
+                    meshSecOpt1 = BinaryMapping.ReadObject<MeshSectionOptional1>(stream);
+                if (isColorFlagRisen)
+                    meshSecOpt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
+                if (meshSec.TriangleStripCount > 0)
+                {
+                    TriangleStripValues = new UInt16[meshSec.TriangleStripCount];
+                    for (int i = 0; i < meshSec.TriangleStripCount; i++)
+                    {
+                        TriangleStripValues[i] = stream.ReadUInt16();
+                    }
+                }
+
+                pmo.meshSection.Add(meshSec);
+                pmo.meshSectionOpt1.Add(meshSecOpt1);
+                pmo.meshSectionOpt2.Add(meshSecOpt2);
+
+                // Get Vertices
+                CoordinateFormat TexCoordFormat = flags.TextureCoordinateFormat;
+                CoordinateFormat VertexPositionFormat = flags.PositionFormat;
+                CoordinateFormat WeightFormat = flags.WeightFormat;
+                ColorFormat ColorFormat = flags.ColorFormat;
+                UInt32 SkinningWeightsCount = flags.SkinningWeightsCount;
+                BinaryReader r = new BinaryReader(stream);
+
+                int currentVertexSize = GetVertexSize(TexCoordFormat, VertexPositionFormat, WeightFormat, ColorFormat, (int)SkinningWeightsCount);
+                int vertexSizeDifference = meshSec.VertexSize - currentVertexSize;
+                long positionAfterHeader = stream.Position;
+
+                if (meshSec.TriangleStripCount > 0 || flags.Primitive == PrimitiveType.PRIMITIVE_TRIANGLE_STRIP)
+                {
+                    int vertInd = 0;
+                    for (int p = 0; p < meshSec.TriangleStripCount; p++)
+                    {
+                        for (int s = 0; s < (TriangleStripValues[p] - 2); s++)
+                        {
+                            if (s % 2 == 0)
+                            {
+                                meshChunk.Indices.Add(vertInd + s);
+                                meshChunk.Indices.Add(vertInd + s + 1);
+                                meshChunk.Indices.Add(vertInd + s + 2);
+                            }
+                            else
+                            {
+                                meshChunk.Indices.Add(vertInd + s + 2);
+                                meshChunk.Indices.Add(vertInd + s + 1);
+                                meshChunk.Indices.Add(vertInd + s);
+                            }
+                        }
+
+                        VertNumber += TriangleStripValues[p];
+                        vertInd += TriangleStripValues[p];
+                    }
+                }
+
+                for (int v = 0; v < meshSec.VertexCount; v++)
+                {
+                    int vertDiff = vertexSizeDifference;
+                    long vertexStartPos = stream.Position;
+                    int vertexIncreaseAmount = 0;
+
+                    for (int i = 0; i < (SkinningWeightsCount + 1); i++)
+                    {
+                        switch (WeightFormat)
+                        {
+                            case CoordinateFormat.NORMALIZED_8_BITS:
+                                pmo.jointWeights.Add(stream.ReadByte() / 127.0f);
+                                break;
+                            case CoordinateFormat.NORMALIZED_16_BITS:
+                                pmo.jointWeights.Add(stream.ReadUInt16() / 32767.0f);
+                                break;
+                            case CoordinateFormat.FLOAT_32_BITS:
+                                pmo.jointWeights.Add(stream.ReadFloat());
+                                break;
+                        }
+                    }
+
+                    Vector2 currentTexCoord;
+
+                    switch (TexCoordFormat)
+                    {
+                        case CoordinateFormat.NORMALIZED_8_BITS:
+                            currentTexCoord.X = stream.ReadByte() / 127.0f;
+                            currentTexCoord.Y = stream.ReadByte() / 127.0f;
+                            meshChunk.textureCoordinates.Add(currentTexCoord);
+                            break;
+                        case CoordinateFormat.NORMALIZED_16_BITS:
+                            vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
+                            currentTexCoord.X = stream.ReadUInt16() / 32767.0f;
+                            currentTexCoord.Y = stream.ReadUInt16() / 32767.0f;
+                            meshChunk.textureCoordinates.Add(currentTexCoord);
+                            break;
+                        case CoordinateFormat.FLOAT_32_BITS:
+                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
+                            currentTexCoord.X = stream.ReadFloat();
+                            currentTexCoord.Y = stream.ReadFloat();
+                            meshChunk.textureCoordinates.Add(currentTexCoord);
+                            break;
+                    }
+
+                    switch (ColorFormat)
+                    {
+                        case Pmo.ColorFormat.NO_COLOR:
+                            meshChunk.colors.Add(new Vector4(0, 0, 0, 0));
+                            break;
+                        case Pmo.ColorFormat.BGR_5650_16BITS:
+                            stream.ReadUInt16();
+                            break;
+                        case Pmo.ColorFormat.ABGR_5551_16BITS:
+                            stream.ReadUInt16();
+                            break;
+                        case Pmo.ColorFormat.ABGR_4444_16BITS:
+                            stream.ReadUInt16();
+                            break;
+                        case Pmo.ColorFormat.ABGR_8888_32BITS:
+                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
+                            meshChunk.colors.Add(new Vector4(stream.ReadByte(), stream.ReadByte(), stream.ReadByte(), stream.ReadByte()));
+                            break;
+                    }
+
+                    Vector3 currentVertex;
+
+                    // Handle triangles and triangle strips.
+                    switch (VertexPositionFormat)
+                    {
+                        case CoordinateFormat.NORMALIZED_8_BITS:
+                            currentVertex.X = r.ReadSByte() / 127.0f * pmo.header.ModelScale;
+                            currentVertex.Y = r.ReadSByte() / 127.0f * pmo.header.ModelScale;
+                            currentVertex.Z = r.ReadSByte() / 127.0f * pmo.header.ModelScale;
+                            meshChunk.vertices.Add(currentVertex);
+                            break;
+                        case CoordinateFormat.NORMALIZED_16_BITS:
+                            vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
+                            currentVertex.X = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
+                            currentVertex.Y = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
+                            currentVertex.Z = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
+                            meshChunk.vertices.Add(currentVertex);
+                            break;
+                        case CoordinateFormat.FLOAT_32_BITS:
+                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                            vertDiff -= vertexIncreaseAmount;
+
+                            currentVertex.X = stream.ReadFloat() * pmo.header.ModelScale;
+                            currentVertex.Y = stream.ReadFloat() * pmo.header.ModelScale;
+                            currentVertex.Z = stream.ReadFloat() * pmo.header.ModelScale;
+                            meshChunk.vertices.Add(currentVertex);
+                            break;
+                    }
+
+                    stream.Seek(vertDiff, SeekOrigin.Current);
+
+                    pmo.TextureIndices.Add(meshSec.TextureID);
+
+                    if (meshSec.TriangleStripCount <= 0)
+                    {
+                        meshChunk.Indices.Add(v);
+                        VertNumber++;
+                    }
+                }
+
+                uint remainder = ((uint)stream.Position % 4);
+
+                if (remainder != 0)
+                {
+                    stream.Seek(remainder, SeekOrigin.Current);
+                }
+
+                VertCnt = meshSec.VertexCount;
+                pmo.Meshes.Add(meshChunk);
             }
 
             // Read textures.
