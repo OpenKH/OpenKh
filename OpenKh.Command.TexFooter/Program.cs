@@ -8,7 +8,7 @@ namespace OpenKh.Command.TexFooter
 {
     [Command("OpenKh.Command.TexFooter")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(ExportCommand), typeof(ImportCommand))]
+    [Subcommand(typeof(ExportCommand), typeof(ImportCommand), typeof(YmlToBinCommand), typeof(BinToYmlCommand))]
     class Program
     {
         static int Main(string[] args)

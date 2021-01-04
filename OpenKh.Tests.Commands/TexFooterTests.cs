@@ -13,40 +13,29 @@ namespace OpenKh.Tests.Commands
 {
     public class TexFooterTests
     {
-        private static string assetMapDir = @"H:\KH2fm.OpenKH\map\jp";
-
-        public static IEnumerable<object[]> IncludeAssetMapFiles() =>
-            Directory.GetFiles(assetMapDir, "*.map")
-                .Select(file => new object[] { file });
-
-        private static string assetObjDir = @"H:\KH2fm.OpenKH\obj";
-
-        public static IEnumerable<object[]> IncludeAssetModelFiles() =>
-            Directory.GetFiles(assetObjDir, "*.mdlx")
-                .Select(file => new object[] { file });
-
-        //[Theory]
-        //[MemberData(nameof(IncludeAssetMapFiles))]
-        //[MemberData(nameof(IncludeAssetModelFiles))]
-        public void ShouldWriteBackTheExactSameFile(string mapOrMdlxFile)
+        [Theory]
+        [InlineData("res/texfooter/clamp.map")]
+        [InlineData("res/texfooter/clamp-uvsc.map")]
+        [InlineData("res/texfooter/clamp-texa.map")]
+        public void ShouldWriteBackTheExactSameFile(string mapFile)
         {
             var baseDir = Environment.CurrentDirectory;
             var outDir = Path.Combine(
                 baseDir,
                 nameof(TexFooterTests),
-                Path.GetFileName(mapOrMdlxFile).Replace('.', '_')
+                Path.GetFileName(mapFile).Replace('.', '_')
             );
             Directory.CreateDirectory(outDir);
 
-            var destWorkFile = Path.Combine(outDir, Path.GetFileName(mapOrMdlxFile));
+            var destWorkFile = Path.Combine(outDir, Path.GetFileName(mapFile));
 
-            File.Copy(mapOrMdlxFile, destWorkFile, true);
+            File.Copy(mapFile, destWorkFile, true);
 
             var exportErrorCode = new ExportCommand
             {
                 MapFile = destWorkFile,
             }
-                .OnExecute();
+                .Execute();
 
             if (exportErrorCode == 1)
             {
@@ -66,29 +55,15 @@ namespace OpenKh.Tests.Commands
                     {
                         MapFile = destWorkFile,
                     }
-                        .OnExecute()
+                        .Execute()
             );
 
             Assert.Equal(
-                expected: ExtractTextureFooterDataFromFile(mapOrMdlxFile),
-                actual: ExtractTextureFooterDataFromFile(destWorkFile)
+                expected: FromFile(mapFile),
+                actual: FromFile(destWorkFile)
             );
         }
 
-        private IEnumerable<byte> ExtractTextureFooterDataFromFile(string mapOrMdlxFile)
-        {
-            var barEntries = File.OpenRead(mapOrMdlxFile).Using(Bar.Read);
-            var modelTextureEntry = barEntries.FirstOrDefault(it => it.Type == Bar.EntryType.ModelTexture);
-            if (modelTextureEntry != null)
-            {
-                var modelTexture = ModelTexture.Read(modelTextureEntry.Stream);
-                var footerData = modelTexture.GetFooterData();
-                if (footerData != null)
-                {
-                    return footerData;
-                }
-            }
-            return new byte[0];
-        }
+        private IEnumerable<byte> FromFile(string file) => File.ReadAllBytes(file);
     }
 }

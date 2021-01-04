@@ -30,10 +30,11 @@ namespace OpenKh.Command.TexFooter.Models
             ShouldEmitKN5 = footerData.ShouldEmitKN5;
         }
 
-        public TextureFooterData ConvertBack(Func<string, ISpriteImageSource> imageLoader)
+        public TextureFooterData ConvertBackTo(Func<string, ISpriteImageSource> imageLoader, TextureFooterData back)
         {
-            var back = new TextureFooterData();
+            back.UvscList.Clear();
             back.UvscList.AddRange(UvscList);
+            back.TextureAnimationList.Clear();
             back.TextureAnimationList.AddRange(
                 TextureAnimationList
                     .Select(texa => texa.ConvertBack(imageLoader))

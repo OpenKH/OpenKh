@@ -1,5 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Imaging;
+using OpenKh.Kh2.TextureFooter;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -406,10 +407,8 @@ namespace OpenKh.Kh2
         private byte[] OffsetData { get; }
         private byte[] PictureData { get; }
         private byte[] PaletteData { get; }
-        private byte[] FooterData { get; set; }
-
-        public byte[] GetFooterData() => FooterData ?? new byte[0];
-        public void SetFooterData(byte[] data) => FooterData = data;
+        
+        public TextureFooterData TextureFooterData { get; }
 
         private const int ClutBasePtr = 0x2C00;
         private const int TexBasePtr = 0x3000;
@@ -457,7 +456,7 @@ namespace OpenKh.Kh2
             stream.Position = header.PaletteOffset;
             PaletteData = stream.ReadBytes(paletteSize);
 
-            FooterData = stream.ReadBytes(footerSize);
+            TextureFooterData = TextureFooterData.Read(stream);
 
             var paletteBaseOffset = _clutTransfer.BitBltBuf.DBP;
 
@@ -659,7 +658,6 @@ namespace OpenKh.Kh2
 
             PictureData = picData.ToArray();
             PaletteData = palData.ToArray();
-            FooterData = build.footerData ?? Encoding.ASCII.GetBytes("_KN5");
 
             var clutQWC = Convert.ToInt32(palData.Length / 16);
 
@@ -785,7 +783,14 @@ namespace OpenKh.Kh2
             var paletteOffset = (int)stream.Position;
             stream.Write(PaletteData);
 
-            stream.Write(FooterData ?? new byte[0]);
+            if (TextureFooterData != null)
+            {
+                TextureFooterData.Write(stream);
+            }
+            else
+            {
+                stream.Write(Encoding.ASCII.GetBytes("_KN5"));
+            }
 
             var writer = new BinaryWriter(stream.SetPosition(0));
             writer.Write(MagicCode);

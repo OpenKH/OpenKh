@@ -1,0 +1,13 @@
+Textures:
+  TEST:
+    UvscList:
+    - TextureIndex: 0
+      UScrollSpeed: 12345
+      VScrollSpeed: 0
+    - TextureIndex: 1
+      UScrollSpeed: 12345
+      VScrollSpeed: 0
+    TextureAnimationList: []
+    UnkFooter: []
+    ShouldEmitDMYAtFirst: false
+    ShouldEmitKN5: true

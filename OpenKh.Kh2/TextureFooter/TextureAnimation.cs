@@ -32,9 +32,9 @@ namespace OpenKh.Kh2.TextureFooter
         [Data] public int OffsetSpriteImage { get; set; }
         [Data] public int DefaultAnimationIndex { get; set; }
 
-        public short[] SlotTable { get; set; }
-        public TextureFrameGroup[] FrameGroupList { get; set; }
-        public byte[] SpriteImage { get; set; }
+        public short[] SlotTable { get; set; } = new short[0];
+        public TextureFrameGroup[] FrameGroupList { get; set; } = new TextureFrameGroup[0];
+        public byte[] SpriteImage { get; set; } = new byte[0];
         public int SpriteStride => (BitsPerPixel == 4) ? (SpriteWidth + 1) / 2
             : (BitsPerPixel == 8) ? SpriteWidth
             : throw new NotSupportedException();

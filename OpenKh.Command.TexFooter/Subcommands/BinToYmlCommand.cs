@@ -3,12 +3,10 @@ using OpenKh.Command.TexFooter.Models;
 using OpenKh.Command.TexFooter.TypeConverters;
 using OpenKh.Command.TexFooter.Utils;
 using OpenKh.Common;
-using OpenKh.Kh2;
 using OpenKh.Kh2.TextureFooter;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,13 +15,13 @@ using YamlDotNet.Serialization;
 namespace OpenKh.Command.TexFooter.Subcommands
 {
     [HelpOption]
-    [Command(Description = "map file: export map or mdlx texture footer. map -> yml")]
-    public class ExportCommand
+    [Command(Description = "texture footer bin -> yml")]
+    class BinToYmlCommand
     {
         [Required]
         [FileExists]
-        [Argument(0, Description = "Map file")]
-        public string MapFile { get; set; }
+        [Argument(0, Description = "Bin file")]
+        public string BinFile { get; set; }
 
         [Argument(1, Description = "Output dir")]
         public string OutputDir { get; set; }
@@ -32,32 +30,13 @@ namespace OpenKh.Command.TexFooter.Subcommands
 
         public int Execute()
         {
-            var perTexture = new PerTexture();
-
-            var barEntries = File.OpenRead(MapFile).Using(Bar.Read);
-            foreach (var entry in barEntries
-                .Where(entry => entry.Type == Bar.EntryType.ModelTexture && ModelTexture.IsValid(entry.Stream))
-            )
-            {
-                entry.Stream.SetPosition(0);
-
-                var modelTexture = ModelTexture.Read(entry.Stream);
-
-                if (modelTexture.Images == null || !modelTexture.Images.Any())
-                {
-                    return 1;
-                }
-
-                var footerData = modelTexture.TextureFooterData;
-
-                perTexture.Textures[entry.Name] = new TextureFooterDataIMEx(footerData);
-            }
+            var footer = File.OpenRead(BinFile).Using(TextureFooterData.Read);
 
             var outDir = Path.Combine(
-                Path.GetDirectoryName(MapFile),
+                Path.GetDirectoryName(BinFile),
                 OutputDir ?? "."
             );
-            var baseName = Path.GetFileNameWithoutExtension(MapFile);
+            var baseName = Path.GetFileNameWithoutExtension(BinFile);
 
             Directory.CreateDirectory(outDir);
 
@@ -68,7 +47,18 @@ namespace OpenKh.Command.TexFooter.Subcommands
                     .WithTypeConverter(new UseJsonStyleArray<byte>())
                     .WithAttributeOverride<TextureFrame>(it => it.Data, new YamlIgnoreAttribute())
                     .Build()
-                    .Serialize(ExportHelper.AlsoExportImages(outDir, baseName, perTexture))
+                    .Serialize(
+                        ExportHelper.AlsoExportImages(
+                            outDir,
+                            baseName,
+                            new PerTexture
+                            {
+                                Textures = {
+                                    ["MAP"] = new TextureFooterDataIMEx(footer)
+                                },
+                            }
+                        )
+                    )
             );
 
             return 0;

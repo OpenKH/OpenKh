@@ -12,71 +12,36 @@ namespace OpenKh.Tests.kh2
 {
     public class TextureFooterDataTests
     {
-        private static string assetMapDir = @"H:\KH2fm.OpenKH\map\jp";
-
-        public static IEnumerable<object[]> IncludeAssetMapFiles() =>
-            Directory.GetFiles(assetMapDir, "*.map")
-                .Select(file => new object[] { file, false });
-
-        private static string assetObjDir = @"H:\KH2fm.OpenKH\obj";
-
-        public static IEnumerable<object[]> IncludeAssetModelFiles() =>
-            Directory.GetFiles(assetObjDir, "*.mdlx")
-                .Select(file => new object[] { file, true });
-
-        //[Theory]
-        //[MemberData(nameof(IncludeAssetMapFiles))]
-        //[MemberData(nameof(IncludeAssetModelFiles))]
-        public void ShouldWriteBackTheExactSameFile(string mapOrMdlxFile, bool thisIsMdlx)
+        [Theory]
+        [InlineData("kh2/res/dummy1.footer.bin", 2, 0)]
+        [InlineData("kh2/res/dummy2.footer.bin", 0, 1)]
+        public void ReadAndCheckSomeParams(string binFile, int numUvsc, int numTexa)
         {
-            File.OpenRead(mapOrMdlxFile).Using(
-                stream =>
-                {
-                    var barEntries = Bar.Read(stream);
+            var footer = File.OpenRead(binFile).Using(TextureFooterData.Read);
+            Assert.Equal(numUvsc, footer.UvscList.Count);
+            Assert.Equal(numTexa, footer.TextureAnimationList.Count);
+        }
 
-                    {
-                        var modelEntry = barEntries.FirstOrDefault(it => it.Type == Bar.EntryType.Model);
-
-                        if (modelEntry != null)
-                        {
-                            var mdlx = Mdlx.Read(modelEntry.Stream);
-
-                            if (thisIsMdlx)
-                            {
-                                Assert.False(mdlx.IsMap, "It has to be a model file.");
-                            }
-                            else
-                            {
-                                Assert.True(mdlx.IsMap, "It has to be a map file.");
-                            }
-                        }
-                    }
-
-                    var modelTextureEntry = barEntries.FirstOrDefault(it => it.Type == Bar.EntryType.ModelTexture);
-                    if (modelTextureEntry == null || modelTextureEntry.Stream.Length == 0)
-                    {
-                        // Having no texture data
-                        return;
-                    }
-
-                    var modelTexture = ModelTexture.Read(modelTextureEntry.Stream);
-
-                    var footerDataStream = new MemoryStream(modelTexture.GetFooterData());
-
-                    Helpers.AssertStream(
-                        footerDataStream,
-                        inStream =>
-                        {
-                            var textureFooterData = TextureFooterData.Read(inStream);
-
-                            var outStream = new MemoryStream();
-                            textureFooterData.Write(outStream);
-
-                            return outStream;
-                        }
-                    );
-                }
-            );
+        [Fact]
+        public void CreateDummy()
+        {
+            {
+                var footer = new TextureFooterData();
+                var stream = new MemoryStream();
+                footer.Write(stream);
+            }
+            {
+                var footer = new TextureFooterData();
+                footer.UvscList.Add(new UvScroll { });
+                var stream = new MemoryStream();
+                footer.Write(stream);
+            }
+            {
+                var footer = new TextureFooterData();
+                footer.TextureAnimationList.Add(new TextureAnimation { });
+                var stream = new MemoryStream();
+                footer.Write(stream);
+            }
         }
     }
 }
