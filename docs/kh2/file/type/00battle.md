@@ -453,11 +453,13 @@ Data on limits.
 | 01     | byte  | Character - [Character/Summon LIST](../../dictionary/characters.md)
 | 02     | byte  | Summon - [Character/Summon LIST](../../dictionary/characters.md)
 | 03     | byte  | Group (3 requires all of the characters to be alive)
-| 04     | char[32]  | Name
-| 36     | 4B | ???
-| 40     | 4B | ???
-| 44     | 4B | ???
-| 48     | 16B | Padding
+| 04     | char[32]  | Filename
+| 36     | ushort | Spawn - [OBJ LIST](../../dictionary/obj.md)
+| 36     | byte[2] | Padding
+| 40     | ushort | Command - [Command LIST](../../dictionary/commands.md)
+| 42     | ushort | Limit - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 44     | byte | Used for Timeless River versions (0D) (May be more bytes)
+| 45     | byte[19] | Padding
 
 ## Sumn
 
