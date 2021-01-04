@@ -54,6 +54,78 @@ types:
     seq:
       - id: mark
         type: u4
+      - id: unk04
+        type: u4
+      - id: unk08
+        type: u4
+      - id: unk0c
+        type: u4
+    instances:
+      sub:
+        type: effects_tab3_sub
+        size-eos: true
+  effects_tab3_sub:
+    seq:
+      - id: unk10
+        type: u4
+      - id: cnt1
+        type: u2
+      - id: cnt2
+        type: u2
+      - id: unk18
+        type: u4
+      - id: unk1c
+        type: u4
+      - id: a
+        type: effects_tab3_a
+        repeat: expr
+        repeat-expr: cnt1
+  effects_tab3_a:
+    seq:
+      - id: offset
+        type: u2
+      - id: flags
+        type: u2
+      - id: unk
+        type: u4
+    instances:
+      b:
+        pos: offset
+        type: effects_tab3_b
+  effects_tab3_b:
+    seq:
+      - id: unk0
+        type: u2
+      - id: unk2
+        type: u2
+      - id: size
+        type: u4
+      - id: unk8
+        type: u4
+      - id: unkc
+        type: u4
+      - id: data
+        type: effects_tab3_c
+        repeat: expr
+        repeat-expr: size / 16
+  effects_tab3_c:
+    seq:
+      - id: unk0
+        type: u2
+      - id: unk2
+        type: u2
+      - id: unk4
+        type: u2
+      - id: unk6
+        type: u2
+      - id: unk8
+        type: u2
+      - id: unka
+        type: u2
+      - id: unkc
+        type: u2
+      - id: unke
+        type: u2
         
   effects_tab4_vert_set:
     seq:
@@ -235,6 +307,14 @@ types:
     seq:
       - id: mark
         type: u4
+      - id: unk4
+        type: u4
+      - id: unk8
+        type: u4
+      - id: unkc
+        type: u2
+      - id: unke
+        type: u2
         
   effects_texture_parent:
     seq:
