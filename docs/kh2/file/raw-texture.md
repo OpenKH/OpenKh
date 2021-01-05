@@ -186,7 +186,7 @@ Provides a single pair of U and V speed factors for texture scrolling. Entries i
 _Notes:_
 
 - The engine can manage up to 16 UVSC entries simultaneously.
-- 6,400,000 will be enough to scroll 1 round per 1 second.
+- 6,400,000 will be enough to scroll 32 pixels per 1 second.
 - Negative scroll speed is acceptable too.
 
 ### TEXA (Texture Animation)
@@ -250,7 +250,7 @@ Sample: TEXA header from _nm07.map_:
 
 _Notes:_
 
-- Slot table seems to have fixed 512 bytes length.
+- Slot table has variable length data computed by formula: _2 bytes * (Maximum - Base + 1)_
 - Number of animations seems to be always 1 on asset maps. And anim table is 4 bytes length.
 - Frame table can be considered as a script block rather than simple data array, because it has relative jump feature.
 

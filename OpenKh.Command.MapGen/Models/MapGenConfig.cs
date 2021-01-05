@@ -75,6 +75,18 @@ namespace OpenKh.Command.MapGen.Models
 
         public bool reuseImd { get; set; }
 
+        public List<UvscItem> uvscList { get; set; } = new List<UvscItem>();
+
+        public class UvscItem
+        {
+            /// <summary>
+            /// 0 to 15
+            /// </summary>
+            public int index { get; set; }
+            public float u { get; set; }
+            public float v { get; set; }
+        }
+
         public MaterialDef FindMaterial(string name)
         {
             return materials
