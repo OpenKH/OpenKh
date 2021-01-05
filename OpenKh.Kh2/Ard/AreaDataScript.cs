@@ -433,7 +433,7 @@ namespace OpenKh.Kh2.Ard
         public class Mission : IAreaDataCommand
         {
             [Data] public int Unk00 { get; set; }
-            [Data] public string Value { get; set; }
+            [Data(Count = 32)] public string Value { get; set; }
 
             public void Parse(int nRow, List<string> tokens)
             {
@@ -447,7 +447,7 @@ namespace OpenKh.Kh2.Ard
 
         public class Layout : IAreaDataCommand
         {
-            [Data] public string Value { get; set; }
+            [Data(Count = 32)] public string Value { get; set; }
 
             public void Parse(int nRow, List<string> tokens)
             {
@@ -561,7 +561,7 @@ namespace OpenKh.Kh2.Ard
         public class SetEvent : IAreaDataSetting
         {
             [Data] public short Type { get; set; }
-            [Data] public string Value { get; set; }
+            [Data(Count = 4)] public string Value { get; set; }
 
             public void Parse(int nRow, List<string> tokens)
             {
@@ -920,21 +920,35 @@ namespace OpenKh.Kh2.Ard
 
         private static void ScriptStringWriter(MappingWriteArgs args)
         {
+            byte[] data;
             var value = (string)args.Item;
-            var data = new byte[4];
-            if (value.Length > 2)
+
+            if (args.Count == 4)
             {
-                data[0] = (byte)value[0];
-                data[1] = (byte)value[1];
-                data[2] = (byte)value[2];
-                if (value.Length >= 4)
-                    data[3] = (byte)value[3];
-            }
-            else if (value.Length > 0)
-            {
-                data[0] = (byte)value[0];
-                if (value.Length == 2)
+                data = new byte[4];
+                if (value.Length > 2)
+                {
+                    data[0] = (byte)value[0];
                     data[1] = (byte)value[1];
+                    data[2] = (byte)value[2];
+                    if (value.Length >= 4)
+                        data[3] = (byte)value[3];
+                }
+                else if (value.Length > 0)
+                {
+                    data[0] = (byte)value[0];
+                    if (value.Length == 2)
+                        data[1] = (byte)value[1];
+                }
+            }
+            else
+            {
+                var strData = Encoding.ASCII.GetBytes(value);
+                var length = args.Count == 1 ? Helpers.Align(strData.Length + 1, 4) : args.Count;
+                data = new byte[length];
+                Array.Copy(strData, data, strData.Length);
+                args.Writer.BaseStream.AlignPosition(4);
+
             }
 
             args.Writer.BaseStream.Write(data);
@@ -956,6 +970,7 @@ namespace OpenKh.Kh2.Ard
             foreach (var item in items)
             {
                 args.Item = item;
+                args.Count = 4;
                 ScriptStringWriter(args);
             }
         }

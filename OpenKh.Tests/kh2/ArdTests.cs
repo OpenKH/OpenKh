@@ -1,5 +1,7 @@
 using OpenKh.Common;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -205,6 +207,60 @@ Unk17";
 
                     return dstStream;
                 });
+
+
+            public static IEnumerable<object[]> ScriptSource()
+            {
+                if (!Directory.Exists(Path.Combine(Helpers.Kh2DataPath, "ard")))
+                {
+                    yield return new object[] { "", "" };
+                    yield break;
+                }
+
+                foreach (var fileName in Directory.GetFiles(Helpers.Kh2DataPath, "ard/*.ard", SearchOption.AllDirectories))
+                {
+                    if (!File.OpenRead(fileName).Using(Bar.IsValid))
+                        continue;
+
+                    yield return new object[] { fileName, "map" };
+                    yield return new object[] { fileName, "btl" };
+                    yield return new object[] { fileName, "evt" };
+                }
+            }
+
+            [SkippableTheory, MemberData(nameof(ScriptSource))]
+            public void Batch_WriteAllScripts(string ardFile, string scriptSet)
+            {
+                Skip.If(ardFile == "", "No ARD files found");
+
+                var binarcEntry = File.OpenRead(ardFile).Using(Bar.Read)
+                    .FirstOrDefault(x => x.Name == scriptSet && x.Type == Bar.EntryType.SpawnScript);
+                if (binarcEntry == null)
+                    return;
+
+                Helpers.AssertStream(binarcEntry.Stream, stream =>
+                {
+                    var memStream = new MemoryStream();
+                    AreaDataScript.Write(memStream, AreaDataScript.Read(stream));
+
+                    return memStream;
+                });
+            }
+
+            [SkippableTheory, MemberData(nameof(ScriptSource))]
+            public void Batch_CompileAllScripts(string ardFile, string scriptSet)
+            {
+                Skip.If(ardFile == null, "No ARD files found");
+
+                var binarcEntry = File.OpenRead(ardFile).Using(Bar.Read)
+                    .FirstOrDefault(x => x.Name == scriptSet && x.Type == Bar.EntryType.SpawnScript);
+                if (binarcEntry == null)
+                    return;
+
+                var expected = AreaDataScript.Decompile(AreaDataScript.Read(binarcEntry.Stream));
+                var actual = AreaDataScript.Decompile(AreaDataScript.Compile(expected));
+                Assert.Equal(expected, actual);
+            }
         }
 
         public class SpawnPointTests
