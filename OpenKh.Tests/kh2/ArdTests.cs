@@ -15,7 +15,7 @@ namespace OpenKh.Tests.kh2
             [Fact]
             public void ReadTest()
             {
-                var spawns = File.OpenRead(FileName).Using(SpawnScript.Read);
+                var spawns = File.OpenRead(FileName).Using(AreaDataScript.Read);
                 var strProgram = spawns.First(x => x.ProgramId == 6).ToString();
 
                 Assert.Equal(31, spawns.Count);
@@ -25,45 +25,56 @@ namespace OpenKh.Tests.kh2
             public void WriteTest() => File.OpenRead(FileName).Using(x => Helpers.AssertStream(x, stream =>
             {
                 var outStream = new MemoryStream();
-                SpawnScript.Write(outStream, SpawnScript.Read(stream));
+                AreaDataScript.Write(outStream, AreaDataScript.Read(stream));
 
                 return outStream;
             }));
 
             [Theory]
-            [InlineData("Spawn \"ABcd\"", SpawnScript.Operation.Spawn, 0x64634241)]
-            [InlineData("MapOcclusion 0xffffffff 0x00000001", SpawnScript.Operation.MapOcclusion, -1, 1)]
-            [InlineData("MultipleSpawn \"0123\" \"4567\"", SpawnScript.Operation.MultipleSpawn, 0x33323130, 0x37363534)]
-            [InlineData("Unk03 123 \"666\"", (SpawnScript.Operation)3, 123, 0x363636)]
-            [InlineData("Unk04 123", (SpawnScript.Operation)4, 123)]
-            [InlineData("Unk05 123", (SpawnScript.Operation)5, 123)]
-            [InlineData("Unk06 123", (SpawnScript.Operation)6, 123)]
-            [InlineData("Unk07 123", (SpawnScript.Operation)7, 123)]
-            [InlineData("Unk09 \"666\"", (SpawnScript.Operation)9, 0x363636)]
-            [InlineData("Party NO_FRIEND", SpawnScript.Operation.Party, 0)]
-            [InlineData("Party DEFAULT", SpawnScript.Operation.Party, 1)]
-            [InlineData("Party W_FRIEND", SpawnScript.Operation.Party, 2)]
-            [InlineData("Party W_FRIEND_IN", SpawnScript.Operation.Party, 3)]
-            [InlineData("Party W_FRIEND_FIX", SpawnScript.Operation.Party, 4)]
-            [InlineData("Party W_FRIEND_ONLY", SpawnScript.Operation.Party, 5)]
-            [InlineData("Party DONALD_ONLY", SpawnScript.Operation.Party, 6)]
-            [InlineData("Bgm 123 456", SpawnScript.Operation.Bgm, 0x01c8007b)]
-            [InlineData("BgmDefault", SpawnScript.Operation.Bgm, 0)]
-            [InlineData("Unk14", (SpawnScript.Operation)0x14)]
-            [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Mission, 0x1234,
+            [InlineData("Spawn \"ABcd\"", 0, 0x64634241)]
+            [InlineData("MapOcclusion 0xffffffff 0x00000001", 1, -1, 1)]
+            [InlineData("MultipleSpawn \"0123\" \"4567\"", 2, 0x33323130, 0x37363534)]
+            [InlineData("Unk03 123 \"666\"", 3, 123, 0x363636)]
+            [InlineData("Unk04 123", 4, 123)]
+            [InlineData("Unk05 123", 5, 123)]
+            [InlineData("Unk06 123", 6, 123)]
+            [InlineData("Unk07 123", 7, 123)]
+            [InlineData("Unk09 \"666\"", 9, 0x363636)]
+            [InlineData("Party NO_FRIEND", 15, 0)]
+            [InlineData("Party DEFAULT", 15, 1)]
+            [InlineData("Party W_FRIEND", 15, 2)]
+            [InlineData("Party W_FRIEND_IN", 15, 3)]
+            [InlineData("Party W_FRIEND_FIX", 15, 4)]
+            [InlineData("Party W_FRIEND_ONLY", 15, 5)]
+            [InlineData("Party DONALD_ONLY", 15, 6)]
+            [InlineData("Bgm 123 456", 16, 0x01c8007b)]
+            [InlineData("Bgm Default Default", 16, 0)]
+            [InlineData("Unk14", 0x14)]
+            [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"", 0x15, 0x1234,
                 0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
-            [InlineData("Layout \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Layout,
+            [InlineData("Layout \"OPENKH IS OUR MISSION!\"", 0x16,
                 0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
-            [InlineData("Unk17", (SpawnScript.Operation)0x17)]
-            [InlineData("BattleLevel 99", SpawnScript.Operation.BattleLevel, 99)]
-            [InlineData("Unk1f \"666\"", (SpawnScript.Operation)0x1f, 0x363636)]
-            [InlineData("Unkff 0x1234567 0x1ccccccc", (SpawnScript.Operation)0xff, 0x1234567, 0x1ccccccc)]
-            public void ParseScriptAsText(string expected, SpawnScript.Operation operation, params int[] parameters) =>
-                Assert.Equal(expected, SpawnScriptParser.AsText(new SpawnScript.Function
-                {
-                    Opcode = operation,
-                    Parameters = parameters.ToList()
-                }));
+            [InlineData("Unk17", 0x17)]
+            [InlineData("BattleLevel 99", 0x1E, 99)]
+            [InlineData("Unk1f \"666\"", 0x1f, 0x363636)]
+            public void ParseScriptAsText(string expected, int operation, params int[] parameters)
+            {
+                const int ProgramId = 0;
+
+                var writer = new BinaryWriter(new MemoryStream());
+                writer.Write((short)ProgramId);
+                writer.Write((short)(parameters.Length * 4 + 8));
+                writer.Write((short)operation);
+                writer.Write((short)parameters.Length);
+                foreach (var item in parameters)
+                    writer.Write(item);
+
+                writer.BaseStream.Position = 0;
+                writer.BaseStream.Flush();
+                var command = AreaDataScript.Read(writer.BaseStream, ProgramId).First();
+
+                Assert.Equal(expected, command.ToString());
+            }
 
             [Fact]
             public void CreateProgramsCorrectly()
@@ -75,74 +86,105 @@ Unk14
 
 Program 0x123
 Unk17";
-                var script = SpawnScriptParser.Compile(Input).ToArray();
+                var script = AreaDataScript.Compile(Input).ToArray();
                 Assert.Equal(2, script.Length);
 
                 Assert.Equal(123, script[0].ProgramId);
                 Assert.Single(script[0].Functions);
-                Assert.Equal((SpawnScript.Operation)0x14, script[0].Functions[0].Opcode);
 
                 Assert.Equal(0x123, script[1].ProgramId);
                 Assert.Single(script[1].Functions);
-                Assert.Equal((SpawnScript.Operation)0x17, script[1].Functions[0].Opcode);
             }
 
             [Theory]
-            [InlineData("Spawn \"ABcd\"", SpawnScript.Operation.Spawn, 0x64634241)]
-            [InlineData("MapOcclusion 0xffffffff 0x00000001", SpawnScript.Operation.MapOcclusion, -1, 1)]
-            [InlineData("MultipleSpawn \"0123\" \"4567\"", SpawnScript.Operation.MultipleSpawn, 0x33323130, 0x37363534)]
-            [InlineData("Unk03 123 \"666\"", (SpawnScript.Operation)3, 123, 0x363636)]
-            [InlineData("Unk04 123", (SpawnScript.Operation)4, 123)]
-            [InlineData("Unk05 123", (SpawnScript.Operation)5, 123)]
-            [InlineData("Unk06 123", (SpawnScript.Operation)6, 123)]
-            [InlineData("Unk07 123", (SpawnScript.Operation)7, 123)]
-            [InlineData("Unk09 \"666\"", (SpawnScript.Operation)9, 0x363636)]
-            [InlineData("Party NO_FRIEND", SpawnScript.Operation.Party, 0)]
-            [InlineData("Party DEFAULT", SpawnScript.Operation.Party, 1)]
-            [InlineData("Party W_FRIEND", SpawnScript.Operation.Party, 2)]
-            [InlineData("Party W_FRIEND_IN", SpawnScript.Operation.Party, 3)]
-            [InlineData("Party W_FRIEND_FIX", SpawnScript.Operation.Party, 4)]
-            [InlineData("Party W_FRIEND_ONLY", SpawnScript.Operation.Party, 5)]
-            [InlineData("Party DONALD_ONLY", SpawnScript.Operation.Party, 6)]
-            [InlineData("Bgm 123 456", SpawnScript.Operation.Bgm, 0x01c8007b)]
-            [InlineData("BgmDefault", SpawnScript.Operation.Bgm, 0)]
-            [InlineData("Unk14", (SpawnScript.Operation)0x14)]
-            [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Mission, 0x1234,
-                0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
-            [InlineData("Layout \"OPENKH IS OUR MISSION!\"", SpawnScript.Operation.Layout,
-                0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
-            [InlineData("Unk17", (SpawnScript.Operation)0x17)]
-            [InlineData("BattleLevel 99", SpawnScript.Operation.BattleLevel, 99)]
-            [InlineData("Unk1f \"666\"", (SpawnScript.Operation)0x1f, 0x363636)]
-            [InlineData("Unk0c 0x1234567 0x1ccccccc", (SpawnScript.Operation)0x0c, 0x1234567, 0x1ccccccc)]
-            [InlineData("Unk0c 0x1234567 0x1ccccccc 0x1ccccccc", (SpawnScript.Operation)0x0c, 0x1234567, 0x1ccccccc, 0x1ccccccc)]
-            public void ParseTextAsScript(string input, SpawnScript.Operation expectedOp, params int[] expectedParams)
+            [InlineData("Spawn \"ABcd\"")]
+            [InlineData("MapOcclusion 0xffffffff 0x00000001")]
+            [InlineData("MultipleSpawn \"0123\" \"4567\"")]
+            [InlineData("Unk03 123 \"666\"")]
+            [InlineData("Unk04 123")]
+            [InlineData("Unk05 123")]
+            [InlineData("Unk06 123")]
+            [InlineData("Unk07 123")]
+            [InlineData("Unk09 \"666\"")]
+            [InlineData("Party NO_FRIEND")]
+            [InlineData("Party DEFAULT")]
+            [InlineData("Party W_FRIEND")]
+            [InlineData("Party W_FRIEND_IN")]
+            [InlineData("Party W_FRIEND_FIX")]
+            [InlineData("Party W_FRIEND_ONLY")]
+            [InlineData("Party DONALD_ONLY")]
+            [InlineData("Bgm 123 456")]
+            [InlineData("Bgm Default Default")]
+            [InlineData("Unk14")]
+            [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"")]
+            [InlineData("Layout \"OPENKH IS OUR MISSION!\"")]
+            [InlineData("Unk17")]
+            [InlineData("BattleLevel 99")]
+            [InlineData("Unk1f \"666\"")]
+            public void ParseTextAsScript(string input)
             {
-                var script = SpawnScriptParser.Compile($"Program 0\n{input}\n").ToArray();
-                Assert.Single(script);
+                var code = $"Program 0x00\n{input}";
+                var scripts = AreaDataScript.Compile(code).ToArray();
+                Assert.Single(scripts);
 
-                var program = script.First();
-                Assert.Single(program.Functions);
+                var decompiled = scripts.First().ToString();
 
-                var function = program.Functions.First();
-                Assert.Equal(expectedOp, function.Opcode);
-                Assert.Equal(expectedParams, function.Parameters.ToArray());
+                Assert.Equal(code, decompiled);
             }
 
-            //[Theory]
-            //[InlineData("Cutscene \"666\" 1", 0x20000, 0x363636, 1)]
-            //[InlineData("GetItem 666", 0x10006, 0x29a)]
-            //[InlineData("GetItem 666 777", 0x20006, 0x29a, 0x309)]
-            //[InlineData("End", 7)]
-            //public void ParseScriptRunAsText(string expected, params int[] parameters)
-            //{
-            //    var text = SpawnScriptParser.AsText(new SpawnScript.Function
-            //    {
-            //        Opcode = SpawnScript.Operation.Run,
-            //        Parameters = new int[] { 0 }.Concat(parameters).ToList()
-            //    });
-            //    Assert.Equal($"\t{expected}", text.Split('\n').LastOrDefault());
-            //}
+            [Fact]
+            public void ParseAreaSettings()
+            {
+                var data = new byte[]
+                {
+                    // Program header
+                    0x00, 0x00, 0x40, 0x00,
+
+                    // Opcode AreaSettings
+                    0x0C, 0x00, 0x0e, 0x00, 0x00, 0x00, 0xFF, 0xFF,
+
+                    // ProgressFlag
+                    0x02, 0x00, 0x0A, 0x38,
+
+                    // Event
+                    0x00, 0x00, 0x02, 0x00, 0x31, 0x31, 0x30, 0x00,
+
+                    // Jump
+                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x0E, 0x00,
+                    0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
+
+                    // Party menu
+                    0x07, 0x00, 0x00, 0x00,
+
+                    // Progress flag
+                    0x02, 0x00, 0x34, 0x12,
+
+                    // UnkAreaSet05
+                    0x05, 0x00, 0x22, 0x11,
+
+                    // AddInventory
+                    0x06, 0x00, 0x02, 0x00,
+                    0x9A, 0x02, 0x00, 0x00,
+                    0x09, 0x03, 0x00, 0x00,
+
+                    // End program
+                    0xFF, 0xFF, 0x00, 0x00,
+                };
+
+                var scripts = AreaDataScript.Read(new MemoryStream(data));
+
+                Assert.Equal(
+                    "Program 0x00\n" +
+                    "AreaSettings 0 0xffff\n" +
+                    "\tSetProgressFlag 0x380A\n" +
+                    "\tSetEvent \"110\" Type 2\n" +
+                    "\tSetJump Type 1 World NM Area 5 Entrance 0 LocalSet 0 FadeType 1\n" +
+                    "\tSetPartyMenu 0\n" +
+                    "\tSetProgressFlag 0x1234\n" +
+                    "\tSetUnk05 0x1122\n" +
+                    "\tSetInventory 666 777\n",
+                    scripts.First().ToString());
+            }
         }
 
         public class SpawnPointTests

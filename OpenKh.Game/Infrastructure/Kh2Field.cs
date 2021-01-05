@@ -382,22 +382,18 @@ namespace OpenKh.Game.Infrastructure
         private void RunSpawnScript(
             IEnumerable<Bar.Entry> barEntries, string spawnScriptName, int programId)
         {
-            var spawnScript = barEntries.ForEntry(spawnScriptName, Bar.EntryType.SpawnScript, SpawnScript.Read);
-            if (spawnScript == null)
+            var script = barEntries.ForEntry(spawnScriptName, Bar.EntryType.SpawnScript, stream =>
+                AreaDataScript.Read(stream, programId));
+            if (script == null)
                 return;
 
-            var program = spawnScript.FirstOrDefault(x => x.ProgramId == programId);
-            if (program == null)
-                return;
-
-            foreach (var function in program.Functions)
+            foreach (var function in script)
             {
-                switch (function.Opcode)
+                switch (function)
                 {
-                    case SpawnScript.Operation.Spawn:
-                        var spawn = function.AsString(0);
-                        Log.Info($"Loading spawn {spawn}");
-                        var spawnPoints = barEntries.ForEntry(spawn, Bar.EntryType.SpawnPoint, SpawnPoint.Read);
+                    case AreaDataScript.Spawn spawn:
+                        Log.Info($"Loading spawn {spawn.SpawnSet}");
+                        var spawnPoints = barEntries.ForEntry(spawn.SpawnSet, Bar.EntryType.SpawnPoint, SpawnPoint.Read);
                         if (spawnPoints != null)
                         {
                             foreach (var spawnPoint in spawnPoints)
