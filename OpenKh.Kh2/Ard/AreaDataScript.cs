@@ -16,6 +16,7 @@ namespace OpenKh.Kh2.Ard
 
     public interface IAreaDataSetting
     {
+        void Parse(int nRow, List<string> tokens);
     }
 
     public enum Party : int
@@ -160,6 +161,9 @@ namespace OpenKh.Kh2.Ard
 
         private static readonly Dictionary<Type, int> _typeSetId =
             _idSetType.ToDictionary(x => x.Value, x => x.Key);
+
+        private static readonly Dictionary<string, Type> _typeSetStr =
+            _idSetType.ToDictionary(x => x.Value.Name, x => x.Value);
 
         private class Header
         {
@@ -327,13 +331,14 @@ namespace OpenKh.Kh2.Ard
 
             public void Parse(int nRow, List<string> tokens)
             {
-                throw new NotImplementedException();
+                Unk00 = ParseAsShort(nRow, GetToken(nRow, tokens, 1));
+                Unk02 = (short)ParseAsInt(nRow, GetToken(nRow, tokens, 2));
             }
 
             public override string ToString()
             {
                 var sb = new StringBuilder();
-                sb.AppendLine($"{nameof(AreaSettings)} {Unk00:x} 0x{Unk02:x}");
+                sb.AppendLine($"{nameof(AreaSettings)} {Unk00} {Unk02}");
                 foreach (var item in Settings)
                     sb.AppendLine($"\t{item}");
 
@@ -558,6 +563,12 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Type { get; set; }
             [Data] public string Value { get; set; }
 
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Type = ParseAsShort(nRow, GetToken(nRow, tokens, 3));
+                Value = ParseAsString(nRow, GetToken(nRow, tokens, 1), 4);
+            }
+
             public override string ToString() =>
                 $"{nameof(SetEvent)} \"{Value}\" Type {Type}";
         }
@@ -571,6 +582,42 @@ namespace OpenKh.Kh2.Ard
             [Data] public short Entrance { get; set; }
             [Data] public short LocalSet { get; set; }
             [Data] public short FadeType { get; set; }
+
+            public void Parse(int nRow, List<string> tokens)
+            {
+                for (var i = 1; i < tokens.Count; i++)
+                {
+                    switch (tokens[i++])
+                    {
+                        case nameof(Type):
+                            Type = ParseAsShort(nRow, GetToken(nRow, tokens, i));
+                            break;
+                        case nameof(World):
+                            var worldId = GetToken(nRow, tokens, i);
+                            for (var j = 0; j < Constants.WorldIds.Length; j++)
+                            {
+                                if (worldId.ToLower() == Constants.WorldIds[j])
+                                {
+                                    World = (short)j;
+                                    break;
+                                }
+                            }
+                            break;
+                        case nameof(Area):
+                            Area = ParseAsShort(nRow, GetToken(nRow, tokens, i));
+                            break;
+                        case nameof(Entrance):
+                            Entrance = ParseAsShort(nRow, GetToken(nRow, tokens, i));
+                            break;
+                        case nameof(LocalSet):
+                            LocalSet = ParseAsShort(nRow, GetToken(nRow, tokens, i));
+                            break;
+                        case nameof(FadeType):
+                            FadeType = ParseAsShort(nRow, GetToken(nRow, tokens, i));
+                            break;
+                    }
+                }
+            }
 
             public override string ToString()
             {
@@ -597,6 +644,11 @@ namespace OpenKh.Kh2.Ard
         {
             [Data] public short Value { get; set; }
 
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Value = ParseAsShort(nRow, GetToken(nRow, tokens, 1));
+            }
+
             public override string ToString() =>
                 $"{nameof(SetProgressFlag)} 0x{Value:X}";
         }
@@ -604,6 +656,11 @@ namespace OpenKh.Kh2.Ard
         public class SetMenuFlag : IAreaDataSetting
         {
             [Data] public short Value { get; set; }
+
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Value = ParseAsShort(nRow, GetToken(nRow, tokens, 1));
+            }
 
             public override string ToString() =>
                 $"{nameof(SetMenuFlag)} 0x{Value:X}";
@@ -613,6 +670,11 @@ namespace OpenKh.Kh2.Ard
         {
             [Data] public short Value { get; set; }
 
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Value = ParseAsShort(nRow, GetToken(nRow, tokens, 1));
+            }
+
             public override string ToString() =>
                 $"{nameof(SetMember)} {Value}";
         }
@@ -620,6 +682,11 @@ namespace OpenKh.Kh2.Ard
         public class SetUnk05 : IAreaDataSetting
         {
             [Data] public short Value { get; set; }
+
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Value = ParseAsShort(nRow, GetToken(nRow, tokens, 1));
+            }
 
             public override string ToString() =>
                 $"{nameof(SetUnk05)} 0x{Value:X}";
@@ -629,6 +696,13 @@ namespace OpenKh.Kh2.Ard
         {
             public List<int> Items { get; set; }
 
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Items = new List<int>();
+                for (var i = 1; i < tokens.Count; i++)
+                    Items.Add(ParseAsInt(nRow, GetToken(nRow, tokens, i)));
+            }
+
             public override string ToString() =>
                 $"{nameof(SetInventory)} {string.Join(" ", Items)}";
         }
@@ -637,12 +711,19 @@ namespace OpenKh.Kh2.Ard
         {
             [Data] public short Value { get; set; }
 
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Value = ParseAsShort(nRow, GetToken(nRow, tokens, 1));
+            }
+
             public override string ToString() =>
                 $"{nameof(SetPartyMenu)} {Value}";
         }
 
         public class SetUnkFlag : IAreaDataSetting
         {
+            public void Parse(int nRow, List<string> tokens) { }
+
             public override string ToString() =>
                 $"{nameof(SetUnkFlag)}";
         }
@@ -709,11 +790,11 @@ namespace OpenKh.Kh2.Ard
                 .Replace("\r\n", "\n")
                 .Replace("\r", "\n")
                 .Split('\n');
-            var row = 0;
 
-            foreach (var line in lines)
+            var row = 0;
+            while (row < lines.Length)
             {
-                row++;
+                var line = lines[row++];
                 var cleanLine = line.Split(Comment);
                 var tokens = Tokenize(row, cleanLine[0]).ToList();
                 if (tokens.Count == 0)
@@ -734,6 +815,25 @@ namespace OpenKh.Kh2.Ard
 
                         state = LexState.Code;
                         script.ProgramId = programId;
+                        break;
+                    case "AreaSettings":
+                        var function = new AreaSettings
+                        {
+                            Settings = new List<IAreaDataSetting>()
+                        };
+                        function.Parse(row, tokens);
+                        script.Functions.Add(function);
+
+                        while (row < lines.Length && (lines[row].Length == 0 || lines[row][0] == '\t'))
+                        {
+                            line = lines[row++];
+                            cleanLine = line.Split(Comment);
+                            tokens = Tokenize(row, cleanLine[0]).ToList();
+                            if (tokens.Count == 0)
+                                continue;
+
+                            function.Settings.Add(ParseAreaSetting(row, tokens));
+                        }
                         break;
                     default:
                         script.Functions.Add(ParseCommand(row, tokens));
@@ -883,7 +983,15 @@ namespace OpenKh.Kh2.Ard
 
         private static void AreaSettingsWriter(MappingWriteArgs args)
         {
-            // TODO
+            var settings = args.Item as AreaSettings;
+            args.Writer.Write(settings.Unk00);
+            args.Writer.Write(settings.Unk02);
+            foreach (var setting in settings.Settings)
+            {
+                var opcode = (short)_typeSetId[setting.GetType()];
+                args.Writer.Write(opcode);
+                Mapping.WriteObject(args.Writer.BaseStream, setting);
+            }
         }
 
         private static object SetInventoryReader(MappingReadArgs args)
@@ -900,7 +1008,10 @@ namespace OpenKh.Kh2.Ard
 
         private static void SetInventoryWriter(MappingWriteArgs args)
         {
-            // TODO
+            var items = args.Item as SetInventory;
+            args.Writer.Write((short)items.Items.Count);
+            foreach (var item in items.Items)
+                args.Writer.Write(item);
         }
 
         private static IAreaDataCommand ParseCommand(int nRow, List<string> tokens)
@@ -912,6 +1023,17 @@ namespace OpenKh.Kh2.Ard
             var command = Activator.CreateInstance(type) as IAreaDataCommand;
             command.Parse(nRow, tokens);
             return command;
+        }
+
+        private static IAreaDataSetting ParseAreaSetting(int nRow, List<string> tokens)
+        {
+            var commandName = tokens[0];
+            if (!_typeSetStr.TryGetValue(commandName, out var type))
+                throw new SpawnScriptCommandNotRecognizedException(nRow, commandName);
+
+            var setting = Activator.CreateInstance(type) as IAreaDataSetting;
+            setting.Parse(nRow, tokens);
+            return setting;
         }
 
         private static IEnumerable<string> Tokenize(int row, string line)
@@ -966,7 +1088,7 @@ namespace OpenKh.Kh2.Ard
         private static short ParseAsShort(int row, string text)
         {
             var value = ParseAsInt(row, text);
-            if (value < 0 || value > short.MaxValue)
+            if (value < short.MinValue || value > short.MaxValue)
                 throw new SpawnScriptShortException(row, value);
             return (short)value;
         }
