@@ -10,7 +10,52 @@ namespace OpenKh.Tests.kh2
     {
         public class SpawnScriptTests
         {
-            const string FileName = "kh2/res/map.spawnscript";
+            private const string FileName = "kh2/res/map.spawnscript";
+            private static readonly byte[] SampleScript = new byte[]
+            {
+                    // Program header
+                    0x00, 0x00, 0x40, 0x00,
+
+                    // Opcode AreaSettings
+                    0x0C, 0x00, 0x0e, 0x00, 0x00, 0x00, 0xFF, 0xFF,
+
+                    // ProgressFlag
+                    0x02, 0x00, 0x0A, 0x38,
+
+                    // Event
+                    0x00, 0x00, 0x02, 0x00, 0x31, 0x31, 0x30, 0x00,
+
+                    // Jump
+                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x0E, 0x00,
+                    0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
+
+                    // Party menu
+                    0x07, 0x00, 0x00, 0x00,
+
+                    // Progress flag
+                    0x02, 0x00, 0x34, 0x12,
+
+                    // UnkAreaSet05
+                    0x05, 0x00, 0x22, 0x11,
+
+                    // AddInventory
+                    0x06, 0x00, 0x02, 0x00,
+                    0x9A, 0x02, 0x00, 0x00,
+                    0x09, 0x03, 0x00, 0x00,
+
+                    // End program
+                    0xFF, 0xFF, 0x00, 0x00,
+            };
+            private const string SampleScriptDecompiled =
+                "Program 0x00\n" +
+                "AreaSettings 0 -1\n" +
+                "\tSetProgressFlag 0x380A\n" +
+                "\tSetEvent \"110\" Type 2\n" +
+                "\tSetJump Type 1 World NM Area 5 Entrance 0 LocalSet 0 FadeType 1\n" +
+                "\tSetPartyMenu 0\n" +
+                "\tSetProgressFlag 0x1234\n" +
+                "\tSetUnk05 0x1122\n" +
+                "\tSetInventory 666 777\n";
 
             [Fact]
             public void ReadTest()
@@ -133,58 +178,33 @@ Unk17";
             }
 
             [Fact]
-            public void ParseAreaSettings()
-            {
-                var data = new byte[]
+            public void WriteAreaSettings() =>
+                Helpers.AssertStream(new MemoryStream(SampleScript), stream =>
                 {
-                    // Program header
-                    0x00, 0x00, 0x40, 0x00,
+                    var dstStream = new MemoryStream();
+                    var scripts = AreaDataScript.Read(stream);
+                    AreaDataScript.Write(dstStream, scripts);
 
-                    // Opcode AreaSettings
-                    0x0C, 0x00, 0x0e, 0x00, 0x00, 0x00, 0xFF, 0xFF,
+                    return dstStream;
+                });
 
-                    // ProgressFlag
-                    0x02, 0x00, 0x0A, 0x38,
-
-                    // Event
-                    0x00, 0x00, 0x02, 0x00, 0x31, 0x31, 0x30, 0x00,
-
-                    // Jump
-                    0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x0E, 0x00,
-                    0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
-
-                    // Party menu
-                    0x07, 0x00, 0x00, 0x00,
-
-                    // Progress flag
-                    0x02, 0x00, 0x34, 0x12,
-
-                    // UnkAreaSet05
-                    0x05, 0x00, 0x22, 0x11,
-
-                    // AddInventory
-                    0x06, 0x00, 0x02, 0x00,
-                    0x9A, 0x02, 0x00, 0x00,
-                    0x09, 0x03, 0x00, 0x00,
-
-                    // End program
-                    0xFF, 0xFF, 0x00, 0x00,
-                };
-
-                var scripts = AreaDataScript.Read(new MemoryStream(data));
-
-                Assert.Equal(
-                    "Program 0x00\n" +
-                    "AreaSettings 0 0xffff\n" +
-                    "\tSetProgressFlag 0x380A\n" +
-                    "\tSetEvent \"110\" Type 2\n" +
-                    "\tSetJump Type 1 World NM Area 5 Entrance 0 LocalSet 0 FadeType 1\n" +
-                    "\tSetPartyMenu 0\n" +
-                    "\tSetProgressFlag 0x1234\n" +
-                    "\tSetUnk05 0x1122\n" +
-                    "\tSetInventory 666 777\n",
-                    scripts.First().ToString());
+            [Fact]
+            public void DecompileAreaSettings()
+            {
+                var scripts = AreaDataScript.Read(new MemoryStream(SampleScript));
+                Assert.Equal(SampleScriptDecompiled, scripts.First().ToString());
             }
+
+            [Fact]
+            public void CompileAreaSettings() =>
+                Helpers.AssertStream(new MemoryStream(SampleScript), _ =>
+                {
+                    var dstStream = new MemoryStream();
+                    var scripts = AreaDataScript.Compile(SampleScriptDecompiled);
+                    AreaDataScript.Write(dstStream, scripts);
+
+                    return dstStream;
+                });
         }
 
         public class SpawnPointTests
