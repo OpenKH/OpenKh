@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
@@ -10,13 +10,13 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
     class SpawnScriptModel
     {
         private readonly string _name;
-        private List<SpawnScript> _spawnScripts;
+        private List<AreaDataScript> _spawnScripts;
 
-        SpawnScriptModel(string name, List<SpawnScript> spawnScripts)
+        SpawnScriptModel(string name, List<AreaDataScript> spawnScripts)
         {
             _name = name;
             _spawnScripts = spawnScripts;
-            Decompiled = SpawnScriptParser.Decompile(spawnScripts);
+            Decompiled = AreaDataScript.Decompile(spawnScripts);
         }
 
         public IEnumerable<int> ProgramIds => _spawnScripts.Select(x => (int)x.ProgramId);
@@ -30,7 +30,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
             {
                 IsError = false;
                 LastError = "Success!";
-                _spawnScripts = SpawnScriptParser.Compile(Decompiled).ToList();
+                _spawnScripts = AreaDataScript.Compile(Decompiled).ToList();
             }
             catch (SpawnScriptParserException ex)
             {
@@ -42,7 +42,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
         public IEnumerable<Bar.Entry> SaveToBar(IEnumerable<Bar.Entry> entries)
         {
             var memStream = new MemoryStream();
-            SpawnScript.Write(memStream, _spawnScripts);
+            AreaDataScript.Write(memStream, _spawnScripts);
 
             return entries.AddOrReplace(new Bar.Entry
             {
@@ -59,7 +59,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
             if (entry == null)
                 return null;
 
-            return new SpawnScriptModel(name, SpawnScript.Read(entry.Stream));
+            return new SpawnScriptModel(name, AreaDataScript.Read(entry.Stream));
         }
     }
 }
