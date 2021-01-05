@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using McMaster.Extensions.CommandLineUtils;
 using System;
@@ -199,11 +199,11 @@ namespace OpenKh.Command.IdxImg
             [Option(CommandOptionType.NoValue, Description = "Do not compress the file to inject", ShortName = "u", LongName = "uncompressed")]
             public bool Uncompressed { get; set; }
 
-            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IDX. By default is 1840 for KH2FM", ShortName = "idx", LongName = "idx-offset")]
-            public long IdxIsoBlock { get; set; } = 1840;
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IDX. Determined automatically by default.", ShortName = "idx", LongName = "idx-offset")]
+            public int IdxIsoBlock { get; set; } = -1;
 
-            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IMG. By default is 671693 for KH2FM", ShortName = "img", LongName = "img-offset")]
-            public long ImgIsoBlock { get; set; } = 671693;
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IMG. Determined automatically by default", ShortName = "img", LongName = "img-offset")]
+            public int ImgIsoBlock { get; set; } = -1;
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -212,6 +212,43 @@ namespace OpenKh.Command.IdxImg
                 const int EstimatedMaximumIdxEntryAmountToBeValid = EsitmatedMaximumIdxFileSize / 0x10 - 4;
 
                 using var isoStream = File.Open(InputIso, FileMode.Open, FileAccess.ReadWrite);
+
+
+                if (IdxIsoBlock == -1 || ImgIsoBlock == -1)
+                {
+                    const int needleLength = 0x0B;
+
+                    var imgNeedle = new byte[needleLength] { 0x01, 0x09, 0x4B, 0x48, 0x32, 0x2E, 0x49, 0x4D, 0x47, 0x3B, 0x31 };
+                    var idxNeedle = new byte[needleLength] { 0x01, 0x09, 0x4B, 0x48, 0x32, 0x2E, 0x49, 0x44, 0x58, 0x3B, 0x31 };
+
+                    const uint basePosition = 0x105 * 0x800;
+
+                    for (int i = 0; i < 0x500; i++)
+                    {
+                        isoStream.Position = basePosition + i;
+                        var hayRead = isoStream.ReadBytes(needleLength);
+
+                        var idxCmp = hayRead.SequenceEqual(idxNeedle);
+                        var imgCmp = hayRead.SequenceEqual(imgNeedle);
+
+                        if (imgCmp || idxCmp)
+                        {
+                            isoStream.Position -= 0x24;
+
+                            var blockStack = isoStream.ReadBytes(0x04);
+                            var blockCorrect = new byte[0x04] { blockStack[3], blockStack[2], blockStack[1], blockStack[0] };
+
+                            if (idxCmp && IdxIsoBlock == -1)
+                                IdxIsoBlock = BitConverter.ToInt32(blockCorrect);
+
+                            else if (imgCmp && ImgIsoBlock == -1)
+                                ImgIsoBlock = BitConverter.ToInt32(blockCorrect);
+                        }
+                    }
+
+                    if (IdxIsoBlock == -1 || ImgIsoBlock == -1)
+                        throw new IOException("Could not determine the LBA Offsets of KH2.IDX or KH2.IMG, is this ISO valid?");
+                }
 
                 var idxStream = OpenIsoSubStream(isoStream, IdxIsoBlock, EsitmatedMaximumIdxFileSize);
                 using var imgStream = OpenIsoSubStream(isoStream, ImgIsoBlock, EsitmatedMaximumImgFileSize);
