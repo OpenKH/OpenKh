@@ -4,8 +4,8 @@ Describes how the game should behave before loading the map. This is responsible
 
 Internally it is a [BAR](bar.md) file, composed by micro files of different purpose:
 
-- [Spawnpoint](#spawn-point) to spawn objects.
-- [Spawnscript](#spawn-script) to execute microcode
+- [Spawn](#spawn) to spawn objects.
+- [Script](#script) to execute microcode
 - Animload responsible to run a cutscene
 - [AI](ai.md) to execute exceptional microcode.
 
@@ -20,7 +20,7 @@ This is the easiest micro-format of an ARD file. This is mainly responsible to s
 | Offset | Type  | Description
 |--------|-------|------------
 | 00     | int   | File type; always 2.
-| 04     | int   | [Spawn point descriptor count](#spawn-point-descriptor)
+| 04     | int   | [Spawn point descriptor count](#spawn-descriptor)
 
 #### Spawn point descriptor
 
@@ -71,7 +71,7 @@ When referring to _place's door_ it means that is the index where to spawn the c
 
 #### Event activator
 
-This is an invisible wall that is responsibe to activate an event. Which event is it, it is described in the [spawn point descriptor](#spawn-point-descriptor). One common usage is changing the map when the player touch the map's "border".
+This is an invisible wall that is responsibe to activate an event. Which event is it, it is described in the [spawn point descriptor](#spawn-descriptor). One common usage is changing the map when the player touch the map's "border".
 
 | Offset | Type  | Description
 |--------|-------|------------
@@ -130,11 +130,11 @@ Just a 12-byte structure, read as Vector3f.
 | 00     | int   | Unknown
 | 04     | int   | Unknown
 
-## Spawn Script
+## Script
 
-This is a micro-code that is responsible to change the behaviour of a specific loaded map.
+This is a micro-code that is responsible to change the behaviour of a specific map.
 
-Every map have three spawn script files: `map`, `btl` and `evt`, loaded in this very speicfic order. Each file have a list of programs, where every program is represented by an unique ID. When a map loads, the game instructs the map loader which program to load ([sub_181cc0](#notes)). A map can load only a single program per spawn script file, but a script can load multiple programs.
+Every map have three script files: `map`, `btl` and `evt`, loaded in this very speicfic order. Each file have a list of programs, where every program is represented by an unique ID. When a map loads, the game instructs the map loader which program to load ([sub_181cc0](#notes)). A map can load only a single program per script file by their ID. This is done by the Local Set or by reading those information in the save data area. The IDs varies from 0 to 50 and it is unique per area. While all the IDs starting from 51 are unique per world. For instance, you can find the Program ID 6 in both TT02 and TT04. But you can only find the Program ID 55 in for the area 4 for Twilight Town world. This is helpful be coherent with the Local Set based on the story progress.
 
 ### Structure
 
@@ -162,61 +162,61 @@ There is a total of 30 operation codes for the spawn script. The parser can be f
 
 - 00: [Spawn](#spawn)
 - 01: [MapOcclusion](#mapocclusion)
-- 02: [MultipleSpawn](#multiplespawn)
-- 03: [unknown](#unknown03)
-- 04: [unknown](#unknown04)
-- 05: [unknown](#unknown05)
+- 02: [RandomSpawn](#randomspawn)
+- 03: [CasualSpawn](#casualspawn)
+- 04: [Capacity](#capacity)
+- 05: [AllocEnemy](#allocenemy)
 - 06: [unknown](#unknown06)
 - 07: [unknown](#unknown07)
 - 09: [unknown](#unknown09)
 - 0a: [unknown](#unknown0a)
-- 0b: [unknown](#unknown0b)
-- 0c: [Scene](#scene)
-- 0e: [unknown](#unknown07e)
-- 0f: [Bgm](#bgm)
-- 10: [Party](#party)
-- 11: [unknown](#unknown11)
+- 0b: [BarrierFlag](#barrierflag)
+- 0c: [AreaSettings](#areasettings)
+- 0e: [unknown](#unknown0e)
+- 0f: [Party](#party)
+- 10: [Bgm](#bgm)
+- 11: [MsgWall](#msgwall)
 - 12: [unknown](#unknown12)
-- 13: [unknown](#unknown13)
-- 14: [unknown](#unknown14)
+- 13: [Camera](#camera)
+- 14: [StatusFlag3](#statusflag3)
 - 15: [Mission](#mission)
 - 16: [Bar](#bar)
-- 17: [unknown](#unknown17)
-- 18: [unknown](#unknown18)
-- 19: [unknown](#unknown19)
-- 1a: [unknown](#unknown1a)
-- 1b: [unknown](#unknown1b)
-- 1c: [unknown](#unknown1c)
+- 17: [StatusFlag5](#statusflag5)
+- 18: [AllocEffect](#alloceffect)
+- 19: [Progress](#progress)
+- 1a: [VisibilityOn](#visibilityon)
+- 1b: [VisibilityOff](#visibilityoff)
+- 1c: [If](#if)
 - 1d: [unknown](#unknown1d)
 - 1e: [BattleLevel](#battlelevel)
 - 1f: [unknown](#unknown1f)
 
 #### Spawn
 
-Loads a [Spawn Point](#spawn-point) file. The parameter is a 4-byte string with the name of the spawn script of the ARD's BAR file. This is the most used opcode, with a usage count of 11949.
+Loads a [Spawn](#spawn) file. The parameter is a 4-byte string with the name of the spawn of the ARD's BAR file. This is the most used opcode, with a usage count of 11949.
 
 #### MapOcclusion
 
 Specify a 64-bit mask that is responsible to enable or disable specific map meshes and collisions. This is very common and used 2186 times.
 
-#### MultipleSpawn
+#### RandomSpawn
 
-This is a bit unknown, but it seems to be used to only load `b_xx` type of spawnpoint. It is probably used to chain multiple battles (eg. spawn more enemies when the current enemeies are all defeated). There are multiple parameter specified based on the function's parameter count, where each one of them looks like [Spawn](#spawn) parameter.
+This is used to randomly spawn a group of enemies. It is very similar to [Spawn](#spawn) but it defines multiple spawns and the game will [randomly](../../rng.md) choose one of them.
 
 Not common (25 times), used in maps like `bb00`, `bb06`, `ca14`, etc. .
 
-#### Unknown03
+#### CasualSpawn
 
-This apparently loads only `b_xx` type of spawnpoints. The first parameter is an unknown integer, while the second one is a 4-byte string.
+Casually spawn or not a specific enemy group. Defines an integer and, if the [random](../../rng.md) number is inferior to the one defined, then the enemy group will spawn. The smaller the number is, the less are the chances to trigger that specific spawn. The enemy group is specified as a 4-byte string, exactly as [Spawn](#spawn).
 Very uncommon, used 17 times and only in the worlds BB, CA, LK and MU.
 
-#### Unknown04
+#### Capacity
 
-Set the memory area `01c6053c` with the 4-byte parameter. The purpose of that memory area is unknown. It's found 465 times and only in `btl`.
+Set the memory area `01c6053c`, which represents a floating number that holds the capacity of the current map. The bigger is the capacity the better is the amount of enemies that can be loaded at once. It's found 465 times and only in `btl`.
 
-#### Unknown05
+#### AllocEnemy
 
-Set the memory area `0034ecd0` with the 4-byte parameter. The purpose of that memory area is unknown. Found 34 times almost every time in `btl`.
+Set the memory area `0034ecd0`, which represents the amount of memory reserved for enemies. It is not exactly clear why and how this is used. Found 34 times almost every time in `btl`.
 
 #### Unknown06
 
@@ -234,13 +234,13 @@ Looks like similar to [Spawn](#spawn), but it's way less used. Found 210 times, 
 
 Found 73 times. Purpose unknown.
 
-#### Unknown0b
+#### Barrier
 
-Set the memory area `0034ecc8` with the first 4-byte parameter. But it always seems to have 2 parameters. The purpose of that memory area is unknown. Found 203 times and only in `map`.
+Set the memory area `0034ecc8`, which seems to define which parts of the map are blocked by an invisible barrier. It might be related on enabling or disabling certain collisions of a map file. Found 203 times and only in `map`.
 
-#### Scene
+#### AreaSettings
 
-This is the most compelx op-code, since internally it process something we would call [scene script](#scene-script). There is currently no way to entirely parse this opcode. This is commonly used, as the usage count tops 2408 times. It is only found in `evt` scripts.
+Enqueue a message to perform a series of actions. Here it is possible to play an event, jump into another map, set the story flags, set the menu flags, set specific party members, obtain items or invoke the party menu. Refer to [Area settings script](#area-settings-script) to know more. This is commonly used, as the usage count tops 2408 times. It is only found in `evt` scripts.
 
 #### Unknown0e
 
@@ -262,23 +262,23 @@ Set how the party member needs to be structured. According to `dbg/member.bin`, 
 
 #### Bgm
 
-Set the map's background musics. The single 4-byte parameter can be read as two 2-byte integers, which represents the field and battle music ID that can be found in `bgm/music_xxx`. This overrides the default field and battle music used in the current map.
+Set the map's background musics. The single 4-byte parameter can be read as two 2-byte integers, which represents the field and battle music ID that can be found in `bgm/music_xxx`. When the values are different than zero, they overrides the default field and battle music used in the current map.
 
 #### Unknown11
 
-Set the memory area `0034ece4` with the first 4-byte parameter. Found 80 times and only in `map`.
+Set the memory area `0034ece4`, which represents the message displayed below when the player touches an invisible wall. Found 80 times and only in `map`.
 
 #### Unknown12
 
-Set the memory area `0034ecd4` with the first 4-byte parameter. This opcode works but it is not used by any program.
+Set the memory area `0034ecd4`. This opcode is unused.
 
 #### Unknown13
 
-Set the memory area `0034ece8` with the first 4-byte parameter. Found 39 times and only in `map` for `hb17`, `lk13`, `mu07` and `po00`, with a parameter of `1` or `2`.
+Set the memory area `0034ece8`, which sets the camera mode for the map with the first 4-byte parameter. It does have a parameter of `1` or `2`. Found 39 times and only in `map` for `hb17`, `lk13`, `mu07` and `po00`.
 
-#### Unknown14
+#### StatusFlag3
 
-Set the 3rd bit of the memory area `0034f240`. Used 89 times.
+Purpose unknown. Set the 3rd bit of the memory area `0034f240`. Used 89 times.
 
 #### Mission
 
@@ -288,25 +288,25 @@ Loads a [mission](msn.md) file by specifying its MSN file name without path and 
 
 Loads a [BAR](bar.md) file by specifying the entire path. The `%s` symbol can be specified in the path to not hard-code the script to work just for a single language. The BAR file can be a [layout](2ld.md) or a `minigame` file.
 
-#### Unknown17
+#### StatusFlag5
 
 Set the 5th bit of the memory area `0034f240`. This is only used twice in `mu07` and might be related to the mechanic of Sora entering in the tornado.
 
-#### Unknown18
+#### AllocEffect
 
-Set the memory area `0034ecec` and `0034ecf0` with the first two parameters. It is only used by `hb33`, `hb34`, `hb38` and `he15` in `btl`.
+Set the memory area `0034ecec` and `0034ecf0` with the first two parameters, which seems to be used by the particle system. It is only used by `hb33`, `hb34`, `hb38` and `he15` in `btl`.
 
-#### Unknown19
+#### Progress
 
-Unknown.
+Set story flag.
 
-#### Unknown1a
+#### VisibilityOn
 
 It seems to do something with `01c60548`. It is only used 3 times in `hb13` by `evt`.
 
-#### Unknown1b
+#### VisibilityOff
 
-It seems to do something with `01c60550`. It is only used 3 times in `hb13` by `evt` and in the same programs used by [Unknown1a](#unknown1a).
+It seems to do something with `01c60550`. It is only used 3 times in `hb13` by `evt`.
 
 #### Unknown1c
 
@@ -324,21 +324,21 @@ Override the battle level of the playing map. Usually used for special boss batt
 
 Purpose unknown. Very similar to [Unknown03](#unknown03)
 
-### Scene script
+### Area settings script
 
 The scene script contains functions with a variable amount of parameters.
 
 | Opcode | Name     | Description
 |--------|----------|-------------
-| 00     | Cutscene | Play a cutscene. param1 cutscene file, param2 unknown
-| 01     |          |
-| 02     |          |
-| 03     |          |
-| 04     |          |
-| 05     |          |
-| 06     | GetItem  | Obtain an item. It is possible to obtain up to 7 items in a row.
-| 07     |          |
-| 08     |          |
+| 00     | Event    | Play an event. Parameters: type, event name.
+| 01     | Jump     | Change maps. Parameters: padding, type, world, area, entrance, localset, fade type.
+| 02     | ProgressFlag | Update story progress.
+| 03     | MenuFlag | Unlock options in the menu.
+| 04     | Member   | Change party member.
+| 05     |          | Unknown.
+| 06     | Inventory | Obtain one or more items. It is possible to obtain up to 7 items in a row.
+| 07     | PartyMenu | Shows the party menu.
+| 08     |          | Sets a flag. Purpose unknown.
 
 ## Notes
 
