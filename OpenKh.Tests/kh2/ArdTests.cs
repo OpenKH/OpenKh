@@ -79,14 +79,14 @@ namespace OpenKh.Tests.kh2
 
             [Theory]
             [InlineData("Spawn \"ABcd\"", 0, 0x64634241)]
-            [InlineData("MapOcclusion 0xffffffff 0x00000001", 1, -1, 1)]
-            [InlineData("MultipleSpawn \"0123\" \"4567\"", 2, 0x33323130, 0x37363534)]
-            [InlineData("Unk03 123 \"666\"", 3, 123, 0x363636)]
-            [InlineData("Unk04 123", 4, 123)]
-            [InlineData("Unk05 123", 5, 123)]
+            [InlineData("MapVisibility 0xffffffff 0x00000001", 1, -1, 1)]
+            [InlineData("RandomSpawn \"0123\" \"4567\"", 2, 0x33323130, 0x37363534)]
+            [InlineData("CausalSpawn 123 \"666\"", 3, 123, 0x363636)]
+            [InlineData("Capacity 123", 4, 123)]
+            [InlineData("AllocEnemy 123", 5, 123)]
             [InlineData("Unk06 123", 6, 123)]
             [InlineData("Unk07 123", 7, 123)]
-            [InlineData("Unk09 \"666\"", 9, 0x363636)]
+            [InlineData("SpawnAlt \"666\"", 9, 0x363636)]
             [InlineData("Party NO_FRIEND", 15, 0)]
             [InlineData("Party DEFAULT", 15, 1)]
             [InlineData("Party W_FRIEND", 15, 2)]
@@ -96,12 +96,12 @@ namespace OpenKh.Tests.kh2
             [InlineData("Party DONALD_ONLY", 15, 6)]
             [InlineData("Bgm 123 456", 16, 0x01c8007b)]
             [InlineData("Bgm Default Default", 16, 0)]
-            [InlineData("Unk14", 0x14)]
+            [InlineData("StatusFlag3", 0x14)]
             [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"", 0x15, 0x1234,
                 0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
             [InlineData("Layout \"OPENKH IS OUR MISSION!\"", 0x16,
                 0x4E45504F, 0x4920484B, 1431248979, 1229791314, 1330205523, 8526, 0, 0)]
-            [InlineData("Unk17", 0x17)]
+            [InlineData("StatusFlag5", 0x17)]
             [InlineData("BattleLevel 99", 0x1E, 99)]
             [InlineData("Unk1f \"666\"", 0x1f, 0x363636)]
             public void ParseScriptAsText(string expected, int operation, params int[] parameters)
@@ -129,10 +129,10 @@ namespace OpenKh.Tests.kh2
                 const string Input = @"
 # This is a comment!
   Program     123 # This is our program entry
-Unk14
+StatusFlag3
 
 Program 0x123
-Unk17";
+StatusFlag5";
                 var script = AreaDataScript.Compile(Input).ToArray();
                 Assert.Equal(2, script.Length);
 
@@ -145,14 +145,14 @@ Unk17";
 
             [Theory]
             [InlineData("Spawn \"ABcd\"")]
-            [InlineData("MapOcclusion 0xffffffff 0x00000001")]
-            [InlineData("MultipleSpawn \"0123\" \"4567\"")]
-            [InlineData("Unk03 123 \"666\"")]
-            [InlineData("Unk04 123")]
-            [InlineData("Unk05 123")]
+            [InlineData("MapVisibility 0xffffffff 0x00000001")]
+            [InlineData("RandomSpawn \"0123\" \"4567\"")]
+            [InlineData("CausalSpawn 123 \"666\"")]
+            [InlineData("Capacity 123")]
+            [InlineData("AllocEnemy 123")]
             [InlineData("Unk06 123")]
             [InlineData("Unk07 123")]
-            [InlineData("Unk09 \"666\"")]
+            [InlineData("SpawnAlt \"666\"")]
             [InlineData("Party NO_FRIEND")]
             [InlineData("Party DEFAULT")]
             [InlineData("Party W_FRIEND")]
@@ -162,10 +162,10 @@ Unk17";
             [InlineData("Party DONALD_ONLY")]
             [InlineData("Bgm 123 456")]
             [InlineData("Bgm Default Default")]
-            [InlineData("Unk14")]
+            [InlineData("StatusFlag3")]
             [InlineData("Mission 0x1234 \"OPENKH IS OUR MISSION!\"")]
             [InlineData("Layout \"OPENKH IS OUR MISSION!\"")]
-            [InlineData("Unk17")]
+            [InlineData("StatusFlag5")]
             [InlineData("BattleLevel 99")]
             [InlineData("Unk1f \"666\"")]
             public void ParseTextAsScript(string input)
