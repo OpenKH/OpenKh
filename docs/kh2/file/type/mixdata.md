@@ -4,10 +4,10 @@ This file contains informations about the moogle shop. Internally it is a [bar](
 
 * [Sub-file Header](#header)
 * Entries
-    * [RECI](#reci)
-    * [COND](#cond)
-    * [LEVE](#leve)
-    * [EXP](#exp)
+    * [RECI](#reci) - Recipes
+    * [COND](#cond) - Conditions
+    * [LEVE](#leve) - Levels
+    * [EXP](#exp) - Experience
 
 ## Header
 
@@ -31,8 +31,8 @@ Magic Code `MIRE`
 | Offset | Type   | Description |
 |--------|--------|-------------|
 | 00     | ushort | [Item ID of Recipe](./03system.md#item)
-| 02     | byte   | 
-| 03     | byte   |
+| 02     | byte   | Unlock (0,1,2,3 => recipe, free development 1,2,3)
+| 03     | byte   | Rank (0,1,2,3 => C,B,A,S)
 | 04     | ushort | Obtained Item
 | 06     | ushort | Upgraded Item (e.g Plus Accessory)
 | 08     | ushort | Ingredient 1
@@ -57,13 +57,13 @@ Magic Code `MICO`
 | Offset | Type   | Description |
 |--------|--------|-------------|
 | 00     | ushort | Id
-| 02     | short  | Reward (either an Item or a shop upgrade)
-| 04     | byte   |
-| 05     | byte   |
-| 06     | byte   |
-| 07     | byte   |
+| 02     | short  | Reward (either an Item or a shop upgrade) - [Item LIST](../../dictionary/inventory.md)
+| 04     | byte   | Reward type (0 for Item, 1 for Shop upgrade)
+| 05     | byte   | Type of material (Check [Items](./03system.md#item))
+| 06     | byte   | Rank of material (Check [Items](./03system.md#item))
+| 07     | byte   | Condition Type (0 for stack, 1 for collect uniques)
 | 08     | short  | Count of needed Materials
-| 0A     | short  |
+| 0A     | short  | Unlock event for the shop (Sam used in shops [Shops](./03system.md#shop))
 
 
 ## Leve
@@ -82,3 +82,15 @@ Magic Code `MILV`
 
 
 ## Exp
+
+Contains exp values for the materials used in recipes. The total exp from a recipe is the sum of all of its materials' exp values.
+
+Magic Code `MIEX`
+
+| Offset | Type   | Description |
+|--------|--------|-------------|
+| 00     | ushort | Rank C mat exp
+| 02     | ushort | Rank B mat exp
+| 04     | ushort | Rank A mat exp
+| 06     | ushort | Rank S mat exp
+| 08     | byte[8]    | 
