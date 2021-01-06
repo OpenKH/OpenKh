@@ -31,6 +31,7 @@ namespace OpenKh.Game.Infrastructure
         private readonly List<ObjectEntity> _actors = new List<ObjectEntity>();
         private readonly Dictionary<int, ObjectEntity> _actorIds = new Dictionary<int, ObjectEntity>();
         private readonly Dictionary<int, byte[]> _subtitleData = new Dictionary<int, byte[]>();
+        private readonly Queue<AreaDataScript.AreaSettings> _areaSettingChain = new Queue<AreaDataScript.AreaSettings>();
         private readonly MonoSpriteDrawing _drawing;
         private Bar _binarcArd;
         private EventPlayer _eventPlayer;
@@ -39,6 +40,7 @@ namespace OpenKh.Game.Infrastructure
         private int _spawnScriptEvt;
         private bool _isFreeCam;
         private bool _isEventPause;
+        private AreaDataScript.SetJump _queuedJump;
 
         private bool _isFading;
         private float _fadeCurrent;
@@ -145,6 +147,22 @@ namespace OpenKh.Game.Infrastructure
             _isEventPause = _inputManager.RightTrigger;
             _isFreeCam = _inputManager.LeftTrigger;
 
+            if (_areaSettingChain.Count > 0)
+            {
+                foreach (var setting in _areaSettingChain.Dequeue().Settings)
+                {
+                    switch (setting)
+                    {
+                        case AreaDataScript.SetEvent evt:
+                            PlayEvent(evt.Value);
+                            break;
+                        case AreaDataScript.SetJump jump:
+                            _queuedJump = jump;
+                            break;
+                    }
+                }
+            }
+
             if (_eventPlayer != null && _isEventPause == false)
             {
                 _eventPlayer.Update(deltaTime);
@@ -155,6 +173,17 @@ namespace OpenKh.Game.Infrastructure
                 }
             }
 
+            if (_queuedJump != null)
+            {
+                if (_eventPlayer?.IsEnd ?? true)
+                {
+                    int world = _queuedJump.World;
+                    if (world < 0)
+                        world = _kernel.World;
+
+                    LoadMapArd(world, _queuedJump.Area);
+                }
+            }
 
             foreach (var entity in _actors.Where(x => x.IsMeshLoaded && x.IsVisible))
                 entity.Update((float)deltaTime);
@@ -407,6 +436,9 @@ namespace OpenKh.Game.Infrastructure
                         }
                         else
                             Log.Warn($"Unable to find spawn \"{spawn}\".");
+                        break;
+                    case AreaDataScript.AreaSettings settings:
+                        _areaSettingChain.Enqueue(settings);
                         break;
                 }
             }
