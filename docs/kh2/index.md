@@ -9,7 +9,7 @@
   
   * [IDX/IMG](file/type/idx.md)
   * [BAR](file/type/bar.md)
-  * [ARD](file/type/ard.md)
+  * [ARD](file/type/areadata.md)
   * [MAP](file/map.md)
   * [MSG](file/type/msg.md)
   * [MSN](file/type/msn.md)

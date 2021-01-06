@@ -1,6 +1,6 @@
-# [Kingdom Hearts II](../../index.md) - ARD
+# [Kingdom Hearts II](../../index.md) - Area Data (ARD file format)
 
-This describes how the game should behave once inside a map. This is responsible to spawn the player, NPC, enemies, run cutscenes, change music, invoke [MSN](msn.md) files and more.
+Describes how the game should behave before loading the map. This is responsible to spawn the player, NPC, enemies, run cutscenes, change music, invoke [MSN](msn.md) files and way more.
 
 Internally it is a [BAR](bar.md) file, composed by micro files of different purpose:
 
