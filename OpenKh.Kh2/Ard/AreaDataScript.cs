@@ -105,6 +105,7 @@ namespace OpenKh.Kh2.Ard
                 .ForType<List<string>>(ScriptMultipleStringReader, ScriptMultipleStringWriter)
                 .ForType<AreaSettings>(AreaSettingsReader, AreaSettingsWriter)
                 .ForType<SetInventory>(SetInventoryReader, SetInventoryWriter)
+                .ForType<If>(IfReader, IfWriter)
                 .Build();
 
         private static readonly Dictionary<int, Type> _idType = new Dictionary<int, Type>()
@@ -134,7 +135,7 @@ namespace OpenKh.Kh2.Ard
             [0x19] = typeof(Progress),
             [0x1A] = typeof(VisibilityOn),
             [0x1B] = typeof(VisibilityOff),
-            // 0x1C???
+            [0x1C] = typeof(If),
             [0x1D] = typeof(Unk1d),
             [0x1E] = typeof(BattleLevel),
             [0x1F] = typeof(Unk1f),
@@ -517,6 +518,21 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"{nameof(VisibilityOff)} {Value}";
+        }
+
+        public class If : IAreaDataCommand
+        {
+            [Data] public int Value { get; set; }
+            public List<IAreaDataCommand> Commands { get; set; }
+
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Value = ParseAsInt(nRow, GetToken(nRow, tokens, 1));
+                throw new Exception($"Parsing an '{nameof(If)}' is not yet supported");
+            }
+
+            public override string ToString() =>
+                $"{nameof(If)} Entrance {Value}{string.Join("\n\t", Commands)}\n";
         }
 
         public class Unk1d : IAreaDataCommand
@@ -1027,6 +1043,24 @@ namespace OpenKh.Kh2.Ard
             args.Writer.Write((short)items.Items.Count);
             foreach (var item in items.Items)
                 args.Writer.Write(item);
+        }
+
+        private static object IfReader(MappingReadArgs args)
+        {
+            var item = new If
+            {
+                Value = args.Reader.ReadInt32(),
+                Commands = ParseScript(args.Reader.BaseStream.ReadBytes()).ToList()
+            };
+
+            return item;
+        }
+
+        private static void IfWriter(MappingWriteArgs args)
+        {
+            var item = args.Item as If;
+            args.Writer.Write(item.Value);
+            Write(args.Writer.BaseStream, item.Commands);
         }
 
         private static IAreaDataCommand ParseCommand(int nRow, List<string> tokens)
