@@ -110,30 +110,30 @@ namespace OpenKh.Kh2.Ard
         private static readonly Dictionary<int, Type> _idType = new Dictionary<int, Type>()
         {
             [0x00] = typeof(Spawn),
-            [0x01] = typeof(MapOcclusion),
-            [0x02] = typeof(MultipleSpawn),
-            [0x03] = typeof(Unk03),
-            [0x04] = typeof(Unk04),
-            [0x05] = typeof(Unk05),
+            [0x01] = typeof(MapVisibility),
+            [0x02] = typeof(RandomSpawn),
+            [0x03] = typeof(CasualSpawn),
+            [0x04] = typeof(Capacity),
+            [0x05] = typeof(AllocEnemy),
             [0x06] = typeof(Unk06),
             [0x07] = typeof(Unk07),
-            [0x09] = typeof(Unk09),
-            [0x0A] = typeof(Unk0a),
-            [0x0B] = typeof(Unk0b),
+            [0x09] = typeof(SpawnAlt),
+            [0x0A] = typeof(MapScript),
+            [0x0B] = typeof(BarrierFlag),
             [0x0C] = typeof(AreaSettings),
             [0x0E] = typeof(Unk0e),
             [0x0F] = typeof(Party),
             [0x10] = typeof(Bgm),
-            [0x11] = typeof(Unk11),
-            [0x13] = typeof(Unk13),
-            [0x14] = typeof(Unk14),
+            [0x11] = typeof(MsgWall),
+            [0x13] = typeof(Camera),
+            [0x14] = typeof(StatusFlag3),
             [0x15] = typeof(Mission),
             [0x16] = typeof(Layout),
-            [0x17] = typeof(Unk17),
-            [0x18] = typeof(Unk18),
-            [0x19] = typeof(Unk19),
-            [0x1A] = typeof(Unk1a),
-            [0x1B] = typeof(Unk1b),
+            [0x17] = typeof(StatusFlag5),
+            [0x18] = typeof(AllocEffect),
+            [0x19] = typeof(Progress),
+            [0x1A] = typeof(VisibilityOn),
+            [0x1B] = typeof(VisibilityOff),
             // 0x1C???
             [0x1D] = typeof(Unk1d),
             [0x1E] = typeof(BattleLevel),
@@ -184,7 +184,7 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(Spawn)} \"{SpawnSet}\"";
         }
 
-        public class MapOcclusion : IAreaDataCommand
+        public class MapVisibility : IAreaDataCommand
         {
             [Data] public int Flags1 { get; set; }
             [Data] public int Flags2 { get; set; }
@@ -196,10 +196,10 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(MapOcclusion)} 0x{Flags1:x08} 0x{Flags2:x08}";
+                $"{nameof(MapVisibility)} 0x{Flags1:x08} 0x{Flags2:x08}";
         }
 
-        public class MultipleSpawn : IAreaDataCommand
+        public class RandomSpawn : IAreaDataCommand
         {
             [Data] public List<string> SpawnSet { get; set; }
 
@@ -212,10 +212,10 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(MultipleSpawn)} {string.Join(" ", SpawnSet.Select(x => $"\"{x}\""))}";
+                $"{nameof(RandomSpawn)} {string.Join(" ", SpawnSet.Select(x => $"\"{x}\""))}";
         }
 
-        public class Unk03 : IAreaDataCommand
+        public class CasualSpawn : IAreaDataCommand
         {
             [Data] public int Unk00 { get; set; }
             [Data(Count = 4)] public string SpawnSet { get; set; }
@@ -227,28 +227,28 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk03)} {Unk00} \"{SpawnSet}\"";
+                $"{nameof(CasualSpawn)} {Unk00} \"{SpawnSet}\"";
         }
 
-        public class Unk04 : IAreaDataCommand
+        public class Capacity : IAreaDataCommand
         {
-            [Data] public int Value { get; set; }
+            [Data] public float Value { get; set; }
 
             public void Parse(int nRow, List<string> tokens)
             {
-                Value = ParseAsInt(nRow, GetToken(nRow, tokens, 1));
+                Value = ParseAsFloat(nRow, GetToken(nRow, tokens, 1));
             }
 
             public override string ToString() =>
-                $"{nameof(Unk04)} {Value}";
+                $"{nameof(Capacity)} {Value}";
         }
 
-        public class Unk05 : IAreaDataCommand
+        public class AllocEnemy : IAreaDataCommand
         {
             [Data] public int Value { get; set; }
 
             public override string ToString() =>
-                $"{nameof(Unk05)} {Value}";
+                $"{nameof(AllocEnemy)} {Value}";
 
             public void Parse(int nRow, List<string> tokens)
             {
@@ -282,7 +282,7 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(Unk07)} {Value}";
         }
 
-        public class Unk09 : IAreaDataCommand
+        public class SpawnAlt : IAreaDataCommand
         {
             [Data(Count = 4)] public string Value { get; set; }
 
@@ -292,10 +292,10 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk09)} \"{Value}\"";
+                $"{nameof(SpawnAlt)} \"{Value}\"";
         }
 
-        public class Unk0a : IAreaDataCommand
+        public class MapScript : IAreaDataCommand
         {
             [Data] public int Value { get; set; }
 
@@ -305,10 +305,10 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk0a)} {Value}";
+                $"{nameof(MapScript)} {Value}";
         }
 
-        public class Unk0b : IAreaDataCommand
+        public class BarrierFlag : IAreaDataCommand
         {
             [Data] public int Value1 { get; set; }
             [Data] public int Value2 { get; set; }
@@ -320,7 +320,7 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk0b)} 0x{Value1:x} 0x{Value2:x}";
+                $"{nameof(BarrierFlag)} 0x{Value1:x} 0x{Value2:x}";
         }
 
         public class AreaSettings : IAreaDataCommand
@@ -397,7 +397,7 @@ namespace OpenKh.Kh2.Ard
             }
         }
 
-        public class Unk11 : IAreaDataCommand
+        public class MsgWall : IAreaDataCommand
         {
             [Data] public int Value { get; set; }
 
@@ -407,10 +407,10 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk11)} 0x{Value:x}";
+                $"{nameof(MsgWall)} 0x{Value:x}";
         }
 
-        public class Unk13 : IAreaDataCommand
+        public class Camera : IAreaDataCommand
         {
             [Data] public int Value { get; set; }
 
@@ -420,14 +420,14 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk13)} {Value}";
+                $"{nameof(Camera)} {Value}";
         }
 
-        public class Unk14 : IAreaDataCommand
+        public class StatusFlag3 : IAreaDataCommand
         {
             public void Parse(int nRow, List<string> tokens) { }
 
-            public override string ToString() => nameof(Unk14);
+            public override string ToString() => nameof(StatusFlag3);
         }
 
         public class Mission : IAreaDataCommand
@@ -458,14 +458,14 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(Layout)} \"{Value}\"";
         }
 
-        public class Unk17 : IAreaDataCommand
+        public class StatusFlag5 : IAreaDataCommand
         {
             public void Parse(int nRow, List<string> tokens) { }
 
-            public override string ToString() => nameof(Unk17);
+            public override string ToString() => nameof(StatusFlag5);
         }
 
-        public class Unk18 : IAreaDataCommand
+        public class AllocEffect : IAreaDataCommand
         {
             [Data] public int Value1 { get; set; }
             [Data] public int Value2 { get; set; }
@@ -477,10 +477,10 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk18)} 0x{Value1:x} 0x{Value2:x}";
+                $"{nameof(AllocEffect)} 0x{Value1:x} 0x{Value2:x}";
         }
 
-        public class Unk19 : IAreaDataCommand
+        public class Progress : IAreaDataCommand
         {
             [Data] public int Value { get; set; }
 
@@ -490,10 +490,10 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk19)} 0x{Value:x}";
+                $"{nameof(Progress)} 0x{Value:x}";
         }
 
-        public class Unk1a : IAreaDataCommand
+        public class VisibilityOn : IAreaDataCommand
         {
             [Data] public int Value { get; set; }
 
@@ -503,10 +503,10 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk1a)} {Value}";
+                $"{nameof(VisibilityOn)} {Value}";
         }
 
-        public class Unk1b : IAreaDataCommand
+        public class VisibilityOff : IAreaDataCommand
         {
             [Data] public int Value { get; set; }
 
@@ -516,7 +516,7 @@ namespace OpenKh.Kh2.Ard
             }
 
             public override string ToString() =>
-                $"{nameof(Unk1b)} {Value}";
+                $"{nameof(VisibilityOff)} {Value}";
         }
 
         public class Unk1d : IAreaDataCommand
@@ -773,7 +773,7 @@ namespace OpenKh.Kh2.Ard
         }
 
         public static string Decompile(IEnumerable<AreaDataScript> scripts) =>
-            string.Join("\n", scripts.Select(x => x.ToString()));
+            string.Join("\n\n", scripts.Select(x => x.ToString()));
 
         public static IEnumerable<AreaDataScript> Compile(string text)
         {
@@ -1116,6 +1116,13 @@ namespace OpenKh.Kh2.Ard
             var strValue = isHexadecimal ? token.Substring(2) : token;
 
             if (!int.TryParse(strValue, nStyle, null, out var value))
+                throw new SpawnScriptNotANumberException(row, token);
+            return value;
+        }
+
+        private static float ParseAsFloat(int row, string token)
+        {
+            if (!float.TryParse(token, out var value))
                 throw new SpawnScriptNotANumberException(row, token);
             return value;
         }
