@@ -80,7 +80,6 @@ Magic Code `MILV`
 | 06     | ushort |
 | 08     | int    | EXP needed
 
-
 ## Exp
 
 Contains exp values for the materials used in recipes. The total exp from a recipe is the sum of all of its materials' exp values.
