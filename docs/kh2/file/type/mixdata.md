@@ -2,16 +2,16 @@
 
 This file contains informations about the moogle shop. Internally it is a [bar](bar.md) file.
 
-* [Sub-file Header](#header)
+* [Subfile Header](#header)
 * Entries
     * [RECI](#reci) - Recipes
     * [COND](#cond) - Conditions
     * [LEVE](#leve) - Levels
     * [EXP](#exp) - Experience
 
-## Header
+## Headers
 
-Each sub-file starts with a header. The structure for all is the same, aside from the Magic Code.
+Each subfile starts with a header. The structure for all is the same, aside from the Magic Code.
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
@@ -20,9 +20,9 @@ Each sub-file starts with a header. The structure for all is the same, aside fro
 | 08     | int    | Entries count
 | 0C     | int    | Padding
 
-## Entries
+## Subfiles
 
-## Reci
+### Reci
 
 Contains the moogle recipes.
 
@@ -48,7 +48,7 @@ Magic Code `MIRE`
 | 1C     | ushort | Ingredient 6
 | 1E     | ushort | Needed amount of Ingredient 6
 
-## Cond
+### Cond
 
 Contains the table from Synthesize -> Lists (Get n types of materials etc.)
 
@@ -65,8 +65,7 @@ Magic Code `MICO`
 | 08     | short  | Count of needed Materials
 | 0A     | short  | Unlock event for the shop (Sam used in shops [Shops](./03system.md#shop))
 
-
-## Leve
+### Leve
 
 Contains moogle level up informations.
 
@@ -80,7 +79,7 @@ Magic Code `MILV`
 | 06     | ushort |
 | 08     | int    | EXP needed
 
-## Exp
+### Exp
 
 Contains exp values for the materials used in recipes. The total exp from a recipe is the sum of all of its materials' exp values.
 
