@@ -234,7 +234,7 @@ StatusFlag5";
                 Skip.If(ardFile == "", "No ARD files found");
 
                 var binarcEntry = File.OpenRead(ardFile).Using(Bar.Read)
-                    .FirstOrDefault(x => x.Name == scriptSet && x.Type == Bar.EntryType.SpawnScript);
+                    .FirstOrDefault(x => x.Name == scriptSet && x.Type == Bar.EntryType.AreaDataScript);
                 if (binarcEntry == null)
                     return;
 
@@ -253,7 +253,7 @@ StatusFlag5";
                 Skip.If(ardFile == null, "No ARD files found");
 
                 var binarcEntry = File.OpenRead(ardFile).Using(Bar.Read)
-                    .FirstOrDefault(x => x.Name == scriptSet && x.Type == Bar.EntryType.SpawnScript);
+                    .FirstOrDefault(x => x.Name == scriptSet && x.Type == Bar.EntryType.AreaDataScript);
                 if (binarcEntry == null)
                     return;
 

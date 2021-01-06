@@ -47,7 +47,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
             return entries.AddOrReplace(new Bar.Entry
             {
                 Name = _name,
-                Type = Bar.EntryType.SpawnScript,
+                Type = Bar.EntryType.AreaDataScript,
                 Stream = memStream
             });
         }
@@ -55,7 +55,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
         public static SpawnScriptModel Create(List<Bar.Entry> entries, string name)
         {
             var entry = entries
-                .FirstOrDefault(x => x.Name == name && x.Type == Bar.EntryType.SpawnScript);
+                .FirstOrDefault(x => x.Name == name && x.Type == Bar.EntryType.AreaDataScript);
             if (entry == null)
                 return null;
 

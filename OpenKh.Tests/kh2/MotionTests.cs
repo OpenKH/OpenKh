@@ -96,7 +96,7 @@ namespace OpenKh.Tests.kh2
             {
                 var entry = File.OpenRead(Path.Combine(KH2Dir, anbFile))
                     .Using(Bar.Read)
-                    .SingleOrDefault(it => it.Name == motionName && it.Type == Bar.EntryType.AnimationLoader);
+                    .SingleOrDefault(it => it.Name == motionName && it.Type == Bar.EntryType.Event);
 
                 if (entry != null)
                 {

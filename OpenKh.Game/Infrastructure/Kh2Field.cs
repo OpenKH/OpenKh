@@ -117,7 +117,7 @@ namespace OpenKh.Game.Infrastructure
 
             _binarcArd = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
             Events = _binarcArd
-                .Where(x => x.Type == Bar.EntryType.AnimationLoader)
+                .Where(x => x.Type == Bar.EntryType.Event)
                 .Select(x => x.Name)
                 .ToList();
 
@@ -131,7 +131,7 @@ namespace OpenKh.Game.Infrastructure
         {
             _actorIds.Clear();
             _subtitleData.Clear();
-            _binarcArd.ForEntry(eventName, Bar.EntryType.AnimationLoader, stream =>
+            _binarcArd.ForEntry(eventName, Bar.EntryType.Event, stream =>
             {
                 _eventPlayer = new EventPlayer(this, Event.Read(stream));
                 RemoveAllActors();
@@ -382,7 +382,7 @@ namespace OpenKh.Game.Infrastructure
         private void RunSpawnScript(
             IEnumerable<Bar.Entry> barEntries, string spawnScriptName, int programId)
         {
-            var script = barEntries.ForEntry(spawnScriptName, Bar.EntryType.SpawnScript, stream =>
+            var script = barEntries.ForEntry(spawnScriptName, Bar.EntryType.AreaDataScript, stream =>
                 AreaDataScript.Read(stream, programId));
             if (script == null)
                 return;
@@ -393,7 +393,7 @@ namespace OpenKh.Game.Infrastructure
                 {
                     case AreaDataScript.Spawn spawn:
                         Log.Info($"Loading spawn {spawn.SpawnSet}");
-                        var spawnPoints = barEntries.ForEntry(spawn.SpawnSet, Bar.EntryType.SpawnPoint, SpawnPoint.Read);
+                        var spawnPoints = barEntries.ForEntry(spawn.SpawnSet, Bar.EntryType.AreaDataSpawn, SpawnPoint.Read);
                         if (spawnPoints != null)
                         {
                             foreach (var spawnPoint in spawnPoints)
