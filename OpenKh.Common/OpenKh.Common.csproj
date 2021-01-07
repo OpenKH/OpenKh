@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Xe.BinaryMapper" Version="1.5.2" />
-    <PackageReference Include="YamlDotNet" Version="9.1.0" />
+    <PackageReference Include="YamlDotNet" Version="9.1.1" />
   </ItemGroup>
 
 </Project>
