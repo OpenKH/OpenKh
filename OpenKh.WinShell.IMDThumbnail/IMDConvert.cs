@@ -12,6 +12,7 @@ using OpenKh.Imaging;
 
 namespace OpenKh.WinShell.IMDUtilities
 {
+    [Obsolete]
     [ComVisible(true)]
     [COMServerAssociation(AssociationType.FileExtension, ".imd")]
     public class IMDConvert : SharpContextMenu
@@ -49,6 +50,8 @@ namespace OpenKh.WinShell.IMDUtilities
 
                     MarshalBitmap _tBitmap = new MarshalBitmap(size.Width, size.Height, data);
                     _tBitmap.Bitmap.Save(filePath.Replace(".imd", ".png"));
+
+                    _tBitmap.Dispose();
                 }
             }
         }
