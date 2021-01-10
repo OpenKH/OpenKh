@@ -50,19 +50,6 @@ namespace OpenKh.WinShell.IMDUtilities
             Bitmap = new Bitmap(Width, Height, Width * 4, PixelFormat.Format32bppArgb, BitsHandle.AddrOfPinnedObject());
         }
 
-        public void SetPixel(int x, int y, Color colour)
-        {
-            int num = x + y * Width;
-            int num2 = colour.ToArgb();
-            Bits[num] = num2;
-        }
-
-        public Color GetPixel(int x, int y)
-        {
-            int num = x + y * Width;
-            return Color.FromArgb(Bits[num]);
-        }
-
         public void Dispose()
         {
             if (!Disposed)
