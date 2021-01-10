@@ -99,6 +99,8 @@ Weapon entity table.
 Contains a list of pointers that point to the offset of a weapon set. There are multiple pointers for multiple sets.
 Weapon sets contain the list of weapon models a character use in certain situations.
 
+The Id within a set is set set as the weapon's subId on the [item table](#item).
+
 ### Went Structure
 
 | Amount | Description |
@@ -202,10 +204,10 @@ Every table has the following header
 | Offset | Type | Description |
 |--------|---------------|-------------|
 | 0      | uint16 | Id - [ITEM LIST](../../dictionary/inventory.md)
-| 2      | uint8  | Category. Refer to the table below to know what categories are recognized. |
-| 3      | uint8  | Unknown |
-| 4      | uint8  | Unknown |
-| 5      | uint8  | Rank (C, B, A, S) for Synthesis items. |
+| 2      | byte  | [Category](#Categories) |
+| 3      | byte  | Visibility (00 are visible on Stock, 01 isn't, 02 is like 00 for team-consumables) |
+| 4      | byte  | SubId* |
+| 5      | byte  | Rank (C, B, A, S) for Synthesis items. |
 | 6      | uint16 | [Status ID](#status-descriptor). Used to assign a certain status change to an item when equipped. |
 | 8      | uint16 | Name message ID |
 | 10     | uint16 | Description message ID |
@@ -214,15 +216,17 @@ Every table has the following header
 | 16     | uint16 | Command. | - [COMMAND LIST](../../dictionary/commands.md)
 | 18     | uint16 | Slot (Order in the menu) |
 | 20     | uint16 | Picture linked to the image. |
-| 22     | uint8  | Unknown |
-| 23     | uint8  | Unknown |
+| 22     | byte  | [Prize Box](#Prize-boxes). |
+| 23     | byte  | [Icon](../../dictionary/icons.md). |
+
+*Used as recovery amount for consumables (% for ethers, halved on charge), AP cost for abilities, Id used in [Went](#went) for weapons.
 
 #### Categories
 
-| Type | Name
+| ID | Description
 |------|------|
-| 0    | Consumable
-| 1    | Boost
+| 0    | Consumable (Equippable)
+| 1    | Consumable (Menu)
 | 2    | Keyblade
 | 3    | Staff
 | 4    | Shield
@@ -245,6 +249,23 @@ Every table has the following header
 | 21   | Form
 | 22   | Map
 | 23   | Report
+
+#### Prize boxes
+
+| ID | Description
+|------|------|
+| 0    | Red S (Synth1)
+| 1    | Red L (Synth1)
+| 2    | Red XL (Synth1)
+| 3    | Blue S (Synth2)
+| 4    | Blue L (Synth2)
+| 5    | Blue XL (Synth2)
+| 6    | Winged S (Equipment)
+| 7    | Winged L (Equipment)
+| 8    | Winged XL (Equipment)
+| 9    | Purple S (Item)
+| 10   | Purple L (Item)
+| 11   | Purple XL (Item)
 
 ### Status table Structure
 
