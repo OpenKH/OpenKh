@@ -856,8 +856,8 @@ namespace OpenKh.Kh2.Ard
 
         private static object ReadSetCameraData(MappingReadArgs args)
         {
-            List<SetCameraData.CameraKeys> AssignValues(SetCameraDataHeader header, IList<SetCameraData.CameraKeys> values) =>
-                Enumerable.Range(0, header.Count).Select(i => values[header.Index + i]).ToList();
+            List<SetCameraData.CameraKeys> AssignValues(SetCameraDataHeader header, IList<SetCameraData.CameraKeys> val) =>
+                Enumerable.Range(0, header.Count).Select(i => val[header.Index + i]).ToList();
 
             var cameraId = args.Reader.ReadInt16();
             var headers = Enumerable
@@ -897,10 +897,10 @@ namespace OpenKh.Kh2.Ard
         {
             void WriteHeader(Stream stream,
                 List<SetCameraData.CameraKeys> values,
-                int startIndex) =>
+                int sIndex) =>
                 Mapping.WriteObject(stream, new SetCameraDataHeader
                 {
-                    Index = (short)startIndex,
+                    Index = (short)sIndex,
                     Count = (short)values.Count
                 });
 
