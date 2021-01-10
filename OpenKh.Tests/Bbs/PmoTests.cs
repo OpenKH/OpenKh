@@ -101,5 +101,13 @@ namespace OpenKh.Tests.Bbs
             Assert.Equal("Root", TestPmo.jointList[0].JointName);
             Assert.Equal(0x1, TestPmo.jointList[1].JointIndex);
         });
+
+        [Fact]
+        public void CheckH03EX00()
+        {
+            var TestPmo = Pmo.Read(File.OpenRead("../../../Bbs/res/h03ex00.pmo"));
+
+            Assert.Equal("3", TestPmo.header.TextureCount.ToString());
+        }
     }
 }

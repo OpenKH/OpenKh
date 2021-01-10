@@ -20,23 +20,36 @@ namespace OpenKh.Engine.Parsers
                 var vertices = new PositionColoredTextured[pmo.Meshes[x].vertices.Count];
                 for (var i = 0; i < vertices.Length; i++)
                 {
-                    byte maxX = 0xff;
-                    byte maxY = 0xff;
-                    byte maxZ = 0xff;
-                    byte maxW = 0xff;
-                    maxX -= (byte)pmo.Meshes[x].colors[i].X;
-                    maxY -= (byte)pmo.Meshes[x].colors[i].Y;
-                    maxZ -= (byte)pmo.Meshes[x].colors[i].Z;
-                    maxW -= (byte)pmo.Meshes[x].colors[i].W;
+                    Vector4 color;
+
+                    if(Pmo.GetFlags(pmo.meshSection[x]).UniformDiffuseFlag)
+                    {
+                        byte[] byt = BitConverter.GetBytes(pmo.meshSectionOpt2[x].DiffuseColor);
+                        if (BitConverter.IsLittleEndian)
+                            Array.Reverse(byt);
+
+                        color.X = 0xFF;
+                        color.Y = 0xFF;
+                        color.Z = 0xFF;
+                        color.W = byt[0];
+                    }
+                    else
+                    {
+                        color = pmo.Meshes[x].colors[i];
+                        color.Y = 0xFF;
+                        color.Z = 0xFF;
+                        color.W = 0xFF;
+                    }
+
                     vertices[i].X = pmo.Meshes[x].vertices[i].X * Scale;
                     vertices[i].Y = pmo.Meshes[x].vertices[i].Y * Scale;
                     vertices[i].Z = pmo.Meshes[x].vertices[i].Z * Scale;
                     vertices[i].Tu = pmo.Meshes[x].textureCoordinates[i].X;
                     vertices[i].Tv = pmo.Meshes[x].textureCoordinates[i].Y;
-                    vertices[i].R = maxX;
-                    vertices[i].G = maxY;
-                    vertices[i].B = maxZ;
-                    vertices[i].A = maxW;
+                    vertices[i].R = (byte)color.W;
+                    vertices[i].G = (byte)color.Z;
+                    vertices[i].B = (byte)color.Y;
+                    vertices[i].A = 0xFF;
                 }
 
                 currentMesh = new MeshDescriptor()
