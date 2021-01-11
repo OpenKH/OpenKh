@@ -29,3 +29,4 @@ And then, for every module you see on the list:
 ![](https://i.imgur.com/vtm04uL.png)
 
 When you do all of the above, Click on "**Explorer -> Restart Explorer**" and that's it! The WinShell extensions should be successfully installed!
+Note that you will only have to do this once. We hope you enjoy these extensions and Keep on Moddin'
