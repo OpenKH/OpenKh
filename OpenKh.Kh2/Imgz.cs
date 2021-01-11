@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -58,7 +58,6 @@ namespace OpenKh.Kh2
 
         public static IEnumerable<Imgd> Read(Stream stream) =>
             OpenAsStream(stream.SetPosition(0)).Select(x => Imgd.Read(x)).ToArray();
-
 
         public static void Write(Stream stream, IEnumerable<Imgd> images)
 		{

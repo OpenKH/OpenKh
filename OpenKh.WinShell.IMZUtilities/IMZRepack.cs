@@ -9,13 +9,14 @@ using SharpShell.SharpContextMenu;
 
 using OpenKh.Kh2;
 using OpenKh.Imaging;
+using System.Collections.Generic;
 
-namespace OpenKh.WinShell.IMDUtilities
+namespace OpenKh.WinShell.IMZUtilities
 {
     [Obsolete]
     [ComVisible(true)]
     [COMServerAssociation(AssociationType.FileExtension, ".imd")]
-    public class IMDConvert : SharpContextMenu
+    public class IMZRepack : SharpContextMenu
     {
         protected override bool CanShowMenu()
         {
@@ -26,34 +27,32 @@ namespace OpenKh.WinShell.IMDUtilities
         {
             var menu = new ContextMenuStrip();
 
-            var itemConvert = new ToolStripMenuItem
-            {
-                Text = "Convert to PNG..."
-            };
+            var itemPack = new ToolStripMenuItem { Text = "Pack into IMGZ..." };
+            itemPack.Click += (sender, args) => RepackFunction();
 
-            itemConvert.Click += (sender, args) => ConvertPNG();
-
-            menu.Items.Add(itemConvert);
+            menu.Items.Add(itemPack);
             return menu;
         }
 
-        private void ConvertPNG()
+        private void RepackFunction()
         {
+            List<Imgd> _tList = new List<Imgd>();
+            string _rPath = "";
+
             foreach (var filePath in SelectedItemPaths)
             {
+                if (_rPath == "")
+                    _rPath = Path.GetDirectoryName(filePath);
+
                 using (FileStream _cStream = new FileStream(filePath, FileMode.Open))
                 {
                     Imgd _tImage = Imgd.Read(_cStream);
-
-                    var size = _tImage.Size;
-                    var data = _tImage.ToBgra32();
-
-                    MarshalBitmap _tBitmap = new MarshalBitmap(size.Width, size.Height, data);
-                    _tBitmap.Bitmap.Save(filePath.Replace(".imd", ".png"));
-
-                    _tBitmap.Dispose();
+                    _tList.Add(_tImage);
                 }
             }
+
+            using (FileStream _oStream = new FileStream(_rPath + "\\output.imz", FileMode.OpenOrCreate))
+                Imgz.Write(_oStream, _tList.ToArray());
         }
     }
 }
