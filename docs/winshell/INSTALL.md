@@ -17,11 +17,15 @@ Afterwards, open the ServerManager (you need Administrator Privileges for this).
 Click on "**File -> Load Server...**", and click on the WinShell extensions you want to load (In our case, "**OpenKh.WinShell.IMDUtilities.dll**")
 
 Afterwards, you should see a screen like this:
+
 ![](https://i.imgur.com/MkNKRfN.png)
 
 And then, for every module you see on the list:
 
 - Click on it and then click on "**Server -> Install**". If successful, you should see a popup telling you so.
 - Click on "**Server -> Register Server (x64)**". No popup should appear.
+- If successful, at the side of the window, you should see something like this where it says 64-Bit Server - Registered:
+
+![](https://i.imgur.com/vtm04uL.png)
 
 When you do all of the above, Click on "**Explorer -> Restart Explorer**" and that's it! The WinShell extensions should be successfully installed!
