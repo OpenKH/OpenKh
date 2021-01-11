@@ -12,9 +12,12 @@ To install these extensions, download the SharpShell ServerManager from [this li
 
 Afterwards, open the ServerManager (you need Administrator Privileges for this). You will be greeted with this screen:
 
+![](https://i.imgur.com/VpByIAO.png)
+
 Click on "**File -> Load Server...**", and click on the WinShell extensions you want to load (In our case, "**OpenKh.WinShell.IMDUtilities.dll**")
 
 Afterwards, you should see a screen like this:
+![](https://i.imgur.com/MkNKRfN.png)
 
 And then, for every module you see on the list:
 
