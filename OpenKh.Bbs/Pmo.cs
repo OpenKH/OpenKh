@@ -219,98 +219,99 @@ namespace OpenKh.Bbs
 
         public class MeshChunks
         {
-            public PrimitiveType type;
-            public byte TriStripCount;
-            public int TextureID;
-            public List<Vector3> vertices;
-            public List<int> Indices;
-            public List<Vector4> colors;
-            public List<Vector2> textureCoordinates;
+            [Data] public int MeshNumber { get; set; }
+            [Data] public MeshSection SectionInfo { get; set; }
+            [Data] public MeshSectionOptional1 SectionInfo_opt1 { get; set; }
+            [Data] public MeshSectionOptional2 SectionInfo_opt2 { get; set; }
+            [Data] public UInt16[] TriangleStripValues { get; set; }
+            [Data] public int TextureID { get; set; }
+            [Data] public List<float> jointWeights { get; set; }
+            [Data] public List<Vector2> textureCoordinates { get; set; }
+            [Data] public List<Vector4> colors { get; set; }
+            [Data] public List<Vector3> vertices { get; set; }
+            [Data] public List<int> Indices { get; set; }
 
             public MeshChunks()
             {
-                type = PrimitiveType.PRIMITIVE_TRIANGLE;
-                TriStripCount = 0;
+                MeshNumber = 0;
+                TriangleStripValues = new UInt16[0];
                 TextureID = 0;
+                jointWeights = new List<float>();
+                textureCoordinates = new List<Vector2>();
+                colors = new List<Vector4>();
                 vertices = new List<Vector3>();
                 Indices = new List<int>();
-                colors = new List<Vector4>();
-                textureCoordinates = new List<Vector2>();
             }
         }
 
         public Header header { get; set; }
         public TextureInfo[] textureInfo { get; set; }
-        public List<MeshSection> meshSection = new List<MeshSection>();
-        public List<MeshSectionOptional1> meshSectionOpt1 = new List<MeshSectionOptional1>();
-        public List<MeshSectionOptional2> meshSectionOpt2 = new List<MeshSectionOptional2>();
-        public List<float> jointWeights = new List<float>();
         public List<byte[]> Textures = new List<byte[]>();
-        public List<byte> TextureIndices = new List<byte>();
         public SkeletonHeader skeletonHeader { get; set; }
         public JointData[] jointList;
 
         public List<MeshChunks> Meshes = new List<MeshChunks>();
 
-        public static void ReadMeshData(ref Stream stream, ref Pmo pmo, ref UInt16 VertCnt, ref int VertNumber, ref int meshSecCount)
+        public static void ReadHeader(ref Stream stream, ref Pmo pmo)
+        {
+            pmo.header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
+        }
+
+        public static void ReadTextureSection(ref Stream stream, ref Pmo pmo)
+        {
+            pmo.textureInfo = new TextureInfo[pmo.header.TextureCount];
+            for (ushort i = 0; i < pmo.header.TextureCount; i++)
+                pmo.textureInfo[i] = BinaryMapping.ReadObject<TextureInfo>(stream);
+        }
+
+        public static void ReadMeshData(ref Stream stream, ref Pmo pmo, ref UInt16 VertCnt, ref int meshSecCount, int MeshNumber = 0)
         {
             // Mesh body 1.
             while (VertCnt > 0)
             {
                 MeshChunks meshChunk = new MeshChunks();
-                MeshSection meshSec = new MeshSection();
-                MeshSectionOptional1 meshSecOpt1 = new MeshSectionOptional1();
-                MeshSectionOptional2 meshSecOpt2 = new MeshSectionOptional2();
-                UInt16[] TriangleStripValues = new UInt16[0];
+                meshChunk.MeshNumber = MeshNumber;
                 meshSecCount++;
 
-                long positionBeforeHeader = stream.Position;
+                meshChunk.SectionInfo = BinaryMapping.ReadObject<MeshSection>(stream);
 
-                meshSec = BinaryMapping.ReadObject<MeshSection>(stream);
-                meshChunk.TextureID = meshSec.TextureID;
-                VertexFlags flags = GetFlags(meshSec);
-
-                if (meshSec.VertexCount <= 0)
+                // Exit if Vertex Count is zero.
+                if (meshChunk.SectionInfo.VertexCount <= 0)
                     break;
+
+                meshChunk.TextureID = meshChunk.SectionInfo.TextureID;
+                VertexFlags flags = GetFlags(meshChunk.SectionInfo);
+                
                 bool isColorFlagRisen = flags.UniformDiffuseFlag;
 
                 if (pmo.header.SkeletonOffset != 0)
-                    meshSecOpt1 = BinaryMapping.ReadObject<MeshSectionOptional1>(stream);
+                    meshChunk.SectionInfo_opt1 = BinaryMapping.ReadObject<MeshSectionOptional1>(stream);
                 if (isColorFlagRisen)
-                    meshSecOpt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
-                if (meshSec.TriangleStripCount > 0)
+                    meshChunk.SectionInfo_opt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
+                if (meshChunk.SectionInfo.TriangleStripCount > 0)
                 {
-                    TriangleStripValues = new UInt16[meshSec.TriangleStripCount];
-                    for (int i = 0; i < meshSec.TriangleStripCount; i++)
+                    meshChunk.TriangleStripValues = new UInt16[meshChunk.SectionInfo.TriangleStripCount];
+                    for (int i = 0; i < meshChunk.SectionInfo.TriangleStripCount; i++)
                     {
-                        TriangleStripValues[i] = stream.ReadUInt16();
+                        meshChunk.TriangleStripValues[i] = stream.ReadUInt16();
                     }
                 }
 
-                meshChunk.type = flags.Primitive;
-                meshChunk.TriStripCount = meshSec.TriangleStripCount;
-
-                pmo.meshSection.Add(meshSec);
-                pmo.meshSectionOpt1.Add(meshSecOpt1);
-                pmo.meshSectionOpt2.Add(meshSecOpt2);
-
-                // Get Vertices
+                // Get Formats.
                 CoordinateFormat TexCoordFormat = flags.TextureCoordinateFormat;
                 CoordinateFormat VertexPositionFormat = flags.PositionFormat;
                 CoordinateFormat WeightFormat = flags.WeightFormat;
                 ColorFormat ColorFormat = flags.ColorFormat;
                 UInt32 SkinningWeightsCount = flags.SkinningWeightsCount;
                 BinaryReader r = new BinaryReader(stream);
-
-                int currentVertexSize = GetVertexSize(TexCoordFormat, VertexPositionFormat, WeightFormat, ColorFormat, (int)SkinningWeightsCount);
                 long positionAfterHeader = stream.Position;
 
-                if (meshSec.TriangleStripCount > 0)
+                if (meshChunk.SectionInfo.TriangleStripCount > 0)
                 {
                     int vertInd = 0;
-                    for (int p = 0; p < meshSec.TriangleStripCount; p++)
+                    for (int p = 0; p < meshChunk.SectionInfo.TriangleStripCount; p++)
                     {
-                        for (int s = 0; s < (TriangleStripValues[p] - 2); s++)
+                        for (int s = 0; s < (meshChunk.TriangleStripValues[p] - 2); s++)
                         {
                             if (s % 2 == 0)
                             {
@@ -326,15 +327,14 @@ namespace OpenKh.Bbs
                             }
                         }
 
-                        VertNumber += TriangleStripValues[p];
-                        vertInd += TriangleStripValues[p];
+                        vertInd += meshChunk.TriangleStripValues[p];
                     }
                 }
                 else
                 {
                     if (flags.Primitive == PrimitiveType.PRIMITIVE_TRIANGLE_STRIP)
                     {
-                        for (int s = 0; s < (meshSec.VertexCount - 2); s++)
+                        for (int s = 0; s < (meshChunk.SectionInfo.VertexCount - 2); s++)
                         {
                             if (s % 2 == 0)
                             {
@@ -352,7 +352,7 @@ namespace OpenKh.Bbs
                     }
                 }
 
-                for (int v = 0; v < meshSec.VertexCount; v++)
+                for (int v = 0; v < meshChunk.SectionInfo.VertexCount; v++)
                 {
                     long vertexStartPos = stream.Position;
                     int vertexIncreaseAmount = 0;
@@ -364,19 +364,18 @@ namespace OpenKh.Bbs
                             switch (WeightFormat)
                             {
                                 case CoordinateFormat.NORMALIZED_8_BITS:
-                                    pmo.jointWeights.Add(stream.ReadByte() / 127.0f);
+                                    meshChunk.jointWeights.Add(stream.ReadByte() / 127.0f);
                                     break;
                                 case CoordinateFormat.NORMALIZED_16_BITS:
-                                    pmo.jointWeights.Add(stream.ReadUInt16() / 32767.0f);
+                                    meshChunk.jointWeights.Add(stream.ReadUInt16() / 32767.0f);
                                     break;
                                 case CoordinateFormat.FLOAT_32_BITS:
-                                    pmo.jointWeights.Add(stream.ReadFloat());
+                                    meshChunk.jointWeights.Add(stream.ReadFloat());
                                     break;
                                 case CoordinateFormat.NO_VERTEX:
                                     break;
                             }
                         }
-
                     }
 
                     Vector2 currentTexCoord;
@@ -425,10 +424,10 @@ namespace OpenKh.Bbs
                             stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
 
                             Vector4 col;
-                            col.X = 0xFF - stream.ReadByte();
-                            col.Y = 0xFF - stream.ReadByte();
-                            col.Z = 0xFF - stream.ReadByte();
-                            col.W = 0xFF - stream.ReadByte();
+                            col.X = stream.ReadByte();
+                            col.Y = stream.ReadByte();
+                            col.Z = stream.ReadByte();
+                            col.W = stream.ReadByte();
                             meshChunk.colors.Add(col);
                             break;
                     }
@@ -439,73 +438,66 @@ namespace OpenKh.Bbs
                     switch (VertexPositionFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            currentVertex.X = r.ReadSByte() / 127.0f * pmo.header.ModelScale;
-                            currentVertex.Y = r.ReadSByte() / 127.0f * pmo.header.ModelScale;
-                            currentVertex.Z = r.ReadSByte() / 127.0f * pmo.header.ModelScale;
+                            currentVertex.X = r.ReadSByte() / 127.0f;
+                            currentVertex.Y = r.ReadSByte() / 127.0f;
+                            currentVertex.Z = r.ReadSByte() / 127.0f;
                             meshChunk.vertices.Add(currentVertex);
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
                             vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
                             stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
 
-                            currentVertex.X = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
-                            currentVertex.Y = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
-                            currentVertex.Z = (float)stream.ReadInt16() / 32767.0f * pmo.header.ModelScale;
+                            currentVertex.X = (float)stream.ReadInt16() / 32767.0f;
+                            currentVertex.Y = (float)stream.ReadInt16() / 32767.0f;
+                            currentVertex.Z = (float)stream.ReadInt16() / 32767.0f;
                             meshChunk.vertices.Add(currentVertex);
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
                             vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
                             stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
 
-                            currentVertex.X = stream.ReadFloat() * pmo.header.ModelScale;
-                            currentVertex.Y = stream.ReadFloat() * pmo.header.ModelScale;
-                            currentVertex.Z = stream.ReadFloat() * pmo.header.ModelScale;
+                            currentVertex.X = stream.ReadFloat();
+                            currentVertex.Y = stream.ReadFloat();
+                            currentVertex.Z = stream.ReadFloat();
                             meshChunk.vertices.Add(currentVertex);
                             break;
                     }
 
-                    stream.Seek(vertexStartPos + meshSec.VertexSize, SeekOrigin.Begin);
-
-                    pmo.TextureIndices.Add(meshSec.TextureID);
+                    stream.Seek(vertexStartPos + meshChunk.SectionInfo.VertexSize, SeekOrigin.Begin);
 
                     if (flags.Primitive == PrimitiveType.PRIMITIVE_TRIANGLE)
                     {
                         meshChunk.Indices.Add(v);
-                        VertNumber++;
                     }
                 }
 
-                VertCnt = meshSec.VertexCount;
+                VertCnt = meshChunk.SectionInfo.VertexCount;
                 pmo.Meshes.Add(meshChunk);
 
-                stream.Seek(positionAfterHeader + (meshSec.VertexCount * meshSec.VertexSize), SeekOrigin.Begin);
+                stream.Seek(positionAfterHeader + (meshChunk.SectionInfo.VertexCount * meshChunk.SectionInfo.VertexSize), SeekOrigin.Begin);
                 stream.Seek(stream.Position % 4, SeekOrigin.Current);
             }
         }
 
         public static Pmo Read(Stream stream)
         {
-            Pmo pmo = new Pmo
-            {
-                header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0))
-            };
+            Pmo pmo = new Pmo();
 
-            pmo.textureInfo = new TextureInfo[pmo.header.TextureCount];
-            for (ushort i = 0; i < pmo.header.TextureCount; i++) pmo.textureInfo[i] = BinaryMapping.ReadObject<TextureInfo>(stream);
+            ReadHeader(ref stream, ref pmo);
+            ReadTextureSection(ref stream, ref pmo);
 
             // Read all data
             UInt16 VertCnt = 0xFFFF;
-            int VertNumber = 0;
             int meshSecCount = 0;
 
-            ReadMeshData(ref stream, ref pmo, ref VertCnt, ref VertNumber, ref meshSecCount);
+            ReadMeshData(ref stream, ref pmo, ref VertCnt, ref meshSecCount, 0);
 
             stream.Seek(pmo.header.MeshOffset1, SeekOrigin.Begin);
             VertCnt = 0xFFFF;
             
             if(pmo.header.MeshOffset1 != 0)
             {
-                ReadMeshData(ref stream, ref pmo, ref VertCnt, ref VertNumber, ref meshSecCount);
+                ReadMeshData(ref stream, ref pmo, ref VertCnt, ref meshSecCount, 1);
             }
 
             // Read textures.
@@ -534,6 +526,180 @@ namespace OpenKh.Bbs
             }
 
             return pmo;
+        }
+
+        public static void Write(Stream stream, Pmo pmo)
+        {
+            BinaryWriter wr = new BinaryWriter(stream);
+
+            stream.Position = 0;
+            bool hasSwappedToSecondModel = false;
+            BinaryMapping.WriteObject<Pmo.Header>(stream, pmo.header);
+
+            for(int i = 0; i < pmo.header.TextureCount; i++) BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
+
+            // Write Mesh Data.
+            for(int j = 0; j < pmo.Meshes.Count; j++)
+            {
+                if(!hasSwappedToSecondModel && pmo.Meshes[j].MeshNumber == 1)
+                {
+                    hasSwappedToSecondModel = true;
+
+                    for (uint b = 0; b < 0xC; b++)
+                        stream.Write((byte)0x00);
+
+                    for (uint b = 0; stream.Position % 0x10 != 0; b++)
+                        stream.Write((byte)0x00);
+                }
+
+                MeshChunks chunk = pmo.Meshes[j];
+
+                BinaryMapping.WriteObject<Pmo.MeshSection>(stream, pmo.Meshes[j].SectionInfo);
+                BinaryMapping.WriteObject<Pmo.MeshSectionOptional1>(stream, pmo.Meshes[j].SectionInfo_opt1);
+                if(chunk.SectionInfo_opt2 != null) BinaryMapping.WriteObject<Pmo.MeshSectionOptional2>(stream, chunk.SectionInfo_opt2);
+                
+                if(chunk.TriangleStripValues.Length > 0)
+                {
+                    for(int z = 0; z < chunk.TriangleStripValues.Length; z++)
+                    {
+                        stream.Write((ushort)chunk.TriangleStripValues[z]);
+                    }
+                }
+
+                for(int k = 0; k < pmo.Meshes[j].SectionInfo.VertexCount; k++)
+                {
+                    long vertexStartPos = stream.Position;
+                    int vertexIncreaseAmount = 0;
+                    
+                    VertexFlags flags = Pmo.GetFlags(chunk.SectionInfo);
+
+                    // Write Joints.
+                    if (flags.WeightFormat != CoordinateFormat.NO_VERTEX)
+                    {
+                        for(int w = 0; w < flags.SkinningWeightsCount + 1; w++)
+                        {
+                            switch (flags.WeightFormat)
+                            {
+                                case CoordinateFormat.NORMALIZED_8_BITS:
+                                    stream.Write((byte)(chunk.jointWeights[w + (k *(flags.SkinningWeightsCount + 1))] * 127.0f));
+                                    break;
+                                case CoordinateFormat.NORMALIZED_16_BITS:
+                                    stream.Write((byte)(chunk.jointWeights[w + (k * (flags.SkinningWeightsCount + 1))] * 32767.0f));
+                                    break;
+                                case CoordinateFormat.FLOAT_32_BITS:
+                                    wr.Write(chunk.jointWeights[w + (k * (flags.SkinningWeightsCount + 1))]);
+                                    break;
+                            }
+                        }
+                    }
+
+                    // Write Texture Coords.
+                    switch (flags.TextureCoordinateFormat)
+                    {
+                        case CoordinateFormat.NORMALIZED_8_BITS:
+                            stream.Write((byte)(chunk.textureCoordinates[k].X * 127.0f));
+                            stream.Write((byte)(chunk.textureCoordinates[k].Y * 127.0f));
+                            break;
+                        case CoordinateFormat.NORMALIZED_16_BITS:
+                            vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
+                            for (int a = 0; a < vertexIncreaseAmount; a++) stream.Write((byte)0xAB);
+
+                            stream.Write((ushort)(chunk.textureCoordinates[k].X * 32767.0f));
+                            stream.Write((ushort)(chunk.textureCoordinates[k].Y * 32767.0f));
+                            break;
+                        case CoordinateFormat.FLOAT_32_BITS:
+                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                            for (int a = 0; a < vertexIncreaseAmount; a++)
+                                stream.Write((byte)0xAB);
+
+                            wr.Write(chunk.textureCoordinates[k].X);
+                            wr.Write(chunk.textureCoordinates[k].Y);
+                            break;
+                    }
+
+                    // Write colors.
+                    switch (flags.ColorFormat)
+                    {
+                        case Pmo.ColorFormat.NO_COLOR:
+                            break;
+                        case Pmo.ColorFormat.BGR_5650_16BITS:
+                            break;
+                        case Pmo.ColorFormat.ABGR_5551_16BITS:
+                            break;
+                        case Pmo.ColorFormat.ABGR_4444_16BITS:
+                            break;
+                        case Pmo.ColorFormat.ABGR_8888_32BITS:
+                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                            for (int a = 0; a < vertexIncreaseAmount; a++)
+                                stream.Write((byte)0xAB);
+
+                            stream.Write((byte)(chunk.colors[k].X));
+                            stream.Write((byte)(chunk.colors[k].Y));
+                            stream.Write((byte)(chunk.colors[k].Z));
+                            stream.Write((byte)(chunk.colors[k].W));
+                            break;
+                    }
+
+                    // Write vertices.
+                    switch (flags.PositionFormat)
+                    {
+                        case CoordinateFormat.NORMALIZED_8_BITS:
+                            wr.Write((sbyte)(chunk.vertices[k].X * 127.0f));
+                            wr.Write((sbyte)(chunk.vertices[k].Y * 127.0f));
+                            wr.Write((sbyte)(chunk.vertices[k].Z * 127.0f));
+                            break;
+                        case CoordinateFormat.NORMALIZED_16_BITS:
+                            vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
+                            for (int a = 0; a < vertexIncreaseAmount; a++)
+                                stream.Write((byte)0xAB);
+
+                            wr.Write((short)(chunk.vertices[k].X * 32767.0f));
+                            wr.Write((short)(chunk.vertices[k].Y * 32767.0f));
+                            wr.Write((short)(chunk.vertices[k].Z * 32767.0f));
+                            break;
+                        case CoordinateFormat.FLOAT_32_BITS:
+                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                            for (int a = 0; a < vertexIncreaseAmount; a++)
+                                stream.Write((byte)0xAB);
+
+                            wr.Write(chunk.vertices[k].X);
+                            wr.Write(chunk.vertices[k].Y);
+                            wr.Write(chunk.vertices[k].Z);
+                            break;
+                    }
+
+                    int padding = ((int)vertexStartPos + chunk.SectionInfo.VertexSize) - (int)stream.Position;
+                    for (int p = 0; p < padding; p++)
+                        stream.Write((byte)0xAB);
+                }
+
+                // Remainder.
+                uint remainder = (uint)stream.Position % 4;
+                for (int p = 0; p < remainder; p++)
+                    stream.Write((byte)0x00);
+
+                if(j == (pmo.Meshes.Count - 1))
+                {
+                    for (uint b = 0; b < 0xC; b++)
+                        stream.Write((byte)0x00);
+
+                    for (uint b = 0; stream.Position % 0x10 != 0; b++)
+                        stream.Write((byte)0x00);
+                }
+            }
+
+            // Write textures.
+            for(int t = 0; t < pmo.Textures.Count; t++)
+            {
+                stream.Write(pmo.Textures[t]);
+            }
+
+            BinaryMapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
+
+            for(int joint = 0; joint < pmo.jointList.Length; joint++)
+            {
+                BinaryMapping.WriteObject<JointData>(stream, pmo.jointList[joint]);
+            }
         }
 
         public static bool IsValid(Stream stream) =>

@@ -17,9 +17,9 @@ namespace OpenKh.Tests.Bbs
         {
             var TestPmo = Pmo.Read(stream);
             List<string> Primitive = new List<string>();
-            for(int i = 0; i < TestPmo.meshSection.Count; i++)
+            for(int i = 0; i < TestPmo.Meshes.Count; i++)
             {
-                uint flag = TestPmo.meshSection[i].VertexFlags;
+                uint flag = TestPmo.Meshes[i].SectionInfo.VertexFlags;
                 flag >>= 28;
                 Pmo.PrimitiveType type = (Pmo.PrimitiveType)flag;
                 Primitive.Add(i + ": " + type.ToString());
@@ -52,12 +52,12 @@ namespace OpenKh.Tests.Bbs
             var TestPmo = Pmo.Read(stream);
 
             // mesh header 1
-            Assert.Equal("585", TestPmo.meshSection[0].VertexCount.ToString());
-            Assert.Equal("0", TestPmo.meshSection[0].TriangleStripCount.ToString());
+            Assert.Equal("585", TestPmo.Meshes[0].SectionInfo.VertexCount.ToString());
+            Assert.Equal("0", TestPmo.Meshes[0].SectionInfo.TriangleStripCount.ToString());
 
             // mesh header 2
-            Assert.Equal("141", TestPmo.meshSection[1].VertexCount.ToString());
-            Assert.Equal("0", TestPmo.meshSection[1].TriangleStripCount.ToString());
+            Assert.Equal("141", TestPmo.Meshes[1].SectionInfo.VertexCount.ToString());
+            Assert.Equal("0", TestPmo.Meshes[1].SectionInfo.TriangleStripCount.ToString());
         });
 
         [Fact]
@@ -74,9 +74,9 @@ namespace OpenKh.Tests.Bbs
             var TestPmo = Pmo.Read(stream);
             bool hasTriangleStrips = false;
 
-            for(int i = 0; i < TestPmo.meshSection.Count; i++)
+            for(int i = 0; i < TestPmo.Meshes.Count; i++)
             {
-                if(TestPmo.meshSection[i].TriangleStripCount != 0)
+                if(TestPmo.Meshes[i].SectionInfo.TriangleStripCount != 0)
                 {
                     hasTriangleStrips = true;
                     break;
@@ -108,6 +108,31 @@ namespace OpenKh.Tests.Bbs
             var TestPmo = Pmo.Read(File.OpenRead("../../../Bbs/res/h03ex00.pmo"));
 
             Assert.Equal("3", TestPmo.header.TextureCount.ToString());
+        }
+
+        [Fact]
+        public void WritesBackCorrectly()
+        {
+            string path = "../../../Bbs/res/";
+            Stream input = File.OpenRead(path + "h03ex00.pmo");
+            var TestPmo = Pmo.Read(input);
+            Stream output = File.Open(path + "h03ex00_TEST.pmo", FileMode.Create);
+            Pmo.Write(output, TestPmo);
+
+            input.Position = 0;
+            output.Position = 0;
+
+            // Check all bytes.
+            for(int i = 0; i < output.Length; i++)
+            {
+                if (input.ReadByte() != output.ReadByte())
+                {
+                    long position = output.Position;
+                    Assert.False(true);
+                }
+            }
+
+            Assert.True(true);
         }
     }
 }

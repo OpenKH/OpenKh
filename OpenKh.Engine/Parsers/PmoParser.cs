@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using OpenKh.Engine.Motion;
 using OpenKh.Kh2;
 using OpenKh.Bbs;
@@ -22,9 +21,9 @@ namespace OpenKh.Engine.Parsers
                 {
                     Vector4 color;
 
-                    if(Pmo.GetFlags(pmo.meshSection[x]).UniformDiffuseFlag)
+                    if(Pmo.GetFlags(pmo.Meshes[x].SectionInfo).UniformDiffuseFlag)
                     {
-                        byte[] byt = BitConverter.GetBytes(pmo.meshSectionOpt2[x].DiffuseColor);
+                        byte[] byt = BitConverter.GetBytes(pmo.Meshes[x].SectionInfo_opt2.DiffuseColor);
                         if (BitConverter.IsLittleEndian)
                             Array.Reverse(byt);
 
@@ -41,9 +40,9 @@ namespace OpenKh.Engine.Parsers
                         color.W = 0xFF;
                     }
 
-                    vertices[i].X = pmo.Meshes[x].vertices[i].X * Scale;
-                    vertices[i].Y = pmo.Meshes[x].vertices[i].Y * Scale;
-                    vertices[i].Z = pmo.Meshes[x].vertices[i].Z * Scale;
+                    vertices[i].X = pmo.Meshes[x].vertices[i].X * pmo.header.ModelScale * Scale;
+                    vertices[i].Y = pmo.Meshes[x].vertices[i].Y * pmo.header.ModelScale * Scale;
+                    vertices[i].Z = pmo.Meshes[x].vertices[i].Z * pmo.header.ModelScale * Scale;
                     vertices[i].Tu = pmo.Meshes[x].textureCoordinates[i].X;
                     vertices[i].Tv = pmo.Meshes[x].textureCoordinates[i].Y;
                     vertices[i].R = (byte)color.W;
