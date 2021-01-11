@@ -113,10 +113,10 @@ namespace OpenKh.Tests.Bbs
         [Fact]
         public void WritesBackCorrectly()
         {
-            string path = "../../../Bbs/res/";
-            Stream input = File.OpenRead(path + "h03ex00.pmo");
+            string path = "../../../Bbs/res/h_zz130";
+            Stream input = File.OpenRead(path + ".pmo");
             var TestPmo = Pmo.Read(input);
-            Stream output = File.Open(path + "h03ex00_TEST.pmo", FileMode.Create);
+            Stream output = File.Open(path + "_TEST.pmo", FileMode.Create);
             Pmo.Write(output, TestPmo);
 
             input.Position = 0;

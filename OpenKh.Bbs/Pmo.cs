@@ -554,9 +554,9 @@ namespace OpenKh.Bbs
 
                 MeshChunks chunk = pmo.Meshes[j];
 
-                BinaryMapping.WriteObject<Pmo.MeshSection>(stream, pmo.Meshes[j].SectionInfo);
-                BinaryMapping.WriteObject<Pmo.MeshSectionOptional1>(stream, pmo.Meshes[j].SectionInfo_opt1);
-                if(chunk.SectionInfo_opt2 != null) BinaryMapping.WriteObject<Pmo.MeshSectionOptional2>(stream, chunk.SectionInfo_opt2);
+                BinaryMapping.WriteObject<Pmo.MeshSection>(stream, chunk.SectionInfo);
+                if (chunk.SectionInfo_opt1 != null) BinaryMapping.WriteObject<Pmo.MeshSectionOptional1>(stream, chunk.SectionInfo_opt1);
+                if (chunk.SectionInfo_opt2 != null) BinaryMapping.WriteObject<Pmo.MeshSectionOptional2>(stream, chunk.SectionInfo_opt2);
                 
                 if(chunk.TriangleStripValues.Length > 0)
                 {
@@ -694,11 +694,14 @@ namespace OpenKh.Bbs
                 stream.Write(pmo.Textures[t]);
             }
 
-            BinaryMapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
-
-            for(int joint = 0; joint < pmo.jointList.Length; joint++)
+            if(pmo.header.SkeletonOffset != 0)
             {
-                BinaryMapping.WriteObject<JointData>(stream, pmo.jointList[joint]);
+                BinaryMapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
+
+                for (int joint = 0; joint < pmo.jointList.Length; joint++)
+                {
+                    BinaryMapping.WriteObject<JointData>(stream, pmo.jointList[joint]);
+                }
             }
         }
 
