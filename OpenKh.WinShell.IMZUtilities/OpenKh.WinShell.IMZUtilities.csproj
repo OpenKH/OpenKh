@@ -2,10 +2,7 @@
 
   <PropertyGroup>
       <TargetFramework>net472</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\OpenKh.WinShell.Output\</OutputPath>
+      <OutputPath>..\OpenKh.WinShell.Output\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
