@@ -81,8 +81,8 @@ namespace OpenKh.Tests.kh2
             [InlineData("Spawn \"ABcd\"", 0, 0x64634241)]
             [InlineData("MapVisibility 0xffffffff 0x00000001", 1, -1, 1)]
             [InlineData("RandomSpawn \"0123\" \"4567\"", 2, 0x33323130, 0x37363534)]
-            [InlineData("CausalSpawn 123 \"666\"", 3, 123, 0x363636)]
-            [InlineData("Capacity 123", 4, 123)]
+            [InlineData("CasualSpawn 123 \"666\"", 3, 123, 0x363636)]
+            [InlineData("Capacity 123", 4, 0x42F60000)]
             [InlineData("AllocEnemy 123", 5, 123)]
             [InlineData("Unk06 123", 6, 123)]
             [InlineData("Unk07 123", 7, 123)]
@@ -147,7 +147,7 @@ StatusFlag5";
             [InlineData("Spawn \"ABcd\"")]
             [InlineData("MapVisibility 0xffffffff 0x00000001")]
             [InlineData("RandomSpawn \"0123\" \"4567\"")]
-            [InlineData("CausalSpawn 123 \"666\"")]
+            [InlineData("CasualSpawn 123 \"666\"")]
             [InlineData("Capacity 123")]
             [InlineData("AllocEnemy 123")]
             [InlineData("Unk06 123")]
@@ -231,7 +231,7 @@ StatusFlag5";
             [SkippableTheory, MemberData(nameof(ScriptSource))]
             public void Batch_WriteAllScripts(string ardFile, string scriptSet)
             {
-                Skip.If(ardFile == "", "No ARD files found");
+                Skip.If(ardFile == string.Empty, "No ARD files found");
 
                 var binarcEntry = File.OpenRead(ardFile).Using(Bar.Read)
                     .FirstOrDefault(x => x.Name == scriptSet && x.Type == Bar.EntryType.AreaDataScript);
@@ -250,7 +250,7 @@ StatusFlag5";
             [SkippableTheory, MemberData(nameof(ScriptSource))]
             public void Batch_CompileAllScripts(string ardFile, string scriptSet)
             {
-                Skip.If(ardFile == null, "No ARD files found");
+                Skip.If(ardFile == string.Empty, "No ARD files found");
 
                 var binarcEntry = File.OpenRead(ardFile).Using(Bar.Read)
                     .FirstOrDefault(x => x.Name == scriptSet && x.Type == Bar.EntryType.AreaDataScript);
