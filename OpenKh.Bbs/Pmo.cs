@@ -244,10 +244,15 @@ namespace OpenKh.Bbs
             }
         }
 
+        // PMO Header.
         public Header header { get; set; }
+        // Data block for textures. The order will reflect their texture index.
         public TextureInfo[] textureInfo { get; set; }
-        public List<byte[]> Textures = new List<byte[]>();
+        // Texture data blobs.
+        public List<byte[]> texturesData = new List<byte[]>();
+        // Header of the skeleton.
         public SkeletonHeader skeletonHeader { get; set; }
+        // Joints present in the skeleton.
         public JointData[] jointList;
 
         public List<MeshChunks> Meshes = new List<MeshChunks>();
@@ -266,7 +271,6 @@ namespace OpenKh.Bbs
 
         public static void ReadMeshData(ref Stream stream, ref Pmo pmo, ref UInt16 VertCnt, ref int meshSecCount, int MeshNumber = 0)
         {
-            // Mesh body 1.
             while (VertCnt > 0)
             {
                 MeshChunks meshChunk = new MeshChunks();
@@ -510,7 +514,7 @@ namespace OpenKh.Bbs
                 byte[] TextureBuffer = new byte[tm2size];
                 TextureBuffer = stream.ReadBytes((int)tm2size);
 
-                pmo.Textures.Add(TextureBuffer);
+                pmo.texturesData.Add(TextureBuffer);
             }
 
             // Read Skeleton.
@@ -689,9 +693,9 @@ namespace OpenKh.Bbs
             }
 
             // Write textures.
-            for(int t = 0; t < pmo.Textures.Count; t++)
+            for(int t = 0; t < pmo.texturesData.Count; t++)
             {
-                stream.Write(pmo.Textures[t]);
+                stream.Write(pmo.texturesData[t]);
             }
 
             if(pmo.header.SkeletonOffset != 0)

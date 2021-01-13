@@ -64,7 +64,7 @@ namespace OpenKh.Tests.Bbs
         public void ReadCorrectTextures() => File.OpenRead(FileName).Using(stream =>
         {
             var TestPmo = Pmo.Read(stream);
-            byte[] buffer = TestPmo.Textures[0];
+            byte[] buffer = TestPmo.texturesData[0];
             Assert.True(buffer[0] == 0x54 && buffer[1] == 0x49 && buffer[2] == 0x4D && buffer[3] == 0x32);
         });
 
