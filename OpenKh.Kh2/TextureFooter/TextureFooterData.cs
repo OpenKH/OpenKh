@@ -62,7 +62,7 @@ namespace OpenKh.Kh2.TextureFooter
 
                     stream.Position = subStreamPos + header.OffsetAnimationTable;
                     var frameGroupOffsetList = Enumerable.Range(0, header.NumAnimations)
-                        .Select(index => stream.ReadUInt32())
+                        .Select(idx => stream.ReadUInt32())
                         .ToArray();
 
                     header.FrameGroupList = frameGroupOffsetList
@@ -71,24 +71,24 @@ namespace OpenKh.Kh2.TextureFooter
                             {
                                 stream.Position = subStreamPos + firstPosition;
                                 var indexedFrameList = new Dictionary<int, TextureFrame>();
-                                var index = 0;
+                                var idx = 0;
                                 while (true)
                                 {
-                                    if (indexedFrameList.ContainsKey(index))
+                                    if (indexedFrameList.ContainsKey(idx))
                                     {
                                         break;
                                     }
 
                                     var frame = BinaryMapping.ReadObject<TextureFrame>(stream);
-                                    indexedFrameList[index] = frame;
+                                    indexedFrameList[idx] = frame;
                                     if (frame.FrameControl == TextureFrameControl.Jump || frame.FrameControl == TextureFrameControl.Stop)
                                     {
-                                        index += frame.FrameIndexDelta;
+                                        idx += frame.FrameIndexDelta;
                                         stream.Seek(TextureFrame.SizeInBytes * (-1 + frame.FrameIndexDelta), SeekOrigin.Current);
                                     }
                                     else
                                     {
-                                        index++;
+                                        idx++;
                                     }
                                 }
                                 return new TextureFrameGroup

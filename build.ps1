@@ -55,6 +55,10 @@ Get-ChildItem -Filter OpenKh.Tools.* | ForEach-Object {
     dotnet sln $solution add $_.FullName
     Test-Success $LASTEXITCODE
 }
+Get-ChildItem -Filter OpenKh.WinShell.* | ForEach-Object {
+    dotnet sln $solution add $_.FullName
+    Test-Success $LASTEXITCODE
+}
 Get-ChildItem -Filter OpenKh.Game* | ForEach-Object {
     dotnet sln $solution add $_.FullName
     Test-Success $LASTEXITCODE
