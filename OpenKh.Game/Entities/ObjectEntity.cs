@@ -4,6 +4,7 @@ using OpenKh.Engine.Motion;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Common;
+using OpenKh.Bbs;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
@@ -150,6 +151,25 @@ namespace OpenKh.Game.Entities
                     return new PngKingdomTexture(path, graphics);
                 }).ToArray(),
             };
+        }
+
+        public static (IModelMotion, IKingdomTexture[]) BBSMeshLoader(GraphicsDevice graphics, string FilePath, IModelMotion Model, IKingdomTexture[] Textures)
+        {
+            const float Scale = 100.0f;
+            var file = File.OpenRead(FilePath);
+            Pmo pmo = Pmo.Read(file);
+            Model = new PmoParser(pmo, Scale);
+
+            List<Tim2KingdomTexture> BbsTextures = new List<Tim2KingdomTexture>();
+            Textures = new IKingdomTexture[pmo.header.TextureCount];
+
+            for (int i = 0; i < pmo.header.TextureCount; i++)
+            {
+                BbsTextures.Add(new Tim2KingdomTexture(pmo.texturesData[i], graphics));
+                Textures[i] = BbsTextures[i];
+            }
+
+            return (Model, Textures);
         }
 
         public static ObjectEntity FromSpawnPoint(Kernel kernel, SpawnPoint.Entity spawnPoint) =>
