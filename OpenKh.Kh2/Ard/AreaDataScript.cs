@@ -751,7 +751,7 @@ namespace OpenKh.Kh2.Ard
         {
             var sb = new StringBuilder();
             sb.AppendLine($"Program 0x{ProgramId:X02}");
-            sb.AppendJoin("\n", Functions);
+            sb.Append(string.Join("\n", Functions));
 
             return sb.ToString().Replace("\r", string.Empty);
         }
