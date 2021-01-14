@@ -68,18 +68,9 @@ namespace OpenKh.Engine.Parsers
 
         public List<MeshDescriptor> MeshDescriptors { get; private set; }
 
-        public List<Mdlx.Bone> Bones()
-        {
-            List<Mdlx.Bone> bon = new List<Mdlx.Bone>();
-
-
-
-            return bon;
-        }
+        public List<Mdlx.Bone> Bones => new List<Mdlx.Bone>();
 
         Matrix4x4[] IModelMotion.InitialPose => new System.Numerics.Matrix4x4[0];
-
-        List<Mdlx.Bone> IModelMotion.Bones => throw new NotImplementedException();
 
         public void ApplyMotion(System.Numerics.Matrix4x4[] matrices)
         {
