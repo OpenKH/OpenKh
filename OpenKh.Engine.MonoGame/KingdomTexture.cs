@@ -49,8 +49,7 @@ namespace OpenKh.Engine.MonoGame
 
         public Tim2KingdomTexture(byte[] texture, GraphicsDevice graphics)
         {
-            List<Tm2> tm2 = Tm2.Read(new MemoryStream(texture)).ToList();
-            Texture2D = tm2[0].CreateTexture(graphics);
+            Texture2D = Tm2.Read(new MemoryStream(texture)).First().CreateTexture(graphics);
         }
 
         public Texture2D Texture2D { get; }

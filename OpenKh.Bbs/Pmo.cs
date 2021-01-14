@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Common.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -257,25 +258,30 @@ namespace OpenKh.Bbs
 
         public List<MeshChunks> Meshes = new List<MeshChunks>();
 
-        public static void ReadHeader(ref Stream stream, ref Pmo pmo)
+        public static void ReadHeader(Stream stream, Pmo pmo)
         {
             pmo.header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
         }
 
-        public static void ReadTextureSection(ref Stream stream, ref Pmo pmo)
+        public static void ReadTextureSection(Stream stream, Pmo pmo)
         {
             pmo.textureInfo = new TextureInfo[pmo.header.TextureCount];
             for (ushort i = 0; i < pmo.header.TextureCount; i++)
                 pmo.textureInfo[i] = BinaryMapping.ReadObject<TextureInfo>(stream);
         }
 
-        public static void ReadMeshData(ref Stream stream, ref Pmo pmo, ref UInt16 VertCnt, ref int meshSecCount, int MeshNumber = 0)
+        public static void ReadMeshData(Stream stream, Pmo pmo, int MeshNumber = 0)
         {
+            // Go to mesh position.
+            if(MeshNumber == 0) stream.Seek(pmo.header.MeshOffset0, SeekOrigin.Begin);
+            else                stream.Seek(pmo.header.MeshOffset1, SeekOrigin.Begin);
+
+            UInt16 VertCnt = 0xFFFF;
+
             while (VertCnt > 0)
             {
                 MeshChunks meshChunk = new MeshChunks();
                 meshChunk.MeshNumber = MeshNumber;
-                meshSecCount++;
 
                 meshChunk.SectionInfo = BinaryMapping.ReadObject<MeshSection>(stream);
 
@@ -478,6 +484,7 @@ namespace OpenKh.Bbs
                 VertCnt = meshChunk.SectionInfo.VertexCount;
                 pmo.Meshes.Add(meshChunk);
 
+                // Find position of next data chunk.
                 stream.Seek(positionAfterHeader + (meshChunk.SectionInfo.VertexCount * meshChunk.SectionInfo.VertexSize), SeekOrigin.Begin);
                 stream.Seek(stream.Position % 4, SeekOrigin.Current);
             }
@@ -487,22 +494,12 @@ namespace OpenKh.Bbs
         {
             Pmo pmo = new Pmo();
 
-            ReadHeader(ref stream, ref pmo);
-            ReadTextureSection(ref stream, ref pmo);
+            ReadHeader(stream, pmo);
+            ReadTextureSection(stream, pmo);
 
             // Read all data
-            UInt16 VertCnt = 0xFFFF;
-            int meshSecCount = 0;
-
-            ReadMeshData(ref stream, ref pmo, ref VertCnt, ref meshSecCount, 0);
-
-            stream.Seek(pmo.header.MeshOffset1, SeekOrigin.Begin);
-            VertCnt = 0xFFFF;
-            
-            if(pmo.header.MeshOffset1 != 0)
-            {
-                ReadMeshData(ref stream, ref pmo, ref VertCnt, ref meshSecCount, 1);
-            }
+            ReadMeshData(stream, pmo, 0);
+            if(pmo.header.MeshOffset1 != 0) ReadMeshData(stream, pmo, 1);
 
             // Read textures.
             for (int i = 0; i < pmo.textureInfo.Length; i++)
@@ -534,8 +531,6 @@ namespace OpenKh.Bbs
 
         public static void Write(Stream stream, Pmo pmo)
         {
-            BinaryWriter wr = new BinaryWriter(stream);
-
             stream.Position = 0;
             bool hasSwappedToSecondModel = false;
             BinaryMapping.WriteObject<Pmo.Header>(stream, pmo.header);
@@ -582,16 +577,18 @@ namespace OpenKh.Bbs
                     {
                         for(int w = 0; w < flags.SkinningWeightsCount + 1; w++)
                         {
+                            int currentIndex = w + (k * (flags.SkinningWeightsCount + 1));
+
                             switch (flags.WeightFormat)
                             {
                                 case CoordinateFormat.NORMALIZED_8_BITS:
-                                    stream.Write((byte)(chunk.jointWeights[w + (k *(flags.SkinningWeightsCount + 1))] * 127.0f));
+                                    stream.Write((byte)(chunk.jointWeights[currentIndex] * 127.0f));
                                     break;
                                 case CoordinateFormat.NORMALIZED_16_BITS:
-                                    stream.Write((byte)(chunk.jointWeights[w + (k * (flags.SkinningWeightsCount + 1))] * 32767.0f));
+                                    stream.Write((byte)(chunk.jointWeights[currentIndex] * 32767.0f));
                                     break;
                                 case CoordinateFormat.FLOAT_32_BITS:
-                                    wr.Write(chunk.jointWeights[w + (k * (flags.SkinningWeightsCount + 1))]);
+                                    StreamExtensions.Write(stream, chunk.jointWeights[currentIndex]);
                                     break;
                             }
                         }
@@ -616,8 +613,8 @@ namespace OpenKh.Bbs
                             for (int a = 0; a < vertexIncreaseAmount; a++)
                                 stream.Write((byte)0xAB);
 
-                            wr.Write(chunk.textureCoordinates[k].X);
-                            wr.Write(chunk.textureCoordinates[k].Y);
+                            StreamExtensions.Write(stream, chunk.textureCoordinates[k].X);
+                            StreamExtensions.Write(stream, chunk.textureCoordinates[k].Y);
                             break;
                     }
 
@@ -648,27 +645,27 @@ namespace OpenKh.Bbs
                     switch (flags.PositionFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            wr.Write((sbyte)(chunk.vertices[k].X * 127.0f));
-                            wr.Write((sbyte)(chunk.vertices[k].Y * 127.0f));
-                            wr.Write((sbyte)(chunk.vertices[k].Z * 127.0f));
+                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].X * 127.0f));
+                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Y * 127.0f));
+                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Z * 127.0f));
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
                             vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
                             for (int a = 0; a < vertexIncreaseAmount; a++)
                                 stream.Write((byte)0xAB);
 
-                            wr.Write((short)(chunk.vertices[k].X * 32767.0f));
-                            wr.Write((short)(chunk.vertices[k].Y * 32767.0f));
-                            wr.Write((short)(chunk.vertices[k].Z * 32767.0f));
+                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].X * 32767.0f));
+                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Y * 32767.0f));
+                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Z * 32767.0f));
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
                             vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
                             for (int a = 0; a < vertexIncreaseAmount; a++)
                                 stream.Write((byte)0xAB);
 
-                            wr.Write(chunk.vertices[k].X);
-                            wr.Write(chunk.vertices[k].Y);
-                            wr.Write(chunk.vertices[k].Z);
+                            StreamExtensions.Write(stream, chunk.vertices[k].X);
+                            StreamExtensions.Write(stream, chunk.vertices[k].Y);
+                            StreamExtensions.Write(stream, chunk.vertices[k].Z);
                             break;
                     }
 
@@ -709,8 +706,9 @@ namespace OpenKh.Bbs
             }
         }
 
+        // Can't be shorter than the header size.
         public static bool IsValid(Stream stream) =>
-            stream.Length >= 4 &&
-            new BinaryReader(stream.SetPosition(0)).ReadUInt32() == MagicCode;
+            stream.Length >= 0xA0 &&
+            stream.SetPosition(0).ReadUInt32() == MagicCode;
     }
 }

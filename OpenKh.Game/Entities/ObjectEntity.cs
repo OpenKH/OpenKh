@@ -66,14 +66,16 @@ namespace OpenKh.Game.Entities
                 return;
             }
 
-            var modelName = $"obj/{objEntry.ModelName}.mdlx";
+            /*var modelName = $"obj/{objEntry.ModelName}.mdlx";
             using var stream = Kernel.DataContent.FileOpen(modelName);
             var entries = Bar.Read(stream);
             _model = entries.ForEntry(x => x.Type == Bar.EntryType.Model, Mdlx.Read);
             Model = MeshLoader.FromKH2(_model);
 
             var texture = entries.ForEntry("tim_", Bar.EntryType.ModelTexture, ModelTexture.Read);
-            Textures = texture.LoadTextures(graphics).ToArray();
+            Textures = texture.LoadTextures(graphics).ToArray();*/
+
+            (Model, Textures) = BBSMeshLoader(graphics, "model/bbs-dummy.pmo", Model, Textures);
 
             try
             {
