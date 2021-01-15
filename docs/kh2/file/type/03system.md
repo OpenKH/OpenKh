@@ -99,7 +99,7 @@ Weapon entity table.
 Contains a list of pointers that point to the offset of a weapon set. There are multiple pointers for multiple sets.
 Weapon sets contain the list of weapon models a character use in certain situations.
 
-The Id within a set is set set as the weapon's subId on the [item table](#item).
+The Id within a "Went set" is the weapon's subId on the [item table](#item).
 
 ### Went Structure
 
