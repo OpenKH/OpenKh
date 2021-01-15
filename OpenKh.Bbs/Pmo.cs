@@ -258,9 +258,11 @@ namespace OpenKh.Bbs
 
         public List<MeshChunks> Meshes = new List<MeshChunks>();
 
+        public int PMO_StartPosition = 0;
+
         public static void ReadHeader(Stream stream, Pmo pmo)
         {
-            pmo.header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
+            pmo.header = BinaryMapping.ReadObject<Header>(stream);
         }
 
         public static void ReadTextureSection(Stream stream, Pmo pmo)
@@ -273,8 +275,8 @@ namespace OpenKh.Bbs
         public static void ReadMeshData(Stream stream, Pmo pmo, int MeshNumber = 0)
         {
             // Go to mesh position.
-            if(MeshNumber == 0) stream.Seek(pmo.header.MeshOffset0, SeekOrigin.Begin);
-            else                stream.Seek(pmo.header.MeshOffset1, SeekOrigin.Begin);
+            if(MeshNumber == 0) stream.Seek(pmo.PMO_StartPosition + pmo.header.MeshOffset0, SeekOrigin.Begin);
+            else                stream.Seek(pmo.PMO_StartPosition + pmo.header.MeshOffset1, SeekOrigin.Begin);
 
             UInt16 VertCnt = 0xFFFF;
 
@@ -388,7 +390,7 @@ namespace OpenKh.Bbs
                         }
                     }
 
-                    Vector2 currentTexCoord;
+                    Vector2 currentTexCoord = new Vector2(0, 0);
 
                     switch (TexCoordFormat)
                     {
@@ -411,6 +413,9 @@ namespace OpenKh.Bbs
 
                             currentTexCoord.X = stream.ReadFloat();
                             currentTexCoord.Y = stream.ReadFloat();
+                            meshChunk.textureCoordinates.Add(currentTexCoord);
+                            break;
+                        case CoordinateFormat.NO_VERTEX:
                             meshChunk.textureCoordinates.Add(currentTexCoord);
                             break;
                     }
@@ -493,13 +498,14 @@ namespace OpenKh.Bbs
         public static Pmo Read(Stream stream)
         {
             Pmo pmo = new Pmo();
+            pmo.PMO_StartPosition = (int)stream.Position;
 
             ReadHeader(stream, pmo);
             ReadTextureSection(stream, pmo);
 
             // Read all data
-            ReadMeshData(stream, pmo, 0);
-            if(pmo.header.MeshOffset1 != 0) ReadMeshData(stream, pmo, 1);
+            if (pmo.header.MeshOffset0 != 0) ReadMeshData(stream, pmo, 0);
+            if (pmo.header.MeshOffset1 != 0) ReadMeshData(stream, pmo, 1);
 
             // Read textures.
             for (int i = 0; i < pmo.textureInfo.Length; i++)
@@ -517,7 +523,7 @@ namespace OpenKh.Bbs
             // Read Skeleton.
             if(pmo.header.SkeletonOffset != 0)
             {
-                stream.Seek(pmo.header.SkeletonOffset, SeekOrigin.Begin);
+                stream.Seek(pmo.PMO_StartPosition + pmo.header.SkeletonOffset, SeekOrigin.Begin);
                 pmo.skeletonHeader = BinaryMapping.ReadObject<SkeletonHeader>(stream);
                 pmo.jointList = new JointData[pmo.skeletonHeader.JointCount];
                 for (int j = 0; j < pmo.skeletonHeader.JointCount; j++)

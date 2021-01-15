@@ -8,9 +8,12 @@ using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Kh2.Models;
+using OpenKh.Bbs;
 using OpenKh.Game.Entities;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine;
+using System.IO;
+using OpenKh.Engine.Parsers;
 
 namespace OpenKh.Game.States
 {
@@ -45,6 +48,8 @@ namespace OpenKh.Game.States
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
         private List<BobEntity> _bobEntities = new List<BobEntity>();
+        private List<PmpEntity> _pmpEntities = new List<PmpEntity>();
+        private List<MeshGroup> _pmpModels = new List<MeshGroup>();
 
         private MenuState _menuState;
 
@@ -184,6 +189,16 @@ namespace OpenKh.Game.States
 
                 RenderMeshNew(pass, _bobModels[entity.BobIndex], passRenderOpaque);
             }
+
+            foreach (var ent in _pmpEntities)
+            {
+                _shader.ProjectionView = _camera.Projection;
+                _shader.WorldView = _camera.World;
+                _shader.ModelView = ent.GetMatrix().ToXna();
+                pass.Apply();
+
+                RenderMeshNew(pass, _pmpModels[ent.Index], passRenderOpaque);
+            }
         }
 
         private void RenderMeshNew(EffectPass pass, IMonoGameModel model, bool passRenderOpaque)
@@ -220,8 +235,35 @@ namespace OpenKh.Game.States
             switch (Field)
             {
                 case Kh2Field kh2Field:
-                    kh2Field.LoadMapArd(Kernel.World, Kernel.Area);
-                    LoadMap(Kernel.World, Kernel.Area);
+                    Pmp pmp = Pmp.Read(File.OpenRead("model/di_04.pmp"));
+                    List<MeshGroup> group = new List<MeshGroup>();
+                    int PmoIndex = 0;
+                    for(int i = 0; i < pmp.objectInfo.Count; i++)
+                    {
+                        if(pmp.objectInfo[i].PMO_Offset != 0)
+                        {
+                            Pmp.ObjectInfo currentInfo = pmp.objectInfo[PmoIndex];
+                            PmpEntity pmpEnt = new PmpEntity(PmoIndex, currentInfo.Position, currentInfo.Rotation, currentInfo.Scale);
+                            PmoParser pParser = new PmoParser(pmp.PmoList[PmoIndex], 100.0f);
+                            List<Tim2KingdomTexture> BbsTextures = new List<Tim2KingdomTexture>();
+                            MeshGroup g = new MeshGroup();
+                            g.MeshDescriptors = pParser.MeshDescriptors;
+                            g.Textures = new IKingdomTexture[pmp.PmoList[PmoIndex].header.TextureCount];
+                            for (int j = 0; j < pmp.PmoList[PmoIndex].header.TextureCount; j++)
+                            {
+                                BbsTextures.Add(new Tim2KingdomTexture(pmp.PmoList[PmoIndex].texturesData[j], _graphics.GraphicsDevice));
+                                g.Textures[j] = BbsTextures[j];
+                            }
+
+                            _pmpEntities.Add(pmpEnt);
+                            _pmpModels.Add(g);
+                            PmoIndex++;
+                        }
+                    }
+
+                    //kh2Field.LoadMapArd(Kernel.World, Kernel.Area);
+                    //LoadMap(Kernel.World, Kernel.Area);
+                    
                     break;
             }
         }
@@ -360,7 +402,7 @@ namespace OpenKh.Game.States
             }
             else
             {
-                debug.Println($"MAP: {Constants.WorldIds[Kernel.World]}{Kernel.Area:D02}");
+                debug.Println($"MAP: {Kh2.Constants.WorldIds[Kernel.World]}{Kernel.Area:D02}");
                 debug.Println($"POS ({_camera.CameraPosition.X:F0}, {_camera.CameraPosition.Y:F0}, {_camera.CameraPosition.Z:F0})");
                 debug.Println($"LKT ({_camera.CameraLookAt.X:F0}, {_camera.CameraLookAt.Y:F0}, {_camera.CameraLookAt.Z:F0})");
             }
@@ -405,7 +447,7 @@ namespace OpenKh.Game.States
             foreach (var place in _places.Skip(_debugPlaceCursor))
             {
                 debug.Print($"{(place.Index == _debugPlaceCursor ? '>' : ' ')} ");
-                debug.Print($"{Constants.WorldIds[place.WorldId]}{place.PlaceId:D02} ");
+                debug.Print($"{Kh2.Constants.WorldIds[place.WorldId]}{place.PlaceId:D02} ");
                 debug.Println(place.MessageId);
             }
         }
@@ -422,7 +464,7 @@ namespace OpenKh.Game.States
             })
             .SelectMany(x => x.Places, (x, place) => new DebugPlace
             {
-                WorldId = Constants.WorldIds
+                WorldId = Kh2.Constants.WorldIds
                     .Select((World, Index) => new { World, Index })
                     .Where(e => e.World == x.World)
                     .Select(x => x.Index).FirstOrDefault(),
