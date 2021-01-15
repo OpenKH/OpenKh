@@ -18,16 +18,19 @@ Contains a definition of every object and it's parameters.
 | 4A     | ushort | Ally damage cap (0100 for normal damage, 02 for chip damage...)
 | 4C     | ushort | Neo Status
 | 4E     | ushort | Neo Moveset
-| 50     | ushort | Unknown
+| 50     | byte | Unknown *1
+| 51     | byte | Padding? (All 00)
 | 52     | short | Weight
 | 54     | byte | Spawn Limiter
 | 55     | byte | Unknown
 | 56     | byte | Unknown
 | 57     | byte | [Command Menu Options](#command-menu-options-fm)
-| 58     | ushort | Spawn additional object 1
-| 5A     | ushort | Spawn additional object 2
-| 5C     | ushort | Spawn additional object 3
-| 5E     | ushort | Unknown
+| 58     | ushort | Spawn additional object 1 - [OBJ LIST](../../dictionary/obj.md)
+| 5A     | ushort | Spawn additional object 2 - [OBJ LIST](../../dictionary/obj.md)
+| 5C     | ushort | Spawn additional object 3 - [OBJ LIST](../../dictionary/obj.md)
+| 5E     | ushort | Spawn additional object 4 - [OBJ LIST](../../dictionary/obj.md)
+
+*1 Something related to the enemy state. Eg: Undead Pirates lose their immunity if they are changed from 2 to 0
 
 ### Object Types
 

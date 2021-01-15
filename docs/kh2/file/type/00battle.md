@@ -5,9 +5,9 @@ This is an essential file for booting [Kingdom Hearts II](../../index.md) and it
 It is a [BAR](bar.md) file and contains the following subfiles:
 
 * [ATKP](#atkp) - Attack Params
-* [PTYA](#ptya) - ???
+* [PTYA](#ptya) - Party Attacks
 * [PRZT](#przt) - Prize Table
-* [VTBL](#vtbl) - ???
+* [VTBL](#vtbl) - Voice Table
 * [LVUP](#lvup) - Level Up
 * [BONS](#bons) - Bonus
 * [BTLV](#btlv) - Battle Level
@@ -76,14 +76,50 @@ The damage effects' values on MSET files point to this table.
 
 ## Ptya
 
-Unknown.
+Contains data for the party's attacks.
+
+Contains a list of pointers that point to the offset of a Ptya set. There are multiple pointers for multiple sets.
+Ptya sets contain the list of attack animations a character use in certain situations in a combo.
+
+### Ptya Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Ptya header
+| 70 	 | Ptya pointers
+| 15 	 | Ptya sets
 
 ### Ptya Header
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | uint | File type (2)
-| 4 	 | uint | Entry Count
+| 4 	 | uint | Pointer Count
+
+### Ptya Set Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Ptya Set Header
+| X 	 | Ptya Set Entry
+
+### Ptya Set Header
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 0     | uint | Ptya Set Entry Count
+
+### Ptya Set Entry
+
+| Offset | Type  | Description
+|--------|-------|--------------
+| 0     | byte[8] | ???
+| 8     | ushort | Animation Id \*1
+| 10     | byte[58] | ??? \*2
+
+\*1 Multiply by 4 to get the slot of the animation in the entity's [moveset file](../anb/mset.md).
+
+\*2 Byte 15 controls vertical momentum. Byte 31 controls front momentum.
 
 ## Przt
 
@@ -128,7 +164,7 @@ The ID of the entry is assigned in the AI of the object.
 
 ## Vtbl
 
-??? ( entries of 14 bytes each)
+Contains data for randomizing voice clips.
 
 ### Vtbl Structure
 
@@ -148,7 +184,20 @@ The ID of the entry is assigned in the AI of the object.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0 	 | 14B | ??? 
+| 0 	 | byte | Character - [CHARACTER LIST](../../dictionary/characters.md)
+| 1 	 | byte | Action 
+| 2 	 | byte | Priority?
+| 3 	 | byte | Padding?
+| 4 	 | byte | Voice 1
+| 5 	 | byte | Voice 1 Chance
+| 6 	 | byte | Voice 2
+| 7 	 | byte | Voice 2 Chance
+| 8 	 | byte | Voice 3
+| 9 	 | byte | Voice 3 Chance
+| 10 	 | byte | Voice 4
+| 11 	 | byte | Voice 4 Chance
+| 12 	 | byte | Voice 5
+| 13 	 | byte | Voice 5 Chance
 
 ## Lvup
 
