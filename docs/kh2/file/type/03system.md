@@ -506,7 +506,7 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 
 ## Sklt
 
-Defines which bone the characters' weapon is attached to.
+Defines which bones the characters' weapons are attached to.
 
 ### Sklt Structure
 
