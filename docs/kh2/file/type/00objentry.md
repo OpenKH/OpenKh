@@ -11,7 +11,7 @@ Contains a definition of every object and it's parameters.
 | 04     | byte | [Object Type](#object-types)
 | 05     | byte | Unknown
 | 06     | byte | Unknown
-| 07     | byte | Weapon Joint
+| 07     | byte | Weapon Joint - Points to [Sklt](03system.md#sklt)
 | 08     | char[32] | Model Name
 | 28     | char[32] | Animation Name
 | 48     | ushort | Unknown

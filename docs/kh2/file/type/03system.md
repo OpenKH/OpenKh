@@ -12,7 +12,7 @@ This is an essential file to boot the game engine.
 * [MEMT](#memt) - Member Table
 * [FTST](#ftst) - Font Style
 * [SHOP](#shop) - Shops
-* [SKLT](#sklt) - ???
+* [SKLT](#sklt) - Skeleton
 * [PREF](#pref) - Preferences?
 * [EVTP](#evtp) - ???
 * [IPIC](#ipic) - ???
@@ -169,6 +169,40 @@ Weapon moveset list.
 ## Arif
 
 Unknown.
+
+### Arif Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Arif Header
+| 19 	 | Arif Pointers
+| 19 	 | Arif Blocks
+
+### Arif Header
+
+| Offset | Type | Description |
+|--------|---------------|-------------|
+| 0      | uint | File type (1)
+| 4      | uint | Arif Pointer Count |
+
+### Arif Pointer
+
+| Offset | Type | Description |
+|--------|---------------|-------------|
+| 0      | ushort | Entry Count
+| 2      | ushort | Block offset |
+
+### Arif Block Structure
+
+| Amount | Description |
+|--------|---------------|
+| [Entry Count] 	 | Arif Entry
+
+### Arif Entry
+
+| Offset | Type | Description |
+|--------|---------------|-------------|
+| 0      | byte[64] | ???
 
 ## ITEM
 
@@ -342,10 +376,6 @@ World ID and room index combined, gives the name of the map. (eg. for world ID =
 | 0    | Chest
 | 1    | Event
 
-## Arif
-
-Unknown.
-
 ## MEMT
 
 Also known as Member Table, defines which [object](../../obj.md) to load in certain situations.
@@ -476,7 +506,29 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 
 ## Sklt
 
-Unknown.
+Defines which bone the characters' weapon is attached to.
+
+### Sklt Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Sklt header
+| 26 	 | Sklt entries
+
+### Sklt Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (1)
+| 4 	 | uint | Entry Count
+
+### Sklt Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | Character Id - [Character LIST](../../dictionary/characters.md)
+| 4 	 | ushort | Bone number 1 (Primary weapon)
+| 6 	 | ushort | Bone number 2 (Secondary weapon)
 
 ## Pref
 
@@ -564,6 +616,29 @@ Each pointer leads to a specific entry's offset.
 ## Evtp
 
 Unknown.
+
+### Evtp Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Evtp header
+| 18 	 | Evtp entries
+
+### Evtp Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (1)
+| 4 	 | uint | Entry Count
+
+### Evtp Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | byte | Id
+| 1 	 | short | Unk2
+| 3 	 | byte[3] | Padding?
+| 6 	 | short | Unk6
 
 ## Ipic
 
