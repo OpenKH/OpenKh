@@ -16,7 +16,7 @@
 | [IMGD](file/type/image.md#imgd) | Images rendered on the 2D screen buffer
 | [FAC](file/type/image.md#fac) | A sub-type of IMGD
 | [IMGZ](file/type/image.md#imgz) | A container housing multiple IMGDs with separation layers
-| [ARD](file/type/ard.md) | Event files containing all sorts of miscellaneous information
+| [ARD](file/type/areadata.md) | Event files containing all sorts of miscellaneous information
 | [MAP](file/map.md) | Game map
 | MAG | A descriptor for magic; contains a PAX inside
 | MDLX | Container for VIF packets; model data and files like textures

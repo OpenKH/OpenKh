@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using System.Collections.Generic;
 using static OpenKh.Kh2.Bar;
 
@@ -23,8 +23,8 @@ namespace OpenKh.Tools.BarEditor
                 [EntryType.Motion] = "motion",
                 [EntryType.Tim2] = "tm2",
                 [EntryType.CameraCollision] = "och",
-                [EntryType.SpawnPoint] = "spawnpoint",
-                [EntryType.SpawnScript] = "spawnscript",
+                [EntryType.AreaDataSpawn] = "spawn",
+                [EntryType.AreaDataScript] = "script",
                 [EntryType.FogColor] = "fog",
                 [EntryType.LightData] = "ocl",
                 [EntryType.MotionTriggers] = "triggers",
@@ -33,7 +33,7 @@ namespace OpenKh.Tools.BarEditor
                 [EntryType.MapCollision2] = "owa",
                 [EntryType.Motionset] = "mset",
                 [EntryType.BgObjPlacement] = "bop",
-                [EntryType.AnimationLoader] = "animload",
+                [EntryType.Event] = "event",
                 [EntryType.ModelCollision] = "coctmodel",
                 [EntryType.Imgd] = "imd",
                 [EntryType.Seqd] = "sqd",

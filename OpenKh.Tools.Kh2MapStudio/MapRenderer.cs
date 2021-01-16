@@ -200,7 +200,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         {
             ArdBarEntries = File.OpenRead(fileName).Using(Bar.Read);
             SpawnPoints = ArdBarEntries
-                .Where(x => x.Type == Bar.EntryType.SpawnPoint && x.Stream.Length > 0)
+                .Where(x => x.Type == Bar.EntryType.AreaDataSpawn && x.Stream.Length > 0)
                 .Select(x =>
                 new SpawnPointModel(ObjEntryController, x.Name, SpawnPoint.Read(x.Stream.SetPosition(0))))
                 .ToList();
@@ -221,7 +221,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 ArdBarEntries.AddOrReplace(new Bar.Entry
                 {
                     Name = spawnPointModel.Name,
-                    Type = Bar.EntryType.SpawnPoint,
+                    Type = Bar.EntryType.AreaDataSpawn,
                     Stream = memStream
                 });
             }

@@ -1,4 +1,4 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Common;
 using OpenKh.Kh2.Ard;
 using System;
@@ -58,8 +58,8 @@ namespace OpenKh.Command.SpawnScript
             protected int OnExecute(CommandLineApplication app)
             {
                 OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.txt");
-                var spawnScript = File.OpenRead(InputPath).Using(Kh2.Ard.SpawnScript.Read);
-                File.WriteAllText(OutputPath, SpawnScriptParser.Decompile(spawnScript));
+                var spawnScript = File.OpenRead(InputPath).Using(AreaDataScript.Read);
+                File.WriteAllText(OutputPath, AreaDataScript.Decompile(spawnScript));
                 return 0;
             }
         }
@@ -77,8 +77,8 @@ namespace OpenKh.Command.SpawnScript
             protected int OnExecute(CommandLineApplication app)
             {
                 OutputPath ??= Path.Combine(Path.GetDirectoryName(InputPath), $"{Path.GetFileNameWithoutExtension(InputPath)}.spawnscript");
-                var spawnScript = SpawnScriptParser.Compile(File.ReadAllText(InputPath));
-                File.Create(OutputPath).Using(stream => Kh2.Ard.SpawnScript.Write(stream, spawnScript));
+                var spawnScript = AreaDataScript.Compile(File.ReadAllText(InputPath));
+                File.Create(OutputPath).Using(stream => AreaDataScript.Write(stream, spawnScript));
                 return 0;
             }
         }
