@@ -170,6 +170,40 @@ Weapon moveset list.
 
 Unknown.
 
+### Arif Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Arif Header
+| 19 	 | Arif Pointers
+| 19 	 | Arif Blocks
+
+### Arif Header
+
+| Offset | Type | Description |
+|--------|---------------|-------------|
+| 0      | uint | File type (1)
+| 4      | uint | Arif Pointer Count |
+
+### Arif Pointer
+
+| Offset | Type | Description |
+|--------|---------------|-------------|
+| 0      | ushort | Entry Count
+| 2      | ushort | Block offset |
+
+### Arif Block Structure
+
+| Amount | Description |
+|--------|---------------|
+| [Entry Count] 	 | Arif Entry
+
+### Arif Entry
+
+| Offset | Type | Description |
+|--------|---------------|-------------|
+| 0      | byte[64] | ???
+
 ## ITEM
 
 Describe an item, that could be anything from a consumable, to a weapon or materials.
@@ -342,68 +376,49 @@ World ID and room index combined, gives the name of the map. (eg. for world ID =
 | 0    | Chest
 | 1    | Event
 
-## Arif
+## Memt
 
-Unknown.
+Defines which character [objects](../../obj.md) to load in certain situations.
 
-## MEMT
+### Memt Structure
 
-Also known as Member Table, defines which [object](../../obj.md) to load in certain situations.
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Memt header
+| 37 	 | Memt entries
+| 1 	 | 28 unknown bytes
 
-The game internally uses a pawn system. There are five pawns: PLAYER, FRIEND_1, FRIEND_2, ACTOR_SORA and ACTOR_SORA_H. The first three are used during gameplay sessions, while the other two are used during cutscenes. When the game finds those pawns, it will instead load the actual object to load given a specific map. This is, for example, how the game decides to load Halloween Sora in `NM` world, or when to load Ping or Mulan in `MU` world given certain story flags. This is true for cutscenes too, where if you go transformed as Final Form, Sora will appear with Final Form clothes even with his high-poly model rather than his default model.
-
-The first [entry](#memt-entry) is the default one as it globally defined which pawn is which object. After that, a series of conditional entries are defined. For each entry that respects a certain condition, it will temporarily overwrite the default values. The first condition is the World ID, which is the current world that the game have loaded. Then there is a World Story Flag and World Story Flag Negation. Those are conditions to load a different entry based on the story progression. As this World Story Flag contains both the flag and the World ID, it is possible to tell to the game to load specific objects of a world based on the story progression of another world. While the first story flag checks if that part of the story is met, the negation one satisfies the condition when the specified story flag is not met.
-
-Whenever a value of `0` in this structure is found, it is ignored. Story flags will always give a positive result, while pawns will fall back to the ones defined in the default entry.
-
-### MEMT Header
+### Memt Header
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0      | uint | File version (5)
-| 4      | uint | Entry Count
+| 0 	 | uint | File type (5)
+| 4 	 | uint | Entry Count
 
-### MEMT entry
-
-Note that on the Vanilla version of the game, this structure is `48` bytes long and not `52`, as Limit and Limti High poly are not existent. The file version remains `5`
+### Memt Entry
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
 | 0      | ushort | [World ID](../../worlds.md)
-| 2      | 10-bit | World story flag
-| 2      | 4-bit | [World story ID](../../worlds.md)
-| 4      | 10-bit | World story flag negation
-| 4      | 4-bit | [World story ID](../../worlds.md) negation
-| 6      | ushort[5] | Unknown
-| 16     | ushort  | Player (Sora)
-| 18     | ushort  | Friend 1 (Donald)
-| 20     | ushort  | Friend 2 (Goofy)
-| 22     | ushort  | World character
-| 24     | ushort  | Player (Valor)
-| 26     | ushort  | Player (Wisdom)
-| 28     | ushort  | Player (Limit)
-| 30     | ushort  | Player (Master)
-| 32     | ushort  | Player (Final)
-| 34     | ushort  | Player (Anti)
-| 36     | ushort  | Player (Mickey)
-| 38     | ushort  | Player (Sora High poly)
-| 40     | ushort  | Player (Valor High poly)
-| 42     | ushort  | Player (Wisdom High poly)
-| 44     | ushort  | Player (Limit High poly)
-| 46     | ushort  | Player (Master High poly)
-| 48     | ushort  | Player (Final High poly)
-| 50     | ushort  | Player (Sora High poly)
-
-### MEMT party
-
-This table, found straight after [the entries](#memt-entry), is used to decide which party members are used in a given portion of the game. How this table is accessed is unknown, but not all the maps uses it. The index is the one for [the entries](#memt-entry) object array, so an index of `0` will check what's in the offset `16` and an index of `3` will check what's in the offset `22`. When the value is equal to `12` (or `10` for Vanilla), the game will not make that specific pawn available in the party. This table seems to be the one responsible to assign or remove specific party members.
-
-| Offset | Type | Description
-|--------|------|-------------
-| 0      | byte | Member index for player
-| 1      | byte | Member index for friend 1
-| 2      | byte | Member index for friend 2
-| 3      | byte | Member index for friend world
+| 2      | ushort[7] | Unknown
+| 16      | ushort  | Player (Sora)
+| 18      | ushort  | Party 1 (Donald)
+| 20      | ushort  | Party 2 (Goofy)
+| 22      | ushort  | Party 3 (World character)
+| 24      | ushort  | Player (Valor)
+| 26      | ushort  | Player (Wisdom)
+| 28      | ushort  | Player (Limit)
+| 30      | ushort  | Player (Master)
+| 32      | ushort  | Player (Final)
+| 34      | ushort  | Player (Anti)
+| 36      | ushort  | Player (Mickey)
+| 38      | ushort  | Player (Sora H)
+| 40      | ushort  | Player (Valor H)
+| 42      | ushort  | Player (Wisdom H)
+| 44      | ushort  | Player (Limit H)
+| 46      | ushort  | Player (Master H)
+| 48      | ushort  | Player (Final H)
+| 50      | ushort  | Player (Sora H)
 
 ## FTST
 
@@ -477,6 +492,29 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 ## Sklt
 
 Unknown.
+
+### Sklt Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Sklt header
+| 26 	 | Sklt entries
+
+### Sklt Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (1)
+| 4 	 | uint | Entry Count
+
+### Sklt Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | byte | Id
+| 1 	 | byte[3] | Padding?
+| 4 	 | ushort | Unk4
+| 6 	 | ushort | Unk6
 
 ## Pref
 
@@ -564,6 +602,29 @@ Each pointer leads to a specific entry's offset.
 ## Evtp
 
 Unknown.
+
+### Evtp Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Evtp header
+| 18 	 | Evtp entries
+
+### Evtp Header
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | uint | File type (1)
+| 4 	 | uint | Entry Count
+
+### Evtp Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | byte | Id
+| 1 	 | short | Unk2
+| 3 	 | byte[3] | Padding?
+| 6 	 | short | Unk6
 
 ## Ipic
 
