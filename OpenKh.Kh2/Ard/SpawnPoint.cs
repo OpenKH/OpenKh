@@ -20,7 +20,8 @@ namespace OpenKh.Kh2.Ard
                 [Data] public float RotationX { get; set; }
                 [Data] public float RotationY { get; set; }
                 [Data] public float RotationZ { get; set; }
-                [Data] public short Unk1c { get; set; }
+                [Data] public byte UseEntrance { get; set; }
+                [Data] public byte Entrance { get; set; }
                 [Data] public short Unk1e { get; set; }
                 [Data] public int Unk20 { get; set; }
                 [Data] public int AiParameter { get; set; }
@@ -39,7 +40,8 @@ namespace OpenKh.Kh2.Ard
             public float RotationX { get; set; }
             public float RotationY { get; set; }
             public float RotationZ { get; set; }
-            public short Unk1c { get; set; }
+            public byte UseEntrance { get; set; }
+            public byte Entrance { get; set; }
             public short Unk1e { get; set; }
             public int Unk20 { get; set; }
             public int AiParameter { get; set; }
@@ -59,7 +61,8 @@ namespace OpenKh.Kh2.Ard
                     RotationX = raw.RotationX,
                     RotationY = raw.RotationY,
                     RotationZ = raw.RotationZ,
-                    Unk1c = raw.Unk1c,
+                    UseEntrance = raw.UseEntrance,
+                    Entrance = raw.Entrance,
                     Unk1e = raw.Unk1e,
                     Unk20 = raw.Unk20,
                     AiParameter = raw.AiParameter,
@@ -79,7 +82,8 @@ namespace OpenKh.Kh2.Ard
                     RotationX = entity.RotationX,
                     RotationY = entity.RotationY,
                     RotationZ = entity.RotationZ,
-                    Unk1c = entity.Unk1c,
+                    UseEntrance = entity.UseEntrance,
+                    Entrance = entity.Entrance,
                     Unk1e = entity.Unk1e,
                     Unk20 = entity.Unk20,
                     AiParameter = entity.AiParameter,
@@ -89,8 +93,8 @@ namespace OpenKh.Kh2.Ard
                 });
 
             public override string ToString() =>
-                $"ID {ObjectId} POS({PositionX:F0}, {PositionY:F0}, {PositionZ:F0}) ROT({RotationX:F0}, {RotationY:F0}, {RotationZ:F0}) " +
-                $"UNK {Unk1c:X} {Unk1e:X} {Unk20:X} {AiParameter:X} {TalkMessage:X} {ReactionCommand:X} {Unk30:X}";
+                $"ID {ObjectId} POS({PositionX:F0}, {PositionY:F0}, {PositionZ:F0}) ROT({RotationX:F0}, {RotationY:F0}, {RotationZ:F0}) Entrance {Entrance}" +
+                $"UNK {UseEntrance:X} {Unk1e:X} {Unk20:X} {AiParameter:X} {TalkMessage:X} {ReactionCommand:X} {Unk30:X}";
         }
 
         public class EventActivator

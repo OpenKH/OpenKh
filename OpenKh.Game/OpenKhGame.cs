@@ -16,10 +16,10 @@ namespace OpenKh.Game
         public string ContentPath { get; internal set; }
         public int InitialState { get; internal set; }
         public int InitialMap { get; internal set; }
-        public int InitialPlace { get; internal set; }
-        public int InitialSpawnScriptMap { get; internal set; }
-        public int InitialSpawnScriptBtl { get; internal set; }
-        public int InitialSpawnScriptEvt { get; internal set; }
+        public int? InitialPlace { get; internal set; }
+        public int? InitialSpawnScriptMap { get; internal set; }
+        public int? InitialSpawnScriptBtl { get; internal set; }
+        public int? InitialSpawnScriptEvt { get; internal set; }
     }
 
     public class OpenKhGame : Microsoft.Xna.Framework.Game, IStateChange
@@ -93,6 +93,9 @@ namespace OpenKh.Game
             _dataContent = new SafeDataContent(_dataContent);
 
             _kernel = new Kernel(_dataContent);
+            if (startup.InitialState != 0)
+                _kernel.LoadSaveData(Config.LastSave);
+
             var resolutionWidth = GetResolutionWidth();
             var resolutionHeight = GetResolutionHeight();
 
@@ -190,6 +193,12 @@ namespace OpenKh.Game
         {
             if (value >= 0)
                 GlobalSettings.Add(key, value.ToString());
+        }
+
+        private void TryAddSetting(string key, int? value)
+        {
+            if (value.HasValue)
+                TryAddSetting(key, value.Value);
         }
 
         private StateInitDesc GetStateInitDesc()

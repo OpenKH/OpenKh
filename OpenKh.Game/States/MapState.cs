@@ -41,7 +41,6 @@ namespace OpenKh.Game.States
         private Camera _camera;
 
         public IField Field { get; private set; }
-        private int _spawnId;
 
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
@@ -64,9 +63,10 @@ namespace OpenKh.Game.States
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
             _menuState = new MenuState(this);
-            Kernel.World = initDesc.StateSettings.GetInt("WorldId", 2);
-            Kernel.Area = initDesc.StateSettings.GetInt("PlaceId", 4);
-            _spawnId = initDesc.StateSettings.GetInt("SpawnId", 99);
+
+            Kernel.World = initDesc.StateSettings.GetInt("WorldId", Kernel.World);
+            Kernel.Area = initDesc.StateSettings.GetInt("PlaceId", Kernel.Area);
+            Kernel.Entrance = initDesc.StateSettings.GetInt("SpawnId", Kernel.Entrance);
             Field = new Kh2Field(
                 Kernel,
                 _camera,
@@ -282,11 +282,11 @@ namespace OpenKh.Game.States
 
         public void LoadTitleScreen() => _stateChange.State = 0;
 
-        public void LoadPlace(int worldId, int placeId, int spawnIndex)
+        public void LoadPlace(int world, int area, int entrance)
         {
-            Kernel.World = worldId;
-            Kernel.Area = placeId;
-            _spawnId = spawnIndex;
+            Kernel.World = world;
+            Kernel.Area = area;
+            Kernel.Entrance = entrance;
 
             BasicallyForceToReloadEverything();
         }

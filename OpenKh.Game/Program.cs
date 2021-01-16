@@ -75,16 +75,16 @@ namespace OpenKh.Game
         public string InitialWorld { get; set; }
 
         [Option("--place <INDEX>", "Boot the game into a specific place ID (eg. for dc06 specify '6')", CommandOptionType.SingleValue)]
-        public int InitialPlace { get; set; }
+        public int InitialPlace { get; set; } = -1;
 
         [Option("--spawn-map <PROGRAM_ID>", "Force the boot map to use a specific spawn script program ID for MAP", CommandOptionType.SingleValue)]
-        public int InitialSpawnScriptMap { get; set; }
+        public int InitialSpawnScriptMap { get; set; } = -1;
 
         [Option("--spawn-btl <PROGRAM_ID>", "Force the boot map to use a specific spawn script program ID for BTL", CommandOptionType.SingleValue)]
-        public int InitialSpawnScriptBtl { get; set; }
+        public int InitialSpawnScriptBtl { get; set; } = -1;
 
         [Option("--spawn-evt <PROGRAM_ID>", "Force the boot map to use a specific spawn script program ID for EVT", CommandOptionType.SingleValue)]
-        public int InitialSpawnScriptEvt { get; set; }
+        public int InitialSpawnScriptEvt { get; set; } = -1;
 
         private void OnExecute()
         {
@@ -115,10 +115,10 @@ namespace OpenKh.Game
                     .Where(x => x.world == InitialWorld)
                     .Select(x => x.index)
                     .FirstOrDefault(),
-                InitialPlace = InitialPlace,
-                InitialSpawnScriptMap = InitialSpawnScriptMap,
-                InitialSpawnScriptBtl = InitialSpawnScriptBtl,
-                InitialSpawnScriptEvt = InitialSpawnScriptEvt,
+                InitialPlace = InitialPlace >= 0 ? (int?)InitialPlace : null,
+                InitialSpawnScriptMap = InitialSpawnScriptMap >= 0 ? (int?)InitialSpawnScriptMap : null,
+                InitialSpawnScriptBtl = InitialSpawnScriptBtl >= 0 ? (int?)InitialSpawnScriptBtl : null,
+                InitialSpawnScriptEvt = InitialSpawnScriptEvt >= 0 ? (int?)InitialSpawnScriptEvt : null,
             });
 
             game.Run();
