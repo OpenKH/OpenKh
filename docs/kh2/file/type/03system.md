@@ -506,7 +506,7 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 
 ## Sklt
 
-Unknown.
+Defines which bone the characters' weapon is attached to.
 
 ### Sklt Structure
 
@@ -526,10 +526,9 @@ Unknown.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | byte | Id
-| 1 	 | byte[3] | Padding?
-| 4 	 | ushort | Unk4
-| 6 	 | ushort | Unk6
+| 0 	 | uint | Character Id - [Character LIST](../../dictionary/characters.md)
+| 4 	 | ushort | Bone number 1 (Primary weapon)
+| 6 	 | ushort | Bone number 2 (Secondary weapon)
 
 ## Pref
 
