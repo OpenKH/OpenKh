@@ -14,6 +14,7 @@ using OpenKh.Engine.MonoGame;
 using OpenKh.Engine;
 using System.IO;
 using OpenKh.Engine.Parsers;
+using System.Collections.Specialized;
 
 namespace OpenKh.Game.States
 {
@@ -192,12 +193,32 @@ namespace OpenKh.Game.States
 
             foreach (var ent in _pmpEntities)
             {
+                if(ent.DifferentMatrix)
+                {
+                    Matrix world = _camera.World;
+                    world.M14 = 0;
+                    world.M24 = 0;
+                    world.M34 = 0;
+                    world.M41 = 0;
+                    world.M42 = 0;
+                    world.M43 = 0;
+                    world.M44 = 1;
+                    _shader.WorldView = world;
+                    _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+                }
+                else
+                {
+                    _shader.WorldView = _camera.World;
+                    _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                }
+                
                 _shader.ProjectionView = _camera.Projection;
-                _shader.WorldView = _camera.World;
                 _shader.ModelView = ent.GetMatrix().ToXna();
+                _shader.UseAlphaMask = true;
                 pass.Apply();
 
                 RenderMeshNew(pass, _pmpModels[ent.Index], passRenderOpaque);
+                
             }
         }
 
@@ -235,36 +256,46 @@ namespace OpenKh.Game.States
             switch (Field)
             {
                 case Kh2Field kh2Field:
-                    Pmp pmp = Pmp.Read(File.OpenRead("model/di_04.pmp"));
-                    List<MeshGroup> group = new List<MeshGroup>();
-                    int PmoIndex = 0;
-                    for(int i = 0; i < pmp.objectInfo.Count; i++)
-                    {
-                        if(pmp.objectInfo[i].PMO_Offset != 0)
-                        {
-                            Pmp.ObjectInfo currentInfo = pmp.objectInfo[PmoIndex];
-                            PmpEntity pmpEnt = new PmpEntity(PmoIndex, currentInfo.Position, currentInfo.Rotation, currentInfo.Scale);
-                            PmoParser pParser = new PmoParser(pmp.PmoList[PmoIndex], 100.0f);
-                            List<Tim2KingdomTexture> BbsTextures = new List<Tim2KingdomTexture>();
-                            MeshGroup g = new MeshGroup();
-                            g.MeshDescriptors = pParser.MeshDescriptors;
-                            g.Textures = new IKingdomTexture[pmp.PmoList[PmoIndex].header.TextureCount];
-                            for (int j = 0; j < pmp.PmoList[PmoIndex].header.TextureCount; j++)
-                            {
-                                BbsTextures.Add(new Tim2KingdomTexture(pmp.PmoList[PmoIndex].texturesData[j], _graphics.GraphicsDevice));
-                                g.Textures[j] = BbsTextures[j];
-                            }
 
-                            _pmpEntities.Add(pmpEnt);
-                            _pmpModels.Add(g);
-                            PmoIndex++;
-                        }
+                    LoadBBSMap("model/sb_07.pmp");
+                    break;
+            }
+        }
+
+        private void LoadBBSMap(string MapPath)
+        {
+            Pmp pmp = Pmp.Read(File.OpenRead(MapPath));
+            List<MeshGroup> group = new List<MeshGroup>();
+
+            int PmoIndex = 0;
+            for (int i = 0; i < pmp.objectInfo.Count; i++)
+            {
+                Pmp.ObjectInfo currentInfo = pmp.objectInfo[i];
+                if (currentInfo.PMO_Offset != 0)
+                {
+                    PmpEntity pmpEnt = new PmpEntity(PmoIndex,
+                        new System.Numerics.Vector3(currentInfo.PositionX, currentInfo.PositionY, currentInfo.PositionZ),
+                        new System.Numerics.Vector3(currentInfo.RotationX, currentInfo.RotationY, currentInfo.RotationZ),
+                        new System.Numerics.Vector3(currentInfo.ScaleX, currentInfo.ScaleY, currentInfo.ScaleZ));
+
+                    pmpEnt.DifferentMatrix = pmp.hasDifferentMatrix[PmoIndex];
+                    PmoParser pParser = new PmoParser(pmp.PmoList[PmoIndex], 100.0f);
+                    List<Tim2KingdomTexture> BbsTextures = new List<Tim2KingdomTexture>();
+
+                    MeshGroup g = new MeshGroup();
+                    g.MeshDescriptors = pParser.MeshDescriptors;
+                    g.Textures = new IKingdomTexture[pmp.PmoList[PmoIndex].header.TextureCount];
+
+                    for (int j = 0; j < pmp.PmoList[PmoIndex].header.TextureCount; j++)
+                    {
+                        BbsTextures.Add(new Tim2KingdomTexture(pmp.PmoList[PmoIndex].texturesData[j], _graphics.GraphicsDevice));
+                        g.Textures[j] = BbsTextures[j];
                     }
 
-                    //kh2Field.LoadMapArd(Kernel.World, Kernel.Area);
-                    //LoadMap(Kernel.World, Kernel.Area);
-                    
-                    break;
+                    _pmpEntities.Add(pmpEnt);
+                    _pmpModels.Add(g);
+                    PmoIndex++;
+                }
             }
         }
 

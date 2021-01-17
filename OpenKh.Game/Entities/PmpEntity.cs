@@ -11,8 +11,8 @@ namespace OpenKh.Game.Entities
         public PmpEntity(int pmoIndex, Vector3 pmoPosition, Vector3 pmoRotation, Vector3 pmoScale)
         {
             Index = pmoIndex;
-            Position = new Vector3(pmoPosition.X, pmoPosition.Y, pmoPosition.Z);
-            Rotation = pmoRotation;
+            Position = pmoPosition * 100.0f;
+            Rotation = pmoRotation * 2.0f;
             Scaling = pmoScale;
         }
 
@@ -20,5 +20,6 @@ namespace OpenKh.Game.Entities
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
         public Vector3 Scaling { get; set; }
+        public bool DifferentMatrix { get; set; }
     }
 }

@@ -28,16 +28,16 @@ namespace OpenKh.Engine.Parsers
                     {
                         byte[] byt = BitConverter.GetBytes(pmo.Meshes[x].SectionInfo_opt2.DiffuseColor);
 
-                        color.X = (byt[0] / 128.0f) * 255.0f;
-                        color.Y = (byt[1] / 128.0f) * 255.0f;
-                        color.Z = (byt[2] / 128.0f) * 255.0f;
+                        color.X = byt[0];
+                        color.Y = byt[1];
+                        color.Z = byt[2];
                         color.W = byt[3];
                     }
                     else
                     {
-                        color.X = (pmo.Meshes[x].colors[i].X / 128.0f) * 255.0f;
-                        color.Y = (pmo.Meshes[x].colors[i].Y / 128.0f) * 255.0f;
-                        color.Z = (pmo.Meshes[x].colors[i].Z / 128.0f) * 255.0f;
+                        color.X = pmo.Meshes[x].colors[i].X;
+                        color.Y = pmo.Meshes[x].colors[i].Y;
+                        color.Z = pmo.Meshes[x].colors[i].Z;
                         color.W = pmo.Meshes[x].colors[i].W;
                     }
 
@@ -57,7 +57,7 @@ namespace OpenKh.Engine.Parsers
                     Vertices = vertices,
                     Indices = pmo.Meshes[x].Indices.ToArray(),
                     TextureIndex = pmo.Meshes[x].TextureID,
-                    IsOpaque = true
+                    IsOpaque = false
                 };
 
                 MeshDescriptors.Add(currentMesh);

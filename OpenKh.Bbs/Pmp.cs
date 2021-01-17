@@ -1,7 +1,10 @@
+using Microsoft.VisualBasic.CompilerServices;
 using OpenKh.Common;
+using OpenKh.Common.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using Xe.BinaryMapper;
 
@@ -41,9 +44,15 @@ namespace OpenKh.Bbs
 
         public class ObjectInfo
         {
-            [Data] public Vector3 Position { get; set; }
-            [Data] public Vector3 Rotation { get; set; }
-            [Data] public Vector3 Scale { get; set; }
+            [Data] public float PositionX { get; set; }
+            [Data] public float PositionY { get; set; }
+            [Data] public float PositionZ { get; set; }
+            [Data] public float RotationX { get; set; }
+            [Data] public float RotationY { get; set; }
+            [Data] public float RotationZ { get; set; }
+            [Data] public float ScaleX { get; set; }
+            [Data] public float ScaleY { get; set; }
+            [Data] public float ScaleZ { get; set; }
             [Data] public uint PMO_Offset { get; set; }
             [Data] public uint Unk1 { get; set; }
             [Data] public ushort ObjectFlags { get; set; }
@@ -51,30 +60,104 @@ namespace OpenKh.Bbs
             [Data] public ushort _ObjectID { get; set; }
         }
 
+        public class PMPTextureInfo
+        {
+            [Data] public uint Offset { get; set; }
+            [Data(Count = 12)] public string TextureName { get; set; }
+            [Data(Count = 4)] public uint[] Unknown { get; set; }
+        }
+
         public Header header = new Header();
         public List<ObjectInfo> objectInfo = new List<ObjectInfo>();
         public List<Pmo> PmoList = new List<Pmo>();
+        public List<int> PmoOrder = new List<int>();
+        public List<byte[]> TextureDataList = new List<byte[]>();
+        public List<PMPTextureInfo> TextureList = new List<PMPTextureInfo>();
+        public List<bool> hasDifferentMatrix = new List<bool>();
 
         public static Pmp Read(Stream stream)
         {
             Pmp pmp = new Pmp();
             pmp.header = BinaryMapping.ReadObject<Header>(stream);
 
+            // Read Object List.
             for(int i = 0; i < pmp.header.ObjectCount; i++)
             {
                 pmp.objectInfo.Add(Mapping.ReadObject<ObjectInfo>(stream));
+                pmp.hasDifferentMatrix.Add(BitsUtil.Int.GetBit(pmp.objectInfo[i].ObjectFlags, 0));
             }
 
-            for(int p = 0; p < pmp.header.ObjectCount; p++)
+            List<uint> PMO_Order = new List<uint>();
+            for (int l = 0; l < pmp.header.ObjectCount; l++)
+                PMO_Order.Add(pmp.objectInfo[l].PMO_Offset);
+
+            PMO_Order.Sort();
+
+            // Read PMO list.
+            for (int p = 0; p < pmp.header.ObjectCount; p++)
             {
-                if(pmp.objectInfo[p].PMO_Offset != 0)
+                if(PMO_Order[p] != 0)
                 {
-                    stream.Seek(pmp.objectInfo[p].PMO_Offset, SeekOrigin.Begin);
+                    stream.Seek(PMO_Order[p], SeekOrigin.Begin);
                     pmp.PmoList.Add(Pmo.Read(stream));
+                    pmp.PmoOrder.Add(pmp.objectInfo[p]._ObjectID);
                 }
             }
 
+            stream.Seek(pmp.header.TextureListOffset, SeekOrigin.Begin);
+
+            for(int t = 0; t < pmp.header.TextureCount; t++)
+            {
+                pmp.TextureList.Add(BinaryMapping.ReadObject<PMPTextureInfo>(stream));
+            }
+
+            // Read textures.
+            for (int k = 0; k < pmp.TextureList.Count; k++)
+            {
+                stream.Seek(pmp.TextureList[k].Offset + 0x10, SeekOrigin.Begin);
+                uint tm2size = stream.ReadUInt32() + 0x10;
+                stream.Seek(pmp.TextureList[k].Offset, SeekOrigin.Begin);
+
+                byte[] TextureBuffer = new byte[tm2size];
+                TextureBuffer = stream.ReadBytes((int)tm2size);
+
+                pmp.TextureDataList.Add(TextureBuffer);
+            }
+
             return pmp;
+        }
+
+        public static void Write(Stream stream, Pmp pmp)
+        {
+            stream.Position = 0;
+            BinaryMapping.WriteObject<Header>(stream, pmp.header);
+
+            for(int i = 0; i < pmp.objectInfo.Count; i++)
+            {
+                BinaryMapping.WriteObject<ObjectInfo>(stream, pmp.objectInfo[i]);
+            }
+
+            for(int p = 0; p < pmp.PmoList.Count; p++)
+            {
+                BinaryMapping.WriteObject<Pmo.Header>(stream, pmp.PmoList[p].header);
+
+                for(int g = 0; g < pmp.PmoList[p].textureInfo.Length; g++)
+                {
+                    BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmp.PmoList[p].textureInfo[g]);
+                }
+
+                Pmo.WriteMeshData(stream, pmp.PmoList[p]);
+            }
+
+            for(int tl = 0; tl < pmp.TextureList.Count; tl++)
+            {
+                BinaryMapping.WriteObject<PMPTextureInfo>(stream, pmp.TextureList[tl]);
+            }
+
+            for (int td = 0; td < pmp.TextureList.Count; td++)
+            {
+                stream.Write(pmp.TextureDataList[td]);
+            }
         }
 
         public static bool IsValid(Stream stream) =>
