@@ -27,20 +27,18 @@ namespace OpenKh.Engine.Parsers
                     if(Pmo.GetFlags(pmo.Meshes[x].SectionInfo).UniformDiffuseFlag)
                     {
                         byte[] byt = BitConverter.GetBytes(pmo.Meshes[x].SectionInfo_opt2.DiffuseColor);
-                        if (BitConverter.IsLittleEndian)
-                            Array.Reverse(byt);
 
-                        color.X = 0xFF;
-                        color.Y = 0xFF;
-                        color.Z = 0xFF;
-                        color.W = byt[0];
+                        color.X = byt[0];
+                        color.Y = byt[1];
+                        color.Z = byt[2];
+                        color.W = byt[3];
                     }
                     else
                     {
-                        color = pmo.Meshes[x].colors[i];
-                        color.Y = 0xFF;
-                        color.Z = 0xFF;
-                        color.W = 0xFF;
+                        color.X = pmo.Meshes[x].colors[i].X;
+                        color.Y = pmo.Meshes[x].colors[i].Y;
+                        color.Z = pmo.Meshes[x].colors[i].Z;
+                        color.W = pmo.Meshes[x].colors[i].W;
                     }
 
                     vertices[i].X = pmo.Meshes[x].vertices[i].X * pmo.header.ModelScale * Scale;
@@ -48,10 +46,10 @@ namespace OpenKh.Engine.Parsers
                     vertices[i].Z = pmo.Meshes[x].vertices[i].Z * pmo.header.ModelScale * Scale;
                     vertices[i].Tu = pmo.Meshes[x].textureCoordinates[i].X;
                     vertices[i].Tv = pmo.Meshes[x].textureCoordinates[i].Y;
-                    vertices[i].R = (byte)color.W;
-                    vertices[i].G = (byte)color.Z;
-                    vertices[i].B = (byte)color.Y;
-                    vertices[i].A = 0xFF;
+                    vertices[i].R = (byte)color.X;
+                    vertices[i].G = (byte)color.Y;
+                    vertices[i].B = (byte)color.Z;
+                    vertices[i].A = (byte)color.W;
                 }
 
                 currentMesh = new MeshDescriptor()
@@ -59,7 +57,7 @@ namespace OpenKh.Engine.Parsers
                     Vertices = vertices,
                     Indices = pmo.Meshes[x].Indices.ToArray(),
                     TextureIndex = pmo.Meshes[x].TextureID,
-                    IsOpaque = true
+                    IsOpaque = false
                 };
 
                 MeshDescriptors.Add(currentMesh);

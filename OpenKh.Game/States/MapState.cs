@@ -8,9 +8,14 @@ using OpenKh.Kh2.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Kh2.Models;
+using OpenKh.Bbs;
 using OpenKh.Game.Entities;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine;
+using System.IO;
+using OpenKh.Engine.Parsers;
+using System.Collections.Specialized;
+using System;
 
 namespace OpenKh.Game.States
 {
@@ -45,6 +50,8 @@ namespace OpenKh.Game.States
         private int _objEntryId = 0x236; // PLAYER
         private bool _enableCameraMovement = true;
         private List<BobEntity> _bobEntities = new List<BobEntity>();
+        private List<PmpEntity> _pmpEntities = new List<PmpEntity>();
+        private List<MeshGroup> _pmpModels = new List<MeshGroup>();
 
         private MenuState _menuState;
 
@@ -184,6 +191,51 @@ namespace OpenKh.Game.States
 
                 RenderMeshNew(pass, _bobModels[entity.BobIndex], passRenderOpaque);
             }
+
+            foreach (var ent in _pmpEntities)
+            {
+                if(ent.DifferentMatrix)
+                {
+                    Matrix world = _camera.World;
+                    world.M14 = 0;
+                    world.M24 = 0;
+                    world.M34 = 0;
+                    world.M41 = 0;
+                    world.M42 = 0;
+                    world.M43 = 0;
+                    world.M44 = 1;
+                    _shader.WorldView = world;
+                    _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+                }
+                else
+                {
+                    _shader.WorldView = _camera.World;
+                    _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                }
+
+                int AxisNumberChanged = 0;
+                AxisNumberChanged += Convert.ToInt32(ent.Scaling.X < 0);
+                AxisNumberChanged += Convert.ToInt32(ent.Scaling.Y < 0);
+                AxisNumberChanged += Convert.ToInt32(ent.Scaling.Z < 0);
+
+                if (AxisNumberChanged == 1 || AxisNumberChanged == 3)
+                {
+                    _graphics.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+                }
+                else
+                {
+                    _graphics.GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
+                }
+
+
+                _shader.ProjectionView = _camera.Projection;
+                _shader.ModelView = ent.GetMatrix().ToXna();
+                _shader.UseAlphaMask = true;
+                pass.Apply();
+
+                RenderMeshNew(pass, _pmpModels[ent.Index], passRenderOpaque);
+                
+            }
         }
 
         private void RenderMeshNew(EffectPass pass, IMonoGameModel model, bool passRenderOpaque)
@@ -223,6 +275,44 @@ namespace OpenKh.Game.States
                     kh2Field.LoadMapArd(Kernel.World, Kernel.Area);
                     LoadMap(Kernel.World, Kernel.Area);
                     break;
+            }
+        }
+
+        private void LoadBBSMap(string MapPath)
+        {
+            Pmp pmp = Pmp.Read(File.OpenRead(MapPath));
+            List<MeshGroup> group = new List<MeshGroup>();
+
+            int PmoIndex = 0;
+            for (int i = 0; i < pmp.objectInfo.Count; i++)
+            {
+                Pmp.ObjectInfo currentInfo = pmp.objectInfo[i];
+
+                if (currentInfo.PMO_Offset != 0)
+                {
+                    PmpEntity pmpEnt = new PmpEntity(PmoIndex,
+                        new System.Numerics.Vector3(currentInfo.PositionX, currentInfo.PositionY, currentInfo.PositionZ),
+                        new System.Numerics.Vector3(currentInfo.RotationX, currentInfo.RotationY, currentInfo.RotationZ),
+                        new System.Numerics.Vector3(currentInfo.ScaleX, currentInfo.ScaleY, currentInfo.ScaleZ));
+
+                    pmpEnt.DifferentMatrix = pmp.hasDifferentMatrix[PmoIndex];
+                    PmoParser pParser = new PmoParser(pmp.PmoList[PmoIndex], 100.0f);
+                    List<Tim2KingdomTexture> BbsTextures = new List<Tim2KingdomTexture>();
+
+                    MeshGroup g = new MeshGroup();
+                    g.MeshDescriptors = pParser.MeshDescriptors;
+                    g.Textures = new IKingdomTexture[pmp.PmoList[PmoIndex].header.TextureCount];
+
+                    for (int j = 0; j < pmp.PmoList[PmoIndex].header.TextureCount; j++)
+                    {
+                        BbsTextures.Add(new Tim2KingdomTexture(pmp.PmoList[PmoIndex].texturesData[j], _graphics.GraphicsDevice));
+                        g.Textures[j] = BbsTextures[j];
+                    }
+
+                    _pmpEntities.Add(pmpEnt);
+                    _pmpModels.Add(g);
+                    PmoIndex++;
+                }
             }
         }
 
@@ -360,7 +450,7 @@ namespace OpenKh.Game.States
             }
             else
             {
-                debug.Println($"MAP: {Constants.WorldIds[Kernel.World]}{Kernel.Area:D02}");
+                debug.Println($"MAP: {Kh2.Constants.WorldIds[Kernel.World]}{Kernel.Area:D02}");
                 debug.Println($"POS ({_camera.CameraPosition.X:F0}, {_camera.CameraPosition.Y:F0}, {_camera.CameraPosition.Z:F0})");
                 debug.Println($"LKT ({_camera.CameraLookAt.X:F0}, {_camera.CameraLookAt.Y:F0}, {_camera.CameraLookAt.Z:F0})");
             }
@@ -405,7 +495,7 @@ namespace OpenKh.Game.States
             foreach (var place in _places.Skip(_debugPlaceCursor))
             {
                 debug.Print($"{(place.Index == _debugPlaceCursor ? '>' : ' ')} ");
-                debug.Print($"{Constants.WorldIds[place.WorldId]}{place.PlaceId:D02} ");
+                debug.Print($"{Kh2.Constants.WorldIds[place.WorldId]}{place.PlaceId:D02} ");
                 debug.Println(place.MessageId);
             }
         }
@@ -422,7 +512,7 @@ namespace OpenKh.Game.States
             })
             .SelectMany(x => x.Places, (x, place) => new DebugPlace
             {
-                WorldId = Constants.WorldIds
+                WorldId = Kh2.Constants.WorldIds
                     .Select((World, Index) => new { World, Index })
                     .Where(e => e.World == x.World)
                     .Select(x => x.Index).FirstOrDefault(),
