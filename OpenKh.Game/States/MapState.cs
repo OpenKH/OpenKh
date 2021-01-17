@@ -15,6 +15,7 @@ using OpenKh.Engine;
 using System.IO;
 using OpenKh.Engine.Parsers;
 using System.Collections.Specialized;
+using System;
 
 namespace OpenKh.Game.States
 {
@@ -211,7 +212,22 @@ namespace OpenKh.Game.States
                     _shader.WorldView = _camera.World;
                     _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                 }
-                
+
+                int AxisNumberChanged = 0;
+                AxisNumberChanged += Convert.ToInt32(ent.Scaling.X < 0);
+                AxisNumberChanged += Convert.ToInt32(ent.Scaling.Y < 0);
+                AxisNumberChanged += Convert.ToInt32(ent.Scaling.Z < 0);
+
+                if (AxisNumberChanged == 1 || AxisNumberChanged == 3)
+                {
+                    _graphics.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+                }
+                else
+                {
+                    _graphics.GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
+                }
+
+
                 _shader.ProjectionView = _camera.Projection;
                 _shader.ModelView = ent.GetMatrix().ToXna();
                 _shader.UseAlphaMask = true;
@@ -256,8 +272,8 @@ namespace OpenKh.Game.States
             switch (Field)
             {
                 case Kh2Field kh2Field:
-
-                    LoadBBSMap("model/sb_07.pmp");
+                    kh2Field.LoadMapArd(Kernel.World, Kernel.Area);
+                    LoadMap(Kernel.World, Kernel.Area);
                     break;
             }
         }
@@ -271,6 +287,7 @@ namespace OpenKh.Game.States
             for (int i = 0; i < pmp.objectInfo.Count; i++)
             {
                 Pmp.ObjectInfo currentInfo = pmp.objectInfo[i];
+
                 if (currentInfo.PMO_Offset != 0)
                 {
                     PmpEntity pmpEnt = new PmpEntity(PmoIndex,

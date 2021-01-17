@@ -198,7 +198,7 @@ namespace OpenKh.Bbs
 
         public List<MeshChunks> Meshes = new List<MeshChunks>();
 
-        public int PMO_StartPosition = 0;
+        public uint PMO_StartPosition = 0;
 
         public static void ReadHeader(Stream stream, Pmo pmo)
         {
@@ -438,7 +438,7 @@ namespace OpenKh.Bbs
         public static Pmo Read(Stream stream)
         {
             Pmo pmo = new Pmo();
-            pmo.PMO_StartPosition = (int)stream.Position;
+            pmo.PMO_StartPosition = (uint)stream.Position;
 
             ReadHeader(stream, pmo);
             ReadTextureSection(stream, pmo);

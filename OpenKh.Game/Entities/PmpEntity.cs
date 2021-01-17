@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using OpenKh.Engine;
 using System.Numerics;
+using System;
 
 namespace OpenKh.Game.Entities
 {
@@ -12,7 +13,7 @@ namespace OpenKh.Game.Entities
         {
             Index = pmoIndex;
             Position = pmoPosition * 100.0f;
-            Rotation = pmoRotation * 2.0f;
+            Rotation = pmoRotation;
             Scaling = pmoScale;
         }
 

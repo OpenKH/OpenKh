@@ -70,7 +70,7 @@ namespace OpenKh.Bbs
         public Header header = new Header();
         public List<ObjectInfo> objectInfo = new List<ObjectInfo>();
         public List<Pmo> PmoList = new List<Pmo>();
-        public List<int> PmoOrder = new List<int>();
+        public List<uint> PmoOrder = new List<uint>();
         public List<byte[]> TextureDataList = new List<byte[]>();
         public List<PMPTextureInfo> TextureList = new List<PMPTextureInfo>();
         public List<bool> hasDifferentMatrix = new List<bool>();
@@ -89,18 +89,22 @@ namespace OpenKh.Bbs
 
             List<uint> PMO_Order = new List<uint>();
             for (int l = 0; l < pmp.header.ObjectCount; l++)
+            {
                 PMO_Order.Add(pmp.objectInfo[l].PMO_Offset);
+            }
 
             PMO_Order.Sort();
+            pmp.PmoOrder = PMO_Order;
 
             // Read PMO list.
             for (int p = 0; p < pmp.header.ObjectCount; p++)
             {
-                if(PMO_Order[p] != 0)
+                ObjectInfo currentPmoInfo = pmp.objectInfo[p];
+                if(currentPmoInfo.PMO_Offset != 0)
                 {
-                    stream.Seek(PMO_Order[p], SeekOrigin.Begin);
+                    stream.Seek(currentPmoInfo.PMO_Offset, SeekOrigin.Begin);
                     pmp.PmoList.Add(Pmo.Read(stream));
-                    pmp.PmoOrder.Add(pmp.objectInfo[p]._ObjectID);
+                    //pmp.PmoOrder.Add(pmp.objectInfo[p]._ObjectID);
                 }
             }
 
@@ -137,16 +141,19 @@ namespace OpenKh.Bbs
                 BinaryMapping.WriteObject<ObjectInfo>(stream, pmp.objectInfo[i]);
             }
 
-            for(int p = 0; p < pmp.PmoList.Count; p++)
-            {
-                BinaryMapping.WriteObject<Pmo.Header>(stream, pmp.PmoList[p].header);
+            List<Pmo> nPmoList = pmp.PmoList;
+            nPmoList.Sort((l, r) => l.PMO_StartPosition.CompareTo(r.PMO_StartPosition));
 
-                for(int g = 0; g < pmp.PmoList[p].textureInfo.Length; g++)
+            for(int p = 0; p < nPmoList.Count; p++)
+            {
+                BinaryMapping.WriteObject<Pmo.Header>(stream, nPmoList[p].header);
+
+                for(int g = 0; g < nPmoList[p].textureInfo.Length; g++)
                 {
-                    BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmp.PmoList[p].textureInfo[g]);
+                    BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, nPmoList[p].textureInfo[g]);
                 }
 
-                Pmo.WriteMeshData(stream, pmp.PmoList[p]);
+                Pmo.WriteMeshData(stream, nPmoList[p]);
             }
 
             for(int tl = 0; tl < pmp.TextureList.Count; tl++)
