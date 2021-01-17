@@ -70,7 +70,6 @@ namespace OpenKh.Bbs
         public Header header = new Header();
         public List<ObjectInfo> objectInfo = new List<ObjectInfo>();
         public List<Pmo> PmoList = new List<Pmo>();
-        public List<uint> PmoOrder = new List<uint>();
         public List<byte[]> TextureDataList = new List<byte[]>();
         public List<PMPTextureInfo> TextureList = new List<PMPTextureInfo>();
         public List<bool> hasDifferentMatrix = new List<bool>();
@@ -87,15 +86,6 @@ namespace OpenKh.Bbs
                 pmp.hasDifferentMatrix.Add(BitsUtil.Int.GetBit(pmp.objectInfo[i].ObjectFlags, 0));
             }
 
-            List<uint> PMO_Order = new List<uint>();
-            for (int l = 0; l < pmp.header.ObjectCount; l++)
-            {
-                PMO_Order.Add(pmp.objectInfo[l].PMO_Offset);
-            }
-
-            PMO_Order.Sort();
-            pmp.PmoOrder = PMO_Order;
-
             // Read PMO list.
             for (int p = 0; p < pmp.header.ObjectCount; p++)
             {
@@ -104,7 +94,6 @@ namespace OpenKh.Bbs
                 {
                     stream.Seek(currentPmoInfo.PMO_Offset, SeekOrigin.Begin);
                     pmp.PmoList.Add(Pmo.Read(stream));
-                    //pmp.PmoOrder.Add(pmp.objectInfo[p]._ObjectID);
                 }
             }
 
