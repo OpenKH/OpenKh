@@ -75,6 +75,8 @@ namespace OpenKh.Game.Entities
             var texture = entries.ForEntry("tim_", Bar.EntryType.ModelTexture, ModelTexture.Read);
             Textures = texture.LoadTextures(graphics).ToArray();
 
+            //(Model, Textures) = BBSMeshLoader(graphics, "model/Test.pmo", Model, Textures);
+
             try
             {
                 var msetName = $"obj/{objEntry.AnimationName}";

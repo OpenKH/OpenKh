@@ -1,10 +1,12 @@
 using OpenKh.Common;
+using OpenKh.Imaging;
 using OpenKh.Common.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using Xe.BinaryMapper;
+using System.Linq;
 
 namespace OpenKh.Bbs
 {
@@ -190,7 +192,7 @@ namespace OpenKh.Bbs
         // Data block for textures. The order will reflect their texture index.
         public TextureInfo[] textureInfo { get; set; }
         // Texture data blobs.
-        public List<byte[]> texturesData = new List<byte[]>();
+        public List<Tm2> texturesData = new List<Tm2>();
         // Header of the skeleton.
         public SkeletonHeader skeletonHeader { get; set; }
         // Joints present in the skeleton.
@@ -457,7 +459,7 @@ namespace OpenKh.Bbs
                 byte[] TextureBuffer = new byte[tm2size];
                 TextureBuffer = stream.ReadBytes((int)tm2size);
 
-                pmo.texturesData.Add(TextureBuffer);
+                pmo.texturesData.Add(Tm2.Read(stream).First());
             }
 
             // Read Skeleton.
@@ -481,14 +483,19 @@ namespace OpenKh.Bbs
             
             BinaryMapping.WriteObject<Pmo.Header>(stream, pmo.header);
 
-            for(int i = 0; i < pmo.header.TextureCount; i++) BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
+            for (int i = 0; i < pmo.header.TextureCount; i++)
+            {
+                BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
+            }
 
             WriteMeshData(stream, pmo);
 
             // Write textures.
             for(int t = 0; t < pmo.texturesData.Count; t++)
             {
-                stream.Write(pmo.texturesData[t]);
+                List<Tm2> tm2list = new List<Tm2>();
+                tm2list.Add(pmo.texturesData[t]);
+                Tm2.Write(stream, tm2list);
             }
 
             if(pmo.header.SkeletonOffset != 0)
@@ -654,10 +661,33 @@ namespace OpenKh.Bbs
                 if (j == (pmo.Meshes.Count - 1))
                 {
                     for (uint b = 0; b < 0xC; b++)
-                        stream.Write((byte)0x00);
+                    {
+                        try
+                        {
+                            stream.Write((byte)0x00);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ToString();
+                        }
+                    }
+                        
 
-                    for (uint b = 0; stream.Position % 0x10 != 0; b++)
-                        stream.Write((byte)0x00);
+                    int pd = (int)stream.Position % 0x10;
+
+                    for (int n = 0; pd != 0 ; n++)
+                    {
+                        try
+                        {
+                            stream.Write((byte)0x00);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ToString();
+                        }
+
+                        pd = (int)stream.Position % 0x10;
+                    }
                 }
             }
         }
