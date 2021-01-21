@@ -345,7 +345,7 @@ namespace OpenKh.Imaging
         {
             _imageFormat = picture.PictureFormat;
             _mipMapCount = picture.MipMapCount;
-            _imageType = picture.ImageType;
+            _imageType = 5;
             _clutType = picture.ClutType;
             _gsTex0 = picture.GsTex0;
             _gsTex1 = picture.GsTex1;
@@ -396,6 +396,7 @@ namespace OpenKh.Imaging
             pic.Height = (short)image.Size.Height;
             pic.GsTex0 = new GsTex();
             pic.GsTex1 = new GsTex();
+            pic.ClutType = 3;
             return new Tm2(buff, clut, pic, PixelFormat.Indexed8);
         }
 
@@ -404,9 +405,9 @@ namespace OpenKh.Imaging
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
 
-            var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
+            var header = BinaryMapping.ReadObject<Header>(stream);
             if (header.Format != 0)
-                stream.Position = 128;
+                stream.Position += 128;
 
             if (stream.Length < HeaderLength || header.MagicCode != MagicCode)
                 throw new InvalidDataException("Invalid header");

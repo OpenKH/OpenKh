@@ -311,7 +311,7 @@ namespace OpenKh.Command.PmoConverter
                 MeshDescriptors = scene.Meshes
                     .Select(x =>
                     {
-                        
+                        x.
                         var vertices = new PositionColoredTextured[x.Vertices.Count];
                         for (var i = 0; i < vertices.Length; i++)
                         {

@@ -455,11 +455,9 @@ namespace OpenKh.Bbs
                 stream.Seek(pmo.textureInfo[i].TextureOffset + 0x10, SeekOrigin.Begin);
                 uint tm2size = stream.ReadUInt32() + 0x10;
                 stream.Seek(pmo.textureInfo[i].TextureOffset, SeekOrigin.Begin);
+                Tm2 tm2 = Tm2.Read(stream).First();
 
-                byte[] TextureBuffer = new byte[tm2size];
-                TextureBuffer = stream.ReadBytes((int)tm2size);
-
-                pmo.texturesData.Add(Tm2.Read(stream).First());
+                pmo.texturesData.Add(tm2);
             }
 
             // Read Skeleton.
@@ -477,35 +475,58 @@ namespace OpenKh.Bbs
             return pmo;
         }
 
+        private List<uint> TextureOffsets = new List<uint>();
+
         public static void Write(Stream stream, Pmo pmo)
         {
             stream.Position = 0;
-            
-            BinaryMapping.WriteObject<Pmo.Header>(stream, pmo.header);
 
-            for (int i = 0; i < pmo.header.TextureCount; i++)
-            {
-                BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
-            }
-
+            WriteHeaderData(stream, pmo);
             WriteMeshData(stream, pmo);
+            WriteTextureData(stream, pmo);
+            WriteTextureOffsets(stream, pmo);
 
-            // Write textures.
-            for(int t = 0; t < pmo.texturesData.Count; t++)
+            if (pmo.header.SkeletonOffset != 0)
             {
-                List<Tm2> tm2list = new List<Tm2>();
-                tm2list.Add(pmo.texturesData[t]);
-                Tm2.Write(stream, tm2list);
-            }
-
-            if(pmo.header.SkeletonOffset != 0)
-            {
+                stream.Seek(pmo.header.SkeletonOffset, SeekOrigin.Begin);
                 BinaryMapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
 
                 for (int joint = 0; joint < pmo.jointList.Length; joint++)
                 {
                     BinaryMapping.WriteObject<JointData>(stream, pmo.jointList[joint]);
                 }
+            }
+        }
+
+        public static void WriteHeaderData(Stream stream, Pmo pmo)
+        {
+            BinaryMapping.WriteObject<Pmo.Header>(stream, pmo.header);
+
+            for (int i = 0; i < pmo.header.TextureCount; i++)
+            {
+                BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
+            }
+        }
+
+        public static void WriteTextureData(Stream stream, Pmo pmo)
+        {
+            // Write textures.
+            for (int t = 0; t < pmo.texturesData.Count; t++)
+            {
+                pmo.TextureOffsets.Add((uint)stream.Position);
+                List<Tm2> tm2list = new List<Tm2>();
+                tm2list.Add(pmo.texturesData[t]);
+                Tm2.Write(stream, tm2list);
+            }
+        }
+
+        public static void WriteTextureOffsets(Stream stream, Pmo pmo)
+        {
+            // Go back to write tm2 offsets.
+            for (int p = 0; p < pmo.texturesData.Count; p++)
+            {
+                stream.Seek(0xA0 + (p * 0x20), SeekOrigin.Begin);
+                stream.Write(pmo.TextureOffsets[p]);
             }
         }
 
