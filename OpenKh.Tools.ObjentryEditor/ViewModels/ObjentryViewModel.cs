@@ -26,13 +26,12 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
             public string Id => $"{Objentry.ObjectId:X02}";
 
-            public ushort ObjectId
+            public uint ObjectId
             {
                 get => Objentry.ObjectId;
                 set { Objentry.ObjectId = value; OnPropertyChanged(nameof(Name)); }
             }
 
-            public ushort Unknown02 { get => Objentry.Unknown02; set => Objentry.Unknown02 = value; }
             public Objentry.Type ObjectType 
             { 
                 get => Objentry.ObjectType; 
@@ -42,20 +41,19 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
                     OnPropertyChanged(nameof(ObjectType));
                 } 
             }
-            public byte Unknown05 { get => Objentry.Unknown05; set => Objentry.Unknown05 = value; }
-            public byte Unknown06 { get => Objentry.Unknown06; set => Objentry.Unknown06 = value; }
+            public byte SubType { get => Objentry.SubType; set => Objentry.SubType = value; }
+            public byte DrawPriority { get => Objentry.DrawPriority; set => Objentry.DrawPriority = value; }
             public byte WeaponJoint { get => Objentry.WeaponJoint; set => Objentry.WeaponJoint = value; }
             public string ModelName { get => Objentry.ModelName; set => Objentry.ModelName = value; }
             public string AnimationName { get => Objentry.AnimationName; set => Objentry.AnimationName = value; }
-            public ushort Unknown48 { get => Objentry.Unknown48; set => Objentry.Unknown48 = value; }
-            public ushort Unknown4a { get => Objentry.Unknown4a; set => Objentry.Unknown4a = value; }
+            public ushort Flag { get => Objentry.Flag; set => Objentry.Flag = value; }
+            public byte TargetType { get => Objentry.TargetType; set => Objentry.TargetType = value; }
             public ushort NeoStatus { get => Objentry.NeoStatus; set => Objentry.NeoStatus = value; }
             public ushort NeoMoveset { get => Objentry.NeoMoveset; set => Objentry.NeoMoveset = value; }
-            public ushort Unknown50 { get => Objentry.Unknown50; set => Objentry.Unknown50 = value; }
-            public short Weight { get => Objentry.Weight; set => Objentry.Weight = value; }
+            public float Weight { get => Objentry.Weight; set => Objentry.Weight = value; }
             public byte SpawnLimiter { get => Objentry.SpawnLimiter; set => Objentry.SpawnLimiter = value; }
-            public byte Unknown55 { get => Objentry.Unknown55; set => Objentry.Unknown55 = value; }
-            public byte Unknown56 { get => Objentry.Unknown56; set => Objentry.Unknown56 = value; }
+            public byte Page { get => Objentry.Page; set => Objentry.Page = value; }
+            public byte ShadowSize { get => Objentry.ShadowSize; set => Objentry.ShadowSize = value; }
             public Objentry.CommandMenuOptions CommandMenuOption 
             { 
                 get => Objentry.CommandMenuOption;
@@ -68,7 +66,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public ushort SpawnObject1 { get => Objentry.SpawnObject1; set => Objentry.SpawnObject1 = value; }
             public ushort SpawnObject2 { get => Objentry.SpawnObject2; set => Objentry.SpawnObject2 = value; }
             public ushort SpawnObject3 { get => Objentry.SpawnObject3; set => Objentry.SpawnObject3 = value; }
-            public ushort Unknown5e { get => Objentry.Unknown5e; set => Objentry.Unknown5e = value; }
+            public ushort SpawnObject4 { get => Objentry.SpawnObject4; set => Objentry.SpawnObject4 = value; }
 
             public override string ToString() => Name;
         }
@@ -114,6 +112,12 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
                 SelectedItem.SpawnObject3 = 0;
                 OnPropertyChanged(nameof(SelectedItem));
             });
+
+            ClearObject4 = new RelayCommand(x =>
+            {
+                SelectedItem.SpawnObject4 = 0;
+                OnPropertyChanged(nameof(SelectedItem));
+            });
         }
 
         public RelayCommand AddAndSelectCommand { get; set; }
@@ -122,6 +126,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         public RelayCommand ClearObject1 { get; set; }
         public RelayCommand ClearObject2 { get; set; }
         public RelayCommand ClearObject3 { get; set; }
+        public RelayCommand ClearObject4 { get; set; }
 
         public Visibility IsItemEditingVisible => IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsItemEditMessageVisible => !IsItemSelected ? Visibility.Visible : Visibility.Collapsed;

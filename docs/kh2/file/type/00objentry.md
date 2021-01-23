@@ -6,31 +6,31 @@ Contains a definition of every object and it's parameters.
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00     | ushort | ID
-| 02     | ushort | Unknown
+| 00     | uint | ID
 | 04     | byte | [Object Type](#object-types)
-| 05     | byte | Unknown
-| 06     | byte | Unknown
+| 05     | byte | Subtype
+| 06     | byte | Draw priority
 | 07     | byte | Weapon Joint - Points to [Sklt](03system.md#sklt)
 | 08     | char[32] | Model Name
 | 28     | char[32] | Animation Name
-| 48     | ushort | Unknown
-| 4A     | ushort | Ally damage cap (0100 for normal damage, 02 for chip damage...)
+| 48     | ushort | Flag (unknown)
+| 4A     | byte | Target Type*
+| 4B     | byte | Padding
 | 4C     | ushort | Neo Status
 | 4E     | ushort | Neo Moveset
-| 50     | byte | Unknown *1
-| 51     | byte | Padding? (All 00)
-| 52     | short | Weight
+| 50     | float | Weight*
 | 54     | byte | Spawn Limiter
-| 55     | byte | Unknown
-| 56     | byte | Unknown
+| 55     | byte | Page (unknown)
+| 56     | byte | Shadow size
 | 57     | byte | [Command Menu Options](#command-menu-options-fm)
 | 58     | ushort | Spawn additional object 1 - [OBJ LIST](../../dictionary/obj.md)
 | 5A     | ushort | Spawn additional object 2 - [OBJ LIST](../../dictionary/obj.md)
 | 5C     | ushort | Spawn additional object 3 - [OBJ LIST](../../dictionary/obj.md)
 | 5E     | ushort | Spawn additional object 4 - [OBJ LIST](../../dictionary/obj.md)
 
-*1 Something related to the enemy state. Eg: Undead Pirates lose their immunity if they are changed from 2 to 0
+*1 Ally damage cap (01 for normal damage, 02 for chip damage...)
+
+*2 The first bit is somewhat related to the enemy state. Eg: Undead Pirates lose their immunity if they are changed from 2 to 0
 
 ### Object Types
 

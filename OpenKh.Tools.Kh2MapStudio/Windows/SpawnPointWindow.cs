@@ -89,7 +89,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                 foreach (var obj in objs.ObjectEntries.Where(x => filter.Length == 0 || x.ModelName.Contains(filter)))
                 {
                     if (ImGui.Selectable(obj.ModelName, obj.ObjectId == entity.ObjectId))
-                        entity.ObjectId = obj.ObjectId;
+                        entity.ObjectId = (int)obj.ObjectId;
                 }
 
                 ImGui.EndCombo();

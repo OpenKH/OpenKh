@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
 using System.Linq;
@@ -31,7 +31,7 @@ namespace OpenKh.Tests.kh2
         public void GroupByUnknown02() => File.OpenRead("kh2/res/00objentry.bin").Using(stream =>
         {
             var table = Objentry.Read(stream);
-            var grouped = table.GroupBy(x => x.Unknown5e).ToList();
+            var grouped = table.GroupBy(x => x.SpawnObject4).ToList();
             Assert.Equal(0x076C, table.Count);
         });
     }
