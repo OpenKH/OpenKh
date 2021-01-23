@@ -255,7 +255,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
                     return 1;
                 return 3;
             }))
-                Objects.Add(new ObjectModel(obj.ObjectId, obj.ModelName));
+                Objects.Add(new ObjectModel((int)obj.ObjectId, obj.ModelName));
             _objectsDictionary = Objects.ToDictionary(x => x.Value, x => x.Name);
         }
 
