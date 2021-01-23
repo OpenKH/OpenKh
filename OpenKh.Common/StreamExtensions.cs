@@ -16,6 +16,7 @@ namespace OpenKh.Common
             new InvalidDataException($"Invalid header: stream must be at least {minHeaderLength} bytes long.");
 
         public static T FromBegin<T>(this T stream) where T : Stream => stream.SetPosition(0);
+        public static T ToEnd<T>(this T stream) where T : Stream => stream.SetPosition(stream.Length);
 
         public static T SetPosition<T>(this T stream, long position) where T : Stream
         {

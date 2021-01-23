@@ -26,13 +26,13 @@ namespace OpenKh.Recom
             [Data] public byte Unk01 { get; set; }
             [Data] public byte Unk02 { get; set; }
             [Data] public byte Unk03 { get; set; }
-            [Data] public int SkeletonOffset { get; set; }
+            [Data] public int BonesOffset { get; set; }
             [Data] public int MatricesOffset { get; set; }
-            [Data] public int MeshCount { get; set; }
-            [Data] public int MeshOffset { get; set; }
+            [Data] public int MaterialCount { get; set; }
+            [Data] public int MaterialsOffset { get; set; }
             [Data] public int VifOffset { get; set; }
             [Data] public int VifOffset2 { get; set; }
-            [Data] public int Unk1C { get; set; }
+            [Data] public int UnkOffset { get; set; }
             [Data] public int Unk20 { get; set; }
             [Data] public int Unk24 { get; set; }
             [Data] public int Unk28 { get; set; }
@@ -57,8 +57,8 @@ namespace OpenKh.Recom
 
         public class Mesh
         {
-            [Data] public short PrimitiveCount { get; set; }
-            [Data] public short Flags { get; set; }
+            public short PrimitiveCount { get; set; }
+            public short Flags { get; set; }
             [Data] public int Unk04 { get; set; }
             [Data] public int Unk08 { get; set; }
             [Data] public int Unk0c { get; set; }
@@ -129,12 +129,14 @@ namespace OpenKh.Recom
         public List<Bone> Bones { get; set; }
         public List<Material> Materials { get; set; }
         public List<Mesh> Meshes { get; set; }
+        public List<Mesh> Meshes2 { get; set; }
+        public List<float> Unk { get; set; }
 
         private Mdl(Stream stream, int baseOffset)
         {
             MyHeader = Mapping.ReadObject<Header>(stream);
 
-            stream.Position = baseOffset + MyHeader.SkeletonOffset;
+            stream.Position = baseOffset + MyHeader.BonesOffset;
             Bones = Enumerable
                 .Range(0, MyHeader.BoneCount)
                 .Select(x => BinaryMapping.ReadObject<Bone>(stream))
@@ -144,21 +146,51 @@ namespace OpenKh.Recom
             foreach (var bone in Bones)
                 bone.Matrix = stream.ReadMatrix4x4();
 
-            stream.Position = baseOffset + MyHeader.MeshOffset;
+            stream.Position = baseOffset + MyHeader.MaterialsOffset;
             Materials = Enumerable
-                .Range(0, MyHeader.MeshCount)
+                .Range(0, MyHeader.MaterialCount)
                 .Select(x => BinaryMapping.ReadObject<Material>(stream))
                 .ToList();
 
-            stream.Position = baseOffset + MyHeader.VifOffset;
-            Meshes = new List<Mesh>();
+            if (MyHeader.VifOffset > 0)
+            {
+                stream.Position = baseOffset + MyHeader.VifOffset;
+                Meshes = ReadMeshes(stream);
+            }
+
+            if (MyHeader.VifOffset2 > 0)
+            {
+                stream.Position = baseOffset + MyHeader.VifOffset2;
+                Meshes2 = ReadMeshes(stream);
+            }
+
+            Unk = new List<float>();
+            stream.Position = baseOffset + MyHeader.UnkOffset;
             while (true)
             {
-                var mesh = Mapping.ReadObject<Mesh>(stream);
-                if (mesh.PrimitiveCount == 0)
+                var value = stream.ReadSingle();
+                if (value == 0)
                     break;
-                Meshes.Add(mesh);
+                Unk.Add(value);
+            }
+        }
+
+        private List<Mesh> ReadMeshes(Stream stream)
+        {
+            var meshes = new List<Mesh>();
+            while (true)
+            {
+                var primitiveCount = stream.ReadInt16();
+                var flags = stream.ReadInt16();
+                if (primitiveCount == 0)
+                    break;
+
+                var mesh = Mapping.ReadObject<Mesh>(stream);
+                mesh.PrimitiveCount = primitiveCount;
+                mesh.Flags = flags;
                 mesh.Vertices = new VertexInfo[mesh.VertexCount];
+                
+                meshes.Add(mesh);
 
                 //if (mesh.TestStr > 0)
                 //    mesh.VertexBufferStride = 64;
@@ -186,18 +218,96 @@ namespace OpenKh.Recom
                             $"VB stride is {mesh.VertexBufferStride:X}");
                 }
 
-                stream.SetPosition(vertexBufferStart + mesh.Vertices.Length * mesh.VertexBufferStride + 0x10);
+                stream.Position += 0x10;
             }
+
+            return meshes;
         }
 
         private void Write(Stream stream)
         {
-            Mapping.WriteObject(stream, MyHeader);
+            if (Bones.Count > byte.MaxValue)
+                throw new ArgumentOutOfRangeException("Bones.Count", Bones.Count, $"Bone count can not exceed {byte.MaxValue}.");
 
+            var startPosition = stream.Position;
+            stream.Seek(0x30, SeekOrigin.Current);
+
+            MyHeader.BoneCount = (byte)Bones.Count;
+            MyHeader.BonesOffset = (int)(stream.Position - startPosition);
             foreach (var bone in Bones)
                 Mapping.WriteObject(stream, bone);
+
+            stream.AlignPosition(0x10);
+            MyHeader.MatricesOffset = (int)(stream.Position - startPosition);
             foreach (var bone in Bones)
                 stream.Write(bone.Matrix);
+
+            stream.AlignPosition(0x10);
+            MyHeader.MaterialsOffset = (int)(stream.Position - startPosition);
+            MyHeader.MaterialCount = Materials.Count;
+            foreach (var material in Materials)
+                Mapping.WriteObject(stream, material);
+
+            if (Meshes != null)
+            {
+                MyHeader.VifOffset = (int)(stream.Position - startPosition);
+                Write(stream, Meshes);
+            }
+            else
+                MyHeader.VifOffset = 0;
+
+            if (Meshes2 != null)
+            {
+                MyHeader.VifOffset2 = (int)(stream.Position - startPosition);
+                Write(stream, Meshes2);
+            }
+            else
+                MyHeader.VifOffset2 = 0;
+
+            MyHeader.UnkOffset = (int)(stream.Position - startPosition);
+            foreach (var value in Unk)
+                stream.Write(value);
+            stream.Write(0);
+            
+            stream.AlignPosition(0x10);
+            var endPosition = stream.Position;
+            if (stream.Length < stream.Position)
+                stream.SetLength(stream.Position);
+
+            stream.Position = startPosition;
+            Mapping.WriteObject(stream, MyHeader);
+            stream.Position = endPosition;
+        }
+
+        private void Write(Stream stream, List<Mesh> meshes)
+        {
+            foreach (var mesh in meshes)
+            {
+                stream.Write(mesh.PrimitiveCount);
+                stream.Write(mesh.Flags);
+                Mapping.WriteObject(stream, mesh);
+                foreach (var vertex in mesh.Vertices)
+                {
+                    switch (mesh.VertexBufferStride)
+                    {
+                        case 0x20:
+                            Mapping.WriteObject(stream, vertex);
+                            Mapping.WriteObject(stream, vertex.Position);
+                            break;
+                        case 0x30:
+                            Mapping.WriteObject(stream, vertex);
+                            Mapping.WriteObject(stream, vertex.Position);
+                            Mapping.WriteObject(stream, vertex.Texture);
+                            break;
+                    }
+                }
+                stream.Write(0x17000000);
+                stream.AlignPosition(0x10);
+            }
+
+            stream.Write((short)0x0000);
+            stream.Write((short)0x6000);
+            stream.AlignPosition(0x10);
         }
 
         public static List<Mdl> Read(Stream stream)
@@ -220,15 +330,25 @@ namespace OpenKh.Recom
             }).ToList();
         }
 
-        public static void Write(Stream stream, IEnumerable<Mdl> mdls)
+        public static void Write(Stream stream, ICollection<Mdl> mdls)
         {
-            stream.Write(0x10);
-            stream.Write(0x34EA0);
-            stream.Write(0);
-            stream.Write(0);
+            var modelCount = mdls.Count;
+            var headerSize = Helpers.Align(modelCount * 4, 0x10);
+            var offsetList = new List<int>(modelCount);
 
+            stream.Position = headerSize;
             foreach (var mdl in mdls)
+            {
+                offsetList.Add((int)stream.Position);
                 mdl.Write(stream);
+            }
+            stream.SetLength(stream.Position);
+
+            stream.FromBegin();
+            foreach (var offset in offsetList)
+                stream.Write(offset);
+
+            stream.ToEnd();
         }
     }
 }
