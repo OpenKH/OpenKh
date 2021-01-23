@@ -197,7 +197,7 @@ namespace OpenKh.Tests.Engine
                             new Sequence.Animation
                             {
                                 FrameEnd = 100,
-                                Flags =  Sequence.CanHostChildFlag,
+                                Flags =  Sequence.IsActiveFlag,
                             }
                         }
                     }
@@ -275,7 +275,7 @@ namespace OpenKh.Tests.Engine
                             new Sequence.Animation
                             {
                                 FrameEnd = 100,
-                                Flags =  Sequence.CanHostChildFlag,
+                                Flags =  Sequence.IsActiveFlag,
                             }
                         }
                     },
@@ -362,7 +362,7 @@ namespace OpenKh.Tests.Engine
                             new Sequence.Animation
                             {
                                 FrameEnd = 100,
-                                Flags =  Sequence.CanHostChildFlag,
+                                Flags =  Sequence.IsActiveFlag,
                                 ColorStart = (colorValue / Divisor).ToRgba(),
                                 ColorEnd = (colorValue / Divisor).ToRgba(),
                             }
