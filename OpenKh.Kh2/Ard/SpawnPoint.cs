@@ -20,17 +20,21 @@ namespace OpenKh.Kh2.Ard
                 [Data] public float RotationX { get; set; }
                 [Data] public float RotationY { get; set; }
                 [Data] public float RotationZ { get; set; }
-                [Data] public byte UseEntrance { get; set; }
-                [Data] public byte Entrance { get; set; }
-                [Data] public short Unk1e { get; set; }
-                [Data] public int Unk20 { get; set; }
-                [Data] public int AiParameter { get; set; }
-                [Data] public int TalkMessage { get; set; }
-                [Data] public int ReactionCommand { get; set; }
-                [Data] public int Unk30 { get; set; }
-                [Data] public int Unk34 { get; set; }
-                [Data] public int Unk38 { get; set; }
-                [Data] public int Unk3c { get; set; }
+                [Data] public byte SpawnType { get; set; }
+                [Data] public byte SpawnArgument { get; set; }
+                [Data] public short Serial { get; set; }
+                [Data] public int Argument1 { get; set; }
+                [Data] public int Argument2 { get; set; }
+                [Data] public short ReactionCommand { get; set; }
+                [Data] public short SpawnDelay { get; set; }
+                [Data] public short Command { get; set; }
+                [Data] public short SpawnRange { get; set; }
+                [Data] public byte Level { get; set; }
+                [Data] public byte Medal { get; set; }
+                [Data] public short Reserved32 { get; set; }
+                [Data] public int Reserved34 { get; set; }
+                [Data] public int Reserved38 { get; set; }
+                [Data] public int Reserved3c { get; set; }
             }
 
             public int ObjectId { get; set; }
@@ -40,14 +44,17 @@ namespace OpenKh.Kh2.Ard
             public float RotationX { get; set; }
             public float RotationY { get; set; }
             public float RotationZ { get; set; }
-            public byte UseEntrance { get; set; }
-            public byte Entrance { get; set; }
-            public short Unk1e { get; set; }
-            public int Unk20 { get; set; }
-            public int AiParameter { get; set; }
-            public int TalkMessage { get; set; }
-            public int ReactionCommand { get; set; }
-            public int Unk30 { get; set; }
+            public byte SpawnType { get; set; }
+            public byte SpawnArgument { get; set; }
+            public short Serial { get; set; }
+            public int Argument1 { get; set; }
+            public int Argument2 { get; set; }
+            public short ReactionCommand { get; set; }
+            public short SpawnDelay { get; set; }
+            public short Command { get; set; }
+            public short SpawnRange { get; set; }
+            public byte Level { get; set; }
+            public byte Medal { get; set; }
 
             public static Entity Read(Stream stream)
             {
@@ -61,14 +68,17 @@ namespace OpenKh.Kh2.Ard
                     RotationX = raw.RotationX,
                     RotationY = raw.RotationY,
                     RotationZ = raw.RotationZ,
-                    UseEntrance = raw.UseEntrance,
-                    Entrance = raw.Entrance,
-                    Unk1e = raw.Unk1e,
-                    Unk20 = raw.Unk20,
-                    AiParameter = raw.AiParameter,
-                    TalkMessage = raw.TalkMessage,
+                    SpawnType = raw.SpawnType,
+                    SpawnArgument = raw.SpawnArgument,
+                    Serial = raw.Serial,
+                    Argument1 = raw.Argument1,
+                    Argument2 = raw.Argument2,
                     ReactionCommand = raw.ReactionCommand,
-                    Unk30 = raw.Unk30,
+                    SpawnDelay = raw.SpawnDelay,
+                    Command = raw.Command,
+                    SpawnRange = raw.SpawnRange,
+                    Level = raw.Level,
+                    Medal = raw.Medal,
                 };
             }
 
@@ -82,26 +92,29 @@ namespace OpenKh.Kh2.Ard
                     RotationX = entity.RotationX,
                     RotationY = entity.RotationY,
                     RotationZ = entity.RotationZ,
-                    UseEntrance = entity.UseEntrance,
-                    Entrance = entity.Entrance,
-                    Unk1e = entity.Unk1e,
-                    Unk20 = entity.Unk20,
-                    AiParameter = entity.AiParameter,
-                    TalkMessage = entity.TalkMessage,
+                    SpawnType = entity.SpawnType,
+                    SpawnArgument = entity.SpawnArgument,
+                    Serial = entity.Serial,
+                    Argument1 = entity.Argument1,
+                    Argument2 = entity.Argument2,
                     ReactionCommand = entity.ReactionCommand,
-                    Unk30 = entity.Unk30,
+                    SpawnDelay = entity.SpawnDelay,
+                    Command = entity.Command,
+                    SpawnRange = entity.SpawnRange,
+                    Level = entity.Level,
+                    Medal = entity.Medal,
                 });
 
             public override string ToString() =>
-                $"ID {ObjectId} POS({PositionX:F0}, {PositionY:F0}, {PositionZ:F0}) ROT({RotationX:F0}, {RotationY:F0}, {RotationZ:F0}) Entrance {Entrance}" +
-                $"UNK {UseEntrance:X} {Unk1e:X} {Unk20:X} {AiParameter:X} {TalkMessage:X} {ReactionCommand:X} {Unk30:X}";
+                $"ID {ObjectId} POS({PositionX:F0}, {PositionY:F0}, {PositionZ:F0}) ROT({RotationX:F0}, {RotationY:F0}, {RotationZ:F0})";
         }
 
         public class EventActivator
         {
             private class Raw
             {
-                [Data] public int Unk00 { get; set; }
+                [Data] public short Shape { get; set; }
+                [Data] public short Option { get; set; }
                 [Data] public float PositionX { get; set; }
                 [Data] public float PositionY { get; set; }
                 [Data] public float PositionZ { get; set; }
@@ -111,15 +124,18 @@ namespace OpenKh.Kh2.Ard
                 [Data] public float RotationX { get; set; }
                 [Data] public float RotationY { get; set; }
                 [Data] public float RotationZ { get; set; }
-                [Data] public int Unk28 { get; set; }
-                [Data] public int Unk2c { get; set; }
-                [Data] public int Unk30 { get; set; }
-                [Data] public int Unk34 { get; set; }
-                [Data] public int Unk38 { get; set; }
-                [Data] public int Unk3c { get; set; }
+                [Data] public int Flags { get; set; }
+                [Data] public short Type { get; set; }
+                [Data] public byte OnBgGroup { get; set; }
+                [Data] public byte OffBgGroup { get; set; }
+                [Data] public int Padding30 { get; set; }
+                [Data] public int Padding34 { get; set; }
+                [Data] public int Padding38 { get; set; }
+                [Data] public int Padding3c { get; set; }
             }
 
-            public int Unk00 { get; set; }
+            public short Shape { get; set; }
+            public short Option { get; set; }
             public float PositionX { get; set; }
             public float PositionY { get; set; }
             public float PositionZ { get; set; }
@@ -129,15 +145,18 @@ namespace OpenKh.Kh2.Ard
             public float RotationX { get; set; }
             public float RotationY { get; set; }
             public float RotationZ { get; set; }
-            public int Unk28 { get; set; }
-            public int Unk2c { get; set; }
+            public int Flags { get; set; }
+            public short Type { get; set; }
+            public byte OnBgGroup { get; set; }
+            public byte OffBgGroup { get; set; }
 
             public static EventActivator Read(Stream stream)
             {
                 var raw = BinaryMapping.ReadObject<Raw>(stream);
                 return new EventActivator
                 {
-                    Unk00 = raw.Unk00,
+                    Shape = raw.Shape,
+                    Option = raw.Option,
                     PositionX = raw.PositionX,
                     PositionY = raw.PositionY,
                     PositionZ = raw.PositionZ,
@@ -147,46 +166,52 @@ namespace OpenKh.Kh2.Ard
                     RotationX = raw.RotationX,
                     RotationY = raw.RotationY,
                     RotationZ = raw.RotationZ,
-                    Unk28 = raw.Unk28,
-                    Unk2c = raw.Unk2c,
+                    Flags = raw.Flags,
+                    Type = raw.Type,
+                    OnBgGroup = raw.OnBgGroup,
+                    OffBgGroup = raw.OffBgGroup,
                 };
             }
 
-            public static void Write(Stream stream, EventActivator unk) =>
+            public static void Write(Stream stream, EventActivator activator) =>
                 BinaryMapping.WriteObject(stream, new Raw
                 {
-                    Unk00 = unk.Unk00,
-                    PositionX = unk.PositionX,
-                    PositionY = unk.PositionY,
-                    PositionZ = unk.PositionZ,
-                    ScaleX = unk.ScaleX,
-                    ScaleY = unk.ScaleY,
-                    ScaleZ = unk.ScaleZ,
-                    RotationX = unk.RotationX,
-                    RotationY = unk.RotationY,
-                    RotationZ = unk.RotationZ,
-                    Unk28 = unk.Unk28,
-                    Unk2c = unk.Unk2c,
+                    Shape = activator.Shape,
+                    Option = activator.Option,
+                    PositionX = activator.PositionX,
+                    PositionY = activator.PositionY,
+                    PositionZ = activator.PositionZ,
+                    ScaleX = activator.ScaleX,
+                    ScaleY = activator.ScaleY,
+                    ScaleZ = activator.ScaleZ,
+                    RotationX = activator.RotationX,
+                    RotationY = activator.RotationY,
+                    RotationZ = activator.RotationZ,
+                    Flags = activator.Flags,
+                    Type = activator.Type,
+                    OnBgGroup = activator.OnBgGroup,
+                    OffBgGroup = activator.OffBgGroup,
                 });
 
             public override string ToString() =>
-                $"ID {Unk00} POS({PositionX:F0}, {PositionY:F0}, {PositionZ:F0}) SCL({ScaleX:F0}, {ScaleY:F0}, {ScaleZ:F0}) ROT({RotationX:F0}, {RotationY:F0}, {RotationZ:F0}) " +
-                $"UNK {RotationX:X} {RotationY:F0} {RotationZ:X} {Unk28:X} {Unk2c:X}";
+                $"Shape {Shape} Option {Option} POS({PositionX:F0}, {PositionY:F0}, {PositionZ:F0}) SCL({ScaleX:F0}, {ScaleY:F0}, {ScaleZ:F0}) ROT({RotationX:F0}, {RotationY:F0}, {RotationZ:F0}) " +
+                $"Flags {Flags:X}, Type {Type}, OnBg {OnBgGroup:X}, OffBg {OffBgGroup:X}";
         }
 
         public class WalkPathDesc
         {
             private class Raw
             {
-                [Data] public short Unk00 { get; set; }
+                [Data] public short Serial { get; set; }
                 [Data] public short Count { get; set; }
-                [Data] public short Unk04 { get; set; }
-                [Data] public short Unk06 { get; set; }
+                [Data] public byte Flag { get; set; }
+                [Data] public byte Id { get; set; }
+                [Data] public short Reserved { get; set; }
             }
 
-            public short Unk00 { get; set; }
-            public short Unk04 { get; set; }
-            public short Unk06 { get; set; }
+            public short Serial { get; set; }
+            public byte Flag { get; set; }
+            public byte Id { get; set; }
             public List<Position> Positions { get; set; }
 
             public static WalkPathDesc Read(Stream stream)
@@ -194,12 +219,12 @@ namespace OpenKh.Kh2.Ard
                 var header = BinaryMapping.ReadObject<Raw>(stream);
                 return new WalkPathDesc
                 {
-                    Unk00 = header.Unk00,
-                    Unk04 = header.Unk04,
-                    Unk06 = header.Unk06,
+                    Serial = header.Serial,
+                    Flag = header.Flag,
+                    Id = header.Id,
                     Positions = Enumerable.Range(0, header.Count)
-                    .Select(_ => BinaryMapping.ReadObject<Position>(stream))
-                    .ToList()
+                        .Select(_ => BinaryMapping.ReadObject<Position>(stream))
+                        .ToList()
                 };
             }
 
@@ -207,16 +232,17 @@ namespace OpenKh.Kh2.Ard
             {
                 BinaryMapping.WriteObject(stream, new Raw
                 {
-                    Unk00 = entity.Unk00,
+                    Serial = entity.Serial,
+                    Flag = entity.Flag,
                     Count = (short)entity.Positions.Count,
-                    Unk04 = entity.Unk04,
-                    Unk06 = entity.Unk06,
+                    Id = entity.Id,
                 });
+
                 foreach (var position in entity.Positions)
                     BinaryMapping.WriteObject(stream, position);
             }
 
-            public override string ToString() => $"{Unk00:X} {Unk04:X} {Unk06:X}";
+            public override string ToString() => $"Serial {Serial:X} Flag {Flag:X} Id {Id:X}";
         }
 
         public class Position
@@ -228,51 +254,53 @@ namespace OpenKh.Kh2.Ard
             public override string ToString() => $"{X:F0} {Y:F0} {Z:F0}";
         }
 
-        public class Unknown0a
+        public class ReturnParameter
         {
-            [Data] public byte Unk00 { get; set; }
-            [Data] public byte Unk01 { get; set; }
-            [Data] public byte Unk02 { get; set; }
-            [Data] public byte Unk03 { get; set; }
-            [Data] public byte Unk04 { get; set; }
-            [Data] public byte Unk05 { get; set; }
-            [Data] public short Unk06 { get; set; }
-            [Data] public int Unk08 { get; set; }
-            [Data] public int Unk0c { get; set; }
+            [Data] public byte Id { get; set; }
+            [Data] public byte Type { get; set; }
+            [Data] public byte Rate { get; set; }
+            [Data] public byte EntryType { get; set; }
+            [Data] public int Argument04 { get; set; }
+            [Data] public int Argument08 { get; set; }
+            [Data] public int Argument0c { get; set; }
 
-            public static Unknown0a Read(Stream stream) =>
-                BinaryMapping.ReadObject<Unknown0a>(stream);
+            public static ReturnParameter Read(Stream stream) =>
+                BinaryMapping.ReadObject<ReturnParameter>(stream);
 
-            public static void Write(Stream stream, Unknown0a entity) =>
+            public static void Write(Stream stream, ReturnParameter entity) =>
                 BinaryMapping.WriteObject(stream, entity);
         }
 
-        public class Unknown0c
+        public class Signal
         {
-            [Data] public int Unk00 { get; set; }
-            [Data] public int Unk04 { get; set; }
+            [Data] public ushort SignalId { get; set; }
+            [Data] public ushort Argument { get; set; }
+            [Data] public byte Action { get; set; }
+            [Data] public byte Padding05 { get; set; }
+            [Data] public byte Padding06 { get; set; }
+            [Data] public byte Padding07 { get; set; }
 
-            public static Unknown0c Read(Stream stream) =>
-                BinaryMapping.ReadObject<Unknown0c>(stream);
+            public static Signal Read(Stream stream) =>
+                BinaryMapping.ReadObject<Signal>(stream);
 
-            public static void Write(Stream stream, Unknown0c entity) =>
+            public static void Write(Stream stream, Signal entity) =>
                 BinaryMapping.WriteObject(stream, entity);
         }
-
-        // loader 00199AA0
         
         private class Raw
         {
-            [Data] public short Unk00 { get; set; }
-            [Data] public short Unk02 { get; set; }
+            [Data] public byte Type { get; set; }
+            [Data] public byte Flag { get; set; }
+            [Data] public short Id { get; set; }
             [Data] public short EntityCount { get; set; }
             [Data] public short EventActivatorCount { get; set; }
-            [Data] public short Unk08Count { get; set; }
-            [Data] public short Unk0aCount { get; set; }
-            [Data] public int Unk0cCount { get; set; }
-            [Data] public int Unk10 { get; set; }
-            [Data] public int Unk14 { get; set; }
-            [Data] public int Unk18 { get; set; }
+            [Data] public short WalkPathCount { get; set; }
+            [Data] public short ReturnParameterCount { get; set; }
+            [Data] public short SignalCount { get; set; }
+            [Data] public short Reserved0e { get; set; }
+            [Data] public int Reserved10 { get; set; }
+            [Data] public int Reserved14 { get; set; }
+            [Data] public int Reserved18 { get; set; }
             [Data] public byte Place { get; set; }
             [Data] public byte Door { get; set; }
             [Data] public byte World { get; set; }
@@ -290,8 +318,9 @@ namespace OpenKh.Kh2.Ard
             public byte Unknown { get; set; }
         }
 
-        public short Unk00 { get; set; }
-        public short Unk02 { get; set; }
+        public byte Type { get; set; }
+        public byte Flag { get; set; }
+        public short Id { get; set; }
         public TeleportDesc Teleport { get; set; }
         public int Unk20 { get; set; }
         public int Unk24 { get; set; }
@@ -299,11 +328,11 @@ namespace OpenKh.Kh2.Ard
         public List<Entity> Entities { get; set; }
         public List<EventActivator> EventActivators { get; set; }
         public List<WalkPathDesc> WalkPath { get; set; }
-        public List<Unknown0a> Unknown0aTable { get; set; }
-        public List<Unknown0c> Unknown0cTable { get; set; }
+        public List<ReturnParameter> ReturnParameters { get; set; }
+        public List<Signal> Signals { get; set; }
 
         public override string ToString() =>
-            $"{Unk00:X} {Unk02:X}\n{string.Join("\n", Entities.Select(x => x.ToString()))}";
+            $"Type {Type:X} Flag {Flag:X} {Id:X}\n{string.Join("\n", Entities.Select(x => x.ToString()))}";
 
         public static List<SpawnPoint> Read(Stream stream)
         {
@@ -324,16 +353,17 @@ namespace OpenKh.Kh2.Ard
             {
                 BinaryMapping.WriteObject(stream, new Raw
                 {
-                    Unk00 = item.Unk00,
-                    Unk02 = item.Unk02,
+                    Type = item.Type,
+                    Flag = item.Flag,
+                    Id = item.Id,
                     EntityCount = (short)item.Entities.Count,
                     EventActivatorCount = (short)item.EventActivators.Count,
-                    Unk08Count = (short)item.WalkPath.Count,
-                    Unk0aCount = (short)item.Unknown0aTable.Count,
-                    Unk0cCount = (short)item.Unknown0cTable.Count,
-                    Unk10 = 0,
-                    Unk14 = 0,
-                    Unk18 = 0,
+                    WalkPathCount = (short)item.WalkPath.Count,
+                    ReturnParameterCount = (short)item.ReturnParameters.Count,
+                    SignalCount = (short)item.Signals.Count,
+                    Reserved10 = 0,
+                    Reserved14 = 0,
+                    Reserved18 = 0,
                     Place = item.Teleport.Place,
                     Door = item.Teleport.Door,
                     World = item.Teleport.World,
@@ -349,10 +379,10 @@ namespace OpenKh.Kh2.Ard
                     EventActivator.Write(stream, unk);
                 foreach (var unk in item.WalkPath)
                     WalkPathDesc.Write(stream, unk);
-                foreach (var unk in item.Unknown0aTable)
-                    Unknown0a.Write(stream, unk);
-                foreach (var unk in item.Unknown0cTable)
-                    Unknown0c.Write(stream, unk);
+                foreach (var unk in item.ReturnParameters)
+                    ReturnParameter.Write(stream, unk);
+                foreach (var unk in item.Signals)
+                    Signal.Write(stream, unk);
             }
         }
 
@@ -361,8 +391,9 @@ namespace OpenKh.Kh2.Ard
             var raw = BinaryMapping.ReadObject<Raw>(stream);
             var spawn = new SpawnPoint
             {
-                Unk00 = raw.Unk00,
-                Unk02 = raw.Unk02,
+                Type = raw.Type,
+                Flag = raw.Flag,
+                Id = raw.Id,
                 Teleport = new TeleportDesc
                 {
                     Place = raw.Place,
@@ -376,9 +407,9 @@ namespace OpenKh.Kh2.Ard
 
             spawn.Entities = ReadList(stream, raw.EntityCount, Entity.Read);
             spawn.EventActivators = ReadList(stream, raw.EventActivatorCount, EventActivator.Read);
-            spawn.WalkPath = ReadList(stream, raw.Unk08Count, WalkPathDesc.Read);
-            spawn.Unknown0aTable = ReadList(stream, raw.Unk0aCount, Unknown0a.Read);
-            spawn.Unknown0cTable = ReadList(stream, raw.Unk0cCount, Unknown0c.Read);
+            spawn.WalkPath = ReadList(stream, raw.WalkPathCount, WalkPathDesc.Read);
+            spawn.ReturnParameters = ReadList(stream, raw.ReturnParameterCount, ReturnParameter.Read);
+            spawn.Signals = ReadList(stream, raw.SignalCount, Signal.Read);
 
             return spawn;
         }
