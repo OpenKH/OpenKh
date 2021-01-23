@@ -50,3 +50,4 @@
   * [Inventory](dictionary/inventory.md)
   * [Obj](dictionary/obj.md)
   * [Shops](dictionary/shops.md)
+  * [Enums](dictionary/enums.md)

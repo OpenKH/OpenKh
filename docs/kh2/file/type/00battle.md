@@ -49,14 +49,14 @@ The damage effects' values on MSET files point to this table.
 | 0 	 | ushort | SubId
 | 2 	 | ushort | Id
 | 4 	 | byte | Pierce (0 normal, 1 pierces armor)
-| 5 	 | byte | Damage reduction (0 normal, 01 half damage, 2 no damage) (Needs confirmation)
+| 5 	 | byte | Difficulty Power Correction (0 normal, 1 critical, 2 no damage)
 | 6 	 | ushort | Power
 | 8 	 | byte | Target (0/1/2 Enemies, 3/4/5 Enemies and allies) (Needs confirmation)
-| 9 	 | byte | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
+| 9 	 | byte | [Attack Attribute](../../dictionary/enums.md#ATK_ATTR)
 | 10 	 | byte | Knockback Type (Check below)
 | 11 	 | byte | Effect on hit (0 none, other values = different effects)
-| 12 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
-| 14 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
+| 12 	 | short | Force 1 (Knockback. Distance depends on enemy weight)
+| 14 	 | short | Force 2 (Knockback. Distance depends on enemy weight)
 | 16 	 | short | ???
 | 18 	 | byte | Attack type (Eg: 20/22 can defeat bosses)
 | 19 	 | short | ???

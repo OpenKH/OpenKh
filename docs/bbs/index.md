@@ -14,3 +14,6 @@
 * Other files
     * [font.arc, fonten.arc](font.md)
 
+## Dictionaries
+
+  * [Enums](dictionary/enums.md)
