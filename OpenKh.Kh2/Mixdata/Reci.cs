@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
@@ -9,9 +9,17 @@ namespace OpenKh.Kh2.Mixdata
     {
         private const int MagicCode = 0x4552494D;
 
+        public enum UnlockType
+        {
+            Recipe = 0,
+            FreeDevelopment1 = 1,
+            FreeDevelopment2 = 2,
+            FreeDevelopment3 = 3,
+        }
+
         [Data] public ushort Id { get; set; } //03system -> item
-        [Data] public byte Unk2 { get; set; }
-        [Data] public byte Unk3 { get; set; }
+        [Data] public UnlockType Unlock { get; set; }
+        [Data] public byte Rank { get; set; }
         [Data] public ushort Item { get; set; }
         [Data] public ushort UpgradedItem { get; set; }
         [Data] public ushort Ingredient1 { get; set; }
