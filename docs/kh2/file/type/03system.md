@@ -6,7 +6,7 @@ This is an essential file to boot the game engine.
 * [CMD](#cmd) - Commands
 * [WENT](#went) - Weapon Entities
 * [WMST](#wmst) - Weapon Movesets
-* [ARIF](#arif) - ???
+* [ARIF](#arif) - Area Info
 * [ITEM](#item) - Items
 * [TRSR](#trsr) - Treasure
 * [MEMT](#memt) - Member Table
@@ -168,7 +168,9 @@ Weapon moveset list.
 
 ## Arif
 
-Unknown.
+Describes the information for each area.
+
+Each Block corresponds to a world.
 
 ### Arif Structure
 
@@ -202,7 +204,22 @@ Unknown.
 
 | Offset | Type | Description |
 |--------|---------------|-------------|
-| 0      | byte[64] | ???
+| 0      | uint | Flag
+| 4      | int | Reverb
+| 8      | int | Bg Set 1
+| 12      | int | Bg Set 2
+| 16      | [BGM](#BGM)[8] | Background Music
+| 48      | ushort | Voice
+| 50      | ushort | Navimap Item
+| 52      | char | Command
+| 53      | char[11] | Reserve
+
+### BGM
+
+| Offset | Type | Description |
+|--------|---------------|-------------|
+| 0      | ushort | Music 1
+| 2      | ushort | Music 2
 
 ## ITEM
 
