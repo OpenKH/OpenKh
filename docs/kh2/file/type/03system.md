@@ -68,30 +68,30 @@ Commands table.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | short | Id - [COMMAND LIST](../../dictionary/commands.md)
-| 2 	 | short | Unk Id 1
-| 4 	 | short | Unk Id 2
-| 6 	 | byte | Submenu
+| 0 	 | ushort | Id - [COMMAND LIST](../../dictionary/commands.md)
+| 2 	 | ushort | Execute
+| 4 	 | byte[2] | Unk04
+| 6 	 | sbyte | Submenu
 | 7 	 | byte | Icon
-| 8 	 | short | Text
-| 10 	 | short | Unk10
-| 12 	 | int | Unk12
-| 16 	 | short | Unk16
-| 18 	 | short | Unk18
-| 20 	 | int | Unk20
-| 24 	 | byte | Unk24
-| 25 	 | byte | Unk25
-| 26 	 | short | Unk26
-| 28 	 | short | Mp/Drive cost
-| 30 	 | int | Unk30
-| 34 	 | short | Unk34
-| 36 	 | byte | Unk36
-| 37 	 | byte | Unk37
-| 38 	 | short | Unk38
-| 40 	 | short | Unk40
-| 42 	 | short | Unk42
-| 44 	 | short | Unk44
-| 46 	 | short | Unk46
+| 8 	 | int | Text
+| 12 	 | uint | Flag
+| 16 	 | float | Range
+| 20 	 | float | Dir
+| 24 	 | float | Dir Range
+| 28 	 | byte | Mp/Drive cost
+| 29 	 | byte | Camera
+| 30 	 | byte | Priority
+| 31 	 | byte | Receiver
+| 32 	 | ushort | Time
+| 34 	 | ushort | Require
+| 36 	 | byte | Mark
+| 37 	 | byte | Action
+| 38 	 | ushort | RcCount
+| 40 	 | ushort | Dist Range
+| 42 	 | ushort | Score
+| 44 	 | ushort | Disasble Form
+| 46 	 | byte | Group
+| 47 	 | byte | Reserve
 
 ## Went
 
