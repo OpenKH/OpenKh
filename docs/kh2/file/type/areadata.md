@@ -4,9 +4,9 @@ Describes how the game should behave before loading the map. This is responsible
 
 Internally it is a [BAR](bar.md) file, composed by micro files of different purpose:
 
-- [Spawn](#spawn) to spawn objects.
+- [Spawn](#spawn) to spawn objects and triggers.
 - [Script](#script) to execute microcode
-- Animload responsible to run a cutscene
+- Event responsible to play a cutscene
 - [AI](ai.md) to execute exceptional microcode.
 
 ## Spawn Point
@@ -20,26 +20,27 @@ This is the easiest micro-format of an ARD file. This is mainly responsible to s
 | Offset | Type  | Description
 |--------|-------|------------
 | 00     | int   | File type; always 2.
-| 04     | int   | [Spawn point descriptor count](#spawn-descriptor)
+| 04     | int   | [Spawn descriptor count](#spawn-descriptor)
 
-#### Spawn point descriptor
+#### Spawn descriptor
 
-When referring to _place's door_ it means that is the index where to spawn the character to when loading the next map (simplified: which part of the map you're coming from). When the door is 99, the playable character is spawn where the save point is located.
+When referring to _entrance_ it means that is the index where to spawn the character to when loading the next map (simplified: which part of the map you're coming from). When the entrance is 99, the playable character is spawn where the save point is located.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | short | Unknown
-| 02     | short | Unknown
+| 00     | byte  | Type
+| 01     | byte  | Flag
+| 02     | short | Id
 | 04     | short | [Entity count](#entity)
 | 06     | short | [Event activator count](#event-activator)
 | 08     | short | [Walk path count](#walk-path). Usually 1.
 | 0a     | short | [Unknown tableA count](#unknown-table-a)
-| 0c     | int   | [Unknown tableC count](#unknown-table-c)
+| 0c     | int   | [Signal count](#signal-table)
 | 10     | int   | Always 0 [*¹](#notes)
 | 14     | int   | Always 0 [*¹](#notes)
 | 18     | int   | Always 0 [*¹](#notes)
-| 1c     | byte  | [World's place index](../../worlds.md)
-| 1d     | byte  | Place's door.
+| 1c     | byte  | [Area ID of a world](../../worlds.md)
+| 1d     | byte  | Entrance
 | 1e     | byte  | [World ID](../../worlds.md)
 | 1f     | byte  | Unknown
 | 20     | int   | Unknown
@@ -57,8 +58,8 @@ When referring to _place's door_ it means that is the index where to spawn the c
 | 10     | float | Rotation X
 | 14     | float | Rotation Y
 | 18     | float | Rotation Z
-| 1c     | byte  | Unknown
-| 1d     | byte  | Entrance index. 99 for save point.
+| 1c     | byte  | [Spawn type](#spawn-types)
+| 1d     | byte  | Spawn argument
 | 1e     | short | Unknown
 | 20     | int   | Unknown
 | 24     | int   | AI parameter
@@ -69,13 +70,23 @@ When referring to _place's door_ it means that is the index where to spawn the c
 | 38     | int   | Always 0 [*¹](#notes)
 | 3c     | int   | Always 0 [*¹](#notes)
 
+##### Spawn types
+
+| ID | Description | Argument purpose
+|----|-------------|-----------------
+| 0  | Do nothing  |
+| 1  | Spawn at entrance | Filter by entrance index
+| 2  | Used by enemies | Unknown
+| 3  | Used by enemies | Unknown
+
 #### Event activator
 
 This is an invisible wall that is responsibe to activate an event. Which event is it, it is described in the [spawn point descriptor](#spawn-descriptor). One common usage is changing the map when the player touch the map's "border".
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | int   | Unknown
+| 00     | short | [Collision box shape](#event-shape)
+| 02     | short | [Option](#event-option)
 | 04     | float | Position X  
 | 08     | float | Position Y
 | 0c     | float | Position Z
@@ -85,12 +96,28 @@ This is an invisible wall that is responsibe to activate an event. Which event i
 | 1c     | float | Rotation X
 | 20     | float | Rotation Y
 | 24     | float | Rotation Z
-| 28     | int   | Unknown
-| 2c     | int   | Unknown
-| 30     | int   | Always 0 [*¹](#notes)
+| 28     | int   | Flags
+| 2c     | short | Type
+| 2e     | short | BG group on
+| 30     | short | BG group off
+| 32     | short | Always 0 [*¹](#notes)
 | 34     | int   | Always 0 [*¹](#notes)
 | 38     | int   | Always 0 [*¹](#notes)
 | 3c     | int   | Always 0 [*¹](#notes)
+
+##### Event shape
+
+| ID | Description
+|----|-------------
+| 0  | Parallelepiped?
+| 1  | Sphere?
+
+##### Event option
+
+| ID | Description
+|----|-------------
+| 0  | Change map?
+| 1  | Show next map name?
 
 #### Walk path
 
@@ -100,10 +127,11 @@ From some early tests, the entities would pick a random point in the walk path a
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | short | Unknown
+| 00     | short | Serial
 | 02     | short | [Walk point count](#walk-point)
-| 04     | short | Unknown
-| 06     | short | Unknown
+| 04     | byte  | Flag
+| 04     | byte  | Id
+| 06     | short | Always 0 [*¹](#notes)
 
 #### Walk point
 
@@ -123,12 +151,16 @@ Just a 12-byte structure, read as Vector3f.
 | 08     | int   | Unknown
 | 0c     | int   | Unknown
 
-### Unknown table C
+### Signal table
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | int   | Unknown
-| 04     | int   | Unknown
+| 00     | short | Signal ID
+| 02     | short | Argument
+| 04     | byte  | Action
+| 05     | byte  | Always 0 [*¹](#notes)
+| 06     | byte  | Always 0 [*¹](#notes)
+| 07     | byte  | Always 0 [*¹](#notes)
 
 ## Script
 
