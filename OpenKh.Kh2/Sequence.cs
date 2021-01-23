@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,15 +12,26 @@ namespace OpenKh.Kh2
         public static readonly uint MagicCodeValidator = 0x44514553U;
         private static readonly long MinimumLength = 48L;
 
-        public const int LinearInterpolationFlag = 0x00000001;
-        public const int CanHostChildFlag = 0x00000002;
-        public const int BouncingFlag = 0x00000010;
-        public const int RotationFlag = 0x00000020;
-        public const int ScalingFlag = 0x00000040;
+        public const int DisableCurveFlag = 0x00000001;
+        public const int IsActiveFlag = 0x00000002;
+        public const int DisableBilinearFlag = 0x00000004;
+        public const int BounceDelayFlag = 0x00000008;
+        public const int BounceDisableFlag = 0x00000010;
+        public const int RotationDisableFlag = 0x00000020;
+        public const int ScalingDisableFlag = 0x00000040;
         public const int ColorInterpolationFlag = 0x00000080;
-        public const int ColorMaskingFlag = 0x00000400;
-        public const int TranslationFlag = 0x00001000;
-        public const int PivotFlag = 0x00004000;
+        public const int RotationInterpolationFlag = 0x00000100;
+        public const int ScalingInterpolationFlag = 0x00000200;
+        public const int ColorMaskFlag = 0x00000400;
+        public const int BounceInterpolationFlag = 0x00000800;
+        public const int TranslationInterpolationFlag = 0x00001000;
+        public const int PivotInterpolationFlag = 0x00002000;
+        public const int PivotDisableFlag = 0x00004000;
+        public const int LastCutFlag = 0x00008000;
+        public const int TranslationDisableFlag = 0x00010000;
+        public const int TranslationOffsetDisableFlag = 0x00020000;
+        public const int PositionDisableFlag = 0x00040000;
+        public const int TagFlag = 0x00080000;
 
         private class Section
         {
@@ -41,13 +52,13 @@ namespace OpenKh.Kh2
 
         public class RawSprite
         {
-            [Data] public int Unknown00 { get; set; }
-            [Data] public int Left { get; set; }
-            [Data] public int Top { get; set; }
-            [Data] public int Right { get; set; }
-            [Data] public int Bottom { get; set; }
-            [Data] public float UTranslation { get; set; }
-            [Data] public float VTranslation { get; set; }
+            [Data] public int Palette { get; set; }
+            [Data] public int U0 { get; set; }
+            [Data] public int V0 { get; set; }
+            [Data] public int U1 { get; set; }
+            [Data] public int V1 { get; set; }
+            [Data] public float UScroll { get; set; }
+            [Data] public float VScroll { get; set; }
             [Data] public uint ColorLeft { get; set; }
             [Data] public uint ColorTop { get; set; }
             [Data] public uint ColorRight { get; set; }
@@ -64,13 +75,13 @@ namespace OpenKh.Kh2
         {
             [Data] public short AnimationIndex { get; set; }
             [Data] public short Count { get; set; }
-            [Data] public short DoNotLoop { get; set; }
-            [Data] public short Unknown06 { get; set; }
-            [Data] public int LoopStart { get; set; }
-            [Data] public int LoopEnd { get; set; }
-            [Data] public int Unknown10 { get; set; }
-            [Data] public int Unknown14 { get; set; }
-            [Data] public int Unknown18 { get; set; }
+            [Data] public short Loop { get; set; }
+            [Data] public short Flags { get; set; }
+            [Data] public int FrameStart { get; set; }
+            [Data] public int FrameEnd { get; set; }
+            [Data] public int X { get; set; }
+            [Data] public int Y { get; set; }
+            [Data] public int Size { get; set; }
             [Data] public int Unknown1C { get; set; }
             [Data] public int Unknown20 { get; set; }
         }
@@ -124,16 +135,16 @@ namespace OpenKh.Kh2
             [Data] public float ScaleXEnd { get; set; }
             [Data] public float ScaleYStart { get; set; }
             [Data] public float ScaleYEnd { get; set; }
-            [Data] public float Unknown60 { get; set; }
-            [Data] public float Unknown64 { get; set; }
-            [Data] public float Unknown68 { get; set; }
-            [Data] public float Unknown6c { get; set; }
+            [Data] public float CurveXStart { get; set; }
+            [Data] public float CurveYStart { get; set; }
+            [Data] public float CurveXEnd { get; set; }
+            [Data] public float CurveYEnd { get; set; }
             [Data] public float BounceXStart { get; set; }
             [Data] public float BounceXEnd { get; set; }
             [Data] public float BounceYStart { get; set; }
             [Data] public float BounceYEnd { get; set; }
-            [Data] public short BounceXSpeed { get; set; }
-            [Data] public short BounceYSpeed { get; set; }
+            [Data] public short BounceXCount { get; set; }
+            [Data] public short BounceYCount { get; set; }
             [Data] public int ColorBlend { get; set; }
             [Data] public uint ColorStart { get; set; }
             [Data] public uint ColorEnd { get; set; }
@@ -178,12 +189,12 @@ namespace OpenKh.Kh2
             Sprites = stream.ReadList<RawSprite>(header.SpriteDesc.Offset, header.SpriteDesc.Count)
                 .Select(x => new Sprite
                 {
-                    Left = x.Left,
-                    Top = x.Top,
-                    Right = x.Right,
-                    Bottom = x.Bottom,
-                    UTranslation = x.UTranslation,
-                    VTranslation = x.VTranslation,
+                    Left = x.U0,
+                    Top = x.V0,
+                    Right = x.U1,
+                    Bottom = x.V1,
+                    UTranslation = x.UScroll,
+                    VTranslation = x.VScroll,
                     ColorLeft = x.ColorLeft,
                     ColorTop = x.ColorTop,
                     ColorRight = x.ColorRight,
@@ -199,13 +210,13 @@ namespace OpenKh.Kh2
                 .Select(x => new AnimationGroup
                 {
                     Animations = animations.Skip(x.AnimationIndex).Take(x.Count).ToList(),
-                    DoNotLoop = x.DoNotLoop,
-                    Unknown06 = x.Unknown06,
-                    LoopStart = x.LoopStart,
-                    LoopEnd = x.LoopEnd,
-                    LightPositionX = x.Unknown10,
-                    TextPositionY = x.Unknown14,
-                    TextScale = x.Unknown18,
+                    DoNotLoop = x.Loop,
+                    Unknown06 = x.Flags,
+                    LoopStart = x.FrameStart,
+                    LoopEnd = x.FrameEnd,
+                    LightPositionX = x.X,
+                    TextPositionY = x.Y,
+                    TextScale = x.Size,
                     UiPadding = x.Unknown1C,
                     TextPositionX = x.Unknown20,
                 }).ToList();
@@ -234,12 +245,12 @@ namespace OpenKh.Kh2
 
             header.SpritePartDesc.Offset = stream.WriteList(Sprites.Select(x => new RawSprite
             {
-                Left = x.Left,
-                Top = x.Top,
-                Right = x.Right,
-                Bottom = x.Bottom,
-                UTranslation = x.UTranslation,
-                VTranslation = x.VTranslation,
+                U0 = x.Left,
+                V0 = x.Top,
+                U1 = x.Right,
+                V1 = x.Bottom,
+                UScroll = x.UTranslation,
+                VScroll = x.VTranslation,
                 ColorLeft = x.ColorLeft,
                 ColorTop = x.ColorTop,
                 ColorRight = x.ColorRight,
@@ -267,13 +278,13 @@ namespace OpenKh.Kh2
                 {
                     AnimationIndex = (short)index,
                     Count = (short)animGroup.Animations.Count,
-                    DoNotLoop = animGroup.DoNotLoop,
-                    Unknown06 = animGroup.Unknown06,
-                    LoopStart = animGroup.LoopStart,
-                    LoopEnd = animGroup.LoopEnd,
-                    Unknown10 = animGroup.LightPositionX,
-                    Unknown14 = animGroup.TextPositionY,
-                    Unknown18 = animGroup.TextScale,
+                    Loop = animGroup.DoNotLoop,
+                    Flags = animGroup.Unknown06,
+                    FrameStart = animGroup.LoopStart,
+                    FrameEnd = animGroup.LoopEnd,
+                    X = animGroup.LightPositionX,
+                    Y = animGroup.TextPositionY,
+                    Size = animGroup.TextScale,
                     Unknown1C = animGroup.UiPadding,
                     Unknown20 = animGroup.TextPositionX,
                 });

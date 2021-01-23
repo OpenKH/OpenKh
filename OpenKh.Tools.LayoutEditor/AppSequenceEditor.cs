@@ -59,7 +59,7 @@ namespace OpenKh.Tools.LayoutEditor
             _debugSequenceRenderer.AnimationGroup;
 
         private bool CanAnimGroupHostChildAnims => SelectedAnimationGroup
-            .Animations.Any(x => (x.Flags & Sequence.CanHostChildFlag) != 0);
+            .Animations.Any(x => (x.Flags & Sequence.IsActiveFlag) != 0);
 
         public int SelectedAnimGroup
         {
@@ -381,19 +381,21 @@ namespace OpenKh.Tools.LayoutEditor
 
         private void AnimationEdit(Sequence.Animation animation, int index)
         {
-            int flags = animation.Flags;
-            if (ImGui.InputInt($"Flags (debug)##{index}", ref flags))
-                animation.Flags = flags;
+            ImGuiFlagBox(animation, $"Is active##{index}", Sequence.IsActiveFlag, true);
+            ImGuiFlagBox(animation, $"Bilinear filtering##{index}", Sequence.DisableBilinearFlag, true);
+            ImGuiFlagBox(animation, $"Last cut##{index}", Sequence.LastCutFlag, true);
+            ImGuiFlagBox(animation, $"Translation##{index}", Sequence.TranslationDisableFlag, true);
+            ImGuiFlagBox(animation, $"Translation offset##{index}", Sequence.TranslationOffsetDisableFlag, true);
+            ImGuiFlagBox(animation, $"Position##{index}", Sequence.PositionDisableFlag, true);
+            ImGuiFlagBox(animation, $"Tag##{index}", Sequence.TagFlag, true);
 
-            int interpolationMode = (animation.Flags & Sequence.LinearInterpolationFlag) != 0 ? 1 : 0;
+            int interpolationMode = (animation.Flags & Sequence.DisableCurveFlag) != 0 ? 1 : 0;
             if (ImGui.Combo($"Interpolation##{index}", ref interpolationMode, new string[]
                 { "Ease in/out", "Linear" }, 2))
             {
-                var flag = Sequence.LinearInterpolationFlag;
+                var flag = Sequence.DisableCurveFlag;
                 animation.Flags = (animation.Flags & ~flag) | (interpolationMode == 0 ? 0 : flag);
             }
-
-            ImGuiFlagBox(animation, $"Can host child animation##{index}", Sequence.CanHostChildFlag, true);
 
             var framePair = new int[] { animation.FrameStart, animation.FrameEnd };
             if (ImGui.DragInt2($"Frame lifespan##{index}", ref framePair[0]))
@@ -406,7 +408,7 @@ namespace OpenKh.Tools.LayoutEditor
             if (ImGui.InputInt($"Sprite group##{index}", ref spriteGroupIndex))
                 animation.SpriteGroupIndex = Math.Min(Math.Max(spriteGroupIndex, 0), _sequence.SpriteGroups.Count - 1);
             
-            if (ImGuiFlagBox(animation, $"Enable translation animation##{index}", Sequence.PivotFlag))
+            if (ImGuiFlagBox(animation, $"Enable translation animation##{index}", Sequence.PivotDisableFlag))
             {
                 var xaPair = new int[] { animation.TranslateXStart, animation.TranslateXEnd };
                 if (ImGui.DragInt2($"Translation X##{index}", ref xaPair[0]))
@@ -432,24 +434,43 @@ namespace OpenKh.Tools.LayoutEditor
                 }
             }
 
-            if (ImGuiFlagBox(animation, $"Enable pivot translation##{index}", Sequence.PivotFlag))
+            if (ImGuiFlagBox(animation, $"Enable pivot translation##{index}", Sequence.PivotDisableFlag))
             {
-                var xbPair = new int[] { animation.PivotXStart, animation.PivotXEnd };
-                if (ImGui.DragInt2($"Pivot X##{index}", ref xbPair[0]))
+                if (ImGuiFlagBox(animation, $"Interpolate pivot##{index}", Sequence.RotationInterpolationFlag))
                 {
-                    animation.PivotXStart = xbPair[0];
-                    animation.PivotXEnd = xbPair[1];
-                }
+                    var xbPair = new int[] { animation.PivotXStart, animation.PivotXEnd };
+                    if (ImGui.DragInt2($"Pivot X##{index}", ref xbPair[0]))
+                    {
+                        animation.PivotXStart = xbPair[0];
+                        animation.PivotXEnd = xbPair[1];
+                    }
 
-                var ybPair = new int[] { animation.PivotYStart, animation.PivotYEnd };
-                if (ImGui.DragInt2($"Pivot Y##{index}", ref ybPair[0]))
+                    var ybPair = new int[] { animation.PivotYStart, animation.PivotYEnd };
+                    if (ImGui.DragInt2($"Pivot Y##{index}", ref ybPair[0]))
+                    {
+                        animation.PivotYStart = ybPair[0];
+                        animation.PivotYEnd = ybPair[1];
+                    }
+                }
+                else
                 {
-                    animation.PivotYStart = ybPair[0];
-                    animation.PivotYEnd = ybPair[1];
+                    var pivotX = animation.PivotXStart;
+                    if (ImGui.DragInt($"Pivot X##{index}", ref pivotX))
+                    {
+                        animation.PivotXStart = pivotX;
+                        animation.PivotXEnd = pivotX;
+                    }
+
+                    var pivotY = animation.PivotYStart;
+                    if (ImGui.DragInt2($"Pivot Y##{index}", ref pivotY))
+                    {
+                        animation.PivotYStart = pivotY;
+                        animation.PivotYEnd = pivotY;
+                    }
                 }
             }
 
-            if (ImGuiFlagBox(animation, $"Enable rotation##{index}", Sequence.RotationFlag))
+            if (ImGuiFlagBox(animation, $"Enable rotation##{index}", Sequence.RotationDisableFlag))
             {
                 var rotationStart = new Vector3(
                     (float)(animation.RotationXStart * 180f / Math.PI),
@@ -460,75 +481,145 @@ namespace OpenKh.Tools.LayoutEditor
                     (float)(animation.RotationYEnd * 180f / Math.PI),
                     (float)(animation.RotationZEnd * 180f / Math.PI));
 
-                if (ImGui.DragFloat3($"Rotation Start##{index}", ref rotationStart))
+                if (ImGuiFlagBox(animation, $"Interpolate rotation##{index}", Sequence.RotationInterpolationFlag))
                 {
-                    animation.RotationXStart = (float)(rotationStart.X * Math.PI / 180f);
-                    animation.RotationYStart = (float)(rotationStart.Y * Math.PI / 180f);
-                    animation.RotationZStart = (float)(rotationStart.Z * Math.PI / 180f);
+
+                    if (ImGui.DragFloat3($"Rotation Start##{index}", ref rotationStart))
+                    {
+                        animation.RotationXStart = (float)(rotationStart.X * Math.PI / 180f);
+                        animation.RotationYStart = (float)(rotationStart.Y * Math.PI / 180f);
+                        animation.RotationZStart = (float)(rotationStart.Z * Math.PI / 180f);
+                    }
+                    if (ImGui.DragFloat3($"Rotation End##{index}", ref rotationEnd))
+                    {
+                        animation.RotationXEnd = (float)(rotationEnd.X * Math.PI / 180f);
+                        animation.RotationYEnd = (float)(rotationEnd.Y * Math.PI / 180f);
+                        animation.RotationZEnd = (float)(rotationEnd.Z * Math.PI / 180f);
+                    }
                 }
-                if (ImGui.DragFloat3($"Rotation End##{index}", ref rotationEnd))
+                else
                 {
-                    animation.RotationXEnd = (float)(rotationEnd.X * Math.PI / 180f);
-                    animation.RotationYEnd = (float)(rotationEnd.Y * Math.PI / 180f);
-                    animation.RotationZEnd = (float)(rotationEnd.Z * Math.PI / 180f);
+                    if (ImGui.DragFloat3($"Rotation Start##{index}", ref rotationStart))
+                    {
+                        animation.RotationXStart = (float)(rotationStart.X * Math.PI / 180f);
+                        animation.RotationYStart = (float)(rotationStart.Y * Math.PI / 180f);
+                        animation.RotationZStart = (float)(rotationStart.Z * Math.PI / 180f);
+                        animation.RotationXEnd = animation.RotationXStart;
+                        animation.RotationYEnd = animation.RotationYStart;
+                        animation.RotationZEnd = animation.RotationZStart;
+                    }
                 }
             }
 
-            if  (ImGuiFlagBox(animation, $"Enable scaling##{index}", Sequence.ScalingFlag))
+            if  (ImGuiFlagBox(animation, $"Enable scaling##{index}", Sequence.ScalingDisableFlag))
             {
-                var scalePair = new Vector2(animation.ScaleStart, animation.ScaleEnd);
-                if (ImGui.DragFloat2($"Scale##{index}", ref scalePair, 0.05f))
+                if (ImGuiFlagBox(animation, $"Scaling interpolation##{index}", Sequence.ScalingInterpolationFlag))
                 {
-                    animation.ScaleStart = scalePair.X;
-                    animation.ScaleEnd = scalePair.Y;
-                }
+                    var scalePair = new Vector2(animation.ScaleStart, animation.ScaleEnd);
+                    if (ImGui.DragFloat2($"Scale##{index}", ref scalePair, 0.05f))
+                    {
+                        animation.ScaleStart = scalePair.X;
+                        animation.ScaleEnd = scalePair.Y;
+                    }
 
-                var scaleXPair = new Vector2(animation.ScaleXStart, animation.ScaleXEnd);
-                if (ImGui.DragFloat2($"Scale X##{index}", ref scaleXPair, 0.05f))
-                {
-                    animation.ScaleXStart = scaleXPair.X;
-                    animation.ScaleXEnd = scaleXPair.Y;
-                }
+                    var scaleXPair = new Vector2(animation.ScaleXStart, animation.ScaleXEnd);
+                    if (ImGui.DragFloat2($"Scale X##{index}", ref scaleXPair, 0.05f))
+                    {
+                        animation.ScaleXStart = scaleXPair.X;
+                        animation.ScaleXEnd = scaleXPair.Y;
+                    }
 
-                var scaleYPair = new Vector2(animation.ScaleYStart, animation.ScaleYEnd);
-                if (ImGui.DragFloat2($"Scale Y##{index}", ref scaleYPair, 0.05f))
+                    var scaleYPair = new Vector2(animation.ScaleYStart, animation.ScaleYEnd);
+                    if (ImGui.DragFloat2($"Scale Y##{index}", ref scaleYPair, 0.05f))
+                    {
+                        animation.ScaleYStart = scaleYPair.X;
+                        animation.ScaleYEnd = scaleYPair.Y;
+                    }
+                }
+                else
                 {
-                    animation.ScaleYStart = scaleYPair.X;
-                    animation.ScaleYEnd = scaleYPair.Y;
+                    var scale = animation.ScaleStart;
+                    if (ImGui.DragFloat($"Scale##{index}", ref scale, 0.05f))
+                    {
+                        animation.ScaleStart = scale;
+                        animation.ScaleEnd = scale;
+                    }
+
+                    var scaleX = animation.ScaleXStart;
+                    if (ImGui.DragFloat($"Scale X##{index}", ref scaleX, 0.05f))
+                    {
+                        animation.ScaleXStart = scaleX;
+                        animation.ScaleXEnd = scaleX;
+                    }
+
+                    var scaleY = animation.ScaleYStart;
+                    if (ImGui.DragFloat($"Scale Y##{index}", ref scaleY, 0.05f))
+                    {
+                        animation.ScaleYStart = scaleY;
+                        animation.ScaleYEnd = scaleY;
+                    }
                 }
             }
 
             var unk6xPair = new Vector4(
-                animation.Unknown60, animation.Unknown64, animation.Unknown68, animation.Unknown6c);
-            if (ImGui.DragFloat4($"Unknown6x##{index}", ref unk6xPair, 0.05f))
+                animation.CurveXStart, animation.CurveYStart, animation.CurveXEnd, animation.CurveYEnd);
+            if (ImGui.DragFloat4($"Curves##{index}", ref unk6xPair, 0.05f))
             {
-                animation.Unknown60 = unk6xPair.X;
-                animation.Unknown64 = unk6xPair.Y;
-                animation.Unknown68 = unk6xPair.Z;
-                animation.Unknown6c = unk6xPair.W;
+                animation.CurveXStart = unk6xPair.X;
+                animation.CurveYStart = unk6xPair.Y;
+                animation.CurveXEnd = unk6xPair.Z;
+                animation.CurveYEnd = unk6xPair.W;
             }
 
-            if (ImGuiFlagBox(animation, $"Enable bouncing##{index}", Sequence.BouncingFlag))
+            if (ImGuiFlagBox(animation, $"Enable bouncing##{index}", Sequence.BounceDisableFlag))
             {
-                var bounceXPair = new Vector2(animation.BounceXStart, animation.BounceXEnd);
-                if (ImGui.DragFloat2($"Bounce X##{index}", ref bounceXPair))
-                {
-                    animation.BounceXStart = bounceXPair.X;
-                    animation.BounceXEnd = bounceXPair.Y;
-                }
+                ImGuiFlagBox(animation, $"Bounce delay##{index}", Sequence.BounceDelayFlag);
 
-                var bounceYPair = new Vector2(animation.BounceYStart, animation.BounceYEnd);
-                if (ImGui.DragFloat2($"Bounce Y##{index}", ref bounceYPair))
+                if (ImGuiFlagBox(animation, $"Bouncing interpolation##{index}", Sequence.BounceInterpolationFlag))
                 {
-                    animation.BounceYStart = bounceYPair.X;
-                    animation.BounceYEnd = bounceYPair.Y;
-                }
+                    var bounceXPair = new Vector2(animation.BounceXStart, animation.BounceXEnd);
+                    if (ImGui.DragFloat2($"Bounce X##{index}", ref bounceXPair))
+                    {
+                        animation.BounceXStart = bounceXPair.X;
+                        animation.BounceXEnd = bounceXPair.Y;
+                    }
 
-                var bounceSpeed = new int[] { animation.BounceXSpeed, animation.BounceYSpeed };
-                if (ImGui.DragInt2($"Bounce speed##{index}", ref bounceSpeed[0]))
+                    var bounceYPair = new Vector2(animation.BounceYStart, animation.BounceYEnd);
+                    if (ImGui.DragFloat2($"Bounce Y##{index}", ref bounceYPair))
+                    {
+                        animation.BounceYStart = bounceYPair.X;
+                        animation.BounceYEnd = bounceYPair.Y;
+                    }
+
+                    var bounceCount = new int[] { animation.BounceXCount, animation.BounceYCount };
+                    if (ImGui.DragInt2($"Bounce count##{index}", ref bounceCount[0]))
+                    {
+                        animation.BounceXCount = (short)bounceCount[0];
+                        animation.BounceYCount = (short)bounceCount[1];
+                    }
+                }
+                else
                 {
-                    animation.BounceXSpeed = (short)bounceSpeed[0];
-                    animation.BounceYSpeed = (short)bounceSpeed[1];
+                    var bounceXValue = animation.BounceXStart;
+                    if (ImGui.DragFloat($"Bounce X##{index}", ref bounceXValue))
+                    {
+                        animation.BounceXStart = bounceXValue;
+                        animation.BounceXEnd = bounceXValue;
+                    }
+
+                    var bounceYValue = animation.BounceYStart;
+                    if (ImGui.DragFloat($"Bounce Y##{index}", ref bounceYValue))
+                    {
+                        animation.BounceYStart = bounceYValue;
+                        animation.BounceYEnd = bounceYValue;
+                    }
+
+                    var bounceCount = new int[] { animation.BounceXCount, animation.BounceYCount };
+                    if (ImGui.DragInt2($"Bounce count##{index}", ref bounceCount[0]))
+                    {
+                        animation.BounceXCount = (short)bounceCount[0];
+                        animation.BounceYCount = (short)bounceCount[1];
+                    }
                 }
             }
 
@@ -537,7 +628,7 @@ namespace OpenKh.Tools.LayoutEditor
                 { "Normal", "Additive", "Subtractive" }, 3))
                 animation.ColorBlend = blendMode;
 
-            if (ImGuiFlagBox(animation, $"Enable color mask##{index}", Sequence.ColorMaskingFlag))
+            if (ImGuiFlagBox(animation, $"Enable color mask##{index}", Sequence.ColorMaskFlag))
             {
                 var colorStart = Utilities.ConvertColor(animation.ColorStart);
                 if (ImGui.ColorPicker4($"Mask start##{index}", ref colorStart))

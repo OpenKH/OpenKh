@@ -150,7 +150,7 @@ namespace OpenKh.Engine.Renderers
             float t;
 
             // loc_23B030
-            if ((animation.Flags & Sequence.LinearInterpolationFlag) != 0)
+            if ((animation.Flags & Sequence.DisableCurveFlag) != 0)
                 t = (float)delta;
             else
                 t = (float)((Math.Sin(delta * Math.PI - Math.PI / 2.0) + 1.0) / 2.0);
@@ -159,7 +159,7 @@ namespace OpenKh.Engine.Renderers
 
             var translateX = Lerp(t, animation.TranslateXStart, animation.TranslateXEnd);
             var translateY = Lerp(t, animation.TranslateYStart, animation.TranslateYEnd);
-            if ((animation.Flags & Sequence.TranslationFlag) == 0)
+            if ((animation.Flags & Sequence.TranslationInterpolationFlag) == 0)
             {
                 context.PositionX += translateX;
                 context.PositionY += translateY;
@@ -170,7 +170,7 @@ namespace OpenKh.Engine.Renderers
                 context.PositionY += animation.TranslateYStart;
             }
 
-            if ((animation.Flags & Sequence.ScalingFlag) == 0)
+            if ((animation.Flags & Sequence.ScalingDisableFlag) == 0)
             {
                 var scale = Lerp(t, animation.ScaleStart, animation.ScaleEnd);
                 var scaleX = Lerp(t, animation.ScaleXStart, animation.ScaleXEnd);
@@ -184,7 +184,7 @@ namespace OpenKh.Engine.Renderers
                 context.ScaleY = 1.0f;
             }
 
-            if ((animation.Flags & Sequence.ColorMaskingFlag) == 0)
+            if ((animation.Flags & Sequence.ColorMaskFlag) == 0)
             {
                 if ((animation.Flags & Sequence.ColorInterpolationFlag) == 0)
                 {
@@ -200,23 +200,23 @@ namespace OpenKh.Engine.Renderers
             else
                 context.Color *= new ColorF(1, 1, 1, 1);
 
-            if ((animation.Flags & Sequence.RotationFlag) == 0)
+            if ((animation.Flags & Sequence.RotationDisableFlag) == 0)
             {
                 context.RotationX = Lerp(t, animation.RotationXStart, animation.RotationXEnd);
                 context.RotationY = Lerp(t, animation.RotationYStart, animation.RotationYEnd);
                 context.RotationZ = Lerp(t, animation.RotationZStart, animation.RotationZEnd);
             }
 
-            if ((animation.Flags & Sequence.PivotFlag) == 0)
+            if ((animation.Flags & Sequence.PivotDisableFlag) == 0)
             {
                 context.PivotX += Lerp(t, animation.PivotXStart, animation.PivotXEnd);
                 context.PivotY += Lerp(t, animation.PivotYStart, animation.PivotYEnd);
             }
 
-            if ((animation.Flags & Sequence.BouncingFlag) == 0)
+            if ((animation.Flags & Sequence.BounceDisableFlag) == 0)
             {
-                var bounceXValue = (float)Math.Sin(Lerp(delta * animation.BounceXSpeed, 0, Math.PI));
-                var bounceYValue = (float)Math.Sin(Lerp(delta * animation.BounceYSpeed, 0, Math.PI));
+                var bounceXValue = (float)Math.Sin(Lerp(delta * animation.BounceXCount, 0, Math.PI));
+                var bounceYValue = (float)Math.Sin(Lerp(delta * animation.BounceYCount, 0, Math.PI));
 
                 context.PositionX += bounceXValue * Lerp(t, animation.BounceXStart, animation.BounceXEnd);
                 context.PositionY += bounceYValue * Lerp(t, animation.BounceYStart, animation.BounceYEnd);
@@ -224,7 +224,7 @@ namespace OpenKh.Engine.Renderers
 
             context.Color *= DebugSequenceRenderer.GetAnimationBlendColor(index);
 
-            if ((animation.Flags & Sequence.CanHostChildFlag) != 0)
+            if ((animation.Flags & Sequence.IsActiveFlag) != 0)
             {
                 CurrentChildContext.PositionX = context.PositionX + context.PivotX;
                 CurrentChildContext.PositionY = context.PositionY + context.PivotY;
@@ -233,7 +233,7 @@ namespace OpenKh.Engine.Renderers
                 // Horrible hack. Basically if TranslationFlag disallow to us the translation
                 // animation, the frame group just uses Translate*Start, but the attached
                 // child context still needs to use the animation.
-                if ((animation.Flags & Sequence.TranslationFlag) != 0)
+                if ((animation.Flags & Sequence.TranslationInterpolationFlag) != 0)
                 {
                     CurrentChildContext.PositionX += translateX - animation.TranslateXStart;
                     CurrentChildContext.PositionY += translateY - animation.TranslateYStart;
