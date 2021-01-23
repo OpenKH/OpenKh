@@ -22,7 +22,7 @@ This file is splitted into two parts: The first `0x1C` bytes are the [header](#h
 | 0x0A   | uint16 | Pause Menu Information Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
 | 0x0C   | BitArray | Boolean Flag Array [5]
 | 0x0D   | byte | [Bonus Reward](00battle.md#bons)
-| 0x0E   | uint16 | Antiform Multiplier
+| 0x0E   | byte | Antiform Multiplier
 | 0x0F   | byte | Padding
 | 0x10   | int | Sound effect when mission is started
 | 0x14   | int | Sound effect when mission is finished
