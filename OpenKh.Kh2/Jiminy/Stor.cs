@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
@@ -10,8 +10,7 @@ namespace OpenKh.Kh2.Jiminy
         public const int MagicCode = 0x54534D4A;
 
         [Data] public byte World { get; set; }
-        [Data] public byte Unk1 { get; set; } //always 00
-        [Data] public ushort Unk2 { get; set; } //always 0000
+        [Data(Count = 3)] public byte[] Padding { get; set; }
         [Data] public ushort SummaryText { get; set; }
         [Data] public ushort ObjectiveText { get; set; }
         [Data] public ushort StoryText { get; set; }

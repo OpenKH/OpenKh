@@ -179,11 +179,11 @@ Magic Code `JMQU`
 | 00     | ushort | World
 | 02     | ushort | Category Text
 | 04     | ushort | Title
-| 06     | ushort | 
+| 06     | ushort | Stat
 | 08     | ushort | Story Flag
-| 0A     | ushort |
-| 0C     | ushort |
-| 0E     | ushort |
+| 0A     | ushort | Game Id
+| 0C     | ushort | Score
+| 0E     | ushort | Clear Condition
 
 ## Puzz
 
