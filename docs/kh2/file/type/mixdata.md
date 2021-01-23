@@ -63,7 +63,7 @@ Magic Code `MICO`
 | 06     | byte   | Rank of material (Check [Items](./03system.md#item))
 | 07     | byte   | Condition Type (0 for stack, 1 for collect uniques)
 | 08     | short  | Count of needed Materials
-| 0A     | short  | Unlock event for the shop (Sam used in shops [Shops](./03system.md#shop))
+| 0A     | short  | Unlock event for the shop (Same used in shops [Shops](./03system.md#shop))
 
 ### Leve
 
