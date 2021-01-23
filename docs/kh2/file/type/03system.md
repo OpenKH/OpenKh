@@ -86,10 +86,10 @@ Commands table.
 | 34 	 | ushort | Require
 | 36 	 | byte | Mark
 | 37 	 | byte | Action
-| 38 	 | ushort | RcCount
+| 38 	 | ushort | Reaction Count
 | 40 	 | ushort | Dist Range
 | 42 	 | ushort | Score
-| 44 	 | ushort | Disasble Form
+| 44 	 | ushort | Disable Form
 | 46 	 | byte | Group
 | 47 	 | byte | Reserve
 

@@ -48,30 +48,36 @@ The damage effects' values on MSET files point to this table.
 |--------|---------------|-------------|
 | 0 	 | ushort | SubId
 | 2 	 | ushort | Id
-| 4 	 | byte | Pierce (0 normal, 1 pierces armor)
-| 5 	 | byte | Damage reduction (0 normal, 01 half damage, 2 no damage) (Needs confirmation)
+| 4 	 | byte | Type (0 normal, 1 pierces armor...)
+| 5 	 | byte | Critical Adjust (0 normal, 1 half damage, 2 no damage)
 | 6 	 | ushort | Power
-| 8 	 | byte | Target (0/1/2 Enemies, 3/4/5 Enemies and allies) (Needs confirmation)
+| 8 	 | byte | Team (Deal damage to: 0/1/2 Enemies, 3/4/5 Enemies and allies...)
 | 9 	 | byte | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
-| 10 	 | byte | Knockback Type (Check below)
+| 10 	 | byte | Reaction (Wether an enemy is flinched, knocked...)
 | 11 	 | byte | Effect on hit (0 none, other values = different effects)
 | 12 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
 | 14 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
 | 16 	 | short | ???
-| 18 	 | byte | Attack type (Eg: 20/22 can defeat bosses)
-| 19 	 | short | ???
+| 18 	 | byte | Flag (Eg: 20/22 can defeat bosses)
+| 19 	 | byte | Refact Self
+| 20 	 | byte | Refact Other
 | 21 	 | byte | Reflected motion (Points to the slot in the MSET to be triggered when the attack is reflected)
-| 22 	 | short | ???
-| 24 	 | short | ???
-| 26 	 | short | ???
-| 28 	 | uint | ID of the sound effect 28
-| 32 	 | short | ???
-| 34 	 | 4B | ??? (Single byte flags)
-| 38 	 | byte | Multihit (1 hit every X frames)
-| 39 	 | short | ???
+| 22 	 | short | Reflect Hit Back
+| 24 	 | int | Reflect Action
+| 28 	 | int | Hit sound Effect
+| 32 	 | ushort | Reflect RC
+| 34 	 | byte | Reflect Range
+| 35 	 | sbyte | Reflect Angle
+| 36 	 | byte | Damage Effect
+| 37 	 | byte | Switch
+| 38 	 | ushort | Interval (1 hit every X frames)
+| 40 	 | byte | Floor Check
 | 41 	 | byte | Drive drain (Adds on normal state, reduces when in a form)
 | 42 	 | byte | Revenge damage
-| 43 	 | 4B | ??? (Single byte flags)
+| 43 	 | byte | Tr Reaction
+| 44 	 | byte | Combo Group
+| 45 	 | byte | Random Effect
+| 46 	 | byte | Kind
 | 47 	 | byte | HP drain (Adds on normal state, reduces when in a form)
 
 ## Ptya
