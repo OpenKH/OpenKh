@@ -13,7 +13,7 @@ This is an essential file to boot the game engine.
 * [FTST](#ftst) - Font Style
 * [SHOP](#shop) - Shops
 * [SKLT](#sklt) - Skeleton
-* [PREF](#pref) - Preferences?
+* [PREF](#pref) - Preferences
 * [EVTP](#evtp) - ???
 * [IPIC](#ipic) - ???
 
@@ -532,86 +532,9 @@ Defines which bones the characters' weapons are attached to.
 
 ## Pref
 
-Defines preferences. It is a [BAR](bar.md) file containing the following subfiles:
+Defines preferences.
 
-| File | Description |
-|--------|---------------|
-| plyr 	 | Player
-| fmab 	 | Form Abilities
-| prty 	 | Party
-| sstm 	 | System
-| magi 	 | Magic
-
-### plyr
-Each pointer leads to a specific entry's offset.
-
-### plyr Structure
-
-| Amount | Description |
-|--------|---------------|
-| 1 	 | Pointer count [uint]
-| 59 	 | Pointers [uint]
-| 10 	 | Plyr entries
-
-### plyr Entry
-
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | byte[116] | Unknown
-
-### fmab
-Each pointer leads to a specific entry's offset.
-
-### fmab Structure
-
-| Amount | Description |
-|--------|---------------|
-| 1 	 | Pointer count [uint]
-| 5 	 | Pointers [uint]
-| 5 	 | fmab entries
-
-### fmab Entry
-
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | byte[68] | Unknown
-
-### prty
-Each pointer leads to a specific entry's offset.
-
-### prty Structure
-
-| Amount | Description |
-|--------|---------------|
-| 1 	 | Pointer count [uint]
-| 70 	 | Pointers [uint]
-| 5 	 | prty entries
-
-### prty Entry
-
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | byte[68] | Unknown
-
-### sstm
-It looks like it uses the common structure file type + file size. Other than that, the structure is unknown.
-
-### magi
-Each pointer leads to a specific entry's offset.
-
-### magi Structure
-
-| Amount | Description |
-|--------|---------------|
-| 1 	 | Pointer count [uint]
-| 36 	 | Pointers [uint]
-| 5 	 | magi entries
-
-### magi Entry
-
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | byte[124] | Unknown
+Documented in [preferences.md](./preferences.md).
 
 ## Evtp
 
