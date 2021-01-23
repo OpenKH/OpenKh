@@ -25,12 +25,12 @@ namespace OpenKh.Kh2.Msn
 
             [Data] public ushort InformationBarTextId { get; set; }
             [Data] public byte PauseMenuType { get; set; }
-            [Data] public byte Unk09 { get; set; }
+            [Data] public byte HelpId { get; set; }
             [Data] public ushort PauseMenuTextId { get; set; }
-            [Data] public byte Unk0C { get; set; }
+            [Data] public byte Help { get; set; }
             [Data] public byte BonsRewardId { get; set; }
             [Data] public byte AntiFormMultiplier { get; set; }
-            [Data] public byte Unk0F { get; set; }
+            [Data] public byte Padding { get; set; }
             [Data] public int SoundEffectStart { get; set; }
             [Data] public int SoundEffectFinish { get; set; }
             [Data] public int SoundEffectFail { get; set; }
@@ -41,17 +41,19 @@ namespace OpenKh.Kh2.Msn
 
         public enum Operation
         {
-            StartEvent = 1,
-            EndEvent = 2,
-            FailEvent = 3,
+            CameraStart = 1,
+            CameraComplete = 2,
+            CameraFailed = 3,
             Timer = 4,
-            GenericCounter = 5,
-            HpGate = 6, //something gauge related, but can also be used for hp wtf, probably controlled in ai?
-            HitCounter = 7,
-            Unk08 = 8,
-            TimerRecord = 9,
-            //ComboCounter = 0xA,
-
+            Counter = 5,
+            Gauge = 6, 
+            ComboCounter = 7,
+            MissionScore = 8,
+            Watch = 9,
+            LimitCost = 0xA,
+            DriveRefillRatio = 0xB,
+            AddDrive = 0xC,
+            CameraPrize = 0xD
         }
 
         public class Function

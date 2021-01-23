@@ -98,24 +98,24 @@ This micro-code is responsible for certain elements to be used in missions.
 
 ### Operation code
 
-There is a total of 13 operation codes for the spawn script. The parser can be found at [sub_181d30](#notes).
+There is a total of 13 operation codes for the mission script. The parser can be found at [sub_181d30](#notes).
 
-- 01: [StartEvent](#startevent)
-- 02: [EndEvent](#endevent)
-- 03: [FailEvent](#failevent)
+- 01: [CameraStart](#camerastart)
+- 02: [CameraComplete](#cameracomplete)
+- 03: [CameraFailed](#camerafailed)
 - 04: [Timer](#timer)
-- 05: [GenericCounter](#genericcounter)
-- 06: [HpGate](#unknown06)
-- 07: [HitCounter](#unknown07)
-- 08: [unknown](#unknown08)
-- 09: [unknown](#unknown09)
-- 0a: [unknown](#unknown0a)
-- 0b: [unknown](#unknown0b)
-- 0c: [unknown](#unknown0c)
-- 0d: [unknown](#unknown0d)
+- 05: [Counter](#counter)
+- 06: [Gauge](#gauge)
+- 07: [ComboCounter](#combocounter)
+- 08: [MissionScore](#missionscore)
+- 09: [Watch](#watch)
+- 0a: [LimitCost](#limitcost)
+- 0b: [DriveRefillRatio](#unknown0b)
+- 0c: [AddDrive](#unknown0c)
+- 0d: [CameraPrize](#cameraprize)
 
 
-#### StartEvent
+#### CameraStart
 
 Intro to missions. Either camera transitions or content from a SEQD.
 
@@ -127,15 +127,15 @@ Intro to missions. Either camera transitions or content from a SEQD.
 
 Used 227 times.
 
-#### EndEvent
+#### CameraComplete
 
-Ending to missions. Either camera transitions or content from a SEQD. Has the same structure as [StartEvent](#startevent).
+Ending to missions. Either camera transitions or content from a SEQD. Has the same structure as [CameraStart](#camerastart).
 
 Used 240 times.
 
-#### FailEvent
+#### CameraFailed
 
-Plays when an event is failed (for example when a struggle battle is lost). Either camera transitions or content from a SEQD. Has the same structure as [StartEvent](#startevent).
+Plays when an event is failed (for example when a struggle battle is lost). Either camera transitions or content from a SEQD. Has the same structure as [CameraStart](#camerastart).
 
 Used 88 times.
 
@@ -155,7 +155,7 @@ If `Initial value` >= `Max value` the timer will count down. Otherwise it will c
 
 Used 78 times.
 
-#### GenericCounter
+#### Counter
 
 Is used to count for example Struggle orbs, enemies, medals in Olympus Cups etc.
 
@@ -170,6 +170,20 @@ Is used to count for example Struggle orbs, enemies, medals in Olympus Cups etc.
 | 0F     | byte  |
 
 Used 208 times.
+
+### LimitCost
+
+Defines how much MP a Limit consumes.
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | int   | MP cost
+
+Used 10 times.
+
+#### CameraPrize
+
+Currently unknown. Either camera transitions or content from a SEQD. Has the same structure as [CameraStart](#camerastart).
 
 ## The `miss` entry
 
