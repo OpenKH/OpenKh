@@ -320,6 +320,8 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 
 ### Btlv Header
 
+Contains the table for battle level of each world. Whether each entry is enabled or not is determined by a bitmask and the final battle level will be the sum of all of the world's enabled battle lv entries.
+
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | uint | File type (1)
@@ -329,7 +331,28 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0 	 | 32B | ??? 
+| 0 	 | uint  | Entry Index
+| 4      | byte[2] | Unknown
+| 6      | byte  | World ZZ
+| 7      | byte  | World of Darkness
+| 8      | byte  | Twilight Town
+| 9      | byte  | Destiny Islands
+| A      | byte  | Hollow Bastion
+| B      | byte  | Beast's Castle
+| C      | byte  | Olympus Coliseum
+| D      | byte  | Agrabah
+| E      | byte  | Land of Dragons
+| F      | byte  | 100 Acre Woods
+| 10     | byte  | Pride Lands
+| 11     | byte  | Atlantica
+| 12     | byte  | Disney Castle
+| 13     | byte  | Timeless River
+| 14     | byte  | Halloween Town
+| 15     | byte  | World Map
+| 16     | byte  | Port Royal
+| 17     | byte  | Space Paranoids
+| 18     | byte  | The World that Never Was
+| 19     | byte[7] | Unknown
 
 ## Lvpm
 
@@ -504,7 +527,7 @@ Data on limits.
 | 03     | byte  | Group (3 requires all of the characters to be alive)
 | 04     | char[32]  | Filename
 | 36     | ushort | Spawn - [OBJ LIST](../../dictionary/obj.md)
-| 36     | byte[2] | Padding
+| 38     | byte[2] | Padding
 | 40     | ushort | Command - [Command LIST](../../dictionary/commands.md)
 | 42     | ushort | Limit - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 44     | byte | Used for Timeless River versions (0D) (May be more bytes)
