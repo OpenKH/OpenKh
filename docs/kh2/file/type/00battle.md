@@ -13,7 +13,7 @@ It is a [BAR](bar.md) file and contains the following subfiles:
 * [BTLV](#btlv) - Battle Level
 * [LVPM](#lvpm) - Level Params
 * [ENMP](#enmp) - Enemy Params
-* [PATN](#patn) - ???
+* [PATN](#patn) - Pattern
 * [PLRP](#plrp) - Player Params
 * [LIMT](#limt) - Limits
 * [SUMN](#sumn) - Summons
@@ -119,13 +119,30 @@ Ptya sets contain the list of attack animations a character use in certain situa
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0     | byte[8] | ???
-| 8     | ushort | Animation Id \*1
-| 10     | byte[58] | ??? \*2
+| 0     | byte | Id
+| 1     | byte | Type
+| 2     | sbyte | Sub
+| 3     | sbyte | Combo Offset
+| 4     | uint | Flag
+| 8     | ushort | Motion Id \*
+| 10     | ushort | Next Motion Id \*
+| 12     | float | Jump
+| 16     | float | Jump Max
+| 20     | float | Jump Min
+| 24     | float | Speed Min
+| 28     | float | Speed Max
+| 32     | float | Near
+| 36     | float | Far
+| 40     | float | Low
+| 44     | float | High
+| 48     | float | Inner Min
+| 52     | float | Inner Max
+| 56     | float | Blend Time
+| 60     | float | Distance Adjust
+| 64     | ushort | Ability - SubId on [Item](./03System#Item)
+| 66     | ushort | Score
 
-\*1 Multiply by 4 to get the slot of the animation in the entity's [moveset file](../anb/mset.md).
-
-\*2 Byte 15 controls vertical momentum. Byte 31 controls front momentum.
+\* Multiply by 4 to get the slot of the motion in the entity's [moveset file](../anb/mset.md).
 
 ## Przt
 
@@ -445,6 +462,7 @@ EG: 05 is Mad Rider, 14 is Reckless, Xaldin, 15 is Morning Star, Assault Rider, 
 | 17     | byte | ???
 | 18     | byte | ???
 | 19     | byte | ???
+| 20     | byte[12] | Padding
 
 \* (00 is immune, 01/0C/0D draws in, 02/03 flinches, 04/07/09/0B knocks out, 05 pulls in(magnet), 06/08/0A is flinch + draw, 0E is flinch + insta revenge...)
 
