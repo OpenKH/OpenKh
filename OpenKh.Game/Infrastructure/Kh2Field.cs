@@ -400,7 +400,7 @@ namespace OpenKh.Game.Infrastructure
                             {
                                 foreach (var desc in spawnPoint.Entities)
                                 {
-                                    if (desc.UseEntrance == 0 || desc.Entrance == _kernel.Entrance)
+                                    if (desc.SpawnType == 0 || desc.SpawnArgument == _kernel.Entrance)
                                         AddActor(desc);
                                 }
                             }
