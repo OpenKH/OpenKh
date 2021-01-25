@@ -6,14 +6,14 @@ This is an essential file to boot the game engine.
 * [CMD](#cmd) - Commands
 * [WENT](#went) - Weapon Entities
 * [WMST](#wmst) - Weapon Movesets
-* [ARIF](#arif) - ???
+* [ARIF](#arif) - Area Info
 * [ITEM](#item) - Items
 * [TRSR](#trsr) - Treasure
 * [MEMT](#memt) - Member Table
 * [FTST](#ftst) - Font Style
 * [SHOP](#shop) - Shops
 * [SKLT](#sklt) - Skeleton
-* [PREF](#pref) - Preferences?
+* [PREF](#pref) - Preferences
 * [EVTP](#evtp) - ???
 * [IPIC](#ipic) - ???
 
@@ -68,30 +68,30 @@ Commands table.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | short | Id - [COMMAND LIST](../../dictionary/commands.md)
-| 2 	 | short | Unk Id 1
-| 4 	 | short | Unk Id 2
-| 6 	 | byte | Submenu
+| 0 	 | ushort | Id - [COMMAND LIST](../../dictionary/commands.md)
+| 2 	 | ushort | Execute
+| 4 	 | byte[2] | Unk04
+| 6 	 | sbyte | Submenu
 | 7 	 | byte | Icon
-| 8 	 | short | Text
-| 10 	 | short | Unk10
-| 12 	 | int | Unk12
-| 16 	 | short | Unk16
-| 18 	 | short | Unk18
-| 20 	 | int | Unk20
-| 24 	 | byte | Unk24
-| 25 	 | byte | Unk25
-| 26 	 | short | Unk26
-| 28 	 | short | Mp/Drive cost
-| 30 	 | int | Unk30
-| 34 	 | short | Unk34
-| 36 	 | byte | Unk36
-| 37 	 | byte | Unk37
-| 38 	 | short | Unk38
-| 40 	 | short | Unk40
-| 42 	 | short | Unk42
-| 44 	 | short | Unk44
-| 46 	 | short | Unk46
+| 8 	 | int | Text
+| 12 	 | uint | Flag
+| 16 	 | float | Range
+| 20 	 | float | Dir
+| 24 	 | float | Dir Range
+| 28 	 | byte | Mp/Drive cost
+| 29 	 | byte | Camera
+| 30 	 | byte | Priority
+| 31 	 | byte | Receiver
+| 32 	 | ushort | Time
+| 34 	 | ushort | Require
+| 36 	 | byte | Mark
+| 37 	 | byte | Action
+| 38 	 | ushort | Reaction Count
+| 40 	 | ushort | Dist Range
+| 42 	 | ushort | Score
+| 44 	 | ushort | Disable Form
+| 46 	 | byte | Group
+| 47 	 | byte | Reserve
 
 ## Went
 
@@ -168,7 +168,9 @@ Weapon moveset list.
 
 ## Arif
 
-Unknown.
+Describes the information for each area.
+
+Each Block corresponds to a world.
 
 ### Arif Structure
 
@@ -202,7 +204,22 @@ Unknown.
 
 | Offset | Type | Description |
 |--------|---------------|-------------|
-| 0      | byte[64] | ???
+| 0      | uint | Flag
+| 4      | int | Reverb
+| 8      | int | Bg Set 1
+| 12      | int | Bg Set 2
+| 16      | [BGM](#BGM)[8] | Background Music
+| 48      | ushort | Voice
+| 50      | ushort | Navimap Item
+| 52      | char | Command
+| 53      | char[11] | Reserve
+
+### BGM
+
+| Offset | Type | Description |
+|--------|---------------|-------------|
+| 0      | ushort | Music 1
+| 2      | ushort | Music 2
 
 ## ITEM
 
@@ -532,86 +549,9 @@ Defines which bones the characters' weapons are attached to.
 
 ## Pref
 
-Defines preferences. It is a [BAR](bar.md) file containing the following subfiles:
+Defines preferences.
 
-| File | Description |
-|--------|---------------|
-| plyr 	 | Player
-| fmab 	 | Form Abilities
-| prty 	 | Party
-| sstm 	 | System
-| magi 	 | Magic
-
-### plyr
-Each pointer leads to a specific entry's offset.
-
-### plyr Structure
-
-| Amount | Description |
-|--------|---------------|
-| 1 	 | Pointer count [uint]
-| 59 	 | Pointers [uint]
-| 10 	 | Plyr entries
-
-### plyr Entry
-
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | byte[116] | Unknown
-
-### fmab
-Each pointer leads to a specific entry's offset.
-
-### fmab Structure
-
-| Amount | Description |
-|--------|---------------|
-| 1 	 | Pointer count [uint]
-| 5 	 | Pointers [uint]
-| 5 	 | fmab entries
-
-### fmab Entry
-
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | byte[68] | Unknown
-
-### prty
-Each pointer leads to a specific entry's offset.
-
-### prty Structure
-
-| Amount | Description |
-|--------|---------------|
-| 1 	 | Pointer count [uint]
-| 70 	 | Pointers [uint]
-| 5 	 | prty entries
-
-### prty Entry
-
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | byte[68] | Unknown
-
-### sstm
-It looks like it uses the common structure file type + file size. Other than that, the structure is unknown.
-
-### magi
-Each pointer leads to a specific entry's offset.
-
-### magi Structure
-
-| Amount | Description |
-|--------|---------------|
-| 1 	 | Pointer count [uint]
-| 36 	 | Pointers [uint]
-| 5 	 | magi entries
-
-### magi Entry
-
-| Offset | Variable Type | Description |
-|--------|---------------|-------------|
-| 0 	 | byte[124] | Unknown
+Documented in [preferences.md](./preferences.md).
 
 ## Evtp
 
