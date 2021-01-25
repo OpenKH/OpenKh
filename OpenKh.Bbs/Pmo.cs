@@ -482,7 +482,7 @@ namespace OpenKh.Bbs
                 stream.Seek(pmo.textureInfo[i].TextureOffset + 0x10, SeekOrigin.Begin);
                 uint tm2size = stream.ReadUInt32() + 0x10;
                 stream.Seek(pmo.textureInfo[i].TextureOffset, SeekOrigin.Begin);
-                Tm2 tm2 = Tm2.Read(stream).First();
+                Tm2 tm2 = Tm2.Read(stream, true).First();
 
                 pmo.texturesData.Add(tm2);
             }

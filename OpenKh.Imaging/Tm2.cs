@@ -400,14 +400,27 @@ namespace OpenKh.Imaging
             return new Tm2(buff, clut, pic, PixelFormat.Indexed8);
         }
 
-        public static IEnumerable<Tm2> Read(Stream stream)
+        // bRelative controls whether the TM2 file is read from the beginning of the file or the current stream position.
+        public static IEnumerable<Tm2> Read(Stream stream, bool bRelative = false)
         {
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
 
+            if (!bRelative)
+                stream.Seek(0, SeekOrigin.Begin);
+
             var header = BinaryMapping.ReadObject<Header>(stream);
             if (header.Format != 0)
-                stream.Position += 128;
+            {
+                if (bRelative)
+                {
+                    stream.Position += 128;
+                }
+                else
+                {
+                    stream.Position = 128;
+                }
+            }   
 
             if (stream.Length < HeaderLength || header.MagicCode != MagicCode)
                 throw new InvalidDataException("Invalid header");
