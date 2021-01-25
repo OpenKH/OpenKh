@@ -472,21 +472,21 @@ Every enemy is associated to one or more IDs (eg. Organization members have diff
 
 | Offset | Type  | Description
 |--------|------|--------------
-|  0     | short | Identifies the enemy. - [Enemy LIST](../../dictionary/enemy.md)
-|  2     | short | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
-|  4     | short[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
-| 44     | short | Damage Cap. (The higher, the less damage received)
-| 46     | short | ???
-| 48     | short | Physical weakness.
-| 4A     | short | Fire weakness.
-| 4C     | short | Blizzard weakness.
-| 4E     | short | Thunder weakness.
-| 50     | short | Dark weakness.
-| 52     | short | Neutral weakness.
-| 54     | short | General weakness.
-| 56     | short | Exp multiplier.
-| 58     | short | Unknown
-| 5A     | short | Unknown
+| 00     | ushort | Id - [Enemy LIST](../../dictionary/enemy.md)
+| 02     | ushort | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
+| 04     | ushort[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
+| 44     | ushort | Damage Cap (The higher, the less damage received)
+| 46     | ushort | Minimum Damage
+| 48     | ushort | Physical weakness
+| 4A     | ushort | Fire weakness
+| 4C     | ushort | Blizzard weakness
+| 4E     | ushort | Thunder weakness
+| 50     | ushort | Dark weakness
+| 52     | ushort | Light weakness
+| 54     | ushort | General weakness
+| 56     | ushort | Exp multiplier
+| 58     | ushort | Prize
+| 5A     | ushort | Bonus Level
 
 ## Patn
 
@@ -557,15 +557,19 @@ Contains informations about starting Character statistics, starting Abilities et
 
 | Offset | Type  | Description
 |--------|-------|--------------
-|  0     | short | Unknown
-|  2     | byte  | Character ID - [Character LIST](../../dictionary/characters.md)
-|  3     | byte  | HP
-|  4     | byte  | MP
-|  5     | byte  | AP
-|  6     | short | Unknown
-|  8     | short | Unknown
-|  A     | short | Unknown
-|  C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 00     | ushort | Id
+| 02     | byte  | Character ID - [Character LIST](../../dictionary/characters.md)
+| 03     | byte  | HP
+| 04     | byte  | MP
+| 05     | byte  | AP
+| 06     | byte  | Strength
+| 07     | byte  | Magic
+| 08     | byte  | Defense
+| 09     | byte  | Armor Slots
+| 0A     | byte  | Accessory Slots
+| 0B     | byte  | Item Slots
+| 0C     | ushort[32] | Starting items (abilities, magic etc. Refer to ITEM from 03system*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 48     | byte[52] | Padding
 
 NOTE: Abilities that are enabled by default begin with an 8.
 
@@ -591,17 +595,16 @@ Data on limits.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-|  0     | byte | ID
-|  1     | byte  | Character - [Character/Summon LIST](../../dictionary/characters.md)
-|  2     | byte  | Summon - [Character/Summon LIST](../../dictionary/characters.md)
-|  3     | byte  | Group (3 requires all of the characters to be alive)
-|  4     | char[32]  | Filename
-| 24     | ushort | Spawn - [OBJ LIST](../../dictionary/obj.md)
-| 26     | byte[2] | Padding
-| 28     | ushort | Command - [Command LIST](../../dictionary/commands.md)
-| 2A     | ushort | Limit - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 2C     | byte | Used for Timeless River versions (0D) (May be more bytes)
-| 2D     | byte[19] | Padding
+| 00     | byte | ID
+| 01     | byte  | Character - [Character/Summon LIST](../../dictionary/characters.md)
+| 02     | byte  | Summon - [Character/Summon LIST](../../dictionary/characters.md)
+| 03     | byte  | Group (3 requires all of the characters to be alive)
+| 04     | char[32]  | Filename
+| 36     | uint | Spawn Id - [OBJ LIST](../../dictionary/obj.md)
+| 40     | ushort | Command - [Command LIST](../../dictionary/commands.md)
+| 42     | ushort | Limit - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 44     | byte | World (Used for Timeless River versions (0D))
+| 45     | byte[19] | Padding
 
 ## Sumn
 
