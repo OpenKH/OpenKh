@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
@@ -62,7 +61,25 @@ namespace OpenKh.Kh2
             JIGSAW = 0x18,
         }
 
-        public enum CommandMenuOptions : byte
+        public enum TargetType : byte
+        {
+            M = 0,
+            S = 1,
+            L = 2
+        }
+
+        public enum ShadowSize : byte
+        {
+            NoShadow = 0,
+            SmallShadow = 1,
+            MiddleShadow = 2,
+            LargeShadow = 3,
+            SmallMovingShadow = 4,
+            MiddleMovingShadow = 5,
+            LargeMovingShadow = 6
+        }
+
+        public enum Form : byte
         {
             [Description("Sora / Roxas")]
             SoraRoxasDefault = 0x0,
@@ -80,15 +97,15 @@ namespace OpenKh.Kh2
             AntiForm = 0x6,
             [Description("Lion King Sora")]
             LionKingSora = 0x7,
-            [Description("Magic, Drive, Party and Limit commands are greyed out")]
-            Unk08 = 0x8,
-            [Description("Drive, Party and Limit commands are greyed out (not used ingame)")]
-            Unk09 = 0x9,
+            [Description("Atlantica Sora")]
+            AtlanticaSora = 0x8,
+            [Description("Sora on Carpet")]
+            SoraCarpet = 0x9,
             [Description("Roxas Dual-Wield")]
             RoxasDualWield = 0xA,
-            [Description("Only Attack and Summon commands are available")]
+            [Description("Default (used on Enemies)")]
             Default = 0xB,
-            [Description("Sora in Cube / Card Form (Luxord battle, not used ingame)")]
+            [Description("Sora in Cube / Card Form")]
             CubeCardForm = 0xC,
         }
 
@@ -99,16 +116,16 @@ namespace OpenKh.Kh2
         [Data] public byte WeaponJoint { get; set; }
         [Data(Count = 32)] public string ModelName { get; set; }
         [Data(Count = 32)] public string AnimationName { get; set; }
-        [Data] public ushort Flag { get; set; }
-        [Data] public byte TargetType { get; set; }
+        [Data] public ushort Flags { get; set; }
+        [Data] public TargetType ObjectTargetType { get; set; }
         [Data] public byte Padding { get; set; }
         [Data] public ushort NeoStatus { get; set; }
         [Data] public ushort NeoMoveset { get; set; }
         [Data] public float Weight { get; set; }
         [Data] public byte SpawnLimiter { get; set; }
         [Data] public byte Page { get; set; }
-        [Data] public byte ShadowSize { get; set; }
-        [Data] public CommandMenuOptions CommandMenuOption { get; set; }
+        [Data] public ShadowSize ObjectShadowSize { get; set; }
+        [Data] public Form ObjectForm { get; set; }
         [Data] public ushort SpawnObject1 { get; set; }
         [Data] public ushort SpawnObject2 { get; set; }
         [Data] public ushort SpawnObject3 { get; set; }

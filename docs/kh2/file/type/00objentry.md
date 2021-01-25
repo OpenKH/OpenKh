@@ -13,24 +13,22 @@ Contains a definition of every object and it's parameters.
 | 07     | byte | Weapon Joint - Points to [Sklt](03system.md#sklt)
 | 08     | char[32] | Model Name
 | 28     | char[32] | Animation Name
-| 48     | ushort | Flag (unknown)
-| 4A     | byte | Target Type*
+| 48     | ushort | [Flags](#flags)
+| 4A     | byte | [Target Type](#target-type)
 | 4B     | byte | Padding
 | 4C     | ushort | Neo Status
 | 4E     | ushort | Neo Moveset
 | 50     | float | Weight*
 | 54     | byte | Spawn Limiter
 | 55     | byte | Page (unknown)
-| 56     | byte | Shadow size
-| 57     | byte | [Command Menu Options](#command-menu-options-fm)
+| 56     | byte | [Shadow Size](#shadow-size)
+| 57     | byte | [Form](#form-fm)
 | 58     | ushort | Spawn additional object 1 - [OBJ LIST](../../dictionary/obj.md)
 | 5A     | ushort | Spawn additional object 2 - [OBJ LIST](../../dictionary/obj.md)
 | 5C     | ushort | Spawn additional object 3 - [OBJ LIST](../../dictionary/obj.md)
 | 5E     | ushort | Spawn additional object 4 - [OBJ LIST](../../dictionary/obj.md)
 
-*1 Ally damage cap (01 for normal damage, 02 for chip damage...)
-
-*2 The first bit is somewhat related to the enemy state. Eg: Undead Pirates lose their immunity if they are changed from 2 to 0
+*The first bit is somewhat related to the enemy state. Eg: Undead Pirates lose their immunity if they are changed from 2 to 0
 
 ### Object Types
 
@@ -62,7 +60,44 @@ Contains a definition of every object and it's parameters.
 | 17 | E_OBJ    | Unknown
 | 18 | JIGSAW   | Puzzle Piece
 
-### Command Menu Options (FM)
+### Flags
+
+| Id   | Description |
+|------|-------------|
+| 0x01 | No APDX
+| 0x02 | Before
+| 0x04 | Fix Color
+| 0x08 | Fly
+| 0x10 | Scissoring
+| 0x20 | Pirate
+| 0x40 | OCC Wall
+| 0x80 | Hift
+
+### Target Type
+
+Ally damage cap (01 for normal damage, 02 for chip damage...)
+
+| Id   | Description |
+|------|-------------|
+| 0x0 | Target Type M
+| 0x1 | Target Type S
+| 0x2 | Target Type L
+
+### Shadow Size
+
+| Id  | Description |
+|-----|-------------|
+| 0x0 | No shadow
+| 0x1 | Small shadow
+| 0x2 | Middle shadow
+| 0x3 | Large shadow
+| 0x4 | Small moving shadow
+| 0x5 | Middle moving shadow
+| 0x6 | Large moving shadow
+
+### Form (FM)
+
+Controls which actions are possible in the command menu.
 
 | Id | Description |
 |----|-------------|
@@ -74,8 +109,8 @@ Contains a definition of every object and it's parameters.
 | 05 | Final Form
 | 06 | Anti Form
 | 07 | Lion King Sora
-| 08 | Magic, Drive, Party and Limit commands are greyed out
-| 09 | Drive, Party and Limit commands are greyed out (not used ingame)
-| 0A | Same as 08, only used in P_EX110_BTLF (Roxas Dual-Wield)
-| 0B | Only Attack and Summon commands are available, default
-| 0C | Sora in Cube / Card Form (Luxord battle, not used ingame)
+| 08 | Atlantica Sora (Magic, Drive, Party and Limit commands are greyed out)
+| 09 | Sora on Carpet (Drive, Party and Limit commands are greyed out)
+| 0A | Roxas Dual-Wield
+| 0B | Default (used on Enemies)
+| 0C | Sora in Cube / Card Form
