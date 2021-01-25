@@ -48,37 +48,85 @@ The damage effects' values on MSET files point to this table.
 |--------|---------------|-------------|
 | 0 	 | ushort | SubId
 | 2 	 | ushort | Id
-| 4 	 | byte | Type (0 normal, 1 pierces armor...)
+| 4 	 | byte | [Type](#type)
 | 5 	 | byte | Critical Adjust (0 normal, 1 half damage, 2 no damage)
 | 6 	 | ushort | Power
 | 8 	 | byte | Team (Deal damage to: 0/1/2 Enemies, 3/4/5 Enemies and allies...)
 | 9 	 | byte | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
-| A 	 | byte | Reaction (Whether an enemy is flinched, knocked...)
-| B 	 | byte | Effect on hit (0 none, other values = different effects)
-| C 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
-| E 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
-| 10 	 | short | ???
-| 12 	 | byte | Flag (Eg: 20/22 can defeat bosses)
-| 13 	 | byte | Refact Self
-| 14 	 | byte | Refact Other
-| 15 	 | byte | Reflected motion (Points to the slot in the MSET to be triggered when the attack is reflected)
-| 16 	 | short | Reflect Hit Back
-| 18 	 | int | Reflect Action
-| 1C 	 | int | Hit Sound Effect
-| 20 	 | ushort | Reflect RC
-| 22 	 | byte | Reflect Range
-| 23 	 | sbyte | Reflect Angle
-| 24 	 | byte | Damage Effect
-| 25 	 | byte | Switch
-| 26 	 | ushort | Interval (1 hit every X frames)
-| 28 	 | byte | Floor Check
-| 29 	 | byte | Drive drain (Adds on normal state, reduces when in a form)
-| 2A 	 | byte | Revenge damage
-| 2B 	 | byte | Tr Reaction
-| 2C 	 | byte | Combo Group
-| 2D 	 | byte | Random Effect
-| 2E 	 | byte | Kind
-| 2F 	 | byte | HP drain (Adds on normal state, reduces when in a form)
+| 10 	 | byte | Reaction (Whether an enemy is flinched, knocked...)
+| 11 	 | byte | Effect on hit (0 none, other values = different effects)
+| 12 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
+| 14 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
+| 16 	 | short | ???
+| 18 	 | byte | [Flags](#flags)
+| 19 	 | byte | [Refact Self](#refact)
+| 20 	 | byte | [Refact Other](#refact)
+| 21 	 | byte | Reflected motion (Points to the slot in the MSET to be triggered when the attack is reflected)
+| 22 	 | short | Reflect Hit Back
+| 24 	 | int | Reflect Action
+| 28 	 | int | Hit Sound Effect
+| 32 	 | ushort | Reflect RC
+| 34 	 | byte | Reflect Range
+| 35 	 | sbyte | Reflect Angle
+| 36 	 | byte | Damage Effect
+| 37 	 | byte | Switch
+| 38 	 | ushort | Interval (1 hit every X frames)
+| 40 	 | byte | Floor Check
+| 41 	 | byte | Drive drain (Adds on normal state, reduces when in a form)
+| 42 	 | byte | Revenge damage
+| 43 	 | byte | [Tr Reaction](#tr-reaction)
+| 44 	 | byte | Combo Group
+| 45 	 | byte | Random Effect
+| 46 	 | byte | [Kind](#kind)
+| 47 	 | byte | HP drain (Adds on normal state, reduces when in a form)
+
+#### Type
+
+| Id | Description |
+|----|-------------|
+| 0  | Normal attack
+| 1  | Pierce armor
+| 2  | Guard
+| 3  | S Guard
+| 4  | Special
+| 5  | Cure
+| 6  | C Cure
+
+#### Flags
+
+| Id   | Description |
+|------|-------------|
+| 0x01 | BG Hit
+| 0x02 | Limit PAX
+| 0x04 | Land
+| 0x08 | Capture PAX
+| 0x10 | Thank you
+| 0x20 | Kill Boss
+
+#### Refact
+
+| Id | Description |
+|----|-------------|
+| 0  | Reflect
+| 1  | Guard
+| 2  | Nothing
+
+#### Tr Reaction
+
+| Id | Description |
+|----|-------------|
+| 0  | Attack
+| 1  | Charge
+| 2  | Crash
+| 3  | Wall
+
+#### Kind
+
+| Id   | Description |
+|------|-------------|
+| 0x01 | Combo Finisher
+| 0x02 | Air Combo Finisher
+| 0x04 | Reaction Command
 
 ## Ptya
 
