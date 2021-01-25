@@ -366,17 +366,17 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 
 | Offset | Type  | Description
 |--------|-------|--------------
-|  0     | byte  | ID - [EVENT LIST](../../dictionary/events.md)
-|  1     | byte  | Character Id
-|  2     | byte  | HP Increase
-|  3     | byte  | MP Increase
-|  4     | byte  | Drive Gauge Upgrade
-|  5     | byte  | Item Slot Upgrade
-|  6     | byte  | Accessory Slot Upgrade
-|  7     | byte  | Armor Slot Upgrade
-|  8     | short | Bonus Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-|  A     | short | Bonus Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-|  C     | int   | Unknown
+| 00     | byte  | ID - [EVENT LIST](../../dictionary/events.md)
+| 01     | byte  | Character Id
+| 02     | byte  | HP Increase
+| 03     | byte  | MP Increase
+| 04     | byte  | Drive Gauge Upgrade
+| 05     | byte  | Item Slot Upgrade
+| 06     | byte  | Accessory Slot Upgrade
+| 07     | byte  | Armor Slot Upgrade
+| 08     | ushort | [Bonus Item 1](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 10     | ushort | [Bonus Item 2](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 12     | int   | Padding
 
 ## Btlv
 
