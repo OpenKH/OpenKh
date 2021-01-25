@@ -177,7 +177,7 @@ The ID of the entry is assigned in the AI of the object.
 | 08     | byte  | Big MP orbs
 | 09     | byte  | Small Drive orbs
 | 0A     | byte  | Big Drive orbs
-| 0B     | byte  | Unknown
+| 0B     | byte  | Padding
 | 0C     | ushort  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 0E     | short  | Item 1 Drop Percentage
 | 10     | ushort  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
@@ -707,10 +707,19 @@ Data on unknown
 
 ### Stop Entry
 
-| Offset | Type  | Description
-|--------|-------|-------------
+| Offset | Type  | Description |
+|--------|-------|-------------|
 | 00     | ushort  | ID
-| 02     | ushort  | ???
+| 02     | ushort  | [Flags](#flags)
+
+#### Flags
+
+| Id  | Description
+|-----|------------|
+| 0x1 | Exist
+| 0x2 | Disable Damage Reaction
+| 0x4 | Star
+| 0x8 | Disable Draw
 
 
 ## 0A
