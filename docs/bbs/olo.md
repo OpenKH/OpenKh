@@ -1,6 +1,5 @@
 # [Kingdom Hearts Birth By Sleep](index.md) - OLO format (Object Spawner)
 
-<<<<<<< HEAD
 This file controls what objects and how they're spawned in levels within [Kingdom Hearts Birth by Sleep](../../index.md).
 
 # Header

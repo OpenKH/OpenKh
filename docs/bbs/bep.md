@@ -1,4 +1,5 @@
 # BEP Format
+
 BEP stands for *Base Enemy Parameter* and it controls the general status for the character amongst other things.
 It is only used for one file named `EnemyCommon.bep`.
 

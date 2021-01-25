@@ -1,4 +1,5 @@
 # EPD Format
+
 EPD stands for Entity Parameter Data and contains all the stats related to the character stats.
 
 The format consists on the following structures in order:  
