@@ -21,7 +21,7 @@
             "Enchanted Dominion",
             "Mysterious Tower",
             "Radiant Garden",
-            "Dark Workd",
+            "Dark World",
             "Olympus Coliseum",
             "Deep Space",
             "Destiny Island",
@@ -32,12 +32,12 @@
             "Mirage Arena",
             "Command Board",
             "World Map",
-            "WP - ???",
+            "WP - Winnie the Pooh",
             "19 - Unused",
             "20 - Unused",
             "21 - Unused",
             "22 - Unused",
-            "JF - ??",
+            "JF - Jump Festa",
         };
 
         public static readonly string[] Language =

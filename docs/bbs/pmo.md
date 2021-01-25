@@ -9,7 +9,10 @@ The format supports varying vertex types and has support for animation bones and
 | Offset | Type | Description |
 |--------|------|-------------|
 | 0x0    | uint32 | Magic Value. Always "PMO\0" (0x004F4D50) |
-| 0x4    | uint8[4] | unknown |
+| 0x4    | uint8 | Number |
+| 0x5    | uint8 | Group |
+| 0x6    | uint8 | Version |
+| 0x7    | uint8 | Padding |
 | 0x8    | uint16 | Texture Count |
 | 0xA    | uint16 | unknown |
 | 0xC    | uint32 | Skeleton Offset |
@@ -18,7 +21,7 @@ The format supports varying vertex types and has support for animation bones and
 | 0x16   | uint16 | Vertex Count |
 | 0x18   | float  | Model Scale |
 | 0x1C   | uint32 | Mesh Offset 1 |
-| 0x20   | float[8][4] | Bounding Box |
+| 0x20   | Vector4[8] | Bounding Box |
 
 ## Texture Info
 
@@ -42,9 +45,9 @@ See also: [TIM2](../common/tm2.md)
 | 0x2    | uint8 | Texture ID, an index into the list of `Texture Info` records |
 | 0x3    | uint8 | Vertex Size, in bytes |
 | 0x4    | uint32 | Vertex Flags, see below |
-| 0x8    | uint8 | unkown |
+| 0x8    | uint8 | Group |
 | 0x9    | uint8 | Triangle Strip count |
-| 0x10   | uint8[2] | unknown |
+| 0xA    | uint16 | Vertex Attribute |
 | varies | uint8[8] | List of bone indices which effect this section. Only present if the PMO blob contains a skeleton (ie: `header.skeletonOffset != 0`) |
 | varies | uint32 | Diffuse Color. Only present if `vertexFlags.DiffuseColor & 1` |
 
@@ -71,7 +74,36 @@ The Primative type bits correspond to the primative type bits of the PSP's [GE P
 | 23 | 1 | Skip Transform Pipline (Not used by BBS) |
 | 24 | 1 | Uniform Diffuse Flag |
 | 25 | 3 | Unknown, possibly unused |
-| 28 | 4 | Primative Type |
+| 28 | 4 | Primitive Type |
+
+### Vertex Attribute
+
+This field defines what kind of primitive is being rendered.
+
+| Value    |       Name           |      Meaning     |
+|----------|----------------------|------------------|
+| 0        | ATTR_BLEND_NONE      |                  |
+| 1        | ATTR_NOMATERIAL      |                  |
+| 2        | ATTR_GLARE           |                  |
+| 4        | ATTR_BACK            |                  |
+| 8        | ATTR_DIVIDE          |                  |
+| 16       | ATTR_TEXALPHA        |                  |
+| 24       | FLAG_SHIFT           |                  |
+| 28       | PRIM_SHIFT           |                  |
+| 32       | ATTR_BLEND_SEMITRANS |                  |
+| 64       | ATTR_BLEND_ADD       |                  |
+| 96       | ATTR_BLEND_SUB       |                  |
+| 224      | ATTR_BLEND_MASK      |                  |
+| 256      | ATTR_8               |                  |
+| 512      | ATTR_9               |                  |
+| 1024     | ATTR_DROPSHADOW      |                  |
+| 2048     | ATTR_ENVMAP          |                  |
+| 4096     | ATTR_12              |                  |
+| 8192     | ATTR_13              |                  |
+| 16384    | ATTR_14              |                  |
+| 32768    | ATTR_15              |                  |
+| 16777216 | FLAG_COLOR           |                  |
+| 33554432 | FLAG_NOWEIGHT        |                  |
 
 Texture Format, Normal Format, Position Format and Weight Format are as follows:
 
@@ -108,7 +140,7 @@ Index Format has not been seen in actual PMO blobs, but if it is used the expect
 
 Uniform Diffuse Flag indicates that all vertices in the section should use the same vertex color, which follows the header before the vertex data. See header structure above.
 
-Primative Type is as follows:
+Primitive Type is as follows:
 
 | Value | Meaning |
 |-------|---------|
@@ -151,20 +183,23 @@ Vertex properties which are in the format `8-bit normalized` or `16-bit normaliz
 | Offset | Type | Description |
 |--------|------|-------------|
 | 0x0    | uint32 | Magic Value. Always "BON\0" |
-| 0x4    | uint32 | unknown |
-| 0x8    | uint32 | Joint Count |
-| 0xC    | uint16 | Unknown, possibly number of skinned joints |
-| 0xE    | uint16 | Unknown, possibly skinning start index |
+| 0x4    | uint32 | padding |
+| 0x8    | uint16 | Maximum Bone Count |
+| 0x8    | uint16 | Bone Count |
+| 0xC    | uint16 | Skinned Bones |
+| 0xE    | uint16 | Skinned Bones Initial Index |
 
 ### Joint Definition
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 0x0 | uint16 | Joint Index |
+| 0x0 | uint16 | Bone Index |
 | 0x2 | uint16 | Padding |
-| 0x4 | uint16 | Parent Joint Index - 0xFFFF indicates no parent|
+| 0x4 | uint16 | Parent Bone Index - 0xFFFF indicates no parent|
 | 0x6 | uint16 | Padding |
-| 0x8 | uint32 | Unknown, possibly skinning index |
-| 0x10 | char[0x10] | Joint Name |
+| 0x8 | uint16 | Skinning Index |
+| 0xA | uint16 | Padding |
+| 0xC | uint32 | Padding |
+| 0x10 | char[16] | Bone Name |
 | 0x20 | float[4][4] | Transform |
 | 0x60 | float[4][4] | Inverse Transform |
