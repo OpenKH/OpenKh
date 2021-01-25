@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using OpenKh.Tools.LayoutEditor.Interfaces;
 using System;
 using OpenKh.Kh2;
@@ -70,7 +70,7 @@ namespace OpenKh.Tools.LayoutEditor
             _drawing = new MonoSpriteDrawing(_graphics, _shader);
             _destinationTexture = _drawing.CreateSpriteTexture(1024, 1024);
             _destinationTextureId = this.BindTexture(_destinationTexture);
-            
+
             _debugRender = new DefaultDebugLayoutRenderer();
             _spriteTextures = images.Select(x => _drawing.CreateSpriteTexture(x)).ToList();
             _renderer = new LayoutRenderer(_layout, _drawing, _spriteTextures);
@@ -114,7 +114,7 @@ namespace OpenKh.Tools.LayoutEditor
 
                     ForMenuBar(_sequenceEditor.Menu);
                     _sequenceEditor.Run();
-                    
+
                     ImGui.EndPopup();
                 }
             }

@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Tools.Kh2MapStudio.Interfaces
+namespace OpenKh.Tools.Kh2MapStudio.Interfaces
 {
     interface ILayerController
     {

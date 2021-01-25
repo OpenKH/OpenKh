@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Bbs.Messages;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
@@ -46,7 +46,8 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
                             x += fontContext.Info.CharacterWidth / 2;
                         continue;
                     }
-                    if (chInfo.Palette >= 2) continue;
+                    if (chInfo.Palette >= 2)
+                        continue;
 
                     var texture = chInfo.Palette == 0 ? texture1 : texture2;
                     var source = new Rectangle

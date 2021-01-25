@@ -1,4 +1,4 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -100,7 +100,7 @@ namespace OpenKh.Command.Bbsa
                 }
             }
         }
-        
+
         private class ListCommand
         {
             [Required]

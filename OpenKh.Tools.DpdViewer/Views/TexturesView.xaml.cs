@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,14 +15,14 @@ using System.Windows.Shapes;
 
 namespace OpenKh.Tools.DpdViewer.Views
 {
-	/// <summary>
-	/// Interaction logic for TexturesView.xaml
-	/// </summary>
-	public partial class TexturesView : UserControl
-	{
-		public TexturesView()
-		{
-			InitializeComponent();
-		}
-	}
+    /// <summary>
+    /// Interaction logic for TexturesView.xaml
+    /// </summary>
+    public partial class TexturesView : UserControl
+    {
+        public TexturesView()
+        {
+            InitializeComponent();
+        }
+    }
 }

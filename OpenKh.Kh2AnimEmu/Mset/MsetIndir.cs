@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

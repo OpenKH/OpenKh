@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -67,11 +67,11 @@ namespace OpenKh.Command.CoctChanger.Utils
                 , it => it.v00
             )
                 .Add(
-                    "SurfaceFlags", 
+                    "SurfaceFlags",
                     face.SurfaceFlags.Flags.ToString("X8")
                 )
                 .Add(
-                    "Vertices", 
+                    "Vertices",
                     string.Join(
                         ", ",
                         new int[] {

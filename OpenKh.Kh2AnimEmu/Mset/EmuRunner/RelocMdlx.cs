@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -94,7 +94,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                 os.Position = off + 16 * (1 + c);
                 uint c00 = br.ReadUInt32();
                 uint pos = UtReloc.Rel4(os, (uint)(off + 16 * (1 + c) + 8), reloc).oldVal;
-                if (c00 == 0x04) r = ty04(pos);
+                if (c00 == 0x04)
+                    r = ty04(pos);
             }
             return r;
         }

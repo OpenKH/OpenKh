@@ -1,4 +1,4 @@
-﻿//#define UsePressed_eeram
+//#define UsePressed_eeram
 //#define AllowRec1
 //#define Allow_DEB_eeram01
 
@@ -107,7 +107,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             uint s2 = tmp2; // st1;
             uint a1 = s2;
 
-            for (int w = 0; w < 65536; w++) ee.ram[w] = 0;
+            for (int w = 0; w < 65536; w++)
+                ee.ram[w] = 0;
 
             if (true)
             {
@@ -120,7 +121,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                     Rxyz      ,Txyz      ,tmp3 ,tmp4,
                     0x0       ,0x0       ,0x0  ,0,
                 };
-                foreach (uint ui in st1al) wr.Write(ui);
+                foreach (uint ui in st1al)
+                    wr.Write(ui);
             }
 
             uint offMsetRoot = 15 * 1024 * 1024;
@@ -186,7 +188,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                     {
                         o1.pfns[ee.pc]();
                     }
-                    else throw new RecfnnotFound(ee.pc, "rc3");
+                    else
+                        throw new RecfnnotFound(ee.pc, "rc3");
                 }
             }
             // Opt2
@@ -234,7 +237,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                     {
                         o1.pfns[ee.pc]();
                     }
-                    else throw new RecfnnotFound(ee.pc, "rc2");
+                    else
+                        throw new RecfnnotFound(ee.pc, "rc2");
                 }
             }
             // Opt1
@@ -351,7 +355,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             uint s2 = tmp2; // st1;
             uint a1 = s2;
 
-            for (int w = 0; w < 65536; w++) ee.ram[w] = 0;
+            for (int w = 0; w < 65536; w++)
+                ee.ram[w] = 0;
 
             if (true)
             {
@@ -364,7 +369,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                     Rxyz      ,Txyz      ,tmp3 ,tmp4,
                     0x0       ,0x0       ,0x0  ,0,
                 };
-                foreach (uint ui in st1al) wr.Write(ui);
+                foreach (uint ui in st1al)
+                    wr.Write(ui);
             }
 
             uint offMsetRoot = 25 * 1024 * 1024;
@@ -430,7 +436,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                     {
                         o1.pfns[ee.pc]();
                     }
-                    else throw new RecfnnotFound(ee.pc, "rc3");
+                    else
+                        throw new RecfnnotFound(ee.pc, "rc3");
                 }
             }
             // Opt2
@@ -478,7 +485,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                     {
                         o1.pfns[ee.pc]();
                     }
-                    else throw new RecfnnotFound(ee.pc, "rc2");
+                    else
+                        throw new RecfnnotFound(ee.pc, "rc2");
                 }
             }
 
@@ -488,15 +496,18 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
                 si.Position = Sxyz;
                 Svec = new float[4 * cnt1];
-                for (int a = 0; a < 4 * cnt1; a++) Svec[a] = br.ReadSingle();
+                for (int a = 0; a < 4 * cnt1; a++)
+                    Svec[a] = br.ReadSingle();
 
                 si.Position = Rxyz;
                 Rvec = new float[4 * cnt1];
-                for (int a = 0; a < 4 * cnt1; a++) Rvec[a] = br.ReadSingle();
+                for (int a = 0; a < 4 * cnt1; a++)
+                    Rvec[a] = br.ReadSingle();
 
                 si.Position = Txyz;
                 Tvec = new float[4 * cnt1];
-                for (int a = 0; a < 4 * cnt1; a++) Tvec[a] = br.ReadSingle();
+                for (int a = 0; a < 4 * cnt1; a++)
+                    Tvec[a] = br.ReadSingle();
             }
 
             cntPass++;
@@ -570,7 +581,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                     };
                     foreach (string s in al)
                     {
-                        if (File.Exists(s)) return s;
+                        if (File.Exists(s))
+                            return s;
                     }
                     return al[1];
                 }

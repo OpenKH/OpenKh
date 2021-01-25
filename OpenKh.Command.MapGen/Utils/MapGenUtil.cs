@@ -1,4 +1,4 @@
-﻿using NLog;
+using NLog;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Kh2;
 using OpenKh.Common;

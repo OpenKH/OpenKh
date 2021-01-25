@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
         private int _selectedTextureIndex;
 
         public bool HasResourceBeenSelected { get; private set; }
-        public Bar.Entry SelectedAnimation{ get; private set; }
+        public Bar.Entry SelectedAnimation { get; private set; }
         public Bar.Entry SelectedTexture { get; private set; }
 
         public ResourceSelectionDialog(

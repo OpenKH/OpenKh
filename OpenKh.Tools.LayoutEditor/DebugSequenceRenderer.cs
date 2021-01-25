@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Renders;
+using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace OpenKh.Tools.LayoutEditor
 
         private Sequence.AnimationGroup _animationGroup;
         private State[] _animationStates = new State[0];
-        
+
         public int FocusOnAnimation { get; set; } = -1;
 
         public Sequence.AnimationGroup AnimationGroup

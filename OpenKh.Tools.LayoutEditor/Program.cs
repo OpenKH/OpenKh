@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.Common.CustomImGui;
+using OpenKh.Tools.Common.CustomImGui;
 using System;
 
 namespace OpenKh.Tools.LayoutEditor

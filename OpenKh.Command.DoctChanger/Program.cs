@@ -1,4 +1,4 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Kh2;
 using OpenKh.Common;
 using System;

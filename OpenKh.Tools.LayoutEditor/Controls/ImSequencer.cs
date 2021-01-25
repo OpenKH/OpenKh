@@ -1,4 +1,4 @@
-﻿// The MIT License(MIT)
+// The MIT License(MIT)
 // 
 // Copyright(c) 2016 Cedric Guillemet
 // 
@@ -366,7 +366,8 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
                 int halfModFrameCount = modFrameCount / 2;
 
-                Action<int, int> drawLine = (int i, int regionHeight) => {
+                Action<int, int> drawLine = (int i, int regionHeight) =>
+                {
                     const uint TextColor = 0xFFBBBBBB;
 
                     bool baseIndex = ((i % modFrameCount) == 0) || (i == sequence.FrameMax || i == sequence.FrameMin);
@@ -481,7 +482,8 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                 draw_list.PushClipRect(childFramePos + new Vector2((float)(legendWidth), 0f), childFramePos + childFrameSize);
 
                 // vertical frame lines in content area
-                Action<int, int> drawLineContent = (int i, int regionHeight) => {
+                Action<int, int> drawLineContent = (int i, int regionHeight) =>
+                {
                     int px = (int)canvas_pos.X + (int)(i * framePixelWidth) + legendWidth - (int)(firstFrameUsed * framePixelWidth);
                     int tiretStart = (int)(contentMin.Y);
                     int tiretEnd = (int)(contentMax.Y);
@@ -507,7 +509,8 @@ namespace OpenKh.Tools.LayoutEditor.Controls
                     // draw background differently if selected
                     var customHeight = 0;
                     for (int i = 0; i < selectedEntry; i++)
-                        customHeight += sequence.GetCustomHeight(i); ;
+                        customHeight += sequence.GetCustomHeight(i);
+                    ;
                     draw_list.AddRectFilled(
                         new Vector2(contentMin.X, contentMin.Y + ItemHeight * selectedEntry + customHeight),
                         new Vector2(contentMin.X + canvas_size.X, contentMin.Y + ItemHeight * (selectedEntry + 1) + customHeight),

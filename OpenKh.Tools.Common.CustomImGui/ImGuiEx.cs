@@ -25,7 +25,7 @@ namespace OpenKh.Tools.Common.CustomImGui
                 Action = action;
             }
         }
-        
+
         public const float FontSizeMultiplier = 96f / 72f;
 
         public unsafe static void SetWpfStyle()
@@ -151,7 +151,8 @@ namespace OpenKh.Tools.Common.CustomImGui
 
         public static bool ForControl(Func<bool> begin, Action end, Action action)
         {
-            if (!begin()) return false;
+            if (!begin())
+                return false;
             action();
             end();
 
@@ -160,7 +161,8 @@ namespace OpenKh.Tools.Common.CustomImGui
 
         public static bool ForControl(Func<bool> begin, Action action)
         {
-            if (!begin()) return false;
+            if (!begin())
+                return false;
             action();
 
             return true;

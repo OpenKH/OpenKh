@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.IdxImg.ViewModels;
+using OpenKh.Tools.IdxImg.ViewModels;
 using System.Windows;
 
 namespace OpenKh.Tools.IdxImg

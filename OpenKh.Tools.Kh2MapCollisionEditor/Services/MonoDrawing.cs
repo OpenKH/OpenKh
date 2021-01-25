@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -101,7 +101,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
         public ISurface CreateSurface(int width, int height, PixelFormat pixelFormat, SurfaceType type = SurfaceType.Input, DataResource dataResource = null)
         {
             Texture2D texture;
-            
+
             switch (type)
             {
                 case SurfaceType.Input:

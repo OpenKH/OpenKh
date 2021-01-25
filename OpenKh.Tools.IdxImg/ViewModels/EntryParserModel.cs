@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +34,7 @@ namespace OpenKh.Tools.IdxImg.ViewModels
                 entries
                 .Where(x => x.IsLeaf(depth) && !x.IsIdx)
                 .Select(x => new FileViewModel(x, idxManager));
-            
+
             var tree = dirs.Cast<EntryViewModel>().Concat(files);
             if (depth == 0)
                 tree = entries

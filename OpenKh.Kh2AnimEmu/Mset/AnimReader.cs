@@ -68,9 +68,12 @@ namespace OpenKh.Kh2Anim.Mset
                     for (int i9 = 0; i9 < cnt9; i9++)
                     {
                         br.ReadUInt16();
-                        int ti10 = br.ReadUInt16(); cnt10 = Math.Max(cnt10, ti10 + 1);
-                        int ti12a = br.ReadUInt16(); cnt12 = Math.Max(cnt12, ti12a + 1);
-                        int ti12b = br.ReadUInt16(); cnt12 = Math.Max(cnt12, ti12b + 1);
+                        int ti10 = br.ReadUInt16();
+                        cnt10 = Math.Max(cnt10, ti10 + 1);
+                        int ti12a = br.ReadUInt16();
+                        cnt12 = Math.Max(cnt12, ti12a + 1);
+                        int ti12b = br.ReadUInt16();
+                        cnt12 = Math.Max(cnt12, ti12b + 1);
                     }
                 }
             }
@@ -83,13 +86,15 @@ namespace OpenKh.Kh2Anim.Mset
                     br.ReadUInt16();
                     br.ReadUInt16();
                     br.ReadUInt16();
-                    int ti8 = br.ReadInt16(); cntt8 = Math.Max(cntt8, ti8 + 1);
+                    int ti8 = br.ReadInt16();
+                    cntt8 = Math.Max(cntt8, ti8 + 1);
                     br.ReadUInt16();
                     br.ReadUInt16();
                 }
             }
 
-            int off1 = tbloff + posTbl.vb4; int cnt1 = posTbl.vb8;
+            int off1 = tbloff + posTbl.vb4;
+            int cnt1 = posTbl.vb8;
             si.Position = off1;
             for (int a1 = 0; a1 < cnt1; a1++)
             {
@@ -107,7 +112,8 @@ namespace OpenKh.Kh2Anim.Mset
                 model.t10List[a] = br.ReadSingle();
             }
 
-            int off11 = tbloff + posTbl.vd4; int cnt11 = posTbl.vb0;
+            int off11 = tbloff + posTbl.vd4;
+            int cnt11 = posTbl.vb0;
             si.Position = off11;
             model.t11List = new float[cnt11];
             for (int a = 0; a < cnt11; a++)
@@ -134,7 +140,8 @@ namespace OpenKh.Kh2Anim.Mset
                 model.t9List.Add(new T9(c00, c02, c04, c06));
             }
 
-            int off2 = tbloff + posTbl.vc0; int cnt2 = posTbl.vc4;
+            int off2 = tbloff + posTbl.vc0;
+            int cnt2 = posTbl.vc4;
             si.Position = off2;
             for (int a = 0; a < cnt2; a++)
             {
@@ -162,7 +169,8 @@ namespace OpenKh.Kh2Anim.Mset
                 }
             }
 
-            int off2x = tbloff + posTbl.vc8; int cnt2x = posTbl.vcc;
+            int off2x = tbloff + posTbl.vc8;
+            int cnt2x = posTbl.vcc;
             si.Position = off2x;
             for (int a = 0; a < cnt2x; a++)
             {
@@ -190,7 +198,8 @@ namespace OpenKh.Kh2Anim.Mset
                 }
             }
 
-            int off3 = tbloff + posTbl.ve0; int cnt3 = posTbl.ve4;
+            int off3 = tbloff + posTbl.ve0;
+            int cnt3 = posTbl.ve4;
             si.Position = off3;
             for (int a3 = 0; a3 < cnt3; a3++)
             {
@@ -203,7 +212,8 @@ namespace OpenKh.Kh2Anim.Mset
                 model.t3List.Add(new T3(c00, c01, c02, c04, c06, c08));
             }
 
-            int off4 = tbloff + posTbl.vac; int cnt4 = posTbl.va2;
+            int off4 = tbloff + posTbl.vac;
+            int cnt4 = posTbl.va2;
             si.Position = off4;
             for (int a4 = 0; a4 < cnt4; a4++)
             {
@@ -212,7 +222,8 @@ namespace OpenKh.Kh2Anim.Mset
                 model.t4List.Add(new T4(c00, c02));
             }
 
-            model.off5 = tbloff + posTbl.va8; model.cnt5 = (posTbl.va2 - posTbl.va0);
+            model.off5 = tbloff + posTbl.va8;
+            model.cnt5 = (posTbl.va2 - posTbl.va0);
             si.Position = model.off5;
             for (int a5 = 0; a5 < model.cnt5; a5++)
             {

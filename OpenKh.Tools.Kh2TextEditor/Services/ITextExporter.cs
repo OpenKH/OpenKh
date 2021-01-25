@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.Kh2TextEditor.Models;
+using OpenKh.Tools.Kh2TextEditor.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;

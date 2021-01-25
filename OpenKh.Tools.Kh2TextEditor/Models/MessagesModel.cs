@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using OpenKh.Tools.Kh2TextEditor.Interfaces;
 using System;

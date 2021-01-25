@@ -1,4 +1,4 @@
-﻿//#define UseUnsafe
+//#define UseUnsafe
 #define UseBitConverter
 
 using System;
@@ -28,22 +28,35 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             {
                 switch (x & 3)
                 {
-                    default: return (byte)((UL[x >> 2]));
-                    case 1: return (byte)((UL[x >> 2] >> 8));
-                    case 2: return (byte)((UL[x >> 2] >> 16));
-                    case 3: return (byte)((UL[x >> 2] >> 24));
+                    default:
+                        return (byte)((UL[x >> 2]));
+                    case 1:
+                        return (byte)((UL[x >> 2] >> 8));
+                    case 2:
+                        return (byte)((UL[x >> 2] >> 16));
+                    case 3:
+                        return (byte)((UL[x >> 2] >> 24));
                 }
             }
             set
             {
-                if (isR0) return;// throw new IsR0Exception();
+                if (isR0)
+                    return;// throw new IsR0Exception();
                 int v = x >> 2;
                 switch (x & 3)
                 {
-                    default: UL[v] = (UL[v] & 0xFFFFFF00U) | (value); break;
-                    case 1: UL[v] = (UL[v] & 0xFFFF00FFU) | (uint)(value << 8); break;
-                    case 2: UL[v] = (UL[v] & 0xFF00FFFFU) | (uint)(value << 16); break;
-                    case 3: UL[v] = (UL[v] & 0x00FFFFFFU) | (uint)(value << 24); break;
+                    default:
+                        UL[v] = (UL[v] & 0xFFFFFF00U) | (value);
+                        break;
+                    case 1:
+                        UL[v] = (UL[v] & 0xFFFF00FFU) | (uint)(value << 8);
+                        break;
+                    case 2:
+                        UL[v] = (UL[v] & 0xFF00FFFFU) | (uint)(value << 16);
+                        break;
+                    case 3:
+                        UL[v] = (UL[v] & 0x00FFFFFFU) | (uint)(value << 24);
+                        break;
                 }
             }
         }
@@ -67,7 +80,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             }
             set
             {
-                if (isR0) return;// throw new IsR0Exception();
+                if (isR0)
+                    return;// throw new IsR0Exception();
                 if ((x & 1) == 0)
                 {
                     x >>= 1;
@@ -101,7 +115,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             }
             set
             {
-                if (isR0) return;// throw new IsR0Exception();
+                if (isR0)
+                    return;// throw new IsR0Exception();
                 x <<= 1;
                 UL[x] = (uint)(value);
                 UL[x + 1] = (uint)(value >> 32);
@@ -128,7 +143,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             }
             set
             {
-                if (isR0) return;// throw new IsR0Exception();
+                if (isR0)
+                    return;// throw new IsR0Exception();
                 x <<= 1;
                 UL[x] = (uint)(value);
                 UL[x + 1] = (uint)(value >> 32);
@@ -154,7 +170,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             }
             set
             {
-                if (isR0) return;// throw new IsR0Exception();
+                if (isR0)
+                    return;// throw new IsR0Exception();
                 UL[x] = (uint)value;
             }
         }
@@ -227,10 +244,14 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
         public int CompareTo(Vec o)
         {
             int t;
-            if (0 != (t = x.CompareTo(o.x))) return t;
-            if (0 != (t = y.CompareTo(o.y))) return t;
-            if (0 != (t = z.CompareTo(o.z))) return t;
-            if (0 != (t = w.CompareTo(o.w))) return t;
+            if (0 != (t = x.CompareTo(o.x)))
+                return t;
+            if (0 != (t = y.CompareTo(o.y)))
+                return t;
+            if (0 != (t = z.CompareTo(o.z)))
+                return t;
+            if (0 != (t = w.CompareTo(o.w)))
+                return t;
             return 0;
         }
 
@@ -346,7 +367,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
         public void eeWrite64(uint off, ulong val)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 spr1.Position = off & 0x3FFF;
@@ -369,7 +391,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
         }
         public void eeWriteSingle(uint off, float val)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 spr1.Position = off & 0x3FFF;
@@ -391,7 +414,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
         }
         public void eeWrite32(uint off, uint val)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 spr1.Position = off & 0x3FFF;
@@ -414,7 +438,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
         }
         public void eeWrite16(uint off, ushort val)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 spr1.Position = off & 0x3FFF;
@@ -437,7 +462,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
         }
         public void eeWrite8(uint off, byte val)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 spr[off & 0x3FFF] = val;
@@ -460,7 +486,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
         public byte eeRead8(uint off)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 return spr[off & 0x3FFF];
@@ -479,7 +506,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
         public ushort eeRead16(uint off)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 return BitConverter.ToUInt16(spr, (int)off & 0x3FFF);
@@ -498,7 +526,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
         public uint eeRead32(uint off)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 return BitConverter.ToUInt32(spr, (int)off & 0x3FFF);
@@ -517,7 +546,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
         public ulong eeRead64(uint off)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 return BitConverter.ToUInt64(spr, (int)off & 0x3FFF);
@@ -536,7 +566,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
         public float eeReadSingle(uint off)
         {
-            if (false) { }
+            if (false)
+            { }
             else if ((off & 0xF0000000U) == 0x70000000U)
             {
                 return BitConverter.ToSingle(spr, (int)off & 0x3FFF);
@@ -588,12 +619,18 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             uint Vcf = 0;
             float pw = +Math.Abs(MobUt.vuDouble(ft.w));
             float nw = -pw;
-            if (MobUt.vuDouble(fs.x) > pw) Vcf |= 0x01;
-            if (MobUt.vuDouble(fs.x) < nw) Vcf |= 0x02;
-            if (MobUt.vuDouble(fs.y) > pw) Vcf |= 0x04;
-            if (MobUt.vuDouble(fs.y) < nw) Vcf |= 0x08;
-            if (MobUt.vuDouble(fs.z) > pw) Vcf |= 0x10;
-            if (MobUt.vuDouble(fs.z) < nw) Vcf |= 0x20;
+            if (MobUt.vuDouble(fs.x) > pw)
+                Vcf |= 0x01;
+            if (MobUt.vuDouble(fs.x) < nw)
+                Vcf |= 0x02;
+            if (MobUt.vuDouble(fs.y) > pw)
+                Vcf |= 0x04;
+            if (MobUt.vuDouble(fs.y) < nw)
+                Vcf |= 0x08;
+            if (MobUt.vuDouble(fs.z) > pw)
+                Vcf |= 0x10;
+            if (MobUt.vuDouble(fs.z) < nw)
+                Vcf |= 0x20;
             ee.Vcf.UL = ((ee.Vcf.UL << 6) | Vcf) & 0xFFFFFFu;
         }
         public static float UL2F(uint val)
@@ -673,28 +710,32 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                 float r = ee.eeReadSingle(off + 0U);
                 //Debug.Assert(!float.IsNaN(r));
                 //Debug.Assert(!float.IsNegativeInfinity(r) && !float.IsPositiveInfinity(r));
-                if (VF != ee.VF[0]) VF.x = r;
+                if (VF != ee.VF[0])
+                    VF.x = r;
             }
             if (true)
             {
                 float r = ee.eeReadSingle(off + 4U);
                 //Debug.Assert(!float.IsNaN(r));
                 //Debug.Assert(!float.IsNegativeInfinity(r) && !float.IsPositiveInfinity(r));
-                if (VF != ee.VF[0]) VF.y = r;
+                if (VF != ee.VF[0])
+                    VF.y = r;
             }
             if (true)
             {
                 float r = ee.eeReadSingle(off + 8U);
                 //Debug.Assert(!float.IsNaN(r));
                 //Debug.Assert(!float.IsNegativeInfinity(r) && !float.IsPositiveInfinity(r));
-                if (VF != ee.VF[0]) VF.z = r;
+                if (VF != ee.VF[0])
+                    VF.z = r;
             }
             if (true)
             {
                 float r = ee.eeReadSingle(off + 12U);
                 //Debug.Assert(!float.IsNaN(r));
                 //Debug.Assert(!float.IsNegativeInfinity(r) && !float.IsPositiveInfinity(r));
-                if (VF != ee.VF[0]) VF.w = r;
+                if (VF != ee.VF[0])
+                    VF.w = r;
             }
         }
 
@@ -814,13 +855,16 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
         private static void sysw(int mark)
         {
-            if (mark >= bita.Count) return;
+            if (mark >= bita.Count)
+                return;
             bita[mark] = true;
         }
         private static void sysr(int mark)
         {
-            if (mark >= bita.Count) return;
-            if (bita[mark]) return;
+            if (mark >= bita.Count)
+                return;
+            if (bita[mark])
+                return;
             bita[mark] = true;
             bitr[mark] = true;
         }
@@ -941,7 +985,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
             }
 #else
             uint f = F2UL(v);
-            switch (f & 0x7F800000) {
+            switch (f & 0x7F800000)
+            {
                 case 0x0:
                     f &= 0x80000000;
                     return UL2F(f);
@@ -1064,7 +1109,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                 rt.UL[1],
                 rs.UL[1],
             };
-            for (int x = 0; x < 4; x++) rd.UL[x] = res[x];
+            for (int x = 0; x < 4; x++)
+                rd.UL[x] = res[x];
         }
 
         public static void PEXTLH(GPR rd, GPR rs, GPR rt)
@@ -1079,7 +1125,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                 rt.US[3],
                 rs.US[3],
             };
-            for (int x = 0; x < 8; x++) rd.US[x] = res[x];
+            for (int x = 0; x < 8; x++)
+                rd.US[x] = res[x];
         }
 
         public static void PEXTLB(GPR rd, GPR rs, GPR rt)
@@ -1102,7 +1149,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                  rt.UB[7],
                  rs.UB[7],
             };
-            for (int x = 0; x < 16; x++) rd.UB[x] = res[x];
+            for (int x = 0; x < 16; x++)
+                rd.UB[x] = res[x];
         }
 
         public static void MULTU(CustEE ee, GPR rs, GPR rt)
@@ -1127,7 +1175,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
 
         public static void MOVZ(GPR rd, GPR rs, GPR rt)
         {
-            if (rt.UD0 == 0) rd.UD0 = rs.UD0;
+            if (rt.UD0 == 0)
+                rd.UD0 = rs.UD0;
         }
 
         public static void PCPYH(GPR rd, GPR rt)
@@ -1176,7 +1225,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                  rt.UL[0],
                  rt.UL[3],
             };
-            for (int x = 0; x < 4; x++) rd.UL[x] = res[x];
+            for (int x = 0; x < 4; x++)
+                rd.UL[x] = res[x];
         }
 
         public static void PPACW(GPR rd, GPR rs, GPR rt)
@@ -1187,7 +1237,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                  rs.UL[0],
                  rs.UL[2],
             };
-            for (int x = 0; x < 4; x++) rd.UL[x] = res[x];
+            for (int x = 0; x < 4; x++)
+                rd.UL[x] = res[x];
         }
 
         public static void PEXTUW(GPR rd, GPR rs, GPR rt)
@@ -1198,7 +1249,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                  rt.UL[3],
                  rs.UL[3],
             };
-            for (int x = 0; x < 4; x++) rd.UL[x] = res[x];
+            for (int x = 0; x < 4; x++)
+                rd.UL[x] = res[x];
         }
 
         public static void PPACB(GPR rd, GPR rs, GPR rt)
@@ -1221,7 +1273,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                  rs.UB[12],
                  rs.UB[14],
             };
-            for (int x = 0; x < 16; x++) rd.UB[x] = res[x];
+            for (int x = 0; x < 16; x++)
+                rd.UB[x] = res[x];
         }
         public static void PPACH(GPR rd, GPR rs, GPR rt)
         {
@@ -1235,7 +1288,8 @@ namespace OpenKh.Kh2Anim.Mset.EmuRunner
                  rs.US[4],
                  rs.US[6],
             };
-            for (int x = 0; x < 8; x++) rd.US[x] = res[x];
+            for (int x = 0; x < 8; x++)
+                rd.US[x] = res[x];
         }
 
         public static void PCPYLD(GPR rd, GPR rs, GPR rt)

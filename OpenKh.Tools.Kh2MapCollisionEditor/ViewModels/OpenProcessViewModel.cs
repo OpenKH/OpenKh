@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Kh2MapCollisionEditor.Services;
 using System.Collections.Generic;
@@ -61,7 +61,7 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
                     _processStream?.Dispose();
 
                     _processStream = ProcessService.OpenPcsx2ProcessStream(value);
-                    
+
                     OnPropertyChanged(nameof(SelectedProcess));
                     OnPropertyChanged(nameof(IsProcessSelected));
                 }

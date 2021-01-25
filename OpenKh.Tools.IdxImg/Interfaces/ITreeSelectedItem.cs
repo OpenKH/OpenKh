@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Tools.IdxImg.Interfaces
+namespace OpenKh.Tools.IdxImg.Interfaces
 {
     public interface ITreeSelectedItem
     {

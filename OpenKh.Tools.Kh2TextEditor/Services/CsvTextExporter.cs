@@ -1,4 +1,4 @@
-﻿using CsvHelper;
+using CsvHelper;
 using CsvHelper.Configuration;
 using OpenKh.Tools.Kh2TextEditor.Models;
 using System;

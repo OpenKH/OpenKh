@@ -1,4 +1,4 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.Conventions;
 using OpenKh.Command.CoctChanger.Utils;
 using OpenKh.Common;
@@ -307,7 +307,8 @@ namespace OpenKh.Command.CoctChanger
 
             private static void GenerateReport(Coct coct, int depth, int index, Report report)
             {
-                if (index == -1) return;
+                if (index == -1)
+                    return;
 
                 report.NodeCount++;
                 report.TreeDepth = Math.Max(report.TreeDepth, depth);

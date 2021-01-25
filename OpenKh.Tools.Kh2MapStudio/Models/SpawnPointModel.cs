@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2.Ard;
+using OpenKh.Kh2.Ard;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using System.Collections.Generic;
 

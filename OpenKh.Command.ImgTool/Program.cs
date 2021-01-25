@@ -1,4 +1,4 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Command.ImgTool.Interfaces;
 using OpenKh.Command.ImgTool.Utils;
 using OpenKh.Common;

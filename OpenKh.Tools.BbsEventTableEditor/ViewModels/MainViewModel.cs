@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Tools.Common;
 using System.Collections.Generic;

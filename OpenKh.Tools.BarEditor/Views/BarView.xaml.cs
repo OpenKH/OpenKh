@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Tools.BarEditor.ViewModels;
 using OpenKh.Tools.Common;
 using System.Linq;
@@ -8,14 +8,14 @@ using System.Windows.Markup;
 
 namespace OpenKh.Tools.BarEditor.Views
 {
-	/// <summary>
-	/// Interaction logic for BarView.xaml
-	/// </summary>
-	public partial class BarView : Window
-	{
-		public BarView()
-		{
-			InitializeComponent();
+    /// <summary>
+    /// Interaction logic for BarView.xaml
+    /// </summary>
+    public partial class BarView : Window
+    {
+        public BarView()
+        {
+            InitializeComponent();
             DataContext = new BarViewModel();
         }
 
@@ -26,11 +26,11 @@ namespace OpenKh.Tools.BarEditor.Views
             DataContext = new BarViewModel(desc);
         }
 
-		private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			var vm = DataContext as BarViewModel;
-			vm.OpenItemCommand.Execute(vm.SelectedItem);
-		}
+        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var vm = DataContext as BarViewModel;
+            vm.OpenItemCommand.Execute(vm.SelectedItem);
+        }
 
         private void Window_Drop(object sender, DragEventArgs e)
         {

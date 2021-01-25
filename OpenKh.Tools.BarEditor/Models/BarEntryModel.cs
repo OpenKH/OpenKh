@@ -15,23 +15,23 @@ namespace OpenKh.Tools.BarEditor.Models
         };
         private readonly IViewSettings _viewSettings;
 
-		public BarEntryModel(Entry entry, IViewSettings viewSettings)
-		{
+        public BarEntryModel(Entry entry, IViewSettings viewSettings)
+        {
             Entry = entry;
             _viewSettings = viewSettings;
-		}
+        }
 
-		public Entry Entry { get; }
+        public Entry Entry { get; }
 
         public EntryType Type
-		{
-			get => Entry.Type;
-			set
-			{
-				Entry.Type = value;
-				OnPropertyChanged(nameof(DisplayName));
-			}
-		}
+        {
+            get => Entry.Type;
+            set
+            {
+                Entry.Type = value;
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
 
         public string DisplayName
         {
@@ -65,52 +65,52 @@ namespace OpenKh.Tools.BarEditor.Models
         }
 
         public short Index
-		{
-			get => (short)Entry.Index;
-			set
-			{
-				Entry.Index = value;
-				OnPropertyChanged(nameof(DisplayName));
-			}
-		}
+        {
+            get => (short)Entry.Index;
+            set
+            {
+                Entry.Index = value;
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
 
-		[Required]
-		[StringLength(4, MinimumLength = 4, ErrorMessage = "Must be 4 characters long.")]
-		public string Tag
-		{
-			get => Entry.Name;
-			set
-			{
-				Entry.Name = value;
-				OnPropertyChanged(nameof(DisplayName));
-			}
-		}
+        [Required]
+        [StringLength(4, MinimumLength = 4, ErrorMessage = "Must be 4 characters long.")]
+        public string Tag
+        {
+            get => Entry.Name;
+            set
+            {
+                Entry.Name = value;
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
 
-		public string Size
-		{
-			get
-			{
-				string unit = "byte";
-				int divisor;
+        public string Size
+        {
+            get
+            {
+                string unit = "byte";
+                int divisor;
 
-				if (Entry.Stream.Length >= 1024 * 1024)
-				{
-					unit = "MB";
-					divisor = 1024 * 1024;
-				}
-				else if (Entry.Stream.Length >= 1024)
-				{
-					unit = "KB";
-					divisor = 1024;
-				}
-				else
-				{
-					return $"{Entry.Stream.Length} {unit}";
-				}
+                if (Entry.Stream.Length >= 1024 * 1024)
+                {
+                    unit = "MB";
+                    divisor = 1024 * 1024;
+                }
+                else if (Entry.Stream.Length >= 1024)
+                {
+                    unit = "KB";
+                    divisor = 1024;
+                }
+                else
+                {
+                    return $"{Entry.Stream.Length} {unit}";
+                }
 
-				return $"{(float)Entry.Stream.Length / divisor:0.00} {unit}";
-			}
-		}
+                return $"{(float)Entry.Stream.Length / divisor:0.00} {unit}";
+            }
+        }
 
         internal void InvalidateTag() => OnPropertyChanged(nameof(DisplayName));
     }

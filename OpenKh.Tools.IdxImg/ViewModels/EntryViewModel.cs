@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Tools.IdxImg.ViewModels
+namespace OpenKh.Tools.IdxImg.ViewModels
 {
     public abstract class EntryViewModel
     {
