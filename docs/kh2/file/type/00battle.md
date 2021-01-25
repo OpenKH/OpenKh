@@ -380,7 +380,7 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 
 ## Btlv
 
-???
+Contains the table for battle level of each world. Whether each entry is enabled or not is determined by a progress flag and the final battle level will be the sum of all of the world's enabled battle level entries.
 
 ### Btlv Structure
 
@@ -391,8 +391,6 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 
 ### Btlv Header
 
-Contains the table for battle level of each world. Whether each entry is enabled or not is determined by a bitmask and the final battle level will be the sum of all of the world's enabled battle lv entries.
-
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | uint | File type (1)
@@ -402,28 +400,28 @@ Contains the table for battle level of each world. Whether each entry is enabled
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0 	 | uint  | Entry Index
-| 4      | byte[2] | Unknown
-| 6      | byte  | World ZZ
-| 7      | byte  | World of Darkness
-| 8      | byte  | Twilight Town
-| 9      | byte  | Destiny Islands
-| A      | byte  | Hollow Bastion
-| B      | byte  | Beast's Castle
-| C      | byte  | Olympus Coliseum
-| D      | byte  | Agrabah
-| E      | byte  | Land of Dragons
-| F      | byte  | 100 Acre Woods
-| 10     | byte  | Pride Lands
-| 11     | byte  | Atlantica
-| 12     | byte  | Disney Castle
-| 13     | byte  | Timeless River
-| 14     | byte  | Halloween Town
-| 15     | byte  | World Map
-| 16     | byte  | Port Royal
-| 17     | byte  | Space Paranoids
-| 18     | byte  | The World that Never Was
-| 19     | byte[7] | Unknown
+| 0 	 | int  | Id
+| 4      | int  | Progress Flag
+| 8      | byte  | World ZZ
+| 9      | byte  | World of Darkness
+| A      | byte  | Twilight Town
+| B      | byte  | Destiny Islands
+| C      | byte  | Hollow Bastion
+| D      | byte  | Beast's Castle
+| E      | byte  | Olympus Coliseum
+| F      | byte  | Agrabah
+| 10     | byte  | Land of Dragons
+| 11     | byte  | 100 Acre Woods
+| 12     | byte  | Pride Lands
+| 13     | byte  | Atlantica
+| 14     | byte  | Disney Castle
+| 15     | byte  | Timeless River
+| 16     | byte  | Halloween Town
+| 17     | byte  | World Map
+| 18     | byte  | Port Royal
+| 19     | byte  | Space Paranoids
+| 1A     | byte  | The World That Never Was
+| 1B     | byte[5] | Padding
 
 ## Lvpm
 
