@@ -51,7 +51,7 @@ namespace OpenKh.Tests.Bbs
             else
             {
                 Assert.Equal((uint)0x4e4f42, TestPmo.skeletonHeader.MagicValue);
-                Assert.Equal((uint)0x35, TestPmo.skeletonHeader.JointCount);
+                Assert.Equal((uint)0x35, TestPmo.skeletonHeader.BoneCount);
             }
         });
 

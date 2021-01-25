@@ -79,21 +79,22 @@ namespace OpenKh.Bbs
         // Fields starting with _ have a temporary name.
         public class SkeletonHeader
         {
-            [Data] public UInt32 MagicValue { get; set; }
-            [Data] public UInt32 Unknown { get; set; }
-            [Data] public UInt32 JointCount { get; set; }
-            [Data] public ushort _SkinnedJoints { get; set; }
-            [Data] public ushort _SkinningStartIndex { get; set; }
+            [Data] public uint MagicValue { get; set; }
+            [Data] public uint Padding1 { get; set; }
+            [Data] public ushort BoneCount { get; set; }
+            [Data] public ushort Padding2 { get; set; }
+            [Data] public ushort SkinnedBoneCount { get; set; }
+            [Data] public ushort nStdBone { get; set; }
         }
 
-        public class JointData
+        public class BoneData
         {
-            [Data] public ushort JointIndex { get; set; }
-            [Data] public ushort Padding { get; set; }
-            [Data] public ushort ParentJointIndex { get; set; }
+            [Data] public ushort BoneIndex { get; set; }
+            [Data] public ushort Padding1 { get; set; }
+            [Data] public ushort ParentBoneIndex { get; set; }
             [Data] public ushort Padding2 { get; set; }
-            [Data] public UInt32 _SkinningIndex { get; set; }
-            [Data] public UInt32 Padding3 { get; set; }
+            [Data] public ushort SkinnedBoneIndex { get; set; }
+            [Data] public ushort Padding3 { get; set; }
             [Data(Count = 16)] public string JointName { get; set; }
             [Data(Count = 16)] public float[] Transform { get; set; }
             [Data(Count = 16)] public float[] InverseTransform { get; set; }
@@ -222,7 +223,7 @@ namespace OpenKh.Bbs
         // Header of the skeleton.
         public SkeletonHeader skeletonHeader { get; set; }
         // Joints present in the skeleton.
-        public JointData[] jointList;
+        public BoneData[] boneList;
 
         public List<MeshChunks> Meshes = new List<MeshChunks>();
 
@@ -491,10 +492,10 @@ namespace OpenKh.Bbs
             {
                 stream.Seek(pmo.PMO_StartPosition + pmo.header.SkeletonOffset, SeekOrigin.Begin);
                 pmo.skeletonHeader = BinaryMapping.ReadObject<SkeletonHeader>(stream);
-                pmo.jointList = new JointData[pmo.skeletonHeader.JointCount];
-                for (int j = 0; j < pmo.skeletonHeader.JointCount; j++)
+                pmo.boneList = new BoneData[pmo.skeletonHeader.BoneCount];
+                for (int j = 0; j < pmo.skeletonHeader.BoneCount; j++)
                 {
-                    pmo.jointList[j] = BinaryMapping.ReadObject<JointData>(stream);
+                    pmo.boneList[j] = BinaryMapping.ReadObject<BoneData>(stream);
                 }
             }
 
@@ -517,9 +518,9 @@ namespace OpenKh.Bbs
                 stream.Seek(pmo.header.SkeletonOffset, SeekOrigin.Begin);
                 BinaryMapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
 
-                for (int joint = 0; joint < pmo.jointList.Length; joint++)
+                for (int joint = 0; joint < pmo.boneList.Length; joint++)
                 {
-                    BinaryMapping.WriteObject<JointData>(stream, pmo.jointList[joint]);
+                    BinaryMapping.WriteObject<BoneData>(stream, pmo.boneList[joint]);
                 }
             }
         }
