@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 
 namespace OpenKh.Kh2.Battle
@@ -6,11 +6,11 @@ namespace OpenKh.Kh2.Battle
     public class Lvpm
     {
         public short HpMultiplier { get; set; } // (Hp * HpMultiplier + 99) / 100
-        public short Unknown02 { get; set; }
-        public short Unknown04 { get; set; }
-        public short Unknown06 { get; set; }
-        public short Attack { get; set; }
-        public short Unknown0a { get; set; }
+        public short Strength { get; set; }
+        public short Defense { get; set; }
+        public short MaxStrength { get; set; }
+        public short MinStrength { get; set; }
+        public short Experience { get; set; }
 
         public static List<Lvpm> Read(Stream stream) => BaseTable<Lvpm>.Read(stream);
 
