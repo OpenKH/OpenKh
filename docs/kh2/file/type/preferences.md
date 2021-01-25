@@ -6,24 +6,25 @@ Defines preferences. It is a [BAR](bar.md) file containing the following subfile
 
 | File | Description |
 |--------|---------------|
-| plyr 	 | Player
-| fmab 	 | Form Abilities
-| prty 	 | Party
-| sstm 	 | System
-| magi 	 | Magic
+| plyr 	 | [Player](#Plyr)
+| fmab 	 | [Form Abilities](#Fmab)
+| prty 	 | [Party](#Prty)
+| sstm 	 | [System](#Sstm)
+| magi 	 | [Magic](#Magi)
 
-### plyr
+### Plyr
+
 Each pointer leads to a specific entry's offset.
 
-### plyr Structure
+### Plyr Structure
 
 | Amount | Description |
 |--------|---------------|
-| 1 	 | Pointer count [uint]
+| 1 	 | Pointer Count [uint]
 | 59 	 | Pointers [uint]
-| 10 	 | Plyr entries
+| 10 	 | Plyr Entries
 
-### plyr Entry
+### Plyr Entry
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
@@ -58,18 +59,19 @@ Each pointer leads to a specific entry's offset.
 | 112 | float | Auto Lock On Inner Adjust
 
 
-### fmab
+### Fmab
+
 Each pointer leads to a specific entry's offset.
 
-### fmab Structure
+### Fmab Structure
 
 | Amount | Description |
 |--------|---------------|
-| 1 	 | Pointer count [uint]
+| 1 	 | Pointer Count [uint]
 | 5 	 | Pointers [uint]
-| 5 	 | fmab entries
+| 5 	 | Fmab Entries
 
-### fmab Entry
+### Fmab Entry
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
@@ -85,24 +87,25 @@ Each pointer leads to a specific entry's offset.
 | 36 | float | Glide Fall Ratio
 | 40 | float | Glide Fall Height
 | 44 | float | Glide Fall Max
-| 48 | float | Glide Accel
+| 48 | float | Glide Acceleration
 | 52 | float | Glide Start Height
 | 56 | float | Glide End Height
 | 60 | float | Glide Turn Speed
 | 64 | float | Dodge Roll Star Time
 
-### prty
+### Prty
+
 Each pointer leads to a specific entry's offset.
 
-### prty Structure
+### Prty Structure
 
 | Amount | Description |
 |--------|---------------|
-| 1 	 | Pointer count [uint]
+| 1 	 | Pointer Count [uint]
 | 70 	 | Pointers [uint]
-| 5 	 | prty entries
+| 5 	 | Prty Entries
 
-### prty Entry
+### Prty Entry
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
@@ -116,22 +119,23 @@ Each pointer leads to a specific entry's offset.
 | 28 | float | Mp Drive
 | 32 | float | Up Down Speed
 | 36 | float | Dash Speed
-| 40 | float | Accel
+| 40 | float | Acceleration
 | 44 | float | Brake
 | 48 | float | Subjective Offset
 
-### sstm
+### Sstm
+
 Each pointer leads to a specific entry's offset.
 
-### sstm Structure
+### Sstm Structure
 
 | Amount | Description |
 |--------|---------------|
-| 1 	 | Pointer count [uint]
+| 1 	 | Pointer Count [uint]
 | 1 	 | Pointers [uint]
-| 1 	 | sstm entries
+| 1 	 | Sstm Entries
 
-### sstm Entry
+### Sstm Entry
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
@@ -180,12 +184,12 @@ Each pointer leads to a specific entry's offset.
 | 168 | float | Attack Distance To Speed
 | 172 | float | Al Carpet Dash Inner
 | 176 | float | Al Carpet Dash Delay
-| 180 | float | Al Carpet Dash Accel
+| 180 | float | Al Carpet Dash Acceleration
 | 184 | float | Al Carpet Dash Brake
 | 188 | float | Lk Dash Drift Inner
 | 192 | float | Lk Dash Drift Time
-| 196 | float | Lk Dash Accel Drift
-| 200 | float | Lk Dash Accel Stop
+| 196 | float | Lk Dash Acceleration Drift
+| 200 | float | Lk Dash Acceleration Stop
 | 204 | float | Lk Dash Drift Speed
 | 208 | float | Lk Magic Jump
 | 212 | float | Mickey Charge Wait
@@ -193,8 +197,8 @@ Each pointer leads to a specific entry's offset.
 | 220 | float | Mickey Min Rate
 | 224 | float | Lm Swim Speed
 | 228 | float | Lm Swim Control
-| 232 | float | Lm Swim Accel
-| 236 | float | Lm Dolphin Accel
+| 232 | float | Lm Swim Acceleration
+| 236 | float | Lm Dolphin Acceleration
 | 240 | float | Lm DolphinSpeedMax
 | 244 | float | Lm DolphinSpeedMin
 | 248 | float | Lm Dolphin Speed Max Distance
@@ -231,54 +235,55 @@ Each pointer leads to a specific entry's offset.
 | 372 | float | Defense Master
 | 376 | int | Defense Master Ratio
 
-### magi
+### Magi
+
 Each pointer leads to a specific entry's offset.
 
-### magi Structure
+### Magi Structure
 
 | Amount | Description |
 |--------|---------------|
-| 1 	 | Pointer count [uint]
+| 1 	 | Pointer Count [uint]
 | 36 	 | Pointers [uint]
-| 5 	 | magi entries
+| 5 	 | Magi Entries
 
-### magi Entry
+### Magi Entry
 
 \* NOTE: Each entry is 124 bytes long, so the info for the fields is wrong somewhere.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 | float | Fire radius
-| 4 | float | Fire height
-| 8 | float | Fire time
-| 12 | float | Blizzard fade time
-| 16 | float | Blizzard time
-| 20 | float | Blizzard speed
-| 24 | float | Blizzard radius
-| 28 | float | Blizzard hit back
-| 32 | float | Thunder no target dist
-| 36 | float | Chunder border height
-| 40 | float | Chunder no target height
-| 44 | float | Chunder check height
-| 48 | float | Chunder burst radius
-| 52 | float | Chunder height
-| 56 | float | Chunder radius
-| 60 | float | Chunder attack wait
-| 64 | float | Chunder time
-| 68 | float | Cure range
-| 72 | float | Magnet min y offset
-| 76 | float | Magnet large time
-| 80 | float | Magnet stay time
-| 84 | float | Magnet small time
-| 88 | float | Magnet radius
-| 92 | float | Reflect radius
-| 96 | float | Reflect laser time
-| 100 | float | Reflect finish time
-| 104 | float | Reflect lv1 radius
-| 108 | float | Reflect lv1 height
-| 112 | int | Reflect lv2 count
-| 116 | float | Reflect lv2 radius
-| 120 | float | Reflect lv2 height
-| 124 | int | Reflect lv3 count
-| 128 | float | Reflect lv3 radius
-| 132 | float | Reflect lv3 height
+| 0 | float | Fire Radius
+| 4 | float | Fire Height
+| 8 | float | Fire Time
+| 12 | float | Blizzard Fade Time
+| 16 | float | Blizzard Time
+| 20 | float | Blizzard Speed
+| 24 | float | Blizzard Radius
+| 28 | float | Blizzard Hit Back
+| 32 | float | Thunder No Target Distance
+| 36 | float | Thunder Border Height
+| 40 | float | Thunder No Target Height
+| 44 | float | Thunder Check Height
+| 48 | float | Thunder Burst Radius
+| 52 | float | Thunder Height
+| 56 | float | Thunder Radius
+| 60 | float | Thunder Attack Wait
+| 64 | float | Thunder Time
+| 68 | float | Cure Range
+| 72 | float | Magnet Min Y Offset
+| 76 | float | Magnet large Time
+| 80 | float | Magnet Stay Time
+| 84 | float | Magnet Small Time
+| 88 | float | Magnet Radius
+| 92 | float | Reflect Radius
+| 96 | float | Reflect Laser Time
+| 100 | float | Reflect Finish Time
+| 104 | float | Reflect Lv1 Radius
+| 108 | float | Reflect Lv1 Height
+| 112 | int | Reflect Lv2 Count
+| 116 | float | Reflect Lv2 Radius
+| 120 | float | Reflect Lv2 Height
+| 124 | int | Reflect Lv3 Count
+| 128 | float | Reflect Lv3 Radius
+| 132 | float | Reflect Lv3 Height
