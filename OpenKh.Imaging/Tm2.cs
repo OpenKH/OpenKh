@@ -387,7 +387,7 @@ namespace OpenKh.Imaging
             return new Tm2(buff, clut, pic, PixelFormat.Indexed8);
         }
 
-        public static Tm2 Create(PngImage image)
+        public static Tm2 Create(IImageRead image)
         {
             byte[] buff = image.GetData();
             byte[] clut = image.GetClut();
