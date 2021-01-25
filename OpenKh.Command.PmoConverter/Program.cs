@@ -18,6 +18,7 @@ using System.Numerics;
 using OpenKh.Common.Utils;
 using System.Diagnostics;
 using OpenKh.Engine.Extensions;
+using Assimp;
 
 namespace OpenKh.Command.PmoConverter
 {
@@ -79,16 +80,19 @@ namespace OpenKh.Command.PmoConverter
             List<MeshDescriptor> Descriptors = meshGroup.MeshDescriptors;
             
             // Max 65K vertices.
-            ushort descriptorVertexCount = 0;
+            uint descriptorVertexCount = 0;
+            uint indicesVertexCount = 0;
             foreach(MeshDescriptor d in Descriptors)
             {
-                descriptorVertexCount += (ushort)d.Vertices.Length;
+                descriptorVertexCount += (uint)d.Vertices.Length;
+                indicesVertexCount += (uint)d.Indices.Length;
             }
 
             // Mesh data.
             for (int i = 0; i < Descriptors.Count; i++)
             {
                 MeshDescriptor desc = Descriptors[i];
+                int[] vertIndices = desc.Indices;
                 Pmo.MeshChunks chunk = new Pmo.MeshChunks();
 
                 // Obtain info for PMO Vertex Flag.
@@ -97,7 +101,7 @@ namespace OpenKh.Command.PmoConverter
                 Pmo.CoordinateFormat VertexFormat = GetVertexFormat(desc);
 
                 chunk.SectionInfo = new Pmo.MeshSection();
-                chunk.SectionInfo.Unknown2 = new byte[2];
+                chunk.SectionInfo.Attribute = 0;
                 chunk.SectionInfo.VertexCount = (ushort)desc.Vertices.Length;
                 chunk.SectionInfo.TextureID = (byte)desc.TextureIndex;
                 chunk.SectionInfo.VertexFlags = 0x30000000; // 0011 000 0 0 00 000 0 000 0 00 00 11 00 000 01
@@ -105,10 +109,10 @@ namespace OpenKh.Command.PmoConverter
                 // Set extra flags.
                 if (UsesUniformColor)
                 {
-                    uint UniformColor = desc.Vertices[0].A;
-                    UniformColor += desc.Vertices[0].B * (uint)0x100;
-                    UniformColor += desc.Vertices[0].G * (uint)0x10000;
-                    UniformColor += desc.Vertices[0].R * (uint)0x1000000;
+                    uint UniformColor = (byte)(desc.Vertices[0].A * 2.0f);
+                    UniformColor += desc.Vertices[0].B * (uint)0x200;
+                    UniformColor += desc.Vertices[0].G * (uint)0x20000;
+                    UniformColor += desc.Vertices[0].R * (uint)0x2000000;
                     chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBit(chunk.SectionInfo.VertexFlags, 24, true);
                     chunk.SectionInfo_opt2 = new Pmo.MeshSectionOptional2();
                     chunk.SectionInfo_opt2.DiffuseColor = UniformColor;
@@ -126,24 +130,26 @@ namespace OpenKh.Command.PmoConverter
                 chunk.SectionInfo.VertexSize += (VertexFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)12 : (byte)((int)VertexFormat * 3); // Vertices
 
 
-                for (int v = 0; v < desc.Vertices.Length; v++)
+                for (int v = 0; v < desc.Indices.Length; v++)
                 {
+                    int index = vertIndices[v];
+
                     Vector4 Color = new Vector4();
-                    Color.X = desc.Vertices[v].R;
-                    Color.Y = desc.Vertices[v].G;
-                    Color.Z = desc.Vertices[v].B;
-                    Color.W = desc.Vertices[v].A;
+                    Color.X = desc.Vertices[index].R * 2;
+                    Color.Y = desc.Vertices[index].G * 2;
+                    Color.Z = desc.Vertices[index].B * 2;
+                    Color.W = desc.Vertices[index].A * 2;
                     chunk.colors.Add(Color);
 
                     Vector3 vec;
-                    vec.X = desc.Vertices[v].X / 10000.0f;
-                    vec.Y = desc.Vertices[v].Y / 10000.0f;
-                    vec.Z = desc.Vertices[v].Z / 10000.0f;
+                    vec.X = desc.Vertices[index].X / 10000.0f;
+                    vec.Y = desc.Vertices[index].Y / 10000.0f;
+                    vec.Z = desc.Vertices[index].Z / 10000.0f;
                     chunk.vertices.Add(vec);
 
                     Vector2 Coords;
-                    Coords.X = desc.Vertices[v].Tu;
-                    Coords.Y = desc.Vertices[v].Tv;
+                    Coords.X = desc.Vertices[index].Tu;
+                    Coords.Y = desc.Vertices[index].Tv;
                     chunk.textureCoordinates.Add(Coords);
                 }
 
@@ -154,10 +160,10 @@ namespace OpenKh.Command.PmoConverter
             pmo.header = new Pmo.Header();
             pmo.header.MagicCode = 0x4F4D50;
             pmo.header.TextureCount = (ushort)TextureData.Count; // TODO.
-            pmo.header.Unk5 = 0x80;
+            pmo.header.Unk0A = 0x80;
             pmo.header.MeshOffset0 = 0xA0 + ((uint)pmo.header.TextureCount * 0x20);
-            pmo.header.VertexCount = descriptorVertexCount;
-            pmo.header.TriangleCount = pmo.header.VertexCount;
+            pmo.header.VertexCount = (ushort)indicesVertexCount;
+            pmo.header.TriangleCount = (ushort)indicesVertexCount;
             pmo.header.TriangleCount /= 3;
             pmo.header.ModelScale = 1.0f;
             pmo.header.BoundingBox = new float[32];
@@ -170,7 +176,6 @@ namespace OpenKh.Command.PmoConverter
                 for (int t = 0; t < TextureData.Count; t++)
                 {
                     Tm2 tm = TextureData[t];
-                    //pmo.textureInfo[t]
                     pmo.textureInfo[t] = new Pmo.TextureInfo();
                     pmo.textureInfo[t].TextureName = TexList[t];
                     pmo.textureInfo[t].Unknown = new UInt32[4];
@@ -298,20 +303,20 @@ namespace OpenKh.Command.PmoConverter
             foreach(Assimp.Material mat in scene.Materials)
             {
                 TexList.Add(Path.GetFileName(mat.TextureDiffuse.FilePath));
-                Stream str = File.OpenRead(TexList[TexList.Count - 1] + ".png");
+                Stream str = File.OpenRead(TexList[TexList.Count - 1]);
                 
                 PngImage png = new PngImage(str);
                 Tm2 tmImage = Tm2.Create(png);
                 TextureData.Add(tmImage);
-                
             }
+
+            int childCount = scene.RootNode.ChildCount;
 
             return new MeshGroup()
             {
                 MeshDescriptors = scene.Meshes
                     .Select(x =>
                     {
-                        x.
                         var vertices = new PositionColoredTextured[x.Vertices.Count];
                         for (var i = 0; i < vertices.Length; i++)
                         {
@@ -329,7 +334,7 @@ namespace OpenKh.Command.PmoConverter
                         return new MeshDescriptor
                         {
                             Vertices = vertices,
-                            Indices = x.Faces.SelectMany(f => f.Indices).ToArray(),
+                            Indices = x.GetIndices(),
                             IsOpaque = true,
                             TextureIndex = x.MaterialIndex
                         };

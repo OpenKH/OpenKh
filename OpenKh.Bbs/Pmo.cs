@@ -17,12 +17,12 @@ namespace OpenKh.Bbs
         public class Header
         {
             [Data] public UInt32 MagicCode { get; set; }
-            [Data] public byte Unk1 { get; set; }
-            [Data] public byte Unk2 { get; set; }
-            [Data] public byte Unk3 { get; set; }
-            [Data] public byte Unk4 { get; set; }
+            [Data] public byte Number { get; set; }
+            [Data] public byte Group { get; set; }
+            [Data] public byte Version { get; set; }
+            [Data] public byte Padding { get; set; }
             [Data] public ushort TextureCount { get; set; }
-            [Data] public ushort Unk5 { get; set; }
+            [Data] public ushort Unk0A { get; set; }
             [Data] public UInt32 SkeletonOffset { get; set; }
             [Data] public UInt32 MeshOffset0 { get; set; }
             [Data] public ushort TriangleCount { get; set; }
@@ -45,9 +45,35 @@ namespace OpenKh.Bbs
             [Data] public byte TextureID { get; set; }
             [Data] public byte VertexSize { get; set; } // In bytes.
             [Data] public UInt32 VertexFlags { get; set; }
-            [Data] public byte Unknown1 { get; set; }
+            [Data] public byte Group { get; set; }
             [Data] public byte TriangleStripCount { get; set; }
-            [Data(Count = 2)] public byte[] Unknown2 { get; set; }
+            [Data] public ushort Attribute { get; set; }
+        }
+
+        public enum VertexAttribute
+        {
+            ATTRIBUTE_BLEND_NONE = 0,
+            ATTRIBUTE_NOMATERIAL = 1,
+            ATTRIBUTE_GLARE = 2,
+            ATTRIBUTE_BACK = 4,
+            ATTRIBUTE_DIVIDE = 8,
+            ATTRIBUTE_TEXALPHA = 16,
+            ATTRIBUTE_FLAG_SHIFT = 24,
+            ATTRIBUTE_PRIM_SHIFT = 28,
+            ATTRIBUTE_BLEND_SEMITRANS = 32,
+            ATTRIBUTE_BLEND_ADD = 64,
+            ATTRIBUTE_BLEND_SUB = 96,
+            ATTRIBUTE_BLEND_MASK = 224,
+            ATTRIBUTE_8 = 256,
+            ATTRIBUTE_9 = 512,
+            ATTRIBUTE_DROPSHADOW = 1024,
+            ATTRIBUTE_ENVMAP = 2048,
+            ATTRIBUTE_12 = 4096,
+            ATTRIBUTE_13 = 8192,
+            ATTRIBUTE_14 = 16384,
+            ATTRIBUTE_15 = 32768,
+            ATTRIBUTE_COLOR = 16777216,
+            ATTRIBUTE_NOWEIGHT = 33554432,
         }
 
         // Fields starting with _ have a temporary name.

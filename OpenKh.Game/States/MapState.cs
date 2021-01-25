@@ -274,7 +274,7 @@ namespace OpenKh.Game.States
                 case Kh2Field kh2Field:
                     //kh2Field.LoadMapArd(Kernel.World, Kernel.Area);
                     //LoadMap(Kernel.World, Kernel.Area);
-                    LoadBBSMap("model/bbs-testmap2.pmp");
+                    LoadBBSMap("model/bbs-testmap.pmp");
                     break;
             }
         }
