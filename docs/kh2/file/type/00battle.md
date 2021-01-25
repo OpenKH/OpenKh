@@ -53,7 +53,7 @@ The damage effects' values on MSET files point to this table.
 | 6 	 | ushort | Power
 | 8 	 | byte | Team (Deal damage to: 0/1/2 Enemies, 3/4/5 Enemies and allies...)
 | 9 	 | byte | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
-| 10 	 | byte | Reaction (Whether an enemy is flinched, knocked...)
+| 10 	 | byte | Enemy Reaction (Whether an enemy is flinched, knocked...)
 | 11 	 | byte | Effect on hit (0 none, other values = different effects)
 | 12 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
 | 14 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
@@ -256,19 +256,19 @@ Contains data for randomizing voice clips.
 | Offset | Type  | Description
 |--------|-------|--------------
 | 0 	 | byte | Character - [CHARACTER LIST](../../dictionary/characters.md)
-| 1 	 | byte | Action 
-| 2 	 | byte | Priority?
-| 3 	 | byte | Padding?
-| 4 	 | byte | Voice 1
-| 5 	 | byte | Voice 1 Chance
-| 6 	 | byte | Voice 2
-| 7 	 | byte | Voice 2 Chance
-| 8 	 | byte | Voice 3
-| 9 	 | byte | Voice 3 Chance
-| A  	 | byte | Voice 4
-| B  	 | byte | Voice 4 Chance
-| C  	 | byte | Voice 5
-| D  	 | byte | Voice 5 Chance
+| 1 	 | byte | Id
+| 2 	 | byte | Priority
+| 3 	 | byte | Reserved
+| 4 	 | sbyte | Voice 1
+| 5 	 | sbyte | Voice 1 Chance
+| 6 	 | sbyte | Voice 2
+| 7 	 | sbyte | Voice 2 Chance
+| 8 	 | sbyte | Voice 3
+| 9 	 | sbyte | Voice 3 Chance
+| 10 	 | sbyte | Voice 4
+| 11 	 | sbyte | Voice 4 Chance
+| 12 	 | sbyte | Voice 5
+| 13 	 | sbyte | Voice 5 Chance
 
 ## Lvup
 
