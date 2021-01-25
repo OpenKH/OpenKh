@@ -374,9 +374,9 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 | 05     | byte  | Item Slot Upgrade
 | 06     | byte  | Accessory Slot Upgrade
 | 07     | byte  | Armor Slot Upgrade
-| 08     | short | Bonus Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 10     | short | Bonus Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 12     | int   | Unknown
+| 08     | ushort | [Bonus Item 1](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 10     | ushort | [Bonus Item 2](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 12     | int   | Padding
 
 ## Btlv
 
