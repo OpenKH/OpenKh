@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using Xe.BinaryMapper;
 
@@ -16,7 +16,7 @@ namespace OpenKh.Kh2.Battle
         [Data] public byte BigMpOrbs { get; set; }
         [Data] public byte SmallDriveOrbs { get; set; }
         [Data] public byte BigDriveOrbs { get; set; }
-        [Data] public byte Unknown0a { get; set; } // Padding?
+        [Data] public byte Padding { get; set; }
         [Data] public ushort Item1 { get; set; }
         [Data] public short Item1Percentage { get; set; }
         [Data] public ushort Item2 { get; set; }
