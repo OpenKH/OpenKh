@@ -5,12 +5,12 @@ namespace OpenKh.Kh2.Battle
 {
     public class Lvpm
     {
-        public short HpMultiplier { get; set; } // (Hp * HpMultiplier + 99) / 100
-        public short Strength { get; set; }
-        public short Defense { get; set; }
-        public short MaxStrength { get; set; }
-        public short MinStrength { get; set; }
-        public short Experience { get; set; }
+        public ushort HpMultiplier { get; set; } // (Hp * HpMultiplier + 99) / 100
+        public ushort Strength { get; set; }
+        public ushort Defense { get; set; }
+        public ushort MaxStrength { get; set; }
+        public ushort MinStrength { get; set; }
+        public ushort Experience { get; set; }
 
         public static List<Lvpm> Read(Stream stream) => BaseTable<Lvpm>.Read(stream);
 
