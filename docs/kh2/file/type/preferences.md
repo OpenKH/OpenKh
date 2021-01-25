@@ -48,9 +48,9 @@ Each pointer leads to a specific entry's offset.
 | 68 | float | Attack First V0
 | 72 | float | Attack Combo V0
 | 76 | float | Attack Finish V0
-| 80 | float | Blow Recov H
-| 84 | float | Blow Recov V
-| 88 | float | Blow Recov Time
+| 80 | float | Blow Recovery H
+| 84 | float | Blow Recovery V
+| 88 | float | Blow Recovery Time
 | 92 | float | Auto Lock On Range
 | 96 | float | Auto Lock On Min H
 | 100 | float | Auto Lock On Max H
@@ -160,11 +160,11 @@ Each pointer leads to a specific entry's offset.
 | 72 | float | Magic Jump
 | 76 | float | Lock On Range
 | 80 | float | Lock On Release Range
-| 84 | float | Stun Recov
-| 88 | float | Stun Recov Hp
+| 84 | float | Stun Recovery
+| 88 | float | Stun Recovery Hp
 | 92 | float | Stun Relax
-| 96 | float | Drive Zako
-| 100 | float | Change Time Zako
+| 96 | float | Drive Enemy
+| 100 | float | Change Time Enemy
 | 104 | float | Drive Time
 | 108 | float | Drive Time Relax
 | 112 | float | Change Time Add Rate
@@ -176,7 +176,7 @@ Each pointer leads to a specific entry's offset.
 | 136 | float | Summon Pray Time Skip
 | 140 | int | Anti Form Drive Count
 | 144 | int | Anti Form Sub Count
-| 148 | float | AntiForm Damage Rate
+| 148 | float | Anti Form Damage Rate
 | 152 | float | Final Form Rate
 | 156 | float | Final Form Mul Rate
 | 160 | float | Final Form Max Rate
@@ -199,8 +199,8 @@ Each pointer leads to a specific entry's offset.
 | 228 | float | Lm Swim Control
 | 232 | float | Lm Swim Acceleration
 | 236 | float | Lm Dolphin Acceleration
-| 240 | float | Lm DolphinSpeedMax
-| 244 | float | Lm DolphinSpeedMin
+| 240 | float | Lm Dolphin Speed Max
+| 244 | float | Lm Dolphin Speed Min
 | 248 | float | Lm Dolphin Speed Max Distance
 | 252 | float | Lm Dolphin Speed Min Distance
 | 256 | float | Lm Dolphin Rotation Max

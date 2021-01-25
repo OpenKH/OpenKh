@@ -53,7 +53,7 @@ The damage effects' values on MSET files point to this table.
 | 6 	 | ushort | Power
 | 8 	 | byte | Team (Deal damage to: 0/1/2 Enemies, 3/4/5 Enemies and allies...)
 | 9 	 | byte | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
-| 10 	 | byte | Reaction (Wether an enemy is flinched, knocked...)
+| 10 	 | byte | Reaction (Whether an enemy is flinched, knocked...)
 | 11 	 | byte | Effect on hit (0 none, other values = different effects)
 | 12 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
 | 14 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
@@ -64,7 +64,7 @@ The damage effects' values on MSET files point to this table.
 | 21 	 | byte | Reflected motion (Points to the slot in the MSET to be triggered when the attack is reflected)
 | 22 	 | short | Reflect Hit Back
 | 24 	 | int | Reflect Action
-| 28 	 | int | Hit sound Effect
+| 28 	 | int | Hit Sound Effect
 | 32 	 | ushort | Reflect RC
 | 34 	 | byte | Reflect Range
 | 35 	 | sbyte | Reflect Angle
