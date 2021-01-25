@@ -14,8 +14,7 @@ This file is splitted into two parts: The first `0x1C` bytes are the [header](#h
 |--------|--------|-------------|
 | 0x00   | uint16 | Magic Code, always `2`
 | 0x02   | uint16 | Id (used in [ARD](ard.md))
-| 0x04   | BitArray | Boolean Flag Array [3]
-| 0x05   | BitArray | Boolean Flag Array [4]
+| 0x04   | uint16 | [Flags](#flags)
 | 0x06   | uint16 | Information Bar Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
 | 0x08   | byte/BitArray | Pause Menu Controller
 | 0x09   | byte | Padding
@@ -28,31 +27,26 @@ This file is splitted into two parts: The first `0x1C` bytes are the [header](#h
 | 0x14   | int | Sound effect when mission is finished
 | 0x18   | int | Sound effect when mission is failed
 
-#### Boolean Flag Array 3
+#### Flags
 
 | Bit | Description |
 |-----|-------------|
-| 1 | Is Boss Battle?
-| 2 | Is Drive Disabled?
-| 4 | ???
-| 8 | ???
-| 16 | ???
-| 32 | ???
-| 64 | ???
-| 128 | ???
-
-#### Boolean Flag Array 4
-
-| Bit | Description |
-|-----|-------------|
-| 1 | ???
-| 2 | Can Mickey save Sora?
-| 4 | ???
-| 8 | Is Magic Disabled?
-| 16 | Does the "Continue" option on the Game Over screen retry the mission?
-| 32 | Are Summons Enabled?
-| 64 | ???
-| 128 | ???
+| 0x1 | Is Boss Battle
+| 0x2 | Is Drive Disabled
+| 0x4 | Is Enable Place
+| 0x8 | unused
+| 0x10 | Is Show Weapon
+| 0x20 | No Leave
+| 0x40 | No Prize
+| 0x80 | No Prizebox
+| 0x100 | Hide Minimap
+| 0x200 | Is Mickey spawnable
+| 0x400 | Is No Experience
+| 0x800 | Is Magic Disabled
+| 0x1000 | Is Retry possible
+| 0x2000 | Is Free Summon (Summon alone)
+| 0x4000 | Is Summon Disabled
+| 0x8000 | unused
 
 #### Pause Menu Controller
 
@@ -98,7 +92,7 @@ This micro-code is responsible for certain elements to be used in missions.
 
 ### Operation code
 
-There is a total of 13 operation codes for the mission script. The parser can be found at [sub_181d30](#notes).
+There is a total of 13 operation codes for the mission script. The parser can be found at [sub_181d30].
 
 - 01: [CameraStart](#camerastart)
 - 02: [CameraComplete](#cameracomplete)
@@ -110,8 +104,8 @@ There is a total of 13 operation codes for the mission script. The parser can be
 - 08: [MissionScore](#missionscore)
 - 09: [Watch](#watch)
 - 0a: [LimitCost](#limitcost)
-- 0b: [DriveRefillRatio](#unknown0b)
-- 0c: [AddDrive](#unknown0c)
+- 0b: [DriveRefillRatio](#driverefillratio)
+- 0c: [AddDrive](#adddrive)
 - 0d: [CameraPrize](#cameraprize)
 
 
@@ -171,7 +165,23 @@ Is used to count for example Struggle orbs, enemies, medals in Olympus Cups etc.
 
 Used 208 times.
 
-### LimitCost
+#### Gauge
+
+Used 55 times.
+
+#### ComboCounter
+
+Used 40 times.
+
+#### MissionScore
+
+Used 0 times.
+
+#### Watch
+
+Used 11 times.
+
+#### LimitCost
 
 Defines how much MP a Limit consumes.
 
@@ -181,9 +191,22 @@ Defines how much MP a Limit consumes.
 
 Used 10 times.
 
+#### DriveRefillRatio
+
+Defines how fast the drive gauge fills/drains.
+
+Used 10 times.
+
+
+#### AddDrive
+
+Used 11 times.
+
 #### CameraPrize
 
 Currently unknown. Either camera transitions or content from a SEQD. Has the same structure as [CameraStart](#camerastart).
+
+Used 42 times.
 
 ## The `miss` entry
 

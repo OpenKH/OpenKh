@@ -13,15 +13,29 @@ namespace OpenKh.Kh2.Msn
             [Data] public ushort Magic { get; set; }
             [Data] public ushort Id { get; set; }
             
-            [Data] public byte Unk03 { get; set; }
-            //[Data(4, BitIndex = 0)] public bool IsBossBattle { get; set; }
-            //[Data(4, BitIndex = 1)] public bool IsDriveDisabled { get; set; }
+            [Data] public ushort Flags { get; set; } 
             
-            [Data] public byte Unk04 { get; set; }
-            //[Data(5, BitIndex = 1)] public bool IsMickeySpawnable { get; set; }
-            //[Data(5, BitIndex = 3)] public bool IsMagicDisabled { get; set; }
-            //[Data(5, BitIndex = 4)] public bool IsRetryPossible { get; set; }
-            //[Data(5, BitIndex = 5)] public bool AreSummonsEnabled { get; set; }
+            /*
+             * 1 = IsBossBattle
+             * 2 = IsDriveDisabled
+             * 4 = IsEnablePlace
+             * 8 = Unused
+             * 
+             * 16 = IsShowWeapon (don't play the weapon transforming animation??)
+             * 32 = NoLeave
+             * 64 = NoPrize
+             * 128 = NoPrizeBox
+             * 
+             * 256 = HideMinimap
+             * 512 = IsMickeySpawnable
+             * 1024 = IsNoExp
+             * 2048 = IsMagicDisabled
+             * 
+             * 4096 = IsRetryPossible (IsContinueSave)
+             * 8192 = IsFreeSummon (summon alone)
+             * 16384 = IsSummonDisabled
+             * 32768 = Unused
+            */
 
             [Data] public ushort InformationBarTextId { get; set; }
             [Data] public byte PauseMenuType { get; set; }
