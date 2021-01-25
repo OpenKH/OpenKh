@@ -33,15 +33,28 @@ What is known about this file is as follows:
 
 This file uses Bit Arrays to store boolean flags for use during the missions. Known arrays/flags are as follows:
 
+#### Boolean Flag Array 2
+
+| Bit | Description |
+|-----|-------------|
+| 1 | ???
+| 2 | ???
+| 4 | ???
+| 8 | ???
+| 16 | Is Control?
+| 32 | ???
+| 64 | ???
+| 128 | ???
+
 #### Boolean Flag Array 3
 
 | Bit | Description |
 |-----|-------------|
 | 1 | Is Boss Battle?
 | 2 | Is Drive Disabled?
-| 4 | ???
-| 8 | ???
-| 16 | ???
+| 4 | Is Enable Place?
+| 8 | Is Minigame?
+| 16 | Is Show Weapon?
 | 32 | ???
 | 64 | ???
 | 128 | ???
@@ -50,13 +63,13 @@ This file uses Bit Arrays to store boolean flags for use during the missions. Kn
 
 | Bit | Description |
 |-----|-------------|
-| 1 | ???
-| 2 | Can Mickey save Sora?
-| 4 | ???
+| 1 | ??? 
+| 2 | Can Mickey save Sora? 
+| 4 | Is Experience Disabled?
 | 8 | Is Magic Disabled?
 | 16 | Does the "Continue" option on the Game Over screen retry the mission?
-| 32 | Are Summons Enabled?
-| 64 | ???
+| 32 | Are Summons Free?
+| 64 | Are Summons Disabled?
 | 128 | ???
 
 ### Pause Menu Controller
