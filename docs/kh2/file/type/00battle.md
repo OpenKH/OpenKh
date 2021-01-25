@@ -167,19 +167,19 @@ The ID of the entry is assigned in the AI of the object.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0      | ushort | ID
-| 2      | byte  | Small HP orbs
-| 3      | byte  | Big HP orbs
-| 4      | byte  | Big Money orbs
-| 5      | byte  | Medium Money orbs
-| 6      | byte  | Small Money orbs
-| 7      | byte  | Small MP orbs
-| 8      | byte  | Big MP orbs
-| 9      | byte  | Small Drive orbs
-| A      | byte  | Big Drive orbs
-| B      | byte  | Unknown
-| C      | ushort  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| E      | short  | Item 1 Drop Percentage
+| 00     | ushort | ID
+| 02     | byte  | Small HP orbs
+| 03     | byte  | Big HP orbs
+| 04     | byte  | Big Money orbs
+| 05     | byte  | Medium Money orbs
+| 06     | byte  | Small Money orbs
+| 07     | byte  | Small MP orbs
+| 08     | byte  | Big MP orbs
+| 09     | byte  | Small Drive orbs
+| 0A     | byte  | Big Drive orbs
+| 0B     | byte  | Padding
+| 0C     | ushort  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0E     | short  | Item 1 Drop Percentage
 | 10     | ushort  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 12     | short  | Item 2 Drop Percentage
 | 14     | ushort  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
@@ -707,10 +707,19 @@ Data on unknown
 
 ### Stop Entry
 
-| Offset | Type  | Description
-|--------|-------|-------------
-|  0     | ushort  | ID
-|  2     | ushort  | ???
+| Offset | Type  | Description |
+|--------|-------|-------------|
+| 00     | ushort  | ID
+| 02     | ushort  | [Flags](#flags)
+
+#### Flags
+
+| Id  | Description
+|-----|------------|
+| 0x1 | Exist
+| 0x2 | Disable Damage Reaction
+| 0x4 | Star
+| 0x8 | Disable Draw
 
 
 ## 0A
