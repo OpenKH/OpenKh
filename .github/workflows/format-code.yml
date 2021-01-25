@@ -1,0 +1,29 @@
+name: Format code
+on:
+  push:
+  pull_request:
+jobs:
+  format-code:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/dotnet/sdk:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Download formatting tool
+        run: dotnet tool install -g dotnet-format
+      - name: Format source code
+        run: |
+          export PATH="$PATH:/github/home/.dotnet/tools"
+          dotnet format
+      - name: Check if files have been modified
+        id: git-check
+        run: echo ::set-output name=modified::$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)
+      - name: Push changes
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          git config --global user.name 'Formatting bot'
+          git config --global user.email 'xeeynamo@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git commit -am "Format code"
+          git push
