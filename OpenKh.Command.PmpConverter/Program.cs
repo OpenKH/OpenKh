@@ -16,7 +16,7 @@ using Assimp;
 
 namespace OpenKh.Command.PmpConverter
 {
-    [Command("OpenKh.Command.PmoConverter")]
+    [Command("OpenKh.Command.PmpConverter")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     class Program
     {
@@ -40,8 +40,12 @@ namespace OpenKh.Command.PmpConverter
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         [Required]
-        [Argument(0, "Convert File", "The file to convert to PMO.")]
+        [Argument(0, "Convert File", "The file to convert to PMP.")]
         public string FileName { get; }
+
+        [Required]
+        [Argument(1, "Converted File", "The resulting converted PMP.")]
+        public string outFileName { get; }
 
         public static List<string> TexList { get; set; }
         public static List<Tm2> TextureData { get; set; }
@@ -50,7 +54,7 @@ namespace OpenKh.Command.PmpConverter
         {
             try
             {
-                Convert(FileName);
+                Convert(FileName, outFileName);
             }
             catch (Exception ex)
             {
@@ -58,11 +62,11 @@ namespace OpenKh.Command.PmpConverter
             }
         }
 
-        private static void Convert(string file)
+        private static void Convert(string fileIn, string fileOut)
         {
-            List<MeshGroup> p = FromFbx(file);
+            List<MeshGroup> p = FromFbx(fileIn);
             Pmp pmp = MeshGroupList2PMP(p);
-            using Stream stream = File.Create("Test.pmp");
+            using Stream stream = File.Create(fileOut);
             Pmp.Write(stream, pmp);
             stream.Close();
         }
@@ -70,7 +74,7 @@ namespace OpenKh.Command.PmpConverter
         private static Pmp MeshGroupList2PMP(List<MeshGroup> meshGroup)
         {
             Pmp pmp = new Pmp();
-            pmp.header.Unk1 = new int[3];
+            pmp.header.Padding = new int[2];
             pmp.PmoList = new List<Pmo>();
             pmp.objectInfo = new List<Pmp.ObjectInfo>();
             pmp.TextureList = new List<Pmp.PMPTextureInfo>();

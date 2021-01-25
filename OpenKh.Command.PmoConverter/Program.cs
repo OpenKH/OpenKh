@@ -49,6 +49,10 @@ namespace OpenKh.Command.PmoConverter
         [Argument(0, "Convert File", "The file to convert to PMO.")]
         public string FileName { get; }
 
+        [Required]
+        [Argument(1, "Converted File", "The resulting converted PMO.")]
+        public string outFileName { get; }
+
         public static List<string> TexList { get; set; }
         public static List<Tm2> TextureData { get; set; }
 
@@ -56,7 +60,7 @@ namespace OpenKh.Command.PmoConverter
         {
             try
             {
-                Convert(FileName);
+                Convert(FileName, outFileName);
             }
             catch (Exception ex)
             {
@@ -64,11 +68,11 @@ namespace OpenKh.Command.PmoConverter
             }
         }
 
-        private static void Convert(string file)
+        private static void Convert(string fileIn, string fileOut)
         {
-            MeshGroup p = FromFbx(file);
+            MeshGroup p = FromFbx(fileIn);
             Pmo pmo = MeshGroup2PMO(p);
-            using Stream stream = File.Create("Test.pmo");
+            using Stream stream = File.Create(fileOut);
             Pmo.Write(stream, pmo);
             stream.Close();
         }
