@@ -440,8 +440,8 @@ Contains the level-up table for the enemies. Based on the level of an enemy, a s
 | 00     | short | HP level. The formula is `(EnemyHp * LevelHp + 99) / 100`.
 | 02     | short | Strength
 | 04     | short | Defense
-| 06     | short | ???
-| 08     | short | ???
+| 06     | short | Max Strength
+| 08     | short | Min Strength
 | 0A     | short | Exp
 
 ## Enmp
