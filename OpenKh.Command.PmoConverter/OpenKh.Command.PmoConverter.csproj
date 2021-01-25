@@ -15,7 +15,6 @@
       <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
       <ProjectReference Include="..\OpenKh.Engine.MonoGame\OpenKh.Engine.MonoGame.csproj" />
       <ProjectReference Include="..\OpenKh.Game\OpenKh.Game.csproj" />
-      <ProjectReference Include="..\OpenKh.WinShell.IMDUtilities\OpenKh.WinShell.IMDUtilities.csproj" />
   </ItemGroup>
     
 </Project>

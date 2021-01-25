@@ -5,7 +5,6 @@ using OpenKh.Imaging;
 using System;
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using OpenKh.Bbs;

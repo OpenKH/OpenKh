@@ -1,11 +1,7 @@
-using OpenKh.Common;
-using OpenKh.Kh2;
-using OpenKh.Engine;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Parsers;
 using OpenKh.Imaging;
 
-using Microsoft.Xna.Framework.Graphics;
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.IO;
@@ -16,9 +12,6 @@ using OpenKh.Bbs;
 using System.Collections.Generic;
 using System.Numerics;
 using OpenKh.Common.Utils;
-using System.Diagnostics;
-using OpenKh.Engine.Extensions;
-using Assimp;
 
 namespace OpenKh.Command.PmoConverter
 {
