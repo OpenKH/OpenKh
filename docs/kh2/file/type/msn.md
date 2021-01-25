@@ -65,7 +65,7 @@ This file uses Bit Arrays to store boolean flags for use during the missions. Kn
 |-----|-------------|
 | 1 | ??? 
 | 2 | Can Mickey save Sora? 
-| 4 | Is Exp Disabled?
+| 4 | Is Experience Disabled?
 | 8 | Is Magic Disabled?
 | 16 | Does the "Continue" option on the Game Over screen retry the mission?
 | 32 | Are Summons Free?
