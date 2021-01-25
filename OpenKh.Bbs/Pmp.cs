@@ -1,6 +1,7 @@
 using Microsoft.VisualBasic.CompilerServices;
 using OpenKh.Common;
 using OpenKh.Common.Utils;
+using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,13 +34,24 @@ namespace OpenKh.Bbs
         public class Header
         {
             [Data] public UInt32 MagicCode { get; set; }
-            [Data(Count = 3)] public int[] Unk1 { get; set; }
+            [Data] public ushort Version { get; set; }
+            [Data(Count = 2)] public int[] Padding { get; set; }
+            [Data] public byte Padding2 { get; set; }
+            [Data] public byte MapFlag { get; set; }
             [Data] public ushort ObjectCount { get; set; }
-            [Data] public ushort Unk2 { get; set; }
-            [Data] public uint Unk3 { get; set; }
-            [Data] public ushort Unk4 { get; set; }
+            [Data] public ushort ModelCount { get; set; }
+            [Data] public uint Padding3 { get; set; }
+            [Data] public ushort Padding4 { get; set; }
             [Data] public ushort TextureCount { get; set; }
             [Data] public uint TextureListOffset { get; set; }
+        }
+
+        public enum MapFlags
+        {
+            FLAG_NONE = 0,
+            FLAG_DISPOFF = 1,
+            FLAG_PRESETOFF = 2,
+            FLAG_SYSPRESETOFF = 4
         }
 
         public class ObjectInfo
@@ -56,21 +68,22 @@ namespace OpenKh.Bbs
             [Data] public uint PMO_Offset { get; set; }
             [Data] public uint Unk1 { get; set; }
             [Data] public ushort ObjectFlags { get; set; }
-            // Unknown use.
-            [Data] public ushort _ObjectID { get; set; }
+            [Data] public ushort ObjectID { get; set; }
         }
 
         public class PMPTextureInfo
         {
             [Data] public uint Offset { get; set; }
             [Data(Count = 12)] public string TextureName { get; set; }
-            [Data(Count = 4)] public uint[] Unknown { get; set; }
+            [Data] public float AnimateUV_X { get; set; }
+            [Data] public float AnimateUV_Y { get; set; }
+            [Data(Count = 2)] public uint[] Unknown { get; set; }
         }
 
         public Header header = new Header();
         public List<ObjectInfo> objectInfo = new List<ObjectInfo>();
         public List<Pmo> PmoList = new List<Pmo>();
-        public List<byte[]> TextureDataList = new List<byte[]>();
+        public List<Tm2> TextureDataList = new List<Tm2>();
         public List<PMPTextureInfo> TextureList = new List<PMPTextureInfo>();
         public List<bool> hasDifferentMatrix = new List<bool>();
 
@@ -111,10 +124,7 @@ namespace OpenKh.Bbs
                 uint tm2size = stream.ReadUInt32() + 0x10;
                 stream.Seek(pmp.TextureList[k].Offset, SeekOrigin.Begin);
 
-                byte[] TextureBuffer = new byte[tm2size];
-                TextureBuffer = stream.ReadBytes((int)tm2size);
-
-                pmp.TextureDataList.Add(TextureBuffer);
+                pmp.TextureDataList.Add(Tm2.Read(stream, true).First());
             }
 
             return pmp;
@@ -152,7 +162,9 @@ namespace OpenKh.Bbs
 
             for (int td = 0; td < pmp.TextureList.Count; td++)
             {
-                stream.Write(pmp.TextureDataList[td]);
+                List<Tm2> l = new List<Tm2>();
+                l.Add(pmp.TextureDataList[td]);
+                Tm2.Write(stream, l);
             }
         }
 

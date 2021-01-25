@@ -47,9 +47,9 @@ namespace OpenKh.Engine.MonoGame
     {
         private static readonly Vector2 DefaultRegion = new Vector2(0, 1);
 
-        public Tim2KingdomTexture(byte[] texture, GraphicsDevice graphics)
+        public Tim2KingdomTexture(Tm2 tm2, GraphicsDevice graphics)
         {
-            Texture2D = Tm2.Read(new MemoryStream(texture)).First().CreateTexture(graphics);
+            Texture2D = tm2.CreateTexture(graphics);
         }
 
         public Texture2D Texture2D { get; }

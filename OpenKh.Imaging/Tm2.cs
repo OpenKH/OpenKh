@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -341,18 +341,86 @@ namespace OpenKh.Imaging
             ImageDataHelpers.InvertRedBlueChannels(_imageData, Size, PixelFormat);
         }
 
+        private Tm2(byte[] buffer, byte[] clut, Picture picture, PixelFormat pixFormat)
+        {
+            _imageFormat = picture.PictureFormat;
+            _mipMapCount = picture.MipMapCount;
+            _imageType = 5;
+            _clutType = picture.ClutType;
+            _gsTex0 = picture.GsTex0;
+            _gsTex1 = picture.GsTex1;
+            _gsReg = picture.GsRegs;
+            _gsPal = picture.GsClut;
+            Size = new Size(picture.Width, picture.Height);
+
+            if (picture.MipMapCount > 1)
+            {
+                _mipmap = new MipMap();
+                throw new NotImplementedException("Mipmaps are not currently supported.");
+            }
+
+            // picture.ClutSize is not valid for KH2 map radar.
+            var clutDataSize = 4 * picture.ClutColorCount;
+
+            _imageData = buffer;
+            _clutData = clut;
+            if (IsClutSwizzled)
+                _clutData = SortClut(_clutData, ClutFormat, picture.ClutColorCount);
+
+            ImageDataHelpers.InvertRedBlueChannels(_imageData, Size, pixFormat);
+        }
+
         public static bool IsValid(Stream stream) =>
             stream.SetPosition(0).ReadInt32() == MagicCode &&
             stream.Length >= HeaderLength;
 
-        public static IEnumerable<Tm2> Read(Stream stream)
+        public static Tm2 Create(byte[] buffer, short width, short height)
+        {
+            byte[] buff = buffer;
+            byte[] clut = new byte[1024];
+            Array.Resize(ref buff, buff.Length - 1024);
+            Array.Copy(buffer, buffer.Length - 1024, clut, 0, 1024);
+            Picture pic = new Picture();
+            pic.Width = width;
+            pic.Height = height;
+            pic.MipMapCount = 0;
+            return new Tm2(buff, clut, pic, PixelFormat.Indexed8);
+        }
+
+        public static Tm2 Create(PngImage image)
+        {
+            byte[] buff = image.GetData();
+            byte[] clut = image.GetClut();
+            Picture pic = new Picture();
+            pic.Width = (short)image.Size.Width;
+            pic.Height = (short)image.Size.Height;
+            pic.GsTex0 = new GsTex();
+            pic.GsTex1 = new GsTex();
+            pic.ClutType = 3;
+            return new Tm2(buff, clut, pic, PixelFormat.Indexed8);
+        }
+
+        // bRelative controls whether the TM2 file is read from the beginning of the file or the current stream position.
+        public static IEnumerable<Tm2> Read(Stream stream, bool bRelative = false)
         {
             if (!stream.CanRead || !stream.CanSeek)
                 throw new InvalidDataException($"Read or seek must be supported.");
 
-            var header = BinaryMapping.ReadObject<Header>(stream.SetPosition(0));
+            if (!bRelative)
+                stream.Seek(0, SeekOrigin.Begin);
+
+            var header = BinaryMapping.ReadObject<Header>(stream);
             if (header.Format != 0)
-                stream.Position = 128;
+            {
+                if (bRelative)
+                {
+                    stream.Position += 128;
+                }
+                else
+                {
+                    stream.Position = 128;
+                }
+            }   
 
             if (stream.Length < HeaderLength || header.MagicCode != MagicCode)
                 throw new InvalidDataException("Invalid header");
@@ -379,7 +447,9 @@ namespace OpenKh.Imaging
 
             foreach (var image in myImages)
             {
-                var colorCount = image._clutData.Length > 0 ? image._clutData.Length * 8 / GetBitsPerPixel(image._clutType) : 0;
+                var colorCount =
+                    image._clutData.Length > 0 ?
+                    image._clutData.Length * 8 / GetBitsPerPixel(image._clutType) : 0;
 
                 BinaryMapping.WriteObject(stream, new Picture
                 {

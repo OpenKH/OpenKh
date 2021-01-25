@@ -1,10 +1,12 @@
 using OpenKh.Common;
+using OpenKh.Imaging;
 using OpenKh.Common.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using Xe.BinaryMapper;
+using System.Linq;
 
 namespace OpenKh.Bbs
 {
@@ -15,12 +17,12 @@ namespace OpenKh.Bbs
         public class Header
         {
             [Data] public UInt32 MagicCode { get; set; }
-            [Data] public byte Unk1 { get; set; }
-            [Data] public byte Unk2 { get; set; }
-            [Data] public byte Unk3 { get; set; }
-            [Data] public byte Unk4 { get; set; }
+            [Data] public byte Number { get; set; }
+            [Data] public byte Group { get; set; }
+            [Data] public byte Version { get; set; }
+            [Data] public byte Padding { get; set; }
             [Data] public ushort TextureCount { get; set; }
-            [Data] public ushort Unk5 { get; set; }
+            [Data] public ushort Unk0A { get; set; }
             [Data] public UInt32 SkeletonOffset { get; set; }
             [Data] public UInt32 MeshOffset0 { get; set; }
             [Data] public ushort TriangleCount { get; set; }
@@ -43,29 +45,56 @@ namespace OpenKh.Bbs
             [Data] public byte TextureID { get; set; }
             [Data] public byte VertexSize { get; set; } // In bytes.
             [Data] public UInt32 VertexFlags { get; set; }
-            [Data] public byte Unknown1 { get; set; }
+            [Data] public byte Group { get; set; }
             [Data] public byte TriangleStripCount { get; set; }
-            [Data(Count = 2)] public byte[] Unknown2 { get; set; }
+            [Data] public ushort Attribute { get; set; }
+        }
+
+        public enum VertexAttribute
+        {
+            ATTRIBUTE_BLEND_NONE = 0,
+            ATTRIBUTE_NOMATERIAL = 1,
+            ATTRIBUTE_GLARE = 2,
+            ATTRIBUTE_BACK = 4,
+            ATTRIBUTE_DIVIDE = 8,
+            ATTRIBUTE_TEXALPHA = 16,
+            ATTRIBUTE_FLAG_SHIFT = 24,
+            ATTRIBUTE_PRIM_SHIFT = 28,
+            ATTRIBUTE_BLEND_SEMITRANS = 32,
+            ATTRIBUTE_BLEND_ADD = 64,
+            ATTRIBUTE_BLEND_SUB = 96,
+            ATTRIBUTE_BLEND_MASK = 224,
+            ATTRIBUTE_8 = 256,
+            ATTRIBUTE_9 = 512,
+            ATTRIBUTE_DROPSHADOW = 1024,
+            ATTRIBUTE_ENVMAP = 2048,
+            ATTRIBUTE_12 = 4096,
+            ATTRIBUTE_13 = 8192,
+            ATTRIBUTE_14 = 16384,
+            ATTRIBUTE_15 = 32768,
+            ATTRIBUTE_COLOR = 16777216,
+            ATTRIBUTE_NOWEIGHT = 33554432,
         }
 
         // Fields starting with _ have a temporary name.
         public class SkeletonHeader
         {
-            [Data] public UInt32 MagicValue { get; set; }
-            [Data] public UInt32 Unknown { get; set; }
-            [Data] public UInt32 JointCount { get; set; }
-            [Data] public ushort _SkinnedJoints { get; set; }
-            [Data] public ushort _SkinningStartIndex { get; set; }
+            [Data] public uint MagicValue { get; set; }
+            [Data] public uint Padding1 { get; set; }
+            [Data] public ushort BoneCount { get; set; }
+            [Data] public ushort Padding2 { get; set; }
+            [Data] public ushort SkinnedBoneCount { get; set; }
+            [Data] public ushort nStdBone { get; set; }
         }
 
-        public class JointData
+        public class BoneData
         {
-            [Data] public ushort JointIndex { get; set; }
-            [Data] public ushort Padding { get; set; }
-            [Data] public ushort ParentJointIndex { get; set; }
+            [Data] public ushort BoneIndex { get; set; }
+            [Data] public ushort Padding1 { get; set; }
+            [Data] public ushort ParentBoneIndex { get; set; }
             [Data] public ushort Padding2 { get; set; }
-            [Data] public UInt32 _SkinningIndex { get; set; }
-            [Data] public UInt32 Padding3 { get; set; }
+            [Data] public ushort SkinnedBoneIndex { get; set; }
+            [Data] public ushort Padding3 { get; set; }
             [Data(Count = 16)] public string JointName { get; set; }
             [Data(Count = 16)] public float[] Transform { get; set; }
             [Data(Count = 16)] public float[] InverseTransform { get; set; }
@@ -190,11 +219,11 @@ namespace OpenKh.Bbs
         // Data block for textures. The order will reflect their texture index.
         public TextureInfo[] textureInfo { get; set; }
         // Texture data blobs.
-        public List<byte[]> texturesData = new List<byte[]>();
+        public List<Tm2> texturesData = new List<Tm2>();
         // Header of the skeleton.
         public SkeletonHeader skeletonHeader { get; set; }
         // Joints present in the skeleton.
-        public JointData[] jointList;
+        public BoneData[] boneList;
 
         public List<MeshChunks> Meshes = new List<MeshChunks>();
 
@@ -453,11 +482,9 @@ namespace OpenKh.Bbs
                 stream.Seek(pmo.textureInfo[i].TextureOffset + 0x10, SeekOrigin.Begin);
                 uint tm2size = stream.ReadUInt32() + 0x10;
                 stream.Seek(pmo.textureInfo[i].TextureOffset, SeekOrigin.Begin);
+                Tm2 tm2 = Tm2.Read(stream, true).First();
 
-                byte[] TextureBuffer = new byte[tm2size];
-                TextureBuffer = stream.ReadBytes((int)tm2size);
-
-                pmo.texturesData.Add(TextureBuffer);
+                pmo.texturesData.Add(tm2);
             }
 
             // Read Skeleton.
@@ -465,40 +492,68 @@ namespace OpenKh.Bbs
             {
                 stream.Seek(pmo.PMO_StartPosition + pmo.header.SkeletonOffset, SeekOrigin.Begin);
                 pmo.skeletonHeader = BinaryMapping.ReadObject<SkeletonHeader>(stream);
-                pmo.jointList = new JointData[pmo.skeletonHeader.JointCount];
-                for (int j = 0; j < pmo.skeletonHeader.JointCount; j++)
+                pmo.boneList = new BoneData[pmo.skeletonHeader.BoneCount];
+                for (int j = 0; j < pmo.skeletonHeader.BoneCount; j++)
                 {
-                    pmo.jointList[j] = BinaryMapping.ReadObject<JointData>(stream);
+                    pmo.boneList[j] = BinaryMapping.ReadObject<BoneData>(stream);
                 }
             }
 
             return pmo;
         }
 
+        private List<uint> TextureOffsets = new List<uint>();
+
         public static void Write(Stream stream, Pmo pmo)
         {
             stream.Position = 0;
-            
-            BinaryMapping.WriteObject<Pmo.Header>(stream, pmo.header);
 
-            for(int i = 0; i < pmo.header.TextureCount; i++) BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
-
+            WriteHeaderData(stream, pmo);
             WriteMeshData(stream, pmo);
+            WriteTextureData(stream, pmo);
+            WriteTextureOffsets(stream, pmo);
 
-            // Write textures.
-            for(int t = 0; t < pmo.texturesData.Count; t++)
+            if (pmo.header.SkeletonOffset != 0)
             {
-                stream.Write(pmo.texturesData[t]);
-            }
-
-            if(pmo.header.SkeletonOffset != 0)
-            {
+                stream.Seek(pmo.header.SkeletonOffset, SeekOrigin.Begin);
                 BinaryMapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
 
-                for (int joint = 0; joint < pmo.jointList.Length; joint++)
+                for (int joint = 0; joint < pmo.boneList.Length; joint++)
                 {
-                    BinaryMapping.WriteObject<JointData>(stream, pmo.jointList[joint]);
+                    BinaryMapping.WriteObject<BoneData>(stream, pmo.boneList[joint]);
                 }
+            }
+        }
+
+        public static void WriteHeaderData(Stream stream, Pmo pmo)
+        {
+            BinaryMapping.WriteObject<Pmo.Header>(stream, pmo.header);
+
+            for (int i = 0; i < pmo.header.TextureCount; i++)
+            {
+                BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
+            }
+        }
+
+        public static void WriteTextureData(Stream stream, Pmo pmo)
+        {
+            // Write textures.
+            for (int t = 0; t < pmo.texturesData.Count; t++)
+            {
+                pmo.TextureOffsets.Add((uint)stream.Position);
+                List<Tm2> tm2list = new List<Tm2>();
+                tm2list.Add(pmo.texturesData[t]);
+                Tm2.Write(stream, tm2list);
+            }
+        }
+
+        public static void WriteTextureOffsets(Stream stream, Pmo pmo)
+        {
+            // Go back to write tm2 offsets.
+            for (int p = 0; p < pmo.texturesData.Count; p++)
+            {
+                stream.Seek(0xA0 + (p * 0x20), SeekOrigin.Begin);
+                stream.Write(pmo.TextureOffsets[p]);
             }
         }
 
@@ -654,10 +709,33 @@ namespace OpenKh.Bbs
                 if (j == (pmo.Meshes.Count - 1))
                 {
                     for (uint b = 0; b < 0xC; b++)
-                        stream.Write((byte)0x00);
+                    {
+                        try
+                        {
+                            stream.Write((byte)0x00);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ToString();
+                        }
+                    }
+                        
 
-                    for (uint b = 0; stream.Position % 0x10 != 0; b++)
-                        stream.Write((byte)0x00);
+                    int pd = (int)stream.Position % 0x10;
+
+                    for (int n = 0; pd != 0 ; n++)
+                    {
+                        try
+                        {
+                            stream.Write((byte)0x00);
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ToString();
+                        }
+
+                        pd = (int)stream.Position % 0x10;
+                    }
                 }
             }
         }

@@ -41,14 +41,6 @@ namespace OpenKh.Tests.Bbs
         });
 
         [Fact]
-        public void ReadCorrectTextures() => File.OpenRead(FileName).Using(stream =>
-        {
-            var TestPmo = Pmo.Read(stream);
-            byte[] buffer = TestPmo.texturesData[0];
-            Assert.True(buffer[0] == 0x54 && buffer[1] == 0x49 && buffer[2] == 0x4D && buffer[3] == 0x32);
-        });
-
-        [Fact]
         public void ReadBoneHeader() => File.OpenRead(FileName).Using(stream =>
         {
             var TestPmo = Pmo.Read(stream);
@@ -59,7 +51,7 @@ namespace OpenKh.Tests.Bbs
             else
             {
                 Assert.Equal((uint)0x4e4f42, TestPmo.skeletonHeader.MagicValue);
-                Assert.Equal((uint)0x35, TestPmo.skeletonHeader.JointCount);
+                Assert.Equal((uint)0x35, TestPmo.skeletonHeader.BoneCount);
             }
         });
 
