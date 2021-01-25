@@ -183,11 +183,20 @@ Magic Code `JMQU`
 | 00     | ushort | World
 | 02     | ushort | Category Text
 | 04     | ushort | Title
-| 06     | ushort | Stat
+| 06     | ushort | [Status](#status)
 | 08     | ushort | Story Flag
 | 0A     | ushort | Game Id
 | 0C     | ushort | Score
 | 0E     | ushort | Clear Condition
+
+### Status
+
+| Type | Description |
+|------|-------------|
+| 0    | Disabled
+| 1    | Draw
+| 2    | Cleared
+| 3    | 100% Cleared
 
 ## Puzz
 
