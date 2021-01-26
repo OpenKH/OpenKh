@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using OpenKh.Common;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
@@ -18,7 +18,7 @@ namespace OpenKh.Game.DataContent
 
         public Stream FileOpen(string path)
         {
-            Log.Info($"Load IDX file {path}");
+            Log.Info("Load IDX file {0}", path);
             return _img.TryFileOpen(path, out var stream) ? stream : null;
         }
     }

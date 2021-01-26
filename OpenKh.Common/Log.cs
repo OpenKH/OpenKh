@@ -16,16 +16,16 @@ namespace OpenKh.Common
         private static readonly Task _taskLog;
         private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
         private static readonly StreamWriter _logWriter = new StreamWriter(LogFileName, false, Encoding.UTF8, 65536);
-        private static readonly Queue<(long ms, string tag, string fmt, string[] args)> _logQueue =
-            new Queue<(long, string, string, string[])>();
+        private static readonly Queue<(long ms, string tag, string fmt, object[] args)> _logQueue =
+            new Queue<(long, string, string, object[])>();
         private static readonly CancellationTokenSource _cancellationTokenSrc = new CancellationTokenSource();
 
         public delegate void LogDispatch(long ms, string tag, string message);
         public static event LogDispatch OnLogDispatch;
 
-        public static void Info(string fmt, params string[] args) => LogText("INF", fmt, args);
-        public static void Warn(string fmt, params string[] args) => LogText("WRN", fmt, args);
-        public static void Err(string fmt, params string[] args) => LogText("ERR", fmt, args);
+        public static void Info(string fmt, params object[] args) => LogText("INF", fmt, args);
+        public static void Warn(string fmt, params object[] args) => LogText("WRN", fmt, args);
+        public static void Err(string fmt, params object[] args) => LogText("ERR", fmt, args);
 
         static Log()
         {
@@ -66,7 +66,7 @@ namespace OpenKh.Common
             throw new TimeoutException("Could not flush logs within the time limit");
         }
 
-        private static void LogText(string tag, string fmt, string[] args)
+        private static void LogText(string tag, string fmt, object[] args)
         {
             var ms = _stopwatch.ElapsedMilliseconds;
             lock (_logQueue)

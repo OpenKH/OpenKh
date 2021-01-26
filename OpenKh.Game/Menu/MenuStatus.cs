@@ -284,7 +284,7 @@ namespace OpenKh.Game.Menu
                 var saveData = MenuManager.GameContext.Kernel.SaveData;
                 if (characterIndex < 0 || characterIndex >= (saveData.Characters?.Length ?? 0))
                 {
-                    Log.Err($"Stats for character '{characterIndex}' is out of range");
+                    Log.Err("Stats for character '{0}' is out of range", characterIndex);
                     yield break;
                 }
 
@@ -292,7 +292,7 @@ namespace OpenKh.Game.Menu
                 var character = saveData.Characters[characterIndex];
                 if (character == null)
                 {
-                    Log.Err($"Stats for character '{characterIndex}' is null");
+                    Log.Err("Stats for character '{0}' is null", characterIndex);
                     yield break;
                 }
 
@@ -324,14 +324,14 @@ namespace OpenKh.Game.Menu
                 var saveData = MenuManager.GameContext.Kernel.SaveData;
                 if (characterIndex < 0 || characterIndex >= (saveData.Characters?.Length ?? 0))
                 {
-                    Log.Err($"Stats for character '{characterIndex}' is out of range");
+                    Log.Err("Stats for character '{0}' is out of range", characterIndex);
                     yield break;
                 }
 
                 var character = saveData.Characters[characterIndex];
                 if (character == null)
                 {
-                    Log.Err($"Stats for character '{characterIndex}' is null");
+                    Log.Err("Stats for character '{0}' is null", characterIndex);
                     yield break;
                 }
 
@@ -355,13 +355,13 @@ namespace OpenKh.Game.Menu
                 var saveData = MenuManager.GameContext.Kernel.SaveData;
                 if (driveFormIndex < 0 || driveFormIndex >= (saveData.DriveForms?.Length ?? 0))
                 {
-                    Log.Err($"Stats for drive form '{driveFormIndex}' is out of range");
+                    Log.Err("Stats for drive form '{0}' is out of range", driveFormIndex);
                     yield break;
                 }
                 var driveForm = saveData.DriveForms[driveFormIndex];
                 if (driveForm == null)
                 {
-                    Log.Err($"Stats for drive form '{driveFormIndex}' is null");
+                    Log.Err("Stats for drive form '{0}' is null", driveFormIndex);
                     yield break;
                 }
 

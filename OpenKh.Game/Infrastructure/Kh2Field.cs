@@ -121,7 +121,7 @@ namespace OpenKh.Game.Infrastructure
                 .Select(x => x.Name)
                 .ToList();
 
-            Log.Info($"Loading spawn {_kernel.SpawnName}");
+            Log.Info("Loading spawn {0}", _kernel.SpawnName);
             RunSpawnScript(_binarcArd, "map", _spawnScriptMap >= 0 ? _spawnScriptMap : _kernel.SpawnMap);
             RunSpawnScript(_binarcArd, "btl", _spawnScriptBtl >= 0 ? _spawnScriptBtl : _kernel.SpawnBtl);
             RunSpawnScript(_binarcArd, "evt", _spawnScriptEvt >= 0 ? _spawnScriptEvt : _kernel.SpawnEvt);
@@ -392,7 +392,7 @@ namespace OpenKh.Game.Infrastructure
                 switch (function)
                 {
                     case AreaDataScript.Spawn spawn:
-                        Log.Info($"Loading spawn {spawn.SpawnSet}");
+                        Log.Info("Loading spawn {0}", spawn.SpawnSet);
                         var spawnPoints = barEntries.ForEntry(spawn.SpawnSet, Bar.EntryType.AreaDataSpawn, SpawnPoint.Read);
                         if (spawnPoints != null)
                         {
@@ -406,7 +406,7 @@ namespace OpenKh.Game.Infrastructure
                             }
                         }
                         else
-                            Log.Warn($"Unable to find spawn \"{spawn}\".");
+                            Log.Warn("Unable to find spawn \"{0}\".", spawn);
                         break;
                 }
             }

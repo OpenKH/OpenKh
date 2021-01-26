@@ -70,12 +70,12 @@ namespace OpenKh.Game
         {
             if (!File.Exists(ConfigFilePath))
             {
-                Log.Info($"Configuration file not found at {ActualConfigFilePath}. Creating default configuraiton.");
+                Log.Info("Configuration file not found at {0}. Creating default configuraiton.", ActualConfigFilePath);
                 Save();
             }
             else
             {
-                Log.Info($"Load configuration file from {ActualConfigFilePath}");
+                Log.Info("Load configuration file from {0}", ActualConfigFilePath);
                 try
                 {
                     _config = ActualConfig.ReadFromFile(ActualConfigFilePath) ?? ActualConfig.Default();
@@ -131,7 +131,7 @@ namespace OpenKh.Game
 
         public static void Save()
         {
-            Log.Info($"Save configuration file to {ActualConfigFilePath}");
+            Log.Info("Save configuration file to {0}, ActualConfigFilePath");
             InternalSave();
         }
 

@@ -334,7 +334,7 @@ namespace OpenKh.Game.States
 
         private void LoadMap(int worldIndex, int placeIndex)
         {
-            Log.Info($"Map={worldIndex},{placeIndex}");
+            Log.Info("Map={0},{1}", worldIndex, placeIndex);
 
             var fileName = Kernel.GetMapFileName(worldIndex, placeIndex);
             var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
