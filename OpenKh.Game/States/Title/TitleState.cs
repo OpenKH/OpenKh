@@ -413,13 +413,5 @@ namespace OpenKh.Game.States.Title
 
             return (float)ctx.Width;
         }
-
-        public void DebugUpdate(IDebug debug)
-        {
-        }
-
-        public void DebugDraw(IDebug debug)
-        {
-        }
     }
 }

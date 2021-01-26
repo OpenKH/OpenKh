@@ -2,7 +2,6 @@ using OpenKh.Engine.Extensions;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
-using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Game.Menu;
 using OpenKh.Kh2;
@@ -279,14 +278,6 @@ namespace OpenKh.Game.States
                     ?.Images?.Select(x => _drawing.CreateSpriteTexture(x)).ToList();
 
             return (layout, _textures);
-        }
-
-        public void DebugDraw(IDebug debug)
-        {
-        }
-
-        public void DebugUpdate(IDebug debug)
-        {
         }
     }
 }

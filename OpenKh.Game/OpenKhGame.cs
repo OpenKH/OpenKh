@@ -64,8 +64,11 @@ namespace OpenKh.Game
                         return;
                 }
 
-                _debugOverlay.OnUpdate = state.DebugUpdate;
-                _debugOverlay.OnDraw = state.DebugDraw;
+                if (state is IDebugConsumer debugConsumer)
+                {
+                    _debugOverlay.OnUpdate = debugConsumer.DebugUpdate;
+                    _debugOverlay.OnDraw = debugConsumer.DebugDraw;
+                }
             }
         }
 

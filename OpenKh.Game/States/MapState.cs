@@ -14,12 +14,11 @@ using OpenKh.Engine.MonoGame;
 using OpenKh.Engine;
 using System.IO;
 using OpenKh.Engine.Parsers;
-using System.Collections.Specialized;
 using System;
 
 namespace OpenKh.Game.States
 {
-    public class MapState : IState, IGameContext
+    public class MapState : IState, IGameContext, IDebugConsumer
     {
         private readonly static BlendState AlphaBlendState = new BlendState()
         {
@@ -381,7 +380,7 @@ namespace OpenKh.Game.States
             BasicallyForceToReloadEverything();
         }
 
-        private bool DebugMode { get; set; }
+        private bool DebugMode { get; set; } = true;
         public void DebugUpdate(IDebug debug)
         {
             if (_input.IsDebug)
