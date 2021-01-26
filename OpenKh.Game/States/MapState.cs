@@ -47,7 +47,6 @@ namespace OpenKh.Game.States
         public IField Field { get; private set; }
 
         private int _objEntryId = 0x236; // PLAYER
-        private bool isDebugMode = true;
         private List<BobEntity> _bobEntities = new List<BobEntity>();
         private List<PmpEntity> _pmpEntities = new List<PmpEntity>();
         private List<MeshGroup> _pmpModels = new List<MeshGroup>();
@@ -102,7 +101,7 @@ namespace OpenKh.Game.States
             {
                 _menuState.OpenMenu();
             }
-            else if (isDebugMode)
+            else if (DebugMode )
             {
                 const double Speed = 100.0;
                 var speed = (float)(deltaTimes.DeltaTime * Speed);
