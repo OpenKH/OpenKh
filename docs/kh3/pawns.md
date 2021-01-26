@@ -474,11 +474,11 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_ex070 | Flame Liberator
 | w_ex080 | Way to the Dawn
 | w_ex081 | Way to the Dawn (Broken)
-| w_ex090 | Oathkeeper
-| w_ex100 | Oblivion
-| w_ex110 | Kingdom Key W
+| w_ex090 | Oathkeeper  (Roxas keyblade)
+| w_ex100 | Oblivion    (Roxas keyblade)
+| w_ex110 | Kingdom Key W (Star Cluster)
 | w_ex120 | Braveheart
-| w_ex130 | ?
+| w_ex130 | Ends of the Earth
 | w_ex210 | The Gazing Eye
 | w_ex220 | Young Xehanort Keyblade
 | w_ex230 | Xigbar's Arrowgun #1
@@ -487,7 +487,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_ex250 | Luxord's Cards
 | w_ex260 | Marluxia's Scythe
 | w_ex270 | Larxene's Kunai
-| w_ex280 | Kingdom Key (?)
+| w_ex280 | Kingdom Key (Xion keyblade)
 | w_ex290 | Void Gear
 | w_ex300 | Soul Eater
 | w_ex340 | Demyx's Sitar
@@ -495,7 +495,11 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_ex360 | DDD Combined Keyblade
 | w_ex380 | The Gazing Eye
 | w_ex390 | The Gazing Eye
-| w_ex410 | Kingdom Key W (?)
+| w_ex400 | The Gazing Eye
+| w_ex410 | Kingdom Key W (Star Cluster)
+| w_ex420 | Yozora´s Sword
+| w_ex422 | Yozora´s Gun
+| w_ex429 | Yozora´s Robot
 | w_gu010 | Knight's Shield
 | w_gu020 | Knight's Shield+
 | w_gu030 | Clockwork Shield
@@ -511,7 +515,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_gu130 | Save The King
 | w_gu140 | Save The King+
 | w_ra010 | Frying Pan
-| w_so010 | Kingdom Key (?)
+| w_so010 | Kingdom Key
 | w_so020 | Shooting Star
 | w_so021 | Shooting Star Formchanges
 | w_so022 | Shooting Star Arrowgun #1
@@ -562,7 +566,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_so112 | Classic Tone Boom Hammer
 | w_so113 | Classic Tone Clock Drill
 | w_so114 | Classic Tone Clock
-| w_so120 | Kingdom Key W (?)
+| w_so120 | Dawn Till Dusk
 | w_so140 | Grand Chef
 | w_so141 | Grand Chef Formchanges
 | w_so142 | Grand Chef Pan
@@ -574,6 +578,10 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_so172 | Nano Gear Formchanges
 | w_so173 | Nano Gear Fist
 | w_so174 | Nano Gear Arms
+| w_so180 | Phantom Green
 | w_so190 | Ultima Weapon
-| w_so191 | Ultima Weapon (?)
-| w_so192 | Ultima Weapon (?) 
+| w_so191 | Ultima Weapon Formchanges
+| w_so192 | Ultima Weapon Formchange weapon
+| w_so200 | Oathkeeper (Sora)
+| w_so210 | Oblivion (Sora)
+| w_so999 | ???
