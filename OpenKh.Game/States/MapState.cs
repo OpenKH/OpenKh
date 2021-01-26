@@ -1,25 +1,24 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenKh.Game.Debugging;
-using OpenKh.Game.Infrastructure;
+using OpenKh.Bbs;
 using OpenKh.Common;
+using OpenKh.Engine;
+using OpenKh.Engine.MonoGame;
+using OpenKh.Engine.Parsers;
+using OpenKh.Game.Debugging;
+using OpenKh.Game.Entities;
+using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
-using System.Collections.Generic;
-using System.Linq;
 using OpenKh.Kh2.Models;
-using OpenKh.Bbs;
-using OpenKh.Game.Entities;
-using OpenKh.Engine.MonoGame;
-using OpenKh.Engine;
-using System.IO;
-using OpenKh.Engine.Parsers;
-using System.Collections.Specialized;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace OpenKh.Game.States
 {
-    public class MapState : IState, IGameContext
+    public class MapState : IState, IGameContext, IDebugConsumer
     {
         private readonly static BlendState AlphaBlendState = new BlendState()
         {
@@ -48,7 +47,6 @@ namespace OpenKh.Game.States
         public IField Field { get; private set; }
 
         private int _objEntryId = 0x236; // PLAYER
-        private bool _enableCameraMovement = true;
         private List<BobEntity> _bobEntities = new List<BobEntity>();
         private List<PmpEntity> _pmpEntities = new List<PmpEntity>();
         private List<MeshGroup> _pmpModels = new List<MeshGroup>();
@@ -103,7 +101,7 @@ namespace OpenKh.Game.States
             {
                 _menuState.OpenMenu();
             }
-            else if (_enableCameraMovement)
+            else if (DebugMode )
             {
                 const double Speed = 100.0;
                 var speed = (float)(deltaTimes.DeltaTime * Speed);
@@ -194,7 +192,7 @@ namespace OpenKh.Game.States
 
             foreach (var ent in _pmpEntities)
             {
-                if(ent.DifferentMatrix)
+                if (ent.DifferentMatrix)
                 {
                     Matrix world = _camera.World;
                     world.M14 = 0;
@@ -234,7 +232,7 @@ namespace OpenKh.Game.States
                 pass.Apply();
 
                 RenderMeshNew(pass, _pmpModels[ent.Index], passRenderOpaque);
-                
+
             }
         }
 
@@ -381,57 +379,11 @@ namespace OpenKh.Game.States
             BasicallyForceToReloadEverything();
         }
 
-
-        #region DEBUG
-
-        private class DebugPlace
-        {
-            public int Index { get; set; }
-            public int WorldId { get; set; }
-            public int PlaceId { get; set; }
-            public ushort MessageId { get; set; }
-        }
-
-        private int _debugType = 0;
-        private int _debugPlaceCursor = 0;
-        private int _debugObjentryCursor = 0;
-        private DebugPlace[] _places;
-
+        private bool DebugMode { get; set; } = true;
         public void DebugUpdate(IDebug debug)
         {
             if (_input.IsDebug)
-            {
-                if (!IsDebugMode())
-                {
-                    EnableDebugMode();
-
-                    if (_places == null)
-                        _places = DebugLoadPlaceList();
-
-                    _debugObjentryCursor = Kernel.ObjEntries
-                        .Select((entry, i) => new { entry, i })
-                        .FirstOrDefault(x => x.entry.ObjectId == _objEntryId)?.i ?? 0;
-                }
-                else
-                    DisableDebugMode();
-            }
-
-            if (IsDebugMode())
-            {
-                if (_input.IsMenuLeft)
-                    _debugType--;
-                else if (_input.IsMenuRight)
-                    _debugType++;
-                _debugType %= 3;
-
-                if (_debugType == 0)
-                { }
-                else if (_debugType == 1)
-                    DebugUpdatePlaceList();
-                else if (_debugType == 2)
-                    if (_input.IsCross)
-                        debug.State = 0;
-            }
+                DebugMode = !DebugMode;
         }
 
         public void DebugDraw(IDebug debug)
@@ -439,92 +391,12 @@ namespace OpenKh.Game.States
             if (_menuState.IsMenuOpen)
                 return;
 
-            if (IsDebugMode())
-            {
-                if (_debugType == 0)
-                    DebugDrawEntities(debug);
-                else if (_debugType == 1)
-                    DebugDrawPlaceList(debug);
-                else if (_debugType == 2)
-                    debug.Println("Press X to return to title screen");
-            }
-            else
+            if (DebugMode)
             {
                 debug.Println($"MAP: {Kh2.Constants.WorldIds[Kernel.World]}{Kernel.Area:D02}");
                 debug.Println($"POS ({_camera.CameraPosition.X:F0}, {_camera.CameraPosition.Y:F0}, {_camera.CameraPosition.Z:F0})");
                 debug.Println($"LKT ({_camera.CameraLookAt.X:F0}, {_camera.CameraLookAt.Y:F0}, {_camera.CameraLookAt.Z:F0})");
             }
         }
-
-        private bool IsDebugMode() => _enableCameraMovement == false;
-        private void EnableDebugMode() => _enableCameraMovement = false;
-        private void DisableDebugMode() => _enableCameraMovement = true;
-        private int Increment(int n) => n + (_input.IsShift ? 10 : 1);
-        private int Decrement(int n) => n - (_input.IsShift ? 10 : 1);
-
-        private void DebugUpdatePlaceList()
-        {
-            if (_input.IsMenuUp)
-                _debugPlaceCursor = Decrement(_debugPlaceCursor);
-            else if (_input.IsMenuDown)
-                _debugPlaceCursor = Increment(_debugPlaceCursor);
-            if (_debugPlaceCursor < 0)
-                _debugPlaceCursor = _places.Length - 1;
-            _debugPlaceCursor %= _places.Length;
-
-            if (_input.IsCross)
-            {
-                var map = _places[_debugPlaceCursor];
-                Kernel.World = map.WorldId;
-                Kernel.Area = map.PlaceId;
-
-                BasicallyForceToReloadEverything();
-                DisableDebugMode();
-            }
-        }
-
-        public void DebugDrawEntities(IDebug debug)
-        {
-        }
-
-        private void DebugDrawPlaceList(IDebug debug)
-        {
-            debug.Println("MAP SELECTION");
-            debug.Println("");
-
-            foreach (var place in _places.Skip(_debugPlaceCursor))
-            {
-                debug.Print($"{(place.Index == _debugPlaceCursor ? '>' : ' ')} ");
-                debug.Print($"{Kh2.Constants.WorldIds[place.WorldId]}{place.PlaceId:D02} ");
-                debug.Println(place.MessageId);
-            }
-        }
-
-        private DebugPlace[] DebugLoadPlaceList() => Kernel.Places
-            .Select(x => new
-            {
-                World = x.Key,
-                Places = x.Value.Select((place, i) => new
-                {
-                    Index = i,
-                    Place = place
-                })
-            })
-            .SelectMany(x => x.Places, (x, place) => new DebugPlace
-            {
-                WorldId = Kh2.Constants.WorldIds
-                    .Select((World, Index) => new { World, Index })
-                    .Where(e => e.World == x.World)
-                    .Select(x => x.Index).FirstOrDefault(),
-                PlaceId = place.Index,
-                MessageId = place.Place.MessageId
-            })
-            .Select((x, i) =>
-            {
-                x.Index = i;
-                return x;
-            })
-            .ToArray();
-        #endregion
     }
 }

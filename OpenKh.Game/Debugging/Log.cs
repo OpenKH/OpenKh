@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -57,7 +57,7 @@ namespace OpenKh.Game.Debugging
         private static void LogText(string tag, string text)
         {
             var ms = _stopwatch.ElapsedMilliseconds;
-            var str = $"[{(ms/1000):D3}.{(ms%1000):D3}] {tag} {text}";
+            var str = $"[{(ms / 1000):D3}.{(ms % 1000):D3}] {tag} {text}";
             lock (_logQueue)
                 _logQueue.Enqueue(str);
         }

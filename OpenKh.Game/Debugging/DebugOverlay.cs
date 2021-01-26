@@ -86,7 +86,7 @@ namespace OpenKh.Game.Debugging
             _messageDrawContext = new DrawContext
             {
                 IgnoreDraw = false,
-                
+
                 x = 0,
                 y = 0,
                 xStart = 0,
@@ -125,6 +125,10 @@ namespace OpenKh.Game.Debugging
 
         public void Println(string text)
         {
+            if (_kernel.Language == Kh2.Constants.Regions[0])
+                // Force to use uppercase to display text correctly with JP
+                text = text.ToUpper();
+
             Print(text);
             EmitNewLine();
         }
