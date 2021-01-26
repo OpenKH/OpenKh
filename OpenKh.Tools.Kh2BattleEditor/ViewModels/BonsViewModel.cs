@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.Kh2BattleEditor.Extensions;
@@ -34,9 +34,8 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             public byte ItemSlotUpgrade { get => Bons.ItemSlotUpgrade; set => Bons.ItemSlotUpgrade = value; }
             public byte AccessorySlotUpgrade { get => Bons.AccessorySlotUpgrade; set => Bons.AccessorySlotUpgrade = value; }
             public byte ArmorSlotUpgrade { get => Bons.ArmorSlotUpgrade; set => Bons.ArmorSlotUpgrade = value; }
-            public short BonusItem1 { get => Bons.BonusItem1; set => Bons.BonusItem1 = value; }
-            public short BonusItem2 { get => Bons.BonusItem2; set => Bons.BonusItem2 = value; }
-            public int Unknown0c { get => Bons.Unknown0c; set => Bons.Unknown0c = value; }
+            public ushort BonusItem1 { get => Bons.BonusItem1; set => Bons.BonusItem1 = value; }
+            public ushort BonusItem2 { get => Bons.BonusItem2; set => Bons.BonusItem2 = value; }
 
             public override string ToString() => Name;
         }

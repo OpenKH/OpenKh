@@ -95,7 +95,7 @@ namespace OpenKh.Game.Infrastructure
         public List<Trsr> Trsr { get; private set; }
 
         // Battle
-        public List<Fmlv.Level> Fmlv { get; private set; }
+        public List<Fmlv> Fmlv { get; private set; }
         public List<Lvup.PlayableCharacter> Lvup { get; private set; }
 
         // 00worldpoint

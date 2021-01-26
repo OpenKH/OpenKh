@@ -60,15 +60,15 @@ namespace OpenKh.Tests.kh2
                 var roxas = table.FirstOrDefault(enemy => enemy.Id == 242);
                 Assert.Equal(99, roxas.Level);
                 Assert.Equal(1750, roxas.Health[0]);
-                Assert.Equal(86, roxas.Unknown44); // 56
-                Assert.Equal(28, roxas.Unknown46);
+                Assert.Equal(86, roxas.MaxDamage); // 56
+                Assert.Equal(28, roxas.MinDamage);
                 Assert.Equal(100, roxas.PhysicalWeakness);
                 Assert.Equal(25, roxas.FireWeakness);
                 Assert.Equal(25, roxas.IceWeakness);
                 Assert.Equal(25, roxas.ThunderWeakness);
                 Assert.Equal(25, roxas.DarkWeakness);
-                Assert.Equal(25, roxas.Unknown52);
-                Assert.Equal(100, roxas.ReflectWeakness);
+                Assert.Equal(25, roxas.LightWeakness);
+                Assert.Equal(100, roxas.GeneralWeakness);
             });
 
             [Fact]
