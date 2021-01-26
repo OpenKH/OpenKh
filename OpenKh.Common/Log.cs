@@ -11,7 +11,7 @@ namespace OpenKh.Common
 {
     public static class Log
     {
-        public static readonly string AppName = NormalizeName(Assembly.GetExecutingAssembly().ManifestModule.ToString());
+        public static readonly string AppName = NormalizeName(Assembly.GetEntryAssembly().ManifestModule.ToString());
         private static readonly string LogFileName = $"{AppName}.log";
         private static readonly Task _taskLog;
         private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
