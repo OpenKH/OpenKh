@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Game.Debugging
+namespace OpenKh.Game.Debugging
 {
     public interface IDebugConsumer
     {

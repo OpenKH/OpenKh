@@ -86,7 +86,7 @@ namespace OpenKh.Game.Debugging
             _messageDrawContext = new DrawContext
             {
                 IgnoreDraw = false,
-                
+
                 x = 0,
                 y = 0,
                 xStart = 0,

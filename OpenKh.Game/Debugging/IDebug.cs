@@ -1,4 +1,4 @@
-﻿using OpenKh.Game.States;
+using OpenKh.Game.States;
 
 namespace OpenKh.Game.Debugging
 {
