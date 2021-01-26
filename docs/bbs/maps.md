@@ -132,3 +132,258 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  YT02   | 不思議な塔 | Mysterious Tower   |             |
 |  YT03   | 塔:エントランス | Entrance   |             |
 |  YT04   | 塔:魔法使いの部屋 | Sorcerer's Chamber   |             |
+
+**Radiant Garden**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  RG00   | レイディアントガーデン | Radiant Garden  |             |
+|  RG01   | 城外庭園 | Outer Garden  |             |
+|  RG02   | エントランス | Entryway  |             |
+|  RG03   | 中央広場 | Central Square  |             |
+|  RG04   | 水路 | Aqueduct  |             |
+|  RG05   | 住宅街 | Castle Town  |             |
+|  RG06   | 動力炉 | Reactor  |             |
+|  RG07   | 噴水広場 | Fountain Court  |             |
+|  RG08   | マーリンの家 | Merlin's House  |             |
+|  RG09   | 庭園 | Gardens  |             |
+|  RG10   | 正面扉口 | Front Doors  |             |
+|  RG11   | 浄化施設 | Purification Facility  |             |
+|  RG12   | 城外庭園 | Outer Gardens  |             |
+|  RG13   | 中央広場 | Central Square  |             |
+|  RG14   | 中央広場 | Central Square  |             |
+
+**FOR EVENTS ONLY**
+
+| **Map** | **Japanese** | **English** | **Translation** | **Comment** |
+|---------|--------------|-------------|-------------|--------
+|  JB00   | イベント専用 | FOR EVENTS ONLY  |             |
+|  JB01   | ルーイの遺跡:広場 | Louie's Ruins  |             |
+|  JB02   | ルーイの遺跡:通路 | Court  |             |
+|  JB03   | 分岐点 | Path Crossroads  |             |
+|  JB04   | 地下遺跡:入口 | UG Ruins Entrance  |             |
+|  JB05   | 地下遺跡:通路1 | UG Ruins Passage 1   |             |
+|  JB06   | 地下遺跡:通路2 | UG Ruins Passage 2 |             |
+|  JB07   | 地下遺跡:広場 | UG Courtyard  |             |
+|  JB08   | 遺跡隣接ジャングル | Jungle Near Ruins  |             |
+|  JB09   | 高台 | Eminence  |             |
+|  JB10   | ジャングル | Jungle  |             |
+|  JB11   | 人間の村近くの川 | Man-Village River  |             |
+|  JB12   | 湿地 | Bog  |             |
+|  JB13   | 闇の世界：中層 | Realm of Darkness: Middle Zone  |             |
+|  JB14   | 闇の世界：下層 | Realm of Darkness: Lower Zone  |             |
+|  JB15   | 闇の世界：上層 | Realm of Darkness: Upper Zone  |             |
+|  JB16   | 闇の狭間 | The Dark Margin  |             |
+|  JB17   | 闇シンデレラ城（FM） |   |  Cinderella's Castle (FM)         |
+|  JB30   | デスティニーアイランド（ひる） |   | Destiny Islands (Noon)     | Text only present in HD ReMiX
+|  JB31   | トラヴァース２番街 |   | Traverse Town 2nd District            | Text only present in HD ReMiX
+|  JB32   | トラヴァース３番街 |   | Traverse Town 3rd District            | Text only present in HD ReMiX
+|  JB32   |  |   | Destiny Islands (Afternoon)            | Text only present in HD ReMiX
+|  JB32   |  |   | Destiny Islands (Night)            | Text only present in HD ReMiX
+|  JB50   | 異空の回廊 | Lanes Between  |             |
+|  JB50   | ブランク | BLANK  |             |
+|  JB50   | 闇の世界 | Realm of Darkness  |             |
+|  JB50   | wmイベント用 | FOR wm EVENT  |             |
+
+
+きかくてすと
+piゆうえんち
+tm_オペラ座
+nd_ノートルダム１F
+nd_ノートルダムカジモド部屋
+トラヴァースタウン４番街
+tp_01:レガシー号甲板
+tl_the_city_幹線道路
+よび
+
+**Olympus Coliseum**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  HE00   | オリンポスコロシアム | Olympus Coliseum  |             |
+|  HE01   | コロシアム:入口広場 | Coliseum Gates  |             |
+|  HE02   | コロシアム:ロビー | Vestibule  |             |
+|  HE03   | コロシアム:西 | West Bracket  |             |
+|  HE04   | コロシアム:東 | East Bracket  |             |
+|  HE05   | テーベの町 | Town Near Thebes  |             |
+|  HE06   | コロシアム:東 | East Bracket  |             |
+
+**Deep Space**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  LS00   | ディープスペース | Deep Space  |             |
+|  LS01   | トゥーロ星:収容区画 | Prison Block  |             |
+|  LS02   | トゥーロ星:転送室 | Turo Transporter  |             |
+|  LS03   | 宇宙船:転送室 | Durgon Transporter  |             |
+|  LS04   | 船内通路 | Ship Corridor  |             |
+|  LS05   | コントロールルーム | Control Room  |             |
+|  LS06   | 拘束室 | Containment Pod  |             |
+|  LS07   | 接続区画 | Ship Hub  |             |
+|  LS08   | 機関室 | Machinery Bay  |             |
+|  LS09   | 出撃デッキ | Launch Deck  |             |
+|  LS10   | 船体外壁 | Ship Exterior  |             |
+|  LS11   | 宇宙 | Outer Space  |             |
+|  LS12   | 船内通路 | Ship Corridor  |             |
+|  LS13   | 異空の回廊 | Lanes Between  |             |
+|  LS14   | 機関室入口 | Bay Access  |             |
+
+**Destiny Islands**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  DI00   | デスティニーアイランド | Destiny Islands  |             |
+|  DI01   | 離島:浜辺 | Island Beach  |             |
+|  DI02   | 離島:浜辺 | Island Beach  |             |
+|  DI03   | 離島:浜辺 | Island Beach  |             |
+|  DI04   | 本島:浜辺 | Main Island Beach  |             |
+
+**Neverland**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  PP00   | ネバーランド | Neverland  |             |
+|  PP01   | 岬 | Cove  |             |
+|  PP02   | 崖道 | Cliff  |             |
+|  PP03   | 人魚の入り江 | Mermaid Lagoon  |             |
+|  PP04   | 海岸 |   | Seacoast            |
+|  PP05   | ジャングル | Jungle Clearing  |             |
+|  PP06   | ピーターの隠れ家 | Peter's Hideout  |             |
+|  PP07   | 渓谷 | Gully  |             |
+|  PP08   | 集落 | Indian Camp  |             |
+|  PP09   | 虹の滝:下部 | Rainbow Falls: Base  |             |
+|  PP10   | 虹の滝:中部 | Rainbow Falls: Ascent  |             |
+|  PP11   | 虹の滝:頂上 | Rainbow Falls: Crest  |             |
+|  PP12   | ドクロ岩:外 | Skull Rock: Entrance  |             |
+|  PP13   | ドクロ岩:中 | Skull Rock: Cavern  |             |
+|  PP14   | 夜空 | Night Sky  |             |
+
+**Disney Town**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  DC00   | ディズニータウン | Disney Town  |             |
+|  DC01   | 書斎 | Library  |             |
+|  DC02   | メイン会場 | Main Plaza  |             |
+|  DC03   | フルーツボール広場 | Fruitball Court  |             |
+|  DC04   | レースコースA | Racecourse A  |             |
+|  DC05   | レース会場前 | Raceway  |             |
+|  DC06   | からくり部屋 | Gizmo Gallery  |             |
+|  DC07   | ピートの遊技場 | Pete's Rec Room  |             |
+|  DC08   | レースコースB | Racecourse B  |             |
+|  DC09   | レースコースC | Racecourse C  |             |
+|  DC10   | レースコースD | Racecourse D  |             |
+|  DC11   | 異空の回廊 | Lanes Between  |             |
+|  DC12   | レース受付 | Raceway Registration  |             |
+|  DC13   | アイス専用 | Ice Cream  |             |
+|  DC14   | フルーツボール専用 | Fruitball  |             |
+
+レース：城内コース Race: Castle Course
+
+**Keyblade Graveyard**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  KG00   | キーブレード墓場 | Keyblade Graveyard  |             |
+|  KG01   | 荒野 | Badlands  |             |
+|  KG02   | 古戦場 | Seat of War  |             |
+|  KG03   | 砂嵐の道 | Twister Trench  |             |
+|  KG04   | 嵐の中 | Eye of the Storm  |             |
+|  KG05   | 嵐の中 | Eye of the Storm  |             |
+|  KG06   | 嵐の中 | Eye of the Storm  |             |
+|  KG07   | 峡谷 | Fissure  |             |
+|  KG08   | キーブレード墓場 | Keyblade Graveyard  |             |
+|  KG09   | キーブレード墓場 | Keyblade Graveyard  |             |
+|  KG10   | キーブレード墓場 | Keyblade Graveyard  |             |
+|  KG11   | 思念の檻 | Will's Cage   |             |
+|  KG12   | キーブレード墓場 | Keyblade Graveyard  |             |
+|  KG50   | ヴェントゥスの精神世界 | Ventus's Mind  |             |
+|  KG51   | ヴェントゥスの精神世界 | Ventus's Mind  |             |
+|  KG52   | ヴェントゥスの精神世界 | Ventus's Mind  |             |
+|  KG53   | ソラの精神世界 | Sora's Mind  |             |
+|  KG54   | テラ=ゼアノートの精神世界 | Terra-Xehanort's Mind  |             |
+|  KG55   | キーブレード墓場 | Keyblade Graveyard  |             |
+|  KG56   | 荒野 | Badlands  |             |
+
+**Mirage Arena**
+
+| **Map** | **Japanese** | **English** | **Translation** | **Comment** |
+|---------|--------------|-------------|-------------|------
+|  VS00   | ミラージュアリーナ | Mirage Arena  |             |
+|  VS01   | ロビー | Hub  |             |
+|  VS02   | コロシアム | Coliseum  |             |
+|  VS03   | アリーナ | Arena  |             |
+|  VS04   | 荒野 | Badlands  |             |
+|  VS05   | ピンボール | Pinball  |             |
+|  VS06   | 接続区画 | Ship Hub  |             |
+|  VS07   | ねずみの通り道 | Mousehole  |             |
+|  VS08   | 屋敷はずれの森 | Forest  |             |
+|  VS09   | ドクロ岩:中 | Skull Rock  |             |
+|  VS10   | 謁見の間 | Audience Chamber  |             |
+|  VS11   | 前庭 | Forecourt  |             |
+|  VS12   | 山頂 | Summit  |             |
+|  VS13   | 出撃デッキ | Launch Deck  |             |
+|  VS14   | 船体外壁 | Ship Exterior  |             |
+|  VS15   | アリーナ | Arena  |             |
+|  VS16   | 大広間（昼） |   | Great Hall (Noon)            |
+|  VS17   | モンストロ（体内A） |   | Monstro (Interior A)            |
+|  VS18   | モンストロ（外） |   | Monstro (Exterior)            |
+|  VS19   | モンストロ（体内B） |   | Monstro (Interior B)       |
+|  VS20   | 山頂(遠景壊) |   | Summit(Broken Environment)       |
+
+**Command Board**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  BD00   | コマンドボード | Command Board  |             |
+|  BD01   | DP:旅立ちの地　えんけい | Land of Departure BG  |             |
+|  BD03   | CD:シンデレラ　えんけい | Cinderella BG  |             |
+|  BD09   | LS:リロ&スティッチ　えんけい | Lilo & Stitch BG  |             |
+|  BD11   | PP:ピーターパン　えんけい | Peter Pan BG  |             |
+|  BD12   | DC:ディズニーキャッスル　えんけい | Disney Castle BG  |             |
+|  BD18   | WP:くまのプーさん　えんけい | Winnie the Pooh BG  |             |
+|  BD19   | PP：ピーターパン（かいがい） | Peter Pan BG  |  Japanese version mentions (Overseas)           |
+
+**World Map**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  WM00   | ワールドマップ | World Map  |             |
+|  WM01   | wm01 | wm01  |             |
+
+**The Hundred Acre Wood**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  WP00   | 100エーカーの森 | The Hundred Acre Wood  |             |
+
+**The Badlands**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  1900   | 謎の荒野 | The Badlands  |             |
+
+**Jump Festa**
+
+| **Map** | **Japanese** | **English** | **Comment** |
+|---------|--------------|-------------|-------------|
+|  JF00   | ジャンフェス(sw10) | Jump Festa (sw10)  |             |
+|  JF01   | ジャンフェス(cd07) | Jump Festa (cd07)  |             |
+|  JF02   | ジャンフェス(cd09) | Jump Festa (cd09)  |             |
+|  JF03   | ジャンフェス(sb10) | Jump Festa (sb10  |             |
+|  JF10   | シンデレラ城下町 | The Town  |             |
+|  JF11   | ポリゴンぶんかつけんしょ | Poly. Partition Test  |             |
+|  JF70   | tt27 | tt27  |             |
+|  JF71   | dc01 | dc01  |             |
+|  JF72   | バトルダイス・テスト１ | Battle Dice Test 1  |             |
+|  JF73   | バトルダイス・テスト２ | Battle Dice Test 2  |             |
+|  JF74   | バトルダイス・テスト３ | Battle Dice Test 3  |             |
+|  JF75   | バトルダイス・テスト４ | Battle Dice Test 4  |             |
+|  JF90   | 各種動作テスト | Operations Test  |             |
+|  JF91   | カメラ当たりけんしょう | Camera Collision Test  |             |
+|  JF92   | きかくテスト | Planner Test  |             |
+|  JF93   | グリッド | Grid  |             |
+|  JF94   | 泳ぎテスト | Swimming Test  |             |
+|  JF95   | エフェクト関連テスト | Effect Test  |             |
+|  JF96   | 配置テスト１ | Placement Test 1  |             |
+|  JF97   | 配置テスト２ | Placement Test 2  |             |
