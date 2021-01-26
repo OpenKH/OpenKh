@@ -2,9 +2,9 @@
 
 Unused Assets Are Sorted by [File Types](file-type.md)
 
-# Models
+## Models
 | File Name | Description | Image(s) |
-|-|-|-|
+|---|---|---|
 | B_EX340.mdlx | Unused model of the head of Xemnas's Dragon's Head | ![image](./images/unused/unused_models/B_EX340.png) |
 | F_CM510.mdlx | Naminé's Promise Charm, used in the prerendered KH:CoM GBA cutscenes | ![image](./images/unused/unused_models/F_CM510.png) |
 | F_EX510.mdlx | Naminé's sketchpad, used in the prerendered KH:CoM GBA cutscenes | ![image](./images/unused/unused_models/F_EX510.png) |
