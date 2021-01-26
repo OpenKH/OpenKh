@@ -657,22 +657,23 @@ Data on magic.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0     | byte | Type
+| 0     | byte | Id
 | 1     | byte | Level
-| 2     | 2B | ???
+| 2     | byte | World
+| 3     | byte | Padding
 | 4     | char[32] | Filename
-| 24     | 2B | ???
-| 26     | short | Command - [Command LIST](../../dictionary/commands.md)
-| 28     | short | Ground motion - [Motion LIST](../../file/anb/mset.html)
-| 2A     | short | Ground ???
-| 2C     | short | Finish motion
-| 2E     | short | Finish ???
-| 30     | short | Air motion
-| 32     | short | Air ???
-| 34     | byte | ???
-| 35     | byte | ???
-| 36     | byte | ???
-| 37     | byte | Padding
+| 36     | ushort | Item
+| 38     | ushort | Command - [Command LIST](../../dictionary/commands.md)
+| 40     | short | Ground motion - [Motion LIST](../../file/anb/mset.html)
+| 42     | short | Ground blend
+| 44     | short | Finish motion
+| 46     | short | Finish blend
+| 48     | short | Air motion
+| 50     | short | Air blend
+| 52     | byte | Voice
+| 53     | byte | Voice Finisher
+| 54     | byte | Voice Self
+| 55     | byte | Padding
 
 ## Vbrt
 
@@ -706,10 +707,12 @@ Contains the level-up table for summons and drive forms.
 
 | Offset | Type  | Description
 |--------|-------|-------------
-|  0     | byte  | First digit is the Form id, second digit is the Form level (e.g. 0x13 is Valor Form Level 3)
-|  1     | byte  | Level of the movement ability in the form (High Jump, Quick Run etc.)
-|  2     | short | Ability obtained through level up - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-|  4     | int   | EXP needed for level up
+| 00     | byte : 0-3 | [Id](#forms)
+| 00     | byte : 4-7 | Level
+| 01     | byte : 0-3 | Ability Level
+| 01     | byte : 4-7 | Anti Rate
+| 02     | ushort | Ability obtained through level up - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 04     | int   | EXP needed for level up
 
 ### Forms
 
