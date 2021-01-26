@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using Xe.BinaryMapper;
 
@@ -23,10 +23,10 @@ namespace OpenKh.Kh2.Battle
                 [Data] public byte Magic { get; set; }
                 [Data] public byte Defense { get; set; }
                 [Data] public byte Ap { get; set; }
-                [Data] public short SwordAbility { get; set; }
-                [Data] public short ShieldAbility { get; set; }
-                [Data] public short StaffAbility { get; set; }
-                [Data] public short Padding { get; set; }
+                [Data] public ushort SwordAbility { get; set; }
+                [Data] public ushort ShieldAbility { get; set; }
+                [Data] public ushort StaffAbility { get; set; }
+                [Data(Count = 2)] public byte[] Padding { get; set; }
             }
         }
 
