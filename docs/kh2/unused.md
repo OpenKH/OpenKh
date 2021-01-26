@@ -46,7 +46,7 @@ Unused Assets Are Sorted by [File Types](file-type.md)
 | N_EX621.mdlx | Unused NPC model of Naminé that's misnumbered(her actual model name is N_EX620) | ![image](./images/unused/unused_models/N_EX621.PNG) |
 | N_EX830_BTL.mdlx | Unused model of unhooded Organization Coat Roxas, it existed back in KH2 Vanilla as well | ![image](./images/unused/unused_models/N_EX830_BTL.PNG) |
 | N_HB050.mdlx | Unused model of Stitch's spaceship | ![image](./images/unused/unused_models/N_HB050.PNG) |
-| N_ZZ010.mdlx | Unused model of Marluxia with his hood up, it's used in the prerendered KH:CoM GBA cutscenes (Top image is Final Mix, bottom image is KH2 Vanilla) | ![image](./images/unused/unused_models/N_ZZ010.PNG)<br><br>![image](./images/unused/unused_models/N_ZZ010)Vanilla.PNG) |
+| N_ZZ010.mdlx | Unused model of Marluxia with his hood up, it's used in the prerendered KH:CoM GBA cutscenes (Top image is Final Mix, bottom image is KH2 Vanilla) | ![image](./images/unused/unused_models/N_ZZ010.PNG)<br><br>![image](./images/unused/unused_models/N_ZZ010_Vanilla.PNG) |
 | N_ZZ160_EV.mdlx | While the Guardian model from this model is used, Ansem himself isn't | ![image](./images/unused/unused_models/N_ZZ160_EV.PNG) |
 | P_EX300.mdlx | Unused model of Woody, it existed back in KH2 Vanilla as well | ![image](./images/unused/unused_models/P_EX300.PNG) |
 | P_EX310.mdlx | Unused model of Buzz Lightyear, it existed back in KH2 Vanilla as well | ![image](./images/unused/unused_models/P_EX310.PNG) |
