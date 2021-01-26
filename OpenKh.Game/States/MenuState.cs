@@ -227,7 +227,7 @@ namespace OpenKh.Game.States
             var deltaTime = deltaTimes.DeltaTime;
 
             ProcessInput(InputManager);
-            
+
             _layoutRenderer.FrameIndex++;
             _backgroundSeq.Update(deltaTime);
             _subMenuDescriptionSeq.Update(deltaTime);

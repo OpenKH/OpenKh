@@ -1,20 +1,20 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenKh.Game.Debugging;
-using OpenKh.Game.Infrastructure;
+using OpenKh.Bbs;
 using OpenKh.Common;
+using OpenKh.Engine;
+using OpenKh.Engine.MonoGame;
+using OpenKh.Engine.Parsers;
+using OpenKh.Game.Debugging;
+using OpenKh.Game.Entities;
+using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
-using System.Collections.Generic;
-using System.Linq;
 using OpenKh.Kh2.Models;
-using OpenKh.Bbs;
-using OpenKh.Game.Entities;
-using OpenKh.Engine.MonoGame;
-using OpenKh.Engine;
-using System.IO;
-using OpenKh.Engine.Parsers;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace OpenKh.Game.States
 {
@@ -193,7 +193,7 @@ namespace OpenKh.Game.States
 
             foreach (var ent in _pmpEntities)
             {
-                if(ent.DifferentMatrix)
+                if (ent.DifferentMatrix)
                 {
                     Matrix world = _camera.World;
                     world.M14 = 0;
@@ -233,7 +233,7 @@ namespace OpenKh.Game.States
                 pass.Apply();
 
                 RenderMeshNew(pass, _pmpModels[ent.Index], passRenderOpaque);
-                
+
             }
         }
 

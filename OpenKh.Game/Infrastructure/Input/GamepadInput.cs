@@ -86,14 +86,16 @@ namespace OpenKh.Game.Infrastructure.Input
         {
             if (Math.Abs(input) < deadzone)
                 return 0.0f;
-            else return input;
+            else
+                return input;
         }
 
         private Vector2 ExcludeRadialDeadZone(Vector2 input, float deadzone)
         {
             if (input.Length() < deadzone)
                 return Vector2.Zero;
-            else return input;
+            else
+                return input;
         }
 
         private Vector2 ExcludeScaledRadialDeadZone(Vector2 input, float deadzone)
