@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,20 +11,31 @@ namespace OpenKh.Game.Debugging
 {
     public static class Log
     {
-        private const string LogFileName = "openkh.log";
-        private static Stopwatch _stopwatch = Stopwatch.StartNew();
-        private static StreamWriter _logWriter = new StreamWriter(LogFileName, false, Encoding.UTF8, 65536);
-        private static Queue<string> _logQueue = new Queue<string>();
-        private static CancellationTokenSource _cancellationTokenSrc = new CancellationTokenSource();
-        private static Task _taskLog;
+        public static readonly string AppName = NormalizeName(Assembly.GetExecutingAssembly().ManifestModule.ToString());
+        private static readonly string LogFileName = $"{AppName}.log";
+        private static readonly Task _taskLog;
+        private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+        private static readonly StreamWriter _logWriter = new StreamWriter(LogFileName, false, Encoding.UTF8, 65536);
+        private static readonly Queue<(long ms, string tag, string fmt, string[] args)> _logQueue =
+            new Queue<(long, string, string, string[])>();
+        private static readonly CancellationTokenSource _cancellationTokenSrc = new CancellationTokenSource();
 
-        public static void Info(string text) => LogText("INF", text);
-        public static void Warn(string text) => LogText("WRN", text);
-        public static void Err(string text) => LogText("ERR", text);
+        public delegate void LogDispatch(long ms, string tag, string message);
+        public static event LogDispatch OnLogDispatch;
+
+        public static void Info(string fmt, params string[] args) => LogText("INF", fmt, args);
+        public static void Warn(string fmt, params string[] args) => LogText("WRN", fmt, args);
+        public static void Err(string fmt, params string[] args) => LogText("ERR", fmt, args);
 
         static Log()
         {
             _taskLog = Task.Run(LogWriterListener, _cancellationTokenSrc.Token);
+            OnLogDispatch += (long ms, string tag, string message) =>
+            {
+                var str = $"[{(ms / 1000):D3}.{(ms % 1000):D3}] {tag} {message}";
+                Console.Error.WriteLine(str);
+                _logWriter.WriteLine(str);
+            };
         }
 
         public static void Close()
@@ -54,12 +66,11 @@ namespace OpenKh.Game.Debugging
             throw new TimeoutException("Could not flush logs within the time limit");
         }
 
-        private static void LogText(string tag, string text)
+        private static void LogText(string tag, string fmt, string[] args)
         {
             var ms = _stopwatch.ElapsedMilliseconds;
-            var str = $"[{(ms / 1000):D3}.{(ms % 1000):D3}] {tag} {text}";
             lock (_logQueue)
-                _logQueue.Enqueue(str);
+                _logQueue.Enqueue((ms, tag, fmt, args));
         }
 
         private static void LogWriterListener()
@@ -78,14 +89,19 @@ namespace OpenKh.Game.Debugging
             lock (_logQueue)
             {
                 while (_logQueue.Count > 0)
-                    LogForReal(_logQueue.Dequeue());
+                {
+                    var evt = _logQueue.Dequeue();
+                    OnLogDispatch(evt.ms, evt.tag, string.Format(evt.fmt, evt.args));
+                }
             }
         }
 
-        private static void LogForReal(string str)
+        private static string NormalizeName(string name)
         {
-            Console.WriteLine(str);
-            _logWriter.WriteLine(str);
+            if (name.EndsWith(".dll") || name.EndsWith(".exe"))
+                return name.Substring(0, name.Length - 4);
+
+            return name;
         }
     }
 }
