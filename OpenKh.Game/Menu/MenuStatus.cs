@@ -1,5 +1,5 @@
 using OpenKh.Engine.Renderers;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using OpenKh.Game.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;

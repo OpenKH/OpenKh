@@ -5,7 +5,7 @@ using OpenKh.Engine;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renders;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using OpenKh.Game.Entities;
 using OpenKh.Game.Events;
 using OpenKh.Kh2;

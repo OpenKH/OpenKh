@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenKh.Game.Debugging
+namespace OpenKh.Common
 {
     public static class Log
     {

@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.DataContent

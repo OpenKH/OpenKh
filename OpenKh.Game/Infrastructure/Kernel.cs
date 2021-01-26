@@ -3,7 +3,7 @@ using OpenKh.Common.Archives;
 using OpenKh.Engine;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Kh2.Contextes;

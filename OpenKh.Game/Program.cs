@@ -1,6 +1,6 @@
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Win32.SafeHandles;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;

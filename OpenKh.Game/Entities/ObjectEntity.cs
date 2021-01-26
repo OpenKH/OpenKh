@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Motion;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Common;
 using OpenKh.Bbs;
