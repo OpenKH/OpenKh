@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.Kh2MapStudio.Interfaces;
+using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
 namespace OpenKh.Tools.Kh2MapStudio.Windows

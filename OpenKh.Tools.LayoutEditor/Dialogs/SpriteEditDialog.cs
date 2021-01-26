@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
 using OpenKh.Tools.LayoutEditor.Interfaces;
@@ -18,7 +18,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
         private readonly IEditorSettings _settings;
         private readonly ISpriteTexture _cropAtlasTexture;
         private readonly IntPtr _cropAtlasTextureId;
-        
+
         private int _selectedSpriteModel;
         private SpriteModel SpriteModel => _spriteModels[_selectedSpriteModel];
 
@@ -67,9 +67,12 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             };
 
             ImGui.Columns(4, "ltrb", false);
-            bool sourceChanged = ImGui.DragInt("UA", ref source[0]); ImGui.NextColumn();
-            sourceChanged |= ImGui.DragInt("VA", ref source[1]); ImGui.NextColumn();
-            sourceChanged |= ImGui.DragInt("UB", ref source[2]); ImGui.NextColumn();
+            bool sourceChanged = ImGui.DragInt("UA", ref source[0]);
+            ImGui.NextColumn();
+            sourceChanged |= ImGui.DragInt("VA", ref source[1]);
+            ImGui.NextColumn();
+            sourceChanged |= ImGui.DragInt("UB", ref source[2]);
+            ImGui.NextColumn();
             sourceChanged |= ImGui.DragInt("VB", ref source[3]);
             if (sourceChanged)
             {

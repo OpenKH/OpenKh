@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Engine.Renders;
 using OpenKh.Tools.Common.Rendering;
 using System;

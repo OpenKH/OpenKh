@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Tools.Kh2MapStudio
+namespace OpenKh.Tools.Kh2MapStudio
 {
     static class EditorSettings
     {

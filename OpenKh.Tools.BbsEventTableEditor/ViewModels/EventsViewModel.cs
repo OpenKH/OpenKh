@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;

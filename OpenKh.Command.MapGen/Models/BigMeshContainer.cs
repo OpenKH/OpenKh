@@ -1,4 +1,4 @@
-﻿using Assimp;
+using Assimp;
 using OpenKh.Command.MapGen.Models;
 using System;
 using System.Collections.Generic;

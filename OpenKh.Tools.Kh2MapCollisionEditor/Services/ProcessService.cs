@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.Common;
+using OpenKh.Tools.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

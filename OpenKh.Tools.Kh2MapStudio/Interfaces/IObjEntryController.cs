@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.MonoGame;
+using OpenKh.Engine.MonoGame;
 using OpenKh.Kh2;
 using System.Collections.Generic;
 

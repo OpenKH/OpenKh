@@ -20,7 +20,7 @@ namespace OpenKh.Tools.Kh2TextEditor.Views
     /// </summary>
     public partial class TextEditorView : UserControl
     {
-       public TextEditorView()
+        public TextEditorView()
         {
             InitializeComponent();
         }

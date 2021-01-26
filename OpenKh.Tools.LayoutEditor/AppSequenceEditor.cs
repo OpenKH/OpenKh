@@ -69,7 +69,7 @@ namespace OpenKh.Tools.LayoutEditor
                 _selectedAnimGroup = value;
                 _animationFrameCurrent = 0;
                 _sequencerSelectedAnimation = 0;
-                
+
                 var animationGroup = _sequence.AnimationGroups[_selectedAnimGroup];
                 _animationFrameCount = SequenceExtensions.GetFrameLength(animationGroup);
                 _debugSequenceRenderer.AnimationGroup = animationGroup;
@@ -407,7 +407,7 @@ namespace OpenKh.Tools.LayoutEditor
             int spriteGroupIndex = animation.SpriteGroupIndex;
             if (ImGui.InputInt($"Sprite group##{index}", ref spriteGroupIndex))
                 animation.SpriteGroupIndex = Math.Min(Math.Max(spriteGroupIndex, 0), _sequence.SpriteGroups.Count - 1);
-            
+
             if (ImGuiFlagBox(animation, $"Enable translation animation##{index}", Sequence.PivotDisableFlag))
             {
                 var xaPair = new int[] { animation.TranslateXStart, animation.TranslateXEnd };
@@ -511,7 +511,7 @@ namespace OpenKh.Tools.LayoutEditor
                 }
             }
 
-            if  (ImGuiFlagBox(animation, $"Enable scaling##{index}", Sequence.ScalingDisableFlag))
+            if (ImGuiFlagBox(animation, $"Enable scaling##{index}", Sequence.ScalingDisableFlag))
             {
                 if (ImGuiFlagBox(animation, $"Scaling interpolation##{index}", Sequence.ScalingInterpolationFlag))
                 {

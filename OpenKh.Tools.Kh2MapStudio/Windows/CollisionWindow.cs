@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using OpenKh.Kh2;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
 
@@ -13,7 +13,8 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
 
         private static void Node(Coct coct, int index)
         {
-            if (index == -1) return;
+            if (index == -1)
+                return;
             ForTreeNode($"Node {index}", () =>
             {
                 var node = coct.CollisionMeshGroupList[index];

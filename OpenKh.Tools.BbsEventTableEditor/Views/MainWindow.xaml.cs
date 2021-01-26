@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.BbsEventTableEditor.ViewModels;
+using OpenKh.Tools.BbsEventTableEditor.ViewModels;
 using System.Windows;
 
 namespace OpenKh.Tools.BbsEventTableEditor.Views

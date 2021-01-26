@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Tools.IdxImg.Interfaces;
 using OpenKh.Tools.IdxImg.Views;
 using System;

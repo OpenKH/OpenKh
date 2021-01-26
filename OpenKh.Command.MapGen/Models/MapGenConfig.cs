@@ -1,4 +1,4 @@
-﻿using OpenKh.Command.MapGen.Utils;
+using OpenKh.Command.MapGen.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;

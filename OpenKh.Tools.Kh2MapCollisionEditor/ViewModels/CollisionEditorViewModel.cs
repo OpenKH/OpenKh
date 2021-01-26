@@ -40,15 +40,19 @@ namespace OpenKh.Tools.Kh2MapCollisionEditor.ViewModels
         public List<CoctLogical.CoctCollisionMeshGroup> C1 => _coct?.CollisionMeshGroupList;
         public IEnumerable<CoctLogical.CoctCollisionMesh> C2 => !AllC2 ? C1Item?.Meshes : C1.SelectMany(c1 => c1.Meshes);
         public IEnumerable<CoctLogical.CoctCollision> C3 => !AllC3 ? C2Item?.Items : C1.SelectMany(c1 => c1.Meshes.SelectMany(c2 => c2.Items));
-        public IEnumerable<CoctLogical.CoctVector4> C4 { get
+        public IEnumerable<CoctLogical.CoctVector4> C4
+        {
+            get
             {
-                if (C3Item == null) yield break;
+                if (C3Item == null)
+                    yield break;
                 yield return _coct?.VertexList[C3Item.Vertex1];
                 yield return _coct?.VertexList[C3Item.Vertex2];
                 yield return _coct?.VertexList[C3Item.Vertex3];
                 if (C3Item.Vertex4 >= 0)
                     yield return _coct?.VertexList[C3Item.Vertex4];
-            } }
+            }
+        }
 
         public CoctLogical.CoctCollisionMeshGroup C1Item { get => c1Item; set { c1Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C2)); } }
         public CoctLogical.CoctCollisionMesh C2Item { get => c2Item; set { c2Item = value; OnPropertyChanged(); OnPropertyChanged(nameof(C3)); } }

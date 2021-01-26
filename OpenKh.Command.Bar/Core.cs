@@ -11,7 +11,7 @@ namespace OpenKh.Command.Bar
         internal class BarRoot
         {
             [JsonProperty] public string OriginalFileName { get; set; }
-            [JsonProperty] public  Kh2.Bar.MotionsetType Motionset { get; set; }
+            [JsonProperty] public Kh2.Bar.MotionsetType Motionset { get; set; }
             [JsonProperty] public List<BarDesc> Entries { get; set; }
         }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common;

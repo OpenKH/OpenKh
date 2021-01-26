@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 
 namespace OpenKh.Tools.Kh2MapCollisionEditor.Services
 {

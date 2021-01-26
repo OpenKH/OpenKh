@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -19,7 +19,8 @@ namespace OpenKh.Tools.Common.CustomImGui
 
             static DrawVertDeclaration()
             {
-                unsafe { Size = sizeof(ImDrawVert); }
+                unsafe
+                { Size = sizeof(ImDrawVert); }
 
                 Declaration = new VertexDeclaration(
                     Size,
@@ -117,14 +118,16 @@ namespace OpenKh.Tools.Common.CustomImGui
 
             // Copy the data to a managed array
             var pixels = new byte[width * height * bytesPerPixel];
-            unsafe { Marshal.Copy(new IntPtr(pixelData), pixels, 0, pixels.Length); }
+            unsafe
+            { Marshal.Copy(new IntPtr(pixelData), pixels, 0, pixels.Length); }
 
             // Create and register the texture as an XNA texture
             var tex2d = new Texture2D(_graphicsDevice, width, height, false, SurfaceFormat.Color);
             tex2d.SetData(pixels);
 
             // Should a texture already have been build previously, unbind it first so it can be deallocated
-            if (_fontTextureId.HasValue) UnbindTexture(_fontTextureId.Value);
+            if (_fontTextureId.HasValue)
+                UnbindTexture(_fontTextureId.Value);
 
             // Bind the new texture to an ImGui-friendly id
             _fontTextureId = BindTexture(tex2d);
@@ -179,7 +182,8 @@ namespace OpenKh.Tools.Common.CustomImGui
         {
             ImGui.Render();
 
-            unsafe { RenderDrawData(ImGui.GetDrawData()); }
+            unsafe
+            { RenderDrawData(ImGui.GetDrawData()); }
         }
 
         #endregion ImGuiRenderer
@@ -216,7 +220,8 @@ namespace OpenKh.Tools.Common.CustomImGui
             // MonoGame-specific //////////////////////
             _game.Window.TextInput += (s, a) =>
             {
-                if (a.Character == '\t') return;
+                if (a.Character == '\t')
+                    return;
 
                 io.AddInputCharacter(a.Character);
             };

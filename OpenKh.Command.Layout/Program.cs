@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.IO;
@@ -154,7 +154,7 @@ namespace OpenKh.Command.Layout
                 Deserialize<Sequence>(Input, Output, "sequence", (x, s) => x.Write(s));
         }
     }
-    
+
     internal class InvalidFileException : Exception
     {
         public InvalidFileException(string fileName, string type) :

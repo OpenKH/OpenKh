@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
 using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;

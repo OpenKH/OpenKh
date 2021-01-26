@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.IdxImg.Interfaces;
+using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

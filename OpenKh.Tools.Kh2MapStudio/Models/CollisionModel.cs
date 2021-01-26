@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Kh2;
 using System;
@@ -54,7 +54,8 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
 
         public void Draw(GraphicsDevice graphics)
         {
-            if (!IsVisible) return;
+            if (!IsVisible)
+                return;
 
             _vertexBuffer?.Dispose();
             _vertexBuffer = null;

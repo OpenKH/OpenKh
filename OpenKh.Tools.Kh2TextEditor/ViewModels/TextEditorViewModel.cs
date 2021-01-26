@@ -170,7 +170,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                         if (_ok)
                             Text += "{:color " + string.Format("#{0}{1}{2}{3}", _color.R.ToString("X2"), _color.G.ToString("X2"), _color.B.ToString("X2"), _color.A.ToString("X2")) + "}";
                     }
-                        break;
+                    break;
                     case 2:
                         Text += "{:scale 16}";
                         break;

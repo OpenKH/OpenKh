@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.IdxImg.Interfaces;
+using OpenKh.Tools.IdxImg.Interfaces;
 using System.Windows;
 using System.Windows.Controls;
 

@@ -27,7 +27,7 @@ namespace OpenKh.WinShell.IMZUtilities
         {
             Width = width;
             Height = height;
-            
+
             Bits = new int[width * height];
 
             for (int i = 0; i < bits.Length; i += 4)

@@ -121,8 +121,10 @@ namespace OpenKh.Tools.Kh2MapStudio
         {
             _bootstrap.GraphicsDevice.Clear(xna.Color.CornflowerBlue);
             ProcessKeyMapping();
-            if (!_bootstrap.ImGuiWantTextInput) ProcessKeyboardInput(Keyboard.GetState(), 1f / 60);
-            if (!_bootstrap.ImGuiWantCaptureMouse) ProcessMouseInput(Mouse.GetState());
+            if (!_bootstrap.ImGuiWantTextInput)
+                ProcessKeyboardInput(Keyboard.GetState(), 1f / 60);
+            if (!_bootstrap.ImGuiWantCaptureMouse)
+                ProcessMouseInput(Mouse.GetState());
 
             ImGui.PushStyleColor(ImGuiCol.WindowBg, BgUiColor);
             ForControl(ImGui.BeginMainMenuBar, ImGui.EndMainMenuBar, MainMenu);
@@ -131,14 +133,22 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             ForWindow("Tools", () =>
             {
-                if (EditorSettings.ViewCamera) CameraWindow.Run(_mapRenderer.Camera);
-                if (EditorSettings.ViewLayerControl) LayerControllerWindow.Run(_mapRenderer);
-                if (EditorSettings.ViewSpawnPoint) SpawnPointWindow.Run(_mapRenderer);
-                if (EditorSettings.ViewMeshGroup) MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
-                if (EditorSettings.ViewBobDescriptor) BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
-                if (EditorSettings.ViewSpawnScriptMap) SpawnScriptWindow.Run("map", _mapRenderer.SpawnScriptMap);
-                if (EditorSettings.ViewSpawnScriptBattle) SpawnScriptWindow.Run("btl", _mapRenderer.SpawnScriptBattle);
-                if (EditorSettings.ViewSpawnScriptEvent) SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
+                if (EditorSettings.ViewCamera)
+                    CameraWindow.Run(_mapRenderer.Camera);
+                if (EditorSettings.ViewLayerControl)
+                    LayerControllerWindow.Run(_mapRenderer);
+                if (EditorSettings.ViewSpawnPoint)
+                    SpawnPointWindow.Run(_mapRenderer);
+                if (EditorSettings.ViewMeshGroup)
+                    MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
+                if (EditorSettings.ViewBobDescriptor)
+                    BobDescriptorWindow.Run(_mapRenderer.BobDescriptors, _mapRenderer.BobMeshGroups.Count);
+                if (EditorSettings.ViewSpawnScriptMap)
+                    SpawnScriptWindow.Run("map", _mapRenderer.SpawnScriptMap);
+                if (EditorSettings.ViewSpawnScriptBattle)
+                    SpawnScriptWindow.Run("btl", _mapRenderer.SpawnScriptBattle);
+                if (EditorSettings.ViewSpawnScriptEvent)
+                    SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
             });
 
             ImGui.PopStyleColor();
@@ -355,17 +365,27 @@ namespace OpenKh.Tools.Kh2MapStudio
                 moveSpeed = (float)(deltaTime * EditorSettings.MoveSpeedShift);
 
             var camera = _mapRenderer.Camera;
-            if (keyboard.IsKeyDown(Keys.W)) camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
-            if (keyboard.IsKeyDown(Keys.S)) camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
-            if (keyboard.IsKeyDown(Keys.A)) camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
-            if (keyboard.IsKeyDown(Keys.D)) camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
-            if (keyboard.IsKeyDown(Keys.Q)) camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
-            if (keyboard.IsKeyDown(Keys.E)) camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.W))
+                camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.S))
+                camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.A))
+                camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.D))
+                camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.Q))
+                camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.E))
+                camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
 
-            if (keyboard.IsKeyDown(Keys.Up)) camera.CameraRotationYawPitchRoll += new xna.Vector3(0, 0, 1 * speed);
-            if (keyboard.IsKeyDown(Keys.Down)) camera.CameraRotationYawPitchRoll -= new xna.Vector3(0, 0, 1 * speed);
-            if (keyboard.IsKeyDown(Keys.Left)) camera.CameraRotationYawPitchRoll += new xna.Vector3(1 * speed, 0, 0);
-            if (keyboard.IsKeyDown(Keys.Right)) camera.CameraRotationYawPitchRoll -= new xna.Vector3(1 * speed, 0, 0);
+            if (keyboard.IsKeyDown(Keys.Up))
+                camera.CameraRotationYawPitchRoll += new xna.Vector3(0, 0, 1 * speed);
+            if (keyboard.IsKeyDown(Keys.Down))
+                camera.CameraRotationYawPitchRoll -= new xna.Vector3(0, 0, 1 * speed);
+            if (keyboard.IsKeyDown(Keys.Left))
+                camera.CameraRotationYawPitchRoll += new xna.Vector3(1 * speed, 0, 0);
+            if (keyboard.IsKeyDown(Keys.Right))
+                camera.CameraRotationYawPitchRoll -= new xna.Vector3(1 * speed, 0, 0);
         }
 
         private void ProcessMouseInput(MouseState mouse)

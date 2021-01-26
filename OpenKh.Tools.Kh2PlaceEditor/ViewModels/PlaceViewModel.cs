@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine;
+using OpenKh.Engine;
 using OpenKh.Kh2;
 using System.Text;
 using Xe.Tools;
@@ -32,7 +32,7 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
         public Place Place { get; }
 
         public string Map => $"{World}{_index:D02}";
-        
+
         public short MessageId
         {
             get => (short)(Place.MessageId & 0x7fff);
@@ -43,7 +43,7 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
                 OnPropertyChanged(nameof(Message));
             }
         }
-        
+
         public string Name
         {
             get => Encoding.GetString(Place.Name);

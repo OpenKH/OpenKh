@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using OpenKh.Tools.Kh2MapStudio.Models;
 using System;
 using System.Collections.Generic;
