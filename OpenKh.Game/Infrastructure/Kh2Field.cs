@@ -11,6 +11,7 @@ using OpenKh.Game.Events;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
+using OpenKh.Kh2.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,8 @@ namespace OpenKh.Game.Infrastructure
         private readonly Kh2MessageProvider _eventMessageProvider;
         private readonly List<ObjectEntity> _actors = new List<ObjectEntity>();
         private readonly Dictionary<int, ObjectEntity> _actorIds = new Dictionary<int, ObjectEntity>();
+        private readonly List<BobEntity> _bobEntities = new List<BobEntity>();
+        private readonly List<MeshGroup> _bobModels = new List<MeshGroup>();
         private readonly Dictionary<int, byte[]> _subtitleData = new Dictionary<int, byte[]>();
         private readonly MonoSpriteDrawing _drawing;
         private Bar _binarcArd;
@@ -95,8 +98,43 @@ namespace OpenKh.Game.Infrastructure
             FadeFromBlack(1.0f);
         }
 
+        public void UnloadMap()
+        {
+            _bobModels.Clear();
+            _bobEntities.Clear();
+        }
+
+        private void InternallyLoadMap(int worldIndex, int placeIndex)
+        {
+            Log.Info($"Map={worldIndex},{placeIndex}");
+
+            var fileName = _kernel.GetMapFileName(worldIndex, placeIndex);
+            var entries = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
+            //AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
+            //AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
+            //AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
+
+            _bobEntities.AddRange(entries.ForEntry("out", Bar.EntryType.BgObjPlacement, BobDescriptor.Read)?
+                .Select(x => new BobEntity(x))?.ToList() ?? new List<BobEntity>());
+
+            var bobModels = entries.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
+            var bobTextures = entries.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
+
+            for (var i = 0; i < bobModels.Count; i++)
+            {
+                _bobModels.Add(new MeshGroup
+                {
+                    MeshDescriptors = MeshLoader.FromKH2(bobModels[i]).MeshDescriptors,
+                    Textures = bobTextures[i].LoadTextures(_graphicsDevice).ToArray()
+                });
+            }
+        }
+
         public void LoadMapArd(int world, int area)
         {
+            UnloadMap();
+            InternallyLoadMap(world, area);
+
             _kernel.DataContent
                 .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[world]}.bar")
                 .Using(stream => Bar.Read(stream))
@@ -177,6 +215,8 @@ namespace OpenKh.Game.Infrastructure
 
         public void ForEveryModel(Action<IEntity, IMonoGameModel> action)
         {
+            foreach (var bob in _bobEntities)
+                action(bob, _bobModels[bob.BobIndex]);
             foreach (var actor in _actors.Where(x => x.IsVisible))
                 action(actor, actor);
         }

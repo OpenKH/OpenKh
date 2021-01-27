@@ -41,14 +41,12 @@ namespace OpenKh.Game.States
         private InputManager _input;
         private IStateChange _stateChange;
         private List<MeshGroup> _models = new List<MeshGroup>();
-        private List<MeshGroup> _bobModels = new List<MeshGroup>();
         private KingdomShader _shader;
         private Camera _camera;
 
         public IField Field { get; private set; }
 
         private int _objEntryId = 0x236; // PLAYER
-        private List<BobEntity> _bobEntities = new List<BobEntity>();
         private List<PmpEntity> _pmpEntities = new List<PmpEntity>();
         private List<MeshGroup> _pmpModels = new List<MeshGroup>();
 
@@ -198,16 +196,6 @@ namespace OpenKh.Game.States
                 }
             });
 
-            foreach (var entity in _bobEntities)
-            {
-                _shader.SetProjectionView(_camera.Projection);
-                _shader.SetWorldView(_camera.World);
-                _shader.SetModelView(entity.GetMatrix());
-                pass.Apply();
-
-                RenderMeshNew(pass, _bobModels[entity.BobIndex], passRenderOpaque);
-            }
-
             foreach (var ent in _pmpEntities)
             {
                 if (ent.DifferentMatrix)
@@ -283,7 +271,6 @@ namespace OpenKh.Game.States
         private void BasicallyForceToReloadEverything()
         {
             _models.Clear();
-            _bobModels.Clear();
 
             switch (Field)
             {
@@ -341,21 +328,6 @@ namespace OpenKh.Game.States
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
             AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
-
-            _bobEntities = entries.ForEntry("out", Bar.EntryType.BgObjPlacement, BobDescriptor.Read)?
-                .Select(x => new BobEntity(x))?.ToList() ?? new List<BobEntity>();
-
-            var bobModels = entries.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
-            var bobTextures = entries.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
-
-            for (var i = 0; i < bobModels.Count; i++)
-            {
-                _bobModels.Add(new MeshGroup
-                {
-                    MeshDescriptors = MeshLoader.FromKH2(bobModels[i]).MeshDescriptors,
-                    Textures = bobTextures[i].LoadTextures(_graphics.GraphicsDevice).ToArray()
-                });
-            }
         }
 
         private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
