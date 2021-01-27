@@ -185,7 +185,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  JB50   | ブランク | BLANK  |             |
 |  JB50   | 闇の世界 | Realm of Darkness  |             |
 |  JB50   | wmイベント用 | FOR wm EVENT  |             |
-|  JB60   | きかくてすと |   | Kikaku Test   | Text only present in HD ReMiX
+|  JB60   | きかくてすと |   | Planner Test   | Text only present in HD ReMiX
 |  JB61   | piゆうえんち |   | pi Amusement Park   | Text only present in HD ReMiX
 |  JB62   | tm_オペラ座 |   |  tm_Opera  | Text only present in HD ReMiX
 |  JB63   | nd_ノートルダム１F |   |  nd_Notredame 1st Floor  | Text only present in HD ReMiX
