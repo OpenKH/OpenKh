@@ -290,9 +290,9 @@ namespace OpenKh.Game.States
                 if (currentInfo.PMO_Offset != 0)
                 {
                     PmpEntity pmpEnt = new PmpEntity(PmoIndex,
-                        new System.Numerics.Vector3(currentInfo.PositionX, currentInfo.PositionY, currentInfo.PositionZ),
-                        new System.Numerics.Vector3(currentInfo.RotationX, currentInfo.RotationY, currentInfo.RotationZ),
-                        new System.Numerics.Vector3(currentInfo.ScaleX, currentInfo.ScaleY, currentInfo.ScaleZ));
+                        new Vector3(currentInfo.PositionX, currentInfo.PositionY, currentInfo.PositionZ),
+                        new Vector3(currentInfo.RotationX, currentInfo.RotationY, currentInfo.RotationZ),
+                        new Vector3(currentInfo.ScaleX, currentInfo.ScaleY, currentInfo.ScaleZ));
 
                     pmpEnt.DifferentMatrix = pmp.hasDifferentMatrix[PmoIndex];
                     PmoParser pParser = new PmoParser(pmp.PmoList[PmoIndex], 100.0f);

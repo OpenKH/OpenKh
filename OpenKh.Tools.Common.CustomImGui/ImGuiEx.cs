@@ -144,7 +144,7 @@ namespace OpenKh.Tools.Common.CustomImGui
                     ImGuiWindowFlags.NoCollapse |
                     ImGuiWindowFlags.NoMove |
                     (noBackground ? ImGuiWindowFlags.NoBackground : ImGuiWindowFlags.None));
-                ImGui.SetWindowPos(new System.Numerics.Vector2(0, 0));
+                ImGui.SetWindowPos(new Vector2(0, 0));
                 ImGui.SetWindowSize(ImGui.GetIO().DisplaySize);
                 return ret;
             }, ImGui.End, action);

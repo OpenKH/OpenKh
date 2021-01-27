@@ -133,7 +133,7 @@ namespace OpenKh.Engine.MonoGame
             }
         }
 
-        public System.Numerics.Matrix4x4 Projection
+        public Matrix4x4 Projection
         {
             get
             {
@@ -143,7 +143,7 @@ namespace OpenKh.Engine.MonoGame
             }
         }
 
-        public System.Numerics.Matrix4x4 World
+        public Matrix4x4 World
         {
             get
             {
@@ -170,7 +170,7 @@ namespace OpenKh.Engine.MonoGame
 
         private void CalculateProjection()
         {
-            _projection = System.Numerics.Matrix4x4.CreatePerspectiveFieldOfView(
+            _projection = Matrix4x4.CreatePerspectiveFieldOfView(
                 _fov, _aspectRatio, _nearClipPlane, _farClipPlane);
 
             ValidateProjection();
@@ -178,10 +178,10 @@ namespace OpenKh.Engine.MonoGame
 
         private void CalculateWorld()
         {
-            _world = System.Numerics.Matrix4x4.CreateLookAt(
-                new System.Numerics.Vector3(CameraPosition.X, CameraPosition.Y, CameraPosition.Z),
-                new System.Numerics.Vector3(CameraLookAt.X, CameraLookAt.Y, CameraLookAt.Z),
-                new System.Numerics.Vector3(CameraUp.X, CameraUp.Y, CameraUp.Z));
+            _world = Matrix4x4.CreateLookAt(
+                new Vector3(CameraPosition.X, CameraPosition.Y, CameraPosition.Z),
+                new Vector3(CameraLookAt.X, CameraLookAt.Y, CameraLookAt.Z),
+                new Vector3(CameraUp.X, CameraUp.Y, CameraUp.Z));
 
             ValidateWorld();
         }
