@@ -3,30 +3,30 @@
 |Id|Index|World
 |--|-----|--
 |EX|00   |Generic
-|DP|01   |[Land of Departure](#Land-Of-Departure)
-|SW|02   |[Dwarf Woodlands](#Dwarf-Woodlands)
-|CD|03   |[Castle of Dreams](#Castle-Of-Dreams)
-|SB|04   |[Enchanted Dominion](#Enchanted-Dominion)
-|YT|05   |[Mysterious Tower](#Mysterious-Tower)
-|RG|06   |[Radiant Garden](#Radiant-Garden)
-|JB|07   |[Jungle Book (JP version)](#FOR-EVENTS-ONLY)
-|JB|07   |[Dark World (FM version)](#FOR-EVENTS-ONLY)
-|HE|08   |[Olympus Coliseum](#Olympus-Coliseum)
-|LS|09   |[Deep Space](#Deep-Space)
-|DI|0A   |[Destiny Island](#Destiny-Islands)
-|PP|0B   |[Neverland](#Neverland)
-|DC|0C   |[Disney Town](#Disney-Town)
-|KG|0D   |[Keyblade Graveyard](#Keyblade-Graveyard)
+|DP|01   |[Land of Departure](##Land-Of-Departure)
+|SW|02   |[Dwarf Woodlands](##Dwarf-Woodlands)
+|CD|03   |[Castle of Dreams](##Castle-Of-Dreams)
+|SB|04   |[Enchanted Dominion](##Enchanted-Dominion)
+|YT|05   |[Mysterious Tower](##Mysterious-Tower)
+|RG|06   |[Radiant Garden](##Radiant-Garden)
+|JB|07   |[Jungle Book (JP version)](##FOR-EVENTS-ONLY)
+|JB|07   |[Dark World (FM version)](##FOR-EVENTS-ONLY)
+|HE|08   |[Olympus Coliseum](##Olympus-Coliseum)
+|LS|09   |[Deep Space](##Deep-Space)
+|DI|0A   |[Destiny Island](##Destiny-Islands)
+|PP|0B   |[Neverland](##Neverland)
+|DC|0C   |[Disney Town](##Disney-Town)
+|KG|0D   |[Keyblade Graveyard](##Keyblade-Graveyard)
 |14|0E   |unused
-|VS|0F   |[Mirage Arena](#Mirage-Arena)
-|BD|10   |[Command Board](#Command-Board)
-|WM|11   |[World Map](#World-Map)
-|WP|12   |[Winnie the Pooh](#Winnie-the-Pooh)
+|VS|0F   |[Mirage Arena](##Mirage-Arena)
+|BD|10   |[Command Board](##Command-Board)
+|WM|11   |[World Map](##World-Map)
+|WP|12   |[Winnie the Pooh](##Winnie-the-Pooh)
 |19|13   |unused
 |20|14   |unused
 |21|15   |unused
 |22|16   |unused
-|JF|17   |[Jump Festa](#Jump-Festa)
+|JF|17   |[Jump Festa](##Jump-Festa)
 
 # Map List
 
@@ -37,7 +37,7 @@ The `English` column is the official translation. Sometimes a `Translation` colu
 Maps with 00 in the name do not exist as files, but the game displays the world's name when trying to load it.
 
 
-# **Land of Departure**
+## **Land of Departure**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -60,7 +60,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  DP16   | 山頂         |   Mountain Path |    Night         |
 
 
-# **Dwarf Woodlands**
+## **Dwarf Woodlands**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -79,7 +79,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  SW12   | 山道 | Mountain Trail |   |
 
 
-# **Castle of Dreams**
+## **Castle of Dreams**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -100,7 +100,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  CD14   | ネズミの通り道 | Mousehole | Not in HD ReMiX  |
 |  CD15   | 衣装部屋 | Wardrobe Room | Not in HD ReMiX  |
 
-# **Enchanted Dominion**
+## **Enchanted Dominion**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -145,7 +145,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  SB38   | 魔女の城:祭壇の間 | Hall   |             |
 |  SB39   | 魔女の城:門 | Gates  |             |
 
-# **Mysterious Tower**
+## **Mysterious Tower**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -155,7 +155,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  YT03   | 塔:エントランス | Entrance   |             |
 |  YT04   | 塔:魔法使いの部屋 | Sorcerer's Chamber   |             |
 
-# **Radiant Garden**
+## **Radiant Garden**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -175,7 +175,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  RG13   | 中央広場 | Central Square  |             |
 |  RG14   | 中央広場 | Central Square  |             |
 
-# **FOR EVENTS ONLY**
+## **FOR EVENTS ONLY**
 
 | **Map** | **Japanese** | **English** | **Translation** | **Comment** |
 |---------|--------------|-------------|-------------|--------
@@ -234,7 +234,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  JB84   | よび |   | Reserved   | Text only present in HD ReMiX
 |  JB85   | よび |   | Reserved   | Text only present in HD ReMiX
 
-# **Olympus Coliseum**
+## **Olympus Coliseum**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -246,7 +246,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  HE05   | テーベの町 | Town Near Thebes  |             |
 |  HE06   | コロシアム:東 | East Bracket  |             |
 
-# **Deep Space**
+## **Deep Space**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -266,7 +266,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  LS13   | 異空の回廊 | Lanes Between  |             |
 |  LS14   | 機関室入口 | Bay Access  |             |
 
-# **Destiny Islands**
+## **Destiny Islands**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -276,7 +276,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  DI03   | 離島:浜辺 | Island Beach  |             |
 |  DI04   | 本島:浜辺 | Main Island Beach  |             |
 
-# **Neverland**
+## **Neverland**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -296,7 +296,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  PP13   | ドクロ岩:中 | Skull Rock: Cavern  |             |
 |  PP14   | 夜空 | Night Sky  |             |
 
-# **Disney Town**
+## **Disney Town**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -318,7 +318,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  DC15   | レース：城内コース | Race: Castle Course  | Removed map  |
 
 
-# **Keyblade Graveyard**
+## **Keyblade Graveyard**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -343,7 +343,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  KG55   | キーブレード墓場 | Keyblade Graveyard  |             |
 |  KG56   | 荒野 | Badlands  |             |
 
-# **Mirage Arena**
+## **Mirage Arena**
 
 | **Map** | **Japanese** | **English** | **Translation** | **Comment** |
 |---------|--------------|-------------|-------------|------
@@ -369,7 +369,7 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  VS19   | モンストロ（体内B） |   | Monstro (Interior B)       |
 |  VS20   | 山頂(遠景壊) |   | Summit(Broken Environment)       |
 
-# **Command Board**
+## **Command Board**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
@@ -382,26 +382,26 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  BD18   | WP:くまのプーさん　えんけい | Winnie the Pooh BG  |             |
 |  BD19   | PP：ピーターパン（かいがい） | Peter Pan BG  |  Japanese version mentions (Overseas)           |
 
-# **World Map**
+## **World Map**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
 |  WM00   | ワールドマップ | World Map  |             |
 |  WM01   | wm01 | wm01  |             |
 
-# **The Hundred Acre Wood**
+## **The Hundred Acre Wood**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
 |  WP00   | 100エーカーの森 | The Hundred Acre Wood  |             |
 
-# **The Badlands**
+## **The Badlands**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
 |  1900   | 謎の荒野 | The Badlands  |             |
 
-# **Jump Festa**
+## **Jump Festa**
 
 | **Map** | **Japanese** | **English** | **Translation** | **Comment** |
 |---------|--------------|-------------|-------------|---------
