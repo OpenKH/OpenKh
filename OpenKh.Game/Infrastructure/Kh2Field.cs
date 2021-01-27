@@ -102,9 +102,17 @@ namespace OpenKh.Game.Infrastructure
 
         public void UnloadMap()
         {
-            _mapMeshes.Clear();
-            _skyboxMeshes.Clear();
-            _bobModels.Clear();
+            Action<List<MeshGroup>> clearMeshGroups = (meshGroups) =>
+            {
+                foreach (var meshGroup in meshGroups)
+                    foreach (var texture in meshGroup.Textures)
+                        texture.Dispose();
+                meshGroups.Clear();
+            };
+
+            clearMeshGroups(_mapMeshes);
+            clearMeshGroups(_skyboxMeshes);
+            clearMeshGroups(_bobModels);
             _bobEntities.Clear();
         }
 
