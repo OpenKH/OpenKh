@@ -204,9 +204,9 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  JB34   |  |   | Destiny Islands (Night)            | Text only present in HD ReMiX
 |  JB35   | トラヴァース３番街 |   | Traverse Town 3rd District            | Text only present in HD ReMiX
 |  JB50   | 異空の回廊 | Lanes Between  |             |
-|  JB50   | ブランク | BLANK  |             |
-|  JB50   | 闇の世界 | Realm of Darkness  |             |
-|  JB50   | wmイベント用 | FOR wm EVENT  |             |
+|  JB51   | ブランク | BLANK  |             |
+|  JB52   | 闇の世界 | Realm of Darkness  |             |
+|  JB53   | wmイベント用 | FOR wm EVENT  |             |
 |  JB60   | きかくてすと |   | Planner Test   | Text only present in HD ReMiX
 |  JB61   | piゆうえんち |   | pi Amusement Park   | Text only present in HD ReMiX
 |  JB62   | tm_オペラ座 |   |  tm_Opera  | Text only present in HD ReMiX
