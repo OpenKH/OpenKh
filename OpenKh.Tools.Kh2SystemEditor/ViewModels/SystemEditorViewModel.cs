@@ -38,7 +38,6 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         private static readonly List<FileDialogFilter> TableExportFilter = FileDialogFilterComposer.Compose()
             .AddExtensions("yml", "yml")
             .AddExtensions("xlsx", "xlsx")
-            .AddExtensions("csv", "csv")
             .AddAllFiles();
 
 
@@ -200,10 +199,17 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
         private void ExportTable<T>(string fileName, IEnumerable<T> list)
         {
-            DictListWriteUtil.Write(
-                fileName,
-                DictionalizeUtil.ToDictList(list)
-            );
+            try
+            {
+                DictListWriteUtil.Write(
+                    fileName,
+                    DictionalizeUtil.ToDictList(list)
+                );
+            }
+            catch (NotSupportedException)
+            {
+                MessageBox.Show("Export in this file format is not supported yet.");
+            }
         }
 
         public void LoadSupportFiles(string basePath)

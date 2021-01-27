@@ -1,5 +1,4 @@
-﻿using OpenKh.Common;
-using CsvHelper;
+using OpenKh.Common;
 using NPOI.XSSF.UserModel;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System;
 using NPOI.SS.UserModel;
-using CsvHelper.TypeConversion;
 using System.ComponentModel;
 
 namespace OpenKh.Tools.Kh2SystemEditor.Utils
@@ -99,27 +97,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.Utils
             }
             else
             {
-                // csv
-                using var writer = new StreamWriter(fileName, false, new UTF8Encoding(true));
-                using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                if (lists.Any())
-                {
-                    var columnNames = lists.First().Keys.ToArray();
-
-                    foreach (var name in columnNames)
-                    {
-                        csv.WriteField(name);
-                    }
-                    foreach (var list in lists)
-                    {
-                        csv.NextRecord();
-
-                        foreach (var name in columnNames)
-                        {
-                            csv.WriteField(list[name]);
-                        }
-                    }
-                }
+                throw new NotSupportedException();
             }
         }
     }
