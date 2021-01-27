@@ -37,7 +37,7 @@ namespace OpenKh.Game.Infrastructure
         private readonly List<MeshGroup> _bobModels = new List<MeshGroup>();
         private readonly Dictionary<int, byte[]> _subtitleData = new Dictionary<int, byte[]>();
         private readonly MonoSpriteDrawing _drawing;
-        private Bar _binarcArd;
+        private Bar _binarcAreaData;
         private EventPlayer _eventPlayer;
         private int _spawnScriptMap;
         private int _spawnScriptBtl;
@@ -114,9 +114,56 @@ namespace OpenKh.Game.Infrastructure
             clearMeshGroups(_skyboxMeshes);
             clearMeshGroups(_bobModels);
             _bobEntities.Clear();
+            RemoveAllActors();
+
+            _eventPlayer = null;
         }
 
-        private void InternallyLoadMap(int worldIndex, int placeIndex)
+        public void LoadArea(int world, int area)
+        {
+            Log.Info($"Area={world},{area}");
+
+            UnloadMap();
+            LoadAreaData(world, area);
+            // TODO load voices (eg. voice/us/battle/nm0_jack.vsb)
+            // TODO load field2d (eg. field2d/jp/nm0field.2dd)
+            // TODO load command (eg. field2d/jp/nm1command.2dd)
+            LoadMap(world, area);
+            LoadMsg(world);
+            // TODO load libretto (eg. libretto-nm.bar)
+            // TODO load effect
+            // TODO load magics
+            // TODO load prize
+            // TODO load prizebox
+            // TODO load entities
+            // TODO load summons
+            // TODO load mission
+            // TODO dispatch entity loading here, not in LoadAreaData
+        }
+
+        private void LoadAreaData(int world, int area)
+        {
+            string fileName;
+            if (_kernel.IsReMix)
+                fileName = $"ard/{_kernel.Language}/{Constants.WorldIds[world]}{area:D02}.ard";
+            else
+                fileName = $"ard/{Constants.WorldIds[world]}{area:D02}.ard";
+
+            _binarcAreaData = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
+            Events = _binarcAreaData
+                .Where(x => x.Type == Bar.EntryType.Event)
+                .Select(x => x.Name)
+                .ToList();
+
+            Log.Info($"Loading spawn {_kernel.SpawnName}");
+            RunSpawnScript(_binarcAreaData, "map", _spawnScriptMap >= 0 ? _spawnScriptMap : _kernel.SpawnMap);
+            RunSpawnScript(_binarcAreaData, "btl", _spawnScriptBtl >= 0 ? _spawnScriptBtl : _kernel.SpawnBtl);
+            RunSpawnScript(_binarcAreaData, "evt", _spawnScriptEvt >= 0 ? _spawnScriptEvt : _kernel.SpawnEvt);
+            // TODO units (or entities) should be spawn later, not in RunSpawnScript. This is because
+            // we want to avoid to load entities that can be potentially not used.
+        }
+
+        private void LoadMap(int world, int area)
         {
             Action<Bar, string, List<MeshGroup>> addMeshes = (binarc, tag, meshGroupList) =>
             {
@@ -125,9 +172,8 @@ namespace OpenKh.Game.Infrastructure
                     meshGroupList.Add(meshes);
             };
 
-            Log.Info("Map={0},{1}", worldIndex, placeIndex);
-
-            var fileName = _kernel.GetMapFileName(worldIndex, placeIndex);
+            Log.Info("Map={0},{1}", world, area);
+            var fileName = _kernel.GetMapFileName(world, area);
             var binarc = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
 
             addMeshes(binarc, "SK0", _skyboxMeshes);
@@ -149,12 +195,7 @@ namespace OpenKh.Game.Infrastructure
                 });
             }
         }
-
-        public void LoadMapArd(int world, int area)
-        {
-            UnloadMap();
-            InternallyLoadMap(world, area);
-
+        private void LoadMsg(int world) =>
             _kernel.DataContent
                 .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[world]}.bar")
                 .Using(stream => Bar.Read(stream))
@@ -164,32 +205,11 @@ namespace OpenKh.Game.Infrastructure
                     return true;
                 });
 
-            string fileName;
-            if (_kernel.IsReMix)
-                fileName = $"ard/{_kernel.Language}/{Constants.WorldIds[world]}{area:D02}.ard";
-            else
-                fileName = $"ard/{Constants.WorldIds[world]}{area:D02}.ard";
-
-            _eventPlayer = null;
-            RemoveAllActors();
-
-            _binarcArd = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
-            Events = _binarcArd
-                .Where(x => x.Type == Bar.EntryType.Event)
-                .Select(x => x.Name)
-                .ToList();
-
-            Log.Info("Loading spawn {0}", _kernel.SpawnName);
-            RunSpawnScript(_binarcArd, "map", _spawnScriptMap >= 0 ? _spawnScriptMap : _kernel.SpawnMap);
-            RunSpawnScript(_binarcArd, "btl", _spawnScriptBtl >= 0 ? _spawnScriptBtl : _kernel.SpawnBtl);
-            RunSpawnScript(_binarcArd, "evt", _spawnScriptEvt >= 0 ? _spawnScriptEvt : _kernel.SpawnEvt);
-        }
-
         public void PlayEvent(string eventName)
         {
             _actorIds.Clear();
             _subtitleData.Clear();
-            _binarcArd.ForEntry(eventName, Bar.EntryType.Event, stream =>
+            _binarcAreaData.ForEntry(eventName, Bar.EntryType.Event, stream =>
             {
                 _eventPlayer = new EventPlayer(this, Event.Read(stream));
                 RemoveAllActors();
@@ -212,7 +232,6 @@ namespace OpenKh.Game.Infrastructure
                     _eventPlayer = null;
                 }
             }
-
 
             foreach (var entity in _actors.Where(x => x.IsMeshLoaded && x.IsVisible))
                 entity.Update((float)deltaTime);
