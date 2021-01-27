@@ -159,24 +159,24 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 
 | **Map** | **Japanese** | **English** | **Translation** | **Comment** |
 |---------|--------------|-------------|-------------|--------
-|  JB00   | イベント専用 | FOR EVENTS ONLY  |             |
-|  JB01   | ルーイの遺跡:広場 | Louie's Ruins  |             |
-|  JB02   | ルーイの遺跡:通路 | Court  |             |
-|  JB03   | 分岐点 | Path Crossroads  |             |
-|  JB04   | 地下遺跡:入口 | UG Ruins Entrance  |             |
-|  JB05   | 地下遺跡:通路1 | UG Ruins Passage 1   |             |
-|  JB06   | 地下遺跡:通路2 | UG Ruins Passage 2 |             |
-|  JB07   | 地下遺跡:広場 | UG Courtyard  |             |
-|  JB08   | 遺跡隣接ジャングル | Jungle Near Ruins  |             |
-|  JB09   | 高台 | Eminence  |             |
-|  JB10   | ジャングル | Jungle  |             |
-|  JB11   | 人間の村近くの川 | Man-Village River  |             |
-|  JB12   | 湿地 | Bog  |             |
-|  JB20   | 闇の世界：中層 | Realm of Darkness: Middle Zone  |             |
-|  JB21   | 闇の世界：下層 | Realm of Darkness: Lower Zone  |             |
-|  JB22   | 闇の世界：上層 | Realm of Darkness: Upper Zone  |             |
-|  JB23   | 闇の狭間 | The Dark Margin  |             |
-|  JB24   | 闇シンデレラ城（FM） |   |  Cinderella's Castle (FM)         |
+|  JB00   | イベント専用 | FOR EVENTS ONLY  |             | JP Version Only
+|  JB01   | ルーイの遺跡:広場 | Louie's Ruins  |             | JP Version Only
+|  JB02   | ルーイの遺跡:通路 | Court  |             | JP Version Only
+|  JB03   | 分岐点 | Path Crossroads  |             | JP Version Only
+|  JB04   | 地下遺跡:入口 | UG Ruins Entrance  |             | JP Version Only
+|  JB05   | 地下遺跡:通路1 | UG Ruins Passage 1   |             | JP Version Only
+|  JB06   | 地下遺跡:通路2 | UG Ruins Passage 2 |             | JP Version Only
+|  JB07   | 地下遺跡:広場 | UG Courtyard  |             | JP Version Only
+|  JB08   | 遺跡隣接ジャングル | Jungle Near Ruins  |             | JP Version Only
+|  JB09   | 高台 | Eminence  |             | JP Version Only
+|  JB10   | ジャングル | Jungle  |             | JP Version Only
+|  JB11   | 人間の村近くの川 | Man-Village River  |          | JP Version Only
+|  JB12   | 湿地 | Bog  |             | JP Version Only
+|  JB20   | 闇の世界：中層 | Realm of Darkness: Middle Zone  |             | Final Mix
+|  JB21   | 闇の世界：下層 | Realm of Darkness: Lower Zone  |             | Final Mix
+|  JB22   | 闇の世界：上層 | Realm of Darkness: Upper Zone  |             | Final Mix
+|  JB23   | 闇の狭間 | The Dark Margin  |             | Final Mix
+|  JB24   | 闇シンデレラ城（FM） |   |  Cinderella's Castle (FM)         | Final Mix
 |  JB30   | デスティニーアイランド（ひる） |   | Destiny Islands (Noon)     | Text only present in HD ReMiX
 |  JB31   | トラヴァース２番街 |   | Traverse Town 2nd District            | Text only present in HD ReMiX
 |  JB32   |  |   |             | Traverse Town 1st District
@@ -295,8 +295,8 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  DC12   | レース受付 | Raceway Registration  |             |
 |  DC13   | アイス専用 | Ice Cream  |             |
 |  DC14   | フルーツボール専用 | Fruitball  |             |
+|  DC15   | レース：城内コース | Race: Castle Course  | Removed map  |
 
-レース：城内コース Race: Castle Course
 
 **Keyblade Graveyard**
 
