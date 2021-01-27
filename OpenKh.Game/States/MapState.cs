@@ -6,6 +6,7 @@ using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Parsers;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Entities;
+using OpenKh.Game.Field;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;

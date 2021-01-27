@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace OpenKh.Game.Infrastructure
+namespace OpenKh.Game.Field
 {
     public interface IField
     {

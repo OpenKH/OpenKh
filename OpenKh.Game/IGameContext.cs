@@ -1,3 +1,4 @@
+using OpenKh.Game.Field;
 using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game

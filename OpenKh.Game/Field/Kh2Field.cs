@@ -8,6 +8,7 @@ using OpenKh.Engine.Renders;
 using OpenKh.Common;
 using OpenKh.Game.Entities;
 using OpenKh.Game.Events;
+using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
@@ -17,7 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using n = System.Numerics;
 
-namespace OpenKh.Game.Infrastructure
+namespace OpenKh.Game.Field
 {
     public class Kh2Field : IField
     {
