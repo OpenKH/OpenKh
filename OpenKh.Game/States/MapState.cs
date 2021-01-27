@@ -40,13 +40,11 @@ namespace OpenKh.Game.States
         private xna.GraphicsDeviceManager _graphics;
         private InputManager _input;
         private IStateChange _stateChange;
-        private List<MeshGroup> _models = new List<MeshGroup>();
         private KingdomShader _shader;
         private Camera _camera;
 
         public IField Field { get; private set; }
 
-        private int _objEntryId = 0x236; // PLAYER
         private List<PmpEntity> _pmpEntities = new List<PmpEntity>();
         private List<MeshGroup> _pmpModels = new List<MeshGroup>();
 
@@ -100,7 +98,7 @@ namespace OpenKh.Game.States
             {
                 _menuState.OpenMenu();
             }
-            else if (DebugMode )
+            else if (DebugMode)
             {
                 const double Speed = 100.0;
                 var speed = (float)(deltaTimes.DeltaTime * Speed);
@@ -162,10 +160,10 @@ namespace OpenKh.Game.States
             _shader.SetModelViewIdentity();
             pass.Apply();
 
-            foreach (var mesh in _models)
+            Field.ForEveryStaticModel(model =>
             {
-                RenderMeshNew(pass, mesh, passRenderOpaque);
-            }
+                RenderMeshNew(pass, model, passRenderOpaque);
+            });
 
             _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
@@ -270,13 +268,10 @@ namespace OpenKh.Game.States
 
         private void BasicallyForceToReloadEverything()
         {
-            _models.Clear();
-
             switch (Field)
             {
                 case Kh2Field kh2Field:
                     kh2Field.LoadMapArd(Kernel.World, Kernel.Area);
-                    LoadMap(Kernel.World, Kernel.Area);
                     break;
             }
         }
@@ -317,45 +312,6 @@ namespace OpenKh.Game.States
                     PmoIndex++;
                 }
             }
-        }
-
-        private void LoadMap(int worldIndex, int placeIndex)
-        {
-            Log.Info("Map={0},{1}", worldIndex, placeIndex);
-
-            var fileName = Kernel.GetMapFileName(worldIndex, placeIndex);
-            var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
-        }
-
-        private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
-        {
-            var model = entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read);
-            if (model == null)
-                return null;
-
-            var textures = entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read);
-            if (model == null)
-                return null;
-
-            return new MeshGroup
-            {
-                MeshDescriptors = MeshLoader.FromKH2(model).MeshDescriptors,
-                Textures = textures.LoadTextures(graphics).ToArray()
-            };
-        }
-
-        private void AddMesh(MeshGroup mesh)
-        {
-            if (mesh == null)
-            {
-                Log.Warn("AddMesh received null");
-                return;
-            }
-
-            _models.Add(mesh);
         }
 
         public void LoadTitleScreen() => _stateChange.State = 0;

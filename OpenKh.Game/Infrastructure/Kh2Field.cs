@@ -31,6 +31,8 @@ namespace OpenKh.Game.Infrastructure
         private readonly Kh2MessageProvider _eventMessageProvider;
         private readonly List<ObjectEntity> _actors = new List<ObjectEntity>();
         private readonly Dictionary<int, ObjectEntity> _actorIds = new Dictionary<int, ObjectEntity>();
+        private readonly List<MeshGroup> _mapMeshes = new List<MeshGroup>();
+        private readonly List<MeshGroup> _skyboxMeshes = new List<MeshGroup>();
         private readonly List<BobEntity> _bobEntities = new List<BobEntity>();
         private readonly List<MeshGroup> _bobModels = new List<MeshGroup>();
         private readonly Dictionary<int, byte[]> _subtitleData = new Dictionary<int, byte[]>();
@@ -100,25 +102,35 @@ namespace OpenKh.Game.Infrastructure
 
         public void UnloadMap()
         {
+            _mapMeshes.Clear();
+            _skyboxMeshes.Clear();
             _bobModels.Clear();
             _bobEntities.Clear();
         }
 
         private void InternallyLoadMap(int worldIndex, int placeIndex)
         {
-            Log.Info($"Map={worldIndex},{placeIndex}");
+            Action<Bar, string, List<MeshGroup>> addMeshes = (binarc, tag, meshGroupList) =>
+            {
+                var meshes = FromMdlx(_graphicsDevice, binarc, tag);
+                if (meshes != null)
+                    meshGroupList.Add(meshes);
+            };
+
+            Log.Info("Map={0},{1}", worldIndex, placeIndex);
 
             var fileName = _kernel.GetMapFileName(worldIndex, placeIndex);
-            var entries = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
-            //AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
-            //AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
-            //AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
+            var binarc = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
 
-            _bobEntities.AddRange(entries.ForEntry("out", Bar.EntryType.BgObjPlacement, BobDescriptor.Read)?
+            addMeshes(binarc, "SK0", _skyboxMeshes);
+            addMeshes(binarc, "SK1", _skyboxMeshes);
+            addMeshes(binarc, "MAP", _mapMeshes);
+
+            _bobEntities.AddRange(binarc.ForEntry("out", Bar.EntryType.BgObjPlacement, BobDescriptor.Read)?
                 .Select(x => new BobEntity(x))?.ToList() ?? new List<BobEntity>());
 
-            var bobModels = entries.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
-            var bobTextures = entries.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
+            var bobModels = binarc.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
+            var bobTextures = binarc.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
 
             for (var i = 0; i < bobModels.Count; i++)
             {
@@ -211,6 +223,14 @@ namespace OpenKh.Game.Infrastructure
 
             if (_fadeCurrentColor.A > 0)
                 DrawFade();
+        }
+
+        public void ForEveryStaticModel(Action<IMonoGameModel> action)
+        {
+            foreach (var mesh in _skyboxMeshes)
+                action(mesh);
+            foreach (var mesh in _mapMeshes)
+                action(mesh);
         }
 
         public void ForEveryModel(Action<IEntity, IMonoGameModel> action)
@@ -467,6 +487,23 @@ namespace OpenKh.Game.Infrastructure
             }
             else
                 return $"anm/{path}.anb";
+        }
+
+        private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
+        {
+            var model = entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read);
+            if (model == null)
+                return null;
+
+            var textures = entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read);
+            if (model == null)
+                return null;
+
+            return new MeshGroup
+            {
+                MeshDescriptors = MeshLoader.FromKH2(model).MeshDescriptors,
+                Textures = textures.LoadTextures(graphics).ToArray()
+            };
         }
     }
 }

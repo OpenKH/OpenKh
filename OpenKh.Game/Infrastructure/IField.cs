@@ -15,6 +15,7 @@ namespace OpenKh.Game.Infrastructure
 
         void PlayEvent(string eventName);
 
+        void ForEveryStaticModel(Action<IMonoGameModel> action);
         void ForEveryModel(Action<IEntity, IMonoGameModel> action);
         void AddActor(int actorId, int objectId);
         void SetActorPosition(int actorId, float x, float y, float z, float rotation);
