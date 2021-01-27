@@ -13,13 +13,15 @@ using System.Linq;
 
 namespace OpenKh.Game.Field
 {
-    public class Kh2Map : IDisposable
+    public class Kh2Map : IMap, IDisposable
     {
         private static readonly MeshGroup Empty = new MeshGroup
         {
             MeshDescriptors = new List<Engine.Parsers.MeshDescriptor>(0),
             Textures = new IKingdomTexture[0]
         };
+
+        private readonly GraphicsDevice _graphics;
         private readonly MeshGroup _mapMeshGroup;
         private readonly MeshGroup _skybox0MeshGroup;
         private readonly MeshGroup _skybox1MeshGroup;
@@ -32,6 +34,8 @@ namespace OpenKh.Game.Field
 
         public Kh2Map(GraphicsDevice graphics, IDataContent content, string path)
         {
+            _graphics = graphics;
+
             var binarc = content.FileOpen(path).Using(Bar.Read);
             _skybox0MeshGroup = FromMdlx(graphics, binarc, "SK0") ?? Empty;
             _skybox1MeshGroup = FromMdlx(graphics, binarc, "SK1") ?? Empty;
@@ -54,17 +58,22 @@ namespace OpenKh.Game.Field
             }
         }
 
-        public void ForEveryStaticModel(Action<IMonoGameModel> action)
+        public void Render(Camera camera, KingdomShader shader, EffectPass pass, bool passRenderOpaque)
         {
-            action(_skybox0MeshGroup);
-            action(_skybox1MeshGroup);
-            action(_mapMeshGroup);
-        }
+            shader.SetModelViewIdentity();
+            pass.Apply();
 
-        public void ForEveryModel(Action<IEntity, IMonoGameModel> action)
-        {
+            _graphics.RenderMeshNew(shader, pass, _skybox0MeshGroup, passRenderOpaque);
+            _graphics.RenderMeshNew(shader, pass, _skybox1MeshGroup, passRenderOpaque);
+            _graphics.RenderMeshNew(shader, pass, _mapMeshGroup, passRenderOpaque);
+
             foreach (var bob in _bobEntities)
-                action(bob, _bobModels[bob.BobIndex]);
+            {
+                shader.SetModelView(bob.GetMatrix());
+                pass.Apply();
+
+                _graphics.RenderMeshNew(shader, pass, _bobModels[bob.BobIndex], passRenderOpaque);
+            }
         }
 
         public void Dispose()

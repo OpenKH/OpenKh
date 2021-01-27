@@ -34,7 +34,7 @@ namespace OpenKh.Game.Field
         private readonly Dictionary<int, byte[]> _subtitleData = new Dictionary<int, byte[]>();
         private readonly MonoSpriteDrawing _drawing;
         private Bar _binarcAreaData;
-        private Kh2Map _map;
+        private IMap _map;
         private EventPlayer _eventPlayer;
         private int _spawnScriptMap;
         private int _spawnScriptBtl;
@@ -113,7 +113,7 @@ namespace OpenKh.Game.Field
             // TODO load voices (eg. voice/us/battle/nm0_jack.vsb)
             // TODO load field2d (eg. field2d/jp/nm0field.2dd)
             // TODO load command (eg. field2d/jp/nm1command.2dd)
-            _map = new Kh2Map(_graphicsDevice, _kernel, world, area);
+            _map = new Kh2Map(_graphicsDevice, _kernel, world, area); // new BbsMap(_graphicsDevice, @"PATH_TO_PMP");
             LoadMsg(world);
             // TODO load libretto (eg. libretto-nm.bar)
             // TODO load effect
@@ -204,16 +204,34 @@ namespace OpenKh.Game.Field
                 DrawFade();
         }
 
-        public void ForEveryStaticModel(Action<IMonoGameModel> action)
+        public void Render(Camera camera, KingdomShader shader, EffectPass pass, bool passRenderOpaque)
         {
-            _map.ForEveryStaticModel(action);
-        }
+            _map.Render(camera, shader, pass, passRenderOpaque);
 
-        public void ForEveryModel(Action<IEntity, IMonoGameModel> action)
-        {
-            _map.ForEveryModel(action);
             foreach (var actor in _actors.Where(x => x.IsVisible))
-                action(actor, actor);
+            {
+                shader.SetModelView(actor.GetMatrix());
+                pass.Apply();
+
+                _graphicsDevice.RenderMeshNew(shader, pass, actor, passRenderOpaque);
+
+                if (_kernel.DebugMode)
+                {
+                    var matrixArray = actor.Model?.CurrentPose;
+                    if (matrixArray != null)
+                    {
+                        foreach (var bone in actor.Model.Bones)
+                        {
+                            if (bone.Parent > 0)
+                            {
+                                var bonePos = matrixArray[bone.Index].Translation;
+                                var parentPos = matrixArray[bone.Parent].Translation;
+                                Debugging.DebugDraw.DrawLine(_graphicsDevice, bonePos, parentPos, Color.Red);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public void AddActor(int actorId, int objectId)

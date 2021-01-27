@@ -1,6 +1,5 @@
-using OpenKh.Engine;
+using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.MonoGame;
-using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -15,8 +14,7 @@ namespace OpenKh.Game.Field
 
         void PlayEvent(string eventName);
 
-        void ForEveryStaticModel(Action<IMonoGameModel> action);
-        void ForEveryModel(Action<IEntity, IMonoGameModel> action);
+        void Render(Camera camera, KingdomShader shader, EffectPass pass, bool passRenderOpaque);
         void AddActor(int actorId, int objectId);
         void SetActorPosition(int actorId, float x, float y, float z, float rotation);
         void SetActorAnimation(int actorId, string path);
