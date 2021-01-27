@@ -69,6 +69,10 @@ namespace OpenKh.Game.Field
 
         public void Render(Camera camera, KingdomShader shader, EffectPass pass, bool passRenderOpaque)
         {
+            if (passRenderOpaque == true)
+                // we know that all the meshes will not be opaque anyway
+                return;
+
             var worldView = camera.World;
             var specialWorldView = worldView;
             specialWorldView.M14 = 0;
