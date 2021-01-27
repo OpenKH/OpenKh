@@ -30,6 +30,19 @@ namespace OpenKh.Engine.Parsers
             B = (byte)clr;
             A = (byte)(clr >> 24);
         }
+
+        public PositionColoredTextured(Vector3 v, uint clr, float tu, float tv)
+        {
+            X = v.X;
+            Y = v.Y;
+            Z = v.Z;
+            Tu = tu;
+            Tv = tv;
+            R = (byte)(clr >> 16);
+            G = (byte)(clr >> 8);
+            B = (byte)clr;
+            A = (byte)(clr >> 24);
+        }
     }
 
     public class MeshDescriptor

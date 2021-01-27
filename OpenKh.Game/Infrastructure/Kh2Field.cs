@@ -249,8 +249,8 @@ namespace OpenKh.Game.Infrastructure
             if (_isFreeCam == true)
                 return;
 
-            _camera.CameraPosition = new Vector3(position.X, position.Y, position.Z);
-            _camera.CameraLookAt = new Vector3(lookAt.X, lookAt.Y, lookAt.Z);
+            _camera.CameraPosition = new n.Vector3(position.X, position.Y, position.Z);
+            _camera.CameraLookAt = new n.Vector3(lookAt.X, lookAt.Y, lookAt.Z);
             _camera.FieldOfView = (float)(fieldOfView * Math.PI / 180);
         }
 
@@ -314,9 +314,9 @@ namespace OpenKh.Game.Infrastructure
                 _graphicsDevice.BlendState = BlendState.AlphaBlend;
 
                 _shader.UseAlphaMask = true;
-                _shader.ProjectionView = Matrix.Identity;
-                _shader.WorldView = Matrix.Identity;
-                _shader.ModelView = Matrix.Identity;
+                _shader.SetProjectionViewIdentity();
+                _shader.SetWorldViewIdentity();
+                _shader.SetModelViewIdentity();
                 pass.Apply();
 
                 _graphicsDevice.DrawUserPrimitives(

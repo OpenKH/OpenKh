@@ -1,12 +1,10 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Imaging;
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
+using System.Numerics;
 
 namespace OpenKh.Engine.MonoGame
 {

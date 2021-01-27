@@ -1,8 +1,8 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
 using OpenKh.Engine.MonoGame;
+using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using xna = Microsoft.Xna.Framework;
 
 namespace OpenKh.Tools.Kh2MapStudio
 {
@@ -26,12 +28,12 @@ namespace OpenKh.Tools.Kh2MapStudio
             AlphaDestinationBlend = Blend.InverseSourceAlpha,
             ColorBlendFunction = BlendFunction.Add,
             AlphaBlendFunction = BlendFunction.Add,
-            BlendFactor = Color.White,
+            BlendFactor = xna.Color.White,
             MultiSampleMask = int.MaxValue,
             IndependentBlendEnable = false
         };
 
-        private readonly GraphicsDeviceManager _graphicsManager;
+        private readonly xna.GraphicsDeviceManager _graphicsManager;
         private readonly GraphicsDevice _graphics;
         private readonly KingdomShader _shader;
         private readonly Texture2D _whiteTexture;
@@ -120,7 +122,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         public SpawnScriptModel SpawnScriptBattle { get; private set; }
         public SpawnScriptModel SpawnScriptEvent { get; private set; }
 
-        public MapRenderer(ContentManager content, GraphicsDeviceManager graphics)
+        public MapRenderer(ContentManager content, xna.GraphicsDeviceManager graphics)
         {
             _graphicsManager = graphics;
             _graphics = graphics.GraphicsDevice;
@@ -268,9 +270,9 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             _shader.Pass(pass =>
             {
-                _shader.ProjectionView = Camera.Projection;
-                _shader.WorldView = Camera.World;
-                _shader.ModelView = Matrix.Identity;
+                _shader.SetProjectionView(Camera.Projection);
+                _shader.SetWorldView(Camera.World);
+                _shader.SetModelViewIdentity();
                 pass.Apply();
 
                 foreach (var mesh in MapMeshGroups.Where(x => x.IsVisible))
@@ -290,11 +292,11 @@ namespace OpenKh.Tools.Kh2MapStudio
                         if (entity.BobIndex < 0 || entity.BobIndex >= BobMeshGroups.Count)
                             continue;
 
-                        _shader.ModelView = Matrix.CreateRotationX(entity.RotationX) *
-                            Matrix.CreateRotationY(entity.RotationY) *
-                            Matrix.CreateRotationZ(entity.RotationZ) *
-                            Matrix.CreateScale(entity.ScalingX, entity.ScalingY, entity.ScalingZ) *
-                            Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
+                        _shader.SetModelView(Matrix4x4.CreateRotationX(entity.RotationX) *
+                            Matrix4x4.CreateRotationY(entity.RotationY) *
+                            Matrix4x4.CreateRotationZ(entity.RotationZ) *
+                            Matrix4x4.CreateScale(entity.ScalingX, entity.ScalingY, entity.ScalingZ) *
+                            Matrix4x4.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ));
                         RenderMeshNew(pass, BobMeshGroups[entity.BobIndex].MeshGroup, true);
                     }
                 }
@@ -305,10 +307,10 @@ namespace OpenKh.Tools.Kh2MapStudio
                     {
                         foreach (var entity in spawnPoint.Entities)
                         {
-                            _shader.ModelView = Matrix.CreateRotationX(entity.RotationX) *
-                                Matrix.CreateRotationY(entity.RotationY) *
-                                Matrix.CreateRotationZ(entity.RotationZ) *
-                                Matrix.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ);
+                            _shader.SetModelView(Matrix4x4.CreateRotationX(entity.RotationX) *
+                                Matrix4x4.CreateRotationY(entity.RotationY) *
+                                Matrix4x4.CreateRotationZ(entity.RotationZ) *
+                                Matrix4x4.CreateTranslation(entity.PositionX, -entity.PositionY, -entity.PositionZ));
                             RenderMeshNew(pass, CurrentSpawnPoint.ObjEntryCtrl[entity.ObjectId], true);
                         }
 
@@ -319,25 +321,24 @@ namespace OpenKh.Tools.Kh2MapStudio
                         _shader.SetRenderTexture(pass, _whiteTexture);
                         foreach (var item in spawnPoint.EventActivators)
                         {
-                            _shader.ModelView = Matrix.CreateRotationX(item.RotationX) *
-                                Matrix.CreateRotationY(item.RotationY) *
-                                Matrix.CreateRotationZ(item.RotationZ) *
-                            Matrix.CreateScale(item.ScaleX, item.ScaleY, item.ScaleZ) *
-                                Matrix.CreateTranslation(item.PositionX, -item.PositionY, -item.PositionZ);
+                            _shader.SetModelView(Matrix4x4.CreateRotationX(item.RotationX) *
+                                Matrix4x4.CreateRotationY(item.RotationY) *
+                                Matrix4x4.CreateRotationZ(item.RotationZ) *
+                                Matrix4x4.CreateScale(item.ScaleX, item.ScaleY, item.ScaleZ) *
+                                Matrix4x4.CreateTranslation(item.PositionX, -item.PositionY, -item.PositionZ));
                             pass.Apply();
 
-                            var color = new Color(1f, 0f, 0f, .5f);
-                            var texCoord = new Vector2();
-                            var vertices = new VertexPositionColorTexture[]
+                            var color = new xna.Color(1f, 0f, 0f, .5f);
+                            var vertices = new PositionColoredTextured[]
                             {
-                                new VertexPositionColorTexture(new Vector3(-1, -1, -1), color, texCoord),
-                                new VertexPositionColorTexture(new Vector3(+1, -1, -1), color, texCoord),
-                                new VertexPositionColorTexture(new Vector3(+1, +1, -1), color, texCoord),
-                                new VertexPositionColorTexture(new Vector3(-1, +1, -1), color, texCoord),
-                                new VertexPositionColorTexture(new Vector3(-1, -1, +1), color, texCoord),
-                                new VertexPositionColorTexture(new Vector3(+1, -1, +1), color, texCoord),
-                                new VertexPositionColorTexture(new Vector3(+1, +1, +1), color, texCoord),
-                                new VertexPositionColorTexture(new Vector3(-1, +1, +1), color, texCoord),
+                                new PositionColoredTextured(new Vector3(-1, -1, -1), 0x800000FFU, 0, 0),
+                                new PositionColoredTextured(new Vector3(+1, -1, -1), 0x800000FFU, 0, 0),
+                                new PositionColoredTextured(new Vector3(+1, +1, -1), 0x800000FFU, 0, 0),
+                                new PositionColoredTextured(new Vector3(-1, +1, -1), 0x800000FFU, 0, 0),
+                                new PositionColoredTextured(new Vector3(-1, -1, +1), 0x800000FFU, 0, 0),
+                                new PositionColoredTextured(new Vector3(+1, -1, +1), 0x800000FFU, 0, 0),
+                                new PositionColoredTextured(new Vector3(+1, +1, +1), 0x800000FFU, 0, 0),
+                                new PositionColoredTextured(new Vector3(-1, +1, +1), 0x800000FFU, 0, 0),
                             };
                             var indices = new int[]
                             {
@@ -348,7 +349,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                                 3, 2, 7, 7, 2, 6,
                                 4, 5, 0, 0, 5, 1
                             };
-                            _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 8, indices, 0, 12);
+                            _graphics.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 8, indices, 0, 12, MeshLoader.PositionColoredTexturedVertexDeclaration);
                         }
                     }
                 }

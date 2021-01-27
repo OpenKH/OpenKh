@@ -366,26 +366,26 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             var camera = _mapRenderer.Camera;
             if (keyboard.IsKeyDown(Keys.W))
-                camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
+                camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
             if (keyboard.IsKeyDown(Keys.S))
-                camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
+                camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
             if (keyboard.IsKeyDown(Keys.A))
-                camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
+                camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
             if (keyboard.IsKeyDown(Keys.D))
-                camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
+                camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
             if (keyboard.IsKeyDown(Keys.Q))
-                camera.CameraPosition += xna.Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
+                camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
             if (keyboard.IsKeyDown(Keys.E))
-                camera.CameraPosition -= xna.Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
+                camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
 
             if (keyboard.IsKeyDown(Keys.Up))
-                camera.CameraRotationYawPitchRoll += new xna.Vector3(0, 0, 1 * speed);
+                camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
             if (keyboard.IsKeyDown(Keys.Down))
-                camera.CameraRotationYawPitchRoll -= new xna.Vector3(0, 0, 1 * speed);
+                camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
             if (keyboard.IsKeyDown(Keys.Left))
-                camera.CameraRotationYawPitchRoll += new xna.Vector3(1 * speed, 0, 0);
+                camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
             if (keyboard.IsKeyDown(Keys.Right))
-                camera.CameraRotationYawPitchRoll -= new xna.Vector3(1 * speed, 0, 0);
+                camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
         }
 
         private void ProcessMouseInput(MouseState mouse)
@@ -396,8 +396,8 @@ namespace OpenKh.Tools.Kh2MapStudio
                 var camera = _mapRenderer.Camera;
                 var xSpeed = (_previousMousePosition.X - mouse.Position.X) * Speed;
                 var ySpeed = (_previousMousePosition.Y - mouse.Position.Y) * Speed;
-                camera.CameraRotationYawPitchRoll += new xna.Vector3(1 * xSpeed, 0, 0);
-                camera.CameraRotationYawPitchRoll += new xna.Vector3(0, 0, 1 * ySpeed);
+                camera.CameraRotationYawPitchRoll += new Vector3(1 * xSpeed, 0, 0);
+                camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * ySpeed);
             }
 
             _previousMousePosition = mouse.Position;

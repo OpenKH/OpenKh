@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Bbs;
 using OpenKh.Common;
@@ -15,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using xna = Microsoft.Xna.Framework;
 
 namespace OpenKh.Game.States
 {
@@ -28,7 +29,7 @@ namespace OpenKh.Game.States
             AlphaDestinationBlend = Blend.InverseSourceAlpha,
             ColorBlendFunction = BlendFunction.Add,
             AlphaBlendFunction = BlendFunction.Add,
-            BlendFactor = Color.White,
+            BlendFactor = xna.Color.White,
             MultiSampleMask = int.MaxValue,
             IndependentBlendEnable = false
         };
@@ -36,7 +37,7 @@ namespace OpenKh.Game.States
         public Kernel Kernel { get; private set; }
         private IDataContent _dataContent;
         private ArchiveManager _archiveManager;
-        private GraphicsDeviceManager _graphics;
+        private xna.GraphicsDeviceManager _graphics;
         private InputManager _input;
         private IStateChange _stateChange;
         private List<MeshGroup> _models = new List<MeshGroup>();
@@ -158,9 +159,9 @@ namespace OpenKh.Game.States
         {
             _graphics.GraphicsDevice.DepthStencilState = passRenderOpaque ? DepthStencilState.Default : DepthStencilState.DepthRead;
 
-            _shader.ProjectionView = _camera.Projection;
-            _shader.WorldView = _camera.World;
-            _shader.ModelView = Matrix.Identity;
+            _shader.SetProjectionView(_camera.Projection);
+            _shader.SetWorldView(_camera.World);
+            _shader.SetModelViewIdentity();
             pass.Apply();
 
             foreach (var mesh in _models)
@@ -172,9 +173,9 @@ namespace OpenKh.Game.States
 
             Field.ForEveryModel((entity, model) =>
             {
-                _shader.ProjectionView = _camera.Projection;
-                _shader.WorldView = _camera.World;
-                _shader.ModelView = entity.GetMatrix().ToXna();
+                _shader.SetProjectionView(_camera.Projection);
+                _shader.SetWorldView(_camera.World);
+                _shader.SetModelView(entity.GetMatrix());
                 pass.Apply();
 
                 RenderMeshNew(pass, model, passRenderOpaque);
@@ -182,9 +183,9 @@ namespace OpenKh.Game.States
 
             foreach (var entity in _bobEntities)
             {
-                _shader.ProjectionView = _camera.Projection;
-                _shader.WorldView = _camera.World;
-                _shader.ModelView = entity.GetMatrix().ToXna();
+                _shader.SetProjectionView(_camera.Projection);
+                _shader.SetWorldView(_camera.World);
+                _shader.SetModelView(entity.GetMatrix());
                 pass.Apply();
 
                 RenderMeshNew(pass, _bobModels[entity.BobIndex], passRenderOpaque);
@@ -194,7 +195,7 @@ namespace OpenKh.Game.States
             {
                 if (ent.DifferentMatrix)
                 {
-                    Matrix world = _camera.World;
+                    var world = _camera.World;
                     world.M14 = 0;
                     world.M24 = 0;
                     world.M34 = 0;
@@ -202,12 +203,12 @@ namespace OpenKh.Game.States
                     world.M42 = 0;
                     world.M43 = 0;
                     world.M44 = 1;
-                    _shader.WorldView = world;
+                    _shader.SetWorldView(ref world);
                     _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
                 }
                 else
                 {
-                    _shader.WorldView = _camera.World;
+                    _shader.SetWorldView(_camera.World);
                     _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                 }
 
@@ -226,8 +227,8 @@ namespace OpenKh.Game.States
                 }
 
 
-                _shader.ProjectionView = _camera.Projection;
-                _shader.ModelView = ent.GetMatrix().ToXna();
+                _shader.SetProjectionView(_camera.Projection);
+                _shader.SetModelView(ent.GetMatrix());
                 _shader.UseAlphaMask = true;
                 pass.Apply();
 

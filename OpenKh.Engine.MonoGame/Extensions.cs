@@ -25,38 +25,38 @@ namespace OpenKh.Engine.MonoGame
                 switch (texture.AddressU)
                 {
                     case ModelTexture.TextureWrapMode.Clamp:
-                        shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
+                        shader.SetTextureRegionUDefault();
                         shader.TextureWrapModeU = TextureWrapMode.Clamp;
                         break;
                     case ModelTexture.TextureWrapMode.Repeat:
-                        shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
+                        shader.SetTextureRegionUDefault();
                         shader.TextureWrapModeU = TextureWrapMode.Repeat;
                         break;
                     case ModelTexture.TextureWrapMode.RegionClamp:
-                        shader.TextureRegionU = texture.RegionU;
+                        shader.SetTextureRegionU(texture.RegionU);
                         shader.TextureWrapModeU = TextureWrapMode.Clamp;
                         break;
                     case ModelTexture.TextureWrapMode.RegionRepeat:
-                        shader.TextureRegionU = texture.RegionU;
+                        shader.SetTextureRegionU(texture.RegionU);
                         shader.TextureWrapModeU = TextureWrapMode.Repeat;
                         break;
                 }
                 switch (texture.AddressV)
                 {
                     case ModelTexture.TextureWrapMode.Clamp:
-                        shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
+                        shader.SetTextureRegionVDefault();
                         shader.TextureWrapModeV = TextureWrapMode.Clamp;
                         break;
                     case ModelTexture.TextureWrapMode.Repeat:
-                        shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
+                        shader.SetTextureRegionVDefault();
                         shader.TextureWrapModeV = TextureWrapMode.Repeat;
                         break;
                     case ModelTexture.TextureWrapMode.RegionClamp:
-                        shader.TextureRegionV = texture.RegionV;
+                        shader.SetTextureRegionV(texture.RegionV);
                         shader.TextureWrapModeV = TextureWrapMode.Clamp;
                         break;
                     case ModelTexture.TextureWrapMode.RegionRepeat:
-                        shader.TextureRegionV = texture.RegionV;
+                        shader.SetTextureRegionV(texture.RegionV);
                         shader.TextureWrapModeV = TextureWrapMode.Repeat;
                         break;
                 }
@@ -70,8 +70,8 @@ namespace OpenKh.Engine.MonoGame
             if (shader.Texture0 != texture)
             {
                 shader.Texture0 = texture;
-                shader.TextureRegionU = KingdomShader.DefaultTextureRegion;
-                shader.TextureRegionV = KingdomShader.DefaultTextureRegion;
+                shader.SetTextureRegionVDefault();
+                shader.SetTextureRegionUDefault();
                 shader.TextureWrapModeU = TextureWrapMode.Clamp;
                 shader.TextureWrapModeV = TextureWrapMode.Clamp;
                 pass.Apply();
