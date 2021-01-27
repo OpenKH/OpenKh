@@ -37,7 +37,7 @@ namespace OpenKh.Game.Field
                         new Vector3(currentInfo.RotationX, currentInfo.RotationY, currentInfo.RotationZ),
                         new Vector3(currentInfo.ScaleX, currentInfo.ScaleY, currentInfo.ScaleZ));
                     pmpEntity.DifferentMatrix = pmp.hasDifferentMatrix[pmoIndex];
-                    
+
                     var pParser = new PmoParser(pmp.PmoList[pmoIndex], 100.0f);
                     var textures = new List<Tim2KingdomTexture>();
 

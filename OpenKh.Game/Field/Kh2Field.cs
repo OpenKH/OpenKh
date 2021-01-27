@@ -148,7 +148,7 @@ namespace OpenKh.Game.Field
             // we want to avoid to load entities that can be potentially not used.
         }
 
-        private void LoadMsg(int world) =>  _kernel.DataContent
+        private void LoadMsg(int world) => _kernel.DataContent
             .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[world]}.bar")
             .Using(stream => Bar.Read(stream))
             .ForEntry(x => x.Type == Bar.EntryType.List, stream =>
@@ -247,7 +247,7 @@ namespace OpenKh.Game.Field
         {
             var actor = _actorIds[actorId];
             actor.Position = new n.Vector3(x, y, z);
-            actor.Rotation = new n.Vector3(0, (float)(rotation * Math.PI / 180) , 0);
+            actor.Rotation = new n.Vector3(0, (float)(rotation * Math.PI / 180), 0);
         }
 
         public void SetActorAnimation(int actorId, string path)
@@ -424,7 +424,7 @@ namespace OpenKh.Game.Field
 
             _messageDrawContext.GlobalScale = 1.0f;
             _messageDrawContext.WidthMultiplier = 1.2f;
-            _messageDrawContext.x = (_messageDrawContext.WindowWidth  - _messageDrawContext.Width) / 2f;
+            _messageDrawContext.x = (_messageDrawContext.WindowWidth - _messageDrawContext.Width) / 2f;
             _messageDrawContext.y = 350;
             _messageDrawContext.IgnoreDraw = false;
             _messageRenderer.Draw(_messageDrawContext, data);
