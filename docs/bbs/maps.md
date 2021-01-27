@@ -178,23 +178,40 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  JB30   | デスティニーアイランド（ひる） |   | Destiny Islands (Noon)     | Text only present in HD ReMiX
 |  JB31   | トラヴァース２番街 |   | Traverse Town 2nd District            | Text only present in HD ReMiX
 |  JB32   | トラヴァース３番街 |   | Traverse Town 3rd District            | Text only present in HD ReMiX
-|  JB32   |  |   | Destiny Islands (Afternoon)            | Text only present in HD ReMiX
-|  JB32   |  |   | Destiny Islands (Night)            | Text only present in HD ReMiX
+|  JB33   |  |   | Destiny Islands (Afternoon)            | Text only present in HD ReMiX
+|  JB34   |  |   | Destiny Islands (Night)            | Text only present in HD ReMiX
 |  JB50   | 異空の回廊 | Lanes Between  |             |
 |  JB50   | ブランク | BLANK  |             |
 |  JB50   | 闇の世界 | Realm of Darkness  |             |
 |  JB50   | wmイベント用 | FOR wm EVENT  |             |
+|  JB??   | きかくてすと |   | Kikaku Test   | Text only present in HD ReMiX
+|  JB??   | piゆうえんち |   | pi Amusement Park   | Text only present in HD ReMiX
+|  JB??   | tm_オペラ座 |   |  tm_Opera  | Text only present in HD ReMiX
+|  JB??   | nd_ノートルダム１F |   |  nd_Notredame 1st Floor  | Text only present in HD ReMiX
+|  JB??   | nd_ノートルダムカジモド部屋 |  | nd_Notredame Quasimodo's Room    | Text only present in HD ReMiX
+|  JB??   | トラヴァースタウン４番街 |   | Traverse Town District 4   | Text only present in HD ReMiX
+|  JB??   | tp_01:レガシー号甲板 |   | tp_01: The Legacy's Deck   | Text only present in HD ReMiX
+|  JB??   | tl_the_city_幹線道路 |   | tl_the_city_Main Road   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
+|  JB??   | よび |   | Reserved   | Text only present in HD ReMiX
 
 
-きかくてすと
-piゆうえんち
-tm_オペラ座
-nd_ノートルダム１F
-nd_ノートルダムカジモド部屋
-トラヴァースタウン４番街
-tp_01:レガシー号甲板
-tl_the_city_幹線道路
-よび
 
 **Olympus Coliseum**
 
@@ -365,8 +382,8 @@ tl_the_city_幹線道路
 
 **Jump Festa**
 
-| **Map** | **Japanese** | **English** | **Comment** |
-|---------|--------------|-------------|-------------|
+| **Map** | **Japanese** | **English** | **Translation** | **Comment** |
+|---------|--------------|-------------|-------------|---------
 |  JF00   | ジャンフェス(sw10) | Jump Festa (sw10)  |             |
 |  JF01   | ジャンフェス(cd07) | Jump Festa (cd07)  |             |
 |  JF02   | ジャンフェス(cd09) | Jump Festa (cd09)  |             |
@@ -379,6 +396,8 @@ tl_the_city_幹線道路
 |  JF73   | バトルダイス・テスト２ | Battle Dice Test 2  |             |
 |  JF74   | バトルダイス・テスト３ | Battle Dice Test 3  |             |
 |  JF75   | バトルダイス・テスト４ | Battle Dice Test 4  |             |
+|  JF??   | ノートルダム（そと） |   | Notredame (Exterior)            | Text only present in HD ReMiX
+|  JF??   | ノートルダム（なか） |   | Notredame (Interior)            | Text only present in HD ReMiX
 |  JF90   | 各種動作テスト | Operations Test  |             |
 |  JF91   | カメラ当たりけんしょう | Camera Collision Test  |             |
 |  JF92   | きかくテスト | Planner Test  |             |
