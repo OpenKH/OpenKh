@@ -12,7 +12,6 @@ using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
-using OpenKh.Kh2.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,13 +31,10 @@ namespace OpenKh.Game.Field
         private readonly Kh2MessageProvider _eventMessageProvider;
         private readonly List<ObjectEntity> _actors = new List<ObjectEntity>();
         private readonly Dictionary<int, ObjectEntity> _actorIds = new Dictionary<int, ObjectEntity>();
-        private readonly List<MeshGroup> _mapMeshes = new List<MeshGroup>();
-        private readonly List<MeshGroup> _skyboxMeshes = new List<MeshGroup>();
-        private readonly List<BobEntity> _bobEntities = new List<BobEntity>();
-        private readonly List<MeshGroup> _bobModels = new List<MeshGroup>();
         private readonly Dictionary<int, byte[]> _subtitleData = new Dictionary<int, byte[]>();
         private readonly MonoSpriteDrawing _drawing;
         private Bar _binarcAreaData;
+        private Kh2Map _map;
         private EventPlayer _eventPlayer;
         private int _spawnScriptMap;
         private int _spawnScriptBtl;
@@ -103,33 +99,21 @@ namespace OpenKh.Game.Field
 
         public void UnloadMap()
         {
-            Action<List<MeshGroup>> clearMeshGroups = (meshGroups) =>
-            {
-                foreach (var meshGroup in meshGroups)
-                    foreach (var texture in meshGroup.Textures)
-                        texture.Dispose();
-                meshGroups.Clear();
-            };
-
-            clearMeshGroups(_mapMeshes);
-            clearMeshGroups(_skyboxMeshes);
-            clearMeshGroups(_bobModels);
-            _bobEntities.Clear();
+            _map?.Dispose();
             RemoveAllActors();
-
             _eventPlayer = null;
         }
 
         public void LoadArea(int world, int area)
         {
-            Log.Info($"Area={world},{area}");
+            Log.Info("Area={0},{1}", world, area);
 
             UnloadMap();
             LoadAreaData(world, area);
             // TODO load voices (eg. voice/us/battle/nm0_jack.vsb)
             // TODO load field2d (eg. field2d/jp/nm0field.2dd)
             // TODO load command (eg. field2d/jp/nm1command.2dd)
-            LoadMap(world, area);
+            _map = new Kh2Map(_graphicsDevice, _kernel, world, area);
             LoadMsg(world);
             // TODO load libretto (eg. libretto-nm.bar)
             // TODO load effect
@@ -164,47 +148,14 @@ namespace OpenKh.Game.Field
             // we want to avoid to load entities that can be potentially not used.
         }
 
-        private void LoadMap(int world, int area)
-        {
-            Action<Bar, string, List<MeshGroup>> addMeshes = (binarc, tag, meshGroupList) =>
+        private void LoadMsg(int world) =>  _kernel.DataContent
+            .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[world]}.bar")
+            .Using(stream => Bar.Read(stream))
+            .ForEntry(x => x.Type == Bar.EntryType.List, stream =>
             {
-                var meshes = FromMdlx(_graphicsDevice, binarc, tag);
-                if (meshes != null)
-                    meshGroupList.Add(meshes);
-            };
-
-            Log.Info("Map={0},{1}", world, area);
-            var fileName = _kernel.GetMapFileName(world, area);
-            var binarc = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
-
-            addMeshes(binarc, "SK0", _skyboxMeshes);
-            addMeshes(binarc, "SK1", _skyboxMeshes);
-            addMeshes(binarc, "MAP", _mapMeshes);
-
-            _bobEntities.AddRange(binarc.ForEntry("out", Bar.EntryType.BgObjPlacement, BobDescriptor.Read)?
-                .Select(x => new BobEntity(x))?.ToList() ?? new List<BobEntity>());
-
-            var bobModels = binarc.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
-            var bobTextures = binarc.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
-
-            for (var i = 0; i < bobModels.Count; i++)
-            {
-                _bobModels.Add(new MeshGroup
-                {
-                    MeshDescriptors = MeshLoader.FromKH2(bobModels[i]).MeshDescriptors,
-                    Textures = bobTextures[i].LoadTextures(_graphicsDevice).ToArray()
-                });
-            }
-        }
-        private void LoadMsg(int world) =>
-            _kernel.DataContent
-                .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[world]}.bar")
-                .Using(stream => Bar.Read(stream))
-                .ForEntry(x => x.Type == Bar.EntryType.List, stream =>
-                {
-                    _eventMessageProvider.Load(Msg.Read(stream));
-                    return true;
-                });
+                _eventMessageProvider.Load(Msg.Read(stream));
+                return true;
+            });
 
         public void PlayEvent(string eventName)
         {
@@ -255,16 +206,12 @@ namespace OpenKh.Game.Field
 
         public void ForEveryStaticModel(Action<IMonoGameModel> action)
         {
-            foreach (var mesh in _skyboxMeshes)
-                action(mesh);
-            foreach (var mesh in _mapMeshes)
-                action(mesh);
+            _map.ForEveryStaticModel(action);
         }
 
         public void ForEveryModel(Action<IEntity, IMonoGameModel> action)
         {
-            foreach (var bob in _bobEntities)
-                action(bob, _bobModels[bob.BobIndex]);
+            _map.ForEveryModel(action);
             foreach (var actor in _actors.Where(x => x.IsVisible))
                 action(actor, actor);
         }
@@ -515,23 +462,6 @@ namespace OpenKh.Game.Field
             }
             else
                 return $"anm/{path}.anb";
-        }
-
-        private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
-        {
-            var model = entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read);
-            if (model == null)
-                return null;
-
-            var textures = entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read);
-            if (model == null)
-                return null;
-
-            return new MeshGroup
-            {
-                MeshDescriptors = MeshLoader.FromKH2(model).MeshDescriptors,
-                Textures = textures.LoadTextures(graphics).ToArray()
-            };
         }
     }
 }
