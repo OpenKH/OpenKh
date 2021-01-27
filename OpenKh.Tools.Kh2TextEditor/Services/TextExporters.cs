@@ -12,7 +12,6 @@ namespace OpenKh.Tools.Kh2TextEditor.Services
         public static IEnumerable<ITextExporter> GetAll() => new ITextExporter[]
         {
             new PlainTextExporter(),
-            new CsvTextExporter(),
             new XmlTextExporter(),
             new YamlTextExporter(),
         };
