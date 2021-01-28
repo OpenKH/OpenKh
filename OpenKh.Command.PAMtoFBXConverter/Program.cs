@@ -11,6 +11,8 @@ using OpenKh.Bbs;
 using System.Collections.Generic;
 using System.Numerics;
 using OpenKh.Common.Utils;
+using Assimp.Unmanaged;
+using Assimp;
 
 namespace OpenKh.Command.PAMtoFBXConverter
 {
@@ -64,10 +66,71 @@ namespace OpenKh.Command.PAMtoFBXConverter
             Pmo pmo = Pmo.Read(pmoStream);
             Pam pam = Pam.Read(pamStream);
 
-            
+            Assimp.Scene nScene = GetPMOScene(pmo);
+            List<Assimp.Animation> FBXAnims = PAMtoFBXAnim(pam);
 
             pmoStream.Close();
             pamStream.Close();
+
+            using var ctx = new AssimpContext();
+            ctx.ExportFile(nScene, "Test.fbx", "fbx");
+            
+        }
+
+        private static Assimp.Scene GetPMOScene(Pmo pmo)
+        {
+            Assimp.Scene scene = new Assimp.Scene();
+            scene.RootNode = new Assimp.Node("root");
+
+            for(int i = 0; i < pmo.Meshes.Count; i++)
+            {
+                Assimp.Mesh mesh = new Assimp.Mesh($"Mesh{i}", Assimp.PrimitiveType.Triangle);
+                Pmo.MeshChunks chunk = pmo.Meshes[i];
+                List<int> indices = new List<int>();
+                for (int j = 0; j < chunk.vertices.Count; j++)
+                {
+                    mesh.Vertices.Add(new Assimp.Vector3D(
+                        chunk.vertices[j].X * pmo.header.ModelScale * 100.0f,
+                        chunk.vertices[j].Y * pmo.header.ModelScale * 100.0f,
+                        chunk.vertices[j].Z * pmo.header.ModelScale * 100.0f));
+
+                    mesh.Faces.Add(new Face(new int[]
+                    {
+                        (j * 3),
+                        (j * 3) + 1,
+                        (j * 3) + 2
+                    }));
+                    
+                }
+                mesh.MaterialIndex = 0;
+
+                var material = new Material();
+                material.Clear();
+
+                scene.Materials.Add(material);
+
+                //mesh.SetIndices(indices.ToArray(), 3);
+                scene.Meshes.Add(mesh);
+            }
+
+            scene.RootNode.MeshIndices.AddRange(Enumerable.Range(0, scene.MeshCount));
+
+            return scene;
+        }
+
+        private static List<Assimp.Animation> PAMtoFBXAnim(Pam pam)
+        {
+            List<Assimp.Animation> animationList = new List<Assimp.Animation>();
+
+            for(int i = 0; i < pam.header.AnimationCount; i++)
+            {
+                Assimp.Animation anim = new Assimp.Animation();
+                anim.Name = pam.animList[i].AnimEntry.AnimationName;
+                
+                animationList.Add(anim);
+            }
+
+            return animationList;
         }
     }
 }
