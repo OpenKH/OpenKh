@@ -106,10 +106,10 @@ namespace OpenKh.Command.PmoConverter
                 // Set extra flags.
                 if (UsesUniformColor)
                 {
-                    uint UniformColor = (byte)(desc.Vertices[0].A * 2.0f);
-                    UniformColor += desc.Vertices[0].B * (uint)0x200;
-                    UniformColor += desc.Vertices[0].G * (uint)0x20000;
-                    UniformColor += desc.Vertices[0].R * (uint)0x2000000;
+                    var UniformColor = (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].A) * 2f);
+                    UniformColor += (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].B)) << 8;
+                    UniformColor += (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].G)) << 16;
+                    UniformColor += (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].R)) << 24;
                     chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBit(chunk.SectionInfo.VertexFlags, 24, true);
                     chunk.SectionInfo_opt2 = new Pmo.MeshSectionOptional2();
                     chunk.SectionInfo_opt2.DiffuseColor = UniformColor;
@@ -322,10 +322,10 @@ namespace OpenKh.Command.PmoConverter
                             vertices[i].Z = x.Vertices[i].Z * Scale;
                             vertices[i].Tu = x.TextureCoordinateChannels[0][i].X;
                             vertices[i].Tv = 1.0f - x.TextureCoordinateChannels[0][i].Y;
-                            vertices[i].R = 0xFF;
-                            vertices[i].G = 0xFF;
-                            vertices[i].B = 0xFF;
-                            vertices[i].A = 0xFF;
+                            vertices[i].R = 1.0f;
+                            vertices[i].G = 1.0f;
+                            vertices[i].B = 1.0f;
+                            vertices[i].A = 1.0f;
                         }
 
                         return new MeshDescriptor
