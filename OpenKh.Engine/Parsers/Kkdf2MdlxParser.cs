@@ -220,10 +220,11 @@ namespace OpenKh.Engine.Parsers
                     for (int i = 0; i < triRef.list.Length; i++)
                     {
                         VertexRef vertRef = triRef.list[i];
-                        Vector3 pos = immutableExportedMesh.positionList[vertRef.vertexIndex];
-                        Vector2 uv = immutableExportedMesh.uvList[vertRef.uvIndex];
                         indices.Add(vertices.Count);
-                        vertices.Add(new PositionColoredTextured(pos, -1, uv.X, uv.Y));
+                        vertices.Add(new PositionColoredTextured(
+                            immutableExportedMesh.positionList[vertRef.vertexIndex],
+                            immutableExportedMesh.uvList[vertRef.uvIndex],
+                            1.0f, 1.0f, 1.0f, 1.0f));
                     }
                 }
 
