@@ -1,6 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Imaging;
-using OpenKh.Common.Utils;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -389,31 +389,45 @@ namespace OpenKh.Bbs
                             break;
                     }
 
-                    switch (ColorFormat)
-                    {
-                        case Pmo.ColorFormat.NO_COLOR:
-                            meshChunk.colors.Add(new Vector4(0xFF, 0xFF, 0xFF, 0xFF));
-                            break;
-                        case Pmo.ColorFormat.BGR_5650_16BITS:
-                            stream.ReadUInt16();
-                            break;
-                        case Pmo.ColorFormat.ABGR_5551_16BITS:
-                            stream.ReadUInt16();
-                            break;
-                        case Pmo.ColorFormat.ABGR_4444_16BITS:
-                            stream.ReadUInt16();
-                            break;
-                        case Pmo.ColorFormat.ABGR_8888_32BITS:
-                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
-                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                    Vector4 col;
 
-                            Vector4 col;
-                            col.X = stream.ReadByte();
-                            col.Y = stream.ReadByte();
-                            col.Z = stream.ReadByte();
-                            col.W = stream.ReadByte();
-                            meshChunk.colors.Add(col);
-                            break;
+                    if (isColorFlagRisen)
+                    {
+                        uint c = meshChunk.SectionInfo_opt2.DiffuseColor;
+                        col.X = c % 0x100;
+                        col.Y = (c >> 8) % 0x100;
+                        col.Z = (c >> 16) % 0x100;
+                        col.W = (c >> 24) % 0x100;
+
+                        meshChunk.colors.Add(col);
+                    }
+                    else
+                    {
+                        switch (ColorFormat)
+                        {
+                            case Pmo.ColorFormat.NO_COLOR:
+                                meshChunk.colors.Add(new Vector4(0xFF, 0xFF, 0xFF, 0xFF));
+                                break;
+                            case Pmo.ColorFormat.BGR_5650_16BITS:
+                                stream.ReadUInt16();
+                                break;
+                            case Pmo.ColorFormat.ABGR_5551_16BITS:
+                                stream.ReadUInt16();
+                                break;
+                            case Pmo.ColorFormat.ABGR_4444_16BITS:
+                                stream.ReadUInt16();
+                                break;
+                            case Pmo.ColorFormat.ABGR_8888_32BITS:
+                                vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                                stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+
+                                col.X = stream.ReadByte();
+                                col.Y = stream.ReadByte();
+                                col.Z = stream.ReadByte();
+                                col.W = stream.ReadByte();
+                                meshChunk.colors.Add(col);
+                                break;
+                        }
                     }
 
                     Vector3 currentVertex;
