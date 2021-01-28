@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using System.Numerics;
 
 namespace OpenKh.Engine.MonoGame
 {
@@ -14,8 +14,8 @@ namespace OpenKh.Engine.MonoGame
         private Vector3 _cameraLookAtY;
         private Vector3 _cameraLookAtZ;
         private Vector3 _cameraUp;
-        private Matrix _projection;
-        private Matrix _world;
+        private Matrix4x4 _projection;
+        private Matrix4x4 _world;
         private bool _isProjectionInvalidated;
         private bool _isWorldInvalidated;
         private Vector3 _cameraYpr;
@@ -126,14 +126,14 @@ namespace OpenKh.Engine.MonoGame
             set
             {
                 _cameraYpr = value;
-                var matrix = Matrix.CreateFromYawPitchRoll(value.X / 180.0f * 3.14159f, value.Y / 180.0f * 3.14159f, value.Z / 180.0f * 3.14159f);
+                var matrix = Matrix4x4.CreateFromYawPitchRoll(value.X / 180.0f * 3.14159f, value.Y / 180.0f * 3.14159f, value.Z / 180.0f * 3.14159f);
                 CameraLookAtX = Vector3.Transform(new Vector3(1, 0, 0), matrix);
                 CameraLookAtY = Vector3.Transform(new Vector3(0, 0, 1), matrix);
                 CameraLookAtZ = Vector3.Transform(new Vector3(0, 1, 0), matrix);
             }
         }
 
-        public Matrix Projection
+        public Matrix4x4 Projection
         {
             get
             {
@@ -143,7 +143,7 @@ namespace OpenKh.Engine.MonoGame
             }
         }
 
-        public Matrix World
+        public Matrix4x4 World
         {
             get
             {
@@ -170,7 +170,7 @@ namespace OpenKh.Engine.MonoGame
 
         private void CalculateProjection()
         {
-            _projection = Matrix.CreatePerspectiveFieldOfView(
+            _projection = Matrix4x4.CreatePerspectiveFieldOfView(
                 _fov, _aspectRatio, _nearClipPlane, _farClipPlane);
 
             ValidateProjection();
@@ -178,7 +178,10 @@ namespace OpenKh.Engine.MonoGame
 
         private void CalculateWorld()
         {
-            _world = Matrix.CreateLookAt(CameraPosition, CameraLookAt, CameraUp);
+            _world = Matrix4x4.CreateLookAt(
+                new Vector3(CameraPosition.X, CameraPosition.Y, CameraPosition.Z),
+                new Vector3(CameraLookAt.X, CameraLookAt.Y, CameraLookAt.Z),
+                new Vector3(CameraUp.X, CameraUp.Y, CameraUp.Z));
 
             ValidateWorld();
         }

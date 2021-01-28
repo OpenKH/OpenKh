@@ -1,14 +1,17 @@
-﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Renders;
 using System;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using xna = Microsoft.Xna.Framework;
 
 namespace OpenKh.Engine.MonoGame
 {
     public class KingdomShader : IDisposable
     {
-        public static readonly Vector2 DefaultTextureRegion = new Vector2(0, 1);
+        private static Matrix4x4 MatrixIdentity = Matrix4x4.Identity;
+        public static Vector2 DefaultTextureRegion = new Vector2(0, 1);
 
         private readonly EffectParameter _modelViewParameter;
         private readonly EffectParameter _worldViewParameter;
@@ -33,34 +36,43 @@ namespace OpenKh.Engine.MonoGame
             _parameterTexture0 = Effect.Parameters["Texture0"];
             _parameterUseAlphaMask = Effect.Parameters["UseAlphaMask"];
 
-            ModelView = Matrix.Identity;
-            WorldView = Matrix.Identity;
-            ProjectionView = Matrix.Identity;
-            TextureRegionU = DefaultTextureRegion;
-            TextureRegionV = DefaultTextureRegion;
+            SetModelViewIdentity();
+            SetWorldViewIdentity();
+            SetProjectionViewIdentity();
+            SetTextureRegionUDefault();
+            SetTextureRegionVDefault();
             TextureWrapModeU = TextureWrapMode.Clamp;
             TextureWrapModeV = TextureWrapMode.Clamp;
         }
 
         public Effect Effect { get; }
 
-        public Matrix ModelView
-        {
-            get => _modelViewParameter.GetValueMatrix();
-            set => _modelViewParameter.SetValue(value);
-        }
+        public void SetModelViewIdentity() =>
+            _modelViewParameter.SetValue(Unsafe.As<Matrix4x4, xna.Matrix>(ref MatrixIdentity));
 
-        public Matrix WorldView
-        {
-            get => _worldViewParameter.GetValueMatrix();
-            set => _worldViewParameter.SetValue(value);
-        }
+        public void SetModelView(Matrix4x4 matrix) =>
+            _modelViewParameter.SetValue(Unsafe.As<Matrix4x4, xna.Matrix>(ref matrix));
 
-        public Matrix ProjectionView
-        {
-            get => _projectionViewParameter.GetValueMatrix();
-            set => _projectionViewParameter.SetValue(value);
-        }
+        public void SetModelView(ref Matrix4x4 matrix) =>
+            _modelViewParameter.SetValue(Unsafe.As<Matrix4x4, xna.Matrix>(ref matrix));
+
+        public void SetWorldViewIdentity() =>
+            _worldViewParameter.SetValue(Unsafe.As<Matrix4x4, xna.Matrix>(ref MatrixIdentity));
+
+        public void SetWorldView(Matrix4x4 matrix) =>
+            _worldViewParameter.SetValue(Unsafe.As<Matrix4x4, xna.Matrix>(ref matrix));
+
+        public void SetWorldView(ref Matrix4x4 matrix) =>
+            _worldViewParameter.SetValue(Unsafe.As<Matrix4x4, xna.Matrix>(ref matrix));
+
+        public void SetProjectionViewIdentity() =>
+            _projectionViewParameter.SetValue(Unsafe.As<Matrix4x4, xna.Matrix>(ref MatrixIdentity));
+
+        public void SetProjectionView(Matrix4x4 matrix) =>
+            _projectionViewParameter.SetValue(Unsafe.As<Matrix4x4, xna.Matrix>(ref matrix));
+
+        public void SetProjectionView(ref Matrix4x4 matrix) =>
+            _projectionViewParameter.SetValue(Unsafe.As<Matrix4x4, xna.Matrix>(ref matrix));
 
         public Texture2D Texture0
         {
@@ -68,16 +80,19 @@ namespace OpenKh.Engine.MonoGame
             set => _parameterTexture0.SetValue(value);
         }
 
-        public Vector2 TextureRegionU
-        {
-            get => _parameterTextureRegionU.GetValueVector2();
-            set => _parameterTextureRegionU.SetValue(value);
-        }
-        public Vector2 TextureRegionV
-        {
-            get => _parameterTextureRegionV.GetValueVector2();
-            set => _parameterTextureRegionV.SetValue(value);
-        }
+        public void SetTextureRegionU(Vector2 vector) =>
+            _parameterTextureRegionU.SetValue(Unsafe.As<Vector2, xna.Vector2>(ref vector));
+        public void SetTextureRegionU(ref Vector2 vector) =>
+            _parameterTextureRegionU.SetValue(Unsafe.As<Vector2, xna.Vector2>(ref vector));
+        public void SetTextureRegionUDefault() =>
+            _parameterTextureRegionU.SetValue(Unsafe.As<Vector2, xna.Vector2>(ref DefaultTextureRegion));
+
+        public void SetTextureRegionV(Vector2 vector) =>
+            _parameterTextureRegionV.SetValue(Unsafe.As<Vector2, xna.Vector2>(ref vector));
+        public void SetTextureRegionV(ref Vector2 vector) =>
+            _parameterTextureRegionV.SetValue(Unsafe.As<Vector2, xna.Vector2>(ref vector));
+        public void SetTextureRegionVDefault() =>
+            _parameterTextureRegionV.SetValue(Unsafe.As<Vector2, xna.Vector2>(ref DefaultTextureRegion));
 
         public TextureWrapMode TextureWrapModeU
         {

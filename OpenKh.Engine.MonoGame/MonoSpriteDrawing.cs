@@ -1,9 +1,10 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
 using OpenKh.Imaging;
 using System.Linq;
+using System.Numerics;
+using xna = Microsoft.Xna.Framework;
 
 namespace OpenKh.Engine.MonoGame
 {
@@ -67,7 +68,7 @@ namespace OpenKh.Engine.MonoGame
             AlphaDestinationBlend = Blend.InverseSourceAlpha,
             ColorBlendFunction = BlendFunction.Add,
             AlphaBlendFunction = BlendFunction.Add,
-            BlendFactor = Color.White,
+            BlendFactor = xna.Color.White,
             MultiSampleMask = int.MaxValue,
             IndependentBlendEnable = false
         };
@@ -79,7 +80,7 @@ namespace OpenKh.Engine.MonoGame
             AlphaDestinationBlend = Blend.One,
             ColorBlendFunction = BlendFunction.Add,
             AlphaBlendFunction = BlendFunction.Add,
-            BlendFactor = Color.White,
+            BlendFactor = xna.Color.White,
             MultiSampleMask = int.MaxValue,
             IndependentBlendEnable = false
         };
@@ -91,7 +92,7 @@ namespace OpenKh.Engine.MonoGame
             AlphaDestinationBlend = Blend.InverseSourceAlpha,
             ColorBlendFunction = BlendFunction.ReverseSubtract,
             AlphaBlendFunction = BlendFunction.ReverseSubtract,
-            BlendFactor = Color.White,
+            BlendFactor = xna.Color.White,
             MultiSampleMask = int.MaxValue,
             IndependentBlendEnable = false,
         };
@@ -110,7 +111,7 @@ namespace OpenKh.Engine.MonoGame
 
         private Texture2D _lastTextureUsed;
         private BlendState _lastBlendState;
-        private Matrix _projectionView;
+        private Matrix4x4 _projectionView;
 
         private Vector2 _textureRegionU;
         private Vector2 _textureRegionV;
@@ -189,11 +190,11 @@ namespace OpenKh.Engine.MonoGame
 
         public void SetViewport(float left, float right, float top, float bottom)
         {
-            _projectionView = Matrix.CreateOrthographicOffCenter(left, right, bottom, top, -1000.0f, +1000.0f);
+            _projectionView = Matrix4x4.CreateOrthographicOffCenter(left, right, bottom, top, -1000.0f, +1000.0f);
         }
 
         public void Clear(ColorF color) =>
-            _graphicsDevice.Clear(new Color(color.R, color.G, color.B, color.A));
+            _graphicsDevice.Clear(new xna.Color(color.R, color.G, color.B, color.A));
 
         public void AppendSprite(SpriteDrawingContext context)
         {
@@ -272,11 +273,11 @@ namespace OpenKh.Engine.MonoGame
             _shader.Pass(pass =>
             {
                 _shader.Texture0 = _lastTextureUsed;
-                _shader.ProjectionView = _projectionView;
-                _shader.WorldView = Matrix.Identity;
-                _shader.ModelView = Matrix.Identity;
-                _shader.TextureRegionU = _textureRegionU;
-                _shader.TextureRegionV = _textureRegionV;
+                _shader.SetProjectionView(ref _projectionView);
+                _shader.SetWorldViewIdentity();
+                _shader.SetModelViewIdentity();
+                _shader.SetTextureRegionU(ref _textureRegionU);
+                _shader.SetTextureRegionV(ref _textureRegionV);
                 _shader.TextureWrapModeU = _textureWrapU;
                 _shader.TextureWrapModeV = _textureWrapV;
                 pass.Apply();
