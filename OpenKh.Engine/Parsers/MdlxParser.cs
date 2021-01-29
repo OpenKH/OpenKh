@@ -74,8 +74,11 @@ namespace OpenKh.Engine.Parsers
             }
         }
 
-        public void ApplyMotion(Matrix4x4[] matrices) =>
+        public void ApplyMotion(Matrix4x4[] matrices)
+        {
+            CurrentPose = matrices;
             MeshDescriptors = _parsedModel.ProcessVerticesAndBuildModel(matrices);
+        }
 
         private static bool IsEntity(Mdlx mdlx) => mdlx.SubModels != null;
 
@@ -86,6 +89,8 @@ namespace OpenKh.Engine.Parsers
         public List<Mdlx.Bone> Bones { get; private set; }
 
         public Matrix4x4[] InitialPose { get; set; }
+
+        public Matrix4x4[] CurrentPose { get; private set; }
 
         private static MeshDescriptor Parse(Mdlx.VifPacketDescriptor vifPacketDescriptor)
         {

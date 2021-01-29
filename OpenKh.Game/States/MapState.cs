@@ -179,6 +179,23 @@ namespace OpenKh.Game.States
                 pass.Apply();
 
                 RenderMeshNew(pass, model, passRenderOpaque);
+
+                if (DebugMode && entity is ObjectEntity ent)
+                {
+                    var matrixArray = ent.Model?.CurrentPose;
+                    if (matrixArray != null)
+                    {
+                        foreach (var bone in ent.Model.Bones)
+                        {
+                            if (bone.Parent > 0)
+                            {
+                                var bonePos = matrixArray[bone.Index].Translation;
+                                var parentPos = matrixArray[bone.Parent].Translation;
+                                Debugging.DebugDraw.DrawLine(_graphics.GraphicsDevice, bonePos, parentPos, xna.Color.Red);
+                            }
+                        }
+                    }
+                }
             });
 
             foreach (var entity in _bobEntities)

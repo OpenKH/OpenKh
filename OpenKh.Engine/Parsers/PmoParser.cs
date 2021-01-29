@@ -69,6 +69,7 @@ namespace OpenKh.Engine.Parsers
         public List<Mdlx.Bone> Bones => new List<Mdlx.Bone>();
 
         Matrix4x4[] IModelMotion.InitialPose => new System.Numerics.Matrix4x4[0];
+        Matrix4x4[] IModelMotion.CurrentPose => new System.Numerics.Matrix4x4[0];
 
         public void ApplyMotion(System.Numerics.Matrix4x4[] matrices)
         {
