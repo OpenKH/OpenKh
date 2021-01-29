@@ -13,6 +13,8 @@ namespace OpenKh.Engine.Motion
 
         Matrix4x4[] InitialPose { get; }
 
+        Matrix4x4[] CurrentPose { get; }
+
         void ApplyMotion(Matrix4x4[] matrices);
     }
 }
