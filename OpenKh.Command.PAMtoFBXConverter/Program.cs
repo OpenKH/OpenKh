@@ -68,6 +68,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
 
             Assimp.Scene nScene = GetPMOScene(pmo);
             List<Assimp.Animation> FBXAnims = PAMtoFBXAnim(pam);
+            nScene.Animations.AddRange(FBXAnims);
 
             pmoStream.Close();
             pamStream.Close();
@@ -82,11 +83,20 @@ namespace OpenKh.Command.PAMtoFBXConverter
             Assimp.Scene scene = new Assimp.Scene();
             scene.RootNode = new Assimp.Node("root");
 
-            for(int i = 0; i < pmo.Meshes.Count; i++)
+            List<Material> matList = new List<Material>();
+            for(int t = 0; t < pmo.header.TextureCount; t++)
+            {
+                Material mat = new Material();
+                mat.Clear();
+                mat.Name = pmo.textureInfo[t].TextureName;
+                scene.Materials.Add(mat);
+            }
+
+            for (int i = 0; i < pmo.Meshes.Count; i++)
             {
                 Assimp.Mesh mesh = new Assimp.Mesh($"Mesh{i}", Assimp.PrimitiveType.Triangle);
                 Pmo.MeshChunks chunk = pmo.Meshes[i];
-                List<int> indices = new List<int>();
+
                 for (int j = 0; j < chunk.vertices.Count; j++)
                 {
                     mesh.Vertices.Add(new Assimp.Vector3D(
@@ -94,26 +104,32 @@ namespace OpenKh.Command.PAMtoFBXConverter
                         chunk.vertices[j].Y * pmo.header.ModelScale * 100.0f,
                         chunk.vertices[j].Z * pmo.header.ModelScale * 100.0f));
 
-                    mesh.Faces.Add(new Face(new int[]
-                    {
-                        (j * 3),
-                        (j * 3) + 1,
-                        (j * 3) + 2
-                    }));
-                    
+                    //mesh.TextureCoordinateChannels[0].Add(new Vector3D());
+                    mesh.VertexColorChannels[0].Add(new Color4D(1.0f, 1.0f, 1.0f, 1.0f));
+                    mesh.Normals.Add(new Vector3D());
+
+                    /*Assimp.Vector3D UV = new Assimp.Vector3D();
+                    UV.X = 0;
+                    UV.Y = 0;
+
+                    mesh.TextureCoordinateChannels[0].Add(UV);
+                    mesh.TextureCoordinateChannels[0].Add(UV);*/
                 }
-                mesh.MaterialIndex = 0;
+                mesh.SetIndices(chunk.Indices.ToArray(), 3);
 
-                var material = new Material();
-                material.Clear();
+                mesh.MaterialIndex = chunk.SectionInfo.TextureID;
 
-                scene.Materials.Add(material);
-
-                //mesh.SetIndices(indices.ToArray(), 3);
                 scene.Meshes.Add(mesh);
             }
 
+            
+
             scene.RootNode.MeshIndices.AddRange(Enumerable.Range(0, scene.MeshCount));
+
+            for (int b = 0; b < pmo.skeletonHeader.BoneCount; b++)
+            {
+                
+            }
 
             return scene;
         }
@@ -126,7 +142,17 @@ namespace OpenKh.Command.PAMtoFBXConverter
             {
                 Assimp.Animation anim = new Assimp.Animation();
                 anim.Name = pam.animList[i].AnimEntry.AnimationName;
+                anim.DurationInTicks = pam.animList[i].AnimHeader.FrameCount;
+                anim.TicksPerSecond = pam.animList[i].AnimHeader.Framerate;
+
+                for(int b = 0; b < pam.animList[i].AnimHeader.BoneCount; b++)
+                {
+                    Pam.BoneChannel chann = pam.animList[i].BoneChannels[b];
+                    
+                    //anim.NodeAnimationChannels[b].PositionKeys.Add(new VectorKey(chann.TranslationX.Header.));
+                }
                 
+
                 animationList.Add(anim);
             }
 
