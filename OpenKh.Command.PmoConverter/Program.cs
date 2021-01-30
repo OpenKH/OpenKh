@@ -106,10 +106,10 @@ namespace OpenKh.Command.PmoConverter
                 // Set extra flags.
                 if (UsesUniformColor)
                 {
-                    var UniformColor = (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].A) * 2f);
-                    UniformColor += (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].B)) << 8;
-                    UniformColor += (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].G)) << 16;
-                    UniformColor += (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].R)) << 24;
+                    var UniformColor = (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].A * 256f));
+                    UniformColor += (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].B * 256f)) << 8;
+                    UniformColor += (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].G * 256f)) << 16;
+                    UniformColor += (uint)(Math.Min(byte.MaxValue, desc.Vertices[0].R * 256f)) << 24;
                     chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBit(chunk.SectionInfo.VertexFlags, 24, true);
                     chunk.SectionInfo_opt2 = new Pmo.MeshSectionOptional2();
                     chunk.SectionInfo_opt2.DiffuseColor = UniformColor;
