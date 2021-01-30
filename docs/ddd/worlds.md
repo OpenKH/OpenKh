@@ -241,11 +241,11 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  EH12   | 凶夢の深淵 | Nightmarish Abyss | 
 |  EH13   | 記憶の摩天楼 | Memory's Skyscraper | 
 |  EH14   | 絶望を望む断崖 | Brink of Despair | 
-|  EH15   | １番街 | First District | Not in final game
-|  EH16   | 離島：浜辺 | Beach | Not in final game
-|  EH17   | 離島：浜辺 | Beach | Not in final game
-|  EH18   | 離島：浜辺 | Beach | Not in final game
-|  EH19   | 目覚めの園 | Station of Awakening | Not in final game
+|  EH15   | １番街 | First District | Not present in final game
+|  EH16   | 離島：浜辺 | Beach | Not present in final game
+|  EH17   | 離島：浜辺 | Beach | Not present in final game
+|  EH18   | 離島：浜辺 | Beach | Not present in final game
+|  EH19   | 目覚めの園 | Station of Awakening | Not present in final game
 |  EH20   | 凶夢の深淵 | Nightmarish Abyss | 
 |  EH60   | (NO DATA) | (NO DATA) | The World That Never Was Dive (Sora)
 |  EH61   | (NO DATA) | (NO DATA) | The World That Never Was Dive (Riku)
@@ -272,29 +272,29 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
 |  ZZ00   | 検証用 | For Testing Purposes | 
-|  ZZ01   | とあるエリア１ | Area 1 | 
-|  ZZ02   | None | None | 
-|  ZZ03   | None | None | 
-|  ZZ04   | None | None | 
-|  ZZ05   | None | None | 
-|  ZZ06   | None | None | 
-|  ZZ07   | None | None | 
-|  ZZ08   | None | None | 
-|  ZZ09   | None | None | 
-|  ZZ10   | None | None | 
-|  ZZ11   | None | None | 
-|  ZZ21   | None | None | 
-|  ZZ22   | None | None | 
-|  ZZ23   | None | None | 
-|  ZZ24   | None | None | 
-|  ZZ25   | None | None | 
-|  ZZ26   | None | None | 
-|  ZZ27   | None | None | 
-|  ZZ50   | (NG) PC動作テスト | PC Functionality Test  | 
-|  ZZ51   | (NG) ミッションテスト | Mission Test | 
-|  ZZ60   | (NO DATA) | (NO DATA) | 
-|  ZZ61   | (NO DATA) | (NO DATA) | 
-|  ZZ70   | (NO DATA) | (NO DATA) | 
+|  ZZ01   | とあるエリア１ | Area 1 | Not present in final game
+|  ZZ02   | None | None | Not present in final game
+|  ZZ03   | None | None | Not present in final game
+|  ZZ04   | None | None | Not present in final game
+|  ZZ05   | None | None | Not present in final game
+|  ZZ06   | None | None | Not present in final game
+|  ZZ07   | None | None | Not present in final game
+|  ZZ08   | None | None | Not present in final game
+|  ZZ09   | None | None | Not present in final game
+|  ZZ10   | None | None | Not present in final game
+|  ZZ11   | None | None | Not present in final game
+|  ZZ21   | None | None | Not present in final game
+|  ZZ22   | None | None | Not present in final game
+|  ZZ23   | None | None | Not present in final game
+|  ZZ24   | None | None | Not present in final game
+|  ZZ25   | None | None | Not present in final game
+|  ZZ26   | None | None | Not present in final game
+|  ZZ27   | None | None | Not present in final game
+|  ZZ50   | (NG) PC動作テスト | PC Functionality Test  | Not present in final game
+|  ZZ51   | (NG) ミッションテスト | Mission Test | Not present in final game
+|  ZZ60   | (NO DATA) | (NO DATA) | Not present in final game
+|  ZZ61   | (NO DATA) | (NO DATA) | Not present in final game
+|  ZZ70   | (NO DATA) | (NO DATA) | Not present in final game
 
 ## **Traverse Town (Revisited)**
 
@@ -309,6 +309,8 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  ??00   | エンディング | Ending | 
 
 ## **Treasure Planet**
+
+This world isn't accessible through normal means. Files have to be romhacked to access these rooms because no World ID remains in the game to allow its access.
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
