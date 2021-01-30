@@ -26,7 +26,7 @@ namespace OpenKh.Tests.Commands
             var barEntries = File.OpenRead(outMap).Using(Bar.Read);
 
             {
-                var doct = Doct.Read(barEntries.Single(it => it.Type == Bar.EntryType.MeshOcclusion).Stream);
+                var doct = Doct.Read(barEntries.Single(it => it.Type == Bar.EntryType.DrawOctalTree).Stream);
                 var writer = new StringWriter();
                 new DumpDoctUtil(doct, writer);
 
@@ -40,7 +40,7 @@ namespace OpenKh.Tests.Commands
             }
 
             {
-                var coct = Coct.Read(barEntries.Single(it => it.Type == Bar.EntryType.MapCollision).Stream);
+                var coct = Coct.Read(barEntries.Single(it => it.Type == Bar.EntryType.CollisionOctalTree).Stream);
                 var writer = new StringWriter();
                 new DumpCoctUtil(coct, writer);
 

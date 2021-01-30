@@ -227,7 +227,7 @@ namespace OpenKh.Command.CoctChanger
                         .Select(
                             it =>
                             {
-                                if (it.Type == Bar.EntryType.MapCollision)
+                                if (it.Type == Bar.EntryType.CollisionOctalTree)
                                 {
                                     it.Stream = new MemoryStream(coctBin, false);
                                 }
@@ -270,9 +270,9 @@ namespace OpenKh.Command.CoctChanger
                 {
                     foreach (var entry in File.OpenRead(InputFile).Using(Bar.Read)
                         .Where(entry => false
-                            || entry.Type == Bar.EntryType.MapCollision
-                            || entry.Type == Bar.EntryType.CameraCollision
-                            || entry.Type == Bar.EntryType.LightData
+                            || entry.Type == Bar.EntryType.CollisionOctalTree
+                            || entry.Type == Bar.EntryType.CameraOctalTree
+                            || entry.Type == Bar.EntryType.ColorOctalTree
                             || entry.Type == Bar.EntryType.MapCollision2
                             || entry.Type == Bar.EntryType.ModelCollision
                         )

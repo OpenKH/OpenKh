@@ -468,7 +468,7 @@ namespace OpenKh.Command.MapGen.Utils
                     new Bar.Entry
                     {
                         Name = config.bar?.doct?.name ?? "eh_1",
-                        Type = Bar.EntryType.MeshOcclusion,
+                        Type = Bar.EntryType.DrawOctalTree,
                         Stream = doctBin,
                     }
                 );
@@ -485,7 +485,7 @@ namespace OpenKh.Command.MapGen.Utils
                     new Bar.Entry
                     {
                         Name = config.bar?.coct?.name ?? "ID_e",
-                        Type = Bar.EntryType.MapCollision,
+                        Type = Bar.EntryType.CollisionOctalTree,
                         Stream = coctBin,
                     }
                 );
