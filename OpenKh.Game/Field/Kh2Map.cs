@@ -28,6 +28,11 @@ namespace OpenKh.Game.Field
         private readonly List<BobEntity> _bobEntities;
         private readonly List<MeshGroup> _bobModels;
 
+        public Coct CollisionOctalTree { get; }
+        public Coct ColorOctalTree { get; }
+        public Coct CameraOctalTree { get; }
+        public Doct DrawOctalTree { get; }
+
         public Kh2Map(GraphicsDevice graphics, Kernel kernel, int world, int area) :
             this(graphics, kernel.DataContent, kernel.GetMapFileName(world, area))
         { }
@@ -41,8 +46,13 @@ namespace OpenKh.Game.Field
             _skybox1MeshGroup = FromMdlx(graphics, binarc, "SK1") ?? Empty;
             _mapMeshGroup = FromMdlx(graphics, binarc, "MAP") ?? Empty;
 
-            _bobEntities = binarc.ForEntry("out", Bar.EntryType.BgObjPlacement, BobDescriptor.Read)?
-                .Select(x => new BobEntity(x))?.ToList() ?? new List<BobEntity>();
+            CollisionOctalTree = binarc.ForEntry(x => x.Type == Bar.EntryType.CollisionOctalTree, Coct.Read);
+            ColorOctalTree = binarc.ForEntry(x => x.Type == Bar.EntryType.ColorOctalTree, Coct.Read);
+            CameraOctalTree = binarc.ForEntry(x => x.Type == Bar.EntryType.CameraOctalTree, Coct.Read);
+            DrawOctalTree = binarc.ForEntry(x => x.Type == Bar.EntryType.DrawOctalTree, Doct.Read);
+
+            _bobEntities = binarc.ForEntry(x => x.Type == Bar.EntryType.BgObjPlacement, BobDescriptor.Read)?
+                .Select(x => new BobEntity(x)).ToList() ?? new List<BobEntity>();
 
             var bobModels = binarc.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
             var bobTextures = binarc.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
