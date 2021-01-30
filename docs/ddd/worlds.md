@@ -241,11 +241,11 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  EH12   | 凶夢の深淵 | Nightmarish Abyss | 
 |  EH13   | 記憶の摩天楼 | Memory's Skyscraper | 
 |  EH14   | 絶望を望む断崖 | Brink of Despair | 
-|  EH15   | １番街 | First District | 
-|  EH16   | 離島：浜辺 | Beach | 
-|  EH17   | 離島：浜辺 | Beach | 
-|  EH18   | 離島：浜辺 | Beach | 
-|  EH19   | 目覚めの園 | Station of Awakening | 
+|  EH15   | １番街 | First District | Not in final game
+|  EH16   | 離島：浜辺 | Beach | Not in final game
+|  EH17   | 離島：浜辺 | Beach | Not in final game
+|  EH18   | 離島：浜辺 | Beach | Not in final game
+|  EH19   | 目覚めの園 | Station of Awakening | Not in final game
 |  EH20   | 凶夢の深淵 | Nightmarish Abyss | 
 |  EH60   | (NO DATA) | (NO DATA) | The World That Never Was Dive (Sora)
 |  EH61   | (NO DATA) | (NO DATA) | The World That Never Was Dive (Riku)
