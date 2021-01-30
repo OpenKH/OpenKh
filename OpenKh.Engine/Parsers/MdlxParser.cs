@@ -11,37 +11,37 @@ using System.Runtime.InteropServices;
 
 namespace OpenKh.Engine.Parsers
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct PositionColoredTextured
     {
         public float X, Y, Z;
         public float Tu, Tv;
-        public byte R, G, B, A;
+        public float R, G, B, A;
 
-        public PositionColoredTextured(Vector3 v, int clr, float tu, float tv)
+        public PositionColoredTextured(float x, float y, float z, float tu, float tv, float r, float g, float b, float a)
         {
-            X = v.X;
-            Y = v.Y;
-            Z = v.Z;
+            X = x;
+            Y = y;
+            Z = z;
             Tu = tu;
             Tv = tv;
-            R = (byte)(clr >> 16);
-            G = (byte)(clr >> 8);
-            B = (byte)clr;
-            A = (byte)(clr >> 24);
+            R = r;
+            G = g;
+            B = b;
+            A = a;
         }
 
-        public PositionColoredTextured(Vector3 v, uint clr, float tu, float tv)
+        public PositionColoredTextured(Vector3 pos, Vector2 uv, float r, float g, float b, float a)
         {
-            X = v.X;
-            Y = v.Y;
-            Z = v.Z;
-            Tu = tu;
-            Tv = tv;
-            R = (byte)(clr >> 16);
-            G = (byte)(clr >> 8);
-            B = (byte)clr;
-            A = (byte)(clr >> 24);
+            X = pos.X;
+            Y = pos.Y;
+            Z = pos.Z;
+            Tu = uv.X;
+            Tv = uv.Y;
+            R = r;
+            G = g;
+            B = b;
+            A = a;
         }
     }
 
@@ -130,13 +130,16 @@ namespace OpenKh.Engine.Parsers
                         colorA = 0x80;
                     }
 
-                    var color = Math.Min(byte.MaxValue, colorB * 2) |
-                        (Math.Min(byte.MaxValue, colorG * 2) << 8) |
-                        (Math.Min(byte.MaxValue, colorR * 2) << 16) |
-                        (Math.Min(byte.MaxValue, colorA * 2) << 24);
-
                     vertices.Add(new PositionColoredTextured(
-                        position, color, (short)(ushort)vertexIndex.U / 4096.0f, (short)(ushort)vertexIndex.V / 4096.0f));
+                        vpu.Vertices[vertexIndex.Index].X,
+                        vpu.Vertices[vertexIndex.Index].Y,
+                        vpu.Vertices[vertexIndex.Index].Z,
+                        (short)(ushort)vertexIndex.U / 4096.0f,
+                        (short)(ushort)vertexIndex.V / 4096.0f,
+                        colorR / 128f,
+                        colorG / 128f,
+                        colorB / 128f,
+                        colorA / 128f));
 
                     indexBuffer[(recentIndex++) & 3] = baseVertexIndex + i;
                     switch (vertexIndex.Function)

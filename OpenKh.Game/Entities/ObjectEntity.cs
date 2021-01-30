@@ -131,10 +131,10 @@ namespace OpenKh.Game.Entities
                             vertices[i].Z = x.Vertices[i].Z * Scale;
                             vertices[i].Tu = x.TextureCoordinateChannels[0][i].X;
                             vertices[i].Tv = 1.0f - x.TextureCoordinateChannels[0][i].Y;
-                            vertices[i].R = 0xFF;
-                            vertices[i].G = 0xFF;
-                            vertices[i].B = 0xFF;
-                            vertices[i].A = 0xFF;
+                            vertices[i].R = 1.0f;
+                            vertices[i].G = 1.0f;
+                            vertices[i].B = 1.0f;
+                            vertices[i].A = 1.0f;
                         }
 
                         return new MeshDescriptor

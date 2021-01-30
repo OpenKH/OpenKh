@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Motion;
 using OpenKh.Engine.Parsers;
@@ -11,11 +10,11 @@ namespace OpenKh.Engine.MonoGame
     public static class MeshLoader
     {
         public static VertexDeclaration PositionColoredTexturedVertexDeclaration =
-            new VertexDeclaration(24, new VertexElement[]
+            new VertexDeclaration(36, new VertexElement[]
             {
                 new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
                 new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
-                new VertexElement(20, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+                new VertexElement(20, VertexElementFormat.Vector4, VertexElementUsage.Color, 0),
             });
 
         public static IModelMotion FromKH2(Mdlx model) =>
