@@ -50,30 +50,30 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  YT03   | 塔：エントランス | Tower: Entrance  |             |
 |  YT04   | 目覚めの園 | Station of Awakening  |             |
 |  YT06   | 離島：浜辺 | Beach  |             |
-|  YT07   |  |   | Yen Sid's Tower (Opened Entrance Door)            |
-|  YT60   |  | (NO DATA)  | Dive (Pick up Soras)            | 
+|  YT07   | (NO DATA) | (NO DATA)  | Yen Sid's Tower (Opened Entrance Door)            |
+|  YT60   | (NO DATA) | (NO DATA)  | Dive (Pick up Soras)            | 
 
 ## **Traverse Town**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
-|  TW00   | トラヴァースタウン | Traverse Town  |             |
-|  TW01   | １番街 | First District  |             |
-|  TW02   | ２番街 | Second District  |             |
-|  TW03   | ３番街 | Third District  |             |
-|  TW04   | ４番街 | Fourth District  |             |
-|  TW05   | ５番街 | Fifth District  |             |
+|  TW00   | トラヴァースタウン | Traverse Town  |    
+|  TW01   | １番街 | First District  |           
+|  TW02   | ２番街 | Second District  |          
+|  TW03   | ３番街 | Third District  |           
+|  TW04   | ４番街 | Fourth District  |          
+|  TW05   | ５番街 | Fifth District  |           
 |  TW06   | 植物園 | Garden  |             |
-|  TW07   | ポストオフィス | Post Office  |             |
-|  TW08   | 裏通り | Back Streets  |             |
-|  TW09   | 噴水広場 | Fountain Plaza  |             |
-|  TW10   | ５番街 | Fifth District  |             |
-|  TW11   | 植物園 | Garden  |             |
+|  TW07   | ポストオフィス | Post Office  |      
+|  TW08   | 裏通り | Back Streets  |           
+|  TW09   | 噴水広場 | Fountain Plaza  |            
+|  TW10   | ５番街 | Fifth District  |           
+|  TW11   | 植物園 | Garden  |      
 |  TW12   | 噴水広場 | Fountain Plaza  | Julius version
 |  TW13   | 噴水広場 | Fountain Plaza  | 
-|  TW14   | ３番街 | Third District  |             |
-|  TW60   |  | (NO DATA)  |             | Traverse Town Dive (Sora)
-|  TW61   |  | (NO DATA)  |             | Traverse Town Dive (Riku)
+|  TW14   | ３番街 | Third District  |     
+|  TW60   | (NO DATA) | (NO DATA)  |  Traverse Town Dive (Sora)
+|  TW61   | (NO DATA) | (NO DATA)  |  Traverse Town Dive (Riku)
 
 ## **Country of the Musketeers**
 
@@ -98,8 +98,8 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  TM16   | オペラ座：ホール | Theatre  | 
 |  TM17   | オペラ座前 | The Opéra  | 
 |  TM18   | 塔 | Tower  |  Not in 2.8
-|  TM60   |  |   |  Country of the Musketeers Dive (Sora)
-|  TM61   |  |   |  Country of the Musketeers Dive (Riku)
+|  TM60   | (NO DATA) | (NO DATA)  |  Country of the Musketeers Dive (Sora)
+|  TM61   | (NO DATA) | (NO DATA)  |  Country of the Musketeers Dive (Riku)
 
 ## **Symphony of Sorcery**
 
@@ -123,9 +123,9 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  FA17   | 不思議な塔 | Tower |  
 |  FA18   | 塔：エントランス | Tower Entrance |  
 |  FA19   | 塔：エントランス | Tower Entrance |  
-|  FA60   |  |  | Symphony of Sorcery Dive (Sora)
-|  FA61   |  |  | Symphony of Sorcery Dive (Riku)
-|  FA62   |  |  | Chernabog Boss Dive
+|  FA60   | (NO DATA) | (NO DATA) | Symphony of Sorcery Dive (Sora)
+|  FA61   | (NO DATA) | (NO DATA) | Symphony of Sorcery Dive (Riku)
+|  FA62   | (NO DATA) | (NO DATA) | Chernabog Boss Dive
 
 ## **Prankster's Paradise**
 
@@ -151,8 +151,8 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  PI17   | 海上 | Ocean Surface | 
 |  PI18   | モンストロ：胃袋 | Monstro: Belly | 
 |  PI19   | 海の底 | Ocean Depths | 
-|  PI60   |  |  | Prankster's Paradise Dive (Sora)
-|  PI61   |  |  | Prankster's Paradise Dive (Riku)
+|  PI60   | (NO DATA) | (NO DATA) | Prankster's Paradise Dive (Sora)
+|  PI61   | (NO DATA) | (NO DATA) | Prankster's Paradise Dive (Riku)
 
 ## **Radiant Garden**
 
@@ -164,9 +164,9 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  RG03   | 駅前広場 | Station Plaza | 
 |  RG04   | 正面扉口 | Castle Doors | 
 |  RG05   | 書斎 | Library | 
-|  RG06   |  |  | Castle Oblivion
-|  RG07   |  |  | Chamber of Waking
-|  RG08   |  |  | Dark Margin
+|  RG06   | (NO DATA) | (NO DATA) | Castle Oblivion
+|  RG07   | (NO DATA) | (NO DATA) | Chamber of Waking
+|  RG08   | (NO DATA) | (NO DATA) | Dark Margin
 
 ## **La Cité des Cloches**
 
@@ -193,8 +193,8 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  ND18   | 橋 | Bridge | 
 |  ND19   | 大聖堂広場 | Square | 
 |  ND20   | 奇跡の法廷 | Court of Miracles | 
-|  ND60   |  |  | La Cité des Cloches Dive (Sora)
-|  ND61   |  |  | La Cité des Cloches Dive (Riku)
+|  ND60   | (NO DATA) | (NO DATA) | La Cité des Cloches Dive (Sora)
+|  ND61   | (NO DATA) | (NO DATA) | La Cité des Cloches Dive (Riku)
 
 ## **The Grid**
 
@@ -219,8 +219,8 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  TL16   | アリーナ | Arena | 
 |  TL17   | ポータル：中枢 | Portal | 
 |  TL18   | ソーラーセイラー | Solar Sailer | 
-|  TL60   |  |  | The Grid Dive (Sora)
-|  TL61   |  |  | The Grid Dive (Riku)
+|  TL60   | (NO DATA) | (NO DATA) | The Grid Dive (Sora)
+|  TL61   | (NO DATA) | (NO DATA) | The Grid Dive (Riku)
 
 ## **The World That Never Was**
 
@@ -247,8 +247,8 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  EH18   | 離島：浜辺 | Beach | 
 |  EH19   | 目覚めの園 | Station of Awakening | 
 |  EH20   | 凶夢の深淵 | Nightmarish Abyss | 
-|  EH60   |  | (NO DATA) | 
-|  EH61   |  | (NO DATA) | 
+|  EH60   | (NO DATA) | (NO DATA) | The World That Never Was Dive (Sora)
+|  EH61   | (NO DATA) | (NO DATA) | The World That Never Was Dive (Riku)
 
 ## **World Map**
 
@@ -263,38 +263,38 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |---------|--------------|-------------|-------------|
 |  DE00   | 育成 | Spirit Space | 
 |  DE01   | カード大会 | Flick Rush | 
-|  DE02   |  |  | 
-|  DE03   |  |  | 
-|  DE10   |  | Petting Plaza | Text not present in 2.8
+|  DE02   | (NO DATA) | (NO DATA) | Hexagonal Stage
+|  DE03   | (NO DATA) | (NO DATA) | Final Round Stage
+|  DE10   | ふれあいひろば | Petting Plaza | Text not present in 2.8
 
 ## **For Testing Purposes**
 
 | **Map** | **Japanese** | **English** | **Comment** |
 |---------|--------------|-------------|-------------|
-|  ZZ00   |  | For Testing Purposes | 
-|  ZZ01   |  | Area 1 | 
-|  ZZ02   |  | None | 
-|  ZZ03   |  | None | 
-|  ZZ04   |  | None | 
-|  ZZ05   |  | None | 
-|  ZZ06   |  | None | 
-|  ZZ07   |  | None | 
-|  ZZ08   |  | None | 
-|  ZZ09   |  | None | 
-|  ZZ10   |  | None | 
-|  ZZ11   |  | None | 
-|  ZZ21   |  | None | 
-|  ZZ22   |  | None | 
-|  ZZ23   |  | None | 
-|  ZZ24   |  | None | 
-|  ZZ25   |  | None | 
-|  ZZ26   |  | None | 
-|  ZZ27   |  | None | 
+|  ZZ00   | 検証用 | For Testing Purposes | 
+|  ZZ01   | とあるエリア１ | Area 1 | 
+|  ZZ02   | None | None | 
+|  ZZ03   | None | None | 
+|  ZZ04   | None | None | 
+|  ZZ05   | None | None | 
+|  ZZ06   | None | None | 
+|  ZZ07   | None | None | 
+|  ZZ08   | None | None | 
+|  ZZ09   | None | None | 
+|  ZZ10   | None | None | 
+|  ZZ11   | None | None | 
+|  ZZ21   | None | None | 
+|  ZZ22   | None | None | 
+|  ZZ23   | None | None | 
+|  ZZ24   | None | None | 
+|  ZZ25   | None | None | 
+|  ZZ26   | None | None | 
+|  ZZ27   | None | None | 
 |  ZZ50   | (NG) PC動作テスト | PC Functionality Test  | 
 |  ZZ51   | (NG) ミッションテスト | Mission Test | 
-|  ZZ60   |  | (NO DATA) | 
-|  ZZ61   |  | (NO DATA) | 
-|  ZZ70   |  | (NO DATA) | 
+|  ZZ60   | (NO DATA) | (NO DATA) | 
+|  ZZ61   | (NO DATA) | (NO DATA) | 
+|  ZZ70   | (NO DATA) | (NO DATA) | 
 
 ## **Traverse Town (Revisited)**
 
@@ -325,4 +325,6 @@ Maps with 00 in the name do not exist as files, but the game displays the world'
 |  TP10   |  |  | Debug Room
 |  TP11   |  |  | Debug Room
 
-jb62
+## **EXTRA**
+
+There's remaining collision data for a level named `jb62`.
