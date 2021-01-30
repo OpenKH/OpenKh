@@ -20,6 +20,7 @@ namespace OpenKh.Game.Entities
     public class ObjectEntity : IEntity, IMonoGameModel
     {
         private Mdlx _model;
+        public List<ObjectCollision> ObjectCollisions { get; set; }
 
         public ObjectEntity(Kernel kernel, int objectId)
         {
@@ -74,6 +75,9 @@ namespace OpenKh.Game.Entities
 
             var texture = entries.ForEntry("tim_", Bar.EntryType.ModelTexture, ModelTexture.Read);
             Textures = texture.LoadTextures(graphics).ToArray();
+
+            ObjectCollisions = entries.ForEntry(x => x.Type == Bar.EntryType.ModelCollision, ObjectCollision.Read) ??
+                new List<ObjectCollision>();
 
             try
             {

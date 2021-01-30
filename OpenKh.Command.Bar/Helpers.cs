@@ -33,7 +33,7 @@ namespace OpenKh.Command.Bar
                 [EntryType.Motionset] = "mset",
                 [EntryType.BgObjPlacement] = "bop",
                 [EntryType.Event] = "event",
-                [EntryType.ModelCollision] = "coctmodel",
+                [EntryType.ModelCollision] = "collision",
                 [EntryType.Imgd] = "imd",
                 [EntryType.Seqd] = "sqd",
                 [EntryType.Layout] = "lad",
