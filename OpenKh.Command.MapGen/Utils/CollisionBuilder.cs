@@ -227,7 +227,7 @@ namespace OpenKh.Command.MapGen.Utils
                                     Vertex2 = helper.AllocateVertex(v2.X, -v2.Y, -v2.Z),
                                     Vertex3 = helper.AllocateVertex(v3.X, -v3.Y, -v3.Z),
                                     Vertex4 = Convert.ToInt16(quad ? helper.AllocateVertex(v4.X, -v4.Y, -v4.Z) : -1),
-                                    SurfaceFlags = new SurfaceFlags() { Flags = mesh.matDef.surfaceFlags }
+                                    Attributes = new Attributes() { Flags = mesh.matDef.surfaceFlags }
                                 },
                                 inflate: 1
                             ));
@@ -257,10 +257,10 @@ namespace OpenKh.Command.MapGen.Utils
 
                 if (left.mesh != null)
                 {
-                    groupChildren.Add(coct.CollisionMeshGroupList.Count);
+                    groupChildren.Add(coct.Nodes.Count);
 
                     coct.CompleteAndAdd(
-                        new CollisionMeshGroup
+                        new CollisionNode
                         {
                             Meshes = new List<CollisionMesh> { left.mesh }
                         }
@@ -277,10 +277,10 @@ namespace OpenKh.Command.MapGen.Utils
                 }
                 else if (right.mesh != null)
                 {
-                    groupChildren.Add(coct.CollisionMeshGroupList.Count);
+                    groupChildren.Add(coct.Nodes.Count);
 
                     coct.CompleteAndAdd(
-                        new CollisionMeshGroup
+                        new CollisionNode
                         {
                             Meshes = new List<CollisionMesh> { right.mesh }
                         }
@@ -291,10 +291,10 @@ namespace OpenKh.Command.MapGen.Utils
                     groupChildren.Add(right.groupIndex.Value);
                 }
 
-                var firstIdx1 = coct.CollisionMeshGroupList.Count;
+                var firstIdx1 = coct.Nodes.Count;
 
                 coct.CompleteAndAdd(
-                    new CollisionMeshGroup
+                    new CollisionNode
                     {
                         Meshes = new List<CollisionMesh>(),
                         Child1 = Convert.ToInt16((groupChildren.Count >= 1) ? groupChildren[0] : -1),
@@ -339,7 +339,7 @@ namespace OpenKh.Command.MapGen.Utils
 
             var coctMeshList = new List<CollisionMesh>();
 
-            foreach (var coctMeshGroup in coct.CollisionMeshGroupList)
+            foreach (var coctMeshGroup in coct.Nodes)
             {
                 var vifPacketIndices = coctMeshGroup.Meshes
                     .Select(it => vifPacketRenderingGroupIndexMatched.IndexOf(it))
@@ -414,7 +414,7 @@ namespace OpenKh.Command.MapGen.Utils
                             Vertex2 = helper.AllocateVertex(v2.X, -v2.Y, -v2.Z),
                             Vertex3 = helper.AllocateVertex(v3.X, -v3.Y, -v3.Z),
                             Vertex4 = Convert.ToInt16(quad ? helper.AllocateVertex(v4.X, -v4.Y, -v4.Z) : -1),
-                            SurfaceFlags = new SurfaceFlags() { Flags = mesh.matDef.surfaceFlags }
+                            Attributes = new Attributes() { Flags = mesh.matDef.surfaceFlags }
                         },
                         inflate: 1
                     ));
@@ -431,7 +431,7 @@ namespace OpenKh.Command.MapGen.Utils
             }
 
             coct.CompleteAndAdd(
-                new CollisionMeshGroup
+                new CollisionNode
                 {
                     Meshes = meshList
                 }

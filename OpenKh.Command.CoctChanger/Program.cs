@@ -142,23 +142,22 @@ namespace OpenKh.Command.CoctChanger
 
                 var collisionMesh = new Coct.CollisionMesh
                 {
-                    Collisions = new List<Coct.Collision>(),
-                    v10 = 0,
-                    v12 = 0,
+                    Collisions = new List<Coct.Collision>()
                 };
 
                 for (var side = 0; side < 6; side++)
                 {
                     var collision = new Coct.Collision
                     {
-                        v00 = 0,
+                        Ground = 0,
+                        FloorLevel = 0,
                         Vertex1 = table4Idxes[faceVertexOrders[side, 0]],
                         Vertex2 = table4Idxes[faceVertexOrders[side, 1]],
                         Vertex3 = table4Idxes[faceVertexOrders[side, 2]],
                         Vertex4 = table4Idxes[faceVertexOrders[side, 3]],
                         Plane = planes[side],
                         BoundingBox = BoundingBoxInt16.Invalid,
-                        SurfaceFlags = new Coct.SurfaceFlags() { Flags = 0x3F1 },
+                        Attributes = new Coct.Attributes() { Flags = 0x3F1 },
                     };
                     coct.Complete(collision);
                     collisionMesh.Collisions.Add(collision);
@@ -167,7 +166,7 @@ namespace OpenKh.Command.CoctChanger
                 coct.Complete(collisionMesh);
 
                 coct.CompleteAndAdd(
-                    new Coct.CollisionMeshGroup
+                    new Coct.CollisionNode
                     {
                         Meshes = new List<Coct.CollisionMesh>() { collisionMesh }
                     }
@@ -312,23 +311,23 @@ namespace OpenKh.Command.CoctChanger
 
                 report.NodeCount++;
                 report.TreeDepth = Math.Max(report.TreeDepth, depth);
-                var meshGroup = coct.CollisionMeshGroupList[index];
-                if (meshGroup.Child1 >= 0)
+                var node = coct.Nodes[index];
+                if (node.Child1 >= 0)
                 {
                     var childDepth = depth + 1;
-                    GenerateReport(coct, childDepth, meshGroup.Child1, report);
-                    GenerateReport(coct, childDepth, meshGroup.Child2, report);
-                    GenerateReport(coct, childDepth, meshGroup.Child3, report);
-                    GenerateReport(coct, childDepth, meshGroup.Child4, report);
-                    GenerateReport(coct, childDepth, meshGroup.Child5, report);
-                    GenerateReport(coct, childDepth, meshGroup.Child6, report);
-                    GenerateReport(coct, childDepth, meshGroup.Child7, report);
-                    GenerateReport(coct, childDepth, meshGroup.Child8, report);
+                    GenerateReport(coct, childDepth, node.Child1, report);
+                    GenerateReport(coct, childDepth, node.Child2, report);
+                    GenerateReport(coct, childDepth, node.Child3, report);
+                    GenerateReport(coct, childDepth, node.Child4, report);
+                    GenerateReport(coct, childDepth, node.Child5, report);
+                    GenerateReport(coct, childDepth, node.Child6, report);
+                    GenerateReport(coct, childDepth, node.Child7, report);
+                    GenerateReport(coct, childDepth, node.Child8, report);
                 }
                 else
                     report.LeafCount++;
 
-                foreach (var mesh in meshGroup.Meshes)
+                foreach (var mesh in node.Meshes)
                 {
                     report.MeshCount++;
                     foreach (var collision in mesh.Collisions)

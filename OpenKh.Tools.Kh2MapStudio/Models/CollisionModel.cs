@@ -79,23 +79,22 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
             return vb;
         }
 
-        private static Assimp.Scene GetScene(Coct rawCoct)
+        private static Assimp.Scene GetScene(Coct coct)
         {
             var color = new Color(1f, 1f, 1f, 1f);
             var scene = new Assimp.Scene();
             scene.RootNode = new Assimp.Node("root");
-            var coct = new CoctLogical(rawCoct);
 
-            for (int i = 0; i < coct.CollisionMeshGroupList.Count; i++)
+            for (int i = 0; i < coct.Nodes.Count; i++)
             {
                 var j = 0;
-                var meshGroup = coct.CollisionMeshGroupList[i];
+                var meshGroup = coct.Nodes[i];
                 foreach (var mesh in meshGroup.Meshes)
                 {
                     var faceIndex = 0;
                     var sceneMesh = new Assimp.Mesh($"Mesh{i}_{j}", Assimp.PrimitiveType.Triangle);
 
-                    foreach (var item in mesh.Items)
+                    foreach (var item in mesh.Collisions)
                     {
                         var v1 = coct.VertexList[item.Vertex1];
                         var v2 = coct.VertexList[item.Vertex2];
@@ -150,18 +149,17 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
             return scene;
         }
 
-        private static List<VertexPositionColorTexture> GetVertices(Coct rawCoct)
+        private static List<VertexPositionColorTexture> GetVertices(Coct coct)
         {
-            var coct = new CoctLogical(rawCoct);
             var vertices = new List<VertexPositionColorTexture>();
-            for (int i1 = 0; i1 < coct.CollisionMeshGroupList.Count; i1++)
+            for (int i1 = 0; i1 < coct.Nodes.Count; i1++)
             {
-                var meshGroup = coct.CollisionMeshGroupList[i1];
+                var meshGroup = coct.Nodes[i1];
                 foreach (var mesh in meshGroup.Meshes)
                 {
-                    foreach (var item in mesh.Items)
+                    foreach (var item in mesh.Collisions)
                     {
-                        var color = ColorPalette[(int)Math.Abs((item.PlaneD * ColorPalette.Length)) % ColorPalette.Length];
+                        var color = ColorPalette[(int)Math.Abs((item.Plane.D * ColorPalette.Length)) % ColorPalette.Length];
                         var v1 = coct.VertexList[item.Vertex1];
                         var v2 = coct.VertexList[item.Vertex2];
                         var v3 = coct.VertexList[item.Vertex3];

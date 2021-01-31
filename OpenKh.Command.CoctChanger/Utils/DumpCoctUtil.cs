@@ -18,57 +18,58 @@ namespace OpenKh.Command.CoctChanger.Utils
             this.coct = coct;
             this.writer = writer;
 
-            if (coct.CollisionMeshGroupList.Any())
+            if (coct.Nodes.Any())
             {
-                DumpEntry1(0, 0);
+                DumpNode(0, 0);
             }
         }
 
-        private void DumpEntry1(int index, int indent)
+        private void DumpNode(int index, int indent)
         {
             if (index == -1)
             {
                 return;
             }
 
-            var entry = coct.CollisionMeshGroupList[index];
-            writer.WriteLine($"{new string(' ', indent)}{ObjDumpUtil.FormatObj(entry, it => it.BoundingBox)}");
+            var node = coct.Nodes[index];
+            writer.WriteLine($"{new string(' ', indent)}{ObjDumpUtil.FormatObj(node, it => it.BoundingBox)}");
 
-            foreach (var mesh in entry.Meshes)
+            foreach (var mesh in node.Meshes)
             {
-                DumpEntry2(mesh, indent + 1);
+                DumpMeshInfo(mesh, indent + 1);
             }
 
-            DumpEntry1(entry.Child1, indent + 1);
-            DumpEntry1(entry.Child2, indent + 1);
-            DumpEntry1(entry.Child3, indent + 1);
-            DumpEntry1(entry.Child4, indent + 1);
-            DumpEntry1(entry.Child5, indent + 1);
-            DumpEntry1(entry.Child6, indent + 1);
-            DumpEntry1(entry.Child7, indent + 1);
-            DumpEntry1(entry.Child8, indent + 1);
+            DumpNode(node.Child1, indent + 1);
+            DumpNode(node.Child2, indent + 1);
+            DumpNode(node.Child3, indent + 1);
+            DumpNode(node.Child4, indent + 1);
+            DumpNode(node.Child5, indent + 1);
+            DumpNode(node.Child6, indent + 1);
+            DumpNode(node.Child7, indent + 1);
+            DumpNode(node.Child8, indent + 1);
         }
 
-        private void DumpEntry2(Coct.CollisionMesh mesh, int indent)
+        private void DumpMeshInfo(Coct.CollisionMesh mesh, int indent)
         {
-            writer.WriteLine($"{new string(' ', indent)}{ObjDumpUtil.FormatObj(mesh, it => it.BoundingBox, it => it.v10, it => it.v12)}");
+            writer.WriteLine($"{new string(' ', indent)}{ObjDumpUtil.FormatObj(mesh, it => it.BoundingBox, it => it.Visibility, it => it.Group)}");
 
             foreach (var face in mesh.Collisions)
             {
-                DumpEntry3(face, indent + 1);
+                DumpFace(face, indent + 1);
             }
         }
 
-        private void DumpEntry3(Coct.Collision face, int indent)
+        private void DumpFace(Coct.Collision face, int indent)
         {
             var dump = ObjDumpUtil.FormatObj(face
                 , it => it.BoundingBox
                 , it => it.Plane
-                , it => it.v00
+                , it => it.Ground
+                , it => it.FloorLevel
             )
                 .Add(
-                    "SurfaceFlags",
-                    face.SurfaceFlags.Flags.ToString("X8")
+                    "Attributes",
+                    face.Attributes.Flags.ToString("X8")
                 )
                 .Add(
                     "Vertices",
