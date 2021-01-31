@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Motion;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Common;
 using OpenKh.Bbs;
@@ -62,7 +62,7 @@ namespace OpenKh.Game.Entities
             var objEntry = Kernel.ObjEntries.FirstOrDefault(x => x.ObjectId == ObjectId);
             if (objEntry == null)
             {
-                Log.Warn($"Object ID {ObjectId} not found.");
+                Log.Warn("Object ID {0} not found.", ObjectId);
                 return;
             }
 
@@ -89,7 +89,7 @@ namespace OpenKh.Game.Entities
                 else
                 {
                     Motion = new Kh2MotionEngine();
-                    Log.Warn($"MSET {objEntry.AnimationName} does not exist");
+                    Log.Warn("MSET {0} does not exist", objEntry.AnimationName);
                 }
             }
             catch (System.NotImplementedException)

@@ -2,7 +2,7 @@ using OpenKh.Engine.Extensions;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using System;
@@ -74,7 +74,7 @@ namespace OpenKh.Game.States.Title
                         _subMenu = new NewGameMenu(_animatedSequenceFactory, this);
                         break;
                     default:
-                        Log.Warn($"Submenu {value.ToString()} not implemented.");
+                        Log.Warn("Submenu {0} not implemented.", value);
                         break;
                 }
 
@@ -153,7 +153,7 @@ namespace OpenKh.Game.States.Title
                 _titleLayout.SequenceItems[0],
                 images.First());
 
-            Log.Info($"Theater={_titleLayoutDesc.HasTheater}");
+            Log.Info("Theater={0}", _titleLayoutDesc.HasTheater);
             if (_titleLayoutDesc.HasTheater)
             {
                 (_theaterLayout, images) = GetLayoutResources("even", "even");
@@ -307,7 +307,7 @@ namespace OpenKh.Game.States.Title
 
         private void SetOption(int option)
         {
-            Log.Info($"TitleOption={option} prev={_optionSelected}");
+            Log.Info("TitleOption={0} prev={1}", option, _optionSelected);
             _optionSelected = option;
 
             switch (_optionSelected)

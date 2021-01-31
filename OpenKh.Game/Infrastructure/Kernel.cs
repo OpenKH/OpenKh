@@ -3,7 +3,7 @@ using OpenKh.Common.Archives;
 using OpenKh.Engine;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.Renders;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Kh2.Contextes;
@@ -109,13 +109,13 @@ namespace OpenKh.Game.Infrastructure
             FontContext = new FontContext();
             MessageProvider = new Kh2MessageProvider();
             _regionId = DetectRegion(dataContent);
-            Log.Info($"Region={Region} Language={Language}");
+            Log.Info("Region={0} Language={1}", Region, Language);
 
             IsReMix = IsReMixFileExists(dataContent, Region);
-            Log.Info($"ReMIX={IsReMix}");
+            Log.Info("ReMIX={0}", IsReMix);
 
             IsFinalMix = IsReMix || RegionId == Constants.RegionFinalMix;
-            Log.Info($"Final Mix={IsFinalMix}");
+            Log.Info("Final Mix={0}", IsFinalMix);
 
             // Load files in the same order as KH2 does
             ObjEntries = LoadFile("00objentry.bin", stream => Objentry.Read(stream));
@@ -170,11 +170,11 @@ namespace OpenKh.Game.Infrastructure
         public void LoadSaveData(string fileName)
         {
             var savePath = Path.Combine(Config.SavePath, fileName);
-            Log.Info($"Attempting to load save {savePath}...");
+            Log.Info("Attempting to load save {0}...", savePath);
             if (File.Exists(savePath))
                 File.OpenRead(savePath).Using(LoadSaveData);
             else
-                Log.Warn($"Save {savePath} not found");
+                Log.Warn("Save {0} not found", savePath);
         }
 
         public bool LoadSaveData(Stream stream)
@@ -243,7 +243,7 @@ namespace OpenKh.Game.Infrastructure
                 var testFileName = $"menu/{Constants.Regions[i]}/title.2ld";
                 if (dataContent.FileExists(testFileName))
                 {
-                    Log.Info($"Region ID candidate: {i}");
+                    Log.Info("Region ID candidate: {0}", i);
                     return i;
                 }
             }

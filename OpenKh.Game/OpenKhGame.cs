@@ -40,7 +40,7 @@ namespace OpenKh.Game
         {
             set
             {
-                Log.Info($"State={value}");
+                Log.Info("State={0}", value);
                 switch (value)
                 {
                     case 0:
@@ -60,7 +60,7 @@ namespace OpenKh.Game
                         state = myState;
                         break;
                     default:
-                        Log.Err($"Invalid state {value}");
+                        Log.Err("Invalid state {0}", value);
                         return;
                 }
 
@@ -102,7 +102,7 @@ namespace OpenKh.Game
             var resolutionWidth = GetResolutionWidth();
             var resolutionHeight = GetResolutionHeight();
 
-            Log.Info($"Internal game resolution set to {resolutionWidth}x{resolutionHeight}");
+            Log.Info("Internal game resolution set to {0}x{1}", resolutionWidth, resolutionHeight);
 
             graphics = new GraphicsDeviceManager(this)
             {
@@ -229,13 +229,13 @@ namespace OpenKh.Game
 
         private static IDataContent CreateDataContent(string basePath, string idxFileName, string imgFileName)
         {
-            Log.Info($"Base directory is {basePath}");
+            Log.Info("Base directory is {0}", basePath);
 
             var idxFullPath = Path.Combine(basePath, idxFileName);
             var imgFullPath = Path.Combine(basePath, imgFileName);
             if (File.Exists(idxFullPath) && File.Exists(imgFullPath))
             {
-                Log.Info($"{idxFullPath} and {imgFullPath} has been found");
+                Log.Info("{0} and {1} has been found", idxFullPath, imgFullPath);
 
                 var imgStream = File.OpenRead(imgFullPath);
                 var idxDataContent = File.OpenRead(idxFullPath)
@@ -248,7 +248,7 @@ namespace OpenKh.Game
             }
             else
             {
-                Log.Info($"No {idxFullPath} or {imgFullPath}, loading extracted files");
+                Log.Info("No {0} or {1}, loading extracted files", idxFullPath, imgFullPath);
                 return new StandardDataContent(basePath);
             }
         }

@@ -1,6 +1,6 @@
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Win32.SafeHandles;
-using OpenKh.Game.Debugging;
+using OpenKh.Common;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -28,7 +28,7 @@ namespace OpenKh.Game
         static void Main(string[] args)
         {
             Log.Info("Boot");
-            Log.Info($"Version {ProductVersion}");
+            Log.Info("Version {0}", ProductVersion);
             void run()
             {
                 Config.Open();
@@ -126,7 +126,7 @@ namespace OpenKh.Game
 
         private static void Catch(Exception ex)
         {
-            Log.Err($"{ex.GetType().Name}: {ex.Message}:\n{ex.StackTrace}");
+            Log.Err("{0}: {1}:\n{2}", ex.GetType().Name, ex.Message, ex.StackTrace);
             if (ex.InnerException != null)
                 Catch(ex.InnerException);
         }
