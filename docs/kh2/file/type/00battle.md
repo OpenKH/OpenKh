@@ -167,23 +167,23 @@ The ID of the entry is assigned in the AI of the object.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 00     | ushort | ID
-| 02     | byte  | Small HP orbs
-| 03     | byte  | Big HP orbs
-| 04     | byte  | Big Money orbs
-| 05     | byte  | Medium Money orbs
-| 06     | byte  | Small Money orbs
-| 07     | byte  | Small MP orbs
-| 08     | byte  | Big MP orbs
-| 09     | byte  | Small Drive orbs
-| 0A     | byte  | Big Drive orbs
-| 0B     | byte  | Unknown
-| 0C     | ushort  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0E     | short  | Item 1 Drop Percentage
-| 10     | ushort  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 12     | short  | Item 2 Drop Percentage
-| 14     | ushort  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 16     | short  | Item 3 Drop Percentage
+| 0      | ushort | ID
+| 2      | byte  | Small HP orbs
+| 3      | byte  | Big HP orbs
+| 4      | byte  | Big Money orbs
+| 5      | byte  | Medium Money orbs
+| 6      | byte  | Small Money orbs
+| 7      | byte  | Small MP orbs
+| 8      | byte  | Big MP orbs
+| 9      | byte  | Small Drive orbs
+| 10     | byte  | Big Drive orbs
+| 11     | byte  | Unknown
+| 12     | ushort  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 14     | short  | Item 1 Drop Percentage
+| 16     | ushort  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 18     | short  | Item 2 Drop Percentage
+| 20     | ushort  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 22     | short  | Item 3 Drop Percentage
 
 ## Vtbl
 
@@ -285,15 +285,15 @@ NOTE: The first character pointer doesn't point to any character. May be some ki
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00     | int  | Needed EXP for next level
-| 04     | byte | Strength of Character
-| 05     | byte | Magic of Character
-| 06     | byte | Defense of Character
-| 07     | byte | AP of Character
-| 08     | short | Ability given when using Sword route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0A     | short | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0C     | short | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0E     | short | Padding
+| 0      | int  | Needed EXP for next level
+| 4      | byte | Strength of Character
+| 5      | byte | Magic of Character
+| 6      | byte | Defense of Character
+| 7      | byte | AP of Character
+| 8      | short | Ability given when using Sword route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 10     | short | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 12     | short | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 14     | short | Padding
 
 ## Bons
 
@@ -311,22 +311,22 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00     | int32 | File type (2)
-| 04     | int32 | Number of 'Bons' entries
+|  0     | int32 | File type (2)
+|  4     | int32 | Number of 'Bons' entries
 
 ### Bons entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 00     | byte  | ID - [EVENT LIST](../../dictionary/events.md)
-| 01     | byte  | Character Id
-| 02     | byte  | HP Increase
-| 03     | byte  | MP Increase
-| 04     | byte  | Drive Gauge Upgrade
-| 05     | byte  | Item Slot Upgrade
-| 06     | byte  | Accessory Slot Upgrade
-| 07     | byte  | Armor Slot Upgrade
-| 08     | short | Bonus Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+|  0     | byte  | ID - [EVENT LIST](../../dictionary/events.md)
+|  1     | byte  | Character Id
+|  2     | byte  | HP Increase
+|  3     | byte  | MP Increase
+|  4     | byte  | Drive Gauge Upgrade
+|  5     | byte  | Item Slot Upgrade
+|  6     | byte  | Accessory Slot Upgrade
+|  7     | byte  | Armor Slot Upgrade
+|  8     | short | Bonus Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 10     | short | Bonus Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 12     | int   | Unknown
 
@@ -360,22 +360,22 @@ Contains the table for battle level of each world. Whether each entry is enabled
 | 7      | byte  | World of Darkness
 | 8      | byte  | Twilight Town
 | 9      | byte  | Destiny Islands
-| A      | byte  | Hollow Bastion
-| B      | byte  | Beast's Castle
-| C      | byte  | Olympus Coliseum
-| D      | byte  | Agrabah
-| E      | byte  | Land of Dragons
-| F      | byte  | 100 Acre Woods
-| 10     | byte  | Pride Lands
-| 11     | byte  | Atlantica
-| 12     | byte  | Disney Castle
-| 13     | byte  | Timeless River
-| 14     | byte  | Halloween Town
-| 15     | byte  | World Map
-| 16     | byte  | Port Royal
-| 17     | byte  | Space Paranoids
-| 18     | byte  | The World that Never Was
-| 19     | byte[7] | Unknown
+| 10     | byte  | Hollow Bastion
+| 11     | byte  | Beast's Castle
+| 12     | byte  | Olympus Coliseum
+| 13     | byte  | Agrabah
+| 14     | byte  | Land of Dragons
+| 15     | byte  | 100 Acre Woods
+| 16     | byte  | Pride Lands
+| 17     | byte  | Atlantica
+| 18     | byte  | Disney Castle
+| 19     | byte  | Timeless River
+| 20     | byte  | Halloween Town
+| 21     | byte  | World Map
+| 22     | byte  | Port Royal
+| 23     | byte  | Space Paranoids
+| 24     | byte  | The World that Never Was
+| 25     | byte[7] | Unknown
 
 ## Lvpm
 
@@ -391,12 +391,12 @@ Contains the level-up table for the enemies. Based on the level of an enemy, a s
 
 | Offset | Type  | Description
 |--------|------ |--------------
-| 00     | short | HP level. The formula is `(EnemyHp * LevelHp + 99) / 100`.
-| 02     | short | Strength
-| 04     | short | Defense
-| 06     | short | ???
-| 08     | short | ???
-| 0A     | short | Exp
+| 0      | short | HP level. The formula is `(EnemyHp * LevelHp + 99) / 100`.
+| 2      | short | Strength
+| 4      | short | Defense
+| 6      | short | ???
+| 8      | short | ???
+| 10     | short | Exp
 
 ## Enmp
 
@@ -426,21 +426,21 @@ Every enemy is associated to one or more IDs (eg. Organization members have diff
 
 | Offset | Type  | Description
 |--------|------|--------------
-| 00     | short | Identifies the enemy. - [Enemy LIST](../../dictionary/enemy.md)
-| 02     | short | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
-| 04     | short[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
-| 44     | short | Damage Cap. (The higher, the less damage received)
-| 46     | short | ???
-| 48     | short | Physical weakness.
-| 4A     | short | Fire weakness.
-| 4C     | short | Blizzard weakness.
-| 4E     | short | Thunder weakness.
-| 50     | short | Dark weakness.
-| 52     | short | Neutral weakness.
-| 54     | short | General weakness.
-| 56     | short | Exp multiplier.
-| 58     | short | Unknown
-| 5A     | short | Unknown
+|  0     | short | Identifies the enemy. - [Enemy LIST](../../dictionary/enemy.md)
+|  2     | short | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
+|  4     | short[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
+| 68     | short | Damage Cap. (The higher, the less damage received)
+| 70     | short | ???
+| 72     | short | Physical weakness.
+| 74     | short | Fire weakness.
+| 76     | short | Blizzard weakness.
+| 78     | short | Thunder weakness.
+| 80     | short | Dark weakness.
+| 82     | short | Neutral weakness.
+| 84     | short | General weakness.
+| 86     | short | Exp multiplier.
+| 88     | short | Unknown
+| 90     | short | Unknown
 
 ## Patn
 
@@ -465,16 +465,16 @@ EG: 05 is Mad Rider, 14 is Reckless, Xaldin, 15 is Morning Star, Assault Rider, 
 
 | Offset | Type  | Description
 |--------|------|--------------
-| 00     | byte | Id
-| 01     | byte | ???
-| 02     | byte | ???
-| 03     | byte | ???
-| 04     | byte | ???
-| 05     | byte | Magnet Burst effect\*
-| 06     | byte | Magnet\*
-| 07     | byte | ???
-| 08     | byte | ???
-| 09     | byte | ???
+|  0     | byte | Id
+|  1     | byte | ???
+|  2     | byte | ???
+|  3     | byte | ???
+|  4     | byte | ???
+|  5     | byte | Magnet Burst effect\*
+|  6     | byte | Magnet\*
+|  7     | byte | ???
+|  8     | byte | ???
+|  9     | byte | ???
 | 10     | byte | ???
 | 11     | byte | ???
 | 12     | byte | ???
@@ -511,15 +511,15 @@ Contains informations about starting Character statistics, starting Abilities et
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 00     | short | Unknown
-| 02     | byte  | Character ID - [Character LIST](../../dictionary/characters.md)
-| 03     | byte  | HP
-| 04     | byte  | MP
-| 05     | byte  | AP
-| 06     | short | Unknown
-| 08     | short | Unknown
-| 0A     | short | Unknown
-| 0C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+|  0     | short | Unknown
+|  2     | byte  | Character ID - [Character LIST](../../dictionary/characters.md)
+|  3     | byte  | HP
+|  4     | byte  | MP
+|  5     | byte  | AP
+|  6     | short | Unknown
+|  8     | short | Unknown
+| 10     | short | Unknown
+| 12     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 
 NOTE: Abilities that are enabled by default begin with an 8.
 
@@ -545,11 +545,11 @@ Data on limits.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 00     | byte | ID
-| 01     | byte  | Character - [Character/Summon LIST](../../dictionary/characters.md)
-| 02     | byte  | Summon - [Character/Summon LIST](../../dictionary/characters.md)
-| 03     | byte  | Group (3 requires all of the characters to be alive)
-| 04     | char[32]  | Filename
+|  0     | byte | ID
+|  1     | byte  | Character - [Character/Summon LIST](../../dictionary/characters.md)
+|  2     | byte  | Summon - [Character/Summon LIST](../../dictionary/characters.md)
+|  3     | byte  | Group (3 requires all of the characters to be alive)
+|  4     | char[32]  | Filename
 | 36     | ushort | Spawn - [OBJ LIST](../../dictionary/obj.md)
 | 38     | byte[2] | Padding
 | 40     | ushort | Command - [Command LIST](../../dictionary/commands.md)
@@ -657,10 +657,10 @@ Contains the level-up table for summons and drive forms.
 
 | Offset | Type  | Description
 |--------|-------|-------------
-| 00     | byte  | First digit is the Form id, second digit is the Form level (e.g. 0x13 is Valor Form Level 3)
-| 01     | byte  | Level of the movement ability in the form (High Jump, Quick Run etc.)
-| 02     | short | Ability obtained through level up - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 04     | int   | EXP needed for level up
+|  0     | byte  | First digit is the Form id, second digit is the Form level (e.g. 0x13 is Valor Form Level 3)
+|  1     | byte  | Level of the movement ability in the form (High Jump, Quick Run etc.)
+|  2     | short | Ability obtained through level up - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+|  4     | int   | EXP needed for level up
 
 ### Forms
 
@@ -668,24 +668,24 @@ Standard (JP/US/EU)
 
 | ID | Form
 |----|-----
-| 00 | Summon
-| 01 | Valor
-| 02 | Wisdom
-| 03 | Master
-| 04 | Final
-| 05 | Anti
+|  0 | Summon
+|  1 | Valor
+|  2 | Wisdom
+|  3 | Master
+|  4 | Final
+|  5 | Anti
 
 Final Mix (JP/PS3/PS4)
 
 | ID | Form
 |----|-----
-| 00 | Summon
-| 01 | Valor
-| 02 | Wisdom
-| 03 | Limit
-| 04 | Master
-| 05 | Final
-| 06 | Anti
+|  0 | Summon
+|  1 | Valor
+|  2 | Wisdom
+|  3 | Limit
+|  4 | Master
+|  5 | Final
+|  6 | Anti
 
 ## Stop
 
@@ -709,8 +709,8 @@ Data on unknown
 
 | Offset | Type  | Description
 |--------|-------|-------------
-| 00     | ushort  | ID
-| 02     | ushort  | ???
+|  0     | ushort  | ID
+|  2     | ushort  | ???
 
 
 ## 0A
