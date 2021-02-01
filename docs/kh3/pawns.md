@@ -386,6 +386,20 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex339 | Marluxia (Hooded)
 | e_ex340 | Riku Repilica (Coat Hooded)
 | e_ex341 | Luxord (Hooded)
+| e_ex351 | Young Xehanort (LimitCut)
+| e_ex352 | Ansem (LimitCut)
+| e_ex353 | Xemnas (LimitCut)
+| e_ex354 | Xigbar (LimitCut)
+| e_ex355 | Saix (LimitCut)
+| e_ex356 | Luxord (LimitCut)
+| e_ex357 | Marluxia (LimitCut)
+| e_ex358 | Larxene (LimitCut)
+| e_ex359 | Xion (LimitCut)
+| e_ex360 | Vanitas (LimitCut)
+| e_ex361 | Dark Riku (LimitCut)
+| e_ex362 | Terranort (LimitCut)
+| e_ex367 | Master Xehanort (LimitCut)
+
 | e_ex407 | Darkside
 | e_ex408 | Xehanort's Guardian
 | e_ex701 | Lump of Horror
