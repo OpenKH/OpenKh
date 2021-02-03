@@ -53,32 +53,32 @@ The damage effects' values on MSET files point to this table.
 | 6 	 | ushort | Power
 | 8 	 | byte | Team (Deal damage to: 0/1/2 Enemies, 3/4/5 Enemies and allies...)
 | 9 	 | byte | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
-| 10 	 | byte | Reaction (Whether an enemy is flinched, knocked...)
-| 11 	 | byte | Effect on hit (0 none, other values = different effects)
-| 12 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
-| 14 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
-| 16 	 | short | ???
-| 18 	 | byte | Flag (Eg: 20/22 can defeat bosses)
-| 19 	 | byte | Refact Self
-| 20 	 | byte | Refact Other
-| 21 	 | byte | Reflected motion (Points to the slot in the MSET to be triggered when the attack is reflected)
-| 22 	 | short | Reflect Hit Back
-| 24 	 | int | Reflect Action
-| 28 	 | int | Hit Sound Effect
-| 32 	 | ushort | Reflect RC
-| 34 	 | byte | Reflect Range
-| 35 	 | sbyte | Reflect Angle
-| 36 	 | byte | Damage Effect
-| 37 	 | byte | Switch
-| 38 	 | ushort | Interval (1 hit every X frames)
-| 40 	 | byte | Floor Check
-| 41 	 | byte | Drive drain (Adds on normal state, reduces when in a form)
-| 42 	 | byte | Revenge damage
-| 43 	 | byte | Tr Reaction
-| 44 	 | byte | Combo Group
-| 45 	 | byte | Random Effect
-| 46 	 | byte | Kind
-| 47 	 | byte | HP drain (Adds on normal state, reduces when in a form)
+| A 	 | byte | Reaction (Whether an enemy is flinched, knocked...)
+| B 	 | byte | Effect on hit (0 none, other values = different effects)
+| C 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
+| E 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
+| 10 	 | short | ???
+| 12 	 | byte | Flag (Eg: 20/22 can defeat bosses)
+| 13 	 | byte | Refact Self
+| 14 	 | byte | Refact Other
+| 15 	 | byte | Reflected motion (Points to the slot in the MSET to be triggered when the attack is reflected)
+| 16 	 | short | Reflect Hit Back
+| 18 	 | int | Reflect Action
+| 1C 	 | int | Hit Sound Effect
+| 20 	 | ushort | Reflect RC
+| 22 	 | byte | Reflect Range
+| 23 	 | sbyte | Reflect Angle
+| 24 	 | byte | Damage Effect
+| 25 	 | byte | Switch
+| 26 	 | ushort | Interval (1 hit every X frames)
+| 28 	 | byte | Floor Check
+| 29 	 | byte | Drive drain (Adds on normal state, reduces when in a form)
+| 2A 	 | byte | Revenge damage
+| 2B 	 | byte | Tr Reaction
+| 2C 	 | byte | Combo Group
+| 2D 	 | byte | Random Effect
+| 2E 	 | byte | Kind
+| 2F 	 | byte | HP drain (Adds on normal state, reduces when in a form)
 
 ## Ptya
 
@@ -119,28 +119,28 @@ Ptya sets contain the list of attack animations a character use in certain situa
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0     | byte | Id
-| 1     | byte | Type
-| 2     | sbyte | Sub
-| 3     | sbyte | Combo Offset
-| 4     | uint | Flag
-| 8     | ushort | Motion Id \*
-| 10     | ushort | Next Motion Id \*
-| 12     | float | Jump
-| 16     | float | Jump Max
-| 20     | float | Jump Min
-| 24     | float | Speed Min
-| 28     | float | Speed Max
-| 32     | float | Near
-| 36     | float | Far
-| 40     | float | Low
-| 44     | float | High
-| 48     | float | Inner Min
-| 52     | float | Inner Max
-| 56     | float | Blend Time
-| 60     | float | Distance Adjust
-| 64     | ushort | Ability - SubId on [Item](./03System#Item)
-| 66     | ushort | Score
+| 0      | byte | Id
+| 1      | byte | Type
+| 2      | sbyte | Sub
+| 3      | sbyte | Combo Offset
+| 4      | uint | Flag
+| 8      | ushort | Motion Id \*
+| A      | ushort | Next Motion Id \*
+| C      | float | Jump
+| 10     | float | Jump Max
+| 14     | float | Jump Min
+| 18     | float | Speed Min
+| 1C     | float | Speed Max
+| 20     | float | Near
+| 24     | float | Far
+| 28     | float | Low
+| 2C     | float | High
+| 30     | float | Inner Min
+| 34     | float | Inner Max
+| 38     | float | Blend Time
+| 3C     | float | Distance Adjust
+| 40     | ushort | Ability - SubId on [Item](./03System#Item)
+| 42     | ushort | Score
 
 \* Multiply by 4 to get the slot of the motion in the entity's [moveset file](../anb/mset.md).
 
@@ -176,14 +176,14 @@ The ID of the entry is assigned in the AI of the object.
 | 7      | byte  | Small MP orbs
 | 8      | byte  | Big MP orbs
 | 9      | byte  | Small Drive orbs
-| 10     | byte  | Big Drive orbs
-| 11     | byte  | Unknown
-| 12     | ushort  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 14     | short  | Item 1 Drop Percentage
-| 16     | ushort  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 18     | short  | Item 2 Drop Percentage
-| 20     | ushort  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 22     | short  | Item 3 Drop Percentage
+| A      | byte  | Big Drive orbs
+| B      | byte  | Unknown
+| C      | ushort  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| E      | short  | Item 1 Drop Percentage
+| 10     | ushort  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 12     | short  | Item 2 Drop Percentage
+| 14     | ushort  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 16     | short  | Item 3 Drop Percentage
 
 ## Vtbl
 
@@ -217,10 +217,10 @@ Contains data for randomizing voice clips.
 | 7 	 | byte | Voice 2 Chance
 | 8 	 | byte | Voice 3
 | 9 	 | byte | Voice 3 Chance
-| 10 	 | byte | Voice 4
-| 11 	 | byte | Voice 4 Chance
-| 12 	 | byte | Voice 5
-| 13 	 | byte | Voice 5 Chance
+| A  	 | byte | Voice 4
+| B  	 | byte | Voice 4 Chance
+| C  	 | byte | Voice 5
+| D  	 | byte | Voice 5 Chance
 
 ## Lvup
 
@@ -278,8 +278,8 @@ NOTE: The first character pointer doesn't point to any character. May be some ki
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00     | uint  | Lvup entry count
-| 04     | uint  | Padding
+| 0      | uint  | Lvup entry count
+| 4      | uint  | Padding
 
 ### Lvup Entry
 
@@ -291,9 +291,9 @@ NOTE: The first character pointer doesn't point to any character. May be some ki
 | 6      | byte | Defense of Character
 | 7      | byte | AP of Character
 | 8      | short | Ability given when using Sword route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 10     | short | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 12     | short | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 14     | short | Padding
+| A      | short | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| C      | short | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| E      | short | Padding
 
 ## Bons
 
@@ -327,8 +327,8 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 |  6     | byte  | Accessory Slot Upgrade
 |  7     | byte  | Armor Slot Upgrade
 |  8     | short | Bonus Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 10     | short | Bonus Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 12     | int   | Unknown
+|  A     | short | Bonus Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+|  C     | int   | Unknown
 
 ## Btlv
 
@@ -360,22 +360,22 @@ Contains the table for battle level of each world. Whether each entry is enabled
 | 7      | byte  | World of Darkness
 | 8      | byte  | Twilight Town
 | 9      | byte  | Destiny Islands
-| 10     | byte  | Hollow Bastion
-| 11     | byte  | Beast's Castle
-| 12     | byte  | Olympus Coliseum
-| 13     | byte  | Agrabah
-| 14     | byte  | Land of Dragons
-| 15     | byte  | 100 Acre Woods
-| 16     | byte  | Pride Lands
-| 17     | byte  | Atlantica
-| 18     | byte  | Disney Castle
-| 19     | byte  | Timeless River
-| 20     | byte  | Halloween Town
-| 21     | byte  | World Map
-| 22     | byte  | Port Royal
-| 23     | byte  | Space Paranoids
-| 24     | byte  | The World that Never Was
-| 25     | byte[7] | Unknown
+| A      | byte  | Hollow Bastion
+| B      | byte  | Beast's Castle
+| C      | byte  | Olympus Coliseum
+| D      | byte  | Agrabah
+| E      | byte  | Land of Dragons
+| F      | byte  | 100 Acre Woods
+| 10     | byte  | Pride Lands
+| 11     | byte  | Atlantica
+| 12     | byte  | Disney Castle
+| 13     | byte  | Timeless River
+| 14     | byte  | Halloween Town
+| 15     | byte  | World Map
+| 16     | byte  | Port Royal
+| 17     | byte  | Space Paranoids
+| 18     | byte  | The World that Never Was
+| 19     | byte[7] | Unknown
 
 ## Lvpm
 
@@ -396,7 +396,7 @@ Contains the level-up table for the enemies. Based on the level of an enemy, a s
 | 4      | short | Defense
 | 6      | short | ???
 | 8      | short | ???
-| 10     | short | Exp
+| A      | short | Exp
 
 ## Enmp
 
@@ -429,18 +429,18 @@ Every enemy is associated to one or more IDs (eg. Organization members have diff
 |  0     | short | Identifies the enemy. - [Enemy LIST](../../dictionary/enemy.md)
 |  2     | short | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
 |  4     | short[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
-| 68     | short | Damage Cap. (The higher, the less damage received)
-| 70     | short | ???
-| 72     | short | Physical weakness.
-| 74     | short | Fire weakness.
-| 76     | short | Blizzard weakness.
-| 78     | short | Thunder weakness.
-| 80     | short | Dark weakness.
-| 82     | short | Neutral weakness.
-| 84     | short | General weakness.
-| 86     | short | Exp multiplier.
-| 88     | short | Unknown
-| 90     | short | Unknown
+| 44     | short | Damage Cap. (The higher, the less damage received)
+| 46     | short | ???
+| 48     | short | Physical weakness.
+| 4A     | short | Fire weakness.
+| 4C     | short | Blizzard weakness.
+| 4E     | short | Thunder weakness.
+| 50     | short | Dark weakness.
+| 52     | short | Neutral weakness.
+| 54     | short | General weakness.
+| 56     | short | Exp multiplier.
+| 58     | short | Unknown
+| 5A     | short | Unknown
 
 ## Patn
 
@@ -475,17 +475,17 @@ EG: 05 is Mad Rider, 14 is Reckless, Xaldin, 15 is Morning Star, Assault Rider, 
 |  7     | byte | ???
 |  8     | byte | ???
 |  9     | byte | ???
+|  A     | byte | ???
+|  B     | byte | ???
+|  C     | byte | ???
+|  D     | byte | ???
+|  E     | byte | ???
+|  F     | byte | ???
 | 10     | byte | ???
 | 11     | byte | ???
 | 12     | byte | ???
 | 13     | byte | ???
-| 14     | byte | ???
-| 15     | byte | ???
-| 16     | byte | ???
-| 17     | byte | ???
-| 18     | byte | ???
-| 19     | byte | ???
-| 20     | byte[12] | Padding
+| 14     | byte[12] | Padding
 
 \* (00 is immune, 01/0C/0D draws in, 02/03 flinches, 04/07/09/0B knocks out, 05 pulls in(magnet), 06/08/0A is flinch + draw, 0E is flinch + insta revenge...)
 
@@ -518,8 +518,8 @@ Contains informations about starting Character statistics, starting Abilities et
 |  5     | byte  | AP
 |  6     | short | Unknown
 |  8     | short | Unknown
-| 10     | short | Unknown
-| 12     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+|  A     | short | Unknown
+|  C     | short[58] | Starting items (abilities, magic etc. Refer to ITEM from 03system*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 
 NOTE: Abilities that are enabled by default begin with an 8.
 
@@ -550,12 +550,12 @@ Data on limits.
 |  2     | byte  | Summon - [Character/Summon LIST](../../dictionary/characters.md)
 |  3     | byte  | Group (3 requires all of the characters to be alive)
 |  4     | char[32]  | Filename
-| 36     | ushort | Spawn - [OBJ LIST](../../dictionary/obj.md)
-| 38     | byte[2] | Padding
-| 40     | ushort | Command - [Command LIST](../../dictionary/commands.md)
-| 42     | ushort | Limit - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 44     | byte | Used for Timeless River versions (0D) (May be more bytes)
-| 45     | byte[19] | Padding
+| 24     | ushort | Spawn - [OBJ LIST](../../dictionary/obj.md)
+| 26     | byte[2] | Padding
+| 28     | ushort | Command - [Command LIST](../../dictionary/commands.md)
+| 2A     | ushort | Limit - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 2C     | byte | Used for Timeless River versions (0D) (May be more bytes)
+| 2D     | byte[19] | Padding
 
 ## Sumn
 
@@ -579,12 +579,12 @@ Data on summons.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0     | ushort | Summon - [Command LIST](../../dictionary/commands.md)
-| 2     | ushort | Item - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 4     | uint | Entity Spawned 1 - [OBJ LIST](../../dictionary/obj.md)
-| 8     | uint | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
-| 12     | ushort | Limit - [Command LIST](../../dictionary/commands.md)
-| 14     | byte[50] | Padding
+| 0      | ushort | Summon - [Command LIST](../../dictionary/commands.md)
+| 2      | ushort | Item - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 4      | uint | Entity Spawned 1 - [OBJ LIST](../../dictionary/obj.md)
+| 8      | uint | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
+| C      | ushort | Limit - [Command LIST](../../dictionary/commands.md)
+| E      | byte[50] | Padding
 
 ## Magc
 
@@ -612,18 +612,18 @@ Data on magic.
 | 1     | byte | Level
 | 2     | 2B | ???
 | 4     | char[32] | Filename
-| 36     | 2B | ???
-| 38     | short | Command - [Command LIST](../../dictionary/commands.md)
-| 40     | short | Ground motion - [Motion LIST](../../file/anb/mset.html)
-| 42     | short | Ground ???
-| 44     | short | Finish motion
-| 46     | short | Finish ???
-| 48     | short | Air motion
-| 50     | short | Air ???
-| 52     | byte | ???
-| 53     | byte | ???
-| 54     | byte | ???
-| 55     | byte | Padding
+| 24     | 2B | ???
+| 26     | short | Command - [Command LIST](../../dictionary/commands.md)
+| 28     | short | Ground motion - [Motion LIST](../../file/anb/mset.html)
+| 2A     | short | Ground ???
+| 2C     | short | Finish motion
+| 2E     | short | Finish ???
+| 30     | short | Air motion
+| 32     | short | Air ???
+| 34     | byte | ???
+| 35     | byte | ???
+| 36     | byte | ???
+| 37     | byte | Padding
 
 ## Vbrt
 
