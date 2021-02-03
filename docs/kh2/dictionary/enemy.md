@@ -86,7 +86,7 @@
 | 86 | Twilight Thorn |
 | 87 | Xaldin |
 | 88 | Demyx |
-| 89 |  |
+| 89 | Luxord |
 | 90 | Xemnas |
 | 91 | Shenzi, Banzai and Ed |
 | 92 |  |
