@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 
 namespace OpenKh.Engine
@@ -67,6 +68,7 @@ namespace OpenKh.Engine
             {
                 _cameraPosition = value;
                 CameraLookAt = CameraPosition + CameraLookAtX;
+                InvalidateWorld();
             }
         }
 
@@ -126,7 +128,10 @@ namespace OpenKh.Engine
             set
             {
                 _cameraYpr = value;
-                var matrix = Matrix4x4.CreateFromYawPitchRoll(value.X / 180.0f * 3.14159f, value.Y / 180.0f * 3.14159f, value.Z / 180.0f * 3.14159f);
+                var matrix = Matrix4x4.CreateFromYawPitchRoll(
+                    (float)(value.X * Math.PI / 180.0),
+                    (float)(value.Y * Math.PI / 180.0),
+                    (float)(value.Z * Math.PI / 180.0));
                 CameraLookAtX = Vector3.Transform(new Vector3(1, 0, 0), matrix);
                 CameraLookAtY = Vector3.Transform(new Vector3(0, 0, 1), matrix);
                 CameraLookAtZ = Vector3.Transform(new Vector3(0, 1, 0), matrix);
@@ -155,8 +160,8 @@ namespace OpenKh.Engine
 
         public Camera()
         {
-            _fov = 1.2f;
-            AspectRatio = 512.0f / 448.0f;
+            FieldOfView = 1.21876054f;
+            AspectRatio = 512.0f / 288.0f;
             NearClipPlane = 1;
             FarClipPlane = int.MaxValue;
             CameraUp = new Vector3(0, 1, 0);
@@ -179,9 +184,9 @@ namespace OpenKh.Engine
         private void CalculateWorld()
         {
             _world = Matrix4x4.CreateLookAt(
-                new Vector3(CameraPosition.X, CameraPosition.Y, CameraPosition.Z),
-                new Vector3(CameraLookAt.X, CameraLookAt.Y, CameraLookAt.Z),
-                new Vector3(CameraUp.X, CameraUp.Y, CameraUp.Z));
+                new Vector3(-CameraPosition.X, CameraPosition.Y, CameraPosition.Z),
+                new Vector3(-CameraLookAt.X, CameraLookAt.Y, CameraLookAt.Z),
+                CameraUp);
 
             ValidateWorld();
         }
