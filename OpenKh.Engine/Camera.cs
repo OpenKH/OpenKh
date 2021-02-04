@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace OpenKh.Engine.MonoGame
+namespace OpenKh.Engine
 {
     public class Camera
     {
