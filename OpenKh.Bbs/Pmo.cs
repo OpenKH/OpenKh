@@ -95,6 +95,7 @@ namespace OpenKh.Bbs
             [Data] public ushort Padding2 { get; set; }
             [Data] public ushort SkinnedBoneIndex { get; set; }
             [Data] public ushort Padding3 { get; set; }
+            [Data] public uint Padding4 { get; set; }
             [Data(Count = 16)] public string JointName { get; set; }
             [Data(Count = 16)] public float[] Transform { get; set; }
             [Data(Count = 16)] public float[] InverseTransform { get; set; }
