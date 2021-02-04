@@ -55,6 +55,8 @@ namespace OpenKh.Game.Infrastructure
         public List<Objentry> ObjEntries { get; }
         public Dictionary<string, List<Place>> Places { get; }
 
+        public bool DebugMode { get; set; }
+
         public int World
         {
             get => SaveData.WorldId;

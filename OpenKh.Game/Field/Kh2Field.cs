@@ -8,6 +8,7 @@ using OpenKh.Engine.Renders;
 using OpenKh.Common;
 using OpenKh.Game.Entities;
 using OpenKh.Game.Events;
+using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
@@ -16,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using n = System.Numerics;
 
-namespace OpenKh.Game.Infrastructure
+namespace OpenKh.Game.Field
 {
     public class Kh2Field : IField
     {
@@ -32,7 +33,8 @@ namespace OpenKh.Game.Infrastructure
         private readonly Dictionary<int, ObjectEntity> _actorIds = new Dictionary<int, ObjectEntity>();
         private readonly Dictionary<int, byte[]> _subtitleData = new Dictionary<int, byte[]>();
         private readonly MonoSpriteDrawing _drawing;
-        private Bar _binarcArd;
+        private Bar _binarcAreaData;
+        private IMap _map;
         private EventPlayer _eventPlayer;
         private int _spawnScriptMap;
         private int _spawnScriptBtl;
@@ -95,43 +97,71 @@ namespace OpenKh.Game.Infrastructure
             FadeFromBlack(1.0f);
         }
 
-        public void LoadMapArd(int world, int area)
+        public void UnloadMap()
         {
-            _kernel.DataContent
-                .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[world]}.bar")
-                .Using(stream => Bar.Read(stream))
-                .ForEntry(x => x.Type == Bar.EntryType.List, stream =>
-                {
-                    _eventMessageProvider.Load(Msg.Read(stream));
-                    return true;
-                });
+            _map?.Dispose();
+            RemoveAllActors();
+            _eventPlayer = null;
+        }
 
+        public void LoadArea(int world, int area)
+        {
+            Log.Info("Area={0},{1}", world, area);
+
+            UnloadMap();
+            LoadAreaData(world, area);
+            // TODO load voices (eg. voice/us/battle/nm0_jack.vsb)
+            // TODO load field2d (eg. field2d/jp/nm0field.2dd)
+            // TODO load command (eg. field2d/jp/nm1command.2dd)
+            _map = new Kh2Map(_graphicsDevice, _kernel, world, area); // new BbsMap(_graphicsDevice, @"PATH_TO_PMP");
+            LoadMsg(world);
+            // TODO load libretto (eg. libretto-nm.bar)
+            // TODO load effect
+            // TODO load magics
+            // TODO load prize
+            // TODO load prizebox
+            // TODO load entities
+            // TODO load summons
+            // TODO load mission
+            // TODO dispatch entity loading here, not in LoadAreaData
+        }
+
+        private void LoadAreaData(int world, int area)
+        {
             string fileName;
             if (_kernel.IsReMix)
                 fileName = $"ard/{_kernel.Language}/{Constants.WorldIds[world]}{area:D02}.ard";
             else
                 fileName = $"ard/{Constants.WorldIds[world]}{area:D02}.ard";
 
-            _eventPlayer = null;
-            RemoveAllActors();
-
-            _binarcArd = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
-            Events = _binarcArd
+            _binarcAreaData = _kernel.DataContent.FileOpen(fileName).Using(Bar.Read);
+            Events = _binarcAreaData
                 .Where(x => x.Type == Bar.EntryType.Event)
                 .Select(x => x.Name)
                 .ToList();
 
-            Log.Info("Loading spawn {0}", _kernel.SpawnName);
-            RunSpawnScript(_binarcArd, "map", _spawnScriptMap >= 0 ? _spawnScriptMap : _kernel.SpawnMap);
-            RunSpawnScript(_binarcArd, "btl", _spawnScriptBtl >= 0 ? _spawnScriptBtl : _kernel.SpawnBtl);
-            RunSpawnScript(_binarcArd, "evt", _spawnScriptEvt >= 0 ? _spawnScriptEvt : _kernel.SpawnEvt);
+            Log.Info($"Loading spawn {_kernel.SpawnName}");
+            RunSpawnScript(_binarcAreaData, "map", _spawnScriptMap >= 0 ? _spawnScriptMap : _kernel.SpawnMap);
+            RunSpawnScript(_binarcAreaData, "btl", _spawnScriptBtl >= 0 ? _spawnScriptBtl : _kernel.SpawnBtl);
+            RunSpawnScript(_binarcAreaData, "evt", _spawnScriptEvt >= 0 ? _spawnScriptEvt : _kernel.SpawnEvt);
+            // TODO units (or entities) should be spawn later, not in RunSpawnScript. This is because
+            // we want to avoid to load entities that can be potentially not used.
         }
+
+        private void LoadMsg(int world) => _kernel.DataContent
+            .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[world]}.bar")
+            .Using(stream => Bar.Read(stream))
+            .ForEntry(x => x.Type == Bar.EntryType.List, stream =>
+            {
+                _eventMessageProvider.Load(Msg.Read(stream));
+                return true;
+            });
 
         public void PlayEvent(string eventName)
         {
             _actorIds.Clear();
             _subtitleData.Clear();
-            _binarcArd.ForEntry(eventName, Bar.EntryType.Event, stream =>
+            _binarcAreaData.ForEntry(eventName, Bar.EntryType.Event, stream =>
             {
                 _eventPlayer = new EventPlayer(this, Event.Read(stream));
                 RemoveAllActors();
@@ -155,7 +185,6 @@ namespace OpenKh.Game.Infrastructure
                 }
             }
 
-
             foreach (var entity in _actors.Where(x => x.IsMeshLoaded && x.IsVisible))
                 entity.Update((float)deltaTime);
 
@@ -175,10 +204,34 @@ namespace OpenKh.Game.Infrastructure
                 DrawFade();
         }
 
-        public void ForEveryModel(Action<IEntity, IMonoGameModel> action)
+        public void Render(Camera camera, KingdomShader shader, EffectPass pass, bool passRenderOpaque)
         {
+            _map.Render(camera, shader, pass, passRenderOpaque);
+
             foreach (var actor in _actors.Where(x => x.IsVisible))
-                action(actor, actor);
+            {
+                shader.SetModelView(actor.GetMatrix());
+                pass.Apply();
+
+                _graphicsDevice.RenderMeshNew(shader, pass, actor, passRenderOpaque);
+
+                if (_kernel.DebugMode)
+                {
+                    var matrixArray = actor.Model?.CurrentPose;
+                    if (matrixArray != null)
+                    {
+                        foreach (var bone in actor.Model.Bones)
+                        {
+                            if (bone.Parent > 0)
+                            {
+                                var bonePos = matrixArray[bone.Index].Translation;
+                                var parentPos = matrixArray[bone.Parent].Translation;
+                                Debugging.DebugDraw.DrawLine(_graphicsDevice, bonePos, parentPos, Color.Red);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public void AddActor(int actorId, int objectId)
@@ -194,7 +247,7 @@ namespace OpenKh.Game.Infrastructure
         {
             var actor = _actorIds[actorId];
             actor.Position = new n.Vector3(x, y, z);
-            actor.Rotation = new n.Vector3(0, (float)(rotation * Math.PI / 180) , 0);
+            actor.Rotation = new n.Vector3(0, (float)(rotation * Math.PI / 180), 0);
         }
 
         public void SetActorAnimation(int actorId, string path)
@@ -371,7 +424,7 @@ namespace OpenKh.Game.Infrastructure
 
             _messageDrawContext.GlobalScale = 1.0f;
             _messageDrawContext.WidthMultiplier = 1.2f;
-            _messageDrawContext.x = (_messageDrawContext.WindowWidth  - _messageDrawContext.Width) / 2f;
+            _messageDrawContext.x = (_messageDrawContext.WindowWidth - _messageDrawContext.Width) / 2f;
             _messageDrawContext.y = 350;
             _messageDrawContext.IgnoreDraw = false;
             _messageRenderer.Draw(_messageDrawContext, data);

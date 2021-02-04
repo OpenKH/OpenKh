@@ -1,5 +1,6 @@
 using NSubstitute;
 using OpenKh.Game.Events;
+using OpenKh.Game.Field;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2.Ard;
 using System.Collections.Generic;
@@ -230,7 +231,7 @@ namespace OpenKh.Tests.Engine
             Assert.Equal(0f, actualRoll, 0);
             Assert.Equal(48.41f, actualFov, 0);
         }
-        
+
         [Theory]
         [InlineData(122, -123.61f, -122.43f)]
         [InlineData(140, -123.68f, -122.80f)]

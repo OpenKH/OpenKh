@@ -1,19 +1,9 @@
 using Microsoft.Xna.Framework.Graphics;
-using OpenKh.Bbs;
 using OpenKh.Common;
-using OpenKh.Engine;
 using OpenKh.Engine.MonoGame;
-using OpenKh.Engine.Parsers;
 using OpenKh.Game.Debugging;
-using OpenKh.Game.Entities;
+using OpenKh.Game.Field;
 using OpenKh.Game.Infrastructure;
-using OpenKh.Kh2;
-using OpenKh.Kh2.Extensions;
-using OpenKh.Kh2.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Numerics;
 using xna = Microsoft.Xna.Framework;
 
@@ -40,17 +30,10 @@ namespace OpenKh.Game.States
         private xna.GraphicsDeviceManager _graphics;
         private InputManager _input;
         private IStateChange _stateChange;
-        private List<MeshGroup> _models = new List<MeshGroup>();
-        private List<MeshGroup> _bobModels = new List<MeshGroup>();
         private KingdomShader _shader;
         private Camera _camera;
 
         public IField Field { get; private set; }
-
-        private int _objEntryId = 0x236; // PLAYER
-        private List<BobEntity> _bobEntities = new List<BobEntity>();
-        private List<PmpEntity> _pmpEntities = new List<PmpEntity>();
-        private List<MeshGroup> _pmpModels = new List<MeshGroup>();
 
         private MenuState _menuState;
 
@@ -102,7 +85,7 @@ namespace OpenKh.Game.States
             {
                 _menuState.OpenMenu();
             }
-            else if (DebugMode )
+            else if (Kernel.DebugMode)
             {
                 const double Speed = 100.0;
                 var speed = (float)(deltaTimes.DeltaTime * Speed);
@@ -164,226 +147,17 @@ namespace OpenKh.Game.States
             _shader.SetModelViewIdentity();
             pass.Apply();
 
-            foreach (var mesh in _models)
-            {
-                RenderMeshNew(pass, mesh, passRenderOpaque);
-            }
-
-            _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-            Field.ForEveryModel((entity, model) =>
-            {
-                _shader.SetProjectionView(_camera.Projection);
-                _shader.SetWorldView(_camera.World);
-                _shader.SetModelView(entity.GetMatrix());
-                pass.Apply();
-
-                RenderMeshNew(pass, model, passRenderOpaque);
-
-                if (DebugMode && entity is ObjectEntity ent)
-                {
-                    var matrixArray = ent.Model?.CurrentPose;
-                    if (matrixArray != null)
-                    {
-                        foreach (var bone in ent.Model.Bones)
-                        {
-                            if (bone.Parent > 0)
-                            {
-                                var bonePos = matrixArray[bone.Index].Translation;
-                                var parentPos = matrixArray[bone.Parent].Translation;
-                                Debugging.DebugDraw.DrawLine(_graphics.GraphicsDevice, bonePos, parentPos, xna.Color.Red);
-                            }
-                        }
-                    }
-                }
-            });
-
-            foreach (var entity in _bobEntities)
-            {
-                _shader.SetProjectionView(_camera.Projection);
-                _shader.SetWorldView(_camera.World);
-                _shader.SetModelView(entity.GetMatrix());
-                pass.Apply();
-
-                RenderMeshNew(pass, _bobModels[entity.BobIndex], passRenderOpaque);
-            }
-
-            foreach (var ent in _pmpEntities)
-            {
-                if (ent.DifferentMatrix)
-                {
-                    var world = _camera.World;
-                    world.M14 = 0;
-                    world.M24 = 0;
-                    world.M34 = 0;
-                    world.M41 = 0;
-                    world.M42 = 0;
-                    world.M43 = 0;
-                    world.M44 = 1;
-                    _shader.SetWorldView(ref world);
-                    _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
-                }
-                else
-                {
-                    _shader.SetWorldView(_camera.World);
-                    _graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-                }
-
-                int AxisNumberChanged = 0;
-                AxisNumberChanged += Convert.ToInt32(ent.Scaling.X < 0);
-                AxisNumberChanged += Convert.ToInt32(ent.Scaling.Y < 0);
-                AxisNumberChanged += Convert.ToInt32(ent.Scaling.Z < 0);
-
-                if (AxisNumberChanged == 1 || AxisNumberChanged == 3)
-                {
-                    _graphics.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
-                }
-                else
-                {
-                    _graphics.GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
-                }
-
-
-                _shader.SetProjectionView(_camera.Projection);
-                _shader.SetModelView(ent.GetMatrix());
-                _shader.UseAlphaMask = true;
-                pass.Apply();
-
-                RenderMeshNew(pass, _pmpModels[ent.Index], passRenderOpaque);
-
-            }
-        }
-
-        private void RenderMeshNew(EffectPass pass, IMonoGameModel model, bool passRenderOpaque)
-        {
-            if (model?.MeshDescriptors == null)
-                return;
-
-            foreach (var meshDescriptor in model.MeshDescriptors)
-            {
-                if (meshDescriptor.Indices.Length == 0 || meshDescriptor.IsOpaque != passRenderOpaque)
-                    continue;
-
-                var textureIndex = meshDescriptor.TextureIndex & 0xffff;
-                if (textureIndex < model.Textures.Length)
-                    _shader.SetRenderTexture(pass, model.Textures[textureIndex]);
-
-                _graphics.GraphicsDevice.DrawUserIndexedPrimitives(
-                    PrimitiveType.TriangleList,
-                    meshDescriptor.Vertices,
-                    0,
-                    meshDescriptor.Vertices.Length,
-                    meshDescriptor.Indices,
-                    0,
-                    meshDescriptor.Indices.Length / 3,
-                    MeshLoader.PositionColoredTexturedVertexDeclaration);
-            }
+            Field.Render(_camera, _shader, pass, passRenderOpaque);
         }
 
         private void BasicallyForceToReloadEverything()
         {
-            _models.Clear();
-            _bobModels.Clear();
-
             switch (Field)
             {
                 case Kh2Field kh2Field:
-                    kh2Field.LoadMapArd(Kernel.World, Kernel.Area);
-                    LoadMap(Kernel.World, Kernel.Area);
+                    kh2Field.LoadArea(Kernel.World, Kernel.Area);
                     break;
             }
-        }
-
-        private void LoadBBSMap(string MapPath)
-        {
-            Pmp pmp = Pmp.Read(File.OpenRead(MapPath));
-            List<MeshGroup> group = new List<MeshGroup>();
-
-            int PmoIndex = 0;
-            for (int i = 0; i < pmp.objectInfo.Count; i++)
-            {
-                Pmp.ObjectInfo currentInfo = pmp.objectInfo[i];
-
-                if (currentInfo.PMO_Offset != 0)
-                {
-                    PmpEntity pmpEnt = new PmpEntity(PmoIndex,
-                        new Vector3(currentInfo.PositionX, currentInfo.PositionY, currentInfo.PositionZ),
-                        new Vector3(currentInfo.RotationX, currentInfo.RotationY, currentInfo.RotationZ),
-                        new Vector3(currentInfo.ScaleX, currentInfo.ScaleY, currentInfo.ScaleZ));
-
-                    pmpEnt.DifferentMatrix = pmp.hasDifferentMatrix[PmoIndex];
-                    PmoParser pParser = new PmoParser(pmp.PmoList[PmoIndex], 100.0f);
-                    List<Tim2KingdomTexture> BbsTextures = new List<Tim2KingdomTexture>();
-
-                    MeshGroup g = new MeshGroup();
-                    g.MeshDescriptors = pParser.MeshDescriptors;
-                    g.Textures = new IKingdomTexture[pmp.PmoList[PmoIndex].header.TextureCount];
-
-                    for (int j = 0; j < pmp.PmoList[PmoIndex].header.TextureCount; j++)
-                    {
-                        BbsTextures.Add(new Tim2KingdomTexture(pmp.PmoList[PmoIndex].texturesData[j], _graphics.GraphicsDevice));
-                        g.Textures[j] = BbsTextures[j];
-                    }
-
-                    _pmpEntities.Add(pmpEnt);
-                    _pmpModels.Add(g);
-                    PmoIndex++;
-                }
-            }
-        }
-
-        private void LoadMap(int worldIndex, int placeIndex)
-        {
-            Log.Info("Map={0},{1}", worldIndex, placeIndex);
-
-            var fileName = Kernel.GetMapFileName(worldIndex, placeIndex);
-            var entries = _dataContent.FileOpen(fileName).Using(Bar.Read);
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK0"));
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "SK1"));
-            AddMesh(FromMdlx(_graphics.GraphicsDevice, entries, "MAP"));
-
-            _bobEntities = entries.ForEntry("out", Bar.EntryType.BgObjPlacement, BobDescriptor.Read)?
-                .Select(x => new BobEntity(x))?.ToList() ?? new List<BobEntity>();
-
-            var bobModels = entries.ForEntries("BOB", Bar.EntryType.Model, Mdlx.Read).ToList();
-            var bobTextures = entries.ForEntries("BOB", Bar.EntryType.ModelTexture, ModelTexture.Read).ToList();
-
-            for (var i = 0; i < bobModels.Count; i++)
-            {
-                _bobModels.Add(new MeshGroup
-                {
-                    MeshDescriptors = MeshLoader.FromKH2(bobModels[i]).MeshDescriptors,
-                    Textures = bobTextures[i].LoadTextures(_graphics.GraphicsDevice).ToArray()
-                });
-            }
-        }
-
-        private static MeshGroup FromMdlx(GraphicsDevice graphics, IEnumerable<Bar.Entry> entries, string name)
-        {
-            var model = entries.ForEntry(name, Bar.EntryType.Model, Mdlx.Read);
-            if (model == null)
-                return null;
-
-            var textures = entries.ForEntry(name, Bar.EntryType.ModelTexture, ModelTexture.Read);
-            if (model == null)
-                return null;
-
-            return new MeshGroup
-            {
-                MeshDescriptors = MeshLoader.FromKH2(model).MeshDescriptors,
-                Textures = textures.LoadTextures(graphics).ToArray()
-            };
-        }
-
-        private void AddMesh(MeshGroup mesh)
-        {
-            if (mesh == null)
-            {
-                Log.Warn("AddMesh received null");
-                return;
-            }
-
-            _models.Add(mesh);
         }
 
         public void LoadTitleScreen() => _stateChange.State = 0;
@@ -397,11 +171,10 @@ namespace OpenKh.Game.States
             BasicallyForceToReloadEverything();
         }
 
-        private bool DebugMode { get; set; } = true;
         public void DebugUpdate(IDebug debug)
         {
             if (_input.IsDebug)
-                DebugMode = !DebugMode;
+                Kernel.DebugMode = !Kernel.DebugMode;
         }
 
         public void DebugDraw(IDebug debug)
@@ -409,7 +182,7 @@ namespace OpenKh.Game.States
             if (_menuState.IsMenuOpen)
                 return;
 
-            if (DebugMode)
+            if (Kernel.DebugMode)
             {
                 debug.Println($"MAP: {Kh2.Constants.WorldIds[Kernel.World]}{Kernel.Area:D02}");
                 debug.Println($"POS ({_camera.CameraPosition.X:F0}, {_camera.CameraPosition.Y:F0}, {_camera.CameraPosition.Z:F0})");
