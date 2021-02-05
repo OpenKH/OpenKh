@@ -82,6 +82,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
             Assimp.Scene scene = new Assimp.Scene();
             scene.RootNode = new Assimp.Node("root");
 
+            // Add materials.
             List<Material> matList = new List<Material>();
             for(int t = 0; t < pmo.header.TextureCount; t++)
             {
@@ -91,8 +92,8 @@ namespace OpenKh.Command.PAMtoFBXConverter
                 scene.Materials.Add(mat);
             }
 
+            // Add skeleton.
             List<Node> Skeleton = new List<Node>();
-            // Bones
             for (int b = 0; b < pmo.skeletonHeader.BoneCount; b++)
             {
                 Pmo.BoneData bn = pmo.boneList[b];
@@ -117,37 +118,35 @@ namespace OpenKh.Command.PAMtoFBXConverter
 
                 Assimp.Matrix4x4 nd_mtx = mtx;
                 nd_mtx.Transpose();
-                Node curNode;
                 if (bn.ParentBoneIndex == 0xFFFF)
                 {
-                    curNode = new Node(bn.JointName);
+                    
+                    Node curNode = new Node(bn.JointName);
                     curNode.Transform = nd_mtx;
                     scene.RootNode.Children.Add(curNode);
                     Skeleton.Add(curNode);
                 }
                 else
                 {
-                    curNode = new Node(bn.JointName, Skeleton[bn.ParentBoneIndex]);
-
+                    Node curNode = new Node(bn.JointName, Skeleton[bn.ParentBoneIndex]);
+                    
                     nd_mtx.A4 *= 100.0f;
                     nd_mtx.B4 *= 100.0f;
                     nd_mtx.C4 *= 100.0f;
-
+                    
                     curNode.Transform = nd_mtx;
                     Skeleton.Add(curNode);
                     scene.RootNode.FindNode(Skeleton[bn.ParentBoneIndex].Name).Children.Add(curNode);
-                }
-
-                
+                } 
             }
 
-            
-
+            // Add meshes.
             for (int i = 0; i < pmo.Meshes.Count; i++)
             {
                 Assimp.Mesh mesh = new Assimp.Mesh($"Mesh{i}", Assimp.PrimitiveType.Triangle);
                 Pmo.MeshChunks chunk = pmo.Meshes[i];
 
+                // Add vertices, vertex color and normals.
                 for (int j = 0; j < chunk.vertices.Count; j++)
                 {
                     mesh.Vertices.Add(new Assimp.Vector3D(
@@ -155,27 +154,96 @@ namespace OpenKh.Command.PAMtoFBXConverter
                         chunk.vertices[j].Y * pmo.header.ModelScale * 100.0f,
                         chunk.vertices[j].Z * pmo.header.ModelScale * 100.0f));
 
-                    //mesh.TextureCoordinateChannels[0].Add(new Vector3D());
                     mesh.VertexColorChannels[0].Add(new Color4D(1.0f, 1.0f, 1.0f, 1.0f));
                     mesh.Normals.Add(new Vector3D());
 
-                    /*Assimp.Vector3D UV = new Assimp.Vector3D();
-                    UV.X = 0;
-                    UV.Y = 0;
-
-                    mesh.TextureCoordinateChannels[0].Add(UV);
-                    mesh.TextureCoordinateChannels[0].Add(UV);*/
                 }
                 mesh.SetIndices(chunk.Indices.ToArray(), 3);
-
                 mesh.MaterialIndex = chunk.SectionInfo.TextureID;
-
                 scene.Meshes.Add(mesh);
+
+                for (int v = 0; v < chunk.vertices.Count; v++)
+                {
+                    // Build bone influences.
+                    for (int z = 0; z < chunk.SectionInfo_opt1.SectionBoneIndices.Length; z++)
+                    {
+                        if(chunk.SectionInfo_opt1.SectionBoneIndices[z] != 0xFF)
+                        {
+                            Pmo.BoneData currentBone = new Pmo.BoneData();
+
+                            int currentIndex = chunk.SectionInfo_opt1.SectionBoneIndices[z];
+                            currentBone = pmo.boneList[currentIndex];
+
+                            string boneName = currentBone.JointName;
+                            Assimp.Matrix4x4 mtx = new Assimp.Matrix4x4();
+                            mtx.A1 = currentBone.Transform[0];
+                            mtx.A2 = currentBone.Transform[1];
+                            mtx.A3 = currentBone.Transform[2];
+                            mtx.A4 = currentBone.Transform[3];
+                            mtx.B1 = currentBone.Transform[4];
+                            mtx.B2 = currentBone.Transform[5];
+                            mtx.B3 = currentBone.Transform[6];
+                            mtx.B4 = currentBone.Transform[7];
+                            mtx.C1 = currentBone.Transform[8];
+                            mtx.C2 = currentBone.Transform[9];
+                            mtx.C3 = currentBone.Transform[10];
+                            mtx.C4 = currentBone.Transform[11];
+                            mtx.D1 = currentBone.Transform[12];
+                            mtx.D2 = currentBone.Transform[13];
+                            mtx.D3 = currentBone.Transform[14];
+                            mtx.D4 = currentBone.Transform[15];
+                            mtx.Transpose();
+
+                            mtx.A4 *= 100.0f;
+                            mtx.B4 *= 100.0f;
+                            mtx.C4 *= 100.0f;
+
+                            Matrix3x3 mtx3 = new Matrix3x3(mtx);
+
+                            List<VertexWeight> weight = new List<VertexWeight>();
+
+                            VertexWeight vW = new VertexWeight();
+                            vW.VertexID = v;
+
+                            float currentWeight = chunk.jointWeights[v].weights[z];
+
+                            switch (chunk.jointWeights[v].coordFormart)
+                            {
+                                case Pmo.CoordinateFormat.NO_VERTEX:
+                                    break;
+                                case Pmo.CoordinateFormat.NORMALIZED_8_BITS:
+                                    currentWeight *= 127.0f;
+                                    currentWeight /= 128.0f;
+                                    break;
+                                case Pmo.CoordinateFormat.NORMALIZED_16_BITS:
+                                    currentWeight *= 32767.0f;
+                                    currentWeight /= 32768.0f;
+                                    break;
+                                case Pmo.CoordinateFormat.FLOAT_32_BITS:
+                                    break;
+                            }
+
+                            vW.Weight = currentWeight;
+                            weight.Add(vW);
+
+                            Bone tempBone = scene.Meshes[i].Bones.Find(x => x.Name == boneName);
+                            int boneInd = scene.Meshes[i].Bones.FindIndex(0, x => x.Name == boneName);
+
+                            if (tempBone == null)
+                            {
+                                Bone bone = new Bone(boneName, mtx3, weight.ToArray());
+                                scene.Meshes[i].Bones.Add(bone);
+                            }
+                            else
+                            {
+                                scene.Meshes[i].Bones[boneInd].VertexWeights.Add(vW);
+                            }
+                        } 
+                    }
+                }
             }
 
             scene.RootNode.MeshIndices.AddRange(Enumerable.Range(0, scene.MeshCount));
-            
-            
 
             return scene;
         }

@@ -186,6 +186,12 @@ namespace OpenKh.Bbs
             return bit;
         }
 
+        public class WeightData
+        {
+            [Data] public CoordinateFormat coordFormart { get; set; }
+            [Data] public List<float> weights { get; set; }
+        }
+
         public class MeshChunks
         {
             [Data] public bool IsTextureOpaque { get; set; }
@@ -195,7 +201,7 @@ namespace OpenKh.Bbs
             [Data] public MeshSectionOptional2 SectionInfo_opt2 { get; set; }
             [Data] public UInt16[] TriangleStripValues { get; set; }
             [Data] public int TextureID { get; set; }
-            [Data] public List<float> jointWeights { get; set; }
+            [Data] public List<WeightData> jointWeights { get; set; }
             [Data] public List<Vector2> textureCoordinates { get; set; }
             [Data] public List<Vector4> colors { get; set; }
             [Data] public List<Vector3> vertices { get; set; }
@@ -207,7 +213,7 @@ namespace OpenKh.Bbs
                 MeshNumber = 0;
                 TriangleStripValues = new UInt16[0];
                 TextureID = 0;
-                jointWeights = new List<float>();
+                jointWeights = new List<WeightData>();
                 textureCoordinates = new List<Vector2>();
                 colors = new List<Vector4>();
                 vertices = new List<Vector3>();
@@ -339,25 +345,32 @@ namespace OpenKh.Bbs
                     long vertexStartPos = stream.Position;
                     int vertexIncreaseAmount = 0;
 
+                    // Vertex Weights.
                     if(pmo.header.SkeletonOffset != 0 && WeightFormat != CoordinateFormat.NO_VERTEX)
                     {
+                        WeightData WeightList = new WeightData();
+                        WeightList.weights = new List<float>();
+                        WeightList.coordFormart = WeightFormat;
+                        
                         for (int i = 0; i < (SkinningWeightsCount + 1); i++)
                         {
                             switch (WeightFormat)
                             {
                                 case CoordinateFormat.NORMALIZED_8_BITS:
-                                    meshChunk.jointWeights.Add(stream.ReadByte() / 127.0f);
+                                    WeightList.weights.Add(stream.ReadByte() / 127.0f);
                                     break;
                                 case CoordinateFormat.NORMALIZED_16_BITS:
-                                    meshChunk.jointWeights.Add(stream.ReadUInt16() / 32767.0f);
+                                    WeightList.weights.Add(stream.ReadUInt16() / 32767.0f);
                                     break;
                                 case CoordinateFormat.FLOAT_32_BITS:
-                                    meshChunk.jointWeights.Add(stream.ReadFloat());
+                                    WeightList.weights.Add(stream.ReadFloat());
                                     break;
                                 case CoordinateFormat.NO_VERTEX:
                                     break;
                             }
                         }
+
+                        meshChunk.jointWeights.Add(WeightList);
                     }
 
                     Vector2 currentTexCoord = new Vector2(0, 0);
@@ -623,13 +636,13 @@ namespace OpenKh.Bbs
                             switch (flags.WeightFormat)
                             {
                                 case CoordinateFormat.NORMALIZED_8_BITS:
-                                    stream.Write((byte)(chunk.jointWeights[currentIndex] * 127.0f));
+                                    stream.Write((byte)(chunk.jointWeights[k].weights[currentIndex] * 127.0f));
                                     break;
                                 case CoordinateFormat.NORMALIZED_16_BITS:
-                                    stream.Write((byte)(chunk.jointWeights[currentIndex] * 32767.0f));
+                                    stream.Write((byte)(chunk.jointWeights[k].weights[currentIndex] * 32767.0f));
                                     break;
                                 case CoordinateFormat.FLOAT_32_BITS:
-                                    StreamExtensions.Write(stream, chunk.jointWeights[currentIndex]);
+                                    StreamExtensions.Write(stream, chunk.jointWeights[k].weights[currentIndex]);
                                     break;
                             }
                         }
