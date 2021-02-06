@@ -160,8 +160,8 @@ namespace OpenKh.Engine
 
         public Camera()
         {
-            FieldOfView = 1.21876054f;
-            AspectRatio = 512.0f / 288.0f;
+            FieldOfView = 1.5f;
+            AspectRatio = 640f / 480f;
             NearClipPlane = 1;
             FarClipPlane = int.MaxValue;
             CameraUp = new Vector3(0, 1, 0);
@@ -175,8 +175,14 @@ namespace OpenKh.Engine
 
         private void CalculateProjection()
         {
-            _projection = Matrix4x4.CreatePerspectiveFieldOfView(
-                _fov, _aspectRatio, _nearClipPlane, _farClipPlane);
+            const double ReferenceWidth = 640f;
+            const double ReferenceHeight = 480f;
+            
+            var srcz = ReferenceWidth / 2.0 / Math.Tan(_fov / 2.0);
+            var actualAspectRatio = 1.0 / _aspectRatio / (ReferenceHeight / ReferenceWidth);
+            var width = ReferenceWidth / (srcz * actualAspectRatio);
+            var height = ReferenceHeight / srcz;
+            _projection = Matrix4x4.CreatePerspective((float)width, (float)height, 1f, 4000000f);
 
             ValidateProjection();
         }
