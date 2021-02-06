@@ -333,15 +333,15 @@ NOTE: The first character pointer doesn't point to any character. May be some ki
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 0      | int  | Needed EXP for next level
-| 4      | byte | Strength of Character
-| 5      | byte | Magic of Character
-| 6      | byte | Defense of Character
-| 7      | byte | AP of Character
-| 8      | short | Ability given when using Sword route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| A      | short | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| C      | short | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| E      | short | Padding
+| 00     | int  | Needed EXP for next level
+| 04     | byte | Strength of Character
+| 05     | byte | Magic of Character
+| 06     | byte | Defense of Character
+| 07     | byte | AP of Character
+| 08     | ushort | Ability given when using Sword route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0A     | ushort | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0C     | ushort | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0E     | byte[2] | Padding
 
 ## Bons
 
@@ -628,12 +628,12 @@ Data on summons.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0      | ushort | Summon - [Command LIST](../../dictionary/commands.md)
-| 2      | ushort | Item - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 4      | uint | Entity Spawned 1 - [OBJ LIST](../../dictionary/obj.md)
-| 8      | uint | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
-| C      | ushort | Limit - [Command LIST](../../dictionary/commands.md)
-| E      | byte[50] | Padding
+| 0     | ushort | Command - [Command LIST](../../dictionary/commands.md)
+| 2     | ushort | Item - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 4     | uint | Entity Spawned 1 - [OBJ LIST](../../dictionary/obj.md)
+| 8     | uint | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
+| 12     | ushort | Limit Command - [Command LIST](../../dictionary/commands.md)
+| 14     | byte[50] | Padding
 
 ## Magc
 
