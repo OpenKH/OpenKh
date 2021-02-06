@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Battle
@@ -12,7 +10,7 @@ namespace OpenKh.Kh2.Battle
         [Data] public ushort Item { get; set; }
         [Data] public uint Entity1 { get; set; }
         [Data] public uint Entity2 { get; set; }
-        [Data] public ushort Limit { get; set; }
+        [Data] public ushort LimitCommand { get; set; }
         [Data(Count = 50)] public byte[] Padding { get; set; }
 
         public static List<Sumn> Read(Stream stream) => BaseTable<Sumn>.Read(stream);
