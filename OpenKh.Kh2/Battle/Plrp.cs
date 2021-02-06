@@ -11,7 +11,7 @@ namespace OpenKh.Kh2.Battle
         [Data] public byte Hp { get; set; }
         [Data] public byte Mp { get; set; }
         [Data] public byte Ap { get; set; }
-        [Data] public byte Attack { get; set; }
+        [Data] public byte Strength { get; set; }
         [Data] public byte Magic { get; set; }
         [Data] public byte Defense { get; set; }
         [Data] public byte ArmorSlotMax { get; set; }
