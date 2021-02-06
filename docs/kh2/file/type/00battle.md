@@ -338,10 +338,10 @@ NOTE: The first character pointer doesn't point to any character. May be some ki
 | 05     | byte | Magic of Character
 | 06     | byte | Defense of Character
 | 07     | byte | AP of Character
-| 08     | short | Ability given when using Sword route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0A     | short | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0C     | short | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0E     | short | Padding
+| 08     | ushort | Ability given when using Sword route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0A     | ushort | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0C     | ushort | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0E     | byte[2] | Padding
 
 ## Bons
 
@@ -628,11 +628,11 @@ Data on summons.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0     | ushort | Summon - [Command LIST](../../dictionary/commands.md)
+| 0     | ushort | Command - [Command LIST](../../dictionary/commands.md)
 | 2     | ushort | Item - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 4     | uint | Entity Spawned 1 - [OBJ LIST](../../dictionary/obj.md)
 | 8     | uint | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
-| 12     | ushort | Limit - [Command LIST](../../dictionary/commands.md)
+| 12     | ushort | Limit Command - [Command LIST](../../dictionary/commands.md)
 | 14     | byte[50] | Padding
 
 ## Magc
