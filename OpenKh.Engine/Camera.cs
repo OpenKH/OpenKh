@@ -97,6 +97,7 @@ namespace OpenKh.Engine
             {
                 _cameraLookAtX = value;
                 CameraLookAt = CameraPosition + CameraLookAtX;
+                InvalidateWorld();
             }
         }
 

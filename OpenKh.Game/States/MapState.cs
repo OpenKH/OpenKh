@@ -98,18 +98,18 @@ namespace OpenKh.Game.States
                     if (_input.S)
                         _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtX, speed * 5);
                     if (_input.A)
-                        _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtY, speed * 5);
-                    if (_input.D)
                         _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtY, speed * 5);
+                    if (_input.D)
+                        _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtY, speed * 5);
 
                     if (_input.Up)
                         _camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
                     if (_input.Down)
                         _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
                     if (_input.Left)
-                        _camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
-                    if (_input.Right)
                         _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
+                    if (_input.Right)
+                        _camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
                 }
 
                 Field.Update(deltaTimes.DeltaTime);
