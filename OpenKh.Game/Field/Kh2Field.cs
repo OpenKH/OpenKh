@@ -5,7 +5,6 @@ using OpenKh.Engine;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renders;
-using OpenKh.Common;
 using OpenKh.Game.Entities;
 using OpenKh.Game.Events;
 using OpenKh.Game.Infrastructure;
@@ -23,6 +22,7 @@ namespace OpenKh.Game.Field
     {
         private readonly Kernel _kernel;
         private readonly Camera _camera;
+        private readonly TargetCamera _targetCamera;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly KingdomShader _shader;
         private readonly InputManager _inputManager;
@@ -61,6 +61,7 @@ namespace OpenKh.Game.Field
         {
             _kernel = kernel;
             _camera = camera;
+            _targetCamera = new TargetCamera(_camera);
             _graphicsDevice = graphicsDevice;
             _shader = shader;
             _inputManager = inputManager;
@@ -172,10 +173,11 @@ namespace OpenKh.Game.Field
 
         public void Update(double deltaTime)
         {
+            var isPlayingEvent = _eventPlayer != null && _isEventPause == false;
             _isEventPause = _inputManager.RightTrigger;
             _isFreeCam = _inputManager.LeftTrigger;
 
-            if (_eventPlayer != null && _isEventPause == false)
+            if (isPlayingEvent)
             {
                 _eventPlayer.Update(deltaTime);
                 if (_eventPlayer.IsEnd)
@@ -185,8 +187,37 @@ namespace OpenKh.Game.Field
                 }
             }
 
+            IEntity playerEntity = null;
             foreach (var entity in _actors.Where(x => x.IsMeshLoaded && x.IsVisible))
+            {
+                if (!_kernel.DebugMode && entity.IsPlayer)
+                    playerEntity = entity;
+
                 entity.Update((float)deltaTime);
+            }
+
+            if (!isPlayingEvent && !_kernel.DebugMode && playerEntity != null)
+            {
+                const float RadiusSpeed = 480f;
+                const double YSpeed = Math.PI;
+                _targetCamera.Update(playerEntity.Position, deltaTime);
+
+                var radius = 0f;
+                var yRotation = 0f;
+                if (_inputManager.Left)
+                    yRotation -= (float)(YSpeed * deltaTime);
+                if (_inputManager.Right)
+                    yRotation += (float)(YSpeed * deltaTime);
+                if (_inputManager.Up)
+                    radius -= (float)(RadiusSpeed * deltaTime);
+                if (_inputManager.Down)
+                    radius += (float)(RadiusSpeed * deltaTime);
+
+                _targetCamera.Radius = Math.Min(
+                    Math.Max(_targetCamera.Radius + radius, _targetCamera.ObjectiveRadiusMin),
+                    _targetCamera.ObjectiveRadiusMax);
+                _targetCamera.BackYRotation += yRotation;
+            }
 
             if (_isFading)
             {

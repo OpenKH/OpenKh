@@ -36,6 +36,8 @@ namespace OpenKh.Game.Entities
         public string ObjectName => Kernel.ObjEntries
             .FirstOrDefault(x => x.ObjectId == ObjectId)?.ModelName;
 
+        public bool IsPlayer { get; set; }
+
         public bool IsMeshLoaded => Model != null;
 
         public IModelMotion Model { get; private set; }
@@ -66,6 +68,8 @@ namespace OpenKh.Game.Entities
                 Log.Warn("Object ID {0} not found.", ObjectId);
                 return;
             }
+
+            IsPlayer = objEntry.ObjectType == Objentry.Type.PLAYER;
 
             var modelName = $"obj/{objEntry.ModelName}.mdlx";
             using var stream = Kernel.DataContent.FileOpen(modelName);
