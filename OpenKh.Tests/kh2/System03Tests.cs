@@ -7,6 +7,32 @@ namespace OpenKh.Tests.kh2
 {
     public class System03Tests
     {
+        public class ArifTests
+        {
+            [Fact]
+            public void CheckForLength() => File.OpenRead("kh2/res/arif.bin").Using(stream =>
+            {
+                var worlds = Arif.Read(stream);
+                
+                Assert.Equal(19, worlds.Count);
+                Assert.Equal(64, worlds[0].Count);
+                Assert.Equal(2, worlds[1].Count);
+                Assert.Equal(42, worlds[2].Count);
+            });
+
+            [Fact]
+            public void ShouldWriteTheExactSameFile() => File.OpenRead("kh2/res/arif.bin").Using(stream =>
+            {
+                Helpers.AssertStream(stream, x =>
+                {
+                    var outStream = new MemoryStream();
+                    Arif.Write(outStream, Arif.Read(x));
+
+                    return outStream;
+                });
+            });
+        }
+
         public class FtstTests
         {
             [Fact]
