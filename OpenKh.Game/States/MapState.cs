@@ -118,7 +118,8 @@ namespace OpenKh.Game.States
 
         public void Draw(DeltaTimes deltaTimes)
         {
-            _camera.AspectRatio = _graphics.PreferredBackBufferWidth / (float)_graphics.PreferredBackBufferHeight;
+            var viewport = _graphics.GraphicsDevice.Viewport;
+            _camera.AspectRatio = (float)viewport.Width / viewport.Height;
 
             _graphics.GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
 
