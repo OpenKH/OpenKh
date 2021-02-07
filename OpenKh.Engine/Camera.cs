@@ -26,6 +26,8 @@ namespace OpenKh.Engine
             get => _fov;
             set
             {
+                if (_fov == value)
+                    return;
                 _fov = value;
                 InvalidateProjection();
             }
@@ -36,6 +38,8 @@ namespace OpenKh.Engine
             get => _nearClipPlane;
             set
             {
+                if (_nearClipPlane == value)
+                    return;
                 _nearClipPlane = value;
                 InvalidateProjection();
             }
@@ -46,6 +50,8 @@ namespace OpenKh.Engine
             get => _farClipPlane;
             set
             {
+                if (_farClipPlane == value)
+                    return;
                 _farClipPlane = value;
                 InvalidateProjection();
             }
@@ -56,6 +62,8 @@ namespace OpenKh.Engine
             get => _aspectRatio;
             set
             {
+                if (_aspectRatio == value)
+                    return;
                 _aspectRatio = value;
                 InvalidateProjection();
             }

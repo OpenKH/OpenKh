@@ -15,18 +15,68 @@ namespace OpenKh.Engine
 
     public class TargetCamera
     {
+        private class CameraMode
+        {
+            public float Fov { get; set; }
+            public float Radius { get; set; }
+            public float LockRadius { get; set; }
+            public float RadiusMin { get; set; }
+            public float RadiusMax { get; set; }
+            public float ObjectiveUpCurve { get; set; }
+        }
+
+        private static readonly CameraMode CameraOutDoor = new CameraMode
+        {
+            Fov = 1.5f,
+            Radius = 420f,
+            LockRadius = 380f,
+            RadiusMin = 250f,
+            RadiusMax = 500f,
+            ObjectiveUpCurve = 0.008f
+        };
+        private static readonly CameraMode CameraInDoor = new CameraMode
+        {
+            Fov = 1.0471975f,
+            Radius = 600f,
+            LockRadius = 520f,
+            RadiusMin = 400f,
+            RadiusMax = 700f,
+            ObjectiveUpCurve = 0.005f
+        };
+        private static readonly CameraMode CameraCrowd = new CameraMode
+        {
+            Fov = 1.0471975f,
+            Radius = 600f,
+            LockRadius = 520f,
+            RadiusMin = 400f,
+            RadiusMax = 700f,
+            ObjectiveUpCurve = 0.005f
+        };
+        private static readonly CameraMode CameraLightCycle = new CameraMode
+        {
+            Fov = 1.0471975f,
+            Radius = 600f,
+            LockRadius = 520f,
+            RadiusMin = 400f,
+            RadiusMax = 633f,
+            ObjectiveUpCurve = 0.005f
+        };
+        private static readonly CameraMode[] CameraTypes = new CameraMode[]
+        {
+            CameraOutDoor,
+            CameraInDoor,
+            CameraCrowd,
+            CameraLightCycle,
+        };
+
+        private Vector4 m_eyeTarget;
+        private int _type;
+
         public TargetCamera(Camera camera)
         {
             Camera = camera;
-            Fov = 1.5f;
-            Radius = 420f;
-            ObjectiveLockRadius = 380f;
-            ObjectiveRadiusMin = 250f;
-            ObjectiveRadiusMax = 500f;
-            ObjectiveUpCurve = 0.008f;
+            Type = 1;
         }
-
-        private Vector4 m_eyeTarget;
 
         public Camera Camera { get; }
         public Vector4 At { get; set; }
@@ -59,6 +109,26 @@ namespace OpenKh.Engine
         public float DefaultFov { get; set; }
         public float DefaultRoll { get; set; }
 
+        public int Type
+        {
+            get => _type;
+            set
+            {
+                Log.Info("{0}.{1}={2}", nameof(TargetCamera), nameof(Type), value);
+                if (value < 0 || value >= CameraTypes.Length)
+                    Log.Err("{0}.{1}={2} not valid", nameof(TargetCamera), nameof(Type), value);
+
+                _type = value;
+                var cameraMode = CameraTypes[value];
+                Fov = DefaultFov = cameraMode.Fov;
+                Radius = ObjectiveInitRadius = cameraMode.Radius;
+                ObjectiveLockRadius = cameraMode.LockRadius;
+                ObjectiveRadiusMin = cameraMode.RadiusMin;
+                ObjectiveRadiusMax = cameraMode.RadiusMax;
+                ObjectiveUpCurve = cameraMode.ObjectiveUpCurve;
+            }
+        }
+
         public void Update(Vector3 target, double deltaTime)
         {
             const bool Interpolate = false;
@@ -70,6 +140,7 @@ namespace OpenKh.Engine
                 1f);
 
             CalculateEyeTarget(AtTarget, Interpolate, deltaTime);
+            Camera.FieldOfView = Fov;
             Camera.CameraPosition = EyeTarget.ToVector3().Invert();
             Camera.CameraLookAt = AtTarget.ToVector3().Invert();
 

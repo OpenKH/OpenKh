@@ -91,6 +91,7 @@ namespace OpenKh.Game.Infrastructure
         }
 
         // System
+        public List<List<Arif>> AreaInfo { get; private set; }
         public List<Ftst.Entry> Ftst { get; private set; }
         public Item Item { get; private set; }
         public Memt MemberTable { get; private set; }
@@ -202,6 +203,7 @@ namespace OpenKh.Game.Infrastructure
         {
             var bar = DataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
+            AreaInfo = bar.ForEntry("arif", Bar.EntryType.List, Kh2.SystemData.Arif.Read);
             Ftst = bar.ForEntry("ftst", Bar.EntryType.List, Kh2.SystemData.Ftst.Read);
             Item = bar.ForEntry("item", Bar.EntryType.List, Kh2.SystemData.Item.Read);
             MemberTable = bar.ForEntry("memt", Bar.EntryType.List, Kh2.SystemData.Memt.Read);

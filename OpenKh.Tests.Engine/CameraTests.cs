@@ -59,6 +59,7 @@ namespace OpenKh.Tests.Engine
             var camera = new Camera();
             var targetCamera = new TargetCamera(camera)
             {
+                Type = 0,
                 Radius = radius,
                 YRotation = yRotation,
                 BackYRotation = yRotation
@@ -77,6 +78,7 @@ namespace OpenKh.Tests.Engine
             var camera = new Camera();
             var targetCamera = new TargetCamera(camera)
             {
+                Type = 0,
                 Radius = 420f,
                 YRotation = 0f,
                 BackYRotation = 0f

@@ -125,6 +125,26 @@ namespace OpenKh.Game.Field
             // TODO load summons
             // TODO load mission
             // TODO dispatch entity loading here, not in LoadAreaData
+
+            if (world >= 0 && world < _kernel.AreaInfo.Count)
+            {
+                var worldInfos = _kernel.AreaInfo[world];
+                if (area >= 0 && area < worldInfos.Count)
+                {
+                    var areaInfo = worldInfos[area];
+                    var isKnown = (areaInfo.Flags & 1) != 0;
+                    var isInDoor = (areaInfo.Flags & 2) != 0;
+                    var isMonochrome = (areaInfo.Flags & 4) != 0;
+                    var hasNoShadow = (areaInfo.Flags & 8) != 0;
+                    var hasGlow = (areaInfo.Flags & 16) != 0;
+
+                    _targetCamera.Type = isInDoor ? 1 : 0;
+                }
+                else
+                    Log.Err("Area {0} can not be found in AreaInfo for world {1}", area, world);
+            }
+            else
+                Log.Err("World {0} can not be found in AreaInfo", world);
         }
 
         private void LoadAreaData(int world, int area)
