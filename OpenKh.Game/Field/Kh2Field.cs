@@ -220,7 +220,7 @@ namespace OpenKh.Game.Field
             {
                 const float RadiusSpeed = 480f;
                 const double YSpeed = Math.PI;
-                _targetCamera.Update(playerEntity.Position, deltaTime);
+                _targetCamera.Update(playerEntity, deltaTime);
 
                 var radius = 0f;
                 var yRotation = 0f;

@@ -1,3 +1,4 @@
+using NSubstitute;
 using OpenKh.Engine;
 using System;
 using System.Numerics;
@@ -54,7 +55,8 @@ namespace OpenKh.Tests.Engine
             float radius, float yRotation,
             float expectedX, float expectedY, float expectedZ)
         {
-            var targetPosition = new Vector3(0f, 0f, -500f);
+            var entity = Substitute.For<IEntity>();
+            entity.Position.ReturnsForAnyArgs(new Vector3(0f, 0f, -500f));
 
             var camera = new Camera();
             var targetCamera = new TargetCamera(camera)
@@ -62,9 +64,10 @@ namespace OpenKh.Tests.Engine
                 Type = 0,
                 Radius = radius,
                 YRotation = yRotation,
-                BackYRotation = yRotation
+                BackYRotation = yRotation,
+                Interpolate = false,
             };
-            targetCamera.Update(targetPosition, 0);
+            targetCamera.Update(entity, 0);
 
             var expected = new Vector3(expectedX, expectedY, expectedZ);
             AssertVector3(expected, camera.CameraPosition);
@@ -73,7 +76,8 @@ namespace OpenKh.Tests.Engine
         [Fact]
         public void TargetCameraSetCorrectValuesToCamera()
         {
-            var targetPosition = new Vector3(0f, 150f, 0f);
+            var entity = Substitute.For<IEntity>();
+            entity.Position.ReturnsForAnyArgs(new Vector3(0f, 150f, 0f));
 
             var camera = new Camera();
             var targetCamera = new TargetCamera(camera)
@@ -81,14 +85,108 @@ namespace OpenKh.Tests.Engine
                 Type = 0,
                 Radius = 420f,
                 YRotation = 0f,
-                BackYRotation = 0f
+                BackYRotation = 0f,
+                Interpolate = false,
             };
-            targetCamera.Update(targetPosition, 0);
+            targetCamera.Update(entity, 0);
 
             var expectedPosition = new Vector3(0f, 401.2f, -420);
             var expectedLookAt = new Vector3(0f, 320f, 0f);
             AssertVector3(expectedPosition, camera.CameraPosition);
             AssertVector3(expectedLookAt, camera.CameraLookAt);
+        }
+
+        [Theory]
+        [InlineData(Math.PI, Math.PI)]
+        [InlineData(0, 0)]
+        [InlineData(-Math.PI, Math.PI)]
+        [InlineData(1, -1)]
+        [InlineData(4, 2.2831852436065674f)]
+        public void TargetCameraRotatesInstantlyOnEntity(
+            float entityRotation, float expected)
+        {
+            var entity = Substitute.For<IEntity>();
+            entity.Rotation.ReturnsForAnyArgs(new Vector3(0f, entityRotation, 0f));
+
+            var camera = new Camera();
+            var targetCamera = new TargetCamera(camera)
+            {
+                Type = 0,
+                Radius = 420f,
+                YRotation = 0f,
+                BackYRotation = 0f,
+                Interpolate = false
+            };
+            targetCamera.InstantlyRotateCameraToEntity(entity);
+            targetCamera.Update(entity, 0);
+
+            Assert.Equal(expected, targetCamera.YRotation, 4);
+        }
+
+        [Theory]
+        [InlineData(100f, 200f, 100f, 0)]
+        [InlineData(100f, 200f, 124.7499924f, 1)]
+        [InlineData(100f, 200f, 143.3124847f, 2)]
+        [InlineData(100f, 200f, 157.2343445f, 3)]
+        [InlineData(100f, 200f, 167.6757507f, 4)]
+        [InlineData(100f, 200f, 175.5068054f, 5)]
+        [InlineData(100f, 200f, 181.3800964f, 6)]
+        [InlineData(100f, 200f, 185.7850647f, 7)]
+        [InlineData(100f, 200f, 189.0887909f, 8)]
+        [InlineData(100f, 200f, 191.5665894f, 9)]
+        [InlineData(100f, 200f, 193.4249268f, 10)]
+        [InlineData(100f, 200f, 194.8186798f, 11)]
+        [InlineData(100f, 200f, 195.8639984f, 12)]
+        [InlineData(100f, 200f, 196.6479950f, 13)]
+        public void TargetCameraInterpolatesCorrectly(
+            float src, float dst, float expected, int frameIndex)
+        {
+            var entity = Substitute.For<IEntity>();
+            entity.Position.ReturnsForAnyArgs(new Vector3(dst, -170f, -500f));
+
+            var camera = new Camera();
+            var targetCamera = new TargetCamera(camera)
+            {
+                Type = 0,
+                Radius = 420f,
+                YRotation = 0f,
+                BackYRotation = 0f,
+                At = new Vector4(src, 0f, 500f, 1f),
+                AtTargetPrev = new Vector4(dst, 0f, 500f, 1f),
+            };
+
+            const double DeltaTime = 1.0 / 30.0;
+            while (frameIndex-- > 0)
+                targetCamera.Update(entity, DeltaTime);
+
+            Assert.Equal(expected, targetCamera.At.X, 3);
+        }
+
+        [Fact]
+        public void TargetCameraInterpolatesCorrectlyEdgeCase()
+        {
+            var entity = Substitute.For<IEntity>();
+            entity.Position.ReturnsForAnyArgs(new Vector3(200, 300f, -400f));
+
+            var camera = new Camera();
+            var targetCamera = new TargetCamera(camera)
+            {
+                Type = 0,
+                Radius = 420f,
+                YRotation = 0f,
+                BackYRotation = 0f,
+                At = new Vector4(100f, 300f, 500f, 1f),
+                AtTarget = new Vector4(200f, -470f, 500f, 1f),
+                AtTargetPrev = new Vector4(98f, -468f, 502f, 1f),
+            };
+
+            const int FrameCount = 10;
+            const double DeltaTime = 1.0 / 30.0;
+            for (var frame = 0; frame < FrameCount; frame++)
+                targetCamera.Update(entity, DeltaTime);
+
+            var expected = new Vector4(194.24677f, -425.70007f, 405.75323f, 1);
+            Assert.Equal(expected, targetCamera.At);
         }
 
         private void AssertVector3(Vector3 expected, Vector3 actual)

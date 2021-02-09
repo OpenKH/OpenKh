@@ -75,10 +75,12 @@ namespace OpenKh.Engine
         public TargetCamera(Camera camera)
         {
             Camera = camera;
-            Type = 1;
+            Type = 0;
+            Interpolate = true;
         }
 
         public Camera Camera { get; }
+        public bool Interpolate { get; set; }
         public Vector4 At { get; set; }
         public Vector4 Eye { get; set; }
         public Vector4 FovV { get; set; }
@@ -129,29 +131,45 @@ namespace OpenKh.Engine
             }
         }
 
-        public void Update(Vector3 target, double deltaTime)
+        public void Update(IEntity objTarget, double deltaTime)
         {
-            const bool Interpolate = false;
-
+            var targetPosition = objTarget.Position;
             AtTarget = new Vector4(
-                target.X,
-                -target.Y - 170f,
-                -target.Z,
+                targetPosition.X,
+                -targetPosition.Y - 170f,
+                -targetPosition.Z,
                 1f);
 
-            CalculateEyeTarget(AtTarget, Interpolate, deltaTime);
-            Camera.FieldOfView = Fov;
-            Camera.CameraPosition = EyeTarget.ToVector3().Invert();
-            Camera.CameraLookAt = AtTarget.ToVector3().Invert();
+            CalculateEyeTarget(AtTarget, false, deltaTime);
+            FovVTarget = new Vector4(Fov, WarpRadians(Roll), 0f, 1f);
 
             if (Interpolate)
             {
-                Eye = EyeTargetPrev = EyeTarget;
-                At = AtTargetPrev = AtTarget;
-                FovV = FovVTargetPrev = FovVTarget =
-                    new Vector4(Fov, WarpRadians(Roll), 0f, 1f);
+                At = InterpolateVector(At, AtTarget, AtTargetPrev, 30.0 * deltaTime * 0.1f, 2.5f, 0.5f, 1.0f);
+                Eye = InterpolateVector(Eye, EyeTarget, EyeTargetPrev, 30.0 * deltaTime * 0.07f, 2.5f, 0.5f, 1.0f);
+                FovV = InterpolateVector(FovV, FovVTarget, FovVTargetPrev, 30.0 * deltaTime * 0.07f, 2.5f, 0.5f, 0.001f);
             }
+            else
+            {
+                Eye = EyeTarget;
+                At = AtTarget;
+                FovV = FovVTarget;
+            }
+
+            EyeTargetPrev = EyeTarget;
+            AtTargetPrev = AtTarget;
+            FovVTargetPrev = FovVTarget;
+
+            Camera.FieldOfView = Fov;
+            Camera.CameraPosition = Eye.ToVector3().Invert();
+            Camera.CameraLookAt = At.ToVector3().Invert();
         }
+
+        public void InstantlyRotateCameraToEntity(IEntity objTarget) =>
+            YRotation = BackYRotation = GetYRotation(objTarget);
+
+        private float GetYRotation(IEntity objTarget) =>
+            WarpRadians((float)(Math.PI * 2 - objTarget.Rotation.Y));
 
         private void CalculateEyeTarget(Vector4 atTarget, bool interpolate, double deltaTime)
         {
@@ -166,6 +184,24 @@ namespace OpenKh.Engine
             EyeTarget = atTarget + Vector4.Transform(
                 new Vector4(0, 0, Radius, 0), Matrix4x4.CreateRotationY(YRotation));
             m_eyeTarget.Y = -((radiusDiff * radiusDiff * ObjectiveUpCurve) - (atTarget.Y + 150.0f));
+        }
+
+        private Vector4 InterpolateVector(
+            Vector4 dst, Vector4 src, Vector4 srcPrev,
+            double deltaTime,
+            float springConst,
+            float dampConst,
+            float springLen)
+        {
+            var vDiff = dst - src;
+            var vectorLength = vDiff.Length();
+            if (vectorLength == 0)
+                return dst;
+
+            var v0 = vDiff * Vector4.Multiply(srcPrev - src, (float)deltaTime);
+            var f0 = v0.X + v0.Y + v0.Z;
+            var f2 = (springConst * (springLen - vectorLength)) + dampConst * f0 / vectorLength;
+            return dst + Vector4.Multiply(vDiff, (float)(1f / vectorLength * f2 * deltaTime));
         }
 
         private float InterpolateYRotation(float src, float dst, double speed)
