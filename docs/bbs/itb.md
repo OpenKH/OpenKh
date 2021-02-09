@@ -5,7 +5,7 @@ ITB stands for *Item Treasure Box* and it contains the list of items obtained in
 ## Header
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | char[4]   | File identifier, always `ITC`. Null terminated.
+| 0x0     | char[4]   | File identifier, always `ITB`. Null terminated.
 | 0x4     | uint16   | Version, `1`
 | 0x6     | uint16   | Padding
 | 0x8     | uint16   | Count of total items

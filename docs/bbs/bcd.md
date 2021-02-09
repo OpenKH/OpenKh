@@ -7,9 +7,9 @@ Found inside map `.arc`s the details of much of the file format remain unkown, h
 | Offset | Type | Description |
 |--------|------|-------------|
 | 0x0 | uint32 | Magic value. Always `"@BCD"`
-| 0x4 | uint32 | Unknown, assumed to be version number
-| 0x8 | uint32 | Unknown, seems to always be `0x1`
-| 0xC | uint32 | Unknown, seems to always be `0x10`
+| 0x4 | uint32 | Version number.
+| 0x8 | uint32 | Collision Data Count
+| 0xC | uint32 | Pointer to Collision Data
 | 0x10 | uint32[9] | A whole bunch of unknowns
 | 0x34 | uint16 | Vertex count
 | 0x36 | uint16 | Face count
