@@ -80,8 +80,8 @@ namespace OpenKh.Game.Entities
             var texture = entries.ForEntry("tim_", Bar.EntryType.ModelTexture, ModelTexture.Read);
             Textures = texture.LoadTextures(graphics).ToArray();
 
-            ObjectCollisions = entries.ForEntry(x => x.Type == Bar.EntryType.ModelCollision, ObjectCollision.Read) ??
-                new List<ObjectCollision>();
+            ObjectCollisions = entries.ForEntry(x => x.Type == Bar.EntryType.ModelCollision && x.Stream.Length > 0,
+                ObjectCollision.Read) ?? new List<ObjectCollision>();
 
             try
             {
