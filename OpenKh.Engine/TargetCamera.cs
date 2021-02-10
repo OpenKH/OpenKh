@@ -70,6 +70,7 @@ namespace OpenKh.Engine
         };
 
         private Vector4 m_eyeTarget;
+        private Vector3 _targetPositionPrev;
         private int _type;
 
         public TargetCamera(Camera camera)
@@ -134,11 +135,33 @@ namespace OpenKh.Engine
         public void Update(IEntity objTarget, double deltaTime)
         {
             var targetPosition = objTarget.Position;
+
             AtTarget = new Vector4(
                 targetPosition.X,
                 -targetPosition.Y - 170f,
                 -targetPosition.Z,
                 1f);
+
+            // This is not really the right way to know if the focused entity is actually moving
+            var isEntityMoving = targetPosition.X != _targetPositionPrev.X ||
+                targetPosition.Z != _targetPositionPrev.Z;
+            _targetPositionPrev = targetPosition;
+            if (isEntityMoving)
+            {
+                const double Speed = Math.PI / 720.0;
+                const double PlayerSpeedMul = Speed / 25.0;
+                const float analogX = 0f;
+                const float analogY = 0f;
+                const float analogW = 1f;
+                const float playerSpeed = 8f; // ???
+                float objYRotation = GetYRotation(objTarget);
+                var deltaFrame = deltaTime * 60.0;
+
+                var speed = (Math.Abs(analogX) + 1.0) * (Math.Abs(analogY) + 1.0) * analogW * 2.0 *
+                    ((PlayerSpeedMul * (playerSpeed - 8.0)) + Speed) * deltaFrame;
+                var rotation = InterpolateYRotation(YRotation, objYRotation, speed); 
+                YRotation = BackYRotation = rotation;
+            }
 
             CalculateEyeTarget(AtTarget, false, deltaTime);
             FovVTarget = new Vector4(Fov, WarpRadians(Roll), 0f, 1f);
