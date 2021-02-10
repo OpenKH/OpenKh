@@ -1,6 +1,6 @@
 # AAC Format
 
-AAC stands for *? ? Collision*.
+AAC probably stands for *Axis Alligned Collision*.
 
 
 ## Header

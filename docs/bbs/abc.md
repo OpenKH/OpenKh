@@ -1,6 +1,6 @@
 # ABC Format
 
-ABC stands for *? ? Collision*.
+ABC probably stands for *Alligned Box Collision*.
 
 
 ## Header
