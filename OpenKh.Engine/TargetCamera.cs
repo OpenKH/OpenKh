@@ -134,7 +134,7 @@ namespace OpenKh.Engine
             }
         }
 
-        public void Update(IEntity objTarget, double deltaTime)
+        public void Update(IEntity objTarget, double deltaTime, bool isYRotationLocked = false)
         {
             var targetPosition = objTarget.Position;
 
@@ -148,7 +148,7 @@ namespace OpenKh.Engine
             var isEntityMoving = targetPosition.X != _targetPositionPrev.X ||
                 targetPosition.Z != _targetPositionPrev.Z;
             _targetPositionPrev = targetPosition;
-            if (isEntityMoving)
+            if (isEntityMoving && !isYRotationLocked)
             {
                 AdjustHorizontalRotation(objTarget, deltaTime);
                 AdjustVerticalDefaultRotation(deltaTime);
@@ -221,7 +221,7 @@ namespace OpenKh.Engine
             float objYRotation = GetYRotation(objTarget);
             var deltaFrame = deltaTime * 60.0;
 
-            var speed = (Math.Abs(analogX) + 1.0) * (Math.Abs(analogY) + 1.0) * analogW * 2.0 *
+            var speed = (Math.Abs(analogX) + 1.0) * (Math.Abs(analogY) + 1.0) * analogW * 4.0 *
                 ((PlayerSpeedMul * (playerSpeed - 8.0)) + Speed) * deltaFrame;
             var rotation = InterpolateYRotation(YRotation, objYRotation, speed);
             YRotation = BackYRotation = rotation;

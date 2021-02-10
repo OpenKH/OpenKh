@@ -223,23 +223,27 @@ namespace OpenKh.Game.Field
             {
                 const float RadiusSpeed = 480f;
                 const double YSpeed = Math.PI;
-                _targetCamera.Update(playerEntity, deltaTime);
 
+                var analogY = 0f;
                 var radius = 0f;
                 var yRotation = 0f;
                 if (_inputManager.Left)
-                    yRotation -= (float)(YSpeed * deltaTime);
+                    analogY = +1f;
                 if (_inputManager.Right)
-                    yRotation += (float)(YSpeed * deltaTime);
+                    analogY = -1f;
                 if (_inputManager.Up)
                     radius -= (float)(RadiusSpeed * deltaTime);
                 if (_inputManager.Down)
                     radius += (float)(RadiusSpeed * deltaTime);
 
+                yRotation -= (float)(YSpeed * analogY * deltaTime);
+
                 _targetCamera.Radius = Math.Min(
                     Math.Max(_targetCamera.Radius + radius, _targetCamera.ObjectiveRadiusMin),
                     _targetCamera.ObjectiveRadiusMax);
                 _targetCamera.BackYRotation += yRotation;
+
+                _targetCamera.Update(playerEntity, deltaTime, Math.Abs(analogY) >= 0.9f);
             }
 
             if (_isFading)
