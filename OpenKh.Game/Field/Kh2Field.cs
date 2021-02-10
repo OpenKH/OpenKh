@@ -211,7 +211,10 @@ namespace OpenKh.Game.Field
             foreach (var entity in _actors.Where(x => x.IsMeshLoaded && x.IsVisible))
             {
                 if (!_kernel.DebugMode && entity.IsPlayer)
+                {
                     playerEntity = entity;
+                    PlayerManager.ProcessPlayer(_inputManager, entity, _targetCamera.YRotation, deltaTime);
+                }
 
                 entity.Update((float)deltaTime);
             }
