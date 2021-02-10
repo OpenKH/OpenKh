@@ -25,6 +25,8 @@ namespace OpenKh.Engine
             public float ObjectiveUpCurve { get; set; }
         }
 
+        private const float FovDefault = 1.5f;
+        private const float FovClose = (float)(Math.PI / (FovDefault * 2f));
         private static readonly CameraMode CameraOutDoor = new CameraMode
         {
             Fov = 1.5f,
@@ -36,7 +38,7 @@ namespace OpenKh.Engine
         };
         private static readonly CameraMode CameraInDoor = new CameraMode
         {
-            Fov = 1.0471975f,
+            Fov = FovClose,
             Radius = 600f,
             LockRadius = 520f,
             RadiusMin = 400f,
@@ -45,7 +47,7 @@ namespace OpenKh.Engine
         };
         private static readonly CameraMode CameraCrowd = new CameraMode
         {
-            Fov = 1.0471975f,
+            Fov = FovClose,
             Radius = 600f,
             LockRadius = 520f,
             RadiusMin = 400f,
@@ -54,7 +56,7 @@ namespace OpenKh.Engine
         };
         private static readonly CameraMode CameraLightCycle = new CameraMode
         {
-            Fov = 1.0471975f,
+            Fov = FovClose,
             Radius = 600f,
             LockRadius = 520f,
             RadiusMin = 400f,
@@ -148,19 +150,8 @@ namespace OpenKh.Engine
             _targetPositionPrev = targetPosition;
             if (isEntityMoving)
             {
-                const double Speed = Math.PI / 720.0;
-                const double PlayerSpeedMul = Speed / 25.0;
-                const float analogX = 0f;
-                const float analogY = 0f;
-                const float analogW = 1f;
-                const float playerSpeed = 8f; // ???
-                float objYRotation = GetYRotation(objTarget);
-                var deltaFrame = deltaTime * 60.0;
-
-                var speed = (Math.Abs(analogX) + 1.0) * (Math.Abs(analogY) + 1.0) * analogW * 2.0 *
-                    ((PlayerSpeedMul * (playerSpeed - 8.0)) + Speed) * deltaFrame;
-                var rotation = InterpolateYRotation(YRotation, objYRotation, speed); 
-                YRotation = BackYRotation = rotation;
+                AdjustHorizontalRotation(objTarget, deltaTime);
+                AdjustVerticalDefaultRotation(deltaTime);
             }
 
             CalculateEyeTarget(AtTarget, false, deltaTime);
@@ -193,6 +184,48 @@ namespace OpenKh.Engine
 
         private float GetYRotation(IEntity objTarget) =>
             WarpRadians((float)(Math.PI * 2 - objTarget.Rotation.Y));
+
+        private void AdjustVerticalDefaultRotation(double deltaTime) =>
+            AdjustVerticalRotation(ObjectiveInitRadius, deltaTime / 2.0);
+
+        private void AdjustVerticalLockonRotation(double deltaTime) =>
+            AdjustVerticalRotation(ObjectiveLockRadius, deltaTime);
+
+        private void AdjustVerticalRotation(float objectiveRadius, double deltaTime)
+        {
+            if (Math.Abs(Radius - objectiveRadius) >= 1.0)
+            {
+                if (Radius > objectiveRadius)
+                {
+                    Radius = (float)(Radius - deltaTime * 60);
+                    if (Radius <= ObjectiveRadiusMin)
+                        Radius = ObjectiveRadiusMin;
+                }
+                else
+                {
+                    Radius = (float)(Radius + deltaTime * 60);
+                    if (Radius >= ObjectiveRadiusMax)
+                        Radius = ObjectiveRadiusMax;
+                }
+            }
+        }
+
+        private void AdjustHorizontalRotation(IEntity objTarget, double deltaTime)
+        {
+            const double Speed = Math.PI / 720.0;
+            const double PlayerSpeedMul = Speed / 25.0;
+            const float analogX = 0f;
+            const float analogY = 0f;
+            const float analogW = 1f;
+            const float playerSpeed = 8f; // ???
+            float objYRotation = GetYRotation(objTarget);
+            var deltaFrame = deltaTime * 60.0;
+
+            var speed = (Math.Abs(analogX) + 1.0) * (Math.Abs(analogY) + 1.0) * analogW * 2.0 *
+                ((PlayerSpeedMul * (playerSpeed - 8.0)) + Speed) * deltaFrame;
+            var rotation = InterpolateYRotation(YRotation, objYRotation, speed);
+            YRotation = BackYRotation = rotation;
+        }
 
         private void CalculateEyeTarget(Vector4 atTarget, bool interpolate, double deltaTime)
         {
