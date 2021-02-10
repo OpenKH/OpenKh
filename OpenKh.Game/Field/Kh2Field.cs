@@ -360,8 +360,8 @@ namespace OpenKh.Game.Field
             if (_isFreeCam == true)
                 return;
 
-            _camera.CameraPosition = new n.Vector3(position.X, position.Y, position.Z);
-            _camera.CameraLookAt = new n.Vector3(lookAt.X, lookAt.Y, lookAt.Z);
+            _camera.CameraPosition = new n.Vector3(-position.X, position.Y, position.Z);
+            _camera.CameraLookAt = new n.Vector3(-lookAt.X, lookAt.Y, lookAt.Z);
             _camera.FieldOfView = (float)(fieldOfView * Math.PI / 180);
         }
 
