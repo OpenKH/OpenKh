@@ -5,10 +5,9 @@ namespace OpenKh.Engine
 {
     public class Camera
     {
+        private bool _isEventMode;
         private float _fov;
         private float _aspectRatio;
-        private float _nearClipPlane;
-        private float _farClipPlane;
         private Vector3 _cameraPosition;
         private Vector3 _cameraLookAt;
         private Vector3 _cameraLookAtX;
@@ -21,6 +20,19 @@ namespace OpenKh.Engine
         private bool _isWorldInvalidated;
         private Vector3 _cameraYpr;
 
+        public bool IsEventMode
+        {
+            get => _isEventMode;
+            set
+            {
+                if (_isEventMode == value)
+                    return;
+
+                _isEventMode = value;
+                InvalidateProjection();
+            }
+        }
+
         public float FieldOfView
         {
             get => _fov;
@@ -29,30 +41,6 @@ namespace OpenKh.Engine
                 if (_fov == value)
                     return;
                 _fov = value;
-                InvalidateProjection();
-            }
-        }
-
-        public float NearClipPlane
-        {
-            get => _nearClipPlane;
-            set
-            {
-                if (_nearClipPlane == value)
-                    return;
-                _nearClipPlane = value;
-                InvalidateProjection();
-            }
-        }
-
-        public float FarClipPlane
-        {
-            get => _farClipPlane;
-            set
-            {
-                if (_farClipPlane == value)
-                    return;
-                _farClipPlane = value;
                 InvalidateProjection();
             }
         }
@@ -171,8 +159,6 @@ namespace OpenKh.Engine
         {
             FieldOfView = 1.5f;
             AspectRatio = 640f / 480f;
-            NearClipPlane = 1;
-            FarClipPlane = int.MaxValue;
             CameraUp = new Vector3(0, 1, 0);
             CameraRotationYawPitchRoll = new Vector3(-90, 0, 10);
         }
@@ -184,14 +170,22 @@ namespace OpenKh.Engine
 
         private void CalculateProjection()
         {
-            const double ReferenceWidth = 640f;
-            const double ReferenceHeight = 480f;
-            
-            var srcz = ReferenceWidth / 2.0 / Math.Tan(_fov / 2.0);
-            var actualAspectRatio = 1.0 / _aspectRatio / (ReferenceHeight / ReferenceWidth);
-            var width = ReferenceWidth / (srcz * actualAspectRatio);
-            var height = ReferenceHeight / srcz;
-            _projection = Matrix4x4.CreatePerspective((float)width, (float)height, 1f, 4000000f);
+            const float NearClipPlane = 1f;
+            const float FarClipPlane = 4000000f;
+
+            if (!_isEventMode)
+            {
+                const double ReferenceWidth = 640f;
+                const double ReferenceHeight = 480f;
+
+                var srcz = ReferenceWidth / 2.0 / Math.Tan(_fov / 2.0);
+                var actualAspectRatio = 1.0 / _aspectRatio / (ReferenceHeight / ReferenceWidth);
+                var width = ReferenceWidth / (srcz * actualAspectRatio);
+                var height = ReferenceHeight / srcz;
+                _projection = Matrix4x4.CreatePerspective((float)width, (float)height, NearClipPlane, FarClipPlane);
+            }
+            else
+                _projection = Matrix4x4.CreatePerspectiveFieldOfView(_fov, _aspectRatio, NearClipPlane, FarClipPlane);
 
             ValidateProjection();
         }

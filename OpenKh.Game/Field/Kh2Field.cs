@@ -194,6 +194,7 @@ namespace OpenKh.Game.Field
         public void Update(double deltaTime)
         {
             var isPlayingEvent = _eventPlayer != null && _isEventPause == false;
+            _camera.IsEventMode = isPlayingEvent;
             _isEventPause = _inputManager.RightTrigger;
             _isFreeCam = _inputManager.LeftTrigger;
 
