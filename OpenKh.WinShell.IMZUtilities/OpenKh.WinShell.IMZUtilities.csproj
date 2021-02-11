@@ -2,7 +2,7 @@
 
   <PropertyGroup>
       <TargetFramework>net472</TargetFramework>
-      <OutputPath>..\OpenKh.WinShell.Output\</OutputPath>
+      <OutputPath>..\bin\WinShell\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
