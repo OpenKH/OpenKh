@@ -12,6 +12,8 @@ Honestly, there really isn't much to say. The OpenKH Image Viewer is capable of 
 
 Currently the program only supports exporting the image, but import functions are well on the way. At the bottom of the program you will notice several details. You can set the scale factor so the image fits the size of the window or select static percentages based on the actual image proportions, and in the case of IMZ (stacked IMD files effectively zipped into one handy file, complete with a cute little bow) you can even select sub-images within to view. Additionally, there are other minor details such as the specific image dimensions and the color palette.
 
-That about wraps up this document for now.
-
 <img src="./viewer.png">
+
+## View and convert from Windows Explorer
+
+It is possible to preview images without opening them via Image Viewer straight from Windows. To achieve that, please follow the [WinShell set-up guide](../winshell/index.md).

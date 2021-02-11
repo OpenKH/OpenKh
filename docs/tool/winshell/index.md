@@ -4,10 +4,11 @@ In order to allow many quality of life improvements to aid in modding Kingdom He
 These WinShell extensions negate the need to navigate through a tool for the most basic operations you can do with Kingdom Hearts files.
 
 Currently, the extensions you see below are the extensions we have within the project:
+
 - OpenKh.WinShell.IMDUtilities -> Provides thumbnail generation for IMD files and quick conversion of them to PNG.
 - OpenKh.WinShell.IMZUtilities -> Provides ease of extraction and repack for IMZ files.
 
-# Installation
+## Installation
 
 All OpenKh.WinShell libraries are powered by SharpShell. So their installation is not standard, but is easy to do none-the-less. 
 To install these extensions, download the SharpShell ServerManager from [this link](https://github.com/dwmkerr/sharpshell/releases).
@@ -16,7 +17,7 @@ Afterwards, open the ServerManager (you need Administrator Privileges for this).
 
 ![ServerManager Main Screen](https://i.imgur.com/VpByIAO.png)
 
-Click on "**File -> Load Server...**", and click on the WinShell extensions you want to load (In our case, "**OpenKh.WinShell.IMDUtilities.dll**")
+Click on "**File -> Load Server...**", and click on the WinShell extensions you want to load (In our case, **OpenKh.WinShell.IMDUtilities.dll** found in `bin/WinShell`)
 
 Afterwards, you should see a screen like this:
 
