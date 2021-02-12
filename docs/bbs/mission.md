@@ -1,12 +1,31 @@
 # Mission Format
 
-Mission files control the state of mission events.
+Mission files control the flow of mission events.
+
+### File List
+Here's the full list of files that use this format.
+
+| Arc File | Internal File  | Description
+|--------|-------|------------
+| common_cd.arc | cdMis.bin | 
+| common_dc.arc | dcMis.bin | 
+| common_di.arc | diMis.bin | 
+| common_dp.arc | dpMis.bin | 
+| common_he.arc | heMis.bin | 
+| common_jb.arc | jbMis.bin | 
+| common_kg.arc | kgMis.bin | 
+| common_ls.arc | lsMis.bin | 
+| common_pp.arc | ppMis.bin | 
+| common_rg.arc | rgMis.bin | 
+| common_sb.arc | sbMis.bin | 
+| common_sw.arc | swMis.bin | 
+| common_vs.arc | vsMis.bin | 
 
 ## Header
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | char[4]   | File identifier, always `MSS`. Null terminated.
-| 0x4     | uint16  | Version
+| 0x0     | char[4]   | File identifier, always `MIS`. Null terminated.
+| 0x4     | uint16  | Version. Always `3`.
 | 0x6     | uint16  | Data Count
 
 ## Mission Data
