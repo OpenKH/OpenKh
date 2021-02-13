@@ -2,7 +2,7 @@
 
 BIC stands for *BGM Ice Collection* and it contains the list of songs used in the Ice Cream minigame in Disney Town.
 
-This file doesn't have the extension `.bic`, but rather just `.bin`
+This file is a `.bic`, but contained in a `.bin`
 
 
 ## Header
