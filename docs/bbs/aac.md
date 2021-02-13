@@ -1,7 +1,8 @@
 # AAC Format
 
-AAC probably stands for *Axis Alligned Collision*.
+AAC stands for *Attach Attack Collision*.
 
+Responsible for collisions attached to a character's weapon or anything else that needs to perform a collision check.
 
 ## Header
 | Offset | Type  | Description

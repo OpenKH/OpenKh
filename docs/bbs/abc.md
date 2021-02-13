@@ -1,7 +1,8 @@
 # ABC Format
 
-ABC probably stands for *Alligned Box Collision*.
+ABC stands for *Attach Body Collision*.
 
+It's responsible for collisions the model itself has to perform.
 
 ## Header
 | Offset | Type  | Description
