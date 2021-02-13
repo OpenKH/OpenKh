@@ -5,6 +5,7 @@ BDC stands for *Board Dice Common*.
 It controls various generic aspects related to the Command Board.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `BDC`. Null terminated.
@@ -13,6 +14,7 @@ It controls various generic aspects related to the Command Board.
 | 0xC     | uint32  | Padding
 
 ## BCD Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | float   | Chain

@@ -5,6 +5,7 @@ TXA stands for *TeXture Animation*.
 This file contains the list of possible states a model's textures can take. This is usually used to change the facial expression of a low poly version of a character.
 
 ## Header 
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `TXA`. Null terminated.
@@ -14,6 +15,7 @@ This file contains the list of possible states a model's textures can take. This
 
 
 ## TXA Data (Type 0)
+
 The way this data structure is read is still unknown.
 
 | Offset | Type  | Description
@@ -32,6 +34,7 @@ The way this data structure is read is still unknown.
 | 0x10    | uint32   | Pointer to Texture Data (Type 1)
 
 ## Texture Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32   | Magic Value

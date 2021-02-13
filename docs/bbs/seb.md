@@ -4,6 +4,7 @@ SEB stands for *Sound Effect ?*.
 
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `@SEB`.
@@ -15,6 +16,7 @@ SEB stands for *Sound Effect ?*.
 | 0x16     | uint16  | Padding
 
 ## SEB Data Table
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32  | Address
@@ -22,6 +24,7 @@ SEB stands for *Sound Effect ?*.
 | 0x8     | char[12]  | Motion Name
 
 ## SEB Sound Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32  | Sound Effect ID

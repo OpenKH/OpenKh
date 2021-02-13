@@ -10,6 +10,7 @@ This file is contained within `Menu/Camp.arc`
 
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[8]   | File identifier, always `@BINCHRG`.
@@ -20,6 +21,7 @@ This file is contained within `Menu/Camp.arc`
 | 0x10    | uint8[16]  | Ability Chance Array
 
 ## Command Charge Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16[2]   | Command Index
@@ -34,6 +36,7 @@ This file is contained within `Menu/Camp.arc`
 | 0xF     | uint8   | Recipe
 
 ## Command Charge Flag
+
 | Bit | Count  | Description
 |--------|-------|------------
 | 0     | 1   | Is it rare?

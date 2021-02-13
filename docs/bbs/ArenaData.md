@@ -5,6 +5,7 @@ This file stores a list missions on Mirage Arena and parameters related to them.
 This file is contained within `system/common_vs.arc`
 
 ## Arena Data 1
+
 This section is read until a completely NULL section is found. 
 
 | Offset | Type  | Description

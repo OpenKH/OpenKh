@@ -34,6 +34,7 @@ The format consists on the following structures in order:
 | 0x24     | float  | Non-Elemental Damage Multiplier
 
 ### Status Ailments
+
 | Bit | Count | Description 
 |-----|-------|-------------
 |  0 | 1 | Fly
@@ -95,6 +96,7 @@ Animation List has 20 instances and 8 filler bytes.
 | 0x24     | uint    | Offset to [Extra Parameters](#Extra-Parameters).
 
 ### Effectiveness Flag
+
 | Bit | Count | Description 
 |-----|-------|-------------
 |  0 | 2 | Effective Poison
@@ -128,6 +130,7 @@ Items dropped by enemies.
 | 0x6     | ushort  | Probability
 
 ### Drop Kind
+
 | Id | Kind  | Description
 |--------|-------|------------
 | 0x0     | ITEM_KIND_HP_SMALL  | Small HP orb.
@@ -160,6 +163,7 @@ This structure contains AI parameters that can change the values in variables us
 | 0C     | float  | Parameter Value
 
 #### Attack Kind
+
 | Id | Kind | Description |
 |----|-------|-----------|
 | 0x01 | Small Damage | 

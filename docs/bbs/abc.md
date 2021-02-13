@@ -5,6 +5,7 @@ ABC stands for *Attach Body Collision*.
 It's responsible for collisions the model itself has to perform.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `@ABC`.
@@ -13,6 +14,7 @@ It's responsible for collisions the model itself has to perform.
 | 0xC     | uint32   | Pointer to ABC Data
 
 ## ABC Extra Header
+
 This extra header contains a definition of all bones used.
 
 However, the data structure is unknown.
@@ -20,6 +22,7 @@ However, the data structure is unknown.
 It seems to be `char[128]` except for the first entry which is `char[32]`.
 
 ## ABC Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32   | Pointer to Bone 1
@@ -32,6 +35,7 @@ It seems to be `char[128]` except for the first entry which is `char[32]`.
 | 0x20    | uint32   | Pointer to Effect Name
 
 ### ABC Flag
+
 | Value | Count  | Description
 |--------|-------|------------
 | 0     | 8   | Padding

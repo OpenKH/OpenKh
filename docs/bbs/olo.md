@@ -3,6 +3,7 @@
 This file controls what objects and how they're spawned in levels within [Kingdom Hearts Birth by Sleep](../../index.md).
 
 # Header
+
 | Offset | Type  | Description
 |--------|-------|---------------
 | 0x0     | char[4]  | File identifier, always `@OLO`.
@@ -23,6 +24,7 @@ This file controls what objects and how they're spawned in levels within [Kingdo
 | 0x38    | uint[2]  | Padding.
 
 ### **OLO Flags**
+
 | Value |       Name            | Description
 |-------|-----------------------|--------------
 | 0     | FLAG_NONE             | Unused
@@ -35,6 +37,7 @@ This file controls what objects and how they're spawned in levels within [Kingdo
 OLO Flags is a bitfield.
 
 # Object Name
+
 | Type  | Description
 |-------|------------
 | char[16]   | File to load.
@@ -42,16 +45,19 @@ OLO Flags is a bitfield.
 `Object Name` just consists of a list of Objects where its count is decided by `uiObjNameNum`
 
 # Path Name Section
+
 | Type  | Field Name
 |-------|------------ 
 |  char[32]  | szName
 
 # Mission Name
+
 | Type  
 |-------
 |  string 
 
 # Trigger Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0    | Vector3  | Trigger location.
@@ -64,6 +70,7 @@ OLO Flags is a bitfield.
 | 0x2C   | float  | Yaw rotation.
 
 ### Trigger Behavior
+
 | Bit   | Count  | Behavior
 |-------|-------|--------------
 | 0     | 4  | [Type](###Trigger-Type)
@@ -73,6 +80,7 @@ OLO Flags is a bitfield.
 | 10    | 22 | Padding
 
 ### Trigger Type
+
 | Value | Name  | Description
 |-------|-------|--------------
 | 0     | Scene Jump
@@ -84,6 +92,7 @@ OLO Flags is a bitfield.
 | 6     | Mission
 
 ### Trigger Shape
+
 | Value |Description
 |-------|--------------
 | 0     | Box
@@ -91,6 +100,7 @@ OLO Flags is a bitfield.
 | 2     | Cylinder
 
 # Group Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0    | Vector3 | Object center location.
@@ -107,6 +117,7 @@ OLO Flags is a bitfield.
 | 0x2A   | uint | Offset to the [Layout Data](###Layout-Data).
 
 ### Group Flag
+
 | Bit   | Count  | Behavior
 |-------|-------|--------------
 | 0     | 4  | Appear Type
@@ -124,6 +135,7 @@ OLO Flags is a bitfield.
 | 29    | 3  | Padding
 
 ### Appear Type
+
 | Value | Name  | Description
 |--------|-------|--------------
 | 0    | APPEAR_TYPE_NONE |
@@ -132,6 +144,7 @@ OLO Flags is a bitfield.
 | 3    | APPEAR_TYPE_NPC_DISTANCE |
 
 # Layout Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0    | char[16] | Object Name
@@ -150,6 +163,7 @@ OLO Flags is a bitfield.
 | 0x78   | char[16] | Mission Label
 
  ### Layout Info
+
  | Bit   | Count  | Behavior
 |-------|-------|--------------
 | 0     | 1  | Appear
@@ -161,40 +175,3 @@ OLO Flags is a bitfield.
 | 20    | 1  | No Load
 | 21    | 8  | Network ID
 | 29    | 3  | Padding
-=======
-This file controls what objects and how they're spawned in levels within [Kingdom Hearts Birth by Sleep](../../index).
-
-# Header
-| Offset | Type  | Description
-|--------|-------|------------
-| 00     | char[4]   | File identifier, always `@OLO`
-| 04     | short   | Number of Header Extra Info in header
-| 06     | short | Number of Spawner Detail Entries in header
-| 08     | int | Number of unique objects to spawn
-| 0c     | int | Header length
-| 10     | HeaderExtraInfo[NumHeaderExtra]   | Extra info in header
-| 3C     | int   | padding
-
-# Spawner List
-| Offset | Type  | Description
-|--------|-------|------------
-| Header.HeaderLength     | string[NumObjectsSpawn]   | List of objects to spawn in the level
-
-# Spawner Info
-| Offset | Type  | Description
-|--------|-------|------------
-| HeaderExtraInfo.Offset     | SpawnerDetailEntry[NumSpawnerDetailEntry]   | Includes extra info on each spawner
-
-
-## Header Extra Info
-| Offset | Type  | Description
-|--------|-------|------------
-| 00     | int   | Unknown
-| 04     | int   | Offset to Detail Entry
-
-## Spawner Detail Entry
-| Offset | Type  | Description
-|--------|-------|------------
-| 00     | int   | Unknown
-| 04     | int   | Unknown
->>>>>>> e5f64d008e0a83ff49f89813fc49c3c79fdaab1a

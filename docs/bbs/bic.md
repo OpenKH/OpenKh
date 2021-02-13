@@ -6,6 +6,7 @@ This file doesn't have the extension `.bic`, but rather just `.bin`
 
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | 

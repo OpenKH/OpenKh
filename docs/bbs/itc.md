@@ -5,6 +5,7 @@ ITC stands for *ITem Collection* and it seems to contain the list of items obtai
 Located in the `ITEM` folder.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `ITC`. Null terminated.
@@ -30,6 +31,7 @@ Located in the `ITEM` folder.
 | 0x1B    | uint8   | Item Count in `WM`
 
 ## ITC Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Collection ID

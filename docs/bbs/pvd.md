@@ -5,6 +5,7 @@ PVD stands for *? Volume Data*.
 It controls volumetric effects as fog or glare.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `PVD`. Null terminated.
@@ -13,6 +14,7 @@ It controls volumetric effects as fog or glare.
 | 0x8     | uint32[2]  | Padding
 
 ## PVD Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32   | Fog Color (ABGR)

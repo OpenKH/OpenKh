@@ -3,6 +3,7 @@
 Mission files control the flow of mission events.
 
 ### File List
+
 Here's the full list of files that use this format.
 
 | Arc File | Internal File  | Description
@@ -22,6 +23,7 @@ Here's the full list of files that use this format.
 | common_vs.arc | vsMis.bin | 
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `MIS`. Null terminated.
@@ -29,6 +31,7 @@ Here's the full list of files that use this format.
 | 0x6     | uint16  | Data Count
 
 ## Mission Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[12]   | Mission Name

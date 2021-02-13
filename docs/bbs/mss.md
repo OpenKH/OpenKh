@@ -5,6 +5,7 @@ MSS stands for *Map Sound ?*.
 It controls sound properties for the loaded map.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `MSS`. Null terminated.
@@ -13,6 +14,7 @@ It controls sound properties for the loaded map.
 | 0x8     | uint32[2]  | Padding
 
 ## MSS Parameters
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Reverberation

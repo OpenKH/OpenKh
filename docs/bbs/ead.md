@@ -5,6 +5,7 @@ EAD stands for *Effect At Data*.
 It seems to control effects attached to objects.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `BDD`. Null terminated.
@@ -16,6 +17,7 @@ It seems to control effects attached to objects.
 The following list contains an entry count specified `Count` from the Header.
 
 ## EAD Data Table
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32   | Offset
@@ -24,6 +26,7 @@ The following list contains an entry count specified `Count` from the Header.
 Unknown Data list here.
 
 ## EAD Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32   | Pointer to Effect File

@@ -5,6 +5,7 @@ NMD stands for *? Map ?*.
 Controls something related to a map's image?
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `NMD`. Null terminated.
@@ -13,6 +14,7 @@ Controls something related to a map's image?
 | 0x8     | uint32[2]  | Padding
 
 ## NMD Parameters
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Image W

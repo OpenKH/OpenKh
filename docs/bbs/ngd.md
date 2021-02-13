@@ -6,6 +6,7 @@ It seems to be used for enemy navigation around the levels.
 
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `@NGD`.

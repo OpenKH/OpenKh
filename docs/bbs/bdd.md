@@ -5,6 +5,7 @@ BDD stands for *Board Dice ?*.
 It controls something related to the command board's panels.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `BDD`. Null terminated.
@@ -15,6 +16,7 @@ It controls something related to the command board's panels.
 | 0xC     | int32   | Padding
 
 ## BDD Settings
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | int32   | Start BP
@@ -29,6 +31,7 @@ It controls something related to the command board's panels.
 | 0x1C     | int32   | Padding
 
 ## BDD Route
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | int16   | Panel IDX
@@ -36,6 +39,7 @@ It controls something related to the command board's panels.
 Two unknown fields here.
 
 ## BDD Panel
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint8   | Type
@@ -46,11 +50,13 @@ Two unknown fields here.
 | 0x10     | uint8[4]   | Per
 
 ## BDD Commands
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | [BDD Command Flag](#BDD-Command)
 
 ### BDD Command
+
 | Bit | Count  | Description
 |--------|-------|------------
 | 0     |  4  | Level

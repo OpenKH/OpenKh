@@ -5,6 +5,7 @@ AAC stands for *Attach Attack Collision*.
 Responsible for collisions attached to a character's weapon or anything else that needs to perform a collision check.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `@AAC`.
@@ -13,6 +14,7 @@ Responsible for collisions attached to a character's weapon or anything else tha
 
 ---
 ## AAC Data Table
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[12]   | Motion Name
@@ -21,6 +23,7 @@ Responsible for collisions attached to a character's weapon or anything else tha
 | 0x14    | uint32   | Pointer Group Data
 
 ### Data Table Flag
+
 | Value | Count  | Description
 |--------|-------|------------
 | 0     | 30   | Padding
@@ -28,6 +31,7 @@ Responsible for collisions attached to a character's weapon or anything else tha
 | 31     | 1   | BG Hit
 ---
 ## AAC Data Group
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32   | Hit Effect Name
@@ -44,6 +48,7 @@ Responsible for collisions attached to a character's weapon or anything else tha
 | 0x1C    | uint32   | Pointer to AAC Data
 
 ### Data Group Flag
+
 | Value | Count  | Description
 |--------|-------|------------
 | 0     | 28   | Padding
@@ -54,6 +59,7 @@ Responsible for collisions attached to a character's weapon or anything else tha
 
 ---
 ## AAC Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32   | Pointer to Bone 1

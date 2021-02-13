@@ -5,6 +5,7 @@ ITE simply stands for *ITEM* and it contains the list of items in the game.
 ITB and ITC formats use the item IDs from this list.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `ITE`. Null terminated.
@@ -18,6 +19,7 @@ ITB and ITC formats use the item IDs from this list.
 | 0x12     | uint16   | Padding
 
 ## Weapon Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Item ID
@@ -25,6 +27,7 @@ ITB and ITC formats use the item IDs from this list.
 | 0x3     | uint8   | Padding
 
 ## Flavor Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Item ID
@@ -32,6 +35,7 @@ ITB and ITC formats use the item IDs from this list.
 | 0x3     | uint8   | Padding
 
 ## Key Item Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Item ID
@@ -39,6 +43,7 @@ ITB and ITC formats use the item IDs from this list.
 | 0x3     | uint8   | Padding
 
 ## Key Item Hide Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Item ID
@@ -46,6 +51,7 @@ ITB and ITC formats use the item IDs from this list.
 | 0x3     | uint8   | Padding
 
 ## Synthesis Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Item ID

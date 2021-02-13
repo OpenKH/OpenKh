@@ -14,6 +14,7 @@ There is a file for each playable character with the following names:
 Not all commands will appear in the shop even if you add them to the list.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `SHP`. Null terminated.
@@ -24,6 +25,7 @@ Not all commands will appear in the shop even if you add them to the list.
 This data chunk repeats as many times as the field `Number of Items` specifies.
 
 ## Ice-cream Shop Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Command Kind

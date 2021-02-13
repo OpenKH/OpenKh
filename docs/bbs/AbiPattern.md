@@ -8,6 +8,7 @@ This file is contained within `Menu/Camp.arc`
 
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[8]   | File identifier, always `@BINABIP`.
@@ -18,6 +19,7 @@ This file is contained within `Menu/Camp.arc`
 | 0x10    | uint8[16]  | Ability Chance Array
 
 ## AbiPattern Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16[8]   | Ability Kind Array

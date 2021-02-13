@@ -7,6 +7,7 @@ This file stores a list of stickers in the game and data related to them.
 This file is contained within `Menu/stickerdata.arc`
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[8]   | File identifier, always `@BINSTED`.
@@ -16,6 +17,7 @@ This file is contained within `Menu/stickerdata.arc`
 | 0xE     | uint16  | Padding
 
 ## StickerEd Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint8   | Item ID

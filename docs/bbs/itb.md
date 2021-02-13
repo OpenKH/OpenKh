@@ -3,6 +3,7 @@
 ITB stands for *Item Treasure Box* and it contains the list of items obtained in treasure boxes.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `ITB`. Null terminated.
@@ -28,6 +29,7 @@ ITB stands for *Item Treasure Box* and it contains the list of items obtained in
 | 0x1B    | uint8   | Item Count in `WM`
 
 ## ITC Data
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16   | Treasure Box ID
@@ -38,6 +40,7 @@ ITB stands for *Item Treasure Box* and it contains the list of items obtained in
 | 0x7     | uint8   | Padding
 
 ## Item Kind
+
 | Value | Name  | Description
 |--------|-------|------------
 | -1     | ITEM_UNKNOWN   | 

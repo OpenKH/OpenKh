@@ -7,6 +7,7 @@ This format's purpose is unknown.
 The only known instance of this file is within `arc/system/seinfo.arc` in the subfile `SeTable.sei`.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `SEI`. Null terminated.
