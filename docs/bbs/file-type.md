@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](index.md) - file types
+# [Kingdom Hearts Birth by Sleep](index.md) - file types
 
 | Extension | Description | Tool | 
 |-----------|-------------|------|
