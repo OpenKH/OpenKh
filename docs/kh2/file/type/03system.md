@@ -70,28 +70,91 @@ Commands table.
 |--------|---------------|-------------|
 | 0 	 | ushort | Id - [COMMAND LIST](../../dictionary/commands.md)
 | 2 	 | ushort | Execute
-| 4 	 | byte[2] | Unk04
+| 4 	 | short | Argument¹
 | 6 	 | sbyte | Submenu
-| 7 	 | byte | Icon
+| 7 	 | byte | [Icon](#icon)
 | 8 	 | int | Text
-| 12 	 | uint | Flag
+| 12 	 | uint | [Flags](#flags)
 | 16 	 | float | Range
 | 20 	 | float | Dir
 | 24 	 | float | Dir Range
 | 28 	 | byte | Mp/Drive cost
-| 29 	 | byte | Camera
+| 29 	 | byte | [Camera](#camera)
 | 30 	 | byte | Priority
-| 31 	 | byte | Receiver
+| 31 	 | byte | [Receiver](#receiver)
 | 32 	 | ushort | Time
 | 34 	 | ushort | Require
 | 36 	 | byte | Mark
-| 37 	 | byte | Action
+| 37 	 | byte | [Action](#action)
 | 38 	 | ushort | Reaction Count
 | 40 	 | ushort | Dist Range
 | 42 	 | ushort | Score
 | 44 	 | ushort | Disable Form
 | 46 	 | byte | Group
 | 47 	 | byte | Reserve
+
+¹: This can be Argument, Form Id or Magic Id
+
+#### Icon
+
+| Id | Description |
+|----|-------------|
+| 0 | None
+| 1 | Attack
+| 2 | Magic
+| 3 | Item
+| 4 | Form
+| 5 | Summon
+| 6 | Friend
+| 7 | Limit
+
+
+#### Flags
+
+| Id | Description |
+|----|-------------|
+| 0x1 | Cursor
+| 0x2 | Land
+| 0x4 | Force
+| 0x8 | Combo
+| 0x10 | Battle
+| 0x20 | Secure
+| 0x40 | Require
+| 0x80 | No Combo
+| 0x100 | Drive
+| 0x200 | Short
+| 0x400 | Disable Sora
+| 0x800 | Disable Roxas
+| 0x1000 | Disable Lion King Sora
+| 0x2000 | Disable Limit Form
+| 0x4000 | Unused
+| 0x8000 | Disable Skateboard
+| 0x10000 | Battle Mode Only
+
+#### Camera
+
+| Id | Description |
+|----|-------------|
+| 0 | Null
+| 1 | Watch
+| 2 | Lock On
+| 3 | Watch & Lock On
+
+#### Receiver
+
+| Id | Description |
+|----|-------------|
+| 0 | Player
+| 1 | Target
+| 2 | Both
+
+#### Action
+
+| Id | Description |
+|----|-------------|
+| 0 | Null
+| 1 | Idle
+| 2 | Jump
 
 ## Went
 
