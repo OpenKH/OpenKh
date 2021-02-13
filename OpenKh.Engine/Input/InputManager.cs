@@ -63,6 +63,9 @@ namespace OpenKh.Engine.Input
             }
         }
 
+        private const float ContinuousRepeatTime = 0.05f;
+        private const float MinimumRepeatTime = 1f / 3f - ContinuousRepeatTime;
+
         private readonly Button _buttonConfirmMask;
         private readonly Button _buttonCancelMask;
         private readonly IInputDevice[] _devices;
@@ -70,11 +73,12 @@ namespace OpenKh.Engine.Input
         private readonly Buttons _released = new Buttons();
         private readonly Buttons _triggered = new Buttons();
         private readonly Buttons _repeated = new Buttons();
+        private float[] _repeatTimers = new float[sizeof(uint) * 8];
 
         public IInputButtons Pressed => _pressed;
         public IInputButtons Released => _released;
         public IInputButtons Triggered => _triggered;
-        public IInputButtons Repeated => Triggered;// _repeated;
+        public IInputButtons Repeated => _repeated;
         public Vector3 AxisLeft { get; private set; }
         public Vector3 AxisRight { get; private set; }
 
@@ -138,6 +142,34 @@ namespace OpenKh.Engine.Input
             _pressed.Raw = pressedNow;
             _released.Raw = (pressedNow ^ previouslyPressed) & ~pressedNow;
             _triggered.Raw = (pressedNow ^ previouslyPressed) & pressedNow;
+
+            _repeated.Raw = 0;
+            for (var i = 0; i < _repeatTimers.Length; i++)
+            {
+                var flag = 1U << i;
+                var isPressed = (_pressed.Raw & flag) != 0;
+                if (isPressed)
+                {
+                    _repeatTimers[i] += (float)deltaTime;
+                    if (_repeatTimers[i] >= MinimumRepeatTime)
+                    {
+                        var continuousRepeatTimer = _repeatTimers[i] - MinimumRepeatTime;
+                        if (continuousRepeatTimer >= ContinuousRepeatTime)
+                        {
+                            continuousRepeatTimer %= ContinuousRepeatTime;
+                            _repeated.Raw |= flag;
+                        }
+
+                        _repeatTimers[i] = MinimumRepeatTime + continuousRepeatTimer;
+                    }
+                    else if (isPressed)
+                    {
+                        _repeated.Raw |= _triggered.Raw & flag;
+                    }
+                }
+                else
+                    _repeatTimers[i] = 0f;
+            }
 
             _pressed.MakeConfirmCancel(_buttonConfirmMask, _buttonCancelMask);
             _released.MakeConfirmCancel(_buttonConfirmMask, _buttonCancelMask);
