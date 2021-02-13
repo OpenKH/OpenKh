@@ -3,13 +3,13 @@
 EPD stands for Entity Parameter Data and contains all the stats related to the character stats.
 
 The format consists on the following structures in order:  
-[Header](##Header)  
-[General Parameters](##General-Parameters)  
-[Animation List](##Animation-List)  
-[Other Parameters](##Other-Parameters)  
-[Technique Parameters](##Technique-Parameters)  
-[Drop Items](##Drop-Items)  
-[Extra Parameters](##Extra-Parameters)  
+[Header](#Header)  
+[General Parameters](#General-Parameters)  
+[Animation List](#Animation-List)  
+[Other Parameters](#Other-Parameters)  
+[Technique Parameters](#Technique-Parameters)  
+[Drop Items](#Drop-Items)  
+[Extra Parameters](#Extra-Parameters)  
 
 ## Header
 
@@ -22,8 +22,8 @@ The format consists on the following structures in order:
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint  | [Status Ailments](###Status-Ailments) flag
-| 0x4     | float | Max HP (Bosses) Health Multiplier (Regular enemies)
+| 0x0     | uint  | [Status Ailments](#Status-Ailments) flag
+| 0x4     | float | Max HP (Bosses) Health Multiplier (Enemies)
 | 0x8     | float | Experience Multiplier
 | 0xC     | uint  | iSize (Unknown)
 | 0x10     | float  | Physical Damage Multiplier
@@ -84,15 +84,15 @@ Animation List has 20 instances and 8 filler bytes.
 | 0x0     | ushort  | Damage Ceiling
 | 0x2     | ushort  | Damage Floor
 | 0x4     | float  | fWeight
-| 0x8     | uint    | [Effectiveness Flag](###Effectiveness-Flag)
+| 0x8     | uint    | [Effectiveness Flag](#Effectiveness-Flag)
 | 0xC     | char    | Prize Box probability.
 | 0xD     | char[3] | padding
-| 0x10     | uint    | Number of [Technique Parameters](###Technique-Parameters).
-| 0x14     | uint    | Offset to [Technique Parameters](###Technique-Parameters).
-| 0x18     | uint    | Number of [Drop Items](###Drop-Items).
-| 0x1C     | uint    | Offset to [Drop Items](###Drop-Items).
-| 0x20     | uint    | Number of [Extra Parameters](###Extra-Parameters).
-| 0x24     | uint    | Offset to [Extra Parameters](###Extra-Parameters).
+| 0x10     | uint    | Number of [Technique Parameters](#Technique-Parameters).
+| 0x14     | uint    | Offset to [Technique Parameters](#Technique-Parameters).
+| 0x18     | uint    | Number of [Drop Items](#Drop-Items).
+| 0x1C     | uint    | Offset to [Drop Items](#Drop-Items).
+| 0x20     | uint    | Number of [Extra Parameters](#Extra-Parameters).
+| 0x24     | uint    | Offset to [Extra Parameters](#Extra-Parameters).
 
 ### Effectiveness Flag
 | Bit | Count | Description 
@@ -111,10 +111,10 @@ This structures repeats for as many animations need their parameters set.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | float  | Hit Damage Multiplier
+| 0x0     | float  | Technique Damage Multiplier
 | 0x4     | byte  | Technique Number
-| 0x5     | byte  | [Attack Kind](###Attack-Kind)
-| 0x6     | byte  | [Attack Attribute](###Attack-Attribute)
+| 0x5     | byte  | [Attack Kind](#Attack-Kind)
+| 0x6     | byte  | [Attack Attribute](#Attack-Attribute)
 | 0x7     | byte  | Success Rate (Usually 0x64 [100])
 
 ## Drop Parameters
@@ -123,7 +123,7 @@ Items dropped by enemies.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint  | Value for [Drop Kind](###Drop-Kind)
+| 0x0     | uint  | Value for [Drop Kind](#Drop-Kind)
 | 0x4     | ushort  | Number
 | 0x6     | ushort  | Probability
 
