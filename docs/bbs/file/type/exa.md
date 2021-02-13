@@ -3,6 +3,7 @@
 This file is used to display cutscenes or anything that requires camerawork. [Kingdom Hearts Birth by Sleep](../../index).
 
 # Header
+
 | Offset | Type  | Field Name | Description
 |--------|-------|------------|------------
 | 0x0     | char[4]   | name | File identifier, always `exa\0`
@@ -17,6 +18,7 @@ This file is used to display cutscenes or anything that requires camerawork. [Ki
 | 0xF     | uint8 | 
 
 # Effects
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x10     | List<char[0x40]>   | List to the full path of the effects
@@ -24,6 +26,7 @@ This file is used to display cutscenes or anything that requires camerawork. [Ki
 The secondary header starts right after all effects.
 
 # EXUSIA RESOURCE INFO
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint32   | Unknown00
@@ -48,6 +51,7 @@ The secondary header starts right after all effects.
 | 0x20     | char[16]   | Name of the map it the event takes place in.
 
 # Resource definition
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint   | Unknown00

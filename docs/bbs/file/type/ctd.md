@@ -31,10 +31,10 @@ Describe a message with a text and links it to a layout
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | short | Unique identifier
-| 02     | short | Unknown
+| 00     | int | Unique identifier
 | 04     | int   | Text offset
 | 08     | int   | [Layout](#layout) index
+| 0C     | int   | Wait Frame Count
 
 ### Layout
 
@@ -48,8 +48,7 @@ Describe how a message should be presented on screen
 | 06     | short | Balloon window height (borders excluded)
 | 08     | byte  | [Dialog box alignment](#dialog-box-alignment)
 | 09     | byte  | [Dialog box border type](#dialog-box-borders)
-| 0a     | byte  | [Text alignment](#text-alignment)
-| 0b     | byte  | Unknown
+| 0a     | short  | [Text alignment](#text-alignment)
 | 0c     | short | Font size. 16=100%, 8=50%
 | 0e     | short | Horizontal space between letters
 | 10     | short | Vertical space between letters
@@ -57,9 +56,9 @@ Describe how a message should be presented on screen
 | 14     | short | Text Y offset
 | 16     | short | [Dialog Hook type](#dialog-hook)
 | 18     | short | Dialog hook horizontal position
-| 1a     | short | Unknown
-| 1c     | short | Unknown
-| 1e     | short | Unknown
+| 1a     | short | Text Color IDX
+| 1c     | short | Padding
+| 1e     | short | Padding
 
 ### Dialog box alignment
 

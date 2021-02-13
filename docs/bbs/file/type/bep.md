@@ -4,6 +4,7 @@ BEP stands for *Base Enemy Parameter* and it controls the general status for the
 It is only used for one file named `EnemyCommon.bep`.
 
 ## Header
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `@BEP`
@@ -14,6 +15,7 @@ It is only used for one file named `EnemyCommon.bep`.
 | 0x14    | uint   | Offset to [Disappear Parameters](###Disappear-Parameters)
 
 ### Base Parameters
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | ushort   | Battle Level
@@ -25,6 +27,7 @@ It is only used for one file named `EnemyCommon.bep`.
 | 0xC     | uint   | Base EXP
 
 ### Disappear Parameters
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | ushort   | World ID
