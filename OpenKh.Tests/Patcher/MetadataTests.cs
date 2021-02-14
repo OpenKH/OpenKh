@@ -19,9 +19,8 @@ namespace OpenKh.Tests.Patcher
             Assert.Equal("openkh/is-awesome", metadata.Dependencies[0].Name);
 
             Assert.NotNull(metadata.Assets);
-            Assert.NotNull(metadata.Assets.Kh2);
-            Assert.Single(metadata.Assets.Kh2.Binaries);
-            Assert.Equal("my/file/path.bin", metadata.Assets.Kh2.Binaries[0].Name);
+            Assert.Single(metadata.Assets);
+            Assert.Equal("my/file/path.bin", metadata.Assets[0].Name);
         }
     }
 }

@@ -1,16 +1,6 @@
-title: Shibuya Command Menu
+title: My awesome untitled mod
+specifications: 1
+dependencies:
+  - name: openkh/is-awesome
 assets:
-  kh2:
-  binaryarchives:
-    - name:    field2d/jp/zz0command.2dd
-      entries:
-      - name: comw_0
-        type: imgd
-        method: copy
-        source:
-        - name: comw_0.imd
-      - name: comw_0
-        type: seqd
-        method: copy
-        source:
-        - name: comw_0.sqd
+  - name: my/file/path.bin

@@ -40,13 +40,15 @@ namespace OpenKh.Tests.Patcher
             var patcher = new PatcherProcessor();
             var patch = new Metadata
             {
-                Assets = new AssetContainer
+                Assets = new List<AssetFile>
                 {
-                    Kh2 = new AssetKh2
+                    new AssetFile
                     {
-                        Binaries = new List<AssetBinary>
+                        Name = "somedir/somefile.bin",
+                        Method = "copy",
+                        Source = new List<AssetFile>
                         {
-                            new AssetBinary
+                            new AssetFile
                             {
                                 Name = "somedir/somefile.bin"
                             }
@@ -55,11 +57,11 @@ namespace OpenKh.Tests.Patcher
                 }
             };
 
-            CreateFile(ModInputDir, patch.Assets.Kh2.Binaries[0].Name).Dispose();
+            CreateFile(ModInputDir, patch.Assets[0].Name).Dispose();
 
             patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
 
-            AssertFileExists(ModOutputDir, patch.Assets.Kh2.Binaries[0].Name);
+            AssertFileExists(ModOutputDir, patch.Assets[0].Name);
         }
 
         [Fact]
@@ -68,29 +70,24 @@ namespace OpenKh.Tests.Patcher
             var patcher = new PatcherProcessor();
             var patch = new Metadata
             {
-                Assets = new AssetContainer
+                Assets = new List<AssetFile>
                 {
-                    Kh2 = new AssetKh2
+                    new AssetFile
                     {
-                        BinaryArchives = new List<AssetBinArc>
+                        Name = "somedir/somefile.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>
                         {
-                            new AssetBinArc
+                            new AssetFile
                             {
-                                Name = "somedir/somefile.bar",
-                                Entries = new List<AssetFile>
+                                Name = "abcd",
+                                Type = "list",
+                                Method = "copy",
+                                Source = new List<AssetFile>
                                 {
                                     new AssetFile
                                     {
-                                        Name = "abcd",
-                                        Format = "list",
-                                        Method = "copy",
-                                        Source = new List<AssetSource>()
-                                        {
-                                            new AssetSource
-                                            {
-                                                Name = "somedir/somefile/abcd.bin"
-                                            }
-                                        }
+                                        Name = "somedir/somefile/abcd.bin"
                                     }
                                 }
                             }
@@ -109,7 +106,7 @@ namespace OpenKh.Tests.Patcher
 
             patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
 
-            AssertFileExists(ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
+            AssertFileExists(ModOutputDir, patch.Assets[0].Name);
             AssertBarFile("abcd", entry =>
             {
                 Assert.Equal(Bar.EntryType.List, entry.Type);
@@ -118,7 +115,7 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal(1, entry.Stream.ReadByte());
                 Assert.Equal(2, entry.Stream.ReadByte());
                 Assert.Equal(3, entry.Stream.ReadByte());
-            }, ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
+            }, ModOutputDir, patch.Assets[0].Name);
         }
 
         [Fact]
@@ -127,29 +124,24 @@ namespace OpenKh.Tests.Patcher
             var patcher = new PatcherProcessor();
             var patch = new Metadata
             {
-                Assets = new AssetContainer
+                Assets = new List<AssetFile>
                 {
-                    Kh2 = new AssetKh2
+                    new AssetFile
                     {
-                        BinaryArchives = new List<AssetBinArc>
+                        Name = "somedir/somefile.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>
                         {
-                            new AssetBinArc
+                            new AssetFile
                             {
-                                Name = "somedir/somefile.bar",
-                                Entries = new List<AssetFile>
+                                Name = "abcd",
+                                Type = "list",
+                                Method = "copy",
+                                Source = new List<AssetFile>
                                 {
                                     new AssetFile
                                     {
-                                        Name = "abcd",
-                                        Format = "list",
-                                        Method = "copy",
-                                        Source = new List<AssetSource>()
-                                        {
-                                            new AssetSource
-                                            {
-                                                Name = "somedir/somefile/abcd.bin"
-                                            }
-                                        }
+                                        Name = "somedir/somefile/abcd.bin"
                                     }
                                 }
                             }
@@ -181,7 +173,7 @@ namespace OpenKh.Tests.Patcher
 
             patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
 
-            AssertFileExists(ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
+            AssertFileExists(ModOutputDir, patch.Assets[0].Name);
             AssertBarFile("abcd", entry =>
             {
                 Assert.Equal(Bar.EntryType.List, entry.Type);
@@ -190,7 +182,7 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal(1, entry.Stream.ReadByte());
                 Assert.Equal(2, entry.Stream.ReadByte());
                 Assert.Equal(3, entry.Stream.ReadByte());
-            }, ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
+            }, ModOutputDir, patch.Assets[0].Name);
             AssertBarFile("nice", entry =>
             {
                 Assert.Equal(Bar.EntryType.Model, entry.Type);
@@ -199,7 +191,7 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal(5, entry.Stream.ReadByte());
                 Assert.Equal(6, entry.Stream.ReadByte());
                 Assert.Equal(7, entry.Stream.ReadByte());
-            }, ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
+            }, ModOutputDir, patch.Assets[0].Name);
         }
 
         [Fact]
@@ -208,30 +200,25 @@ namespace OpenKh.Tests.Patcher
             var patcher = new PatcherProcessor();
             var patch = new Metadata
             {
-                Assets = new AssetContainer
+                Assets = new List<AssetFile>
                 {
-                    Kh2 = new AssetKh2
+                    new AssetFile
                     {
-                        BinaryArchives = new List<AssetBinArc>
+                        Name = "somedir/somefile.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>
                         {
-                            new AssetBinArc
+                            new AssetFile
                             {
-                                Name = "somedir/somefile.bar",
-                                Entries = new List<AssetFile>
+                                Name = "test",
+                                Method = "image",
+                                Type = "imgd",
+                                Source = new List<AssetFile>
                                 {
                                     new AssetFile
                                     {
-                                        Name = "test",
-                                        Format = "imgd",
-                                        Method = "image",
-                                        Source = new List<AssetSource>()
-                                        {
-                                            new AssetSource
-                                            {
-                                                Name = "sample.png",
-                                                IsSwizzled = false
-                                            }
-                                        }
+                                        Name = "sample.png",
+                                        IsSwizzled = false
                                     }
                                 }
                             }
@@ -244,12 +231,11 @@ namespace OpenKh.Tests.Patcher
 
             patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
 
-            AssertFileExists(ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
+            AssertFileExists(ModOutputDir, patch.Assets[0].Name);
             AssertBarFile("test", entry =>
             {
                 Assert.True(Imgd.IsValid(entry.Stream));
-            }, ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
-
+            }, ModOutputDir, patch.Assets[0].Name);
         }
 
         private static void AssertFileExists(params string[] paths)
