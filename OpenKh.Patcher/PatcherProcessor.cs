@@ -1,7 +1,8 @@
 using OpenKh.Common;
+using OpenKh.Kh2;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace OpenKh.Patcher
 {
@@ -33,23 +34,95 @@ namespace OpenKh.Patcher
         {
             if (assets == null)
                 throw new Exception("No Kingdom Hearts II assets found.");
+
             if (assets.Binaries != null)
-                PatchBinary(outputDir, modPath, assets.Binaries);
+                foreach (var binary in assets.Binaries)
+                    PatchBinary(outputDir, modPath, binary);
+
+            if (assets.BinaryArchives != null)
+            {
+                foreach (var binarc in assets.BinaryArchives)
+                {
+                    // Copy original asset to patch if not present to the destination directory
+                    var dstFilePath = Path.Combine(outputDir, binarc.Name);
+                    if (!File.Exists(dstFilePath))
+                    {
+                        var srcDir = Path.Combine(originalAssets, binarc.Name);
+                        if (File.Exists(srcDir))
+                        {
+                            var dstDir = Path.GetDirectoryName(dstFilePath);
+                            Directory.CreateDirectory(dstDir);
+                            File.Copy(srcDir, dstFilePath);
+                        }
+                    }
+
+                    PatchBinArc(outputDir, modPath, binarc);
+                }
+            }
         }
 
-        private void PatchBinary(string outputDir, string modPath, IEnumerable<AssetBinary> binaries)
+        private void PatchBinary(string outputDir, string modPath, AssetBinary binaryEntry)
         {
-            foreach (var binaryEntry in binaries)
-            {
-                var srcFile = Path.Combine(modPath, binaryEntry.Name);
-                var dstFile = Path.Combine(outputDir, binaryEntry.Name);
-                var dstDir = Path.GetDirectoryName(dstFile);
+            var srcFile = Path.Combine(modPath, binaryEntry.Name);
+            var dstFile = Path.Combine(outputDir, binaryEntry.Name);
+            var dstDir = Path.GetDirectoryName(dstFile);
 
-                if (!File.Exists(srcFile))
-                    throw new FileNotFoundException($"The mod does not contain the file {binaryEntry.Name}", srcFile);
-                Directory.CreateDirectory(dstDir);
-                File.Copy(srcFile, dstFile, true);
+            if (!File.Exists(srcFile))
+                throw new FileNotFoundException($"The mod does not contain the file {binaryEntry.Name}", srcFile);
+            Directory.CreateDirectory(dstDir);
+            File.Copy(srcFile, dstFile, true);
+        }
+
+        private void PatchBinArc(string outputDir, string modPath, AssetBinArc assetBinarc)
+        {
+            var dstFile = Path.Combine(outputDir, assetBinarc.Name);
+            var binarc = File.Exists(dstFile) ?
+                File.OpenRead(dstFile).Using(Bar.Read) :
+                new Bar()
+                {
+                    Motionset = assetBinarc.MotionsetType
+                };
+
+            foreach (var file in assetBinarc.Entries)
+            {
+                if (!Enum.TryParse<Bar.EntryType>(file.Format, true, out var barEntryType))
+                    throw new Exception($"BinArc type {file.Format} not recognized");
+
+                string srcFile;
+                Stream srcStream;
+                switch (file.Method)
+                {
+                    case "copy":
+                        srcFile = Path.Combine(modPath, file.Source.Name);
+                        srcStream = File.OpenRead(srcFile);
+                        break;
+                    default:
+                        throw new Exception($"Patching method {file.Method} not recognized");
+                }
+
+                var existingEntry = binarc.FirstOrDefault(x => x.Name == file.Name && x.Type == barEntryType);
+                if (existingEntry == null)
+                {
+                    binarc.Add(new Bar.Entry
+                    {
+                        Name = file.Name,
+                        Type = barEntryType,
+                        Stream = srcStream
+                    });
+                }
+                else
+                {
+                    existingEntry.Stream = srcStream;
+                }
             }
+
+            var dstDir = Path.GetDirectoryName(dstFile);
+            Directory.CreateDirectory(dstDir);
+
+            File.Create(dstFile).Using(stream => Bar.Write(stream, binarc));
+
+            foreach (var entry in binarc)
+                entry.Stream?.Dispose();
         }
     }
 }
