@@ -67,6 +67,7 @@ namespace OpenKh.Imaging
 
         public PngImage(Stream stream)
         {
+            stream.SetPosition(0);
             var header = BinaryMapping.ReadObject<Signature>(stream);
             if (header.Magic != Signature.Valid)
             {
@@ -328,6 +329,19 @@ namespace OpenKh.Imaging
                 | ((val >> 8) & 0x0000FF00)
                 | ((val >> 24) & 0x000000FF)
                 ;
+        }
+
+        public static bool IsValid(Stream stream)
+        {
+            stream.SetPosition(0);
+            return stream.ReadByte() == 0x89 &&
+                stream.ReadByte() == 0x50 &&
+                stream.ReadByte() == 0x4e &&
+                stream.ReadByte() == 0x47 &&
+                stream.ReadByte() == 0x0d &&
+                stream.ReadByte() == 0x0a &&
+                stream.ReadByte() == 0x1a &&
+                stream.ReadByte() == 0x0a;
         }
 
         public static PngImage Read(Stream stream) => new PngImage(stream);

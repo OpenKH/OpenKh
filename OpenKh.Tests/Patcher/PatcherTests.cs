@@ -84,9 +84,12 @@ namespace OpenKh.Tests.Patcher
                                         Name = "abcd",
                                         Format = "list",
                                         Method = "copy",
-                                        Source = new AssetSource
+                                        Source = new List<AssetSource>()
                                         {
-                                            Name = "somedir/somefile/abcd.bin"
+                                            new AssetSource
+                                            {
+                                                Name = "somedir/somefile/abcd.bin"
+                                            }
                                         }
                                     }
                                 }
@@ -140,9 +143,12 @@ namespace OpenKh.Tests.Patcher
                                         Name = "abcd",
                                         Format = "list",
                                         Method = "copy",
-                                        Source = new AssetSource
+                                        Source = new List<AssetSource>()
                                         {
-                                            Name = "somedir/somefile/abcd.bin"
+                                            new AssetSource
+                                            {
+                                                Name = "somedir/somefile/abcd.bin"
+                                            }
                                         }
                                     }
                                 }
@@ -194,6 +200,56 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal(6, entry.Stream.ReadByte());
                 Assert.Equal(7, entry.Stream.ReadByte());
             }, ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
+        }
+
+        [Fact]
+        public void Kh2CreateImgdTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new AssetContainer
+                {
+                    Kh2 = new AssetKh2
+                    {
+                        BinaryArchives = new List<AssetBinArc>
+                        {
+                            new AssetBinArc
+                            {
+                                Name = "somedir/somefile.bar",
+                                Entries = new List<AssetFile>
+                                {
+                                    new AssetFile
+                                    {
+                                        Name = "test",
+                                        Format = "imgd",
+                                        Method = "image",
+                                        Source = new List<AssetSource>()
+                                        {
+                                            new AssetSource
+                                            {
+                                                Name = "sample.png",
+                                                IsSwizzled = false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Copy("Imaging/res/png/32.png", Path.Combine(ModInputDir, "sample.png"));
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
+            AssertBarFile("test", entry =>
+            {
+                Assert.True(Imgd.IsValid(entry.Stream));
+            }, ModOutputDir, patch.Assets.Kh2.BinaryArchives[0].Name);
+
         }
 
         private static void AssertFileExists(params string[] paths)

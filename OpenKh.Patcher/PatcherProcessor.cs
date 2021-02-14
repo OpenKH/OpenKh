@@ -1,6 +1,8 @@
 using OpenKh.Common;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -30,7 +32,7 @@ namespace OpenKh.Patcher
             }
         }
 
-        private void PatchKh2(string originalAssets, string outputDir, string modPath, AssetKh2 assets)
+        private static void PatchKh2(string originalAssets, string outputDir, string modPath, AssetKh2 assets)
         {
             if (assets == null)
                 throw new Exception("No Kingdom Hearts II assets found.");
@@ -61,7 +63,7 @@ namespace OpenKh.Patcher
             }
         }
 
-        private void PatchBinary(string outputDir, string modPath, AssetBinary binaryEntry)
+        private static void PatchBinary(string outputDir, string modPath, AssetBinary binaryEntry)
         {
             var srcFile = Path.Combine(modPath, binaryEntry.Name);
             var dstFile = Path.Combine(outputDir, binaryEntry.Name);
@@ -73,7 +75,7 @@ namespace OpenKh.Patcher
             File.Copy(srcFile, dstFile, true);
         }
 
-        private void PatchBinArc(string outputDir, string modPath, AssetBinArc assetBinarc)
+        private static void PatchBinArc(string outputDir, string modPath, AssetBinArc assetBinarc)
         {
             var dstFile = Path.Combine(outputDir, assetBinarc.Name);
             var binarc = File.Exists(dstFile) ?
@@ -93,8 +95,11 @@ namespace OpenKh.Patcher
                 switch (file.Method)
                 {
                     case "copy":
-                        srcFile = Path.Combine(modPath, file.Source.Name);
+                        srcFile = Path.Combine(modPath, file.Source[0].Name);
                         srcStream = File.OpenRead(srcFile);
+                        break;
+                    case "image":
+                        srcStream = CreateImage(modPath, file.Source, file.Format);
                         break;
                     default:
                         throw new Exception($"Patching method {file.Method} not recognized");
@@ -123,6 +128,43 @@ namespace OpenKh.Patcher
 
             foreach (var entry in binarc)
                 entry.Stream?.Dispose();
+        }
+
+        private static Stream CreateImage(string modPath, List<AssetSource> source, string format)
+        {
+            var stream = new MemoryStream();
+            switch (format)
+            {
+                case "imd":
+                case "imgd":
+                    CreateImageImd(modPath, source[0]).Write(stream);
+                    break;
+                case "imz":
+                case "imgz":
+                    Imgz.Write(stream, source.Select(x => CreateImageImd(modPath, x)));
+                    break;
+                case "fac":
+                    Imgd.WriteAsFac(stream, source.Select(x => CreateImageImd(modPath, x)));
+                    break;
+                default:
+                    stream.Dispose();
+                    throw new Exception($"Image format exportation '{format}' not recognized");
+            }
+
+            return stream;
+        }
+
+        private static Imgd CreateImageImd(string modPath, AssetSource source)
+        {
+            var srcFile = Path.Combine(modPath, source.Name);
+            using var srcStream = File.OpenRead(srcFile);
+            if (PngImage.IsValid(srcStream))
+            {
+                var png = PngImage.Read(srcStream);
+                return Imgd.Create(png.Size, png.PixelFormat, png.GetData(), png.GetClut(), source.IsSwizzled);
+            }
+
+            throw new Exception($"Image source '{source.Name}' not recognized");
         }
     }
 }
