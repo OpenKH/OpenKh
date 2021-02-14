@@ -1,3 +1,4 @@
+using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.IO;
 using YamlDotNet.Serialization;
@@ -43,9 +44,30 @@ namespace OpenKh.Patcher
     public class AssetKh2
     {
         public List<AssetBinary> Binaries { get; set; }
+        public List<AssetBinArc> BinaryArchives { get; set; }
     }
 
     public class AssetBinary
+    {
+        public string Name { get; set; }
+    }
+
+    public class AssetBinArc
+    {
+        public string Name { get; set; }
+        public Bar.MotionsetType MotionsetType { get; set; }
+        public List<AssetFile> Entries { get; set; }
+    }
+
+    public class AssetFile
+    {
+        public string Name { get; set; }
+        public string Format { get; set; }
+        public string Method { get; set; }
+        public AssetSource Source { get; set; }
+    }
+
+    public class AssetSource
     {
         public string Name { get; set; }
     }

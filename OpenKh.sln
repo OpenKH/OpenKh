@@ -168,6 +168,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ItbEditor", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.IteViewer", "IteEditor\OpenKh.Tools.IteViewer.csproj", "{7BA60C7F-4DA9-4A62-A1DC-0F8FF87E4430}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Patcher", "OpenKh.Patcher\OpenKh.Patcher.csproj", "{05223179-5A23-433E-B255-44AA4FEA733B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Patcher", "OpenKh.Patcher\OpenKh.Patcher.csproj", "{05223179-5A23-433E-B255-44AA4FEA733B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
