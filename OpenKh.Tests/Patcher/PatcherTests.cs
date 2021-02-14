@@ -211,7 +211,7 @@ namespace OpenKh.Tests.Patcher
                             new AssetFile
                             {
                                 Name = "test",
-                                Method = "image",
+                                Method = "imgd",
                                 Type = "imgd",
                                 Source = new List<AssetFile>
                                 {
