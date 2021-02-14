@@ -1,9 +1,16 @@
-title: My awesome untitled mod
-specifications: 1
-dependencies:
-  - name: openkh/is-awesome
-totally-ignored-field: yare yare daze
+title: Shibuya Command Menu
 assets:
   kh2:
-    binaries:
-      - name: my/file/path.bin
+  binaryarchives:
+    - name:    field2d/jp/zz0command.2dd
+      entries:
+      - name: comw_0
+        type: imgd
+        method: copy
+        source:
+        - name: comw_0.imd
+      - name: comw_0
+        type: seqd
+        method: copy
+        source:
+        - name: comw_0.sqd

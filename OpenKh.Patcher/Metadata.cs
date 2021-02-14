@@ -64,11 +64,12 @@ namespace OpenKh.Patcher
         public string Name { get; set; }
         public string Format { get; set; }
         public string Method { get; set; }
-        public AssetSource Source { get; set; }
+        public List<AssetSource> Source { get; set; }
     }
 
     public class AssetSource
     {
         public string Name { get; set; }
+        public bool IsSwizzled { get; set; }
     }
 }
