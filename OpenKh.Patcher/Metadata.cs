@@ -16,7 +16,7 @@ namespace OpenKh.Patcher
         public string Title { get; set; }
         public int Specifications { get; set; }
         public List<Dependency> Dependencies { get; set; }
-        public AssetContainer Assets { get; set; }
+        public List<AssetFile> Assets { get; set; }
 
         private static readonly IDeserializer deserializer =
             new DeserializerBuilder()
@@ -36,40 +36,14 @@ namespace OpenKh.Patcher
             serializer.Serialize(new StreamWriter(stream), this);
     }
 
-    public class AssetContainer
-    {
-        public AssetKh2 Kh2 { get; set; }
-    }
-
-    public class AssetKh2
-    {
-        public List<AssetBinary> Binaries { get; set; }
-        public List<AssetBinArc> BinaryArchives { get; set; }
-    }
-
-    public class AssetBinary
-    {
-        public string Name { get; set; }
-    }
-
-    public class AssetBinArc
-    {
-        public string Name { get; set; }
-        public Bar.MotionsetType MotionsetType { get; set; }
-        public List<AssetFile> Entries { get; set; }
-    }
-
     public class AssetFile
     {
         public string Name { get; set; }
-        public string Format { get; set; }
         public string Method { get; set; }
-        public List<AssetSource> Source { get; set; }
-    }
+        public List<AssetFile> Source { get; set; }
 
-    public class AssetSource
-    {
-        public string Name { get; set; }
+        public string Type { get; set; }
+        public Bar.MotionsetType MotionsetType { get; set; }
         public bool IsSwizzled { get; set; }
     }
 }
