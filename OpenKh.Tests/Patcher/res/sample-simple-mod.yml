@@ -1,0 +1,9 @@
+title: My awesome untitled mod
+specifications: 1
+dependencies:
+  - name: openkh/is-awesome
+totally-ignored-field: yare yare daze
+assets:
+  kh2:
+    binaries:
+      - name: my/file/path.bin
