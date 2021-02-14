@@ -50,7 +50,22 @@ namespace OpenKh.Patcher
                 if (metadata.Assets == null)
                     throw new Exception("No assets found.");
 
-                metadata.Assets.AsParallel().ForAll(x => PatchFile(context, x));
+                metadata.Assets.AsParallel().ForAll(assetFile =>
+                {
+                    var dstFile = context.GetDestinationPath(assetFile.Name);
+                    context.EnsureDirectoryExists(dstFile);
+
+                    if (!File.Exists(dstFile))
+                    {
+                        var originalFile = context.GetOriginalAssetPath(assetFile.Name);
+                        if (File.Exists(originalFile))
+                            File.Copy(originalFile, dstFile);
+                    }
+
+                    using var stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    PatchFile(context, assetFile, stream);
+                    stream.SetLength(stream.Position);
+                });
             }
             catch (Exception ex)
             {
@@ -58,7 +73,7 @@ namespace OpenKh.Patcher
             }
         }
 
-        private static void PatchFile(Context context, AssetFile assetFile)
+        private static void PatchFile(Context context, AssetFile assetFile, Stream stream)
         {
             if (assetFile == null)
                 throw new Exception("Asset file is null.");
@@ -66,40 +81,27 @@ namespace OpenKh.Patcher
             switch (assetFile.Method)
             {
                 case "copy":
-                    CopyFile(context, assetFile);
+                    CopyFile(context, assetFile, stream);
                     break;
+                case "bar":
                 case "binarc":
-                    ArchiveBar(context, assetFile);
+                    PatchBinarc(context, assetFile, stream);
+                    break;
+                case "imd":
+                case "imgd":
+                    CreateImageImd(context, assetFile.Source[0]).Write(stream);
+                    break;
+                case "imz":
+                case "imgz":
+                    Imgz.Write(stream, assetFile.Source.Select(x => CreateImageImd(context, x)));
+                    break;
+                case "fac":
+                    Imgd.WriteAsFac(stream, assetFile.Source.Select(x => CreateImageImd(context, x)));
                     break;
             }
-
-            //if (assets.Binaries != null)
-            //    foreach (var binary in assets.Binaries)
-            //        PatchBinary(outputDir, modPath, binary);
-
-            //if (assets.BinaryArchives != null)
-            //{
-            //    foreach (var binarc in assets.BinaryArchives)
-            //    {
-            //        // Copy original asset to patch if not present to the destination directory
-            //        var dstFilePath = Path.Combine(outputDir, binarc.Name);
-            //        if (!File.Exists(dstFilePath))
-            //        {
-            //            var srcDir = Path.Combine(originalAssets, binarc.Name);
-            //            if (File.Exists(srcDir))
-            //            {
-            //                var dstDir = Path.GetDirectoryName(dstFilePath);
-            //                Directory.CreateDirectory(dstDir);
-            //                File.Copy(srcDir, dstFilePath);
-            //            }
-            //        }
-
-            //        PatchBinArc(outputDir, modPath, binarc);
-            //    }
-            //}
         }
 
-        private static void CopyFile(Context context, AssetFile assetFile)
+        private static void CopyFile(Context context, AssetFile assetFile, Stream stream)
         {
             if (assetFile.Source == null || assetFile.Source.Count == 0)
                 throw new Exception($"File '{assetFile.Name}' does not contain any source");
@@ -108,26 +110,13 @@ namespace OpenKh.Patcher
             if (!File.Exists(srcFile))
                 throw new FileNotFoundException($"The mod does not contain the file {assetFile.Source[0].Name}", srcFile);
 
-            var dstFile = context.GetDestinationPath(assetFile.Name);
-            context.EnsureDirectoryExists(dstFile);
-            File.Copy(srcFile, dstFile, true);
+            using var srcStream = File.OpenRead(srcFile);
+            srcStream.CopyTo(stream);
         }
 
-        private static void ArchiveBar(Context context, AssetFile assetFile)
+        private static void PatchBinarc(Context context, AssetFile assetFile, Stream stream)
         {
-            var dstFile = context.GetDestinationPath(assetFile.Name);
-            if (!File.Exists(dstFile))
-            {
-                var originalFile = context.GetOriginalAssetPath(assetFile.Name);
-                if (File.Exists(originalFile))
-                {
-                    context.EnsureDirectoryExists(dstFile);
-                    File.Copy(originalFile, dstFile);
-                }
-            }
-
-            var binarc = File.Exists(dstFile) ?
-                File.OpenRead(dstFile).Using(Bar.Read) :
+            var binarc = Bar.IsValid(stream) ? Bar.Read(stream) :
                 new Bar()
                 {
                     Motionset = assetFile.MotionsetType
@@ -138,68 +127,24 @@ namespace OpenKh.Patcher
                 if (!Enum.TryParse<Bar.EntryType>(file.Type, true, out var barEntryType))
                     throw new Exception($"BinArc type {file.Type} not recognized");
 
-                string srcFile;
-                Stream srcStream;
-                switch (file.Method)
+                var entry = binarc.FirstOrDefault(x => x.Name == file.Name && x.Type == barEntryType);
+                if (entry == null)
                 {
-                    case "copy":
-                        srcFile = context.GetSourceModAssetPath(file.Source[0].Name);
-                        srcStream = File.OpenRead(srcFile);
-                        break;
-                    case "image":
-                        srcStream = CreateImage(context, file.Source, file.Type);
-                        break;
-                    default:
-                        throw new Exception($"Patching method {file.Method} not recognized");
-                }
-
-                var existingEntry = binarc.FirstOrDefault(x => x.Name == file.Name && x.Type == barEntryType);
-                if (existingEntry == null)
-                {
-                    binarc.Add(new Bar.Entry
+                    entry = new Bar.Entry
                     {
                         Name = file.Name,
                         Type = barEntryType,
-                        Stream = srcStream
-                    });
+                        Stream = new MemoryStream()
+                    };
+                    binarc.Add(entry);
                 }
-                else
-                {
-                    existingEntry.Stream = srcStream;
-                }
+
+                PatchFile(context, file, entry.Stream);
             }
 
-            var dstDir = Path.GetDirectoryName(dstFile);
-            Directory.CreateDirectory(dstDir);
-
-            File.Create(dstFile).Using(stream => Bar.Write(stream, binarc));
-
+            Bar.Write(stream.SetPosition(0), binarc);
             foreach (var entry in binarc)
                 entry.Stream?.Dispose();
-        }
-
-        private static Stream CreateImage(Context context, List<AssetFile> source, string format)
-        {
-            var stream = new MemoryStream();
-            switch (format)
-            {
-                case "imd":
-                case "imgd":
-                    CreateImageImd(context, source[0]).Write(stream);
-                    break;
-                case "imz":
-                case "imgz":
-                    Imgz.Write(stream, source.Select(x => CreateImageImd(context, x)));
-                    break;
-                case "fac":
-                    Imgd.WriteAsFac(stream, source.Select(x => CreateImageImd(context, x)));
-                    break;
-                default:
-                    stream.Dispose();
-                    throw new Exception($"Image format exportation '{format}' not recognized");
-            }
-
-            return stream;
         }
 
         private static Imgd CreateImageImd(Context context, AssetFile source)
