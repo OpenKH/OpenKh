@@ -1,5 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Messages;
 using OpenKh.Patcher;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using Xunit;
 using Xunit.Sdk;
+using YamlDotNet.Serialization;
 
 namespace OpenKh.Tests.Patcher
 {
@@ -236,6 +238,109 @@ namespace OpenKh.Tests.Patcher
             {
                 Assert.True(Imgd.IsValid(entry.Stream));
             }, ModOutputDir, patch.Assets[0].Name);
+        }
+
+        [Fact]
+        public void MergeKh2MsgTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "msg/us/sys.msg",
+                        Method = "kh2msg",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "sys.yml",
+                                Language = "en",
+                            }
+                        }
+                    },
+                    new AssetFile
+                    {
+                        Name = "msg/it/sys.msg",
+                        Method = "kh2msg",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "sys.yml",
+                                Language = "it",
+                            }
+                        }
+                    },
+                    new AssetFile
+                    {
+                        Name = "msg/jp/sys.msg",
+                        Method = "kh2msg",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "sys.yml",
+                                Language = "jp",
+                            }
+                        }
+                    }
+                }
+            };
+
+            Directory.CreateDirectory(Path.Combine(AssetsInputDir, "msg/us/"));
+            File.Create(Path.Combine(AssetsInputDir, "msg/us/sys.msg")).Using(stream =>
+            {
+                Msg.Write(stream, new List<Msg.Entry>
+                {
+                    new Msg.Entry
+                    {
+                        Data = new byte[] { 1, 2, 3, 0 },
+                        Id = 123
+                    }
+                });
+            });
+            File.Create(Path.Combine(ModInputDir, "sys.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- id: 456");
+                writer.WriteLine("  en: English");
+                writer.WriteLine("  it: Italiano");
+                writer.WriteLine("  jp: テスト");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "msg/jp/sys.msg");
+            File.OpenRead(Path.Combine(ModOutputDir, "msg/jp/sys.msg")).Using(stream =>
+            {
+                var msg = Msg.Read(stream);
+                Assert.Single(msg);
+                Assert.Equal(456, msg[0].Id);
+                Assert.Equal("テスト", Encoders.JapaneseSystem.Decode(msg[0].Data).First().Text);
+            });
+
+            AssertFileExists(ModOutputDir, "msg/us/sys.msg");
+            File.OpenRead(Path.Combine(ModOutputDir, "msg/us/sys.msg")).Using(stream =>
+            {
+                var msg = Msg.Read(stream);
+                Assert.Equal(2, msg.Count);
+                Assert.Equal(123, msg[0].Id);
+                Assert.Equal(456, msg[1].Id);
+                Assert.Equal("English", Encoders.InternationalSystem.Decode(msg[1].Data).First().Text);
+            });
+
+            AssertFileExists(ModOutputDir, "msg/it/sys.msg");
+            File.OpenRead(Path.Combine(ModOutputDir, "msg/it/sys.msg")).Using(stream =>
+            {
+                var msg = Msg.Read(stream);
+                Assert.Single(msg);
+                Assert.Equal(456, msg[0].Id);
+                Assert.Equal("Italiano", Encoders.InternationalSystem.Decode(msg[0].Data).First().Text);
+            });
         }
 
         private static void AssertFileExists(params string[] paths)

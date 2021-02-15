@@ -44,6 +44,7 @@ namespace OpenKh.Patcher
 
         public string Type { get; set; }
         public Bar.MotionsetType MotionsetType { get; set; }
+        public string Language { get; set; }
         public bool IsSwizzled { get; set; }
     }
 }
