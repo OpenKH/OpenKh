@@ -66,7 +66,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
             Pam pam = Pam.Read(pamStream);
 
             Assimp.Scene nScene = GetPMOScene(pmo);
-            List<Assimp.Animation> FBXAnims = PAMtoFBXAnim(pam);
+            List<Assimp.Animation> FBXAnims = PAMtoFBXAnim(pmo, pam);
             nScene.Animations.AddRange(FBXAnims);
 
             pmoStream.Close();
@@ -192,13 +192,16 @@ namespace OpenKh.Command.PAMtoFBXConverter
                             mtx.D2 = currentBone.Transform[13];
                             mtx.D3 = currentBone.Transform[14];
                             mtx.D4 = currentBone.Transform[15];
+                            Matrix3x3 mtx3 = new Matrix3x3(mtx);
+
                             mtx.Transpose();
 
                             mtx.A4 *= 100.0f;
                             mtx.B4 *= 100.0f;
                             mtx.C4 *= 100.0f;
 
-                            Matrix3x3 mtx3 = new Matrix3x3(mtx);
+                            
+                            mtx3.Transpose();
 
                             List<VertexWeight> weight = new List<VertexWeight>();
 
@@ -248,7 +251,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
             return scene;
         }
 
-        private static List<Assimp.Animation> PAMtoFBXAnim(Pam pam)
+        private static List<Assimp.Animation> PAMtoFBXAnim(Pmo pmo, Pam pam)
         {
             List<Assimp.Animation> animationList = new List<Assimp.Animation>();
 
@@ -259,18 +262,312 @@ namespace OpenKh.Command.PAMtoFBXConverter
                 anim.DurationInTicks = pam.animList[i].AnimHeader.FrameCount;
                 anim.TicksPerSecond = pam.animList[i].AnimHeader.Framerate;
 
-                for(int b = 0; b < pam.animList[i].AnimHeader.BoneCount; b++)
+                //anim.MeshAnimationChannels[0].MeshKeys.Add(new MeshKey(anim.DurationInTicks / 2, new Vector3D(0, 0, 100)));
+                
+                for (int b = 0; b < pam.animList[i].AnimHeader.BoneCount; b++)
                 {
                     Pam.BoneChannel chann = pam.animList[i].BoneChannels[b];
                     
-                    //anim.NodeAnimationChannels[b].PositionKeys.Add(new VectorKey(chann.TranslationX.Header.));
-                }
-                
+                    anim.NodeAnimationChannels.Add(new NodeAnimationChannel());
+                    anim.NodeAnimationChannels[b].NodeName = pmo.boneList[b].JointName;
+                    ChannelData dat = GetChannelKeyframes(chann, anim.DurationInTicks);
+
+                    //AddTranslationAtKeyframe(anim.NodeAnimationChannels[b].PositionKeys, 0, new Vector3D(), anim.TicksPerSecond);
+                    // Position
+                    /*if(dat.transData != null)
+                    {
+                        foreach (ChannelTranslationData trans in dat.transData)
+                        {
+                            AddTranslationAtKeyframe(anim.NodeAnimationChannels[b].PositionKeys, trans.keyframeID, trans.Translation, anim.TicksPerSecond);
+                        }
+                    }*/
+
+                    /*if (dat.rotData != null)
+                    {
+                        // Rotation
+                        foreach (ChannelRotationData trans in dat.rotData)
+                        {
+                            AddRotationAtKeyframe(anim.NodeAnimationChannels[b].RotationKeys, trans.keyframeID, trans.Rotation, anim.TicksPerSecond);
+                        }
+                    }*/
+
+                }     
 
                 animationList.Add(anim);
             }
 
             return animationList;
+        }
+
+        private static void AddTranslationAtKeyframe(List<VectorKey> Keys, int keyframe, Vector3D value, double framerate = 30.0)
+        {
+            double frametick = 1.0 / framerate;
+            double keyframeTime = frametick * keyframe;
+            Keys.Add(new VectorKey(keyframeTime, value));
+        }
+
+        private static void AddRotationAtKeyframe(List<QuaternionKey> Keys, int keyframe, Assimp.Quaternion value, double framerate = 30.0)
+        {
+            double frametick = 1.0 / framerate;
+            double keyframeTime = frametick * keyframe;
+            Keys.Add(new QuaternionKey(keyframeTime, value));
+        }
+
+        public class ChannelTranslationData
+        {
+            public int keyframeID = 0;
+            public Vector3D Translation = new Vector3D();
+        }
+
+        public class ChannelRotationData
+        {
+            public int keyframeID = 0;
+            public Assimp.Quaternion Rotation = new Assimp.Quaternion();
+        }
+
+        public class ChannelData
+        {
+            public ChannelTranslationData[] transData;
+            public ChannelRotationData[] rotData;
+        }
+
+        private static ChannelData GetChannelKeyframes(Pam.BoneChannel channel, double animFrameCount)
+        {
+            ChannelData channData = new ChannelData();
+            int keyCount = 0;
+
+            // Translation X
+            if (channel.TranslationX != null)
+            {
+                keyCount = channel.TranslationX.Header.KeyframeCount_16bits + channel.TranslationX.Header.KeyframeCount_8bits;
+                channData.transData = new ChannelTranslationData[keyCount];
+
+                if (keyCount == 1)
+                {
+                    channData.transData = new ChannelTranslationData[1];
+                    channData.transData[0] = new ChannelTranslationData();
+                    channData.transData[0].keyframeID = 0;
+                    channData.transData[0].Translation.X = channel.TranslationX.Header.MaxValue;
+                }
+                else
+                {
+                    if (keyCount == animFrameCount)
+                    {
+                        for (int i = 0; i < keyCount; i++)
+                        {
+                            channData.transData[i] = new ChannelTranslationData();
+                            channData.transData[i].keyframeID = i;
+                            channData.transData[i].Translation.X = channel.TranslationX.Keyframes[i].Value;
+                        }
+                    }
+
+                    if (keyCount < animFrameCount)
+                    {
+                        channData.transData = new ChannelTranslationData[channel.TranslationX.Keyframes.Count];
+                        for (int i = 0; i < channel.TranslationX.Keyframes.Count; i++)
+                        {
+                            channData.transData[i] = new ChannelTranslationData();
+                            channData.transData[i].keyframeID = channel.TranslationX.Keyframes[i].FrameID_16bits + channel.TranslationX.Keyframes[i].FrameID_8bits;
+                            channData.transData[i].Translation.X = channel.TranslationX.Keyframes[i].Value;
+                        }
+                    }
+                }
+            }
+
+            if (channel.TranslationY != null)
+            {
+                // Translation Y
+                keyCount = channel.TranslationY.Header.KeyframeCount_16bits + channel.TranslationY.Header.KeyframeCount_8bits;
+                channData.transData = new ChannelTranslationData[keyCount];
+
+                if (keyCount == 1)
+                {
+                    channData.transData = new ChannelTranslationData[1];
+                    channData.transData[0] = new ChannelTranslationData();
+                    channData.transData[0].keyframeID = 0;
+                    channData.transData[0].Translation.Y = channel.TranslationY.Header.MaxValue;
+                }
+                else
+                {
+                    if (keyCount == animFrameCount)
+                    {
+                        for (int i = 0; i < keyCount; i++)
+                        {
+                            channData.transData[i] = new ChannelTranslationData();
+                            channData.transData[i].keyframeID = i;
+                            channData.transData[i].Translation.Y = channel.TranslationY.Keyframes[i].Value;
+                        }
+                    }
+
+                    if (keyCount < animFrameCount)
+                    {
+                        channData.transData = new ChannelTranslationData[channel.TranslationY.Keyframes.Count];
+                        for (int i = 0; i < channel.TranslationY.Keyframes.Count; i++)
+                        {
+                            channData.transData[i] = new ChannelTranslationData();
+                            channData.transData[i].keyframeID = channel.TranslationY.Keyframes[i].FrameID_16bits + channel.TranslationY.Keyframes[i].FrameID_8bits;
+                            channData.transData[i].Translation.Y = channel.TranslationY.Keyframes[i].Value;
+                        }
+                    }
+                }
+            }
+
+            if (channel.TranslationZ != null)
+            {
+                // Translation Z
+                keyCount = channel.TranslationZ.Header.KeyframeCount_16bits + channel.TranslationZ.Header.KeyframeCount_8bits;
+                channData.transData = new ChannelTranslationData[keyCount];
+
+                if (keyCount == 1)
+                {
+                    channData.transData = new ChannelTranslationData[1];
+                    channData.transData[0] = new ChannelTranslationData();
+                    channData.transData[0].keyframeID = 0;
+                    channData.transData[0].Translation.Z = channel.TranslationZ.Header.MaxValue;
+                }
+                else
+                {
+                    if (keyCount == animFrameCount)
+                    {
+                        for (int i = 0; i < keyCount; i++)
+                        {
+                            channData.transData[i] = new ChannelTranslationData();
+                            channData.transData[i].keyframeID = i;
+                            channData.transData[i].Translation.Z = channel.TranslationZ.Keyframes[i].Value;
+                        }
+                    }
+
+                    if (keyCount < animFrameCount)
+                    {
+                        channData.transData = new ChannelTranslationData[channel.TranslationZ.Keyframes.Count];
+                        for (int i = 0; i < channel.TranslationZ.Keyframes.Count; i++)
+                        {
+                            channData.transData[i] = new ChannelTranslationData();
+                            channData.transData[i].keyframeID = channel.TranslationZ.Keyframes[i].FrameID_16bits + channel.TranslationZ.Keyframes[i].FrameID_8bits;
+                            channData.transData[i].Translation.Z = channel.TranslationZ.Keyframes[i].Value;
+                        }
+                    }
+                }
+            }
+
+            if (channel.RotationX != null)
+            {
+                // Rotation X
+                keyCount = channel.RotationX.Header.KeyframeCount_16bits + channel.RotationX.Header.KeyframeCount_8bits;
+                channData.rotData = new ChannelRotationData[keyCount];
+
+                if (keyCount == 1)
+                {
+                    channData.rotData = new ChannelRotationData[1];
+                    channData.rotData[0] = new ChannelRotationData();
+                    channData.rotData[0].keyframeID = 0;
+                    channData.rotData[0].Rotation.X = channel.RotationX.Header.MaxValue;
+                }
+                else
+                {
+                    if (keyCount == animFrameCount)
+                    {
+                        for (int i = 0; i < keyCount; i++)
+                        {
+                            channData.rotData[i] = new ChannelRotationData();
+                            channData.rotData[i].keyframeID = i;
+                            channData.rotData[i].Rotation.X = channel.RotationX.Keyframes[i].Value;
+                        }
+                    }
+
+                    if (keyCount < animFrameCount)
+                    {
+                        channData.rotData = new ChannelRotationData[channel.RotationX.Keyframes.Count];
+                        for (int i = 0; i < channel.RotationX.Keyframes.Count; i++)
+                        {
+                            channData.rotData[i] = new ChannelRotationData();
+                            channData.rotData[i].keyframeID = channel.RotationX.Keyframes[i].FrameID_16bits + channel.RotationX.Keyframes[i].FrameID_8bits;
+                            channData.rotData[i].Rotation.X = channel.RotationX.Keyframes[i].Value;
+                        }
+                    }
+                }
+            }
+
+
+            if (channel.RotationY != null)
+            {
+                // Rotation Y
+                keyCount = channel.RotationY.Header.KeyframeCount_16bits + channel.RotationY.Header.KeyframeCount_8bits;
+                channData.rotData = new ChannelRotationData[keyCount];
+
+                if (keyCount == 1)
+                {
+                    channData.rotData = new ChannelRotationData[1];
+                    channData.rotData[0] = new ChannelRotationData();
+                    channData.rotData[0].keyframeID = 0;
+                    channData.rotData[0].Rotation.Y = channel.RotationY.Header.MaxValue;
+                }
+                else
+                {
+                    if (keyCount == animFrameCount)
+                    {
+                        for (int i = 0; i < keyCount; i++)
+                        {
+                            channData.rotData[i] = new ChannelRotationData();
+                            channData.rotData[i].keyframeID = i;
+                            channData.rotData[i].Rotation.Y = channel.RotationY.Keyframes[i].Value;
+                        }
+                    }
+
+                    if (keyCount < animFrameCount)
+                    {
+                        channData.rotData = new ChannelRotationData[channel.RotationY.Keyframes.Count];
+                        for (int i = 0; i < channel.RotationY.Keyframes.Count; i++)
+                        {
+                            channData.rotData[i] = new ChannelRotationData();
+                            channData.rotData[i].keyframeID = channel.RotationY.Keyframes[i].FrameID_16bits + channel.RotationY.Keyframes[i].FrameID_8bits;
+                            channData.rotData[i].Rotation.Y = channel.RotationY.Keyframes[i].Value;
+                        }
+                    }
+                }
+                
+            }
+
+            if (channel.RotationZ != null)
+            {
+                // Rotation Z
+                keyCount = channel.RotationZ.Header.KeyframeCount_16bits + channel.RotationZ.Header.KeyframeCount_8bits;
+                channData.rotData = new ChannelRotationData[keyCount];
+
+                if (keyCount == 1)
+                {
+                    channData.rotData = new ChannelRotationData[1];
+                    channData.rotData[0] = new ChannelRotationData();
+                    channData.rotData[0].keyframeID = 0;
+                    channData.rotData[0].Rotation.Z = channel.RotationZ.Header.MaxValue;
+                }
+                else
+                {
+                    if (keyCount == animFrameCount)
+                    {
+                        for (int i = 0; i < keyCount; i++)
+                        {
+                            channData.rotData[i] = new ChannelRotationData();
+                            channData.rotData[i].keyframeID = i;
+                            channData.rotData[i].Rotation.Z = channel.RotationZ.Keyframes[i].Value;
+                        }
+                    }
+
+                    if (keyCount < animFrameCount)
+                    {
+                        channData.rotData = new ChannelRotationData[channel.RotationZ.Keyframes.Count];
+                        for (int i = 0; i < channel.RotationZ.Keyframes.Count; i++)
+                        {
+                            channData.rotData[i] = new ChannelRotationData();
+                            channData.rotData[i].keyframeID = channel.RotationZ.Keyframes[i].FrameID_16bits + channel.RotationZ.Keyframes[i].FrameID_8bits;
+                            channData.rotData[i].Rotation.Z = channel.RotationZ.Keyframes[i].Value;
+                        }
+                    }
+                }
+                
+            } 
+
+            return channData;
         }
     }
 }

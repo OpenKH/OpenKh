@@ -177,9 +177,9 @@ namespace OpenKh.Bbs
                         
                         if(keyframeCnt != 1)
                         {
-                            for(ushort z = 0; z < keyframeCnt; z++)
+                            boneChannel.TranslationX.Keyframes = new List<KeyframeEntry>();
+                            for (ushort z = 0; z < keyframeCnt; z++)
                             {
-                                boneChannel.TranslationX.Keyframes = new List<KeyframeEntry>();
                                 KeyframeEntry ent = new KeyframeEntry();
                                 if (keyframeCnt == frameCnt)
                                 {
@@ -222,10 +222,11 @@ namespace OpenKh.Bbs
 
                         if (keyframeCnt != 1)
                         {
+                            boneChannel.TranslationY.Keyframes = new List<KeyframeEntry>();
                             for (ushort z = 0; z < keyframeCnt; z++)
                             {
-                                boneChannel.TranslationY.Keyframes = new List<KeyframeEntry>();
                                 KeyframeEntry ent = new KeyframeEntry();
+
                                 if (keyframeCnt == frameCnt)
                                 {
                                     ent.FrameID_16bits = z;
@@ -267,9 +268,9 @@ namespace OpenKh.Bbs
 
                         if (keyframeCnt != 1)
                         {
+                            boneChannel.TranslationZ.Keyframes = new List<KeyframeEntry>();
                             for (ushort z = 0; z < keyframeCnt; z++)
                             {
-                                boneChannel.TranslationZ.Keyframes = new List<KeyframeEntry>();
                                 KeyframeEntry ent = new KeyframeEntry();
                                 if (keyframeCnt == frameCnt)
                                 {
@@ -314,9 +315,9 @@ namespace OpenKh.Bbs
 
                         if (keyframeCnt != 1)
                         {
+                            boneChannel.RotationX.Keyframes = new List<KeyframeEntry>();
                             for (ushort z = 0; z < keyframeCnt; z++)
                             {
-                                boneChannel.RotationX.Keyframes = new List<KeyframeEntry>();
                                 KeyframeEntry ent = new KeyframeEntry();
                                 if (keyframeCnt == frameCnt)
                                 {
@@ -359,9 +360,9 @@ namespace OpenKh.Bbs
 
                         if (keyframeCnt != 1)
                         {
+                            boneChannel.RotationY.Keyframes = new List<KeyframeEntry>();
                             for (ushort z = 0; z < keyframeCnt; z++)
                             {
-                                boneChannel.RotationY.Keyframes = new List<KeyframeEntry>();
                                 KeyframeEntry ent = new KeyframeEntry();
                                 if (keyframeCnt == frameCnt)
                                 {
@@ -404,9 +405,9 @@ namespace OpenKh.Bbs
 
                         if (keyframeCnt != 1)
                         {
+                            boneChannel.RotationZ.Keyframes = new List<KeyframeEntry>();
                             for (ushort z = 0; z < keyframeCnt; z++)
                             {
-                                boneChannel.RotationZ.Keyframes = new List<KeyframeEntry>();
                                 KeyframeEntry ent = new KeyframeEntry();
                                 if (keyframeCnt == frameCnt)
                                 {
@@ -451,9 +452,9 @@ namespace OpenKh.Bbs
 
                         if (keyframeCnt != 1)
                         {
+                            boneChannel.ScaleX.Keyframes = new List<KeyframeEntry>();
                             for (ushort z = 0; z < keyframeCnt; z++)
                             {
-                                boneChannel.ScaleX.Keyframes = new List<KeyframeEntry>();
                                 KeyframeEntry ent = new KeyframeEntry();
                                 if (keyframeCnt == frameCnt)
                                 {
@@ -496,9 +497,9 @@ namespace OpenKh.Bbs
 
                         if (keyframeCnt != 1)
                         {
+                            boneChannel.ScaleY.Keyframes = new List<KeyframeEntry>();
                             for (ushort z = 0; z < keyframeCnt; z++)
                             {
-                                boneChannel.ScaleY.Keyframes = new List<KeyframeEntry>();
                                 KeyframeEntry ent = new KeyframeEntry();
                                 if (keyframeCnt == frameCnt)
                                 {
@@ -541,9 +542,9 @@ namespace OpenKh.Bbs
 
                         if (keyframeCnt != 1)
                         {
+                            boneChannel.ScaleZ.Keyframes = new List<KeyframeEntry>();
                             for (ushort z = 0; z < keyframeCnt; z++)
                             {
-                                boneChannel.ScaleZ.Keyframes = new List<KeyframeEntry>();
                                 KeyframeEntry ent = new KeyframeEntry();
                                 if (keyframeCnt == frameCnt)
                                 {
