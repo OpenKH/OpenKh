@@ -95,14 +95,14 @@ namespace OpenKh.Imaging
             GS_PSMCT16S = 10,
         }
 
-        private enum IMG_TYPE
+        public enum IMG_TYPE
         {
             IT_RGBA = 3,
             IT_CLUT4 = 4,
             IT_CLUT8 = 5,
         };
 
-        private enum CLT_TYPE
+        public enum CLT_TYPE
         {
             CT_A1BGR5 = 1,
             CT_XBGR8 = 2,
