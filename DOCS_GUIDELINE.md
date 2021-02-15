@@ -70,3 +70,11 @@ If it's an **enum**, just create a table with the **value** of each element and 
 |  2  | Magic
 |  3  | Friend
 |  4  | Skill
+
+---
+
+## Formatting tips
+
+While no specific guidelines for formatting the text are required, we heavily encourage to use all the markdown synthax you can.
+
+It is also recommended to use a separator `---` for big sections, like the ones used in this document for visual clarity.
