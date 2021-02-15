@@ -7,12 +7,7 @@
   </PropertyGroup>
 
 <ItemGroup>
-        <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
         <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
-        <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
-        <ProjectReference Include="..\OpenKh.Engine.MonoGame\OpenKh.Engine.MonoGame.csproj" />
-        <ProjectReference Include="..\OpenKh.Game\OpenKh.Game.csproj" />
-        <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
     </ItemGroup>
 
 </Project>

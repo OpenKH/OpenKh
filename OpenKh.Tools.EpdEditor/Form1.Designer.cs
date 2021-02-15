@@ -175,7 +175,7 @@ namespace OpenKh.Tools.EpdEditor
             this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Location = new System.Drawing.Point(13, 43);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(791, 200);
+            this.groupBox1.Size = new System.Drawing.Size(722, 180);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General Stats";
@@ -183,7 +183,7 @@ namespace OpenKh.Tools.EpdEditor
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(563, 22);
+            this.label2.Location = new System.Drawing.Point(540, 22);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(27, 15);
             this.label2.TabIndex = 3;
@@ -191,68 +191,68 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // SizeBox
             // 
-            this.SizeBox.Location = new System.Drawing.Point(563, 42);
+            this.SizeBox.Location = new System.Drawing.Point(540, 42);
             this.SizeBox.Name = "SizeBox";
-            this.SizeBox.Size = new System.Drawing.Size(100, 23);
+            this.SizeBox.Size = new System.Drawing.Size(60, 23);
             this.SizeBox.TabIndex = 2;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(670, 124);
+            this.label8.Location = new System.Drawing.Point(628, 124);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(91, 15);
+            this.label8.Size = new System.Drawing.Size(73, 15);
             this.label8.TabIndex = 3;
-            this.label8.Text = "Special Damage";
+            this.label8.Text = "Special Dmg";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(564, 124);
+            this.label7.Location = new System.Drawing.Point(541, 124);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(101, 15);
+            this.label7.Size = new System.Drawing.Size(83, 15);
             this.label7.TabIndex = 3;
-            this.label7.Text = "Darkness Damage";
+            this.label7.Text = "Darkness Dmg";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(458, 124);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(98, 15);
+            this.label4.Size = new System.Drawing.Size(80, 15);
             this.label4.TabIndex = 3;
-            this.label4.Text = "Thunder Damage";
+            this.label4.Text = "Thunder Dmg";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(669, 74);
+            this.label6.Location = new System.Drawing.Point(627, 74);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(69, 15);
+            this.label6.Size = new System.Drawing.Size(51, 15);
             this.label6.TabIndex = 3;
-            this.label6.Text = "Ice Damage";
+            this.label6.Text = "Ice Dmg";
             // 
             // SpecialDamageBox
             // 
-            this.SpecialDamageBox.Location = new System.Drawing.Point(670, 145);
+            this.SpecialDamageBox.Location = new System.Drawing.Point(628, 145);
             this.SpecialDamageBox.Name = "SpecialDamageBox";
-            this.SpecialDamageBox.Size = new System.Drawing.Size(100, 23);
+            this.SpecialDamageBox.Size = new System.Drawing.Size(60, 23);
             this.SpecialDamageBox.TabIndex = 2;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(563, 74);
+            this.label5.Location = new System.Drawing.Point(540, 74);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(73, 15);
+            this.label5.Size = new System.Drawing.Size(55, 15);
             this.label5.TabIndex = 3;
-            this.label5.Text = "Fire Damage";
+            this.label5.Text = "Fire Dmg";
             // 
             // DarknessDamageBox
             // 
-            this.DarknessDamageBox.Location = new System.Drawing.Point(564, 145);
+            this.DarknessDamageBox.Location = new System.Drawing.Point(541, 145);
             this.DarknessDamageBox.Name = "DarknessDamageBox";
-            this.DarknessDamageBox.Size = new System.Drawing.Size(100, 23);
+            this.DarknessDamageBox.Size = new System.Drawing.Size(60, 23);
             this.DarknessDamageBox.TabIndex = 2;
             // 
             // label3
@@ -260,42 +260,42 @@ namespace OpenKh.Tools.EpdEditor
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(457, 74);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(97, 15);
+            this.label3.Size = new System.Drawing.Size(79, 15);
             this.label3.TabIndex = 3;
-            this.label3.Text = "Physical Damage";
+            this.label3.Text = "Physical Dmg";
             // 
             // ThunderDamageBox
             // 
-            this.ThunderDamageBox.Location = new System.Drawing.Point(458, 145);
+            this.ThunderDamageBox.Location = new System.Drawing.Point(457, 145);
             this.ThunderDamageBox.Name = "ThunderDamageBox";
-            this.ThunderDamageBox.Size = new System.Drawing.Size(100, 23);
+            this.ThunderDamageBox.Size = new System.Drawing.Size(60, 23);
             this.ThunderDamageBox.TabIndex = 2;
             // 
             // IceDamageBox
             // 
-            this.IceDamageBox.Location = new System.Drawing.Point(669, 95);
+            this.IceDamageBox.Location = new System.Drawing.Point(627, 95);
             this.IceDamageBox.Name = "IceDamageBox";
-            this.IceDamageBox.Size = new System.Drawing.Size(100, 23);
+            this.IceDamageBox.Size = new System.Drawing.Size(60, 23);
             this.IceDamageBox.TabIndex = 2;
             // 
             // FireDamageBox
             // 
-            this.FireDamageBox.Location = new System.Drawing.Point(563, 95);
+            this.FireDamageBox.Location = new System.Drawing.Point(540, 95);
             this.FireDamageBox.Name = "FireDamageBox";
-            this.FireDamageBox.Size = new System.Drawing.Size(100, 23);
+            this.FireDamageBox.Size = new System.Drawing.Size(60, 23);
             this.FireDamageBox.TabIndex = 2;
             // 
             // PhysicalDamageBox
             // 
             this.PhysicalDamageBox.Location = new System.Drawing.Point(457, 95);
             this.PhysicalDamageBox.Name = "PhysicalDamageBox";
-            this.PhysicalDamageBox.Size = new System.Drawing.Size(100, 23);
+            this.PhysicalDamageBox.Size = new System.Drawing.Size(60, 23);
             this.PhysicalDamageBox.TabIndex = 2;
             // 
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(670, 21);
+            this.label19.Location = new System.Drawing.Point(628, 21);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(81, 15);
             this.label19.TabIndex = 3;
@@ -303,9 +303,9 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // EXPMultiplierBox
             // 
-            this.EXPMultiplierBox.Location = new System.Drawing.Point(670, 42);
+            this.EXPMultiplierBox.Location = new System.Drawing.Point(628, 42);
             this.EXPMultiplierBox.Name = "EXPMultiplierBox";
-            this.EXPMultiplierBox.Size = new System.Drawing.Size(100, 23);
+            this.EXPMultiplierBox.Size = new System.Drawing.Size(60, 23);
             this.EXPMultiplierBox.TabIndex = 2;
             // 
             // label1
@@ -313,15 +313,15 @@ namespace OpenKh.Tools.EpdEditor
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(458, 21);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(100, 15);
+            this.label1.Size = new System.Drawing.Size(68, 15);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Maximum Health";
+            this.label1.Text = "Max Health";
             // 
             // MaxHealthBox
             // 
             this.MaxHealthBox.Location = new System.Drawing.Point(458, 42);
             this.MaxHealthBox.Name = "MaxHealthBox";
-            this.MaxHealthBox.Size = new System.Drawing.Size(100, 23);
+            this.MaxHealthBox.Size = new System.Drawing.Size(60, 23);
             this.MaxHealthBox.TabIndex = 2;
             // 
             // groupBox2
@@ -329,7 +329,7 @@ namespace OpenKh.Tools.EpdEditor
             this.groupBox2.Controls.Add(this.flowLayoutPanel1);
             this.groupBox2.Location = new System.Drawing.Point(6, 15);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(446, 175);
+            this.groupBox2.Size = new System.Drawing.Size(434, 160);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Status Ailments";
@@ -358,7 +358,7 @@ namespace OpenKh.Tools.EpdEditor
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(6, 22);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(428, 147);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(419, 131);
             this.flowLayoutPanel1.TabIndex = 1;
             // 
             // StatusAilment_checkbox_01
@@ -554,9 +554,9 @@ namespace OpenKh.Tools.EpdEditor
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.AnimationLayoutPanel);
-            this.groupBox3.Location = new System.Drawing.Point(12, 245);
+            this.groupBox3.Location = new System.Drawing.Point(12, 229);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(1129, 96);
+            this.groupBox3.Size = new System.Drawing.Size(986, 58);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Animation List";
@@ -583,133 +583,133 @@ namespace OpenKh.Tools.EpdEditor
             this.AnimationLayoutPanel.Controls.Add(this.AnimationTextBox_18);
             this.AnimationLayoutPanel.Location = new System.Drawing.Point(0, 23);
             this.AnimationLayoutPanel.Name = "AnimationLayoutPanel";
-            this.AnimationLayoutPanel.Size = new System.Drawing.Size(1114, 65);
+            this.AnimationLayoutPanel.Size = new System.Drawing.Size(974, 30);
             this.AnimationLayoutPanel.TabIndex = 0;
             // 
             // AnimationTextBox_01
             // 
             this.AnimationTextBox_01.Location = new System.Drawing.Point(3, 3);
             this.AnimationTextBox_01.Name = "AnimationTextBox_01";
-            this.AnimationTextBox_01.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_01.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_01.TabIndex = 0;
             // 
             // AnimationTextBox_02
             // 
-            this.AnimationTextBox_02.Location = new System.Drawing.Point(109, 3);
+            this.AnimationTextBox_02.Location = new System.Drawing.Point(57, 3);
             this.AnimationTextBox_02.Name = "AnimationTextBox_02";
-            this.AnimationTextBox_02.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_02.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_02.TabIndex = 0;
             // 
             // AnimationTextBox_03
             // 
-            this.AnimationTextBox_03.Location = new System.Drawing.Point(215, 3);
+            this.AnimationTextBox_03.Location = new System.Drawing.Point(111, 3);
             this.AnimationTextBox_03.Name = "AnimationTextBox_03";
-            this.AnimationTextBox_03.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_03.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_03.TabIndex = 1;
             // 
             // AnimationTextBox_04
             // 
-            this.AnimationTextBox_04.Location = new System.Drawing.Point(321, 3);
+            this.AnimationTextBox_04.Location = new System.Drawing.Point(165, 3);
             this.AnimationTextBox_04.Name = "AnimationTextBox_04";
-            this.AnimationTextBox_04.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_04.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_04.TabIndex = 2;
             // 
             // AnimationTextBox_05
             // 
-            this.AnimationTextBox_05.Location = new System.Drawing.Point(427, 3);
+            this.AnimationTextBox_05.Location = new System.Drawing.Point(219, 3);
             this.AnimationTextBox_05.Name = "AnimationTextBox_05";
-            this.AnimationTextBox_05.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_05.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_05.TabIndex = 3;
             // 
             // AnimationTextBox_06
             // 
-            this.AnimationTextBox_06.Location = new System.Drawing.Point(533, 3);
+            this.AnimationTextBox_06.Location = new System.Drawing.Point(273, 3);
             this.AnimationTextBox_06.Name = "AnimationTextBox_06";
-            this.AnimationTextBox_06.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_06.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_06.TabIndex = 4;
             // 
             // AnimationTextBox_07
             // 
-            this.AnimationTextBox_07.Location = new System.Drawing.Point(639, 3);
+            this.AnimationTextBox_07.Location = new System.Drawing.Point(327, 3);
             this.AnimationTextBox_07.Name = "AnimationTextBox_07";
-            this.AnimationTextBox_07.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_07.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_07.TabIndex = 5;
             // 
             // AnimationTextBox_08
             // 
-            this.AnimationTextBox_08.Location = new System.Drawing.Point(745, 3);
+            this.AnimationTextBox_08.Location = new System.Drawing.Point(381, 3);
             this.AnimationTextBox_08.Name = "AnimationTextBox_08";
-            this.AnimationTextBox_08.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_08.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_08.TabIndex = 6;
             // 
             // AnimationTextBox_09
             // 
-            this.AnimationTextBox_09.Location = new System.Drawing.Point(851, 3);
+            this.AnimationTextBox_09.Location = new System.Drawing.Point(435, 3);
             this.AnimationTextBox_09.Name = "AnimationTextBox_09";
-            this.AnimationTextBox_09.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_09.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_09.TabIndex = 7;
             // 
             // AnimationTextBox_10
             // 
-            this.AnimationTextBox_10.Location = new System.Drawing.Point(957, 3);
+            this.AnimationTextBox_10.Location = new System.Drawing.Point(489, 3);
             this.AnimationTextBox_10.Name = "AnimationTextBox_10";
-            this.AnimationTextBox_10.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_10.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_10.TabIndex = 8;
             // 
             // AnimationTextBox_11
             // 
-            this.AnimationTextBox_11.Location = new System.Drawing.Point(3, 32);
+            this.AnimationTextBox_11.Location = new System.Drawing.Point(543, 3);
             this.AnimationTextBox_11.Name = "AnimationTextBox_11";
-            this.AnimationTextBox_11.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_11.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_11.TabIndex = 9;
             // 
             // AnimationTextBox_12
             // 
-            this.AnimationTextBox_12.Location = new System.Drawing.Point(109, 32);
+            this.AnimationTextBox_12.Location = new System.Drawing.Point(597, 3);
             this.AnimationTextBox_12.Name = "AnimationTextBox_12";
-            this.AnimationTextBox_12.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_12.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_12.TabIndex = 10;
             // 
             // AnimationTextBox_13
             // 
-            this.AnimationTextBox_13.Location = new System.Drawing.Point(215, 32);
+            this.AnimationTextBox_13.Location = new System.Drawing.Point(651, 3);
             this.AnimationTextBox_13.Name = "AnimationTextBox_13";
-            this.AnimationTextBox_13.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_13.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_13.TabIndex = 11;
             // 
             // AnimationTextBox_14
             // 
-            this.AnimationTextBox_14.Location = new System.Drawing.Point(321, 32);
+            this.AnimationTextBox_14.Location = new System.Drawing.Point(705, 3);
             this.AnimationTextBox_14.Name = "AnimationTextBox_14";
-            this.AnimationTextBox_14.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_14.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_14.TabIndex = 12;
             // 
             // AnimationTextBox_15
             // 
-            this.AnimationTextBox_15.Location = new System.Drawing.Point(427, 32);
+            this.AnimationTextBox_15.Location = new System.Drawing.Point(759, 3);
             this.AnimationTextBox_15.Name = "AnimationTextBox_15";
-            this.AnimationTextBox_15.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_15.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_15.TabIndex = 13;
             // 
             // AnimationTextBox_16
             // 
-            this.AnimationTextBox_16.Location = new System.Drawing.Point(533, 32);
+            this.AnimationTextBox_16.Location = new System.Drawing.Point(813, 3);
             this.AnimationTextBox_16.Name = "AnimationTextBox_16";
-            this.AnimationTextBox_16.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_16.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_16.TabIndex = 14;
             // 
             // AnimationTextBox_17
             // 
-            this.AnimationTextBox_17.Location = new System.Drawing.Point(639, 32);
+            this.AnimationTextBox_17.Location = new System.Drawing.Point(867, 3);
             this.AnimationTextBox_17.Name = "AnimationTextBox_17";
-            this.AnimationTextBox_17.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_17.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_17.TabIndex = 15;
             // 
             // AnimationTextBox_18
             // 
-            this.AnimationTextBox_18.Location = new System.Drawing.Point(745, 32);
+            this.AnimationTextBox_18.Location = new System.Drawing.Point(921, 3);
             this.AnimationTextBox_18.Name = "AnimationTextBox_18";
-            this.AnimationTextBox_18.Size = new System.Drawing.Size(100, 23);
+            this.AnimationTextBox_18.Size = new System.Drawing.Size(48, 23);
             this.AnimationTextBox_18.TabIndex = 16;
             // 
             // textBox10
@@ -761,16 +761,16 @@ namespace OpenKh.Tools.EpdEditor
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.label11);
             this.groupBox4.Controls.Add(this.NumericWeight);
-            this.groupBox4.Location = new System.Drawing.Point(810, 54);
+            this.groupBox4.Location = new System.Drawing.Point(741, 50);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(331, 189);
+            this.groupBox4.Size = new System.Drawing.Size(257, 173);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Other Parameters";
             // 
             // NumericMini
             // 
-            this.NumericMini.Location = new System.Drawing.Point(205, 96);
+            this.NumericMini.Location = new System.Drawing.Point(205, 84);
             this.NumericMini.Maximum = new decimal(new int[] {
             2,
             0,
@@ -782,7 +782,7 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // NumericBlind
             // 
-            this.NumericBlind.Location = new System.Drawing.Point(167, 96);
+            this.NumericBlind.Location = new System.Drawing.Point(167, 84);
             this.NumericBlind.Maximum = new decimal(new int[] {
             2,
             0,
@@ -794,7 +794,7 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // NumericFaint
             // 
-            this.NumericFaint.Location = new System.Drawing.Point(129, 97);
+            this.NumericFaint.Location = new System.Drawing.Point(129, 85);
             this.NumericFaint.Maximum = new decimal(new int[] {
             2,
             0,
@@ -806,7 +806,7 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // NumericBind
             // 
-            this.NumericBind.Location = new System.Drawing.Point(91, 97);
+            this.NumericBind.Location = new System.Drawing.Point(91, 85);
             this.NumericBind.Maximum = new decimal(new int[] {
             2,
             0,
@@ -818,7 +818,7 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // NumericStop
             // 
-            this.NumericStop.Location = new System.Drawing.Point(50, 97);
+            this.NumericStop.Location = new System.Drawing.Point(50, 85);
             this.NumericStop.Maximum = new decimal(new int[] {
             2,
             0,
@@ -830,7 +830,7 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // NumericPoison
             // 
-            this.NumericPoison.Location = new System.Drawing.Point(12, 96);
+            this.NumericPoison.Location = new System.Drawing.Point(12, 84);
             this.NumericPoison.Maximum = new decimal(new int[] {
             2,
             0,
@@ -843,7 +843,7 @@ namespace OpenKh.Tools.EpdEditor
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(205, 79);
+            this.label18.Location = new System.Drawing.Point(205, 67);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(31, 15);
             this.label18.TabIndex = 3;
@@ -852,7 +852,7 @@ namespace OpenKh.Tools.EpdEditor
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(165, 79);
+            this.label17.Location = new System.Drawing.Point(165, 67);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(34, 15);
             this.label17.TabIndex = 3;
@@ -861,7 +861,7 @@ namespace OpenKh.Tools.EpdEditor
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(126, 79);
+            this.label16.Location = new System.Drawing.Point(126, 67);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(33, 15);
             this.label16.TabIndex = 3;
@@ -870,7 +870,7 @@ namespace OpenKh.Tools.EpdEditor
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(89, 79);
+            this.label15.Location = new System.Drawing.Point(89, 67);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(31, 15);
             this.label15.TabIndex = 3;
@@ -879,7 +879,7 @@ namespace OpenKh.Tools.EpdEditor
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(52, 79);
+            this.label14.Location = new System.Drawing.Point(52, 67);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(31, 15);
             this.label14.TabIndex = 3;
@@ -888,7 +888,7 @@ namespace OpenKh.Tools.EpdEditor
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(6, 79);
+            this.label13.Location = new System.Drawing.Point(6, 67);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(43, 15);
             this.label13.TabIndex = 3;
@@ -896,20 +896,20 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // NumericDamageFloor
             // 
-            this.NumericDamageFloor.Location = new System.Drawing.Point(112, 37);
+            this.NumericDamageFloor.Location = new System.Drawing.Point(102, 37);
             this.NumericDamageFloor.Maximum = new decimal(new int[] {
             65535,
             0,
             0,
             0});
             this.NumericDamageFloor.Name = "NumericDamageFloor";
-            this.NumericDamageFloor.Size = new System.Drawing.Size(97, 23);
+            this.NumericDamageFloor.Size = new System.Drawing.Size(75, 23);
             this.NumericDamageFloor.TabIndex = 4;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(112, 19);
+            this.label10.Location = new System.Drawing.Point(102, 19);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(81, 15);
             this.label10.TabIndex = 3;
@@ -917,7 +917,7 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // NumericPrizeboxProbability
             // 
-            this.NumericPrizeboxProbability.Location = new System.Drawing.Point(12, 150);
+            this.NumericPrizeboxProbability.Location = new System.Drawing.Point(6, 135);
             this.NumericPrizeboxProbability.Name = "NumericPrizeboxProbability";
             this.NumericPrizeboxProbability.Size = new System.Drawing.Size(97, 23);
             this.NumericPrizeboxProbability.TabIndex = 4;
@@ -925,7 +925,7 @@ namespace OpenKh.Tools.EpdEditor
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(12, 132);
+            this.label12.Location = new System.Drawing.Point(6, 117);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(65, 15);
             this.label12.TabIndex = 3;
@@ -940,7 +940,7 @@ namespace OpenKh.Tools.EpdEditor
             0,
             0});
             this.NumericDamageCeiling.Name = "NumericDamageCeiling";
-            this.NumericDamageCeiling.Size = new System.Drawing.Size(97, 23);
+            this.NumericDamageCeiling.Size = new System.Drawing.Size(75, 23);
             this.NumericDamageCeiling.TabIndex = 4;
             // 
             // label9
@@ -955,7 +955,7 @@ namespace OpenKh.Tools.EpdEditor
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(218, 19);
+            this.label11.Location = new System.Drawing.Point(112, 115);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(45, 15);
             this.label11.TabIndex = 3;
@@ -963,9 +963,9 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // NumericWeight
             // 
-            this.NumericWeight.Location = new System.Drawing.Point(216, 36);
+            this.NumericWeight.Location = new System.Drawing.Point(112, 133);
             this.NumericWeight.Name = "NumericWeight";
-            this.NumericWeight.Size = new System.Drawing.Size(100, 23);
+            this.NumericWeight.Size = new System.Drawing.Size(65, 23);
             this.NumericWeight.TabIndex = 2;
             // 
             // TechParamsGBox
@@ -973,7 +973,7 @@ namespace OpenKh.Tools.EpdEditor
             this.TechParamsGBox.Controls.Add(this.TechniqueLayout);
             this.TechParamsGBox.Location = new System.Drawing.Point(3, 3);
             this.TechParamsGBox.Name = "TechParamsGBox";
-            this.TechParamsGBox.Size = new System.Drawing.Size(1105, 170);
+            this.TechParamsGBox.Size = new System.Drawing.Size(983, 170);
             this.TechParamsGBox.TabIndex = 6;
             this.TechParamsGBox.TabStop = false;
             this.TechParamsGBox.Text = "Technique Parameters";
@@ -985,7 +985,7 @@ namespace OpenKh.Tools.EpdEditor
             this.TechniqueLayout.Dock = System.Windows.Forms.DockStyle.Left;
             this.TechniqueLayout.Location = new System.Drawing.Point(3, 19);
             this.TechniqueLayout.Name = "TechniqueLayout";
-            this.TechniqueLayout.Size = new System.Drawing.Size(1099, 148);
+            this.TechniqueLayout.Size = new System.Drawing.Size(969, 148);
             this.TechniqueLayout.TabIndex = 0;
             this.TechniqueLayout.WrapContents = false;
             // 
@@ -994,7 +994,7 @@ namespace OpenKh.Tools.EpdEditor
             this.DropItemsGBox.Controls.Add(this.DroppedLayout);
             this.DropItemsGBox.Location = new System.Drawing.Point(3, 179);
             this.DropItemsGBox.Name = "DropItemsGBox";
-            this.DropItemsGBox.Size = new System.Drawing.Size(1110, 123);
+            this.DropItemsGBox.Size = new System.Drawing.Size(984, 120);
             this.DropItemsGBox.TabIndex = 7;
             this.DropItemsGBox.TabStop = false;
             this.DropItemsGBox.Text = "Dropped Items";
@@ -1004,15 +1004,15 @@ namespace OpenKh.Tools.EpdEditor
             this.DroppedLayout.AutoScroll = true;
             this.DroppedLayout.Location = new System.Drawing.Point(5, 15);
             this.DroppedLayout.Name = "DroppedLayout";
-            this.DroppedLayout.Size = new System.Drawing.Size(1099, 95);
+            this.DroppedLayout.Size = new System.Drawing.Size(967, 95);
             this.DroppedLayout.TabIndex = 0;
             // 
             // ExtraParamsGBox
             // 
             this.ExtraParamsGBox.Controls.Add(this.ExtraLayout);
-            this.ExtraParamsGBox.Location = new System.Drawing.Point(3, 308);
+            this.ExtraParamsGBox.Location = new System.Drawing.Point(3, 305);
             this.ExtraParamsGBox.Name = "ExtraParamsGBox";
-            this.ExtraParamsGBox.Size = new System.Drawing.Size(1110, 142);
+            this.ExtraParamsGBox.Size = new System.Drawing.Size(984, 130);
             this.ExtraParamsGBox.TabIndex = 8;
             this.ExtraParamsGBox.TabStop = false;
             this.ExtraParamsGBox.Text = "Extra Parameters";
@@ -1024,7 +1024,7 @@ namespace OpenKh.Tools.EpdEditor
             this.ExtraLayout.Dock = System.Windows.Forms.DockStyle.Left;
             this.ExtraLayout.Location = new System.Drawing.Point(3, 19);
             this.ExtraLayout.Name = "ExtraLayout";
-            this.ExtraLayout.Size = new System.Drawing.Size(1100, 120);
+            this.ExtraLayout.Size = new System.Drawing.Size(969, 108);
             this.ExtraLayout.TabIndex = 0;
             this.ExtraLayout.WrapContents = false;
             // 
@@ -1035,9 +1035,9 @@ namespace OpenKh.Tools.EpdEditor
             this.OptionalLayoutPanel.Controls.Add(this.DropItemsGBox);
             this.OptionalLayoutPanel.Controls.Add(this.ExtraParamsGBox);
             this.OptionalLayoutPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.OptionalLayoutPanel.Location = new System.Drawing.Point(13, 347);
+            this.OptionalLayoutPanel.Location = new System.Drawing.Point(11, 293);
             this.OptionalLayoutPanel.Name = "OptionalLayoutPanel";
-            this.OptionalLayoutPanel.Size = new System.Drawing.Size(1124, 453);
+            this.OptionalLayoutPanel.Size = new System.Drawing.Size(990, 438);
             this.OptionalLayoutPanel.TabIndex = 9;
             // 
             // EPDForm
@@ -1045,7 +1045,7 @@ namespace OpenKh.Tools.EpdEditor
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1149, 809);
+            this.ClientSize = new System.Drawing.Size(1007, 739);
             this.Controls.Add(this.OptionalLayoutPanel);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.SaveEPDButton);
@@ -1053,7 +1053,7 @@ namespace OpenKh.Tools.EpdEditor
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.LoadEPDButton);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "EPDForm";
             this.Text = "EPD Editor";

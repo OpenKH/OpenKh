@@ -87,7 +87,7 @@ namespace OpenKh.Tools.EpdEditor
                 techCon.TechParamGBox.Text = "Parameter " + (t+1);
                 techCon.TechniquePower.Text = epd.techniqueParameters[t].TechniquePowerCorrection.ToString();
                 techCon.NumericTechniqueNumber.Value = epd.techniqueParameters[t].TechniqueNumber;
-                techCon.AttackKind.SelectedIndex = epd.techniqueParameters[t].TechniqueKind;
+                techCon.AttackKind.SelectedIndex = (epd.techniqueParameters[t].TechniqueKind > 0x38 ? 0 : epd.techniqueParameters[t].TechniqueKind);
                 techCon.AttackAttribute.SelectedIndex = epd.techniqueParameters[t].TechniqueAttribute % 8;
                 techCon.NumericSuccessRate.Value = epd.techniqueParameters[t].SuccessRate;
                 TechniqueLayout.Controls.Add(techCon);
@@ -217,6 +217,9 @@ namespace OpenKh.Tools.EpdEditor
 
             if(result == DialogResult.OK)
             {
+                TechniqueLayout.Controls.Clear();
+                DroppedLayout.Controls.Clear();
+                ExtraLayout.Controls.Clear();
                 Stream epdFile = File.OpenRead(dialog.FileName);
                 FileLoadedLabel.Text = "File currently loaded: " + dialog.FileName;
                 epd = Epd.Read(epdFile);

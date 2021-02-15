@@ -45,7 +45,7 @@ namespace OpenKh.Tools.EpdEditor
             this.ExtraParamGBox.Controls.Add(this.ParameterName);
             this.ExtraParamGBox.Location = new System.Drawing.Point(5, 5);
             this.ExtraParamGBox.Name = "ExtraParamGBox";
-            this.ExtraParamGBox.Size = new System.Drawing.Size(288, 71);
+            this.ExtraParamGBox.Size = new System.Drawing.Size(211, 71);
             this.ExtraParamGBox.TabIndex = 0;
             this.ExtraParamGBox.TabStop = false;
             this.ExtraParamGBox.Text = "Extra Param 1";
@@ -53,7 +53,7 @@ namespace OpenKh.Tools.EpdEditor
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(190, 19);
+            this.label2.Location = new System.Drawing.Point(107, 19);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(35, 15);
             this.label2.TabIndex = 3;
@@ -70,17 +70,16 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // ParameterValue
             // 
-            this.ParameterValue.Location = new System.Drawing.Point(193, 38);
+            this.ParameterValue.Location = new System.Drawing.Point(110, 38);
             this.ParameterValue.Name = "ParameterValue";
             this.ParameterValue.Size = new System.Drawing.Size(87, 23);
             this.ParameterValue.TabIndex = 1;
             // 
             // ParameterName
             // 
-            this.ParameterName.Enabled = false;
             this.ParameterName.Location = new System.Drawing.Point(6, 38);
             this.ParameterName.Name = "ParameterName";
-            this.ParameterName.Size = new System.Drawing.Size(181, 23);
+            this.ParameterName.Size = new System.Drawing.Size(98, 23);
             this.ParameterName.TabIndex = 0;
             // 
             // ExtraControl
@@ -89,7 +88,7 @@ namespace OpenKh.Tools.EpdEditor
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.ExtraParamGBox);
             this.Name = "ExtraControl";
-            this.Size = new System.Drawing.Size(300, 84);
+            this.Size = new System.Drawing.Size(227, 84);
             this.ExtraParamGBox.ResumeLayout(false);
             this.ExtraParamGBox.PerformLayout();
             this.ResumeLayout(false);
