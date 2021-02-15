@@ -735,7 +735,7 @@ namespace OpenKh.Tools.EpdEditor
             this.SaveEPDButton.Name = "SaveEPDButton";
             this.SaveEPDButton.Size = new System.Drawing.Size(75, 23);
             this.SaveEPDButton.TabIndex = 4;
-            this.SaveEPDButton.Text = "Save";
+            this.SaveEPDButton.Text = "Save as..";
             this.SaveEPDButton.UseVisualStyleBackColor = true;
             this.SaveEPDButton.Click += new System.EventHandler(this.SaveEPDButton_Click);
             // 
@@ -1012,7 +1012,7 @@ namespace OpenKh.Tools.EpdEditor
             this.ExtraParamsGBox.Controls.Add(this.ExtraLayout);
             this.ExtraParamsGBox.Location = new System.Drawing.Point(3, 308);
             this.ExtraParamsGBox.Name = "ExtraParamsGBox";
-            this.ExtraParamsGBox.Size = new System.Drawing.Size(1110, 115);
+            this.ExtraParamsGBox.Size = new System.Drawing.Size(1110, 142);
             this.ExtraParamsGBox.TabIndex = 8;
             this.ExtraParamsGBox.TabStop = false;
             this.ExtraParamsGBox.Text = "Extra Parameters";
@@ -1024,7 +1024,7 @@ namespace OpenKh.Tools.EpdEditor
             this.ExtraLayout.Dock = System.Windows.Forms.DockStyle.Left;
             this.ExtraLayout.Location = new System.Drawing.Point(3, 19);
             this.ExtraLayout.Name = "ExtraLayout";
-            this.ExtraLayout.Size = new System.Drawing.Size(1100, 93);
+            this.ExtraLayout.Size = new System.Drawing.Size(1100, 120);
             this.ExtraLayout.TabIndex = 0;
             this.ExtraLayout.WrapContents = false;
             // 
@@ -1037,7 +1037,7 @@ namespace OpenKh.Tools.EpdEditor
             this.OptionalLayoutPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.OptionalLayoutPanel.Location = new System.Drawing.Point(13, 347);
             this.OptionalLayoutPanel.Name = "OptionalLayoutPanel";
-            this.OptionalLayoutPanel.Size = new System.Drawing.Size(1124, 431);
+            this.OptionalLayoutPanel.Size = new System.Drawing.Size(1124, 453);
             this.OptionalLayoutPanel.TabIndex = 9;
             // 
             // EPDForm
@@ -1045,7 +1045,7 @@ namespace OpenKh.Tools.EpdEditor
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1149, 788);
+            this.ClientSize = new System.Drawing.Size(1149, 809);
             this.Controls.Add(this.OptionalLayoutPanel);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.SaveEPDButton);

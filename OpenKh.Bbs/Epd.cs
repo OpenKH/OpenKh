@@ -128,7 +128,7 @@ namespace OpenKh.Bbs
 
         public class ExtraParameters
         {
-            [Data(Count = 12)] public char[] ParameterName { get; set; }
+            [Data(Count = 12)] public string ParameterName { get; set; }
             [Data] public float ParameterValue { get; set; }
         }
 
@@ -231,6 +231,48 @@ namespace OpenKh.Bbs
             return stat;
         }
 
+        public static uint GetStatusAilmentFromStates(bool Fly, bool SmallDamage, bool SmallDamageOnly, bool Hitback, bool Poison, bool Slow,
+                                                      bool Stop, bool Bind, bool Faint, bool Freeze, bool Burn, bool Confuse, bool Blind, bool Death,
+                                                      bool ZeroGravity, bool Mini, bool Magnet, bool Degen, bool Sleep)
+        {
+            uint AilmentFlag = 0;
+
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 0, Fly);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 1, SmallDamage);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 2, SmallDamageOnly);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 3, Hitback);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 10, Poison);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 11, Slow);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 12, Stop);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 13, Bind);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 14, Faint);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 15, Freeze);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 16, Burn);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 17, Confuse);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 18, Blind);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 19, Death);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 20, ZeroGravity);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 21, Mini);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 22, Magnet);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 23, Degen);
+            AilmentFlag = BitsUtil.Int.SetBit(AilmentFlag, 24, Sleep);
+
+            return AilmentFlag;
+        }
+
+        public static uint GetEffectivenessFlagFromStates(uint Poison, uint Stop, uint Bind, uint Faint, uint Blind, uint Minimum)
+        {
+            uint Effectiveness = 0;
+            Effectiveness = BitsUtil.Int.SetBits(Effectiveness, 0, 2, Poison);
+            Effectiveness = BitsUtil.Int.SetBits(Effectiveness, 2, 2, Stop);
+            Effectiveness = BitsUtil.Int.SetBits(Effectiveness, 4, 2, Bind);
+            Effectiveness = BitsUtil.Int.SetBits(Effectiveness, 6, 2, Faint);
+            Effectiveness = BitsUtil.Int.SetBits(Effectiveness, 8, 2, Blind);
+            Effectiveness = BitsUtil.Int.SetBits(Effectiveness, 10, 2, Minimum);
+
+            return Effectiveness;
+        }
+
         public static EffectivenessFlag GetEffectivenessFlag(Epd epd)
         {
             EffectivenessFlag flag = new EffectivenessFlag();
@@ -289,6 +331,38 @@ namespace OpenKh.Bbs
             }
 
             return epd;
+        }
+
+        public static void Write(Stream stream, Epd epd)
+        {
+            BinaryMapping.WriteObject<Header>(stream, epd.header);
+            BinaryMapping.WriteObject<GeneralParameters>(stream, epd.generalParameters);
+            BinaryWriter w = new BinaryWriter(stream);
+
+            foreach(char[] anim in epd.AnimationList)
+            {
+                w.Write(anim);
+            }
+
+            stream.Write((uint)0);
+            stream.Write((uint)0);
+
+            BinaryMapping.WriteObject<OtherParameters>(stream, epd.otherParameters);
+
+            foreach (TechniqueParameters param in epd.techniqueParameters)
+            {
+                BinaryMapping.WriteObject<TechniqueParameters>(stream, param);
+            }
+
+            foreach (DropParameters param in epd.dropParameters)
+            {
+                BinaryMapping.WriteObject<DropParameters>(stream, param);
+            }
+
+            foreach (ExtraParameters param in epd.extraParameters)
+            {
+                BinaryMapping.WriteObject<ExtraParameters>(stream, param);
+            }
         }
 
         public static bool IsValid(Stream stream) =>

@@ -86,7 +86,7 @@ namespace OpenKh.Tools.EpdEditor
 
                 techCon.TechParamGBox.Text = "Parameter " + (t+1);
                 techCon.TechniquePower.Text = epd.techniqueParameters[t].TechniquePowerCorrection.ToString();
-                techCon.TechniqueNumber.Text = epd.techniqueParameters[t].TechniqueNumber.ToString();
+                techCon.NumericTechniqueNumber.Value = epd.techniqueParameters[t].TechniqueNumber;
                 techCon.AttackKind.SelectedIndex = epd.techniqueParameters[t].TechniqueKind;
                 techCon.AttackAttribute.SelectedIndex = epd.techniqueParameters[t].TechniqueAttribute % 8;
                 techCon.NumericSuccessRate.Value = epd.techniqueParameters[t].SuccessRate;
@@ -111,10 +111,101 @@ namespace OpenKh.Tools.EpdEditor
                 ExtraControl extraCon = new ExtraControl();
 
                 extraCon.ExtraParamGBox.Text = "Extra Param " + (e+1);
-                string ParamName = new string(epd.extraParameters[e].ParameterName);
-                extraCon.ParameterName.Text = new string(ParamName);
+                extraCon.ParameterName.Text = epd.extraParameters[e].ParameterName;
                 extraCon.ParameterValue.Text = epd.extraParameters[e].ParameterValue.ToString();
                 ExtraLayout.Controls.Add(extraCon);
+            }
+        }
+
+        private void UpdateWriteInfo()
+        {
+            Epd.Header head = epd.header;
+            epd = new Epd();
+
+            epd.header = head;
+
+            // General Parameters
+            epd.generalParameters = new Epd.GeneralParameters();
+            epd.generalParameters.StatusAilmentsFlag =
+                Epd.GetStatusAilmentFromStates(
+                    StatusAilment_checkbox_01.Checked, StatusAilment_checkbox_02.Checked, StatusAilment_checkbox_03.Checked, StatusAilment_checkbox_04.Checked, StatusAilment_checkbox_05.Checked,
+                    StatusAilment_checkbox_06.Checked, StatusAilment_checkbox_07.Checked, StatusAilment_checkbox_08.Checked, StatusAilment_checkbox_09.Checked, StatusAilment_checkbox_10.Checked,
+                    StatusAilment_checkbox_11.Checked, StatusAilment_checkbox_12.Checked, StatusAilment_checkbox_13.Checked, StatusAilment_checkbox_14.Checked, StatusAilment_checkbox_15.Checked,
+                    StatusAilment_checkbox_16.Checked, StatusAilment_checkbox_17.Checked, StatusAilment_checkbox_18.Checked, StatusAilment_checkbox_19.Checked);
+            epd.generalParameters.Health = float.Parse(MaxHealthBox.Text);
+            epd.generalParameters.ExperienceMultiplier = float.Parse(EXPMultiplierBox.Text);
+            epd.generalParameters.Size = uint.Parse(SizeBox.Text, System.Globalization.NumberStyles.Integer);
+            epd.generalParameters.PhysicalDamageMultiplier = float.Parse(PhysicalDamageBox.Text);
+            epd.generalParameters.FireDamageMultiplier = float.Parse(FireDamageBox.Text);
+            epd.generalParameters.IceDamageMultiplier = float.Parse(IceDamageBox.Text);
+            epd.generalParameters.ThunderDamageMultiplier = float.Parse(ThunderDamageBox.Text);
+            epd.generalParameters.DarknessDamageMultiplier = float.Parse(DarknessDamageBox.Text);
+            epd.generalParameters.NonElementalDamageMultiplier = float.Parse(SpecialDamageBox.Text);
+
+            // Anim list
+            epd.AnimationList = new List<char[]>();
+            foreach(TextBox txt in AnimationLayoutPanel.Controls)
+            {
+                char[] arr = new char[4];
+                if(txt.Text != "")
+                {
+                    arr[0] = txt.Text.ToCharArray()[0];
+                    arr[1] = txt.Text.ToCharArray()[1];
+                    arr[2] = txt.Text.ToCharArray()[2];
+                    arr[3] = (char)0;
+                }
+                epd.AnimationList.Add(arr);
+            }
+
+            // Other Parameters
+            epd.otherParameters = new Epd.OtherParameters();
+            epd.otherParameters.DamageCeiling = Decimal.ToUInt16(NumericDamageCeiling.Value);
+            epd.otherParameters.DamageFloor = Decimal.ToUInt16(NumericDamageFloor.Value);
+            epd.otherParameters.fWeight = float.Parse(NumericWeight.Text);
+            epd.otherParameters.EffectivenessFlag =
+                Epd.GetEffectivenessFlagFromStates(decimal.ToUInt32(NumericPoison.Value), decimal.ToUInt32(NumericStop.Value), decimal.ToUInt32(NumericBind.Value),
+                                                   decimal.ToUInt32(NumericFaint.Value), decimal.ToUInt32(NumericBlind.Value), decimal.ToUInt32(NumericMini.Value));
+            epd.otherParameters.PrizeBoxProbability = decimal.ToSByte(NumericPrizeboxProbability.Value);
+            epd.otherParameters.padding = new byte[3];
+            epd.otherParameters.TechniqueParameterCount = (uint)TechniqueLayout.Controls.Count;
+            epd.otherParameters.TechniqueParameterOffset = 0xA0;
+            epd.otherParameters.DropItemsCount = (uint)DroppedLayout.Controls.Count;
+            epd.otherParameters.DropItemsOffset = 0xA0 + (epd.otherParameters.TechniqueParameterCount * 8);
+            epd.otherParameters.ExtraParametersCount = (uint)ExtraLayout.Controls.Count;
+            epd.otherParameters.ExtraParametersOffset = 0xA0 + ((epd.otherParameters.TechniqueParameterCount + epd.otherParameters.DropItemsCount) * 8);
+
+            // Technique Parameters
+            epd.techniqueParameters = new List<Epd.TechniqueParameters>();
+            foreach(TechControl tech in TechniqueLayout.Controls)
+            {
+                Epd.TechniqueParameters param = new Epd.TechniqueParameters();
+                param.TechniquePowerCorrection = float.Parse(tech.TechniquePower.Text);
+                param.TechniqueNumber = decimal.ToByte(tech.NumericTechniqueNumber.Value);
+                param.TechniqueKind = (byte)tech.AttackKind.SelectedIndex;
+                param.TechniqueAttribute = (byte)tech.AttackAttribute.SelectedIndex;
+                param.SuccessRate = decimal.ToByte(tech.NumericSuccessRate.Value);
+                epd.techniqueParameters.Add(param);
+            }
+
+            // Drop Parameters
+            epd.dropParameters = new List<Epd.DropParameters>();
+            foreach(DropControl drop in DroppedLayout.Controls)
+            {
+                Epd.DropParameters param = new Epd.DropParameters();
+                param.ItemIndex = (uint)drop.ItemComboBox.SelectedIndex;
+                param.ItemCount = decimal.ToUInt16(drop.NumericItemCount.Value);
+                param.Probability = decimal.ToUInt16(drop.NumericItemProbability.Value);
+                epd.dropParameters.Add(param);
+            }
+
+            // Extra Parameters
+            epd.extraParameters = new List<Epd.ExtraParameters>();
+            foreach(ExtraControl extra in ExtraLayout.Controls)
+            {
+                Epd.ExtraParameters param = new Epd.ExtraParameters();
+                param.ParameterName = extra.ParameterName.Text;
+                param.ParameterValue = float.Parse(extra.ParameterValue.Text);
+                epd.extraParameters.Add(param);
             }
         }
 
@@ -136,6 +227,18 @@ namespace OpenKh.Tools.EpdEditor
 
         private void SaveEPDButton_Click(object sender, EventArgs e)
         {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "Enemy Parameter Data files (*.epd)|*.epd|All files (*.*)|*.*";
+            DialogResult result = dialog.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                Stream epdOut = File.OpenWrite(dialog.FileName);
+                UpdateWriteInfo();
+                Epd.Write(epdOut, epd);
+                epdOut.Close();
+            }
+
             MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }

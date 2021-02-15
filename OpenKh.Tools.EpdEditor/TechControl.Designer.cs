@@ -38,14 +38,16 @@ namespace OpenKh.Tools.EpdEditor
             this.AttackKind = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.TechniqueNumber = new System.Windows.Forms.TextBox();
             this.TechniquePower = new System.Windows.Forms.TextBox();
+            this.NumericTechniqueNumber = new System.Windows.Forms.NumericUpDown();
             this.TechParamGBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NumericSuccessRate)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumericTechniqueNumber)).BeginInit();
             this.SuspendLayout();
             // 
             // TechParamGBox
             // 
+            this.TechParamGBox.Controls.Add(this.NumericTechniqueNumber);
             this.TechParamGBox.Controls.Add(this.NumericSuccessRate);
             this.TechParamGBox.Controls.Add(this.label5);
             this.TechParamGBox.Controls.Add(this.label4);
@@ -54,18 +56,17 @@ namespace OpenKh.Tools.EpdEditor
             this.TechParamGBox.Controls.Add(this.AttackKind);
             this.TechParamGBox.Controls.Add(this.label2);
             this.TechParamGBox.Controls.Add(this.label1);
-            this.TechParamGBox.Controls.Add(this.TechniqueNumber);
             this.TechParamGBox.Controls.Add(this.TechniquePower);
             this.TechParamGBox.Location = new System.Drawing.Point(10, 0);
             this.TechParamGBox.Name = "TechParamGBox";
-            this.TechParamGBox.Size = new System.Drawing.Size(446, 117);
+            this.TechParamGBox.Size = new System.Drawing.Size(435, 117);
             this.TechParamGBox.TabIndex = 0;
             this.TechParamGBox.TabStop = false;
             this.TechParamGBox.Text = "Parameters 1";
             // 
             // NumericSuccessRate
             // 
-            this.NumericSuccessRate.Location = new System.Drawing.Point(269, 84);
+            this.NumericSuccessRate.Location = new System.Drawing.Point(264, 36);
             this.NumericSuccessRate.Maximum = new decimal(new int[] {
             65565,
             0,
@@ -78,7 +79,7 @@ namespace OpenKh.Tools.EpdEditor
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(270, 67);
+            this.label5.Location = new System.Drawing.Point(265, 19);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(74, 15);
             this.label5.TabIndex = 5;
@@ -87,7 +88,7 @@ namespace OpenKh.Tools.EpdEditor
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(269, 18);
+            this.label4.Location = new System.Drawing.Point(265, 66);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(91, 15);
             this.label4.TabIndex = 5;
@@ -115,7 +116,7 @@ namespace OpenKh.Tools.EpdEditor
             "ATK_ATTR_ZERO",
             "ATK_ATTR_SPECIAL",
             "ATK_ATTR_MAX"});
-            this.AttackAttribute.Location = new System.Drawing.Point(269, 36);
+            this.AttackAttribute.Location = new System.Drawing.Point(265, 84);
             this.AttackAttribute.Name = "AttackAttribute";
             this.AttackAttribute.Size = new System.Drawing.Size(158, 23);
             this.AttackAttribute.TabIndex = 4;
@@ -204,13 +205,6 @@ namespace OpenKh.Tools.EpdEditor
             this.label1.TabIndex = 2;
             this.label1.Text = "Technique Power";
             // 
-            // TechniqueNumber
-            // 
-            this.TechniqueNumber.Location = new System.Drawing.Point(124, 36);
-            this.TechniqueNumber.Name = "TechniqueNumber";
-            this.TechniqueNumber.Size = new System.Drawing.Size(100, 23);
-            this.TechniqueNumber.TabIndex = 1;
-            // 
             // TechniquePower
             // 
             this.TechniquePower.Location = new System.Drawing.Point(4, 36);
@@ -218,16 +212,29 @@ namespace OpenKh.Tools.EpdEditor
             this.TechniquePower.Size = new System.Drawing.Size(100, 23);
             this.TechniquePower.TabIndex = 0;
             // 
+            // NumericTechniqueNumber
+            // 
+            this.NumericTechniqueNumber.Location = new System.Drawing.Point(124, 36);
+            this.NumericTechniqueNumber.Maximum = new decimal(new int[] {
+            256,
+            0,
+            0,
+            0});
+            this.NumericTechniqueNumber.Name = "NumericTechniqueNumber";
+            this.NumericTechniqueNumber.Size = new System.Drawing.Size(62, 23);
+            this.NumericTechniqueNumber.TabIndex = 7;
+            // 
             // TechControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.TechParamGBox);
             this.Name = "TechControl";
-            this.Size = new System.Drawing.Size(467, 128);
+            this.Size = new System.Drawing.Size(454, 124);
             this.TechParamGBox.ResumeLayout(false);
             this.TechParamGBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NumericSuccessRate)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumericTechniqueNumber)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -243,7 +250,7 @@ namespace OpenKh.Tools.EpdEditor
         public System.Windows.Forms.ComboBox AttackKind;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        public System.Windows.Forms.TextBox TechniqueNumber;
         public System.Windows.Forms.TextBox TechniquePower;
+        public System.Windows.Forms.NumericUpDown NumericTechniqueNumber;
     }
 }
