@@ -1,10 +1,12 @@
 using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Messages;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using YamlDotNet.Serialization;
 
 namespace OpenKh.Patcher
 {
@@ -33,6 +35,18 @@ namespace OpenKh.Patcher
             public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, path);
             public string GetDestinationPath(string path) => Path.Combine(DestinationPath, path);
             public void EnsureDirectoryExists(string fileName) => Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            public void CopyOriginalFile(string fileName)
+            {
+                var dstFile = GetDestinationPath(fileName);
+                EnsureDirectoryExists(dstFile);
+
+                if (!File.Exists(dstFile))
+                {
+                    var originalFile = GetOriginalAssetPath(fileName);
+                    if (File.Exists(originalFile))
+                        File.Copy(originalFile, dstFile);
+                }
+            }
         }
 
         public void Patch(string originalAssets, string outputDir, string modFilePath)
@@ -52,19 +66,11 @@ namespace OpenKh.Patcher
 
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
+                    context.CopyOriginalFile(assetFile.Name);
                     var dstFile = context.GetDestinationPath(assetFile.Name);
-                    context.EnsureDirectoryExists(dstFile);
-
-                    if (!File.Exists(dstFile))
-                    {
-                        var originalFile = context.GetOriginalAssetPath(assetFile.Name);
-                        if (File.Exists(originalFile))
-                            File.Copy(originalFile, dstFile);
-                    }
 
                     using var stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                     PatchFile(context, assetFile, stream);
-                    stream.SetLength(stream.Position);
                 });
             }
             catch (Exception ex)
@@ -98,7 +104,12 @@ namespace OpenKh.Patcher
                 case "fac":
                     Imgd.WriteAsFac(stream, assetFile.Source.Select(x => CreateImageImd(context, x)));
                     break;
+                case "kh2msg":
+                    PatchKh2Msg(context, assetFile.Source, stream);
+                    break;
             }
+
+            stream.SetLength(stream.Position);
         }
 
         private static void CopyFile(Context context, AssetFile assetFile, Stream stream)
@@ -158,6 +169,49 @@ namespace OpenKh.Patcher
             }
 
             throw new Exception($"Image source '{source.Name}' not recognized");
+        }
+
+        private static void PatchKh2Msg(Context context, List<AssetFile> sources, Stream stream)
+        {
+            var msgs = Msg.IsValid(stream) ? Msg.Read(stream) : new List<Msg.Entry>();
+
+            foreach (var source in sources)
+            {
+                if (string.IsNullOrEmpty(source.Language))
+                    throw new Exception($"No language specified in '{source.Name}'");
+
+                var content = File.ReadAllText(context.GetSourceModAssetPath(source.Name));
+                var patchedMsgs = new Deserializer().Deserialize<List<Dictionary<string, string>>>(content);
+                foreach (var msg in patchedMsgs)
+                {
+                    if (!msg.TryGetValue("id", out var strId))
+                        throw new Exception($"Source '{source.Name}' contains a message without an ID");
+                    if (!ushort.TryParse(strId, out var id))
+                        throw new Exception($"Message ID '{strId} in '{source.Name}' must be between 0 and 65535");
+                    if (!msg.TryGetValue(source.Language, out var text))
+                        continue;
+
+                    var encoder = source.Language switch
+                    {
+                        "jp" => Encoders.JapaneseSystem,
+                        "tr" => Encoders.TurkishSystem,
+                        _ => Encoders.InternationalSystem,
+                    };
+
+                    var data = encoder.Encode(MsgSerializer.DeserializeText(text).ToList());
+                    var originalMsg = msgs.FirstOrDefault(x => x.Id == id);
+                    if (originalMsg == null)
+                        msgs.Add(new Msg.Entry
+                        {
+                            Id = id,
+                            Data = data
+                        });
+                    else
+                        originalMsg.Data = data;
+                }
+            }
+
+            Msg.WriteOptimized(stream.SetPosition(0), msgs);
         }
     }
 }
