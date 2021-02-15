@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
@@ -10,11 +10,11 @@ using Xe.IO;
 namespace OpenKh.Kh2
 {
     public partial class Imgd : IImageRead
-	{
+    {
         private class Header
         {
             [Data] public uint MagicCode { get; set; }
-            [Data] public int Unk04 { get; set; }
+            [Data] public int Version { get; set; }
             [Data] public int BitmapOffset { get; set; }
             [Data] public int BitmapLength { get; set; }
             [Data] public int ClutOffset { get; set; }
@@ -37,7 +37,7 @@ namespace OpenKh.Kh2
             [Data] public int Swizzled { get; set; }
         }
 
-		private const uint MagicCode = 0x44474D49U;
+        private const uint MagicCode = 0x44474D49U;
         private const int HeaderLength = 0x40;
         private const short Format32bpp = 0x00;
         private const short Format8bpp = 0x13;
@@ -54,8 +54,8 @@ namespace OpenKh.Kh2
         private readonly short format;
         private readonly int swizzled;
 
-		private Imgd(Stream stream)
-		{
+        private Imgd(Stream stream)
+        {
             stream
                 .MustReadAndSeek()
                 .MustHaveHeaderLengthOf(HeaderLength);
@@ -84,13 +84,13 @@ namespace OpenKh.Kh2
         public static Imgd Read(Stream stream) => new Imgd(stream.SetPosition(0));
 
         public void Write(Stream stream)
-		{
+        {
             stream.MustWriteAndSeek();
 
             BinaryMapping.WriteObject(stream, new Header
             {
                 MagicCode = MagicCode,
-                Unk04 = 0x100,
+                Version = 0x100,
                 BitmapOffset = HeaderLength,
                 BitmapLength = Data.Length,
                 ClutOffset = HeaderLength + Data.Length,
@@ -185,7 +185,7 @@ namespace OpenKh.Kh2
         /// In IMGD file:
         /// - NOT IsSwizzled && Format4bpp = storing reversed pixel order ([1, 2] to 0x21)
         /// </remarks>
-		public byte[] Data { get; }
+        public byte[] Data { get; }
 
         public byte[] Clut { get; }
 
@@ -194,18 +194,18 @@ namespace OpenKh.Kh2
         public PixelFormat PixelFormat => GetPixelFormat(format);
 
         public byte[] GetData()
-		{
-			switch (format)
+        {
+            switch (format)
             {
                 case Format32bpp:
                     return GetData32bpp();
                 case Format8bpp:
                     return IsSwizzled ? Ps2.Decode8(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data;
                 case Format4bpp:
-					return IsSwizzled ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data;
-				default:
-					throw new NotSupportedException($"The format {format} is not supported.");
-			}
+                    return IsSwizzled ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data;
+                default:
+                    throw new NotSupportedException($"The format {format} is not supported.");
+            }
         }
 
         public byte[] GetClut()
