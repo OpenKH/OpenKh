@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using OpenKh.Patcher;
@@ -238,6 +239,56 @@ namespace OpenKh.Tests.Patcher
             {
                 Assert.True(Imgd.IsValid(entry.Stream));
             }, ModOutputDir, patch.Assets[0].Name);
+        }
+
+        [Fact]
+        public void Kh2MergeImzTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "out.imz",
+                        Method = "imgz",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "test.imd",
+                                Index = 1,
+                            }
+                        }
+                    }
+                }
+            };
+
+            var tmpImd = Imgd.Create(new System.Drawing.Size(16, 16), PixelFormat.Indexed4, new byte[16 * 16 / 2], new byte[4], false);
+            var patchImd = Imgd.Create(new System.Drawing.Size(32, 16), PixelFormat.Indexed4, new byte[32 * 16 / 2], new byte[4], false);
+            CreateFile(AssetsInputDir, "out.imz").Using(x =>
+            {
+                Imgz.Write(x, new Imgd[]
+                {
+                    tmpImd,
+                    tmpImd,
+                    tmpImd,
+                });
+            });
+            CreateFile(ModInputDir, "test.imd").Using(patchImd.Write);
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "out.imz");
+            File.OpenRead(Path.Combine(ModOutputDir, "out.imz")).Using(x =>
+            {
+                var images = Imgz.Read(x).ToList();
+                Assert.Equal(3, images.Count);
+                Assert.Equal(16, images[0].Size.Width);
+                Assert.Equal(32, images[1].Size.Width);
+                Assert.Equal(16, images[2].Size.Width);
+            });
         }
 
         [Fact]

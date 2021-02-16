@@ -99,7 +99,7 @@ namespace OpenKh.Patcher
                     break;
                 case "imz":
                 case "imgz":
-                    Imgz.Write(stream, assetFile.Source.Select(x => CreateImageImd(context, x)));
+                    PatchImageImz(context, assetFile, stream);
                     break;
                 case "fac":
                     Imgd.WriteAsFac(stream, assetFile.Source.Select(x => CreateImageImd(context, x)));
@@ -167,8 +167,31 @@ namespace OpenKh.Patcher
                 var png = PngImage.Read(srcStream);
                 return Imgd.Create(png.Size, png.PixelFormat, png.GetData(), png.GetClut(), source.IsSwizzled);
             }
+            else if (Imgd.IsValid(srcStream))
+                return Imgd.Read(srcStream);
 
             throw new Exception($"Image source '{source.Name}' not recognized");
+        }
+
+        private static void PatchImageImz(Context context, AssetFile assetFile, Stream stream)
+        {
+            var index = 0;
+            var images = Imgz.IsValid(stream) ? Imgz.Read(stream).ToList() : new List<Imgd>();
+            foreach (var source in assetFile.Source)
+            {
+                if (source.Index > 0)
+                    index = source.Index;
+
+                var imd = CreateImageImd(context, source);
+                if (images.Count <= index)
+                    images.Add(imd);
+                else
+                    images[index] = imd;
+
+                index++;
+            }
+
+            Imgz.Write(stream.SetPosition(0), images);
         }
 
         private static void PatchKh2Msg(Context context, List<AssetFile> sources, Stream stream)
