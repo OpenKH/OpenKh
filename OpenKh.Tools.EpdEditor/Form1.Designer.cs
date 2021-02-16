@@ -175,7 +175,7 @@ namespace OpenKh.Tools.EpdEditor
             this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Location = new System.Drawing.Point(13, 43);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(722, 180);
+            this.groupBox1.Size = new System.Drawing.Size(701, 169);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General Stats";
@@ -183,145 +183,163 @@ namespace OpenKh.Tools.EpdEditor
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(540, 22);
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label2.Location = new System.Drawing.Point(529, 21);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(27, 15);
+            this.label2.Size = new System.Drawing.Size(27, 13);
             this.label2.TabIndex = 3;
             this.label2.Text = "Size";
             // 
             // SizeBox
             // 
-            this.SizeBox.Location = new System.Drawing.Point(540, 42);
+            this.SizeBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.SizeBox.Location = new System.Drawing.Point(529, 35);
             this.SizeBox.Name = "SizeBox";
-            this.SizeBox.Size = new System.Drawing.Size(60, 23);
+            this.SizeBox.Size = new System.Drawing.Size(60, 22);
             this.SizeBox.TabIndex = 2;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(628, 124);
+            this.label8.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label8.Location = new System.Drawing.Point(616, 113);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(73, 15);
+            this.label8.Size = new System.Drawing.Size(70, 13);
             this.label8.TabIndex = 3;
             this.label8.Text = "Special Dmg";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(541, 124);
+            this.label7.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label7.Location = new System.Drawing.Point(529, 113);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(83, 15);
+            this.label7.Size = new System.Drawing.Size(81, 13);
             this.label7.TabIndex = 3;
             this.label7.Text = "Darkness Dmg";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(458, 124);
+            this.label4.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label4.Location = new System.Drawing.Point(445, 113);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(80, 15);
+            this.label4.Size = new System.Drawing.Size(78, 13);
             this.label4.TabIndex = 3;
             this.label4.Text = "Thunder Dmg";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(627, 74);
+            this.label6.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label6.Location = new System.Drawing.Point(615, 64);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(51, 15);
+            this.label6.Size = new System.Drawing.Size(48, 13);
             this.label6.TabIndex = 3;
             this.label6.Text = "Ice Dmg";
             // 
             // SpecialDamageBox
             // 
-            this.SpecialDamageBox.Location = new System.Drawing.Point(628, 145);
+            this.SpecialDamageBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.SpecialDamageBox.Location = new System.Drawing.Point(615, 128);
             this.SpecialDamageBox.Name = "SpecialDamageBox";
-            this.SpecialDamageBox.Size = new System.Drawing.Size(60, 23);
+            this.SpecialDamageBox.Size = new System.Drawing.Size(60, 22);
             this.SpecialDamageBox.TabIndex = 2;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(540, 74);
+            this.label5.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label5.Location = new System.Drawing.Point(533, 64);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(55, 15);
+            this.label5.Size = new System.Drawing.Size(53, 13);
             this.label5.TabIndex = 3;
             this.label5.Text = "Fire Dmg";
             // 
             // DarknessDamageBox
             // 
-            this.DarknessDamageBox.Location = new System.Drawing.Point(541, 145);
+            this.DarknessDamageBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.DarknessDamageBox.Location = new System.Drawing.Point(530, 128);
             this.DarknessDamageBox.Name = "DarknessDamageBox";
-            this.DarknessDamageBox.Size = new System.Drawing.Size(60, 23);
+            this.DarknessDamageBox.Size = new System.Drawing.Size(60, 22);
             this.DarknessDamageBox.TabIndex = 2;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(457, 74);
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label3.Location = new System.Drawing.Point(445, 64);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(79, 15);
+            this.label3.Size = new System.Drawing.Size(74, 13);
             this.label3.TabIndex = 3;
             this.label3.Text = "Physical Dmg";
             // 
             // ThunderDamageBox
             // 
-            this.ThunderDamageBox.Location = new System.Drawing.Point(457, 145);
+            this.ThunderDamageBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.ThunderDamageBox.Location = new System.Drawing.Point(446, 128);
             this.ThunderDamageBox.Name = "ThunderDamageBox";
-            this.ThunderDamageBox.Size = new System.Drawing.Size(60, 23);
+            this.ThunderDamageBox.Size = new System.Drawing.Size(60, 22);
             this.ThunderDamageBox.TabIndex = 2;
             // 
             // IceDamageBox
             // 
-            this.IceDamageBox.Location = new System.Drawing.Point(627, 95);
+            this.IceDamageBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.IceDamageBox.Location = new System.Drawing.Point(615, 80);
             this.IceDamageBox.Name = "IceDamageBox";
-            this.IceDamageBox.Size = new System.Drawing.Size(60, 23);
+            this.IceDamageBox.Size = new System.Drawing.Size(60, 22);
             this.IceDamageBox.TabIndex = 2;
             // 
             // FireDamageBox
             // 
-            this.FireDamageBox.Location = new System.Drawing.Point(540, 95);
+            this.FireDamageBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.FireDamageBox.Location = new System.Drawing.Point(530, 80);
             this.FireDamageBox.Name = "FireDamageBox";
-            this.FireDamageBox.Size = new System.Drawing.Size(60, 23);
+            this.FireDamageBox.Size = new System.Drawing.Size(60, 22);
             this.FireDamageBox.TabIndex = 2;
             // 
             // PhysicalDamageBox
             // 
-            this.PhysicalDamageBox.Location = new System.Drawing.Point(457, 95);
+            this.PhysicalDamageBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.PhysicalDamageBox.Location = new System.Drawing.Point(446, 80);
             this.PhysicalDamageBox.Name = "PhysicalDamageBox";
-            this.PhysicalDamageBox.Size = new System.Drawing.Size(60, 23);
+            this.PhysicalDamageBox.Size = new System.Drawing.Size(60, 22);
             this.PhysicalDamageBox.TabIndex = 2;
             // 
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(628, 21);
+            this.label19.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label19.Location = new System.Drawing.Point(615, 21);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(81, 15);
+            this.label19.Size = new System.Drawing.Size(78, 13);
             this.label19.TabIndex = 3;
             this.label19.Text = "EXP Multiplier";
             // 
             // EXPMultiplierBox
             // 
-            this.EXPMultiplierBox.Location = new System.Drawing.Point(628, 42);
+            this.EXPMultiplierBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.EXPMultiplierBox.Location = new System.Drawing.Point(615, 35);
             this.EXPMultiplierBox.Name = "EXPMultiplierBox";
-            this.EXPMultiplierBox.Size = new System.Drawing.Size(60, 23);
+            this.EXPMultiplierBox.Size = new System.Drawing.Size(60, 22);
             this.EXPMultiplierBox.TabIndex = 2;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(458, 21);
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label1.Location = new System.Drawing.Point(446, 21);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(68, 15);
+            this.label1.Size = new System.Drawing.Size(65, 13);
             this.label1.TabIndex = 3;
             this.label1.Text = "Max Health";
             // 
             // MaxHealthBox
             // 
-            this.MaxHealthBox.Location = new System.Drawing.Point(458, 42);
+            this.MaxHealthBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.MaxHealthBox.Location = new System.Drawing.Point(446, 35);
             this.MaxHealthBox.Name = "MaxHealthBox";
-            this.MaxHealthBox.Size = new System.Drawing.Size(60, 23);
+            this.MaxHealthBox.Size = new System.Drawing.Size(60, 22);
             this.MaxHealthBox.TabIndex = 2;
             // 
             // groupBox2
@@ -329,7 +347,7 @@ namespace OpenKh.Tools.EpdEditor
             this.groupBox2.Controls.Add(this.flowLayoutPanel1);
             this.groupBox2.Location = new System.Drawing.Point(6, 15);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(434, 160);
+            this.groupBox2.Size = new System.Drawing.Size(434, 148);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Status Ailments";
@@ -358,15 +376,16 @@ namespace OpenKh.Tools.EpdEditor
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(6, 22);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(419, 131);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(419, 120);
             this.flowLayoutPanel1.TabIndex = 1;
             // 
             // StatusAilment_checkbox_01
             // 
             this.StatusAilment_checkbox_01.AutoSize = true;
+            this.StatusAilment_checkbox_01.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.StatusAilment_checkbox_01.Location = new System.Drawing.Point(3, 3);
             this.StatusAilment_checkbox_01.Name = "StatusAilment_checkbox_01";
-            this.StatusAilment_checkbox_01.Size = new System.Drawing.Size(41, 19);
+            this.StatusAilment_checkbox_01.Size = new System.Drawing.Size(40, 17);
             this.StatusAilment_checkbox_01.TabIndex = 0;
             this.StatusAilment_checkbox_01.Text = "Fly";
             this.StatusAilment_checkbox_01.UseVisualStyleBackColor = true;
@@ -374,9 +393,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_02
             // 
             this.StatusAilment_checkbox_02.AutoSize = true;
-            this.StatusAilment_checkbox_02.Location = new System.Drawing.Point(3, 28);
+            this.StatusAilment_checkbox_02.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_02.Location = new System.Drawing.Point(3, 26);
             this.StatusAilment_checkbox_02.Name = "StatusAilment_checkbox_02";
-            this.StatusAilment_checkbox_02.Size = new System.Drawing.Size(151, 19);
+            this.StatusAilment_checkbox_02.Size = new System.Drawing.Size(146, 17);
             this.StatusAilment_checkbox_02.TabIndex = 0;
             this.StatusAilment_checkbox_02.Text = "Small Damage Reaction";
             this.StatusAilment_checkbox_02.UseVisualStyleBackColor = true;
@@ -384,9 +404,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_03
             // 
             this.StatusAilment_checkbox_03.AutoSize = true;
-            this.StatusAilment_checkbox_03.Location = new System.Drawing.Point(3, 53);
+            this.StatusAilment_checkbox_03.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_03.Location = new System.Drawing.Point(3, 49);
             this.StatusAilment_checkbox_03.Name = "StatusAilment_checkbox_03";
-            this.StatusAilment_checkbox_03.Size = new System.Drawing.Size(179, 19);
+            this.StatusAilment_checkbox_03.Size = new System.Drawing.Size(173, 17);
             this.StatusAilment_checkbox_03.TabIndex = 0;
             this.StatusAilment_checkbox_03.Text = "Small Damage Reaction Only";
             this.StatusAilment_checkbox_03.UseVisualStyleBackColor = true;
@@ -394,9 +415,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_04
             // 
             this.StatusAilment_checkbox_04.AutoSize = true;
-            this.StatusAilment_checkbox_04.Location = new System.Drawing.Point(3, 78);
+            this.StatusAilment_checkbox_04.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_04.Location = new System.Drawing.Point(3, 72);
             this.StatusAilment_checkbox_04.Name = "StatusAilment_checkbox_04";
-            this.StatusAilment_checkbox_04.Size = new System.Drawing.Size(67, 19);
+            this.StatusAilment_checkbox_04.Size = new System.Drawing.Size(65, 17);
             this.StatusAilment_checkbox_04.TabIndex = 0;
             this.StatusAilment_checkbox_04.Text = "Hitback";
             this.StatusAilment_checkbox_04.UseVisualStyleBackColor = true;
@@ -404,9 +426,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_05
             // 
             this.StatusAilment_checkbox_05.AutoSize = true;
-            this.StatusAilment_checkbox_05.Location = new System.Drawing.Point(3, 103);
+            this.StatusAilment_checkbox_05.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_05.Location = new System.Drawing.Point(3, 95);
             this.StatusAilment_checkbox_05.Name = "StatusAilment_checkbox_05";
-            this.StatusAilment_checkbox_05.Size = new System.Drawing.Size(62, 19);
+            this.StatusAilment_checkbox_05.Size = new System.Drawing.Size(61, 17);
             this.StatusAilment_checkbox_05.TabIndex = 0;
             this.StatusAilment_checkbox_05.Text = "Poison";
             this.StatusAilment_checkbox_05.UseVisualStyleBackColor = true;
@@ -414,9 +437,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_06
             // 
             this.StatusAilment_checkbox_06.AutoSize = true;
-            this.StatusAilment_checkbox_06.Location = new System.Drawing.Point(188, 3);
+            this.StatusAilment_checkbox_06.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_06.Location = new System.Drawing.Point(182, 3);
             this.StatusAilment_checkbox_06.Name = "StatusAilment_checkbox_06";
-            this.StatusAilment_checkbox_06.Size = new System.Drawing.Size(51, 19);
+            this.StatusAilment_checkbox_06.Size = new System.Drawing.Size(51, 17);
             this.StatusAilment_checkbox_06.TabIndex = 0;
             this.StatusAilment_checkbox_06.Text = "Slow";
             this.StatusAilment_checkbox_06.UseVisualStyleBackColor = true;
@@ -424,9 +448,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_07
             // 
             this.StatusAilment_checkbox_07.AutoSize = true;
-            this.StatusAilment_checkbox_07.Location = new System.Drawing.Point(188, 28);
+            this.StatusAilment_checkbox_07.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_07.Location = new System.Drawing.Point(182, 26);
             this.StatusAilment_checkbox_07.Name = "StatusAilment_checkbox_07";
-            this.StatusAilment_checkbox_07.Size = new System.Drawing.Size(50, 19);
+            this.StatusAilment_checkbox_07.Size = new System.Drawing.Size(50, 17);
             this.StatusAilment_checkbox_07.TabIndex = 0;
             this.StatusAilment_checkbox_07.Text = "Stop";
             this.StatusAilment_checkbox_07.UseVisualStyleBackColor = true;
@@ -434,9 +459,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_08
             // 
             this.StatusAilment_checkbox_08.AutoSize = true;
-            this.StatusAilment_checkbox_08.Location = new System.Drawing.Point(188, 53);
+            this.StatusAilment_checkbox_08.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_08.Location = new System.Drawing.Point(182, 49);
             this.StatusAilment_checkbox_08.Name = "StatusAilment_checkbox_08";
-            this.StatusAilment_checkbox_08.Size = new System.Drawing.Size(50, 19);
+            this.StatusAilment_checkbox_08.Size = new System.Drawing.Size(49, 17);
             this.StatusAilment_checkbox_08.TabIndex = 0;
             this.StatusAilment_checkbox_08.Text = "Bind";
             this.StatusAilment_checkbox_08.UseVisualStyleBackColor = true;
@@ -444,9 +470,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_09
             // 
             this.StatusAilment_checkbox_09.AutoSize = true;
-            this.StatusAilment_checkbox_09.Location = new System.Drawing.Point(188, 78);
+            this.StatusAilment_checkbox_09.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_09.Location = new System.Drawing.Point(182, 72);
             this.StatusAilment_checkbox_09.Name = "StatusAilment_checkbox_09";
-            this.StatusAilment_checkbox_09.Size = new System.Drawing.Size(52, 19);
+            this.StatusAilment_checkbox_09.Size = new System.Drawing.Size(52, 17);
             this.StatusAilment_checkbox_09.TabIndex = 0;
             this.StatusAilment_checkbox_09.Text = "Faint";
             this.StatusAilment_checkbox_09.UseVisualStyleBackColor = true;
@@ -454,9 +481,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_10
             // 
             this.StatusAilment_checkbox_10.AutoSize = true;
-            this.StatusAilment_checkbox_10.Location = new System.Drawing.Point(188, 103);
+            this.StatusAilment_checkbox_10.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_10.Location = new System.Drawing.Point(182, 95);
             this.StatusAilment_checkbox_10.Name = "StatusAilment_checkbox_10";
-            this.StatusAilment_checkbox_10.Size = new System.Drawing.Size(59, 19);
+            this.StatusAilment_checkbox_10.Size = new System.Drawing.Size(59, 17);
             this.StatusAilment_checkbox_10.TabIndex = 0;
             this.StatusAilment_checkbox_10.Text = "Freeze";
             this.StatusAilment_checkbox_10.UseVisualStyleBackColor = true;
@@ -464,9 +492,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_11
             // 
             this.StatusAilment_checkbox_11.AutoSize = true;
-            this.StatusAilment_checkbox_11.Location = new System.Drawing.Point(253, 3);
+            this.StatusAilment_checkbox_11.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_11.Location = new System.Drawing.Point(247, 3);
             this.StatusAilment_checkbox_11.Name = "StatusAilment_checkbox_11";
-            this.StatusAilment_checkbox_11.Size = new System.Drawing.Size(51, 19);
+            this.StatusAilment_checkbox_11.Size = new System.Drawing.Size(50, 17);
             this.StatusAilment_checkbox_11.TabIndex = 0;
             this.StatusAilment_checkbox_11.Text = "Burn";
             this.StatusAilment_checkbox_11.UseVisualStyleBackColor = true;
@@ -474,9 +503,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_12
             // 
             this.StatusAilment_checkbox_12.AutoSize = true;
-            this.StatusAilment_checkbox_12.Location = new System.Drawing.Point(253, 28);
+            this.StatusAilment_checkbox_12.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_12.Location = new System.Drawing.Point(247, 26);
             this.StatusAilment_checkbox_12.Name = "StatusAilment_checkbox_12";
-            this.StatusAilment_checkbox_12.Size = new System.Drawing.Size(70, 19);
+            this.StatusAilment_checkbox_12.Size = new System.Drawing.Size(69, 17);
             this.StatusAilment_checkbox_12.TabIndex = 0;
             this.StatusAilment_checkbox_12.Text = "Confuse";
             this.StatusAilment_checkbox_12.UseVisualStyleBackColor = true;
@@ -484,9 +514,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_13
             // 
             this.StatusAilment_checkbox_13.AutoSize = true;
-            this.StatusAilment_checkbox_13.Location = new System.Drawing.Point(253, 53);
+            this.StatusAilment_checkbox_13.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_13.Location = new System.Drawing.Point(247, 49);
             this.StatusAilment_checkbox_13.Name = "StatusAilment_checkbox_13";
-            this.StatusAilment_checkbox_13.Size = new System.Drawing.Size(53, 19);
+            this.StatusAilment_checkbox_13.Size = new System.Drawing.Size(52, 17);
             this.StatusAilment_checkbox_13.TabIndex = 1;
             this.StatusAilment_checkbox_13.Text = "Blind";
             this.StatusAilment_checkbox_13.UseVisualStyleBackColor = true;
@@ -494,9 +525,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_14
             // 
             this.StatusAilment_checkbox_14.AutoSize = true;
-            this.StatusAilment_checkbox_14.Location = new System.Drawing.Point(253, 78);
+            this.StatusAilment_checkbox_14.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_14.Location = new System.Drawing.Point(247, 72);
             this.StatusAilment_checkbox_14.Name = "StatusAilment_checkbox_14";
-            this.StatusAilment_checkbox_14.Size = new System.Drawing.Size(57, 19);
+            this.StatusAilment_checkbox_14.Size = new System.Drawing.Size(57, 17);
             this.StatusAilment_checkbox_14.TabIndex = 2;
             this.StatusAilment_checkbox_14.Text = "Death";
             this.StatusAilment_checkbox_14.UseVisualStyleBackColor = true;
@@ -504,9 +536,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_15
             // 
             this.StatusAilment_checkbox_15.AutoSize = true;
-            this.StatusAilment_checkbox_15.Location = new System.Drawing.Point(253, 103);
+            this.StatusAilment_checkbox_15.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_15.Location = new System.Drawing.Point(247, 95);
             this.StatusAilment_checkbox_15.Name = "StatusAilment_checkbox_15";
-            this.StatusAilment_checkbox_15.Size = new System.Drawing.Size(90, 19);
+            this.StatusAilment_checkbox_15.Size = new System.Drawing.Size(87, 17);
             this.StatusAilment_checkbox_15.TabIndex = 3;
             this.StatusAilment_checkbox_15.Text = "Zero Gravity";
             this.StatusAilment_checkbox_15.UseVisualStyleBackColor = true;
@@ -514,9 +547,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_16
             // 
             this.StatusAilment_checkbox_16.AutoSize = true;
-            this.StatusAilment_checkbox_16.Location = new System.Drawing.Point(349, 3);
+            this.StatusAilment_checkbox_16.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_16.Location = new System.Drawing.Point(340, 3);
             this.StatusAilment_checkbox_16.Name = "StatusAilment_checkbox_16";
-            this.StatusAilment_checkbox_16.Size = new System.Drawing.Size(50, 19);
+            this.StatusAilment_checkbox_16.Size = new System.Drawing.Size(49, 17);
             this.StatusAilment_checkbox_16.TabIndex = 4;
             this.StatusAilment_checkbox_16.Text = "Mini";
             this.StatusAilment_checkbox_16.UseVisualStyleBackColor = true;
@@ -524,9 +558,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_17
             // 
             this.StatusAilment_checkbox_17.AutoSize = true;
-            this.StatusAilment_checkbox_17.Location = new System.Drawing.Point(349, 28);
+            this.StatusAilment_checkbox_17.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_17.Location = new System.Drawing.Point(340, 26);
             this.StatusAilment_checkbox_17.Name = "StatusAilment_checkbox_17";
-            this.StatusAilment_checkbox_17.Size = new System.Drawing.Size(67, 19);
+            this.StatusAilment_checkbox_17.Size = new System.Drawing.Size(66, 17);
             this.StatusAilment_checkbox_17.TabIndex = 5;
             this.StatusAilment_checkbox_17.Text = "Magnet";
             this.StatusAilment_checkbox_17.UseVisualStyleBackColor = true;
@@ -534,9 +569,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_18
             // 
             this.StatusAilment_checkbox_18.AutoSize = true;
-            this.StatusAilment_checkbox_18.Location = new System.Drawing.Point(349, 53);
+            this.StatusAilment_checkbox_18.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_18.Location = new System.Drawing.Point(340, 49);
             this.StatusAilment_checkbox_18.Name = "StatusAilment_checkbox_18";
-            this.StatusAilment_checkbox_18.Size = new System.Drawing.Size(60, 19);
+            this.StatusAilment_checkbox_18.Size = new System.Drawing.Size(60, 17);
             this.StatusAilment_checkbox_18.TabIndex = 6;
             this.StatusAilment_checkbox_18.Text = "Degen";
             this.StatusAilment_checkbox_18.UseVisualStyleBackColor = true;
@@ -544,9 +580,10 @@ namespace OpenKh.Tools.EpdEditor
             // StatusAilment_checkbox_19
             // 
             this.StatusAilment_checkbox_19.AutoSize = true;
-            this.StatusAilment_checkbox_19.Location = new System.Drawing.Point(349, 78);
+            this.StatusAilment_checkbox_19.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.StatusAilment_checkbox_19.Location = new System.Drawing.Point(340, 72);
             this.StatusAilment_checkbox_19.Name = "StatusAilment_checkbox_19";
-            this.StatusAilment_checkbox_19.Size = new System.Drawing.Size(54, 19);
+            this.StatusAilment_checkbox_19.Size = new System.Drawing.Size(54, 17);
             this.StatusAilment_checkbox_19.TabIndex = 7;
             this.StatusAilment_checkbox_19.Text = "Sleep";
             this.StatusAilment_checkbox_19.UseVisualStyleBackColor = true;
@@ -554,9 +591,9 @@ namespace OpenKh.Tools.EpdEditor
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.AnimationLayoutPanel);
-            this.groupBox3.Location = new System.Drawing.Point(12, 229);
+            this.groupBox3.Location = new System.Drawing.Point(13, 218);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(986, 58);
+            this.groupBox3.Size = new System.Drawing.Size(953, 58);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Animation List";
@@ -583,133 +620,169 @@ namespace OpenKh.Tools.EpdEditor
             this.AnimationLayoutPanel.Controls.Add(this.AnimationTextBox_18);
             this.AnimationLayoutPanel.Location = new System.Drawing.Point(0, 23);
             this.AnimationLayoutPanel.Name = "AnimationLayoutPanel";
-            this.AnimationLayoutPanel.Size = new System.Drawing.Size(974, 30);
+            this.AnimationLayoutPanel.Size = new System.Drawing.Size(942, 30);
             this.AnimationLayoutPanel.TabIndex = 0;
             // 
             // AnimationTextBox_01
             // 
+            this.AnimationTextBox_01.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.AnimationTextBox_01.Location = new System.Drawing.Point(3, 3);
+            this.AnimationTextBox_01.MaxLength = 3;
             this.AnimationTextBox_01.Name = "AnimationTextBox_01";
-            this.AnimationTextBox_01.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_01.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_01.TabIndex = 0;
             // 
             // AnimationTextBox_02
             // 
-            this.AnimationTextBox_02.Location = new System.Drawing.Point(57, 3);
+            this.AnimationTextBox_02.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_02.Location = new System.Drawing.Point(55, 3);
+            this.AnimationTextBox_02.MaxLength = 3;
             this.AnimationTextBox_02.Name = "AnimationTextBox_02";
-            this.AnimationTextBox_02.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_02.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_02.TabIndex = 0;
             // 
             // AnimationTextBox_03
             // 
-            this.AnimationTextBox_03.Location = new System.Drawing.Point(111, 3);
+            this.AnimationTextBox_03.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_03.Location = new System.Drawing.Point(107, 3);
+            this.AnimationTextBox_03.MaxLength = 3;
             this.AnimationTextBox_03.Name = "AnimationTextBox_03";
-            this.AnimationTextBox_03.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_03.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_03.TabIndex = 1;
             // 
             // AnimationTextBox_04
             // 
-            this.AnimationTextBox_04.Location = new System.Drawing.Point(165, 3);
+            this.AnimationTextBox_04.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_04.Location = new System.Drawing.Point(159, 3);
+            this.AnimationTextBox_04.MaxLength = 3;
             this.AnimationTextBox_04.Name = "AnimationTextBox_04";
-            this.AnimationTextBox_04.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_04.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_04.TabIndex = 2;
             // 
             // AnimationTextBox_05
             // 
-            this.AnimationTextBox_05.Location = new System.Drawing.Point(219, 3);
+            this.AnimationTextBox_05.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_05.Location = new System.Drawing.Point(211, 3);
+            this.AnimationTextBox_05.MaxLength = 3;
             this.AnimationTextBox_05.Name = "AnimationTextBox_05";
-            this.AnimationTextBox_05.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_05.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_05.TabIndex = 3;
             // 
             // AnimationTextBox_06
             // 
-            this.AnimationTextBox_06.Location = new System.Drawing.Point(273, 3);
+            this.AnimationTextBox_06.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_06.Location = new System.Drawing.Point(263, 3);
+            this.AnimationTextBox_06.MaxLength = 3;
             this.AnimationTextBox_06.Name = "AnimationTextBox_06";
-            this.AnimationTextBox_06.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_06.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_06.TabIndex = 4;
             // 
             // AnimationTextBox_07
             // 
-            this.AnimationTextBox_07.Location = new System.Drawing.Point(327, 3);
+            this.AnimationTextBox_07.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_07.Location = new System.Drawing.Point(315, 3);
+            this.AnimationTextBox_07.MaxLength = 3;
             this.AnimationTextBox_07.Name = "AnimationTextBox_07";
-            this.AnimationTextBox_07.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_07.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_07.TabIndex = 5;
             // 
             // AnimationTextBox_08
             // 
-            this.AnimationTextBox_08.Location = new System.Drawing.Point(381, 3);
+            this.AnimationTextBox_08.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_08.Location = new System.Drawing.Point(367, 3);
+            this.AnimationTextBox_08.MaxLength = 3;
             this.AnimationTextBox_08.Name = "AnimationTextBox_08";
-            this.AnimationTextBox_08.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_08.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_08.TabIndex = 6;
             // 
             // AnimationTextBox_09
             // 
-            this.AnimationTextBox_09.Location = new System.Drawing.Point(435, 3);
+            this.AnimationTextBox_09.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_09.Location = new System.Drawing.Point(419, 3);
+            this.AnimationTextBox_09.MaxLength = 3;
             this.AnimationTextBox_09.Name = "AnimationTextBox_09";
-            this.AnimationTextBox_09.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_09.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_09.TabIndex = 7;
             // 
             // AnimationTextBox_10
             // 
-            this.AnimationTextBox_10.Location = new System.Drawing.Point(489, 3);
+            this.AnimationTextBox_10.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_10.Location = new System.Drawing.Point(471, 3);
+            this.AnimationTextBox_10.MaxLength = 3;
             this.AnimationTextBox_10.Name = "AnimationTextBox_10";
-            this.AnimationTextBox_10.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_10.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_10.TabIndex = 8;
             // 
             // AnimationTextBox_11
             // 
-            this.AnimationTextBox_11.Location = new System.Drawing.Point(543, 3);
+            this.AnimationTextBox_11.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_11.Location = new System.Drawing.Point(523, 3);
+            this.AnimationTextBox_11.MaxLength = 3;
             this.AnimationTextBox_11.Name = "AnimationTextBox_11";
-            this.AnimationTextBox_11.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_11.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_11.TabIndex = 9;
             // 
             // AnimationTextBox_12
             // 
-            this.AnimationTextBox_12.Location = new System.Drawing.Point(597, 3);
+            this.AnimationTextBox_12.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_12.Location = new System.Drawing.Point(575, 3);
+            this.AnimationTextBox_12.MaxLength = 3;
             this.AnimationTextBox_12.Name = "AnimationTextBox_12";
-            this.AnimationTextBox_12.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_12.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_12.TabIndex = 10;
             // 
             // AnimationTextBox_13
             // 
-            this.AnimationTextBox_13.Location = new System.Drawing.Point(651, 3);
+            this.AnimationTextBox_13.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_13.Location = new System.Drawing.Point(627, 3);
+            this.AnimationTextBox_13.MaxLength = 3;
             this.AnimationTextBox_13.Name = "AnimationTextBox_13";
-            this.AnimationTextBox_13.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_13.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_13.TabIndex = 11;
             // 
             // AnimationTextBox_14
             // 
-            this.AnimationTextBox_14.Location = new System.Drawing.Point(705, 3);
+            this.AnimationTextBox_14.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_14.Location = new System.Drawing.Point(679, 3);
+            this.AnimationTextBox_14.MaxLength = 3;
             this.AnimationTextBox_14.Name = "AnimationTextBox_14";
-            this.AnimationTextBox_14.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_14.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_14.TabIndex = 12;
             // 
             // AnimationTextBox_15
             // 
-            this.AnimationTextBox_15.Location = new System.Drawing.Point(759, 3);
+            this.AnimationTextBox_15.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_15.Location = new System.Drawing.Point(731, 3);
+            this.AnimationTextBox_15.MaxLength = 3;
             this.AnimationTextBox_15.Name = "AnimationTextBox_15";
-            this.AnimationTextBox_15.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_15.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_15.TabIndex = 13;
             // 
             // AnimationTextBox_16
             // 
-            this.AnimationTextBox_16.Location = new System.Drawing.Point(813, 3);
+            this.AnimationTextBox_16.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_16.Location = new System.Drawing.Point(783, 3);
+            this.AnimationTextBox_16.MaxLength = 3;
             this.AnimationTextBox_16.Name = "AnimationTextBox_16";
-            this.AnimationTextBox_16.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_16.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_16.TabIndex = 14;
             // 
             // AnimationTextBox_17
             // 
-            this.AnimationTextBox_17.Location = new System.Drawing.Point(867, 3);
+            this.AnimationTextBox_17.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_17.Location = new System.Drawing.Point(835, 3);
+            this.AnimationTextBox_17.MaxLength = 3;
             this.AnimationTextBox_17.Name = "AnimationTextBox_17";
-            this.AnimationTextBox_17.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_17.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_17.TabIndex = 15;
             // 
             // AnimationTextBox_18
             // 
-            this.AnimationTextBox_18.Location = new System.Drawing.Point(921, 3);
+            this.AnimationTextBox_18.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.AnimationTextBox_18.Location = new System.Drawing.Point(887, 3);
+            this.AnimationTextBox_18.MaxLength = 3;
             this.AnimationTextBox_18.Name = "AnimationTextBox_18";
-            this.AnimationTextBox_18.Size = new System.Drawing.Size(48, 23);
+            this.AnimationTextBox_18.Size = new System.Drawing.Size(46, 22);
             this.AnimationTextBox_18.TabIndex = 16;
             // 
             // textBox10
@@ -761,9 +834,9 @@ namespace OpenKh.Tools.EpdEditor
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.label11);
             this.groupBox4.Controls.Add(this.NumericWeight);
-            this.groupBox4.Location = new System.Drawing.Point(741, 50);
+            this.groupBox4.Location = new System.Drawing.Point(720, 43);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(257, 173);
+            this.groupBox4.Size = new System.Drawing.Size(246, 169);
             this.groupBox4.TabIndex = 5;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Other Parameters";
@@ -973,7 +1046,7 @@ namespace OpenKh.Tools.EpdEditor
             this.TechParamsGBox.Controls.Add(this.TechniqueLayout);
             this.TechParamsGBox.Location = new System.Drawing.Point(3, 3);
             this.TechParamsGBox.Name = "TechParamsGBox";
-            this.TechParamsGBox.Size = new System.Drawing.Size(983, 170);
+            this.TechParamsGBox.Size = new System.Drawing.Size(951, 164);
             this.TechParamsGBox.TabIndex = 6;
             this.TechParamsGBox.TabStop = false;
             this.TechParamsGBox.Text = "Technique Parameters";
@@ -985,16 +1058,16 @@ namespace OpenKh.Tools.EpdEditor
             this.TechniqueLayout.Dock = System.Windows.Forms.DockStyle.Left;
             this.TechniqueLayout.Location = new System.Drawing.Point(3, 19);
             this.TechniqueLayout.Name = "TechniqueLayout";
-            this.TechniqueLayout.Size = new System.Drawing.Size(969, 148);
+            this.TechniqueLayout.Size = new System.Drawing.Size(938, 142);
             this.TechniqueLayout.TabIndex = 0;
             this.TechniqueLayout.WrapContents = false;
             // 
             // DropItemsGBox
             // 
             this.DropItemsGBox.Controls.Add(this.DroppedLayout);
-            this.DropItemsGBox.Location = new System.Drawing.Point(3, 179);
+            this.DropItemsGBox.Location = new System.Drawing.Point(3, 173);
             this.DropItemsGBox.Name = "DropItemsGBox";
-            this.DropItemsGBox.Size = new System.Drawing.Size(984, 120);
+            this.DropItemsGBox.Size = new System.Drawing.Size(951, 120);
             this.DropItemsGBox.TabIndex = 7;
             this.DropItemsGBox.TabStop = false;
             this.DropItemsGBox.Text = "Dropped Items";
@@ -1002,17 +1075,20 @@ namespace OpenKh.Tools.EpdEditor
             // DroppedLayout
             // 
             this.DroppedLayout.AutoScroll = true;
-            this.DroppedLayout.Location = new System.Drawing.Point(5, 15);
+            this.DroppedLayout.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.DroppedLayout.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DroppedLayout.Location = new System.Drawing.Point(3, 19);
             this.DroppedLayout.Name = "DroppedLayout";
-            this.DroppedLayout.Size = new System.Drawing.Size(967, 95);
+            this.DroppedLayout.Size = new System.Drawing.Size(935, 98);
             this.DroppedLayout.TabIndex = 0;
+            this.DroppedLayout.WrapContents = false;
             // 
             // ExtraParamsGBox
             // 
             this.ExtraParamsGBox.Controls.Add(this.ExtraLayout);
-            this.ExtraParamsGBox.Location = new System.Drawing.Point(3, 305);
+            this.ExtraParamsGBox.Location = new System.Drawing.Point(3, 299);
             this.ExtraParamsGBox.Name = "ExtraParamsGBox";
-            this.ExtraParamsGBox.Size = new System.Drawing.Size(984, 130);
+            this.ExtraParamsGBox.Size = new System.Drawing.Size(951, 120);
             this.ExtraParamsGBox.TabIndex = 8;
             this.ExtraParamsGBox.TabStop = false;
             this.ExtraParamsGBox.Text = "Extra Parameters";
@@ -1024,7 +1100,7 @@ namespace OpenKh.Tools.EpdEditor
             this.ExtraLayout.Dock = System.Windows.Forms.DockStyle.Left;
             this.ExtraLayout.Location = new System.Drawing.Point(3, 19);
             this.ExtraLayout.Name = "ExtraLayout";
-            this.ExtraLayout.Size = new System.Drawing.Size(969, 108);
+            this.ExtraLayout.Size = new System.Drawing.Size(937, 98);
             this.ExtraLayout.TabIndex = 0;
             this.ExtraLayout.WrapContents = false;
             // 
@@ -1035,9 +1111,9 @@ namespace OpenKh.Tools.EpdEditor
             this.OptionalLayoutPanel.Controls.Add(this.DropItemsGBox);
             this.OptionalLayoutPanel.Controls.Add(this.ExtraParamsGBox);
             this.OptionalLayoutPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.OptionalLayoutPanel.Location = new System.Drawing.Point(11, 293);
+            this.OptionalLayoutPanel.Location = new System.Drawing.Point(12, 277);
             this.OptionalLayoutPanel.Name = "OptionalLayoutPanel";
-            this.OptionalLayoutPanel.Size = new System.Drawing.Size(990, 438);
+            this.OptionalLayoutPanel.Size = new System.Drawing.Size(957, 422);
             this.OptionalLayoutPanel.TabIndex = 9;
             // 
             // EPDForm
@@ -1045,7 +1121,7 @@ namespace OpenKh.Tools.EpdEditor
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1007, 739);
+            this.ClientSize = new System.Drawing.Size(978, 706);
             this.Controls.Add(this.OptionalLayoutPanel);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.SaveEPDButton);

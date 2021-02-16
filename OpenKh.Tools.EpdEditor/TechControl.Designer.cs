@@ -30,6 +30,7 @@ namespace OpenKh.Tools.EpdEditor
         private void InitializeComponent()
         {
             this.TechParamGBox = new System.Windows.Forms.GroupBox();
+            this.NumericTechniqueNumber = new System.Windows.Forms.NumericUpDown();
             this.NumericSuccessRate = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -39,10 +40,9 @@ namespace OpenKh.Tools.EpdEditor
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.TechniquePower = new System.Windows.Forms.TextBox();
-            this.NumericTechniqueNumber = new System.Windows.Forms.NumericUpDown();
             this.TechParamGBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NumericSuccessRate)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NumericTechniqueNumber)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumericSuccessRate)).BeginInit();
             this.SuspendLayout();
             // 
             // TechParamGBox
@@ -59,10 +59,22 @@ namespace OpenKh.Tools.EpdEditor
             this.TechParamGBox.Controls.Add(this.TechniquePower);
             this.TechParamGBox.Location = new System.Drawing.Point(10, 0);
             this.TechParamGBox.Name = "TechParamGBox";
-            this.TechParamGBox.Size = new System.Drawing.Size(435, 117);
+            this.TechParamGBox.Size = new System.Drawing.Size(435, 114);
             this.TechParamGBox.TabIndex = 0;
             this.TechParamGBox.TabStop = false;
             this.TechParamGBox.Text = "Parameters 1";
+            // 
+            // NumericTechniqueNumber
+            // 
+            this.NumericTechniqueNumber.Location = new System.Drawing.Point(124, 36);
+            this.NumericTechniqueNumber.Maximum = new decimal(new int[] {
+            256,
+            0,
+            0,
+            0});
+            this.NumericTechniqueNumber.Name = "NumericTechniqueNumber";
+            this.NumericTechniqueNumber.Size = new System.Drawing.Size(62, 23);
+            this.NumericTechniqueNumber.TabIndex = 7;
             // 
             // NumericSuccessRate
             // 
@@ -75,6 +87,11 @@ namespace OpenKh.Tools.EpdEditor
             this.NumericSuccessRate.Name = "NumericSuccessRate";
             this.NumericSuccessRate.Size = new System.Drawing.Size(75, 23);
             this.NumericSuccessRate.TabIndex = 6;
+            this.NumericSuccessRate.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             // 
             // label5
             // 
@@ -120,6 +137,7 @@ namespace OpenKh.Tools.EpdEditor
             this.AttackAttribute.Name = "AttackAttribute";
             this.AttackAttribute.Size = new System.Drawing.Size(158, 23);
             this.AttackAttribute.TabIndex = 4;
+            this.AttackAttribute.Text = "ATK_ATTR_NONE";
             // 
             // AttackKind
             // 
@@ -186,6 +204,7 @@ namespace OpenKh.Tools.EpdEditor
             this.AttackKind.Name = "AttackKind";
             this.AttackKind.Size = new System.Drawing.Size(253, 23);
             this.AttackKind.TabIndex = 4;
+            this.AttackKind.Text = "ATK_KIND_NONE";
             // 
             // label2
             // 
@@ -211,18 +230,7 @@ namespace OpenKh.Tools.EpdEditor
             this.TechniquePower.Name = "TechniquePower";
             this.TechniquePower.Size = new System.Drawing.Size(100, 23);
             this.TechniquePower.TabIndex = 0;
-            // 
-            // NumericTechniqueNumber
-            // 
-            this.NumericTechniqueNumber.Location = new System.Drawing.Point(124, 36);
-            this.NumericTechniqueNumber.Maximum = new decimal(new int[] {
-            256,
-            0,
-            0,
-            0});
-            this.NumericTechniqueNumber.Name = "NumericTechniqueNumber";
-            this.NumericTechniqueNumber.Size = new System.Drawing.Size(62, 23);
-            this.NumericTechniqueNumber.TabIndex = 7;
+            this.TechniquePower.Text = "1";
             // 
             // TechControl
             // 
@@ -230,11 +238,11 @@ namespace OpenKh.Tools.EpdEditor
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.TechParamGBox);
             this.Name = "TechControl";
-            this.Size = new System.Drawing.Size(454, 124);
+            this.Size = new System.Drawing.Size(454, 118);
             this.TechParamGBox.ResumeLayout(false);
             this.TechParamGBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NumericSuccessRate)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NumericTechniqueNumber)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumericSuccessRate)).EndInit();
             this.ResumeLayout(false);
 
         }

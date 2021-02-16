@@ -20,6 +20,7 @@ namespace OpenKh.Tools.EpdEditor
         }
 
         Epd epd = new Epd();
+        Stream epdFile;
 
         private void UpdateEPDData()
         {
@@ -93,6 +94,9 @@ namespace OpenKh.Tools.EpdEditor
                 TechniqueLayout.Controls.Add(techCon);
             }
 
+            AddTechParam techParamPlus = new AddTechParam();
+            TechniqueLayout.Controls.Add(techParamPlus);
+
             // Drop Parameters
             for (int d = 0; d < epd.dropParameters.Count; d++)
             {
@@ -105,6 +109,9 @@ namespace OpenKh.Tools.EpdEditor
                 DroppedLayout.Controls.Add(dropCon);
             }
 
+            AddDropParam dropParamPlus = new AddDropParam();
+            DroppedLayout.Controls.Add(dropParamPlus);
+
             // Extra Parameters
             for (int e = 0; e < epd.extraParameters.Count; e++)
             {
@@ -115,6 +122,9 @@ namespace OpenKh.Tools.EpdEditor
                 extraCon.ParameterValue.Text = epd.extraParameters[e].ParameterValue.ToString();
                 ExtraLayout.Controls.Add(extraCon);
             }
+
+            AddExtraParam extraParamPlus = new AddExtraParam();
+            ExtraLayout.Controls.Add(extraParamPlus);
         }
 
         private void UpdateWriteInfo()
@@ -167,45 +177,66 @@ namespace OpenKh.Tools.EpdEditor
                                                    decimal.ToUInt32(NumericFaint.Value), decimal.ToUInt32(NumericBlind.Value), decimal.ToUInt32(NumericMini.Value));
             epd.otherParameters.PrizeBoxProbability = decimal.ToSByte(NumericPrizeboxProbability.Value);
             epd.otherParameters.padding = new byte[3];
-            epd.otherParameters.TechniqueParameterCount = (uint)TechniqueLayout.Controls.Count;
-            epd.otherParameters.TechniqueParameterOffset = 0xA0;
-            epd.otherParameters.DropItemsCount = (uint)DroppedLayout.Controls.Count;
-            epd.otherParameters.DropItemsOffset = 0xA0 + (epd.otherParameters.TechniqueParameterCount * 8);
+            epd.otherParameters.TechniqueParameterCount = (uint)(TechniqueLayout.Controls.Count - 1 < 0 ? 0 : TechniqueLayout.Controls.Count - 1);
+            epd.otherParameters.TechniqueParameterOffset = 0xA8;
+            epd.otherParameters.DropItemsCount = (uint)(DroppedLayout.Controls.Count - 1 < 0 ? 0 : DroppedLayout.Controls.Count - 1);
+            epd.otherParameters.DropItemsOffset = 0xA8 + (epd.otherParameters.TechniqueParameterCount * 8);
             epd.otherParameters.ExtraParametersCount = (uint)ExtraLayout.Controls.Count;
-            epd.otherParameters.ExtraParametersOffset = 0xA0 + ((epd.otherParameters.TechniqueParameterCount + epd.otherParameters.DropItemsCount) * 8);
+            epd.otherParameters.ExtraParametersOffset = 0xA8 + ((epd.otherParameters.TechniqueParameterCount + epd.otherParameters.DropItemsCount) * 8);
 
             // Technique Parameters
             epd.techniqueParameters = new List<Epd.TechniqueParameters>();
-            foreach(TechControl tech in TechniqueLayout.Controls)
+            try
             {
-                Epd.TechniqueParameters param = new Epd.TechniqueParameters();
-                param.TechniquePowerCorrection = float.Parse(tech.TechniquePower.Text);
-                param.TechniqueNumber = decimal.ToByte(tech.NumericTechniqueNumber.Value);
-                param.TechniqueKind = (byte)tech.AttackKind.SelectedIndex;
-                param.TechniqueAttribute = (byte)tech.AttackAttribute.SelectedIndex;
-                param.SuccessRate = decimal.ToByte(tech.NumericSuccessRate.Value);
-                epd.techniqueParameters.Add(param);
+                foreach (TechControl tech in TechniqueLayout.Controls)
+                {
+                    Epd.TechniqueParameters param = new Epd.TechniqueParameters();
+                    param.TechniquePowerCorrection = float.Parse(tech.TechniquePower.Text);
+                    param.TechniqueNumber = decimal.ToByte(tech.NumericTechniqueNumber.Value);
+                    param.TechniqueKind = (byte)tech.AttackKind.SelectedIndex;
+                    param.TechniqueAttribute = (byte)tech.AttackAttribute.SelectedIndex;
+                    param.SuccessRate = decimal.ToByte(tech.NumericSuccessRate.Value);
+                    epd.techniqueParameters.Add(param);
+                }
+            }
+            catch (InvalidCastException)
+            {
+                Console.WriteLine("Cannot convert to this type.");
             }
 
             // Drop Parameters
             epd.dropParameters = new List<Epd.DropParameters>();
-            foreach(DropControl drop in DroppedLayout.Controls)
+            try
             {
-                Epd.DropParameters param = new Epd.DropParameters();
-                param.ItemIndex = (uint)drop.ItemComboBox.SelectedIndex;
-                param.ItemCount = decimal.ToUInt16(drop.NumericItemCount.Value);
-                param.Probability = decimal.ToUInt16(drop.NumericItemProbability.Value);
-                epd.dropParameters.Add(param);
+                foreach (DropControl drop in DroppedLayout.Controls)
+                {
+                    Epd.DropParameters param = new Epd.DropParameters();
+                    param.ItemIndex = (uint)drop.ItemComboBox.SelectedIndex;
+                    param.ItemCount = decimal.ToUInt16(drop.NumericItemCount.Value);
+                    param.Probability = decimal.ToUInt16(drop.NumericItemProbability.Value);
+                    epd.dropParameters.Add(param);
+                }
+            }
+            catch (InvalidCastException)
+            {
+                Console.WriteLine("Cannot convert to this type.");
             }
 
             // Extra Parameters
             epd.extraParameters = new List<Epd.ExtraParameters>();
-            foreach(ExtraControl extra in ExtraLayout.Controls)
+            try
             {
-                Epd.ExtraParameters param = new Epd.ExtraParameters();
-                param.ParameterName = extra.ParameterName.Text;
-                param.ParameterValue = float.Parse(extra.ParameterValue.Text);
-                epd.extraParameters.Add(param);
+                foreach (ExtraControl extra in ExtraLayout.Controls)
+                {
+                    Epd.ExtraParameters param = new Epd.ExtraParameters();
+                    param.ParameterName = extra.ParameterName.Text;
+                    param.ParameterValue = float.Parse(extra.ParameterValue.Text);
+                    epd.extraParameters.Add(param);
+                }
+            }
+            catch (InvalidCastException)
+            {
+                Console.WriteLine("Cannot convert to this type.");
             }
         }
 
@@ -220,7 +251,8 @@ namespace OpenKh.Tools.EpdEditor
                 TechniqueLayout.Controls.Clear();
                 DroppedLayout.Controls.Clear();
                 ExtraLayout.Controls.Clear();
-                Stream epdFile = File.OpenRead(dialog.FileName);
+                if (epdFile != null) epdFile.Close();
+                epdFile = File.OpenRead(dialog.FileName);
                 FileLoadedLabel.Text = "File currently loaded: " + dialog.FileName;
                 epd = Epd.Read(epdFile);
                 UpdateEPDData();

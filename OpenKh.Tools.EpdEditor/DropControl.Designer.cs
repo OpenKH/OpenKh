@@ -30,15 +30,15 @@ namespace OpenKh.Tools.EpdEditor
         private void InitializeComponent()
         {
             this.DropGBox = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.ItemComboBox = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.NumericItemCount = new System.Windows.Forms.NumericUpDown();
             this.NumericItemProbability = new System.Windows.Forms.NumericUpDown();
+            this.NumericItemCount = new System.Windows.Forms.NumericUpDown();
+            this.ItemComboBox = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.DropGBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NumericItemCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NumericItemProbability)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumericItemCount)).BeginInit();
             this.SuspendLayout();
             // 
             // DropGBox
@@ -49,21 +49,36 @@ namespace OpenKh.Tools.EpdEditor
             this.DropGBox.Controls.Add(this.label3);
             this.DropGBox.Controls.Add(this.label2);
             this.DropGBox.Controls.Add(this.label1);
-            this.DropGBox.Location = new System.Drawing.Point(5, 5);
+            this.DropGBox.Location = new System.Drawing.Point(5, 0);
             this.DropGBox.Name = "DropGBox";
-            this.DropGBox.Size = new System.Drawing.Size(365, 74);
+            this.DropGBox.Size = new System.Drawing.Size(365, 70);
             this.DropGBox.TabIndex = 0;
             this.DropGBox.TabStop = false;
             this.DropGBox.Text = "Drop Item 1";
             // 
-            // label1
+            // NumericItemProbability
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(45, 15);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Item ID";
+            this.NumericItemProbability.Location = new System.Drawing.Point(280, 37);
+            this.NumericItemProbability.Name = "NumericItemProbability";
+            this.NumericItemProbability.Size = new System.Drawing.Size(64, 23);
+            this.NumericItemProbability.TabIndex = 3;
+            // 
+            // NumericItemCount
+            // 
+            this.NumericItemCount.Location = new System.Drawing.Point(199, 37);
+            this.NumericItemCount.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.NumericItemCount.Name = "NumericItemCount";
+            this.NumericItemCount.Size = new System.Drawing.Size(59, 23);
+            this.NumericItemCount.TabIndex = 2;
+            this.NumericItemCount.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // ItemComboBox
             // 
@@ -92,15 +107,7 @@ namespace OpenKh.Tools.EpdEditor
             this.ItemComboBox.Name = "ItemComboBox";
             this.ItemComboBox.Size = new System.Drawing.Size(176, 23);
             this.ItemComboBox.TabIndex = 1;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(199, 19);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(40, 15);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Count";
+            this.ItemComboBox.Text = "ITEM_KIND_HP_SMALL";
             // 
             // label3
             // 
@@ -111,24 +118,23 @@ namespace OpenKh.Tools.EpdEditor
             this.label3.TabIndex = 0;
             this.label3.Text = "Probability";
             // 
-            // NumericItemCount
+            // label2
             // 
-            this.NumericItemCount.Location = new System.Drawing.Point(199, 37);
-            this.NumericItemCount.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.NumericItemCount.Name = "NumericItemCount";
-            this.NumericItemCount.Size = new System.Drawing.Size(59, 23);
-            this.NumericItemCount.TabIndex = 2;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(199, 19);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(40, 15);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Count";
             // 
-            // NumericItemProbability
+            // label1
             // 
-            this.NumericItemProbability.Location = new System.Drawing.Point(280, 37);
-            this.NumericItemProbability.Name = "NumericItemProbability";
-            this.NumericItemProbability.Size = new System.Drawing.Size(64, 23);
-            this.NumericItemProbability.TabIndex = 3;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 19);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(45, 15);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Item ID";
             // 
             // DropControl
             // 
@@ -136,11 +142,11 @@ namespace OpenKh.Tools.EpdEditor
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.DropGBox);
             this.Name = "DropControl";
-            this.Size = new System.Drawing.Size(377, 87);
+            this.Size = new System.Drawing.Size(377, 75);
             this.DropGBox.ResumeLayout(false);
             this.DropGBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NumericItemCount)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NumericItemProbability)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NumericItemCount)).EndInit();
             this.ResumeLayout(false);
 
         }

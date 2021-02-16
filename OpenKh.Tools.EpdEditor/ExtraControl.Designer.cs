@@ -43,7 +43,7 @@ namespace OpenKh.Tools.EpdEditor
             this.ExtraParamGBox.Controls.Add(this.label1);
             this.ExtraParamGBox.Controls.Add(this.ParameterValue);
             this.ExtraParamGBox.Controls.Add(this.ParameterName);
-            this.ExtraParamGBox.Location = new System.Drawing.Point(5, 5);
+            this.ExtraParamGBox.Location = new System.Drawing.Point(5, 0);
             this.ExtraParamGBox.Name = "ExtraParamGBox";
             this.ExtraParamGBox.Size = new System.Drawing.Size(211, 71);
             this.ExtraParamGBox.TabIndex = 0;
@@ -74,13 +74,16 @@ namespace OpenKh.Tools.EpdEditor
             this.ParameterValue.Name = "ParameterValue";
             this.ParameterValue.Size = new System.Drawing.Size(87, 23);
             this.ParameterValue.TabIndex = 1;
+            this.ParameterValue.Text = "1";
             // 
             // ParameterName
             // 
             this.ParameterName.Location = new System.Drawing.Point(6, 38);
+            this.ParameterName.MaxLength = 12;
             this.ParameterName.Name = "ParameterName";
             this.ParameterName.Size = new System.Drawing.Size(98, 23);
             this.ParameterName.TabIndex = 0;
+            this.ParameterName.Text = "Parameter";
             // 
             // ExtraControl
             // 
@@ -88,7 +91,7 @@ namespace OpenKh.Tools.EpdEditor
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.ExtraParamGBox);
             this.Name = "ExtraControl";
-            this.Size = new System.Drawing.Size(227, 84);
+            this.Size = new System.Drawing.Size(224, 75);
             this.ExtraParamGBox.ResumeLayout(false);
             this.ExtraParamGBox.PerformLayout();
             this.ResumeLayout(false);
