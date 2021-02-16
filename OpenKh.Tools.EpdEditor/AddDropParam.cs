@@ -18,7 +18,7 @@ namespace OpenKh.Tools.EpdEditor
         private void AddDropControl_Click(object sender, EventArgs e)
         {
             DropControl cont = new DropControl();
-            cont.DropGBox.Text = "Drop Item " + this.Parent.Controls.Count;
+            cont.DropGBox.Text = "Prize " + this.Parent.Controls.Count;
             this.Parent.Controls.Add(cont);
             this.Parent.Controls.Add(new AddDropParam());
             this.Parent.Controls.Remove(this);

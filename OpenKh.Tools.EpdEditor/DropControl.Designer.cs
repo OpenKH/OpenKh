@@ -54,7 +54,7 @@ namespace OpenKh.Tools.EpdEditor
             this.DropGBox.Size = new System.Drawing.Size(365, 70);
             this.DropGBox.TabIndex = 0;
             this.DropGBox.TabStop = false;
-            this.DropGBox.Text = "Drop Item 1";
+            this.DropGBox.Text = "Prize 1";
             // 
             // NumericItemProbability
             // 
@@ -132,9 +132,9 @@ namespace OpenKh.Tools.EpdEditor
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 19);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(45, 15);
+            this.label1.Size = new System.Drawing.Size(46, 15);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Item ID";
+            this.label1.Text = "Prize ID";
             // 
             // DropControl
             // 
