@@ -181,7 +181,7 @@ namespace OpenKh.Tools.EpdEditor
             epd.otherParameters.TechniqueParameterOffset = 0xA8;
             epd.otherParameters.DropItemsCount = (uint)(DroppedLayout.Controls.Count - 1 < 0 ? 0 : DroppedLayout.Controls.Count - 1);
             epd.otherParameters.DropItemsOffset = 0xA8 + (epd.otherParameters.TechniqueParameterCount * 8);
-            epd.otherParameters.ExtraParametersCount = (uint)ExtraLayout.Controls.Count;
+            epd.otherParameters.ExtraParametersCount = (uint)(ExtraLayout.Controls.Count - 1 < 0 ? 0 : ExtraLayout.Controls.Count - 1);
             epd.otherParameters.ExtraParametersOffset = 0xA8 + ((epd.otherParameters.TechniqueParameterCount + epd.otherParameters.DropItemsCount) * 8);
 
             // Technique Parameters
