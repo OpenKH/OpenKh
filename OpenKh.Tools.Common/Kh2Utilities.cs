@@ -26,7 +26,7 @@ namespace OpenKh.Tools.Common
         public static List<Msg.Entry> ReadMsgFromIdx(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             if (!Idx.IsValid(stream))
-                throw new InvalidFileException<Idx>();
+                throw new InvalidFileException(typeof(Idx));
 
             var imgFileName = $"{Path.GetFileNameWithoutExtension(fileName)}.img";
             var imgFilePath = Path.Combine(Path.GetDirectoryName(fileName), imgFileName);
@@ -40,7 +40,7 @@ namespace OpenKh.Tools.Common
         public static List<Msg.Entry> ReadMsgFromIdx(Stream idxStream, Stream imgStream)
         {
             var img = new Img(imgStream, Idx.Read(idxStream), false);
-            foreach (var language in Constants.Languages)
+            foreach (var language in Constants.Regions)
             {
                 var stream = img.FileOpen($"msg/{language}/sys.bar");
                 if (stream != null)
@@ -65,7 +65,7 @@ namespace OpenKh.Tools.Common
 
             var entries = Bar.Read(stream);
             var entry = entries
-                .FirstOrDefault(x => x.Type == Bar.EntryType.Binary && x.Name == "sys");
+                .FirstOrDefault(x => x.Type == Bar.EntryType.List && x.Name == "sys");
 
             if (entry == null)
                 throw new InvalidFileException<Msg>();

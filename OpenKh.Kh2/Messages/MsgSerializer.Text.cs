@@ -1,8 +1,7 @@
-﻿using OpenKh.Common.Exceptions;
+using OpenKh.Common.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 
 namespace OpenKh.Kh2.Messages
@@ -25,8 +24,6 @@ namespace OpenKh.Kh2.Messages
                 return entry.Text;
             if (entry.Command == MessageCommand.PrintComplex)
                 return $"{{{entry.Text}}}";
-            if (entry.Command == MessageCommand.NewLine)
-                return "\n";
             if (entry.Command == MessageCommand.Tabulation)
                 return "\t";
 
@@ -52,14 +49,7 @@ namespace OpenKh.Kh2.Messages
                 MessageCommandModel messageCommand;
 
                 var ch = value[i++];
-                if (ch == '\n')
-                {
-                    messageCommand = new MessageCommandModel
-                    {
-                        Command = MessageCommand.NewLine,
-                    };
-                }
-                else if (ch == '\t')
+                if (ch == '\t')
                 {
                     messageCommand = new MessageCommandModel
                     {

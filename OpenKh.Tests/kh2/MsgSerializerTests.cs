@@ -1,5 +1,4 @@
-﻿using OpenKh.Common.Exceptions;
-using OpenKh.Kh2;
+using OpenKh.Common.Exceptions;
 using OpenKh.Kh2.Messages;
 using System.IO;
 using System.Linq;
@@ -44,12 +43,7 @@ namespace OpenKh.Tests.kh2
                 new MessageCommandModel
                 {
                     Command = MessageCommand.PrintText,
-                    Text = " complex!"
-                },
-                new MessageCommandModel
-                {
-                    Command = MessageCommand.NewLine,
-                    Text = " complex!"
+                    Text = " complex!\n"
                 },
             };
 
@@ -182,10 +176,7 @@ namespace OpenKh.Tests.kh2
         {
             var commands = MsgSerializer.DeserializeText("hello\nworld!").ToArray();
             Assert.Equal(MessageCommand.PrintText, commands[0].Command);
-            Assert.Equal("hello", commands[0].Text);
-            Assert.Equal(MessageCommand.NewLine, commands[1].Command);
-            Assert.Equal(MessageCommand.PrintText, commands[2].Command);
-            Assert.Equal("world!", commands[2].Text);
+            Assert.Equal("hello\nworld!", commands[0].Text);
         }
 
         [Fact]
@@ -220,8 +211,8 @@ namespace OpenKh.Tests.kh2
         }
 
         [Theory]
-        [InlineData(new byte[] { 0x17, 0x0c, 0xdd }, "{:delay&fade 0C DD}")]
-        [InlineData(new byte[] { 0x17, 0x01, 0x02 }, "{:delay&fade 01 02}")]
+        [InlineData(new byte[] { 0x17, 0x0c, 0xdd }, "{:delayandfade 0C DD}")]
+        [InlineData(new byte[] { 0x17, 0x01, 0x02 }, "{:delayandfade 01 02}")]
         public void SerializeDelayAndFade(byte[] data, string expected)
         {
             var commands = Encoders.InternationalSystem.Decode(data);
@@ -230,8 +221,8 @@ namespace OpenKh.Tests.kh2
         }
 
         [Theory]
-        [InlineData("{:delay&fade 0C DD}", new byte[] { 0x17, 0x0c, 0xdd, 0x00 })]
-        [InlineData("{:delay&fade 01 02}", new byte[] { 0x17, 0x01, 0x02, 0x00 })]
+        [InlineData("{:delayandfade 0C DD}", new byte[] { 0x17, 0x0c, 0xdd, 0x00 })]
+        [InlineData("{:delayandfade 01 02}", new byte[] { 0x17, 0x01, 0x02, 0x00 })]
         public void DeserializeDelayAndFade(string text, byte[] expected)
         {
             var commands = MsgSerializer.DeserializeText(text);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +11,6 @@ namespace OpenKh.Tools.Kh2TextEditor.Services
     {
         public static IEnumerable<ITextImporter> GetAll() => new ITextImporter[]
         {
-            new CsvTextImporter(),
             new XmlTextImporter(),
             new YamlTextImporter(),
         };

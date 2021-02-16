@@ -1,4 +1,4 @@
-# Kingdom Hearts I File Types
+# [Kingdom Hearts I](index.md) File Types
 
 | Extension | Description | Tool |
 |-----------|-------------|------|
@@ -23,10 +23,10 @@
 | DAT (3) | Sound Effect Data, somewhat similar to SE file; example: eventse/al\_002.dat
 | DAT (4) | TARC Binary Archive; example: worldmap/challe.dat
 | DBT | Unknown; example: xs\_bambi.dbt
-| DPP | Unknown; example: eveffect/al/al\_000.dpp
+| DPP | Special Effects Header; example: eveffect/al/al\_000.dpp
 | DPX | Special Effects; example: nm08.dpx
 | EV | Unknown; example: gameover.ev
-| EVM | Unknown; example: al01\_al011.evm
+| EVM | Event Motion Data (Cutscene Animations); example: al01\_al011.evm
 | IMG | World Image Data; example: aw00\_01.img
 | IMG (1) | Raw (TIM2) Image Archive; example: title/title.img
 | KMB | Unknown; example: menu/md\_anthem.kmb

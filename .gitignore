@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Project specific files
+.tests/
+
 # User-specific files
 *.suo
 *.user
@@ -328,3 +331,6 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# WinShell Build Output
+OpenKh.WinShell.Output/

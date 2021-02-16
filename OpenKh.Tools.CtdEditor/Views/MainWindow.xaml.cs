@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.CtdEditor.ViewModels;
+using OpenKh.Tools.CtdEditor.ViewModels;
 using System.Windows;
 
 namespace OpenKh.Tools.CtdEditor.Views

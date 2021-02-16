@@ -1,0 +1,249 @@
+<UserControl x:Class="OpenKh.Tools.Kh2SystemEditor.Views.MemtView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2SystemEditor.Views" xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="0"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ListBox
+                Grid.Column="0"
+                ItemsSource="{Binding Items}"
+                SelectedItem="{Binding SelectedItem}"
+                DisplayMemberPath="Title">
+            </ListBox>
+
+            <Grid Grid.Row="1" Margin="0 5 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="_Add" Command="{Binding AddCommand}"/>
+                <Button Grid.Column="2" Content="_Remove" Command="{Binding RemoveCommand}"/>
+            </Grid>
+        </Grid>
+
+        <StackPanel
+            Grid.Column="2"
+            Margin="5 0 5 0"
+            Visibility="{Binding IsItemEditMessageVisible, FallbackValue=Collapsed}">
+            <TextBlock
+                Text="Please select an item to modify"/>
+        </StackPanel>
+
+        <ScrollViewer
+            Grid.Column="2"
+            Margin="5 0 5 0"
+            VerticalScrollBarVisibility="Auto"
+            Visibility="{Binding IsItemEditingVisible}">
+            <controls:TwoColumnsPanel RowSpacing="3" DataContext="{Binding SelectedItem}">
+                <TextBlock Text="World" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox
+                    ItemsSource="{Binding Worlds}"
+                    SelectedValue="{Binding WorldId}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"/>
+
+                <TextBlock Text="Unk06" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unk06, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Unk08" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unk08, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Unk0A" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unk0A, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Unk0C" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unk0C, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Unk0E" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Unk0E, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Separator/>
+                <Separator/>
+                <TextBlock Text="For world" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox
+                    ItemsSource="{Binding Worlds}"
+                    SelectedValue="{Binding FlagWorld}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"/>
+                <TextBlock Text="Has flag" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding FlagStory, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Separator/>
+                <Separator/>
+                <TextBlock Text="For world" Margin="{StaticResource LabelMargin}"/>
+                <ComboBox
+                    ItemsSource="{Binding Worlds}"
+                    SelectedValue="{Binding FlagWorldNeg}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"/>
+                <TextBlock Text="Has not flag" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding FlagStoryNeg, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Separator/>
+                <Separator/>
+                <TextBlock Text="PLAYER"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="FRIEND_1"/>
+                <ComboBox
+                    SelectedValue="{Binding FRIEND_1}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="FRIEND_2"/>
+                <ComboBox
+                    SelectedValue="{Binding FRIEND_2}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="FRIEND_W"/>
+                <ComboBox
+                    SelectedValue="{Binding FRIEND_W}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_BTLF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_BTLF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_MAGF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_MAGF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_KH1F"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_KH1F}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    IsEnabled="{Binding MemberEditEnabled[6]}"
+                    />
+                <TextBlock Text="PLAYER_TRIF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_TRIF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_ULTF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_ULTF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_HTLF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_HTLF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="MICKEY"/>
+                <ComboBox
+                    SelectedValue="{Binding MICKEY}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_H"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_H}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_H_BTLF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_H_BTLF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_H_MAGF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_H_MAGF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_H_KH1F"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_H_KH1F}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    IsEnabled="{Binding MemberEditEnabled[14]}"
+                    />
+                <TextBlock Text="PLAYER_H_TRIF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_H_TRIF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_H_ULTF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_H_ULTF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+                <TextBlock Text="PLAYER_H_HTLF"/>
+                <ComboBox
+                    SelectedValue="{Binding PLAYER_H_HTLF}"
+                    ItemsSource="{Binding Objects}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Value"
+                    IsEditable="True"
+                    />
+            </controls:TwoColumnsPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

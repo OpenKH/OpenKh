@@ -1,0 +1,41 @@
+alias khbar='OpenKh.Command.Bar'
+alias unbar='OpenKh.Command.Bar unpack'
+alias rebar='OpenKh.Command.Bar pack'
+alias listbar='OpenKh.Command.Bar list'
+
+alias khbbsa='OpenKh.Command.Bbsa'
+alias unbbsa='OpenKh.Command.Bbsa extract'
+alias listbbsa='OpenKh.Command.Bbsa list'
+
+alias khasset='OpenKh.Command.HdAssets'
+alias unasset='OpenKh.Command.HdAssets extract'
+alias listasset='OpenKh.Command.HdAssets list'
+
+alias khidx='OpenKh.Command.IdxImg'
+alias unidx='OpenKh.Command.IdxImg extract'
+alias listidx='OpenKh.Command.IdxImg list'
+alias injectiso='OpenKh.Command.IdxImg inject'
+
+alias khlayout='OpenKh.Command.Layout'
+alias unlayout='OpenKh.Command.Layout unlayout'
+alias relayout='OpenKh.Command.Layout relayout'
+alias unsequence='OpenKh.Command.Layout sequence'
+alias resequence='OpenKh.Command.Layout sequence'
+
+alias khmsg='OpenKh.Command.MsgTool'
+alias unmsg='OpenKh.Command.MsgTool --input'
+
+alias khimg='OpenKh.Command.ImgTool'
+alias khimd='OpenKh.Command.ImgTool imd'
+alias khimz='OpenKh.Command.ImgTool imz'
+alias unimd='OpenKh.Command.ImgTool unimd'
+alias unimz='OpenKh.Command.ImgTool unimz'
+
+alias doctchg='OpenKh.Command.DoctChanger'
+
+alias unspawnscript='OpenKh.Command.SpawnScript decompile'
+alias respawnscript='OpenKh.Command.SpawnScript compile'
+alias unspawnpoint='OpenKh.Command.SpawnScript unpoint'
+alias respawnpoint='OpenKh.Command.SpawnScript repoint'
+
+alias texfooter='OpenKh.Command.TexFooter'

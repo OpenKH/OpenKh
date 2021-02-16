@@ -26,7 +26,7 @@ steps:
 - script: git submodule update --init --recursive --depth 1
   displayName: 'Download dependencies'
 
-- task: NuGetToolInstaller@0
+- task: NuGetToolInstaller@1
   displayName: 'Install build tools'
 
 - task: NuGetCommand@2
@@ -36,16 +36,6 @@ steps:
 
 - powershell: .\pre-build.ps1
   displayName: 'Build tools and libraries metadata'
-
-- task: VSBuild@1
-  displayName: 'Build project'
-  inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    vsVersion: 'latest'
-    msbuildArgs: '/t:Build'
-    maximumCpuCount: true
 
 - script: dotnet test --configuration $(buildConfiguration) --logger trx --verbosity normal --collect "Code coverage"
   displayName: 'Run tests'
@@ -62,44 +52,45 @@ steps:
   inputs:
     summaryFileLocation: '**/*.coverage'
 
-- powershell: gci env:* | sort-object name | Format-Table -AutoSize | Out-File $env:BUILD_ARTIFACTSTAGINGDIRECTORY/environment-variables.txt
-  displayName: 'List artifacts to publish'
-
-- task: CopyFiles@2
-  displayName: 'Pack .Net Framework 4 tools and libraries'
+- task: VSBuild@1
+  displayName: 'Build project'
   inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: |
-     OpenKh*/**/$(BuildConfiguration)/net4**/**/?(*.exe|*.dll|*.json|*.config)
-    targetFolder: '$(Build.ArtifactStagingDirectory)/net4'
-    flattenFolders: true
+    solution: '**/OpenKh.Command.*.csproj'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/openkh'
+    maximumCpuCount: true
 
-- task: CopyFiles@2
-  displayName: 'Pack .Net Framework 4 resources'
+- task: VSBuild@1
+  displayName: 'Build project'
   inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: |
-     OpenKh*/**/$(BuildConfiguration)/net4**/**/resources/**
-    targetFolder: '$(Build.ArtifactStagingDirectory)/net4/resources'
-    flattenFolders: true
+    solution: '**/OpenKh.Tools.*.csproj'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/openkh'
+    maximumCpuCount: true
+    
+- task: VSBuild@1
+  displayName: 'Build project'
+  inputs:
+    solution: '**/OpenKh.WinShell.*.csproj'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/openkh/winshell'
+    maximumCpuCount: true
 
-- task: CopyFiles@2
-  displayName: 'Pack .Net Core tools and libraries'
+- task: VSBuild@1
+  displayName: 'Build project'
   inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: |
-     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/?(*.exe|*.dll|*.json|*.config)
-    targetFolder: '$(Build.ArtifactStagingDirectory)/netcore'
-    flattenFolders: true
-
-- task: CopyFiles@2
-  displayName: 'Pack .Net Core resources'
-  inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: |
-     OpenKh*/**/$(BuildConfiguration)/netcoreapp**/**/resources/**
-    targetFolder: '$(Build.ArtifactStagingDirectory)/netcore/resources'
-    flattenFolders: true
+    solution: '**/OpenKh.Game*.csproj'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/openkh'
+    maximumCpuCount: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'

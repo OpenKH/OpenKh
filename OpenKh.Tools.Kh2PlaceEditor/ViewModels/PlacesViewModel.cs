@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine;
+using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System.Collections.Generic;

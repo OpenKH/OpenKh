@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Imaging;
 
 namespace OpenKh.Tools.CtdEditor.ViewModels

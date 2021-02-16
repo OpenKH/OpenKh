@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2MapCollisionEditor.Views.Collision3View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2MapCollisionEditor.Views"
+             xmlns:controls="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="100">
+    <controls:TwoColumnsPanel>
+        <TextBlock Text="v00"/>
+        <TextBox Text="{Binding v00, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Vtx1"/>
+        <TextBox Text="{Binding Vertex1, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Vtx2"/>
+        <TextBox Text="{Binding Vertex2, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Vtx3"/>
+        <TextBox Text="{Binding Vertex3, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Vtx4"/>
+        <TextBox Text="{Binding Vertex4, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Flags"/>
+        <TextBox Text="{Binding Flags.Unknown}"/>
+
+        <TextBlock Text="Plane X"/>
+        <TextBox Text="{Binding PlaneX, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Plane Y"/>
+        <TextBox Text="{Binding PlaneY, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Plane Z"/>
+        <TextBox Text="{Binding PlaneZ, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Plane D"/>
+        <TextBox Text="{Binding PlaneD, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock Text="MinX"/>
+        <TextBox Text="{Binding BoundingBox.MinX, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="MinY"/>
+        <TextBox Text="{Binding BoundingBox.MinY, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="MinZ"/>
+        <TextBox Text="{Binding BoundingBox.MinZ, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="MaxX"/>
+        <TextBox Text="{Binding BoundingBox.MaxX, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="MaxY"/>
+        <TextBox Text="{Binding BoundingBox.MaxY, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="MaxZ"/>
+        <TextBox Text="{Binding BoundingBox.MaxZ, UpdateSourceTrigger=PropertyChanged}"/>
+    </controls:TwoColumnsPanel>
+</UserControl>

@@ -94,7 +94,7 @@ namespace OpenKh.Tests.kh2
         public void Read8bitPaletteCorrectly() => File.OpenRead(FileName2).Using(stream =>
         {
             var images = ModelTexture.Read(stream).Images;
-            
+
             AssertPalette(images, 0, 0, 0, 0, 0);
             AssertPalette(images, 0, 4, 10, 10, 10);
             AssertPalette(images, 0, 8, 11, 15, 23);
@@ -149,6 +149,85 @@ namespace OpenKh.Tests.kh2
             {
                 Console.WriteLine($"Error for texture {imageIndex}");
                 throw;
+            }
+        }
+
+        [Theory]
+        [InlineData("4bit-128-128")]
+        [InlineData("4bit-256-128")]
+        [InlineData("4bit-256-512")]
+        [InlineData("4bit-512-128")]
+        [InlineData("4bit-512-512")]
+        [InlineData("8bit-128-128")]
+        [InlineData("8bit-128-64")]
+        [InlineData("8bit-256-128")]
+        [InlineData("8bit-256-256")]
+        [InlineData("8bit-512-256")]
+        [InlineData("8bit-512-512")]
+        public void CreateAndRead(string baseName)
+        {
+            var image = File.OpenRead($"kh2/res/image-{baseName}.imd").Using(s => Imgd.Read(s));
+
+            {
+                var outStream = new MemoryStream();
+                {
+                    var textures = new ModelTexture(new Imgd[] { image });
+                    textures.Write(outStream);
+                }
+                {
+                    outStream.Position = 0;
+                    var textures = ModelTexture.Read(outStream);
+                    Assert.Single(textures.Images);
+
+                    var converted = textures.Images.Single();
+
+                    Assert.Equal(image.PixelFormat, converted.PixelFormat);
+                    Assert.Equal(image.Size, converted.Size);
+                    Assert.Equal(image.GetClut(), converted.GetClut());
+                    Assert.Equal(image.GetData(), converted.GetData());
+                }
+            }
+
+            {
+                var outStream = new MemoryStream();
+                {
+                    var textures = new ModelTexture(new Imgd[] { image, image });
+                    textures.Write(outStream);
+                }
+                {
+                    outStream.Position = 0;
+                    var textures = ModelTexture.Read(outStream);
+                    Assert.Equal(2, textures.Images.Count);
+
+                    foreach (var converted in textures.Images)
+                    {
+                        Assert.Equal(image.PixelFormat, converted.PixelFormat);
+                        Assert.Equal(image.Size, converted.Size);
+                        Assert.Equal(image.GetClut(), converted.GetClut());
+                        Assert.Equal(image.GetData(), converted.GetData());
+                    }
+                }
+            }
+
+            {
+                var outStream = new MemoryStream();
+                {
+                    var textures = new ModelTexture(new Imgd[] { image, image, image, image });
+                    textures.Write(outStream);
+                }
+                {
+                    outStream.Position = 0;
+                    var textures = ModelTexture.Read(outStream);
+                    Assert.Equal(4, textures.Images.Count);
+
+                    foreach (var converted in textures.Images)
+                    {
+                        Assert.Equal(image.PixelFormat, converted.PixelFormat);
+                        Assert.Equal(image.Size, converted.Size);
+                        Assert.Equal(image.GetClut(), converted.GetClut());
+                        Assert.Equal(image.GetData(), converted.GetData());
+                    }
+                }
             }
         }
     }

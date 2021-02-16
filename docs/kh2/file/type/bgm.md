@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](../../index) - BGM (BackGround Music)
+# [Kingdom Hearts II](../../index.md) - BGM (BackGround Music)
 Kingdom Hearts II use a custom format for its sequenced music called BGM, which
 is handled internally by the Square Sound Library and is a similar format to
 some Square games released at the time, such as Final Fantasy X.

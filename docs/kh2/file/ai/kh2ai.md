@@ -1,6 +1,8 @@
 # [Kingdom Hearts II](../../index) - AI ISA
 
-This document is licensed under the [CC-BY license](https://creativecommons.org/licenses/by/4.0/) by GovanifY.
+Original document is licensed under the [CC-BY license](https://creativecommons.org/licenses/by/4.0/) by GovanifY.
+
+License [exemption given by GovanifY](https://discordapp.com/channels/409140906625728532/575294959129722881/725434128597778463) permits the relicensing of this documentation to match ALv2 for the purpose of use and reference within the OpenKH repository.
 \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_  
 v0.1
 

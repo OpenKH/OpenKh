@@ -2,8 +2,8 @@
 {
     public interface IMessageProvider
     {
-        string GetMessage(ushort id);
+        string GetString(ushort id);
 
-        void SetMessage(ushort id, string text);
+        void SetString(ushort id, string text);
     }
 }

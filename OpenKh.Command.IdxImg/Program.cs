@@ -1,4 +1,5 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Common;
+using OpenKh.Kh2;
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
@@ -6,14 +7,25 @@ using System.IO;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Xe.IO;
 
 namespace OpenKh.Command.IdxImg
 {
     [Command("OpenKh.Command.IdxImg")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(ExtractCommand), typeof(ListCommand))]
+    [Subcommand(
+        typeof(ExtractCommand),
+        typeof(ListCommand),
+        typeof(InjectCommand))]
     class Program
     {
+        class CustomException : Exception
+        {
+            public CustomException(string message) :
+                base(message)
+            { }
+        }
+
         static int Main(string[] args)
         {
             try
@@ -24,6 +36,11 @@ namespace OpenKh.Command.IdxImg
             {
                 Console.WriteLine($"The file {e.FileName} cannot be found. The program will now exit.");
                 return 2;
+            }
+            catch (CustomException e)
+            {
+                Console.WriteLine(e.Message);
+                return 1;
             }
             catch (Exception e)
             {
@@ -47,7 +64,7 @@ namespace OpenKh.Command.IdxImg
 
             [Required]
             [FileExists]
-            [Argument(0, Description = "Kingdom Hearts II IDX file, paired with a IMG")]
+            [Argument(0, Description = "Kingdom Hearts II IDX file")]
             public string InputIdx { get; set; }
 
             [FileExists]
@@ -63,25 +80,36 @@ namespace OpenKh.Command.IdxImg
             [Option(CommandOptionType.NoValue, Description = "Split sub-IDX when extracting recursively", ShortName = "s", LongName = "split")]
             public bool Split { get; set; }
 
+            [Option(CommandOptionType.NoValue, Description = "Do not extract files that are already found in the destination directory", ShortName = "n")]
+            public bool DoNotExtractAgain { get; set; }
+
             protected int OnExecute(CommandLineApplication app)
             {
                 var inputImg = InputImg ?? InputIdx.Replace(".idx", ".img", StringComparison.InvariantCultureIgnoreCase);
-                var outputDir = OutputDir ?? Path.Combine(Path.GetFullPath(inputImg), "extract");
+                var outputDir = OutputDir ?? Path.Combine(Path.GetDirectoryName(inputImg), "extract");
 
-                Idx idx = OpenIdx(InputIdx);
+                var idxEntries = OpenIdx(InputIdx);
 
                 using (var imgStream = File.OpenRead(inputImg))
                 {
-                    var img = new Img(imgStream, idx, false);
+                    var img = new Img(imgStream, idxEntries, false);
                     var idxName = Path.GetFileNameWithoutExtension(InputIdx);
 
-                    var subIdxPath = ExtractIdx(img, idx, Recursive && Split ? Path.Combine(outputDir, "KH2") : outputDir);
+                    var subIdxPath = ExtractIdx(
+                        img,
+                        idxEntries,
+                        Recursive && Split ? Path.Combine(outputDir, "KH2") : outputDir,
+                        DoNotExtractAgain);
                     if (Recursive)
                     {
                         foreach (var idxFileName in subIdxPath)
                         {
                             idxName = Path.GetFileNameWithoutExtension(idxFileName);
-                            ExtractIdx(img, OpenIdx(idxFileName), Split ? Path.Combine(outputDir, idxName) : outputDir);
+                            ExtractIdx(
+                                img,
+                                OpenIdx(idxFileName),
+                                Split ? Path.Combine(outputDir, idxName) : outputDir,
+                                DoNotExtractAgain);
                         }
                     }
                 }
@@ -89,27 +117,33 @@ namespace OpenKh.Command.IdxImg
                 return 0;
             }
 
-            public static List<string> ExtractIdx(Img img, Idx idx, string basePath)
+            public static List<string> ExtractIdx(
+                Img img,
+                IEnumerable<Idx.Entry> idxEntries,
+                string basePath,
+                bool doNotExtractAgain)
             {
                 var idxs = new List<string>();
 
-                foreach (var entry in idx.GetNameEntries())
+                foreach (var entry in idxEntries)
                 {
-                    var fileName = entry.Name;
+                    var fileName = IdxName.Lookup(entry);
                     if (fileName == null)
-                        fileName = $"@noname/{entry.Entry.Hash32:X08}-{entry.Entry.Hash16:X04}";
-
-                    Console.WriteLine(fileName);
+                        fileName = $"@noname/{entry.Hash32:X08}-{entry.Hash16:X04}";
 
                     var outputFile = Path.Combine(basePath, fileName);
+                    if (doNotExtractAgain && File.Exists(outputFile))
+                        continue;
+
                     var outputDir = Path.GetDirectoryName(outputFile);
                     if (Directory.Exists(outputDir) == false)
                         Directory.CreateDirectory(outputDir);
 
+                    Console.WriteLine(fileName);
                     using (var file = File.Create(outputFile))
                     {
                         // TODO handle decompression
-                        img.FileOpen(entry.Entry).CopyTo(file);
+                        img.FileOpen(entry).CopyTo(file);
                     }
 
                     if (Path.GetExtension(fileName) == ".idx")
@@ -134,21 +168,167 @@ namespace OpenKh.Command.IdxImg
 
             protected int OnExecute(CommandLineApplication app)
             {
-                var entries = OpenIdx(InputIdx).GetNameEntries();
+                var entries = OpenIdx(InputIdx);
                 if (Sort)
-                    entries = entries.OrderBy(x => x.Entry.Offset);
+                    entries = entries.OrderBy(x => x.Offset);
 
                 foreach (var entry in entries)
-                    Console.WriteLine(entry.Name);
+                    Console.WriteLine(IdxName.Lookup(entry) ?? $"@{entry.Hash32:X08}-{entry.Hash16:X04}");
 
                 return 0;
             }
         }
 
-        private static Idx OpenIdx(string fileName)
+        [Command(Description = "Patch an ISO by injecting a single file in the IMG, without repacking. Useful for quick testing.")]
+        private class InjectCommand
         {
-            using (var idxStream = File.OpenRead(fileName))
-                return Idx.Read(idxStream);
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Kingdom Hearts II ISO file that contains the game files")]
+            public string InputIso { get; set; }
+
+            [Required]
+            [FileExists]
+            [Argument(1, Description = "File to inject")]
+            public string InputFile { get; set; }
+
+            [Required]
+            [Argument(2, Description = "IDX file path (eg. msg/jp/sys.bar)")]
+            public string FilePath { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Do not compress the file to inject", ShortName = "u", LongName = "uncompressed")]
+            public bool Uncompressed { get; set; }
+
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IDX. Determined automatically by default.", ShortName = "idx", LongName = "idx-offset")]
+            public int IdxIsoBlock { get; set; } = -1;
+
+            [Option(CommandOptionType.SingleValue, Description = "ISO block for KH2.IMG. Determined automatically by default", ShortName = "img", LongName = "img-offset")]
+            public int ImgIsoBlock { get; set; } = -1;
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                const long EsitmatedMaximumImgFileSize = 4L * 1024 * 1024 * 1024; // 4GB
+                const int EsitmatedMaximumIdxFileSize = 600 * 1024; // 600KB
+                const int EstimatedMaximumIdxEntryAmountToBeValid = EsitmatedMaximumIdxFileSize / 0x10 - 4;
+
+                using var isoStream = File.Open(InputIso, FileMode.Open, FileAccess.ReadWrite);
+
+
+                if (IdxIsoBlock == -1 || ImgIsoBlock == -1)
+                {
+                    const int needleLength = 0x0B;
+
+                    var imgNeedle = new byte[needleLength] { 0x01, 0x09, 0x4B, 0x48, 0x32, 0x2E, 0x49, 0x4D, 0x47, 0x3B, 0x31 };
+                    var idxNeedle = new byte[needleLength] { 0x01, 0x09, 0x4B, 0x48, 0x32, 0x2E, 0x49, 0x44, 0x58, 0x3B, 0x31 };
+
+                    const uint basePosition = 0x105 * 0x800;
+
+                    for (int i = 0; i < 0x500; i++)
+                    {
+                        isoStream.Position = basePosition + i;
+                        var hayRead = isoStream.ReadBytes(needleLength);
+
+                        var idxCmp = hayRead.SequenceEqual(idxNeedle);
+                        var imgCmp = hayRead.SequenceEqual(imgNeedle);
+
+                        if (imgCmp || idxCmp)
+                        {
+                            isoStream.Position -= 0x24;
+
+                            var blockStack = isoStream.ReadBytes(0x04);
+                            var blockCorrect = new byte[0x04] { blockStack[3], blockStack[2], blockStack[1], blockStack[0] };
+
+                            if (idxCmp && IdxIsoBlock == -1)
+                                IdxIsoBlock = BitConverter.ToInt32(blockCorrect);
+
+                            else if (imgCmp && ImgIsoBlock == -1)
+                                ImgIsoBlock = BitConverter.ToInt32(blockCorrect);
+                        }
+                    }
+
+                    if (IdxIsoBlock == -1 || ImgIsoBlock == -1)
+                        throw new IOException("Could not determine the LBA Offsets of KH2.IDX or KH2.IMG, is this ISO valid?");
+                }
+
+                var idxStream = OpenIsoSubStream(isoStream, IdxIsoBlock, EsitmatedMaximumIdxFileSize);
+                using var imgStream = OpenIsoSubStream(isoStream, ImgIsoBlock, EsitmatedMaximumImgFileSize);
+
+                var idxEntryCount = idxStream.ReadInt32();
+                if (idxEntryCount > EstimatedMaximumIdxEntryAmountToBeValid)
+                    throw new CustomException("There is a high chance that the IDX block is not valid, therefore the injection will terminate to avoid corruption.");
+
+                var idxEntries = Idx.Read(idxStream.SetPosition(0));
+                var entry = idxEntries.FirstOrDefault(x => x.Hash32 == Idx.GetHash32(FilePath) && x.Hash16 == Idx.GetHash16(FilePath));
+                if (entry == null)
+                {
+                    idxStream = GetIdxStreamWhichContainsTargetedFile(idxEntries, imgStream, FilePath);
+                    if (idxStream == null)
+                        throw new CustomException($"The file {FilePath} has not been found inside the KH2.IDX, therefore the injection will terminate.");
+
+                    idxEntries = Idx.Read(idxStream.SetPosition(0));
+                    entry = idxEntries.FirstOrDefault(x => x.Hash32 == Idx.GetHash32(FilePath) && x.Hash16 == Idx.GetHash16(FilePath));
+                }
+
+                var inputData = File.ReadAllBytes(InputFile);
+                var decompressedLength = inputData.Length;
+                if (Uncompressed == false)
+                    inputData = Img.Compress(inputData);
+
+                var blockCountRequired = (inputData.Length + 0x7ff) / 0x800 - 1;
+                if (blockCountRequired > entry.BlockLength)
+                    throw new CustomException($"The file to inject is too big: the actual is {inputData.Length} but the maximum allowed is {GetLength(entry.BlockLength)}.");
+
+                imgStream.SetPosition(GetOffset(entry.Offset));
+                // Clean completely the content of the previous file to not mess up the decompression
+                imgStream.Write(new byte[GetLength(entry.BlockLength)]);
+
+                imgStream.SetPosition(GetOffset(entry.Offset));
+                imgStream.Write(inputData);
+
+                entry.IsCompressed = !Uncompressed;
+                entry.Length = decompressedLength;
+                // we are intentionally not patching entry.BlockLength because it would not allow to insert back bigger files.
+
+                Idx.Write(idxStream.SetPosition(0), idxEntries);
+
+                return 0;
+            }
+
+            private Stream GetIdxStreamWhichContainsTargetedFile(List<Idx.Entry> idxEntries, Stream imgStream, string fileName)
+            {
+                var idxDictionary = new IdxDictionary { idxEntries };
+
+                foreach (var innerIdx in Img.InternalIdxs)
+                {
+                    if (idxDictionary.TryGetEntry(innerIdx, out var innerIdxEntry))
+                    {
+                        var innerIdxStream = OpenIsoSubStream(imgStream, innerIdxEntry.Offset, innerIdxEntry.Length);
+                        var innerIdxDictionary = new IdxDictionary
+                        {
+                            Idx.Read(innerIdxStream)
+                        };
+
+                        if (innerIdxDictionary.Exists(fileName))
+                            return innerIdxStream;
+                    }
+                }
+
+                return null;
+            }
+
+            private static Stream OpenIsoSubStream(Stream isoStream, long blockOffset, long length) =>
+                new SubStream(isoStream, blockOffset * 0x800, length);
+            private static long GetOffset(long blockOffset) => blockOffset * 0x800;
+            private static int GetLength(int blockLength) => blockLength * 0x800 + 0x800;
+        }
+
+        private static IEnumerable<Idx.Entry> OpenIdx(string fileName)
+        {
+            using var idxStream = File.OpenRead(fileName);
+            if (!Idx.IsValid(idxStream))
+                throw new CustomException($"The IDX {fileName} is invalid or not recognized.");
+
+            return Idx.Read(idxStream);
         }
     }
 }

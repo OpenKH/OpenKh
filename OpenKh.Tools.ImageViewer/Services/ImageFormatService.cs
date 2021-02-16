@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +7,7 @@ using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
+using OpenKh.Tools.Common.Imaging;
 
 namespace OpenKh.Tools.ImageViewer.Services
 {  
@@ -29,6 +30,8 @@ namespace OpenKh.Tools.ImageViewer.Services
 
                 GetImageFormat("IMGZ", "imz", true, Imgz.IsValid, s => Imgz.Read(s), (stream, images) =>
                     Imgz.Write(stream, images.Select(x => x.AsImgd()))),
+
+                GetImageFormat("KH2 Font", "bar", true, IsKh2Font, ReadKh2Font, WriteKh2Font),
 
                 GetImageFormat("Font ARC", "arc", false, FontsArc.IsValid, s =>
                 {
@@ -53,7 +56,7 @@ namespace OpenKh.Tools.ImageViewer.Services
                 GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
                     throw new NotImplementedException()),
 
-                GetImageFormat("KH2TIM", "tex", true, _ => true,
+                GetImageFormat("KH2TIM", "tex", false, _ => true,
                     s => ModelTexture.Read(s).Images.Cast<IImageRead>(),
                     (stream, images) => throw new NotImplementedException()),
             };

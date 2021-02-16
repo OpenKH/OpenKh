@@ -6,7 +6,7 @@ namespace OpenKh.Tools.ImageViewer.Services
 {
     public partial class ImageFormatService
     {
-        private class ImageContainer : IImageContainer
+        internal class ImageContainer : IImageContainer
         {
             private readonly IImageRead[] _images;
 

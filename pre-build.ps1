@@ -1,7 +1,17 @@
+##############################################################################
+# Assign assembly tags to every project                                      #
+#                                                                            #
+# This script essentially modifies every *.csproj file to create tags like   #
+# "company name", "author" and mostly version number.                        #
+# This script is not meant to be run locally, but only to be consumed by     #
+# Azure Pipelines. It still work locally for the purpose of testing, but     #
+# otherwise it is quite pointless.                                           #
+##############################################################################
+
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/powershell?view=azure-devops
 
 function Log([string]$text) {
-    Write-Warning $text
+    Write-Debug $text
 }
 
 # If this script is not running on a build server, remind user to

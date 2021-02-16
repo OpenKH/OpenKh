@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine;
+using OpenKh.Engine;
 using OpenKh.Kh2;
 using System.Text;
 using Xe.Tools;
@@ -12,6 +12,11 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
 
         private readonly IMessageProvider _messageProvider;
         private readonly int _index;
+
+        static PlaceViewModel()
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        }
 
         public PlaceViewModel(IMessageProvider messageProvider,
             string world, int index, Place place)
@@ -27,7 +32,7 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
         public Place Place { get; }
 
         public string Map => $"{World}{_index:D02}";
-        
+
         public short MessageId
         {
             get => (short)(Place.MessageId & 0x7fff);
@@ -38,14 +43,14 @@ namespace OpenKh.Tools.Kh2PlaceEditor.ViewModels
                 OnPropertyChanged(nameof(Message));
             }
         }
-        
+
         public string Name
         {
             get => Encoding.GetString(Place.Name);
             set => Place.Name = Encoding.GetBytes(value);
         }
 
-        public string Message => _messageProvider.GetMessage(Place.MessageId);
+        public string Message => _messageProvider.GetString(Place.MessageId);
 
         public void RefreshMessages()
         {

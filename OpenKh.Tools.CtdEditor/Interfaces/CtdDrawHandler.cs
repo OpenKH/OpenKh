@@ -1,9 +1,10 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Bbs.Messages;
-using OpenKh.Tools.Common;
+using OpenKh.Engine.Extensions;
+using OpenKh.Engine.Renders;
+using OpenKh.Tools.Common.Rendering;
 using System.Drawing;
 using System.Linq;
-using Xe.Drawing;
 
 namespace OpenKh.Tools.CtdEditor.Interfaces
 {
@@ -14,10 +15,10 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
 
         public CtdDrawHandler()
         {
-            DrawingContext = new DrawingDirect3D();
+            DrawingContext = new SpriteDrawingDirect3D();
         }
 
-        public IDrawing DrawingContext { get; }
+        public ISpriteDrawing DrawingContext { get; }
 
         public void DrawHandler(
             ICtdMessageEncoder encoder,
@@ -32,8 +33,8 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
             int BeginY = layout.DialogY + layout.TextY;
             var x = BeginX;
             var y = BeginY;
-            var texture1 = DrawingContext.CreateSurface(fontContext.Image1);
-            var texture2 = DrawingContext.CreateSurface(fontContext.Image2);
+            var texture1 = DrawingContext.CreateSpriteTexture(fontContext.Image1);
+            var texture2 = DrawingContext.CreateSpriteTexture(fontContext.Image2);
             foreach (var ch in encoder.ToUcs(message.Data))
             {
                 if (ch >= 0x20)
@@ -45,7 +46,8 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
                             x += fontContext.Info.CharacterWidth / 2;
                         continue;
                     }
-                    if (chInfo.Palette >= 2) continue;
+                    if (chInfo.Palette >= 2)
+                        continue;
 
                     var texture = chInfo.Palette == 0 ? texture1 : texture2;
                     var source = new Rectangle
@@ -55,7 +57,11 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
                         Width = chInfo.Width,
                         Height = fontContext.Info.CharacterHeight
                     };
-                    DrawingContext.DrawSurface(texture, source, x, y);
+                    DrawingContext.AppendSprite(new SpriteDrawingContext()
+                        .SpriteTexture(texture)
+                        .Source(chInfo.PositionX, chInfo.PositionY, chInfo.Width, fontContext.Info.CharacterHeight)
+                        .MatchSourceSize()
+                        .Position(x, y));
 
                     x += source.Width + layout.HorizontalSpace;
                 }
@@ -73,14 +79,13 @@ namespace OpenKh.Tools.CtdEditor.Interfaces
         }
 
         private void DrawPspScreen() =>
-            DrawingContext.FillRectangle(new RectangleF(0, 0, PspScreenWidth, PspScreenHeight), Color.Black);
+            DrawingContext.FillRectangle(0, 0, PspScreenWidth, PspScreenHeight, ColorF.Black);
 
-        private void DrawDialog(Ctd.Layout layout) => DrawingContext.DrawRectangle(new RectangleF
-        {
-            X = layout.DialogX - 1,
-            Y = layout.DialogY - 1,
-            Width = layout.DialogWidth + 1,
-            Height = layout.DialogHeight + 1,
-        }, Color.Cyan);
+        private void DrawDialog(Ctd.Layout layout) => DrawingContext.DrawRectangle(
+            layout.DialogX - 1,
+            layout.DialogY - 1,
+            layout.DialogWidth + 1,
+            layout.DialogHeight + 1,
+            ColorF.FromRgba(Color.Cyan.ToArgb()));
     }
 }

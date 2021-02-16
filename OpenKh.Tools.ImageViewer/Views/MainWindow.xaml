@@ -1,4 +1,4 @@
-﻿<Window x:Class="OpenKh.Tools.ImageViewer.Views.MainWindow"
+<Window x:Class="OpenKh.Tools.ImageViewer.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -26,8 +26,24 @@
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Header="Import..." Command="{Binding ImportCommand}"/>
-                <MenuItem Header="Export..." Command="{Binding ExportCommand}"/>
+                <MenuItem Header="Create _new IMGZ" Command="{Binding CreateNewImgzCommand}"/>
+                <MenuItem Header="Convert to IMGZ" Command="{Binding ConvertToImgzCommand}"/>
+                <Separator/>
+                <MenuItem Header="Insert empty image" Command="{Binding InsertEmptyImageCommand}"/>
+                <Separator/>
+                <MenuItem Header="Replace current image..." Command="{Binding ImportCommand}" CommandParameter="ReplaceCurrent"/>
+                <MenuItem Header="Insert image..." Command="{Binding ImportCommand}" CommandParameter="BeforeCurrent"/>
+                <MenuItem Header="Append image..." Command="{Binding ImportCommand}" CommandParameter="Last"/>
+                <Separator/>
+                <MenuItem Header="Convert to 4-bpp image" Command="{Binding ConvertBitsPerPixelCommand}" CommandParameter="4"/>
+                <MenuItem Header="Convert to 8-bpp image" Command="{Binding ConvertBitsPerPixelCommand}" CommandParameter="8"/>
+                <Separator/>
+                <MenuItem Header="Use pngquant" IsChecked="{Binding UsePngquant}" Command="{Binding CheckQuant}" IsCheckable="True" />
+                <Separator/>
+                <MenuItem Header="Remove current image" Command="{Binding RemoveImageCommand}"/>
+                <Separator/>
+                <MenuItem Header="Export current image..." Command="{Binding ExportCurrentCommand}"/>
+                <MenuItem Header="Export all images..." Command="{Binding ExportAllCommand}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
@@ -70,26 +86,52 @@
                 </DrawingBrush>
             </Canvas.Background>
         </Canvas>
-        
-        <Image
-            Grid.Row="1"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Visibility="{Binding ImageFitVisibility}"
-            Source="{Binding Image.Bitmap}"/>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Top"
+              Visibility="{Binding ImageFitVisibility}">
+            <Canvas Background="Gray"/>
+            <Canvas>
+                <Canvas.Background>
+                    <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
+                        <DrawingBrush.Drawing>
+                            <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80000000"/>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Canvas.Background>
+            </Canvas>
+            <Image Source="{Binding Image.Bitmap}"/>
+        </Grid>
+
+        <Grid Grid.Row="1"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Top"
+              >
             <ScrollViewer
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto"
                 Visibility="{Binding ImageCustomZoomVisibility}">
-                <Image
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
+                <Grid
                     Width="{Binding ImageZoomWidth}"
                     Height="{Binding ImageZoomHeight}"
-                    Source="{Binding Image.Bitmap}" 
-                    Stretch="Fill"/>
+                    >
+                    <Canvas Background="Gray"/>
+                    <Canvas>
+                        <Canvas.Background>
+                            <DrawingBrush TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
+                                <DrawingBrush.Drawing>
+                                    <GeometryDrawing Geometry="M0,0 H16 V16 H32 V32 H16 V16 H0Z" Brush="#80000000"/>
+                                </DrawingBrush.Drawing>
+                            </DrawingBrush>
+                        </Canvas.Background>
+                    </Canvas>
+                    <Image
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Source="{Binding Image.Bitmap}" 
+                        Stretch="Fill"/>
+                </Grid>
             </ScrollViewer>
         </Grid>
 

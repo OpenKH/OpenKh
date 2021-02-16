@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="OpenKh.Tools.IdxImg.Views.FilePropertyView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.IdxImg.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="150">
+    <StackPanel>
+        <TextBlock Text="Full path"/>
+        <TextBox Margin="0 0 0 5" IsReadOnly="True" Text="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Physical offset"/>
+        <TextBox Margin="0 0 0 5" IsReadOnly="True" Text="{Binding PhysicalOffset, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Physical size"/>
+        <TextBox Margin="0 0 0 5" IsReadOnly="True" Text="{Binding PhysicalLength, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="Uncompressed size"/>
+        <TextBox Margin="0 0 0 5" IsReadOnly="True" Text="{Binding UncompressedLength, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <CheckBox Margin="0 0 0 5" Content="Compress" IsChecked="{Binding IsCompressed}" IsHitTestVisible="False"/>
+        <CheckBox Margin="0 0 0 5" Content="Stream" IsChecked="{Binding IsStream}" IsHitTestVisible="False"/>
+    </StackPanel>
+</UserControl>

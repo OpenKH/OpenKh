@@ -1,4 +1,4 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Common.Archives;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace OpenKh.Command.HdAssets
 {
-    [Command("OpenKh.Command.IdxImg")]
+    [Command("OpenKh.Command.HdAsset")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(
         typeof(ExtractCommand),

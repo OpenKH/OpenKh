@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using System.Globalization;
 using System.Linq;
 using Xe.Tools;

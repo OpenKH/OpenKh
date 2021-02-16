@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +6,7 @@ using Xe.IO;
 
 namespace OpenKh.Kh2
 {
-    public static class Imgz
+    public class Imgz
 	{
 		private struct Entry
 		{
@@ -14,6 +14,13 @@ namespace OpenKh.Kh2
 		}
 
 		private const uint MagicCode = 0x5A474D49U;
+
+        public IEnumerable<Imgd> Images { get; }
+
+        public Imgz(Stream stream)
+        {
+            Images = Read(stream);
+        }
 
         public static IEnumerable<Stream> OpenAsStream(Stream stream)
         {
@@ -50,8 +57,7 @@ namespace OpenKh.Kh2
             stream.Length >= 4 && stream.SetPosition(0).ReadInt32() == MagicCode;
 
         public static IEnumerable<Imgd> Read(Stream stream) =>
-            OpenAsStream(stream.SetPosition(0)).Select(x => Imgd.Read(x));
-
+            OpenAsStream(stream.SetPosition(0)).Select(x => Imgd.Read(x)).ToArray();
 
         public static void Write(Stream stream, IEnumerable<Imgd> images)
 		{

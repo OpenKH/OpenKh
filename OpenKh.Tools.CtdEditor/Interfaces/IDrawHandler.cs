@@ -1,12 +1,12 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Bbs.Messages;
-using Xe.Drawing;
+using OpenKh.Engine.Renders;
 
 namespace OpenKh.Tools.CtdEditor.Interfaces
 {
     public interface IDrawHandler
     {
-        IDrawing DrawingContext { get; }
+        ISpriteDrawing DrawingContext { get; }
 
         void DrawHandler(
             ICtdMessageEncoder encoder,

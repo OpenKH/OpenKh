@@ -1,6 +1,8 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
+using OpenKh.Tools.BarEditor.Interfaces;
 using OpenKh.Tools.BarEditor.Models;
 using OpenKh.Tools.BarEditor.Services;
+using OpenKh.Tools.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,190 +16,312 @@ using Xe.Tools.Wpf.Models;
 
 namespace OpenKh.Tools.BarEditor.ViewModels
 {
-    public class BarViewModel : GenericListModel<BarEntryModel>
-	{
-		private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
+    public class BarViewModel : GenericListModel<BarEntryModel>, IViewSettings
+    {
+        private static string ApplicationName = Utilities.GetApplicationName();
+        private string _fileName;
+        private static readonly List<FileDialogFilter> Filters = FileDialogFilterComposer.Compose().AddAllFiles();
+        private readonly ToolInvokeDesc _toolInvokeDesc;
+        private Bar.MotionsetType _motionsetType;
+        private bool _showSlotNumber;
+        private bool _showMovesetName;
 
-		public BarViewModel() : this((IEnumerable<BarEntryModel>)null) { }
+        public static EnumModel<Bar.MotionsetType> MotionsetTypes { get; } = new EnumModel<Bar.MotionsetType>();
 
-		public BarViewModel(Stream stream) :
-			this(Bar.Read(stream))
-		{
-			OpenCommand = new RelayCommand(x => { }, x => false);
-			SaveCommand = new RelayCommand(x =>
-			{
-				stream.Position = 0;
-				stream.SetLength(0);
-				Bar.Write(stream, Items.Select(item => item.Entry));
-			});
-		}
+        public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
-		public BarViewModel(IEnumerable<Bar.Entry> list) :
-			this(list.Select(x => new BarEntryModel(x)))
-		{ }
+        public BarViewModel(ToolInvokeDesc desc) : this()
+        {
+            _toolInvokeDesc = desc;
+            OpenStream(desc.SelectedEntry.Stream);
 
-		public BarViewModel(IEnumerable<BarEntryModel> list) :
-			base(list)
-		{
-			Types = new EnumModel<Bar.EntryType>();
+            NewCommand = new RelayCommand(x => { }, x => false);
+            OpenCommand = new RelayCommand(x => { }, x => false);
+            SaveCommand = new RelayCommand(x =>
+            {
+                var memoryStream = new MemoryStream();
 
-			OpenCommand = new RelayCommand(x =>
-			{
-				FileDialog.OnOpen(fileName =>
-				{
-					using (var stream = File.Open(fileName, FileMode.Open))
-					{
-						FileName = fileName;
-						Items.Clear();
-						foreach (var item in Bar.Read(stream))
-						{
-							Items.Add(new BarEntryModel(item));
-						}
-					}
-				}, Filters);
-			}, x => true);
+                Bar.Write(memoryStream, Items.Select(item => item.Entry), MotionsetType);
 
-			SaveCommand = new RelayCommand(x =>
-			{
-				if (!string.IsNullOrEmpty(FileName))
-				{
-					using (var stream = File.Open(FileName, FileMode.Create))
-					{
-						Bar.Write(stream, Items.Select(item => item.Entry));
-					}
-				}
-				else
-				{
-					SaveAsCommand.Execute(x);
-				}
-			}, x => true);
+                var stream = _toolInvokeDesc.SelectedEntry.Stream;
 
-			SaveAsCommand = new RelayCommand(x =>
-			{
-				FileDialog.OnSave(fileName =>
-				{
-					using (var stream = File.Open(fileName, FileMode.Create))
-					{
-						Bar.Write(stream, Items.Select(item => item.Entry));
-					}
-				}, Filters);
-			}, x => true);
+                stream.Position = 0;
+                stream.SetLength(0);
+                memoryStream.Position = 0;
+                memoryStream.CopyTo(stream);
+            });
+            SaveAsCommand = new RelayCommand(x => { }, x => false);
+        }
 
-			ExitCommand = new RelayCommand(x =>
-			{
-				Window.Close();
-			}, x => true);
+        public BarViewModel() : base(new BarEntryModel[0])
+        {
+            Types = new EnumModel<Bar.EntryType>();
 
-			AboutCommand = new RelayCommand(x =>
-			{
-				new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
-			}, x => true);
+            NewCommand = new RelayCommand(x =>
+            {
+                FileName = "untitled.bar";
+                Items.Clear();
+                MotionsetType = 0;
+            }, x => true);
 
-			OpenItemCommand = new RelayCommand(x =>
-			{
-				try
-				{
-					ToolsLoaderService.OpenTool(SelectedItem.Entry.Stream, SelectedItem.Type);
-				}
-				catch (Exception e)
-				{
-					MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-				}
-				OnPropertyChanged(nameof(SelectedItem));
-			}, x => true);
+            OpenCommand = new RelayCommand(x =>
+            {
+                FileDialog.OnOpen(fileName =>
+                {
+                    OpenFileName(fileName);
+                    FileName = fileName;
+                }, Filters);
+            }, x => true);
 
-			ExportCommand = new RelayCommand(x =>
-			{
-                var defaultFileName = $"{SelectedItem.Entry.Name}.bin";
+            SaveCommand = new RelayCommand(x =>
+            {
+                if (!string.IsNullOrEmpty(FileName))
+                {
+                    SaveToFile(FileName);
+                }
+                else
+                {
+                    SaveAsCommand.Execute(x);
+                }
+            }, x => true);
 
-				FileDialog.OnSave(fileName =>
-				{
-					using (var fStream = File.OpenWrite(fileName))
-					{
-						SelectedItem.Entry.Stream.Position = 0;
-						SelectedItem.Entry.Stream.CopyTo(fStream);
-					}
-				}, Filters, defaultFileName);
-			}, x => IsItemSelected);
+            SaveAsCommand = new RelayCommand(x =>
+            {
+                FileDialog.OnSave(fileName =>
+                {
+                    SaveToFile(fileName);
+                }, Filters, Path.GetFileName(FileName));
+            }, x => true);
+
+            ExitCommand = new RelayCommand(x =>
+            {
+                Window.Close();
+            }, x => true);
+
+            AboutCommand = new RelayCommand(x =>
+            {
+                new AboutDialog(Assembly.GetExecutingAssembly()).ShowDialog();
+            }, x => true);
+
+            OpenItemCommand = new RelayCommand(x =>
+            {
+                try
+                {
+                    var tempFileName = SaveToTempraryFile();
+                    switch (ToolsLoaderService.OpenTool(FileName, tempFileName, SelectedItem.Entry))
+                    {
+                        case Common.ToolInvokeDesc.ContentChangeInfo.File:
+                            ReloadFromTemporaryFile(tempFileName);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                OnPropertyChanged(nameof(SelectedItem));
+            }, x => true);
+
+            ExportCommand = new RelayCommand(x =>
+            {
+                var defaultFileName = GetSuggestedFileName(SelectedItem.Entry);
+
+                FileDialog.OnSave(fileName =>
+                {
+                    using var fStream = File.OpenWrite(fileName);
+                    SelectedItem.Entry.Stream.Position = 0;
+                    SelectedItem.Entry.Stream.CopyTo(fStream);
+                }, Filters, defaultFileName);
+            }, x => IsItemSelected);
 
             ExportAllCommand = new RelayCommand(x =>
             {
-				FileDialog.OnFolder(folder =>
-				{
-					foreach (var item in Items.Select(item => item.Entry))
-					{
-						var fileName = $"{item.Name}.bin";
-						using (var fStream = File.OpenWrite(Path.Combine(folder, fileName)))
-						{
-							item.Stream.Position = 0;
-							item.Stream.CopyTo(fStream);
-						}
-					}
-				});
+                FileDialog.OnFolder(folder =>
+                {
+                    foreach (var item in Items.Select(item => item.Entry))
+                    {
+                        var fileName = GetSuggestedFileName(item);
+                        using var fStream = File.OpenWrite(Path.Combine(folder, fileName));
+                        item.Stream.Position = 0;
+                        item.Stream.CopyTo(fStream);
+                    }
+                });
             }, x => true);
 
             ImportCommand = new RelayCommand(x =>
-			{
-				FileDialog.OnOpen(fileName =>
-				{
-					using (var fStream = File.OpenRead(fileName))
-					{
-						var memStream = new MemoryStream((int)fStream.Length);
-						fStream.CopyTo(memStream);
-						SelectedItem.Entry.Stream = memStream;
-					}
+            {
+                FileDialog.OnOpen(fileName =>
+                {
+                    var fStream = File.OpenRead(fileName);
+                    var memStream = new MemoryStream((int)fStream.Length);
+                    fStream.CopyTo(memStream);
+                    SelectedItem.Entry.Stream = memStream;
 
-					OnPropertyChanged(nameof(SelectedItem.Size));
-				}, Filters);
-			}, x => IsItemSelected);
-			SearchCommand = new RelayCommand(x => { }, x => false);
-		}
+                    OnPropertyChanged(nameof(SelectedItem));
+                }, Filters);
+            }, x => IsItemSelected);
+        }
 
-		private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+        public void OpenFileName(string fileName)
+        {
+            using var stream = File.Open(fileName, FileMode.Open);
+            OpenStream(stream);
+        }
 
-		private string FileName { get; set; }
+        private void OpenStream(Stream stream)
+        {
+            Items.Clear();
 
-		public RelayCommand OpenCommand { get; set; }
+            var binarc = Bar.Read(stream);
+            ShowMovesetName = AutodetectMsetFile(binarc);
+            ShowSlotNumber = ShowMovesetName;
 
-		public RelayCommand SaveCommand { get; set; }
+            MotionsetType = binarc.Motionset;
 
-		public RelayCommand SaveAsCommand { get; set; }
+            foreach (var item in binarc)
+            {
+                Items.Add(new BarEntryModel(item, this));
+            }
+        }
 
-		public RelayCommand ExitCommand { get; set; }
+        private void SaveToFile(string fileName)
+        {
+            var memoryStream = new MemoryStream();
+            Bar.Write(memoryStream, Items.Select(item => item.Entry), MotionsetType);
 
-		public RelayCommand AboutCommand { get; set; }
+            using var stream = File.Open(fileName, FileMode.Create);
+            memoryStream.Position = 0;
+            memoryStream.CopyTo(stream);
+        }
 
+        private string GetTemporaryFileName(string actualFileName)
+        {
+            return Path.GetTempFileName();
+        }
+
+        private string SaveToTempraryFile()
+        {
+            var tempFileName = GetTemporaryFileName(FileName);
+            SaveToFile(tempFileName);
+
+            return tempFileName;
+        }
+
+        private void ReloadFromTemporaryFile(string tempFileName)
+        {
+            OpenFileName(tempFileName);
+        }
+
+        private static string GetSuggestedFileName(Bar.Entry item) =>
+            $"{item.Name}_{item.Index}.{Helpers.GetSuggestedExtension(item.Type)}";
+
+        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+
+        public string FileName
+        {
+            get => _fileName;
+            set
+            {
+                _fileName = value;
+                OnPropertyChanged(nameof(Title));
+            }
+        }
+
+        public Bar.MotionsetType MotionsetType
+        {
+            get => _motionsetType;
+            set
+            {
+                _motionsetType = value;
+                InvalidateBarEntryTags();
+                OnPropertyChanged(nameof(MotionsetType));
+                OnPropertyChanged(nameof(IsMsetInfoVisible));
+            }
+        }
+
+        public Visibility IsMsetInfoVisible =>
+            MotionsetType == Bar.MotionsetType.Player &&
+            ShowMovesetName == true ? Visibility.Visible : Visibility.Collapsed;
+
+        public RelayCommand NewCommand { get; set; }
+        public RelayCommand OpenCommand { get; set; }
+        public RelayCommand SaveCommand { get; set; }
+        public RelayCommand SaveAsCommand { get; set; }
+        public RelayCommand ExitCommand { get; set; }
+        public RelayCommand AboutCommand { get; set; }
         public RelayCommand ExportCommand { get; set; }
-
         public RelayCommand ExportAllCommand { get; set; }
-
         public RelayCommand ImportCommand { get; set; }
+        public RelayCommand OpenItemCommand { get; set; }
 
-		public RelayCommand OpenItemCommand { get; set; }
+        public EnumModel<Bar.EntryType> Types { get; set; }
 
-		public RelayCommand SearchCommand { get; set; }
+        public string ExportFileName => IsItemSelected ?
+            GetSuggestedFileName(SelectedItem.Entry) : string.Empty;
 
-		public EnumModel<Bar.EntryType> Types { get; set; }
+        public bool IsPlayer => MotionsetType != Bar.MotionsetType.Default;
 
-		public string ExportFileName => IsItemSelected ? $"{SelectedItem?.DisplayName}.bin" : "(no file selected)";
+        public bool ShowSlotNumber
+        {
+            get => _showSlotNumber;
+            set
+            {
+                _showSlotNumber = value;
+                InvalidateBarEntryTags();
+                OnPropertyChanged();
+            }
+        }
 
-		protected override BarEntryModel OnNewItem()
-		{
-			return new BarEntryModel(new Bar.Entry()
-			{
-				Stream = new MemoryStream()
-			});
-		}
+        public bool ShowMovesetName
+        {
+            get => _showMovesetName;
+            set
+            {
+                _showMovesetName = value;
+                InvalidateBarEntryTags();
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsMsetInfoVisible));
+            }
+        }
 
-		protected override void OnSelectedItem(BarEntryModel item)
-		{
-			base.OnSelectedItem(item);
+        public int GetSlotIndex(BarEntryModel item) => Items.IndexOf(item);
 
-			ExportCommand.CanExecute(SelectedItem);
-			ImportCommand.CanExecute(SelectedItem);
-			OpenItemCommand.CanExecute(SelectedItem);
+        private void InvalidateBarEntryTags()
+        {
+            foreach (var item in Items)
+                item.InvalidateTag();
+        }
 
-			OnPropertyChanged(nameof(ExportFileName));
-		}
-	}
+        protected override BarEntryModel OnNewItem()
+        {
+            return new BarEntryModel(new Bar.Entry()
+            {
+                Stream = new MemoryStream()
+            }, this);
+        }
+
+        protected override void OnSelectedItem(BarEntryModel item)
+        {
+            base.OnSelectedItem(item);
+
+            ExportCommand.CanExecute(SelectedItem);
+            ImportCommand.CanExecute(SelectedItem);
+            OpenItemCommand.CanExecute(SelectedItem);
+
+            OnPropertyChanged(nameof(ExportFileName));
+        }
+
+        private static bool AutodetectMsetFile(Bar binarc)
+        {
+            // When the motionset type is not default, it's easy to assume it's a MSET.
+            if (binarc.Motionset != Bar.MotionsetType.Default)
+                return true;
+
+            // When not, we need to make an assumption. For example a MSET usually
+            // contains a bunch of ANB. We can say that if we find mroe tha N ANB
+            // entries then it's a MSET.
+            const int AnbCountAssumption = 4;
+            return binarc.Count(x => x.Type == Bar.EntryType.Anb) >= AnbCountAssumption;
+        }
+    }
 }

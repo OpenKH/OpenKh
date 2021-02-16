@@ -1,7 +1,12 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Common;
+using OpenKh.Imaging;
+using OpenKh.Kh2;
+using OpenKh.Tests.Imaging;
 using System.IO;
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace OpenKh.Tests.kh2
 {
@@ -16,6 +21,7 @@ namespace OpenKh.Tests.kh2
 
         [Theory]
         [InlineData("50worldmap")]
+        [InlineData("sample2")]
         public void TestDecompression(string fileName)
         {
             using (var fileCompressed = File.OpenRead($"kh2/res/{fileName}.cmp"))
@@ -36,6 +42,95 @@ namespace OpenKh.Tests.kh2
                     Assert.Equal(fileExpected.Length, matched);
                 }
             }
+        }
+
+        [Theory]
+        [InlineData("50worldmap")]
+        [InlineData("sample2")]
+        public void CompressCorrectly(string fileName) =>
+            File.OpenRead($"kh2/res/{fileName}.dec").Using(stream =>
+            {
+                Helpers.AssertStream(stream, inStream =>
+                    new MemoryStream(Img.Decompress(Img.Compress(inStream.ReadAllBytes()))));
+            });
+
+        [Theory]
+        [InlineData("50worldmap", 0x16d)]
+        [InlineData("sample2", 0x4ac)]
+        public void CompressEquallyOrBetter(string fileName, int expectLength) =>
+            File.OpenRead($"kh2/res/{fileName}.dec").Using(stream =>
+            {
+                var compress = Img.Compress(stream.ReadAllBytes());
+                if (compress.Length > expectLength)
+                {
+                    throw new XunitException($"Compressed file is {compress.Length} byte, but the official one is {expectLength}.\n" +
+                        "The compression algorithm is not performant enough.");
+                }
+            });
+
+        [Fact]
+        public void CompressCorrectlyWhenKeyIsFoundInTheData() =>
+            new MemoryStream(Enumerable.Range(0, 0x100).Select(x => (byte)x).ToArray()).Using(stream =>
+            {
+                Helpers.AssertStream(stream, inStream =>
+                    new MemoryStream(Img.Decompress(Img.Compress(inStream.ReadAllBytes()))));
+            });
+
+        [Fact]
+        public void CreateEmptyFileIfCompressedSourceIsEmpty()
+        {
+            var input = Enumerable.Range(0, 0x1000).Select(_ => (byte)0).ToArray();
+            Assert.Empty(Img.Decompress(input));
+        }
+
+        [Fact]
+        public void CreateAndRead4bppSuccessfully()
+        {
+            var imgd = Imgd.Create(
+                new System.Drawing.Size(ImageDecodeTests.Width, ImageDecodeTests.Height),
+                PixelFormat.Indexed4,
+                ImageDecodeTests.Data4bpp, ImageDecodeTests.Clut4bpp, false);
+
+            Assert.Equal(ImageDecodeTests.ExpectedFrom4bpp, imgd.ToBgra32());
+
+            using var stream = new MemoryStream();
+            imgd.Write(stream);
+            imgd = Imgd.Read(stream.SetPosition(0));
+
+            Assert.Equal(ImageDecodeTests.ExpectedFrom4bpp, imgd.ToBgra32());
+        }
+
+        public void AlwaysCompressCorrectly()
+        {
+            using var imgStream = File.OpenRead("G:\\KH2.IMG");
+            new Img(imgStream, File.OpenRead("G:\\KH2.IDX").Using(Idx.Read), true)
+                .Entries.ToList()
+                .Where(x => x.IsCompressed)
+                .Where(x => !x.IsStreamed)
+                .Select(x => new
+                {
+                    Name = IdxName.Lookup(x),
+                    Entry = x,
+                    Data = imgStream
+                        .SetPosition(x.Offset * 0x800)
+                        .ReadBytes((x.BlockLength + 1) * 0x800)
+                })
+                .ToList()
+                .AsParallel()
+                .WithDegreeOfParallelism(16)
+                .ForAll(x =>
+                {
+                    new MemoryStream(Img.Decompress(x.Data)).Using(stream =>
+                    {
+                        Helpers.AssertStream(stream, inStream =>
+                        {
+                            var compressedData = Img.Compress(inStream.ReadAllBytes());
+                            var decompressedData = Img.Decompress(compressedData);
+
+                            return new MemoryStream(decompressedData);
+                        });
+                    });
+                });
         }
     }
 }

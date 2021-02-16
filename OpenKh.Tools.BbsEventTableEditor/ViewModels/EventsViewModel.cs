@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -8,8 +8,6 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
 {
     public class EventsViewModel : GenericListModel<EventViewModel>
     {
-        private EventViewModel _selectedItem;
-
         public EventsViewModel() :
             this(new Event[0])
         { }

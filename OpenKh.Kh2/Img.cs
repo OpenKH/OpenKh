@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Xe.IO;
@@ -7,9 +7,9 @@ namespace OpenKh.Kh2
 {
     public class Img
     {
-        const int IsoBlockAlign = 0x800;
+        public const int IsoBlockAlign = 0x800;
 
-        private static string[] InternalIdxs =
+        public static string[] InternalIdxs =
         {
             "000al.idx",
             "000bb.idx",
@@ -34,27 +34,55 @@ namespace OpenKh.Kh2
 
         private readonly Stream stream;
 
-        public Img(Stream stream, Idx idx, bool loadAllIdx)
+        public Img(Stream stream, IEnumerable<Idx.Entry> idxEntries, bool loadAllIdx)
         {
             this.stream = stream;
-            Idx = idx;
+            Entries = new IdxDictionary
+            {
+                idxEntries
+            };
+
             if (loadAllIdx)
-                Idx = LoadAllIdx(Idx);
+            {
+                foreach (var fileName in InternalIdxs)
+                {
+                    FileOpen(fileName, entryStream =>
+                    {
+                        Entries.Add(Idx.Read(entryStream));
+                    });
+                }
+            }
         }
 
-        public Idx Idx { get; }
+        public IdxDictionary Entries { get; }
+
+        public bool FileExists(string fileName) => Entries.Exists(fileName);
+
+        public bool TryFileOpen(string fileName, out Stream stream)
+        {
+            bool result;
+            if (result = Entries.TryGetEntry(fileName, out var entry))
+            {
+                stream = FileOpen(entry);
+                return true;
+            }
+
+            stream = null;
+            return false;
+        }
 
         public bool FileOpen(string fileName, Action<Stream> callback)
         {
             bool result;
-            if (result = Idx.TryGetEntry(fileName, out var entry))
+            if (result = Entries.TryGetEntry(fileName, out var entry))
                 callback(FileOpen(entry));
+
             return result;
         }
 
         public Stream FileOpen(string fileName)
         {
-            if (Idx.TryGetEntry(fileName, out var entry))
+            if (Entries.TryGetEntry(fileName, out var entry))
                 return FileOpen(entry);
 
             throw new FileNotFoundException("File not found", fileName);
@@ -80,8 +108,10 @@ namespace OpenKh.Kh2
         {
             var srcIndex = srcData.Length - 1;
 
-            byte key;
-            while ((key = srcData[srcIndex--]) == 0) ;
+            byte key = 0;
+            while (srcIndex > 0 && (key = srcData[srcIndex--]) == 0) ;
+            if (srcIndex == 0)
+                return new byte[0];
 
             int decSize = srcData[srcIndex--] |
                 (srcData[srcIndex--] << 8) |
@@ -120,29 +150,99 @@ namespace OpenKh.Kh2
             return dstData;
         }
 
-        private static byte ReadByteBackward(Stream stream)
+        public static byte[] Compress(byte[] srcData)
         {
-            stream.Position -= 1;
-            var b = stream.ReadByte();
-            stream.Position -= 1;
-            return (byte)b;
-        }
+            const int MaxWindowSize = 0x102;
+            const int MaxSlidingIndex = 0xff;
 
-        private static void WriteByteBackward(Stream stream, byte value)
-        {
-            stream.Position -= 1;
-            stream.WriteByte(value);
-            stream.Position -= 1;
-        }
+            var decompressedLength = srcData.Length;
+            var key = GetLeastUsedByte(srcData);
+            var buffer = new List<byte>(decompressedLength);
 
-        private Idx LoadAllIdx(Idx idx)
-        {
-            foreach (var fileName in InternalIdxs)
+            buffer.Add(key);
+            buffer.Add((byte)(decompressedLength >> 0));
+            buffer.Add((byte)(decompressedLength >> 8));
+            buffer.Add((byte)(decompressedLength >> 16));
+            buffer.Add((byte)(decompressedLength >> 24));
+
+            int sourceIndex = decompressedLength - 1;
+
+            while (sourceIndex >= 0)
             {
-                idx = idx.Merge(Idx.Read(FileOpen(fileName)));
+                var ch = srcData[sourceIndex];
+                if (ch == key)
+                {
+                    buffer.Add(key);
+                    buffer.Add(0);
+                    sourceIndex--;
+                    continue;
+                }
+
+                var windowSizeCandidate = 0;
+                var slidingIndexCandidate = -1;
+                var maxWindowSize = Math.Min(sourceIndex, MaxWindowSize);
+                for (var slidingIndex = MaxSlidingIndex; slidingIndex > 0; slidingIndex--)
+                {
+                    if (slidingIndex + sourceIndex >= decompressedLength)
+                        continue;
+
+                    int windowSize;
+                    for (windowSize = 0; windowSize < maxWindowSize; windowSize++)
+                    {
+                        var startWindow = sourceIndex + slidingIndex - windowSize;
+                        if (srcData[startWindow] != srcData[sourceIndex - windowSize])
+                            break;
+                    }
+
+                    if (windowSize > windowSizeCandidate)
+                    {
+                        windowSizeCandidate = windowSize;
+                        slidingIndexCandidate = slidingIndex;
+                    }
+                }
+
+                if (windowSizeCandidate > 3)
+                {
+                    buffer.Add(key);
+                    buffer.Add((byte)slidingIndexCandidate);
+                    buffer.Add((byte)(windowSizeCandidate - 3));
+                    sourceIndex -= windowSizeCandidate;
+                }
+                else
+                {
+                    buffer.Add(ch);
+                    sourceIndex--;
+                }
             }
 
-            return idx;
+            var compressedLength = buffer.Count;
+            var cmp = new byte[compressedLength];
+            for (var i = 0; i < compressedLength; i++)
+            {
+                cmp[i] = buffer[compressedLength - i - 1];
+            }
+
+            return cmp;
+        }
+
+        private static byte GetLeastUsedByte(byte[] data)
+        {
+            var dictionary = new int[0x100];
+            foreach (var ch in data)
+                dictionary[ch]++;
+
+            var elementFound = int.MaxValue;
+            var indexFound = 1; // the least used byte is never zero
+            for (var i = 1; i < 0x100; i++)
+            {
+                if (dictionary[i] < elementFound)
+                {
+                    elementFound = dictionary[i];
+                    indexFound = i;
+                }
+            }
+
+            return (byte)indexFound;
         }
     }
 }

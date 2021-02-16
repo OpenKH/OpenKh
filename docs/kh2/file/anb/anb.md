@@ -1,107 +1,125 @@
-# [Kingdom Hearts II](../../index) - ANB
+# [Kingdom Hearts II](../../index.md) - ANB (Animation Binary)
 
-Okay, so this doc is is for people to look at and think “so that’s what an ANB does”.
+ANB files are used by the game engine to animate a 3D model and trigger events in specific frames. They are used for both gameplay and cutscenes. All the gameplay ANB files are located inside [MSET](mset.md) files in `obj/`, while for cutscenes they are located in `anm/{WORLD}/{MODEL}/`.
+Internally they are just [BAR archives](../type/bar.md) and for what it's known the only two files that can be found in are [motion data](#motion-data) and [effect data](#effect-data).
 
+## Motion data
 
-I’ll jump into it, so first off, download the stuff in kkdf2’s gitlab for the msetDoc. Get it here: https://gitlab.com/kenjiuno/msetDoc
+This file is responsible of animating a [3D model](../type/mdlx.md). It comes in two forms, interpolated and RAW. Due to the bigger complexity of interpolated-type motion files, they will be documented in a [separate document](motion.md).
 
+The game engine assumes that the maximum frame rate is `60`; this is referred as Global Frame Rate (or GFR). But every motion can run at a different frame rate; this is referred as Local Frame Rate (or LFR).
 
+The RAW animation type just takes an array of matrices for each frame and applies them to the bones of a model. It is a very cheap technique in terms of CPU usage, but it requires a big amount of memory.
 
-This is because it’s better to look back and forth between ours to get a more thorough understanding.
+### Motion header
 
+Like model files, the first `0x90` are reserved an always set to `00`. Offsets and file size ignores the first `0x90`. This document refers to the motion type `1`, which is the RAW one. When the motion type is `0`, the rest of the file after the header will be very different; refer to [interpolated motion document](motion.md).
 
-Then Download this: https://drive.google.com/file/d/1vVFq4DSlmXR7wTT1eoUKIFMAoihKzVeq/view?usp=sharing, it’s a group of files to help follow along.
+| Offset | Type | Description
+|--------|------|--------------
+| 0      | int  | Motion 'type', 0=Interpolated, 1=Raw
+| 4      | int  | Unknown. It can be `0` or `1`
+| 8      | int  | Size of the file
+| 12     | int  | Always 0
 
+### Raw motion header
 
-ANBs are stored in MSETs, as I’m sure you know, so extract one (I’ve provided you with A000, P_EX100’s Battle Idle, since it’s the one use in kkdf2’s docs, it’s easier to follow along with) and all things should apply the same
+This is located straight after the motion header.
 
+| Offset | Type | Description
+|--------|------|--------------
+| 0x00   | int  | Bone count. Must match with the bone count of the model.
+| 0x04   | int  | Always 0
+| 0x08   | int  | Always 0
+| 0x0C   | int  | Always 0
+| 0x10   | int  | Amount of GFR in a loop (`FrameEnd - FrameLoop`)
+| 0x14   | int  | Total amount of frames, expressed in LFR
+| 0x18   | int  | Unknown
+| 0x1c   | int  | Offset to the [second matrix table](#raw-motion-more-matrices)
+| 0x20   | vec4f | Bounding Box minimum
+| 0x30   | vec4f | Bounding Box maximum
+| 0x40   | float | Frame loop
+| 0x44   | float | Frame end
+| 0x48   | float | Frames per second, defines the LFR
+| 0x4c   | float | Frame count, expressed in LFR
 
-First (again), open the anb (A000) in the hex editor of your choosing, I’m using HxD, then set the bytes to 16 bytes a line. The first 3 lines should be
+### Raw motion matrices
 
-![image](./images/image4.png)
+An array of array of 4x4 matrices (`Matrix4x4[][]`). The first dimension of the array refers to the total amount of frames, while the second dimension is the bone count. For each frame (LFR), the game engine takes BoneCount amount of `Matrix4x4` and multiplies them to the mesh that corresponds to a specific bone.
 
-This is just telling what anb it is, nothing groundbreaking.
+### Raw motion more matrices
 
-![image](./images/image6.png)
+This is optionally defined and its purpose is unknown. It is an array of 4x4 matrices (`Matrix4x4[]`), where the size of the array is equal to the bone count. For the few files that has been analysed, those matrices are always a Matrix Identity.
 
-The first 12 lines are useless in terms of doing things in the game, in this case, I deleted them, `A000 top chunk off so that it matchs kkdf2's formating for the first part` is the result of this. *Note, re add the deleted lines at the end of the process, I’m simply telling you to delete lines in order to make viewing the bytes more manageable, and to follow the initial docs.
+## Effect data
 
+This file describe triggers that happens during a [motion](#motion-data) and it's believed they are located into a different file to favour decoupling.
 
-Now, change the bytes per line to 8, and then go to offset 000000B0. This is where the fun begins.
+### Effect main header
 
+| Amount | Description |
+|--------|---------------|
+| Single |  [Header](#effect-entry-header)
+| Array  |  [Type A effect](#Type-A-effect) (Happens during X frames)
+| Array  |  [Type B effect](#Type-B-effect) (Triggered on a specific frame)
 
-Scroll Down.
+### Effect entry header
 
-![image](./images/image3.png)
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0      | byte | [Type A effect](#Type-A-effect) count
+| 1      | byte | [Type B effect](#Type-B-effect) count
+| 2      | short | Start offset of the type B effects
 
-The `Red` is the bones number
+### Type A effect
 
-The `Blue` is the type of modification (translate, scale, rotate)
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0      | short | Start frame
+| 2      | short | End frame
+| 4      | byte | [Effect A ID](#effect-a-list)
+| 5      | byte | Param size as shorts
+| 6      | short[] | Param
 
-The `Green` is the extent to which is is modified
+### Type B effect
 
-## Format description
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0      | short | Trigger frame
+| 2      | byte | [Effect B ID](#effect-b-list)
+| 3      | byte | Param size as shorts
+| 4      | short[] | Param
 
-Display the values that correspond to the action of the bone. Full credits to kkdf2 for the chart.
+### Effect A list
 
-| Topic   | Description
-|---------|----------------
-| Joint#  | Apply fixed value for ax in joint specified by `joint#`
-| Channel | 
-| Value   |
+| ID | Effect | Parameter | Size
+|--------|---------------|-------------|-------------|
+| 0      | Allows controls (But brings to idle animaiton) | |
+| 1      | Allows controls (But blocks the animation) | |
+| 2      | Allows controls | |
+| 3      | Blocks the animation (But disables gravity) | |
+| 4      | Blocks controls (But allows gravity) | |
+| 10     | Activates hitbox | ? | ?
+| 20     | Performs a reaction command (On current model) | ? | ?
+| 23     | Draws an additional texture | ? | ?
+| 25     | Performs a reaction command (On another model) | ? | ?
+| 27     | Makes invincible | |
+| 30     | Blocks everything | |
+| 34     | Blocks reaction command | |
+| 41     | Allows controls (But disables model rotation) | |
 
-Those are the known accepted values for the Joint channel
+### Effect B list
 
-| Channel | Description
-|---------|---------------
-| 0       | Modify `scale.x`
-| 1       | Modify `scale.y`
-| 2       | Modify `scale.z`
-| 3       | Modify `rotate.x`
-| 4       | Modify `rotate.y`
-| 5       | Modify `rotate.z`
-| 6       | Modify `translate.x`
-| 7       | Modify `translate.y`
-| 8       | Modify `translate.z`
-| ...     | unresearched
-
-## Samples
-
-P_EX100 has 227 bones, most if not all of which are present, and the bones are labeled in hex, so bone 1 is “01” and  bone 227 is “E3”.
-
-
-As kkdf2 (from now on referred to as Mr. Kenjiuno) discovered, the bytes in each line  “destroy the mdlx”, in other words, it poses the model into the desired shape bone by bone until you get the main pose wanted.
-
-![image](./images/image5.png)
-
-The above image is an example of me messing with what is the X Axis Rotate Value on bone 2.
-
-![image](./images/image1.gif)
-
-All other bones not paired to bone 2 will be unaffected.
-
-
-Now is where things get a lot more tricky to understand, but bare with me.
-
-Go to line offset 00000F88 (remember, we have it set to 8 bytes per line) in `A000 top chunk off so that it matchs kkdf2's formating for the first part`, the bytes should read as follows `00 00 03 0A 00 00 00 00` once you’re here, delete all bytes above this for simplicity sake, and save as a new file (re add the cut files once the process is done). Once all bytes above are gone, set bytes per line to 6.
-
-
-Keep Reading
-
-![image](./images/image2.png)
-
-The `Red` is the bones number
-
-The `Blue` is the type of modification (translate, scale, rotate)
-
-The `Green` is from what I can gather, a pointer that specifies what kind of interpolation occurs and for how long
-
-The Purple is unknown from what I’ve read.
-
-*Refer to Mr. Kenjiuno’s docs about this section to understand more, the explanation I’ve given will help to further understand what he’s said: `t2` in his doc
-
-
-Most if not all data below this section is dedicated to interpolation and the process of it, however, there is one section in which the IK (Inverse Kinematics) is called on. Because I can’t figure this section of his docs, and because Mr. Kenjuino stated that they were speculations as he goes further into the ANB, I strongly recommend following the rest of his docs, this doc’s main purpose was to give basic info to help understand the more complex stuff.
-
-
-**This Doc needs to be improved, if you have any insights, please revise any errors, the goal is to have the most comprehensive, yet understandable explanation.
+| ID | Effect | Parameter | Size
+|----|---------------|-------------|-------------|
+| 1  | Plays PAX sprite | PAX sprite ID | ?
+| 2  | Plays footstep sound | Sound ID | ?
+| 3  | Plays animation in slot 628 | |
+| 13 | Plays an enemy vsb voice | vsb ID | ?
+| 14 | Plays an ally vsb voice | vsb ID | ?
+| 22 | Makes the keyblade appear | ? | ?
+| 23 | Makes model opacity decrease | ? | ?
+| 24 | Makes model opacity increase | ? | ?
+| 26 | Makes a mesh disappear | ? | ?
+| 27 | Makes a mesh appear | ? | ?
+| 29 | Plays a Keyblade appearance sprite | |

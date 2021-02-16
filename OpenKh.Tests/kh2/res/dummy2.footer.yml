@@ -1,0 +1,40 @@
+Textures:
+  TEST:
+    UvscList: []
+    TextureAnimationList:
+    - Unk1: 123
+      TextureIndex: 0
+      FrameStride: 0
+      BaseSlotIndex: 0
+      SpriteImageFile: ./dummy2.footer-test-0.png
+      NumSpritesInImageData: 1
+      UOffsetInBaseImage: 0
+      VOffsetInBaseImage: 0
+      DefaultAnimationIndex: 0
+      SlotTable: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      FrameGroupList:
+      - IndexedFrameList:
+          0:
+            MinimumLength: 123
+            MaximumLength: 456
+            SpriteImageIndex: 0
+            FrameControl: DisableSprite
+            FrameIndexDelta: 0
+          1:
+            MinimumLength: 123
+            MaximumLength: 456
+            SpriteImageIndex: 0
+            FrameControl: EnableSprite
+            FrameIndexDelta: 0
+          2:
+            MinimumLength: 123
+            MaximumLength: 456
+            SpriteImageIndex: 0
+            FrameControl: DisableSprite
+            FrameIndexDelta: 0
+          3:
+            MinimumLength: 0
+            MaximumLength: 0
+            SpriteImageIndex: 0
+            FrameControl: Jump
+            FrameIndexDelta: -3

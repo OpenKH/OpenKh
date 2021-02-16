@@ -1,22 +1,23 @@
 ﻿using OpenKh.Bbs;
+using OpenKh.Common;
 using System.IO;
 using Xunit;
 
 namespace OpenKh.Tests.Bbs
 {
-    public class EventTableTests : Common
+    public class EventTableTests
     {
         private const string FilePath = "Bbs/res/event-table.bin";
 
         [Fact]
-        public void ReadEntriesCountCorrectly() => FileOpenRead(FilePath, stream =>
+        public void ReadEntriesCountCorrectly() => File.OpenRead(FilePath).Using(stream =>
         {
             var events = Event.Read(stream);
             Assert.Equal(92, events.Count);
         });
 
         [Fact]
-        public void ParseSingleEntryCorrectly() => FileOpenRead(FilePath, stream =>
+        public void ParseSingleEntryCorrectly() => File.OpenRead(FilePath).Using(stream =>
         {
             var events = Event.Read(stream);
             var @event = events[22];
@@ -28,7 +29,7 @@ namespace OpenKh.Tests.Bbs
         });
 
         [Fact]
-        public void WritesBackCorrectly() => FileOpenRead(FilePath, stream =>
+        public void WritesBackCorrectly() => File.OpenRead(FilePath).Using(stream =>
             Helpers.AssertStream(stream, x =>
             {
                 var events = Event.Read(stream);

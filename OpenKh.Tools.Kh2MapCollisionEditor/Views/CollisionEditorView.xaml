@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="OpenKh.Tools.Kh2MapCollisionEditor.Views.CollisionEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2MapCollisionEditor.Views"
+             xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="160"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="C1"/>
+        <ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding C1}" SelectedItem="{Binding C1Item}"/>
+        <local:Collision1View Grid.Row="2" Grid.Column="0" DataContext="{Binding C1Item}"/>
+
+        <CheckBox Grid.Row="0" Grid.Column="1" Content="C2" IsChecked="{Binding AllC2}"/>
+        <ListBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding C2}" SelectedItem="{Binding C2Item}"/>
+        <local:Collision2View Grid.Row="2" Grid.Column="1" DataContext="{Binding C2Item}"/>
+
+        <CheckBox Grid.Row="0" Grid.Column="2" Content="C3" IsChecked="{Binding AllC3}"/>
+        <ListBox Grid.Row="1" Grid.Column="2" ItemsSource="{Binding C3}" SelectedItem="{Binding C3Item}"/>
+        <local:Collision3View Grid.Row="2" Grid.Column="2" DataContext="{Binding C3Item}"/>
+
+        <TextBlock Grid.Row="0" Grid.Column="3" Text="C4"/>
+        <ListBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding C4}" SelectedItem="{Binding C4Item}"/>
+        <local:VertexView Grid.Row="2" Grid.Column="3" DataContext="{Binding C4Item}"/>
+
+        <controls:DrawPanel
+            Grid.Row="3"
+            Grid.ColumnSpan="7"
+            Drawing="{Binding DrawingContext}"
+            DrawCreate="{Binding DrawCreate}"
+            DrawDestroy="{Binding DrawDestroy}"
+            DrawBegin="{Binding DrawBegin}"
+            DrawEnd="{Binding DrawEnd}"/>
+    </Grid>
+</UserControl>

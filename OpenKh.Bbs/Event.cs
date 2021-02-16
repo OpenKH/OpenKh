@@ -12,13 +12,7 @@ namespace OpenKh.Bbs
         private class Header
         {
             [Data] public int MagicCode { get; set; }
-            [Data] public int Count { get => Items.TryGetCount(); set => Items = Items.CreateOrResize(value); }
-            [Data] public List<Event> Items { get; set; }
-
-            static Header()
-            {
-                BinaryMapping.SetMemberLengthMapping<Header>(nameof(Items), (o, m) => o.Count);
-            }
+            [Data] public int Count { get; set; }
         }
 
         [Data] public ushort Id { get; set; }
@@ -36,14 +30,24 @@ namespace OpenKh.Bbs
             return magicCode == MagicCode;
         }
 
-        public static List<Event> Read(Stream stream) =>
-            BinaryMapping.ReadObject<Header>(stream).Items;
+        public static List<Event> Read(Stream stream)
+        {
+            var header = BinaryMapping.ReadObject<Header>(stream);
+            return Enumerable.Range(0, header.Count)
+                .Select(_ => BinaryMapping.ReadObject<Event>(stream))
+                .ToList();
+        }
 
-        public static void Write(Stream stream, IEnumerable<Event> events) =>
+        public static void Write(Stream stream, IEnumerable<Event> events)
+        {
+            var list = events.ToList();
             BinaryMapping.WriteObject(stream, new Header
             {
                 MagicCode = MagicCode,
-                Items = events.ToList()
+                Count = list.Count
             });
+            foreach (var item in list)
+                BinaryMapping.WriteObject(stream, item);
+        }
     }
 }

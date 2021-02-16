@@ -1,5 +1,6 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Bbs.Messages;
+using OpenKh.Engine.Renders;
 using OpenKh.Tools.CtdEditor.Interfaces;
 using System.Linq;
 using Xe.Drawing;
@@ -61,7 +62,7 @@ namespace OpenKh.Tools.CtdEditor.ViewModels
 
         public string Title => $"{Id}: {Text}";
 
-        public IDrawing DrawingContext => _drawHandler.DrawingContext;
+        public ISpriteDrawing DrawingContext => _drawHandler.DrawingContext;
         public RelayCommand DrawHandler { get; }
         public FontsArc.Font FontContext { get; set; }
 

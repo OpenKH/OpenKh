@@ -1,10 +1,8 @@
-﻿using OpenKh.Tools.Common;
+using OpenKh.Tools.Common;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Contextes;
 using OpenKh.Kh2.Extensions;
-using OpenKh.Tools.Common.Models;
-using OpenKh.Tools.Common.Extensions;
 using OpenKh.Tools.Kh2TextEditor.Types;
 using System;
 using System.Collections.Generic;
@@ -18,6 +16,8 @@ using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 using OpenKh.Tools.Kh2TextEditor.Services;
 using System.Text;
+using OpenKh.Engine.Renders;
+using OpenKh.Engine.Extensions;
 
 namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 {
@@ -246,6 +246,9 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }
 
             FileName = fileName;
+            LoadSupportFiles(Path.GetDirectoryName(fileName));
+            AutodetectRegion();
+
             return true;
         });
 
@@ -307,7 +310,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             }
         }
 
-        private void OpenFontImageFile(string fileName) => File.OpenRead(fileName).Using(stream =>
+        public void OpenFontImageFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             if (Bar.IsValid(stream))
             {
@@ -321,7 +324,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
             throw new NotImplementedException();
         }
 
-        private void OpenFontInfoFile(string fileName) => File.OpenRead(fileName).Using(stream =>
+        public void OpenFontInfoFile(string fileName) => File.OpenRead(fileName).Using(stream =>
         {
             if (Bar.IsValid(stream))
             {
@@ -337,7 +340,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
 
         private void InvalidateFontContext()
         {
-            KingdomTextContext context;
+            RenderingMessageContext context;
 
             switch (EncodingType)
             {
@@ -369,6 +372,20 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                             break;
                     }
                     break;
+                case EncodingType.Turkish:
+                    switch (FontType)
+                    {
+                        case FontType.System:
+                            context = _fontContext.ToKh2TRSystemTextContext();
+                            break;
+                        case FontType.Event:
+                            context = _fontContext.ToKh2TREventTextContext();
+                            break;
+                        default:
+                            context = null;
+                            break;
+                    }
+                    break;
                 default:
                     context = null;
                     break;
@@ -392,7 +409,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 return false;
 
             var msgEntry = Bar.Read(stream)
-                .FirstOrDefault(x => x.Type == Bar.EntryType.Binary);
+                .FirstOrDefault(x => x.Type == Bar.EntryType.List);
 
             if (msgEntry == null)
                 return false;
@@ -413,9 +430,49 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private void WriteBar(List<Bar.Entry> entries, Stream stream)
         {
             var newEntries = entries
-                .ForEntry(Bar.EntryType.Binary, _barEntryName, 0, entry => WriteMsg(entry.Stream));
+                .ForEntry(Bar.EntryType.List, _barEntryName, 0, entry => WriteMsg(entry.Stream));
 
             Bar.Write(stream, newEntries);
+        }
+
+        private void LoadSupportFiles(string basePath)
+        {
+            const string FontImageFileName = "fontimage.bar";
+            var fontImageFileName = Path.Combine(basePath, FontImageFileName);
+            if (File.Exists(fontImageFileName))
+                OpenFontImageFile(fontImageFileName);
+
+            const string FontInfoFileName = "fontinfo.bar";
+            var fontInfoFileName = Path.Combine(basePath, FontInfoFileName);
+            if (File.Exists(fontInfoFileName))
+                OpenFontImageFile(fontInfoFileName);
+        }
+
+        private void AutodetectRegion()
+        {
+            switch (IsMsgJapanese())
+            {
+                case true:
+                    EncodingType = EncodingType.Japanese;
+                    break;
+                case false:
+                    EncodingType = EncodingType.European;
+                    break;
+            }
+        }
+
+        private bool? IsMsgJapanese()
+        {
+            const ushort FakeTextId = 0x0ADC;
+            if (TextEditor?.MessageEntries == null)
+                return null;
+
+            var messageEntry = TextEditor.MessageEntries.FirstOrDefault(x => x.Id == FakeTextId);
+            var data = messageEntry?.Data;
+            if (data == null || data.Length == 0)
+                return null;
+
+            return data.Length != 5;
         }
     }
 }

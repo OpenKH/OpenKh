@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -92,31 +92,30 @@ namespace OpenKh.Kh2
             CubeCardForm = 0xC,
         }
 
-        [Data] public ushort ObjectId { get; set; }
-        [Data] public ushort Unknown02 { get; set; } // has something to do with if the obj is rendered or not, NO: ObjectId is actually an uint, but it's bitshifted afterwards?! see z_un_003216b8
+        [Data] public uint ObjectId { get; set; }
         [Data] public Type ObjectType { get; set; }
-        [Data] public byte Unknown05{ get; set; } //padding? isn't used ingame
-        [Data] public byte Unknown06 { get; set; }
+        [Data] public byte SubType { get; set; }
+        [Data] public byte DrawPriority { get; set; }
         [Data] public byte WeaponJoint { get; set; }
         [Data(Count = 32)] public string ModelName { get; set; }
         [Data(Count = 32)] public string AnimationName { get; set; }
-        [Data] public ushort Unknown48 { get; set; } //z_un_00169398 (00169840)
-        [Data] public ushort Unknown4a { get; set; }
+        [Data] public ushort Flag { get; set; }
+        [Data] public byte TargetType { get; set; }
+        [Data] public byte Padding { get; set; }
         [Data] public ushort NeoStatus { get; set; }
         [Data] public ushort NeoMoveset { get; set; }
-        [Data] public ushort Unknown50 { get; set; } // some kind of floating point calculation? z_un_0016a0a0
-        [Data] public short Weight { get; set; }
+        [Data] public float Weight { get; set; }
         [Data] public byte SpawnLimiter { get; set; }
-        [Data] public byte Unknown55 { get; set; } // padding?
-        [Data] public byte Unknown56{ get; set; }
+        [Data] public byte Page { get; set; }
+        [Data] public byte ShadowSize { get; set; }
         [Data] public CommandMenuOptions CommandMenuOption { get; set; }
         [Data] public ushort SpawnObject1 { get; set; }
         [Data] public ushort SpawnObject2 { get; set; }
         [Data] public ushort SpawnObject3 { get; set; }
-        [Data] public ushort Unknown5e { get; set; }
+        [Data] public ushort SpawnObject4 { get; set; }
 
-        public static BaseTable<Objentry> Read(Stream stream) => BaseTable<Objentry>.Read(stream);
+        public static List<Objentry> Read(Stream stream) => BaseTable<Objentry>.Read(stream);
         public static void Write(Stream stream, IEnumerable<Objentry> entries) =>
-            BaseTable<Objentry>.Write(stream, 3, entries.ToList());
+            BaseTable<Objentry>.Write(stream, 3, entries);
     }
 }

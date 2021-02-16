@@ -1,4 +1,4 @@
-﻿using OpenKh.Common.Exceptions;
+using OpenKh.Common.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +34,7 @@ namespace OpenKh.Kh2.Messages.Internals
             else
                 AppendEncodedCommand(list, messageCommand.Command, messageCommand.Data);
         }
-        
+
         private void AppendEncodedCommand(List<byte> list, MessageCommand command, byte[] data)
         {
             if (!_tableCommands.TryGetValue(command, out var pair))
@@ -63,7 +63,7 @@ namespace OpenKh.Kh2.Messages.Internals
         {
             if (!_tableCharacters.TryGetValue(ch, out var data))
                 throw new ArgumentException($"The character {ch} it is not supported by the specified encoding.");
-            
+
             list.Add(data);
         }
 

@@ -91,7 +91,7 @@ namespace OpenKh.Kh2
 
         public static Dictionary<string, List<Place>> Read(Stream stream) =>
             Bar.Read(stream)
-                .Where(x => x.Type == Bar.EntryType.Binary)
+                .Where(x => x.Type == Bar.EntryType.List)
                 .ToDictionary(x => x.Name, x => ReadPlaceEntry(x.Stream).ToList());
 
         public static void Write(Stream stream, Dictionary<string, List<Place>> entries)
@@ -114,7 +114,7 @@ namespace OpenKh.Kh2
                 {
                     Name = placeGroup.Key,
                     Stream = memoryStream,
-                    Type = Bar.EntryType.Binary
+                    Type = Bar.EntryType.List
                 });
             };
 

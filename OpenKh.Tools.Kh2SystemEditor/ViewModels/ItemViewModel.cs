@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using OpenKh.Engine;
 using OpenKh.Kh2;
-using OpenKh.Kh2.System;
+using OpenKh.Kh2.SystemData;
 using OpenKh.Tools.Common.Models;
 using OpenKh.Tools.Kh2SystemEditor.Extensions;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
@@ -29,7 +29,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
             public Item.Entry Item { get; }
 
-            public string Title => $"{Item.Id:X02} {_messageProvider.GetMessage(Item.Name)}";
+            public string Title => $"{Item.Id:X02} {_messageProvider.GetString(Item.Name)}";
 
             public ushort Id { get => Item.Id; set => Item.Id = value; }
             public Item.Type Type  { get => Item.Type; set => Item.Type = value; }
@@ -64,18 +64,25 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public byte Icon2  { get => Item.Icon1; set => Item.Icon1 = value; }
 
             public string IdText => $"{Id} (0x{Id:X})";
-            public string Name { get => _messageProvider.GetMessage(Item.Name); set => _messageProvider.SetMessage(Item.Name, value); }
-            public string Description { get => _messageProvider.GetMessage(Item.Description); set => _messageProvider.SetMessage(Item.Description, value); }
+            public string Name { get => _messageProvider.GetString(Item.Name); set => _messageProvider.SetString(Item.Name, value); }
+            public string Description { get => _messageProvider.GetString(Item.Description); set => _messageProvider.SetString(Item.Description, value); }
             public EnumModel<Item.Type> Types { get; }
             public EnumModel<Item.Rank> Ranks { get; }
 
             public override string ToString() => Title;
+
+            public void RefreshMessages()
+            {
+                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(Description));
+            }
         }
 
         private const string entryName = "item";
+        private readonly IMessageProvider _messageProvider;
+        private readonly List<Item.Stat> _item2;
         private string _searchTerm;
-        private IMessageProvider _messageProvider;
-        private List<Item.Stat> _item2;
 
         public ItemViewModel(IMessageProvider messageProvider, IEnumerable<Bar.Entry> entries) :
             this(messageProvider, Item.Read(entries.GetBinaryStream(entryName)))
@@ -122,7 +129,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             var stream = new MemoryStream();
             new Item
             {
-                Items1 = this.Select(x => x.Item).ToList(),
+                Items1 = UnfilteredItems.Select(x => x.Item).ToList(),
                 Items2 = _item2
             }.Write(stream);
 
@@ -172,5 +179,13 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
 
         private bool FilterByName(Entry arg) =>
             arg.Title.ToUpper().Contains(SearchTerm.ToUpper());
+
+        public void RefreshAllMessages()
+        {
+            foreach (var item in Items)
+            {
+                item.RefreshMessages();
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyTitle>KH2 Text editor</AssemblyTitle>
     <Product>KH2 Text editor - OpenKH</Product>
@@ -12,14 +12,13 @@
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
-    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Drawing.Direct3D\Xe.Drawing.Direct3D.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
   </ItemGroup>
     
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="15.0.0" />
-    <PackageReference Include="YamlDotNet" Version="8.1.0" />
+    <PackageReference Include="ColorPickerWPF" Version="1.0.9" />
+    <PackageReference Include="YamlDotNet" Version="9.1.4" />
   </ItemGroup>
       
 </Project>

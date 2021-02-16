@@ -14,7 +14,6 @@ namespace OpenKh.Common.Archives
             [Data] public int AssetCount { get; set; }
             [Data] public int Unused08 { get; set; }
             [Data] public int Unused0c { get; set; }
-            [Data] public List<HeaderEntry> Entries { get; set; }
         }
 
         private class HeaderEntry
@@ -44,11 +43,6 @@ namespace OpenKh.Common.Archives
             }
         }
 
-        static HdAsset()
-        {
-            BinaryMapping.SetMemberLengthMapping<Header>(nameof(Header.Entries), (o, memberName) => o.AssetCount);
-        }
-
         private readonly Header _header;
         private Stream stream;
         private List<Entry> entries;
@@ -68,25 +62,28 @@ namespace OpenKh.Common.Archives
             set => entries = value ?? throw new ArgumentNullException(nameof(Entries));
         }
 
-        private HdAsset()
+        public HdAsset()
         {
+            _header = new Header();
             Stream = new MemoryStream();
             Entries = new List<Entry>();
         }
 
         private HdAsset(Stream stream)
         {
-            var binaryReader = new BinaryReader(stream);
-            _header = BinaryMapping.ReadObject<Header>(binaryReader);
+            _header = BinaryMapping.ReadObject<Header>(stream);
+            var entries = Enumerable.Range(0, _header.AssetCount)
+                .Select(_ => BinaryMapping.ReadObject<HeaderEntry>(stream))
+                .ToList();
 
             Stream = new MemoryStream(_header.OriginalLength);
             stream.Copy(Stream, _header.OriginalLength);
             Stream.Position = 0;
 
-            Entries = _header.Entries.Select(x => new Entry
+            Entries = entries.Select(x => new Entry
             {
                 Name = x.Name,
-                Stream = GetSubStreamCopy(stream, x.Offset, x.Length),
+                Stream = GetSubStreamCopy(stream, x.Offset, x.Length).SetPosition(0),
                 Flags = x.Flags,
             }).ToList();
         }
@@ -95,7 +92,7 @@ namespace OpenKh.Common.Archives
         {
             _header.OriginalLength = (int)Stream.Length;
             _header.AssetCount = Entries.Count;
-            _header.Entries = Entries.Select(x => new HeaderEntry
+            var entries = Entries.Select(x => new HeaderEntry
             {
                 Name = x.Name,
                 Offset = -1,
@@ -104,13 +101,10 @@ namespace OpenKh.Common.Archives
                 Unused = 0
             }).ToList();
 
-            BinaryMapping.WriteObject(stream, _header);
-
-            Stream.Position = 0;
-            Stream.CopyTo(stream);
+            Stream.SetPosition(0).CopyTo(stream.SetPosition(0x10 + Entries.Count * 0x30));
             for (var i = 0; i < Entries.Count; i++)
             {
-                _header.Entries[i].Offset = (int)stream.Position;
+                entries[i].Offset = (int)stream.Position;
 
                 var srcStream = Entries[i].Stream;
                 srcStream.Position = 0;
@@ -119,6 +113,8 @@ namespace OpenKh.Common.Archives
 
             stream.Position = 0;
             BinaryMapping.WriteObject(stream, _header);
+            foreach (var entry in entries)
+                BinaryMapping.WriteObject(stream, entry);
         }
 
         private Stream GetSubStreamCopy(Stream stream, int offset, int length)
@@ -129,7 +125,34 @@ namespace OpenKh.Common.Archives
             return outStream;
         }
 
-        public static HdAsset New() => new HdAsset();
         public static HdAsset Read(Stream stream) => new HdAsset(stream);
+
+        public static bool IsValid(Stream stream)
+        {
+            const int MinimumPossibleSizeForHeader = 0x10;
+            const int EstimatedMaximumPossibleSizeForOriginalAsset = 32 * 1024 * 1024;
+            const int EstimatedMaximumPossibleRemasteredAssetCount = 1024;
+
+            if (stream.Length < MinimumPossibleSizeForHeader)
+                return false;
+
+            var originalAssetLength = stream.ReadInt32();
+            if (originalAssetLength > EstimatedMaximumPossibleSizeForOriginalAsset)
+                return false;
+
+            var assetCount = stream.ReadInt32();
+            if (assetCount >= EstimatedMaximumPossibleRemasteredAssetCount)
+                return false;
+
+            if (stream.ReadInt32() != 0)
+                return false;
+            if (stream.ReadInt32() != 0)
+                return false;
+
+            if (originalAssetLength + MinimumPossibleSizeForHeader > stream.Length)
+                return false;
+
+            return true;
+        }
     }
 }
