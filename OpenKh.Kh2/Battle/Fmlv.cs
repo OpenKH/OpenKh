@@ -1,3 +1,4 @@
+using OpenKh.Common.Utils;
 using System.Collections.Generic;
 using System.IO;
 using Xe.BinaryMapper;
@@ -33,26 +34,26 @@ namespace OpenKh.Kh2.Battle
 
         public int FormId
         {
-            get => Unk0 >> 4;
-            set => Unk0 = (byte)((Unk0 & 0x0F) | (value << 4));
+            get => BitsUtil.Int.GetBits(Unk0, 4, 4);
+            set => Unk0 = (byte)BitsUtil.Int.SetBits(Unk0, 4, 4, value);
         }
 
         public int FormLevel
         {
-            get => Unk0 & 0xF;
-            set => Unk0 = (byte)((Unk0 & 0xF0) | (value & 0xF));
+            get => BitsUtil.Int.GetBits(Unk0, 0, 4);
+            set => Unk0 = (byte)BitsUtil.Int.SetBits(Unk0, 0, 4, value);
         }
 
         public int AbilityLevel
         {
-            get => Unk1 >> 4;
-            set => Unk1 = (byte)((Unk1 & 0x0F) | (value << 4));
+            get => BitsUtil.Int.GetBits(Unk1, 0, 4);
+            set => Unk1 = (byte)BitsUtil.Int.SetBits(Unk1, 0, 4, value);
         }
 
         public int AntiRate
         {
-            get => Unk1 & 0xF;
-            set => Unk1 = (byte)((Unk1 & 0xF0) | (value & 0xF));
+            get => BitsUtil.Int.GetBits(Unk1, 4, 4);
+            set => Unk1 = (byte)BitsUtil.Int.SetBits(Unk1, 4, 4, value);
         }
 
         public FormVanilla VanillaForm
