@@ -65,7 +65,9 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             }
 
             public string Name => $"Level {Level.FormLevel}";
-            //public byte LevelGrowthAbility { get => Level.LevelGrowthAbility; set => Level.LevelGrowthAbility = value; }
+
+            public int AbilityLevel { get => Level.AbilityLevel; set => Level.AbilityLevel = value; }
+            public int AntiRate { get => Level.AntiRate; set => Level.AntiRate = value; }
             public ushort Ability { get => Level.Ability; set => Level.Ability = value; }
             public int Exp { get => Level.Exp; set => Level.Exp = value; }
         }
