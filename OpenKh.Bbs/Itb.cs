@@ -7,9 +7,9 @@ using OpenKh.Common;
 
 namespace OpenKh.Bbs
 {
-    public class Itc
+    public class Itb
     {
-        private const uint MagicCode = 0x435449;
+        private const uint MagicCode = 0x425449;
         private const ushort version = 1;
 
         public class Header
@@ -37,42 +37,42 @@ namespace OpenKh.Bbs
             [Data] public byte ItemCountWM { get; set; }
         }
 
-        public class ITCData
+        public class ITBData
         {
-            [Data] public ushort CollectionID { get; set; }
+            [Data] public ushort TreasureBoxID { get; set; }
             [Data] public ushort ItemID { get; set; }
+            [Data] public byte ItemKind { get; set; }
             [Data] public byte WorldID { get; set; }
-            [Data] public byte Padding1 { get; set; }
-            [Data] public byte Padding2 { get; set; }
+            [Data] public byte ReportID { get; set; }
             [Data] public byte Padding3 { get; set; }
         }
 
         public Header header = new Header();
-        public List<ITCData> AllITC = new List<ITCData>();
+        public List<ITBData> AllITB = new List<ITBData>();
 
-        public static Itc Read(Stream stream)
+        public static Itb Read(Stream stream)
         {
-            Itc itc = new Itc();
+            Itb itb = new Itb();
 
-            itc.header = BinaryMapping.ReadObject<Header>(stream);
+            itb.header = BinaryMapping.ReadObject<Header>(stream);
 
-            itc.AllITC = new List<ITCData>();
+            itb.AllITB = new List<ITBData>();
 
-            for(int i = 0; i < itc.header.ItemsTotal; i++)
+            for (int i = 0; i < itb.header.ItemsTotal; i++)
             {
-                itc.AllITC.Add(BinaryMapping.ReadObject<ITCData>(stream));
+                itb.AllITB.Add(BinaryMapping.ReadObject<ITBData>(stream));
             }
 
-            return itc;
+            return itb;
         }
 
-        public static void Write(Stream stream, Itc itc)
+        public static void Write(Stream stream, Itb itb)
         {
-            BinaryMapping.WriteObject<Header>(stream, itc.header);
+            BinaryMapping.WriteObject<Header>(stream, itb.header);
 
-            for (int i = 0; i < itc.header.ItemsTotal; i++)
+            for (int i = 0; i < itb.header.ItemsTotal; i++)
             {
-                BinaryMapping.WriteObject<ITCData>(stream, itc.AllITC[i]);
+                BinaryMapping.WriteObject<ITBData>(stream, itb.AllITB[i]);
             }
         }
 

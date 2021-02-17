@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using OpenKh.Bbs;
+using OpenKh.Bbs.SystemData;
 
 namespace OpenKh.Tools.ItcEditor
 {
@@ -87,7 +88,7 @@ namespace OpenKh.Tools.ItcEditor
                 ItcEntry itcEntry = new ItcEntry();
                 itcEntry.ITC_GBox.Text = "ITC Entry " + (i + 1);
                 itcEntry.NumericCollectionID.Value = itc.AllITC[i].CollectionID;
-                itcEntry.ItemIDComboBox.SelectedItem = (ItcEntry.ItemList)itc.AllITC[i].ItemID;
+                itcEntry.ItemIDComboBox.SelectedItem = (Item.Type)itc.AllITC[i].ItemID;
                 currentFPanel.Controls.Add(itcEntry);
             }
         }
@@ -104,7 +105,7 @@ namespace OpenKh.Tools.ItcEditor
                     {
                         if(ent.NumericCollectionID.Value == CollID)
                         {
-                            ItcEntry.ItemList nItem = (ItcEntry.ItemList)ent.ItemIDComboBox.SelectedItem;
+                            Item.Type nItem = (Item.Type)ent.ItemIDComboBox.SelectedItem;
                             ushort ItemVal = (ushort)nItem;
                             itc.AllITC[i].ItemID = ItemVal;
                             break;
