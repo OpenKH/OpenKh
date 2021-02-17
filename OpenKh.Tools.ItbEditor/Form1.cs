@@ -119,12 +119,22 @@ namespace OpenKh.Tools.ItbEditor
                     {
                         if(ent.NumericTreasureBoxID.Value == TrsrID)
                         {
-                            Item.Type nItem = (Item.Type)ent.ItemIDComboBox.SelectedItem;
-                            ushort ItemVal = (ushort)nItem;
-                            Item.Kind nKind = (Item.Kind)ent.ItemKindComboBox.SelectedItem;
-                            byte ItemKind = (byte)nKind;
-                            itb.AllITB[i].ItemID = ItemVal;
-                            itb.AllITB[i].ItemKind = ItemKind;
+                            itb.AllITB[i].ItemKind = (byte)ent.ItemKindComboBox.SelectedIndex;
+                            
+                            switch (itb.AllITB[i].ItemKind)
+                            {
+                                case 0:
+                                    Item.Type nItem = (Item.Type)ent.ItemIDComboBox.SelectedItem;
+                                    ushort ItemVal = (ushort)nItem;
+                                    itb.AllITB[i].ItemID = ItemVal;
+                                    break;
+                                case 1:
+                                    Command.Type nCommand = (Command.Type)ent.ItemIDComboBox.SelectedItem;
+                                    ushort CommandVal = (ushort)nCommand;
+                                    itb.AllITB[i].ItemID = CommandVal;
+                                    break;
+                            }
+                            
                             itb.AllITB[i].ReportID = (byte)ent.NumericReportID.Value;
                             break;
                         }
