@@ -292,6 +292,76 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void Kh2MergeImzInsideBarTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "out.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "test",
+                                Type = "imgz",
+                                Method = "imgz",
+                                Source = new List<AssetFile>
+                                {
+                                    new AssetFile
+                                    {
+                                        Name = "test.imd",
+                                        Index = 1
+                                    }
+                                },
+                            }
+                        }
+                    }
+                }
+            };
+
+            var tmpImd = Imgd.Create(new System.Drawing.Size(16, 16), PixelFormat.Indexed4, new byte[16 * 16 / 2], new byte[4], false);
+            var patchImd = Imgd.Create(new System.Drawing.Size(32, 16), PixelFormat.Indexed4, new byte[32 * 16 / 2], new byte[4], false);
+            CreateFile(AssetsInputDir, "out.bar").Using(x =>
+            {
+                using var memoryStream = new MemoryStream();
+                Imgz.Write(memoryStream, new Imgd[]
+                {
+                    tmpImd,
+                    tmpImd,
+                    tmpImd,
+                });
+
+                Bar.Write(x, new Bar
+                {
+                    new Bar.Entry
+                    {
+                        Name = "test",
+                        Type = Bar.EntryType.Imgz,
+                        Stream = memoryStream
+                    }
+                });
+            });
+            CreateFile(ModInputDir, "test.imd").Using(patchImd.Write);
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "out.bar");
+            AssertBarFile("test", x =>
+            {
+                var images = Imgz.Read(x.Stream).ToList();
+                Assert.Equal(3, images.Count);
+                Assert.Equal(16, images[0].Size.Width);
+                Assert.Equal(32, images[1].Size.Width);
+                Assert.Equal(16, images[2].Size.Width);
+            }, ModOutputDir, "out.bar");
+        }
+
+        [Fact]
         public void MergeKh2MsgTest()
         {
             var patcher = new PatcherProcessor();
