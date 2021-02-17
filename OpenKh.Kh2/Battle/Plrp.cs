@@ -23,6 +23,6 @@ namespace OpenKh.Kh2.Battle
         public static List<Plrp> Read(Stream stream) => BaseTable<Plrp>.Read(stream);
 
         public static void Write(Stream stream, IEnumerable<Plrp> items) =>
-            BaseTable<Plrp>.Write(stream, 2, items);
+            BaseTable<Plrp>.Write(stream, 1, items);
     }
 }
