@@ -1,0 +1,18 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.InstallModProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        mc:Ignorable="d"
+        Title="Installing a new mod..." Height="120" Width="300" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <StackPanel Margin="10">
+        <TextBlock Margin="0 0 0 10">
+            <Run>Installing the mod </Run>
+            <Run FontWeight="Bold" Text="{Binding ModName}" d:Text="openkh/mod-template"/>
+            <Run>...</Run>
+        </TextBlock>
+        <ProgressBar Margin="0 0 0 10" Height="20" IsIndeterminate="{Binding ProgressUnknown}" Value="{Binding ProgressValue}" Maximum="1" d:IsIndeterminate="True" />
+        <TextBlock Text="{Binding ProgressText}" d:Text="Downloading file title1.png"/>
+    </StackPanel>
+</Window>
