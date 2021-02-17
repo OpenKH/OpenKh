@@ -4,6 +4,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
@@ -210,7 +211,15 @@ namespace OpenKh.Patcher
                     if (!msg.TryGetValue("id", out var strId))
                         throw new Exception($"Source '{source.Name}' contains a message without an ID");
                     if (!ushort.TryParse(strId, out var id))
-                        throw new Exception($"Message ID '{strId} in '{source.Name}' must be between 0 and 65535");
+                    {
+                        if (strId.Length > 2 && strId[1] == 'x')
+                        {
+                            if (!ushort.TryParse(strId.Substring(2), NumberStyles.HexNumber, null, out id))
+                                throw new Exception($"Message ID '{strId} in '{source.Name}' must be between 0 and 65535");
+                        }
+                        else
+                            throw new Exception($"Message ID '{strId} in '{source.Name}' must be between 0 and 65535");
+                    }
                     if (!msg.TryGetValue(source.Language, out var text))
                         continue;
 
