@@ -1,8 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
-using OpenKh.Kh2.Utils;
 using System.IO;
-using System.Text;
 using Xunit;
 
 namespace OpenKh.Tests.kh2
@@ -18,24 +16,24 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ReadCollision() => File.OpenRead(FileName).Using(stream =>
         {
-            var collision = new CoctLogical(Coct.Read(stream));
+            var collision = Coct.Read(stream);
 
-            Assert.Equal(188, collision.CollisionMeshGroupList.Count);
-            Assert.Equal(7, collision.CollisionMeshGroupList[5].Child1);
-            Assert.Equal(6, collision.CollisionMeshGroupList[5].Child2);
-            Assert.Equal(6, collision.CollisionMeshGroupList[5].Child2);
-            Assert.Equal(-4551, collision.CollisionMeshGroupList[5].MinX);
+            Assert.Equal(188, collision.Nodes.Count);
+            Assert.Equal(7, collision.Nodes[5].Child1);
+            Assert.Equal(6, collision.Nodes[5].Child2);
+            Assert.Equal(6, collision.Nodes[5].Child2);
+            Assert.Equal(-4551, collision.Nodes[5].BoundingBox.Minimum.X);
 
-            Assert.Equal(1, collision.CollisionMeshGroupList[5].Meshes.Count);
+            Assert.Equal(1, collision.Nodes[5].Meshes.Count);
 
-            Assert.Equal(99, collision.CollisionMeshGroupList[6].Meshes[0].MinY);
-            Assert.Equal(-3449, collision.CollisionMeshGroupList[6].Meshes[0].MaxX);
-            Assert.Equal(1, collision.CollisionMeshGroupList[6].Meshes[0].Items.Count);
+            Assert.Equal(99, collision.Nodes[6].Meshes[0].BoundingBox.Minimum.Y);
+            Assert.Equal(-3449, collision.Nodes[6].Meshes[0].BoundingBox.Maximum.X);
+            Assert.Equal(1, collision.Nodes[6].Meshes[0].Collisions.Count);
 
-            Assert.Equal(24, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex1);
-            Assert.Equal(25, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex2);
-            Assert.Equal(14, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex3);
-            Assert.Equal(18, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex4);
+            Assert.Equal(24, collision.Nodes[7].Meshes[0].Collisions[0].Vertex1);
+            Assert.Equal(25, collision.Nodes[7].Meshes[0].Collisions[0].Vertex2);
+            Assert.Equal(14, collision.Nodes[7].Meshes[0].Collisions[0].Vertex3);
+            Assert.Equal(18, collision.Nodes[7].Meshes[0].Collisions[0].Vertex4);
 
             Assert.Equal(549, collision.VertexList.Count);
         });
@@ -62,45 +60,5 @@ namespace OpenKh.Tests.kh2
         //        Coct.Read(stream).Write(outStream);
         //        return outStream;
         //    });
-
-        [Fact]
-        public void TestLogicalReadWrite()
-        {
-            File.OpenRead(FileName).Using(
-                inStream =>
-                {
-                    var outStream = new MemoryStream();
-                    var coct = Coct.Read(inStream);
-                    var coctLogical = new CoctLogical(coct);
-                    var coctBack = coctLogical.CreateCoct();
-                    coctBack.Write(outStream);
-
-                    outStream.Position = 0;
-
-                    {
-                        var collision = new CoctLogical(Coct.Read(outStream));
-
-                        Assert.Equal(188, collision.CollisionMeshGroupList.Count);
-                        Assert.Equal(7, collision.CollisionMeshGroupList[5].Child1);
-                        Assert.Equal(6, collision.CollisionMeshGroupList[5].Child2);
-                        Assert.Equal(6, collision.CollisionMeshGroupList[5].Child2);
-                        Assert.Equal(-4551, collision.CollisionMeshGroupList[5].MinX);
-
-                        Assert.Equal(1, collision.CollisionMeshGroupList[5].Meshes.Count);
-
-                        Assert.Equal(99, collision.CollisionMeshGroupList[6].Meshes[0].MinY);
-                        Assert.Equal(-3449, collision.CollisionMeshGroupList[6].Meshes[0].MaxX);
-                        Assert.Equal(1, collision.CollisionMeshGroupList[6].Meshes[0].Items.Count);
-
-                        Assert.Equal(24, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex1);
-                        Assert.Equal(25, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex2);
-                        Assert.Equal(14, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex3);
-                        Assert.Equal(18, collision.CollisionMeshGroupList[7].Meshes[0].Items[0].Vertex4);
-
-                        Assert.Equal(549, collision.VertexList.Count);
-                    }
-                }
-            );
-        }
     }
 }

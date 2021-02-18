@@ -33,6 +33,9 @@ namespace OpenKh.Engine.Motion
             get => _animationIndex;
             set
             {
+                if (_animationIndex == value)
+                    return;
+
                 _animationIndex = value;
                 if (_binarc == null)
                 {

@@ -43,7 +43,7 @@ namespace OpenKh.Command.MapGen.Utils
                 logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups.");
             }
 
-            logger.Debug($"Output: {collisionBuilder.coct.CollisionMeshGroupList.Count:#,##0} collision mesh groups");
+            logger.Debug($"Output: {collisionBuilder.coct.Nodes.Count:#,##0} collision mesh groups");
 
             {
                 var matDefList = bigMeshContainer.AllocatedMaterialDefs;
@@ -468,7 +468,7 @@ namespace OpenKh.Command.MapGen.Utils
                     new Bar.Entry
                     {
                         Name = config.bar?.doct?.name ?? "eh_1",
-                        Type = Bar.EntryType.MeshOcclusion,
+                        Type = Bar.EntryType.DrawOctalTree,
                         Stream = doctBin,
                     }
                 );
@@ -485,7 +485,7 @@ namespace OpenKh.Command.MapGen.Utils
                     new Bar.Entry
                     {
                         Name = config.bar?.coct?.name ?? "ID_e",
-                        Type = Bar.EntryType.MapCollision,
+                        Type = Bar.EntryType.CollisionOctalTree,
                         Stream = coctBin,
                     }
                 );

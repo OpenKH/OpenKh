@@ -20,6 +20,7 @@ namespace OpenKh.Game.Entities
     public class ObjectEntity : IEntity, IMonoGameModel
     {
         private Mdlx _model;
+        public List<ObjectCollision> ObjectCollisions { get; set; }
 
         public ObjectEntity(Kernel kernel, int objectId)
         {
@@ -34,6 +35,8 @@ namespace OpenKh.Game.Entities
 
         public string ObjectName => Kernel.ObjEntries
             .FirstOrDefault(x => x.ObjectId == ObjectId)?.ModelName;
+
+        public bool IsPlayer { get; set; }
 
         public bool IsMeshLoaded => Model != null;
 
@@ -66,6 +69,8 @@ namespace OpenKh.Game.Entities
                 return;
             }
 
+            IsPlayer = objEntry.ObjectType == Objentry.Type.PLAYER;
+
             var modelName = $"obj/{objEntry.ModelName}.mdlx";
             using var stream = Kernel.DataContent.FileOpen(modelName);
             var entries = Bar.Read(stream);
@@ -74,6 +79,9 @@ namespace OpenKh.Game.Entities
 
             var texture = entries.ForEntry("tim_", Bar.EntryType.ModelTexture, ModelTexture.Read);
             Textures = texture.LoadTextures(graphics).ToArray();
+
+            ObjectCollisions = entries.ForEntry(x => x.Type == Bar.EntryType.ModelCollision && x.Stream.Length > 0,
+                ObjectCollision.Read) ?? new List<ObjectCollision>();
 
             try
             {

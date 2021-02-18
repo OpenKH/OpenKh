@@ -141,6 +141,9 @@ namespace OpenKh.Game
 
         protected override void Initialize()
         {
+            Window.AllowUserResizing = true;
+            Window.Title = "OpenKH Game Engine";
+
             _debugOverlay.Initialize(GetStateInitDesc());
             State = _startup.InitialState;
 

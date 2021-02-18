@@ -82,7 +82,7 @@ namespace OpenKh.Command.DoctChanger
                         .Select(
                             it =>
                             {
-                                if (it.Type == Bar.EntryType.MeshOcclusion)
+                                if (it.Type == Bar.EntryType.DrawOctalTree)
                                 {
                                     it.Stream = new MemoryStream(doctBin, false);
                                 }
@@ -183,7 +183,7 @@ namespace OpenKh.Command.DoctChanger
 
                 var entries = File.OpenRead(MapIn).Using(s => Bar.Read(s));
 
-                var doctEntry = entries.Single(it => it.Type == Bar.EntryType.MeshOcclusion);
+                var doctEntry = entries.Single(it => it.Type == Bar.EntryType.DrawOctalTree);
 
                 var doct = Doct.Read(doctEntry.Stream);
 
@@ -226,7 +226,7 @@ namespace OpenKh.Command.DoctChanger
             public string MapOut { get; set; }
 
             private static bool IsMapModel(Bar.Entry entry) => entry.Type == Bar.EntryType.Model && entry.Name == "MAP";
-            private static bool IsDoct(Bar.Entry entry) => entry.Type == Bar.EntryType.MeshOcclusion;
+            private static bool IsDoct(Bar.Entry entry) => entry.Type == Bar.EntryType.DrawOctalTree;
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -308,7 +308,7 @@ namespace OpenKh.Command.DoctChanger
                 {
                     foreach (var entry in File.OpenRead(InputFile).Using(Bar.Read)
                         .Where(entry => false
-                            || entry.Type == Bar.EntryType.MeshOcclusion
+                            || entry.Type == Bar.EntryType.DrawOctalTree
                         )
                     )
                     {

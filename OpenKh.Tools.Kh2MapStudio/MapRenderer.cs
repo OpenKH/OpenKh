@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
+using OpenKh.Engine;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
@@ -165,19 +166,19 @@ namespace OpenKh.Tools.Kh2MapStudio
             }
 
             var mapCollisionEntry = MapBarEntries
-                .Where(x => x.Name.StartsWith("ID_") && x.Type == Bar.EntryType.MapCollision)
+                .Where(x => x.Name.StartsWith("ID_") && x.Type == Bar.EntryType.CollisionOctalTree)
                 .FirstOrDefault();
             if (mapCollisionEntry != null)
                 MapCollision = new CollisionModel(Coct.Read(mapCollisionEntry.Stream));
 
             var cameraCollisionEntry = MapBarEntries
-                .Where(x => x.Name.StartsWith("CH_") && x.Type == Bar.EntryType.CameraCollision)
+                .Where(x => x.Name.StartsWith("CH_") && x.Type == Bar.EntryType.CameraOctalTree)
                 .FirstOrDefault();
             if (cameraCollisionEntry != null)
                 CameraCollision = new CollisionModel(Coct.Read(cameraCollisionEntry.Stream));
 
             var lightCollisionEntry = MapBarEntries
-                .Where(x => x.Name == "COL_" && x.Type == Bar.EntryType.LightData)
+                .Where(x => x.Name == "COL_" && x.Type == Bar.EntryType.ColorOctalTree)
                 .FirstOrDefault();
             if (lightCollisionEntry != null)
                 LightCollision = new CollisionModel(Coct.Read(lightCollisionEntry.Stream));
