@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-   <PropertyGroup>
-     <TargetFramework>net472</TargetFramework>
-     <OutputPath>..\bin\WinShell\</OutputPath>
-   </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <OutputPath>..\bin\WinShell\</OutputPath>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="SharpShell" Version="2.7.2" />
