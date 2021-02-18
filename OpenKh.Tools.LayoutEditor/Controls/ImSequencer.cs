@@ -214,8 +214,6 @@ namespace OpenKh.Tools.LayoutEditor.Controls
 
             var popupOpened = false;
             var sequenceCount = sequence.ItemCount;
-            if (sequenceCount == 0)
-                return false;
             ImGui.BeginGroup();
 
             var draw_list = ImGui.GetWindowDrawList();
