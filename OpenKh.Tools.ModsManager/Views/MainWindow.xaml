@@ -81,7 +81,7 @@
             </StackPanel>
 
             <StackPanel Grid.Row="2">
-                <Button Content="Install mods" Command="{Binding BuildCommand}"/>
+                <Button Content="Build and run" Command="{Binding BuildCommand}"/>
             </StackPanel>
         </Grid>
     </Grid>
