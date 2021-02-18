@@ -1,11 +1,12 @@
+using OpenKh.Common;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using System.Windows.Navigation;
 
 namespace OpenKh.Tools.Common
 {
@@ -90,9 +91,14 @@ namespace OpenKh.Tools.Common
             });
         }
 
-        private void NavigateURL(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
-        {
-            Process.Start(e.Uri.ToString());
-        }
+        private void NavigateURL(object sender, RequestNavigateEventArgs e) =>
+            new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    FileName = e.Uri.AbsoluteUri
+                }
+            }.Using(x => x.Start());
     }
 }
