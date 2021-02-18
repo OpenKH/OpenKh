@@ -32,7 +32,7 @@ namespace OpenKh.Tools.IdxImg.ViewModels
                 .Select(x => new FolderViewModel(x.Key, depth + 1, x, idxManager));
             var files =
                 entries
-                .Where(x => x.IsLeaf(depth) && !x.IsIdx)
+                .Where(x => x.IsLeaf(depth))
                 .Select(x => new FileViewModel(x, idxManager));
 
             var tree = dirs.Cast<EntryViewModel>().Concat(files);
