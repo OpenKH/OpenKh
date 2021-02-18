@@ -21,14 +21,14 @@
 | [bcd](file//type/bcd.md) | Map collision | 
 | [bdc](file//type/bdc.md) | Contains Command Board settings | 
 | [bdd](file//type/bdd.md) | Contains settings related to the Command Board's dice behavior | 
-| [bep](file//type/bep.md) | List of base enemy parameters | 
+| [bep](file//type/bep.md) | List of base enemy parameters | OpenKh.Tools.BepEditor
 | [bgm](file//type/bgm.md) | List of background music in the game | 
 | [bsd](file//type/bsd.md) | List of Status Ailments and the effects they play on characters | 
 | [ctd](file//type/ctd.md) | File containing a list of text strings and how they need to be displayed | 
 | [ead](file//type/ead.md) | Controls effects attached to weapons | 
 | ecm | Unknown | 
 | edp | Unknown | 
-| [epd](file//type/epd.md) | File that controls various parameters for enemies. Overwrites data in .bep | 
+| [epd](file//type/epd.md) | File that controls various parameters for enemies. Overwrites data in .bep | OpenKh.Tools.EpdEditor
 | esd | Unknown | 
 | ese | Unknown | 
 | ept | AI routine | 
@@ -37,8 +37,9 @@
 | fep | Particle Effects | 
 | [frr](file//type/frr.md) | Unknown | 
 | gpd | Unknown | 
-| [itb](file//type/itb.md) | List of treasure boxes and their contents | 
-| [itc](file//type/itc.md) | List of items obtained through events | 
+| [itb](file//type/itb.md) | List of treasure boxes and their contents | OpenKh.Tools.ItbEditor
+| [itc](file//type/itc.md) | List of items obtained through collectibles | OpenKh.Tools.ItcEditor
+| [ite](file//type/ite.md) | List of items used in the game | OpenKh.Tools.IteEditor
 | l2d | Layout file | 
 | lad | Unknown | 
 | lub | Compiled lua script used for AI | 
