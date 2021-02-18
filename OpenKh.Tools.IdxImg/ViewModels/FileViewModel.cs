@@ -45,7 +45,7 @@ namespace OpenKh.Tools.IdxImg.ViewModels
         public RelayCommand AppendCommand { get; }
         public RelayCommand ImportCommand { get; }
 
-        public override void Extract(string outputPath) =>
+        public override void Extract(string outputPath, IExtractProgress progress) =>
             ExtractForReal(Path.Combine(outputPath, Name));
 
         private void ExtractForReal(string fileName) =>
