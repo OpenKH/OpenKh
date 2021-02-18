@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using OpenKh.Common;
+using OpenKh.Engine.Input;
 using OpenKh.Game.DataContent;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Infrastructure;
@@ -30,7 +31,7 @@ namespace OpenKh.Game
         private readonly IDataContent _dataContent;
         private readonly Kernel _kernel;
         private readonly ArchiveManager archiveManager;
-        private readonly InputManager inputManager;
+        private readonly IInput _input;
         private readonly DebugOverlay _debugOverlay;
         private readonly OpenKhGameStartup _startup;
         private IState state;
@@ -115,7 +116,7 @@ namespace OpenKh.Game
             IsMouseVisible = true;
 
             archiveManager = new ArchiveManager(_dataContent);
-            inputManager = new InputManager();
+            _input = new InputManager(true, new InputKeyboard(), new InputGamepad());
             _debugOverlay = new DebugOverlay(this);
 
             Config.OnConfigurationChange += () =>
@@ -159,11 +160,10 @@ namespace OpenKh.Game
 
         protected override void Update(GameTime gameTime)
         {
-            inputManager.Update(gameTime);
-            if (inputManager.IsExit)
-                Exit();
-
             var deltaTimes = GetDeltaTimes(gameTime);
+            _input.Update(deltaTimes.DeltaTime);
+            if (false)
+                Exit();
 
             if (Config.DebugMode)
                 _debugOverlay.Update(deltaTimes);
@@ -214,7 +214,7 @@ namespace OpenKh.Game
                 DataContent = _dataContent,
                 ArchiveManager = archiveManager,
                 Kernel = _kernel,
-                InputManager = inputManager,
+                Input = _input,
                 ContentManager = Content,
                 GraphicsDevice = graphics,
                 StateChange = this,

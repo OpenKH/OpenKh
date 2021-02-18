@@ -1,4 +1,5 @@
-﻿using OpenKh.Engine.Renderers;
+using OpenKh.Engine.Input;
+using OpenKh.Engine.Renderers;
 using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.States.Title
@@ -101,8 +102,8 @@ namespace OpenKh.Game.States.Title
             _animMenuOption4.Update(deltaTime);
             _animMenuOptionSelected.Update(deltaTime);
 
-            var inputManager = _mainMenu.InputManager;
-            InputNewGameMenu(inputManager);
+            var input = _mainMenu.Input;
+            InputNewGameMenu(input);
 
             if (_animMenuBg.IsEnd)
             {
@@ -116,10 +117,10 @@ namespace OpenKh.Game.States.Title
             DrawNewGameMenu();
         }
 
-        private void InputNewGameMenu(InputManager inputManager)
+        private void InputNewGameMenu(IInput input)
         {
             bool isOptionChanged = false;
-            if (inputManager.IsCross)
+            if (input.Triggered.Cancel)
             {
                 _animMenuBg.End();
                 _animMenuWindow.End();
@@ -131,7 +132,7 @@ namespace OpenKh.Game.States.Title
                 _animMenuOptionSelected.End();
                 _stateToSet = MainMenuState.Running;
             }
-            else if (inputManager.IsCircle)
+            else if (input.Triggered.Confirm)
             {
                 _animMenuBg.End();
                 _animMenuWindow.End();
@@ -143,14 +144,14 @@ namespace OpenKh.Game.States.Title
                 _animMenuOptionSelected.End();
                 _stateToSet = MainMenuState.StartNewGame;
             }
-            else if (inputManager.IsMenuUp)
+            else if (input.Repeated.Up)
             {
                 _difficultyOption--;
                 if (_difficultyOption < 0)
                     _difficultyOption = _difficultyCount - 1;
                 isOptionChanged = true;
             }
-            else if (inputManager.IsMenuDown)
+            else if (input.Repeated.Down)
             {
                 _difficultyOption = (_difficultyOption + 1) % _difficultyCount;
                 isOptionChanged = true;

@@ -1,3 +1,4 @@
+using OpenKh.Engine.Input;
 using OpenKh.Engine.Renderers;
 using OpenKh.Game.Infrastructure;
 using System.Collections.Generic;
@@ -188,13 +189,13 @@ namespace OpenKh.Game.Menu
             );
         }
 
-        protected override void ProcessInput(InputManager inputManager)
+        protected override void ProcessInput(IInput input)
         {
-            if (inputManager.IsMenuUp)
+            if (input.Repeated.Up)
                 SelectedOption--;
-            if (inputManager.IsMenuDown)
+            if (input.Repeated.Down)
                 SelectedOption++;
-            if (inputManager.IsCircle)
+            if (input.Triggered.Confirm)
             {
                 switch (SelectedOption)
                 {
@@ -212,10 +213,10 @@ namespace OpenKh.Game.Menu
                         break;
                 }
             }
-            else if (inputManager.IsCross)
+            else if (input.Triggered.Cancel)
                 MenuManager.CloseAllMenu();
 
-            IsDebugMenuVisible = inputManager.RightTrigger;
+            IsDebugMenuVisible = input.Pressed.R2;
         }
 
         private IAnimatedSequence InitializeMenuOptions(bool skipIntro = false)

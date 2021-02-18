@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using OpenKh.Engine.Extensions;
+using OpenKh.Engine.Input;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renders;
 using OpenKh.Game.Infrastructure;
@@ -16,7 +17,7 @@ namespace OpenKh.Game.Debugging
         private IDataContent _dataContent;
         private ArchiveManager _archiveManager;
         private Kernel _kernel;
-        private InputManager _inputManager;
+        private IInput _input;
         private GraphicsDeviceManager _graphics;
         private KingdomShader _shader;
         private readonly IStateChange _stateChange;
@@ -42,7 +43,7 @@ namespace OpenKh.Game.Debugging
             _dataContent = initDesc.DataContent;
             _archiveManager = initDesc.ArchiveManager;
             _kernel = initDesc.Kernel;
-            _inputManager = initDesc.InputManager;
+            _input = initDesc.Input;
             _graphics = initDesc.GraphicsDevice;
 
             _shader = new KingdomShader(initDesc.ContentManager);

@@ -3,6 +3,7 @@ using OpenKh.Common;
 using OpenKh.Game.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
+using OpenKh.Engine.Input;
 
 namespace OpenKh.Game.Menu
 {
@@ -411,18 +412,18 @@ namespace OpenKh.Game.Menu
             return SequenceFactory.Create(animDesc);
         }
 
-        protected override void ProcessInput(InputManager inputManager)
+        protected override void ProcessInput(IInput input)
         {
-            if (inputManager.IsMenuUp)
+            if (input.Repeated.Up)
                 SelectedOption--;
-            else if (inputManager.IsMenuDown)
+            else if (input.Repeated.Down)
                 SelectedOption++;
-            else if (inputManager.IsCircle)
+            else if (input.Triggered.Confirm)
             {
                 // No selection
             }
             else
-                base.ProcessInput(inputManager);
+                base.ProcessInput(input);
         }
 
         public override void Open()

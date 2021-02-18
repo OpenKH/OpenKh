@@ -1,4 +1,5 @@
-﻿using OpenKh.Engine.Renderers;
+using OpenKh.Engine.Input;
+using OpenKh.Engine.Renderers;
 using OpenKh.Game.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,17 +95,17 @@ namespace OpenKh.Game.Menu
                 }));
         }
 
-        protected override void ProcessInput(InputManager inputManager)
+        protected override void ProcessInput(IInput input)
         {
-            if (inputManager.IsMenuUp)
+            if (input.Repeated.Up)
                 SelectedOption--;
-            else if (inputManager.IsMenuDown)
+            else if (input.Repeated.Down)
                 SelectedOption++;
-            if (inputManager.IsMenuLeft)
+            if (input.Repeated.Left)
                 SelectedOption -= MaxOptionPerColumn;
-            if (inputManager.IsMenuRight)
+            if (input.Repeated.Right)
                 SelectedOption += MaxOptionPerColumn;
-            else if (inputManager.IsCircle)
+            else if (input.Triggered.Confirm)
             {
                 var place = _places[SelectedOption];
                 MenuManager.GameContext.LoadPlace(
@@ -115,7 +116,7 @@ namespace OpenKh.Game.Menu
                 MenuManager.CloseAllMenu();
             }
             else
-                base.ProcessInput(inputManager);
+                base.ProcessInput(input);
         }
 
         public override void Open()
