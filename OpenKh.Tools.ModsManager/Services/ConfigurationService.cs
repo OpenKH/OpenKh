@@ -21,6 +21,6 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string ModsPath => "./mods";
         public static string OutputModPath => @"D:\Repository\openkh\OpenKh.Game\bin\Debug\netcoreapp3.1\mod";
-        public static string GameAssetPath => @"D:\Hacking\KH2\export_ps4";
+        public static string GameAssetPath => @"D:\Hacking\KH2\export_fm";
     }
 }

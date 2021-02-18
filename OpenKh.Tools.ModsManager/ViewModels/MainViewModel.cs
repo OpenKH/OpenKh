@@ -4,6 +4,7 @@ using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.Views;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
     {
         private static string ApplicationName = Utilities.GetApplicationName();
         private ModViewModel _selectedValue;
+        private Pcsx2Injector _pcsx2Injector;
 
         public string Title => ApplicationName;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
@@ -117,12 +119,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             BuildCommand = new RelayCommand(_ =>
             {
                 ModsService.RunPacherAsync();
-                MessageBox.Show(
-                    "Mods installed!\nTODO: Run the game as soon as the mods are installed",
-                    "Mods installed",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                var process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = @"D:\Emulators\PS2\pcsx2.exe",
+                    WorkingDirectory = @"D:\Emulators\PS2",
+                    Arguments = @"D:\Emulators\PS2\\KH2FM.iso"
+                });
+                _pcsx2Injector.Run(process);
+
             }, _ => ModsList.Any(x => x.Enabled));
+
+            _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
         }
 
         private void ReloadModsList()
