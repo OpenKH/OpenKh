@@ -12,12 +12,12 @@ namespace OpenKh.Game.Infrastructure
             Keys.Down,
             Keys.Left,
             Keys.Right,
-            Keys.L,             // Cross
-            Keys.K,             // Circle
-            Keys.O,             // Square
-            Keys.P,             // Triangle
-            Keys.Space,         // Select
-            Keys.Enter,         // Start
+            Keys.L,             // FaceDown
+            Keys.K,             // FaceRight
+            Keys.O,             // FaceLeft
+            Keys.P,             // FaceUp
+            Keys.Space,         // SpecialLeft
+            Keys.Enter,         // SpecialRight
             Keys.U,             // L1
             Keys.LeftShift,     // L2
             Keys.D8,            // L3
