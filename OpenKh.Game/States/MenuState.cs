@@ -269,7 +269,7 @@ namespace OpenKh.Game.States
 
         private void ProcessInput(IInput input)
         {
-            if (input.Triggered.Start)
+            if (input.Triggered.SpecialRight)
                 CloseAllMenu();
         }
 

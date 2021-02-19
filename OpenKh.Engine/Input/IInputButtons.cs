@@ -6,12 +6,12 @@ namespace OpenKh.Engine.Input
         bool Down { get; }
         bool Left { get; }
         bool Right { get; }
-        bool Cross { get; }
-        bool Circle { get; }
-        bool Square { get; }
-        bool Triangle { get; }
-        bool Select { get; }
-        bool Start { get; }
+        bool FaceDown { get; }
+        bool FaceRight { get; }
+        bool FaceLeft { get; }
+        bool FaceUp { get; }
+        bool SpecialLeft { get; }
+        bool SpecialRight { get; }
         bool L1 { get; }
         bool L2 { get; }
         bool L3 { get; }

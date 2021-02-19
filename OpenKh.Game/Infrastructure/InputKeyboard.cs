@@ -47,12 +47,12 @@ namespace OpenKh.Game.Infrastructure
         public bool Down { get; private set; }
         public bool Left { get; private set; }
         public bool Right { get; private set; }
-        public bool Cross { get; private set; }
-        public bool Circle { get; private set; }
-        public bool Square { get; private set; }
-        public bool Triangle { get; private set; }
-        public bool Select { get; private set; }
-        public bool Start { get; private set; }
+        public bool FaceDown { get; private set; }
+        public bool FaceRight { get; private set; }
+        public bool FaceLeft { get; private set; }
+        public bool FaceUp { get; private set; }
+        public bool SpecialLeft { get; private set; }
+        public bool SpecialRight { get; private set; }
         public bool L1 { get; private set; }
         public bool L2 { get; private set; }
         public bool L3 { get; private set; }
@@ -69,12 +69,12 @@ namespace OpenKh.Game.Infrastructure
             Down = state.IsKeyDown(ButtonBindings[1]);
             Left = state.IsKeyDown(ButtonBindings[2]);
             Right = state.IsKeyDown(ButtonBindings[3]);
-            Cross = state.IsKeyDown(ButtonBindings[4]);
-            Circle = state.IsKeyDown(ButtonBindings[5]);
-            Square = state.IsKeyDown(ButtonBindings[6]);
-            Triangle = state.IsKeyDown(ButtonBindings[7]);
-            Select = state.IsKeyDown(ButtonBindings[8]);
-            Start = state.IsKeyDown(ButtonBindings[9]);
+            FaceDown = state.IsKeyDown(ButtonBindings[4]);
+            FaceRight = state.IsKeyDown(ButtonBindings[5]);
+            FaceLeft = state.IsKeyDown(ButtonBindings[6]);
+            FaceUp = state.IsKeyDown(ButtonBindings[7]);
+            SpecialLeft = state.IsKeyDown(ButtonBindings[8]);
+            SpecialRight = state.IsKeyDown(ButtonBindings[9]);
             L1 = state.IsKeyDown(ButtonBindings[10]);
             L2 = state.IsKeyDown(ButtonBindings[11]);
             L3 = state.IsKeyDown(ButtonBindings[12]);

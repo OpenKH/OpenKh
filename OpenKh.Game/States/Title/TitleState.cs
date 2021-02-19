@@ -202,7 +202,7 @@ namespace OpenKh.Game.States.Title
             {
                 if (IsIntro)
                 {
-                    if (Input.Triggered.Confirm || Input.Triggered.Cancel || Input.Triggered.Start)
+                    if (Input.Triggered.Confirm || Input.Triggered.Cancel || Input.Triggered.SpecialRight)
                         SkipIntro();
                 }
                 else if (IsNewGameStarting)

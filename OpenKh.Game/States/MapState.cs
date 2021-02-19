@@ -84,7 +84,7 @@ namespace OpenKh.Game.States
                 return;
             }
 
-            if (_input.Triggered.Start)
+            if (_input.Triggered.SpecialRight)
             {
                 _menuState.OpenMenu();
             }
@@ -163,7 +163,7 @@ namespace OpenKh.Game.States
 
         public void DebugUpdate(IDebug debug)
         {
-            if (_input.Triggered.Select)
+            if (_input.Triggered.SpecialLeft)
                 Kernel.DebugMode = !Kernel.DebugMode;
         }
 

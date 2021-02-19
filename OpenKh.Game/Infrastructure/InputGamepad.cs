@@ -16,12 +16,12 @@ namespace OpenKh.Game.Infrastructure
         public bool Down { get; private set; }
         public bool Left { get; private set; }
         public bool Right { get; private set; }
-        public bool Cross { get; private set; }
-        public bool Circle { get; private set; }
-        public bool Square { get; private set; }
-        public bool Triangle { get; private set; }
-        public bool Select { get; private set; }
-        public bool Start { get; private set; }
+        public bool FaceDown { get; private set; }
+        public bool FaceRight { get; private set; }
+        public bool FaceLeft { get; private set; }
+        public bool FaceUp { get; private set; }
+        public bool SpecialLeft { get; private set; }
+        public bool SpecialRight { get; private set; }
         public bool L1 { get; private set; }
         public bool L2 { get; private set; }
         public bool L3 { get; private set; }
@@ -38,12 +38,12 @@ namespace OpenKh.Game.Infrastructure
             Down = state.DPad.Down == ButtonState.Pressed;
             Left = state.DPad.Left == ButtonState.Pressed;
             Right = state.DPad.Right == ButtonState.Pressed;
-            Cross = state.Buttons.A == ButtonState.Pressed;
-            Circle = state.Buttons.B == ButtonState.Pressed;
-            Square = state.Buttons.X == ButtonState.Pressed;
-            Triangle = state.Buttons.Y == ButtonState.Pressed;
-            Select = state.Buttons.Back == ButtonState.Pressed;
-            Start = state.Buttons.Start == ButtonState.Pressed;
+            FaceDown = state.Buttons.A == ButtonState.Pressed;
+            FaceRight = state.Buttons.B == ButtonState.Pressed;
+            FaceLeft = state.Buttons.X == ButtonState.Pressed;
+            FaceUp = state.Buttons.Y == ButtonState.Pressed;
+            SpecialLeft = state.Buttons.Back == ButtonState.Pressed;
+            SpecialRight = state.Buttons.Start == ButtonState.Pressed;
             L1 = state.Buttons.LeftShoulder == ButtonState.Pressed;
             L3 = state.Buttons.LeftStick == ButtonState.Pressed;
             R1 = state.Buttons.RightStick == ButtonState.Pressed;

@@ -1,4 +1,3 @@
-using System;
 using System.Numerics;
 
 namespace OpenKh.Engine.Input
@@ -11,12 +10,12 @@ namespace OpenKh.Engine.Input
             Down,
             Left,
             Right,
-            Cross,
-            Circle,
-            Square,
-            Triangle,
-            Select,
-            Start,
+            FaceDown,
+            FaceRight,
+            FaceLeft,
+            FaceUp,
+            SpecialLeft,
+            SpecialRight,
             L1,
             L2,
             L3,
@@ -35,12 +34,12 @@ namespace OpenKh.Engine.Input
             public bool Down => (Raw & (1 << (int)Button.Down)) != 0;
             public bool Left => (Raw & (1 << (int)Button.Left)) != 0;
             public bool Right => (Raw & (1 << (int)Button.Right)) != 0;
-            public bool Cross => (Raw & (1 << (int)Button.Cross)) != 0;
-            public bool Circle => (Raw & (1 << (int)Button.Circle)) != 0;
-            public bool Square => (Raw & (1 << (int)Button.Square)) != 0;
-            public bool Triangle => (Raw & (1 << (int)Button.Triangle)) != 0;
-            public bool Select => (Raw & (1 << (int)Button.Select)) != 0;
-            public bool Start => (Raw & (1 << (int)Button.Start)) != 0;
+            public bool FaceDown => (Raw & (1 << (int)Button.FaceDown)) != 0;
+            public bool FaceRight => (Raw & (1 << (int)Button.FaceRight)) != 0;
+            public bool FaceLeft => (Raw & (1 << (int)Button.FaceLeft)) != 0;
+            public bool FaceUp => (Raw & (1 << (int)Button.FaceUp)) != 0;
+            public bool SpecialLeft => (Raw & (1 << (int)Button.SpecialLeft)) != 0;
+            public bool SpecialRight => (Raw & (1 << (int)Button.SpecialRight)) != 0;
             public bool L1 => (Raw & (1 << (int)Button.L1)) != 0;
             public bool L2 => (Raw & (1 << (int)Button.L2)) != 0;
             public bool L3 => (Raw & (1 << (int)Button.L3)) != 0;
@@ -84,8 +83,8 @@ namespace OpenKh.Engine.Input
 
         public InputManager(bool japaneseStyleButtons, params IInputDevice[] devices)
         {
-            _buttonConfirmMask = japaneseStyleButtons ? Button.Circle : Button.Cross;
-            _buttonCancelMask = japaneseStyleButtons ? Button.Cross : Button.Circle;
+            _buttonConfirmMask = japaneseStyleButtons ? Button.FaceRight : Button.FaceDown;
+            _buttonCancelMask = japaneseStyleButtons ? Button.FaceDown : Button.FaceRight;
             _devices = devices;
         }
 
@@ -108,18 +107,18 @@ namespace OpenKh.Engine.Input
                     pressedNow |= 1 << (int)Button.Left;
                 if (device.Right)
                     pressedNow |= 1 << (int)Button.Right;
-                if (device.Cross)
-                    pressedNow |= 1 << (int)Button.Cross;
-                if (device.Circle)
-                    pressedNow |= 1 << (int)Button.Circle;
-                if (device.Square)
-                    pressedNow |= 1 << (int)Button.Square;
-                if (device.Triangle)
-                    pressedNow |= 1 << (int)Button.Triangle;
-                if (device.Select)
-                    pressedNow |= 1 << (int)Button.Select;
-                if (device.Start)
-                    pressedNow |= 1 << (int)Button.Start;
+                if (device.FaceDown)
+                    pressedNow |= 1 << (int)Button.FaceDown;
+                if (device.FaceRight)
+                    pressedNow |= 1 << (int)Button.FaceRight;
+                if (device.FaceLeft)
+                    pressedNow |= 1 << (int)Button.FaceLeft;
+                if (device.FaceUp)
+                    pressedNow |= 1 << (int)Button.FaceUp;
+                if (device.SpecialLeft)
+                    pressedNow |= 1 << (int)Button.SpecialLeft;
+                if (device.SpecialRight)
+                    pressedNow |= 1 << (int)Button.SpecialRight;
                 if (device.L1)
                     pressedNow |= 1 << (int)Button.L1;
                 if (device.L2)
