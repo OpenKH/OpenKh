@@ -409,7 +409,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
                 return false;
 
             var msgEntry = Bar.Read(stream)
-                .FirstOrDefault(x => x.Type == Bar.EntryType.List);
+                .FirstOrDefault(x => x.Type == Bar.EntryType.OtherData);
 
             if (msgEntry == null)
                 return false;
@@ -430,7 +430,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private void WriteBar(List<Bar.Entry> entries, Stream stream)
         {
             var newEntries = entries
-                .ForEntry(Bar.EntryType.List, _barEntryName, 0, entry => WriteMsg(entry.Stream));
+                .ForEntry(Bar.EntryType.OtherData, _barEntryName, 0, entry => WriteMsg(entry.Stream));
 
             Bar.Write(stream, newEntries);
         }

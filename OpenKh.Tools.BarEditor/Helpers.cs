@@ -13,7 +13,7 @@ namespace OpenKh.Tools.BarEditor
             {
                 [EntryType.Dummy] = "dummy",
                 [EntryType.Binary] = "bin",
-                [EntryType.List] = "list",
+                [EntryType.OtherData] = "list",
                 [EntryType.Bdx] = "bdx",
                 [EntryType.Model] = "model",
                 [EntryType.DrawOctalTree] = "ocd",

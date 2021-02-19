@@ -172,7 +172,7 @@ namespace OpenKh.Game.Field
         private void LoadMsg(int world) => _kernel.DataContent
             .FileOpen($"msg/{_kernel.Language}/{Constants.WorldIds[world]}.bar")
             .Using(stream => Bar.Read(stream))
-            .ForEntry(x => x.Type == Bar.EntryType.List, stream =>
+            .ForEntry(x => x.Type == Bar.EntryType.OtherData, stream =>
             {
                 _eventMessageProvider.Load(Msg.Read(stream));
                 return true;

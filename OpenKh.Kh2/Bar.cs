@@ -48,7 +48,7 @@ namespace OpenKh.Kh2
 		{
 			Dummy = 0,
 			Binary = 1,
-			List = 2,
+			OtherData = 2,
 			Bdx = 3,
 			Model = 4,
             DrawOctalTree = 5,

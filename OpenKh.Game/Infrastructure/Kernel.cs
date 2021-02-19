@@ -203,19 +203,19 @@ namespace OpenKh.Game.Infrastructure
         {
             var bar = DataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
-            AreaInfo = bar.ForEntry("arif", Bar.EntryType.List, Kh2.SystemData.Arif.Read);
-            Ftst = bar.ForEntry("ftst", Bar.EntryType.List, Kh2.SystemData.Ftst.Read);
-            Item = bar.ForEntry("item", Bar.EntryType.List, Kh2.SystemData.Item.Read);
-            MemberTable = bar.ForEntry("memt", Bar.EntryType.List, Kh2.SystemData.Memt.Read);
-            Trsr = bar.ForEntry("tsrs", Bar.EntryType.List, Kh2.SystemData.Trsr.Read);
+            AreaInfo = bar.ForEntry("arif", Bar.EntryType.OtherData, Kh2.SystemData.Arif.Read);
+            Ftst = bar.ForEntry("ftst", Bar.EntryType.OtherData, Kh2.SystemData.Ftst.Read);
+            Item = bar.ForEntry("item", Bar.EntryType.OtherData, Kh2.SystemData.Item.Read);
+            MemberTable = bar.ForEntry("memt", Bar.EntryType.OtherData, Kh2.SystemData.Memt.Read);
+            Trsr = bar.ForEntry("tsrs", Bar.EntryType.OtherData, Kh2.SystemData.Trsr.Read);
         }
 
         private void LoadBattle(string fileName)
         {
             var bar = DataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
-            Fmlv = bar.ForEntry("fmlv", Bar.EntryType.List, Kh2.Battle.Fmlv.Read);
-            Lvup = bar.ForEntry("lvup", Bar.EntryType.List, Kh2.Battle.Lvup.Read)?.Characters;
+            Fmlv = bar.ForEntry("fmlv", Bar.EntryType.OtherData, Kh2.Battle.Fmlv.Read);
+            Lvup = bar.ForEntry("lvup", Bar.EntryType.OtherData, Kh2.Battle.Lvup.Read)?.Characters;
         }
 
         private void LoadWorldPoint(string fileName)
@@ -237,7 +237,7 @@ namespace OpenKh.Game.Infrastructure
             var messageBar = DataContent.FileOpen($"msg/{Language}/sys.bar")
                 .Using(stream => Bar.Read(stream));
 
-            MessageProvider.Load(messageBar.ForEntry(worldId, Bar.EntryType.List, Msg.Read));
+            MessageProvider.Load(messageBar.ForEntry(worldId, Bar.EntryType.OtherData, Msg.Read));
         }
 
         private static int DetectRegion(IDataContent dataContent)
