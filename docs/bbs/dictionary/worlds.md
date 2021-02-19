@@ -32,7 +32,7 @@
 
 The list below includes all the maps in the game and their names in japanese and english.
 
-The `English` column is the official translation. Sometimes a `Translation` column is added to translated a name that only exists in japanese.
+The `English` column is the official translation. Sometimes a `Translation` column is added to translate a name that only exists in japanese.
 
 Maps with 00 in the name do not exist as files, but the game displays the world's name when trying to load it.
 
