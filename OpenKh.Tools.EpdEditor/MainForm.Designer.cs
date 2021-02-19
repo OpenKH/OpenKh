@@ -50,7 +50,7 @@ namespace OpenKh.Tools.EpdEditor
             this.label1 = new System.Windows.Forms.Label();
             this.MaxHealthBox = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.FlowStatusAilments = new System.Windows.Forms.FlowLayoutPanel();
             this.StatusAilment_checkbox_01 = new System.Windows.Forms.CheckBox();
             this.StatusAilment_checkbox_02 = new System.Windows.Forms.CheckBox();
             this.StatusAilment_checkbox_03 = new System.Windows.Forms.CheckBox();
@@ -123,7 +123,7 @@ namespace OpenKh.Tools.EpdEditor
             this.OptionalLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.flowLayoutPanel1.SuspendLayout();
+            this.FlowStatusAilments.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.AnimationLayoutPanel.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -344,7 +344,7 @@ namespace OpenKh.Tools.EpdEditor
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.flowLayoutPanel1);
+            this.groupBox2.Controls.Add(this.FlowStatusAilments);
             this.groupBox2.Location = new System.Drawing.Point(6, 15);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(434, 148);
@@ -352,32 +352,32 @@ namespace OpenKh.Tools.EpdEditor
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Status Ailments";
             // 
-            // flowLayoutPanel1
+            // FlowStatusAilments
             // 
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_01);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_02);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_03);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_04);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_05);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_06);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_07);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_08);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_09);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_10);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_11);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_12);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_13);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_14);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_15);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_16);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_17);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_18);
-            this.flowLayoutPanel1.Controls.Add(this.StatusAilment_checkbox_19);
-            this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(6, 22);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(419, 120);
-            this.flowLayoutPanel1.TabIndex = 1;
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_01);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_02);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_03);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_04);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_05);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_06);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_07);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_08);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_09);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_10);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_11);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_12);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_13);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_14);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_15);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_16);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_17);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_18);
+            this.FlowStatusAilments.Controls.Add(this.StatusAilment_checkbox_19);
+            this.FlowStatusAilments.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.FlowStatusAilments.Location = new System.Drawing.Point(6, 22);
+            this.FlowStatusAilments.Name = "FlowStatusAilments";
+            this.FlowStatusAilments.Size = new System.Drawing.Size(419, 120);
+            this.FlowStatusAilments.TabIndex = 1;
             // 
             // StatusAilment_checkbox_01
             // 
@@ -1136,8 +1136,8 @@ namespace OpenKh.Tools.EpdEditor
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
-            this.flowLayoutPanel1.ResumeLayout(false);
-            this.flowLayoutPanel1.PerformLayout();
+            this.FlowStatusAilments.ResumeLayout(false);
+            this.FlowStatusAilments.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.AnimationLayoutPanel.ResumeLayout(false);
             this.AnimationLayoutPanel.PerformLayout();
@@ -1182,7 +1182,7 @@ namespace OpenKh.Tools.EpdEditor
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox MaxHealthBox;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.FlowLayoutPanel FlowStatusAilments;
         private System.Windows.Forms.CheckBox StatusAilment_checkbox_01;
         private System.Windows.Forms.CheckBox StatusAilment_checkbox_02;
         private System.Windows.Forms.CheckBox StatusAilment_checkbox_03;

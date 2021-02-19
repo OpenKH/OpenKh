@@ -1,7 +1,7 @@
 
-namespace OpenKh.Tools.ItbEditor
+namespace OpenKh.Tools.ItcEditor
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -29,9 +29,9 @@ namespace OpenKh.Tools.ItbEditor
         /// </summary>
         private void InitializeComponent()
         {
-            this.LoadITBButton = new System.Windows.Forms.Button();
-            this.SaveITBButton = new System.Windows.Forms.Button();
-            this.ItbTabControl = new System.Windows.Forms.TabControl();
+            this.LoadITCButton = new System.Windows.Forms.Button();
+            this.SaveITCButton = new System.Windows.Forms.Button();
+            this.ItcTabControl = new System.Windows.Forms.TabControl();
             this.TabDP = new System.Windows.Forms.TabPage();
             this.FlowDP = new System.Windows.Forms.FlowLayoutPanel();
             this.TabSW = new System.Windows.Forms.TabPage();
@@ -64,8 +64,7 @@ namespace OpenKh.Tools.ItbEditor
             this.FlowBD = new System.Windows.Forms.FlowLayoutPanel();
             this.TabWM = new System.Windows.Forms.TabPage();
             this.FlowWM = new System.Windows.Forms.FlowLayoutPanel();
-            this.NewChestButton = new System.Windows.Forms.Button();
-            this.ItbTabControl.SuspendLayout();
+            this.ItcTabControl.SuspendLayout();
             this.TabDP.SuspendLayout();
             this.TabSW.SuspendLayout();
             this.TabCD.SuspendLayout();
@@ -84,57 +83,53 @@ namespace OpenKh.Tools.ItbEditor
             this.TabWM.SuspendLayout();
             this.SuspendLayout();
             // 
-            // LoadITBButton
+            // LoadITCButton
             // 
-            this.LoadITBButton.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.LoadITBButton.Location = new System.Drawing.Point(13, 13);
-            this.LoadITBButton.Name = "LoadITBButton";
-            this.LoadITBButton.Size = new System.Drawing.Size(75, 23);
-            this.LoadITBButton.TabIndex = 0;
-            this.LoadITBButton.Text = "Load ITB";
-            this.LoadITBButton.UseVisualStyleBackColor = true;
-            this.LoadITBButton.Click += new System.EventHandler(this.LoadITCButton_Click);
+            this.LoadITCButton.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.LoadITCButton.Location = new System.Drawing.Point(13, 13);
+            this.LoadITCButton.Name = "LoadITCButton";
+            this.LoadITCButton.Size = new System.Drawing.Size(75, 23);
+            this.LoadITCButton.TabIndex = 0;
+            this.LoadITCButton.Text = "Load ITC";
+            this.LoadITCButton.UseVisualStyleBackColor = true;
+            this.LoadITCButton.Click += new System.EventHandler(this.LoadITCButton_Click);
             // 
-            // SaveITBButton
+            // SaveITCButton
             // 
-            this.SaveITBButton.Enabled = false;
-            this.SaveITBButton.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.SaveITBButton.Location = new System.Drawing.Point(94, 13);
-            this.SaveITBButton.Name = "SaveITBButton";
-            this.SaveITBButton.Size = new System.Drawing.Size(75, 23);
-            this.SaveITBButton.TabIndex = 1;
-            this.SaveITBButton.Text = "Save as...";
-            this.SaveITBButton.UseVisualStyleBackColor = true;
-            this.SaveITBButton.Click += new System.EventHandler(this.SaveITCButton_Click);
+            this.SaveITCButton.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.SaveITCButton.Location = new System.Drawing.Point(94, 12);
+            this.SaveITCButton.Name = "SaveITCButton";
+            this.SaveITCButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveITCButton.TabIndex = 1;
+            this.SaveITCButton.Text = "Save as...";
+            this.SaveITCButton.UseVisualStyleBackColor = true;
+            this.SaveITCButton.Click += new System.EventHandler(this.SaveITCButton_Click);
             // 
-            // ItbTabControl
+            // ItcTabControl
             // 
-            this.ItbTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ItbTabControl.Controls.Add(this.TabDP);
-            this.ItbTabControl.Controls.Add(this.TabSW);
-            this.ItbTabControl.Controls.Add(this.TabCD);
-            this.ItbTabControl.Controls.Add(this.TabSB);
-            this.ItbTabControl.Controls.Add(this.TabYT);
-            this.ItbTabControl.Controls.Add(this.TabRG);
-            this.ItbTabControl.Controls.Add(this.TabJB);
-            this.ItbTabControl.Controls.Add(this.TabHE);
-            this.ItbTabControl.Controls.Add(this.TabLS);
-            this.ItbTabControl.Controls.Add(this.TabDI);
-            this.ItbTabControl.Controls.Add(this.TabPP);
-            this.ItbTabControl.Controls.Add(this.TabDC);
-            this.ItbTabControl.Controls.Add(this.TabKG);
-            this.ItbTabControl.Controls.Add(this.TabVS);
-            this.ItbTabControl.Controls.Add(this.TabBD);
-            this.ItbTabControl.Controls.Add(this.TabWM);
-            this.ItbTabControl.ItemSize = new System.Drawing.Size(40, 20);
-            this.ItbTabControl.Location = new System.Drawing.Point(12, 42);
-            this.ItbTabControl.Name = "ItbTabControl";
-            this.ItbTabControl.SelectedIndex = 0;
-            this.ItbTabControl.Size = new System.Drawing.Size(645, 390);
-            this.ItbTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-            this.ItbTabControl.TabIndex = 2;
+            this.ItcTabControl.Controls.Add(this.TabDP);
+            this.ItcTabControl.Controls.Add(this.TabSW);
+            this.ItcTabControl.Controls.Add(this.TabCD);
+            this.ItcTabControl.Controls.Add(this.TabSB);
+            this.ItcTabControl.Controls.Add(this.TabYT);
+            this.ItcTabControl.Controls.Add(this.TabRG);
+            this.ItcTabControl.Controls.Add(this.TabJB);
+            this.ItcTabControl.Controls.Add(this.TabHE);
+            this.ItcTabControl.Controls.Add(this.TabLS);
+            this.ItcTabControl.Controls.Add(this.TabDI);
+            this.ItcTabControl.Controls.Add(this.TabPP);
+            this.ItcTabControl.Controls.Add(this.TabDC);
+            this.ItcTabControl.Controls.Add(this.TabKG);
+            this.ItcTabControl.Controls.Add(this.TabVS);
+            this.ItcTabControl.Controls.Add(this.TabBD);
+            this.ItcTabControl.Controls.Add(this.TabWM);
+            this.ItcTabControl.ItemSize = new System.Drawing.Size(40, 20);
+            this.ItcTabControl.Location = new System.Drawing.Point(12, 42);
+            this.ItcTabControl.Name = "ItcTabControl";
+            this.ItcTabControl.SelectedIndex = 0;
+            this.ItcTabControl.Size = new System.Drawing.Size(645, 390);
+            this.ItcTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+            this.ItcTabControl.TabIndex = 2;
             // 
             // TabDP
             // 
@@ -150,9 +145,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowDP
             // 
-            this.FlowDP.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowDP.AutoScroll = true;
             this.FlowDP.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowDP.Location = new System.Drawing.Point(3, 3);
@@ -173,9 +165,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowSW
             // 
-            this.FlowSW.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowSW.AutoScroll = true;
             this.FlowSW.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowSW.Location = new System.Drawing.Point(3, 3);
@@ -196,9 +185,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowCD
             // 
-            this.FlowCD.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowCD.AutoScroll = true;
             this.FlowCD.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowCD.Location = new System.Drawing.Point(3, 3);
@@ -219,9 +205,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowSB
             // 
-            this.FlowSB.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowSB.AutoScroll = true;
             this.FlowSB.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowSB.Location = new System.Drawing.Point(3, 3);
@@ -242,9 +225,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowYT
             // 
-            this.FlowYT.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowYT.AutoScroll = true;
             this.FlowYT.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowYT.Location = new System.Drawing.Point(3, 3);
@@ -265,9 +245,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowRG
             // 
-            this.FlowRG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowRG.AutoScroll = true;
             this.FlowRG.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowRG.Location = new System.Drawing.Point(3, 3);
@@ -288,9 +265,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowJB
             // 
-            this.FlowJB.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowJB.AutoScroll = true;
             this.FlowJB.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowJB.Location = new System.Drawing.Point(3, 3);
@@ -311,9 +285,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowHE
             // 
-            this.FlowHE.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowHE.AutoScroll = true;
             this.FlowHE.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowHE.Location = new System.Drawing.Point(3, 3);
@@ -334,9 +305,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowLS
             // 
-            this.FlowLS.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowLS.AutoScroll = true;
             this.FlowLS.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowLS.Location = new System.Drawing.Point(3, 3);
@@ -357,9 +325,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowDI
             // 
-            this.FlowDI.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowDI.AutoScroll = true;
             this.FlowDI.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowDI.Location = new System.Drawing.Point(3, 3);
@@ -380,9 +345,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowPP
             // 
-            this.FlowPP.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowPP.AutoScroll = true;
             this.FlowPP.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowPP.Location = new System.Drawing.Point(3, 3);
@@ -403,9 +365,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowDC
             // 
-            this.FlowDC.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowDC.AutoScroll = true;
             this.FlowDC.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowDC.Location = new System.Drawing.Point(3, 3);
@@ -426,9 +385,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowKG
             // 
-            this.FlowKG.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowKG.AutoScroll = true;
             this.FlowKG.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowKG.Location = new System.Drawing.Point(3, 3);
@@ -449,9 +405,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowVS
             // 
-            this.FlowVS.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowVS.AutoScroll = true;
             this.FlowVS.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowVS.Location = new System.Drawing.Point(3, 3);
@@ -472,9 +425,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowBD
             // 
-            this.FlowBD.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowBD.AutoScroll = true;
             this.FlowBD.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowBD.Location = new System.Drawing.Point(3, 3);
@@ -495,9 +445,6 @@ namespace OpenKh.Tools.ItbEditor
             // 
             // FlowWM
             // 
-            this.FlowWM.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowWM.AutoScroll = true;
             this.FlowWM.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowWM.Location = new System.Drawing.Point(3, 3);
@@ -505,31 +452,18 @@ namespace OpenKh.Tools.ItbEditor
             this.FlowWM.Size = new System.Drawing.Size(631, 356);
             this.FlowWM.TabIndex = 1;
             // 
-            // NewChestButton
-            // 
-            this.NewChestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.NewChestButton.Enabled = false;
-            this.NewChestButton.Location = new System.Drawing.Point(493, 13);
-            this.NewChestButton.Name = "NewChestButton";
-            this.NewChestButton.Size = new System.Drawing.Size(160, 23);
-            this.NewChestButton.TabIndex = 3;
-            this.NewChestButton.Text = "Add Chest to this world";
-            this.NewChestButton.UseVisualStyleBackColor = true;
-            this.NewChestButton.Click += new System.EventHandler(this.NewChestButton_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(664, 441);
-            this.Controls.Add(this.NewChestButton);
-            this.Controls.Add(this.ItbTabControl);
-            this.Controls.Add(this.SaveITBButton);
-            this.Controls.Add(this.LoadITBButton);
+            this.Controls.Add(this.ItcTabControl);
+            this.Controls.Add(this.SaveITCButton);
+            this.Controls.Add(this.LoadITCButton);
             this.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.Name = "Form1";
-            this.Text = "ITB Editor (Item Treasure Box)";
-            this.ItbTabControl.ResumeLayout(false);
+            this.Text = "ITC Editor (Item Collection)";
+            this.ItcTabControl.ResumeLayout(false);
             this.TabDP.ResumeLayout(false);
             this.TabSW.ResumeLayout(false);
             this.TabCD.ResumeLayout(false);
@@ -552,9 +486,9 @@ namespace OpenKh.Tools.ItbEditor
 
         #endregion
 
-        private System.Windows.Forms.Button LoadITBButton;
-        private System.Windows.Forms.Button SaveITBButton;
-        private System.Windows.Forms.TabControl ItbTabControl;
+        private System.Windows.Forms.Button LoadITCButton;
+        private System.Windows.Forms.Button SaveITCButton;
+        private System.Windows.Forms.TabControl ItcTabControl;
         private System.Windows.Forms.TabPage TabDP;
         private System.Windows.Forms.TabPage TabSW;
         private System.Windows.Forms.TabPage TabCD;
@@ -587,7 +521,6 @@ namespace OpenKh.Tools.ItbEditor
         private System.Windows.Forms.FlowLayoutPanel FlowVS;
         private System.Windows.Forms.FlowLayoutPanel FlowBD;
         private System.Windows.Forms.FlowLayoutPanel FlowWM;
-        private System.Windows.Forms.Button NewChestButton;
     }
 }
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
@@ -19,7 +19,8 @@ namespace OpenKh.Bbs
         [Data] public ushort EventIndex { get; set; }
         [Data] public byte World { get; set; }
         [Data] public byte Room { get; set; }
-        [Data] public ushort Unknown06 { get; set; }
+        [Data] public byte EventPtn { get; set; }
+        [Data] public byte Opt { get; set; }
 
         public static bool IsValid(Stream stream)
         {
