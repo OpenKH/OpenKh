@@ -4,13 +4,15 @@ PCAM stands for *Player CAMera*.
 
 It controls various aspects of a specific player's camera.
 
+The player's main camera is usually `000`.
+
 ## Header
 
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | char[4]   | File identifier, always `@PCA`.
 | 0x4     | uint32  | [Kind](#PCAM-Kind)
-| 0x8     | float  | View Angle
+| 0x8     | float  | FOV
 | 0xC     | float  | Size
 
 The next data chunk is repeated twice. Normal and Extended.
