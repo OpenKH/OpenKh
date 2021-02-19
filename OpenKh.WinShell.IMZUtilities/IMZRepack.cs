@@ -48,11 +48,15 @@ namespace OpenKh.WinShell.IMZUtilities
                 {
                     Imgd _tImage = Imgd.Read(_cStream);
                     _tList.Add(_tImage);
+                    _cStream.Close();
                 }
             }
 
             using (FileStream _oStream = new FileStream(_rPath + "\\output.imz", FileMode.OpenOrCreate))
+            {
                 Imgz.Write(_oStream, _tList.ToArray());
+                _oStream.Close();
+            }
         }
     }
 }

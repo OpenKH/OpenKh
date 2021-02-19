@@ -48,10 +48,15 @@ namespace OpenKh.WinShell.IMZUtilities
                     foreach (var _tImage in _tArchive.Images)
                     {
                         using (FileStream _tStream = new FileStream(_fPath + string.Format("\\{0}.imd", _i.ToString("000")), FileMode.OpenOrCreate))
+                        {
                             _tImage.Write(_tStream);
-
+                            _tStream.Close();
+                        }
+                        
                         _i++;
                     }
+
+                    _cStream.Close();
                 }
             }
         }
