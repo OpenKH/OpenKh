@@ -2,7 +2,7 @@
 
 PAO stands for *Player Attack Order*.
 
-It controls the way a character performs combos.
+It controls the way a character performs combos for command styles.
 
 These files are usually contained within `pXXinit.arc` files with XX being the respective PCXX player and it's stored as a `.bin`.
 
@@ -18,6 +18,7 @@ This file has no header. You stop reading data once you find an empty entry.
 | 0x4     | PAO Order[4]  | Order Values
 
 ### PAO Kind
+
 | Value | Name  | Description
 |--------|-------|------------
 | 0     | KIND_NONE   | 
@@ -30,6 +31,7 @@ This file has no header. You stop reading data once you find an empty entry.
 ---
 
 ## PAO Order
+
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | uint16  | [Switch](#PAO-Switch)
