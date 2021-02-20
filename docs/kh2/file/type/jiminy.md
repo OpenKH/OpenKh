@@ -15,6 +15,8 @@ This file contains different informations about Jiminy's Journal. Internally it 
     * [QUES](#ques)
     * [PUZZ](#puzz)
 
+---
+
 ## Header
 
 Each sub-file starts with the same header. Only the Magic Code differs.
@@ -26,7 +28,11 @@ Each sub-file starts with the same header. Only the Magic Code differs.
 | 08     | int    | Entries count
 | 0C     | int    | Padding
 
+---
+
 ## Entries
+
+---
 
 ## Worl
 
@@ -47,6 +53,8 @@ Magic Code `JMWO`
 
 Only the world `hb` utilized the alternative texts and story flag fields to switch from `Hollow Bastion` to `Radiant Garden` later in the game.
 
+---
+
 ## Stor
 
 Contains informations about the entries shown in the "Story" section of each world.
@@ -62,6 +70,8 @@ Magic Code `JMST`
 | 08     | ushort | Text used in the "Story" section of the world
 | 0A     | ushort | Story Flag when to show the texts
 
+---
+
 ## Albu
 
 Contains informations about the entries shown in the "Album" section of each world.
@@ -75,6 +85,8 @@ Magic Code `JMAL`
 | 06     | ushort | Story Flag when to show entry
 | 08     | ushort | Title Text
 | 0A     | ushort | Description Text
+
+---
 
 ## Char
 
@@ -103,6 +115,8 @@ Magic Code `JMCH`
 | 1C     | float  | Scale
 | 20     | float  | Scale 2
 
+---
+
 ## Anse
 
 Contains the texts for the Secret Ansem Reports.
@@ -115,6 +129,8 @@ Magic Code `JMAN`
 | 02     | ushort | Title
 | 04     | ushort | Text
 | 06     | ushort | Padding
+
+---
 
 ## Diag
 
@@ -146,6 +162,8 @@ Magic Code `JMDI`
 
 Currently unknown. Read in z_un_002a18d0.
 
+---
+
 ## Limi
 
 Contains informations about the section "Limits".
@@ -159,6 +177,8 @@ Magic Code `JMLI`
 | 04     | ushort | Description
 | 06     | ushort | Padding
 
+---
+
 ## Mini
 
 Contains informations about the section "Minigames".
@@ -171,6 +191,8 @@ Magic Code `JMMG`
 | 02     | ushort | Title
 | 04     | ushort | Highscore Text
 | 06     | ushort | Game Id
+
+---
 
 ## Ques
 
@@ -197,6 +219,8 @@ Magic Code `JMQU`
 | 1    | Draw
 | 2    | Cleared
 | 3    | 100% Cleared
+
+---
 
 ## Puzz
 
