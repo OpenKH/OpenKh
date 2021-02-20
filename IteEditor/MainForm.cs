@@ -73,11 +73,6 @@ namespace OpenKh.Tools.IteEditor
 
         }
 
-        private void UpdateWriteInfo()
-        {
-
-        }
-
         private void LoadITEButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
@@ -93,23 +88,6 @@ namespace OpenKh.Tools.IteEditor
                 UpdateParameters(ite);
                 //SaveITEButton.Enabled = true;
             }
-        }
-
-        private void SaveITEButton_Click(object sender, EventArgs e)
-        {
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "Item files (*.ite)|*.ite|All files (*.*)|*.*";
-            DialogResult result = dialog.ShowDialog();
-
-            if (result == DialogResult.OK)
-            {
-                Stream iteOut = File.OpenWrite(dialog.FileName);
-                UpdateWriteInfo();
-                Ite.Write(iteOut, ite);
-                iteOut.Close();
-            }
-
-            MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

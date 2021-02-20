@@ -166,7 +166,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ItcEditor", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ItbEditor", "OpenKh.Tools.ItbEditor\OpenKh.Tools.ItbEditor.csproj", "{0AC54BBF-A08D-44CA-9140-EB5C47573BAE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.IteEditor", "IteEditor\OpenKh.Tools.IteEditor.csproj", "{7BA60C7F-4DA9-4A62-A1DC-0F8FF87E4430}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.IteViewer", "IteEditor\OpenKh.Tools.IteViewer.csproj", "{7BA60C7F-4DA9-4A62-A1DC-0F8FF87E4430}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

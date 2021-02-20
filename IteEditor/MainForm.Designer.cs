@@ -30,7 +30,6 @@ namespace OpenKh.Tools.IteEditor
         private void InitializeComponent()
         {
             this.LoadITEButton = new System.Windows.Forms.Button();
-            this.SaveITEButton = new System.Windows.Forms.Button();
             this.ITETabControl = new System.Windows.Forms.TabControl();
             this.TabWeapons = new System.Windows.Forms.TabPage();
             this.FlowWeapons = new System.Windows.Forms.FlowLayoutPanel();
@@ -60,17 +59,6 @@ namespace OpenKh.Tools.IteEditor
             this.LoadITEButton.Text = "Load ITE";
             this.LoadITEButton.UseVisualStyleBackColor = true;
             this.LoadITEButton.Click += new System.EventHandler(this.LoadITEButton_Click);
-            // 
-            // SaveITEButton
-            // 
-            this.SaveITEButton.Enabled = false;
-            this.SaveITEButton.Location = new System.Drawing.Point(94, 13);
-            this.SaveITEButton.Name = "SaveITEButton";
-            this.SaveITEButton.Size = new System.Drawing.Size(75, 23);
-            this.SaveITEButton.TabIndex = 1;
-            this.SaveITEButton.Text = "Save as...";
-            this.SaveITEButton.UseVisualStyleBackColor = true;
-            this.SaveITEButton.Click += new System.EventHandler(this.SaveITEButton_Click);
             // 
             // ITETabControl
             // 
@@ -215,16 +203,15 @@ namespace OpenKh.Tools.IteEditor
             this.FlowSynthesis.Size = new System.Drawing.Size(558, 336);
             this.FlowSynthesis.TabIndex = 1;
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(577, 425);
             this.Controls.Add(this.ITETabControl);
-            this.Controls.Add(this.SaveITEButton);
             this.Controls.Add(this.LoadITEButton);
-            this.Name = "Form1";
-            this.Text = "ITE Editor";
+            this.Name = "MainForm";
+            this.Text = "ITE Viewer";
             this.ITETabControl.ResumeLayout(false);
             this.TabWeapons.ResumeLayout(false);
             this.TabFlavors.ResumeLayout(false);
@@ -238,7 +225,6 @@ namespace OpenKh.Tools.IteEditor
         #endregion
 
         private System.Windows.Forms.Button LoadITEButton;
-        private System.Windows.Forms.Button SaveITEButton;
         private System.Windows.Forms.TabControl ITETabControl;
         private System.Windows.Forms.TabPage TabWeapons;
         private System.Windows.Forms.FlowLayoutPanel FlowWeapons;
