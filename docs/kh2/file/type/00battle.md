@@ -23,6 +23,8 @@ It is a [BAR](bar.md) file and contains the following subfiles:
 * [STOP](#stop) - ???
 * [0A](#0a) - ??? (3 entries)
 
+---
+
 ## Atkp
 
 Contains the parameters for the various actions in the game.
@@ -128,6 +130,8 @@ The damage effects' values on MSET files point to this table.
 | 0x02 | Air Combo Finisher
 | 0x04 | Reaction Command
 
+---
+
 ## Ptya
 
 Contains data for the party's attacks.
@@ -192,6 +196,8 @@ Ptya sets contain the list of attack animations a character use in certain situa
 
 \* Multiply by 4 to get the slot of the motion in the entity's [moveset file](../anb/mset.md).
 
+---
+
 ## Przt
 
 Contains the item drop table.
@@ -233,6 +239,8 @@ The ID of the entry is assigned in the AI of the object.
 | 14     | ushort  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 16     | short  | Item 3 Drop Percentage
 
+---
+
 ## Vtbl
 
 Contains data for randomizing voice clips.
@@ -269,6 +277,8 @@ Contains data for randomizing voice clips.
 | 11 	 | sbyte | Voice 4 Chance
 | 12 	 | sbyte | Voice 5
 | 13 	 | sbyte | Voice 5 Chance
+
+---
 
 ## Lvup
 
@@ -343,6 +353,8 @@ NOTE: The first character pointer doesn't point to any character. May be some ki
 | 0C     | ushort | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 0E     | byte[2] | Padding
 
+---
+
 ## Bons
 
 Contains reward items (GET! BONUS).
@@ -377,6 +389,8 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 | 08     | ushort | [Bonus Item 1](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 10     | ushort | [Bonus Item 2](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 12     | int   | Padding
+
+---
 
 ## Btlv
 
@@ -423,6 +437,8 @@ Contains the table for battle level of each world. Whether each entry is enabled
 | 1A     | byte  | The World That Never Was
 | 1B     | byte[5] | Padding
 
+---
+
 ## Lvpm
 
 Contains the level-up table for the enemies. Based on the level of an enemy, a specific level, containing multiplying values, will be applied over the base statistics of an enemy.
@@ -443,6 +459,8 @@ Contains the level-up table for the enemies. Based on the level of an enemy, a s
 | 06     | ushort | Max Strength
 | 08     | ushort | Min Strength
 | 0A     | ushort | Exp
+
+---
 
 ## Enmp
 
@@ -487,6 +505,8 @@ Every enemy is associated to one or more IDs (eg. Organization members have diff
 | 56     | ushort | Exp multiplier
 | 58     | ushort | Prize
 | 5A     | ushort | Bonus Level
+
+---
 
 ## Patn
 
@@ -535,6 +555,8 @@ EG: 05 is Mad Rider, 14 is Reckless, Xaldin, 15 is Morning Star, Assault Rider, 
 
 \* (00 is immune, 01/0C/0D draws in, 02/03 flinches, 04/07/09/0B knocks out, 05 pulls in(magnet), 06/08/0A is flinch + draw, 0E is flinch + insta revenge...)
 
+---
+
 ## Plrp
 
 Contains informations about starting Character statistics, starting Abilities etc.
@@ -573,6 +595,8 @@ Contains informations about starting Character statistics, starting Abilities et
 
 NOTE: Abilities that are enabled by default begin with an 8.
 
+---
+
 ## Limt
 
 Data on limits.
@@ -606,6 +630,8 @@ Data on limits.
 | 44     | byte | World (Used for Timeless River versions (0D))
 | 45     | byte[19] | Padding
 
+---
+
 ## Sumn
 
 Data on summons.
@@ -634,6 +660,8 @@ Data on summons.
 | 8     | uint | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
 | 12     | ushort | Limit Command - [Command LIST](../../dictionary/commands.md)
 | 14     | byte[50] | Padding
+
+---
 
 ## Magc
 
@@ -675,6 +703,8 @@ Data on magic.
 | 54     | byte | Voice Self
 | 55     | byte | Padding
 
+---
+
 ## Vbrt
 
 [BAR](bar.md) file containing unknown data.
@@ -684,6 +714,8 @@ Data on magic.
 * bliz
 * v0lo
 * l_bo (2 entries)
+
+---
 
 ## Fmlv
 
@@ -739,6 +771,8 @@ Final Mix (JP/PS3/PS4)
 |  5 | Final
 |  6 | Anti
 
+---
+
 ## Stop
 
 Data on unknown
@@ -773,6 +807,7 @@ Data on unknown
 | 0x4 | Star
 | 0x8 | Disable Draw
 
+---
 
 ## 0A
 

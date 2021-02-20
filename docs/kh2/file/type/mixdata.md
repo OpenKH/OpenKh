@@ -9,6 +9,8 @@ This file contains informations about the moogle shop. Internally it is a [bar](
     * [LEVE](#leve) - Levels
     * [EXP](#exp) - Experience
 
+---
+
 ## Headers
 
 Each subfile starts with a header. The structure for all is the same, aside from the Magic Code.
@@ -20,7 +22,11 @@ Each subfile starts with a header. The structure for all is the same, aside from
 | 08     | int    | Entries count
 | 0C     | int    | Padding
 
+---
+
 ## Subfiles
+
+---
 
 ### Reci
 
@@ -48,6 +54,8 @@ Magic Code `MIRE`
 | 1C     | ushort | Ingredient 6
 | 1E     | ushort | Needed amount of Ingredient 6
 
+---
+
 ### Cond
 
 Contains the table from Synthesize -> Lists (Get n types of materials etc.)
@@ -65,6 +73,8 @@ Magic Code `MICO`
 | 08     | short  | Count of needed Materials
 | 0A     | short  | Unlock event for the shop (Same used in shops [Shops](./03system.md#shop))
 
+---
+
 ### Leve
 
 Contains moogle level up informations.
@@ -78,6 +88,8 @@ Magic Code `MILV`
 | 04     | ushort | 
 | 06     | ushort |
 | 08     | int    | EXP needed
+
+---
 
 ### Exp
 
