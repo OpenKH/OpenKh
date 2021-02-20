@@ -42,7 +42,7 @@ namespace OpenKh.Tools.BepEditor
             {
                 DisappearParameters baseParam = new DisappearParameters();
                 baseParam.DisappearGBox.Text = "Disappear Param " + (j+1);
-                baseParam.NumericWorldID.Value = bep.disappearParameters[j].WorldID;
+                baseParam.WorldIDComboBox.SelectedIndex = bep.disappearParameters[j].WorldID;
                 baseParam.NumericRoomID.Value = bep.disappearParameters[j].RoomID;
                 baseParam.DistanceTextBox.Text = bep.disappearParameters[j].Distance.ToString();
                 DisappearLayout.Controls.Add(baseParam);
@@ -71,7 +71,7 @@ namespace OpenKh.Tools.BepEditor
             foreach (DisappearParameters disappearParam in DisappearLayout.Controls)
             {
                 Bep.DisappearParameter param = new Bep.DisappearParameter();
-                param.WorldID = decimal.ToUInt16(disappearParam.NumericWorldID.Value);
+                param.WorldID = (ushort)disappearParam.WorldIDComboBox.SelectedIndex;
                 param.RoomID = decimal.ToUInt16(disappearParam.NumericRoomID.Value);
                 param.Distance = float.Parse(disappearParam.DistanceTextBox.Text);
                 bep.disappearParameters.Add(param);

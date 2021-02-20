@@ -30,31 +30,68 @@ namespace OpenKh.Tools.BepEditor
         private void InitializeComponent()
         {
             this.DisappearGBox = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.NumericWorldID = new System.Windows.Forms.NumericUpDown();
-            this.NumericRoomID = new System.Windows.Forms.NumericUpDown();
             this.DistanceTextBox = new System.Windows.Forms.TextBox();
+            this.NumericRoomID = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.WorldIDComboBox = new System.Windows.Forms.ComboBox();
             this.DisappearGBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NumericWorldID)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NumericRoomID)).BeginInit();
             this.SuspendLayout();
             // 
             // DisappearGBox
             // 
+            this.DisappearGBox.Controls.Add(this.WorldIDComboBox);
             this.DisappearGBox.Controls.Add(this.DistanceTextBox);
             this.DisappearGBox.Controls.Add(this.NumericRoomID);
-            this.DisappearGBox.Controls.Add(this.NumericWorldID);
             this.DisappearGBox.Controls.Add(this.label3);
             this.DisappearGBox.Controls.Add(this.label2);
             this.DisappearGBox.Controls.Add(this.label1);
             this.DisappearGBox.Location = new System.Drawing.Point(4, 4);
             this.DisappearGBox.Name = "DisappearGBox";
-            this.DisappearGBox.Size = new System.Drawing.Size(275, 83);
+            this.DisappearGBox.Size = new System.Drawing.Size(306, 83);
             this.DisappearGBox.TabIndex = 0;
             this.DisappearGBox.TabStop = false;
             this.DisappearGBox.Text = "Disappear 1";
+            // 
+            // DistanceTextBox
+            // 
+            this.DistanceTextBox.Location = new System.Drawing.Point(193, 41);
+            this.DistanceTextBox.Name = "DistanceTextBox";
+            this.DistanceTextBox.Size = new System.Drawing.Size(100, 23);
+            this.DistanceTextBox.TabIndex = 5;
+            this.DistanceTextBox.Text = "1";
+            // 
+            // NumericRoomID
+            // 
+            this.NumericRoomID.Location = new System.Drawing.Point(134, 42);
+            this.NumericRoomID.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.NumericRoomID.Name = "NumericRoomID";
+            this.NumericRoomID.Size = new System.Drawing.Size(53, 23);
+            this.NumericRoomID.TabIndex = 4;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(193, 23);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(52, 15);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Distance";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(134, 23);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 15);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Room ID";
             // 
             // label1
             // 
@@ -65,55 +102,14 @@ namespace OpenKh.Tools.BepEditor
             this.label1.TabIndex = 0;
             this.label1.Text = "World ID";
             // 
-            // label2
+            // WorldIDComboBox
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(78, 23);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 15);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Room ID";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(152, 24);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(52, 15);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Distance";
-            // 
-            // NumericWorldID
-            // 
-            this.NumericWorldID.Location = new System.Drawing.Point(7, 42);
-            this.NumericWorldID.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.NumericWorldID.Name = "NumericWorldID";
-            this.NumericWorldID.Size = new System.Drawing.Size(53, 23);
-            this.NumericWorldID.TabIndex = 3;
-            // 
-            // NumericRoomID
-            // 
-            this.NumericRoomID.Location = new System.Drawing.Point(78, 42);
-            this.NumericRoomID.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.NumericRoomID.Name = "NumericRoomID";
-            this.NumericRoomID.Size = new System.Drawing.Size(53, 23);
-            this.NumericRoomID.TabIndex = 4;
-            // 
-            // DistanceTextBox
-            // 
-            this.DistanceTextBox.Location = new System.Drawing.Point(152, 42);
-            this.DistanceTextBox.Name = "DistanceTextBox";
-            this.DistanceTextBox.Size = new System.Drawing.Size(100, 23);
-            this.DistanceTextBox.TabIndex = 5;
-            this.DistanceTextBox.Text = "1";
+            this.WorldIDComboBox.FormattingEnabled = true;
+            this.WorldIDComboBox.Location = new System.Drawing.Point(7, 42);
+            this.WorldIDComboBox.Name = "WorldIDComboBox";
+            this.WorldIDComboBox.Size = new System.Drawing.Size(121, 23);
+            this.WorldIDComboBox.TabIndex = 6;
+            this.WorldIDComboBox.Text = "Land of Departure";
             // 
             // DisappearParameters
             // 
@@ -121,10 +117,9 @@ namespace OpenKh.Tools.BepEditor
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.DisappearGBox);
             this.Name = "DisappearParameters";
-            this.Size = new System.Drawing.Size(288, 94);
+            this.Size = new System.Drawing.Size(325, 94);
             this.DisappearGBox.ResumeLayout(false);
             this.DisappearGBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NumericWorldID)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NumericRoomID)).EndInit();
             this.ResumeLayout(false);
 
@@ -135,9 +130,9 @@ namespace OpenKh.Tools.BepEditor
         public System.Windows.Forms.GroupBox DisappearGBox;
         public System.Windows.Forms.TextBox DistanceTextBox;
         public System.Windows.Forms.NumericUpDown NumericRoomID;
-        public System.Windows.Forms.NumericUpDown NumericWorldID;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
+        public System.Windows.Forms.ComboBox WorldIDComboBox;
     }
 }

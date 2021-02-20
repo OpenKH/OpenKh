@@ -75,6 +75,7 @@ namespace OpenKh.Tools.BbsEventTableEditor.ViewModels
                 Event.World = (byte)Math.Min(Constants.Worlds.Length, value);
                 OnPropertyChanged(nameof(Name));
                 OnPropertyChanged(nameof(EventPath));
+                OnPropertyChanged(nameof(Rooms));
             }
         }
 
