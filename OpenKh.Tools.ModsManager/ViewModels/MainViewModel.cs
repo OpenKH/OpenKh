@@ -33,6 +33,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand MoveUp { get; set; }
         public RelayCommand MoveDown { get; set; }
         public RelayCommand BuildCommand { get; set; }
+        public RelayCommand WizardCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -119,15 +120,50 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             BuildCommand = new RelayCommand(_ =>
             {
                 ModsService.RunPacherAsync();
-                var process = Process.Start(new ProcessStartInfo
+                switch (ConfigurationService.GameEdition)
                 {
-                    FileName = @"D:\Emulators\PS2\pcsx2.exe",
-                    WorkingDirectory = @"D:\Emulators\PS2",
-                    Arguments = @"D:\Emulators\PS2\\KH2FM.iso"
-                });
-                _pcsx2Injector.Run(process);
+                    case 0:
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = ConfigurationService.OpenKhGameEngineLocation,
+                            WorkingDirectory = Path.GetDirectoryName(ConfigurationService.OpenKhGameEngineLocation),
+                            Arguments = $"--data \"{ConfigurationService.GameDataLocation}\" --modpath \"{ConfigurationService.GameModPath}\""
+                        });
+                        break;
+                    case 1:
+                        _pcsx2Injector.Run(Process.Start(new ProcessStartInfo
+                        {
+                            FileName = ConfigurationService.Pcsx2Location,
+                            WorkingDirectory = Path.GetDirectoryName(ConfigurationService.Pcsx2Location),
+                            Arguments = ConfigurationService.IsoLocation
+                        }));
+                        break;
+                    case 2:
+                        break;
+                }
 
             }, _ => ModsList.Any(x => x.Enabled));
+            WizardCommand = new RelayCommand(_ =>
+            {
+                var dialog = new SetupWizardWindow()
+                {
+                    ConfigGameEdition = ConfigurationService.GameEdition,
+                    ConfigGameDataLocation = ConfigurationService.GameDataLocation,
+                    ConfigIsoLocation = ConfigurationService.IsoLocation,
+                    ConfigOpenKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation,
+                    ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
+                    ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation
+                };
+                if (dialog.ShowDialog() == true)
+                {
+                    ConfigurationService.GameEdition = dialog.ConfigGameEdition;
+                    ConfigurationService.GameDataLocation = dialog.ConfigGameDataLocation;
+                    ConfigurationService.IsoLocation = dialog.ConfigIsoLocation;
+                    ConfigurationService.OpenKhGameEngineLocation = dialog.ConfigOpenKhGameEngineLocation;
+                    ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
+                    ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
+                }
+            });
 
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
         }

@@ -1,0 +1,155 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.SetupWizardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="{Binding Title}" d:Title="OpenKH Mods Manager set-up"
+        Height="350" Width="400">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+    <xctk:Wizard
+        HelpButtonVisibility="Collapsed"
+        CancelButtonClosesWindow="True"
+        FinishButtonClosesWindow="True"
+        CurrentPage="{Binding ElementName=Page3}"
+        Finish="Wizard_Finish">
+        <xctk:WizardPage
+            x:Name="IntroPage" 
+            Title="Welcome to OpenKH Mods Manager"
+            PageType="Exterior"
+            Description="This set-up will guide you through the basic configuration of this tool, allowing you to install and play mods from the best modders in the Kingdom Hearts community.">
+        </xctk:WizardPage>
+        <xctk:WizardPage
+            x:Name="Page1"
+            PageType="Interior"
+            Title="Configure the game you want to mod"
+            Description="Do not worry, you can change this option later"
+            CanSelectNextPage="{Binding IsIsoSelected}"
+            NextPage="{Binding ElementName=Page2}"
+            PreviousPage="{Binding ElementName=IntroPage}">
+            <StackPanel>
+                <TextBlock>Supported games:</TextBlock>
+                <StackPanel Margin="10 3 0 10">
+                    <TextBlock>Kingdom Hearts II: Final Mix</TextBlock>
+                </StackPanel>
+                <TextBlock Margin="0 0 0 3">Please select the location of the ISO image</TextBlock>
+                <Grid Margin="0 0 0 3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding IsoLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}">
+                        <Image Source="{StaticResource FolderOpen_16x}"/>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </xctk:WizardPage>
+        <xctk:WizardPage
+            x:Name="Page2"
+            PageType="Interior"
+            Title="Game edition"
+            CanSelectNextPage="{Binding IsGameSelected}"
+            Description="Selected the preferred edition to launch the game"
+            NextPage="{Binding ElementName=Page3}"
+            PreviousPage="{Binding ElementName=Page1}">
+            <StackPanel>
+                <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
+                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
+                    <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
+                    <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
+                    <ComboBoxItem Visibility="Visible">PC release via Epic Game store</ComboBoxItem>
+                </ComboBox>
+                <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
+                    <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding OpenKhGameEngineLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectOpenKhGameEngineCommand}">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
+                    <TextBlock Margin="0 0 0 3">NOTE: The engine is work in progress and might show inaccuracy.</TextBlock>
+                </StackPanel>
+                <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
+                    <TextBlock Margin="0 0 0 3">Please select the location of PCSX2 emulator</TextBlock>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding Pcsx2Location, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcsx2Command}">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
+                    <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
+                </StackPanel>
+                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                    <TextBlock Margin="0 0 0 3">Please select the location of the PC release</TextBlock>
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding PcReleaseLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcReleaseCommand}">
+                            <Image Source="{StaticResource FolderOpen_16x}"/>
+                        </Button>
+                    </Grid>
+                    <TextBlock Margin="0 0 0 3">NOTE: Always be sure to use a supported version as updated might break the compatibility</TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </xctk:WizardPage>
+        <xctk:WizardPage
+            x:Name="Page3"
+            PageType="Interior"
+            Title="Set game data"
+            Description="It might be necessary to extract game's data"
+            CanSelectNextPage="{Binding IsGameDataFound}"
+            PreviousPage="{Binding ElementName=Page2}"
+            NextPage="{Binding ElementName=LastPage}">
+            <StackPanel>
+                <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
+                <Grid Margin="0 0 0 3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding GameDataLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectGameDataLocationCommand}">
+                        <Image Source="{StaticResource FolderOpen_16x}"/>
+                    </Button>
+                </Grid>
+                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                    It seems you do not have your Kingdom Hearts II copy extracted.
+                </TextBlock>
+                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                    You already have your Kingdom Hearts II copy extracted.
+                </TextBlock>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Press the button below to initialize the game extraction. It will take between 5 and 15 mintues based on the speed of your hard drive.
+                </TextBlock>
+                <Button Margin="0 0 0 6" Width="120" Height="22" HorizontalAlignment="Left" Command="{Binding ExtractGameDataCommand}">Extract game data</Button>
+                <ProgressBar Margin="0 0 0 6" Height="22" Visibility="{Binding ProgressBarVisibility}" IsIndeterminate="True"/>
+                <TextBlock Margin="0 0 0 3" Visibility="{Binding ExtractionCompleteVisibility}">
+                    The extraction of the game data succeded!
+                </TextBlock>
+            </StackPanel>
+        </xctk:WizardPage>
+        <xctk:WizardPage
+            x:Name="LastPage"
+            PageType="Exterior"
+            Title="You're set!"
+            Description="You successfully configured OpenKH Mods Manager. Have fun with all the amazing mods that the community has to offer!"
+            CanFinish="True"/>
+    </xctk:Wizard>
+</Window>

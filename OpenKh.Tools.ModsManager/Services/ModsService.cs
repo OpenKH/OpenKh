@@ -16,7 +16,7 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             get
             {
-                var modsPath = ConfigurationService.ModsPath;
+                var modsPath = ConfigurationService.ModCollectionPath;
                 var startPath = modsPath.Length;
                 var lastChar = modsPath[startPath - 1];
                 if (lastChar != '/' && lastChar != '\\')
@@ -100,10 +100,10 @@ namespace OpenKh.Tools.ModsManager.Services
         }
 
         public static string GetModPath(string author, string repo) =>
-            Path.Combine(ConfigurationService.ModsPath, author, repo);
+            Path.Combine(ConfigurationService.ModCollectionPath, author, repo);
 
         public static string GetModPath(string repositoryName) =>
-            Path.Combine(ConfigurationService.ModsPath, repositoryName);
+            Path.Combine(ConfigurationService.ModCollectionPath, repositoryName);
 
         public static IEnumerable<ModModel> GetMods(IEnumerable<string> repositoryNames)
         {
@@ -129,8 +129,8 @@ namespace OpenKh.Tools.ModsManager.Services
             {
                 var mod = modsList[i];
                 patcherProcessor.Patch(
-                    ConfigurationService.GameAssetPath,
-                    ConfigurationService.OutputModPath,
+                    ConfigurationService.GameDataLocation,
+                    ConfigurationService.GameModPath,
                     mod.Metadata,
                     mod.Path);
             }
