@@ -68,6 +68,15 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public ushort SpawnObject3 { get => Objentry.SpawnObject3; set => Objentry.SpawnObject3 = value; }
             public ushort SpawnObject4 { get => Objentry.SpawnObject4; set => Objentry.SpawnObject4 = value; }
 
+            public bool NoApdx { get => Objentry.NoApdx; set => Objentry.NoApdx = value; }
+            public bool Before { get => Objentry.Before; set => Objentry.Before = value; }
+            public bool FixColor { get => Objentry.FixColor; set => Objentry.FixColor = value; }
+            public bool Fly { get => Objentry.Fly; set => Objentry.Fly = value; }
+            public bool Scissoring { get => Objentry.Scissoring; set => Objentry.Scissoring = value; }
+            public bool IsPirate { get => Objentry.IsPirate; set => Objentry.IsPirate = value; }
+            public bool WallOcclusion { get => Objentry.WallOcclusion; set => Objentry.WallOcclusion = value; }
+            public bool Hift { get => Objentry.Hift; set => Objentry.Hift = value; }
+
             public override string ToString() => Name;
         }
 

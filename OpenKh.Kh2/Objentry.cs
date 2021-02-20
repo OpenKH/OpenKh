@@ -1,3 +1,4 @@
+using OpenKh.Common.Utils;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -130,6 +131,54 @@ namespace OpenKh.Kh2
         [Data] public ushort SpawnObject2 { get; set; }
         [Data] public ushort SpawnObject3 { get; set; }
         [Data] public ushort SpawnObject4 { get; set; }
+
+        public bool NoApdx
+        {
+            get => BitsUtil.Int.GetBit(Flags, 0);
+            set => Flags = (ushort)BitsUtil.Int.SetBit(Flags, 0, value);
+        }
+
+        public bool Before
+        {
+            get => BitsUtil.Int.GetBit(Flags, 1);
+            set => Flags = (ushort)BitsUtil.Int.SetBit(Flags, 1, value);
+        }
+
+        public bool FixColor
+        {
+            get => BitsUtil.Int.GetBit(Flags, 2);
+            set => Flags = (ushort)BitsUtil.Int.SetBit(Flags, 2, value);
+        }
+
+        public bool Fly
+        {
+            get => BitsUtil.Int.GetBit(Flags, 3);
+            set => Flags = (ushort)BitsUtil.Int.SetBit(Flags, 3, value);
+        }
+
+        public bool Scissoring
+        {
+            get => BitsUtil.Int.GetBit(Flags, 4);
+            set => Flags = (ushort)BitsUtil.Int.SetBit(Flags, 4, value);
+        }
+
+        public bool IsPirate
+        {
+            get => BitsUtil.Int.GetBit(Flags, 5);
+            set => Flags = (ushort)BitsUtil.Int.SetBit(Flags, 5, value);
+        }
+
+        public bool WallOcclusion
+        {
+            get => BitsUtil.Int.GetBit(Flags, 6);
+            set => Flags = (ushort)BitsUtil.Int.SetBit(Flags, 6, value);
+        }
+
+        public bool Hift
+        {
+            get => BitsUtil.Int.GetBit(Flags, 7);
+            set => Flags = (ushort)BitsUtil.Int.SetBit(Flags, 7, value);
+        }
 
         public static List<Objentry> Read(Stream stream) => BaseTable<Objentry>.Read(stream);
         public static void Write(Stream stream, IEnumerable<Objentry> entries) =>
