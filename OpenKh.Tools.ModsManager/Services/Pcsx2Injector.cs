@@ -21,49 +21,159 @@ namespace OpenKh.Tools.ModsManager.Services
             public uint[] NewPattern { get; set; }
         }
 
+        private static readonly uint[] LoadFilePatch = new uint[]
+        {
+            0x3c0e0010, // lui	   t6, 0x0010       store in 0x100000
+            0xadc4fff4, // sw	   a0, -0xC(t6)     const char* filename
+            0xadc5fff8, // sw	   a1, -0x8(t6)     void* memDst
+            0x240d0001, // addiu   t5, zero, 1      mode = LoadFile
+            0xadcdfffc, // sw      t5, -0x4(t6)     
+            0x8dcdfffc, // lw      t5, -0x4(t6)     loop until mode=0
+            0x15a0fffe, // bne     t5, zero, 0x1682cc
+            0x8dc2fff8, // lw      v0, -0x8(t6)     check return value
+            0x14400002, // bne     v0, zero, 0x1682e4
+            0x24030064, // addiu   v1,zero,0x64
+            0x0000000C, // syscall
+            0x00000000, // nop
+            0x03e00008, // jr      ra
+            0x00000000, // nop
+        };
+
+        private static readonly uint[] GetFileSizePatch = new uint[]
+        {
+            0x3c0e0010, // lui	   t6, 0x0010
+            0xadc4fff8, // sw	   a0, -0x8(t6) const char* filename
+            0x240d0002, // addiu   t5, zero, 2  mode = GetFileSize
+            0xadcdfffc, // sw      t5, -0x4(t6) int mode
+            0x8dcdfffc, // lw      t5, -0x4(t6)
+            0x15a0fffe, // bne     t5, zero, -8
+            0x00000000, // nop
+            0x8dc2fff8, // lw      v0, -0x8(t6)
+            0x03e00008, // jr      $ra
+            0x00000000, // nop
+        };
+        private const string KH2FM = "SLPM_666.75;1";
+        private const string KH2JP = "SLPM_662.33;1";
+        private const string KH2US = "SLUS_210.05;1";
+        private const string KH2UK = "SLES_541.14;1";
+        private const string KH2FR = "SLES_542.32;1";
+        private const string KH2DE = "";
+        private const string KH2IT = "SLES_542.34;1";
+        private const string KH2ES = "SLES_542.35;1";
+
         private static readonly Patch[] _patches = new Patch[]
         {
             new Patch
             {
-                Game = "SLPM_666.75;1",
+                Game = KH2JP,
                 Name = "LoadFile",
-                Address = 0x1682b8,
-                NewPattern = new uint[]
-                {
-                    0x3c0e0010, // lui	   t6, 0x0010       store in 0x100000
-                    0xadc4fff4, // sw	   a0, -0xC(t6)     const char* filename
-                    0xadc5fff8, // sw	   a1, -0x8(t6)     void* memDst
-                    0x240d0001, // addiu   t5, zero, 1      mode = LoadFile
-                    0xadcdfffc, // sw      t5, -0x4(t6)     
-                    0x8dcdfffc, // lw      t5, -0x4(t6)     loop until mode=0
-                    0x15a0fffe, // bne     t5, zero, 0x1682cc
-                    0x8dc2fff8, // lw      v0, -0x8(t6)     check return value
-                    0x14400002, // bne     v0, zero, 0x1682e4
-                    0x24030064, // addiu   v1,zero,0x64
-                    0x0000000C, // syscall
-                    0x00000000, // nop
-                    0x03e00008, // jr      ra
-                    0x00000000, // nop
-                },
+                Address = 0x167F20,
+                NewPattern = LoadFilePatch,
             },
             new Patch
             {
-                Game = "SLPM_666.75;1",
+                Game = KH2JP,
+                Name = "GetFileSize",
+                Address = 0x1AC698,
+                NewPattern = GetFileSizePatch,
+            },
+            new Patch
+            {
+                Game = KH2US,
+                Name = "LoadFile",
+                Address = 0x167C50,
+                NewPattern = LoadFilePatch,
+            },
+            new Patch
+            {
+                Game = KH2US,
+                Name = "GetFileSize",
+                Address = 0x1AC760,
+                NewPattern = GetFileSizePatch,
+            },
+            new Patch
+            {
+                Game = KH2UK,
+                Name = "LoadFile",
+                Address = 0x167CA8,
+                NewPattern = LoadFilePatch,
+            },
+            new Patch
+            {
+                Game = KH2UK,
+                Name = "GetFileSize",
+                Address = 0x1AC858,
+                NewPattern = GetFileSizePatch,
+            },
+            new Patch
+            {
+                Game = KH2FR,
+                Name = "LoadFile",
+                Address = 0x167CA8,
+                NewPattern = LoadFilePatch,
+            },
+            new Patch
+            {
+                Game = KH2FR,
+                Name = "GetFileSize",
+                Address = 0x1AC858,
+                NewPattern = GetFileSizePatch,
+            },
+            new Patch
+            {
+                Game = KH2DE,
+                Name = "LoadFile",
+                Address = 0x167CA8,
+                NewPattern = LoadFilePatch,
+            },
+            new Patch
+            {
+                Game = KH2DE,
+                Name = "GetFileSize",
+                Address = 0x1AC858,
+                NewPattern = GetFileSizePatch,
+            },
+            new Patch
+            {
+                Game = KH2IT,
+                Name = "LoadFile",
+                Address = 0x167CA8,
+                NewPattern = LoadFilePatch,
+            },
+            new Patch
+            {
+                Game = KH2IT,
+                Name = "GetFileSize",
+                Address = 0x1AC858,
+                NewPattern = GetFileSizePatch,
+            },
+            new Patch
+            {
+                Game = KH2ES,
+                Name = "LoadFile",
+                Address = 0x167CA8,
+                NewPattern = LoadFilePatch,
+            },
+            new Patch
+            {
+                Game = KH2ES,
+                Name = "GetFileSize",
+                Address = 0x1AC858,
+                NewPattern = GetFileSizePatch,
+            },
+            new Patch
+            {
+                Game = KH2FM,
+                Name = "LoadFile",
+                Address = 0x1682b8,
+                NewPattern = LoadFilePatch,
+            },
+            new Patch
+            {
+                Game = KH2FM,
                 Name = "GetFileSize",
                 Address = 0x1AE1B0,
-                NewPattern = new uint[]
-                {
-                    0x3c0e0010, // lui	   t6, 0x0010
-                    0xadc4fff8, // sw	   a0, -0x8(t6) const char* filename
-                    0x240d0002, // addiu   t5, zero, 2  mode = GetFileSize
-                    0xadcdfffc, // sw      t5, -0x4(t6) int mode
-                    0x8dcdfffc, // lw      t5, -0x4(t6)
-                    0x15a0fffe, // bne     t5, zero, -8
-                    0x00000000, // nop
-                    0x8dc2fff8, // lw      v0, -0x8(t6)
-                    0x03e00008, // jr      $ra
-                    0x00000000, // nop
-                },
+                NewPattern = GetFileSizePatch,
             },
         };
 
