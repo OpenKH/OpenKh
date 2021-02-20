@@ -17,6 +17,8 @@ This is an essential file to boot the game engine.
 * [EVTP](#evtp) - ???
 * [IPIC](#ipic) - ???
 
+---
+
 ## Rcct
 
 Unknown table.
@@ -45,6 +47,8 @@ Unknown table.
 | 6 	 | short | Unk6
 | 8 	 | short | Unk8
 | 10 	 | short | Unk10 (Padding?)
+
+---
 
 ## Cmd
 
@@ -156,6 +160,8 @@ Commands table.
 | 1 | Idle
 | 2 | Jump
 
+---
+
 ## Went
 
 Weapon entity table.
@@ -213,6 +219,8 @@ The Id within a "Went set" is the weapon's subId on the [item table](#item).
 <li>Goofy WI</li>
 </ul>
 
+---
+
 ## Wmst
 
 Weapon moveset list.
@@ -228,6 +236,8 @@ Weapon moveset list.
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | char[32] | Weapon moveset filename
+
+---
 
 ## Arif
 
@@ -284,7 +294,9 @@ Each Block corresponds to a world.
 | 0      | ushort | Music 1
 | 2      | ushort | Music 2
 
-## ITEM
+---
+
+## Item
 
 Describe an item, that could be anything from a consumable, to a weapon or materials.
 
@@ -416,7 +428,9 @@ Every table has the following header
 | 14     | uint8  | General resistance |
 | 15     | uint8  | Unknown |
 
-## TRSR
+---
+
+## Trsr
 
 The treasure table describes what item cam be retrieved from a specific chest or event to a given map.
 
@@ -456,7 +470,9 @@ World ID and room index combined, gives the name of the map. (eg. for world ID =
 | 0    | Chest
 | 1    | Event
 
-## MEMT
+---
+
+## Memt
 
 Also known as Member Table, defines which [object](../../obj.md) to load in certain situations.
 
@@ -466,14 +482,14 @@ The first [entry](#memt-entry) is the default one as it globally defined which p
 
 Whenever a value of `0` in this structure is found, it is ignored. Story flags will always give a positive result, while pawns will fall back to the ones defined in the default entry.
 
-### MEMT Header
+### Memt Header
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0      | uint | File version (5)
 | 4      | uint | Entry Count
 
-### MEMT entry
+### Memt entry
 
 Note that on the Vanilla version of the game, this structure is `48` bytes long and not `52`, as Limit and Limti High poly are not existent. The file version remains `5`
 
@@ -504,7 +520,7 @@ Note that on the Vanilla version of the game, this structure is `48` bytes long 
 | 48     | ushort  | Player (Final High poly)
 | 50     | ushort  | Player (Sora High poly)
 
-### MEMT party
+### Memt party
 
 This table, found straight after [the entries](#memt-entry), is used to decide which party members are used in a given portion of the game. How this table is accessed is unknown, but not all the maps uses it. The index is the one for [the entries](#memt-entry) object array, so an index of `0` will check what's in the offset `16` and an index of `3` will check what's in the offset `22`. When the value is equal to `12` (or `10` for Vanilla), the game will not make that specific pawn available in the party. This table seems to be the one responsible to assign or remove specific party members.
 
@@ -515,13 +531,17 @@ This table, found straight after [the entries](#memt-entry), is used to decide w
 | 2      | byte | Member index for friend 2
 | 3      | byte | Member index for friend world
 
-## FTST
+---
+
+## Ftst
 
 This is a table that contains the font palette for each world.
 
 The FTST is a binary file that contains N amount of palettes (9 for FM version), where every palette contain an unique ID (or key) and exactly 19 different colors.
 
 Each color correspond to the [world index](../../worlds.md) and it is loaded based on the current world.
+
+---
 
 ## Shop
 
@@ -584,6 +604,8 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 |--------|---------------|-------------|
 | 0 	 | uint | Item Id - [Item LIST](../../dictionary/inventory.md)
 
+---
+
 ## Sklt
 
 Defines which bones the characters' weapons are attached to.
@@ -610,11 +632,15 @@ Defines which bones the characters' weapons are attached to.
 | 4 	 | ushort | Bone number 1 (Primary weapon)
 | 6 	 | ushort | Bone number 2 (Secondary weapon)
 
+---
+
 ## Pref
 
 Defines preferences.
 
 Documented in [preferences.md](./preferences.md).
+
+---
 
 ## Evtp
 
@@ -642,6 +668,8 @@ Unknown.
 | 1 	 | short | Unk2
 | 3 	 | byte[3] | Padding?
 | 6 	 | short | Unk6
+
+---
 
 ## Ipic
 
