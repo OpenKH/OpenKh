@@ -1,4 +1,5 @@
-﻿using OpenKh.Engine.Renders;
+using OpenKh.Engine.Input;
+using OpenKh.Engine.Renders;
 using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.States.Title
@@ -19,7 +20,7 @@ namespace OpenKh.Game.States.Title
     interface ITitleMainMenu
     {
         Kernel Kernel { get; }
-        InputManager InputManager { get; }
+        IInput Input { get; }
         IMessageRenderer MessageRenderer { get; }
         MainMenuState State { set; }
 

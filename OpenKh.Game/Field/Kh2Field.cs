@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using n = System.Numerics;
+using OpenKh.Engine.Input;
 
 namespace OpenKh.Game.Field
 {
@@ -25,7 +26,7 @@ namespace OpenKh.Game.Field
         private readonly TargetCamera _targetCamera;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly KingdomShader _shader;
-        private readonly InputManager _inputManager;
+        private readonly IInput _input;
         private readonly Kh2MessageRenderer _messageRenderer;
         private readonly DrawContext _messageDrawContext;
         private readonly Kh2MessageProvider _eventMessageProvider;
@@ -57,14 +58,14 @@ namespace OpenKh.Game.Field
             Dictionary<string, string> settings,
             GraphicsDevice graphicsDevice,
             KingdomShader shader,
-            InputManager inputManager)
+            IInput input)
         {
             _kernel = kernel;
             _camera = camera;
             _targetCamera = new TargetCamera(_camera);
             _graphicsDevice = graphicsDevice;
             _shader = shader;
-            _inputManager = inputManager;
+            _input = input;
 
             var viewport = graphicsDevice.Viewport;
             _drawing = new MonoSpriteDrawing(graphicsDevice, _shader);
@@ -195,8 +196,8 @@ namespace OpenKh.Game.Field
         {
             var isPlayingEvent = _eventPlayer != null && _isEventPause == false;
             _camera.IsEventMode = isPlayingEvent;
-            _isEventPause = _inputManager.RightTrigger;
-            _isFreeCam = _inputManager.LeftTrigger;
+            _isEventPause = _input.Pressed.R2;
+            _isFreeCam = _input.Pressed.L2;
 
             if (isPlayingEvent)
             {
@@ -214,7 +215,7 @@ namespace OpenKh.Game.Field
                 if (!isPlayingEvent && !_kernel.DebugMode && entity.IsPlayer)
                 {
                     playerEntity = entity;
-                    PlayerManager.ProcessPlayer(_inputManager, entity, _targetCamera.YRotation, deltaTime);
+                    PlayerManager.ProcessPlayer(_input, entity, _targetCamera.YRotation, deltaTime);
                 }
 
                 entity.Update((float)deltaTime);
@@ -228,14 +229,8 @@ namespace OpenKh.Game.Field
                 var analogY = 0f;
                 var radius = 0f;
                 var yRotation = 0f;
-                if (_inputManager.Left)
-                    analogY = +1f;
-                if (_inputManager.Right)
-                    analogY = -1f;
-                if (_inputManager.Up)
-                    radius -= (float)(RadiusSpeed * deltaTime);
-                if (_inputManager.Down)
-                    radius += (float)(RadiusSpeed * deltaTime);
+                analogY = -_input.AxisRight.X;
+                radius -= (float)(_input.AxisRight.Y * RadiusSpeed * deltaTime);
 
                 yRotation -= (float)(YSpeed * analogY * deltaTime);
 

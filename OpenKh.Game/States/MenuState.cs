@@ -8,6 +8,7 @@ using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.Linq;
 using OpenKh.Game.Debugging;
+using OpenKh.Engine.Input;
 
 namespace OpenKh.Game.States
 {
@@ -32,7 +33,7 @@ namespace OpenKh.Game.States
 
         public IGameContext GameContext { get; }
         public AnimatedSequenceFactory SequenceFactory { get; private set; }
-        public InputManager InputManager { get; private set; }
+        public IInput Input { get; private set; }
         public bool IsMenuOpen { get; private set; }
 
         public MenuState(IGameContext gameContext)
@@ -45,7 +46,7 @@ namespace OpenKh.Game.States
             _kernel = initDesc.Kernel;
             _content = initDesc.DataContent;
             _archiveManager = initDesc.ArchiveManager;
-            InputManager = initDesc.InputManager;
+            Input = initDesc.Input;
 
             var viewport = initDesc.GraphicsDevice.GraphicsDevice.Viewport;
             _shader = new KingdomShader(initDesc.ContentManager);
@@ -227,7 +228,7 @@ namespace OpenKh.Game.States
         {
             var deltaTime = deltaTimes.DeltaTime;
 
-            ProcessInput(InputManager);
+            ProcessInput(Input);
 
             _layoutRenderer.FrameIndex++;
             _backgroundSeq.Update(deltaTime);
@@ -266,9 +267,9 @@ namespace OpenKh.Game.States
             _drawing.Flush();
         }
 
-        private void ProcessInput(InputManager inputManager)
+        private void ProcessInput(IInput input)
         {
-            if (inputManager.IsStart)
+            if (input.Triggered.SpecialRight)
                 CloseAllMenu();
         }
 
