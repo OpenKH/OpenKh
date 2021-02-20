@@ -6,6 +6,13 @@ namespace OpenKh.Game.DataContent
 {
     public class ModDataContent : IDataContent
     {
+        private readonly string _modPath;
+
+        public ModDataContent(string modPath)
+        {
+            _modPath = modPath;
+        }
+
         public bool FileExists(string fileName) => File.Exists(GetPath(fileName));
 
         public Stream FileOpen(string path)
@@ -20,6 +27,6 @@ namespace OpenKh.Game.DataContent
             return null;
         }
 
-        private string GetPath(string path) => Path.Combine(Config.ModPath, path);
+        private string GetPath(string path) => Path.Combine(_modPath, path);
     }
 }
