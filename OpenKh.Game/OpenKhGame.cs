@@ -15,6 +15,7 @@ namespace OpenKh.Game
     public class OpenKhGameStartup
     {
         public string ContentPath { get; internal set; }
+        public string ModPath { get; internal set; }
         public int InitialState { get; internal set; }
         public int InitialMap { get; internal set; }
         public int? InitialPlace { get; internal set; }
@@ -85,9 +86,10 @@ namespace OpenKh.Game
             TryAddSetting("SpawnScriptEvt", startup.InitialSpawnScriptEvt);
 
             var contentPath = startup.ContentPath ?? Config.DataPath;
+            var modPathPath = startup.ModPath ?? Config.ModPath;
 
             _dataContent = CreateDataContent(contentPath, Config.IdxFilePath, Config.ImgFilePath);
-            _dataContent = new MultipleDataContent(new ModDataContent(), _dataContent);
+            _dataContent = new MultipleDataContent(new ModDataContent(modPathPath), _dataContent);
             if (Kernel.IsReMixFileHasHdAssetHeader(_dataContent, "fm"))
             {
                 Log.Info("ReMIX files with HD asset header detected");
