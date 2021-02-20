@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="OpenKh.Tools.BbsEventTableEditor.Views.EventsView"
+<UserControl x:Class="OpenKh.Tools.BbsEventTableEditor.Views.EventsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -49,10 +49,18 @@
                     />
 
                 <TextBlock Text="Room" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Room, UpdateSourceTrigger=PropertyChanged}"/>
+                <ComboBox
+                    ItemsSource="{Binding Rooms}"
+                    SelectedValue="{Binding Room}"
+                    SelectedValuePath="Key"
+                    DisplayMemberPath="Value"
+                    />
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown06, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Event Ptn" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding EventPtn, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Opt" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Opt, UpdateSourceTrigger=PropertyChanged}"/>
             </controls:TwoColumnsPanel>
 
             <Separator Margin="0 5 0 5"/>

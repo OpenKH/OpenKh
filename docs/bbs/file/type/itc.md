@@ -1,6 +1,6 @@
 # ITC Format
 
-ITC stands for *ITem Collection* and it seems to contain the list of items obtained through events.
+ITC stands for *ITem Collection* and it seems to contain the list of items obtained through collectibles. In this case, just the crowns for stickers.
 
 Located in the `ITEM` folder.
 
