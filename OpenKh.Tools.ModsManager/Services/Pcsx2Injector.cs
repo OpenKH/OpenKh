@@ -12,6 +12,19 @@ namespace OpenKh.Tools.ModsManager.Services
 {
     public class Pcsx2Injector
     {
+        private class Offsets
+        {
+            public string GameName { get; set; }
+            public int LoadFile { get; set; }
+            public int GetFileSize { get; set; }
+            public int RegionInit { get; set; }
+            public int BufferPointer { get; set; }
+            public int RegionForce { get; set; }
+            public int RegionId { get; set; }
+            public int RegionPtr { get; set; }
+            public int LanguagePtr { get; set; }
+        }
+
         private class Patch
         {
             public string Game { get; set; }
@@ -20,6 +33,8 @@ namespace OpenKh.Tools.ModsManager.Services
             public uint[] Pattern { get; set; }
             public uint[] NewPattern { get; set; }
         }
+
+        private const string KH2FM = "SLPM_666.75;1";
 
         private static readonly uint[] LoadFilePatch = new uint[]
         {
@@ -52,128 +67,117 @@ namespace OpenKh.Tools.ModsManager.Services
             0x03e00008, // jr      $ra
             0x00000000, // nop
         };
-        private const string KH2FM = "SLPM_666.75;1";
-        private const string KH2JP = "SLPM_662.33;1";
-        private const string KH2US = "SLUS_210.05;1";
-        private const string KH2UK = "SLES_541.14;1";
-        private const string KH2FR = "SLES_542.32;1";
-        private const string KH2DE = "";
-        private const string KH2IT = "SLES_542.34;1";
-        private const string KH2ES = "SLES_542.35;1";
 
-        private static readonly Patch[] _patches = new Patch[]
+        private static readonly uint[] RegionInitPatch = new uint[]
         {
-            new Patch
+            0x03e00008, // jr      $ra
+            0x00000000, // nop
+        };
+
+        private static readonly string[] MemoryCardPatch = new string[]
+        {
+            "SLPM", "666", "75",
+            "SLPM", "666", "75",
+            "SLPM", "666", "75", "666", "75", "75", "75",
+        };
+
+        private static readonly Offsets[] _offsets = new Offsets[]
+        {
+            new Offsets
             {
-                Game = KH2JP,
-                Name = "LoadFile",
-                Address = 0x167F20,
-                NewPattern = LoadFilePatch,
+                GameName = "SLPM_662.33;1",
+                LoadFile = 0x167F20,
+                GetFileSize = 0x1AC698,
+                RegionInit = 0x105CA0,
+                BufferPointer = 0x35E680,
+                RegionForce = 0x37FCC8,
+                RegionId = 0x349514,
+                RegionPtr = 0x349510,
+                LanguagePtr = 0x349510, // same as Region
             },
-            new Patch
+            new Offsets
             {
-                Game = KH2JP,
-                Name = "GetFileSize",
-                Address = 0x1AC698,
-                NewPattern = GetFileSizePatch,
+                GameName = "SLUS_210.05;1",
+                LoadFile = 0x167C50,
+                GetFileSize = 0x1AC760,
+                RegionInit = 0x105CB0,
+                BufferPointer = 0x35EE98,
+                RegionForce = 0x3806D8,
+                RegionId = 0x349D44,
+                RegionPtr = 0x349D40,
+                LanguagePtr = 0x349D40, // same as Region
             },
-            new Patch
+            new Offsets
             {
-                Game = KH2US,
-                Name = "LoadFile",
-                Address = 0x167C50,
-                NewPattern = LoadFilePatch,
+                GameName = "SLES_541.14;1",
+                LoadFile = 0x167CA8,
+                GetFileSize = 0x1AC858,
+                RegionInit = 0x105CB0,
+                BufferPointer = 0x35F3A8,
+                RegionForce = 0x378378,
+                RegionId = 0x34A24C,
+                RegionPtr = 0x34A240,
+                LanguagePtr = 0x34A244,
             },
-            new Patch
+            new Offsets
             {
-                Game = KH2US,
-                Name = "GetFileSize",
-                Address = 0x1AC760,
-                NewPattern = GetFileSizePatch,
+                GameName = "SLES_542.32;1",
+                LoadFile = 0x167CA8,
+                GetFileSize = 0x1AC858,
+                RegionInit = 0x105CB0,
+                BufferPointer = 0x35F3A8,
+                RegionForce = 0x378378,
+                RegionId = 0x34A24C,
+                RegionPtr = 0x34A240,
+                LanguagePtr = 0x34A244,
             },
-            new Patch
+            new Offsets
             {
-                Game = KH2UK,
-                Name = "LoadFile",
-                Address = 0x167CA8,
-                NewPattern = LoadFilePatch,
+                GameName = "SLES_542.33;1",
+                LoadFile = 0x167CA8,
+                GetFileSize = 0x1AC858,
+                RegionInit = 0x105CB0,
+                BufferPointer = 0x35F3A8,
+                RegionForce = 0x378378,
+                RegionId = 0x34A24C,
+                RegionPtr = 0x34A240,
+                LanguagePtr = 0x34A244,
             },
-            new Patch
+            new Offsets
             {
-                Game = KH2UK,
-                Name = "GetFileSize",
-                Address = 0x1AC858,
-                NewPattern = GetFileSizePatch,
+                GameName = "SLES_542.34;1",
+                LoadFile = 0x167CA8,
+                GetFileSize = 0x1AC858,
+                RegionInit = 0x105CB0,
+                BufferPointer = 0x35F3A8,
+                RegionForce = 0x378378,
+                RegionId = 0x34A24C,
+                RegionPtr = 0x34A240,
+                LanguagePtr = 0x34A244,
             },
-            new Patch
+            new Offsets
             {
-                Game = KH2FR,
-                Name = "LoadFile",
-                Address = 0x167CA8,
-                NewPattern = LoadFilePatch,
+                GameName = "SLES_542.35;1",
+                LoadFile = 0x167CA8,
+                GetFileSize = 0x1AC858,
+                RegionInit = 0x105CB0,
+                BufferPointer = 0x35F3A8,
+                RegionForce = 0x378378,
+                RegionId = 0x34A24C,
+                RegionPtr = 0x34A240,
+                LanguagePtr = 0x34A244,
             },
-            new Patch
+            new Offsets
             {
-                Game = KH2FR,
-                Name = "GetFileSize",
-                Address = 0x1AC858,
-                NewPattern = GetFileSizePatch,
-            },
-            new Patch
-            {
-                Game = KH2DE,
-                Name = "LoadFile",
-                Address = 0x167CA8,
-                NewPattern = LoadFilePatch,
-            },
-            new Patch
-            {
-                Game = KH2DE,
-                Name = "GetFileSize",
-                Address = 0x1AC858,
-                NewPattern = GetFileSizePatch,
-            },
-            new Patch
-            {
-                Game = KH2IT,
-                Name = "LoadFile",
-                Address = 0x167CA8,
-                NewPattern = LoadFilePatch,
-            },
-            new Patch
-            {
-                Game = KH2IT,
-                Name = "GetFileSize",
-                Address = 0x1AC858,
-                NewPattern = GetFileSizePatch,
-            },
-            new Patch
-            {
-                Game = KH2ES,
-                Name = "LoadFile",
-                Address = 0x167CA8,
-                NewPattern = LoadFilePatch,
-            },
-            new Patch
-            {
-                Game = KH2ES,
-                Name = "GetFileSize",
-                Address = 0x1AC858,
-                NewPattern = GetFileSizePatch,
-            },
-            new Patch
-            {
-                Game = KH2FM,
-                Name = "LoadFile",
-                Address = 0x1682b8,
-                NewPattern = LoadFilePatch,
-            },
-            new Patch
-            {
-                Game = KH2FM,
-                Name = "GetFileSize",
-                Address = 0x1AE1B0,
-                NewPattern = GetFileSizePatch,
+                GameName = KH2FM,
+                LoadFile = 0x1682b8,
+                GetFileSize = 0x1AE1B0,
+                RegionInit = 0x105AF8,
+                BufferPointer = 0x350E88,
+                RegionForce = 0x369E98,
+                RegionId = 0x33CAFC,
+                RegionPtr = 0x33CAF0,
+                LanguagePtr = 0x33CAF4,
             },
         };
 
@@ -187,6 +191,10 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             _operationDispatcher = operationDispatcher;
         }
+
+        public int RegionId { get; set; }
+        public string Region { get; set; }
+        public string Language { get; set; }
 
         public void Run(Process process)
         {
@@ -270,16 +278,50 @@ namespace OpenKh.Tools.ModsManager.Services
         private void WritePatch(Stream stream, string game)
         {
             var bufferedStream = new BufferedStream(stream);
-            foreach (var patch in _patches.Where(x => x.Game == game))
-                WritePatch(bufferedStream, patch);
-            bufferedStream.Flush();
+            var offsets = _offsets.FirstOrDefault(x => x.GameName == game);
+            if (offsets != null)
+            {
+                WritePatch(bufferedStream, offsets.LoadFile, LoadFilePatch);
+                WritePatch(bufferedStream, offsets.GetFileSize, GetFileSizePatch);
+                if (RegionId >= 0)
+                {
+                    WritePatch(bufferedStream, offsets.RegionInit, RegionInitPatch);
+                    WritePatch(bufferedStream, offsets.RegionForce, Region);
+                    WritePatch(bufferedStream, offsets.RegionForce + 8, Language);
+                    WritePatch(bufferedStream, offsets.RegionId, RegionId);
+                    WritePatch(bufferedStream, offsets.RegionPtr, offsets.RegionForce);
+                    WritePatch(bufferedStream, offsets.LanguagePtr, offsets.RegionForce + 8);
+                }
+
+                bufferedStream.Flush();
+            }
         }
 
-        private void WritePatch(Stream stream, Patch patch)
+        private void WritePatch(Stream stream, long offset, uint[] patch)
         {
-            stream.SetPosition(patch.Address);
-            foreach (var word in patch.NewPattern)
+            if (offset == 0)
+                return;
+
+            stream.SetPosition(offset);
+            foreach (var word in patch)
                 stream.Write(word);
+        }
+
+        private void WritePatch(Stream stream, long offset, int patch)
+        {
+            if (offset == 0)
+                return;
+            stream.SetPosition(offset).Write(patch);
+        }
+
+        private void WritePatch(Stream stream, long offset, string patch)
+        {
+            if (offset == 0)
+                return;
+
+            stream.SetPosition(offset);
+            foreach (var ch in patch)
+                stream.Write((byte)ch);
         }
 
         private static string ReadString(Stream stream, int ptr)
