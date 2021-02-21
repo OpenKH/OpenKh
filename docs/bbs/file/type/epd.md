@@ -2,6 +2,8 @@
 
 EPD stands for Entity Parameter Data and contains all the stats related to the character stats.
 
+These files are contained within the `.arc` files of character beginning with `e` or `b`, for example, `b01ex00.arc` has a file named `b01ex00.epd` which contains its stats.
+
 The format consists on the following structures in order:  
 [Header](#Header)  
 [General Parameters](#General-Parameters)  

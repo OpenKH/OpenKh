@@ -18,6 +18,7 @@ The player's main camera is usually `000`.
 The next data chunk is repeated twice. Normal and Extended.
 
 ### PCAM Kind
+
 | Value | Name  | Description
 |--------|-------|------------
 | 0     | PCAM_KIND_NONE   | 
@@ -40,6 +41,7 @@ The next data chunk is repeated twice. Normal and Extended.
 | 0x20     | Vector4f   | Aim
 
 ### PCAM Type
+
 | Value | Name  | Description
 |--------|-------|------------
 | 0     | PCAM_TYPE_NONE   | 

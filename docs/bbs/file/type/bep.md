@@ -1,7 +1,7 @@
 # BEP Format
 
 BEP stands for *Base Enemy Parameter* and it controls the general status for the character amongst other things.
-It is only used for one file named `EnemyCommon.bep`.
+It is only used for one file named `EnemyCommon.bep` within `arc/system/commongame.arc`
 
 ## Header
 

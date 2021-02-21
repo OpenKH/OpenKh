@@ -4,6 +4,8 @@ ITE simply stands for *ITEM* and it contains the list of items in the game.
 
 ITB and ITC formats use the item IDs from this list.
 
+This file can be found in the `item` folder or inside `arc/system/commongame.arc`.
+
 ## Header
 
 | Offset | Type  | Description
