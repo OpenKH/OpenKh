@@ -4,19 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        xmlns:converters="clr-namespace:OpenKh.Tools.ModsManager.Converters"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="{Binding Title}" d:Title="OpenKH Mods Manager set-up"
-        Height="350" Width="400">
+        Height="370" Width="400">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:RadioBoolToIntConverter x:Key="radioBoolToIntConverter" />
+        <Thickness x:Key="RegionMargins" Left="0" Top="0" Right="0" Bottom="2" />
     </Window.Resources>
     <xctk:Wizard
         HelpButtonVisibility="Collapsed"
         CancelButtonClosesWindow="True"
         FinishButtonClosesWindow="True"
-        CurrentPage="{Binding ElementName=Page3}"
+        CurrentPage="{Binding ElementName=IntroPage}"
         Finish="Wizard_Finish">
         <xctk:WizardPage
             x:Name="IntroPage" 
@@ -25,12 +28,12 @@
             Description="This set-up will guide you through the basic configuration of this tool, allowing you to install and play mods from the best modders in the Kingdom Hearts community.">
         </xctk:WizardPage>
         <xctk:WizardPage
-            x:Name="Page1"
+            x:Name="PageIsoSelection"
             PageType="Interior"
             Title="Configure the game you want to mod"
             Description="Do not worry, you can change this option later"
             CanSelectNextPage="{Binding IsIsoSelected}"
-            NextPage="{Binding ElementName=Page2}"
+            NextPage="{Binding ElementName=PageGameEdition}"
             PreviousPage="{Binding ElementName=IntroPage}">
             <StackPanel>
                 <TextBlock>Supported games:</TextBlock>
@@ -51,13 +54,13 @@
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
-            x:Name="Page2"
+            x:Name="PageGameEdition"
             PageType="Interior"
             Title="Game edition"
             CanSelectNextPage="{Binding IsGameSelected}"
             Description="Selected the preferred edition to launch the game"
-            NextPage="{Binding ElementName=Page3}"
-            PreviousPage="{Binding ElementName=Page1}">
+            NextPage="{Binding ElementName=PageGameData}"
+            PreviousPage="{Binding ElementName=PageIsoSelection}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
                 <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
@@ -110,13 +113,13 @@
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
-            x:Name="Page3"
+            x:Name="PageGameData"
             PageType="Interior"
             Title="Set game data"
             Description="It might be necessary to extract game's data"
             CanSelectNextPage="{Binding IsGameDataFound}"
-            PreviousPage="{Binding ElementName=Page2}"
-            NextPage="{Binding ElementName=LastPage}">
+            PreviousPage="{Binding ElementName=PageGameEdition}"
+            NextPage="{Binding ElementName=PageRegion}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
                 <Grid Margin="0 0 0 3">
@@ -143,6 +146,33 @@
                 <TextBlock Margin="0 0 0 3" Visibility="{Binding ExtractionCompleteVisibility}">
                     The extraction of the game data succeded!
                 </TextBlock>
+            </StackPanel>
+        </xctk:WizardPage>
+        <xctk:WizardPage
+            x:Name="PageRegion"
+            PageType="Interior"
+            Title="Set your preferred region"
+            Description="This will instruct the game to force to load specific languages"
+            CanSelectNextPage="{Binding IsGameDataFound}"
+            PreviousPage="{Binding ElementName=PageGameData}"
+            NextPage="{Binding ElementName=LastPage}">
+            <StackPanel>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Do not worry if your game's data does not contain all the files for that language because the Mods Manager have a fallback mechanic for you.
+                </TextBlock>
+                <GroupBox Header="Region">
+                    <StackPanel Margin="6">
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=0}" Content="Use game's default"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=1}" Content="Japanese (JP/JP)"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=2}" Content="English (US/US)"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=3}" Content="English (UK/US)"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=4}" Content="Italian (IT/IT)"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=5}" Content="Spanish (SP/SP)"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=6}" Content="German (GR/GR)"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=7}" Content="French (FR/FR)"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=8}" Content="Final Mix (FM/JP)"/>
+                    </StackPanel>
+                </GroupBox>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage

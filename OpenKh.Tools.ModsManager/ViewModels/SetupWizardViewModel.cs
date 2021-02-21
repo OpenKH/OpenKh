@@ -103,6 +103,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility ProgressBarVisibility { get; set; }
         public Visibility ExtractionCompleteVisibility { get; set; }
 
+        public int RegionId { get; set; }
+
         public SetupWizardViewModel()
         {
             ProgressBarVisibility = Visibility.Collapsed;
