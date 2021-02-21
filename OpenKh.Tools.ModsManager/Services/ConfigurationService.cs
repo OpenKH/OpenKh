@@ -59,7 +59,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static ICollection<string> EnabledMods
         {
-            get => File.ReadAllLines(EnabledModsPath);
+            get => File.Exists(EnabledModsPath) ? File.ReadAllLines(EnabledModsPath) : new string[0];
             set => File.WriteAllLines(EnabledModsPath, value);
         }
 
