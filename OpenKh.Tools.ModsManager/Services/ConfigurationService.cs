@@ -29,6 +29,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public string OpenKhGameEngineLocation { get; internal set; }
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
+            public int RegionId { get; internal set; }
 
             public void Save(string fileName)
             {
@@ -138,6 +139,16 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.PcReleaseLocation = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static int RegionId
+        {
+            get => _config.RegionId;
+            set
+            {
+                _config.RegionId = value;
                 _config.Save(ConfigPath);
             }
         }

@@ -131,6 +131,20 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         });
                         break;
                     case 1:
+                        if (ConfigurationService.RegionId > 0)
+                        {
+                            _pcsx2Injector.RegionId = ConfigurationService.RegionId - 1;
+                            _pcsx2Injector.Region = Kh2.Constants.Regions[_pcsx2Injector.RegionId];
+                            _pcsx2Injector.Language = _pcsx2Injector.Region switch
+                            {
+                                "uk" => "us",
+                                "fm" => "jp",
+                                _ => _pcsx2Injector.Region,
+                            };
+                        }
+                        else
+                            _pcsx2Injector.RegionId = -1;
+
                         _pcsx2Injector.Run(Process.Start(new ProcessStartInfo
                         {
                             FileName = ConfigurationService.Pcsx2Location,
@@ -152,7 +166,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigIsoLocation = ConfigurationService.IsoLocation,
                     ConfigOpenKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation,
                     ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
-                    ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation
+                    ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
+                    ConfigRegionId = ConfigurationService.RegionId,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -162,6 +177,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.OpenKhGameEngineLocation = dialog.ConfigOpenKhGameEngineLocation;
                     ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
+                    ConfigurationService.RegionId = dialog.ConfigRegionId;
                 }
             });
 

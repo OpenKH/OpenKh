@@ -22,6 +22,7 @@ namespace OpenKh.Tools.ModsManager.Views
         public string ConfigPcsx2Location { get => _vm.Pcsx2Location; set => _vm.Pcsx2Location = value; }
         public string ConfigPcReleaseLocation { get => _vm.PcReleaseLocation; set => _vm.PcReleaseLocation = value; }
         public string ConfigGameDataLocation { get => _vm.GameDataLocation; set => _vm.GameDataLocation = value; }
+        public int ConfigRegionId { get => _vm.RegionId; set => _vm.RegionId = value; }
 
         private void Wizard_Finish(object sender, Xceed.Wpf.Toolkit.Core.CancelRoutedEventArgs e)
         {

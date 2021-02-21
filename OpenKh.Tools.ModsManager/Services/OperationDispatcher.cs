@@ -12,10 +12,6 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public bool LoadFile(Stream outStream, string fileName)
         {
-            //fileName = fileName.Replace("menu/it/title", "menu/fm/title");
-            //fileName = fileName.Replace("menu/it/pause", "menu/fm/pause");
-            fileName = fileName.Replace("menu/it/save", "menu/fm/save");
-
             if (LoadFileInternal(outStream, fileName))
                 return true;
 
