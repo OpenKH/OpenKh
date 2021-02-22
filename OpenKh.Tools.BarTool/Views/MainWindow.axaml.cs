@@ -1,3 +1,6 @@
+using System.IO;
+using System.Linq;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -6,8 +9,7 @@ using Avalonia.Markup.Xaml;
 using OpenKh.Kh2;
 using OpenKh.Tools.BarTool.Models;
 using OpenKh.Tools.BarTool.ViewModels;
-using System.IO;
-using System.Linq;
+
 
 namespace OpenKh.Tools.BarTool.Views
 {
@@ -39,21 +41,7 @@ namespace OpenKh.Tools.BarTool.Views
                 var _viewModel = DataContext as MainWindowViewModel;
 
                 if (_viewModel != null)
-                {
-                    using (FileStream _stream = new FileStream(_fileList.ElementAt(0), FileMode.Open))
-                    {
-                        CurrentFile = Bar.Read(_stream);
-
-                        foreach (var _item in CurrentFile)
-                        {
-                            var _barItem = new EntryModel(_item);
-                            _viewModel.Items.Add(_barItem);
-                        }
-
-                        _viewModel.FileName = Path.GetFileName(_fileList.ElementAt(0));
-                        _viewModel.Title = string.Format("{0} | BAR - OpenKH", _viewModel.FileName);
-                    }
-                }
+                    _viewModel.OpenDrop(_fileList.ElementAt(0));
             }
         }
 

@@ -9,17 +9,21 @@ using OpenKh.Kh2;
 using OpenKh.Tools.BarTool.Views;
 using OpenKh.Tools.BarTool.Models;
 using OpenKh.Tools.BarTool.Dialogs;
+using OpenKh.Tools.BarTool.Interfaces;
 
 using ReactiveUI;
 using Avalonia.Controls;
 
 namespace OpenKh.Tools.BarTool.ViewModels
 {
-    public class MainWindowViewModel : ReactiveObject
+    public class MainWindowViewModel : ReactiveObject, IViewSettings
     {
         MainWindow Instance;
+
         string _title;
         string _fileName;
+        bool _slotBool;
+        bool _msetBool;
 
         public ObservableCollection<EntryModel> Items { get; private set; }
 
@@ -32,9 +36,9 @@ namespace OpenKh.Tools.BarTool.ViewModels
             set => this.RaiseAndSetIfChanged(ref _fileName, value, nameof(FileName));
         }
 
-        public string Title 
-        { 
-            get => _title; 
+        public string Title
+        {
+            get => _title;
             set => this.RaiseAndSetIfChanged(ref _title, value, nameof(Title));
         }
 
@@ -50,6 +54,30 @@ namespace OpenKh.Tools.BarTool.ViewModels
         public IReactiveCommand ExtractCommand => ReactiveCommand.Create(ExtractEvent);
         public IReactiveCommand AddCommand => ReactiveCommand.Create(AddEvent);
         public IReactiveCommand ExtractAllCommand => ReactiveCommand.Create(ExtractAllEvent);
+        public IReactiveCommand InvalidateTags => ReactiveCommand.Create(InvalidationEvent);
+
+        public bool IsPlayer => MotionsetType == Bar.MotionsetType.Player;
+        public int GetSlotIndex(EntryModel item) => Items.IndexOf(item);
+
+        public bool ShowSlotNumber
+        {
+            get => _slotBool;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _slotBool, value, nameof(ShowSlotNumber));
+                InvalidationEvent();
+            }
+        }
+
+        public bool ShowMovesetName
+        {
+            get => _msetBool;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _msetBool, value, nameof(ShowMovesetName));
+                InvalidationEvent();
+            }
+        }
 
         public MainWindowViewModel()
         {
@@ -60,10 +88,35 @@ namespace OpenKh.Tools.BarTool.ViewModels
             Title = "Untitled.bar | BAR - OpenKH";
 
             MotionsetType = Bar.MotionsetType.Default;
+            this.RaisePropertyChanged();
         }
 
         private static string GetSuggestedFileName(Bar.Entry item) =>
             $"{item.Name}.{Helpers.GetSuggestedExtension(item.Type)}";
+
+        public void OpenDrop(string Input)
+        {
+            Items.Clear();
+            FileName = Path.GetFileName(Input);
+
+            using (FileStream _stream = new FileStream(Input, FileMode.Open))
+            {
+                Instance.CurrentFile = Bar.Read(_stream);
+                MotionsetType = Instance.CurrentFile.Motionset;
+                this.RaisePropertyChanged(nameof(MotionsetType));
+
+                if (AutoDetectMSET(Instance.CurrentFile))
+                    ShowMovesetName = true;
+
+                foreach (var _item in Instance.CurrentFile)
+                {
+                    var _barItem = new EntryModel(_item, this);
+                    Items.Add(_barItem);
+                }
+
+                Title = string.Format("{0} | BAR - OpenKH", FileName);
+            }
+        }
 
         async Task<bool> SaveCheck()
         {
@@ -123,9 +176,12 @@ namespace OpenKh.Tools.BarTool.ViewModels
                         MotionsetType = Instance.CurrentFile.Motionset;
                         this.RaisePropertyChanged(nameof(MotionsetType));
 
+                        if (AutoDetectMSET(Instance.CurrentFile))
+                            ShowMovesetName = true;
+
                         foreach (var _item in Instance.CurrentFile)
                         {
-                            var _barItem = new EntryModel(_item);
+                            var _barItem = new EntryModel(_item, this);
                             Items.Add(_barItem);
                         }
 
@@ -200,7 +256,7 @@ namespace OpenKh.Tools.BarTool.ViewModels
             var _entry = new Bar.Entry();
             _entry.Name = "newf";
 
-            Items.Add(new EntryModel(_entry));
+            Items.Add(new EntryModel(_entry, this));
             this.RaisePropertyChanged(nameof(Items));
         }
 
@@ -246,6 +302,20 @@ namespace OpenKh.Tools.BarTool.ViewModels
                         _item.Entry.Stream.CopyTo(_stream);
                 }
             }
+        }
+
+        void InvalidationEvent()
+        {
+            foreach (var _item in Items)
+                _item.Invalidate();
+        }
+
+        private static bool AutoDetectMSET(Bar Input)
+        {
+            if (Input.Motionset != Bar.MotionsetType.Default)
+                return true;
+
+            return Input.Count(x => x.Type == Bar.EntryType.Anb) >= 4;
         }
     }
 }

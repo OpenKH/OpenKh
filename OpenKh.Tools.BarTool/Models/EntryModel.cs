@@ -1,17 +1,22 @@
 using OpenKh.Kh2;
 using OpenKh.Tools.BarTool.Views;
+using OpenKh.Tools.BarTool.Interfaces;
 
 using ReactiveUI;
+using System.Text;
 
 namespace OpenKh.Tools.BarTool.Models
 {
     public class EntryModel : ReactiveObject
     {
         Bar.Entry _entry;
+        IViewSettings _viewSettings;
 
         string _tag;
         Bar.EntryType _type;
         bool _duplicate;
+
+        private readonly string[] MotionsetMode = new string[] { "BW", "B_", "__", "_W" };
 
         public Bar.Entry Entry
         {
@@ -19,8 +24,36 @@ namespace OpenKh.Tools.BarTool.Models
         }
 
         public string Name 
-        { 
-            get => string.Format("{0} [{1}]{2}", _tag, Helpers.GetSuggestedExtension(_type).ToUpper(), _duplicate ? " - D" : ""); 
+        {
+            get
+            {
+                var _builder = new StringBuilder(0x30);
+
+                if (_viewSettings.ShowSlotNumber || _viewSettings.ShowMovesetName)
+                {
+                    var _index = _viewSettings.GetSlotIndex(this);
+
+                    if (_viewSettings.ShowSlotNumber)
+                        _builder.Append($"{_index:D02} ");
+
+                    if (_viewSettings.ShowMovesetName)
+                    {
+                        var _motionID = _index;
+
+                        if (_viewSettings.IsPlayer)
+                        {
+                            _motionID /= 4;
+                            _builder.Append($"{MotionsetMode[_index & 3]} ");
+                        }
+
+                        _builder.Append($"{(MotionSet.MotionName)_motionID} {Tag}");
+                        return _builder.ToString();
+                    }
+                }
+
+                _builder.Append(string.Format("{0} [{1}]{2}", Tag, Helpers.GetSuggestedExtension(Type).ToUpper(), Duplicate ? " - D" : ""));
+                return _builder.ToString();
+            }
         }
 
         public string Tag 
@@ -78,10 +111,13 @@ namespace OpenKh.Tools.BarTool.Models
             }
         }
 
+        public void Invalidate() => this.RaisePropertyChanged((nameof(Name)));
 
-        public EntryModel(Bar.Entry Input)
+
+        public EntryModel(Bar.Entry Input, IViewSettings View)
         {
             _entry = Input;
+            _viewSettings = View;
 
             _tag = _entry.Name;
             _type = _entry.Type;

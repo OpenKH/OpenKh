@@ -27,7 +27,12 @@
                 <MenuItem Header="Add New File..." Command="{Binding AddCommand}"/>
                 <MenuItem Header="Extract All Files..." Command="{Binding ExtractAllCommand}"/>
             </MenuItem>
-            <MenuItem Header="View"/>
+            
+            <MenuItem Header="View">
+                <CheckBox Content="Show Slot Numbers" IsChecked="{Binding ShowSlotNumber, Mode=TwoWay}"/>
+                <CheckBox Content="Show Animation Name" IsChecked="{Binding ShowMovesetName, Mode=TwoWay}"/>
+            </MenuItem>
+            
             <MenuItem Header="Help"/>
         </Menu>
 
@@ -48,7 +53,7 @@
                     </ListBox.ItemTemplate>
 
                     <ListBox.ContextMenu>
-                        <ContextMenu IsEnabled="{Binding #FileBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}}">
+                        <ContextMenu IsEnabled="{Binding #FileBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}">
                             <MenuItem Header="Open File..." Command="{Binding SubOpenCommand}"/>
                             <MenuItem Header="Delete File..." Command="{Binding DeleteCommand}"/>
                             <Separator/>
@@ -69,7 +74,7 @@
                 </ComboBox>
             </StackPanel>
 
-            <StackPanel Grid.Column="1" VerticalAlignment="Stretch" IsEnabled="{Binding #FileBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}}">
+            <StackPanel Grid.Column="1" VerticalAlignment="Stretch" IsEnabled="{Binding #FileBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}">
                 <Label Content="Tag:" Margin="0, 5, 0, 0"/>
                 <TextBox Margin="0, 5, 10, 0" Text="{Binding #FileBox.SelectedItem.Tag, Mode=TwoWay}" MaxLength="4"/>
 
@@ -84,6 +89,15 @@
 
                 <Label Content="Size:" Margin="0, 5, 0, 0"/>
                 <Label Content="{Binding #FileBox.SelectedItem.Size}" Margin="0, 5, 0, 0"/>
+                
+                <Separator Margin="5" IsVisible="{Binding ShowMovesetName}"/>
+                <Label Content="Moveset Info:" Margin="0, 5, 0, 0" IsVisible="{Binding ShowMovesetName}"/>
+                <StackPanel Margin="5" IsVisible="{Binding ShowMovesetName}">
+                    <TextBlock>BW: In battle, Has weapon</TextBlock>
+                    <TextBlock>B_: In battle, No weapon</TextBlock>
+                    <TextBlock>__: Out battle, No weapon</TextBlock>
+                    <TextBlock>_W: Out battle, Has weapon</TextBlock>
+                </StackPanel>            
             </StackPanel>
         </Grid>
     </DockPanel>
