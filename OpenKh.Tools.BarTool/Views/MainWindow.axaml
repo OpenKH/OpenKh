@@ -4,9 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" 
-        Width="480" Height="355" 
-        MinWidth="480" MinHeight="355"
-        MaxWidth="480" MaxHeight="355"
+        Width="480" Height="365" 
+        MinWidth="480" MinHeight="365"
+        MaxWidth="480" MaxHeight="365"
         x:Class="OpenKh.Tools.BarTool.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico" Name="MainWindow"
         Title="{Binding Title}" DragDrop.AllowDrop="True">
@@ -58,9 +58,15 @@
                     </ListBox.ContextMenu>
                 </ListBox>
 
-                <Label Content="Motionset Type:" Margin="10, -5, 0, -5"/>
-                
-                <ComboBox HorizontalAlignment="Stretch" Margin="10"/>
+                <Label Content="Motionset Type:" Margin="10, -5, 0, -5" />
+
+                <ComboBox HorizontalAlignment="Stretch" Margin="10" Items="{Binding MotionsetTypes}" SelectedIndex="{Binding MotionsetType, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <ComboBoxItem Content="{Binding Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </StackPanel>
 
             <StackPanel Grid.Column="1" VerticalAlignment="Stretch" IsEnabled="{Binding #FileBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}}">
@@ -75,6 +81,9 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
+
+                <Label Content="Size:" Margin="0, 5, 0, 0"/>
+                <Label Content="{Binding #FileBox.SelectedItem.Size}" Margin="0, 5, 0, 0"/>
             </StackPanel>
         </Grid>
     </DockPanel>

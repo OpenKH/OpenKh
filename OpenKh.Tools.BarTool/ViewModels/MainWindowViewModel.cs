@@ -19,11 +19,19 @@ namespace OpenKh.Tools.BarTool.ViewModels
     {
         MainWindow Instance;
         string _title;
+        string _fileName;
 
         public ObservableCollection<EntryModel> Items { get; private set; }
-        public EnumModel<Bar.EntryType> Types { get; }
 
-        public string FileName { get; set; }
+        public static EnumModel<Bar.MotionsetType> MotionsetTypes { get; } = new EnumModel<Bar.MotionsetType>();
+        public static EnumModel<Bar.EntryType> Types { get; } = new EnumModel<Bar.EntryType>();
+
+        public string FileName
+        {
+            get => _fileName;
+            set => this.RaiseAndSetIfChanged(ref _fileName, value, nameof(FileName));
+        }
+
         public string Title 
         { 
             get => _title; 
@@ -31,6 +39,7 @@ namespace OpenKh.Tools.BarTool.ViewModels
         }
 
         public EntryModel CurrentItem { get; set; }
+        public Bar.MotionsetType MotionsetType { get; set; }
 
         public IReactiveCommand NewCommand => ReactiveCommand.Create(NewEvent);
         public IReactiveCommand OpenCommand => ReactiveCommand.Create(OpenEvent);
@@ -45,12 +54,12 @@ namespace OpenKh.Tools.BarTool.ViewModels
         public MainWindowViewModel()
         {
             Instance = MainWindow.Instance;
-            FileName = "";
+            FileName = "Untitled.BAR";
 
             Items = new ObservableCollection<EntryModel>();
-            Types = new EnumModel<Bar.EntryType>();
+            Title = "Untitled.bar | BAR - OpenKH";
 
-            Title = "Untitled | BAR - OpenKH";
+            MotionsetType = Bar.MotionsetType.Default;
         }
 
         private static string GetSuggestedFileName(Bar.Entry item) =>
@@ -75,13 +84,15 @@ namespace OpenKh.Tools.BarTool.ViewModels
             }
         }
 
-        
         async void NewEvent()
         {
             if (await SaveCheck())
             {
                 Items.Clear();
                 Instance.IsSaved = true;
+
+                FileName = "Untitled.bar";
+                Title = string.Format("{0} | BAR - OpenKH", FileName);
             }
         }
 
@@ -103,11 +114,14 @@ namespace OpenKh.Tools.BarTool.ViewModels
 
                 if (_files.Length == 1)
                 {
+                    Items.Clear();
                     FileName = Path.GetFileName(_files[0]);
 
                     using (FileStream _stream = new FileStream(_files[0], FileMode.Open))
                     {
                         Instance.CurrentFile = Bar.Read(_stream);
+                        MotionsetType = Instance.CurrentFile.Motionset;
+                        this.RaisePropertyChanged(nameof(MotionsetType));
 
                         foreach (var _item in Instance.CurrentFile)
                         {

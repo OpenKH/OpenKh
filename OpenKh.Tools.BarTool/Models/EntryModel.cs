@@ -20,7 +20,7 @@ namespace OpenKh.Tools.BarTool.Models
 
         public string Name 
         { 
-            get => string.Format("{0} [{1}] {2}", _tag, Helpers.GetSuggestedExtension(_type), _duplicate ? "D" : ""); 
+            get => string.Format("{0} [{1}]{2}", _tag, Helpers.GetSuggestedExtension(_type).ToUpper(), _duplicate ? " - D" : ""); 
         }
 
         public string Tag 
@@ -49,6 +49,35 @@ namespace OpenKh.Tools.BarTool.Models
         {
             get => _duplicate;
         }
+
+        public string Size
+        {
+            get
+            {
+                string _unit = "B";
+                int _factor;
+
+                if (Entry.Stream.Length >= 1024 * 1024)
+                {
+                    _unit = "MiB";
+                    _factor = 1024 * 1024;
+                }
+
+                else if (Entry.Stream.Length >= 1024)
+                {
+                    _unit = "KiB";
+                    _factor = 1024;
+                }
+
+                else
+                {
+                    return $"{Entry.Stream.Length} {_unit}";
+                }
+
+                return $"{(float)Entry.Stream.Length / _factor:0.00} {_unit}";
+            }
+        }
+
 
         public EntryModel(Bar.Entry Input)
         {
