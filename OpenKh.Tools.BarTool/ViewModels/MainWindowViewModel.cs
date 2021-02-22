@@ -17,13 +17,18 @@ namespace OpenKh.Tools.BarTool.ViewModels
 {
     public class MainWindowViewModel : ReactiveObject
     {
-        Bar _currentFile;
-        string _fileName;
+        MainWindow Instance;
+        string _title;
 
         public ObservableCollection<EntryModel> Items { get; private set; }
         public EnumModel<Bar.EntryType> Types { get; }
 
-        public string Title { get; private set; }
+        public string FileName { get; set; }
+        public string Title 
+        { 
+            get => _title; 
+            set => this.RaiseAndSetIfChanged(ref _title, value, nameof(Title));
+        }
 
         public EntryModel CurrentItem { get; set; }
 
@@ -39,8 +44,8 @@ namespace OpenKh.Tools.BarTool.ViewModels
 
         public MainWindowViewModel()
         {
-            _currentFile = new Bar();
-            _fileName = "";
+            Instance = MainWindow.Instance;
+            FileName = "";
 
             Items = new ObservableCollection<EntryModel>();
             Types = new EnumModel<Bar.EntryType>();
@@ -53,10 +58,10 @@ namespace OpenKh.Tools.BarTool.ViewModels
 
         async Task<bool> SaveCheck()
         {
-            switch (MainWindow.Instance.IsSaved)
+            switch (Instance.IsSaved)
             {
                 case false:
-                    var _result = await MessageBox.Show(MainWindow.Instance, "Your latest changes are not saved.\nAre you sure you want to proceed?", "Unsaved Progress", MessageBox.MessageBoxButtons.YesNo);
+                    var _result = await MessageBox.Show(Instance, "Your latest changes are not saved.\nAre you sure you want to proceed?", "Unsaved Progress", MessageBox.MessageBoxButtons.YesNo);
                     
                     switch (_result)
                     {
@@ -70,12 +75,13 @@ namespace OpenKh.Tools.BarTool.ViewModels
             }
         }
 
+        
         async void NewEvent()
         {
             if (await SaveCheck())
             {
                 Items.Clear();
-                MainWindow.Instance.IsSaved = true;
+                Instance.IsSaved = true;
             }
         }
 
@@ -93,24 +99,23 @@ namespace OpenKh.Tools.BarTool.ViewModels
                 }
                 };
 
-                var _files = await _dialog.ShowAsync(MainWindow.Instance);
+                var _files = await _dialog.ShowAsync(Instance);
 
                 if (_files.Length == 1)
                 {
-                    _fileName = Path.GetFileName(_files[0]);
+                    FileName = Path.GetFileName(_files[0]);
 
                     using (FileStream _stream = new FileStream(_files[0], FileMode.Open))
                     {
-                        _currentFile = Bar.Read(_stream);
+                        Instance.CurrentFile = Bar.Read(_stream);
 
-                        foreach (var _item in _currentFile)
+                        foreach (var _item in Instance.CurrentFile)
                         {
                             var _barItem = new EntryModel(_item);
                             Items.Add(_barItem);
                         }
 
-                        Title = string.Format("{0} | BAR - OpenKH", _fileName);
-                        this.RaisePropertyChanged(nameof(Title));
+                        Title = string.Format("{0} | BAR - OpenKH", FileName);
                     }
                 }
             }
@@ -126,17 +131,17 @@ namespace OpenKh.Tools.BarTool.ViewModels
                     new FileDialogFilter() { Name = "Binary Archive", Extensions = new List<string>() { "bar" } },
                     new FileDialogFilter() { Name = "All Files", Extensions = new List<string>() { "*" } },
                 },
-                InitialFileName = _fileName
+                InitialFileName = FileName
             };
 
-            var _file = await _dialog.ShowAsync(MainWindow.Instance);
+            var _file = await _dialog.ShowAsync(Instance);
 
             if (!string.IsNullOrEmpty(_file))
             {
                 using (FileStream _stream = new FileStream(_file, FileMode.OpenOrCreate))
                     Bar.Write(_stream, Items.Select(item => item.Entry));
 
-                MainWindow.Instance.IsSaved = true;
+                Instance.IsSaved = true;
             }
         }
 
@@ -159,7 +164,7 @@ namespace OpenKh.Tools.BarTool.ViewModels
                 }
             };
 
-            var _files = await _dialog.ShowAsync(MainWindow.Instance);
+            var _files = await _dialog.ShowAsync(Instance);
 
             if (_files.Length == 1)
             {
@@ -199,7 +204,7 @@ namespace OpenKh.Tools.BarTool.ViewModels
                 InitialFileName = _defName
             };
 
-            var _file = await _dialog.ShowAsync(MainWindow.Instance);
+            var _file = await _dialog.ShowAsync(Instance);
 
             if (!string.IsNullOrEmpty(_file))
             {
@@ -215,7 +220,7 @@ namespace OpenKh.Tools.BarTool.ViewModels
                 Title = "Choose a path for export...",
             };
 
-            var _folder = await _dialog.ShowAsync(MainWindow.Instance);
+            var _folder = await _dialog.ShowAsync(Instance);
 
             if (!string.IsNullOrEmpty(_folder))
             {

@@ -9,7 +9,7 @@
         MaxWidth="480" MaxHeight="355"
         x:Class="OpenKh.Tools.BarTool.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico" Name="MainWindow"
-        Title="{Binding Title}">
+        Title="{Binding Title}" DragDrop.AllowDrop="True">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
