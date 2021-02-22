@@ -1,4 +1,6 @@
 using OpenKh.Kh2;
+using OpenKh.Tools.BarTool.Views;
+
 using ReactiveUI;
 
 namespace OpenKh.Tools.BarTool.Models
@@ -28,6 +30,7 @@ namespace OpenKh.Tools.BarTool.Models
             {
                 _entry.Name = value;
                 this.RaiseAndSetIfChanged(ref _tag, value, nameof(Name));
+                MainWindow.Instance.IsSaved = false;
             }
         }
 
@@ -38,6 +41,7 @@ namespace OpenKh.Tools.BarTool.Models
             {
                 _entry.Type = value;
                 this.RaiseAndSetIfChanged(ref _type, value, nameof(Name));
+                MainWindow.Instance.IsSaved = false;
             }
         }
 

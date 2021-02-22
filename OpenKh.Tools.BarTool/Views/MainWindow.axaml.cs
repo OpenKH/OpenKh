@@ -7,6 +7,7 @@ namespace OpenKh.Tools.BarTool.Views
     public class MainWindow : Window
     {
         public static MainWindow Instance;
+        public bool IsSaved = true;
 
         public MainWindow()
         {

@@ -1,0 +1,20 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="800" Height="450"
+        x:Class="OpenKh.Tools.BarTool.Dialogs.MessageBox" SizeToContent="WidthAndHeight" CanResize="False">
+    
+    <StackPanel HorizontalAlignment="Center">
+        <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Name="Text" Margin="10"/>
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Name="Buttons">
+            <StackPanel.Styles>
+                <Style Selector="Button">
+                    <Setter Property="Margin" Value="5"/>
+                </Style>
+            </StackPanel.Styles>
+        </StackPanel>
+    </StackPanel>
+    
+</Window>
+
