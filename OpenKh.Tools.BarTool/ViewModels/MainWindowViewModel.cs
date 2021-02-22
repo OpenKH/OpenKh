@@ -14,17 +14,19 @@ using ReactiveUI;
 
 namespace OpenKh.Tools.BarTool.ViewModels
 {
-    public class MainWindowViewModel
+    public class MainWindowViewModel : ReactiveObject
     {
         Bar _currentFile;
+        string _fileName;
 
         public ObservableCollection<EntryModel> Items { get; private set; }
         public EnumModel<Bar.EntryType> Types { get; }
 
+        public string Title { get; private set; }
+
         public IReactiveCommand NewCommand { get; }
         public IReactiveCommand OpenCommand { get; }
         public IReactiveCommand SaveCommand { get; }
-
 
         public MainWindowViewModel()
         {
@@ -36,6 +38,8 @@ namespace OpenKh.Tools.BarTool.ViewModels
             NewCommand = ReactiveCommand.Create(NewEvent);
             OpenCommand = ReactiveCommand.Create(OpenEvent);
             SaveCommand = ReactiveCommand.Create(SaveEvent);
+
+            Title = "Untitled | BAR - OpenKH";
         }
 
         void NewEvent()
@@ -59,6 +63,8 @@ namespace OpenKh.Tools.BarTool.ViewModels
 
             if (_files.Length == 1)
             {
+                _fileName = Path.GetFileName(_files[0]);
+
                 using (FileStream _stream = new FileStream(_files[0], FileMode.Open))
                 {
                     _currentFile = Bar.Read(_stream);
@@ -68,6 +74,9 @@ namespace OpenKh.Tools.BarTool.ViewModels
                         var _barItem = new EntryModel(_item);
                         Items.Add(_barItem);
                     }
+
+                    Title = string.Format("{0} | BAR - OpenKH", _fileName);
+                    this.RaisePropertyChanged(nameof(Title));
                 }
             }
         }
@@ -79,15 +88,19 @@ namespace OpenKh.Tools.BarTool.ViewModels
                 Title = "Save this Archive...",
                 Filters = new List<FileDialogFilter>
                 {
-                     new FileDialogFilter() { Name = "Binary Archive", Extensions = new List<string>() { "bar" } },
-                     new FileDialogFilter() { Name = "All Files", Extensions = new List<string>() { "*" } },
-                }
+                    new FileDialogFilter() { Name = "Binary Archive", Extensions = new List<string>() { "bar" } },
+                    new FileDialogFilter() { Name = "All Files", Extensions = new List<string>() { "*" } },
+                },
+                InitialFileName = _fileName
             };
 
             var _file = await _dialog.ShowAsync(MainWindow.Instance);
 
-            using (FileStream _stream = new FileStream(_file, FileMode.OpenOrCreate))
-                Bar.Write(_stream, Items.Select(item => item.Entry));
+            if (!string.IsNullOrEmpty(_file))
+            {
+                using (FileStream _stream = new FileStream(_file, FileMode.OpenOrCreate))
+                    Bar.Write(_stream, Items.Select(item => item.Entry));
+            }
         }
     }
 }

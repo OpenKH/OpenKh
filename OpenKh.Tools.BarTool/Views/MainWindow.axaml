@@ -9,7 +9,7 @@
         MaxWidth="480" MaxHeight="355"
         x:Class="OpenKh.Tools.BarTool.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico" Name="MainWindow"
-        Title="OpenKH - BAR Editor [Avalonia]">
+        Title="{Binding Title}">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -22,6 +22,7 @@
                 <MenuItem Header="Open File..." Command="{Binding OpenCommand}"/>
                 <MenuItem Header="Save File..." Command="{Binding SaveCommand}"/>
             </MenuItem>
+            
             <MenuItem Header="Edit"/>
             <MenuItem Header="View"/>
             <MenuItem Header="Help"/>
@@ -35,6 +36,7 @@
 
             <StackPanel Name="stackFirst" Grid.Column="0" MinWidth="240" VerticalAlignment="Stretch">
                 <Label Content="Files:" VerticalAlignment="Top" Margin="10, 5, 0, -5"/>
+                
                 <ListBox Name="fileBox" Height="215" Margin="10" Items="{Binding Items, Mode=TwoWay}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -44,14 +46,17 @@
                 </ListBox>
 
                 <Label Content="Motionset Type:" Margin="10, -5, 0, -5"/>
+                
                 <ComboBox HorizontalAlignment="Stretch" Margin="10"/>
             </StackPanel>
 
             <StackPanel Grid.Column="1" VerticalAlignment="Stretch" IsEnabled="{Binding #fileBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}}">
                 <Label Content="Tag:" Margin="0, 5, 0, 0"/>
-                <TextBox Margin="0, 5, 10, 0" Text="{Binding #fileBox.SelectedItem.Tag, Mode=TwoWay}"/>
+                
+                <TextBox Margin="0, 5, 10, 0" Text="{Binding #fileBox.SelectedItem.Tag, Mode=TwoWay}" MaxLength="4"/>
 
                 <Label Content="Type:" Margin="0, 5, 0, 0"/>
+                
                 <ComboBox HorizontalAlignment="Stretch" Margin="0, 5, 10, 0" Items="{Binding Types}" SelectedIndex="{Binding #fileBox.SelectedItem.Type, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
