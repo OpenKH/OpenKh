@@ -3,7 +3,6 @@
 ## General documentation
 
 * [Game builds](builds.md)
-* [Worlds](worlds.md)
 * [File types](file-type.md)
     * [Archive format](file//type/bbsa.md)
     * [ARC format](file//type/arc.md)
@@ -16,3 +15,7 @@
 * Other files
     * [font.arc, fonten.arc](font.md)
 
+## Dictionaries
+
+* [Worlds](dictionary/worlds.md)
+* [Models](dictionary/models.md)
