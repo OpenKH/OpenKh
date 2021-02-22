@@ -14,7 +14,7 @@
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-
+    
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="30" Background="#F0F0F0">
             <MenuItem Header="File">
@@ -22,8 +22,11 @@
                 <MenuItem Header="Open File..." Command="{Binding OpenCommand}"/>
                 <MenuItem Header="Save File..." Command="{Binding SaveCommand}"/>
             </MenuItem>
-            
-            <MenuItem Header="Edit"/>
+
+            <MenuItem Header="Edit">
+                <MenuItem Header="Add New File..." Command="{Binding AddCommand}"/>
+                <MenuItem Header="Extract All Files..." Command="{Binding ExtractAllCommand}"/>
+            </MenuItem>
             <MenuItem Header="View"/>
             <MenuItem Header="Help"/>
         </Menu>
@@ -34,15 +37,25 @@
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Name="stackFirst" Grid.Column="0" MinWidth="240" VerticalAlignment="Stretch">
+            <StackPanel Grid.Column="0" MinWidth="240" VerticalAlignment="Stretch">
                 <Label Content="Files:" VerticalAlignment="Top" Margin="10, 5, 0, -5"/>
                 
-                <ListBox Name="fileBox" Height="215" Margin="10" Items="{Binding Items, Mode=TwoWay}">
+                <ListBox Name="FileBox" Height="215" Margin="10" Items="{Binding Items, Mode=TwoWay}" SelectedItem="{Binding CurrentItem, Mode=OneWayToSource}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <ListBoxItem Content="{Binding Name}"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
+
+                    <ListBox.ContextMenu>
+                        <ContextMenu IsEnabled="{Binding #FileBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}}">
+                            <MenuItem Header="Open File..." Command="{Binding SubOpenCommand}"/>
+                            <MenuItem Header="Delete File..." Command="{Binding DeleteCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Import to File..." Command="{Binding ImportCommand}"/>
+                            <MenuItem Header="Extract File..." Command="{Binding ExtractCommand}"/>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
                 </ListBox>
 
                 <Label Content="Motionset Type:" Margin="10, -5, 0, -5"/>
@@ -50,14 +63,12 @@
                 <ComboBox HorizontalAlignment="Stretch" Margin="10"/>
             </StackPanel>
 
-            <StackPanel Grid.Column="1" VerticalAlignment="Stretch" IsEnabled="{Binding #fileBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}}">
+            <StackPanel Grid.Column="1" VerticalAlignment="Stretch" IsEnabled="{Binding #FileBox.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}}">
                 <Label Content="Tag:" Margin="0, 5, 0, 0"/>
-                
-                <TextBox Margin="0, 5, 10, 0" Text="{Binding #fileBox.SelectedItem.Tag, Mode=TwoWay}" MaxLength="4"/>
+                <TextBox Margin="0, 5, 10, 0" Text="{Binding #FileBox.SelectedItem.Tag, Mode=TwoWay}" MaxLength="4"/>
 
                 <Label Content="Type:" Margin="0, 5, 0, 0"/>
-                
-                <ComboBox HorizontalAlignment="Stretch" Margin="0, 5, 10, 0" Items="{Binding Types}" SelectedIndex="{Binding #fileBox.SelectedItem.Type, Mode=TwoWay}">
+                <ComboBox HorizontalAlignment="Stretch" Margin="0, 5, 10, 0" Items="{Binding Types}" SelectedIndex="{Binding #FileBox.SelectedItem.Type, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <ComboBoxItem Content="{Binding Name}"/>
