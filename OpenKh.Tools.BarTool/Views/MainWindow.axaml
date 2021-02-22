@@ -32,8 +32,11 @@
                 <CheckBox Content="Show Slot Numbers" IsChecked="{Binding ShowSlotNumber, Mode=TwoWay}"/>
                 <CheckBox Content="Show Animation Name" IsChecked="{Binding ShowMovesetName, Mode=TwoWay}"/>
             </MenuItem>
-            
-            <MenuItem Header="Help"/>
+
+            <MenuItem Header="Help">
+                <MenuItem Header="About" Command="{Binding AboutCommand}"/>
+                <MenuItem Header="Guide" Command="{Binding GuideCommand}"/>
+            </MenuItem>
         </Menu>
 
         <Grid DockPanel.Dock="Bottom">

@@ -12,7 +12,8 @@ namespace OpenKh.Tools.BarTool.Dialogs
             Ok,
             OkCancel,
             YesNo,
-            YesNoCancel
+            YesNoCancel,
+            None
         }
 
         public enum MessageBoxResult

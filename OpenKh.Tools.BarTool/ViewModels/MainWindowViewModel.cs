@@ -13,6 +13,7 @@ using OpenKh.Tools.BarTool.Interfaces;
 
 using ReactiveUI;
 using Avalonia.Controls;
+using System.Diagnostics;
 
 namespace OpenKh.Tools.BarTool.ViewModels
 {
@@ -54,7 +55,8 @@ namespace OpenKh.Tools.BarTool.ViewModels
         public IReactiveCommand ExtractCommand => ReactiveCommand.Create(ExtractEvent);
         public IReactiveCommand AddCommand => ReactiveCommand.Create(AddEvent);
         public IReactiveCommand ExtractAllCommand => ReactiveCommand.Create(ExtractAllEvent);
-        public IReactiveCommand InvalidateTags => ReactiveCommand.Create(InvalidationEvent);
+        public IReactiveCommand AboutCommand => ReactiveCommand.Create(AboutEvent);
+        public IReactiveCommand GuideCommand => ReactiveCommand.Create(GuideEvent);
 
         public bool IsPlayer => MotionsetType == Bar.MotionsetType.Player;
         public int GetSlotIndex(EntryModel item) => Items.IndexOf(item);
@@ -302,6 +304,22 @@ namespace OpenKh.Tools.BarTool.ViewModels
                         _item.Entry.Stream.CopyTo(_stream);
                 }
             }
+        }
+
+        async void AboutEvent() => await MessageBox.Show(Instance, "BAR Editor - OpenKH\n\nVersion X.XX\nCompiled on XX.XX.XXXX", "About this tool", MessageBox.MessageBoxButtons.None);
+
+        void GuideEvent()
+        {
+            var _process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    FileName = "https://openkh.dev/kh2/file/type/bar.html"
+                }
+            };
+
+            _process.Start();
         }
 
         void InvalidationEvent()
