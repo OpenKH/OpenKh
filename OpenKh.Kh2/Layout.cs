@@ -1,9 +1,11 @@
-﻿using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using Xe.BinaryMapper;
-using Xe.IO;
+
+using OpenKh.Common;
+using OpenKh.Common.Utils;
 
 namespace OpenKh.Kh2
 {

@@ -1,14 +1,17 @@
-﻿// Inspired by Kddf2's khkh_xldM.
+// Inspired by Kddf2's khkh_xldM.
 // Original source code: https://gitlab.com/kenjiuno/khkh_xldM/blob/master/khkh_xldMii/Mdlxfst.cs
 
-using OpenKh.Common;
-using OpenKh.Common.Ps2;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using Xe.BinaryMapper;
-using Xe.IO;
+
+using OpenKh.Common;
+using OpenKh.Common.Ps2;
+using OpenKh.Common.Utils;
 
 namespace OpenKh.Kh2
 {

@@ -84,10 +84,12 @@ namespace OpenKh.Tools.BarTool.ViewModels
         public MainWindowViewModel()
         {
             Instance = MainWindow.Instance;
-            FileName = "Untitled.BAR";
-
             Items = new ObservableCollection<EntryModel>();
-            Title = "Untitled.bar | BAR - OpenKH";
+
+            CurrentItem = new EntryModel(new Bar.Entry(), this);
+
+            _fileName = "Untitled.BAR";
+            _title = "Untitled.bar | BAR - OpenKH";
 
             MotionsetType = Bar.MotionsetType.Default;
             this.RaisePropertyChanged();

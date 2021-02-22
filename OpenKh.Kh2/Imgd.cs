@@ -1,11 +1,12 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using Xe.BinaryMapper;
-using Xe.IO;
+
+using OpenKh.Common.Utils;
 
 namespace OpenKh.Kh2
 {

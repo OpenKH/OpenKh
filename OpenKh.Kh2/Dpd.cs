@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Xe.IO;
+
+using OpenKh.Common.Utils;
 
 namespace OpenKh.Kh2
 {

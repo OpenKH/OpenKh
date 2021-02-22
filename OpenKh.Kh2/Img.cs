@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Xe.IO;
+
+using OpenKh.Common.Utils;
 
 namespace OpenKh.Kh2
 {
