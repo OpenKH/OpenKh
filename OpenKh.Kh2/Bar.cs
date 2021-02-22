@@ -105,7 +105,7 @@ namespace OpenKh.Kh2
 		{
 			public EntryType Type { get; set; }
 
-			public int Index { get; set; }
+			public bool Duplicate { get; set; }
 
 			public string Name { get; set; }
 
@@ -148,7 +148,7 @@ namespace OpenKh.Kh2
                 .Select(x => new
                 {
                     Type = (EntryType)reader.ReadUInt16(),
-                    Index = reader.ReadInt16(),
+                    Duplicate = reader.ReadInt16() == 1 ? true : false,
                     Name = Encoding.UTF8.GetString(reader.ReadBytes(4)),
                     Offset = reader.ReadInt32(),
                     Size = reader.ReadInt32()
@@ -169,7 +169,7 @@ namespace OpenKh.Kh2
                     return new Entry
                     {
                         Type = x.Type,
-                        Index = x.Index,
+                        Duplicate = x.Duplicate,
                         Name = name,
                         Offset = x.Offset,
                         Stream = fileStream
@@ -212,10 +212,10 @@ namespace OpenKh.Kh2
                 offset = Align(offset, entry);
 
                 writer.Write((ushort)entry.Type);
-				writer.Write((ushort)entry.Index);
+				writer.Write(entry.Duplicate == true ? (ushort)1 : (ushort)0);
 				writer.Write(Encoding.UTF8.GetBytes(normalizedName), 0, 4);
 
-                if (entry.Index != 0)
+                if (entry.Duplicate != false)
                 {
                     var linkInfo = dicLink[(entry.Name, entry.Type)];
                     entry.Offset = linkInfo.offset;
@@ -239,7 +239,7 @@ namespace OpenKh.Kh2
 			foreach (var entry in myEntries)
             {
                 writer.BaseStream.Position = entry.Offset;
-                if (entry.Index == 0)
+                if (entry.Duplicate == false)
                 {
                     entry.Stream.Position = 0;
                     entry.Stream.CopyTo(writer.BaseStream);

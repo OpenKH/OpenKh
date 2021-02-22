@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,16 +7,16 @@ namespace OpenKh.Kh2.Extensions
 {
     public static class BarExtensions
     {
-        public static IEnumerable<Bar.Entry> ForEntry(this IEnumerable<Bar.Entry> entries, Bar.EntryType type, string name, int index, Action<Bar.Entry> funcEntry)
+        public static IEnumerable<Bar.Entry> ForEntry(this IEnumerable<Bar.Entry> entries, Bar.EntryType type, string name, bool duplicate, Action<Bar.Entry> funcEntry)
         {
-            var entry = entries.FirstOrDefault(x => x.Type == type && x.Name == name && x.Index == index);
+            var entry = entries.FirstOrDefault(x => x.Type == type && x.Name == name && x.Duplicate == duplicate);
             if (entry == null)
             {
                 entry = new Bar.Entry
                 {
                     Type = type,
                     Name = name,
-                    Index = index,
+                    Duplicate = duplicate,
                     Stream = new MemoryStream()
                 };
 
@@ -31,7 +31,7 @@ namespace OpenKh.Kh2.Extensions
             this IEnumerable<Bar.Entry> entries, Bar.Entry entry)
         {
             var existingEntry = entries
-                .FirstOrDefault(x => x.Type == entry.Type && x.Name == entry.Name && x.Index == 0);
+                .FirstOrDefault(x => x.Type == entry.Type && x.Name == entry.Name && x.Duplicate == false);
             if (existingEntry == null)
             {
                 entries = entries.Concat(new Bar.Entry[] {
@@ -39,7 +39,7 @@ namespace OpenKh.Kh2.Extensions
                     {
                         Type = entry.Type,
                         Name = entry.Name,
-                        Index = 0,
+                        Duplicate = false,
                         Stream = entry.Stream
                     }
                 });
