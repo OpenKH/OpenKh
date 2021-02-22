@@ -121,7 +121,7 @@ namespace OpenKh.Command.Bar
             {
                 using var stream = File.OpenRead(InputBar);
                 foreach (var entry in Kh2.Bar.Read(stream))
-                    Console.WriteLine($"{entry.Name}, {entry.Type}, {entry.Index}");
+                    Console.WriteLine($"{entry.Name}, {entry.Type}, {entry.Duplicate}");
 
                 return 0;
             }

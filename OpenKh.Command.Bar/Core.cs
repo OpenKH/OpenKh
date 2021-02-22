@@ -20,7 +20,7 @@ namespace OpenKh.Command.Bar
             [JsonProperty] public string FileName { get; set; }
             [JsonProperty] public string InternalName { get; set; }
             [JsonProperty] public int TypeId { get; set; }
-            [JsonProperty] public int LinkIndex { get; set; }
+            [JsonProperty] public bool Duplicate { get; set; }
             [JsonIgnore] public Stream Stream { get; set; }
 
             public override string ToString() => FileName;
@@ -52,14 +52,14 @@ namespace OpenKh.Command.Bar
                         FileName = $"{x.Name}.{Helpers.GetSuggestedExtension(x.Type)}",
                         InternalName = x.Name,
                         TypeId = (int)x.Type,
-                        LinkIndex = x.Index,
+                        Duplicate = x.Duplicate,
                         Stream = x.Stream,
                     })
                     .ToList()
             };
 
             foreach (var entryGroup in project.Entries
-                .Where(x => x.LinkIndex == 0)
+                .Where(x => x.Duplicate == false)
                 .GroupBy(x => $"{x.InternalName}_{x.TypeId}"))
             {
                 var items = entryGroup.ToArray();
@@ -83,7 +83,7 @@ namespace OpenKh.Command.Bar
                 File.WriteAllText(projectFileName, JsonConvert.SerializeObject(project, Formatting.Indented));
             }
 
-            foreach (var entry in project.Entries.Where(x => x.LinkIndex == 0))
+            foreach (var entry in project.Entries.Where(x => x.Duplicate == false))
             {
                 var outputFileName = Path.Combine(outputFolder, entry.FileName);
 
@@ -100,7 +100,7 @@ namespace OpenKh.Command.Bar
             originalFileName = project.OriginalFileName;
 
             var streams = project.Entries
-                .Where(x => x.LinkIndex == 0)
+                .Where(x => x.Duplicate == false)
                 .ToDictionary(x => x.FileName,
                     x => File.OpenRead(Path.Combine(baseDirectory, x.FileName)));
 
@@ -113,8 +113,8 @@ namespace OpenKh.Command.Bar
                 {
                     Name = x.InternalName,
                     Type = (Kh2.Bar.EntryType)x.TypeId,
-                    Index = x.LinkIndex,
-                    Stream = x.LinkIndex == 0 ? streams[x.FileName] : null
+                    Duplicate = x.Duplicate,
+                    Stream = x.Duplicate == false ? streams[x.FileName] : null
                 }));
 
             return binarc;
