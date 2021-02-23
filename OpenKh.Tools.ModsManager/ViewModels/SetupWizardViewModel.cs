@@ -22,14 +22,25 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             .AddExtensions("PCSX2 emulator", "exe");
 
         private int _gameEdition;
+        private string _isoLocation;
         private string _openKhGameEngineLocation;
         private string _pcsx2Location;
         private string _pcReleaseLocation;
+        private string _gameDataLocation;
 
         public string Title => $"Set-up wizard | {ApplicationName}";
 
         public RelayCommand SelectIsoCommand { get; }
-        public string IsoLocation { get; set; }
+        public string IsoLocation
+        {
+            get => _isoLocation;
+            set
+            {
+                _isoLocation = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsIsoSelected));
+            }
+        }
         public bool IsIsoSelected => !string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation);
 
         public bool IsGameSelected
@@ -52,6 +63,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _gameEdition = value;
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
                 OnPropertyChanged(nameof(OpenKhGameEngineConfigVisibility));
                 OnPropertyChanged(nameof(Pcsx2ConfigVisibility));
@@ -67,6 +79,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _openKhGameEngineLocation = value;
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
             }
         }
@@ -79,6 +92,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _pcsx2Location = value;
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
             }
         }
@@ -91,12 +105,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _pcReleaseLocation = value;
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
             }
         }
 
         public RelayCommand SelectGameDataLocationCommand { get; }
-        public string GameDataLocation { get; set; }
+        public string GameDataLocation
+        {
+            get => _gameDataLocation;
+            set
+            {
+                _gameDataLocation = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+            }
+        }
         public bool IsGameDataFound => File.Exists(Path.Combine(GameDataLocation ?? "", "00objentry.bin"));
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
@@ -111,43 +137,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             ExtractionCompleteVisibility = Visibility.Collapsed;
 
             SelectIsoCommand = new RelayCommand(_ =>
-            {
-                FileDialog.OnOpen(fileName =>
-                {
-                    IsoLocation = fileName;
-                    OnPropertyChanged(nameof(IsoLocation));
-                    OnPropertyChanged(nameof(IsIsoSelected));
-                }, _isoFilter);
-            });
+                FileDialog.OnOpen(fileName => IsoLocation = fileName, _isoFilter));
             SelectOpenKhGameEngineCommand = new RelayCommand(_ =>
-            {
-                FileDialog.OnOpen(fileName =>
-                {
-                    OpenKhGameEngineLocation = fileName;
-                    OnPropertyChanged(nameof(OpenKhGameEngineLocation));
-                    OnPropertyChanged(nameof(IsGameSelected));
-                }, _openkhGeFilter);
-            });
+                FileDialog.OnOpen(fileName => OpenKhGameEngineLocation = fileName, _openkhGeFilter));
             SelectPcsx2Command = new RelayCommand(_ =>
-            {
-                FileDialog.OnOpen(fileName =>
-                {
-                    Pcsx2Location = fileName;
-                    OnPropertyChanged(nameof(Pcsx2Location));
-                    OnPropertyChanged(nameof(IsGameSelected));
-                }, _pcsx2Filter);
-            });
+                FileDialog.OnOpen(fileName => Pcsx2Location = fileName, _pcsx2Filter));
             SelectGameDataLocationCommand = new RelayCommand(_ =>
-            {
-                FileDialog.OnFolder(path =>
-                {
-                    GameDataLocation = path;
-                    OnPropertyChanged(nameof(GameDataLocation));
-                    OnPropertyChanged(nameof(IsGameDataFound));
-                    OnPropertyChanged(nameof(GameDataNotFoundVisibility));
-                    OnPropertyChanged(nameof(GameDataFoundVisibility));
-                });
-            });
+                FileDialog.OnFolder(path => GameDataLocation = path));
         }
     }
 }
