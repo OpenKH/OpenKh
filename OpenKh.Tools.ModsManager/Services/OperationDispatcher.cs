@@ -21,13 +21,16 @@ namespace OpenKh.Tools.ModsManager.Services
             "ovl_gumimenu.x",
         };
 
-        public bool LoadFile(Stream outStream, string fileName)
+        public int LoadFile(Stream outStream, string fileName)
         {
-            var result = GetFinalNamePath(fileName, out var finalFileName);
-            if (result)
-                File.OpenRead(finalFileName).Using(x => x.CopyTo(outStream, 512 * 1024));
+            if (GetFinalNamePath(fileName, out var finalFileName))
+                return File.OpenRead(finalFileName).Using(x =>
+                {
+                    x.CopyTo(outStream, 512 * 1024);
+                    return (int)x.Length;
+                });
 
-            return result;
+            return 0;
         }
 
         public int GetFileSize(string fileName)

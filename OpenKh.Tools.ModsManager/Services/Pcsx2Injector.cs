@@ -354,7 +354,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 return;
 
             var returnValue = _operationDispatcher.LoadFile(stream.SetPosition(ptrMemDst), fileName);
-            stream.SetPosition(OperationAddress - 4).Write(returnValue ? 1 : 0);
+            stream.SetPosition(OperationAddress - 4).Write(returnValue);
         }
 
         private void OperationGetFileSize(Stream stream)
@@ -478,7 +478,4 @@ namespace OpenKh.Tools.ModsManager.Services
             return fileName;
         }
     }
-
-
-
 }
