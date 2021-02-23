@@ -23,9 +23,9 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public bool LoadFile(Stream outStream, string fileName)
         {
-            bool result = GetFinalNamePath(fileName, out var finalFileName);
+            var result = GetFinalNamePath(fileName, out var finalFileName);
             if (result)
-                File.OpenRead(finalFileName).Using(x => x.CopyTo(outStream));
+                File.OpenRead(finalFileName).Using(x => x.CopyTo(outStream, 512 * 1024));
 
             return result;
         }

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xe.IO;
 
 namespace OpenKh.Tools.ModsManager.Services
 {
@@ -119,18 +118,13 @@ namespace OpenKh.Tools.ModsManager.Services
             LUI(T6, HookStack),
             SW(A0, T6, Param1),
             SW(A1, T6, Param2),
-            SW(A2, T6, Param3),
-            SW(A3, T6, Param4),
             SW(T5, T6, ParamOperator),
             LW(T5, T6, ParamOperator),
             BNE(T5, (byte)Operation.HookExit, -2),
             LW(V0, T6, ParamReturn),
-            BEQ(V0, Zero, 4),
-            ADDIU(V1, Zero, 0x64),  // FlushCache
-            ADDIU(A0, Zero, 0),     // Flush data cache
-            SYSCALL(),              // Perform action
-            JR(T4),
+            BEQ(V0, Zero, 2),
             NOP(),
+            ADDIU(RA, RA, 4),
             ADDIU(SP, SP, -0x10),
             SD(T4, SP, 0x08),
             SD(S0, SP, 0x00),
@@ -359,10 +353,7 @@ namespace OpenKh.Tools.ModsManager.Services
             if (string.IsNullOrEmpty(fileName))
                 return;
 
-            var dstStream = new BufferedStream(new SubStream(stream, ptrMemDst, stream.Length - ptrMemDst));
-            var returnValue = _operationDispatcher.LoadFile(dstStream, fileName);
-            dstStream.Flush();
-
+            var returnValue = _operationDispatcher.LoadFile(stream.SetPosition(ptrMemDst), fileName);
             stream.SetPosition(OperationAddress - 4).Write(returnValue ? 1 : 0);
         }
 
@@ -487,4 +478,7 @@ namespace OpenKh.Tools.ModsManager.Services
             return fileName;
         }
     }
+
+
+
 }
