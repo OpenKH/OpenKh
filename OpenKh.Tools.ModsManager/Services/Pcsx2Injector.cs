@@ -36,42 +36,145 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private const string KH2FM = "SLPM_666.75;1";
 
-        private static readonly uint[] LoadFilePatch = new uint[]
+        private const uint Zero = 0x00;
+        private const uint AT = 0x01;
+        private const uint V0 = 0x02;
+        private const uint V1 = 0x03;
+        private const uint A0 = 0x04;
+        private const uint A1 = 0x05;
+        private const uint A2 = 0x06;
+        private const uint A3 = 0x07;
+        private const uint T0 = 0x08;
+        private const uint T1 = 0x09;
+        private const uint T2 = 0x0A;
+        private const uint T3 = 0x0B;
+        private const uint T4 = 0x0C;
+        private const uint T5 = 0x0D;
+        private const uint T6 = 0x0E;
+        private const uint T7 = 0x0F;
+        private const uint S0 = 0x10;
+        private const uint S1 = 0x11;
+        private const uint S2 = 0x12;
+        private const uint S3 = 0x13;
+        private const uint S4 = 0x14;
+        private const uint S5 = 0x15;
+        private const uint S6 = 0x16;
+        private const uint S7 = 0x17;
+        private const uint T8 = 0x18;
+        private const uint T9 = 0x19;
+        private const uint SP = 0x1D;
+        private const uint RA = 0x1F;
+
+        private static uint NOP() => 0x00000000;
+        private static uint JR(uint reg) => 0x00000008U | (reg << 21);
+        private static uint SYSCALL() => 0x0000000C;
+        private static uint JAL(uint offset) =>
+            0x0C000000U | (offset / 4);
+        private static uint BEQ(uint left, uint right, short jump) =>
+            0x10000000U | (right << 16) | (left << 21) | (ushort)jump;
+        private static uint BNE(uint left, uint right, short jump) =>
+            0x14000000U | (right << 16) | (left << 21) | (ushort)jump;
+        private static uint ADDIU(uint dst, uint src, short value) =>
+            0x24000000U | (dst << 16) | (src << 21) | (ushort)value;
+        private static uint LUI(uint dst, ushort value) =>
+            0x3C000000U | (dst << 16) | value;
+        private static uint LW(uint dst, uint src, short offset) =>
+            0x8C000000U | (dst << 16) | (src << 21) | (ushort)offset;
+        private static uint SW(uint src, uint dst, short offset) =>
+            0xAC000000U | (src << 16) | (dst << 21) | (ushort)offset;
+        private static uint LD(uint src, uint dst, short offset) =>
+            0xDC000000U | (src << 16) | (dst << 21) | (ushort)offset;
+        private static uint SD(uint src, uint dst, short offset) =>
+            0xFC000000U | (src << 16) | (dst << 21) | (ushort)offset;
+
+
+        public enum Operation
         {
-            0x3c0e0010, // lui	   t6, 0x0010       store in 0x100000
-            0xadc4fff4, // sw	   a0, -0xC(t6)     const char* filename
-            0xadc5fff8, // sw	   a1, -0x8(t6)     void* memDst
-            0x240d0001, // addiu   t5, zero, 1      mode = LoadFile
-            0xadcdfffc, // sw      t5, -0x4(t6)     
-            0x8dcdfffc, // lw      t5, -0x4(t6)     loop until mode=0
-            0x15a0fffe, // bne     t5, zero, 0x1682cc
-            0x8dc2fff8, // lw      v0, -0x8(t6)     check return value
-            0x14400002, // bne     v0, zero, 0x1682e4
-            0x24030064, // addiu   v1,zero,0x64
-            0x0000000C, // syscall
-            0x00000000, // nop
-            0x03e00008, // jr      ra
-            0x00000000, // nop
+            HookExit,
+            LoadFile,
+            GetFileSize
+        }
+
+        private const uint BaseHookPtr = 0xFFF00;
+        private const int HookStack = 0x0F;
+        private const int ParamOperator = -0x04;
+        private const int Param1 = -0x08;
+        private const int Param2 = -0x0C;
+        private const int Param3 = -0x10;
+        private const int Param4 = -0x14;
+        private const int ParamReturn = Param1;
+
+        private static readonly uint[] LoadFileHook = new uint[]
+        {
+            // Input:
+            // T4 return program counter
+            // T5 Operation
+            // RA fallback program counter
+            //
+            // Work:
+            // T6 Hook stack
+            // V0 Return value
+            // V1 syscall parameter
+            //
+            LUI(T6, HookStack),
+            SW(A0, T6, Param1),
+            SW(A1, T6, Param2),
+            SW(A2, T6, Param3),
+            SW(A3, T6, Param4),
+            SW(T5, T6, ParamOperator),
+            LW(T5, T6, ParamOperator),
+            BNE(T5, (byte)Operation.HookExit, -2),
+            LW(V0, T6, ParamReturn),
+            BEQ(V0, Zero, 4),
+            ADDIU(V1, Zero, 0x64),  // FlushCache
+            ADDIU(A0, Zero, 0),     // Flush data cache
+            SYSCALL(),              // Perform action
+            JR(T4),
+            NOP(),
+            ADDIU(SP, SP, -0x10),
+            SD(T4, SP, 0x08),
+            SD(S0, SP, 0x00),
+            JR(RA),
+            NOP(),
         };
 
-        private static readonly uint[] GetFileSizePatch = new uint[]
+        private static readonly uint[] GetFileSizeHook = new uint[]
         {
-            0x3c0e0010, // lui	   t6, 0x0010
-            0xadc4fff8, // sw	   a0, -0x8(t6) const char* filename
-            0x240d0002, // addiu   t5, zero, 2  mode = GetFileSize
-            0xadcdfffc, // sw      t5, -0x4(t6) int mode
-            0x8dcdfffc, // lw      t5, -0x4(t6)
-            0x15a0fffe, // bne     t5, zero, -8
-            0x00000000, // nop
-            0x8dc2fff8, // lw      v0, -0x8(t6)
-            0x03e00008, // jr      $ra
-            0x00000000, // nop
+            // Input:
+            // A0 const char* fileName
+            // T4 return program counter
+            // T5 Operation
+            // RA fallback program counter
+            //
+            // Work:
+            // T6 Hook stack
+            // V0 Return value
+            // V1 syscall parameter
+            //
+            LUI(T6, HookStack),
+            SW(A0, T6, Param1),
+            SW(A1, T6, Param2),
+            SW(A2, T6, Param3),
+            SW(A3, T6, Param4),
+            SW(T5, T6, ParamOperator),
+            LW(T5, T6, ParamOperator),
+            BNE(T5, (byte)Operation.HookExit, -2),
+            LW(V0, T6, ParamReturn),
+            BEQ(V0, Zero, 2),
+            NOP(),
+            JR(T4),
+            NOP(),
+            ADDIU(SP, SP, -0x10),
+            SD(T4, SP, 0x08),
+            SD(S0, SP, 0x00),
+            JR(RA),
+            NOP(),
         };
 
         private static readonly uint[] RegionInitPatch = new uint[]
         {
-            0x03e00008, // jr      $ra
-            0x00000000, // nop
+            JR(RA),
+            NOP(),
         };
 
         private static readonly string[] MemoryCardPatch = new string[]
@@ -182,10 +285,12 @@ namespace OpenKh.Tools.ModsManager.Services
         };
 
         private readonly IOperationDispatcher _operationDispatcher;
-        private const int OperationAddress = 0xFFFFC;
+        private const int OperationAddress = (HookStack << 16) - 4;
         private CancellationTokenSource _cancellationTokenSource;
         private CancellationToken _cancellationToken;
         private Task _injectorTask;
+        private uint _hookPtr;
+        private uint _nextHookPtr;
 
         public Pcsx2Injector(IOperationDispatcher operationDispatcher)
         {
@@ -224,22 +329,22 @@ namespace OpenKh.Tools.ModsManager.Services
             while (!_cancellationToken.IsCancellationRequested && !isProcessDead)
             {
                 var operation = stream.SetPosition(OperationAddress).ReadInt32();
-                switch (operation)
+                switch ((Operation)operation)
                 {
-                    case 1:
+                    case Operation.LoadFile:
                         OperationCopyFile(stream);
                         break;
-                    case 2:
+                    case Operation.GetFileSize:
                         OperationGetFileSize(stream);
                         break;
                     default:
                         break;
-                    case 0:
+                    case Operation.HookExit:
                         Thread.Sleep(1);
                         continue;
                 }
 
-                stream.SetPosition(OperationAddress).Write(0);
+                stream.SetPosition(OperationAddress).Write((int)Operation.HookExit);
             }
         }
 
@@ -248,8 +353,8 @@ namespace OpenKh.Tools.ModsManager.Services
             const int ParameterCount = 2;
             stream.SetPosition(OperationAddress - ParameterCount * sizeof(uint));
 
-            var ptrFileName = stream.ReadInt32();
             var ptrMemDst = stream.ReadInt32();
+            var ptrFileName = stream.ReadInt32();
             var fileName = ReadString(stream, ptrFileName);
             if (string.IsNullOrEmpty(fileName))
                 return;
@@ -277,12 +382,36 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private void WritePatch(Stream stream, string game)
         {
+            ResetHooks();
             var bufferedStream = new BufferedStream(stream);
             var offsets = _offsets.FirstOrDefault(x => x.GameName == game);
             if (offsets != null)
             {
-                WritePatch(bufferedStream, offsets.LoadFile, LoadFilePatch);
-                WritePatch(bufferedStream, offsets.GetFileSize, GetFileSizePatch);
+                if (offsets.LoadFile > 0)
+                {
+                    WritePatch(bufferedStream, offsets.LoadFile,
+                        ADDIU(T4, RA, 0),
+                        JAL(WriteHook(bufferedStream, LoadFileHook)),
+                        ADDIU(T5, Zero, (byte)Operation.LoadFile));
+                }
+
+                if (offsets.GetFileSize > 0)
+                {
+                    var subGetFileSizePtr = stream.SetPosition(offsets.GetFileSize + 8).ReadUInt32();
+                    WritePatch(bufferedStream, offsets.GetFileSize,
+                        ADDIU(T4, RA, 0),
+                        JAL(WriteHook(bufferedStream, GetFileSizeHook)),
+                        ADDIU(T5, Zero, (byte)Operation.GetFileSize),
+                        subGetFileSizePtr,
+                        NOP(),
+                        BEQ(V0, Zero, 2),
+                        NOP(),
+                        LW(V0, V0, 0x0C),
+                        LD(RA, SP, 0x08),
+                        JR(RA),
+                        ADDIU(SP, SP, 0x10));
+                }
+
                 if (RegionId >= 0)
                 {
                     WritePatch(bufferedStream, offsets.RegionInit, RegionInitPatch);
@@ -297,14 +426,25 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private void WritePatch(Stream stream, long offset, uint[] patch)
+        private void ResetHooks() => _nextHookPtr = BaseHookPtr;
+
+        private uint WriteHook(Stream stream, params uint[] patch)
+        {
+            _hookPtr = _nextHookPtr;
+            _nextHookPtr += WritePatch(stream, _hookPtr, patch);
+            return _hookPtr;
+        }
+
+        private uint WritePatch(Stream stream, long offset, params uint[] patch)
         {
             if (offset == 0)
-                return;
+                return 0;
 
             stream.SetPosition(offset);
             foreach (var word in patch)
                 stream.Write(word);
+            stream.Flush();
+            return (uint)(patch.Length * sizeof(uint));
         }
 
         private void WritePatch(Stream stream, long offset, int patch)
