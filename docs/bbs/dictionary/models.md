@@ -1,4 +1,4 @@
-# [Kingdom Hearts Birth By Sleep](index.md) - Models
+# [Kingdom Hearts Birth By Sleep](../index.md) - Models
 
 The filename structure is as follows:
 
