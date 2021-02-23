@@ -10,14 +10,14 @@ Eg: B00JB00 -> B 00 JB 00
 
 | ID | Category |
 | - | - |
-| B | Bosses |
-| F | Field items |
-| G | Interactables (Not necessarily by the player) |
-| H | Characters |
-| M | Monsters |
-| N | NPCs |
-| P | Players |
-| W | Weapons |
+| B | [Bosses](#Bosses) |
+| F | [Field items](#Field-items) |
+| G | [Interactables](#Interactables) (Not necessarily by the player) |
+| H | [Characters](#Characters) |
+| M | [Monsters](#Monsters) |
+| N | [NPCs](#NPCs) |
+| P | [Players](#Players) |
+| W | [Weapons](#Weapons) |
 
 ### SubId
 
@@ -25,6 +25,13 @@ SubIds are used for different versions of a model (Eg: Eraqus normal and Eraqus 
 In the model list SubIds are ignored to keep it small.
 
 ## Models
+
+Notes:
+
+* Models marked as (OG) use the original textures from vanilla.
+* Models in parentheses are simple meshes without textures (At least visibly). Eg: (Plane)
+
+### Bosses
 
 | Filename | Description |
 |-|-|
@@ -172,6 +179,11 @@ In the model list SubIds are ignored to keep it small.
 | B97EX | Graveyard Keyblade 7 |
 | B98EX | Graveyard Keyblade 8 |
 | B99EX | Graveyard Keyblade 9 |
+
+### Field items
+
+| Filename | Description |
+|-|-|
 | F01CD | Cinderella's crystal shoe |
 | F01DC | Seasalt ice cream |
 | F01DI | Papou fruit |
@@ -307,6 +319,11 @@ In the model list SubIds are ignored to keep it small.
 | F21KG | Cilindrical cloud skybox |
 | F22EX | Dropped command (Special) |
 | F50CD | Necklace pearl |
+
+### Interactables
+
+| Filename | Description |
+|-|-|
 | G01CD | Chest (Small) (Castle of Dreams) |
 | G01DC | Chest (Small) (Disney Town) |
 | G01DI | Destiny Island palm tree 3 |
@@ -693,6 +710,11 @@ In the model list SubIds are ignored to keep it small.
 | G94DC | Manhole cover |
 | G95DC | Manhole cover |
 | G99HE | Flask |
+
+### Characters
+
+| Filename | Description |
+|-|-|
 | H00JB | Sora (KH1) |
 | H01CD | Cinderella (Casual) |
 | H01DI | Sora (Kid) |
@@ -740,6 +762,11 @@ In the model list SubIds are ignored to keep it small.
 | H41EX | Xehanort (Textureless party) |
 | H51EX | Xehanort (Terranort) |
 | H63EX | Vanitas (Helmetless, Ventus, X-Blade) |
+
+### Monsters
+
+| Filename | Description |
+|-|-|
 | M00JB | Shadow |
 | M01EX | Flood |
 | M01LS | Wall gun |
@@ -884,6 +911,11 @@ In the model list SubIds are ignored to keep it small.
 | M93EX | Wayward Wind |
 | M94EX | Rainfell |
 | M95EX | Ends of the Earth |
+
+### NPCs
+
+| Filename | Description |
+|-|-|
 | N01BD | Fairy Godmother |
 | N01CD | Cinderella (Casual) |
 | N01DI | Sora (Kid) |
@@ -1011,6 +1043,11 @@ In the model list SubIds are ignored to keep it small.
 | N49DC | Rocket |
 | N50CD | (Cube) |
 | N50DC | Rocket |
+
+### Players
+
+| Filename | Description |
+|-|-|
 | P00JB | Sora (KH1) |
 | P01EX | Ventus |
 | P02EX | Aqua |
@@ -1027,6 +1064,11 @@ In the model list SubIds are ignored to keep it small.
 | P41EX | Ventus (Helmetless) |
 | P42EX | Aqua (Helmetless) |
 | P43EX | Terra (Helmetless) |
+
+### Weapons
+
+| Filename | Description |
+|-|-|
 | W01AQ | Waterfell |
 | W01EX | Kingdom Key - Keychain (Textureless) |
 | W01TE | Earthshaker |
