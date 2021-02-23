@@ -156,7 +156,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         break;
                 }
 
-            }, _ => ModsList.Any(x => x.Enabled));
+            });
             WizardCommand = new RelayCommand(_ =>
             {
                 var dialog = new SetupWizardWindow()
