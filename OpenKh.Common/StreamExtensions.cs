@@ -174,6 +174,22 @@ namespace OpenKh.Common
             return encoding.GetString(data, 0, terminatorIndex < 0 ? maxLength : terminatorIndex);
         }
 
+        public static byte PeekByte(this Stream stream) => stream.Peek(x => (byte)x.ReadByte());
+        public static short PeekInt16(this Stream stream) => stream.Peek(x => x.ReadInt16());
+        public static ushort PeekUInt16(this Stream stream) => stream.Peek(x => x.ReadUInt16());
+        public static int PeekInt32(this Stream stream) => stream.Peek(x => x.ReadInt32());
+        public static uint PeekUInt32(this Stream stream) => stream.Peek(x => x.ReadUInt32());
+        public static long PeekInt64(this Stream stream) => stream.Peek(x => x.ReadInt64());
+        public static ulong PeekUInt64(this Stream stream) => stream.Peek(x => x.ReadUInt64());
+
+        public static T Peek<T>(this Stream stream, Func<Stream, T> func)
+        {
+            var currentPosition = stream.Position;
+            var result = func(stream);
+            stream.SetPosition(currentPosition);
+            return result;
+        }
+
         public static int WriteList<T>(this Stream stream, IEnumerable<T> items)
             where T : class
         {

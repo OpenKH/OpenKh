@@ -262,7 +262,7 @@ namespace OpenKh.Kh2
         }
 
         public static bool IsValid(Stream stream) =>
-            stream.Length >= 4 && new BinaryReader(stream).PeekInt32() == MagicCode;
+            stream.Length >= 4 && stream.PeekInt32() == MagicCode;
 
     }
 }

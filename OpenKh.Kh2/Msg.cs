@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -242,7 +242,7 @@ namespace OpenKh.Kh2
         }
 
         public static bool IsValid(Stream stream) =>
-            stream.Length >= 4 && new BinaryReader(stream).PeekUInt32() == MagicCode;
+            stream.Length >= 4 && stream.PeekUInt32() == MagicCode;
 
     }
 }

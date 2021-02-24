@@ -302,6 +302,6 @@ namespace OpenKh.Kh2
             new Sequence(stream);
 
         public static bool IsValid(Stream stream) =>
-            stream.Length >= MinimumLength && new BinaryReader(stream).PeekInt32() == MagicCodeValidator;
+            stream.Length >= MinimumLength && stream.PeekInt32() == MagicCodeValidator;
     }
 }
