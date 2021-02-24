@@ -237,30 +237,5 @@ namespace OpenKh.Tests.kh2
                 imgd.Data
             );
         }
-
-        [Fact]
-        public void WriteRgba8888PixelOrder()
-        {
-            var actual = new MemoryStream();
-            Imgd
-                .Create(
-                    new Size(2, 2),
-                    PixelFormat.Rgba8888,
-                    new byte[] {
-                        // Input: R, G, B, A
-                        0x27, 0x7F, 0xFF, 0xFF,
-                        0x4C, 0xB1, 0x22, 0xFF,
-                        0xE8, 0xA2, 0x00, 0xFF,
-                        0x00, 0xF2, 0xFF, 0xFF,
-                    },
-                    null,
-                    false
-                )
-                .Write(actual);
-
-            var expectedData = File.ReadAllBytes($"kh2/res/2x2x32.imd");
-
-            Assert.Equal(expectedData, actual.ToArray());
-        }
     }
 }
