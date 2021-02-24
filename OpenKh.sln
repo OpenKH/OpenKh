@@ -167,12 +167,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ItbEditor", "OpenKh.Tools.ItbEditor\OpenKh.Tools.ItbEditor.csproj", "{0AC54BBF-A08D-44CA-9140-EB5C47573BAE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.IteViewer", "IteEditor\OpenKh.Tools.IteViewer.csproj", "{7BA60C7F-4DA9-4A62-A1DC-0F8FF87E4430}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Patcher", "OpenKh.Patcher\OpenKh.Patcher.csproj", "{05223179-5A23-433E-B255-44AA4FEA733B}"
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Patcher", "OpenKh.Patcher\OpenKh.Patcher.csproj", "{05223179-5A23-433E-B255-44AA4FEA733B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.Patcher", "OpenKh.Command.Patcher\OpenKh.Command.Patcher.csproj", "{7E771545-B4E6-499B-9550-7281BE612C65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.ModsManager", "OpenKh.Tools.ModsManager\OpenKh.Tools.ModsManager.csproj", "{A1BCC739-3BDC-41AF-BD0B-78C5E55F88A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ModsManager", "OpenKh.Tools.ModsManager\OpenKh.Tools.ModsManager.csproj", "{A1BCC739-3BDC-41AF-BD0B-78C5E55F88A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
