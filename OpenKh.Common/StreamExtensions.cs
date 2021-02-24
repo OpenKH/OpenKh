@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using Xe.BinaryMapper;
 
@@ -61,34 +62,79 @@ namespace OpenKh.Common
                 .ToList();
         }
 
-        public static short ReadInt16(this Stream stream) =>
-            (short)(stream.ReadByte() | (stream.ReadByte() << 8));
+        unsafe public static short ReadInt16(this Stream stream)
+        {
+            var buffer = new byte[2];
+            stream.Read(buffer, 0, 2);
+            fixed (byte* ptr = buffer)
+                return *(short*)ptr;
+        }
 
-        public static ushort ReadUInt16(this Stream stream) =>
-            (ushort)(stream.ReadByte() | (stream.ReadByte() << 8));
+        unsafe public static ushort ReadUInt16(this Stream stream)
+        {
+            var buffer = new byte[2];
+            stream.Read(buffer, 0, 2);
+            fixed (byte* ptr = buffer)
+                return *(ushort*)ptr;
+        }
 
-        public static int ReadInt32(this Stream stream) =>
-            stream.ReadByte() | (stream.ReadByte() << 8) |
-            (stream.ReadByte() << 16) | (stream.ReadByte() << 24);
+        unsafe public static int ReadInt32(this Stream stream)
+        {
+            var buffer = new byte[4];
+            stream.Read(buffer, 0, 4);
+            fixed (byte* ptr = buffer)
+                return *(int*)ptr;
+        }
 
-        public static uint ReadUInt32(this Stream stream) =>
-            (uint)(stream.ReadByte() | (stream.ReadByte() << 8) |
-            (stream.ReadByte() << 16) | (stream.ReadByte() << 24));
+        unsafe public static uint ReadUInt32(this Stream stream)
+        {
+            var buffer = new byte[4];
+            stream.Read(buffer, 0, 4);
+            fixed (byte* ptr = buffer)
+                return *(uint*)ptr;
+        }
 
-        public static long ReadInt64(this Stream stream) =>
-            new BinaryReader(stream).ReadInt64();
+        unsafe public static long ReadInt64(this Stream stream)
+        {
+            var buffer = new byte[8];
+            stream.Read(buffer, 0, 8);
+            fixed (byte* ptr = buffer)
+                return *(long*)ptr;
+        }
 
-        public static ulong ReadUInt64(this Stream stream) =>
-            new BinaryReader(stream).ReadUInt64();
+        unsafe public static ulong ReadUInt64(this Stream stream)
+        {
+            var buffer = new byte[8];
+            stream.Read(buffer, 0, 8);
+            fixed (byte* ptr = buffer)
+                return *(ulong*)ptr;
+        }
 
-        public static float ReadSingle(this Stream stream) =>
-            new BinaryReader(stream).ReadSingle();
+        unsafe public static float ReadSingle(this Stream stream)
+        {
+            var buffer = new byte[4];
+            stream.Read(buffer, 0, 4);
+            fixed (byte* ptr = buffer)
+                return *(float*)ptr;
+        }
 
-        public static float ReadFloat(this Stream stream) =>
-            new BinaryReader(stream).ReadSingle();
+        unsafe public static float ReadFloat(this Stream stream) => stream.ReadSingle();
 
-        public static double ReadDouble(this Stream stream) =>
-            new BinaryReader(stream).ReadDouble();
+        unsafe public static double ReadDouble(this Stream stream)
+        {
+            var buffer = new byte[8];
+            stream.Read(buffer, 0, 8);
+            fixed (byte* ptr = buffer)
+                return *(double*)ptr;
+        }
+
+        unsafe public static Matrix4x4 ReadMatrix4x4(this Stream stream)
+        {
+            var buffer = new byte[4 * 4 * sizeof(float)];
+            stream.Read(buffer, 0, 4 * 4 * sizeof(float));
+            fixed (byte* ptr = buffer)
+                return *(Matrix4x4*)ptr;
+        }
 
         public static List<int> ReadInt32List(this Stream stream, int offset, int count)
         {
@@ -121,9 +167,6 @@ namespace OpenKh.Common
             return data;
         }
 
-        public static string ReadString(this Stream stream, int maxLength) =>
-            stream.ReadString(maxLength, Encoding.UTF8);
-
         public static string ReadString(this Stream stream, int maxLength, Encoding encoding)
         {
             var data = stream.ReadBytes(maxLength);
@@ -154,26 +197,65 @@ namespace OpenKh.Common
             return (int)stream.Position - oldPosition;
         }
 
-        public static int Write(this Stream stream, IEnumerable<ushort> items)
+        unsafe public static void Write(this Stream stream, byte value) => stream.WriteByte(value);
+        unsafe public static void Write(this Stream stream, sbyte value) => stream.WriteByte((byte)value);
+        unsafe public static void Write(this Stream stream, char value) => stream.WriteByte((byte)value);
+        unsafe public static void Write(this Stream stream, short value)
         {
-            var oldPosition = (int)stream.Position;
-            var writer = new BinaryWriter(stream);
-            foreach (var item in items)
-                writer.Write(item);
-
-            return (int)stream.Position - oldPosition;
+            var buffer = new byte[2];
+            fixed (byte* ptr = buffer)
+                *(short*)ptr = value;
+            stream.Write(buffer, 0, 2);
         }
-
-        public static void Write(this Stream stream, byte value) => new BinaryWriter(stream).Write(value);
-        public static void Write(this Stream stream, sbyte value) => new BinaryWriter(stream).Write(value);
-        public static void Write(this Stream stream, char value) => new BinaryWriter(stream).Write(value);
-        public static void Write(this Stream stream, short value) => new BinaryWriter(stream).Write(value);
-        public static void Write(this Stream stream, ushort value) => new BinaryWriter(stream).Write(value);
-        public static void Write(this Stream stream, int value) => new BinaryWriter(stream).Write(value);
-        public static void Write(this Stream stream, uint value) => new BinaryWriter(stream).Write(value);
-        public static void Write(this Stream stream, long value) => new BinaryWriter(stream).Write(value);
-        public static void Write(this Stream stream, ulong value) => new BinaryWriter(stream).Write(value);
-        public static void Write(this Stream stream, float value) => new BinaryWriter(stream).Write(value);
+        unsafe public static void Write(this Stream stream, ushort value)
+        {
+            var buffer = new byte[2];
+            fixed (byte* ptr = buffer)
+                *(ushort*)ptr = value;
+            stream.Write(buffer, 0, 2);
+        }
+        unsafe public static void Write(this Stream stream, int value)
+        {
+            var buffer = new byte[4];
+            fixed (byte* ptr = buffer)
+                *(int*)ptr = value;
+            stream.Write(buffer, 0, 4);
+        }
+        unsafe public static void Write(this Stream stream, uint value)
+        {
+            var buffer = new byte[4];
+            fixed (byte* ptr = buffer)
+                *(uint*)ptr = value;
+            stream.Write(buffer, 0, 4);
+        }
+        unsafe public static void Write(this Stream stream, long value)
+        {
+            var buffer = new byte[8];
+            fixed (byte* ptr = buffer)
+                *(long*)ptr = value;
+            stream.Write(buffer, 0, 8);
+        }
+        unsafe public static void Write(this Stream stream, ulong value)
+        {
+            var buffer = new byte[8];
+            fixed (byte* ptr = buffer)
+                *(ulong*)ptr = value;
+            stream.Write(buffer, 0, 8);
+        }
+        unsafe public static void Write(this Stream stream, float value)
+        {
+            var buffer = new byte[4];
+            fixed (byte* ptr = buffer)
+                *(float*)ptr = value;
+            stream.Write(buffer, 0, 4);
+        }
+        unsafe public static void Write(this Stream stream, Matrix4x4 value)
+        {
+            var buffer = new byte[4 * 4 * sizeof(float)];
+            fixed (byte* ptr = buffer)
+                *(Matrix4x4*)ptr = value;
+            stream.Write(buffer, 0, 4 * 4 * sizeof(float));
+        }
 
         public static void Copy(this Stream source, Stream destination, int length, int bufferSize = 65536)
         {

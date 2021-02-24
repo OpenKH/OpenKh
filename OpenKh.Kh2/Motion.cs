@@ -374,13 +374,12 @@ namespace OpenKh.Kh2
                     FrameCount = raw.FrameCount
                 };
 
-                var reader = new BinaryReader(stream);
                 Raw.Matrices = new List<Matrix4x4[]>(raw.TotalFrameCount);
                 for (var i = 0; i < raw.TotalFrameCount; i++)
                 {
                     var matrices = new Matrix4x4[Raw.BoneCount];
                     for (var j = 0; j < Raw.BoneCount; j++)
-                        matrices[j] = ReadMatrix(reader);
+                        matrices[j] = stream.ReadMatrix4x4();
 
                     Raw.Matrices.Add(matrices);
                 }
@@ -390,7 +389,7 @@ namespace OpenKh.Kh2
                     stream.Position = ReservedSize + raw.Unk2c;
                     Raw.Matrices2 = new Matrix4x4[raw.TotalFrameCount];
                     for (var j = 0; j < Raw.Matrices2.Length; j++)
-                        Raw.Matrices2[j] = ReadMatrix(reader);
+                        Raw.Matrices2[j] = stream.ReadMatrix4x4();
                 }
                 else
                     Raw.Matrices2 = new Matrix4x4[0];
@@ -573,15 +572,12 @@ namespace OpenKh.Kh2
                 FrameCount = rawMotion.FrameCount
             });
 
-            var writer = new BinaryWriter(stream);
             foreach (var block in rawMotion.Matrices)
                 for (int i = 0; i < block.Length; i++)
-                    WriteMatrix(writer, block[i]);
+                    stream.Write(block[i]);
 
             for (int i = 0; i < rawMotion.Matrices2.Length; i++)
-                WriteMatrix(writer, rawMotion.Matrices2[i]);
-
-            writer.Flush();
+                stream.Write(rawMotion.Matrices2[i]);
         }
 
         private static void Write(Stream stream, InterpolatedMotion motion, bool unkFlag)
@@ -731,44 +727,6 @@ namespace OpenKh.Kh2
             TimelineStartIndex = obj.TimelineStartIndex,
             TimelineCount = obj.TimelineCount,
         };
-
-        private static Matrix4x4 ReadMatrix(BinaryReader reader) => new Matrix4x4(
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle());
-
-        private static void WriteMatrix(BinaryWriter writer, Matrix4x4 matrix)
-        {
-            writer.Write(matrix.M11);
-            writer.Write(matrix.M12);
-            writer.Write(matrix.M13);
-            writer.Write(matrix.M14);
-            writer.Write(matrix.M21);
-            writer.Write(matrix.M22);
-            writer.Write(matrix.M23);
-            writer.Write(matrix.M24);
-            writer.Write(matrix.M31);
-            writer.Write(matrix.M32);
-            writer.Write(matrix.M33);
-            writer.Write(matrix.M34);
-            writer.Write(matrix.M41);
-            writer.Write(matrix.M42);
-            writer.Write(matrix.M43);
-            writer.Write(matrix.M44);
-        }
 
         private Motion(bool isRaw)
         {
