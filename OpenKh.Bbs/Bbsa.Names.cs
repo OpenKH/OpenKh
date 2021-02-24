@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace OpenKh.Bbs
 {
     public partial class Bbsa
     {
         protected static Dictionary<uint, string> NameDictionary =
-            TryReadLines(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources/bbsa.txt"))
+            TryReadLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/bbsa.txt"))
             .ToDictionary(x => GetHash(x), x => x);
 
         private static IEnumerable<string> TryReadLines(string fileName) =>
