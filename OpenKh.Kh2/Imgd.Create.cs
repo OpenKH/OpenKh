@@ -27,6 +27,9 @@ namespace OpenKh.Kh2
                     case Format8bpp:
                         Data = Swizzle8bpp(size, data);
                         break;
+                    default:
+                        Data = data;
+                        break;
                 }
             }
             else
@@ -51,7 +54,7 @@ namespace OpenKh.Kh2
             byte[] data,
             byte[] clut,
             bool isSwizzled) =>
-            new Imgd(size, pixelFormat, data, clut, isSwizzled);
+            new Imgd(size, pixelFormat, ImageDataHelpers.GetInvertedRedBlueChannels(data, size, pixelFormat), clut, isSwizzled);
 
         private static byte[] Swizzle4bpp(Size size, byte[] data)
         {
