@@ -301,13 +301,10 @@ namespace OpenKh.Tools.ModsManager.Services
             _cancellationToken = _cancellationTokenSource.Token;
             _injectorTask = Task.Run(async () =>
             {
-                while (!_cancellationToken.IsCancellationRequested)
-                {
-                    var gameName = await Pcsx2MemoryService.GetPcsx2ApplicationName(process, _cancellationToken);
-                    var processStream = new ProcessStream(process, 0x20000000, 0x2000000);
-                    WritePatch(processStream, gameName);
-                    MainLoop(processStream);
-                }
+                var gameName = await Pcsx2MemoryService.GetPcsx2ApplicationName(process, _cancellationToken);
+                using var processStream = new ProcessStream(process, 0x20000000, 0x2000000);
+                WritePatch(processStream, gameName);
+                MainLoop(processStream);
             }, _cancellationToken);
         }
 
@@ -323,6 +320,9 @@ namespace OpenKh.Tools.ModsManager.Services
             while (!_cancellationToken.IsCancellationRequested && !isProcessDead)
             {
                 var operation = stream.SetPosition(OperationAddress).ReadInt32();
+                if (stream.Position == OperationAddress) 
+                    break; // The emulator stopped its execution
+
                 switch ((Operation)operation)
                 {
                     case Operation.LoadFile:
