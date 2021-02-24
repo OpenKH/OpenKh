@@ -40,6 +40,7 @@ namespace OpenKh.Patcher
     {
         public string Name { get; set; }
         public string Method { get; set; }
+        public List<Multi> Multi { get; set; }
         public List<AssetFile> Source { get; set; }
 
         public string Type { get; set; }
@@ -47,5 +48,10 @@ namespace OpenKh.Patcher
         public string Language { get; set; }
         public bool IsSwizzled { get; set; }
         public int Index { get; set; }
+    }
+
+    public class Multi
+    {
+        public string Name { get; set; }
     }
 }

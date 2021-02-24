@@ -464,6 +464,60 @@ namespace OpenKh.Tests.Patcher
             });
         }
 
+        [Fact]
+        public void ProcessMultipleTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "somedir/somefile.bar",
+                        Method = "binarc",
+                        Multi = new List<Multi>
+                        {
+                            new Multi { Name = "somedir/another.bar" }
+                        },
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "test",
+                                Method = "imgd",
+                                Type = "imgd",
+                                Source = new List<AssetFile>
+                                {
+                                    new AssetFile
+                                    {
+                                        Name = "sample.png",
+                                        IsSwizzled = false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Copy("Imaging/res/png/32.png", Path.Combine(ModInputDir, "sample.png"));
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, patch.Assets[0].Name);
+            AssertBarFile("test", entry =>
+            {
+                Assert.True(Imgd.IsValid(entry.Stream));
+            }, ModOutputDir, patch.Assets[0].Name);
+
+            AssertFileExists(ModOutputDir, patch.Assets[0].Multi[0].Name);
+            AssertBarFile("test", entry =>
+            {
+                Assert.True(Imgd.IsValid(entry.Stream));
+            }, ModOutputDir, patch.Assets[0].Multi[0].Name);
+        }
+
         private static void AssertFileExists(params string[] paths)
         {
             var filePath = Path.Join(paths);
