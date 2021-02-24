@@ -71,11 +71,19 @@ namespace OpenKh.Patcher
 
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
-                    context.CopyOriginalFile(assetFile.Name);
-                    var dstFile = context.GetDestinationPath(assetFile.Name);
+                    var names = new List<string>();
+                    names.Add(assetFile.Name);
+                    if (assetFile.Multi != null)
+                        names.AddRange(assetFile.Multi.Select(x => x.Name).Where(x => !string.IsNullOrEmpty(x)));
 
-                    using var stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                    PatchFile(context, assetFile, stream);
+                    foreach (var name in names)
+                    {
+                        context.CopyOriginalFile(name);
+                        var dstFile = context.GetDestinationPath(name);
+
+                        using var stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                        PatchFile(context, assetFile, stream);
+                    }
                 });
             }
             catch (Exception ex)
