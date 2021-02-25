@@ -105,16 +105,16 @@ OLO Flags is a bitfield.
 |--------|-------|------------
 | 0x0    | Vector3 | Object center location.
 | 0xC    | float | Radius of object.
-| 0x10   | uint | ID of the Trigger associated
-| 0x14   | uint | [Group Flag](###Group-Flag)
+| 0x10   | uint32 | ID of the Trigger associated
+| 0x14   | uint32 | [Group Flag](###Group-Flag)
 | 0x18   | float | Appear Parameter
-| 0x1C   | uint | Offset to Group Data (?)
+| 0x1C   | uint32 | Offset to Group Data (?)
 | 0x20   | float | Dead Rate
-| 0x24   | ushort | Game Trigger
+| 0x24   | uint16 | Game Trigger
 | 0x26   | uint8 | Mission Parameter
 | 0x27   | uint8 | Unknown Parameter
-| 0x28   | uint | Number of Layout Object Data entities.
-| 0x2A   | uint | Offset to the [Layout Data](###Layout-Data).
+| 0x28   | uint32 | Number of Layout Object Data entities.
+| 0x2C   | uint32 | Offset to the [Layout Data](###Layout-Data).
 
 ### Group Flag
 
@@ -128,8 +128,8 @@ OLO Flags is a bitfield.
 | 11    | 1  | Fire
 | 12    | 8  | ID
 | 20    | 1  | Specified
-| 21    | 1  | Game Trigger to Fire
-| 22    | 1  | Mission to Fire
+| 21    | 1  | Game Trigger Fire
+| 22    | 1  | Mission Fire
 | 23    | 1  | All Dead No Appear
 | 24    | 5  | Group ID
 | 29    | 3  | Padding
@@ -147,20 +147,24 @@ OLO Flags is a bitfield.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0    | char[16] | Object Name
-| 0x10   | Vector3 | Position
-| 0x1C   | Vector3 | Rotation
-| 0x20   | float | Height
-| 0x24   | uint | [Layout Info](###Layout-Info)
-| 0x28   | uint | Unique ID
-| 0x2C   | ushort | Parameter 5
-| 0x2E   | ushort | Parameter 6
-| 0x30   | ushort | Parameter 7
-| 0x32   | ushort | Parameter 8
-| 0x34   | uint | Message ID
-| 0x38   | char[32] | Path Name
-| 0x58   | char[32] | Script Name
-| 0x78   | char[16] | Mission Label
+| 0x0    | uint32 | Object Name
+| 0x4    | Vector3 | Position
+| 0x10   | Vector3 | Rotation
+| 0x1C   | float | Height
+| 0x20   | uint32 | [Layout Info](###Layout-Info)
+| 0x24   | uint32 | Unique ID
+| 0x28   | uint16 | Parameter 1
+| 0x2A   | uint16 | Parameter 2
+| 0x2C   | uint16 | Parameter 3
+| 0x2E   | uint16 | Trigger
+| 0x30   | float | Parameter 5
+| 0x34   | float | Parameter 6
+| 0x38   | float | Parameter 7
+| 0x3C   | float | Parameter 8
+| 0x40   | int32 | Message ID
+| 0x44   | uint32 | Path Name
+| 0x48   | uint32 | Script Name
+| 0x4C   | uint32 | Mission Label
 
  ### Layout Info
 
