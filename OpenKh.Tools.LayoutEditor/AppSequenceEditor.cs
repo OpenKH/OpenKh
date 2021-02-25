@@ -309,7 +309,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 Name = name,
                 Stream = stream,
-                Type = Bar.EntryType.Seqd
+                Type = Bar.EntryType.SequenceData
             };
         }
 
@@ -322,7 +322,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 Name = name,
                 Stream = stream,
-                Type = Bar.EntryType.Imgd
+                Type = Bar.EntryType.ImageData
             };
         }
 

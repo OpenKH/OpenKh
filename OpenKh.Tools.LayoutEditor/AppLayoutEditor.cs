@@ -285,7 +285,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 Name = name,
                 Stream = stream,
-                Type = Bar.EntryType.Layout
+                Type = Bar.EntryType.LayoutData
             };
         }
 
@@ -298,7 +298,7 @@ namespace OpenKh.Tools.LayoutEditor
             {
                 Name = name,
                 Stream = stream,
-                Type = Bar.EntryType.Imgz
+                Type = Bar.EntryType.ImageZip
             };
         }
 

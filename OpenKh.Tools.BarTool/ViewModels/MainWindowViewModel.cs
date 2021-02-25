@@ -335,7 +335,7 @@ namespace OpenKh.Tools.BarTool.ViewModels
             if (Input.Motionset != Bar.MotionsetType.Default)
                 return true;
 
-            return Input.Count(x => x.Type == Bar.EntryType.Anb) >= 4;
+            return Input.Count(x => x.Type == Bar.EntryType.AnimationBinary) >= 4;
         }
     }
 }

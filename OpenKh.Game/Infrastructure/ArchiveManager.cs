@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,10 +15,10 @@ namespace OpenKh.Game.Infrastructure
 
         private readonly Dictionary<Bar.EntryType, Func<Entry, object>> getters = new Dictionary<Bar.EntryType, Func<Entry, object>>
         {
-            [Bar.EntryType.Layout] = entry => Layout.Read(entry.Stream),
-            [Bar.EntryType.Seqd] = entry => Sequence.Read(entry.Stream),
-            [Bar.EntryType.Imgd] = entry => Imgd.Read(entry.Stream),
-            [Bar.EntryType.Imgz] = entry => new Imgz(entry.Stream),
+            [Bar.EntryType.LayoutData] = entry => Layout.Read(entry.Stream),
+            [Bar.EntryType.SequenceData] = entry => Sequence.Read(entry.Stream),
+            [Bar.EntryType.ImageData] = entry => Imgd.Read(entry.Stream),
+            [Bar.EntryType.ImageZip] = entry => new Imgz(entry.Stream),
             [Bar.EntryType.Model] = entry => Mdlx.Read(entry.Stream),
             [Bar.EntryType.ModelTexture] = entry => ModelTexture.Read(entry.Stream),
         };
@@ -50,10 +50,10 @@ namespace OpenKh.Game.Infrastructure
         public T Get<T>(string resourceName)
             where T : class
         {
-            if (typeof(T) == typeof(Layout)) return GetItem<T>(resourceName, Bar.EntryType.Layout);
-            if (typeof(T) == typeof(Sequence)) return GetItem<T>(resourceName, Bar.EntryType.Seqd);
-            if (typeof(T) == typeof(Imgd)) return GetItem<T>(resourceName, Bar.EntryType.Imgd);
-            if (typeof(T) == typeof(Imgz)) return GetItem<T>(resourceName, Bar.EntryType.Imgz);
+            if (typeof(T) == typeof(Layout)) return GetItem<T>(resourceName, Bar.EntryType.LayoutData);
+            if (typeof(T) == typeof(Sequence)) return GetItem<T>(resourceName, Bar.EntryType.SequenceData);
+            if (typeof(T) == typeof(Imgd)) return GetItem<T>(resourceName, Bar.EntryType.ImageData);
+            if (typeof(T) == typeof(Imgz)) return GetItem<T>(resourceName, Bar.EntryType.ImageZip);
             if (typeof(T) == typeof(Mdlx)) return GetItem<T>(resourceName, Bar.EntryType.Model);
             if (typeof(T) == typeof(ModelTexture)) return GetItem<T>(resourceName, Bar.EntryType.ModelTexture);
             return null;

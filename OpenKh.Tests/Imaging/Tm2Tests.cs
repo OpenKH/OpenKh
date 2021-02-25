@@ -78,7 +78,7 @@ namespace OpenKh.Tests.Imaging
                                 .Where(
                                     entry => true
                                         && entry.Name == "rada"
-                                        && entry.Type == Bar.EntryType.Tim2
+                                        && entry.Type == Bar.EntryType.PS2Image
                                 )
                                 .ToList()
                                 .ForEach(

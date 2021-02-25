@@ -135,7 +135,7 @@ namespace OpenKh.Research.Kh2Anim.Subcommands
                 {
                     new Bar.Entry
                     {
-                        Type = Bar.EntryType.Anb,
+                        Type = Bar.EntryType.AnimationBinary,
                         Stream = anbFile,
                         Name = "A000",
                     },

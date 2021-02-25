@@ -405,8 +405,8 @@ namespace OpenKh.Tools.LayoutEditor
 
         private bool OpenBarContent(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
         {
-            var layoutEntries = entries.Count(x => x.Type == Bar.EntryType.Layout);
-            var sequenceEntries = entries.Count(x => x.Type == Bar.EntryType.Seqd);
+            var layoutEntries = entries.Count(x => x.Type == Bar.EntryType.LayoutData);
+            var sequenceEntries = entries.Count(x => x.Type == Bar.EntryType.SequenceData);
 
             if (DoesContainSequenceAnimations(entries))
                 return Open2dd(entries);
@@ -418,8 +418,8 @@ namespace OpenKh.Tools.LayoutEditor
 
         private bool Open2ld(IEnumerable<Bar.Entry> entries, bool doNotShowLayoutSelectionDialog = false)
         {
-            var layoutEntries = entries.Count(x => x.Type == Bar.EntryType.Layout);
-            int imagesEntries = entries.Count(x => x.Type == Bar.EntryType.Imgz);
+            var layoutEntries = entries.Count(x => x.Type == Bar.EntryType.LayoutData);
+            int imagesEntries = entries.Count(x => x.Type == Bar.EntryType.ImageZip);
 
             if (layoutEntries == 0)
                 throw new Exception("No layout found.");
@@ -427,20 +427,20 @@ namespace OpenKh.Tools.LayoutEditor
                 throw new Exception("No image container found.");
             if (layoutEntries > 1 || imagesEntries > 1)
             {
-                OpenResourceSelectionDialog(entries, Bar.EntryType.Layout, Bar.EntryType.Imgz);
+                OpenResourceSelectionDialog(entries, Bar.EntryType.LayoutData, Bar.EntryType.ImageZip);
                 return true;
             }
 
-            var layoutEntry = entries.First(x => x.Type == Bar.EntryType.Layout);
-            var textureContainerEntry = entries.First(x => x.Type == Bar.EntryType.Imgz);
+            var layoutEntry = entries.First(x => x.Type == Bar.EntryType.LayoutData);
+            var textureContainerEntry = entries.First(x => x.Type == Bar.EntryType.ImageZip);
             OpenLayoutEditor(layoutEntry, textureContainerEntry);
             return true;
         }
 
         private bool Open2dd(IEnumerable<Bar.Entry> entries)
         {
-            var sequenceEntries = entries.Count(x => x.Type == Bar.EntryType.Seqd);
-            int imagesEntries = entries.Count(x => x.Type == Bar.EntryType.Imgd);
+            var sequenceEntries = entries.Count(x => x.Type == Bar.EntryType.SequenceData);
+            int imagesEntries = entries.Count(x => x.Type == Bar.EntryType.ImageData);
 
             if (sequenceEntries == 0)
                 throw new Exception("No sequence found.");
@@ -448,12 +448,12 @@ namespace OpenKh.Tools.LayoutEditor
                 throw new Exception("No image found.");
             if (sequenceEntries > 1 || imagesEntries > 1)
             {
-                OpenResourceSelectionDialog(entries, Bar.EntryType.Seqd, Bar.EntryType.Imgd);
+                OpenResourceSelectionDialog(entries, Bar.EntryType.SequenceData, Bar.EntryType.ImageData);
                 return true;
             }
 
-            var sequenceEntry = entries.First(x => x.Type == Bar.EntryType.Seqd);
-            var textureEntry = entries.First(x => x.Type == Bar.EntryType.Imgd);
+            var sequenceEntry = entries.First(x => x.Type == Bar.EntryType.SequenceData);
+            var textureEntry = entries.First(x => x.Type == Bar.EntryType.ImageData);
             OpenSequenceEditor(sequenceEntry, textureEntry);
             return true;
         }
@@ -464,7 +464,7 @@ namespace OpenKh.Tools.LayoutEditor
             _resourceSelectionDialog = new ResourceSelectionDialog(
                 entries, animationType, textureType);
             _isResourceSelectionDialogOpening = true;
-            _isResourceSelectingLayout = animationType == Bar.EntryType.Layout;
+            _isResourceSelectingLayout = animationType == Bar.EntryType.LayoutData;
         }
 
         private void OpenSequenceEditor(Bar.Entry sequenceEntry, Bar.Entry textureEntry)
@@ -537,15 +537,15 @@ namespace OpenKh.Tools.LayoutEditor
 
         //private void OpenLayout(LayoutEntryModel layoutEntryModel)
         //{
-        //    AnimationName = layoutEntryModel.Layout.Name;
+        //    AnimationName = layoutEntryModel.LayoutData.Name;
         //    SpriteName = layoutEntryModel.Images.Name;
 
         //    var texturesViewModel = new TexturesViewModel(layoutEntryModel.Images.Value);
 
         //    var layoutEditorViewModel = new LayoutEditorViewModel(this, this, EditorDebugRenderingService)
         //    {
-        //        SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.Layout.Value, texturesViewModel, EditorDebugRenderingService),
-        //        Layout = layoutEntryModel.Layout.Value,
+        //        SequenceGroups = new SequenceGroupsViewModel(layoutEntryModel.LayoutData.Value, texturesViewModel, EditorDebugRenderingService),
+        //        Layout = layoutEntryModel.LayoutData.Value,
         //        Images = layoutEntryModel.Images.Value
         //    };
 
@@ -601,10 +601,10 @@ namespace OpenKh.Tools.LayoutEditor
         }
 
         private static bool DoesContainSequenceAnimations(IEnumerable<Bar.Entry> entries) =>
-            entries.Any(x => x.Type == Bar.EntryType.Seqd);
+            entries.Any(x => x.Type == Bar.EntryType.SequenceData);
 
         private static bool DoesContainLayoutAnimations(IEnumerable<Bar.Entry> entries) =>
-            entries.Any(x => x.Type == Bar.EntryType.Layout);
+            entries.Any(x => x.Type == Bar.EntryType.LayoutData);
 
         private static void ShowLinkPcsx2ErrorProcessNotFound() =>
             ShowError("No PCSX2 process found.\nPlease run PCSX2 with Kingdom Hearts II/Re:CoM first and try again.", LinkToPcsx2ActionName);

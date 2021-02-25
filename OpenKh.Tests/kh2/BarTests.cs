@@ -177,7 +177,7 @@ namespace OpenKh.Tests.kh2
             {
                 new Bar.Entry
                 {
-                    Type = Bar.EntryType.Dummy,
+                    Type = Bar.EntryType.DUMMY,
                     Duplicate = false,
                     Name = name,
                     Stream = new MemoryStream()

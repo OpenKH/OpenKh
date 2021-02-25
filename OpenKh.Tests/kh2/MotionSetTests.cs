@@ -115,7 +115,7 @@ namespace OpenKh.Tests.kh2
             {
                 Duplicate = false,
                 Name = $"A{i/4:D03}",
-                Type = Bar.EntryType.Anb,
+                Type = Bar.EntryType.AnimationBinary,
                 Stream = new MemoryStream(hasAnimation ? new byte[1] : new byte[0])
             }).ToList();
     }

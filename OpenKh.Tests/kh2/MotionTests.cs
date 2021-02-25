@@ -54,7 +54,7 @@ namespace OpenKh.Tests.kh2
             Helpers.ForAllFiles(".tests/kh2_data", fileName =>
         {
             Helpers.ForBarEntries(fileName,
-                x => x.Type == Bar.EntryType.Anb && x.Stream.Length > 0, (fileName, entry) =>
+                x => x.Type == Bar.EntryType.AnimationBinary && x.Stream.Length > 0, (fileName, entry) =>
             {
                 if (!Bar.IsValid(entry.Stream))
                     return;
@@ -115,7 +115,7 @@ namespace OpenKh.Tests.kh2
                 {
                     foreach (var (msetEntry, index) in File.OpenRead(msetFile).Using(Bar.Read)
                         .Select((msetEntry, index) => (msetEntry, index))
-                        .Where(pair => pair.msetEntry.Type == Bar.EntryType.Anb && pair.msetEntry.Stream.Length != 0)
+                        .Where(pair => pair.msetEntry.Type == Bar.EntryType.AnimationBinary && pair.msetEntry.Stream.Length != 0)
                     )
                     {
                         foreach (var anbEntry in Bar.Read(msetEntry.Stream)
@@ -142,7 +142,7 @@ namespace OpenKh.Tests.kh2
                     .Skip(index)
                     .First();
 
-                Assert.Equal(Bar.EntryType.Anb, msetEntry.Type);
+                Assert.Equal(Bar.EntryType.AnimationBinary, msetEntry.Type);
 
                 if (msetEntry != null)
                 {
