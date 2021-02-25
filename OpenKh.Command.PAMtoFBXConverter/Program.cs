@@ -97,7 +97,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
             for (int b = 0; b < pmo.skeletonHeader.BoneCount; b++)
             {
                 Pmo.BoneData bn = pmo.boneList[b];
-
+                
                 Assimp.Matrix4x4 mtx = new Assimp.Matrix4x4();
                 mtx.A1 = bn.Transform[0];
                 mtx.A2 = bn.Transform[1];

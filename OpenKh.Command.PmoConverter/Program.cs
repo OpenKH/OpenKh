@@ -180,7 +180,6 @@ namespace OpenKh.Command.PmoConverter
                 }
             }
 
-
             return pmo;
         }
 
@@ -239,7 +238,7 @@ namespace OpenKh.Command.PmoConverter
             bool is16bits = true;
             foreach (PositionColoredTextured vert in desc.Vertices)
             {
-                ResizedVector = new Vector2(vert.Tu * 32767.0f, vert.Tv * 32767.0f);
+                ResizedVector = new Vector2(vert.Tu * 32768.0f, vert.Tv * 32768.0f);
 
                 if (ResizedVector.X > 65535 || ResizedVector.Y > 65535)
                 {
@@ -275,7 +274,7 @@ namespace OpenKh.Command.PmoConverter
             bool is16bits = true;
             foreach (PositionColoredTextured vert in desc.Vertices)
             {
-                ResizedVector = new Vector3(((vert.X / 100.0f) * 32767.0f), ((vert.Y / 100.0f) * 32767.0f), ((vert.Z / 100.0f) * 32767.0f));
+                ResizedVector = new Vector3(((vert.X / 100.0f) * 32768.0f), ((vert.Y / 100.0f) * 32768.0f), ((vert.Z / 100.0f) * 32768.0f));
 
                 if (ResizedVector.X > 65535 || ResizedVector.Y > 65535 || ResizedVector.Z > 65535)
                 {

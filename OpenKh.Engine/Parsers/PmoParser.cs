@@ -76,31 +76,36 @@ namespace OpenKh.Engine.Parsers
                     mtx.M42 = boneData.Transform[13];
                     mtx.M43 = boneData.Transform[14];
                     mtx.M44 = boneData.Transform[15];
+                    Matrix4x4 mtx_nd = Matrix4x4.Transpose(mtx);
+
+                    mtx_nd.M11 *= Scale;
+                    mtx_nd.M21 *= Scale;
+                    mtx_nd.M31 *= Scale;
 
                     Vector3 loc;
                     Quaternion quat;
                     Vector3 scl;
 
-                    Matrix4x4.Decompose(mtx, out scl, out quat, out loc);
+                    Matrix4x4.Decompose(mtx_nd, out scl, out quat, out loc);
                     
                     //mtx = Matrix4x4.Transpose(mtx);
-                    matrices.Add(mtx);
+                    matrices.Add(mtx_nd);
 
                     Mdlx.Bone otherBone = new Mdlx.Bone();
                     otherBone.Index = boneData.BoneIndex;
                     otherBone.Parent = (boneData.ParentBoneIndex == 0xFFFF) ? 0 : boneData.ParentBoneIndex;
-                    otherBone.TranslationX = mtx.M11;
-                    otherBone.TranslationY = mtx.M12;
-                    otherBone.TranslationZ = mtx.M13;
-                    otherBone.TranslationW = mtx.M14;
-                    otherBone.RotationX = mtx.M21;
-                    otherBone.RotationY = mtx.M22;
-                    otherBone.RotationZ = mtx.M23;
-                    otherBone.RotationW = mtx.M24;
-                    otherBone.ScaleX = mtx.M31;
-                    otherBone.ScaleY = mtx.M32;
-                    otherBone.ScaleZ = mtx.M33;
-                    otherBone.ScaleW = mtx.M34;
+                    otherBone.TranslationX = mtx_nd.Translation.X;
+                    otherBone.TranslationY = mtx_nd.Translation.Y;
+                    otherBone.TranslationZ = mtx_nd.Translation.Z;
+                    otherBone.TranslationW = mtx_nd.M14;
+                    otherBone.RotationX = mtx_nd.M21;
+                    otherBone.RotationY = mtx_nd.M22;
+                    otherBone.RotationZ = mtx_nd.M23;
+                    otherBone.RotationW = mtx_nd.M24;
+                    otherBone.ScaleX = mtx_nd.M31;
+                    otherBone.ScaleY = mtx_nd.M32;
+                    otherBone.ScaleZ = mtx_nd.M33;
+                    otherBone.ScaleW = mtx_nd.M34;
 
                     skeleton.Add(otherBone);
                 }
