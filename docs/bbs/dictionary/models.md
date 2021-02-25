@@ -93,7 +93,6 @@ Notes:
 | B20CD | Lucifer |
 | B20DC | Dale |
 | B20EX | Eraqus |
-| B20EX | Eraqus (No scars) |
 | B20HE | Hercules |
 | B200LS | Experiment 221 |
 | B20PP | Peter Pan |
@@ -1064,6 +1063,7 @@ Notes:
 | P41EX | Ventus (Helmetless) |
 | P42EX | Aqua (Helmetless) |
 | P43EX | Terra (Helmetless) |
+| P93EX | Terra (Armored with cape) (2.5 exclusive) |
 
 ### Weapons
 
