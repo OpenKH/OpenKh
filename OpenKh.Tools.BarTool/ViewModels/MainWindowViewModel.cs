@@ -169,7 +169,7 @@ namespace OpenKh.Tools.BarTool.ViewModels
 
                 var _files = await _dialog.ShowAsync(Instance);
 
-                if (_files.Length == 1)
+                if (_files != null && _files.Length == 1)
                 {
                     Items.Clear();
                     FileName = Path.GetFileName(_files[0]);
