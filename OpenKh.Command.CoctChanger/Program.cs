@@ -278,7 +278,7 @@ namespace OpenKh.Command.CoctChanger
                         )
                     )
                     {
-                        Console.WriteLine($"# {entry.Name}:{entry.Index} ({entry.Type})");
+                        Console.WriteLine($"# {entry.Name} ({entry.Type})");
                         PrintSummary(Coct.Read(entry.Stream));
                         Console.WriteLine();
                     }

@@ -23,10 +23,10 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             Bar.EntryType textureType)
         {
             _animations = entries
-                .Where(x => x.Type == animationType && x.Index == 0)
+                .Where(x => x.Type == animationType && x.Duplicate == false)
                 .ToArray();
             _textures = entries
-                .Where(x => x.Type == textureType && x.Index == 0)
+                .Where(x => x.Type == textureType && x.Duplicate == false)
                 .ToArray();
         }
 

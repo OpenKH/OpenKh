@@ -114,7 +114,7 @@ namespace OpenKh.Command.MapGen.Utils
                     Name = addFile.name,
                     Type = (Bar.EntryType)addFile.type,
                     Stream = new MemoryStream(data),
-                    Index = addFile.index,
+                    Duplicate = addFile.duplicate,
                 };
             }
         }

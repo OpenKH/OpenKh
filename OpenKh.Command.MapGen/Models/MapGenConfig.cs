@@ -46,7 +46,7 @@ namespace OpenKh.Command.MapGen.Models
             public string name { get; set; }
             public int type { get; set; }
             public string fromFile { get; set; }
-            public int index { get; set; }
+            public bool duplicate { get; set; }
         }
 
         public BarConfig bar { get; set; }

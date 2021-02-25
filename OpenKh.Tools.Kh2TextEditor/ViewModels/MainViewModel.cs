@@ -430,7 +430,7 @@ namespace OpenKh.Tools.Kh2TextEditor.ViewModels
         private void WriteBar(List<Bar.Entry> entries, Stream stream)
         {
             var newEntries = entries
-                .ForEntry(Bar.EntryType.List, _barEntryName, 0, entry => WriteMsg(entry.Stream));
+                .ForEntry(Bar.EntryType.List, _barEntryName, false, entry => WriteMsg(entry.Stream));
 
             Bar.Write(stream, newEntries);
         }

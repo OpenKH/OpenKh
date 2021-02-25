@@ -312,7 +312,7 @@ namespace OpenKh.Command.DoctChanger
                         )
                     )
                     {
-                        Console.WriteLine($"# {entry.Name}:{entry.Index} ({entry.Type})");
+                        Console.WriteLine($"# {entry.Name} ({entry.Type})");
                         PrintSummary(Doct.Read(entry.Stream));
                         Console.WriteLine();
                     }

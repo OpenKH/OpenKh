@@ -80,7 +80,7 @@ namespace OpenKh.Tests
             foreach (var entry in File
                 .OpenRead(fileName)
                 .Using(stream => Bar.Read(stream))
-                .Where(x => x.Index == 0)
+                .Where(x => x.Duplicate == false)
                 .Where(predicate))
             {
                 try

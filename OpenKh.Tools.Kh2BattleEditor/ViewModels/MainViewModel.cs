@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.Common;
@@ -193,7 +193,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         }
 
         private IEnumerable<Bar.Entry> SaveBattleItem(IEnumerable<Bar.Entry> entries, IBattleGetChanges battleGetChanges) =>
-            entries.ForEntry(Bar.EntryType.List, battleGetChanges.EntryName, 0, entry => entry.Stream = battleGetChanges.CreateStream());
+            entries.ForEntry(Bar.EntryType.List, battleGetChanges.EntryName, false, entry => entry.Stream = battleGetChanges.CreateStream());
 
         private T GetBattleViewModelInstance<T>(IEnumerable<Bar.Entry> entries)
             where T : IBattleGetChanges => (T)Activator.CreateInstance(typeof(T), entries);

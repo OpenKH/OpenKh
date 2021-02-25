@@ -113,7 +113,7 @@ namespace OpenKh.Tests.kh2
         private static List<Bar.Entry> GenerateFakeBar(IEnumerable<bool> hasAnimationArray) =>
             hasAnimationArray.Select((hasAnimation, i) => new Bar.Entry
             {
-                Index = 0,
+                Duplicate = false,
                 Name = $"A{i/4:D03}",
                 Type = Bar.EntryType.Anb,
                 Stream = new MemoryStream(hasAnimation ? new byte[1] : new byte[0])
