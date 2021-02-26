@@ -51,7 +51,7 @@
                 <ListBox Name="FileBox" Height="215" Margin="10" Items="{Binding Items, Mode=TwoWay}" SelectedItem="{Binding CurrentItem, Mode=OneWayToSource}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <ListBoxItem Content="{Binding Name}"/>
+                            <TextBlock Text="{Binding Name}"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
 
@@ -71,7 +71,7 @@
                 <ComboBox HorizontalAlignment="Stretch" Margin="10" Items="{Binding MotionsetTypes}" SelectedIndex="{Binding MotionsetType, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
-                            <ComboBoxItem Content="{Binding Name}"/>
+                            <TextBlock Text="{Binding Name}"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
@@ -85,7 +85,7 @@
                 <ComboBox HorizontalAlignment="Stretch" Margin="0, 5, 10, 0" Items="{Binding Types}" SelectedIndex="{Binding #FileBox.SelectedItem.Type, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
-                            <ComboBoxItem Content="{Binding Name}"/>
+                            <TextBlock Text="{Binding Name}"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
