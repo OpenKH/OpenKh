@@ -151,7 +151,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             FileName = ConfigurationService.Pcsx2Location,
                             WorkingDirectory = Path.GetDirectoryName(ConfigurationService.Pcsx2Location),
-                            Arguments = ConfigurationService.IsoLocation
+                            Arguments = $"\"{ConfigurationService.IsoLocation}\""
                         }));
                         break;
                     case 2:
