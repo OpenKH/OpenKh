@@ -24,7 +24,7 @@
             <Grid Margin="0 0 0 5" Background="White">
                 <TextBlock Margin="5,1" MinWidth="50" Text="eg. openkh/my-kingdomhearts-mod" 
                    Foreground="Gray" Visibility="{Binding ElementName=txtSourceModUrl, Path=Text.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" IsHitTestVisible="False"/>
-                <TextBox Name="txtSourceModUrl" Background="Transparent" Text="{Binding RepositoryName}" KeyUp="txtSourceModUrl_KeyUp" />
+                <TextBox Name="txtSourceModUrl" Background="Transparent" Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
             </Grid>
 
             <TextBlock Margin="0 0 0 3">Or install it from a ZIP archive</TextBlock>
