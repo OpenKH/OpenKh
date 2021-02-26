@@ -31,14 +31,14 @@ namespace OpenKh.Game.Infrastructure
             // Left
             Keys.W,
             Keys.S,
-            Keys.A,
             Keys.D,
+            Keys.A,
             
             // Right
             Keys.Up,
             Keys.Down,
-            Keys.Left,
             Keys.Right,
+            Keys.Left,
         };
 
         public Vector3 AnalogLeft { get; private set; }
