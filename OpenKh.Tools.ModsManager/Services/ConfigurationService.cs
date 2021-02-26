@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -55,6 +58,29 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             if (!Directory.Exists(ModCollectionPath))
                 Directory.CreateDirectory(ModCollectionPath);
+
+            Task.Run(async () =>
+            {
+                using var client = new HttpClient();
+                var response = await client
+                    .GetAsync("https://raw.githubusercontent.com/OpenKH/mods-manager-feed/main/featured.txt");
+                FeaturedMods = (await response.Content.ReadAsStringAsync())
+                    .Split("\n")
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .ToList();
+            });
+
+            Task.Run(async () =>
+            {
+                using var client = new HttpClient();
+                var response = await client
+                    .GetAsync("https://raw.githubusercontent.com/OpenKH/mods-manager-feed/main/deny.txt");
+                BlacklistedMods = (await response.Content.ReadAsStringAsync())
+                    .Split("\n")
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .ToList();
+                BlacklistedMods.Add("OpenKH/mod-template");
+            });
         }
 
         public static ICollection<string> EnabledMods
@@ -62,6 +88,9 @@ namespace OpenKh.Tools.ModsManager.Services
             get => File.Exists(EnabledModsPath) ? File.ReadAllLines(EnabledModsPath) : new string[0];
             set => File.WriteAllLines(EnabledModsPath, value);
         }
+
+        public static ICollection<string> FeaturedMods { get; private set; }
+        public static ICollection<string> BlacklistedMods { get; private set; }
 
         public static string ModCollectionPath
         {
