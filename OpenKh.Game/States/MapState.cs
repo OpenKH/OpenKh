@@ -93,9 +93,9 @@ namespace OpenKh.Game.States
                 const double Speed = 100.0;
                 var speed = (float)(deltaTimes.DeltaTime * Speed);
                 _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtX, _input.AxisLeft.Y * speed * 5);
-                _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtY, -_input.AxisLeft.X * speed * 5);
+                _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtY, -_input.AxisLeft.X * speed * 5);
                 _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, -_input.AxisRight.Y * speed);
-                _camera.CameraRotationYawPitchRoll -= new Vector3(_input.AxisRight.X * speed, 0, 0);
+                _camera.CameraRotationYawPitchRoll += new Vector3(_input.AxisRight.X * speed, 0, 0);
 
                 Field.Update(deltaTimes.DeltaTime);
             }
