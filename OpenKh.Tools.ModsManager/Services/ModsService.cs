@@ -1,10 +1,12 @@
 using LibGit2Sharp;
 using OpenKh.Common;
 using OpenKh.Patcher;
+using OpenKh.Tools.ModsManager.Exceptions;
 using OpenKh.Tools.ModsManager.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,27 +14,25 @@ namespace OpenKh.Tools.ModsManager.Services
 {
     public static class ModsService
     {
+        private const string ModMetadata = "mod.yml";
+        private const string DefaultGitBranch = "main";
+
         public static IEnumerable<string> Mods
         {
             get
             {
                 var modsPath = ConfigurationService.ModCollectionPath;
-                var startPath = modsPath.Length;
-                var lastChar = modsPath[startPath - 1];
-                if (lastChar != '/' && lastChar != '\\')
-                    startPath++;
-
                 foreach (var dir in Directory.GetDirectories(modsPath))
                 {
                     var authorName = Path.GetFileName(dir);
                     foreach (var subdir in Directory.GetDirectories(dir))
                     {
                         var repoName = Path.GetFileName(subdir);
-                        if (File.Exists(Path.Combine(subdir, "mod.yml")))
+                        if (File.Exists(Path.Combine(subdir, ModMetadata)))
                             yield return $"{authorName}/{repoName}";
                     }
 
-                    if (File.Exists(Path.Combine(dir, "mod.yml")))
+                    if (File.Exists(Path.Combine(dir, ModMetadata)))
                         yield return authorName;
                 }
             }
@@ -51,29 +51,87 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
+        public static bool IsModBlocked(string repositoryName) =>
+            ConfigurationService.BlacklistedMods.Any(x => x.Equals(repositoryName, StringComparison.InvariantCultureIgnoreCase));
+
+        public static bool IsUserBlocked(string repositoryName) =>
+            IsModBlocked(Path.GetDirectoryName(repositoryName));
+
+        public static Task InstallMod(
+            string name,
+            bool isZipFile,
+            Action<string> progressOutput = null,
+            Action<float> progressNumber = null)
+        {
+            return isZipFile ?
+                Task.Run(() => InstallModFromZip(name, progressOutput, progressNumber)) :
+                InstallModFromGithub(name, progressOutput, progressNumber);
+        }
+
+        public static void InstallModFromZip(
+            string fileName,
+            Action<string> progressOutput = null,
+            Action<float> progressNumber = null)
+        {
+            var modName = Path.GetFileNameWithoutExtension(fileName);
+            progressOutput?.Invoke($"Opening '{modName}' zip archive...");
+
+            using var zipFile = ZipFile.OpenRead(fileName);
+            var isValidMod = zipFile.GetEntry(ModMetadata) != null;
+            if (!isValidMod)
+                throw new ModNotValidException(modName);
+
+            var modPath = GetModPath(modName);
+            if (Directory.Exists(modPath))
+                throw new ModAlreadyExistsExceptions(modName);
+            Directory.CreateDirectory(modPath);
+
+            var entryExtractCount = 0;
+            var entryCount = zipFile.Entries.Count;
+            foreach (var entry in zipFile.Entries.Where(x => (x.ExternalAttributes & 0x10) != 0x10))
+            {
+                progressOutput?.Invoke($"Extracting '{entry.FullName}'...");
+                progressNumber?.Invoke((float)entryExtractCount / entryCount);
+                var dstFileName = Path.Combine(modPath, entry.FullName);
+                var dstFilePath = Path.GetDirectoryName(dstFileName);
+                if (!Directory.Exists(dstFilePath))
+                    Directory.CreateDirectory(dstFilePath);
+                File.Create(dstFileName)
+                    .Using(outStream =>
+                    {
+                        using var zipStream = entry.Open();
+                        zipStream.CopyTo(outStream);
+                    });
+
+                entryExtractCount++;
+            }
+        }
+
         public static async Task InstallModFromGithub(
             string repositoryName,
             Action<string> progressOutput = null,
             Action<float> progressNumber = null)
         {
-            var branchName = "main";
-            progressOutput?.Invoke($"Fetching file mod.yml from {branchName}");
-            var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, "mod.yml");
+            var branchName = DefaultGitBranch;
+            progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
+            var isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
             if (!isValidMod)
             {
-                progressOutput?.Invoke($"mod.yml not found, fetching default branch name");
+                progressOutput?.Invoke($"{ModMetadata} not found, fetching default branch name");
                 branchName = await RepositoryService.GetMainBranchFromRepository(repositoryName);
                 if (branchName == null)
-                    throw new Exception($"Repository '{repositoryName}' not found.");
+                    throw new RepositoryNotFoundException(repositoryName);
 
-                progressOutput?.Invoke($"Fetching file mod.yml from {branchName}");
-                isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, "mod.yml");
+                progressOutput?.Invoke($"Fetching file {ModMetadata} from {branchName}");
+                isValidMod = await RepositoryService.IsFileExists(repositoryName, branchName, ModMetadata);
             }
 
             if (!isValidMod)
-                throw new Exception($"Repository '{repositoryName}' does not contain a valid OpenKH compatible mod");
+                throw new ModNotValidException(repositoryName);
 
             var modPath = GetModPath(repositoryName);
+            if (Directory.Exists(modPath))
+                throw new ModAlreadyExistsExceptions(repositoryName);
             Directory.CreateDirectory(modPath);
 
             progressOutput?.Invoke($"Mod found, initializing clonation process");
@@ -115,7 +173,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     Name = repositoryName,
                     Path = modPath,
-                    Metadata = File.OpenRead(Path.Combine(modPath, "mod.yml")).Using(Metadata.Read),
+                    Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
                     IsEnabled = enabledMods.Contains(repositoryName)
                 };
             }
