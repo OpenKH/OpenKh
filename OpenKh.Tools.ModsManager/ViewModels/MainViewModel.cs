@@ -64,12 +64,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     InstallModProgressWindow progressWindow = null;
                     try
                     {
-                        var repositoryName = view.RepositoryName;
+                        var name = view.RepositoryName;
+                        var isZipFile = view.IsZipFile;
                         progressWindow = Application.Current.Dispatcher.Invoke(() =>
                         {
                             var progressWindow = new InstallModProgressWindow
                             {
-                                ModName = repositoryName,
+                                ModName = isZipFile ? Path.GetFileName(name) : name,
                                 ProgressText = "Initializing",
                                 ShowActivated = true
                             };
@@ -77,7 +78,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             return progressWindow;
                         });
 
-                        await ModsService.InstallModFromGithub(repositoryName, progress =>
+                        await ModsService.InstallMod(name, isZipFile, progress =>
                         {
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
                         }, nProgress =>
@@ -85,7 +86,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
                         });
 
-                        var mod = ModsService.GetMods(new string[] { repositoryName }).First();
+                        var actualName = isZipFile ? Path.GetFileNameWithoutExtension(name) : name;
+                        var mod = ModsService.GetMods(new string[] { actualName }).First();
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             progressWindow.Close();
@@ -188,6 +190,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             ModsList = new ObservableCollection<ModViewModel>(
                 ModsService.GetMods(ModsService.Mods).Select(Map));
+            OnPropertyChanged(nameof(ModsList));
         }
 
         private ModViewModel Map(ModModel mod) => new ModViewModel(mod, this);

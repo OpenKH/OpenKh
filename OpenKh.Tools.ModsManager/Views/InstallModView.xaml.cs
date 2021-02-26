@@ -1,5 +1,7 @@
+using OpenKh.Tools.ModsManager.Services;
 using System.Collections.Generic;
 using System.Windows;
+using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.ModsManager.Views
 {
@@ -8,7 +10,12 @@ namespace OpenKh.Tools.ModsManager.Views
     /// </summary>
     public partial class InstallModView : Window
     {
+        private static readonly IEnumerable<FileDialogFilter> _zipFilter = FileDialogFilterComposer
+            .Compose()
+            .AddExtensions("OpenKH mod as ZIP file", "zip");
+
         public string RepositoryName { get; set; }
+        public bool IsZipFile { get; private set; }
 
         public InstallModView()
         {
@@ -35,8 +42,16 @@ namespace OpenKh.Tools.ModsManager.Views
 
             Close();
         }
-            DialogResult = true;
-            Close();
+
+        private void InstallZip_Click(object sender, RoutedEventArgs e)
+        {
+            FileDialog.OnOpen(fileName =>
+            {
+                IsZipFile = true;
+                RepositoryName = fileName;
+                DialogResult = true;
+                Close();
+            }, _zipFilter);
         }
 
         private void txtSourceModUrl_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
