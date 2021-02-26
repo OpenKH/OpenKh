@@ -79,7 +79,6 @@ namespace OpenKh.Tools.ModsManager.Services
                     .Split("\n")
                     .Where(x => !string.IsNullOrEmpty(x))
                     .ToList();
-                BlacklistedMods.Add("OpenKH/mod-template");
             });
         }
 
