@@ -465,6 +465,56 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void MergeKh2AreaDataScriptTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "map.script",
+                        Method = "areadatascript",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "map.txt",
+                            }
+                        }
+                    },
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "map.script")).Using(stream =>
+            {
+                var compiledProgram = Kh2.Ard.AreaDataScript.Compile("Program 1\nSpawn \"1111\"");
+                Kh2.Ard.AreaDataScript.Write(stream, compiledProgram);
+            });
+            File.Create(Path.Combine(ModInputDir, "map.txt")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("Program 2");
+                writer.WriteLine("Spawn \"2222\"");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "map.script");
+            File.OpenRead(Path.Combine(ModOutputDir, "map.script")).Using(stream =>
+            {
+                var scripts = Kh2.Ard.AreaDataScript.Read(stream);
+                var decompiled = Kh2.Ard.AreaDataScript.Decompile(scripts);
+                decompiled.Contains("Program 1");
+                decompiled.Contains("Spawn \"1111\"");
+                decompiled.Contains("Program 2");
+                decompiled.Contains("Spawn \"2222\"");
+            });
+        }
+
+        [Fact]
         public void ProcessMultipleTest()
         {
             var patcher = new PatcherProcessor();
