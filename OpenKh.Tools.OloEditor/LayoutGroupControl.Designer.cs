@@ -206,7 +206,16 @@ namespace OpenKh.Tools.OloEditor
             "APPEAR_TYPE_NONE",
             "APPEAR_TYPE_PLAYER_DISTANCE",
             "APPEAR_TYPE_SPECIFIED",
-            "APPEAR_TYPE_NPC_DISTANCE"});
+            "APPEAR_TYPE_NPC_DISTANCE",
+            "APPEAR_04",
+            "APPEAR_05",
+            "APPEAR_06",
+            "APPEAR_07",
+            "APPEAR_08",
+            "APPEAR_09",
+            "APPEAR_10",
+            "APPEAR_11",
+            "APPEAR_12"});
             this.AppearTypeComboBox.Location = new System.Drawing.Point(8, 41);
             this.AppearTypeComboBox.Name = "AppearTypeComboBox";
             this.AppearTypeComboBox.Size = new System.Drawing.Size(193, 23);

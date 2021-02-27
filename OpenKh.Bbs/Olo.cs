@@ -131,7 +131,6 @@ namespace OpenKh.Bbs
             [Data] public byte UnkParameter { get; set; }
             [Data] public uint ObjectLayoutDataCount { get; set; }
             [Data] public uint ObjectLayoutDataOffset { get; set; }
-            [Data] public List<LayoutData> LayoutList { get; set; }
         }
 
         public enum AppearType
@@ -242,6 +241,7 @@ namespace OpenKh.Bbs
         public List<ObjectName> MissionNameList = new List<ObjectName>();
         public List<TriggerData> TriggerList = new List<TriggerData>();
         public List<GroupData> GroupList = new List<GroupData>();
+        public List<LayoutData> LayoutList = new List<LayoutData>();
 
         public static bool IsValid(Stream stream)
         {
@@ -296,14 +296,15 @@ namespace OpenKh.Bbs
             stream.Seek(olo.header.GroupDataOffset, SeekOrigin.Begin);
             for (int i = 0; i < olo.header.GroupDataCount; i++)
             {
+                stream.Seek(olo.header.GroupDataOffset + (i * 0x30), SeekOrigin.Begin);
                 GroupData data = BinaryMapping.ReadObject<GroupData>(stream);
-                data.LayoutList = new List<LayoutData>();
+                olo.LayoutList = new List<LayoutData>();
 
                 stream.Seek(data.ObjectLayoutDataOffset, SeekOrigin.Begin);
                 
                 for (int j = 0; j < data.ObjectLayoutDataCount; j++)
                 {
-                    data.LayoutList.Add(BinaryMapping.ReadObject<LayoutData>(stream));
+                    olo.LayoutList.Add(BinaryMapping.ReadObject<LayoutData>(stream));
                 }
 
                 olo.GroupList.Add(data);
@@ -344,11 +345,11 @@ namespace OpenKh.Bbs
             for (int i = 0; i < olo.header.GroupDataCount; i++)
             {
                 BinaryMapping.WriteObject<GroupData>(stream, olo.GroupList[i]);
+            }
 
-                for (int j = 0; j < olo.GroupList[i].ObjectLayoutDataCount; j++)
-                {
-                    BinaryMapping.WriteObject<LayoutData>(stream, olo.GroupList[i].LayoutList[j]);
-                }
+            for (int j = 0; j < olo.LayoutList.Count; j++)
+            {
+                BinaryMapping.WriteObject<LayoutData>(stream, olo.LayoutList[j]);
             }
         }
     }

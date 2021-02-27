@@ -196,7 +196,7 @@ namespace OpenKh.Tools.OloEditor
             this.FlowTriggers.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowTriggers.Location = new System.Drawing.Point(0, 0);
             this.FlowTriggers.Name = "FlowTriggers";
-            this.FlowTriggers.Size = new System.Drawing.Size(747, 481);
+            this.FlowTriggers.Size = new System.Drawing.Size(949, 527);
             this.FlowTriggers.TabIndex = 0;
             this.FlowTriggers.WrapContents = false;
             // 

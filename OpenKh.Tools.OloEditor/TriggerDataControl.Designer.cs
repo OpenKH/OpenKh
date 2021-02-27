@@ -118,23 +118,23 @@ namespace OpenKh.Tools.OloEditor
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(355, 161);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(104, 15);
+            this.label9.Size = new System.Drawing.Size(112, 15);
             this.label9.TabIndex = 8;
-            this.label9.Text = "Unknown Param 2";
+            this.label9.Text = "P2 (Room Entrance)";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(355, 113);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(104, 15);
+            this.label6.Size = new System.Drawing.Size(63, 15);
             this.label6.TabIndex = 8;
-            this.label6.Text = "Unknown Param 1";
+            this.label6.Text = "P1 (Room)";
             // 
             // StopCheckbox
             // 
             this.StopCheckbox.AutoSize = true;
-            this.StopCheckbox.Location = new System.Drawing.Point(270, 183);
+            this.StopCheckbox.Location = new System.Drawing.Point(290, 183);
             this.StopCheckbox.Name = "StopCheckbox";
             this.StopCheckbox.Size = new System.Drawing.Size(50, 19);
             this.StopCheckbox.TabIndex = 7;
@@ -144,7 +144,7 @@ namespace OpenKh.Tools.OloEditor
             // FireCheckbox
             // 
             this.FireCheckbox.AutoSize = true;
-            this.FireCheckbox.Location = new System.Drawing.Point(219, 183);
+            this.FireCheckbox.Location = new System.Drawing.Point(239, 183);
             this.FireCheckbox.Name = "FireCheckbox";
             this.FireCheckbox.Size = new System.Drawing.Size(45, 19);
             this.FireCheckbox.TabIndex = 6;
@@ -154,7 +154,7 @@ namespace OpenKh.Tools.OloEditor
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(114, 161);
+            this.label5.Location = new System.Drawing.Point(134, 161);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(70, 15);
             this.label5.TabIndex = 5;
@@ -180,7 +180,7 @@ namespace OpenKh.Tools.OloEditor
             "Box",
             "Sphere",
             "Cylinder"});
-            this.TriggerShapeComboBox.Location = new System.Drawing.Point(113, 179);
+            this.TriggerShapeComboBox.Location = new System.Drawing.Point(133, 179);
             this.TriggerShapeComboBox.Name = "TriggerShapeComboBox";
             this.TriggerShapeComboBox.Size = new System.Drawing.Size(100, 23);
             this.TriggerShapeComboBox.TabIndex = 4;
@@ -199,7 +199,7 @@ namespace OpenKh.Tools.OloEditor
             "Mission"});
             this.TriggerTypeComboBox.Location = new System.Drawing.Point(6, 179);
             this.TriggerTypeComboBox.Name = "TriggerTypeComboBox";
-            this.TriggerTypeComboBox.Size = new System.Drawing.Size(101, 23);
+            this.TriggerTypeComboBox.Size = new System.Drawing.Size(121, 23);
             this.TriggerTypeComboBox.TabIndex = 4;
             this.TriggerTypeComboBox.Text = "Scene Jump";
             // 
