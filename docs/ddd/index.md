@@ -4,3 +4,5 @@
 
 * [Game builds](builds.md)
 * [Worlds](worlds.md)
+* Other files
+    * [lboard.bin](file//lboard.md)
