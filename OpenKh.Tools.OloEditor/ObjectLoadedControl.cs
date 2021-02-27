@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Linq;
 using System.Windows.Forms;
-using OpenKh.Bbs;
+using OpenKh.Bbs.SystemData;
 
 namespace OpenKh.Tools.OloEditor
 {
@@ -15,7 +15,7 @@ namespace OpenKh.Tools.OloEditor
         public ObjectLoadedControl()
         {
             InitializeComponent();
-            ObjectLoadedComboBox.DataSource = Olo.SpawnObjectList.Values.ToList();
+            ObjectLoadedComboBox.DataSource = GameObject.SpawnObjectList.Values.ToList();
         }
     }
 }

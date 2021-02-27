@@ -7,117 +7,6 @@ namespace OpenKh.Bbs
 {
     public class Olo
     {
-        public static Dictionary<string, string> SpawnObjectList = new Dictionary<string, string>()
-        {
-            {"b01ex00", "Mysterious Figure"},
-            {"b02ex00", "Red Eyes"},
-            {"b10ex00", "Vanitas"},
-            {"b10ex01", "Vanitas (Low AI)"},
-            {"b10ex02", "Vanitas (Final Battle)"},
-            {"b11ex00", "Vanitas (Unmasked)"},
-            {"b12ex00", "Vanitas Lingering Spirit"},
-            {"b12ex01", "Vanitas Lingering Spirit Clone"},
-            {"b20ex00", "Eraqus"},
-            {"b30ex00", "Braig (Scarred)"},
-            {"b31ex00", "Braig Bullets"},
-            {"b32ex00", "Braig"},
-            {"b40ex00", "Master Xehanort"},
-            {"b50ex00", "Terra-Xehanort"},
-            {"b51ex00", "Terra-Xehanort 2"},
-            {"b52ex00", "Terra-Xehanort + Guardian"},
-            {"b53ex00", "Terra-Xehanort's No Name"},
-            {"b54ex00", "Terra-Xehanort's No Name Keychain"},
-            {"b55ex00", "Terra-Xehanort's Ultima Cannon"},
-            {"b56ex00", "Terra-Xehanort's Guardian"},
-            {"b60ex00", "Ventus (Boss)"},
-            {"b61ex00", "Ventus Weapon"},
-            {"b62ex00", "Armor Ventus (Boss)"},
-            {"b63ex00", "Ventus=Vanitas (Boss)"},
-
-            {"b01vs00", "Mimic Master (Boss)"},
-
-            {"g01ex00", "Savepoint"},
-            {"g02ex00", "Examine Actor (To place on static object)"},
-            {"g03ex00", "Crown (Puzzle)"},
-            {"g04ex00", "Jellyshade Swam"},
-            {"g05ex00", "Teleporter"},
-            {"g10ex00", "Invisible Wall"},
-            {"g20ex00", "g20ex00"},
-
-            {"g01jb00", "Small Chest (JB)"},
-            {"g02jb00", "Large Chest (JB)"},
-            {"g03jb00", "Large Chest (Debug)"},
-            {"g10jb00", "Plume of Darkness"},
-            {"g11jb00", "Sphere of Darkness"},
-            {"g12jb00", "g12jb00"},
-            {"g13jb00", "g13jb00"},
-            {"g14jb00", "g14jb00"},
-            {"g15jb00", "g15jb00"},
-            {"g16jb00", "g16jb00"},
-            {"g17jb00", "g17jb00"},
-            {"g18jb00", "g18jb00"},
-            {"g19jb00", "g19jb00"},
-            {"g20jb00", "g20jb00"},
-            {"g21jb00", "g21jb00"},
-            {"g22jb00", "g22jb00"},
-            {"g23jb00", "g23jb00"},
-
-            {"g01kg00", "Small Chest (KG)"},
-            {"g02kg00", "Large Chest (KG)"},
-            {"g10kg00", "Tornado (KG)"},
-            {"g11kg00", "Tornado Base (KG)"},
-            {"g12kg00", "Untextured Triangle"},
-            {"g13kg00", "g13kg00 (KG)"},
-
-            {"g01pp00", "g01pp00"},
-            {"g20pp00", "g20pp00"},
-
-            {"m01ex00", "Flood"},
-            {"m02ex00", "Scrapper"},
-            {"m03ex00", "Bruiser"},
-            {"m04ex00", "Red Hot Chili"},
-            {"m05ex00", "Monotrucker"},
-            {"m06ex00", "Thornbite"},
-            {"m07ex00", "Shoegazer"},
-            {"m08ex00", "Spiderchest"},
-            {"m09ex00", "Archraven"},
-            {"m10ex00", "Hareraiser"},
-            {"m11ex00", "Jellyshade"},
-            {"m12ex00", "Tank Toppler"},
-            {"m13ex00", "Vile Phial"},
-            {"m14ex00", "Sonic Blaster"},
-            {"m15ex00", "Triple Wrecker"},
-            {"m16ex00", "Wild Bruiser"},
-            {"m17ex00", "Blue Sea Salt"},
-            {"m18ex00", "Yellow Mustard"},
-            {"m19ex00", "Mandrake"},
-            {"m20ex00", "Buckle Bruiser"},
-
-            {"m40ex00", "Shadow"},
-            {"m41ex00", "Neoshadow"},
-            {"m42ex00", "Darkball"},
-
-            {"m54ex00", "Ringer Pot"},
-
-
-            {"n10ex00", "Moogle Shop 1"},
-            {"n11ex00", "Moogle Shop 2"},
-            {"n12ex00", "Moogle Shop 3"},
-            {"n13ex00", "Moogle Shop 4"},
-
-            {"p01ex00", "Ventus (PC)"},
-            {"p02ex00", "Aqua (PC)"},
-            {"p03ex00", "Terra (PC)"},
-            {"p11ex00", "Ventus Armor (PC)"},
-            {"p12ex00", "Aqua Armor (PC)"},
-            {"p13ex00", "Terra Armor (PC)"},
-            {"p41ex00", "Ventus Armor Helmetless (PC)"},
-            {"p42ex00", "Aqua Armor Helmetless (PC)"},
-            {"p43ex00", "Terra Armor Helmetless (PC)"},
-
-            
-        };
-
         private const int MagicCode = 0x4F4C4F40; // Always @OLO
 
         public class Header
@@ -209,11 +98,21 @@ namespace OpenKh.Bbs
         {
             TriggerBehavior behavior = new TriggerBehavior();
             behavior.Type = (TriggerType)BitsUtil.Int.GetBits((int)value, 0, 4);
-            behavior.Shape = (TriggerShape)BitsUtil.Int.GetBits((int)value, 4, 8);
+            behavior.Shape = (TriggerShape)BitsUtil.Int.GetBits((int)value, 4, 4);
             behavior.Fire = BitsUtil.Int.GetBit((int)value, 8);
             behavior.Stop = BitsUtil.Int.GetBit((int)value, 9);
 
             return behavior;
+        }
+
+        public static uint MakeTriggerBehavior(TriggerType type, TriggerShape shape, bool Fire, bool Stop)
+        {
+            uint val = 0;
+            val = BitsUtil.Int.SetBits(val, 0, 4, (uint)type);
+            val = BitsUtil.Int.SetBits(val, 4, 4, (uint)shape);
+            val = BitsUtil.Int.SetBit(val, 8, Fire);
+            val = BitsUtil.Int.SetBit(val, 9, Stop);
+            return val;
         }
 
         public class GroupData
@@ -277,6 +176,25 @@ namespace OpenKh.Bbs
             flag.GroupID = (byte)BitsUtil.Int.GetBits((int)value, 24, 5);
 
             return flag;
+        }
+
+        public static uint MakeGroupFlag(AppearType Type, bool Linked, bool AppearOK, bool LinkInvoke, byte Step, bool Fire, byte ID, bool Specified, bool GameTriggerFire, bool MissionFire, bool AllDeadNoAppear, byte GroupID)
+        {
+            uint val = 0;
+            val = BitsUtil.Int.SetBits(val, 0, 4, (uint)Type);
+            val = BitsUtil.Int.SetBit(val, 4, Linked);
+            val = BitsUtil.Int.SetBit(val, 5, AppearOK);
+            val = BitsUtil.Int.SetBit(val, 6, LinkInvoke);
+            val = BitsUtil.Int.SetBits(val, 7, 4, Step);
+            val = BitsUtil.Int.SetBit(val, 11, Fire);
+            val = BitsUtil.Int.SetBits(val, 12, 8, ID);
+            val = BitsUtil.Int.SetBit(val, 20, Specified);
+            val = BitsUtil.Int.SetBit(val, 21, GameTriggerFire);
+            val = BitsUtil.Int.SetBit(val, 22, MissionFire);
+            val = BitsUtil.Int.SetBit(val, 23, AllDeadNoAppear);
+            val = BitsUtil.Int.SetBits(val, 24, 5, GroupID);
+
+            return val;
         }
 
         public class LayoutData
@@ -392,6 +310,46 @@ namespace OpenKh.Bbs
             }
 
             return olo;
+        }
+
+        public static void Write(Stream stream, Olo olo)
+        {
+            BinaryMapping.WriteObject<Header>(stream, olo.header);
+
+            for (int i = 0; i < olo.header.SpawnObjectsCount; i++)
+            {
+                BinaryMapping.WriteObject<ObjectName>(stream, olo.ObjectList[i]);
+            }
+
+            for (int i = 0; i < olo.header.FilePathCount; i++)
+            {
+                BinaryMapping.WriteObject<PathName>(stream, olo.FileList[i]);
+            }
+
+            for (int i = 0; i < olo.header.ScriptPathCount; i++)
+            {
+                BinaryMapping.WriteObject<PathName>(stream, olo.ScriptList[i]);
+            }
+
+            for (int i = 0; i < olo.header.MissionNameCount; i++)
+            {
+                BinaryMapping.WriteObject<ObjectName>(stream, olo.MissionNameList[i]);
+            }
+
+            for (int i = 0; i < olo.header.TriggerDataCount; i++)
+            {
+                BinaryMapping.WriteObject<TriggerData>(stream, olo.TriggerList[i]);
+            }
+
+            for (int i = 0; i < olo.header.GroupDataCount; i++)
+            {
+                BinaryMapping.WriteObject<GroupData>(stream, olo.GroupList[i]);
+
+                for (int j = 0; j < olo.GroupList[i].ObjectLayoutDataCount; j++)
+                {
+                    BinaryMapping.WriteObject<LayoutData>(stream, olo.GroupList[i].LayoutList[j]);
+                }
+            }
         }
     }
 }

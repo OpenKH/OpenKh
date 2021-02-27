@@ -43,7 +43,7 @@ namespace OpenKh.Tools.OloEditor
             {
                 ObjectLoadedControl cObjectCon = new ObjectLoadedControl();
                 cObjectCon.GBox.Text = "Object Loaded " + i;
-                cObjectCon.ObjectLoadedComboBox.SelectedItem = Olo.SpawnObjectList[obj.Name];
+                cObjectCon.ObjectLoadedComboBox.SelectedItem = Bbs.SystemData.GameObject.SpawnObjectList[obj.Name];
                 FlowObjects.Controls.Add(cObjectCon);
                 i++;
             }
@@ -112,6 +112,7 @@ namespace OpenKh.Tools.OloEditor
             {
                 LayoutGroupControl cLayoutCon = new LayoutGroupControl();
                 cLayoutCon.GBox.Text = "Group Layout " + i;
+                cLayoutCon.data = obj;
                 cLayoutCon.CenterX.Text = obj.CenterX.ToString();
                 cLayoutCon.CenterY.Text = obj.CenterY.ToString();
                 cLayoutCon.CenterZ.Text = obj.CenterZ.ToString();
@@ -144,7 +145,49 @@ namespace OpenKh.Tools.OloEditor
 
         private void UpdateWriteInfo()
         {
+            int i = 0;
+            foreach(ObjectLoadedControl objLoaded in FlowObjects.Controls)
+            {
+                var invertedDictionary = Bbs.SystemData.GameObject.SpawnObjectList.ToDictionary(x => x.Value, x => x.Key);
+                olo.ObjectList[i].Name = invertedDictionary[objLoaded.ObjectLoadedComboBox.Text];
+                i++;
+            }
 
+            i = 0;
+            foreach (PathNameControl pathLoaded in FlowFiles.Controls)
+            {
+                olo.FileList[i].Name = pathLoaded.Name;
+                i++;
+            }
+
+            i = 0;
+            foreach (PathNameControl scriptLoaded in FlowScripts.Controls)
+            {
+                olo.ScriptList[i].Name = scriptLoaded.Name;
+                i++;
+            }
+
+            i = 0;
+            foreach (ObjectNameControl missionLoaded in FlowMissions.Controls)
+            {
+                olo.MissionNameList[i].Name = missionLoaded.Name;
+                i++;
+            }
+
+            i = 0;
+            foreach (TriggerDataControl trg in FlowTriggers.Controls)
+            {
+                olo.TriggerList[i] = trg.GetTriggerData();
+                i++;
+            }
+
+            i = 0;
+            foreach (LayoutGroupControl grp in FlowLayout.Controls)
+            {
+                grp.GetGroupData();
+                olo.GroupList[i] = grp.data;
+                i++;
+            }
         }
 
         private void LoadOLOButton_Click(object sender, EventArgs e)
@@ -174,11 +217,10 @@ namespace OpenKh.Tools.OloEditor
             {
                 Stream oloOut = File.OpenWrite(dialog.FileName);
                 UpdateWriteInfo();
-                //Olo.Write(oloOut, olo);
+                Olo.Write(oloOut, olo);
                 oloOut.Close();
+                MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
