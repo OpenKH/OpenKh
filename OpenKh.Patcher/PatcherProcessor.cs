@@ -120,6 +120,9 @@ namespace OpenKh.Patcher
                 case "kh2msg":
                     PatchKh2Msg(context, assetFile.Source, stream);
                     break;
+                case "areadatascript":
+                    PatchAreaDataScript(context, assetFile.Source, stream);
+                    break;
             }
 
             stream.SetLength(stream.Position);
@@ -256,6 +259,19 @@ namespace OpenKh.Patcher
             }
 
             Msg.WriteOptimized(stream.SetPosition(0), msgs);
+        }
+
+        private static void PatchAreaDataScript(Context context, List<AssetFile> sources, Stream stream)
+        {
+            var scripts = Kh2.Ard.AreaDataScript.Read(stream).ToDictionary(x => x.ProgramId, x => x);
+            foreach (var source in sources)
+            {
+                var programsInput = File.ReadAllText(context.GetSourceModAssetPath(source.Name));
+                foreach (var newScript in Kh2.Ard.AreaDataScript.Compile(programsInput))
+                    scripts[newScript.ProgramId] = newScript;
+            }
+
+            Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
         }
     }
 }
