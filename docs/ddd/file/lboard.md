@@ -8,16 +8,16 @@ The entry point of the file. It is unknown exactly how it works but it appears t
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
-| 0x00   | byte   | Offset of the start of the last node of a board (treating the first node as offset 0)
-| 0x01   | byte   | ID of board
+| 0x00   | byte   | Unknown but might be related to 16*(# of always visible nodes in a board)
+| 0x01   | byte   | ID of board?
 | 0x02   | byte   | Always 0
 | 0x03   | byte   | Always 0
 
-The header is ended with a 16 byte footer that is all 00 except for the 2nd byte which is 02
+The header has a 16 byte footer that is 00 02 and then all 00
 
 ## Board
 
-After the header is the definition of each spirit board. The boards are a series of 16 byte definitions for each node. The start of a new board is marked by a header of 16 bytes that is all 00 except for the 2nd byte which is 08
+After the header is the definition of each spirit board. The boards are a series of 16 byte definitions for each node. Each board has a 16 byte header that is all 00 except for the 2nd byte that is 00 08 and then all 00
 
 The definition for each node is as follows
 
@@ -62,7 +62,9 @@ E.X. 23 would be the second row and the 3rd column
 
 ### Unknown 1
 
-Only used in 4 nodes, with the following definitions. Appears to turn the secret question mark red. If you give it any other value than 00 or 03 for a question mark, it turns the question mark purple.
+Appears related to Secret nodes. If 03, turns the question mark red. If any value other than 03 or 00, turns the question mark purple
+
+The following are the 4 nodes in lboard.bin where this byte is nonzero
 
 ```
 04 17 03 00 00 00 00 01 32 00 02 06 00 00 00 00
@@ -75,10 +77,11 @@ Only used in 4 nodes, with the following definitions. Appears to turn the secret
 
 Specifies which connections to draw from this node to other nodes. 
 
-Color key:
-  Pink - bidirectional
-  Yellow - One way out of the node
-  Blue - One way in to the node
+| Color key |
+| --------- |
+| Pink - bidirectional
+| Yellow - One way out of the node
+| Blue - One way in to the node
 
 | Value  | Right Connection | Down Connection |   
 |--------|------------------|-----------------|
@@ -100,7 +103,7 @@ Color key:
 | 0F     | Blue             | Blue
 
 
-The last 4 bits appear to be all that matter, although the following values can be found within lboard.bin, it is unknown what they change.
+The last 4 bits appear to be all that matter. Although the following values can be found within lboard.bin, it is unknown what they change.
 
 `12, 14, 41, 44, 51`
 
