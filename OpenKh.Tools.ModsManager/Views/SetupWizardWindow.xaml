@@ -118,8 +118,12 @@
             Title="Set game data"
             Description="It might be necessary to extract game's data"
             CanSelectNextPage="{Binding IsGameDataFound}"
+            CanSelectPreviousPage="{Binding IsNotExtracting}"
+            CanCancel="{Binding IsNotExtracting}"
+            CanFinish="{Binding IsNotExtracting}"
             PreviousPage="{Binding ElementName=PageGameEdition}"
-            NextPage="{Binding ElementName=PageRegion}">
+            NextPage="{Binding ElementName=PageRegion}"
+            IsEnabled="{Binding IsNotExtracting}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
                 <Grid Margin="0 0 0 3">
@@ -142,9 +146,9 @@
                     Press the button below to initialize the game extraction. It will take between 5 and 15 mintues based on the speed of your hard drive.
                 </TextBlock>
                 <Button Margin="0 0 0 6" Width="120" Height="22" HorizontalAlignment="Left" Command="{Binding ExtractGameDataCommand}">Extract game data</Button>
-                <ProgressBar Margin="0 0 0 6" Height="22" Visibility="{Binding ProgressBarVisibility}" IsIndeterminate="True"/>
+                <ProgressBar Margin="0 0 0 6" Height="22" Visibility="{Binding ProgressBarVisibility}" Minimum="0" Maximum="1" Value="{Binding ExtractionProgress}"/>
                 <TextBlock Margin="0 0 0 3" Visibility="{Binding ExtractionCompleteVisibility}">
-                    The extraction of the game data succeded!
+                    The extraction of the game's data succeded!
                 </TextBlock>
             </StackPanel>
         </xctk:WizardPage>

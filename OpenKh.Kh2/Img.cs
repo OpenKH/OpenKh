@@ -30,6 +30,7 @@ namespace OpenKh.Kh2
             "000tt.idx",
             "000wi.idx",
             "000wm.idx",
+            "000zz.idx",
         };
 
         private readonly Stream stream;
