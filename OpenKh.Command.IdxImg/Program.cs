@@ -213,38 +213,11 @@ namespace OpenKh.Command.IdxImg
 
                 using var isoStream = File.Open(InputIso, FileMode.Open, FileAccess.ReadWrite);
 
-
                 if (IdxIsoBlock == -1 || ImgIsoBlock == -1)
                 {
-                    const int needleLength = 0x0B;
-
-                    var imgNeedle = new byte[needleLength] { 0x01, 0x09, 0x4B, 0x48, 0x32, 0x2E, 0x49, 0x4D, 0x47, 0x3B, 0x31 };
-                    var idxNeedle = new byte[needleLength] { 0x01, 0x09, 0x4B, 0x48, 0x32, 0x2E, 0x49, 0x44, 0x58, 0x3B, 0x31 };
-
-                    const uint basePosition = 0x105 * 0x800;
-
-                    for (int i = 0; i < 0x500; i++)
-                    {
-                        isoStream.Position = basePosition + i;
-                        var hayRead = isoStream.ReadBytes(needleLength);
-
-                        var idxCmp = hayRead.SequenceEqual(idxNeedle);
-                        var imgCmp = hayRead.SequenceEqual(imgNeedle);
-
-                        if (imgCmp || idxCmp)
-                        {
-                            isoStream.Position -= 0x24;
-
-                            var blockStack = isoStream.ReadBytes(0x04);
-                            var blockCorrect = new byte[0x04] { blockStack[3], blockStack[2], blockStack[1], blockStack[0] };
-
-                            if (idxCmp && IdxIsoBlock == -1)
-                                IdxIsoBlock = BitConverter.ToInt32(blockCorrect);
-
-                            else if (imgCmp && ImgIsoBlock == -1)
-                                ImgIsoBlock = BitConverter.ToInt32(blockCorrect);
-                        }
-                    }
+                    var bufferedStream = new BufferedStream(isoStream);
+                    IdxIsoBlock = IsoUtility.GetFileOffset(bufferedStream, "KH2.IDX;1");
+                    ImgIsoBlock = IsoUtility.GetFileOffset(bufferedStream, "KH2.IMG;1");
 
                     if (IdxIsoBlock == -1 || ImgIsoBlock == -1)
                         throw new IOException("Could not determine the LBA Offsets of KH2.IDX or KH2.IMG, is this ISO valid?");
