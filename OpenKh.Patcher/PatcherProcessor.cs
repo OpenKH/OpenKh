@@ -59,10 +59,6 @@ namespace OpenKh.Patcher
 
         public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath)
         {
-            if (Directory.Exists(outputDir))
-                Directory.Delete(outputDir, true);
-            Directory.CreateDirectory(outputDir);
-
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {

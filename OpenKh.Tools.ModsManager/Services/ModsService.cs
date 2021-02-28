@@ -181,6 +181,10 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static Task RunPacherAsync() => Task.Run(() =>
         {
+            if (Directory.Exists(ConfigurationService.GameModPath))
+                Directory.Delete(ConfigurationService.GameModPath, true);
+            Directory.CreateDirectory(ConfigurationService.GameModPath);
+
             var patcherProcessor = new PatcherProcessor();
             var modsList = GetMods(EnabledMods).ToList();
             for (var i = modsList.Count - 1; i >= 0; i--)
