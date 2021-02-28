@@ -43,6 +43,7 @@ namespace OpenKh.Patcher
         public List<Multi> Multi { get; set; }
         public List<AssetFile> Source { get; set; }
 
+        public bool Required { get; set; }
         public string Type { get; set; }
         public Bar.MotionsetType MotionsetType { get; set; }
         public string Language { get; set; }
