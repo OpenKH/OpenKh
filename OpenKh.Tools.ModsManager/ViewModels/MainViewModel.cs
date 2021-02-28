@@ -24,7 +24,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
     public class MainViewModel : BaseNotifyPropertyChanged, IChangeModEnableState
     {
         private static string ApplicationName = Utilities.GetApplicationName();
-        private readonly DebuggingWindow _debuggingWindow = new DebuggingWindow();
+        private DebuggingWindow _debuggingWindow = new DebuggingWindow();
         private ModViewModel _selectedValue;
         private Pcsx2Injector _pcsx2Injector;
 
@@ -126,8 +126,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
             BuildCommand = new RelayCommand(async _ =>
             {
-                if (!_debuggingWindow.IsLoaded)
-                    _debuggingWindow.Show();
+                if (_debuggingWindow.IsLoaded)
+                    _debuggingWindow = new DebuggingWindow();
+                Application.Current.Dispatcher.Invoke(_debuggingWindow.Show);
                 _debuggingWindow.ClearLogs();
 
                 await ModsService.RunPacherAsync();
