@@ -224,6 +224,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             ModsList.RemoveAt(selectedIndex);
             ModsList.Insert(++selectedIndex, item);
             SelectedValue = ModsList[selectedIndex];
+            ModEnableStateChanged();
         }
 
         private void MoveSelectedModUp()
@@ -236,6 +237,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             ModsList.RemoveAt(selectedIndex);
             ModsList.Insert(--selectedIndex, item);
             SelectedValue = ModsList[selectedIndex];
+            ModEnableStateChanged();
         }
 
         private bool CanSelectedModMoveDown() =>

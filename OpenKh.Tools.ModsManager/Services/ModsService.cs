@@ -43,9 +43,9 @@ namespace OpenKh.Tools.ModsManager.Services
             get
             {
                 var enabledMods = ConfigurationService.EnabledMods;
-                foreach (var mod in Mods)
+                foreach (var mod in enabledMods)
                 {
-                    if (enabledMods.Contains(mod))
+                    if (Mods.Contains(mod))
                         yield return mod;
                 }
             }
