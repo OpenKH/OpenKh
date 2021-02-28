@@ -27,6 +27,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private DebuggingWindow _debuggingWindow = new DebuggingWindow();
         private ModViewModel _selectedValue;
         private Pcsx2Injector _pcsx2Injector;
+        private Process _runningProcess;
 
         public string Title => ApplicationName;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
@@ -126,6 +127,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
             BuildCommand = new RelayCommand(async _ =>
             {
+                CloseRunningProcess();
                 Application.Current.Dispatcher.Invoke(_debuggingWindow.Close);
                 _debuggingWindow = new DebuggingWindow();
                 Application.Current.Dispatcher.Invoke(_debuggingWindow.Show);
@@ -135,7 +137,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (ConfigurationService.GameEdition)
                 {
                     case 0:
-                        Process.Start(new ProcessStartInfo
+                        _runningProcess = Process.Start(new ProcessStartInfo
                         {
                             FileName = ConfigurationService.OpenKhGameEngineLocation,
                             WorkingDirectory = Path.GetDirectoryName(ConfigurationService.OpenKhGameEngineLocation),
@@ -157,12 +159,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                             _pcsx2Injector.RegionId = -1;
 
-                        _pcsx2Injector.Run(Process.Start(new ProcessStartInfo
+                        _runningProcess = Process.Start(new ProcessStartInfo
                         {
                             FileName = ConfigurationService.Pcsx2Location,
                             WorkingDirectory = Path.GetDirectoryName(ConfigurationService.Pcsx2Location),
                             Arguments = $"\"{ConfigurationService.IsoLocation}\""
-                        }), _debuggingWindow);
+                        });
+                        _pcsx2Injector.Run(_runningProcess, _debuggingWindow);
                         break;
                     case 2:
                         break;
@@ -194,6 +197,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             });
 
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
+        }
+
+        public void CloseAllWindows()
+        {
+            CloseRunningProcess();
+            _debuggingWindow.Close();
+        }
+
+        public void CloseRunningProcess()
+        {
+            if (_runningProcess == null)
+                return;
+
+            _pcsx2Injector.Stop();
+            _runningProcess.CloseMainWindow();
+            _runningProcess.Kill();
+            _runningProcess.Dispose();
         }
 
         private void ReloadModsList()
