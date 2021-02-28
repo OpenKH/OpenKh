@@ -120,7 +120,6 @@
             CanSelectNextPage="{Binding IsGameDataFound}"
             CanSelectPreviousPage="{Binding IsNotExtracting}"
             CanCancel="{Binding IsNotExtracting}"
-            CanFinish="{Binding IsNotExtracting}"
             PreviousPage="{Binding ElementName=PageGameEdition}"
             NextPage="{Binding ElementName=PageRegion}"
             IsEnabled="{Binding IsNotExtracting}">
