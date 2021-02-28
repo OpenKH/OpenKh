@@ -1,5 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Tools.Common;
+using OpenKh.Tools.ModsManager.Interfaces;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -285,6 +286,8 @@ namespace OpenKh.Tools.ModsManager.Services
         private Task _injectorTask;
         private uint _hookPtr;
         private uint _nextHookPtr;
+        private string game;
+        private Offsets _myOffsets;
 
         public Pcsx2Injector(IOperationDispatcher operationDispatcher)
         {
@@ -295,16 +298,29 @@ namespace OpenKh.Tools.ModsManager.Services
         public string Region { get; set; }
         public string Language { get; set; }
 
-        public void Run(Process process)
+        public void Run(Process process, IDebugging debugging)
         {
             _cancellationTokenSource = new CancellationTokenSource();
             _cancellationToken = _cancellationTokenSource.Token;
             _injectorTask = Task.Run(async () =>
             {
+                Log.Info("Waiting for the game to boot");
                 var gameName = await Pcsx2MemoryService.GetPcsx2ApplicationName(process, _cancellationToken);
                 using var processStream = new ProcessStream(process, 0x20000000, 0x2000000);
-                WritePatch(processStream, gameName);
-                MainLoop(processStream);
+
+                Log.Info("Injecting code");
+                _myOffsets = _offsets.FirstOrDefault(x => x.GameName == gameName);
+                if (_myOffsets == null)
+                {
+                    Log.Err($"Game {gameName} not recognized. Exiting from the injector service.");
+                    return;
+                }
+
+                WritePatch(processStream, _myOffsets);
+
+                Log.Info("Executing the injector main loop");
+                MainLoop(processStream, debugging);
+                debugging.HideDebugger();
             }, _cancellationToken);
         }
 
@@ -314,7 +330,7 @@ namespace OpenKh.Tools.ModsManager.Services
             _injectorTask.Wait();
         }
 
-        private void MainLoop(Stream stream)
+        private void MainLoop(Stream stream, IDebugging debugging)
         {
             var isProcessDead = false;
             while (!_cancellationToken.IsCancellationRequested && !isProcessDead)
@@ -371,15 +387,15 @@ namespace OpenKh.Tools.ModsManager.Services
             stream.SetPosition(OperationAddress - 4).Write(returnValue);
         }
 
-        private void WritePatch(Stream stream, string game)
+        private void WritePatch(Stream stream, Offsets offsets)
         {
             ResetHooks();
             var bufferedStream = new BufferedStream(stream);
-            var offsets = _offsets.FirstOrDefault(x => x.GameName == game);
             if (offsets != null)
             {
                 if (offsets.LoadFile > 0)
                 {
+                    Log.Info("Injeting LoadFile function");
                     WritePatch(bufferedStream, offsets.LoadFile,
                         ADDIU(T4, RA, 0),
                         JAL(WriteHook(bufferedStream, LoadFileHook)),
@@ -388,6 +404,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 if (offsets.GetFileSize > 0)
                 {
+                    Log.Info("Injeting GetFileSize function");
                     var subGetFileSizePtr = stream.SetPosition(offsets.GetFileSize + 8).ReadUInt32();
                     WritePatch(bufferedStream, offsets.GetFileSize,
                         ADDIU(T4, RA, 0),
@@ -405,6 +422,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 if (RegionId >= 0)
                 {
+                    Log.Info("Injeting SetupRegion function");
                     WritePatch(bufferedStream, offsets.RegionInit, RegionInitPatch);
                     WritePatch(bufferedStream, offsets.RegionForce, Region);
                     WritePatch(bufferedStream, offsets.RegionForce + 8, Language);

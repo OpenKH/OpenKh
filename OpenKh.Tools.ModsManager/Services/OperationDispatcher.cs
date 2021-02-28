@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Tools.ModsManager.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 
@@ -24,12 +25,16 @@ namespace OpenKh.Tools.ModsManager.Services
         public int LoadFile(Stream outStream, string fileName)
         {
             if (GetFinalNamePath(fileName, out var finalFileName))
+            {
+                Log.Info($"Load file {fileName}");
                 return File.OpenRead(finalFileName).Using(x =>
                 {
                     x.CopyTo(outStream, 512 * 1024);
                     return (int)x.Length;
                 });
+            }
 
+            Log.Warn($"File {fileName} not found, falling back");
             return 0;
         }
 

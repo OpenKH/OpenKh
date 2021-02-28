@@ -186,6 +186,8 @@ namespace OpenKh.Tools.ModsManager.Services
             for (var i = modsList.Count - 1; i >= 0; i--)
             {
                 var mod = modsList[i];
+                Log.Info($"Patching using {mod.Name} from {mod.Path}");
+
                 patcherProcessor.Patch(
                     ConfigurationService.GameDataLocation,
                     ConfigurationService.GameModPath,

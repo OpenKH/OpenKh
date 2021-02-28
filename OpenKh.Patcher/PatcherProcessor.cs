@@ -88,6 +88,7 @@ namespace OpenKh.Patcher
             }
             catch (Exception ex)
             {
+                Log.Err($"Patcher failed: {ex.Message}");
                 throw new PatcherException(metadata, ex);
             }
         }
@@ -122,6 +123,10 @@ namespace OpenKh.Patcher
                     break;
                 case "areadatascript":
                     PatchAreaDataScript(context, assetFile.Source, stream);
+                    break;
+                default:
+                    Log.Warn($"Method '{assetFile.Method}' not recognized for '{assetFile.Name}'. Falling back to 'copy'");
+                    CopyFile(context, assetFile, stream);
                     break;
             }
 
