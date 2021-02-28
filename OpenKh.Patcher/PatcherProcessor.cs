@@ -74,6 +74,9 @@ namespace OpenKh.Patcher
 
                     foreach (var name in names)
                     {
+                        if (assetFile.Required && !File.Exists(context.GetOriginalAssetPath(name)))
+                            continue;
+
                         context.CopyOriginalFile(name);
                         var dstFile = context.GetDestinationPath(name);
 
