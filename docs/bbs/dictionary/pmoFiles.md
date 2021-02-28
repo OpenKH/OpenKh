@@ -1111,7 +1111,7 @@ Notes:
 | W11VE | Sweetstack |
 | W12AQ | Destiny's Embrace |
 | W12TE | Darkgnaw |
-| W12VE | Light Seeker |
+| W12VE | Light Seeker (JP vanilla exclusive) |
 | W13AQ | Stormfall |
 | W13TE | Ends of the Earth |
 | W14AQ | Brightcrest |
