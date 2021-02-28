@@ -97,7 +97,7 @@ namespace OpenKh.Tools.ItbEditor
                         itbEntry.ItemIDComboBox.SelectedItem = (Item.Type)itb.AllITB[i].ItemID;
                         break;
                     case 1:
-                        itbEntry.ItemIDComboBox.SelectedItem = (Command.Type)itb.AllITB[i].ItemID;
+                        itbEntry.ItemIDComboBox.SelectedItem = (Command.Kind)itb.AllITB[i].ItemID;
                         break;
                 }
 
@@ -129,7 +129,7 @@ namespace OpenKh.Tools.ItbEditor
                                     itb.AllITB[i].ItemID = ItemVal;
                                     break;
                                 case 1:
-                                    Command.Type nCommand = (Command.Type)ent.ItemIDComboBox.SelectedItem;
+                                    Command.Kind nCommand = (Command.Kind)ent.ItemIDComboBox.SelectedItem;
                                     ushort CommandVal = (ushort)nCommand;
                                     itb.AllITB[i].ItemID = CommandVal;
                                     break;

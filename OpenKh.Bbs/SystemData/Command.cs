@@ -6,7 +6,7 @@ namespace OpenKh.Bbs.SystemData
 {
     public class Command
     {
-        public enum Type : ushort
+        public enum Kind : ushort
         {
             COMMAND_KIND_None = 0,
             COMMAND_KIND_Attack = 1,
@@ -97,13 +97,16 @@ namespace OpenKh.Bbs.SystemData
             COMMAND_KIND_FinalBreak = 92,
             COMMAND_KIND_CosmicArts = 93,
             COMMAND_KIND_Catastrophe = 94,
+            COMMAND_KIND_Rush = 95,
             COMMAND_KIND_FireRush = 96,
             COMMAND_KIND_DarkCatalyst = 97,
             COMMAND_KIND_FreezeRaid = 102,
             COMMAND_KIND_Judgement = 105,
             COMMAND_KIND_FireBlitz = 106,
             COMMAND_KIND_AerialSlam = 109,
+            COMMAND_KIND_Midareuchi = 110,
             COMMAND_KIND_LastArcanum = 111,
+            COMMAND_KIND_PoisonBlade = 113,
             COMMAND_KIND_BlizzardBlade = 115,
             COMMAND_KIND_FireStrike = 118,
             COMMAND_KIND_ConfuseStrike = 119,
@@ -157,7 +160,9 @@ namespace OpenKh.Bbs.SystemData
             COMMAND_KIND_Stopga = 186,
             COMMAND_KIND_Stopra = 185,
             COMMAND_KIND_HiPotion = 189,
+            COMMAND_KIND_MegePotion = 190,
             COMMAND_KIND_Ether = 191,
+            COMMAND_KIND_MegaEther = 192,
             COMMAND_KIND_Elixir = 194,
             COMMAND_KIND_LastElixir = 195,
             COMMAND_KIND_BalloonLetter = 196,
@@ -234,10 +239,13 @@ namespace OpenKh.Bbs.SystemData
             COMMAND_KIND_BubbleBlaster = 287,
             COMMAND_KIND_DarkVolley = 288,
             COMMAND_KIND_BioBarrage = 291,
+            COMMAND_KIND_PhotonCharge = 294,
             COMMAND_KIND_IceSlider = 295,
             COMMAND_KIND_DarkCannon = 298,
             COMMAND_KIND_BladeBallista = 301,
+            COMMAND_KIND_Open = 304,
             COMMAND_KIND_Check = 305,
+            COMMAND_KIND_action5 = 307,
             COMMAND_KIND_Cover = 308,
             COMMAND_KIND_Goto = 309,
             COMMAND_KIND_Goal = 310,
@@ -253,6 +261,12 @@ namespace OpenKh.Bbs.SystemData
             COMMAND_KIND_action25 = 327,
             COMMAND_KIND_action26 = 328,
             COMMAND_KIND_HealLight = 329,
+            COMMAND_KIND_NetAccess = 330,
+            COMMAND_KIND_NetWarp = 331,
+            COMMAND_KIND_NetReady = 332,
+            COMMAND_KIND_NetCancel = 333,
+            COMMAND_KIND_NetExchange = 334,
+            COMMAND_KIND_NetStart = 335,
             COMMAND_KIND_DebugJump = 336,
             COMMAND_KIND_StyleNormal = 337,
             COMMAND_KIND_StyleFatalMode = 338,
@@ -340,31 +354,12 @@ namespace OpenKh.Bbs.SystemData
             COMMAND_KIND_IllusionAction5 = 420,
             COMMAND_KIND_ENCHANT_START = 421,
             COMMAND_KIND_ENCHANT_END = 450,
-            COMMAND_KIND_End = 498,
-
-
-
-
-
-            COMMAND_KIND_Midareuchi = 110,
-            
-            COMMAND_KIND_MegePotion = 190,
-            COMMAND_KIND_MegaEther = 192,
-            
-            
-            
-            COMMAND_KIND_NetAccess = 330,
-            COMMAND_KIND_NetCancel = 333,
-            COMMAND_KIND_NetExchange = 334,
-            COMMAND_KIND_NetReady = 332,
-            COMMAND_KIND_NetStart = 335,
-            COMMAND_KIND_NetWarp = 331,
-            COMMAND_KIND_Open = 304,
-            COMMAND_KIND_PRIZE_END = 497,
             COMMAND_KIND_PRIZE_START = 482,
-            COMMAND_KIND_PhotonCharge = 294,
+            COMMAND_KIND_PRIZE_END = 497,
+            COMMAND_KIND_End = 498,
             
-            COMMAND_KIND_PoisonBlade = 113,
+            
+            
             COMMAND_KIND_PoisonGuard = 269,
             COMMAND_KIND_Potion = 188,
             COMMAND_KIND_Provoke = 217,
@@ -383,11 +378,10 @@ namespace OpenKh.Bbs.SystemData
             COMMAND_KIND_Remedy = 193,
             COMMAND_KIND_RhythmMixer = 29,
             COMMAND_KIND_RockBreaker = 27,
-            COMMAND_KIND_Rush = 95,
             COMMAND_KIND_SHOOT_END = 302,
             COMMAND_KIND_SHOOT_REG = 18,
             COMMAND_KIND_SHOOT_START = 283,
-            COMMAND_KIND_STYLE_END = 353,
+            
             COMMAND_KIND_STYLE_START = 337,
             COMMAND_KIND_Salvation = 124,
             COMMAND_KIND_Save = 302,
@@ -451,7 +445,84 @@ namespace OpenKh.Bbs.SystemData
             COMMAND_KIND_ZeroGraviga = 155,
             COMMAND_KIND_ZeroGravira = 154,
             COMMAND_KIND_ZeroGravity = 153,
-            COMMAND_KIND_action5 = 307,
+            
+        }
+
+       public enum Type : byte
+       {
+            COMMAND_TYPE_NONE = 0,
+            COMMAND_TYPE_BASE = 1,
+            COMMAND_TYPE_DECK = 2,
+            COMMAND_TYPE_ACTION = 3,
+            COMMAND_TYPE_REACTION = 4,
+            COMMAND_TYPE_SHOOTLOCK = 5,
+            COMMAND_TYPE_STYLE = 6,
+            COMMAND_TYPE_DLINK = 7,
+            COMMAND_TYPE_ENCHANT = 8,
+            COMMAND_TYPE_ABILITY = 9,
+            COMMAND_TYPE_PRIZE = 10,
+            COMMAND_TYPE_OTHER = 11,
+            COMMAND_TYPE_ILLUSION = 12,
+            COMMAND_TYPE_END = 13
+       }
+
+        public enum Category : byte
+        {
+            COMMAND_CATEGORY_NONE = 0,
+            COMMAND_CATEGORY_ATTACK = 1,
+            COMMAND_CATEGORY_MAGIC = 2,
+            COMMAND_CATEGORY_ITEM = 3,
+            COMMAND_CATEGORY_MOVE = 4,
+            COMMAND_CATEGORY_GUARD = 5,
+            COMMAND_CATEGORY_COUNTER = 6,
+            COMMAND_CATEGORY_FINISH = 7,
+            COMMAND_CATEGORY_DLINK = 8,
+            COMMAND_CATEGORY_SHOOTLOCK = 9,
+            COMMAND_CATEGORY_TALK = 10,
+            COMMAND_CATEGORY_STATUS = 11,
+            COMMAND_CATEGORY_FRIEND = 12,
+            COMMAND_CATEGORY_NETWORK = 13,
+            COMMAND_CATEGORY_EMOTE = 14,
+            COMMAND_CATEGORY_DEBUG = 15,
+            COMMAND_CATEGORY_PRIZE = 16,
+            COMMAND_CATEGORY_SUPPORT = 17,
+            COMMAND_CATEGORY_END = 18
+        }
+
+        public enum SubCategory : byte
+        {
+            COMMAND_SUB_NONE = 0,
+            COMMAND_SUB_JUMP = 1,
+            COMMAND_SUB_STUB = 2,
+            COMMAND_SUB_RAID = 3,
+            COMMAND_SUB_CHAIN = 4,
+            COMMAND_SUB_VERTICAL = 5,
+            COMMAND_SUB_TURN = 6,
+            COMMAND_SUB_FIRE = 7,
+            COMMAND_SUB_BLIZZARD = 8,
+            COMMAND_SUB_THUNDER = 9,
+            COMMAND_SUB_CURE = 10,
+            COMMAND_SUB_DETONE = 11,
+            COMMAND_SUB_ZEROG = 12,
+            COMMAND_SUB_MAGNE = 13,
+            COMMAND_SUB_AERO = 14,
+            COMMAND_SUB_STATUS = 15,
+            COMMAND_SUB_SPECIAL = 16,
+            COMMAND_SUB_ICE = 17,
+            COMMAND_SUB_OTHER = 18,
+            COMMAND_SUB_COMBO = 19,
+            COMMAND_SUB_FINISH = 20,
+            COMMAND_SUB_COMMAND = 21,
+            COMMAND_SUB_PUSH_O = 22,
+            COMMAND_SUB_PUSH_T = 23,
+            COMMAND_SUB_PUSH_S = 24,
+            COMMAND_SUB_PUSH_X = 25,
+            COMMAND_SUB_EXTRA = 26,
+            COMMAND_SUB_ANOTHER = 27,
+            COMMAND_SUB_SHOOTLOCK = 28,
+            COMMAND_SUB_DLINK = 29,
+            COMMAND_SUB_ILLUSION = 30,
+            COMMAND_SUB_END = 31
         }
     }
 }

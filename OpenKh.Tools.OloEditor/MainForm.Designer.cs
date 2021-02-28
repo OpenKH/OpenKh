@@ -44,6 +44,12 @@ namespace OpenKh.Tools.OloEditor
             this.FlowTriggers = new System.Windows.Forms.FlowLayoutPanel();
             this.TabLayout = new System.Windows.Forms.TabPage();
             this.FlowLayout = new System.Windows.Forms.FlowLayoutPanel();
+            this.OLOFlagsGBox = new System.Windows.Forms.GroupBox();
+            this.EnemyFlag = new System.Windows.Forms.CheckBox();
+            this.GimmickFlag = new System.Windows.Forms.CheckBox();
+            this.NPCFlag = new System.Windows.Forms.CheckBox();
+            this.PlayerFlag = new System.Windows.Forms.CheckBox();
+            this.EventTriggerFlag = new System.Windows.Forms.CheckBox();
             this.TabControlOLO.SuspendLayout();
             this.TabObjects.SuspendLayout();
             this.TabFilePath.SuspendLayout();
@@ -51,13 +57,14 @@ namespace OpenKh.Tools.OloEditor
             this.TabMissions.SuspendLayout();
             this.TabTriggers.SuspendLayout();
             this.TabLayout.SuspendLayout();
+            this.OLOFlagsGBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // LoadOLOButton
             // 
             this.LoadOLOButton.Location = new System.Drawing.Point(12, 12);
             this.LoadOLOButton.Name = "LoadOLOButton";
-            this.LoadOLOButton.Size = new System.Drawing.Size(75, 23);
+            this.LoadOLOButton.Size = new System.Drawing.Size(75, 30);
             this.LoadOLOButton.TabIndex = 0;
             this.LoadOLOButton.Text = "Load OLO";
             this.LoadOLOButton.UseVisualStyleBackColor = true;
@@ -68,7 +75,7 @@ namespace OpenKh.Tools.OloEditor
             this.SaveOLOButton.Enabled = false;
             this.SaveOLOButton.Location = new System.Drawing.Point(93, 12);
             this.SaveOLOButton.Name = "SaveOLOButton";
-            this.SaveOLOButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveOLOButton.Size = new System.Drawing.Size(75, 30);
             this.SaveOLOButton.TabIndex = 1;
             this.SaveOLOButton.Text = "Save as...";
             this.SaveOLOButton.UseVisualStyleBackColor = true;
@@ -86,10 +93,10 @@ namespace OpenKh.Tools.OloEditor
             this.TabControlOLO.Controls.Add(this.TabTriggers);
             this.TabControlOLO.Controls.Add(this.TabLayout);
             this.TabControlOLO.ItemSize = new System.Drawing.Size(125, 20);
-            this.TabControlOLO.Location = new System.Drawing.Point(12, 41);
+            this.TabControlOLO.Location = new System.Drawing.Point(12, 54);
             this.TabControlOLO.Name = "TabControlOLO";
             this.TabControlOLO.SelectedIndex = 0;
-            this.TabControlOLO.Size = new System.Drawing.Size(960, 558);
+            this.TabControlOLO.Size = new System.Drawing.Size(960, 545);
             this.TabControlOLO.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.TabControlOLO.TabIndex = 2;
             // 
@@ -101,7 +108,7 @@ namespace OpenKh.Tools.OloEditor
             this.TabObjects.Location = new System.Drawing.Point(4, 24);
             this.TabObjects.Name = "TabObjects";
             this.TabObjects.Padding = new System.Windows.Forms.Padding(3);
-            this.TabObjects.Size = new System.Drawing.Size(952, 530);
+            this.TabObjects.Size = new System.Drawing.Size(952, 517);
             this.TabObjects.TabIndex = 0;
             this.TabObjects.Text = "Objects";
             // 
@@ -113,7 +120,7 @@ namespace OpenKh.Tools.OloEditor
             this.FlowObjects.AutoSize = true;
             this.FlowObjects.Location = new System.Drawing.Point(3, 3);
             this.FlowObjects.Name = "FlowObjects";
-            this.FlowObjects.Size = new System.Drawing.Size(946, 527);
+            this.FlowObjects.Size = new System.Drawing.Size(946, 514);
             this.FlowObjects.TabIndex = 0;
             // 
             // TabFilePath
@@ -222,11 +229,77 @@ namespace OpenKh.Tools.OloEditor
             this.FlowLayout.TabIndex = 0;
             this.FlowLayout.WrapContents = false;
             // 
+            // OLOFlagsGBox
+            // 
+            this.OLOFlagsGBox.Controls.Add(this.EventTriggerFlag);
+            this.OLOFlagsGBox.Controls.Add(this.PlayerFlag);
+            this.OLOFlagsGBox.Controls.Add(this.NPCFlag);
+            this.OLOFlagsGBox.Controls.Add(this.GimmickFlag);
+            this.OLOFlagsGBox.Controls.Add(this.EnemyFlag);
+            this.OLOFlagsGBox.Enabled = false;
+            this.OLOFlagsGBox.Location = new System.Drawing.Point(174, 5);
+            this.OLOFlagsGBox.Name = "OLOFlagsGBox";
+            this.OLOFlagsGBox.Size = new System.Drawing.Size(402, 43);
+            this.OLOFlagsGBox.TabIndex = 3;
+            this.OLOFlagsGBox.TabStop = false;
+            this.OLOFlagsGBox.Text = "Flags";
+            // 
+            // EnemyFlag
+            // 
+            this.EnemyFlag.AutoSize = true;
+            this.EnemyFlag.Location = new System.Drawing.Point(26, 18);
+            this.EnemyFlag.Name = "EnemyFlag";
+            this.EnemyFlag.Size = new System.Drawing.Size(62, 19);
+            this.EnemyFlag.TabIndex = 0;
+            this.EnemyFlag.Text = "Enemy";
+            this.EnemyFlag.UseVisualStyleBackColor = true;
+            // 
+            // GimmickFlag
+            // 
+            this.GimmickFlag.AutoSize = true;
+            this.GimmickFlag.Location = new System.Drawing.Point(94, 18);
+            this.GimmickFlag.Name = "GimmickFlag";
+            this.GimmickFlag.Size = new System.Drawing.Size(74, 19);
+            this.GimmickFlag.TabIndex = 0;
+            this.GimmickFlag.Text = "Gimmick";
+            this.GimmickFlag.UseVisualStyleBackColor = true;
+            // 
+            // NPCFlag
+            // 
+            this.NPCFlag.AutoSize = true;
+            this.NPCFlag.Location = new System.Drawing.Point(174, 18);
+            this.NPCFlag.Name = "NPCFlag";
+            this.NPCFlag.Size = new System.Drawing.Size(50, 19);
+            this.NPCFlag.TabIndex = 0;
+            this.NPCFlag.Text = "NPC";
+            this.NPCFlag.UseVisualStyleBackColor = true;
+            // 
+            // PlayerFlag
+            // 
+            this.PlayerFlag.AutoSize = true;
+            this.PlayerFlag.Location = new System.Drawing.Point(230, 18);
+            this.PlayerFlag.Name = "PlayerFlag";
+            this.PlayerFlag.Size = new System.Drawing.Size(58, 19);
+            this.PlayerFlag.TabIndex = 0;
+            this.PlayerFlag.Text = "Player";
+            this.PlayerFlag.UseVisualStyleBackColor = true;
+            // 
+            // EventTriggerFlag
+            // 
+            this.EventTriggerFlag.AutoSize = true;
+            this.EventTriggerFlag.Location = new System.Drawing.Point(298, 18);
+            this.EventTriggerFlag.Name = "EventTriggerFlag";
+            this.EventTriggerFlag.Size = new System.Drawing.Size(94, 19);
+            this.EventTriggerFlag.TabIndex = 0;
+            this.EventTriggerFlag.Text = "Event Trigger";
+            this.EventTriggerFlag.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 611);
+            this.Controls.Add(this.OLOFlagsGBox);
             this.Controls.Add(this.TabControlOLO);
             this.Controls.Add(this.SaveOLOButton);
             this.Controls.Add(this.LoadOLOButton);
@@ -240,6 +313,8 @@ namespace OpenKh.Tools.OloEditor
             this.TabMissions.ResumeLayout(false);
             this.TabTriggers.ResumeLayout(false);
             this.TabLayout.ResumeLayout(false);
+            this.OLOFlagsGBox.ResumeLayout(false);
+            this.OLOFlagsGBox.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -261,6 +336,12 @@ namespace OpenKh.Tools.OloEditor
         private System.Windows.Forms.FlowLayoutPanel FlowMissions;
         private System.Windows.Forms.FlowLayoutPanel FlowTriggers;
         private System.Windows.Forms.FlowLayoutPanel FlowLayout;
+        private System.Windows.Forms.GroupBox OLOFlagsGBox;
+        private System.Windows.Forms.CheckBox EventTriggerFlag;
+        private System.Windows.Forms.CheckBox PlayerFlag;
+        private System.Windows.Forms.CheckBox NPCFlag;
+        private System.Windows.Forms.CheckBox GimmickFlag;
+        private System.Windows.Forms.CheckBox EnemyFlag;
     }
 }
 

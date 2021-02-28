@@ -8,11 +8,26 @@ namespace OpenKh.Bbs.SystemData
     {
         public static Dictionary<string, string> SpawnObjectList = new Dictionary<string, string>()
         {
+            {"b01cd00", "Symphony Master (Boss!)"},
+            {"b02cd00", "Trumpet (Boss!)"},
+            {"b03cd00", "Violin (Boss!)"},
+            {"b04cd00", "Drum (Boss!)"},
+            {"b05cd00", "Unknown (CD) (Boss!)"},
+            {"b10cd00", "Cursed Carriage (Boss!)"},
+            {"b20cd00", "Lucifer (Boss!)"},
+
             {"b01dc00", "Captain Dark (Invincible) (No AI) (Boss!)"},
             {"b02dc00", "Captain Dark (Untargettable)"},
             {"b03dc00", "Captain Justice (Untargettable)"},
             {"b10dc00", "Chip (Untargettable)"},
             {"b20dc00", "Dale (Untargettable)"},
+
+            {"b01he00", "Hades (Boss!)"},
+            {"b10he00", "Ice Titan (Boss!)"},
+            {"b20he00", "Hercules (Ally!) (T-Stance)"},
+            {"b21he00", "Hercules (Boss!) (T-Stance)"},
+            {"b30he00", "Zack (Helmet) (Boss!)"},
+            {"b40he00", "Zack (Helmetless) (Boss!)"},
 
             {"b01ex00", "Mysterious Figure (Boss!)"},
             {"b02ex00", "Red Eyes (Boss!)"},
@@ -63,6 +78,12 @@ namespace OpenKh.Bbs.SystemData
             {"b06rg00", "Trinity Armor (Right Hand) (Boss!)"},
             {"b07rg00", "Trinity Armor (Left Hand) (Boss!)"},
             {"b08rg00", "Trinity Armor (Legs) (Boss!)"},
+
+            {"b01sb00", "Maleficent (Boss!)"},
+            {"b03sb00", "Maleficent Dragon (Boss!)"},
+            {"b10sb00", "Wheel Master (Boss!)"},
+            {"b11sb00", "Wheel Master Spinner (Boss!)"},
+            {"b12sb00", "Hittable Component"},
 
             {"b01sw00", "Mad Treant (Boss!)"},
             {"b02sw00", "Poisoned Apples"},
@@ -127,7 +148,7 @@ namespace OpenKh.Bbs.SystemData
             {"g02ex00", "Examine Actor (To place on static object)"},
             {"g03ex00", "Crown (Puzzle)"},
             {"g04ex00", "Jellyshade Swam"},
-            {"g05ex00", "Teleporter"},
+            {"g05ex00", "Unversed Portal"},
             {"g10ex00", "Invisible Wall"},
             {"g20ex00", "g20ex00"},
 

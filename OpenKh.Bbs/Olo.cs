@@ -12,7 +12,7 @@ namespace OpenKh.Bbs
         public class Header
         {
             [Data] public int MagicCode { get; set; }
-            [Data] public ushort FileVersion { get; set; } // Pretty much always 5.
+            [Data] public ushort FileVersion { get; set; }
             [Data] public ushort Flag { get; set; }
             [Data] public uint SpawnObjectsCount { get; set; }
             [Data] public uint SpawnObjectsOffset { get; set; }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using OpenKh.Bbs;
+using OpenKh.Common.Utils;
 
 namespace OpenKh.Tools.OloEditor
 {
@@ -37,6 +38,12 @@ namespace OpenKh.Tools.OloEditor
             TabMissions.Text = "Missions (" + olo.MissionNameList.Count + ")";
             TabTriggers.Text = "Triggers (" + olo.TriggerList.Count + ")";
             TabLayout.Text = "Layout (" + olo.header.GroupDataCount + ")";
+
+            EnemyFlag.Checked = BitsUtil.Int.GetBit(olo.header.Flag, 0);
+            GimmickFlag.Checked = BitsUtil.Int.GetBit(olo.header.Flag, 1);
+            NPCFlag.Checked = BitsUtil.Int.GetBit(olo.header.Flag, 2);
+            PlayerFlag.Checked = BitsUtil.Int.GetBit(olo.header.Flag, 3);
+            EventTriggerFlag.Checked = BitsUtil.Int.GetBit(olo.header.Flag, 4);
 
             int i = 1;
             foreach (Olo.ObjectName obj in olo.ObjectList)
@@ -145,6 +152,15 @@ namespace OpenKh.Tools.OloEditor
 
         private void UpdateWriteInfo()
         {
+            ushort oloFlag = 0;
+            oloFlag = (ushort)BitsUtil.Int.SetBit(oloFlag, 0, EnemyFlag.Checked);
+            oloFlag = (ushort)BitsUtil.Int.SetBit(oloFlag, 1, GimmickFlag.Checked);
+            oloFlag = (ushort)BitsUtil.Int.SetBit(oloFlag, 2, NPCFlag.Checked);
+            oloFlag = (ushort)BitsUtil.Int.SetBit(oloFlag, 3, PlayerFlag.Checked);
+            oloFlag = (ushort)BitsUtil.Int.SetBit(oloFlag, 4, EventTriggerFlag.Checked);
+
+            olo.header.Flag = oloFlag;
+
             int i = 0;
             foreach(ObjectLoadedControl objLoaded in FlowObjects.Controls)
             {
@@ -204,6 +220,7 @@ namespace OpenKh.Tools.OloEditor
                 olo = Olo.Read(oloFile);
                 UpdateParameters();
                 SaveOLOButton.Enabled = true;
+                OLOFlagsGBox.Enabled = true;
             }
         }
 
