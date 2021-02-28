@@ -1,4 +1,4 @@
-# [Kingdom Hearts Birth By Sleep](index.md) - Worlds
+# [Kingdom Hearts Birth By Sleep](../index.md) - Worlds
 
 |Id|Index|World
 |--|-----|--
