@@ -27,12 +27,12 @@ namespace OpenKh.Tools.ModsManager.Views
 
         public void ClearLogs()
         {
-            LogPanel.Children.Clear();
+            Application.Current.Dispatcher.Invoke(LogPanel.Children.Clear);
         }
 
         public void HideDebugger()
         {
-            Application.Current.Dispatcher.Invoke(Close);
+            Application.Current.Dispatcher.Invoke(Hide);
         }
 
         public void Log(long ms, string tag, string message)
