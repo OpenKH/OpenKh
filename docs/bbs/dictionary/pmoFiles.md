@@ -1,4 +1,4 @@
-# [Kingdom Hearts Birth By Sleep](../index.md) - Models
+# [Kingdom Hearts Birth By Sleep](../index.md) - PMO files
 
 The filename structure is as follows:
 
@@ -24,7 +24,7 @@ Eg: B00JB00 -> B 00 JB 00
 SubIds are used for different versions of a model (Eg: Eraqus normal and Eraqus with scars) or related models (Eg: Keyblades and Keychains)
 In the model list SubIds are ignored to keep it small.
 
-## Models
+## PMO files
 
 Notes:
 
@@ -758,7 +758,7 @@ Notes:
 | H20PP | Peter Pan |
 | H21EX | Ventus |
 | H40EX | Xehanort |
-| H41EX | Xehanort (Textureless party) |
+| H41EX | Xehanort (Textureless) |
 | H51EX | Xehanort (Terranort) |
 | H63EX | Vanitas (Helmetless, Ventus, X-Blade) |
 
@@ -1111,6 +1111,7 @@ Notes:
 | W11VE | Sweetstack |
 | W12AQ | Destiny's Embrace |
 | W12TE | Darkgnaw |
+| W12VE | Light Seeker |
 | W13AQ | Stormfall |
 | W13TE | Ends of the Earth |
 | W14AQ | Brightcrest |

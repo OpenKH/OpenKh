@@ -18,4 +18,4 @@
 ## Dictionaries
 
 * [Worlds](dictionary/worlds.md)
-* [Models](dictionary/models.md)
+* [PMO files](dictionary/pmoFiles.md)
