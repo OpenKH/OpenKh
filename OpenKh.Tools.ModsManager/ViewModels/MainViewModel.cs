@@ -126,8 +126,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
             BuildCommand = new RelayCommand(async _ =>
             {
-                if (_debuggingWindow.IsLoaded)
-                    _debuggingWindow = new DebuggingWindow();
+                Application.Current.Dispatcher.Invoke(_debuggingWindow.Close);
+                _debuggingWindow = new DebuggingWindow();
                 Application.Current.Dispatcher.Invoke(_debuggingWindow.Show);
                 _debuggingWindow.ClearLogs();
 
