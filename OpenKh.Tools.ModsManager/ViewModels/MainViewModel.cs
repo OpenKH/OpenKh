@@ -1,3 +1,4 @@
+using OpenKh.Common;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ModsManager.Models;
 using OpenKh.Tools.ModsManager.Services;
@@ -23,6 +24,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
     public class MainViewModel : BaseNotifyPropertyChanged, IChangeModEnableState
     {
         private static string ApplicationName = Utilities.GetApplicationName();
+        private readonly DebuggingWindow _debuggingWindow = new DebuggingWindow();
         private ModViewModel _selectedValue;
         private Pcsx2Injector _pcsx2Injector;
 
@@ -51,6 +53,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public MainViewModel()
         {
+            Log.OnLogDispatch += (long ms, string tag, string message) =>
+                _debuggingWindow.Log(ms, tag, message);
+
             ReloadModsList();
             SelectedValue = ModsList.FirstOrDefault();
             AddModCommand = new RelayCommand(_ =>
@@ -119,9 +124,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }, _ => SelectedValue != null);
             MoveUp = new RelayCommand(_ => MoveSelectedModUp(), _ => CanSelectedModMoveUp());
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
-            BuildCommand = new RelayCommand(_ =>
+            BuildCommand = new RelayCommand(async _ =>
             {
-                ModsService.RunPacherAsync();
+                if (!_debuggingWindow.IsLoaded)
+                    _debuggingWindow.Show();
+                _debuggingWindow.ClearLogs();
+
+                await ModsService.RunPacherAsync();
                 switch (ConfigurationService.GameEdition)
                 {
                     case 0:
@@ -152,7 +161,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             FileName = ConfigurationService.Pcsx2Location,
                             WorkingDirectory = Path.GetDirectoryName(ConfigurationService.Pcsx2Location),
                             Arguments = $"\"{ConfigurationService.IsoLocation}\""
-                        }));
+                        }), _debuggingWindow);
                         break;
                     case 2:
                         break;
