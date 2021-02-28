@@ -1,6 +1,7 @@
 using OpenKh.Tools.ModsManager.Interfaces;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -32,10 +33,10 @@ namespace OpenKh.Tools.ModsManager.Views
 
         public void HideDebugger()
         {
-            Application.Current.Dispatcher.Invoke(Hide);
+            Task.Run(() => Application.Current.Dispatcher.Invoke(Hide));
         }
 
-        public void Log(long ms, string tag, string message)
+        public void Log(long ms, string tag, string message) => Task.Run(() =>
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -53,7 +54,7 @@ namespace OpenKh.Tools.ModsManager.Views
                     Foreground = brush
                 });
             });
-        }
+        });
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

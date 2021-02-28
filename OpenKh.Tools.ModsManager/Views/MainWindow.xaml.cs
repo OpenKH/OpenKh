@@ -1,4 +1,5 @@
 using OpenKh.Tools.ModsManager.ViewModels;
+using System;
 using System.Diagnostics;
 using System.Windows;
 
@@ -13,6 +14,12 @@ namespace OpenKh.Tools.ModsManager.Views
         {
             InitializeComponent();
             DataContext = new MainViewModel();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            (DataContext as MainViewModel)?.CloseAllWindows();
+            base.OnClosed(e);
         }
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
