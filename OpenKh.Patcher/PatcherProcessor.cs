@@ -267,7 +267,9 @@ namespace OpenKh.Patcher
 
         private static void PatchAreaDataScript(Context context, List<AssetFile> sources, Stream stream)
         {
-            var scripts = Kh2.Ard.AreaDataScript.Read(stream).ToDictionary(x => x.ProgramId, x => x);
+            var scripts = Kh2.Ard.AreaDataScript.IsValid(stream) ?
+                Kh2.Ard.AreaDataScript.Read(stream).ToDictionary(x => x.ProgramId, x => x) :
+                new Dictionary<short, Kh2.Ard.AreaDataScript>();
             foreach (var source in sources)
             {
                 var programsInput = File.ReadAllText(context.GetSourceModAssetPath(source.Name));

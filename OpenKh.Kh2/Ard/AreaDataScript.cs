@@ -756,6 +756,16 @@ namespace OpenKh.Kh2.Ard
             return sb.ToString().Replace("\r", string.Empty);
         }
 
+        public static bool IsValid(Stream stream)
+        {
+            if (stream.Length == 0)
+                return false;
+
+            var isValid = stream.SetPosition(stream.Length - 4).ReadInt32() == 0x0000FFFF;
+            stream.SetPosition(0);
+            return isValid;
+        }
+
         public static List<AreaDataScript> Read(Stream stream) =>
             ReadAll(stream).ToList();
 
