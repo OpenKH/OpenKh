@@ -115,8 +115,7 @@ namespace OpenKh.Game.Field
             // TODO load voices (eg. voice/us/battle/nm0_jack.vsb)
             // TODO load field2d (eg. field2d/jp/nm0field.2dd)
             // TODO load command (eg. field2d/jp/nm1command.2dd)
-            //_map = new Kh2Map(_graphicsDevice, _kernel, world, area); // new BbsMap(_graphicsDevice, @"PATH_TO_PMP");
-            _map = new BbsMap(_graphicsDevice, "models/dp_02.pmp");
+            _map = new Kh2Map(_graphicsDevice, _kernel, world, area); // new BbsMap(_graphicsDevice, @"PATH_TO_PMP");
             LoadMsg(world);
             // TODO load libretto (eg. libretto-nm.bar)
             // TODO load effect

@@ -24,20 +24,20 @@ namespace OpenKh.Engine.Parsers
                 {
                     Vector4 color;
 
-                    color.X = pmo.Meshes[x].colors[i].X;
-                    color.Y = pmo.Meshes[x].colors[i].Y;
-                    color.Z = pmo.Meshes[x].colors[i].Z;
-                    color.W = pmo.Meshes[x].colors[i].W;
+                    color.X = pmo.Meshes[x].colors[i].X / 128.0f;
+                    color.Y = pmo.Meshes[x].colors[i].Y / 128.0f;
+                    color.Z = pmo.Meshes[x].colors[i].Z / 128.0f;
+                    color.W = pmo.Meshes[x].colors[i].W / 128.0f;
 
                     vertices[i].X = pmo.Meshes[x].vertices[i].X * pmo.header.ModelScale * Scale;
                     vertices[i].Y = pmo.Meshes[x].vertices[i].Y * pmo.header.ModelScale * Scale;
                     vertices[i].Z = pmo.Meshes[x].vertices[i].Z * pmo.header.ModelScale * Scale;
                     vertices[i].Tu = pmo.Meshes[x].textureCoordinates[i].X;
                     vertices[i].Tv = pmo.Meshes[x].textureCoordinates[i].Y;
-                    vertices[i].R = (byte)color.X;
-                    vertices[i].G = (byte)color.Y;
-                    vertices[i].B = (byte)color.Z;
-                    vertices[i].A = 0xFF;
+                    vertices[i].R = color.X;
+                    vertices[i].G = color.Y;
+                    vertices[i].B = color.Z;
+                    vertices[i].A = color.W;
                 }
 
                 currentMesh = new MeshDescriptor()
@@ -45,13 +45,13 @@ namespace OpenKh.Engine.Parsers
                     Vertices = vertices,
                     Indices = pmo.Meshes[x].Indices.ToArray(),
                     TextureIndex = pmo.Meshes[x].TextureID,
-                    IsOpaque = true
+                    IsOpaque = false
                 };
 
                 MeshDescriptors.Add(currentMesh);
             }
 
-            if(pmo.header.SkeletonOffset != 0)
+            if (pmo.header.SkeletonOffset != 0)
             {
                 List<Matrix4x4> matrices = new List<Matrix4x4>();
                 List<Mdlx.Bone> skeleton = new List<Mdlx.Bone>();
