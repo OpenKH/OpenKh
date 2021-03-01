@@ -3,7 +3,6 @@ using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Motion;
 using OpenKh.Common;
 using OpenKh.Game.Infrastructure;
-using OpenKh.Common;
 using OpenKh.Bbs;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;

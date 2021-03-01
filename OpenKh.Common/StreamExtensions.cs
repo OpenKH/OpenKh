@@ -128,6 +128,30 @@ namespace OpenKh.Common
                 return *(double*)ptr;
         }
 
+        unsafe public static Vector2 ReadVector2(this Stream stream)
+        {
+            var buffer = new byte[2 * sizeof(float)];
+            stream.Read(buffer, 0, 2 * sizeof(float));
+            fixed (byte* ptr = buffer)
+                return *(Vector2*)ptr;
+        }
+
+        unsafe public static Vector3 ReadVector3(this Stream stream)
+        {
+            var buffer = new byte[3 * sizeof(float)];
+            stream.Read(buffer, 0, 3 * sizeof(float));
+            fixed (byte* ptr = buffer)
+                return *(Vector3*)ptr;
+        }
+
+        unsafe public static Vector4 ReadVector4(this Stream stream)
+        {
+            var buffer = new byte[4 * sizeof(float)];
+            stream.Read(buffer, 0, 4 * sizeof(float));
+            fixed (byte* ptr = buffer)
+                return *(Vector4*)ptr;
+        }
+
         unsafe public static Matrix4x4 ReadMatrix4x4(this Stream stream)
         {
             var buffer = new byte[4 * 4 * sizeof(float)];
@@ -264,6 +288,27 @@ namespace OpenKh.Common
             fixed (byte* ptr = buffer)
                 *(float*)ptr = value;
             stream.Write(buffer, 0, 4);
+        }
+        unsafe public static void Write(this Stream stream, Vector2 value)
+        {
+            var buffer = new byte[2 * sizeof(float)];
+            fixed (byte* ptr = buffer)
+                *(Vector2*)ptr = value;
+            stream.Write(buffer, 0, 2 * sizeof(float));
+        }
+        unsafe public static void Write(this Stream stream, Vector3 value)
+        {
+            var buffer = new byte[3 * sizeof(float)];
+            fixed (byte* ptr = buffer)
+                *(Vector3*)ptr = value;
+            stream.Write(buffer, 0, 3 * sizeof(float));
+        }
+        unsafe public static void Write(this Stream stream, Vector4 value)
+        {
+            var buffer = new byte[4 * sizeof(float)];
+            fixed (byte* ptr = buffer)
+                *(Vector4*)ptr = value;
+            stream.Write(buffer, 0, 4 * sizeof(float));
         }
         unsafe public static void Write(this Stream stream, Matrix4x4 value)
         {
