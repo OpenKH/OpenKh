@@ -61,17 +61,6 @@ namespace OpenKh.Engine.Parsers
                     Matrix4x4 mtx = boneData.Transform;
                     Matrix4x4 mtx_nd = Matrix4x4.Transpose(mtx);
 
-                    mtx_nd.M11 *= Scale;
-                    mtx_nd.M21 *= Scale;
-                    mtx_nd.M31 *= Scale;
-
-                    Vector3 loc;
-                    Quaternion quat;
-                    Vector3 scl;
-
-                    Matrix4x4.Decompose(mtx_nd, out scl, out quat, out loc);
-                    
-                    //mtx = Matrix4x4.Transpose(mtx);
                     matrices.Add(mtx_nd);
 
                     Mdlx.Bone otherBone = new Mdlx.Bone();
