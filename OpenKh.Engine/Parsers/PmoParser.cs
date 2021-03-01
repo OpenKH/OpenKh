@@ -17,7 +17,6 @@ namespace OpenKh.Engine.Parsers
             MeshDescriptors = new List<MeshDescriptor>();
             MeshDescriptor currentMesh = new MeshDescriptor();
             
-
             for (int x = 0; x < pmo.Meshes.Count; x++)
             {
                 var vertices = new PositionColoredTextured[pmo.Meshes[x].vertices.Count];
