@@ -12,6 +12,11 @@ namespace OpenKh.Bbs
 {
     public class Pmo
     {
+        private static readonly IBinaryMapping Mapping =
+           MappingConfiguration.DefaultConfiguration()
+               .ForTypeMatrix4x4()
+               .Build();
+
         private const UInt32 MagicCode = 0x4F4D50;
 
         public class Header
@@ -238,14 +243,14 @@ namespace OpenKh.Bbs
 
         public static void ReadHeader(Stream stream, Pmo pmo)
         {
-            pmo.header = BinaryMapping.ReadObject<Header>(stream);
+            pmo.header = Mapping.ReadObject<Header>(stream);
         }
 
         public static void ReadTextureSection(Stream stream, Pmo pmo)
         {
             pmo.textureInfo = new TextureInfo[pmo.header.TextureCount];
             for (ushort i = 0; i < pmo.header.TextureCount; i++)
-                pmo.textureInfo[i] = BinaryMapping.ReadObject<TextureInfo>(stream);
+                pmo.textureInfo[i] = Mapping.ReadObject<TextureInfo>(stream);
         }
 
         public static void ReadMeshData(Stream stream, Pmo pmo, int MeshNumber = 0)
@@ -261,7 +266,7 @@ namespace OpenKh.Bbs
                 MeshChunks meshChunk = new MeshChunks();
                 meshChunk.MeshNumber = MeshNumber;
 
-                meshChunk.SectionInfo = BinaryMapping.ReadObject<MeshSection>(stream);
+                meshChunk.SectionInfo = Mapping.ReadObject<MeshSection>(stream);
 
                 // Exit if Vertex Count is zero.
                 if (meshChunk.SectionInfo.VertexCount <= 0)
@@ -273,9 +278,9 @@ namespace OpenKh.Bbs
                 bool isColorFlagRisen = flags.UniformDiffuseFlag;
 
                 if (pmo.header.SkeletonOffset != 0)
-                    meshChunk.SectionInfo_opt1 = BinaryMapping.ReadObject<MeshSectionOptional1>(stream);
+                    meshChunk.SectionInfo_opt1 = Mapping.ReadObject<MeshSectionOptional1>(stream);
                 if (isColorFlagRisen)
-                    meshChunk.SectionInfo_opt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
+                    meshChunk.SectionInfo_opt2 = Mapping.ReadObject<MeshSectionOptional2>(stream);
                 if (meshChunk.SectionInfo.TriangleStripCount > 0)
                 {
                     meshChunk.TriangleStripValues = new UInt16[meshChunk.SectionInfo.TriangleStripCount];
@@ -522,11 +527,11 @@ namespace OpenKh.Bbs
             if(pmo.header.SkeletonOffset != 0)
             {
                 stream.Seek(pmo.PMO_StartPosition + pmo.header.SkeletonOffset, SeekOrigin.Begin);
-                pmo.skeletonHeader = BinaryMapping.ReadObject<SkeletonHeader>(stream);
+                pmo.skeletonHeader = Mapping.ReadObject<SkeletonHeader>(stream);
                 pmo.boneList = new BoneData[pmo.skeletonHeader.BoneCount];
                 for (int j = 0; j < pmo.skeletonHeader.BoneCount; j++)
                 {
-                    pmo.boneList[j] = BinaryMapping.ReadObject<BoneData>(stream);
+                    pmo.boneList[j] = Mapping.ReadObject<BoneData>(stream);
                 }
             }
 
@@ -547,22 +552,22 @@ namespace OpenKh.Bbs
             if (pmo.header.SkeletonOffset != 0)
             {
                 stream.Seek(pmo.header.SkeletonOffset, SeekOrigin.Begin);
-                BinaryMapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
+                Mapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
 
                 for (int joint = 0; joint < pmo.boneList.Length; joint++)
                 {
-                    BinaryMapping.WriteObject<BoneData>(stream, pmo.boneList[joint]);
+                    Mapping.WriteObject<BoneData>(stream, pmo.boneList[joint]);
                 }
             }
         }
 
         public static void WriteHeaderData(Stream stream, Pmo pmo)
         {
-            BinaryMapping.WriteObject<Pmo.Header>(stream, pmo.header);
+            Mapping.WriteObject<Pmo.Header>(stream, pmo.header);
 
             for (int i = 0; i < pmo.header.TextureCount; i++)
             {
-                BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
+                Mapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
             }
         }
 
@@ -608,11 +613,11 @@ namespace OpenKh.Bbs
 
                 MeshChunks chunk = pmo.Meshes[j];
 
-                BinaryMapping.WriteObject<Pmo.MeshSection>(stream, chunk.SectionInfo);
+                Mapping.WriteObject<Pmo.MeshSection>(stream, chunk.SectionInfo);
                 if (chunk.SectionInfo_opt1 != null)
-                    BinaryMapping.WriteObject<Pmo.MeshSectionOptional1>(stream, chunk.SectionInfo_opt1);
+                    Mapping.WriteObject<Pmo.MeshSectionOptional1>(stream, chunk.SectionInfo_opt1);
                 if (chunk.SectionInfo_opt2 != null)
-                    BinaryMapping.WriteObject<Pmo.MeshSectionOptional2>(stream, chunk.SectionInfo_opt2);
+                    Mapping.WriteObject<Pmo.MeshSectionOptional2>(stream, chunk.SectionInfo_opt2);
 
                 if (chunk.TriangleStripValues.Length > 0)
                 {
