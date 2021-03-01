@@ -118,6 +118,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     Handle(() =>
                     {
+                        foreach (var filePath in Directory.GetFiles(mod.Path, "*", SearchOption.AllDirectories))
+                        {
+                            var attributes = File.GetAttributes(filePath);
+                            if (attributes.HasFlag(FileAttributes.ReadOnly))
+                                File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+                        }
+
                         Directory.Delete(mod.Path, true);
                         ReloadModsList();
                     });
