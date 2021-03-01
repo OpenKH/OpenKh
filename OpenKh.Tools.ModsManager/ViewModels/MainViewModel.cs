@@ -141,17 +141,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _debuggingWindow.ClearLogs();
 
                 await ModsService.RunPacherAsync();
+                ProcessStartInfo processStartInfo;
+                bool isPcsx2 = false;
                 switch (ConfigurationService.GameEdition)
                 {
                     case 0:
-                        _runningProcess = Process.Start(new ProcessStartInfo
+                        Log.Info("Starting OpenKH Game Engine");
+                        processStartInfo = new ProcessStartInfo
                         {
                             FileName = ConfigurationService.OpenKhGameEngineLocation,
                             WorkingDirectory = Path.GetDirectoryName(ConfigurationService.OpenKhGameEngineLocation),
-                            Arguments = $"--data \"{ConfigurationService.GameDataLocation}\" --modpath \"{ConfigurationService.GameModPath}\""
-                        });
+                            Arguments = $"--data \"{ConfigurationService.GameDataLocation}\" --modpath \"{ConfigurationService.GameModPath}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                        };
                         break;
                     case 1:
+                        Log.Info("Starting PCSX2");
                         if (ConfigurationService.RegionId > 0)
                         {
                             _pcsx2Injector.RegionId = ConfigurationService.RegionId - 1;
@@ -166,18 +173,39 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         else
                             _pcsx2Injector.RegionId = -1;
 
-                        _runningProcess = Process.Start(new ProcessStartInfo
+                        processStartInfo = new ProcessStartInfo
                         {
                             FileName = ConfigurationService.Pcsx2Location,
                             WorkingDirectory = Path.GetDirectoryName(ConfigurationService.Pcsx2Location),
-                            Arguments = $"\"{ConfigurationService.IsoLocation}\""
-                        });
-                        _pcsx2Injector.Run(_runningProcess, _debuggingWindow);
+                            Arguments = $"\"{ConfigurationService.IsoLocation}\"",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                        };
+                        isPcsx2 = true;
                         break;
-                    case 2:
+                    default:
+                        processStartInfo = null;
                         break;
                 }
 
+                if (processStartInfo != null)
+                {
+                    _runningProcess = new Process() { StartInfo = processStartInfo };
+                    _runningProcess.OutputDataReceived += (sender, e) => CaptureLog(e.Data);
+                    _runningProcess.ErrorDataReceived += (sender, e) => CaptureLog(e.Data);
+                    _runningProcess.Start();
+                    _runningProcess.BeginOutputReadLine();
+                    _runningProcess.BeginErrorReadLine();
+                    if (isPcsx2)
+                        _pcsx2Injector.Run(_runningProcess, _debuggingWindow);
+
+                    await Task.Run(() =>
+                    {
+                        _runningProcess.WaitForExit();
+                        CloseAllWindows();
+                    });
+                }
             });
             WizardCommand = new RelayCommand(_ =>
             {
@@ -209,7 +237,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public void CloseAllWindows()
         {
             CloseRunningProcess();
-            _debuggingWindow.Close();
+            Application.Current.Dispatcher.Invoke(_debuggingWindow.Close);
         }
 
         public void CloseRunningProcess()
@@ -221,6 +249,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             _runningProcess.CloseMainWindow();
             _runningProcess.Kill();
             _runningProcess.Dispose();
+            _runningProcess = null;
+        }
+
+        private void CaptureLog(string data)
+        {
+            if (data == null)
+                return;
+            else if (data.Contains("err", StringComparison.InvariantCultureIgnoreCase))
+                Log.Err(data);
+            else if (data.Contains("wrn", StringComparison.InvariantCultureIgnoreCase))
+                Log.Warn(data);
+            else if (data.Contains("warn", StringComparison.InvariantCultureIgnoreCase))
+                Log.Warn(data);
+            else
+                Log.Info(data);
         }
 
         private void ReloadModsList()
