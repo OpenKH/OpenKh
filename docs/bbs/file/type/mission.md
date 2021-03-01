@@ -58,6 +58,27 @@ Here's the full list of files that use this format.
 | 0x56    | uint8   | Padding
 | 0x57    | uint8   | Padding
 
+### Bonus
+
+The type of bonus to receive. It is not possible to give two rewards of the same type.
+
+| Value | Description
+|--------|-------
+| 0     | None
+| 1     | Maximum HP
+| 2     | Deck Capacity Increase
+| 3     | Command
+
+### Present
+
+The type of present to receive. Presents cannot give you debug commands or abilities/enchantments.
+
+| Value | Description
+|--------|-------
+| 0     | None
+| 1     | Item
+| 2     | Command
+
 ### Mission Kind
 
 | Value | Name  | Description

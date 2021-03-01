@@ -64,7 +64,8 @@ OLO Flags is a bitfield.
 | 0xC    | Vector3  | Trigger scale.
 | 0x18   | uint  | Trigger ID. (uiID)
 | 0x1C   | uint  | [Trigger Behavior](###Trigger-Behavior)
-| 0x20   | ushort[2]  | Unknown Parameters
+| 0x20   | ushort  | Parameter 1 (Room to Teleport to)
+| 0x22   | ushort  | Parameter 2 (Room Entrance to use)
 | 0x24   | uint  | ID of CTD file to load
 | 0x28   | uint  | Possibly a reference to [Trigger Type](###Trigger-Type) (Game Trigger)
 | 0x2C   | float  | Yaw rotation.
@@ -153,8 +154,8 @@ OLO Flags is a bitfield.
 | 0x1C   | float | Height
 | 0x20   | uint32 | [Layout Info](###Layout-Info)
 | 0x24   | uint32 | Unique ID
-| 0x28   | uint16 | Parameter 1
-| 0x2A   | uint16 | Parameter 2
+| 0x28   | uint16 | Parameter 1 (Reward ID for [Sticker](itc.md) & [Chest](itb.md))
+| 0x2A   | uint16 | Parameter 2 (Controls effect spawns)
 | 0x2C   | uint16 | Parameter 3
 | 0x2E   | uint16 | Trigger
 | 0x30   | float | Parameter 5
