@@ -59,23 +59,7 @@ namespace OpenKh.Engine.Parsers
 
                 foreach (Pmo.BoneData boneData in pmo.boneList)
                 {
-                    Matrix4x4 mtx = new Matrix4x4();
-                    mtx.M11 = boneData.Transform[0];
-                    mtx.M12 = boneData.Transform[1];
-                    mtx.M13 = boneData.Transform[2];
-                    mtx.M14 = boneData.Transform[3];
-                    mtx.M21 = boneData.Transform[4];
-                    mtx.M22 = boneData.Transform[5];
-                    mtx.M23 = boneData.Transform[6];
-                    mtx.M24 = boneData.Transform[7];
-                    mtx.M31 = boneData.Transform[8];
-                    mtx.M32 = boneData.Transform[9];
-                    mtx.M33 = boneData.Transform[10];
-                    mtx.M34 = boneData.Transform[11];
-                    mtx.M41 = boneData.Transform[12];
-                    mtx.M42 = boneData.Transform[13];
-                    mtx.M43 = boneData.Transform[14];
-                    mtx.M44 = boneData.Transform[15];
+                    Matrix4x4 mtx = boneData.Transform;
                     Matrix4x4 mtx_nd = Matrix4x4.Transpose(mtx);
 
                     mtx_nd.M11 *= Scale;

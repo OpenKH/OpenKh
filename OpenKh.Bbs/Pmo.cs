@@ -97,8 +97,8 @@ namespace OpenKh.Bbs
             [Data] public ushort Padding3 { get; set; }
             [Data] public uint Padding4 { get; set; }
             [Data(Count = 16)] public string JointName { get; set; }
-            [Data(Count = 16)] public float[] Transform { get; set; }
-            [Data(Count = 16)] public float[] InverseTransform { get; set; }
+            [Data] public Matrix4x4 Transform { get; set; }
+            [Data] public Matrix4x4 InverseTransform { get; set; }
         }
 
         public class MeshSectionOptional1
@@ -655,16 +655,16 @@ namespace OpenKh.Bbs
                     switch (flags.TextureCoordinateFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            stream.Write((byte)(chunk.textureCoordinates[k].X * 127.0f));
-                            stream.Write((byte)(chunk.textureCoordinates[k].Y * 127.0f));
+                            stream.Write((byte)(chunk.textureCoordinates[k].X * 128.0f));
+                            stream.Write((byte)(chunk.textureCoordinates[k].Y * 128.0f));
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
                             vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
                             for (int a = 0; a < vertexIncreaseAmount; a++)
                                 stream.Write((byte)0xAB);
 
-                            stream.Write((ushort)(chunk.textureCoordinates[k].X * 32767.0f));
-                            stream.Write((ushort)(chunk.textureCoordinates[k].Y * 32767.0f));
+                            stream.Write((ushort)(chunk.textureCoordinates[k].X * 32768.0f));
+                            stream.Write((ushort)(chunk.textureCoordinates[k].Y * 32768.0f));
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
                             vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
@@ -703,18 +703,18 @@ namespace OpenKh.Bbs
                     switch (flags.PositionFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].X * 127.0f));
-                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Y * 127.0f));
-                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Z * 127.0f));
+                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].X * 128.0f));
+                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Y * 128.0f));
+                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Z * 128.0f));
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
                             vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
                             for (int a = 0; a < vertexIncreaseAmount; a++)
                                 stream.Write((byte)0xAB);
 
-                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].X * 32767.0f));
-                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Y * 32767.0f));
-                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Z * 32767.0f));
+                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].X * 32768.0f));
+                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Y * 32768.0f));
+                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Z * 32768.0f));
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
                             vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
