@@ -167,6 +167,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ItbEditor", "OpenKh.Tools.ItbEditor\OpenKh.Tools.ItbEditor.csproj", "{0AC54BBF-A08D-44CA-9140-EB5C47573BAE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.IteViewer", "IteEditor\OpenKh.Tools.IteViewer.csproj", "{7BA60C7F-4DA9-4A62-A1DC-0F8FF87E4430}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.PAMtoFBXConverter", "OpenKh.Command.PAMtoFBXConverter\OpenKh.Command.PAMtoFBXConverter.csproj", "{A9695331-C335-4C62-B5B3-7FB3ED512EA3}"
 EndProject
 Global
