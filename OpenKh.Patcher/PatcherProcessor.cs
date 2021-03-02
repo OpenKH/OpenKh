@@ -123,6 +123,9 @@ namespace OpenKh.Patcher
                 case "areadatascript":
                     PatchAreaDataScript(context, assetFile.Source, stream);
                     break;
+                case "listreplace":
+                    PatchListReplace(context, assetFile.Source, stream);
+                    break;
                 default:
                     Log.Warn($"Method '{assetFile.Method}' not recognized for '{assetFile.Name}'. Falling back to 'copy'");
                     CopyFile(context, assetFile, stream);
@@ -131,6 +134,8 @@ namespace OpenKh.Patcher
 
             stream.SetLength(stream.Position);
         }
+
+
 
         private static void CopyFile(Context context, AssetFile assetFile, Stream stream)
         {
@@ -278,6 +283,80 @@ namespace OpenKh.Patcher
             }
 
             Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
+        }
+
+        private static void PatchListReplace(Context context, List<AssetFile> sources, Stream stream)
+        {
+            foreach (var source in sources)
+            {
+                var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+                Dictionary<string, byte> characterMap = new Dictionary<string, byte>() {
+                            { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14}
+                        };
+                    string sourceText = File.ReadAllText(context.GetSourceModAssetPath(source.Name));
+                    if (source.Name.Contains("enc"))
+                    {
+                        byte[] data = System.Convert.FromBase64String(sourceText);
+                        sourceText = System.Text.ASCIIEncoding.ASCII.GetString(data);
+                    }
+                    switch (source.Type)
+                    {
+                        case "trsr":
+                            var TrsrList = Kh2.SystemData.Trsr.Read(stream).ToDictionary(x => x.Id, x => x);
+                            var moddedTrsr = deserializer.Deserialize<Dictionary<int, Kh2.SystemData.Trsr>>(sourceText);
+                            foreach (KeyValuePair<int, Kh2.SystemData.Trsr> treasure in moddedTrsr)
+                            {
+                                TrsrList[treasure.Value.Id].ItemId = treasure.Value.ItemId;
+                            }
+                                Kh2.SystemData.Trsr.Write(stream.SetPosition(0), TrsrList.Values);
+                            break;
+
+                        case "item":
+                            var ItemList = Kh2.SystemData.Item.Read(stream);
+                            var moddedItem = deserializer.Deserialize<Kh2.SystemData.Item>(sourceText);
+                            ItemList = moddedItem;
+                            ItemList.Write(stream.SetPosition(0));
+                            break;
+
+                        case "fmlv":
+                            var FormList = Kh2.Battle.Fmlv.Read(stream).ToDictionary(x => String.Concat(x.FormFm, x.FormLevel), x => x);
+                            var moddedForms = deserializer.Deserialize<Dictionary<string, Kh2.Battle.Fmlv.Level>>(sourceText);
+                            foreach (KeyValuePair<string, Kh2.Battle.Fmlv.Level> form in moddedForms)
+                            {
+                                FormList[form.Key].Ability = form.Value.Ability;
+                                FormList[form.Key].LevelGrowthAbility = form.Value.LevelGrowthAbility;
+                                FormList[form.Key].Exp = form.Value.Exp;
+                            }
+                            Kh2.Battle.Fmlv.Write(stream.SetPosition(0), FormList.Values);
+                            break;
+
+                        case "lvup":
+                            var LevelList = Kh2.Battle.Lvup.Read(stream);
+                            var moddedLevels = deserializer.Deserialize<Kh2.Battle.Lvup>(sourceText);
+                            int i = 0;
+                            foreach (Kh2.Battle.Lvup.PlayableCharacter character in moddedLevels.Characters)
+                            {
+                                LevelList.Characters[i].Levels = character.Levels;
+                                i++;
+                            }
+                            LevelList.Write(stream.SetPosition(0));
+                            break;
+
+                        case "bons":
+                            var BonusList = Kh2.Battle.Bons.Read(stream).ToDictionary(x => String.Concat(x.RewardId, characterMap.FirstOrDefault(y => y.Value == x.CharacterId).Key), x => x);
+                            var moddedBonus = deserializer.Deserialize<Dictionary<string, Kh2.Battle.Bons>>(sourceText);
+                            foreach (KeyValuePair<string, Kh2.Battle.Bons> bonus in moddedBonus)
+                            {
+                                BonusList[bonus.Key] = bonus.Value;
+                            }
+                            Kh2.Battle.Bons.Write(stream.SetPosition(0), BonusList.Values);
+                            break;
+
+                        default:
+                            break;
+                    }
+             }
+            
         }
     }
 }
