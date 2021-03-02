@@ -371,8 +371,8 @@ namespace OpenKh.Imaging
         }
 
         public static bool IsValid(Stream stream) =>
-            stream.SetPosition(0).ReadInt32() == MagicCode &&
-            stream.Length >= HeaderLength;
+            stream.PeekInt32() == MagicCode &&
+            (stream.Length - stream.Position) >= HeaderLength;
 
         public static Tm2 Create(byte[] buffer, short width, short height)
         {
@@ -401,26 +401,12 @@ namespace OpenKh.Imaging
         }
 
         // bRelative controls whether the TM2 file is read from the beginning of the file or the current stream position.
-        public static IEnumerable<Tm2> Read(Stream stream, bool bRelative = false)
+        public static IEnumerable<Tm2> Read(Stream stream)
         {
-            if (!stream.CanRead || !stream.CanSeek)
-                throw new InvalidDataException($"Read or seek must be supported.");
-
-            if (!bRelative)
-                stream.Seek(0, SeekOrigin.Begin);
-
+            stream.MustReadAndSeek();
             var header = BinaryMapping.ReadObject<Header>(stream);
             if (header.Format != 0)
-            {
-                if (bRelative)
-                {
-                    stream.Position += 128;
-                }
-                else
-                {
-                    stream.Position = 128;
-                }
-            }   
+                stream.Position += 128;
 
             if (stream.Length < HeaderLength || header.MagicCode != MagicCode)
                 throw new InvalidDataException("Invalid header");
@@ -432,8 +418,7 @@ namespace OpenKh.Imaging
 
         public static void Write(Stream stream, IEnumerable<Tm2> images)
         {
-            if (!stream.CanWrite || !stream.CanSeek)
-                throw new InvalidDataException($"Write or seek must be supported.");
+            stream.MustWriteAndSeek();
 
             var myImages = images.ToArray();
             BinaryMapping.WriteObject(stream, new Header

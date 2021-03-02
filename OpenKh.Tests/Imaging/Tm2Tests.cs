@@ -20,7 +20,7 @@ namespace OpenKh.Tests.Imaging
                 stream.Write(header, 0, header.Length);
                 stream.SetLength(length);
 
-                Assert.Equal(expected, Tm2.IsValid(stream));
+                Assert.Equal(expected, Tm2.IsValid(stream.SetPosition(0)));
             });
 
         [Theory]

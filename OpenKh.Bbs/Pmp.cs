@@ -124,7 +124,7 @@ namespace OpenKh.Bbs
                 uint tm2size = stream.ReadUInt32() + 0x10;
                 stream.Seek(pmp.TextureList[k].Offset, SeekOrigin.Begin);
 
-                pmp.TextureDataList.Add(Tm2.Read(stream, true).First());
+                pmp.TextureDataList.Add(Tm2.Read(stream).First());
             }
 
             return pmp;
