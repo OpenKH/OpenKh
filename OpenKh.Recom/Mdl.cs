@@ -119,7 +119,7 @@ namespace OpenKh.Recom
         {
             [Data] public Vector2 TextureUv { get; set; }
             [Data] public float Unk28 { get; set; }
-            [Data] public int MeshId { get; set; }
+            [Data] public int MaterialIndex { get; set; }
 
             public override string ToString() =>
                 TextureUv.ToString();

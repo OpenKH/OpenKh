@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using OpenKh.Engine.Parsers;
 using OpenKh.Engine;
 using System.Numerics;
+using OpenKh.Recom;
 
 namespace OpenKh.Game.Entities
 {
@@ -158,6 +159,26 @@ namespace OpenKh.Game.Entities
                     return new PngKingdomTexture(path, graphics);
                 }).ToArray(),
             };
+        }
+
+        public static (IModelMotion, IKingdomTexture[]) ComMeshLoader(GraphicsDevice graphics, string filePath)
+        {
+            var mdlFilename = $"{filePath}.MDL";
+            var texFilename = $"{filePath}.RTM";
+
+            var mdl = File.OpenRead(mdlFilename).Using(Mdl.Read);
+            var submodel = mdl.First();
+
+            var materials = File.OpenRead(texFilename).Using(Rtm.Read);
+            var textures = materials
+                .SelectMany(x => x.Textures)
+                .Select(x => new Tim2KingdomTexture(x, graphics))
+                .ToArray();
+            var materialIndices = materials
+                .Select((x, Index) => new { x.Name, Index })
+                .ToDictionary(x => Path.GetFileNameWithoutExtension(x.Name), x => x.Index);
+
+            return (new MdlComParser(submodel, materialIndices), textures);
         }
 
         public static (IModelMotion, IKingdomTexture[]) BBSMeshLoader(GraphicsDevice graphics, string FilePath, IModelMotion Model, IKingdomTexture[] Textures)

@@ -24,6 +24,7 @@
     <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
     <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
+    <ProjectReference Include="..\OpenKh.Recom\OpenKh.Recom.csproj" />
   </ItemGroup>
 
   <ItemGroup>
