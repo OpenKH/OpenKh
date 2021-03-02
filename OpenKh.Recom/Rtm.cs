@@ -9,37 +9,68 @@ namespace OpenKh.Recom
 {
     public class Rtm
     {
-        private class HeaderEntry
+        private interface IHeaderEntry
         {
-            [Data(Count = 20)] public string Name { get; set; }
-            [Data] public uint Flags { get; set; }
+            string Name { get; set; }
+            uint Offset { get; set; }
+            uint Length { get; set; }
+            ushort Flags { get; set; }
+            uint Reserved1 { get; set; }
+            ushort Reserved2 { get; set; }
+        }
+
+        private class FinalHeaderEntry : IHeaderEntry
+        {
+            [Data] public uint Offset { get; set; }
+            [Data(Count = 16)] public string Name { get; set; }
+            [Data] public uint Reserved1 { get; set; }
+            [Data] public ushort Reserved2 { get; set; }
+            [Data] public ushort Flags { get; set; }
             [Data] public uint Length { get; set; }
-            [Data] public uint NextTextureOffset { get; set; }
+        }
+
+        private class BetaHeaderEntry : IHeaderEntry
+        {
+            [Data(Count = 16)] public string Name { get; set; }
+            [Data] public uint Offset { get; set; }
+            [Data] public ushort Flags { get; set; }
+            [Data] public ushort Reserved2 { get; set; }
+            [Data] public uint Reserved1 { get; set; }
+            [Data] public uint Length { get; set; }
         }
 
         public string Name { get; set; }
         public List<Tm2> Textures { get; set; }
 
+        private static IEnumerable<IHeaderEntry> ReadHeader<THeaderEntry>(Stream stream)
+            where THeaderEntry : class, IHeaderEntry
+        {
+            while (true)
+            {
+                var entry = BinaryMapping.ReadObject<THeaderEntry>(stream);
+                if (entry.Name.Length == 0)
+                    yield break;
+                yield return entry;
+            }
+        }
+
         public static List<Rtm> Read(Stream stream)
         {
             stream.MustReadAndSeek();
             var basePosition = stream.Position;
-            var headerLength = stream.ReadUInt32();
-            var textureEntries = new List<HeaderEntry>(16);
-            var canContinue = headerLength >= 0x40;
-            while (canContinue)
+            var textureEntries = ReadHeader<FinalHeaderEntry>(stream).ToList();
+            if (textureEntries.Count > 0)
             {
-                var headerEntry = BinaryMapping.ReadObject<HeaderEntry>(stream);
-                textureEntries.Add(headerEntry);
-                canContinue = headerEntry.NextTextureOffset > 0;
+                if (textureEntries[0].Reserved1 != 0 ||
+                    textureEntries[0].Reserved2 != 0 ||
+                    textureEntries[0].Flags != 0x0102)
+                    textureEntries = ReadHeader<BetaHeaderEntry>(stream.SetPosition(basePosition)).ToList();
             }
 
-            var nextTextureOffset = headerLength;
             return textureEntries
                 .Select(x =>
                 {
-                    stream.SetPosition(basePosition + nextTextureOffset);
-                    nextTextureOffset = x.NextTextureOffset & 0x7FFFFFFFU;
+                    stream.SetPosition(basePosition + (x.Offset & 0x7FFFFFFFU));
                     return new Rtm
                     {
                         Name = x.Name,
@@ -53,32 +84,29 @@ namespace OpenKh.Recom
         {
             stream.MustWriteAndSeek();
 
-            var headerSize = textures.Count * 0x20 + 0x20;
-            var headerEntries = new List<HeaderEntry>();
+            var headerEntries = new List<FinalHeaderEntry>();
             var basePosition = stream.Position;
-            stream.Position += headerSize;
-
+            stream.Position += textures.Count * 0x20 + 0x20;
             foreach (var texture in textures)
             {
                 var prevPosition = stream.Position;
                 Tm2.Write(stream, texture.Textures);
-
-                headerEntries.Add(new HeaderEntry
+                headerEntries.Add(new FinalHeaderEntry
                 {
                     Name = texture.Name,
-                    Flags = 0x1020000,
+                    Flags = 0x0102,
                     Length = (uint)(stream.Position - prevPosition - basePosition) | 0x80000000U,
-                    NextTextureOffset = (uint)(stream.Position - basePosition)
+                    Offset = (uint)(prevPosition - basePosition)
                 });
             }
-
-            if (headerEntries.Count > 0)
-                headerEntries[^1].NextTextureOffset = 0;
+            headerEntries.Add(new FinalHeaderEntry
+            {
+                Name = string.Empty
+            });
 
             var finalPosition = stream.Position;
 
             stream.SetPosition(basePosition);
-            stream.Write(headerSize);
             foreach (var entry in headerEntries)
                 BinaryMapping.WriteObject(stream, entry);
 
