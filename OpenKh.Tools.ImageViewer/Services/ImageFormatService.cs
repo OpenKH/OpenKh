@@ -7,6 +7,7 @@ using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
+using OpenKh.Recom;
 using OpenKh.Tools.Common.Imaging;
 
 namespace OpenKh.Tools.ImageViewer.Services
@@ -54,6 +55,9 @@ namespace OpenKh.Tools.ImageViewer.Services
                     throw new NotImplementedException()),
 
                 GetImageFormat("TIM2", "tm2", false, Tm2.IsValid, s => Tm2.Read(s), (stream, images) =>
+                    throw new NotImplementedException()),
+
+                GetImageFormat("RTM", "rtm", false, _ => true, s => Rtm.Read(s).SelectMany(x => x.Textures), (stream, images) =>
                     throw new NotImplementedException()),
 
                 GetImageFormat("KH2TIM", "tex", false, _ => true,
