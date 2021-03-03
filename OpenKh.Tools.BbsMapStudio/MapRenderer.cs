@@ -144,6 +144,7 @@ namespace OpenKh.Tools.BbsMapStudio
                         Vector3 Loc = new Vector3(currentInfo.PositionX, currentInfo.PositionY, currentInfo.PositionZ);
                         Vector3 Rot = new Vector3(currentInfo.RotationX, currentInfo.RotationY, currentInfo.RotationZ);
                         Vector3 Scl = new Vector3(currentInfo.ScaleX, currentInfo.ScaleY, currentInfo.ScaleZ);
+
                         MapMeshGroups.Add(new MeshGroupModel(_graphics, "", BbsMap.PmoList[pmoIndex], BbsMap.PmoList[pmoIndex].texturesData, i, Loc * 100, Rot, Scl, BbsMap.hasDifferentMatrix[pmoIndex]));
                         pmoIndex++;
                     }
