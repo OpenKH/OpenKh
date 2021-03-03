@@ -58,6 +58,45 @@ namespace OpenKh.Game.Field
             }
         }
 
+        public BbsMap(GraphicsDevice graphics, Arc.Entry filePath)
+        {
+            _graphics = graphics;
+            var pmp = Pmp.Read(new MemoryStream(filePath.Data));
+            var group = new List<MeshGroup>();
+
+            int pmoIndex = 0;
+            for (int i = 0; i < pmp.objectInfo.Count; i++)
+            {
+                Pmp.ObjectInfo currentInfo = pmp.objectInfo[i];
+
+                if (currentInfo.PMO_Offset != 0)
+                {
+                    var pmpEntity = new PmpEntity(pmoIndex,
+                        new Vector3(currentInfo.PositionX, currentInfo.PositionY, currentInfo.PositionZ),
+                        new Vector3(currentInfo.RotationX, currentInfo.RotationY, currentInfo.RotationZ),
+                        new Vector3(currentInfo.ScaleX, currentInfo.ScaleY, currentInfo.ScaleZ));
+                    pmpEntity.DifferentMatrix = pmp.hasDifferentMatrix[pmoIndex];
+
+                    var pParser = new PmoParser(pmp.PmoList[pmoIndex], 100.0f);
+                    var textures = new List<Tim2KingdomTexture>();
+
+                    var meshGroup = new MeshGroup();
+                    meshGroup.MeshDescriptors = pParser.MeshDescriptors;
+                    meshGroup.Textures = new IKingdomTexture[pmp.PmoList[pmoIndex].header.TextureCount];
+
+                    for (int j = 0; j < pmp.PmoList[pmoIndex].header.TextureCount; j++)
+                    {
+                        textures.Add(new Tim2KingdomTexture(pmp.PmoList[pmoIndex].texturesData[j], graphics));
+                        meshGroup.Textures[j] = textures[j];
+                    }
+
+                    _pmpEntities.Add(pmpEntity);
+                    _pmpModels.Add(meshGroup);
+                    pmoIndex++;
+                }
+            }
+        }
+
         public void Dispose()
         {
             foreach (var model in _pmpModels)

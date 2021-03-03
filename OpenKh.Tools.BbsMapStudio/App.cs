@@ -1,0 +1,393 @@
+using Assimp;
+using ImGuiNET;
+using Microsoft.Xna.Framework.Input;
+using OpenKh.Kh2;
+using OpenKh.Tools.Common.CustomImGui;
+using OpenKh.Tools.BbsMapStudio.Windows;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Numerics;
+using System.Windows;
+using Xe.Tools.Wpf.Dialogs;
+using static OpenKh.Tools.Common.CustomImGui.ImGuiEx;
+using xna = Microsoft.Xna.Framework;
+
+namespace OpenKh.Tools.BbsMapStudio
+{
+    class App : IDisposable
+    {
+        private static readonly List<FileDialogFilter> MapFilter =
+            FileDialogFilterComposer.Compose()
+            .AddExtensions("MAP file", "pmp")
+            .AddAllFiles();
+        private static readonly List<FileDialogFilter> ArdFilter =
+            FileDialogFilterComposer.Compose()
+            .AddExtensions("ARD file", "ard")
+            .AddAllFiles();
+        private static readonly List<FileDialogFilter> ModelFilter =
+            FileDialogFilterComposer.Compose()
+            .AddExtensions("glTF file (GL Transmission Format)", "gltf")
+            .AddExtensions("FBX file", "fbx")
+            .AddExtensions("DAE file (Collada)  (might be unaccurate)", "dae")
+            .AddExtensions("OBJ file (Wavefront)  (might lose some information)", "obj")
+            .AddAllFiles();
+
+        private readonly Vector4 BgUiColor = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+        private readonly MonoGameImGuiBootstrap _bootstrap;
+        private bool _exitFlag = false;
+
+        private readonly Dictionary<Keys, Action> _keyMapping = new Dictionary<Keys, Action>();
+        private readonly MapRenderer _mapRenderer;
+        private string _gamePath;
+        private string _mapName;
+        private string _region;
+        private string _ardPath;
+        private string _mapPath;
+        private string _objPath;
+        private List<string> _mapList = new List<string>();
+        private ObjEntryController _objEntryController;
+
+        private xna.Point _previousMousePosition;
+
+        public string Title
+        {
+            get
+            {
+                var mapName = _mapName != null ? $"{_mapName}@" : string.Empty;
+                return $"{mapName}{_gamePath ?? "unloaded"} | {MonoGameImGuiBootstrap.ApplicationName}";
+            }
+        }
+
+        private string GamePath
+        {
+            get => _gamePath;
+            set
+            {
+                _gamePath = value;
+                UpdateTitle();
+                EnumerateMapList();
+
+                Settings.Default.GamePath = value;
+                Settings.Default.Save();
+
+            }
+        }
+
+        private string MapName
+        {
+            get => _mapName;
+            set
+            {
+                _mapName = value;
+                UpdateTitle();
+
+                _mapRenderer.Close();
+                _mapRenderer.OpenMap(Path.Combine(_mapPath, $"{_mapName}.arc"));
+            }
+        }
+
+        private bool IsGameOpen => !string.IsNullOrEmpty(_gamePath);
+        private bool IsMapOpen => !string.IsNullOrEmpty(_mapName);
+        private bool IsOpen => IsGameOpen && IsMapOpen;
+
+        public App(MonoGameImGuiBootstrap bootstrap, string gamePath = null)
+        {
+            _bootstrap = bootstrap;
+            _bootstrap.Title = Title;
+            _mapRenderer = new MapRenderer(bootstrap.Content, bootstrap.GraphicsDeviceManager);
+            AddKeyMapping(Keys.O, MenuFileOpen);
+            AddKeyMapping(Keys.S, MenuFileSave);
+            AddKeyMapping(Keys.Q, MenuFileUnload);
+
+            if (string.IsNullOrEmpty(gamePath))
+                gamePath = Settings.Default.GamePath;
+
+            if (!string.IsNullOrEmpty(gamePath))
+                OpenFolder(gamePath);
+
+            ImGui.PushStyleColor(ImGuiCol.MenuBarBg, BgUiColor);
+        }
+
+        public bool MainLoop()
+        {
+            _bootstrap.GraphicsDevice.Clear(xna.Color.CornflowerBlue);
+            ProcessKeyMapping();
+            if (!_bootstrap.ImGuiWantTextInput)
+                ProcessKeyboardInput(Keyboard.GetState(), 1f / 60);
+            if (!_bootstrap.ImGuiWantCaptureMouse)
+                ProcessMouseInput(Mouse.GetState());
+
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, BgUiColor);
+            ForControl(ImGui.BeginMainMenuBar, ImGui.EndMainMenuBar, MainMenu);
+
+            MainWindow();
+
+            ForWindow("Tools", () =>
+            {
+                if (EditorSettings.ViewCamera)
+                    CameraWindow.Run(_mapRenderer.Camera);
+                if (EditorSettings.ViewLayerControl)
+                    LayerControllerWindow.Run(_mapRenderer);
+                if (EditorSettings.ViewSpawnPoint)
+                    SpawnPointWindow.Run(_mapRenderer);
+                if (EditorSettings.ViewMeshGroup)
+                    MeshGroupWindow.Run(_mapRenderer.MapMeshGroups);
+                if (EditorSettings.ViewSpawnScriptMap)
+                    SpawnScriptWindow.Run("map", _mapRenderer.SpawnScriptMap);
+            });
+
+            ImGui.PopStyleColor();
+
+            return _exitFlag;
+        }
+
+        public void Dispose()
+        {
+            _objEntryController?.Dispose();
+        }
+
+        private void MainWindow()
+        {
+            if (!IsGameOpen)
+            {
+                ImGui.Text("Game content not loaded.");
+                return;
+            }
+
+            ForControl(() =>
+            {
+                var nextPos = ImGui.GetCursorPos();
+                var ret = ImGui.Begin("MapList",
+                    ImGuiWindowFlags.NoDecoration |
+                    ImGuiWindowFlags.NoCollapse |
+                    ImGuiWindowFlags.NoMove);
+                ImGui.SetWindowPos(nextPos);
+                ImGui.SetWindowSize(new Vector2(64, 0));
+                return ret;
+            }, () => { }, () =>
+            {
+                foreach (var map in _mapList)
+                {
+                    if (ImGui.Selectable(map, MapName == map))
+                    {
+                        MapName = map;
+                    }
+                }
+            });
+            ImGui.SameLine();
+
+            if (!IsMapOpen)
+            {
+                ImGui.Text("Please select a map to edit.");
+                return;
+            }
+
+            _mapRenderer.Update(1f / 60);
+            _mapRenderer.Draw();
+        }
+
+        void MainMenu()
+        {
+            ForMenuBar(() =>
+            {
+                ForMenu("File", () =>
+                {
+                    ForMenuItem("Open extracted game folder...", "CTRL+O", MenuFileOpen);
+                    ForMenuItem("Unload current map+ard", "CTRL+Q", MenuFileUnload, IsOpen);
+                    ForMenuItem("Import extern PMP file", MenuFileOpenMap, IsGameOpen);
+                    ForMenuItem("Save map+ard", "CTRL+S", MenuFileSave, IsOpen);
+                    ForMenuItem("Save map as...", MenuFileSaveMapAs, IsOpen);
+                    ImGui.Separator();
+                    ForMenu("Export", () =>
+                    {
+                        ForMenuItem("Map Collision", ExportMapCollision, _mapRenderer.ShowMapCollision.HasValue);
+                        ForMenuItem("Camera Collision", ExportCameraCollision, _mapRenderer.ShowCameraCollision.HasValue);
+                        ForMenuItem("Light Collision", ExportLightCollision, _mapRenderer.ShowLightCollision.HasValue);
+                    });
+                    ImGui.Separator();
+                    ForMenu("Preferences", () =>
+                    {
+                        ForEdit("Movement speed", () => EditorSettings.MoveSpeed, x => EditorSettings.MoveSpeed = x);
+                        ForEdit("Movement speed (shift)", () => EditorSettings.MoveSpeedShift, x => EditorSettings.MoveSpeedShift = x);
+                    });
+                    ImGui.Separator();
+                    ForMenuItem("Exit", MenuFileExit);
+                });
+                ForMenu("View", () =>
+                {
+                    ForMenuCheck("Camera", () => EditorSettings.ViewCamera, x => EditorSettings.ViewCamera = x);
+                    ForMenuCheck("Layer control", () => EditorSettings.ViewLayerControl, x => EditorSettings.ViewLayerControl = x);
+                    ForMenuCheck("Spawn points", () => EditorSettings.ViewSpawnPoint, x => EditorSettings.ViewSpawnPoint = x);
+                    ForMenuCheck("BOB descriptors", () => EditorSettings.ViewBobDescriptor, x => EditorSettings.ViewBobDescriptor = x);
+                    ForMenuCheck("Mesh group", () => EditorSettings.ViewMeshGroup, x => EditorSettings.ViewMeshGroup = x);
+                    ForMenuCheck("Spawn script MAP", () => EditorSettings.ViewSpawnScriptMap, x => EditorSettings.ViewSpawnScriptMap = x);
+                    ForMenuCheck("Spawn script BTL", () => EditorSettings.ViewSpawnScriptBattle, x => EditorSettings.ViewSpawnScriptBattle = x);
+                    ForMenuCheck("Spawn script EVT", () => EditorSettings.ViewSpawnScriptEvent, x => EditorSettings.ViewSpawnScriptEvent = x);
+                });
+                ForMenu("Help", () =>
+                {
+                    ForMenuItem("About", ShowAboutDialog);
+                });
+            });
+        }
+
+        private void MenuFileOpen() => FileDialog.OnFolder(OpenFolder);
+        private void MenuFileUnload() => _mapRenderer.Close();
+        private void MenuFileOpenMap() => FileDialog.OnOpen(_mapRenderer.OpenMap, MapFilter);
+
+        private void MenuFileSave()
+        {
+            _mapRenderer.SaveMap(Path.Combine(_mapPath, MapName + ".pmp"));
+        }
+
+        private void MenuFileSaveMapAs()
+        {
+            var defaultName = MapName + ".pmp";
+            FileDialog.OnSave(_mapRenderer.SaveMap, MapFilter, defaultName);
+        }
+
+        private void ExportMapCollision() => FileDialog.OnSave(fileName =>
+        {
+            ExportScene(fileName, _mapRenderer.MapCollision.Scene);
+        }, ModelFilter, $"{MapName}_map-collision.dae");
+
+        private void ExportCameraCollision() => FileDialog.OnSave(fileName =>
+        {
+            ExportScene(fileName, _mapRenderer.CameraCollision.Scene);
+        }, ModelFilter, $"{MapName}_camera-collision.dae");
+
+        private void ExportLightCollision() => FileDialog.OnSave(fileName =>
+        {
+            ExportScene(fileName, _mapRenderer.LightCollision.Scene);
+        }, ModelFilter, $"{MapName}_light-collision.dae");
+
+        private void MenuFileExit() => _exitFlag = true;
+
+        public void OpenFolder(string gamePath)
+        {
+            try
+            {
+                if (!Directory.Exists(_mapPath = Path.Combine(gamePath, "arc/map")))
+                    throw new DirectoryNotFoundException(
+                        "The specified directory must contain the full extracted copy of the game.");
+
+                GamePath = gamePath;
+            }
+            catch (Exception ex)
+            {
+                ShowError(ex.Message);
+            }
+        }
+
+        private void UpdateTitle()
+        {
+            _bootstrap.Title = Title;
+        }
+
+        private void EnumerateMapList()
+        {
+            var mapFiles = Directory.GetFiles(_mapPath, "*.arc");
+
+            _mapList.Clear();
+            foreach (var mapFile in mapFiles)
+            {
+                var mapName = Path.GetFileNameWithoutExtension(mapFile);
+                if (File.Exists(Path.Combine(_mapPath, $"{mapName}.arc")))
+                    _mapList.Add(mapName);
+            }
+        }
+
+        private void AddKeyMapping(Keys key, Action action)
+        {
+            _keyMapping[key] = action;
+        }
+
+        private void ProcessKeyMapping()
+        {
+            var k = Keyboard.GetState();
+            if (k.IsKeyDown(Keys.LeftControl))
+            {
+                var keys = k.GetPressedKeys();
+                foreach (var key in keys)
+                {
+                    if (_keyMapping.TryGetValue(key, out var action))
+                        action();
+                }
+            }
+        }
+
+        private void ProcessKeyboardInput(KeyboardState keyboard, float deltaTime)
+        {
+            var speed = (float)(deltaTime * EditorSettings.MoveSpeed);
+            var moveSpeed = speed;
+            if (keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift))
+                moveSpeed = (float)(deltaTime * EditorSettings.MoveSpeedShift);
+
+            var camera = _mapRenderer.Camera;
+            if (keyboard.IsKeyDown(Keys.W))
+                camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.S))
+                camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.A))
+                camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.D))
+                camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.Q))
+                camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.E))
+                camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
+
+            if (keyboard.IsKeyDown(Keys.Up))
+                camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
+            if (keyboard.IsKeyDown(Keys.Down))
+                camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
+            if (keyboard.IsKeyDown(Keys.Left))
+                camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
+            if (keyboard.IsKeyDown(Keys.Right))
+                camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
+        }
+
+        private void ProcessMouseInput(MouseState mouse)
+        {
+            const float Speed = 0.25f;
+            if (mouse.LeftButton == ButtonState.Pressed)
+            {
+                var camera = _mapRenderer.Camera;
+                var xSpeed = (_previousMousePosition.X - mouse.Position.X) * Speed;
+                var ySpeed = (_previousMousePosition.Y - mouse.Position.Y) * Speed;
+                camera.CameraRotationYawPitchRoll += new Vector3(1 * xSpeed, 0, 0);
+                camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * ySpeed);
+            }
+
+            _previousMousePosition = mouse.Position;
+        }
+
+        private static void ExportScene(string fileName, Scene scene)
+        {
+            using var ctx = new AssimpContext();
+            var extension = Path.GetExtension(fileName).ToLower();
+            var exportFormat = ctx.GetSupportedExportFormats();
+            foreach (var format in exportFormat)
+            {
+                if ($".{format.FileExtension}" == extension)
+                {
+                    var material = new Material();
+                    material.Clear();
+
+                    scene.Materials.Add(material);
+                    ctx.ExportFile(scene, fileName, format.FormatId);
+                    return;
+                }
+            }
+
+            ShowError($"Unable to export with '{extension}' extension.");
+        }
+
+        public static void ShowError(string message, string title = "Error") =>
+            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+
+        private void ShowAboutDialog() =>
+            MessageBox.Show("OpenKH is amazing.");
+    }
+}
