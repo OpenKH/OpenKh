@@ -1,6 +1,4 @@
-# w_start Format
-
-w_start stands for *World Start*.
+# WorldStart Format
 
 It controls the initial location you appear in when you first arrive a world.
 
