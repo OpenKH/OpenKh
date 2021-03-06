@@ -84,10 +84,3 @@ Take an example with tempo = 160 BPM, the SSEQ file is processed twice in 3 noti
 | 0xE1 | BPM: 2 byte | TEMPO
 | 0xE3 | Value: 2 byte | SWEEP PITCH
 | 0xFF | NONE | EOT: End Of Track
-
-
-
-
-
-
-
