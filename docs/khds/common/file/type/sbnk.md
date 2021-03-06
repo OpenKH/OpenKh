@@ -147,7 +147,7 @@ The graph above shows the amplitude envelope when a note is sound. The y-axis is
 
 * __Release rate__ determines how fast the amplitude drops from 100% to 0%. Not from sustain level to 0%. (See the second downward curve). The value has the same meaning as Decay rate.
 
-See this [file](http://www.feshrine.net/hacking/doc/articulation.htm) for more details on how to interpret the articulation data. The __raw data__ column is the transformed value used for calculation.
+The __raw data__ column is the transformed value used for calculation.
 
 The SEQ Player treats 0 as the 100% amplitude value and -92544 (723*128) as the 0% amplitude value. The starting ampltitude is 0% (-92544).
 
