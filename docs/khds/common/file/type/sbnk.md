@@ -162,6 +162,3 @@ The __scale__ column is the corresponding value to feed in DLS Bank.
 During the decay phase, in each cycle, the SSEQ Player calculates the new amplitude value: amplitude value = amplitude value - decay rate. Note the starting amplitude value is 0. The decay phase stops when amplitude reaches sustain level.
 
 The other columns are self-explanatory.
-
-
-
