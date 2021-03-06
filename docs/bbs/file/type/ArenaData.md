@@ -2,7 +2,7 @@
 
 This file stores a list missions on Mirage Arena and parameters related to them.
 
-This file is contained within `system/common_vs.arc`
+This file is contained within `arc/system/common_vs.arc` named `ArenaData.bin`.
 
 ## Arena Data 1
 

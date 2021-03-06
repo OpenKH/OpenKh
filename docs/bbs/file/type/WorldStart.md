@@ -11,7 +11,7 @@ This file is located inside `parag_xx.arc` where `xx` are the initial of the cha
 | 0x0     | uint32  | Version, always `2`.
 | 0x4     | uint32  | Data Count
 
-## w_start Data
+## World Start Data
 
 | Offset | Type  | Description
 |--------|-------|------------
