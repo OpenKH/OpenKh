@@ -43,6 +43,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand BuildAndRunCommand { get; set; }
         public RelayCommand StopRunningInstanceCommand { get; set; }
         public RelayCommand WizardCommand { get; set; }
+        public RelayCommand OpenLinkCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -184,6 +185,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                 }
             });
+            OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
+            {
+                UseShellExecute = true
+            }));
 
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
         }
