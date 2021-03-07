@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using Xe.Tools;
@@ -23,7 +24,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
     public class MainViewModel : BaseNotifyPropertyChanged, IChangeModEnableState
     {
+        private static Version _version = Assembly.GetEntryAssembly()?.GetName()?.Version;
         private static string ApplicationName = Utilities.GetApplicationName();
+        private static string ApplicationVersion = Utilities.GetApplicationVersion();
         private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
 
         private DebuggingWindow _debuggingWindow = new DebuggingWindow();
@@ -32,6 +35,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private Process _runningProcess;
 
         public string Title => ApplicationName;
+        public string CurrentVersion => ApplicationVersion;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
