@@ -285,14 +285,16 @@ namespace OpenKh.Patcher
             Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
         }
 
+        private static readonly Dictionary<string, byte> characterMap = new Dictionary<string, byte>(){
+            { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14} 
+        };
+
+        private static readonly IDeserializer deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+            
         private static void PatchListReplace(Context context, List<AssetFile> sources, Stream stream)
         {
             foreach (var source in sources)
             {
-                var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
-                Dictionary<string, byte> characterMap = new Dictionary<string, byte>() {
-                            { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14}
-                        };
                     string sourceText = File.ReadAllText(context.GetSourceModAssetPath(source.Name));
                     if (source.Name.Contains("enc"))
                     {
