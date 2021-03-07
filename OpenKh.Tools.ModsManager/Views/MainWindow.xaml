@@ -14,7 +14,10 @@
         <KeyBinding Key="Delete" Command="{Binding RemoveModCommand}"/>
         <KeyBinding Key="Up" Modifiers="Alt" Command="{Binding MoveUp}"/>
         <KeyBinding Key="Down" Modifiers="Alt" Command="{Binding MoveDown}"/>
-        <KeyBinding Key="F5" Command="{Binding BuildCommand}"/>
+        <KeyBinding Key="F5" Command="{Binding BuildAndRunCommand}"/>
+        <KeyBinding Key="B" Modifiers="Ctrl" Command="{Binding BuildCommand}"/>
+        <KeyBinding Key="F5" Modifiers="Ctrl" Command="{Binding RunCommand}"/>
+        <KeyBinding Key="F5" Modifiers="Shift" Command="{Binding StopRunningInstanceCommand}"/>
         <KeyBinding Key="W" Modifiers="Alt" Command="{Binding WizardCommand}"/>
     </Window.InputBindings>
     <Window.Resources>
@@ -62,7 +65,10 @@
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="_Run">
-                <MenuItem Header="Build and _run" Command="{Binding BuildCommand}" InputGestureText="F5"/>
+                <MenuItem Header="Build and _run" Command="{Binding BuildAndRunCommand}" InputGestureText="F5"/>
+                <MenuItem Header="Build only" Command="{Binding BuildCommand}" InputGestureText="Ctrl+B"/>
+                <MenuItem Header="Run only" Command="{Binding RunCommand}" InputGestureText="Ctrl+F5"/>
+                <MenuItem Header="Stop" Command="{Binding StopRunningInstanceCommand}" InputGestureText="Shift+F5"/>
             </MenuItem>
             <MenuItem Header="_Settings">
                 <MenuItem Header="Run _wizard" Command="{Binding WizardCommand}" InputGestureText="Alt+W"/>
