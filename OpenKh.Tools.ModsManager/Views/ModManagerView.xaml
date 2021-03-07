@@ -38,7 +38,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="24"/>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="256"/>
         </Grid.ColumnDefinitions>
 
         <ListBox
@@ -50,10 +50,10 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Height="64" Margin="3" Orientation="Horizontal">
-                        <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center">
+                        <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding Enabled}">
                             <CheckBox.Content>
                                 <Grid Margin="3 1 10 0">
-                                    <Image Width="64" Height="64" Source="{Binding Image}"/>
+                                    <Image Width="64" Height="64" Source="{Binding IconImage}"/>
                                 </Grid>
                             </CheckBox.Content>
                         </CheckBox>
@@ -81,7 +81,9 @@
                 </Button>
             </StackPanel>
         </Grid>
-        <local:ModDetailsView Grid.Column="3" DataContext="{Binding SelectedValue}">
-        </local:ModDetailsView>
+        <ScrollViewer Grid.Column="3">
+            <local:ModDetailsView Grid.Column="3" DataContext="{Binding SelectedValue}"/>
+        </ScrollViewer>
+
     </Grid>
 </UserControl>
