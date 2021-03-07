@@ -10,6 +10,9 @@
         ResizeMode="NoResize"
          FocusManager.FocusedElement="{Binding ElementName=txtSourceModUrl}"
         Title="Install a new mod..." Height="160" Width="300" SizeToContent="Height">
+    <Window.InputBindings>
+        <KeyBinding Key="Esc" Command="{Binding CloseCommand}"/>
+    </Window.InputBindings>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>

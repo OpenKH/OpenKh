@@ -8,6 +8,9 @@ namespace OpenKh.Tools.Common
 {
     public static class Utilities
     {
+        private static readonly Assembly RunningAssembly = Assembly.GetEntryAssembly();
+        private static readonly AssemblyName RunningAssemblyName = RunningAssembly?.GetName();
+
         public static readonly Action<Exception> DefaultExceptionHandler = ex =>
             MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
@@ -18,9 +21,16 @@ namespace OpenKh.Tools.Common
 
         public static string GetApplicationName()
         {
-            var assembly = Assembly.GetEntryAssembly();
-            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var fvi = FileVersionInfo.GetVersionInfo(RunningAssembly.Location);
             return fvi.ProductName;
+        }
+
+        public static string GetApplicationVersion()
+        {
+            var version = RunningAssemblyName?.Version;
+            if (version == null)
+                return "unknown";
+            return $"{version.Major}.{version.Minor:D02}.{version.Build:D02}.{version.Revision}";
         }
 
         public static void Catch(Action action)
