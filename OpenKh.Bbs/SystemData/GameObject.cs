@@ -133,11 +133,10 @@ namespace OpenKh.Bbs.SystemData
             {"b93vs00", "No Heart's Keyblade Transformation 3"},
             {"b94vs00", "No Heart's Keyblade Handle"},
 
-            {"g50cd00", "g50cd00"},
-            {"g51cd00", "g51cd00"},
-
             {"g01cd00", "Small Chest (CD)"},
             {"g02cd00", "Large Chest (CD)"},
+            {"g03cd00", "Large Chest EXTRA (CD)"},
+            {"g10cd00", "Fork (CD)"},
             {"g11cd00", "Yarn Ball (Red) (CD)"},
             {"g12cd00", "Match Box (CD)"},
             {"g14cd00", "Cheese (CD)"},
@@ -147,6 +146,14 @@ namespace OpenKh.Bbs.SystemData
             {"g18cd00", "White Sash (CD)"},
             {"g19cd00", "Pink Thread (CD)"},
             {"g20cd00", "Spider Web (CD)"},
+            {"g21cd00", "g21cd00 (CD)"},
+            {"g23cd00", "Cinderella Dress (CD)"},
+            {"g24cd00", "Prince Charming (Dancing) (CD)"},
+            {"g25cd00", "g25cd00 (CD)"},
+            {"g50cd00", "Dress Stand (CD)"},
+            {"g51cd00", "Pink Dress (CD)"},
+            {"g52cd00", "Pumpkin Patch (CD)"},
+            {"g53cd00", "g53cd00 (CD)"},
 
             {"g01dc00", "Small Chest (DC)"},
             {"g02dc00", "Large Chest (DC)"},
@@ -161,6 +168,7 @@ namespace OpenKh.Bbs.SystemData
             {"g05ex00", "Unversed Portal"},
             {"g10ex00", "Invisible Wall 10"},
             {"g17ex00", "Invisible Wall 17"},
+            {"g18ex00", "Invisible Wall 18"},
             {"g20ex00", "g20ex00"},
 
             {"g01jb00", "Small Chest (JB)"},
@@ -200,6 +208,7 @@ namespace OpenKh.Bbs.SystemData
 
             {"g01sb00", "Small Chest (SB)"},
             {"g02sb00", "Large Chest (SB)"},
+            {"g03sb00", "Large Chest EXTRA (SB)"},
             {"g11sb00", "Labyrinth Wall 11 (SB)"},
             {"g12sb00", "Wheel 1 (SB)"},
             {"g14sb00", "Unknown Collision 14 (SB)"},
@@ -352,12 +361,40 @@ namespace OpenKh.Bbs.SystemData
             {"m03sb00", "Boulder (SB)"},
             {"m10sb00", "Unknown Enemy m10sb00 (SB)"},
 
-            {"n09cd00", "Jaq (Ally!) (Guard)"},
+            {"n01bd00", "Fairy Godmother (NPC) (BD)"},
+            {"n05bd00", "Chip (Running) (BD)"},
+            {"n06bd00", "Fireworks (Moving) (BD)"},
+            {"n10bd00", "n10bd00 (BD)"},
+            {"n13bd00", "Honey Pot (BD)"},
+            {"n17bd00", "Dice (BD)"},
+            {"n18bd00", "n18bd00 (BD)"},
+            {"n19bd00", "Water Layer with Caustics (BD)"},
+            {"n20bd00", "Experiment 212 (Moving) (BD)"},
+            {"n21bd00", "Rabbit (Moving) (BD)"},
+            {"n24bd00", "Winnie the Pooh Board (BD)"},
 
-            {"n10ex00", "Moogle Shop 1"},
-            {"n11ex00", "Moogle Shop 2"},
-            {"n12ex00", "Moogle Shop 3"},
-            {"n13ex00", "Moogle Shop 4"},
+            {"n05cd00", "Fairy Godmother (NPC) (CD)"},
+            {"n09cd00", "Jaq (NPC) (CD)"},
+            {"n11cd00", "Grand Duke (NPC) (CD)"},
+
+            {"n01he00", "Hercules (NPC) (HE)"},
+            {"n30he00", "Zack (Hair and Helmet) (NPC) (HE)"},
+
+            {"n01ex00", "Flood (NPC) (EX)"},
+            {"n10ex00", "Moogle Shop 1 (NPC) (EX)"},
+            {"n11ex00", "Moogle Shop 2 (NPC) (EX)"},
+            {"n12ex00", "Moogle Shop 3 (NPC) (EX)"},
+            {"n13ex00", "Moogle Shop 4 (NPC) (EX)"},
+            {"n32ex00", "Yellowshade (Red) (NPC) (EX)"},
+
+            {"n01ls00", "Stitch (T-Stance) (NPC) (LS)"},
+
+            {"n01sb01", "Aurora (NPC) (SB)"},
+
+            {"n01sw00", "Snowwhite (NPC) (SW)"},
+            {"n01sw01", "Snowwhite (T-Stance) (NPC) (SW)"},
+
+            {"n01yt00", "Yen Sid (NPC) (YT)"},
 
             {"p00jb00", "Sora (PC)"},
             {"p01ex00", "Ventus (PC)"},

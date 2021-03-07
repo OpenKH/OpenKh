@@ -482,12 +482,12 @@ namespace OpenKh.Tools.OloEditor
             // 
             this.NumericMessageID.Location = new System.Drawing.Point(499, 41);
             this.NumericMessageID.Maximum = new decimal(new int[] {
-            32767,
+            2147483647,
             0,
             0,
             0});
             this.NumericMessageID.Minimum = new decimal(new int[] {
-            32768,
+            -2147483648,
             0,
             0,
             -2147483648});
