@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Title="{Binding Title}" Height="450" Width="600">
+        Title="{Binding Title}" Height="450" Width="640">
     <Window.InputBindings>
         <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding ExitCommand}"/>
         <KeyBinding Key="Insert" Command="{Binding AddModCommand}"/>
