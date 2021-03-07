@@ -21,6 +21,23 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             get
             {
+                var allMods = UnorderedMods.ToList();
+                var enabledMods = EnabledMods.ToHashSet();
+                var disabledMods = new List<string>(allMods.Count);
+                foreach (var mod in allMods)
+                {
+                    if (!enabledMods.Contains(mod))
+                        disabledMods.Add(mod);
+                }
+
+                return enabledMods.Concat(disabledMods);
+            }
+        }
+
+        public static IEnumerable<string> UnorderedMods
+        {
+            get
+            {
                 var modsPath = ConfigurationService.ModCollectionPath;
                 foreach (var dir in Directory.GetDirectories(modsPath))
                 {
@@ -42,10 +59,10 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             get
             {
-                var enabledMods = ConfigurationService.EnabledMods;
-                foreach (var mod in enabledMods)
+                var mods = UnorderedMods.ToList();
+                foreach (var mod in ConfigurationService.EnabledMods)
                 {
-                    if (Mods.Contains(mod))
+                    if (mods.Contains(mod))
                         yield return mod;
                 }
             }
