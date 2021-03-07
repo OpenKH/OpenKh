@@ -1,3 +1,4 @@
+using LibGit2Sharp;
 using Newtonsoft.Json;
 using System;
 using System.Net;
@@ -46,5 +47,18 @@ namespace OpenKh.Tools.ModsManager.Services
             using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
             return response.StatusCode == HttpStatusCode.OK;
         }
+
+        public static Task<int> FetchUpdate(string path) => Task.Run(() =>
+        {
+            if (!Repository.IsValid(path))
+                return -1;
+
+            using var repository = new Repository(path);
+            if (repository.Info.IsHeadDetached)
+                return -1;
+
+            repository.Network.Fetch(repository.Head.RemoteName, new string[0]);
+            return repository.Head.TrackingDetails.BehindBy ?? 0;
+        });
     }
 }

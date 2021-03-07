@@ -46,22 +46,37 @@
             Grid.Column="0"
             VerticalAlignment="Stretch"
             ItemsSource="{Binding ModsList}"
-            SelectedValue="{Binding SelectedValue}" KeyUp="ListBox_KeyUp">
+            SelectedValue="{Binding SelectedValue}" KeyUp="ListBox_KeyUp"
+            HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Height="64" Margin="3" Orientation="Horizontal">
-                        <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding Enabled}">
+                    <Grid Height="64" Margin="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0" VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding Enabled}">
                             <CheckBox.Content>
                                 <Grid Margin="3 1 10 0">
                                     <Image Width="64" Height="64" Source="{Binding IconImage}"/>
                                 </Grid>
                             </CheckBox.Content>
                         </CheckBox>
-                        <StackPanel>
+                        <StackPanel Grid.Column="1">
                             <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
                             <TextBlock Text="{Binding Author}"/>
                         </StackPanel>
-                    </StackPanel>
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding UpdateVisibility}">
+                            <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveUp}">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock HorizontalAlignment="Center" Text="{Binding UpdateCount}"/>
+                                    <Image Source="{StaticResource Download_16x}"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

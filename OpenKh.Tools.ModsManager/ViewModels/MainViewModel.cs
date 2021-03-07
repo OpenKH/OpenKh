@@ -195,6 +195,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }));
 
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
+            FetchUpdates();
         }
 
         public void CloseAllWindows()
@@ -360,5 +361,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         private bool CanSelectedModMoveUp() =>
             SelectedValue != null && ModsList.IndexOf(SelectedValue) > 0;
+
+        private async Task FetchUpdates()
+        {
+            await foreach (var modUpdate in ModsService.FetchUpdates())
+            {
+                var mod = ModsList.FirstOrDefault(x => x.Source == modUpdate.Name);
+                if (mod == null)
+                    continue;
+
+                Application.Current.Dispatcher.Invoke(() =>
+                    mod.UpdateCount = modUpdate.UpdateCount);
+            }
+        }
     }
 }
