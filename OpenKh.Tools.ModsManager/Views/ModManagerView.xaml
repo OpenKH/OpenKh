@@ -54,7 +54,6 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
                         </Grid.ColumnDefinitions>
 
                         <CheckBox Grid.Column="0" VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding Enabled}">
@@ -67,14 +66,7 @@
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
                             <TextBlock Text="{Binding Author}"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="{Binding UpdateVisibility}">
-                            <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveUp}">
-                                <StackPanel Orientation="Vertical">
-                                    <TextBlock HorizontalAlignment="Center" Text="{Binding UpdateCount}"/>
-                                    <Image Source="{StaticResource Download_16x}"/>
-                                </StackPanel>
-                            </Button>
+                            <TextBlock Visibility="{Binding UpdateVisibility}" Text="Update available" Foreground="Gray"/>
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
