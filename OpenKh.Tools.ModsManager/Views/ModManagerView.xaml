@@ -38,7 +38,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="24"/>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="256"/>
+            <ColumnDefinition Width="282"/>
         </Grid.ColumnDefinitions>
 
         <ListBox

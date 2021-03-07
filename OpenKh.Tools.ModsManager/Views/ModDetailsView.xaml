@@ -17,6 +17,7 @@
                     <TextBlock Text="{Binding Author}" Foreground="{DynamicResource textHyperlink}" d:Text="Author name"/>
                 </Hyperlink>
             </TextBlock>
+            <Image Width="256" Height="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
             <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Text="{Binding Description}"/>
             <TextBlock Margin="0 0 0 3">
                 <Hyperlink NavigateUri="{Binding SourceUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
@@ -33,7 +34,6 @@
                 This mod is available only locally and it is not linked to any GitHub repository or protected by the OpenKH Mods License.
             </TextBlock>
         </StackPanel>
-        <Image Width="256" Height="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
         <Expander Header="Files to patch">
             <TextBlock Text="{Binding FilesToPatch}" TextWrapping="Wrap" d:Text="msg/jp/sys.bar"/>
         </Expander>
