@@ -21,7 +21,6 @@
         <KeyBinding Key="W" Modifiers="Alt" Command="{Binding WizardCommand}"/>
     </Window.InputBindings>
     <Window.Resources>
-        <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
         <ControlTemplate x:Key="modList" TargetType="ListBox">
             <Border Name="Border" BorderThickness="1">
                 <Border.BorderBrush>

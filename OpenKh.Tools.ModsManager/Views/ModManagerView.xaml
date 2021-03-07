@@ -7,7 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="600">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
         <ControlTemplate x:Key="modList" TargetType="ListBox">
             <Border Name="Border" BorderThickness="1">
                 <Border.BorderBrush>
@@ -82,40 +81,7 @@
                 </Button>
             </StackPanel>
         </Grid>
-        <Grid Grid.Column="3">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" DataContext="{Binding SelectedValue}">
-                <TextBlock Margin="0 0 0 5" FontWeight="Bold" Text="{Binding Title}"/>
-                <StackPanel Visibility="{Binding SourceVisibility}">
-                    <TextBlock Text="Source"/>
-                    <TextBox Margin="0 0 0 5" IsReadOnly="True" Text="{Binding Source, Mode=OneWay}"/>
-
-                    <TextBlock>
-                        <Hyperlink NavigateUri="{Binding GithubUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
-                            <TextBlock Text="Mod source" Foreground="{DynamicResource textHyperlink}"/>
-                        </Hyperlink>
-                    </TextBlock>
-
-                    <TextBlock>
-                        <Hyperlink NavigateUri="{Binding Homepage}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
-                            <TextBlock Text="Homepage" Foreground="{DynamicResource textHyperlink}"/>
-                        </Hyperlink>
-                    </TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding LocalVisibility}">
-                    <TextBlock TextWrapping="Wrap">
-                        This mod is available only locally and it does not have any source.
-                    </TextBlock>
-                </StackPanel>
-            </StackPanel>
-
-            <StackPanel Grid.Row="2">
-                <Button Content="Test wizard" Command="{Binding WizardCommand}"/>
-            </StackPanel>
-        </Grid>
+        <local:ModDetailsView Grid.Column="3" DataContext="{Binding SelectedValue}">
+        </local:ModDetailsView>
     </Grid>
 </UserControl>
