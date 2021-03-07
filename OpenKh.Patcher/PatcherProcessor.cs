@@ -316,15 +316,26 @@ namespace OpenKh.Patcher
                             break;
 
                         case "fmlv":
-                            var formList = Kh2.Battle.Fmlv.Read(stream).ToDictionary(x => String.Concat(x.FormFm, x.FormLevel), x => x);
-                            var moddedForms = deserializer.Deserialize<Dictionary<string, Kh2.Battle.Fmlv.Level>>(sourceText);
+                            var formRaw = Kh2.Battle.Fmlv.Read(stream).ToList();
+                            var formList = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv.Level>>();
+                            foreach (var form in formRaw)
+                            {
+                                if (!formList.ContainsKey(form.FormFm))
+                                {
+                                    formList.Add(form.FormFm, new List<Kh2.Battle.Fmlv.Level>());
+                                }
+                                formList[form.FormFm].Add(form);
+                            }
+                            var moddedForms = deserializer.Deserialize<Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv.Level>>>(sourceText);
                             foreach (var form in moddedForms)
                             {
-                                formList[form.Key].Ability = form.Value.Ability;
-                                formList[form.Key].LevelGrowthAbility = form.Value.LevelGrowthAbility;
-                                formList[form.Key].Exp = form.Value.Exp;
+                                foreach (var level in form.Value)
+                                {
+                                    formList[form.Key][level.FormLevel - 1] = level;
+                                }
+
                             }
-                            Kh2.Battle.Fmlv.Write(stream.SetPosition(0), formList.Values);
+                            Kh2.Battle.Fmlv.Write(stream.SetPosition(0), formList.Values.SelectMany(x=>x).ToList());
                             break;
 
                         case "lvup":
