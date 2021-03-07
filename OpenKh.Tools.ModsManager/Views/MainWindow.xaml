@@ -91,6 +91,12 @@
                         <Image Source="{StaticResource WebURL_16x}"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Header="OpenKH Mods License" Command="{Binding OpenLinkCommand}"
+                    CommandParameter="https://github.com/OpenKH/mods-manager-feed/blob/main/openkh-mods-license.md">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource WebURL_16x}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="OpenKH source code" Command="{Binding OpenLinkCommand}"
                     CommandParameter="https://github.com/Xeeynamo/OpenKh">
                     <MenuItem.Icon>

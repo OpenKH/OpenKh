@@ -5,32 +5,37 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="300">
+             d:DesignHeight="450" d:DesignWidth="256">
     <UserControl.Resources>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
     </UserControl.Resources>
     <StackPanel>
-        <TextBlock Margin="0 0 0 5" FontWeight="Bold" Text="{Binding Title}"/>
         <StackPanel Visibility="{Binding SourceVisibility}">
-            <TextBlock Text="Source"/>
-            <TextBox Margin="0 0 0 5" IsReadOnly="True" Text="{Binding Source, Mode=OneWay}"/>
-
-            <TextBlock>
-                <Hyperlink NavigateUri="{Binding GithubUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
-                    <TextBlock Text="Mod source" Foreground="{DynamicResource textHyperlink}"/>
+            <TextBlock Margin="0 0 0 3" FontWeight="Bold" Text="{Binding Title}" d:Text="Mod title"/>
+            <TextBlock Margin="0 0 0 3">
+                <Hyperlink NavigateUri="{Binding AuthorUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
+                    <TextBlock Text="{Binding Author}" Foreground="{DynamicResource textHyperlink}" d:Text="Author name"/>
                 </Hyperlink>
             </TextBlock>
-
-            <TextBlock>
-                <Hyperlink NavigateUri="{Binding Homepage}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
-                    <TextBlock Text="Homepage" Foreground="{DynamicResource textHyperlink}"/>
+            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Text="{Binding Description}"/>
+            <TextBlock Margin="0 0 0 3">
+                <Hyperlink NavigateUri="{Binding SourceUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
+                    <TextBlock Text="Mod source code" Foreground="{DynamicResource textHyperlink}"/>
                 </Hyperlink>
+            </TextBlock>
+            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                <Run>This mod is protected by the OpenKH Mods License.</Run>
             </TextBlock>
         </StackPanel>
         <StackPanel Visibility="{Binding LocalVisibility}">
-            <TextBlock TextWrapping="Wrap">
-                    This mod is available only locally and it does not have any source.
+            <TextBlock Margin="0 0 0 3" FontWeight="Bold" Text="{Binding Title}" d:Text="Mod title"/>
+            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                This mod is available only locally and it is not linked to any GitHub repository or protected by the OpenKH Mods License.
             </TextBlock>
         </StackPanel>
+        <Image Width="256" Height="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
+        <Expander Header="Files to patch">
+            <TextBlock Text="{Binding FilesToPatch}" TextWrapping="Wrap" d:Text="msg/jp/sys.bar"/>
+        </Expander>
     </StackPanel>
 </UserControl>

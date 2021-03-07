@@ -173,7 +173,8 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     Name = repositoryName,
                     Path = modPath,
-                    ImageSource = Path.Combine(modPath, "icon.png"),
+                    IconImageSource = Path.Combine(modPath, "icon.png"),
+                    PreviewImageSource = Path.Combine(modPath, "preview.png"),
                     Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
                     IsEnabled = enabledMods.Contains(repositoryName)
                 };
