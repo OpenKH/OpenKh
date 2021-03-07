@@ -1,5 +1,10 @@
 using OpenKh.Tools.ModsManager.Models;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Xe.Tools;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
@@ -13,6 +18,20 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             _model = model;
             _changeModEnableState = changeModEnableState;
+
+            var nameIndex = Source.IndexOf('/');
+            if (nameIndex > 0)
+            {
+                Author = Source[0..nameIndex];
+                Name = Source[(nameIndex + 1)..];
+            }
+            else
+            {
+                Author = _model.Metadata.OriginalAuthor;
+                Name = Source;
+            }
+
+            LoadImage();
         }
 
         public bool Enabled
@@ -26,12 +45,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
         }
 
+        public ImageSource Image { get; private set; }
+
         public bool IsHosted => _model.Name.Contains('/');
         public string Path => _model.Path;
         public Visibility SourceVisibility => IsHosted ? Visibility.Visible : Visibility.Collapsed;
         public Visibility LocalVisibility => !IsHosted ? Visibility.Visible : Visibility.Collapsed;
 
         public string Title => _model.Metadata.Title;
+        public string Name { get; }
+        public string Author { get; }
         public string Source => _model.Name;
 
         public string GithubUrl
@@ -56,5 +79,34 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 return $"https://{author}.github.io/{project}";
             }
         }
+
+        private Task LoadImage() => Task.Run(() =>
+        {
+            if (string.IsNullOrEmpty(_model.ImageSource))
+                return; // Should set a default image
+
+            try
+            {
+                var uri = new Uri(_model.ImageSource);
+                if (uri.Scheme == "file" && !File.Exists(uri.AbsolutePath))
+                    return; // Should set a default image
+
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.UriSource = uri;
+                bitmapImage.EndInit();
+                bitmapImage.Freeze();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Image = bitmapImage;
+                    OnPropertyChanged(nameof(Image));
+                });
+            }
+            catch
+            {
+                // Silently fail if the image can not be loaded
+            }
+        });
     }
 }

@@ -3,87 +3,72 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ext="clr-namespace:Xe.Tools.Wpf.Extensions"
-        xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Title="{Binding Title}" Height="450" Width="400">
+        Title="{Binding Title}" Height="450" Width="600">
+    <Window.InputBindings>
+        <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding ExitCommand}"/>
+        <KeyBinding Key="Insert" Command="{Binding AddModCommand}"/>
+        <KeyBinding Key="Delete" Command="{Binding RemoveModCommand}"/>
+        <KeyBinding Key="Up" Modifiers="Alt" Command="{Binding MoveUp}"/>
+        <KeyBinding Key="Down" Modifiers="Alt" Command="{Binding MoveDown}"/>
+        <KeyBinding Key="F5" Command="{Binding BuildCommand}"/>
+        <KeyBinding Key="W" Modifiers="Alt" Command="{Binding WizardCommand}"/>
+    </Window.InputBindings>
     <Window.Resources>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
-    </Window.Resources>
-    <Grid Margin="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="24"/>
-            <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <ListBox
-            Grid.Column="0"
-            VerticalAlignment="Stretch"
-            ItemsSource="{Binding ModsList}"
-            SelectedValue="{Binding SelectedValue}" KeyUp="ListBox_KeyUp">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Margin="5,2" IsChecked="{Binding Enabled}"/>
-                        <TextBlock Text="{Binding Title}"/>
+        <ControlTemplate x:Key="modList" TargetType="ListBox">
+            <Border Name="Border" BorderThickness="1">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="#FFABADB3" />
+                </Border.BorderBrush>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Margin="3">
+                        <TextBlock HorizontalAlignment="Center" Text="Highest priority"/>
+                        <Separator Margin="3" Background="#FFABADB3"/>
                     </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <StackPanel Grid.Column="1">
-            <Button Grid.Row="0" Margin="0 0 0 3" Command="{Binding MoveUp}">
-                <Image Source="{StaticResource AddRowToAbove_16x}"/>
-            </Button>
-            <Button Grid.Row="4" Margin="0 0 0 3" Command="{Binding MoveDown}">
-                <Image Source="{StaticResource AddRowToBelow_16x}"/>
-            </Button>
-            <Button Grid.Row="2" Margin="0 0 0 3" Command="{Binding AddModCommand}">
-                <Image Source="{StaticResource Add_16x}"/>
-            </Button>
-            <Button Grid.Row="2" Margin="0 0 0 3" Command="{Binding RemoveModCommand}">
-                <Image Source="{StaticResource Remove_color_16x}"/>
-            </Button>
-        </StackPanel>
-        <Grid Grid.Column="3">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" DataContext="{Binding SelectedValue}">
-                <TextBlock Margin="0 0 0 5" FontWeight="Bold" Text="{Binding Title}"/>
-                <StackPanel Visibility="{Binding SourceVisibility}">
-                    <TextBlock Text="Source"/>
-                    <TextBox Margin="0 0 0 5" IsReadOnly="True" Text="{Binding Source, Mode=OneWay}"/>
+                    <StackPanel Grid.Row="2" Margin="3">
+                        <Separator Margin="3" Background="#FFABADB3"/>
+                        <TextBlock HorizontalAlignment="Center" Text="Lowest priority"/>
+                    </StackPanel>
+                    <ScrollViewer Grid.Row="1" Margin="0" Focusable="false">
+                        <StackPanel Margin="0" IsItemsHost="True" />
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                    <TextBlock>
-                        <Hyperlink NavigateUri="{Binding GithubUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
-                            <TextBlock Text="Mod source" Foreground="{DynamicResource textHyperlink}"/>
-                        </Hyperlink>
-                    </TextBlock>
+        <Menu Grid.Row="0">
+            <MenuItem Header="_Mods">
+                <MenuItem Header="_Install a new mod" Command="{Binding AddModCommand}" InputGestureText="Ins"/>
+                <Separator/>
+                <MenuItem Header="_Delete selected mod" Command="{Binding RemoveModCommand}" InputGestureText="Del"/>
+                <MenuItem Header="Increase priority" Command="{Binding MoveUp}" InputGestureText="Alt+Up"/>
+                <MenuItem Header="Decrease priority" Command="{Binding MoveDown}" InputGestureText="Alt+Down"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
+            </MenuItem>
+            <MenuItem Header="_Run">
+                <MenuItem Header="Build and _run" Command="{Binding BuildCommand}" InputGestureText="F5"/>
+            </MenuItem>
+            <MenuItem Header="_Settings">
+                <MenuItem Header="Run _wizard" Command="{Binding WizardCommand}" InputGestureText="Alt+W"/>
+            </MenuItem>
+        </Menu>
 
-                    <TextBlock>
-                        <Hyperlink NavigateUri="{Binding Homepage}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
-                            <TextBlock Text="Homepage" Foreground="{DynamicResource textHyperlink}"/>
-                        </Hyperlink>
-                    </TextBlock>
-                </StackPanel>
-                <StackPanel Visibility="{Binding LocalVisibility}">
-                    <TextBlock TextWrapping="Wrap">
-                        This mod is available only locally and it does not have any source.
-                    </TextBlock>
-                </StackPanel>
-            </StackPanel>
-
-            <StackPanel Grid.Row="2">
-                <Button Content="Test wizard" Command="{Binding WizardCommand}"/>
-                <Button Content="Build and run" Command="{Binding BuildCommand}"/>
-            </StackPanel>
-        </Grid>
+        <local:ModManagerView Grid.Row="1" DataContext="{Binding}"/>
     </Grid>
 </Window>
