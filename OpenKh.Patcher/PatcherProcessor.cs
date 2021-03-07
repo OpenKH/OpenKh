@@ -301,7 +301,7 @@ namespace OpenKh.Patcher
                         case "trsr":
                             var trsrList = Kh2.SystemData.Trsr.Read(stream).ToDictionary(x => x.Id, x => x);
                             var moddedTrsr = deserializer.Deserialize<Dictionary<int, Kh2.SystemData.Trsr>>(sourceText);
-                            foreach (KeyValuePair<int, Kh2.SystemData.Trsr> treasure in moddedTrsr)
+                            foreach (var treasure in moddedTrsr)
                             {
                                 trsrList[treasure.Value.Id].ItemId = treasure.Value.ItemId;
                             }
@@ -318,7 +318,7 @@ namespace OpenKh.Patcher
                         case "fmlv":
                             var formList = Kh2.Battle.Fmlv.Read(stream).ToDictionary(x => String.Concat(x.FormFm, x.FormLevel), x => x);
                             var moddedForms = deserializer.Deserialize<Dictionary<string, Kh2.Battle.Fmlv.Level>>(sourceText);
-                            foreach (KeyValuePair<string, Kh2.Battle.Fmlv.Level> form in moddedForms)
+                            foreach (var form in moddedForms)
                             {
                                 formList[form.Key].Ability = form.Value.Ability;
                                 formList[form.Key].LevelGrowthAbility = form.Value.LevelGrowthAbility;
@@ -331,7 +331,7 @@ namespace OpenKh.Patcher
                             var levelList = Kh2.Battle.Lvup.Read(stream);
                             var moddedLevels = deserializer.Deserialize<Kh2.Battle.Lvup>(sourceText);
                             int i = 0;
-                            foreach (Kh2.Battle.Lvup.PlayableCharacter character in moddedLevels.Characters)
+                            foreach (var character in moddedLevels.Characters)
                             {
                                 levelList.Characters[i].Levels = character.Levels;
                                 i++;
@@ -342,7 +342,7 @@ namespace OpenKh.Patcher
                         case "bons":
                             var bonusList = Kh2.Battle.Bons.Read(stream).ToDictionary(x => String.Concat(x.RewardId, characterMap.FirstOrDefault(y => y.Value == x.CharacterId).Key), x => x);
                             var moddedBonus = deserializer.Deserialize<Dictionary<string, Kh2.Battle.Bons>>(sourceText);
-                            foreach (KeyValuePair<string, Kh2.Battle.Bons> bonus in moddedBonus)
+                            foreach (var bonus in moddedBonus)
                             {
                                 bonusList[bonus.Key] = bonus.Value;
                             }
