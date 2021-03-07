@@ -12,6 +12,7 @@
         <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding ExitCommand}"/>
         <KeyBinding Key="Insert" Command="{Binding AddModCommand}"/>
         <KeyBinding Key="Delete" Command="{Binding RemoveModCommand}"/>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenModFolderCommand}"/>
         <KeyBinding Key="Up" Modifiers="Alt" Command="{Binding MoveUp}"/>
         <KeyBinding Key="Down" Modifiers="Alt" Command="{Binding MoveDown}"/>
         <KeyBinding Key="F5" Command="{Binding BuildAndRunCommand}"/>
@@ -57,6 +58,7 @@
             <MenuItem Header="_Mods">
                 <MenuItem Header="_Install a new mod" Command="{Binding AddModCommand}" InputGestureText="Ins"/>
                 <Separator/>
+                <MenuItem Header="_Open mod folder" Command="{Binding OpenModFolderCommand}" InputGestureText="Ctrl+O"/>
                 <MenuItem Header="_Delete selected mod" Command="{Binding RemoveModCommand}" InputGestureText="Del"/>
                 <MenuItem Header="Increase priority" Command="{Binding MoveUp}" InputGestureText="Alt+Up"/>
                 <MenuItem Header="Decrease priority" Command="{Binding MoveDown}" InputGestureText="Alt+Down"/>
