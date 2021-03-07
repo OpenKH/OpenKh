@@ -51,7 +51,8 @@ namespace OpenKh.Tools.ModsManager.Views
                 LogPanel.Children.Insert(0, new TextBlock
                 {
                     Text = str,
-                    Foreground = brush
+                    Foreground = brush,
+                    TextWrapping = TextWrapping.Wrap
                 });
             });
         });
