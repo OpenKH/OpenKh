@@ -234,6 +234,38 @@ namespace OpenKh.Bbs
             [Data] public byte NetworkID { get; set; }
         }
 
+        public static LayoutInfo GetLayoutInfo(uint value)
+        {
+            LayoutInfo flag = new LayoutInfo();
+
+            flag.Appear = BitsUtil.Int.GetBit((int)value, 0);
+            flag.LoadOnly = BitsUtil.Int.GetBit((int)value, 1);
+            flag.Dead = BitsUtil.Int.GetBit((int)value, 2);
+            flag.ID = (byte)BitsUtil.Int.GetBits((int)value, 3, 8);
+            flag.ModelDisplayOff = BitsUtil.Int.GetBit((int)value, 11);
+            flag.GroupID = (byte)BitsUtil.Int.GetBits((int)value, 12, 8);
+            flag.NoLoad = BitsUtil.Int.GetBit((int)value, 20);
+            flag.NetworkID = (byte)BitsUtil.Int.GetBits((int)value, 21, 8);
+
+            return flag;
+        }
+
+        public static uint MakeLayoutInfo(bool Appear, bool LoadOnly, bool Dead, byte ID, bool ModelDisplayOff, byte GroupID, bool NoLoad, byte NetworkID)
+        {
+            uint val = 0;
+
+            val = BitsUtil.Int.SetBit(val, 0, Appear);
+            val = BitsUtil.Int.SetBit(val, 1, LoadOnly);
+            val = BitsUtil.Int.SetBit(val, 2, Dead);
+            val = BitsUtil.Int.SetBits(val, 3, 8, ID);
+            val = BitsUtil.Int.SetBit(val, 11, ModelDisplayOff);
+            val = BitsUtil.Int.SetBits(val, 12, 8, GroupID);
+            val = BitsUtil.Int.SetBit(val, 20, NoLoad);
+            val = BitsUtil.Int.SetBits(val, 21, 8, NetworkID);
+
+            return val;
+        }
+
         public Header header;
         public List<ObjectName> ObjectList = new List<ObjectName>();
         public List<PathName> FileList = new List<PathName>();
@@ -294,12 +326,11 @@ namespace OpenKh.Bbs
 
             olo.GroupList = new List<GroupData>();
             stream.Seek(olo.header.GroupDataOffset, SeekOrigin.Begin);
+            olo.LayoutList = new List<LayoutData>();
             for (int i = 0; i < olo.header.GroupDataCount; i++)
             {
                 stream.Seek(olo.header.GroupDataOffset + (i * 0x30), SeekOrigin.Begin);
                 GroupData data = BinaryMapping.ReadObject<GroupData>(stream);
-                olo.LayoutList = new List<LayoutData>();
-
                 stream.Seek(data.ObjectLayoutDataOffset, SeekOrigin.Begin);
                 
                 for (int j = 0; j < data.ObjectLayoutDataCount; j++)

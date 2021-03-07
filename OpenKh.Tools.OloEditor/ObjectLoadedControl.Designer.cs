@@ -39,7 +39,7 @@ namespace OpenKh.Tools.OloEditor
             this.GBox.Controls.Add(this.ObjectLoadedComboBox);
             this.GBox.Location = new System.Drawing.Point(4, 0);
             this.GBox.Name = "GBox";
-            this.GBox.Size = new System.Drawing.Size(217, 58);
+            this.GBox.Size = new System.Drawing.Size(261, 58);
             this.GBox.TabIndex = 0;
             this.GBox.TabStop = false;
             this.GBox.Text = "Object Loaded 1";
@@ -49,7 +49,7 @@ namespace OpenKh.Tools.OloEditor
             this.ObjectLoadedComboBox.FormattingEnabled = true;
             this.ObjectLoadedComboBox.Location = new System.Drawing.Point(6, 22);
             this.ObjectLoadedComboBox.Name = "ObjectLoadedComboBox";
-            this.ObjectLoadedComboBox.Size = new System.Drawing.Size(200, 23);
+            this.ObjectLoadedComboBox.Size = new System.Drawing.Size(249, 23);
             this.ObjectLoadedComboBox.TabIndex = 0;
             // 
             // ObjectLoadedControl
@@ -58,7 +58,7 @@ namespace OpenKh.Tools.OloEditor
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.GBox);
             this.Name = "ObjectLoadedControl";
-            this.Size = new System.Drawing.Size(229, 63);
+            this.Size = new System.Drawing.Size(270, 63);
             this.GBox.ResumeLayout(false);
             this.ResumeLayout(false);
 

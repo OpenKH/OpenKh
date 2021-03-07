@@ -115,6 +115,7 @@ namespace OpenKh.Tools.OloEditor
             }
 
             i = 1;
+            int j = 0;
             foreach (Olo.GroupData obj in olo.GroupList)
             {
                 LayoutGroupControl cLayoutCon = new LayoutGroupControl();
@@ -145,6 +146,14 @@ namespace OpenKh.Tools.OloEditor
                 cLayoutCon.GroupFlagCheckboxList.SetItemChecked(6, gFlag.MissionFire);
                 cLayoutCon.GroupFlagCheckboxList.SetItemChecked(7, gFlag.AllDeadNoAppear);
 
+                for(int p = 0; p < obj.ObjectLayoutDataCount; p++)
+                {
+                    LayoutDataControl cLayoutData = new LayoutDataControl();
+                    cLayoutData.SetLayoutData(olo.LayoutList[j], j);
+                    cLayoutCon.FlowLayout.Controls.Add(cLayoutData);
+                    j++;
+                }
+                
                 FlowLayout.Controls.Add(cLayoutCon);
                 i++;
             }
@@ -204,6 +213,19 @@ namespace OpenKh.Tools.OloEditor
                 olo.GroupList[i] = grp.data;
                 i++;
             }
+
+            i = 0;
+            int j = 0;
+            foreach (LayoutGroupControl grp in FlowLayout.Controls)
+            {
+                foreach(LayoutDataControl dCon in grp.FlowLayout.Controls)
+                {
+                    olo.LayoutList[j] = dCon.GetLayoutData();
+                    j++;
+                }
+                
+                i++;
+            }
         }
 
         private void LoadOLOButton_Click(object sender, EventArgs e)
@@ -238,6 +260,11 @@ namespace OpenKh.Tools.OloEditor
                 oloOut.Close();
                 MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void TabControlOLO_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

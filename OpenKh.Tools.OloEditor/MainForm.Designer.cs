@@ -45,11 +45,11 @@ namespace OpenKh.Tools.OloEditor
             this.TabLayout = new System.Windows.Forms.TabPage();
             this.FlowLayout = new System.Windows.Forms.FlowLayoutPanel();
             this.OLOFlagsGBox = new System.Windows.Forms.GroupBox();
-            this.EnemyFlag = new System.Windows.Forms.CheckBox();
-            this.GimmickFlag = new System.Windows.Forms.CheckBox();
-            this.NPCFlag = new System.Windows.Forms.CheckBox();
-            this.PlayerFlag = new System.Windows.Forms.CheckBox();
             this.EventTriggerFlag = new System.Windows.Forms.CheckBox();
+            this.PlayerFlag = new System.Windows.Forms.CheckBox();
+            this.NPCFlag = new System.Windows.Forms.CheckBox();
+            this.GimmickFlag = new System.Windows.Forms.CheckBox();
+            this.EnemyFlag = new System.Windows.Forms.CheckBox();
             this.TabControlOLO.SuspendLayout();
             this.TabObjects.SuspendLayout();
             this.TabFilePath.SuspendLayout();
@@ -99,6 +99,7 @@ namespace OpenKh.Tools.OloEditor
             this.TabControlOLO.Size = new System.Drawing.Size(960, 545);
             this.TabControlOLO.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.TabControlOLO.TabIndex = 2;
+            this.TabControlOLO.SelectedIndexChanged += new System.EventHandler(this.TabControlOLO_SelectedIndexChanged);
             // 
             // TabObjects
             // 
@@ -129,7 +130,7 @@ namespace OpenKh.Tools.OloEditor
             this.TabFilePath.Location = new System.Drawing.Point(4, 24);
             this.TabFilePath.Name = "TabFilePath";
             this.TabFilePath.Padding = new System.Windows.Forms.Padding(3);
-            this.TabFilePath.Size = new System.Drawing.Size(952, 530);
+            this.TabFilePath.Size = new System.Drawing.Size(952, 517);
             this.TabFilePath.TabIndex = 1;
             this.TabFilePath.Text = "Files";
             // 
@@ -149,7 +150,7 @@ namespace OpenKh.Tools.OloEditor
             this.TabScripts.Controls.Add(this.FlowScripts);
             this.TabScripts.Location = new System.Drawing.Point(4, 24);
             this.TabScripts.Name = "TabScripts";
-            this.TabScripts.Size = new System.Drawing.Size(952, 530);
+            this.TabScripts.Size = new System.Drawing.Size(952, 517);
             this.TabScripts.TabIndex = 2;
             this.TabScripts.Text = "Scripts";
             // 
@@ -169,7 +170,7 @@ namespace OpenKh.Tools.OloEditor
             this.TabMissions.Controls.Add(this.FlowMissions);
             this.TabMissions.Location = new System.Drawing.Point(4, 24);
             this.TabMissions.Name = "TabMissions";
-            this.TabMissions.Size = new System.Drawing.Size(952, 530);
+            this.TabMissions.Size = new System.Drawing.Size(952, 517);
             this.TabMissions.TabIndex = 3;
             this.TabMissions.Text = "Missions";
             // 
@@ -190,7 +191,7 @@ namespace OpenKh.Tools.OloEditor
             this.TabTriggers.Controls.Add(this.FlowTriggers);
             this.TabTriggers.Location = new System.Drawing.Point(4, 24);
             this.TabTriggers.Name = "TabTriggers";
-            this.TabTriggers.Size = new System.Drawing.Size(952, 530);
+            this.TabTriggers.Size = new System.Drawing.Size(952, 517);
             this.TabTriggers.TabIndex = 4;
             this.TabTriggers.Text = "Triggers";
             // 
@@ -212,7 +213,7 @@ namespace OpenKh.Tools.OloEditor
             this.TabLayout.Controls.Add(this.FlowLayout);
             this.TabLayout.Location = new System.Drawing.Point(4, 24);
             this.TabLayout.Name = "TabLayout";
-            this.TabLayout.Size = new System.Drawing.Size(952, 530);
+            this.TabLayout.Size = new System.Drawing.Size(952, 517);
             this.TabLayout.TabIndex = 5;
             this.TabLayout.Text = "Layout";
             // 
@@ -244,35 +245,15 @@ namespace OpenKh.Tools.OloEditor
             this.OLOFlagsGBox.TabStop = false;
             this.OLOFlagsGBox.Text = "Flags";
             // 
-            // EnemyFlag
+            // EventTriggerFlag
             // 
-            this.EnemyFlag.AutoSize = true;
-            this.EnemyFlag.Location = new System.Drawing.Point(26, 18);
-            this.EnemyFlag.Name = "EnemyFlag";
-            this.EnemyFlag.Size = new System.Drawing.Size(62, 19);
-            this.EnemyFlag.TabIndex = 0;
-            this.EnemyFlag.Text = "Enemy";
-            this.EnemyFlag.UseVisualStyleBackColor = true;
-            // 
-            // GimmickFlag
-            // 
-            this.GimmickFlag.AutoSize = true;
-            this.GimmickFlag.Location = new System.Drawing.Point(94, 18);
-            this.GimmickFlag.Name = "GimmickFlag";
-            this.GimmickFlag.Size = new System.Drawing.Size(74, 19);
-            this.GimmickFlag.TabIndex = 0;
-            this.GimmickFlag.Text = "Gimmick";
-            this.GimmickFlag.UseVisualStyleBackColor = true;
-            // 
-            // NPCFlag
-            // 
-            this.NPCFlag.AutoSize = true;
-            this.NPCFlag.Location = new System.Drawing.Point(174, 18);
-            this.NPCFlag.Name = "NPCFlag";
-            this.NPCFlag.Size = new System.Drawing.Size(50, 19);
-            this.NPCFlag.TabIndex = 0;
-            this.NPCFlag.Text = "NPC";
-            this.NPCFlag.UseVisualStyleBackColor = true;
+            this.EventTriggerFlag.AutoSize = true;
+            this.EventTriggerFlag.Location = new System.Drawing.Point(298, 18);
+            this.EventTriggerFlag.Name = "EventTriggerFlag";
+            this.EventTriggerFlag.Size = new System.Drawing.Size(94, 19);
+            this.EventTriggerFlag.TabIndex = 0;
+            this.EventTriggerFlag.Text = "Event Trigger";
+            this.EventTriggerFlag.UseVisualStyleBackColor = true;
             // 
             // PlayerFlag
             // 
@@ -284,15 +265,35 @@ namespace OpenKh.Tools.OloEditor
             this.PlayerFlag.Text = "Player";
             this.PlayerFlag.UseVisualStyleBackColor = true;
             // 
-            // EventTriggerFlag
+            // NPCFlag
             // 
-            this.EventTriggerFlag.AutoSize = true;
-            this.EventTriggerFlag.Location = new System.Drawing.Point(298, 18);
-            this.EventTriggerFlag.Name = "EventTriggerFlag";
-            this.EventTriggerFlag.Size = new System.Drawing.Size(94, 19);
-            this.EventTriggerFlag.TabIndex = 0;
-            this.EventTriggerFlag.Text = "Event Trigger";
-            this.EventTriggerFlag.UseVisualStyleBackColor = true;
+            this.NPCFlag.AutoSize = true;
+            this.NPCFlag.Location = new System.Drawing.Point(174, 18);
+            this.NPCFlag.Name = "NPCFlag";
+            this.NPCFlag.Size = new System.Drawing.Size(50, 19);
+            this.NPCFlag.TabIndex = 0;
+            this.NPCFlag.Text = "NPC";
+            this.NPCFlag.UseVisualStyleBackColor = true;
+            // 
+            // GimmickFlag
+            // 
+            this.GimmickFlag.AutoSize = true;
+            this.GimmickFlag.Location = new System.Drawing.Point(94, 18);
+            this.GimmickFlag.Name = "GimmickFlag";
+            this.GimmickFlag.Size = new System.Drawing.Size(74, 19);
+            this.GimmickFlag.TabIndex = 0;
+            this.GimmickFlag.Text = "Gimmick";
+            this.GimmickFlag.UseVisualStyleBackColor = true;
+            // 
+            // EnemyFlag
+            // 
+            this.EnemyFlag.AutoSize = true;
+            this.EnemyFlag.Location = new System.Drawing.Point(26, 18);
+            this.EnemyFlag.Name = "EnemyFlag";
+            this.EnemyFlag.Size = new System.Drawing.Size(62, 19);
+            this.EnemyFlag.TabIndex = 0;
+            this.EnemyFlag.Text = "Enemy";
+            this.EnemyFlag.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 

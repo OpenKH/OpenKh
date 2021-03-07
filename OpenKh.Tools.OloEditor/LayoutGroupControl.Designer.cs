@@ -60,6 +60,7 @@ namespace OpenKh.Tools.OloEditor
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.FlowLayout = new System.Windows.Forms.FlowLayoutPanel();
             this.GBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NumericGroupID)).BeginInit();
@@ -411,13 +412,24 @@ namespace OpenKh.Tools.OloEditor
             this.label1.TabIndex = 0;
             this.label1.Text = "Center X";
             // 
+            // FlowLayout
+            // 
+            this.FlowLayout.AutoSize = true;
+            this.FlowLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.FlowLayout.Location = new System.Drawing.Point(4, 185);
+            this.FlowLayout.Name = "FlowLayout";
+            this.FlowLayout.Size = new System.Drawing.Size(796, 14);
+            this.FlowLayout.TabIndex = 1;
+            // 
             // LayoutGroupControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
+            this.Controls.Add(this.FlowLayout);
             this.Controls.Add(this.GBox);
             this.Name = "LayoutGroupControl";
-            this.Size = new System.Drawing.Size(813, 185);
+            this.Size = new System.Drawing.Size(813, 229);
             this.GBox.ResumeLayout(false);
             this.GBox.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -430,6 +442,7 @@ namespace OpenKh.Tools.OloEditor
             ((System.ComponentModel.ISupportInitialize)(this.NumericGameTrigger)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NumericAssociatedTrigger)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -466,5 +479,6 @@ namespace OpenKh.Tools.OloEditor
         public System.Windows.Forms.NumericUpDown NumericID;
         public System.Windows.Forms.NumericUpDown NumericStep;
         public System.Windows.Forms.CheckedListBox GroupFlagCheckboxList;
+        public System.Windows.Forms.FlowLayoutPanel FlowLayout;
     }
 }
