@@ -311,22 +311,37 @@ namespace OpenKh.Patcher
                         case "item":
                             var itemList = Kh2.SystemData.Item.Read(stream);
                             var moddedItem = deserializer.Deserialize<Kh2.SystemData.Item>(sourceText);
-                            itemList = moddedItem;
+                             foreach (var item in moddedItem.Items1)
+                             {
+                                var itemToUpdate = itemList.Items1.FirstOrDefault(x => x.Id == item.Id);
+                                if (itemToUpdate != null)
+                                {
+                                    itemList.Items1[itemList.Items1.IndexOf(itemToUpdate)] = item;
+                                }
+                             }
+                             foreach (var item in moddedItem.Items2)
+                             {
+                                var itemToUpdate = itemList.Items2.FirstOrDefault(x => x.Id == item.Id);
+                                if (itemToUpdate != null)
+                                {
+                                    itemList.Items2[itemList.Items2.IndexOf(itemToUpdate)] = item;
+                                }
+                             }
                             itemList.Write(stream.SetPosition(0));
                             break;
 
                         case "fmlv":
                             var formRaw = Kh2.Battle.Fmlv.Read(stream).ToList();
-                            var formList = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv.Level>>();
+                            var formList = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv>>();
                             foreach (var form in formRaw)
                             {
-                                if (!formList.ContainsKey(form.FormFm))
+                                if (!formList.ContainsKey(form.FinalMixForm))
                                 {
-                                    formList.Add(form.FormFm, new List<Kh2.Battle.Fmlv.Level>());
+                                    formList.Add(form.FinalMixForm, new List<Kh2.Battle.Fmlv>());
                                 }
-                                formList[form.FormFm].Add(form);
+                                formList[form.FinalMixForm].Add(form);
                             }
-                            var moddedForms = deserializer.Deserialize<Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv.Level>>>(sourceText);
+                            var moddedForms = deserializer.Deserialize<Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv>>>(sourceText);
                             foreach (var form in moddedForms)
                             {
                                 foreach (var level in form.Value)
