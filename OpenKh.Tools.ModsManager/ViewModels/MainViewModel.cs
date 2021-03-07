@@ -24,6 +24,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
     public class MainViewModel : BaseNotifyPropertyChanged, IChangeModEnableState
     {
         private static string ApplicationName = Utilities.GetApplicationName();
+        private Window Window => Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
+
         private DebuggingWindow _debuggingWindow = new DebuggingWindow();
         private ModViewModel _selectedValue;
         private Pcsx2Injector _pcsx2Injector;
@@ -31,6 +33,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public string Title => ApplicationName;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
+        public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
         public RelayCommand MoveUp { get; set; }
@@ -59,6 +62,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             ReloadModsList();
             SelectedValue = ModsList.FirstOrDefault();
+
+            ExitCommand = new RelayCommand(_ => Window.Close());
             AddModCommand = new RelayCommand(_ =>
             {
                 var view = new InstallModView();

@@ -6,6 +6,7 @@ namespace OpenKh.Tools.ModsManager.Models
     {
         public string Name { get; set; }
         public string Path { get; set; }
+        public string ImageSource { get; set; }
         public Metadata Metadata { get; set; }
         public bool IsEnabled { get; set; }
     }

@@ -14,6 +14,7 @@ namespace OpenKh.Patcher
         }
 
         public string Title { get; set; }
+        public string OriginalAuthor { get; set; }
         public int Specifications { get; set; }
         public List<Dependency> Dependencies { get; set; }
         public List<AssetFile> Assets { get; set; }
