@@ -1,6 +1,7 @@
 using OpenKh.Tools.ModsManager.Services;
 using System.Collections.Generic;
 using System.Windows;
+using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 
 namespace OpenKh.Tools.ModsManager.Views
@@ -14,6 +15,7 @@ namespace OpenKh.Tools.ModsManager.Views
             .Compose()
             .AddExtensions("OpenKH mod as ZIP file", "zip");
 
+        public RelayCommand CloseCommand { get; }
         public string RepositoryName { get; set; }
         public bool IsZipFile { get; private set; }
 
@@ -21,6 +23,8 @@ namespace OpenKh.Tools.ModsManager.Views
         {
             InitializeComponent();
             DataContext = this;
+
+            CloseCommand = new RelayCommand(_ => Close());
         }
 
         private void Install_Click(object sender, RoutedEventArgs e)
