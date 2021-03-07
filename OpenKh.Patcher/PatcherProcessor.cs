@@ -296,11 +296,6 @@ namespace OpenKh.Patcher
             foreach (var source in sources)
             {
                     string sourceText = File.ReadAllText(context.GetSourceModAssetPath(source.Name));
-                    if (source.Name.Contains("enc"))
-                    {
-                        byte[] data = System.Convert.FromBase64String(sourceText);
-                        sourceText = System.Text.ASCIIEncoding.ASCII.GetString(data);
-                    }
                     switch (source.Type)
                     {
                         case "trsr":
