@@ -14,16 +14,6 @@ namespace OpenKh.Tools.ModsManager.Views
             InitializeComponent();
         }
 
-        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
-        {
-            using (var proc = new Process())
-            {
-                proc.StartInfo.UseShellExecute = true;
-                proc.StartInfo.FileName = e.Uri.AbsoluteUri;
-                proc.Start();
-            }
-        }
-
         private void ListBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Delete)
