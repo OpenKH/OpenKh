@@ -1,4 +1,6 @@
 using OpenKh.Tools.ModsManager.Models;
+using OpenKh.Tools.ModsManager.Services;
+using OpenKh.Tools.ModsManager.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,12 +10,14 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xe.Tools;
+using Xe.Tools.Wpf.Commands;
+using static OpenKh.Tools.ModsManager.Helpers;
 
 namespace OpenKh.Tools.ModsManager.ViewModels
 {
     public class ModViewModel : BaseNotifyPropertyChanged
     {
-        private static readonly string FallbackImage;
+        private static readonly string FallbackImage = null;
         private readonly ModModel _model;
         private readonly IChangeModEnableState _changeModEnableState;
         private int _updateCount;
@@ -35,18 +39,60 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 Name = Source;
             }
 
-            LoadImage(_model.IconImageSource, FallbackImage, image =>
+            ReadMetadata();
+
+            UpdateCommand = new RelayCommand(async _ =>
             {
-                IconImage = image;
-                OnPropertyChanged(nameof(IconImage));
-            });
-            LoadImage(_model.PreviewImageSource, null, image =>
-            {
-                PreviewImage = image;
-                OnPropertyChanged(nameof(PreviewImage));
-                OnPropertyChanged(nameof(PreviewImageVisibility));
+                InstallModProgressWindow progressWindow = null;
+                try
+                {
+                    progressWindow = Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        var progressWindow = new InstallModProgressWindow
+                        {
+                            OperationName = "Updating",
+                            ModName = Source,
+                            ProgressText = "Initializing",
+                            ShowActivated = true
+                        };
+                        progressWindow.Show();
+                        return progressWindow;
+                    });
+
+                    await ModsService.Update(Source, progress =>
+                    {
+                        Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressText = progress);
+                    }, nProgress =>
+                    {
+                        Application.Current.Dispatcher.Invoke(() => progressWindow.ProgressValue = nProgress);
+                    });
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        progressWindow.ProgressText = "Reading latest changes";
+                        progressWindow.ProgressValue = 1f;
+                    });
+
+                    var mod = ModsService.GetMods(new string[] { Source }).First();
+                    ReadMetadata();
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        progressWindow.Close();
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Handle(ex);
+                }
+                finally
+                {
+                    Application.Current.Dispatcher.Invoke(() => progressWindow?.Close());
+                }
             });
         }
+
+        public RelayCommand UpdateCommand { get; }
 
         public bool Enabled
         {
@@ -119,6 +165,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
         }
 
+        private void ReadMetadata() => Task.Run(() =>
+        {
+            LoadImage(_model.IconImageSource, FallbackImage, image =>
+            {
+                IconImage = image;
+                OnPropertyChanged(nameof(IconImage));
+            });
+            LoadImage(_model.PreviewImageSource, null, image =>
+            {
+                PreviewImage = image;
+                OnPropertyChanged(nameof(PreviewImage));
+                OnPropertyChanged(nameof(PreviewImageVisibility));
+            });
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(Description));
+                OnPropertyChanged(nameof(Homepage));
+                OnPropertyChanged(nameof(FilesToPatch));
+                UpdateCount = 0;
+            });
+        });
+
         private static void LoadImage(string source, string fallback, Action<ImageSource> setter)
         {
             if (string.IsNullOrEmpty(source) && !string.IsNullOrEmpty(fallback))
@@ -140,6 +210,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 var bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
                 bitmapImage.UriSource = uri;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                 bitmapImage.EndInit();
                 bitmapImage.Freeze();
 

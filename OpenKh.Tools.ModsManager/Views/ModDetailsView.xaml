@@ -23,7 +23,7 @@
                 <Run Text="{Binding UpdateCount}"/>
                 <Run> updates behind.</Run>
                 </TextBlock>
-                <Button Margin="0 0 0 3" Content="Download updates"/>
+                <Button Margin="0 0 0 3" Content="Download updates" Command="{Binding UpdateCommand}"/>
             </StackPanel>
             <Image Width="256" Height="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
             <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Text="{Binding Description}"/>
