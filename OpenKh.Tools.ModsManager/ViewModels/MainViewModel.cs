@@ -33,6 +33,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private ModViewModel _selectedValue;
         private Pcsx2Injector _pcsx2Injector;
         private Process _runningProcess;
+        private bool _isBuilding;
 
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
@@ -62,6 +63,20 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(AddModCommand));
                 OnPropertyChanged(nameof(RemoveModCommand));
                 OnPropertyChanged(nameof(OpenModFolderCommand));
+            }
+        }
+
+        public bool IsBuilding
+        {
+            get => _isBuilding;
+            set
+            {
+                _isBuilding = value;
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    OnPropertyChanged(nameof(BuildCommand));
+                    OnPropertyChanged(nameof(BuildAndRunCommand));
+                });
             }
         }
 
@@ -157,7 +172,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             });
             MoveUp = new RelayCommand(_ => MoveSelectedModUp(), _ => CanSelectedModMoveUp());
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
-            BuildCommand = new RelayCommand(async _ => await ModsService.RunPacherAsync());
+            BuildCommand = new RelayCommand(async _ =>
+            {
+                ResetLogWindow();
+                await BuildPatches();
+                CloseAllWindows();
+            }, _ => !IsBuilding);
             RunCommand = new RelayCommand(async _ =>
             {
                 CloseRunningProcess();
@@ -168,9 +188,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 CloseRunningProcess();
                 ResetLogWindow();
-                await ModsService.RunPacherAsync();
+                await BuildPatches();
                 await RunGame();
-            });
+            }, _ => !IsBuilding);
             StopRunningInstanceCommand = new RelayCommand(_ =>
             {
                 CloseRunningProcess();
@@ -236,7 +256,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             _debuggingWindow.ClearLogs();
         }
 
-        private Task RunPatcher() => ModsService.RunPacherAsync();
+        private async Task BuildPatches()
+        {
+            IsBuilding = true;
+            await ModsService.RunPacherAsync();
+            IsBuilding = false;
+        }
 
         private Task RunGame()
         {
