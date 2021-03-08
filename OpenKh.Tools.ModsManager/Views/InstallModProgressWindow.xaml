@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
         mc:Ignorable="d"
-        Title="Installing a new mod..." Height="120" Width="300" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="{Binding DialogTitle}" d:Title="Installing mod..." Height="120" Width="300" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <StackPanel Margin="10">
-        <TextBlock Margin="0 0 0 10">
-            <Run>Installing the mod </Run>
+        <TextBlock Margin="0 0 0 10" d:Text="Installing the mod XYZ">
+            <Run Text="{Binding OperationName}"/> 
+            <Run> the mod </Run>
             <Run FontWeight="Bold" Text="{Binding ModName}" d:Text="openkh/mod-template"/>
             <Run>...</Run>
         </TextBlock>

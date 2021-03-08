@@ -213,6 +213,11 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
+        public static Task Update(string modName,
+            Action<string> progressOutput = null,
+            Action<float> progressNumber = null) =>
+            RepositoryService.FetchAndResetUponOrigin(GetModPath(modName), progressOutput, progressNumber);
+
         public static Task RunPacherAsync() => Task.Run(() =>
         {
             if (Directory.Exists(ConfigurationService.GameModPath))
