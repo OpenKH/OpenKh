@@ -48,6 +48,9 @@ namespace OpenKh.Command.PmoConverter
 
         public static List<string> TexList { get; set; }
         public static List<Tm2> TextureData { get; set; }
+        public static List<Assimp.Bone> BoneData { get; set; }
+        public static List<Assimp.Node> NodeData { get; set; }
+
 
         private void OnExecute()
         {
@@ -116,16 +119,22 @@ namespace OpenKh.Command.PmoConverter
                 } 
                 else
                     chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 2, 3, (uint)0x7);
-                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, (uint)TextureCoordinateFormat);
-                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, (uint)VertexFormat);
+                //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, (uint)TextureCoordinateFormat);
+                //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, (uint)VertexFormat);
+
+                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, 2);
+                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, 2);
 
                 chunk.SectionInfo.VertexSize += 0; // Weights.
+                TextureCoordinateFormat = Pmo.CoordinateFormat.NORMALIZED_16_BITS;
                 chunk.SectionInfo.VertexSize += (TextureCoordinateFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)8  : (byte)((int)TextureCoordinateFormat * 2); // Texture Coordinates
                 if (chunk.SectionInfo.VertexSize % 4 != 0)
                     chunk.SectionInfo.VertexSize += 2;
                 chunk.SectionInfo.VertexSize += UsesUniformColor ? (byte)0 : (byte)4; // VertexColor
+                VertexFormat = Pmo.CoordinateFormat.NORMALIZED_16_BITS;
                 chunk.SectionInfo.VertexSize += (VertexFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)12 : (byte)((int)VertexFormat * 3); // Vertices
-
+                if (chunk.SectionInfo.VertexSize % 4 != 0)
+                    chunk.SectionInfo.VertexSize += 2;
 
                 for (int v = 0; v < desc.Indices.Length; v++)
                 {
@@ -178,6 +187,43 @@ namespace OpenKh.Command.PmoConverter
                     pmo.textureInfo[t].Unknown = new UInt32[4];
                     pmo.texturesData.Add( TextureData[t] );
                 }
+            }
+
+            //pmo.header.SkeletonOffset = pmo.header.MeshOffset0 + 0;
+            pmo.skeletonHeader.MagicValue = 0x4E4F42;
+            pmo.skeletonHeader.BoneCount = (ushort)BoneData.Count;
+            pmo.skeletonHeader.SkinnedBoneCount = (ushort)BoneData.Count;
+            pmo.skeletonHeader.nStdBone = 2;
+
+            pmo.boneList = new Pmo.BoneData[BoneData.Count];
+
+            for(int b = 0; b < pmo.boneList.Length; b++)
+            {
+                Pmo.BoneData bn = new Pmo.BoneData();
+                bn.BoneIndex = (ushort)b;
+                bn.JointName = BoneData[b].Name;
+
+                Matrix4x4 mtx = new Matrix4x4();
+                mtx.M11 = BoneData[b].OffsetMatrix.A1;
+                mtx.M12 = BoneData[b].OffsetMatrix.A2;
+                mtx.M13 = BoneData[b].OffsetMatrix.A3;
+                mtx.M14 = BoneData[b].OffsetMatrix.A4;
+                mtx.M21 = BoneData[b].OffsetMatrix.B1;
+                mtx.M22 = BoneData[b].OffsetMatrix.B2;
+                mtx.M23 = BoneData[b].OffsetMatrix.B3;
+                mtx.M24 = BoneData[b].OffsetMatrix.B4;
+                mtx.M31 = BoneData[b].OffsetMatrix.C1;
+                mtx.M32 = BoneData[b].OffsetMatrix.C2;
+                mtx.M33 = BoneData[b].OffsetMatrix.C3;
+                mtx.M34 = BoneData[b].OffsetMatrix.C4;
+                mtx.M41 = BoneData[b].OffsetMatrix.D1;
+                mtx.M42 = BoneData[b].OffsetMatrix.D2;
+                mtx.M43 = BoneData[b].OffsetMatrix.D3;
+                mtx.M44 = BoneData[b].OffsetMatrix.D4;
+
+                bn.Transform = mtx;
+                bn.InverseTransform = mtx;
+                pmo.boneList[b] = bn;
             }
 
             return pmo;
@@ -295,18 +341,43 @@ namespace OpenKh.Command.PmoConverter
             var baseFilePath = Path.GetDirectoryName(filePath);
             TexList = new List<string>();
             TextureData = new List<Tm2>();
+            BoneData = new List<Assimp.Bone>();
 
             foreach(Assimp.Material mat in scene.Materials)
             {
-                TexList.Add(Path.GetFileName(mat.TextureDiffuse.FilePath));
-                Stream str = File.OpenRead(TexList[TexList.Count - 1]);
+                Stream str = null;
+                var name = Path.GetFileName(mat.TextureDiffuse.FilePath);
+                if (name != "" || name != null)
+                {
+                    str = File.OpenRead(name + ".png");
+                }
                 
-                PngImage png = new PngImage(str);
-                Tm2 tmImage = Tm2.Create(png);
-                TextureData.Add(tmImage);
+                if(str != null)
+                {
+                    TexList.Add(Path.GetFileName(mat.TextureDiffuse.FilePath));
+                    PngImage png = new PngImage(str);
+                    Tm2 tmImage = Tm2.Create(png);
+                    TextureData.Add(tmImage);
+                }
             }
 
-            int childCount = scene.RootNode.ChildCount;
+            Assimp.Bone rBone = new Assimp.Bone();
+            foreach(var m in scene.Meshes)
+            {
+                foreach(var bn in m.Bones)
+                {
+                    if (!BoneData.Contains(bn))
+                        BoneData.Add(bn);
+                }
+            }
+
+            foreach(var nd in scene.RootNode.Children)
+            {
+                foreach(var n in nd.Children)
+                {
+                    int m = n.ChildCount;
+                }
+            }
 
             return new MeshGroup()
             {
