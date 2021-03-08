@@ -57,8 +57,36 @@ namespace OpenKh.Tools.ModsManager.Services
             if (repository.Info.IsHeadDetached)
                 return -1;
 
-            repository.Network.Fetch(repository.Head.RemoteName, new string[0]);
+            Fetch(repository);
             return repository.Head.TrackingDetails.BehindBy ?? 0;
         });
+
+        public static Task FetchAndResetUponOrigin(string path,
+            Action<string> progressOutput = null,
+            Action<float> progressNumber = null) => Task.Run(() =>
+        {
+            if (!Repository.IsValid(path))
+                return;
+
+            using var repository = new Repository(path);
+            if (repository.Info.IsHeadDetached)
+                return;
+
+            Fetch(repository);
+            repository.Reset(ResetMode.Hard, repository.Head.TrackedBranch.Tip, new CheckoutOptions
+            {
+                CheckoutModifiers = CheckoutModifiers.Force,
+                CheckoutNotifyFlags = CheckoutNotifyFlags.None,
+                OnCheckoutProgress = (string path, int completedSteps, int totalSteps) =>
+                {
+                    progressOutput?.Invoke(path);
+                    var nProgress = (float)completedSteps / totalSteps;
+                    progressNumber?.Invoke(nProgress);
+                }
+            });
+        });
+
+        private static void Fetch(Repository repository) =>
+            repository.Network.Fetch(repository.Head.RemoteName, new string[0]);
     }
 }

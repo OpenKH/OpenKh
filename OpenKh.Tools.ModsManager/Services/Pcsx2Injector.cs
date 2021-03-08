@@ -326,8 +326,15 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public void Stop()
         {
-            _cancellationTokenSource?.Cancel();
-            _injectorTask?.Wait();
+            try
+            {
+                _cancellationTokenSource?.Cancel();
+                _injectorTask?.Wait();
+            }
+            catch
+            {
+
+            }
         }
 
         private void MainLoop(Stream stream, IDebugging debugging)

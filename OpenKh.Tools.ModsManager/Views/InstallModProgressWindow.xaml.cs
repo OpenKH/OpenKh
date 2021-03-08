@@ -13,6 +13,7 @@ namespace OpenKh.Tools.ModsManager.Views
         private string _progressText;
         private bool _progressUnknown;
         private float _progressValue;
+        private string _operationName = "Installing";
 
         public InstallModProgressWindow()
         {
@@ -24,6 +25,19 @@ namespace OpenKh.Tools.ModsManager.Views
                     cancelEventArgs.Cancel = true;
             };
         }
+
+        public string OperationName
+        {
+            get => _operationName;
+            set
+            {
+                _operationName = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Title));
+            }
+        }
+
+        public string DialogTitle => $"{OperationName} mod...";
 
         public string ModName
         {
@@ -60,9 +74,7 @@ namespace OpenKh.Tools.ModsManager.Views
             get => _progressValue;
             set
             {
-                if (ProgressUnknown == false)
-                    ProgressUnknown = true;
-
+                ProgressUnknown = false;
                 _progressValue = value;
                 OnPropertyChanged();
             }
