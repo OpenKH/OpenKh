@@ -21,6 +21,23 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             get
             {
+                var allMods = UnorderedMods.ToList();
+                var enabledMods = EnabledMods.ToHashSet();
+                var disabledMods = new List<string>(allMods.Count);
+                foreach (var mod in allMods)
+                {
+                    if (!enabledMods.Contains(mod))
+                        disabledMods.Add(mod);
+                }
+
+                return enabledMods.Concat(disabledMods);
+            }
+        }
+
+        public static IEnumerable<string> UnorderedMods
+        {
+            get
+            {
                 var modsPath = ConfigurationService.ModCollectionPath;
                 foreach (var dir in Directory.GetDirectories(modsPath))
                 {
@@ -42,10 +59,10 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             get
             {
-                var enabledMods = ConfigurationService.EnabledMods;
-                foreach (var mod in enabledMods)
+                var mods = UnorderedMods.ToList();
+                foreach (var mod in ConfigurationService.EnabledMods)
                 {
-                    if (Mods.Contains(mod))
+                    if (mods.Contains(mod))
                         yield return mod;
                 }
             }
@@ -163,28 +180,52 @@ namespace OpenKh.Tools.ModsManager.Services
         public static string GetModPath(string repositoryName) =>
             Path.Combine(ConfigurationService.ModCollectionPath, repositoryName);
 
-        public static IEnumerable<ModModel> GetMods(IEnumerable<string> repositoryNames)
+        public static IEnumerable<ModModel> GetMods(IEnumerable<string> modNames)
         {
             var enabledMods = ConfigurationService.EnabledMods;
-            foreach (var repositoryName in repositoryNames)
+            foreach (var modName in modNames)
             {
-                var modPath = GetModPath(repositoryName);
+                var modPath = GetModPath(modName);
                 yield return new ModModel
                 {
-                    Name = repositoryName,
+                    Name = modName,
                     Path = modPath,
                     IconImageSource = Path.Combine(modPath, "icon.png"),
                     PreviewImageSource = Path.Combine(modPath, "preview.png"),
                     Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
-                    IsEnabled = enabledMods.Contains(repositoryName)
+                    IsEnabled = enabledMods.Contains(modName)
                 };
+            }
+        }
+
+        public static async IAsyncEnumerable<ModUpdateModel> FetchUpdates()
+        {
+            foreach (var modName in Mods)
+            {
+                var modPath = GetModPath(modName);
+                var updateCount = await RepositoryService.FetchUpdate(modPath);
+                if (updateCount > 0)
+                    yield return new ModUpdateModel
+                    {
+                        Name = modName,
+                        UpdateCount = updateCount
+                    };
             }
         }
 
         public static Task RunPacherAsync() => Task.Run(() =>
         {
             if (Directory.Exists(ConfigurationService.GameModPath))
-                Directory.Delete(ConfigurationService.GameModPath, true);
+            {
+                try
+                {
+                    Directory.Delete(ConfigurationService.GameModPath, true);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn("Unable to fully clean the mod directory:\n{0}", ex.Message);
+                }
+            }
             Directory.CreateDirectory(ConfigurationService.GameModPath);
 
             var patcherProcessor = new PatcherProcessor();

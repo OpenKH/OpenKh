@@ -16,6 +16,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private static readonly string FallbackImage;
         private readonly ModModel _model;
         private readonly IChangeModEnableState _changeModEnableState;
+        private int _updateCount;
 
         public ModViewModel(ModModel model, IChangeModEnableState changeModEnableState)
         {
@@ -89,6 +90,21 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 return $"https://{author}.github.io/{project}";
             }
         }
+
+        public int UpdateCount
+        {
+            get => _updateCount;
+            set
+            {
+                _updateCount = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsUpdateAvailable));
+                OnPropertyChanged(nameof(UpdateVisibility));
+            }
+        }
+
+        public bool IsUpdateAvailable => UpdateCount > 0;
+        public Visibility UpdateVisibility => IsUpdateAvailable ? Visibility.Visible : Visibility.Collapsed;
 
         private IEnumerable<string> GetFilesToPatch()
         {

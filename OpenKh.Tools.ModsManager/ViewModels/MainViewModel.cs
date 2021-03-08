@@ -40,6 +40,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
+        public RelayCommand OpenModFolderCommand { get; set; }
         public RelayCommand MoveUp { get; set; }
         public RelayCommand MoveDown { get; set; }
         public RelayCommand BuildCommand { get; set; }
@@ -60,6 +61,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(MoveDown));
                 OnPropertyChanged(nameof(AddModCommand));
                 OnPropertyChanged(nameof(RemoveModCommand));
+                OnPropertyChanged(nameof(OpenModFolderCommand));
             }
         }
 
@@ -145,6 +147,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     });
                 }
             }, _ => SelectedValue != null);
+            OpenModFolderCommand = new RelayCommand(_ =>
+            {
+                using var process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = SelectedValue.Path,
+                    UseShellExecute = true
+                });
+            });
             MoveUp = new RelayCommand(_ => MoveSelectedModUp(), _ => CanSelectedModMoveUp());
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
             BuildCommand = new RelayCommand(async _ => await ModsService.RunPacherAsync());
@@ -195,6 +205,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }));
 
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
+            FetchUpdates();
         }
 
         public void CloseAllWindows()
@@ -360,5 +371,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         private bool CanSelectedModMoveUp() =>
             SelectedValue != null && ModsList.IndexOf(SelectedValue) > 0;
+
+        private async Task FetchUpdates()
+        {
+            await foreach (var modUpdate in ModsService.FetchUpdates())
+            {
+                var mod = ModsList.FirstOrDefault(x => x.Source == modUpdate.Name);
+                if (mod == null)
+                    continue;
+
+                Application.Current.Dispatcher.Invoke(() =>
+                    mod.UpdateCount = modUpdate.UpdateCount);
+            }
+        }
     }
 }

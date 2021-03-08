@@ -17,6 +17,14 @@
                     <TextBlock Text="{Binding Author}" Foreground="{DynamicResource textHyperlink}" d:Text="Author name"/>
                 </Hyperlink>
             </TextBlock>
+            <StackPanel Visibility="{Binding UpdateVisibility}">
+                <TextBlock Margin="0 0 0 3">
+                <Run>The mod is </Run>
+                <Run Text="{Binding UpdateCount}"/>
+                <Run> updates behind.</Run>
+                </TextBlock>
+                <Button Margin="0 0 0 3" Content="Download updates"/>
+            </StackPanel>
             <Image Width="256" Height="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
             <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Text="{Binding Description}"/>
             <TextBlock Margin="0 0 0 3">
