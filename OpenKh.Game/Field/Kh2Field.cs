@@ -525,8 +525,8 @@ namespace OpenKh.Game.Field
             {
                 switch (_kernel.RegionId)
                 {
-                    case 0: // jp
-                    case Constants.RegionFinalMix: // fm
+                    case (int)Constants.RegionId.Japanese:
+                    case (int)Constants.RegionId.FinalMix:
                         return $"anm/fm/{path}.anb";
                     default:
                         return $"anm/us/{path}.anb";

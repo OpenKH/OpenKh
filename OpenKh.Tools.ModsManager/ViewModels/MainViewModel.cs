@@ -287,12 +287,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         _pcsx2Injector.RegionId = ConfigurationService.RegionId - 1;
                         _pcsx2Injector.Region = Kh2.Constants.Regions[_pcsx2Injector.RegionId];
-                        _pcsx2Injector.Language = _pcsx2Injector.Region switch
-                        {
-                            "uk" => "us",
-                            "fm" => "jp",
-                            _ => _pcsx2Injector.Region,
-                        };
+                        _pcsx2Injector.Language = Kh2.Constants.Languages[_pcsx2Injector.RegionId];
                     }
                     else
                         _pcsx2Injector.RegionId = -1;

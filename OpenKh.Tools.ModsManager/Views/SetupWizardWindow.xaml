@@ -166,8 +166,8 @@
                 <GroupBox Header="Region">
                     <StackPanel Margin="6">
                         <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=0}" Content="Use game's default"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=1}" Content="Japanese (JP/JP)"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=2}" Content="English (US/US)"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=2}" Content="Japanese (JP/JP)"/>
+                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=1}" Content="English (US/US)"/>
                         <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=3}" Content="English (UK/US)"/>
                         <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=4}" Content="Italian (IT/IT)"/>
                         <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=5}" Content="Spanish (SP/SP)"/>
