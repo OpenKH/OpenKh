@@ -1,10 +1,8 @@
-using OpenKh.Tools.Kh2TextEditor.Models;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using YamlDotNet;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace OpenKh.Tools.Kh2TextEditor.Services
 {
@@ -13,13 +11,16 @@ namespace OpenKh.Tools.Kh2TextEditor.Services
         void ITextExporter.Export(IEnumerable<ExchangeableMessage> messages, TextWriter writer)
         {
             new YamlDotNet.Serialization.SerializerBuilder()
+                .IgnoreFields()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build()
                 .Serialize(
                     writer,
-                    new
+                    messages.Select(x => new
                     {
-                        Messages = messages
-                    }
+                        id = x.Id,
+                        text = x.Text
+                    })
                 );
         }
 

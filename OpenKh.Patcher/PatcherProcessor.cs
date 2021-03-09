@@ -249,7 +249,7 @@ namespace OpenKh.Patcher
                         _ => Encoders.InternationalSystem,
                     };
 
-                    var data = encoder.Encode(MsgSerializer.DeserializeText(text).ToList());
+                    var data = encoder.Encode(MsgSerializer.DeserializeText(text ?? string.Empty).ToList());
                     var originalMsg = msgs.FirstOrDefault(x => x.Id == id);
                     if (originalMsg == null)
                         msgs.Add(new Msg.Entry
