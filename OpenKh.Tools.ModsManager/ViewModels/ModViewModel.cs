@@ -120,6 +120,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string Source => _model.Name;
         public string AuthorUrl => $"https://github.com/{Author}";
         public string SourceUrl => $"https://github.com/{Source}";
+        public string ReportBugUrl => $"https://github.com/{Source}/issues";
         public string FilesToPatch => string.Join('\n', GetFilesToPatch());
 
         public string Description => _model.Metadata.Description;
