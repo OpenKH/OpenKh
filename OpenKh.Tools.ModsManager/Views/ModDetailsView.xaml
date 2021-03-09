@@ -32,6 +32,11 @@
                     <TextBlock Text="Mod source code" Foreground="{DynamicResource textHyperlink}"/>
                 </Hyperlink>
             </TextBlock>
+            <TextBlock Margin="0 0 0 3">
+                <Hyperlink NavigateUri="{Binding ReportBugUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
+                    <TextBlock Text="Report bug" Foreground="{DynamicResource textHyperlink}"/>
+                </Hyperlink>
+            </TextBlock>
             <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                 <Run>This mod is protected by the OpenKH Mods License.</Run>
             </TextBlock>
