@@ -91,7 +91,14 @@ namespace OpenKh.Tools.ModsManager.Services
             if (string.IsNullOrEmpty(repository.Head.RemoteName))
                 return;
 
-            repository.Network.Fetch(repository.Head.RemoteName, new string[0]);
+            try
+            {
+                repository.Network.Fetch(repository.Head.RemoteName, new string[0]);
+            }
+            catch
+            {
+
+            }
         }
     }
 }
