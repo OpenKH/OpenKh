@@ -68,7 +68,10 @@ namespace OpenKh.Tools.ModsManager.Services
 
             foreach (var fallback in _regionFallback)
             {
-                var temptativeRegionalFallbackFileName = fileName.Replace($"/{region}/", $"/{fallback}/");
+                var temptativeRegionalFallbackFileName = fileName
+                    .Replace($"/{region}/", $"/{fallback}/")
+                    .Replace($".a.{region}", $".a.{fallback}")
+                    .Replace($".apdx", $".a.{fallback}");
                 finalFileName = Path.Combine(ConfigurationService.GameModPath, temptativeRegionalFallbackFileName);
                 if (File.Exists(finalFileName))
                     return true;
@@ -86,8 +89,8 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             foreach (var region in Kh2.Constants.Regions)
             {
-                var indexOfRegion = fileName.IndexOf($"/{region}/");
-                if (indexOfRegion >= 0)
+                if (fileName.Contains($"/{region}/") ||
+                    fileName.EndsWith($".a.{region}"))
                     return region;
             }
 
