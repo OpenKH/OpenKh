@@ -86,7 +86,12 @@ namespace OpenKh.Tools.ModsManager.Services
             });
         });
 
-        private static void Fetch(Repository repository) =>
+        private static void Fetch(Repository repository)
+        {
+            if (string.IsNullOrEmpty(repository.Head.RemoteName))
+                return;
+
             repository.Network.Fetch(repository.Head.RemoteName, new string[0]);
+        }
     }
 }
