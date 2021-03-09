@@ -184,8 +184,8 @@ Vertex properties which are in the format `8-bit normalized` or `16-bit normaliz
 |--------|------|-------------|
 | 0x0    | uint32 | Magic Value. Always "BON\0" |
 | 0x4    | uint32 | padding |
-| 0x8    | uint16 | Maximum Bone Count |
 | 0x8    | uint16 | Bone Count |
+| 0xA    | uint16 | padding |
 | 0xC    | uint16 | Skinned Bones |
 | 0xE    | uint16 | Skinned Bones Initial Index |
 
