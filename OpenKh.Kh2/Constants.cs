@@ -62,12 +62,25 @@ namespace OpenKh.Kh2
         public const int FontTableEventHeight = 512;
         public const int FontIconWidth = 24;
         public const int FontIconHeight = 24;
-        public const int RegionFinalMix = 7;
 
         public const int PaletteCount = 9;
         public const int WorldCount = (int)World.WorldThatNeverWas + 1;
         public const int MaxAreaPerWorldCount = 64;
         public const int JiminyWorldCount = (int)JiminyWorld.Nobody + 1;
+
+        public enum RegionId
+        {
+            Undefined = -1,
+            UnitedStates,
+            Japanese,
+            UnitedKingdom,
+            Italian,
+            Spanish,
+            German,
+            French,
+            FinalMix,
+            MAX
+        }
 
         public static readonly string[] WorldIds = new string[WorldCount]
         {
@@ -76,9 +89,14 @@ namespace OpenKh.Kh2
             "ca", "tr", "eh"
         };
 
-        public static readonly string[] Regions = new string[]
+        public static readonly string[] Regions = new string[(int)RegionId.MAX]
         {
-            "jp", "us", "uk", "it", "sp", "gr", "fr", "fm"
+            "us", "jp", "uk", "it", "sp", "gr", "fr", "fm"
+        };
+
+        public static readonly string[] Languages = new string[(int)RegionId.MAX]
+        {
+            "us", "jp", "us", "it", "sp", "gr", "fr", "jp"
         };
 
         public static readonly string[] WorldNames = new string[WorldCount]
