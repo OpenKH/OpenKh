@@ -70,9 +70,9 @@ namespace OpenKh.Kh2
 
         public enum RegionId
         {
-            Undefined = -1,
-            UnitedStates,
+            Undefined,
             Japanese,
+            UnitedStates,
             UnitedKingdom,
             Italian,
             Spanish,
@@ -91,12 +91,12 @@ namespace OpenKh.Kh2
 
         public static readonly string[] Regions = new string[(int)RegionId.MAX]
         {
-            "us", "jp", "uk", "it", "sp", "gr", "fr", "fm"
+            "", "jp", "us", "uk", "it", "sp", "gr", "fr", "fm"
         };
 
         public static readonly string[] Languages = new string[(int)RegionId.MAX]
         {
-            "us", "jp", "us", "it", "sp", "gr", "fr", "jp"
+            "", "jp", "us", "us", "it", "sp", "gr", "fr", "jp"
         };
 
         public static readonly string[] WorldNames = new string[WorldCount]

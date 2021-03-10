@@ -283,14 +283,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     break;
                 case 1:
                     Log.Info("Starting PCSX2");
-                    if (ConfigurationService.RegionId > 0)
-                    {
-                        _pcsx2Injector.RegionId = ConfigurationService.RegionId - 1;
-                        _pcsx2Injector.Region = Kh2.Constants.Regions[_pcsx2Injector.RegionId];
-                        _pcsx2Injector.Language = Kh2.Constants.Languages[_pcsx2Injector.RegionId];
-                    }
-                    else
-                        _pcsx2Injector.RegionId = -1;
+                    _pcsx2Injector.RegionId = ConfigurationService.RegionId;
+                    _pcsx2Injector.Region = Kh2.Constants.Regions[_pcsx2Injector.RegionId];
+                    _pcsx2Injector.Language = Kh2.Constants.Languages[_pcsx2Injector.RegionId];
 
                     processStartInfo = new ProcessStartInfo
                     {

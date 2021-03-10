@@ -70,6 +70,14 @@ namespace OpenKh.Tools.ModsManager.Services
         private static uint SYSCALL() => 0x0000000C;
         private static uint JAL(uint offset) =>
             0x0C000000U | (offset / 4);
+        private static uint BLTZ(uint reg, short jump) =>
+            0x04000000U | (0 << 16) | (reg << 21) | (ushort)jump;
+        private static uint BGEZ(uint reg, short jump) =>
+            0x04000000U | (1 << 16) | (reg << 21) | (ushort)jump;
+        private static uint BLTZL(uint reg, short jump) =>
+            0x04000000U | (2 << 16) | (reg << 21) | (ushort)jump;
+        private static uint BGEZL(uint reg, short jump) =>
+            0x04000000U | (1 << 16) | (reg << 21) | (ushort)jump;
         private static uint BEQ(uint left, uint right, short jump) =>
             0x10000000U | (right << 16) | (left << 21) | (ushort)jump;
         private static uint BNE(uint left, uint right, short jump) =>
@@ -397,15 +405,14 @@ namespace OpenKh.Tools.ModsManager.Services
         private void WritePatch(Stream stream, Offsets offsets)
         {
             ResetHooks();
-            var bufferedStream = new BufferedStream(stream);
             if (offsets != null)
             {
                 if (offsets.LoadFile > 0)
                 {
                     Log.Info("Injeting LoadFile function");
-                    WritePatch(bufferedStream, offsets.LoadFile,
+                    WritePatch(stream, offsets.LoadFile,
                         ADDIU(T4, RA, 0),
-                        JAL(WriteHook(bufferedStream, LoadFileHook)),
+                        JAL(WriteHook(stream, LoadFileHook)),
                         ADDIU(T5, Zero, (byte)Operation.LoadFile));
                 }
 
@@ -413,9 +420,9 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     Log.Info("Injeting GetFileSize function");
                     var subGetFileSizePtr = stream.SetPosition(offsets.GetFileSize + 8).ReadUInt32();
-                    WritePatch(bufferedStream, offsets.GetFileSize,
+                    WritePatch(stream, offsets.GetFileSize,
                         ADDIU(T4, RA, 0),
-                        JAL(WriteHook(bufferedStream, GetFileSizeHook)),
+                        JAL(WriteHook(stream, GetFileSizeHook)),
                         ADDIU(T5, Zero, (byte)Operation.GetFileSize),
                         subGetFileSizePtr,
                         NOP(),
@@ -427,19 +434,41 @@ namespace OpenKh.Tools.ModsManager.Services
                         ADDIU(SP, SP, 0x10));
                 }
 
-                if (RegionId >= 0)
+                if (RegionId > 0)
                 {
                     Log.Info("Injeting SetupRegion function");
-                    WritePatch(bufferedStream, offsets.RegionInit, RegionInitPatch);
-                    WritePatch(bufferedStream, offsets.RegionForce, Region);
-                    WritePatch(bufferedStream, offsets.RegionForce + 8, Language);
-                    WritePatch(bufferedStream, offsets.RegionId, RegionId);
-                    WritePatch(bufferedStream, offsets.RegionPtr, offsets.RegionForce);
-                    WritePatch(bufferedStream, offsets.LanguagePtr, offsets.RegionForce + 8);
+                    WritePatch(stream, offsets.RegionInit, RegionInitPatch);
+                    WritePatch(stream, offsets.RegionForce, Region);
+                    WritePatch(stream, offsets.RegionForce + 8, Language);
+                    WritePatch(stream, offsets.RegionId, RegionId);
+                    WritePatch(stream, offsets.RegionPtr, offsets.RegionForce);
+                    WritePatch(stream, offsets.LanguagePtr, offsets.RegionForce + 8);
+
+                    if (offsets.GameName == KH2FM)
+                        PatchKh2FmPs2(stream);
                 }
 
-                bufferedStream.Flush();
+                stream.Flush();
             }
+        }
+
+        private void PatchKh2FmPs2(Stream stream)
+        {
+            // Always use "SLPM" for memory card regardless the region
+            WritePatch(stream, 0x240138,
+                ADDIU(V0, Zero, (int)Kh2.Constants.RegionId.FinalMix));
+
+            // Always use "BI" for memory card regardless the region
+            WritePatch(stream, 0x2402E8,
+                ADDIU(V0, Zero, (int)Kh2.Constants.RegionId.FinalMix),
+                NOP());
+
+            // Always use "KH2J" header for saves
+            WritePatch(stream, 0x105870,
+                LUI(V0, 0x4A32),
+                ADDIU(V0, V0, 0x484B),
+                JR(RA),
+                NOP());
         }
 
         private void ResetHooks() => _nextHookPtr = BaseHookPtr;
