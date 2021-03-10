@@ -173,11 +173,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.PAMtoFBXConverter", "OpenKh.Command.PAMtoFBXConverter\OpenKh.Command.PAMtoFBXConverter.csproj", "{A9695331-C335-4C62-B5B3-7FB3ED512EA3}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.PAMtoFBXConverter", "OpenKh.Command.PAMtoFBXConverter\OpenKh.Command.PAMtoFBXConverter.csproj", "{A9695331-C335-4C62-B5B3-7FB3ED512EA3}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.PAtkEditor", "OpenKh.Tools.PAtkEditor\OpenKh.Tools.PAtkEditor.csproj", "{5B6A7706-0028-4634-AE35-18E2BEAFD3D4}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.PAtkEditor", "OpenKh.Tools.PAtkEditor\OpenKh.Tools.PAtkEditor.csproj", "{5B6A7706-0028-4634-AE35-18E2BEAFD3D4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.OloEditor", "OpenKh.Tools.OloEditor\OpenKh.Tools.OloEditor.csproj", "{940E9927-13D3-4CC7-8034-37982E3885C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.MissionEditor", "OpenKh.Tools.MissionEditor\OpenKh.Tools.MissionEditor.csproj", "{A88E268F-A8CC-48E4-8AE9-5CC7A774022D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.MissionEditor", "OpenKh.Tools.MissionEditor\OpenKh.Tools.MissionEditor.csproj", "{A88E268F-A8CC-48E4-8AE9-5CC7A774022D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ModsManager", "OpenKh.Tools.ModsManager\OpenKh.Tools.ModsManager.csproj", "{A1BCC739-3BDC-41AF-BD0B-78C5E55F88A2}"
 EndProject

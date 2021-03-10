@@ -549,8 +549,13 @@ namespace OpenKh.Bbs
             WriteTextureData(stream, pmo);
             WriteTextureOffsets(stream, pmo);
 
-            if (pmo.header.SkeletonOffset != 0)
+            if (pmo.boneList.Length > 0)
             {
+                stream.Seek(0, SeekOrigin.End);
+                pmo.header.SkeletonOffset = (uint)stream.Position;
+                stream.Seek(0xC, SeekOrigin.Begin);
+                stream.Write(pmo.header.SkeletonOffset);
+                stream.Seek(0, SeekOrigin.End);
                 stream.Seek(pmo.header.SkeletonOffset, SeekOrigin.Begin);
                 Mapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
 

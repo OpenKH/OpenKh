@@ -190,7 +190,9 @@ namespace OpenKh.Command.PmoConverter
             }
 
             //pmo.header.SkeletonOffset = pmo.header.MeshOffset0 + 0;
-            pmo.skeletonHeader.MagicValue = 0x4E4F42;
+            pmo.skeletonHeader = new Pmo.SkeletonHeader();
+            pmo.boneList = new Pmo.BoneData[0];
+            /*pmo.skeletonHeader.MagicValue = 0x4E4F42;
             pmo.skeletonHeader.BoneCount = (ushort)BoneData.Count;
             pmo.skeletonHeader.SkinnedBoneCount = (ushort)BoneData.Count;
             pmo.skeletonHeader.nStdBone = 2;
@@ -201,6 +203,21 @@ namespace OpenKh.Command.PmoConverter
             {
                 Pmo.BoneData bn = new Pmo.BoneData();
                 bn.BoneIndex = (ushort)b;
+
+                Assimp.Node curNode = new Assimp.Node();
+                ushort p = 0;
+                foreach(var nd in NodeData)
+                {
+                    p++;
+                    if(nd.Name == BoneData[b].Name)
+                    {
+                        curNode = nd;
+                        p--;
+                        break;
+                    }
+                }
+
+                bn.ParentBoneIndex = p;
                 bn.JointName = BoneData[b].Name;
 
                 Matrix4x4 mtx = new Matrix4x4();
@@ -224,7 +241,7 @@ namespace OpenKh.Command.PmoConverter
                 bn.Transform = mtx;
                 bn.InverseTransform = mtx;
                 pmo.boneList[b] = bn;
-            }
+            }*/
 
             return pmo;
         }
@@ -338,10 +355,12 @@ namespace OpenKh.Command.PmoConverter
             const float Scale = 1.0f;
             var assimp = new Assimp.AssimpContext();
             var scene = assimp.ImportFile(filePath, Assimp.PostProcessSteps.PreTransformVertices);
+            var BoneScene = assimp.ImportFile(filePath);
             var baseFilePath = Path.GetDirectoryName(filePath);
             TexList = new List<string>();
             TextureData = new List<Tm2>();
             BoneData = new List<Assimp.Bone>();
+            NodeData = new List<Assimp.Node>();
 
             foreach(Assimp.Material mat in scene.Materials)
             {
@@ -362,7 +381,7 @@ namespace OpenKh.Command.PmoConverter
             }
 
             Assimp.Bone rBone = new Assimp.Bone();
-            foreach(var m in scene.Meshes)
+            foreach(var m in BoneScene.Meshes)
             {
                 foreach(var bn in m.Bones)
                 {
@@ -371,13 +390,7 @@ namespace OpenKh.Command.PmoConverter
                 }
             }
 
-            foreach(var nd in scene.RootNode.Children)
-            {
-                foreach(var n in nd.Children)
-                {
-                    int m = n.ChildCount;
-                }
-            }
+            NodeData.AddRange(BoneScene.RootNode.Children.ToList());
 
             return new MeshGroup()
             {
