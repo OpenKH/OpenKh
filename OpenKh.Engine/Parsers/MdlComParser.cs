@@ -12,10 +12,19 @@ namespace OpenKh.Engine.Parsers
         private Matrix4x4 GetMatrix(List<Mdl.Bone> bones, int index)
         {
             var bone = bones[index];
-            var parent = bone.ParIds >= 0 ?
-                GetMatrix(bones, bone.ParIds) :
+            var parent = bone.Parent >= 0 ?
+                GetMatrix(bones, bone.Parent) :
                 Matrix4x4.Identity;
             return Matrix4x4.Multiply(bone.Matrix, parent);
+        }
+
+        private Matrix4x4 GetMatrix(List<Mdl.Bone> bones, Matrix4x4[] matrices, int index)
+        {
+            var bone = bones[index];
+            var parent = bone.Parent >= 0 ?
+                GetMatrix(bones, bone.Parent) :
+                Matrix4x4.Identity;
+            return Matrix4x4.Multiply(matrices[index], parent);
         }
 
         private readonly Mdl _mdl;
@@ -30,7 +39,7 @@ namespace OpenKh.Engine.Parsers
             MeshDescriptors = mdl.Meshes
                 .Select(UnstripTriangles)
                 .ToList();
-            InitialPose = _mdl.Bones.Select((x, i) => GetMatrix(_mdl.Bones, i)).ToArray();
+            InitialPose = _mdl.Bones.Select(x => x.Matrix).ToArray();
             CurrentPose = InitialPose;
         }
 
@@ -39,10 +48,15 @@ namespace OpenKh.Engine.Parsers
         public List<Mdlx.Bone> Bones => new List<Mdlx.Bone>();
 
         public Matrix4x4[] InitialPose { get; }
-        public Matrix4x4[] CurrentPose { get; }
+        public Matrix4x4[] CurrentPose { get; private set; }
 
         public void ApplyMotion(Matrix4x4[] matrices)
         {
+            var m = new Matrix4x4[matrices.Length];
+            for (var i = 0; i < matrices.Length; i++)
+                m[i] = GetMatrix(_mdl.Bones, matrices, i);
+            CurrentPose = m;
+
             for (var i = 0; i < MeshDescriptors.Count; i++)
             {
                 var meshDescriptor = MeshDescriptors[i];
@@ -52,7 +66,7 @@ namespace OpenKh.Engine.Parsers
                     for (var j = 0; j < mesh.Vertices.Length; j++)
                     {
                         var pos = Vector3.Transform(mesh.Vertices[j].Position.Position,
-                            InitialPose[mesh.Vertices[j].Position.BoneId]);
+                            m[mesh.Vertices[j].Position.BoneIndex]);
                         meshDescriptor.Vertices[j].X = pos.X * 100f;
                         meshDescriptor.Vertices[j].Y = pos.Y * 100f;
                         meshDescriptor.Vertices[j].Z = pos.Z * 100f;

@@ -42,12 +42,12 @@ namespace OpenKh.Recom
         public class Bone
         {
             [Data(Count = 16)] public string Name { get; set; }
-            [Data] public short ParIds { get; set; }
+            [Data] public short Parent { get; set; }
             [Data] public short Unknown { get; set; }
             public Matrix4x4 Matrix;
 
             public override string ToString() =>
-                $"{Name} {ParIds:X} {Unknown:X}";
+                $"{Name} {Parent:X} {Unknown:X}";
         }
 
         public class Material
@@ -109,7 +109,7 @@ namespace OpenKh.Recom
         {
             [Data] public Vector3 Position { get; set; }
             [Data] public short Unk1c { get; set; }
-            [Data] public short BoneId { get; set; }
+            [Data] public short BoneIndex { get; set; }
 
             public override string ToString() =>
                 Position.ToString();
