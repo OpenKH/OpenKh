@@ -27,6 +27,15 @@ function Test-Success([int] $exitCode) {
     }
 }
 
+function Get-CSProjects([string]$filter) {
+    Get-ChildItem -Filter $filter | ForEach-Object {
+        $csprojPath = (Join-Path $_.FullName $_.Name) + ".csproj"
+        if ( Test-Path -Path $csprojPath -PathType Leaf ) {
+            Write-Output $csprojPath
+        }
+    }
+}
+
 # Use submodules
 git submodule update --init --recursive --depth 1
 Test-Success $LASTEXITCODE
@@ -47,20 +56,19 @@ dotnet new sln -n $solutionBase --force
 Test-Success $LASTEXITCODE
 
 # Add items to solution
-Get-ChildItem -Filter OpenKh.Command.* | ForEach-Object {
-    dotnet sln $solution add $_.FullName
+Get-CSProjects "OpenKh.Command.*" | ForEach-Object {
+    dotnet sln $solution add $_
+}
+Get-CSProjects "OpenKh.Tools.*" | ForEach-Object {
+    dotnet sln $solution add $_
     Test-Success $LASTEXITCODE
 }
-Get-ChildItem -Filter OpenKh.Tools.* | ForEach-Object {
-    dotnet sln $solution add $_.FullName
+Get-CSProjects "OpenKh.WinShell.*" | ForEach-Object {
+    dotnet sln $solution add $_
     Test-Success $LASTEXITCODE
 }
-Get-ChildItem -Filter OpenKh.WinShell.* | ForEach-Object {
-    dotnet sln $solution add $_.FullName
-    Test-Success $LASTEXITCODE
-}
-Get-ChildItem -Filter OpenKh.Game* | ForEach-Object {
-    dotnet sln $solution add $_.FullName
+Get-CSProjects "OpenKh.Game*" | ForEach-Object {
+    dotnet sln $solution add $_
     Test-Success $LASTEXITCODE
 }
 
