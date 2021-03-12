@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xe.Tools.Wpf", "XeEngine.To
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xe.Tools", "XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj", "{C02F5C8B-16A0-4591-A65D-8A7E845D5F59}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{812E9C9B-C5AA-459B-9C30-FCAE79A0B3B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "Playground\Playground.csproj", "{812E9C9B-C5AA-459B-9C30-FCAE79A0B3B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.DpdViewer", "OpenKh.Tools.DpdViewer\OpenKh.Tools.DpdViewer.csproj", "{CC70D894-EAFB-43F8-9DF3-3AC6DE95E093}"
 EndProject
@@ -168,7 +168,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ItbEditor", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.IteViewer", "IteEditor\OpenKh.Tools.IteViewer.csproj", "{7BA60C7F-4DA9-4A62-A1DC-0F8FF87E4430}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.PAMtoFBXConverter", "OpenKh.Command.PAMtoFBXConverter\OpenKh.Command.PAMtoFBXConverter.csproj", "{A9695331-C335-4C62-B5B3-7FB3ED512EA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.PAMtoFBXConverter", "OpenKh.Command.PAMtoFBXConverter\OpenKh.Command.PAMtoFBXConverter.csproj", "{A9695331-C335-4C62-B5B3-7FB3ED512EA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
