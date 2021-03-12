@@ -16,8 +16,8 @@ PMP files contain several [PMOs](./pmo.md) and their associated [textures](../co
 | 0x12 | uint16 | Model Instance Count |
 | 0x14 | uint32 | Padding |
 | 0x18 | uint16 | Padding |
-| 0x1C | uint16 | Texture Count |
-| 0x1E | uint32 | Texture List Offset |
+| 0x1A | uint16 | Texture Count |
+| 0x1C | uint32 | Texture List Offset |
 
 ### Map Flags
 
