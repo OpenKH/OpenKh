@@ -515,7 +515,7 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
-        public void ListReplaceTest()
+        public void ListReplaceFmlvTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
@@ -539,94 +539,6 @@ namespace OpenKh.Tests.Patcher
                                 {
                                     Name = "FmlvList.yml",
                                     Type = "fmlv"
-                                }
-                            }
-                        }
-                    }
-                },
-                new AssetFile
-                {
-                    Name = "lvup.bin",
-                    Method = "binarc",
-                    Source = new List<AssetFile>
-                    {
-                        new AssetFile
-                        {
-                            Name = "lvup",
-                            Method = "listreplace",
-                            Type = "List",
-                            Source = new List<AssetFile>
-                            {
-                                new AssetFile
-                                {
-                                    Name = "LvupList.yml",
-                                    Type = "lvup"
-                                }
-                            }
-                        }
-                    }
-                },
-                new AssetFile
-                {
-                    Name = "bons.bin",
-                    Method = "binarc",
-                    Source = new List<AssetFile>
-                    {
-                        new AssetFile
-                        {
-                            Name = "bons",
-                            Method = "listreplace",
-                            Type = "List",
-                            Source = new List<AssetFile>
-                            {
-                                new AssetFile
-                                {
-                                    Name = "BonsList.yml",
-                                    Type = "bons"
-                                }
-                            }
-                        }
-                    }
-                },
-                new AssetFile
-                {
-                    Name = "trsr.bin",
-                    Method = "binarc",
-                    Source = new List<AssetFile>
-                    {
-                        new AssetFile
-                        {
-                            Name = "trsr",
-                            Method = "listreplace",
-                            Type = "List",
-                            Source = new List<AssetFile>
-                            {
-                                new AssetFile
-                                {
-                                    Name = "TrsrList.yml",
-                                    Type = "trsr"
-                                }
-                            }
-                        }
-                    }
-                },
-                new AssetFile
-                {
-                    Name = "item.bin",
-                    Method = "binarc",
-                    Source = new List<AssetFile>
-                    {
-                        new AssetFile
-                        {
-                            Name = "item",
-                            Method = "listreplace",
-                            Type = "List",
-                            Source = new List<AssetFile>
-                            {
-                                new AssetFile
-                                {
-                                    Name = "ItemList.yml",
-                                    Type = "item"
                                 }
                             }
                         }
@@ -674,11 +586,57 @@ namespace OpenKh.Tests.Patcher
 
             #endregion
 
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "fmlv.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "fmlv.bin")).Using(stream =>
+            {
+                var fmlv = Kh2.Battle.Fmlv.Read(stream);
+                Assert.True(fmlv[0] == testFmlv);
+            });
+        }
+
+        [Fact]
+        public void ListReplaceLvupTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                new AssetFile
+                {
+                    Name = "lvup.bin",
+                    Method = "binarc",
+                    Source = new List<AssetFile>
+                    {
+                        new AssetFile
+                        {
+                            Name = "lvup",
+                            Method = "listreplace",
+                            Type = "List",
+                            Source = new List<AssetFile>
+                            {
+                                new AssetFile
+                                {
+                                    Name = "LvupList.yml",
+                                    Type = "lvup"
+                                }
+                            }
+                        }
+                    }
+                }
+                }
+            };
+
             #region lvupPatch
 
             File.Create(Path.Combine(AssetsInputDir, "lvup.bin")).Using(stream =>
             {
-                var fmlvStream = new Kh2.Battle.Lvup { 
+                var fmlvStream = new Kh2.Battle.Lvup
+                {
                     Characters = new List<Kh2.Battle.Lvup.PlayableCharacter>
                     {
                         new Kh2.Battle.Lvup.PlayableCharacter
@@ -736,6 +694,51 @@ namespace OpenKh.Tests.Patcher
 
             #endregion
 
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "lvup.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "lvup.bin")).Using(stream =>
+            {
+                var lvup = Kh2.Battle.Lvup.Read(stream);
+                Assert.True(lvup.Characters[0].Levels[0] == soraLevel0);
+            });
+        }
+
+        [Fact]
+        public void ListReplaceBonsTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                new AssetFile
+                {
+                    Name = "bons.bin",
+                    Method = "binarc",
+                    Source = new List<AssetFile>
+                    {
+                        new AssetFile
+                        {
+                            Name = "bons",
+                            Method = "listreplace",
+                            Type = "List",
+                            Source = new List<AssetFile>
+                            {
+                                new AssetFile
+                                {
+                                    Name = "BonsList.yml",
+                                    Type = "bons"
+                                }
+                            }
+                        }
+                    }
+                },
+                }
+            };
+
             #region bonsPatch
 
             File.Create(Path.Combine(AssetsInputDir, "bons.bin")).Using(stream =>
@@ -765,6 +768,51 @@ namespace OpenKh.Tests.Patcher
 
             #endregion
 
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "bons.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "bons.bin")).Using(stream =>
+            {
+                var bons = Kh2.Battle.Bons.Read(stream);
+                Assert.True(bons[0] == testBons[0]);
+            });
+        }
+
+        [Fact]
+        public void ListReplaceTrsrTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                new AssetFile
+                {
+                    Name = "trsr.bin",
+                    Method = "binarc",
+                    Source = new List<AssetFile>
+                    {
+                        new AssetFile
+                        {
+                            Name = "trsr",
+                            Method = "listreplace",
+                            Type = "List",
+                            Source = new List<AssetFile>
+                            {
+                                new AssetFile
+                                {
+                                    Name = "TrsrList.yml",
+                                    Type = "trsr"
+                                }
+                            }
+                        }
+                    }
+                }
+                }
+            };
+
             #region trsrPatch
             File.Create(Path.Combine(AssetsInputDir, "trsr.bin")).Using(stream =>
             {
@@ -790,6 +838,51 @@ namespace OpenKh.Tests.Patcher
 
             File.WriteAllText(Path.Combine(ModInputDir, "TrsrList.yml"), serializer.Serialize(testTrsr));
             #endregion
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "trsr.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "trsr.bin")).Using(stream =>
+            {
+                var trsr = Kh2.SystemData.Trsr.Read(stream);
+                Assert.True(trsr[0] == testTrsr[0]);
+            });
+        }
+
+        [Fact]
+        public void ListReplaceItemTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                { 
+                new AssetFile
+                {
+                    Name = "item.bin",
+                    Method = "binarc",
+                    Source = new List<AssetFile>
+                    {
+                        new AssetFile
+                        {
+                            Name = "item",
+                            Method = "listreplace",
+                            Type = "List",
+                            Source = new List<AssetFile>
+                            {
+                                new AssetFile
+                                {
+                                    Name = "ItemList.yml",
+                                    Type = "item"
+                                }
+                            }
+                        }
+                    }
+                }
+                }
+            };
 
             #region itemPatch
             File.Create(Path.Combine(AssetsInputDir, "item.bin")).Using(stream =>
@@ -837,39 +930,15 @@ namespace OpenKh.Tests.Patcher
             };
 
             File.WriteAllText(Path.Combine(ModInputDir, "ItemList.yml"), serializer.Serialize(testItem));
-            
+
 
 
             #endregion
 
             patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
 
-            AssertFileExists(ModOutputDir, "fmlv.bin");
-            AssertFileExists(ModOutputDir, "lvup.bin");
-            AssertFileExists(ModOutputDir, "bons.bin");
-            AssertFileExists(ModOutputDir, "trsr.bin");
             AssertFileExists(ModOutputDir, "item.bin");
 
-            File.OpenRead(Path.Combine(ModOutputDir, "fmlv.bin")).Using(stream =>
-            {
-                var fmlv = Kh2.Battle.Fmlv.Read(stream);
-                Assert.True(fmlv[0] == testFmlv);
-            });
-            File.OpenRead(Path.Combine(ModOutputDir, "lvup.bin")).Using(stream =>
-            {
-                var lvup = Kh2.Battle.Lvup.Read(stream);
-                Assert.True(lvup.Characters[0].Levels[0] == soraLevel0);
-            });
-            File.OpenRead(Path.Combine(ModOutputDir, "bons.bin")).Using(stream =>
-            {
-                var bons = Kh2.Battle.Bons.Read(stream);
-                Assert.True(bons[0] == testBons[0]);
-            });
-            File.OpenRead(Path.Combine(ModOutputDir, "trsr.bin")).Using(stream =>
-            {
-                var trsr = Kh2.SystemData.Trsr.Read(stream);
-                Assert.True(trsr[0] == testTrsr[0]);
-            });
             File.OpenRead(Path.Combine(ModOutputDir, "item.bin")).Using(stream =>
             {
                 var item = Kh2.SystemData.Item.Read(stream);
