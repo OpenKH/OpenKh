@@ -311,22 +311,28 @@ namespace OpenKh.Patcher
                         case "item":
                             var itemList = Kh2.SystemData.Item.Read(stream);
                             var moddedItem = deserializer.Deserialize<Kh2.SystemData.Item>(sourceText);
-                             foreach (var item in moddedItem.Items1)
-                             {
-                                var itemToUpdate = itemList.Items1.FirstOrDefault(x => x.Id == item.Id);
-                                if (itemToUpdate != null)
+                            if (moddedItem.Items1 != null)
+                            {
+                                foreach (var item in moddedItem.Items1)
                                 {
-                                    itemList.Items1[itemList.Items1.IndexOf(itemToUpdate)] = item;
+                                    var itemToUpdate = itemList.Items1.FirstOrDefault(x => x.Id == item.Id);
+                                    if (itemToUpdate != null)
+                                    {
+                                        itemList.Items1[itemList.Items1.IndexOf(itemToUpdate)] = item;
+                                    }
                                 }
-                             }
-                             foreach (var item in moddedItem.Items2)
-                             {
-                                var itemToUpdate = itemList.Items2.FirstOrDefault(x => x.Id == item.Id);
-                                if (itemToUpdate != null)
+                            }
+                            if (moddedItem.Items2 != null)
+                            {
+                                foreach (var item in moddedItem.Items2)
                                 {
-                                    itemList.Items2[itemList.Items2.IndexOf(itemToUpdate)] = item;
+                                    var itemToUpdate = itemList.Items2.FirstOrDefault(x => x.Id == item.Id);
+                                    if (itemToUpdate != null)
+                                    {
+                                        itemList.Items2[itemList.Items2.IndexOf(itemToUpdate)] = item;
+                                    }
                                 }
-                             }
+                            }
                             itemList.Write(stream.SetPosition(0));
                             break;
 
@@ -342,36 +348,36 @@ namespace OpenKh.Patcher
                                 formList[form.FinalMixForm].Add(form);
                             }
                             var moddedForms = deserializer.Deserialize<Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv>>>(sourceText);
-                            foreach (var form in moddedForms)
-                            {
-                                foreach (var level in form.Value)
+                                foreach (var form in moddedForms)
                                 {
-                                    formList[form.Key][level.FormLevel - 1] = level;
-                                }
+                                    foreach (var level in form.Value)
+                                    {
+                                        formList[form.Key][level.FormLevel - 1] = level;
+                                    }
 
-                            }
+                                }
                             Kh2.Battle.Fmlv.Write(stream.SetPosition(0), formList.Values.SelectMany(x=>x).ToList());
                             break;
 
                         case "lvup":
                             var levelList = Kh2.Battle.Lvup.Read(stream);
                             var moddedLevels = deserializer.Deserialize<Kh2.Battle.Lvup>(sourceText);
-                            int i = 0;
-                            foreach (var character in moddedLevels.Characters)
-                            {
-                                levelList.Characters[i].Levels = character.Levels;
-                                i++;
-                            }
+                                int i = 0;
+                                foreach (var character in moddedLevels.Characters)
+                                {
+                                    levelList.Characters[i].Levels = character.Levels;
+                                    i++;
+                                }
                             levelList.Write(stream.SetPosition(0));
                             break;
 
                         case "bons":
                             var bonusList = Kh2.Battle.Bons.Read(stream).ToDictionary(x => String.Concat(x.RewardId, characterMap.FirstOrDefault(y => y.Value == x.CharacterId).Key), x => x);
                             var moddedBonus = deserializer.Deserialize<Dictionary<string, Kh2.Battle.Bons>>(sourceText);
-                            foreach (var bonus in moddedBonus)
-                            {
-                                bonusList[bonus.Key] = bonus.Value;
-                            }
+                                foreach (var bonus in moddedBonus)
+                                {
+                                    bonusList[bonus.Key] = bonus.Value;
+                                }
                             Kh2.Battle.Bons.Write(stream.SetPosition(0), bonusList.Values);
                             break;
 
