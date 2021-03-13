@@ -58,6 +58,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 _selectedValue = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsModSelected));
+                OnPropertyChanged(nameof(IsModInfoVisible));
+                OnPropertyChanged(nameof(IsModUnselectedMessageVisible));
                 OnPropertyChanged(nameof(MoveUp));
                 OnPropertyChanged(nameof(MoveDown));
                 OnPropertyChanged(nameof(AddModCommand));
@@ -65,6 +68,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(OpenModFolderCommand));
             }
         }
+
+        public bool IsModSelected => SelectedValue != null;
+
+        public Visibility IsModInfoVisible => IsModSelected ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
 
         public bool IsBuilding
         {
@@ -161,7 +169,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         ReloadModsList();
                     });
                 }
-            }, _ => SelectedValue != null);
+            }, _ => IsModSelected);
             OpenModFolderCommand = new RelayCommand(_ =>
             {
                 using var process = Process.Start(new ProcessStartInfo
@@ -169,7 +177,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     FileName = SelectedValue.Path,
                     UseShellExecute = true
                 });
-            });
+            }, _ => IsModSelected);
             MoveUp = new RelayCommand(_ => MoveSelectedModUp(), _ => CanSelectedModMoveUp());
             MoveDown = new RelayCommand(_ => MoveSelectedModDown(), _ => CanSelectedModMoveDown());
             BuildCommand = new RelayCommand(async _ =>

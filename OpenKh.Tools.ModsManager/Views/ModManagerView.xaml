@@ -88,9 +88,24 @@
                 </Button>
             </StackPanel>
         </Grid>
-        <ScrollViewer Grid.Column="3">
-            <local:ModDetailsView Grid.Column="3" DataContext="{Binding SelectedValue}"/>
-        </ScrollViewer>
+        <Grid Grid.Column="3">
+            <StackPanel Visibility="{Binding IsModUnselectedMessageVisible}">
+                <TextBlock Margin="0 0 0 3" Text="The selected mod info will be displayed here." TextWrapping="Wrap"/>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    To add a new mod click the '+' button or go to the Mods menu.
+                    A simple mod to add for testing can be 'OpenKH/mod-template'.
+                </TextBlock>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Once you will select the mods you want to, go to the menu 'Run'
+                    and then select 'Build and Run'! The 'Build' is only required when the
+                    content of a mod or the selected mod changes. If you are unsure, you
+                    can just always use 'Build and Run'.
+                </TextBlock>
+            </StackPanel>
+            <ScrollViewer Visibility="{Binding IsModInfoVisible}">
+                <local:ModDetailsView Grid.Column="3" DataContext="{Binding SelectedValue}"/>
+            </ScrollViewer>
+        </Grid>
 
     </Grid>
 </UserControl>
