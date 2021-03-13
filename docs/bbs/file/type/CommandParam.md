@@ -19,6 +19,67 @@ This data is located with the game's executable.
 
 ** This list can be used for special purposes, mainly for non-equippable commands, that will be listed down here per command.
 
+Holy:
+- LV7 % HP Recovery
+- LV8 Unknown (10)
+
+Magic Hour:
+- LV6 Amount of hits LV1
+- LV7 Amount of hits LV2
+- LV8 Amount of hits LV3
+- LV9 Amount of hits LV4
+- LV10 Amount of hits LV5
+
+Snipe Thunder:
+- LV4 Amount of thunder attacks
+- LV5 Amount of button presses (1st time)
+- LV6 Amount of button presses (2nd time)
+- LV7 Unknown (possibly thunder damage?)(150)
+- LV8 Unknown (possibly thunder damage?)(180)
+- LV9 Unknown (possibly thunder damage?)(210)
+
+Sweet Memories:
+- LV4 Attack Count (1st time)
+- LV5 Attack Count (2nd time)
+- LV6 Attack Count (3rd time)
+- LV7 Attack Damage (1st time)
+- LV8 Attack Damage (2nd time)
+- LV9 Attack Damage (3rd time)
+
+Donald Cosmic:
+- LV4 Amount of Attacks
+- LV7 Allowed Misses?
+- LV8 Burn % Chance
+- LV9 Unknown
+
+Goofy Turbo:
+- LV4 Turbo Duration
+
+Dragon Breath:
+- LV4 Wait between attacks
+- LV7 Fire Duration
+
+Blessing Dance:
+- LV4 Attack Count
+
+Sweet Seven:
+- LV4 Amount of Attacks
+- LV7 Allowed Wait Time Between Attacks
+
+Air Dive:
+- LV4 Amount of dives
+
+Landbreaker:
+- LV4 Amount of attacks
+- LV5 Wait time between attacks
+
+Gold Rush:
+- LV6 % Chance of dropping muny
+- LV7 Max amount of munny prizes
+
+Crazy Hours:
+- LV6 % Stun/Stop
+
 Heal Strike:
 - LV1 Forward Dash Damage
 - LV2 Spin Strike Damage
@@ -38,10 +99,10 @@ Surprise:
 - LV6 % Stop
 - LV7 Number of prizes
 
-Air Arts 4:
+Air Arts:
 - LV6 Stun % Chance
 
-Magical Pulse 4:
+Magical Pulse:
 - LV1 Hit 1 Strength
 - LV2 Hit 2 Strength
 - LV3 Hit 3 Strength
@@ -49,7 +110,7 @@ Magical Pulse 4:
 - LV7 Ailment % Hit 2
 - LV8 Ailment % Hit 3
 
-Black Star 2:
+Black Star:
 - LV1 Keyblade Rise Strength
 - LV2 Wave Strength
 - LV3 Meteorite Strength
