@@ -383,8 +383,6 @@ namespace OpenKh.Patcher
 
                         case "objentry":
                             var objEntryList = Kh2.Objentry.Read(stream).ToDictionary(x => x.ObjectId, x=>x);
-                            var serializer = new Serializer().Serialize(objEntryList);
-                            File.WriteAllText(context.GetSourceModAssetPath("objentry.yml"), serializer);
                             var moddedObjEntry = deserializer.Deserialize<Dictionary<uint, Kh2.Objentry>>(sourceText);
                             foreach (var objEntry in moddedObjEntry)
                             {
