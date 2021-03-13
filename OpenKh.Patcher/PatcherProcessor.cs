@@ -381,6 +381,18 @@ namespace OpenKh.Patcher
                             Kh2.Battle.Bons.Write(stream.SetPosition(0), bonusList.Values);
                             break;
 
+                        case "objentry":
+                            var objEntryList = Kh2.Objentry.Read(stream).ToDictionary(x => x.ObjectId, x=>x);
+                            var serializer = new Serializer().Serialize(objEntryList);
+                            File.WriteAllText(context.GetSourceModAssetPath("objentry.yml"), serializer);
+                            var moddedObjEntry = deserializer.Deserialize<Dictionary<uint, Kh2.Objentry>>(sourceText);
+                            foreach (var objEntry in moddedObjEntry)
+                            {
+                                objEntryList[objEntry.Key] = objEntry.Value;
+                            }
+                            Kh2.Objentry.Write(stream.SetPosition(0), objEntryList.Values);
+                            break;
+
                         default:
                             break;
                     }
