@@ -28,19 +28,19 @@ PTX files followed by `-evt` decide what happens when an event triggers, such as
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0    | uint16 | 
-| 0x2    | uint16 | 
-| 0x4    | uint16 | 
-| 0x6    | uint16 | 
+| 0x0    | uint16 | unk0
+| 0x2    | uint16 | unk2
+| 0x4    | uint16 | unk4
+| 0x6    | uint16 | unk6
 | 0x8    | uint32 | Start event? (1 auto-starts teleport)
 | 0xC    | uint32 | (Anything other than 0x2 crashes)
-| 0x10   | uint16 | 
+| 0x10   | uint16 | unk10
 | 0x12   | uint16 | World
 | 0x14   | uint16 | Room
 | 0x16   | uint16 | Entrance
-| 0x18   | uint16 | 
-| 0x1A   | uint16 | 
-| 0x1C   | uint16 | `Always 0xFF`
+| 0x18   | uint16 | unk18
+| 0x1A   | uint16 | unk1a
+| 0x1C   | uint16 | unk1c `Always 0xFF`
 
 ## Music Section
 
