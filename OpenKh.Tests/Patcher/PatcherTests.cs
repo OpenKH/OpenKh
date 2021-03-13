@@ -1014,13 +1014,13 @@ namespace OpenKh.Tests.Patcher
                 new AssetFile
                 {
                     Name = "objentry.bin",
-                    Method = "binarc",
+                    Method = "listreplace",
                     Source = new List<AssetFile>
                     {
                         new AssetFile
                         {
                             Name = "ObjEntryList.yml",
-                            Type = "obj"
+                            Type = "objentry"
                         }
                     }
                 },
