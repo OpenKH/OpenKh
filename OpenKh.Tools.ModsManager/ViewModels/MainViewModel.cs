@@ -303,8 +303,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     break;
             }
 
-            if (processStartInfo == null)
+            if (processStartInfo == null || !File.Exists(processStartInfo.FileName))
+            {
+                MessageBox.Show(
+                    "Unable to locate the executable. Please run the Wizard by going to the Settings menu.",
+                    "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CloseAllWindows();
                 return Task.CompletedTask;
+            }
 
             _runningProcess = new Process() { StartInfo = processStartInfo };
             _runningProcess.OutputDataReceived += (sender, e) => CaptureLog(e.Data);
