@@ -1002,6 +1002,67 @@ namespace OpenKh.Tests.Patcher
             }, ModOutputDir, patch.Assets[0].Multi[0].Name);
         }
 
+        [Fact]
+        public void ListReplaceObjEntryTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                new AssetFile
+                {
+                    Name = "objentry.bin",
+                    Method = "binarc",
+                    Source = new List<AssetFile>
+                    {
+                        new AssetFile
+                        {
+                            Name = "ObjEntryList.yml",
+                            Type = "obj"
+                        }
+                    }
+                },
+                }
+            };
+
+            #region objEntryPatch
+
+            File.Create(Path.Combine(AssetsInputDir, "objentry.bin")).Using(stream =>
+            {
+                var objEntryStream = new Kh2.Objentry {
+                    ObjectId = 1,
+                    ModelName = "M_EX060"
+                };
+                Kh2.Objentry.Write(stream, new List<Kh2.Objentry> { objEntryStream });
+            });
+
+            var testObjEntry = new Dictionary<uint,Kh2.Objentry>
+            {
+                { 1,
+                new Kh2.Objentry
+                {
+                    ObjectId = 1,
+                    ModelName = "M_EX050"
+                }
+                }
+            };
+
+            File.WriteAllText(Path.Combine(ModInputDir, "ObjEntryList.yml"), serializer.Serialize(testObjEntry));
+
+            #endregion
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "objentry.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "objentry.bin")).Using(stream =>
+            {
+                var objentry = Kh2.Objentry.Read(stream);
+                Assert.True(objentry[1] == testObjEntry[1]);
+            });
+        }
         private static void AssertFileExists(params string[] paths)
         {
             var filePath = Path.Join(paths);
