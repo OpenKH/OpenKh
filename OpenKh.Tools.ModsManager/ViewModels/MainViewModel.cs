@@ -225,6 +225,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
+                    ConfigurationService.IsFirstRunComplete = true;
                 }
             });
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -234,6 +235,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
             FetchUpdates();
+
+            if (!ConfigurationService.IsFirstRunComplete)
+                WizardCommand.Execute(null);
         }
 
         public void CloseAllWindows()

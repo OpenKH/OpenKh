@@ -24,6 +24,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
 
+            public bool IsFirstRunComplete { get; set; }
             public string ModCollectionPath { get; internal set; }
             public string GameModPath { get; internal set; }
             public string GameDataPath { get; internal set; }
@@ -90,6 +91,16 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static ICollection<string> FeaturedMods { get; private set; }
         public static ICollection<string> BlacklistedMods { get; private set; }
+
+        public static bool IsFirstRunComplete
+        {
+            get => _config.IsFirstRunComplete;
+            set
+            {
+                _config.IsFirstRunComplete = value;
+                _config.Save(ConfigPath);
+            }
+        }
 
         public static string ModCollectionPath
         {
