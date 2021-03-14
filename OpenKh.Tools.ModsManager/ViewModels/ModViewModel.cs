@@ -40,6 +40,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
 
             ReadMetadata();
+            if (Title != null)
+                Name = Title;
 
             UpdateCommand = new RelayCommand(async _ =>
             {
@@ -114,7 +116,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility SourceVisibility => IsHosted ? Visibility.Visible : Visibility.Collapsed;
         public Visibility LocalVisibility => !IsHosted ? Visibility.Visible : Visibility.Collapsed;
 
-        public string Title => _model.Metadata.Title;
+        public string Title => _model?.Metadata?.Title ?? Name;
         public string Name { get; }
         public string Author { get; }
         public string Source => _model.Name;
