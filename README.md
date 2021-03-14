@@ -8,7 +8,7 @@ Aims to centralize all the technical knowledge of the 'Kingdom Hearts' game seri
 
 ## Documentation
 
-All the documentation is located in the `/docs` folder in its raw form. A more web-friendly version can be accessed at: https://openkh.dev/
+All the documentation is located in the `/docs` folder in its raw form. A more web-friendly version can be accessed at: [https://openkh.dev/](https://openkh.dev/)
 
 ## Downloads
 
@@ -18,7 +18,7 @@ New builds of OpenKH are automatically generated every time one of the contribut
 
 All the builds from `master` and from pull requestes are generated from [Azure Pipelines](https://dev.azure.com/xeeynamo/OpenKH/_build).
 
-OpenKH tools require the instllation of the [.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.1). All the UI tools are designed to work on Windows, while command line tools will work on any operating system.
+OpenKH tools require the instllation of the [.NET 5.0 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0). All the UI tools are designed to work on Windows, while command line tools will work on any operating system.
 Note: All CLI and GUI programs **should** be cross-platform, though extensive testing primarily happens on Windows systems.
 
 <p align="center">
@@ -37,7 +37,7 @@ From a community perspective, OpenKH will provide the best form of documentation
 
 ## Build from source code
 
-The minimum requirement is [.NET Core 3.1.x](https://dotnet.microsoft.com/download/dotnet-core/3.1). Once the repository is downloaded, `build.ps1` or `build.sh` needs be executed based from the operating system in use. That is all.
+The minimum requirement is [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0). Once the repository is downloaded, `build.ps1` or `build.sh` needs be executed based from the operating system in use. That is all.
 
 ## Additional info
 

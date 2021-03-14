@@ -2,7 +2,8 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net5.0-windows</TargetFramework>
+        <LangVersion>latest</LangVersion>
 		<AssemblyTitle>KH2 Map Studio</AssemblyTitle>
 		<Product>KH2 Map Studio - OpenKh</Product>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
