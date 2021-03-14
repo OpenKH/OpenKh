@@ -9,6 +9,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using static OpenKh.Tools.ModsManager.Helpers;
 
 namespace OpenKh.Tools.ModsManager.Services
 {
@@ -218,7 +219,7 @@ namespace OpenKh.Tools.ModsManager.Services
             Action<float> progressNumber = null) =>
             RepositoryService.FetchAndResetUponOrigin(GetModPath(modName), progressOutput, progressNumber);
 
-        public static Task RunPacherAsync() => Task.Run(() =>
+        public static Task<bool> RunPacherAsync() => Task.Run(() => Handle(() =>
         {
             if (Directory.Exists(ConfigurationService.GameModPath))
             {
@@ -246,7 +247,9 @@ namespace OpenKh.Tools.ModsManager.Services
                     mod.Metadata,
                     mod.Path);
             }
-        });
+
+            return true;
+        }));
 
         private static string GetSourceFromUrl(string url)
         {
