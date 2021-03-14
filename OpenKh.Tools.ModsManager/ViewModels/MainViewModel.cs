@@ -403,6 +403,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         private async Task FetchUpdates()
         {
+            await Task.Delay(50); // fixes a bug where the UI wanted to refresh too soon
             await foreach (var modUpdate in ModsService.FetchUpdates())
             {
                 var mod = ModsList.FirstOrDefault(x => x.Source == modUpdate.Name);
