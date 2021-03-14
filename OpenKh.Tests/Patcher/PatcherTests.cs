@@ -552,35 +552,34 @@ namespace OpenKh.Tests.Patcher
 
             File.Create(Path.Combine(AssetsInputDir, "fmlv.bin")).Using(stream =>
             {
-                var fmlvStream = new List<Kh2.Battle.Fmlv>{
-                    new Kh2.Battle.Fmlv {
-                        Unk0 = 17,
-                        AbilityLevel = 0,
+                var fmlvStream = new List<Kh2.Battle.Fmlv.Level>{
+                    new Kh2.Battle.Fmlv.Level {
+                        LevelGrowthAbility = 0,
                         Ability = 1,
                         Exp = 70,
                         FormId = 1,
                         FormLevel = 1,
-                        VanillaForm = Kh2.Battle.Fmlv.FormVanilla.Valor,
-                        FinalMixForm = Kh2.Battle.Fmlv.FormFm.Valor
+                        FormVanilla = Kh2.Battle.Fmlv.FormVanilla.Valor,
+                        FormFm = Kh2.Battle.Fmlv.FormFm.Valor
                     }
                 };
                 Kh2.Battle.Fmlv.Write(stream,fmlvStream);
             });
 
-            var testFmlv = new Kh2.Battle.Fmlv
+            var testFmlv = new FmlvDTO
             {
                 Unk0 = 17,
-                AbilityLevel = 1,
+                LevelGrowthAbility = 1,
                 Ability = 17,
                 Exp = 1,
                 FormId = 1,
                 FormLevel = 1,
-                VanillaForm = Kh2.Battle.Fmlv.FormVanilla.Valor,
-                FinalMixForm = Kh2.Battle.Fmlv.FormFm.Valor
+                FormVanilla = Kh2.Battle.Fmlv.FormVanilla.Valor,
+                FormFm = Kh2.Battle.Fmlv.FormFm.Valor
             };
 
-            var fmlvDict = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv>>();
-            fmlvDict.Add(Kh2.Battle.Fmlv.FormFm.Valor, new List<Kh2.Battle.Fmlv>() { testFmlv });
+            var fmlvDict = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<FmlvDTO>>();
+            fmlvDict.Add(Kh2.Battle.Fmlv.FormFm.Valor, new List<FmlvDTO>() { testFmlv });
 
             File.WriteAllText(Path.Combine(ModInputDir, "FmlvList.yml"), serializer.Serialize(fmlvDict));
 
@@ -593,7 +592,8 @@ namespace OpenKh.Tests.Patcher
             File.OpenRead(Path.Combine(ModOutputDir, "fmlv.bin")).Using(stream =>
             {
                 var fmlv = Kh2.Battle.Fmlv.Read(stream);
-                Assert.True(fmlv[0] == testFmlv);
+                Assert.True(fmlv[0].Exp == testFmlv.Exp);
+                Assert.True(fmlv[0].Ability == testFmlv.Ability);
             });
         }
 

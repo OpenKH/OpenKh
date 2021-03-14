@@ -338,21 +338,24 @@ namespace OpenKh.Patcher
 
                         case "fmlv":
                             var formRaw = Kh2.Battle.Fmlv.Read(stream).ToList();
-                            var formList = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv>>();
+                            var formList = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv.Level>>();
                             foreach (var form in formRaw)
                             {
-                                if (!formList.ContainsKey(form.FinalMixForm))
+                                if (!formList.ContainsKey(form.FormFm))
                                 {
-                                    formList.Add(form.FinalMixForm, new List<Kh2.Battle.Fmlv>());
+                                    formList.Add(form.FormFm, new List<Kh2.Battle.Fmlv.Level>());
                                 }
-                                formList[form.FinalMixForm].Add(form);
+                                formList[form.FormFm].Add(form);
                             }
-                            var moddedForms = deserializer.Deserialize<Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv>>>(sourceText);
+                            var moddedForms = deserializer.Deserialize<Dictionary<Kh2.Battle.Fmlv.FormFm, List<FmlvDTO>>>(sourceText);
                                 foreach (var form in moddedForms)
                                 {
                                     foreach (var level in form.Value)
                                     {
-                                        formList[form.Key][level.FormLevel - 1] = level;
+                                        formList[level.FormFm][level.FormLevel - 1].Ability = level.Ability;
+                                        formList[level.FormFm][level.FormLevel - 1].Exp = level.Exp;
+                                        formList[level.FormFm][level.FormLevel - 1].LevelGrowthAbility = level.LevelGrowthAbility;
+                                        
                                     }
 
                                 }
