@@ -863,7 +863,7 @@ namespace OpenKh.Tests.Patcher
                 {
                     new AssetFile()
                     {
-                        Name = "00battle.bar",
+                        Name = "00battle.bin",
                         Method = "binarc",
                         Source = new List<AssetFile>()
                         {
@@ -886,11 +886,11 @@ namespace OpenKh.Tests.Patcher
                 }
             };
 
-            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bin")).Using(stream =>
             {
                 var lvupEntry = new Kh2.Battle.Lvup
                 {
-                    Count = 1,
+                    Count = 13,
                     Unknown08 = new byte[0x38],
                     Characters = new List<Kh2.Battle.Lvup.PlayableCharacter>()
                     {
@@ -904,7 +904,140 @@ namespace OpenKh.Tests.Patcher
                                     Exp = 50
                                 }
                             }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
                         }
+
                     }
                 };
                 using var lvupStream = new MemoryStream();
@@ -931,13 +1064,76 @@ namespace OpenKh.Tests.Patcher
 
             patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
 
-            AssertFileExists(ModOutputDir, "00battle.bar");
+            AssertFileExists(ModOutputDir, "00battle.bin");
 
-            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bin")).Using(stream =>
             {
                 var binarc = Bar.Read(stream);
                 var lvupStream = Kh2.Battle.Lvup.Read(binarc[0].Stream);
                 Assert.True(lvupStream.Characters[0].Levels[0].Exp == 500);
+            });
+
+        }
+
+        [Fact]
+        public void ListReplaceObjEntryTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00objentry.bin",
+                        Method = "listreplace",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "ObjList.yml",
+                                Type = "objentry",
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00objentry.bin")).Using(stream =>
+            {
+                var objEntry = new List<Kh2.Objentry>()
+                {
+                    new Kh2.Objentry
+                    {
+                        ObjectId = 1,
+                        ModelName = "M_EX060",
+                        AnimationName = "M_EX060.mset"
+                    }
+                    };
+                Kh2.Objentry.Write(stream, objEntry);
+            });
+
+            File.Create(Path.Combine(ModInputDir, "ObjList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("1:");
+                writer.WriteLine("  ObjectId: 1");
+                writer.WriteLine("  ModelName: M_EX100");
+                writer.WriteLine("  AnimationName: M_EX100.mset");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00objentry.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00objentry.bin")).Using(stream =>
+            {
+                var objStream = Kh2.Objentry.Read(stream);
+                Assert.True(objStream[0].ModelName == "M_EX100");
+                Assert.True(objStream[0].AnimationName == "M_EX100.mset");
             });
 
         }
