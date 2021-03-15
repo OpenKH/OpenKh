@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Kh1;
 using OpenKh.Kh2;
 using OpenKh.Bbs;
 using OpenKh.Tools.Common;
