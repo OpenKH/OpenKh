@@ -444,9 +444,9 @@ namespace OpenKh.Tools.OloEditor
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(335, 71);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(50, 15);
+            this.label10.Size = new System.Drawing.Size(166, 15);
             this.label10.TabIndex = 1;
-            this.label10.Text = "Param 5";
+            this.label10.Text = "Param 5 (Interaction Distance)";
             // 
             // label6
             // 

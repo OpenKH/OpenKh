@@ -37,7 +37,11 @@ namespace OpenKh.Tools.MissionEditor
 
         private void UpdateWriteInfo()
         {
-
+            mission.Clear();
+            foreach (MissionEntry miss in FlowMission.Controls)
+            {
+                mission.Add(miss.GetMissionData());
+            }
         }
 
         private void LoadMissionButton_Click(object sender, EventArgs e)
@@ -54,6 +58,7 @@ namespace OpenKh.Tools.MissionEditor
                 mission = Mission.Read(missionFile).ToList();
                 UpdateParameters();
                 SaveMissionButton.Enabled = true;
+                AddMissionButton.Enabled = true;
             }
         }
 
@@ -71,6 +76,13 @@ namespace OpenKh.Tools.MissionEditor
                 missionOut.Close();
                 MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void AddMissionButton_Click(object sender, EventArgs e)
+        {
+            MissionEntry ent = new MissionEntry();
+            ent.groupBox1.Text = "Mission " + (FlowMission.Controls.Count + 1);
+            FlowMission.Controls.Add(ent);
         }
     }
 }

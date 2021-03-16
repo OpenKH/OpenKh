@@ -144,7 +144,7 @@ namespace OpenKh.Command.PmoConverter
                     Color.X = desc.Vertices[index].R * 2;
                     Color.Y = desc.Vertices[index].G * 2;
                     Color.Z = desc.Vertices[index].B * 2;
-                    Color.W = desc.Vertices[index].A * 2;
+                    Color.W = 128.0f;
                     chunk.colors.Add(Color);
 
                     Vector3 vec;
@@ -368,7 +368,7 @@ namespace OpenKh.Command.PmoConverter
                 var name = Path.GetFileName(mat.TextureDiffuse.FilePath);
                 if (name != "" || name != null)
                 {
-                    str = File.OpenRead(name + ".png");
+                    str = File.OpenRead(name);
                 }
                 
                 if(str != null)

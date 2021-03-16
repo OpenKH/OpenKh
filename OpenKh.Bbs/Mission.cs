@@ -10,7 +10,7 @@ namespace OpenKh.Bbs
 {
     public class Mission
     {
-        private const int MagicCode = 0x4D4953;
+        private const int MagicCode = 0x53494D;
         private const ushort FileVersion = 3;
 
         public class Header

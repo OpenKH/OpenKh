@@ -32,6 +32,7 @@ namespace OpenKh.Tools.MissionEditor
             this.LoadMissionButton = new System.Windows.Forms.Button();
             this.SaveMissionButton = new System.Windows.Forms.Button();
             this.FlowMission = new System.Windows.Forms.FlowLayoutPanel();
+            this.AddMissionButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LoadMissionButton
@@ -46,6 +47,7 @@ namespace OpenKh.Tools.MissionEditor
             // 
             // SaveMissionButton
             // 
+            this.SaveMissionButton.Enabled = false;
             this.SaveMissionButton.Location = new System.Drawing.Point(107, 12);
             this.SaveMissionButton.Name = "SaveMissionButton";
             this.SaveMissionButton.Size = new System.Drawing.Size(83, 28);
@@ -67,11 +69,24 @@ namespace OpenKh.Tools.MissionEditor
             this.FlowMission.Size = new System.Drawing.Size(681, 391);
             this.FlowMission.TabIndex = 2;
             // 
+            // AddMissionButton
+            // 
+            this.AddMissionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.AddMissionButton.Enabled = false;
+            this.AddMissionButton.Location = new System.Drawing.Point(573, 12);
+            this.AddMissionButton.Name = "AddMissionButton";
+            this.AddMissionButton.Size = new System.Drawing.Size(121, 28);
+            this.AddMissionButton.TabIndex = 3;
+            this.AddMissionButton.Text = "Add Mission";
+            this.AddMissionButton.UseVisualStyleBackColor = true;
+            this.AddMissionButton.Click += new System.EventHandler(this.AddMissionButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(706, 450);
+            this.Controls.Add(this.AddMissionButton);
             this.Controls.Add(this.FlowMission);
             this.Controls.Add(this.SaveMissionButton);
             this.Controls.Add(this.LoadMissionButton);
@@ -86,6 +101,7 @@ namespace OpenKh.Tools.MissionEditor
         private System.Windows.Forms.Button LoadMissionButton;
         private System.Windows.Forms.Button SaveMissionButton;
         private System.Windows.Forms.FlowLayoutPanel FlowMission;
+        private System.Windows.Forms.Button AddMissionButton;
     }
 }
 
