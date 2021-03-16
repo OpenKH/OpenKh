@@ -1055,10 +1055,9 @@ namespace OpenKh.Tests.Patcher
             File.Create(Path.Combine(ModInputDir, "LvupList.yml")).Using(stream =>
             {
                 var writer = new StreamWriter(stream);
-                writer.WriteLine("Characters:");
-                writer.WriteLine("- NumLevels: 99");
-                writer.WriteLine("  Levels:");
-                writer.WriteLine("  - Exp: 500");
+                writer.WriteLine("Sora:");
+                writer.WriteLine("  1:");
+                writer.WriteLine("    Exp: 500");
                 writer.Flush();
             });
 

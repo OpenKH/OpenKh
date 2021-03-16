@@ -364,13 +364,16 @@ namespace OpenKh.Patcher
 
                         case "lvup":
                             var levelList = Kh2.Battle.Lvup.Read(stream);
-                            var moddedLevels = deserializer.Deserialize<Kh2.Battle.Lvup>(sourceText);
-                                int i = 0;
-                                foreach (var character in moddedLevels.Characters)
+                            var moddedLevels = deserializer.Deserialize<Dictionary<string, Dictionary<int, Kh2.Battle.Lvup.PlayableCharacter.Level>>> (sourceText);
+
+                            foreach (var character in moddedLevels)
+                            {
+                                foreach (var level in moddedLevels[character.Key])
                                 {
-                                    levelList.Characters[i].Levels = character.Levels;
-                                    i++;
+                                    levelList.Characters[characterMap[character.Key] - 1].Levels[level.Key - 1] = moddedLevels[character.Key][level.Key];
                                 }
+                            }   
+
                             levelList.Write(stream.SetPosition(0));
                             break;
 
