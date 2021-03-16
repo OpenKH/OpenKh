@@ -84,8 +84,8 @@ namespace OpenKh.Engine.Motion
                 model.ApplyMotion(model.InitialPose);
             else if (CurrentMotion.IsRaw)
                 ApplyRawMotion(model, CurrentMotion.Raw, time);
-            else
-                ApplyInterpolatedMotion(model, CurrentMotion.Interpolated, time);
+            //else
+                //ApplyInterpolatedMotion(model, CurrentMotion.Interpolated, time);
         }
 
         private void ApplyRawMotion(IModelMotion model, Kh2.Motion.RawMotion motion, float time)

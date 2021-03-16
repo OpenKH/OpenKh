@@ -83,6 +83,8 @@ namespace OpenKh.Imaging
                         data[i * 4 + 2] = tmp;
                     }
                     break;
+                case PixelFormat.Rgba1555:
+                    break;
                 case PixelFormat.Indexed8:
                     break;
                 case PixelFormat.Indexed4:

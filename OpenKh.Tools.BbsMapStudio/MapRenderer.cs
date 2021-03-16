@@ -139,13 +139,23 @@ namespace OpenKh.Tools.BbsMapStudio
                 for (int i = 0; i < BbsMap.objectInfo.Count; i++)
                 {
                     Pmp.ObjectInfo currentInfo = BbsMap.objectInfo[i];
-                    if (currentInfo.PMO_Offset != 0)
+                    if (BbsMap.PmoList[i] != null)
                     {
                         Vector3 Loc = new Vector3(currentInfo.PositionX, currentInfo.PositionY, currentInfo.PositionZ);
                         Vector3 Rot = new Vector3(currentInfo.RotationX, currentInfo.RotationY, currentInfo.RotationZ);
                         Vector3 Scl = new Vector3(currentInfo.ScaleX, currentInfo.ScaleY, currentInfo.ScaleZ);
+                        if(BbsMap.PmoList[i].texturesData.Count == 0)
+                        {
+                            byte[] buff = new byte[2048];
+                            for(int b = 1024; b < buff.Length -1024; b++)
+                            {
+                                buff[b] = 0xFF;
+                            }
+                            var tx = Imaging.Tm2.Create(buff, 32, 32);
+                            BbsMap.PmoList[i].texturesData.Add(tx);
+                        }
 
-                        MapMeshGroups.Add(new MeshGroupModel(_graphics, "", BbsMap.PmoList[pmoIndex], BbsMap.PmoList[pmoIndex].texturesData, i, Loc * 100, Rot, Scl, BbsMap.hasDifferentMatrix[pmoIndex]));
+                        MapMeshGroups.Add(new MeshGroupModel(_graphics, "", BbsMap.PmoList[i], BbsMap.PmoList[i].texturesData, i, Loc * 100, Rot, Scl, BbsMap.hasDifferentMatrix[i]));
                         pmoIndex++;
                     }
                 }
@@ -221,27 +231,6 @@ namespace OpenKh.Tools.BbsMapStudio
                 _shader.SetWorldView(Camera.World);
                 _shader.SetModelViewIdentity();
                 pass.Apply();
-
-                foreach (var mesh in MapMeshGroups.Where(x => x.IsVisible))
-                {
-                    _shader.SetModelView(Matrix4x4.CreateRotationX(mesh.Rotation.X) *
-                                Matrix4x4.CreateRotationY(mesh.Rotation.Y) *
-                                Matrix4x4.CreateRotationZ(mesh.Rotation.Z) *
-                                Matrix4x4.CreateScale(mesh.Scale.X, mesh.Scale.Y, mesh.Scale.Z) *
-                                Matrix4x4.CreateTranslation(mesh.Location.X, mesh.Location.Y, mesh.Location.Z));
-
-                    int AxisNumberChanged = 0;
-                    AxisNumberChanged += Convert.ToInt32(mesh.Scale.X < 0);
-                    AxisNumberChanged += Convert.ToInt32(mesh.Scale.Y < 0);
-                    AxisNumberChanged += Convert.ToInt32(mesh.Scale.Z < 0);
-
-                    if (AxisNumberChanged == 1 || AxisNumberChanged == 3)
-                        _graphics.RasterizerState = RasterizerState.CullCounterClockwise;
-                    else
-                        _graphics.RasterizerState = RasterizerState.CullClockwise;
-
-                    RenderMeshNew(pass, mesh.MeshGroup, true);
-                }
                     
                 foreach (var mesh in MapMeshGroups.Where(x => x.IsVisible))
                 {
@@ -272,6 +261,7 @@ namespace OpenKh.Tools.BbsMapStudio
                     else
                         _graphics.RasterizerState = RasterizerState.CullClockwise;
 
+                    pass.Apply();
                     RenderMeshNew(pass, mesh.MeshGroup, false);
                 }
                     
