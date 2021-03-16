@@ -26,7 +26,7 @@
 | [bsd](file//type/bsd.md) | List of Status Ailments and the effects they play on characters | 
 | [ctd](file//type/ctd.md) | File containing a list of text strings and how they need to be displayed | 
 | [ead](file//type/ead.md) | Controls effects attached to weapons | 
-| ecm | Unknown | 
+| [ecm](file//type/ecm.md) | Controls camera used on characters, mainly NPCs | 
 | edp | Unknown | 
 | [epd](file//type/epd.md) | File that controls various parameters for enemies. Overwrites data in .bep | OpenKh.Tools.EpdEditor
 | esd | Unknown | 
@@ -34,7 +34,7 @@
 | ept | AI routine | 
 | [exa](file//type/exa.md) | Cutscene files | 
 | exb | Unknown | 
-| fep | Particle Effects | 
+| [fep](file//type/fep.md) | Particle Effects | 
 | [frr](file//type/frr.md) | Unknown | 
 | gpd | Unknown | 
 | [itb](file//type/itb.md) | List of treasure boxes and their contents | OpenKh.Tools.ItbEditor

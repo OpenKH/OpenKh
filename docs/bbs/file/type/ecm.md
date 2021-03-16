@@ -30,7 +30,7 @@ This file controls how camera moves or behaves. Mostly for NPCs.
 | Offset | Type     | Description
 |--------|----------|------------
 | 0x0    | int32    | Camera Point Count
-| 0x4    | uint32   | Pointer to [Camera Point Data](#CAMERA-POINT)
+| 0x4    | uint32   | Pointer to [Camera Point Data](#CAMERA-POINT) (Usually zero)
 
 Camera Point usually follows this small data.
 
