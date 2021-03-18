@@ -352,9 +352,9 @@ namespace OpenKh.Patcher
                                 {
                                     foreach (var level in form.Value)
                                     {
-                                        formList[level.FormFm][level.FormLevel - 1].Ability = level.Ability;
-                                        formList[level.FormFm][level.FormLevel - 1].Exp = level.Exp;
-                                        formList[level.FormFm][level.FormLevel - 1].LevelGrowthAbility = level.LevelGrowthAbility;
+                                        formList[form.Key][level.FormLevel - 1].Ability = level.Ability;
+                                        formList[form.Key][level.FormLevel - 1].Exp = level.Experience;
+                                        formList[form.Key][level.FormLevel - 1].LevelGrowthAbility = level.GrowthAbilityLevel;
                                         
                                     }
 
