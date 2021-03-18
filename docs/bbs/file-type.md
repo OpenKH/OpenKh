@@ -40,7 +40,7 @@
 | [itb](file//type/itb.md) | List of treasure boxes and their contents | OpenKh.Tools.ItbEditor
 | [itc](file//type/itc.md) | List of items obtained through collectibles | OpenKh.Tools.ItcEditor
 | [ite](file//type/ite.md) | List of items used in the game | OpenKh.Tools.IteEditor
-| l2d | Layout file | 
+| [l2d](file//type/l2d.md) | Layout 2D files | 
 | lad | Unknown | 
 | lub | Compiled lua script used for AI using LUA 5.1 | 
 | [mss](file//type/mss.md) | Controls how sounds behave in a map | 
