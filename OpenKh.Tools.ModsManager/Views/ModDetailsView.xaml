@@ -10,8 +10,8 @@
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
     </UserControl.Resources>
     <StackPanel>
+        <TextBlock Margin="0 0 0 3" FontWeight="Bold" Text="{Binding Title}" d:Text="Mod title"/>
         <StackPanel Visibility="{Binding SourceVisibility}">
-            <TextBlock Margin="0 0 0 3" FontWeight="Bold" Text="{Binding Title}" d:Text="Mod title"/>
             <TextBlock Margin="0 0 0 3">
                 <Hyperlink NavigateUri="{Binding AuthorUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
                     <TextBlock Text="{Binding Author}" Foreground="{DynamicResource textHyperlink}" d:Text="Author name"/>
@@ -25,7 +25,7 @@
                 </TextBlock>
                 <Button Margin="0 0 0 3" Content="Download updates" Command="{Binding UpdateCommand}"/>
             </StackPanel>
-            <Image Width="256" Height="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
+            <Image MaxWidth="256" MaxHeight="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
             <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Text="{Binding Description}"/>
             <TextBlock Margin="0 0 0 3">
                 <Hyperlink NavigateUri="{Binding SourceUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
@@ -42,7 +42,6 @@
             </TextBlock>
         </StackPanel>
         <StackPanel Visibility="{Binding LocalVisibility}">
-            <TextBlock Margin="0 0 0 3" FontWeight="Bold" Text="{Binding Title}" d:Text="Mod title"/>
             <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                 This mod is available only locally and it is not linked to any GitHub repository or protected by the OpenKH Mods License.
             </TextBlock>
