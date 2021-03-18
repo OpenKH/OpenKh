@@ -42,13 +42,13 @@ See also: [TIM2](../common/tm2.md)
 | Offset | Type | Description |
 |--------|------|-------------|
 | 0x0    | uint16 | Vertex Count |
-| 0x2    | uint8 | Texture ID, an index into the list of `Texture Info` records |
+| 0x2    | int8 | Texture ID, an index into the list of `Texture Info` records |
 | 0x3    | uint8 | Vertex Size, in bytes |
 | 0x4    | uint32 | Vertex Flags, see below |
 | 0x8    | uint8 | Group |
 | 0x9    | uint8 | Triangle Strip count |
-| 0xA    | uint16 | Vertex Attribute |
-| varies | uint8[8] | List of bone indices which effect this section. Only present if the PMO blob contains a skeleton (ie: `header.skeletonOffset != 0`) |
+| 0xA    | uint16 | [Vertex Attribute](#Vertex-Attribute) |
+| 0xC    | uint8[8] | List of bone indices which effect this section. Only present if the PMO blob contains a skeleton (ie: `header.skeletonOffset != 0`) |
 | varies | uint32 | Diffuse Color. Only present if `vertexFlags.DiffuseColor & 1` |
 
 The section header is followed by `vertexCount * vertexSize` bytes of vertex data. The next Section header follows on the next 4-byte alignment after that.
@@ -87,10 +87,10 @@ This field defines what kind of primitive is being rendered.
 | 2        | ATTR_GLARE           |                  |
 | 4        | ATTR_BACK            |                  |
 | 8        | ATTR_DIVIDE          |                  |
-| 16       | ATTR_TEXALPHA        |                  |
+| 16       | ATTR_TEXALPHA        | Specifies that the texture used contains alpha values for transparency    |
 | 24       | FLAG_SHIFT           |                  |
 | 28       | PRIM_SHIFT           |                  |
-| 32       | ATTR_BLEND_SEMITRANS |                  |
+| 32       | ATTR_BLEND_SEMITRANS | Specifies that the material must be blended as semitransparent        |
 | 64       | ATTR_BLEND_ADD       |                  |
 | 96       | ATTR_BLEND_SUB       |                  |
 | 224      | ATTR_BLEND_MASK      |                  |
