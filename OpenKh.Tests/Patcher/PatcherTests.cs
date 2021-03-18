@@ -732,7 +732,8 @@ namespace OpenKh.Tests.Patcher
                         FormLevel = 1,
                         FormFm = Kh2.Battle.Fmlv.FormFm.Valor,
                         FormVanilla = Kh2.Battle.Fmlv.FormVanilla.Valor,
-                        Exp= 100
+                        Exp= 100,
+                        Ability = 200
                     }
                     };
                 using var fmlvStream = new MemoryStream();
@@ -750,12 +751,19 @@ namespace OpenKh.Tests.Patcher
             File.Create(Path.Combine(ModInputDir, "FmlvList.yml")).Using(stream =>
             {
                 var writer = new StreamWriter(stream);
-                writer.WriteLine("Valor:");
-                writer.WriteLine("- FormId: 1");
-                writer.WriteLine("  FormLevel: 1");
-                writer.WriteLine("  FormFm: Valor");
-                writer.WriteLine("  FormVanilla: Valor");
-                writer.WriteLine("  Exp: 5");
+                var serializer = new Serializer();
+                serializer.Serialize(writer, new Dictionary<string, FmlvDTO[]>
+                {
+                    ["Valor"] = new[]
+                    {
+                        new FmlvDTO
+                        {
+                        FormLevel = 1,
+                        Experience = 5,
+                        Ability = 127
+                        }
+                    }
+                });
                 writer.Flush();
             });
 
@@ -768,6 +776,7 @@ namespace OpenKh.Tests.Patcher
                 var binarc = Bar.Read(stream);
                 var fmlvStream = Kh2.Battle.Fmlv.Read(binarc[0].Stream);
                 Assert.True(fmlvStream[0].Exp == 5);
+                Assert.True(fmlvStream[0].Ability == 127);
             });
 
         }
