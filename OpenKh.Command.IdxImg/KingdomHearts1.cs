@@ -88,10 +88,10 @@ namespace OpenKh.Command.IdxImg
 
                 [Required]
                 [FileExists]
-                [Argument(0, Description = "Kingdom Hearts II IDX file, paired with a IMG")]
+                [Argument(0, Description = "Path to the Kingdom Hearts ISO file")]
                 public string InputIso { get; set; }
 
-                [Option(CommandOptionType.NoValue, Description = "Sort file list by their position in the IMG", ShortName = "s", LongName = "sort")]
+                [Option(CommandOptionType.NoValue, Description = "Sort file list by their position in the ISO", ShortName = "s", LongName = "sort")]
                 public bool Sort { get; set; }
 
                 protected int OnExecute(CommandLineApplication app)
