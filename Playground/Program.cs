@@ -18,6 +18,25 @@ const string Output = @"D:\kh2\modifiedfile.bar";
 
 Console.WriteLine("Hello OpenKH!");
 
+var idxs = File.OpenRead(@"E:\Hacking\KH1\KINGDOM.IDX").Using(Idx1.Read);
+var names = Idx1Name.Lookup(idxs.OrderBy(x => x.IsoBlock)).OrderBy(x => x.Entry.Hash).ToList();
+File.WriteAllLines(@"D:\asd.txt", names.Select(x => x.ToString()));
+var aaa = File
+    .ReadAllLines(Path.Combine(AppContext.BaseDirectory, "resources/kh1idx.txt"))
+    .Select(x => new
+    {
+        Name = x,
+        Hash = Idx1.GetHash(x)
+    })
+    .GroupBy(x => x.Hash)
+    .Where(x => x.Count() > 1)
+    .Select(x => new
+    {
+        Name1 = x.First().Name,
+        Name2 = x.Skip(1).First().Name
+    })
+    .ToList();
+idxs = idxs;
 // Parse, modify and save a KH2 BinArc file:
 //var binarc = File.OpenRead(Input).Using(Bar.Read);
 //// perform here your changes

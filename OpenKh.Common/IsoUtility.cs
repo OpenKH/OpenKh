@@ -14,18 +14,20 @@ namespace OpenKh.Common
             const uint basePosition = 0x105 * BlockLength; // un-needly hardcoded?
 
             var fileNameData = Encoding.UTF8.GetBytes(fileName);
-            var needle = new byte[fileNameData.Length + 2];
-            needle[0] = 0x01;
-            needle[1] = 0x09;
-            Array.Copy(fileNameData, 0, needle, 2, fileNameData.Length);
-
+            isoStream.SetPosition(basePosition);
             for (int i = 0; i < 0x500; i++)
             {
-                isoStream.Position = basePosition + i;
-                var hayRead = isoStream.ReadBytes(needle.Length);
-                if (hayRead.SequenceEqual(needle))
+                if (isoStream.ReadByte() != 1)
+                    continue;
+
+                var stringLength = isoStream.ReadByte();
+                if (stringLength != fileNameData.Length)
+                    continue;
+
+                var currentPosition = isoStream.Position;
+                if (isoStream.ReadBytes(stringLength).SequenceEqual(fileNameData))
                 {
-                    isoStream.Position -= 0x24;
+                    isoStream.SetPosition(currentPosition - 0x1B);
 
                     var blockStack = isoStream.ReadBytes(0x04);
                     var blockCorrectEndian = new byte[0x04]
@@ -38,6 +40,8 @@ namespace OpenKh.Common
 
                     return BitConverter.ToInt32(blockCorrectEndian, 0);
                 }
+
+                isoStream.Position = currentPosition + 1;
             }
 
             return -1;
