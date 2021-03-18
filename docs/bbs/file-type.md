@@ -29,20 +29,20 @@
 | [ecm](file//type/ecm.md) | Controls camera used on characters, mainly NPCs | 
 | edp | Unknown | 
 | [epd](file//type/epd.md) | File that controls various parameters for enemies. Overwrites data in .bep | OpenKh.Tools.EpdEditor
-| esd | Unknown | 
-| ese | Unknown | 
+| [esd](file//type/esd.md) | It controls what files the current arc inherits from | 
+| [ese](file//type/esd.md) | Sound effects for particle effects | 
 | ept | AI routine | 
 | [exa](file//type/exa.md) | Cutscene files | 
 | exb | Unknown | 
 | [fep](file//type/fep.md) | Particle Effects | 
 | [frr](file//type/frr.md) | Unknown | 
-| gpd | Unknown | 
+| [gpd](file//type/gpd.md) | List of prizes dropped by Gimmick entities | 
 | [itb](file//type/itb.md) | List of treasure boxes and their contents | OpenKh.Tools.ItbEditor
 | [itc](file//type/itc.md) | List of items obtained through collectibles | OpenKh.Tools.ItcEditor
 | [ite](file//type/ite.md) | List of items used in the game | OpenKh.Tools.IteEditor
 | l2d | Layout file | 
 | lad | Unknown | 
-| lub | Compiled lua script used for AI | 
+| lub | Compiled lua script used for AI using LUA 5.1 | 
 | [mss](file//type/mss.md) | Controls how sounds behave in a map | 
 | [ngd](file//type/ngd.md) | Controls how the navigation grid is created for levels | 
 | [nmd](file//type/nmd.md) | Unknown | 
