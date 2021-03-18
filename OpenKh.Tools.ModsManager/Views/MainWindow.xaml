@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize"
         Title="{Binding Title}" Height="450" Width="660">
     <Window.InputBindings>
         <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding ExitCommand}"/>
