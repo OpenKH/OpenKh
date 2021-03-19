@@ -32,8 +32,9 @@
 | [esd](file//type/esd.md) | It controls what files the current arc inherits from | 
 | [ese](file//type/esd.md) | Sound effects for particle effects | 
 | ept | AI routine | 
+| etp | Unknown | 
 | [exa](file//type/exa.md) | Cutscene files | 
-| exb | Unknown | 
+| [exb](file//type/exb.md) | Binary version of an Excel file containing minigame related data | 
 | [fep](file//type/fep.md) | Particle Effects | 
 | [frr](file//type/frr.md) | Unknown | 
 | [gpd](file//type/gpd.md) | List of prizes dropped by Gimmick entities | 
@@ -52,7 +53,7 @@
 | [pmo](file//type/pmo.md) | 3D Model (Skeletal and Static) | 
 | [pmp](file//type/pmp.md) | Map geometry files | 
 | pst | Unknown | 
-| [ptx](file//type/ptx.md) | Unknown | 
+| [ptx](file//type/ptx.md) | File controlling many event related events happening in a map | 
 | [pvd](file//type/pvd.md) | File that controls special effects on maps such as fog | 
 | [scd](file//type/scd.md) | Sound container | 
 | [seb](file//type/seb.md) | Controls which sounds are played per animation | 
