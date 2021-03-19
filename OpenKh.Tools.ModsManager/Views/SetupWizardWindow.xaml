@@ -94,6 +94,7 @@
             <StackPanel>
                 <TextBlock>Supported games:</TextBlock>
                 <StackPanel Margin="10 3 0 10">
+                    <TextBlock>Kingdom Hearts I (Final Mix)</TextBlock>
                     <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix)</TextBlock>
                 </StackPanel>
                 <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO image</TextBlock>
@@ -139,11 +140,15 @@
                         <Image Source="{StaticResource FolderOpen_16x}"/>
                     </Button>
                 </Grid>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
-                    It seems you do not have your Kingdom Hearts II copy extracted.
+                <TextBlock Margin="0 0 0 6" TextWrapping="Wrap" Visibility="{Binding GameDataNotFoundVisibility}">
+                    <Run>It seems you do not have your </Run>
+                    <Run Text="{Binding GameName}" d:Text="Some KH game"/>
+                    <Run> copy extracted.</Run>
                 </TextBlock>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
-                    You already have your Kingdom Hearts II copy extracted.
+                <TextBlock Margin="0 0 0 6" TextWrapping="Wrap" Visibility="{Binding GameDataFoundVisibility}">
+                    <Run>You already have your </Run>
+                    <Run Text="{Binding GameName}" d:Text="Some KH game"/>
+                    <Run> copy extracted.</Run>
                 </TextBlock>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                     Press the button below to initialize the game extraction. It will take between 5 and 15 mintues based on the speed of your hard drive.

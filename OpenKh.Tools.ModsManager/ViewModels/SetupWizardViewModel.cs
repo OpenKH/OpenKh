@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Kh1;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.ModsManager.Services;
@@ -64,6 +65,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(GameRecognizedVisibility));
                 OnPropertyChanged(nameof(GameNotRecognizedVisibility));
                 OnPropertyChanged(nameof(IsGameRecognized));
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
             }
         }
         public bool IsIsoSelected => !string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation);
@@ -153,7 +157,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => IsNotExtracting && File.Exists(Path.Combine(GameDataLocation ?? "", "00objentry.bin"));
+        public bool IsGameDataFound => IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, GameDataLocation);
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;
@@ -178,7 +182,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 await ExtractGameData(IsoLocation, GameDataLocation));
         }
 
-        private async Task ExtractGameData(string isoLocation, string gameDataLocation)
+        private Task ExtractGameData(string isoLocation, string gameDataLocation)
+        {
+            return GameId switch
+            {
+                "kh1" => ExtractKingdomHearts1GameData(isoLocation, gameDataLocation),
+                "kh2" => ExtractKingdomHearts2GameData(isoLocation, gameDataLocation),
+                _ => Task.CompletedTask,
+            };
+        }
+
+        private async Task ExtractKingdomHearts2GameData(string isoLocation, string gameDataLocation)
         {
             var fileBlocks = File.OpenRead(isoLocation).Using(stream =>
             {
@@ -228,6 +242,71 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (!Directory.Exists(directoryDestination))
                         Directory.CreateDirectory(directoryDestination);
                     File.Create(fileDestination).Using(dstStream => stream.CopyTo(dstStream, BufferSize));
+
+                    fileProcessed++;
+                    ExtractionProgress = (float)fileProcessed / fileCount;
+                    OnPropertyChanged(nameof(ExtractionProgress));
+                }
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    IsNotExtracting = true;
+                    ExtractionProgress = 1.0f;
+                    OnPropertyChanged(nameof(IsNotExtracting));
+                    OnPropertyChanged(nameof(IsGameDataFound));
+                    OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                    OnPropertyChanged(nameof(GameDataFoundVisibility));
+                    OnPropertyChanged(nameof(ProgressBarVisibility));
+                    OnPropertyChanged(nameof(ExtractionCompleteVisibility));
+                    OnPropertyChanged(nameof(ExtractionProgress));
+                });
+            });
+        }
+
+        private async Task ExtractKingdomHearts1GameData(string isoLocation, string gameDataLocation)
+        {
+            const int IsoBlock = 0x800;
+            using var stream = File.OpenRead(isoLocation);
+            var firstBlock = IsoUtility.GetFileOffset(stream, "SYSTEM.CNF;1");
+            if (firstBlock == -1)
+                throw new IOException("The file specified seems to not be a valid PlayStation 2 ISO.");
+
+            var kingdomIdxBlock = IsoUtility.GetFileOffset(stream, "KINGDOM.IDX;1");
+            if (kingdomIdxBlock == -1)
+                throw new IOException("The file specified seems to not be a Kingdom Hearts 1 ISO");
+
+            var idx = Idx1.Read(stream.SetPosition(kingdomIdxBlock * IsoBlock));
+            var img = new Img1(stream, idx, firstBlock);
+
+            IsNotExtracting = false;
+            ExtractionProgress = 0;
+            OnPropertyChanged(nameof(IsNotExtracting));
+            OnPropertyChanged(nameof(IsGameDataFound));
+            OnPropertyChanged(nameof(ProgressBarVisibility));
+            OnPropertyChanged(nameof(ExtractionCompleteVisibility));
+            OnPropertyChanged(nameof(ExtractionProgress));
+
+            await Task.Run(() =>
+            {
+                var fileCount = img.Entries.Count;
+                var fileProcessed = 0;
+                foreach (var entry in img.Entries)
+                {
+                    var fileName = entry.Key;
+                    if (fileName == "kingdom.img")
+                        continue;
+
+                    if (fileName == null)
+                        fileName = $"@noname/{entry.Value.Hash:X08}";
+
+                    var outputFile = Path.Combine(gameDataLocation, fileName);
+
+                    var outputDir = Path.GetDirectoryName(outputFile);
+                    if (Directory.Exists(outputDir) == false)
+                        Directory.CreateDirectory(outputDir);
+
+                    using var file = File.Create(outputFile);
+                    img.FileOpen(entry.Value).CopyTo(file);
 
                     fileProcessed++;
                     ExtractionProgress = (float)fileProcessed / fileCount;
