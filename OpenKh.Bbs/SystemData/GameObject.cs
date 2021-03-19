@@ -6,7 +6,7 @@ namespace OpenKh.Bbs.SystemData
 {
     public class GameObject
     {
-        public static Dictionary<string, string> SpawnObjectList = new Dictionary<string, string>()
+        private static Dictionary<string, string> spawnObjectList = new Dictionary<string, string>()
         {
             {"b01cd00", "Symphony Master (Boss!)"},
             {"b02cd00", "Trumpet (Boss!)"},
@@ -218,6 +218,7 @@ namespace OpenKh.Bbs.SystemData
             {"g01pp00", "Small Chest (PP)"},
             {"g02pp00", "Large Chest (PP)"},
             {"g20pp00", "Unknown Collision 20 (PP)"},
+            {"g21pp00", "Unknown 21 (PP)"},
             {"g22pp00", "Boat collision (PP)"},
 
             {"g01rg00", "Small Chest (RG)"},
@@ -439,9 +440,11 @@ namespace OpenKh.Bbs.SystemData
             {"p13ex00", "Terra Armor (PC)"},
             {"p41ex00", "Ventus Armor Helmetless (PC)"},
             {"p42ex00", "Aqua Armor Helmetless (PC)"},
-            {"p43ex00", "Terra Armor Helmetless (PC)"},
+            {"p43ex00", "Terra Armor Helmetless (PC)"}
 
 
         };
+
+        public static Dictionary<string, string> SpawnObjectList { get => spawnObjectList; set => spawnObjectList = value; }
     }
 }
