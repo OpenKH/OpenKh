@@ -19,39 +19,14 @@
         HelpButtonVisibility="Collapsed"
         CancelButtonClosesWindow="True"
         FinishButtonClosesWindow="True"
-        CurrentPage="{Binding ElementName=IntroPage}"
+        CurrentPage="{Binding ElementName=PageIsoSelection}"
         Finish="Wizard_Finish">
         <xctk:WizardPage
             x:Name="IntroPage" 
             Title="Welcome to OpenKH Mods Manager"
             PageType="Exterior"
-            Description="This set-up will guide you through the basic configuration of this tool, allowing you to install and play mods from the best modders in the Kingdom Hearts community.">
-        </xctk:WizardPage>
-        <xctk:WizardPage
-            x:Name="PageIsoSelection"
-            PageType="Interior"
-            Title="Configure the game you want to mod"
-            Description="Do not worry, you can change this option later"
-            CanSelectNextPage="{Binding IsIsoSelected}"
-            NextPage="{Binding ElementName=PageGameEdition}"
-            PreviousPage="{Binding ElementName=IntroPage}">
-            <StackPanel>
-                <TextBlock>Supported games:</TextBlock>
-                <StackPanel Margin="10 3 0 10">
-                    <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix)</TextBlock>
-                </StackPanel>
-                <TextBlock Margin="0 0 0 3">Please select the location of the ISO image</TextBlock>
-                <Grid Margin="0 0 0 3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="20"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding IsoLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}">
-                        <Image Source="{StaticResource FolderOpen_16x}"/>
-                    </Button>
-                </Grid>
-            </StackPanel>
+            Description="This set-up will guide you through the basic configuration of this tool, allowing you to install and play mods from the best modders in the Kingdom Hearts community."
+            NextPage="{Binding ElementName=PageGameEdition}">
         </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="PageGameEdition"
@@ -59,8 +34,7 @@
             Title="Game edition"
             CanSelectNextPage="{Binding IsGameSelected}"
             Description="Selected the preferred edition to launch the game"
-            NextPage="{Binding ElementName=PageGameData}"
-            PreviousPage="{Binding ElementName=PageIsoSelection}">
+            NextPage="{Binding ElementName=PageIsoSelection}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
                 <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
@@ -113,6 +87,39 @@
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
+            x:Name="PageIsoSelection"
+            PageType="Interior"
+            Title="Configure the game you want to mod"
+            Description="Do not worry, you can change this option later"
+            CanSelectNextPage="{Binding IsGameRecognized}"
+            NextPage="{Binding ElementName=PageGameData}">
+            <StackPanel>
+                <TextBlock>Supported games:</TextBlock>
+                <StackPanel Margin="10 3 0 10">
+                    <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix)</TextBlock>
+                </StackPanel>
+                <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO image</TextBlock>
+                <Grid Margin="0 0 0 3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding IsoLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectIsoCommand}">
+                        <Image Source="{StaticResource FolderOpen_16x}"/>
+                    </Button>
+                </Grid>
+                <TextBlock TextWrapping="Wrap" Visibility="{Binding GameRecognizedVisibility}">
+                    <Run>A copy of </Run>
+                    <Run Text="{Binding GameName}" d:Text="Some KH game"/>
+                    <Run> was successfully recognized!</Run>
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Visibility="{Binding GameNotRecognizedVisibility}">
+                    It was not possible to recognize the game of the ISO you provided. Be sure that the game is within the list of supported games.
+                </TextBlock>
+            </StackPanel>
+        </xctk:WizardPage>
+        <xctk:WizardPage
             x:Name="PageGameData"
             PageType="Interior"
             Title="Set game data"
@@ -120,7 +127,6 @@
             CanSelectNextPage="{Binding IsGameDataFound}"
             CanSelectPreviousPage="{Binding IsNotExtracting}"
             CanCancel="{Binding IsNotExtracting}"
-            PreviousPage="{Binding ElementName=PageGameEdition}"
             NextPage="{Binding ElementName=PageRegion}"
             IsEnabled="{Binding IsNotExtracting}">
             <StackPanel>
@@ -157,7 +163,6 @@
             Title="Set your preferred region"
             Description="This will instruct the game to force to load specific languages"
             CanSelectNextPage="{Binding IsGameDataFound}"
-            PreviousPage="{Binding ElementName=PageGameData}"
             NextPage="{Binding ElementName=LastPage}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">

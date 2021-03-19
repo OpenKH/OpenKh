@@ -1,6 +1,7 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common;
+using OpenKh.Tools.ModsManager.Services;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -36,17 +37,39 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string Title => $"Set-up wizard | {ApplicationName}";
 
         public RelayCommand SelectIsoCommand { get; }
+        public string GameId { get; set; }
+        public string GameName { get; set; }
         public string IsoLocation
         {
             get => _isoLocation;
             set
             {
                 _isoLocation = value;
+                if (File.Exists(_isoLocation))
+                {
+                    var game = GameService.DetectGameId(_isoLocation);
+                    GameId = game?.Id;
+                    GameName = game?.Name;
+                }
+                else
+                {
+                    GameId = null;
+                    GameName = null;
+                }
+
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsIsoSelected));
+                OnPropertyChanged(nameof(GameId));
+                OnPropertyChanged(nameof(GameName));
+                OnPropertyChanged(nameof(GameRecognizedVisibility));
+                OnPropertyChanged(nameof(GameNotRecognizedVisibility));
+                OnPropertyChanged(nameof(IsGameRecognized));
             }
         }
         public bool IsIsoSelected => !string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation);
+        public bool IsGameRecognized => IsIsoSelected && GameId != null;
+        public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
 
         public bool IsGameSelected
         {
