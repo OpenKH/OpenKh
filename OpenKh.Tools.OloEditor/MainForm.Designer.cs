@@ -50,6 +50,7 @@ namespace OpenKh.Tools.OloEditor
             this.NPCFlag = new System.Windows.Forms.CheckBox();
             this.GimmickFlag = new System.Windows.Forms.CheckBox();
             this.EnemyFlag = new System.Windows.Forms.CheckBox();
+            this.AddSectionButton = new System.Windows.Forms.Button();
             this.TabControlOLO.SuspendLayout();
             this.TabObjects.SuspendLayout();
             this.TabFilePath.SuspendLayout();
@@ -295,11 +296,24 @@ namespace OpenKh.Tools.OloEditor
             this.EnemyFlag.Text = "Enemy";
             this.EnemyFlag.UseVisualStyleBackColor = true;
             // 
+            // AddSectionButton
+            // 
+            this.AddSectionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.AddSectionButton.Enabled = false;
+            this.AddSectionButton.Location = new System.Drawing.Point(817, 12);
+            this.AddSectionButton.Name = "AddSectionButton";
+            this.AddSectionButton.Size = new System.Drawing.Size(148, 36);
+            this.AddSectionButton.TabIndex = 4;
+            this.AddSectionButton.Text = "Add Section to Current";
+            this.AddSectionButton.UseVisualStyleBackColor = true;
+            this.AddSectionButton.Click += new System.EventHandler(this.AddSectionButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 611);
+            this.Controls.Add(this.AddSectionButton);
             this.Controls.Add(this.OLOFlagsGBox);
             this.Controls.Add(this.TabControlOLO);
             this.Controls.Add(this.SaveOLOButton);
@@ -343,6 +357,7 @@ namespace OpenKh.Tools.OloEditor
         private System.Windows.Forms.CheckBox NPCFlag;
         private System.Windows.Forms.CheckBox GimmickFlag;
         private System.Windows.Forms.CheckBox EnemyFlag;
+        private System.Windows.Forms.Button AddSectionButton;
     }
 }
 

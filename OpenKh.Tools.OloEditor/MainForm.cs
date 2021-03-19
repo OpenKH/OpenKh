@@ -243,6 +243,7 @@ namespace OpenKh.Tools.OloEditor
                 UpdateParameters();
                 SaveOLOButton.Enabled = true;
                 OLOFlagsGBox.Enabled = true;
+                AddSectionButton.Enabled = true;
             }
         }
 
@@ -265,6 +266,34 @@ namespace OpenKh.Tools.OloEditor
         private void TabControlOLO_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void AddSectionButton_Click(object sender, EventArgs e)
+        {
+            switch (TabControlOLO.SelectedIndex)
+            {
+                case 0:
+                    Olo.ObjectName nObj = new Olo.ObjectName();
+                    nObj.Name = "m01ex00";
+                    olo.ObjectList.Add(nObj);
+                    break;
+                case 1:
+                    olo.FileList.Add(new Olo.PathName());
+                    break;
+                case 2:
+                    olo.ScriptList.Add(new Olo.PathName());
+                    break;
+                case 3:
+                    olo.MissionNameList.Add(new Olo.ObjectName());
+                    break;
+                case 4:
+                    olo.TriggerList.Add(new Olo.TriggerData());
+                    break;
+                case 5:
+                    olo.GroupList.Add(new Olo.GroupData());
+                    break;
+            }
+            UpdateParameters();
         }
     }
 }

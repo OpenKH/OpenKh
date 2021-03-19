@@ -182,6 +182,7 @@ namespace OpenKh.Bbs.SystemData
             {"g04ex00", "Jellyshade Swam"},
             {"g05ex00", "Unversed Portal"},
             {"g10ex00", "Invisible Wall 10"},
+            {"g12ex00", "g12ex00"},
             {"g17ex00", "Invisible Wall 17"},
             {"g18ex00", "Invisible Wall 18"},
             {"g20ex00", "g20ex00"},
@@ -224,6 +225,7 @@ namespace OpenKh.Bbs.SystemData
             {"g01rg00", "Small Chest (RG)"},
             {"g02rg00", "Large Chest (RG)"},
             {"g12rg00", "Invisible Wall 12 (RG)"},
+            {"g16rg00", "Invisible Wall 16 (RG)"},
             {"g18rg00", "Invisible Wall 18 (RG)"},
 
             {"g01sb00", "Small Chest (SB)"},

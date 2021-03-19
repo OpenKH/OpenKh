@@ -90,6 +90,7 @@ namespace OpenKh.Tools.OloEditor
             // 
             // GBox
             // 
+            this.GBox.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.GBox.Controls.Add(this.Param8Box);
             this.GBox.Controls.Add(this.Param7Box);
             this.GBox.Controls.Add(this.Param6Box);
