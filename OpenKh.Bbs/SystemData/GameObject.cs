@@ -222,6 +222,8 @@ namespace OpenKh.Bbs.SystemData
 
             {"g01rg00", "Small Chest (RG)"},
             {"g02rg00", "Large Chest (RG)"},
+            {"g12rg00", "Invisible Wall 12 (RG)"},
+            {"g18rg00", "Invisible Wall 18 (RG)"},
 
             {"g01sb00", "Small Chest (SB)"},
             {"g02sb00", "Large Chest (SB)"},
