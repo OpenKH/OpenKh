@@ -300,10 +300,10 @@ namespace OpenKh.Patcher
                     {
                         case "trsr":
                             var trsrList = Kh2.SystemData.Trsr.Read(stream).ToDictionary(x => x.Id, x => x);
-                            var moddedTrsr = deserializer.Deserialize<Dictionary<int, Kh2.SystemData.Trsr>>(sourceText);
+                            var moddedTrsr = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Trsr>>(sourceText);
                             foreach (var treasure in moddedTrsr)
                             {
-                                trsrList[treasure.Value.Id].ItemId = treasure.Value.ItemId;
+                                trsrList[treasure.Key].ItemId = treasure.Value.ItemId;
                             }
                                 Kh2.SystemData.Trsr.Write(stream.SetPosition(0), trsrList.Values);
                             break;

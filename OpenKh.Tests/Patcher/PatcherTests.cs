@@ -573,7 +573,6 @@ namespace OpenKh.Tests.Patcher
             {
                 var writer = new StreamWriter(stream);
                 writer.WriteLine("1:");
-                writer.WriteLine("  Id: 1");
                 writer.WriteLine("  ItemId: 200");
                 writer.Flush();
             });
