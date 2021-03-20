@@ -730,12 +730,25 @@ namespace OpenKh.Tests.Patcher
                     {
                         FormId = 1,
                         FormLevel = 1,
-                        FormFm = Kh2.Battle.Fmlv.FormFm.Valor,
-                        FormVanilla = Kh2.Battle.Fmlv.FormVanilla.Valor,
-                        Exp= 100,
+                        Exp = 100,
                         Ability = 200
-                    }
-                    };
+                    },
+                    new Kh2.Battle.Fmlv.Level
+                    {
+                        FormId = 1,
+                        FormLevel = 2,
+                        Exp = 100,
+                        Ability = 200
+                    },
+                    new Kh2.Battle.Fmlv.Level
+                    {
+                        FormId = 2,
+                        FormLevel = 1,
+                        Exp = 100,
+                        Ability = 200
+                    },
+                };
+
                 using var fmlvStream = new MemoryStream();
                 Kh2.Battle.Fmlv.Write(fmlvStream, fmlvEntry);
                 Bar.Write(stream, new Bar() {
@@ -758,9 +771,9 @@ namespace OpenKh.Tests.Patcher
                     {
                         new FmlvDTO
                         {
-                        FormLevel = 1,
-                        Experience = 5,
-                        Ability = 127
+                            FormLevel = 1,
+                            Experience = 5,
+                            Ability = 127
                         }
                     }
                 });
@@ -774,11 +787,20 @@ namespace OpenKh.Tests.Patcher
             File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
             {
                 var binarc = Bar.Read(stream);
-                var fmlvStream = Kh2.Battle.Fmlv.Read(binarc[0].Stream);
-                Assert.True(fmlvStream[0].Exp == 5);
-                Assert.True(fmlvStream[0].Ability == 127);
-            });
+                var fmlv = Kh2.Battle.Fmlv.Read(binarc[0].Stream);
 
+                Assert.Equal(3, fmlv.Count);
+                Assert.Equal(1, fmlv[0].FormId);
+                Assert.Equal(1, fmlv[0].FormLevel);
+                Assert.Equal(5, fmlv[0].Exp);
+                Assert.Equal(127, fmlv[0].Ability);
+
+                Assert.Equal(1, fmlv[1].FormId);
+                Assert.Equal(2, fmlv[1].FormLevel);
+
+                Assert.Equal(2, fmlv[2].FormId);
+                Assert.Equal(1, fmlv[2].FormLevel);
+            });
         }
 
         [Fact]
