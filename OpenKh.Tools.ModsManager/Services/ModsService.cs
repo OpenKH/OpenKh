@@ -152,7 +152,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 throw new ModAlreadyExistsExceptions(repositoryName);
             Directory.CreateDirectory(modPath);
 
-            progressOutput?.Invoke($"Mod found, initializing clonation process");
+            progressOutput?.Invoke($"Mod found, initializing cloning process");
             await Task.Run(() =>
             {
                 var options = new CloneOptions

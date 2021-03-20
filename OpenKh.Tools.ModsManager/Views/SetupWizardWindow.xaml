@@ -82,7 +82,7 @@
                             <Image Source="{StaticResource FolderOpen_16x}"/>
                         </Button>
                     </Grid>
-                    <TextBlock Margin="0 0 0 3">NOTE: Always be sure to use a supported version as updated might break the compatibility</TextBlock>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version as updated might break the compatibility</TextBlock>
                 </StackPanel>
             </StackPanel>
         </xctk:WizardPage>

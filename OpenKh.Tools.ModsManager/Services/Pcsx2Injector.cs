@@ -409,7 +409,7 @@ namespace OpenKh.Tools.ModsManager.Services
             {
                 if (offsets.LoadFile > 0)
                 {
-                    Log.Info("Injeting LoadFile function");
+                    Log.Info("Injecting {0} function", offsets.LoadFile);
                     WritePatch(stream, offsets.LoadFile,
                         ADDIU(T4, RA, 0),
                         JAL(WriteHook(stream, LoadFileHook)),
@@ -418,7 +418,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 if (offsets.GetFileSize > 0)
                 {
-                    Log.Info("Injeting GetFileSize function");
+                    Log.Info("Injecting {0} function", offsets.GetFileSize);
                     var subGetFileSizePtr = stream.SetPosition(offsets.GetFileSize + 8).ReadUInt32();
                     WritePatch(stream, offsets.GetFileSize,
                         ADDIU(T4, RA, 0),
@@ -436,7 +436,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 if (RegionId > 0)
                 {
-                    Log.Info("Injeting SetupRegion function");
+                    Log.Info("Injecting {0} function", "RegionInit");
                     WritePatch(stream, offsets.RegionInit, RegionInitPatch);
                     WritePatch(stream, offsets.RegionForce, Region);
                     WritePatch(stream, offsets.RegionForce + 8, Language);
