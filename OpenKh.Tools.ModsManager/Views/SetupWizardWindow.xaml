@@ -40,7 +40,7 @@
                 <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
                     <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
                     <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
-                    <ComboBoxItem Visibility="Visible">PC release via Epic Game store</ComboBoxItem>
+                    <ComboBoxItem Visibility="Hidden">PC release via Epic Game store</ComboBoxItem>
                 </ComboBox>
                 <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
                     <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
