@@ -12,8 +12,6 @@
         Height="370" Width="400">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <converters:RadioBoolToIntConverter x:Key="radioBoolToIntConverter" />
-        <Thickness x:Key="RegionMargins" Left="0" Top="0" Right="0" Bottom="2" />
     </Window.Resources>
     <xctk:Wizard
         HelpButtonVisibility="Collapsed"
@@ -165,22 +163,23 @@
             CanSelectNextPage="{Binding IsGameDataFound}"
             NextPage="{Binding ElementName=LastPage}">
             <StackPanel>
+                <TextBlock>Region</TextBlock>
+                <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding RegionId}">
+                    <ComboBoxItem>Use game default region</ComboBoxItem>
+                    <ComboBoxItem>Japanese (text JP, menu JP, voice JP)</ComboBoxItem>
+                    <ComboBoxItem>English (text US, menu US, voice US)</ComboBoxItem>
+                    <ComboBoxItem>English (text US, menu UK, voice US)</ComboBoxItem>
+                    <ComboBoxItem>Italian (text IT, menu IT, voice IT)</ComboBoxItem>
+                    <ComboBoxItem>Spanish (text SP, menu SP, voice SP)</ComboBoxItem>
+                    <ComboBoxItem>German (text GR, menu GR, voice GR)</ComboBoxItem>
+                    <ComboBoxItem>French (text FR, menu FR, voice FR)</ComboBoxItem>
+                    <ComboBoxItem>Final Mix (text JP, menu FM, voice US)</ComboBoxItem>
+                </ComboBox>
+                
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    Do not worry if your game's data does not contain all the files for that language because the Mods Manager have a fallback mechanic for you.
+                    Forces to load the internal configuration to a specific region. This allows to effectively load files from other languages, swap the O and X buttons and use the font table in a different way.
+                    Do not worry if some region files are not found as the Mods Manager has a fallback mechanic.
                 </TextBlock>
-                <GroupBox Header="Region">
-                    <StackPanel Margin="6">
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=0}" Content="Use game's default"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=1}" Content="Japanese (JP/JP)"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=2}" Content="English (US/US)"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=3}" Content="English (UK/US)"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=4}" Content="Italian (IT/IT)"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=5}" Content="Spanish (SP/SP)"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=6}" Content="German (GR/GR)"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=7}" Content="French (FR/FR)"/>
-                        <RadioButton Margin="{StaticResource RegionMargins}" IsChecked="{Binding RegionId, Converter={StaticResource radioBoolToIntConverter}, ConverterParameter=8}" Content="Final Mix (FM/JP)"/>
-                    </StackPanel>
-                </GroupBox>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
