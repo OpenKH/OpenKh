@@ -303,7 +303,15 @@ namespace OpenKh.Patcher
                             var moddedTrsr = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Trsr>>(sourceText);
                             foreach (var treasure in moddedTrsr)
                             {
-                                trsrList[treasure.Key].ItemId = treasure.Value.ItemId;
+                                if (trsrList.ContainsKey(treasure.Key))
+                                {
+                                    trsrList[treasure.Key].ItemId = treasure.Value.ItemId;
+                                }
+                                else
+                                {
+                                    trsrList.Add(treasure.Key, treasure.Value);
+                                }
+
                             }
                                 Kh2.SystemData.Trsr.Write(stream.SetPosition(0), trsrList.Values);
                             break;
@@ -320,6 +328,10 @@ namespace OpenKh.Patcher
                                     {
                                         itemList.Items[itemList.Items.IndexOf(itemToUpdate)] = item;
                                     }
+                                    else
+                                    {
+                                        itemList.Items.Add(item);
+                                    }
                                 }
                             }
                             if (moddedItem.Stats != null)
@@ -330,6 +342,10 @@ namespace OpenKh.Patcher
                                     if (itemToUpdate != null)
                                     {
                                         itemList.Stats[itemList.Stats.IndexOf(itemToUpdate)] = item;
+                                    }
+                                    else
+                                    {
+                                        itemList.Stats.Add(item);
                                     }
                                 }
                             }
@@ -382,7 +398,14 @@ namespace OpenKh.Patcher
                             var moddedBonus = deserializer.Deserialize<Dictionary<string, Kh2.Battle.Bons>>(sourceText);
                                 foreach (var bonus in moddedBonus)
                                 {
-                                    bonusList[bonus.Key] = bonus.Value;
+                                    if (bonusList.ContainsKey(bonus.Key))
+                                    {
+                                        bonusList[bonus.Key] = bonus.Value;
+                                    }
+                                    else
+                                    {
+                                        bonusList.Add(bonus.Key, bonus.Value);
+                                    } 
                                 }
                             Kh2.Battle.Bons.Write(stream.SetPosition(0), bonusList.Values);
                             break;
@@ -392,7 +415,14 @@ namespace OpenKh.Patcher
                             var moddedObjEntry = deserializer.Deserialize<Dictionary<uint, Kh2.Objentry>>(sourceText);
                             foreach (var objEntry in moddedObjEntry)
                             {
-                                objEntryList[objEntry.Key] = objEntry.Value;
+                                if (objEntryList.ContainsKey(objEntry.Key))
+                                {
+                                    objEntryList[objEntry.Key] = objEntry.Value;
+                                }
+                                else
+                                {
+                                    objEntryList.Add(objEntry.Key, objEntry.Value);
+                                }
                             }
                             Kh2.Objentry.Write(stream.SetPosition(0), objEntryList.Values);
                             break;
