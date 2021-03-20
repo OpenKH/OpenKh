@@ -14,24 +14,24 @@ namespace OpenKh.Tools.ModsManager.Services
     {
         private class Offsets
         {
-            public string GameName { get; set; }
-            public int LoadFile { get; set; }
-            public int GetFileSize { get; set; }
-            public int RegionInit { get; set; }
-            public int BufferPointer { get; set; }
-            public int RegionForce { get; set; }
-            public int RegionId { get; set; }
-            public int RegionPtr { get; set; }
-            public int LanguagePtr { get; set; }
+            public string GameName { get; init; }
+            public int LoadFile { get; init; }
+            public int GetFileSize { get; init; }
+            public int RegionInit { get; init; }
+            public int BufferPointer { get; init; }
+            public int RegionForce { get; init; }
+            public int RegionId { get; init; }
+            public int RegionPtr { get; init; }
+            public int LanguagePtr { get; init; }
         }
 
         private class Patch
         {
-            public string Game { get; set; }
-            public string Name { get; set; }
-            public int Address { get; set; }
-            public uint[] Pattern { get; set; }
-            public uint[] NewPattern { get; set; }
+            public string Game { get; init; }
+            public string Name { get; init; }
+            public int Address { get; init; }
+            public uint[] Pattern { get; init; }
+            public uint[] NewPattern { get; init; }
         }
 
         private const string KH2FM = "SLPM_666.75;1";
@@ -294,7 +294,6 @@ namespace OpenKh.Tools.ModsManager.Services
         private Task _injectorTask;
         private uint _hookPtr;
         private uint _nextHookPtr;
-        private string game;
         private Offsets _myOffsets;
 
         public Pcsx2Injector(IOperationDispatcher operationDispatcher)
@@ -447,8 +446,6 @@ namespace OpenKh.Tools.ModsManager.Services
                     if (offsets.GameName == KH2FM)
                         PatchKh2FmPs2(stream);
                 }
-
-                stream.Flush();
             }
         }
 
