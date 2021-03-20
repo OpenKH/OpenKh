@@ -585,7 +585,7 @@ namespace OpenKh.Tests.Patcher
              {
                  var binarc = Bar.Read(stream);
                  var trsrStream = Kh2.SystemData.Trsr.Read(binarc[0].Stream);
-                 Assert.True(trsrStream[0].ItemId == 200);
+                 Assert.Equal(200, trsrStream[0].ItemId);
              });
 
         }
@@ -681,8 +681,8 @@ namespace OpenKh.Tests.Patcher
             {
                 var binarc = Bar.Read(stream);
                 var itemStream = Kh2.SystemData.Item.Read(binarc[0].Stream);
-                Assert.True(itemStream.Items[0].ShopBuy == 200);
-                Assert.True(itemStream.Stats[0].Ability == 150);
+                Assert.Equal(200, itemStream.Items[0].ShopBuy);
+                Assert.Equal(150, itemStream.Stats[0].Ability);
             });
 
         }
@@ -877,7 +877,7 @@ namespace OpenKh.Tests.Patcher
             {
                 var binarc = Bar.Read(stream);
                 var bonsStream = Kh2.Battle.Bons.Read(binarc[0].Stream);
-                Assert.True(bonsStream[0].BonusItem1 == 200);
+                Assert.Equal(200, bonsStream[0].BonusItem1);
             });
 
         }
@@ -1099,7 +1099,7 @@ namespace OpenKh.Tests.Patcher
             {
                 var binarc = Bar.Read(stream);
                 var lvupStream = Kh2.Battle.Lvup.Read(binarc[0].Stream);
-                Assert.True(lvupStream.Characters[0].Levels[0].Exp == 500);
+                Assert.Equal(500, lvupStream.Characters[0].Levels[0].Exp);
             });
 
         }
@@ -1161,8 +1161,8 @@ namespace OpenKh.Tests.Patcher
             File.OpenRead(Path.Combine(ModOutputDir, "00objentry.bin")).Using(stream =>
             {
                 var objStream = Kh2.Objentry.Read(stream);
-                Assert.True(objStream[0].ModelName == "M_EX100");
-                Assert.True(objStream[0].AnimationName == "M_EX100.mset");
+                Assert.Equal("M_EX100", objStream[0].ModelName);
+                Assert.Equal("M_EX100.mset", objStream[0].AnimationName);
             });
 
         }
