@@ -286,7 +286,7 @@ namespace OpenKh.Patcher
         }
 
         private static readonly Dictionary<string, byte> characterMap = new Dictionary<string, byte>(){
-            { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14} 
+            { "Sora", 1 }, { "Donald", 2 }, { "Goofy", 3 },  { "Mickey", 4 },  { "Auron", 5 }, { "PingMulan",6 }, { "Aladdin", 7 },  { "Sparrow", 8 }, { "Beast", 9 },  { "Jack", 10 },  { "Simba", 11 }, { "Tron", 12 }, { "Riku", 13 }, { "Roxas", 14}, {"Ping", 15} 
         };
 
         private static readonly IDeserializer deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
@@ -401,20 +401,38 @@ namespace OpenKh.Patcher
                             break;
 
                         case "bons":
-                            var bonusList = Kh2.Battle.Bons.Read(stream).ToDictionary(x => String.Concat(x.RewardId, characterMap.FirstOrDefault(y => y.Value == x.CharacterId).Key), x => x);
-                            var moddedBonus = deserializer.Deserialize<Dictionary<string, Kh2.Battle.Bons>>(sourceText);
+                            var bonusRaw = Kh2.Battle.Bons.Read(stream);
+                            var bonusList = new Dictionary<byte, Dictionary<string, Kh2.Battle.Bons>>();
+                            foreach (var bonus in bonusRaw)
+                            {
+                                if (!bonusList.ContainsKey(bonus.RewardId))
+                                {
+                                    bonusList.Add(bonus.RewardId, new Dictionary<string, Kh2.Battle.Bons>());
+                                }
+                                var character = characterMap.First(x => x.Value == bonus.CharacterId).Key;
+                                if (!bonusList[bonus.RewardId].ContainsKey(character))
+                                {
+                                    bonusList[bonus.RewardId].Add(character, bonus);
+                                }
+                            }
+                            var moddedBonus = deserializer.Deserialize<Dictionary<byte, Dictionary<string, Kh2.Battle.Bons>>>(sourceText);
                                 foreach (var bonus in moddedBonus)
                                 {
-                                    if (bonusList.ContainsKey(bonus.Key))
+                                    if (!bonusList.ContainsKey(bonus.Key))
                                     {
-                                        bonusList[bonus.Key] = bonus.Value;
+                                        bonusList.Add(bonus.Key, new Dictionary<string, Kh2.Battle.Bons>());
                                     }
-                                    else
+                                    foreach (var character in moddedBonus[bonus.Key])
                                     {
-                                        bonusList.Add(bonus.Key, bonus.Value);
-                                    } 
+                                        if (!bonusList[bonus.Key].ContainsKey(character.Key))
+                                        {
+                                            bonusList[bonus.Key].Add(character.Key, new Kh2.Battle.Bons());
+                                        }
+                                        bonusList[bonus.Key][character.Key] = character.Value;
+                                    }
                                 }
-                            Kh2.Battle.Bons.Write(stream.SetPosition(0), bonusList.Values);
+
+                        Kh2.Battle.Bons.Write(stream.SetPosition(0), bonusList.Values.SelectMany(x => x.Values));
                             break;
 
                         case "objentry":

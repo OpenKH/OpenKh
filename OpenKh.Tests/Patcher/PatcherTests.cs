@@ -845,6 +845,12 @@ namespace OpenKh.Tests.Patcher
                         CharacterId = 1,
                         RewardId = 15,
                         BonusItem1 = 10
+                    },
+                    new Kh2.Battle.Bons
+                    {
+                        CharacterId = 2,
+                        RewardId = 15,
+                        BonusItem1 = 5
                     }
                     };
                 using var bonsStream = new MemoryStream();
@@ -862,10 +868,9 @@ namespace OpenKh.Tests.Patcher
             File.Create(Path.Combine(ModInputDir, "BonsList.yml")).Using(stream =>
             {
                 var writer = new StreamWriter(stream);
-                writer.WriteLine("15Sora:");
-                writer.WriteLine("  RewardId: 15");
-                writer.WriteLine("  CharacterId: 1");
-                writer.WriteLine("  BonusItem1: 200");
+                writer.WriteLine("15:");
+                writer.WriteLine("  Sora:");
+                writer.WriteLine("    BonusItem1: 200");
                 writer.Flush();
             });
 
@@ -878,6 +883,7 @@ namespace OpenKh.Tests.Patcher
                 var binarc = Bar.Read(stream);
                 var bonsStream = Kh2.Battle.Bons.Read(binarc[0].Stream);
                 Assert.Equal(200, bonsStream[0].BonusItem1);
+                Assert.Equal(5, bonsStream[1].BonusItem1);
             });
 
         }
