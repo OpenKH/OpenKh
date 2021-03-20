@@ -26,7 +26,7 @@ This file type contains all types of menus or interactible 2D widgets.
 |--------|-------|------------
 | 0x0     | char[4]   | Signature, always `SQ2P`.
 | 0x4     | char[4]   | Version
-| 0x8     | uint8[4]  | Reserved
+| 0x8     | uint8[8]  | Reserved
 | 0x10    | uint32    | SP2 Offset
 | 0x14    | uint32    | SQ2 Offset
 | 0x18    | uint32    | TM2 Offset
@@ -40,7 +40,7 @@ SP stands for **sprite**.
 |--------|-------|------------
 | 0x0     | char[4]   | Signature, always `SP2@`.
 | 0x4     | char[4]   | Version
-| 0x8     | uint8[4]  | Reserved
+| 0x8     | uint8[8]  | Reserved
 | 0x10    | int32     | [Parts](#SP2-Parts) Count
 | 0x14    | int32     | [Parts](#SP2-Parts)  Offset
 | 0x18    | int32     | [Group](#SP2-Group) Count
@@ -96,7 +96,7 @@ SP stands for **sprite**.
 |--------|-------|------------
 | 0x0     | char[4]   | Signature, always `SQ2@`.
 | 0x4     | char[4]   | Version
-| 0x8     | uint8[4]  | Reserved
+| 0x8     | uint8[8]  | Reserved
 | 0x10    | int32     | [Sequence](#SQ2-Sequence) Count
 | 0x14    | int32     | [Sequence](#SQ2-Sequence) Offset
 | 0x18    | int32     | [Control](#SQ2-Control) Count
@@ -213,7 +213,7 @@ SP stands for **sprite**.
 |--------|-------|------------
 | 0x0     | char[4]   | Signature, always `SQ2P`.
 | 0x4     | char[4]   | Version
-| 0x8     | uint8[4]  | Reserved
+| 0x8     | uint8[8]  | Reserved
 | 0x10    | int32     | [Layout](#LY2-Layout) Count
 | 0x14    | int32     | [Layout](#LY2-Layout) Offset
 | 0x18    | int32     | Control Count
