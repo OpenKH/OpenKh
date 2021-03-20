@@ -469,6 +469,10 @@ namespace OpenKh.Tools.ModsManager.Services
                 ADDIU(V0, V0, 0x484B),
                 JR(RA),
                 NOP());
+
+            // Fix weird game bug where KH2FM would crash on map change
+            // when the region is different from JP or FM.
+            WritePatch(stream, 0x015ABE8, ADDIU(V0, Zero, 1));
         }
 
         private void ResetHooks() => _nextHookPtr = BaseHookPtr;
