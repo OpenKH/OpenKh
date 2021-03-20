@@ -61,8 +61,8 @@ namespace OpenKh.Tests.kh2
             public void CheckForLength() => File.OpenRead("kh2/res/item.bin").Using(stream =>
             {
                 var entries = Item.Read(stream);
-                Assert.Equal(535, entries.Items1.Count);
-                Assert.Equal(151, entries.Items2.Count);
+                Assert.Equal(535, entries.Items.Count);
+                Assert.Equal(151, entries.Stats.Count);
             });
 
             [Fact]

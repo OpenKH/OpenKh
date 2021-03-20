@@ -631,7 +631,7 @@ namespace OpenKh.Tests.Patcher
                 {
                     new Kh2.SystemData.Item
                     {
-                        Items1 = new List<Kh2.SystemData.Item.Entry>()
+                        Items = new List<Kh2.SystemData.Item.Entry>()
                         {
                             new Kh2.SystemData.Item.Entry()
                             {
@@ -639,7 +639,7 @@ namespace OpenKh.Tests.Patcher
                                 ShopBuy = 10
                             }
                         },
-                        Items2 = new List<Kh2.SystemData.Item.Stat>()
+                        Stats = new List<Kh2.SystemData.Item.Stat>()
                         {
                             new Kh2.SystemData.Item.Stat()
                             {
@@ -665,10 +665,10 @@ namespace OpenKh.Tests.Patcher
             File.Create(Path.Combine(ModInputDir, "ItemList.yml")).Using(stream =>
             {
                 var writer = new StreamWriter(stream);
-                writer.WriteLine("Items1:");
+                writer.WriteLine("Items:");
                 writer.WriteLine("- Id: 1");
                 writer.WriteLine("  ShopBuy: 200");
-                writer.WriteLine("Items2:");
+                writer.WriteLine("Stats:");
                 writer.WriteLine("- Id: 10");
                 writer.WriteLine("  Ability: 150");
                 writer.Flush();
@@ -682,8 +682,8 @@ namespace OpenKh.Tests.Patcher
             {
                 var binarc = Bar.Read(stream);
                 var itemStream = Kh2.SystemData.Item.Read(binarc[0].Stream);
-                Assert.True(itemStream.Items1[0].ShopBuy == 200);
-                Assert.True(itemStream.Items2[0].Ability == 150);
+                Assert.True(itemStream.Items[0].ShopBuy == 200);
+                Assert.True(itemStream.Stats[0].Ability == 150);
             });
 
         }

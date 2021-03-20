@@ -311,25 +311,25 @@ namespace OpenKh.Patcher
                         case "item":
                             var itemList = Kh2.SystemData.Item.Read(stream);
                             var moddedItem = deserializer.Deserialize<Kh2.SystemData.Item>(sourceText);
-                            if (moddedItem.Items1 != null)
+                            if (moddedItem.Items != null)
                             {
-                                foreach (var item in moddedItem.Items1)
+                                foreach (var item in moddedItem.Items)
                                 {
-                                    var itemToUpdate = itemList.Items1.FirstOrDefault(x => x.Id == item.Id);
+                                    var itemToUpdate = itemList.Items.FirstOrDefault(x => x.Id == item.Id);
                                     if (itemToUpdate != null)
                                     {
-                                        itemList.Items1[itemList.Items1.IndexOf(itemToUpdate)] = item;
+                                        itemList.Items[itemList.Items.IndexOf(itemToUpdate)] = item;
                                     }
                                 }
                             }
-                            if (moddedItem.Items2 != null)
+                            if (moddedItem.Stats != null)
                             {
-                                foreach (var item in moddedItem.Items2)
+                                foreach (var item in moddedItem.Stats)
                                 {
-                                    var itemToUpdate = itemList.Items2.FirstOrDefault(x => x.Id == item.Id);
+                                    var itemToUpdate = itemList.Stats.FirstOrDefault(x => x.Id == item.Id);
                                     if (itemToUpdate != null)
                                     {
-                                        itemList.Items2[itemList.Items2.IndexOf(itemToUpdate)] = item;
+                                        itemList.Stats[itemList.Stats.IndexOf(itemToUpdate)] = item;
                                     }
                                 }
                             }
