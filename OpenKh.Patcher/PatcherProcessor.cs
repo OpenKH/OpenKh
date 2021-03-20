@@ -305,7 +305,14 @@ namespace OpenKh.Patcher
                             {
                                 if (trsrList.ContainsKey(treasure.Key))
                                 {
-                                    trsrList[treasure.Key].ItemId = treasure.Value.ItemId;
+                                    if (treasure.Value.World == 0)
+                                    {
+                                        trsrList[treasure.Key].ItemId = treasure.Value.ItemId;
+                                    }
+                                    else
+                                    {
+                                        trsrList[treasure.Key] = treasure.Value;
+                                    } 
                                 }
                                 else
                                 {
