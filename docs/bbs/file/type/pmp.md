@@ -26,9 +26,9 @@ The usage of these flags is still unknown.
 | Value | Name  
 |--------|------
 | 0 | NO_FLAG
-| 1 | MAPFLAG_DISPOFF=1
-| 2 | MAPFLAG_PRESETOFF=2
-| 4 | MAPFLAG_SYSPRESETOFF=4
+| 1 | MAPFLAG_DISPOFF
+| 2 | MAPFLAG_PRESETOFF
+| 4 | MAPFLAG_SYSPRESETOFF
 
 ## Object Instance List
 
