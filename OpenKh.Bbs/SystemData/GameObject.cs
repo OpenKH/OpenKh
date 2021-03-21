@@ -189,7 +189,12 @@ namespace OpenKh.Bbs.SystemData
 
             {"g01he00", "Small Chest (HE)"},
             {"g02he00", "Large Chest (HE)"},
+            {"g10he00", "Small Pot (HE)"},
+            {"g11he00", "Large Pot (HE)"},
+            {"g12he00", "Rolling Barrel (HE)"},
+            {"g13he00", "Explosive Barrel (HE)"},
             {"g50he00", "Closed Sign (HE)"},
+            {"g99he00", "Flask (HE)"},
 
             {"g01jb00", "Small Chest (JB)"},
             {"g02jb00", "Large Chest (JB)"},
