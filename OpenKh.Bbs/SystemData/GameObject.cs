@@ -187,6 +187,10 @@ namespace OpenKh.Bbs.SystemData
             {"g18ex00", "Invisible Wall 18"},
             {"g20ex00", "g20ex00"},
 
+            {"g01he00", "Small Chest (HE)"},
+            {"g02he00", "Large Chest (HE)"},
+            {"g50he00", "Closed Sign (HE)"},
+
             {"g01jb00", "Small Chest (JB)"},
             {"g02jb00", "Large Chest (JB)"},
             {"g03jb00", "Large Chest (Debug)"},
