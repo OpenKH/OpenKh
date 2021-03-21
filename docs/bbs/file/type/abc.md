@@ -25,14 +25,14 @@ It seems to be `char[128]` except for the first entry which is `char[32]`.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint32   | Pointer to Bone 1
-| 0x4     | Vector3f   | Offset 1
-| 0x10    | uint32   | Pointer to Bone 2
-| 0x14    | Vector3f   | Offset 2
-| 0x20    | float   | Radius
-| 0x20    | uint32   | ABC Flag
-| 0x20    | uint32   | Pointer to Effect FEP
-| 0x20    | uint32   | Pointer to Effect Name
+| 0x0     | uint32    | Pointer to Bone 1
+| 0x4     | Vector3f  | Offset 1
+| 0x10    | uint32    | Pointer to Bone 2
+| 0x14    | Vector3f  | Offset 2
+| 0x20    | float     | Radius
+| 0x20    | uint32    | ABC Flag
+| 0x20    | uint32    | Pointer to Effect FEP
+| 0x20    | uint32    | Pointer to Effect Name
 
 ### ABC Flag
 

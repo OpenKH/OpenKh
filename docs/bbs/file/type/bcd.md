@@ -34,14 +34,14 @@ List of `header.face_count` of the following structure, found at `face list offs
 | 0x4 | uint32 | Unknown.
 | 0x8 | uint32 | Unknown.
 | 0xC | uint32 | Unknown.
-| 0x10 | short | Vertex index 1
-| 0x12 | short | Vertex index 2
-| 0x14 | short | Vertex index 3
-| 0x16 | short | Vertex index 4 *
-| 0x18 | short | Unknown
-| 0x1A | short | Unknown
-| 0x1C | short | Unknown
-| 0x1E | short | Unknown
+| 0x10 | int16 | Vertex index 1
+| 0x12 | int16 | Vertex index 2
+| 0x14 | int16 | Vertex index 3
+| 0x16 | int16 | Vertex index 4 *
+| 0x18 | int16 | Unknown
+| 0x1A | int16 | Unknown
+| 0x1C | int16 | Unknown
+| 0x1E | int16 | Unknown
 | 0x20 | uint32 | Unknown
 | 0x20 | uint32 | Unknown, possibly flags
 | 0x20 | uint32 | Unknown

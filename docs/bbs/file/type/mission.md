@@ -65,9 +65,9 @@ The type of bonus to receive. It is not possible to give two rewards of the same
 | Value | Description
 |--------|-------
 | 0     | None
-| 1     | Maximum HP
+| 1     | Maximum HP Increase
 | 2     | Deck Capacity Increase
-| 3     | Command
+| 3     | Obtain Command
 
 ### Present
 
@@ -76,8 +76,8 @@ The type of present to receive. Presents cannot give you debug commands or abili
 | Value | Description
 |--------|-------
 | 0     | None
-| 1     | Item
-| 2     | Command
+| 1     | Obtain Item
+| 2     | Obtain Command
 
 ### Mission Kind
 

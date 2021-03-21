@@ -34,12 +34,12 @@ The next data chunk is repeated twice. Normal and Extended.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint32   | [Type](#PCAM-Type)
-| 0x4     | float   | Adjustment
-| 0x8     | float   | Timer
-| 0xC     | uint32   | [Flag](#PCAM-Flag)
-| 0x10     | Vector4f   | Eye
-| 0x20     | Vector4f   | Aim
+| 0x0     | uint32     | [Type](#PCAM-Type)
+| 0x4     | float      | Adjustment
+| 0x8     | float      | Timer
+| 0xC     | uint32     | [Flag](#PCAM-Flag)
+| 0x10    | Vector4f   | Eye
+| 0x20    | Vector4f   | Aim
 
 ### PCAM Type
 

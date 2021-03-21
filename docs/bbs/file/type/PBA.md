@@ -8,15 +8,15 @@ This file contains the list of animation indices used for combos.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint  | Unknown
-| 0x4     | uint  | Ground Base Hit 1
-| 0x8     | uint  | Unknown
-| 0xC     | uint  | Ground Base Hit 2
-| 0x10    | uint  | Ground to Air Hit
-| 0x14    | uint  | Ground Finisher Single Target
-| 0x18    | uint  | Aerial Base Hit 1
-| 0x1C    | uint  | Aerial Base Hit 2
-| 0x20    | uint  | Aerial Area Hit
-| 0x24    | uint  | Unknown
-| 0x28    | uint  | Ground Area Finisher
-| 0x2C    | uint  | Aerial Finisher
+| 0x0     | uint32  | Unknown
+| 0x4     | uint32  | Ground Base Hit 1
+| 0x8     | uint32  | Unknown
+| 0xC     | uint32  | Ground Base Hit 2
+| 0x10    | uint32  | Ground to Air Hit
+| 0x14    | uint32  | Ground Finisher Single Target
+| 0x18    | uint32  | Aerial Base Hit 1
+| 0x1C    | uint32  | Aerial Base Hit 2
+| 0x20    | uint32  | Aerial Area Hit
+| 0x24    | uint32  | Unknown
+| 0x28    | uint32  | Ground Area Finisher
+| 0x2C    | uint32  | Aerial Finisher

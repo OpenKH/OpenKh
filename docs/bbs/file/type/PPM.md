@@ -22,7 +22,7 @@ These files are usually contained within `pXXinit.arc` files with XX being the r
 | 0x24    | float  | Map Collision Shift Y
 | 0x28    | float  | Hang Shift Y
 | 0x2C    | float  | Body Collision Weight
-| 0x30    | uint  | Start Max HP
-| 0x34    | uint  | Dummy
-| 0x38    | uint  | Dummy
-| 0x3C    | uint  | Dummy
+| 0x30    | uint32 | Start Max HP
+| 0x34    | uint32 | Dummy
+| 0x38    | uint32 | Dummy
+| 0x3C    | uint32 | Dummy

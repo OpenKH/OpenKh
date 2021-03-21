@@ -7,21 +7,21 @@ This file controls what objects and how they're spawned in levels within [Kingdo
 | Offset | Type  | Description
 |--------|-------|---------------
 | 0x0     | char[4]  | File identifier, always `@OLO`.
-| 0x4     | ushort   | File version.
-| 0x6     | ushort   | Flag from [OLO Flags](###OLO-Flags)
-| 0x8     | uint     | Number of Objects to spawn.
-| 0xC     | uint     | Offset to the [Object Name](###Object-Name) section.
-| 0x10    | uint     | Number of file path addresses.
-| 0x14    | uint     | Offset to a list of [Path Name](###Path-Name) for **files**.
-| 0x18    | uint     | Number of Script name
-| 0x1C    | uint     | Offset to a list of [Path Name](###Path-Name) for **Scripts**.
-| 0x20    | uint     | Number of Mission labels.
-| 0x24    | uint     | Offset to the [Mission Name](###Mission-Name) definitions.
-| 0x28    | uint     | Number of Triggers.
-| 0x2C    | uint     | Offset to the [Trigger Data](###Trigger-Data) definitions.
-| 0x30    | uint     | Number of Group data.
-| 0x34    | uint     | Offset to the [Group Data](###Group-Data) definitions.
-| 0x38    | uint[2]  | Padding.
+| 0x4     | uint16   | File version.
+| 0x6     | uint16   | Flag from [OLO Flags](###OLO-Flags)
+| 0x8     | uint32     | Number of Objects to spawn.
+| 0xC     | uint32     | Offset to the [Object Name](###Object-Name) section.
+| 0x10    | uint32     | Number of file path addresses.
+| 0x14    | uint32     | Offset to a list of [Path Name](###Path-Name) for **files**.
+| 0x18    | uint32     | Number of Script name
+| 0x1C    | uint32     | Offset to a list of [Path Name](###Path-Name) for **Scripts**.32
+| 0x20    | uint32     | Number of Mission labels.
+| 0x24    | uint32     | Offset to the [Mission Name](###Mission-Name) definitions.
+| 0x28    | uint32     | Number of Triggers.
+| 0x2C    | uint32     | Offset to the [Trigger Data](###Trigger-Data) definitions.
+| 0x30    | uint32     | Number of Group data.
+| 0x34    | uint32     | Offset to the [Group Data](###Group-Data) definitions.
+| 0x38    | uint32[2]  | Padding.
 
 ### **OLO Flags**
 
@@ -62,12 +62,12 @@ OLO Flags is a bitfield.
 |--------|-------|------------
 | 0x0    | Vector3  | Trigger location.
 | 0xC    | Vector3  | Trigger scale.
-| 0x18   | uint  | Trigger ID. (uiID)
-| 0x1C   | uint  | [Trigger Behavior](###Trigger-Behavior)
-| 0x20   | ushort  | Parameter 1 (Room to Teleport to)
-| 0x22   | ushort  | Parameter 2 (Room Entrance to use)
-| 0x24   | uint  | ID of CTD file to load
-| 0x28   | uint  | Possibly a reference to [Trigger Type](###Trigger-Type) (Game Trigger)
+| 0x18   | uint32  | Trigger ID. (uiID)
+| 0x1C   | uint32  | [Trigger Behavior](###Trigger-Behavior)
+| 0x20   | uint16  | Parameter 1 (Room to Teleport to)
+| 0x22   | uint16  | Parameter 2 (Room Entrance to use)
+| 0x24   | uint32  | ID of CTD file to load
+| 0x28   | uint32  | Possibly a reference to [Trigger Type](###Trigger-Type) (Game Trigger)
 | 0x2C   | float  | Yaw rotation.
 
 ### Trigger Behavior

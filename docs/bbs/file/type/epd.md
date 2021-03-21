@@ -24,16 +24,16 @@ The format consists on the following structures in order:
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint  | [Status Ailments](#Status-Ailments) flag
-| 0x4     | float | Max HP (Bosses) Health Multiplier (Enemies)
-| 0x8     | float | Experience Multiplier
-| 0xC     | uint  | iSize (Unknown)
-| 0x10     | float  | Physical Damage Multiplier
-| 0x14     | float  | Fire Damage Multiplier
-| 0x18     | float  | Ice Damage Multiplier
-| 0x1C     | float  | Thunder Damage Multiplier
-| 0x20     | float  | Darkness Damage Multiplier
-| 0x24     | float  | Non-Elemental Damage Multiplier
+| 0x0     | uint32 | [Status Ailments](#Status-Ailments) flag
+| 0x4     | float  | Max HP (Bosses) Health Multiplier (Enemies)
+| 0x8     | float  | Experience Multiplier
+| 0xC     | uint32 | iSize (Unknown)
+| 0x10    | float  | Physical Damage Multiplier
+| 0x14    | float  | Fire Damage Multiplier
+| 0x18    | float  | Ice Damage Multiplier
+| 0x1C    | float  | Thunder Damage Multiplier
+| 0x20    | float  | Darkness Damage Multiplier
+| 0x24    | float  | Non-Elemental Damage Multiplier
 
 ### Status Ailments
 
@@ -84,18 +84,18 @@ Animation List has 20 instances and 8 filler bytes.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | ushort  | Damage Ceiling
-| 0x2     | ushort  | Damage Floor
-| 0x4     | float  | fWeight
-| 0x8     | uint    | [Effectiveness Flag](#Effectiveness-Flag)
-| 0xC     | char    | Prize Box probability.
-| 0xD     | char[3] | padding
-| 0x10     | uint    | Number of [Technique Parameters](#Technique-Parameters).
-| 0x14     | uint    | Offset to [Technique Parameters](#Technique-Parameters).
-| 0x18     | uint    | Number of [Drop Items](#Drop-Items).
-| 0x1C     | uint    | Offset to [Drop Items](#Drop-Items).
-| 0x20     | uint    | Number of [Extra Parameters](#Extra-Parameters).
-| 0x24     | uint    | Offset to [Extra Parameters](#Extra-Parameters).
+| 0x0     | uint16    | Damage Ceiling
+| 0x2     | uint16    | Damage Floor
+| 0x4     | float     | fWeight
+| 0x8     | uint32    | [Effectiveness Flag](#Effectiveness-Flag)
+| 0xC     | uint8     | Prize Box probability.
+| 0xD     | uint8[3]  | padding
+| 0x10    | uint32    | Number of [Technique Parameters](#Technique-Parameters).
+| 0x14    | uint32    | Offset to [Technique Parameters](#Technique-Parameters).
+| 0x18    | uint32    | Number of [Drop Items](#Drop-Items).
+| 0x1C    | uint32    | Offset to [Drop Items](#Drop-Items).
+| 0x20    | uint32    | Number of [Extra Parameters](#Extra-Parameters).
+| 0x24    | uint32    | Offset to [Extra Parameters](#Extra-Parameters).
 
 ### Effectiveness Flag
 
@@ -116,10 +116,10 @@ This structures repeats for as many animations need their parameters set.
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | float  | Technique Damage Multiplier
-| 0x4     | byte  | Technique Number
-| 0x5     | byte  | [Attack Kind](#Attack-Kind)
-| 0x6     | byte  | [Attack Attribute](#Attack-Attribute)
-| 0x7     | byte  | Success Rate (Usually 0x64 [100])
+| 0x4     | uint8  | Technique Number
+| 0x5     | uint8  | [Attack Kind](#Attack-Kind)
+| 0x6     | uint8  | [Attack Attribute](#Attack-Attribute)
+| 0x7     | uint8  | Success Rate (Usually 0x64 [100])
 
 ## Drop Parameters
 
@@ -127,9 +127,9 @@ Items dropped by enemies.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint  | Value for [Drop Kind](#Drop-Kind)
-| 0x4     | ushort  | Number
-| 0x6     | ushort  | Probability
+| 0x0     | uint32  | Value for [Drop Kind](#Drop-Kind)
+| 0x4     | uint16  | Number
+| 0x6     | uint16  | Probability
 
 ### Drop Kind
 
@@ -161,8 +161,8 @@ This structure contains AI parameters that can change the values in variables us
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | char[0xC]  | Parameter Name
-| 0C     | float  | Parameter Value
+| 0x0     | char[0xC]  | Parameter Name
+| 0xC     | float      | Parameter Value
 
 #### Attack Kind
 

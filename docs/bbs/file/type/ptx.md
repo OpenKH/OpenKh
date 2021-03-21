@@ -72,6 +72,8 @@ This file controls things such as events triggered by OLO files or the music to 
 
 ## Parse Pattern Argument
 
+Use unknown.
+
 | Value | Name  
 |--------|------
 | 0x2   | PARSE_SETFILE
@@ -86,20 +88,17 @@ This file controls things such as events triggered by OLO files or the music to 
 | 0xFF2 | PARSE_ALL
 
 ---
-# TYPE_MAP
+# TYPE_EVENT
+
+## PTNCODE_SETFILE
 
 Controls which spawns appear in the level and what flag needs to be risen for them to be triggered.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint16 | Flag to load with
-| 0x2     | uint16 | Size of string chunk + 4
-| 0x4     | uint16 | unk3 // Always 0x1
-| 0x6     | uint16 | String Count
-| 0x8     | string[String Count] | Name of OLO files to spawn. Given an olo name `{world}{area}-{ID}.olo`, only the `ID` section is written, ending with a 0x0000FFFF entry.
-
----
-# TYPE_EVENT
+| 0x0     | uint16 | Code `Always 0x1`
+| 0x2     | uint16 | String Count
+| 0x4     | string[String Count] | Name of OLO files to spawn. Given an olo name `{world}{area}-{ID}.olo`, only the `ID` section is written.
 
 ## PTNCODE_BGM
 
@@ -133,8 +132,7 @@ This one occupies 4 bytes per instances.
 | 0x0    | uint16 | World
 | 0x2    | uint16 | Room
 | 0x4    | uint16 | Entrance
-| 0x6    | uint8  | Unknown
-| 0x7    | uint16 | unk1a
+| 0x6    | uint16 | Unknown
 
 # Jump Type
 
@@ -147,7 +145,11 @@ This one occupies 4 bytes per instances.
 | 0xFFFFFFFE    | TYPE_DEFAULT_EXCEPT_WIPE
 | 0xFFFFFFFF    | TYPE_DEFAULT
 
+---
+
 # P_CHARA
+
+Unused enumeraion.
 
 | Value | Name  
 |--------|------

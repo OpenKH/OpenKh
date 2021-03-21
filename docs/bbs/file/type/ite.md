@@ -17,8 +17,8 @@ This file can be found in the `item` folder or inside `arc/system/commongame.arc
 | 0xA     | uint16   | Flavor Data Count
 | 0xC     | uint16   | Key Item Data Count
 | 0xE     | uint16   | Key Hide Data Count
-| 0x10     | uint16   | Synthesis Data Count
-| 0x12     | uint16   | Padding
+| 0x10    | uint16   | Synthesis Data Count
+| 0x12    | uint16   | Padding
 
 ## Weapon Data
 
