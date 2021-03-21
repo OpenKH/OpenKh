@@ -1,0 +1,6 @@
+title: My awesome untitled mod
+specifications: 1
+dependencies:
+  - name: openkh/is-awesome
+assets:
+  - name: my/file/path.bin

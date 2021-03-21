@@ -28,22 +28,7 @@ namespace OpenKh.Game.Infrastructure
             get => Config.RegionId == -1 ? _regionId : Config.RegionId;
             set => Config.RegionId = value;
         }
-        public string Language
-        {
-            get
-            {
-                int languageId;
-                if (RegionId == Constants.RegionFinalMix) // Final mix should load JP assets
-                    languageId = 0;
-                else if (RegionId == 2) // UK region should load US assets
-                    languageId = 1;
-                else
-                    languageId = RegionId;
-
-                return Constants.Regions[languageId];
-            }
-        }
-
+        public string Language => Constants.Languages[RegionId];
         public string Region => Constants.Regions[RegionId];
         public IDataContent DataContent { get; }
         public FontContext FontContext { get; }
@@ -117,7 +102,7 @@ namespace OpenKh.Game.Infrastructure
             IsReMix = IsReMixFileExists(dataContent, Region);
             Log.Info("ReMIX={0}", IsReMix);
 
-            IsFinalMix = IsReMix || RegionId == Constants.RegionFinalMix;
+            IsFinalMix = IsReMix || RegionId == (int)Constants.RegionId.FinalMix;
             Log.Info("Final Mix={0}", IsFinalMix);
 
             // Load files in the same order as KH2 does

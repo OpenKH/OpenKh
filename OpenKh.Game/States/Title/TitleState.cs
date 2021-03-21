@@ -126,7 +126,7 @@ namespace OpenKh.Game.States.Title
                 else
                     _titleLayoutDesc = ReMixTitleLayout;
             }
-            else if (Kernel.RegionId == Kh2.Constants.RegionFinalMix)
+            else if (Kernel.RegionId == (int)Kh2.Constants.RegionId.FinalMix)
             {
                 if (_isTheaterModeUnlocked)
                     _titleLayoutDesc = FinalMixTheaterTitleLayout;
