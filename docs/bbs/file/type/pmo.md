@@ -22,7 +22,7 @@ The format supports varying vertex types and has support for animation bones and
 | 0x16   | uint16 | Vertex Count |
 | 0x18   | float  | Model Scale |
 | 0x1C   | uint32 | Mesh Offset 1 |
-| 0x20   | Vector4[8] | Bounding Box |
+| 0x20   | Matrix4x4[2] | Bounding Box |
 
 ## Texture Info
 
@@ -30,9 +30,11 @@ The Header is followed by `Texture Count` Texture Info records
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 0x0    | uint32 | Offset of TM2 block if present in current file. |
-| 0x4    | char[0xC] | Texture Name |
-| 0x10   | int32[4] | unknown |
+| 0x0    | uint32    | Offset of TM2 block if present in current file. |
+| 0x4    | char[12] | Texture Name |
+| 0x10   | float     | Tiling Speed X |
+| 0x14   | float     | Tiling Speed Y |
+| 0x18   | int32[2]  | Padding |
 
 See also: [TIM2](../common/tm2.md)
 
@@ -42,22 +44,22 @@ See also: [TIM2](../common/tm2.md)
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 0x0    | uint16 | Vertex Count |
-| 0x2    | int8 | Texture ID, an index into the list of `Texture Info` records |
-| 0x3    | uint8 | Vertex Size, in bytes |
-| 0x4    | uint32 | Vertex Flags, see below |
-| 0x8    | uint8 | Group |
-| 0x9    | uint8 | Triangle Strip count |
-| 0xA    | uint16 | [Vertex Attribute](#Vertex-Attribute) |
-| 0xC    | uint8[8] | List of bone indices which effect this section. Only present if the PMO blob contains a skeleton (ie: `header.skeletonOffset != 0`) |
-| varies | uint32 | Diffuse Color. Only present if `vertexFlags.DiffuseColor & 1` |
+| 0x0    | uint16   | Vertex Count |
+| 0x2    | int8     | Texture ID, an index into the list of `Texture Info` records 
+| 0x3    | uint8    | Vertex Size, in bytes
+| 0x4    | uint32   | Vertex Flags, see below 
+| 0x8    | uint8    | Group 
+| 0x9    | uint8    | Triangle Strip count 
+| 0xA    | uint16   | [Vertex Attribute](#Vertex-Attribute) 
+| 0xC    | uint8[8] | List of bone indices which effect this section. Only present if the PMO blob contains a skeleton (ie: `header.skeletonOffset != 0`) 
+| varies | uint32 | Diffuse Color. Only present if `vertexFlags.DiffuseColor & 1` 
 
 The section header is followed by `vertexCount * vertexSize` bytes of vertex data. The next Section header follows on the next 4-byte alignment after that.
 
 ### Vertex flags
 
 The 24 least significant bits of this structure correspond to the PSP's [GE VTYPE command](http://hitmen.c02.at/files/yapspd/psp_doc/chap11.html#sec11.5.15).
-The Primative type bits correspond to the primative type bits of the PSP's [GE PRIM command](http://hitmen.c02.at/files/yapspd/psp_doc/chap11.html#sec11.5.3).
+The Primitive type bits correspond to the primitive type bits of the PSP's [GE PRIM command](http://hitmen.c02.at/files/yapspd/psp_doc/chap11.html#sec11.5.3).
 
 | Bit | Count | Description |
 |-----|-------|-------------|
@@ -83,28 +85,28 @@ This field defines what kind of primitive is being rendered.
 
 | Value    |       Name           |      Meaning     |
 |----------|----------------------|------------------|
-| 0        | ATTR_BLEND_NONE      |                  |
-| 1        | ATTR_NOMATERIAL      |                  |
-| 2        | ATTR_GLARE           |                  |
-| 4        | ATTR_BACK            |                  |
-| 8        | ATTR_DIVIDE          |                  |
-| 16       | ATTR_TEXALPHA        | Specifies that the texture used contains alpha values for transparency    |
-| 24       | FLAG_SHIFT           |                  |
-| 28       | PRIM_SHIFT           |                  |
-| 32       | ATTR_BLEND_SEMITRANS | Specifies that the material must be blended as semitransparent        |
-| 64       | ATTR_BLEND_ADD       |                  |
-| 96       | ATTR_BLEND_SUB       |                  |
-| 224      | ATTR_BLEND_MASK      |                  |
-| 256      | ATTR_8               |                  |
-| 512      | ATTR_9               |                  |
-| 1024     | ATTR_DROPSHADOW      |                  |
-| 2048     | ATTR_ENVMAP          |                  |
-| 4096     | ATTR_12              |                  |
-| 8192     | ATTR_13              |                  |
-| 16384    | ATTR_14              |                  |
-| 32768    | ATTR_15              |                  |
-| 16777216 | FLAG_COLOR           |                  |
-| 33554432 | FLAG_NOWEIGHT        |                  |
+| 0        | ATTR_BLEND_NONE      |                  
+| 1        | ATTR_NOMATERIAL      |                  
+| 2        | ATTR_GLARE           |                  
+| 4        | ATTR_BACK            |                  
+| 8        | ATTR_DIVIDE          |                  
+| 16       | ATTR_TEXALPHA        | Specifies that the texture used contains alpha values for transparency 
+| 24       | FLAG_SHIFT           |                  
+| 28       | PRIM_SHIFT           |                  
+| 32       | ATTR_BLEND_SEMITRANS | Specifies that the material must be blended as semitransparent     
+| 64       | ATTR_BLEND_ADD       |                  
+| 96       | ATTR_BLEND_SUB       |                  
+| 224      | ATTR_BLEND_MASK      |                  
+| 256      | ATTR_8               |                  
+| 512      | ATTR_9               |                  
+| 1024     | ATTR_DROPSHADOW      |                  
+| 2048     | ATTR_ENVMAP          |                  
+| 4096     | ATTR_12              |                  
+| 8192     | ATTR_13              |                  
+| 16384    | ATTR_14              |                  
+| 32768    | ATTR_15              |                  
+| 16777216 | FLAG_COLOR           |                  
+| 33554432 | FLAG_NOWEIGHT        |                  
 
 Texture Format, Normal Format, Position Format and Weight Format are as follows:
 
@@ -202,5 +204,5 @@ Vertex properties which are in the format `8-bit normalized` or `16-bit normaliz
 | 0xA | uint16 | Padding |
 | 0xC | uint32 | Padding |
 | 0x10 | char[16] | Bone Name |
-| 0x20 | float[4][4] | Transform |
-| 0x60 | float[4][4] | Inverse Transform |
+| 0x20 | Matrix4x4 | Transform |
+| 0x60 | Matrix4x4 | Inverse Transform |
