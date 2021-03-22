@@ -149,10 +149,10 @@ namespace OpenKh.Command.PmpConverter
                     for (int v = 0; v < desc.Vertices.Length; v++)
                     {
                         Vector4 Color = new Vector4();
-                        Color.X = desc.Vertices[v].R * 2;
-                        Color.Y = desc.Vertices[v].G * 2;
-                        Color.Z = desc.Vertices[v].B * 2;
-                        Color.W = desc.Vertices[v].A * 2;
+                        Color.X = desc.Vertices[v].R * 256;
+                        Color.Y = desc.Vertices[v].G * 256;
+                        Color.Z = desc.Vertices[v].B * 256;
+                        Color.W = 128;
                         chunk.colors.Add(Color);
 
                         Vector3 vec;
@@ -349,8 +349,6 @@ namespace OpenKh.Command.PmpConverter
                 Node child = scene.RootNode.Children[i];
                 MeshGroup currentMeshGroup = new MeshGroup();
                 currentMeshGroup.MeshDescriptors = new List<MeshDescriptor>();
-
-                int tempMatID = 0x8000;
 
                 // Get meshes by ID.
                 foreach(int j in child.MeshIndices)

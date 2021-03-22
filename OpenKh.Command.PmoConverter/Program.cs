@@ -133,7 +133,9 @@ namespace OpenKh.Command.PmoConverter
                 chunk.SectionInfo.VertexSize += (TextureCoordinateFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)8  : (byte)((int)TextureCoordinateFormat * 2); // Texture Coordinates
                 if (chunk.SectionInfo.VertexSize % 4 != 0)
                     chunk.SectionInfo.VertexSize += 2;
+
                 chunk.SectionInfo.VertexSize += UsesUniformColor ? (byte)0 : (byte)4; // VertexColor
+
                 VertexFormat = (Pmo.CoordinateFormat)posFormat;
                 chunk.SectionInfo.VertexSize += (VertexFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)12 : (byte)((int)VertexFormat * 3); // Vertices
                 if (chunk.SectionInfo.VertexSize % 4 != 0)
@@ -144,10 +146,10 @@ namespace OpenKh.Command.PmoConverter
                     int index = vertIndices[v];
 
                     Vector4 Color = new Vector4();
-                    Color.X = desc.Vertices[index].R * 2;
-                    Color.Y = desc.Vertices[index].G * 2;
-                    Color.Z = desc.Vertices[index].B * 2;
-                    Color.W = 128.0f;
+                    Color.X = desc.Vertices[index].R * 256;
+                    Color.Y = desc.Vertices[index].G * 256;
+                    Color.Z = desc.Vertices[index].B * 256;
+                    Color.W = 128;
                     chunk.colors.Add(Color);
 
                     Vector3 vec;
@@ -254,19 +256,17 @@ namespace OpenKh.Command.PmoConverter
 
         public static bool UsesUniformDiffuseFlag(MeshDescriptor desc)
         {
-            bool bDiffuseFlag = true;
             Vector4 InitialColor = new Vector4(desc.Vertices[0].R, desc.Vertices[0].G, desc.Vertices[0].B, desc.Vertices[0].A);
-            Vector4 CompareColor = new Vector4();
 
-            foreach(PositionColoredTextured vert in desc.Vertices)
+            foreach (PositionColoredTextured vert in desc.Vertices)
             {
-                CompareColor = new Vector4(vert.R, vert.G, vert.B, vert.A);
+                Vector4 CompareColor = new Vector4(vert.R, vert.G, vert.B, vert.A);
 
                 if (CompareColor != InitialColor)
                     return false;
             }
 
-            return bDiffuseFlag;
+            return true;
         }
 
         public static Pmo.CoordinateFormat GetTextureCoordinateFormat(MeshDescriptor desc)
