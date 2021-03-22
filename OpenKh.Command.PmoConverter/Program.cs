@@ -122,13 +122,14 @@ namespace OpenKh.Command.PmoConverter
                 //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, (uint)TextureCoordinateFormat);
                 //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, (uint)VertexFormat);
 
-                int posFormat = 3;
+                uint texFormat = 3;
+                uint posFormat = 3;
 
-                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, 2);
-                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, (uint)posFormat);
+                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, texFormat);
+                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, posFormat);
 
                 chunk.SectionInfo.VertexSize += 0; // Weights.
-                TextureCoordinateFormat = Pmo.CoordinateFormat.NORMALIZED_16_BITS;
+                TextureCoordinateFormat = (Pmo.CoordinateFormat)texFormat;
                 chunk.SectionInfo.VertexSize += (TextureCoordinateFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)8  : (byte)((int)TextureCoordinateFormat * 2); // Texture Coordinates
                 if (chunk.SectionInfo.VertexSize % 4 != 0)
                     chunk.SectionInfo.VertexSize += 2;
@@ -167,6 +168,9 @@ namespace OpenKh.Command.PmoConverter
             // Header.
             pmo.header = new Pmo.Header();
             pmo.header.MagicCode = 0x4F4D50;
+            pmo.header.Number = 1;
+            pmo.header.Group = 1;
+            pmo.header.Version = 3;
             pmo.header.TextureCount = (ushort)TextureData.Count; // TODO.
             pmo.header.Unk0A = 0x800;
             pmo.header.MeshOffset0 = 0xA0 + ((uint)pmo.header.TextureCount * 0x20);
