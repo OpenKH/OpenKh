@@ -44,7 +44,6 @@ namespace OpenKh.Tools.BbsMapStudio
         private string _region;
         private string _ardPath;
         private string _mapPath;
-        private string _objPath;
         private List<string> _mapList = new List<string>();
         private ObjEntryController _objEntryController;
 
