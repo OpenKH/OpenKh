@@ -122,8 +122,10 @@ namespace OpenKh.Command.PmoConverter
                 //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, (uint)TextureCoordinateFormat);
                 //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, (uint)VertexFormat);
 
+                int posFormat = 3;
+
                 chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, 2);
-                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, 2);
+                chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, (uint)posFormat);
 
                 chunk.SectionInfo.VertexSize += 0; // Weights.
                 TextureCoordinateFormat = Pmo.CoordinateFormat.NORMALIZED_16_BITS;
@@ -131,7 +133,7 @@ namespace OpenKh.Command.PmoConverter
                 if (chunk.SectionInfo.VertexSize % 4 != 0)
                     chunk.SectionInfo.VertexSize += 2;
                 chunk.SectionInfo.VertexSize += UsesUniformColor ? (byte)0 : (byte)4; // VertexColor
-                VertexFormat = Pmo.CoordinateFormat.NORMALIZED_16_BITS;
+                VertexFormat = (Pmo.CoordinateFormat)posFormat;
                 chunk.SectionInfo.VertexSize += (VertexFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)12 : (byte)((int)VertexFormat * 3); // Vertices
                 if (chunk.SectionInfo.VertexSize % 4 != 0)
                     chunk.SectionInfo.VertexSize += 2;
@@ -166,7 +168,7 @@ namespace OpenKh.Command.PmoConverter
             pmo.header = new Pmo.Header();
             pmo.header.MagicCode = 0x4F4D50;
             pmo.header.TextureCount = (ushort)TextureData.Count; // TODO.
-            pmo.header.Unk0A = 0x80;
+            pmo.header.Unk0A = 0x800;
             pmo.header.MeshOffset0 = 0xA0 + ((uint)pmo.header.TextureCount * 0x20);
             pmo.header.VertexCount = (ushort)indicesVertexCount;
             pmo.header.TriangleCount = (ushort)indicesVertexCount;
