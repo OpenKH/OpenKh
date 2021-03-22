@@ -405,10 +405,10 @@ namespace OpenKh.Command.PmoConverter
                             vertices[i].Z = x.Vertices[i].Z * Scale;
                             vertices[i].Tu = x.TextureCoordinateChannels[0][i].X;
                             vertices[i].Tv = 1.0f - x.TextureCoordinateChannels[0][i].Y;
-                            vertices[i].R = 1.0f;
-                            vertices[i].G = 1.0f;
-                            vertices[i].B = 1.0f;
-                            vertices[i].A = 1.0f;
+                            vertices[i].R = 0.5f;
+                            vertices[i].G = 0.5f;
+                            vertices[i].B = 0.5f;
+                            vertices[i].A = 0.5f;
                         }
 
                         return new MeshDescriptor

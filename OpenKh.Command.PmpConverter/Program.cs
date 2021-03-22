@@ -173,7 +173,7 @@ namespace OpenKh.Command.PmpConverter
                 // Header.
                 pmo.header = new Pmo.Header();
                 pmo.header.MagicCode = 0x4F4D50;
-                pmo.header.TextureCount = (ushort)TextureData.Count; // TODO.
+                pmo.header.TextureCount = (ushort)textureIndices.Count; // TODO.
                 pmo.header.Unk0A = 0x80;
                 pmo.header.MeshOffset0 = 0xA0 + ((uint)pmo.header.TextureCount * 0x20);
                 pmo.header.VertexCount = descriptorVertexCount;
@@ -347,6 +347,8 @@ namespace OpenKh.Command.PmpConverter
                 MeshGroup currentMeshGroup = new MeshGroup();
                 currentMeshGroup.MeshDescriptors = new List<MeshDescriptor>();
 
+                int tempMatID = 0x8000;
+
                 // Get meshes by ID.
                 foreach(int j in child.MeshIndices)
                 {
@@ -371,6 +373,7 @@ namespace OpenKh.Command.PmpConverter
                     meshDescriptor.Indices = x.GetIndices();
                     meshDescriptor.IsOpaque = false;
                     meshDescriptor.TextureIndex = x.MaterialIndex;
+                    
 
                     currentMeshGroup.MeshDescriptors.Add(meshDescriptor);
                 }

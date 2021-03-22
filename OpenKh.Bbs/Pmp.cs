@@ -172,9 +172,14 @@ namespace OpenKh.Bbs
 
             for (int td = 0; td < pmp.TextureList.Count; td++)
             {
+                uint sPos = (uint)stream.Position;
                 List<Tm2> l = new List<Tm2>();
                 l.Add(pmp.TextureDataList[td]);
                 Tm2.Write(stream, l);
+
+                stream.Seek(pos + (td * 0x20), SeekOrigin.Begin);
+                stream.Write(sPos);
+                stream.Seek(0, SeekOrigin.End);
             }
         }
 
