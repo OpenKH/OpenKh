@@ -272,9 +272,8 @@ namespace OpenKh.Tools.EpdEditor
                 UpdateWriteInfo();
                 Epd.Write(epdOut, epd);
                 epdOut.Close();
+                MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

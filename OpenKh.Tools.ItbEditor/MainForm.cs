@@ -173,9 +173,8 @@ namespace OpenKh.Tools.ItbEditor
                 UpdateWriteInfo();
                 Itb.Write(itbOut, itb);
                 itbOut.Close();
+                MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void NewChestButton_Click(object sender, EventArgs e)
