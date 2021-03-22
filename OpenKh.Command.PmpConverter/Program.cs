@@ -176,8 +176,8 @@ namespace OpenKh.Command.PmpConverter
                 pmo.header.Number = 1;
                 pmo.header.Group = 1;
                 pmo.header.Version = 3;
-                pmo.header.TextureCount = (ushort)textureIndices.Count; // TODO.
-                pmo.header.Unk0A = 0x800;
+                pmo.header.TextureCount = (byte)textureIndices.Count; // TODO.
+                pmo.header.Flag = 0x800;
                 pmo.header.MeshOffset0 = 0xA0 + ((uint)pmo.header.TextureCount * 0x20);
                 pmo.header.VertexCount = descriptorVertexCount;
                 pmo.header.TriangleCount = pmo.header.VertexCount;
