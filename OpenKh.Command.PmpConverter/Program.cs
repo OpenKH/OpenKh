@@ -366,10 +366,10 @@ namespace OpenKh.Command.PmpConverter
                         vertices[k].Z = x.Vertices[k].Z * Scale;
                         vertices[k].Tu = x.TextureCoordinateChannels[0][k].X;
                         vertices[k].Tv = 1.0f - x.TextureCoordinateChannels[0][k].Y;
-                        vertices[k].R = 1.0f;
-                        vertices[k].G = 1.0f;
-                        vertices[k].B = 1.0f;
-                        vertices[k].A = 1.0f;
+                        vertices[k].R = x.VertexColorChannels[0][i].R;
+                        vertices[k].G = x.VertexColorChannels[0][i].G;
+                        vertices[k].B = x.VertexColorChannels[0][i].B;
+                        vertices[k].A = x.VertexColorChannels[0][i].A;
                     }
 
                     meshDescriptor.Vertices = vertices;

@@ -411,12 +411,12 @@ namespace OpenKh.Command.PmoConverter
                             vertices[i].Z = x.Vertices[i].Z * Scale;
                             vertices[i].Tu = x.TextureCoordinateChannels[0][i].X;
                             vertices[i].Tv = 1.0f - x.TextureCoordinateChannels[0][i].Y;
-                            vertices[i].R = 0.5f;
-                            vertices[i].G = 0.5f;
-                            vertices[i].B = 0.5f;
-                            vertices[i].A = 0.5f;
+                            vertices[i].R = x.VertexColorChannels[0][i].R;
+                            vertices[i].G = x.VertexColorChannels[0][i].G;
+                            vertices[i].B = x.VertexColorChannels[0][i].B;
+                            vertices[i].A = x.VertexColorChannels[0][i].A;
                         }
-
+                        
                         return new MeshDescriptor
                         {
                             Vertices = vertices,
