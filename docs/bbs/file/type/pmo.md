@@ -9,12 +9,13 @@ The format supports varying vertex types and has support for animation bones and
 | Offset | Type | Description |
 |--------|------|-------------|
 | 0x0    | uint32 | Magic Value. Always "PMO\0" (0x004F4D50) |
-| 0x4    | uint8 | Number |
-| 0x5    | uint8 | Group |
-| 0x6    | uint8 | Version |
-| 0x7    | uint8 | Padding |
-| 0x8    | uint16 | Texture Count |
-| 0xA    | uint16 | unknown |
+| 0x4    | uint8  | Number |
+| 0x5    | uint8  | Group |
+| 0x6    | uint8  | Version |
+| 0x7    | uint8  | Padding |
+| 0x8    | uint8  | Texture Count |
+| 0x9    | uint8  | Padding |
+| 0xA    | uint16 | Flag |
 | 0xC    | uint32 | Skeleton Offset |
 | 0x10   | uint32 | Mesh Offset 0 |
 | 0x14   | uint16 | Triangle Count |
