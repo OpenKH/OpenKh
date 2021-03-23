@@ -22,7 +22,7 @@ The format supports varying vertex types and has support for animation bones and
 | 0x16   | uint16 | Vertex Count |
 | 0x18   | float  | Model Scale |
 | 0x1C   | uint32 | Mesh Offset 1 |
-| 0x20   | Matrix4x4[2] | Bounding Box |
+| 0x20   | float[8][8] | Bounding Box |
 
 ## Texture Info
 
