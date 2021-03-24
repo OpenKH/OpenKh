@@ -202,22 +202,24 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
             try
             {
-                var uri = new Uri(source);
-                if (uri.Scheme == "file" && !File.Exists(uri.AbsolutePath))
+                if (!File.Exists(source))
                 {
                     if (!string.IsNullOrEmpty(fallback))
                         LoadImage(fallback, null, setter);
                     return;
                 }
 
-                var bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.UriSource = uri;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-                bitmapImage.Freeze();
+                using (var fs = new FileStream(source, FileMode.Open))
+                {
+                    var bitmapImage = new BitmapImage();
+                    bitmapImage.BeginInit();
+                    bitmapImage.StreamSource = fs;
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
+                    bitmapImage.Freeze();
 
-                Application.Current.Dispatcher.Invoke(() => setter(bitmapImage));
+                    Application.Current.Dispatcher.Invoke(() => setter(bitmapImage));
+                }
             }
             catch
             {
