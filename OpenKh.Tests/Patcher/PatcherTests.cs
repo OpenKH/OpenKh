@@ -515,6 +515,56 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void PatchKh2SpawnPointTest()
+        {
+
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "map.script",
+                        Method = "areadataspawn",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "map.yaml",
+                            }
+                        }
+                    },
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "map.script")).Using(stream =>
+            {
+                var spawnPoint = new List<Kh2.Ard.SpawnPoint>();
+
+                Kh2.Ard.SpawnPoint.Write(stream, spawnPoint);
+            });
+            File.Create(Path.Combine(ModInputDir, "map.yaml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- Type: 2");
+                writer.WriteLine("  Flag: 1");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "map.script");
+            var content = File.ReadAllText(Path.Combine(ModOutputDir, "map.script"));
+            var scripts = new Deserializer().Deserialize<List< Kh2.Ard.SpawnPoint >> (content);
+           
+            Assert.Equal(2, scripts[0].Type);
+            Assert.Equal(1, scripts[0].Flag);
+                
+        }
+
+
+        [Fact]
         public void ProcessMultipleTest()
         {
             var patcher = new PatcherProcessor();
