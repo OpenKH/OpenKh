@@ -41,46 +41,46 @@ The damage effects' values on MSET files point to this table.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (6)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (6)
+| 4 	 | uint32 | Entry Count
 
 ### Atkp Entry
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | ushort | SubId
-| 2 	 | ushort | Id
-| 4 	 | byte | [Type](#type)
-| 5 	 | byte | Critical Adjust (0 normal, 1 half damage, 2 no damage)
-| 6 	 | ushort | Power
-| 8 	 | byte | Team (Deal damage to: 0/1/2 Enemies, 3/4/5 Enemies and allies...)
-| 9 	 | byte | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
-| 10 	 | byte | Enemy Reaction (Whether an enemy is flinched, knocked...)
-| 11 	 | byte | Effect on hit (0 none, other values = different effects)
-| 12 	 | short | Knockback Strength 1 (Distance depends on enemy weight)
-| 14 	 | short | Knockback Strength 2 (Distance depends on enemy weight)
-| 16 	 | short | ???
-| 18 	 | byte | [Flags](#flags)
-| 19 	 | byte | [Refact Self](#refact)
-| 20 	 | byte | [Refact Other](#refact)
-| 21 	 | byte | Reflected motion (Points to the slot in the MSET to be triggered when the attack is reflected)
-| 22 	 | short | Reflect Hit Back
-| 24 	 | int | Reflect Action
-| 28 	 | int | Hit Sound Effect
-| 32 	 | ushort | Reflect RC
-| 34 	 | byte | Reflect Range
-| 35 	 | sbyte | Reflect Angle
-| 36 	 | byte | Damage Effect
-| 37 	 | byte | Switch
-| 38 	 | ushort | Interval (1 hit every X frames)
-| 40 	 | byte | Floor Check
-| 41 	 | byte | Drive drain (Adds on normal state, reduces when in a form)
-| 42 	 | byte | Revenge damage
-| 43 	 | byte | [Tr Reaction](#tr-reaction)
-| 44 	 | byte | Combo Group
-| 45 	 | byte | Random Effect
-| 46 	 | byte | [Kind](#kind)
-| 47 	 | byte | HP drain (Adds on normal state, reduces when in a form)
+| 0 	 | uint16 | SubId
+| 2 	 | uint16 | Id
+| 4 	 | uint8 | [Type](#type)
+| 5 	 | uint8 | Critical Adjust (0 normal, 1 half damage, 2 no damage)
+| 6 	 | uint16 | Power
+| 8 	 | uint8 | Team (Deal damage to: 0/1/2 Enemies, 3/4/5 Enemies and allies...)
+| 9 	 | uint8 | Element (0 phys, 1 fire, 2 blizz, 3 thun...)
+| 10 	 | uint8 | Enemy Reaction (Whether an enemy is flinched, knocked...)
+| 11 	 | uint8 | Effect on hit (0 none, other values = different effects)
+| 12 	 | int16 | Knockback Strength 1 (Distance depends on enemy weight)
+| 14 	 | int16 | Knockback Strength 2 (Distance depends on enemy weight)
+| 16 	 | int16 | ???
+| 18 	 | uint8 | [Flags](#flags)
+| 19 	 | uint8 | [Refact Self](#refact)
+| 20 	 | uint8 | [Refact Other](#refact)
+| 21 	 | uint8 | Reflected motion (Points to the slot in the MSET to be triggered when the attack is reflected)
+| 22 	 | int16 | Reflect Hit Back
+| 24 	 | int32 | Reflect Action
+| 28 	 | int32 | Hit Sound Effect
+| 32 	 | uint16 | Reflect RC
+| 34 	 | uint8 | Reflect Range
+| 35 	 | int8 | Reflect Angle
+| 36 	 | uint8 | Damage Effect
+| 37 	 | uint8 | Switch
+| 38 	 | uint16 | Interval (1 hit every X frames)
+| 40 	 | uint8 | Floor Check
+| 41 	 | uint8 | Drive drain (Adds on normal state, reduces when in a form)
+| 42 	 | uint8 | Revenge damage
+| 43 	 | uint8 | [Tr Reaction](#tr-reaction)
+| 44 	 | uint8 | Combo Group
+| 45 	 | uint8 | Random Effect
+| 46 	 | uint8 | [Kind](#kind)
+| 47 	 | uint8 | HP drain (Adds on normal state, reduces when in a form)
 
 #### Type
 
@@ -96,14 +96,14 @@ The damage effects' values on MSET files point to this table.
 
 #### Flags
 
-| Id   | Description |
-|------|-------------|
-| 0x01 | BG Hit
-| 0x02 | Limit PAX
-| 0x04 | Land
-| 0x08 | Capture PAX
-| 0x10 | Thank you
-| 0x20 | Kill Boss
+| Position | Size | Description |
+|----------|------|-------------|
+| 0 | 1 | BG Hit
+| 1 | 1 | Limit PAX
+| 2 | 1 | Land
+| 3 | 1 | Capture PAX
+| 4 | 1 | Thank you
+| 5 | 1 | Kill Boss
 
 #### Refact
 
@@ -124,11 +124,11 @@ The damage effects' values on MSET files point to this table.
 
 #### Kind
 
-| Id   | Description |
-|------|-------------|
-| 0x01 | Combo Finisher
-| 0x02 | Air Combo Finisher
-| 0x04 | Reaction Command
+| Position | Size | Description |
+|----------|------|-------------|
+| 0 | 1 | Combo Finisher
+| 1 | 1 | Air Combo Finisher
+| 2 | 1 | Reaction Command
 
 ---
 
@@ -151,8 +151,8 @@ Ptya sets contain the list of attack animations a character use in certain situa
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (2)
-| 4 	 | uint | Pointer Count
+| 0 	 | uint32 | File type (2)
+| 4 	 | uint32 | Pointer Count
 
 ### Ptya Set Structure
 
@@ -165,34 +165,34 @@ Ptya sets contain the list of attack animations a character use in certain situa
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0     | uint | Ptya Set Entry Count
+| 0     | uint32 | Ptya Set Entry Count
 
 ### Ptya Set Entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0      | byte | Id
-| 1      | byte | Type
-| 2      | sbyte | Sub
-| 3      | sbyte | Combo Offset
-| 4      | uint | Flag
-| 8      | ushort | Motion Id \*
-| A      | ushort | Next Motion Id \*
-| C      | float | Jump
-| 10     | float | Jump Max
-| 14     | float | Jump Min
-| 18     | float | Speed Min
-| 1C     | float | Speed Max
-| 20     | float | Near
-| 24     | float | Far
-| 28     | float | Low
-| 2C     | float | High
-| 30     | float | Inner Min
-| 34     | float | Inner Max
-| 38     | float | Blend Time
-| 3C     | float | Distance Adjust
-| 40     | ushort | Ability - SubId on [Item](./03System#Item)
-| 42     | ushort | Score
+| 0     | uint8 | Id
+| 1     | uint8 | Type
+| 2     | int8 | Sub
+| 3     | int8 | Combo Offset
+| 4     | uint32 | Flag
+| 8     | uint16 | Motion Id \*
+| 10     | uint16 | Next Motion Id \*
+| 12     | float | Jump
+| 16     | float | Jump Max
+| 20     | float | Jump Min
+| 24     | float | Speed Min
+| 28     | float | Speed Max
+| 32     | float | Near
+| 36     | float | Far
+| 40     | float | Low
+| 44     | float | High
+| 48     | float | Inner Min
+| 52     | float | Inner Max
+| 56     | float | Blend Time
+| 60     | float | Distance Adjust
+| 64     | uint16 | Ability - SubId on [Item](./03System#Item)
+| 66     | uint16 | Score
 
 \* Multiply by 4 to get the slot of the motion in the entity's [moveset file](../anb/mset.md).
 
@@ -214,30 +214,30 @@ The ID of the entry is assigned in the AI of the object.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (2)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (2)
+| 4 	 | uint32 | Entry Count
 
 ### Przt Entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 00     | ushort | ID
-| 02     | byte  | Small HP orbs
-| 03     | byte  | Big HP orbs
-| 04     | byte  | Big Money orbs
-| 05     | byte  | Medium Money orbs
-| 06     | byte  | Small Money orbs
-| 07     | byte  | Small MP orbs
-| 08     | byte  | Big MP orbs
-| 09     | byte  | Small Drive orbs
-| 0A     | byte  | Big Drive orbs
-| 0B     | byte  | Padding
-| 0C     | ushort  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0E     | short  | Item 1 Drop Percentage
-| 10     | ushort  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 12     | short  | Item 2 Drop Percentage
-| 14     | ushort  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 16     | short  | Item 3 Drop Percentage
+| 0x00     | uint16 | ID
+| 0x02     | uint8  | Small HP orbs
+| 0x03     | uint8  | Big HP orbs
+| 0x04     | uint8  | Big Money orbs
+| 0x05     | uint8  | Medium Money orbs
+| 0x06     | uint8  | Small Money orbs
+| 0x07     | uint8  | Small MP orbs
+| 0x08     | uint8  | Big MP orbs
+| 0x09     | uint8  | Small Drive orbs
+| 0x0A     | uint8  | Big Drive orbs
+| 0x0B     | uint8  | Padding
+| 0x0C     | uint16  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0x0E     | int16  | Item 1 Drop Percentage
+| 0x10     | uint16  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0x12     | int16  | Item 2 Drop Percentage
+| 0x14     | uint16  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0x16     | int16  | Item 3 Drop Percentage
 
 ---
 
@@ -256,27 +256,27 @@ Contains data for randomizing voice clips.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (1)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (1)
+| 4 	 | uint32 | Entry Count
 
 ### Vtbl Entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0 	 | byte | Character - [CHARACTER LIST](../../dictionary/characters.md)
-| 1 	 | byte | Id
-| 2 	 | byte | Priority
-| 3 	 | byte | Reserved
-| 4 	 | sbyte | Voice 1
-| 5 	 | sbyte | Voice 1 Chance
-| 6 	 | sbyte | Voice 2
-| 7 	 | sbyte | Voice 2 Chance
-| 8 	 | sbyte | Voice 3
-| 9 	 | sbyte | Voice 3 Chance
-| 10 	 | sbyte | Voice 4
-| 11 	 | sbyte | Voice 4 Chance
-| 12 	 | sbyte | Voice 5
-| 13 	 | sbyte | Voice 5 Chance
+| 0 	 | uint8 | Character - [CHARACTER LIST](../../dictionary/characters.md)
+| 1 	 | uint8 | Id
+| 2 	 | uint8 | Priority
+| 3 	 | uint8 | Reserved
+| 4 	 | int8 | Voice 1
+| 5 	 | int8 | Voice 1 Chance
+| 6 	 | int8 | Voice 2
+| 7 	 | int8 | Voice 2 Chance
+| 8 	 | int8 | Voice 3
+| 9 	 | int8 | Voice 3 Chance
+| 10 	 | int8 | Voice 4
+| 11 	 | int8 | Voice 4 Chance
+| 12 	 | int8 | Voice 5
+| 13 	 | int8 | Voice 5 Chance
 
 ---
 
@@ -315,15 +315,15 @@ NOTE: The first character pointer doesn't point to any character. May be some ki
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (2)
-| 4 	 | uint | Character pointer count
+| 0 	 | uint32 | File type (2)
+| 4 	 | uint32 | Character pointer count
 
 ### Character pointer
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | Offset of the character (Measured in 4 bytes, so 10 means offset 40)
-| 4 	 | uint | Padding
+| 0 	 | uint32 | Offset of the character (Measured in 4 bytes, so 10 means offset 40)
+| 4 	 | uint32 | Padding
 
 ### Character Structure
 
@@ -336,22 +336,22 @@ NOTE: The first character pointer doesn't point to any character. May be some ki
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 0      | uint  | Lvup entry count
-| 4      | uint  | Padding
+| 00     | uint32  | Lvup entry count
+| 04     | uint32  | Padding
 
 ### Lvup Entry
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 00     | int  | Needed EXP for next level
-| 04     | byte | Strength of Character
-| 05     | byte | Magic of Character
-| 06     | byte | Defense of Character
-| 07     | byte | AP of Character
-| 08     | ushort | Ability given when using Sword route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0A     | ushort | Ability given when using Shield route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0C     | ushort | Ability given when using Staff route (03system.bin --> ITEM sub file) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0E     | byte[2] | Padding
+| 0x00     | int32  | Needed EXP for next level
+| 0x04     | uint8 | Strength of Character
+| 0x05     | uint8 | Magic of Character
+| 0x06     | uint8 | Defense of Character
+| 0x07     | uint8 | AP of Character
+| 0x08     | uint16 | Ability given when using Sword route  - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0x0A     | uint16 | Ability given when using Shield route - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0x0C     | uint16 | Ability given when using Staff route  - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0x0E     | uint8[2] | Padding
 
 ---
 
@@ -378,17 +378,17 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 00     | byte  | ID - [EVENT LIST](../../dictionary/events.md)
-| 01     | byte  | Character Id
-| 02     | byte  | HP Increase
-| 03     | byte  | MP Increase
-| 04     | byte  | Drive Gauge Upgrade
-| 05     | byte  | Item Slot Upgrade
-| 06     | byte  | Accessory Slot Upgrade
-| 07     | byte  | Armor Slot Upgrade
-| 08     | ushort | [Bonus Item 1](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 10     | ushort | [Bonus Item 2](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 12     | int   | Padding
+| 0x00     | uint8  | ID - [EVENT LIST](../../dictionary/events.md)
+| 0x01     | uint8  | Character Id
+| 0x02     | uint8  | HP Increase
+| 0x03     | uint8  | MP Increase
+| 0x04     | uint8  | Drive Gauge Upgrade
+| 0x05     | uint8  | Item Slot Upgrade
+| 0x06     | uint8  | Accessory Slot Upgrade
+| 0x07     | uint8  | Armor Slot Upgrade
+| 0x08     | uint16 | [Bonus Item 1](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0x10     | uint16 | [Bonus Item 2](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0x12     | int32   | Padding
 
 ---
 
@@ -407,35 +407,35 @@ Contains the table for battle level of each world. Whether each entry is enabled
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (1)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (1)
+| 4 	 | uint32 | Entry Count
 
 ### Btlv Entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0 	 | int  | Id
-| 4      | int  | Progress Flag
-| 8      | byte  | World ZZ
-| 9      | byte  | World of Darkness
-| A      | byte  | Twilight Town
-| B      | byte  | Destiny Islands
-| C      | byte  | Hollow Bastion
-| D      | byte  | Beast's Castle
-| E      | byte  | Olympus Coliseum
-| F      | byte  | Agrabah
-| 10     | byte  | Land of Dragons
-| 11     | byte  | 100 Acre Woods
-| 12     | byte  | Pride Lands
-| 13     | byte  | Atlantica
-| 14     | byte  | Disney Castle
-| 15     | byte  | Timeless River
-| 16     | byte  | Halloween Town
-| 17     | byte  | World Map
-| 18     | byte  | Port Royal
-| 19     | byte  | Space Paranoids
-| 1A     | byte  | The World That Never Was
-| 1B     | byte[5] | Padding
+| 0x0 	 | int32  | Id
+| 0x4      | int32  | Progress Flag
+| 0x8      | uint8  | World ZZ
+| 0x9      | uint8  | World of Darkness
+| 0xA      | uint8  | Twilight Town
+| 0xB      | uint8  | Destiny Islands
+| 0xC      | uint8  | Hollow Bastion
+| 0xD      | uint8  | Beast's Castle
+| 0xE      | uint8  | Olympus Coliseum
+| 0xF      | uint8  | Agrabah
+| 0x10     | uint8  | Land of Dragons
+| 0x11     | uint8  | 100 Acre Woods
+| 0x12     | uint8  | Pride Lands
+| 0x13     | uint8  | Atlantica
+| 0x14     | uint8  | Disney Castle
+| 0x15     | uint8  | Timeless River
+| 0x16     | uint8  | Halloween Town
+| 0x17     | uint8  | World Map
+| 0x18     | uint8  | Port Royal
+| 0x19     | uint8  | Space Paranoids
+| 0x1A     | uint8  | The World That Never Was
+| 0x1B     | uint8[5] | Padding
 
 ---
 
@@ -453,12 +453,12 @@ Contains the level-up table for the enemies. Based on the level of an enemy, a s
 
 | Offset | Type  | Description
 |--------|------ |--------------
-| 00     | ushort | HP level. The formula is `(EnemyHp * LevelHp + 99) / 100`.
-| 02     | ushort | Strength
-| 04     | ushort | Defense
-| 06     | ushort | Max Strength
-| 08     | ushort | Min Strength
-| 0A     | ushort | Exp
+| 0x00     | uint16 | HP level. The formula is `(EnemyHp * LevelHp + 99) / 100`.
+| 0x02     | uint16 | Strength
+| 0x04     | uint16 | Defense
+| 0x06     | uint16 | Max Strength
+| 0x08     | uint16 | Min Strength
+| 0x0A     | uint16 | Exp
 
 ---
 
@@ -483,28 +483,28 @@ Every enemy is associated to one or more IDs (eg. Organization members have diff
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (2)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (2)
+| 4 	 | uint32 | Entry Count
 
 ### Enmp Entry
 
 | Offset | Type  | Description
 |--------|------|--------------
-| 00     | ushort | Id - [Enemy LIST](../../dictionary/enemy.md)
-| 02     | ushort | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
-| 04     | ushort[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
-| 44     | ushort | Damage Cap (The higher, the less damage received)
-| 46     | ushort | Minimum Damage
-| 48     | ushort | Physical weakness
-| 4A     | ushort | Fire weakness
-| 4C     | ushort | Blizzard weakness
-| 4E     | ushort | Thunder weakness
-| 50     | ushort | Dark weakness
-| 52     | ushort | Light weakness
-| 54     | ushort | General weakness
-| 56     | ushort | Exp multiplier
-| 58     | ushort | Prize
-| 5A     | ushort | Bonus Level
+| 0x00     | uint16 | Id - [Enemy LIST](../../dictionary/enemy.md)
+| 0x02     | uint16 | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
+| 0x04     | uint16[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
+| 0x44     | uint16 | Damage Cap (The higher, the less damage received)
+| 0x46     | uint16 | Minimum Damage
+| 0x48     | uint16 | Physical weakness
+| 0x4A     | uint16 | Fire weakness
+| 0x4C     | uint16 | Blizzard weakness
+| 0x4E     | uint16 | Thunder weakness
+| 0x50     | uint16 | Dark weakness
+| 0x52     | uint16 | Light weakness
+| 0x54     | uint16 | General weakness
+| 0x56     | uint16 | Exp multiplier
+| 0x58     | uint16 | Prize
+| 0x5A     | uint16 | Bonus Level
 
 ---
 
@@ -524,34 +524,34 @@ EG: 05 is Mad Rider, 14 is Reckless, Xaldin, 15 is Morning Star, Assault Rider, 
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (2)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (2)
+| 4 	 | uint32 | Entry Count
 
 ### Patn Entry
 
 | Offset | Type  | Description
 |--------|------|--------------
-|  0     | byte | Id
-|  1     | byte | ???
-|  2     | byte | ???
-|  3     | byte | ???
-|  4     | byte | ???
-|  5     | byte | Magnet Burst effect\*
-|  6     | byte | Magnet\*
-|  7     | byte | ???
-|  8     | byte | ???
-|  9     | byte | ???
-|  A     | byte | ???
-|  B     | byte | ???
-|  C     | byte | ???
-|  D     | byte | ???
-|  E     | byte | ???
-|  F     | byte | ???
-| 10     | byte | ???
-| 11     | byte | ???
-| 12     | byte | ???
-| 13     | byte | ???
-| 14     | byte[12] | Padding
+| 00     | uint8 | Id
+| 01     | uint8 | ???
+| 02     | uint8 | ???
+| 03     | uint8 | ???
+| 04     | uint8 | ???
+| 05     | uint8 | Magnet Burst effect\*
+| 06     | uint8 | Magnet\*
+| 07     | uint8 | ???
+| 08     | uint8 | ???
+| 09     | uint8 | ???
+| 10     | uint8 | ???
+| 11     | uint8 | ???
+| 12     | uint8 | ???
+| 13     | uint8 | ???
+| 14     | uint8 | ???
+| 15     | uint8 | ???
+| 16     | uint8 | ???
+| 17     | uint8 | ???
+| 18     | uint8 | ???
+| 19     | uint8 | ???
+| 20     | uint8[12] | Padding
 
 \* (00 is immune, 01/0C/0D draws in, 02/03 flinches, 04/07/09/0B knocks out, 05 pulls in(magnet), 06/08/0A is flinch + draw, 0E is flinch + insta revenge...)
 
@@ -572,26 +572,26 @@ Contains informations about starting Character statistics, starting Abilities et
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (2)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (2)
+| 4 	 | uint32 | Entry Count
 
 ### Plrp Entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 00     | ushort | Id
-| 02     | byte  | Character ID - [Character LIST](../../dictionary/characters.md)
-| 03     | byte  | HP
-| 04     | byte  | MP
-| 05     | byte  | AP
-| 06     | byte  | Strength
-| 07     | byte  | Magic
-| 08     | byte  | Defense
-| 09     | byte  | Armor Slots
-| 0A     | byte  | Accessory Slots
-| 0B     | byte  | Item Slots
-| 0C     | ushort[32] | Starting items (abilities, magic etc. Refer to ITEM from 03system*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 48     | byte[52] | Padding
+| 0x00     | uint16 | Id
+| 0x02     | uint8  | Character ID - [Character LIST](../../dictionary/characters.md)
+| 0x03     | uint8  | HP
+| 0x04     | uint8  | MP
+| 0x05     | uint8  | AP
+| 0x06     | uint8  | Strength
+| 0x07     | uint8  | Magic
+| 0x08     | uint8  | Defense
+| 0x09     | uint8  | Armor Slots
+| 0x0A     | uint8  | Accessory Slots
+| 0x0B     | uint8  | Item Slots
+| 0x0C     | uint16[32] | Starting items (abilities, magic etc*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 0x48     | uint8[52] | Padding
 
 NOTE: Abilities that are enabled by default begin with an 8.
 
@@ -612,23 +612,23 @@ Data on limits.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (2)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (2)
+| 4 	 | uint32 | Entry Count
 
 ### Limt Entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 00     | byte | ID
-| 01     | byte  | Character - [Character/Summon LIST](../../dictionary/characters.md)
-| 02     | byte  | Summon - [Character/Summon LIST](../../dictionary/characters.md)
-| 03     | byte  | Group (3 requires all of the characters to be alive)
+| 00     | uint8 | ID
+| 01     | uint8  | Character - [Character/Summon LIST](../../dictionary/characters.md)
+| 02     | uint8  | Summon - [Character/Summon LIST](../../dictionary/characters.md)
+| 03     | uint8  | Group (3 requires all of the characters to be alive)
 | 04     | char[32]  | Filename
-| 36     | uint | Spawn Id - [OBJ LIST](../../dictionary/obj.md)
-| 40     | ushort | Command - [Command LIST](../../dictionary/commands.md)
-| 42     | ushort | Limit - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 44     | byte | World (Used for Timeless River versions (0D))
-| 45     | byte[19] | Padding
+| 36     | uint32 | Spawn Id - [OBJ LIST](../../dictionary/obj.md)
+| 40     | uint16 | Command - [Command LIST](../../dictionary/commands.md)
+| 42     | uint16 | Limit - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 44     | uint8 | World (Used for Timeless River versions (0D))
+| 45     | uint8[19] | Padding
 
 ---
 
@@ -647,19 +647,19 @@ Data on summons.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (2)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (2)
+| 4 	 | uint32 | Entry Count
 
 ### Sumn Entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0     | ushort | Command - [Command LIST](../../dictionary/commands.md)
-| 2     | ushort | Item - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 4     | uint | Entity Spawned 1 - [OBJ LIST](../../dictionary/obj.md)
-| 8     | uint | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
-| 12     | ushort | Limit Command - [Command LIST](../../dictionary/commands.md)
-| 14     | byte[50] | Padding
+| 0     | uint16 | Command - [Command LIST](../../dictionary/commands.md)
+| 2     | uint16 | Item - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 4     | uint32 | Entity Spawned 1 - [OBJ LIST](../../dictionary/obj.md)
+| 8     | uint32 | Entity Spawned 2 - [OBJ LIST](../../dictionary/obj.md)
+| 12     | uint16 | Limit Command - [Command LIST](../../dictionary/commands.md)
+| 14     | uint8[50] | Padding
 
 ---
 
@@ -678,30 +678,30 @@ Data on magic.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (1)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (1)
+| 4 	 | uint32 | Entry Count
 
 ### Magc Entry
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0     | byte | Id
-| 1     | byte | Level
-| 2     | byte | World
-| 3     | byte | Padding
+| 0     | uint8 | Id
+| 1     | uint8 | Level
+| 2     | uint8 | World
+| 3     | uint8 | Padding
 | 4     | char[32] | Filename
-| 36     | ushort | Item
-| 38     | ushort | Command - [Command LIST](../../dictionary/commands.md)
-| 40     | short | Ground motion - [Motion LIST](../../file/anb/mset.html)
-| 42     | short | Ground blend
-| 44     | short | Finish motion
-| 46     | short | Finish blend
-| 48     | short | Air motion
-| 50     | short | Air blend
-| 52     | byte | Voice
-| 53     | byte | Voice Finisher
-| 54     | byte | Voice Self
-| 55     | byte | Padding
+| 36     | uint16 | Item
+| 38     | uint16 | Command - [Command LIST](../../dictionary/commands.md)
+| 40     | int16 | Ground motion - [Motion LIST](../../file/anb/mset.html)
+| 42     | int16 | Ground blend
+| 44     | int16 | Finish motion
+| 46     | int16 | Finish blend
+| 48     | int16 | Air motion
+| 50     | int16 | Air blend
+| 52     | uint8 | Voice
+| 53     | uint8 | Voice Finisher
+| 54     | uint8 | Voice Self
+| 55     | uint8 | Padding
 
 ---
 
@@ -732,19 +732,19 @@ Contains the level-up table for summons and drive forms.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (2)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (2)
+| 4 	 | uint32 | Entry Count
 
 ### Fmlv Entry
 
 | Offset | Type  | Description
 |--------|-------|-------------
-| 00     | byte : 0-3 | [Id](#forms)
-| 00     | byte : 4-7 | Level
-| 01     | byte : 0-3 | Ability Level
-| 01     | byte : 4-7 | Anti Rate
-| 02     | ushort | Ability obtained through level up - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 04     | int   | EXP needed for level up
+| 00     | uint8 : 0-3 | [Id](#forms)
+| 00     | uint8 : 4-7 | Level
+| 01     | uint8 : 0-3 | Ability Level
+| 01     | uint8 : 4-7 | Anti Rate
+| 02     | uint16 | Ability obtained through level up - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 04     | int32   | EXP needed for level up
 
 ### Forms
 
@@ -788,24 +788,24 @@ Data on unknown
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | File type (1)
-| 4 	 | uint | Entry Count
+| 0 	 | uint32 | File type (1)
+| 4 	 | uint32 | Entry Count
 
 ### Stop Entry
 
 | Offset | Type  | Description |
 |--------|-------|-------------|
-| 00     | ushort  | ID
-| 02     | ushort  | [Flags](#flags)
+| 00     | uint16  | ID
+| 02     | uint16  | [Flags](#flags)
 
 #### Flags
 
-| Id  | Description
-|-----|------------|
-| 0x1 | Exist
-| 0x2 | Disable Damage Reaction
-| 0x4 | Star
-| 0x8 | Disable Draw
+| Position | Size | Description |
+|----------|------|-------------|
+| 0 | 1 | Exist
+| 1 | 1 | Disable Damage Reaction
+| 2 | 1 | Star
+| 3 | 1 | Disable Draw
 
 ---
 
