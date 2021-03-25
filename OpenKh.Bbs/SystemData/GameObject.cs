@@ -352,6 +352,7 @@ namespace OpenKh.Bbs.SystemData
             {"g39sb00", "g39sb00 (SB)"},
             {"g40sb00", "Unknown Collision 40 (With EPD) (SB)"},
             {"g41sb00", "g41sb00 (SB)"},
+            {"g42sb00", "Collision 42 (SB)"},
             {"g50sb00", "g50sb00 (SB)"},
             {"g51sb00", "Darkness Semisphere 51 (SB)"},
             {"g54sb00", "Bush (SB)"},
