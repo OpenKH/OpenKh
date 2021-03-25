@@ -355,7 +355,7 @@ namespace OpenKh.Tools.BbsMapStudio
                 var camera = _mapRenderer.Camera;
                 var xSpeed = (_previousMousePosition.X - mouse.Position.X) * Speed;
                 var ySpeed = (_previousMousePosition.Y - mouse.Position.Y) * Speed;
-                camera.CameraRotationYawPitchRoll += new Vector3(1 * xSpeed, 0, 0);
+                camera.CameraRotationYawPitchRoll += new Vector3(-1 * xSpeed, 0, 0);
                 camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * ySpeed);
             }
 
