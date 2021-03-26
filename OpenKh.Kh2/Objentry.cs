@@ -180,6 +180,11 @@ namespace OpenKh.Kh2
             set => Flags = (ushort)BitsUtil.Int.SetBit(Flags, 7, value);
         }
 
+        public override string ToString()
+        {
+            return ModelName;
+        }
+
         public static List<Objentry> Read(Stream stream) => BaseTable<Objentry>.Read(stream);
         public static void Write(Stream stream, IEnumerable<Objentry> entries) =>
             BaseTable<Objentry>.Write(stream, 3, entries);
