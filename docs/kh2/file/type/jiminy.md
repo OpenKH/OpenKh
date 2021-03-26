@@ -160,8 +160,6 @@ Magic Code `JMDI`
 | 06     | byte   | Draw
 | 07     | byte   | Padding 
 
-Currently unknown. Read in z_un_002a18d0.
-
 ---
 
 ## Limi

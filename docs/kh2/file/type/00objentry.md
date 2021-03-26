@@ -18,7 +18,7 @@ Contains a definition of every object and it's parameters.
 | 0x4B   | uint8 | Padding
 | 0x4C   | uint16 | Neo Status
 | 0x4E   | uint16 | Neo Moveset
-| 0x50   | float | Weight*
+| 0x50   | float | Weight
 | 0x54   | uint8 | Spawn Limiter
 | 0x55   | uint8 | Page (unknown)
 | 0x56   | uint8 | [Shadow Size](#shadow-size)
@@ -27,8 +27,6 @@ Contains a definition of every object and it's parameters.
 | 0x5A   | uint16 | Spawn additional object 2 - [OBJ LIST](../../dictionary/obj.md)
 | 0x5C   | uint16 | Spawn additional object 3 - [OBJ LIST](../../dictionary/obj.md)
 | 0x5E   | uint16 | Spawn additional object 4 - [OBJ LIST](../../dictionary/obj.md)
-
-*The first bit is somewhat related to the enemy state. Eg: Undead Pirates lose their immunity if they are changed from 2 to 0
 
 ### Object Types
 
