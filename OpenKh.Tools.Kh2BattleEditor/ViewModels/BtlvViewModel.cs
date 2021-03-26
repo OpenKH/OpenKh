@@ -68,16 +68,6 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public Visibility IsItemEditingVisible => IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsItemEditMessageVisible => !IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
 
-        //public string SearchTerm
-        //{
-        //    get => _searchTerm;
-        //    set
-        //    {
-        //        _searchTerm = value;
-        //        PerformFiltering();
-        //    }
-        //}
-
         public Stream CreateStream()
         {
             var stream = new MemoryStream();
@@ -92,19 +82,6 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             OnPropertyChanged(nameof(IsItemEditingVisible));
             OnPropertyChanged(nameof(IsItemEditMessageVisible));
         }
-
-        //private void PerformFiltering()
-        //{
-        //    if (string.IsNullOrWhiteSpace(_searchTerm))
-        //        Filter(FilterNone);
-        //    else
-        //        Filter(FilterByEnemy);
-        //}
-
-        //private bool FilterNone(BtlvEntryViewModel arg) => true;
-
-        //private bool FilterByEnemy(BtlvEntryViewModel arg) =>
-        //    arg.Name.ToUpper().Contains(SearchTerm.ToUpper());
 
         private static BtlvEntryViewModel Map(Btlv item) =>
             new BtlvEntryViewModel(item);
