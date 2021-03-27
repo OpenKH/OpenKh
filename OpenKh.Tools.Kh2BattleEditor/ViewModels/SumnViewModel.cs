@@ -7,12 +7,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Xe.Tools;
 
 namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 {
     public class SumnViewModel : MyGenericListModel<SumnViewModel.SumnEntryViewModel>, IBattleGetChanges
     {
-        public class SumnEntryViewModel
+        public class SumnEntryViewModel : BaseNotifyPropertyChanged
         {
             public Sumn Sumn { get; }
 
@@ -21,11 +22,23 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
                 Sumn = sumn;
             }
 
-            public ushort Command { get => Sumn.Command; set => Sumn.Command = value; }
+            public ushort Command 
+            { 
+                get => Sumn.Command;
+                set 
+                { 
+                    Sumn.Command = value;
+                    OnPropertyChanged(nameof(Id));
+                }
+            }
             public ushort Item { get => Sumn.Item; set => Sumn.Item = value; }
             public uint Entity1 { get => Sumn.Entity1; set => Sumn.Entity1 = value; }
             public uint Entity2 { get => Sumn.Entity2; set => Sumn.Entity2 = value; }
             public ushort LimitCommand { get => Sumn.LimitCommand; set => Sumn.LimitCommand = value; }
+
+            public string Id => $"{Sumn.Command:X02}";
+
+            public string Name => Id;
         }
 
         private const string entryName = "sumn";
