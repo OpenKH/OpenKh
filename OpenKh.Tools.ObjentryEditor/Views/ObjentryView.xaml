@@ -100,9 +100,6 @@
                     <TextBlock Text="Animation Name" Margin="{StaticResource LabelMargin}"/>
                     <TextBox Text="{Binding SelectedItem.AnimationName, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Text="Flag" Margin="{StaticResource LabelMargin}"/>
-                    <TextBox Text="{Binding SelectedItem.Flags, UpdateSourceTrigger=PropertyChanged}"/>
-
                     <TextBlock Text="Target Type" Margin="{StaticResource LabelMargin}"/>
                     <ComboBox Grid.Column="0" ItemsSource="{Binding TargetTypes}" SelectedValue="{Binding SelectedItem.ObjectTargetType}" DisplayMemberPath="Name" SelectedValuePath="Value" Margin="{StaticResource LabelMargin}"/>
 
