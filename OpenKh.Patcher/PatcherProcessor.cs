@@ -123,8 +123,8 @@ namespace OpenKh.Patcher
                 case "areadatascript":
                     PatchAreaDataScript(context, assetFile.Source, stream);
                     break;
-                case "listreplace":
-                    PatchListReplace(context, assetFile.Source, stream);
+                case "listpatch":
+                    PatchList(context, assetFile.Source, stream);
                     break;
                 default:
                     Log.Warn($"Method '{assetFile.Method}' not recognized for '{assetFile.Name}'. Falling back to 'copy'");
@@ -291,7 +291,7 @@ namespace OpenKh.Patcher
 
         private static readonly IDeserializer deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
             
-        private static void PatchListReplace(Context context, List<AssetFile> sources, Stream stream)
+        private static void PatchList(Context context, List<AssetFile> sources, Stream stream)
         {
             foreach (var source in sources)
             {

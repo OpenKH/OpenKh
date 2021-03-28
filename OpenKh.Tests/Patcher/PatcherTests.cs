@@ -515,7 +515,7 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
-        public void ListReplaceTrsrTest()
+        public void ListPatchTrsrTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
@@ -591,7 +591,7 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
-        public void ListReplaceItemTest()
+        public void ListPatchItemTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
@@ -688,7 +688,7 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
-        public void ListReplaceFmlvTest()
+        public void ListPatchFmlvTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
@@ -803,7 +803,7 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
-        public void ListReplaceBonsTest()
+        public void ListPatchBonsTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
@@ -889,7 +889,7 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
-        public void ListReplaceLvupTest()
+        public void ListPatchLvupTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
@@ -1111,7 +1111,7 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
-        public void ListReplaceObjEntryTest()
+        public void ListPatchObjEntryTest()
         {
             var patcher = new PatcherProcessor();
             var serializer = new Serializer();
