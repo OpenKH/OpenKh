@@ -79,8 +79,8 @@ namespace OpenKh.Kh2.SystemData
             [Data] public byte Unknown { get; set; }
         }
 
-        [Data] public List<Entry> Items1 { get; set; }
-        [Data] public List<Stat> Items2 { get; set; }
+        [Data] public List<Entry> Items { get; set; }
+        [Data] public List<Stat> Stats { get; set; }
 
         public static Item Read(Stream stream)
         {
@@ -90,15 +90,15 @@ namespace OpenKh.Kh2.SystemData
 
             return new Item
             {
-                Items1 = one,
-                Items2 = two
+                Items = one,
+                Stats = two
             };
         }
 
         public void Write(Stream stream)
         {
-            BaseTable<Entry>.Write(stream, 6, Items1);
-            BaseTable<Stat>.Write(stream, 0, Items2);
+            BaseTable<Entry>.Write(stream, 6, Items);
+            BaseTable<Stat>.Write(stream, 0, Stats);
         }
     }
 }
