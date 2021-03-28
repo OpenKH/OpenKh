@@ -10,7 +10,7 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/dotnet/sdk:3.1
+      image: mcr.microsoft.com/dotnet/sdk:5.0
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -26,7 +26,6 @@ jobs:
       - name: Execute tests
         run: |
           dotnet test OpenKh.Tests --filter Batch_ --logger "trx;LogFileName=result.trx" --logger "html;LogFileName=result.html" || true
-          dotnet test OpenKh.Tests.Engine --filter Batch_ --logger "trx;LogFileName=result.trx" --logger "html;LogFileName=result.html" || true
       - name: Prepare result folder
         run: |
           mkdir TestResults
@@ -35,10 +34,6 @@ jobs:
           mv ../OpenKh.Tests/TestResults/result.* ./
           mv result.trx result-unit.trx
           mv result.html result-unit.html
-
-          mv ../OpenKh.Tests.Engine/TestResults/result.* ./
-          mv result.trx result-engine.trx
-          mv result.html result-engine.html
       - name: Publish artifacts
         uses: actions/upload-artifact@v2
         with:
