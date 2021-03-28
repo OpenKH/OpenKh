@@ -359,6 +359,9 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         private void RenderMeshNew(EffectPass pass, MeshGroup mesh, bool passRenderOpaque)
         {
+            if (mesh.MeshDescriptors == null)
+                return;
+
             foreach (var meshDescriptor in mesh.MeshDescriptors)
             {
                 if (meshDescriptor.IsOpaque != passRenderOpaque)
