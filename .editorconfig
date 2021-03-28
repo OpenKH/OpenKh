@@ -2,23 +2,16 @@ root = true
 
 [*]
 charset = utf-8
-end_of_line = lf
+end_of_line = crlf
 insert_final_newline = true
 indent_style = space
 indent_size = 4
 tab_size = 4
 
-[*.md]
-end_of_line = crlf
-
-[*.sln]
-end_of_line = crlf
-
-[*.csproj]
-end_of_line = crlf
+[*.sh]
+end_of_line = lf
 
 [*.cs]
-end_of_line = lf
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
 csharp_new_line_before_catch = true
