@@ -741,8 +741,8 @@ Contains the level-up table for summons and drive forms.
 |--------|-------|-------------
 | 00     | uint8 : 0-3 | [Id](#forms)
 | 00     | uint8 : 4-7 | Level
-| 01     | uint8 : 0-3 | Ability Level
-| 01     | uint8 : 4-7 | Anti Rate
+| 01     | uint8 : 0-3 | Anti Rate
+| 01     | uint8 : 4-7 | Ability Level
 | 02     | uint16 | Ability obtained through level up - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
 | 04     | int32   | EXP needed for level up
 
