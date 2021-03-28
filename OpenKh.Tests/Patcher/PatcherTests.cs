@@ -531,7 +531,7 @@ namespace OpenKh.Tests.Patcher
                             new AssetFile()
                             {
                                 Name = "trsr",
-                                Method = "listreplace",
+                                Method = "listpatch",
                                 Type = "List",
                                 Source = new List<AssetFile>()
                                 {
@@ -608,7 +608,7 @@ namespace OpenKh.Tests.Patcher
                             new AssetFile()
                             {
                                 Name = "item",
-                                Method = "listreplace",
+                                Method = "listpatch",
                                 Type = "List",
                                 Source = new List<AssetFile>()
                                 {
@@ -705,7 +705,7 @@ namespace OpenKh.Tests.Patcher
                             new AssetFile()
                             {
                                 Name = "fmlv",
-                                Method = "listreplace",
+                                Method = "listpatch",
                                 Type = "List",
                                 Source = new List<AssetFile>()
                                 {
@@ -820,7 +820,7 @@ namespace OpenKh.Tests.Patcher
                             new AssetFile()
                             {
                                 Name = "bons",
-                                Method = "listreplace",
+                                Method = "listpatch",
                                 Type = "List",
                                 Source = new List<AssetFile>()
                                 {
@@ -906,7 +906,7 @@ namespace OpenKh.Tests.Patcher
                             new AssetFile()
                             {
                                 Name = "lvup",
-                                Method = "listreplace",
+                                Method = "listpatch",
                                 Type = "List",
                                 Source = new List<AssetFile>()
                                 {
@@ -1122,7 +1122,7 @@ namespace OpenKh.Tests.Patcher
                     new AssetFile()
                     {
                         Name = "00objentry.bin",
-                        Method = "listreplace",
+                        Method = "listpatch",
                         Type = "List",
                         Source = new List<AssetFile>()
                         {
