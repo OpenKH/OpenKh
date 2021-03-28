@@ -2,9 +2,9 @@ name: Test with game data
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, advanced-test-suite ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, advanced-test-suite ]
 
 jobs:
   run-tests:
