@@ -26,9 +26,9 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
             public string Id => $"{Objentry.ObjectId:X02}";
 
-            public uint ObjectId
+            public ushort ObjectId
             {
-                get => Objentry.ObjectId;
+                get => (ushort)Objentry.ObjectId;
                 set { Objentry.ObjectId = value; OnPropertyChanged(nameof(Name)); }
             }
 
