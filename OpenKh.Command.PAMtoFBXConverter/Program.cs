@@ -74,7 +74,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
 
             using var ctx = new AssimpContext();
             ctx.ExportFile(nScene, "Test.fbx", "fbx");
-            
+
         }
 
         private static Assimp.Scene GetPMOScene(Pmo pmo)
@@ -84,7 +84,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
 
             // Add materials.
             List<Material> matList = new List<Material>();
-            for(int t = 0; t < pmo.header.TextureCount; t++)
+            for (int t = 0; t < pmo.header.TextureCount; t++)
             {
                 Material mat = new Material();
                 mat.Clear();
@@ -97,7 +97,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
             for (int b = 0; b < pmo.skeletonHeader.BoneCount; b++)
             {
                 Pmo.BoneData bn = pmo.boneList[b];
-                
+
                 Assimp.Matrix4x4 mtx = new Assimp.Matrix4x4();
                 mtx.A1 = bn.Transform.M11;
                 mtx.A2 = bn.Transform.M12;
@@ -120,7 +120,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
                 nd_mtx.Transpose();
                 if (bn.ParentBoneIndex == 0xFFFF)
                 {
-                    
+
                     Node curNode = new Node(bn.JointName);
                     curNode.Transform = nd_mtx;
                     scene.RootNode.Children.Add(curNode);
@@ -129,15 +129,15 @@ namespace OpenKh.Command.PAMtoFBXConverter
                 else
                 {
                     Node curNode = new Node(bn.JointName, Skeleton[bn.ParentBoneIndex]);
-                    
+
                     nd_mtx.A4 *= 100.0f;
                     nd_mtx.B4 *= 100.0f;
                     nd_mtx.C4 *= 100.0f;
-                    
+
                     curNode.Transform = nd_mtx;
                     Skeleton.Add(curNode);
                     scene.RootNode.FindNode(Skeleton[bn.ParentBoneIndex].Name).Children.Add(curNode);
-                } 
+                }
             }
 
             // Add meshes.
@@ -167,7 +167,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
                     // Build bone influences.
                     for (int z = 0; z < chunk.SectionInfo_opt1.SectionBoneIndices.Length; z++)
                     {
-                        if(chunk.SectionInfo_opt1.SectionBoneIndices[z] != 0xFF)
+                        if (chunk.SectionInfo_opt1.SectionBoneIndices[z] != 0xFF)
                         {
                             Pmo.BoneData currentBone = new Pmo.BoneData();
 
@@ -200,7 +200,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
                             mtx.B4 *= 100.0f;
                             mtx.C4 *= 100.0f;
 
-                            
+
                             mtx3.Transpose();
 
                             List<VertexWeight> weight = new List<VertexWeight>();
@@ -241,7 +241,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
                             {
                                 scene.Meshes[i].Bones[boneInd].VertexWeights.Add(vW);
                             }
-                        } 
+                        }
                     }
                 }
             }
@@ -255,7 +255,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
         {
             List<Assimp.Animation> animationList = new List<Assimp.Animation>();
 
-            for(int i = 0; i < pam.header.AnimationCount; i++)
+            for (int i = 0; i < pam.header.AnimationCount; i++)
             {
                 Assimp.Animation anim = new Assimp.Animation();
                 anim.Name = pam.animList[i].AnimEntry.AnimationName;
@@ -263,11 +263,11 @@ namespace OpenKh.Command.PAMtoFBXConverter
                 anim.TicksPerSecond = pam.animList[i].AnimHeader.Framerate;
 
                 //anim.MeshAnimationChannels[0].MeshKeys.Add(new MeshKey(anim.DurationInTicks / 2, new Vector3D(0, 0, 100)));
-                
+
                 for (int b = 0; b < pam.animList[i].AnimHeader.BoneCount; b++)
                 {
                     Pam.BoneChannel chann = pam.animList[i].BoneChannels[b];
-                    
+
                     anim.NodeAnimationChannels.Add(new NodeAnimationChannel());
                     anim.NodeAnimationChannels[b].NodeName = pmo.boneList[b].JointName;
                     ChannelData dat = GetChannelKeyframes(chann, anim.DurationInTicks);
@@ -291,7 +291,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
                         }
                     }*/
 
-                }     
+                }
 
                 animationList.Add(anim);
             }
@@ -525,7 +525,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
                         }
                     }
                 }
-                
+
             }
 
             if (channel.RotationZ != null)
@@ -564,8 +564,8 @@ namespace OpenKh.Command.PAMtoFBXConverter
                         }
                     }
                 }
-                
-            } 
+
+            }
 
             return channData;
         }

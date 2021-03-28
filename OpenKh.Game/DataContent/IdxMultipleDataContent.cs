@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Game.Infrastructure;
 using OpenKh.Kh2;
 using System.IO;

@@ -240,7 +240,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.Services
         public static string GetEnemyName(int id)
         {
             _enemyNames.TryGetValue(id, out var name);
-            
+
             return name;
         }
     }

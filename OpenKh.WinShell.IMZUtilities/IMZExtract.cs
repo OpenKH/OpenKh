@@ -52,7 +52,7 @@ namespace OpenKh.WinShell.IMZUtilities
                             _tImage.Write(_tStream);
                             _tStream.Close();
                         }
-                        
+
                         _i++;
                     }
 

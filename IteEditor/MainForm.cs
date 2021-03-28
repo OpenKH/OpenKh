@@ -26,7 +26,7 @@ namespace OpenKh.Tools.IteEditor
         private void UpdateParameters(Ite ite)
         {
             int cnt = 1;
-            for(int i = 0; i < ite.header.WeaponDataCount; i++)
+            for (int i = 0; i < ite.header.WeaponDataCount; i++)
             {
                 IteEntry itEntry = new IteEntry();
                 itEntry.ITE_GBox.Text = "ITC Entry " + cnt;

@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs.Messages;
+using OpenKh.Bbs.Messages;
 using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;

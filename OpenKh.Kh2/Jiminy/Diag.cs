@@ -1,4 +1,4 @@
-﻿using Xe.BinaryMapper;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Jiminy
 {

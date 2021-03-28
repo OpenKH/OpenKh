@@ -194,7 +194,7 @@ namespace OpenKh.Game
                 SequenceIndexStart = start;
                 SequenceIndexEnd = end;
             }
-            
+
             public void Update(double deltaTime)
             {
                 if (!IsEnd)

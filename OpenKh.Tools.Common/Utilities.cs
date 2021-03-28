@@ -15,7 +15,7 @@ namespace OpenKh.Tools.Common
             MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
         public static Action<Exception> ExceptionHandler = DefaultExceptionHandler;
-        
+
         public static Window GetCurrentWindow() =>
             Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive);
 
@@ -44,7 +44,7 @@ namespace OpenKh.Tools.Common
                 ExceptionHandler(ex);
             }
         }
-        
+
         public static void ShowError(string message, string title = "Error") =>
             MessageBox.Show(GetCurrentWindow(), message, title, MessageBoxButton.OK, MessageBoxImage.Error);
     }

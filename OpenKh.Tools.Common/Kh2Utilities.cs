@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Common;
 using OpenKh.Common.Exceptions;
 using System.Collections.Generic;
@@ -52,8 +52,10 @@ namespace OpenKh.Tools.Common
 
         public static List<Msg.Entry> ReadMsg(Stream stream)
         {
-            if (Bar.IsValid(stream)) return ReadMsgFromBar(stream);
-            else if (Msg.IsValid(stream)) return ReadMsgFromRawMsg(stream);
+            if (Bar.IsValid(stream))
+                return ReadMsgFromBar(stream);
+            else if (Msg.IsValid(stream))
+                return ReadMsgFromRawMsg(stream);
 
             throw new InvalidFileException<Msg>();
         }

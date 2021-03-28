@@ -286,7 +286,7 @@ namespace OpenKh.Kh2.Ard
             public static void Write(Stream stream, Signal entity) =>
                 BinaryMapping.WriteObject(stream, entity);
         }
-        
+
         private class Raw
         {
             [Data] public byte Type { get; set; }

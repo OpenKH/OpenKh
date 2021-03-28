@@ -108,9 +108,9 @@ namespace OpenKh.Engine.Renders
         public float SourceRight { get; set; }
         public float SourceBottom { get; set; }
 
-        public Vector2 Vec0 { get; set;}
-        public Vector2 Vec1 { get; set;}
-        public Vector2 Vec2 { get; set;}
+        public Vector2 Vec0 { get; set; }
+        public Vector2 Vec1 { get; set; }
+        public Vector2 Vec2 { get; set; }
         public Vector2 Vec3 { get; set; }
 
         public ColorF Color0 { get; set; }

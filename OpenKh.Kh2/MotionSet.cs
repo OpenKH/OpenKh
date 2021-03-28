@@ -214,7 +214,7 @@ namespace OpenKh.Kh2
             RTN_08,
             RTN_09,
         }
-    
+
         public static int GetMotionSetIndex(
             IList<Bar.Entry> barEntries, MotionName motionId, bool isBattle, bool hasWeapon)
         {

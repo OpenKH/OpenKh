@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Game.States.Title
+namespace OpenKh.Game.States.Title
 {
     internal class Constants
     {

@@ -46,7 +46,7 @@ namespace OpenKh.Bbs
             ite.header = BinaryMapping.ReadObject<Header>(stream);
 
             // Weapon.
-            for(int i = 0; i < ite.header.WeaponDataCount; i++)
+            for (int i = 0; i < ite.header.WeaponDataCount; i++)
             {
                 ite.WeaponList.Add(BinaryMapping.ReadObject<ITEData>(stream));
             }

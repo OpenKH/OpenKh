@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.Drawing;
 using System.Linq;

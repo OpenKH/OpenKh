@@ -25,7 +25,7 @@ namespace OpenKh.Tools.ItbEditor
 
         private void UpdateParameters(Itb itb)
         {
-            foreach(TabPage tCon in ItbTabControl.TabPages)
+            foreach (TabPage tCon in ItbTabControl.TabPages)
             {
                 tCon.Controls[0].Controls.Clear();
             }
@@ -101,7 +101,7 @@ namespace OpenKh.Tools.ItbEditor
                         break;
                 }
 
-                
+
                 itbEntry.NumericReportID.Value = itb.AllITB[i].ReportID;
                 currentFPanel.Controls.Add(itbEntry);
             }
@@ -109,18 +109,18 @@ namespace OpenKh.Tools.ItbEditor
 
         private void UpdateWriteInfo()
         {
-            for(int i = 0; i < itb.header.ItemsTotal; i++)
+            for (int i = 0; i < itb.header.ItemsTotal; i++)
             {
                 ushort TrsrID = itb.AllITB[i].TreasureBoxID;
 
-                foreach(TabPage page in ItbTabControl.TabPages)
+                foreach (TabPage page in ItbTabControl.TabPages)
                 {
-                    foreach(ItbEntry ent in page.Controls[0].Controls)
+                    foreach (ItbEntry ent in page.Controls[0].Controls)
                     {
-                        if(ent.NumericTreasureBoxID.Value == TrsrID)
+                        if (ent.NumericTreasureBoxID.Value == TrsrID)
                         {
                             itb.AllITB[i].ItemKind = (byte)ent.ItemKindComboBox.SelectedIndex;
-                            
+
                             switch (itb.AllITB[i].ItemKind)
                             {
                                 case 0:
@@ -134,7 +134,7 @@ namespace OpenKh.Tools.ItbEditor
                                     itb.AllITB[i].ItemID = CommandVal;
                                     break;
                             }
-                            
+
                             itb.AllITB[i].ReportID = (byte)ent.NumericReportID.Value;
                             break;
                         }

@@ -121,7 +121,7 @@ namespace OpenKh.Kh2.Ard
             public override string ToString() =>
                 $"{nameof(SetActor)}: ObjEntry {ObjectEntry:X}, Name {Name}, ActorID {ActorId}";
         }
-        
+
         public class SeqActorPosition : IEventEntry
         {
             [Data] public short Unk00 { get; set; }
@@ -206,7 +206,7 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(EventStart)}: Fade in for {FadeIn} frames";
         }
 
-        public class SeqFade: IEventEntry
+        public class SeqFade : IEventEntry
         {
             public enum FadeType : short
             {
@@ -770,7 +770,7 @@ namespace OpenKh.Kh2.Ard
                 stream.Position += 4;
                 Mapping.WriteObject(stream, item);
                 var nextPosition = stream.AlignPosition(2).Position;
-                
+
                 var id = _typeId[item.GetType()];
                 var length = stream.Position - startPosition;
                 stream.Position = startPosition;

@@ -10,7 +10,7 @@ using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.Common.Imaging;
 
 namespace OpenKh.Tools.ImageViewer.Services
-{  
+{
     public partial class ImageFormatService : IImageFormatService
     {
         private static readonly IImageFormat[] imageFormat;

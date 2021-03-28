@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.ObjentryEditor.ViewModels;
+using OpenKh.Tools.ObjentryEditor.ViewModels;
 using System.Windows;
 
 namespace OpenKh.Tools.ObjentryEditor

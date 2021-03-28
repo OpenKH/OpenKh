@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Kh2.Messages.Internals
+namespace OpenKh.Kh2.Messages.Internals
 {
     internal class TableCmdModel : BaseCmdModel
     {

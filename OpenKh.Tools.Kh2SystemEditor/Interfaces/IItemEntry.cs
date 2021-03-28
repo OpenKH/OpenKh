@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Tools.Kh2SystemEditor.Interfaces
+namespace OpenKh.Tools.Kh2SystemEditor.Interfaces
 {
     public interface IItemEntry
     {

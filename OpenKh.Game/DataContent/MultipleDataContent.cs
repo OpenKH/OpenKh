@@ -1,4 +1,4 @@
-﻿using OpenKh.Game.Infrastructure;
+using OpenKh.Game.Infrastructure;
 using System.IO;
 using System.Linq;
 

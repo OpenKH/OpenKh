@@ -75,11 +75,11 @@ namespace OpenKh.Command.PmoConverter
             Pmo pmo = new Pmo();
 
             List<MeshDescriptor> Descriptors = meshGroup.MeshDescriptors;
-            
+
             // Max 65K vertices.
             uint descriptorVertexCount = 0;
             uint indicesVertexCount = 0;
-            foreach(MeshDescriptor d in Descriptors)
+            foreach (MeshDescriptor d in Descriptors)
             {
                 descriptorVertexCount += (uint)d.Vertices.Length;
                 indicesVertexCount += (uint)d.Indices.Length;
@@ -113,14 +113,14 @@ namespace OpenKh.Command.PmoConverter
                     chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBit(chunk.SectionInfo.VertexFlags, 24, true);
                     chunk.SectionInfo_opt2 = new Pmo.MeshSectionOptional2();
                     chunk.SectionInfo_opt2.DiffuseColor = UniformColor;
-                } 
+                }
                 else
                     chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 2, 3, (uint)0x7);
                 chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, (uint)TextureCoordinateFormat);
                 chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, (uint)VertexFormat);
 
                 chunk.SectionInfo.VertexSize += 0; // Weights.
-                chunk.SectionInfo.VertexSize += (TextureCoordinateFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)8  : (byte)((int)TextureCoordinateFormat * 2); // Texture Coordinates
+                chunk.SectionInfo.VertexSize += (TextureCoordinateFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)8 : (byte)((int)TextureCoordinateFormat * 2); // Texture Coordinates
                 if (chunk.SectionInfo.VertexSize % 4 != 0)
                     chunk.SectionInfo.VertexSize += 2;
                 chunk.SectionInfo.VertexSize += UsesUniformColor ? (byte)0 : (byte)4; // VertexColor
@@ -166,7 +166,7 @@ namespace OpenKh.Command.PmoConverter
             pmo.header.BoundingBox = new float[32];
 
             // Texture block.
-            if(TextureData.Count > 0)
+            if (TextureData.Count > 0)
             {
                 pmo.textureInfo = new Pmo.TextureInfo[TextureData.Count];
 
@@ -176,7 +176,7 @@ namespace OpenKh.Command.PmoConverter
                     pmo.textureInfo[t] = new Pmo.TextureInfo();
                     pmo.textureInfo[t].TextureName = TexList[t];
                     pmo.textureInfo[t].Unknown = new UInt32[4];
-                    pmo.texturesData.Add( TextureData[t] );
+                    pmo.texturesData.Add(TextureData[t]);
                 }
             }
 
@@ -189,7 +189,7 @@ namespace OpenKh.Command.PmoConverter
             Vector4 InitialColor = new Vector4(desc.Vertices[0].R, desc.Vertices[0].G, desc.Vertices[0].B, desc.Vertices[0].A);
             Vector4 CompareColor = new Vector4();
 
-            foreach(PositionColoredTextured vert in desc.Vertices)
+            foreach (PositionColoredTextured vert in desc.Vertices)
             {
                 CompareColor = new Vector4(vert.R, vert.G, vert.B, vert.A);
 
@@ -268,7 +268,8 @@ namespace OpenKh.Command.PmoConverter
                     break;
                 }
             }
-            if (is8bits) return Pmo.CoordinateFormat.NORMALIZED_8_BITS;
+            if (is8bits)
+                return Pmo.CoordinateFormat.NORMALIZED_8_BITS;
 
             // Check if 16 bits per coordinate.
             bool is16bits = true;
@@ -282,7 +283,8 @@ namespace OpenKh.Command.PmoConverter
                     break;
                 }
             }
-            if (is16bits) return Pmo.CoordinateFormat.NORMALIZED_16_BITS;
+            if (is16bits)
+                return Pmo.CoordinateFormat.NORMALIZED_16_BITS;
 
             return Pmo.CoordinateFormat.FLOAT_32_BITS;
         }
@@ -296,11 +298,11 @@ namespace OpenKh.Command.PmoConverter
             TexList = new List<string>();
             TextureData = new List<Tm2>();
 
-            foreach(Assimp.Material mat in scene.Materials)
+            foreach (Assimp.Material mat in scene.Materials)
             {
                 TexList.Add(Path.GetFileName(mat.TextureDiffuse.FilePath));
                 Stream str = File.OpenRead(TexList[TexList.Count - 1]);
-                
+
                 PngImage png = new PngImage(str);
                 Tm2 tmImage = Tm2.Create(png);
                 TextureData.Add(tmImage);

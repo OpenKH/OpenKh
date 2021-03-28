@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Tools.Common
+namespace OpenKh.Tools.Common
 {
     public static class ToolsConstants
     {

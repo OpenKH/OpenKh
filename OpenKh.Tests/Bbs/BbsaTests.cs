@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using System.IO;
 using OpenKh.Common;
 using Xunit;

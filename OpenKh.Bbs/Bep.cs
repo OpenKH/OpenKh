@@ -50,7 +50,7 @@ namespace OpenKh.Bbs
 
             stream.Seek(bep.header.BaseParametersOffset, SeekOrigin.Begin);
             bep.baseParameters = new List<BaseParameter>();
-            for(int c = 0; c < bep.header.BaseParametersCount; c++)
+            for (int c = 0; c < bep.header.BaseParametersCount; c++)
             {
                 bep.baseParameters.Add(BinaryMapping.ReadObject<BaseParameter>(stream));
             }

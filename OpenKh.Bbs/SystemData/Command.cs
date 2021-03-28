@@ -347,12 +347,12 @@ namespace OpenKh.Bbs.SystemData
 
 
             COMMAND_KIND_Midareuchi = 110,
-            
+
             COMMAND_KIND_MegePotion = 190,
             COMMAND_KIND_MegaEther = 192,
-            
-            
-            
+
+
+
             COMMAND_KIND_NetAccess = 330,
             COMMAND_KIND_NetCancel = 333,
             COMMAND_KIND_NetExchange = 334,
@@ -363,7 +363,7 @@ namespace OpenKh.Bbs.SystemData
             COMMAND_KIND_PRIZE_END = 497,
             COMMAND_KIND_PRIZE_START = 482,
             COMMAND_KIND_PhotonCharge = 294,
-            
+
             COMMAND_KIND_PoisonBlade = 113,
             COMMAND_KIND_PoisonGuard = 269,
             COMMAND_KIND_Potion = 188,
@@ -410,12 +410,12 @@ namespace OpenKh.Bbs.SystemData
             COMMAND_KIND_StarBurst = 284,
             COMMAND_KIND_StitchShoot = 319,
             COMMAND_KIND_StitchStrike = 320,
-            
+
             COMMAND_KIND_StopReflect = 274,
             COMMAND_KIND_StormShock = 290,
             COMMAND_KIND_StrikeRaid = 101,
             COMMAND_KIND_StunBlade = 116,
-            
+
 
             COMMAND_KIND_SuperGlide = 259,
             COMMAND_KIND_Sutemi = 129,

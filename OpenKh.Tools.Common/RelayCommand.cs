@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.Common

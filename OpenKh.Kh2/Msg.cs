@@ -166,8 +166,10 @@ namespace OpenKh.Kh2
                     continue;
 
                 int j;
-                for (j = pattern.Length - 1; j >= 1 && data[i + j] == pattern[j]; j--) ;
-                if (j == 0) return i;
+                for (j = pattern.Length - 1; j >= 1 && data[i + j] == pattern[j]; j--)
+                    ;
+                if (j == 0)
+                    return i;
             }
 
             return -1;

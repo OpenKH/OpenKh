@@ -110,7 +110,8 @@ namespace OpenKh.Kh2
             var srcIndex = srcData.Length - 1;
 
             byte key = 0;
-            while (srcIndex > 0 && (key = srcData[srcIndex--]) == 0) ;
+            while (srcIndex > 0 && (key = srcData[srcIndex--]) == 0)
+                ;
             if (srcIndex == 0)
                 return new byte[0];
 

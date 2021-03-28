@@ -1,4 +1,4 @@
-﻿// MIT License
+// MIT License
 // 
 // Copyright(c) 2017 Luciano (Xeeynamo) Ciccariello
 // 
@@ -39,17 +39,17 @@ namespace OpenKh.Tools.Common.Rendering
     using OpenKh.Engine.Renders;
 
     public partial class SpriteDrawingDirect3D : ISpriteDrawing
-	{
-		[DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false), SuppressUnmanagedCodeSecurity]
-		public static extern IntPtr CopyMemory(IntPtr dest, IntPtr src, ulong count);
+    {
+        [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false), SuppressUnmanagedCodeSecurity]
+        public static extern IntPtr CopyMemory(IntPtr dest, IntPtr src, ulong count);
 
-		[StructLayout(LayoutKind.Sequential)]
-		private struct Vertex
-		{
-			public float X, Y;
-			public float U, V;
-			public ColorF Color;
-		}
+        [StructLayout(LayoutKind.Sequential)]
+        private struct Vertex
+        {
+            public float X, Y;
+            public float U, V;
+            public ColorF Color;
+        }
 
         public void AppendSprite(SpriteDrawingContext context)
         {
@@ -94,7 +94,7 @@ namespace OpenKh.Tools.Common.Rendering
             };
         }
 
-		private CSpriteTexture _currentTexture;
+        private CSpriteTexture _currentTexture;
         private void SetTextureToDraw(ISpriteTexture texture)
         {
             if (_currentTexture != texture)
@@ -114,19 +114,19 @@ namespace OpenKh.Tools.Common.Rendering
         private Vertex[] _dataBuffer = new Vertex[MaximumQuadsCount];
         private int _pendingVerticesCount;
 
-		private int RequestVertices(int count)
-		{
-			if (_pendingVerticesCount + count >= MaximumQuadsCount)
-			{
-				Flush();
-			}
+        private int RequestVertices(int count)
+        {
+            if (_pendingVerticesCount + count >= MaximumQuadsCount)
+            {
+                Flush();
+            }
 
-			var index = _pendingVerticesCount;
-			_pendingVerticesCount += count;
+            var index = _pendingVerticesCount;
+            _pendingVerticesCount += count;
 
-			return index;
-		}
-		
+            return index;
+        }
+
         public void Flush()
         {
             if (_pendingVerticesCount == 0)
@@ -170,13 +170,13 @@ namespace OpenKh.Tools.Common.Rendering
             }
             else
             {
-				var size = _pendingVerticesCount * dx.Utilities.SizeOf<Vertex>();
-				var dataBox = Context.MapSubresource(_vertexBuffer, 0, d3d.MapMode.WriteDiscard, d3d.MapFlags.None);
+                var size = _pendingVerticesCount * dx.Utilities.SizeOf<Vertex>();
+                var dataBox = Context.MapSubresource(_vertexBuffer, 0, d3d.MapMode.WriteDiscard, d3d.MapFlags.None);
                 IntPtr addr = Marshal.UnsafeAddrOfPinnedArrayElement(_dataBuffer, 0);
                 CopyMemory(dataBox.DataPointer, addr, (ulong)size);
                 Context.UnmapSubresource(_vertexBuffer, 0);
             }
-            
+
             Context.DrawIndexed(_pendingVerticesCount / 4 * 6, 0, 0);
             Context.Flush();
             _pendingVerticesCount = 0;

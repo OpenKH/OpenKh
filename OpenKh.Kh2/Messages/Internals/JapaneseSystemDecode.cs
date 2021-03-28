@@ -283,12 +283,18 @@ namespace OpenKh.Kh2.Messages.Internals
                     case 0x1b:
                         switch (parameter)
                         {
-                            case 0x54: return AppendComplex(decoder, "I");
-                            case 0x55: return AppendComplex(decoder, "II");
-                            case 0x56: return AppendComplex(decoder, "IV");
-                            case 0x57: return AppendComplex(decoder, "V");
-                            case 0x58: return AppendComplex(decoder, "VI");
-                            case 0x59: return AppendComplex(decoder, "IX");
+                            case 0x54:
+                                return AppendComplex(decoder, "I");
+                            case 0x55:
+                                return AppendComplex(decoder, "II");
+                            case 0x56:
+                                return AppendComplex(decoder, "IV");
+                            case 0x57:
+                                return AppendComplex(decoder, "V");
+                            case 0x58:
+                                return AppendComplex(decoder, "VI");
+                            case 0x59:
+                                return AppendComplex(decoder, "IX");
                         }
                         break;
                 }

@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 
 namespace OpenKh.Tools.Common
 {

@@ -40,7 +40,7 @@ namespace OpenKh.Common
 
                     return BitConverter.ToInt32(blockCorrectEndian, 0);
                 }
-                
+
                 isoStream.Position = currentPosition + 1;
             }
 

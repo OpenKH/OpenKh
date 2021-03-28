@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using Xe.IO;
 namespace OpenKh.Kh2
 {
     public partial class Imgd : IImageRead
-	{
+    {
         private class Header
         {
             [Data] public uint MagicCode { get; set; }
@@ -37,7 +37,7 @@ namespace OpenKh.Kh2
             [Data] public int Swizzled { get; set; }
         }
 
-		private const uint MagicCode = 0x44474D49U;
+        private const uint MagicCode = 0x44474D49U;
         private const int HeaderLength = 0x40;
         private const short Format32bpp = 0x00;
         private const short Format8bpp = 0x13;
@@ -54,8 +54,8 @@ namespace OpenKh.Kh2
         private readonly short format;
         private readonly int swizzled;
 
-		private Imgd(Stream stream)
-		{
+        private Imgd(Stream stream)
+        {
             stream
                 .MustReadAndSeek()
                 .MustHaveHeaderLengthOf(HeaderLength);
@@ -84,7 +84,7 @@ namespace OpenKh.Kh2
         public static Imgd Read(Stream stream) => new Imgd(stream.SetPosition(0));
 
         public void Write(Stream stream)
-		{
+        {
             stream.MustWriteAndSeek();
 
             BinaryMapping.WriteObject(stream, new Header
@@ -194,26 +194,28 @@ namespace OpenKh.Kh2
         public PixelFormat PixelFormat => GetPixelFormat(format);
 
         public byte[] GetData()
-		{
-			switch (format)
+        {
+            switch (format)
             {
                 case Format32bpp:
                     return GetData32bpp();
                 case Format8bpp:
                     return IsSwizzled ? Ps2.Decode8(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 64), Size.Width / 128, Size.Height / 64) : Data;
                 case Format4bpp:
-					return IsSwizzled ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data;
-				default:
-					throw new NotSupportedException($"The format {format} is not supported.");
-			}
+                    return IsSwizzled ? Ps2.Decode4(Ps2.Encode32(Data, Size.Width / 128, Size.Height / 128), Size.Width / 128, Size.Height / 128) : Data;
+                default:
+                    throw new NotSupportedException($"The format {format} is not supported.");
+            }
         }
 
         public byte[] GetClut()
         {
             switch (format)
             {
-                case Format8bpp: return GetClut8();
-                case Format4bpp: return GetClut4();
+                case Format8bpp:
+                    return GetClut8();
+                case Format4bpp:
+                    return GetClut4();
                 default:
                     throw new NotSupportedException($"The format {format} is not supported or does not contain any palette.");
             }
@@ -278,10 +280,14 @@ namespace OpenKh.Kh2
         {
             switch (format)
             {
-                case Format32bpp: return PixelFormat.Rgba8888;
-                case Format8bpp: return PixelFormat.Indexed8;
-                case Format4bpp: return PixelFormat.Indexed4;
-                default: return PixelFormat.Undefined;
+                case Format32bpp:
+                    return PixelFormat.Rgba8888;
+                case Format8bpp:
+                    return PixelFormat.Indexed8;
+                case Format4bpp:
+                    return PixelFormat.Indexed4;
+                default:
+                    return PixelFormat.Undefined;
             }
         }
 
@@ -289,9 +295,12 @@ namespace OpenKh.Kh2
         {
             switch (pixelFormat)
             {
-                case PixelFormat.Rgba8888: return Format32bpp;
-                case PixelFormat.Indexed4: return Format4bpp;
-                case PixelFormat.Indexed8: return Format8bpp;
+                case PixelFormat.Rgba8888:
+                    return Format32bpp;
+                case PixelFormat.Indexed4:
+                    return Format4bpp;
+                case PixelFormat.Indexed8:
+                    return Format8bpp;
                 default:
                     throw new ArgumentOutOfRangeException(
                         $"Pixel format {pixelFormat} is not supported.");
@@ -302,9 +311,12 @@ namespace OpenKh.Kh2
         {
             switch (format)
             {
-                case Format32bpp: return SubFormat32bpp;
-                case Format4bpp: return SubFormat4bpp;
-                case Format8bpp: return SubFormat8bpp;
+                case Format32bpp:
+                    return SubFormat32bpp;
+                case Format4bpp:
+                    return SubFormat4bpp;
+                case Format8bpp:
+                    return SubFormat8bpp;
                 default:
                     throw new ArgumentOutOfRangeException(
                         $"Format {format} is not supported.");

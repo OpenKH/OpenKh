@@ -1,4 +1,4 @@
-﻿// Inspired by Kddf2's khkh_xldM.
+// Inspired by Kddf2's khkh_xldM.
 // Original source code: https://gitlab.com/kenjiuno/khkh_xldM/blob/master/khkh_xldMii/Mdlxfst.cs
 
 using OpenKh.Common;
@@ -160,7 +160,7 @@ namespace OpenKh.Kh2
                 Unk = header.Unk,
                 DmaChainCount = header.DmaChainCount,
             };
-            
+
             var dmaChainHeaders = For(subModel.DmaChainCount, () => BinaryMapping.ReadObject<DmaChainHeader>(stream));
 
             stream.Position = header.UnkDataOffset;

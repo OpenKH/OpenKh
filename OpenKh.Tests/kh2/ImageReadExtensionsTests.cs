@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;

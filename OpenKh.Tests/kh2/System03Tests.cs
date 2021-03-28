@@ -13,7 +13,7 @@ namespace OpenKh.Tests.kh2
             public void CheckForLength() => File.OpenRead("kh2/res/arif.bin").Using(stream =>
             {
                 var worlds = Arif.Read(stream);
-                
+
                 Assert.Equal(19, worlds.Count);
                 Assert.Equal(64, worlds[0].Count);
                 Assert.Equal(2, worlds[1].Count);

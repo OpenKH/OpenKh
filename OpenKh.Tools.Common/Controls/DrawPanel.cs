@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Renders;
+using OpenKh.Engine.Renders;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -24,7 +24,7 @@ namespace OpenKh.Tools.Common.Controls
 
 
         public static readonly DependencyProperty DrawingProperty =
-            GetDependencyProperty<DrawPanel, ISpriteDrawing>(nameof(Drawing),(o, x) => o.SetDrawing(x));
+            GetDependencyProperty<DrawPanel, ISpriteDrawing>(nameof(Drawing), (o, x) => o.SetDrawing(x));
 
         public static readonly DependencyProperty DrawCreateCommandProperty =
             GetDependencyProperty<DrawPanel, ICommand>(nameof(DrawCreate), (o, x) => o.drawCreateCommand = x);

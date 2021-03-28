@@ -407,7 +407,7 @@ namespace OpenKh.Kh2
         private byte[] OffsetData { get; }
         private byte[] PictureData { get; }
         private byte[] PaletteData { get; }
-        
+
         public TextureFooterData TextureFooterData { get; }
 
         private const int ClutBasePtr = 0x2C00;

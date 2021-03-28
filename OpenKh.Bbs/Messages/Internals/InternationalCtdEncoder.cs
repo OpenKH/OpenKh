@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -143,8 +143,10 @@ namespace OpenKh.Bbs.Messages.Internals
             while (enumerator.MoveNext())
             {
                 var ch = enumerator.Current;
-                if (ch < 0x21) yield return ch;
-                else if (ch < 0x80) yield return _jisToUcs[ch - 0x20];
+                if (ch < 0x21)
+                    yield return ch;
+                else if (ch < 0x80)
+                    yield return _jisToUcs[ch - 0x20];
                 else if (ch < 0xa0)
                 {
                     if (!enumerator.MoveNext())
@@ -152,7 +154,8 @@ namespace OpenKh.Bbs.Messages.Internals
                     else
                         yield return (ushort)((ch << 8) | enumerator.Current);
                 }
-                else if (ch < 0xe0) yield return ch; // TODO convert 0xa0-0xdf characters to UCS
+                else if (ch < 0xe0)
+                    yield return ch; // TODO convert 0xa0-0xdf characters to UCS
                 else if (ch < 0xf0)
                 {
                     if (!enumerator.MoveNext())
@@ -160,7 +163,8 @@ namespace OpenKh.Bbs.Messages.Internals
                     else
                         yield return (ushort)((ch << 8) | enumerator.Current);
                 }
-                else yield return ch;
+                else
+                    yield return ch;
             }
         }
 

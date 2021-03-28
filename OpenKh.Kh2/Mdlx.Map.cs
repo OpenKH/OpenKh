@@ -83,7 +83,8 @@ namespace OpenKh.Kh2
         private static M4 ReadAsMap(Stream stream)
         {
             var header = BinaryMapping.ReadObject<SubModelMapHeader>(stream);
-            if (header.Type != Map) throw new NotSupportedException("Type must be 2 for maps");
+            if (header.Type != Map)
+                throw new NotSupportedException("Type must be 2 for maps");
 
             var dmaChainMaps = For(header.DmaChainMapCount, () => BinaryMapping.ReadObject<DmaChainMap>(stream));
 
@@ -244,7 +245,8 @@ namespace OpenKh.Kh2
             while (true)
             {
                 var data = stream.ReadUInt16();
-                if (data == 0xFFFF) break;
+                if (data == 0xFFFF)
+                    break;
                 yield return data;
             }
         }

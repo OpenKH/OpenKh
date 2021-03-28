@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Engine
+namespace OpenKh.Engine
 {
     public interface IMessageProvider
     {

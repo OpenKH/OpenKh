@@ -25,7 +25,7 @@ namespace OpenKh.Tools.ItcEditor
 
         private void UpdateParameters(Itc itc)
         {
-            foreach(TabPage tCon in ItcTabControl.TabPages)
+            foreach (TabPage tCon in ItcTabControl.TabPages)
             {
                 tCon.Controls[0].Controls.Clear();
             }
@@ -95,15 +95,15 @@ namespace OpenKh.Tools.ItcEditor
 
         private void UpdateWriteInfo()
         {
-            for(int i = 0; i < itc.header.ItemsTotal; i++)
+            for (int i = 0; i < itc.header.ItemsTotal; i++)
             {
                 ushort CollID = itc.AllITC[i].CollectionID;
 
-                foreach(TabPage page in ItcTabControl.TabPages)
+                foreach (TabPage page in ItcTabControl.TabPages)
                 {
-                    foreach(ItcEntry ent in page.Controls[0].Controls)
+                    foreach (ItcEntry ent in page.Controls[0].Controls)
                     {
-                        if(ent.NumericCollectionID.Value == CollID)
+                        if (ent.NumericCollectionID.Value == CollID)
                         {
                             Item.Type nItem = (Item.Type)ent.ItemIDComboBox.SelectedItem;
                             ushort ItemVal = (ushort)nItem;

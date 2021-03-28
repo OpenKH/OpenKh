@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 
 namespace OpenKh.Common
@@ -16,8 +16,10 @@ namespace OpenKh.Common
             if (rectangle.Width == 0 || rectangle.Height == 0)
                 return Rectangle.Empty;
 
-            if (rectangle.Width < 0) rectangle = rectangle.FlipX();
-            if (rectangle.Height < 0) rectangle = rectangle.FlipY();
+            if (rectangle.Width < 0)
+                rectangle = rectangle.FlipX();
+            if (rectangle.Height < 0)
+                rectangle = rectangle.FlipY();
 
             return rectangle;
         }
@@ -27,8 +29,10 @@ namespace OpenKh.Common
             rect = rect.GetVisibility();
             rectangle = rectangle.GetVisibility();
 
-            if (rect.IsEmpty) return rectangle;
-            if (rectangle.IsEmpty) return rect;
+            if (rect.IsEmpty)
+                return rectangle;
+            if (rectangle.IsEmpty)
+                return rect;
 
             return Rectangle.FromLTRB(
                 Math.Min(rect.Left, rectangle.Left),

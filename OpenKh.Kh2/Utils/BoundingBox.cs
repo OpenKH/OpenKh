@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2.Extensions;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Jiminy;
 using System;
 using System.Collections.Generic;

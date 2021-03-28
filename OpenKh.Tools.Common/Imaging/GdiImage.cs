@@ -1,4 +1,4 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;

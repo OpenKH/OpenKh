@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Game.Menu
+namespace OpenKh.Game.Menu
 {
     public interface IMenu
     {

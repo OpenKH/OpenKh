@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Tools.Common;
@@ -50,7 +50,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public EnmpViewModel Enmp
         {
             get => _enmp;
-            private set { _enmp = value; OnPropertyChanged();}
+            private set { _enmp = value; OnPropertyChanged(); }
         }
 
         public FmlvViewModel Fmlv

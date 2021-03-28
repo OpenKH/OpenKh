@@ -302,7 +302,7 @@ namespace OpenKh.Bbs
             epd.generalParameters = BinaryMapping.ReadObject<GeneralParameters>(stream);
             BinaryReader r = new BinaryReader(stream);
 
-            for(int i = 0; i < 18; i++)
+            for (int i = 0; i < 18; i++)
             {
                 char[] animName = r.ReadChars(4);
                 epd.AnimationList.Add(animName);
@@ -313,7 +313,7 @@ namespace OpenKh.Bbs
             epd.otherParameters = BinaryMapping.ReadObject<OtherParameters>(stream);
 
             stream.Seek(epd.otherParameters.TechniqueParameterOffset, SeekOrigin.Begin);
-            for(int t = 0; t < epd.otherParameters.TechniqueParameterCount; t++)
+            for (int t = 0; t < epd.otherParameters.TechniqueParameterCount; t++)
             {
                 epd.techniqueParameters.Add(BinaryMapping.ReadObject<TechniqueParameters>(stream));
             }
@@ -339,7 +339,7 @@ namespace OpenKh.Bbs
             BinaryMapping.WriteObject<GeneralParameters>(stream, epd.generalParameters);
             BinaryWriter w = new BinaryWriter(stream);
 
-            foreach(char[] anim in epd.AnimationList)
+            foreach (char[] anim in epd.AnimationList)
             {
                 w.Write(anim);
             }

@@ -1,4 +1,4 @@
-﻿// MIT License
+// MIT License
 // 
 // Copyright(c) 2017 Luciano (Xeeynamo) Ciccariello
 // 
@@ -66,7 +66,7 @@ namespace OpenKh.Tools.Common.Rendering
             };
 
             private List<IDisposable> _disposables = new List<IDisposable>();
-			
+
             private d3d.Device d3dDevice;
             private dxgi.Device dxgiDevice;
             private dxgi.Device1 dxgiDevice1;
@@ -88,14 +88,14 @@ namespace OpenKh.Tools.Common.Rendering
                 d3dDevice = new d3d.Device(DriverType.Hardware, flags);
                 Device = d3dDevice.QueryInterface<d3d.Device1>();
                 dxgiDevice = d3dDevice.QueryInterface<dxgi.Device>();
-				dxgiDevice1 = dxgiDevice.QueryInterface<dxgi.Device1>();
+                dxgiDevice1 = dxgiDevice.QueryInterface<dxgi.Device1>();
                 dxgiAdapter = dxgiDevice.Adapter.QueryInterface<dxgi.Adapter>();
                 dxgiFactory = dxgiAdapter.GetParent<dxgi.Factory>();
 
                 CreateResources();
             }
 
-			private void CreateResources()
+            private void CreateResources()
             {
                 //CreateDepthStencilState();
                 CreateRasterizer();
@@ -105,7 +105,7 @@ namespace OpenKh.Tools.Common.Rendering
                 InitializeShaders();
             }
 
-			private void CreateWindowSizeDependentResources(Size size)
+            private void CreateWindowSizeDependentResources(Size size)
             {
                 var desc = new dxgi.SwapChainDescription
                 {
@@ -126,10 +126,10 @@ namespace OpenKh.Tools.Common.Rendering
                 desc.SampleDescription.Count = 1;
                 desc.SampleDescription.Quality = 0;
 
-               //_swapChain = new dxgi.SwapChain(dxgiFactory, d3dDevice, desc);
+                //_swapChain = new dxgi.SwapChain(dxgiFactory, d3dDevice, desc);
             }
 
-			private void CreateDepthStencilState()
+            private void CreateDepthStencilState()
             {
                 var desc = new d3d.DepthStencilStateDescription
                 {
@@ -154,15 +154,15 @@ namespace OpenKh.Tools.Common.Rendering
                 Context.OutputMerger.DepthStencilState = depthStencilState;
             }
 
-			private void CreateRasterizer()
+            private void CreateRasterizer()
             {
                 var desc = new d3d.RasterizerStateDescription()
                 {
-					FillMode = d3d.FillMode.Solid,
-					CullMode = d3d.CullMode.None,
-					IsFrontCounterClockwise = false,
-					IsDepthClipEnabled = true,
-					IsScissorEnabled = false
+                    FillMode = d3d.FillMode.Solid,
+                    CullMode = d3d.CullMode.None,
+                    IsFrontCounterClockwise = false,
+                    IsDepthClipEnabled = true,
+                    IsScissorEnabled = false
                 };
 
                 var rasterizerState = new d3d.RasterizerState(Device, desc);
@@ -170,7 +170,7 @@ namespace OpenKh.Tools.Common.Rendering
                 Context.Rasterizer.State = rasterizerState;
             }
 
-			private void CreateBlend()
+            private void CreateBlend()
             {
                 var desc = new d3d.BlendStateDescription()
                 {
@@ -205,7 +205,7 @@ namespace OpenKh.Tools.Common.Rendering
                 _disposables.Add(sampler);
             }
 
-			private void SetRenderTargetlendProperties(ref d3d.RenderTargetBlendDescription desc)
+            private void SetRenderTargetlendProperties(ref d3d.RenderTargetBlendDescription desc)
             {
                 desc.IsBlendEnabled = true;
                 desc.SourceBlend = d3d.BlendOption.SourceAlpha;

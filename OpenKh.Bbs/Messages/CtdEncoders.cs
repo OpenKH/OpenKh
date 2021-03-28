@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs.Messages.Internals;
+using OpenKh.Bbs.Messages.Internals;
 
 namespace OpenKh.Bbs.Messages
 {

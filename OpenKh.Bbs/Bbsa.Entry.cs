@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.IO;
 using Xe.IO;
@@ -133,24 +133,42 @@ namespace OpenKh.Bbs
             var magicCode = new BinaryReader(stream).ReadUInt32();
             switch (magicCode)
             {
-                case 0x61754C1B: return "lub";
-                case 0x41264129: return "ice";
-                case 0x44544340: return "ctd";
-                case 0x50444540: return "edp";
-                case 0x00435241: return "arc";
-                case 0x44424D40: return "mbd";
-                case 0x00444145: return "ead";
-                case 0x07504546: return "fep";
-                case 0x00425449: return "itb";
-                case 0x00435449: return "itc";
-                case 0x00455449: return "ite";
-                case 0x004D4150: return "pam";
-                case 0x004F4D50: return "pmo";
-                case 0x42444553: return "scd";
-                case 0x324D4954: return "tm2";
-                case 0x00415854: return "txa";
-                case 0x00617865: return "exa";
-                default: return null;
+                case 0x61754C1B:
+                    return "lub";
+                case 0x41264129:
+                    return "ice";
+                case 0x44544340:
+                    return "ctd";
+                case 0x50444540:
+                    return "edp";
+                case 0x00435241:
+                    return "arc";
+                case 0x44424D40:
+                    return "mbd";
+                case 0x00444145:
+                    return "ead";
+                case 0x07504546:
+                    return "fep";
+                case 0x00425449:
+                    return "itb";
+                case 0x00435449:
+                    return "itc";
+                case 0x00455449:
+                    return "ite";
+                case 0x004D4150:
+                    return "pam";
+                case 0x004F4D50:
+                    return "pmo";
+                case 0x42444553:
+                    return "scd";
+                case 0x324D4954:
+                    return "tm2";
+                case 0x00415854:
+                    return "txa";
+                case 0x00617865:
+                    return "exa";
+                default:
+                    return null;
             }
         }
 

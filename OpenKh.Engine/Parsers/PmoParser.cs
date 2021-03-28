@@ -16,7 +16,7 @@ namespace OpenKh.Engine.Parsers
             aPmo = pmo;
             MeshDescriptors = new List<MeshDescriptor>();
             MeshDescriptor currentMesh = new MeshDescriptor();
-            
+
             for (int x = 0; x < pmo.Meshes.Count; x++)
             {
                 var vertices = new PositionColoredTextured[pmo.Meshes[x].vertices.Count];
@@ -97,7 +97,7 @@ namespace OpenKh.Engine.Parsers
 
         public void ApplyMotion(Matrix4x4[] matrices)
         {
-            
+
         }
     }
 }

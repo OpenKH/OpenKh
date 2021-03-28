@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace OpenKh.Tools.Kh2BattleEditor.Services
 {

@@ -124,15 +124,15 @@ namespace OpenKh.Bbs
 
             pam.header = BinaryMapping.ReadObject<Header>(stream);
             pam.animList = new List<AnimationInfo>();
-            
-            for(int i = 0; i < pam.header.AnimationCount; i++)
+
+            for (int i = 0; i < pam.header.AnimationCount; i++)
             {
                 pam.animList.Add(new AnimationInfo());
                 pam.animList[i].AnimEntry = BinaryMapping.ReadObject<AnimationEntry>(stream);
             }
 
             // Get all anims in PAM pack.
-            for(int j = 0; j < pam.animList.Count; j++)
+            for (int j = 0; j < pam.animList.Count; j++)
             {
                 stream.Seek(pam.animList[j].AnimEntry.AnimationOffset, SeekOrigin.Begin);
                 pam.animList[j].AnimHeader = BinaryMapping.ReadObject<AnimationHeader>(stream);
@@ -174,8 +174,8 @@ namespace OpenKh.Bbs
                         {
                             keyframeCnt = boneChannel.TranslationX.Header.KeyframeCount_8bits = (byte)stream.ReadByte();
                         }
-                        
-                        if(keyframeCnt != 1)
+
+                        if (keyframeCnt != 1)
                         {
                             boneChannel.TranslationX.Keyframes = new List<KeyframeEntry>();
                             for (ushort z = 0; z < keyframeCnt; z++)

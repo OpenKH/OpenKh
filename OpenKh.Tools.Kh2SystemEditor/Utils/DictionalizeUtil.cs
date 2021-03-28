@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.Kh2SystemEditor.Attributes;
+using OpenKh.Tools.Kh2SystemEditor.Attributes;
 using OpenKh.Tools.Kh2SystemEditor.ViewModels;
 using System;
 using System.Collections.Generic;

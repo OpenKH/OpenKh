@@ -93,7 +93,7 @@ namespace OpenKh.Command.PmpConverter
                     descriptorVertexCount += (ushort)d.Vertices.Length;
                     textureIndices.Add(d.TextureIndex);
                 }
-                
+
                 // Mesh data.
                 for (int i = 0; i < Descriptors.Count; i++)
                 {
@@ -330,14 +330,14 @@ namespace OpenKh.Command.PmpConverter
                 TextureData.Add(tmImage);
             }
 
-            for(int i = 0; i < scene.RootNode.ChildCount; i++)
+            for (int i = 0; i < scene.RootNode.ChildCount; i++)
             {
                 Node child = scene.RootNode.Children[i];
                 MeshGroup currentMeshGroup = new MeshGroup();
                 currentMeshGroup.MeshDescriptors = new List<MeshDescriptor>();
 
                 // Get meshes by ID.
-                foreach(int j in child.MeshIndices)
+                foreach (int j in child.MeshIndices)
                 {
                     MeshDescriptor meshDescriptor = new MeshDescriptor();
                     Mesh x = scene.Meshes[j];

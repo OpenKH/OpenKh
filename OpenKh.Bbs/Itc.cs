@@ -58,7 +58,7 @@ namespace OpenKh.Bbs
 
             itc.AllITC = new List<ITCData>();
 
-            for(int i = 0; i < itc.header.ItemsTotal; i++)
+            for (int i = 0; i < itc.header.ItemsTotal; i++)
             {
                 itc.AllITC.Add(BinaryMapping.ReadObject<ITCData>(stream));
             }

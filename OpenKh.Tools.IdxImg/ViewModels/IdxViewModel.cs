@@ -58,7 +58,7 @@ namespace OpenKh.Tools.IdxImg.ViewModels
                     break;
 
                 child.Extract(outputPath, progress);
-            }    
+            }
         }
     }
 }

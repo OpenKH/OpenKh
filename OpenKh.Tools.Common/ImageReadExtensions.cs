@@ -1,4 +1,4 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 

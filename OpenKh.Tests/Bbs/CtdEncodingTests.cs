@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs.Messages;
+using OpenKh.Bbs.Messages;
 using System.Linq;
 using Xunit;
 
@@ -76,7 +76,7 @@ namespace OpenKh.Tests.Bbs
         }
 
         [Theory]
-        [InlineData(0xf1, 0xae, "{:icon button-triangle}")] 
+        [InlineData(0xf1, 0xae, "{:icon button-triangle}")]
         [InlineData(0xf1, 0xb4, "{:icon button-l}")]
         [InlineData(0xf1, 0xc5, "{:icon button-dpad-v}")]
         [InlineData(0xf9, 0x41, "{:color default}")]

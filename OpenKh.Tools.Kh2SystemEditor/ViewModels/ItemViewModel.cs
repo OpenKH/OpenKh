@@ -32,11 +32,11 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public string Title => $"{Item.Id:X02} {_messageProvider.GetString(Item.Name)}";
 
             public ushort Id { get => Item.Id; set => Item.Id = value; }
-            public Item.Type Type  { get => Item.Type; set => Item.Type = value; }
-            public byte Flag0  { get => Item.Flag0; set => Item.Flag0 = value; }
-            public byte Flag1  { get => Item.Flag1; set => Item.Flag1 = value; }
+            public Item.Type Type { get => Item.Type; set => Item.Type = value; }
+            public byte Flag0 { get => Item.Flag0; set => Item.Flag0 = value; }
+            public byte Flag1 { get => Item.Flag1; set => Item.Flag1 = value; }
             public Item.Rank Rank { get => Item.Rank; set => Item.Rank = value; }
-            public ushort StatEntry  { get => Item.StatEntry; set => Item.StatEntry = value; }
+            public ushort StatEntry { get => Item.StatEntry; set => Item.StatEntry = value; }
             public ushort NameId
             {
                 get => Item.Name;
@@ -57,11 +57,11 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             }
             public ushort ShopBuy { get => Item.ShopBuy; set => Item.ShopBuy = value; }
             public ushort ShopSell { get => Item.ShopSell; set => Item.ShopSell = value; }
-            public ushort Command  { get => Item.Command; set => Item.Command = value; }
-            public ushort Slot  { get => Item.Slot; set => Item.Slot = value; }
-            public short Picture  { get => Item.Picture; set => Item.Picture = value; }
-            public byte Icon1  { get => Item.Icon1; set => Item.Icon1 = value; }
-            public byte Icon2  { get => Item.Icon1; set => Item.Icon1 = value; }
+            public ushort Command { get => Item.Command; set => Item.Command = value; }
+            public ushort Slot { get => Item.Slot; set => Item.Slot = value; }
+            public short Picture { get => Item.Picture; set => Item.Picture = value; }
+            public byte Icon1 { get => Item.Icon1; set => Item.Icon1 = value; }
+            public byte Icon2 { get => Item.Icon1; set => Item.Icon1 = value; }
 
             public string IdText => $"{Id} (0x{Id:X})";
             public string Name { get => _messageProvider.GetString(Item.Name); set => _messageProvider.SetString(Item.Name, value); }
@@ -109,7 +109,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         }
 
         public string EntryName => entryName;
-        
+
         public Visibility IsItemEditingVisible => IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsItemEditMessageVisible => !IsItemSelected ? Visibility.Visible : Visibility.Collapsed;
 

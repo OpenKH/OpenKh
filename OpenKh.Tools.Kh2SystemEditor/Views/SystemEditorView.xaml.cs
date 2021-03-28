@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Tools.Kh2SystemEditor.ViewModels;
 using System.IO;
 using System.Windows;

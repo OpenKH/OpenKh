@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Bbs

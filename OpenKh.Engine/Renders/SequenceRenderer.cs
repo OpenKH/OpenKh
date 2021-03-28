@@ -148,7 +148,7 @@ namespace OpenKh.Engine.Renderers
 
             var context = contextParent.Clone();
             var delta = (double)(context.FrameIndex - animation.FrameStart) / (animation.FrameEnd - animation.FrameStart);
-            
+
             float t;
 
             // loc_23B030

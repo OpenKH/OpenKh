@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2.Utils

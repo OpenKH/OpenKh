@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Game.States
+namespace OpenKh.Game.States
 {
     public interface IStateChange
     {

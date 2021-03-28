@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 
 namespace OpenKh.Ps2
@@ -257,7 +257,7 @@ namespace OpenKh.Ps2
         {
             _destinationAddress = (int)opcode.UnpackAddress;
             //if (opcode.UnpackAddsTops)
-                _destinationAddress += Vif1_Tops;
+            _destinationAddress += Vif1_Tops;
             _destinationAddress *= VertexAlignment;
             _unpackMaskIndex = 0;
 
@@ -293,10 +293,18 @@ namespace OpenKh.Ps2
             var currentMask = NextMask();
             var value = reader();
 
-            if (currentMask.X == MaskType.Write) Write(value); Next();
-            if (currentMask.Y == MaskType.Write) Write(value); Next();
-            if (currentMask.Z == MaskType.Write) Write(value); Next();
-            if (currentMask.W == MaskType.Write) Write(value); Next();
+            if (currentMask.X == MaskType.Write)
+                Write(value);
+            Next();
+            if (currentMask.Y == MaskType.Write)
+                Write(value);
+            Next();
+            if (currentMask.Z == MaskType.Write)
+                Write(value);
+            Next();
+            if (currentMask.W == MaskType.Write)
+                Write(value);
+            Next();
         }
 
         public void UnpackVector2(Func<uint> reader)
@@ -305,24 +313,38 @@ namespace OpenKh.Ps2
             var x = reader();
             var y = reader();
 
-            if (currentMask.X == MaskType.Write) Write(x); Next();
-            if (currentMask.Y == MaskType.Write) Write(y); Next();
+            if (currentMask.X == MaskType.Write)
+                Write(x);
+            Next();
+            if (currentMask.Y == MaskType.Write)
+                Write(y);
+            Next();
 
             // While PS2 docs says that the following two values will
             // be indeterminate, PCSX2 seems to follow this exact
             // logic. Probably to emulate an undefined behaviour.
             // We are going to do the same, just in case.
-            if (currentMask.Z == MaskType.Write) Write(x); Next();
-            if (currentMask.W == MaskType.Write) Write(y); Next();
+            if (currentMask.Z == MaskType.Write)
+                Write(x);
+            Next();
+            if (currentMask.W == MaskType.Write)
+                Write(y);
+            Next();
         }
 
         private void UnpackVector3(Func<uint> reader)
         {
             var currentMask = NextMask();
 
-            if (currentMask.X == MaskType.Write) Write(reader()); Next();
-            if (currentMask.Y == MaskType.Write) Write(reader()); Next();
-            if (currentMask.Z == MaskType.Write) Write(reader()); Next();
+            if (currentMask.X == MaskType.Write)
+                Write(reader());
+            Next();
+            if (currentMask.Y == MaskType.Write)
+                Write(reader());
+            Next();
+            if (currentMask.Z == MaskType.Write)
+                Write(reader());
+            Next();
 
             // According to PCSX2, the following logic emulates the
             // behaviour of the real hardware.. Time for some hacks!
@@ -340,10 +362,18 @@ namespace OpenKh.Ps2
         {
             var currentMask = NextMask();
 
-            if (currentMask.X == MaskType.Write) Write(reader()); Next();
-            if (currentMask.Y == MaskType.Write) Write(reader()); Next();
-            if (currentMask.Z == MaskType.Write) Write(reader()); Next();
-            if (currentMask.W == MaskType.Write) Write(reader()); Next();
+            if (currentMask.X == MaskType.Write)
+                Write(reader());
+            Next();
+            if (currentMask.Y == MaskType.Write)
+                Write(reader());
+            Next();
+            if (currentMask.Z == MaskType.Write)
+                Write(reader());
+            Next();
+            if (currentMask.W == MaskType.Write)
+                Write(reader());
+            Next();
         }
 
         private void Write(uint value)

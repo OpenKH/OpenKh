@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -33,7 +33,8 @@ namespace OpenKh.Kh2.Messages
                         throw ex;
                 }
 
-                return SerializeXEntries(x.Id, messageDecoded, ignoreExceptions); ;
+                return SerializeXEntries(x.Id, messageDecoded, ignoreExceptions);
+                ;
             }));
         }
 

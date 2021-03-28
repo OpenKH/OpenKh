@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Bbs.Messages
+namespace OpenKh.Bbs.Messages
 {
     public interface ICtdMessageDecode
     {

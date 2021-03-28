@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -50,12 +50,18 @@ namespace OpenKh.Game.Infrastructure
         public T Get<T>(string resourceName)
             where T : class
         {
-            if (typeof(T) == typeof(Layout)) return GetItem<T>(resourceName, Bar.EntryType.Layout);
-            if (typeof(T) == typeof(Sequence)) return GetItem<T>(resourceName, Bar.EntryType.Seqd);
-            if (typeof(T) == typeof(Imgd)) return GetItem<T>(resourceName, Bar.EntryType.Imgd);
-            if (typeof(T) == typeof(Imgz)) return GetItem<T>(resourceName, Bar.EntryType.Imgz);
-            if (typeof(T) == typeof(Mdlx)) return GetItem<T>(resourceName, Bar.EntryType.Model);
-            if (typeof(T) == typeof(ModelTexture)) return GetItem<T>(resourceName, Bar.EntryType.ModelTexture);
+            if (typeof(T) == typeof(Layout))
+                return GetItem<T>(resourceName, Bar.EntryType.Layout);
+            if (typeof(T) == typeof(Sequence))
+                return GetItem<T>(resourceName, Bar.EntryType.Seqd);
+            if (typeof(T) == typeof(Imgd))
+                return GetItem<T>(resourceName, Bar.EntryType.Imgd);
+            if (typeof(T) == typeof(Imgz))
+                return GetItem<T>(resourceName, Bar.EntryType.Imgz);
+            if (typeof(T) == typeof(Mdlx))
+                return GetItem<T>(resourceName, Bar.EntryType.Model);
+            if (typeof(T) == typeof(ModelTexture))
+                return GetItem<T>(resourceName, Bar.EntryType.ModelTexture);
             return null;
         }
 

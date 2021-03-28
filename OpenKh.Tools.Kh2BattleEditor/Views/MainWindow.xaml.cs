@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using OpenKh.Tools.Kh2BattleEditor.ViewModels;
 
 namespace OpenKh.Tools.Kh2BattleEditor.Views

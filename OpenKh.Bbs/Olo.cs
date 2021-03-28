@@ -33,7 +33,7 @@ namespace OpenKh.Bbs
         private struct UnkStruct
         {
             [Data] public int unk1 { get; set; } // 0x1 for bosses - 0x2 execute special code. SHOP-SAVE-TALK NECESSARY FOR OBJECTS TO APPEAR
-            [Data] public int ExtraDataOffset { get; set; } 
+            [Data] public int ExtraDataOffset { get; set; }
         }
 
         private struct OLOInfo
@@ -70,7 +70,7 @@ namespace OpenKh.Bbs
 
         private Olo()
         {
-            
+
         }
 
         public static bool IsValid(Stream stream)

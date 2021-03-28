@@ -1,4 +1,4 @@
-﻿using OpenKh.Engine.Renders;
+using OpenKh.Engine.Renders;
 
 namespace OpenKh.Engine.Extensions
 {

@@ -44,7 +44,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     var data = stream.SetPosition(blockIndex * BlockIso).ReadBytes(BlockIso);
                     var expectData = Encoding.UTF8.GetBytes(detector.ProductId);
                     if (string.Join(' ', data).Contains(string.Join(' ', expectData))) // TODO: inefficient, but it works lol
-                        return game; 
+                        return game;
                 }
             }
 

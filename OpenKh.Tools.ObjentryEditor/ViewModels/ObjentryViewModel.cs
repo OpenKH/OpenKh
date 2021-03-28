@@ -32,14 +32,14 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
                 set { Objentry.ObjectId = value; OnPropertyChanged(nameof(Name)); }
             }
 
-            public Objentry.Type ObjectType 
-            { 
-                get => Objentry.ObjectType; 
+            public Objentry.Type ObjectType
+            {
+                get => Objentry.ObjectType;
                 set
                 {
                     Objentry.ObjectType = value;
                     OnPropertyChanged(nameof(ObjectType));
-                } 
+                }
             }
             public byte SubType { get => Objentry.SubType; set => Objentry.SubType = value; }
             public byte DrawPriority { get => Objentry.DrawPriority; set => Objentry.DrawPriority = value; }
@@ -54,8 +54,8 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public byte SpawnLimiter { get => Objentry.SpawnLimiter; set => Objentry.SpawnLimiter = value; }
             public byte Page { get => Objentry.Page; set => Objentry.Page = value; }
             public byte ShadowSize { get => Objentry.ShadowSize; set => Objentry.ShadowSize = value; }
-            public Objentry.CommandMenuOptions CommandMenuOption 
-            { 
+            public Objentry.CommandMenuOptions CommandMenuOption
+            {
                 get => Objentry.CommandMenuOption;
                 set
                 {
@@ -170,11 +170,11 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         private Objentry Clone(Objentry source)
         {
             var newObj = Activator.CreateInstance<Objentry>();
-            foreach(var field in newObj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var field in newObj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 field.SetValue(newObj, field.GetValue(source));
             }
-            
+
             newObj.ObjectId = GetObjectIdForNewEntry();
             return newObj;
         }

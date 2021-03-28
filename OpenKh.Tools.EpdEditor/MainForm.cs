@@ -58,7 +58,7 @@ namespace OpenKh.Tools.EpdEditor
 
             // Animations
             int i = 0;
-            foreach(Control con in AnimationLayoutPanel.Controls)
+            foreach (Control con in AnimationLayoutPanel.Controls)
             {
                 con.Text = new String(epd.AnimationList[i]);
                 i++;
@@ -85,7 +85,7 @@ namespace OpenKh.Tools.EpdEditor
             {
                 TechControl techCon = new TechControl();
 
-                techCon.TechParamGBox.Text = "Parameter " + (t+1);
+                techCon.TechParamGBox.Text = "Parameter " + (t + 1);
                 techCon.TechniquePower.Text = epd.techniqueParameters[t].TechniquePowerCorrection.ToString();
                 techCon.NumericTechniqueNumber.Value = epd.techniqueParameters[t].TechniqueNumber;
                 techCon.AttackKind.SelectedIndex = (epd.techniqueParameters[t].TechniqueKind > 0x38 ? 0 : epd.techniqueParameters[t].TechniqueKind);
@@ -102,7 +102,7 @@ namespace OpenKh.Tools.EpdEditor
             {
                 DropControl dropCon = new DropControl();
 
-                dropCon.DropGBox.Text = "Drop Item " + (d+1);
+                dropCon.DropGBox.Text = "Drop Item " + (d + 1);
                 dropCon.ItemComboBox.SelectedIndex = (int)epd.dropParameters[d].ItemIndex;
                 dropCon.NumericItemCount.Value = epd.dropParameters[d].ItemCount;
                 dropCon.NumericItemProbability.Value = epd.dropParameters[d].Probability;
@@ -117,7 +117,7 @@ namespace OpenKh.Tools.EpdEditor
             {
                 ExtraControl extraCon = new ExtraControl();
 
-                extraCon.ExtraParamGBox.Text = "Extra Param " + (e+1);
+                extraCon.ExtraParamGBox.Text = "Extra Param " + (e + 1);
                 extraCon.ParameterName.Text = epd.extraParameters[e].ParameterName;
                 extraCon.ParameterValue.Text = epd.extraParameters[e].ParameterValue.ToString();
                 ExtraLayout.Controls.Add(extraCon);
@@ -154,10 +154,10 @@ namespace OpenKh.Tools.EpdEditor
 
             // Anim list
             epd.AnimationList = new List<char[]>();
-            foreach(TextBox txt in AnimationLayoutPanel.Controls)
+            foreach (TextBox txt in AnimationLayoutPanel.Controls)
             {
                 char[] arr = new char[4];
-                if(txt.Text != "")
+                if (txt.Text != "")
                 {
                     arr[0] = txt.Text.ToCharArray()[0];
                     arr[1] = txt.Text.ToCharArray()[1];
@@ -246,12 +246,13 @@ namespace OpenKh.Tools.EpdEditor
             dialog.Filter = "Enemy Parameter Data files (*.epd)|*.epd|All files (*.*)|*.*";
             DialogResult result = dialog.ShowDialog();
 
-            if(result == DialogResult.OK)
+            if (result == DialogResult.OK)
             {
                 TechniqueLayout.Controls.Clear();
                 DroppedLayout.Controls.Clear();
                 ExtraLayout.Controls.Clear();
-                if (epdFile != null) epdFile.Close();
+                if (epdFile != null)
+                    epdFile.Close();
                 epdFile = File.OpenRead(dialog.FileName);
                 FileLoadedLabel.Text = "File currently loaded: " + dialog.FileName;
                 epd = Epd.Read(epdFile);

@@ -1,4 +1,4 @@
-﻿// MIT License
+// MIT License
 // 
 // Copyright(c) 2017 Luciano (Xeeynamo) Ciccariello
 // 
@@ -91,7 +91,7 @@ namespace OpenKh.Tools.Common.Rendering
                     bitmapSource.CopyPixels(stride, buffer);
                     if (filterColors.Length > 0)
                     {
-						Xe.Tools.Utilities.BitmapUtility.MakeTransparent_Bgra32(buffer.DataPointer, stride,
+                        Xe.Tools.Utilities.BitmapUtility.MakeTransparent_Bgra32(buffer.DataPointer, stride,
                             bitmapSource.Size.Height, filterColors
                             .Select(x => new Xe.Graphics.Color()
                             {
@@ -171,8 +171,8 @@ namespace OpenKh.Tools.Common.Rendering
 
             public void Dispose()
             {
-				_backTexture?.Dispose();
-				ShaderResourceView.Dispose();
+                _backTexture?.Dispose();
+                ShaderResourceView.Dispose();
                 Texture.Dispose();
             }
 
@@ -203,43 +203,43 @@ namespace OpenKh.Tools.Common.Rendering
             }
 
             public void Save(string filename)
-			{
-				if (File.Exists(filename))
-					File.Delete(filename);
+            {
+                if (File.Exists(filename))
+                    File.Delete(filename);
 
-				var imagingFactory = new wic.ImagingFactory2();
-				var wicPixelFormat = wic.PixelFormat.Format32bppPBGRA;
+                var imagingFactory = new wic.ImagingFactory2();
+                var wicPixelFormat = wic.PixelFormat.Format32bppPBGRA;
 
-				using (var mapped = Map())
-				{
-					using (var stream = new wic.WICStream(imagingFactory, filename, NativeFileAccess.Write))
-					{
-						using (var encoder = new wic.PngBitmapEncoder(imagingFactory))
-						{
-							encoder.Initialize(stream);
-							using (var bitmapFrameEncode = new wic.BitmapFrameEncode(encoder))
-							{
-								bitmapFrameEncode.Initialize();
-								bitmapFrameEncode.SetSize(Width, Height);
-								bitmapFrameEncode.SetPixelFormat(ref wicPixelFormat);
-								bitmapFrameEncode.WritePixels(Height, new SharpDX.DataRectangle()
-								{
-									DataPointer = mapped.Data,
-									Pitch = mapped.Stride
-								});
+                using (var mapped = Map())
+                {
+                    using (var stream = new wic.WICStream(imagingFactory, filename, NativeFileAccess.Write))
+                    {
+                        using (var encoder = new wic.PngBitmapEncoder(imagingFactory))
+                        {
+                            encoder.Initialize(stream);
+                            using (var bitmapFrameEncode = new wic.BitmapFrameEncode(encoder))
+                            {
+                                bitmapFrameEncode.Initialize();
+                                bitmapFrameEncode.SetSize(Width, Height);
+                                bitmapFrameEncode.SetPixelFormat(ref wicPixelFormat);
+                                bitmapFrameEncode.WritePixels(Height, new SharpDX.DataRectangle()
+                                {
+                                    DataPointer = mapped.Data,
+                                    Pitch = mapped.Stride
+                                });
 
-								bitmapFrameEncode.Commit();
-								encoder.Commit();
-							}
-						}
-					}
-				}
-			}
+                                bitmapFrameEncode.Commit();
+                                encoder.Commit();
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public ISpriteTexture CreateSpriteTexture(IImageRead image) =>
             CreateSpriteTexture(image.Size.Width, image.Size.Height, image.ToBgra32());
-        
+
         public ISpriteTexture CreateSpriteTexture(int width, int height)
         {
             if (width <= 0 || width > 65536)

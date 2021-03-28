@@ -1,4 +1,4 @@
-﻿using OpenKh.Common.Archives;
+using OpenKh.Common.Archives;
 using OpenKh.Game.Infrastructure;
 using System.IO;
 

@@ -67,7 +67,7 @@ namespace OpenKh.Tests.Bbs
             output.Position = 0;
 
             // Check all bytes.
-            for(int i = 0; i < output.Length; i++)
+            for (int i = 0; i < output.Length; i++)
             {
                 if (input.ReadByte() != output.ReadByte())
                 {

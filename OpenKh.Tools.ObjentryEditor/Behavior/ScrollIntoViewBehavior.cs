@@ -1,4 +1,4 @@
-﻿//https://stackoverflow.com/questions/16866309/listbox-scroll-into-view-with-mvvm
+//https://stackoverflow.com/questions/16866309/listbox-scroll-into-view-with-mvvm
 using System.Collections.Specialized;
 using System.Windows.Controls;
 using System.Windows.Interactivity;

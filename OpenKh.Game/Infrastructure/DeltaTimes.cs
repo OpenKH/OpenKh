@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Game.Infrastructure
+namespace OpenKh.Game.Infrastructure
 {
     public class DeltaTimes
     {

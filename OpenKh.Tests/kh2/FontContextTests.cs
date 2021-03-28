@@ -1,4 +1,4 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Contextes;
 using System;

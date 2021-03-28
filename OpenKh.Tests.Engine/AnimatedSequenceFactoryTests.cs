@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
@@ -21,7 +21,7 @@ namespace OpenKh.Tests.Engine
             public double LastPosY { get; private set; }
             public ColorF LastColor { get; private set; }
 
-            public void Draw(DrawContext context, string message) => 
+            public void Draw(DrawContext context, string message) =>
                 throw new NotImplementedException();
 
             public void Draw(DrawContext context, byte[] data)
@@ -94,7 +94,7 @@ namespace OpenKh.Tests.Engine
                 {
                     new Sequence.Sprite
                     {
-                        
+
                     }
                 }
             };

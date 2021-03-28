@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Tools.Kh2BattleEditor.Extensions;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
@@ -13,25 +13,25 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
     public class FmlvViewModel : GenericListModel<FmlvFormViewModel>, IBattleGetChanges
     {
         private const string entryName = "fmlv";
-        
+
         public string EntryName => entryName;
-        
+
         public FmlvViewModel() :
             this(new List<Fmlv.Level>())
-        {}
+        { }
 
         public FmlvViewModel(IEnumerable<Bar.Entry> entries) :
             this(Fmlv.Read(entries.GetBattleStream(entryName)))
-        {}
+        { }
 
 
         public FmlvViewModel(IEnumerable<Fmlv.Level> levels) :
             this(levels, (levels.ToList().Count == 0x2D))
-        {}
+        { }
 
         public FmlvViewModel(IEnumerable<Fmlv.Level> list, bool isFinalMix) :
             base(list.GroupBy(x => x.FormId).Select(x => new FmlvFormViewModel(x, isFinalMix)))
-        {}
+        { }
 
         public Stream CreateStream()
         {
@@ -48,7 +48,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
         public FmlvFormViewModel(IGrouping<int, Fmlv.Level> x, bool isFinalMix) :
             base(x.Select(y => new FmlvLevelViewModel(y)))
-            
+
         {
             fmlvGroup = x;
             this.isFinalMix = isFinalMix;

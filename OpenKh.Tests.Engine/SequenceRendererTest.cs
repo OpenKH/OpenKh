@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;

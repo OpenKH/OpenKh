@@ -114,7 +114,7 @@ namespace OpenKh.Tests.kh2
             hasAnimationArray.Select((hasAnimation, i) => new Bar.Entry
             {
                 Index = 0,
-                Name = $"A{i/4:D03}",
+                Name = $"A{i / 4:D03}",
                 Type = Bar.EntryType.Anb,
                 Stream = new MemoryStream(hasAnimation ? new byte[1] : new byte[0])
             }).ToList();

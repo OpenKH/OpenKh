@@ -350,7 +350,7 @@ namespace OpenKh.Tools.ModsManager.Services
             while (!_cancellationToken.IsCancellationRequested && !isProcessDead)
             {
                 var operation = stream.SetPosition(OperationAddress).ReadInt32();
-                if (stream.Position == OperationAddress) 
+                if (stream.Position == OperationAddress)
                     break; // The emulator stopped its execution
 
                 switch ((Operation)operation)

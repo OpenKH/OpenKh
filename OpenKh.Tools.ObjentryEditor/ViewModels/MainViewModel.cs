@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common;
 using System.Collections.Generic;
@@ -39,7 +39,7 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         public RelayCommand SaveAsCommand { get; }
         public RelayCommand ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
-    
+
         public MainViewModel()
         {
             OpenCommand = new RelayCommand(x =>

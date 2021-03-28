@@ -1,4 +1,4 @@
-﻿using OpenKh.Common.Exceptions;
+using OpenKh.Common.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

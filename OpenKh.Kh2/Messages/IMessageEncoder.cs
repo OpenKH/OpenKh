@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Kh2.Messages
+namespace OpenKh.Kh2.Messages
 {
     public interface IMessageEncoder : IMessageDecode, IMessageEncode
     {

@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Utils;
 using System;

@@ -24,10 +24,10 @@ namespace OpenKh.Tools.BepEditor
 
         private void UpdateParameters(Bep bep)
         {
-            for(int i = 0; i < bep.baseParameters.Count; i++)
+            for (int i = 0; i < bep.baseParameters.Count; i++)
             {
                 BaseParameters baseParam = new BaseParameters();
-                baseParam.BaseParamGBox.Text = "Base Param " + (i+1);
+                baseParam.BaseParamGBox.Text = "Base Param " + (i + 1);
                 baseParam.NumericBattleLevel.Value = bep.baseParameters[i].BattleLevel;
                 baseParam.NumericBaseAttack.Value = bep.baseParameters[i].BaseAttack;
                 baseParam.NumericDefense.Value = bep.baseParameters[i].Defense;
@@ -41,7 +41,7 @@ namespace OpenKh.Tools.BepEditor
             for (int j = 0; j < bep.disappearParameters.Count; j++)
             {
                 DisappearParameters baseParam = new DisappearParameters();
-                baseParam.DisappearGBox.Text = "Disappear Param " + (j+1);
+                baseParam.DisappearGBox.Text = "Disappear Param " + (j + 1);
                 baseParam.WorldIDComboBox.SelectedIndex = bep.disappearParameters[j].WorldID;
                 baseParam.NumericRoomID.Value = bep.disappearParameters[j].RoomID;
                 baseParam.DistanceTextBox.Text = bep.disappearParameters[j].Distance.ToString();
@@ -55,7 +55,7 @@ namespace OpenKh.Tools.BepEditor
             bep = new Bep();
             bep.header = head;
 
-            foreach(BaseParameters baseParam in BaseStatsLayout.Controls)
+            foreach (BaseParameters baseParam in BaseStatsLayout.Controls)
             {
                 Bep.BaseParameter param = new Bep.BaseParameter();
                 param.BattleLevel = decimal.ToUInt16(baseParam.NumericBattleLevel.Value);
@@ -65,7 +65,7 @@ namespace OpenKh.Tools.BepEditor
                 param.DamageFloor = decimal.ToByte(baseParam.NumericDamageFloor.Value);
                 param.BaseHP = decimal.ToUInt32(baseParam.NumericBaseHP.Value);
                 param.BaseEXP = decimal.ToUInt32(baseParam.numericBaseEXP.Value);
-                bep.baseParameters.Add(param); 
+                bep.baseParameters.Add(param);
             }
 
             foreach (DisappearParameters disappearParam in DisappearLayout.Controls)

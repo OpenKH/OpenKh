@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.IO;
 using System.Linq;
@@ -68,7 +68,7 @@ namespace OpenKh.Ps2
             public override string ToString() =>
                 $"{X:F}, {Y:F}, {Z:F}, {W:F}";
         }
-        
+
         public VertexIndex[] Indices { get; }
         public VertexColor[] Colors { get; }
         public VertexCoord[] Vertices { get; }

@@ -61,12 +61,15 @@ namespace OpenKh.Engine.Renders
             _charTableHeight = context.TableHeight / context.FontHeight * context.FontHeight;
             _encode = context.Encoder;
 
-            if (_imageFont != null) InitializeSurface(ref _spriteFont, _imageFont);
-            if (_imageFont2 != null) InitializeSurface(ref _spriteFont2, _imageFont2);
-            if (_imageIcon != null) InitializeSurface(ref _spriteIcon, _imageIcon);
+            if (_imageFont != null)
+                InitializeSurface(ref _spriteFont, _imageFont);
+            if (_imageFont2 != null)
+                InitializeSurface(ref _spriteFont2, _imageFont2);
+            if (_imageIcon != null)
+                InitializeSurface(ref _spriteIcon, _imageIcon);
         }
 
-        public void Draw(DrawContext drawContext,  string message) =>
+        public void Draw(DrawContext drawContext, string message) =>
             Draw(drawContext, MsgSerializer.DeserializeText(message));
 
         public void Draw(DrawContext drawContext, byte[] data)

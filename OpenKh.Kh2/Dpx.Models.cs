@@ -1,4 +1,4 @@
-﻿namespace OpenKh.Kh2
+namespace OpenKh.Kh2
 {
     public partial class Dpx
     {

@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Tools.Kh2BattleEditor.Extensions;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
@@ -27,7 +27,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             _lvup = Lvup;
         }
 
-        public LvupViewModel(IEnumerable<Lvup.PlayableCharacter> characters) : 
+        public LvupViewModel(IEnumerable<Lvup.PlayableCharacter> characters) :
             base(characters.Select((x, i) => new CharacterViewModel(x, i)))
         {
         }

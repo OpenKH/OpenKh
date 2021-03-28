@@ -7,13 +7,13 @@ using Xe.IO;
 namespace OpenKh.Kh2
 {
     public class Imgz
-	{
-		private struct Entry
-		{
-			public int Offset, Length;
-		}
+    {
+        private struct Entry
+        {
+            public int Offset, Length;
+        }
 
-		private const uint MagicCode = 0x5A474D49U;
+        private const uint MagicCode = 0x5A474D49U;
 
         public IEnumerable<Imgd> Images { get; }
 
@@ -60,47 +60,47 @@ namespace OpenKh.Kh2
             OpenAsStream(stream.SetPosition(0)).Select(x => Imgd.Read(x)).ToArray();
 
         public static void Write(Stream stream, IEnumerable<Imgd> images)
-		{
-			if (!stream.CanWrite)
-				throw new InvalidDataException($"Read or seek must be supported.");
+        {
+            if (!stream.CanWrite)
+                throw new InvalidDataException($"Read or seek must be supported.");
 
-			var writer = new BinaryWriter(stream);
-			var count = images.Count();
+            var writer = new BinaryWriter(stream);
+            var count = images.Count();
 
-			writer.Write(MagicCode);
-			writer.Write(0x100);
-			writer.Write(0x10); // Header size;
-			writer.Write(count);
+            writer.Write(MagicCode);
+            writer.Write(0x100);
+            writer.Write(0x10); // Header size;
+            writer.Write(count);
 
-			int baseOffset = (int)(stream.Position + count * 8);
+            int baseOffset = (int)(stream.Position + count * 8);
 
-			// Align by 0x10
-			if ((baseOffset & 0xF) != 0)
-			{
-				baseOffset += 0x10 - (baseOffset & 0xF);
-			}
+            // Align by 0x10
+            if ((baseOffset & 0xF) != 0)
+            {
+                baseOffset += 0x10 - (baseOffset & 0xF);
+            }
 
-			int currentOffset = baseOffset;
+            int currentOffset = baseOffset;
 
-			var imgStreams = new List<MemoryStream>(count);
-			foreach (var image in images)
-			{
-				var memStream = new MemoryStream();
-				image.Write(memStream);
-				imgStreams.Add(memStream);
+            var imgStreams = new List<MemoryStream>(count);
+            foreach (var image in images)
+            {
+                var memStream = new MemoryStream();
+                image.Write(memStream);
+                imgStreams.Add(memStream);
 
-				writer.Write(currentOffset);
-				writer.Write((int)memStream.Length);
+                writer.Write(currentOffset);
+                writer.Write((int)memStream.Length);
 
-				currentOffset += (int)memStream.Length;
-			}
+                currentOffset += (int)memStream.Length;
+            }
 
-			stream.Position = baseOffset;
-			foreach (var imgStream in imgStreams)
-			{
-				imgStream.Position = 0;
-				imgStream.WriteTo(stream);
-			}
-		}
+            stream.Position = baseOffset;
+            foreach (var imgStream in imgStreams)
+            {
+                imgStream.Position = 0;
+                imgStream.WriteTo(stream);
+            }
+        }
     }
 }

@@ -54,8 +54,10 @@ namespace OpenKh.Kh2
         {
             switch (PixelFormat)
             {
-                case PixelFormat.Indexed8: return GetClut8();
-                case PixelFormat.Indexed4: return GetClut4();
+                case PixelFormat.Indexed8:
+                    return GetClut8();
+                case PixelFormat.Indexed4:
+                    return GetClut4();
                 default:
                     throw new NotSupportedException($"The format {PixelFormat} is not supported.");
             }

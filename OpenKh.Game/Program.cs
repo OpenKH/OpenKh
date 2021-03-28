@@ -96,7 +96,7 @@ namespace OpenKh.Game
             {
                 const int STD_OUTPUT_HANDLE = -11;
                 AllocConsole();
-                
+
                 var stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
                 var safeFileHandle = new SafeFileHandle(stdHandle, true);
                 var fileStream = new FileStream(safeFileHandle, FileAccess.Write);

@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using OpenKh.Engine.Renders;
 using System;
 using System.Linq;

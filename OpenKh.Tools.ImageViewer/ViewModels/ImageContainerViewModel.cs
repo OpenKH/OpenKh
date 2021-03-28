@@ -1,4 +1,4 @@
-﻿using OpenKh.Tools.ImageViewer.Services;
+using OpenKh.Tools.ImageViewer.Services;
 using System.Collections.Generic;
 using System.Linq;
 using Xe.Tools.Wpf.Models;
