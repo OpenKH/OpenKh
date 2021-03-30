@@ -29,7 +29,7 @@ namespace OpenKh.Tools.ItbEditor
                     ItemIDComboBox.DataSource = Enum.GetValues(typeof(Item.Type));
                     break;
                 case 1:
-                    ItemIDComboBox.DataSource = Enum.GetValues(typeof(Command.Type));
+                    ItemIDComboBox.DataSource = Enum.GetValues(typeof(Command.Kind));
                     break;
             }
         }

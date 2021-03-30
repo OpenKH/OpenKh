@@ -109,9 +109,8 @@ namespace OpenKh.Tools.BepEditor
                 UpdateWriteInfo();
                 Bep.Write(bepOut, bep);
                 bepOut.Close();
+                MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

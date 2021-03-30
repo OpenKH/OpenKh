@@ -25,9 +25,10 @@ namespace OpenKh.Bbs
             [Data] public byte Number { get; set; }
             [Data] public byte Group { get; set; }
             [Data] public byte Version { get; set; }
-            [Data] public byte Padding { get; set; }
-            [Data] public ushort TextureCount { get; set; }
-            [Data] public ushort Unk0A { get; set; }
+            [Data] public byte Padding1 { get; set; }
+            [Data] public byte TextureCount { get; set; }
+            [Data] public byte Padding2 { get; set; }
+            [Data] public ushort Flag { get; set; }
             [Data] public UInt32 SkeletonOffset { get; set; }
             [Data] public UInt32 MeshOffset0 { get; set; }
             [Data] public ushort TriangleCount { get; set; }
@@ -549,8 +550,13 @@ namespace OpenKh.Bbs
             WriteTextureData(stream, pmo);
             WriteTextureOffsets(stream, pmo);
 
-            if (pmo.header.SkeletonOffset != 0)
+            if (pmo.boneList != null && pmo.boneList.Length > 0)
             {
+                stream.Seek(0, SeekOrigin.End);
+                pmo.header.SkeletonOffset = (uint)stream.Position;
+                stream.Seek(0xC, SeekOrigin.Begin);
+                stream.Write(pmo.header.SkeletonOffset);
+                stream.Seek(0, SeekOrigin.End);
                 stream.Seek(pmo.header.SkeletonOffset, SeekOrigin.Begin);
                 Mapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
 

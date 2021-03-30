@@ -251,12 +251,12 @@ namespace OpenKh.Tools.EpdEditor
                 TechniqueLayout.Controls.Clear();
                 DroppedLayout.Controls.Clear();
                 ExtraLayout.Controls.Clear();
-                if (epdFile != null) epdFile.Close();
                 epdFile = File.OpenRead(dialog.FileName);
                 FileLoadedLabel.Text = "File currently loaded: " + dialog.FileName;
                 epd = Epd.Read(epdFile);
                 UpdateEPDData();
                 SaveEPDButton.Enabled = true;
+                epdFile.Close();
             }
         }
 
@@ -272,9 +272,8 @@ namespace OpenKh.Tools.EpdEditor
                 UpdateWriteInfo();
                 Epd.Write(epdOut, epd);
                 epdOut.Close();
+                MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

@@ -144,9 +144,8 @@ namespace OpenKh.Tools.ItcEditor
                 UpdateWriteInfo();
                 Itc.Write(itcOut, itc);
                 itcOut.Close();
+                MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            MessageBox.Show("File saved successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
