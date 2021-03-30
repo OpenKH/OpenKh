@@ -555,7 +555,7 @@ namespace OpenKh.Tests.Patcher
            
             Assert.Equal(2, scripts[0].Type);
             Assert.Equal(1, scripts[0].Flag);
-            }
+            });
         }
 
                 
