@@ -26,8 +26,6 @@ namespace OpenKh.Command.IdxImg
 
             private class ExtractCommand
             {
-                private Program Parent { get; set; }
-
                 [Required]
                 [FileExists]
                 [Argument(0, Description = "Kingdom Hearts II IDX file")]
@@ -119,8 +117,6 @@ namespace OpenKh.Command.IdxImg
 
             private class ListCommand
             {
-                private Program Parent { get; set; }
-
                 [Required]
                 [FileExists]
                 [Argument(0, Description = "Kingdom Hearts II IDX file, paired with a IMG")]

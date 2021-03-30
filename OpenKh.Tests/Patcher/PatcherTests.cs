@@ -549,20 +549,674 @@ namespace OpenKh.Tests.Patcher
                 var writer = new StreamWriter(stream);
                 writer.WriteLine("- Type: 2");
                 writer.WriteLine("  Flag: 1");
-                writer.Flush();
-            });
-
-            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
-
             AssertFileExists(ModOutputDir, "map.script");
             var content = File.ReadAllText(Path.Combine(ModOutputDir, "map.script"));
             var scripts = new Deserializer().Deserialize<List< Kh2.Ard.SpawnPoint >> (content);
            
             Assert.Equal(2, scripts[0].Type);
             Assert.Equal(1, scripts[0].Flag);
-                
+            }
         }
 
+                
+                
+        public void ListPatchTrsrTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata() { 
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "03system.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "trsr",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "TrsrList.yml",
+                                        Type = "trsr"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "03system.bar")).Using(stream =>
+            {
+                var trsrEntry = new List<Kh2.SystemData.Trsr>()
+                {
+                    new Kh2.SystemData.Trsr
+                    {
+                        Id = 1,
+                        ItemId = 10
+                    }
+                    };
+                using var trsrStream = new MemoryStream();
+                Kh2.SystemData.Trsr.Write(trsrStream, trsrEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "trsr",
+                        Type = Bar.EntryType.List,
+                        Stream = trsrStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "TrsrList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("1:");
+                writer.WriteLine("  ItemId: 200");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "03system.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bar")).Using(stream =>
+             {
+                 var binarc = Bar.Read(stream);
+                 var trsrStream = Kh2.SystemData.Trsr.Read(binarc[0].Stream);
+                 Assert.Equal(200, trsrStream[0].ItemId);
+             });
+
+        }
+
+        [Fact]
+        public void ListPatchItemTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "03system.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "item",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "ItemList.yml",
+                                        Type = "item"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "03system.bar")).Using(stream =>
+            {
+                var itemEntry = new List<Kh2.SystemData.Item>()
+                {
+                    new Kh2.SystemData.Item
+                    {
+                        Items = new List<Kh2.SystemData.Item.Entry>()
+                        {
+                            new Kh2.SystemData.Item.Entry()
+                            {
+                                Id = 1,
+                                ShopBuy = 10
+                            }
+                        },
+                        Stats = new List<Kh2.SystemData.Item.Stat>()
+                        {
+                            new Kh2.SystemData.Item.Stat()
+                            {
+                                Id = 10,
+                                Ability = 15
+                            }
+                        }
+                        
+                    }
+                    };
+                using var itemStream = new MemoryStream();
+                itemEntry[0].Write(itemStream);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "item",
+                        Type = Bar.EntryType.List,
+                        Stream = itemStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "ItemList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("Items:");
+                writer.WriteLine("- Id: 1");
+                writer.WriteLine("  ShopBuy: 200");
+                writer.WriteLine("Stats:");
+                writer.WriteLine("- Id: 10");
+                writer.WriteLine("  Ability: 150");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "03system.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var itemStream = Kh2.SystemData.Item.Read(binarc[0].Stream);
+                Assert.Equal(200, itemStream.Items[0].ShopBuy);
+                Assert.Equal(150, itemStream.Stats[0].Ability);
+            });
+
+        }
+
+        [Fact]
+        public void ListPatchFmlvTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "fmlv",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "FmlvList.yml",
+                                        Type = "fmlv"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var fmlvEntry = new List<Kh2.Battle.Fmlv.Level>()
+                {
+                    new Kh2.Battle.Fmlv.Level
+                    {
+                        FormId = 1,
+                        FormLevel = 1,
+                        Exp = 100,
+                        Ability = 200
+                    },
+                    new Kh2.Battle.Fmlv.Level
+                    {
+                        FormId = 1,
+                        FormLevel = 2,
+                        Exp = 100,
+                        Ability = 200
+                    },
+                    new Kh2.Battle.Fmlv.Level
+                    {
+                        FormId = 2,
+                        FormLevel = 1,
+                        Exp = 100,
+                        Ability = 200
+                    },
+                };
+
+                using var fmlvStream = new MemoryStream();
+                Kh2.Battle.Fmlv.Write(fmlvStream, fmlvEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "fmlv",
+                        Type = Bar.EntryType.List,
+                        Stream = fmlvStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "FmlvList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                var serializer = new Serializer();
+                serializer.Serialize(writer, new Dictionary<string, FmlvDTO[]>
+                {
+                    ["Valor"] = new[]
+                    {
+                        new FmlvDTO
+                        {
+                            FormLevel = 1,
+                            Experience = 5,
+                            Ability = 127
+                        }
+                    }
+                });
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var fmlv = Kh2.Battle.Fmlv.Read(binarc[0].Stream);
+
+                Assert.Equal(3, fmlv.Count);
+                Assert.Equal(1, fmlv[0].FormId);
+                Assert.Equal(1, fmlv[0].FormLevel);
+                Assert.Equal(5, fmlv[0].Exp);
+                Assert.Equal(127, fmlv[0].Ability);
+
+                Assert.Equal(1, fmlv[1].FormId);
+                Assert.Equal(2, fmlv[1].FormLevel);
+
+                Assert.Equal(2, fmlv[2].FormId);
+                Assert.Equal(1, fmlv[2].FormLevel);
+            });
+        }
+
+        [Fact]
+        public void ListPatchBonsTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "bons",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "BonsList.yml",
+                                        Type = "bons"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var bonsEntry = new List<Kh2.Battle.Bons>()
+                {
+                    new Kh2.Battle.Bons
+                    {
+                        CharacterId = 1,
+                        RewardId = 15,
+                        BonusItem1 = 10
+                    },
+                    new Kh2.Battle.Bons
+                    {
+                        CharacterId = 2,
+                        RewardId = 15,
+                        BonusItem1 = 5
+                    }
+                    };
+                using var bonsStream = new MemoryStream();
+                Kh2.Battle.Bons.Write(bonsStream, bonsEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "bons",
+                        Type = Bar.EntryType.List,
+                        Stream = bonsStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "BonsList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("15:");
+                writer.WriteLine("  Sora:");
+                writer.WriteLine("    BonusItem1: 200");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var bonsStream = Kh2.Battle.Bons.Read(binarc[0].Stream);
+                Assert.Equal(200, bonsStream[0].BonusItem1);
+                Assert.Equal(5, bonsStream[1].BonusItem1);
+            });
+
+        }
+
+        [Fact]
+        public void ListPatchLvupTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bin",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "lvup",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "LvupList.yml",
+                                        Type = "lvup"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bin")).Using(stream =>
+            {
+                var lvupEntry = new Kh2.Battle.Lvup
+                {
+                    Count = 13,
+                    Unknown08 = new byte[0x38],
+                    Characters = new List<Kh2.Battle.Lvup.PlayableCharacter>()
+                    {
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        },
+                        new Kh2.Battle.Lvup.PlayableCharacter()
+                        {
+                            NumLevels = 1,
+                            Levels = new List<Kh2.Battle.Lvup.PlayableCharacter.Level>()
+                            {
+                                new Kh2.Battle.Lvup.PlayableCharacter.Level()
+                                {
+                                    Exp = 50
+                                }
+                            }
+                        }
+
+                    }
+                };
+                using var lvupStream = new MemoryStream();
+                lvupEntry.Write(lvupStream);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "lvup",
+                        Type = Bar.EntryType.List,
+                        Stream = lvupStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "LvupList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("Sora:");
+                writer.WriteLine("  1:");
+                writer.WriteLine("    Exp: 500");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bin")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var lvupStream = Kh2.Battle.Lvup.Read(binarc[0].Stream);
+                Assert.Equal(500, lvupStream.Characters[0].Levels[0].Exp);
+            });
+
+        }
+
+        [Fact]
+        public void ListPatchObjEntryTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00objentry.bin",
+                        Method = "listpatch",
+                        Type = "List",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "ObjList.yml",
+                                Type = "objentry",
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00objentry.bin")).Using(stream =>
+            {
+                var objEntry = new List<Kh2.Objentry>()
+                {
+                    new Kh2.Objentry
+                    {
+                        ObjectId = 1,
+                        ModelName = "M_EX060",
+                        AnimationName = "M_EX060.mset"
+                    }
+                    };
+                Kh2.Objentry.Write(stream, objEntry);
+            });
+
+            File.Create(Path.Combine(ModInputDir, "ObjList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("1:");
+                writer.WriteLine("  ObjectId: 1");
+                writer.WriteLine("  ModelName: M_EX100");
+                writer.WriteLine("  AnimationName: M_EX100.mset");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00objentry.bin");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00objentry.bin")).Using(stream =>
+            {
+                var objStream = Kh2.Objentry.Read(stream);
+                Assert.Equal("M_EX100", objStream[0].ModelName);
+                Assert.Equal("M_EX100.mset", objStream[0].AnimationName);
+            });
+
+        }
 
         [Fact]
         public void ProcessMultipleTest()
@@ -617,6 +1271,7 @@ namespace OpenKh.Tests.Patcher
                 Assert.True(Imgd.IsValid(entry.Stream));
             }, ModOutputDir, patch.Assets[0].Multi[0].Name);
         }
+
 
         private static void AssertFileExists(params string[] paths)
         {

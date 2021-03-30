@@ -84,8 +84,6 @@ namespace OpenKh.Command.IdxImg
 
             private class ListCommand
             {
-                private Program Parent { get; set; }
-
                 [Required]
                 [FileExists]
                 [Argument(0, Description = "Path to the Kingdom Hearts ISO file")]

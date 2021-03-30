@@ -91,16 +91,16 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         public ItemViewModel(IMessageProvider messageProvider) :
             this(messageProvider, new Item
             {
-                Items1 = new List<Item.Entry>(),
-                Items2 = new List<Item.Stat>()
+                Items = new List<Item.Entry>(),
+                Stats = new List<Item.Stat>()
             })
         { }
 
         private ItemViewModel(IMessageProvider messageProvider, Item item) :
-            this(messageProvider, item.Items1)
+            this(messageProvider, item.Items)
         {
             _messageProvider = messageProvider;
-            _item2 = item.Items2;
+            _item2 = item.Stats;
         }
 
         private ItemViewModel(IMessageProvider messageProvider, IEnumerable<Item.Entry> items) :
@@ -129,8 +129,8 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             var stream = new MemoryStream();
             new Item
             {
-                Items1 = UnfilteredItems.Select(x => x.Item).ToList(),
-                Items2 = _item2
+                Items = UnfilteredItems.Select(x => x.Item).ToList(),
+                Stats = _item2
             }.Write(stream);
 
             return stream;
