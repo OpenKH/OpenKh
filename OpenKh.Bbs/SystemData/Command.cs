@@ -8,7 +8,7 @@ namespace OpenKh.Bbs.SystemData
     {
         public enum Kind : ushort
         {
-            COMMAND_KIND_None = 0,
+            None = 0,
             COMMAND_KIND_Attack = 1,
             COMMAND_KIND_Blitz01 = 2,
             COMMAND_KIND_Blitz02 = 3,
@@ -497,7 +497,7 @@ namespace OpenKh.Bbs.SystemData
 
        public enum Type : byte
        {
-            COMMAND_TYPE_NONE = 0,
+            None = 0,
             COMMAND_TYPE_BASE = 1,
             COMMAND_TYPE_DECK = 2,
             COMMAND_TYPE_ACTION = 3,
@@ -515,7 +515,7 @@ namespace OpenKh.Bbs.SystemData
 
         public enum Category : byte
         {
-            COMMAND_CATEGORY_NONE = 0,
+            None = 0,
             COMMAND_CATEGORY_ATTACK = 1,
             COMMAND_CATEGORY_MAGIC = 2,
             COMMAND_CATEGORY_ITEM = 3,
@@ -538,7 +538,7 @@ namespace OpenKh.Bbs.SystemData
 
         public enum SubCategory : byte
         {
-            COMMAND_SUB_NONE = 0,
+            None = 0,
             COMMAND_SUB_JUMP = 1,
             COMMAND_SUB_STUB = 2,
             COMMAND_SUB_RAID = 3,
