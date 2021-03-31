@@ -452,6 +452,17 @@ namespace OpenKh.Patcher
                             Kh2.Objentry.Write(stream.SetPosition(0), objEntryList.Values);
                             break;
 
+                        case "plrp":
+                            var plrpList = Kh2.Battle.Plrp.Read(stream);
+                            var moddedPlrp = deserializer.Deserialize<List<Kh2.Battle.Plrp>>(sourceText);
+                            foreach (var plrp in moddedPlrp)
+                            {
+                                var oldPlrp = plrpList.First(x => x.Character == plrp.Character && x.Difficulty == plrp.Difficulty);
+                                plrpList[plrpList.IndexOf(oldPlrp)] = plrp;
+                            }
+                            Kh2.Battle.Plrp.Write(stream.SetPosition(0), plrpList);
+                        break;
+
                         default:
                             break;
                     }
