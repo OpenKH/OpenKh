@@ -101,3 +101,8 @@
 | LIMIT_TOTAL_MEDAL         | 0x5f5e0ff
 | LIMIT_TOTAL_WALK          | 0x5f5e0ff
 | LIMIT_TOTAL_MUNNY         | 0x5f5e0ff
+
+# ANIM
+
+|          Value            | Name  
+|---------------------------|------

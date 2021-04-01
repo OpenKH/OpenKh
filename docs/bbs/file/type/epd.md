@@ -13,14 +13,14 @@ The format consists on the following structures in order:
 [Drop Items](#Drop-Items)  
 [Extra Parameters](#Extra-Parameters)  
 
-## Header
+# Header
 
 | Offset | Type  | Description
 |--------|-------|------------
 | 0x0     | string   | File identifier, always `@EPD`
 | 0x4     | int   | Version, `9`
 
-## General Parameters
+# General Parameters
 
 | Offset | Type  | Description
 |--------|-------|------------
@@ -35,7 +35,7 @@ The format consists on the following structures in order:
 | 0x20    | float  | Darkness Damage Multiplier
 | 0x24    | float  | Non-Elemental Damage Multiplier
 
-### Status Ailments
+## Status Ailments
 
 | Bit | Count | Description 
 |-----|-------|-------------
@@ -72,7 +72,7 @@ The format consists on the following structures in order:
 | 30 | 1 | dummy30
 | 31 | 1 | dummy31
 
-## Animation List
+# Animation List
 
 | Offset | Type  | Description
 |--------|-------|------------
@@ -80,7 +80,7 @@ The format consists on the following structures in order:
 
 Animation List has 20 instances and 8 filler bytes.
 
-## Other Parameters
+# Other Parameters
 
 | Offset | Type  | Description
 |--------|-------|------------
@@ -97,7 +97,7 @@ Animation List has 20 instances and 8 filler bytes.
 | 0x20    | uint32    | Number of [Extra Parameters](#Extra-Parameters).
 | 0x24    | uint32    | Offset to [Extra Parameters](#Extra-Parameters).
 
-### Effectiveness Flag
+## Effectiveness Flag
 
 | Bit | Count | Description 
 |-----|-------|-------------
@@ -109,7 +109,7 @@ Animation List has 20 instances and 8 filler bytes.
 | 10 | 2 | Effective Minimum
 | 12 | 20| padding
 
-## Technique Parameters
+# Technique Parameters
 
 This structures repeats for as many animations need their parameters set.
 
@@ -121,50 +121,7 @@ This structures repeats for as many animations need their parameters set.
 | 0x6     | uint8  | [Attack Attribute](#Attack-Attribute)
 | 0x7     | uint8  | Success Rate (Usually 0x64 [100])
 
-## Drop Parameters
-
-Items dropped by enemies.
-
-| Offset | Type  | Description
-|--------|-------|------------
-| 0x0     | uint32  | Value for [Drop Kind](#Drop-Kind)
-| 0x4     | uint16  | Number
-| 0x6     | uint16  | Probability
-
-### Drop Kind
-
-| Id | Kind  | Description
-|--------|-------|------------
-| 0x0     | ITEM_KIND_HP_SMALL  | Small HP orb.
-| 0x1     | ITEM_KIND_HP_BIG  | Big HP orb.
-| 0x2     | ITEM_KIND_MUNNY_SMALL  | Small Munny orb.
-| 0x3     | ITEM_KIND_MUNNY_MIDDEL  | Middle Munny orb.
-| 0x4     | ITEM_KIND_MUNNY_BIG  | Big Munny orb.
-| 0x5     | ITEM_KIND_FOCUS_SMALL  | Small Focus orb.
-| 0x6     | ITEM_KIND_FOCUS_BIG  | Big Focus orb.
-| 0x7     | ITEM_KIND_DRAINMIST  | 
-| 0x8     | ITEM_KIND_D_LINK  | 
-| 0x9     | ITEM_KIND_MANDORAKE1  | 
-| 0xA     | ITEM_KIND_MANDORAKE2  | 
-| 0xB     | ITEM_KIND_JERRYBALL1  | 
-| 0xC     | ITEM_KIND_JERRYBALL2  | 
-| 0xD     | ITEM_KIND_JERRYBALL3  | 
-| 0xE     | ITEM_KIND_JERRYBALL4  | 
-| 0xF     | ITEM_KIND_JERRYBALL5  | 
-| 0x10    | ITEM_KIND_JERRYBALL6  | 
-| 0x11    | ITEM_KIND_JERRYBALL7  | 
-| 0x12    | ITEM_KIND_JERRYBALL8  | 
-
-## Extra Parameters  
-
-This structure contains AI parameters that can change the values in variables used in the enemy's LUA.
-
-| Offset | Type  | Description
-|--------|-------|------------
-| 0x0     | char[0xC]  | Parameter Name
-| 0xC     | float      | Parameter Value
-
-#### Attack Kind
+## Attack Kind
 
 | Id | Kind | Description |
 |----|-------|-----------|
@@ -225,7 +182,7 @@ This structure contains AI parameters that can change the values in variables us
 | 0x37 | Gathering | Freezes character for a long time.
 | 0x38 | Exhausted | 1HP, No Focus, No D-Link, All Commands in cooldown.
 
-#### Attack Attribute
+## Attack Attribute
 
 | Id | Kind  
 |----|-------
@@ -238,3 +195,48 @@ This structure contains AI parameters that can change the values in variables us
 | 0x6 | Zero
 | 0x7 | Special
 | 0x8 | MAX
+
+## Drop Parameters
+
+Items dropped by enemies.
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 0x0     | uint32  | Value for [Drop Kind](#Drop-Kind)
+| 0x4     | uint16  | Number
+| 0x6     | uint16  | Probability
+
+## Drop Kind
+
+| Id | Kind  | Description
+|--------|-------|------------
+| 0x0     | ITEM_KIND_HP_SMALL  | Small HP orb.
+| 0x1     | ITEM_KIND_HP_BIG  | Big HP orb.
+| 0x2     | ITEM_KIND_MUNNY_SMALL  | Small Munny orb.
+| 0x3     | ITEM_KIND_MUNNY_MIDDEL  | Middle Munny orb.
+| 0x4     | ITEM_KIND_MUNNY_BIG  | Big Munny orb.
+| 0x5     | ITEM_KIND_FOCUS_SMALL  | Small Focus orb.
+| 0x6     | ITEM_KIND_FOCUS_BIG  | Big Focus orb.
+| 0x7     | ITEM_KIND_DRAINMIST  | 
+| 0x8     | ITEM_KIND_D_LINK  | 
+| 0x9     | ITEM_KIND_MANDORAKE1  | 
+| 0xA     | ITEM_KIND_MANDORAKE2  | 
+| 0xB     | ITEM_KIND_JERRYBALL1  | 
+| 0xC     | ITEM_KIND_JERRYBALL2  | 
+| 0xD     | ITEM_KIND_JERRYBALL3  | 
+| 0xE     | ITEM_KIND_JERRYBALL4  | 
+| 0xF     | ITEM_KIND_JERRYBALL5  | 
+| 0x10    | ITEM_KIND_JERRYBALL6  | 
+| 0x11    | ITEM_KIND_JERRYBALL7  | 
+| 0x12    | ITEM_KIND_JERRYBALL8  | 
+
+# Extra Parameters  
+
+This structure contains AI parameters that can change the values in variables used in the enemy's LUA.
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 0x0     | char[0xC]  | Parameter Name
+| 0xC     | float      | Parameter Value
+
+
