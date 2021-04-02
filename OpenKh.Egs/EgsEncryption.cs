@@ -78,26 +78,26 @@ namespace OpenKh.Egs
             return finalKey;
         }
 
-        private static byte[] Xor(byte[] dst, int dstIndex, byte[] a, int aIndex, byte[] b, int bIndex)
-        {
-            dst[dstIndex + 0] = (byte)(a[aIndex + 0] ^ b[bIndex + 0]);
-            dst[dstIndex + 1] = (byte)(a[aIndex + 1] ^ b[bIndex + 1]);
-            dst[dstIndex + 2] = (byte)(a[aIndex + 2] ^ b[bIndex + 2]);
-            dst[dstIndex + 3] = (byte)(a[aIndex + 3] ^ b[bIndex + 3]);
-            return dst;
-        }
-
-        private static byte[] Xor(byte[] dst, int dstIndex, byte[] b, int bIndex) =>
-            Xor(dst, dstIndex, dst, dstIndex, b, bIndex);
-
         public static void DecryptChunk(byte[] key, byte[] ptrData, int index, int passCount)
         {
             for (var i = passCount; i >= 0; i--)
             {
-                Xor(ptrData, index + 0x00, key, 16 * i + 0x00);
-                Xor(ptrData, index + 0x04, key, 16 * i + 0x04);
-                Xor(ptrData, index + 0x08, key, 16 * i + 0x08);
-                Xor(ptrData, index + 0x0C, key, 16 * i + 0x0C);
+                ptrData[0x00 + index] ^= key[0x00 + 0x10 * i];
+                ptrData[0x01 + index] ^= key[0x01 + 0x10 * i];
+                ptrData[0x02 + index] ^= key[0x02 + 0x10 * i];
+                ptrData[0x03 + index] ^= key[0x03 + 0x10 * i];
+                ptrData[0x04 + index] ^= key[0x04 + 0x10 * i];
+                ptrData[0x05 + index] ^= key[0x05 + 0x10 * i];
+                ptrData[0x06 + index] ^= key[0x06 + 0x10 * i];
+                ptrData[0x07 + index] ^= key[0x07 + 0x10 * i];
+                ptrData[0x08 + index] ^= key[0x08 + 0x10 * i];
+                ptrData[0x09 + index] ^= key[0x09 + 0x10 * i];
+                ptrData[0x0A + index] ^= key[0x0A + 0x10 * i];
+                ptrData[0x0B + index] ^= key[0x0B + 0x10 * i];
+                ptrData[0x0C + index] ^= key[0x0C + 0x10 * i];
+                ptrData[0x0D + index] ^= key[0x0D + 0x10 * i];
+                ptrData[0x0E + index] ^= key[0x0E + 0x10 * i];
+                ptrData[0x0F + index] ^= key[0x0F + 0x10 * i];
             }
         }
     }
