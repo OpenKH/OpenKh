@@ -1,0 +1,130 @@
+using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Common;
+using OpenKh.Egs;
+using OpenKh.Kh1;
+using OpenKh.Kh2;
+using System;
+using System.Buffers.Text;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace OpenKh.Command.IdxImg
+{
+    partial class Program
+    {
+        [Command("hed", Description = "Make operation on the Epic Games Store release of Kingdom Hearts"),
+         Subcommand(typeof(ExtractCommand))]
+        private class EpicGamesAssets
+        {
+            private static readonly string[] AdditionalNames = new string[]
+            {
+                "KHHD2.8.config",
+                "KHHD2.5.config"
+            }
+                .Concat(Constants.Languages.SelectMany(lang =>
+                    Constants.WorldIds.SelectMany(world =>
+                        Enumerable.Range(0, 64).Select(index => Path.Combine("ard", lang).Replace('\\', '/') + $"/{world}{index:D02}.ard"))))
+                .Concat(Constants.Languages.SelectMany(lang =>
+                    Constants.WorldIds.SelectMany(world =>
+                        Enumerable.Range(0, 64).Select(index => Path.Combine("map", lang).Replace('\\', '/') + $"/{world}{index:D02}.map"))))
+                .Concat(Constants.Languages.SelectMany(lang =>
+                    Constants.WorldIds.SelectMany(world =>
+                        Enumerable.Range(0, 64).Select(index => Path.Combine("ard", lang).Replace('\\', '/') + $"/{world}{index:D02}.ard"))))
+                .Distinct()
+                .ToArray();
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                app.ShowHelp();
+                return 1;
+            }
+
+            static string ToString(byte[] data)
+            {
+                var sb = new StringBuilder(data.Length * 2);
+                for (var i = 0; i < data.Length; i++)
+                    sb.Append(data[i].ToString("X02"));
+
+                return sb.ToString();
+            }
+
+            private class ExtractCommand
+            {
+                [Required]
+                [FileExists]
+                [Argument(0, Description = "Kingdom Hearts HED file")]
+                public string InputHed { get; set; }
+
+                [Option(CommandOptionType.SingleValue, Description = "Path where the content will be extracted", ShortName = "o", LongName = "output")]
+                public string OutputDir { get; set; }
+
+                [Option(CommandOptionType.NoValue, Description = "Do not extract files that are already found in the destination directory", ShortName = "n")]
+                public bool DoNotExtractAgain { get; set; }
+
+                protected int OnExecute(CommandLineApplication app)
+                {
+                    var outputDir = OutputDir ?? Path.GetFileNameWithoutExtension(InputHed);
+                    using var hedStream = File.OpenRead(InputHed);
+                    using var img = File.OpenRead(Path.ChangeExtension(InputHed, "pkg"));
+                    
+                    var names = IdxName.Names
+                        .Concat(IdxName.Names.Where(x => x.Contains("anm/")).SelectMany(x => new string[]
+                        {
+                            x.Replace("anm/", "anm/jp"),
+                            x.Replace("anm/", "anm/us"),
+                            x.Replace("anm/", "anm/fm")
+                        }))
+                        .Concat(AdditionalNames).Distinct()
+                        .ToDictionary(x => EpicGamesAssets.ToString(MD5.HashData(Encoding.UTF8.GetBytes(x))), x => x);
+                    foreach (var entry in Hed.Read(hedStream))
+                    {
+                        var hash = EpicGamesAssets.ToString(entry.MD5);
+                        if (!names.TryGetValue(hash, out var fileName))
+                            fileName = hash;
+
+                        var outputFileName = Path.Combine(outputDir, fileName);
+                        if (DoNotExtractAgain && File.Exists(outputFileName))
+                            continue;
+
+                        Console.WriteLine(fileName);
+                        var extractDir = Path.GetDirectoryName(outputFileName);
+                        if (!Directory.Exists(extractDir))
+                            Directory.CreateDirectory(extractDir);
+
+                        var hdAsset = new EgsHdAsset(img.SetPosition(entry.Offset));
+                        File.Create(outputFileName).Using(stream => stream.Write(hdAsset.ReadData()));
+                    }
+
+                    return 0;
+                }
+            }
+
+            //private class ListCommand
+            //{
+            //    [Required]
+            //    [FileExists]
+            //    [Argument(0, Description = "Kingdom Hearts II IDX file, paired with a IMG")]
+            //    public string InputIdx { get; set; }
+
+            //    [Option(CommandOptionType.NoValue, Description = "Sort file list by their position in the IMG", ShortName = "s", LongName = "sort")]
+            //    public bool Sort { get; set; }
+
+            //    protected int OnExecute(CommandLineApplication app)
+            //    {
+            //        var entries = OpenIdx(InputIdx);
+            //        if (Sort)
+            //            entries = entries.OrderBy(x => x.Offset);
+
+            //        foreach (var entry in entries)
+            //            Console.WriteLine(IdxName.Lookup(entry) ?? $"@{entry.Hash32:X08}-{entry.Hash16:X04}");
+
+            //        return 0;
+            //    }
+            //}
+        }
+    }
+}
