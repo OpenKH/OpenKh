@@ -67,8 +67,7 @@ namespace OpenKh.Command.IdxImg
             private class ExtractCommand
             {
                 [Required]
-                [FileExists]
-                [Argument(0, Description = "Kingdom Hearts HED file")]
+                [Argument(0, Description = "Kingdom Hearts HED input filter; you can specify 'kh2_first.hed', 'kh2_*' or even '*' to extract everything.")]
                 public string InputHed { get; set; }
 
                 [Option(CommandOptionType.SingleValue, Description = "Path where the content will be extracted", ShortName = "o", LongName = "output")]
@@ -79,10 +78,24 @@ namespace OpenKh.Command.IdxImg
 
                 protected int OnExecute(CommandLineApplication app)
                 {
-                    var outputDir = OutputDir ?? Path.GetFileNameWithoutExtension(InputHed);
-                    using var hedStream = File.OpenRead(InputHed);
-                    using var img = File.OpenRead(Path.ChangeExtension(InputHed, "pkg"));
-                    
+                    var directory = Path.GetDirectoryName(InputHed);
+                    var filter = Path.GetFileName(InputHed);
+
+                    Directory
+                        .GetFiles(string.IsNullOrEmpty(directory) ? "." : directory, filter)
+                        .Where(x => x.EndsWith(".hed"))
+                        .AsParallel()
+                        .ForAll(inputHed => Extract(inputHed, OutputDir));
+
+                    return 0;
+                }
+
+                protected void Extract(string inputHed, string output)
+                {
+                    var outputDir = output ?? Path.GetFileNameWithoutExtension(inputHed);
+                    using var hedStream = File.OpenRead(inputHed);
+                    using var img = File.OpenRead(Path.ChangeExtension(inputHed, "pkg"));
+
                     var names = KH2Names
                         .Concat(Idx1Name.Names)
                         .Concat(Bbsa.Names)
@@ -109,8 +122,6 @@ namespace OpenKh.Command.IdxImg
                         var hdAsset = new EgsHdAsset(img.SetPosition(entry.Offset));
                         File.Create(outputFileName).Using(stream => stream.Write(hdAsset.ReadData()));
                     }
-
-                    return 0;
                 }
             }
 
