@@ -549,13 +549,17 @@ namespace OpenKh.Tests.Patcher
                 var writer = new StreamWriter(stream);
                 writer.WriteLine("- Type: 2");
                 writer.WriteLine("  Flag: 1");
+                writer.Flush();
+            });
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
             AssertFileExists(ModOutputDir, "map.script");
             var content = File.ReadAllText(Path.Combine(ModOutputDir, "map.script"));
             var scripts = new Deserializer().Deserialize<List< Kh2.Ard.SpawnPoint >> (content);
-           
+
             Assert.Equal(2, scripts[0].Type);
             Assert.Equal(1, scripts[0].Flag);
-            });
+           
         }
 
                 
