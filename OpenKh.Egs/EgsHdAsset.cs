@@ -37,6 +37,7 @@ namespace OpenKh.Egs
         public static string[] MareNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/mare.txt"));
         public static string[] SettingMenuNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/settingmenu.txt"));
         public static string[] TheaterNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/theater.txt"));
+        public static string[] RecomNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/recom.txt"));
 
         public EgsHdAsset(Stream stream)
         {

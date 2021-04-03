@@ -99,6 +99,7 @@ namespace OpenKh.Command.IdxImg
                     var names = KH2Names
                         .Concat(Idx1Name.Names)
                         .Concat(Bbsa.Names)
+                        .Concat(EgsHdAsset.RecomNames)
                         .Concat(EgsHdAsset.MareNames)
                         .Concat(EgsHdAsset.SettingMenuNames)
                         .Concat(EgsHdAsset.TheaterNames)
