@@ -49,7 +49,7 @@ Asset Example
 
 ## Binarc Methods
 
-* `copy` - Performs a copy on a supfile within a Bar. Must be one of the [following]() types
+* `copy` - Performs a copy on a supfile within a Bar. Must be one of the [following](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Tools.BarEditor/Helpers.cs#L14) types
 
 Asset Example
 
