@@ -189,20 +189,36 @@ Asset Example
 
 `item` Source Example
 ```
-- Id: 6
+Stats:
+- Ability: 412
+  AbilityPoints: 0
+  Attack: 0
+  DarkResistance: 100
+  Defense: 0
+  FireResistance: 100
+  GeneralResistance: 100
+  IceResistance: 100
+  Id: 116
+  LightningResistance: 100
+  Magic: 7
+  Unknown: 0
+  Unknown08: 100
+  Unknown0d: 100
+Items:
+- Id: 1
   Type: Consumable
-  Flag0: 2
-  Flag1: 100
+  Flag0: 0
+  Flag1: 40
   Rank: C
-  StatEntry: 3
-  Name: 33538
-  Description: 33539
-  ShopBuy: 0
-  ShopSell: 30
-  Command: 243
-  Slot: 5
-  Picture: 6
-  Icon1: 10
+  StatEntry: 1
+  Name: 33528
+  Description: 33529
+  ShopBuy: 40
+  ShopSell: 10
+  Command: 23
+  Slot: 0
+  Picture: 1
+  Icon1: 9
   Icon2: 0
 ```
 
@@ -214,11 +230,6 @@ Final:
   FormId: 5
   FormLevel: 1
   GrowthAbilityLevel: 1
-  InvalidChecks:
-  - Form
-  LocationTypes:
-  - FormLevel
-  - Level1Form
 ```
 
 `lvup` Source Example
@@ -229,11 +240,7 @@ Sora:
     Character: Sora
     Defense: 0
     Exp: 100
-    InvalidChecks: []
     Level: 2
-    LocationTypes:
-    - Level
-    - ExcludeFrom99
     Magic: 0
     Padding: 0
     ShieldAbility: 577
@@ -254,10 +261,7 @@ Sora:
     Description: ''
     DriveGaugeUpgrade: 0
     HpIncrease: 0
-    InvalidChecks: &id001 []
     ItemSlotUpgrade: 0
-    LocationTypes:
-    - BC
     MpIncrease: 0
     RewardId: 2
     Unknown0c: 0
@@ -345,3 +349,11 @@ assets:
 ```
 
 ## Publishing a mod
+
+Mods should be published to a public github repository, so that users an install the mod just by providing the repository name.
+
+It is recommended to apply the following tags to the repository, in order to make it easily found by searching GitHub for mods manager mods.
+
+`openkh-mods`
+
+`<your games abbreviation>` (ie `kh2` or `bbs`)
