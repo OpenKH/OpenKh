@@ -64,7 +64,26 @@ Asset Example
     type: Bdx
 ```
 
-* `imgd` // `imgz` // `fac`- Replaces an image found within a binarc. 
+* `imgd` - Replaces a single imgd found within a binarc
+
+Asset Example
+
+```
+  - name: menu/us/title.2ld
+    multi:
+      - name: menu/jp/title.2ld
+    required: true
+    method: binarc
+    source:
+      - name: titl
+        type: imgd
+        method: imgd
+        source:
+          - name: title/title1.png
+            highdef: title/title1_hd.png
+```
+
+* // `imgz` // `fac`- Replaces multiple imgd's found within a binarc. 
 
 Asset Example
 
