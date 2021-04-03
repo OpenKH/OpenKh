@@ -1,13 +1,13 @@
 using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Bbs;
 using OpenKh.Common;
 using OpenKh.Egs;
 using OpenKh.Kh1;
 using OpenKh.Kh2;
 using System;
-using System.Buffers.Text;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,22 +20,34 @@ namespace OpenKh.Command.IdxImg
          Subcommand(typeof(ExtractCommand))]
         private class EpicGamesAssets
         {
-            private static readonly string[] AdditionalNames = new string[]
-            {
-                "KHHD2.8.config",
-                "KHHD2.5.config"
-            }
-                .Concat(Constants.Languages.SelectMany(lang =>
-                    Constants.WorldIds.SelectMany(world =>
+            private static readonly IEnumerable<string> KH2Names = IdxName.Names
+                .Concat(IdxName.Names.Where(x => x.Contains("anm/")).SelectMany(x => new string[]
+                {
+                    x.Replace("anm/", "anm/jp/"),
+                    x.Replace("anm/", "anm/us/"),
+                    x.Replace("anm/", "anm/fm/")
+                }))
+                .Concat(Kh2.Constants.Languages.SelectMany(lang =>
+                    Kh2.Constants.WorldIds.SelectMany(world =>
                         Enumerable.Range(0, 64).Select(index => Path.Combine("ard", lang).Replace('\\', '/') + $"/{world}{index:D02}.ard"))))
-                .Concat(Constants.Languages.SelectMany(lang =>
-                    Constants.WorldIds.SelectMany(world =>
+                .Concat(Kh2.Constants.Languages.SelectMany(lang =>
+                    Kh2.Constants.WorldIds.SelectMany(world =>
                         Enumerable.Range(0, 64).Select(index => Path.Combine("map", lang).Replace('\\', '/') + $"/{world}{index:D02}.map"))))
-                .Concat(Constants.Languages.SelectMany(lang =>
-                    Constants.WorldIds.SelectMany(world =>
-                        Enumerable.Range(0, 64).Select(index => Path.Combine("ard", lang).Replace('\\', '/') + $"/{world}{index:D02}.ard"))))
-                .Distinct()
-                .ToArray();
+                .Concat(Kh2.Constants.Languages.SelectMany(lang =>
+                    Kh2.Constants.WorldIds.SelectMany(world =>
+                        Enumerable.Range(0, 64).Select(index => Path.Combine("map", lang).Replace('\\', '/') + $"/{world}{index:D02}.bar"))))
+                .Concat(IdxName.Names.Where(x => x.StartsWith("bgm/")).Select(x => x.Replace(".bgm", ".win32.scd")))
+                .Concat(IdxName.Names.Where(x => x.StartsWith("se/")).Select(x => x.Replace(".seb", ".win32.scd")))
+                .Concat(IdxName.Names.Where(x => x.StartsWith("vagstream/")).Select(x => x.Replace(".vas", ".win32.scd")))
+                .Concat(IdxName.Names.Where(x => x.StartsWith("voice/")).Select(x => x
+                    .Replace(".vag", ".win32.scd")
+                    .Replace(".vsb", ".win32.scd")))
+                .Concat(new string[]
+                {
+                    "item-011.imd",
+                    "KH2.IDX",
+                    "ICON/ICON0.PNG",
+                });
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -71,14 +83,13 @@ namespace OpenKh.Command.IdxImg
                     using var hedStream = File.OpenRead(InputHed);
                     using var img = File.OpenRead(Path.ChangeExtension(InputHed, "pkg"));
                     
-                    var names = IdxName.Names
-                        .Concat(IdxName.Names.Where(x => x.Contains("anm/")).SelectMany(x => new string[]
-                        {
-                            x.Replace("anm/", "anm/jp"),
-                            x.Replace("anm/", "anm/us"),
-                            x.Replace("anm/", "anm/fm")
-                        }))
-                        .Concat(AdditionalNames).Distinct()
+                    var names = KH2Names
+                        .Concat(Idx1Name.Names)
+                        .Concat(Bbsa.Names)
+                        .Concat(EgsHdAsset.MareNames)
+                        .Concat(EgsHdAsset.SettingMenuNames)
+                        .Concat(EgsHdAsset.TheaterNames)
+                        .Distinct()
                         .ToDictionary(x => EpicGamesAssets.ToString(MD5.HashData(Encoding.UTF8.GetBytes(x))), x => x);
                     foreach (var entry in Hed.Read(hedStream))
                     {

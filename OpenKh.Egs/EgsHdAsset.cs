@@ -34,6 +34,10 @@ namespace OpenKh.Egs
         private readonly long _dataOffset;
         private readonly Dictionary<string, RemasteredEntry> _entries;
 
+        public static string[] MareNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/mare.txt"));
+        public static string[] SettingMenuNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/settingmenu.txt"));
+        public static string[] TheaterNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/theater.txt"));
+
         public EgsHdAsset(Stream stream)
         {
             _stream = stream;

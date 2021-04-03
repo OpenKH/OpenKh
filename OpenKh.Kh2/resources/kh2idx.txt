@@ -17614,6 +17614,7 @@ menu/fm/shopface/p_xm100.bin
 menu/fm/sw_010_s.bar
 menu/fm/sw_020_s.bar
 menu/fm/title.2ld
+menu/fm/titlejf.2ld
 menu/fr/ab_010_o.bar
 menu/fr/ab_010_r.bar
 menu/fr/ab_010_s.bar
@@ -17833,6 +17834,7 @@ menu/fr/shopface/p_wi030.bin
 menu/fr/sw_010_s.bar
 menu/fr/sw_020_s.bar
 menu/fr/title.2ld
+menu/fr/titlejf.2ld
 menu/gr/ab_010_o.bar
 menu/gr/ab_010_r.bar
 menu/gr/ab_010_s.bar
@@ -18052,6 +18054,7 @@ menu/gr/shopface/p_wi030.bin
 menu/gr/sw_010_s.bar
 menu/gr/sw_020_s.bar
 menu/gr/title.2ld
+menu/gr/titlejf.2ld
 menu/it/ab_010_o.bar
 menu/it/ab_010_r.bar
 menu/it/ab_010_s.bar
@@ -18272,6 +18275,7 @@ menu/it/shopface/p_wi030.bin
 menu/it/sw_010_s.bar
 menu/it/sw_020_s.bar
 menu/it/title.2ld
+menu/it/titlejf.2ld
 menu/jp/ab_010_o.bar
 menu/jp/ab_010_r.bar
 menu/jp/ab_010_s.bar
@@ -18493,6 +18497,7 @@ menu/jp/shopface/p_wi030.bin
 menu/jp/sw_010_s.bar
 menu/jp/sw_020_s.bar
 menu/jp/title.2ld
+menu/jp/titlejf.2ld
 menu/sp/ab_010_o.bar
 menu/sp/ab_010_r.bar
 menu/sp/ab_010_s.bar
@@ -18712,6 +18717,7 @@ menu/sp/shopface/p_wi030.bin
 menu/sp/sw_010_s.bar
 menu/sp/sw_020_s.bar
 menu/sp/title.2ld
+menu/sp/titlejf.2ld
 menu/uk/ab_010_o.bar
 menu/uk/ab_010_r.bar
 menu/uk/ab_010_s.bar
@@ -18931,6 +18937,7 @@ menu/uk/shopface/p_wi030.bin
 menu/uk/sw_010_s.bar
 menu/uk/sw_020_s.bar
 menu/uk/title.2ld
+menu/uk/titlejf.2ld
 menu/us/ab_010_o.bar
 menu/us/ab_010_r.bar
 menu/us/ab_010_s.bar
@@ -19150,6 +19157,7 @@ menu/us/shopface/p_wi030.bin
 menu/us/sw_010_s.bar
 menu/us/sw_020_s.bar
 menu/us/title.2ld
+menu/us/titlejf.2ld
 mg_heft.2ld
 mg_lm_mu.2ld
 minigame/al_14.bar
