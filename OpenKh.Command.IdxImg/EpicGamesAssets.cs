@@ -51,6 +51,7 @@ namespace OpenKh.Command.IdxImg
                 });
             private static readonly Dictionary<string, string> Names = KH2Names
                 .Concat(Idx1Name.Names)
+                .Concat(EgsHdAsset.DddNames)
                 .Concat(EgsHdAsset.BbsNames)
                 .Concat(EgsHdAsset.RecomNames)
                 .Concat(EgsHdAsset.MareNames)
