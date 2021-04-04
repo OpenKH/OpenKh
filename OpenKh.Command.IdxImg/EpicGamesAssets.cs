@@ -47,6 +47,7 @@ namespace OpenKh.Command.IdxImg
                     "item-011.imd",
                     "KH2.IDX",
                     "ICON/ICON0.PNG",
+                    "ICON/ICON0_EN.png",
                 });
             private static readonly Dictionary<string, string> Names = KH2Names
                 .Concat(Idx1Name.Names)
