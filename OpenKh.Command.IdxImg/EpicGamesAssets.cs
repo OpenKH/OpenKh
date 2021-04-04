@@ -48,6 +48,16 @@ namespace OpenKh.Command.IdxImg
                     "KH2.IDX",
                     "ICON/ICON0.PNG",
                 });
+            private static readonly Dictionary<string, string> Names = KH2Names
+                .Concat(Idx1Name.Names)
+                .Concat(EgsHdAsset.BbsNames)
+                .Concat(EgsHdAsset.RecomNames)
+                .Concat(EgsHdAsset.MareNames)
+                .Concat(EgsHdAsset.SettingMenuNames)
+                .Concat(EgsHdAsset.TheaterNames)
+                .Concat(EgsHdAsset.Kh1AdditionalNames)
+                .Distinct()
+                .ToDictionary(x => ToString(MD5.HashData(Encoding.UTF8.GetBytes(x))), x => x);
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -96,19 +106,10 @@ namespace OpenKh.Command.IdxImg
                     using var hedStream = File.OpenRead(inputHed);
                     using var img = File.OpenRead(Path.ChangeExtension(inputHed, "pkg"));
 
-                    var names = KH2Names
-                        .Concat(Idx1Name.Names)
-                        .Concat(EgsHdAsset.BbsNames)
-                        .Concat(EgsHdAsset.RecomNames)
-                        .Concat(EgsHdAsset.MareNames)
-                        .Concat(EgsHdAsset.SettingMenuNames)
-                        .Concat(EgsHdAsset.TheaterNames)
-                        .Distinct()
-                        .ToDictionary(x => EpicGamesAssets.ToString(MD5.HashData(Encoding.UTF8.GetBytes(x))), x => x);
                     foreach (var entry in Hed.Read(hedStream))
                     {
                         var hash = EpicGamesAssets.ToString(entry.MD5);
-                        if (!names.TryGetValue(hash, out var fileName))
+                        if (!Names.TryGetValue(hash, out var fileName))
                             fileName = hash;
 
                         var outputFileName = Path.Combine(outputDir, fileName);

@@ -27,6 +27,14 @@ namespace OpenKh.Egs
             [Data] public int DecompressedLength { get; set; }
         }
 
+        private static readonly string ResourcePath = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources");
+        public static string[] MareNames = File.ReadAllLines(Path.Combine(ResourcePath, "mare.txt"));
+        public static string[] SettingMenuNames = File.ReadAllLines(Path.Combine(ResourcePath, "settingmenu.txt"));
+        public static string[] TheaterNames = File.ReadAllLines(Path.Combine(ResourcePath, "theater.txt"));
+        public static string[] RecomNames = File.ReadAllLines(Path.Combine(ResourcePath, "recom.txt"));
+        public static string[] BbsNames = File.ReadAllLines(Path.Combine(ResourcePath, "bbs.txt"));
+        public static string[] Kh1AdditionalNames = File.ReadAllLines(Path.Combine(ResourcePath, "kh1pc.txt"));
+
         private readonly Stream _stream;
         private readonly Header _header;
         private readonly byte[] _seed;
@@ -34,11 +42,6 @@ namespace OpenKh.Egs
         private readonly long _dataOffset;
         private readonly Dictionary<string, RemasteredEntry> _entries;
 
-        public static string[] MareNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/mare.txt"));
-        public static string[] SettingMenuNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/settingmenu.txt"));
-        public static string[] TheaterNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/theater.txt"));
-        public static string[] RecomNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/recom.txt"));
-        public static string[] BbsNames = File.ReadAllLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/bbs.txt"));
 
         public EgsHdAsset(Stream stream)
         {
