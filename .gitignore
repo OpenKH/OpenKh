@@ -334,3 +334,6 @@ ASALocalRun/
 
 # WinShell Build Output
 OpenKh.WinShell.Output/
+
+# VS History
+.vshistory
