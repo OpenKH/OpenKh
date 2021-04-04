@@ -11,13 +11,15 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Command.IdxImg
 {
     partial class Program
     {
         [Command("hed", Description = "Make operation on the Epic Games Store release of Kingdom Hearts"),
-         Subcommand(typeof(ExtractCommand))]
+         Subcommand(typeof(ExtractCommand)),
+         Subcommand(typeof(PackCommand))]
         private class EpicGamesAssets
         {
             private static readonly IEnumerable<string> KH2Names = IdxName.Names
@@ -125,6 +127,51 @@ namespace OpenKh.Command.IdxImg
                         var hdAsset = new EgsHdAsset(img.SetPosition(entry.Offset));
                         File.Create(outputFileName).Using(stream => stream.Write(hdAsset.ReadData()));
                     }
+                }
+            }
+
+            private class PackCommand
+            {
+                [Required]
+                [Argument(0, Description = "Folder to pack using EGS format.")]
+                public string InputFolder { get; set; }
+
+                [Option(CommandOptionType.SingleValue, Description = "Path where the content will be packed", ShortName = "o", LongName = "output")]
+                public string OutputDir { get; set; }
+
+                protected int OnExecute(CommandLineApplication app)
+                {
+                    var files = Directory.EnumerateFiles(InputFolder, "*.*", SearchOption.AllDirectories);
+                    using var hedStream = File.OpenWrite($"{InputFolder}.hed");
+
+                    foreach (var file in files)
+                    {
+                        var md5 = CreateMD5(file);
+
+                        var hedEntry = new Hed.Entry()
+                        {
+                            MD5 = md5,
+                            Offset = 0,
+                            DataLength = 0,
+                            ActualLength = 0,
+                        };
+
+                        BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedEntry);
+
+                        Console.WriteLine($"Packed: {file}");
+                    }
+
+                    return 0;
+                }
+            }
+
+            public static byte[] CreateMD5(string input)
+            {
+                // Use input string to calculate MD5 hash
+                using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+                {
+                    byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                    return md5.ComputeHash(inputBytes);
                 }
             }
 
