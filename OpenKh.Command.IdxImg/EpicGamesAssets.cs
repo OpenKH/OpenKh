@@ -119,13 +119,30 @@ namespace OpenKh.Command.IdxImg
                             continue;
 
                         Console.WriteLine(fileName);
-                        var extractDir = Path.GetDirectoryName(outputFileName);
-                        if (!Directory.Exists(extractDir))
-                            Directory.CreateDirectory(extractDir);
+                        CreateDirectoryForFile(outputFileName);
+
+                        File.Create(outputFileName).Using(stream => stream.Write(img.SetPosition(entry.Offset).ReadBytes(entry.DataLength)));
 
                         var hdAsset = new EgsHdAsset(img.SetPosition(entry.Offset));
                         File.Create(outputFileName).Using(stream => stream.Write(hdAsset.ReadData()));
+
+                        foreach (var asset in hdAsset.Assets)
+                        {
+                            var outputFileNameRemastered = outputFileName + asset;
+                            Console.WriteLine(outputFileNameRemastered);
+                            CreateDirectoryForFile(outputFileNameRemastered);
+
+                            var assetData = hdAsset.ReadAsset(asset);
+                            File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                        }
                     }
+                }
+
+                private static void CreateDirectoryForFile(string fileName)
+                {
+                    var directoryName = Path.GetDirectoryName(fileName);
+                    if (!Directory.Exists(directoryName))
+                        Directory.CreateDirectory(directoryName);
                 }
             }
 
