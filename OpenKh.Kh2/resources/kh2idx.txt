@@ -19624,6 +19624,7 @@ msg/fr/nm.bar
 msg/fr/place.bin
 msg/fr/po.bar
 msg/fr/sys.bar
+msg/fr/title.bar
 msg/fr/tr.bar
 msg/fr/tt.bar
 msg/fr/wi.bar
@@ -19648,6 +19649,7 @@ msg/gr/nm.bar
 msg/gr/place.bin
 msg/gr/po.bar
 msg/gr/sys.bar
+msg/gr/title.bar
 msg/gr/tr.bar
 msg/gr/tt.bar
 msg/gr/wi.bar
@@ -19672,6 +19674,7 @@ msg/it/nm.bar
 msg/it/place.bin
 msg/it/po.bar
 msg/it/sys.bar
+msg/it/title.bar
 msg/it/tr.bar
 msg/it/tt.bar
 msg/it/wi.bar
@@ -19721,6 +19724,7 @@ msg/sp/nm.bar
 msg/sp/place.bin
 msg/sp/po.bar
 msg/sp/sys.bar
+msg/sp/title.bar
 msg/sp/tr.bar
 msg/sp/tt.bar
 msg/sp/wi.bar
@@ -19746,6 +19750,7 @@ msg/us/place.bin
 msg/us/po.bar
 msg/us/sys.bar
 msg/us/sys.mb
+msg/us/title.bar
 msg/us/tr.bar
 msg/us/tt.bar
 msg/us/wi.bar
