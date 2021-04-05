@@ -17,7 +17,7 @@
 | 12 | Defeat Beast |
 | 13 |  |
 | 14 |  |
-| 15 | Defend the gate in Hollow Bastion |
+| 15 | Defeat Jafar |
 | 16 | Defeat Pete (Waterway) |
 | 17 | Defeat Pete (Wharf) |
 | 18 | Defeat Prison Keeper |
@@ -49,7 +49,7 @@
 | 44 |  |
 | 45 | Freeze the computers at Dataspace |
 | 46 | Defeat the enemies at Treasure Room |
-| 47 | Defeat Jafar |
+| 47 | Defend the gate in Hollow Bastion |
 | 48 |  |
 | 49 | Defeat Shenzi, Banzai & Ed (King's Den) |
 | 50 | Defeat Shenzi, Banzai & Ed (Graveyard) |
