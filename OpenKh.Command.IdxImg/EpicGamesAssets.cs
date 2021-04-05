@@ -147,21 +147,17 @@ namespace OpenKh.Command.IdxImg
                 }
             }
 
+            [Command("list", Description = "List the content of a HED file ")]
             private class ListCommand
             {
                 [Required]
                 [Argument(0, Description = "Kingdom Hearts HED input file")]
                 public string InputHed { get; set; }
 
-                [Option(CommandOptionType.NoValue, Description = "Sort file list by their position in the HED", ShortName = "s", LongName = "sort")]
-                public bool Sort { get; set; }
-
                 protected int OnExecute(CommandLineApplication app)
                 {
                     using var hedStream = File.OpenRead(InputHed);
                     var entries = Hed.Read(hedStream);
-                    if (Sort)
-                        entries = entries.OrderBy(x => x.Offset);
 
                     foreach(var entry in entries)
                     {
