@@ -17,7 +17,8 @@ namespace OpenKh.Command.IdxImg
     partial class Program
     {
         [Command("hed", Description = "Make operation on the Epic Games Store release of Kingdom Hearts"),
-         Subcommand(typeof(ExtractCommand))]
+         Subcommand(typeof(ExtractCommand)),
+         Subcommand(typeof(ListCommand))]
         private class EpicGamesAssets
         {
             private static readonly IEnumerable<string> KH2Names = IdxName.Names
@@ -146,28 +147,34 @@ namespace OpenKh.Command.IdxImg
                 }
             }
 
-            //private class ListCommand
-            //{
-            //    [Required]
-            //    [FileExists]
-            //    [Argument(0, Description = "Kingdom Hearts II IDX file, paired with a IMG")]
-            //    public string InputIdx { get; set; }
+            private class ListCommand
+            {
+                [Required]
+                [Argument(0, Description = "Kingdom Hearts HED input file")]
+                public string InputHed { get; set; }
 
-            //    [Option(CommandOptionType.NoValue, Description = "Sort file list by their position in the IMG", ShortName = "s", LongName = "sort")]
-            //    public bool Sort { get; set; }
+                [Option(CommandOptionType.NoValue, Description = "Sort file list by their position in the HED", ShortName = "s", LongName = "sort")]
+                public bool Sort { get; set; }
 
-            //    protected int OnExecute(CommandLineApplication app)
-            //    {
-            //        var entries = OpenIdx(InputIdx);
-            //        if (Sort)
-            //            entries = entries.OrderBy(x => x.Offset);
+                protected int OnExecute(CommandLineApplication app)
+                {
+                    using var hedStream = File.OpenRead(InputHed);
+                    var entries = Hed.Read(hedStream);
+                    if (Sort)
+                        entries = entries.OrderBy(x => x.Offset);
 
-            //        foreach (var entry in entries)
-            //            Console.WriteLine(IdxName.Lookup(entry) ?? $"@{entry.Hash32:X08}-{entry.Hash16:X04}");
+                    foreach(var entry in entries)
+                    {
+                        var hash = EpicGamesAssets.ToString(entry.MD5);
+                        if (!Names.TryGetValue(hash, out var fileName))
+                            fileName = hash;
 
-            //        return 0;
-            //    }
-            //}
+                        Console.WriteLine(fileName);
+                    }
+
+                    return 0;
+                }
+            }
         }
     }
 }
