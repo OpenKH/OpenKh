@@ -331,19 +331,17 @@ Every table has the following header
 |--------|---------------|-------------|
 | 0      | uint16 | Id - [ITEM LIST](../../dictionary/inventory.md)
 | 2      | byte  | [Category](#Categories) |
-| 3      | byte  | Visibility (00 are visible on Stock, 01 isn't, 02 is like 00 for team-consumables) |
-| 4      | byte  | SubId* |
-| 5      | byte  | Rank (C, B, A, S) for Synthesis items. |
-| 6      | uint16 | [Status ID](#status-descriptor). Used to assign a certain status change to an item when equipped. |
+| 3      | byte  | Flag |
+| 4 - 7  |  | Dependent on the Category, see [variable structures](#variable-structures) |
 | 8      | uint16 | Name message ID |
 | 10     | uint16 | Description message ID |
 | 12     | uint16 | Shop buy price |
 | 14     | uint16 | Shop sell price |
-| 16     | uint16 | Command. | - [COMMAND LIST](../../dictionary/commands.md)
+| 16     | uint16 | Command - [COMMAND LIST](../../dictionary/commands.md)
 | 18     | uint16 | Slot (Order in the menu) |
-| 20     | uint16 | Picture linked to the image. |
-| 22     | byte  | [Prize Box](#Prize-boxes). |
-| 23     | byte  | [Icon](../../dictionary/icons.md). |
+| 20     | uint16 | Picture linked to the image |
+| 22     | byte  | [Prize Box](#Prize-boxes) |
+| 23     | byte  | [Icon](../../dictionary/icons.md) |
 
 *Used as recovery amount for consumables (% for ethers, halved on charge), AP cost for abilities, Id used in [Went](#went) for weapons.
 
@@ -376,6 +374,13 @@ Every table has the following header
 | 22   | Map
 | 23   | Report
 
+#### Flags
+
+| Position | Size | Description |
+|----------|------|-------------|
+| 0 | 1 | Special
+| 1 | 1 | Normal Form Only
+
 #### Prize boxes
 
 | ID | Description
@@ -392,6 +397,57 @@ Every table has the following header
 | 9    | Purple S (Item)
 | 10   | Purple L (Item)
 | 11   | Purple XL (Item)
+
+### Variable structures
+
+#### Ability
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Id
+| 6 | uint8 | Ap
+| 7 | uint8 | Type
+
+#### Consumables
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Cure Rate
+| 6 | uint16 | Effect
+
+#### Equipment (Armor, Accessory)
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Param
+| 6 | uint16 | Unused
+
+#### Magic
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Id
+| 6 | uint16 | Unused
+
+#### Synthesis
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint8 | Rank
+| 5 | uint8 | Type
+
+#### Report
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Id
+
+#### Weapons
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Id
+| 6 | uint16 | Param
 
 ### Status table Structure
 
@@ -419,14 +475,14 @@ Every table has the following header
 | 5      | uint8  | Magic boost |
 | 6      | uint8  | Defense boost |
 | 7      | uint8  | AP boost |
-| 8      | uint8  | Unknown |
-| 9      | uint8  | Fire resistance |
-| 10     | uint8  | Ice resistance |
-| 11     | uint8  | Lightning resistance |
-| 12     | uint8  | Dark resistance |
-| 13     | uint8  | Unknown |
-| 14     | uint8  | General resistance |
-| 15     | uint8  | Unknown |
+| 8      | uint8  | Physical damage |
+| 9      | uint8  | Fire damage |
+| 10     | uint8  | Ice damage |
+| 11     | uint8  | Lightning damage |
+| 12     | uint8  | Dark damage |
+| 13     | uint8  | Light/Neutral damage |
+| 14     | uint8  | General damage |
+| 15     | uint8  | Reserve |
 
 ---
 
