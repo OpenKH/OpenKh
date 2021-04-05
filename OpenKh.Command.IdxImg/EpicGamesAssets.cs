@@ -141,20 +141,29 @@ namespace OpenKh.Command.IdxImg
 
                 protected int OnExecute(CommandLineApplication app)
                 {
-                    var files = Directory.EnumerateFiles(InputFolder, "*.*", SearchOption.AllDirectories);
+                    var files = Directory.EnumerateFiles(InputFolder, "*.*", SearchOption.AllDirectories).OrderBy(x => x, StringComparer.Ordinal);
                     using var hedStream = File.OpenWrite($"{InputFolder}.hed");
+
+                    var offset = 0L;
 
                     foreach (var file in files)
                     {
-                        var md5 = CreateMD5(file);
+                        var filename = file.Replace($"{InputFolder}\\", "").Replace("\\", "/");
+                        var md5 = CreateMD5(filename);
+                        var fileStream = File.OpenRead(file);
 
                         var hedEntry = new Hed.Entry()
                         {
-                            MD5 = md5,
-                            Offset = 0,
-                            DataLength = 0,
-                            ActualLength = 0,
+                            MD5 = StringToByteArray(md5),
+                            Offset = offset,
+                            DataLength = (int)(fileStream.Length), // TODO: Add header size after encryption
+                            ActualLength = (int)fileStream.Length,
                         };
+
+                        // TODO: Is not correct yet as we need to encrypt data to get total data size
+                        offset += hedEntry.DataLength;
+
+                        fileStream.Close();
 
                         BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedEntry);
 
@@ -165,14 +174,30 @@ namespace OpenKh.Command.IdxImg
                 }
             }
 
-            public static byte[] CreateMD5(string input)
+            public static string CreateMD5(string input)
             {
                 // Use input string to calculate MD5 hash
                 using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
                 {
                     byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-                    return md5.ComputeHash(inputBytes);
+                    byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                    // Convert the byte array to hexadecimal string
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < hashBytes.Length; i++)
+                    {
+                        sb.Append(hashBytes[i].ToString("X2"));
+                    }
+                    return sb.ToString();
                 }
+            }
+
+            public static byte[] StringToByteArray(string hex)
+            {
+                return Enumerable.Range(0, hex.Length)
+                                 .Where(x => x % 2 == 0)
+                                 .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                                 .ToArray();
             }
 
             //private class ListCommand
