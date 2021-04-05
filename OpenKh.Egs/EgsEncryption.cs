@@ -80,24 +80,18 @@ namespace OpenKh.Egs
 
         public static void DecryptChunk(byte[] key, byte[] ptrData, int index, int passCount)
         {
+            const int MaxChunkLength = 0x10;
+
+            var chunkLength = Math.Min(ptrData.Length - index, MaxChunkLength);
             for (var i = passCount; i >= 0; i--)
             {
-                ptrData[0x00 + index] ^= key[0x00 + 0x10 * i];
-                ptrData[0x01 + index] ^= key[0x01 + 0x10 * i];
-                ptrData[0x02 + index] ^= key[0x02 + 0x10 * i];
-                ptrData[0x03 + index] ^= key[0x03 + 0x10 * i];
-                ptrData[0x04 + index] ^= key[0x04 + 0x10 * i];
-                ptrData[0x05 + index] ^= key[0x05 + 0x10 * i];
-                ptrData[0x06 + index] ^= key[0x06 + 0x10 * i];
-                ptrData[0x07 + index] ^= key[0x07 + 0x10 * i];
-                ptrData[0x08 + index] ^= key[0x08 + 0x10 * i];
-                ptrData[0x09 + index] ^= key[0x09 + 0x10 * i];
-                ptrData[0x0A + index] ^= key[0x0A + 0x10 * i];
-                ptrData[0x0B + index] ^= key[0x0B + 0x10 * i];
-                ptrData[0x0C + index] ^= key[0x0C + 0x10 * i];
-                ptrData[0x0D + index] ^= key[0x0D + 0x10 * i];
-                ptrData[0x0E + index] ^= key[0x0E + 0x10 * i];
-                ptrData[0x0F + index] ^= key[0x0F + 0x10 * i];
+                for (var j = 0; j < chunkLength; j += 4)
+                {
+                    ptrData[0x00 + index + j] ^= key[0x00 + 0x10 * i + j];
+                    ptrData[0x01 + index + j] ^= key[0x01 + 0x10 * i + j];
+                    ptrData[0x02 + index + j] ^= key[0x02 + 0x10 * i + j];
+                    ptrData[0x03 + index + j] ^= key[0x03 + 0x10 * i + j];
+                }
             }
         }
     }
