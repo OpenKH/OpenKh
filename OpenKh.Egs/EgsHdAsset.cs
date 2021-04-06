@@ -90,10 +90,17 @@ namespace OpenKh.Egs
 
         public byte[] ReadData()
         {
+            if (_header.CompressedLength < 0)
+                _header.CompressedLength = _header.CompressedLength;
+
             var dataLength = _header.CompressedLength >= 0 ? _header.CompressedLength : _header.DecompressedLength;
             var data = _stream.SetPosition(_dataOffset).ReadBytes(dataLength);
-            for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
-                EgsEncryption.DecryptChunk(_key, data, i, PassCount);
+
+            if (_header.CompressedLength >= -1)
+            {
+                for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
+                    EgsEncryption.DecryptChunk(_key, data, i, PassCount);
+            }
 
             if (_header.CompressedLength >= 0)
             {
