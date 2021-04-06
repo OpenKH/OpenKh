@@ -119,7 +119,7 @@ namespace OpenKh.Command.IdxImg
                         if (DoNotExtractAgain && File.Exists(outputFileName))
                             continue;
 
-                        Console.WriteLine(fileName);
+                        Console.WriteLine(outputFileName);
                         CreateDirectoryForFile(outputFileName);
 
                         File.Create(outputFileName).Using(stream => stream.Write(img.SetPosition(entry.Offset).ReadBytes(entry.DataLength)));
