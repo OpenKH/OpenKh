@@ -48,6 +48,18 @@ namespace OpenKh.Egs
 
             for (var i = 0; i < 0x100; i += 0x10)
                 DecryptChunk(key, data, i, PassCount);
+
+            return data;
+        }
+
+        public static byte[] Encrypt(byte[] data, byte[] seed)
+        {
+            const int PassCount = 10;
+            var key = EgsEncryption.GenerateKey(seed, PassCount);
+
+            for (var i = 0; i < Math.Min(data.Length, 0x100); i += 0x10)
+                EgsEncryption.EncryptChunk(key, data, i, PassCount);
+
             return data;
         }
 
@@ -98,6 +110,23 @@ namespace OpenKh.Egs
                 ptrData[0x0D + index] ^= key[0x0D + 0x10 * i];
                 ptrData[0x0E + index] ^= key[0x0E + 0x10 * i];
                 ptrData[0x0F + index] ^= key[0x0F + 0x10 * i];
+            }
+        }
+
+        public static void EncryptChunk(byte[] key, byte[] ptrData, int index, int passCount)
+        {
+            const int MaxChunkLength = 0x10;
+
+            var chunkLength = Math.Min(ptrData.Length - index, MaxChunkLength);
+            for (var i = passCount; i >= 0; i--)
+            {
+                for (var j = 0; j < chunkLength; j += 4)
+                {
+                    ptrData[0x00 + index + j] ^= key[0x00 + 0x10 * i + j];
+                    ptrData[0x01 + index + j] ^= key[0x01 + 0x10 * i + j];
+                    ptrData[0x02 + index + j] ^= key[0x02 + 0x10 * i + j];
+                    ptrData[0x03 + index + j] ^= key[0x03 + 0x10 * i + j];
+                }
             }
         }
     }

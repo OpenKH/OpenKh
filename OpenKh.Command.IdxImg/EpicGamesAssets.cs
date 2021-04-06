@@ -136,41 +136,79 @@ namespace OpenKh.Command.IdxImg
                 [Argument(0, Description = "Folder to pack using EGS format.")]
                 public string InputFolder { get; set; }
 
-                [Option(CommandOptionType.SingleValue, Description = "Path where the content will be packed", ShortName = "o", LongName = "output")]
+                [Option(CommandOptionType.SingleValue, Description = "Folder inside where the packed content will be dropped", ShortName = "o", LongName = "output")]
                 public string OutputDir { get; set; }
 
                 protected int OnExecute(CommandLineApplication app)
                 {
-                    var files = Directory.EnumerateFiles(InputFolder, "*.*", SearchOption.AllDirectories).OrderBy(x => x, StringComparer.Ordinal);
-                    using var hedStream = File.OpenWrite($"{InputFolder}.hed");
+                    Pack(InputFolder, OutputDir);
+
+                    return 0;
+                }
+
+                protected void Pack(string inputFolder, string output)
+                {
+                    var outputDir = output ?? Directory.GetParent(inputFolder).FullName;
+                    var files = Directory.EnumerateFiles(inputFolder, "*.*", SearchOption.AllDirectories).OrderBy(x => x, StringComparer.Ordinal);
+
+                    var outputFilename = Path.GetFileName(inputFolder);
+                    var outputHedFile = Path.Join(outputDir, $"{outputFilename}.hed");
+                    var outputPkgFile = Path.Join(outputDir, $"{outputFilename}.pkg");
+
+                    var hedStream = File.Create(outputHedFile);
+                    var pkgStream = File.Create(outputPkgFile);
 
                     var offset = 0L;
 
                     foreach (var file in files)
                     {
-                        var filename = file.Replace($"{InputFolder}\\", "").Replace("\\", "/");
-                        var md5 = CreateMD5(filename);
+                        var filename = file.Replace($"{inputFolder}\\", "").Replace("\\", "/");
+                        var md5 = StringToByteArray(CreateMD5(filename));
                         var fileStream = File.OpenRead(file);
+                        var fileSize = (int)fileStream.Length;
 
+                        // Write HED entry for the current file
                         var hedEntry = new Hed.Entry()
                         {
-                            MD5 = StringToByteArray(md5),
+                            MD5 = md5,
                             Offset = offset,
-                            DataLength = (int)(fileStream.Length), // TODO: Add header size after encryption
-                            ActualLength = (int)fileStream.Length,
+                            DataLength = fileSize + 0x10,
+                            ActualLength = fileSize,
                         };
-
-                        // TODO: Is not correct yet as we need to encrypt data to get total data size
-                        offset += hedEntry.DataLength;
-
-                        fileStream.Close();
 
                         BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedEntry);
 
-                        Console.WriteLine($"Packed: {file}");
+                        // Encrypt and write current file data in the PKG stream
+                        var header = new EgsHdAsset.Header()
+                        {
+                            CompressedLength = -1,
+                            DecompressedLength = fileSize,
+                            RemasteredAssetCount = 0,
+                            Unknown0c = 0
+                        };
+
+                        // The seed used for encryption is the data header
+                        var seed = new MemoryStream();
+                        BinaryMapping.WriteObject<EgsHdAsset.Header>(seed, header);
+
+                        var encryptedFileData = EgsEncryption.Encrypt(
+                            fileStream.ReadAllBytes(),
+                            seed.SetPosition(0).ReadAllBytes()
+                        );
+
+                        BinaryMapping.WriteObject<EgsHdAsset.Header>(pkgStream, header);
+                        pkgStream.Write(encryptedFileData);
+
+
+                        Console.WriteLine($"Packed: {filename}");
+
+                        offset += hedEntry.DataLength;
+
+                        fileStream.Close();
                     }
 
-                    return 0;
+                    Console.WriteLine($"Output HED file location: {outputHedFile}");
+                    Console.WriteLine($"Output PKG file location: {outputPkgFile}");
                 }
             }
 

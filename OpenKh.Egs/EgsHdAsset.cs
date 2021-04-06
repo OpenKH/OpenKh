@@ -10,7 +10,7 @@ namespace OpenKh.Egs
 {
     public class EgsHdAsset
     {
-        private class Header
+        public class Header
         {
             [Data] public int DecompressedLength { get; set; }
             [Data] public int RemasteredAssetCount { get; set; }
