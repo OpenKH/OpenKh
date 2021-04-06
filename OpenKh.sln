@@ -181,7 +181,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ModsManager", "OpenKh.Tools.ModsManager\OpenKh.Tools.ModsManager.csproj", "{A1BCC739-3BDC-41AF-BD0B-78C5E55F88A2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Kh1", "OpenKh.Kh1\OpenKh.Kh1.csproj", "{EB189B6E-AFA0-463D-8DE8-A51ED32969FD}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.PAMtoFBXConverter", "OpenKh.Command.PAMtoFBXConverter\OpenKh.Command.PAMtoFBXConverter.csproj", "{A9695331-C335-4C62-B5B3-7FB3ED512EA3}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.BbsMapStudio", "OpenKh.Tools.BbsMapStudio\OpenKh.Tools.BbsMapStudio.csproj", "{C2DB9627-2FE5-4BD9-8271-D3A86DACBA30}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Egs", "OpenKh.Egs\OpenKh.Egs.csproj", "{9370AE74-CA9A-440C-BD03-A9D802579B32}"

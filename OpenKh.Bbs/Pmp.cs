@@ -160,9 +160,9 @@ namespace OpenKh.Bbs
                 {
                     BinaryMapping.WriteObject<Pmo.Header>(stream, nPmoList[p].header);
 
-                    for (int g = 0; g < nPmoList[p].textureInfo.Length; g++)
+                    for (int v = 0; v < nPmoList[p].textureInfo.Length; v++)
                     {
-                        BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, nPmoList[p].textureInfo[g]);
+                        BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, nPmoList[p].textureInfo[v]);
                     }
 
                     Pmo.WriteMeshData(stream, nPmoList[p]);
