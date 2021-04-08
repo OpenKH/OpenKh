@@ -1,3 +1,4 @@
+KHBbSFM.png
 KHHD2.5.config
 KHHD2.8.config
 arc/boss/b01cd00.arc
@@ -20438,6 +20439,11 @@ lua/TriBullet.lub
 lua/TrinityBullet.lub
 lua/TXehanort.lub
 lua/Ventus.lub
+menu/de/load_menu.l2d
+menu/en/load_menu.l2d
+menu/es/load_menu.l2d
+menu/fr/load_menu.l2d
+menu/it/load_menu.l2d
 message/de/battledice/CTbd000.ctd
 message/de/event/cd/CTcd100.ctd
 message/de/event/cd/CTcd200.ctd
