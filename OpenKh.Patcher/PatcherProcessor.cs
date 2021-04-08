@@ -123,6 +123,9 @@ namespace OpenKh.Patcher
                 case "areadatascript":
                     PatchAreaDataScript(context, assetFile.Source, stream);
                     break;
+                case "spawnpoint":
+                    PatchSpawnPoint(context, assetFile, stream);
+                    break;
                 case "listpatch":
                     PatchList(context, assetFile.Source, stream);
                     break;
@@ -283,6 +286,20 @@ namespace OpenKh.Patcher
             }
 
             Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
+        }
+
+        private static void PatchSpawnPoint(Context context, AssetFile assetFile, Stream stream)
+        {
+            if (assetFile.Source == null || assetFile.Source.Count == 0)
+                throw new Exception($"File '{assetFile.Name}' does not contain any source");
+
+            var srcFile = context.GetSourceModAssetPath(assetFile.Source[0].Name);
+            if (!File.Exists(srcFile))
+                throw new FileNotFoundException($"The mod does not contain the file {assetFile.Source[0].Name}", srcFile);
+
+            var spawnPoint = Helpers.YamlDeserialize<List<Kh2.Ard.SpawnPoint>>(File.ReadAllText(srcFile));
+
+            Kh2.Ard.SpawnPoint.Write(stream.SetPosition(0), spawnPoint);
         }
 
         private static readonly Dictionary<string, byte> characterMap = new Dictionary<string, byte>(){
