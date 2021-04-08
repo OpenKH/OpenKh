@@ -28782,6 +28782,10 @@ obj/TSURU_N_HB500.mset
 obj/TSURU_N_HB510.mset
 obj/TSURU_N_HB520.mset
 obj/TSURU_N_ZZ020.mset
+obj/us/B_CA040_HUM_OKA.mdlx
+obj/us/B_CA040_PUB.mdlx
+obj/us/B_CA040_SKL_OKA.mdlx
+obj/us/B_CA040.mdlx
 obj/W_AL000.a.fm
 obj/W_AL000.a.fr
 obj/W_AL000.a.gr
