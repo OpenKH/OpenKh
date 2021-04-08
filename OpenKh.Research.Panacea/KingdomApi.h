@@ -1,12 +1,16 @@
 #pragma once
+#include "OpenKH.h"
 
-#define BaseAddress 0xC00
-#define Axa_CFileMan_LoadFile 0x1367D0
-#define Axa_CFileMan_GetFileSize 0x1364D0
-#define Axa_AxaResourceMan_SetResourceItem 0x139630
-#define Axa_PackageMan_GetFileInfo 0x136A10
+enum KingdomApiFunction
+{
+    Axa_CFileMan_LoadFile,
+    Axa_CFileMan_GetFileSize,
+    Axa_AxaResourceMan_SetResourceItem,
+    Axa_PackageMan_GetFileInfo,
+    KingdomApiFunction_END
+};
 
-#define PFNDEF(RETURN_TYPE, NAME, ARGS) \
+#define PFN_DECLARE(RETURN_TYPE, NAME, ARGS) \
 	typedef RETURN_TYPE (__cdecl * PFN_##NAME)ARGS; \
     extern PFN_##NAME pfn_##NAME
 
@@ -50,7 +54,7 @@ namespace Axa
     };
 }
 
-PFNDEF(long, Axa_CFileMan_LoadFile, (Axa::CFileMan* _this, const char* filename, void* addr, bool useHdAsset));
-PFNDEF(long, Axa_CFileMan_GetFileSize, (Axa::CFileMan* _this, const char* filename, int mode));
-PFNDEF(long, Axa_AxaResourceMan_SetResourceItem, (const char* filename));
-PFNDEF(Axa::PackageMan::Unk*, Axa_PackageMan_GetFileInfo, (const char* filename, int mode));
+PFN_DECLARE(long, Axa_CFileMan_LoadFile, (Axa::CFileMan* _this, const char* filename, void* addr, bool useHdAsset));
+PFN_DECLARE(long, Axa_CFileMan_GetFileSize, (Axa::CFileMan* _this, const char* filename, int mode));
+PFN_DECLARE(long, Axa_AxaResourceMan_SetResourceItem, (const char* filename));
+PFN_DECLARE(Axa::PackageMan::Unk*, Axa_PackageMan_GetFileInfo, (const char* filename, int mode));

@@ -2,9 +2,10 @@
 #include <windows.h>
 #include <cstdio>
 #include <cassert>
+#include "OpenKH.h"
 
-FILE* fConsole = nullptr;
-void Hook();
+FILE* fConsoleStdout = nullptr;
+FILE* fConsoleStderr = nullptr;
 
 BOOL APIENTRY DllMain(
     HMODULE hModule,
@@ -16,16 +17,18 @@ BOOL APIENTRY DllMain(
     case DLL_PROCESS_ATTACH:
 #ifdef _DEBUG
         AllocConsole();
-        fConsole = freopen("CONOUT$", "w", stdout);
+        fConsoleStdout = freopen("CONOUT$", "w", stdout);
+        fConsoleStderr = freopen("CONOUT$", "w", stderr);
 #endif
-        Hook();
+        OpenKH::Initialize();
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
         break;
     case DLL_PROCESS_DETACH:
 #ifdef _DEBUG
-        fclose(fConsole);
+        fclose(fConsoleStderr);
+        fclose(fConsoleStdout);
         FreeConsole();
 #endif
         break;
@@ -42,6 +45,8 @@ extern "C" __declspec(dllexport) HRESULT APIENTRY DirectInput8Create(
     char buffer[0x100];
     
     auto initialLength = GetWindowsDirectoryA(buffer, sizeof(buffer) - sizeof(OriginalDllName) - 1);
+    assert(initialLength > 0);
+
     strcpy(buffer + initialLength, OriginalDllName);
 
     auto hModule = LoadLibraryA(buffer);
