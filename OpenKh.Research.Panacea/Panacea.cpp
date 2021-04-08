@@ -1,9 +1,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <cstdio>
-#include "Panacea.h"
 #include <cstdlib>
 #include <cassert>
+#include "Panacea.h"
 
 template <class TFunc>
 class Hook
@@ -159,7 +159,7 @@ void Panacea::Initialize()
 bool Panacea::TransformFilePath(char* strOutPath, int maxLength, const char* originalPath)
 {
     const char BaseOriginalPath[] = "C:/hd28/EPIC/juefigs/KH2ReSource/";
-    const char ModFolderPath[] = "E:\\openkh_mods\\mod";
+    const char ModFolderPath[] = "D:\\Hacking\\openkh_mods\\mod";
 
     const char* actualFileName = originalPath + sizeof(BaseOriginalPath) - 1;
     sprintf_s(strOutPath, maxLength, "%s\\%s", ModFolderPath, actualFileName);
@@ -199,7 +199,7 @@ long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename, in
     {
         auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
         if (fileinfo)
-            return fileinfo->FileSize;
+            return (long)fileinfo->FileSize;
 
         WIN32_FIND_DATAA findData;
         HANDLE handle = FindFirstFileA(filename, &findData);
