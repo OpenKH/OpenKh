@@ -148,26 +148,33 @@ Hook<TFunc>* NewHook(TFunc originalFunc, TFunc replacementFunc, const char* func
 }
 
 Hook<PFN_Axa_CFileMan_LoadFile>* Hook_Axa_CFileMan_LoadFile;
+Hook<PFN_Axa_CFileMan_GetFileSize>* Hook_Axa_CFileMan_GetFileSize;
 
 void Panacea::Initialize()
 {
     Hook_Axa_CFileMan_LoadFile = NewHook(pfn_Axa_CFileMan_LoadFile, Panacea::LoadFile, "Axa::CFileMan::LoadFile");
+    Hook_Axa_CFileMan_GetFileSize = NewHook(pfn_Axa_CFileMan_GetFileSize, Panacea::GetFileSize, "Axa::CFileMan::GetFileSize");
 }
 
-long __cdecl Panacea::LoadFile(Axa::CFileMan* _this, const char* filename, void* addr, bool unk)
+bool Panacea::TransformFilePath(char* strOutPath, int maxLength, const char* originalPath)
 {
     const char BaseOriginalPath[] = "C:/hd28/EPIC/juefigs/KH2ReSource/";
     const char ModFolderPath[] = "E:\\openkh_mods\\mod";
+
+    const char* actualFileName = originalPath + sizeof(BaseOriginalPath) - 1;
+    sprintf_s(strOutPath, maxLength, "%s\\%s", ModFolderPath, actualFileName);
+
+    return GetFileAttributesA(strOutPath) != INVALID_FILE_ATTRIBUTES;
+}
+
+long __cdecl Panacea::LoadFile(Axa::CFileMan* _this, const char* filename, void* addr, bool useHdAsset)
+{
     char path[MAX_PATH];
-
-    const char* actualFileName = filename + sizeof(BaseOriginalPath) - 1;
-    sprintf_s(path, "%s\\%s", ModFolderPath, actualFileName);
-
-    if (GetFileAttributesA(path) == INVALID_FILE_ATTRIBUTES)
+    if (!TransformFilePath(path, sizeof(path), filename))
     {
-        auto ret = Hook_Axa_CFileMan_LoadFile->Unpatch()(_this, filename, addr, unk);
+        printf("%s\n", filename);
+        auto ret = Hook_Axa_CFileMan_LoadFile->Unpatch()(_this, filename, addr, useHdAsset);
         Hook_Axa_CFileMan_LoadFile->Patch();
-        printf("LoadFile(\"%s\", %p, %i): %i\n", filename, addr, unk, ret);
         return ret;
     }
 
@@ -183,3 +190,32 @@ long __cdecl Panacea::LoadFile(Axa::CFileMan* _this, const char* filename, void*
     return length;
 }
 
+long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename, int mode)
+{
+    const int FileNotFound = 0;
+    char path[MAX_PATH];
+
+    if (!TransformFilePath(path, sizeof(path), filename))
+    {
+        auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
+        if (fileinfo)
+            return fileinfo->FileSize;
+
+        WIN32_FIND_DATAA findData;
+        HANDLE handle = FindFirstFileA(filename, &findData);
+        if (handle != INVALID_HANDLE_VALUE)
+        {
+            CloseHandle(handle);
+            return findData.nFileSizeLow;
+        }
+
+        return FileNotFound;
+    }
+
+    FILE* file = fopen(path, "rb");
+    fseek(file, 0, SEEK_END);
+    auto length = ftell(file);
+    fclose(file);
+
+    return length;
+}

@@ -43,7 +43,6 @@ extern "C" __declspec(dllexport) HRESULT APIENTRY DirectInput8Create(
     
     auto initialLength = GetWindowsDirectoryA(buffer, sizeof(buffer) - sizeof(OriginalDllName) - 1);
     strcpy(buffer + initialLength, OriginalDllName);
-    printf(buffer);
 
     auto hModule = LoadLibraryA(buffer);
     assert(hModule != nullptr);
