@@ -7,14 +7,8 @@
 #include "KingdomApi.h"
 #include "Panacea.h"
 
-#define PFN_DEFINE(NAME) PFN_##NAME pfn_##NAME
-
 const long BaseAddress = 0xC00;
 HINSTANCE g_hInstance;
-PFN_DEFINE(Axa_CFileMan_LoadFile);
-PFN_DEFINE(Axa_CFileMan_GetFileSize);
-PFN_DEFINE(Axa_AxaResourceMan_SetResourceItem);
-PFN_DEFINE(Axa_PackageMan_GetFileInfo);
 
 static const long KingdomApi_KH2[KingdomApiFunction_END] =
 {
@@ -24,12 +18,20 @@ static const long KingdomApi_KH2[KingdomApiFunction_END] =
     0x136A10,
 };
 
+static const long KingdomApi_BBS[KingdomApiFunction_END] =
+{
+    0,
+    0x4BB810,
+    0x524CA0,
+    0x4BBD50,
+};
+
 static const long* KingdomApiOffsets[(int)OpenKH::GameId::END]
 {
     nullptr,
     KingdomApi_KH2,
     nullptr,
-    nullptr,
+    KingdomApi_BBS,
     nullptr,
 };
 
@@ -83,8 +85,19 @@ void OpenKH::Main()
 
 OpenKH::GameId OpenKH::DetectGame()
 {
+    const char* DetectedFmt = "%s detected.\n";
     if (strcmp((const char*)g_hInstance + 0x2BD2090, "dummy_string") == 0)
+    {
+        fprintf(stdout, DetectedFmt, "Kingdom Hearts II");
         return GameId::KingdomHearts2;
+    }
+    if (strcmp((const char*)g_hInstance + 0x11165090, "dummy_string") == 0)
+    {
+        fprintf(stdout, DetectedFmt, "Kingdom Hearts Birth By Sleep");
+        Hook(pfn_Bbs_File_load, Bbs_File_load);
+        Hook(pfn_Bbs_CRsrcData_loadCallback, Bbs_CRsrcData_loadCallback);
+        return GameId::KingdomHeartsBbs;
+    }
 
     return GameId::Unknown;
 }
