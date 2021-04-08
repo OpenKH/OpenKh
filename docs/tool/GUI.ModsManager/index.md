@@ -17,11 +17,11 @@ The mod.yml file is a YAML format specification for your mod. It will contain th
 * `description` - A description of what your mod does
 * `originalAuthor` - The name of the original author who created this mod. If you just ported this mod to the modsmanager for someone else, include the original authors name.
 * `logo` - The path to the icon.png
-* `assets` - A list of assets that will be modified when the mod runs. See `asset types`, for details on creating an asset.
+* `assets` - A list of assets that will be modified when the mod runs. See `asset types`, for details on creating an asset. Some asset types will work on any game, while others are game specific.
 
 ## Asset Methods
 
-* `copy` - Performs a direct copy to overwrite a file. Works on any file type.
+* `copy` (any game) - Performs a direct copy to overwrite a file. Works on any file type.
 
 Asset Example: 
 
@@ -32,7 +32,7 @@ Asset Example:
   - name: files/modified_msn.bar
 ```
 
-* `binarc` - Specifies a modification to a subfile within a binarc, using one of the available methods. See `binarc methods` for details on implementing a specific method.
+* `binarc` (KH2, BBS, DDD) - Specifies a modification to a subfile within a binarc, using one of the available methods. See `binarc methods` for details on implementing a specific method.
 
 Asset Example
 
@@ -49,7 +49,7 @@ Asset Example
 
 ## Binarc Methods
 
-* `copy` - Performs a copy on a supfile within a Bar. Must be one of the [following](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Tools.BarEditor/Helpers.cs#L14) types
+* `copy` (KH2, BBS) - Performs a copy on a supfile within a Bar. Must be one of the [following](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Tools.BarEditor/Helpers.cs#L14) types
 
 Asset Example
 
@@ -64,7 +64,7 @@ Asset Example
     type: Bdx
 ```
 
-* `imgd` - Replaces a single imgd found within a binarc
+* `imgd` (KH2) - Replaces a single imgd found within a binarc
 
 Asset Example
 
@@ -83,7 +83,7 @@ Asset Example
             highdef: title/title1_hd.png
 ```
 
-* // `imgz` // `fac`- Replaces multiple imgd's found within a binarc. 
+* // `imgz` // `fac` (KH2) - Replaces multiple imgd's found within a binarc. 
 
 Asset Example
 
@@ -109,7 +109,7 @@ Asset Example
             index: 1
 ```
 
-* `kh2msg` - Replaces text found within a kh2 messages file. Uses a yaml file as an source.
+* `kh2msg` (KH2) - Replaces text found within a kh2 messages file. Uses a yaml file as an source.
 
 Asset Example
 
@@ -137,7 +137,7 @@ Yaml Source Example
   jp: OPENKHすばらしい!
 ```
 
-* `areadatascript` - Modifies a series programs found within a KH2 Spawnscript subfile (located within ard files), using the text format created by OpenKh.Command.SpawnScript. You can only provide a subset of the programs found within the spawnscript, the others will be taken from the original file.
+* `areadatascript` (KH2) - Modifies a series programs found within a KH2 Spawnscript subfile (located within ard files), using the text format created by OpenKh.Command.SpawnScript. You can only provide a subset of the programs found within the spawnscript, the others will be taken from the original file.
 
 Asset Example
 ```
@@ -164,7 +164,7 @@ AreaSettings 0 -1
 	SetPartyMenu 0
 ```
 
-* `areadataspawn` - Modifies a KH2 Spawnpoint subfile (located within ard files), using an yaml file created using OpenKh.Command.SpawnScript.
+* `areadataspawn` (KH2) - Modifies a KH2 Spawnpoint subfile (located within ard files), using an yaml file created using OpenKh.Command.SpawnScript.
 
 Asset Example
 
@@ -179,7 +179,7 @@ Asset Example
     type: AreaDataSpawn
 ```
 
-* `listpatch` - Can modify the following different types of list binaries found within KH2.
+* `listpatch` (KH2) - Can modify the following different types of list binaries found within KH2.
  * `trsr`
  * `item`
  * `fmlv`
