@@ -38,6 +38,14 @@ static const long KingdomApi_BBS[KingdomApiFunction_END] =
     0x4BBD50,
 };
 
+static const long KingdomApi_BBS[KingdomApiFunction_END] =
+{
+    0,
+    0x4BB810,
+    0x524CA0,
+    0x4BBD50,
+};
+
 static const long* KingdomApiOffsets[(int)OpenKH::GameId::END]
 {
     nullptr,

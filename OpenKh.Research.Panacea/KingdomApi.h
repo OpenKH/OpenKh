@@ -116,6 +116,20 @@ namespace Bbs
     };
 }
 
+namespace Bbs
+{
+    namespace File
+    {
+        size_t load(const char* pszPath, long long a2);
+    }
+
+    class CRsrcData
+    {
+    public:
+        void loadCallback(unsigned int* pMem, size_t size, unsigned int* pArg, int nOpt);
+    };
+}
+
 PFN_DECLARE(long, Axa_CFileMan_LoadFile, (Axa::CFileMan* _this, const char* filename, void* addr, bool useHdAsset));
 PFN_DECLARE(void*, Axa_CFileMan_LoadFileWithMalloc, (Axa::CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char* filename2));
 PFN_DECLARE(long, Axa_CFileMan_GetFileSize, (Axa::CFileMan* _this, const char* filename));
