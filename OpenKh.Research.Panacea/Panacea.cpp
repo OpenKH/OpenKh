@@ -143,17 +143,23 @@ public:
 template <typename TFunc>
 Hook<TFunc>* NewHook(TFunc originalFunc, TFunc replacementFunc, const char* functionName)
 {
-    // this function circumnavigates a very weird compilation error I could not find a fix for.
+    if (originalFunc == nullptr)
+        return nullptr;
+
     return new Hook<TFunc>(originalFunc, replacementFunc, functionName);
 }
 
 Hook<PFN_Axa_CFileMan_LoadFile>* Hook_Axa_CFileMan_LoadFile;
 Hook<PFN_Axa_CFileMan_GetFileSize>* Hook_Axa_CFileMan_GetFileSize;
+Hook<PFN_Bbs_File_load>* Hook_Bbs_File_load;
+Hook<PFN_Bbs_CRsrcData_loadCallback>* Hook_CRsrcData_loadCallback;
 
 void Panacea::Initialize()
 {
     Hook_Axa_CFileMan_LoadFile = NewHook(pfn_Axa_CFileMan_LoadFile, Panacea::LoadFile, "Axa::CFileMan::LoadFile");
     Hook_Axa_CFileMan_GetFileSize = NewHook(pfn_Axa_CFileMan_GetFileSize, Panacea::GetFileSize, "Axa::CFileMan::GetFileSize");
+    Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
+    Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
 }
 
 bool Panacea::TransformFilePath(char* strOutPath, int maxLength, const char* originalPath)
@@ -195,6 +201,7 @@ long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename, in
     const int FileNotFound = 0;
     char path[MAX_PATH];
 
+    fprintf(stdout, "%s\n", filename);
     if (!TransformFilePath(path, sizeof(path), filename))
     {
         auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
@@ -218,4 +225,20 @@ long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename, in
     fclose(file);
 
     return length;
+}
+
+size_t __cdecl Panacea::BbsFileLoad(const char* filename, long long a2)
+{
+    fprintf(stdout, "File::load: %s\n", filename);
+    auto ret = Hook_Bbs_File_load->Unpatch()(filename, a2);
+    Hook_Bbs_File_load->Patch();
+
+    return ret;
+}
+
+void __cdecl Panacea::BbsCRsrcDataloadCallback(unsigned int* pMem, size_t size, unsigned int* pArg, int nOpt)
+{
+    fprintf(stdout, "CRsrcData::loadCallback(0x%p, %lli, 0x%p, %i)\n", pMem, size, pArg, nOpt);
+    Hook_CRsrcData_loadCallback->Unpatch()(pMem, size, pArg, nOpt);
+    Hook_CRsrcData_loadCallback->Patch();
 }
