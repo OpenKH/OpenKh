@@ -69,10 +69,15 @@ namespace OpenKh.Egs
         {
             var entry = _entries[assetName];
             var dataLength = entry.CompressedLength >= 0 ? entry.CompressedLength : entry.DecompressedLength;
+            if (dataLength % 16 != 0)
+                dataLength += 16 - (dataLength % 16);
             var data = _stream.AlignPosition(0x10).ReadBytes(dataLength);
 
             for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
+            {
                 EgsEncryption.DecryptChunk(_key, data, i, PassCount);
+            }
+                
 
             if (entry.CompressedLength >= 0)
             {
