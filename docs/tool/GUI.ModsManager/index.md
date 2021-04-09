@@ -32,7 +32,7 @@ Asset Example:
   - name: files/modified_msn.bar
 ```
 
-* `binarc` (KH2, BBS, DDD) - Specifies a modification to a subfile within a binarc, using one of the available methods. See `binarc methods` for details on implementing a specific method.
+* `binarc` (KH2) - Specifies a modification to a subfile within a binarc, using one of the available methods. See `binarc methods` for details on implementing a specific method.
 
 Asset Example
 
