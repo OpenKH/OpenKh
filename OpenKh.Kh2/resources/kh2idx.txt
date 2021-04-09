@@ -14876,6 +14876,7 @@ file/us/tt_my.2ld
 file/us/tt_pt.2ld
 file/us/wi_bo.2ld
 file/us/wm_ws.2ld
+GHelpText.bin
 gm_ps.2ld
 gumibattle/abilityparam.bin
 gumibattle/advice.bin
@@ -19301,6 +19302,7 @@ menu/us/title.2ld
 menu/us/titlejf.2ld
 mg_heft.2ld
 mg_lm_mu.2ld
+MHelpText.bin
 minigame/al_14.bar
 minigame/eh_22.bar
 minigame/po_06.bar
@@ -31911,6 +31913,7 @@ se/wave3301.wd
 se/wave3302.wd
 se/wave3303.wd
 se/wave3304.wd
+THelpText.bin
 tr_cy.2ld
 tr_tm.2ld
 tt_my.2ld
