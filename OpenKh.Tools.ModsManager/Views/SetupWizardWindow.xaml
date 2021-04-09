@@ -32,13 +32,14 @@
             Title="Game edition"
             CanSelectNextPage="{Binding IsGameSelected}"
             Description="Selected the preferred edition to launch the game"
-            NextPage="{Binding ElementName=PageIsoSelection}">
+            NextPage="{Binding ElementName=PageIsoSelection}"
+            CanFinish="{Binding IsEpicGamesRelease}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
                 <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
                     <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
                     <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
-                    <ComboBoxItem Visibility="Hidden">PC release via Epic Game store</ComboBoxItem>
+                    <ComboBoxItem>PC release via Epic Game store</ComboBoxItem>
                 </ComboBox>
                 <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
                     <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
@@ -69,7 +70,7 @@
                     <TextBlock Margin="0 0 0 3">NOTE: Only PCSX2 up to 1.6.0 and PCSX2-EX are supported.</TextBlock>
                 </StackPanel>
                 <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
-                    <TextBlock Margin="0 0 0 3">Please select the location of the PC release</TextBlock>
+                    <TextBlock Margin="0 0 0 3">Please select the folder location of the PC release</TextBlock>
                     <Grid Margin="0 0 0 3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -95,7 +96,7 @@
                 <TextBlock>Supported games:</TextBlock>
                 <StackPanel Margin="10 3 0 10">
                     <TextBlock>Kingdom Hearts I (Final Mix)</TextBlock>
-                    <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix)</TextBlock>
+                    <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix, PC)</TextBlock>
                 </StackPanel>
                 <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO image</TextBlock>
                 <Grid Margin="0 0 0 3">
