@@ -14364,8 +14364,6 @@ event/layout/lm_404s_2.2ld
 event/layout/lm_404s_3.2ld
 event/layout/lm_411s_1.2ld
 event/layout/lm_telop.2ld
-event/layout/lm_telop.2ld
-event/layout/lm_telop.2ld
 event/layout/mu_104s_1.2ld
 event/layout/mu_104s_2.2ld
 event/layout/mu_104s_3.2ld
@@ -14403,10 +14401,6 @@ event/layout/tt_502s_1.2ld
 event/layout/tt_505s_1.2ld
 event/layout/tt_600s_1.2ld
 event/layout/tt_khend.2ld
-event/layout/tt_khend.2ld
-event/layout/tt_khend.2ld
-event/layout/tt_telop.2ld
-event/layout/tt_telop.2ld
 event/layout/tt_telop.2ld
 event/layout/us/lm_telop.2ld
 event/layout/us/tt_khend.2ld
@@ -14415,6 +14409,7 @@ event/layout/wi_104s_1.2ld
 event/layout/wi_104s_2.2ld
 event/layout/wi_113s_1.2ld
 eventviewer.bar
+F9F32B1A2683721DADF1E72F88A416B0.png
 field2d/fr/al0command.2dd
 field2d/fr/al0field.2dd
 field2d/fr/bb0command.2dd
@@ -14876,6 +14871,7 @@ file/us/tt_my.2ld
 file/us/tt_pt.2ld
 file/us/wi_bo.2ld
 file/us/wm_ws.2ld
+GHelpText.bin
 gm_ps.2ld
 gumibattle/abilityparam.bin
 gumibattle/advice.bin
@@ -17771,6 +17767,7 @@ menu/fr/at_020_s.bar
 menu/fr/at_030_s.bar
 menu/fr/camp.2ld
 menu/fr/ending.2ld
+menu/fr/eventviewer.2ld
 menu/fr/itemshop.2ld
 menu/fr/jiminy.bar
 menu/fr/jm_photo/al11.bin
@@ -17991,6 +17988,7 @@ menu/gr/at_020_s.bar
 menu/gr/at_030_s.bar
 menu/gr/camp.2ld
 menu/gr/ending.2ld
+menu/gr/eventviewer.2ld
 menu/gr/itemshop.2ld
 menu/gr/jiminy.bar
 menu/gr/jm_photo/al11.bin
@@ -18211,6 +18209,7 @@ menu/it/at_020_s.bar
 menu/it/at_030_s.bar
 menu/it/camp.2ld
 menu/it/ending.2ld
+menu/it/eventviewer.2ld
 menu/it/itemshop.2ld
 menu/it/jiminy.bar
 menu/it/jm_photo/al11.bin
@@ -18654,6 +18653,7 @@ menu/sp/at_020_s.bar
 menu/sp/at_030_s.bar
 menu/sp/camp.2ld
 menu/sp/ending.2ld
+menu/sp/eventviewer.2ld
 menu/sp/itemshop.2ld
 menu/sp/jiminy.bar
 menu/sp/jm_photo/al11.bin
@@ -19094,6 +19094,7 @@ menu/us/at_020_s.bar
 menu/us/at_030_s.bar
 menu/us/camp.2ld
 menu/us/ending.2ld
+menu/us/eventviewer.2ld
 menu/us/itemshop.2ld
 menu/us/jiminy.bar
 menu/us/jm_photo/al11.bin
@@ -19301,6 +19302,7 @@ menu/us/title.2ld
 menu/us/titlejf.2ld
 mg_heft.2ld
 mg_lm_mu.2ld
+MHelpText.bin
 minigame/al_14.bar
 minigame/eh_22.bar
 minigame/po_06.bar
@@ -31911,6 +31913,7 @@ se/wave3301.wd
 se/wave3302.wd
 se/wave3303.wd
 se/wave3304.wd
+THelpText.bin
 tr_cy.2ld
 tr_tm.2ld
 tt_my.2ld
