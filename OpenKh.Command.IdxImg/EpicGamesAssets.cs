@@ -21,44 +21,15 @@ namespace OpenKh.Command.IdxImg
          Subcommand(typeof(ListCommand))]
         private class EpicGamesAssets
         {
-            private static readonly IEnumerable<string> KH2Names = IdxName.Names
-                .Concat(IdxName.Names.Where(x => x.Contains("anm/")).SelectMany(x => new string[]
-                {
-                    x.Replace("anm/", "anm/jp/"),
-                    x.Replace("anm/", "anm/us/"),
-                    x.Replace("anm/", "anm/fm/")
-                }))
-                .Concat(Kh2.Constants.Languages.SelectMany(lang =>
-                    Kh2.Constants.WorldIds.SelectMany(world =>
-                        Enumerable.Range(0, 64).Select(index => Path.Combine("ard", lang).Replace('\\', '/') + $"/{world}{index:D02}.ard"))))
-                .Concat(Kh2.Constants.Languages.SelectMany(lang =>
-                    Kh2.Constants.WorldIds.SelectMany(world =>
-                        Enumerable.Range(0, 64).Select(index => Path.Combine("map", lang).Replace('\\', '/') + $"/{world}{index:D02}.map"))))
-                .Concat(Kh2.Constants.Languages.SelectMany(lang =>
-                    Kh2.Constants.WorldIds.SelectMany(world =>
-                        Enumerable.Range(0, 64).Select(index => Path.Combine("map", lang).Replace('\\', '/') + $"/{world}{index:D02}.bar"))))
-                .Concat(IdxName.Names.Where(x => x.StartsWith("bgm/")).Select(x => x.Replace(".bgm", ".win32.scd")))
-                .Concat(IdxName.Names.Where(x => x.StartsWith("se/")).Select(x => x.Replace(".seb", ".win32.scd")))
-                .Concat(IdxName.Names.Where(x => x.StartsWith("vagstream/")).Select(x => x.Replace(".vas", ".win32.scd")))
-                .Concat(IdxName.Names.Where(x => x.StartsWith("voice/")).Select(x => x
-                    .Replace(".vag", ".win32.scd")
-                    .Replace(".vsb", ".win32.scd")))
-                .Concat(new string[]
-                {
-                    "item-011.imd",
-                    "KH2.IDX",
-                    "ICON/ICON0.PNG",
-                    "ICON/ICON0_EN.png",
-                });
-            private static readonly Dictionary<string, string> Names = KH2Names
-                .Concat(Idx1Name.Names)
-                .Concat(EgsHdAsset.DddNames)
-                .Concat(EgsHdAsset.BbsNames)
-                .Concat(EgsHdAsset.RecomNames)
+            private static readonly Dictionary<string, string> Names = EgsHdAsset.BbsNames
+                .Concat(EgsHdAsset.Kh1Names)
+                .Concat(EgsHdAsset.Kh2Names)
+                .Concat(EgsHdAsset.Kh3dNames)
+                .Concat(EgsHdAsset.Launcher28Names)
                 .Concat(EgsHdAsset.MareNames)
-                .Concat(EgsHdAsset.SettingMenuNames)
+                .Concat(EgsHdAsset.RecomNames)
+                .Concat(EgsHdAsset.SettingsMenuNames)
                 .Concat(EgsHdAsset.TheaterNames)
-                .Concat(EgsHdAsset.Kh1AdditionalNames)
                 .Distinct()
                 .ToDictionary(x => ToString(MD5.HashData(Encoding.UTF8.GetBytes(x))), x => x);
 

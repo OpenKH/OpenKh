@@ -28,13 +28,15 @@ namespace OpenKh.Egs
         }
 
         private static readonly string ResourcePath = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources");
-        public static string[] DddNames = File.ReadAllLines(Path.Combine(ResourcePath, "ddd.txt"));
-        public static string[] MareNames = File.ReadAllLines(Path.Combine(ResourcePath, "mare.txt"));
-        public static string[] SettingMenuNames = File.ReadAllLines(Path.Combine(ResourcePath, "settingmenu.txt"));
-        public static string[] TheaterNames = File.ReadAllLines(Path.Combine(ResourcePath, "theater.txt"));
-        public static string[] RecomNames = File.ReadAllLines(Path.Combine(ResourcePath, "recom.txt"));
         public static string[] BbsNames = File.ReadAllLines(Path.Combine(ResourcePath, "bbs.txt"));
-        public static string[] Kh1AdditionalNames = File.ReadAllLines(Path.Combine(ResourcePath, "kh1pc.txt"));
+        public static string[] Kh1Names = File.ReadAllLines(Path.Combine(ResourcePath, "kh1.txt"));
+        public static string[] Kh2Names = File.ReadAllLines(Path.Combine(ResourcePath, "kh2.txt"));
+        public static string[] Kh3dNames = File.ReadAllLines(Path.Combine(ResourcePath, "kh3d.txt"));
+        public static string[] Launcher28Names = File.ReadAllLines(Path.Combine(ResourcePath, "launcher28.txt"));
+        public static string[] MareNames = File.ReadAllLines(Path.Combine(ResourcePath, "mare.txt"));
+        public static string[] RecomNames = File.ReadAllLines(Path.Combine(ResourcePath, "recom.txt"));
+        public static string[] SettingsMenuNames = File.ReadAllLines(Path.Combine(ResourcePath, "settings_menu.txt"));
+        public static string[] TheaterNames = File.ReadAllLines(Path.Combine(ResourcePath, "theater.txt"));
 
         private const int PassCount = 10;
         private readonly Stream _stream;
