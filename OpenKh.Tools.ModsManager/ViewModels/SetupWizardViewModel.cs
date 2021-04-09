@@ -79,14 +79,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get
             {
-                var location = GameEdition switch
+                switch (GameEdition)
                 {
-                    0 => OpenKhGameEngineLocation,
-                    1 => Pcsx2Location,
-                    2 => PcReleaseLocation,
-                    _ => string.Empty,
-                };
-                return !string.IsNullOrEmpty(location) && File.Exists(location);
+                    case 0:
+                        return !string.IsNullOrEmpty(OpenKhGameEngineLocation) && File.Exists(OpenKhGameEngineLocation);
+                    case 1:
+                        return !string.IsNullOrEmpty(Pcsx2Location) && File.Exists(Pcsx2Location);
+                    case 2:
+                        return !string.IsNullOrEmpty(PcReleaseLocation) &&
+                            Directory.Exists(PcReleaseLocation) &&
+                            File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll"));
+                    default:
+                        return false;
+                }
             }
         }
         public int GameEdition
@@ -100,8 +105,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(OpenKhGameEngineConfigVisibility));
                 OnPropertyChanged(nameof(Pcsx2ConfigVisibility));
                 OnPropertyChanged(nameof(PcReleaseConfigVisibility));
+                OnPropertyChanged(nameof(IsEpicGamesRelease));
             }
         }
+        public bool IsEpicGamesRelease => GameEdition == 2;
 
         public RelayCommand SelectOpenKhGameEngineCommand { get; }
         public Visibility OpenKhGameEngineConfigVisibility => GameEdition == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -176,6 +183,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 FileDialog.OnOpen(fileName => OpenKhGameEngineLocation = fileName, _openkhGeFilter));
             SelectPcsx2Command = new RelayCommand(_ =>
                 FileDialog.OnOpen(fileName => Pcsx2Location = fileName, _pcsx2Filter));
+            SelectPcReleaseCommand = new RelayCommand(_ =>
+                FileDialog.OnFolder(path => PcReleaseLocation = path));
             SelectGameDataLocationCommand = new RelayCommand(_ =>
                 FileDialog.OnFolder(path => GameDataLocation = path));
             ExtractGameDataCommand = new RelayCommand(async _ =>

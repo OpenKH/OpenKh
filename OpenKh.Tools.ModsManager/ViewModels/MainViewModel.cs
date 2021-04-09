@@ -313,7 +313,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 default:
-                    processStartInfo = null;
+                    Log.Info("Starting Kingdom Hearts II: Final Mix");
+                    processStartInfo = new ProcessStartInfo
+                    {
+                        FileName = Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
+                        WorkingDirectory = ConfigurationService.PcReleaseLocation,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                    };
+                    // TODO copy OpenKh.Research.Panacea.dll as DINPUT8.dll
                     break;
             }
 
