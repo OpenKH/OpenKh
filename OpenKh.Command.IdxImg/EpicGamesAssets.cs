@@ -113,7 +113,7 @@ namespace OpenKh.Command.IdxImg
                     {
                         var hash = EpicGamesAssets.ToString(entry.MD5);
                         if (!Names.TryGetValue(hash, out var fileName))
-                            fileName = hash;
+                            fileName = $"{hash}.dat";
 
                         var outputFileName = Path.Combine(outputDir, fileName);
                         if (DoNotExtractAgain && File.Exists(outputFileName))
@@ -129,7 +129,7 @@ namespace OpenKh.Command.IdxImg
 
                         foreach (var asset in hdAsset.Assets)
                         {
-                            var outputFileNameRemastered = outputFileName + asset;
+                            var outputFileNameRemastered = Path.Combine(Path.ChangeExtension(outputFileName, null), asset);
                             Console.WriteLine(outputFileNameRemastered);
                             CreateDirectoryForFile(outputFileNameRemastered);
 
@@ -159,11 +159,11 @@ namespace OpenKh.Command.IdxImg
                     using var hedStream = File.OpenRead(InputHed);
                     var entries = Hed.Read(hedStream);
 
-                    foreach(var entry in entries)
+                    foreach (var entry in entries)
                     {
                         var hash = EpicGamesAssets.ToString(entry.MD5);
                         if (!Names.TryGetValue(hash, out var fileName))
-                            fileName = hash;
+                            fileName = $"{hash}.dat";
 
                         Console.WriteLine(fileName);
                     }
