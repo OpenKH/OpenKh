@@ -64105,4 +64105,3 @@ sound/win/voice/jp/event/yt/1yt40201aq0.win32.scd
 sound/win/voice/jp/event/yt/1yt40202aq0.win32.scd
 sound/win/voice/jp/event/yt/1yt40203aq0.win32.scd
 sound/win/voice/jp/event/yt/1yt40204aq0.win32.scd
-
