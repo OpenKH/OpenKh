@@ -17,4 +17,3 @@ sp/l2d/win_count.l2d
 uk/l2d/calibration.l2d
 uk/l2d/setting_1525.l2d
 uk/l2d/win_count.l2d
-
