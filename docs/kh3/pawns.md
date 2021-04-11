@@ -366,7 +366,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex319 | Demyx
 | e_ex320 | Luxord (Hooded)
 | e_ex321 | Hooded Organization Member 
-| e_ex322 | Darqua (Dark Aqua)
+| e_ex322 | Anti-Aqua
 | e_ex323 | Xigbar Arm
 | e_ex324 | Xigbar Arm (?)
 | e_ex325 | Terra-Xehanort
@@ -397,7 +397,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex359 | Xion (LimitCut)
 | e_ex360 | Vanitas (LimitCut)
 | e_ex361 | Dark Riku (LimitCut)
-| e_ex362 | Terranort (LimitCut)
+| e_ex362 | Terra-Xehanort (LimitCut)
 | e_ex367 | Master Xehanort (LimitCut)
 
 | e_ex407 | Darkside
