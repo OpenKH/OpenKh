@@ -77,6 +77,32 @@ namespace OpenKh.Command.IdxImg
                 return sb.ToString();
             }
 
+            public static byte[] ToBytes(string hex)
+            {
+                return Enumerable.Range(0, hex.Length)
+                                 .Where(x => x % 2 == 0)
+                                 .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                                 .ToArray();
+            }
+
+            public static string CreateMD5(string input)
+            {
+                // Use input string to calculate MD5 hash
+                using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+                {
+                    byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                    byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                    // Convert the byte array to hexadecimal string
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < hashBytes.Length; i++)
+                    {
+                        sb.Append(hashBytes[i].ToString("X2"));
+                    }
+                    return sb.ToString();
+                }
+            }
+
             private class ExtractCommand
             {
                 [Required]
@@ -163,14 +189,14 @@ namespace OpenKh.Command.IdxImg
                     foreach (var file in files)
                     {
                         var filename = file.Replace($"{inputFolder}\\", "").Replace("\\", "/");
-                        var md5 = StringToByteArray(CreateMD5(filename));
+                        var hash = CreateMD5(filename);
                         var fileStream = File.OpenRead(file);
                         var fileSize = (int)fileStream.Length;
 
                         // Write HED entry for the current file
                         var hedEntry = new Hed.Entry()
                         {
-                            MD5 = md5,
+                            MD5 = ToBytes(hash),
                             Offset = offset,
                             DataLength = fileSize + 0x10,
                             ActualLength = fileSize,
@@ -186,6 +212,13 @@ namespace OpenKh.Command.IdxImg
                             RemasteredAssetCount = 0,
                             Unknown0c = 0
                         };
+
+                        // Is it an HD assets?
+                        if (filename.Contains('-'))
+                        {
+                            var split = filename.Split('-');
+
+                        }
 
                         // The seed used for encryption is the data header
                         var seed = new MemoryStream();
@@ -210,32 +243,6 @@ namespace OpenKh.Command.IdxImg
                     Console.WriteLine($"Output HED file location: {outputHedFile}");
                     Console.WriteLine($"Output PKG file location: {outputPkgFile}");
                 }
-            }
-
-            public static string CreateMD5(string input)
-            {
-                // Use input string to calculate MD5 hash
-                using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
-                {
-                    byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-                    byte[] hashBytes = md5.ComputeHash(inputBytes);
-
-                    // Convert the byte array to hexadecimal string
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < hashBytes.Length; i++)
-                    {
-                        sb.Append(hashBytes[i].ToString("X2"));
-                    }
-                    return sb.ToString();
-                }
-            }
-
-            public static byte[] StringToByteArray(string hex)
-            {
-                return Enumerable.Range(0, hex.Length)
-                                 .Where(x => x % 2 == 0)
-                                 .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
-                                 .ToArray();
             }
 
             //private class ListCommand
