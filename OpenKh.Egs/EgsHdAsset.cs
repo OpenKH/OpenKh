@@ -18,7 +18,7 @@ namespace OpenKh.Egs
             [Data] public int Unknown0c { get; set; }
         }
 
-        private class RemasteredEntry
+        public class RemasteredEntry
         {
             [Data(Count = 0x20)] public string Name { get; set; }
             [Data] public int Offset { get; set; }
