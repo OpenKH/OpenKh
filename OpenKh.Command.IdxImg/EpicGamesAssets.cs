@@ -40,6 +40,7 @@ namespace OpenKh.Command.IdxImg
                 .Concat(IdxName.Names.Where(x => x.StartsWith("bgm/")).Select(x => x.Replace(".bgm", ".win32.scd")))
                 .Concat(IdxName.Names.Where(x => x.StartsWith("se/")).Select(x => x.Replace(".seb", ".win32.scd")))
                 .Concat(IdxName.Names.Where(x => x.StartsWith("vagstream/")).Select(x => x.Replace(".vas", ".win32.scd")))
+                .Concat(IdxName.Names.Where(x => x.StartsWith("gumibattle/se/")).Select(x => x.Replace(".seb", ".win32.scd")))
                 .Concat(IdxName.Names.Where(x => x.StartsWith("voice/")).Select(x => x
                     .Replace(".vag", ".win32.scd")
                     .Replace(".vsb", ".win32.scd")))
