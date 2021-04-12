@@ -21,9 +21,12 @@ namespace OpenKh.Command.IdxImg
         [Command("hed", Description = "Make operation on the Epic Games Store release of Kingdom Hearts"),
          Subcommand(typeof(ExtractCommand)),
          Subcommand(typeof(PackCommand)),
+         Subcommand(typeof(PatchCommand)),
          Subcommand(typeof(ListCommand))]
         private class EpicGamesAssets
         {
+            #region MD5 names
+
             private static readonly IEnumerable<string> KH2Names = IdxName.Names
                 .Concat(IdxName.Names.Where(x => x.Contains("anm/")).SelectMany(x => new string[]
                 {
@@ -53,6 +56,7 @@ namespace OpenKh.Command.IdxImg
                     "ICON/ICON0.PNG",
                     "ICON/ICON0_EN.png",
                 });
+
             private static readonly Dictionary<string, string> Names = KH2Names
                 .Concat(Idx1Name.Names)
                 .Concat(EgsHdAsset.DddNames)
@@ -66,19 +70,12 @@ namespace OpenKh.Command.IdxImg
                 .Distinct()
                 .ToDictionary(x => ToString(MD5.HashData(Encoding.UTF8.GetBytes(x))), x => x);
 
+            #endregion
+
             protected int OnExecute(CommandLineApplication app)
             {
                 app.ShowHelp();
                 return 1;
-            }
-
-            private static string ToString(byte[] data)
-            {
-                var sb = new StringBuilder(data.Length * 2);
-                for (var i = 0; i < data.Length; i++)
-                    sb.Append(data[i].ToString("X02"));
-
-                return sb.ToString();
             }
 
             private class ExtractCommand
@@ -151,6 +148,7 @@ namespace OpenKh.Command.IdxImg
                 }
             }
 
+            [Command("pack", Description = "Pack a folder in a PKG file (with its HED companion).")]
             private class PackCommand
             {
                 [Required]
@@ -203,24 +201,12 @@ namespace OpenKh.Command.IdxImg
                     var compressedData = CompressData(newFileStream.ReadAllBytes());
 
                     // Write a new entry in the HED stream
-                    var hedEntry = new Hed.Entry()
-                    {
-                        MD5 = ToBytes(newFileHash),
-                        ActualLength = (int)newFileStream.Length,
-                        DataLength = compressedData.Length + 0x10,
-                        Offset = pkgStream.Length
-                    };
+                    var hedEntry = CreateHedEntry(filename, newFileStream, compressedData, pkgStream.Length);
 
                     BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedEntry);
 
                     // Encrypt and write current file data in the PKG stream
-                    var header = new EgsHdAsset.Header()
-                    {
-                        CompressedLength = compressedData.Length,
-                        DecompressedLength = (int)newFileStream.Length,
-                        RemasteredAssetCount = 0, // TODO: Write this file using the replaced file data,
-                        Unknown0c = 0x0 // TODO: Write this field using the replaced file data
-                    };
+                    var header = CreateAssetHeader(newFileStream, compressedData, 0);
 
                     // The seed used for encryption is the data header
                     var seed = new MemoryStream();
@@ -238,50 +224,134 @@ namespace OpenKh.Command.IdxImg
 
                     return hedEntry;
                 }
+            }
 
-                #region Utils
+            [Command("patch", Description = "Replace one or multiple files in a PKG file.")]
+            private class PatchCommand
+            {
+                [Required]
+                [Argument(0, Description = "The PKG file that will be patched.")]
+                public string PkgFile { get; set; }
 
-                public static byte[] ToBytes(string hex)
+                [Required]
+                [Argument(1, Description = "Folder that contains the files to replace.")]
+                public string InputFolder { get; set; }
+
+                [Option(CommandOptionType.SingleValue, Description = "Path where the patched PKG will be dropped.", ShortName = "o", LongName = "output")]
+                public string OutputDir { get; set; }
+
+                protected int OnExecute(CommandLineApplication app)
                 {
-                    return Enumerable.Range(0, hex.Length)
-                                     .Where(x => x % 2 == 0)
-                                     .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
-                                     .ToArray();
+                    Patch(PkgFile, InputFolder, OutputDir);
+
+                    return 0;
                 }
 
-                public static string CreateMD5(string input)
+                protected void Patch(string pkgFile, string inputFolder, string outputFolder)
                 {
-                    // Use input string to calculate MD5 hash
-                    using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
-                    {
-                        byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-                        byte[] hashBytes = md5.ComputeHash(inputBytes);
+                    var outputDir = outputFolder ?? Path.GetFileNameWithoutExtension(pkgFile);
 
-                        // Convert the byte array to hexadecimal string
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < hashBytes.Length; i++)
+                    // Files to inject in the PKG
+                    var inputFiles = Directory.EnumerateFiles(inputFolder, "*.*", SearchOption.AllDirectories)
+                                              .Select(x => x.Replace($"{inputFolder}\\", "")
+                                              .Replace(@"\", "/"));
+
+                    var hedFile = Path.ChangeExtension(pkgFile, "hed");
+                    var hedStream = File.OpenRead(hedFile);
+                    var pkgStream = File.OpenRead(pkgFile);
+
+                    if (!Directory.Exists(outputDir))
+                        Directory.CreateDirectory(outputDir);
+
+                    using var patchedHedStream = File.Create(Path.Combine(outputDir, Path.GetFileName(hedFile)));
+                    using var patchedPkgStream = File.Create(Path.Combine(outputDir, Path.GetFileName(pkgFile)));
+
+                    var pkgOffset = 0L;
+
+                    foreach (var entry in Hed.Read(hedStream))
+                    {
+                        var hash = EpicGamesAssets.ToString(entry.MD5);
+
+                        if (!Names.TryGetValue(hash, out var filename))
                         {
-                            sb.Append(hashBytes[i].ToString("X2"));
+                            continue;
                         }
 
-                        return sb.ToString();
+                        // Replace the found files
+                        if (inputFiles.Contains(filename))
+                        {
+                            var seed = pkgStream.ReadBytes(0x10);
+                            var originalHeader = BinaryMapping.ReadObject<EgsHdAsset.Header>(new MemoryStream(seed));
+
+                            // Skipped the older asset data as it will be replaced
+                            var skippedData = new byte[entry.DataLength - 0x10];
+                            pkgStream.Read(skippedData, 0, entry.DataLength - 0x10);
+
+                            var fileToInject = Path.Combine(inputFolder, filename);
+                            var newHedEntry = ReplaceFile(fileToInject, patchedHedStream, patchedPkgStream, originalHeader);
+
+                            pkgOffset += newHedEntry.DataLength;
+
+                            Console.WriteLine($"Replaced file: {filename}");
+                        }
+                        // Write the original data
+                        else
+                        {
+                            entry.Offset = pkgOffset;
+
+                            BinaryMapping.WriteObject<Hed.Entry>(patchedHedStream, entry);
+
+                            var data = new byte[entry.DataLength];
+                            var dataLenght = pkgStream.Read(data, 0, entry.DataLength);
+
+                            patchedPkgStream.Write(data);
+
+                            if (dataLenght != entry.DataLength)
+                            {
+                                throw new Exception($"Error, can't read  {entry.DataLength} bytes for file {filename}. (only read {dataLenght})");
+                            }
+
+                            pkgOffset += dataLenght;
+                        }
                     }
                 }
 
-                public static byte[] CompressData(byte[] data)
+                private Hed.Entry ReplaceFile(string fileToInject, FileStream hedStream, FileStream pkgStream, EgsHdAsset.Header originalHeader)
                 {
-                    using (MemoryStream compressedStream = new MemoryStream())
-                    {
-                        var deflateStream = new ZlibStream(compressedStream, Ionic.Zlib.CompressionMode.Compress, true);
+                    var newFileStream = File.OpenRead(fileToInject);
+                    var filename = fileToInject.Replace(InputFolder, "").Replace(@"\", "/");
 
-                        deflateStream.Write(data, 0, data.Length);
-                        deflateStream.Close();
+                    var compressedData = CompressData(newFileStream.ReadAllBytes());
 
-                        return compressedStream.ReadAllBytes();
-                    }
+                    // Write a new entry in the HED stream
+                    var hedEntry = CreateHedEntry(filename, newFileStream, compressedData, pkgStream.Length);
+
+                    BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedEntry);
+
+                    // Encrypt and write current file data in the PKG stream
+                    var header = CreateAssetHeader(
+                        newFileStream, 
+                        compressedData, 
+                        0, //originalHeader.RemasteredAssetCount, => TODO: Write this file using the replaced file data
+                        originalHeader.Unknown0c
+                    );
+
+                    // The seed used for encryption is the data header
+                    var seed = new MemoryStream();
+                    BinaryMapping.WriteObject<EgsHdAsset.Header>(seed, header);
+
+                    var encryptedFileData = EgsEncryption.Encrypt(
+                        compressedData,
+                        seed.ReadAllBytes()
+                    );
+
+                    BinaryMapping.WriteObject<EgsHdAsset.Header>(pkgStream, header);
+                    pkgStream.Write(encryptedFileData);
+
+                    newFileStream.Close();
+
+                    return hedEntry;
                 }
-
-                #endregion
             }
 
             [Command("list", Description = "List the content of a HED file ")]
@@ -308,6 +378,83 @@ namespace OpenKh.Command.IdxImg
                     return 0;
                 }
             }
+
+            #region Utils
+
+            private static string ToString(byte[] data)
+            {
+                var sb = new StringBuilder(data.Length * 2);
+                for (var i = 0; i < data.Length; i++)
+                    sb.Append(data[i].ToString("X02"));
+
+                return sb.ToString();
+            }
+
+            public static byte[] ToBytes(string hex)
+            {
+                return Enumerable.Range(0, hex.Length)
+                                 .Where(x => x % 2 == 0)
+                                 .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                                 .ToArray();
+            }
+
+            public static string CreateMD5(string input)
+            {
+                // Use input string to calculate MD5 hash
+                using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+                {
+                    byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                    byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                    // Convert the byte array to hexadecimal string
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < hashBytes.Length; i++)
+                    {
+                        sb.Append(hashBytes[i].ToString("X2"));
+                    }
+
+                    return sb.ToString();
+                }
+            }
+
+            public static byte[] CompressData(byte[] data)
+            {
+                using (MemoryStream compressedStream = new MemoryStream())
+                {
+                    var deflateStream = new ZlibStream(compressedStream, Ionic.Zlib.CompressionMode.Compress, true);
+
+                    deflateStream.Write(data, 0, data.Length);
+                    deflateStream.Close();
+
+                    return compressedStream.ReadAllBytes();
+                }
+            }
+
+            public static Hed.Entry CreateHedEntry(string filename, FileStream fileStream, byte[] compressedData, long offset)
+            {
+                var fileHash = CreateMD5(filename);
+
+                return new Hed.Entry()
+                {
+                    MD5 = ToBytes(fileHash),
+                    ActualLength = (int)fileStream.Length,
+                    DataLength = compressedData.Length + 0x10, // Size of the file header
+                    Offset = offset
+                };
+            }
+
+            public static  EgsHdAsset.Header CreateAssetHeader(FileStream fileStream, byte[] compressedData, int remasteredAssetCount = 0, int unknown0c = 0x0)
+            {
+                return new EgsHdAsset.Header()
+                {
+                    CompressedLength = compressedData.Length,
+                    DecompressedLength = (int)fileStream.Length,
+                    RemasteredAssetCount = remasteredAssetCount,
+                    Unknown0c = unknown0c
+                };
+            }
+
+            #endregion
         }
     }
 }
