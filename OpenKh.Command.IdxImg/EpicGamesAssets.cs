@@ -20,6 +20,7 @@ namespace OpenKh.Command.IdxImg
         [Command("hed", Description = "Make operation on the Epic Games Store release of Kingdom Hearts"),
          Subcommand(typeof(ExtractCommand)),
          Subcommand(typeof(PackCommand))]
+         Subcommand(typeof(ListCommand))]
         private class EpicGamesAssets
         {
             private static readonly IEnumerable<string> KH2Names = IdxName.Names
@@ -53,12 +54,14 @@ namespace OpenKh.Command.IdxImg
                 });
             private static readonly Dictionary<string, string> Names = KH2Names
                 .Concat(Idx1Name.Names)
+                .Concat(EgsHdAsset.DddNames)
                 .Concat(EgsHdAsset.BbsNames)
                 .Concat(EgsHdAsset.RecomNames)
                 .Concat(EgsHdAsset.MareNames)
                 .Concat(EgsHdAsset.SettingMenuNames)
                 .Concat(EgsHdAsset.TheaterNames)
                 .Concat(EgsHdAsset.Kh1AdditionalNames)
+                .Concat(EgsHdAsset.Launcher28Names)
                 .Distinct()
                 .ToDictionary(x => ToString(MD5.HashData(Encoding.UTF8.GetBytes(x))), x => x);
 
@@ -139,20 +142,37 @@ namespace OpenKh.Command.IdxImg
                     {
                         var hash = EpicGamesAssets.ToString(entry.MD5);
                         if (!Names.TryGetValue(hash, out var fileName))
-                            fileName = hash;
+                            fileName = $"{hash}.dat";
 
                         var outputFileName = Path.Combine(outputDir, fileName);
                         if (DoNotExtractAgain && File.Exists(outputFileName))
                             continue;
 
-                        Console.WriteLine(fileName);
-                        var extractDir = Path.GetDirectoryName(outputFileName);
-                        if (!Directory.Exists(extractDir))
-                            Directory.CreateDirectory(extractDir);
+                        Console.WriteLine(outputFileName);
+                        CreateDirectoryForFile(outputFileName);
+
+                        File.Create(outputFileName).Using(stream => stream.Write(img.SetPosition(entry.Offset).ReadBytes(entry.DataLength)));
 
                         var hdAsset = new EgsHdAsset(img.SetPosition(entry.Offset));
                         File.Create(outputFileName).Using(stream => stream.Write(hdAsset.ReadData()));
+
+                        foreach (var asset in hdAsset.Assets)
+                        {
+                            var outputFileNameRemastered = Path.Combine(Path.ChangeExtension(outputFileName, null), asset);
+                            Console.WriteLine(outputFileNameRemastered);
+                            CreateDirectoryForFile(outputFileNameRemastered);
+
+                            var assetData = hdAsset.ReadAsset(asset);
+                            File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                        }
                     }
+                }
+
+                private static void CreateDirectoryForFile(string fileName)
+                {
+                    var directoryName = Path.GetDirectoryName(fileName);
+                    if (!Directory.Exists(directoryName))
+                        Directory.CreateDirectory(directoryName);
                 }
             }
 
@@ -245,28 +265,30 @@ namespace OpenKh.Command.IdxImg
                 }
             }
 
-            //private class ListCommand
-            //{
-            //    [Required]
-            //    [FileExists]
-            //    [Argument(0, Description = "Kingdom Hearts II IDX file, paired with a IMG")]
-            //    public string InputIdx { get; set; }
+            [Command("list", Description = "List the content of a HED file ")]
+            private class ListCommand
+            {
+                [Required]
+                [Argument(0, Description = "Kingdom Hearts HED input file")]
+                public string InputHed { get; set; }
 
-            //    [Option(CommandOptionType.NoValue, Description = "Sort file list by their position in the IMG", ShortName = "s", LongName = "sort")]
-            //    public bool Sort { get; set; }
+                protected int OnExecute(CommandLineApplication app)
+                {
+                    using var hedStream = File.OpenRead(InputHed);
+                    var entries = Hed.Read(hedStream);
 
-            //    protected int OnExecute(CommandLineApplication app)
-            //    {
-            //        var entries = OpenIdx(InputIdx);
-            //        if (Sort)
-            //            entries = entries.OrderBy(x => x.Offset);
+                    foreach (var entry in entries)
+                    {
+                        var hash = EpicGamesAssets.ToString(entry.MD5);
+                        if (!Names.TryGetValue(hash, out var fileName))
+                            fileName = $"{hash}.dat";
 
-            //        foreach (var entry in entries)
-            //            Console.WriteLine(IdxName.Lookup(entry) ?? $"@{entry.Hash32:X08}-{entry.Hash16:X04}");
+                        Console.WriteLine(fileName);
+                    }
 
-            //        return 0;
-            //    }
-            //}
+                    return 0;
+                }
+            }
         }
     }
 }
