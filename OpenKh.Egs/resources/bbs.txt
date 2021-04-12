@@ -22423,6 +22423,7 @@ pic/sb30603.tm2
 pic/sb30604.tm2
 pic/yt102_17.tm2
 pic/yt102_18.tm2
+save_image/en/KHBbSFM.png
 sound/bgm/001sinde_f.ps4.scd
 sound/bgm/001sinde_f.win32.scd
 sound/bgm/002sinde_b.ps4.scd

@@ -365,4 +365,5 @@ pi32.ard
 pi37.ard
 po32.ard
 po37.ard
+save_image/en/KHFM.png
 tz59_18.img

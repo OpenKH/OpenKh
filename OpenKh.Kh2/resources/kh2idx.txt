@@ -30737,6 +30737,7 @@ ovl_shop.x
 ovl_title.x
 p_ex330.2ld
 radar.tm2
+save_image/en/KHIIFM.png
 se/se000.seb
 se/se001.seb
 se/se002.seb
