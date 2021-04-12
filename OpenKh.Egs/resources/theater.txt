@@ -1,4 +1,4 @@
-﻿backup_icon0.png
+backup_icon0.png
 bg/artwork/hd501.tm2
 bg/artwork/hd502.tm2
 bg/artwork/hd512.tm2
@@ -730,6 +730,8 @@ jp/l2d/kh1_theater.l2d
 jp/message/jp/event/hd/bin/cthd400.ctd
 KHHD2.5.config
 KHHD2.8.config
+save_image/en/KHFM_Theater.png
+save_image/jp/KHFM_Theater.png
 sound/bgm_006.win32.scd
 sound/bgm_110.win32.scd
 sound/BGM_al_field.win32.scd
