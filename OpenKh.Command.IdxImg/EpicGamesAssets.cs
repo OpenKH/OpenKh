@@ -1,3 +1,4 @@
+using Ionic.Zlib;
 using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Bbs;
 using OpenKh.Common;
@@ -19,7 +20,7 @@ namespace OpenKh.Command.IdxImg
     {
         [Command("hed", Description = "Make operation on the Epic Games Store release of Kingdom Hearts"),
          Subcommand(typeof(ExtractCommand)),
-         Subcommand(typeof(PackCommand))]
+         Subcommand(typeof(PackCommand)),
          Subcommand(typeof(ListCommand))]
         private class EpicGamesAssets
         {
@@ -71,39 +72,13 @@ namespace OpenKh.Command.IdxImg
                 return 1;
             }
 
-            static string ToString(byte[] data)
+            private static string ToString(byte[] data)
             {
                 var sb = new StringBuilder(data.Length * 2);
                 for (var i = 0; i < data.Length; i++)
                     sb.Append(data[i].ToString("X02"));
 
                 return sb.ToString();
-            }
-
-            public static byte[] ToBytes(string hex)
-            {
-                return Enumerable.Range(0, hex.Length)
-                                 .Where(x => x % 2 == 0)
-                                 .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
-                                 .ToArray();
-            }
-
-            public static string CreateMD5(string input)
-            {
-                // Use input string to calculate MD5 hash
-                using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
-                {
-                    byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-                    byte[] hashBytes = md5.ComputeHash(inputBytes);
-
-                    // Convert the byte array to hexadecimal string
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < hashBytes.Length; i++)
-                    {
-                        sb.Append(hashBytes[i].ToString("X2"));
-                    }
-                    return sb.ToString();
-                }
             }
 
             private class ExtractCommand
@@ -208,61 +183,105 @@ namespace OpenKh.Command.IdxImg
 
                     foreach (var file in files)
                     {
-                        var filename = file.Replace($"{inputFolder}\\", "").Replace("\\", "/");
-                        var hash = CreateMD5(filename);
-                        var fileStream = File.OpenRead(file);
-                        var fileSize = (int)fileStream.Length;
+                        var hedEntry = AddFile(file, hedStream, pkgStream);
 
-                        // Write HED entry for the current file
-                        var hedEntry = new Hed.Entry()
-                        {
-                            MD5 = ToBytes(hash),
-                            Offset = offset,
-                            DataLength = fileSize + 0x10,
-                            ActualLength = fileSize,
-                        };
-
-                        BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedEntry);
-
-                        // Encrypt and write current file data in the PKG stream
-                        var header = new EgsHdAsset.Header()
-                        {
-                            CompressedLength = -1,
-                            DecompressedLength = fileSize,
-                            RemasteredAssetCount = 0,
-                            Unknown0c = 0
-                        };
-
-                        // Is it an HD assets?
-                        if (filename.Contains('-'))
-                        {
-                            var split = filename.Split('-');
-
-                        }
-
-                        // The seed used for encryption is the data header
-                        var seed = new MemoryStream();
-                        BinaryMapping.WriteObject<EgsHdAsset.Header>(seed, header);
-
-                        var encryptedFileData = EgsEncryption.Encrypt(
-                            fileStream.ReadAllBytes(),
-                            seed.SetPosition(0).ReadAllBytes()
-                        );
-
-                        BinaryMapping.WriteObject<EgsHdAsset.Header>(pkgStream, header);
-                        pkgStream.Write(encryptedFileData);
-
-
-                        Console.WriteLine($"Packed: {filename}");
+                        Console.WriteLine($"Packed: {file}");
 
                         offset += hedEntry.DataLength;
-
-                        fileStream.Close();
                     }
 
                     Console.WriteLine($"Output HED file location: {outputHedFile}");
                     Console.WriteLine($"Output PKG file location: {outputPkgFile}");
                 }
+
+                private Hed.Entry AddFile(string input, FileStream hedStream, FileStream pkgStream)
+                {
+                    var newFileStream = File.OpenRead(input);
+                    var filename = input.Replace(InputFolder, "").Replace(@"\", "/");
+                    var newFileHash = CreateMD5(filename);
+
+                    var compressedData = CompressData(newFileStream.ReadAllBytes());
+
+                    // Write a new entry in the HED stream
+                    var hedEntry = new Hed.Entry()
+                    {
+                        MD5 = ToBytes(newFileHash),
+                        ActualLength = (int)newFileStream.Length,
+                        DataLength = compressedData.Length + 0x10,
+                        Offset = pkgStream.Length
+                    };
+
+                    BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedEntry);
+
+                    // Encrypt and write current file data in the PKG stream
+                    var header = new EgsHdAsset.Header()
+                    {
+                        CompressedLength = compressedData.Length,
+                        DecompressedLength = (int)newFileStream.Length,
+                        RemasteredAssetCount = 0, // TODO: Write this file using the replaced file data,
+                        Unknown0c = 0x0 // TODO: Write this field using the replaced file data
+                    };
+
+                    // The seed used for encryption is the data header
+                    var seed = new MemoryStream();
+                    BinaryMapping.WriteObject<EgsHdAsset.Header>(seed, header);
+
+                    var encryptedFileData = EgsEncryption.Encrypt(
+                        compressedData,
+                        seed.ReadAllBytes()
+                    );
+
+                    BinaryMapping.WriteObject<EgsHdAsset.Header>(pkgStream, header);
+                    pkgStream.Write(encryptedFileData);
+
+                    newFileStream.Close();
+
+                    return hedEntry;
+                }
+
+                #region Utils
+
+                public static byte[] ToBytes(string hex)
+                {
+                    return Enumerable.Range(0, hex.Length)
+                                     .Where(x => x % 2 == 0)
+                                     .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                                     .ToArray();
+                }
+
+                public static string CreateMD5(string input)
+                {
+                    // Use input string to calculate MD5 hash
+                    using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+                    {
+                        byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                        byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                        // Convert the byte array to hexadecimal string
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < hashBytes.Length; i++)
+                        {
+                            sb.Append(hashBytes[i].ToString("X2"));
+                        }
+
+                        return sb.ToString();
+                    }
+                }
+
+                public static byte[] CompressData(byte[] data)
+                {
+                    using (MemoryStream compressedStream = new MemoryStream())
+                    {
+                        var deflateStream = new ZlibStream(compressedStream, Ionic.Zlib.CompressionMode.Compress, true);
+
+                        deflateStream.Write(data, 0, data.Length);
+                        deflateStream.Close();
+
+                        return compressedStream.ReadAllBytes();
+                    }
+                }
+
+                #endregion
             }
 
             [Command("list", Description = "List the content of a HED file ")]
