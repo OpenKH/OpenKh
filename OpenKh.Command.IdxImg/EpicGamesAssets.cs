@@ -59,6 +59,7 @@ namespace OpenKh.Command.IdxImg
                 .Concat(EgsHdAsset.SettingMenuNames)
                 .Concat(EgsHdAsset.TheaterNames)
                 .Concat(EgsHdAsset.Kh1AdditionalNames)
+                .Concat(EgsHdAsset.Launcher28Names)
                 .Distinct()
                 .ToDictionary(x => ToString(MD5.HashData(Encoding.UTF8.GetBytes(x))), x => x);
 

@@ -35,6 +35,7 @@ namespace OpenKh.Egs
         public static string[] RecomNames = File.ReadAllLines(Path.Combine(ResourcePath, "recom.txt"));
         public static string[] BbsNames = File.ReadAllLines(Path.Combine(ResourcePath, "bbs.txt"));
         public static string[] Kh1AdditionalNames = File.ReadAllLines(Path.Combine(ResourcePath, "kh1pc.txt"));
+        public static string[] Launcher28Names = File.ReadAllLines(Path.Combine(ResourcePath, "launcher28.txt"));
 
         private const int PassCount = 10;
         private readonly Stream _stream;
