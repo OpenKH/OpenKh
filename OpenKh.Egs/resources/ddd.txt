@@ -1,4 +1,4 @@
-
+KH3DHD.png
 _grpdef/boss/b_de020.rgr
 _grpdef/boss/b_de030.rgr
 _grpdef/boss/b_de040.rgr
@@ -9041,6 +9041,7 @@ event/en/yt/yt303/bin/yt303.exa
 event/en/yt/yt304/bin/yt304.exa
 event/en/yt/yt351/bin/yt351.exa
 event/en/yt/yt352/bin/yt352.exa
+font/de/bin/iconfont_n.ctt
 font/en/bin/cmdfont.bcfnt
 font/en/bin/helpfont.bcfnt
 font/en/bin/iconfont_n.ctt
@@ -9049,6 +9050,9 @@ font/en/bin/menufont.bcfnt
 font/en/bin/mesfont.bcfnt
 font/en/bin/numeral.bcfnt
 font/en/bin/talkfont.bcfnt
+font/es/bin/iconfont_n.ctt
+font/fr/bin/iconfont_n.ctt
+font/it/bin/iconfont_n.ctt
 font/jp/bin/helpfont.bcfnt
 font/jp/bin/talkfont.bcfnt
 game/bin/baseprm.bin
