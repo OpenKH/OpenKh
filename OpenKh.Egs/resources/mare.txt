@@ -1345,6 +1345,8 @@ jp/tim2/title/title_recoded.tm2
 jp/tim2/title/title_recom.tm2
 KHHD2.5.config
 KHHD2.8.config
+save_image/en/KH1.5+2.5_system.png
+save_image/jp/KH1.5+2.5_system.png
 sound/bgm_000.win32.scd
 sound/bgm_001.win32.scd
 sound/bgm_002.win32.scd
