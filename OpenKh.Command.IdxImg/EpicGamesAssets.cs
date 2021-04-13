@@ -117,7 +117,7 @@ namespace OpenKh.Command.IdxImg
                         if (!Names.TryGetValue(hash, out var fileName))
                             fileName = $"{hash}.dat";
 
-                        var outputFileName = Path.Combine(outputDir, fileName);
+                        var outputFileName = Path.Combine(outputDir + "/original/", fileName);
                         if (DoNotExtractAgain && File.Exists(outputFileName))
                             continue;
 
@@ -129,6 +129,7 @@ namespace OpenKh.Command.IdxImg
                         var hdAsset = new EgsHdAsset(img.SetPosition(entry.Offset));
                         File.Create(outputFileName).Using(stream => stream.Write(hdAsset.ReadData()));
 
+                        outputFileName = Path.Combine(outputDir + "/remastered/", fileName);
                         foreach (var asset in hdAsset.Assets)
                         {
                             var outputFileNameRemastered = Path.Combine(Path.ChangeExtension(outputFileName, null), asset);
