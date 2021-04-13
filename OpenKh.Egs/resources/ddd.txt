@@ -1,4 +1,3 @@
-KH3DHD.png
 _grpdef/boss/b_de020.rgr
 _grpdef/boss/b_de030.rgr
 _grpdef/boss/b_de040.rgr
@@ -16535,6 +16534,8 @@ motionNE/wep/w_so01/anm/ev_pi/bin/w_ex010_11404e.pam
 motionNE/wep/w_so01/anm/ev_pi/bin/w_ex010_11405e.pam
 motionNE/wep/w_so01/anm/ev_tm/bin/w_so010_10108a.pam
 motionNE/wep/w_so01/anm/ev_yt/bin/w_so010_20406e.pam
+save_image/en/KH3DHD.png
+save_image/jp/KH3DHD.png
 setdata/jp/bin/areainfo.bin
 setdata/jp/bin/de/de01-m20_.olo
 setdata/jp/bin/di/di00set.bin

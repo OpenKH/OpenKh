@@ -85,7 +85,7 @@ namespace OpenKh.Egs
                 using var compressedStream = new MemoryStream(data);
                 using var deflate = new DeflateStream(compressedStream.SetPosition(2), CompressionMode.Decompress);
 
-                var decompressedData = new byte[_header.DecompressedLength];
+                var decompressedData = new byte[entry.DecompressedLength];
                 deflate.Read(decompressedData);
 
                 return decompressedData;

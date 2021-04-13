@@ -46,6 +46,7 @@ namespace OpenKh.Command.IdxImg
                 .Concat(IdxName.Names.Where(x => x.StartsWith("bgm/")).Select(x => x.Replace(".bgm", ".win32.scd")))
                 .Concat(IdxName.Names.Where(x => x.StartsWith("se/")).Select(x => x.Replace(".seb", ".win32.scd")))
                 .Concat(IdxName.Names.Where(x => x.StartsWith("vagstream/")).Select(x => x.Replace(".vas", ".win32.scd")))
+                .Concat(IdxName.Names.Where(x => x.StartsWith("gumibattle/se/")).Select(x => x.Replace(".seb", ".win32.scd")))
                 .Concat(IdxName.Names.Where(x => x.StartsWith("voice/")).Select(x => x
                     .Replace(".vag", ".win32.scd")
                     .Replace(".vsb", ".win32.scd")))
@@ -116,7 +117,7 @@ namespace OpenKh.Command.IdxImg
                         if (!Names.TryGetValue(hash, out var fileName))
                             fileName = $"{hash}.dat";
 
-                        var outputFileName = Path.Combine(outputDir, fileName);
+                        var outputFileName = Path.Combine(outputDir + "/original/", fileName);
                         if (DoNotExtractAgain && File.Exists(outputFileName))
                             continue;
 
@@ -128,6 +129,7 @@ namespace OpenKh.Command.IdxImg
                         var hdAsset = new EgsHdAsset(img.SetPosition(entry.Offset));
                         File.Create(outputFileName).Using(stream => stream.Write(hdAsset.ReadData()));
 
+                        outputFileName = Path.Combine(outputDir + "/remastered/", fileName);
                         foreach (var asset in hdAsset.Assets)
                         {
                             var outputFileNameRemastered = Path.Combine(GetHDAssetFolder(outputFileName), asset);
