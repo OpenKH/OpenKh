@@ -389,7 +389,7 @@ namespace OpenKh.Command.IdxImg
                     // Is there remastered assets?
                     if (header.RemasteredAssetCount > 0)
                     {
-                        ReplaceRemasteredAssets(fileToInject, pkgStream);
+                        ReplaceRemasteredAssets(fileToInject, compressedData.Length, pkgStream);
                     }
 
                     // Make sure to write the original file after remastered assets headers
@@ -400,7 +400,7 @@ namespace OpenKh.Command.IdxImg
                     return hedEntry;
                 }
 
-                private void ReplaceRemasteredAssets(string originalFile, FileStream pkgStream)
+                private void ReplaceRemasteredAssets(string originalFile, int originalFileSize, FileStream pkgStream)
                 {
                     var remasteredAssetsFolder = GetHDAssetFolder(originalFile);
 
@@ -408,7 +408,7 @@ namespace OpenKh.Command.IdxImg
                     {
                         var remasteredAssetFiles = GetAllFiles(remasteredAssetsFolder);
                         var allRemasteredAssetsData = new MemoryStream();
-                        var assetCounter = 1;
+                        var totalRemasteredAssetHeadersSize = (remasteredAssetFiles.Count() * 0x30);
 
                         foreach (var remasteredAssetFile in remasteredAssetFiles)
                         {
@@ -421,7 +421,7 @@ namespace OpenKh.Command.IdxImg
                                 CompressedLength = compressedData.Length,
                                 DecompressedLength = (int)assetFileStream.Length,
                                 Name = remasteredAssetFile,
-                                Offset = (int)pkgStream.Position + (assetCounter * 0x30) + offsetPosition, // 0x30 is the size of this header
+                                Offset = (int)pkgStream.Position + totalRemasteredAssetHeadersSize + offsetPosition + originalFileSize, // 0x30 is the size of this header
                                 Unknown24 = 0 // TODO: Use the original data
                             };
 
@@ -440,8 +440,6 @@ namespace OpenKh.Command.IdxImg
                             assetFileStream.Close();
 
                             offsetPosition += encryptedData.Length;
-
-                            assetCounter++;
                         }
 
                         pkgStream.Write(allRemasteredAssetsData.ReadAllBytes());
