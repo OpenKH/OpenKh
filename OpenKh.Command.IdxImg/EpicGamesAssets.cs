@@ -25,6 +25,9 @@ namespace OpenKh.Command.IdxImg
          Subcommand(typeof(ListCommand))]
         private class EpicGamesAssets
         {
+            private const string ORIGINAL_FILES_FOLDER_NAME = "original";
+            private const string REMASTERED_FILES_FOLDER_NAME = "remastered";
+
             #region MD5 names
 
             private static readonly IEnumerable<string> KH2Names = IdxName.Names
@@ -117,7 +120,8 @@ namespace OpenKh.Command.IdxImg
                         if (!Names.TryGetValue(hash, out var fileName))
                             fileName = $"{hash}.dat";
 
-                        var outputFileName = Path.Combine(outputDir + "/original/", fileName);
+                        var outputFileName = Path.Combine(outputDir, ORIGINAL_FILES_FOLDER_NAME, fileName); 
+                        ;
                         if (DoNotExtractAgain && File.Exists(outputFileName))
                             continue;
 
@@ -129,7 +133,7 @@ namespace OpenKh.Command.IdxImg
                         var hdAsset = new EgsHdAsset(img.SetPosition(entry.Offset));
                         File.Create(outputFileName).Using(stream => stream.Write(hdAsset.ReadData()));
 
-                        outputFileName = Path.Combine(outputDir + "/remastered/", fileName);
+                        outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
                         foreach (var asset in hdAsset.Assets)
                         {
                             var outputFileNameRemastered = Path.Combine(GetHDAssetFolder(outputFileName), asset);
@@ -161,9 +165,19 @@ namespace OpenKh.Command.IdxImg
                 [Option(CommandOptionType.SingleValue, Description = "Folder inside where the packed content will be dropped", ShortName = "o", LongName = "output")]
                 public string OutputDir { get; set; }
 
+                private string _originalFilesFolder;
+
                 protected int OnExecute(CommandLineApplication app)
                 {
-                    Pack(InputFolder, OutputDir);
+                    _originalFilesFolder = Path.Combine(InputFolder, ORIGINAL_FILES_FOLDER_NAME);
+
+                    if (!Directory.Exists(_originalFilesFolder))
+                    {
+                        Console.WriteLine($"Unable to find folder {_originalFilesFolder}, please make sure files to packs are there.");
+                        return -1;
+                    }
+
+                    Pack(_originalFilesFolder, OutputDir);
 
                     return 0;
                 }
@@ -173,7 +187,7 @@ namespace OpenKh.Command.IdxImg
                     var outputDir = output ?? Directory.GetParent(inputFolder).FullName;
                     var files = Directory.EnumerateFiles(inputFolder, "*.*", SearchOption.AllDirectories).OrderBy(x => x, StringComparer.Ordinal);
 
-                    var outputFilename = Path.GetFileName(inputFolder);
+                    var outputFilename = Path.GetFileName(InputFolder);
                     var outputHedFile = Path.Join(outputDir, $"{outputFilename}.hed");
                     var outputPkgFile = Path.Join(outputDir, $"{outputFilename}.pkg");
 
@@ -198,7 +212,7 @@ namespace OpenKh.Command.IdxImg
                 private Hed.Entry AddFile(string input, FileStream hedStream, FileStream pkgStream)
                 {
                     var newFileStream = File.OpenRead(input);
-                    var filename = input.Replace(InputFolder, "").Replace(@"\", "/");
+                    var filename = input.Replace($"{_originalFilesFolder}\\", "").Replace(@"\", "/");
                     var newFileHash = CreateMD5(filename);
 
                     var compressedData = CompressData(newFileStream.ReadAllBytes());
@@ -245,7 +259,15 @@ namespace OpenKh.Command.IdxImg
 
                 protected int OnExecute(CommandLineApplication app)
                 {
-                    Patch(PkgFile, InputFolder, OutputDir);
+                    var originalFilesFolder = Path.Combine(InputFolder, ORIGINAL_FILES_FOLDER_NAME);
+
+                    if (!Directory.Exists(originalFilesFolder))
+                    {
+                        Console.WriteLine($"Unable to find folder {originalFilesFolder}, please make sure files to packs are there.");
+                        return -1;
+                    }
+
+                    Patch(PkgFile, originalFilesFolder, OutputDir);
 
                     return 0;
                 }
