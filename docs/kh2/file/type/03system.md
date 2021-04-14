@@ -578,7 +578,7 @@ Note that on the Vanilla version of the game, this structure is `48` bytes long 
 
 ### Memt party
 
-This table, found straight after [the entries](#memt-entry), is used to decide which party members are used in a given portion of the game. How this table is accessed is unknown, but not all the maps uses it. The index is the one for [the entries](#memt-entry) object array, so an index of `0` will check what's in the offset `16` and an index of `3` will check what's in the offset `22`. When the value is equal to `12` (or `10` for Vanilla), the game will not make that specific pawn available in the party. This table seems to be the one responsible to assign or remove specific party members.
+This table, found straight after [the entries](#memt-entry), is used to decide which party members are used in a given portion of the game. This table is used by [AreaData scripts](./areadata.md#party) and controls what the values actually do. The index is the one for [the entries](#memt-entry) object array, so an index of `0` will check what's in the offset `16` and an index of `3` will check what's in the offset `22`. When the value is equal to `12` (or `10` for Vanilla), the game will not make that specific pawn available in the party. This table seems to be the one responsible to assign or remove specific party members.
 
 | Offset | Type | Description
 |--------|------|-------------
