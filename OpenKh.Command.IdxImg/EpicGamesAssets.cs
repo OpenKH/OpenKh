@@ -545,6 +545,10 @@ namespace OpenKh.Command.IdxImg
                 {
                     var deflateStream = new ZlibStream(compressedStream, Ionic.Zlib.CompressionMode.Compress, true);
 
+                    // Make sure compressed data is aligned with 0x10
+                    int padding = data.Length % 0x10 == 0 ? 0 : (0x10 - data.Length % 0x10);
+                    Array.Resize(ref data, data.Length + padding);
+
                     deflateStream.Write(data, 0, data.Length);
                     deflateStream.Close();
 
