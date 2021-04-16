@@ -27,7 +27,7 @@
 | [ctd](file//type/ctd.md) | File containing a list of text strings and how they need to be displayed | 
 | [ead](file//type/ead.md) | Controls effects attached to weapons | 
 | [ecm](file//type/ecm.md) | Controls camera used on characters, mainly NPCs | 
-| edp | Unknown | 
+| edp | File used for special settings, for example, EXP 0 stats | 
 | [epd](file//type/epd.md) | File that controls various parameters for enemies. Overwrites data in .bep | OpenKh.Tools.EpdEditor
 | [esd](file//type/esd.md) | It controls what files the current arc inherits from | 
 | [ese](file//type/esd.md) | Sound effects for particle effects | 
