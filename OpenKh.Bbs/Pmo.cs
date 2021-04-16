@@ -650,13 +650,13 @@ namespace OpenKh.Bbs
                             switch (flags.WeightFormat)
                             {
                                 case CoordinateFormat.NORMALIZED_8_BITS:
-                                    stream.Write((byte)(chunk.jointWeights[k].weights[currentIndex] * 127.0f));
+                                    stream.Write((byte)(chunk.jointWeights[k].weights[w] * 128.0f));
                                     break;
                                 case CoordinateFormat.NORMALIZED_16_BITS:
-                                    stream.Write((byte)(chunk.jointWeights[k].weights[currentIndex] * 32767.0f));
+                                    stream.Write((byte)(chunk.jointWeights[k].weights[w] * 32768.0f));
                                     break;
                                 case CoordinateFormat.FLOAT_32_BITS:
-                                    StreamExtensions.Write(stream, chunk.jointWeights[k].weights[currentIndex]);
+                                    StreamExtensions.Write(stream, chunk.jointWeights[k].weights[w]);
                                     break;
                             }
                         }
