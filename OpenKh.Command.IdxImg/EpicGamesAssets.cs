@@ -162,8 +162,11 @@ namespace OpenKh.Command.IdxImg
                 [Argument(0, Description = "Folder to pack using EGS format.")]
                 public string InputFolder { get; set; }
 
-                [Option(CommandOptionType.SingleValue, Description = "Folder inside where the packed content will be dropped", ShortName = "o", LongName = "output")]
+                [Option(CommandOptionType.SingleValue, Description = "Folder inside where the packed content will be dropped.", ShortName = "o", LongName = "output")]
                 public string OutputDir { get; set; }
+
+                [Option(CommandOptionType.SingleValue, Description = "File path of the original hed we want to repack.", ShortName = "hed", LongName = "originalHedPath")]
+                public string OriginalHed { get; set; }
 
                 private string _originalFilesFolder;
 
@@ -177,12 +180,12 @@ namespace OpenKh.Command.IdxImg
                         return -1;
                     }
 
-                    Pack(_originalFilesFolder, OutputDir);
+                    Pack(_originalFilesFolder, OutputDir, OriginalHed);
 
                     return 0;
                 }
 
-                protected void Pack(string inputFolder, string output)
+                protected void Pack(string inputFolder, string output, string originalHed = null)
                 {
                     var outputDir = output ?? Directory.GetParent(inputFolder).FullName;
                     var files = Directory.EnumerateFiles(inputFolder, "*.*", SearchOption.AllDirectories).OrderBy(x => x, StringComparer.Ordinal);
@@ -194,15 +197,38 @@ namespace OpenKh.Command.IdxImg
                     var hedStream = File.Create(outputHedFile);
                     var pkgStream = File.Create(outputPkgFile);
 
-                    var offset = 0L;
-
-                    foreach (var file in files)
+                    // TODO: Remove this when we will find out what are the last unknown fields in Hed.Entry, Header and RemasteredEntry structures
+                    if (!string.IsNullOrEmpty(originalHed))
                     {
-                        var hedEntry = AddFile(file, hedStream, pkgStream);
+                        using var originalHedStream = File.OpenRead(originalHed);
+                        using var originalPkgStream = File.OpenRead(Path.ChangeExtension(originalHed, "pkg"));
 
-                        Console.WriteLine($"Packed: {file}");
+                        var hedEntries = Hed.Read(originalHedStream).ToList();
 
-                        offset += hedEntry.DataLength;
+                        foreach (var file in files)
+                        {
+                            var relativeFilePath = GetRelativePath(file, _originalFilesFolder);
+                            var md5Hash = ToBytes(CreateMD5(relativeFilePath));
+                            var originalHedEntry = hedEntries.FirstOrDefault(entry => entry.MD5.SequenceEqual(md5Hash));
+                            EgsHdAsset originalAsset = null;
+
+                            if (originalHedEntry != null)
+                            {
+                                // Get original PKG entry
+                                originalAsset = new EgsHdAsset(originalPkgStream.SetPosition(originalHedEntry.Offset));
+                            }
+
+                            AddFile(file, hedStream, pkgStream);
+                            Console.WriteLine($"Packed: {file}");
+                        }
+                    }
+                    else
+                    {
+                        foreach (var file in files)
+                        {
+                            AddFile(file, hedStream, pkgStream);
+                            Console.WriteLine($"Packed: {file}");
+                        }
                     }
 
                     Console.WriteLine($"Output HED file location: {outputHedFile}");
@@ -212,9 +238,7 @@ namespace OpenKh.Command.IdxImg
                 private Hed.Entry AddFile(string input, FileStream hedStream, FileStream pkgStream)
                 {
                     var newFileStream = File.OpenRead(input);
-                    var filename = input.Replace($"{_originalFilesFolder}\\", "").Replace(@"\", "/");
-                    var newFileHash = CreateMD5(filename);
-
+                    var filename = GetRelativePath(input, _originalFilesFolder);
                     var compressedData = CompressData(newFileStream.ReadAllBytes());
 
                     // Write a new entry in the HED stream
@@ -383,7 +407,7 @@ namespace OpenKh.Command.IdxImg
                 private Hed.Entry ReplaceFile(string fileToInject, FileStream hedStream, FileStream pkgStream, EgsHdAsset.Header originalHeader)
                 {
                     var newFileStream = File.OpenRead(fileToInject);
-                    var filename = fileToInject.Replace(InputFolder, "").Replace(@"\", "/");
+                    var filename = GetRelativePath(fileToInject, InputFolder);
 
                     var compressedData = CompressData(newFileStream.ReadAllBytes());
 
@@ -586,6 +610,11 @@ namespace OpenKh.Command.IdxImg
                 var assetFolderName = Path.Combine(parentFolder, $"HD-{Path.GetFileName(assetFile)}");
 
                 return assetFolderName;
+            }
+
+            private static string GetRelativePath(string filePath, string origin)
+            {
+                return filePath.Replace($"{origin}\\", "").Replace(@"\", "/");
             }
 
             #endregion
