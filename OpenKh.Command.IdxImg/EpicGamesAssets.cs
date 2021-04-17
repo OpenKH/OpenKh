@@ -20,7 +20,6 @@ namespace OpenKh.Command.IdxImg
     {
         [Command("hed", Description = "Make operation on the Epic Games Store release of Kingdom Hearts"),
          Subcommand(typeof(ExtractCommand)),
-         Subcommand(typeof(PackCommand)),
          Subcommand(typeof(PatchCommand)),
          Subcommand(typeof(ListCommand))]
         private class EpicGamesAssets
@@ -152,118 +151,6 @@ namespace OpenKh.Command.IdxImg
                     var directoryName = Path.GetDirectoryName(fileName);
                     if (!Directory.Exists(directoryName))
                         Directory.CreateDirectory(directoryName);
-                }
-            }
-
-            [Command("pack", Description = "Pack a folder in a PKG file (with its HED companion).")]
-            private class PackCommand
-            {
-                [Required]
-                [Argument(0, Description = "Folder to pack using EGS format.")]
-                public string InputFolder { get; set; }
-
-                [Option(CommandOptionType.SingleValue, Description = "Folder inside where the packed content will be dropped.", ShortName = "o", LongName = "output")]
-                public string OutputDir { get; set; }
-
-                [Option(CommandOptionType.SingleValue, Description = "File path of the original hed we want to repack.", ShortName = "hed", LongName = "originalHedPath")]
-                public string OriginalHed { get; set; }
-
-                private string _originalFilesFolder;
-
-                protected int OnExecute(CommandLineApplication app)
-                {
-                    _originalFilesFolder = Path.Combine(InputFolder, ORIGINAL_FILES_FOLDER_NAME);
-
-                    if (!Directory.Exists(_originalFilesFolder))
-                    {
-                        Console.WriteLine($"Unable to find folder {_originalFilesFolder}, please make sure files to packs are there.");
-                        return -1;
-                    }
-
-                    Pack(_originalFilesFolder, OutputDir, OriginalHed);
-
-                    return 0;
-                }
-
-                protected void Pack(string inputFolder, string output, string originalHed = null)
-                {
-                    var outputDir = output ?? Directory.GetParent(inputFolder).FullName;
-                    var files = Directory.EnumerateFiles(inputFolder, "*.*", SearchOption.AllDirectories).OrderBy(x => x, StringComparer.Ordinal);
-
-                    var outputFilename = Path.GetFileName(InputFolder);
-                    var outputHedFile = Path.Join(outputDir, $"{outputFilename}.hed");
-                    var outputPkgFile = Path.Join(outputDir, $"{outputFilename}.pkg");
-
-                    var hedStream = File.Create(outputHedFile);
-                    var pkgStream = File.Create(outputPkgFile);
-
-                    // TODO: Remove this when we will find out what are the last unknown fields in Hed.Entry, Header and RemasteredEntry structures
-                    if (!string.IsNullOrEmpty(originalHed))
-                    {
-                        using var originalHedStream = File.OpenRead(originalHed);
-                        using var originalPkgStream = File.OpenRead(Path.ChangeExtension(originalHed, "pkg"));
-
-                        var hedEntries = Hed.Read(originalHedStream).ToList();
-
-                        foreach (var file in files)
-                        {
-                            var relativeFilePath = GetRelativePath(file, _originalFilesFolder);
-                            var md5Hash = ToBytes(CreateMD5(relativeFilePath));
-                            var originalHedEntry = hedEntries.FirstOrDefault(entry => entry.MD5.SequenceEqual(md5Hash));
-                            EgsHdAsset originalAsset = null;
-
-                            if (originalHedEntry != null)
-                            {
-                                // Get original PKG entry
-                                originalAsset = new EgsHdAsset(originalPkgStream.SetPosition(originalHedEntry.Offset));
-                            }
-
-                            AddFile(file, hedStream, pkgStream);
-                            Console.WriteLine($"Packed: {file}");
-                        }
-                    }
-                    else
-                    {
-                        foreach (var file in files)
-                        {
-                            AddFile(file, hedStream, pkgStream);
-                            Console.WriteLine($"Packed: {file}");
-                        }
-                    }
-
-                    Console.WriteLine($"Output HED file location: {outputHedFile}");
-                    Console.WriteLine($"Output PKG file location: {outputPkgFile}");
-                }
-
-                private Hed.Entry AddFile(string input, FileStream hedStream, FileStream pkgStream)
-                {
-                    var newFileStream = File.OpenRead(input);
-                    var filename = GetRelativePath(input, _originalFilesFolder);
-                    var compressedData = CompressData(newFileStream.ReadAllBytes());
-
-                    // Write a new entry in the HED stream
-                    var hedEntry = CreateHedEntry(filename, newFileStream, compressedData, pkgStream.Length);
-
-                    BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedEntry);
-
-                    // Encrypt and write current file data in the PKG stream
-                    var header = CreateAssetHeader(newFileStream, compressedData, 0);
-
-                    // The seed used for encryption is the data header
-                    var seed = new MemoryStream();
-                    BinaryMapping.WriteObject<EgsHdAsset.Header>(seed, header);
-
-                    var encryptedFileData = EgsEncryption.Encrypt(
-                        compressedData,
-                        seed.ReadAllBytes()
-                    );
-
-                    BinaryMapping.WriteObject<EgsHdAsset.Header>(pkgStream, header);
-                    pkgStream.Write(encryptedFileData);
-
-                    newFileStream.Close();
-
-                    return hedEntry;
                 }
             }
 
@@ -607,7 +494,7 @@ namespace OpenKh.Command.IdxImg
             private static string GetHDAssetFolder(string assetFile)
             {
                 var parentFolder = Directory.GetParent(assetFile).FullName;
-                var assetFolderName = Path.Combine(parentFolder, $"HD-{Path.GetFileName(assetFile)}");
+                var assetFolderName = Path.Combine(parentFolder, $"{Path.GetFileName(assetFile)}");
 
                 return assetFolderName;
             }
