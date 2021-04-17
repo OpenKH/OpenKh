@@ -30,7 +30,7 @@ It seems to be `char[128]` except for the first entry which is `char[32]`.
 | 0x10    | uint32    | Pointer to Bone 2
 | 0x14    | Vector3f  | Offset 2
 | 0x20    | float     | Radius
-| 0x20    | uint32    | ABC Flag
+| 0x20    | uint32    | [ABC Flag](#ABC-Flag)
 | 0x20    | uint32    | Pointer to Effect FEP
 | 0x20    | uint32    | Pointer to Effect Name
 

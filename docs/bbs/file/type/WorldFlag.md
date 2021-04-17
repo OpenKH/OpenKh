@@ -22,7 +22,7 @@ This file is located inside `parag_xx.arc` where `xx` are the initial of the cha
 
 ## World Flag Data
 
-Each world flag consists of sections like this until it reaches the end of the flag definition.
+Each world flag data consists of sections like this until it reaches the end of the flag definition which is a World Code and World Count of 0.
 
 | Offset | Type  | Description
 |--------|-------|------------
