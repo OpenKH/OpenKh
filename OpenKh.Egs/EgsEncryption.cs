@@ -116,17 +116,10 @@ namespace OpenKh.Egs
             {
                 for (var j = 0; j < chunkLength; j += 4)
                 {
-                    if (0x00 + index + j < ptrData.Length)
-                        ptrData[0x00 + index + j] ^= key[0x00 + 0x10 * i + j];
-
-                    if (0x01 + index + j < ptrData.Length)
-                        ptrData[0x01 + index + j] ^= key[0x01 + 0x10 * i + j];
-
-                    if (0x02 + index + j < ptrData.Length)
-                        ptrData[0x02 + index + j] ^= key[0x02 + 0x10 * i + j];
-                    
-                    if (0x03 + index + j < ptrData.Length)
-                        ptrData[0x03 + index + j] ^= key[0x03 + 0x10 * i + j];
+                    ptrData[0x00 + index + j] ^= key[0x00 + 0x10 * i + j];
+                    ptrData[0x01 + index + j] ^= key[0x01 + 0x10 * i + j];
+                    ptrData[0x02 + index + j] ^= key[0x02 + 0x10 * i + j];
+                    ptrData[0x03 + index + j] ^= key[0x03 + 0x10 * i + j];
                 }
             }
         }

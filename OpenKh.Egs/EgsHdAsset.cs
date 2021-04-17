@@ -45,6 +45,9 @@ namespace OpenKh.Egs
         private readonly long _dataOffset;
         private readonly Dictionary<string, RemasteredEntry> _entries;
 
+        public string[] Assets { get; }
+        public Header OriginalAssetHeader => _header;
+        public Dictionary<string, RemasteredEntry> RemasteredAssetHeaders => _entries;
 
         public EgsHdAsset(Stream stream)
         {
@@ -55,30 +58,32 @@ namespace OpenKh.Egs
             _key = EgsEncryption.GenerateKey(seed, PassCount);
             
             _header = BinaryMapping.ReadObject<Header>(new MemoryStream(seed));
+
             var entries = Enumerable
                 .Range(0, _header.RemasteredAssetCount)
                 .Select(_ => BinaryMapping.ReadObject<RemasteredEntry>(stream))
                 .ToList();
+
             _entries = entries.ToDictionary(x => x.Name, x => x);
-            Assets = entries.Select(x => x.Name).ToArray();
             _dataOffset = stream.Position;
+
+            Assets = entries.Select(x => x.Name).ToArray();
         }
 
-        public string[] Assets { get; }
-
-        public byte[] ReadAsset(string assetName)
+        public byte[] ReadRemasteredAsset(string assetName)
         {
             var entry = _entries[assetName];
             var dataLength = entry.CompressedLength >= 0 ? entry.CompressedLength : entry.DecompressedLength;
+            
             if (dataLength % 16 != 0)
                 dataLength += 16 - (dataLength % 16);
+
             var data = _stream.AlignPosition(0x10).ReadBytes(dataLength);
 
             for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
             {
                 EgsEncryption.DecryptChunk(_key, data, i, PassCount);
             }
-                
 
             if (entry.CompressedLength >= 0)
             {
