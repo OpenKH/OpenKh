@@ -257,12 +257,19 @@ namespace OpenKh.Command.IdxImg
                             var shouldCompressData = asset.OriginalAssetHeader.CompressedLength > 0;
                             var newHedEntry = ReplaceFile(fileToInject, patchedHedStream, patchedPkgStream, asset, shouldCompressData, entry);
 
+                            //Console.WriteLine("HED");
+                            //Console.WriteLine($"ActualLength: {entry.ActualLength} | {newHedEntry.ActualLength}");
+                            //Console.WriteLine($"DataLength: {entry.DataLength} | {newHedEntry.DataLength}");
+                            //Console.WriteLine($"Offset: {entry.Offset} | {newHedEntry.Offset}");
+                            //Console.WriteLine($"MD5: {EpicGamesAssets.ToString(entry.MD5)} | {EpicGamesAssets.ToString(newHedEntry.MD5)}");
+
                             pkgOffset += newHedEntry.DataLength;
                         }
                         // Write the original data
                         else
                         {
                             entry.Offset = pkgOffset;
+                            pkgStream.SetPosition(entry.Offset);
 
                             BinaryMapping.WriteObject<Hed.Entry>(patchedHedStream, entry);
 
@@ -289,20 +296,22 @@ namespace OpenKh.Command.IdxImg
                     var filename = GetRelativePath(fileToInject, Path.Combine(InputFolder, ORIGINAL_FILES_FOLDER_NAME));
                     var offset = pkgStream.Position;
                     var compressedData = shouldCompressData ? CompressData(newFileStream.ReadAllBytes()) : newFileStream.ReadAllBytes();
+                    var comrpessedDataLenght = compressedData.Length == newFileStream.Length ? asset.OriginalAssetHeader.CompressedLength : compressedData.Length;
 
                     // Encrypt and write current file data in the PKG stream
                     var header = CreateAssetHeader(
                         newFileStream,
-                        compressedData,
+                        comrpessedDataLenght,
                         asset.OriginalAssetHeader.RemasteredAssetCount,
                         asset.OriginalAssetHeader.Unknown0c
                     );
 
-                    // The seed used for encryption is the data header
+                    // The seed used for encryption is the data header6
                     var seed = new MemoryStream();
                     BinaryMapping.WriteObject<EgsHdAsset.Header>(seed, header);
 
-                    var encryptedFileData = EgsEncryption.Encrypt(compressedData, seed.ReadAllBytes());
+                    var encryptionKey = seed.ReadAllBytes();
+                    var encryptedFileData = header.CompressedLength >= 1 ? EgsEncryption.Encrypt(compressedData, encryptionKey) : compressedData;
 
                     BinaryMapping.WriteObject<EgsHdAsset.Header>(pkgStream, header);
 
@@ -313,7 +322,7 @@ namespace OpenKh.Command.IdxImg
                     // Is there remastered assets?
                     if (header.RemasteredAssetCount > 0)
                     {
-                        remasteredHeaders = ReplaceRemasteredAssets(fileToInject, asset, pkgStream, seed.ReadAllBytes(), encryptedFileData);
+                        remasteredHeaders = ReplaceRemasteredAssets(fileToInject, asset, pkgStream, encryptionKey, encryptedFileData);
 
                         // If a remastered asset is not replaced, we still want to count its size for the HED entry
                         // TODO: We should also rewrite their offset + data => it won't work for the moment
@@ -335,6 +344,12 @@ namespace OpenKh.Command.IdxImg
                     var hedEntry = CreateHedEntry(filename, newFileStream, compressedData, offset, remasteredHeaders);
 
                     BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedEntry);
+
+                    //Console.WriteLine("Data header");
+                    //Console.WriteLine($"CompressedLength: {asset.OriginalAssetHeader.CompressedLength} | {header.CompressedLength}");
+                    //Console.WriteLine($"DecompressedLength: {asset.OriginalAssetHeader.DecompressedLength} | {header.DecompressedLength}");
+                    //Console.WriteLine($"RemasteredAssetCount: {asset.OriginalAssetHeader.RemasteredAssetCount} | {header.RemasteredAssetCount}");
+                    //Console.WriteLine($"Unknown0c: {asset.OriginalAssetHeader.Unknown0c} | {header.Unknown0c}");
 
                     return hedEntry;
                 }
@@ -508,11 +523,11 @@ namespace OpenKh.Command.IdxImg
                 };
             }
 
-            public static EgsHdAsset.Header CreateAssetHeader(FileStream fileStream, byte[] compressedData, int remasteredAssetCount = 0, int unknown0c = 0x0)
+            public static EgsHdAsset.Header CreateAssetHeader(FileStream fileStream, int compressedDataLenght, int remasteredAssetCount = 0, int unknown0c = 0x0)
             {
                 return new EgsHdAsset.Header()
                 {
-                    CompressedLength = compressedData.Length == fileStream.Length ? -1 : compressedData.Length,
+                    CompressedLength = compressedDataLenght,
                     DecompressedLength = (int)fileStream.Length,
                     RemasteredAssetCount = remasteredAssetCount,
                     Unknown0c = unknown0c
