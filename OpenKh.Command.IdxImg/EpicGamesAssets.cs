@@ -306,6 +306,8 @@ namespace OpenKh.Command.IdxImg
 
                     BinaryMapping.WriteObject<EgsHdAsset.Header>(pkgStream, header);
 
+                    Console.WriteLine($"Replaced original file: {filename}");
+
                     var remasteredHeaders = new List<EgsHdAsset.RemasteredEntry>();
 
                     // Is there remastered assets?
@@ -376,6 +378,8 @@ namespace OpenKh.Command.IdxImg
 
                             // Write asset header in the PKG stream
                             BinaryMapping.WriteObject<EgsHdAsset.RemasteredEntry>(pkgStream, remasteredEntry);
+
+                            Console.WriteLine($"Replaced remastered file: {relativePath}/{remasteredAssetFile}");
 
                             var encryptedData = EgsEncryption.Encrypt(compressedData, seed);
 
@@ -488,7 +492,12 @@ namespace OpenKh.Command.IdxImg
                 var fileHash = CreateMD5(filename);
                 // 0x10 => size of the original asset header
                 // 0x30 => size of the remastered asset header
-                var dataLength = remasteredHeaders.Sum(h => h.CompressedLength) + (remasteredHeaders.Count * 0x30) + data.Length + 0x10;
+                var dataLength = data.Length + 0x10;
+
+                foreach (var header in remasteredHeaders)
+                {
+                    dataLength += header.CompressedLength + 0x30;
+                }
 
                 return new Hed.Entry()
                 {
