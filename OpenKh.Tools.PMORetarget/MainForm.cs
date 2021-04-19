@@ -88,6 +88,10 @@ namespace OpenKh.Tools.PMORetarget
                             {
                                 chunk.SectionInfo_opt1.SectionBoneIndices[i] = (byte)foundBone.BoneIndex;
                             }
+                            else
+                            {
+                                chunk.SectionInfo_opt1.SectionBoneIndices[i] = 0xFF;
+                            }
                         }
                     }
                 }

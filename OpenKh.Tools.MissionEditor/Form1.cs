@@ -59,6 +59,7 @@ namespace OpenKh.Tools.MissionEditor
                 UpdateParameters();
                 SaveMissionButton.Enabled = true;
                 AddMissionButton.Enabled = true;
+                missionFile.Close();
             }
         }
 
