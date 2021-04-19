@@ -157,12 +157,11 @@ namespace OpenKh.Tools.EpdEditor
             foreach(TextBox txt in AnimationLayoutPanel.Controls)
             {
                 char[] arr = new char[4];
-                if(txt.Text != "")
+                
+                if (txt.Text != "")
                 {
-                    arr[0] = txt.Text.ToCharArray()[0];
-                    arr[1] = txt.Text.ToCharArray()[1];
-                    arr[2] = txt.Text.ToCharArray()[2];
-                    arr[3] = (char)0;
+                    arr = txt.Text.ToCharArray(0, txt.Text.Length);
+                    Array.Resize(ref arr, 4);
                 }
                 epd.AnimationList.Add(arr);
             }
