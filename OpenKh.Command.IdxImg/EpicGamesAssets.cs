@@ -270,20 +270,22 @@ namespace OpenKh.Command.IdxImg
                         // Write the original data
                         else
                         {
-                            entry.Offset = pkgOffset;
                             pkgStream.SetPosition(entry.Offset);
-
-                            BinaryMapping.WriteObject<Hed.Entry>(patchedHedStream, entry);
 
                             var data = new byte[entry.DataLength];
                             var dataLenght = pkgStream.Read(data, 0, entry.DataLength);
-
-                            patchedPkgStream.Write(data);
 
                             if (dataLenght != entry.DataLength)
                             {
                                 throw new Exception($"Error, can't read  {entry.DataLength} bytes for file {filename}. (only read {dataLenght})");
                             }
+
+                            // Write the HED entry with new offset
+                            entry.Offset = pkgOffset;
+                            BinaryMapping.WriteObject<Hed.Entry>(patchedHedStream, entry);
+
+                            // Write the PKG file with the original asset file data
+                            patchedPkgStream.Write(data);
 
                             pkgOffset += dataLenght;
                         }
