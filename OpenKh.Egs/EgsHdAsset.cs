@@ -44,13 +44,15 @@ namespace OpenKh.Egs
         private readonly long _baseOffset;
         private readonly long _dataOffset;
         private readonly Dictionary<string, RemasteredEntry> _entries;
+        private readonly Hed.Entry _hedEntry;
 
         public string[] Assets { get; }
         public Header OriginalAssetHeader => _header;
         public Dictionary<string, RemasteredEntry> RemasteredAssetHeaders => _entries;
 
-        public EgsHdAsset(Stream stream)
+        public EgsHdAsset(Stream stream, Hed.Entry hedEntry)
         {
+            _hedEntry = hedEntry;
             _stream = stream;
             _baseOffset = stream.Position;
 
@@ -72,8 +74,8 @@ namespace OpenKh.Egs
 
         public byte[] ReadRemasteredAsset(string assetName)
         {
-            var entry = _entries[assetName];
-            var dataLength = entry.CompressedLength >= 0 ? entry.CompressedLength : entry.DecompressedLength;
+            var header = _entries[assetName];
+            var dataLength = header.CompressedLength >= 0 ? header.CompressedLength : header.DecompressedLength;
             
             if (dataLength % 16 != 0)
                 dataLength += 16 - (dataLength % 16);
@@ -81,16 +83,14 @@ namespace OpenKh.Egs
             var data = _stream.AlignPosition(0x10).ReadBytes(dataLength);
 
             for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
-            {
                 EgsEncryption.DecryptChunk(_key, data, i, PassCount);
-            }
 
-            if (entry.CompressedLength >= 0)
+            if (header.CompressedLength >= 0)
             {
                 using var compressedStream = new MemoryStream(data);
                 using var deflate = new DeflateStream(compressedStream.SetPosition(2), CompressionMode.Decompress);
 
-                var decompressedData = new byte[entry.DecompressedLength];
+                var decompressedData = new byte[header.DecompressedLength];
                 deflate.Read(decompressedData);
 
                 return decompressedData;
@@ -101,9 +101,6 @@ namespace OpenKh.Egs
 
         public byte[] ReadData()
         {
-            if (_header.CompressedLength < 0)
-                _header.CompressedLength = _header.CompressedLength;
-
             var dataLength = _header.CompressedLength >= 0 ? _header.CompressedLength : _header.DecompressedLength;
             var data = _stream.SetPosition(_dataOffset).ReadBytes(dataLength);
 
