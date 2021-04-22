@@ -132,7 +132,7 @@ namespace OpenKh.Command.IdxImg
                         outputFileName = Path.Combine(outputDir + "/remastered/", fileName);
                         foreach (var asset in hdAsset.Assets)
                         {
-                            var outputFileNameRemastered = Path.Combine(Path.ChangeExtension(outputFileName, null), asset);
+                            var outputFileNameRemastered = Path.Combine(outputFileName, asset);
                             Console.WriteLine(outputFileNameRemastered);
                             CreateDirectoryForFile(outputFileNameRemastered);
 
