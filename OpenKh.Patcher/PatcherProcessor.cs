@@ -378,23 +378,23 @@ namespace OpenKh.Patcher
 
                         case "fmlv":
                             var formRaw = Kh2.Battle.Fmlv.Read(stream).ToList();
-                            var formList = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv.Level>>();
+                            var formList = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv>>();
                             foreach (var form in formRaw)
                             {
-                                if (!formList.ContainsKey(form.FormFm))
+                                if (!formList.ContainsKey(form.FinalMixForm))
                                 {
-                                    formList.Add(form.FormFm, new List<Kh2.Battle.Fmlv.Level>());
+                                    formList.Add(form.FinalMixForm, new List<Kh2.Battle.Fmlv>());
                                 }
-                                formList[form.FormFm].Add(form);
+                                formList[form.FinalMixForm].Add(form);
                             }
                             var moddedForms = deserializer.Deserialize<Dictionary<Kh2.Battle.Fmlv.FormFm, List<FmlvDTO>>>(sourceText);
                                 foreach (var form in moddedForms)
                                 {
                                     foreach (var level in form.Value)
                                     {
-                                        formList[form.Key][level.FormLevel - 1].Ability = level.Ability;
+                                        formList[form.Key][level.FormLevel - 1].Ability = (ushort)level.Ability;
                                         formList[form.Key][level.FormLevel - 1].Exp = level.Experience;
-                                        formList[form.Key][level.FormLevel - 1].LevelGrowthAbility = level.GrowthAbilityLevel;
+                                        formList[form.Key][level.FormLevel - 1].Unk1= level.GrowthAbilityLevel;
                                         
                                     }
 
@@ -474,7 +474,7 @@ namespace OpenKh.Patcher
                             var moddedPlrp = deserializer.Deserialize<List<Kh2.Battle.Plrp>>(sourceText);
                             foreach (var plrp in moddedPlrp)
                             {
-                                var oldPlrp = plrpList.First(x => x.Character == plrp.Character && x.Difficulty == plrp.Difficulty);
+                                var oldPlrp = plrpList.First(x => x.Character == plrp.Character && x.Id == plrp.Id);
                                 plrpList[plrpList.IndexOf(oldPlrp)] = plrp;
                             }
                             Kh2.Battle.Plrp.Write(stream.SetPosition(0), plrpList);
