@@ -26,7 +26,7 @@ namespace OpenKh.Kh2.Battle
                 [Data] public ushort SwordAbility { get; set; }
                 [Data] public ushort ShieldAbility { get; set; }
                 [Data] public ushort StaffAbility { get; set; }
-                [Data(Count = 2)] public byte[] Padding { get; set; }
+                [Data] public ushort Padding { get; set; }
             }
         }
 
