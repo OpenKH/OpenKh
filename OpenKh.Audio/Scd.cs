@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using Xe.BinaryMapper;
 using System.Linq;
 using System.IO;
-using System.Text;
 using OpenKh.Common;
 
-namespace OpenKh.Bbs
+namespace OpenKh.Audio
 {
     public class Scd
     {
@@ -43,11 +42,27 @@ namespace OpenKh.Bbs
             [Data] public uint StreamSize { get; set; }
             [Data] public uint ChannelCount { get; set; }
             [Data] public uint SampleRate { get; set; }
-            [Data] public uint Codec { get; set; }
+            [Data] public Codec Codec { get; set; }
             [Data] public uint LoopStart { get; set; }
             [Data] public uint LoopEnd { get; set; }
             [Data] public uint ExtraDataSize { get; set; }
             [Data] public uint AuxChunkCount { get; set; }
+
+            public byte[] ExtraData { get; set; }
+            public byte[] Data { get; set; }
+        }
+
+        public enum Codec : uint
+        {
+            Pcm = 0x1,
+            PsAdpcm = 0x3,
+            OggVorbis = 0x6,
+            Mpeg = 0x7,
+            MsAdpcm = 0xc,
+            DspAdpcm = 0xa,
+            Xma2 = 0xb,
+            DspAdpcm2 = 0x15,
+            Atrac9 = 0x16
         }
 
         public class VAGHeader
@@ -65,11 +80,11 @@ namespace OpenKh.Bbs
 
         public static Header header = new Header();
         public static TableOffsetHeader tableOffsetHeader = new TableOffsetHeader();
-        public static List<byte[]> StreamFiles = new List<byte[]>();
+        public static List<StreamHeader> StreamFiles = new List<StreamHeader>();
 
         public static Scd Read(Stream stream)
         {
-            Scd scd = new Scd();
+            Scd scd = new();
 
             header = BinaryMapping.ReadObject<Header>(stream);
             tableOffsetHeader = BinaryMapping.ReadObject<TableOffsetHeader>(stream);
@@ -87,8 +102,11 @@ namespace OpenKh.Bbs
                 stream.Seek(off, SeekOrigin.Begin);
                 var streamInfo = BinaryMapping.ReadObject<StreamHeader>(stream);
 
-                byte[] st = stream.ReadBytes((int)streamInfo.StreamSize);
-                StreamFiles.Add(st);
+                streamInfo.ExtraData = stream.ReadBytes((int)streamInfo.ExtraDataSize);
+                streamInfo.Data = stream.ReadBytes((int)streamInfo.StreamSize);
+
+
+                StreamFiles.Add(streamInfo);
 
                 // Convert to VAG Streams.
                 /*VAGHeader vagHeader = new VAGHeader();
@@ -98,9 +116,6 @@ namespace OpenKh.Bbs
                 vagHeader.Magic = 0x70474156;
                 vagHeader.Name = p.ToString();*/
             }
-
-
-
             return scd;
         }
 
