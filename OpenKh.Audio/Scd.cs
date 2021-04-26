@@ -65,19 +65,6 @@ namespace OpenKh.Audio
             Atrac9 = 0x16
         }
 
-        public class VAGHeader
-        {
-            [Data] public uint Magic { get; set; }
-            [Data] public uint Version { get; set; } // Usually 3
-            [Data] public uint Reserved08 { get; set; }
-            [Data] public uint DataSize { get; set; }
-            [Data] public uint SamplingFrequency { get; set; }
-            [Data(Count = 10)] public byte[] Reserved14 { get; set; }
-            [Data] public byte ChannelCount { get; set; }
-            [Data] public byte Reserved1F { get; set; }
-            [Data(Count = 16)] public string Name { get; set; }
-        }
-
         public static Header header = new Header();
         public static TableOffsetHeader tableOffsetHeader = new TableOffsetHeader();
         public static List<StreamHeader> StreamFiles = new List<StreamHeader>();
@@ -107,14 +94,6 @@ namespace OpenKh.Audio
 
 
                 StreamFiles.Add(streamInfo);
-
-                // Convert to VAG Streams.
-                /*VAGHeader vagHeader = new VAGHeader();
-                vagHeader.ChannelCount = (byte)streamInfo.ChannelCount;
-                vagHeader.SamplingFrequency = (byte)streamInfo.SampleRate;
-                vagHeader.Version = 3;
-                vagHeader.Magic = 0x70474156;
-                vagHeader.Name = p.ToString();*/
             }
             return scd;
         }
