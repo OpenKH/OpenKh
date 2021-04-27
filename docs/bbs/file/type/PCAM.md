@@ -5,7 +5,7 @@ PCAM stands for *Player CAMera*.
 It controls various aspects of a specific player's camera.
 
 Camera files are contained across many files, but the main list of cameras is in `arc/pc/PXXInit.arc` where XX is the number of the player.
-The player's main camera is usually `000`.
+The player's main camera is usually the one starting with a `P` and followed by `000` after.
 
 ## Header
 

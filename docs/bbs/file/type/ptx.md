@@ -123,7 +123,7 @@ This section can be added to change the music applied to an event, usually insid
 
 ## PTNCODE_TRG_ACTION
 
-This one occupies 4 bytes per instances.
+This one occupies 4 bytes per instance.
 
 ### Room Teleport
 

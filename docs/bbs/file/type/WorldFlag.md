@@ -32,24 +32,24 @@ Each world flag data consists of sections like this until it reaches the end of 
 
 ### World Code
 
-| Value | Name
-|--------|------------
-| 0      | _CODE_END
-| 1      | _CODE_NEW_EPISODE
-| 2      | _CODE_OLD_EPISODE
-| 3      | _CODE_HIDDEN
-| 4      | _CODE_DARKNESS
-| 5      | _CODE_FREE
-| 6      | _CODE_LANDABLE
-| 7      | _CODE_SHIELD
-| 8      | _CODE_CLEARED
-| 9      | _CODE_NEXT
-| 10     | _CODE_ROUTELESS
-| 11     | _CODE_DISCONNECT
-| 12     | _CODE_CONNECT
-| 13     | _CODE_DICE_OPEN
-| 14     | _CODE_REFUSE
-| 15     | _CODE_UNKNOWN
-| 16     | _CODE_KNOWN
-| 17     | _CODE_MESSAGE
-| 18     | _CODE_UNCEAR
+| Value | Name | Description
+|--------|------------|-----
+| 0      | _CODE_END            | 
+| 1      | _CODE_NEW_EPISODE    | 
+| 2      | _CODE_OLD_EPISODE    | 
+| 3      | _CODE_HIDDEN         | World is hidden from view
+| 4      | _CODE_DARKNESS       | World is darkened
+| 5      | _CODE_FREE           | World appears in the worldmap
+| 6      | _CODE_LANDABLE       | World can be landed on
+| 7      | _CODE_SHIELD         | World protected by a shield
+| 8      | _CODE_CLEARED        | World cleared
+| 9      | _CODE_NEXT           | World moves to the next flag
+| 10     | _CODE_ROUTELESS      | World isn't connected by world lines
+| 11     | _CODE_DISCONNECT     | 
+| 12     | _CODE_CONNECT        | 
+| 13     | _CODE_DICE_OPEN      | 
+| 14     | _CODE_REFUSE         | 
+| 15     | _CODE_UNKNOWN        | 
+| 16     | _CODE_KNOWN          | 
+| 17     | _CODE_MESSAGE        | 
+| 18     | _CODE_UNCEAR         | 
