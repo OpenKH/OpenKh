@@ -515,6 +515,55 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void PatchKh2SpawnPointTest()
+        {
+
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "map.script",
+                        Method = "areadataspawn",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "map.yaml",
+                            }
+                        }
+                    },
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "map.script")).Using(stream =>
+            {
+                var spawnPoint = new List<Kh2.Ard.SpawnPoint>();
+
+                Kh2.Ard.SpawnPoint.Write(stream, spawnPoint);
+            });
+            File.Create(Path.Combine(ModInputDir, "map.yaml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- Type: 2");
+                writer.WriteLine("  Flag: 1");
+                writer.Flush();
+            });
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "map.script");
+            var content = File.ReadAllText(Path.Combine(ModOutputDir, "map.script"));
+            var scripts = new Deserializer().Deserialize<List< Kh2.Ard.SpawnPoint >> (content);
+
+            Assert.Equal(2, scripts[0].Type);
+            Assert.Equal(1, scripts[0].Flag);
+           
+        }
+
+                
+                
         public void ListPatchTrsrTest()
         {
             var patcher = new PatcherProcessor();
@@ -1171,6 +1220,95 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal("M_EX100.mset", objStream[0].AnimationName);
             });
 
+        }
+
+        [Fact]
+        public void ListPatchPlrpTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "plrp",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "PlrpList.yml",
+                                        Type = "plrp"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var plrpEntry = new List<Kh2.Battle.Plrp>()
+                {
+                    new Kh2.Battle.Plrp
+                    {
+                        Difficulty = 7,
+                        Character = 1,
+                        Ap = 2,
+                        Objects = new List<short>(new short[58])
+                    }
+                };
+
+                using var plrpStream = new MemoryStream();
+                Kh2.Battle.Plrp.Write(plrpStream, plrpEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "plrp",
+                        Type = Bar.EntryType.List,
+                        Stream = plrpStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "PlrpList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                var serializer = new Serializer();
+                var moddedPlrp = new List<Kh2.Battle.Plrp>{
+                    new Kh2.Battle.Plrp
+                    {
+                        Difficulty = 7,
+                        Character = 1,
+                        Ap = 200,
+                        Objects = new List<short>(new short[58])
+                    } 
+                };
+                writer.Write(serializer.Serialize(moddedPlrp));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var plrp = Kh2.Battle.Plrp.Read(binarc[0].Stream);
+
+                Assert.Equal(200, plrp[0].Ap);
+            });
         }
 
         [Fact]
