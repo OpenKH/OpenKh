@@ -19,6 +19,10 @@ The mod.yml file is a YAML format specification for your mod. It will contain th
 * `logo` - The path to the icon.png
 * `assets` - A list of assets that will be modified when the mod runs. See `asset types`, for details on creating an asset. Some asset types will work on any game, while others are game specific.
 
+While you are developing a mod you can create a folder inside the "mods" directory of the mods manager release, IE
+
+`<modsmanager release>/mods/<authorname>/<modname>`
+
 ## Asset Methods
 
 * `copy` (any game) - Performs a direct copy to overwrite a file. Works on any file type.
@@ -49,7 +53,7 @@ Asset Example
 
 ## Binarc Methods
 
-* `copy` (KH2, BBS) - Performs a copy on a supfile within a Bar. Must be one of the [following](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Tools.BarEditor/Helpers.cs#L14) types
+* `copy` (KH2) - Performs a copy on a supfile within a Bar. Must be one of the [following](https://github.com/Xeeynamo/OpenKh/blob/master/OpenKh.Tools.BarEditor/Helpers.cs#L14) types
 
 Asset Example
 
@@ -370,6 +374,7 @@ assets:
 ## Publishing a mod
 
 Mods should be published to a public github repository, so that users an install the mod just by providing the repository name.
+
 
 It is recommended to apply the following tags to the repository, in order to make it easily found by searching GitHub for mods manager mods.
 
