@@ -4,76 +4,53 @@ Mission file. They are located in `msn/{language}/` and describe how a certain m
 
 ## Mission
 
-This is the entry point of the file. It is a binary-type file and it always have as a name `{WORLD_ID}{MAP_INDEX}`
+This is the entry point of the file. It is a binary-type file and it's name is always `{WORLD_ID}{MAP_INDEX}`. Example: for the file `EH21_MS101`, where `EH` is the [world](../../worlds.md) and `21` is the map index, the mission name is called `EH21`.
 
-eg. for the file `EH21_MS101`, where `EH` is the [world](../../worlds.md) and `21` is the map index, the mission name is called `EH21`.
+This file is splitted into two parts: The first `0x1C` bytes are the [header](#header). This length is always fixed. After that comes a block of variable length which contains [opcodes](#opcodes).
 
-How this file is read is not completely understood.
-
-What is known about this file is as follows:
+### Header
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
 | 0x00   | uint16 | Magic Code, always `2`
-| 0x02   | BitArray | Boolean Flag Array [1]
-| 0x03   | BitArray | Boolean Flag Array [2]
-| 0x04   | BitArray | Boolean Flag Array [3]
-| 0x05   | BitArray | Boolean Flag Array [4]
-| 0x06   | uint16 | Unknown. Probably actually a bit array.
-| 0x08   | Unknown (Either uint16 or BitArray) | Pause Menu Controller
-| 0x0A   | uint16 | Pause Menu Information Text
+| 0x02   | uint16 | Id (used in [ARD](ard.md))
+| 0x04   | uint16 | [Flags](#flags)
+| 0x06   | uint16 | Information Bar Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
+| 0x08   | byte/BitArray | Pause Menu Controller
+| 0x09   | byte | Padding
+| 0x0A   | uint16 | Pause Menu Information Text Id (loaded from `msg\{LANGUAGE}\{WORLD_ID}.bar`)
 | 0x0C   | BitArray | Boolean Flag Array [5]
 | 0x0D   | byte | [Bonus Reward](00battle.md#bons)
-| 0x0E   | uint16 | Antiform Multiplier
-| - | - | -
-| 0x1C | uint16 | Intro Camera Controller
+| 0x0E   | byte | Antiform Multiplier
+| 0x0F   | byte | Padding
+| 0x10   | int | Sound effect when mission is started
+| 0x14   | int | Sound effect when mission is finished
+| 0x18   | int | Sound effect when mission is failed
 
-
-### Boolean Flag Arrays
-
-This file uses Bit Arrays to store boolean flags for use during the missions. Known arrays/flags are as follows:
-
-#### Boolean Flag Array 2
+#### Flags
 
 | Bit | Description |
 |-----|-------------|
-| 1 | ???
-| 2 | ???
-| 4 | ???
-| 8 | ???
-| 16 | Is Control?
-| 32 | ???
-| 64 | ???
-| 128 | ???
+| 0x1 | Is Boss Battle
+| 0x2 | Is Drive Disabled
+| 0x4 | Is Enable Place
+| 0x8 | unused
+| 0x10 | Is Show Weapon
+| 0x20 | No Leave
+| 0x40 | No Prize
+| 0x80 | No Prizebox
+| 0x100 | Hide Minimap
+| 0x200 | Is Mickey spawnable
+| 0x400 | Is No Experience
+| 0x800 | Is Magic Disabled
+| 0x1000 | Is Retry possible
+| 0x2000 | Is Free Summon (Summon alone)
+| 0x4000 | Is Summon Disabled
+| 0x8000 | unused
 
-#### Boolean Flag Array 3
+#### Pause Menu Controller
 
-| Bit | Description |
-|-----|-------------|
-| 1 | Is Boss Battle?
-| 2 | Is Drive Disabled?
-| 4 | Is Enable Place?
-| 8 | Is Minigame?
-| 16 | Is Show Weapon?
-| 32 | ???
-| 64 | ???
-| 128 | ???
-
-#### Boolean Flag Array 4
-
-| Bit | Description |
-|-----|-------------|
-| 1 | ??? 
-| 2 | Can Mickey save Sora? 
-| 4 | Is Experience Disabled?
-| 8 | Is Magic Disabled?
-| 16 | Does the "Continue" option on the Game Over screen retry the mission?
-| 32 | Are Summons Free?
-| 64 | Are Summons Disabled?
-| 128 | ???
-
-### Pause Menu Controller
-Defines the type of Pause Menu Available when pressing start. Known values are as follows:
+Defines the type of Pause Menu Available when pressing start.
 
 | Value | Description |
 |-------|-------------|
@@ -100,14 +77,136 @@ Defines the type of Pause Menu Available when pressing start. Known values are a
 
 This is most likely a BitArray and needs to be explored further.
 
-### Pause Menu Information Text
-Loads a string of ID uint16 from `.\msg\{LANGUAGE}\{WORLD_ID}.bar` to be displayed in the information box while the game is paused.
-
-### Antiform Multiplier
+#### Antiform Multiplier
 Multiplies the chance of getting Antiform in a battle. Seems to affect the frequency with which Mickey can save Sora, too.
 
-### Intro Camera Controller
-Decides whether or not the game will do the intro camera zooms on the character at the beginning of the battle. The only known value is '01'.
+### Opcodes
+
+This micro-code is responsible for certain elements to be used in missions.
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | short | [Operation code](#operation-code)
+| 02     | short | Parameter count for the operation
+| 04     | int[] | Parameters
+
+### Operation code
+
+There is a total of 13 operation codes for the mission script. The parser can be found at [sub_181d30].
+
+- 01: [CameraStart](#camerastart)
+- 02: [CameraComplete](#cameracomplete)
+- 03: [CameraFailed](#camerafailed)
+- 04: [Timer](#timer)
+- 05: [Counter](#counter)
+- 06: [Gauge](#gauge)
+- 07: [ComboCounter](#combocounter)
+- 08: [MissionScore](#missionscore)
+- 09: [Watch](#watch)
+- 0a: [LimitCost](#limitcost)
+- 0b: [DriveRefillRatio](#driverefillratio)
+- 0c: [AddDrive](#adddrive)
+- 0d: [CameraPrize](#cameraprize)
+
+
+#### CameraStart
+
+Intro to missions. Either camera transitions or content from a SEQD.
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | byte  | Entry number in BAR to AnimationLoader file (for camera)
+| 01     | byte  | Entry number in BAR to SEQD file
+| 02     | ushort | Object Id which camera will focus on
+
+Used 227 times.
+
+#### CameraComplete
+
+Ending to missions. Either camera transitions or content from a SEQD. Has the same structure as [CameraStart](#camerastart).
+
+Used 240 times.
+
+#### CameraFailed
+
+Plays when an event is failed (for example when a struggle battle is lost). Either camera transitions or content from a SEQD. Has the same structure as [CameraStart](#camerastart).
+
+Used 88 times.
+
+#### Timer
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | int   | Initial value
+| 04     | int   | Max value
+| 08     | int   | Min value
+| 0C     | byte  | Entry number in BAR to SEQD file. If no file is present the timer will be invisible.
+| 0D     | byte  |
+| 0E     | byte  |
+| 0F     | byte  |
+
+If `Initial value` >= `Max value` the timer will count down. Otherwise it will count up.
+
+Used 78 times.
+
+#### Counter
+
+Is used to count for example Struggle orbs, enemies, medals in Olympus Cups etc.
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | int   | Initial value
+| 04     | int   | Max value
+| 08     | int   | Min value
+| 0C     | byte  | Entry number in BAR to SEQD file. If no file is present the counter will be invisible.
+| 0D     | byte  |
+| 0E     | byte  |
+| 0F     | byte  |
+
+Used 208 times.
+
+#### Gauge
+
+Used 55 times.
+
+#### ComboCounter
+
+Used 40 times.
+
+#### MissionScore
+
+Used 0 times.
+
+#### Watch
+
+Used 11 times.
+
+#### LimitCost
+
+Defines how much MP a Limit consumes.
+
+| Offset | Type  | Description
+|--------|-------|------------
+| 00     | int   | MP cost
+
+Used 10 times.
+
+#### DriveRefillRatio
+
+Defines how fast the drive gauge fills/drains.
+
+Used 10 times.
+
+
+#### AddDrive
+
+Used 11 times.
+
+#### CameraPrize
+
+Currently unknown. Either camera transitions or content from a SEQD. Has the same structure as [CameraStart](#camerastart).
+
+Used 42 times.
 
 ## The `miss` entry
 

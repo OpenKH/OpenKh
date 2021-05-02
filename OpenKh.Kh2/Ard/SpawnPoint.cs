@@ -334,6 +334,9 @@ namespace OpenKh.Kh2.Ard
         public override string ToString() =>
             $"Type {Type:X} Flag {Flag:X} {Id:X}\n{string.Join("\n", Entities.Select(x => x.ToString()))}";
 
+        public static bool IsValid(Stream stream) =>
+            stream.Length >= 4 && stream.PeekUInt32() == 0x2;
+
         public static List<SpawnPoint> Read(Stream stream)
         {
             var typeId = stream.ReadInt32();

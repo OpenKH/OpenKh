@@ -72,7 +72,7 @@ void OpenKH::Initialize()
 
     Hook(KingdomApiOffsets[(int)gameId]);
     Panacea::Initialize();
-
+    
     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)OpenKH::Main, NULL, 0, NULL);
 }
 
@@ -86,18 +86,32 @@ void OpenKH::Main()
 OpenKH::GameId OpenKH::DetectGame()
 {
     const char* DetectedFmt = "%s detected.\n";
+
+    // We should just return unknown if the launcher is running
+
+    wchar_t buffer[MAX_PATH]; // MAX_PATH default macro
+    int len = GetModuleFileName(NULL, buffer, MAX_PATH);
+
+    const char* launcher_name = "C:\\Program Files\\Epic Games\\KH_1.5_2.5\\KINGDOM HEARTS HD 1.5+2.5 Launcher.exe";
+    size_t newsize = strlen(launcher_name) + 1;
+    wchar_t* launcher_name_wide = new wchar_t[newsize];
+    size_t convertedChars = 0;
+    mbstowcs_s(&convertedChars, launcher_name_wide, newsize, launcher_name, _TRUNCATE);
+    if (wcscmp(buffer, launcher_name_wide) == 0)
+        return GameId::Unknown;
+
     if (strcmp((const char*)g_hInstance + 0x2BD2090, "dummy_string") == 0)
-    {
-        fprintf(stdout, DetectedFmt, "Kingdom Hearts II");
-        return GameId::KingdomHearts2;
-    }
-    if (strcmp((const char*)g_hInstance + 0x11165090, "dummy_string") == 0)
-    {
-        fprintf(stdout, DetectedFmt, "Kingdom Hearts Birth By Sleep");
-        Hook(pfn_Bbs_File_load, Bbs_File_load);
-        Hook(pfn_Bbs_CRsrcData_loadCallback, Bbs_CRsrcData_loadCallback);
-        return GameId::KingdomHeartsBbs;
-    }
+        {
+            fprintf(stdout, DetectedFmt, "Kingdom Hearts II");
+            return GameId::KingdomHearts2;
+        }
+        if (strcmp((const char*)g_hInstance + 0x11165090, "dummy_string") == 0)
+        {
+            fprintf(stdout, DetectedFmt, "Kingdom Hearts Birth By Sleep");
+            Hook(pfn_Bbs_File_load, Bbs_File_load);
+            Hook(pfn_Bbs_CRsrcData_loadCallback, Bbs_CRsrcData_loadCallback);
+            return GameId::KingdomHeartsBbs;
+        }
 
     return GameId::Unknown;
 }

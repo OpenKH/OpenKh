@@ -196,32 +196,32 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 
 | Pawn    | Description
 |---------|-------------
-| e_bx001 | Shadow
-| e_bx009 | Soldier
-| e_bx016 | Neoshadow
-| e_bx037 | 
-| e_bx044 | Pole Cannon
-| e_bx048 | Tireblade
+| e_bx001 | Shadow (Flash Tracer)
+| e_bx009 | Soldier (Flash Tracer)
+| e_bx016 | Neoshadow (Flash Tracer)
+| e_bx037 | Gold Beat (Flash Tracer)
+| e_bx044 | Pole Cannon (Flash Tracer)
+| e_bx048 | Tireblade (Flash Tracer)
 | e_bx059 | Metal Troll
 | e_bx063 | Metal Troll Axe
-| e_bx079 | 
-| e_bx080 | 
-| e_bx083 | 
-| e_bx084 | 
+| e_bx079 | Gold Beat Back Piece 1
+| e_bx080 | Gold Beat Back Piece 2
+| e_bx083 | Rocket (Pole Cannon)
+| e_bx084 | Pole (Pole Cannon)
 | e_bx901 | Dark Baymax
-| e_bx902 | 
-| e_bx903 | Cubes
-| e_bx905 | Cubes
+| e_bx902 | Darkubes (Single)
+| e_bx903 | Darkubes (Disc)
+| e_bx905 | Darkubes (Huge Block)
 | e_bx906 | Dark Baymax
-| e_bx907 | Cubes
+| e_bx907 | Darkubes (Stack)
 | e_ca002 | Large Body
-| e_ca004 | 
+| e_ca004 | Water Core
 | e_ca005 | Earth Core
 | e_ca035 | Powerwild
-| e_ca036 | 
-| e_ca037 | 
-| e_ca038 | 
-| e_ca041 | 
+| e_ca036 | Marine Rumba
+| e_ca037 | Gold Beat
+| e_ca038 | Malachite Bolero
+| e_ca041 | Sandworm (name?)
 | e_ca047 | Lich
 | e_ca110 | Gambler
 | e_ca401 | Ship Sails
@@ -231,49 +231,49 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ca405 | Ship Sails
 | e_ca411 | Ship Base
 | e_ca412 | Ship Base
-| e_ca413 | 
-| e_ca414 | 
-| e_ca415 | Ship Base
+| e_ca413 | Wrecked Ship
+| e_ca414 | Wrecked Ship
+| e_ca415 | Flying Dutchman (Ship Base)
 | e_ca421 | Ship
 | e_ca901 | Davy Jones
 | e_dw401 | Demon Tide
-| e_dw402 | Pole?
-| e_dw407 | 
+| e_dw402 | Demon Tower
+| e_dw407 | Darkside
 | e_ex001 | Shadow
 | e_ex002 | Large Body
 | e_ex003 | Flame Core
-| e_ex004 | Ball
+| e_ex004 | Water Core
 | e_ex005 | Earth Core
 | e_ex006 | Satyr
 | e_ex007 | Bizarre Archer
-| e_ex008 | Arrow
+| e_ex008 | Arrow (Bizarre Archer)
 | e_ex009 | Soldier
 | e_ex010 | Air Soldier
 | e_ex011 | Chaos Carriage
-| e_ex012 | 
+| e_ex012 | Chief Puff/Puffball Stack (?)
 | e_ex013 | Chief Puff
 | e_ex014 | Puffball
 | e_ex015 | Toy Trooper
 | e_ex016 | Neoshadow
-| e_ex017 | Gigas
+| e_ex017 | Vermilion Samba
 | e_ex018 | Gigas
 | e_ex020 | Marionette
 | e_ex021 | Raging Vulture
 | e_ex024 | Sword
 | e_ex025 | Sword
 | e_ex026 | Vaporfly
-| e_ex027 | 
-| e_ex028 | 
+| e_ex027 | Lightning Angler
+| e_ex028 | Sea Sprite
 | e_ex030 | 
 | e_ex031 | 
 | e_ex032 | Gigas
 | e_ex033 | Gigas
 | e_ex035 | Powerwild
-| e_ex036 | 
-| e_ex037 | 
-| e_ex038 | 
+| e_ex036 | Marine Rumba
+| e_ex037 | Gold Beat
+| e_ex038 | Malachite Bolero
 | e_ex039 | Parasol Beauty
-| e_ex041 | 
+| e_ex041 | Sandworm (name?)
 | e_ex042 | Anchor Raider
 | e_ex043 | Dark Inferno
 | e_ex044 | Pole Cannon
@@ -288,41 +288,41 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex053 | Grape Flan
 | e_ex054 | Catastrochorus
 | e_ex055 | Honeydew Flan
-| e_ex056 | Grapefruit Flan
-| e_ex057 | 
-| e_ex058 | 
+| e_ex056 | Watermelon Flan
+| e_ex057 | Watermelon
+| e_ex058 | Pancakes (?) w/ Fruit
 | e_ex059 | Rock Troll
 | e_ex061 | Popcat
 | e_ex062 | 
 | e_ex063 | Rock Troll Axe
-| e_ex064 | 
-| e_ex065 | Popcat
-| e_ex066 | Popcat
-| e_ex067 | Popcat
-| e_ex068 | Popcat
-| e_ex069 | 
-| e_ex070 | 
-| e_ex071 | 
+| e_ex064 | Kraken Tentacle (Davy Jones Fight)
+| e_ex065 | Vitality Popcat
+| e_ex066 | Magic Popcat
+| e_ex067 | Focus Popcat
+| e_ex068 | Munny Popcat
+| e_ex069 | Chain links (Anchor Raider)(?)
+| e_ex070 | Anchor (Anchor Raider)(?)
+| e_ex071 | Kraken Tentacle (Davy Jones Fight)
 | e_ex072 | Spear Lizard
 | e_ex073 | Pogo Shovel
 | e_ex075 | Gigas Arms?
 | e_ex076 | Gigas Arms?
 | e_ex077 | Gigas Arms?
 | e_ex078 | Vermillion Samba Back Piece
-| e_ex079 | 
-| e_ex080 | 
+| e_ex079 | Gold Beat Back Piece 1
+| e_ex080 | Gold Beat Back Piece 2
 | e_ex081 | Fluttering
-| e_ex082 | 
-| e_ex083 | 
-| e_ex084 | 
-| e_ex085 | Gigas
-| e_ex086 | Gigas
-| e_ex087 | Gigas
+| e_ex082 | Frost Serpent (Grounded) 
+| e_ex083 | Rocket (Pole Cannon)
+| e_ex084 | Pole (Pole Cannon)
+| e_ex085 | Gigas (Beat of Lead)(?)
+| e_ex086 | Gigas (Beat of Lead)(?)
+| e_ex087 | Gigas (Beat of Lead)(?)
 | e_ex088 | Gigas Arms?
 | e_ex089 | Gigas Arms?
 | e_ex090 | Gigas Arms?
-| e_ex091 | 
-| e_ex092 | 
+| e_ex091 | Gigas Prime (?)
+| e_ex092 | Gigas Prime (?)
 | e_ex093 | Mechanitaur
 | e_ex094 | High Soldier
 | e_ex095 | Helmed Body
@@ -331,19 +331,19 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex098 | 
 | e_ex099 | 
 | e_ex101 | Dusk
-| e_ex105 | 
+| e_ex105 | Sorcerer
 | e_ex106 | Sniper
-| e_ex107 | 
-| e_ex108 | 
+| e_ex107 | Berserker
+| e_ex108 | Berserker (Size Change)
 | e_ex110 | Gambler
 | e_ex113 | Reaper
 | e_ex114 | Ninja
 | e_ex115 | 
-| e_ex116 | 
+| e_ex116 | Vines (Reaper)(?)
 | e_ex201 | Flood
 | e_ex202 | Flowersnake
-| e_ex203 | Spike Turtletoad
-| e_ex204 | 
+| e_ex203 | Spiked Turtletoad
+| e_ex204 | Spike
 | e_ex205 | Turtletoad
 | e_ex301 | Xehanort
 | e_ex302 | Young Xehanort
@@ -356,7 +356,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex309 | Larxene
 | e_ex310 | Xion (Hooded)
 | e_ex311 | Vanitas
-| e_ex312 | Terranort
+| e_ex312 | Terra-Xehanort
 | e_ex313 | Riku Replica
 | e_ex314 | Vanitas (Coat Hooded)
 | e_ex315 | Vanitas (No Mask)
@@ -365,14 +365,14 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex318 | Young Xehanort (Hooded)
 | e_ex319 | Demyx
 | e_ex320 | Luxord (Hooded)
-| e_ex321 | 
-| e_ex322 | Darqua (Dark Aqua)
+| e_ex321 | Hooded Organization Member 
+| e_ex322 | Anti-Aqua
 | e_ex323 | Xigbar Arm
 | e_ex324 | Xigbar Arm (?)
-| e_ex325 | Terra
+| e_ex325 | Terra-Xehanort
 | e_ex326 | Xehanort's Guardian
 | e_ex327 | Luxord
-| e_ex328 | 
+| e_ex328 | Hooded Organization Member
 | e_ex329 | Vanitas
 | e_ex330 | Larxene (Hooded)
 | e_ex331 | Hooded Organization Member
@@ -397,30 +397,35 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex359 | Xion (LimitCut)
 | e_ex360 | Vanitas (LimitCut)
 | e_ex361 | Dark Riku (LimitCut)
-| e_ex362 | Terranort (LimitCut)
+| e_ex362 | Terra-Xehanort (LimitCut)
 | e_ex367 | Master Xehanort (LimitCut)
 
 | e_ex407 | Darkside
 | e_ex408 | Xehanort's Guardian
+| e_ex409 | Darkside (ReMind)
 | e_ex701 | Lump of Horror
-| e_ex702 | 
-| e_ex703 | 
+| e_ex702 | Lump of Horror (Form 2)
+| e_ex703 | Lump of Horror (Hand)
 | e_ex711 | King of Toys
-| e_ex712 | 
+| e_ex712 | Rocket (King of Toys)
 | e_ex721 | Grim Guardianess
-| e_ex722 | 
-| e_ex723 | 
-| e_ex724 | 
-| e_ex725 | 
-| e_ex726 | 
-| e_ex727 | 
+| e_ex722 | Tree Root (Grim Guardianess)
+| e_ex723 | Crow (Grim Guardianess)
+| e_ex724 | Bomb (Grim Guardianess)
+| e_ex725 | Flower Trap (Grim Guardianess)
+| e_ex726 | Vines (Spread)
+| e_ex727 | Vines (Single)
 | e_ex731 | Skoll
-| e_ex732 | 
+| e_ex732 | Wolf Head (Skoll)
 | e_ex733 | 
 | e_ex734 | 
+| e_ex751 | Dark Inferno χ
 | e_ex761 | Xehanort Replica
 | e_ex771 | Xehanort (Keyblade Armor)
-| e_ex772 | Xehanort (Keyblade Armor) (?)
+| e_ex772 | Xehanort (Keyblade Armor)(Cracked)
+| e_ex773 | Xehanort (ReMind)(Keyblade Armor)
+| e_ex774 | Xehanort (ReMind)(Keyblade Armor)(Cracked)
+| e_ex781 | Yozora
 | e_ex801 | Supreme Smasher
 | e_ex806 | Beasts & Bugs
 | e_ex816 | Angelic Amber
@@ -449,7 +454,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_fz903 | Marshmallow
 | e_he001 | Rock Titan
 | e_he902 | Ice Titan
-| e_he903 | 
+| e_he903 | Tornado Titan
 | e_he904 | Lava Titan
 
 ## Weapon
