@@ -145,10 +145,18 @@ namespace OpenKh.Patcher
             if (assetFile.Source == null || assetFile.Source.Count == 0)
                 throw new Exception($"File '{assetFile.Name}' does not contain any source");
 
-            var srcFile = context.GetSourceModAssetPath(assetFile.Source[0].Name);
-            if (!File.Exists(srcFile))
-                throw new FileNotFoundException($"The mod does not contain the file {assetFile.Source[0].Name}", srcFile);
+            string srcFile; 
 
+            if (assetFile.Source[0].Type == "internal")
+            {
+                srcFile = context.GetOriginalAssetPath(assetFile.Source[0].Name);
+            }
+            else
+            {
+                srcFile = context.GetSourceModAssetPath(assetFile.Source[0].Name);
+                if (!File.Exists(srcFile))
+                    throw new FileNotFoundException($"The mod does not contain the file {assetFile.Source[0].Name}", srcFile);
+            }
             using var srcStream = File.OpenRead(srcFile);
             srcStream.CopyTo(stream);
         }
