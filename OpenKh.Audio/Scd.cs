@@ -7,15 +7,16 @@ using OpenKh.Common;
 
 namespace OpenKh.Audio
 {
-    public class Scd
+    public partial class Scd
     {
-        private const UInt64 MagicCode = 0x4643535342444553;
+        private const ulong MagicCode = 0x4643535342444553;
         private const uint FileVersion = 3;
         private const ushort SSCFVersion = 0x400;
+        private const int Alignment = 16;
 
         public class Header
         {
-            [Data] public UInt64 MagicCode { get; set; }
+            [Data] public ulong MagicCode { get; set; }
             [Data] public uint FileVersion { get; set; }
             [Data] public ushort SSCFVersion { get; set; }
             [Data] public ushort HeaderSize { get; set; }
@@ -25,17 +26,39 @@ namespace OpenKh.Audio
 
         public class TableOffsetHeader
         {
-            [Data] public ushort Table0ElementCount { get; set; }
-            [Data] public ushort Table1ElementCount { get; set; }
+            //renamed table numbers according to vgmstream's source code
+            [Data] public ushort Table1ElementCount { get; set; } //also for table 4
             [Data] public ushort Table2ElementCount { get; set; }
+            [Data] public ushort Table3ElementCount { get; set; }
             [Data] public ushort Unk06 { get; set; }
-            [Data] public uint Table0Offset { get; set; }
-            [Data] public uint Table1Offset { get; set; }
             [Data] public uint Table2Offset { get; set; }
+            [Data] public uint Table3Offset { get; set; }
+            [Data] public uint Table4Offset { get; set; }
             [Data] public uint Unk14 { get; set; }
-            [Data] public uint Unk18 { get; set; }
+            [Data] public uint Table5Offset { get; set; } //strange
             [Data] public uint Padding { get; set; }
         }
+
+        /* Header sequence:
+         * Table1
+         * Table2
+         * Table3
+         * Table4
+         * Table5
+         * 
+         * In-file sequence:
+         * Table4
+         * Table1
+         * Table2
+         * Table5
+         * Table3
+         */
+
+        public static List<uint> Table1Offsets { get; set; } //Info entries (if SSCF version 4 sound entries have names)
+        public static List<uint> Table2Offsets { get; set; }
+        public static List<uint> Table3Offsets { get; set; } //Sound entries
+        public static List<uint> Table4Offsets { get; set; }
+        public static List<uint> Table5Offsets { get; set; }
 
         public class StreamHeader
         {
@@ -76,15 +99,23 @@ namespace OpenKh.Audio
             header = BinaryMapping.ReadObject<Header>(stream);
             tableOffsetHeader = BinaryMapping.ReadObject<TableOffsetHeader>(stream);
 
-            stream.Seek(tableOffsetHeader.Table1Offset, SeekOrigin.Begin);
+            Table1Offsets = ReadTableOffsets(stream, tableOffsetHeader.Table1ElementCount).ToList();
+            
+            stream.Position = tableOffsetHeader.Table2Offset;
+            Table2Offsets = ReadTableOffsets(stream, tableOffsetHeader.Table2ElementCount).ToList();
+            
+            stream.Position = tableOffsetHeader.Table3Offset;
+            Table3Offsets = ReadTableOffsets(stream, tableOffsetHeader.Table3ElementCount).ToList();
 
-            List<uint> SoundOffsets = new List<uint>();
-            for (int i = 0; i < tableOffsetHeader.Table1ElementCount; i++)
-            {
-                SoundOffsets.Add(stream.ReadUInt32());
-            }
+            stream.Position = tableOffsetHeader.Table4Offset;
+            Table4Offsets = ReadTableOffsets(stream, tableOffsetHeader.Table1ElementCount).ToList();
 
-            foreach(uint off in SoundOffsets)
+            SetPaddedPosition(stream, tableOffsetHeader.Table1ElementCount);
+            var count = (int)(Table4Offsets[0] - stream.Position) / 4;
+            Table5Offsets = ReadTableOffsets(stream, count).ToList();
+
+
+            foreach (uint off in Table3Offsets)
             {
                 stream.Seek(off, SeekOrigin.Begin);
                 var streamInfo = BinaryMapping.ReadObject<StreamHeader>(stream);
@@ -101,6 +132,18 @@ namespace OpenKh.Audio
         public static void Write(Scd scd, Stream stream)
         {
 
+        }
+
+        private static IEnumerable<uint> ReadTableOffsets(Stream stream, int count)
+        {
+            for (int i = 0; i < count; i++)
+                yield return stream.ReadUInt32();
+        }
+
+        private static void SetPaddedPosition(Stream stream, int count)
+        {
+            var shift = (count * 4) % Alignment;
+            stream.Position = shift > 0 ? stream.Position + Alignment - shift : stream.Position;
         }
     }
 }
