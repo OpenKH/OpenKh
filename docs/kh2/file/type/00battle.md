@@ -221,23 +221,23 @@ The ID of the entry is assigned in the AI of the object.
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0x00     | uint16 | ID
-| 0x02     | uint8  | Small HP orbs
-| 0x03     | uint8  | Big HP orbs
-| 0x04     | uint8  | Big Money orbs
-| 0x05     | uint8  | Medium Money orbs
-| 0x06     | uint8  | Small Money orbs
-| 0x07     | uint8  | Small MP orbs
-| 0x08     | uint8  | Big MP orbs
-| 0x09     | uint8  | Small Drive orbs
-| 0x0A     | uint8  | Big Drive orbs
-| 0x0B     | uint8  | Padding
-| 0x0C     | uint16  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0x0E     | int16  | Item 1 Drop Percentage
-| 0x10     | uint16  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0x12     | int16  | Item 2 Drop Percentage
-| 0x14     | uint16  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0x16     | int16  | Item 3 Drop Percentage
+| 00     | uint16 | ID
+| 02     | uint8  | Small HP orbs
+| 03     | uint8  | Big HP orbs
+| 04     | uint8  | Big Money orbs
+| 05     | uint8  | Medium Money orbs
+| 06     | uint8  | Small Money orbs
+| 07     | uint8  | Small MP orbs
+| 08     | uint8  | Big MP orbs
+| 09     | uint8  | Small Drive orbs
+| 10     | uint8  | Big Drive orbs
+| 11     | uint8  | Padding
+| 12     | uint16  | Item 1 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 14     | int16  | Item 1 Drop Percentage
+| 16     | uint16  | Item 2 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 18     | int16  | Item 2 Drop Percentage
+| 20     | uint16  | Item 3 (Refer to ITEM from 03system) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 22     | int16  | Item 3 Drop Percentage
 
 ---
 
@@ -343,15 +343,15 @@ NOTE: The first character pointer doesn't point to any character. May be some ki
 
 | Offset | Type | Description |
 |--------|------|-------------|
-| 0x00     | int32  | Needed EXP for next level
-| 0x04     | uint8 | Strength of Character
-| 0x05     | uint8 | Magic of Character
-| 0x06     | uint8 | Defense of Character
-| 0x07     | uint8 | AP of Character
-| 0x08     | uint16 | Ability given when using Sword route  - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0x0A     | uint16 | Ability given when using Shield route - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0x0C     | uint16 | Ability given when using Staff route  - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0x0E     | uint8[2] | Padding
+| 00     | int32  | Needed EXP for next level
+| 04     | uint8 | Strength of Character
+| 05     | uint8 | Magic of Character
+| 06     | uint8 | Defense of Character
+| 07     | uint8 | AP of Character
+| 08     | uint16 | Ability given when using Sword route  - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 10     | uint16 | Ability given when using Shield route - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 12     | uint16 | Ability given when using Staff route  - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 14     | uint8[2] | Padding
 
 ---
 
@@ -378,17 +378,17 @@ The ID is assigned in the msn file (first sub file, offset 0xD).
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0x00     | uint8  | ID - [EVENT LIST](../../dictionary/events.md)
-| 0x01     | uint8  | Character Id
-| 0x02     | uint8  | HP Increase
-| 0x03     | uint8  | MP Increase
-| 0x04     | uint8  | Drive Gauge Upgrade
-| 0x05     | uint8  | Item Slot Upgrade
-| 0x06     | uint8  | Accessory Slot Upgrade
-| 0x07     | uint8  | Armor Slot Upgrade
-| 0x08     | uint16 | [Bonus Item 1](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0x10     | uint16 | [Bonus Item 2](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0x12     | int32   | Padding
+| 00     | uint8  | ID - [EVENT LIST](../../dictionary/events.md)
+| 01     | uint8  | Character Id
+| 02     | uint8  | HP Increase
+| 03     | uint8  | MP Increase
+| 04     | uint8  | Drive Gauge Upgrade
+| 05     | uint8  | Item Slot Upgrade
+| 06     | uint8  | Accessory Slot Upgrade
+| 07     | uint8  | Armor Slot Upgrade
+| 08     | uint16 | [Bonus Item 1](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 10     | uint16 | [Bonus Item 2](03system.md#item) - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 12     | int32   | Padding
 
 ---
 
@@ -414,28 +414,28 @@ Contains the table for battle level of each world. Whether each entry is enabled
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0x0 	 | int32  | Id
-| 0x4      | int32  | Progress Flag
-| 0x8      | uint8  | World ZZ
-| 0x9      | uint8  | World of Darkness
-| 0xA      | uint8  | Twilight Town
-| 0xB      | uint8  | Destiny Islands
-| 0xC      | uint8  | Hollow Bastion
-| 0xD      | uint8  | Beast's Castle
-| 0xE      | uint8  | Olympus Coliseum
-| 0xF      | uint8  | Agrabah
-| 0x10     | uint8  | Land of Dragons
-| 0x11     | uint8  | 100 Acre Woods
-| 0x12     | uint8  | Pride Lands
-| 0x13     | uint8  | Atlantica
-| 0x14     | uint8  | Disney Castle
-| 0x15     | uint8  | Timeless River
-| 0x16     | uint8  | Halloween Town
-| 0x17     | uint8  | World Map
-| 0x18     | uint8  | Port Royal
-| 0x19     | uint8  | Space Paranoids
-| 0x1A     | uint8  | The World That Never Was
-| 0x1B     | uint8[5] | Padding
+| 00 	 | int32  | Id
+| 04     | int32  | Progress Flag
+| 08     | uint8  | World ZZ
+| 09     | uint8  | World of Darkness
+| 10     | uint8  | Twilight Town
+| 11     | uint8  | Destiny Islands
+| 12     | uint8  | Hollow Bastion
+| 13     | uint8  | Beast's Castle
+| 14     | uint8  | Olympus Coliseum
+| 15     | uint8  | Agrabah
+| 16     | uint8  | Land of Dragons
+| 17     | uint8  | 100 Acre Woods
+| 18     | uint8  | Pride Lands
+| 19     | uint8  | Atlantica
+| 20     | uint8  | Disney Castle
+| 21     | uint8  | Timeless River
+| 22     | uint8  | Halloween Town
+| 23     | uint8  | World Map
+| 24     | uint8  | Port Royal
+| 25     | uint8  | Space Paranoids
+| 26     | uint8  | The World That Never Was
+| 27     | uint8[5] | Padding
 
 ---
 
@@ -453,12 +453,12 @@ Contains the level-up table for the enemies. Based on the level of an enemy, a s
 
 | Offset | Type  | Description
 |--------|------ |--------------
-| 0x00     | uint16 | HP level. The formula is `(EnemyHp * LevelHp + 99) / 100`.
-| 0x02     | uint16 | Strength
-| 0x04     | uint16 | Defense
-| 0x06     | uint16 | Max Strength
-| 0x08     | uint16 | Min Strength
-| 0x0A     | uint16 | Exp
+| 00     | uint16 | HP level. The formula is `(EnemyHp * LevelHp + 99) / 100`.
+| 02     | uint16 | Strength
+| 04     | uint16 | Defense
+| 06     | uint16 | Max Strength
+| 08     | uint16 | Min Strength
+| 10     | uint16 | Exp
 
 ---
 
@@ -490,21 +490,21 @@ Every enemy is associated to one or more IDs (eg. Organization members have diff
 
 | Offset | Type  | Description
 |--------|------|--------------
-| 0x00     | uint16 | Id - [Enemy LIST](../../dictionary/enemy.md)
-| 0x02     | uint16 | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
-| 0x04     | uint16[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
-| 0x44     | uint16 | Damage Cap (The higher, the less damage received)
-| 0x46     | uint16 | Minimum Damage
-| 0x48     | uint16 | Physical weakness
-| 0x4A     | uint16 | Fire weakness
-| 0x4C     | uint16 | Blizzard weakness
-| 0x4E     | uint16 | Thunder weakness
-| 0x50     | uint16 | Dark weakness
-| 0x52     | uint16 | Light weakness
-| 0x54     | uint16 | General weakness
-| 0x56     | uint16 | Exp multiplier
-| 0x58     | uint16 | Prize
-| 0x5A     | uint16 | Bonus Level
+| 00     | uint16 | Id - [Enemy LIST](../../dictionary/enemy.md)
+| 02     | uint16 | Level of the enemy. Must be between 1 and 99. (0 uses the world's battle level)
+| 04     | uint16[32] | Health amount. It is multiplied by Hp from [LVPM](#lvpm).
+| 68     | uint16 | Damage Cap (The higher, the less damage received)
+| 70     | uint16 | Minimum Damage
+| 72     | uint16 | Physical weakness
+| 74     | uint16 | Fire weakness
+| 76     | uint16 | Blizzard weakness
+| 78     | uint16 | Thunder weakness
+| 80     | uint16 | Dark weakness
+| 82     | uint16 | Light weakness
+| 84     | uint16 | General weakness
+| 86     | uint16 | Exp multiplier
+| 88     | uint16 | Prize
+| 90     | uint16 | Bonus Level
 
 ---
 
@@ -579,19 +579,19 @@ Contains informations about starting Character statistics, starting Abilities et
 
 | Offset | Type  | Description
 |--------|-------|--------------
-| 0x00     | uint16 | Id
-| 0x02     | uint8  | Character ID - [Character LIST](../../dictionary/characters.md)
-| 0x03     | uint8  | HP
-| 0x04     | uint8  | MP
-| 0x05     | uint8  | AP
-| 0x06     | uint8  | Strength
-| 0x07     | uint8  | Magic
-| 0x08     | uint8  | Defense
-| 0x09     | uint8  | Armor Slots
-| 0x0A     | uint8  | Accessory Slots
-| 0x0B     | uint8  | Item Slots
-| 0x0C     | uint16[32] | Starting items (abilities, magic etc*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
-| 0x48     | uint8[52] | Padding
+| 00     | uint16 | Id
+| 02     | uint8  | Character ID - [Character LIST](../../dictionary/characters.md)
+| 03     | uint8  | HP
+| 04     | uint8  | MP
+| 05     | uint8  | AP
+| 06     | uint8  | Strength
+| 07     | uint8  | Magic
+| 08     | uint8  | Defense
+| 09     | uint8  | Armor Slots
+| 10     | uint8  | Accessory Slots
+| 11     | uint8  | Item Slots
+| 12     | uint16[32] | Starting items (abilities, magic etc*). These are obtained after the dusks fight in Station of Awakening. - [ITEM/ABILITY LIST](../../dictionary/inventory.md)
+| 72     | uint8[52] | Padding
 
 NOTE: Abilities that are enabled by default begin with an 8.
 
