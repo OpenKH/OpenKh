@@ -136,7 +136,8 @@ namespace OpenKh.Audio
 
             SetPaddedPosition(stream, scd.tableOffsetHeader.Table1ElementCount);
             var count = (int)(scd.Table4Offsets[0] - stream.Position) / 4;
-            scd.Table5Offsets = ReadTableOffsets(stream, count).Distinct().ToList();
+            scd.Table5Offsets = ReadTableOffsets(stream, count).ToList();
+            scd.Table5Offsets.RemoveAll(x => x == 0);
 
             scd.Table4Entries = new List<Table4>();
             foreach(var offset in scd.Table4Offsets)
@@ -166,23 +167,14 @@ namespace OpenKh.Audio
                 scd.Table2Entries.Add(BinaryMapping.ReadObject<Table2>(stream));
             }
 
-            // if Table5Offsets has only one entry, there's no actual offset table
-            // instead, Table5Offset from the TableOffsetHeader points directly to the data
             scd.Table5Entries = new List<Table5>();
-            if (scd.Table5Offsets.Count == 1)
+            foreach (var offset in scd.Table5Offsets)
             {
-                stream.Position = scd.tableOffsetHeader.Table5Offset;
+                stream.Position = offset;
                 scd.Table5Entries.Add(BinaryMapping.ReadObject<Table5>(stream));
             }
-            else
-            {
-                foreach (var offset in scd.Table5Offsets)
-                {
-                    stream.Position = offset;
-                    scd.Table5Entries.Add(BinaryMapping.ReadObject<Table5>(stream));
-                }
-            }
 
+            scd.StreamFileEntries = new List<StreamFile>();
             foreach (var offset in scd.Table3Offsets)
             {
                 stream.Position = offset;
@@ -196,7 +188,7 @@ namespace OpenKh.Audio
             return scd;
         }
 
-        public static void Write(Scd scd, Stream stream)
+        public static void Write(Stream stream, Scd scd)
         {
             BinaryMapping.WriteObject(stream, scd.header);
             BinaryMapping.WriteObject(stream, scd.tableOffsetHeader);
@@ -207,10 +199,8 @@ namespace OpenKh.Audio
             WriteTableOffsets(stream, scd.Table4Offsets);
             WriteTableOffsets(stream, scd.Table5Offsets);
 
-            foreach(var ent in scd.Table4Entries)
-            {
+            foreach (var ent in scd.Table4Entries)
                 BinaryMapping.WriteObject(stream, ent);
-            }
 
             foreach (var ent in scd.Table1Entries)
             {
@@ -219,20 +209,24 @@ namespace OpenKh.Audio
             }
 
             foreach (var ent in scd.Table2Entries)
-            {
                 BinaryMapping.WriteObject(stream, ent);
-            }
+
+            stream.Position = Helpers.Align((int)stream.Position, Alignment);
 
             foreach (var ent in scd.Table5Entries)
-            {
                 BinaryMapping.WriteObject(stream, ent);
-            }
+
+            stream.Position = Helpers.Align((int)stream.Position, Alignment);
 
             foreach (var ent in scd.StreamFileEntries)
             {
                 BinaryMapping.WriteObject(stream, ent);
                 stream.Write(ent.ExtraData);
                 stream.Write(ent.Data);
+
+                var misalignment = Helpers.Align((int)stream.Position, Alignment) - stream.Position;
+                while (misalignment-- > 0)
+                    stream.WriteByte(0);
             }
         }
 
