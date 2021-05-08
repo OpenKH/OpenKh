@@ -1343,6 +1343,7 @@ jp/tim2/title/title_kh2.tm2
 jp/tim2/title/title_khfm.tm2
 jp/tim2/title/title_recoded.tm2
 jp/tim2/title/title_recom.tm2
+KH15+25.png
 KHHD2.5.config
 KHHD2.8.config
 save_image/en/KH1.5+2.5_system.png

@@ -4,6 +4,7 @@ icon0_jp.png
 icon0_ne.png
 KHHD2.5.config
 KHHD2.8.config
+KH28.png
 bg/artwork/hd001.tm2
 bg/artwork/hd002.tm2
 bg/artwork/hd003.tm2
