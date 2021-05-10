@@ -593,6 +593,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_so144 | Grand Chef Pan (?)
 | w_so145 | Grand Chef Pan (?)
 | w_so150 | Starlight
+| w_so160 | Midnight Blue
 | w_so170 | Nano Gear
 | w_so172 | Nano Gear Formchanges
 | w_so173 | Nano Gear Fist
