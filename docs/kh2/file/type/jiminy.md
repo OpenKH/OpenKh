@@ -15,6 +15,8 @@ This file contains different informations about Jiminy's Journal. Internally it 
     * [QUES](#ques)
     * [PUZZ](#puzz)
 
+---
+
 ## Header
 
 Each sub-file starts with the same header. Only the Magic Code differs.
@@ -26,7 +28,11 @@ Each sub-file starts with the same header. Only the Magic Code differs.
 | 08     | int    | Entries count
 | 0C     | int    | Padding
 
+---
+
 ## Entries
+
+---
 
 ## Worl
 
@@ -37,8 +43,7 @@ Magic Code `JMWO`
 | Offset | Type   | Description |
 |--------|--------|-------------|
 | 00     | byte   | Index
-| 01     | char[2]| ID
-| 03     | byte   | Padding
+| 01     | char[3]| ID
 | 04     | ushort | Text used in the title bar
 | 06     | ushort | Text used in menus (Treasures, Puzzle Pieces etc.)
 | 08     | ushort | Story Flag to use this text
@@ -47,6 +52,8 @@ Magic Code `JMWO`
 | 0E     | ushort | Alternative Story Flag to use the alternative text
 
 Only the world `hb` utilized the alternative texts and story flag fields to switch from `Hollow Bastion` to `Radiant Garden` later in the game.
+
+---
 
 ## Stor
 
@@ -57,12 +64,13 @@ Magic Code `JMST`
 | Offset | Type   | Description |
 |--------|--------|-------------|
 | 00     | byte   | [World](#worl)
-| 01     | byte   | Unknown, always 0
-| 02     | ushort | Unknown, always 0
+| 01     | byte[3] | Padding
 | 04     | ushort | Text used in the "Summary" textbox
 | 06     | ushort | Text used in the "Objective" textbox
 | 08     | ushort | Text used in the "Story" section of the world
 | 0A     | ushort | Story Flag when to show the texts
+
+---
 
 ## Albu
 
@@ -73,12 +81,12 @@ Magic Code `JMAL`
 | Offset | Type   | Description |
 |--------|--------|-------------|
 | 00     | byte   | [World](#worl)
-| 01     | char[2]| Picture Id (menu/"region"/jm_photo/"world_id"_"picture_id".bin)
-| 03     | byte   | Padding
-| 04     | ushort | Unknown, always 0
+| 01     | char[5]| Picture Id (menu/"region"/jm_photo/"world_id"_"picture_id".bin)
 | 06     | ushort | Story Flag when to show entry
 | 08     | ushort | Title Text
 | 0A     | ushort | Description Text
+
+---
 
 ## Char
 
@@ -95,17 +103,19 @@ Magic Code `JMCH`
 | 04     | ushort | ID
 | 06     | ushort | Title
 | 08     | ushort | Description
-| 0A     | ushort | Second Title (used for Disney and FF characters)
+| 0A     | ushort | Source Title
 | 0C     | ushort | [Object ID](./00objentry.md#structure)
-| 0E     | ushort |
-| 10     | ushort |
-| 12     | short  | Object Position X
-| 14     | short  | Object Position Y
-| 16     | short  | Object Rotation X
-| 18     | short  | 
-| 1A     | short  | 
-| 1C     | float  | 
-| 20     | float  | 
+| 0E     | ushort | Motion
+| 10     | ushort | Stat
+| 12     | short  | Object X Position
+| 14     | short  | Object Y Position
+| 16     | short  | Object Y Rotation
+| 18     | short  | Object X Position 2
+| 1A     | short  | Object Y Position 2
+| 1C     | float  | Scale
+| 20     | float  | Scale 2
+
+---
 
 ## Anse
 
@@ -120,27 +130,37 @@ Magic Code `JMAN`
 | 04     | ushort | Text
 | 06     | ushort | Padding
 
+---
+
 ## Diag
 
 Seems to contain story flags. This sub-file houses two different structures.
 
 Magic Code `JMDI`
 
-### Structure 1
+### Structure 1 (Data Info)
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
-| 00     | ushort | ID
-| 02     | ushort |
+| 00     | ushort | DrawProgress
+| 02     | ushort | HideProgress
 | 04     | byte   | World
-| 05     | byte   | Room
-| 06     | byte   |
+| 05     | byte   | Count
+| 06     | byte   | Type
 | 07     | byte   | Padding
-| 08     | int    | 
+| 08     | uint   | Address 
 
-### Structure 2
+### Structure 2 (Character Info)
 
-Currently unknown. Read in z_un_002a18d0.
+| Offset | Type   | Description |
+|--------|--------|-------------|
+| 00     | ushort | Label
+| 02     | short  | X Position
+| 04     | short  | Y Position
+| 06     | byte   | Draw
+| 07     | byte   | Padding 
+
+---
 
 ## Limi
 
@@ -150,10 +170,12 @@ Magic Code `JMLI`
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
-| 00     | ushort |
+| 00     | ushort | Command Id
 | 02     | ushort | Title
 | 04     | ushort | Description
 | 06     | ushort | Padding
+
+---
 
 ## Mini
 
@@ -166,7 +188,9 @@ Magic Code `JMMG`
 | 00     | ushort | World
 | 02     | ushort | Title
 | 04     | ushort | Highscore Text
-| 06     | ushort |
+| 06     | ushort | Game Id
+
+---
 
 ## Ques
 
@@ -179,11 +203,22 @@ Magic Code `JMQU`
 | 00     | ushort | World
 | 02     | ushort | Category Text
 | 04     | ushort | Title
-| 06     | ushort | 
+| 06     | ushort | [Status](#status)
 | 08     | ushort | Story Flag
-| 0A     | ushort |
-| 0C     | ushort |
-| 0E     | ushort |
+| 0A     | ushort | Game Id
+| 0C     | ushort | Score
+| 0E     | ushort | Clear Condition
+
+### Status
+
+| Type | Description |
+|------|-------------|
+| 0    | Disabled
+| 1    | Draw
+| 2    | Cleared
+| 3    | 100% Cleared
+
+---
 
 ## Puzz
 

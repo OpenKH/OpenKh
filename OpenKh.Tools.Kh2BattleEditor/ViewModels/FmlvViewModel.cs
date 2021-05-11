@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Tools.Kh2BattleEditor.Extensions;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
@@ -17,7 +17,7 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         public string EntryName => entryName;
         
         public FmlvViewModel() :
-            this(new List<Fmlv.Level>())
+            this(new List<Fmlv>())
         {}
 
         public FmlvViewModel(IEnumerable<Bar.Entry> entries) :
@@ -25,11 +25,11 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         {}
 
 
-        public FmlvViewModel(IEnumerable<Fmlv.Level> levels) :
+        public FmlvViewModel(IEnumerable<Fmlv> levels) :
             this(levels, (levels.ToList().Count == 0x2D))
         {}
 
-        public FmlvViewModel(IEnumerable<Fmlv.Level> list, bool isFinalMix) :
+        public FmlvViewModel(IEnumerable<Fmlv> list, bool isFinalMix) :
             base(list.GroupBy(x => x.FormId).Select(x => new FmlvFormViewModel(x, isFinalMix)))
         {}
 
@@ -43,10 +43,10 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
     public class FmlvFormViewModel : GenericListModel<FmlvFormViewModel.FmlvLevelViewModel>
     {
-        private readonly IGrouping<int, Fmlv.Level> fmlvGroup;
+        private readonly IGrouping<int, Fmlv> fmlvGroup;
         private readonly bool isFinalMix;
 
-        public FmlvFormViewModel(IGrouping<int, Fmlv.Level> x, bool isFinalMix) :
+        public FmlvFormViewModel(IGrouping<int, Fmlv> x, bool isFinalMix) :
             base(x.Select(y => new FmlvLevelViewModel(y)))
             
         {
@@ -58,15 +58,17 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
         public class FmlvLevelViewModel
         {
-            public Fmlv.Level Level { get; }
-            public FmlvLevelViewModel(Fmlv.Level level)
+            public Fmlv Level { get; }
+            public FmlvLevelViewModel(Fmlv level)
             {
                 Level = level;
             }
 
             public string Name => $"Level {Level.FormLevel}";
-            public byte LevelGrowthAbility { get => Level.LevelGrowthAbility; set => Level.LevelGrowthAbility = value; }
-            public short Ability { get => Level.Ability; set => Level.Ability = value; }
+
+            public int AbilityLevel { get => Level.AbilityLevel; set => Level.AbilityLevel = value; }
+            public int AntiRate { get => Level.AntiRate; set => Level.AntiRate = value; }
+            public ushort Ability { get => Level.Ability; set => Level.Ability = value; }
             public int Exp { get => Level.Exp; set => Level.Exp = value; }
         }
     }

@@ -1,7 +1,7 @@
 # [Kingdom Hearts II](index.md) - Commands
 
-| Id       | Command Name      |
-|------------|---------------|
+| Id       | Command Name |
+|----------|--------------|
 | 0 | - |
 | 1 | Attack |
 | 2 | Magic |

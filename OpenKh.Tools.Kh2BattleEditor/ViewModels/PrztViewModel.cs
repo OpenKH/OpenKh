@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Tools.Kh2BattleEditor.Extensions;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
@@ -32,7 +32,6 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             public byte BigMpOrbs { get => Przt.BigMpOrbs; set => Przt.BigMpOrbs = value; }
             public byte SmallDriveOrbs { get => Przt.SmallDriveOrbs; set => Przt.SmallDriveOrbs = value; }
             public byte BigDriveOrbs { get => Przt.BigDriveOrbs; set => Przt.BigDriveOrbs = value; }
-            public byte Unknown0a { get => Przt.Unknown0a; set => Przt.Unknown0a = value; }
             public ushort Item1 { get => Przt.Item1; set => Przt.Item1 = value; }
             public short Item1Percentage { get => Przt.Item1Percentage; set => Przt.Item1Percentage = value; }
             public ushort Item2 { get => Przt.Item2; set => Przt.Item2 = value; }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using Xe.BinaryMapper;
 
@@ -7,9 +7,9 @@ namespace OpenKh.Kh2.Battle
     public class Vtbl
     {
         [Data] public byte CharacterId { get; set; }
-        [Data] public byte ActionId { get; set; }
+        [Data] public byte Id { get; set; }
         [Data] public byte Priority { get; set; }
-        [Data] public byte Unknown03 { get; set; } //Padding?
+        [Data] public byte Reserved { get; set; } //Padding?
         [Data(Count = 5)] public List<Voice> Voices { get; set; }
 
         public class Voice

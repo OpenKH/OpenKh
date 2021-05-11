@@ -26,9 +26,9 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
 
             public string Id => $"{Objentry.ObjectId:X02}";
 
-            public uint ObjectId
+            public ushort ObjectId
             {
-                get => Objentry.ObjectId;
+                get => (ushort)Objentry.ObjectId;
                 set { Objentry.ObjectId = value; OnPropertyChanged(nameof(Name)); }
             }
 
@@ -46,27 +46,36 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
             public byte WeaponJoint { get => Objentry.WeaponJoint; set => Objentry.WeaponJoint = value; }
             public string ModelName { get => Objentry.ModelName; set => Objentry.ModelName = value; }
             public string AnimationName { get => Objentry.AnimationName; set => Objentry.AnimationName = value; }
-            public ushort Flag { get => Objentry.Flag; set => Objentry.Flag = value; }
-            public byte TargetType { get => Objentry.TargetType; set => Objentry.TargetType = value; }
+            public ushort Flags { get => Objentry.Flags; set => Objentry.Flags = value; }
+            public Objentry.TargetType ObjectTargetType { get => Objentry.ObjectTargetType; set => Objentry.ObjectTargetType = value; }
             public ushort NeoStatus { get => Objentry.NeoStatus; set => Objentry.NeoStatus = value; }
             public ushort NeoMoveset { get => Objentry.NeoMoveset; set => Objentry.NeoMoveset = value; }
             public float Weight { get => Objentry.Weight; set => Objentry.Weight = value; }
             public byte SpawnLimiter { get => Objentry.SpawnLimiter; set => Objentry.SpawnLimiter = value; }
             public byte Page { get => Objentry.Page; set => Objentry.Page = value; }
-            public byte ShadowSize { get => Objentry.ShadowSize; set => Objentry.ShadowSize = value; }
-            public Objentry.CommandMenuOptions CommandMenuOption 
+            public Objentry.ShadowSize ObjectShadowSize { get => Objentry.ObjectShadowSize; set => Objentry.ObjectShadowSize = value; }
+            public Objentry.Form ObjectForm
             { 
-                get => Objentry.CommandMenuOption;
+                get => Objentry.ObjectForm;
                 set
                 {
-                    Objentry.CommandMenuOption = value;
-                    OnPropertyChanged(nameof(CommandMenuOption));
+                    Objentry.ObjectForm = value;
+                    OnPropertyChanged(nameof(ObjectForm));
                 }
             }
             public ushort SpawnObject1 { get => Objentry.SpawnObject1; set => Objentry.SpawnObject1 = value; }
             public ushort SpawnObject2 { get => Objentry.SpawnObject2; set => Objentry.SpawnObject2 = value; }
             public ushort SpawnObject3 { get => Objentry.SpawnObject3; set => Objentry.SpawnObject3 = value; }
             public ushort SpawnObject4 { get => Objentry.SpawnObject4; set => Objentry.SpawnObject4 = value; }
+
+            public bool NoApdx { get => Objentry.NoApdx; set => Objentry.NoApdx = value; }
+            public bool Before { get => Objentry.Before; set => Objentry.Before = value; }
+            public bool FixColor { get => Objentry.FixColor; set => Objentry.FixColor = value; }
+            public bool Fly { get => Objentry.Fly; set => Objentry.Fly = value; }
+            public bool Scissoring { get => Objentry.Scissoring; set => Objentry.Scissoring = value; }
+            public bool IsPirate { get => Objentry.IsPirate; set => Objentry.IsPirate = value; }
+            public bool WallOcclusion { get => Objentry.WallOcclusion; set => Objentry.WallOcclusion = value; }
+            public bool Hift { get => Objentry.Hift; set => Objentry.Hift = value; }
 
             public override string ToString() => Name;
         }
@@ -75,13 +84,17 @@ namespace OpenKh.Tools.ObjentryEditor.ViewModels
         private string _searchTerm;
 
         public EnumModel<Objentry.Type> ObjEntryTypes { get; }
-        public EnumModel<Objentry.CommandMenuOptions> CommandMenuOptions { get; }
+        public EnumModel<Objentry.TargetType> TargetTypes { get; }
+        public EnumModel<Objentry.ShadowSize> ShadowSizes{ get; }
+        public EnumModel<Objentry.Form> Forms { get; }
 
         public ObjentryViewModel(IEnumerable<Objentry> items) :
             base(items.Select(Map))
         {
             ObjEntryTypes = new EnumModel<Objentry.Type>();
-            CommandMenuOptions = new EnumModel<Objentry.CommandMenuOptions>();
+            TargetTypes = new EnumModel<Objentry.TargetType>();
+            ShadowSizes= new EnumModel<Objentry.ShadowSize>();
+            Forms = new EnumModel<Objentry.Form>();
             AddAndSelectCommand = new RelayCommand(x =>
             {
                 AddCommand.Execute(null);

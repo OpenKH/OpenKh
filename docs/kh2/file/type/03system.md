@@ -17,6 +17,8 @@ This is an essential file to boot the game engine.
 * [EVTP](#evtp) - ???
 * [IPIC](#ipic) - ???
 
+---
+
 ## Rcct
 
 Unknown table.
@@ -46,6 +48,8 @@ Unknown table.
 | 8 	 | short | Unk8
 | 10 	 | short | Unk10 (Padding?)
 
+---
+
 ## Cmd
 
 Commands table.
@@ -70,28 +74,93 @@ Commands table.
 |--------|---------------|-------------|
 | 0 	 | ushort | Id - [COMMAND LIST](../../dictionary/commands.md)
 | 2 	 | ushort | Execute
-| 4 	 | byte[2] | Unk04
+| 4 	 | short | Argument¹
 | 6 	 | sbyte | Submenu
-| 7 	 | byte | Icon
+| 7 	 | byte | [Icon](#icon)
 | 8 	 | int | Text
-| 12 	 | uint | Flag
+| 12 	 | uint | [Flags](#flags)
 | 16 	 | float | Range
 | 20 	 | float | Dir
 | 24 	 | float | Dir Range
 | 28 	 | byte | Mp/Drive cost
-| 29 	 | byte | Camera
+| 29 	 | byte | [Camera](#camera)
 | 30 	 | byte | Priority
-| 31 	 | byte | Receiver
+| 31 	 | byte | [Receiver](#receiver)
 | 32 	 | ushort | Time
 | 34 	 | ushort | Require
 | 36 	 | byte | Mark
-| 37 	 | byte | Action
+| 37 	 | byte | [Action](#action)
 | 38 	 | ushort | Reaction Count
 | 40 	 | ushort | Dist Range
 | 42 	 | ushort | Score
 | 44 	 | ushort | Disable Form
 | 46 	 | byte | Group
 | 47 	 | byte | Reserve
+
+¹: This can be Argument, Form Id or Magic Id
+
+#### Icon
+
+| Id | Description |
+|----|-------------|
+| 0 | None
+| 1 | Attack
+| 2 | Magic
+| 3 | Item
+| 4 | Form
+| 5 | Summon
+| 6 | Friend
+| 7 | Limit
+
+
+#### Flags
+
+| Id | Description |
+|----|-------------|
+| 0x1 | Cursor
+| 0x2 | Land
+| 0x4 | Force
+| 0x8 | Combo
+| 0x10 | Battle
+| 0x20 | Secure
+| 0x40 | Require
+| 0x80 | No Combo
+| 0x100 | Drive
+| 0x200 | Short
+| 0x400 | Disable Sora
+| 0x800 | Disable Roxas
+| 0x1000 | Disable Lion King Sora
+| 0x2000 | Disable Limit Form
+| 0x4000 | Unused
+| 0x8000 | Disable Skateboard
+| 0x10000 | Battle Mode Only
+
+#### Camera
+
+| Id | Description |
+|----|-------------|
+| 0 | Null
+| 1 | Watch
+| 2 | Lock On
+| 3 | Watch & Lock On
+
+#### Receiver
+
+| Id | Description |
+|----|-------------|
+| 0 | Player
+| 1 | Target
+| 2 | Both
+
+#### Action
+
+| Id | Description |
+|----|-------------|
+| 0 | Null
+| 1 | Idle
+| 2 | Jump
+
+---
 
 ## Went
 
@@ -150,6 +219,8 @@ The Id within a "Went set" is the weapon's subId on the [item table](#item).
 <li>Goofy WI</li>
 </ul>
 
+---
+
 ## Wmst
 
 Weapon moveset list.
@@ -165,6 +236,8 @@ Weapon moveset list.
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0 	 | char[32] | Weapon moveset filename
+
+---
 
 ## Arif
 
@@ -221,7 +294,9 @@ Each Block corresponds to a world.
 | 0      | ushort | Music 1
 | 2      | ushort | Music 2
 
-## ITEM
+---
+
+## Item
 
 Describe an item, that could be anything from a consumable, to a weapon or materials.
 
@@ -256,19 +331,17 @@ Every table has the following header
 |--------|---------------|-------------|
 | 0      | uint16 | Id - [ITEM LIST](../../dictionary/inventory.md)
 | 2      | byte  | [Category](#Categories) |
-| 3      | byte  | Visibility (00 are visible on Stock, 01 isn't, 02 is like 00 for team-consumables) |
-| 4      | byte  | SubId* |
-| 5      | byte  | Rank (C, B, A, S) for Synthesis items. |
-| 6      | uint16 | [Status ID](#status-descriptor). Used to assign a certain status change to an item when equipped. |
+| 3      | byte  | Flag |
+| 4 - 7  |  | Dependent on the Category, see [variable structures](#variable-structures) |
 | 8      | uint16 | Name message ID |
 | 10     | uint16 | Description message ID |
 | 12     | uint16 | Shop buy price |
 | 14     | uint16 | Shop sell price |
-| 16     | uint16 | Command. | - [COMMAND LIST](../../dictionary/commands.md)
+| 16     | uint16 | Command - [COMMAND LIST](../../dictionary/commands.md)
 | 18     | uint16 | Slot (Order in the menu) |
-| 20     | uint16 | Picture linked to the image. |
-| 22     | byte  | [Prize Box](#Prize-boxes). |
-| 23     | byte  | [Icon](../../dictionary/icons.md). |
+| 20     | uint16 | Picture linked to the image |
+| 22     | byte  | [Prize Box](#Prize-boxes) |
+| 23     | byte  | [Icon](../../dictionary/icons.md) |
 
 *Used as recovery amount for consumables (% for ethers, halved on charge), AP cost for abilities, Id used in [Went](#went) for weapons.
 
@@ -301,6 +374,13 @@ Every table has the following header
 | 22   | Map
 | 23   | Report
 
+#### Flags
+
+| Position | Size | Description |
+|----------|------|-------------|
+| 0 | 1 | Special
+| 1 | 1 | Normal Form Only
+
 #### Prize boxes
 
 | ID | Description
@@ -317,6 +397,57 @@ Every table has the following header
 | 9    | Purple S (Item)
 | 10   | Purple L (Item)
 | 11   | Purple XL (Item)
+
+### Variable structures
+
+#### Ability
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Id
+| 6 | uint8 | Ap
+| 7 | uint8 | Type
+
+#### Consumables
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Cure Rate
+| 6 | uint16 | Effect
+
+#### Equipment (Armor, Accessory)
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Param
+| 6 | uint16 | Unused
+
+#### Magic
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Id
+| 6 | uint16 | Unused
+
+#### Synthesis
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint8 | Rank
+| 5 | uint8 | Type
+
+#### Report
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Id
+
+#### Weapons
+
+| Offset | Type | Description |
+|--------|------|-------------|
+| 4 | uint16 | Id
+| 6 | uint16 | Param
 
 ### Status table Structure
 
@@ -344,16 +475,18 @@ Every table has the following header
 | 5      | uint8  | Magic boost |
 | 6      | uint8  | Defense boost |
 | 7      | uint8  | AP boost |
-| 8      | uint8  | Unknown |
-| 9      | uint8  | Fire resistance |
-| 10     | uint8  | Ice resistance |
-| 11     | uint8  | Lightning resistance |
-| 12     | uint8  | Dark resistance |
-| 13     | uint8  | Unknown |
-| 14     | uint8  | General resistance |
-| 15     | uint8  | Unknown |
+| 8      | uint8  | Physical damage |
+| 9      | uint8  | Fire damage |
+| 10     | uint8  | Ice damage |
+| 11     | uint8  | Lightning damage |
+| 12     | uint8  | Dark damage |
+| 13     | uint8  | Light/Neutral damage |
+| 14     | uint8  | General damage |
+| 15     | uint8  | Reserve |
 
-## TRSR
+---
+
+## Trsr
 
 The treasure table describes what item cam be retrieved from a specific chest or event to a given map.
 
@@ -393,7 +526,9 @@ World ID and room index combined, gives the name of the map. (eg. for world ID =
 | 0    | Chest
 | 1    | Event
 
-## MEMT
+---
+
+## Memt
 
 Also known as Member Table, defines which [object](../../obj.md) to load in certain situations.
 
@@ -403,14 +538,14 @@ The first [entry](#memt-entry) is the default one as it globally defined which p
 
 Whenever a value of `0` in this structure is found, it is ignored. Story flags will always give a positive result, while pawns will fall back to the ones defined in the default entry.
 
-### MEMT Header
+### Memt Header
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 0      | uint | File version (5)
 | 4      | uint | Entry Count
 
-### MEMT entry
+### Memt entry
 
 Note that on the Vanilla version of the game, this structure is `48` bytes long and not `52`, as Limit and Limti High poly are not existent. The file version remains `5`
 
@@ -441,9 +576,9 @@ Note that on the Vanilla version of the game, this structure is `48` bytes long 
 | 48     | ushort  | Player (Final High poly)
 | 50     | ushort  | Player (Sora High poly)
 
-### MEMT party
+### Memt party
 
-This table, found straight after [the entries](#memt-entry), is used to decide which party members are used in a given portion of the game. How this table is accessed is unknown, but not all the maps uses it. The index is the one for [the entries](#memt-entry) object array, so an index of `0` will check what's in the offset `16` and an index of `3` will check what's in the offset `22`. When the value is equal to `12` (or `10` for Vanilla), the game will not make that specific pawn available in the party. This table seems to be the one responsible to assign or remove specific party members.
+This table, found straight after [the entries](#memt-entry), is used to decide which party members are used in a given portion of the game. This table is used by [AreaData scripts](./areadata.md#party) and controls what the values actually do. The index is the one for [the entries](#memt-entry) object array, so an index of `0` will check what's in the offset `16` and an index of `3` will check what's in the offset `22`. When the value is equal to `12` (or `10` for Vanilla), the game will not make that specific pawn available in the party. This table seems to be the one responsible to assign or remove specific party members.
 
 | Offset | Type | Description
 |--------|------|-------------
@@ -452,13 +587,17 @@ This table, found straight after [the entries](#memt-entry), is used to decide w
 | 2      | byte | Member index for friend 2
 | 3      | byte | Member index for friend world
 
-## FTST
+---
+
+## Ftst
 
 This is a table that contains the font palette for each world.
 
 The FTST is a binary file that contains N amount of palettes (9 for FM version), where every palette contain an unique ID (or key) and exactly 19 different colors.
 
 Each color correspond to the [world index](../../worlds.md) and it is loaded based on the current world.
+
+---
 
 ## Shop
 
@@ -521,6 +660,8 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 |--------|---------------|-------------|
 | 0 	 | uint | Item Id - [Item LIST](../../dictionary/inventory.md)
 
+---
+
 ## Sklt
 
 Defines which bones the characters' weapons are attached to.
@@ -547,11 +688,15 @@ Defines which bones the characters' weapons are attached to.
 | 4 	 | ushort | Bone number 1 (Primary weapon)
 | 6 	 | ushort | Bone number 2 (Secondary weapon)
 
+---
+
 ## Pref
 
 Defines preferences.
 
 Documented in [preferences.md](./preferences.md).
+
+---
 
 ## Evtp
 
@@ -579,6 +724,8 @@ Unknown.
 | 1 	 | short | Unk2
 | 3 	 | byte[3] | Padding?
 | 6 	 | short | Unk6
+
+---
 
 ## Ipic
 

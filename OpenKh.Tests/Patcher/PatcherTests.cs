@@ -772,23 +772,23 @@ namespace OpenKh.Tests.Patcher
 
             File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
             {
-                var fmlvEntry = new List<Kh2.Battle.Fmlv.Level>()
+                var fmlvEntry = new List<Kh2.Battle.Fmlv>()
                 {
-                    new Kh2.Battle.Fmlv.Level
+                    new Kh2.Battle.Fmlv
                     {
                         FormId = 1,
                         FormLevel = 1,
                         Exp = 100,
                         Ability = 200
                     },
-                    new Kh2.Battle.Fmlv.Level
+                    new Kh2.Battle.Fmlv
                     {
                         FormId = 1,
                         FormLevel = 2,
                         Exp = 100,
                         Ability = 200
                     },
-                    new Kh2.Battle.Fmlv.Level
+                    new Kh2.Battle.Fmlv
                     {
                         FormId = 2,
                         FormLevel = 1,
@@ -1262,10 +1262,11 @@ namespace OpenKh.Tests.Patcher
                 {
                     new Kh2.Battle.Plrp
                     {
-                        Difficulty = 7,
+                        Id = 7,
                         Character = 1,
                         Ap = 2,
-                        Objects = new List<short>(new short[58])
+                        Items = new List<ushort>(32),
+                        Padding = new byte[52]
                     }
                 };
 
@@ -1288,10 +1289,11 @@ namespace OpenKh.Tests.Patcher
                 var moddedPlrp = new List<Kh2.Battle.Plrp>{
                     new Kh2.Battle.Plrp
                     {
-                        Difficulty = 7,
+                        Id = 7,
                         Character = 1,
                         Ap = 200,
-                        Objects = new List<short>(new short[58])
+                        Items = new List<ushort>(32),
+                        Padding = new byte[52]
                     } 
                 };
                 writer.Write(serializer.Serialize(moddedPlrp));
