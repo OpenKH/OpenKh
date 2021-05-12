@@ -44,20 +44,20 @@ namespace OpenKh.Egs
         private readonly long _baseOffset;
         private readonly long _dataOffset;
         private readonly Dictionary<string, RemasteredEntry> _entries;
-        private readonly Hed.Entry _hedEntry;
 
         public string[] Assets { get; }
+        public byte[] Key { get; }
         public Header OriginalAssetHeader => _header;
         public Dictionary<string, RemasteredEntry> RemasteredAssetHeaders => _entries;
 
-        public EgsHdAsset(Stream stream, Hed.Entry hedEntry)
+        public EgsHdAsset(Stream stream)
         {
-            _hedEntry = hedEntry;
             _stream = stream;
             _baseOffset = stream.Position;
 
             var seed = stream.ReadBytes(0x10);
             _key = EgsEncryption.GenerateKey(seed, PassCount);
+			Key = _key;
             
             _header = BinaryMapping.ReadObject<Header>(new MemoryStream(seed));
 
@@ -71,42 +71,68 @@ namespace OpenKh.Egs
 
             Assets = entries.Select(x => x.Name).ToArray();
         }
+		
+		public byte[] ReadRawRemasteredAsset(string assetName)
+		{
+			var entry = _entries[assetName];
+			var data = new byte[entry.CompressedLength >= 0 ? entry.CompressedLength : entry.DecompressedLength];
+
+			data = _stream.AlignPosition(0x10).ReadBytes(data.Length);
+
+			return data;
+		}
 
         public byte[] ReadRemasteredAsset(string assetName)
         {
-            var header = _entries[assetName];
-            var dataLength = header.CompressedLength >= 0 ? header.CompressedLength : header.DecompressedLength;
-            
-            if (dataLength % 16 != 0)
-                dataLength += 16 - (dataLength % 16);
+			var entry = _entries[assetName];
+			byte[] data = ReadRawRemasteredAsset(assetName);
+            return DecompressRemasteredData(data, entry);
+        }
 
-            var data = _stream.AlignPosition(0x10).ReadBytes(dataLength);
+		public byte[] DecompressRemasteredData(byte[] data, RemasteredEntry entry)
+		{   
+			var paddedData = data;
+			if (data.Length % 16 != 0)
+                paddedData = new byte[data.Length + 16 - (data.Length % 16)];
+			Array.Copy(data, 0, paddedData, 0, data.Length);
 
-            for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
-                EgsEncryption.DecryptChunk(_key, data, i, PassCount);
+			if(entry.CompressedLength>=-1){
+				for (var i = 0; i < Math.Min(paddedData.Length, 0x100); i += 0x10)
+				{
+					EgsEncryption.DecryptChunk(_key, paddedData, i, PassCount);
+				}
+			}
 
-            if (header.CompressedLength >= 0)
+            if (entry.CompressedLength >= 0)
             {
-                using var compressedStream = new MemoryStream(data);
-                using var deflate = new DeflateStream(compressedStream.SetPosition(2), CompressionMode.Decompress);
+				using var compressedStream = new MemoryStream(paddedData);                using var deflate = new DeflateStream(compressedStream.SetPosition(2), CompressionMode.Decompress);
 
-                var decompressedData = new byte[header.DecompressedLength];
+                var decompressedData = new byte[entry.DecompressedLength];
                 deflate.Read(decompressedData);
 
                 return decompressedData;
             }
             
-            return data;
-        }
+            return paddedData;
+		}
+
+		public byte[] ReadRawData(){
+			var data = new byte[_header.CompressedLength >= 0 ? _header.CompressedLength : _header.DecompressedLength];
+            data = _stream.SetPosition(_dataOffset).ReadBytes(data.Length);
+			return data;
+		}
 
         public byte[] ReadData()
         {
-            var dataLength = _header.CompressedLength >= 0 ? _header.CompressedLength : _header.DecompressedLength;
-            var data = _stream.SetPosition(_dataOffset).ReadBytes(dataLength);
+            var data = ReadRawData();
+            return DecompressData(data);
+        }
 
+		public byte[] DecompressData(byte[] data)
+		{
             if (_header.CompressedLength >= -1)
             {
-                for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
+                for (var i = 0; i < Math.Min(data.Length, 0x100); i += 0x10)
                     EgsEncryption.DecryptChunk(_key, data, i, PassCount);
             }
 
