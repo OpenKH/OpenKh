@@ -1,42 +1,50 @@
-# [Kingdom Hearts Dream Drop Distance](../../index.md) - lboard.bin
+# [Kingdom Hearts Dream Drop Distance](../index.md) - lboard
 
-Located in `game.rbin` and describes the layout and behavior of the spirit boards for the different dream eaters. This file is in little endian.
+Location: /game/de/bin/ (`game.rbin` in non-PC)
 
-## Header
+Describes the layout and behavior of the spirits' boards.
 
-The entry point of the file. It is unknown exactly how it works but it appears to have a header of 16 bytes and then be a table of 4 byte entries, where the nth entry corresponds to the nth board found in lboard.bin
+## File Structure
+
+| Amount | Description |
+|--------|---------------|
+| 1 	 | Header (240 bytes)
+| X 	 | Boards (Y bytes each)
+| 1 	 | Padding (16 bytes)
+
+## Header Structure
+
+| Position | Type  | Description
+|--------|-------|--------------
+| 0   | int32 | File Identifier? (44 33 22 11)
+| 8   | int32 | Board Count
+| 16  | int8[55] | Board Offsets
+| 236 | int8 | Padding
+
+There should be as many Board Offsets as Board Count dictates. Each Board Offset has the address of the board within the file.
+
+## Board Structure
+
+| Amount | Description |
+|--------|---------------|
+| X 	 | Node Entries (16 bytes each)
+| 1 	 | EOF Node (16 bytes; A node of type 08 with all other values as 00)
+
+## Node Entry Structure
 
 | Offset | Type   | Description |
 |--------|--------|-------------|
-| 0x00   | byte   | Unknown but might be related to 16*(# of always visible nodes in a board)
-| 0x01   | byte   | ID of board?
-| 0x02   | byte   | Always 0
-| 0x03   | byte   | Always 0
-
-The header has a 16 byte footer that is 00 02 and then all 00
-
-## Board
-
-After the header is the definition of each spirit board. The boards are a series of 16 byte definitions for each node. Each board has a 16 byte header that is all 00 except for the 2nd byte that is 00 08 and then all 00
-
-The definition for each node is as follows
-
-| Offset | Type   | Description |
-|--------|--------|-------------|
-| 0x00   | byte   | Node Position
-| 0x01   | byte   | Node Type
-| 0x02   | byte   | Unknown 1
-| 0x03   | byte   | Connections
-| 0x04   | byte   | Disposition Requirement?
-| 0x05   | uint16 | Unknown 2
-| 0x07   | byte   | Unknown 3
-| 0x08   | uint16 | Generic cost (used by most node types)
-| 0x10   | byte   | Reward
-| 0x11   | byte   | Unknown 4
-| 0x12   | byte   | Unused (Always 0)
-| 0x13   | byte   | Unused (Always 0)
-| 0x14   | byte   | Unused (Always 0)
-| 0x15   | byte   | Unused (Always 0)
+| 0x00   | uint8    | Position
+| 0x01   | uint8    | Type
+| 0x02   | uint8    | Unknown 1
+| 0x03   | uint8    | Connections
+| 0x04   | uint8    | Disposition Requirement
+| 0x05   | uint16   | Unknown 2
+| 0x07   | uint8    | Unknown 3
+| 0x08   | uint16   | Generic cost (used by most node types)
+| 0x10   | uint8    | Reward
+| 0x11   | uint8    | Unknown 4
+| 0x12   | uint8[4] | Padding
 
 ### Node Position
 
@@ -51,18 +59,18 @@ E.X. 23 would be the second row and the 3rd column
 | 00     | Invisible
 | 01     | Empty Cloud (value not found in lboard.bin)
 | 02     | Starting Point
-| 03     | Purchasable Node
-| 04     | Purchasable Node
+| 03     | Purchasable Node (Stat)
+| 04     | Purchasable Node (Item)
 | 06     | Level Checkpoint
 | 07     | Secret (Green Question Mark)
-| 08     | Invisible
+| 08     | EOF node
 | 16     | Link Checkpoint
-| 17     | Secret (Green Question Mark)
+| 17     | Secret (Red Question Mark)
 | 26     | Item Checkpoint
 
 ### Unknown 1
 
-Appears related to Secret nodes. If 03, turns the question mark red. If any value other than 03 or 00, turns the question mark purple
+Related to Red Secret nodes. If 03, turns the question mark red. If any value other than 03 or 00, turns the question mark purple
 
 The following are the 4 nodes in lboard.bin where this byte is nonzero
 
@@ -77,33 +85,20 @@ The following are the 4 nodes in lboard.bin where this byte is nonzero
 
 Specifies which connections to draw from this node to other nodes. 
 
-| Color key |
-| --------- |
-| Pink - bidirectional
-| Yellow - One way out of the node
-| Blue - One way in to the node
+| Position | Size  | Description
+|--------|-------|--------------
+| 0 | 4 | < unknown >
+| 4 | 2 | Right connection
+| 6 | 2 | Down connection
 
-| Value  | Right Connection | Down Connection |   
-|--------|------------------|-----------------|
-| 00     | No               | No
-| 01     | Pink             | No
-| 02     | Yellow           | No
-| 03     | Blue             | No
-| 04     | No               | Pink
-| 05     | Pink             | Pink
-| 06     | Yellow           | Pink
-| 07     | Blue             | Pink
-| 08     | No               | Yellow
-| 09     | Pink             | Yellow
-| 0A     | Yellow           | Yellow
-| 0B     | Blue             | Yellow
-| 0C     | No               | Blue
-| 0D     | Pink             | Blue
-| 0E     | Yellow           | Blue
-| 0F     | Blue             | Blue
+| Value  | Description   
+|--------|--------|
+| 0     | None
+| 1     | Both ways
+| 2     | In
+| 3     | Out
 
-
-The last 4 bits appear to be all that matter. Although the following values can be found within lboard.bin, it is unknown what they change.
+The unknown bits appear to be all that matter. Although the following values can be found within lboard.bin, it is unknown what they change.
 
 `12, 14, 41, 44, 51`
 
@@ -147,13 +142,13 @@ Item Checkpoint - Appears to be the ID of the item required for the item checkpo
 
 ### Reward
 
-Index of the reward given by the node. It is indexed off the table of commands for that dream eater, although the table doesn't appear to be in the same order is displayed in game.
+Index of the reward given by the node. The rewards are stored in [lbt_list](./lbt_list.md).
 
 For Item Checkpoint nodes, this is the number of items required for the checkpoint.
 
 ### Unknown 4
 
-Related to secret nodes somehow
+Related to Red Secret nodes somehow
 
 Some example nodes
 
