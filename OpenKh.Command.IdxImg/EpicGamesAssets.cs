@@ -176,8 +176,15 @@ namespace OpenKh.Command.IdxImg
                 [Option(CommandOptionType.SingleValue, Description = "Path where the patched PKG will be dropped.", ShortName = "o", LongName = "output")]
                 public string OutputDir { get; set; }
 
+                private List<string> _patchFiles = new List<string>();
+
                 protected int OnExecute(CommandLineApplication app)
                 {
+                    // Get files to inject in the PKG to detect if we want to include new files or not
+                    // We only get the original files as for me it doesn't make sense to include
+                    // new "remastered" asset since it must be linked to an original one
+                    _patchFiles = GetAllFiles(Path.Combine(InputFolder, ORIGINAL_FILES_FOLDER_NAME)).ToList();
+
                     Patch(PkgFile, InputFolder, OutputDir);
 
                     return 0;
@@ -185,6 +192,8 @@ namespace OpenKh.Command.IdxImg
 
                 protected void Patch(string pkgFile, string inputFolder, string outputFolder)
                 {
+                    var filenames = new List<string>();
+
                     var remasteredFilesFolder = Path.Combine(inputFolder, REMASTERED_FILES_FOLDER_NAME);
 
                     var outputDir = outputFolder ?? Path.GetFileNameWithoutExtension(pkgFile);
@@ -211,6 +220,13 @@ namespace OpenKh.Command.IdxImg
                             throw new Exception("Unknown filename!");
                         }
 
+                        if (_patchFiles.Contains(filename))
+                        {
+                            _patchFiles.Remove(filename);
+                        }
+
+                        filenames.Add(filename);
+
                         var asset = new EgsHdAsset(pkgStream.SetPosition(hedHeader.Offset));
 
                         if (hedHeader.DataLength > 0)
@@ -222,6 +238,70 @@ namespace OpenKh.Command.IdxImg
                             Console.WriteLine($"Skipped: {filename}");
                         }
                     }
+
+                    // Add all files that are not in the original HED file and inject them in the PKG stream too
+                    foreach (var filename in _patchFiles)
+                    {
+                        AddFile(inputFolder, filename, patchedHedStream, patchedPkgStream);
+                        Console.WriteLine($"Added a new file: {filename}");
+                    }
+                }
+
+                private Hed.Entry AddFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, bool shouldCompressData = false, bool shouldEncryptData = false)
+                {
+                    var completeFilePath = Path.Combine(inputFolder, ORIGINAL_FILES_FOLDER_NAME, filename);
+                    var offset = pkgStream.Position;
+
+                    #region Data
+
+                    using var newFileStream = File.OpenRead(completeFilePath);
+
+                    var header = new EgsHdAsset.Header()
+                    {
+                        // CompressedLenght => -2: no compression and encryption, -1: no compression 
+                        CompressedLength = !shouldCompressData ? !shouldEncryptData ? -2 : -1 : 0,
+                        DecompressedLength = (int)newFileStream.Length,
+                        RemasteredAssetCount = 0,
+                        CreationDate = -1
+                    };
+
+                    var decompressedData = newFileStream.ReadAllBytes();
+                    var compressedData = decompressedData.ToArray();
+
+                    if (shouldCompressData)
+                    {
+                        compressedData = CompressData(decompressedData);
+                        header.CompressedLength = compressedData.Length;
+                    }
+
+                    // Encrypt and write current file data in the PKG stream
+                    // The seed used for encryption is the original data header
+                    var seed = new MemoryStream();
+                    BinaryMapping.WriteObject<EgsHdAsset.Header>(seed, header);
+
+                    var encryptionSeed = seed.ReadAllBytes();
+                    var encryptedData = header.CompressedLength > -2 ? EgsEncryption.Encrypt(compressedData, encryptionSeed) : compressedData;
+
+                    // Write original file header
+                    BinaryMapping.WriteObject<EgsHdAsset.Header>(pkgStream, header);
+
+                    // Make sure to write the original file after remastered assets headers
+                    pkgStream.Write(encryptedData);
+
+                    #endregion
+
+                    // Write a new entry in the HED stream
+                    var hedHeader = new Hed.Entry()
+                    {
+                        MD5 = ToBytes(CreateMD5(filename)),
+                        ActualLength = (int)newFileStream.Length,
+                        DataLength = (int)(pkgStream.Position - offset),
+                        Offset = offset
+                    };
+
+                    BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedHeader);
+
+                    return hedHeader;
                 }
 
                 private static Hed.Entry ReplaceFile(
