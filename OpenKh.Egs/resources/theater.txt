@@ -909,6 +909,7 @@ sp/font/menufont.inf
 sp/font/menufont.tm2
 sp/l2d/kh1_theater.l2d
 sp/message/sp/event/hd/bin/cthd400.ctd
+KHFMTheater.png
 uk/ctd/ct00100.ctd
 uk/ctd/ctmn000.ctd
 uk/event/en/kh/kh000/kh000.exia2
