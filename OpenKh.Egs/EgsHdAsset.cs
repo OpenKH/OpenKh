@@ -16,7 +16,7 @@ namespace OpenKh.Egs
             [Data] public int RemasteredAssetCount { get; set; }
             // Original data's compressed length => -2: no compression and encryption, -1: no compression, > 0: compressed size
             [Data] public int CompressedLength { get; set; }
-            [Data] public int Unknown0c { get; set; }
+            [Data] public int CreationDate { get; set; }
         }
 
         public class RemasteredEntry
@@ -28,6 +28,16 @@ namespace OpenKh.Egs
             [Data] public int DecompressedLength { get; set; }
             [Data] public int CompressedLength { get; set; }
         }
+
+        private static readonly string ResourcePath = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources");
+        public static string[] DddNames = File.ReadAllLines(Path.Combine(ResourcePath, "ddd.txt"));
+        public static string[] MareNames = File.ReadAllLines(Path.Combine(ResourcePath, "mare.txt"));
+        public static string[] SettingMenuNames = File.ReadAllLines(Path.Combine(ResourcePath, "settingmenu.txt"));
+        public static string[] TheaterNames = File.ReadAllLines(Path.Combine(ResourcePath, "theater.txt"));
+        public static string[] RecomNames = File.ReadAllLines(Path.Combine(ResourcePath, "recom.txt"));
+        public static string[] BbsNames = File.ReadAllLines(Path.Combine(ResourcePath, "bbs.txt"));
+        public static string[] Kh1AdditionalNames = File.ReadAllLines(Path.Combine(ResourcePath, "kh1pc.txt"));
+        public static string[] Launcher28Names = File.ReadAllLines(Path.Combine(ResourcePath, "launcher28.txt"));
 
         private const int PASS_COUNT = 10;
 
