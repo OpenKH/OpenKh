@@ -50,5 +50,16 @@ namespace OpenKh.Tests.Egs
             var data = EgsEncryption.Decrypt(new MemoryStream(encrypted));
             Assert.Equal(ToString(expected), ToString(data[0..16]));
         }
+
+        /*
+            Tests to write:
+            Extract PKG file with original files only(encrypted or not | compressed or not)
+            Extract PKG file with remastered files(encrypted or not | compressed or not)
+            Patch PKG file replacing an original asset
+            Patch PKG file replacing a remastered asset
+            Patch PKG file replacing multiple remastered assets
+            Patch PKG file replacing an original asset + 1 or multiple remastered asset(s)
+            Add a new file to an existing PKG file
+        */
     }
 }

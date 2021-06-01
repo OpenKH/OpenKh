@@ -45,4 +45,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Egs\res\" />
+  </ItemGroup>
+
 </Project>
