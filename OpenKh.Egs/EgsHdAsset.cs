@@ -104,7 +104,7 @@ namespace OpenKh.Egs
 
             _remasteredAssetsRawData.Add(assetName, data.ToArray());
 
-            if (_header.CompressedLength > -2)
+            if (header.CompressedLength > -2)
             {
                 for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
                     EgsEncryption.DecryptChunk(_key, data, i, PASS_COUNT);
