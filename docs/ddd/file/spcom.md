@@ -76,4 +76,4 @@ Bonus parameters given by using a command on Spirit creation.
 | 0x0B     | int8  | Resistance dark (%)                    |
 | 0x0C     | int8  | Resistance light (%)                   |
 | 0x0D     | int8  | Affinity                               |
-| 0x0E     | int16  | Padding                                |
+| 0x0E     | int16 | Padding                                |
