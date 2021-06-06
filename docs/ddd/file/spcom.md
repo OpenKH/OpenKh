@@ -38,6 +38,8 @@ Eg: Meow Wow is in offset 1 and has 6 entries. The next spirit, Tama Sheep, has 
 
 ## Table A entries
 
+Combinations for every spirit.
+
 | Position | Type  | Description                            |
 | -------- | ----- | -------------------------------------- |
 | 0x00     | int16 | [Spirit 1](../dictionary/spirits)      |
@@ -57,6 +59,22 @@ Eg: Meow Wow is in offset 1 and has 6 entries. The next spirit, Tama Sheep, has 
 
 ## Table B entries
 
-| Position | Type     | Description |
-| -------- | -------- | ----------- |
-| 0x00     | int8[16] | < Unknown > |
+Bonus parameters given by using a command on Spirit creation.
+
+| Position | Type  | Description                            |
+| -------- | ----- | -------------------------------------- |
+| 0x00     | int8  | [Item 1 Id](../dictionary/items)       |
+| 0x01     | int8  | [Item 1 Category](../dictionary/items) |
+| 0x02     | int16 | HP                                     |
+| 0x04     | int8  | Attack                                 |
+| 0x05     | int8  | Defense                                |
+| 0x06     | int8  | Magic                                  |
+| 0x07     | int8  | Weakness physical (%)                  |
+| 0x08     | int8  | Weakness fire (%)                      |
+| 0x09     | int8  | Weakness blizzard (%)                  |
+| 0x0A     | int8  | Weakness thunder (%)                   |
+| 0x0B     | int8  | Weakness water (%)                     |
+| 0x0C     | int8  | Weakness dark (%)                      |
+| 0x0D     | int8  | Weakness light (%)                     |
+| 0x0E     | int8  | Affinity                               |
+| 0x0F     | int8  | Padding                                |
