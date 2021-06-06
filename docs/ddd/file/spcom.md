@@ -69,12 +69,11 @@ Bonus parameters given by using a command on Spirit creation.
 | 0x04     | int8  | Attack                                 |
 | 0x05     | int8  | Defense                                |
 | 0x06     | int8  | Magic                                  |
-| 0x07     | int8  | Weakness physical (%)                  |
-| 0x08     | int8  | Weakness fire (%)                      |
-| 0x09     | int8  | Weakness blizzard (%)                  |
-| 0x0A     | int8  | Weakness thunder (%)                   |
-| 0x0B     | int8  | Weakness water (%)                     |
-| 0x0C     | int8  | Weakness dark (%)                      |
-| 0x0D     | int8  | Weakness light (%)                     |
-| 0x0E     | int8  | Affinity                               |
-| 0x0F     | int8  | Padding                                |
+| 0x07     | int8  | Resistance fire (%)                    |
+| 0x08     | int8  | Resistance blizzard (%)                |
+| 0x09     | int8  | Resistance thunder (%)                 |
+| 0x0A     | int8  | Resistance water (%)                   |
+| 0x0B     | int8  | Resistance dark (%)                    |
+| 0x0C     | int8  | Resistance light (%)                   |
+| 0x0D     | int8  | Affinity                               |
+| 0x0E     | int16  | Padding                                |
