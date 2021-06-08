@@ -12,6 +12,7 @@
     * [lbt_list](file/lbt_list.md) - List Board Treasure: Spirit Boards' rewards
     * [tboxdt](file/tboxdt.md) - Treasure Box Data Table: Treasure Chests
     * [techprm](file/techprm.md) - Technique Params: Data on attacks
+    * [spcom](file/spcom.md) - Spirit Combinations: Spirit Recipes
 
 * ### Savedata
     * [Inventory](savedata/inventory.md)
