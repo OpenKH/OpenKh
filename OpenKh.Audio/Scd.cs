@@ -4,6 +4,7 @@ using Xe.BinaryMapper;
 using System.Linq;
 using System.IO;
 using OpenKh.Common;
+using YamlDotNet.Serialization;
 
 namespace OpenKh.Audio
 {
@@ -95,8 +96,8 @@ namespace OpenKh.Audio
             [Data] public uint ExtraDataSize { get; set; }
             [Data] public uint AuxChunkCount { get; set; }
 
-            public byte[] ExtraData { get; set; }
-            public byte[] Data { get; set; }
+            [YamlIgnore] public byte[] ExtraData { get; set; }
+            [YamlIgnore] public byte[] Data { get; set; }
             public string Name { get; set; }
         }
         public List<StreamFile> StreamFileEntries { get; set; }
@@ -181,6 +182,9 @@ namespace OpenKh.Audio
 
                 streamInfo.ExtraData = stream.ReadBytes((int)streamInfo.ExtraDataSize);
                 streamInfo.Data = stream.ReadBytes((int)streamInfo.StreamSize);
+
+                //extract stream names (if v4) or set number as name
+                // ...
 
                 StreamFileEntries.Add(streamInfo);
             }

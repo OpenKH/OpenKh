@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Audio
@@ -26,7 +22,7 @@ namespace OpenKh.Audio
             public byte[] VorbisHeader { get; set; }
         }
 
-        private static void Xor(byte[] ptr, byte key)
+        public static void Xor(byte[] ptr, byte key)
         {
             for (int i = 0; i < ptr.Length; i++)
                 ptr[i] ^= key;
