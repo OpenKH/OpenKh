@@ -845,6 +845,8 @@ gr/tim2/title/title_kh2.tm2
 gr/tim2/title/title_khfm.tm2
 gr/tim2/title/title_recoded.tm2
 gr/tim2/title/title_recom.tm2
+gr/tim2/theater/days_theatre.tm2
+gr/tim2/theater/Recoded_theatre.tm2
 icon0_jp.png
 icon0_ne.png
 icon0.png
