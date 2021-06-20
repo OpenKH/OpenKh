@@ -6,41 +6,41 @@
 
 | Offset | Length | Type       | Name
 |--------|--------|------------|-----
-| 0      | 68     | PKT_HEADER | m_pktHeader
-| 68     | 80     | PKT_GAME   | m_pktGame
-| 148    | 880    | PKT_OBJECT | m_pktObject
+| 0x0    | 68     | PKT_HEADER | m_pktHeader
+| 0x44   | 80     | PKT_GAME   | m_pktGame
+| 0x94   | 880    | PKT_OBJECT | m_pktObject
 
 ### PKT_HEADER
 
 | Offset | Length | Type      | Name
 |--------|--------|-----------|-----
-| 0      | 1      | byte      | m_nUser
-| 1      | 1      | byte      | m_nCode
-| 2      | 1      | byte      | [m_nPhase](#PKT_HEADER-Phase) Needs testing
-| 3      | 1      | byte      | m_nReady
-| 4      | 1      | byte      | pad0
-| 5      | 1      | byte      | m_nOpenLv
-| 6      | 1      | undefined |
-| 7      | 1      | undefined |
-| 8      | 4      | uint32    | m_nSendCount
-| 12     | 4      | uint32    | m_uiUserColor
-| 16     | 38     | char[38]  | m_szNickName
-| 54     | 8      | char[8]   | m_szRoomName
-| 62     | 1      | undefined |
-| 63     | 1      | undefined |
-| 64     | 4      | float     | m_fUpdate
+| 0x0    | 1      | byte      | m_nUser
+| 0x1    | 1      | byte      | m_nCode
+| 0x2    | 1      | byte      | [m_nPhase](#PKT_HEADER-Phase) Needs testing
+| 0x3    | 1      | byte      | m_nReady
+| 0x4    | 1      | byte      | pad0
+| 0x5    | 1      | byte      | m_nOpenLv
+| 0x6    | 1      | undefined |
+| 0x7    | 1      | undefined |
+| 0x8    | 4      | uint32    | m_nSendCount
+| 0xC    | 4      | uint32    | m_uiUserColor
+| 0x10   | 38     | char[38]  | m_szNickName
+| 0x36   | 8      | char[8]   | m_szRoomName
+| 0x3E   | 1      | undefined |
+| 0x3F   | 1      | undefined |
+| 0x40   | 4      | float     | m_fUpdate
 
 ### PKT_GAME
 
 | Offset | Length | Type    | Name
 |--------|--------|---------|-----
-| 0      | 80     | char[8] | m_nData
+| 0x0    | 80     | char[8] | m_nData
 
 ### PKT_OBJECT
 
 | Offset | Length | Type    | Name
 |--------|--------|---------|-----
-| 0      | 880    | char[8] | m_nData
+| 0x0    | 880    | char[8] | m_nData
 
 ### Network State
 
@@ -89,22 +89,22 @@
 
 | Offset | Length | Type | Name
 |--------|--------|------|-----
-| 0      | 1      | byte | nGameMode
-| 1      | 1      | byte | nEventRule
-| 2      | 1      | byte | nDataMode
-| 3      | 1      | byte | nTimeLimit
-| 4      | 1      | byte | nMemberMax
-| 5      | 1      | byte | nField
-| 6      | 1      | byte | nTarget
-| 7      | 1      | byte | nRank
+| 0x0    | 1      | byte | nGameMode
+| 0x1    | 1      | byte | nEventRule
+| 0x2    | 1      | byte | nDataMode
+| 0x3    | 1      | byte | nTimeLimit
+| 0x4    | 1      | byte | nMemberMax
+| 0x5    | 1      | byte | nField
+| 0x6    | 1      | byte | nTarget
+| 0x7    | 1      | byte | nRank
 
 ### GAME_INFO
 
 | Offset | Length | Type  | Name
 |--------|--------|-------|-----
-| 0      | 4      | int32 | m_iServerFlag
-| 4      | 4      | int32 | m_iClientReady
-| 8      | 4      | int32 | m_iServerIndex
+| 0x0    | 4      | int32 | m_iServerFlag
+| 0x4    | 4      | int32 | m_iClientReady
+| 0x8    | 4      | int32 | m_iServerIndex
 
 ### PKT_HEADER Phase
 
@@ -213,156 +213,156 @@ Union
 
 | Postition | Size | Name            |
 |-----------|------|-----------------|
-| 0         | 1    | UiError         |
-| 1         | 1    | UiOnlineWait    |
-| 2         | 1    | UiExterminate   |
-| 3         | 6    | __dummy__       |
-| 9         | 1    | uiDataSetupAll  |
-| 10        | 1    | uiDataSetup     |
-| 11        | 1    | uiStartCheck    |
-| 12        | 1    | uiReadyAll      |
-| 13        | 1    | uiReady         |
-| 14        | 1    | uiExitStart     |
-| 15        | 1    | uiPCamAdvertise |
-| 16        | 1    | uiRoundStart    |
-| 17        | 1    | uiLeaderLive    |
-| 18        | 1    | uiTeamError     |
-| 19        | 1    | uiResultWindow  |
-| 20        | 1    | uiMVP           |
-| 21        | 1    | uiLose          |
-| 22        | 1    | uiWin           |
-| 23        | 1    | uiDecideAll     |
-| 24        | 1    | uiDecide        |
-| 25        | 1    | uiExit          |
-| 26        | 1    | uiSelectWindow  |
-| 27        | 1    | uiTotalScore    |
-| 28        | 1    | uiDataFree      |
-| 29        | 1    | uiTeamBattle    |
-| 30        | 1    | uiLeader        |
-| 31        | 1    | uiOnline        |
+| 0x0       | 1    | UiError         |
+| 0x1       | 1    | UiOnlineWait    |
+| 0x2       | 1    | UiExterminate   |
+| 0x3       | 6    | __dummy__       |
+| 0x9       | 1    | uiDataSetupAll  |
+| 0xA       | 1    | uiDataSetup     |
+| 0xB       | 1    | uiStartCheck    |
+| 0xC       | 1    | uiReadyAll      |
+| 0xD       | 1    | uiReady         |
+| 0xE       | 1    | uiExitStart     |
+| 0xF       | 1    | uiPCamAdvertise |
+| 0x10      | 1    | uiRoundStart    |
+| 0x11      | 1    | uiLeaderLive    |
+| 0x12      | 1    | uiTeamError     |
+| 0x13      | 1    | uiResultWindow  |
+| 0x14      | 1    | uiMVP           |
+| 0x15      | 1    | uiLose          |
+| 0x16      | 1    | uiWin           |
+| 0x17      | 1    | uiDecideAll     |
+| 0x18      | 1    | uiDecide        |
+| 0x19      | 1    | uiExit          |
+| 0x1A      | 1    | uiSelectWindow  |
+| 0x1B      | 1    | uiTotalScore    |
+| 0x1C      | 1    | uiDataFree      |
+| 0x1D      | 1    | uiTeamBattle    |
+| 0x1E      | 1    | uiLeader        |
+| 0x1F      | 1    | uiOnline        |
 
 ### PLAYER_INFO
 
 | Offset | Length | Type     | Name
 |--------|--------|----------|-----
-| 0      | 38     | char[38] | m_szName
-| 38     | 1      | byte     | m_nDeck
-| 39     | 1      | byte     | m_nColor
-| 40     | 1      | byte     | m_nTeam
-| 41     | 1      | byte     | m_nDecide
-| 42     | 1      | byte     | m_nRank
-| 43     | 1      | byte     | m_nWin
-| 44     | 1      | byte     | m_nLose
-| 45     | 1      | byte     | m_nMVP
-| 46     | 1      | byte     | m_nLiveInfo
-| 47     | 1      | byte     | m_dum0
-| 48     | 4      | uint32   | m_nScore
-| 52     | 4      | uint32   | m_nScoreR
-| 56     | 4      | uint32   | m_nTotal
-| 60     | 2      | uint16   | m_nMedal
-| 62     | 2      | uint16   | m_nBonusP
-| 64     | 2      | uint16   | m_nBonusM
-| 66     | 1      | byte     | m_dum1
-| 67     | 1      | byte     | m_dum2
+| 0x0    | 38     | char[38] | m_szName
+| 0x26   | 1      | byte     | m_nDeck
+| 0x27   | 1      | byte     | m_nColor
+| 0x28   | 1      | byte     | m_nTeam
+| 0x29   | 1      | byte     | m_nDecide
+| 0x2A   | 1      | byte     | m_nRank
+| 0x2B   | 1      | byte     | m_nWin
+| 0x2C   | 1      | byte     | m_nLose
+| 0x2D   | 1      | byte     | m_nMVP
+| 0x2E   | 1      | byte     | m_nLiveInfo
+| 0x2F   | 1      | byte     | m_dum0
+| 0x30   | 4      | uint32   | m_nScore
+| 0x34   | 4      | uint32   | m_nScoreR
+| 0x38   | 4      | uint32   | m_nTotal
+| 0x3C   | 2      | uint16   | m_nMedal
+| 0x3E   | 2      | uint16   | m_nBonusP
+| 0x40   | 2      | uint16   | m_nBonusM
+| 0x42   | 1      | byte     | m_dum1
+| 0x43   | 1      | byte     | m_dum2
 
 ### PLAYER_SCORE
 
 | Offset | Length | Type      | Name
 |--------|--------|-----------|-----
-| 0      | 4      | uint32    | m_nScore
-| 4      | 2      | uint16    | m_nMedal
-| 6      | 2      | uint16    | m_nBonusP
-| 8      | 2      | uint16    | m_nBonusM
-| 10     | 2      | undefined | 
-| 11     | 2      | undefined | 
+| 0x0    | 4      | uint32    | m_nScore
+| 0x4    | 2      | uint16    | m_nMedal
+| 0x6    | 2      | uint16    | m_nBonusP
+| 0x8    | 2      | uint16    | m_nBonusM
+| 0xA    | 1      | undefined | 
+| 0xB    | 1      | undefined | 
 
 ### TEAM_INFO
 
 | Offset | Length | Type      | Name
 |--------|--------|-----------|-----
-| 0      | 4      | uint32    | m_nScore
-| 4      | 4      | uint32    | m_nScoreR
-| 8      | 2      | uint16    | m_nBonusP
-| 10     | 2      | uint16    | m_nBonusM
-| 12     | 1      | byte      | m_nWin
-| 13     | 1      | byte      | m_nLose
-| 14     | 1      | byte      | m_nRank
-| 15     | 1      | byte      | m_nMemberCount
-| 16     | 6      | byte[6]   | m_nMember
-| 22     | 1      | undefined |
-| 23     | 1      | undefined |
+| 0x0    | 4      | uint32    | m_nScore
+| 0x4    | 4      | uint32    | m_nScoreR
+| 0x8    | 2      | uint16    | m_nBonusP
+| 0xA    | 2      | uint16    | m_nBonusM
+| 0xC    | 1      | byte      | m_nWin
+| 0xD    | 1      | byte      | m_nLose
+| 0xE    | 1      | byte      | m_nRank
+| 0xF    | 1      | byte      | m_nMemberCount
+| 0x10   | 6      | byte[6]   | m_nMember
+| 0x16   | 1      | undefined |
+| 0x17   | 1      | undefined |
 
 ### TEAM_SCORE
 
 | Offset | Length | Type      | Name
 |--------|--------|-----------|-----
-| 0      | 4      | uint32    | m_nScore
-| 4      | 1      | byte      | m_nWin
-| 5      | 1      | byte      | m_nLose
-| 6      | 1      | undefined | 
-| 7      | 1      | undefined | 
+| 0x0    | 4      | uint32    | m_nScore
+| 0x4    | 1      | byte      | m_nWin
+| 0x5    | 1      | byte      | m_nLose
+| 0x6    | 1      | undefined | 
+| 0x7    | 1      | undefined | 
 
 ### CNetGameVSMode
 
 | Offset | Length | Type             | Name
 |--------|--------|------------------|-----
-| 0      | 52     | CTreeTask        | super_CTreeTask
-| 52     | 4      | IAllocator*      | m_pAllocator
-| 56     | 4      | VSMODE_FLAG_DATA | m_FlagData
-| 60     | 4      | float            | m_fTimer
-| 64     | 4      | float            | m_fLocalTimer
-| 68     | 4      | float            | m_fGamerTimer
-| 72     | 1      | byte             | m_nState
-| 73     | 1      | byte             | m_nPreState
-| 74     | 1      | byte             | m_nStateEntry
-| 75     | 1      | byte             | m_nStateSelect
-| 76     | 1      | byte             | m_nStateLoad
-| 77     | 1      | byte             | m_nStateGame
-| 78     | 1      | byte             | m_nStateResult
-| 79     | 1      | byte             | m_nStateAlert
-| 80     | 10     | byte[10]         | m_nCheck
-| 90     | 2      | uint16           | m_nCheckFlag
-| 92     | 1      | byte             | m_nCheckCurrent
-| 93     | 1      | byte             | m_dum0
-| 94     | 1      | byte             | m_dum1
-| 95     | 1      | byte             | m_dum2
-| 96     | 4      | CGameCockpit*    | m_pGameCockpit
-| 100    | 4      | CGOnlineWait*    | m_pOnlineWait
-| 104    | 6      | byte[6]          | m_nLiveInfo
-| 110    | 1      | byte             | m_nRecvMax
-| 111    | 1      | byte             | m_nRecvOnline
-| 112    | 1      | byte             | m_nRecvLost
-| 113    | 1      | byte             | m_nLeaderId
-| 114    | 1      | byte             | m_nDataSetupOK
-| 115    | 1      | byte             | m_nStartMember
-| 116    | 1      | byte             | m_nPacketCode
-| 117    | 1      | byte             | m_nDropCount
-| 118    | 1      | byte             | m_nMemberReady
-| 119    | 1      | byte             | m_inGameMode
-| 120    | 1      | byte             | m_inEventRule
-| 121    | 1      | byte             | m_inDataMode
-| 122    | 1      | byte             | m_inTimeLimit
-| 123    | 1      | byte             | m_inMemberMax
-| 124    | 1      | byte             | m_inField
-| 125    | 1      | byte             | m_outGameMode
-| 126    | 1      | byte             | m_outEventRule
-| 127    | 1      | byte             | m_outDataMode
-| 128    | 1      | byte             | m_outTimeLimit
-| 129    | 1      | byte             | m_outMemberMax
-| 130    | 1      | byte             | m_outField
-| 131    | 1      | byte             | m_nMVP
-| 132    | 1      | byte             | m_nTeam
-| 133    | 1      | byte             | m_nDeckType
-| 134    | 1      | byte             | m_nPlayerNum
-| 135    | 1      | byte             | m_nMember
-| 136    | 1      | byte             | m_nMemberLost
-| 137    | 1      | byte             | m_nMemberOK
-| 138    | 1      | byte             | m_nResult
-| 139    | 1      | undefined        | 
-| 140    | 72     | PLAYER_SCORE[6]  | m_PlayerScore
-| 212    | 16     | TEAM_SCORE[2]    | m_TeamScore
-| 228    | 408    | PLAYER_INFO[6]   | m_PlayerInfo
-| 636    | 48     | TEAM_INFO[6]     | m_TeamInfo
+| 0x0    | 52     | CTreeTask        | super_CTreeTask
+| 0x34   | 4      | IAllocator*      | m_pAllocator
+| 0x38   | 4      | VSMODE_FLAG_DATA | m_FlagData
+| 0x3C   | 4      | float            | m_fTimer
+| 0x40   | 4      | float            | m_fLocalTimer
+| 0x44   | 4      | float            | m_fGamerTimer
+| 0x48   | 1      | byte             | m_nState
+| 0x49   | 1      | byte             | m_nPreState
+| 0x4A   | 1      | byte             | m_nStateEntry
+| 0x4B   | 1      | byte             | m_nStateSelect
+| 0x4C   | 1      | byte             | m_nStateLoad
+| 0x4D   | 1      | byte             | m_nStateGame
+| 0x4E   | 1      | byte             | m_nStateResult
+| 0x4F   | 1      | byte             | m_nStateAlert
+| 0x50   | 10     | byte[10]         | m_nCheck
+| 0x5A   | 2      | uint16           | m_nCheckFlag
+| 0x5C   | 1      | byte             | m_nCheckCurrent
+| 0x5D   | 1      | byte             | m_dum0
+| 0x5E   | 1      | byte             | m_dum1
+| 0x5F   | 1      | byte             | m_dum2
+| 0x60   | 4      | CGameCockpit*    | m_pGameCockpit
+| 0x64   | 4      | CGOnlineWait*    | m_pOnlineWait
+| 0x68   | 6      | byte[6]          | m_nLiveInfo
+| 0x6E   | 1      | byte             | m_nRecvMax
+| 0x6F   | 1      | byte             | m_nRecvOnline
+| 0x70   | 1      | byte             | m_nRecvLost
+| 0x71   | 1      | byte             | m_nLeaderId
+| 0x72   | 1      | byte             | m_nDataSetupOK
+| 0x73   | 1      | byte             | m_nStartMember
+| 0x74   | 1      | byte             | m_nPacketCode
+| 0x75   | 1      | byte             | m_nDropCount
+| 0x76   | 1      | byte             | m_nMemberReady
+| 0x77   | 1      | byte             | m_inGameMode
+| 0x78   | 1      | byte             | m_inEventRule
+| 0x79   | 1      | byte             | m_inDataMode
+| 0x7A   | 1      | byte             | m_inTimeLimit
+| 0x7B   | 1      | byte             | m_inMemberMax
+| 0x7C   | 1      | byte             | m_inField
+| 0x7D   | 1      | byte             | m_outGameMode
+| 0x7E   | 1      | byte             | m_outEventRule
+| 0x7F   | 1      | byte             | m_outDataMode
+| 0x80   | 1      | byte             | m_outTimeLimit
+| 0x81   | 1      | byte             | m_outMemberMax
+| 0x82   | 1      | byte             | m_outField
+| 0x83   | 1      | byte             | m_nMVP
+| 0x84   | 1      | byte             | m_nTeam
+| 0x85   | 1      | byte             | m_nDeckType
+| 0x86   | 1      | byte             | m_nPlayerNum
+| 0x87   | 1      | byte             | m_nMember
+| 0x88   | 1      | byte             | m_nMemberLost
+| 0x89   | 1      | byte             | m_nMemberOK
+| 0x8A   | 1      | byte             | m_nResult
+| 0x8B   | 1      | undefined        | 
+| 0x8C   | 72     | PLAYER_SCORE[6]  | m_PlayerScore
+| 0xD4   | 16     | TEAM_SCORE[2]    | m_TeamScore
+| 0xE4   | 408    | PLAYER_INFO[6]   | m_PlayerInfo
+| 0x27C  | 48     | TEAM_INFO[6]     | m_TeamInfo
 
 ### Split up next enums in there own categorie
 
@@ -504,58 +504,58 @@ ___
 
 | Offset | Length | Type               | Name
 |--------|--------|--------------------|-----
-| 0      | 1      | sbyte              | m_nPlayerNum
-| 1      | 1      | byte               | m_CurrentBestPlayerCarLap
-| 2      | 1      | byte               | fillerb0
-| 3      | 1      | byte               | fillerb1
-| 4      | 4      | float              | m_GameTimer
-| 8      | 104    | CAR                | m_Player
-| 112    | 580    | NPC[5]             | m_Npc
-| 692    | 64     | GIMMICK_TORNADO[4] | m_GimmickTornado
-| 756    | 32     | GIMMICK_SHIELD[4]  | m_GimmickShield
-| 788    | 6      | byte[6]            | m_isRequestCutNetwork
-| 794    | 1      | byte               | filler0
-| 795    | 1      | byte               | filler1
-| 796    | 8      | GIMMICK_PISTON     | m_GimmickPiston
+| 0x0    | 1      | sbyte              | m_nPlayerNum
+| 0x1    | 1      | byte               | m_CurrentBestPlayerCarLap
+| 0x2    | 1      | byte               | fillerb0
+| 0x3    | 1      | byte               | fillerb1
+| 0x4    | 4      | float              | m_GameTimer
+| 0x8    | 104    | CAR                | m_Player
+| 0x70   | 580    | NPC[5]             | m_Npc
+| 0x2B4  | 64     | GIMMICK_TORNADO[4] | m_GimmickTornado
+| 0x2F4  | 32     | GIMMICK_SHIELD[4]  | m_GimmickShield
+| 0x314  | 6      | byte[6]            | m_isRequestCutNetwork
+| 0x31A  | 1      | byte               | filler0
+| 0x31B  | 1      | byte               | filler1
+| 0x31C  | 8      | GIMMICK_PISTON     | m_GimmickPiston
 
 ### PktObject Object
 
 | Offset | Length | Type   | Name
 |--------|--------|--------|-----
-| 0      | 8      | HEADER | m_Header
-| 8      | 4      | GAME   | m_Game
-| 12     | 804    | RACE   | m_RaceData
+| 0x0    | 8      | HEADER | m_Header
+| 0x8    | 4      | GAME   | m_Game
+| 0xC    | 804    | RACE   | m_RaceData
 
 ### PktObject Header
 
 | Offset | Length | Type   | Name
 |--------|--------|--------|-----
-| 0      | 2      | uint16 | m_Phase
-| 2      | 1      | byte   | m_isEnable
-| 3      | 1      | byte   | m_CharaID
-| 4      | 2      | uint16 | m_AllMemberPhaseRecive
-| 6      | 1      | byte   | filler0
-| 7      | 1      | byte   | filler1
+| 0x0    | 2      | uint16 | m_Phase
+| 0x2    | 1      | byte   | m_isEnable
+| 0x3    | 1      | byte   | m_CharaID
+| 0x4    | 2      | uint16 | m_AllMemberPhaseRecive
+| 0x6    | 1      | byte   | filler0
+| 0x7    | 1      | byte   | filler1
 
 ### PktObject Game
 
 | Offset | Length | Type | Name
 |--------|--------|------|-----
-| 0      | 1      | byte | fillerb0
-| 1      | 1      | byte | fillerb1
-| 2      | 1      | byte | fillerb2
-| 3      | 1      | byte | fillerb3
+| 0x0    | 1      | byte | fillerb0
+| 0x1    | 1      | byte | fillerb1
+| 0x2    | 1      | byte | fillerb2
+| 0x3    | 1      | byte | fillerb3
 
 ### PktObject Rider
 
 | Offset | Length | Type  | Name
 |--------|--------|-------|-----
-| 0      | 2      | int16 | m_nPosX
-| 2      | 2      | int16 | m_nPosZ
-| 4      | 2      | int16 | m_nPosY
-| 6      | 2      | int16 | m_nRotX
-| 8      | 2      | int16 | m_nRotY
-| 10     | 2      | int16 | m_nRotZ
+| 0x0    | 2      | int16 | m_nPosX
+| 0x2    | 2      | int16 | m_nPosZ
+| 0x4    | 2      | int16 | m_nPosY
+| 0x6    | 2      | int16 | m_nRotX
+| 0x8    | 2      | int16 | m_nRotY
+| 0xA    | 2      | int16 | m_nRotZ
 
 ### PktObject GIMMICK
 
@@ -568,39 +568,39 @@ ___
 
 | Offset | Length | Type  | Name
 |--------|--------|-------|-----
-| 0      | 104    | CAR   | m_Car
-| 104    | 12     | RIDER | m_Rider
+| 0x0    | 104    | CAR   | m_Car
+| 0x68   | 12     | RIDER | m_Rider
 
 ### PktObject GIMMICK_TORNADO
 
 | Offset | Length | Type  | Name
 |--------|--------|-------|-----
-| 0      | 1      | byte  | m_UniqueID
-| 1      | 1      | byte  | m_MoveDirection
-| 2      | 2      | int16 | m_nPosY
-| 4      | 4      | float | m_nPosX
-| 8      | 4      | float | m_nPosZ
-| 12     | 2      | int16 | m_nVelX
-| 14     | 2      | int16 | m_nVelZ
+| 0x0    | 1      | byte  | m_UniqueID
+| 0x1    | 1      | byte  | m_MoveDirection
+| 0x2    | 2      | int16 | m_nPosY
+| 0x4    | 4      | float | m_nPosX
+| 0x8    | 4      | float | m_nPosZ
+| 0xC    | 2      | int16 | m_nVelX
+| 0xE    | 2      | int16 | m_nVelZ
 
 ### PktObject GIMMICK_SHIELD
 
 | Offset | Length | Type   | Name
 |--------|--------|--------|-----
-| 0      | 1      | byte   | m_UniqueID
-| 1      | 1      | byte   | filler0
-| 2      | 1      | byte   | filler1
-| 3      | 1      | byte   | filler2
-| 4      | 4      | uint32 | m_DisappearCounter
+| 0x0    | 1      | byte   | m_UniqueID
+| 0x1    | 1      | byte   | filler0
+| 0x2    | 1      | byte   | filler1
+| 0x3    | 1      | byte   | filler2
+| 0x4    | 4      | uint32 | m_DisappearCounter
 
 ### PktObject GIMMICK_PISTON
 
 | Offset | Length | Type   | Name
 |--------|--------|--------|-----
-| 0      | 2      | uint16 | m_nAnimTime
-| 2      | 1      | byte   | filler00
-| 3      | 1      | byte   | filler01
-| 4      | 4      | float  | m_MotSpeed
+| 0x0    | 2      | uint16 | m_nAnimTime
+| 0x2    | 1      | byte   | filler00
+| 0x3    | 1      | byte   | filler01
+| 0x4    | 4      | float  | m_MotSpeed
 
 ### PktObject CAR_BIT
 
@@ -615,69 +615,69 @@ ___
 | 26        | 1    | m_isLockOnEnable
 | 27        | 2    | m_ShieldState (int)
 | 29        | 2    | m_GuardState (int)
-| 30        | 1    | m_isRiderAction
+| 31        | 1    | m_isRiderAction
 
 ### PktObject CAR
 
 | Offset | Length | Type    | Name
 |--------|--------|---------|-----
-| 0      | 48     | BULLET  | m_Bullet
-| 48     | 1      | byte    | m_nAnimNo
-| 49     | 1      | byte    | m_LockOnPlayerNum
-| 50     | 1      | byte    | m_DangerPlayerNum
-| 51     | 1      | byte    | m_State
-| 52     | 4      | CAR_BIT | m_CarBit
-| 56     | 1      | byte    | m_DarkStateCounter
-| 57     | 1      | sbyte   | m_CurrentLap
-| 58     | 1      | byte    | filler1
-| 59     | 1      | byte    | filler2
-| 60     | 4      | float   | m_nPosX
-| 64     | 4      | float   | m_nPosZ
-| 68     | 2      | int16   | m_nPosY
-| 70     | 2      | int16   | m_nRotX
-| 72     | 2      | int16   | m_nRotY
-| 74     | 2      | int16   | m_nRotZ
-| 76     | 4      | float   | m_nOldX
-| 80     | 4      | float   | m_nOldZ
-| 84     | 2      | int16   | m_nOldY
-| 86     | 2      | int16   | m_nVelX
-| 88     | 2      | int16   | m_nVelY
-| 90     | 2      | int16   | m_nVelZ
-| 92     | 2      | uint16  | m_nAnimTime
-| 94     | 1      | ubyte   | m_CurrentPathIndex
-| 95     | 1      | ubyte   | m_CurrentPathCount
-| 96     | 1      | ubyte   | m_CurrentPathDataNo
-| 97     | 1      | ubyte   | m_CurrentBranchTargetPathIndex
-| 98     | 1      | byte    | filler00
-| 99     | 1      | byte    | filler01
-| 100    | 4      | float   | m_CheckDangerAfterPlayerLength
+| 0x0    | 48     | BULLET  | m_Bullet
+| 0x30   | 1      | byte    | m_nAnimNo
+| 0x31   | 1      | byte    | m_LockOnPlayerNum
+| 0x32   | 1      | byte    | m_DangerPlayerNum
+| 0x33   | 1      | byte    | m_State
+| 0x34   | 4      | CAR_BIT | m_CarBit
+| 0x38   | 1      | byte    | m_DarkStateCounter
+| 0x39   | 1      | sbyte   | m_CurrentLap
+| 0x3A   | 1      | byte    | filler1
+| 0x3B   | 1      | byte    | filler2
+| 0x3C   | 4      | float   | m_nPosX
+| 0x40   | 4      | float   | m_nPosZ
+| 0x44   | 2      | int16   | m_nPosY
+| 0x46   | 2      | int16   | m_nRotX
+| 0x48   | 2      | int16   | m_nRotY
+| 0x4A   | 2      | int16   | m_nRotZ
+| 0x4C   | 4      | float   | m_nOldX
+| 0x50   | 4      | float   | m_nOldZ
+| 0x54   | 2      | int16   | m_nOldY
+| 0x56   | 2      | int16   | m_nVelX
+| 0x58   | 2      | int16   | m_nVelY
+| 0x5A   | 2      | int16   | m_nVelZ
+| 0x5C   | 2      | uint16  | m_nAnimTime
+| 0x5E   | 1      | ubyte   | m_CurrentPathIndex
+| 0x5F   | 1      | ubyte   | m_CurrentPathCount
+| 0x60   | 1      | ubyte   | m_CurrentPathDataNo
+| 0x61   | 1      | ubyte   | m_CurrentBranchTargetPathIndex
+| 0x62   | 1      | byte    | filler00
+| 0x63   | 1      | byte    | filler01
+| 0x64   | 4      | float   | m_CheckDangerAfterPlayerLength
 
 ### PktObject BULLET
 
 | Offset | Length | Type   | Name
 |--------|--------|--------|-----
-| 0      | 1      | byte   | m_isExist
-| 1      | 1      | byte   | m_DangerPlayerNum
-| 2      | 2      | uint16 | m_BulletID
-| 4      | 1      | byte   | m_State
-| 5      | 1      | byte   | m_Mode
-| 6      | 1      | byte   | m_fillerb0
-| 7      | 1      | byte   | m_fillerb1
-| 8      | 4      | float  | m_TimbeID
-| 12     | 4      | float  | m_nPosX
-| 16     | 4      | float  | m_nPosZ
-| 20     | 2      | int16  | m_nPosY
-| 22     | 2      | int16  | m_nRotX
-| 24     | 2      | int16  | m_nRotY
-| 26     | 2      | int16  | m_nRotZ
-| 28     | 4      | float  | m_nOldX
-| 32     | 4      | float  | m_nOldZ
-| 36     | 2      | int16  | m_nOldY
-| 38     | 2      | int16  | m_nVelX
-| 40     | 2      | int16  | m_nVelY
-| 42     | 2      | int16  | m_nVelZ
-| 44     | 2      | int16  | m_Param0
-| 46     | 2      | int16  | m_Param1
+| 0x0    | 1      | byte   | m_isExist
+| 0x1    | 1      | byte   | m_DangerPlayerNum
+| 0x2    | 2      | uint16 | m_BulletID
+| 0x4    | 1      | byte   | m_State
+| 0x5    | 1      | byte   | m_Mode
+| 0x6    | 1      | byte   | m_fillerb0
+| 0x7    | 1      | byte   | m_fillerb1
+| 0x8    | 4      | float  | m_TimbeID
+| 0xC    | 4      | float  | m_nPosX
+| 0x10   | 4      | float  | m_nPosZ
+| 0x14   | 2      | int16  | m_nPosY
+| 0x16   | 2      | int16  | m_nRotX
+| 0x18   | 2      | int16  | m_nRotY
+| 0x1A   | 2      | int16  | m_nRotZ
+| 0x1C   | 4      | float  | m_nOldX
+| 0x20   | 4      | float  | m_nOldZ
+| 0x24   | 2      | int16  | m_nOldY
+| 0x26   | 2      | int16  | m_nVelX
+| 0x28   | 2      | int16  | m_nVelY
+| 0x2A   | 2      | int16  | m_nVelZ
+| 0x2C   | 2      | int16  | m_Param0
+| 0x2E   | 2      | int16  | m_Param1
 
 ### PktObject ShieldState
 
@@ -706,22 +706,22 @@ ___
 
 | Offset | Length | Type   | Name
 |--------|--------|--------|-----
-| 0      | 2      | uint16 | m_Phase
-| 2      | 2      | uint16 | m_phaseAkn
+| 0x0    | 2      | uint16 | m_Phase
+| 0x2    | 2      | uint16 | m_phaseAkn
 
 ### PktGame COMMON_DATA
 
 | Offset | Length | Type         | Name
 |--------|--------|--------------|-----
-| 0      | 4      | HEADER       | m_Header
-| 4      | 1      | byte         | m_NpcNum
-| 5      | 1      | byte         | m_MemberNum
-| 6      | 1      | byte         | fillerb0
-| 7      | 1      | byte         | fillerb1
-| 8      | 10     | NPC_INFO[5]  | m_NpcInfo
-| 18     | 1      | byte         | fillerb2
-| 19     | 1      | byte         | fillerb3
-| 20     | 48     | RACE_INFO[6] | m_RaceInfo
+| 0x0    | 4      | HEADER       | m_Header
+| 0x4    | 1      | byte         | m_NpcNum
+| 0x5    | 1      | byte         | m_MemberNum
+| 0x6    | 1      | byte         | fillerb0
+| 0x7    | 1      | byte         | fillerb1
+| 0x8    | 10     | NPC_INFO[5]  | m_NpcInfo
+| 0x12   | 1      | byte         | fillerb2
+| 0x13   | 1      | byte         | fillerb3
+| 0x14   | 48     | RACE_INFO[6] | m_RaceInfo
 
 ### PktGame RACE_INFO_BIT
 
@@ -738,32 +738,32 @@ ___
 
 | Offset | Length | Type          | Name
 |--------|--------|---------------|-----
-| 0      | 4      | RACE_INFO_BIT | m_InfoBit
-| 4      | 4      | float         | m_GoalTime
+| 0x0    | 4      | RACE_INFO_BIT | m_InfoBit
+| 0x4    | 4      | float         | m_GoalTime
 
 ### PktGame NPC_INFO
 
 | Offset | Length | Type | Name
 |--------|--------|------|-----
-| 0      | 1      | byte | m_CarID
-| 1      | 1      | byte | m_PlayerNum
+| 0x0    | 1      | byte | m_CarID
+| 0x1    | 1      | byte | m_PlayerNum
 
 ### PktGame CNetGameRace
 
 | Offset | Length | Type           | Name
 |--------|--------|----------------|-----
-| 0      | 52     | CTreeTask      | super_CTreeTask
-| 52     | 4      | uint32         | m_Step
-| 56     | 520    | NETGAME_STATUS | m_NetGameStatus
-| 576    | 4      | float          | m_Timer
-| 580    | 4      | int32          | m_CurrentCarNum
-| 584    | 4      | int32          | m_CurrentMemberNum
-| 588    | 4      | int32          | m_TimeOutStep
-| 592    | 4      | float          | m_StartUpOverTimer
-| 596    | 4      | cGOnlineWait*  | m_pGOnlineWait
-| 600    | 4      | bool           | m_isDispOnlineWait
-| 604    | 4      | int32          | m_EventReadyStep
-| 608    | 4      | float          | m_EventReadyTimer
+| 0x0    | 52     | CTreeTask      | super_CTreeTask
+| 0x34   | 4      | uint32         | m_Step
+| 0x38   | 520    | NETGAME_STATUS | m_NetGameStatus
+| 0x240  | 4      | float          | m_Timer
+| 0x244  | 4      | int32          | m_CurrentCarNum
+| 0x248  | 4      | int32          | m_CurrentMemberNum
+| 0x24C  | 4      | int32          | m_TimeOutStep
+| 0x250  | 4      | float          | m_StartUpOverTimer
+| 0x254  | 4      | cGOnlineWait*  | m_pGOnlineWait
+| 0x258  | 4      | bool           | m_isDispOnlineWait
+| 0x25C  | 4      | int32          | m_EventReadyStep
+| 0x260  | 4      | float          | m_EventReadyTimer
 
 ### PktGame SyncPhaseState
 
@@ -781,7 +781,7 @@ ToDO
 
 ___
 
-## NetGameHistoryWork
+## NetGameHistory
 
 ToDO
 
@@ -799,179 +799,179 @@ ___
 
 | Offset | Length | Type                        | Name
 |--------|--------|-----------------------------|-----
-| 0      | 4      | int32                       | iNum
-| 4      | 56     | PKT_ONE_WOOLGIMMICK_DATA[2] | woolGimmickData
+| 0x0    | 4      | int32                       | iNum
+| 0x4    | 56     | PKT_ONE_WOOLGIMMICK_DATA[2] | woolGimmickData
 
 ### PKT_SELECT_DATA
 
 | Offset | Length | Type         | Name
 |--------|--------|--------------|-----
-| 0      | 4      | __HANDLE__   | m_hNetGameHandle
-| 4      | 1      | byte         | m_nState
-| 5      | 1      | byte         | m_nSubState
-| 6      | 1      | byte         | m_nPlayerNum
-| 7      | 1      | byte         | m_nChara
-| 8      | 1      | byte         | m_nWeaponID
-| 9      | 1      | byte         | m_nTeam
-| 10     | 1      | byte         | m_nDeckType
-| 11     | 1      | byte         | m_nField
-| 12     | 12     | PLAYER_SCORE | m_nScore
-| 24     | 1      | byte         | m_nResult
-| 25     | 1      | byte         | m_nArenaLv
-| 26     | 1      | byte         | m_nLv
-| 27     | 1      | byte         | m_nRound
-| 28     | 1      | byte         | m_nWorkState
-| 29     | 1      | byte         | m_nWorkFlag
-| 30     | 1      | byte         | m_nLostFlag
-| 31     | 1      | byte:4       | m_nCheck9
-| 31     | 1      | byte:4       | m_nCheck8
-| 32     | 1      | byte:4       | m_nCheck7
-| 32     | 1      | byte:4       | m_nCheck6
-| 33     | 1      | byte:4       | m_nCheck5
-| 33     | 1      | byte:4       | m_nCheck4
-| 34     | 1      | byte:4       | m_nCheck3
-| 34     | 1      | byte:4       | m_nCheck2
-| 35     | 1      | byte:4       | m_nCheck1
-| 35     | 1      | byte:4       | m_nCheck0
-| 36     | 1      | byte         | m_dum1
-| 37     | 1      | byte         | m_dum0
-| 38     | 64     | COMMAND[8]   | m_cmdDeck
-| 102    | 8      | COMMAND      | m_cmdFinish
-| 110    | 8      | COMMAND      | m_cmdShootLock
-| 118    | 8      | COMMAND      | m_cmdJump
-| 126    | 8      | COMMAND      | m_cmdGlide
-| 134    | 8      | COMMAND      | m_cmdAerialDash
-| 142    | 8      | COMMAND      | m_cmdGroundDash
-| 150    | 8      | COMMAND      | m_cmdDashAbi
-| 158    | 8      | COMMAND      | m_cmdAvoidSlide
-| 166    | 8      | COMMAND      | m_cmdComboSlide
-| 174    | 8      | COMMAND      | m_cmdTurnAbi
-| 182    | 8      | COMMAND      | m_cmdGuard
-| 190    | 8      | COMMAND      | m_cmdGuardAbi
-| 198    | 8      | COMMAND      | m_cmdBlowAbi
-| 206    | 1      | undefined    |
-| 207    | 1      | undefined    |
+| 0x0    | 4      | __HANDLE__   | m_hNetGameHandle
+| 0x4    | 1      | byte         | m_nState
+| 0x5    | 1      | byte         | m_nSubState
+| 0x6    | 1      | byte         | m_nPlayerNum
+| 0x7    | 1      | byte         | m_nChara
+| 0x8    | 1      | byte         | m_nWeaponID
+| 0x9    | 1      | byte         | m_nTeam
+| 0xA    | 1      | byte         | m_nDeckType
+| 0xB    | 1      | byte         | m_nField
+| 0xC    | 12     | PLAYER_SCORE | m_nScore
+| 0x18   | 1      | byte         | m_nResult
+| 0x19   | 1      | byte         | m_nArenaLv
+| 0x1A   | 1      | byte         | m_nLv
+| 0x1B   | 1      | byte         | m_nRound
+| 0x1C   | 1      | byte         | m_nWorkState
+| 0x1D   | 1      | byte         | m_nWorkFlag
+| 0x1E   | 1      | byte         | m_nLostFlag
+| 0x1F   | 1      | byte:4       | m_nCheck9
+| 0x1F   | 1      | byte:4       | m_nCheck8
+| 0x20   | 1      | byte:4       | m_nCheck7
+| 0x20   | 1      | byte:4       | m_nCheck6
+| 0x21   | 1      | byte:4       | m_nCheck5
+| 0x21   | 1      | byte:4       | m_nCheck4
+| 0x22   | 1      | byte:4       | m_nCheck3
+| 0x22   | 1      | byte:4       | m_nCheck2
+| 0x23   | 1      | byte:4       | m_nCheck1
+| 0x23   | 1      | byte:4       | m_nCheck0
+| 0x24   | 1      | byte         | m_dum1
+| 0x25   | 1      | byte         | m_dum0
+| 0x26   | 64     | COMMAND[8]   | m_cmdDeck
+| 0x66   | 8      | COMMAND      | m_cmdFinish
+| 0x6E   | 8      | COMMAND      | m_cmdShootLock
+| 0x76   | 8      | COMMAND      | m_cmdJump
+| 0x7E   | 8      | COMMAND      | m_cmdGlide
+| 0x86   | 8      | COMMAND      | m_cmdAerialDash
+| 0x8E   | 8      | COMMAND      | m_cmdGroundDash
+| 0x96   | 8      | COMMAND      | m_cmdDashAbi
+| 0x9E   | 8      | COMMAND      | m_cmdAvoidSlide
+| 0xA6   | 8      | COMMAND      | m_cmdComboSlide
+| 0xAE   | 8      | COMMAND      | m_cmdTurnAbi
+| 0xB6   | 8      | COMMAND      | m_cmdGuard
+| 0xBE   | 8      | COMMAND      | m_cmdGuardAbi
+| 0xC6   | 8      | COMMAND      | m_cmdBlowAbi
+| 0xCE   | 1      | undefined    |
+| 0xCF   | 1      | undefined    |
 
 ### PKT_PLAYER_DATA
 
 | Offset | Length | Type         | Name
 |--------|--------|--------------|-----
-| 0      | 4      | __HANDLE__   | m_hNetGameHandle
-| 4      | 1      | byte         | m_nState
-| 5      | 1      | byte         | m_nSubState
-| 6      | 1      | byte         | m_nPlayerNum
-| 7      | 1      | byte         | m_nChara
-| 8      | 1      | byte         | m_nWeaponID
-| 9      | 1      | byte         | m_nTeam
-| 10     | 1      | byte         | m_nDeckType
-| 11     | 1      | byte         | m_nField
-| 12     | 12     | PLAYER_SCORE | m_nScore
-| 24     | 1      | byte         | m_nResult
-| 25     | 1      | byte         | m_nArenaLv
-| 26     | 1      | byte         | m_nLv
-| 27     | 1      | byte         | m_nRound
-| 28     | 1      | byte         | m_nWorkState
-| 29     | 1      | byte         | m_nWorkFlag
-| 30     | 1      | byte         | m_nLostFlag
-| 31     | 1      | byte:4       | m_nCheck9
-| 31     | 1      | byte:4       | m_nCheck8
-| 32     | 1      | byte:4       | m_nCheck7
-| 32     | 1      | byte:4       | m_nCheck6
-| 33     | 1      | byte:4       | m_nCheck5
-| 33     | 1      | byte:4       | m_nCheck4
-| 34     | 1      | byte:4       | m_nCheck3
-| 34     | 1      | byte:4       | m_nCheck2
-| 35     | 1      | byte:4       | m_nCheck1
-| 35     | 1      | byte:4       | m_nCheck0
-| 36     | 1      | byte         | m_dum1
-| 37     | 1      | byte         | m_dum0
-| 38     | 2      | int16        | m_nHp
-| 40     | 2      | int16        | m_nHpMax
-| 42     | 1      | byte         | m_nAp
-| 43     | 1      | byte         | m_nMp
-| 44     | 1      | byte         | m_nDp
-| 45     | 1      | byte         | m_nWork0
-| 46     | 2      | int16        | m_nStateTime
-| 48     | 1      | byte         | m_nPlayerState
-| 49     | 1      | byte         | m_nSubPlayerState
-| 50     | 1      | undefined    | 
-| 51     | 1      | undefined    | 
-| 52     | 4      | uint32       | m_nPlayerFlag
-| 56     | 4      | uint32       | m_nTrgFlag
-| 60     | 4      | uint32       | m_nAttackFlag
-| 64     | 4      | uint32       | m_nDamageFlag
-| 68     | 4      | uint32       | m_nColor
-| 72     | 2      | uint16       | m_nCommandKind
-| 74     | 1      | byte         | m_nCommandLv
-| 75     | 1      | byte         | m_nStyleID
-| 76     | 2      | uint16       | m_nReplyKind
-| 78     | 1      | byte         | m_nHpHealLight
-| 79     | 1      | byte         | m_nShootLockNum
-| 80     | 2      | int16        | m_nAnim
-| 82     | 2      | int16        | m_nAnimTime
-| 84     | 4      | byte[4]      | m_nAtkGrp
-| 88     | 2      | int16        | m_nEffGroup
-| 90     | 2      | int16        | m_nSEChannel
-| 92     | 2      | int16        | m_nPosX
-| 94     | 2      | int16        | m_nPosY
-| 96     | 2      | int16        | m_nPosZ
-| 98     | 2      | int16        | m_nRotX
-| 100    | 2      | int16        | m_nRotY
-| 102    | 2      | int16        | m_nSclXYZ
-| 104    | 2      | int16        | m_nOldX
-| 106    | 2      | int16        | m_nOldY
-| 108    | 2      | int16        | m_nOldZ
-| 110    | 2      | int16        | m_nVelX
-| 112    | 2      | int16        | m_nVelY
-| 114    | 2      | int16        | m_nVelZ
-| 116    | 2      | uint16       | m_nPlayerStateCounter
-| 118    | 2      | int16        | m_nAtkPower
-| 120    | 2      | int16        | m_nAtkForce
-| 122    | 1      | byte         | m_nCryticalRate
-| 123    | 1      | byte         | m_AtkAttr
-| 124    | 4      | _HANDLE_     | m_hLockonTarget
-| 128    | 4      | _HANDLE_     | m_hActionTarget
-| 132    | 2      | uint16       | m_nAtkDataId
-| 134    | 1      | byte         | m_nBltCount
-| 135    | 1      | byte         | m_nBltId
-| 136    | 3      | byte[3]      | m_nLoadStyle
-| 139    | 1      | byte         | m_nReqStyle
-| 140    | 2      | int16        | m_nLmtX
-| 142    | 2      | int16        | m_nLmtY
-| 144    | 2      | int16        | m_nLmtZ
-| 146    | 2      | int16        | m_nLmtR
-| 148    | 2      | uint16       | m_nLmtKind
-| 150    | 1      | byte         | m_nLmtCreator
-| 151    | 1      | byte         | m_nLmtState
-| 152    | 1      | byte         | m_nLmtResult
-| 153    | 3      | byte[3]      | m_nLmtMember
-| 156    | 2      | uint16       | m_nReactionKind
-| 158    | 1      | byte         | m_nDeckNum
-| 159    | 1      | byte         | m_nAtkGroup
-| 160    | 2      | int16        | m_nCntX
-| 162    | 2      | int16        | m_nCntY
-| 164    | 2      | int16        | m_nCntZ
-| 166    | 2      | int16        | m_nCntR
-| 168    | 2      | uint16       | m_nAnimSetCount
-| 170    | 1      | byte         | m_nTargetPC
-| 171    | 1      | byte         | m_nDFinishStep
-| 172    | 2      | int16        | m_nCommandStep
-| 174    | 1      | byte         | m_nEnemyAttackerPC
-| 175    | 1      | byte         | m_nEnemyMurdererPC
-| 176    | 2      | int16        | m_nAnimSpd
-| 178    | 2      | int16        | m_nIllAnimSpd
-| 180    | 2      | int16        | m_nIllHP
-| 182    | 1      | byte         | m_nIllGauge
-| 183    | 1      | byte         | m_nIllLuaState
-| 184    | 1      | byte         | m_nIllAnimId
-| 185    | 1      | byte         | m_nIllState
-| 186    | 1      | byte         | m_nIllGravity
-| 187    | 1      | byte         | m_nIllGroundIn
-| 188    | 1      | byte         | m_nIllDamage
-| 189    | 1      | undefined    |
-| 190    | 2      | uint16       | m_nAtkKind
-| 192    | 17     | byte[17]     | m_nPad
-| 209    | 1      | undefined    |
-| 210    | 1      | undefined    |
-| 211    | 1      | undefined    |
+| 0x0      | 4      | __HANDLE__   | m_hNetGameHandle
+| 0x4      | 1      | byte         | m_nState
+| 0x5      | 1      | byte         | m_nSubState
+| 0x6      | 1      | byte         | m_nPlayerNum
+| 0x7      | 1      | byte         | m_nChara
+| 0x8      | 1      | byte         | m_nWeaponID
+| 0x9      | 1      | byte         | m_nTeam
+| 0xA     | 1      | byte         | m_nDeckType
+| 0xB     | 1      | byte         | m_nField
+| 0xC     | 12     | PLAYER_SCORE | m_nScore
+| 0x18     | 1      | byte         | m_nResult
+| 0x19     | 1      | byte         | m_nArenaLv
+| 0x1A     | 1      | byte         | m_nLv
+| 0x1B     | 1      | byte         | m_nRound
+| 0x1C     | 1      | byte         | m_nWorkState
+| 0x1D     | 1      | byte         | m_nWorkFlag
+| 0x1E     | 1      | byte         | m_nLostFlag
+| 0x1F     | 1      | byte:4       | m_nCheck9
+| 0x1F     | 1      | byte:4       | m_nCheck8
+| 0x20     | 1      | byte:4       | m_nCheck7
+| 0x20     | 1      | byte:4       | m_nCheck6
+| 0x21     | 1      | byte:4       | m_nCheck5
+| 0x21     | 1      | byte:4       | m_nCheck4
+| 0x22     | 1      | byte:4       | m_nCheck3
+| 0x22     | 1      | byte:4       | m_nCheck2
+| 0x23   | 1      | byte:4       | m_nCheck1
+| 0x23     | 1      | byte:4       | m_nCheck0
+| 0x24   | 1      | byte         | m_dum1
+| 0x25     | 1      | byte         | m_dum0
+| 0x26     | 2      | int16        | m_nHp
+| 0x28     | 2      | int16        | m_nHpMax
+| 0x2A     | 1      | byte         | m_nAp
+| 0x2B     | 1      | byte         | m_nMp
+| 0x2C     | 1      | byte         | m_nDp
+| 0x2D     | 1      | byte         | m_nWork0
+| 0x2E     | 2      | int16        | m_nStateTime
+| 0x30     | 1      | byte         | m_nPlayerState
+| 0x31     | 1      | byte         | m_nSubPlayerState
+| 0x32     | 1      | undefined    | 
+| 0x33   | 1      | undefined    | 
+| 0x34     | 4      | uint32       | m_nPlayerFlag
+| 0x38     | 4      | uint32       | m_nTrgFlag
+| 0x3C     | 4      | uint32       | m_nAttackFlag
+| 0x40     | 4      | uint32       | m_nDamageFlag
+| 0x44   | 4      | uint32       | m_nColor
+| 0x48     | 2      | uint16       | m_nCommandKind
+| 0x4A     | 1      | byte         | m_nCommandLv
+| 0x4B   | 1      | byte         | m_nStyleID
+| 0x4C   | 2      | uint16       | m_nReplyKind
+| 0x4E     | 1      | byte         | m_nHpHealLight
+| 0x4F     | 1      | byte         | m_nShootLockNum
+| 0x50     | 2      | int16        | m_nAnim
+| 0x52     | 2      | int16        | m_nAnimTime
+| 0x54   | 4      | byte[4]      | m_nAtkGrp
+| 0x58     | 2      | int16        | m_nEffGroup
+| 0x5A    | 2      | int16        | m_nSEChannel
+| 0x5C     | 2      | int16        | m_nPosX
+| 0x5E     | 2      | int16        | m_nPosY
+| 0x60     | 2      | int16        | m_nPosZ
+| 0x62     | 2      | int16        | m_nRotX
+| 0x64    | 2      | int16        | m_nRotY
+| 0x66    | 2      | int16        | m_nSclXYZ
+| 0x68    | 2      | int16        | m_nOldX
+| 0x6A    | 2      | int16        | m_nOldY
+| 0x6C    | 2      | int16        | m_nOldZ
+| 0x6E    | 2      | int16        | m_nVelX
+| 0x70    | 2      | int16        | m_nVelY
+| 0x72    | 2      | int16        | m_nVelZ
+| 0x74    | 2      | uint16       | m_nPlayerStateCounter
+| 0x76    | 2      | int16        | m_nAtkPower
+| 0x78    | 2      | int16        | m_nAtkForce
+| 0x7A    | 1      | byte         | m_nCryticalRate
+| 0x7B    | 1      | byte         | m_AtkAttr
+| 0x7C    | 4      | _HANDLE_     | m_hLockonTarget
+| 0x80    | 4      | _HANDLE_     | m_hActionTarget
+| 0x84    | 2      | uint16       | m_nAtkDataId
+| 0x86    | 1      | byte         | m_nBltCount
+| 0x87    | 1      | byte         | m_nBltId
+| 0x88    | 3      | byte[3]      | m_nLoadStyle
+| 0x8B    | 1      | byte         | m_nReqStyle
+| 0x8C    | 2      | int16        | m_nLmtX
+| 0x8E    | 2      | int16        | m_nLmtY
+| 0x90    | 2      | int16        | m_nLmtZ
+| 0x92    | 2      | int16        | m_nLmtR
+| 0x94    | 2      | uint16       | m_nLmtKind
+| 0x96    | 1      | byte         | m_nLmtCreator
+| 0x97    | 1      | byte         | m_nLmtState
+| 0x98    | 1      | byte         | m_nLmtResult
+| 0x99    | 3      | byte[3]      | m_nLmtMember
+| 0x9C    | 2      | uint16       | m_nReactionKind
+| 0x9E    | 1      | byte         | m_nDeckNum
+| 0x9F    | 1      | byte         | m_nAtkGroup
+| 0xA0    | 2      | int16        | m_nCntX
+| 0xA2    | 2      | int16        | m_nCntY
+| 0xA4    | 2      | int16        | m_nCntZ
+| 0xA6    | 2      | int16        | m_nCntR
+| 0xA8    | 2      | uint16       | m_nAnimSetCount
+| 0xAA    | 1      | byte         | m_nTargetPC
+| 0xAB    | 1      | byte         | m_nDFinishStep
+| 0xAC    | 2      | int16        | m_nCommandStep
+| 0xAE    | 1      | byte         | m_nEnemyAttackerPC
+| 0xAF    | 1      | byte         | m_nEnemyMurdererPC
+| 0xB0    | 2      | int16        | m_nAnimSpd
+| 0xB2    | 2      | int16        | m_nIllAnimSpd
+| 0xB4    | 2      | int16        | m_nIllHP
+| 0xB6    | 1      | byte         | m_nIllGauge
+| 0xB7    | 1      | byte         | m_nIllLuaState
+| 0xB8    | 1      | byte         | m_nIllAnimId
+| 0xB9    | 1      | byte         | m_nIllState
+| 0xBA    | 1      | byte         | m_nIllGravity
+| 0xBB    | 1      | byte         | m_nIllGroundIn
+| 0xBC    | 1      | byte         | m_nIllDamage
+| 0xBD    | 1      | undefined    |
+| 0xBE    | 2      | uint16       | m_nAtkKind
+| 0xC0    | 17     | byte[17]     | m_nPad
+| 0xD1    | 1      | undefined    |
+| 0xD2    | 1      | undefined    |
+| 0xD3    | 1      | undefined    |
 
