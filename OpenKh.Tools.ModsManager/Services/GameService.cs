@@ -20,8 +20,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPM_662.33;1" },
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLUS_210.05;1" },
-                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SCUS_210.05;1" },
-                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLES_541.44;1" },
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLES_541.14;1" },
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLES_542.32;1" },
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLES_542.33;1" },
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLES_542.34;1" },
