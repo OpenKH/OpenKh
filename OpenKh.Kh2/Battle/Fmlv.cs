@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using OpenKh.Common.Utils;
+using System.Collections.Generic;
 using System.IO;
 using Xe.BinaryMapper;
 
@@ -26,44 +27,50 @@ namespace OpenKh.Kh2.Battle
             AntiForm
         }
 
-        public class Level
+        [Data] public byte Unk0 { get; set; }
+        [Data] public byte Unk1 { get; set; }
+        [Data] public ushort Ability { get; set; }
+        [Data] public int Exp { get; set; }
+
+        public int FormId
         {
-            [Data] public byte Unk0 { get; set; }
-            [Data] public byte LevelGrowthAbility { get; set; }
-            [Data] public short Ability { get; set; }
-            [Data] public int Exp { get; set; }
-
-            public int FormId
-            {
-                get => Unk0 >> 4;
-                set => Unk0 = (byte)((Unk0 & 0x0F) | (value << 4));
-            }
-
-            public int FormLevel
-            {
-                get => Unk0 & 0xF;
-                set => Unk0 = (byte)((Unk0 & 0xF0) | (value & 0xF));
-            }
-
-            public FormVanilla FormVanilla
-            {
-                get => (FormVanilla)FormId;
-                set => FormId = (int)value;
-            }
-
-            public FormFm FormFm
-            {
-                get => (FormFm)FormId;
-                set => FormId = (int)value;
-            }
-
-            public override string ToString() =>
-                $"{FormFm} {FormLevel}: EXP {Exp}, Ability {Ability:X04} Lv. {LevelGrowthAbility}";
+            get => BitsUtil.Int.GetBits(Unk0, 4, 4);
+            set => Unk0 = (byte)BitsUtil.Int.SetBits(Unk0, 4, 4, value);
         }
 
-        public static List<Level> Read(Stream stream) => BaseTable<Level>.Read(stream);
+        public int FormLevel
+        {
+            get => BitsUtil.Int.GetBits(Unk0, 0, 4);
+            set => Unk0 = (byte)BitsUtil.Int.SetBits(Unk0, 0, 4, value);
+        }
 
-        public static void Write(Stream stream, IEnumerable<Level> items) =>
-            BaseTable<Level>.Write(stream, 2, items);
+        public int AbilityLevel
+        {
+            get => BitsUtil.Int.GetBits(Unk1, 0, 4);
+            set => Unk1 = (byte)BitsUtil.Int.SetBits(Unk1, 0, 4, value);
+        }
+
+        public int AntiRate
+        {
+            get => BitsUtil.Int.GetBits(Unk1, 4, 4);
+            set => Unk1 = (byte)BitsUtil.Int.SetBits(Unk1, 4, 4, value);
+        }
+
+        public FormVanilla VanillaForm
+        {
+            get => (FormVanilla)FormId;
+            set => FormId = (int)value;
+        }
+
+        public FormFm FinalMixForm
+        {
+            get => (FormFm)FormId;
+            set => FormId = (int)value;
+        }
+
+        public static List<Fmlv> Read(Stream stream) => BaseTable<Fmlv>.Read(stream);
+
+        public static void Write(Stream stream, IEnumerable<Fmlv> items) =>
+            BaseTable<Fmlv>.Write(stream, 2, items);
     }
 }
