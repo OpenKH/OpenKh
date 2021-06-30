@@ -10,17 +10,19 @@ namespace OpenKh.Egs
 {
     public class EgsHdAsset
     {
-        private class Header
+        public class Header
         {
             [Data] public int DecompressedLength { get; set; }
             [Data] public int RemasteredAssetCount { get; set; }
+            // Original data's compressed length => -2: no compression and encryption, -1: no compression, > 0: compressed size
             [Data] public int CompressedLength { get; set; }
-            [Data] public int Unknown0c { get; set; }
+            [Data] public int CreationDate { get; set; }
         }
 
-        private class RemasteredEntry
+        public class RemasteredEntry
         {
             [Data(Count = 0x20)] public string Name { get; set; }
+            // The offset is relative to: Original asset's header size + all remastered asset's header size + original asset's decompressed data length
             [Data] public int Offset { get; set; }
             [Data] public int Unknown24 { get; set; }
             [Data] public int DecompressedLength { get; set; }
@@ -37,78 +39,107 @@ namespace OpenKh.Egs
         public static string[] Kh1AdditionalNames = File.ReadAllLines(Path.Combine(ResourcePath, "kh1pc.txt"));
         public static string[] Launcher28Names = File.ReadAllLines(Path.Combine(ResourcePath, "launcher28.txt"));
 
-        private const int PassCount = 10;
+        private const int PASS_COUNT = 10;
+
         private readonly Stream _stream;
         private readonly Header _header;
         private readonly byte[] _key;
+        private readonly byte[] _seed;
         private readonly long _baseOffset;
         private readonly long _dataOffset;
         private readonly Dictionary<string, RemasteredEntry> _entries;
+        private byte[] _originalData;
+        private byte[] _originalRawData;
+        private readonly Dictionary<string, byte[]> _remasteredAssetsData = new Dictionary<string, byte[]>();
+        private readonly Dictionary<string, byte[]> _remasteredAssetsRawData = new Dictionary<string, byte[]>();
 
+        public string[] Assets { get; }
+        public byte[] Seed => _seed;
+        public Header OriginalAssetHeader => _header;
+        public Dictionary<string, RemasteredEntry> RemasteredAssetHeaders => _entries;
+        public byte[] OriginalData => _originalData;
+        public byte[] OriginalRawData => _originalRawData;
+        public Dictionary<string, byte[]> RemasteredAssetsDecompressedData => _remasteredAssetsData;
+        public Dictionary<string, byte[]> RemasteredAssetsCompressedData => _remasteredAssetsRawData;
 
         public EgsHdAsset(Stream stream)
         {
             _stream = stream;
             _baseOffset = stream.Position;
 
-            var seed = stream.ReadBytes(0x10);
-            _key = EgsEncryption.GenerateKey(seed, PassCount);
-            
-            _header = BinaryMapping.ReadObject<Header>(new MemoryStream(seed));
+            _seed = stream.ReadBytes(0x10);
+            _key = EgsEncryption.GenerateKey(_seed, PASS_COUNT);
+
+            _header = BinaryMapping.ReadObject<Header>(new MemoryStream(_seed));
+
             var entries = Enumerable
                 .Range(0, _header.RemasteredAssetCount)
                 .Select(_ => BinaryMapping.ReadObject<RemasteredEntry>(stream))
                 .ToList();
+
             _entries = entries.ToDictionary(x => x.Name, x => x);
-            Assets = entries.Select(x => x.Name).ToArray();
             _dataOffset = stream.Position;
+
+            Assets = entries.Select(x => x.Name).ToArray();
+
+            ReadData();
+
+            foreach (var remasteredAssetName in Assets)
+            {
+                ReadRemasteredAsset(remasteredAssetName);
+            }
+
+            stream.SetPosition(_dataOffset);
         }
 
-        public string[] Assets { get; }
-
-        public byte[] ReadAsset(string assetName)
+        private byte[] ReadRemasteredAsset(string assetName)
         {
-            var entry = _entries[assetName];
-            var dataLength = entry.CompressedLength >= 0 ? entry.CompressedLength : entry.DecompressedLength;
+            var header = _entries[assetName];
+            var dataLength = header.CompressedLength >= 0 ? header.CompressedLength : header.DecompressedLength;
+
             if (dataLength % 16 != 0)
                 dataLength += 16 - (dataLength % 16);
+
             var data = _stream.AlignPosition(0x10).ReadBytes(dataLength);
 
-            for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
-            {
-                EgsEncryption.DecryptChunk(_key, data, i, PassCount);
-            }
-                
+            _remasteredAssetsRawData.Add(assetName, data.ToArray());
 
-            if (entry.CompressedLength >= 0)
+            if (header.CompressedLength > -2)
+            {
+                for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
+                    EgsEncryption.DecryptChunk(_key, data, i, PASS_COUNT);
+            }
+
+            if (header.CompressedLength > -1)
             {
                 using var compressedStream = new MemoryStream(data);
                 using var deflate = new DeflateStream(compressedStream.SetPosition(2), CompressionMode.Decompress);
 
-                var decompressedData = new byte[entry.DecompressedLength];
+                var decompressedData = new byte[header.DecompressedLength];
                 deflate.Read(decompressedData);
 
-                return decompressedData;
+                data = decompressedData;
             }
-            
+
+            _remasteredAssetsData.Add(assetName, data.ToArray());
+
             return data;
         }
 
-        public byte[] ReadData()
+        private byte[] ReadData()
         {
-            if (_header.CompressedLength < 0)
-                _header.CompressedLength = _header.CompressedLength;
-
             var dataLength = _header.CompressedLength >= 0 ? _header.CompressedLength : _header.DecompressedLength;
             var data = _stream.SetPosition(_dataOffset).ReadBytes(dataLength);
 
-            if (_header.CompressedLength >= -1)
+            _originalRawData = data.ToArray();
+
+            if (_header.CompressedLength > -2)
             {
                 for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
-                    EgsEncryption.DecryptChunk(_key, data, i, PassCount);
+                    EgsEncryption.DecryptChunk(_key, data, i, PASS_COUNT);
             }
 
-            if (_header.CompressedLength >= 0)
+            if (_header.CompressedLength > -1)
             {
                 using var compressedStream = new MemoryStream(data);
                 using var deflate = new DeflateStream(compressedStream.SetPosition(2), CompressionMode.Decompress);
@@ -116,8 +147,10 @@ namespace OpenKh.Egs
                 var decompressedData = new byte[_header.DecompressedLength];
                 deflate.Read(decompressedData);
 
-                return decompressedData;
+                data = decompressedData;
             }
+
+            _originalData = data.ToArray();
 
             return data;
         }

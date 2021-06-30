@@ -50,5 +50,91 @@ namespace OpenKh.Tests.Egs
             var data = EgsEncryption.Decrypt(new MemoryStream(encrypted));
             Assert.Equal(ToString(expected), ToString(data[0..16]));
         }
+
+        [Fact]
+        public void UnpackCompressedAndEncryptedPkgFile()
+        {
+            EgsTools.Extract("Egs/res/dummy_compressed_encrypted.hed", "output", false);
+
+            Assert.True(File.Exists("output/original/dummy.txt"));
+            Assert.Equal("COUCOU", File.ReadAllText("output/original/dummy.txt"));
+
+            Directory.Delete("output", true);
+        }
+
+        [Fact]
+        public void UnpackCompressedPkgFile()
+        {
+            EgsTools.Extract("Egs/res/dummy_compressed.hed", "output", false);
+
+            Assert.True(File.Exists("output/original/dummy.txt"));
+            Assert.Equal("COUCOU", File.ReadAllText("output/original/dummy.txt"));
+
+            Directory.Delete("output", true);
+        }
+
+        [Fact]
+        public void UnpackPkgFile()
+        {
+            EgsTools.Extract("Egs/res/dummy.hed", "output", false);
+
+            Assert.True(File.Exists("output/original/dummy.txt"));
+            Assert.Equal("COUCOU", File.ReadAllText("output/original/dummy.txt"));
+
+            Directory.Delete("output", true);
+        }
+
+        [Fact]
+        public void PatchCompressedAndEncryptedPkgFile()
+        {
+            EgsTools.Patch("Egs/res/dummy_compressed_encrypted.pkg", "Egs/res/patch", "output");
+
+            EgsTools.Extract("output/dummy_compressed_encrypted.hed", "output", false);
+
+            Assert.True(File.Exists("output/original/dummy.txt"));
+            Assert.Equal("COUCOU2", File.ReadAllText("output/original/dummy.txt"));
+
+            Directory.Delete("output", true);
+        }
+
+        [Fact]
+        public void PatchCompressedPkgFile()
+        {
+            EgsTools.Patch("Egs/res/dummy_compressed.pkg", "Egs/res/patch", "output");
+
+            EgsTools.Extract("output/dummy_compressed.hed", "output", false);
+
+            Assert.True(File.Exists("output/original/dummy.txt"));
+            Assert.Equal("COUCOU2", File.ReadAllText("output/original/dummy.txt"));
+
+            Directory.Delete("output", true);
+        }
+
+        [Fact]
+        public void PatchPkgFile()
+        {
+            EgsTools.Patch("Egs/res/dummy.pkg", "Egs/res/patch", "output");
+
+            EgsTools.Extract("output/dummy.hed", "output", false);
+
+            Assert.True(File.Exists("output/original/dummy.txt"));
+            Assert.Equal("COUCOU2", File.ReadAllText("output/original/dummy.txt"));
+
+            Directory.Delete("output", true);
+        }
+
+        [Fact]
+        public void AddNewAssetToPkgFile()
+        {
+            EgsTools.Patch("Egs/res/dummy.pkg", "Egs/res/newFile", "output");
+            EgsTools.Extract("output/dummy.hed", "output", false);
+
+            Assert.True(File.Exists("output/original/3099BDDF69006018C7C4385006B0B91D.dat"));
+            Assert.Equal("This is a new file.", File.ReadAllText("output/original/3099BDDF69006018C7C4385006B0B91D.dat"));
+
+            Directory.Delete("output", true);
+        }
+
+        // TODO: Write a test to add/patch remastered assets
     }
 }
