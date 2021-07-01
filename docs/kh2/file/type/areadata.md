@@ -41,7 +41,7 @@ When referring to _entrance_ it means that is the index where to spawn the chara
 | 18     | int   | Always 0 [*¹](#notes)
 | 1c     | byte  | [Area ID of a world](../../worlds.md)
 | 1d     | byte  | Entrance
-| 1e     | byte  | [World ID](../../worlds.md)
+| 1e     | byte  | Approach Direction Trigger
 | 1f     | byte  | Unknown
 | 20     | int   | Unknown
 | 24     | int   | Unknown
@@ -51,18 +51,18 @@ When referring to _entrance_ it means that is the index where to spawn the chara
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | int   | [Model ID](./00objentry.md)
+| 0x00     | int   | [Model ID](./00objentry.md)
 | 04     | float | Position X  
 | 08     | float | Position Y
-| 0c     | float | Position Z
-| 10     | float | Rotation X
+| 12     | float | Position Z
+| 16     | float | Rotation X
 | 14     | float | Rotation Y
 | 18     | float | Rotation Z
 | 1c     | byte  | [Spawn type](#spawn-types)
 | 1d     | byte  | Spawn argument
-| 1e     | short | Unknown
-| 20     | int   | Unknown
-| 24     | int   | AI parameter
+| 1e     | short | Serial
+| 20     | int   | Argument 1
+| 24     | int   | Argument 2
 | 28     | int   | Talk message
 | 2c     | int   | Reaction command
 | 30     | int   | Unknown
@@ -294,7 +294,7 @@ Set how the party member needs to be structured. According to `dbg/member.bin`, 
 
 #### Bgm
 
-Set the map's background musics. The single 4-byte parameter can be read as two 2-byte integers, which represents the field and battle music ID that can be found in `bgm/music_xxx`. When the values are different than zero, they overrides the default field and battle music used in the current map.
+Set the map's background musics. The single 4-byte parameter can be read as two 2-byte integers, which represents the field and battle music ID that can be found in `bgm/music_xxx`. They overrides the default field and battle music used in the current map.
 
 #### Unknown11
 
@@ -367,7 +367,7 @@ The scene script contains functions with a variable amount of parameters.
 | 02     | ProgressFlag | Update story progress.
 | 03     | MenuFlag | Unlock options in the menu.
 | 04     | Member   | Change party member.
-| 05     |          | Unknown.
+| 05     |          | Auto-reverts
 | 06     | Inventory | Obtain one or more items. It is possible to obtain up to 7 items in a row.
 | 07     | PartyMenu | Shows the party menu.
 | 08     |          | Sets a flag. Purpose unknown.
