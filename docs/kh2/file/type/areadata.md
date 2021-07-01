@@ -346,7 +346,7 @@ Seems to recursively call the spawn script parser, but it is only used in `he09`
 
 #### Unknown1d
 
-Purpose unknown. Used 196 times.
+Auto revert Sora when the room is entered if the argument is 4 and disables drive if the argument is 5. Used 196 times.
 
 #### BattleLevel
 
@@ -367,9 +367,9 @@ The scene script contains functions with a variable amount of parameters.
 | 02     | ProgressFlag | Update story progress.
 | 03     | MenuFlag | Unlock options in the menu.
 | 04     | Member   | Change party member.
-| 05     |          | Auto-reverts
+| 05     |          | Heals Sora's stats depending on the argument (auto revert, full heal, HP&MP only)
 | 06     | Inventory | Obtain one or more items. It is possible to obtain up to 7 items in a row.
-| 07     | PartyMenu | Shows the party menu.
+| 07     | PartyMenu | Shows the party menu if Member is also defined.
 | 08     |          | Sets a flag. Purpose unknown.
 
 ## Notes
