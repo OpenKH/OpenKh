@@ -7,7 +7,7 @@ namespace OpenKh.Command.IdxImg
 {
     [Command("OpenKh.Command.IdxImg")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
-    [Subcommand(typeof(KingdomHearts1), typeof(KingdomHearts2))]
+    [Subcommand(typeof(KingdomHearts1), typeof(KingdomHearts2), typeof(EpicGamesAssets))]
     partial class Program
     {
         class CustomException : Exception

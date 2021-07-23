@@ -7,9 +7,8 @@ namespace OpenKh.Kh1
 {
     public record Idx1Name
     {
-        private static Dictionary<uint, string> _nameDictionary = File
-            .ReadAllLines(Path.Combine(AppContext.BaseDirectory, "resources/kh1idx.txt"))
-            .ToDictionary(name => Idx1.GetHash(name), name => name);
+        public static string[] Names = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "resources/kh1idx.txt"));
+        private static Dictionary<uint, string> _nameDictionary = Names.ToDictionary(name => Idx1.GetHash(name), name => name);
 
         public Idx1 Entry { get; set; }
         public string Name { get; set; }
