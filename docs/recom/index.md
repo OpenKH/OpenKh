@@ -3,4 +3,4 @@
 ## General Documentation
 
 * [Game builds](builds.md)
-* [Worlds](Worlds.md)
+* [Worlds](worlds.md)
