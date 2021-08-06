@@ -47,6 +47,8 @@ When referring to _entrance_ it means that is the index where to spawn the chara
 | 24     | int   | Unknown
 | 28     | int   | Always 0 [*¹](#notes)
 
+Approach Direction Trigger determines if the event is triggered only when approaching from a specific direction or if it can be triggered by approaching it from any direction (even from above/below). An example of the former would be the room transition used in CoR skip where you land behind the trigger and have to move away from the exit for a bit in order to move to CoR: Depths. An example of the latter would be Cloud's mandatory cutscene in HB.
+
 #### Entity
 
 | Offset | Type  | Description
