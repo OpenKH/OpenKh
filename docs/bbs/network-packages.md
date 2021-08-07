@@ -265,16 +265,6 @@ Union
 | 0x42   | 1      | byte     | m_dum1
 | 0x43   | 1      | byte     | m_dum2
 
-### PLAYER_SCORE
-
-| Offset | Length | Type      | Name
-|--------|--------|-----------|-----
-| 0x0    | 4      | uint32    | m_nScore
-| 0x4    | 2      | uint16    | m_nMedal
-| 0x6    | 2      | uint16    | m_nBonusP
-| 0x8    | 2      | uint16    | m_nBonusM
-| 0xA    | 1      | undefined | 
-| 0xB    | 1      | undefined | 
 
 ### TEAM_INFO
 
@@ -291,16 +281,6 @@ Union
 | 0x10   | 6      | byte[6]   | m_nMember
 | 0x16   | 1      | undefined |
 | 0x17   | 1      | undefined |
-
-### TEAM_SCORE
-
-| Offset | Length | Type      | Name
-|--------|--------|-----------|-----
-| 0x0    | 4      | uint32    | m_nScore
-| 0x4    | 1      | byte      | m_nWin
-| 0x5    | 1      | byte      | m_nLose
-| 0x6    | 1      | undefined | 
-| 0x7    | 1      | undefined | 
 
 ### CNetGameVSMode
 
@@ -777,13 +757,218 @@ ___
 
 ## NetGameHistoryWork
 
-ToDO
+### NetGameHistoryData
+
+| Offset | Length | Type         | Name
+|--------|--------|--------------|-----
+| 0x0    | 16     | SPspDataTime | AddHistoryTime
+| 0x10   | 4      | uint32       | resultTime
+| 0x14   | 1      | byte         | content
+| 0x15   | 1      | byte         | result
+| 0x16   | 1      | byte         | mode
+| 0x17   | 1      | byte         | details
+| 0x18   | 2      | int16        | detailsParam0
+| 0x1A   | 2      | int16        | detailsParam1
+| 0x1C   | 2      | uint16       | medal
+| 0x1E   | 1      | byte         | neckNameID0
+| 0x1F   | 1      | byte         | neckNameID1
+| 0x20   | 1      | byte         | neckNameID2
+| 0x21   | 1      | byte         | neckNameID3
+| 0x22   | 1      | byte         | neckNameID4
+| 0x23   | 1      | char         | dummy
+
+### NetGameHistoryWork
+
+| Offset | Length | Type                   | Name
+|--------|--------|------------------------|-----
+| 0x0    | 1900   | char[50][38]           | nickName
+| 0x76C  | 50     | char[50]               | nickNameRef
+| 0x79E  | 1      | char                   | historyNum
+| 0x79F  | 1      | char                   | historyNowIndex
+| 0x7A0  | 360    | NetGamehistoryData[10] | historyData
+
+### SPspDataTime
+| Offset | Length | Type   | Name
+|--------|--------|--------|-----
+| 0x0    | 2      | uint16 | year
+| 0x2    | 2      | uint16 | month
+| 0x4    | 2      | uint16 | day
+| 0x6    | 2      | uint16 | hour
+| 0x8    | 2      | uint16 | minute
+| 0xA    | 2      | uint16 | second
+| 0xC    | 4      | uint32 | microsecond
 
 ___
 
 ## NetGameHistory
 
-ToDO
+### HISTORY_CONTENT
+
+| Name                   | Value
+|------------------------|------
+| HISTORY_CONTENT_VS     | 0x0
+| HISTORY_CONTENT_ARENA  | 0x1
+| HISTORY_CONTENT_DICE   | 0x2
+| HISTORY_CONTENT_RACE   | 0x3
+| HISTORY_CONTENT_D_LINK | 0x4
+
+### HISTORY_CONTENT_INFO
+
+Union
+
+| Length | Type            | Name
+|--------|-----------------|-----
+| 4      | conflict 1      | ??
+| 4      | conflict 2      | ??
+| 4      | conflict 3      | ??
+
+conflict 1
+
+| Offset | Length | Type   | Name
+|--------|--------|--------|-----
+| 0x0    | 2      | uint16 | detailsMettsAgainNum
+| 0x2    | 2      | uint16 | detailsCmdKind
+
+conflict 2
+
+| Offset | Length | Type  | Name
+|--------|--------|-------|-----
+| 0x0    | 1      | byte  | fillerb
+| 0x1    | 1      | byte  | m_Lap
+| 0x2    | 2      | int16 | fillers
+
+conflict 3
+
+| Offset | Length | Type  | Name
+|--------|--------|-------|-----
+| 0x0    | 2      | int16 | detailsParam0
+| 0x2    | 2      | int16 | detailsParam1
+
+
+| Offset | Length | Type            | Name
+|--------|--------|-----------------|-----
+| 0x0    | 16     | SPspDataTime    | AddHistoryTime
+| 0x10   | 4      | uint32          | resultTime
+| 0x14   | 4      | HISTORY_CONTENT | content
+| 0x18   | 4      | HISTORY_MODE    | mode
+| 0x1C   | 4      | HISTORY_RESULT  | result
+| 0x20   | 4      | HISTORY_DETAILS | details
+| 0x24   | 4      | union           | HISTORY_CONTENT_INFO union (the needed struct probably depends on the mode)
+| 0x28   | 2      | uint16          | medal
+| 0x2A   | 1      | ??              | undefined
+| 0x2B   | 1      | ??              | undefined
+
+### HISTORY_DETAILS
+
+| Name                   | Value
+|------------------------|------
+| HISTORY_DETAILS_NONE   | 0x0
+| HISTORY_DETAILS_D_LINK | 0x1
+| HISTORY_RIDE_RACE      | 0x2
+
+### HISTORY_MODE
+
+| Name                  | Value
+|-----------------------|------
+| HISTORY_MODE_VS_BR    | 0x0
+| HISTORY_MODE_VS_TEAM  | 0x1
+| HISTORY_MODE_ARENA_0  | 0x2
+| HISTORY_MODE_ARENA_1  | 0x3
+| HISTORY_MODE_ARENA_2  | 0x4
+| HISTORY_MODE_ARENA_3  | 0x5
+| HISTORY_MODE_ARENA_4  | 0x6
+| HISTORY_MODE_ARENA_5  | 0x7
+| HISTORY_MODE_ARENA_6  | 0x8
+| HISTORY_MODE_ARENA_7  | 0x9
+| HISTORY_MODE_ARENA_8  | 0xA
+| HISTORY_MODE_ARENA_9  | 0xB
+| HISTORY_MODE_ARENA_10 | 0xC
+| HISTORY_MODE_ARENA_11 | 0xD
+| HISTORY_MODE_ARENA_12 | 0xE
+| HISTORY_MODE_ARENA_13 | 0xF
+| HISTORY_MODE_ARENA_14 | 0x10
+| HISTORY_MODE_ARENA_15 | 0x11
+| HISTORY_MODE_DICE_0   | 0x12
+| HISTORY_MODE_DICE_1   | 0x13
+| HISTORY_MODE_DICE_2   | 0x14
+| HISTORY_MODE_DICE_3   | 0x15
+| HISTORY_MODE_DICE_4   | 0x16
+| HISTORY_MODE_DICE_5   | 0x17
+| HISTORY_MODE_DICE_6   | 0x18
+| HISTORY_MODE_RACE_0   | 0x19
+| HISTORY_MODE_RACE_1   | 0x1A
+| HISTORY_MODE_RACE_2   | 0x1B
+| HISTORY_MODE_RACE_3   | 0x1C
+
+### HISTORY_NICKNAME
+
+Union conflict 1
+
+| Length | Type       | Name
+|--------|------------|-----
+| 20     | conflict 1 | ??
+| 20     | conflict 2 | ??
+
+Union conflict 2
+
+| Length | Type       | Name
+|--------|------------|-----
+| 20     | conflict 3 | ??
+| 20     | conflict 4 | ??
+
+conflict 1
+
+| Offset | Length | Type      | Name
+|--------|--------|-----------|-----
+| 0x0    | 20     | char *[5] | pNickName
+
+conflict 2
+
+| Offset | Length | Type   | Name
+|--------|--------|--------|-----
+| 0x0    | 4      | char * | pNickName0
+| 0x4    | 4      | char * | pNickName1
+| 0x8    | 4      | char * | pNickName2
+| 0xC    | 4      | char * | pNickName3
+| 0x10   | 4      | char * | pNickName4
+
+conflict 3
+
+| Offset | Length | Type      | Name
+|--------|--------|-----------|-----
+| 0x0    | 20     | bool [5]  | isEnemyNickName
+
+conflict 4
+
+| Offset | Length | Type | Name
+|--------|--------|------|-----
+| 0x0    | 4      | bool | isEnemyNickName0
+| 0x4    | 4      | bool | isEnemyNickName1
+| 0x8    | 4      | bool | isEnemyNickName2
+| 0xC    | 4      | bool | isEnemyNickName3
+| 0x10   | 4      | bool | isEnemyNickName4
+
+
+Names are guess from types.
+
+| Offset | Length | Type             | Name
+|--------|--------|------------------|-----
+| 0x0    | 20     | union conflict 1 | pNickName
+| 0x14   | 20     | union conflict 2 | isEnemyNickName
+
+### HISTORY_RESULT
+
+| Name                  | Value
+|-----------------------|------
+| HISTORY_RESULT_WIN    | 0x0
+| HISTORY_RESULT_LOSE   | 0x1
+| HISTORY_RESULT_RANK_1 | 0x2
+| HISTORY_RESULT_RANK_2 | 0x3
+| HISTORY_RESULT_RANK_3 | 0x4
+| HISTORY_RESULT_RANK_4 | 0x5
+| HISTORY_RESULT_RANK_5 | 0x6
+| HISTORY_RESULT_RANK_6 | 0x7
+| HISTORY_RESULT_TIE    | 0x8
 
 ___
 
@@ -795,62 +980,293 @@ ___
 
 ## NetGameDef
 
-### PKT_WOOLGIMMICK_DATA
+### PKT_DLINK_DATA
 
-| Offset | Length | Type                        | Name
-|--------|--------|-----------------------------|-----
-| 0x0    | 4      | int32                       | iNum
-| 0x4    | 56     | PKT_ONE_WOOLGIMMICK_DATA[2] | woolGimmickData
+| Name             | Value
+|------------------|------
+| LINK_STATUS_NONE | 0x0
+| LINK_STATUS_REQ  | 0x1
+| LINK_STATUS_OK   | 0x2
+| LINK_STATUS_NG   | 0x3
+| LINK_STATUS_BUSY | 0x4
 
-### PKT_SELECT_DATA
+### PKT_BATTLE_GAME
 
-| Offset | Length | Type         | Name
-|--------|--------|--------------|-----
-| 0x0    | 4      | __HANDLE__   | m_hNetGameHandle
-| 0x4    | 1      | byte         | m_nState
-| 0x5    | 1      | byte         | m_nSubState
-| 0x6    | 1      | byte         | m_nPlayerNum
-| 0x7    | 1      | byte         | m_nChara
-| 0x8    | 1      | byte         | m_nWeaponID
-| 0x9    | 1      | byte         | m_nTeam
-| 0xA    | 1      | byte         | m_nDeckType
-| 0xB    | 1      | byte         | m_nField
-| 0xC    | 12     | PLAYER_SCORE | m_nScore
-| 0x18   | 1      | byte         | m_nResult
-| 0x19   | 1      | byte         | m_nArenaLv
-| 0x1A   | 1      | byte         | m_nLv
-| 0x1B   | 1      | byte         | m_nRound
-| 0x1C   | 1      | byte         | m_nWorkState
-| 0x1D   | 1      | byte         | m_nWorkFlag
-| 0x1E   | 1      | byte         | m_nLostFlag
-| 0x1F   | 1      | byte:4       | m_nCheck9
-| 0x1F   | 1      | byte:4       | m_nCheck8
-| 0x20   | 1      | byte:4       | m_nCheck7
-| 0x20   | 1      | byte:4       | m_nCheck6
-| 0x21   | 1      | byte:4       | m_nCheck5
-| 0x21   | 1      | byte:4       | m_nCheck4
-| 0x22   | 1      | byte:4       | m_nCheck3
-| 0x22   | 1      | byte:4       | m_nCheck2
-| 0x23   | 1      | byte:4       | m_nCheck1
-| 0x23   | 1      | byte:4       | m_nCheck0
-| 0x24   | 1      | byte         | m_dum1
-| 0x25   | 1      | byte         | m_dum0
-| 0x26   | 64     | COMMAND[8]   | m_cmdDeck
-| 0x66   | 8      | COMMAND      | m_cmdFinish
-| 0x6E   | 8      | COMMAND      | m_cmdShootLock
-| 0x76   | 8      | COMMAND      | m_cmdJump
-| 0x7E   | 8      | COMMAND      | m_cmdGlide
-| 0x86   | 8      | COMMAND      | m_cmdAerialDash
-| 0x8E   | 8      | COMMAND      | m_cmdGroundDash
-| 0x96   | 8      | COMMAND      | m_cmdDashAbi
-| 0x9E   | 8      | COMMAND      | m_cmdAvoidSlide
-| 0xA6   | 8      | COMMAND      | m_cmdComboSlide
-| 0xAE   | 8      | COMMAND      | m_cmdTurnAbi
-| 0xB6   | 8      | COMMAND      | m_cmdGuard
-| 0xBE   | 8      | COMMAND      | m_cmdGuardAbi
-| 0xC6   | 8      | COMMAND      | m_cmdBlowAbi
-| 0xCE   | 1      | undefined    |
-| 0xCF   | 1      | undefined    |
+| Offset | Length | Type    | Name
+|--------|--------|---------|-----
+| 0x0    | 1      | byte    | m_nState
+| 0x1    | 1      | byte    | m_nSubState
+| 0x2    | 1      | byte    | m_nMVP
+| 0x3    | 1      | byte    | m_nStartMember
+| 0x4    | 1      | byte    | m_nGameMode
+| 0x5    | 1      | byte    | m_nEventRule
+| 0x6    | 1      | byte    | m_nDataMode
+| 0x7    | 1      | byte    | m_nTimeLimit
+| 0x8    | 1      | byte    | m_nMemberMax
+| 0x9    | 1      | byte    | m_nField
+| 0xA    | 1      | byte    | m_nTarget
+| 0xB    | 1      | byte    | m_nRank
+| 0xC    | 4      | uint32  | m_BattleFlag
+| 0x10   | 4      | float   | m_fTimer
+| 0x14   | 4      | uint32  | m_nPlayTime
+| 0x18   | 3      | byte[3] | m_nReqStyle
+| 0x1B   | 1      | byte    | m_ndum0
+| 0x1C   | 2      | int16   | m_nLmtX
+| 0x1E   | 2      | int16   | m_nLmtY
+| 0x20   | 2      | int16   | m_nLmtZ
+| 0x22   | 2      | int16   | m_nLmtR
+| 0x24   | 2      | uint16  | m_nLmtKind
+| 0x26   | 1      | byte    | m_nLmtCreator
+| 0x27   | 1      | byte    | m_nLmtState
+| 0x28   | 1      | byte    | m_nLmtResult
+| 0x29   | 3      | byte[3] | m_nLmtMember
+
+### PKT_BATTLE_PLAY
+
+| Offset | Length | Type             | Name
+|--------|--------|------------------|-----
+| 0x0    | 212    | PKT_PLAYER_DATA  | m_datPlayer
+| 0xD4   | 164    | PKT_GIMMICK_DATA | m_datGimmick
+| 0x178  | 480    | PKT_ENEMY_DATA   | m_datEnemy
+
+### PKT_BATTLE_VS_PLAY
+
+| Offset | Length | Type                   | Name
+|--------|--------|------------------------|-----
+| 0x0    | 212    | PKT_PLAYER_DATA        | m_datPlayer
+| 0xD4   | 164    | PKT_GIMMICK_DATA       | m_datGimmick
+| 0x178  | 380    | PKT_COMMAND_PRIZE_DATA | m_datCmdPrize
+| 0x2F4  | 60     | PKT_WOOLGIMMICK_DATA   | m_datWoolGimmick
+
+### PKT_COMMAND_PRIZE_CREATE
+
+| Offset | Length | Type                              | Name
+|--------|--------|-----------------------------------|-----
+| 0x0    | 4      | uint32                            | uiCount
+| 0x4    | 4      | int32                             | iNum
+| 0x8    | 8      | uint8[8]                          | uiReady
+| 0x10   | 8      | uint8[8]                          | uiCompleteCreate
+| 0x18   | 160    | PKT_COMMAND_PRIZE_CREATE_INFO[10] | Info
+
+### PKT_COMMAND_PRIZE_CREATE_INFO
+
+| Offset | Length | Type   | Name
+|--------|--------|--------|-----
+| 0x0    | 2      | uint16 | uiID
+| 0x2    | 2      | uint16 | uiCmdKind
+| 0x4    | 2      | int16  | iPosX
+| 0x6    | 2      | int16  | iPosY
+| 0x8    | 2      | int16  | iPosZ
+| 0xA    | 2      | int16  | iVelX
+| 0xC    | 2      | int16  | iVelY
+| 0xE    | 2      | int16  | iVelZ
+
+### PKT_COMMAND_PRIZE_DATA
+
+| Offset | Length | Type                           | Name
+|--------|--------|--------------------------------|-----
+| 0x0    | 4      | int32                          | iCmdPrizeNum
+| 0x4    | 192    | PKT_ONE_COMMAND_PRIZE_DATA[48] | cmdPrizeData
+| 0xC4   | 184    | PKT_COMMAND_PRIZE_CREATE       | cmdPrizeCreate
+
+### PKT_CROWD_MUSH_JERRY
+
+| Offset | Length | Type      | Name
+|--------|--------|-----------|-----
+| 0x0    | 4      | _HANDLE_  | hNetGameHandle (is a int32)
+| 0x4    | 4      | int32     | iMushJerryNum
+
+### PKT_DLINK_DATA
+
+| Offset | Length | Type      | Name
+|--------|--------|-----------|-----
+| 0      | 224    | DL_STATUS | m_DLinkInfo
+
+### PKT_ENEMY_DATA
+
+| Offset | Length | Type                   | Name
+|--------|--------|------------------------|-----
+| 0x0    | 4      | uint32                 | iNum
+| 0x4    | 432    | PKT_ONE_ENEMY_DATA[12] | enemyData
+| 0x1B4  | 8      | PKT_CROWD_MUSH_JERRY   | crowdMushJerry
+| 0x1BC  | 4      | PKT_MMCMASTER_DATA     | mmcMasterPkt
+| 0x1C0  | 4      | float                  | fTimeCounterFrame
+| 0x1C4  | 28     | int8[28]               | iWork
+
+### PKT_GIMMICK_DATA
+
+| Offset | Length | Type                     | Name
+|--------|--------|--------------------------|-----
+| 0x0    | 4      | int32                    | iNum
+| 0x4    | 160    | PKT_ONE_GIMMICK_DATA[20] | gimmickData
+
+### PKT_LOBBY_PLAY
+
+| Offset | Length | Type            | Name
+|--------|--------|-----------------|-----
+| 0x0    | 212    | PKT_PLAYER_DATA | m_datPlayer
+| 0xD4   | 224    | PKT_DLINK_DATA  | m_datDLink
+
+### PKT_MMCMASTER_DATA
+
+union
+
+| Length | Type        | Name
+|--------|-------------|-----
+| 1      | uint8       | uiFlag
+| 1      | anon struct |
+
+anon struct
+
+| Postition | Size | Name
+|-----------|------|-----
+| 0         | 6    | __dummy__
+| 6         | 1    | uiSummons2
+| 7         | 1    | uiSummons1
+
+
+| Offset | Length | Type  | Name
+|--------|--------|-------|-----
+| 0x0    | 2      | int16 | iTimer
+| 0x2    | 1      | union |
+| 0x3    | 1      | int8  | iCount
+
+### PKT_ONE_COMMAND_PRIZE_DATA
+
+union
+
+| Length | Type        | Name
+|--------|-------------|-----
+| 2      | uint16      | uiFlag
+| 2      | anon struct |
+
+anon struct
+
+| Postition | Size | Name
+|-----------|------|-----
+| 0         | 6    | __dummy__
+| 6         | 1    | uiReady
+| 7         | 1    | uiMaster
+| 8         | 8    | uiNetPlayerNum
+
+
+| Offset | Length | Type   | Name
+|--------|--------|--------|-----
+| 0x0    | 2      | uint16 | uiID
+| 0x2    | 2      | union  |
+
+### PKT_ONE_ENEMY_DATA
+
+union 1
+
+| Length | Type          | Name
+|--------|---------------|-----
+| 2      | int16         | iGroup
+| 2      | anon struct 1 |
+
+anon struct 1
+
+| Postition | Size | Name
+|-----------|------|-----
+| 0         | 6    | iAtkGroup
+| 6         | 10   | iEffGroup
+
+union 2
+
+| Length | Type          | Name
+|--------|---------------|-----
+| 1      | uint8         | uiFlag
+| 1      | anon struct 2 |
+
+anon struct 2
+
+| Postition | Size | Name
+|-----------|------|-----
+| 0         | 1    | __dummy__
+| 1         | 4    | uiNetPlayerNum
+| 5         | 1    | uiDamageReaction
+| 6         | 1    | uiRef
+| 7         | 1    | uiMaster
+
+
+| Offset | Length | Type       | Name
+|--------|--------|------------|-----
+| 0x0    | 4      | __HANDLE__ | hNetGameHandle
+| 0x4    | 4      | __HANDLE__ | hNetTargetHandle
+| 0x8    | 4      | int32      | iState
+| 0xC    | 2      | int16      | iVelX
+| 0xE    | 2      | int16      | iVelY
+| 0x10   | 2      | int16      | iVelZ
+| 0x12   | 2      | int16      | iPosX
+| 0x14   | 2      | int16      | iPosY
+| 0x16   | 2      | int16      | iPosZ
+| 0x18   | 2      | int16      | iRotX
+| 0x1A   | 2      | int16      | iRotY
+| 0x1C   | 2      | int16      | iHP
+| 0x1E   | 1      | int8       | iMotionNum
+| 0x1F   | 1      | int8       | iState
+| 0x20   | 2      | union 1    |
+| 0x22   | 1      | union 2    |
+| 0x23   | 1      | int8       | dummy
+
+### PKT_ONE_GIMMICK_DATA
+
+union
+
+| Length | Type        | Name
+|--------|-------------|-----
+| 1      | uint8       | uiFlag
+| 1      | anon struct |
+
+anon struct
+
+| Postition | Size | Name
+|-----------|------|-----
+| 0         | 6    | __dummy__
+| 6         | 1    | uiRef
+| 7         | 1    | uiMaster
+
+
+| Offset | Length | Type       | Name
+|--------|--------|------------|-----
+| 0x0    | 4      | __HANDLE__ | hNetGameHandle
+| 0x4    | 2      | int16      | iStateCount
+| 0x6    | 1      | int8       | iState
+| 0x7    | 1      | union      |
+
+### PKT_ONE_WOOLGIMMICK_DATA
+
+union
+
+| Length | Type        | Name
+|--------|-------------|-----
+| 1      | uint8       | uiFlag
+| 1      | anon struct |
+
+anon struct
+
+| Postition | Size | Name
+|-----------|------|-----
+| 0         | 5    | __dummy__
+| 5         | 1    | uiAttack
+| 6         | 1    | uiRef
+| 7         | 1    | uiMaster
+
+
+| Offset | Length | Type       | Name
+|--------|--------|------------|-----
+| 0x0    | 4      | __HANDLE__ | hNetGameHandle
+| 0x4    | 4      | __HANDLE__ | hNetTargetHandle
+| 0x8    | 4      | uint32     | iState
+| 0xC    | 2      | int16      | iVelX
+| 0xE    | 2      | int16      | iVelY
+| 0x10   | 2      | int16      | iVelZ
+| 0x12   | 2      | int16      | iPosX
+| 0x14   | 2      | int16      | iPosY
+| 0x16   | 2      | int16      | iPosZ
+| 0x18   | 2      | int16      | iRotY
+| 0x1A   | 1      | union      |
+| 0x1B   | 1      | uint8      | iPlayerID
 
 ### PKT_PLAYER_DATA
 
@@ -975,3 +1391,108 @@ ___
 | 0xD2   | 1      | undefined    |
 | 0xD3   | 1      | undefined    |
 
+### PKT_SELECT_DATA
+
+| Offset | Length | Type         | Name
+|--------|--------|--------------|-----
+| 0x0    | 4      | __HANDLE__   | m_hNetGameHandle
+| 0x4    | 1      | byte         | m_nState
+| 0x5    | 1      | byte         | m_nSubState
+| 0x6    | 1      | byte         | m_nPlayerNum
+| 0x7    | 1      | byte         | m_nChara
+| 0x8    | 1      | byte         | m_nWeaponID
+| 0x9    | 1      | byte         | m_nTeam
+| 0xA    | 1      | byte         | m_nDeckType
+| 0xB    | 1      | byte         | m_nField
+| 0xC    | 12     | PLAYER_SCORE | m_nScore
+| 0x18   | 1      | byte         | m_nResult
+| 0x19   | 1      | byte         | m_nArenaLv
+| 0x1A   | 1      | byte         | m_nLv
+| 0x1B   | 1      | byte         | m_nRound
+| 0x1C   | 1      | byte         | m_nWorkState
+| 0x1D   | 1      | byte         | m_nWorkFlag
+| 0x1E   | 1      | byte         | m_nLostFlag
+| 0x1F   | 1      | byte:4       | m_nCheck9
+| 0x1F   | 1      | byte:4       | m_nCheck8
+| 0x20   | 1      | byte:4       | m_nCheck7
+| 0x20   | 1      | byte:4       | m_nCheck6
+| 0x21   | 1      | byte:4       | m_nCheck5
+| 0x21   | 1      | byte:4       | m_nCheck4
+| 0x22   | 1      | byte:4       | m_nCheck3
+| 0x22   | 1      | byte:4       | m_nCheck2
+| 0x23   | 1      | byte:4       | m_nCheck1
+| 0x23   | 1      | byte:4       | m_nCheck0
+| 0x24   | 1      | byte         | m_dum1
+| 0x25   | 1      | byte         | m_dum0
+| 0x26   | 64     | COMMAND[8]   | m_cmdDeck
+| 0x66   | 8      | COMMAND      | m_cmdFinish
+| 0x6E   | 8      | COMMAND      | m_cmdShootLock
+| 0x76   | 8      | COMMAND      | m_cmdJump
+| 0x7E   | 8      | COMMAND      | m_cmdGlide
+| 0x86   | 8      | COMMAND      | m_cmdAerialDash
+| 0x8E   | 8      | COMMAND      | m_cmdGroundDash
+| 0x96   | 8      | COMMAND      | m_cmdDashAbi
+| 0x9E   | 8      | COMMAND      | m_cmdAvoidSlide
+| 0xA6   | 8      | COMMAND      | m_cmdComboSlide
+| 0xAE   | 8      | COMMAND      | m_cmdTurnAbi
+| 0xB6   | 8      | COMMAND      | m_cmdGuard
+| 0xBE   | 8      | COMMAND      | m_cmdGuardAbi
+| 0xC6   | 8      | COMMAND      | m_cmdBlowAbi
+| 0xCE   | 1      | undefined    |
+| 0xCF   | 1      | undefined    |
+
+### PKT_WOOLGIMMICK_DATA
+
+| Offset | Length | Type                        | Name
+|--------|--------|-----------------------------|-----
+| 0x0    | 4      | int32                       | iNum
+| 0x4    | 56     | PKT_ONE_WOOLGIMMICK_DATA[2] | woolGimmickData
+
+### PLAYER_SCORE
+
+| Offset | Length | Type      | Name
+|--------|--------|-----------|-----
+| 0x0    | 4      | uint32    | m_nScore
+| 0x4    | 2      | uint16    | m_nMedal
+| 0x6    | 2      | uint16    | m_nBonusP
+| 0x8    | 2      | uint16    | m_nBonusM
+| 0xA    | 1      | undefined | 
+| 0xB    | 1      | undefined | 
+
+### TEAM_SCORE (defined in netgamevsmode)
+
+| Offset | Length | Type      | Name
+|--------|--------|-----------|-----
+| 0x0    | 4      | uint32    | m_nScore
+| 0x4    | 1      | byte      | m_nWin
+| 0x5    | 1      | byte      | m_nLose
+| 0x6    | 1      | undefined | 
+| 0x7    | 1      | undefined |
+
+## NetGameCockpit
+
+### CGameCockpit
+
+| Name             | Value
+|------------------|------
+| 
+
+## NetGameArenaData
+
+### ARENA_EVENT_DATA
+
+| Offset | Length | Type    | Name
+|--------|--------|---------|-----
+| 0x0    | 4      | uint32 | uiCtdId
+| 0x4    | 1      | byte   | nArea
+| 0x5    | 1      | byte   | nRank
+| 0x6    | 1      | byte   | nLevel
+| 0x7    | 1      | byte   | nExtra
+| 0x8    | 2      | uint16 | nMedal
+| 0xA    | 2      | uint16 | nData
+| 0xC    | 1      | byte   | nRound
+| 0xD    | 1      | byte   | nTextId
+| 0xE    | 1      | byte   | nAreaData
+| 0xF    | 1      | byte   | nAreaCount
+
+## NetGameArena
