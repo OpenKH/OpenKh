@@ -82,7 +82,7 @@ namespace OpenKh.Tests.kh2
             [InlineData("MapVisibility 0xffffffff 0x00000001", 1, -1, 1)]
             [InlineData("RandomSpawn \"0123\" \"4567\"", 2, 0x33323130, 0x37363534)]
             [InlineData("CasualSpawn 123 \"666\"", 3, 123, 0x363636)]
-            [InlineData("Capacity 123", 4, 0x42F60000)]
+            [InlineData("Capacity 123", 4, 123)]
             [InlineData("AllocEnemy 123", 5, 123)]
             [InlineData("Unk06 123", 6, 123)]
             [InlineData("Unk07 123", 7, 123)]

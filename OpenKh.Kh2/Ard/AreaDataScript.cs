@@ -126,6 +126,7 @@ namespace OpenKh.Kh2.Ard
             [0x0F] = typeof(Party),
             [0x10] = typeof(Bgm),
             [0x11] = typeof(MsgWall),
+            [0x12] = typeof(AllocPacket),
             [0x13] = typeof(Camera),
             [0x14] = typeof(StatusFlag3),
             [0x15] = typeof(Mission),
@@ -233,11 +234,11 @@ namespace OpenKh.Kh2.Ard
 
         public class Capacity : IAreaDataCommand
         {
-            [Data] public float Value { get; set; }
+            [Data] public int Value { get; set; }
 
             public void Parse(int nRow, List<string> tokens)
             {
-                Value = ParseAsFloat(nRow, GetToken(nRow, tokens, 1));
+                Value = ParseAsInt(nRow, GetToken(nRow, tokens, 1));
             }
 
             public override string ToString() =>
@@ -250,6 +251,19 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"{nameof(AllocEnemy)} {Value}";
+
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Value = ParseAsInt(nRow, GetToken(nRow, tokens, 1));
+            }
+        }
+
+        public class AllocPacket : IAreaDataCommand
+        {
+            [Data] public int Value { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(AllocPacket)} {Value}";
 
             public void Parse(int nRow, List<string> tokens)
             {
@@ -527,7 +541,6 @@ namespace OpenKh.Kh2.Ard
 
             public void Parse(int nRow, List<string> tokens)
             {
-                Value = ParseAsInt(nRow, GetToken(nRow, tokens, 1));
                 throw new Exception($"Parsing an '{nameof(If)}' is not yet supported");
             }
 

@@ -208,7 +208,7 @@ There is a total of 30 operation codes for the spawn script. The parser can be f
 - 0f: [Party](#party)
 - 10: [Bgm](#bgm)
 - 11: [MsgWall](#msgwall)
-- 12: [unknown](#unknown12)
+- 12: [AllocPacket](#allocpacket)
 - 13: [Camera](#camera)
 - 14: [StatusFlag3](#statusflag3)
 - 15: [Mission](#mission)
@@ -244,7 +244,7 @@ Very uncommon, used 17 times and only in the worlds BB, CA, LK and MU.
 
 #### Capacity
 
-Set the memory area `01c6053c`, which represents a floating number that holds the capacity of the current map. The bigger is the capacity the better is the amount of enemies that can be loaded at once. It's found 465 times and only in `btl`.
+Set the memory area `01c6053c`, which represents an integer that holds the capacity of the current map. The bigger is the capacity the better is the amount of enemies that can be loaded at once. It's found 465 times and only in `btl`.
 
 #### AllocEnemy
 
@@ -300,9 +300,9 @@ Set the map's background musics. The single 4-byte parameter can be read as two 
 
 Set the memory area `0034ece4`, which represents the message displayed below when the player touches an invisible wall. Found 80 times and only in `map`.
 
-#### Unknown12
+#### AllocPacket
 
-Set the memory area `0034ecd4`. This opcode is unused.
+Set the memory area `0034ecd4`, which is related to the amount of memory reserved for the cache buffer. This opcode is unused.
 
 #### Unknown13
 
