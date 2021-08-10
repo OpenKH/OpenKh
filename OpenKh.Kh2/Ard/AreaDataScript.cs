@@ -1179,7 +1179,7 @@ namespace OpenKh.Kh2.Ard
 
         private static float ParseAsFloat(int row, string token)
         {
-            if (!float.TryParse(token, out var value))
+            if (!float.TryParse(token, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
                 throw new SpawnScriptNotANumberException(row, token);
             return value;
         }
