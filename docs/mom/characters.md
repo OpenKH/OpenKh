@@ -18,7 +18,7 @@ Most of the character and party data can be manipulated using a [SQLite database
 | Ventus           | character0000009 | 110000009     |
 | Terra            | character0000010 | 110000010     |
 | Aqua             | character0000011 | 110000011     |
-| Mickey (KH2|DDD) | character0000012 | 110000012     |
+| Mickey (KH2/DDD) | character0000012 | 110000012     |
 | Aladdin          | character0000014 | 110000014     |
 | Ariel            | character0000015 | 110000015     |
 | Peter Pan        | character0000016 | 110000016     |
