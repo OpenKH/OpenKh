@@ -170,10 +170,10 @@ Some tracks are localized based on the region and are found at a different locat
 
 Where `{REGION}` can be `Japan`, `Asia` or `World`, e.g. `StreamingAssets\World\Sead\music\`
 
-| Song                       | Description
-|----------------------------|-------------
-| MUSIC0000139.win.sab.bytes | Let It Go
-| MUSIC0000140.win.sab.bytes | A Whole New World
-| MUSIC0000143.win.sab.bytes | Circle of Life
+| Song         | Description
+|--------------|-------------
+| MUSIC0000139 | Let It Go
+| MUSIC0000140 | A Whole New World
+| MUSIC0000143 | Circle of Life
 
 While `Simple and Clean`, `Sanctuary` and `Don't Think Twice` are located in the default location, they are also replaced with their Japanese equivalents depending on the region.
