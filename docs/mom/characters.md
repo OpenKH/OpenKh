@@ -4,8 +4,6 @@ Most of the character and party data can be manipulated using a [SQLite database
 
 ## Documented IDs
 
-Format: `Name - AssetBundle Name / PartyTable ID`
-
 | Character        | AssetBundle Name | PartyTable ID |
 | -----------------|------------------|---------------|
 | Sora (KH1)       | character0000000 | 110000000     |
