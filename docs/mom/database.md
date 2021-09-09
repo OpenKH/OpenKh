@@ -1,14 +1,21 @@
 # [Kingdom Hearts Melody of Memory](index.md) Database
 
-Most of the game logic is able to be manipulated using a SQLite database located in: `StreamingAssets\SQLite\Table.db`
+Most of the game logic is able to be manipulated using a SQLite database located in...
+
+| Platform | Location                          |
+|----------|-----------------------------------|
+| Switch   | `StreamingAssets\SQLite\Table.db` |
+| PC       | `StreamingAssets\Data\data.dat`   |
+
+The database is encrypted using SQLCipher 3 with default values.
 
 ## Documented Tables
 
-| Table Name | Notes |
-|---|---|
+| Table Name         | Notes |
+|--------------------|-------|
 | GameSceneFlowTable | Defines menu layout, eg. Title>Tutorial>Main Screen, comments describe what each flow does, translation required however |
-| MusicTable | Defines music track properties, like difficulty values, item drops and drop rates |
-| PartyTable | Defines which characters are in each team, and if they're selectable by the player or not. |
+| MusicTable         | Defines music track properties, like difficulty values, item drops and drop rates |
+| PartyTable         | Defines which characters are in each team, and if they're selectable by the player or not. |
 
 ## Noteworthy Details
 
