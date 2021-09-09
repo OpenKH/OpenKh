@@ -13,6 +13,6 @@ This documentation is ***also*** based on the "World" Nintendo Switch version of
 * Music Tracks
   * [File Types Overview](files.md)
     * [File Type .sed](sed.md)
-  * [Song List](songs.md)
+  * [Track List](tracks.md)
   * [AssetBundles](assetbundle.md)
     * [Trigger Maps (Enemy Placement)](trigger.md)
