@@ -13,9 +13,11 @@ The database is encrypted using SQLCipher 3 with default values.
 
 | Table Name         | Notes |
 |--------------------|-------|
+| DoorTable          | Defines criteria for doors to unlock other worlds |
 | GameSceneFlowTable | Defines menu layout, eg. Title>Tutorial>Main Screen, comments describe what each flow does, translation required however |
 | MusicTable         | Defines music track properties, like difficulty values, item drops and drop rates |
 | PartyTable         | Defines which characters are in each team, and if they're selectable by the player or not. |
+| TripWorldTable     | Defines worlds, eg. which tracks should be included (up to 8), world icon, clearing rewards, and more | 
 
 ## Noteworthy Details
 
@@ -60,4 +62,11 @@ WHERE PartyID=120000000;
 UPDATE PartyTable
 SET Character3 = 110000009
 WHERE PartyID=120000000;
+```
+
+### Unlock all worlds on the world map by default
+
+```sql
+UPDATE TripWorldTable
+SET StartFlag = 1;
 ```
