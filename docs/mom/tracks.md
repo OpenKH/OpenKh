@@ -147,7 +147,7 @@ Most tracks are identical across all versions (Japan/Asia/World).
 | MUSIC0000148 | Guardando nel Buio -Arrangement-
 | MUSIC0000161 | Destiny's Force
 | MUSIC0000168 | Simple and Clean -Opening Version-
-| MUSIC0000169 | Sanctuary ~opening version~
+| MUSIC0000169 | Sanctuary -opening version-
 | MUSIC0000170 | Don't Think Twice -Opening Version-
 | MUSIC0000171 | Dive into the Heart Destati -Tutorial Segment[?]-
 | MUSIC0000174 | Graveyard Labyrinth
