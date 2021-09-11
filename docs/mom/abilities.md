@@ -2,7 +2,7 @@
 
 Abilities are used for reaction prompts and are typically available for party leaders only. The SQL table `AbilityTable` contains a list of all Ability IDs. Ability IDs are assigned to characters in the SQL table `CharacterTable`. Switching abilities changes the display name only, but will not change the character's behavior.
 
-| AbylityID | Type        | Name          | Assigned to 
+| AbilityID | Type        | Name          | Assigned to 
 |-----------|-------------|---------------|--------------
 | 130000000 | Long Range  | Thundaga      | 110000000 (Sora KH1)
 | 130000001 | Short Range | Ars Arcanum   | 110000000 (Sora KH1)
