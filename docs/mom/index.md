@@ -10,6 +10,7 @@ This documentation is ***also*** based on the "World" Nintendo Switch version of
 
 * [Database](database.md)
 * [Characters](characters.md)
+* [Abilities](abilities.md)
 * Music Tracks
   * [File Types Overview](files.md)
     * [File Type .sed](sed.md)
