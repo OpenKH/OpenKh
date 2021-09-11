@@ -13,6 +13,7 @@ The database is encrypted using SQLCipher 3 with default values.
 
 | Table Name         | Notes |
 |--------------------|-------|
+| AbilityTable       | Lists IDs of all [abilities](abilities.md)
 | DoorTable          | Defines criteria for doors to unlock other worlds |
 | GameSceneFlowTable | Defines menu layout, eg. Title>Tutorial>Main Screen, comments describe what each flow does, translation required however |
 | MusicTable         | Defines music track properties, like difficulty values, item drops and drop rates |
