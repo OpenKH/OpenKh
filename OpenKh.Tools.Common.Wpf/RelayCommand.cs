@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using Xe.Tools.Wpf.Commands;
 
-namespace OpenKh.Tools.Common
+namespace OpenKh.Tools.Common.Wpf
 {
     public class RelayCommand<T> : RelayCommand
     {

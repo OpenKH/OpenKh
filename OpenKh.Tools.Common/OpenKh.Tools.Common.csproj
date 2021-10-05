@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,13 +22,7 @@
     <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
     <ProjectReference Include="..\OpenKh.Imaging\OpenKh.Imaging.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
-    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Page Update="MessageDialog.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
+    <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
   </ItemGroup>
 
 </Project>

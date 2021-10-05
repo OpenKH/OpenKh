@@ -1,6 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Services;
 using System.Collections.Generic;
 using System.IO;

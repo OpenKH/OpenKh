@@ -1,7 +1,7 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
 using System;
 using System.Collections.Generic;

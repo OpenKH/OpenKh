@@ -1,8 +1,8 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Xe.Tools.Wpf.Models;
 
-namespace OpenKh.Tools.Common.Models
+namespace OpenKh.Tools.Common.Wpf.Models
 {
     public class MyGenericListModel<T> : GenericListModel<T>, IEnumerable<T>
     {

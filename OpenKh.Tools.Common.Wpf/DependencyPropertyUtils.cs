@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Windows;
 
-namespace OpenKh.Tools.Common
+namespace OpenKh.Tools.Common.Wpf
 {
     public static class DependencyPropertyUtils
     {

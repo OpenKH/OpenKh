@@ -1,13 +1,13 @@
-﻿using OpenKh.Engine;
+using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using static OpenKh.Tools.Common.DependencyPropertyUtils;
+using static OpenKh.Tools.Common.Wpf.DependencyPropertyUtils;
 
-namespace OpenKh.Tools.Common.Controls
+namespace OpenKh.Tools.Common.Wpf.Controls
 {
     public class LayoutRendererPanel : DrawPanel
     {
