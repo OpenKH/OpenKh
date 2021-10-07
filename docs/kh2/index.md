@@ -38,6 +38,7 @@
 ## Research
 
 * [Game files](files.md)
+* [Epic Games PKG/HED Contents](hed.md)
 * [Undiscovered game files](files-unknown.md)
 
 ## Dictionaries
