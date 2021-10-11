@@ -400,7 +400,6 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex361 | Dark Riku (LimitCut)
 | e_ex362 | Terra-Xehanort (LimitCut)
 | e_ex367 | Master Xehanort (LimitCut)
-
 | e_ex407 | Darkside
 | e_ex408 | Xehanort's Guardian
 | e_ex409 | Darkside (ReMind)
@@ -486,7 +485,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_do130 | Save The Queen
 | w_do140 | Save The Queen+
 | w_ex010 | Star Seeker
-| w_ex020 | Kingdom Key
+| w_ex020 | Kingdom Key D
 | w_ex030 | Wayward Wind
 | w_ex040 | Earthshaker
 | w_ex050 | Rainfell
@@ -586,7 +585,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_so112 | Classic Tone Boom Hammer
 | w_so113 | Classic Tone Clock Drill
 | w_so114 | Classic Tone Clock
-| w_so120 | Dawn Till Dusk
+| w_so120 | Dawn Till Dusk / Elemental Encoder
 | w_so140 | Grand Chef
 | w_so141 | Grand Chef Formchanges
 | w_so142 | Grand Chef Pan
