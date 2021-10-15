@@ -342,9 +342,9 @@ It seems to do something with `01c60548`. It is only used 3 times in `hb13` by `
 
 It seems to do something with `01c60550`. It is only used 3 times in `hb13` by `evt`.
 
-#### Unknown1c
+#### If
 
-Seems to recursively call the spawn script parser, but it is only used in `he09` for 130 times. Purpose unknown.
+Conditionals for the script based on the entrance.
 
 #### Unknown1d
 
