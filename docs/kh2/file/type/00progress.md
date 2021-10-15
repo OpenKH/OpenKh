@@ -33,16 +33,16 @@ The pointer used by a world's x-th flag is located at offset 2x (for example, a 
 ### Operation Codes
 
 - 0: [Termination](#termination)
-- 1: [Change ARD program](#change ard program)
-- 2: [Block area](#block area)
-- 3: [Unblock area](#unblock area)
-- 4: [Add World Point](#add world point)
-- 5: [Remove World Point](#remove world point)
-- 6: [Change BGM Set](#change bgm set)
-- 7: [Lower story flag](#lower story flag)
-- 8: [Raise minigame flag](#raise minigame flag)
-- C: [Raise story flag](#raise story flag)
-- D: [Change world map status](#change world map status)
+- 1: [Change ARD program](#change-ard-program)
+- 2: [Block area](#block-area)
+- 3: [Unblock area](#unblock-area)
+- 4: [Add World Point](#add-world-point)
+- 5: [Remove World Point](#remove-world-point)
+- 6: [Change BGM Set](#change-bgm-set)
+- 7: [Lower story flag](#lower-story-flag)
+- 8: [Raise minigame flag](#raise-minigame-flag)
+- C: [Raise story flag](#raise-story-flag)
+- D: [Change world map status](#change-world-map-status)
 
 #### Termination
 
