@@ -39,10 +39,10 @@ The pointer used by a world's x-th flag is located at offset 2x (for example, a 
 - 4: [Add World Point](#add-world-point)
 - 5: [Remove World Point](#remove-world-point)
 - 6: [Change BGM Set](#change-bgm-set)
-- 7: [Lower story flag](#lower-story-flag)
+- 7: [Lower progress flag](#lower-progress-flag)
 - 8: [Raise menu flag](#raise-menu-flag)
 - 9: [Lower menu flag](#lower-menu-flag)
-- C: [Raise story flag](#raise-story-flag)
+- C: [Raise progress flag](#raise-progress-flag)
 - D: [Change world map status](#change-world-map-status)
 
 #### Termination
@@ -73,9 +73,9 @@ Revokes access to the area from the World Map, requiring Sora to revisit it. Use
 
 Changes which BGM set plays, as defined on ARIF in [03system.bin](03system.md).
 
-#### Lower Story Flag
+#### Lower Progress Flag
 
-Lowers the story flag, enabling it to be reraised including all the operations tied to it.
+Lowers the progress flag, enabling it to be reraised including all the operations tied to it.
 
 #### Raise Menu Flag
 
@@ -85,9 +85,9 @@ Raises a menu flag.
 
 Lowers a menu flag.
 
-#### Raise Story Flag
+#### Raise Progress Flag
 
-Raises another story flag, executing the script triggered by it.
+Raises another progress flag, executing the script triggered by it.
 
 #### Change World Map Status
 
@@ -247,7 +247,7 @@ When the required amount of condition bits are true (bit set to 1), the target w
 
 ### Flag Categories
 
-- 1 - Story Flag
+- 1 - Progress Flag
 - 2 - World Flag
 - 3 - Menu Flag
 
@@ -267,9 +267,9 @@ Determines if a world's Keyhole is shown, hidden or only shown as gray square in
 | Offset | Type   | Description
 |--------|--------|------------
 | 0      | uint32 | World ID
-| 4      | uint16 | Story Flag to Show Key 1
-| 6      | uint16 | Story Flag to Complete Key 1
-| 8      | uint16 | Story Flag to Show Key 2
-| 10     | uint16 | Story Flag to Complete Key 2
-| 12     | uint16 | Story Flag to Show Key 3
-| 14     | uint16 | Story Flag to Complete Key 3
+| 4      | uint16 | Progress Flag to Show Key 1
+| 6      | uint16 | Progress Flag to Complete Key 1
+| 8      | uint16 | Progress Flag to Show Key 2
+| 10     | uint16 | Progress Flag to Complete Key 2
+| 12     | uint16 | Progress Flag to Show Key 3
+| 14     | uint16 | Progress Flag to Complete Key 3
