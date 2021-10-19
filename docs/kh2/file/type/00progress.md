@@ -40,7 +40,8 @@ The pointer used by a world's x-th flag is located at offset 2x (for example, a 
 - 5: [Remove World Point](#remove-world-point)
 - 6: [Change BGM Set](#change-bgm-set)
 - 7: [Lower story flag](#lower-story-flag)
-- 8: [Raise minigame flag](#raise-minigame-flag)
+- 8: [Raise menu flag](#raise-menu-flag)
+- 9: [Lower menu flag](#lower-menu-flag)
 - C: [Raise story flag](#raise-story-flag)
 - D: [Change world map status](#change-world-map-status)
 
@@ -74,11 +75,15 @@ Changes which BGM set plays, as defined on ARIF in [03system.bin](03system.md).
 
 #### Lower Story Flag
 
-Lowers the story flag, enabling it to be reraised.
+Lowers the story flag, enabling it to be reraised including all the operations tied to it.
 
-#### Raise Minigame Flag
+#### Raise Menu Flag
 
-Raises a minigame flag.
+Raises a menu flag.
+
+#### Lower Menu Flag
+
+Lowers a menu flag.
 
 #### Raise Story Flag
 
@@ -243,8 +248,8 @@ When the required amount of condition bits are true (bit set to 1), the target w
 ### Flag Categories
 
 - 1 - Story Flag
-- 2 - ???
-- 3 - Minigame Flag
+- 2 - World Flag
+- 3 - Menu Flag
 
 ## WMKY
 
