@@ -1,8 +1,8 @@
-using OpenKh.Tools.ModsManager.ViewModels;
+using OpenKh.Tools.ModManager.ViewModels;
 using System;
 using System.Windows;
 
-namespace OpenKh.Tools.ModsManager.Views
+namespace OpenKh.Tools.ModManager.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

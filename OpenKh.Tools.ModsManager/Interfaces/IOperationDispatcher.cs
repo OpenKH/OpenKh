@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace OpenKh.Tools.ModsManager.Interfaces
+namespace OpenKh.Tools.ModManager.Interfaces
 {
     public interface IOperationDispatcher
     {

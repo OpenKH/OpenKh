@@ -1,4 +1,4 @@
-# Kingdom Hearts Melody of Memory
+# Kingdom Hearts Melody of Memory - Back to [Index](../index.md)
 
 ## Notes
 

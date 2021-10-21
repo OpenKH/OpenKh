@@ -1,4 +1,4 @@
-using OpenKh.Tools.ModsManager.Interfaces;
+using OpenKh.Tools.ModManager.Interfaces;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace OpenKh.Tools.ModsManager.Views
+namespace OpenKh.Tools.ModManager.Views
 {
     /// <summary>
     /// Interaction logic for DebuggingWindow.xaml

@@ -1,6 +1,6 @@
 using OpenKh.Patcher;
 
-namespace OpenKh.Tools.ModsManager.Models
+namespace OpenKh.Tools.ModManager.Models
 {
     public class ModModel
     {

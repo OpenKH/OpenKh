@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace OpenKh.Tools.ModsManager.Services
+namespace OpenKh.Tools.ModManager.Services
 {
     public static class ConfigurationService
     {

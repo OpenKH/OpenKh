@@ -1,6 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Tools.Common;
-using OpenKh.Tools.ModsManager.Interfaces;
+using OpenKh.Tools.ModManager.Interfaces;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenKh.Tools.ModsManager.Services
+namespace OpenKh.Tools.ModManager.Services
 {
     public class Pcsx2Injector
     {

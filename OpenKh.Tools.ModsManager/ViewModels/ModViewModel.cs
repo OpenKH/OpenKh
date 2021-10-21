@@ -1,6 +1,6 @@
-using OpenKh.Tools.ModsManager.Models;
-using OpenKh.Tools.ModsManager.Services;
-using OpenKh.Tools.ModsManager.Views;
+using OpenKh.Tools.ModManager.Models;
+using OpenKh.Tools.ModManager.Services;
+using OpenKh.Tools.ModManager.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,9 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
-using static OpenKh.Tools.ModsManager.Helpers;
+using static OpenKh.Tools.ModManager.Helpers;
 
-namespace OpenKh.Tools.ModsManager.ViewModels
+namespace OpenKh.Tools.ModManager.ViewModels
 {
     public class ModViewModel : BaseNotifyPropertyChanged
     {

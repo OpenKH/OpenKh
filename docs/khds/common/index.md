@@ -1,4 +1,4 @@
-# Kingdom Hearts DS games
+# Kingdom Hearts DS games - Back to [Index](../../index.md)
 
 ## General Documentation
 

@@ -23,7 +23,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenKh.Tools.ModsManager.Services
+namespace OpenKh.Tools.ModManager.Services
 {
     public static class Pcsx2MemoryService
     {

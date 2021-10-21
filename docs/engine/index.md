@@ -1,4 +1,4 @@
-# OpenKH Game Engine
+# OpenKH Game Engine - Back to [Index](../index.md)
 
 The OpenKH Game Engine aims to re-create the same experience for games from Kingdom Hearts 1 to Kingdom Hearts Dream Drop Distance, allowing to mix assets between those games and unleash modding by expanding the source code or from just unchain the games from the hardware limitations of their original hardwares.
 

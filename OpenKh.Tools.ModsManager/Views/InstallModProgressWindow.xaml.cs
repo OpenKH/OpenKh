@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
-namespace OpenKh.Tools.ModsManager.Views
+namespace OpenKh.Tools.ModManager.Views
 {
     /// <summary>
     /// Interaction logic for InstallModProgressWindow.xaml

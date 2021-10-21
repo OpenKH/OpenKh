@@ -1,4 +1,4 @@
-# Kingdom Hearts Birth By Sleep
+# Kingdom Hearts Birth By Sleep - Back to [Index](../index.md)
 
 ## General documentation
 

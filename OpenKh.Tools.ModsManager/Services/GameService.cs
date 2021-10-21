@@ -1,11 +1,11 @@
 using OpenKh.Common;
-using OpenKh.Tools.ModsManager.Models;
+using OpenKh.Tools.ModManager.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace OpenKh.Tools.ModsManager.Services
+namespace OpenKh.Tools.ModManager.Services
 {
     public static class GameService
     {

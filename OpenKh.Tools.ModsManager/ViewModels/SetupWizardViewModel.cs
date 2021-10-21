@@ -1,7 +1,7 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common;
-using OpenKh.Tools.ModsManager.Services;
+using OpenKh.Tools.ModManager.Services;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 
-namespace OpenKh.Tools.ModsManager.ViewModels
+namespace OpenKh.Tools.ModManager.ViewModels
 {
     public class SetupWizardViewModel : BaseNotifyPropertyChanged
     {

@@ -1,17 +1,17 @@
 using LibGit2Sharp;
 using OpenKh.Common;
 using OpenKh.Patcher;
-using OpenKh.Tools.ModsManager.Exceptions;
-using OpenKh.Tools.ModsManager.Models;
+using OpenKh.Tools.ModManager.Exceptions;
+using OpenKh.Tools.ModManager.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using static OpenKh.Tools.ModsManager.Helpers;
+using static OpenKh.Tools.ModManager.Helpers;
 
-namespace OpenKh.Tools.ModsManager.Services
+namespace OpenKh.Tools.ModManager.Services
 {
     public static class ModsService
     {

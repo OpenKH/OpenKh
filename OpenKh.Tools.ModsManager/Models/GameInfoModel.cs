@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace OpenKh.Tools.ModsManager.Models
+namespace OpenKh.Tools.ModManager.Models
 {
     public record GameInfoModel
     {

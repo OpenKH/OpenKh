@@ -1,9 +1,9 @@
 using OpenKh.Common;
-using OpenKh.Tools.ModsManager.Interfaces;
+using OpenKh.Tools.ModManager.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 
-namespace OpenKh.Tools.ModsManager.Services
+namespace OpenKh.Tools.ModManager.Services
 {
     public class OperationDispatcher : IOperationDispatcher
     {

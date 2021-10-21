@@ -1,4 +1,4 @@
-# Kingdom Hearts Dream Drop Distance
+# Kingdom Hearts Dream Drop Distance - Back to [Index](../index.md)
 
 ## General Documentation
 

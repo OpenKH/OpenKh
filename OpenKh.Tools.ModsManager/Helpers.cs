@@ -1,8 +1,8 @@
-using OpenKh.Tools.ModsManager.Services;
+using OpenKh.Tools.ModManager.Services;
 using System;
 using System.Windows;
 
-namespace OpenKh.Tools.ModsManager
+namespace OpenKh.Tools.ModManager
 {
     public static class Helpers
     {

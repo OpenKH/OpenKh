@@ -1,8 +1,8 @@
 using OpenKh.Common;
 using OpenKh.Tools.Common;
-using OpenKh.Tools.ModsManager.Models;
-using OpenKh.Tools.ModsManager.Services;
-using OpenKh.Tools.ModsManager.Views;
+using OpenKh.Tools.ModManager.Models;
+using OpenKh.Tools.ModManager.Services;
+using OpenKh.Tools.ModManager.Views;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
-using static OpenKh.Tools.ModsManager.Helpers;
+using static OpenKh.Tools.ModManager.Helpers;
 
-namespace OpenKh.Tools.ModsManager.ViewModels
+namespace OpenKh.Tools.ModManager.ViewModels
 {
     public interface IChangeModEnableState
     {

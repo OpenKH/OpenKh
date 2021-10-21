@@ -1,6 +1,6 @@
 using System;
 
-namespace OpenKh.Tools.ModsManager.Exceptions
+namespace OpenKh.Tools.ModManager.Exceptions
 {
     public class ModAlreadyExistsExceptions : Exception
     {

@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace OpenKh.Tools.ModsManager.Converters
+namespace OpenKh.Tools.ModManager.Converters
 {
     public class RadioBoolToIntConverter : IValueConverter
     {

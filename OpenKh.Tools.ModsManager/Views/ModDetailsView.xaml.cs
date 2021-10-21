@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
-namespace OpenKh.Tools.ModsManager.Views
+namespace OpenKh.Tools.ModManager.Views
 {
     /// <summary>
     /// Interaction logic for ModDetailsView.xaml

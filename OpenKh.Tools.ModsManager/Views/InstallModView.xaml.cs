@@ -1,10 +1,10 @@
-using OpenKh.Tools.ModsManager.Services;
+using OpenKh.Tools.ModManager.Services;
 using System.Collections.Generic;
 using System.Windows;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 
-namespace OpenKh.Tools.ModsManager.Views
+namespace OpenKh.Tools.ModManager.Views
 {
     /// <summary>
     /// Interaction logic for InstallModView.xaml
