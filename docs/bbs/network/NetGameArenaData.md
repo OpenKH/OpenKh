@@ -2,8 +2,8 @@
 
 ### ARENA_EVENT_DATA
 
-| Offset | Length | Type    | Name
-|--------|--------|---------|-----
+| Offset | Length | Type   | Name
+|--------|--------|--------|-----
 | 0x0    | 4      | uint32 | uiCtdId
 | 0x4    | 1      | byte   | nArea
 | 0x5    | 1      | byte   | nRank

@@ -12,6 +12,7 @@
     * [CTD text format](file//type/ctd.md)
     * [Events](file//type/events.md)
 
+* [Network packages](network-packages.md)
 * Other files
     * [font.arc, fonten.arc](font.md)
 

@@ -40,5 +40,3 @@
 | 0x8    | 2      | uint16 | minute
 | 0xA    | 2      | uint16 | second
 | 0xC    | 4      | uint32 | microsecond
-
-___

@@ -62,5 +62,3 @@ These are 4 bytes in size
 | Name      | Value
 |-----------|------
 | _JOB_PRI_ | 0x9C40
-
-___
