@@ -5,6 +5,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Utils;
 using OpenKh.Tools.Common;
 using OpenKh.Tools.Common.Imaging;
+using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ImageViewer.Services;
 using System;
 using System.Collections.Generic;

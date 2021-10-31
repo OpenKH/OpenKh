@@ -1,4 +1,4 @@
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Contextes;

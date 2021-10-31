@@ -1,8 +1,8 @@
-﻿using OpenKh.Imaging;
+using OpenKh.Imaging;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace OpenKh.Tools.Common
+namespace OpenKh.Tools.Common.Wpf
 {
     public static class ImageReadExtensions
     {

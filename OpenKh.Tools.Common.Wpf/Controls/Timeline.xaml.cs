@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static OpenKh.Tools.Common.DependencyPropertyUtils;
+using static OpenKh.Tools.Common.Wpf.DependencyPropertyUtils;
 
-namespace OpenKh.Tools.Common.Controls
+namespace OpenKh.Tools.Common.Wpf.Controls
 {
     /// <summary>
     /// Interaction logic for Timeline.xaml

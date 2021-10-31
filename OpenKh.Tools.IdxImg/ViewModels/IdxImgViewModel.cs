@@ -9,7 +9,7 @@ using forms = System.Windows.Forms;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 
 namespace OpenKh.Tools.IdxImg.ViewModels
 {

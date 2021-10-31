@@ -3,6 +3,7 @@ using OpenKh.Tools.BarEditor.Interfaces;
 using OpenKh.Tools.BarEditor.Models;
 using OpenKh.Tools.BarEditor.Services;
 using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using System;
 using System.Collections.Generic;
 using System.IO;

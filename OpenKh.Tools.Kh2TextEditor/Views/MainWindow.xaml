@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2TextEditor.Views"
-        xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
+        xmlns:controls="clr-namespace:OpenKh.Tools.Common.Wpf.Controls;assembly=OpenKh.Tools.Common.Wpf"
         xmlns:converters="clr-namespace:OpenKh.Tools.Kh2TextEditor.Converters"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="600" Width="800">

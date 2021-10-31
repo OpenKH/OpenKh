@@ -2,7 +2,7 @@ using OpenKh.Common;
 using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
