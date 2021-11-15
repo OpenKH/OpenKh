@@ -631,7 +631,7 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | short | Id?
+| 0 	 | short | [Command Argument](#cmd)
 | 2 	 | short | Unlock Menu Flag (Unlocks items for extra inventory)
 | 4 	 | short | Name Id
 | 6 	 | short | Shop keeper entity - [OBJ LIST](../../dictionary/obj.md)
