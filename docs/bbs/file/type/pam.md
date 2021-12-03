@@ -7,15 +7,15 @@
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
 | 00 | char[4] | The identifier of the file (always 0x004D4150) |
-| 04 | uint | Animation count|
-| 08 | byte[6] | Always zero. Padding, never read by the game.|
-| 0E | ushort  | File version. |
+| 04 | uint32 | Animation count|
+| 08 | uint8[6] | Always zero. Padding, never read by the game.|
+| 0E | uint16  | File version. |
 
 ### PAM Entry
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 00 | uint | Offset to animation, alignment doesn't matter.|
+| 00 | uint32 | Offset to animation, alignment doesn't matter.|
 | 04 | char[12] | Animation name.|
 
 ## Animations
@@ -26,14 +26,14 @@ Animations in Birth by Sleep do not need to be aligned in any way.
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 00 | ushort  | Animation Flag, currently unknown, but determines how the data inside the animation is read.|
-| 02 | byte | Animation frame rate, always 0x1E, or 30 FPS.|
-| 03 | byte | Interpolation frame count, determines how many frames it takes to transition into this animation.|
-| 04 | ushort | Loop from frame, determines the point the animation loops from, usually the last frame.|
+| 00 | uint16  | Animation Flag, currently unknown, but determines how the data inside the animation is read.|
+| 02 | uint8 | Animation frame rate, always 0x1E, or 30 FPS.|
+| 03 | uint8 | Interpolation frame count, determines how many frames it takes to transition into this animation.|
+| 04 | uint16 | Loop from frame, determines the point the animation loops from, usually the last frame.|
 | 06 | uint8 | Bone count, must match bone count of target model.|
 | 07 | uint8 | Padding |
-| 08 | ushort | Animation frame count.|
-| 0A | ushort | Loop to frame, determines the point the animation loops to.|
+| 08 | uint16 | Animation frame count.|
+| 0A | uint16 | Loop to frame, determines the point the animation loops to.|
 
 ## Animation Data
 
@@ -45,7 +45,7 @@ Each channel contains keyframes or a constant value . Linear interpolation is us
 
 ## Channel Flags
 
-Immediately after the header the flags start at 0xC. They are read 2 bytes at a time for each bone. Only the first 9 bits are used and the rest is always 0.
+Immediately after the header the flags start at 0xC. They are read 2 uint8s at a time for each bone. Only the first 9 bits are used and the rest is always 0.
 
 The meanings of the set bits are as follows:
 
@@ -73,8 +73,8 @@ The keyframe data (if exists) is quantized and stored as unsigned shorts. The ma
 |--------|---------------|-------------|
 | 00 | float  | Maximum value for this channel|
 | 04 | float  | Minimum value for this channel|
-| 08 | byte   | Keyframe count (animation frame count <= 255) |
-| 08 | ushort | Keyframe count (animation frame count > 255) |
+| 08 | uint8   | Keyframe count (animation frame count <= 255) |
+| 08 | uint16 | Keyframe count (animation frame count > 255) |
 
 ## Keyframe Data
 
@@ -92,7 +92,7 @@ This channel has a key for every frame of this animation. So the frame ids of ke
 
 | Variable Type | Description |
 |---------------|-------------|
-| ushort | Quantized value of this keyframe|
+| uint16 | Quantized value of this keyframe|
 
 ### Keyframe Count < Animation Frame Count
 
@@ -102,9 +102,9 @@ This channel has only keys for specific frames. Therefore the frame id is also s
 
 | Variable Type | Description |
 |---------------|-------------|
-| byte   | Frame id of this keyframe (animation frame count <= 255)|
-| ushort | Frame id of this keyframe (animation frame count > 255)|
-| ushort | Quantized value of this keyframe|
+| uint8   | Frame id of this keyframe (animation frame count <= 255)|
+| uint16 | Frame id of this keyframe (animation frame count > 255)|
+| uint16 | Quantized value of this keyframe|
 
 ## Implementation and Other Uses
 
