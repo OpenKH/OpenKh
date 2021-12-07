@@ -2,7 +2,8 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net5.0-windows</TargetFramework>
+        <LangVersion>latest</LangVersion>
 		<AssemblyTitle>BBS Map Studio</AssemblyTitle>
 		<Product>BBS Map Studio - OpenKh</Product>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -35,6 +36,7 @@
 		<ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
         <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
 		<ProjectReference Include="..\OpenKh.Tools.Common.CustomImGui\OpenKh.Tools.Common.CustomImGui.csproj" />
+        <ProjectReference Include="..\OpenKh.Tools.Common.WPF\OpenKh.Tools.Common.Wpf.csproj" />
 		<ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
 	</ItemGroup>
 
