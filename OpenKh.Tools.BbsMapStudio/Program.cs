@@ -25,12 +25,12 @@ namespace OpenKh.Tools.BbsMapStudio
         private static string GetVersion()
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
-        [Argument(0, "KH2 GamePath")]
+        [Argument(0, "BBS GamePath")]
         public string GamePath { get; }
         #endregion
 
-        const int InitialWindowWidth = 1000;
-        const int InitialWindowHeight = 800;
+        const int InitialWindowWidth = 1280;
+        const int InitialWindowHeight = 720;
         private readonly MonoGameImGuiBootstrap _bootstrap;
         private App _app;
 
