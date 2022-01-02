@@ -6,11 +6,14 @@ using System.Text;
 using Xe;
 using Xe.IO;
 using Xe.BinaryMapper;
+using OpenKh.Common.Exceptions;
 
 namespace OpenKh.Ddd
 {
 	public class Rbin
 	{
+        private const int MagicCode = 0x52415243;
+
         private class Header
         {
             [Data] public int MagicCode { get; set; }
@@ -47,6 +50,7 @@ namespace OpenKh.Ddd
             }
         }
 
+        public int Version { get; set; }
         public string MountPath { get; set; }
 
         //TEMP
@@ -55,6 +59,10 @@ namespace OpenKh.Ddd
         protected Rbin(Stream stream)
         {
             var header = BinaryMapping.ReadObject<Header>(stream);
+            if (header.MagicCode != MagicCode)
+                throw new InvalidFileException<Rbin>();
+
+            Version = header.Version;
             MountPath = header.MountPath;
 
             var entryList = Enumerable.Range(0, header.FileCount)
