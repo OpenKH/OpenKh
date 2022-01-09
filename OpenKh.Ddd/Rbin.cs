@@ -10,8 +10,8 @@ using OpenKh.Common.Exceptions;
 
 namespace OpenKh.Ddd
 {
-	public class Rbin
-	{
+    public class Rbin
+    {
         private const int MagicCode = 0x52415243;
 
         private class Header
@@ -24,7 +24,7 @@ namespace OpenKh.Ddd
             [Data(Count = 16)] public string MountPath { get; set; }
         }
 
-        public class FileEntry
+        public class TocEntry
         {
             [Data] public uint Hash { get; set; }
             [Data] public uint NameOffset { get; set; }
@@ -36,9 +36,9 @@ namespace OpenKh.Ddd
 
             public string Name { get; set; }
 
-            public static FileEntry Read(Stream stream)
+            public static TocEntry Read(Stream stream)
             {
-                var entry = BinaryMapping.ReadObject<FileEntry>(stream);
+                var entry = BinaryMapping.ReadObject<TocEntry>(stream);
                 var currOffset = stream.Position;
                 // NameOffset is realtive to it's own location and we've read it and 2 more ints since then
                 // so subtract 12 bytes
@@ -52,9 +52,7 @@ namespace OpenKh.Ddd
 
         public int Version { get; set; }
         public string MountPath { get; set; }
-
-        //TEMP
-        public List<FileEntry> FileEntries { get; set; }
+        public List<TocEntry> TOC { get; set; }
 
         protected Rbin(Stream stream)
         {
@@ -66,9 +64,9 @@ namespace OpenKh.Ddd
             MountPath = header.MountPath;
 
             var entryList = Enumerable.Range(0, header.FileCount)
-                .Select(x => FileEntry.Read(stream))
+                .Select(x => TocEntry.Read(stream))
                 .ToList();
-            FileEntries = entryList;
+            TOC = entryList;
         }
 
         public static Rbin Read(Stream stream) => new Rbin(stream);
