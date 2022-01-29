@@ -89,7 +89,7 @@ namespace OpenKh.Command.Rbin
                 }
 
                 var rbinStream = File.OpenRead(RbinFilePath);
-                var rbin = Ddd.Rbin.Read(File.OpenRead(RbinFilePath));
+                var rbin = Ddd.Rbin.Read(rbinStream);
                 // TODO: If we knew the hash algorithm this would be a binary search not a linear
                 //      one as the toc entries are sorted by hash.
                 var tocEntry = rbin.TOC.Find(f => f.Name == Target);
@@ -123,7 +123,7 @@ namespace OpenKh.Command.Rbin
                 }
 
                 var rbinStream = File.OpenRead(RbinFilePath);
-                var rbin = Ddd.Rbin.Read(File.OpenRead(RbinFilePath));
+                var rbin = Ddd.Rbin.Read(rbinStream);
                 Directory.CreateDirectory(OutputFolder);
                 foreach (var tocEntry in rbin.TOC)
                 {

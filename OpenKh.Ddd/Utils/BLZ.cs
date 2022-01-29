@@ -23,16 +23,16 @@ namespace OpenKh.Ddd.Utils
      */
     public static class BLZ
     {
-        public static byte[] Uncompress(Stream stream, int fileLength)
+        public static byte[] Uncompress(Stream stream, int fileLength, bool printWarnings = false)
         {
             if (fileLength < 8)
-                throw new Exception("Bad Length");
+                //TODO: better exception type(s) throughout this function.
+                throw new Exception("Bad File Length!");
 
             byte[] packedBytes = new byte[fileLength];
             if (stream.Read(packedBytes) < fileLength)
             {
-                //TODO: better exception type.
-                throw new Exception("Unexpected end of file");
+                throw new Exception("Unexpected end of file!");
             }
 
             var memoryStream = new MemoryStream(packedBytes);
@@ -43,8 +43,9 @@ namespace OpenKh.Ddd.Utils
             if (extraBytes == 0)
             {
                 // No compression, copy in to out, minus last 4 bytes
-                // TODO
-                throw new NotImplementedException();
+                byte[] outBuffer = new byte[fileLength - 4];
+                Buffer.BlockCopy(packedBytes, 0, outBuffer, 0, fileLength - 4);
+                return outBuffer;
             }
 
             memoryStream.Seek(-5, SeekOrigin.End);
@@ -77,8 +78,7 @@ namespace OpenKh.Ddd.Utils
                 {
                     if (bytesRead >= encodedLength)
                     {
-                        // TODO: Error
-                        throw new Exception("bad length");
+                        throw new Exception("Unexpected end of data while reading flag byte!");
                     }
                     flags = packedReader.ReadByte();
                     bytesRead++;
@@ -89,8 +89,7 @@ namespace OpenKh.Ddd.Utils
                 {
                     if (bytesRead + 1 >= encodedLength)
                     {
-                        // TODO: Error
-                        throw new Exception("bad length");
+                        throw new Exception("Unexpected end of data while reading decompression token!");
                     }
 
                     ushort info = (ushort)((packedReader.ReadByte() << 8) | packedReader.ReadByte());
@@ -99,7 +98,10 @@ namespace OpenKh.Ddd.Utils
                     var length = (info >> 12) + 3;
                     if (bytesWritten + length > bytesToWrite)
                     {
-                        // TODO: Warning
+                        if (printWarnings)
+                        {
+                            Console.WriteLine("WARN: Final decompression token longer than remaining bytes to be written. Output may be truncated.");
+                        }
                         length = bytesToWrite - bytesWritten;
                     }
                     var displacement = (info & 0xFFF) + 3;
@@ -110,8 +112,7 @@ namespace OpenKh.Ddd.Utils
                 {
                     if (bytesRead == encodedLength)
                     {
-                        // TODO: Error
-                        throw new Exception("bad length");
+                        throw new Exception("Unexpected end of data while reading literal byte!");
                     }
 
                     byte b = packedReader.ReadByte();
