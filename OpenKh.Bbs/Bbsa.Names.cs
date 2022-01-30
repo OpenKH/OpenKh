@@ -10,7 +10,7 @@ namespace OpenKh.Bbs
         public static string[] Names = TryReadLines(Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/bbsa.txt"))
             .ToArray();
 
-        public static Dictionary<uint, string> NameDictionary = Names.ToDictionary(x => GetHash(x), x => x);
+        protected static Dictionary<uint, string> NameDictionary = Names.ToDictionary(x => GetHash(x), x => x);
 
         private static IEnumerable<string> TryReadLines(string fileName) =>
             File.Exists(fileName) ? ReadLines(fileName) : new string[0];
