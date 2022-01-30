@@ -48,18 +48,6 @@ namespace OpenKh.Bbs
             public string Name => $"{FolderName}/{FileName}";
             public bool HasCompleteName => fileName != null && folderName != null;
 
-            //public string CalculateNameWithExtension(Func<int, Stream> bbsaLoader)
-            //{
-            //    if (!CalculateArchiveOffset(bbsaHeader, offset, out var archiveIndex, out var physicalSector))
-            //        return Name;
-
-            //    var stream = bbsaLoader(archiveIndex);
-            //    var extension = (string.IsNullOrEmpty(ext)) ? CalculateExtension(stream, physicalSector * SectorLength) : ext;
-            //    if (extension == null)
-            //        return Name;
-
-            //    return $"{Name}.{extension}";
-            //}
             public string CalculateNameWithExtension(Func<int, Stream> bbsaLoader)
             {
                 if (!CalculateArchiveOffset(bbsaHeader, offset, out var archiveIndex, out var physicalSector))
@@ -209,50 +197,6 @@ namespace OpenKh.Bbs
                     return null;
             }
         }
-        //private static string CalculateExtension(Stream stream, int offset)
-        //{
-        //    stream.Position = offset;
-        //    var magicCode = new BinaryReader(stream).ReadUInt32();
-        //    switch (magicCode)
-        //    {
-        //        case 0x61754C1B:
-        //            return "lub";
-        //        case 0x41264129:
-        //            return "ice";
-        //        case 0x44544340:
-        //            return "ctd";
-        //        case 0x50444540:
-        //            return "edp";
-        //        case 0x00435241:
-        //            return "arc";
-        //        case 0x44424D40:
-        //            return "mbd";
-        //        case 0x00444145:
-        //            return "ead";
-        //        case 0x07504546:
-        //            return "fep";
-        //        case 0x00425449:
-        //            return "itb";
-        //        case 0x00435449:
-        //            return "itc";
-        //        case 0x00455449:
-        //            return "ite";
-        //        case 0x004D4150:
-        //            return "pam";
-        //        case 0x004F4D50:
-        //            return "pmo";
-        //        case 0x42444553:
-        //            return "scd";
-        //        case 0x324D4954:
-        //            return "tm2";
-        //        case 0x00415854:
-        //            return "txa";
-        //        case 0x00617865:
-        //            return "exa";
-        //        default:
-        //            return null;
-        //    }
-        //}
 
         private static string CalculateFolderName(uint hash)
         {
