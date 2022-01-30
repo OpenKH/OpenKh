@@ -279,8 +279,10 @@ namespace OpenKh.Bbs
         }
 
         private const int LbaLength = 8;
-        public readonly Header _header;
+        protected readonly Header _header;
         protected readonly ArchivePartitionHeader _header2;
+
+        public Header GetHeader() => _header;
 
         protected Bbsa(Stream stream)
         {
@@ -298,10 +300,11 @@ namespace OpenKh.Bbs
             _header2.Partitions = ReadPartitions<ArchivePartitionEntry>(stream, header2Offset + 8, _header2.PartitionCount);
             ReadPartitionLba(_header2.Partitions, stream, header2Offset + _header2.PartitionEntriesOffset);
             //ReadArcEntries(_header2.Partitions, stream, header2Offset + _header2.ArcEntriesOffset);
+            //Thanks Thamstras for the structure information, ArcEntries extraction and repacking to be implemented 
         }
 
         #region Repack
-        public struct TempHeader
+        protected struct TempHeader
         {
             public uint Archive1Sector;
             public uint Archive2Sector;
@@ -369,7 +372,7 @@ namespace OpenKh.Bbs
                 #endregion//Used on Write
 
                 string containerPath = Path.Combine(inputFilesFolderPath, $"{prefix}{i}");
-
+                
                 foreach (var file in bbsa.Files.Where(x => x.ArchiveIndex == i).OrderBy(x=>x.offset))
                 {
                     var name = file.CalculateNameWithExtension(x => streams[x]);
@@ -426,7 +429,7 @@ namespace OpenKh.Bbs
             OUTstreams[4].Close();
         }
 
-        public static TempHeader GetHeader(Bbsa bbsa, string inputFilesFolderPath, string prefix, FileStream[] streams, out uint bbs4Count)
+        protected static TempHeader GetHeader(Bbsa bbsa, string inputFilesFolderPath, string prefix, FileStream[] streams, out uint bbs4Count)
         {
             uint bbs4Sec = 0;
             TempHeader tempHeader = new TempHeader();//Used to count sectors in containers
@@ -482,25 +485,25 @@ namespace OpenKh.Bbs
             bbs4Count = bbs4Sec;
             return tempHeader;
         }
-        public static void WriteBytes(byte[] bytes, Stream destination, uint destinationOffset)
+        private static void WriteBytes(byte[] bytes, Stream destination, uint destinationOffset)
         {
             destination.Position = destinationOffset;
             foreach (var b in bytes)
                 destination.WriteByte(b);
         }
-        public static void WriteUint(uint value, Stream destination, uint destinationOffset)
+        private static void WriteUint(uint value, Stream destination, uint destinationOffset)
         {
             byte[] valueBytes = BitConverter.GetBytes((UInt32)value);
             WriteBytes(valueBytes, destination, destinationOffset);
         }
-        public static uint GetFileSectorSize(uint length)
+        private static uint GetFileSectorSize(uint length)
         {
             uint result = length;
             while (length % 0x800 != 0)
                 result++;
             return (uint)(result / 0x800);
         }
-        public static int GetArchiveIndex(Header header, int offset)
+        protected static int GetArchiveIndex(Header header, int offset)
         {
             int archiveIndex = 0;
             if (offset >= header.Archive4Sector)
@@ -529,7 +532,7 @@ namespace OpenKh.Bbs
             }
             return archiveIndex;
         }
-        public static int GetFileOffset(TempHeader header, int baseOffset, int partIndex)
+        protected static int GetFileOffset(TempHeader header, int baseOffset, int partIndex)
         {
             int resultOffset = 0;
             var temp = header;
