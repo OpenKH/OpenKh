@@ -215,5 +215,5 @@ namespace OpenKh.Bbs
 
             return string.Format(pathCategory, strLanguage, strWorld);
         }
-    }
+    } 
 }
