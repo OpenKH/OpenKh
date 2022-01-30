@@ -149,7 +149,7 @@ namespace OpenKh.Command.Bbsa
                     var offs = kk >> 12;
                     var siz = kk & 0xFFF;
                     var info = (offs << 12) + siz;
-                    Bbs.Bbsa.CalculateArchiveOffset(bbsa._header, file.offset, out var nuind, out var coffs);
+                    Bbs.Bbsa.CalculateArchiveOffset(bbsa.GetHeader(), file.offset, out var nuind, out var coffs);
 
                     Console.WriteLine(name + $" -- {prefix}{file.ArchiveIndex}.DAT");
 
@@ -236,7 +236,7 @@ namespace OpenKh.Command.Bbsa
                             var offs = kk >> 12;
                             var siz = kk & 0xFFF;
                             var info = (offs << 12) + siz;
-                            Bbs.Bbsa.CalculateArchiveOffset(bbsa._header, file.offset, out var nuind, out var coffs);
+                            Bbs.Bbsa.CalculateArchiveOffset(bbsa.GetHeader(), file.offset, out var nuind, out var coffs);
 
                             if (DetailedLog)
                             {
