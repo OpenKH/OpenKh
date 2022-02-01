@@ -53,6 +53,10 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ca206 | Calypso/Tia Dalma
 | n_ca209 | Cutler Beckett
 | n_ca210 | Joshamee Gibbs
+| n_db211 | Ira
+| n_db212 | Invi
+| n_db213 | Aced
+| n_db215 | Gula
 | n_db217 | Chirithy
 | n_db218 | Ephemer
 | n_dw003 | Mickey (0.2)
@@ -84,6 +88,10 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ex016 | Evan
 | n_ex017 | Aeleus
 | n_ex018 | Ienzo
+| n_ex019 | Leon
+| n_ex020 | Aerith
+| n_ex021 | Yuffie
+| n_ex022 | Cid
 | n_ex023 | Sora (KH3)
 | n_ex024 | Eraqus
 | n_ex028 | Moogle (With Balloon)
@@ -98,6 +106,18 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ex040 | Aqua (No Cloth)
 | n_ex041 | Roxas (Coat Hooded)
 | n_ex042 | Xehanort (Shadow Form)
+| n_ex044 | Hooded Organization Member
+| n_ex045 | Young Xehanort
+| n_ex046 | Ansem the Wise
+| n_ex047 | Even
+| n_ex050 | Lingering Will
+| n_ex051 | Lingering Will (Armor Pieces)
+| n_ex053 | Lingering Will
+| n_ex054 | Lingering Will
+| n_ex055 | Lingering Will
+| n_ex060 | Kairi (KH3)
+| n_ex070 | Kairi (KH3)
+| n_ex071 | Namine
 | n_ex100 | Maleficent
 | n_ex101 | Pete
 | n_ex102 | Jiminy Cricket
@@ -111,6 +131,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ex110 | Dewey (?)
 | n_ex111 | Louie (?)
 | n_ex112 | Merlin
+| n_ex113 | Fairy Godmother
 | n_fz201 | Anna
 | n_fz202 | Elsa
 | n_fz203 | Kristoff
