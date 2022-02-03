@@ -63,13 +63,13 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_dw202 | Riku (KH1)
 | n_dw205 | Ansem the Wise (Coat)
 | n_dw208 | Ansem the Wise (Coat Unhooded)
-| n_ew001 | Donald (Monsters Inc)
-| n_ew002 | Goofy
-| n_ew003 | Mickey (Final World Clones)
-| n_ew004 | Riku (Final World Clones)
-| n_ew005 | Aqua (Final World Clones)
-| n_ew006 | Ventus (Final World Clones)
-| n_ew007 | Lea (Final World Clones)
+| n_ew001 | Donald (Final World)
+| n_ew002 | Goofy (Final World)
+| n_ew003 | Mickey (Final World)
+| n_ew004 | Riku (Final World)
+| n_ew005 | Aqua (Final World)
+| n_ew006 | Ventus (Final World)
+| n_ew007 | Lea (Final World)
 | n_ew008 | Sora (Final World Clones)
 | n_ex001 | Donald
 | n_ex002 | Goofy
