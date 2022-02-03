@@ -209,7 +209,7 @@ namespace OpenKh.Command.Bbsa
             public bool Log { get; set; }
 
             [Option(CommandOptionType.SingleValue, Description = "List all files from desired BBS{x}.DAT index archive.", ShortName = "i", LongName = "index")]
-            public int Index { get; set; }
+            public int Index { get; set; } = -1;
 
             protected int OnExecute(CommandLineApplication app)
             {
