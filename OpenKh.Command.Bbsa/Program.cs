@@ -145,34 +145,38 @@ namespace OpenKh.Command.Bbsa
                     if (!Directory.Exists(destinationFolder))
                         Directory.CreateDirectory(destinationFolder);
                     streams[0].Position = file.Location + 4;
-                    var kk = new BinaryReader(streams[0]).ReadUInt32();
-                    var offs = kk >> 12;
-                    var siz = kk & 0xFFF;
-                    var info = (offs << 12) + siz;
+                    
                     Bbs.Bbsa.CalculateArchiveOffset(bbsa.GetHeader(), file.offset, out var nuind, out var coffs);
 
                     Console.WriteLine(name + $" -- {prefix}{file.ArchiveIndex}.DAT");
 
-                    if (detailed)
+                    if (detailed || log)
                     {
-                        Console.WriteLine($"OffsetStr: 0x{file.Location.ToString("X2")} on BBS0\n" +
-                                $"PointerValue: 0x{kk.ToString("X2")}\n" +
+                        var reader = new BinaryReader(streams[0]).ReadUInt32();
+                        var offs = reader >> 12;
+                        var siz = reader & 0xFFF;
+                        var info = (offs << 12) + siz;
+
+                        Console.WriteLine($"OffsetStr: 0x{file.Location.ToString("X2")} on BBS{file.ArchiveIndex}\n" +
+                                $"PointerValue: 0x{reader.ToString("X2")}\n" +
                                 $"CalculatedOffset: {coffs}\n" +
                                 $"Offset: {offs}\n" +
                                 $"Size: 0x{siz.ToString("X2")} Sectors\n" +
                                 $"\nSupraInfo: 0x{info.ToString("X2")}\n");
+
+                        if (log)
+                        {
+                            Sb.AppendLine(file.Name + $" -- {prefix}{file.ArchiveIndex}.DAT" +
+                                        $"\r\nOffsetStr: 0x{file.Location.ToString("X2")} on BBS{file.ArchiveIndex}\r\n" +
+                                            $"PointerValue: 0x{reader.ToString("X2")}\r\n" +
+                                            $"CalculatedOffset: {coffs}\r\n" +
+                                            $"Offset: {offs}\r\n" +
+                                            $"Size: 0x{siz.ToString("X2")} Sectors\r\n" +
+                                            $"\nSupraInfo: 0x{info.ToString("X2")}\r\n-------------//--------------\r\n");
+                        }
+
                     }
 
-                    if (log)
-                    {
-                        Sb.AppendLine(file.Name + $" -- {prefix}{file.ArchiveIndex}.DAT" +
-                                    $"\r\nOffsetStr: 0x{file.Location.ToString("X2")} on BBS0\r\n" +
-                                        $"PointerValue: 0x{kk.ToString("X2")}\r\n" +
-                                        $"CalculatedOffset: {coffs}\r\n" +
-                                        $"Offset: {offs}\r\n" +
-                                        $"Size: 0x{siz.ToString("X2")} Sectors\r\n" +
-                                        $"\nSupraInfo: 0x{info.ToString("X2")}\r\n-------------//--------------\r\n");
-                    }
 
                     using (var outStream = File.Create(destinationFileName))
                         bbsaFileStream.CopyTo(outStream);
@@ -219,50 +223,50 @@ namespace OpenKh.Command.Bbsa
                 var bbsa = Bbs.Bbsa.Read(stream);
 
                 StringBuilder Sb = null;
+
                 if (Log)
                 {
                     Sb = new StringBuilder();
                     Sb.Append($"OpenKingdomHearts BirthBySleep Archive Command Ansem Report\r\n{DateTime.Now.ToString("F")}\r\n\r\n");
                 }
-                int i = Index >= 0 ? Index: 0;
 
-                for (; i < 5; i++)
+                foreach (var file in Index >= 0 ? bbsa.Files.Where(x => x.ArchiveIndex == Index) : bbsa.Files)
                 {
-                    foreach (var file in bbsa.Files.Where(x => x.ArchiveIndex==i))
+                    Console.WriteLine(file.Name + $" -- {prefix}{file.ArchiveIndex}.DAT");
+                    stream.Position = file.Location + 4;
+                    
+                    Bbs.Bbsa.CalculateArchiveOffset(bbsa.GetHeader(), file.offset, out var nuind, out var coffs);
+
+                    if (DetailedLog || Log)
                     {
-                            Console.WriteLine(file.Name + $" -- {prefix}{file.ArchiveIndex}.DAT");
-                            stream.Position = file.Location + 4;
-                            var kk = new BinaryReader(stream).ReadUInt32();
-                            var offs = kk >> 12;
-                            var siz = kk & 0xFFF;
-                            var info = (offs << 12) + siz;
-                            Bbs.Bbsa.CalculateArchiveOffset(bbsa.GetHeader(), file.offset, out var nuind, out var coffs);
+                        var reader = new BinaryReader(stream).ReadUInt32();
+                        var offs = reader >> 12;
+                        var siz = reader & 0xFFF;
+                        var info = (offs << 12) + siz;
 
-                            if (DetailedLog)
-                            {
-                                Console.WriteLine($"\nOffsetStr: 0x{file.Location.ToString("X2")} on BBS0\n" +
-                                    $"PointerValue: 0x{kk.ToString("X2")}\n" +
-                                    $"CalculatedOffset: {coffs}\n" +
-                                    $"Offset: {offs}\n" +
-                                    $"Size: 0x{siz.ToString("X2")} Sectors\n" +
-                                    $"\nSupraInfo: 0x{info.ToString("X2")}");
-                                if (WaitEachFile)
-                                    Console.ReadLine();
-                            }
+                        Console.WriteLine($"\nOffsetStr: 0x{file.Location.ToString("X2")} on BBS{file.ArchiveIndex}\n" +
+                            $"PointerValue: 0x{reader.ToString("X2")}\n" +
+                            $"CalculatedOffset: {coffs}\n" +
+                            $"Offset: {offs}\n" +
+                            $"Size: 0x{siz.ToString("X2")} Sectors\n" +
+                            $"\nSupraInfo: 0x{info.ToString("X2")}");
+                        if (WaitEachFile)
+                            Console.ReadLine();
 
-                            if (Log)
-                            {
-                                Sb.AppendLine(file.Name + $" -- {prefix}{file.ArchiveIndex}.DAT" +
-                                    $"\r\nOffsetStr: 0x{file.Location.ToString("X2")} on BBS0\r\n" +
-                                        $"PointerValue: 0x{kk.ToString("X2")}\r\n" +
-                                        $"CalculatedOffset: {coffs}\r\n" +
-                                        $"Offset: {offs}\r\n" +
-                                        $"Size: 0x{siz.ToString("X2")} Sectors\r\n" +
-                                        $"\nSupraInfo: 0x{info.ToString("X2")}\r\n-------------//--------------\r\n");
-                            }
+                        if (Log)
+                        {
+                            Sb.AppendLine(file.Name + $" -- {prefix}{file.ArchiveIndex}.DAT" +
+                                $"\r\nOffsetStr: 0x{file.Location.ToString("X2")} on BBS{file.ArchiveIndex}\r\n" +
+                                    $"PointerValue: 0x{reader.ToString("X2")}\r\n" +
+                                    $"CalculatedOffset: {coffs}\r\n" +
+                                    $"Offset: {offs}\r\n" +
+                                    $"Size: 0x{siz.ToString("X2")} Sectors\r\n" +
+                                    $"\nSupraInfo: 0x{info.ToString("X2")}\r\n-------------//--------------\r\n");
+                        }
                     }
-                }
 
+                   
+                }
 
                 if (Log)
                 {
