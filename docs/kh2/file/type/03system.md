@@ -639,7 +639,7 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 | 10 	 | short | PosY
 | 12 	 | short | PosZ
 | 14 	 | byte | Extra Inventory Bitmask (Get other items from unlocked shops)
-| 15 	 | byte | Sound Id (When the shop is open)
+| 15 	 | byte | Sound Id (When the shop is opened)
 | 16 	 | short | Inventory count
 | 18 	 | byte | Unk18 (Id?) - [SHOP LIST](../../dictionary/shops.md)
 | 19 	 | byte | Unk19
