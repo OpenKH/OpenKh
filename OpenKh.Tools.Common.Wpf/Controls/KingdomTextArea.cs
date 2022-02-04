@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Windows;
 using OpenKh.Engine.Renders;
 
-namespace OpenKh.Tools.Common.Controls
+namespace OpenKh.Tools.Common.Wpf.Controls
 {
     public class KingdomTextArea : DrawPanel
     {

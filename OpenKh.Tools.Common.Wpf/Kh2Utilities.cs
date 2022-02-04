@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Common;
 using OpenKh.Common.Exceptions;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using Xe.Tools.Wpf.Dialogs;
 using System.Linq;
 using System;
 
-namespace OpenKh.Tools.Common
+namespace OpenKh.Tools.Common.Wpf
 {
     public class Kh2Utilities
     {

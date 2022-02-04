@@ -1,5 +1,5 @@
-﻿using OpenKh.Imaging;
-using OpenKh.Tools.Common;
+using OpenKh.Imaging;
+using OpenKh.Tools.Common.Wpf;
 using System.Windows.Media.Imaging;
 using Xe.Tools;
 

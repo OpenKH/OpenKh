@@ -2,7 +2,7 @@
 
 ITC stands for *ITem Collection* and it seems to contain the list of items obtained through collectibles. In this case, just the crowns for stickers.
 
-Located in the `ITEM` folder.
+This file can be found in the `item` folder or within `arc/system/common_xx.arc` where `xx` is the first two letters of the character it belongs to, for example `Aq` for Aqua.
 
 ## Header
 

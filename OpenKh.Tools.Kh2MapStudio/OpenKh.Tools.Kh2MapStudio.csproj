@@ -27,7 +27,7 @@
 		<PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
 		<PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.7" />
 		<PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
-		<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
+		<PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -35,6 +35,7 @@
 		<ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
 		<ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
 		<ProjectReference Include="..\OpenKh.Tools.Common.CustomImGui\OpenKh.Tools.Common.CustomImGui.csproj" />
+		<ProjectReference Include="..\OpenKh.Tools.Common.WPF\OpenKh.Tools.Common.Wpf.csproj" />
 		<ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
 	</ItemGroup>
 

@@ -1,12 +1,12 @@
-﻿using OpenKh.Engine.Renderers;
+using OpenKh.Engine.Renderers;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
 using System.Drawing;
 using System.Windows;
-using static OpenKh.Tools.Common.DependencyPropertyUtils;
+using static OpenKh.Tools.Common.Wpf.DependencyPropertyUtils;
 using OpenKh.Engine.Renders;
 
-namespace OpenKh.Tools.Common.Controls
+namespace OpenKh.Tools.Common.Wpf.Controls
 {
     public class SequenceRendererPanel : DrawPanel
     {

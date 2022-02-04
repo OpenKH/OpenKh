@@ -8,7 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 
-namespace OpenKh.Tools.Common
+namespace OpenKh.Tools.Common.Wpf
 {
     /// <summary>
     /// Interaction logic for MessageDialog.xaml

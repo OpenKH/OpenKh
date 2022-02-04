@@ -18,15 +18,15 @@ The `WorldName` is calculated from `World ID` using the [world](worlds.md) table
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | int   | File identifier, always set to `1`
-| 04     | int   | [Event entries](#event-entry) count
+| 0x0     | int32   | File identifier, always set to `1`
+| 0x4     | int32   | [Event entries](#event-entry) count
 
 ### Event entry
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | short | Global event unique identifier
-| 02     | short | Event index
-| 04     | byte  | World ID
-| 05     | byte  | Room ID
-| 06     | short | Unknown
+| 0x0     | int16 | Global event unique identifier
+| 0x2     | int16 | Event index
+| 0x4     | uint8 | World ID
+| 0x5     | uint8 | Room ID
+| 0x6     | int16 | Unknown

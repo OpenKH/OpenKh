@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2TextEditor.Views"
-             xmlns:controls="clr-namespace:OpenKh.Tools.Common.Controls;assembly=OpenKh.Tools.Common"
+             xmlns:controls="clr-namespace:OpenKh.Tools.Common.Wpf.Controls;assembly=OpenKh.Tools.Common.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="250" d:DesignWidth="400">
     <Grid>

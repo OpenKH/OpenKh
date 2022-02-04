@@ -1,6 +1,6 @@
 using OpenKh.Bbs;
 using OpenKh.Common;
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

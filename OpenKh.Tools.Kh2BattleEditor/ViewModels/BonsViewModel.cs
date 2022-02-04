@@ -1,6 +1,6 @@
 using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
-using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Common.Wpf.Models;
 using OpenKh.Tools.Kh2BattleEditor.Extensions;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
 using OpenKh.Tools.Kh2BattleEditor.Services;
