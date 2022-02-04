@@ -348,7 +348,7 @@ Conditionals for the script based on the entrance.
 
 #### Unknown1d
 
-Auto revert Sora when the room is entered if the argument is 4 and disables drive if the argument is 5. Used 196 times.
+Determines Sora's stats. Value of 4 Auto revert Sora when the room is entered, 5 disables drive, 6 enables using forms alone, while 1 or 3 have unknown effects. Used 196 times.
 
 #### BattleLevel
 
