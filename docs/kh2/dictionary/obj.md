@@ -1,8 +1,8 @@
 # [Kingdom Hearts II](index.md) - Objects (Entities)
 
-| Id       |   Filename    | obj (Entity)
-|------------|---------------|---------------|
-1 | M_EX060 | (M) Fat Bandit |
+| Id       |   Filename    | obj (Entity) |
+|----------|---------------|--------------|
+| 1 | M_EX060 | (M) Fat Bandit |
 | 2 | M_EX500 | (M) Trick Ghost |
 | 3 | M_EX510 | (M) Rabid Dog |
 | 4 | M_EX520 | (M) Hook Bat |

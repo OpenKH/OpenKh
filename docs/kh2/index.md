@@ -1,6 +1,6 @@
-# Kingdom Hearts II
+# Kingdom Hearts II - Back to [Index](../index.md)
 
-## General documentation
+## General Documentation
 
 * [Games builds](builds.md)
 * [Editions](editions.md)

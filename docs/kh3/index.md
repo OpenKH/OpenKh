@@ -1,4 +1,4 @@
-# Kingdom Hearts III
+# Kingdom Hearts III - Back to [Index](../index.md)
 
 ## General documentation
 

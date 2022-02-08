@@ -1,4 +1,4 @@
-# Kingdom Hearts VR
+# Kingdom Hearts VR - Back to [Index](../../index.md)
 
 ## General Documentation
 

@@ -1,4 +1,4 @@
-# Kingdom Hearts 358/2 Days
+# Kingdom Hearts 358/2 Days - Back to [Index](../../index.md)
 
 ## General Documentation
 

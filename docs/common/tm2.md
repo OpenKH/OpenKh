@@ -1,4 +1,4 @@
-# TM2 - PlayStation 2 texture format
+# TM2 (PlayStation 2 texture format) - Back to [Index](../index.md)
 
 As the title suggests, this is the texture format used by PlayStation 2 games, not only Kingdom Hearts.
 
