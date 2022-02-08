@@ -631,14 +631,15 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | short | Id?
-| 2 	 | short | Unlock (The items that will be unlocked in TT & HB)
+| 0 	 | short | [Command Argument](#cmd)
+| 2 	 | short | Unlock Menu Flag (Unlocks items for extra inventory)
 | 4 	 | short | Name Id
 | 6 	 | short | Shop keeper entity - [OBJ LIST](../../dictionary/obj.md)
 | 8 	 | short | PosX
 | 10 	 | short | PosY
 | 12 	 | short | PosZ
-| 14 	 | short | Sound Id (When the shop is open)
+| 14 	 | byte | Extra Inventory Bitmask (Get other items from unlocked shops)
+| 15 	 | byte | Sound Id (When the shop is opened)
 | 16 	 | short | Inventory count
 | 18 	 | byte | Unk18 (Id?) - [SHOP LIST](../../dictionary/shops.md)
 | 19 	 | byte | Unk19
