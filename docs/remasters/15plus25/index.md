@@ -1,4 +1,4 @@
-# Kingdom Hearts HD 1.5 + 2.5 ReMIX
+# Kingdom Hearts HD 1.5 + 2.5 ReMIX - Back to [Index](../../index.md)
 
 ## General documentation
 
