@@ -158,7 +158,8 @@ namespace OpenKh.Egs
                 // We don't know this filename, we ignore it
                 if (!Names.TryGetValue(hash, out var filename))
                 {
-                    throw new Exception("Unknown filename!");
+                    Console.WriteLine($"Unknown filename (hash: {hash})");
+                    continue;
                 }
 
                 if (patchFiles.Contains(filename))
@@ -196,6 +197,10 @@ namespace OpenKh.Egs
             #region Data
 
             using var newFileStream = File.OpenRead(completeFilePath);
+            bool RemasterExist = false;
+            string RemasteredPath = completeFilePath.Replace("\\original\\", "\\remastered\\");
+            if (Directory.Exists(RemasteredPath))
+                RemasterExist = true;
 
             var header = new EgsHdAsset.Header()
             {
@@ -215,6 +220,12 @@ namespace OpenKh.Egs
                 header.CompressedLength = compressedData.Length;
             }
 
+            SDasset sdasset = new SDasset(filename, decompressedData, RemasterExist);
+            RemasterExist = false;
+
+            if (sdasset != null && !sdasset.Invalid)
+                header.RemasteredAssetCount = sdasset.TextureCount;
+
             // Encrypt and write current file data in the PKG stream
             // The seed used for encryption is the original data header
             var seed = new MemoryStream();
@@ -226,8 +237,17 @@ namespace OpenKh.Egs
             // Write original file header
             BinaryMapping.WriteObject<EgsHdAsset.Header>(pkgStream, header);
 
-            // Make sure to write the original file after remastered assets headers
-            pkgStream.Write(encryptedData);
+            if (header.RemasteredAssetCount > 0)
+            {
+                // Create an "Asset" to pass to ReplaceRemasteredAssets
+                EgsHdAsset asset = new EgsHdAsset(header, decompressedData, encryptedData, encryptionSeed);
+                ReplaceRemasteredAssets(inputFolder, filename, asset, pkgStream, encryptionSeed, encryptedData, sdasset);
+            }
+            else
+            {
+                // Make sure to write the original file after remastered assets headers
+                pkgStream.Write(encryptedData);
+            }
 
             #endregion
 
@@ -239,6 +259,11 @@ namespace OpenKh.Egs
                 DataLength = (int)(pkgStream.Position - offset),
                 Offset = offset
             };
+
+            //if (!Names.TryGetValue(Helpers.ToString(hedHeader.MD5), out var existingfilename))
+            //{
+            //    File.AppendAllText("resources/custom_filenames.txt", filename + "\n");
+            //}
 
             BinaryMapping.WriteObject<Hed.Entry>(hedStream, hedHeader);
 
@@ -272,13 +297,26 @@ namespace OpenKh.Egs
             var encryptedData = asset.OriginalRawData;
             var encryptionSeed = asset.Seed;
 
+            SDasset sdasset = null;
             // We want to replace the original file
             if (File.Exists(completeFilePath))
             {
+                bool RemasterExist = false;
                 Console.WriteLine($"Replacing original: {filename}!");
+                string RemasteredPath = completeFilePath.Replace("\\original\\","\\remastered\\");
+                if (Directory.Exists(RemasteredPath))
+                {
+                    Console.WriteLine($"Remastered Folder Exists! Path: {RemasteredPath}");
+                    RemasterExist = true;
+                }
 
                 using var newFileStream = File.OpenRead(completeFilePath);
                 decompressedData = newFileStream.ReadAllBytes();
+
+                sdasset = new SDasset(filename, decompressedData, RemasterExist);
+
+                if (sdasset != null && !sdasset.Invalid)
+                    header.RemasteredAssetCount = sdasset.TextureCount;
 
                 var compressedData = decompressedData.ToArray();
                 var compressedDataLenght = originalHeader.CompressedLength;
@@ -292,7 +330,6 @@ namespace OpenKh.Egs
 
                 header.CompressedLength = compressedDataLenght;
                 header.DecompressedLength = decompressedData.Length;
-
                 // Encrypt and write current file data in the PKG stream
 
                 // The seed used for encryption is the original data header
@@ -311,7 +348,7 @@ namespace OpenKh.Egs
             // Is there remastered assets?
             if (header.RemasteredAssetCount > 0)
             {
-                remasteredHeaders = ReplaceRemasteredAssets(inputFolder, filename, asset, pkgStream, encryptionSeed, encryptedData);
+                remasteredHeaders = ReplaceRemasteredAssets(inputFolder, filename, asset, pkgStream, encryptionSeed, encryptedData, sdasset);
             }
             else
             {
@@ -342,32 +379,60 @@ namespace OpenKh.Egs
             return hedHeader;
         }
 
-        private static List<EgsHdAsset.RemasteredEntry> ReplaceRemasteredAssets(string inputFolder, string originalFile, EgsHdAsset asset, FileStream pkgStream, byte[] seed, byte[] originalAssetData)
+        private static List<EgsHdAsset.RemasteredEntry> ReplaceRemasteredAssets(string inputFolder, string originalFile, EgsHdAsset asset, FileStream pkgStream, byte[] seed, byte[] originalAssetData, SDasset sdasset)
         {
             var newRemasteredHeaders = new List<EgsHdAsset.RemasteredEntry>();
+            var oldRemasteredHeaders = new List<EgsHdAsset.RemasteredEntry>();
             var relativePath = Helpers.GetRelativePath(originalFile, Path.Combine(inputFolder, ORIGINAL_FILES_FOLDER_NAME));
             var remasteredAssetsFolder = Path.Combine(inputFolder, REMASTERED_FILES_FOLDER_NAME, relativePath);
 
             var allRemasteredAssetsData = new MemoryStream();
-            // 0x30 is the size of this header
-            var totalRemasteredAssetHeadersSize = asset.RemasteredAssetHeaders.Count() * 0x30;
-            // This offset is relative to the original asset data
-            var offset = totalRemasteredAssetHeadersSize + 0x10 + asset.OriginalAssetHeader.DecompressedLength;
-
-            if (offset != asset.RemasteredAssetHeaders.Values.First().Offset)
-            {
-                throw new Exception("Something is wrong here!");
-            }
 
             foreach (var remasteredAssetHeader in asset.RemasteredAssetHeaders.Values)
             {
+                oldRemasteredHeaders.Add(remasteredAssetHeader);
+            }
+
+            //At the moment this only applies on fresh PKGs (or ones that haven't been patched with this modded MDLX before, otherwise we'd neet to analyse ALL MDLX files)
+            if (sdasset != null && !sdasset.Invalid)
+            {
+                //File.AppendAllText("custom_hd_assets.txt", "HD assets for: " + originalFile + "\n");
+                while (oldRemasteredHeaders.Count > sdasset.TextureCount)
+                {
+                    //File.AppendAllText("custom_hd_assets.txt", "Removing: -" + (oldRemasteredHeaders.Count - 1) + ".dds\n");
+                    oldRemasteredHeaders.RemoveAt(oldRemasteredHeaders.Count - 1);
+                }
+                while (oldRemasteredHeaders.Count < sdasset.TextureCount)
+                {
+                    var newRemasteredAssetHeader = new EgsHdAsset.RemasteredEntry()
+                    {
+                        CompressedLength = 0,
+                        DecompressedLength = 0,
+                        Name = "-" + oldRemasteredHeaders.Count + ".dds",
+                        Offset = 0,
+                        OriginalAssetOffset = 0
+                    };
+                    //File.AppendAllText("custom_hd_assets.txt", "Adding: -" + oldRemasteredHeaders.Count + ".dds\n");
+                    oldRemasteredHeaders.Add(newRemasteredAssetHeader);
+                }
+                //File.AppendAllText("custom_hd_assets.txt", "\n");
+            }
+
+            // 0x30 is the size of this header
+            var totalRemasteredAssetHeadersSize = oldRemasteredHeaders.Count() * 0x30;
+            // This offset is relative to the original asset data
+            var offset = totalRemasteredAssetHeadersSize + 0x10 + asset.OriginalAssetHeader.DecompressedLength;
+
+            for (int i = 0; i < oldRemasteredHeaders.Count; i++)
+            {
+                var remasteredAssetHeader = oldRemasteredHeaders[i];
                 var filename = remasteredAssetHeader.Name;
                 var assetFilePath = Path.Combine(remasteredAssetsFolder, filename);
 
                 // Use base remastered asset data
-                var assetData = asset.RemasteredAssetsCompressedData[filename];
+                var assetData = asset.RemasteredAssetsDecompressedData.ContainsKey(filename) ? asset.RemasteredAssetsDecompressedData[filename] : new byte[] { };
                 var decompressedLength = remasteredAssetHeader.DecompressedLength;
-
+                var originalAssetOffset = remasteredAssetHeader.OriginalAssetOffset;
                 if (File.Exists(assetFilePath))
                 {
                     Console.WriteLine($"Replacing remastered file: {relativePath}/{filename}");
@@ -376,20 +441,25 @@ namespace OpenKh.Egs
                     decompressedLength = assetData.Length;
                     assetData = remasteredAssetHeader.CompressedLength > -1 ? Helpers.CompressData(assetData) : assetData;
                     assetData = remasteredAssetHeader.CompressedLength > -2 ? EgsEncryption.Encrypt(assetData, seed) : assetData;
+                    if (sdasset != null && !sdasset.Invalid)
+                        originalAssetOffset = sdasset.Offsets[i];
                 }
                 else
                 {
-                    Console.WriteLine($"Keeping remastered file: {relativePath}/{filename}");
-
+                    //Console.WriteLine($"Keeping remastered file: {relativePath}/{filename}");
                     // The original file have been replaced, we need to encrypt all remastered asset with the new key
                     if (!seed.SequenceEqual(asset.Seed))
                     {
-                        assetData = asset.RemasteredAssetsDecompressedData[filename];
                         assetData = remasteredAssetHeader.CompressedLength > -1 ? Helpers.CompressData(assetData) : assetData;
                         assetData = remasteredAssetHeader.CompressedLength > -2 ? EgsEncryption.Encrypt(assetData, seed) : assetData;
+                        if (sdasset != null && !sdasset.Invalid && sdasset.TextureCount >= i)
+                            originalAssetOffset = sdasset.Offsets[i];
+                    }
+                    else
+                    {
+                        assetData = asset.RemasteredAssetsCompressedData.ContainsKey(filename) ? asset.RemasteredAssetsCompressedData[filename] : new byte[] { };
                     }
                 }
-
                 var compressedLength = remasteredAssetHeader.CompressedLength > -1 ? assetData.Length : remasteredAssetHeader.CompressedLength;
 
                 var newRemasteredAssetHeader = new EgsHdAsset.RemasteredEntry()
@@ -398,7 +468,7 @@ namespace OpenKh.Egs
                     DecompressedLength = decompressedLength,
                     Name = filename,
                     Offset = offset,
-                    Unknown24 = remasteredAssetHeader.Unknown24
+                    OriginalAssetOffset = originalAssetOffset
                 };
 
                 newRemasteredHeaders.Add(newRemasteredAssetHeader);
@@ -440,10 +510,271 @@ namespace OpenKh.Egs
                 if (!Names.TryGetValue(hash, out var fileName))
                     fileName = $"{hash}.dat";
 
-                Console.WriteLine(fileName);
+                //Console.WriteLine(fileName);
             }
         }
 
         #endregion
+    }
+
+    class SDasset
+    {
+        public List<int> Offsets = new List<int>();
+        public int TextureCount = 0;
+        public bool Invalid = true;
+
+        public SDasset(string name, byte[] originalAssetData, bool remasterpathtrue)
+        {
+            dynamic asset = null;
+            switch (Path.GetExtension(name), remasterpathtrue)
+            {
+                case (".2dd", true):
+                    asset = new BAR(originalAssetData);
+                    break;
+                case (".2ld", true):
+                    asset = new BAR(originalAssetData);
+                    break;
+                case (".bar", true):
+                    asset = new BAR(originalAssetData);
+                    break;
+                case (".imd", true):
+                    asset = new IMD(originalAssetData);
+                    break;
+                case (".mdlx", true):
+                    asset = new MDLX(originalAssetData);
+                    break;
+            }
+            if (asset != null && !asset.Invalid)
+            {
+                Offsets = asset.Offsets;
+                TextureCount = asset.TextureCount;
+                Invalid = false;
+            }
+        }
+    }
+
+    class IMD
+    {
+        public List<int> Offsets = new List<int>();
+        public int TextureCount = 0;
+        public bool Invalid = false;
+
+        public IMD(byte[] originalAssetData)
+        {
+            using (MemoryStream ms = new MemoryStream(originalAssetData))
+            {
+                int magic = ms.ReadInt32();
+                if (magic != 1145523529)
+                { //IMGD
+                    Invalid = true;
+                    return;
+                }
+
+                TextureCount = 1;
+                ms.ReadInt32(); //always 256
+                int IMDoffset = ms.ReadInt32(); //offset for image data
+                Offsets.Add(IMDoffset + 0x20000000);
+            }
+        }
+    }
+	
+	class IMZ
+    {
+        public List<int> Offsets = new List<int>();
+        public int TextureCount = 0;
+        public bool Invalid = false;
+
+        public IMZ(byte[] originalAssetData)
+        {
+            using (MemoryStream ms = new MemoryStream(originalAssetData))
+            {
+                int magic = ms.ReadInt32();
+                if (magic != 1514622281)
+                { //IMGZ
+                    Invalid = true;
+                    return;
+                }
+                ms.ReadInt32();
+                ms.ReadInt32();
+				TextureCount = ms.ReadInt32();
+
+                for (int i = 0; i < TextureCount; i++)
+				{
+					ms.seek(0x10 + (i * 0x8), SeekOrigin.Begin);
+					int offset = ms.ReadInt32();
+					ms.Seek(offset, SeekOrigin.Begin);
+					int magic2 = ms.ReadInt32();
+					if (magic2 != 1145523529)
+					{ //IMGD
+						Invalid = true;
+						return;
+					}
+						
+					ms.ReadInt32(); //always 256
+					int IMDoffset = ms.ReadInt32(); //offset for image data
+					Offsets.Add(offset + IMDoffset + 0x20000000);
+				}
+            }
+        }
+    }
+
+    class BAR
+    {
+        public List<int> Offsets = new List<int>();
+        public int TextureCount = 0;
+        public bool Invalid = false;
+
+        public BAR(byte[] originalAssetData)
+        {
+
+            using (MemoryStream ms = new MemoryStream(originalAssetData))
+            {
+                int magic = ms.ReadInt32();
+                if (magic != 22167874)
+                { //BAR
+                    Console.WriteLine("Invalid BAR! - " + magic);
+                    Invalid = true;
+                    return;
+                }
+
+                int count = ms.ReadInt32();
+
+                for (int i = 0; i < count; i++)
+                {
+                    //Console.WriteLine("Testing number: " + i);
+                    ms.Seek(0x10 + (i * 0x10), SeekOrigin.Begin);
+                    int type = ms.ReadInt32();
+					switch (type)
+					{
+						case (24): //IMD
+							//Console.WriteLine("is an image! - " + type);
+							ms.ReadInt32();
+							int offset = ms.ReadInt32();
+							ms.Seek(offset, SeekOrigin.Begin);
+
+							int magic2 = ms.ReadInt32();
+							if (magic2 == 1145523529)
+							{ //IMGD
+								TextureCount = 1;
+								ms.ReadInt32(); //always 256
+								int IMDoffset = ms.ReadInt32(); //offset for image data
+								Offsets.Add((IMDoffset + offset)+ 0x20000000);
+							}
+							break;
+						case (29): //IMZ
+							//Console.WriteLine("is an image collection! - " + type);
+							ms.ReadInt32();
+							int offset = ms.ReadInt32();
+							ms.Seek(offset, SeekOrigin.Begin);
+
+							int magic2 = ms.ReadInt32();
+							if (magic2 != 1514622281)
+							{ //IMGZ
+								ms.ReadInt32();
+								ms.ReadInt32();
+								int ImageCount = ms.ReadInt32();
+								for (int j = 0; j < ImageCount; j++)
+								{
+									ms.seek(0x10 + (j * 0x8), SeekOrigin.Begin);
+									int IMZoffset = ms.ReadInt32();
+									ms.Seek(IMZoffset, SeekOrigin.Begin);
+									
+									int magic3 = ms.ReadInt32();
+									if (magic3 == 1145523529)
+									{
+										ms.ReadInt32(); //always 256
+										int IMDoffset = ms.ReadInt32(); //offset for image data
+										Offsets.Add(offset + IMZoffset + IMDoffset + 0x20000000);
+									}
+								}
+							}
+							break;
+					}
+                }
+
+                if (TextureCount == 0)
+                {
+                    Console.WriteLine("BAR doesn't contain any images." );
+                    Invalid = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    class MDLX
+    {
+        public List<int> Offsets = new List<int>();
+        public int TextureCount = 0;
+        public bool Invalid = false;
+
+        public MDLX(byte[] originalAssetData)
+        {
+            using (MemoryStream ms = new MemoryStream(originalAssetData))
+            {
+                ms.ReadInt32();
+                int version = ms.ReadInt32();
+                if (version != 2 && version != 3 && version != 4)
+                { //original: version != 3
+                    Invalid = true;
+                    return;
+                }
+                ms.Seek(0x24, SeekOrigin.Begin);
+                string tim_ = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                if (tim_ != "tim_")
+                {
+                    Invalid = true;
+                    return;
+                }
+                int TIMoffset = ms.ReadInt32();
+
+                ms.Seek(TIMoffset, SeekOrigin.Begin);
+                int pointer = ms.ReadInt32();
+                if (pointer == -1)
+                {
+                    Invalid = true;
+                    return;
+                }
+
+                ms.Seek(TIMoffset + 0x0c, SeekOrigin.Begin);
+                TextureCount = ms.ReadInt32();
+
+                ms.ReadInt32();
+                ms.ReadInt32();
+                int infoOffset = ms.ReadInt32();
+                int dataOffset = ms.ReadInt32();
+
+                int diff = 0;
+                for (int i = 0; i < TextureCount; i++)
+                {
+                    int offset = TIMoffset + dataOffset + diff + (i * 0x10) + 0x20000000;
+                    Offsets.Add(offset);
+
+                    int textInfoOffset = TIMoffset + infoOffset + 0x20 + 0x40 + 0x10 + (0xA0 * i);
+                    ms.Seek(textInfoOffset, SeekOrigin.Begin);
+                    ulong num = ms.ReadUInt64();
+                    int width = (ushort)(1u << ((int)(num >> 0x1A) & 0x0F));
+                    int height = (ushort)(1u << ((int)(num >> 0x1E) & 0x0F));
+                    diff += width * height;
+                }
+
+                int index = Helpers.IndexOfByteArray(originalAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), TIMoffset);
+
+                while (index > -1)
+                {
+                    ms.Seek(index + 0x0a, SeekOrigin.Begin);
+                    int imageToApplyTo = (int)ms.ReadInt16();
+
+                    ms.Seek(0x1c, SeekOrigin.Current);
+                    int texaOffset = ms.ReadInt32();
+                    int offset = index + texaOffset + 0x08 + (imageToApplyTo * 0x10) + 0x20000000;
+                    Offsets.Add(offset);
+
+                    TextureCount++;
+                    index = Helpers.IndexOfByteArray(originalAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
+                }
+            }
+        }
+
     }
 }

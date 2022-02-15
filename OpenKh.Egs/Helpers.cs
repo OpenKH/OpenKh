@@ -103,6 +103,30 @@ namespace OpenKh.Egs
         {
             return filePath.Replace($"{origin}\\", "").Replace(@"\", "/");
         }
+        public static int IndexOfByteArray(byte[] a, byte[] b, int s = 0)
+        {
+            int index = Array.IndexOf(a, b[0], s);
+            while (index > -1)
+            {
+                if (index > -1)
+                {
+                    bool match = true;
+                    for (int i = 1; i < b.Length; i++)
+                    {
+                        if (index + i > a.Length)
+                            match = false;
+                        if (a[index + i] != b[i])
+                            match = false;
+                        if (!match)
+                            break;
+                    }
+                    if (match)
+                        return index;
+                }
+                index = Array.IndexOf(a, b[0], index + 1);
+            }
+            return -1;
+        }
 
         #endregion
     }
