@@ -185,7 +185,7 @@ namespace OpenKh.Egs
             foreach (var filename in patchFiles)
             {
                 AddFile(inputFolder, filename, patchedHedStream, patchedPkgStream);
-                Console.WriteLine($"Added a new file: {filename}");
+                //Console.WriteLine($"Added a new file: {filename}");
             }
         }
 
@@ -580,8 +580,8 @@ namespace OpenKh.Egs
             }
         }
     }
-	
-	class IMZ
+
+    class IMZ
     {
         public List<int> Offsets = new List<int>();
         public int TextureCount = 0;
@@ -599,24 +599,24 @@ namespace OpenKh.Egs
                 }
                 ms.ReadInt32();
                 ms.ReadInt32();
-				TextureCount = ms.ReadInt32();
+                TextureCount = ms.ReadInt32();
 
                 for (int i = 0; i < TextureCount; i++)
-				{
-					ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
-					int offset = ms.ReadInt32();
-					ms.Seek(offset, SeekOrigin.Begin);
-					int magic2 = ms.ReadInt32();
-					if (magic2 != 1145523529)
-					{ //IMGD
-						Invalid = true;
-						return;
-					}
+                {
+                    ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
+                    int offset = ms.ReadInt32();
+                    ms.Seek(offset, SeekOrigin.Begin);
+                    int magic2 = ms.ReadInt32();
+                    if (magic2 != 1145523529)
+                    { //IMGD
+                        Invalid = true;
+                        return;
+                    }
 
-					ms.ReadInt32(); //always 256
-					int IMDoffset = ms.ReadInt32(); //offset for image data
-					Offsets.Add(offset + IMDoffset + 0x20000000);
-				}
+                    ms.ReadInt32(); //always 256
+                    int IMDoffset = ms.ReadInt32(); //offset for image data
+                    Offsets.Add(offset + IMDoffset + 0x20000000);
+                }
             }
         }
     }
@@ -639,70 +639,72 @@ namespace OpenKh.Egs
                 }
 
                 int count = ms.ReadInt32();
+                int offset = 0;
+                int magic2 = 0;
 
                 for (int i = 0; i < count; i++)
                 {
                     //Console.WriteLine("Testing number: " + i);
                     ms.Seek(0x10 + (i * 0x10), SeekOrigin.Begin);
                     int type = ms.ReadInt32();
-					switch (type)
-					{
-						case (24): //IMD
-							//Console.WriteLine("is an image! - " + type);
-							ms.ReadInt32();
-							int offset = ms.ReadInt32();
-							ms.Seek(offset, SeekOrigin.Begin);
+                    switch (type)
+                    {
+                        case (24): //IMD
+                                   //Console.WriteLine("is an image! - " + type);
+                            ms.ReadInt32();
+                            offset = ms.ReadInt32();
+                            ms.Seek(offset, SeekOrigin.Begin);
 
-							int magic2 = ms.ReadInt32();
-							if (magic2 == 1145523529)
-							{ //IMGD
-								TextureCount += 1;
-								ms.ReadInt32(); //always 256
-								int IMDoffset = ms.ReadInt32(); //offset for image data
-								Offsets.Add(offset + IMDoffset + 0x20000000);
-							}
-							break;
-						case (29): //IMZ
-							//Console.WriteLine("is an image collection! - " + type);
-							ms.ReadInt32();
-							int offset = ms.ReadInt32();
-							ms.Seek(offset, SeekOrigin.Begin);
+                            magic2 = ms.ReadInt32();
+                            if (magic2 == 1145523529)
+                            { //IMGD
+                                TextureCount += 1;
+                                ms.ReadInt32(); //always 256
+                                int IMDoffset = ms.ReadInt32(); //offset for image data
+                                Offsets.Add(offset + IMDoffset + 0x20000000);
+                            }
+                            break;
+                        case (29): //IMZ
+                                   //Console.WriteLine("is an image collection! - " + type);
+                            ms.ReadInt32();
+                            offset = ms.ReadInt32();
+                            ms.Seek(offset, SeekOrigin.Begin);
 
-							int magic2 = ms.ReadInt32();
-							if (magic2 == 1514622281)
-							{ //IMGZ
-								ms.ReadInt32();
-								ms.ReadInt32();
-								int ImageCount = ms.ReadInt32();
+                            magic2 = ms.ReadInt32();
+                            if (magic2 == 1514622281)
+                            { //IMGZ
+                                ms.ReadInt32();
+                                ms.ReadInt32();
+                                int ImageCount = ms.ReadInt32();
                                 TextureCount += ImageCount;
-								for (int j = 0; j < ImageCount; j++)
-								{
-									ms.Seek(offset + 0x10 + (j * 0x8), SeekOrigin.Begin);
-									int IMZoffset = ms.ReadInt32();
-									ms.Seek(offset + IMZoffset, SeekOrigin.Begin);
-									
-									int magic3 = ms.ReadInt32();
-									if (magic3 == 1145523529)
-									{
-										ms.ReadInt32(); //always 256
-										int IMDoffset = ms.ReadInt32(); //offset for image data
-										Offsets.Add(offset + IMZoffset + IMDoffset + 0x20000000);
-									}
-								}
-							}
-							break;
-					}
+                                for (int j = 0; j < ImageCount; j++)
+                                {
+                                    ms.Seek(offset + 0x10 + (j * 0x8), SeekOrigin.Begin);
+                                    int IMZoffset = ms.ReadInt32();
+                                    ms.Seek(offset + IMZoffset, SeekOrigin.Begin);
+
+                                    int magic3 = ms.ReadInt32();
+                                    if (magic3 == 1145523529)
+                                    {
+                                        ms.ReadInt32(); //always 256
+                                        int IMDoffset = ms.ReadInt32(); //offset for image data
+                                        Offsets.Add(offset + IMZoffset + IMDoffset + 0x20000000);
+                                    }
+                                }
+                            }
+                            break;
+                    }
                 }
 
                 if (TextureCount == 0)
                 {
-					Console.WriteLine("BAR doesn't contain any images." );
-					Invalid = true;
-					return;
+                    Console.WriteLine("BAR doesn't contain any images.");
+                    Invalid = true;
+                    return;
                 }
-			}
-		}
-	}
+            }
+        }
+    }
 
     class MDLX
     {
