@@ -540,6 +540,9 @@ namespace OpenKh.Egs
                 case (".imd", true):
                     asset = new IMD(originalAssetData);
                     break;
+                case (".imz", true):
+                    asset = new IMZ(originalAssetData);
+                    break;
                 case (".mdlx", true):
                     asset = new MDLX(originalAssetData);
                     break;
@@ -600,7 +603,7 @@ namespace OpenKh.Egs
 
                 for (int i = 0; i < TextureCount; i++)
 				{
-					ms.seek(0x10 + (i * 0x8), SeekOrigin.Begin);
+					ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
 					int offset = ms.ReadInt32();
 					ms.Seek(offset, SeekOrigin.Begin);
 					int magic2 = ms.ReadInt32();
@@ -609,7 +612,7 @@ namespace OpenKh.Egs
 						Invalid = true;
 						return;
 					}
-						
+
 					ms.ReadInt32(); //always 256
 					int IMDoffset = ms.ReadInt32(); //offset for image data
 					Offsets.Add(offset + IMDoffset + 0x20000000);
@@ -626,13 +629,11 @@ namespace OpenKh.Egs
 
         public BAR(byte[] originalAssetData)
         {
-
             using (MemoryStream ms = new MemoryStream(originalAssetData))
             {
                 int magic = ms.ReadInt32();
                 if (magic != 22167874)
                 { //BAR
-                    Console.WriteLine("Invalid BAR! - " + magic);
                     Invalid = true;
                     return;
                 }
@@ -655,10 +656,10 @@ namespace OpenKh.Egs
 							int magic2 = ms.ReadInt32();
 							if (magic2 == 1145523529)
 							{ //IMGD
-								TextureCount = 1;
+								TextureCount += 1;
 								ms.ReadInt32(); //always 256
 								int IMDoffset = ms.ReadInt32(); //offset for image data
-								Offsets.Add((IMDoffset + offset)+ 0x20000000);
+								Offsets.Add(offset + IMDoffset + 0x20000000);
 							}
 							break;
 						case (29): //IMZ
@@ -668,16 +669,17 @@ namespace OpenKh.Egs
 							ms.Seek(offset, SeekOrigin.Begin);
 
 							int magic2 = ms.ReadInt32();
-							if (magic2 != 1514622281)
+							if (magic2 == 1514622281)
 							{ //IMGZ
 								ms.ReadInt32();
 								ms.ReadInt32();
 								int ImageCount = ms.ReadInt32();
+                                TextureCount += ImageCount;
 								for (int j = 0; j < ImageCount; j++)
 								{
-									ms.seek(0x10 + (j * 0x8), SeekOrigin.Begin);
+									ms.Seek(offset + 0x10 + (j * 0x8), SeekOrigin.Begin);
 									int IMZoffset = ms.ReadInt32();
-									ms.Seek(IMZoffset, SeekOrigin.Begin);
+									ms.Seek(offset + IMZoffset, SeekOrigin.Begin);
 									
 									int magic3 = ms.ReadInt32();
 									if (magic3 == 1145523529)
@@ -694,13 +696,13 @@ namespace OpenKh.Egs
 
                 if (TextureCount == 0)
                 {
-                    Console.WriteLine("BAR doesn't contain any images." );
-                    Invalid = true;
-                    return;
+					Console.WriteLine("BAR doesn't contain any images." );
+					Invalid = true;
+					return;
                 }
-            }
-        }
-    }
+			}
+		}
+	}
 
     class MDLX
     {
