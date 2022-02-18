@@ -1,6 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
+
+//Criado pela equipe do OpenKh
+
+//Modificado por HeroRicky_Games
+
 namespace OpenKh.Kh2.Messages.Internals
 {
     internal class InternationalSystemDecode : IMessageDecode
@@ -195,7 +200,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xb7] = new TextCmdModel('à'),
             [0xb8] = new TextCmdModel('á'),
             [0xb9] = new TextCmdModel('â'),
-            [0xba] = new TextCmdModel('ä'),
+            [0xba] = new TextCmdModel('ã'),
             [0xbb] = new TextCmdModel('è'),
             [0xbc] = new TextCmdModel('é'),
             [0xbd] = new TextCmdModel('ê'),
@@ -208,7 +213,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xc4] = new TextCmdModel('ò'),
             [0xc5] = new TextCmdModel('ó'),
             [0xc6] = new TextCmdModel('ô'),
-            [0xc7] = new TextCmdModel('ö'),
+            [0xc7] = new TextCmdModel('õ'),
             [0xc8] = new TextCmdModel('ù'),
             [0xc9] = new TextCmdModel('ú'),
             [0xca] = new TextCmdModel('û'),
@@ -220,7 +225,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xd0] = new TextCmdModel('À'),
             [0xd1] = new TextCmdModel('Á'),
             [0xd2] = new TextCmdModel('Â'),
-            [0xd3] = new TextCmdModel('Ä'),
+            [0xd3] = new TextCmdModel('Ã'),
             [0xd4] = new TextCmdModel('È'),
             [0xd5] = new TextCmdModel('É'),
             [0xd6] = new TextCmdModel('Ê'),
@@ -233,7 +238,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xdd] = new TextCmdModel('Ò'),
             [0xde] = new TextCmdModel('Ó'),
             [0xdf] = new TextCmdModel('Ô'),
-            [0xe0] = new TextCmdModel('Ö'),
+            [0xe0] = new TextCmdModel('Õ'),
             [0xe1] = new TextCmdModel('Ù'),
             [0xe2] = new TextCmdModel('Ú'),
             [0xe3] = new TextCmdModel('Û'),
@@ -253,6 +258,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xf1] = new TextCmdModel('■'),
             [0xf2] = new TextCmdModel('□'),
             [0xf3] = new TextCmdModel('▲'),
+            [0x09] = new TextCmdModel('＞'),
             [0xf4] = new TextCmdModel('△'),
             [0xf5] = new TextCmdModel('●'),
             [0xf6] = new TextCmdModel('○'),
@@ -264,10 +270,20 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xfc] = new TextCmdModel('↓'),
             [0xfd] = new TextCmdModel('・'),
             [0xfe] = new TextCmdModel('❤'),
+            [0xfe] = new TextCmdModel('＞'),
             [0xff] = new UnsupportedCmdModel(0xff), // Unused
+
+        };
+
+         public static readonly Dictionary<int, BaseCmdModel> _table2 = new Dictionary<int, BaseCmdModel>
+        {
+
+
+
         };
 
         public List<MessageCommandModel> Decode(byte[] data) =>
             new BaseMessageDecoder(_table, data).Decode();
+
     }
 }
