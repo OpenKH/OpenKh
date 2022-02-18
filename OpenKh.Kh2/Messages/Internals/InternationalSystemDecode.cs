@@ -270,6 +270,7 @@ namespace OpenKh.Kh2.Messages.Internals
             [0xfc] = new TextCmdModel('↓'),
             [0xfd] = new TextCmdModel('・'),
             [0xfe] = new TextCmdModel('❤'),
+            [0xfe] = new TextCmdModel('＞'),
             [0xff] = new UnsupportedCmdModel(0xff), // Unused
 
         };
