@@ -302,6 +302,7 @@ namespace OpenKh.Egs
             if (File.Exists(completeFilePath))
             {
                 bool RemasterExist = false;
+
                 Console.WriteLine($"Replacing original: {filename}!");
                 string RemasteredPath = completeFilePath.Replace("\\original\\","\\remastered\\");
                 if (Directory.Exists(RemasteredPath))
@@ -422,12 +423,66 @@ namespace OpenKh.Egs
             var totalRemasteredAssetHeadersSize = oldRemasteredHeaders.Count() * 0x30;
             // This offset is relative to the original asset data
             var offset = totalRemasteredAssetHeadersSize + 0x10 + asset.OriginalAssetHeader.DecompressedLength;
+            List<string> remasteredNames = new List<string>();
+
+
+            remasteredNames.Clear();
+            //grab list of full file paths from current remasteredAssetsFolder path and add them to a list.
+            //we use this list later to correctly add the file names to the PKG.
+            if (Directory.Exists(remasteredAssetsFolder) && Directory.GetFiles(remasteredAssetsFolder, "*", SearchOption.AllDirectories).Length > 0) //only do this if there are actually file in it.
+            {
+                remasteredNames.AddRange(Directory.GetFiles(remasteredAssetsFolder, "*", SearchOption.AllDirectories).ToList());
+                for (int l = 0; l < remasteredNames.Count; l++) //fix names
+                {
+                    remasteredNames[l] = remasteredNames[l].Replace(remasteredAssetsFolder, "").Replace(@"\", "/");
+                }
+
+                if (remasteredNames.Contains("/-10.dds") || remasteredNames.Contains("/-10.png"))
+                {
+                    //Make a sorted list tempremasteredNames
+                    List<string> tempremasteredNamesD = new List<string>();
+                    List<string> tempremasteredNamesP = new List<string>();
+                    for (int i = 0; i < remasteredNames.Count; i++)
+                    {
+                        var filename = "/-"  + i.ToString();
+                        Console.WriteLine("TEST for " + filename + ".dds/.png");
+                        if (remasteredNames.Contains(filename + ".dds"))
+                        {
+                            Console.WriteLine(filename + ".dds" + "FOUND!");
+                            tempremasteredNamesD.Add(filename + ".dds");
+                            remasteredNames.Remove(filename + ".dds");
+                        }
+                        else if (remasteredNames.Contains(filename + ".png"))
+                        {
+                            Console.WriteLine(filename + ".png" + "FOUND!");
+                            tempremasteredNamesP.Add(filename + ".png");
+                            remasteredNames.Remove(filename + ".png");
+                        }
+                    }
+                    //Add the image files at the end
+                    //DDS list first, PNG list 2nd, everything else after
+                    tempremasteredNamesD.AddRange(tempremasteredNamesP);
+                    tempremasteredNamesD.AddRange(remasteredNames);
+                    //Add the sorted list back to remasteredNames
+                    remasteredNames = tempremasteredNamesD;
+                }
+            }
 
             for (int i = 0; i < oldRemasteredHeaders.Count; i++)
             {
                 var remasteredAssetHeader = oldRemasteredHeaders[i];
                 var filename = remasteredAssetHeader.Name;
                 var assetFilePath = Path.Combine(remasteredAssetsFolder, filename);
+
+                //get actual file names ONLY if the remastered asset count is greater than 0 and ONLY if the number of files in the 
+                //remastered folder for the SD asset is equal to or greater than what the total count is from what was gotten in SDasset.
+                //if those criteria aren't met then do the old method.
+                if (remasteredNames.Count >= oldRemasteredHeaders.Count && remasteredNames.Count > 0)
+                {
+                    //filename = remasteredNames[i].Replace((remasteredAssetsFolder), "").Remove(0, 1);
+                    filename = remasteredNames[i].Remove(0, 1);
+                    assetFilePath = Path.Combine(remasteredAssetsFolder, filename);
+                }
 
                 // Use base remastered asset data
                 var assetData = asset.RemasteredAssetsDecompressedData.ContainsKey(filename) ? asset.RemasteredAssetsDecompressedData[filename] : new byte[] { };
@@ -529,11 +584,7 @@ namespace OpenKh.Egs
             switch (Path.GetExtension(name), remasterpathtrue)
             {
                 case (".2dd", true):
-                    asset = new BAR(originalAssetData);
-                    break;
                 case (".2ld", true):
-                    asset = new BAR(originalAssetData);
-                    break;
                 case (".bar", true):
                     asset = new BAR(originalAssetData);
                     break;
@@ -547,6 +598,20 @@ namespace OpenKh.Egs
                     asset = new MDLX(originalAssetData);
                     break;
             }
+            switch (".a" + (Path.GetExtension(name)), remasterpathtrue)
+            {
+                case (".a.fm", true):
+                case (".a.fr", true):
+                case (".a.gr", true):
+                case (".a.it", true):
+                case (".a.sp", true):
+                case (".a.us", true):
+                case (".a.uk", true):
+                case (".a.jp", true):
+                    asset = new BAR(originalAssetData);
+                    break;
+            }
+
             if (asset != null && !asset.Invalid)
             {
                 Offsets = asset.Offsets;
@@ -624,6 +689,7 @@ namespace OpenKh.Egs
     class BAR
     {
         public List<int> Offsets = new List<int>();
+        public List<int> OffsetsAudio = new List<int>();
         public int TextureCount = 0;
         public bool Invalid = false;
 
@@ -631,6 +697,22 @@ namespace OpenKh.Egs
         {
             using (MemoryStream ms = new MemoryStream(originalAssetData))
             {
+                int subcount = 0;
+                int offset = 0;
+                int suboffset = 0;
+                int subtype = 0;
+                int Dpxoffset = 0;
+                int DpdOffset = 0;
+                int DpdOffsets = 0;
+                int DpdCount = 0;
+                int DpdTexCount = 0;
+                int DpdTexOffset = 0;
+                int DpdTexOffsets = 0;
+                int Unk1Count = 0;
+                int Unk2Count = 0;
+                int magic2 = 0;
+                string magicsound;
+
                 int magic = ms.ReadInt32();
                 if (magic != 22167874)
                 { //BAR
@@ -639,18 +721,57 @@ namespace OpenKh.Egs
                 }
 
                 int count = ms.ReadInt32();
-                int offset = 0;
-                int magic2 = 0;
-
                 for (int i = 0; i < count; i++)
                 {
-                    //Console.WriteLine("Testing number: " + i);
                     ms.Seek(0x10 + (i * 0x10), SeekOrigin.Begin);
                     int type = ms.ReadInt32();
+                    //Console.WriteLine("type is - " + type);
                     switch (type)
                     {
+                        case (18): //PAX
+                            //Console.WriteLine("type is an PAX archive! - " + type);
+                            ms.ReadInt32();
+                            offset = ms.ReadInt32();
+                            ms.Seek(offset, SeekOrigin.Begin);
+
+                            magic2 = ms.ReadInt32();
+                            //Console.WriteLine("pax magic is - " + magic2);
+                            if (magic2 == 1599619408)
+                            { //PAX_
+
+                                ms.ReadInt64();
+                                Dpxoffset = ms.ReadInt32();
+                                //Console.WriteLine("Dpxoffset is - " + Dpxoffset);
+                                ms.Seek(offset + Dpxoffset + 0xC, SeekOrigin.Begin);
+                                Unk1Count = ms.ReadInt32();
+                                ms.Seek(Unk1Count * 0x20, SeekOrigin.Current);
+                                DpdCount = ms.ReadInt32();
+                                DpdOffsets = ((int)ms.Position);
+
+                                for (int d = 0; d < DpdCount; d++)
+                                {
+                                    ms.Seek(DpdOffsets + (d * 0x4), SeekOrigin.Begin);
+                                    DpdOffset = ms.ReadInt32();
+                                    ms.Seek(offset + Dpxoffset + DpdOffset, SeekOrigin.Begin);
+
+                                    ms.ReadInt32(); // unknown
+                                    Unk2Count = ms.ReadInt32();
+                                    ms.Seek(Unk2Count * 0x4, SeekOrigin.Current);
+                                    DpdTexCount = ms.ReadInt32();
+                                    DpdTexOffsets = ((int)ms.Position);
+
+                                    for (int t = 0; t < DpdTexCount; t++)
+                                    {
+                                        TextureCount += 1;
+                                        ms.Seek(DpdTexOffsets + (t * 0x4), SeekOrigin.Begin);
+                                        DpdTexOffset = ms.ReadInt32();
+                                        Offsets.Add(offset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000);
+                                    }
+                                }
+                            }
+                            break;
                         case (24): //IMD
-                                   //Console.WriteLine("is an image! - " + type);
+                            //Console.WriteLine("is an image! - " + type);
                             ms.ReadInt32();
                             offset = ms.ReadInt32();
                             ms.Seek(offset, SeekOrigin.Begin);
@@ -665,7 +786,7 @@ namespace OpenKh.Egs
                             }
                             break;
                         case (29): //IMZ
-                                   //Console.WriteLine("is an image collection! - " + type);
+                            //Console.WriteLine("is an image collection! - " + type);
                             ms.ReadInt32();
                             offset = ms.ReadInt32();
                             ms.Seek(offset, SeekOrigin.Begin);
@@ -693,12 +814,113 @@ namespace OpenKh.Egs
                                 }
                             }
                             break;
+                        case (31): //Sound Effects
+                            //Console.WriteLine("is audio! - " + type);
+                            ms.ReadInt32();
+                            offset = ms.ReadInt32();
+                            ms.Seek(offset, SeekOrigin.Begin);
+
+                            magicsound = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(6));
+                            //Console.WriteLine("magic is - " + magicsound);
+                            if (magicsound == "ORIGIN")
+                            {
+                                TextureCount += 1;
+                                OffsetsAudio.Add(-1);
+                            }
+                            break;
+                        case (34): //Voice Audio
+                            //Console.WriteLine("is audio! - " + type);
+                            ms.ReadInt32();
+                            offset = ms.ReadInt32();
+                            ms.Seek(offset, SeekOrigin.Begin);
+
+                            magicsound = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(6));
+                            //Console.WriteLine("magic is - " + magicsound);
+                            if (magicsound == "ORIGIN")
+                            {
+                                TextureCount += 1;
+                                OffsetsAudio.Add(-1);
+                            }
+                            break;
+                        case (46): //sub-BAR
+                            //Console.WriteLine("is BAR-ception! - " + type);
+                            ms.ReadInt32();
+                            offset = ms.ReadInt32();
+                            ms.Seek(offset, SeekOrigin.Begin);
+                            suboffset = ((int)ms.Position);
+
+                            magic2 = ms.ReadInt32();
+                            if (magic2 == 22167874)
+                            {
+                                subcount = ms.ReadInt32();
+
+                                for (int s = 0; s < subcount; s++)
+                                {
+
+                                    ms.Seek(0x10 + suboffset + (s * 0x10), SeekOrigin.Begin);
+                                    subtype = ms.ReadInt32();
+
+                                    switch (subtype)
+                                    {
+                                        case (24): //IMD
+                                            //Console.WriteLine("is a BAR-ception image! - " + type);
+                                            ms.ReadInt32();
+                                            offset = ms.ReadInt32();
+                                            ms.Seek(offset + suboffset, SeekOrigin.Begin);
+
+                                            magic2 = ms.ReadInt32();
+                                            if (magic2 == 1145523529)
+                                            { //IMGD
+                                                TextureCount += 1;
+                                                ms.ReadInt32(); //always 256
+                                                int IMDoffset = ms.ReadInt32(); //offset for image data
+                                                Offsets.Add(suboffset + offset + IMDoffset + 0x20000000);
+                                            }
+                                            break;
+                                        case (29): //IMZ
+                                            //Console.WriteLine("is a BAR-ception image collection! - " + subtype);
+                                            ms.ReadInt32();
+                                            offset = ms.ReadInt32();
+                                            ms.Seek(offset + suboffset, SeekOrigin.Begin);
+
+                                            magic2 = ms.ReadInt32();
+                                            //Console.WriteLine("BAR-ception image collection magic2: - " + magic2);
+                                            if (magic2 == 1514622281)
+                                            { //IMGZ
+                                                ms.ReadInt64();
+                                                int ImageCount = ms.ReadInt32();
+                                                //Console.WriteLine("BAR-ception imz count: - " + ImageCount);
+                                                for (int sj = 0; sj < ImageCount; sj++)
+                                                {
+                                                    ms.Seek(suboffset + offset +  + 0x10 + (sj * 0x8), SeekOrigin.Begin);
+                                                    int IMZoffset = ms.ReadInt32();
+                                                    ms.Seek(suboffset + offset + IMZoffset, SeekOrigin.Begin);
+
+                                                    int magic3 = ms.ReadInt32();
+                                                    //Console.WriteLine("BAR-ception magic3: - " + magic3);
+                                                    if (magic3 == 1145523529)
+                                                    {
+                                                        TextureCount += 1;
+                                                        ms.ReadInt32(); //always 256
+                                                        int IMDoffset = ms.ReadInt32(); //offset for image data
+                                                        Offsets.Add(suboffset + offset + IMZoffset + IMDoffset + 0x20000000);
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                    }
+                                }
+                            }
+                            break;
                     }
                 }
 
+                //add all audio offsets to the end. they need to always be last
+                Offsets.AddRange(OffsetsAudio);
+                
                 if (TextureCount == 0)
                 {
-                    Console.WriteLine("BAR doesn't contain any images.");
+                    Console.WriteLine("BAR doesn't contain hd assets.");
                     Invalid = true;
                     return;
                 }
