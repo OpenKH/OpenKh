@@ -223,11 +223,11 @@ Their type is SQEXSEADSoundBank or SQEXSEADSound.
 | 007       | \<Pain Grunt\>     | Being damaged |
 | 008       | "No"       | Being damaged |
 | 009       | "Enough"        | |
-| 010       | "Chain"         | Healing (Items, Cure)   |
-| 011       | "Nice"       | Healing (Items, Cure)   |
-| 012       | "That's it"         | Healing (Items, Cure)   |
-| 013       | "Are you happy now?" | Healing (Items, Cure)   |
-| 014       | "How's that?"        | Healing (Items, Cure)   |
+| 010       | "Chain"              | |
+| 011       | "Nice"            | |
+| 012       | "That's it"              | |
+| 013       | "Are you happy now?"      | |
+| 014       | "How's that?"             | |
 | 015       | \<Pain Grunt\>     | Being damaged |
 | 016       | \<Pain Grunt\>     | Being damaged |
 | 017       | \<Pain Grunt\>     | Being damaged |
