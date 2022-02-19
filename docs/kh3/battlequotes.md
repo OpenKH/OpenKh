@@ -4,9 +4,18 @@ Battle quotes are the voice clips played when a character engages in battle. The
 
 `/Game/Sound/VOICE/Localization/{Language Code}/battle/`
 
-Their type is TypeSQEXSEADSoundBank or SQEXSEADSound.
+Their type is SQEXSEADSoundBank or SQEXSEADSound.
 
-## Sora
+## Overview
+* [PC - Player Character](#pc---player-character)
+    * [Sora](#sora)
+* [Enemy](#enemy)
+    * [Terra-Xehanort](#terra-xehanort)
+
+## PC - Player Character
+`/Game/Sound/VOICE/Localization/en/battle/PC/`
+
+### Sora
 
 `/Game/Sound/VOICE/Localization/en/battle/PC/Battle_Sora.uasset`
 
@@ -192,3 +201,47 @@ Their type is TypeSQEXSEADSoundBank or SQEXSEADSound.
 | 177       | "Are both of you ready?" | Re:Mind |
 | 178       | "I gotta dig deeper!" | Re:Mind |
 | 179       | "It's not over yet!" | Re:Mind |
+
+[To top](#kingdom-hearts-iii-battle-quotes)
+
+## Enemy
+`/Game/Sound/VOICE/Localization/en/battle/ENEMY/`
+
+### Terra-Xehanort
+
+`/Game/Sound/VOICE/Localization/en/battle/ENEMY/Battle_Terra-Xehanort.uasset`
+
+| Audio Nr. | Quote           | Note                    |
+|:---------:|-----------------|-------------------------|
+| 000       | "Enjoy"       | Attacking |
+| 001       | "Surrender"        | Attacking |
+| 002       | "Dark Times ahead"         | Desperation Move (DM) |
+| 003       | "Don't let him escape"        | Attacking |
+| 004       | "Brick him"          | Attacking |
+| 005       | "Join the shadows"          | Attacking |
+| 006       | "Over here"     | |
+| 007       | \<Pain Grunt\>     | Being damaged |
+| 008       | "No"       | Being damaged |
+| 009       | "Enough"        | |
+| 010       | "Chain"              | |
+| 011       | "Nice"            | |
+| 012       | "That's it"              | |
+| 013       | "Are you happy now?"      | |
+| 014       | "How's that?"             | |
+| 015       | \<Pain Grunt\>     | Being damaged |
+| 016       | \<Pain Grunt\>     | Being damaged |
+| 017       | \<Pain Grunt\>     | Being damaged |
+| 018       | \<Pain Grunt\>     | Being damaged |
+| 019       | \<Pain Grunt\>     | Being damaged |
+| 020       | "What?" | |
+| 021       | \<Pain Grunt\>     | Being damaged |
+| 022       | \<Attack Grunt\> | |
+| 023       | \<Attack Grunt\> | |
+| 024       | "Come one" | Attacking |
+| 025       | \<Attack Grunt\> | |
+| 026       | \<Attack Grunt\> | |
+| 027       | \<Attack Grunt\> | |
+| 028       | \<Attack Grunt\> | |
+| 029       | \<Attack Grunt\> | |
+
+[To top](#kingdom-hearts-iii-battle-quotes)
