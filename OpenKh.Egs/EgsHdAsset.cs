@@ -24,7 +24,7 @@ namespace OpenKh.Egs
             [Data(Count = 0x20)] public string Name { get; set; }
             // The offset is relative to: Original asset's header size + all remastered asset's header size + original asset's decompressed data length
             [Data] public int Offset { get; set; }
-            [Data] public int Unknown24 { get; set; }
+            [Data] public int OriginalAssetOffset { get; set; }
             [Data] public int DecompressedLength { get; set; }
             [Data] public int CompressedLength { get; set; }
         }
@@ -61,6 +61,15 @@ namespace OpenKh.Egs
         public byte[] OriginalRawData => _originalRawData;
         public Dictionary<string, byte[]> RemasteredAssetsDecompressedData => _remasteredAssetsData;
         public Dictionary<string, byte[]> RemasteredAssetsCompressedData => _remasteredAssetsRawData;
+
+        public EgsHdAsset(Header temp_header, byte[] temp_originalData, byte[] temp_originalRawData, byte[] temp_seed)
+        {
+            _header = temp_header;
+            _originalData = temp_originalData;
+            _originalRawData = temp_originalRawData;
+            _seed = temp_seed;
+            _entries = new Dictionary<string, RemasteredEntry>();
+        }
 
         public EgsHdAsset(Stream stream)
         {
