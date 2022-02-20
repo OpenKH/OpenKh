@@ -31,8 +31,8 @@ Contains multiple [IMGDs](#imgd) prepended by a [specific header](#imz-header). 
 | 18 | uint32_t | Always `-1`
 | 1c | uint16_t | Image width
 | 1e | uint16_t | Image height
-| 20 | uint16_t | Image width to the power of 2 (w²)
-| 22 | uint16_t | Image height to the power of 2 (h²)
+| 20 | uint16_t | 2 to the power of image width (2ⁿ)
+| 22 | uint16_t | 2 to the power of image height (2ⁿ)
 | 24 | uint16_t | Image width divided by `64`
 | 26 | uint16_t | [Image format](#image-formats)
 | 28 | uint32_t | Always `-1`
