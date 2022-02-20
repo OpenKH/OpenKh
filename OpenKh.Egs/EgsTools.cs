@@ -461,13 +461,13 @@ namespace OpenKh.Egs
                         //Console.WriteLine("TEST for " + filename + ".dds/.png");
                         if (remasteredNames.Contains(filename + ".dds"))
                         {
-                            Console.WriteLine(filename + ".dds" + "FOUND!");
+                            //Console.WriteLine(filename + ".dds" + "FOUND!");
                             tempremasteredNamesD.Add(filename + ".dds");
                             remasteredNames.Remove(filename + ".dds");
                         }
                         else if (remasteredNames.Contains(filename + ".png"))
                         {
-                            Console.WriteLine(filename + ".png" + "FOUND!");
+                            //Console.WriteLine(filename + ".png" + "FOUND!");
                             tempremasteredNamesP.Add(filename + ".png");
                             remasteredNames.Remove(filename + ".png");
                         }
