@@ -320,7 +320,7 @@ namespace OpenKh.Egs
                 string RemasteredPath = completeFilePath.Replace("\\original\\","\\remastered\\");
                 if (Directory.Exists(RemasteredPath))
                 {
-                    Console.WriteLine($"Remastered Folder Exists! Path: {RemasteredPath}");
+                    //Console.WriteLine($"Remastered Folder Exists! Path: {RemasteredPath}");
                     RemasterExist = true;
                 }
 
@@ -439,7 +439,7 @@ namespace OpenKh.Egs
             List<string> remasteredNames = new List<string>();
 
 
-            remasteredNames.Clear();
+            //remasteredNames.Clear();
             //grab list of full file paths from current remasteredAssetsFolder path and add them to a list.
             //we use this list later to correctly add the file names to the PKG.
             if (Directory.Exists(remasteredAssetsFolder) && Directory.GetFiles(remasteredAssetsFolder, "*", SearchOption.AllDirectories).Length > 0) //only do this if there are actually file in it.
@@ -490,7 +490,7 @@ namespace OpenKh.Egs
                 //get actual file names ONLY if the remastered asset count is greater than 0 and ONLY if the number of files in the 
                 //remastered folder for the SD asset is equal to or greater than what the total count is from what was gotten in SDasset.
                 //if those criteria aren't met then do the old method.
-                if (remasteredNames.Count >= oldRemasteredHeaders.Count && remasteredNames.Count > 0)
+                if (remasteredNames.Count > oldRemasteredHeaders.Count && remasteredNames.Count > 0)
                 {
                     //filename = remasteredNames[i].Replace((remasteredAssetsFolder), "").Remove(0, 1);
                     filename = remasteredNames[i].Remove(0, 1);
@@ -514,7 +514,7 @@ namespace OpenKh.Egs
                 }
                 else
                 {
-                    //Console.WriteLine($"Keeping remastered file: {relativePath}/{filename}");
+                    Console.WriteLine($"Keeping remastered file: {relativePath}/{filename}");
                     // The original file have been replaced, we need to encrypt all remastered asset with the new key
                     if (!seed.SequenceEqual(asset.Seed))
                     {
@@ -601,7 +601,7 @@ namespace OpenKh.Egs
                 case (".bar", true):
                 case (".bin", true):
                 case (".mag", true):
-                case (".map", true):
+                //case (".map", true): //alot more complicated than i thought. try again later
                 case (".mdlx", true):
                     asset = new BAR(originalAssetData);
                     break;
@@ -641,6 +641,8 @@ namespace OpenKh.Egs
                 TextureCount = asset.TextureCount;
                 Invalid = false;
             }
+
+            //Console.WriteLine("File: " + name + " | Asset Count: " + TextureCount);
         }
     }
 
@@ -969,7 +971,7 @@ namespace OpenKh.Egs
                             //Console.WriteLine("Bitmap image!);
 
                             TextureCount += 1;
-                            OffsetsAudio.Add(offset + 0x20000000);
+                            Offsets.Add(offset + 0x20000000);
                         }
                         break;
                     case (46): //BAR
@@ -1082,9 +1084,8 @@ namespace OpenKh.Egs
             ms.Seek(0x0c, SeekOrigin.Begin);
             TextureCount += ms.ReadInt32();
 
-            ms.ReadInt32();
-            ms.ReadInt32();
-            int infoOffset = ms.ReadInt32();
+            ms.Seek(0x18, SeekOrigin.Begin);
+            int GsinfoOff = ms.ReadInt32();
             int dataOffset = ms.ReadInt32();
 
             int diff = 0;
@@ -1093,8 +1094,7 @@ namespace OpenKh.Egs
                 int offset = dataOffset + diff + (i * 0x10) + 0x20000000;
                 Offsets.Add(offset);
 
-                int textInfoOffset = infoOffset + 0x20 + 0x40 + 0x10 + (0xA0 * i);
-                ms.Seek(textInfoOffset, SeekOrigin.Begin);
+                ms.Seek(GsinfoOff + 0x70 + (i * 0xA0), SeekOrigin.Begin);
                 ulong num = ms.ReadUInt64();
                 int width = (ushort)(1u << ((int)(num >> 0x1A) & 0x0F));
                 int height = (ushort)(1u << ((int)(num >> 0x1E) & 0x0F));
@@ -1126,40 +1126,41 @@ namespace OpenKh.Egs
             ms.Seek(0x0c, SeekOrigin.Begin);
             TextureCount += ms.ReadInt32();
 
-            ms.ReadInt32();
-            ms.ReadInt32();
-            int infoOffset = ms.ReadInt32();
+            ms.Seek(0x18, SeekOrigin.Begin);
+            int GsinfoOff = ms.ReadInt32();
             int dataOffset = ms.ReadInt32();
 
             int diff = 0;
             for (int i = 0; i < TextureCount; i++)
             {
-                int offset = dataOffset + diff + (i * 0x10) + 0x20000000;
-                Offsets.Add(origOffset + offset);
+                int offset = origOffset + dataOffset + diff + (i * 0x10) + 0x20000000;
+                Offsets.Add(offset);
 
-                int textInfoOffset = infoOffset + 0x20 + 0x40 + 0x10 + (0xA0 * i);
-                ms.Seek(textInfoOffset, SeekOrigin.Begin);
-                ulong num = ms.ReadUInt64();
-                int width = (ushort)(1u << ((int)(num >> 0x1A) & 0x0F));
-                int height = (ushort)(1u << ((int)(num >> 0x1E) & 0x0F));
-                diff += width * height;
+                ms.Seek(GsinfoOff + 0x70 + (i * 0xA0), SeekOrigin.Begin);
+                long Tex0Reg = ms.ReadInt64();
+
+                //int pixelfmt = (ushort)(1u << ((int)(Tex0Reg >> 20) & 0x0F));
+                int width = (ushort)(1u << ((int)(Tex0Reg >> 0x1A) & 0x0F));
+                int height = (ushort)(1u << ((int)(Tex0Reg >> 0x1E) & 0x0F));
+
+                diff += (width * height);
             }
 
             int index = Helpers.IndexOfByteArray(subAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), 0);
-
             while (index > -1)
             {
                 ms.Seek(index + 0x0a, SeekOrigin.Begin);
                 int imageToApplyTo = (int)ms.ReadInt16();
-
+            
                 ms.Seek(0x1c, SeekOrigin.Current);
                 int texaOffset = ms.ReadInt32();
                 int offset = index + texaOffset + 0x08 + (imageToApplyTo * 0x10) + 0x20000000;
                 Offsets.Add(origOffset + offset);
-
+            
                 TextureCount++;
                 index = Helpers.IndexOfByteArray(subAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
             }
+
         }
     }
 
