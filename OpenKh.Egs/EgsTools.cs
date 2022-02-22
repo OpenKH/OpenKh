@@ -185,7 +185,7 @@ namespace OpenKh.Egs
             foreach (var filename in patchFiles)
             {
                 AddFile(inputFolder, filename, patchedHedStream, patchedPkgStream);
-                //Console.WriteLine($"Added a new file: {filename}");
+                Console.WriteLine($"Added a new file: {filename}");
             }
         }
 
@@ -193,14 +193,27 @@ namespace OpenKh.Egs
         {
             var completeFilePath = Path.Combine(inputFolder, ORIGINAL_FILES_FOLDER_NAME, filename);
             var offset = pkgStream.Position;
+            var paddedfile = new MemoryStream();
 
             #region Data
 
-            using var newFileStream = File.OpenRead(completeFilePath);
             bool RemasterExist = false;
             string RemasteredPath = completeFilePath.Replace("\\original\\", "\\remastered\\");
             if (Directory.Exists(RemasteredPath))
                 RemasterExist = true;
+
+            using var newFileStream = File.OpenRead(completeFilePath);
+            var decompressedData = newFileStream.ReadAllBytes();
+            var compressedData = decompressedData.ToArray();
+            if (newFileStream.Length % 0x10 != 0)
+            {
+                //Console.WriteLine("Original file NOT aligned! Fixing.");
+                newFileStream.CopyTo(paddedfile);
+                paddedfile.Write(Enumerable.Repeat((byte)0xCD, 16 - ((int)newFileStream.Length % 0x10)).ToArray());
+                //Console.WriteLine("New Size: " + Convert.ToString(paddedfile.Length, 16));
+                decompressedData = paddedfile.ReadAllBytes();
+                compressedData = decompressedData.ToArray();
+            }
 
             var header = new EgsHdAsset.Header()
             {
@@ -210,9 +223,14 @@ namespace OpenKh.Egs
                 RemasteredAssetCount = 0,
                 CreationDate = -1
             };
+            if (paddedfile.Length > 0)
+            {
+                header.DecompressedLength = (int)paddedfile.Length;
+            }
 
-            var decompressedData = newFileStream.ReadAllBytes();
-            var compressedData = decompressedData.ToArray();
+            //Moved this to earlier in the code
+            //var decompressedData = newFileStream.ReadAllBytes();
+            //var compressedData = decompressedData.ToArray();
 
             if (shouldCompressData)
             {
@@ -270,13 +288,7 @@ namespace OpenKh.Egs
             return hedHeader;
         }
 
-        private static Hed.Entry ReplaceFile(
-            string inputFolder,
-            string filename,
-            FileStream hedStream,
-            FileStream pkgStream,
-            EgsHdAsset asset,
-            Hed.Entry originalHedHeader = null)
+        private static Hed.Entry ReplaceFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, EgsHdAsset asset, Hed.Entry originalHedHeader = null)
         {
             var completeFilePath = Path.Combine(inputFolder, ORIGINAL_FILES_FOLDER_NAME, filename);
 
@@ -299,6 +311,7 @@ namespace OpenKh.Egs
 
             SDasset sdasset = null;
             // We want to replace the original file
+
             if (File.Exists(completeFilePath))
             {
                 bool RemasterExist = false;
@@ -307,7 +320,7 @@ namespace OpenKh.Egs
                 string RemasteredPath = completeFilePath.Replace("\\original\\","\\remastered\\");
                 if (Directory.Exists(RemasteredPath))
                 {
-                    Console.WriteLine($"Remastered Folder Exists! Path: {RemasteredPath}");
+                    //Console.WriteLine($"Remastered Folder Exists! Path: {RemasteredPath}");
                     RemasterExist = true;
                 }
 
@@ -426,7 +439,7 @@ namespace OpenKh.Egs
             List<string> remasteredNames = new List<string>();
 
 
-            remasteredNames.Clear();
+            //remasteredNames.Clear();
             //grab list of full file paths from current remasteredAssetsFolder path and add them to a list.
             //we use this list later to correctly add the file names to the PKG.
             if (Directory.Exists(remasteredAssetsFolder) && Directory.GetFiles(remasteredAssetsFolder, "*", SearchOption.AllDirectories).Length > 0) //only do this if there are actually file in it.
@@ -445,16 +458,16 @@ namespace OpenKh.Egs
                     for (int i = 0; i < remasteredNames.Count; i++)
                     {
                         var filename = "/-"  + i.ToString();
-                        Console.WriteLine("TEST for " + filename + ".dds/.png");
+                        //Console.WriteLine("TEST for " + filename + ".dds/.png");
                         if (remasteredNames.Contains(filename + ".dds"))
                         {
-                            Console.WriteLine(filename + ".dds" + "FOUND!");
+                            //Console.WriteLine(filename + ".dds" + "FOUND!");
                             tempremasteredNamesD.Add(filename + ".dds");
                             remasteredNames.Remove(filename + ".dds");
                         }
                         else if (remasteredNames.Contains(filename + ".png"))
                         {
-                            Console.WriteLine(filename + ".png" + "FOUND!");
+                            //Console.WriteLine(filename + ".png" + "FOUND!");
                             tempremasteredNamesP.Add(filename + ".png");
                             remasteredNames.Remove(filename + ".png");
                         }
@@ -477,7 +490,7 @@ namespace OpenKh.Egs
                 //get actual file names ONLY if the remastered asset count is greater than 0 and ONLY if the number of files in the 
                 //remastered folder for the SD asset is equal to or greater than what the total count is from what was gotten in SDasset.
                 //if those criteria aren't met then do the old method.
-                if (remasteredNames.Count >= oldRemasteredHeaders.Count && remasteredNames.Count > 0)
+                if (remasteredNames.Count > oldRemasteredHeaders.Count && remasteredNames.Count > 0)
                 {
                     //filename = remasteredNames[i].Replace((remasteredAssetsFolder), "").Remove(0, 1);
                     filename = remasteredNames[i].Remove(0, 1);
@@ -501,7 +514,7 @@ namespace OpenKh.Egs
                 }
                 else
                 {
-                    //Console.WriteLine($"Keeping remastered file: {relativePath}/{filename}");
+                    Console.WriteLine($"Keeping remastered file: {relativePath}/{filename}");
                     // The original file have been replaced, we need to encrypt all remastered asset with the new key
                     if (!seed.SequenceEqual(asset.Seed))
                     {
@@ -586,6 +599,10 @@ namespace OpenKh.Egs
                 case (".2dd", true):
                 case (".2ld", true):
                 case (".bar", true):
+                case (".bin", true):
+                case (".mag", true):
+                //case (".map", true): //alot more complicated than i thought. try again later
+                case (".mdlx", true):
                     asset = new BAR(originalAssetData);
                     break;
                 case (".imd", true):
@@ -594,9 +611,15 @@ namespace OpenKh.Egs
                 case (".imz", true):
                     asset = new IMZ(originalAssetData);
                     break;
-                case (".mdlx", true):
-                    asset = new MDLX(originalAssetData);
+                case (".pax", true):
+                    asset = new PAX(originalAssetData);
                     break;
+                case (".tm2", true):
+                    asset = new TM2(originalAssetData);
+                    break;
+                //case (".dpd", true): //Special file, fix later
+                //asset = new IMZ(originalAssetData);
+                //    break;
             }
             switch (".a" + (Path.GetExtension(name)), remasterpathtrue)
             {
@@ -618,6 +641,8 @@ namespace OpenKh.Egs
                 TextureCount = asset.TextureCount;
                 Invalid = false;
             }
+
+            //Console.WriteLine("File: " + name + " | Asset Count: " + TextureCount);
         }
     }
 
@@ -629,20 +654,33 @@ namespace OpenKh.Egs
 
         public IMD(byte[] originalAssetData)
         {
-            using (MemoryStream ms = new MemoryStream(originalAssetData))
-            {
-                int magic = ms.ReadInt32();
-                if (magic != 1145523529)
-                { //IMGD
-                    Invalid = true;
-                    return;
-                }
+            using MemoryStream ms = new MemoryStream(originalAssetData);
 
-                TextureCount = 1;
-                ms.ReadInt32(); //always 256
-                int IMDoffset = ms.ReadInt32(); //offset for image data
-                Offsets.Add(IMDoffset + 0x20000000);
+            var magic = ms.ReadInt32();
+            if (magic != 1145523529) //IMGD
+            { 
+                Invalid = true;
+                return;
             }
+
+            TextureCount += 1; //IMDs are always single images
+            ms.ReadInt32(); //always 256
+            int IMDoffset = ms.ReadInt32(); //offset for image data
+            Offsets.Add(IMDoffset + 0x20000000);
+
+        }
+
+        public IMD(byte[] subAssetData, int origoffset)
+        {
+            using MemoryStream ms = new MemoryStream(subAssetData);
+
+            ms.ReadInt32(); //magic
+
+            TextureCount += 1; //IMDs are always single images
+            ms.ReadInt32(); //always 256(?)
+            int IMDoffset = ms.ReadInt32(); //offset for image data
+            Offsets.Add(origoffset + IMDoffset + 0x20000000);
+
         }
     }
 
@@ -654,33 +692,153 @@ namespace OpenKh.Egs
 
         public IMZ(byte[] originalAssetData)
         {
-            using (MemoryStream ms = new MemoryStream(originalAssetData))
+            using MemoryStream ms = new MemoryStream(originalAssetData);
+
+            int magic = ms.ReadInt32();
+            if (magic != 1514622281)
+            { //IMGZ
+                Invalid = true;
+                return;
+            }
+
+            ms.ReadInt64();
+
+            TextureCount += ms.ReadInt32();
+            for (int i = 0; i < TextureCount; i++)
             {
-                int magic = ms.ReadInt32();
-                if (magic != 1514622281)
-                { //IMGZ
+                ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
+
+                int offset = ms.ReadInt32();
+                ms.Seek(offset, SeekOrigin.Begin);
+
+                int magic2 = ms.ReadInt32();
+                if (magic2 != 1145523529) //IMGD
+                { 
                     Invalid = true;
                     return;
                 }
-                ms.ReadInt32();
-                ms.ReadInt32();
-                TextureCount = ms.ReadInt32();
 
-                for (int i = 0; i < TextureCount; i++)
+                ms.ReadInt32(); //always 256
+                int IMDoffset = ms.ReadInt32(); //offset for image data
+                Offsets.Add(offset + IMDoffset + 0x20000000);
+            }
+        }
+
+        public IMZ(byte[] subAssetData, int origOffset)
+        {
+            using MemoryStream ms = new MemoryStream(subAssetData);
+
+            ms.ReadInt32(); //magic
+            ms.ReadInt64(); //unknown
+
+            TextureCount += ms.ReadInt32();
+            for (int i = 0; i < TextureCount; i++) 
+            {
+                ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
+                int offset = ms.ReadInt32();
+                ms.Seek(offset, SeekOrigin.Begin);
+
+                int magic2 = ms.ReadInt32();
+                if (magic2 == 1145523529) //IMGD
                 {
-                    ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
-                    int offset = ms.ReadInt32();
-                    ms.Seek(offset, SeekOrigin.Begin);
-                    int magic2 = ms.ReadInt32();
-                    if (magic2 != 1145523529)
-                    { //IMGD
-                        Invalid = true;
-                        return;
-                    }
-
                     ms.ReadInt32(); //always 256
                     int IMDoffset = ms.ReadInt32(); //offset for image data
-                    Offsets.Add(offset + IMDoffset + 0x20000000);
+                    Offsets.Add(origOffset + offset + IMDoffset + 0x20000000);
+                }
+            }
+        }
+    }
+
+    class PAX
+    {
+        public List<int> Offsets = new List<int>();
+        public int TextureCount = 0;
+        public bool Invalid = false;
+
+        public PAX(byte[] originalAssetData)
+        {
+            using MemoryStream ms = new MemoryStream(originalAssetData);
+
+            var magic = ms.ReadInt32();
+            if (magic != 1599619408) //PAX_
+            {
+                Invalid = true;
+                return;
+            }
+
+            ms.ReadInt64(); //we just skip these 8 bytes. unsure what they are for.
+
+            var Dpxoffset = ms.ReadInt32();
+            ms.Seek(Dpxoffset + 0xC, SeekOrigin.Begin);
+
+            var Unk1Count = ms.ReadInt32(); //unsure what this block of data is for. we seem to not need it though.
+            ms.Seek(Unk1Count * 0x20, SeekOrigin.Current); //so skip it to get to the part we actually need.
+
+            var DpdCount = ms.ReadInt32();
+            var DpdOffsets = ((int)ms.Position); //the DPDs are what have our textures so save the position of this area.
+
+            for (int d = 0; d < DpdCount; d++)
+            {
+                ms.Seek(DpdOffsets + (d * 0x4), SeekOrigin.Begin);
+
+                var DpdOffset = ms.ReadInt32();
+                ms.Seek(Dpxoffset + DpdOffset, SeekOrigin.Begin);
+
+                ms.ReadInt32(); //unknown
+
+                var Unk2Count = ms.ReadInt32(); //don't know this block of data, so skip it to get to what me need
+                ms.Seek(Unk2Count * 0x4, SeekOrigin.Current);
+
+                var DpdTexCount = ms.ReadInt32(); //finally found the texture offsets
+                var DpdTexOffsets = ((int)ms.Position); //save this position
+
+                for (int t = 0; t < DpdTexCount; t++)
+                {
+                    TextureCount += 1;
+                    ms.Seek(DpdTexOffsets + (t * 0x4), SeekOrigin.Begin);
+                    var DpdTexOffset = ms.ReadInt32();
+                    Offsets.Add(Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000);
+                }
+            }
+        }
+
+        public PAX(byte[] subAssetData, int origOffset)
+        {
+            using MemoryStream ms = new MemoryStream(subAssetData);
+
+            ms.ReadInt32(); //magic. already confirmed in main asset
+            ms.ReadInt64(); //we just skip these 8 bytes. unsure what they are for.
+
+            var Dpxoffset = ms.ReadInt32();
+            ms.Seek(Dpxoffset + 0xC, SeekOrigin.Begin);
+
+            var Unk1Count = ms.ReadInt32(); //unsure what this block of data is for. we seem to not need it though.
+            ms.Seek(Unk1Count * 0x20, SeekOrigin.Current); //so skip it to get to the part we actually need.
+
+            var DpdCount = ms.ReadInt32();
+            var DpdOffsets = ((int)ms.Position); //the DPDs are what have our textures so save the position of this area.
+
+            for (int d = 0; d < DpdCount; d++)
+            {
+                ms.Seek(DpdOffsets + (d * 0x4), SeekOrigin.Begin);
+
+                var DpdOffset = ms.ReadInt32();
+                ms.Seek(Dpxoffset + DpdOffset, SeekOrigin.Begin);
+
+                ms.ReadInt32(); //unknown
+
+                var Unk2Count = ms.ReadInt32(); //don't know this block of data, so skip it to get to what me need
+                ms.Seek(Unk2Count * 0x4, SeekOrigin.Current);
+
+                var DpdTexCount = ms.ReadInt32(); //finally found the texture offsets
+                var DpdTexOffsets = ((int)ms.Position); //save this position
+
+                for (int t = 0; t < DpdTexCount; t++)
+                {
+                    TextureCount += 1;
+                    ms.Seek(DpdTexOffsets + (t * 0x4), SeekOrigin.Begin);
+                    var DpdTexOffset = ms.ReadInt32();
+                    Offsets.Add(origOffset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000);
                 }
             }
         }
@@ -689,318 +847,398 @@ namespace OpenKh.Egs
     class BAR
     {
         public List<int> Offsets = new List<int>();
+        public List<int> OffsetsTIM = new List<int>();
+        public List<int> OffsetsPAX = new List<int>();
+        public List<int> OffsetsTM2 = new List<int>();
         public List<int> OffsetsAudio = new List<int>();
         public int TextureCount = 0;
         public bool Invalid = false;
-
+        
         public BAR(byte[] originalAssetData)
         {
-            using (MemoryStream ms = new MemoryStream(originalAssetData))
+            dynamic subasset;
+
+            using MemoryStream ms = new MemoryStream(originalAssetData);
+
+            int type;
+            int offset;
+            int subsize;
+            string magic;
+            byte[] subfile;
+
+            magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(3));
+            if (magic != "BAR") //BAR
             {
-                int subcount = 0;
-                int offset = 0;
-                int suboffset = 0;
-                int subtype = 0;
-                int Dpxoffset = 0;
-                int DpdOffset = 0;
-                int DpdOffsets = 0;
-                int DpdCount = 0;
-                int DpdTexCount = 0;
-                int DpdTexOffset = 0;
-                int DpdTexOffsets = 0;
-                int Unk1Count = 0;
-                int Unk2Count = 0;
-                int magic2 = 0;
-                string magicsound;
+                Invalid = true;
+                return;
+            }
+            ms.ReadBytes(1);
 
-                int magic = ms.ReadInt32();
-                if (magic != 22167874)
-                { //BAR
-                    Invalid = true;
-                    return;
-                }
+            int count = ms.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                ms.Seek(0x10 + (i * 0x10), SeekOrigin.Begin);
 
-                int count = ms.ReadInt32();
-                for (int i = 0; i < count; i++)
+                type = ms.ReadInt32(); //subasset type
+                ms.ReadInt32(); //subasset name
+                offset = ms.ReadInt32(); //subasset offset
+                subsize = ms.ReadInt32(); //subasset size
+
+                ms.Seek(offset, SeekOrigin.Begin);
+
+                //Console.WriteLine("Type is - " + type);
+                switch (type)
                 {
-                    ms.Seek(0x10 + (i * 0x10), SeekOrigin.Begin);
-                    int type = ms.ReadInt32();
-                    //Console.WriteLine("type is - " + type);
-                    switch (type)
-                    {
-                        case (18): //PAX
-                            //Console.WriteLine("type is an PAX archive! - " + type);
-                            ms.ReadInt32();
-                            offset = ms.ReadInt32();
+                    case (7): //RAW Image
+                        int rawmagic = ms.ReadInt32();
+                        if (rawmagic == 0)
+                        {
+                            //Console.WriteLine("RAW image!");
                             ms.Seek(offset, SeekOrigin.Begin);
+                            subfile = ms.ReadBytes(subsize);
+                            subasset = new RAW(subfile, offset);
 
-                            magic2 = ms.ReadInt32();
-                            //Console.WriteLine("pax magic is - " + magic2);
-                            if (magic2 == 1599619408)
-                            { //PAX_
-
-                                ms.ReadInt64();
-                                Dpxoffset = ms.ReadInt32();
-                                //Console.WriteLine("Dpxoffset is - " + Dpxoffset);
-                                ms.Seek(offset + Dpxoffset + 0xC, SeekOrigin.Begin);
-                                Unk1Count = ms.ReadInt32();
-                                ms.Seek(Unk1Count * 0x20, SeekOrigin.Current);
-                                DpdCount = ms.ReadInt32();
-                                DpdOffsets = ((int)ms.Position);
-
-                                for (int d = 0; d < DpdCount; d++)
-                                {
-                                    ms.Seek(DpdOffsets + (d * 0x4), SeekOrigin.Begin);
-                                    DpdOffset = ms.ReadInt32();
-                                    ms.Seek(offset + Dpxoffset + DpdOffset, SeekOrigin.Begin);
-
-                                    ms.ReadInt32(); // unknown
-                                    Unk2Count = ms.ReadInt32();
-                                    ms.Seek(Unk2Count * 0x4, SeekOrigin.Current);
-                                    DpdTexCount = ms.ReadInt32();
-                                    DpdTexOffsets = ((int)ms.Position);
-
-                                    for (int t = 0; t < DpdTexCount; t++)
-                                    {
-                                        TextureCount += 1;
-                                        ms.Seek(DpdTexOffsets + (t * 0x4), SeekOrigin.Begin);
-                                        DpdTexOffset = ms.ReadInt32();
-                                        Offsets.Add(offset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000);
-                                    }
-                                }
-                            }
-                            break;
-                        case (24): //IMD
-                            //Console.WriteLine("is an image! - " + type);
-                            ms.ReadInt32();
-                            offset = ms.ReadInt32();
+                            TextureCount += subasset.TextureCount;
+                            OffsetsTIM.AddRange(subasset.Offsets);
+                        }
+                        break;
+                    case (10): //TIM2
+                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                        if (magic == "TIM2")
+                        {
+                            //Console.WriteLine("TIM2 Image!");
                             ms.Seek(offset, SeekOrigin.Begin);
+                            subfile = ms.ReadBytes(subsize);
+                            subasset = new TM2(subfile, offset);
 
-                            magic2 = ms.ReadInt32();
-                            if (magic2 == 1145523529)
-                            { //IMGD
-                                TextureCount += 1;
-                                ms.ReadInt32(); //always 256
-                                int IMDoffset = ms.ReadInt32(); //offset for image data
-                                Offsets.Add(offset + IMDoffset + 0x20000000);
-                            }
-                            break;
-                        case (29): //IMZ
-                            //Console.WriteLine("is an image collection! - " + type);
-                            ms.ReadInt32();
-                            offset = ms.ReadInt32();
+                            TextureCount += subasset.TextureCount;
+                            OffsetsTM2.AddRange(subasset.Offsets);
+                        }
+                        break;
+                    case (18): //PAX
+                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(3));
+                        if (magic == "PAX") //PAX
+                        {
+                            //Console.WriteLine("PAX archive!");
                             ms.Seek(offset, SeekOrigin.Begin);
+                            subfile = ms.ReadBytes(subsize);
+                            subasset = new PAX(subfile, offset);
 
-                            magic2 = ms.ReadInt32();
-                            if (magic2 == 1514622281)
-                            { //IMGZ
-                                ms.ReadInt32();
-                                ms.ReadInt32();
-                                int ImageCount = ms.ReadInt32();
-                                TextureCount += ImageCount;
-                                for (int j = 0; j < ImageCount; j++)
-                                {
-                                    ms.Seek(offset + 0x10 + (j * 0x8), SeekOrigin.Begin);
-                                    int IMZoffset = ms.ReadInt32();
-                                    ms.Seek(offset + IMZoffset, SeekOrigin.Begin);
-
-                                    int magic3 = ms.ReadInt32();
-                                    if (magic3 == 1145523529)
-                                    {
-                                        ms.ReadInt32(); //always 256
-                                        int IMDoffset = ms.ReadInt32(); //offset for image data
-                                        Offsets.Add(offset + IMZoffset + IMDoffset + 0x20000000);
-                                    }
-                                }
-                            }
-                            break;
-                        case (31): //Sound Effects
-                            //Console.WriteLine("is audio! - " + type);
-                            ms.ReadInt32();
-                            offset = ms.ReadInt32();
+                            TextureCount += subasset.TextureCount;
+                            OffsetsPAX.AddRange(subasset.Offsets);
+                        }
+                        break;
+                    case (24): //IMD
+                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                        if (magic == "IMGD") //IMGD
+                        {
+                            //Console.WriteLine("Image!");
                             ms.Seek(offset, SeekOrigin.Begin);
+                            subfile = ms.ReadBytes(subsize);
+                            subasset = new IMD(subfile, offset);
 
-                            magicsound = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(6));
-                            //Console.WriteLine("magic is - " + magicsound);
-                            if (magicsound == "ORIGIN")
-                            {
-                                TextureCount += 1;
-                                OffsetsAudio.Add(-1);
-                            }
-                            break;
-                        case (34): //Voice Audio
-                            //Console.WriteLine("is audio! - " + type);
-                            ms.ReadInt32();
-                            offset = ms.ReadInt32();
+                            TextureCount += subasset.TextureCount;
+                            Offsets.AddRange(subasset.Offsets);
+                        }
+                        break;
+                    case (29): //IMZ                           
+                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                        if (magic == "IMGZ")//IMGZ
+                        {
+                            //Console.WriteLine("Image Collection!");
                             ms.Seek(offset, SeekOrigin.Begin);
+                            subfile = ms.ReadBytes(subsize);
+                            subasset = new IMZ(subfile, offset);
 
-                            magicsound = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(6));
-                            //Console.WriteLine("magic is - " + magicsound);
-                            if (magicsound == "ORIGIN")
-                            {
-                                TextureCount += 1;
-                                OffsetsAudio.Add(-1);
-                            }
-                            break;
-                        case (46): //sub-BAR
-                            //Console.WriteLine("is BAR-ception! - " + type);
-                            ms.ReadInt32();
-                            offset = ms.ReadInt32();
+                            TextureCount += subasset.TextureCount;
+                            Offsets.AddRange(subasset.Offsets);
+                        }
+                        break;
+                    case (31): //Sound Effects
+                    case (34): //Voice Audio
+                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(6));
+                        if (magic == "ORIGIN")
+                        {
+                            //Console.WriteLine("Audio file!");
+
+                            TextureCount += 1;
+                            OffsetsAudio.Add(-1);
+                        }
+                        break;
+                    case (36): //raw bitmap
+                        //no magic for these. we just hope that any instance of this is actually a bitmap
+                        {
+                            //Console.WriteLine("Bitmap image!);
+
+                            TextureCount += 1;
+                            Offsets.Add(offset + 0x20000000);
+                        }
+                        break;
+                    case (46): //BAR
+                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(3));
+                        if (magic == "BAR")
+                        {
+                            //Console.WriteLine("BAR-ception!);
                             ms.Seek(offset, SeekOrigin.Begin);
-                            suboffset = ((int)ms.Position);
+                            subfile = ms.ReadBytes(subsize);
+                            subasset = new BAR(subfile, offset);
 
-                            magic2 = ms.ReadInt32();
-                            if (magic2 == 22167874)
-                            {
-                                subcount = ms.ReadInt32();
-
-                                for (int s = 0; s < subcount; s++)
-                                {
-
-                                    ms.Seek(0x10 + suboffset + (s * 0x10), SeekOrigin.Begin);
-                                    subtype = ms.ReadInt32();
-
-                                    switch (subtype)
-                                    {
-                                        case (24): //IMD
-                                            //Console.WriteLine("is a BAR-ception image! - " + type);
-                                            ms.ReadInt32();
-                                            offset = ms.ReadInt32();
-                                            ms.Seek(offset + suboffset, SeekOrigin.Begin);
-
-                                            magic2 = ms.ReadInt32();
-                                            if (magic2 == 1145523529)
-                                            { //IMGD
-                                                TextureCount += 1;
-                                                ms.ReadInt32(); //always 256
-                                                int IMDoffset = ms.ReadInt32(); //offset for image data
-                                                Offsets.Add(suboffset + offset + IMDoffset + 0x20000000);
-                                            }
-                                            break;
-                                        case (29): //IMZ
-                                            //Console.WriteLine("is a BAR-ception image collection! - " + subtype);
-                                            ms.ReadInt32();
-                                            offset = ms.ReadInt32();
-                                            ms.Seek(offset + suboffset, SeekOrigin.Begin);
-
-                                            magic2 = ms.ReadInt32();
-                                            //Console.WriteLine("BAR-ception image collection magic2: - " + magic2);
-                                            if (magic2 == 1514622281)
-                                            { //IMGZ
-                                                ms.ReadInt64();
-                                                int ImageCount = ms.ReadInt32();
-                                                //Console.WriteLine("BAR-ception imz count: - " + ImageCount);
-                                                for (int sj = 0; sj < ImageCount; sj++)
-                                                {
-                                                    ms.Seek(suboffset + offset +  + 0x10 + (sj * 0x8), SeekOrigin.Begin);
-                                                    int IMZoffset = ms.ReadInt32();
-                                                    ms.Seek(suboffset + offset + IMZoffset, SeekOrigin.Begin);
-
-                                                    int magic3 = ms.ReadInt32();
-                                                    //Console.WriteLine("BAR-ception magic3: - " + magic3);
-                                                    if (magic3 == 1145523529)
-                                                    {
-                                                        TextureCount += 1;
-                                                        ms.ReadInt32(); //always 256
-                                                        int IMDoffset = ms.ReadInt32(); //offset for image data
-                                                        Offsets.Add(suboffset + offset + IMZoffset + IMDoffset + 0x20000000);
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                    }
-                                }
-                            }
-                            break;
-                    }
-                }
-
-                //add all audio offsets to the end. they need to always be last
-                Offsets.AddRange(OffsetsAudio);
-                
-                if (TextureCount == 0)
-                {
-                    Console.WriteLine("BAR doesn't contain hd assets.");
-                    Invalid = true;
-                    return;
+                            TextureCount += subasset.TextureCount;
+                            Offsets.AddRange(subasset.Offsets);
+                        }
+                        break;
                 }
             }
+
+            //mostly needed for maps, though maybe other files need this sorting too
+            OffsetsTIM.AddRange(OffsetsPAX);
+            OffsetsTIM.AddRange(OffsetsTM2);
+            OffsetsTIM.AddRange(Offsets);
+            OffsetsTIM.AddRange(OffsetsAudio);
+            Offsets = OffsetsTIM;
+
+            if (TextureCount == 0)
+            {
+                //Console.WriteLine("BAR doesn't contain hd assets.");
+                Invalid = true;
+                return;
+            }
+        }
+
+        public BAR(byte[] originalAssetData, int origOffset)
+        {
+            //Bar-ception. luckily only IMGZ and IMGD can be in these. (as far as i know anyway...)
+            int type;
+            int offset;
+            int subsize;
+            string magic;
+            byte[] subfile;
+            dynamic subasset;
+
+            using MemoryStream ms = new MemoryStream(originalAssetData);
+
+            ms.ReadInt32(); //magic
+
+            int count = ms.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                ms.Seek(0x10 + (i * 0x10), SeekOrigin.Begin);
+                type = ms.ReadInt32(); //subasset type
+                ms.ReadInt32(); //subasset name
+                offset = ms.ReadInt32(); //subasset offset
+                subsize = ms.ReadInt32(); //subasset size
+                ms.Seek(offset, SeekOrigin.Begin);
+
+                switch (type)
+                {
+                    case (24): //IMD
+                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                        if (magic == "IMGD") //IMGD
+                        {
+                            //Console.WriteLine("BAR-ception Image!");
+                            ms.Seek(offset, SeekOrigin.Begin);
+                            subfile = ms.ReadBytes(subsize);
+                            subasset = new IMD(subfile, offset);
+
+                            TextureCount += subasset.TextureCount;
+                            Offsets.AddRange(subasset.Offsets);
+                        }
+                        break;
+                    case (29): //IMZ                           
+                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                        if (magic == "IMGZ")//IMGZ
+                        {
+                            //Console.WriteLine("BAR-ception Image Collection!");
+                            ms.Seek(offset, SeekOrigin.Begin);
+                            subfile = ms.ReadBytes(subsize);
+                            subasset = new IMZ(subfile, offset);
+
+                            TextureCount += subasset.TextureCount;
+                            Offsets.AddRange(subasset.Offsets);
+                        }
+                        break;
+                }
+            }
+
         }
     }
 
-    class MDLX
+    class RAW
     {
         public List<int> Offsets = new List<int>();
         public int TextureCount = 0;
         public bool Invalid = false;
 
-        public MDLX(byte[] originalAssetData)
+        //i don't think RAW textures can ever be single files, but added just in case
+        public RAW(byte[] originalAssetData)
         {
-            using (MemoryStream ms = new MemoryStream(originalAssetData))
+            using MemoryStream ms = new MemoryStream(originalAssetData);
+
+            var magic = ms.ReadInt32();
+            if (magic != 0) //0x00000000
             {
-                ms.ReadInt32();
-                int version = ms.ReadInt32();
-                if (version != 2 && version != 3 && version != 4)
-                { //original: version != 3
-                    Invalid = true;
-                    return;
-                }
-                ms.Seek(0x24, SeekOrigin.Begin);
-                string tim_ = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
-                if (tim_ != "tim_")
+                Invalid = true;
+                return;
+            }
+
+            ms.Seek(0x0c, SeekOrigin.Begin);
+            TextureCount += ms.ReadInt32();
+
+            ms.Seek(0x18, SeekOrigin.Begin);
+            int GsinfoOff = ms.ReadInt32();
+            int dataOffset = ms.ReadInt32();
+
+            int diff = 0;
+            for (int i = 0; i < TextureCount; i++)
+            {
+                int offset = dataOffset + diff + (i * 0x10) + 0x20000000;
+                Offsets.Add(offset);
+
+                ms.Seek(GsinfoOff + 0x70 + (i * 0xA0), SeekOrigin.Begin);
+                ulong num = ms.ReadUInt64();
+                int width = (ushort)(1u << ((int)(num >> 0x1A) & 0x0F));
+                int height = (ushort)(1u << ((int)(num >> 0x1E) & 0x0F));
+                diff += width * height;
+            }
+
+            int index = Helpers.IndexOfByteArray(originalAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), 0);
+
+            while (index > -1)
+            {
+                ms.Seek(index + 0x0a, SeekOrigin.Begin);
+                int imageToApplyTo = (int)ms.ReadInt16();
+
+                ms.Seek(0x1c, SeekOrigin.Current);
+                int texaOffset = ms.ReadInt32();
+                int offset = index + texaOffset + 0x08 + (imageToApplyTo * 0x10) + 0x20000000;
+                Offsets.Add(offset);
+
+                TextureCount++;
+                index = Helpers.IndexOfByteArray(originalAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
+            }
+
+        }
+
+        public RAW(byte[] subAssetData, int origOffset)
+        {
+            using MemoryStream ms = new MemoryStream(subAssetData);
+
+            ms.Seek(0x0c, SeekOrigin.Begin);
+            TextureCount += ms.ReadInt32();
+
+            ms.Seek(0x18, SeekOrigin.Begin);
+            int GsinfoOff = ms.ReadInt32();
+            int dataOffset = ms.ReadInt32();
+
+            int diff = 0;
+            for (int i = 0; i < TextureCount; i++)
+            {
+                int offset = origOffset + dataOffset + diff + (i * 0x10) + 0x20000000;
+                Offsets.Add(offset);
+
+                ms.Seek(GsinfoOff + 0x70 + (i * 0xA0), SeekOrigin.Begin);
+                long Tex0Reg = ms.ReadInt64();
+
+                //int pixelfmt = (ushort)(1u << ((int)(Tex0Reg >> 20) & 0x0F));
+                int width = (ushort)(1u << ((int)(Tex0Reg >> 0x1A) & 0x0F));
+                int height = (ushort)(1u << ((int)(Tex0Reg >> 0x1E) & 0x0F));
+
+                diff += (width * height);
+            }
+
+            int index = Helpers.IndexOfByteArray(subAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), 0);
+            while (index > -1)
+            {
+                ms.Seek(index + 0x0a, SeekOrigin.Begin);
+                int imageToApplyTo = (int)ms.ReadInt16();
+            
+                ms.Seek(0x1c, SeekOrigin.Current);
+                int texaOffset = ms.ReadInt32();
+                int offset = index + texaOffset + 0x08 + (imageToApplyTo * 0x10) + 0x20000000;
+                Offsets.Add(origOffset + offset);
+            
+                TextureCount++;
+                index = Helpers.IndexOfByteArray(subAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
+            }
+
+        }
+    }
+
+    class TM2
+    {
+        public List<int> Offsets = new List<int>();
+        public int TextureCount = 0;
+        public bool Invalid = false;
+
+        public TM2(byte[] originalAssetData)
+        {
+            using MemoryStream ms = new MemoryStream(originalAssetData);
+
+            var magic = ms.ReadInt32();
+            if (magic != 843925844) //TIM2
+            {
+                Invalid = true;
+                return;
+            }
+
+            ms.ReadInt16(); //format
+            int texCount = ms.ReadInt16();
+            ms.ReadInt64(); //unused
+            int totalsize = 0;
+
+            for (int i = 0; i < texCount; i++)
+            {
+                ms.Seek(0x10 + totalsize, SeekOrigin.Begin);
+                totalsize += ms.ReadInt32();
+
+                if (i == 0 && totalsize == 0 && texCount > 1)
                 {
                     Invalid = true;
                     return;
                 }
-                int TIMoffset = ms.ReadInt32();
 
-                ms.Seek(TIMoffset, SeekOrigin.Begin);
-                int pointer = ms.ReadInt32();
-                if (pointer == -1)
-                {
-                    Invalid = true;
-                    return;
-                }
+                ms.ReadInt32(); //Clut size
+                ms.ReadInt32(); //Image size
+                int header = ms.ReadInt16(); //header size
+                ms.Seek((header - 0x10) + 0x2, SeekOrigin.Current);
+                int imageOffset = ((int)ms.Position);
 
-                ms.Seek(TIMoffset + 0x0c, SeekOrigin.Begin);
-                TextureCount = ms.ReadInt32();
-
-                ms.ReadInt32();
-                ms.ReadInt32();
-                int infoOffset = ms.ReadInt32();
-                int dataOffset = ms.ReadInt32();
-
-                int diff = 0;
-                for (int i = 0; i < TextureCount; i++)
-                {
-                    int offset = TIMoffset + dataOffset + diff + (i * 0x10) + 0x20000000;
-                    Offsets.Add(offset);
-
-                    int textInfoOffset = TIMoffset + infoOffset + 0x20 + 0x40 + 0x10 + (0xA0 * i);
-                    ms.Seek(textInfoOffset, SeekOrigin.Begin);
-                    ulong num = ms.ReadUInt64();
-                    int width = (ushort)(1u << ((int)(num >> 0x1A) & 0x0F));
-                    int height = (ushort)(1u << ((int)(num >> 0x1E) & 0x0F));
-                    diff += width * height;
-                }
-
-                int index = Helpers.IndexOfByteArray(originalAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), TIMoffset);
-
-                while (index > -1)
-                {
-                    ms.Seek(index + 0x0a, SeekOrigin.Begin);
-                    int imageToApplyTo = (int)ms.ReadInt16();
-
-                    ms.Seek(0x1c, SeekOrigin.Current);
-                    int texaOffset = ms.ReadInt32();
-                    int offset = index + texaOffset + 0x08 + (imageToApplyTo * 0x10) + 0x20000000;
-                    Offsets.Add(offset);
-
-                    TextureCount++;
-                    index = Helpers.IndexOfByteArray(originalAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
-                }
+                TextureCount += 1;
+                Offsets.Add(0x10 + imageOffset + 0x20000000);
             }
         }
 
+        public TM2(byte[] subAssetData, int origOffset)
+        {
+            using MemoryStream ms = new MemoryStream(subAssetData);
+
+            ms.ReadInt32(); //magic
+            ms.ReadInt16(); //format
+            int texCount = ms.ReadInt16();
+            ms.ReadInt64(); //unused
+            int totalsize = 0;
+
+            for (int i = 0; i < texCount; i++)
+            {
+                ms.Seek(0x10 + totalsize, SeekOrigin.Begin);
+                totalsize += ms.ReadInt32();
+
+                if (i == 0 && totalsize == 0 && texCount > 1)
+                {
+                    Invalid = true;
+                    return;
+                }
+
+                ms.ReadInt32(); //Clut size
+                ms.ReadInt32(); //Image size
+                int header = ms.ReadInt16(); //header size
+                ms.Seek((header - 0x10) + 0x2, SeekOrigin.Current);
+                int imageOffset = ((int)ms.Position);
+
+                TextureCount += 1;
+                Offsets.Add(origOffset + 0x10 + imageOffset + 0x20000000);
+            }
+        }
     }
-}
+
+ }
