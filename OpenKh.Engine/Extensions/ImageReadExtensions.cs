@@ -20,6 +20,8 @@ namespace OpenKh.Engine.Extensions
                         image.GetData(), image.GetClut(), Bgra);
                 case PixelFormat.Rgba8888:
                     return ImageDataHelpers.FromBitmap32(image.GetData(), Rgba);
+                case PixelFormat.Rgba1555:
+                    return new byte[0];
                 default:
                     throw new ArgumentException($"The pixel format {image.PixelFormat} is not supported.");
             }
