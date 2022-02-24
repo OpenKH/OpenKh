@@ -439,7 +439,7 @@ namespace OpenKh.Egs
             List<string> remasteredNames = new List<string>();
 
 
-            //remasteredNames.Clear();
+            remasteredNames.Clear();
             //grab list of full file paths from current remasteredAssetsFolder path and add them to a list.
             //we use this list later to correctly add the file names to the PKG.
             if (Directory.Exists(remasteredAssetsFolder) && Directory.GetFiles(remasteredAssetsFolder, "*", SearchOption.AllDirectories).Length > 0) //only do this if there are actually file in it.
@@ -490,7 +490,7 @@ namespace OpenKh.Egs
                 //get actual file names ONLY if the remastered asset count is greater than 0 and ONLY if the number of files in the 
                 //remastered folder for the SD asset is equal to or greater than what the total count is from what was gotten in SDasset.
                 //if those criteria aren't met then do the old method.
-                if (remasteredNames.Count > oldRemasteredHeaders.Count && remasteredNames.Count > 0)
+                if (remasteredNames.Count >= oldRemasteredHeaders.Count && remasteredNames.Count > 0)
                 {
                     //filename = remasteredNames[i].Replace((remasteredAssetsFolder), "").Remove(0, 1);
                     filename = remasteredNames[i].Remove(0, 1);
@@ -618,7 +618,7 @@ namespace OpenKh.Egs
                     asset = new TM2(originalAssetData);
                     break;
                 //case (".dpd", true): //Special file, fix later
-                //asset = new IMZ(originalAssetData);
+                //asset = new DPD(originalAssetData);
                 //    break;
             }
             switch (".a" + (Path.GetExtension(name)), remasterpathtrue)
@@ -642,7 +642,7 @@ namespace OpenKh.Egs
                 Invalid = false;
             }
 
-            //Console.WriteLine("File: " + name + " | Asset Count: " + TextureCount);
+            Console.WriteLine("File: " + name + " | Asset Count: " + TextureCount);
         }
     }
 
@@ -959,7 +959,7 @@ namespace OpenKh.Egs
                         magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(6));
                         if (magic == "ORIGIN")
                         {
-                            //Console.WriteLine("Audio file!");
+                            Console.WriteLine("Audio file!");
 
                             TextureCount += 1;
                             OffsetsAudio.Add(-1);
