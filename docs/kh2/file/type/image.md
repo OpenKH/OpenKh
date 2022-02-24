@@ -31,8 +31,8 @@ Contains multiple [IMGDs](#imgd) prepended by a [specific header](#imz-header). 
 | 18 | uint32_t | Always `-1`
 | 1c | uint16_t | Image width
 | 1e | uint16_t | Image height
-| 20 | uint16_t | Square root of image width
-| 22 | uint16_t | Square root of image height
+| 20 | uint16_t | 2 to the power of image width (2ⁿ)
+| 22 | uint16_t | 2 to the power of image height (2ⁿ)
 | 24 | uint16_t | Image width divided by `64`
 | 26 | uint16_t | [Image format](#image-formats)
 | 28 | uint32_t | Always `-1`
@@ -43,7 +43,7 @@ Contains multiple [IMGDs](#imgd) prepended by a [specific header](#imz-header). 
 | 34 | uint16_t | `3` if 32bpp, `5` if 8bpp or `4` if 4bpp
 | 36 | uint16_t | `0` when format is 32bpp, else `3`
 | 38 | uint32_t | Always `0`
-| 3c | uint32_t | `4` if the image is swizzled, else `0`
+| 3c | uint32_t | `7` if the image is swizzled, else `3`
 
 ### IMZ header
 
