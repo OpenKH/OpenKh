@@ -806,7 +806,7 @@ namespace OpenKh.Egs
                     {
                         //Console.WriteLine("new texture found");
                         int finaloffset = Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
-                        TempOffsets.Add(value1, finaloffset);
+                        TempOffsets.Add(value1 + t, finaloffset);
                         TextureCount += 1;
                     }
                 }
@@ -859,7 +859,7 @@ namespace OpenKh.Egs
                     {
                         //Console.WriteLine("new texture found");
                         int finaloffset = origOffset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
-                        TempOffsets.Add(value1, finaloffset);
+                        TempOffsets.Add(value1 + t, finaloffset);
                         TextureCount += 1;
                     }
 
