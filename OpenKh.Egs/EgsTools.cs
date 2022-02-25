@@ -756,6 +756,12 @@ namespace OpenKh.Egs
         public int TextureCount = 0;
         public bool Invalid = false;
 
+        //PAX Textures are a bit weird to link to their remastered counterparts.
+        //Currently all offsets seem to be gotten correctly, but the order of them doesn't always match how
+        //the devs seemed to hvave them ordered in the remastered folder.
+        //If adding a new PAX or file with a PAX the user will usually have to manually re-order their remastered
+        //textures to link up correctly by renaming them.
+
         public PAX(byte[] originalAssetData)
         {
             using MemoryStream ms = new MemoryStream(originalAssetData);
@@ -798,28 +804,34 @@ namespace OpenKh.Egs
                     ms.Seek(DpdTexOffsets + (t * 0x4), SeekOrigin.Begin);
                     var DpdTexOffset = ms.ReadInt32();
                     ms.Seek(Dpxoffset + DpdOffset + DpdTexOffset, SeekOrigin.Begin);
-                    int value1 = ms.ReadInt32();
+                    int value1 = ms.ReadInt32(); //use this as a key in  the dictionary
                     ms.ReadInt32();
-                    int value2 = ms.ReadInt32();
+                    int value2 = ms.ReadInt32(); //this value seems to define if a texture is new
 
                     if (value2 == 0)
                     {
-                        Console.WriteLine("new texture found");
+                        //Console.WriteLine("new texture found");
                         TextureCount += 1;
                         int finaloffset = Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
 
+                        //check to see if our key already exists
                         if (!TempOffsets.ContainsKey(value1))
                         {
+                            //if it doesn't then add it as normal
                             TempOffsets.Add(value1, finaloffset);
                         }
                         else
                         {
+                            //if it does then we need to increase the offset by 1 for the original value
                             TempOffsets[value1] += 1;
+                            //then use that new value + 1 as our new offset for the duplicate key then add t to our key so that it can actually be added.
                             TempOffsets.Add(value1 + t, (TempOffsets[value1] + 1));
                         }
                     }
                 }
+                //Add our current list of offsets from the dpd to our main ffsets list
                 Offsets.AddRange(TempOffsets.Values);
+                //then clear the temp list for the next dpd
                 TempOffsets.Clear();
             }
         }
@@ -857,33 +869,40 @@ namespace OpenKh.Egs
 
                 for (int t = 0; t < DpdTexCount; t++)
                 {
+                    //Console.WriteLine("new PAX texture found");
+
                     ms.Seek(DpdTexOffsets + (t * 0x4), SeekOrigin.Begin);
                     var DpdTexOffset = ms.ReadInt32();
                     ms.Seek(Dpxoffset + DpdOffset + DpdTexOffset, SeekOrigin.Begin);
-                    int value1 = ms.ReadInt32();
+                    int value1 = ms.ReadInt32(); //use this as a key in  the dictionary
                     ms.ReadInt32();
-                    int value2 = ms.ReadInt32();
+                    int value2 = ms.ReadInt32(); //this value seems to define if a texture is new
 
                     if (value2 == 0)
                     {
-                        Console.WriteLine("new texture found");
+                        //Console.WriteLine("new texture found");
                         TextureCount += 1;
-
                         int finaloffset = origOffset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
-
+                        
+                        //check to see if our key already exists
                         if (!TempOffsets.ContainsKey(value1))
                         {
+                            //if it doesn't then add it as normal
                             TempOffsets.Add(value1, finaloffset);
                         }
                         else
                         {
+                            //if it does then we need to increase the offset by 1 for the original value
                             TempOffsets[value1] += 1;
+                            //then use that new value + 1 as our new offset for the duplicate key then add t to our key so that it can actually be added.
                             TempOffsets.Add(value1 + t, (TempOffsets[value1] + 1));
                         }
 
                     }
                 }
+                //Add our current list of offsets from the dpd to our main ffsets list
                 Offsets.AddRange(TempOffsets.Values);
+                //then clear the temp list for the next dpd
                 TempOffsets.Clear();
             }
         }
