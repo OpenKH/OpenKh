@@ -804,10 +804,19 @@ namespace OpenKh.Egs
 
                     if (value2 == 0)
                     {
-                        //Console.WriteLine("new texture found");
-                        int finaloffset = Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
-                        TempOffsets.Add(value1 + t, finaloffset);
+                        Console.WriteLine("new texture found");
                         TextureCount += 1;
+                        int finaloffset = Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
+
+                        if (!TempOffsets.ContainsKey(value1))
+                        {
+                            TempOffsets.Add(value1, finaloffset);
+                        }
+                        else
+                        {
+                            TempOffsets[value1] += 1;
+                            TempOffsets.Add(value1 + t, (TempOffsets[value1] + 1));
+                        }
                     }
                 }
                 Offsets.AddRange(TempOffsets.Values);
@@ -857,12 +866,22 @@ namespace OpenKh.Egs
 
                     if (value2 == 0)
                     {
-                        //Console.WriteLine("new texture found");
-                        int finaloffset = origOffset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
-                        TempOffsets.Add(value1 + t, finaloffset);
+                        Console.WriteLine("new texture found");
                         TextureCount += 1;
-                    }
 
+                        int finaloffset = origOffset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
+
+                        if (!TempOffsets.ContainsKey(value1))
+                        {
+                            TempOffsets.Add(value1, finaloffset);
+                        }
+                        else
+                        {
+                            TempOffsets[value1] += 1;
+                            TempOffsets.Add(value1 + t, (TempOffsets[value1] + 1));
+                        }
+
+                    }
                 }
                 Offsets.AddRange(TempOffsets.Values);
                 TempOffsets.Clear();
