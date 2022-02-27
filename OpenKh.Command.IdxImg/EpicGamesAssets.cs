@@ -42,7 +42,7 @@ namespace OpenKh.Command.IdxImg
                 [Option(CommandOptionType.NoValue, Description = "Do not extract files that are already found in the destination directory", ShortName = "n")]
                 public bool DoNotExtractAgain { get; set; }
 
-                [Option(CommandOptionType.NoValue, Description = "Extract files in their raw pkg format", ShortName = "r", LongName = "raw")]
+                [Option(CommandOptionType.NoValue, Description = "Extract files in their raw bundled format", ShortName = "r", LongName = "raw")]
                 public bool ExtractRaw { get; set; }
 
                 protected int OnExecute(CommandLineApplication app)
