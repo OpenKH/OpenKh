@@ -498,6 +498,7 @@ namespace OpenKh.Egs
                     //Make a sorted list tempremasteredNames
                     List<string> tempremasteredNamesD = new List<string>();
                     List<string> tempremasteredNamesP = new List<string>();
+                    List<string> tempremasteredNames = new List<string>(remasteredNames);
                     for (int i = 0; i < remasteredNames.Count; i++)
                     {
                         var filename = "/-"  + i.ToString();
@@ -506,19 +507,19 @@ namespace OpenKh.Egs
                         {
                             //Console.WriteLine(filename + ".dds" + "FOUND!");
                             tempremasteredNamesD.Add(filename + ".dds");
-                            remasteredNames.Remove(filename + ".dds");
+                            tempremasteredNames.Remove(filename + ".dds");
                         }
                         else if (remasteredNames.Contains(filename + ".png"))
                         {
                             //Console.WriteLine(filename + ".png" + "FOUND!");
                             tempremasteredNamesP.Add(filename + ".png");
-                            remasteredNames.Remove(filename + ".png");
+                            tempremasteredNames.Remove(filename + ".png");
                         }
                     }
                     //Add the image files at the end
                     //DDS list first, PNG list 2nd, everything else after
                     tempremasteredNamesD.AddRange(tempremasteredNamesP);
-                    tempremasteredNamesD.AddRange(remasteredNames);
+                    tempremasteredNamesD.AddRange(tempremasteredNames);
                     //Add the sorted list back to remasteredNames
                     remasteredNames = tempremasteredNamesD;
                 }
