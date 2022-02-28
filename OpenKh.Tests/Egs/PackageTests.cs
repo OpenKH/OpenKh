@@ -181,8 +181,54 @@ namespace OpenKh.Tests.Egs
             Directory.Delete("output", true);
         }
 
+        [Fact]
+        public void RawUnpackPkgFile()
+        {
+            EgsTools.ExtractRaw("Egs/res/dummy.hed", "outputraw", false);
 
+            //this is what the result should always equal
+            byte[] compareBytes = { 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x43, 0x4F, 0x55, 0x43, 0x4F, 0x55 };
 
+            Assert.True(File.Exists("outputraw/raw/dummy.txt"));
+
+            //this is what the size for this specific file should always be for this test
+            Assert.True(File.ReadAllBytes("outputraw/raw/dummy.txt").Length == 0x16); 
+            Assert.Equal(compareBytes, File.ReadAllBytes("outputraw/raw/dummy.txt"));
+       
+            Directory.Delete("outputraw", true);
+        }
+
+        [Fact]
+        public void AddNewRawAssetToPkgFile()
+        {
+            EgsTools.Patch("Egs/res/dummy_raw.pkg", "Egs/res/patch_raw", "outputraw");
+            EgsTools.Extract("outputraw/dummy_raw.hed", "outputraw", false);
+
+            Assert.True(File.Exists("outputraw/original/82C8D7589901652871ADCD5BC17EC0EC.dat"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-0.dds"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-1.dds"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-2.dds"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-3.dds"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-4.dds"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-5.dds"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-6.dds"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-7.dds"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/se/dmy001"));
+            Assert.True(File.Exists("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/voice/dmy002"));
+
+            Assert.Equal("This is a bar sub-raw hd texture.", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-0.dds"));
+            Assert.Equal("This is a bar sub-pax hd texture.", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-1.dds"));
+            Assert.Equal("This is a bar sub-tm2 hd texture.", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-2.dds"));
+            Assert.Equal("This is a bar sub-imd hd texture.", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-3.dds"));
+            Assert.Equal("This is a bar sub-imz hd texture.", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-4.dds"));
+            Assert.Equal("This is a bar sub-bitmap hd texture.", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-5.dds"));
+            Assert.Equal("This is a bar sub-bar imd hd texture.", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-6.dds"));
+            Assert.Equal("This is a bar sub-bar imz hd texture.", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/-7.dds"));
+            Assert.Equal("This is a dummy sound effect.", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/se/dmy001"));
+            Assert.Equal("This is a dummy voice audio", File.ReadAllText("outputraw/remastered/82C8D7589901652871ADCD5BC17EC0EC.dat/voice/dmy002"));
+
+            Directory.Delete("outputraw", true);
+        }
 
     }
 }
