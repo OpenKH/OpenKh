@@ -1,4 +1,4 @@
-# [Kingdom Hearts II](index.md) - Files Types
+# [Kingdom Hearts II](index.md) - File Types
 
 | Container                  | Description                                                         | Tools                                      |
 |----------------------------|---------------------------------------------------------------------|--------------------------------------------|
