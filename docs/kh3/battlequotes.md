@@ -275,7 +275,7 @@ Their type is SQEXSEADSoundBank or SQEXSEADSound.
 | 019       | "Begone"                         |              |
 | 020       | \<strike sounds\>                |              |
 | 021       | \<strike sounds\>                |              |
-| 022       |                                  | failed to extract |
+| 022       |                                  | Audio fails to extract. File uses dummy codec. |
 | 023       | "No Escape"                      |              |
 | 024       | "Leaving?"                       |              |
 | 025       | "No"                             |              |
