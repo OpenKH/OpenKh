@@ -9,3 +9,5 @@
 ## Dictionaries
 
   * [Mdls](dictionary/mdls.md)
+  * [Inventory](dictionary/inventory.md)
+  * [Commands](dictionary/command.md)

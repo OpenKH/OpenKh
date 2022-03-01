@@ -11,6 +11,7 @@ Their type is SQEXSEADSoundBank or SQEXSEADSound.
     * [Sora](#sora)
 * [Enemy](#enemy)
     * [Terra-Xehanort](#terra-xehanort)
+    * [Xemnas](#xemnas)
 
 ## PC - Player Character
 `/Game/Sound/VOICE/Localization/en/battle/PC/`
@@ -217,7 +218,7 @@ Their type is SQEXSEADSoundBank or SQEXSEADSound.
 | 001       | "Surrender"        | Attacking |
 | 002       | "Dark Times ahead"         | Desperation Move (DM) |
 | 003       | "Don't let him escape"        | Attacking |
-| 004       | "Brick him"          | Attacking |
+| 004       | "Break him"          | Attacking |
 | 005       | "Join the shadows"          | Attacking |
 | 006       | "Over here"     | |
 | 007       | \<Pain Grunt\>     | Being damaged |
@@ -243,5 +244,40 @@ Their type is SQEXSEADSoundBank or SQEXSEADSound.
 | 027       | \<Attack Grunt\> | |
 | 028       | \<Attack Grunt\> | |
 | 029       | \<Attack Grunt\> | |
+
+[To top](#kingdom-hearts-iii-battle-quotes)
+
+### Xemnas
+
+`/Game/Sound/VOICE/Localization/en/battle/ENEMY/Battle_Xemnas.uasset`
+
+| Audio Nr. | Quote                            | Note         |
+|:---------:| -------------------------------- | ------------ |
+| 000       | \<strike sounds\>                |              |
+| 001       | "To the Void"                    |              |
+| 002       | "No More"                        |              |
+| 003       | "Erase"                          |              |
+| 004       | "Burst"                          |              |
+| 005       | "There"                          |              |
+| 006       | "Strike"                         |              |
+| 007       | "Anger and Hatred reign supreme" |              |
+| 008       | "Feel the Emptyness"             |              |
+| 009       | "Insolence"                      |              |
+| 010       | \<hurt sounds\>                  | Damage taken |
+| 011       | \<hurt sounds\>                  | Damage taken |
+| 012       | \<hurt sounds\>                  | Damage taken |
+| 013       | \<hurt sounds\>                  | Damage taken |
+| 014       | \<hurt sounds\>                  | Damage taken |
+| 015       | \<hurt sounds\>                  | Damage taken |
+| 016       | "Are you Ready"                  |              |
+| 017       | "Grovel"                         |              |
+| 018       | "Pay Attention"                  |              |
+| 019       | "Begone"                         |              |
+| 020       | \<strike sounds\>                |              |
+| 021       | \<strike sounds\>                |              |
+| 022       | ?                                | Fails to extract. |
+| 023       | "No Escape"                      |              |
+| 024       | "Leaving?"                       |              |
+| 025       | "No"                             |              |
 
 [To top](#kingdom-hearts-iii-battle-quotes)
