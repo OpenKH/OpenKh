@@ -645,7 +645,6 @@ namespace OpenKh.Egs
                 case (".bar", true):
                 case (".bin", true):
                 case (".mag", true):
-                //case (".map", true): //alot more complicated than i thought. try again later
                 case (".mdlx", true):
                     asset = new BAR(originalAssetData);
                     break;
@@ -893,7 +892,7 @@ namespace OpenKh.Egs
                             //Console.WriteLine("RAW image!");
                             ms.Seek(offset, SeekOrigin.Begin);
                             subfile = ms.ReadBytes(subsize);
-                            subasset = new RAW(subfile, offset);
+                            subasset = new RAW(subfile, offset, subname);
 
                             TextureCount += subasset.TextureCount;
                             OffsetsTIM.AddRange(subasset.Offsets);
