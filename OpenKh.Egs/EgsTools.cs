@@ -481,16 +481,19 @@ namespace OpenKh.Egs
             var offset = totalRemasteredAssetHeadersSize + 0x10 + asset.OriginalAssetHeader.DecompressedLength;
             List<string> remasteredNames = new List<string>();
 
+            if (asset.RemasteredAssetHeaders.Values.Count == 0 || offset != asset.RemasteredAssetHeaders.Values.First().Offset)
+                remasteredNames.Clear();
 
-            remasteredNames.Clear();
             //grab list of full file paths from current remasteredAssetsFolder path and add them to a list.
             //we use this list later to correctly add the file names to the PKG.
-            if (Directory.Exists(remasteredAssetsFolder) && Directory.GetFiles(remasteredAssetsFolder, "*", SearchOption.AllDirectories).Length > 0) //only do this if there are actually file in it.
+            if (Directory.Exists(remasteredAssetsFolder) && Directory.GetFiles(remasteredAssetsFolder, "*", SearchOption.AllDirectories).Length > 0) //only do this if there are actually files in it.
             {
                 remasteredNames.AddRange(Directory.GetFiles(remasteredAssetsFolder, "*", SearchOption.AllDirectories).ToList());
+
                 for (int l = 0; l < remasteredNames.Count; l++) //fix names
                 {
                     remasteredNames[l] = remasteredNames[l].Replace(remasteredAssetsFolder, "").Replace(@"\", "/");
+                    remasteredNames[l] = Path.ChangeExtension(remasteredNames[l], Path.GetExtension(remasteredNames[l]).ToLower());
                 }
 
                 if (remasteredNames.Contains("/-10.dds") || remasteredNames.Contains("/-10.png"))
@@ -502,7 +505,6 @@ namespace OpenKh.Egs
                     for (int i = 0; i < remasteredNames.Count; i++)
                     {
                         var filename = "/-"  + i.ToString();
-                        //Console.WriteLine("TEST for " + filename + ".dds/.png");
                         if (remasteredNames.Contains(filename + ".dds"))
                         {
                             //Console.WriteLine(filename + ".dds" + "FOUND!");
@@ -534,7 +536,7 @@ namespace OpenKh.Egs
                 //get actual file names ONLY if the remastered asset count is greater than 0 and ONLY if the number of files in the 
                 //remastered folder for the SD asset is equal to or greater than what the total count is from what was gotten in SDasset.
                 //if those criteria aren't met then do the old method.
-                if (remasteredNames.Count >= oldRemasteredHeaders.Count && remasteredNames.Count > 0)
+                if (sdasset != null && !sdasset.Invalid && remasteredNames.Count >= oldRemasteredHeaders.Count && remasteredNames.Count > 0)
                 {
                     //filename = remasteredNames[i].Replace((remasteredAssetsFolder), "").Remove(0, 1);
                     filename = remasteredNames[i].Remove(0, 1);
@@ -558,7 +560,8 @@ namespace OpenKh.Egs
                 }
                 else
                 {
-                    Console.WriteLine($"Keeping remastered file: {relativePath}/{filename}");
+                    if (Directory.Exists(relativePath))
+                        Console.WriteLine($"Keeping remastered file: {relativePath}/{filename}");
                     // The original file have been replaced, we need to encrypt all remastered asset with the new key
                     if (!seed.SequenceEqual(asset.Seed))
                     {
@@ -684,9 +687,8 @@ namespace OpenKh.Egs
                 Offsets = asset.Offsets;
                 TextureCount = asset.TextureCount;
                 Invalid = false;
+                Console.WriteLine("File: " + name + " | Asset Count: " + TextureCount);
             }
-
-            Console.WriteLine("File: " + name + " | Asset Count: " + TextureCount);
         }
     }
 
@@ -1094,7 +1096,6 @@ namespace OpenKh.Egs
 
             ms.Seek(0x0c, SeekOrigin.Begin);
             TextureCount += ms.ReadInt32();
-            Console.WriteLine("TexCount = " + TextureCount);
 
             ms.Seek(0x18, SeekOrigin.Begin);
             int GsinfoOff = ms.ReadInt32();
