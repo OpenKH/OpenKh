@@ -650,20 +650,20 @@ namespace OpenKh.Egs
                     asset = new BAR(originalAssetData);
                     break;
                 case (".imd", true):
-                    asset = new IMD(originalAssetData);
+                    asset = new IMD(originalAssetData, 0);
                     break;
                 case (".imz", true):
-                    asset = new IMZ(originalAssetData);
+                    asset = new IMZ(originalAssetData, 0);
                     break;
                 case (".pax", true):
-                    asset = new PAX(originalAssetData);
+                    asset = new PAX(originalAssetData, 0);
                     break;
                 case (".tm2", true):
-                    asset = new TM2(originalAssetData);
+                    asset = new TM2(originalAssetData, 0);
                     break;
                 //case (".dpd", true): //Special file, fix later
-                //asset = new DPD(originalAssetData);
-                //    break;
+                    //asset = new DPD(originalAssetData);
+                    //break;
             }
             switch (".a" + (Path.GetExtension(name)), remasterpathtrue)
             {
@@ -696,35 +696,21 @@ namespace OpenKh.Egs
         public int TextureCount = 0;
         public bool Invalid = false;
 
-        public IMD(byte[] originalAssetData)
+        public IMD(byte[] AssetData, int AssetOffset)
         {
-            using MemoryStream ms = new MemoryStream(originalAssetData);
+            using MemoryStream ms = new MemoryStream(AssetData);
 
-            var magic = ms.ReadInt32();
-            if (magic != 1145523529) //IMGD
-            { 
+            int magic = ms.ReadInt32();
+            if (magic != 1145523529 && AssetOffset == 0) //IMGD
+            {
                 Invalid = true;
                 return;
             }
 
-            TextureCount += 1; //IMDs are always single images
-            ms.ReadInt32(); //always 256
-            int IMDoffset = ms.ReadInt32(); //offset for image data
-            Offsets.Add(IMDoffset + 0x20000000);
-
-        }
-
-        public IMD(byte[] subAssetData, int origoffset)
-        {
-            using MemoryStream ms = new MemoryStream(subAssetData);
-
-            ms.ReadInt32(); //magic
-
-            TextureCount += 1; //IMDs are always single images
+            TextureCount = 1; //IMDs are always single images
             ms.ReadInt32(); //always 256(?)
-            int IMDoffset = ms.ReadInt32(); //offset for image data
-            Offsets.Add(origoffset + IMDoffset + 0x20000000);
-
+            int Imageoffset = ms.ReadInt32(); //offset for image data
+            Offsets.Add(AssetOffset + Imageoffset + 0x20000000);
         }
     }
 
@@ -734,60 +720,31 @@ namespace OpenKh.Egs
         public int TextureCount = 0;
         public bool Invalid = false;
 
-        public IMZ(byte[] originalAssetData)
+        public IMZ(byte[] AssetData, int AssetOffset)
         {
-            using MemoryStream ms = new MemoryStream(originalAssetData);
+            using MemoryStream ms = new MemoryStream(AssetData);
 
             int magic = ms.ReadInt32();
-            if (magic != 1514622281)
+            if (magic != 1514622281 && AssetOffset == 0)
             { //IMGZ
                 Invalid = true;
                 return;
             }
-
-            ms.ReadInt64();
-
-            TextureCount += ms.ReadInt32();
-            for (int i = 0; i < TextureCount; i++)
-            {
-                ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
-
-                int offset = ms.ReadInt32();
-                ms.Seek(offset, SeekOrigin.Begin);
-
-                int magic2 = ms.ReadInt32();
-                if (magic2 != 1145523529) //IMGD
-                { 
-                    Invalid = true;
-                    return;
-                }
-
-                ms.ReadInt32(); //always 256
-                int IMDoffset = ms.ReadInt32(); //offset for image data
-                Offsets.Add(offset + IMDoffset + 0x20000000);
-            }
-        }
-
-        public IMZ(byte[] subAssetData, int origOffset)
-        {
-            using MemoryStream ms = new MemoryStream(subAssetData);
-
-            ms.ReadInt32(); //magic
             ms.ReadInt64(); //unknown
 
-            TextureCount += ms.ReadInt32();
+            TextureCount = ms.ReadInt32();
             for (int i = 0; i < TextureCount; i++) 
             {
                 ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
-                int offset = ms.ReadInt32();
-                ms.Seek(offset, SeekOrigin.Begin);
+                int IMDoffset = ms.ReadInt32(); //Offset for IMGD data
+                ms.Seek(IMDoffset, SeekOrigin.Begin);
 
-                int magic2 = ms.ReadInt32();
-                if (magic2 == 1145523529) //IMGD
+                magic = ms.ReadInt32();
+                if (magic == 1145523529) //IMGD
                 {
                     ms.ReadInt32(); //always 256
-                    int IMDoffset = ms.ReadInt32(); //offset for image data
-                    Offsets.Add(origOffset + offset + IMDoffset + 0x20000000);
+                    int Imageoffset = ms.ReadInt32(); //offset for image data
+                    Offsets.Add(AssetOffset + IMDoffset + Imageoffset + 0x20000000);
                 }
             }
         }
@@ -806,85 +763,16 @@ namespace OpenKh.Egs
         //If adding a new PAX or file with a PAX the user will usually have to manually re-order their remastered
         //textures to link up correctly by renaming them.
 
-        public PAX(byte[] originalAssetData)
+        public PAX(byte[] AssetData, int AssetOffset)
         {
-            using MemoryStream ms = new MemoryStream(originalAssetData);
+            using MemoryStream ms = new MemoryStream(AssetData);
 
             var magic = ms.ReadInt32();
-            if (magic != 1599619408) //PAX_
+            if (magic != 1599619408 && AssetOffset == 0) //PAX_
             {
                 Invalid = true;
                 return;
             }
-
-            ms.ReadInt64(); //we just skip these 8 bytes. unsure what they are for.
-
-            var Dpxoffset = ms.ReadInt32();
-            ms.Seek(Dpxoffset + 0xC, SeekOrigin.Begin);
-
-            var Unk1Count = ms.ReadInt32(); //unsure what this block of data is for. we seem to not need it though.
-            ms.Seek(Unk1Count * 0x20, SeekOrigin.Current); //so skip it to get to the part we actually need.
-
-            var DpdCount = ms.ReadInt32();
-            var DpdOffsets = ((int)ms.Position); //the DPDs are what have our textures so save the position of this area.
-
-            for (int d = 0; d < DpdCount; d++)
-            {
-                ms.Seek(DpdOffsets + (d * 0x4), SeekOrigin.Begin);
-
-                var DpdOffset = ms.ReadInt32();
-                ms.Seek(Dpxoffset + DpdOffset, SeekOrigin.Begin);
-
-                ms.ReadInt32(); //unknown
-
-                var Unk2Count = ms.ReadInt32(); //don't know this block of data, so skip it to get to what me need
-                ms.Seek(Unk2Count * 0x4, SeekOrigin.Current);
-
-                var DpdTexCount = ms.ReadInt32(); //finally found the texture offsets
-                var DpdTexOffsets = ((int)ms.Position); //save this position
-
-                for (int t = 0; t < DpdTexCount; t++)
-                {
-                    ms.Seek(DpdTexOffsets + (t * 0x4), SeekOrigin.Begin);
-                    var DpdTexOffset = ms.ReadInt32();
-                    ms.Seek(Dpxoffset + DpdOffset + DpdTexOffset, SeekOrigin.Begin);
-                    int value1 = ms.ReadInt32(); //use this as a key in  the dictionary
-                    ms.ReadInt32();
-                    int value2 = ms.ReadInt32(); //this value seems to define if a texture is new
-
-                    if (value2 == 0)
-                    {
-                        //Console.WriteLine("new texture found");
-                        TextureCount += 1;
-                        int finaloffset = Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
-
-                        //check to see if our key already exists
-                        if (!TempOffsets.ContainsKey(value1))
-                        {
-                            //if it doesn't then add it as normal
-                            TempOffsets.Add(value1, finaloffset);
-                        }
-                        else
-                        {
-                            //if it does then we need to increase the offset by 1 for the original value
-                            TempOffsets[value1] += 1;
-                            //then use that new value + 1 as our new offset for the duplicate key then add t to our key so that it can actually be added.
-                            TempOffsets.Add(value1 + t, (TempOffsets[value1] + 1));
-                        }
-                    }
-                }
-                //Add our current list of offsets from the dpd to our main ffsets list
-                Offsets.AddRange(TempOffsets.Values);
-                //then clear the temp list for the next dpd
-                TempOffsets.Clear();
-            }
-        }
-
-        public PAX(byte[] subAssetData, int origOffset)
-        {
-            using MemoryStream ms = new MemoryStream(subAssetData);
-
-            ms.ReadInt32(); //magic. already confirmed in main asset
             ms.ReadInt64(); //we just skip these 8 bytes. unsure what they are for.
 
             var Dpxoffset = ms.ReadInt32();
@@ -926,7 +814,7 @@ namespace OpenKh.Egs
                     {
                         //Console.WriteLine("new texture found");
                         TextureCount += 1;
-                        int finaloffset = origOffset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
+                        int finaloffset = AssetOffset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
                         
                         //check to see if our key already exists
                         if (!TempOffsets.ContainsKey(value1))
@@ -988,6 +876,7 @@ namespace OpenKh.Egs
                 ms.Seek(0x10 + (i * 0x10), SeekOrigin.Begin);
 
                 type = ms.ReadInt32(); //subasset type
+                //int subname = ms.ReadInt32(); //subasset name
                 ms.ReadInt32(); //subasset name
                 offset = ms.ReadInt32(); //subasset offset
                 subsize = ms.ReadInt32(); //subasset size
@@ -1177,13 +1066,27 @@ namespace OpenKh.Egs
         public int TextureCount = 0;
         public bool Invalid = false;
 
-        //i don't think RAW textures can ever be single files, but added just in case
-        public RAW(byte[] originalAssetData)
+        //Getting the offsets for these are a bit complicated due to
+        //images being one after another with no offset table to use.
+        public RAW(byte[] AssetData, int AssetOffset)
         {
-            using MemoryStream ms = new MemoryStream(originalAssetData);
+            using MemoryStream ms = new MemoryStream(AssetData);
 
-            var magic = ms.ReadInt32();
-            if (magic != 0) //0x00000000
+            //this is real jank. we need to modify the final offset later as a special case for 
+            //map files. hopefully this actually works for all maps. (it didn't)
+            //int modify = 0;
+            //int modify2 = 0;
+            //if (special == 5259597) // MAP
+            //    modify = +128;
+            //if (special == 4345666)
+            //{
+            //    modify = -16;
+            //    modify2 = 1;
+            //}
+
+
+            int magic = ms.ReadInt32();
+            if (magic != 0 && AssetOffset == 0) //0x00000000
             {
                 Invalid = true;
                 return;
@@ -1191,6 +1094,7 @@ namespace OpenKh.Egs
 
             ms.Seek(0x0c, SeekOrigin.Begin);
             TextureCount += ms.ReadInt32();
+            Console.WriteLine("TexCount = " + TextureCount);
 
             ms.Seek(0x18, SeekOrigin.Begin);
             int GsinfoOff = ms.ReadInt32();
@@ -1199,62 +1103,56 @@ namespace OpenKh.Egs
             int diff = 0;
             for (int i = 0; i < TextureCount; i++)
             {
-                int offset = dataOffset + diff + (i * 0x10) + 0x20000000;
-                Offsets.Add(offset);
-
-                ms.Seek(GsinfoOff + 0x70 + (i * 0xA0), SeekOrigin.Begin);
-                ulong num = ms.ReadUInt64();
-                int width = (ushort)(1u << ((int)(num >> 0x1A) & 0x0F));
-                int height = (ushort)(1u << ((int)(num >> 0x1E) & 0x0F));
-                diff += width * height;
-            }
-
-            int index = Helpers.IndexOfByteArray(originalAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), 0);
-
-            while (index > -1)
-            {
-                ms.Seek(index + 0x0a, SeekOrigin.Begin);
-                int imageToApplyTo = (int)ms.ReadInt16();
-
-                ms.Seek(0x1c, SeekOrigin.Current);
-                int texaOffset = ms.ReadInt32();
-                int offset = index + texaOffset + 0x08 + (imageToApplyTo * 0x10) + 0x20000000;
-                Offsets.Add(offset);
-
-                TextureCount++;
-                index = Helpers.IndexOfByteArray(originalAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
-            }
-
-        }
-
-        public RAW(byte[] subAssetData, int origOffset)
-        {
-            using MemoryStream ms = new MemoryStream(subAssetData);
-
-            ms.Seek(0x0c, SeekOrigin.Begin);
-            TextureCount += ms.ReadInt32();
-
-            ms.Seek(0x18, SeekOrigin.Begin);
-            int GsinfoOff = ms.ReadInt32();
-            int dataOffset = ms.ReadInt32();
-
-            int diff = 0;
-            for (int i = 0; i < TextureCount; i++)
-            {
-                int offset = origOffset + dataOffset + diff + (i * 0x10) + 0x20000000;
+                int offset = AssetOffset + dataOffset + diff + (i * 0x10) + 0x20000000;
                 Offsets.Add(offset);
 
                 ms.Seek(GsinfoOff + 0x70 + (i * 0xA0), SeekOrigin.Begin);
                 long Tex0Reg = ms.ReadInt64();
 
-                //int pixelfmt = (ushort)(1u << ((int)(Tex0Reg >> 20) & 0x0F));
-                int width = (ushort)(1u << ((int)(Tex0Reg >> 0x1A) & 0x0F));
-                int height = (ushort)(1u << ((int)(Tex0Reg >> 0x1E) & 0x0F));
+                uint PSM = (uint)(Tex0Reg >> 20) & 0x3fu;
+                int width = (ushort)(1u << ((int)(Tex0Reg >> 26) & 0x0F));
+                int height = (ushort)(1u << ((int)(Tex0Reg >> 30) & 0x0F));
 
-                diff += (width * height);
+                int bpp;
+                bool div = false;
+                switch (PSM)
+                {
+                    case (0):
+                    case (1):
+                    case (27):
+                    case (26):
+                    case (48):
+                    case (49):
+                        bpp = 4;
+                        break;
+                    case (2):
+                    case (10):
+                    case (50):
+                    case (58):
+                        bpp = 2;
+                        break;
+                    case (19):
+                    case (44): //unsure about this one
+                        bpp = 1;
+                        break;
+                    case (20):
+                        bpp = 2;
+                        div = true;
+                        break;
+                    default:
+                        bpp = 1;
+                        div = false;
+                        Console.WriteLine("Warning: Unknown Pixel Storage Mode! PSM = " + PSM);
+                        break;
+                }
+
+                if (!div)
+                    diff += (width * height) * bpp;
+                else
+                    diff += (width * height) / bpp;
             }
 
-            int index = Helpers.IndexOfByteArray(subAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), 0);
+            int index = Helpers.IndexOfByteArray(AssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), 0);
             while (index > -1)
             {
                 ms.Seek(index + 0x0a, SeekOrigin.Begin);
@@ -1263,10 +1161,10 @@ namespace OpenKh.Egs
                 ms.Seek(0x1c, SeekOrigin.Current);
                 int texaOffset = ms.ReadInt32();
                 int offset = index + texaOffset + 0x08 + (imageToApplyTo * 0x10) + 0x20000000;
-                Offsets.Add(origOffset + offset);
+                Offsets.Add(AssetOffset + offset);
             
                 TextureCount++;
-                index = Helpers.IndexOfByteArray(subAssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
+                index = Helpers.IndexOfByteArray(AssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
             }
 
         }
@@ -1278,12 +1176,12 @@ namespace OpenKh.Egs
         public int TextureCount = 0;
         public bool Invalid = false;
 
-        public TM2(byte[] originalAssetData)
+        public TM2(byte[] AssetData, int AssetOffset)
         {
-            using MemoryStream ms = new MemoryStream(originalAssetData);
+            using MemoryStream ms = new MemoryStream(AssetData);
 
-            var magic = ms.ReadInt32();
-            if (magic != 843925844) //TIM2
+            int magic = ms.ReadInt32();
+            if (magic != 843925844 && AssetOffset == 0) //TIM2
             {
                 Invalid = true;
                 return;
@@ -1312,41 +1210,8 @@ namespace OpenKh.Egs
                 int imageOffset = ((int)ms.Position);
 
                 TextureCount += 1;
-                Offsets.Add(0x10 + imageOffset + 0x20000000);
-            }
-        }
-
-        public TM2(byte[] subAssetData, int origOffset)
-        {
-            using MemoryStream ms = new MemoryStream(subAssetData);
-
-            ms.ReadInt32(); //magic
-            ms.ReadInt16(); //format
-            int texCount = ms.ReadInt16();
-            ms.ReadInt64(); //unused
-            int totalsize = 0;
-
-            for (int i = 0; i < texCount; i++)
-            {
-                ms.Seek(0x10 + totalsize, SeekOrigin.Begin);
-                totalsize += ms.ReadInt32();
-
-                if (i == 0 && totalsize == 0 && texCount > 1)
-                {
-                    Invalid = true;
-                    return;
-                }
-
-                ms.ReadInt32(); //Clut size
-                ms.ReadInt32(); //Image size
-                int header = ms.ReadInt16(); //header size
-                ms.Seek((header - 0x10) + 0x2, SeekOrigin.Current);
-                int imageOffset = ((int)ms.Position);
-
-                TextureCount += 1;
-                Offsets.Add(origOffset + 0x10 + imageOffset + 0x20000000);
+                Offsets.Add(AssetOffset + 0x10 + imageOffset + 0x20000000);
             }
         }
     }
-
  }
