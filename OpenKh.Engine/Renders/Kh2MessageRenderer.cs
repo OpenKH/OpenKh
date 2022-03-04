@@ -186,6 +186,10 @@ namespace OpenKh.Engine.Renders
 
         private void DrawIcon(DrawContext context, byte index)
         {
+            //workaround for the HD port exclusive icons
+            if (index > 59)
+                index = 11;
+
             if (_spriteIcon != null)
                 DrawIcon(context, (index % _iconPerRow) * IconWidth, (index / _iconPerRow) * IconHeight);
 
