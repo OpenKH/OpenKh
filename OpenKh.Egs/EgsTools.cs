@@ -493,7 +493,9 @@ namespace OpenKh.Egs
                 for (int l = 0; l < remasteredNames.Count; l++) //fix names
                 {
                     remasteredNames[l] = remasteredNames[l].Replace(remasteredAssetsFolder, "").Replace(@"\", "/");
-                    remasteredNames[l] = Path.ChangeExtension(remasteredNames[l], Path.GetExtension(remasteredNames[l]).ToLower());
+                    //this check is needed else it adds a full stop for files without extensions.
+                    if (Path.GetExtension(remasteredNames[l]) != "")
+                        remasteredNames[l] = Path.ChangeExtension(remasteredNames[l], Path.GetExtension(remasteredNames[l]).ToLower());
                 }
 
                 if (remasteredNames.Contains("/-10.dds") || remasteredNames.Contains("/-10.png"))
