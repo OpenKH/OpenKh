@@ -333,7 +333,7 @@ Keyboard & Mouse:
 
 These final icons don't have a static image but instead change what they look like based on the current active controller. 
 As an example `dynamic-cross` will look like the Playstation Cross input while using a Playstation controller then dynamically change to the Xbox A input if the cotroller was changed to an Xbox controller during gameplay.
-`dynamic-circle-jp` and `dynamic-cross-jp` are used in place of `dynamic-cross` and `dynamic-circle` respectively if the user changed their settings to swap the comfim/cancel input.
+`dynamic-circle-jp` and `dynamic-cross-jp` are used in place of `dynamic-cross` and `dynamic-circle` respectively if the user changed their settings to swap the confirm/cancel input.
 
 | Icon-Name				
 |-----------------------
