@@ -456,7 +456,7 @@ namespace OpenKh.Kh2.Messages
                 [191] = "mouse-right-click",
                 [192] = "mouse-middle-click",
                 [193] = "mouse-extra-click1",
-                [194] = "mouse-extrac-click2",
+                [194] = "mouse-extra-click2",
                 [195] = "mouse-up",
                 [196] = "mouse-down",
                 [197] = "mouse-left",
