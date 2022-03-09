@@ -374,7 +374,7 @@ For example `dynamic-cross` will look like the Playstation <img src="../../kh2/i
 
 As a result of this information and how the PC port handles these dynamic texts, the user should ***ALWAYS*** use these icons in place of static ones used above.
 
-| Dynamic-Button-Name		        | PS Icon | XB Icon | Generic Icon |
+| Dynamic-Button-Name		    | PS Icon | XB Icon | Generic Icon |
 |-------------------------------|---------|---------|--------------|
 | dynamic-cross                 | ![image](../../kh2/images/icons/ps/button-cross.png) | ![image](../../kh2/images/icons/xb/button-cross(PC).png) | ![image](../../kh2/images/icons/generic/gen-2.png) |
 | dynamic-circle-jp             | ![image](../../kh2/images/icons/ps/button-cross.png) | ![image](../../kh2/images/icons/xb/button-cross(PC).png) | ![image](../../kh2/images/icons/generic/gen-2.png) |
