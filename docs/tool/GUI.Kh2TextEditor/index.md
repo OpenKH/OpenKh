@@ -110,73 +110,73 @@ As a farewell, here's a list of all the {:icon} arguments you can use to spice u
 
 ### Miscellaneous Icons (All Versions)
 
-| Icon-Name                 | Icon
-|---------------------------|---------
-| ability-equip             | ![image](../../kh2/images/icons/misc/ability-equip.png)
-| ability-unequip           | ![image](../../kh2/images/icons/misc/ability-unequip.png)
-| accessory                 | ![image](../../kh2/images/icons/misc/accessory.png)
-| ai-mode-frequent          | ![image](../../kh2/images/icons/misc/ai-mode-frequent.png)
-| ai-mode-moderate          | ![image](../../kh2/images/icons/misc/ai-mode-moderate.png)
-| ai-mode-rare              | ![image](../../kh2/images/icons/misc/ai-mode-rare.png)
-| ai-settings               | ![image](../../kh2/images/icons/misc/ai-settings.png)
-| armor                     | ![image](../../kh2/images/icons/misc/armor.png)
-| auto-equip                | ![image](../../kh2/images/icons/misc/auto-equip.png)
-| exclamation-mark          | ![image](../../kh2/images/icons/misc/exclamation-mark.png)
-| form                      | ![image](../../kh2/images/icons/misc/form.png)
-| gem-blazing               | ![image](../../kh2/images/icons/misc/gem-blazing.png)
-| gem-bright                | ![image](../../kh2/images/icons/misc/gem-bright.png)
-| gem-dark                  | ![image](../../kh2/images/icons/misc/gem-dark.png)
-| gem-dense                 | ![image](../../kh2/images/icons/misc/gem-dense.png)
-| gem-energy                | ![image](../../kh2/images/icons/misc/gem-energy.png)
-| gem-frost                 | ![image](../../kh2/images/icons/misc/gem-frost.png)
-| gem-lightning             | ![image](../../kh2/images/icons/misc/gem-lightning.png)
-| gem-lucid                 | ![image](../../kh2/images/icons/misc/gem-lucid.png)
-| gem-mythril               | ![image](../../kh2/images/icons/misc/gem-mythril.png)
-| gem-orichalcum            | ![image](../../kh2/images/icons/misc/gem-orichalcum.png)
-| gem-power                 | ![image](../../kh2/images/icons/misc/gem-power.png)
-| gem-serenity              | ![image](../../kh2/images/icons/misc/gem-serenity.png)
-| gem-twilight              | ![image](../../kh2/images/icons/misc/gem-twilight.png)
-| gumi-block                | ![image](../../kh2/images/icons/misc/gumi-block.png)
-| gumi-blueprint            | ![image](../../kh2/images/icons/misc/gumi-blueprint.png)
-| gumi-brush                | ![image](../../kh2/images/icons/misc/gumi-brush.png)
-| gumi-gear                 | ![image](../../kh2/images/icons/misc/gumi-gear.png)
-| gumi-ship                 | ![image](../../kh2/images/icons/misc/gumi-ship.png)
-| item-consumable           | ![image](../../kh2/images/icons/misc/item-consumable.png)
-| item-key                  | ![image](../../kh2/images/icons/misc/item-key.png)
-| item-tent                 | ![image](../../kh2/images/icons/misc/item-tent.png)
-| magic                     | ![image](../../kh2/images/icons/misc/magic.png)
-| magic-nocharge            | ![image](../../kh2/images/icons/misc/magic-nocharge.png)
-| material                  | ![image](../../kh2/images/icons/misc/material.png)
-| party                     | ![image](../../kh2/images/icons/misc/party.png)
-| question-mark             | ![image](../../kh2/images/icons/misc/question-mark.png)
-| rank-a                    | ![image](../../kh2/images/icons/misc/rank-a.png)
-| rank-b                    | ![image](../../kh2/images/icons/misc/rank-b.png)
-| rank-c                    | ![image](../../kh2/images/icons/misc/rank-c.png)
-| rank-s                    | ![image](../../kh2/images/icons/misc/rank-s.png)
-| remembrance               | ![image](../../kh2/images/icons/misc/remembrance.png)
-| tranquil                  | ![image](../../kh2/images/icons/misc/tranquil.png)
-| weapon-keyblade           | ![image](../../kh2/images/icons/misc/weapon-keyblade.png)
-| weapon-keyblade-equip     | ![image](../../kh2/images/icons/misc/weapon-keyblade-equip.png)
-| weapon-shield             | ![image](../../kh2/images/icons/misc/weapon-shield.png)
-| weapon-shield-equip       | ![image](../../kh2/images/icons/misc/weapon-shield-equip.png)
-| weapon-staff              | ![image](../../kh2/images/icons/misc/weapon-staff.png)
-| weapon-staff-equip        | ![image](../../kh2/images/icons/misc/weapon-staff-equip.png)
+| Icon-Name                 | Icon    |
+|---------------------------|---------|
+| ability-equip             | ![image](../../kh2/images/icons/misc/ability-equip.png) |
+| ability-unequip           | ![image](../../kh2/images/icons/misc/ability-unequip.png) |
+| accessory                 | ![image](../../kh2/images/icons/misc/accessory.png) |
+| ai-mode-frequent          | ![image](../../kh2/images/icons/misc/ai-mode-frequent.png) |
+| ai-mode-moderate          | ![image](../../kh2/images/icons/misc/ai-mode-moderate.png) |
+| ai-mode-rare              | ![image](../../kh2/images/icons/misc/ai-mode-rare.png) |
+| ai-settings               | ![image](../../kh2/images/icons/misc/ai-settings.png) |
+| armor                     | ![image](../../kh2/images/icons/misc/armor.png) |
+| auto-equip                | ![image](../../kh2/images/icons/misc/auto-equip.png) |
+| exclamation-mark          | ![image](../../kh2/images/icons/misc/exclamation-mark.png) |
+| form                      | ![image](../../kh2/images/icons/misc/form.png) |
+| gem-blazing               | ![image](../../kh2/images/icons/misc/gem-blazing.png) |
+| gem-bright                | ![image](../../kh2/images/icons/misc/gem-bright.png) |
+| gem-dark                  | ![image](../../kh2/images/icons/misc/gem-dark.png) |
+| gem-dense                 | ![image](../../kh2/images/icons/misc/gem-dense.png) |
+| gem-energy                | ![image](../../kh2/images/icons/misc/gem-energy.png) |
+| gem-frost                 | ![image](../../kh2/images/icons/misc/gem-frost.png) |
+| gem-lightning             | ![image](../../kh2/images/icons/misc/gem-lightning.png) |
+| gem-lucid                 | ![image](../../kh2/images/icons/misc/gem-lucid.png) |
+| gem-mythril               | ![image](../../kh2/images/icons/misc/gem-mythril.png) |
+| gem-orichalcum            | ![image](../../kh2/images/icons/misc/gem-orichalcum.png) |
+| gem-power                 | ![image](../../kh2/images/icons/misc/gem-power.png) |
+| gem-serenity              | ![image](../../kh2/images/icons/misc/gem-serenity.png) |
+| gem-twilight              | ![image](../../kh2/images/icons/misc/gem-twilight.png) |
+| gumi-block                | ![image](../../kh2/images/icons/misc/gumi-block.png) |
+| gumi-blueprint            | ![image](../../kh2/images/icons/misc/gumi-blueprint.png) |
+| gumi-brush                | ![image](../../kh2/images/icons/misc/gumi-brush.png) |
+| gumi-gear                 | ![image](../../kh2/images/icons/misc/gumi-gear.png) |
+| gumi-ship                 | ![image](../../kh2/images/icons/misc/gumi-ship.png) |
+| item-consumable           | ![image](../../kh2/images/icons/misc/item-consumable.png) |
+| item-key                  | ![image](../../kh2/images/icons/misc/item-key.png) |
+| item-tent                 | ![image](../../kh2/images/icons/misc/item-tent.png) |
+| magic                     | ![image](../../kh2/images/icons/misc/magic.png) |
+| magic-nocharge            | ![image](../../kh2/images/icons/misc/magic-nocharge.png) |
+| material                  | ![image](../../kh2/images/icons/misc/material.png) |
+| party                     | ![image](../../kh2/images/icons/misc/party.png) |
+| question-mark             | ![image](../../kh2/images/icons/misc/question-mark.png) |
+| rank-a                    | ![image](../../kh2/images/icons/misc/rank-a.png) |
+| rank-b                    | ![image](../../kh2/images/icons/misc/rank-b.png) |
+| rank-c                    | ![image](../../kh2/images/icons/misc/rank-c.png) |
+| rank-s                    | ![image](../../kh2/images/icons/misc/rank-s.png) |
+| remembrance               | ![image](../../kh2/images/icons/misc/remembrance.png) |
+| tranquil                  | ![image](../../kh2/images/icons/misc/tranquil.png) |
+| weapon-keyblade           | ![image](../../kh2/images/icons/misc/weapon-keyblade.png) |
+| weapon-keyblade-equip     | ![image](../../kh2/images/icons/misc/weapon-keyblade-equip.png) |
+| weapon-shield             | ![image](../../kh2/images/icons/misc/weapon-shield.png) |
+| weapon-shield-equip       | ![image](../../kh2/images/icons/misc/weapon-shield-equip.png) |
+| weapon-staff              | ![image](../../kh2/images/icons/misc/weapon-staff.png) |
+| weapon-staff-equip        | ![image](../../kh2/images/icons/misc/weapon-staff-equip.png) |
 
 ### PS2 Version Button Icons
 
-| Button-Name | Icon 
-|-------------|------
-| button-circle             | ![image](../../kh2/images/icons/original/button-circle.png)
-| button-cross              | ![image](../../kh2/images/icons/original/button-cross.png)
-| button-dpad               | ![image](../../kh2/images/icons/original/button-dpad.png)
-| button-l1                 | ![image](../../kh2/images/icons/original/button-l1.png)
-| button-l2                 | ![image](../../kh2/images/icons/original/button-l2.png)
-| button-r1                 | ![image](../../kh2/images/icons/original/button-r1.png)
-| button-r2                 | ![image](../../kh2/images/icons/original/button-r2.png)
-| button-select             | ![image](../../kh2/images/icons/original/button-select.png)
-| button-square             | ![image](../../kh2/images/icons/original/button-square.png)
-| button-start              | ![image](../../kh2/images/icons/original/button-start.png)
-| button-triangle           | ![image](../../kh2/images/icons/original/button-triangle.png)
+| Button-Name			      | Icon    |
+|-----------------------|---------|
+| button-circle         | ![image](../../kh2/images/icons/original/button-circle.png) |
+| button-cross          | ![image](../../kh2/images/icons/original/button-cross.png) |
+| button-dpad           | ![image](../../kh2/images/icons/original/button-dpad.png) |
+| button-l1             | ![image](../../kh2/images/icons/original/button-l1.png) |
+| button-l2             | ![image](../../kh2/images/icons/original/button-l2.png) |
+| button-r1             | ![image](../../kh2/images/icons/original/button-r1.png) |
+| button-r2             | ![image](../../kh2/images/icons/original/button-r2.png) |
+| button-select         | ![image](../../kh2/images/icons/original/button-select.png) |
+| button-square         | ![image](../../kh2/images/icons/original/button-square.png) |
+| button-start          | ![image](../../kh2/images/icons/original/button-start.png) |
+| button-triangle       | ![image](../../kh2/images/icons/original/button-triangle.png) |
 
 The HD Collection (the PC port specifically) repurposes both used and unused PS2 button icons and adds in brand new ones for its multiple supported control options.
 
@@ -184,185 +184,185 @@ Below is a list of each icon name sorted by button/controller type.
 
 ### Xbox Button Icons
 
-| Button-Name			| Icon
-|-----------------------|---------
-| button-cross          | ![image](../../kh2/images/icons/xb/button-cross(PC).png)
-| button-circle         | ![image](../../kh2/images/icons/xb/button-circle(PC).png)
-| button-square         | ![image](../../kh2/images/icons/xb/button-square(PC).png)
-| button-triangle       | ![image](../../kh2/images/icons/xb/button-triangle(PC).png)
-| button-select         | ![image](../../kh2/images/icons/xb/button-select(PC).png)
-| button-start          | ![image](../../kh2/images/icons/xb/button-start(PC).png)
-| button-l1             | ![image](../../kh2/images/icons/xb/button-l1(PC).png)
-| button-l2             | ![image](../../kh2/images/icons/xb/button-l2(PC).png)
-| weapon-keyblade-equip	| ![image](../../kh2/images/icons/xb/weapon-keyblade-equip(PC).png)
-| button-r1             | ![image](../../kh2/images/icons/xb/button-r1(PC).png)
-| button-r2             | ![image](../../kh2/images/icons/xb/button-r2(PC).png)
-| weapon-staff-equip    | ![image](../../kh2/images/icons/xb/weapon-staff-equip(PC).png)
-| xb-analog             | ![image](../../kh2/images/icons/xb/xb-analog.png)
-| form                  | ![image](../../kh2/images/icons/xb/form(PC).png)
-| xb-left-analog-up     | ![image](../../kh2/images/icons/xb/xb-left-analog-up.png)
-| xb-left-analog-down   | ![image](../../kh2/images/icons/xb/xb-left-analog-down.png)
-| xb-left-analog-left   | ![image](../../kh2/images/icons/xb/xb-left-analog-left.png)
-| xb-left-analog-right  | ![image](../../kh2/images/icons/xb/xb-left-analog-right.png)
-| weapon-shield-equip   | ![image](../../kh2/images/icons/xb/weapon-shield-equip(PC).png)
-| xb-right-analog-up    | ![image](../../kh2/images/icons/xb/xb-right-analog-up.png)
-| xb-right-analog-down  | ![image](../../kh2/images/icons/xb/xb-right-analog-down.png)
-| xb-right-analog-left  | ![image](../../kh2/images/icons/xb/xb-right-analog-left.png)
-| xb-right-analog-right | ![image](../../kh2/images/icons/xb/xb-right-analog-right.png)
-| button-dpad           | ![image](../../kh2/images/icons/xb/button-dpad(PC).png)
-| xb-dpad-up            | ![image](../../kh2/images/icons/xb/xb-dpad-up.png)
-| xb-dpad-down          | ![image](../../kh2/images/icons/xb/xb-dpad-down.png)
-| xb-dpad-left          | ![image](../../kh2/images/icons/xb/xb-dpad-left.png)
-| xb-dpad-right         | ![image](../../kh2/images/icons/xb/xb-dpad-right.png)
-| xb-dpad-updown        | ![image](../../kh2/images/icons/xb/xb-dpad-updown.png)
-| xb-dpad-leftright     | ![image](../../kh2/images/icons/xb/xb-dpad-leftright.png)
+| Button-Name			      | Icon    |
+|-----------------------|---------|
+| button-cross          | ![image](../../kh2/images/icons/xb/button-cross(PC).png) |
+| button-circle         | ![image](../../kh2/images/icons/xb/button-circle(PC).png) |
+| button-square         | ![image](../../kh2/images/icons/xb/button-square(PC).png) |
+| button-triangle       | ![image](../../kh2/images/icons/xb/button-triangle(PC).png) |
+| button-select         | ![image](../../kh2/images/icons/xb/button-select(PC).png) |
+| button-start          | ![image](../../kh2/images/icons/xb/button-start(PC).png) |
+| button-l1             | ![image](../../kh2/images/icons/xb/button-l1(PC).png) |
+| button-l2             | ![image](../../kh2/images/icons/xb/button-l2(PC).png) |
+| weapon-keyblade-equip	| ![image](../../kh2/images/icons/xb/weapon-keyblade-equip(PC).png) |
+| button-r1             | ![image](../../kh2/images/icons/xb/button-r1(PC).png) |
+| button-r2             | ![image](../../kh2/images/icons/xb/button-r2(PC).png) |
+| weapon-staff-equip    | ![image](../../kh2/images/icons/xb/weapon-staff-equip(PC).png) |
+| xb-analog             | ![image](../../kh2/images/icons/xb/xb-analog.png) |
+| form                  | ![image](../../kh2/images/icons/xb/form(PC).png) |
+| xb-left-analog-up     | ![image](../../kh2/images/icons/xb/xb-left-analog-up.png) |
+| xb-left-analog-down   | ![image](../../kh2/images/icons/xb/xb-left-analog-down.png) |
+| xb-left-analog-left   | ![image](../../kh2/images/icons/xb/xb-left-analog-left.png) |
+| xb-left-analog-right  | ![image](../../kh2/images/icons/xb/xb-left-analog-right.png) |
+| weapon-shield-equip   | ![image](../../kh2/images/icons/xb/weapon-shield-equip(PC).png) |
+| xb-right-analog-up    | ![image](../../kh2/images/icons/xb/xb-right-analog-up.png) |
+| xb-right-analog-down  | ![image](../../kh2/images/icons/xb/xb-right-analog-down.png) |
+| xb-right-analog-left  | ![image](../../kh2/images/icons/xb/xb-right-analog-left.png) |
+| xb-right-analog-right | ![image](../../kh2/images/icons/xb/xb-right-analog-right.png) |
+| button-dpad           | ![image](../../kh2/images/icons/xb/button-dpad(PC).png) |
+| xb-dpad-up            | ![image](../../kh2/images/icons/xb/xb-dpad-up.png) |
+| xb-dpad-down          | ![image](../../kh2/images/icons/xb/xb-dpad-down.png) |
+| xb-dpad-left          | ![image](../../kh2/images/icons/xb/xb-dpad-left.png) |
+| xb-dpad-right         | ![image](../../kh2/images/icons/xb/xb-dpad-right.png) |
+| xb-dpad-updown        | ![image](../../kh2/images/icons/xb/xb-dpad-updown.png) |
+| xb-dpad-leftright     | ![image](../../kh2/images/icons/xb/xb-dpad-leftright.png) |
 
 ### PlayStation Button Icons
 
-| Button-Name			| Icon
-|-----------------------|---------
-| ps-cross              | ![image](../../kh2/images/icons/ps/button-cross.png)
-| ps-circle             | ![image](../../kh2/images/icons/ps/button-circle.png)
-| ps-square             | ![image](../../kh2/images/icons/ps/button-square.png)
-| ps-triangle           | ![image](../../kh2/images/icons/ps/button-triangle.png)
-| ps-touchpad           | ![image](../../kh2/images/icons/ps/ps-touchpad.png)
-| ps-options            | ![image](../../kh2/images/icons/ps/ps-options.png)
-| ps-l1                 | ![image](../../kh2/images/icons/ps/button-l1.png)
-| ps-l2                 | ![image](../../kh2/images/icons/ps/button-l2.png)
-| ps-r3                 | ![image](../../kh2/images/icons/ps/ps-r3.png)
-| ps-r1                 | ![image](../../kh2/images/icons/ps/button-r1.png)
-| ps-r2                 | ![image](../../kh2/images/icons/ps/button-r2.png)
-| ps-l3                 | ![image](../../kh2/images/icons/ps/ps-l3.png)
-| ps-analog             | ![image](../../kh2/images/icons/ps/ps-analog.png)
-| ps-analog-left        | ![image](../../kh2/images/icons/ps/ps-analog-left.png)
-| ps-left-analog-up     | ![image](../../kh2/images/icons/ps/ps-left-analog-up.png)
-| ps-left-analog-down   | ![image](../../kh2/images/icons/ps/ps-left-analog-down.png)
-| ps-left-analog-left   | ![image](../../kh2/images/icons/ps/ps-left-analog-left.png)
-| ps-left-analog-right  | ![image](../../kh2/images/icons/ps/ps-left-analog-right.png)
-| ps-analog-right       | ![image](../../kh2/images/icons/ps/ps-analog-right.png)
-| ps-right-analog-up    | ![image](../../kh2/images/icons/ps/ps-right-analog-up.png)
-| ps-right-analog-down  | ![image](../../kh2/images/icons/ps/ps-right-analog-down.png)
-| ps-right-analog-left  | ![image](../../kh2/images/icons/ps/ps-right-analog-left.png)
-| ps-right-analog-right	| ![image](../../kh2/images/icons/ps/ps-right-analog-right.png)
-| ps-dpad               | ![image](../../kh2/images/icons/ps/button-dpad.png)
-| ps-dpad-up            | ![image](../../kh2/images/icons/ps/ps-dpad-up.png)
-| ps-dpad-down          | ![image](../../kh2/images/icons/ps/ps-dpad-down.png)
-| ps-dpad-left          | ![image](../../kh2/images/icons/ps/ps-dpad-left.png)
-| ps-dpad-right         | ![image](../../kh2/images/icons/ps/ps-dpad-right.png)
-| ps-dpad-updown        | ![image](../../kh2/images/icons/ps/ps-dpad-updown.png)
-| ps-dpad-leftright     | ![image](../../kh2/images/icons/ps/ps-dpad-leftright.png)
+| Button-Name			      | Icon    |
+|-----------------------|---------|
+| ps-cross              | ![image](../../kh2/images/icons/ps/button-cross.png) |
+| ps-circle             | ![image](../../kh2/images/icons/ps/button-circle.png) |
+| ps-square             | ![image](../../kh2/images/icons/ps/button-square.png) |
+| ps-triangle           | ![image](../../kh2/images/icons/ps/button-triangle.png) |
+| ps-touchpad           | ![image](../../kh2/images/icons/ps/ps-touchpad.png) |
+| ps-options            | ![image](../../kh2/images/icons/ps/ps-options.png) |
+| ps-l1                 | ![image](../../kh2/images/icons/ps/button-l1.png) |
+| ps-l2                 | ![image](../../kh2/images/icons/ps/button-l2.png) |
+| ps-r3                 | ![image](../../kh2/images/icons/ps/ps-r3.png) |
+| ps-r1                 | ![image](../../kh2/images/icons/ps/button-r1.png) |
+| ps-r2                 | ![image](../../kh2/images/icons/ps/button-r2.png) |
+| ps-l3                 | ![image](../../kh2/images/icons/ps/ps-l3.png) |
+| ps-analog             | ![image](../../kh2/images/icons/ps/ps-analog.png) |
+| ps-analog-left        | ![image](../../kh2/images/icons/ps/ps-analog-left.png) |
+| ps-left-analog-up     | ![image](../../kh2/images/icons/ps/ps-left-analog-up.png) |
+| ps-left-analog-down   | ![image](../../kh2/images/icons/ps/ps-left-analog-down.png) |
+| ps-left-analog-left   | ![image](../../kh2/images/icons/ps/ps-left-analog-left.png) |
+| ps-left-analog-right  | ![image](../../kh2/images/icons/ps/ps-left-analog-right.png) |
+| ps-analog-right       | ![image](../../kh2/images/icons/ps/ps-analog-right.png) |
+| ps-right-analog-up    | ![image](../../kh2/images/icons/ps/ps-right-analog-up.png) |
+| ps-right-analog-down  | ![image](../../kh2/images/icons/ps/ps-right-analog-down.png) |
+| ps-right-analog-left  | ![image](../../kh2/images/icons/ps/ps-right-analog-left.png) |
+| ps-right-analog-right	| ![image](../../kh2/images/icons/ps/ps-right-analog-right.png) |
+| ps-dpad               | ![image](../../kh2/images/icons/ps/button-dpad.png) |
+| ps-dpad-up            | ![image](../../kh2/images/icons/ps/ps-dpad-up.png) |
+| ps-dpad-down          | ![image](../../kh2/images/icons/ps/ps-dpad-down.png) |
+| ps-dpad-left          | ![image](../../kh2/images/icons/ps/ps-dpad-left.png) |
+| ps-dpad-right         | ![image](../../kh2/images/icons/ps/ps-dpad-right.png) |
+| ps-dpad-updown        | ![image](../../kh2/images/icons/ps/ps-dpad-updown.png) |
+| ps-dpad-leftright     | ![image](../../kh2/images/icons/ps/ps-dpad-leftright.png) |
 
 ### Generic Button Icons
 
-| Button-Name			| Icon
-|-----------------------|---------
-| gen-1                 | ![image](../../kh2/images/icons/generic/gen-1.png)
-| gen-2                 | ![image](../../kh2/images/icons/generic/gen-2.png)
-| gen-3                 | ![image](../../kh2/images/icons/generic/gen-3.png)
-| gen-4                 | ![image](../../kh2/images/icons/generic/gen-4.png)
-| gen-r1                | ![image](../../kh2/images/icons/generic/gen-r1.png)
-| gen-r2                | ![image](../../kh2/images/icons/generic/gen-r2.png)
-| gen-l1                | ![image](../../kh2/images/icons/generic/gen-l1.png)
-| gen-l2                | ![image](../../kh2/images/icons/generic/gen-l2.png)
-| gen-select            | ![image](../../kh2/images/icons/generic/gen-select.png)
-| gen-start             | ![image](../../kh2/images/icons/generic/gen-start.png)
+| Button-Name			      | Icon    |
+|-----------------------|---------|
+| gen-1                 | ![image](../../kh2/images/icons/generic/gen-1.png) |
+| gen-2                 | ![image](../../kh2/images/icons/generic/gen-2.png) |
+| gen-3                 | ![image](../../kh2/images/icons/generic/gen-3.png) |
+| gen-4                 | ![image](../../kh2/images/icons/generic/gen-4.png) |
+| gen-r1                | ![image](../../kh2/images/icons/generic/gen-r1.png) |
+| gen-r2                | ![image](../../kh2/images/icons/generic/gen-r2.png) |
+| gen-l1                | ![image](../../kh2/images/icons/generic/gen-l1.png) |
+| gen-l2                | ![image](../../kh2/images/icons/generic/gen-l2.png) |
+| gen-select            | ![image](../../kh2/images/icons/generic/gen-select.png) |
+| gen-start             | ![image](../../kh2/images/icons/generic/gen-start.png) |
 
 ### Keyboard and Mouse Icons
 
-| Key-Name				| Icon
-|-----------------------|---------
-| kb-a                  | ![image](../../kh2/images/icons/kbm/kb-a.png)
-| kb-b                  | ![image](../../kh2/images/icons/kbm/kb-b.png)
-| kb-c                  | ![image](../../kh2/images/icons/kbm/kb-c.png)
-| kb-d                  | ![image](../../kh2/images/icons/kbm/kb-d.png)
-| kb-e                  | ![image](../../kh2/images/icons/kbm/kb-e.png)
-| kb-f                  | ![image](../../kh2/images/icons/kbm/kb-f.png)
-| kb-g                  | ![image](../../kh2/images/icons/kbm/kb-g.png)
-| kb-h                  | ![image](../../kh2/images/icons/kbm/kb-h.png)
-| kb-i                  | ![image](../../kh2/images/icons/kbm/kb-i.png)
-| kb-j                  | ![image](../../kh2/images/icons/kbm/kb-j.png)
-| kb-k                  | ![image](../../kh2/images/icons/kbm/kb-k.png)
-| kb-l                  | ![image](../../kh2/images/icons/kbm/kb-l.png)
-| kb-m                  | ![image](../../kh2/images/icons/kbm/kb-m.png)
-| kb-n                  | ![image](../../kh2/images/icons/kbm/kb-n.png)
-| kb-o                  | ![image](../../kh2/images/icons/kbm/kb-o.png)
-| kb-p                  | ![image](../../kh2/images/icons/kbm/kb-p.png)
-| kb-q                  | ![image](../../kh2/images/icons/kbm/kb-q.png)
-| kb-r                  | ![image](../../kh2/images/icons/kbm/kb-r.png)
-| kb-s                  | ![image](../../kh2/images/icons/kbm/kb-s.png)
-| kb-t                  | ![image](../../kh2/images/icons/kbm/kb-t.png)
-| kb-u                  | ![image](../../kh2/images/icons/kbm/kb-u.png)
-| kb-v                  | ![image](../../kh2/images/icons/kbm/kb-v.png)
-| kb-w                  | ![image](../../kh2/images/icons/kbm/kb-w.png)
-| kb-x                  | ![image](../../kh2/images/icons/kbm/kb-x.png)
-| kb-y                  | ![image](../../kh2/images/icons/kbm/kb-y.png)
-| kb-z                  | ![image](../../kh2/images/icons/kbm/kb-z.png)
-| kb-left-shift         | ![image](../../kh2/images/icons/kbm/kb-left-shift.png)
-| kb-right-shift        | ![image](../../kh2/images/icons/kbm/kb-right-shift.png)
-| kb-left-ctrl          | ![image](../../kh2/images/icons/kbm/kb-left-ctrl.png)
-| kb-right-crtl         | ![image](../../kh2/images/icons/kbm/kb-right-crtl.png)
-| kb-left-alt           | ![image](../../kh2/images/icons/kbm/kb-left-alt.png)
-| kb-right-alt          | ![image](../../kh2/images/icons/kbm/kb-right-alt.png)
-| kb-enter              | ![image](../../kh2/images/icons/kbm/kb-enter.png)
-| kb-backspace          | ![image](../../kh2/images/icons/kbm/kb-backspace.png)
-| kb-space              | ![image](../../kh2/images/icons/kbm/kb-space.png)
-| kb-esc                | ![image](../../kh2/images/icons/kbm/kb-esc.png)
-| kb-insert             | ![image](../../kh2/images/icons/kbm/kb-insert.png)
-| kb-delete             | ![image](../../kh2/images/icons/kbm/kb-delete.png)
-| kb-1                  | ![image](../../kh2/images/icons/kbm/kb-1.png)
-| kb-2                  | ![image](../../kh2/images/icons/kbm/kb-2.png)
-| kb-3                  | ![image](../../kh2/images/icons/kbm/kb-3.png)
-| kb-4                  | ![image](../../kh2/images/icons/kbm/kb-4.png)
-| kb-5                  | ![image](../../kh2/images/icons/kbm/kb-5.png)
-| kb-6                  | ![image](../../kh2/images/icons/kbm/kb-6.png)
-| kb-7                  | ![image](../../kh2/images/icons/kbm/kb-7.png)
-| kb-8                  | ![image](../../kh2/images/icons/kbm/kb-8.png)
-| kb-9                  | ![image](../../kh2/images/icons/kbm/kb-9.png)
-| kb-0                  | ![image](../../kh2/images/icons/kbm/kb-0.png)
-| kb-numpad-1           | ![image](../../kh2/images/icons/kbm/kb-numpad-1.png)
-| kb-numpad-2           | ![image](../../kh2/images/icons/kbm/kb-numpad-2.png)
-| kb-numpad-3           | ![image](../../kh2/images/icons/kbm/kb-numpad-3.png)
-| kb-numpad-4           | ![image](../../kh2/images/icons/kbm/kb-numpad-4.png)
-| kb-numpad-5           | ![image](../../kh2/images/icons/kbm/kb-numpad-5.png)
-| kb-numpad-6           | ![image](../../kh2/images/icons/kbm/kb-numpad-6.png)
-| kb-numpad-7           | ![image](../../kh2/images/icons/kbm/kb-numpad-7.png)
-| kb-numpad-8           | ![image](../../kh2/images/icons/kbm/kb-numpad-8.png)
-| kb-numpad-9           | ![image](../../kh2/images/icons/kbm/kb-numpad-9.png)
-| kb-numpad-0           | ![image](../../kh2/images/icons/kbm/kb-numpad-0.png)
-| kb-numpad-divide      | ![image](../../kh2/images/icons/kbm/kb-numpad-divide.png)
-| kb-numpad-multiply    | ![image](../../kh2/images/icons/kbm/kb-numpad-multiply.png)
-| kb-numpad-minus       | ![image](../../kh2/images/icons/kbm/kb-numpad-minus.png)
-| kb-numpad-plus        | ![image](../../kh2/images/icons/kbm/kb-numpad-plus.png)
-| kb-numpad-period      | ![image](../../kh2/images/icons/kbm/kb-numpad-period.png)
-| kb-up                 | ![image](../../kh2/images/icons/kbm/kb-up.png)
-| kb-down               | ![image](../../kh2/images/icons/kbm/kb-down.png)
-| kb-left               | ![image](../../kh2/images/icons/kbm/kb-left.png)
-| kb-right              | ![image](../../kh2/images/icons/kbm/kb-right.png)
-| kb-f1                 | ![image](../../kh2/images/icons/kbm/kb-f1.png)
-| kb-f2                 | ![image](../../kh2/images/icons/kbm/kb-f2.png)
-| kb-f3                 | ![image](../../kh2/images/icons/kbm/kb-f3.png)
-| kb-f4                 | ![image](../../kh2/images/icons/kbm/kb-f4.png)
-| kb-f5                 | ![image](../../kh2/images/icons/kbm/kb-f5.png)
-| kb-f6                 | ![image](../../kh2/images/icons/kbm/kb-f6.png)
-| kb-f7                 | ![image](../../kh2/images/icons/kbm/kb-f7.png)
-| kb-f8                 | ![image](../../kh2/images/icons/kbm/kb-f8.png)
-| kb-f9                 | ![image](../../kh2/images/icons/kbm/kb-f9.png)
-| kb-f10                | ![image](../../kh2/images/icons/kbm/kb-f10.png)
-| kb-f11                | ![image](../../kh2/images/icons/kbm/kb-f11.png)
-| kb-f12                | ![image](../../kh2/images/icons/kbm/kb-f12.png)
-| mouse-left-click      | ![image](../../kh2/images/icons/kbm/mouse-left-click.png)
-| mouse-right-click     | ![image](../../kh2/images/icons/kbm/mouse-right-click.png)
-| mouse-middle-click    | ![image](../../kh2/images/icons/kbm/mouse-middle-click.png)
-| mouse-extra-click1    | ![image](../../kh2/images/icons/kbm/mouse-extra-click1.png)
-| mouse-extra-click2    | ![image](../../kh2/images/icons/kbm/mouse-extra-click2.png)
-| mouse-up              | ![image](../../kh2/images/icons/kbm/mouse-up.png)
-| mouse-down            | ![image](../../kh2/images/icons/kbm/mouse-down.png)
-| mouse-left            | ![image](../../kh2/images/icons/kbm/mouse-left.png)
-| mouse-right           | ![image](../../kh2/images/icons/kbm/mouse-right.png)
-| mouse-scroll-up       | ![image](../../kh2/images/icons/kbm/mouse-scroll-up.png)
-| mouse-scroll-down     | ![image](../../kh2/images/icons/kbm/mouse-scroll-down.png)
-| mouse-neutral         | ![image](../../kh2/images/icons/kbm/mouse-neutral.png)
-| hash                  | ![image](../../kh2/images/icons/kbm/hash.png)
+| Key-Name	  		      | Icon    |
+|-----------------------|---------|
+| kb-a                  | ![image](../../kh2/images/icons/kbm/kb-a.png) |
+| kb-b                  | ![image](../../kh2/images/icons/kbm/kb-b.png) |
+| kb-c                  | ![image](../../kh2/images/icons/kbm/kb-c.png) |
+| kb-d                  | ![image](../../kh2/images/icons/kbm/kb-d.png) |
+| kb-e                  | ![image](../../kh2/images/icons/kbm/kb-e.png) |
+| kb-f                  | ![image](../../kh2/images/icons/kbm/kb-f.png) |
+| kb-g                  | ![image](../../kh2/images/icons/kbm/kb-g.png) |
+| kb-h                  | ![image](../../kh2/images/icons/kbm/kb-h.png) |
+| kb-i                  | ![image](../../kh2/images/icons/kbm/kb-i.png) |
+| kb-j                  | ![image](../../kh2/images/icons/kbm/kb-j.png) |
+| kb-k                  | ![image](../../kh2/images/icons/kbm/kb-k.png) |
+| kb-l                  | ![image](../../kh2/images/icons/kbm/kb-l.png) |
+| kb-m                  | ![image](../../kh2/images/icons/kbm/kb-m.png) |
+| kb-n                  | ![image](../../kh2/images/icons/kbm/kb-n.png) |
+| kb-o                  | ![image](../../kh2/images/icons/kbm/kb-o.png) |
+| kb-p                  | ![image](../../kh2/images/icons/kbm/kb-p.png) |
+| kb-q                  | ![image](../../kh2/images/icons/kbm/kb-q.png) |
+| kb-r                  | ![image](../../kh2/images/icons/kbm/kb-r.png) |
+| kb-s                  | ![image](../../kh2/images/icons/kbm/kb-s.png) |
+| kb-t                  | ![image](../../kh2/images/icons/kbm/kb-t.png) |
+| kb-u                  | ![image](../../kh2/images/icons/kbm/kb-u.png) |
+| kb-v                  | ![image](../../kh2/images/icons/kbm/kb-v.png) |
+| kb-w                  | ![image](../../kh2/images/icons/kbm/kb-w.png) |
+| kb-x                  | ![image](../../kh2/images/icons/kbm/kb-x.png) |
+| kb-y                  | ![image](../../kh2/images/icons/kbm/kb-y.png) |
+| kb-z                  | ![image](../../kh2/images/icons/kbm/kb-z.png) |
+| kb-left-shift         | ![image](../../kh2/images/icons/kbm/kb-left-shift.png) |
+| kb-right-shift        | ![image](../../kh2/images/icons/kbm/kb-right-shift.png) |
+| kb-left-ctrl          | ![image](../../kh2/images/icons/kbm/kb-left-ctrl.png) |
+| kb-right-crtl         | ![image](../../kh2/images/icons/kbm/kb-right-crtl.png) |
+| kb-left-alt           | ![image](../../kh2/images/icons/kbm/kb-left-alt.png) |
+| kb-right-alt          | ![image](../../kh2/images/icons/kbm/kb-right-alt.png) |
+| kb-enter              | ![image](../../kh2/images/icons/kbm/kb-enter.png) |
+| kb-backspace          | ![image](../../kh2/images/icons/kbm/kb-backspace.png) |
+| kb-space              | ![image](../../kh2/images/icons/kbm/kb-space.png) |
+| kb-esc                | ![image](../../kh2/images/icons/kbm/kb-esc.png) |
+| kb-insert             | ![image](../../kh2/images/icons/kbm/kb-insert.png) |
+| kb-delete             | ![image](../../kh2/images/icons/kbm/kb-delete.png) |
+| kb-1                  | ![image](../../kh2/images/icons/kbm/kb-1.png) |
+| kb-2                  | ![image](../../kh2/images/icons/kbm/kb-2.png) |
+| kb-3                  | ![image](../../kh2/images/icons/kbm/kb-3.png) |
+| kb-4                  | ![image](../../kh2/images/icons/kbm/kb-4.png) |
+| kb-5                  | ![image](../../kh2/images/icons/kbm/kb-5.png) |
+| kb-6                  | ![image](../../kh2/images/icons/kbm/kb-6.png) |
+| kb-7                  | ![image](../../kh2/images/icons/kbm/kb-7.png) |
+| kb-8                  | ![image](../../kh2/images/icons/kbm/kb-8.png) |
+| kb-9                  | ![image](../../kh2/images/icons/kbm/kb-9.png) |
+| kb-0                  | ![image](../../kh2/images/icons/kbm/kb-0.png) |
+| kb-numpad-1           | ![image](../../kh2/images/icons/kbm/kb-numpad-1.png) |
+| kb-numpad-2           | ![image](../../kh2/images/icons/kbm/kb-numpad-2.png) |
+| kb-numpad-3           | ![image](../../kh2/images/icons/kbm/kb-numpad-3.png) |
+| kb-numpad-4           | ![image](../../kh2/images/icons/kbm/kb-numpad-4.png) |
+| kb-numpad-5           | ![image](../../kh2/images/icons/kbm/kb-numpad-5.png) |
+| kb-numpad-6           | ![image](../../kh2/images/icons/kbm/kb-numpad-6.png) |
+| kb-numpad-7           | ![image](../../kh2/images/icons/kbm/kb-numpad-7.png) |
+| kb-numpad-8           | ![image](../../kh2/images/icons/kbm/kb-numpad-8.png) |
+| kb-numpad-9           | ![image](../../kh2/images/icons/kbm/kb-numpad-9.png) |
+| kb-numpad-0           | ![image](../../kh2/images/icons/kbm/kb-numpad-0.png) |
+| kb-numpad-divide      | ![image](../../kh2/images/icons/kbm/kb-numpad-divide.png) |
+| kb-numpad-multiply    | ![image](../../kh2/images/icons/kbm/kb-numpad-multiply.png) |
+| kb-numpad-minus       | ![image](../../kh2/images/icons/kbm/kb-numpad-minus.png) |
+| kb-numpad-plus        | ![image](../../kh2/images/icons/kbm/kb-numpad-plus.png) |
+| kb-numpad-period      | ![image](../../kh2/images/icons/kbm/kb-numpad-period.png) |
+| kb-up                 | ![image](../../kh2/images/icons/kbm/kb-up.png) |
+| kb-down               | ![image](../../kh2/images/icons/kbm/kb-down.png) |
+| kb-left               | ![image](../../kh2/images/icons/kbm/kb-left.png) |
+| kb-right              | ![image](../../kh2/images/icons/kbm/kb-right.png) |
+| kb-f1                 | ![image](../../kh2/images/icons/kbm/kb-f1.png) |
+| kb-f2                 | ![image](../../kh2/images/icons/kbm/kb-f2.png) |
+| kb-f3                 | ![image](../../kh2/images/icons/kbm/kb-f3.png) |
+| kb-f4                 | ![image](../../kh2/images/icons/kbm/kb-f4.png) |
+| kb-f5                 | ![image](../../kh2/images/icons/kbm/kb-f5.png) |
+| kb-f6                 | ![image](../../kh2/images/icons/kbm/kb-f6.png) |
+| kb-f7                 | ![image](../../kh2/images/icons/kbm/kb-f7.png) |
+| kb-f8                 | ![image](../../kh2/images/icons/kbm/kb-f8.png) |
+| kb-f9                 | ![image](../../kh2/images/icons/kbm/kb-f9.png) |
+| kb-f10                | ![image](../../kh2/images/icons/kbm/kb-f10.png) |
+| kb-f11                | ![image](../../kh2/images/icons/kbm/kb-f11.png) |
+| kb-f12                | ![image](../../kh2/images/icons/kbm/kb-f12.png) |
+| mouse-left-click      | ![image](../../kh2/images/icons/kbm/mouse-left-click.png) |
+| mouse-right-click     | ![image](../../kh2/images/icons/kbm/mouse-right-click.png) |
+| mouse-middle-click    | ![image](../../kh2/images/icons/kbm/mouse-middle-click.png) |
+| mouse-extra-click1    | ![image](../../kh2/images/icons/kbm/mouse-extra-click1.png) |
+| mouse-extra-click2    | ![image](../../kh2/images/icons/kbm/mouse-extra-click2.png) |
+| mouse-up              | ![image](../../kh2/images/icons/kbm/mouse-up.png) |
+| mouse-down            | ![image](../../kh2/images/icons/kbm/mouse-down.png) |
+| mouse-left            | ![image](../../kh2/images/icons/kbm/mouse-left.png) |
+| mouse-right           | ![image](../../kh2/images/icons/kbm/mouse-right.png) |
+| mouse-scroll-up       | ![image](../../kh2/images/icons/kbm/mouse-scroll-up.png) |
+| mouse-scroll-down     | ![image](../../kh2/images/icons/kbm/mouse-scroll-down.png) |
+| mouse-neutral         | ![image](../../kh2/images/icons/kbm/mouse-neutral.png) |
+| hash                  | ![image](../../kh2/images/icons/kbm/hash.png) |
 
 ### Dynamic Button Icons
 
@@ -374,21 +374,21 @@ For example `dynamic-cross` will look like the Playstation <img src="../../kh2/i
 
 As a result of this information and how the PC port handles these dynamic texts, the user should ***ALWAYS*** use these icons in place of static ones used above.
 
-| Dynamic-Button-Name		    | PS Icon | XB Icon | Generic Icon |
+| Dynamic-Button-Name		        | PS Icon | XB Icon | Generic Icon |
 |-------------------------------|---------|---------|--------------|
-| dynamic-cross                 | ![image](../../kh2/images/icons/ps/button-cross.png) | ![image](../../kh2/images/icons/xb/button-cross(PC).png) | ![image](../../kh2/images/icons/generic/gen-2.png)
-| dynamic-circle-jp             | ![image](../../kh2/images/icons/ps/button-cross.png) | ![image](../../kh2/images/icons/xb/button-cross(PC).png) | ![image](../../kh2/images/icons/generic/gen-2.png)
-| dynamic-circle                | ![image](../../kh2/images/icons/ps/button-circle.png) | ![image](../../kh2/images/icons/xb/button-circle(PC).png) | ![image](../../kh2/images/icons/generic/gen-4.png)
-| dynamic-cross-jp              | ![image](../../kh2/images/icons/ps/button-circle.png) | ![image](../../kh2/images/icons/xb/button-circle(PC).png) | ![image](../../kh2/images/icons/generic/gen-4.png)
-| dynamic-square                | ![image](../../kh2/images/icons/ps/button-square.png) | ![image](../../kh2/images/icons/xb/button-square(PC).png) | ![image](../../kh2/images/icons/generic/gen-3.png)
-| dynamic-triangle              | ![image](../../kh2/images/icons/ps/button-triangle.png) | ![image](../../kh2/images/icons/xb/button-triangle(PC).png) | ![image](../../kh2/images/icons/generic/gen-1.png)
-| dynamic-select                | ![image](../../kh2/images/icons/ps/ps-touchpad.png) | ![image](../../kh2/images/icons/xb/button-select(PC).png) | ![image](../../kh2/images/icons/generic/gen-select.png)
-| dynamic-start                 | ![image](../../kh2/images/icons/ps/ps-options.png) | ![image](../../kh2/images/icons/xb/button-start(PC).png) | ![image](../../kh2/images/icons/generic/gen-start.png)
-| dynamic-l1                    | ![image](../../kh2/images/icons/ps/button-l1.png) | ![image](../../kh2/images/icons/xb/button-l1(PC).png) | ![image](../../kh2/images/icons/generic/gen-l1.png)
-| dynamic-l2                    | ![image](../../kh2/images/icons/ps/button-l2.png) | ![image](../../kh2/images/icons/xb/button-l2(PC).png) | ![image](../../kh2/images/icons/generic/gen-l2.png)
+| dynamic-cross                 | ![image](../../kh2/images/icons/ps/button-cross.png) | ![image](../../kh2/images/icons/xb/button-cross(PC).png) | ![image](../../kh2/images/icons/generic/gen-2.png) |
+| dynamic-circle-jp             | ![image](../../kh2/images/icons/ps/button-cross.png) | ![image](../../kh2/images/icons/xb/button-cross(PC).png) | ![image](../../kh2/images/icons/generic/gen-2.png) |
+| dynamic-circle                | ![image](../../kh2/images/icons/ps/button-circle.png) | ![image](../../kh2/images/icons/xb/button-circle(PC).png) | ![image](../../kh2/images/icons/generic/gen-4.png) |
+| dynamic-cross-jp              | ![image](../../kh2/images/icons/ps/button-circle.png) | ![image](../../kh2/images/icons/xb/button-circle(PC).png) | ![image](../../kh2/images/icons/generic/gen-4.png) |
+| dynamic-square                | ![image](../../kh2/images/icons/ps/button-square.png) | ![image](../../kh2/images/icons/xb/button-square(PC).png) | ![image](../../kh2/images/icons/generic/gen-3.png) |
+| dynamic-triangle              | ![image](../../kh2/images/icons/ps/button-triangle.png) | ![image](../../kh2/images/icons/xb/button-triangle(PC).png) | ![image](../../kh2/images/icons/generic/gen-1.png) |
+| dynamic-select                | ![image](../../kh2/images/icons/ps/ps-touchpad.png) | ![image](../../kh2/images/icons/xb/button-select(PC).png) | ![image](../../kh2/images/icons/generic/gen-select.png) |
+| dynamic-start                 | ![image](../../kh2/images/icons/ps/ps-options.png) | ![image](../../kh2/images/icons/xb/button-start(PC).png) | ![image](../../kh2/images/icons/generic/gen-start.png) |
+| dynamic-l1                    | ![image](../../kh2/images/icons/ps/button-l1.png) | ![image](../../kh2/images/icons/xb/button-l1(PC).png) | ![image](../../kh2/images/icons/generic/gen-l1.png) |
+| dynamic-l2                    | ![image](../../kh2/images/icons/ps/button-l2.png) | ![image](../../kh2/images/icons/xb/button-l2(PC).png) | ![image](../../kh2/images/icons/generic/gen-l2.png) |
 | dynamic-l3                    | ![image](../../kh2/images/icons/ps/ps-l3.png) | ![image](../../kh2/images/icons/xb/weapon-keyblade-equip(PC).png) | 
-| dynamic-r1                    | ![image](../../kh2/images/icons/ps/button-r1.png) | ![image](../../kh2/images/icons/xb/button-r1(PC).png) | ![image](../../kh2/images/icons/generic/gen-r1.png)
-| dynamic-r2                    | ![image](../../kh2/images/icons/ps/button-r2.png) | ![image](../../kh2/images/icons/xb/button-r2(PC).png) | ![image](../../kh2/images/icons/generic/gen-r2.png)
+| dynamic-r1                    | ![image](../../kh2/images/icons/ps/button-r1.png) | ![image](../../kh2/images/icons/xb/button-r1(PC).png) | ![image](../../kh2/images/icons/generic/gen-r1.png) |
+| dynamic-r2                    | ![image](../../kh2/images/icons/ps/button-r2.png) | ![image](../../kh2/images/icons/xb/button-r2(PC).png) | ![image](../../kh2/images/icons/generic/gen-r2.png) |
 | dynamic-r3                    | ![image](../../kh2/images/icons/ps/ps-r3.png) | ![image](../../kh2/images/icons/xb/weapon-staff-equip(PC).png) | 
 | dynamic-analog                | ![image](../../kh2/images/icons/ps/ps-analog.png) | ![image](../../kh2/images/icons/xb/xb-analog.png) | 
 | dynamic-left-analog           | ![image](../../kh2/images/icons/ps/ps-analog-left.png) | ![image](../../kh2/images/icons/xb/form(PC).png) | 
