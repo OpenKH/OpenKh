@@ -129,6 +129,11 @@ namespace OpenKh.Egs
             return -1;
         }
 
+        public static void ScanPrint(string scantext)
+        {
+            if (SDasset.ScanMode)
+                Console.WriteLine(scantext);
+        }
 
         #endregion
     }

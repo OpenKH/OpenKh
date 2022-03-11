@@ -1,5 +1,7 @@
 using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Common.Archives;
+using OpenKh.Common;
+using OpenKh.Egs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,7 +15,8 @@ namespace OpenKh.Command.HdAssets
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(
         typeof(ExtractCommand),
-        typeof(StripCommand))]
+        typeof(StripCommand),
+        typeof(ScanCommand))]
     class Program
     {
         private const string DefaultPrefix = "_ASSET_";
@@ -135,6 +138,44 @@ namespace OpenKh.Command.HdAssets
             }
         }
 
+        [Command(Description = "Scan SD files to get info on HD texture order to correctly link them on patch.")]
+        private class ScanCommand
+        {
+            [Required]
+            [Argument(0, Description = "Input file or directory of SD assets")]
+            public string Input { get; set; }
+
+            [Option(CommandOptionType.NoValue, Description = "Execute the command recursively for all the sub-folders", ShortName = "r", LongName = "recursive")]
+            public bool Recursive { get; set; }
+
+            protected void OnExecute(CommandLineApplication app)
+            {
+                foreach (var filePath in GetFiles(Input, Recursive, DefaultPrefix))
+                {
+                    SDasset asset;
+                    
+                    using (var stream = File.OpenRead(filePath))
+                    {
+                        //try
+                        //{
+                            // Avoid to crash on files that are not a ReMIX asset
+                            asset = new SDasset(filePath, stream.ReadAllBytes(), true, true);
+
+                            if (asset.TextureCount == 0)
+                                Console.WriteLine($"File \"{filePath}\" did not contain any files to link!");
+                        //}
+                        //catch
+                        //{
+                        //    // Not a ReMIX asset
+                        //    continue;
+                        //}
+                    }
+
+                    //using (var stream = File.Create(filePath))
+                    //    asset.Stream.CopyTo(stream);
+                }
+            }
+        }
         private static string[] GetFiles(string input, bool recursive, string excludePrefix)
         {
             if (File.Exists(input))
