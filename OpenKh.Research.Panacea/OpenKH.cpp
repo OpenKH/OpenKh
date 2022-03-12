@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <cstdio>
 #include <cstdlib>
+#include <intrin.h>
 
 #include "OpenKH.h"
 #include "KingdomApi.h"
@@ -12,10 +13,10 @@ HINSTANCE g_hInstance;
 
 static const long KingdomApi_KH2[KingdomApiFunction_END] =
 {
-    0x1367D0,
-    0x1364D0,
-    0x139630,
-    0x136A10,
+    0x136890,
+    0x136590,
+    0x1396F0,
+    0x136AD0,
 };
 
 static const long KingdomApi_BBS[KingdomApiFunction_END] =
@@ -62,7 +63,6 @@ void OpenKH::Initialize()
 {
     g_hInstance = GetModuleHandle(NULL);
     fprintf(stdout, "Executable instance at %p\n", g_hInstance);
-
     auto gameId = DetectGame();
     if (gameId == OpenKH::GameId::Unknown)
     {
