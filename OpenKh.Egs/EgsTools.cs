@@ -735,6 +735,7 @@ namespace OpenKh.Egs
         {
             using MemoryStream ms = new MemoryStream(AssetData);
 
+            
             int magic = ms.ReadInt32();
             if (magic != 1514622281 && AssetOffset == 0)
             { //IMGZ
@@ -742,16 +743,17 @@ namespace OpenKh.Egs
                 Helpers.ScanPrint("IMZ could not be scanned! Wrong filetype?");
                 return;
             }
-            //ms.ReadInt64(); //unknown
-            //ms.ReadInt32(); //texture count
+            ms.ReadInt64(); //unknown
+            int TexCount = ms.ReadInt32(); //texture count
 
-            for (int i = 0; i < TextureCount; i++) 
+            for (int i = 0; i < TexCount; i++) 
             {
                 ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
                 int IMDoffset = ms.ReadInt32(); //Offset for IMGD data
                 ms.Seek(IMDoffset, SeekOrigin.Begin);
 
                 magic = ms.ReadInt32();
+                Console.WriteLine(magic);
                 if (magic == 1145523529) //IMGD
                 {
                     TextureCount += 1;
@@ -759,6 +761,7 @@ namespace OpenKh.Egs
                     int Imageoffset = ms.ReadInt32(); //offset for image data
                     Offsets.Add(AssetOffset + IMDoffset + Imageoffset + 0x20000000);
                 }
+
             }
 
             if (AssetOffset == 0)
@@ -1060,14 +1063,51 @@ namespace OpenKh.Egs
                         magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(3));
                         if (magic == "BAR")
                         {
-                            //Console.WriteLine("BAR-ception!);
-                            ms.Seek(offset, SeekOrigin.Begin);
-                            subfile = ms.ReadBytes(subsize);
-                            subasset = new BAR(subfile, offset);
+                            ms.ReadBytes(1);
+                            int subcount = ms.ReadInt32();
+                            ms.ReadInt64();
+                            var posOffset = (int)ms.Position;
 
-                            TextureCount += subasset.TextureCount;
-                            OffsetsIMD.AddRange(subasset.OffsetsIMD);
-                            OffsetsIMZ.AddRange(subasset.OffsetsIMZ);
+                            for (int s = 0; s < subcount; s++)
+                            {
+                                ms.Seek(posOffset + (s * 0x10), SeekOrigin.Begin);
+                                int subtype = ms.ReadInt32(); //subasset type
+                                ms.ReadInt32(); //subasset name
+                                int suboffset = ms.ReadInt32(); //subasset offset
+                                subsize = ms.ReadInt32(); //subasset size
+                                ms.Seek((posOffset - 0x10) + suboffset, SeekOrigin.Begin);
+                                string subMagic;
+
+                                switch (subtype)
+                                {
+                                    case (24): //IMD
+                                        subMagic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                                        if (subMagic == "IMGD") //IMGD
+                                        {
+                                            //Console.WriteLine("BAR-ception Image!");
+                                            ms.Seek((posOffset - 0x10) + suboffset, SeekOrigin.Begin);
+                                            subfile = ms.ReadBytes(subsize);
+                                            subasset = new IMD(subfile, offset + suboffset);
+
+                                            TextureCount += subasset.TextureCount;
+                                            OffsetsIMD.AddRange(subasset.Offsets);
+                                        }
+                                        break;
+                                    case (29): //IMZ                           
+                                        subMagic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                                        if (subMagic == "IMGZ")//IMGZ
+                                        {
+                                            //Console.WriteLine("BAR-ception Image Collection!");
+                                            ms.Seek((posOffset - 0x10) + suboffset, SeekOrigin.Begin);
+                                            subfile = ms.ReadBytes(subsize);
+                                            subasset = new IMZ(subfile, offset + suboffset);
+
+                                            TextureCount += subasset.TextureCount;
+                                            OffsetsIMZ.AddRange(subasset.Offsets);
+                                        }
+                                        break;
+                                }
+                            }
                         }
                         else
                             Helpers.ScanPrint("BAR subtype found in BAR, but could not be scanned! Is this subtype correct?");
@@ -1167,63 +1207,6 @@ namespace OpenKh.Egs
                 Invalid = true;
                 return;
             }
-        }
-
-        public BAR(byte[] originalAssetData, int origOffset)
-        {
-            //Bar-ception. luckily only IMGZ and IMGD can be in these. (as far as i know anyway...)
-            int type;
-            int offset;
-            int subsize;
-            string magic;
-            byte[] subfile;
-            dynamic subasset;
-
-            using MemoryStream ms = new MemoryStream(originalAssetData);
-
-            ms.ReadInt32(); //magic
-
-            int count = ms.ReadInt32();
-            for (int i = 0; i < count; i++)
-            {
-                ms.Seek(0x10 + (i * 0x10), SeekOrigin.Begin);
-                type = ms.ReadInt32(); //subasset type
-                ms.ReadInt32(); //subasset name
-                offset = ms.ReadInt32(); //subasset offset
-                subsize = ms.ReadInt32(); //subasset size
-                ms.Seek(offset, SeekOrigin.Begin);
-
-                switch (type)
-                {
-                    case (24): //IMD
-                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
-                        if (magic == "IMGD") //IMGD
-                        {
-                            //Console.WriteLine("BAR-ception Image!");
-                            ms.Seek(offset, SeekOrigin.Begin);
-                            subfile = ms.ReadBytes(subsize);
-                            subasset = new IMD(subfile, offset);
-
-                            TextureCount += subasset.TextureCount;
-                            OffsetsIMD.AddRange(subasset.Offsets);
-                        }
-                        break;
-                    case (29): //IMZ                           
-                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
-                        if (magic == "IMGZ")//IMGZ
-                        {
-                            //Console.WriteLine("BAR-ception Image Collection!");
-                            ms.Seek(offset, SeekOrigin.Begin);
-                            subfile = ms.ReadBytes(subsize);
-                            subasset = new IMZ(subfile, offset);
-
-                            TextureCount += subasset.TextureCount;
-                            OffsetsIMZ.AddRange(subasset.Offsets);
-                        }
-                        break;
-                }
-            }
-
         }
     }
 

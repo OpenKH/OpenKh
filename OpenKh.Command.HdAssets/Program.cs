@@ -153,26 +153,11 @@ namespace OpenKh.Command.HdAssets
                 foreach (var filePath in GetFiles(Input, Recursive, DefaultPrefix))
                 {
                     SDasset asset;
-                    
-                    using (var stream = File.OpenRead(filePath))
-                    {
-                        //try
-                        //{
-                            // Avoid to crash on files that are not a ReMIX asset
-                            asset = new SDasset(filePath, stream.ReadAllBytes(), true, true);
+                    using var stream = File.OpenRead(filePath);
+                    asset = new SDasset(filePath, stream.ReadAllBytes(), true, true);
 
-                            if (asset.TextureCount == 0)
-                                Console.WriteLine($"File \"{filePath}\" did not contain any files to link!");
-                        //}
-                        //catch
-                        //{
-                        //    // Not a ReMIX asset
-                        //    continue;
-                        //}
-                    }
-
-                    //using (var stream = File.Create(filePath))
-                    //    asset.Stream.CopyTo(stream);
+                    if (asset.TextureCount == 0)
+                        Console.WriteLine($"File \"{filePath}\" did not contain any files to link!");
                 }
             }
         }
