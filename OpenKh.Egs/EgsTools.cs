@@ -650,7 +650,7 @@ namespace OpenKh.Egs
                 case (".bar", true):
                 case (".bin", true):
                 case (".mag", true):
-                //case (".map", true): //alot more complicated than i thought. try again later
+                case (".map", true):
                 case (".mdlx", true):
                     asset = new BAR(originalAssetData);
                     break;
@@ -1070,24 +1070,9 @@ namespace OpenKh.Egs
         public int TextureCount = 0;
         public bool Invalid = false;
 
-        //Getting the offsets for these are a bit complicated due to
-        //images being one after another with no offset table to use.
         public RAW(byte[] AssetData, int AssetOffset)
         {
             using MemoryStream ms = new MemoryStream(AssetData);
-
-            //this is real jank. we need to modify the final offset later as a special case for 
-            //map files. hopefully this actually works for all maps. (it didn't)
-            //int modify = 0;
-            //int modify2 = 0;
-            //if (special == 5259597) // MAP
-            //    modify = +128;
-            //if (special == 4345666)
-            //{
-            //    modify = -16;
-            //    modify2 = 1;
-            //}
-
 
             int magic = ms.ReadInt32();
             if (magic != 0 && AssetOffset == 0) //0x00000000
@@ -1096,63 +1081,62 @@ namespace OpenKh.Egs
                 return;
             }
 
-            ms.Seek(0x0c, SeekOrigin.Begin);
-            TextureCount += ms.ReadInt32();
-
-            ms.Seek(0x18, SeekOrigin.Begin);
+            ms.ReadInt32(); // color count
+            int TextureInfoCount = ms.ReadInt32();
+            int GSInfoCount = ms.ReadInt32();
+            int OffsetDataOff = ms.ReadInt32();
+            int CLUTTransinfoOff = ms.ReadInt32();
             int GsinfoOff = ms.ReadInt32();
             int dataOffset = ms.ReadInt32();
 
-            int diff = 0;
-            for (int i = 0; i < TextureCount; i++)
+            TextureCount += GSInfoCount;
+
+            //get all the image data offsets from the CLUT Transfer Info blocks
+            Dictionary<int, int> PicOffsets = new Dictionary<int, int>();
+            for (int t = 0; t < TextureInfoCount; t++)
             {
-                int offset = AssetOffset + dataOffset + diff + (i * 0x10) + 0x20000000;
-                Offsets.Add(offset);
+                ms.Seek((CLUTTransinfoOff + 0x90) + (t * 0x90) + 116, SeekOrigin.Begin);
+                PicOffsets.Add(t, ms.ReadInt32());
+            }
 
-                ms.Seek(GsinfoOff + 0x70 + (i * 0xA0), SeekOrigin.Begin);
+            //first loop to get number of pixel format 8 textures
+            //this is needed to calculate the correct HD link offsets because for some reason
+            //Pixel format 4 textures need to be adjusted by Pixel8 image count * 16
+            int Modifier = 0;
+            for (int m = 0; m < GSInfoCount; m++)
+            {
+                ms.Seek(GsinfoOff + 0x70 + (m * 0xA0), SeekOrigin.Begin);
                 long Tex0Reg = ms.ReadInt64();
-
                 uint PSM = (uint)(Tex0Reg >> 20) & 0x3fu;
-                int width = (ushort)(1u << ((int)(Tex0Reg >> 26) & 0x0F));
-                int height = (ushort)(1u << ((int)(Tex0Reg >> 30) & 0x0F));
+                if (PSM != 20)
+                    Modifier += 1;
+            }
 
-                int bpp;
-                bool div = false;
-                switch (PSM)
+            //second loop to get actual offsets
+            //We need to keep track of how many of each type of texture we find
+            //to correctly aclculate the the game expects for the HD link offsets.
+            int Pxl4Count = 0;
+            int Pxl8Count = 0;
+            for (int p = 0; p < GSInfoCount; p++)
+            {
+                ms.Seek(OffsetDataOff + p, SeekOrigin.Begin);
+                int CurrentKey = ms.ReadByte();
+
+                ms.Seek(GsinfoOff + 0x70 + (p * 0xA0), SeekOrigin.Begin);
+                long Tex0Reg = ms.ReadInt64();
+                uint PSM = (uint)(Tex0Reg >> 20) & 0x3fu;
+
+                int FinalOffset = AssetOffset + PicOffsets[CurrentKey] + 0x20000000;
+                if (PSM == 20)
                 {
-                    case (0):
-                    case (1):
-                    case (27):
-                    case (26):
-                    case (48):
-                    case (49):
-                        bpp = 4;
-                        break;
-                    case (2):
-                    case (10):
-                    case (50):
-                    case (58):
-                        bpp = 2;
-                        break;
-                    case (19):
-                    case (44): //unsure about this one
-                        bpp = 1;
-                        break;
-                    case (20):
-                        bpp = 2;
-                        div = true;
-                        break;
-                    default:
-                        bpp = 1;
-                        div = false;
-                        Console.WriteLine("Warning: Unknown Pixel Storage Mode! PSM = " + PSM);
-                        break;
+                    Offsets.Add(FinalOffset + Pxl4Count + (Modifier * 0x10));
+                    Pxl4Count += 1;
                 }
-
-                if (!div)
-                    diff += (width * height) * bpp;
                 else
-                    diff += (width * height) / bpp;
+                {
+                    Offsets.Add(FinalOffset + (Pxl8Count * 0x10));
+                    Pxl8Count += 1;
+                }
             }
 
             int index = Helpers.IndexOfByteArray(AssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), 0);
@@ -1169,7 +1153,6 @@ namespace OpenKh.Egs
                 TextureCount++;
                 index = Helpers.IndexOfByteArray(AssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
             }
-
         }
     }
 
@@ -1213,7 +1196,7 @@ namespace OpenKh.Egs
                 int imageOffset = ((int)ms.Position);
 
                 TextureCount += 1;
-                Offsets.Add(AssetOffset + 0x10 + imageOffset + 0x20000000);
+                Offsets.Add(AssetOffset + imageOffset + 0x20000000);
             }
         }
     }
