@@ -753,7 +753,7 @@ namespace OpenKh.Egs
                 ms.Seek(IMDoffset, SeekOrigin.Begin);
 
                 magic = ms.ReadInt32();
-                Console.WriteLine(magic);
+                //Console.WriteLine(magic);
                 if (magic == 1145523529) //IMGD
                 {
                     TextureCount += 1;
