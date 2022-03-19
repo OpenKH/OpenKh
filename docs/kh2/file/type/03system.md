@@ -554,8 +554,8 @@ Note that on the Vanilla version of the game, this structure is `48` bytes long 
 | 0      | ushort | [World ID](../../worlds.md)
 | 2      | ushort | World story flag
 | 4      | ushort | World story flag negation
-| 6      | ubyte | Command flag (based on [ARIF](#arif) but uses 1-index as opposed to its 0-index)
-| 7      | ubyte[9] | Unknown
+| 6      | byte | Command flag (based on [ARIF](#arif) but uses 1-index as opposed to its 0-index)
+| 7      | byte[9] | Unknown
 | 16     | ushort  | Player (Sora)
 | 18     | ushort  | Friend 1 (Donald)
 | 20     | ushort  | Friend 2 (Goofy)
