@@ -20,7 +20,7 @@
 | xa_al_1070.mdls | Random NPC | 
 | xa_al_1080.mdls | Babu | 
 | xa_al_1089.mdls | Babu | 
-| xa_al_2010.mdls | Dark Lamp (Jafar's | Lamp) | 
+| xa_al_2010.mdls | Dark Lamp (Jafar's Lamp) | 
 | xa_al_3010.mdls | Jafar | 
 | xa_al_3018.mdls | Jafar | 
 | xa_al_3019.mdls | Jafar | 
@@ -30,7 +30,7 @@
 | xa_al_3040.mdls | Pot Centipede (Piece 2) | 
 | xa_al_3050.mdls | Kurt Zisa | 
 | xa_al_3059.mdls | Kurt Zisa | 
-| xa_al_3060.mdls | Cave of Wonders | Guardian (Tiger Head) | 
+| xa_al_3060.mdls | Cave of Wonders Guardian (Tiger Head) | 
 | xa_al_7000.mdls | Aladdin (High-Poly) | 
 | xa_al_7010.mdls | Jafar (High-Poly) | 
 | xa_al_7020.mdls | Genie (High-Poly) | 
@@ -42,16 +42,16 @@
 | xa_aw_1020.mdls | Cheshire Cat | 
 | xa_aw_1029.mdls | Cheshire Cat | 
 | xa_aw_1030.mdls | Ace of Spade Card | 
-| xa_aw_1031.mdls | Ace of Spade Card  | 
-| xa_aw_1039.mdls | Ace of Spade Card  | 
-| xa_aw_1060.mdls | Ace of Hearts | Card | 
-| xa_aw_1061.mdls | Ace of Hearts | Card | 
-| xa_aw_1069.mdls | Ace of Hearts | Card | 
+| xa_aw_1031.mdls | Ace of Spade Card | 
+| xa_aw_1039.mdls | Ace of Spade Card | 
+| xa_aw_1060.mdls | Ace of Hearts Card | 
+| xa_aw_1061.mdls | Ace of Hearts Card | 
+| xa_aw_1069.mdls | Ace of Hearts Card | 
 | xa_aw_1090.mdls | Door knob | 
 | xa_aw_1099.mdls | Door knob | 
 | xa_aw_3000.mdls | Trickmaster | 
 | xa_aw_3009.mdls | Trickmaster | 
-| xa_aw_7000.mdls | Queen of Hearts | (High-Poly) | 
+| xa_aw_7000.mdls | Queen of Hearts (High-Poly) | 
 | xa_dc_1000.mdls | Donald (Wizard) | 
 | xa_dc_1010.mdls | Goofy (Knight) | 
 | xa_dc_1020.mdls | Mini Mouse | 
@@ -81,10 +81,10 @@
 | xa_di_3001.mdls | Darkside | 
 | xa_di_3009.mdls | Darkside | 
 | xa_ew_2010.mdls | Bit Sniper | 
-| xa_ew_2020.mdls | Part of Ansem Boss | (Structure) | 
-| xa_ew_2030.mdls | Part of Ansem Boss | (Structure) | 
-| xa_ew_2040.mdls | Part of Ansem Boss | (Monster Face) | 
-| xa_ew_2050.mdls | Part of Ansem Boss | (Structure) | 
+| xa_ew_2020.mdls | Part of Ansem Boss (Structure) | 
+| xa_ew_2030.mdls | Part of Ansem Boss (Structure) | 
+| xa_ew_2040.mdls | Part of Ansem Boss (Monster Face) | 
+| xa_ew_2050.mdls | Part of Ansem Boss (Structure) | 
 | xa_ew_2060.mdls | End of World Piece? (unknown) | 
 | xa_ew_3020.mdls | Ansem (Final Boss) | 
 | xa_ex_0010.mdls | Sora | 
@@ -151,132 +151,132 @@
 | xa_ex_1590.mdls | Sora (Kid) | 
 | xa_ex_1600.mdls | Riku (Kid) | 
 | xa_ex_1610.mdls | Kairi (Kid) | 
-| xa_ex_1620.mdls | Kairi's | Grandma | 
+| xa_ex_1620.mdls | Kairi's Grandma | 
 | xa_ex_1630.mdls | Ansem (w/Guardian) | 
 | xa_ex_1638.mdls | Ansem (w/Guardian) | 
 | xa_ex_1639.mdls | Ansem (w/Guardian) | 
 | xa_ex_1640.mdls | Ansem (Brown Coat) | 
 | xa_ex_1650.mdls | Donald (Angry) | 
-| xa_ex_2010.mdls | Heartless | Soldier | 
-| xa_ex_2019.mdls | Heartless | Soldier | 
-| xa_ex_2020.mdls | Heartless | Shadow | 
-| xa_ex_2021.mdls | Heartless | Shadow (Halloween Town) | 
-| xa_ex_2022.mdls | Heartless | Shadow (End of World?) | 
-| xa_ex_2029.mdls | Heartless | Shadow | 
-| xa_ex_2030.mdls | Heartless | Powerwilds | (Monkey) | 
-| xa_ex_2039.mdls | Heartless | Powerwilds | (Monkey) | 
-| xa_ex_2040.mdls | Heartless | Bouncywild (Monkey) | 
-| xa_ex_2049.mdls | Heartless | Bouncywild (Monkey) | 
-| xa_ex_2050.mdls | Heartless | Large Body | 
-| xa_ex_2059.mdls | Heartless | Large Body | 
-| xa_ex_2060.mdls | Heartless | Large Body (Agrabah) | 
-| xa_ex_2069.mdls | Heartless | Large Body (Agrabah) | 
-| xa_ex_2070.mdls | Heartless | Sea Neon | 
-| xa_ex_2079.mdls | Heartless | Sea Neon | 
-| xa_ex_2080.mdls | Heartless | Sea Neon | 
-| xa_ex_2089.mdls | Heartless | Sea Neon | 
-| xa_ex_2090.mdls | Heartless | Bandit | 
-| xa_ex_2099.mdls | Heartless | Bandit | 
-| xa_ex_2100.mdls | Heartless | Pirate  | 
-| xa_ex_2109.mdls | Heartless | Pirate  | 
-| xa_ex_2110.mdls | Heartless | Red Nocturne | 
-| xa_ex_2119.mdls | Heartless | Red Nocturne | 
-| xa_ex_2120.mdls | Heartless | Blue Rhapsody  | 
-| xa_ex_2129.mdls | Heartless | Blue Rhapsody  | 
-| xa_ex_2130.mdls | Heartless | Yellow Opera  | 
-| xa_ex_2139.mdls | Heartless | Yellow Opera  | 
-| xa_ex_2140.mdls | Heartless | Green Requiem | 
-| xa_ex_2149.mdls | Heartless | Green Requiem | 
-| xa_ex_2150.mdls | Heartless | Wizard | 
-| xa_ex_2151.mdls | Heartless | Wizard (Halloween Town) | 
-| xa_ex_2159.mdls | Heartless | Wizard | 
-| xa_ex_2160.mdls | Heartless | Air Soldier | 
-| xa_ex_2169.mdls | Heartless | Air Soldier | 
-| xa_ex_2170.mdls | Heartless | Pot Spider (Ligher Red) | 
+| xa_ex_2010.mdls | Heartless Soldier | 
+| xa_ex_2019.mdls | Heartless Soldier | 
+| xa_ex_2020.mdls | Heartless Shadow | 
+| xa_ex_2021.mdls | Heartless Shadow (Halloween Town) | 
+| xa_ex_2022.mdls | Heartless Shadow (End of World?) | 
+| xa_ex_2029.mdls | Heartless Shadow | 
+| xa_ex_2030.mdls | Heartless Powerwilds (Monkey) | 
+| xa_ex_2039.mdls | Heartless Powerwilds (Monkey) | 
+| xa_ex_2040.mdls | Heartless Bouncywild (Monkey) | 
+| xa_ex_2049.mdls | Heartless Bouncywild (Monkey) | 
+| xa_ex_2050.mdls | Heartless Large Body | 
+| xa_ex_2059.mdls | Heartless Large Body | 
+| xa_ex_2060.mdls | Heartless Large Body (Agrabah) | 
+| xa_ex_2069.mdls | Heartless Large Body (Agrabah) | 
+| xa_ex_2070.mdls | Heartless Sea Neon | 
+| xa_ex_2079.mdls | Heartless Sea Neon | 
+| xa_ex_2080.mdls | Heartless Sea Neon | 
+| xa_ex_2089.mdls | Heartless Sea Neon | 
+| xa_ex_2090.mdls | Heartless Bandit | 
+| xa_ex_2099.mdls | Heartless Bandit | 
+| xa_ex_2100.mdls | Heartless Pirate | 
+| xa_ex_2109.mdls | Heartless Pirate | 
+| xa_ex_2110.mdls | Heartless Red Nocturne | 
+| xa_ex_2119.mdls | Heartless Red Nocturne | 
+| xa_ex_2120.mdls | Heartless Blue Rhapsody | 
+| xa_ex_2129.mdls | Heartless Blue Rhapsody | 
+| xa_ex_2130.mdls | Heartless Yellow Opera | 
+| xa_ex_2139.mdls | Heartless Yellow Opera | 
+| xa_ex_2140.mdls | Heartless Green Requiem | 
+| xa_ex_2149.mdls | Heartless Green Requiem | 
+| xa_ex_2150.mdls | Heartless Wizard | 
+| xa_ex_2151.mdls | Heartless Wizard (Halloween Town) | 
+| xa_ex_2159.mdls | Heartless Wizard | 
+| xa_ex_2160.mdls | Heartless Air Soldier | 
+| xa_ex_2169.mdls | Heartless Air Soldier | 
+| xa_ex_2170.mdls | Heartless Pot Spider (Ligher Red) | 
 | xa_ex_2171.mdls | Red Pot (Hidden Pot Spider) | 
-| xa_ex_2172.mdls | Heartless | Pot Spider (Darker Red) | 
-| xa_ex_2179.mdls | Heartless | Pot Spider (Lighter Red) | 
-| xa_ex_2180.mdls | Heartless | Barrel Spider (Lighter Brown) | 
+| xa_ex_2172.mdls | Heartless Pot Spider (Darker Red) | 
+| xa_ex_2179.mdls | Heartless Pot Spider (Lighter Red) | 
+| xa_ex_2180.mdls | Heartless Barrel Spider (Lighter Brown) | 
 | xa_ex_2181.mdls | Crate (Darker) (Hidden Barrel Spider) | 
-| xa_ex_2182.mdls | Heartless | Barrel Spider (Darker Brown) | 
+| xa_ex_2182.mdls | Heartless Barrel Spider (Darker Brown) | 
 | xa_ex_2183.mdls | Crate (Lighter) (Hidden Barrel Spider) | 
-| xa_ex_2184.mdls | Heartless | Barrel Spider (Ligther Brown) | 
-| xa_ex_2189.mdls | Heartless | Barrel Spider (Even Lighter Brown? lol) | 
-| xa_ex_2190.mdls | Heartless | Pot Scorpion | 
+| xa_ex_2184.mdls | Heartless Barrel Spider (Ligther Brown) | 
+| xa_ex_2189.mdls | Heartless Barrel Spider (Even Lighter Brown? lol) | 
+| xa_ex_2190.mdls | Heartless Pot Scorpion | 
 | xa_ex_2191.mdls | Red Pot (Hidden Pot Scorpion?) | 
-| xa_ex_2199.mdls | Heartless | Pot Scorpion | 
-| xa_ex_2200.mdls | Heartless | Wight Knight | 
-| xa_ex_2201.mdls | Heartless | Wight Knight (Halloween Town) | 
-| xa_ex_2209.mdls | Heartless | Wight Knight (Halloween Town) | 
-| xa_ex_2210.mdls | Heartless | Air Pirate  | 
-| xa_ex_2219.mdls | Heartless | Air Pirate | 
-| xa_ex_2220.mdls | Heartless | Gargoyle | 
-| xa_ex_2221.mdls | Heartless | Gargoyle (Halloween Town) | 
-| xa_ex_2229.mdls | Heartless | Gargoyle (Halloween Town) | 
-| xa_ex_2230.mdls | Heartless | Search Ghost  | 
-| xa_ex_2231.mdls | Heartless | Search Ghost (Halloween Town) | 
-| xa_ex_2238.mdls | Heartless | Search Ghost (Halloween Town) | 
-| xa_ex_2239.mdls | Heartless | Search Ghost  | 
-| xa_ex_2240.mdls | Heartless | Jet Balloon  | 
-| xa_ex_2249.mdls | Heartless | Jet Balloon | 
-| xa_ex_2250.mdls | Heartless | Missle Divers | 
-| xa_ex_2259.mdls | Heartless | Missle Divers | 
-| xa_ex_2260.mdls | Heartless | Chimera | 
-| xa_ex_2269.mdls | Heartless | Chimera | 
-| xa_ex_2270.mdls | Heartless | Battleship | 
-| xa_ex_2279.mdls | Heartless | Battleship | 
-| xa_ex_2280.mdls | Heartless | Darkball | 
-| xa_ex_2281.mdls | Heartless | Darkball (Halloween Town) | 
-| xa_ex_2282.mdls | Heartless | Darkball (End of World) | 
-| xa_ex_2289.mdls | Heartless | Darkball  | 
-| xa_ex_2290.mdls | Heartless | Invisible | 
-| xa_ex_2292.mdls | Heartless | Invisible (End of World) | 
-| xa_ex_2299.mdls | Heartless | Invisible | 
-| xa_ex_2310.mdls | Heartless | Behemoth | 
-| xa_ex_2311.mdls | Heartless | Behemoth (Different Color 1) | 
-| xa_ex_2312.mdls | Heartless | Behemoth (Different Color 2) | 
-| xa_ex_2317.mdls | Heartless | Behemoth (Different Color 2) | 
-| xa_ex_2318.mdls | Heartless | Behemoth (Different Color 1) | 
-| xa_ex_2319.mdls | Heartless | Behemoth | 
-| xa_ex_2320.mdls | Heartless | Wyvern | 
-| xa_ex_2329.mdls | Heartless | Wyvern | 
-| xa_ex_2330.mdls | Heartless | Angel Star | 
-| xa_ex_2339.mdls | Heartless | Angel Star | 
-| xa_ex_2340.mdls | Heartless | Defender | 
-| xa_ex_2349.mdls | Heartless | White Mushroom | 
-| xa_ex_2350.mdls | Heartless | White Mushroom (Halloween Town) | 
-| xa_ex_2352.mdls | Heartless | White Mushroom | 
-| xa_ex_2359.mdls | Heartless | White Mushroom | 
-| xa_ex_2380.mdls | Heartless | Black Fungi | 
-| xa_ex_2381.mdls | Heartless | Mushroom (Halloween Town) | 
-| xa_ex_2389.mdls | Heartless | Black Fungi | 
-| xa_ex_2390.mdls | Heartless | Rare Truffles | 
-| xa_ex_2391.mdls | Heartless | Rare Truffles | (Halloween Town) | 
-| xa_ex_2399.mdls | Heartless | Rare Truffles | 
-| xa_ex_2400.mdls | Heartless | Pot Centipede (Complete) | 
-| xa_ex_2410.mdls | Heartless | Pink Agaricus | 
-| xa_ex_2419.mdls | Heartless | Pink Agaricus | 
-| xa_ex_2420.mdls | Heartless | Neoshadow | 
-| xa_ex_2429.mdls | Heartless | Neoshadow | 
-| xa_ex_2430.mdls | Heartless | Soldier (Color 2) | 
-| xa_ex_2439.mdls | Heartless | Soldier (Color 2) | 
-| xa_ex_2440.mdls | Heartless | Shadow | 
-| xa_ex_2449.mdls | Heartless | Shadow | 
-| xa_ex_2450.mdls | Heartless | Sniperwild (Monkey) | 
-| xa_ex_2459.mdls | Heartless | Sniperwild (Monkey) | 
-| xa_ex_2460.mdls | Heartless | Black Ballade  | 
-| xa_ex_2469.mdls | Heartless | Black Ballade  | 
-| xa_ex_2470.mdls | Heartless | Search Ghost  | 
-| xa_ex_2479.mdls | Heartless | Search Ghost  | 
-| xa_ex_2480.mdls | Heartless | Jet Balloon  | 
-| xa_ex_2489.mdls | Heartless | Jet Balloon  | 
-| xa_ex_2490.mdls | Heartless | Missle Diver | 
+| xa_ex_2199.mdls | Heartless Pot Scorpion | 
+| xa_ex_2200.mdls | Heartless Wight Knight | 
+| xa_ex_2201.mdls | Heartless Wight Knight (Halloween Town) | 
+| xa_ex_2209.mdls | Heartless Wight Knight (Halloween Town) | 
+| xa_ex_2210.mdls | Heartless Air Pirate | 
+| xa_ex_2219.mdls | Heartless Air Pirate | 
+| xa_ex_2220.mdls | Heartless Gargoyle | 
+| xa_ex_2221.mdls | Heartless Gargoyle (Halloween Town) | 
+| xa_ex_2229.mdls | Heartless Gargoyle (Halloween Town) | 
+| xa_ex_2230.mdls | Heartless Search Ghost | 
+| xa_ex_2231.mdls | Heartless Search Ghost (Halloween Town) | 
+| xa_ex_2238.mdls | Heartless Search Ghost (Halloween Town) | 
+| xa_ex_2239.mdls | Heartless Search Ghost | 
+| xa_ex_2240.mdls | Heartless Jet Balloon | 
+| xa_ex_2249.mdls | Heartless Jet Balloon | 
+| xa_ex_2250.mdls | Heartless Missle Divers | 
+| xa_ex_2259.mdls | Heartless Missle Divers | 
+| xa_ex_2260.mdls | Heartless Chimera | 
+| xa_ex_2269.mdls | Heartless Chimera | 
+| xa_ex_2270.mdls | Heartless Battleship | 
+| xa_ex_2279.mdls | Heartless Battleship | 
+| xa_ex_2280.mdls | Heartless Darkball | 
+| xa_ex_2281.mdls | Heartless Darkball (Halloween Town) | 
+| xa_ex_2282.mdls | Heartless Darkball (End of World) | 
+| xa_ex_2289.mdls | Heartless Darkball  | 
+| xa_ex_2290.mdls | Heartless Invisible | 
+| xa_ex_2292.mdls | Heartless Invisible (End of World) | 
+| xa_ex_2299.mdls | Heartless Invisible | 
+| xa_ex_2310.mdls | Heartless Behemoth | 
+| xa_ex_2311.mdls | Heartless Behemoth (Different Color 1) | 
+| xa_ex_2312.mdls | Heartless Behemoth (Different Color 2) | 
+| xa_ex_2317.mdls | Heartless Behemoth (Different Color 2) | 
+| xa_ex_2318.mdls | Heartless Behemoth (Different Color 1) | 
+| xa_ex_2319.mdls | Heartless Behemoth | 
+| xa_ex_2320.mdls | Heartless Wyvern | 
+| xa_ex_2329.mdls | Heartless Wyvern | 
+| xa_ex_2330.mdls | Heartless Angel Star | 
+| xa_ex_2339.mdls | Heartless Angel Star | 
+| xa_ex_2340.mdls | Heartless Defender | 
+| xa_ex_2349.mdls | Heartless White Mushroom | 
+| xa_ex_2350.mdls | Heartless White Mushroom (Halloween Town) | 
+| xa_ex_2352.mdls | Heartless White Mushroom | 
+| xa_ex_2359.mdls | Heartless White Mushroom | 
+| xa_ex_2380.mdls | Heartless Black Fungi | 
+| xa_ex_2381.mdls | Heartless Mushroom (Halloween Town) | 
+| xa_ex_2389.mdls | Heartless Black Fungi | 
+| xa_ex_2390.mdls | Heartless Rare Truffles | 
+| xa_ex_2391.mdls | Heartless Rare Truffles (Halloween Town) | 
+| xa_ex_2399.mdls | Heartless Rare Truffles | 
+| xa_ex_2400.mdls | Heartless Pot Centipede (Complete) | 
+| xa_ex_2410.mdls | Heartless Pink Agaricus | 
+| xa_ex_2419.mdls | Heartless Pink Agaricus | 
+| xa_ex_2420.mdls | Heartless Neoshadow | 
+| xa_ex_2429.mdls | Heartless Neoshadow | 
+| xa_ex_2430.mdls | Heartless Soldier (Color 2) | 
+| xa_ex_2439.mdls | Heartless Soldier (Color 2) | 
+| xa_ex_2440.mdls | Heartless Shadow | 
+| xa_ex_2449.mdls | Heartless Shadow | 
+| xa_ex_2450.mdls | Heartless Sniperwild (Monkey) | 
+| xa_ex_2459.mdls | Heartless Sniperwild (Monkey) | 
+| xa_ex_2460.mdls | Heartless Black Ballade  | 
+| xa_ex_2469.mdls | Heartless Black Ballade  | 
+| xa_ex_2470.mdls | Heartless Search Ghost | 
+| xa_ex_2479.mdls | Heartless Search Ghost | 
+| xa_ex_2480.mdls | Heartless Jet Balloon  | 
+| xa_ex_2489.mdls | Heartless Jet Balloon  | 
+| xa_ex_2490.mdls | Heartless Missle Diver | 
 | xa_ex_3000.mdls | Sephiroth | 
 | xa_ex_3008.mdls | Sephiroth | 
 | xa_ex_3009.mdls | Sephiroth | 
-| xa_ex_3010.mdls | Xemnas | (Enigmatic Man) | 
-| xa_ex_3018.mdls | Xemnas | (Enigmatic Man) | 
-| xa_ex_3019.mdls | Xemnas | (Enigmatic Man) | 
+| xa_ex_3010.mdls | Xemnas (Enigmatic Man) | 
+| xa_ex_3018.mdls | Xemnas (Enigmatic Man) | 
+| xa_ex_3019.mdls | Xemnas (Enigmatic Man) | 
 | xa_ex_4010.mdls | Hercules | 
 | xa_ex_4011.mdls | Hercules | 
 | xa_ex_4019.mdls | Hercules | 
@@ -294,10 +294,10 @@
 | xa_ex_4070.mdls | Simba | 
 | xa_ex_4079.mdls | Simba | 
 | xa_ex_4098.mdls | Genie (With Legs) | 
-| xa_ex_7010.mdls | Sora (High-Poly) | 
-| xa_ex_7015.mdls | Sora (High-Poly) | 
-| xa_ex_7016.mdls | Sora (High-Poly) | 
-| xa_ex_7018.mdls | Sora (High-Poly) | 
+| xa_ex_7010.mdls | Sora (High-Poly)  | 
+| xa_ex_7015.mdls | Sora (High-Poly)  | 
+| xa_ex_7016.mdls | Sora (High-Poly)  | 
+| xa_ex_7018.mdls | Sora (High-Poly)  | 
 | xa_ex_7050.mdls | Sora (Atlantica) (High-Poly) | 
 | xa_ex_7070.mdls | Donald (Classic-outfit) (High-Poly) | 
 | xa_ex_7080.mdls | Donald (Wizard) (High-Poly) | 
@@ -322,7 +322,7 @@
 | xa_he_1010.mdls | Hades | 
 | xa_he_1011.mdls | Hades | 
 | xa_he_1019.mdls | Hades | 
-| xa_he_1030.mdls | Hades | (Sephiroth Feather) | 
+| xa_he_1030.mdls | Sephiroth Feather | 
 | xa_he_1040.mdls | Unknown Object | 
 | xa_he_3000.mdls | Rock Titan | 
 | xa_he_3009.mdls | Rock Titan | 
@@ -331,7 +331,7 @@
 | xa_he_3020.mdls | Cerberus | 
 | xa_he_3021.mdls | Cerberus | 
 | xa_he_3029.mdls | Cerberus | 
-| xa_eh_7000.mdls | Hades | (High-Poly) | 
+| xa_eh_7000.mdls | Hades (High-Poly) | 
 | xa_lm_0000.mdls | Sora (Atlantica) | 
 | xa_lm_0010.mdls | Donald (Atlantica) | 
 | xa_lm_0020.mdls | Goofy (Atlantica) | 
@@ -390,9 +390,9 @@
 | xa_nm_3000.mdls | Oogie Boogie | 
 | xa_nm_3008.mdls | Oogie Boogie | 
 | xa_nm_3009.mdls | Oogie Boogie | 
-| xa_nm_3010.mdls | Oogie Boogie (Boss | from Manor) | 
-| xa_nm_3020.mdls | Oogie Boogie Piece (Boss | from Manor?) | 
-| xa_nm_3030.mdls | Oogie Boogie Piece (Boss | from Manor?) | 
+| xa_nm_3010.mdls | Oogie Boogie (Boss from Manor) | 
+| xa_nm_3020.mdls | Oogie Boogie Piece (Boss from Manor?) | 
+| xa_nm_3030.mdls | Oogie Boogie Piece (Boss from Manor?) | 
 | xa_nm_7000.mdls | Jack Skellington (High-Poly) | 
 | xa_nm_7010.mdls | Ooogie Boogie (High-Poly) (Dice in hands) | 
 | xa_pc_0000.mdls | The Beast | 
@@ -442,7 +442,7 @@
 | xa_po_1049.mdls | Owl  | 
 | xa_po_1050.mdls | Roo | 
 | xa_po_1059.mdls | Roo | 
-| xa_po_7000.mdls | Pooh Beart (High-Poly) | 
+| xa_po_7000.mdls | Pooh Bear (High-Poly) | 
 | xa_pp_0000.mdls | Peter Pan | 
 | xa_pp_0008.mdls | Peter Pan | 
 | xa_pp_0009.mdls | Peter Pan | 
@@ -473,12 +473,12 @@
 | xa_tw_2020.mdls | Magic Table | 
 | xa_tw_2030.mdls | Magic Dresser | 
 | xa_tw_2040.mdls | Magic Teapot | 
-| xa_tw_3000.mdls | Heartless | Guard Armor | 
-| xa_tw_3009.mdls | Heartless | Guard Armor | 
-| xa_tw_3010.mdls | Heartless | Guard Armor | 
-| xa_tw_3019.mdls | Heartless | Guard Armor | 
-| xa_tw_3020.mdls | Heartless | Guard Armor (Pink) | 
-| xa_tw_3029.mdls | Heartless | Guard Armor (Pink) | 
+| xa_tw_3000.mdls | Heartless Guard Armor | 
+| xa_tw_3009.mdls | Heartless Guard Armor | 
+| xa_tw_3010.mdls | Heartless Guard Armor | 
+| xa_tw_3019.mdls | Heartless Guard Armor | 
+| xa_tw_3020.mdls | Heartless Guard Armor (Pink) | 
+| xa_tw_3029.mdls | Heartless Guard Armor (Pink) | 
 | xa_tz_0030.mdls | Tarzan | 
 | xa_tz_0039.mdls | Tarzan | 
 | xa_tz_1000.mdls | Jane | 
