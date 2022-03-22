@@ -17,6 +17,15 @@ static const long KingdomApi_KH2[KingdomApiFunction_END] =
     0x136590,
     0x1396F0,
     0x136AD0,
+    0x136A00,
+    0x141B40,
+    0x136600,
+    0x136640,
+    0x137860,
+    0x1020B0,
+    0x136690,
+    0x136F30,
+    0x135E10,
 };
 
 static const long KingdomApi_BBS[KingdomApiFunction_END] =
@@ -45,6 +54,18 @@ void Hook(T& pfn, long address)
     pfn = (T)((long long)g_hInstance + BaseAddress + address);
 }
 
+template <typename T>
+void GetVarPtr(VarPtr<T>& vp, void* offset)
+{
+    vp.SetPtr((T*)(*(int*)offset + ((char*)offset + 4)));
+}
+
+template <typename T, size_t N>
+void GetArrPtr(ArrayPtr<T,N>& vp, void* offset)
+{
+    vp.SetPtr((T*)(*(int*)offset + ((char*)offset + 4)));
+}
+
 void Hook(const long kingdomApiOffsets[])
 {
     if (kingdomApiOffsets == nullptr)
@@ -54,9 +75,22 @@ void Hook(const long kingdomApiOffsets[])
     }
 
     Hook(pfn_Axa_CFileMan_LoadFile, KingdomApi_KH2[Axa_CFileMan_LoadFile]);
+    Hook(pfn_Axa_CFileMan_LoadFileWithMalloc, KingdomApi_KH2[Axa_CFileMan_LoadFileWithMalloc]);
     Hook(pfn_Axa_CFileMan_GetFileSize, KingdomApi_KH2[Axa_CFileMan_GetFileSize]);
     Hook(pfn_Axa_AxaResourceMan_SetResourceItem, KingdomApi_KH2[Axa_AxaResourceMan_SetResourceItem]);
     Hook(pfn_Axa_PackageMan_GetFileInfo, KingdomApi_KH2[Axa_PackageMan_GetFileInfo]);
+    Hook(pfn_Axa_CalcHash, KingdomApi_KH2[Axa_CalcHash]);
+    Hook(pfn_Axa_SetReplacePath, KingdomApi_KH2[Axa_SetReplacePath]);
+    Hook(pfn_Axa_FreeAllPackages, KingdomApi_KH2[Axa_FreeAllPackages]);
+    Hook(pfn_Axa_CFileMan_GetRemasteredCount, KingdomApi_KH2[Axa_CFileMan_GetRemasteredCount]);
+    Hook(pfn_Axa_CFileMan_GetRemasteredEntry, KingdomApi_KH2[Axa_CFileMan_GetRemasteredEntry]);
+    Hook(pfn_Axa_PackageFile_GetRemasteredAsset, KingdomApi_KH2[Axa_PackageFile_GetRemasteredAsset]);
+    Hook(pfn_Axa_CFileMan_GetAudioStream, KingdomApi_KH2[Axa_CFileMan_GetAudioStream]);
+    Hook(pfn_Axa_OpenFile, KingdomApi_KH2[Axa_OpenFile]);
+    GetVarPtr(PackageFileCount, (char*)pfn_Axa_PackageMan_GetFileInfo + 0x1A);
+    GetVarPtr(LastOpenedPackage, (char*)pfn_Axa_CFileMan_GetRemasteredCount + 3);
+    GetArrPtr(PackageFiles, (char*)pfn_Axa_PackageMan_GetFileInfo + 0xB1);
+    GetArrPtr(BasePath, (char*)pfn_Axa_AxaResourceMan_SetResourceItem + 0x3E);
 }
 
 void OpenKH::Initialize()

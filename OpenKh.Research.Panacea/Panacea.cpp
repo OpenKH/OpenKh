@@ -3,6 +3,15 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
+#include <ShlObj.h>
+#include <Shlwapi.h>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <map>
+#include <algorithm>
+#include <queue>
+#include <fcntl.h>
 #include "Panacea.h"
 
 template <class TFunc>
@@ -37,12 +46,10 @@ class Hook
 
     TFunc m_pOriginalFunc;
     TFunc m_pReplaceFunc;
-    void* m_pMiddleFunc;
     void* m_pPatchLoadFile;
     void* m_pUnpatchLoadFile;
     DWORD m_PreviousProtectionValue;
     int m_patchLenLoadFile;
-    int m_middleLenLoadFile;
 
 public:
     void Patch()
@@ -60,59 +67,22 @@ public:
         m_pOriginalFunc(originalFunc),
         m_pReplaceFunc(replaceFunc)
     {
-        unsigned char Function[]
-        {
-            PushRbp,
-            PushRsi,
-            PushRdi,
-            PushRcx,
-            PushRdx,
-            PushR9_1, PushR9_2,
-            PushR8_1, PushR8_2,
-            // sub rsp, 30h
-            0x48, 0x83, 0xEC, 0x30,
-            // call m_pReplaceFunc
-            0xFF, 0x15, 0x02, 0x00, 0x00, 0x00, 0xEB, 0x08,
-            (unsigned char)((long long)m_pReplaceFunc >> 0),
-            (unsigned char)((long long)m_pReplaceFunc >> 8),
-            (unsigned char)((long long)m_pReplaceFunc >> 16),
-            (unsigned char)((long long)m_pReplaceFunc >> 24),
-            (unsigned char)((long long)m_pReplaceFunc >> 32),
-            (unsigned char)((long long)m_pReplaceFunc >> 40),
-            (unsigned char)((long long)m_pReplaceFunc >> 48),
-            (unsigned char)((long long)m_pReplaceFunc >> 56),
-            // add     rsp, 30h
-            0x48, 0x83, 0xC4, 0x30,
-            PopR8_1, PopR8_2,
-            PopR9_1, PopR9_2,
-            PopRdx,
-            PopRcx,
-            PopRdi,
-            PopRsi,
-            PopRbp,
-            RETN,
-        };
-
         fputs(nameFunc, stdout);
 
-        m_middleLenLoadFile = sizeof(Function);
-        void* m_pMiddleFunc = VirtualAlloc(nullptr, m_middleLenLoadFile, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-        assert(m_pMiddleFunc != 0);
-        memcpy(m_pMiddleFunc, Function, m_middleLenLoadFile);
-        printf(" hooked to %p ", m_pMiddleFunc);
+        printf(" hooked to %p ", m_pReplaceFunc);
 
         unsigned char Patch[]
         {
             // jmp functionPtr
             0xFF, 0x25, 0x00, 0x00, 0x00, 0x00,
-            (unsigned char)(((long long)m_pMiddleFunc >> 0)),
-            (unsigned char)(((long long)m_pMiddleFunc >> 8)),
-            (unsigned char)(((long long)m_pMiddleFunc >> 16)),
-            (unsigned char)(((long long)m_pMiddleFunc >> 24)),
-            (unsigned char)(((long long)m_pMiddleFunc >> 32)),
-            (unsigned char)(((long long)m_pMiddleFunc >> 40)),
-            (unsigned char)(((long long)m_pMiddleFunc >> 48)),
-            (unsigned char)(((long long)m_pMiddleFunc >> 56)),
+            (unsigned char)(((long long)m_pReplaceFunc >> 0)),
+            (unsigned char)(((long long)m_pReplaceFunc >> 8)),
+            (unsigned char)(((long long)m_pReplaceFunc >> 16)),
+            (unsigned char)(((long long)m_pReplaceFunc >> 24)),
+            (unsigned char)(((long long)m_pReplaceFunc >> 32)),
+            (unsigned char)(((long long)m_pReplaceFunc >> 40)),
+            (unsigned char)(((long long)m_pReplaceFunc >> 48)),
+            (unsigned char)(((long long)m_pReplaceFunc >> 56)),
         };
 
         VirtualProtect(originalFunc, sizeof(Patch), PAGE_EXECUTE_READWRITE, &m_PreviousProtectionValue);
@@ -135,7 +105,6 @@ public:
         Unpatch();
         free(m_pPatchLoadFile);
         free(m_pUnpatchLoadFile);
-        VirtualFree(m_pMiddleFunc, 0, MEM_RELEASE);
         VirtualProtect(m_pOriginalFunc, m_patchLenLoadFile, m_PreviousProtectionValue, &m_PreviousProtectionValue);
     }
 };
@@ -149,28 +118,532 @@ Hook<TFunc>* NewHook(TFunc originalFunc, TFunc replacementFunc, const char* func
     return new Hook<TFunc>(originalFunc, replacementFunc, functionName);
 }
 
+struct ModFileInfo
+{
+    Axa::HedEntry Header;
+    Axa::PkgEntry FileInfo;
+};
+
+char ModFolderPath[MAX_PATH];
+class FakePackageFile : public Axa::PackageFile
+{
+public:
+    FakePackageFile()
+    {
+        strcpy(PkgFileName, "ModFiles");
+        std::string modfol(ModFolderPath);
+        std::queue<std::string> folq;
+        folq.push(modfol);
+        while (!folq.empty())
+        {
+            auto& curfol = folq.front();
+            WIN32_FIND_DATAA data;
+            char path[MAX_PATH];
+            snprintf(path, sizeof(path), "%s\\*", curfol.c_str());
+            HANDLE findHandle = FindFirstFileA(path, &data);
+            if (findHandle != INVALID_HANDLE_VALUE)
+            {
+                do
+                {
+                    if (!strcmp(data.cFileName, ".") || !strcmp(data.cFileName, ".."))
+                        continue;
+                    if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                    {
+                        if (curfol.size() != modfol.size() || _stricmp(data.cFileName, "remastered"))
+                            folq.push(curfol + '\\' + data.cFileName);
+                        continue;
+                    }
+                    std::string filename = curfol + '/' + data.cFileName;
+                    std::string basefn = filename.substr(modfol.length() + 1);
+                    std::transform(basefn.begin(), basefn.end(), basefn.begin(), [](char c)
+                        {
+                            if (c == '\\')
+                                return '/';
+                            return c;
+                        });
+                    ModFileInfo fileInfo{};
+                    Axa::CalcHash(basefn.c_str(), (int)basefn.size(), &fileInfo.Header.hash);
+                    fileInfo.Header.actualLength = data.nFileSizeLow;
+                    fileInfo.Header.dataLength = data.nFileSizeLow;
+                    fileInfo.Header.offset = fileData.size();
+                    fileInfo.FileInfo.creationDate = data.ftCreationTime.dwLowDateTime;
+                    fileInfo.FileInfo.decompressedSize = data.nFileSizeLow;
+                    fileInfo.FileInfo.compressedSize = -2;
+                    fileData[basefn] = fileInfo;
+                } while (FindNextFileA(findHandle, &data));
+            }
+            folq.pop();
+        }
+    }
+
+    bool OpenFile(const char* a1, const char* a2)
+    {
+        const char* fn;
+        if (a2)
+            fn = a1 + strlen(a2) + 1;
+        else
+            fn = a1 + strlen(BasePath) + 1;
+        auto result = fileData.find(fn);
+        if (result != fileData.end())
+        {
+            strcpy_s(CurrentFileName, a1);
+            HeaderData = &result->second.Header;
+            CurrentFileData = result->second.FileInfo;
+            FileDataCopy = result->second.FileInfo;
+            return true;
+        }
+        memset(CurrentFileName, 0, sizeof(CurrentFileName));
+        HeaderData = nullptr;
+        memset(&CurrentFileData, 0, sizeof(CurrentFileData));
+        memset(&FileDataCopy, 0, sizeof(FileDataCopy));
+        return false;
+    }
+
+    void OtherFunc() {}
+
+private:
+    std::map<std::string, ModFileInfo> fileData;
+};
+
+Hook<PFN_Axa_SetReplacePath>* Hook_Axa_SetReplacePath;
+Hook<PFN_Axa_FreeAllPackages>* Hook_Axa_FreeAllPackages;
 Hook<PFN_Axa_CFileMan_LoadFile>* Hook_Axa_CFileMan_LoadFile;
+Hook<PFN_Axa_CFileMan_LoadFileWithMalloc>* Hook_Axa_CFileMan_LoadFileWithMalloc;
 Hook<PFN_Axa_CFileMan_GetFileSize>* Hook_Axa_CFileMan_GetFileSize;
+Hook<PFN_Axa_CFileMan_GetRemasteredCount>* Hook_Axa_CFileMan_GetRemasteredCount;
+Hook<PFN_Axa_CFileMan_GetRemasteredEntry>* Hook_Axa_CFileMan_GetRemasteredEntry;
+Hook<PFN_Axa_PackageFile_GetRemasteredAsset>* Hook_Axa_PackageFile_GetRemasteredAsset;
+Hook<PFN_Axa_CFileMan_GetAudioStream>* Hook_Axa_CFileMan_GetAudioStream;
 Hook<PFN_Bbs_File_load>* Hook_Bbs_File_load;
 Hook<PFN_Bbs_CRsrcData_loadCallback>* Hook_CRsrcData_loadCallback;
 
 void Panacea::Initialize()
 {
+    SHGetFolderPathA(0, CSIDL_MYDOCUMENTS, nullptr, 0, ModFolderPath);
+    std::strcat(ModFolderPath, "\\KINGDOM HEARTS HD 1.5+2.5 ReMIX\\mod\\kh2");
+    Hook_Axa_SetReplacePath = NewHook(pfn_Axa_SetReplacePath, Panacea::SetReplacePath, "Axa::SetReplacePath");
+    Hook_Axa_FreeAllPackages = NewHook(pfn_Axa_FreeAllPackages, Panacea::FreeAllPackages, "Axa::FreeAllPackages");
     Hook_Axa_CFileMan_LoadFile = NewHook(pfn_Axa_CFileMan_LoadFile, Panacea::LoadFile, "Axa::CFileMan::LoadFile");
+    Hook_Axa_CFileMan_LoadFileWithMalloc = NewHook(pfn_Axa_CFileMan_LoadFileWithMalloc, Panacea::LoadFileWithMalloc, "Axa::CFileMan::LoadFileWithMalloc");
     Hook_Axa_CFileMan_GetFileSize = NewHook(pfn_Axa_CFileMan_GetFileSize, Panacea::GetFileSize, "Axa::CFileMan::GetFileSize");
+    Hook_Axa_CFileMan_GetRemasteredCount = NewHook(pfn_Axa_CFileMan_GetRemasteredCount, Panacea::GetRemasteredCount, "Axa::CFileMan::GetRemasteredCount");
+    Hook_Axa_CFileMan_GetRemasteredEntry = NewHook(pfn_Axa_CFileMan_GetRemasteredEntry, Panacea::GetRemasteredEntry, "Axa::CFileMan::GetRemasteredEntry");
+    Hook_Axa_PackageFile_GetRemasteredAsset = NewHook(pfn_Axa_PackageFile_GetRemasteredAsset, Panacea::GetRemasteredAsset, "Axa::PackageFile::GetRemasteredAsset");
+    //Hook_Axa_CFileMan_GetAudioStream = NewHook(pfn_Axa_CFileMan_GetAudioStream, Panacea::GetAudioStream, "Axa::CFileMan::GetAudioStream");
     Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
     Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
 }
 
+int Panacea::SetReplacePath(__int64 a1, const char* a2)
+{
+    PackageFiles[PackageFileCount++] = new FakePackageFile();
+    auto ret = Hook_Axa_SetReplacePath->Unpatch()(a1, a2);
+    Hook_Axa_SetReplacePath->Patch();
+    return ret;
+}
+
+void Panacea::FreeAllPackages()
+{
+    delete PackageFiles[--PackageFileCount];
+    PackageFiles[PackageFileCount] = nullptr;
+    Hook_Axa_FreeAllPackages->Unpatch()();
+    Hook_Axa_FreeAllPackages->Patch();
+}
+
 bool Panacea::TransformFilePath(char* strOutPath, int maxLength, const char* originalPath)
 {
-    const char BaseOriginalPath[] = "C:/hd28/EPIC/juefigs/KH2ReSource/";
-    const char ModFolderPath[] = "D:\\mod-manager\\openkh\\mod";
-
-    const char* actualFileName = originalPath + sizeof(BaseOriginalPath) - 1;
+    const char* actualFileName = originalPath + strlen(BasePath) + 1;
     sprintf_s(strOutPath, maxLength, "%s\\%s", ModFolderPath, actualFileName);
 
     return GetFileAttributesA(strOutPath) != INVALID_FILE_ATTRIBUTES;
+}
+
+std::unordered_map<std::string, std::vector<Axa::RemasteredEntry>> RemasteredData;
+
+void GetIMDOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+{
+    if (*(int*)addr == 'DGMI')
+    {
+        Axa::RemasteredEntry ent{};
+        ent.origOffset = ((int*)addr)[2] + baseoff + 0x20000000;
+        entries.push_back(ent);
+    }
+}
+
+void GetIMZOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+{
+    if (*(int*)addr == 'ZGMI')
+    {
+        int texcnt = ((int*)addr)[3];
+        int* off = (int*)addr + 4;
+        while (texcnt-- > 0)
+        {
+            int imdoff = *off;
+            GetIMDOffsets((char*)addr + imdoff, baseoff + imdoff, entries);
+            off += 2;
+        }
+    }
+}
+
+void GetTM2Offsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+{
+    if (*(int*)addr == '2MIT')
+    {
+        int texcnt = ((short*)addr)[3];
+        char* off = (char*)addr + 0x10;
+        baseoff += 0x10;
+        while (texcnt-- > 0)
+        {
+            int next = *(int*)off;
+            Axa::RemasteredEntry ent{};
+            ent.origOffset = *(short*)(off + 12) + baseoff + 0x20000000;
+            entries.push_back(ent);
+            off += next;
+            baseoff += next;
+        }
+    }
+}
+
+void GetDPDOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+{
+    int* off = (int*)addr;
+    if (*off++ == 0x96)
+    {
+        off += *off + 1;
+        int texcnt = *off++;
+        std::map<int, int> offsets;
+        for (int t = 0; t < texcnt; ++t)
+        {
+            int texoff = *off++;
+            int* off2 = (int*)((char*)addr + texoff);
+            if (off2[2] == 0)
+            {
+                int val = off2[0];
+                auto found = offsets.find(val);
+                if (found == offsets.end())
+                {
+                    offsets[val] = texoff + 0x20;
+                }
+                else
+                {
+                    found->second++;
+                    offsets[val + t] = found->second + 1;
+                }
+            }
+        }
+        for (auto& i : offsets)
+        {
+            Axa::RemasteredEntry ent{};
+            ent.origOffset = i.second + baseoff + 0x20000000;
+            entries.push_back(ent);
+        }
+    }
+}
+
+void GetDPXOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+{
+    int* off = (int*)((char*)addr + *(int*)addr * 0x20);
+    int dpdcnt = *off++;
+    while (dpdcnt-- > 0)
+    {
+        int dpdoff = *off++;
+        GetDPDOffsets((char*)addr + dpdoff, baseoff + dpdoff, entries);
+    }
+}
+
+void GetPAXOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+{
+    if (*(int*)addr == '_XAP')
+    {
+        int dpxoff = ((int*)addr)[3];
+        GetDPXOffsets((char*)addr + dpxoff + 12, baseoff + dpxoff + 12, entries);
+    }
+}
+
+const char TEXA[] = "TEXA";
+void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+{
+    if (*(int*)addr == 0)
+    {
+        int* off = (int*)addr;
+        int TextureInfoCount = off[2];
+        int GSInfoCount = off[3];
+        int OffsetDataOff = off[4];
+        int CLUTTransinfoOff = off[5];
+        int GsinfoOff = off[6];
+        int dataOffset = off[7];
+
+        //get all the image data offsets from the CLUT Transfer Info blocks
+        int* PicOffsets = new int[TextureInfoCount];
+        for (int t = 0; t < TextureInfoCount; t++)
+            PicOffsets[t] = *(int*)((char*)addr + (CLUTTransinfoOff + 0x90) + (t * 0x90) + 116);
+
+        //first loop to get number of pixel format 8 textures
+        //this is needed to calculate the correct HD link offsets because for some reason
+        //Pixel format 4 textures need to be adjusted by Pixel8 image count * 16
+        int Modifier = 0;
+        for (int m = 0; m < GSInfoCount; m++)
+        {
+            long long Tex0Reg = *(long long*)((char*)addr + GsinfoOff + 0x70 + (m * 0xA0));
+            unsigned int PSM = (unsigned int)(Tex0Reg >> 20) & 0x3fu;
+            if (PSM != 20)
+                Modifier += 1;
+        }
+
+        //second loop to get actual offsets
+        //We need to keep track of how many of each type of texture we find
+        //to correctly aclculate the the game expects for the HD link offsets.
+        int Pxl4Count = 0;
+        int Pxl8Count = 0;
+        for (int p = 0; p < GSInfoCount; p++)
+        {
+            int CurrentKey = *((char*)addr + OffsetDataOff + p);
+
+            long long Tex0Reg = *(long long*)((char*)addr + GsinfoOff + 0x70 + (p * 0xA0));
+            unsigned int PSM = (unsigned int)(Tex0Reg >> 20) & 0x3fu;
+
+            int FinalOffset = baseoff + PicOffsets[CurrentKey] + 0x20000000;
+            Axa::RemasteredEntry ent{};
+            if (PSM == 20)
+            {
+                ent.origOffset = FinalOffset + Pxl4Count + (Modifier * 0x10);
+                Pxl4Count += 1;
+            }
+            else
+            {
+                ent.origOffset = FinalOffset + (Pxl8Count * 0x10);
+                Pxl8Count += 1;
+            }
+            entries.push_back(ent);
+        }
+
+        delete[] PicOffsets;
+
+        char *texa = std::search((char*)addr, (char*)endaddr, TEXA, TEXA + 4);
+        while (texa != endaddr)
+        {
+            int imageToApplyTo = *(short*)(texa + 0x0A);
+            int texaOffset = *(int*)(texa + 0x1C);
+            Axa::RemasteredEntry ent{};
+            ent.origOffset = (int)(baseoff + (texa - (char*)addr) + texaOffset + 0x08 + (imageToApplyTo * 0x10LL) + 0x20000000);
+            entries.push_back(ent);
+            texa = std::search(texa + 4, (char*)endaddr, TEXA, TEXA + 4);
+        }
+    }
+}
+
+void GetBAROffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+{
+    if (*(int*)addr == '\1RAB')
+    {
+        std::vector<Axa::RemasteredEntry> entriesTIM;
+        std::vector<Axa::RemasteredEntry> entriesPAX;
+        std::vector<Axa::RemasteredEntry> entriesTM2;
+        std::vector<Axa::RemasteredEntry> entriesGeneral;
+        std::vector<Axa::RemasteredEntry> entriesAudio;
+        int count = ((int*)addr)[1];
+        int* off = (int*)addr + 4;
+        while (count-- > 0)
+        {
+            int datoff = off[2];
+            switch (*off)
+            {
+            case 7:
+                GetRAWOffsets((char*)addr + datoff, (char*)addr + datoff + off[3], baseoff + datoff, entriesTIM);
+                break;
+            case 10:
+                GetTM2Offsets((char*)addr + datoff, baseoff + datoff, entriesTM2);
+                break;
+            case 18:
+                GetPAXOffsets((char*)addr + datoff, baseoff + datoff, entriesPAX);
+                break;
+            case 24:
+                GetIMDOffsets((char*)addr + datoff, baseoff + datoff, entriesGeneral);
+                break;
+            case 29:
+                GetIMZOffsets((char*)addr + datoff, baseoff + datoff, entriesGeneral);
+                break;
+            case 31:
+            case 34:
+                if (!memcmp((char*)addr + datoff, "ORIGIN", 6))
+                {
+                    Axa::RemasteredEntry ent{};
+                    ent.origOffset = -1;
+                    entriesAudio.push_back(ent);
+                }
+                break;
+            case 36:
+                {
+                    Axa::RemasteredEntry ent{};
+                    ent.origOffset = baseoff + datoff + 0x20000000;
+                    entriesGeneral.push_back(ent);
+                }
+                break;
+            case 46:
+                GetBAROffsets((char*)addr + datoff, baseoff + datoff, entriesGeneral);
+                break;
+            }
+            off += 4;
+        }
+        entries.insert(entries.end(), entriesTIM.begin(), entriesTIM.end());
+        entries.insert(entries.end(), entriesPAX.begin(), entriesPAX.end());
+        entries.insert(entries.end(), entriesTM2.begin(), entriesTM2.end());
+        entries.insert(entries.end(), entriesGeneral.begin(), entriesGeneral.end());
+        entries.insert(entries.end(), entriesAudio.begin(), entriesAudio.end());
+    }
+}
+
+void ScanFolder(const std::string& folder, std::vector<Axa::RemasteredEntry>& files)
+{
+    std::queue<std::string> folq;
+    folq.push(folder);
+    while (!folq.empty())
+    {
+        auto& curfol = folq.front();
+        WIN32_FIND_DATAA data;
+        char path[MAX_PATH];
+        snprintf(path, sizeof(path), "%s\\*", curfol.c_str());
+        HANDLE findHandle = FindFirstFileA(path, &data);
+        if (findHandle != INVALID_HANDLE_VALUE)
+        {
+            do
+            {
+                if (!strcmp(data.cFileName, ".") || !strcmp(data.cFileName, ".."))
+                    continue;
+                if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                {
+                    folq.push(curfol + '\\' + data.cFileName);
+                    continue;
+                }
+                std::string filename = curfol + '/' + data.cFileName;
+                std::string basefn = filename.substr(folder.length() + 1);
+                std::transform(basefn.begin(), basefn.end(), basefn.begin(), [](char c)
+                    {
+                        if (c == '\\')
+                            return '/';
+                        return c;
+                    });
+                Axa::RemasteredEntry fileInfo{};
+                strcpy_s(fileInfo.name, basefn.c_str());
+                fileInfo.decompressedSize = data.nFileSizeLow;
+                fileInfo.compressedSize = -2;
+                files.push_back(fileInfo);
+            } while (FindNextFileA(findHandle, &data));
+        }
+        folq.pop();
+    }
+}
+
+bool sortRemasteredFiles(const Axa::RemasteredEntry& a, const Axa::RemasteredEntry& b)
+{
+    const char* exta = a.name + strlen(a.name) - 4;
+    const char* extb = b.name + strlen(b.name) - 4;
+    if (!_stricmp(exta, ".dds"))
+    {
+        if (_stricmp(extb, ".dds"))
+            return true;
+        const char* fna = a.name;
+        if (*fna == '-')
+            ++fna;
+        const char* fnb = b.name;
+        if (*fnb == '-')
+            ++fnb;
+        if (isdigit(*fna) && isdigit(*fnb))
+        {
+            int ia = atoi(fna);
+            int ib = atoi(fnb);
+            return ia < ib;
+        }
+    }
+    else if (!_stricmp(exta, ".png"))
+    {
+        if (!_stricmp(extb, ".dds"))
+            return false;
+        if (_stricmp(extb, ".png"))
+            return true;
+        const char* fna = a.name;
+        if (*fna == '-')
+            ++fna;
+        const char* fnb = b.name;
+        if (*fnb == '-')
+            ++fnb;
+        if (isdigit(*fna) && isdigit(*fnb))
+        {
+            int ia = atoi(fna);
+            int ib = atoi(fnb);
+            return ia < ib;
+        }
+    }
+    return false;
+}
+
+void GetRemasteredFiles(Axa::PackageFile *fileinfo, const char* path, void* addr)
+{
+    if (RemasteredData.find(path) == RemasteredData.cend())
+    {
+        char remasteredFolder[MAX_PATH];
+        sprintf_s(remasteredFolder, "%s\\remastered\\%s", ModFolderPath, path + strlen(ModFolderPath) + 1);
+        std::vector<Axa::RemasteredEntry> entries;
+        bool folderexist = GetFileAttributesA(remasteredFolder) & FILE_ATTRIBUTE_DIRECTORY;
+        if (fileinfo->CurrentFileData.remasteredCount != 0 || folderexist)
+        {
+            const char* ext = PathFindExtensionA(path);
+            if (ext[-2] == '.' && ext[-1] == 'a')
+                ext -= 2;
+            if (!_stricmp(ext, ".imd"))
+                GetIMDOffsets(addr, 0, entries);
+            else if (!_stricmp(ext, ".imz"))
+                GetIMZOffsets(addr, 0, entries);
+            else if (!_stricmp(ext, ".tm2"))
+                GetTM2Offsets(addr, 0, entries);
+            else if (!_stricmp(ext, ".pax"))
+                GetPAXOffsets(addr, 0, entries);
+            else if (!_stricmp(ext, ".2dd")
+                || !_stricmp(ext, ".2ld")
+                || !_stricmp(ext, ".a.fm")
+                || !_stricmp(ext, ".a.fr")
+                || !_stricmp(ext, ".a.gr")
+                || !_stricmp(ext, ".a.it")
+                || !_stricmp(ext, ".a.sp")
+                || !_stricmp(ext, ".a.us")
+                || !_stricmp(ext, ".a.uk")
+                || !_stricmp(ext, ".a.jp")
+                || !_stricmp(ext, ".bar")
+                || !_stricmp(ext, ".bin")
+                || !_stricmp(ext, ".mag")
+                || !_stricmp(ext, ".map")
+                || !_stricmp(ext, ".mdlx"))
+                GetBAROffsets(addr, 0, entries);
+            std::vector<Axa::RemasteredEntry> modfiles;
+            if (folderexist)
+                ScanFolder(path, modfiles);
+            if (fileinfo->CurrentFileData.remasteredCount == entries.size())
+            {
+                for (int i = 0; i < fileinfo->CurrentFileData.remasteredCount; ++i)
+                {
+                    int off = entries[i].origOffset;
+                    entries[i] = fileinfo->RemasteredData[i];
+                    auto found = std::find_if(modfiles.cbegin(), modfiles.cend(), [entries, i](const Axa::RemasteredEntry& a) { return !_stricmp(entries[i].name, a.name); });
+                    if (found != modfiles.cend())
+                        entries[i] = *found;
+                    entries[i].origOffset = off;
+                }
+            }
+            else if (modfiles.size() == entries.size())
+            {
+                std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
+                for (int i = 0; i < modfiles.size(); ++i)
+                {
+                    int off = entries[i].origOffset;
+                    entries[i] = modfiles[i];
+                    entries[i].origOffset = off;
+                }
+            }
+            else
+                entries.clear();
+        }
+        RemasteredData.insert_or_assign(fileinfo->CurrentFileName, entries);
+    }
 }
 
 long __cdecl Panacea::LoadFile(Axa::CFileMan* _this, const char* filename, void* addr, bool useHdAsset)
@@ -178,41 +651,88 @@ long __cdecl Panacea::LoadFile(Axa::CFileMan* _this, const char* filename, void*
     char path[MAX_PATH];
     if (!TransformFilePath(path, sizeof(path), filename))
     {
-        printf("%s\n", filename);
+        fprintf(stdout, "LoadFile(\"%s\", %d)\n", filename, useHdAsset);
         auto ret = Hook_Axa_CFileMan_LoadFile->Unpatch()(_this, filename, addr, useHdAsset);
         Hook_Axa_CFileMan_LoadFile->Patch();
         return ret;
     }
 
-    printf("%s\n", path);
+    fprintf(stdout, "LoadFile(\"%s\", %d)\n", path, useHdAsset);
+    auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
     FILE* file = fopen(path, "rb");
     fseek(file, 0, SEEK_END);
     auto length = ftell(file);
-    
+
     fseek(file, 0, SEEK_SET);
     fread(addr, length, 1, file);
     fclose(file);
 
-    return length;
+    if (!length || !useHdAsset)
+        return length;
+
+    GetRemasteredFiles(fileinfo, path, addr);
+
+    if (Axa::AxaResourceMan::SetResourceItem(filename, length, addr) != -1)
+        return length;
+    return 0;
 }
 
-long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename, int mode)
+void* __cdecl Panacea::LoadFileWithMalloc(Axa::CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char *filename2)
+{
+    char path[MAX_PATH];
+    if (!TransformFilePath(path, sizeof(path), filename))
+    {
+        fprintf(stdout, "LoadFileWithMalloc(\"%s\", %d, \"%s\")\n", filename, useHdAsset, filename2);
+        auto ret = Hook_Axa_CFileMan_LoadFileWithMalloc->Unpatch()(_this, filename, sizePtr, useHdAsset, filename2);
+        Hook_Axa_CFileMan_LoadFileWithMalloc->Patch();
+        return ret;
+    }
+
+    fprintf(stdout, "LoadFileWithMalloc(\"%s\", %d, \"%s\")\n", path, useHdAsset, filename2);
+    auto fileinfo = Axa::PackageMan::GetFileInfo(filename, filename2);
+    if (*sizePtr == -1)
+        return nullptr;
+    FILE* file = fopen(path, "rb");
+    fseek(file, 0, SEEK_END);
+    *sizePtr = ftell(file);
+    void *addr = _aligned_malloc(*sizePtr, 0x10);
+    if (!addr)
+        return addr;
+    
+    fseek(file, 0, SEEK_SET);
+    fread(addr, *sizePtr, 1, file);
+    fclose(file);
+
+    if (!useHdAsset)
+        return addr;
+
+    GetRemasteredFiles(fileinfo, path, addr);
+
+    if (Axa::AxaResourceMan::SetResourceItem(filename, *sizePtr, addr) != -1)
+        return addr;
+    return nullptr;
+}
+
+long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename)
 {
     const int FileNotFound = 0;
     char path[MAX_PATH];
 
-    fprintf(stdout, "%s\n", filename);
-    if (!TransformFilePath(path, sizeof(path), filename))
+    auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
+   if (!TransformFilePath(path, sizeof(path), filename))
     {
-        auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
         if (fileinfo)
-            return (long)fileinfo->FileSize;
+        {
+            fprintf(stdout, "GetFileSize(\"%s\") = %d\n", filename, (long)fileinfo->CurrentFileData.decompressedSize);
+            return (long)fileinfo->CurrentFileData.decompressedSize;
+        }
 
         WIN32_FIND_DATAA findData;
         HANDLE handle = FindFirstFileA(filename, &findData);
         if (handle != INVALID_HANDLE_VALUE)
         {
             CloseHandle(handle);
+            fprintf(stdout, "GetFileSize(\"%s\") = %d\n", filename, findData.nFileSizeLow);
             return findData.nFileSizeLow;
         }
 
@@ -224,7 +744,85 @@ long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename, in
     auto length = ftell(file);
     fclose(file);
 
+    fprintf(stdout, "GetFileSize(\"%s\") = %d\n", path, length);
     return length;
+}
+
+__int64 __cdecl Panacea::GetRemasteredCount()
+{
+    auto found = RemasteredData.find(PackageFiles[LastOpenedPackage]->CurrentFileName);
+    if (found != RemasteredData.end())
+        return found->second.size();
+    return PackageFiles[LastOpenedPackage]->CurrentFileData.remasteredCount;
+}
+
+Axa::RemasteredEntry* Panacea::GetRemasteredEntry(Axa::CFileMan* a1, int* origOffsetPtr, int assetNum)
+{
+    auto found = RemasteredData.find(PackageFiles[LastOpenedPackage]->CurrentFileName);
+    if (found != RemasteredData.end())
+    {
+        if (assetNum >= found->second.size())
+            return nullptr;
+        *origOffsetPtr = found->second[assetNum].origOffset;
+        return &found->second[assetNum];
+    }
+    auto ret = Hook_Axa_CFileMan_GetRemasteredEntry->Unpatch()(a1, origOffsetPtr, assetNum);
+    Hook_Axa_CFileMan_GetRemasteredEntry->Patch();
+    return ret;
+}
+
+void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizePtr, int assetNum)
+{
+    Axa::RemasteredEntry* entry;
+    auto found = RemasteredData.find(PackageFiles[LastOpenedPackage]->CurrentFileName);
+    if (found != RemasteredData.end())
+    {
+        if (assetNum >= found->second.size())
+            return nullptr;
+        entry = &found->second[assetNum];
+    }
+    else
+    {
+        if (assetNum >= a1->CurrentFileData.remasteredCount)
+            return nullptr;
+        entry = &a1->RemasteredData[assetNum];
+    }
+    char path[MAX_PATH];
+    TransformFilePath(path, sizeof(path), a1->CurrentFileName);
+    char remastered[MAX_PATH];
+    sprintf_s(remastered, "%s\\remastered\\%s\\%s", ModFolderPath, path + strlen(ModFolderPath) + 1, entry->name);
+    if (GetFileAttributesA(remastered) != INVALID_FILE_ATTRIBUTES)
+    {
+        FILE* file = fopen(remastered, "rb");
+        fseek(file, 0, SEEK_END);
+        *assetSizePtr = ftell(file);
+        void* addr = _aligned_malloc(*assetSizePtr, 0x10);
+        if (!addr)
+            return addr;
+
+        fseek(file, 0, SEEK_SET);
+        fread(addr, *assetSizePtr, 1, file);
+        fclose(file);
+        return addr;
+    }
+    auto ret = Hook_Axa_PackageFile_GetRemasteredAsset->Unpatch()(a1, assetSizePtr, assetNum);
+    Hook_Axa_PackageFile_GetRemasteredAsset->Patch();
+    return ret;
+}
+
+int Panacea::GetAudioStream(Axa::CFileMan* a1, const char* a2)
+{
+    char path[MAX_PATH];
+    if (!TransformFilePath(path, sizeof(path), a2))
+    {
+        fprintf(stdout, "GetAudioStream(\"%s\")\n", a2);
+        auto ret = Hook_Axa_CFileMan_GetAudioStream->Unpatch()(a1, a2);
+        Hook_Axa_CFileMan_GetAudioStream->Patch();
+        return ret;
+    }
+
+    fprintf(stdout, "GetAudioStream(\"%s\")\n", path);
+    return Axa::OpenFile(path, O_RDONLY | O_BINARY);
 }
 
 size_t __cdecl Panacea::BbsFileLoad(const char* filename, long long a2)
