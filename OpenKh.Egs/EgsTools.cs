@@ -260,7 +260,7 @@ namespace OpenKh.Egs
                     header.CompressedLength = compressedData.Length;
                 }
 
-                SDasset sdasset = new SDasset(filename, decompressedData, RemasterExist);
+                SDasset sdasset = new SDasset(filename, decompressedData, RemasterExist, false);
                 RemasterExist = false;
 
                 if (sdasset != null && !sdasset.Invalid)
@@ -359,7 +359,7 @@ namespace OpenKh.Egs
                 using var newFileStream = File.OpenRead(completeFilePath);
                 decompressedData = newFileStream.ReadAllBytes();
 
-                sdasset = new SDasset(filename, decompressedData, RemasterExist);
+                sdasset = new SDasset(filename, decompressedData, RemasterExist, false);
 
                 if (sdasset != null && !sdasset.Invalid)
                     header.RemasteredAssetCount = sdasset.TextureCount;
@@ -634,15 +634,18 @@ namespace OpenKh.Egs
         #endregion
     }
 
-    class SDasset
+    public class SDasset
     {
         public List<int> Offsets = new List<int>();
         public int TextureCount = 0;
         public bool Invalid = true;
+        public static bool ScanMode = false;
 
-        public SDasset(string name, byte[] originalAssetData, bool remasterpathtrue)
+        public SDasset(string name, byte[] originalAssetData, bool remasterpathtrue, bool scanmode)
         {
             dynamic asset = null;
+            ScanMode = scanmode;
+
             switch (Path.GetExtension(name), remasterpathtrue)
             {
                 case (".2dd", true):
@@ -689,7 +692,7 @@ namespace OpenKh.Egs
                 Offsets = asset.Offsets;
                 TextureCount = asset.TextureCount;
                 Invalid = false;
-                Console.WriteLine("File: " + name + " | Asset Count: " + TextureCount);
+                Console.WriteLine("File: " + name + " | Asset Count: " + TextureCount + "\n");
             }
         }
     }
@@ -708,6 +711,7 @@ namespace OpenKh.Egs
             if (magic != 1145523529 && AssetOffset == 0) //IMGD
             {
                 Invalid = true;
+                Helpers.ScanPrint("IMD texture could not be scanned! Wrong filetype?");
                 return;
             }
 
@@ -715,6 +719,9 @@ namespace OpenKh.Egs
             ms.ReadInt32(); //always 256(?)
             int Imageoffset = ms.ReadInt32(); //offset for image data
             Offsets.Add(AssetOffset + Imageoffset + 0x20000000);
+
+            if (AssetOffset == 0)
+                Helpers.ScanPrint($"IMD texture found! | Suggested HD Texture name: -0.dds");
         }
     }
 
@@ -728,28 +735,39 @@ namespace OpenKh.Egs
         {
             using MemoryStream ms = new MemoryStream(AssetData);
 
+            
             int magic = ms.ReadInt32();
             if (magic != 1514622281 && AssetOffset == 0)
             { //IMGZ
                 Invalid = true;
+                Helpers.ScanPrint("IMZ could not be scanned! Wrong filetype?");
                 return;
             }
             ms.ReadInt64(); //unknown
+            int TexCount = ms.ReadInt32(); //texture count
 
-            TextureCount = ms.ReadInt32();
-            for (int i = 0; i < TextureCount; i++) 
+            for (int i = 0; i < TexCount; i++) 
             {
                 ms.Seek(0x10 + (i * 0x8), SeekOrigin.Begin);
                 int IMDoffset = ms.ReadInt32(); //Offset for IMGD data
                 ms.Seek(IMDoffset, SeekOrigin.Begin);
 
                 magic = ms.ReadInt32();
+                //Console.WriteLine(magic);
                 if (magic == 1145523529) //IMGD
                 {
+                    TextureCount += 1;
                     ms.ReadInt32(); //always 256
                     int Imageoffset = ms.ReadInt32(); //offset for image data
                     Offsets.Add(AssetOffset + IMDoffset + Imageoffset + 0x20000000);
                 }
+
+            }
+
+            if (AssetOffset == 0)
+            {
+                for (int i = 0; i < Offsets.Count; i++)
+                    Helpers.ScanPrint($"IMZ texture found! | Suggested HD Texture name: -{i}.dds");
             }
         }
     }
@@ -758,23 +776,27 @@ namespace OpenKh.Egs
     {
         public List<int> Offsets = new List<int>();
         SortedDictionary<int, int> TempOffsets = new SortedDictionary<int, int>();
+        SortedDictionary<int, Tuple<string, int>> TempScanPAX = new SortedDictionary<int, Tuple<string, int>>();
+        public Dictionary<string, int> ScanPAX = new Dictionary<string, int>();
         public int TextureCount = 0;
         public bool Invalid = false;
 
         //PAX Textures are a bit weird to link to their remastered counterparts.
-        //Currently all offsets seem to be gotten correctly, but the order of them doesn't always match how
-        //the devs seemed to hvave them ordered in the remastered folder.
+        //Currently all offsets seem to be gotten correctly, but the order of them doesn't
+        //always match how the devs seemed to have them ordered in the remastered folder.
         //If adding a new PAX or file with a PAX the user will usually have to manually re-order their remastered
         //textures to link up correctly by renaming them.
 
         public PAX(byte[] AssetData, int AssetOffset)
         {
             using MemoryStream ms = new MemoryStream(AssetData);
+            //ScanPAX.Clear();
 
             var magic = ms.ReadInt32();
             if (magic != 1599619408 && AssetOffset == 0) //PAX_
             {
                 Invalid = true;
+                Helpers.ScanPrint("PAX could not be scanned! Wrong filetype?");
                 return;
             }
             ms.ReadInt64(); //we just skip these 8 bytes. unsure what they are for.
@@ -817,14 +839,17 @@ namespace OpenKh.Egs
                     if (value2 == 0)
                     {
                         //Console.WriteLine("new texture found");
+
                         TextureCount += 1;
                         int finaloffset = AssetOffset + Dpxoffset + DpdOffset + (DpdTexOffset + 0x20) + 0x20000000;
-                        
+                        var ScanTuple = new Tuple<string, int>($"PAX texture was found in DPD {d} as image {t}!", value2);
+
                         //check to see if our key already exists
                         if (!TempOffsets.ContainsKey(value1))
                         {
                             //if it doesn't then add it as normal
                             TempOffsets.Add(value1, finaloffset);
+                            TempScanPAX.Add(value1, ScanTuple);
                         }
                         else
                         {
@@ -832,14 +857,44 @@ namespace OpenKh.Egs
                             TempOffsets[value1] += 1;
                             //then use that new value + 1 as our new offset for the duplicate key then add t to our key so that it can actually be added.
                             TempOffsets.Add(value1 + t, (TempOffsets[value1] + 1));
+                            TempScanPAX.Add(value1 + t, ScanTuple);
                         }
-
+                    }
+                    else
+                    {
+                        var ScanTuple = new Tuple<string, int>($"PAX \"combo\" texture was found in DPD {d} as image {t}!", value2);
+                        //int prevValue = TempOffsets[TempOffsets.Count - 1];
+                        TempScanPAX.Add(value1, ScanTuple);
+                        //ScanPAX.Add($"PAX \"combo\" texture was found in DPD {d} as image {t}!", value2);
                     }
                 }
                 //Add our current list of offsets from the dpd to our main ffsets list
                 Offsets.AddRange(TempOffsets.Values);
+                foreach (Tuple<string,int> PT in TempScanPAX.Values)
+                    ScanPAX.Add(PT.Item1, PT.Item2);
+
                 //then clear the temp list for the next dpd
                 TempOffsets.Clear();
+                TempScanPAX.Clear();
+            }
+
+            if (AssetOffset == 0)
+            {
+                int imageNum = 0;
+                for (int a = 0; a < ScanPAX.Count; a++)
+                {
+                    if (ScanPAX.ElementAt(a).Value == 0)
+                    {
+                        Helpers.ScanPrint(ScanPAX.ElementAt(a).Key + $" | Aprox. HD Texture name: -{imageNum}.dds");
+                        imageNum += 1;
+                    }
+                    else
+                    {
+                        Helpers.ScanPrint(ScanPAX.ElementAt(a).Key + $" Combine it with HD Texture -{imageNum - 1}.dds for proper HD linking.");
+                    }
+
+                }
+
             }
         }
     }
@@ -847,10 +902,16 @@ namespace OpenKh.Egs
     class BAR
     {
         public List<int> Offsets = new List<int>();
-        public List<int> OffsetsTIM = new List<int>();
-        public List<int> OffsetsPAX = new List<int>();
-        public List<int> OffsetsTM2 = new List<int>();
-        public List<int> OffsetsAudio = new List<int>();
+        List<int> OffsetsTIM = new List<int>();
+        List<int> OffsetsPAX = new List<int>();
+        List<int> OffsetsTM2 = new List<int>();
+        List<int> OffsetsIMD = new List<int>();
+        List<int> OffsetsIMZ = new List<int>();
+        List<int> OffsetsRAW = new List<int>();
+        List<int> OffsetsAudio = new List<int>();
+        public List<Tuple<string, int>> NamesAudio = new List<Tuple<string, int>>();
+        Dictionary<string, int> ScanPAX = new Dictionary<string, int>();
+
         public int TextureCount = 0;
         public bool Invalid = false;
         
@@ -870,6 +931,8 @@ namespace OpenKh.Egs
             if (magic != "BAR") //BAR
             {
                 Invalid = true;
+                Helpers.ScanPrint("BAR could not be scanned! Wrong filetype?");
+                Helpers.ScanPrint("Valid BAR file types are: bar, bin, mag, map, mdlx, 2dd, and 2ld.");
                 return;
             }
             ms.ReadBytes(1);
@@ -902,6 +965,8 @@ namespace OpenKh.Egs
                             TextureCount += subasset.TextureCount;
                             OffsetsTIM.AddRange(subasset.Offsets);
                         }
+                        else
+                            Helpers.ScanPrint("RAW subtype found in BAR, but could not be scanned! Is this subtype correct?");
                         break;
                     case (10): //TIM2
                         magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
@@ -915,6 +980,8 @@ namespace OpenKh.Egs
                             TextureCount += subasset.TextureCount;
                             OffsetsTM2.AddRange(subasset.Offsets);
                         }
+                        else
+                            Helpers.ScanPrint("TM2 subtype found in BAR, but could not be scanned! Is this subtype correct?");
                         break;
                     case (18): //PAX
                         magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(3));
@@ -927,7 +994,10 @@ namespace OpenKh.Egs
 
                             TextureCount += subasset.TextureCount;
                             OffsetsPAX.AddRange(subasset.Offsets);
+                            ScanPAX = subasset.ScanPAX;
                         }
+                        else
+                            Helpers.ScanPrint("PAX subtype found in BAR, but could not be scanned! Is this subtype correct?");
                         break;
                     case (24): //IMD
                         magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
@@ -939,8 +1009,10 @@ namespace OpenKh.Egs
                             subasset = new IMD(subfile, offset);
 
                             TextureCount += subasset.TextureCount;
-                            Offsets.AddRange(subasset.Offsets);
+                            OffsetsIMD.AddRange(subasset.Offsets);
                         }
+                        else
+                            Helpers.ScanPrint("IMD subtype found in BAR, but could not be scanned! Is this subtype correct?");
                         break;
                     case (29): //IMZ                           
                         magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
@@ -952,19 +1024,31 @@ namespace OpenKh.Egs
                             subasset = new IMZ(subfile, offset);
 
                             TextureCount += subasset.TextureCount;
-                            Offsets.AddRange(subasset.Offsets);
+                            OffsetsIMZ.AddRange(subasset.Offsets);
                         }
+                        else
+                            Helpers.ScanPrint("IMZ subtype found in BAR, but could not be scanned! Is this subtype correct?");
                         break;
                     case (31): //Sound Effects
                     case (34): //Voice Audio
                         magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(6));
                         if (magic == "ORIGIN")
                         {
-                            Console.WriteLine("Audio file!");
+                            //Console.WriteLine("Audio file!");
+
+                            ms.ReadBytes(6);
+                            short audioID = ms.ReadInt16();
+                            ms.ReadInt16();
+                            string name = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(32)).TrimEnd('\0');
 
                             TextureCount += 1;
                             OffsetsAudio.Add(-1);
+
+                            var ScanTuple = new Tuple<string, int>(name, audioID);
+                            NamesAudio.Add(ScanTuple);
                         }
+                        else
+                            Helpers.ScanPrint("Audio subtype found in BAR, but could not be scanned! Is this subtype correct?\nThe HD port uses a custom method for loading audio. Make sure your file was correctly made to support it.");
                         break;
                     case (36): //raw bitmap
                         //no magic for these. we just hope that any instance of this is actually a bitmap
@@ -972,31 +1056,150 @@ namespace OpenKh.Egs
                             //Console.WriteLine("Bitmap image!);
 
                             TextureCount += 1;
-                            Offsets.Add(offset + 0x20000000);
+                            OffsetsRAW.Add(offset + 0x20000000);
                         }
                         break;
                     case (46): //BAR
                         magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(3));
                         if (magic == "BAR")
                         {
-                            //Console.WriteLine("BAR-ception!);
-                            ms.Seek(offset, SeekOrigin.Begin);
-                            subfile = ms.ReadBytes(subsize);
-                            subasset = new BAR(subfile, offset);
+                            ms.ReadBytes(1);
+                            int subcount = ms.ReadInt32();
+                            ms.ReadInt64();
+                            var posOffset = (int)ms.Position;
 
-                            TextureCount += subasset.TextureCount;
-                            Offsets.AddRange(subasset.Offsets);
+                            for (int s = 0; s < subcount; s++)
+                            {
+                                ms.Seek(posOffset + (s * 0x10), SeekOrigin.Begin);
+                                int subtype = ms.ReadInt32(); //subasset type
+                                ms.ReadInt32(); //subasset name
+                                int suboffset = ms.ReadInt32(); //subasset offset
+                                subsize = ms.ReadInt32(); //subasset size
+                                ms.Seek((posOffset - 0x10) + suboffset, SeekOrigin.Begin);
+                                string subMagic;
+
+                                switch (subtype)
+                                {
+                                    case (24): //IMD
+                                        subMagic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                                        if (subMagic == "IMGD") //IMGD
+                                        {
+                                            //Console.WriteLine("BAR-ception Image!");
+                                            ms.Seek((posOffset - 0x10) + suboffset, SeekOrigin.Begin);
+                                            subfile = ms.ReadBytes(subsize);
+                                            subasset = new IMD(subfile, offset + suboffset);
+
+                                            TextureCount += subasset.TextureCount;
+                                            OffsetsIMD.AddRange(subasset.Offsets);
+                                        }
+                                        break;
+                                    case (29): //IMZ                           
+                                        subMagic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
+                                        if (subMagic == "IMGZ")//IMGZ
+                                        {
+                                            //Console.WriteLine("BAR-ception Image Collection!");
+                                            ms.Seek((posOffset - 0x10) + suboffset, SeekOrigin.Begin);
+                                            subfile = ms.ReadBytes(subsize);
+                                            subasset = new IMZ(subfile, offset + suboffset);
+
+                                            TextureCount += subasset.TextureCount;
+                                            OffsetsIMZ.AddRange(subasset.Offsets);
+                                        }
+                                        break;
+                                }
+                            }
                         }
+                        else
+                            Helpers.ScanPrint("BAR subtype found in BAR, but could not be scanned! Is this subtype correct?");
                         break;
                 }
             }
 
             //mostly needed for maps, though maybe other files need this sorting too
-            OffsetsTIM.AddRange(OffsetsPAX);
-            OffsetsTIM.AddRange(OffsetsTM2);
-            OffsetsTIM.AddRange(Offsets);
-            OffsetsTIM.AddRange(OffsetsAudio);
-            Offsets = OffsetsTIM;
+            Offsets.AddRange(OffsetsTIM);
+            Offsets.AddRange(OffsetsPAX);
+            Offsets.AddRange(OffsetsTM2);
+            Offsets.AddRange(OffsetsIMD);
+            Offsets.AddRange(OffsetsIMZ);
+            Offsets.AddRange(OffsetsRAW);
+            Offsets.AddRange(OffsetsAudio);
+
+            if (TextureCount > 0 && SDasset.ScanMode)
+            {
+                int imageNum = 0;
+
+                if (OffsetsTIM.Count > 0)
+                {
+                    for (int a = 0; a < OffsetsTIM.Count; a++)
+                    {
+                        Helpers.ScanPrint($"TIM texture was found! | Aprox. HD Texture name: -{imageNum}.dds");
+                        imageNum += 1;
+                    }
+                }
+
+                if (OffsetsPAX.Count > 0)
+                {
+                    for (int a = 0; a < ScanPAX.Count; a++)
+                    {
+                        if (ScanPAX.ElementAt(a).Value == 0)
+                        {
+                            Helpers.ScanPrint(ScanPAX.ElementAt(a).Key + $" | Aprox. HD Texture name: -{imageNum}.dds");
+                            imageNum += 1;
+                        }
+                        else
+                        {
+                            Helpers.ScanPrint(ScanPAX.ElementAt(a).Key + $" Combine it with HD Texture -{imageNum - 1}.dds for proper HD linking.");
+                            //Console.WriteLine("Combine it with HD Texture -" + (imageNum - 1) + ".dds for proper HD linking.");
+                        }
+
+                    }
+                }
+
+                if (OffsetsTM2.Count > 0)
+                {
+                    for (int a = 0; a < OffsetsTM2.Count; a++)
+                    {
+                        Helpers.ScanPrint($"TM2 texture was found! | Aprox. HD Texture name: -{imageNum}.dds");
+                        imageNum += 1;
+                    }
+                }
+
+                if (OffsetsIMD.Count > 0)
+                {
+                    for (int a = 0; a < OffsetsIMD.Count; a++)
+                    {
+                        Helpers.ScanPrint($"IMD texture was found! | Aprox. HD Texture name: -{imageNum}.dds");
+                        imageNum += 1;
+                    }
+                }
+
+                if (OffsetsIMZ.Count > 0)
+                {
+                    for (int a = 0; a < OffsetsIMZ.Count; a++)
+                    {
+                        Helpers.ScanPrint($"IMZ texture was found! | Aprox. HD Texture name: -{imageNum}.dds");
+                        imageNum += 1;
+                    }
+                }
+
+                if (OffsetsRAW.Count > 0)
+                {
+                    for (int a = 0; a < OffsetsRAW.Count; a++)
+                    {
+                        Helpers.ScanPrint($"Bitmap texture was found! | Aprox. HD Texture name: -{imageNum}.dds");
+                        imageNum += 1;
+                    }
+                }
+
+                if (OffsetsAudio.Count > 0)
+                {
+                    for (int a = 0; a < OffsetsAudio.Count; a++)
+                    {
+                        Helpers.ScanPrint($"Audio asset was found! | Audio ID: {NamesAudio.ElementAt(a).Item2} | HD Audio name: {NamesAudio.ElementAt(a).Item1}");
+                    }
+                }
+
+            }
 
             if (TextureCount == 0)
             {
@@ -1004,63 +1207,6 @@ namespace OpenKh.Egs
                 Invalid = true;
                 return;
             }
-        }
-
-        public BAR(byte[] originalAssetData, int origOffset)
-        {
-            //Bar-ception. luckily only IMGZ and IMGD can be in these. (as far as i know anyway...)
-            int type;
-            int offset;
-            int subsize;
-            string magic;
-            byte[] subfile;
-            dynamic subasset;
-
-            using MemoryStream ms = new MemoryStream(originalAssetData);
-
-            ms.ReadInt32(); //magic
-
-            int count = ms.ReadInt32();
-            for (int i = 0; i < count; i++)
-            {
-                ms.Seek(0x10 + (i * 0x10), SeekOrigin.Begin);
-                type = ms.ReadInt32(); //subasset type
-                ms.ReadInt32(); //subasset name
-                offset = ms.ReadInt32(); //subasset offset
-                subsize = ms.ReadInt32(); //subasset size
-                ms.Seek(offset, SeekOrigin.Begin);
-
-                switch (type)
-                {
-                    case (24): //IMD
-                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
-                        if (magic == "IMGD") //IMGD
-                        {
-                            //Console.WriteLine("BAR-ception Image!");
-                            ms.Seek(offset, SeekOrigin.Begin);
-                            subfile = ms.ReadBytes(subsize);
-                            subasset = new IMD(subfile, offset);
-
-                            TextureCount += subasset.TextureCount;
-                            Offsets.AddRange(subasset.Offsets);
-                        }
-                        break;
-                    case (29): //IMZ                           
-                        magic = System.Text.Encoding.ASCII.GetString(ms.ReadBytes(4));
-                        if (magic == "IMGZ")//IMGZ
-                        {
-                            //Console.WriteLine("BAR-ception Image Collection!");
-                            ms.Seek(offset, SeekOrigin.Begin);
-                            subfile = ms.ReadBytes(subsize);
-                            subasset = new IMZ(subfile, offset);
-
-                            TextureCount += subasset.TextureCount;
-                            Offsets.AddRange(subasset.Offsets);
-                        }
-                        break;
-                }
-            }
-
         }
     }
 
@@ -1078,6 +1224,7 @@ namespace OpenKh.Egs
             if (magic != 0 && AssetOffset == 0) //0x00000000
             {
                 Invalid = true;
+                Helpers.ScanPrint("RAW texture could not be scanned! Wrong filetype?");
                 return;
             }
 
@@ -1114,7 +1261,7 @@ namespace OpenKh.Egs
 
             //second loop to get actual offsets
             //We need to keep track of how many of each type of texture we find
-            //to correctly aclculate the the game expects for the HD link offsets.
+            //to correctly calculate what the game expects for the HD link offsets.
             int Pxl4Count = 0;
             int Pxl8Count = 0;
             for (int p = 0; p < GSInfoCount; p++)
@@ -1153,6 +1300,12 @@ namespace OpenKh.Egs
                 TextureCount++;
                 index = Helpers.IndexOfByteArray(AssetData, System.Text.Encoding.UTF8.GetBytes("TEXA"), index + 1);
             }
+
+            if (AssetOffset == 0)
+            {
+                for (int i = 0; i < Offsets.Count; i++)
+                    Helpers.ScanPrint($"RAW texture found! | Suggested HD Texture name: -{i}.dds");
+            }
         }
     }
 
@@ -1170,6 +1323,7 @@ namespace OpenKh.Egs
             if (magic != 843925844 && AssetOffset == 0) //TIM2
             {
                 Invalid = true;
+                Helpers.ScanPrint("TM2 texture could not be scanned! Wrong filetype?");
                 return;
             }
 
@@ -1186,6 +1340,7 @@ namespace OpenKh.Egs
                 if (i == 0 && totalsize == 0 && texCount > 1)
                 {
                     Invalid = true;
+                    Helpers.ScanPrint("TM2 texture could not be scanned! Wrong filetype?");
                     return;
                 }
 
@@ -1198,6 +1353,13 @@ namespace OpenKh.Egs
                 TextureCount += 1;
                 Offsets.Add(AssetOffset + imageOffset + 0x20000000);
             }
+
+            if (AssetOffset == 0)
+            {
+                for (int i = 0; i < Offsets.Count; i++)
+                    Helpers.ScanPrint($"TM2 texture found! | Suggested HD Texture name: -{i}.dds");
+            }
         }
     }
- }
+ 
+}
