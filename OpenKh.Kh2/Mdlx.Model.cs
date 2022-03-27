@@ -1,4 +1,4 @@
-﻿// Inspired by Kddf2's khkh_xldM.
+// Inspired by Kddf2's khkh_xldM.
 // Original source code: https://gitlab.com/kenjiuno/khkh_xldM/blob/master/khkh_xldMii/Mdlxfst.cs
 
 using OpenKh.Common;
@@ -113,6 +113,45 @@ namespace OpenKh.Kh2
             public int Unk08 { get; set; }
             public int DmaLength { get; set; }
             public List<DmaVif> DmaVifs { get; set; }
+
+            public byte renderFlag1 {
+                get { return BitConverter.GetBytes(RenderFlags)[0]; }
+                set {
+                    Byte[] flagArray = BitConverter.GetBytes(RenderFlags);
+                    flagArray[0] = value;
+                    RenderFlags = BitConverter.ToInt32(flagArray,0);
+                }
+            }
+            public byte renderFlag2
+            {
+                get { return BitConverter.GetBytes(RenderFlags)[1]; }
+                set
+                {
+                    Byte[] flagArray = BitConverter.GetBytes(RenderFlags);
+                    flagArray[1] = value;
+                    RenderFlags = BitConverter.ToInt32(flagArray, 0);
+                }
+            }
+            public byte renderFlag3
+            {
+                get { return BitConverter.GetBytes(RenderFlags)[2]; }
+                set
+                {
+                    Byte[] flagArray = BitConverter.GetBytes(RenderFlags);
+                    flagArray[2] = value;
+                    RenderFlags = BitConverter.ToInt32(flagArray, 0);
+                }
+            }
+            public byte renderFlag4
+            {
+                get { return BitConverter.GetBytes(RenderFlags)[3]; }
+                set
+                {
+                    Byte[] flagArray = BitConverter.GetBytes(RenderFlags);
+                    flagArray[3] = value;
+                    RenderFlags = BitConverter.ToInt32(flagArray, 0);
+                }
+            }
         }
 
         public class DmaVif

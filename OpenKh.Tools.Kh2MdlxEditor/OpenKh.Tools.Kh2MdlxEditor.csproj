@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.BarEditor\OpenKh.Tools.BarEditor.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.ImageViewer\OpenKh.Tools.ImageViewer.csproj" />
+  </ItemGroup>
+
+</Project>
