@@ -626,3 +626,187 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_so200 | Oathkeeper (Sora)
 | w_so210 | Oblivion (Sora)
 | w_so999 | ???
+
+## Object
+
+`/Game/Character/obj`
+
+| Pawn    | Description
+|---------|-------------
+| o_at001 | ?
+| o_at002 | ?
+| o_at004 | ?
+| o_at005 | ?
+| o_bx202 | Baymax chip (Tadashi)
+| o_bx203 | Baymax chip
+| o_bx204 | AR Device
+| o_bx207 | Baymax chip (Sora)
+| o_bx210 | Rocket
+| o_bx211 | Heartless struck by Blizzard
+| o_bx213 | Sphere
+| o_bx214 | Cube
+| o_bx215 | Protusion
+| o_bx217 | Go Go's disc
+| o_bx218 | Wasabi's gauntlet
+| o_bx219 | Fred's monster suit
+| o_bx220 | Baymax
+| o_bx221 | Sora
+| o_ca201 | Crab
+| o_ca203 | Rolled up map
+| o_ca204 | Open map
+| o_ca205 | Jack's compass
+| o_ca207 | Jewelry
+| o_ca209 | Crab (hidden)
+| o_ca301 | Sora's pirate ship (sails)
+| o_ca302 | Enemy pirate ship (sails)
+| o_ca311 | Sora's pirate ship (bottom part)
+| o_ca312 | Enemy pirate ship (bottom part)
+| o_ca313 | Pirate ship (sails)
+| o_ca321 | Pirate ship
+| o_cn201 | Fork
+| o_cn202 | ?
+| o_dw201 | Aqua wayfinder
+| o_dw202 | Terra wayfinder
+| o_dw301 | Tiara (0.2 customization item)
+| o_dw302 | Antennae (0.2 customization item)
+| o_dw303 | Figaro (0.2 customization item)
+| o_dw304 | Minnie ears (0.2 customization item)
+| o_dw305 | Iron ornament (0.2 customization item)
+| o_dw306 | Blades (0.2 customization item)
+| o_dw307 | Wings (0.2 customization item)
+| o_dw308 | Pauldron (0.2 customization item)
+| o_dw309 | Arm plate (0.2 customization item)
+| o_dw310 | Arm guards (0.2 customization item)
+| o_dw311 | Arm guards (0.2 customization item)
+| o_ex001 | Big Magic Mountain train
+| o_ex002 | Big Magic Mountain coaster
+| o_ex003 | Pirate Ship
+| o_ex006 | Mad Tea Cups
+| o_ex007 | Blaster Blaze
+| o_ex008 | Blaster Blaze gun
+| o_ex100 | Simba
+| o_ex101 | Ariel
+| o_ex102 | Stitch
+| o_ex103 | Wreck It Ralph
+| o_ex104 | Meow Wow
+| o_ex111 | 8-Bit Blast (three cannon wall)
+| o_ex112 | 8|-Bit Blast (single cannon wall)
+| o_ex113 | 8-Bit Blast (cannon pointed up)
+| o_ex114 | 8-Bit Blast (cannons facing all directions)
+| o_ex115 | 8-Bit Blast (cannons t-shaped)
+| o_ex116 | 8-Bit Blast (cannons pointed forward and down)
+| o_ex117 | 8-Bit Blast platform
+| o_ex118 | 8-Bit Blast cube
+| o_ex119 | 8-Bit Blast cannon
+| o_ex120 | Meow Wow link charm
+| o_ex130 | Meow Wow
+| o_ex131 | Komory Bat
+| o_ex132 | Tubguin Ace
+| o_ex133 | Tama Sheep
+| o_ex134 | Pricklemane
+| o_ex135 | Ghostabocky
+| o_ex137 | Kooma Panda
+| o_ex139 | Lord Kyroo
+| o_ex141 | Escarglow
+| o_ex154 | Prize box
+| o_ex155 | Small wings
+| o_ex156 | Item box
+| o_ex157 | Small wings (four)
+| o_ex158 | Item box (synthesis)
+| o_ex159 | Ring with eight points
+| o_ex160 | Ingredient box
+| o_ex161 | Hexagon with six points
+| o_ex162 | Moogle head
+| o_ex202 | Jellyfish
+| o_ex204 | Gummiphone photo segment
+| o_ex208 | Firework
+| o_ex209 | Claw
+| o_ex210 | Rock
+| o_ex211 | Cube
+| o_ex212 | Flat plane
+| o_ex213 | Timeless River Sora
+| o_ex214 | Timeless River Sora
+| o_ex215 | Timeless River window
+| o_ex217 | Electronic screen
+| o_ex219 | (no model, only textures)
+| o_ex220 | Gummiship crystal
+| o_ex221 | Gummiship crystal
+| o_ex222 | Gummiship crystal
+| o_ex223 | Gummiship crystal
+| o_ex224 | Gummiship crystal
+| o_ex225 | Gummiship crystal
+| o_ex226 | Gummiship crystal
+| o_ex227 | Kairi flower petal
+| o_ex228 | Kairi flower petal
+| o_ex229 | Kairi flower (full bloom)
+| o_ex230 | Kupo Coin
+| o_ex231 | Data Greeting platform
+| o_ex232 | ?
+| o_ex233 | Screw
+| o_ex234 | Dented plate
+| o_ex235 | Dented plate
+| o_ex240 | Meow Wow
+| o_ex241 | Meow Wow
+| o_ex242 | Meow Wow
+| o_ex250 | Tama Sheep
+| o_ex251 | Tama Sheep
+| o_ex252 | Tama Sheep
+| o_ex260 | Komory Bat
+| o_ex261 | Komory Bat
+| o_ex262 | Komory Bat
+| o_ex270 | Pricklemane
+| o_ex271 | Pricklemane
+| o_ex272 | Pricklemane
+| o_ex280 | Hebby Repp
+| o_ex281 | Hebby Repp
+| o_ex282 | Hebby Repp
+| o_ex290 | Necho Cat
+| o_ex291 | Necho Cat
+| o_ex292 | Necho Cat
+| o_ex300 | Kooma Panda
+| o_ex301 | Kooma Panda
+| o_ex302 | Kooma Panda
+| o_ex320 | Tubguin Ace
+| o_ex321 | Tubguin Ace
+| o_ex322 | Tubguin Ace
+| o_ex330 | Escarglow
+| o_ex331 | Escarglow
+| o_ex332 | Escarglow
+| o_ex340 | Ghostabocky
+| o_ex341 | Ghostabocky
+| o_ex342 | Ghostabocky
+| o_ex350 | Lord Kyroo
+| o_ex351 | Lord Kyroo
+| o_ex352 | Lord Kyroo
+| o_ex353 | Lord Kyroo
+| o_ex360 | Ryu Dragon
+| o_ex361 | Ryu Dragon
+| o_ex362 | Ryu Dragon
+| o_ex501 | Rock
+| o_ex502 | Rock
+| o_ex503 | Rock
+| o_ex504 | Rock
+| o_kg201 | Keyblade wave
+| o_kg202 | Starlight
+| o_kg203 | Terranort chain
+| o_kg204 | Terranort chain
+| o_kg205 | Terranort chain
+| o_kg206 | Terranort chain (short)
+| o_tt201 | Pooh book
+| o_tt202 | Tea cup
+| o_tt203 | Twilight Trio photo (with Roxas)
+| o_tt204 | Twilight Trio photo (without Roxas)
+| o_tt205 | Sea|salt icecream
+| o_tt206 | Giantland movie poster
+| o_tt207 | Taute aux Fruits box
+| o_tt208 | Gummiphone stand
+| o_tt209 | Hand bag
+| o_tt210 | Orange
+| o_tt211 | Peach
+| o_tt212 | Lemon
+| o_tt213 | (no model, only textures)
+| o_tt214 | Orange
+| o_tt215 | Apple
+| o_tt216 | Pear
+| o_tt217 | Long rod
+| o_tt218 | Tangled spring
