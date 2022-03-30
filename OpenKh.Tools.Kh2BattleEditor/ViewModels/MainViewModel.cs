@@ -1,7 +1,7 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -28,6 +28,9 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         private BonsViewModel _bons;
         private PrztViewModel _przt;
         private LvupViewModel _lvup;
+        private SumnViewModel _sumn;
+        private BtlvViewModel _btlv;
+        private PlrpViewModel _plrp;
 
         public string Title => $"{FileName ?? "untitled"} | {ApplicationName}";
 
@@ -75,6 +78,24 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
         {
             get => _lvup;
             private set { _lvup = value; OnPropertyChanged(); }
+        }
+
+        public SumnViewModel Sumn
+        {
+            get => _sumn;
+            private set { _sumn = value; OnPropertyChanged(); }
+        }
+
+        public BtlvViewModel Btlv
+        {
+            get => _btlv;
+            private set { _btlv = value; OnPropertyChanged(); }
+        }
+
+        public PlrpViewModel Plrp
+        {
+            get => _plrp;
+            private set { _plrp = value; OnPropertyChanged(); }
         }
 
         public MainViewModel()
@@ -161,6 +182,9 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             "bons",
             "przt",
             "lvup",
+            "sumn",
+            "btlv",
+            "plrp",
         }.Contains(x.Name));
 
         private void CreateBattleItems()
@@ -171,6 +195,9 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             Bons = GetDefaultBattleViewModelInstance<BonsViewModel>();
             Przt = GetDefaultBattleViewModelInstance<PrztViewModel>();
             Lvup = GetDefaultBattleViewModelInstance<LvupViewModel>();
+            Sumn = GetDefaultBattleViewModelInstance<SumnViewModel>();
+            Btlv = GetDefaultBattleViewModelInstance<BtlvViewModel>();
+            Plrp = GetDefaultBattleViewModelInstance<PlrpViewModel>();
         }
 
         private void LoadBattleItems(IEnumerable<Bar.Entry> entries)
@@ -181,6 +208,9 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             Bons = GetBattleViewModelInstance<BonsViewModel>(_battleItems);
             Przt = GetBattleViewModelInstance<PrztViewModel>(_battleItems);
             Lvup = GetBattleViewModelInstance<LvupViewModel>(_battleItems);
+            Sumn = GetBattleViewModelInstance<SumnViewModel>(_battleItems);
+            Btlv = GetBattleViewModelInstance<BtlvViewModel>(_battleItems);
+            Plrp = GetBattleViewModelInstance<PlrpViewModel>(_battleItems);
         }
 
         private void SaveBattleItems()
@@ -190,6 +220,9 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
             _battleItems = SaveBattleItem(_battleItems, Bons);
             _battleItems = SaveBattleItem(_battleItems, Przt);
             _battleItems = SaveBattleItem(_battleItems, Lvup);
+            _battleItems = SaveBattleItem(_battleItems, Sumn);
+            _battleItems = SaveBattleItem(_battleItems, Btlv);
+            _battleItems = SaveBattleItem(_battleItems, Plrp);
         }
 
         private IEnumerable<Bar.Entry> SaveBattleItem(IEnumerable<Bar.Entry> entries, IBattleGetChanges battleGetChanges) =>

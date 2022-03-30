@@ -14,16 +14,16 @@ The encoding used is [Shift-JIS](https://en.wikipedia.org/wiki/Shift_JIS). The E
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | int   | File identifier, `0x44544340`
-| 04     | int   | Version, always `1`
-| 08     | short | RESERVED
-| 0a     | short | Unknonw
-| 0c     | short | [Layout](#layout) count
-| 0e     | short | [Message](#message) count
-| 10     | int   | [Message](#message) offset
-| 14     | int   | [Layout](#layout) offset
-| 18     | int   | Text start offset
-| 1c     | int   | RESERVED
+| 00     | int32   | File identifier, `0x44544340`
+| 04     | int32   | Version, always `1`
+| 08     | int16 | RESERVED
+| 0a     | int16 | Unknonw
+| 0c     | int16 | [Layout](#layout) count
+| 0e     | int16 | [Message](#message) count
+| 10     | int32   | [Message](#message) offset
+| 14     | int32   | [Layout](#layout) offset
+| 18     | int32   | Text start offset
+| 1c     | int32   | RESERVED
 
 ### Message
 
@@ -31,10 +31,10 @@ Describe a message with a text and links it to a layout
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | int | Unique identifier
-| 04     | int   | Text offset
-| 08     | int   | [Layout](#layout) index
-| 0C     | int   | Wait Frame Count
+| 00     | int32 | Unique identifier
+| 04     | int32   | Text offset
+| 08     | int32   | [Layout](#layout) index
+| 0C     | int32   | Wait Frame Count
 
 ### Layout
 
@@ -42,82 +42,82 @@ Describe how a message should be presented on screen
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | short | Dialog X position
-| 02     | short | Dialog Y position
-| 04     | short | Balloon window width (borders excluded)
-| 06     | short | Balloon window height (borders excluded)
-| 08     | byte  | [Dialog box alignment](#dialog-box-alignment)
-| 09     | byte  | [Dialog box border type](#dialog-box-borders)
-| 0a     | short  | [Text alignment](#text-alignment)
-| 0c     | short | Font size. 16=100%, 8=50%
-| 0e     | short | Horizontal space between letters
-| 10     | short | Vertical space between letters
-| 12     | short | Text X offset
-| 14     | short | Text Y offset
-| 16     | short | [Dialog Hook type](#dialog-hook)
-| 18     | short | Dialog hook horizontal position
-| 1a     | short | Text Color IDX
-| 1c     | short | Padding
-| 1e     | short | Padding
+| 00     | int16 | Dialog X position
+| 02     | int16 | Dialog Y position
+| 04     | int16 | Balloon window width (borders excluded)
+| 06     | int16 | Balloon window height (borders excluded)
+| 08     | uint8  | [Dialog box alignment](#dialog-box-alignment)
+| 09     | uint8  | [Dialog box border type](#dialog-box-borders)
+| 0a     | int16  | [Text alignment](#text-alignment)
+| 0c     | int16 | Font size. 16=100%, 8=50%
+| 0e     | int16 | Horizontal space between letters
+| 10     | int16 | Vertical space between letters
+| 12     | int16 | Text X offset
+| 14     | int16 | Text Y offset
+| 16     | int16 | [Dialog Hook type](#dialog-hook)
+| 18     | int16 | Dialog hook horizontal position
+| 1a     | int16 | Text Color IDX
+| 1c     | int16 | Padding
+| 1e     | int16 | Padding
 
 ### Dialog box alignment
 
 | Value | Description
 |-------|-------------
-| 00    | Use position
-| 01    | Align to the left
-| 02    | Align to the centre
-| 03    | Align to the right
+| 0x0    | Use position
+| 0x1    | Align to the left
+| 0x2    | Align to the centre
+| 0x3    | Align to the right
 
 ### Dialog box borders
 
 | Value | Description
 |-------|-------------
-| 00    | Rounded borders
-| 01    | Diamond borders
-| 02    | Spike borders
-| 03    | Black information dialog
-| 04    | Diamond borders
-| 05    | Invisible box
+| 0x0    | Rounded borders
+| 0x1    | Diamond borders
+| 0x2    | Spike borders
+| 0x3    | Black information dialog
+| 0x4    | Diamond borders
+| 0x5    | Invisible box
 
 ### Text alignment
 
 | Value | Vertical | Horizontal | Text alignment
 |-------|----------|------------|----------------
-| 00    | Top      | Left       | Left
-| 01    | Top      | Right      | Left
-| 02    | Top      | Center     | Left
-| 03    | Top      | Left       | Left
-| 04    | Top      | Left       | Left
-| 05    | Top      | Right      | Right
-| 06    | Top      | Center     | Center
-| 07    | Top      | Left       | Left
-| 08    | Center   | Left       | Left
-| 09    | Center   | Right      | Left
-| 0a    | Center   | Center     | Left
-| 0b    | Bottom   | Center     | Left
-| 0c    | Top      | Left       | Left
-| 0d    | Center   | Right      | Right
-| 0e    | Center   | Center     | Center
-| 0f    | Bottom   | Center     | Center
+| 0x0    | Top      | Left       | Left
+| 0x1    | Top      | Right      | Left
+| 0x2    | Top      | Center     | Left
+| 0x3    | Top      | Left       | Left
+| 0x4    | Top      | Left       | Left
+| 0x5    | Top      | Right      | Right
+| 0x6    | Top      | Center     | Center
+| 0x7    | Top      | Left       | Left
+| 0x8    | Center   | Left       | Left
+| 0x9    | Center   | Right      | Left
+| 0xa    | Center   | Center     | Left
+| 0xb    | Bottom   | Center     | Left
+| 0xc    | Top      | Left       | Left
+| 0xd    | Center   | Right      | Right
+| 0xe    | Center   | Center     | Center
+| 0xf    | Bottom   | Center     | Center
 
 ### Dialog hook
 
 | Value | Shape  | Location | Origin
 |-------|--------|----------|--------
-| 00    | Hook   | Bottom   | Left
-| 01    | Hook   | Bottom   | Right
-| 02    | Hook   | Top      | Left
-| 03    | Hook   | Top      | Right
-| 04    | Bubble | Bottom   | Left
-| 05    | Bubble | Bottom   | Right
-| 06    | Bubble | Top      | Left
-| 07    | Bubble | Top      | Right
-| 08    | Spike  | Bottom   | Left
-| 09    | Spike  | Bottom   | Right
-| 0a    | Spike  | Top      | Left
-| 0b    | Spike  | Top      | Right
-| 0c    | None   |          |
-| 0d    | None   |          |
-| 0e    | None   |          |
-| 0f    | None   |          |
+| 0x0    | Hook   | Bottom   | Left
+| 0x1    | Hook   | Bottom   | Right
+| 0x2    | Hook   | Top      | Left
+| 0x3    | Hook   | Top      | Right
+| 0x4    | Bubble | Bottom   | Left
+| 0x5    | Bubble | Bottom   | Right
+| 0x6    | Bubble | Top      | Left
+| 0x7    | Bubble | Top      | Right
+| 0x8    | Spike  | Bottom   | Left
+| 0x9    | Spike  | Bottom   | Right
+| 0xa    | Spike  | Top      | Left
+| 0xb    | Spike  | Top      | Right
+| 0xc    | None   |          |
+| 0xd    | None   |          |
+| 0xe    | None   |          |
+| 0xf    | None   |          |

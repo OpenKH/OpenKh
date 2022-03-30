@@ -7,7 +7,7 @@ using System.Windows;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Extensions;
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using Xe.Tools;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;

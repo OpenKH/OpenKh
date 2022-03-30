@@ -2,6 +2,8 @@
 
 ITB stands for *Item Treasure Box* and it contains the list of items obtained in treasure boxes.
 
+This file can be found in the `item` folder or within `arc/system/common_xx.arc` where `xx` is the first two letters of the character it belongs to, for example `Aq` for Aqua.
+
 ## Header
 
 | Offset | Type  | Description

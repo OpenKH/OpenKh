@@ -41,28 +41,30 @@ When referring to _entrance_ it means that is the index where to spawn the chara
 | 18     | int   | Always 0 [*¹](#notes)
 | 1c     | byte  | [Area ID of a world](../../worlds.md)
 | 1d     | byte  | Entrance
-| 1e     | byte  | [World ID](../../worlds.md)
+| 1e     | byte  | Approach Direction Trigger
 | 1f     | byte  | Unknown
 | 20     | int   | Unknown
 | 24     | int   | Unknown
 | 28     | int   | Always 0 [*¹](#notes)
 
+Approach Direction Trigger determines if the event is triggered only when approaching from a specific direction or if it can be triggered by approaching it from any direction (even from above/below). An example of the former would be the room transition used in CoR skip where you land behind the trigger and have to move away from the exit for a bit in order to move to CoR: Depths. An example of the latter would be Cloud's mandatory cutscene in HB.
+
 #### Entity
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 00     | int   | [Model ID](./00objentry.md)
+| 0x00     | int   | [Model ID](./00objentry.md)
 | 04     | float | Position X  
 | 08     | float | Position Y
-| 0c     | float | Position Z
-| 10     | float | Rotation X
+| 12     | float | Position Z
+| 16     | float | Rotation X
 | 14     | float | Rotation Y
 | 18     | float | Rotation Z
 | 1c     | byte  | [Spawn type](#spawn-types)
 | 1d     | byte  | Spawn argument
-| 1e     | short | Unknown
-| 20     | int   | Unknown
-| 24     | int   | AI parameter
+| 1e     | short | Serial
+| 20     | int   | Argument 1
+| 24     | int   | Argument 2
 | 28     | int   | Talk message
 | 2c     | int   | Reaction command
 | 30     | int   | Unknown
@@ -201,14 +203,14 @@ There is a total of 30 operation codes for the spawn script. The parser can be f
 - 06: [unknown](#unknown06)
 - 07: [unknown](#unknown07)
 - 09: [unknown](#unknown09)
-- 0a: [unknown](#unknown0a)
+- 0a: [MapScript](#mapscript)
 - 0b: [BarrierFlag](#barrierflag)
 - 0c: [AreaSettings](#areasettings)
 - 0e: [unknown](#unknown0e)
 - 0f: [Party](#party)
 - 10: [Bgm](#bgm)
 - 11: [MsgWall](#msgwall)
-- 12: [unknown](#unknown12)
+- 12: [AllocPacket](#allocpacket)
 - 13: [Camera](#camera)
 - 14: [StatusFlag3](#statusflag3)
 - 15: [Mission](#mission)
@@ -244,7 +246,7 @@ Very uncommon, used 17 times and only in the worlds BB, CA, LK and MU.
 
 #### Capacity
 
-Set the memory area `01c6053c`, which represents a floating number that holds the capacity of the current map. The bigger is the capacity the better is the amount of enemies that can be loaded at once. It's found 465 times and only in `btl`.
+Set the memory area `01c6053c`, which represents an integer that holds the capacity of the current map. The bigger the capacity is the more amount of enemies can be loaded at once. It's found 465 times and only in `btl`.
 
 #### AllocEnemy
 
@@ -262,9 +264,9 @@ Set the memory area `0034ecdc` with the 4-byte parameter. The purpose of that me
 
 Looks like similar to [Spawn](#spawn), but it's way less used. Found 210 times, mostly in `map` and just once in `wi00` as `evt`.
 
-#### Unknown0a
+#### MapScript
 
-Found 73 times. Purpose unknown.
+Used to execute the bdx (AI) subfile within the ARD. The argument defines the index of the subfile to be used.
 
 #### Barrier
 
@@ -276,7 +278,7 @@ Enqueue a message to perform a series of actions. Here it is possible to play an
 
 #### Unknown0e
 
-Set the memory area `0034ece0` with the first 4-byte parameter. The purpose of that memory area is unknown. Used 323 times and only in `map`.
+Set the memory area `0034ece0` with the first 4-byte parameter, which affects the minimap. Used 323 times and only in `map`.
 
 #### Party
 
@@ -294,19 +296,19 @@ Set how the party member needs to be structured. According to `dbg/member.bin`, 
 
 #### Bgm
 
-Set the map's background musics. The single 4-byte parameter can be read as two 2-byte integers, which represents the field and battle music ID that can be found in `bgm/music_xxx`. When the values are different than zero, they overrides the default field and battle music used in the current map.
+Set the map's background musics. The single 4-byte parameter can be read as two 2-byte integers, which represents the field and battle music ID that can be found in `bgm/music_xxx`. They overrides the default field and battle music used in the current map.
 
-#### Unknown11
+#### MsgWall
 
 Set the memory area `0034ece4`, which represents the message displayed below when the player touches an invisible wall. Found 80 times and only in `map`.
 
-#### Unknown12
+#### AllocPacket
 
-Set the memory area `0034ecd4`. This opcode is unused.
+Set the memory area `0034ecd4`, which is related to the amount of memory reserved for the cache buffer. This opcode is unused.
 
-#### Unknown13
+#### Camera
 
-Set the memory area `0034ece8`, which sets the camera mode for the map with the first 4-byte parameter. It does have a parameter of `1` or `2`. Found 39 times and only in `map` for `hb17`, `lk13`, `mu07` and `po00`.
+Set the memory area `0034ece8`, which sets the camera mode for the map with the first 4-byte parameter. It has a parameter of `1` or `2`. Found 39 times and only in `map` for `hb17`, `lk13`, `mu07` and `po00`.
 
 #### StatusFlag3
 
@@ -340,13 +342,13 @@ It seems to do something with `01c60548`. It is only used 3 times in `hb13` by `
 
 It seems to do something with `01c60550`. It is only used 3 times in `hb13` by `evt`.
 
-#### Unknown1c
+#### If
 
-Seems to recursively call the spawn script parser, but it is only used in `he09` for 130 times. Purpose unknown.
+Conditionals for the script based on the entrance.
 
 #### Unknown1d
 
-Purpose unknown. Used 196 times.
+Determines Sora's stats. Value of 4 Auto revert Sora when the room is entered, 5 disables drive, 6 enables using forms alone, while 1 or 3 have unknown effects. Used 196 times.
 
 #### BattleLevel
 
@@ -354,7 +356,7 @@ Override the battle level of the playing map. Usually used for special boss batt
 
 #### Unknown1f
 
-Purpose unknown. Very similar to [Unknown03](#unknown03)
+Spawn based on Bulky Vendor RNG. Very similar to [Unknown03](#unknown03)
 
 ### Area settings script
 
@@ -364,12 +366,12 @@ The scene script contains functions with a variable amount of parameters.
 |--------|----------|-------------
 | 00     | Event    | Play an event. Parameters: type, event name.
 | 01     | Jump     | Change maps. Parameters: padding, type, world, area, entrance, localset, fade type.
-| 02     | ProgressFlag | Update story progress.
+| 02     | ProgressFlag | Update story progress flag.
 | 03     | MenuFlag | Unlock options in the menu.
 | 04     | Member   | Change party member.
-| 05     |          | Unknown.
+| 05     |          | Heals Sora's stats depending on the argument (auto revert, full heal, HP&MP only)
 | 06     | Inventory | Obtain one or more items. It is possible to obtain up to 7 items in a row.
-| 07     | PartyMenu | Shows the party menu.
+| 07     | PartyMenu | Shows the party menu if Member is also defined.
 | 08     |          | Sets a flag. Purpose unknown.
 
 ## Notes

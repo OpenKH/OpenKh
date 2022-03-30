@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using Xe.BinaryMapper;
 
@@ -14,9 +14,9 @@ namespace OpenKh.Kh2.Battle
         [Data] public byte ItemSlotUpgrade { get; set; }
         [Data] public byte AccessorySlotUpgrade { get; set; }
         [Data] public byte ArmorSlotUpgrade { get; set; }
-        [Data] public short BonusItem1 { get; set; }
-        [Data] public short BonusItem2 { get; set; }
-        [Data] public int Unknown0c { get; set; }
+        [Data] public ushort BonusItem1 { get; set; }
+        [Data] public ushort BonusItem2 { get; set; }
+        [Data] public int Padding { get; set; }
 
         public override string ToString() =>
             $"HP: {HpIncrease}, MP: {MpIncrease}, ItemSlot: {ItemSlotUpgrade}, " +

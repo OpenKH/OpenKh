@@ -1,4 +1,4 @@
-# Kingdom Hearts Melody of Memory
+# Kingdom Hearts Melody of Memory - Back to [Index](../index.md)
 
 ## Notes
 
@@ -10,8 +10,10 @@ This documentation is ***also*** based on the "World" Nintendo Switch version of
 
 * [Database](database.md)
 * [Characters](characters.md)
+* [Abilities](abilities.md)
 * Music Tracks
   * [File Types Overview](files.md)
-  * [Audio Tracks](sed.md)
+    * [File Type .sed](sed.md)
+  * [Track List](tracks.md)
   * [AssetBundles](assetbundle.md)
     * [Trigger Maps (Enemy Placement)](trigger.md)

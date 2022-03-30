@@ -1,8 +1,8 @@
 # [Kingdom Hearts II](index.md) - Objects (Entities)
 
-| Id       |   Filename    | obj (Entity)
-|------------|---------------|---------------|
-1 | M_EX060 | (M) Fat Bandit |
+| Id       |   Filename    | obj (Entity) |
+|----------|---------------|--------------|
+| 1 | M_EX060 | (M) Fat Bandit |
 | 2 | M_EX500 | (M) Trick Ghost |
 | 3 | M_EX510 | (M) Rabid Dog |
 | 4 | M_EX520 | (M) Hook Bat |
@@ -530,7 +530,7 @@
 | 862 | N_TR010_BTL | (N) Sark (BTL) (TR) |
 | 863 | F_TR050 | (F) MCP barrier (TR) |
 | 864 | F_TR060 | (F) MCP wall (TR) |
-| 865 | B_EX200 | (?) Piramid shape? Related to Xemnas? |
+| 865 | B_EX200 | (B) Twilight Thorn's Energy Ball (Break Raid RC) |
 | 866 | H_CA020 | (H) Elizabeth (CA) |
 | 900 | W_EX000 | (W) ??? (EX000) |
 | 901 | N_TR010_TSURU | (N) Sark (TSURU) (TR) |

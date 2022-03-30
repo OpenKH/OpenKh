@@ -1,10 +1,8 @@
 # Kingdom Hearts Hacking Community
 
-This is a central place for documentation and discoveries about Kingdom Hearts games.
+This is a centralized place for the documentation and other discoveries about the internal working of Kingdom Hearts games.
 
-Every contribution is more than welcome!
-
-Right now the documentation contains info about the following games:
+As of right now, the documentation contains info about the following games:
 
 * [Kingdom Hearts I](kh1/index.md)
 * [Kingdom Hearts II](kh2/index.md)
@@ -27,3 +25,7 @@ Right now the documentation contains info about the following games:
   * [PS4 HD assets](common/hdassets.md)
 * [Tools](tool/index.md)
 * [OpenKH Game Engine](engine/index.md)
+
+### Contributions are more than welcome where applicable!
+
+For more information about contributing, visit our [Contributing](https://github.com/Xeeynamo/OpenKh/blob/master/CONTRIBUTING.md) page. 

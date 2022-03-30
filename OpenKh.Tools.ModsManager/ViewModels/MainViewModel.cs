@@ -1,5 +1,5 @@
 using OpenKh.Common;
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Models;
 using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.Views;

@@ -7,11 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+    <ProjectReference Include="..\OpenKh.Egs\OpenKh.Egs.csproj" />
     <ProjectReference Include="..\OpenKh.Kh1\OpenKh.Kh1.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
   </ItemGroup>

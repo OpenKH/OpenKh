@@ -1,4 +1,4 @@
-# Kingdom Hearts Chain of Memories
+# Kingdom Hearts Chain of Memories - Back to [Index](../index.md)
 
 ## General Documentation
 

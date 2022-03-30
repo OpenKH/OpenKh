@@ -53,19 +53,23 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ca206 | Calypso/Tia Dalma
 | n_ca209 | Cutler Beckett
 | n_ca210 | Joshamee Gibbs
+| n_db211 | Ira
+| n_db212 | Invi
+| n_db213 | Aced
+| n_db215 | Gula
 | n_db217 | Chirithy
 | n_db218 | Ephemer
 | n_dw003 | Mickey (0.2)
 | n_dw202 | Riku (KH1)
 | n_dw205 | Ansem the Wise (Coat)
 | n_dw208 | Ansem the Wise (Coat Unhooded)
-| n_ew001 | Donald (Monsters Inc)
-| n_ew002 | Goofy
-| n_ew003 | Mickey (?)
-| n_ew004 | Riku (?)
-| n_ew005 | Aqua (?)
-| n_ew006 | Ventus (?)
-| n_ew007 | Lea (?)
+| n_ew001 | Donald (Final World)
+| n_ew002 | Goofy (Final World)
+| n_ew003 | Mickey (Final World)
+| n_ew004 | Riku (Final World)
+| n_ew005 | Aqua (Final World)
+| n_ew006 | Ventus (Final World)
+| n_ew007 | Lea (Final World)
 | n_ew008 | Sora (Final World Clones)
 | n_ex001 | Donald
 | n_ex002 | Goofy
@@ -84,6 +88,11 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ex016 | Evan
 | n_ex017 | Aeleus
 | n_ex018 | Ienzo
+| n_ex019 | Leon
+| n_ex020 | Aerith
+| n_ex021 | Yuffie
+| n_ex022 | Cid
+| n_ex023 | Sora (KH3)
 | n_ex024 | Eraqus
 | n_ex028 | Moogle (With Balloon)
 | n_ex029 | Lingering Will
@@ -97,6 +106,18 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ex040 | Aqua (No Cloth)
 | n_ex041 | Roxas (Coat Hooded)
 | n_ex042 | Xehanort (Shadow Form)
+| n_ex044 | Hooded Organization Member
+| n_ex045 | Young Xehanort
+| n_ex046 | Ansem the Wise
+| n_ex047 | Even
+| n_ex050 | Lingering Will
+| n_ex051 | Lingering Will (Armor Pieces)
+| n_ex053 | Lingering Will
+| n_ex054 | Lingering Will
+| n_ex055 | Lingering Will
+| n_ex060 | Kairi (KH3)
+| n_ex070 | Kairi (KH3)
+| n_ex071 | Namine
 | n_ex100 | Maleficent
 | n_ex101 | Pete
 | n_ex102 | Jiminy Cricket
@@ -110,6 +131,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | n_ex110 | Dewey (?)
 | n_ex111 | Louie (?)
 | n_ex112 | Merlin
+| n_ex113 | Fairy Godmother
 | n_fz201 | Anna
 | n_fz202 | Elsa
 | n_fz203 | Kristoff
@@ -399,7 +421,6 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | e_ex361 | Dark Riku (LimitCut)
 | e_ex362 | Terra-Xehanort (LimitCut)
 | e_ex367 | Master Xehanort (LimitCut)
-
 | e_ex407 | Darkside
 | e_ex408 | Xehanort's Guardian
 | e_ex409 | Darkside (ReMind)
@@ -485,7 +506,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_do130 | Save The Queen
 | w_do140 | Save The Queen+
 | w_ex010 | Star Seeker
-| w_ex020 | Kingdom Key
+| w_ex020 | Kingdom Key D
 | w_ex030 | Wayward Wind
 | w_ex040 | Earthshaker
 | w_ex050 | Rainfell
@@ -585,7 +606,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_so112 | Classic Tone Boom Hammer
 | w_so113 | Classic Tone Clock Drill
 | w_so114 | Classic Tone Clock
-| w_so120 | Dawn Till Dusk
+| w_so120 | Dawn Till Dusk / Elemental Encoder
 | w_so140 | Grand Chef
 | w_so141 | Grand Chef Formchanges
 | w_so142 | Grand Chef Pan
@@ -593,6 +614,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | w_so144 | Grand Chef Pan (?)
 | w_so145 | Grand Chef Pan (?)
 | w_so150 | Starlight
+| w_so160 | Midnight Blue
 | w_so170 | Nano Gear
 | w_so172 | Nano Gear Formchanges
 | w_so173 | Nano Gear Fist

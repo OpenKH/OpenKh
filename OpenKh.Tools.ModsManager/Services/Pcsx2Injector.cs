@@ -559,6 +559,10 @@ namespace OpenKh.Tools.ModsManager.Services
             // Fix weird game bug where KH2FM would crash on map change
             // when the region is different from JP or FM.
             WritePatch(stream, 0x015ABE8, ADDIU(V0, Zero, 1));
+            
+            // Fix issue where KH2FM fails to load movie cutscenes
+            // when the region is different from FM.
+            WritePatch(stream, 0x022BC68, ADDIU(A2, A1, -0x6130));
         }
 
         private void ResetHooks() => _nextHookPtr = BaseHookPtr;

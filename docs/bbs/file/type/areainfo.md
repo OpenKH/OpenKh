@@ -15,9 +15,9 @@ The subfile is contained within `preset/areainfo.arc`
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0     | uint8   | World ID
-| 0x1     | uint8   | Room ID
-| 0x2     | uint8   | Flag
-| 0x3     | uint8   | External SCD
+| 0x0     | uint8    | World ID
+| 0x1     | uint8    | Room ID
+| 0x2     | uint8    | Flag
+| 0x3     | uint8    | External SCD
 | 0x4     | uint16   | Heap
 | 0x6     | uint16   | Padding
