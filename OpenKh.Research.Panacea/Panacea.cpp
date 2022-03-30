@@ -419,11 +419,11 @@ void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<Axa::Rema
 
         delete[] PicOffsets;
 
-        char *texa = std::search((char*)addr, (char*)endaddr, TEXA, TEXA + 4);
+        char* texa = std::search((char*)addr, (char*)endaddr, TEXA, TEXA + 4);
         while (texa != endaddr)
         {
             int imageToApplyTo = *(short*)(texa + 0x0A);
-            int texaOffset = *(int*)(texa + 0x1C);
+            int texaOffset = *(int*)(texa + 0x28);
             Axa::RemasteredEntry ent{};
             ent.origOffset = (int)(baseoff + (texa - (char*)addr) + texaOffset + 0x08 + (imageToApplyTo * 0x10LL) + 0x20000000);
             entries.push_back(ent);
@@ -473,12 +473,12 @@ void GetBAROffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& e
                 }
                 break;
             case 36:
-                {
-                    Axa::RemasteredEntry ent{};
-                    ent.origOffset = baseoff + datoff + 0x20000000;
-                    entriesGeneral.push_back(ent);
-                }
-                break;
+            {
+                Axa::RemasteredEntry ent{};
+                ent.origOffset = baseoff + datoff + 0x20000000;
+                entriesGeneral.push_back(ent);
+            }
+            break;
             case 46:
                 GetBAROffsets((char*)addr + datoff, baseoff + datoff, entriesGeneral);
                 break;
@@ -577,7 +577,7 @@ bool sortRemasteredFiles(const Axa::RemasteredEntry& a, const Axa::RemasteredEnt
     return false;
 }
 
-void GetRemasteredFiles(Axa::PackageFile *fileinfo, const char* path, void* addr)
+void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr)
 {
     if (RemasteredData.find(path) == RemasteredData.cend())
     {
@@ -616,31 +616,34 @@ void GetRemasteredFiles(Axa::PackageFile *fileinfo, const char* path, void* addr
                 GetBAROffsets(addr, 0, entries);
             std::vector<Axa::RemasteredEntry> modfiles;
             if (folderexist)
+            {
                 ScanFolder(remasteredFolder, modfiles);
-            if (fileinfo->CurrentFileData.remasteredCount == entries.size())
-            {
-                for (int i = 0; i < fileinfo->CurrentFileData.remasteredCount; ++i)
+                if (modfiles.size() == entries.size())
                 {
-                    int off = entries[i].origOffset;
-                    entries[i] = fileinfo->RemasteredData[i];
-                    auto found = std::find_if(modfiles.cbegin(), modfiles.cend(), [entries, i](const Axa::RemasteredEntry& a) { return !_stricmp(entries[i].name, a.name); });
-                    if (found != modfiles.cend())
-                        entries[i] = *found;
-                    entries[i].origOffset = off;
+                    std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
+                    for (int i = 0; i < modfiles.size(); ++i)
+                    {
+                        int off = entries[i].origOffset;
+                        entries[i] = modfiles[i];
+                        entries[i].origOffset = off;
+                    }
                 }
+                else
+                    entries.clear();
             }
-            else if (modfiles.size() == entries.size())
-            {
-                std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
-                for (int i = 0; i < modfiles.size(); ++i)
-                {
-                    int off = entries[i].origOffset;
-                    entries[i] = modfiles[i];
-                    entries[i].origOffset = off;
-                }
-            }
+            else if (fileinfo->CurrentFileData.remasteredCount == entries.size())
+                memcpy(entries.data(), fileinfo->RemasteredData, entries.size() * sizeof(Axa::RemasteredEntry));
             else
                 entries.clear();
+        }
+        FILE* fh;
+        if (!fopen_s(&fh, "remastered.log", "a"))
+        {
+            fprintf(fh, "%s(\"%s\") found %lld assets:\n", __func__, path, entries.size());
+            for (auto& ent : entries)
+                fprintf(fh, "\"%s\", 0x%X, 0x%X\n", ent.name, ent.origOffset, ent.decompressedSize);
+            fprintf(fh, "\n");
+            fclose(fh);
         }
         RemasteredData.insert_or_assign(fileinfo->CurrentFileName, entries);
     }
@@ -677,7 +680,7 @@ long __cdecl Panacea::LoadFile(Axa::CFileMan* _this, const char* filename, void*
     return 0;
 }
 
-void* __cdecl Panacea::LoadFileWithMalloc(Axa::CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char *filename2)
+void* __cdecl Panacea::LoadFileWithMalloc(Axa::CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char* filename2)
 {
     char path[MAX_PATH];
     if (!TransformFilePath(path, sizeof(path), filename))
@@ -695,10 +698,10 @@ void* __cdecl Panacea::LoadFileWithMalloc(Axa::CFileMan* _this, const char* file
     FILE* file = fopen(path, "rb");
     fseek(file, 0, SEEK_END);
     *sizePtr = ftell(file);
-    void *addr = _aligned_malloc(*sizePtr, 0x10);
+    void* addr = _aligned_malloc(*sizePtr, 0x10);
     if (!addr)
         return addr;
-    
+
     fseek(file, 0, SEEK_SET);
     fread(addr, *sizePtr, 1, file);
     fclose(file);
@@ -719,7 +722,7 @@ long __cdecl Panacea::GetFileSize(Axa::CFileMan* _this, const char* filename)
     char path[MAX_PATH];
 
     auto fileinfo = Axa::PackageMan::GetFileInfo(filename, 0);
-   if (!TransformFilePath(path, sizeof(path), filename))
+    if (!TransformFilePath(path, sizeof(path), filename))
     {
         if (fileinfo)
         {
