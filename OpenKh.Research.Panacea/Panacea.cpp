@@ -342,11 +342,11 @@ void GetDPDOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& e
 
 void GetDPXOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
 {
-    int* off = (int*)((char*)addr + *(int*)addr * 0x20);
+    int* off = (int*)((char*)addr + *(int*)addr * 0x20 + 4);
     int dpdcnt = *off++;
     while (dpdcnt-- > 0)
     {
-        int dpdoff = *off++;
+        int dpdoff = *off++ - 0xC;
         GetDPDOffsets((char*)addr + dpdoff, baseoff + dpdoff, entries);
     }
 }
@@ -616,7 +616,7 @@ void GetRemasteredFiles(Axa::PackageFile *fileinfo, const char* path, void* addr
                 GetBAROffsets(addr, 0, entries);
             std::vector<Axa::RemasteredEntry> modfiles;
             if (folderexist)
-                ScanFolder(path, modfiles);
+                ScanFolder(remasteredFolder, modfiles);
             if (fileinfo->CurrentFileData.remasteredCount == entries.size())
             {
                 for (int i = 0; i < fileinfo->CurrentFileData.remasteredCount; ++i)
