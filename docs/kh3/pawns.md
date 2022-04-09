@@ -643,7 +643,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | o_bx207 | Baymax chip (Sora)
 | o_bx210 | Rocket
 | o_bx211 | Heartless struck by Blizzard
-| o_bx213 | Sphere
+| o_bx213 | Honey Lemon's chem-balls
 | o_bx214 | Cube
 | o_bx215 | Protusion
 | o_bx217 | Go Go's disc
@@ -666,7 +666,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | o_cn201 | Fork
 | o_cn202 | ?
 | o_dw201 | Aqua wayfinder
-| o_dw202 | Terra wayfinder
+| o_dw202 | Ventus wayfinder
 | o_dw301 | Tiara (0.2 customization item)
 | o_dw302 | Antennae (0.2 customization item)
 | o_dw303 | Figaro (0.2 customization item)
@@ -687,10 +687,10 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | o_ex100 | Simba
 | o_ex101 | Ariel
 | o_ex102 | Stitch
-| o_ex103 | Wreck It Ralph
+| o_ex103 | Wreck-It Ralph
 | o_ex104 | Meow Wow
 | o_ex111 | 8-Bit Blast (three cannon wall)
-| o_ex112 | 8|-Bit Blast (single cannon wall)
+| o_ex112 | 8-Bit Blast (single cannon wall)
 | o_ex113 | 8-Bit Blast (cannon pointed up)
 | o_ex114 | 8-Bit Blast (cannons facing all directions)
 | o_ex115 | 8-Bit Blast (cannons t-shaped)
@@ -718,7 +718,7 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | o_ex161 | Hexagon with six points
 | o_ex162 | Moogle head
 | o_ex202 | Jellyfish
-| o_ex204 | Gummiphone photo segment
+| o_ex204 | Gummiphone
 | o_ex208 | Firework
 | o_ex209 | Claw
 | o_ex210 | Rock
@@ -786,26 +786,97 @@ Some maps overrides the pawn path contained in the save data, loading an hard co
 | o_ex502 | Rock
 | o_ex503 | Rock
 | o_ex504 | Rock
+| o_fz201 | Hans' sword
+| o_fz202 | Snowball
+| o_fz210 | Olaf's head
+| o_fz211 | (no model or textures)
+| o_fz212 | Olaf's body (small)
+| o_fz213 | Olaf's body (big)
+| o_fz214 | Olaf's body (tall)
+| o_fz215 | Olaf's body
+| o_fz216 | Olaf's carrot nose
+| o_fz217 | Olaf's arms
+| o_he201 | Pandora's Box
+| o_he202 | Shackles
+| o_he203 | Shackles
+| o_he204 | Shackles
+| o_he205 | Zeus's lightning bolt
+| o_he206 | Terra statue
+| o_he207 | Cloud statue
+| o_he208 | Auron statue
+| o_he209 | Lava Titan spike
+| o_he301 | Rock
 | o_kg201 | Keyblade wave
 | o_kg202 | Starlight
 | o_kg203 | Terranort chain
 | o_kg204 | Terranort chain
 | o_kg205 | Terranort chain
 | o_kg206 | Terranort chain (short)
+| o_mi201 | Door card key
+| o_mi202 | CDA radio
+| o_mi203 | CDA zip line
+| o_mi210 | Lump of Horror hand
+| o_mi214 | ?
+| o_mi215 | Lump of Horror goo
+| o_po202 | Pot of honey
+| o_po203 | Gopher hole
+| o_ra202 | Barrel
+| o_ra204 | Eugene's satchel
+| o_ra205 | Rapunzel's crown
+| o_ra211 | Mother Gothel falling cloak
+| o_ra213 | Lantern
+| o_ra215 | ?
+| o_ra216 | Arrow
+| o_ra220 | Rapunzel's curled hair
+| o_re201 | Crab
+| o_re202 | Truckle of cheese
+| o_re203 | Meats
+| o_re204 | Meats
+| o_re205 | Flat bread
+| o_re206 | Stove top
+| o_re207 | Stove top
+| o_re208 | Fish
+| o_re209 | Steak
+| o_re210 | Fish 
+| o_re211 | Half cut apple
+| o_re212 | Mushroom top
+| o_re213 | Half cut onion
+| o_re214 | Cucumber
+| o_re215 | Broken egg shell (top half)
+| o_re216 | Frying pan
+| o_re217 | Wine bottle
+| o_re218 | Knife
+| o_re219 | Salt & pepper shaker
+| o_re220 | Broken egg shell (bottom half)
+| o_re221 | Bowl
+| o_re222 | Spatula
+| o_re223 | Egg
+| o_re224 | Plate of tomatoes
+| o_re225 | Half cut tomato
+| o_re226 | Plate of fish
+| o_re227 | Fish
+| o_re228 | Meats
+| o_re229 | Half cut pear
+| o_re230 | (no model)
+| o_re234 | Bowl of eggs
+| o_re240 | Present boxes
+| o_ts802 | Hanging toy
+| o_ts803 | Hanging toy
+| o_ts901 | The Big One rocket
 | o_tt201 | Pooh book
 | o_tt202 | Tea cup
 | o_tt203 | Twilight Trio photo (with Roxas)
 | o_tt204 | Twilight Trio photo (without Roxas)
-| o_tt205 | Sea|salt icecream
+| o_tt205 | Sea-salt ice cream
 | o_tt206 | Giantland movie poster
-| o_tt207 | Taute aux Fruits box
+| o_tt207 | Tarte aux Fruits box
 | o_tt208 | Gummiphone stand
 | o_tt209 | Hand bag
 | o_tt210 | Orange
 | o_tt211 | Peach
 | o_tt212 | Lemon
 | o_tt213 | (no model, only textures)
-| o_tt214 | Orange
+| o_tt214 | Fruit
 | o_tt215 | Apple
 | o_tt216 | Pear
 | o_tt217 | Long rod
