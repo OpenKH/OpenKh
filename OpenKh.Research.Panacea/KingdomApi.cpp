@@ -16,6 +16,7 @@ PFN_DEFINE(Axa_CFileMan_GetRemasteredEntry);
 PFN_DEFINE(Axa_PackageFile_GetRemasteredAsset);
 PFN_DEFINE(Axa_CFileMan_GetAudioStream);
 PFN_DEFINE(Axa_OpenFile);
+PFN_DEFINE(Axa_DebugPrint);
 PFN_DEFINE(Bbs_File_load);
 PFN_DEFINE(Bbs_CRsrcData_loadCallback);
 

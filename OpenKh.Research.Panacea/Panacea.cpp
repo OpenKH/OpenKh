@@ -13,6 +13,7 @@
 #include <queue>
 #include <fcntl.h>
 #include "Panacea.h"
+#include <cstdarg>
 
 template <class TFunc>
 class Hook
@@ -171,6 +172,7 @@ public:
                     fileInfo.FileInfo.compressedSize = -2;
                     fileData[basefn] = fileInfo;
                 } while (FindNextFileA(findHandle, &data));
+                FindClose(findHandle);
             }
             folq.pop();
         }
@@ -205,6 +207,22 @@ private:
     std::map<std::string, ModFileInfo> fileData;
 };
 
+struct MyAppVtbl
+{
+    void* func1;
+    void* func2;
+    void* onInit;
+    void* onSoftReset;
+    int (*onFrame)(__int64 a1);
+    void* onExit;
+    void* onResize;
+    void* onFrameForSaveWait;
+    void* func3;
+};
+
+MyAppVtbl customAppVtbl;
+int (*onFrameOrig)(__int64 a1);
+
 Hook<PFN_Axa_SetReplacePath>* Hook_Axa_SetReplacePath;
 Hook<PFN_Axa_FreeAllPackages>* Hook_Axa_FreeAllPackages;
 Hook<PFN_Axa_CFileMan_LoadFile>* Hook_Axa_CFileMan_LoadFile;
@@ -214,8 +232,10 @@ Hook<PFN_Axa_CFileMan_GetRemasteredCount>* Hook_Axa_CFileMan_GetRemasteredCount;
 Hook<PFN_Axa_CFileMan_GetRemasteredEntry>* Hook_Axa_CFileMan_GetRemasteredEntry;
 Hook<PFN_Axa_PackageFile_GetRemasteredAsset>* Hook_Axa_PackageFile_GetRemasteredAsset;
 Hook<PFN_Axa_CFileMan_GetAudioStream>* Hook_Axa_CFileMan_GetAudioStream;
+Hook<PFN_Axa_DebugPrint>* Hook_Axa_DebugPrint;
 Hook<PFN_Bbs_File_load>* Hook_Bbs_File_load;
 Hook<PFN_Bbs_CRsrcData_loadCallback>* Hook_CRsrcData_loadCallback;
+std::vector<void(*)()> framefuncs;
 
 void Panacea::Initialize()
 {
@@ -230,12 +250,64 @@ void Panacea::Initialize()
     Hook_Axa_CFileMan_GetRemasteredEntry = NewHook(pfn_Axa_CFileMan_GetRemasteredEntry, Panacea::GetRemasteredEntry, "Axa::CFileMan::GetRemasteredEntry");
     Hook_Axa_PackageFile_GetRemasteredAsset = NewHook(pfn_Axa_PackageFile_GetRemasteredAsset, Panacea::GetRemasteredAsset, "Axa::PackageFile::GetRemasteredAsset");
     //Hook_Axa_CFileMan_GetAudioStream = NewHook(pfn_Axa_CFileMan_GetAudioStream, Panacea::GetAudioStream, "Axa::CFileMan::GetAudioStream");
+    Hook_Axa_DebugPrint = NewHook(pfn_Axa_DebugPrint, Panacea::DebugPrint, "Axa::DebugPrint");
     Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
     Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
+    intptr_t base = (intptr_t)GetModuleHandleA(nullptr);
+    DWORD oldprot;
+    VirtualProtect((void*)(base + 0x1000), 0x576000, PAGE_EXECUTE_WRITECOPY, &oldprot);
+    VirtualProtect((void*)(base + 0x576000), 0x2000, PAGE_EXECUTE_WRITECOPY, &oldprot);
+    VirtualProtect((void*)(base + 0x579000), 0x198000, PAGE_WRITECOPY, &oldprot);
+    VirtualProtect((void*)(base + 0x2B81000), 0x51000, PAGE_WRITECOPY, &oldprot);
+    VirtualProtect((void*)(base + 0x2BD3000), 0x2000, PAGE_WRITECOPY, &oldprot);
+    char dllpath[MAX_PATH];
+    SHGetFolderPathA(0, CSIDL_MYDOCUMENTS, nullptr, 0, dllpath);
+    std::strcat(dllpath, "\\KINGDOM HEARTS HD 1.5+2.5 ReMIX\\dll\\kh2\\");
+    char search[MAX_PATH];
+    std::strcpy(search, dllpath);
+    std::strcat(search, "*.dll");
+    std::vector<void(*)()> initfuncs;
+    WIN32_FIND_DATAA find;
+    HANDLE fh = FindFirstFileA(search, &find);
+    if (fh != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            char filepath[MAX_PATH];
+            std::strcpy(filepath, dllpath);
+            std::strcat(filepath, find.cFileName);
+            HMODULE dllhandle = LoadLibraryA(filepath);
+            if (dllhandle)
+            {
+                fprintf(stdout, "Loaded DLL \"%s\".\n", find.cFileName);
+                void (*initfunc)() = (void(*)())GetProcAddress(dllhandle, "OnInit");
+                if (initfunc)
+                    initfuncs.push_back(initfunc);
+                void (*framefunc)() = (void(*)())GetProcAddress(dllhandle, "OnFrame");
+                if (framefunc)
+                    framefuncs.push_back(framefunc);
+            }
+        } while (FindNextFileA(fh, &find));
+        FindClose(fh);
+    }
+    for (auto f : initfuncs)
+        f();
+}
+
+int Panacea::FrameHook(__int64 a1)
+{
+    for (auto f : framefuncs)
+        f();
+    return onFrameOrig(a1);
 }
 
 int Panacea::SetReplacePath(__int64 a1, const char* a2)
 {
+    auto app = (MyAppVtbl**)a1;
+    customAppVtbl = **app;
+    onFrameOrig = customAppVtbl.onFrame;
+    customAppVtbl.onFrame = FrameHook;
+    *app = &customAppVtbl;
     PackageFiles[PackageFileCount++] = new FakePackageFile();
     auto ret = Hook_Axa_SetReplacePath->Unpatch()(a1, a2);
     Hook_Axa_SetReplacePath->Patch();
@@ -826,6 +898,16 @@ int Panacea::GetAudioStream(Axa::CFileMan* a1, const char* a2)
 
     fprintf(stdout, "GetAudioStream(\"%s\")\n", path);
     return Axa::OpenFile(path, O_RDONLY | O_BINARY);
+}
+
+void Panacea::DebugPrint(const char* format, ...)
+{
+#if 0
+    va_list args;
+    va_start(args, format);
+    vfprintf(stdout, format, args);
+    va_end(args);
+#endif
 }
 
 size_t __cdecl Panacea::BbsFileLoad(const char* filename, long long a2)

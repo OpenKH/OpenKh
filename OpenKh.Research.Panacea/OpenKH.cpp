@@ -26,6 +26,7 @@ static const long KingdomApi_KH2[KingdomApiFunction_END] =
     0x136690,
     0x136F30,
     0x135E10,
+    0x13EB60,
 };
 
 static const long KingdomApi_BBS[KingdomApiFunction_END] =
@@ -87,6 +88,7 @@ void Hook(const long kingdomApiOffsets[])
     Hook(pfn_Axa_PackageFile_GetRemasteredAsset, KingdomApi_KH2[Axa_PackageFile_GetRemasteredAsset]);
     Hook(pfn_Axa_CFileMan_GetAudioStream, KingdomApi_KH2[Axa_CFileMan_GetAudioStream]);
     Hook(pfn_Axa_OpenFile, KingdomApi_KH2[Axa_OpenFile]);
+    Hook(pfn_Axa_DebugPrint, KingdomApi_KH2[Axa_DebugPrint]);
     GetVarPtr(PackageFileCount, (char*)pfn_Axa_PackageMan_GetFileInfo + 0x1A);
     GetVarPtr(LastOpenedPackage, (char*)pfn_Axa_CFileMan_GetRemasteredCount + 3);
     GetArrPtr(PackageFiles, (char*)pfn_Axa_PackageMan_GetFileInfo + 0xB1);

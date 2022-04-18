@@ -16,6 +16,7 @@ enum KingdomApiFunction
     Axa_FreeAllPackages,
     Axa_CFileMan_GetAudioStream,
     Axa_OpenFile,
+    Axa_DebugPrint,
     KingdomApiFunction_END
 };
 
@@ -128,6 +129,7 @@ PFN_DECLARE(Axa::RemasteredEntry*, Axa_CFileMan_GetRemasteredEntry, (Axa::CFileM
 PFN_DECLARE(void*, Axa_PackageFile_GetRemasteredAsset, (Axa::PackageFile* a1, unsigned int* assetSizePtr, int assetNum));
 PFN_DECLARE(int, Axa_CFileMan_GetAudioStream, (Axa::CFileMan* a1, const char* a2));
 PFN_DECLARE(int, Axa_OpenFile, (const char* Format, int OFlag));
+PFN_DECLARE(void, Axa_DebugPrint, (const char* Format, ...));
 PFN_DECLARE(size_t, Bbs_File_load, (const char* pszPath, long long a2));
 PFN_DECLARE(void, Bbs_CRsrcData_loadCallback, (unsigned int* pMem, size_t size, unsigned int* pArg, int nOpt));
 
