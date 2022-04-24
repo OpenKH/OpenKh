@@ -11,6 +11,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
+        
         <DockPanel Grid.Column="0">
             <Label DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="White">Range Triggers</Label>
             <DataGrid
@@ -29,6 +30,7 @@
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>
+        
         <DockPanel Grid.Column="1">
             <Label DockPanel.Dock="Top" HorizontalAlignment="Center" Foreground="White">Frame Triggers</Label>
             <DataGrid
