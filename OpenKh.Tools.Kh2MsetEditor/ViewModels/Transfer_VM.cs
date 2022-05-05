@@ -159,7 +159,7 @@ namespace OpenKh.Tools.Kh2MsetEditor.ViewModels
             // Bones
             foreach (boneTransferWrapper boneTransfer in boneTransferWrappers)
             {
-                boneTransfers.Add(boneTransfer.FromBone, boneTransfer.FromBone);
+                boneTransfers.Add(boneTransfer.FromBone, boneTransfer.ToBone);
             }
             // IK Helpers
             foreach (int i in Enumerable.Range(0, fromAnb.MotionFile.IKHelpers.Count))
