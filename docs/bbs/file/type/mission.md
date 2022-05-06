@@ -50,7 +50,7 @@ Here's the full list of files that use this format.
 | 0x4C    | uint8   | Navigation
 | 0x4D    | uint8   | Present 1
 | 0x4E    | uint8   | Present 2
-| 0x4F    | uint8   | General Path
+| 0x4F    | uint8   | [General Path](#General-Path)
 | 0x50    | uint16  | Present 1 Parameters
 | 0x52    | uint16  | Present 2 Parameters
 | 0x54    | uint8   | HP Recovery
@@ -60,7 +60,11 @@ Here's the full list of files that use this format.
 
 ### Bonus
 
+Bonuses are rewards you receive as the boss is defeated or the event is over.
+
 The type of bonus to receive. It is not possible to give two rewards of the same type.
+
+Bonuses cannot give you debug commands or abilities/enchantments.
 
 | Value | Description
 |--------|-------
@@ -71,7 +75,11 @@ The type of bonus to receive. It is not possible to give two rewards of the same
 
 ### Present
 
+Presents are rewards you receive after the battle phase is over.
+
 The type of present to receive. Presents cannot give you debug commands or abilities/enchantments.
+
+Trying to give items that don't belong to the specific character result in a crash.
 
 | Value | Description
 |--------|-------
@@ -79,7 +87,16 @@ The type of present to receive. Presents cannot give you debug commands or abili
 | 1     | Obtain Item
 | 2     | Obtain Command
 
+### General Path
+| Value | Description
+|--------|-------
+| 0     | GENERAL_PATH_START
+| 1     | GENERAL_PATH_END
+
+
 ### Mission Kind
+
+This is the "name" attributed to the mission. Serves as an identifier.
 
 | Value | Name  | Description
 |--------|-------|------------
