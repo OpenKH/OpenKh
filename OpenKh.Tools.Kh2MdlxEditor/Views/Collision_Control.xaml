@@ -7,17 +7,15 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel Background="#2d2d2d">
-        <!-- Header data -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
             <Label Foreground="White">Enabled:</Label>
             <TextBox MinWidth="40" Text="{Binding Path=CollisionFile.Enable}"/>
         </StackPanel>
 
-        <!-- Collision data -->
         <DataGrid Name="DataTable"
-                  AutoGenerateColumns="False"
-                  ItemsSource="{Binding CollisionFile.EntryList}"
-                  CanUserAddRows="False">
+                AutoGenerateColumns="False"
+                ItemsSource="{Binding CollisionFile.EntryList}"
+                CanUserAddRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=Group}" Header="Group" />
                 <DataGridTextColumn Binding="{Binding Path=Parts}" Header="Parts" />

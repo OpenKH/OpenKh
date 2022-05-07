@@ -7,11 +7,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <TabControl>
+        
         <TabItem Header="Triggers">
             <ContentControl Background="#2d2d2d" x:Name="contentFrame_Trigger"/>
         </TabItem>
+        
         <TabItem Header="Motion">
             <ContentControl Background="#2d2d2d" x:Name="contentFrame_Motion"/>
         </TabItem>
+        
     </TabControl>
 </UserControl>

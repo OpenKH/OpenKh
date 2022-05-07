@@ -7,7 +7,7 @@
 | [AI](file/ai/index.md)          | Located in BAR files; used as a scripting language
 | [ANB](file/anb/anb.md)          | Raw animation data (bone manipulations, positions, etc.)
 | [ARD](file/type/areadata.md)    | Event files containing all sorts of miscellaneous information
-| [BAR](file/type/bar.md)         | Primary file and data container
+| [BAR](file/type/bar.md)         | Primary file and data container | OpenKh.Tools.BarEditor
 | BGM                             | Midi-like file
 | [COCT](file/type/coct.md)       | Data to instance collision detection
 | DBG                             | Binary file; likely used for debug menu
@@ -22,8 +22,8 @@
 | [IMGZ](file/type/image.md#imgz) | A container housing multiple IMGDs with separation layers
 | MAG                             | A descriptor for magic; contains a PAX inside
 | [MAP](file/map.md)              | Game map
-| MDLX                            | Container for VIF packets; model data and files like textures
-| MSET                            | Moveset; contains effect casters, references ANBs, etc.
+| [MDLX](file/type/mdlx.md)       | Container for VIF packets; model data and files like textures | OpenKh.Tools.KH2MdlxEditor
+| [MSET](file/anb/mset.md)        | Moveset; contains effect casters, references ANBs, etc. | OpenKh.Tools.KH2MsetEditor
 | [MSG](file/type/msg.md)         | Storing localized HUD textures for worlds
 | [MSN](file/type/msn.md)         | Mission file; defines how maps behave
 | PAX                             | Graphical effects; contains inside DPX entries

@@ -5,40 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenKh.Tools.Kh2MsetEditor.Views"
         mc:Ignorable="d"
-        Title="OpenKh | Mset Editor" Height="450" Width="800">
-    <DockPanel AllowDrop="True" Drop="Window_Drop">
-        <!-- Top navbar -->
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="File">
-                <MenuItem Header="TEST" Visibility="Collapsed" Click="Menu_Test"/>
-                <MenuItem Header="Save As" Click="Menu_SaveFile"/>
+        Title="OpenKh | Mset Editor" Height="600" Width="1000">
+    <DockPanel>
+        <Menu DockPanel.Dock="Bottom">
+            <MenuItem Header="Mode">
+                <MenuItem Header="Data Viewer" Click="Menu_ModeDataViewer"/>
+                <MenuItem Header="Transfer Data" Click="Menu_ModeTransfer"/>
             </MenuItem>
         </Menu>
-        <Grid Background="Black">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <DockPanel Grid.Column="0">
-                <StackPanel DockPanel.Dock="Bottom" Background="White" Height="100">
-                    <StackPanel Margin="10" Orientation="Horizontal">
-                        <CheckBox VerticalAlignment="Center" Checked="DummyFilter_Enable" Unchecked="DummyFilter_Disable"></CheckBox>
-                        <Label>Filter Dummies</Label>
-                    </StackPanel>
-                </StackPanel>
-                <ListView ItemsSource="{Binding entryList_View}" DisplayMemberPath="Name" Background="#222222" Foreground="White" SelectionChanged="ListViewItem_SelectionChange">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <!--<EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />-->
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                </ListView>
-            </DockPanel>
-            <!-- MSET BAR content -->
-            
-            <!-- Content loader -->
-            <ContentControl Grid.Column="1" Background="#2d2d2d" x:Name="contentFrame"/>
-        </Grid>
-
+        <ContentControl Background="#2d2d2d" x:Name="contentFrame"/>
     </DockPanel>
 </Window>

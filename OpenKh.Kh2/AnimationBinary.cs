@@ -5,8 +5,9 @@ namespace OpenKh.Kh2
 {
     public class AnimationBinary
     {
-        public Motion MotionFile;
-        public MotionTrigger MotionTriggerFile;
+        // NOTE: AnimationBinaries may contain RAW motion files instead of interpolated. This file uses the more common interpolated motion type.
+        public Motion.InterpolatedMotion MotionFile { get; set; }
+        public MotionTrigger MotionTriggerFile { get; set; }
 
         // BAR data
         public int MotionIndex { get; set; }
@@ -26,7 +27,8 @@ namespace OpenKh.Kh2
                 switch (barEntry.Type)
                 {
                     case Bar.EntryType.Motion:
-                        MotionFile = Motion.Read(barEntry.Stream);
+                        //MotionFile = Motion.Read(barEntry.Stream);
+                        MotionFile = new Motion.InterpolatedMotion(barEntry.Stream);
                         MotionIndex = barEntry.Index;
                         MotionName = barEntry.Name;
                         break;
@@ -79,8 +81,7 @@ namespace OpenKh.Kh2
             MotionEntry.Type = Bar.EntryType.Motion;
             MotionEntry.Index = MotionIndex;
             MotionEntry.Name = MotionName;
-            MotionEntry.Stream = new MemoryStream();
-            Motion.Write(MotionEntry.Stream, MotionFile);
+            MotionEntry.Stream = MotionFile.toStream();
 
             Bar.Entry TriggerEntry = new Bar.Entry();
             TriggerEntry.Type = Bar.EntryType.MotionTriggers;
