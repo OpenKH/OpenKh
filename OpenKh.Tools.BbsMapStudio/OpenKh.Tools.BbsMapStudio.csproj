@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net5.0-windows</TargetFramework>
+		<TargetFramework>net6.0-windows7.0</TargetFramework>
         <LangVersion>latest</LangVersion>
 		<AssemblyTitle>BBS Map Studio</AssemblyTitle>
 		<Product>BBS Map Studio - OpenKh</Product>
