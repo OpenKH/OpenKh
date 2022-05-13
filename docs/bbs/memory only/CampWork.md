@@ -6,12 +6,12 @@ This isn't a file, but a memory region in the executable.
 
 | Offset | Type  | Description
 |---------|--------|------------
-| 0x0     | CmdWork | Command Work
+| 0x0     | [CmdWork](./CmdWork.md) | Command Work
 | 0x18CA  | Unknown | Unknown
 | 0x18CB  | Unknown | Unknown
-| 0x18CC  | AbilityFlag[30] | Ability Flags
-| 0x1944  | EtcFlag[55] | Etc Flags
-| 0x197B  | HelpFlag[40] | Help Flags
+| 0x18CC  | [AbiFlag](#Ability-Flag)[30] | Ability Flags
+| 0x1944  | [EtcFlag](#Etc-Flag)[55] | Etc Flags
+| 0x197B  | [HelpFlag](#Help-Flag)[40] | Help Flags
 | 0x19A3  | NickNameWork | Nickname Work
 | 0x19C9  | Unknown | Unknown
 | 0x19CA  | Unknown | Unknown
@@ -32,3 +32,36 @@ This isn't a file, but a memory region in the executable.
 | 0x27FC  | uint16[4][2] | Arena Flag Array
 | 0x280C  | int8 | Number of Trophy Info
 | 0x280D  | uint8[7] | Padding
+
+
+### ABILITY FLAG
+
+
+| Bit     | Length | Description
+|-----|--------|------------
+| 0   | 11 | Padding
+| 11  | 3 | Master Notice
+| 14  | 2 | fgNewReport
+| 16  | 2 | fgNewCamp
+| 18  | 5 | Master On
+| 23  | 3 | Master
+| 26  | 3 | Equip
+| 29  | 3 | Total
+
+### ETC FLAG
+
+
+| Bit     | Length | Description
+|---------|--------|------------
+| 0   | 4 | Padding
+| 4   | 2 | fgNewReport
+| 6   | 2 | fgNewCamp
+
+### HELP FLAG
+
+
+| Bit     | Length | Description
+|---------|--------|------------
+| 0   | 3 | Padding
+| 3   | 3 | Category
+| 6   | 2 | fgNewCamp

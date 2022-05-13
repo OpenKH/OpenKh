@@ -62,9 +62,11 @@ Here's the full list of files that use this format.
 
 Bonuses are rewards you receive as the boss is defeated or the event is over.
 
-The type of bonus to receive. It is not possible to give two rewards of the same type.
+The type of bonus to receive.
 
-Bonuses cannot give you debug commands or abilities/enchantments.
+Bonuses cannot give you **debug commands or abilities/enchantments/d-links**. Any command style can be given at any time.
+
+**It is not possible to give two rewards of the same type.**
 
 | Value | Description
 |--------|-------
@@ -77,9 +79,13 @@ Bonuses cannot give you debug commands or abilities/enchantments.
 
 Presents are rewards you receive after the battle phase is over.
 
-The type of present to receive. Presents cannot give you debug commands or abilities/enchantments.
+This field controls the type of present to receive.
+
+Presents cannot give you **debug commands or abilities/enchantments**. Giving command styles out of order can also result in a crash.
 
 Trying to give items that don't belong to the specific character result in a crash.
+
+**It is possible to get two presents of the same type.**
 
 | Value | Description
 |--------|-------
@@ -88,6 +94,7 @@ Trying to give items that don't belong to the specific character result in a cra
 | 2     | Obtain Command
 
 ### General Path
+
 | Value | Description
 |--------|-------
 | 0     | GENERAL_PATH_START

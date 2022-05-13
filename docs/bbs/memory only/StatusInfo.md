@@ -33,3 +33,14 @@ This isn't a file, but a memory region in the executable.
 | 0xB98   | uint16 | Selected Finisher
 | 0xB9A   | uint16 | Ability Points?
 | 0xB9C   | int16[14] | Padding
+
+## STATUS INFO RELATED ENUM
+
+| Name            |      Value      |     Description
+|-----------------|----------------|------------
+| START_ARMOR_COLOR  | 0xFF808080  | 
+| ARMOR_COLOR_MIN  | 0x40  | 
+| ARMOR_COLOR_MAX  | 0xC0  | 
+| MAX_LEVEL  | 0x63 | 
+| MAX_MEDAL  | 0x1869F | 
+| MAX_MUNNIE  | 0xF423F | 
