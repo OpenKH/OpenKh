@@ -1,6 +1,7 @@
 using OpenKh.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -10,6 +11,733 @@ namespace OpenKh.Kh2
 {
     public class Motion
     {
+        /*
+         * Motions animate character models. They can be either Raw or Interpolated. They always start with 0x90 reserved bytes and the Motion Header, which defines the type of the motion.
+         * Animations use Straight Ahead animation.
+         * Raw motions start from the base pose and contain a matrix of bone animations.
+         * Interpolated start from a defined initial pose and count with Inverse Kinematic tech. To help with IK, it creates a series of extra "bones".
+         * Bones refers to the original skeleton bones.
+         * IK Helpers refers to the extra "bones".
+         * Joints refers to the list of bones and IK Helpers.
+         */
+
+        public static int baseOffset = 0x90;
+
+        /**************************************
+         * STRUCTURES
+         **************************************/
+
+        /*
+         * COMMON
+         */
+
+        public class Header
+        {
+            [Data] public int Type { get; set; } // ENUM
+            [Data] public int SubType { get; set; } // ENUM
+            [Data] public int ExtraOffset { get; set; }
+            [Data] public int ExtraSize { get; set; }
+        }
+
+        // Unknown
+        public class Extra
+        {
+            [Data] public int Type { get; set; } // ENUM
+            [Data] public float QWC { get; set; }
+            [Data(Count = 2)] public int Param { get; set; }
+        }
+
+        // Defines the limits of the animation
+        public class BoundingBox
+        {
+            [Data] public float BoundingBoxMinX { get; set; }
+            [Data] public float BoundingBoxMinY { get; set; }
+            [Data] public float BoundingBoxMinZ { get; set; }
+            [Data] public float BoundingBoxMinW { get; set; }
+            [Data] public float BoundingBoxMaxX { get; set; }
+            [Data] public float BoundingBoxMaxY { get; set; }
+            [Data] public float BoundingBoxMaxZ { get; set; }
+            [Data] public float BoundingBoxMaxW { get; set; }
+        }
+        // Defines when the animation starts, ends and loops
+        public class FrameData
+        {
+            [Data] public float FrameStart { get; set; }
+            [Data] public float FrameEnd { get; set; }
+            [Data] public float FramesPerSecond { get; set; }
+            [Data] public float FrameReturn { get; set; }
+        }
+
+        /*
+         * RAW
+         */
+
+        public class RawMotionHeader
+        {
+            [Data] public int BoneCount { get; set; }
+            [Data(Count = 3)] public uint[] Reserved { get; set; }
+            [Data] public int FrameCount { get; set; }
+            [Data] public int TotalFrameCount { get; set; }
+            [Data] public uint AnimationMatrixOffset { get; set; }
+            [Data] public uint PositionMatrixOffset { get; set; }
+            [Data] public BoundingBox BoundingBox { get; set; }
+            [Data] public FrameData FrameData { get; set; }
+        }
+
+        public class RawMotion
+        {
+            [Data] public Header MotionHeader { get; set; }
+            [Data] public RawMotionHeader RawMotionHeader { get; set; }
+            public List<Matrix4x4> AnimationMatrices { get; set; }
+            public List<Matrix4x4> PositionMatrices { get; set; }
+
+            public RawMotion(Stream stream)
+            {
+                stream.Position = baseOffset;
+
+                MotionHeader = BinaryMapping.ReadObject<Header>(stream);
+                RawMotionHeader = BinaryMapping.ReadObject<RawMotionHeader>(stream);
+
+                stream.Position = baseOffset + RawMotionHeader.AnimationMatrixOffset;
+                AnimationMatrices = new List<Matrix4x4>();
+                while (stream.Position < RawMotionHeader.PositionMatrixOffset)
+                {
+                    AnimationMatrices.Add(stream.ReadMatrix4x4());
+                }
+
+                stream.Position = baseOffset + RawMotionHeader.PositionMatrixOffset;
+                PositionMatrices = new List<Matrix4x4>();
+                while (stream.Position < MotionHeader.ExtraOffset)
+                {
+                    PositionMatrices.Add(stream.ReadMatrix4x4());
+                }
+            }
+        }
+
+        /*
+         * INTERPOLATED
+         */
+
+        public class InterpolatedMotionHeader
+        {
+            [Data] public short BoneCount { get; set; }
+            [Data] public short TotalBoneCount { get; set; } // Bones + IK Helper bones
+            [Data] public int FrameCount { get; set; }
+            [Data] public int IKHelperOffset { get; set; }
+            [Data] public int JointOffset { get; set; }
+            [Data] public int KeyTimeCount { get; set; }
+            [Data] public int InitialPoseOffset { get; set; }
+            [Data] public int InitialPoseCount { get; set; }
+            [Data] public int RootPositionOffset { get; set; }
+            [Data] public int FCurveForwardOffset { get; set; }
+            [Data] public int FCurveForwardCount { get; set; }
+            [Data] public int FCurveInverseOffset { get; set; }
+            [Data] public int FCurveInverseCount { get; set; }
+            [Data] public int FCurveKeyOffset { get; set; }
+            [Data] public int KeyTimeOffset { get; set; }
+            [Data] public int KeyValueOffset { get; set; }
+            [Data] public int KeyTangentOffset { get; set; }
+            [Data] public int ConstraintOffset { get; set; }
+            [Data] public int ConstraintCount { get; set; }
+            [Data] public int ConstraintActivationOffset { get; set; }
+            [Data] public int LimiterOffset { get; set; }
+            [Data] public int ExpressionOffset { get; set; }
+            [Data] public int ExpressionCount { get; set; }
+            [Data] public int ExpressionNodeOffset { get; set; }
+            [Data] public int ExpressionNodeCount { get; set; }
+            [Data] public BoundingBox BoundingBox { get; set; }
+            [Data] public FrameData FrameData { get; set; }
+            [Data] public int ExternalEffectorOffset { get; set; }
+            [Data(Count = 3)] public int[] Reserved { get; set; }
+        }
+
+        public class InterpolatedMotion
+        {
+            [Data] public Header MotionHeader { get; set; }
+            [Data] public InterpolatedMotionHeader InterpolatedMotionHeader { get; set; }
+            public List<InitialPose> InitialPoses { get; set; }
+            public List<FCurve> FCurvesForward { get; set; }
+            public List<FCurve> FCurvesInverse { get; set; }
+            public List<Key> FCurveKeys { get; set; }
+            public List<float> KeyTimes { get; set; }
+            public List<float> KeyValues { get; set; }
+            public List<float> KeyTangents { get; set; }
+            public List<Constraint> Constraints { get; set; }
+            public List<ConstraintActivation> ConstraintActivations { get; set; }
+            public List<Limiter> Limiters { get; set; }
+            public List<Expression> Expressions { get; set; }
+            public List<ExpressionNode> ExpressionNodes { get; set; }
+            public List<IKHelper> IKHelpers { get; set; }
+            public List<Joint> Joints { get; set; }
+            public RootPosition RootPosition { get; set; }
+            public List<ExternalEffector> ExternalEffectors { get; set; }
+
+            /**************************************
+             * CONSTRUCTORS
+             **************************************/
+
+            public InterpolatedMotion(Stream stream)
+            {
+                stream.Position = baseOffset;
+
+                MotionHeader = BinaryMapping.ReadObject<Header>(stream);
+                InterpolatedMotionHeader = BinaryMapping.ReadObject<InterpolatedMotionHeader>(stream);
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.InitialPoseOffset;
+                InitialPoses = new List<InitialPose>();
+                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.InitialPoseCount)) {
+                    InitialPoses.Add(BinaryMapping.ReadObject<InitialPose>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.FCurveForwardOffset;
+                FCurvesForward = new List<FCurve>();
+                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.FCurveForwardCount))
+                {
+                    FCurvesForward.Add(BinaryMapping.ReadObject<FCurve>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.FCurveInverseOffset;
+                FCurvesInverse = new List<FCurve>();
+                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.FCurveInverseCount))
+                {
+                    FCurvesInverse.Add(BinaryMapping.ReadObject<FCurve>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.FCurveKeyOffset;
+                FCurveKeys = new List<Key>();
+                int calcKeyCount = (InterpolatedMotionHeader.KeyTimeOffset - InterpolatedMotionHeader.FCurveKeyOffset) / 8;
+                foreach (int i in Enumerable.Range(0, calcKeyCount))
+                {
+                    FCurveKeys.Add(BinaryMapping.ReadObject<Key>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.KeyTimeOffset;
+                KeyTimes = new List<float>();
+                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.KeyTimeCount))
+                {
+                    KeyTimes.Add(stream.ReadSingle());
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.KeyValueOffset;
+                KeyValues = new List<float>();
+                while (stream.Position < baseOffset + InterpolatedMotionHeader.KeyTangentOffset)
+                {
+                    KeyValues.Add(stream.ReadSingle());
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.KeyTangentOffset;
+                KeyTangents = new List<float>();
+                while (stream.Position < baseOffset + InterpolatedMotionHeader.ConstraintOffset)
+                {
+                    KeyTangents.Add(stream.ReadSingle());
+                }
+
+                int activationCount = 0;
+                short limiterCount = -1;
+                stream.Position = baseOffset + InterpolatedMotionHeader.ConstraintOffset;
+                Constraints = new List<Constraint>();
+                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.ConstraintCount))
+                {
+                    Constraints.Add(BinaryMapping.ReadObject<Constraint>(stream));
+                    if (Constraints[i].ActivationCount != 0) {
+                        activationCount += Constraints[i].ActivationCount;
+                    }
+                    if (Constraints[i].LimiterId > limiterCount) {
+                        limiterCount = Constraints[i].LimiterId;
+                    }
+                }
+                limiterCount++;
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.ConstraintActivationOffset;
+                ConstraintActivations = new List<ConstraintActivation>();
+                foreach (int i in Enumerable.Range(0, activationCount))
+                {
+                    ConstraintActivations.Add(BinaryMapping.ReadObject<ConstraintActivation>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.LimiterOffset;
+                Limiters = new List<Limiter>();
+                foreach (int i in Enumerable.Range(0, limiterCount))
+                {
+                    Limiters.Add(BinaryMapping.ReadObject<Limiter>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.ExpressionOffset;
+                Expressions = new List<Expression>();
+                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.ExpressionCount))
+                {
+                    Expressions.Add(BinaryMapping.ReadObject<Expression>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.ExpressionNodeOffset;
+                ExpressionNodes = new List<ExpressionNode>();
+                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.ExpressionNodeCount))
+                {
+                    ExpressionNodes.Add(BinaryMapping.ReadObject<ExpressionNode>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.IKHelperOffset;
+                IKHelpers = new List<IKHelper>();
+                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.TotalBoneCount - InterpolatedMotionHeader.BoneCount))
+                {
+                    IKHelpers.Add(BinaryMapping.ReadObject<IKHelper>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.JointOffset;
+                Joints = new List<Joint>();
+                for (int i = 0; i < InterpolatedMotionHeader.TotalBoneCount; i++)
+                {
+                    Joints.Add(BinaryMapping.ReadObject<Joint>(stream));
+                }
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.RootPositionOffset;
+                RootPosition = BinaryMapping.ReadObject<RootPosition>(stream);
+
+                stream.Position = baseOffset + InterpolatedMotionHeader.ExternalEffectorOffset;
+                ExternalEffectors = new List<ExternalEffector>();
+                while (stream.Position < baseOffset + MotionHeader.ExtraOffset && stream.PeekInt16() != 0)
+                {
+                    ExternalEffectors.Add(BinaryMapping.ReadObject<ExternalEffector>(stream));
+                }
+                // Padding to 16 byte align
+            }
+
+            public Stream toStream()
+            {
+                Stream stream = new MemoryStream();
+                BinaryWriter writer = new BinaryWriter(stream);
+
+                recalcHeaderData();
+                stream.Write(new byte[baseOffset]);
+
+                BinaryMapping.WriteObject(stream, MotionHeader);
+                BinaryMapping.WriteObject(stream, InterpolatedMotionHeader);
+
+                foreach (InitialPose item in InitialPoses)
+                    BinaryMapping.WriteObject(stream, item);
+
+                foreach (FCurve item in FCurvesForward)
+                    BinaryMapping.WriteObject(stream, item);
+
+                foreach (FCurve item in FCurvesInverse)
+                    BinaryMapping.WriteObject(stream, item);
+
+                foreach (Key item in FCurveKeys)
+                    BinaryMapping.WriteObject(stream, item);
+
+                alignStreamBytes(stream, 4);
+                foreach (float item in KeyTimes)
+                    writer.Write(item);
+
+                foreach (float item in KeyValues)
+                    writer.Write(item);
+
+                foreach (float item in KeyTangents)
+                    writer.Write(item);
+
+                foreach (Constraint item in Constraints)
+                    BinaryMapping.WriteObject(stream, item);
+
+                foreach (ConstraintActivation item in ConstraintActivations)
+                    BinaryMapping.WriteObject(stream, item);
+
+                alignStreamBytes(stream, 16);
+                foreach (Limiter item in Limiters)
+                    BinaryMapping.WriteObject(stream, item);
+
+                foreach (Expression item in Expressions)
+                    BinaryMapping.WriteObject(stream, item);
+
+                foreach (ExpressionNode item in ExpressionNodes)
+                    BinaryMapping.WriteObject(stream, item);
+
+                alignStreamBytes(stream, 16);
+                foreach (IKHelper item in IKHelpers)
+                    BinaryMapping.WriteObject(stream, item);
+
+                foreach (Joint item in Joints)
+                    BinaryMapping.WriteObject(stream, item);
+
+                alignStreamBytes(stream, 16);
+                BinaryMapping.WriteObject(stream, RootPosition);
+
+                foreach (ExternalEffector item in ExternalEffectors)
+                    BinaryMapping.WriteObject(stream, item);
+                alignStreamBytes(stream, 16);
+
+                stream.Position = 0;
+                return stream;
+            }
+            public void alignStreamBytes(Stream stream, int alignToByte)
+            {
+                while (stream.Length % alignToByte != 0) {
+                    stream.WriteByte(0);
+                }
+            }
+
+            public void recalcHeaderData()
+            {
+                InterpolatedMotionHeader.TotalBoneCount = (short)(InterpolatedMotionHeader.BoneCount + IKHelpers.Count);
+
+                InterpolatedMotionHeader.InitialPoseCount = InitialPoses.Count;
+
+                InterpolatedMotionHeader.FCurveForwardOffset = InterpolatedMotionHeader.InitialPoseOffset + (InterpolatedMotionHeader.InitialPoseCount * 8);
+                InterpolatedMotionHeader.FCurveForwardCount = FCurvesForward.Count;
+
+                InterpolatedMotionHeader.FCurveInverseOffset = InterpolatedMotionHeader.FCurveForwardOffset + (InterpolatedMotionHeader.FCurveForwardCount * 6);
+                InterpolatedMotionHeader.FCurveInverseCount = FCurvesInverse.Count;
+
+                InterpolatedMotionHeader.FCurveKeyOffset = InterpolatedMotionHeader.FCurveInverseOffset + (InterpolatedMotionHeader.FCurveInverseCount * 6);
+
+                InterpolatedMotionHeader.KeyTimeOffset = InterpolatedMotionHeader.FCurveKeyOffset + (FCurveKeys.Count * 8);
+                InterpolatedMotionHeader.KeyTimeCount = KeyTimes.Count;
+                InterpolatedMotionHeader.KeyTimeOffset = alignOffsetBytes(InterpolatedMotionHeader.KeyTimeOffset, 4);
+
+                InterpolatedMotionHeader.KeyValueOffset = InterpolatedMotionHeader.KeyTimeOffset + (InterpolatedMotionHeader.KeyTimeCount * 4);
+
+                InterpolatedMotionHeader.KeyTangentOffset = InterpolatedMotionHeader.KeyValueOffset + (KeyValues.Count * 4);
+
+                InterpolatedMotionHeader.ConstraintOffset = InterpolatedMotionHeader.KeyTangentOffset + (KeyTangents.Count * 4);
+                InterpolatedMotionHeader.ConstraintCount = Constraints.Count;
+
+                InterpolatedMotionHeader.ConstraintActivationOffset = InterpolatedMotionHeader.ConstraintOffset + (InterpolatedMotionHeader.ConstraintCount * 12);
+
+                InterpolatedMotionHeader.LimiterOffset = InterpolatedMotionHeader.ConstraintActivationOffset + (ConstraintActivations.Count * 8);
+                InterpolatedMotionHeader.LimiterOffset = alignOffsetBytes(InterpolatedMotionHeader.LimiterOffset, 16);
+
+                InterpolatedMotionHeader.ExpressionOffset = InterpolatedMotionHeader.LimiterOffset + (Limiters.Count * 48);
+                InterpolatedMotionHeader.ExpressionCount = Expressions.Count;
+
+                InterpolatedMotionHeader.ExpressionNodeOffset = InterpolatedMotionHeader.ExpressionOffset + (InterpolatedMotionHeader.ExpressionCount * 8);
+                InterpolatedMotionHeader.ExpressionNodeCount = ExpressionNodes.Count;
+
+                InterpolatedMotionHeader.IKHelperOffset = InterpolatedMotionHeader.ExpressionNodeOffset + (InterpolatedMotionHeader.ExpressionNodeCount * 12);
+                InterpolatedMotionHeader.IKHelperOffset = alignOffsetBytes(InterpolatedMotionHeader.IKHelperOffset, 16);
+
+                InterpolatedMotionHeader.JointOffset = InterpolatedMotionHeader.IKHelperOffset + (IKHelpers.Count * 64);
+
+                InterpolatedMotionHeader.RootPositionOffset = InterpolatedMotionHeader.JointOffset + (Joints.Count * 4);
+                InterpolatedMotionHeader.RootPositionOffset = alignOffsetBytes(InterpolatedMotionHeader.RootPositionOffset, 16);
+
+                InterpolatedMotionHeader.ExternalEffectorOffset = InterpolatedMotionHeader.RootPositionOffset + 84;
+
+                MotionHeader.ExtraOffset = InterpolatedMotionHeader.ExternalEffectorOffset + (ExternalEffectors.Count * 2);
+                MotionHeader.ExtraOffset = alignOffsetBytes(MotionHeader.ExtraOffset, 16);
+            }
+            public int alignOffsetBytes(int offset, int alignToByte)
+            {
+                while (offset % alignToByte != 0) {
+                    offset++;
+                }
+                return offset;
+            }
+        }
+
+        public class InitialPose
+        {
+            [Data] public short BoneId { get; set; }
+            [Data] public short Channel { get; set; } // ENUM
+            [Data] public float Value { get; set; }
+
+            public override string ToString() =>
+                $"{BoneId} {Transforms[Channel]} {Value}";
+        }
+        public class FCurve
+        {
+            [Data] public short JointId { get; set; } // Either Bone ID or IK Helper ID starting from 0 for both types
+            [Data] public byte Channel { get; set; } // ENUM. 4b channel + 2b pre + 2b post
+            [Data] public byte KeyCount { get; set; }
+            [Data] public short KeyStartId { get; set; }
+
+            public override string ToString() =>
+                $"{JointId} {Transforms[Channel]} ({KeyStartId} - {KeyStartId + KeyCount -1})";
+        }
+        public class Key
+        {
+            [Data] public short Type_Time { get; set; }
+            [Data] public short ValueId { get; set; }
+            [Data] public short LeftTangentId { get; set; }
+            [Data] public short RightTangentId { get; set; }
+
+            public short Type { get { return (short)(Type_Time & 0xC000); } set { Type_Time = (short)(TimeId + value & 0xC000); } } // Interpolation type ENUM
+            public short TimeId { get { return (short)(Type_Time & 0x3FFF); } set { Type_Time = (short)(Type + value & 0x3FFF); } } // Keyframe
+        }
+        public class Constraint
+        {
+            [Data] public byte Type { get; set; } // ENUM
+            [Data] public byte TemporaryActiveFlag { get; set; }
+            [Data] public short ConstrainedJointId { get; set; } // Joint being constrained. Either Bone ID or IK Helper ID starting from last bone
+            [Data] public short SourceJointId { get; set; } // Source joint of the constrain. Either Bone ID or IK Helper ID starting from last bone
+            [Data] public short LimiterId { get; set; }
+            [Data] public short ActivationCount { get; set; }
+            [Data] public short ActivationStartId { get; set; }
+        }
+
+        public class ConstraintActivation
+        {
+            [Data] public float Time { get; set; }
+            [Data] public int Active { get; set; }
+        }
+
+        public class Limiter
+        {
+            [Data] public int Flags { get; set; }
+            [Data] public int Padding { get; set; }
+            [Data] public float DampingWidth { get; set; }
+            [Data] public float DampingStrength { get; set; }
+            [Data] public float MinX { get; set; }
+            [Data] public float MinY { get; set; }
+            [Data] public float MinZ { get; set; }
+            [Data] public float MinW { get; set; }
+            [Data] public float MaxX { get; set; }
+            [Data] public float MaxY { get; set; }
+            [Data] public float MaxZ { get; set; }
+            [Data] public float MaxW { get; set; }
+
+            /*
+             * NOT WORTH PARSING
+             * FLAGS:
+             * type 3b
+             * global 1b
+             * xmin/xmax/ymin/ymax/zmin/zmax 1b each
+             * reserved 22b
+             * 
+             * TYPES:
+             * ROT = 0, SPHERE = 1, BOX = 2
+             */
+        }
+
+        public class Expression
+        {
+            [Data] public short TargetId { get; set; } // IK Helper ID starting from last bone
+            [Data] public short TargetChannel { get; set; } // ENUM
+            [Data] public short Reserved { get; set; }
+            [Data] public short NodeId { get; set; }
+        }
+
+        public class ExpressionNode
+        {
+            [Data] public int Data { get; set; }
+            [Data] public float Value { get; set; }
+            [Data] public short CAR { get; set; }
+            [Data] public short CDR { get; set; }
+            public int type { get { return (int)(Data & 0xF000); } set { Data = (int)(((Data - type) + (value & 0xF000))); } }  // ENUM
+            /*
+             * NOT WORTH PARSING
+             * DATA:
+             * type 8b
+             * isGlobal 1b
+             * reserved 7b
+             * element 16b
+             */
+        }
+
+        public class IKHelper
+        {
+            [Data] public short Index { get; set; }
+            [Data] public short SiblingId { get; set; }
+            [Data] public short ParentId { get; set; }
+            [Data] public short ChildId { get; set; }
+            [Data] public int Reserved { get; set; }
+            [Data] public int Flags { get; set; }
+            [Data] public float ScaleX { get; set; }
+            [Data] public float ScaleY { get; set; }
+            [Data] public float ScaleZ { get; set; }
+            [Data] public float ScaleW { get; set; }
+            [Data] public float RotateX { get; set; }
+            [Data] public float RotateY { get; set; }
+            [Data] public float RotateZ { get; set; }
+            [Data] public float RotateW { get; set; }
+            [Data] public float TranslateX { get; set; }
+            [Data] public float TranslateY { get; set; }
+            [Data] public float TranslateZ { get; set; }
+            [Data] public float TranslateW { get; set; }
+            /*
+             * NOT WORTH PARSING
+             * FLAGS:
+             * unknown 10b
+             * reserved 19b
+             * enableBias 1b
+             * below 1b
+             * terminate 1b
+             */
+        }
+        public class Joint
+        {
+            [Data] public short JointId { get; set; } // Either Bone ID or IK Helper ID starting from last bone
+            [Data] public byte Flags { get; set; }
+            [Data] public byte Reserved { get; set; }
+            public byte IK { get { return (byte)(Flags & 0xC); } set { Flags = (byte)(((Flags - IK) + (value & 0xC))); } }
+            public byte extEffector { get { return (byte)(Flags & 0x1); } set { Flags = (byte)(((Flags - IK) + (value & 0x1))); } }
+            public byte calculated { get { return (byte)(Flags & 0x4); } set { Flags = (byte)(((Flags - IK) + (value & 0x4))); } }
+            /*
+             * NOT WORTH PARSING
+             * FLAGS:
+             * ik 2b
+             * trans 1b
+             * rotation 1b
+             * fixed 1b
+             * calculated 1b
+             * calcMatrix2Rot 1b
+             * extEffector 1b
+             */
+
+            public Joint() { }
+            public Joint(short jointId)
+            {
+                this.JointId = jointId;
+                Flags = 0;
+                Reserved = 0;
+            }
+
+            public override string ToString() =>
+                $"{JointId} Flag:{Flags} IK:{IK}";
+        }
+        public class RootPosition
+        {
+            [Data] public float ScaleX { get; set; }
+            [Data] public float ScaleY { get; set; }
+            [Data] public float ScaleZ { get; set; }
+            [Data] public int NotUnit { get; set; }
+            [Data] public float RotateX { get; set; }
+            [Data] public float RotateY { get; set; }
+            [Data] public float RotateZ { get; set; }
+            [Data] public float RotateW { get; set; }
+            [Data] public float TranslateX { get; set; }
+            [Data] public float TranslateY { get; set; }
+            [Data] public float TranslateZ { get; set; }
+            [Data] public float TranslateW { get; set; }
+            [Data(Count = 9)] public int[] FCurveId { get; set; } // F Curve Id from both forward and inverse
+        }
+        public class ExternalEffector
+        {
+            [Data] public short JointId { get; set; }
+        }
+
+        /**************************************
+         * ENUMS
+         **************************************/
+
+        public enum MotionType
+        {
+            INTERPOLATED = 0,
+            RAW = 1,
+        }
+        public enum MotionSubType
+        {
+            NORMAL = 0,
+            IGNORE_SCALE = 1,
+        }
+        public enum ExtraType
+        {
+            WEAPON_CNS = 0,
+            TERMINATE = 1,
+        }
+        public enum KeyType
+        {
+            CONSTANT = 0,
+            LINEAR = 1,
+            HERMITE = 2,
+        }
+        public enum Channel
+        {
+            SCALE_X = 0,
+            SCALE_Y = 1,
+            SCALE_Z = 2,
+            ROTATATION_X = 3,
+            ROTATATION_Y = 4,
+            ROTATATION_Z = 5,
+            TRANSLATION_X = 6,
+            TRANSLATION_Y = 7,
+            TRANSLATION_Z = 8,
+            UNKNOWN = -1,
+        }
+        public enum ConstraintType
+        {
+            POS = 0,
+            PATH = 1,
+            ORI = 2,
+            DIR = 3,
+            UPVCT = 4,
+            TWO_PNTS = 5,
+            SCL = 6,
+            CAM = 7,
+            CAM_PATH = 8,
+            INT_PATH = 9,
+            INT = 10,
+            CAM_UPVCT = 11,
+            POS_LIM = 12,
+            ROT_LIM = 13,
+        }
+        public enum ExpressionType
+        {
+            FUNC_SIN = 0,
+            FUNC_COS = 1,
+            FUNC_TAN = 2,
+            FUNC_ASIN = 3,
+            FUNC_ACOS = 4,
+            FUNC_ATAN = 5,
+            FUNC_LOG = 6,
+            FUNC_EXP = 7,
+            FUNC_ABS = 8,
+            FUNC_POW = 9,
+            FUNC_SQRT = 10,
+            FUNC_MIN = 11,
+            FUNC_MAX = 12,
+            FUNC_AV = 13,
+            FUNC_COND = 14,
+            FUNC_AT_FRAME = 15,
+            FUNC_CTR_DIST = 16,
+            FUNC_FMOD = 17,
+            OP_PLUS = 18,
+            OP_MINUS = 19,
+            OP_MUL = 20,
+            OP_DIV = 21,
+            OP_MOD = 22,
+            OP_EQ = 23,
+            OP_GT = 24,
+            OP_GE = 25,
+            OP_LT = 26,
+            OP_LE = 27,
+            OP_AND = 28,
+            OP_OR = 29,
+            VARIABLE_FC = 30,
+            CONSTANT_NUM = 31,
+            FCURVE_ETRNX = 32,
+            FCURVE_ETRNY = 33,
+            FCURVE_ETRNZ = 34,
+            FCURVE_ROTX = 35,
+            FCURVE_ROTY = 36,
+            FCURVE_ROTZ = 37,
+            FCURVE_SCALX = 38,
+            FCURVE_SCALY = 39,
+            FCURVE_SCALZ = 40,
+            LIST = 41,
+            ELEMENT_NAME = 42,
+            FUNC_AT_FRAME_ROT = 43,
+            EXPR_UNKNOWN = -1,
+        }
+
+        public static bool isInterpolated(Stream stream)
+        {
+            stream.Position = baseOffset;
+            int type = stream.ReadByte();
+            stream.Position = 0;
+
+            if (type == 0)
+                return true;
+            else
+                return false;
+        }
+
+        /**************************************
+         * OLD VERSION
+         * Kept for multiple reasons.
+         * - The new version has a complete parsing of the files, however the old version has some good ideas that ideally would be implemented in the new version to keep only 1 version.
+         * - Compatibility with older tools (Engine) which parses a motion wether it is raw or interpolated. In the new version the type of motion has to be checked before parsing to one or the other.
+         * - The old version stores the times/values/tangents directly in the keys, which makes it easier to work with but harder to parse, since in the original structure they are stored in their own tables.
+         **************************************/
+
         private class PoolValues<T>
         {
             private readonly Dictionary<T, int> _valuePool = new Dictionary<T, int>();
@@ -64,7 +792,7 @@ namespace OpenKh.Kh2
             Hermite4, // unused?
         }
 
-        private class Header
+        private class Header_Old
         {
             [Data] public int Version { get; set; }
             [Data] public int Unk04 { get; set; }
@@ -98,7 +826,7 @@ namespace OpenKh.Kh2
             public List<Matrix4x4[]> Matrices { get; set; }
         }
 
-        public class RawMotion
+        public class RawMotion_OLD
         {
             public int BoneCount { get; set; }
             public int Unk28 { get; set; }
@@ -165,7 +893,7 @@ namespace OpenKh.Kh2
             [Data] public int Unk9c { get; set; }
         }
 
-        public class InterpolatedMotion
+        public class InterpolatedMotion_OLD
         {
             public short BoneCount { get; set; }
             public int TotalFrameCount { get; set; }
@@ -185,7 +913,7 @@ namespace OpenKh.Kh2
             public int Unk98 { get; set; }
             public int Unk9c { get; set; }
 
-            public List<StaticPoseTable> StaticPose { get; set; }
+            public List<InitialPose> StaticPose { get; set; }
             public List<BoneAnimationTable> ModelBoneAnimation { get; set; }
             public List<BoneAnimationTable> IKHelperAnimation { get; set; }
             public List<TimelineTable> Timeline { get; set; }
@@ -198,15 +926,7 @@ namespace OpenKh.Kh2
             public FooterTable Footer { get; set; }
         }
 
-        public class StaticPoseTable
-        {
-            [Data] public short BoneIndex { get; set; }
-            [Data] public short Channel { get; set; }
-            [Data] public float Value { get; set; }
-
-            public override string ToString() =>
-                $"{BoneIndex} {Transforms[Channel]} {Value}";
-        }
+        
 
         public class BoneAnimationTableInternal
         {
@@ -341,21 +1061,21 @@ namespace OpenKh.Kh2
         public bool UnkFlag { get; set; }
         public bool IsRaw { get; }
 
-        public RawMotion Raw { get; }
-        public InterpolatedMotion Interpolated { get; }
+        public RawMotion_OLD Raw { get; }
+        public InterpolatedMotion_OLD Interpolated { get; }
 
         private Motion(Stream stream)
         {
             stream.Position += ReservedSize;
 
-            var header = BinaryMapping.ReadObject<Header>(stream);
+            var header = BinaryMapping.ReadObject<Header_Old>(stream);
             IsRaw = header.Version == 1;
             UnkFlag = header.Unk04 != 0;
 
             if (IsRaw)
             {
                 var raw = BinaryMapping.ReadObject<RawMotionInternal>(stream);
-                Raw = new RawMotion
+                Raw = new RawMotion_OLD
                 {
                     BoneCount = raw.BoneCount,
                     Unk28 = raw.Unk28,
@@ -398,7 +1118,7 @@ namespace OpenKh.Kh2
             {
                 var reader = new BinaryReader(stream);
                 var motion = BinaryMapping.ReadObject<InterpolatedMotionInternal>(stream);
-                Interpolated = new InterpolatedMotion
+                Interpolated = new InterpolatedMotion_OLD
                 {
                     BoneCount = motion.BoneCount,
                     TotalFrameCount = motion.TotalFrameCount,
@@ -422,7 +1142,7 @@ namespace OpenKh.Kh2
                 stream.Position = ReservedSize + motion.StaticPoseOffset;
                 Interpolated.StaticPose = Enumerable
                     .Range(0, motion.StaticPoseCount)
-                    .Select(x => BinaryMapping.ReadObject<StaticPoseTable>(stream))
+                    .Select(x => BinaryMapping.ReadObject<InitialPose>(stream))
                     .ToList();
 
                 stream.Position = ReservedSize + motion.ModelBoneAnimationOffset;
@@ -532,12 +1252,12 @@ namespace OpenKh.Kh2
                 Write(stream, motion.Interpolated, motion.UnkFlag);
         }
 
-        private static void Write(Stream stream, RawMotion rawMotion, bool unkFlag)
+        private static void Write(Stream stream, RawMotion_OLD rawMotion, bool unkFlag)
         {
             const int HeaderSize = 0x60;
 
             stream.Write(new byte[ReservedSize], 0, ReservedSize);
-            BinaryMapping.WriteObject(stream, new Header
+            BinaryMapping.WriteObject(stream, new Header_Old
             {
                 Version = 1,
                 Unk04 = unkFlag ? 1 : 0,
@@ -580,7 +1300,7 @@ namespace OpenKh.Kh2
                 stream.Write(rawMotion.Matrices2[i]);
         }
 
-        private static void Write(Stream stream, InterpolatedMotion motion, bool unkFlag)
+        private static void Write(Stream stream, InterpolatedMotion_OLD motion, bool unkFlag)
         {
             var valuePool = new PoolValues<float>();
             var keyFramePool = new PoolValues<float>(motion.Timeline.Select(x => x.KeyFrame).Distinct().OrderBy(x => x));
@@ -620,7 +1340,7 @@ namespace OpenKh.Kh2
             };
 
             stream.Write(new byte[ReservedSize], 0, ReservedSize);
-            BinaryMapping.WriteObject(stream, new Header { });
+            BinaryMapping.WriteObject(stream, new Header_Old { });
             BinaryMapping.WriteObject(stream, new InterpolatedMotionInternal { });
 
             header.StaticPoseCount = motion.StaticPose.Count;
@@ -700,7 +1420,7 @@ namespace OpenKh.Kh2
             stream.SetLength(stream.Position);
 
             stream.SetPosition(ReservedSize);
-            BinaryMapping.WriteObject(stream, new Header
+            BinaryMapping.WriteObject(stream, new Header_Old
             {
                 Version = 0,
                 Unk04 = unkFlag ? 1 : 0,
@@ -733,14 +1453,14 @@ namespace OpenKh.Kh2
             IsRaw = isRaw;
             if (isRaw)
             {
-                Raw = new RawMotion
+                Raw = new RawMotion_OLD
                 {
                     Matrices = new List<Matrix4x4[]>(),
                 };
             }
             else
             {
-                Interpolated = new InterpolatedMotion
+                Interpolated = new InterpolatedMotion_OLD
                 {
                     Footer = new FooterTable(),
                     IKChains = new List<IKChainTable>(),
@@ -748,7 +1468,7 @@ namespace OpenKh.Kh2
                     IKHelpers = new List<IKHelperTable>(),
                     Joints = new List<JointTable>(),
                     ModelBoneAnimation = new List<BoneAnimationTable>(),
-                    StaticPose = new List<StaticPoseTable>(),
+                    StaticPose = new List<InitialPose>(),
                     Table6 = new List<UnknownTable6>(),
                     Table7 = new List<UnknownTable7>(),
                     Table8 = new List<UnknownTable8>(),
