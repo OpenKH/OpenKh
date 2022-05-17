@@ -88,7 +88,7 @@ namespace OpenKh.Tools.ItcEditor
             this.LoadITCButton.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.LoadITCButton.Location = new System.Drawing.Point(13, 13);
             this.LoadITCButton.Name = "LoadITCButton";
-            this.LoadITCButton.Size = new System.Drawing.Size(75, 23);
+            this.LoadITCButton.Size = new System.Drawing.Size(75, 32);
             this.LoadITCButton.TabIndex = 0;
             this.LoadITCButton.Text = "Load ITC";
             this.LoadITCButton.UseVisualStyleBackColor = true;
@@ -99,7 +99,7 @@ namespace OpenKh.Tools.ItcEditor
             this.SaveITCButton.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.SaveITCButton.Location = new System.Drawing.Point(94, 12);
             this.SaveITCButton.Name = "SaveITCButton";
-            this.SaveITCButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveITCButton.Size = new System.Drawing.Size(75, 32);
             this.SaveITCButton.TabIndex = 1;
             this.SaveITCButton.Text = "Save as...";
             this.SaveITCButton.UseVisualStyleBackColor = true;
@@ -123,11 +123,11 @@ namespace OpenKh.Tools.ItcEditor
             this.ItcTabControl.Controls.Add(this.TabVS);
             this.ItcTabControl.Controls.Add(this.TabBD);
             this.ItcTabControl.Controls.Add(this.TabWM);
-            this.ItcTabControl.ItemSize = new System.Drawing.Size(40, 20);
-            this.ItcTabControl.Location = new System.Drawing.Point(12, 42);
+            this.ItcTabControl.ItemSize = new System.Drawing.Size(40, 24);
+            this.ItcTabControl.Location = new System.Drawing.Point(12, 61);
             this.ItcTabControl.Name = "ItcTabControl";
             this.ItcTabControl.SelectedIndex = 0;
-            this.ItcTabControl.Size = new System.Drawing.Size(645, 390);
+            this.ItcTabControl.Size = new System.Drawing.Size(676, 399);
             this.ItcTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.ItcTabControl.TabIndex = 2;
             // 
@@ -137,19 +137,24 @@ namespace OpenKh.Tools.ItcEditor
             this.TabDP.BackColor = System.Drawing.Color.White;
             this.TabDP.Controls.Add(this.FlowDP);
             this.TabDP.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.TabDP.Location = new System.Drawing.Point(4, 24);
+            this.TabDP.Location = new System.Drawing.Point(4, 28);
             this.TabDP.Name = "TabDP";
-            this.TabDP.Size = new System.Drawing.Size(637, 362);
+            this.TabDP.Size = new System.Drawing.Size(668, 367);
             this.TabDP.TabIndex = 0;
             this.TabDP.Text = "DP";
             // 
             // FlowDP
             // 
+            this.FlowDP.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowDP.AutoScroll = true;
+            this.FlowDP.AutoSize = true;
+            this.FlowDP.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.FlowDP.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowDP.Location = new System.Drawing.Point(3, 3);
             this.FlowDP.Name = "FlowDP";
-            this.FlowDP.Size = new System.Drawing.Size(631, 356);
+            this.FlowDP.Size = new System.Drawing.Size(0, 0);
             this.FlowDP.TabIndex = 0;
             // 
             // TabSW
@@ -452,19 +457,20 @@ namespace OpenKh.Tools.ItcEditor
             this.FlowWM.Size = new System.Drawing.Size(631, 356);
             this.FlowWM.TabIndex = 1;
             // 
-            // Form1
+            // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(664, 441);
+            this.ClientSize = new System.Drawing.Size(714, 483);
             this.Controls.Add(this.ItcTabControl);
             this.Controls.Add(this.SaveITCButton);
             this.Controls.Add(this.LoadITCButton);
             this.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "ITC Editor (Item Collection)";
             this.ItcTabControl.ResumeLayout(false);
             this.TabDP.ResumeLayout(false);
+            this.TabDP.PerformLayout();
             this.TabSW.ResumeLayout(false);
             this.TabCD.ResumeLayout(false);
             this.TabSB.ResumeLayout(false);

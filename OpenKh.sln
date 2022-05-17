@@ -195,8 +195,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2MdlxEditor", "OpenKh.Tools.Kh2MdlxEditor\OpenKh.Tools.Kh2MdlxEditor.csproj", "{101C4A12-CAA4-4CF1-B9CC-59957165E0BA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2MsetEditor", "OpenKh.Tools.Kh2MsetEditor\OpenKh.Tools.Kh2MsetEditor.csproj", "{1F02AC54-9FC2-4922-B2DA-E76BC41E95C6}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.Common.Wpf", "OpenKh.Tools.Common.WPF\OpenKh.Tools.Common.Wpf.csproj", "{1D12643E-5707-406E-872D-1D66CE14ECA0}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.PMORetarget", "OpenKh.Tools.PMORetarget\OpenKh.Tools.PMORetarget.csproj", "{D6AAB571-811B-47EF-9DF3-19B68E492A58}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.PMORetarget", "OpenKh.Tools.PMORetarget\OpenKh.Tools.PMORetarget.csproj", "{D6AAB571-811B-47EF-9DF3-19B68E492A58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

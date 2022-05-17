@@ -52,9 +52,10 @@ namespace OpenKh.Tools.IteEditor
             // LoadITEButton
             // 
             this.LoadITEButton.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.LoadITEButton.Location = new System.Drawing.Point(13, 13);
+            this.LoadITEButton.Location = new System.Drawing.Point(19, 22);
+            this.LoadITEButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.LoadITEButton.Name = "LoadITEButton";
-            this.LoadITEButton.Size = new System.Drawing.Size(75, 23);
+            this.LoadITEButton.Size = new System.Drawing.Size(107, 38);
             this.LoadITEButton.TabIndex = 0;
             this.LoadITEButton.Text = "Load ITE";
             this.LoadITEButton.UseVisualStyleBackColor = true;
@@ -70,10 +71,13 @@ namespace OpenKh.Tools.IteEditor
             this.ITETabControl.Controls.Add(this.TabKeyItem);
             this.ITETabControl.Controls.Add(this.TabKeyItemHide);
             this.ITETabControl.Controls.Add(this.TabSynthesis);
-            this.ITETabControl.Location = new System.Drawing.Point(0, 50);
+            this.ITETabControl.ItemSize = new System.Drawing.Size(94, 30);
+            this.ITETabControl.Location = new System.Drawing.Point(0, 83);
+            this.ITETabControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ITETabControl.Name = "ITETabControl";
+            this.ITETabControl.Padding = new System.Drawing.Point(10, 3);
             this.ITETabControl.SelectedIndex = 0;
-            this.ITETabControl.Size = new System.Drawing.Size(577, 375);
+            this.ITETabControl.Size = new System.Drawing.Size(824, 625);
             this.ITETabControl.TabIndex = 2;
             // 
             // TabWeapons
@@ -81,10 +85,11 @@ namespace OpenKh.Tools.IteEditor
             this.TabWeapons.AutoScroll = true;
             this.TabWeapons.Controls.Add(this.FlowWeapons);
             this.TabWeapons.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.TabWeapons.Location = new System.Drawing.Point(4, 24);
+            this.TabWeapons.Location = new System.Drawing.Point(4, 34);
+            this.TabWeapons.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TabWeapons.Name = "TabWeapons";
-            this.TabWeapons.Padding = new System.Windows.Forms.Padding(3);
-            this.TabWeapons.Size = new System.Drawing.Size(569, 347);
+            this.TabWeapons.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.TabWeapons.Size = new System.Drawing.Size(816, 587);
             this.TabWeapons.TabIndex = 0;
             this.TabWeapons.Text = "Weapons";
             this.TabWeapons.UseVisualStyleBackColor = true;
@@ -97,9 +102,10 @@ namespace OpenKh.Tools.IteEditor
             this.FlowWeapons.AutoScroll = true;
             this.FlowWeapons.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.FlowWeapons.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.FlowWeapons.Location = new System.Drawing.Point(3, 3);
+            this.FlowWeapons.Location = new System.Drawing.Point(4, 5);
+            this.FlowWeapons.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.FlowWeapons.Name = "FlowWeapons";
-            this.FlowWeapons.Size = new System.Drawing.Size(563, 341);
+            this.FlowWeapons.Size = new System.Drawing.Size(803, 566);
             this.FlowWeapons.TabIndex = 0;
             // 
             // TabFlavors
@@ -107,10 +113,11 @@ namespace OpenKh.Tools.IteEditor
             this.TabFlavors.AutoScroll = true;
             this.TabFlavors.Controls.Add(this.FlowFlavors);
             this.TabFlavors.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.TabFlavors.Location = new System.Drawing.Point(4, 24);
+            this.TabFlavors.Location = new System.Drawing.Point(4, 34);
+            this.TabFlavors.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TabFlavors.Name = "TabFlavors";
-            this.TabFlavors.Padding = new System.Windows.Forms.Padding(3);
-            this.TabFlavors.Size = new System.Drawing.Size(569, 347);
+            this.TabFlavors.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.TabFlavors.Size = new System.Drawing.Size(816, 587);
             this.TabFlavors.TabIndex = 1;
             this.TabFlavors.Text = "Flavors";
             this.TabFlavors.UseVisualStyleBackColor = true;
@@ -123,9 +130,10 @@ namespace OpenKh.Tools.IteEditor
             this.FlowFlavors.AutoScroll = true;
             this.FlowFlavors.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.FlowFlavors.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.FlowFlavors.Location = new System.Drawing.Point(3, 3);
+            this.FlowFlavors.Location = new System.Drawing.Point(4, 5);
+            this.FlowFlavors.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.FlowFlavors.Name = "FlowFlavors";
-            this.FlowFlavors.Size = new System.Drawing.Size(558, 336);
+            this.FlowFlavors.Size = new System.Drawing.Size(797, 560);
             this.FlowFlavors.TabIndex = 1;
             // 
             // TabKeyItem
@@ -133,9 +141,10 @@ namespace OpenKh.Tools.IteEditor
             this.TabKeyItem.AutoScroll = true;
             this.TabKeyItem.Controls.Add(this.FlowKeyItem);
             this.TabKeyItem.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.TabKeyItem.Location = new System.Drawing.Point(4, 24);
+            this.TabKeyItem.Location = new System.Drawing.Point(4, 34);
+            this.TabKeyItem.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TabKeyItem.Name = "TabKeyItem";
-            this.TabKeyItem.Size = new System.Drawing.Size(569, 347);
+            this.TabKeyItem.Size = new System.Drawing.Size(816, 587);
             this.TabKeyItem.TabIndex = 2;
             this.TabKeyItem.Text = "Key Item";
             this.TabKeyItem.UseVisualStyleBackColor = true;
@@ -148,9 +157,10 @@ namespace OpenKh.Tools.IteEditor
             this.FlowKeyItem.AutoScroll = true;
             this.FlowKeyItem.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.FlowKeyItem.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.FlowKeyItem.Location = new System.Drawing.Point(3, 3);
+            this.FlowKeyItem.Location = new System.Drawing.Point(4, 5);
+            this.FlowKeyItem.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.FlowKeyItem.Name = "FlowKeyItem";
-            this.FlowKeyItem.Size = new System.Drawing.Size(558, 336);
+            this.FlowKeyItem.Size = new System.Drawing.Size(797, 560);
             this.FlowKeyItem.TabIndex = 1;
             // 
             // TabKeyItemHide
@@ -158,9 +168,10 @@ namespace OpenKh.Tools.IteEditor
             this.TabKeyItemHide.AutoScroll = true;
             this.TabKeyItemHide.Controls.Add(this.FlowKeyItemHide);
             this.TabKeyItemHide.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.TabKeyItemHide.Location = new System.Drawing.Point(4, 24);
+            this.TabKeyItemHide.Location = new System.Drawing.Point(4, 34);
+            this.TabKeyItemHide.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TabKeyItemHide.Name = "TabKeyItemHide";
-            this.TabKeyItemHide.Size = new System.Drawing.Size(569, 347);
+            this.TabKeyItemHide.Size = new System.Drawing.Size(816, 587);
             this.TabKeyItemHide.TabIndex = 3;
             this.TabKeyItemHide.Text = "Key Item Hide";
             this.TabKeyItemHide.UseVisualStyleBackColor = true;
@@ -173,9 +184,10 @@ namespace OpenKh.Tools.IteEditor
             this.FlowKeyItemHide.AutoScroll = true;
             this.FlowKeyItemHide.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.FlowKeyItemHide.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.FlowKeyItemHide.Location = new System.Drawing.Point(8, 3);
+            this.FlowKeyItemHide.Location = new System.Drawing.Point(11, 5);
+            this.FlowKeyItemHide.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.FlowKeyItemHide.Name = "FlowKeyItemHide";
-            this.FlowKeyItemHide.Size = new System.Drawing.Size(553, 336);
+            this.FlowKeyItemHide.Size = new System.Drawing.Size(790, 560);
             this.FlowKeyItemHide.TabIndex = 1;
             // 
             // TabSynthesis
@@ -183,9 +195,10 @@ namespace OpenKh.Tools.IteEditor
             this.TabSynthesis.AutoScroll = true;
             this.TabSynthesis.Controls.Add(this.FlowSynthesis);
             this.TabSynthesis.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.TabSynthesis.Location = new System.Drawing.Point(4, 24);
+            this.TabSynthesis.Location = new System.Drawing.Point(4, 34);
+            this.TabSynthesis.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TabSynthesis.Name = "TabSynthesis";
-            this.TabSynthesis.Size = new System.Drawing.Size(569, 347);
+            this.TabSynthesis.Size = new System.Drawing.Size(816, 587);
             this.TabSynthesis.TabIndex = 4;
             this.TabSynthesis.Text = "Synthesis";
             this.TabSynthesis.UseVisualStyleBackColor = true;
@@ -198,18 +211,20 @@ namespace OpenKh.Tools.IteEditor
             this.FlowSynthesis.AutoScroll = true;
             this.FlowSynthesis.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.FlowSynthesis.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.FlowSynthesis.Location = new System.Drawing.Point(3, 3);
+            this.FlowSynthesis.Location = new System.Drawing.Point(4, 5);
+            this.FlowSynthesis.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.FlowSynthesis.Name = "FlowSynthesis";
-            this.FlowSynthesis.Size = new System.Drawing.Size(558, 336);
+            this.FlowSynthesis.Size = new System.Drawing.Size(797, 560);
             this.FlowSynthesis.TabIndex = 1;
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(577, 425);
+            this.ClientSize = new System.Drawing.Size(824, 708);
             this.Controls.Add(this.ITETabControl);
             this.Controls.Add(this.LoadITEButton);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "MainForm";
             this.Text = "ITE Viewer";
             this.ITETabControl.ResumeLayout(false);

@@ -89,7 +89,7 @@ namespace OpenKh.Tools.ItbEditor
             this.LoadITBButton.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.LoadITBButton.Location = new System.Drawing.Point(13, 13);
             this.LoadITBButton.Name = "LoadITBButton";
-            this.LoadITBButton.Size = new System.Drawing.Size(75, 23);
+            this.LoadITBButton.Size = new System.Drawing.Size(75, 32);
             this.LoadITBButton.TabIndex = 0;
             this.LoadITBButton.Text = "Load ITB";
             this.LoadITBButton.UseVisualStyleBackColor = true;
@@ -101,7 +101,7 @@ namespace OpenKh.Tools.ItbEditor
             this.SaveITBButton.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.SaveITBButton.Location = new System.Drawing.Point(94, 13);
             this.SaveITBButton.Name = "SaveITBButton";
-            this.SaveITBButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveITBButton.Size = new System.Drawing.Size(75, 32);
             this.SaveITBButton.TabIndex = 1;
             this.SaveITBButton.Text = "Save as...";
             this.SaveITBButton.UseVisualStyleBackColor = true;
@@ -128,11 +128,11 @@ namespace OpenKh.Tools.ItbEditor
             this.ItbTabControl.Controls.Add(this.TabVS);
             this.ItbTabControl.Controls.Add(this.TabBD);
             this.ItbTabControl.Controls.Add(this.TabWM);
-            this.ItbTabControl.ItemSize = new System.Drawing.Size(40, 20);
-            this.ItbTabControl.Location = new System.Drawing.Point(12, 42);
+            this.ItbTabControl.ItemSize = new System.Drawing.Size(40, 26);
+            this.ItbTabControl.Location = new System.Drawing.Point(12, 50);
             this.ItbTabControl.Name = "ItbTabControl";
             this.ItbTabControl.SelectedIndex = 0;
-            this.ItbTabControl.Size = new System.Drawing.Size(645, 390);
+            this.ItbTabControl.Size = new System.Drawing.Size(645, 422);
             this.ItbTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.ItbTabControl.TabIndex = 2;
             // 
@@ -142,9 +142,9 @@ namespace OpenKh.Tools.ItbEditor
             this.TabDP.BackColor = System.Drawing.Color.White;
             this.TabDP.Controls.Add(this.FlowDP);
             this.TabDP.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.TabDP.Location = new System.Drawing.Point(4, 24);
+            this.TabDP.Location = new System.Drawing.Point(4, 30);
             this.TabDP.Name = "TabDP";
-            this.TabDP.Size = new System.Drawing.Size(637, 362);
+            this.TabDP.Size = new System.Drawing.Size(637, 388);
             this.TabDP.TabIndex = 0;
             this.TabDP.Text = "DP";
             // 
@@ -157,7 +157,7 @@ namespace OpenKh.Tools.ItbEditor
             this.FlowDP.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowDP.Location = new System.Drawing.Point(3, 3);
             this.FlowDP.Name = "FlowDP";
-            this.FlowDP.Size = new System.Drawing.Size(631, 356);
+            this.FlowDP.Size = new System.Drawing.Size(631, 382);
             this.FlowDP.TabIndex = 0;
             // 
             // TabSW
@@ -511,23 +511,23 @@ namespace OpenKh.Tools.ItbEditor
             this.NewChestButton.Enabled = false;
             this.NewChestButton.Location = new System.Drawing.Point(493, 13);
             this.NewChestButton.Name = "NewChestButton";
-            this.NewChestButton.Size = new System.Drawing.Size(160, 23);
+            this.NewChestButton.Size = new System.Drawing.Size(160, 32);
             this.NewChestButton.TabIndex = 3;
             this.NewChestButton.Text = "Add Chest to this world";
             this.NewChestButton.UseVisualStyleBackColor = true;
             this.NewChestButton.Click += new System.EventHandler(this.NewChestButton_Click);
             // 
-            // Form1
+            // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(664, 441);
+            this.ClientSize = new System.Drawing.Size(664, 473);
             this.Controls.Add(this.NewChestButton);
             this.Controls.Add(this.ItbTabControl);
             this.Controls.Add(this.SaveITBButton);
             this.Controls.Add(this.LoadITBButton);
             this.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "ITB Editor (Item Treasure Box)";
             this.ItbTabControl.ResumeLayout(false);
             this.TabDP.ResumeLayout(false);
