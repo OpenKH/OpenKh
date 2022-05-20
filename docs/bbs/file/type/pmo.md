@@ -22,7 +22,7 @@ The format supports varying vertex types and has support for animation bones and
 | 0x16   | uint16 | Vertex Count |
 | 0x18   | float  | Model Scale |
 | 0x1C   | uint32 | Mesh Offset 1 |
-| 0x20   | float[8][8] | Bounding Box |
+| 0x20   | float[4][8] | Bounding Box |
 
 ## Texture Info
 
@@ -40,18 +40,18 @@ See also: [TIM2](../common/tm2.md)
 
 ## Mesh Sections
 
-`Mesh Offset 0` and `Mesh Offset 1` both point to the start of a list of `Mesh Section Header`s. You keep reading headers + their verts until you encounter a 0 `Vertex Count`. This structure must be aligned on a 4 byte boundry.
+`Mesh Offset 0` and `Mesh Offset 1` both point to the start of a list of `Mesh Section Header`s. You keep reading headers + their verts until you encounter a 0 `Vertex Count`. This structure must be aligned on a 4 byte boundary.
 
 | Offset | Type | Description |
 |--------|------|-------------|
 | 0x0    | uint16   | Vertex Count |
 | 0x2    | int8     | Texture ID, an index into the list of `Texture Info` records 
 | 0x3    | uint8    | Vertex Size, in bytes
-| 0x4    | uint32   | Vertex Flags, see below 
+| 0x4    | uint32   | [Vertex Flags](#vertex-flags), see below 
 | 0x8    | uint8    | Group 
 | 0x9    | uint8    | Triangle Strip count 
 | 0xA    | uint16   | [Vertex Attribute](#Vertex-Attribute) 
-| 0xC    | uint8[8] | List of bone indices which effect this section. Only present if the PMO blob contains a skeleton (ie: `header.skeletonOffset != 0`) 
+| 0xC    | uint8[8] | List of bone indices that affect this section. Only present if the PMO blob contains a skeleton (ie: `header.skeletonOffset != 0`) 
 | varies | uint32 | Diffuse Color. Only present if `vertexFlags.DiffuseColor & 1` 
 
 The section header is followed by `vertexCount * vertexSize` bytes of vertex data. The next Section header follows on the next 4-byte alignment after that.
@@ -63,51 +63,23 @@ The Primitive type bits correspond to the primitive type bits of the PSP's [GE P
 
 | Bit | Count | Description |
 |-----|-------|-------------|
-|  0 | 2 | Texture Coordinate Format |
-|  2 | 3 | Color Format |
+|  0 | 2 | [Texture Coordinate Format](#coordinate-format) |
+|  2 | 3 | [Color Format](#color-format) |
 |  5 | 2 | Normal Format (Not used by BBS) |
-|  7 | 2 | Position Format |
-|  9 | 2 | Weight Format |
+|  7 | 2 | [Position Format](#coordinate-format) |
+|  9 | 2 | [Weight Format](#coordinate-format) |
 | 11 | 2 | Indices Format (Not used by BBS) |
 | 13 | 1 | Unused |
-| 14 | 3 | Number of skinning weights |
+| 14 | 3 | Skinning Weights Count |
 | 17 | 1 | Unused |
 | 18 | 3 | Number of morphing weights (Not used by BBS) |
 | 21 | 2 | Unused |
 | 23 | 1 | Skip Transform Pipline (Not used by BBS) |
 | 24 | 1 | Uniform Diffuse Flag |
 | 25 | 3 | Unknown, possibly unused |
-| 28 | 4 | Primitive Type |
+| 28 | 4 | Primitive Type |             
 
-### Vertex Attribute
-
-This field defines what kind of primitive is being rendered.
-
-| Value    |       Name           |      Meaning     |
-|----------|----------------------|------------------|
-| 0        | ATTR_BLEND_NONE      |                  
-| 1        | ATTR_NOMATERIAL      |                  
-| 2        | ATTR_GLARE           |                  
-| 4        | ATTR_BACK            |                  
-| 8        | ATTR_DIVIDE          |                  
-| 16       | ATTR_TEXALPHA        | Specifies that the texture used contains alpha values for transparency 
-| 24       | FLAG_SHIFT           |                  
-| 28       | PRIM_SHIFT           |                  
-| 32       | ATTR_BLEND_SEMITRANS | Specifies that the material must be blended as semitransparent     
-| 64       | ATTR_BLEND_ADD       |                  
-| 96       | ATTR_BLEND_SUB       |                  
-| 224      | ATTR_BLEND_MASK      |                  
-| 256      | ATTR_8               |                  
-| 512      | ATTR_9               |                  
-| 1024     | ATTR_DROPSHADOW      |                  
-| 2048     | ATTR_ENVMAP          |                  
-| 4096     | ATTR_12              |                  
-| 8192     | ATTR_13              |                  
-| 16384    | ATTR_14              |                  
-| 32768    | ATTR_15              |                  
-| 16777216 | FLAG_COLOR           |                  
-| 33554432 | FLAG_NOWEIGHT        |                  
-
+### Coordinate Format
 Texture Format, Normal Format, Position Format and Weight Format are as follows:
 
 | Value | Meaning |
@@ -118,6 +90,8 @@ Texture Format, Normal Format, Position Format and Weight Format are as follows:
 | 0x3 | 32-bit float |
 
 Weight format has only been observed to use 8-bit fixed in actual PMO blobs.
+
+### Color Format
 
 Color Format is as follows:
 
@@ -180,6 +154,35 @@ Vertex properties which are in the format `8-bit normalized` or `16-bit normaliz
 	// uint16
 	float value = (float)data / 32767.0f;
 ```
+
+### Vertex Attribute
+
+This field defines what kind of primitive is being rendered.
+
+| Value    |       Name           |      Meaning     |
+|----------|----------------------|------------------|
+| 0        | ATTR_BLEND_NONE      |                  
+| 1        | ATTR_NOMATERIAL      |                  
+| 2        | ATTR_GLARE           |                  
+| 4        | ATTR_BACK            |                  
+| 8        | ATTR_DIVIDE          |                  
+| 16       | ATTR_TEXALPHA        | Specifies that the texture used contains alpha values for transparency 
+| 24       | FLAG_SHIFT           |                  
+| 28       | PRIM_SHIFT           |                  
+| 32       | ATTR_BLEND_SEMITRANS | Specifies that the material must be blended as semitransparent     
+| 64       | ATTR_BLEND_ADD       |                  
+| 96       | ATTR_BLEND_SUB       |                  
+| 224      | ATTR_BLEND_MASK      |                  
+| 256      | ATTR_8               |                  
+| 512      | ATTR_9               |                  
+| 1024     | ATTR_DROPSHADOW      |                  
+| 2048     | ATTR_ENVMAP          |                  
+| 4096     | ATTR_12              |                  
+| 8192     | ATTR_13              |                  
+| 16384    | ATTR_14              |                  
+| 32768    | ATTR_15              |                  
+| 16777216 | FLAG_COLOR           |                  
+| 33554432 | FLAG_NOWEIGHT        |     
 
 ## Skeleton Header
 
