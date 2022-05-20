@@ -97,7 +97,7 @@ namespace OpenKh.Bbs
         {
             [Data] public ushort BoneIndex { get; set; }
             [Data] public ushort Padding1 { get; set; }
-            [Data] public ushort ParentBoneIndex { get; set; }
+            [Data] public short ParentBoneIndex { get; set; }
             [Data] public ushort Padding2 { get; set; }
             [Data] public ushort SkinnedBoneIndex { get; set; }
             [Data] public ushort Padding3 { get; set; }
@@ -194,7 +194,7 @@ namespace OpenKh.Bbs
 
         public class WeightData
         {
-            [Data] public CoordinateFormat coordFormart { get; set; }
+            [Data] public CoordinateFormat coordFormat { get; set; }
             [Data] public List<float> weights { get; set; }
         }
 
@@ -356,7 +356,7 @@ namespace OpenKh.Bbs
                     {
                         WeightData WeightList = new WeightData();
                         WeightList.weights = new List<float>();
-                        WeightList.coordFormart = WeightFormat;
+                        WeightList.coordFormat = WeightFormat;
                         
                         for (int i = 0; i < (SkinningWeightsCount + 1); i++)
                         {
@@ -643,7 +643,7 @@ namespace OpenKh.Bbs
                     // Write Joints.
                     if (flags.WeightFormat != CoordinateFormat.NO_VERTEX)
                     {
-                        for (int w = 0; w < flags.SkinningWeightsCount + 1; w++)
+                        for (int w = 0; w < flags.SkinningWeightsCount; w++)
                         {
                             int currentIndex = w + (k * (flags.SkinningWeightsCount + 1));
 
