@@ -30,7 +30,7 @@ This file can be found in the `item` folder or within `arc/system/common_xx.arc`
 | 0x1A    | uint8   | Item Count in `BD`
 | 0x1B    | uint8   | Item Count in `WM`
 
-## ITC Data
+## ITB Data
 
 | Offset | Type  | Description
 |--------|-------|------------

@@ -1,6 +1,6 @@
 # PLAYER DATA
 
-This isn't a file, but a memory region in the executable.
+This isn't a file, but data specification that appears instantiated in memory.
 
 ## Stats
 
