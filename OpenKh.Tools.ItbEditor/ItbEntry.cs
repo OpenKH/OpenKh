@@ -33,5 +33,10 @@ namespace OpenKh.Tools.ItbEditor
                     break;
             }
         }
+
+        private void ITB_GBox_Enter(object sender, EventArgs e)
+        {
+
+        }
     }
 }

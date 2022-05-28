@@ -54,40 +54,46 @@ namespace OpenKh.Tools.ItbEditor
             this.ITB_GBox.Controls.Add(this.NumericTreasureBoxID);
             this.ITB_GBox.Controls.Add(this.label1);
             this.ITB_GBox.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ITB_GBox.Location = new System.Drawing.Point(4, 4);
+            this.ITB_GBox.Location = new System.Drawing.Point(6, 7);
+            this.ITB_GBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ITB_GBox.Name = "ITB_GBox";
-            this.ITB_GBox.Size = new System.Drawing.Size(562, 78);
+            this.ITB_GBox.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.ITB_GBox.Size = new System.Drawing.Size(803, 130);
             this.ITB_GBox.TabIndex = 0;
             this.ITB_GBox.TabStop = false;
             this.ITB_GBox.Text = "ITB Entry 1";
+            this.ITB_GBox.Enter += new System.EventHandler(this.ITB_GBox_Enter);
             // 
             // NumericReportID
             // 
-            this.NumericReportID.Location = new System.Drawing.Point(492, 37);
+            this.NumericReportID.Location = new System.Drawing.Point(703, 62);
+            this.NumericReportID.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.NumericReportID.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.NumericReportID.Name = "NumericReportID";
-            this.NumericReportID.Size = new System.Drawing.Size(56, 23);
+            this.NumericReportID.Size = new System.Drawing.Size(80, 31);
             this.NumericReportID.TabIndex = 7;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(492, 19);
+            this.label4.Location = new System.Drawing.Point(703, 32);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(56, 15);
+            this.label4.Size = new System.Drawing.Size(89, 25);
             this.label4.TabIndex = 6;
             this.label4.Text = "Report ID";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(87, 18);
+            this.label3.Location = new System.Drawing.Point(124, 30);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(31, 15);
+            this.label3.Size = new System.Drawing.Size(47, 25);
             this.label3.TabIndex = 5;
             this.label3.Text = "Kind";
             // 
@@ -97,9 +103,10 @@ namespace OpenKh.Tools.ItbEditor
             this.ItemKindComboBox.Items.AddRange(new object[] {
             "ITEM",
             "COMMAND"});
-            this.ItemKindComboBox.Location = new System.Drawing.Point(87, 37);
+            this.ItemKindComboBox.Location = new System.Drawing.Point(124, 62);
+            this.ItemKindComboBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ItemKindComboBox.Name = "ItemKindComboBox";
-            this.ItemKindComboBox.Size = new System.Drawing.Size(121, 23);
+            this.ItemKindComboBox.Size = new System.Drawing.Size(171, 33);
             this.ItemKindComboBox.TabIndex = 4;
             this.ItemKindComboBox.Text = "ITEM";
             this.ItemKindComboBox.SelectedIndexChanged += new System.EventHandler(this.ItemKindComboBox_SelectedIndexChanged);
@@ -107,9 +114,10 @@ namespace OpenKh.Tools.ItbEditor
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(214, 19);
+            this.label2.Location = new System.Drawing.Point(306, 32);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(31, 15);
+            this.label2.Size = new System.Drawing.Size(48, 25);
             this.label2.TabIndex = 3;
             this.label2.Text = "Item";
             // 
@@ -286,9 +294,10 @@ namespace OpenKh.Tools.ItbEditor
             "Abounding Ore",
             "Chaos Crystal",
             "Secret Gem"});
-            this.ItemIDComboBox.Location = new System.Drawing.Point(214, 37);
+            this.ItemIDComboBox.Location = new System.Drawing.Point(306, 62);
+            this.ItemIDComboBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ItemIDComboBox.Name = "ItemIDComboBox";
-            this.ItemIDComboBox.Size = new System.Drawing.Size(272, 23);
+            this.ItemIDComboBox.Size = new System.Drawing.Size(387, 33);
             this.ItemIDComboBox.TabIndex = 2;
             this.ItemIDComboBox.Text = "DUMMY";
             this.ItemIDComboBox.SelectedIndexChanged += new System.EventHandler(this.ItemIDComboBox_SelectedIndexChanged);
@@ -296,32 +305,35 @@ namespace OpenKh.Tools.ItbEditor
             // NumericTreasureBoxID
             // 
             this.NumericTreasureBoxID.Enabled = false;
-            this.NumericTreasureBoxID.Location = new System.Drawing.Point(6, 37);
+            this.NumericTreasureBoxID.Location = new System.Drawing.Point(9, 62);
+            this.NumericTreasureBoxID.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.NumericTreasureBoxID.Maximum = new decimal(new int[] {
             65535,
             0,
             0,
             0});
             this.NumericTreasureBoxID.Name = "NumericTreasureBoxID";
-            this.NumericTreasureBoxID.Size = new System.Drawing.Size(75, 23);
+            this.NumericTreasureBoxID.Size = new System.Drawing.Size(107, 31);
             this.NumericTreasureBoxID.TabIndex = 1;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 19);
+            this.label1.Location = new System.Drawing.Point(9, 32);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(66, 15);
+            this.label1.Size = new System.Drawing.Size(101, 25);
             this.label1.TabIndex = 0;
             this.label1.Text = "Treasure ID";
             // 
             // ItbEntry
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.ITB_GBox);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "ItbEntry";
-            this.Size = new System.Drawing.Size(573, 88);
+            this.Size = new System.Drawing.Size(819, 147);
             this.ITB_GBox.ResumeLayout(false);
             this.ITB_GBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NumericReportID)).EndInit();

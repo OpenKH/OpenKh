@@ -132,7 +132,7 @@ namespace OpenKh.Tools.ItbEditor
             this.ItbTabControl.Location = new System.Drawing.Point(12, 50);
             this.ItbTabControl.Name = "ItbTabControl";
             this.ItbTabControl.SelectedIndex = 0;
-            this.ItbTabControl.Size = new System.Drawing.Size(645, 422);
+            this.ItbTabControl.Size = new System.Drawing.Size(909, 509);
             this.ItbTabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.ItbTabControl.TabIndex = 2;
             // 
@@ -144,7 +144,7 @@ namespace OpenKh.Tools.ItbEditor
             this.TabDP.ForeColor = System.Drawing.SystemColors.ControlText;
             this.TabDP.Location = new System.Drawing.Point(4, 30);
             this.TabDP.Name = "TabDP";
-            this.TabDP.Size = new System.Drawing.Size(637, 388);
+            this.TabDP.Size = new System.Drawing.Size(901, 475);
             this.TabDP.TabIndex = 0;
             this.TabDP.Text = "DP";
             // 
@@ -157,16 +157,16 @@ namespace OpenKh.Tools.ItbEditor
             this.FlowDP.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.FlowDP.Location = new System.Drawing.Point(3, 3);
             this.FlowDP.Name = "FlowDP";
-            this.FlowDP.Size = new System.Drawing.Size(631, 382);
+            this.FlowDP.Size = new System.Drawing.Size(895, 469);
             this.FlowDP.TabIndex = 0;
             // 
             // TabSW
             // 
             this.TabSW.AutoScroll = true;
             this.TabSW.Controls.Add(this.FlowSW);
-            this.TabSW.Location = new System.Drawing.Point(4, 24);
+            this.TabSW.Location = new System.Drawing.Point(4, 30);
             this.TabSW.Name = "TabSW";
-            this.TabSW.Size = new System.Drawing.Size(637, 362);
+            this.TabSW.Size = new System.Drawing.Size(637, 388);
             this.TabSW.TabIndex = 1;
             this.TabSW.Text = "SW";
             this.TabSW.UseVisualStyleBackColor = true;
@@ -187,9 +187,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabCD.AutoScroll = true;
             this.TabCD.Controls.Add(this.FlowCD);
-            this.TabCD.Location = new System.Drawing.Point(4, 24);
+            this.TabCD.Location = new System.Drawing.Point(4, 30);
             this.TabCD.Name = "TabCD";
-            this.TabCD.Size = new System.Drawing.Size(637, 362);
+            this.TabCD.Size = new System.Drawing.Size(637, 388);
             this.TabCD.TabIndex = 2;
             this.TabCD.Text = "CD";
             this.TabCD.UseVisualStyleBackColor = true;
@@ -210,9 +210,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabSB.AutoScroll = true;
             this.TabSB.Controls.Add(this.FlowSB);
-            this.TabSB.Location = new System.Drawing.Point(4, 24);
+            this.TabSB.Location = new System.Drawing.Point(4, 30);
             this.TabSB.Name = "TabSB";
-            this.TabSB.Size = new System.Drawing.Size(637, 362);
+            this.TabSB.Size = new System.Drawing.Size(637, 388);
             this.TabSB.TabIndex = 3;
             this.TabSB.Text = "SB";
             this.TabSB.UseVisualStyleBackColor = true;
@@ -233,9 +233,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabYT.AutoScroll = true;
             this.TabYT.Controls.Add(this.FlowYT);
-            this.TabYT.Location = new System.Drawing.Point(4, 24);
+            this.TabYT.Location = new System.Drawing.Point(4, 30);
             this.TabYT.Name = "TabYT";
-            this.TabYT.Size = new System.Drawing.Size(637, 362);
+            this.TabYT.Size = new System.Drawing.Size(637, 388);
             this.TabYT.TabIndex = 4;
             this.TabYT.Text = "YT";
             this.TabYT.UseVisualStyleBackColor = true;
@@ -256,9 +256,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabRG.AutoScroll = true;
             this.TabRG.Controls.Add(this.FlowRG);
-            this.TabRG.Location = new System.Drawing.Point(4, 24);
+            this.TabRG.Location = new System.Drawing.Point(4, 30);
             this.TabRG.Name = "TabRG";
-            this.TabRG.Size = new System.Drawing.Size(637, 362);
+            this.TabRG.Size = new System.Drawing.Size(637, 388);
             this.TabRG.TabIndex = 5;
             this.TabRG.Text = "RG";
             this.TabRG.UseVisualStyleBackColor = true;
@@ -279,9 +279,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabJB.AutoScroll = true;
             this.TabJB.Controls.Add(this.FlowJB);
-            this.TabJB.Location = new System.Drawing.Point(4, 24);
+            this.TabJB.Location = new System.Drawing.Point(4, 30);
             this.TabJB.Name = "TabJB";
-            this.TabJB.Size = new System.Drawing.Size(637, 362);
+            this.TabJB.Size = new System.Drawing.Size(637, 388);
             this.TabJB.TabIndex = 6;
             this.TabJB.Text = "JB";
             this.TabJB.UseVisualStyleBackColor = true;
@@ -302,9 +302,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabHE.AutoScroll = true;
             this.TabHE.Controls.Add(this.FlowHE);
-            this.TabHE.Location = new System.Drawing.Point(4, 24);
+            this.TabHE.Location = new System.Drawing.Point(4, 30);
             this.TabHE.Name = "TabHE";
-            this.TabHE.Size = new System.Drawing.Size(637, 362);
+            this.TabHE.Size = new System.Drawing.Size(637, 388);
             this.TabHE.TabIndex = 7;
             this.TabHE.Text = "HE";
             this.TabHE.UseVisualStyleBackColor = true;
@@ -325,9 +325,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabLS.AutoScroll = true;
             this.TabLS.Controls.Add(this.FlowLS);
-            this.TabLS.Location = new System.Drawing.Point(4, 24);
+            this.TabLS.Location = new System.Drawing.Point(4, 30);
             this.TabLS.Name = "TabLS";
-            this.TabLS.Size = new System.Drawing.Size(637, 362);
+            this.TabLS.Size = new System.Drawing.Size(637, 388);
             this.TabLS.TabIndex = 8;
             this.TabLS.Text = "LS";
             this.TabLS.UseVisualStyleBackColor = true;
@@ -348,9 +348,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabDI.AutoScroll = true;
             this.TabDI.Controls.Add(this.FlowDI);
-            this.TabDI.Location = new System.Drawing.Point(4, 24);
+            this.TabDI.Location = new System.Drawing.Point(4, 30);
             this.TabDI.Name = "TabDI";
-            this.TabDI.Size = new System.Drawing.Size(637, 362);
+            this.TabDI.Size = new System.Drawing.Size(637, 388);
             this.TabDI.TabIndex = 9;
             this.TabDI.Text = "DI";
             this.TabDI.UseVisualStyleBackColor = true;
@@ -371,9 +371,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabPP.AutoScroll = true;
             this.TabPP.Controls.Add(this.FlowPP);
-            this.TabPP.Location = new System.Drawing.Point(4, 24);
+            this.TabPP.Location = new System.Drawing.Point(4, 30);
             this.TabPP.Name = "TabPP";
-            this.TabPP.Size = new System.Drawing.Size(637, 362);
+            this.TabPP.Size = new System.Drawing.Size(637, 388);
             this.TabPP.TabIndex = 10;
             this.TabPP.Text = "PP";
             this.TabPP.UseVisualStyleBackColor = true;
@@ -394,9 +394,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabDC.AutoScroll = true;
             this.TabDC.Controls.Add(this.FlowDC);
-            this.TabDC.Location = new System.Drawing.Point(4, 24);
+            this.TabDC.Location = new System.Drawing.Point(4, 30);
             this.TabDC.Name = "TabDC";
-            this.TabDC.Size = new System.Drawing.Size(637, 362);
+            this.TabDC.Size = new System.Drawing.Size(637, 388);
             this.TabDC.TabIndex = 11;
             this.TabDC.Text = "DC";
             this.TabDC.UseVisualStyleBackColor = true;
@@ -417,9 +417,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabKG.AutoScroll = true;
             this.TabKG.Controls.Add(this.FlowKG);
-            this.TabKG.Location = new System.Drawing.Point(4, 24);
+            this.TabKG.Location = new System.Drawing.Point(4, 30);
             this.TabKG.Name = "TabKG";
-            this.TabKG.Size = new System.Drawing.Size(637, 362);
+            this.TabKG.Size = new System.Drawing.Size(637, 388);
             this.TabKG.TabIndex = 12;
             this.TabKG.Text = "KG";
             this.TabKG.UseVisualStyleBackColor = true;
@@ -440,9 +440,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabVS.AutoScroll = true;
             this.TabVS.Controls.Add(this.FlowVS);
-            this.TabVS.Location = new System.Drawing.Point(4, 24);
+            this.TabVS.Location = new System.Drawing.Point(4, 30);
             this.TabVS.Name = "TabVS";
-            this.TabVS.Size = new System.Drawing.Size(637, 362);
+            this.TabVS.Size = new System.Drawing.Size(637, 388);
             this.TabVS.TabIndex = 13;
             this.TabVS.Text = "VS";
             this.TabVS.UseVisualStyleBackColor = true;
@@ -463,9 +463,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabBD.AutoScroll = true;
             this.TabBD.Controls.Add(this.FlowBD);
-            this.TabBD.Location = new System.Drawing.Point(4, 24);
+            this.TabBD.Location = new System.Drawing.Point(4, 30);
             this.TabBD.Name = "TabBD";
-            this.TabBD.Size = new System.Drawing.Size(637, 362);
+            this.TabBD.Size = new System.Drawing.Size(637, 388);
             this.TabBD.TabIndex = 14;
             this.TabBD.Text = "BD";
             this.TabBD.UseVisualStyleBackColor = true;
@@ -486,9 +486,9 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.TabWM.AutoScroll = true;
             this.TabWM.Controls.Add(this.FlowWM);
-            this.TabWM.Location = new System.Drawing.Point(4, 24);
+            this.TabWM.Location = new System.Drawing.Point(4, 30);
             this.TabWM.Name = "TabWM";
-            this.TabWM.Size = new System.Drawing.Size(637, 362);
+            this.TabWM.Size = new System.Drawing.Size(637, 388);
             this.TabWM.TabIndex = 15;
             this.TabWM.Text = "WM";
             this.TabWM.UseVisualStyleBackColor = true;
@@ -509,7 +509,7 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.NewChestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.NewChestButton.Enabled = false;
-            this.NewChestButton.Location = new System.Drawing.Point(493, 13);
+            this.NewChestButton.Location = new System.Drawing.Point(757, 13);
             this.NewChestButton.Name = "NewChestButton";
             this.NewChestButton.Size = new System.Drawing.Size(160, 32);
             this.NewChestButton.TabIndex = 3;
@@ -521,7 +521,7 @@ namespace OpenKh.Tools.ItbEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(664, 473);
+            this.ClientSize = new System.Drawing.Size(928, 560);
             this.Controls.Add(this.NewChestButton);
             this.Controls.Add(this.ItbTabControl);
             this.Controls.Add(this.SaveITBButton);
@@ -529,6 +529,7 @@ namespace OpenKh.Tools.ItbEditor
             this.Font = new System.Drawing.Font("Segoe UI Historic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.Name = "MainForm";
             this.Text = "ITB Editor (Item Treasure Box)";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.ItbTabControl.ResumeLayout(false);
             this.TabDP.ResumeLayout(false);
             this.TabSW.ResumeLayout(false);

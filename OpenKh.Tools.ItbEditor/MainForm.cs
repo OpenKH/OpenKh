@@ -243,5 +243,10 @@ namespace OpenKh.Tools.ItbEditor
             ItbTabControl.SelectedTab.Controls[0].Controls.Add(itEntry);
             itb.AllITB.Add(nData);
         }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
