@@ -200,8 +200,15 @@ namespace OpenKh.Patcher
             using var srcStream = File.OpenRead(srcFile);
             if (PngImage.IsValid(srcStream))
             {
-                var png = PngImage.Read(srcStream);
-                return Imgd.Create(png.Size, png.PixelFormat, png.GetData(), png.GetClut(), source.IsSwizzled);
+                try
+                {
+                    var png = PngImage.Read(srcStream);
+                    return Imgd.Create(png.Size, png.PixelFormat, png.GetData(), png.GetClut(), source.IsSwizzled);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Unable to decode the PNG '{source.Name}': {ex.Message}");
+                }
             }
             else if (Imgd.IsValid(srcStream))
                 return Imgd.Read(srcStream);
