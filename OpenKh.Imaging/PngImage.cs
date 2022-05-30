@@ -134,12 +134,12 @@ namespace OpenKh.Imaging
 
             fullData.Position = 2;
 
-            var deflater = new DeflateStream(fullData, CompressionMode.Decompress);
-
-            Size = new Size(ihdr.Width, ihdr.Height);
+            using var deflater = new DeflateStream(fullData, CompressionMode.Decompress);
+            using var deflated = new BufferedStream(deflater);
 
             var bits = ihdr.Bits;
             var colorType = (ColorType)ihdr.ColorType;
+            Size = new Size(ihdr.Width, ihdr.Height);
 
             if (bits == 4 && colorType == ColorType.Indexed)
             {
@@ -148,8 +148,8 @@ namespace OpenKh.Imaging
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
                 {
-                    var filter = deflater.ReadByte();
-                    deflater.Read(_data, y * stride, stride);
+                    var filter = deflated.ReadByte();
+                    deflated.Read(_data, y * stride, stride);
                     ApplyFilter(_data, y * stride, 1, stride, filter);
                 }
                 _clut = PrepareClut(PLTE, tRNS, 16);
@@ -161,8 +161,8 @@ namespace OpenKh.Imaging
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
                 {
-                    var filter = deflater.ReadByte();
-                    deflater.Read(_data, y * stride, stride);
+                    var filter = deflated.ReadByte();
+                    deflated.Read(_data, y * stride, stride);
                     ApplyFilter(_data, y * stride, 1, stride, filter);
                 }
                 _clut = PrepareClut(PLTE, tRNS, 256);
@@ -174,8 +174,8 @@ namespace OpenKh.Imaging
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
                 {
-                    var filter = deflater.ReadByte();
-                    deflater.Read(_data, y * stride, stride);
+                    var filter = deflated.ReadByte();
+                    deflated.Read(_data, y * stride, stride);
                     ApplyFilter(_data, y * stride, 3, stride, filter);
                 }
             }
@@ -186,8 +186,8 @@ namespace OpenKh.Imaging
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
                 {
-                    var filter = deflater.ReadByte();
-                    deflater.Read(_data, y * stride, stride);
+                    var filter = deflated.ReadByte();
+                    deflated.Read(_data, y * stride, stride);
                     ApplyFilter(_data, y * stride, 4, stride, filter);
                 }
 
