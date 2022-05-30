@@ -131,7 +131,7 @@ namespace OpenKh.Game
 
         public static void Save()
         {
-            Log.Info("Save configuration file to {0}, ActualConfigFilePath");
+            Log.Info("Save configuration file to {0}", ActualConfigFilePath);
             InternalSave();
         }
 
