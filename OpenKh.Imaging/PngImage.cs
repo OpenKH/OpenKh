@@ -273,7 +273,7 @@ namespace OpenKh.Imaging
             }
             else
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException($"PNG filter {filter} not supported");
             }
         }
 
