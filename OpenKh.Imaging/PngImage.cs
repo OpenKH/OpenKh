@@ -134,8 +134,10 @@ namespace OpenKh.Imaging
 
             fullData.Position = 2;
 
-            using var deflater = new DeflateStream(fullData, CompressionMode.Decompress);
-            using var deflated = new BufferedStream(deflater);
+            using var deflated = new MemoryStream((int)fullData.Length * 2);
+            using (var deflater = new DeflateStream(fullData, CompressionMode.Decompress))
+                deflater.CopyTo(deflated);
+            deflated.FromBegin();
 
             var bits = ihdr.Bits;
             var colorType = (ColorType)ihdr.ColorType;
