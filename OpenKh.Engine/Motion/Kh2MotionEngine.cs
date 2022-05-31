@@ -84,18 +84,18 @@ namespace OpenKh.Engine.Motion
                 model.ApplyMotion(model.InitialPose);
             else if (CurrentMotion.IsRaw)
                 ApplyRawMotion(model, CurrentMotion.Raw, time);
-            else
-                ApplyInterpolatedMotion(model, CurrentMotion.Interpolated, time);
+            //else
+                //ApplyInterpolatedMotion(model, CurrentMotion.Interpolated, time);
         }
 
-        private void ApplyRawMotion(IModelMotion model, Kh2.Motion.RawMotion motion, float time)
+        private void ApplyRawMotion(IModelMotion model, Kh2.Motion.RawMotion_OLD motion, float time)
         {
             var absoluteFrame = (int)Math.Floor(motion.FramePerSecond * time);
             var actualFrame = absoluteFrame % motion.Matrices.Count;
             model.ApplyMotion(motion.Matrices[actualFrame]);
         }
 
-        public static void ApplyInterpolatedMotion(IModelMotion model, Kh2.Motion.InterpolatedMotion motion, float time)
+        public static void ApplyInterpolatedMotion(IModelMotion model, Kh2.Motion.InterpolatedMotion_OLD motion, float time)
         {
             var absoluteFrame = (float)Math.Floor(60.0f * time);
             var actualFrame = (int)Loop(motion.FrameCount * 2, motion.FrameEnd * 2, absoluteFrame);
@@ -125,22 +125,22 @@ namespace OpenKh.Engine.Motion
                 switch (pose.Channel)
                 {
                     case 3:
-                        sourceRotations[pose.BoneIndex].X = pose.Value;
+                        sourceRotations[pose.BoneId].X = pose.Value;
                         break;
                     case 4:
-                        sourceRotations[pose.BoneIndex].Y = pose.Value;
+                        sourceRotations[pose.BoneId].Y = pose.Value;
                         break;
                     case 5:
-                        sourceRotations[pose.BoneIndex].Z = pose.Value;
+                        sourceRotations[pose.BoneId].Z = pose.Value;
                         break;
                     case 6:
-                        sourceTranslations[pose.BoneIndex].X = pose.Value;
+                        sourceTranslations[pose.BoneId].X = pose.Value;
                         break;
                     case 7:
-                        sourceTranslations[pose.BoneIndex].Y = pose.Value;
+                        sourceTranslations[pose.BoneId].Y = pose.Value;
                         break;
                     case 8:
-                        sourceTranslations[pose.BoneIndex].Z = pose.Value;
+                        sourceTranslations[pose.BoneId].Z = pose.Value;
                         break;
                 }
             }

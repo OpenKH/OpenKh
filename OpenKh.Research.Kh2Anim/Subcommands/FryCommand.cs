@@ -83,9 +83,9 @@ namespace OpenKh.Research.Kh2Anim.Subcommands
             interpolated.FrameLoop = FrameLoop;
             interpolated.FramePerSecond = FramePerSecond;
             interpolated.StaticPose.Add(
-                new Motion.StaticPoseTable
+                new Motion.InitialPose
                 {
-                    BoneIndex = 1,
+                    BoneId = 1,
                     Channel = 6,
                     Value = InitialValue,
                 }

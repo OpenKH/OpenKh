@@ -38,5 +38,10 @@ namespace OpenKh.Tools.OloEditor
                 data.UnkParameter = decimal.ToByte(NumericUnknownParam.Value);
             }
         }
+
+        private void AppearTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

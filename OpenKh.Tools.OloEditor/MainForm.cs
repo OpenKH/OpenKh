@@ -153,7 +153,8 @@ namespace OpenKh.Tools.OloEditor
                     cLayoutCon.FlowLayout.Controls.Add(cLayoutData);
                     j++;
                 }
-                
+
+                cLayoutCon.AutoSize = true;
                 FlowLayout.Controls.Add(cLayoutCon);
                 i++;
             }
@@ -290,7 +291,11 @@ namespace OpenKh.Tools.OloEditor
                     olo.TriggerList.Add(new Olo.TriggerData());
                     break;
                 case 5:
-                    olo.GroupList.Add(new Olo.GroupData());
+                    Olo.GroupData nGroup = new Olo.GroupData();
+                    
+                    Olo.LayoutData nLayout = new Olo.LayoutData();
+                    olo.GroupList.Add(nGroup);
+                    olo.LayoutList.Add(nLayout);
                     break;
             }
             UpdateParameters();

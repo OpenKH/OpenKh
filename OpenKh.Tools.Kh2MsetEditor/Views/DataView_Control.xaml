@@ -1,0 +1,40 @@
+<UserControl x:Class="OpenKh.Tools.Kh2MsetEditor.Views.DataView_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2MsetEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <DockPanel AllowDrop="True" Drop="Window_Drop">
+        
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Save As" Click="Menu_SaveFile"/>
+            </MenuItem>
+        </Menu>
+        
+        <Grid Background="Black">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            
+            <DockPanel Grid.Column="0">
+                <StackPanel DockPanel.Dock="Bottom" Background="White" Height="100">
+                    <StackPanel Margin="10" Orientation="Horizontal">
+                        <CheckBox VerticalAlignment="Center" Checked="DummyFilter_Enable" Unchecked="DummyFilter_Disable"></CheckBox>
+                        <Label>Filter Dummies</Label>
+                    </StackPanel>
+                </StackPanel>
+                <ListView ItemsSource="{Binding entryList_View}" DisplayMemberPath="Name" Background="#222222" Foreground="White" SelectionChanged="ListViewItem_SelectionChange">
+                </ListView>
+            </DockPanel>
+            
+            <ContentControl Grid.Column="1" Background="#2d2d2d" x:Name="contentFrame"/>
+            
+        </Grid>
+
+    </DockPanel>
+</UserControl>

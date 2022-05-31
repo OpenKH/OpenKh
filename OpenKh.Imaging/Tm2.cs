@@ -400,6 +400,18 @@ namespace OpenKh.Imaging
             return new Tm2(buff, clut, pic, PixelFormat.Indexed8);
         }
 
+        public void HalvedAlpha()
+        {
+            for(int i = 0; i < _clutData.Length; i++)
+            {
+                if((i+1) % 4 == 0)
+                {
+                    _clutData[i] = 0xFF;
+                }
+            }
+            
+        }
+
         // bRelative controls whether the TM2 file is read from the beginning of the file or the current stream position.
         public static IEnumerable<Tm2> Read(Stream stream, bool bRelative = false)
         {

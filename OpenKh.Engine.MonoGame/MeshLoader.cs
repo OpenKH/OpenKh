@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Engine.Motion;
 using OpenKh.Engine.Parsers;
+using OpenKh.Bbs;
 using OpenKh.Kh2;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,9 @@ namespace OpenKh.Engine.MonoGame
 
         public static IModelMotion FromKH2(Mdlx model) =>
             model != null ? new MdlxParser(model) : null;
+
+        public static IModelMotion FromBBS(Pmo pmo) =>
+            pmo != null ? new PmoParser(pmo, 100.0f) : null;
 
         public static IEnumerable<KingdomTexture> LoadTextures(
             this ModelTexture texture, GraphicsDevice graphics) => texture?.Images?

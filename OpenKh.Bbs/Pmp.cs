@@ -108,6 +108,10 @@ namespace OpenKh.Bbs
                     stream.Seek(currentPmoInfo.PMO_Offset, SeekOrigin.Begin);
                     pmp.PmoList.Add(Pmo.Read(stream));
                 }
+                else
+                {
+                    pmp.PmoList.Add(null);
+                }
             }
 
             stream.Seek(pmp.header.TextureListOffset, SeekOrigin.Begin);
@@ -152,7 +156,7 @@ namespace OpenKh.Bbs
 
                 BinaryMapping.WriteObject<Pmo.Header>(stream, nPmoList[p].header);
 
-                for(int g = 0; g < nPmoList[p].textureInfo.Length; g++)
+                for (int g = 0; g < nPmoList[p].textureInfo.Length; g++)
                 {
                     BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, nPmoList[p].textureInfo[g]);
                 }

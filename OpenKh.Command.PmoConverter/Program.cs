@@ -39,7 +39,7 @@ namespace OpenKh.Command.PmoConverter
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         [Required]
-        [Argument(0, "Convert File", "The file to convert to PMO.")]
+        [Argument(0, "Convert File", "The FBX to convert to PMO. (Textures preferrably converted to TM2.)")]
         public string FileName { get; }
 
         [Required]
@@ -99,12 +99,15 @@ namespace OpenKh.Command.PmoConverter
                 bool UsesUniformColor = UsesUniformDiffuseFlag(desc);
                 Pmo.CoordinateFormat TextureCoordinateFormat = GetTextureCoordinateFormat(desc);
                 Pmo.CoordinateFormat VertexFormat = GetVertexFormat(desc);
+                Pmo.CoordinateFormat WeightFormat = Pmo.CoordinateFormat.FLOAT_32_BITS;
 
                 chunk.SectionInfo = new Pmo.MeshSection();
                 chunk.SectionInfo.Attribute = 0;
                 chunk.SectionInfo.VertexCount = (ushort)desc.Vertices.Length;
                 chunk.SectionInfo.TextureID = (byte)desc.TextureIndex;
                 chunk.SectionInfo.VertexFlags = 0x30000000; // 0011 000 0 0 00 000 0 000 0 00 00 11 00 000 01
+                //chunk.SectionInfo_opt1 = new Pmo.MeshSectionOptional1();
+                //chunk.SectionInfo_opt1.SectionBoneIndices = GetBoneInfluences(desc);
 
                 // Set extra flags.
                 if (UsesUniformColor)
@@ -124,11 +127,14 @@ namespace OpenKh.Command.PmoConverter
 
                 uint texFormat = 3;
                 uint posFormat = 3;
+                uint weightFormat = 1;
 
                 chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, texFormat);
                 chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, posFormat);
+                //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 9, 2, weightFormat);
+                //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 14, 3, 4);
 
-                chunk.SectionInfo.VertexSize += 0; // Weights.
+                //chunk.SectionInfo.VertexSize += 4; // Weights.
                 TextureCoordinateFormat = (Pmo.CoordinateFormat)texFormat;
                 chunk.SectionInfo.VertexSize += (TextureCoordinateFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)8  : (byte)((int)TextureCoordinateFormat * 2); // Texture Coordinates
                 if (chunk.SectionInfo.VertexSize % 4 != 0)
@@ -162,6 +168,44 @@ namespace OpenKh.Command.PmoConverter
                     Coords.X = desc.Vertices[index].Tu;
                     Coords.Y = desc.Vertices[index].Tv;
                     chunk.textureCoordinates.Add(Coords);
+
+                    /*
+                    Pmo.WeightData weights = new Pmo.WeightData();
+                    weights.weights = new List<float>();
+                    weights.coordFormat = Pmo.CoordinateFormat.NORMALIZED_8_BITS;
+                    weights.weights.Add(100.0f);
+
+                    
+                    int weightsAdded = 0;
+                    foreach (var bn in BoneData)
+                    {
+                        // Check each vertex weight
+                        foreach(Assimp.VertexWeight vertW in bn.VertexWeights)
+                        {
+                            // Check supported bones.
+                            foreach(byte tempIndices in chunk.SectionInfo_opt1.SectionBoneIndices)
+                            {
+                                byte tst = tempIndices;
+                                // Check if supported bone is weighted to this vertex.
+                                if(tst == vertW.VertexID)
+                                {
+                                    if(weightsAdded < 4)
+                                    {
+                                        weights.weights.Add(vertW.Weight);
+                                        weightsAdded++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Make sure there's always 4 weights.
+                    for(int vt = weightsAdded; vt < 4; v++)
+                    {
+                        weights.weights.Add(0.0f);
+                    }*/
+
+                    //chunk.jointWeights.Add(weights);
                 }
 
                 pmo.Meshes.Add(chunk);
@@ -174,13 +218,27 @@ namespace OpenKh.Command.PmoConverter
             pmo.header.Group = 1;
             pmo.header.Version = 3;
             pmo.header.TextureCount = (byte)TextureData.Count; // TODO.
-            pmo.header.Flag = 0x800;
+            pmo.header.Flag = 0x8000;
             pmo.header.MeshOffset0 = 0xA0 + ((uint)pmo.header.TextureCount * 0x20);
             pmo.header.VertexCount = (ushort)indicesVertexCount;
             pmo.header.TriangleCount = (ushort)indicesVertexCount;
             pmo.header.TriangleCount /= 3;
             pmo.header.ModelScale = 1.0f;
-            pmo.header.BoundingBox = new float[32];
+
+            float[] commonBoundBox =
+                new float[32]
+                {
+                    -1.0f, -1.0f, -1.0f, 1.0f,
+                    1.0f, -1.0f, -1.0f, 1.0f,
+                    -1.0f, -1.0f, 1.0f, 1.0f,
+                    1.0f, -1.0f, 1.0f, 1.0f,
+                    1.0f, -1.0f, 1.0f, 1.0f,
+                    1.0f, 1.0f, -1.0f, 1.0f,
+                    -1.0f, 1.0f, 1.0f, 1.0f,
+                    1.0f, 1.0f, 1.0f, 1.0f
+                };
+
+            pmo.header.BoundingBox = commonBoundBox;
 
             // Texture block.
             if(TextureData.Count > 0)
@@ -197,15 +255,25 @@ namespace OpenKh.Command.PmoConverter
                 }
             }
 
-            //pmo.header.SkeletonOffset = pmo.header.MeshOffset0 + 0;
+            /*
+            pmo.header.SkeletonOffset = pmo.header.MeshOffset0 + 0;
             pmo.skeletonHeader = new Pmo.SkeletonHeader();
             pmo.boneList = new Pmo.BoneData[0];
-            /*pmo.skeletonHeader.MagicValue = 0x4E4F42;
+            pmo.skeletonHeader.MagicValue = 0x4E4F42;
             pmo.skeletonHeader.BoneCount = (ushort)BoneData.Count;
             pmo.skeletonHeader.SkinnedBoneCount = (ushort)BoneData.Count;
             pmo.skeletonHeader.nStdBone = 2;
 
-            pmo.boneList = new Pmo.BoneData[BoneData.Count];
+            Pmo.BoneData RootBone = new Pmo.BoneData();
+            RootBone.ParentBoneIndex = 0;
+            RootBone.BoneIndex = 0;
+            RootBone.JointName = "Root";
+
+            pmo.boneList = new Pmo.BoneData[1];
+            pmo.boneList[0] = RootBone;
+            */
+
+            /*pmo.boneList = new Pmo.BoneData[BoneData.Count];
 
             for(int b = 0; b < pmo.boneList.Length; b++)
             {
@@ -356,6 +424,19 @@ namespace OpenKh.Command.PmoConverter
             return Pmo.CoordinateFormat.FLOAT_32_BITS;
         }
 
+        public static byte[] GetBoneInfluences(MeshDescriptor desc)
+        {
+            byte[] boneInfluences = new byte[8];
+            
+            foreach(Assimp.Bone bn in BoneData)
+            {
+                
+            }
+
+            boneInfluences = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
+
+            return boneInfluences;
+        }
         public static MeshGroup FromFbx(string filePath)
         {
             const float Scale = 1.0f;
@@ -371,18 +452,39 @@ namespace OpenKh.Command.PmoConverter
             foreach(Assimp.Material mat in scene.Materials)
             {
                 Stream str = null;
-                var name = Path.GetFileName(mat.TextureDiffuse.FilePath);
+                var name = Path.GetFileNameWithoutExtension(mat.TextureDiffuse.FilePath);
+                var FinalName = "";
+                bool isTm2 = false;
                 if (name != "" || name != null)
                 {
-                    str = File.OpenRead(name);
+                    if(!File.Exists(name + ".tm2"))
+                    {
+                        FinalName = name + ".png";
+                        str = File.OpenRead(FinalName);
+                    }
+                    else
+                    {
+                        isTm2 = true;
+                        FinalName = name + ".tm2";
+                        str = File.OpenRead(FinalName);
+                    }
                 }
                 
                 if(str != null)
                 {
-                    TexList.Add(Path.GetFileName(mat.TextureDiffuse.FilePath));
-                    PngImage png = new PngImage(str);
-                    Tm2 tmImage = Tm2.Create(png);
-                    TextureData.Add(tmImage);
+                    TexList.Add(Path.GetFileNameWithoutExtension(mat.TextureDiffuse.FilePath));
+
+                    if (isTm2)
+                    {
+                        var rTim = Tm2.Read(str);
+                        TextureData.Add(rTim.ToArray()[0]);
+                    }
+                    else
+                    {
+                        PngImage png = new PngImage(str);
+                        Tm2 tmImage = Tm2.Create(png);
+                        TextureData.Add(tmImage);
+                    } 
                 }
             }
 

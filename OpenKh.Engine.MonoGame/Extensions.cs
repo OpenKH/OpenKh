@@ -12,7 +12,20 @@ namespace OpenKh.Engine.MonoGame
         {
             var size = image.Size;
             var texture = new Texture2D(graphicsDevice, size.Width, size.Height);
-            texture.SetData(image.AsBgra8888());
+            if(image.PixelFormat != PixelFormat.Rgba1555)
+            {
+                texture.SetData(image.AsBgra8888());
+            }
+            else
+            {
+                texture = new Texture2D(graphicsDevice, 1, 1);
+                byte[] pix = new byte[4];
+                pix[0] = 0xFF;
+                pix[1] = 0xFF;
+                pix[2] = 0xFF;
+                pix[3] = 0xFF;
+                texture.SetData(pix);
+            }
 
             return texture;
         }

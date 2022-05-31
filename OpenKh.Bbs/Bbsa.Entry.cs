@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.IO;
 using Xe.IO;
@@ -11,9 +11,10 @@ namespace OpenKh.Bbs
         {
             private const int SectorLength = 0x800;
             private readonly Header bbsaHeader;
-            private readonly int offset;
+            public readonly int offset;
             private readonly int length;
             private readonly string fileName;
+            private readonly string ext;
             private readonly string folderName;
 
             internal Entry(
@@ -21,21 +22,29 @@ namespace OpenKh.Bbs
                 int offset,
                 int length,
                 string fileName,
+                string ext,
                 string folderName,
                 uint fileHash,
-                uint folderHash)
+                uint folderHash,
+                uint locationoffs,
+                int archIndex)
             {
                 bbsaHeader = bbsa._header;
                 this.offset = offset;
                 this.length = length;
                 this.fileName = fileName;
+                this.ext = ext;
                 this.folderName = folderName;
                 FileHash = fileHash;
                 FolderHash = folderHash;
+                Location = locationoffs;
+                ArchiveIndex = archIndex;
             }
 
             public uint FileHash { get; }
             public uint FolderHash { get; }
+            public uint Location { get; }
+            public int ArchiveIndex { get; }
             public string Name => $"{FolderName}/{FileName}";
             public bool HasCompleteName => fileName != null && folderName != null;
 
@@ -51,8 +60,23 @@ namespace OpenKh.Bbs
 
                 return $"{Name}.{extension}";
             }
+            public string CalculateNameWithExtension(Func<int, Stream> bbsaLoader, out int ArchiveIndex)
+            {
+                ArchiveIndex = 0;
+                if (!CalculateArchiveOffset(bbsaHeader, offset, out var archiveIndex, out var physicalSector))
+                {
+                    ArchiveIndex = archiveIndex;
+                    return Name;
+                }
 
-            public SubStream OpenStream(Func<int, Stream> bbsaLoader)
+                var stream = bbsaLoader(archiveIndex);
+                var extension = CalculateExtension(stream, physicalSector * SectorLength);
+                if (extension == null)
+                    return Name;
+
+                return $"{Name}.{extension}";
+            }
+            public SubStream OpenStream(Func<int, Stream> bbsaLoader, bool first = false)
             {
                 if (!CalculateArchiveOffset(bbsaHeader, offset, out var archiveIndex, out var physicalSector))
                     return null;
@@ -63,6 +87,8 @@ namespace OpenKh.Bbs
 
                 if (length == 0xFFF)
                 {
+                    if(first==true)
+                        subStreamLength = GetPsmfLength(stream, subStreamOffset);
                     if (IsPsmf(stream, subStreamOffset))
                         subStreamLength = GetPsmfLength(stream, subStreamOffset);
                 }
@@ -89,7 +115,7 @@ namespace OpenKh.Bbs
                 (stream.ReadByte() << 0);
         }
 
-        private static bool CalculateArchiveOffset(
+        public static bool CalculateArchiveOffset(
             Header header, int offset, out int archiveIndex, out int physicalSector)
         {
             if (offset >= header.Archive4Sector)
@@ -112,7 +138,7 @@ namespace OpenKh.Bbs
                 archiveIndex = 1;
                 physicalSector = offset - header.Archive1Sector + 1;
             }
-            else if (offset >= header.Archive0Sector)
+            else if (offset >= header.Archive0Sector|| offset <= header.Archive0Sector)
             {
                 archiveIndex = 0;
                 physicalSector = offset + header.Archive0Sector;
@@ -133,24 +159,42 @@ namespace OpenKh.Bbs
             var magicCode = new BinaryReader(stream).ReadUInt32();
             switch (magicCode)
             {
-                case 0x61754C1B: return "lub";
-                case 0x41264129: return "ice";
-                case 0x44544340: return "ctd";
-                case 0x50444540: return "edp";
-                case 0x00435241: return "arc";
-                case 0x44424D40: return "mbd";
-                case 0x00444145: return "ead";
-                case 0x07504546: return "fep";
-                case 0x00425449: return "itb";
-                case 0x00435449: return "itc";
-                case 0x00455449: return "ite";
-                case 0x004D4150: return "pam";
-                case 0x004F4D50: return "pmo";
-                case 0x42444553: return "scd";
-                case 0x324D4954: return "tm2";
-                case 0x00415854: return "txa";
-                case 0x00617865: return "exa";
-                default: return null;
+                case 0x61754C1B:
+                    return "lub";
+                case 0x41264129:
+                    return "ice";
+                case 0x44544340:
+                    return "ctd";
+                case 0x50444540:
+                    return "edp";
+                case 0x00435241:
+                    return "arc";
+                case 0x44424D40:
+                    return "mbd";
+                case 0x00444145:
+                    return "ead";
+                case 0x07504546:
+                    return "fep";
+                case 0x00425449:
+                    return "itb";
+                case 0x00435449:
+                    return "itc";
+                case 0x00455449:
+                    return "ite";
+                case 0x004D4150:
+                    return "pam";
+                case 0x004F4D50:
+                    return "pmo";
+                case 0x42444553:
+                    return "scd";
+                case 0x324D4954:
+                    return "tm2";
+                case 0x00415854:
+                    return "txa";
+                case 0x00617865:
+                    return "exa";
+                default:
+                    return null;
             }
         }
 
@@ -171,5 +215,5 @@ namespace OpenKh.Bbs
 
             return string.Format(pathCategory, strLanguage, strWorld);
         }
-    }
+    } 
 }
