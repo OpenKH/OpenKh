@@ -70,7 +70,7 @@ namespace OpenKh.Game.Entities
 
             IsPlayer = objEntry.ObjectType == Objentry.Type.PLAYER;
 
-            /*var modelName = $"obj/{objEntry.ModelName}.mdlx";
+            var modelName = $"obj/{objEntry.ModelName}.mdlx";
             using var stream = Kernel.DataContent.FileOpen(modelName);
             var entries = Bar.Read(stream);
             _model = entries.ForEntry(x => x.Type == Bar.EntryType.Model, Mdlx.Read);
@@ -80,9 +80,9 @@ namespace OpenKh.Game.Entities
             Textures = texture.LoadTextures(graphics).ToArray();
 
             ObjectCollisions = entries.ForEntry(x => x.Type == Bar.EntryType.ModelCollision && x.Stream.Length > 0,
-                ObjectCollision.Read) ?? new List<ObjectCollision>();*/
+                ObjectCollision.Read) ?? new List<ObjectCollision>();
 
-            (Model, Textures) = BBSMeshLoader(graphics, "models/Test.pmo", Model, Textures);
+            //(Model, Textures) = BBSMeshLoader(graphics, "models/Test.pmo", Model, Textures);
 
             try
             {
