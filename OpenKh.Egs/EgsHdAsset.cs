@@ -109,59 +109,45 @@ namespace OpenKh.Egs
             if (dataLength % 16 != 0)
                 dataLength += 16 - (dataLength % 16);
 
-            var data = _stream.AlignPosition(0x10).ReadBytes(dataLength);
+            var packedData = _stream.AlignPosition(0x10).ReadBytes(dataLength);
 
-            _remasteredAssetsRawData.Add(assetName, data.ToArray());
+            _remasteredAssetsRawData.Add(assetName, packedData.ToArray());
 
             if (header.CompressedLength > -2)
             {
                 for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
-                    EgsEncryption.DecryptChunk(_key, data, i, PASS_COUNT);
+                    EgsEncryption.DecryptChunk(_key, packedData, i, PASS_COUNT);
             }
 
-            if (header.CompressedLength > -1)
-            {
-                using var compressedStream = new MemoryStream(data);
-                using var deflate = new DeflateStream(compressedStream.SetPosition(2), CompressionMode.Decompress);
-
-                var decompressedData = new byte[header.DecompressedLength];
-                deflate.Read(decompressedData);
-
-                data = decompressedData;
-            }
-
-            _remasteredAssetsData.Add(assetName, data.ToArray());
-
-            return data;
+            var realData = header.CompressedLength > -1 ? Decompress(packedData, header.DecompressedLength) : packedData;
+            _remasteredAssetsData.Add(assetName, realData.ToArray());
+            return realData;
         }
 
         private byte[] ReadData()
         {
             var dataLength = _header.CompressedLength >= 0 ? _header.CompressedLength : _header.DecompressedLength;
-            var data = _stream.SetPosition(_dataOffset).ReadBytes(dataLength);
+            var packedData = _stream.SetPosition(_dataOffset).ReadBytes(dataLength);
 
-            _originalRawData = data.ToArray();
+            _originalRawData = packedData.ToArray();
 
             if (_header.CompressedLength > -2)
             {
                 for (var i = 0; i < Math.Min(dataLength, 0x100); i += 0x10)
-                    EgsEncryption.DecryptChunk(_key, data, i, PASS_COUNT);
+                    EgsEncryption.DecryptChunk(_key, packedData, i, PASS_COUNT);
             }
 
-            if (_header.CompressedLength > -1)
-            {
-                using var compressedStream = new MemoryStream(data);
-                using var deflate = new DeflateStream(compressedStream.SetPosition(2), CompressionMode.Decompress);
+            return _originalData = _header.CompressedLength > -1 ? Decompress(packedData, _header.DecompressedLength) : packedData;
+        }
 
-                var decompressedData = new byte[_header.DecompressedLength];
-                deflate.Read(decompressedData);
+        private static byte[] Decompress(byte[] compressedData, int expectedDecompressedLength)
+        {
+            using var compressedStream = new MemoryStream(compressedData);
+            using var deflate = new DeflateStream(compressedStream.SetPosition(2), CompressionMode.Decompress);
+            using var decompressedStream = new MemoryStream(expectedDecompressedLength);
 
-                data = decompressedData;
-            }
-
-            _originalData = data.ToArray();
-
-            return data;
+            deflate.CopyTo(decompressedStream);
+            return decompressedStream.ToArray();
         }
     }
 }
