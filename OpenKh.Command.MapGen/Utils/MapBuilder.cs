@@ -16,7 +16,7 @@ namespace OpenKh.Command.MapGen.Utils
     {
         private const int MaxVertCount = 71;
 
-        private Mdlx.M4 mapModel;
+        private ModelBackground mapModel;
         private BigMeshContainer bigMeshContainer;
         private List<BigMesh> smallMeshList = new List<BigMesh>();
         private ModelTexture modelTex;
@@ -258,9 +258,9 @@ namespace OpenKh.Command.MapGen.Utils
 
             logger.Debug($"Starting mesh splitter and vif packets builder.");
 
-            mapModel = new Mdlx.M4
+            mapModel = new ModelBackground
             {
-                VifPackets = new List<Mdlx.VifPacketDescriptor>(),
+                VifPackets = new List<ModelBackground.VifPacketDescriptor>(),
             };
 
             foreach (var bigMesh in bigMeshContainer.MeshList
@@ -277,7 +277,7 @@ namespace OpenKh.Command.MapGen.Utils
                     smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.VifPackets.Count));
 
                     mapModel.VifPackets.Add(
-                        new Mdlx.VifPacketDescriptor
+                        new ModelBackground.VifPacketDescriptor
                         {
                             VifPacket = dmaPack.vifPacket.ToArray(),
                             TextureId = smallMesh.textureIndex,
@@ -285,7 +285,7 @@ namespace OpenKh.Command.MapGen.Utils
                                 dmaPack.firstVifPacketQwc,
                                 0,
                             },
-                            IsTransparentFlag = smallMesh.matDef.transparentFlag ?? 0,
+                            TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
                             EnableUvsc = smallMesh.matDef.uvscIndex.HasValue,
                             UvscIndex = smallMesh.matDef.uvscIndex ?? 0,
                         }

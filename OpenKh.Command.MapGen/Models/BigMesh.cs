@@ -23,7 +23,7 @@ namespace OpenKh.Command.MapGen.Models
         /// <summary>
         /// -1 if nodraw flag set
         /// </summary>
-        public int textureIndex = -1;
+        public short textureIndex = -1;
 
         public MaterialDef matDef;
 

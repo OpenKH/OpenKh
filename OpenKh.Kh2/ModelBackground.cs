@@ -1,6 +1,4 @@
-// Original source code: https://gitlab.com/kenjiuno/khkh_xldM/blob/master/khkh_xldMii/Mdlxfst.cs
-
-using OpenKh.Common;
+﻿using OpenKh.Common;
 using OpenKh.Common.Ps2;
 using OpenKh.Common.Utils;
 using System;
@@ -11,28 +9,32 @@ using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
 {
-    public partial class Mdlx
+    public class ModelBackground : Model
     {
-        public class SubModelMapHeader
+        private record Header
         {
-            [Data] public int Type { get; set; }
+            [Data] public Type Type { get; set; }
             [Data] public int Unk04 { get; set; }
             [Data] public int Unk08 { get; set; }
             [Data] public int NextOffset { get; set; }
-            [Data] public int DmaChainMapCount { get; set; }
-            [Data] public short va4 { get; set; }
+            [Data] public ushort DmaChainCount { get; set; }
+            [Data] public short Unk12 { get; set; }
+            [Data] public short Unk14 { get; set; }
             [Data] public short CountVifPacketRenderingGroup { get; set; }
             [Data] public int OffsetVifPacketRenderingGroup { get; set; }
             [Data] public int OffsetToOffsetDmaChainIndexRemapTable { get; set; }
         }
 
-        private class DmaChainMap
+        private record DmaChainMap
         {
             [Data] public int VifOffset { get; set; }
-            [Data] public int TextureIndex { get; set; }
+            [Data] public short TextureIndex { get; set; }
+            [Data] public short Unk06 { get; set; }
             [Data] public short Unk08 { get; set; }
-            [Data] public short IsTransparentFlag { get; set; }
-            [Data] public int Unk0c { get; set; }
+            [Data] public short TransparencyFlag { get; set; }
+            [Data] public byte Unk0c { get; set; }
+            [Data] public byte Unk0d { get; set; }
+            [Data] public short PolygonCount { get; set; }
 
             public bool EnableUvsc
             {
@@ -47,24 +49,16 @@ namespace OpenKh.Kh2
             }
         }
 
-        public class M4
-        {
-            public int unk04;
-            public int unk08;
-            public int nextOffset;
-            public short va4;
-            public List<ushort> DmaChainIndexRemapTable;
-            public List<ushort[]> vifPacketRenderingGroup;
-            public List<VifPacketDescriptor> VifPackets;
-        }
-
-        public class VifPacketDescriptor
+        public record VifPacketDescriptor
         {
             public byte[] VifPacket { get; set; }
-            public int TextureId { get; set; }
+            public short TextureId { get; set; }
+            public short Unk06 { get; set; }
             public short Unk08 { get; set; }
-            public short IsTransparentFlag { get; set; }
-            public int Unk0c { get; set; }
+            public short TransparencyFlag { get; set; }
+            public byte Unk0c { get; set; }
+            public byte Unk0d { get; set; }
+            public short PolygonCount { get; set; }
             public ushort[] DmaPerVif { get; set; }
 
             public bool EnableUvsc
@@ -80,12 +74,35 @@ namespace OpenKh.Kh2
             }
         }
 
-        private static M4 ReadAsMap(Stream stream)
-        {
-            var header = BinaryMapping.ReadObject<SubModelMapHeader>(stream);
-            if (header.Type != Map) throw new NotSupportedException("Type must be 2 for maps");
+        private readonly List<DmaChainMap> _dmaChains;
+        public List<ushort> DmaChainIndexRemapTable { get; set; }
+        public List<VifPacketDescriptor> VifPackets { get; set; }
+        public int Unk04 { get; set; }
+        public int Unk08 { get; set; }
+        private readonly int _nextOffset;
+        public short Unk12 { get; set; }
+        public short Unk14 { get; set; }
+        private readonly short _countVifPacketRenderingGroup;
+        public List<ushort[]> vifPacketRenderingGroup;
 
-            var dmaChainMaps = For(header.DmaChainMapCount, () => BinaryMapping.ReadObject<DmaChainMap>(stream));
+        public ModelBackground()
+        {
+
+        }
+
+        public ModelBackground(Stream stream)
+        {
+            var header = BinaryMapping.ReadObject<Header>(stream);
+            _dmaChains = For(header.DmaChainCount, () => BinaryMapping.ReadObject<DmaChainMap>(stream));
+
+            foreach (var group in _dmaChains)
+            {
+                if (group.TransparencyFlag > 0)
+                    Flags |= 1;
+                if ((group.Unk06 & 1) != 0)
+                    Flags |= 2;
+            }
+
 
             stream.Position = header.OffsetVifPacketRenderingGroup;
 
@@ -93,17 +110,17 @@ namespace OpenKh.Kh2
             var count1 = (short)((stream.ReadInt32() - header.OffsetVifPacketRenderingGroup) / 4);
             stream.Position -= 4;
 
-            var vifPacketRenderingGroup = For(count1, () => stream.ReadInt32())
+            vifPacketRenderingGroup = For(count1, () => stream.ReadInt32())
                 .Select(offset => ReadUInt16List(stream.SetPosition(offset)).ToArray())
                 .ToList();
 
             stream.Position = header.OffsetToOffsetDmaChainIndexRemapTable;
             var offsetDmaChainIndexRemapTable = stream.ReadInt32();
             stream.Position = offsetDmaChainIndexRemapTable;
-            var dmaChainIndexRemapTable = ReadUInt16List(stream)
+            DmaChainIndexRemapTable = ReadUInt16List(stream)
                 .ToList();
 
-            var vifPackets = dmaChainMaps
+            VifPackets = _dmaChains
                 .Select(dmaChain =>
                 {
                     var currentVifOffset = dmaChain.VifOffset;
@@ -127,50 +144,62 @@ namespace OpenKh.Kh2
                     {
                         VifPacket = packet.ToArray(),
                         TextureId = dmaChain.TextureIndex,
+                        Unk06 = dmaChain.Unk06,
                         Unk08 = dmaChain.Unk08,
-                        IsTransparentFlag = dmaChain.IsTransparentFlag,
+                        TransparencyFlag = dmaChain.TransparencyFlag,
                         Unk0c = dmaChain.Unk0c,
+                        Unk0d = dmaChain.Unk0d,
+                        PolygonCount = dmaChain.PolygonCount,
                         DmaPerVif = sizePerDma.ToArray(),
                     };
                 })
                 .ToList();
 
-            return new M4
-            {
-                unk04 = header.Unk04,
-                unk08 = header.Unk08,
-                nextOffset = header.NextOffset,
-                va4 = header.va4,
-
-                vifPacketRenderingGroup = vifPacketRenderingGroup,
-                DmaChainIndexRemapTable = dmaChainIndexRemapTable,
-                VifPackets = vifPackets
-            };
+            Unk04 = header.Unk04;
+            Unk08 = header.Unk08;
+            _nextOffset = header.NextOffset;
+            Unk12 = header.Unk12;
+            Unk14 = header.Unk14;
+            _countVifPacketRenderingGroup = header.CountVifPacketRenderingGroup;
         }
 
-        private static void WriteAsMap(Stream stream, M4 mapModel)
+        public override int GroupCount => _dmaChains.Count;
+
+        public override int GetDrawPolygonCount(IList<byte> displayFlags)
         {
-            var mapHeader = new SubModelMapHeader
+            var groupCount = Math.Min(displayFlags.Count, _dmaChains.Count);
+            var polygonCount = 0;
+            for (var i = 0; i < groupCount; i++)
             {
-                Type = Map,
-                DmaChainMapCount = mapModel.VifPackets.Count,
+                if (displayFlags[i] > 0)
+                    polygonCount += _dmaChains[i].PolygonCount;
+            }
 
-                Unk04 = mapModel.unk04,
-                Unk08 = mapModel.unk08,
-                NextOffset = mapModel.nextOffset,
-                va4 = mapModel.va4,
-                CountVifPacketRenderingGroup = Convert.ToInt16(mapModel.vifPacketRenderingGroup.Count),
+            return polygonCount;
+        }
+
+        protected override void InternalWrite(Stream stream)
+        {
+            var mapHeader = new Header
+            {
+                Type = Type.Background,
+                Unk04 = Unk04,
+                Unk08 = Unk08,
+                NextOffset = _nextOffset,
+                DmaChainCount = (ushort)_dmaChains.Count,
+                Unk12 = Unk12,
+                Unk14 = Unk14,
+                CountVifPacketRenderingGroup = _countVifPacketRenderingGroup,
             };
-
             BinaryMapping.WriteObject(stream, mapHeader);
 
             var dmaChainMapDescriptorOffset = (int)stream.Position;
-            stream.Position += mapModel.VifPackets.Count * 0x10;
+            stream.Position += VifPackets.Count * 0x10;
 
             mapHeader.OffsetVifPacketRenderingGroup = (int)stream.Position;
-            stream.Position += mapModel.vifPacketRenderingGroup.Count * 4;
+            stream.Position += vifPacketRenderingGroup.Count * 4;
             var groupOffsets = new List<int>();
-            foreach (var group in mapModel.vifPacketRenderingGroup)
+            foreach (var group in vifPacketRenderingGroup)
             {
                 groupOffsets.Add((int)stream.Position);
                 WriteUInt16List(stream, group);
@@ -189,12 +218,12 @@ namespace OpenKh.Kh2
             mapHeader.OffsetToOffsetDmaChainIndexRemapTable = remapTableOffsetToOffset;
             var remapTableOffset = remapTableOffsetToOffset + 4;
             stream.Write(remapTableOffset);
-            WriteUInt16List(stream, mapModel.DmaChainIndexRemapTable);
+            WriteUInt16List(stream, DmaChainIndexRemapTable);
 
             stream.AlignPosition(0x10);
 
             var dmaChainVifOffsets = new List<int>();
-            foreach (var dmaChainMap in mapModel.VifPackets)
+            foreach (var dmaChainMap in VifPackets)
             {
                 var vifPacketIndex = 0;
                 dmaChainVifOffsets.Add((int)stream.Position);
@@ -220,40 +249,27 @@ namespace OpenKh.Kh2
             stream.SetLength(stream.Position);
 
             stream.Position = dmaChainMapDescriptorOffset;
-            for (var i = 0; i < mapModel.VifPackets.Count; i++)
+            for (var i = 0; i < VifPackets.Count; i++)
             {
-                var dmaChainMap = mapModel.VifPackets[i];
+                var dmaChainMap = VifPackets[i];
                 BinaryMapping.WriteObject(stream, new DmaChainMap
                 {
                     VifOffset = dmaChainVifOffsets[i],
                     TextureIndex = dmaChainMap.TextureId,
+                    Unk06 = dmaChainMap.Unk06,
                     Unk08 = dmaChainMap.Unk08,
-                    IsTransparentFlag = dmaChainMap.IsTransparentFlag,
+                    TransparencyFlag = dmaChainMap.TransparencyFlag,
                     Unk0c = dmaChainMap.Unk0c,
+                    Unk0d = dmaChainMap.Unk0d,
+                    PolygonCount = dmaChainMap.PolygonCount,
                     EnableUvsc = dmaChainMap.EnableUvsc,
                     UvscIndex = dmaChainMap.UvscIndex,
                 });
             }
 
-            stream.Position = 0;
+            stream.FromBegin();
             BinaryMapping.WriteObject(stream, mapHeader);
-        }
-
-        private static IEnumerable<ushort> ReadUInt16List(Stream stream)
-        {
-            while (true)
-            {
-                var data = stream.ReadUInt16();
-                if (data == 0xFFFF) break;
-                yield return data;
-            }
-        }
-
-        private static void WriteUInt16List(Stream stream, IEnumerable<ushort> alb2t2)
-        {
-            foreach (var data in alb2t2)
-                stream.Write(data);
-            stream.Write((ushort)0xFFFF);
+            stream.SetPosition(stream.Length);
         }
     }
 }

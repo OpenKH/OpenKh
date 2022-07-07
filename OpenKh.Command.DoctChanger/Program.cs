@@ -238,8 +238,8 @@ namespace OpenKh.Command.DoctChanger
 
                 var mapModel = Mdlx.Read(entries.Single(IsMapModel).Stream);
 
-                var numVifPackets = mapModel.MapModel.VifPackets.Count;
-                var numAlb2Groups = mapModel.MapModel.vifPacketRenderingGroup.Count;
+                var numVifPackets = mapModel.ModelBackground.VifPackets.Count;
+                var numAlb2Groups = mapModel.ModelBackground.vifPacketRenderingGroup.Count;
 
                 Console.WriteLine($"numVifPackets: {numVifPackets:#,##0}");
                 Console.WriteLine($"numAlb2Groups: {numAlb2Groups:#,##0}");
