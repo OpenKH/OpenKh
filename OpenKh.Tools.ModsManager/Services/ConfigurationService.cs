@@ -51,8 +51,9 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private const string ConfigPath = "mods-manager.yml";
-        private const string EnabledModsPath = "mods.txt";
+        private static string AssDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        private static string ConfigPath = Path.Combine(AssDirectory, "mods-manager.yml");
+        private static string EnabledModsPath = Path.Combine(AssDirectory, "mods.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
 
         static ConfigurationService()
@@ -104,7 +105,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string ModCollectionPath
         {
-            get => _config.ModCollectionPath ?? Path.GetFullPath("mods");
+            get => _config.ModCollectionPath ?? Path.GetFullPath(Path.Combine(AssDirectory, "mods"));
             set
             {
                 _config.ModCollectionPath = value;
@@ -114,7 +115,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string GameModPath
         {
-            get => _config.GameModPath ?? Path.GetFullPath("mod");
+            get => _config.GameModPath ?? Path.GetFullPath(Path.Combine(AssDirectory, "mod"));
             set
             {
                 _config.GameModPath = value;
@@ -124,7 +125,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string GameDataLocation
         {
-            get => _config.GameDataPath ?? Path.GetFullPath("data");
+            get => _config.GameDataPath ?? Path.GetFullPath(Path.Combine(AssDirectory, "data"));
             set
             {
                 _config.GameDataPath = value;
