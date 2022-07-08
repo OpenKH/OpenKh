@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Common.Ps2;
 using OpenKh.Common.Utils;
 using System;
@@ -14,8 +14,8 @@ namespace OpenKh.Kh2
         private record Header
         {
             [Data] public Type Type { get; set; }
-            [Data] public int Unk04 { get; set; }
-            [Data] public int Unk08 { get; set; }
+            [Data] public int IsSkyBox { get; set; }
+            [Data] public int Unk08 { get; set; } // unused?
             [Data] public int NextOffset { get; set; }
             [Data] public ushort DmaChainCount { get; set; }
             [Data] public short Unk12 { get; set; }
@@ -77,7 +77,7 @@ namespace OpenKh.Kh2
         private readonly List<DmaChainMap> _dmaChains;
         public List<ushort> DmaChainIndexRemapTable { get; set; }
         public List<VifPacketDescriptor> VifPackets { get; set; }
-        public int Unk04 { get; set; }
+        public bool IsSkyBox { get; set; }
         public int Unk08 { get; set; }
         private readonly int _nextOffset;
         public short Unk12 { get; set; }
@@ -155,7 +155,7 @@ namespace OpenKh.Kh2
                 })
                 .ToList();
 
-            Unk04 = header.Unk04;
+            IsSkyBox = header.IsSkyBox == 1;
             Unk08 = header.Unk08;
             _nextOffset = header.NextOffset;
             Unk12 = header.Unk12;
@@ -183,7 +183,7 @@ namespace OpenKh.Kh2
             var mapHeader = new Header
             {
                 Type = Type.Background,
-                Unk04 = Unk04,
+                IsSkyBox = IsSkyBox ? 1 : 0,
                 Unk08 = Unk08,
                 NextOffset = _nextOffset,
                 DmaChainCount = (ushort)_dmaChains.Count,
