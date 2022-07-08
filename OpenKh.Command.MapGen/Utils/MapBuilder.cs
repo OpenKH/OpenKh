@@ -260,7 +260,7 @@ namespace OpenKh.Command.MapGen.Utils
 
             mapModel = new ModelBackground
             {
-                VifPackets = new List<ModelBackground.ModelChunk>(),
+                Chunks = new List<ModelBackground.ModelChunk>(),
             };
 
             foreach (var bigMesh in bigMeshContainer.MeshList
@@ -273,10 +273,10 @@ namespace OpenKh.Command.MapGen.Utils
 
                     smallMeshList.Add(smallMesh);
 
-                    bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.VifPackets.Count));
-                    smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.VifPackets.Count));
+                    bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
+                    smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
 
-                    mapModel.VifPackets.Add(
+                    mapModel.Chunks.Add(
                         new ModelBackground.ModelChunk
                         {
                             VifPacket = dmaPack.vifPacket.ToArray(),
@@ -292,7 +292,7 @@ namespace OpenKh.Command.MapGen.Utils
                 }
             }
 
-            logger.Debug($"Output: {mapModel.VifPackets.Count:#,##0} vif packets.");
+            logger.Debug($"Output: {mapModel.Chunks.Count:#,##0} vif packets.");
 
             logger.Debug($"The builder has done.");
 
@@ -302,7 +302,7 @@ namespace OpenKh.Command.MapGen.Utils
 
             mapModel.vifPacketRenderingGroup = new List<ushort[]>(
                 new ushort[][] {
-                        Enumerable.Range(0, mapModel.VifPackets.Count)
+                        Enumerable.Range(0, mapModel.Chunks.Count)
                             .Select(it => Convert.ToUInt16(it))
                             .ToArray()
                 }
@@ -311,7 +311,7 @@ namespace OpenKh.Command.MapGen.Utils
             logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups.");
 
             mapModel.DmaChainIndexRemapTable = new List<ushort>(
-                Enumerable.Range(0, mapModel.VifPackets.Count)
+                Enumerable.Range(0, mapModel.Chunks.Count)
                     .Select(it => Convert.ToUInt16(it))
                     .ToArray()
             );

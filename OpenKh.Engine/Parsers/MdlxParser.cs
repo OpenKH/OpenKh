@@ -68,7 +68,7 @@ namespace OpenKh.Engine.Parsers
             }
             else if (IsMap(mdlx))
             {
-                MeshDescriptors = mdlx.ModelBackground.VifPackets
+                MeshDescriptors = mdlx.ModelBackground.Chunks
                     .Select(vifPacket => Parse(vifPacket))
                     .ToList();
             }

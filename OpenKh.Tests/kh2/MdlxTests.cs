@@ -106,7 +106,7 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ReadVifPackets() => File.OpenRead(MapFileName).Using(stream =>
         {
-            var alvifpkt = Mdlx.Read(stream).ModelBackground.VifPackets;
+            var alvifpkt = Mdlx.Read(stream).ModelBackground.Chunks;
             Assert.Equal(97, alvifpkt.Count);
 
             var packet1 = alvifpkt[0];

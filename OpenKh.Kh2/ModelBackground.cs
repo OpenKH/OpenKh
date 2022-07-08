@@ -31,7 +31,7 @@ namespace OpenKh.Kh2
             [Data] public int OffsetToOffsetDmaChainIndexRemapTable { get; set; }
         }
 
-        private record ModelChunkInfo
+        private record ChunkInfo
         {
             [Data] public int DmaTagOffset { get; set; }
             [Data] public short TextureIndex { get; set; }
@@ -141,9 +141,8 @@ namespace OpenKh.Kh2
             public ushort[] DmaPerVif { get; set; }
         }
 
-        private readonly List<ModelChunkInfo> _dmaChains;
         public List<ushort> DmaChainIndexRemapTable { get; set; }
-        public List<ModelChunk> VifPackets { get; set; }
+        public List<ModelChunk> Chunks { get; set; }
         public BackgroundType BgType { get; set; }
         public int Attribute { get; set; }
         private readonly int _nextOffset;
@@ -160,13 +159,13 @@ namespace OpenKh.Kh2
         public ModelBackground(Stream stream)
         {
             var header = BinaryMapping.ReadObject<Header>(stream);
-            _dmaChains = For(header.ChunkCount, () => BinaryMapping.ReadObject<ModelChunkInfo>(stream));
+            var chunks = For(header.ChunkCount, () => BinaryMapping.ReadObject<ChunkInfo>(stream));
 
-            foreach (var group in _dmaChains)
+            foreach (var chunk in chunks)
             {
-                if (group.TransparencyFlag > 0)
+                if (chunk.TransparencyFlag > 0)
                     Flags |= 1;
-                if (group.IsSpecular)
+                if (chunk.IsSpecular)
                     Flags |= 2;
             }
 
@@ -186,10 +185,10 @@ namespace OpenKh.Kh2
             DmaChainIndexRemapTable = ReadUInt16List(stream)
                 .ToList();
 
-            VifPackets = _dmaChains
-                .Select(dmaChain =>
+            Chunks = chunks
+                .Select(chunk =>
                 {
-                    var currentVifOffset = dmaChain.DmaTagOffset;
+                    var currentVifOffset = chunk.DmaTagOffset;
 
                     DmaTag dmaTag;
                     var packet = new List<byte>();
@@ -209,21 +208,21 @@ namespace OpenKh.Kh2
                     return new ModelChunk
                     {
                         VifPacket = packet.ToArray(),
-                        TextureId = dmaChain.TextureIndex,
-                        Priority = dmaChain.Priority,
-                        TransparencyFlag = dmaChain.TransparencyFlag,
-                        IsSpecular = dmaChain.IsSpecular,
-                        HasVertexBuffer = dmaChain.HasVertexBuffer,
-                        Alternative = dmaChain.Alternative,
-                        IsAlphaSubtract = dmaChain.IsAlphaSubtract,
-                        IsAlphaAdd = dmaChain.IsAlphaAdd,
-                        UVScrollIndex = dmaChain.UVScrollIndex,
-                        IsShadowOff = dmaChain.IsShadowOff,
-                        IsPhase = dmaChain.IsPhase,
-                        DrawPriority = dmaChain.DrawPriority,
-                        IsMulti = dmaChain.IsMulti,
-                        IsAlpha = dmaChain.IsAlpha,
-                        PolygonCount = dmaChain.PolygonCount,
+                        TextureId = chunk.TextureIndex,
+                        Priority = chunk.Priority,
+                        TransparencyFlag = chunk.TransparencyFlag,
+                        IsSpecular = chunk.IsSpecular,
+                        HasVertexBuffer = chunk.HasVertexBuffer,
+                        Alternative = chunk.Alternative,
+                        IsAlphaSubtract = chunk.IsAlphaSubtract,
+                        IsAlphaAdd = chunk.IsAlphaAdd,
+                        UVScrollIndex = chunk.UVScrollIndex,
+                        IsShadowOff = chunk.IsShadowOff,
+                        IsPhase = chunk.IsPhase,
+                        DrawPriority = chunk.DrawPriority,
+                        IsMulti = chunk.IsMulti,
+                        IsAlpha = chunk.IsAlpha,
+                        PolygonCount = chunk.PolygonCount,
                         DmaPerVif = sizePerDma.ToArray(),
                     };
                 })
@@ -237,16 +236,16 @@ namespace OpenKh.Kh2
             _countVifPacketRenderingGroup = header.CountVifPacketRenderingGroup;
         }
 
-        public override int GroupCount => _dmaChains.Count;
+        public override int GroupCount => Chunks.Count;
 
         public override int GetDrawPolygonCount(IList<byte> displayFlags)
         {
-            var groupCount = Math.Min(displayFlags.Count, _dmaChains.Count);
+            var groupCount = Math.Min(displayFlags.Count, Chunks.Count);
             var polygonCount = 0;
             for (var i = 0; i < groupCount; i++)
             {
                 if (displayFlags[i] > 0)
-                    polygonCount += _dmaChains[i].PolygonCount;
+                    polygonCount += Chunks[i].PolygonCount;
             }
 
             return polygonCount;
@@ -260,7 +259,7 @@ namespace OpenKh.Kh2
                 BgType = BgType,
                 Attribute = Attribute,
                 NextOffset = _nextOffset,
-                ChunkCount = (ushort)_dmaChains.Count,
+                ChunkCount = (ushort)Chunks.Count,
                 Unk12 = Unk12,
                 Unk14 = Unk14,
                 CountVifPacketRenderingGroup = _countVifPacketRenderingGroup,
@@ -268,7 +267,7 @@ namespace OpenKh.Kh2
             BinaryMapping.WriteObject(stream, mapHeader);
 
             var dmaChainMapDescriptorOffset = (int)stream.Position;
-            stream.Position += VifPackets.Count * 0x10;
+            stream.Position += Chunks.Count * 0x10;
 
             mapHeader.OffsetVifPacketRenderingGroup = (int)stream.Position;
             stream.Position += vifPacketRenderingGroup.Count * 4;
@@ -296,13 +295,13 @@ namespace OpenKh.Kh2
 
             stream.AlignPosition(0x10);
 
-            var dmaChainVifOffsets = new List<int>();
-            foreach (var dmaChainMap in VifPackets)
+            var dmaTagOffsets = new List<int>();
+            foreach (var chunk in Chunks)
             {
                 var vifPacketIndex = 0;
-                dmaChainVifOffsets.Add((int)stream.Position);
+                dmaTagOffsets.Add((int)stream.Position);
 
-                foreach (var packetCount in dmaChainMap.DmaPerVif)
+                foreach (var packetCount in chunk.DmaPerVif)
                 {
                     BinaryMapping.WriteObject(stream, new DmaTag
                     {
@@ -313,7 +312,7 @@ namespace OpenKh.Kh2
                     });
 
                     var packetLength = packetCount * 0x10 + 8;
-                    stream.Write(dmaChainMap.VifPacket, vifPacketIndex, packetLength);
+                    stream.Write(chunk.VifPacket, vifPacketIndex, packetLength);
 
                     vifPacketIndex += packetLength;
                 }
@@ -323,27 +322,27 @@ namespace OpenKh.Kh2
             stream.SetLength(stream.Position);
 
             stream.Position = dmaChainMapDescriptorOffset;
-            for (var i = 0; i < VifPackets.Count; i++)
+            for (var i = 0; i < Chunks.Count; i++)
             {
-                var dmaChain = VifPackets[i];
-                BinaryMapping.WriteObject(stream, new ModelChunkInfo
+                var chunk = Chunks[i];
+                BinaryMapping.WriteObject(stream, new ChunkInfo
                 {
-                    DmaTagOffset = dmaChainVifOffsets[i],
-                    TextureIndex = dmaChain.TextureId,
-                    Priority = dmaChain.Priority,
-                    TransparencyFlag = dmaChain.TransparencyFlag,
-                    IsSpecular = dmaChain.IsSpecular,
-                    HasVertexBuffer = dmaChain.HasVertexBuffer,
-                    Alternative = dmaChain.Alternative,
-                    IsAlphaSubtract = dmaChain.IsAlphaSubtract,
-                    IsAlphaAdd = dmaChain.IsAlphaAdd,
-                    UVScrollIndex = dmaChain.UVScrollIndex,
-                    IsShadowOff = dmaChain.IsShadowOff,
-                    IsPhase = dmaChain.IsPhase,
-                    DrawPriority = dmaChain.DrawPriority,
-                    IsMulti = dmaChain.IsMulti,
-                    IsAlpha = dmaChain.IsAlpha,
-                    PolygonCount = dmaChain.PolygonCount,
+                    DmaTagOffset = dmaTagOffsets[i],
+                    TextureIndex = chunk.TextureId,
+                    Priority = chunk.Priority,
+                    TransparencyFlag = chunk.TransparencyFlag,
+                    IsSpecular = chunk.IsSpecular,
+                    HasVertexBuffer = chunk.HasVertexBuffer,
+                    Alternative = chunk.Alternative,
+                    IsAlphaSubtract = chunk.IsAlphaSubtract,
+                    IsAlphaAdd = chunk.IsAlphaAdd,
+                    UVScrollIndex = chunk.UVScrollIndex,
+                    IsShadowOff = chunk.IsShadowOff,
+                    IsPhase = chunk.IsPhase,
+                    DrawPriority = chunk.DrawPriority,
+                    IsMulti = chunk.IsMulti,
+                    IsAlpha = chunk.IsAlpha,
+                    PolygonCount = chunk.PolygonCount,
                 });
             }
 

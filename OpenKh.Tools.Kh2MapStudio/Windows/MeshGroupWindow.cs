@@ -40,7 +40,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                         var meshIndex = group[j];
                         ForTreeNode($"Index {j}, Mesh {meshIndex}##{index}", () =>
                         {
-                            var vifPacket = meshGroup.Map.VifPackets[meshIndex];
+                            var vifPacket = meshGroup.Map.Chunks[meshIndex];
                             ForEdit("Texture",
                                 () => vifPacket.TextureId,
                                 x => vifPacket.TextureId = (short)Math.Min(Math.Max(x, 0), meshGroup.Texture.Count - 1));
@@ -65,7 +65,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                 });
             }
 
-            for (var i = 0; i < meshGroup.Map.VifPackets.Count; i++)
+            for (var i = 0; i < meshGroup.Map.Chunks.Count; i++)
             {
             }
         }
