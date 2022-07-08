@@ -11,13 +11,19 @@ namespace OpenKh.Kh2
 {
     public class ModelBackground : Model
     {
+        public enum BackgroundType : int
+        {
+            Field,
+            Skybox,
+        }
+
         private record Header
         {
             [Data] public Type Type { get; set; }
-            [Data] public int IsSkyBox { get; set; }
-            [Data] public int Unk08 { get; set; } // unused?
+            [Data] public BackgroundType BgType { get; set; }
+            [Data] public int Attribute { get; set; }
             [Data] public int NextOffset { get; set; }
-            [Data] public ushort DmaChainCount { get; set; }
+            [Data] public ushort ChunkCount { get; set; }
             [Data] public short Unk12 { get; set; }
             [Data] public short Unk14 { get; set; }
             [Data] public short CountVifPacketRenderingGroup { get; set; }
@@ -25,60 +31,121 @@ namespace OpenKh.Kh2
             [Data] public int OffsetToOffsetDmaChainIndexRemapTable { get; set; }
         }
 
-        private record DmaChainMap
+        private record ModelChunkInfo
         {
-            [Data] public int VifOffset { get; set; }
+            [Data] public int DmaTagOffset { get; set; }
             [Data] public short TextureIndex { get; set; }
-            [Data] public short Unk06 { get; set; }
-            [Data] public short Unk08 { get; set; }
+            [Data] public ushort Flags1 { get; set; }
+            [Data] public short Priority { get; set; }
             [Data] public short TransparencyFlag { get; set; }
-            [Data] public byte Unk0c { get; set; }
-            [Data] public byte Unk0d { get; set; }
+            [Data] public byte Flags2 { get; set; }
+            [Data] public byte Flags3 { get; set; }
             [Data] public short PolygonCount { get; set; }
 
-            public bool EnableUvsc
+            public bool IsSpecular
             {
-                get => BitsUtil.Int.GetBit(Unk0c, 1);
-                set => Unk0c = BitsUtil.Int.SetBit(Unk0c, 1, value);
+                get => BitsUtil.Int.GetBit(Flags1, 0);
+                set => Flags1 = (ushort)BitsUtil.Int.SetBit(Flags1, 0, value);
             }
 
-            public int UvscIndex
+            public bool HasVertexBuffer
             {
-                get => BitsUtil.Int.GetBits(Unk0c, 2, 4);
-                set => Unk0c = BitsUtil.Int.SetBits(Unk0c, 2, 4, value);
+                get => BitsUtil.Int.GetBit(Flags1, 1);
+                set => Flags1 = (ushort)BitsUtil.Int.SetBit(Flags1, 1, value);
+            }
+
+            public int Alternative
+            {
+                get => BitsUtil.Int.GetBits(Flags1, 2, 12);
+                set => Flags1 = (ushort)BitsUtil.Int.SetBits(Flags1, 2, 12, value);
+            }
+
+            public bool IsAlphaSubtract
+            {
+                get => BitsUtil.Int.GetBit(Flags2, 7);
+                set => Flags2 = BitsUtil.Int.SetBit(Flags2, 7, value);
+            }
+
+            public bool IsAlphaAdd
+            {
+                get => BitsUtil.Int.GetBit(Flags2, 6);
+                set => Flags2 = BitsUtil.Int.SetBit(Flags2, 6, value);
+            }
+
+            public int UVScrollIndex
+            {
+                get => BitsUtil.Int.GetBits(Flags2, 1, 5);
+                set => Flags2 = BitsUtil.Int.SetBits(Flags2, 1, 5, value);
+            }
+
+            public bool IsShadowOff
+            {
+                get => BitsUtil.Int.GetBit(Flags2, 0);
+                set => Flags2 = BitsUtil.Int.SetBit(Flags2, 0, value);
+            }
+
+            public bool IsPhase
+            {
+                get => BitsUtil.Int.GetBit(Flags3, 7);
+                set => Flags3 = BitsUtil.Int.SetBit(Flags3, 7, value);
+            }
+
+            public uint DrawPriority
+            {
+                get => (uint)BitsUtil.Int.GetBits(Flags3, 2, 5);
+                set => Flags3 = BitsUtil.Int.SetBits(Flags3, 2, 5, (int)value);
+            }
+
+            public bool IsMulti
+            {
+                get => BitsUtil.Int.GetBit(Flags3, 1);
+                set => Flags3 = BitsUtil.Int.SetBit(Flags3, 1, value);
+            }
+
+            public bool IsAlpha
+            {
+                get => BitsUtil.Int.GetBit(Flags3, 0);
+                set => Flags3 = BitsUtil.Int.SetBit(Flags3, 0, value);
             }
         }
 
-        public record VifPacketDescriptor
+        public record ModelChunk
         {
             public byte[] VifPacket { get; set; }
             public short TextureId { get; set; }
-            public short Unk06 { get; set; }
-            public short Unk08 { get; set; }
+            public short Priority { get; set; }
             public short TransparencyFlag { get; set; }
-            public byte Unk0c { get; set; }
-            public byte Unk0d { get; set; }
+
+            public bool IsSpecular { get; set; }
+
+            public bool HasVertexBuffer { get; set; }
+
+            public int Alternative { get; set; }
+
+            public bool IsAlphaSubtract { get; set; }
+
+            public bool IsAlphaAdd { get; set; }
+
+            public int UVScrollIndex { get; set; }
+
+            public bool IsShadowOff { get; set; }
+
+            public bool IsPhase { get; set; }
+
+            public uint DrawPriority { get; set; }
+
+            public bool IsMulti { get; set; }
+
+            public bool IsAlpha { get; set; }
             public short PolygonCount { get; set; }
             public ushort[] DmaPerVif { get; set; }
-
-            public bool EnableUvsc
-            {
-                get => BitsUtil.Int.GetBit(Unk0c, 1);
-                set => Unk0c = BitsUtil.Int.SetBit(Unk0c, 1, value);
-            }
-
-            public int UvscIndex
-            {
-                get => BitsUtil.Int.GetBits(Unk0c, 2, 4);
-                set => Unk0c = BitsUtil.Int.SetBits(Unk0c, 2, 4, value);
-            }
         }
 
-        private readonly List<DmaChainMap> _dmaChains;
+        private readonly List<ModelChunkInfo> _dmaChains;
         public List<ushort> DmaChainIndexRemapTable { get; set; }
-        public List<VifPacketDescriptor> VifPackets { get; set; }
-        public bool IsSkyBox { get; set; }
-        public int Unk08 { get; set; }
+        public List<ModelChunk> VifPackets { get; set; }
+        public BackgroundType BgType { get; set; }
+        public int Attribute { get; set; }
         private readonly int _nextOffset;
         public short Unk12 { get; set; }
         public short Unk14 { get; set; }
@@ -93,16 +160,15 @@ namespace OpenKh.Kh2
         public ModelBackground(Stream stream)
         {
             var header = BinaryMapping.ReadObject<Header>(stream);
-            _dmaChains = For(header.DmaChainCount, () => BinaryMapping.ReadObject<DmaChainMap>(stream));
+            _dmaChains = For(header.ChunkCount, () => BinaryMapping.ReadObject<ModelChunkInfo>(stream));
 
             foreach (var group in _dmaChains)
             {
                 if (group.TransparencyFlag > 0)
                     Flags |= 1;
-                if ((group.Unk06 & 1) != 0)
+                if (group.IsSpecular)
                     Flags |= 2;
             }
-
 
             stream.Position = header.OffsetVifPacketRenderingGroup;
 
@@ -123,7 +189,7 @@ namespace OpenKh.Kh2
             VifPackets = _dmaChains
                 .Select(dmaChain =>
                 {
-                    var currentVifOffset = dmaChain.VifOffset;
+                    var currentVifOffset = dmaChain.DmaTagOffset;
 
                     DmaTag dmaTag;
                     var packet = new List<byte>();
@@ -140,23 +206,31 @@ namespace OpenKh.Kh2
                         currentVifOffset += 16 + 16 * dmaTag.Qwc;
                     } while (dmaTag.TagId < 2);
 
-                    return new VifPacketDescriptor
+                    return new ModelChunk
                     {
                         VifPacket = packet.ToArray(),
                         TextureId = dmaChain.TextureIndex,
-                        Unk06 = dmaChain.Unk06,
-                        Unk08 = dmaChain.Unk08,
+                        Priority = dmaChain.Priority,
                         TransparencyFlag = dmaChain.TransparencyFlag,
-                        Unk0c = dmaChain.Unk0c,
-                        Unk0d = dmaChain.Unk0d,
+                        IsSpecular = dmaChain.IsSpecular,
+                        HasVertexBuffer = dmaChain.HasVertexBuffer,
+                        Alternative = dmaChain.Alternative,
+                        IsAlphaSubtract = dmaChain.IsAlphaSubtract,
+                        IsAlphaAdd = dmaChain.IsAlphaAdd,
+                        UVScrollIndex = dmaChain.UVScrollIndex,
+                        IsShadowOff = dmaChain.IsShadowOff,
+                        IsPhase = dmaChain.IsPhase,
+                        DrawPriority = dmaChain.DrawPriority,
+                        IsMulti = dmaChain.IsMulti,
+                        IsAlpha = dmaChain.IsAlpha,
                         PolygonCount = dmaChain.PolygonCount,
                         DmaPerVif = sizePerDma.ToArray(),
                     };
                 })
                 .ToList();
 
-            IsSkyBox = header.IsSkyBox == 1;
-            Unk08 = header.Unk08;
+            BgType = header.BgType;
+            Attribute = header.Attribute;
             _nextOffset = header.NextOffset;
             Unk12 = header.Unk12;
             Unk14 = header.Unk14;
@@ -183,10 +257,10 @@ namespace OpenKh.Kh2
             var mapHeader = new Header
             {
                 Type = Type.Background,
-                IsSkyBox = IsSkyBox ? 1 : 0,
-                Unk08 = Unk08,
+                BgType = BgType,
+                Attribute = Attribute,
                 NextOffset = _nextOffset,
-                DmaChainCount = (ushort)_dmaChains.Count,
+                ChunkCount = (ushort)_dmaChains.Count,
                 Unk12 = Unk12,
                 Unk14 = Unk14,
                 CountVifPacketRenderingGroup = _countVifPacketRenderingGroup,
@@ -251,19 +325,25 @@ namespace OpenKh.Kh2
             stream.Position = dmaChainMapDescriptorOffset;
             for (var i = 0; i < VifPackets.Count; i++)
             {
-                var dmaChainMap = VifPackets[i];
-                BinaryMapping.WriteObject(stream, new DmaChainMap
+                var dmaChain = VifPackets[i];
+                BinaryMapping.WriteObject(stream, new ModelChunkInfo
                 {
-                    VifOffset = dmaChainVifOffsets[i],
-                    TextureIndex = dmaChainMap.TextureId,
-                    Unk06 = dmaChainMap.Unk06,
-                    Unk08 = dmaChainMap.Unk08,
-                    TransparencyFlag = dmaChainMap.TransparencyFlag,
-                    Unk0c = dmaChainMap.Unk0c,
-                    Unk0d = dmaChainMap.Unk0d,
-                    PolygonCount = dmaChainMap.PolygonCount,
-                    EnableUvsc = dmaChainMap.EnableUvsc,
-                    UvscIndex = dmaChainMap.UvscIndex,
+                    DmaTagOffset = dmaChainVifOffsets[i],
+                    TextureIndex = dmaChain.TextureId,
+                    Priority = dmaChain.Priority,
+                    TransparencyFlag = dmaChain.TransparencyFlag,
+                    IsSpecular = dmaChain.IsSpecular,
+                    HasVertexBuffer = dmaChain.HasVertexBuffer,
+                    Alternative = dmaChain.Alternative,
+                    IsAlphaSubtract = dmaChain.IsAlphaSubtract,
+                    IsAlphaAdd = dmaChain.IsAlphaAdd,
+                    UVScrollIndex = dmaChain.UVScrollIndex,
+                    IsShadowOff = dmaChain.IsShadowOff,
+                    IsPhase = dmaChain.IsPhase,
+                    DrawPriority = dmaChain.DrawPriority,
+                    IsMulti = dmaChain.IsMulti,
+                    IsAlpha = dmaChain.IsAlpha,
+                    PolygonCount = dmaChain.PolygonCount,
                 });
             }
 

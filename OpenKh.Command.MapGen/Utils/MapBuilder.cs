@@ -260,7 +260,7 @@ namespace OpenKh.Command.MapGen.Utils
 
             mapModel = new ModelBackground
             {
-                VifPackets = new List<ModelBackground.VifPacketDescriptor>(),
+                VifPackets = new List<ModelBackground.ModelChunk>(),
             };
 
             foreach (var bigMesh in bigMeshContainer.MeshList
@@ -277,7 +277,7 @@ namespace OpenKh.Command.MapGen.Utils
                     smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.VifPackets.Count));
 
                     mapModel.VifPackets.Add(
-                        new ModelBackground.VifPacketDescriptor
+                        new ModelBackground.ModelChunk
                         {
                             VifPacket = dmaPack.vifPacket.ToArray(),
                             TextureId = smallMesh.textureIndex,
@@ -286,8 +286,7 @@ namespace OpenKh.Command.MapGen.Utils
                                 0,
                             },
                             TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
-                            EnableUvsc = smallMesh.matDef.uvscIndex.HasValue,
-                            UvscIndex = smallMesh.matDef.uvscIndex ?? 0,
+                            UVScrollIndex = smallMesh.matDef.uvscIndex ?? 0,
                         }
                     );
                 }

@@ -92,7 +92,7 @@ namespace OpenKh.Engine.Parsers
 
         public Matrix4x4[] CurrentPose { get; private set; }
 
-        private static MeshDescriptor Parse(ModelBackground.VifPacketDescriptor vifPacketDescriptor)
+        private static MeshDescriptor Parse(ModelBackground.ModelChunk vifPacketDescriptor)
         {
             var vertices = new List<PositionColoredTextured>();
             var indices = new List<int>();
