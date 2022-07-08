@@ -23,10 +23,10 @@ namespace OpenKh.Kh2
             [Data] public BackgroundType BgType { get; set; }
             [Data] public int Attribute { get; set; }
             [Data] public int NextOffset { get; set; }
-            [Data] public ushort ChunkCount { get; set; }
-            [Data] public short Unk12 { get; set; }
-            [Data] public short Unk14 { get; set; }
-            [Data] public short CountVifPacketRenderingGroup { get; set; }
+            [Data] public ushort ModelCount { get; set; }
+            [Data] public ushort ShadowCount { get; set; }
+            [Data] public ushort TextureCount { get; set; }
+            [Data] public ushort OctalTreeCount { get; set; }
             [Data] public int OffsetVifPacketRenderingGroup { get; set; }
             [Data] public int OffsetToOffsetDmaChainIndexRemapTable { get; set; }
         }
@@ -146,9 +146,9 @@ namespace OpenKh.Kh2
         public BackgroundType BgType { get; set; }
         public int Attribute { get; set; }
         private readonly int _nextOffset;
-        public short Unk12 { get; set; }
-        public short Unk14 { get; set; }
-        private readonly short _countVifPacketRenderingGroup;
+        public ushort ShadowCount { get; private set; }
+        public ushort TextureCount { get; private set; }
+        public ushort OctalTreeCount { get; private set; }
         public List<ushort[]> vifPacketRenderingGroup;
 
         public ModelBackground()
@@ -159,7 +159,7 @@ namespace OpenKh.Kh2
         public ModelBackground(Stream stream)
         {
             var header = BinaryMapping.ReadObject<Header>(stream);
-            var chunks = For(header.ChunkCount, () => BinaryMapping.ReadObject<ChunkInfo>(stream));
+            var chunks = For(header.ModelCount, () => BinaryMapping.ReadObject<ChunkInfo>(stream));
 
             foreach (var chunk in chunks)
             {
@@ -231,9 +231,9 @@ namespace OpenKh.Kh2
             BgType = header.BgType;
             Attribute = header.Attribute;
             _nextOffset = header.NextOffset;
-            Unk12 = header.Unk12;
-            Unk14 = header.Unk14;
-            _countVifPacketRenderingGroup = header.CountVifPacketRenderingGroup;
+            ShadowCount = header.ShadowCount;
+            TextureCount = header.TextureCount;
+            OctalTreeCount = header.OctalTreeCount;
         }
 
         public override int GroupCount => Chunks.Count;
@@ -259,10 +259,10 @@ namespace OpenKh.Kh2
                 BgType = BgType,
                 Attribute = Attribute,
                 NextOffset = _nextOffset,
-                ChunkCount = (ushort)Chunks.Count,
-                Unk12 = Unk12,
-                Unk14 = Unk14,
-                CountVifPacketRenderingGroup = _countVifPacketRenderingGroup,
+                ModelCount = (ushort)Chunks.Count,
+                ShadowCount = ShadowCount,
+                TextureCount = TextureCount,
+                OctalTreeCount = OctalTreeCount,
             };
             BinaryMapping.WriteObject(stream, mapHeader);
 

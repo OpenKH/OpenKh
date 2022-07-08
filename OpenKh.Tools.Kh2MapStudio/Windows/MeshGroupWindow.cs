@@ -26,9 +26,10 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
             ForEdit("Is sky box",
                 () => meshGroup.Map.BgType == Kh2.ModelBackground.BackgroundType.Skybox,
                 x => meshGroup.Map.BgType = x ? Kh2.ModelBackground.BackgroundType.Skybox : Kh2.ModelBackground.BackgroundType.Field);
-            ForEdit("Unk08", () => meshGroup.Map.Attribute, x => meshGroup.Map.Attribute = x);
-            ForEdit("Unk12", () => meshGroup.Map.Unk12, x => meshGroup.Map.Unk12 = x);
-            ForEdit("Unk14", () => meshGroup.Map.Unk14, x => meshGroup.Map.Unk14 = x);
+            ForEdit("Attribute", () => meshGroup.Map.Attribute, x => meshGroup.Map.Attribute = x);
+            ForEdit("Shadow count", () => meshGroup.Map.ShadowCount, x => { });
+            ForEdit("Texture count", () => meshGroup.Map.TextureCount, x => { });
+            ForEdit("Octaltree count", () => meshGroup.Map.OctalTreeCount, x => { });
 
             for (var i = 0; i < meshGroup.Map.vifPacketRenderingGroup.Count; i++)
             {
