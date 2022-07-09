@@ -27,7 +27,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
         }
 
         public string Name { get; }
-        public Mdlx.M4 Map => _model.MapModel;
+        public ModelBackground Map => _model.ModelBackground;
         public List<ModelTexture.Texture> Texture { get; }
         public int Index { get; }
         public MeshGroup MeshGroup { get; private set; }

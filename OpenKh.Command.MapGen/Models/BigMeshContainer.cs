@@ -19,10 +19,10 @@ namespace OpenKh.Command.MapGen.Models
             var it = MeshList.Find(it => it.matDef == matDef);
             if (it == null)
             {
-                var textureIndex = -1;
+                var textureIndex = (short)-1;
                 if (!matDef.nodraw)
                 {
-                    textureIndex = AllocatedMaterialDefs.Count;
+                    textureIndex = (short)AllocatedMaterialDefs.Count;
                     AllocatedMaterialDefs.Add(matDef);
                 }
 

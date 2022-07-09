@@ -204,20 +204,39 @@ namespace OpenKh.Tools.Common.CustomImGui
                 setter(value);
         }
 
-        public static void ForEdit(string name, Func<byte> getter, Action<byte> setter) =>
-            ForEdit(name, () => (int)getter(), x => setter((byte)x));
+        public static void ForEdit(string name, Func<byte> getter, Action<byte> setter)
+        {
+            var value = (int)getter();
+            if (ImGui.DragInt(name, ref value, 1.0f, byte.MinValue, byte.MaxValue))
+                setter((byte)value);
+        }
 
-        public static void ForEdit(string name, Func<short> getter, Action<short> setter) =>
-            ForEdit(name, () => (int)getter(), x => setter((short)x));
+        public static void ForEdit(string name, Func<short> getter, Action<short> setter)
+        {
+            var value = (int)getter();
+            if (ImGui.DragInt(name, ref value, 1.0f, short.MinValue, short.MaxValue))
+                setter((short)value);
+        }
 
-        public static void ForEdit(string name, Func<ushort> getter, Action<ushort> setter) =>
-            ForEdit(name, () => (int)getter(), x => setter((ushort)x));
+        public static void ForEdit(string name, Func<ushort> getter, Action<ushort> setter)
+        {
+            var value = (int)getter();
+            if (ImGui.DragInt(name, ref value, 1.0f, ushort.MinValue, ushort.MaxValue))
+                setter((ushort)value);
+        }
 
         public static void ForEdit(string name, Func<int> getter, Action<int> setter)
         {
             var value = getter();
             if (ImGui.DragInt(name, ref value))
                 setter(value);
+        }
+
+        public static void ForEdit(string name, Func<uint> getter, Action<uint> setter)
+        {
+            var value = (int)getter();
+            if (ImGui.DragInt(name, ref value, 1.0f, (int)uint.MinValue, int.MaxValue))
+                setter((uint)value);
         }
 
         public static void ForEdit(string name, Func<float> getter, Action<float> setter, float speed = 1f)

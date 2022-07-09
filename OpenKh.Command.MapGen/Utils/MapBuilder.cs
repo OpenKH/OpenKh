@@ -16,7 +16,7 @@ namespace OpenKh.Command.MapGen.Utils
     {
         private const int MaxVertCount = 71;
 
-        private Mdlx.M4 mapModel;
+        private ModelBackground mapModel;
         private BigMeshContainer bigMeshContainer;
         private List<BigMesh> smallMeshList = new List<BigMesh>();
         private ModelTexture modelTex;
@@ -258,9 +258,9 @@ namespace OpenKh.Command.MapGen.Utils
 
             logger.Debug($"Starting mesh splitter and vif packets builder.");
 
-            mapModel = new Mdlx.M4
+            mapModel = new ModelBackground
             {
-                VifPackets = new List<Mdlx.VifPacketDescriptor>(),
+                Chunks = new List<ModelBackground.ModelChunk>(),
             };
 
             foreach (var bigMesh in bigMeshContainer.MeshList
@@ -273,11 +273,11 @@ namespace OpenKh.Command.MapGen.Utils
 
                     smallMeshList.Add(smallMesh);
 
-                    bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.VifPackets.Count));
-                    smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.VifPackets.Count));
+                    bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
+                    smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
 
-                    mapModel.VifPackets.Add(
-                        new Mdlx.VifPacketDescriptor
+                    mapModel.Chunks.Add(
+                        new ModelBackground.ModelChunk
                         {
                             VifPacket = dmaPack.vifPacket.ToArray(),
                             TextureId = smallMesh.textureIndex,
@@ -285,15 +285,14 @@ namespace OpenKh.Command.MapGen.Utils
                                 dmaPack.firstVifPacketQwc,
                                 0,
                             },
-                            IsTransparentFlag = smallMesh.matDef.transparentFlag ?? 0,
-                            EnableUvsc = smallMesh.matDef.uvscIndex.HasValue,
-                            UvscIndex = smallMesh.matDef.uvscIndex ?? 0,
+                            TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
+                            UVScrollIndex = smallMesh.matDef.uvscIndex ?? 0,
                         }
                     );
                 }
             }
 
-            logger.Debug($"Output: {mapModel.VifPackets.Count:#,##0} vif packets.");
+            logger.Debug($"Output: {mapModel.Chunks.Count:#,##0} vif packets.");
 
             logger.Debug($"The builder has done.");
 
@@ -303,7 +302,7 @@ namespace OpenKh.Command.MapGen.Utils
 
             mapModel.vifPacketRenderingGroup = new List<ushort[]>(
                 new ushort[][] {
-                        Enumerable.Range(0, mapModel.VifPackets.Count)
+                        Enumerable.Range(0, mapModel.Chunks.Count)
                             .Select(it => Convert.ToUInt16(it))
                             .ToArray()
                 }
@@ -312,7 +311,7 @@ namespace OpenKh.Command.MapGen.Utils
             logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups.");
 
             mapModel.DmaChainIndexRemapTable = new List<ushort>(
-                Enumerable.Range(0, mapModel.VifPackets.Count)
+                Enumerable.Range(0, mapModel.Chunks.Count)
                     .Select(it => Convert.ToUInt16(it))
                     .ToArray()
             );

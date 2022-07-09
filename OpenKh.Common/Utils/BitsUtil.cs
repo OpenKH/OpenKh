@@ -6,6 +6,7 @@ namespace OpenKh.Common.Utils
         {
             public static bool GetBit(int Data, int position) => GetBits(Data, position, 1) != 0;
 
+            public static byte SetBit(byte Data, int position, bool value) => SetBits(Data, position, 1, value ? 1 : 0);
             public static int SetBit(int Data, int position, bool value) => SetBits(Data, position, 1, value ? 1 : 0);
             public static uint SetBit(uint Data, int position, bool value) => SetBits(Data, position, 1, (uint)(value ? 1 : 0));
 
@@ -13,6 +14,12 @@ namespace OpenKh.Common.Utils
             {
                 var mask = (1 << size) - 1;
                 return (Data >> position) & mask;
+            }
+
+            public static byte SetBits(byte Data, int position, int size, int value)
+            {
+                var mask = (int)((1 << size) - 1U);
+                return (byte)(Data & ~(mask << position) | ((value & mask) << position));
             }
 
             public static int SetBits(int Data, int position, int size, int value)
