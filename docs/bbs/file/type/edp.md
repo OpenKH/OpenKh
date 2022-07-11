@@ -1,6 +1,6 @@
 # EDP Format
 
-EPD stands for *Experience Data Parameters* and it controls all of the changes made when enabling EXP 0 in game.
+EDP stands for *Experience Data Parameters* and it controls all of the changes made when enabling EXP 0 in game.
 
 # Header
 
