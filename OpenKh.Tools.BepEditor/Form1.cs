@@ -94,6 +94,7 @@ namespace OpenKh.Tools.BepEditor
                 bep = Bep.Read(bepFile);
                 UpdateParameters(bep);
                 SaveBEP.Enabled = true;
+                bepFile.Close();
             }
         }
 

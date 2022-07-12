@@ -69,7 +69,7 @@ namespace OpenKh.Bbs
         {
             BinaryMapping.WriteObject<Header>(stream, bep.header);
 
-            for (int c = 0; c < bep.disappearParameters.Count; c++)
+            for (int c = 0; c < bep.baseParameters.Count; c++)
             {
                 BinaryMapping.WriteObject<BaseParameter>(stream, bep.baseParameters[c]);
             }

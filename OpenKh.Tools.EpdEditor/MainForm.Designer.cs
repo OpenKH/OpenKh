@@ -473,9 +473,9 @@ namespace OpenKh.Tools.EpdEditor
             this.StatusAilment_checkbox_09.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.StatusAilment_checkbox_09.Location = new System.Drawing.Point(182, 72);
             this.StatusAilment_checkbox_09.Name = "StatusAilment_checkbox_09";
-            this.StatusAilment_checkbox_09.Size = new System.Drawing.Size(52, 17);
+            this.StatusAilment_checkbox_09.Size = new System.Drawing.Size(50, 17);
             this.StatusAilment_checkbox_09.TabIndex = 0;
-            this.StatusAilment_checkbox_09.Text = "Faint";
+            this.StatusAilment_checkbox_09.Text = "Stun";
             this.StatusAilment_checkbox_09.UseVisualStyleBackColor = true;
             // 
             // StatusAilment_checkbox_10
@@ -572,9 +572,9 @@ namespace OpenKh.Tools.EpdEditor
             this.StatusAilment_checkbox_18.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.StatusAilment_checkbox_18.Location = new System.Drawing.Point(340, 49);
             this.StatusAilment_checkbox_18.Name = "StatusAilment_checkbox_18";
-            this.StatusAilment_checkbox_18.Size = new System.Drawing.Size(60, 17);
+            this.StatusAilment_checkbox_18.Size = new System.Drawing.Size(54, 17);
             this.StatusAilment_checkbox_18.TabIndex = 6;
-            this.StatusAilment_checkbox_18.Text = "Degen";
+            this.StatusAilment_checkbox_18.Text = "Warp";
             this.StatusAilment_checkbox_18.UseVisualStyleBackColor = true;
             // 
             // StatusAilment_checkbox_19
@@ -936,9 +936,9 @@ namespace OpenKh.Tools.EpdEditor
             this.label16.AutoSize = true;
             this.label16.Location = new System.Drawing.Point(126, 67);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(33, 15);
+            this.label16.Size = new System.Drawing.Size(31, 15);
             this.label16.TabIndex = 3;
-            this.label16.Text = "Faint";
+            this.label16.Text = "Stun";
             // 
             // label15
             // 

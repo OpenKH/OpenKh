@@ -118,7 +118,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
 
                 Assimp.Matrix4x4 nd_mtx = mtx;
                 nd_mtx.Transpose();
-                if (bn.ParentBoneIndex == 0xFFFF)
+                if (bn.ParentBoneIndex == -1)
                 {
                     
                     Node curNode = new Node(bn.JointName);
@@ -210,7 +210,7 @@ namespace OpenKh.Command.PAMtoFBXConverter
 
                             float currentWeight = chunk.jointWeights[v].weights[z];
 
-                            switch (chunk.jointWeights[v].coordFormart)
+                            switch (chunk.jointWeights[v].coordFormat)
                             {
                                 case Pmo.CoordinateFormat.NO_VERTEX:
                                     break;

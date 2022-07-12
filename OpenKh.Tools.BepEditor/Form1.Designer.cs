@@ -50,7 +50,7 @@ namespace OpenKh.Tools.BepEditor
             this.BaseStatsLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.BaseStatsLayout.Location = new System.Drawing.Point(3, 3);
             this.BaseStatsLayout.Name = "BaseStatsLayout";
-            this.BaseStatsLayout.Size = new System.Drawing.Size(401, 382);
+            this.BaseStatsLayout.Size = new System.Drawing.Size(443, 663);
             this.BaseStatsLayout.TabIndex = 0;
             this.BaseStatsLayout.WrapContents = false;
             // 
@@ -97,7 +97,7 @@ namespace OpenKh.Tools.BepEditor
             this.tabControl1.Location = new System.Drawing.Point(14, 41);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(415, 416);
+            this.tabControl1.Size = new System.Drawing.Size(457, 697);
             this.tabControl1.TabIndex = 1;
             // 
             // TabBaseStats
@@ -106,7 +106,7 @@ namespace OpenKh.Tools.BepEditor
             this.TabBaseStats.Location = new System.Drawing.Point(4, 24);
             this.TabBaseStats.Name = "TabBaseStats";
             this.TabBaseStats.Padding = new System.Windows.Forms.Padding(3);
-            this.TabBaseStats.Size = new System.Drawing.Size(407, 388);
+            this.TabBaseStats.Size = new System.Drawing.Size(449, 669);
             this.TabBaseStats.TabIndex = 0;
             this.TabBaseStats.Text = "Base Stats";
             this.TabBaseStats.UseVisualStyleBackColor = true;
@@ -117,7 +117,7 @@ namespace OpenKh.Tools.BepEditor
             this.TabDisappearParameters.Location = new System.Drawing.Point(4, 24);
             this.TabDisappearParameters.Name = "TabDisappearParameters";
             this.TabDisappearParameters.Padding = new System.Windows.Forms.Padding(3);
-            this.TabDisappearParameters.Size = new System.Drawing.Size(382, 388);
+            this.TabDisappearParameters.Size = new System.Drawing.Size(407, 388);
             this.TabDisappearParameters.TabIndex = 1;
             this.TabDisappearParameters.Text = "Disappear Parameters";
             this.TabDisappearParameters.UseVisualStyleBackColor = true;
@@ -126,7 +126,7 @@ namespace OpenKh.Tools.BepEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(441, 469);
+            this.ClientSize = new System.Drawing.Size(483, 750);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.SaveBEP);
             this.Controls.Add(this.LoadBEP);
