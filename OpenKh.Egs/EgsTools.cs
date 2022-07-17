@@ -18,8 +18,6 @@ namespace OpenKh.Egs
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
         private const string REMASTERED_FILES_FOLDER_NAME = "remastered";
 
-        delegate void ActionRef<T1, T2, T3, T4, T5>(T1 item1, T2 item2, T3 item3, ref T4 item4, T5 item5);
-
         #region MD5 names
 
         private static readonly IEnumerable<string> KH2Names = IdxName.Names
