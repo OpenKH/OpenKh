@@ -129,7 +129,7 @@ OpenKH::GameId OpenKH::DetectGame()
     wchar_t buffer[MAX_PATH]; // MAX_PATH default macro
     GetModuleFileName(NULL, buffer, MAX_PATH);
 
-    if (wcsicmp(PathFindFileName(buffer), L"KINGDOM HEARTS HD 1.5+2.5 Launcher.exe") == 0)
+    if (_wcsicmp(PathFindFileName(buffer), L"KINGDOM HEARTS HD 1.5+2.5 Launcher.exe") == 0)
         return GameId::Unknown;
 
     if (strcmp((const char*)g_hInstance + 0x2BD2090, "dummy_string") == 0)
