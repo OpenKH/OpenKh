@@ -605,6 +605,7 @@ This file contains data for the shops.
 There's a list of products available. Products are grouped in Inventories. Shops sell products in their inventories.
 Each inventory has the product on its "Product offset" and the following "Product count" products.
 Each shop has the inventory on its "Inventory offset" and the following "Inventory count" products.
+"Valid Item Table" is always at the end of the file. It has no count and is read from the "Valid Items Offset" to the end of the file. In it is every possible Item that can be bought in any of the shops. Any item added to any of the shops must also add the Item ID to this table or the game will crash.
 
 ### Shop Structure
 
@@ -613,9 +614,8 @@ Each shop has the inventory on its "Inventory offset" and the following "Invento
 | 1 	 | Shop header
 | 21 	 | Shop entries
 | 333 	 | Inventory entries
-| 536 	 | Product entries
-
-NOTE: there are 464 products + 72 empty (There may be padding)
+| 404 	 | Product entries
+| 60     | Valid Item Table
 
 ### Shop Header
 
@@ -624,8 +624,9 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 | 0 	 | char[4] | File ID (TZSH)
 | 4 	 | ushort | File type (7)
 | 6 	 | ushort | Shop List count
-| 8 	 | 4B | Unk8
-| 12 	 | 4B | Unk12
+| 8 	 | ushort | Inventory Entry count
+| 10 	 | ushort | Product Entry count
+| 12 	 | uint | Valid Items Offset
 
 ### Shop Entry
 
@@ -641,7 +642,7 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 | 14 	 | byte | Extra Inventory Bitmask (Get other items from unlocked shops)
 | 15 	 | byte | Sound Id (When the shop is opened)
 | 16 	 | short | Inventory count
-| 18 	 | byte | Unk18 (Id?) - [SHOP LIST](../../dictionary/shops.md)
+| 18 	 | byte | Shop Id - [SHOP LIST](../../dictionary/shops.md)
 | 19 	 | byte | Unk19
 | 20 	 | short | Inventory Offset
 | 22 	 | short | Padding
@@ -652,14 +653,20 @@ NOTE: there are 464 products + 72 empty (There may be padding)
 |--------|---------------|-------------|
 | 0 	 | short | Unlock event Id (FFFF means always unlocked)
 | 2 	 | short | Product count
-| 4 	 | short | Product size
+| 4 	 | short | Product Offset
 | 6 	 | short | Padding
 
 ### Product Entry
 
 | Offset | Variable Type | Description |
 |--------|---------------|-------------|
-| 0 	 | uint | Item Id - [Item LIST](../../dictionary/inventory.md)
+| 0 	 | short | Item Id - [Item LIST](../../dictionary/inventory.md)
+
+### Valid Item Table Entry
+
+| Offset | Variable Type | Description |
+|--------|---------------|-------------|
+| 0 	 | short | Item Id - [Item LIST](../../dictionary/inventory.md)
 
 ---
 
