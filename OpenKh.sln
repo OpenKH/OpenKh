@@ -182,6 +182,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.ModsManager", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Kh1", "OpenKh.Kh1\OpenKh.Kh1.csproj", "{EB189B6E-AFA0-463D-8DE8-A51ED32969FD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenKh.Research.Panacea", "OpenKh.Research.Panacea\OpenKh.Research.Panacea.vcxproj", "{3EF82533-6397-496F-A70F-429BB3611A17}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.BbsMapStudio", "OpenKh.Tools.BbsMapStudio\OpenKh.Tools.BbsMapStudio.csproj", "{C2DB9627-2FE5-4BD9-8271-D3A86DACBA30}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Egs", "OpenKh.Egs\OpenKh.Egs.csproj", "{9370AE74-CA9A-440C-BD03-A9D802579B32}"
@@ -195,7 +197,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2MdlxEditor", "OpenKh.Tools.Kh2MdlxEditor\OpenKh.Tools.Kh2MdlxEditor.csproj", "{101C4A12-CAA4-4CF1-B9CC-59957165E0BA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2MsetEditor", "OpenKh.Tools.Kh2MsetEditor\OpenKh.Tools.Kh2MsetEditor.csproj", "{1F02AC54-9FC2-4922-B2DA-E76BC41E95C6}"
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenKh.Research.Panacea", "OpenKh.Research.Panacea\OpenKh.Research.Panacea.vcxproj", "{3EF82533-6397-496F-A70F-429BB3611A17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
