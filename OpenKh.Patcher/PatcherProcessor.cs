@@ -20,6 +20,19 @@ namespace OpenKh.Patcher
             public string SourceModAssetPath { get; set; }
             public string DestinationPath { get; set; }
 
+            public static List<string> Regions = new List<string>()
+            {
+                "us",
+                "jp",
+                "us",
+                "uk",
+                "it",
+                "sp",
+                "gr",
+                "fr",
+                "fm",
+            };
+
             public Context(
                 Metadata metadata,
                 string originalAssetPath,
@@ -36,9 +49,8 @@ namespace OpenKh.Patcher
             public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, path);
             public string GetDestinationPath(string path) => Path.Combine(DestinationPath, path);
             public void EnsureDirectoryExists(string fileName) => Directory.CreateDirectory(Path.GetDirectoryName(fileName));
-            public void CopyOriginalFile(string fileName)
+            public void CopyOriginalFile(string fileName, string dstFile)
             {
-                var dstFile = GetDestinationPath(fileName);
                 EnsureDirectoryExists(dstFile);
 
                 if (!File.Exists(dstFile))
@@ -57,7 +69,7 @@ namespace OpenKh.Patcher
             Patch(originalAssets, outputDir, metadata, modBasePath);
         }
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false)
         {
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
@@ -74,17 +86,62 @@ namespace OpenKh.Patcher
 
                     foreach (var name in names)
                     {
+                        if (assetFile.Platform == null)
+                            assetFile.Platform = "both";
+
                         if (assetFile.Required && !File.Exists(context.GetOriginalAssetPath(name)))
                             continue;
 
-                        context.CopyOriginalFile(name);
-                        var dstFile = context.GetDestinationPath(name);
+                        var _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "kh2_first";
 
-                        using var stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                        PatchFile(context, assetFile, stream);
+                        var dstFile = context.GetDestinationPath(name);
+                        var _pcFile = name.Contains("remastered") || name.Contains("raw");
+
+                        var _extraPath = _pcFile ? "" : "original/";
+
+                        switch (platform)
+                        {
+                            default:
+                            {
+                                if (assetFile.Platform.ToLower() == "pc")
+                                    continue;
+
+                                else if (_pcFile)
+                                    continue;
+
+                                context.CopyOriginalFile(name, dstFile);
+
+                                using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                                PatchFile(context, assetFile, _stream);
+
+                                _stream.Close();
+                            }
+                            break;
+
+                            case 2:
+                            {
+                                if (assetFile.Platform.ToLower() == "ps2")
+                                    continue;
+
+                                if (assetFile.Platform.ToLower() != "ps2")
+                                    dstFile = context.GetDestinationPath(_packageFile + "/" + _extraPath + name);
+
+                                else if (_pcFile)
+                                    dstFile = context.GetDestinationPath(_packageFile + "/" + name);
+
+                                context.CopyOriginalFile(name, dstFile);
+
+                                using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                                PatchFile(context, assetFile, _stream);
+
+                                _stream.Close();
+                            }
+                            break;
+                        }
                     }
                 });
             }
+
             catch (Exception ex)
             {
                 Log.Err($"Patcher failed: {ex.Message}");

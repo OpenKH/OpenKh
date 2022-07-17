@@ -18,6 +18,26 @@ namespace OpenKh.Tools.ModsManager.Services
         private const string ModMetadata = "mod.yml";
         private const string DefaultGitBranch = "main";
 
+        private static string[] _gameList = new string[]
+        {
+            "OpenKH",
+            "PCSX2-EX",
+            "PC"
+        };
+
+        private static string[] _langList = new string[]
+        {
+            "Default",
+            "Japanese",
+            "English [US]",
+            "English [UK]",
+            "Italian",
+            "Spanish",
+            "German",
+            "French",
+            "Final Mix"
+        };
+
         public static IEnumerable<string> Mods
         {
             get
@@ -219,7 +239,7 @@ namespace OpenKh.Tools.ModsManager.Services
             Action<float> progressNumber = null) =>
             RepositoryService.FetchAndResetUponOrigin(GetModPath(modName), progressOutput, progressNumber);
 
-        public static Task<bool> RunPacherAsync() => Task.Run(() => Handle(() =>
+        public static Task<bool> RunPacherAsync(bool fastMode) => Task.Run(() => Handle(() =>
         {
             if (Directory.Exists(ConfigurationService.GameModPath))
             {
@@ -236,16 +256,19 @@ namespace OpenKh.Tools.ModsManager.Services
 
             var patcherProcessor = new PatcherProcessor();
             var modsList = GetMods(EnabledMods).ToList();
+
             for (var i = modsList.Count - 1; i >= 0; i--)
             {
                 var mod = modsList[i];
-                Log.Info($"Patching using {mod.Name} from {mod.Path}");
+                Log.Info($"Building {mod.Name} for {_gameList[ConfigurationService.GameEdition]} - {_langList[ConfigurationService.RegionId]}");
 
                 patcherProcessor.Patch(
                     ConfigurationService.GameDataLocation,
                     ConfigurationService.GameModPath,
                     mod.Metadata,
-                    mod.Path);
+                    mod.Path,
+                    ConfigurationService.GameEdition,
+                    fastMode);
             }
 
             return true;

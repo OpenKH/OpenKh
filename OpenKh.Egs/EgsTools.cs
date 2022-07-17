@@ -18,6 +18,8 @@ namespace OpenKh.Egs
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
         private const string REMASTERED_FILES_FOLDER_NAME = "remastered";
 
+        delegate void ActionRef<T1, T2, T3, T4, T5>(T1 item1, T2 item2, T3 item3, ref T4 item4, T5 item5);
+
         #region MD5 names
 
         private static readonly IEnumerable<string> KH2Names = IdxName.Names
@@ -51,7 +53,7 @@ namespace OpenKh.Egs
                     "ICON/ICON0_EN.png",
             });
 
-        private static readonly Dictionary<string, string> Names = KH2Names
+        public static readonly Dictionary<string, string> Names = KH2Names
             .Concat(Idx1Name.Names)
             .Concat(EgsHdAsset.DddNames)
             .Concat(EgsHdAsset.BbsNames)
@@ -133,7 +135,7 @@ namespace OpenKh.Egs
             }
         }
 
-        private static string GetHDAssetFolder(string assetFile)
+        public static string GetHDAssetFolder(string assetFile)
         {
             var parentFolder = Directory.GetParent(assetFile).FullName;
             var assetFolderName = Path.Combine(parentFolder, $"{Path.GetFileName(assetFile)}");
@@ -141,7 +143,7 @@ namespace OpenKh.Egs
             return assetFolderName;
         }
 
-        private static void CreateDirectoryForFile(string fileName)
+        public static void CreateDirectoryForFile(string fileName)
         {
             var directoryName = Path.GetDirectoryName(fileName);
             if (!Directory.Exists(directoryName))
@@ -214,7 +216,7 @@ namespace OpenKh.Egs
             }
         }
 
-        private static Hed.Entry AddFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, bool shouldCompressData = false, bool shouldEncryptData = false)
+        public static Hed.Entry AddFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, bool shouldCompressData = false, bool shouldEncryptData = false)
         {
             var completeFilePath = Path.Combine(inputFolder, ORIGINAL_FILES_FOLDER_NAME, filename);
             var completeRawFilePath = Path.Combine(inputFolder, RAW_FILES_FOLDER_NAME, filename);
@@ -318,7 +320,7 @@ namespace OpenKh.Egs
             return hedHeader;
         }
 
-        private static Hed.Entry ReplaceFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, EgsHdAsset asset, Hed.Entry originalHedHeader = null)
+        public static Hed.Entry ReplaceFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, EgsHdAsset asset, Hed.Entry originalHedHeader = null)
         {
             var completeFilePath = Path.Combine(inputFolder, ORIGINAL_FILES_FOLDER_NAME, filename);
             var completeRawFilePath = Path.Combine(inputFolder, RAW_FILES_FOLDER_NAME, filename);

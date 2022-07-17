@@ -4,6 +4,7 @@ using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Services;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Xe.IO;
@@ -22,10 +23,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             .AddExtensions("PlayStation 2 game ISO", "iso");
         private static List<FileDialogFilter> _openkhGeFilter = FileDialogFilterComposer
             .Compose()
-            .AddExtensions("OpenKH Game Engine executable", "*Game.exe");
+            .AddExtensions("OpenKH Game Engine Executable", "*Game.exe");
         private static List<FileDialogFilter> _pcsx2Filter = FileDialogFilterComposer
             .Compose()
-            .AddExtensions("PCSX2 emulator", "exe");
+            .AddExtensions("PCSX2 Emulator", "exe");
+        private static List<FileDialogFilter> _pcFilter = FileDialogFilterComposer
+           .Compose()
+           .AddExtensions("PC Release Executable", "exe");
 
         private int _gameEdition;
         private string _isoLocation;
@@ -33,6 +37,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcsx2Location;
         private string _pcReleaseLocation;
         private string _gameDataLocation;
+
+        private const string RAW_FILES_FOLDER_NAME = "raw";
+        private const string ORIGINAL_FILES_FOLDER_NAME = "original";
+        private const string REMASTERED_FILES_FOLDER_NAME = "remastered";
 
         public string Title => $"Set-up wizard | {ApplicationName}";
 
@@ -66,8 +74,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsGameRecognized));
             }
         }
-        public bool IsIsoSelected => !string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation);
-        public bool IsGameRecognized => IsIsoSelected && GameId != null;
+        public bool IsIsoSelected => (!string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation)) || GameEdition == 2;
+        public bool IsGameRecognized => (IsIsoSelected && GameId != null) || GameEdition == 2;
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
 
@@ -82,6 +90,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     2 => PcReleaseLocation,
                     _ => string.Empty,
                 };
+
                 return !string.IsNullOrEmpty(location) && File.Exists(location);
             }
         }
@@ -172,81 +181,194 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 FileDialog.OnOpen(fileName => OpenKhGameEngineLocation = fileName, _openkhGeFilter));
             SelectPcsx2Command = new RelayCommand(_ =>
                 FileDialog.OnOpen(fileName => Pcsx2Location = fileName, _pcsx2Filter));
+            SelectPcReleaseCommand = new RelayCommand(_ =>
+                FileDialog.OnOpen(fileName => PcReleaseLocation = fileName, _pcFilter));
             SelectGameDataLocationCommand = new RelayCommand(_ =>
                 FileDialog.OnFolder(path => GameDataLocation = path));
-            ExtractGameDataCommand = new RelayCommand(async _ =>
-                await ExtractGameData(IsoLocation, GameDataLocation));
+            ExtractGameDataCommand = new RelayCommand(async _ => 
+            { 
+                BEGIN:
+                try
+                {
+                    await ExtractGameData(IsoLocation, GameDataLocation);
+                }
+
+                catch (IOException _ex)
+                {
+                    var _sysMessage = MessageBox.Show(_ex.Message + "\n\nWould you like to try again?", "An Exception was Caught!", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                    switch (_sysMessage)
+                    {
+                        case MessageBoxResult.Yes:
+                            goto BEGIN;
+                            break;
+                    }
+                }
+            });
         }
 
         private async Task ExtractGameData(string isoLocation, string gameDataLocation)
         {
-            var fileBlocks = File.OpenRead(isoLocation).Using(stream =>
+            switch (GameEdition)
             {
-                var bufferedStream = new BufferedStream(stream);
-                var idxBlock = IsoUtility.GetFileOffset(bufferedStream, "KH2.IDX;1");
-                var imgBlock = IsoUtility.GetFileOffset(bufferedStream, "KH2.IMG;1");
-                return (idxBlock, imgBlock);
-            });
 
-            if (fileBlocks.idxBlock == -1 || fileBlocks.imgBlock == -1)
-            {
-                MessageBox.Show(
-                    $"Unable to find the files KH2.IDX and KH2.IMG in the ISO at '{isoLocation}'. The extraction will stop.",
-                    "Extraction error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                return;
-            }
-
-            IsNotExtracting = false;
-            ExtractionProgress = 0;
-            OnPropertyChanged(nameof(IsNotExtracting));
-            OnPropertyChanged(nameof(IsGameDataFound));
-            OnPropertyChanged(nameof(ProgressBarVisibility));
-            OnPropertyChanged(nameof(ExtractionCompleteVisibility));
-            OnPropertyChanged(nameof(ExtractionProgress));
-
-            await Task.Run(() =>
-            {
-                using var isoStream = File.OpenRead(isoLocation);
-
-                var idxOffset = fileBlocks.idxBlock * 0x800L;
-                var idx = Idx.Read(new SubStream(isoStream, idxOffset, isoStream.Length - idxOffset));
-
-                var imgOffset = fileBlocks.imgBlock * 0x800L;
-                var imgStream = new SubStream(isoStream, imgOffset, isoStream.Length - imgOffset);
-                var img = new Img(imgStream, idx, true);
-
-                var fileCount = img.Entries.Count;
-                var fileProcessed = 0;
-                foreach (var fileEntry in img.Entries)
+                default:
                 {
-                    var fileName = IdxName.Lookup(fileEntry) ?? $"@{fileEntry.Hash32:08X}_{fileEntry.Hash16:04X}";
-                    using var stream = img.FileOpen(fileEntry);
-                    var fileDestination = Path.Combine(gameDataLocation, fileName);
-                    var directoryDestination = Path.GetDirectoryName(fileDestination);
-                    if (!Directory.Exists(directoryDestination))
-                        Directory.CreateDirectory(directoryDestination);
-                    File.Create(fileDestination).Using(dstStream => stream.CopyTo(dstStream, BufferSize));
+                    var fileBlocks = File.OpenRead(isoLocation).Using(stream =>
+                    {
+                        var bufferedStream = new BufferedStream(stream);
+                        var idxBlock = IsoUtility.GetFileOffset(bufferedStream, "KH2.IDX;1");
+                        var imgBlock = IsoUtility.GetFileOffset(bufferedStream, "KH2.IMG;1");
+                        return (idxBlock, imgBlock);
+                    });
 
-                    fileProcessed++;
-                    ExtractionProgress = (float)fileProcessed / fileCount;
-                    OnPropertyChanged(nameof(ExtractionProgress));
-                }
+                    if (fileBlocks.idxBlock == -1 || fileBlocks.imgBlock == -1)
+                    {
+                        MessageBox.Show(
+                            $"Unable to find the files KH2.IDX and KH2.IMG in the ISO at '{isoLocation}'. The extraction will stop.",
+                            "Extraction error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                        return;
+                    }
 
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    IsNotExtracting = true;
-                    ExtractionProgress = 1.0f;
+                    IsNotExtracting = false;
+                    ExtractionProgress = 0;
                     OnPropertyChanged(nameof(IsNotExtracting));
                     OnPropertyChanged(nameof(IsGameDataFound));
-                    OnPropertyChanged(nameof(GameDataNotFoundVisibility));
-                    OnPropertyChanged(nameof(GameDataFoundVisibility));
                     OnPropertyChanged(nameof(ProgressBarVisibility));
                     OnPropertyChanged(nameof(ExtractionCompleteVisibility));
                     OnPropertyChanged(nameof(ExtractionProgress));
-                });
-            });
+
+                    await Task.Run(() =>
+                    {
+                        using var isoStream = File.OpenRead(isoLocation);
+
+                        var idxOffset = fileBlocks.idxBlock * 0x800L;
+                        var idx = Idx.Read(new SubStream(isoStream, idxOffset, isoStream.Length - idxOffset));
+
+                        var imgOffset = fileBlocks.imgBlock * 0x800L;
+                        var imgStream = new SubStream(isoStream, imgOffset, isoStream.Length - imgOffset);
+                        var img = new Img(imgStream, idx, true);
+
+                        var fileCount = img.Entries.Count;
+                        var fileProcessed = 0;
+                        foreach (var fileEntry in img.Entries)
+                        {
+                            var fileName = IdxName.Lookup(fileEntry) ?? $"@{fileEntry.Hash32:08X}_{fileEntry.Hash16:04X}";
+                            using var stream = img.FileOpen(fileEntry);
+                            var fileDestination = Path.Combine(gameDataLocation, fileName);
+                            var directoryDestination = Path.GetDirectoryName(fileDestination);
+                            if (!Directory.Exists(directoryDestination))
+                                Directory.CreateDirectory(directoryDestination);
+                            File.Create(fileDestination).Using(dstStream => stream.CopyTo(dstStream, BufferSize));
+
+                            fileProcessed++;
+                            ExtractionProgress = (float)fileProcessed / fileCount;
+                            OnPropertyChanged(nameof(ExtractionProgress));
+                        }
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            IsNotExtracting = true;
+                            ExtractionProgress = 1.0f;
+                            OnPropertyChanged(nameof(IsNotExtracting));
+                            OnPropertyChanged(nameof(IsGameDataFound));
+                            OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                            OnPropertyChanged(nameof(GameDataFoundVisibility));
+                            OnPropertyChanged(nameof(ProgressBarVisibility));
+                            OnPropertyChanged(nameof(ExtractionCompleteVisibility));
+                            OnPropertyChanged(nameof(ExtractionProgress));
+                        });
+                    });
+                }
+                break;
+
+                case 2:
+                {
+                    IsNotExtracting = false;
+                    ExtractionProgress = 0;
+                    OnPropertyChanged(nameof(IsNotExtracting));
+                    OnPropertyChanged(nameof(IsGameDataFound));
+                    OnPropertyChanged(nameof(ProgressBarVisibility));
+                    OnPropertyChanged(nameof(ExtractionCompleteVisibility));
+                    OnPropertyChanged(nameof(ExtractionProgress));
+
+                    await Task.Run(() =>
+                    {
+                        var _nameList = new string[]
+                        {
+                            "first",
+                            "second",
+                            "third",
+                            "fourth",
+                            "fifth",
+                            "sixth"
+                        };
+
+                        var _totalFiles = 0;
+                        var _procTotalFiles = 0;
+
+                        for (int i = 0; i < 6; i++)
+                        {
+                            using var _stream = new FileStream(Path.GetDirectoryName(_pcReleaseLocation) + "/Image/en/kh2_" + _nameList[i] + ".hed", FileMode.Open);
+                            var _hedFile = OpenKh.Egs.Hed.Read(_stream);
+                            _totalFiles += _hedFile.Count();
+                        }
+
+                        for (int i = 0; i < 6; i++)
+                        {
+                            var outputDir = gameDataLocation;
+                            using var hedStream = File.OpenRead(Path.GetDirectoryName(_pcReleaseLocation) + "/Image/en/kh2_" + _nameList[i] + ".hed");
+                            using var img = File.OpenRead(Path.GetDirectoryName(_pcReleaseLocation) + "/Image/en/kh2_" + _nameList[i] + ".pkg");
+
+                            foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
+                            {
+                                var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
+                                if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
+                                    fileName = $"{hash}.dat";
+
+                                var outputFileName = Path.Combine(outputDir, fileName);
+
+                                OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
+
+                                var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
+
+                                File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
+
+                                outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
+
+                                foreach (var asset in hdAsset.Assets)
+                                {
+                                    var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
+                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
+
+                                    var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
+                                    File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                                    _procTotalFiles++;
+
+                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
+                                    OnPropertyChanged(nameof(ExtractionProgress));
+                                }
+                            }
+                        }
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            IsNotExtracting = true;
+                            ExtractionProgress = 1.0f;
+                            OnPropertyChanged(nameof(IsNotExtracting));
+                            OnPropertyChanged(nameof(IsGameDataFound));
+                            OnPropertyChanged(nameof(GameDataNotFoundVisibility));
+                            OnPropertyChanged(nameof(GameDataFoundVisibility));
+                            OnPropertyChanged(nameof(ProgressBarVisibility));
+                            OnPropertyChanged(nameof(ExtractionCompleteVisibility));
+                            OnPropertyChanged(nameof(ExtractionProgress));
+                        });
+                    });
+                }
+                break;
+            }
         }
     }
 }

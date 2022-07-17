@@ -42,6 +42,8 @@ namespace OpenKh.Patcher
     {
         public string Name { get; set; }
         public string Method { get; set; }
+        public string Platform { get; set; }
+        public string Package { get; set; }
         public List<Multi> Multi { get; set; }
         public List<AssetFile> Source { get; set; }
 
