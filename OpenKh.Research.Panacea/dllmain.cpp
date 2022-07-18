@@ -14,7 +14,6 @@ typedef BOOL(WINAPI* PFN_MiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HA
 PFN_MiniDumpWriteDump MiniDumpWriteDumpPtr;
 void HookDbgHelp()
 {
-    LoadLibraryA("LuaBackend.dll");
     const char OriginalDllName[] = "\\DBGHELP.dll";
     char buffer[0x100];
 
