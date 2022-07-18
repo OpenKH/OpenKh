@@ -2,10 +2,33 @@
 #include <windows.h>
 #include <cstdio>
 #include <cassert>
+#define MiniDumpWriteDump MiniDumpWriteDump_
+#include <DbgHelp.h>
+#undef MiniDumpWriteDump
 #include "OpenKH.h"
 
 FILE* fConsoleStdout = nullptr;
 FILE* fConsoleStderr = nullptr;
+
+typedef BOOL(WINAPI* PFN_MiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam, PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
+PFN_MiniDumpWriteDump MiniDumpWriteDumpPtr;
+void HookDbgHelp()
+{
+    LoadLibraryA("LuaBackend.dll");
+    const char OriginalDllName[] = "\\DBGHELP.dll";
+    char buffer[0x100];
+
+    auto initialLength = GetSystemDirectoryA(buffer, sizeof(buffer) - sizeof(OriginalDllName) - 1);
+    assert(initialLength > 0);
+
+    strcpy(buffer + initialLength, OriginalDllName);
+
+    auto hModule = LoadLibraryA(buffer);
+    assert(hModule != nullptr);
+
+    MiniDumpWriteDumpPtr = (PFN_MiniDumpWriteDump)GetProcAddress(hModule, "MiniDumpWriteDump");
+    assert(hModule != nullptr);
+}
 
 BOOL APIENTRY DllMain(
     HMODULE hModule,
@@ -15,11 +38,10 @@ BOOL APIENTRY DllMain(
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-#ifdef _DEBUG
         AllocConsole();
         fConsoleStdout = freopen("CONOUT$", "w", stdout);
         fConsoleStderr = freopen("CONOUT$", "w", stderr);
-#endif
+        HookDbgHelp();
         OpenKH::Initialize();
         break;
     case DLL_THREAD_ATTACH:
@@ -36,24 +58,8 @@ BOOL APIENTRY DllMain(
     return TRUE;
 }
 
-typedef HRESULT(APIENTRY* PFN_DirectInput8Create)(
-    HINSTANCE hinst, DWORD dwVersion, const IID* const riidltf, LPVOID* ppvOut, void* punkOuter);
-extern "C" __declspec(dllexport) HRESULT APIENTRY DirectInput8Create(
-    HINSTANCE hinst, DWORD dwVersion, const IID* const riidltf, LPVOID * ppvOut, void* punkOuter)
+extern "C" __declspec(dllexport) BOOL WINAPI MiniDumpWriteDump(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam, PMINIDUMP_CALLBACK_INFORMATION CallbackParam)
 {
-    const char OriginalDllName[] = "\\System32\\DINPUT8.DLL";
-    char buffer[0x100];
-    
-    auto initialLength = GetWindowsDirectoryA(buffer, sizeof(buffer) - sizeof(OriginalDllName) - 1);
-    assert(initialLength > 0);
-
-    strcpy(buffer + initialLength, OriginalDllName);
-
-    auto hModule = LoadLibraryA(buffer);
-    assert(hModule != nullptr);
-
-    auto proc = (PFN_DirectInput8Create)GetProcAddress(hModule, "DirectInput8Create");
-    assert(hModule != nullptr);
-
-    return proc(hinst, dwVersion, riidltf, ppvOut, punkOuter);
+    if (!MiniDumpWriteDumpPtr) HookDbgHelp();
+    return MiniDumpWriteDumpPtr(hProcess, ProcessId, hFile, DumpType, ExceptionParam, UserStreamParam, CallbackParam);
 }
