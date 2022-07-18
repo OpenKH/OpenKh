@@ -39,14 +39,6 @@ static const long KingdomApi_BBS[KingdomApiFunction_END] =
     0x4BBD50,
 };
 
-static const long KingdomApi_BBS[KingdomApiFunction_END] =
-{
-    0,
-    0x4BB810,
-    0x524CA0,
-    0x4BBD50,
-};
-
 static const long* KingdomApiOffsets[(int)OpenKH::GameId::END]
 {
     nullptr,
@@ -105,25 +97,81 @@ void Hook(const long kingdomApiOffsets[])
     GetArrPtr(BasePath, (char*)pfn_Axa_AxaResourceMan_SetResourceItem + 0x3E);
 }
 
+OpenKH::GameId OpenKH::m_GameID = OpenKH::GameId::Unknown;
+std::string OpenKH::m_ModPath = "./mod";
+bool OpenKH::m_OverrideEos = false;
+bool OpenKH::m_ShowConsole = false;
 void OpenKH::Initialize()
 {
     g_hInstance = GetModuleHandle(NULL);
+    ReadSettings("panacea_settings.txt");
 
-    fprintf(stdout, "Overriding Epic Games Online Service\n");
-    EOSOverride(g_hInstance);
+    if (m_ShowConsole)
+    {
+        AllocConsole();
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+    }
+
+    if (m_OverrideEos)
+    {
+        fprintf(stdout, "Overriding Epic Games Online Service\n");
+        EOSOverride(g_hInstance);
+    }
 
     fprintf(stdout, "Executable instance at %p\n", g_hInstance);
-    auto gameId = DetectGame();
-    if (gameId == OpenKH::GameId::Unknown)
+    m_GameID = DetectGame();
+    if (m_GameID == OpenKH::GameId::Unknown)
     {
-        fprintf(stderr, "Unable to detect the running game. OpenKH Panacea will now terminate.\n");
+        fprintf(stderr, "Unable to detect the running game. Panacea will not be executed.\n");
         return;
     }
 
-    Hook(KingdomApiOffsets[(int)gameId]);
+    Hook(KingdomApiOffsets[(int)m_GameID]);
     Panacea::Initialize();
     
     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)OpenKH::Main, NULL, 0, NULL);
+}
+
+void OpenKH::ReadSettings(const char* filename)
+{
+    auto parseBool = [](const char* str, bool& value)
+    {
+        if (!strcmp(str, "false") || !strcmp(str, "0"))
+            value = false;
+        else if (!strcmp(str, "true") || !strcmp(str, "1"))
+            value = true;
+    };
+
+    fprintf(stdout, "Reading settings from '%s'\n", filename);
+    FILE* f = fopen(filename, "r");
+    if (!f)
+    {
+        fprintf(stderr, "Setting file '%s' not found\n", filename);
+        return;
+    }
+
+    char buf[1024]; // allows very long path names
+    while (fgets(buf, sizeof(buf), f))
+    {
+        char* separator = strchr(buf, '=');
+        if (!separator) continue;
+
+        const char* key = buf;
+        char* value = separator + 1;
+        *separator = '\0';
+        if (!key || !value) continue;
+        strtok(value, "\n\r"); // removes new line character
+
+        if (!strncmp(key, "mod_path", sizeof(buf)) && strnlen(value, sizeof(buf)) > 0)
+            m_ModPath = std::string(value);
+        else if (!strncmp(key, "eos_override", sizeof(buf)))
+            parseBool(value, m_OverrideEos);
+        else if (!strncmp(key, "show_console", sizeof(buf)))
+            parseBool(value, m_ShowConsole);
+    }
+
+    fclose(f);
 }
 
 void OpenKH::Main()
@@ -136,27 +184,26 @@ void OpenKH::Main()
 OpenKH::GameId OpenKH::DetectGame()
 {
     const char* DetectedFmt = "%s detected.\n";
+    wchar_t buffer[MAX_PATH]; // MAX_PATH default macro
+    GetModuleFileNameW(NULL, buffer, MAX_PATH);
 
     // We should just return unknown if the launcher is running
-
-    wchar_t buffer[MAX_PATH]; // MAX_PATH default macro
-    GetModuleFileName(NULL, buffer, MAX_PATH);
-
-    if (_wcsicmp(PathFindFileName(buffer), L"KINGDOM HEARTS HD 1.5+2.5 Launcher.exe") == 0)
+    if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS HD 1.5+2.5 Launcher.exe") == 0)
         return GameId::Unknown;
 
     if (strcmp((const char*)g_hInstance + 0x2BD2090, "dummy_string") == 0)
-        {
-            fprintf(stdout, DetectedFmt, "Kingdom Hearts II");
-            return GameId::KingdomHearts2;
-        }
-        if (strcmp((const char*)g_hInstance + 0x11165090, "dummy_string") == 0)
-        {
-            fprintf(stdout, DetectedFmt, "Kingdom Hearts Birth By Sleep");
-            Hook(pfn_Bbs_File_load, Bbs_File_load);
-            Hook(pfn_Bbs_CRsrcData_loadCallback, Bbs_CRsrcData_loadCallback);
-            return GameId::KingdomHeartsBbs;
-        }
+    {
+        fprintf(stdout, DetectedFmt, "Kingdom Hearts II");
+        return GameId::KingdomHearts2;
+    }
+    
+    if (strcmp((const char*)g_hInstance + 0x11165090, "dummy_string") == 0)
+    {
+        fprintf(stdout, DetectedFmt, "Kingdom Hearts Birth By Sleep");
+        Hook(pfn_Bbs_File_load, Bbs_File_load);
+        Hook(pfn_Bbs_CRsrcData_loadCallback, Bbs_CRsrcData_loadCallback);
+        return GameId::KingdomHeartsBbs;
+    }
 
     return GameId::Unknown;
 }

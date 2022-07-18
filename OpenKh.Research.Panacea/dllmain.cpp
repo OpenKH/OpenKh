@@ -7,15 +7,12 @@
 #undef MiniDumpWriteDump
 #include "OpenKH.h"
 
-FILE* fConsoleStdout = nullptr;
-FILE* fConsoleStderr = nullptr;
-
 typedef BOOL(WINAPI* PFN_MiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam, PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 PFN_MiniDumpWriteDump MiniDumpWriteDumpPtr;
 void HookDbgHelp()
 {
     const char OriginalDllName[] = "\\DBGHELP.dll";
-    char buffer[0x100];
+    char buffer[MAX_PATH];
 
     auto initialLength = GetSystemDirectoryA(buffer, sizeof(buffer) - sizeof(OriginalDllName) - 1);
     assert(initialLength > 0);
@@ -37,9 +34,6 @@ BOOL APIENTRY DllMain(
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        AllocConsole();
-        fConsoleStdout = freopen("CONOUT$", "w", stdout);
-        fConsoleStderr = freopen("CONOUT$", "w", stderr);
         HookDbgHelp();
         OpenKH::Initialize();
         break;
@@ -47,11 +41,6 @@ BOOL APIENTRY DllMain(
     case DLL_THREAD_DETACH:
         break;
     case DLL_PROCESS_DETACH:
-#ifdef _DEBUG
-        fclose(fConsoleStderr);
-        fclose(fConsoleStdout);
-        FreeConsole();
-#endif
         break;
     }
     return TRUE;

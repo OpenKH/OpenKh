@@ -13,6 +13,7 @@
 #include <queue>
 #include <fcntl.h>
 #include "Panacea.h"
+#include "OpenKH.h"
 #include <cstdarg>
 
 template <class TFunc>
@@ -125,16 +126,14 @@ struct ModFileInfo
     Axa::PkgEntry FileInfo;
 };
 
-char ModFolderPath[MAX_PATH];
 class FakePackageFile : public Axa::PackageFile
 {
 public:
     FakePackageFile()
     {
         strcpy(PkgFileName, "ModFiles");
-        std::string modfol(ModFolderPath);
         std::queue<std::string> folq;
-        folq.push(modfol);
+        folq.push(OpenKH::m_ModPath);
         while (!folq.empty())
         {
             auto& curfol = folq.front();
@@ -150,12 +149,12 @@ public:
                         continue;
                     if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                     {
-                        if (curfol.size() != modfol.size() || _stricmp(data.cFileName, "remastered"))
+                        if (curfol.size() != OpenKH::m_ModPath.size() || _stricmp(data.cFileName, "remastered"))
                             folq.push(curfol + '\\' + data.cFileName);
                         continue;
                     }
                     std::string filename = curfol + '/' + data.cFileName;
-                    std::string basefn = filename.substr(modfol.length() + 1);
+                    std::string basefn = filename.substr(OpenKH::m_ModPath.length() + 1);
                     std::transform(basefn.begin(), basefn.end(), basefn.begin(), [](char c)
                         {
                             if (c == '\\')
@@ -239,8 +238,6 @@ std::vector<void(*)()> framefuncs;
 
 void Panacea::Initialize()
 {
-    SHGetFolderPathA(0, CSIDL_MYDOCUMENTS, nullptr, 0, ModFolderPath);
-    std::strcat(ModFolderPath, "\\KINGDOM HEARTS HD 1.5+2.5 ReMIX\\mod\\kh2");
     Hook_Axa_SetReplacePath = NewHook(pfn_Axa_SetReplacePath, Panacea::SetReplacePath, "Axa::SetReplacePath");
     Hook_Axa_FreeAllPackages = NewHook(pfn_Axa_FreeAllPackages, Panacea::FreeAllPackages, "Axa::FreeAllPackages");
     Hook_Axa_CFileMan_LoadFile = NewHook(pfn_Axa_CFileMan_LoadFile, Panacea::LoadFile, "Axa::CFileMan::LoadFile");
@@ -325,7 +322,7 @@ void Panacea::FreeAllPackages()
 bool Panacea::TransformFilePath(char* strOutPath, int maxLength, const char* originalPath)
 {
     const char* actualFileName = originalPath + strlen(BasePath) + 1;
-    sprintf_s(strOutPath, maxLength, "%s\\%s", ModFolderPath, actualFileName);
+    sprintf_s(strOutPath, maxLength, "%s\\%s", OpenKH::m_ModPath.c_str(), actualFileName);
 
     return GetFileAttributesA(strOutPath) != INVALID_FILE_ATTRIBUTES;
 }
@@ -654,7 +651,7 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
     if (RemasteredData.find(path) == RemasteredData.cend())
     {
         char remasteredFolder[MAX_PATH];
-        sprintf_s(remasteredFolder, "%s\\remastered\\%s", ModFolderPath, path + strlen(ModFolderPath) + 1);
+        sprintf_s(remasteredFolder, "%s\\remastered\\%s", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1);
         std::vector<Axa::RemasteredEntry> entries;
         bool folderexist = GetFileAttributesA(remasteredFolder) & FILE_ATTRIBUTE_DIRECTORY;
         if (fileinfo->CurrentFileData.remasteredCount != 0 || folderexist)
@@ -865,7 +862,7 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
     char path[MAX_PATH];
     TransformFilePath(path, sizeof(path), a1->CurrentFileName);
     char remastered[MAX_PATH];
-    sprintf_s(remastered, "%s\\remastered\\%s\\%s", ModFolderPath, path + strlen(ModFolderPath) + 1, entry->name);
+    sprintf_s(remastered, "%s\\remastered\\%s\\%s", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1, entry->name);
     if (GetFileAttributesA(remastered) != INVALID_FILE_ATTRIBUTES)
     {
         FILE* file = fopen(remastered, "rb");

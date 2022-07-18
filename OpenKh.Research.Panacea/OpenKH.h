@@ -1,5 +1,5 @@
 #pragma once
-#include <cstring>
+#include <string>
 
 namespace OpenKH
 {
@@ -14,9 +14,15 @@ namespace OpenKH
         END,
     };
 
+    extern GameId m_GameID;
+    extern std::string m_ModPath;
+    extern bool m_OverrideEos;
+    extern bool m_ShowConsole;
+
     void Initialize();
     void Main();
 
     GameId DetectGame();
     long LoadFile(const char* filename, void* addr);
+    void ReadSettings(const char* filename);
 }
