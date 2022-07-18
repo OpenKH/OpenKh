@@ -3,7 +3,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
-#include <ShlObj.h>
 #include <Shlwapi.h>
 #include <string>
 #include <vector>
@@ -126,6 +125,20 @@ struct ModFileInfo
     Axa::PkgEntry FileInfo;
 };
 
+std::string CombinePaths(const char* left, const char* right)
+{
+    char finalPath[MAX_PATH];
+    return PathCombineA(finalPath, left, right);
+}
+std::string CombinePaths(const std::string& left, const char* right)
+{
+    return CombinePaths(left.c_str(), right);
+}
+std::string CombinePaths(const std::string& left, const std::string& right)
+{
+    return CombinePaths(left.c_str(), right.c_str());
+}
+
 class FakePackageFile : public Axa::PackageFile
 {
 public:
@@ -136,11 +149,10 @@ public:
         folq.push(OpenKH::m_ModPath);
         while (!folq.empty())
         {
-            auto& curfol = folq.front();
+            auto& curDir = folq.front();
             WIN32_FIND_DATAA data;
-            char path[MAX_PATH];
-            snprintf(path, sizeof(path), "%s\\*", curfol.c_str());
-            HANDLE findHandle = FindFirstFileA(path, &data);
+            auto path = CombinePaths(curDir, "*");
+            HANDLE findHandle = FindFirstFileA(path.c_str(), &data);
             if (findHandle != INVALID_HANDLE_VALUE)
             {
                 do
@@ -149,11 +161,11 @@ public:
                         continue;
                     if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                     {
-                        if (curfol.size() != OpenKH::m_ModPath.size() || _stricmp(data.cFileName, "remastered"))
-                            folq.push(curfol + '\\' + data.cFileName);
+                        if (curDir.size() != OpenKH::m_ModPath.size() || _stricmp(data.cFileName, "remastered"))
+                            folq.push(CombinePaths(curDir, data.cFileName));
                         continue;
                     }
-                    std::string filename = curfol + '/' + data.cFileName;
+                    std::string filename = CombinePaths(curDir, data.cFileName);
                     std::string basefn = filename.substr(OpenKH::m_ModPath.length() + 1);
                     std::transform(basefn.begin(), basefn.end(), basefn.begin(), [](char c)
                         {
@@ -257,11 +269,11 @@ void Panacea::Initialize()
     VirtualProtect((void*)(base + 0x579000), 0x198000, PAGE_WRITECOPY, &oldprot);
     VirtualProtect((void*)(base + 0x2B81000), 0x51000, PAGE_WRITECOPY, &oldprot);
     VirtualProtect((void*)(base + 0x2BD3000), 0x2000, PAGE_WRITECOPY, &oldprot);
-    char dllpath[MAX_PATH];
-    SHGetFolderPathA(0, CSIDL_MYDOCUMENTS, nullptr, 0, dllpath);
-    std::strcat(dllpath, "\\KINGDOM HEARTS HD 1.5+2.5 ReMIX\\dll\\kh2\\");
+
+    auto dllpath = CombinePaths(OpenKH::m_ModPath, "dll");
+    
     char search[MAX_PATH];
-    std::strcpy(search, dllpath);
+    std::strcpy(search, dllpath.c_str());
     std::strcat(search, "*.dll");
     std::vector<void(*)()> initfuncs;
     WIN32_FIND_DATAA find;
@@ -271,7 +283,7 @@ void Panacea::Initialize()
         do
         {
             char filepath[MAX_PATH];
-            std::strcpy(filepath, dllpath);
+            std::strcpy(filepath, dllpath.c_str());
             std::strcat(filepath, find.cFileName);
             HMODULE dllhandle = LoadLibraryA(filepath);
             if (dllhandle)
