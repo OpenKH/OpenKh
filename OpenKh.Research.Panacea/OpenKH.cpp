@@ -8,6 +8,7 @@
 #include "OpenKH.h"
 #include "KingdomApi.h"
 #include "Panacea.h"
+#include "EOSOverrider.h"
 
 const long BaseAddress = 0xC00;
 HINSTANCE g_hInstance;
@@ -107,6 +108,10 @@ void Hook(const long kingdomApiOffsets[])
 void OpenKH::Initialize()
 {
     g_hInstance = GetModuleHandle(NULL);
+
+    fprintf(stdout, "Overriding Epic Games Online Service\n");
+    EOSOverride(g_hInstance);
+
     fprintf(stdout, "Executable instance at %p\n", g_hInstance);
     auto gameId = DetectGame();
     if (gameId == OpenKH::GameId::Unknown)
