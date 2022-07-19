@@ -91,6 +91,10 @@ namespace OpenKh.Patcher
                 return new MemoryStream(hdAsset.OriginalData);
             }
         }
-        public void Dispose() { }
+        public void Dispose()
+        {
+            foreach (var stream in _pkgStreams)
+                stream.Value.Dispose();
+        }
     }
 }
