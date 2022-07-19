@@ -49,16 +49,15 @@ namespace OpenKh.Patcher
             public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, path);
             public string GetDestinationPath(string path) => Path.Combine(DestinationPath, path);
             public void EnsureDirectoryExists(string fileName) => Directory.CreateDirectory(Path.GetDirectoryName(fileName));
-            public void CopyOriginalFile(string fileName, string dstFile)
+            public void CopyOriginalFile(string fileName, Stream dstFile)
             {
-                EnsureDirectoryExists(dstFile);
+                var originalFile = GetOriginalAssetPath(fileName);
 
-                if (!File.Exists(dstFile))
+                if (File.Exists(originalFile))
                 {
-                    var originalFile = GetOriginalAssetPath(fileName);
-                    if (File.Exists(originalFile))
-                        File.Copy(originalFile, dstFile,true);
-                }
+                    var _byteFile = File.ReadAllBytes(originalFile);
+                    dstFile.Write(_byteFile, 0, _byteFile.Length);
+                };
             }
         }
 
@@ -109,12 +108,14 @@ namespace OpenKh.Patcher
                                 else if (_pcFile)
                                     continue;
 
-                                context.CopyOriginalFile(name, dstFile);
-
+                                context.EnsureDirectoryExists(dstFile);
                                 using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+
+                                context.CopyOriginalFile(name, _stream);
                                 PatchFile(context, assetFile, _stream);
 
                                 _stream.Close();
+                                _stream.Dispose();
                             }
                             break;
 
@@ -129,12 +130,14 @@ namespace OpenKh.Patcher
                                 else if (_pcFile)
                                     dstFile = context.GetDestinationPath(_packageFile + "/" + name);
 
-                                context.CopyOriginalFile(name, dstFile);
-
+                                context.EnsureDirectoryExists(dstFile);
                                 using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+
+                                context.CopyOriginalFile(name, _stream);
                                 PatchFile(context, assetFile, _stream);
 
                                 _stream.Close();
+                                _stream.Dispose();
                             }
                             break;
                         }
@@ -193,6 +196,7 @@ namespace OpenKh.Patcher
             }
 
             stream.SetLength(stream.Position);
+            stream.Close();
         }
 
 

@@ -313,6 +313,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     Log.Warn("Unable to fully clean the mod directory:\n{0}", ex.Message);
                 }
             }
+
             Directory.CreateDirectory(ConfigurationService.GameModPath);
 
             var patcherProcessor = new PatcherProcessor();
