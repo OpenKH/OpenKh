@@ -107,15 +107,6 @@ namespace OpenKh.Patcher
 
                                 else if (_pcFile)
                                     continue;
-
-                                context.EnsureDirectoryExists(dstFile);
-                                using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-
-                                context.CopyOriginalFile(name, _stream);
-                                PatchFile(context, assetFile, _stream);
-
-                                _stream.Close();
-                                _stream.Dispose();
                             }
                             break;
 
@@ -129,18 +120,24 @@ namespace OpenKh.Patcher
 
                                 else if (_pcFile)
                                     dstFile = context.GetDestinationPath(_packageFile + "/" + name);
-
-                                context.EnsureDirectoryExists(dstFile);
-                                using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-
-                                context.CopyOriginalFile(name, _stream);
-                                PatchFile(context, assetFile, _stream);
-
-                                _stream.Close();
-                                _stream.Dispose();
                             }
                             break;
                         }
+
+                        context.EnsureDirectoryExists(dstFile);
+
+                        try
+                        {
+                            using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+
+                            context.CopyOriginalFile(name, _stream);
+                            PatchFile(context, assetFile, _stream);
+
+                            _stream.Close();
+                            _stream.Dispose();
+                        }
+
+                        catch (IOException) { }
                     }
                 });
             }
