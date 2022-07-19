@@ -30,8 +30,8 @@
                 <TextBox Name="txtSourceModUrl" Background="Transparent" Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}" KeyUp="txtSourceModUrl_KeyUp" />
             </Grid>
 
-            <TextBlock Margin="0 0 0 3">Or install it from a ZIP archive</TextBlock>
-            <Button Margin="0 0 0 5" Click="InstallZip_Click">Select and install ZIP</Button>
+            <TextBlock Margin="0 0 0 3">Or install it from a Mod Archive</TextBlock>
+            <Button Margin="0 0 0 5" Click="InstallZip_Click">Select and install Mod Archive</Button>
         </StackPanel>
 
         <Grid Grid.Row="2">

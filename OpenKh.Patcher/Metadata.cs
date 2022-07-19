@@ -36,6 +36,8 @@ namespace OpenKh.Patcher
             deserializer.Deserialize<Metadata>(new StreamReader(stream));
         public void Write(Stream stream) =>
             serializer.Serialize(new StreamWriter(stream), this);
+        public override string ToString() =>
+        serializer.Serialize(this);
     }
 
     public class AssetFile
