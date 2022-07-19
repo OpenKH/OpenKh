@@ -3,6 +3,7 @@ using OpenKh.Kh1;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
     public class SetupWizardViewModel : BaseNotifyPropertyChanged
     {
         private const int BufferSize = 65536;
+        private static readonly string PanaceaDllName = "OpenKH.Panacea.dll";
         private static string ApplicationName = Utilities.GetApplicationName();
         private static List<FileDialogFilter> _isoFilter = FileDialogFilterComposer
             .Compose()
@@ -199,15 +201,52 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public int RegionId { get; set; }
 
         public RelayCommand InstallPanaceaCommand { get; }
+        private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
+        private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.DLL");
+        public Visibility PanaceaNotInstalledVisibility => !IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PanaceaInstalledVisibility => IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
         public bool IsLastPanaceaVersionInstalled
         {
             get
             {
-                return false;
+                if (!File.Exists(PanaceaSourceLocation))
+                    // While debugging it is most likely to not have the compiled
+                    // DLL into the right place. So don't bother.
+                    return true;
+
+                if (!File.Exists(PanaceaDestinationLocation))
+                    // DBGHELP.dll is not installed
+                    return false;
+
+                byte[] CalcualteChecksum(string fileName) =>
+                    System.Security.Cryptography.MD5.Create().Using(md5 =>
+                        File.OpenRead(fileName).Using(md5.ComputeHash));
+                bool IsEqual(byte[] left, byte[] right)
+                {
+                    for (var i = 0; i < left.Length; i++)
+                        if (left[i] != right[i])
+                            return false;
+                    return true;
+                }
+
+                return IsEqual(
+                    CalcualteChecksum(PanaceaSourceLocation),
+                    CalcualteChecksum(PanaceaDestinationLocation));
             }
         }
 
-        public bool BypassLauncher { get; set; }
+        public Visibility BypassLauncherVisibility => BypassLauncher ? Visibility.Visible : Visibility.Collapsed;
+        private bool _bypassLauncher;
+
+        public bool BypassLauncher
+        {
+            get => _bypassLauncher;
+            set
+            {
+                _bypassLauncher = value;
+                OnPropertyChanged(nameof(BypassLauncherVisibility));
+            }
+        }
         public string EpicGamesUserID { get; set; }
 
         public SetupWizardViewModel()
@@ -226,7 +265,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             ExtractGameDataCommand = new RelayCommand(async _ =>
                 await ExtractGameData(IsoLocation, GameDataLocation));
             InstallPanaceaCommand = new RelayCommand(_ =>
-                MessageBox.Show("Work in progress :)))"));
+            {
+                if (File.Exists(PanaceaSourceLocation))
+                    // Again, do not bother in debug mode
+                    File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation);
+                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+            });
         }
 
         private Task ExtractGameData(string isoLocation, string gameDataLocation)

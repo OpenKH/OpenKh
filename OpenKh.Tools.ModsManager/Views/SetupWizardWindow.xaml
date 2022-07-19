@@ -204,19 +204,26 @@
             PreviousPage="{Binding ElementName=PageGameEdition}"
             NextPage="{Binding ElementName=PageEosConfig}">
             <StackPanel>
+                <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                        It seems you do not have OpenKH Panacea installed or you are running a different version than the one
+                        compatible with the Mods Manager. We need your permission to install it into the game's folder.
+                    </TextBlock>
+                    <Button
+                        Margin="0 0 0 6"
+                        Content="Install OpenKH Panacea"
+                        HorizontalAlignment="Left"
+                        Width="160"
+                        Command="{Binding InstallPanaceaCommand}"/>
+                </StackPanel>
+                <StackPanel Visibility="{Binding PanaceaInstalledVisibility}">
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                        OpenKH Panacea is installed!
+                    </TextBlock>
+                </StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    It seems you do not have OpenKH Panacea installed or you are running a different version than the one
-                    compatible with the Mods Manager. We need your permission to install it into the game's folder.
-                </TextBlock>
-                <Button
-                    Margin="0 0 0 6"
-                    Content="Install OpenKH Panacea"
-                    HorizontalAlignment="Left"
-                    Width="160"
-                    Command="{Binding InstallPanaceaCommand}"/>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed.
-                    If installed, this file is named 'DBGHELP.dll' and it can be found in your game's data folder.
+                        OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed.
+                        If installed, this file is named 'DBGHELP.dll' and it can be found in your game's data folder.
                 </TextBlock>
             </StackPanel>
         </xctk:WizardPage>
@@ -235,34 +242,36 @@
                     or if you are developing one.
                 </TextBlock>
                 <CheckBox
-                    Margin="0 0 0 6"
+                    Margin="0 0 0 10"
                     IsChecked="{Binding BypassLauncher}"
                     Content="Bypass the launcher"/>
 
-                <Grid Margin="0 0 0 3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Grid.Column="0"
-                        Text="Epic Games User ID"
-                        Margin="0 0 3 0"/>
-                    <TextBox
-                        Grid.Column="1"
-                        Width="Auto"
-                        Text="{Binding EpicGamesUserID}"/>
-                </Grid>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    When bypassing the launcher, you need to specify your Epic Games User ID otherwise your
-                    existing saves will not work. Click the link below to find you User ID. It is right after
-                    the Account Info text.
-                    <Hyperlink NavigateUri="https://www.epicgames.com/account/personal"
-                               TextDecorations="{x:Null}" RequestNavigate="NavigateURL">
-                        <TextBlock Text="https://www.epicgames.com/account/personal"
-                                   Foreground="{DynamicResource textHyperlink}"/>
-                    </Hyperlink>
-                </TextBlock>
+                <StackPanel Visibility="{Binding BypassLauncherVisibility}">
+                    <Grid Margin="0 0 0 3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Column="0"
+                            Text="Epic Games User ID"
+                            Margin="0 0 3 0"/>
+                        <TextBox
+                            Grid.Column="1"
+                            Width="Auto"
+                            Text="{Binding EpicGamesUserID}"/>
+                    </Grid>
+                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                        When bypassing the launcher, you need to specify your Epic Games User ID otherwise your
+                        existing saves will not work. Click the link below to find you User ID. It is right after
+                        the Account Info text.
+                        <Hyperlink NavigateUri="https://www.epicgames.com/account/personal"
+                                   TextDecorations="{x:Null}" RequestNavigate="NavigateURL">
+                            <TextBlock Text="https://www.epicgames.com/account/personal"
+                                       Foreground="{DynamicResource textHyperlink}"/>
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
             </StackPanel>
         </xctk:WizardPage>
         
