@@ -215,6 +215,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
                     ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
                     ConfigRegionId = ConfigurationService.RegionId,
+                    ConfigEpicGamesUserID = ConfigurationService.EpicGamesUserID,
+                    ConfigBypassLauncher = ConfigurationService.BypassLauncher,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -225,7 +227,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
+                    ConfigurationService.EpicGamesUserID = dialog.ConfigEpicGamesUserID;
+                    ConfigurationService.BypassLauncher = dialog.ConfigBypassLauncher;
                     ConfigurationService.IsFirstRunComplete = true;
+
+                    const int EpicGamesPC = 2;
+                    if (ConfigurationService.GameEdition == EpicGamesPC &&
+                        Directory.Exists(ConfigurationService.PcReleaseLocation))
+                    {
+                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                            new string[]
+                            {
+                                $"mod_path={ConfigurationService.GameModPath}",
+                                $"eos_override={ConfigurationService.BypassLauncher}",
+                                $"show_console={false}",
+                            });
+                    }
                 }
             });
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -312,18 +329,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     };
                     isPcsx2 = true;
                     break;
-                default:
+                case 2:
+                    if (!ConfigurationService.BypassLauncher)
+                    {
+                        MessageBox.Show(
+                            "You can only run the game from the Mods Manager by bypassing the launcher.\nRepeat the wizard to change the setting.",
+                            "Unable to start the game",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                        return Task.CompletedTask;
+                    }
+
                     Log.Info("Starting Kingdom Hearts II: Final Mix");
                     processStartInfo = new ProcessStartInfo
                     {
                         FileName = Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
                         WorkingDirectory = ConfigurationService.PcReleaseLocation,
+                        Arguments = $"-AUTH_TYPE=refreshtoken -epiclocale=en -epicuserid={ConfigurationService.EpicGamesUserID}",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
                     };
-                    // TODO copy OpenKh.Research.Panacea.dll as DINPUT8.dll
                     break;
+                default:
+                    return Task.CompletedTask;
             }
 
             if (processStartInfo == null || !File.Exists(processStartInfo.FileName))

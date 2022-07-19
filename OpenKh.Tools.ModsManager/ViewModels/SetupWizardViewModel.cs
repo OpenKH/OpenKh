@@ -28,12 +28,31 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             .Compose()
             .AddExtensions("PCSX2 emulator", "exe");
 
+        const int OpenKHGameEngine = 0;
+        const int PCSX2 = 1;
+        const int EpicGames = 2;
+
         private int _gameEdition;
         private string _isoLocation;
         private string _openKhGameEngineLocation;
         private string _pcsx2Location;
         private string _pcReleaseLocation;
         private string _gameDataLocation;
+
+        private Xceed.Wpf.Toolkit.WizardPage _wizardNextPage;
+        public Xceed.Wpf.Toolkit.WizardPage WizardNextPage
+        {
+            get => _wizardNextPage;
+            private set
+            {
+                _wizardNextPage = value;
+                OnPropertyChanged();
+            }
+        }
+        public Xceed.Wpf.Toolkit.WizardPage PageIsoSelection { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageEosInstall { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageEosConfig { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage LastPage { get; internal set; }
 
         public string Title => $"Set-up wizard | {ApplicationName}";
 
@@ -79,27 +98,32 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get
             {
-                switch (GameEdition)
+                return GameEdition switch
                 {
-                    case 0:
-                        return !string.IsNullOrEmpty(OpenKhGameEngineLocation) && File.Exists(OpenKhGameEngineLocation);
-                    case 1:
-                        return !string.IsNullOrEmpty(Pcsx2Location) && File.Exists(Pcsx2Location);
-                    case 2:
-                        return !string.IsNullOrEmpty(PcReleaseLocation) &&
-                            Directory.Exists(PcReleaseLocation) &&
-                            File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll"));
-                    default:
-                        return false;
-                }
+                    OpenKHGameEngine => !string.IsNullOrEmpty(OpenKhGameEngineLocation) && File.Exists(OpenKhGameEngineLocation),
+                    PCSX2 => !string.IsNullOrEmpty(Pcsx2Location) && File.Exists(Pcsx2Location),
+                    EpicGames => !string.IsNullOrEmpty(PcReleaseLocation) &&
+                        Directory.Exists(PcReleaseLocation) &&
+                        File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")),
+                    _ => false,
+                };
             }
         }
+
         public int GameEdition
         {
             get => _gameEdition;
             set
             {
                 _gameEdition = value;
+                WizardNextPage = GameEdition switch
+                {
+                    OpenKHGameEngine => LastPage,
+                    PCSX2 => PageIsoSelection,
+                    EpicGames => IsLastPanaceaVersionInstalled ? PageEosConfig : PageEosInstall,
+                    _ => null,
+                };
+
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
                 OnPropertyChanged(nameof(OpenKhGameEngineConfigVisibility));
@@ -174,6 +198,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public int RegionId { get; set; }
 
+        public RelayCommand InstallPanaceaCommand { get; }
+        public bool IsLastPanaceaVersionInstalled
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public bool BypassLauncher { get; set; }
+        public string EpicGamesUserID { get; set; }
+
         public SetupWizardViewModel()
         {
             IsNotExtracting = true;
@@ -189,6 +225,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 FileDialog.OnFolder(path => GameDataLocation = path));
             ExtractGameDataCommand = new RelayCommand(async _ =>
                 await ExtractGameData(IsoLocation, GameDataLocation));
+            InstallPanaceaCommand = new RelayCommand(_ =>
+                MessageBox.Show("Work in progress :)))"));
         }
 
         private Task ExtractGameData(string isoLocation, string gameDataLocation)

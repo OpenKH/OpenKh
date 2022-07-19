@@ -137,9 +137,9 @@ void OpenKH::ReadSettings(const char* filename)
 {
     auto parseBool = [](const char* str, bool& value)
     {
-        if (!strcmp(str, "false") || !strcmp(str, "0"))
+        if (!_stricmp(str, "false") ||!strcmp(str, "0"))
             value = false;
-        else if (!strcmp(str, "true") || !strcmp(str, "1"))
+        else if (!_stricmp(str, "true") || !strcmp(str, "1"))
             value = true;
     };
 

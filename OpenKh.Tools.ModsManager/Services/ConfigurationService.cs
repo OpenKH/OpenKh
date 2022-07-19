@@ -34,6 +34,8 @@ namespace OpenKh.Tools.ModsManager.Services
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
             public int RegionId { get; internal set; }
+            public bool BypassLauncher { get; internal set; }
+            public string EpicGamesUserID { get; internal set; }
 
             public void Save(string fileName)
             {
@@ -191,6 +193,26 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.RegionId = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static bool BypassLauncher
+        {
+            get => _config.BypassLauncher;
+            set
+            {
+                _config.BypassLauncher = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static string EpicGamesUserID
+        {
+            get => _config.EpicGamesUserID;
+            set
+            {
+                _config.EpicGamesUserID = value;
                 _config.Save(ConfigPath);
             }
         }
