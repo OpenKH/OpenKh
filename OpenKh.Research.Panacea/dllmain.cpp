@@ -5,12 +5,15 @@
 #define MiniDumpWriteDump MiniDumpWriteDump_
 #include <DbgHelp.h>
 #undef MiniDumpWriteDump
+#include <Shlwapi.h>
 #include "OpenKH.h"
 
 typedef BOOL(WINAPI* PFN_MiniDumpWriteDump)(HANDLE hProcess, DWORD ProcessId, HANDLE hFile, MINIDUMP_TYPE DumpType, PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam, PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 PFN_MiniDumpWriteDump MiniDumpWriteDumpPtr;
 void HookDbgHelp()
 {
+    if (PathFileExists(L"LuaBackend.dll"))
+        LoadLibrary(L"LuaBackend.dll");
     const char OriginalDllName[] = "\\DBGHELP.dll";
     char buffer[MAX_PATH];
 
