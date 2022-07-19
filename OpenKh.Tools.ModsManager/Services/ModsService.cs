@@ -219,7 +219,7 @@ namespace OpenKh.Tools.ModsManager.Services
             Action<float> progressNumber = null) =>
             RepositoryService.FetchAndResetUponOrigin(GetModPath(modName), progressOutput, progressNumber);
 
-        public static Task<bool> RunPacherAsync() => Task.Run(() => Handle(() =>
+        public static Task<bool> RunPacherAsync(int gameEdition) => Task.Run(() => Handle(() =>
         {
             if (Directory.Exists(ConfigurationService.GameModPath))
             {
@@ -241,8 +241,16 @@ namespace OpenKh.Tools.ModsManager.Services
                 var mod = modsList[i];
                 Log.Info($"Patching using {mod.Name} from {mod.Path}");
 
+                using var sourceAssets = gameEdition switch
+                {
+                    0 => new PlainSourceAssets(ConfigurationService.GameDataLocation),
+                    1 => new PlainSourceAssets(ConfigurationService.GameDataLocation),
+                    2 => (ISourceAssets)new EpicGamesSourceAssets(ConfigurationService.PcReleaseLocation),
+                    _ => throw new NotImplementedException()
+                };
+
                 patcherProcessor.Patch(
-                    ConfigurationService.GameDataLocation,
+                    sourceAssets,
                     ConfigurationService.GameModPath,
                     mod.Metadata,
                     mod.Path);

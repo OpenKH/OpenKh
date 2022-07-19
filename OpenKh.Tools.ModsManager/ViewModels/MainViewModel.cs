@@ -288,7 +288,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private async Task<bool> BuildPatches()
         {
             IsBuilding = true;
-            var result = await ModsService.RunPacherAsync();
+            var result = await ModsService.RunPacherAsync(ConfigurationService.GameEdition);
             IsBuilding = false;
 
             return result;

@@ -2,7 +2,7 @@ using System.IO;
 
 namespace OpenKh.Common
 {
-    public class Helpers
+    public static class Helpers
     {
         public static int Align(int offset, int alignment)
         {

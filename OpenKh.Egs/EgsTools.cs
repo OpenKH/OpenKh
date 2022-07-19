@@ -51,7 +51,7 @@ namespace OpenKh.Egs
                     "ICON/ICON0_EN.png",
             });
 
-        private static readonly Dictionary<string, string> Names = KH2Names
+        public static readonly Dictionary<string, string> Names = KH2Names
             .Concat(Idx1Name.Names)
             .Concat(EgsHdAsset.DddNames)
             .Concat(EgsHdAsset.BbsNames)

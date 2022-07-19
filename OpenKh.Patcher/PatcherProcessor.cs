@@ -16,23 +16,22 @@ namespace OpenKh.Patcher
         public class Context
         {
             public Metadata Metadata { get; set; }
-            public string OriginalAssetPath { get; }
+            public ISourceAssets SourceAssets { get; }
             public string SourceModAssetPath { get; set; }
             public string DestinationPath { get; set; }
 
             public Context(
                 Metadata metadata,
-                string originalAssetPath,
+                ISourceAssets sourceAssets,
                 string sourceModAssetPath,
                 string destinationPath)
             {
                 Metadata = metadata;
-                OriginalAssetPath = originalAssetPath;
+                SourceAssets = sourceAssets;
                 SourceModAssetPath = sourceModAssetPath;
                 DestinationPath = destinationPath;
             }
 
-            public string GetOriginalAssetPath(string path) => Path.Combine(OriginalAssetPath, path);
             public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, path);
             public string GetDestinationPath(string path) => Path.Combine(DestinationPath, path);
             public void EnsureDirectoryExists(string fileName) => Directory.CreateDirectory(Path.GetDirectoryName(fileName));
@@ -43,23 +42,26 @@ namespace OpenKh.Patcher
 
                 if (!File.Exists(dstFile))
                 {
-                    var originalFile = GetOriginalAssetPath(fileName);
-                    if (File.Exists(originalFile))
-                        File.Copy(originalFile, dstFile,true);
+                    if (SourceAssets.Exists(fileName))
+                    {
+                        using var sourceStream = SourceAssets.OpenRead(fileName);
+                        using var destStream = File.Create(dstFile);
+                        sourceStream.CopyTo(destStream);
+                    }
                 }
             }
         }
 
-        public void Patch(string originalAssets, string outputDir, string modFilePath)
+        public void Patch(ISourceAssets sourceAssets, string outputDir, string modFilePath)
         {
             var metadata = File.OpenRead(modFilePath).Using(Metadata.Read);
             var modBasePath = Path.GetDirectoryName(modFilePath);
-            Patch(originalAssets, outputDir, metadata, modBasePath);
+            Patch(sourceAssets, outputDir, metadata, modBasePath);
         }
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath)
+        public void Patch(ISourceAssets sourceAssets, string outputDir, Metadata metadata, string modBasePath)
         {
-            var context = new Context(metadata, originalAssets, modBasePath, outputDir);
+            var context = new Context(metadata, sourceAssets, modBasePath, outputDir);
             try
             {
                 if (metadata.Assets == null)
@@ -74,7 +76,7 @@ namespace OpenKh.Patcher
 
                     foreach (var name in names)
                     {
-                        if (assetFile.Required && !File.Exists(context.GetOriginalAssetPath(name)))
+                        if (assetFile.Required && !context.SourceAssets.Exists(name))
                             continue;
 
                         context.CopyOriginalFile(name);
@@ -145,20 +147,19 @@ namespace OpenKh.Patcher
             if (assetFile.Source == null || assetFile.Source.Count == 0)
                 throw new Exception($"File '{assetFile.Name}' does not contain any source");
 
-            string srcFile; 
-
             if (assetFile.Source[0].Type == "internal")
             {
-                srcFile = context.GetOriginalAssetPath(assetFile.Source[0].Name);
+                using var srcStream = context.SourceAssets.OpenRead(assetFile.Source[0].Name);
+                srcStream.CopyTo(stream);
             }
             else
             {
-                srcFile = context.GetSourceModAssetPath(assetFile.Source[0].Name);
+                var srcFile = context.GetSourceModAssetPath(assetFile.Source[0].Name);
                 if (!File.Exists(srcFile))
                     throw new FileNotFoundException($"The mod does not contain the file {assetFile.Source[0].Name}", srcFile);
+                using var srcStream = File.OpenRead(srcFile);
+                srcStream.CopyTo(stream);
             }
-            using var srcStream = File.OpenRead(srcFile);
-            srcStream.CopyTo(stream);
         }
 
         private static void PatchBinarc(Context context, AssetFile assetFile, Stream stream)
