@@ -37,6 +37,16 @@ steps:
 - powershell: .\pre-build.ps1
   displayName: 'Build tools and libraries metadata'
 
+- task: VSBuild@1
+  displayName: 'Build Panacea'
+  inputs:
+    solution: '**/OpenKh.Research.Panacea.csproj'
+    platform: 'x64'
+    configuration: '$(buildConfiguration)'
+    vsVersion: 'latest'
+    msbuildArgs: '/t:Build /p:DebugType=None /p:DebugSymbols=false /p:OutputPath=$(Build.ArtifactStagingDirectory)/openkh'
+    maximumCpuCount: true
+
 - script: dotnet test --configuration $(buildConfiguration) --logger trx --verbosity normal --collect "Code coverage"
   displayName: 'Run tests'
 
