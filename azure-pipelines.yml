@@ -40,7 +40,7 @@ steps:
 - task: VSBuild@1
   displayName: 'Build Panacea'
   inputs:
-    solution: '**/OpenKh.Research.Panacea.csproj'
+    solution: '**/OpenKh.Research.Panacea.vcxproj'
     platform: 'x64'
     configuration: '$(buildConfiguration)'
     vsVersion: 'latest'
