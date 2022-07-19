@@ -49,15 +49,15 @@ namespace OpenKh.Patcher
             public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, path);
             public string GetDestinationPath(string path) => Path.Combine(DestinationPath, path);
             public void EnsureDirectoryExists(string fileName) => Directory.CreateDirectory(Path.GetDirectoryName(fileName));
-            public void CopyOriginalFile(string fileName, Stream dstFile)
+            public void CopyOriginalFile(string fileName, string dstFile)
             {
-                var originalFile = GetOriginalAssetPath(fileName);
-
-                if (File.Exists(originalFile))
+                if (!File.Exists(dstFile))
                 {
-                    var _byteFile = File.ReadAllBytes(originalFile);
-                    dstFile.Write(_byteFile, 0, _byteFile.Length);
-                };
+                    var originalFile = GetOriginalAssetPath(fileName);
+
+                    if (File.Exists(originalFile))
+                        File.Copy(originalFile, dstFile);
+                }
             }
         }
 
@@ -128,9 +128,9 @@ namespace OpenKh.Patcher
 
                         try
                         {
-                            using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                            context.CopyOriginalFile(name, dstFile);
 
-                            context.CopyOriginalFile(name, _stream);
+                            using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                             PatchFile(context, assetFile, _stream);
 
                             _stream.Close();
