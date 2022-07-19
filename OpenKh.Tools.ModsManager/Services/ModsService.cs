@@ -138,11 +138,14 @@ namespace OpenKh.Tools.ModsManager.Services
                 var _splitStr = _str.Split(_strSplitter);
                 var _package = _splitStr[0];
 
-                if (_str.Contains("original"))
-                    _str = String.Join("\\", _splitStr.Skip(2));
+                if (isModPatch)
+                {
+                    if (_str.Contains("original"))
+                        _str = String.Join("\\", _splitStr.Skip(2));
 
-                else
-                    _str = String.Join("\\", _splitStr.Skip(1));
+                    else
+                        _str = String.Join("\\", _splitStr.Skip(1));
+                }
 
                 progressOutput?.Invoke($"Extracting '{_str}'...");
                 progressNumber?.Invoke((float)entryExtractCount / entryCount);
