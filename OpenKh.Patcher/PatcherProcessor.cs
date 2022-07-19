@@ -193,7 +193,6 @@ namespace OpenKh.Patcher
             }
 
             stream.SetLength(stream.Position);
-            stream.Close();
         }
 
 
