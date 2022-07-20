@@ -177,11 +177,12 @@ void OpenKH::Main()
 OpenKH::GameId OpenKH::DetectGame()
 {
     const char* DetectedFmt = "%s detected.\n";
-    if (strcmp((const char*)g_hInstance + 0x2BD2090, "dummy_string") == 0)
-    {
-        fprintf(stdout, DetectedFmt, "Kingdom Hearts II");
+    wchar_t buffer[MAX_PATH]; // MAX_PATH default macro
+    GetModuleFileNameW(NULL, buffer, MAX_PATH);
+
+    // We should just return unknown if the launcher is running
+    if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS II FINAL MIX.exe") == 0)
         return GameId::KingdomHearts2;
-    }
 
     return GameId::Unknown;
 }
