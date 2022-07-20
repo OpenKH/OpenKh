@@ -5,32 +5,50 @@
 #include <intrin.h>
 #include <Shlwapi.h>
 #include <Psapi.h>
+#include <list>
 
 #include "OpenKH.h"
 #include "KingdomApi.h"
 #include "Panacea.h"
 #include "EOSOverrider.h"
 
+struct FuncInfo
+{
+    void*& func;
+    const char* pattern;
+    const char* patvalid;
+};
+
 HINSTANCE g_hInstance;
 const void* endAddress;
+std::list<FuncInfo> funcsToHook;
 
 template <typename T>
-void Hook(T& pfn, const char *pattern, const char *patvalid)
+void Hook(T& pfn, const char* pattern, const char* patvalid)
 {
-    size_t patlen = strlen(patvalid);
+    funcsToHook.push_back({ (void*)pfn, pattern, patvalid });
+}
 
+void FindAllFuncs()
+{
     for (const char* addr = (const char*)g_hInstance; addr < (const char*)endAddress - 0x10; addr += 0x10)
-    {
-        int i = 0;
-        for (; i < patlen; i++)
-            if (patvalid[i] != '?' && pattern[i] != addr[i])
-                break;
-        if (i == patlen)
+        for (auto iter = funcsToHook.begin(); iter != funcsToHook.end(); ++iter)
         {
-            pfn = (T)addr;
-            break;
+            size_t patlen = strlen(iter->patvalid);
+
+            int i = 0;
+            for (; i < patlen; i++)
+                if (iter->patvalid[i] != '?' && iter->pattern[i] != addr[i])
+                    break;
+            if (i == patlen)
+            {
+                iter->func = (void*)addr;
+                funcsToHook.erase(iter);
+                if (funcsToHook.empty())
+                    return;
+                break;
+            }
         }
-    }
 }
 
 template <typename T>
@@ -61,6 +79,7 @@ void Hook()
     Hook(pfn_Axa_CFileMan_GetAudioStream, "\x4C\x8B\xDC\x55\x56\x57\x48\x83\xEC\x70\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4", "xxxxxxxxxxxxx????xxx");
     Hook(pfn_Axa_OpenFile, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xDA\x48\x8B\xD1\x48\x8D\x4C\x24", "xxxxx????xxx????xxxxxxx????xxxxxxxxx");
     Hook(pfn_Axa_DebugPrint, "\x48\x89\x54\x24\x00\x4C\x89\x44\x24\x00\x4C\x89\x4C\x24\x00\xC3", "xxxx?xxxx?xxxx?x");
+    FindAllFuncs();
     GetVarPtr(PackageFileCount, (char*)pfn_Axa_PackageMan_GetFileInfo + 0x1A);
     GetVarPtr(LastOpenedPackage, (char*)pfn_Axa_CFileMan_GetRemasteredCount + 3);
     GetArrPtr(PackageFiles, (char*)pfn_Axa_PackageMan_GetFileInfo + 0xB1);
