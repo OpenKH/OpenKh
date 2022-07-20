@@ -26,7 +26,8 @@ std::list<FuncInfo> funcsToHook;
 template <typename T>
 void Hook(T& pfn, const char* pattern, const char* patvalid)
 {
-    funcsToHook.push_back({ (void*)pfn, pattern, patvalid });
+    FuncInfo func{ (void*&)pfn, pattern, patvalid };
+    funcsToHook.push_back(func);
 }
 
 void FindAllFuncs()
