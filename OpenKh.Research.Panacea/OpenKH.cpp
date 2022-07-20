@@ -4,57 +4,33 @@
 #include <cstdlib>
 #include <intrin.h>
 #include <Shlwapi.h>
+#include <Psapi.h>
 
 #include "OpenKH.h"
 #include "KingdomApi.h"
 #include "Panacea.h"
 #include "EOSOverrider.h"
 
-const long BaseAddress = 0xC00;
 HINSTANCE g_hInstance;
-
-static const long KingdomApi_KH2[KingdomApiFunction_END] =
-{
-    0x136890,
-    0x136590,
-    0x1396F0,
-    0x136AD0,
-    0x136A00,
-    0x141B40,
-    0x136600,
-    0x136640,
-    0x137860,
-    0x1020B0,
-    0x136690,
-    0x136F30,
-    0x135E10,
-    0x13EB60,
-};
-
-static const long KingdomApi_BBS[KingdomApiFunction_END] =
-{
-    0,
-    0x4BB810,
-    0x524CA0,
-    0x4BBD50,
-};
-
-static const long* KingdomApiOffsets[(int)OpenKH::GameId::END]
-{
-    nullptr,
-    KingdomApi_KH2,
-    nullptr,
-    KingdomApi_BBS,
-    nullptr,
-};
+const void* endAddress;
 
 template <typename T>
-void Hook(T& pfn, long address)
+void Hook(T& pfn, const char *pattern, const char *patvalid)
 {
-    if (!address)
-        return;
+    size_t patlen = strlen(patvalid);
 
-    pfn = (T)((long long)g_hInstance + BaseAddress + address);
+    for (const char* addr = (const char*)g_hInstance; addr < (const char*)endAddress - 0x10; addr += 0x10)
+    {
+        int i = 0;
+        for (; i < patlen; i++)
+            if (patvalid[i] != '?' && pattern[i] != addr[i])
+                break;
+        if (i == patlen)
+        {
+            pfn = (T)addr;
+            break;
+        }
+    }
 }
 
 template <typename T>
@@ -69,28 +45,22 @@ void GetArrPtr(ArrayPtr<T,N>& vp, void* offset)
     vp.SetPtr((T*)(*(int*)offset + ((char*)offset + 4)));
 }
 
-void Hook(const long kingdomApiOffsets[])
+void Hook()
 {
-    if (kingdomApiOffsets == nullptr)
-    {
-        fprintf(stderr, "The running game is not yet supported.\n");
-        return;
-    }
-
-    Hook(pfn_Axa_CFileMan_LoadFile, KingdomApi_KH2[Axa_CFileMan_LoadFile]);
-    Hook(pfn_Axa_CFileMan_LoadFileWithMalloc, KingdomApi_KH2[Axa_CFileMan_LoadFileWithMalloc]);
-    Hook(pfn_Axa_CFileMan_GetFileSize, KingdomApi_KH2[Axa_CFileMan_GetFileSize]);
-    Hook(pfn_Axa_AxaResourceMan_SetResourceItem, KingdomApi_KH2[Axa_AxaResourceMan_SetResourceItem]);
-    Hook(pfn_Axa_PackageMan_GetFileInfo, KingdomApi_KH2[Axa_PackageMan_GetFileInfo]);
-    Hook(pfn_Axa_CalcHash, KingdomApi_KH2[Axa_CalcHash]);
-    Hook(pfn_Axa_SetReplacePath, KingdomApi_KH2[Axa_SetReplacePath]);
-    Hook(pfn_Axa_FreeAllPackages, KingdomApi_KH2[Axa_FreeAllPackages]);
-    Hook(pfn_Axa_CFileMan_GetRemasteredCount, KingdomApi_KH2[Axa_CFileMan_GetRemasteredCount]);
-    Hook(pfn_Axa_CFileMan_GetRemasteredEntry, KingdomApi_KH2[Axa_CFileMan_GetRemasteredEntry]);
-    Hook(pfn_Axa_PackageFile_GetRemasteredAsset, KingdomApi_KH2[Axa_PackageFile_GetRemasteredAsset]);
-    Hook(pfn_Axa_CFileMan_GetAudioStream, KingdomApi_KH2[Axa_CFileMan_GetAudioStream]);
-    Hook(pfn_Axa_OpenFile, KingdomApi_KH2[Axa_OpenFile]);
-    Hook(pfn_Axa_DebugPrint, KingdomApi_KH2[Axa_DebugPrint]);
+    Hook(pfn_Axa_CFileMan_LoadFile, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xDA\x48", "xxxxx????xxx????xxxxxxx????xxx");
+    Hook(pfn_Axa_CFileMan_LoadFileWithMalloc, "\x48\x89\x5C\x24\x00\x48\x89\x6C\x24\x00\x48\x89\x74\x24\x00\x48\x89\x7C\x24\x00\x41\x56\x48\x83\xEC\x20\x48\x8B\xEA\x45", "xxxx?xxxx?xxxx?xxxx?xxxxxxxxxx");
+    Hook(pfn_Axa_CFileMan_GetFileSize, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x48\x8B\xDA\x33\xD2\x48\x8B\xCB\xE8", "xxxxx????xxx????xxxxxxx????xxxxxxxxx");
+    Hook(pfn_Axa_AxaResourceMan_SetResourceItem, "\x48\x89\x5C\x24\x00\x55\x56\x57\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x49\x8B\xF0\x8B\xFA\x48\x8B", "xxxx?xxxxxx????xxx????xxxxxxx????xxxxxxx");
+    Hook(pfn_Axa_PackageMan_GetFileInfo, "\x40\x53\x55\x56\x48\x83\xEC\x50\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x44\x24\x00\x44\x8B\x05", "xxxxxxxxxxx????xxxxxxx?xxx");
+    Hook(pfn_Axa_CalcHash, "\x40\x53\x56\x57\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xFA\x48\x8B\xD9\x48\x8D\x54\x24", "xxxxxxx????xxx????xxxxxxx????xxxxxxxxx");
+    Hook(pfn_Axa_SetReplacePath, "\x4C\x8D\x81\x60\x02\x00\x00\x4C\x8B\xCA\x48\x8D\x15\x00\x00\x00\x00\x48\x8D\x0D", "xxxxxxxxxxxxx????xxx");
+    Hook(pfn_Axa_FreeAllPackages, "\x48\x89\x6C\x24\x00\x56\x48\x83\xEC\x20\x8B\x05\x00\x00\x00\x00\x33\xED\x8B\xF5", "xxxx?xxxxxxx????xxxx");
+    Hook(pfn_Axa_CFileMan_GetRemasteredCount, "\x48\x63\x05\x00\x00\x00\x00\x48\x8D\x0D\x00\x00\x00\x00\x48\x8B\x04\xC1\x8B\x80", "xxx????xxx????xxxxxx");
+    Hook(pfn_Axa_CFileMan_GetRemasteredEntry, "\x48\x63\x05\x00\x00\x00\x00\x4C\x8D\x0D\x00\x00\x00\x00\x4D\x8B\x0C\xC1\x4D\x8B", "xxx????xxx????xxxxxx");
+    Hook(pfn_Axa_PackageFile_GetRemasteredAsset, "\x40\x53\x56\x48\x83\xEC\x28\x48\x8B\xD9\x48\x8B\xF2\x48\x8B\x89", "xxxxxxxxxxxxxxxx");
+    Hook(pfn_Axa_CFileMan_GetAudioStream, "\x4C\x8B\xDC\x55\x56\x57\x48\x83\xEC\x70\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4", "xxxxxxxxxxxxx????xxx");
+    Hook(pfn_Axa_OpenFile, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xDA\x48\x8B\xD1\x48\x8D\x4C\x24", "xxxxx????xxx????xxxxxxx????xxxxxxxxx");
+    Hook(pfn_Axa_DebugPrint, "\x48\x89\x54\x24\x00\x4C\x89\x44\x24\x00\x4C\x89\x4C\x24\x00\xC3", "xxxx?xxxx?xxxx?x");
     GetVarPtr(PackageFileCount, (char*)pfn_Axa_PackageMan_GetFileInfo + 0x1A);
     GetVarPtr(LastOpenedPackage, (char*)pfn_Axa_CFileMan_GetRemasteredCount + 3);
     GetArrPtr(PackageFiles, (char*)pfn_Axa_PackageMan_GetFileInfo + 0xB1);
@@ -104,6 +74,9 @@ bool OpenKH::m_ShowConsole = false;
 void OpenKH::Initialize()
 {
     g_hInstance = GetModuleHandle(NULL);
+    MODULEINFO moduleInfo;
+    GetModuleInformation(GetCurrentProcess(), g_hInstance, &moduleInfo, sizeof(MODULEINFO));
+    endAddress = (const char*)g_hInstance + moduleInfo.SizeOfImage;
     ReadSettings("panacea_settings.txt");
 
     if (m_ShowConsole)
@@ -127,7 +100,7 @@ void OpenKH::Initialize()
         return;
     }
 
-    Hook(KingdomApiOffsets[(int)m_GameID]);
+    Hook();
     Panacea::Initialize();
     
     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)OpenKH::Main, NULL, 0, NULL);
@@ -184,32 +157,16 @@ void OpenKH::Main()
 OpenKH::GameId OpenKH::DetectGame()
 {
     const char* DetectedFmt = "%s detected.\n";
-    wchar_t buffer[MAX_PATH]; // MAX_PATH default macro
-    GetModuleFileNameW(NULL, buffer, MAX_PATH);
-
-    // We should just return unknown if the launcher is running
-    if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS HD 1.5+2.5 Launcher.exe") == 0)
-        return GameId::Unknown;
-
     if (strcmp((const char*)g_hInstance + 0x2BD2090, "dummy_string") == 0)
     {
         fprintf(stdout, DetectedFmt, "Kingdom Hearts II");
         return GameId::KingdomHearts2;
-    }
-    
-    if (strcmp((const char*)g_hInstance + 0x11165090, "dummy_string") == 0)
-    {
-        fprintf(stdout, DetectedFmt, "Kingdom Hearts Birth By Sleep");
-        Hook(pfn_Bbs_File_load, Bbs_File_load);
-        Hook(pfn_Bbs_CRsrcData_loadCallback, Bbs_CRsrcData_loadCallback);
-        return GameId::KingdomHeartsBbs;
     }
 
     return GameId::Unknown;
 }
 
 long OpenKH::LoadFile(const char* filename, void* addr) {
-    const char BasePath[] = "C:/hd28/EPIC/juefigs/KH2ReSource/";
     char buffer[0x80];
     strcpy(buffer, BasePath);
     strcpy(buffer + strlen(BasePath), filename);

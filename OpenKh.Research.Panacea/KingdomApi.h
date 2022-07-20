@@ -1,25 +1,6 @@
 #pragma once
 #include "OpenKH.h"
 
-enum KingdomApiFunction
-{
-    Axa_CFileMan_LoadFile,
-    Axa_CFileMan_GetFileSize,
-    Axa_AxaResourceMan_SetResourceItem,
-    Axa_PackageMan_GetFileInfo,
-    Axa_CFileMan_LoadFileWithMalloc,
-    Axa_CalcHash,
-    Axa_CFileMan_GetRemasteredCount,
-    Axa_CFileMan_GetRemasteredEntry,
-    Axa_PackageFile_GetRemasteredAsset,
-    Axa_SetReplacePath,
-    Axa_FreeAllPackages,
-    Axa_CFileMan_GetAudioStream,
-    Axa_OpenFile,
-    Axa_DebugPrint,
-    KingdomApiFunction_END
-};
-
 const int Bbs_File_load = 0xE7D70;
 const int Bbs_CRsrcData_loadCallback = 0x113800;
 
