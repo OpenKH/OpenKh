@@ -260,15 +260,31 @@ void Panacea::Initialize()
     Hook_Axa_PackageFile_GetRemasteredAsset = NewHook(pfn_Axa_PackageFile_GetRemasteredAsset, Panacea::GetRemasteredAsset, "Axa::PackageFile::GetRemasteredAsset");
     //Hook_Axa_CFileMan_GetAudioStream = NewHook(pfn_Axa_CFileMan_GetAudioStream, Panacea::GetAudioStream, "Axa::CFileMan::GetAudioStream");
     Hook_Axa_DebugPrint = NewHook(pfn_Axa_DebugPrint, Panacea::DebugPrint, "Axa::DebugPrint");
-    Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
-    Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
-    intptr_t base = (intptr_t)GetModuleHandleA(nullptr);
-    DWORD oldprot;
-    VirtualProtect((void*)(base + 0x1000), 0x576000, PAGE_EXECUTE_WRITECOPY, &oldprot);
-    VirtualProtect((void*)(base + 0x576000), 0x2000, PAGE_EXECUTE_WRITECOPY, &oldprot);
-    VirtualProtect((void*)(base + 0x579000), 0x198000, PAGE_WRITECOPY, &oldprot);
-    VirtualProtect((void*)(base + 0x2B81000), 0x51000, PAGE_WRITECOPY, &oldprot);
-    VirtualProtect((void*)(base + 0x2BD3000), 0x2000, PAGE_WRITECOPY, &oldprot);
+    //Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
+    //Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
+    ULONG_PTR baseImage = (ULONG_PTR)GetModuleHandle(nullptr);
+
+    PIMAGE_DOS_HEADER dosHeaders = (PIMAGE_DOS_HEADER)baseImage;
+    PIMAGE_NT_HEADERS ntHeaders = (PIMAGE_NT_HEADERS)(baseImage + dosHeaders->e_lfanew);
+
+    PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER)((intptr_t)&ntHeaders->OptionalHeader + ntHeaders->FileHeader.SizeOfOptionalHeader);
+    MEMORY_BASIC_INFORMATION meminf;
+    for (int i = 0; i < ntHeaders->FileHeader.NumberOfSections; i++)
+    {
+        VirtualQuery((const void*)(baseImage + section->VirtualAddress), &meminf, sizeof(meminf));
+        DWORD oldprot;
+        switch (meminf.Protect & 0xFF)
+        {
+        case PAGE_EXECUTE:
+        case PAGE_EXECUTE_READ:
+            VirtualProtect(meminf.BaseAddress, meminf.RegionSize, PAGE_EXECUTE_WRITECOPY, &oldprot);
+            break;
+        case PAGE_NOACCESS:
+        case PAGE_READONLY:
+            VirtualProtect(meminf.BaseAddress, meminf.RegionSize, PAGE_WRITECOPY, &oldprot);
+            break;
+        }
+    }
 
     auto dllpath = CombinePaths(OpenKH::m_ModPath, "dll");
     
