@@ -172,6 +172,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _pcReleaseLocation = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
+                OnPropertyChanged(nameof(IsGameDataFound));
             }
         }
 
@@ -190,7 +191,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, GameDataLocation);
+        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, GameDataLocation)) || (IsEpicGamesRelease && IsGameSelected);
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;

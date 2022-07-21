@@ -80,7 +80,12 @@ namespace OpenKh.Patcher
             _pkgStreams = Kh2Pkgs.ToDictionary(x => x, x => File.OpenRead(Path.Combine(_basePath, $"{x}.pkg")));
         }
 
-        private string NormalizePath(string path) => path;
+        private static string NormalizePath(string path)
+        {
+            // Existing mods used slashes and backslashes interchangeably, so support both by normalizing
+            return path.Replace("\\", "/");
+        }
+
         public bool Exists(string path) => _entries.ContainsKey(NormalizePath(path));
         public Stream OpenRead(string path)
         {
