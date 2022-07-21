@@ -218,8 +218,9 @@ namespace OpenKh.Common
             where T : class
         {
             var oldPosition = (int)stream.Position;
+
             foreach (var item in items)
-                BinaryMapping.WriteObject<T>(stream, item, oldPosition);
+                stream.Write(Helpers.ToRawData(item));
 
             return (int)stream.Position - oldPosition;
         }

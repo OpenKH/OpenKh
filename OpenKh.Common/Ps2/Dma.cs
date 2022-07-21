@@ -1,4 +1,4 @@
-﻿using Xe.BinaryMapper;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Common.Ps2
 {
@@ -34,9 +34,9 @@ namespace OpenKh.Common.Ps2
     /// </summary>
     public class VifCode
     {
-        [Data] public byte Cmd { get; set; }
-        [Data] public byte Num { get; set; }
-        [Data] public ushort Immediate { get; set; }
+        public byte Cmd { get; set; }
+        public byte Num { get; set; }
+        public ushort Immediate { get; set; }
 
         public VifOpcode Opcode
         {
@@ -59,9 +59,9 @@ namespace OpenKh.Common.Ps2
         /// <summary>
         /// Quadword count; packet size
         /// </summary>
-        [Data] public ushort Qwc { get; set; }
-        [Data] public ushort Param { get; set; }
-        [Data] public int Address { get; set; }
+        public ushort Qwc { get; set; }
+        public ushort Param { get; set; }
+        public int Address { get; set; }
 
         public int TagId
         {

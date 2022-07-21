@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Xe.BinaryMapper;
 
 namespace OpenKh.Common.Archives
@@ -10,19 +11,32 @@ namespace OpenKh.Common.Archives
     {
         private class Header
         {
-            [Data] public int OriginalLength { get; set; }
-            [Data] public int AssetCount { get; set; }
-            [Data] public int Unused08 { get; set; }
-            [Data] public int Unused0c { get; set; }
+            public int OriginalLength { get; set; }
+            public int AssetCount { get; set; }
+            public int Unused08 { get; set; }
+            public int Unused0c { get; set; }
         }
 
         private class HeaderEntry
         {
-            [Data(Count = 0x20)] public string Name { get; set; }
-            [Data] public int Offset { get; set; }
-            [Data] public int Flags { get; set; }
-            [Data] public int Length { get; set; }
-            [Data] public int Unused { get; set; }
+            public string Name { get; set; }
+            public int Offset { get; set; }
+            public int Flags { get; set; }
+            public int Length { get; set; }
+            public int Unused { get; set; }
+
+            public HeaderEntry() { }
+            public HeaderEntry(Stream input)
+            {
+                using (var _br = new BinaryReader(input))
+                {
+                    Name = Encoding.Default.GetString(_br.ReadBytes(0x20));
+                    Offset = _br.ReadInt32();
+                    Flags = _br.ReadInt32();
+                    Length = _br.ReadInt32();
+                    Unused = _br.ReadInt32();
+                }
+            }
         }
 
         public class Entry
@@ -71,9 +85,10 @@ namespace OpenKh.Common.Archives
 
         private HdAsset(Stream stream)
         {
-            _header = BinaryMapping.ReadObject<Header>(stream);
+            _header = Helpers.FromRawData<Header>(stream.ReadBytes(0x10));
+
             var entries = Enumerable.Range(0, _header.AssetCount)
-                .Select(_ => BinaryMapping.ReadObject<HeaderEntry>(stream))
+                .Select(_ => new HeaderEntry(stream))
                 .ToList();
 
             Stream = new MemoryStream(_header.OriginalLength);
@@ -112,9 +127,10 @@ namespace OpenKh.Common.Archives
             }
 
             stream.Position = 0;
-            BinaryMapping.WriteObject(stream, _header);
+            stream.Write(Helpers.ToRawData(_header));
+
             foreach (var entry in entries)
-                BinaryMapping.WriteObject(stream, entry);
+                stream.Write(Helpers.ToRawData(entry));
         }
 
         private Stream GetSubStreamCopy(Stream stream, int offset, int length)
