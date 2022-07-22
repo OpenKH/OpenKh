@@ -177,7 +177,6 @@ public:
                     Axa::CalcHash(basefn.c_str(), (int)basefn.size(), &fileInfo.Header.hash);
                     fileInfo.Header.actualLength = data.nFileSizeLow;
                     fileInfo.Header.dataLength = data.nFileSizeLow;
-                    fileInfo.Header.offset = fileData.size();
                     fileInfo.FileInfo.creationDate = data.ftCreationTime.dwLowDateTime;
                     fileInfo.FileInfo.decompressedSize = data.nFileSizeLow;
                     fileInfo.FileInfo.compressedSize = -2;
@@ -218,6 +217,23 @@ private:
     std::map<std::string, ModFileInfo> fileData;
 };
 
+class StreamPackageFile : public Axa::PackageFile
+{
+public:
+    StreamPackageFile()
+    {
+        HeaderData = new Axa::HedEntry();
+        FileCount = 1;
+    }
+
+    bool OpenFile(const char* a1, const char* a2)
+    {
+        return false;
+    }
+
+    void OtherFunc() {}
+};
+
 struct MyAppVtbl
 {
     void* func1;
@@ -247,6 +263,7 @@ Hook<PFN_Axa_DebugPrint>* Hook_Axa_DebugPrint;
 Hook<PFN_Bbs_File_load>* Hook_Bbs_File_load;
 Hook<PFN_Bbs_CRsrcData_loadCallback>* Hook_CRsrcData_loadCallback;
 std::vector<void(*)()> framefuncs;
+StreamPackageFile StreamDummy;
 
 void Panacea::Initialize()
 {
@@ -333,6 +350,9 @@ int Panacea::SetReplacePath(__int64 a1, const char* a2)
     onFrameOrig = customAppVtbl.onFrame;
     customAppVtbl.onFrame = FrameHook;
     *app = &customAppVtbl;
+    //memmove(&PackageFiles[1], PackageFiles, sizeof(Axa::PackageFile*) * PackageFileCount);
+    //PackageFiles[0] = &StreamDummy;
+    //++PackageFileCount;
     PackageFiles[PackageFileCount++] = new FakePackageFile();
     auto ret = Hook_Axa_SetReplacePath->Unpatch()(a1, a2);
     Hook_Axa_SetReplacePath->Patch();
@@ -341,6 +361,8 @@ int Panacea::SetReplacePath(__int64 a1, const char* a2)
 
 void Panacea::FreeAllPackages()
 {
+    //--PackageFileCount;
+    //memmove(PackageFiles, &PackageFiles[1], sizeof(Axa::PackageFile*) * PackageFileCount);
     delete PackageFiles[--PackageFileCount];
     PackageFiles[PackageFileCount] = nullptr;
     Hook_Axa_FreeAllPackages->Unpatch()();
@@ -913,16 +935,28 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
 int Panacea::GetAudioStream(Axa::CFileMan* a1, const char* a2)
 {
     char path[MAX_PATH];
-    if (!TransformFilePath(path, sizeof(path), a2))
+    bool isMod = false;
+    if (TransformFilePath(path, sizeof(path), a2))
     {
-        fprintf(stdout, "GetAudioStream(\"%s\")\n", a2);
-        auto ret = Hook_Axa_CFileMan_GetAudioStream->Unpatch()(a1, a2);
-        Hook_Axa_CFileMan_GetAudioStream->Patch();
-        return ret;
+        fprintf(stdout, "GetAudioStream(\"%s\")\n", path);
+        isMod = true;
+        memcpy(StreamDummy.PkgFileName, path, MAX_PATH);
+        std::string basefn = a2 + strlen(BasePath) + 1;
+        std::transform(basefn.begin(), basefn.end(), basefn.begin(), [](char c)
+            {
+                if (c == '\\')
+                    return '/';
+                return c;
+            });
+        Axa::CalcHash(basefn.c_str(), basefn.size(), StreamDummy.HeaderData->hash);
     }
-
-    fprintf(stdout, "GetAudioStream(\"%s\")\n", path);
-    return Axa::OpenFile(path, O_RDONLY | O_BINARY);
+    else
+        fprintf(stdout, "GetAudioStream(\"%s\")\n", a2);
+    auto ret = Hook_Axa_CFileMan_GetAudioStream->Unpatch()(a1, a2);
+    Hook_Axa_CFileMan_GetAudioStream->Patch();
+    if (isMod)
+        lseeki64(ret, 0, SEEK_SET);
+    return ret;
 }
 
 void Panacea::DebugPrint(const char* format, ...)
