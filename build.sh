@@ -57,7 +57,7 @@ then
 fi
 
 # Publish solution
-dotnet publish $solution --configuration $configuration --verbosity $verbosity --framework net5.0 --output $output /p:DebugType=None /p:DebugSymbols=false
+dotnet publish $solution --configuration $configuration --verbosity $verbosity --framework net6.0 --output $output /p:DebugType=None /p:DebugSymbols=false
 
 rm $solution
 
