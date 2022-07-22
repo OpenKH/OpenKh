@@ -36,12 +36,16 @@ namespace OpenKh.Patcher
             deserializer.Deserialize<Metadata>(new StreamReader(stream));
         public void Write(Stream stream) =>
             serializer.Serialize(new StreamWriter(stream), this);
+        public override string ToString() =>
+        serializer.Serialize(this);
     }
 
     public class AssetFile
     {
         public string Name { get; set; }
         public string Method { get; set; }
+        public string Platform { get; set; }
+        public string Package { get; set; }
         public List<Multi> Multi { get; set; }
         public List<AssetFile> Source { get; set; }
 

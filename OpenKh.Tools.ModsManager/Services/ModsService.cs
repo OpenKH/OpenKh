@@ -18,6 +18,26 @@ namespace OpenKh.Tools.ModsManager.Services
         private const string ModMetadata = "mod.yml";
         private const string DefaultGitBranch = "main";
 
+        private static string[] _gameList = new string[]
+        {
+            "OpenKH",
+            "PCSX2-EX",
+            "PC"
+        };
+
+        private static string[] _langList = new string[]
+        {
+            "Default",
+            "Japanese",
+            "English [US]",
+            "English [UK]",
+            "Italian",
+            "Spanish",
+            "German",
+            "French",
+            "Final Mix"
+        };
+
         public static IEnumerable<string> Mods
         {
             get
@@ -95,7 +115,10 @@ namespace OpenKh.Tools.ModsManager.Services
             progressOutput?.Invoke($"Opening '{modName}' zip archive...");
 
             using var zipFile = ZipFile.OpenRead(fileName);
-            var isValidMod = zipFile.GetEntry(ModMetadata) != null;
+
+            var isModPatch = fileName.Contains(".kh2pcpatch");
+            var isValidMod = zipFile.GetEntry(ModMetadata) != null || isModPatch;
+
             if (!isValidMod)
                 throw new ModNotValidException(modName);
 
@@ -106,11 +129,27 @@ namespace OpenKh.Tools.ModsManager.Services
 
             var entryExtractCount = 0;
             var entryCount = zipFile.Entries.Count;
+
             foreach (var entry in zipFile.Entries.Where(x => (x.ExternalAttributes & 0x10) != 0x10))
             {
-                progressOutput?.Invoke($"Extracting '{entry.FullName}'...");
+                var _str = entry.FullName;
+                var _strSplitter = _str.IndexOf('/') > -1 ? "/" : "\\";
+
+                var _splitStr = _str.Split(_strSplitter);
+                var _package = _splitStr[0];
+
+                if (isModPatch)
+                {
+                    if (_str.Contains("original"))
+                        _str = String.Join("\\", _splitStr.Skip(2));
+
+                    else
+                        _str = String.Join("\\", _splitStr.Skip(1));
+                }
+
+                progressOutput?.Invoke($"Extracting '{_str}'...");
                 progressNumber?.Invoke((float)entryExtractCount / entryCount);
-                var dstFileName = Path.Combine(modPath, entry.FullName);
+                var dstFileName = Path.Combine(modPath, _str);
                 var dstFilePath = Path.GetDirectoryName(dstFileName);
                 if (!Directory.Exists(dstFilePath))
                     Directory.CreateDirectory(dstFilePath);
@@ -122,6 +161,48 @@ namespace OpenKh.Tools.ModsManager.Services
                     });
 
                 entryExtractCount++;
+            }
+
+            if (isModPatch)
+            {
+                var _yamlGen = new Metadata();
+
+                _yamlGen.Title = modName + " (KH2PCPATCH)";
+                _yamlGen.Description = "This is an atuomatically generated metadata for this KH2PCPATCH Modification.";
+                _yamlGen.OriginalAuthor = "Unknown";
+                _yamlGen.Assets = new List<AssetFile>();
+
+                foreach (var entry in zipFile.Entries.Where(x => (x.ExternalAttributes & 0x10) != 0x10))
+                {
+                    var _str = entry.FullName;
+                    var _strSplitter = _str.IndexOf('/') > -1 ? "/" : "\\";
+
+                    var _splitStr = _str.Split(_strSplitter);
+                    var _package = _splitStr[0];
+
+                    if (_str.Contains("original"))
+                        _str = String.Join("\\", _splitStr.Skip(2));
+
+                    else
+                        _str = String.Join("\\", _splitStr.Skip(1));
+
+                    var _assetFile = new AssetFile();
+                    var _assetSource = new AssetFile();
+
+                    _assetSource.Name = _str;
+
+                    _assetFile.Method = "copy";
+                    _assetFile.Name = _str;
+                    _assetFile.Package = _package;
+                    _assetFile.Source = new List<AssetFile>() { _assetSource };
+                    _assetFile.Platform = "pc";
+
+                    _yamlGen.Assets.Add(_assetFile);
+                }
+
+                var _yamlPath = Path.Combine(modPath + "/mod.yml");
+
+                File.WriteAllText(_yamlPath, _yamlGen.ToString());
             }
         }
 
@@ -219,7 +300,7 @@ namespace OpenKh.Tools.ModsManager.Services
             Action<float> progressNumber = null) =>
             RepositoryService.FetchAndResetUponOrigin(GetModPath(modName), progressOutput, progressNumber);
 
-        public static Task<bool> RunPacherAsync() => Task.Run(() => Handle(() =>
+        public static Task<bool> RunPacherAsync(bool fastMode) => Task.Run(() => Handle(() =>
         {
             if (Directory.Exists(ConfigurationService.GameModPath))
             {
@@ -232,20 +313,24 @@ namespace OpenKh.Tools.ModsManager.Services
                     Log.Warn("Unable to fully clean the mod directory:\n{0}", ex.Message);
                 }
             }
+
             Directory.CreateDirectory(ConfigurationService.GameModPath);
 
             var patcherProcessor = new PatcherProcessor();
             var modsList = GetMods(EnabledMods).ToList();
+
             for (var i = modsList.Count - 1; i >= 0; i--)
             {
                 var mod = modsList[i];
-                Log.Info($"Patching using {mod.Name} from {mod.Path}");
+                Log.Info($"Building {mod.Name} for {_gameList[ConfigurationService.GameEdition]} - {_langList[ConfigurationService.RegionId]}");
 
                 patcherProcessor.Patch(
                     ConfigurationService.GameDataLocation,
                     ConfigurationService.GameModPath,
                     mod.Metadata,
-                    mod.Path);
+                    mod.Path,
+                    ConfigurationService.GameEdition,
+                    fastMode);
             }
 
             return true;
