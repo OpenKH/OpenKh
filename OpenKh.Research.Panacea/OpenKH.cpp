@@ -92,6 +92,7 @@ OpenKH::GameId OpenKH::m_GameID = OpenKH::GameId::Unknown;
 std::string OpenKH::m_ModPath = "./mod";
 bool OpenKH::m_OverrideEos = false;
 bool OpenKH::m_ShowConsole = false;
+bool OpenKH::m_DebugLog = false;
 void OpenKH::Initialize()
 {
     g_hInstance = GetModuleHandle(NULL);
@@ -163,6 +164,8 @@ void OpenKH::ReadSettings(const char* filename)
             parseBool(value, m_OverrideEos);
         else if (!strncmp(key, "show_console", sizeof(buf)))
             parseBool(value, m_ShowConsole);
+        else if (!strncmp(key, "debug_log", sizeof(buf)))
+            parseBool(value, m_DebugLog);
     }
 
     fclose(f);
