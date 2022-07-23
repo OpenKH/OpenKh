@@ -43,11 +43,11 @@ jobs:
     - name: Checkout submodules
       run: git submodule update --init --recursive
     
-    # Try to force .NET 6 build
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '6.0'
+    # Try to force .NET 6 build, this doesn't work atm well because we have projects that uses .net2.0 standard
+    #- name: Setup .NET
+    #  uses: actions/setup-dotnet@v1
+    #  with:
+    #    dotnet-version: '6.0'
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
