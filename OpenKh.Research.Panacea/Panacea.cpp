@@ -772,8 +772,6 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
                 else
                     entries.clear();
             }
-            else if (fileinfo->CurrentFileData.remasteredCount == entries.size())
-                memcpy(entries.data(), fileinfo->RemasteredData, entries.size() * sizeof(Axa::RemasteredEntry));
             else
                 entries.clear();
         }
@@ -941,12 +939,21 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
         entry = &a1->RemasteredData[assetNum];
     }
     char path[MAX_PATH];
-    TransformFilePath(path, sizeof(path), a1->CurrentFileName);
     char remastered[MAX_PATH];
-    strcpy(remastered, path);
-    *strstr(remastered, "original") = 0;
-    strcat(remastered, "remastered");
-    strcat(remastered, strstr(path, "original") + 8);
+    if (TransformFilePath(path, sizeof(path), a1->CurrentFileName))
+    {
+        strcpy(remastered, path);
+        *strstr(remastered, "original") = 0;
+        strcat(remastered, "remastered");
+        strcat(remastered, strstr(path, "original") + 8);
+    }
+    else
+    {
+        snprintf(remastered, MAX_PATH, "%s\\%s", OpenKH::m_ModPath.c_str(), PathFindFileNameA(a1->PkgFileName));
+        PathRemoveExtensionA(remastered);
+        strcat(remastered, "\\remastered\\");
+        strcat(remastered, a1->CurrentFileName + strlen(BasePath) + 1);
+    }
     strcat(remastered, "\\");
     strcat(remastered, entry->name);
     if (GetFileAttributesA(remastered) != INVALID_FILE_ATTRIBUTES)
