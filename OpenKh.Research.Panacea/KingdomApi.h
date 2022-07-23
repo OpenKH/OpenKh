@@ -170,5 +170,6 @@ private:
 
 PVAR_DECLARE(int, PackageFileCount);
 PVAR_DECLARE(int, LastOpenedPackage);
+PVAR_DECLARE(__int64 (__cdecl*)(int FileHandle, __int64 Offset, int Origin), lseeki64);
 PARR_DECLARE(Axa::PackageFile*, PackageFiles, 16);
 PARR_DECLARE(char, BasePath, 128);

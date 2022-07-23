@@ -93,5 +93,6 @@ void Bbs::CRsrcData::loadCallback(unsigned int* pMem, size_t size, unsigned int*
 
 PVAR_DEFINE(int, PackageFileCount);
 PVAR_DEFINE(int, LastOpenedPackage);
+PVAR_DEFINE(__int64(__cdecl*)(int FileHandle, __int64 Offset, int Origin), lseeki64);
 PARR_DEFINE(Axa::PackageFile*, PackageFiles, 16);
 PARR_DEFINE(char, BasePath, 128);
