@@ -238,6 +238,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
                     ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
                     ConfigRegionId = ConfigurationService.RegionId,
+                    ConfigEpicGamesUserID = ConfigurationService.EpicGamesUserID,
+                    ConfigBypassLauncher = ConfigurationService.BypassLauncher,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -248,7 +250,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
+                    ConfigurationService.EpicGamesUserID = dialog.ConfigEpicGamesUserID;
+                    ConfigurationService.BypassLauncher = dialog.ConfigBypassLauncher;
                     ConfigurationService.IsFirstRunComplete = true;
+
+                    const int EpicGamesPC = 2;
+                    if (ConfigurationService.GameEdition == EpicGamesPC &&
+                        Directory.Exists(ConfigurationService.PcReleaseLocation))
+                    {
+                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                            new string[]
+                            {
+                                $"mod_path={ConfigurationService.GameModPath}",
+                                $"eos_override={ConfigurationService.BypassLauncher}",
+                                $"show_console={false}",
+                            });
+                    }
                 }
             });
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -335,9 +352,30 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     };
                     isPcsx2 = true;
                     break;
-                default:
-                    processStartInfo = null;
+                case 2:
+                    if (!ConfigurationService.BypassLauncher)
+                    {
+                        MessageBox.Show(
+                            "You can only run the game from the Mods Manager by bypassing the launcher.\nRepeat the wizard to change the setting.",
+                            "Unable to start the game",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                        return Task.CompletedTask;
+                    }
+
+                    Log.Info("Starting Kingdom Hearts II: Final Mix");
+                    processStartInfo = new ProcessStartInfo
+                    {
+                        FileName = Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
+                        WorkingDirectory = ConfigurationService.PcReleaseLocation,
+                        Arguments = $"-AUTH_TYPE=refreshtoken -epiclocale=en -epicuserid={ConfigurationService.EpicGamesUserID}",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                    };
                     break;
+                default:
+                    return Task.CompletedTask;
             }
 
             if (processStartInfo == null || !File.Exists(processStartInfo.FileName))
@@ -445,11 +483,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             patchFiles.AddRange(OpenKh.Egs.Helpers.GetAllFiles(_rawPath).ToList());
 
                         var _pkgSoft = fastMode ? "kh2_first" : _dirPart;
-                        var _pkgName = Path.GetDirectoryName(ConfigurationService.PcReleaseLocation) + "/Image/en/" + _pkgSoft + ".pkg";
+                        var _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", "en", _pkgSoft + ".pkg");
 
-                        var _backupDir = Path.GetDirectoryName(ConfigurationService.PcReleaseLocation) + "/BackupImage";
+                        var _backupDir = Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage");
 
-                        if (!Directory.Exists(Path.GetDirectoryName(ConfigurationService.PcReleaseLocation) + "/BackupImage"))
+                        if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
                             Directory.CreateDirectory(_backupDir);
 
                         var filenames = new List<string>();
@@ -544,19 +582,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (ConfigurationService.GameEdition == 2)
                 {
-                    if (!Directory.Exists(Path.GetDirectoryName(ConfigurationService.PcReleaseLocation) + "/BackupImage"))
+                    if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
                     {
                         Log.Warn("backup folder cannot be found! Cannot restore the game.");
                     }
 
                     else
                     {
-                        foreach (var file in Directory.GetFiles(Path.GetDirectoryName(ConfigurationService.PcReleaseLocation) + "/BackupImage").Where(x => x.Contains(".pkg")))
+                        foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")).Where(x => x.Contains(".pkg")))
                         {
                             Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
 
                             var _fileBare = Path.GetFileName(file);
-                            var _trueName = Path.GetDirectoryName(ConfigurationService.PcReleaseLocation) + "/Image/en/" + _fileBare;
+                            var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", "en", _fileBare);
 
                             File.Delete(Path.ChangeExtension(_trueName, "hed"));
                             File.Delete(_trueName);

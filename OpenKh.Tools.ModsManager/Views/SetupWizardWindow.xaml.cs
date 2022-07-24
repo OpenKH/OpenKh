@@ -21,6 +21,7 @@ namespace OpenKh.Tools.ModsManager.Views
             _vm.PageIsoSelection = PageIsoSelection;
             _vm.PageEosInstall = PageEosInstall;
             _vm.PageEosConfig = PageEosConfig;
+            _vm.PageRegion = PageRegion;
             _vm.LastPage = LastPage;
         }
 

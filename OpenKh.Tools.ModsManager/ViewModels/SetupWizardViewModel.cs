@@ -1,7 +1,9 @@
 using OpenKh.Common;
+using OpenKh.Kh1;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +19,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
     public class SetupWizardViewModel : BaseNotifyPropertyChanged
     {
         private const int BufferSize = 65536;
+        private static readonly string PanaceaDllName = "OpenKH.Panacea.dll";
         private static string ApplicationName = Utilities.GetApplicationName();
         private static List<FileDialogFilter> _isoFilter = FileDialogFilterComposer
             .Compose()
@@ -27,9 +30,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private static List<FileDialogFilter> _pcsx2Filter = FileDialogFilterComposer
             .Compose()
             .AddExtensions("PCSX2 Emulator", "exe");
-        private static List<FileDialogFilter> _pcFilter = FileDialogFilterComposer
-           .Compose()
-           .AddExtensions("PC Release Executable", "exe");
+
+        const int OpenKHGameEngine = 0;
+        const int PCSX2 = 1;
+        const int EpicGames = 2;
 
         private int _gameEdition;
         private string _isoLocation;
@@ -37,6 +41,32 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcsx2Location;
         private string _pcReleaseLocation;
         private string _gameDataLocation;
+
+        private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterIntro;
+        public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterIntro
+        {
+            get => _wizardPageAfterIntro;
+            private set
+            {
+                _wizardPageAfterIntro = value;
+                OnPropertyChanged();
+            }
+        }
+        private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterGameData;
+        public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterGameData
+        {
+            get => _wizardPageAfterGameData;
+            private set
+            {
+                _wizardPageAfterGameData = value;
+                OnPropertyChanged();
+            }
+        }
+        public Xceed.Wpf.Toolkit.WizardPage PageIsoSelection { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageEosInstall { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageEosConfig { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PageRegion { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage LastPage { get; internal set; }
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
@@ -72,10 +102,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(GameRecognizedVisibility));
                 OnPropertyChanged(nameof(GameNotRecognizedVisibility));
                 OnPropertyChanged(nameof(IsGameRecognized));
+                OnPropertyChanged(nameof(IsGameDataFound));
+                OnPropertyChanged(nameof(GameDataFoundVisibility));
+                OnPropertyChanged(nameof(GameDataNotFoundVisibility));
             }
         }
-        public bool IsIsoSelected => (!string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation)) || GameEdition == 2;
-        public bool IsGameRecognized => (IsIsoSelected && GameId != null) || GameEdition == 2;
+        public bool IsIsoSelected => (!string.IsNullOrEmpty(IsoLocation) && File.Exists(IsoLocation));
+        public bool IsGameRecognized => (IsIsoSelected && GameId != null);
         public Visibility GameRecognizedVisibility => IsIsoSelected && GameId != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameNotRecognizedVisibility => IsIsoSelected && GameId == null ? Visibility.Visible : Visibility.Collapsed;
 
@@ -83,23 +116,39 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             get
             {
-                var location = GameEdition switch
+                return GameEdition switch
                 {
-                    0 => OpenKhGameEngineLocation,
-                    1 => Pcsx2Location,
-                    2 => PcReleaseLocation,
-                    _ => string.Empty,
+                    OpenKHGameEngine => !string.IsNullOrEmpty(OpenKhGameEngineLocation) && File.Exists(OpenKhGameEngineLocation),
+                    PCSX2 => !string.IsNullOrEmpty(Pcsx2Location) && File.Exists(Pcsx2Location),
+                    EpicGames => !string.IsNullOrEmpty(PcReleaseLocation) &&
+                        Directory.Exists(PcReleaseLocation) &&
+                        File.Exists(Path.Combine(PcReleaseLocation, "EOSSDK-Win64-Shipping.dll")),
+                    _ => false,
                 };
-
-                return !string.IsNullOrEmpty(location) && File.Exists(location);
             }
         }
+
         public int GameEdition
         {
             get => _gameEdition;
             set
             {
                 _gameEdition = value;
+                WizardPageAfterIntro = GameEdition switch
+                {
+                    OpenKHGameEngine => LastPage,
+                    PCSX2 => PageIsoSelection,
+                    EpicGames => IsLastPanaceaVersionInstalled ? PageEosConfig : PageEosInstall,
+                    _ => null,
+                };
+                WizardPageAfterGameData = GameEdition switch
+                {
+                    OpenKHGameEngine => LastPage,
+                    PCSX2 => PageRegion,
+                    EpicGames => LastPage,
+                    _ => null,
+                };
+
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
                 OnPropertyChanged(nameof(OpenKhGameEngineConfigVisibility));
@@ -107,9 +156,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PcReleaseConfigVisibility));
             }
         }
-
         public RelayCommand SelectOpenKhGameEngineCommand { get; }
-        public Visibility OpenKhGameEngineConfigVisibility => GameEdition == 0 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility OpenKhGameEngineConfigVisibility => GameEdition == OpenKHGameEngine ? Visibility.Visible : Visibility.Collapsed;
         public string OpenKhGameEngineLocation
         {
             get => _openKhGameEngineLocation;
@@ -122,7 +170,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public RelayCommand SelectPcsx2Command { get; }
-        public Visibility Pcsx2ConfigVisibility => GameEdition == 1 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility Pcsx2ConfigVisibility => GameEdition == PCSX2 ? Visibility.Visible : Visibility.Collapsed;
         public string Pcsx2Location
         {
             get => _pcsx2Location;
@@ -135,7 +183,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public RelayCommand SelectPcReleaseCommand { get; }
-        public Visibility PcReleaseConfigVisibility => GameEdition == 2 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PcReleaseConfigVisibility => GameEdition == EpicGames ? Visibility.Visible : Visibility.Collapsed;
         public string PcReleaseLocation
         {
             get => _pcReleaseLocation;
@@ -144,6 +192,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _pcReleaseLocation = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsGameSelected));
+                OnPropertyChanged(nameof(IsGameDataFound));
             }
         }
 
@@ -162,7 +211,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => IsNotExtracting && File.Exists(Path.Combine(GameDataLocation ?? "", "00objentry.bin"));
+        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, GameDataLocation) || 
+            (GameEdition == EpicGames && GameService.FolderContainsUniqueFile("kh2", GameDataLocation)));
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;
@@ -171,6 +221,55 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public float ExtractionProgress { get; set; }
 
         public int RegionId { get; set; }
+
+        public RelayCommand InstallPanaceaCommand { get; }
+        private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
+        private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.DLL");
+        public Visibility PanaceaNotInstalledVisibility => !IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PanaceaInstalledVisibility => IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public bool IsLastPanaceaVersionInstalled
+        {
+            get
+            {
+                if (!File.Exists(PanaceaSourceLocation))
+                    // While debugging it is most likely to not have the compiled
+                    // DLL into the right place. So don't bother.
+                    return true;
+
+                if (!File.Exists(PanaceaDestinationLocation))
+                    // DBGHELP.dll is not installed
+                    return false;
+
+                byte[] CalcualteChecksum(string fileName) =>
+                    System.Security.Cryptography.MD5.Create().Using(md5 =>
+                        File.OpenRead(fileName).Using(md5.ComputeHash));
+                bool IsEqual(byte[] left, byte[] right)
+                {
+                    for (var i = 0; i < left.Length; i++)
+                        if (left[i] != right[i])
+                            return false;
+                    return true;
+                }
+
+                return IsEqual(
+                    CalcualteChecksum(PanaceaSourceLocation),
+                    CalcualteChecksum(PanaceaDestinationLocation));
+            }
+        }
+
+        public Visibility BypassLauncherVisibility => BypassLauncher ? Visibility.Visible : Visibility.Collapsed;
+        private bool _bypassLauncher;
+
+        public bool BypassLauncher
+        {
+            get => _bypassLauncher;
+            set
+            {
+                _bypassLauncher = value;
+                OnPropertyChanged(nameof(BypassLauncherVisibility));
+            }
+        }
+        public string EpicGamesUserID { get; set; }
 
         public SetupWizardViewModel()
         {
@@ -182,7 +281,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             SelectPcsx2Command = new RelayCommand(_ =>
                 FileDialog.OnOpen(fileName => Pcsx2Location = fileName, _pcsx2Filter));
             SelectPcReleaseCommand = new RelayCommand(_ =>
-                FileDialog.OnOpen(fileName => PcReleaseLocation = fileName, _pcFilter));
+                FileDialog.OnFolder(path => PcReleaseLocation = path));
             SelectGameDataLocationCommand = new RelayCommand(_ =>
                 FileDialog.OnFolder(path => GameDataLocation = path));
             ExtractGameDataCommand = new RelayCommand(async _ => 
@@ -204,6 +303,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             break;
                     }
                 }
+            });
+            InstallPanaceaCommand = new RelayCommand(_ =>
+            {
+                if (File.Exists(PanaceaSourceLocation))
+                    // Again, do not bother in debug mode
+                    File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation);
+                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
             });
         }
 
@@ -284,7 +390,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
                 break;
 
-                case 2:
+                case EpicGames:
                 {
                     IsNotExtracting = false;
                     ExtractionProgress = 0;
@@ -311,7 +417,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                         for (int i = 0; i < 6; i++)
                         {
-                            using var _stream = new FileStream(Path.GetDirectoryName(_pcReleaseLocation) + "/Image/en/kh2_" + _nameList[i] + ".hed", FileMode.Open);
+                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", "en", "kh2_" + _nameList[i] + ".hed"), FileMode.Open);
                             var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                             _totalFiles += _hedFile.Count();
                         }
@@ -319,8 +425,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         for (int i = 0; i < 6; i++)
                         {
                             var outputDir = gameDataLocation;
-                            using var hedStream = File.OpenRead(Path.GetDirectoryName(_pcReleaseLocation) + "/Image/en/kh2_" + _nameList[i] + ".hed");
-                            using var img = File.OpenRead(Path.GetDirectoryName(_pcReleaseLocation) + "/Image/en/kh2_" + _nameList[i] + ".pkg");
+                            using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", "en", "kh2_" + _nameList[i] + ".hed"));
+                            using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", "en", "kh2_" + _nameList[i] + ".pkg"));
 
                             foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                             {
