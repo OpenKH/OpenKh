@@ -64,10 +64,15 @@
                 <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
-            <MenuItem Header="_Run">
-                <MenuItem Header="Build and _run" Command="{Binding BuildAndRunCommand}" InputGestureText="F5"/>
-                <MenuItem Header="Build only" Command="{Binding BuildCommand}" InputGestureText="Ctrl+B"/>
-                <MenuItem Header="Run only" Command="{Binding RunCommand}" InputGestureText="Ctrl+F5"/>
+            <MenuItem Header="Game">
+                <MenuItem Header="Build...">
+                    <MenuItem Header="Build Only" Command="{Binding BuildCommand}" InputGestureText="Ctrl+B"/>
+                    <MenuItem Header="Build and Patch [PC]" Command="{Binding PatchCommand}" CommandParameter="false" InputGestureText="Ctrl+P"/>
+                    <MenuItem Header="Build and Patch [Fast/PC]" Command="{Binding PatchCommand}" CommandParameter="true" InputGestureText="Ctrl+P+F"/>
+                    <MenuItem Header="Build and Run [OpenKH/PCSX2]" Command="{Binding BuildAndRunCommand}" InputGestureText="F5"/>
+                </MenuItem>
+                <MenuItem Header="Run [OpenKH/PCSX2]" Command="{Binding RunCommand}" InputGestureText="Ctrl+F5"/>
+                <MenuItem Header="Restore [PC]" Command="{Binding RestoreCommand}" InputGestureText="Ctrl+R"/>
                 <MenuItem Header="Stop" Command="{Binding StopRunningInstanceCommand}" InputGestureText="Shift+F5"/>
             </MenuItem>
             <MenuItem Header="_Settings">

@@ -188,7 +188,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.BbsMapStudio",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Egs", "OpenKh.Egs\OpenKh.Egs.csproj", "{9370AE74-CA9A-440C-BD03-A9D802579B32}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Common.Wpf", "OpenKh.Tools.Common.WPF\OpenKh.Tools.Common.Wpf.csproj", "{1D12643E-5707-406E-872D-1D66CE14ECA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Common.Wpf", "OpenKh.Tools.Common.Wpf\OpenKh.Tools.Common.Wpf.csproj", "{1D12643E-5707-406E-872D-1D66CE14ECA0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Ddd", "OpenKh.Ddd\OpenKh.Ddd.csproj", "{21580B80-AE14-4A11-8C79-74AB0B9DF41E}"
 EndProject
