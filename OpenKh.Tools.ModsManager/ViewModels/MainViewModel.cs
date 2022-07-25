@@ -430,8 +430,45 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (ConfigurationService.GameEdition == 2)
                 {
-                    foreach (var directory in Directory.GetDirectories(ConfigurationService.GameModPath))
+                    // Use the package map file to rearrange the files in the structure needed by the patcher
+                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, "patch-package-map.txt");
+                    var packageMap = File
+                        .ReadLines(packageMapLocation)
+                        .Select(line => line.Split(" $$$$ "))
+                        .ToDictionary(array => array[0], array => array[1]);
+
+                    var patchStagingDir = Path.Combine(ConfigurationService.GameModPath, "patch-staging");
+                    if (Directory.Exists(patchStagingDir))
+                        Directory.Delete(patchStagingDir, true);
+                    Directory.CreateDirectory(patchStagingDir);
+                    foreach (var entry in packageMap)
                     {
+                        var sourceFile = Path.Combine(ConfigurationService.GameModPath, entry.Key);
+                        var destFile = Path.Combine(patchStagingDir, entry.Value);
+                        Directory.CreateDirectory(Path.GetDirectoryName(destFile));
+                        File.Move(sourceFile, destFile);
+                    }
+
+                    foreach (var directory in Directory.GetDirectories(ConfigurationService.GameModPath))
+                        if (!"patch-staging".Equals(Path.GetFileName(directory)))
+                            Directory.Delete(directory, true);
+
+                    var stagingDirs = Directory.GetDirectories(patchStagingDir).Select(directory => Path.GetFileName(directory)).ToHashSet();
+                    var specialDirs = Directory.GetDirectories(Path.Combine(patchStagingDir, "special")).Select(directory => Path.GetFileName(directory));
+                    foreach (var packageName in stagingDirs)
+                        Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.GameModPath, packageName));
+                    foreach (var specialDir in specialDirs)
+                        Directory.Move(Path.Combine(ConfigurationService.GameModPath, "special", specialDir), Path.Combine(ConfigurationService.GameModPath, specialDir));
+
+                    stagingDirs.Remove("special"); // Since it's not actually a real game package
+                    Directory.Delete(patchStagingDir, true);
+                    Directory.Delete(Path.Combine(ConfigurationService.GameModPath, "special"), true);
+
+                    foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.GameModPath, packageDir)))
+                    {
+                        if (specialDirs.Contains(Path.GetDirectoryName(directory)))
+                            continue;
+
                         var patchFiles = new List<string>();
                         var _dirPart = new DirectoryInfo(directory).Name;
 
@@ -452,7 +489,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (!Directory.Exists(Path.GetDirectoryName(ConfigurationService.PcReleaseLocation) + "/BackupImage"))
                             Directory.CreateDirectory(_backupDir);
 
-                        var filenames = new List<string>();
                         var outputDir = "patchedpkgs";
                         var hedFile = Path.ChangeExtension(_pkgName, "hed");
 
@@ -499,8 +535,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             {
                                 patchFiles.Remove(filename);
 
-                                filenames.Add(filename);
-
                                 if (hedHeader.DataLength > 0)
                                 {
                                     OpenKh.Egs.EgsTools.ReplaceFile(directory, filename, patchedHedStream, patchedPkgStream, asset, hedHeader);
@@ -530,7 +564,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                         File.Delete(hedFile);
                         File.Delete(_pkgName);
-
+                        
                         File.Move(Path.Combine(outputDir, Path.GetFileName(hedFile)), hedFile);
                         File.Move(Path.Combine(outputDir, Path.GetFileName(_pkgName)), _pkgName);
                     }

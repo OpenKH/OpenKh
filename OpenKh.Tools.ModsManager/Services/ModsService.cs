@@ -4,6 +4,7 @@ using OpenKh.Patcher;
 using OpenKh.Tools.ModsManager.Exceptions;
 using OpenKh.Tools.ModsManager.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -318,6 +319,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
             var patcherProcessor = new PatcherProcessor();
             var modsList = GetMods(EnabledMods).ToList();
+            var packageMap = new ConcurrentDictionary<string, string>();
 
             for (var i = modsList.Count - 1; i >= 0; i--)
             {
@@ -330,8 +332,15 @@ namespace OpenKh.Tools.ModsManager.Services
                     mod.Metadata,
                     mod.Path,
                     ConfigurationService.GameEdition,
-                    fastMode);
+                    fastMode,
+                    packageMap);
             }
+
+            using var packageMapWriter = new StreamWriter(Path.Combine(ConfigurationService.GameModPath, "patch-package-map.txt"));
+            foreach (var entry in packageMap)
+                packageMapWriter.WriteLine(entry.Key + " $$$$ " + entry.Value);
+            packageMapWriter.Flush();
+            packageMapWriter.Close();
 
             return true;
         }));
