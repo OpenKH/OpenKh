@@ -3,6 +3,7 @@ using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -68,7 +69,7 @@ namespace OpenKh.Patcher
             Patch(originalAssets, outputDir, metadata, modBasePath);
         }
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null)
         {
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
@@ -94,34 +95,50 @@ namespace OpenKh.Patcher
                         var _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "kh2_first";
 
                         var dstFile = context.GetDestinationPath(name);
+                        var packageMapLocation = "";
                         var _pcFile = name.Contains("remastered") || name.Contains("raw");
+
+                        // Special case for mods that want to bundle scripts or DLL files
+                        var nonGameFile = name.StartsWith("scripts/") || name.StartsWith("dlls/");
 
                         var _extraPath = _pcFile ? "" : "original/";
 
-                        switch (platform)
+                        if (nonGameFile)
                         {
-                            default:
+                            packageMapLocation = "special/" + name;
+                        }
+                        else
+                        {
+                            switch (platform)
                             {
-                                if (assetFile.Platform.ToLower() == "pc")
-                                    continue;
+                                default:
+                                {
+                                    if (assetFile.Platform.ToLower() == "pc")
+                                        continue;
 
-                                else if (_pcFile)
-                                    continue;
+                                    else if (_pcFile)
+                                        continue;
+                                }
+                                break;
+
+                                case 2:
+                                {
+                                    if (assetFile.Platform.ToLower() == "ps2")
+                                        continue;
+
+                                    if (assetFile.Platform.ToLower() != "ps2")
+                                        packageMapLocation = _packageFile + "/" + _extraPath + name;
+
+                                    else if (_pcFile)
+                                        packageMapLocation = _packageFile + "/" + name;
+                                }
+                                break;
                             }
-                            break;
+                        }
 
-                            case 2:
-                            {
-                                if (assetFile.Platform.ToLower() == "ps2")
-                                    continue;
-
-                                if (assetFile.Platform.ToLower() != "ps2")
-                                    dstFile = context.GetDestinationPath(_packageFile + "/" + _extraPath + name);
-
-                                else if (_pcFile)
-                                    dstFile = context.GetDestinationPath(_packageFile + "/" + name);
-                            }
-                            break;
+                        if (packageMap != null && packageMapLocation.Length > 0)
+                        {
+                            packageMap[name] = packageMapLocation;
                         }
 
                         context.EnsureDirectoryExists(dstFile);
