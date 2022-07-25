@@ -149,52 +149,46 @@ public:
     FakePackageFile()
     {
         strcpy(PkgFileName, "ModFiles");
-        for (int i = 0; i < PackageFileCount; i++)
+        std::string& basepath = OpenKH::m_ModPath;
+        std::queue<std::string> folq;
+        folq.push(basepath);
+        while (!folq.empty())
         {
-            char pkgname[MAX_PATH];
-            strcpy(pkgname, PackageFiles[i]->PkgFileName);
-            PathRemoveExtensionA(pkgname);
-            std::string basepath = OpenKH::m_ModPath + "\\" + PathFindFileNameA(pkgname) + "\\original";
-            std::queue<std::string> folq;
-            folq.push(basepath);
-            while (!folq.empty())
+            auto& curDir = folq.front();
+            WIN32_FIND_DATAA data;
+            auto path = CombinePaths(curDir, "*");
+            HANDLE findHandle = FindFirstFileA(path.c_str(), &data);
+            if (findHandle != INVALID_HANDLE_VALUE)
             {
-                auto& curDir = folq.front();
-                WIN32_FIND_DATAA data;
-                auto path = CombinePaths(curDir, "*");
-                HANDLE findHandle = FindFirstFileA(path.c_str(), &data);
-                if (findHandle != INVALID_HANDLE_VALUE)
+                do
                 {
-                    do
+                    if (!strcmp(data.cFileName, ".") || !strcmp(data.cFileName, ".."))
+                        continue;
+                    if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                     {
-                        if (!strcmp(data.cFileName, ".") || !strcmp(data.cFileName, ".."))
-                            continue;
-                        if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                        folq.push(CombinePaths(curDir, data.cFileName));
+                        continue;
+                    }
+                    std::string filename = CombinePaths(curDir, data.cFileName);
+                    std::string basefn = filename.substr(basepath.length() + 1);
+                    std::transform(basefn.begin(), basefn.end(), basefn.begin(), [](char c)
                         {
-                            folq.push(CombinePaths(curDir, data.cFileName));
-                            continue;
-                        }
-                        std::string filename = CombinePaths(curDir, data.cFileName);
-                        std::string basefn = filename.substr(basepath.length() + 1);
-                        std::transform(basefn.begin(), basefn.end(), basefn.begin(), [](char c)
-                            {
-                                if (c == '\\')
-                                    return '/';
-                                return c;
-                            });
-                        ModFileInfo fileInfo{};
-                        Axa::CalcHash(basefn.c_str(), (int)basefn.size(), &fileInfo.Header.hash);
-                        fileInfo.Header.actualLength = data.nFileSizeLow;
-                        fileInfo.Header.dataLength = data.nFileSizeLow;
-                        fileInfo.FileInfo.creationDate = data.ftCreationTime.dwLowDateTime;
-                        fileInfo.FileInfo.decompressedSize = data.nFileSizeLow;
-                        fileInfo.FileInfo.compressedSize = -2;
-                        fileData[basefn] = fileInfo;
-                    } while (FindNextFileA(findHandle, &data));
-                    FindClose(findHandle);
-                }
-                folq.pop();
+                            if (c == '\\')
+                                return '/';
+                            return c;
+                        });
+                    ModFileInfo fileInfo{};
+                    Axa::CalcHash(basefn.c_str(), (int)basefn.size(), &fileInfo.Header.hash);
+                    fileInfo.Header.actualLength = data.nFileSizeLow;
+                    fileInfo.Header.dataLength = data.nFileSizeLow;
+                    fileInfo.FileInfo.creationDate = data.ftCreationTime.dwLowDateTime;
+                    fileInfo.FileInfo.decompressedSize = data.nFileSizeLow;
+                    fileInfo.FileInfo.compressedSize = -2;
+                    fileData[basefn] = fileInfo;
+                } while (FindNextFileA(findHandle, &data));
+                FindClose(findHandle);
             }
+            folq.pop();
         }
     }
 
@@ -383,17 +377,9 @@ void Panacea::FreeAllPackages()
 bool Panacea::TransformFilePath(char* strOutPath, int maxLength, const char* originalPath)
 {
     const char* actualFileName = originalPath + strlen(BasePath) + 1;
-    for (int i = 0; i < PackageFileCount; i++)
-    {
-        char pkgname[MAX_PATH];
-        strcpy(pkgname, PackageFiles[i]->PkgFileName);
-        PathRemoveExtensionA(pkgname);
-        sprintf_s(strOutPath, maxLength, "%s\\%s\\original\\%s", OpenKH::m_ModPath.c_str(), PathFindFileNameA(pkgname), actualFileName);
+    sprintf_s(strOutPath, maxLength, "%s\\%s", OpenKH::m_ModPath.c_str(), actualFileName);
 
-        if (GetFileAttributesA(strOutPath) != INVALID_FILE_ATTRIBUTES)
-            return true;
-    }
-    return false;
+    return GetFileAttributesA(strOutPath) != INVALID_FILE_ATTRIBUTES;
 }
 
 std::unordered_map<std::string, std::vector<Axa::RemasteredEntry>> RemasteredData;
@@ -720,10 +706,7 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
     if (RemasteredData.find(path) == RemasteredData.cend())
     {
         char remasteredFolder[MAX_PATH];
-        strcpy(remasteredFolder, path);
-        *strstr(remasteredFolder, "original") = 0;
-        strcat(remasteredFolder, "remastered");
-        strcat(remasteredFolder, strstr(path, "original") + 8);
+        sprintf_s(remasteredFolder, "%s\\remastered\\%s", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1);
         std::vector<Axa::RemasteredEntry> entries;
         bool folderexist = GetFileAttributesA(remasteredFolder) & FILE_ATTRIBUTE_DIRECTORY;
         if (fileinfo->CurrentFileData.remasteredCount != 0 || folderexist)
@@ -939,23 +922,9 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
         entry = &a1->RemasteredData[assetNum];
     }
     char path[MAX_PATH];
+    TransformFilePath(path, sizeof(path), a1->CurrentFileName);
     char remastered[MAX_PATH];
-    if (TransformFilePath(path, sizeof(path), a1->CurrentFileName))
-    {
-        strcpy(remastered, path);
-        *strstr(remastered, "original") = 0;
-        strcat(remastered, "remastered");
-        strcat(remastered, strstr(path, "original") + 8);
-    }
-    else
-    {
-        snprintf(remastered, MAX_PATH, "%s\\%s", OpenKH::m_ModPath.c_str(), PathFindFileNameA(a1->PkgFileName));
-        PathRemoveExtensionA(remastered);
-        strcat(remastered, "\\remastered\\");
-        strcat(remastered, a1->CurrentFileName + strlen(BasePath) + 1);
-    }
-    strcat(remastered, "\\");
-    strcat(remastered, entry->name);
+    sprintf_s(remastered, "%s\\remastered\\%s\\%s", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1, entry->name);
     if (GetFileAttributesA(remastered) != INVALID_FILE_ATTRIBUTES)
     {
         FILE* file = fopen(remastered, "rb");
