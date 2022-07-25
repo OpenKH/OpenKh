@@ -191,6 +191,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 _pcReleaseLocation = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
+                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
                 OnPropertyChanged(nameof(IsGameSelected));
                 OnPropertyChanged(nameof(IsGameDataFound));
             }
@@ -224,13 +227,17 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public RelayCommand InstallPanaceaCommand { get; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
-        private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.DLL");
+        private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.dll");
         public Visibility PanaceaNotInstalledVisibility => !IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PanaceaInstalledVisibility => IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
         public bool IsLastPanaceaVersionInstalled
         {
             get
             {
+                if (PcReleaseLocation == null)
+                    // Won't be able to find the source location
+                    return false;
+
                 if (!File.Exists(PanaceaSourceLocation))
                     // While debugging it is most likely to not have the compiled
                     // DLL into the right place. So don't bother.
@@ -240,7 +247,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     // DBGHELP.dll is not installed
                     return false;
 
-                byte[] CalcualteChecksum(string fileName) =>
+                byte[] CalculateChecksum(string fileName) =>
                     System.Security.Cryptography.MD5.Create().Using(md5 =>
                         File.OpenRead(fileName).Using(md5.ComputeHash));
                 bool IsEqual(byte[] left, byte[] right)
@@ -252,8 +259,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 }
 
                 return IsEqual(
-                    CalcualteChecksum(PanaceaSourceLocation),
-                    CalcualteChecksum(PanaceaDestinationLocation));
+                    CalculateChecksum(PanaceaSourceLocation),
+                    CalculateChecksum(PanaceaDestinationLocation));
             }
         }
 
@@ -308,8 +315,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 if (File.Exists(PanaceaSourceLocation))
                     // Again, do not bother in debug mode
-                    File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation);
+                    File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
+                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
             });
         }
 
