@@ -13,7 +13,8 @@ namespace OpenKh.Tools.ModsManager.Views
     {
         private static readonly IEnumerable<FileDialogFilter> _zipFilter = FileDialogFilterComposer
             .Compose()
-            .AddExtensions("OpenKH mod as ZIP file", "zip");
+            .AddExtensions("OpenKH ZIP Mod", "zip")
+            .AddExtensions("KH2PCPATCH Mod", "kh2pcpatch");
 
         public RelayCommand CloseCommand { get; }
         public string RepositoryName { get; set; }

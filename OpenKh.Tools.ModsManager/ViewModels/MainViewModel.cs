@@ -4,6 +4,7 @@ using OpenKh.Tools.ModsManager.Models;
 using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.Views;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -35,6 +36,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private Process _runningProcess;
         private bool _isBuilding;
 
+        private const string RAW_FILES_FOLDER_NAME = "raw";
+        private const string ORIGINAL_FILES_FOLDER_NAME = "original";
+        private const string REMASTERED_FILES_FOLDER_NAME = "remastered";
+
         public string Title => ApplicationName;
         public string CurrentVersion => ApplicationVersion;
         public ObservableCollection<ModViewModel> ModsList { get; set; }
@@ -45,6 +50,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand MoveUp { get; set; }
         public RelayCommand MoveDown { get; set; }
         public RelayCommand BuildCommand { get; set; }
+        public RelayCommand PatchCommand { get; set; }
+        public RelayCommand RestoreCommand { get; set; }
         public RelayCommand RunCommand { get; set; }
         public RelayCommand BuildAndRunCommand { get; set; }
         public RelayCommand StopRunningInstanceCommand { get; set; }
@@ -183,20 +190,36 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             BuildCommand = new RelayCommand(async _ =>
             {
                 ResetLogWindow();
-                await BuildPatches();
+                await BuildPatches(false);
                 CloseAllWindows();
             }, _ => !IsBuilding);
+
+            PatchCommand = new RelayCommand(async (fastMode) =>
+            {
+                ResetLogWindow();
+                await BuildPatches(Convert.ToBoolean(fastMode));
+                await PatchGame(Convert.ToBoolean(fastMode));
+                CloseAllWindows();
+            }, _ => !IsBuilding);
+
             RunCommand = new RelayCommand(async _ =>
             {
                 CloseRunningProcess();
                 ResetLogWindow();
                 await RunGame();
             });
+
+            RestoreCommand = new RelayCommand(async _ =>
+            {
+                ResetLogWindow();
+                await RestoreGame();
+                CloseAllWindows();
+            });
             BuildAndRunCommand = new RelayCommand(async _ =>
             {
                 CloseRunningProcess();
                 ResetLogWindow();
-                if (await BuildPatches())
+                if (await BuildPatches(false))
                     await RunGame();
             }, _ => !IsBuilding);
             StopRunningInstanceCommand = new RelayCommand(_ =>
@@ -285,10 +308,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             _debuggingWindow.ClearLogs();
         }
 
-        private async Task<bool> BuildPatches()
+        private async Task<bool> BuildPatches(bool fastMode)
         {
             IsBuilding = true;
-            var result = await ModsService.RunPacherAsync(ConfigurationService.GameEdition);
+            var result = await ModsService.RunPacherAsync(fastMode);
             IsBuilding = false;
 
             return result;
@@ -437,6 +460,151 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             ModsList.Insert(--selectedIndex, item);
             SelectedValue = ModsList[selectedIndex];
             ModEnableStateChanged();
+        }
+
+        private async Task PatchGame(bool fastMode)
+        {
+            await Task.Run(() =>
+            {
+                if (ConfigurationService.GameEdition == 2)
+                {
+                    foreach (var directory in Directory.GetDirectories(ConfigurationService.GameModPath))
+                    {
+                        var patchFiles = new List<string>();
+                        var _dirPart = new DirectoryInfo(directory).Name;
+
+                        var _orgPath = Path.Combine(directory, ORIGINAL_FILES_FOLDER_NAME);
+                        var _rawPath = Path.Combine(directory, RAW_FILES_FOLDER_NAME);
+
+                        if (Directory.Exists(_orgPath))
+                            patchFiles = OpenKh.Egs.Helpers.GetAllFiles(_orgPath).ToList();
+
+                        if (Directory.Exists(_rawPath))
+                            patchFiles.AddRange(OpenKh.Egs.Helpers.GetAllFiles(_rawPath).ToList());
+
+                        var _pkgSoft = fastMode ? "kh2_first" : _dirPart;
+                        var _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", "en", _pkgSoft + ".pkg");
+
+                        var _backupDir = Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage");
+
+                        if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
+                            Directory.CreateDirectory(_backupDir);
+
+                        var filenames = new List<string>();
+                        var outputDir = "patchedpkgs";
+                        var hedFile = Path.ChangeExtension(_pkgName, "hed");
+
+                        if (!File.Exists(_backupDir + "/" + _pkgSoft + ".pkg"))
+                        {
+                            Log.Info($"Backing Up Package File {_pkgSoft}");
+
+                            File.Copy(_pkgName, _backupDir + "/" + _pkgSoft + ".pkg");
+                            File.Copy(hedFile, _backupDir + "/" + _pkgSoft + ".hed");
+                        }
+
+                        else
+                        {
+                            Log.Info($"Restoring Package File {_pkgSoft}");
+
+                            File.Delete(hedFile);
+                            File.Delete(_pkgName);
+
+                            File.Copy(_backupDir + "/" + _pkgSoft + ".pkg", _pkgName);
+                            File.Copy(_backupDir + "/" + _pkgSoft + ".hed", hedFile);
+                        }
+
+                        using var hedStream = File.OpenRead(hedFile);
+                        using var pkgStream = File.OpenRead(_pkgName);
+                        var hedHeaders = OpenKh.Egs.Hed.Read(hedStream).ToList();
+
+                        if (!Directory.Exists(outputDir))
+                            Directory.CreateDirectory(outputDir);
+
+                        using var patchedHedStream = File.Create(Path.Combine(outputDir, Path.GetFileName(hedFile)));
+                        using var patchedPkgStream = File.Create(Path.Combine(outputDir, Path.GetFileName(_pkgName)));
+
+                        foreach (var hedHeader in hedHeaders)
+                        {
+                            var hash = OpenKh.Egs.Helpers.ToString(hedHeader.MD5);
+
+                            // We don't know this filename, we ignore it
+                            if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var filename))
+                                continue;
+
+                            var asset = new OpenKh.Egs.EgsHdAsset(pkgStream.SetPosition(hedHeader.Offset));
+
+                            if (patchFiles.Contains(filename))
+                            {
+                                patchFiles.Remove(filename);
+
+                                filenames.Add(filename);
+
+                                if (hedHeader.DataLength > 0)
+                                {
+                                    OpenKh.Egs.EgsTools.ReplaceFile(directory, filename, patchedHedStream, patchedPkgStream, asset, hedHeader);
+                                    Log.Info($"Replacing File {filename} in {_pkgSoft}");
+                                }
+                            }
+
+                            else
+                            {
+                                OpenKh.Egs.EgsTools.ReplaceFile(directory, filename, patchedHedStream, patchedPkgStream, asset, hedHeader);
+                                Log.Info($"Skipped File {filename} in {_pkgSoft}");
+                            }
+                        }
+
+                        // Add all files that are not in the original HED file and inject them in the PKG stream too
+                        foreach (var filename in patchFiles)
+                        {
+                            OpenKh.Egs.EgsTools.AddFile(directory, filename, patchedHedStream, patchedPkgStream);
+                            Log.Info($"Adding File {filename} to {_pkgSoft}");
+                        }
+
+                        hedStream.Close();
+                        pkgStream.Close();
+
+                        patchedHedStream.Close();
+                        patchedPkgStream.Close();
+
+                        File.Delete(hedFile);
+                        File.Delete(_pkgName);
+
+                        File.Move(Path.Combine(outputDir, Path.GetFileName(hedFile)), hedFile);
+                        File.Move(Path.Combine(outputDir, Path.GetFileName(_pkgName)), _pkgName);
+                    }
+                }
+            });
+        }
+
+        private async Task RestoreGame()
+        {
+            await Task.Run(() =>
+            {
+                if (ConfigurationService.GameEdition == 2)
+                {
+                    if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
+                    {
+                        Log.Warn("backup folder cannot be found! Cannot restore the game.");
+                    }
+
+                    else
+                    {
+                        foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")).Where(x => x.Contains(".pkg")))
+                        {
+                            Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
+
+                            var _fileBare = Path.GetFileName(file);
+                            var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", "en", _fileBare);
+
+                            File.Delete(Path.ChangeExtension(_trueName, "hed"));
+                            File.Delete(_trueName);
+
+                            File.Copy(file, _trueName);
+                            File.Copy(Path.ChangeExtension(file, "hed"), Path.ChangeExtension(_trueName, "hed"));
+                        }
+                    }
+                }
+            });
         }
 
         private bool CanSelectedModMoveDown() =>

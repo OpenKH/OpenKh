@@ -133,7 +133,7 @@ namespace OpenKh.Egs
             }
         }
 
-        private static string GetHDAssetFolder(string assetFile)
+        public static string GetHDAssetFolder(string assetFile)
         {
             var parentFolder = Directory.GetParent(assetFile).FullName;
             var assetFolderName = Path.Combine(parentFolder, $"{Path.GetFileName(assetFile)}");
@@ -141,7 +141,7 @@ namespace OpenKh.Egs
             return assetFolderName;
         }
 
-        private static void CreateDirectoryForFile(string fileName)
+        public static void CreateDirectoryForFile(string fileName)
         {
             var directoryName = Path.GetDirectoryName(fileName);
             if (!Directory.Exists(directoryName))
@@ -214,7 +214,7 @@ namespace OpenKh.Egs
             }
         }
 
-        private static Hed.Entry AddFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, bool shouldCompressData = false, bool shouldEncryptData = false)
+        public static Hed.Entry AddFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, bool shouldCompressData = false, bool shouldEncryptData = false)
         {
             var completeFilePath = Path.Combine(inputFolder, ORIGINAL_FILES_FOLDER_NAME, filename);
             var completeRawFilePath = Path.Combine(inputFolder, RAW_FILES_FOLDER_NAME, filename);
@@ -318,7 +318,7 @@ namespace OpenKh.Egs
             return hedHeader;
         }
 
-        private static Hed.Entry ReplaceFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, EgsHdAsset asset, Hed.Entry originalHedHeader = null)
+        public static Hed.Entry ReplaceFile(string inputFolder, string filename, FileStream hedStream, FileStream pkgStream, EgsHdAsset asset, Hed.Entry originalHedHeader = null)
         {
             var completeFilePath = Path.Combine(inputFolder, ORIGINAL_FILES_FOLDER_NAME, filename);
             var completeRawFilePath = Path.Combine(inputFolder, RAW_FILES_FOLDER_NAME, filename);

@@ -16,52 +16,61 @@ namespace OpenKh.Patcher
         public class Context
         {
             public Metadata Metadata { get; set; }
-            public ISourceAssets SourceAssets { get; }
+            public string OriginalAssetPath { get; }
             public string SourceModAssetPath { get; set; }
             public string DestinationPath { get; set; }
 
+            public static List<string> Regions = new List<string>()
+            {
+                "us",
+                "jp",
+                "us",
+                "uk",
+                "it",
+                "sp",
+                "gr",
+                "fr",
+                "fm",
+            };
+
             public Context(
                 Metadata metadata,
-                ISourceAssets sourceAssets,
+                string originalAssetPath,
                 string sourceModAssetPath,
                 string destinationPath)
             {
                 Metadata = metadata;
-                SourceAssets = sourceAssets;
+                OriginalAssetPath = originalAssetPath;
                 SourceModAssetPath = sourceModAssetPath;
                 DestinationPath = destinationPath;
             }
 
+            public string GetOriginalAssetPath(string path) => Path.Combine(OriginalAssetPath, path);
             public string GetSourceModAssetPath(string path) => Path.Combine(SourceModAssetPath, path);
             public string GetDestinationPath(string path) => Path.Combine(DestinationPath, path);
             public void EnsureDirectoryExists(string fileName) => Directory.CreateDirectory(Path.GetDirectoryName(fileName));
-            public void CopyOriginalFile(string fileName)
+            public void CopyOriginalFile(string fileName, string dstFile)
             {
-                var dstFile = GetDestinationPath(fileName);
-                EnsureDirectoryExists(dstFile);
-
                 if (!File.Exists(dstFile))
                 {
-                    if (SourceAssets.Exists(fileName))
-                    {
-                        using var sourceStream = SourceAssets.OpenRead(fileName);
-                        using var destStream = File.Create(dstFile);
-                        sourceStream.CopyTo(destStream);
-                    }
+                    var originalFile = GetOriginalAssetPath(fileName);
+
+                    if (File.Exists(originalFile))
+                        File.Copy(originalFile, dstFile);
                 }
             }
         }
 
-        public void Patch(ISourceAssets sourceAssets, string outputDir, string modFilePath)
+        public void Patch(string originalAssets, string outputDir, string modFilePath)
         {
             var metadata = File.OpenRead(modFilePath).Using(Metadata.Read);
             var modBasePath = Path.GetDirectoryName(modFilePath);
-            Patch(sourceAssets, outputDir, metadata, modBasePath);
+            Patch(originalAssets, outputDir, metadata, modBasePath);
         }
 
-        public void Patch(ISourceAssets sourceAssets, string outputDir, Metadata metadata, string modBasePath)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false)
         {
-            var context = new Context(metadata, sourceAssets, modBasePath, outputDir);
+            var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {
                 if (metadata.Assets == null)
@@ -76,17 +85,63 @@ namespace OpenKh.Patcher
 
                     foreach (var name in names)
                     {
-                        if (assetFile.Required && !context.SourceAssets.Exists(name))
+                        if (assetFile.Platform == null)
+                            assetFile.Platform = "both";
+
+                        if (assetFile.Required && !File.Exists(context.GetOriginalAssetPath(name)))
                             continue;
 
-                        context.CopyOriginalFile(name);
-                        var dstFile = context.GetDestinationPath(name);
+                        var _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "kh2_first";
 
-                        using var stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                        PatchFile(context, assetFile, stream);
+                        var dstFile = context.GetDestinationPath(name);
+                        var _pcFile = name.Contains("remastered") || name.Contains("raw");
+
+                        var _extraPath = _pcFile ? "" : "original/";
+
+                        switch (platform)
+                        {
+                            default:
+                            {
+                                if (assetFile.Platform.ToLower() == "pc")
+                                    continue;
+
+                                else if (_pcFile)
+                                    continue;
+                            }
+                            break;
+
+                            case 2:
+                            {
+                                if (assetFile.Platform.ToLower() == "ps2")
+                                    continue;
+
+                                if (assetFile.Platform.ToLower() != "ps2")
+                                    dstFile = context.GetDestinationPath(_packageFile + "/" + _extraPath + name);
+
+                                else if (_pcFile)
+                                    dstFile = context.GetDestinationPath(_packageFile + "/" + name);
+                            }
+                            break;
+                        }
+
+                        context.EnsureDirectoryExists(dstFile);
+
+                        try
+                        {
+                            context.CopyOriginalFile(name, dstFile);
+
+                            using var _stream = File.Open(dstFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                            PatchFile(context, assetFile, _stream);
+
+                            _stream.Close();
+                            _stream.Dispose();
+                        }
+
+                        catch (IOException) { }
                     }
                 });
             }
+
             catch (Exception ex)
             {
                 Log.Err($"Patcher failed: {ex.Message}");
@@ -147,19 +202,20 @@ namespace OpenKh.Patcher
             if (assetFile.Source == null || assetFile.Source.Count == 0)
                 throw new Exception($"File '{assetFile.Name}' does not contain any source");
 
+            string srcFile; 
+
             if (assetFile.Source[0].Type == "internal")
             {
-                using var srcStream = context.SourceAssets.OpenRead(assetFile.Source[0].Name);
-                srcStream.CopyTo(stream);
+                srcFile = context.GetOriginalAssetPath(assetFile.Source[0].Name);
             }
             else
             {
-                var srcFile = context.GetSourceModAssetPath(assetFile.Source[0].Name);
+                srcFile = context.GetSourceModAssetPath(assetFile.Source[0].Name);
                 if (!File.Exists(srcFile))
                     throw new FileNotFoundException($"The mod does not contain the file {assetFile.Source[0].Name}", srcFile);
-                using var srcStream = File.OpenRead(srcFile);
-                srcStream.CopyTo(stream);
             }
+            using var srcStream = File.OpenRead(srcFile);
+            srcStream.CopyTo(stream);
         }
 
         private static void PatchBinarc(Context context, AssetFile assetFile, Stream stream)

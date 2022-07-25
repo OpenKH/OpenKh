@@ -36,13 +36,13 @@
             CanSelectNextPage="{Binding IsGameSelected}"
             Description="Selected the preferred edition to launch the game"
             PreviousPage="{Binding ElementName=IntroPage}"
-            NextPage="{Binding WizardNextPage}">
+            NextPage="{Binding WizardPageAfterIntro}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
                 <ComboBox Margin="0 0 0 6" SelectedIndex="{Binding GameEdition}">
                     <ComboBoxItem>OpenKH Game Engine</ComboBoxItem>
                     <ComboBoxItem>PlayStation 2 using PCSX2 emulator</ComboBoxItem>
-                    <ComboBoxItem>PC release via Epic Game store</ComboBoxItem>
+                    <ComboBoxItem>PC Release via Epic Game Store</ComboBoxItem>
                 </ComboBox>
                 <StackPanel Visibility="{Binding OpenKhGameEngineConfigVisibility}">
                     <TextBlock Margin="0 0 0 3">Please select the location of OpenKH Game Engine</TextBlock>
@@ -93,16 +93,14 @@
             PageType="Interior"
             Title="Configure the game you want to mod"
             Description="Do not worry, you can change this option later"
-            CanSelectNextPage="{Binding IsGameRecognized}"
             PreviousPage="{Binding ElementName=PageGameEdition}"
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock>Supported games:</TextBlock>
                 <StackPanel Margin="10 3 0 10">
-                    <TextBlock>Kingdom Hearts I (Final Mix)</TextBlock>
                     <TextBlock>Kingdom Hearts II (JP, US, EU, Final Mix, PC)</TextBlock>
                 </StackPanel>
-                <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO image</TextBlock>
+                <TextBlock Margin="0 0 0 3">Please select the location of the PlayStation 2 ISO Image.</TextBlock>
                 <Grid Margin="0 0 0 3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -126,13 +124,13 @@
         <xctk:WizardPage
             x:Name="PageGameData"
             PageType="Interior"
-            Title="Set game data"
-            Description="It might be necessary to extract game's data"
+            Title="Set Game Data Location"
+            Description="It might be necessary to extract game's data."
             CanSelectNextPage="{Binding IsGameDataFound}"
             CanSelectPreviousPage="{Binding IsNotExtracting}"
             CanCancel="{Binding IsNotExtracting}"
             PreviousPage="{Binding ElementName=PageIsoSelection}"
-            NextPage="{Binding ElementName=PageRegion}"
+            NextPage="{Binding WizardPageAfterGameData}"
             IsEnabled="{Binding IsNotExtracting}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
@@ -146,18 +144,14 @@
                         <Image Source="{StaticResource FolderOpen_16x}"/>
                     </Button>
                 </Grid>
-                <TextBlock Margin="0 0 0 6" TextWrapping="Wrap" Visibility="{Binding GameDataNotFoundVisibility}">
-                    <Run>It seems you do not have your </Run>
-                    <Run Text="{Binding GameName}" d:Text="Some KH game"/>
-                    <Run> copy extracted.</Run>
+                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                    It seems you do not have your Kingdom Hearts II copy extracted.
                 </TextBlock>
-                <TextBlock Margin="0 0 0 6" TextWrapping="Wrap" Visibility="{Binding GameDataFoundVisibility}">
-                    <Run>You already have your </Run>
-                    <Run Text="{Binding GameName}" d:Text="Some KH game"/>
-                    <Run> copy extracted.</Run>
+                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                    You already have your Kingdom Hearts II copy extracted.
                 </TextBlock>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    Press the button below to initialize the game extraction. It will take between 5 and 15 mintues based on the speed of your hard drive.
+                    Press the button below to initialize the game extraction. It will take between 5 and 15 minutes based on the speed of your hard drive.
                 </TextBlock>
                 <Button Margin="0 0 0 6" Width="120" Height="22" HorizontalAlignment="Left" Command="{Binding ExtractGameDataCommand}">Extract game data</Button>
                 <ProgressBar Margin="0 0 0 6" Height="22" Visibility="{Binding ProgressBarVisibility}" Minimum="0" Maximum="1" Value="{Binding ExtractionProgress}"/>
@@ -198,16 +192,22 @@
         <xctk:WizardPage
             x:Name="PageEosInstall"
             PageType="Interior"
-            Title="Install OpenKH Panacea"
+            Title="Install OpenKH Panacea (Experimental)"
             Description="Install the Mods Manager support into the game's folder."
-            CanSelectNextPage="{Binding IsLastPanaceaVersionInstalled}"
             PreviousPage="{Binding ElementName=PageGameEdition}"
             NextPage="{Binding ElementName=PageEosConfig}">
             <StackPanel>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                        OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
+                        modifying the game files.
+                        If installed, this file is named 'DBGHELP.dll' and it can be found in your game's data folder.
+                </TextBlock>
                 <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         It seems you do not have OpenKH Panacea installed or you are running a different version than the one
                         compatible with the Mods Manager. We need your permission to install it into the game's folder.
+                        If you choose not to install, you may need to use one of the Build and Patch options to apply mods
+                        to your game.
                     </TextBlock>
                     <Button
                         Margin="0 0 0 6"
@@ -221,10 +221,6 @@
                         OpenKH Panacea is installed!
                     </TextBlock>
                 </StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed.
-                        If installed, this file is named 'DBGHELP.dll' and it can be found in your game's data folder.
-                </TextBlock>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
@@ -232,9 +228,8 @@
             PageType="Interior"
             Title="Configure Kingdom Hearts HD 1.5+2.5 ReMIX"
             Description="Change the way the launcher behaves."
-            CanSelectNextPage="{Binding IsGameDataFound}"
             PreviousPage="{Binding ElementName=PageEosInstall}"
-            NextPage="{Binding ElementName=LastPage}">
+            NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                     To run the game within the Mods Manager, you need to bypass the launcher.
@@ -274,7 +269,6 @@
                 </StackPanel>
             </StackPanel>
         </xctk:WizardPage>
-        
         <xctk:WizardPage
             x:Name="LastPage"
             PageType="Exterior"
