@@ -192,16 +192,22 @@
         <xctk:WizardPage
             x:Name="PageEosInstall"
             PageType="Interior"
-            Title="Install OpenKH Panacea"
+            Title="Install OpenKH Panacea (Experimental)"
             Description="Install the Mods Manager support into the game's folder."
-            CanSelectNextPage="{Binding IsLastPanaceaVersionInstalled}"
             PreviousPage="{Binding ElementName=PageGameEdition}"
             NextPage="{Binding ElementName=PageEosConfig}">
             <StackPanel>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                        OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
+                        modifying the game files.
+                        If installed, this file is named 'DBGHELP.dll' and it can be found in your game's data folder.
+                </TextBlock>
                 <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         It seems you do not have OpenKH Panacea installed or you are running a different version than the one
                         compatible with the Mods Manager. We need your permission to install it into the game's folder.
+                        If you choose not to install, you may need to use one of the Build and Patch options to apply mods
+                        to your game.
                     </TextBlock>
                     <Button
                         Margin="0 0 0 6"
@@ -215,10 +221,6 @@
                         OpenKH Panacea is installed!
                     </TextBlock>
                 </StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed.
-                        If installed, this file is named 'DBGHELP.dll' and it can be found in your game's data folder.
-                </TextBlock>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
