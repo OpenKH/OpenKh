@@ -492,7 +492,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             Directory.Delete(directory, true);
 
                     var stagingDirs = Directory.GetDirectories(patchStagingDir).Select(directory => Path.GetFileName(directory)).ToHashSet();
-                    var specialDirs = Directory.GetDirectories(Path.Combine(patchStagingDir, "special")).Select(directory => Path.GetFileName(directory));
+
+                    string[] specialDirs = Array.Empty<string>();
+                    var specialStagingDir = Path.Combine(patchStagingDir, "special");
+                    if (Directory.Exists(specialStagingDir))
+                        specialDirs = Directory.GetDirectories(specialStagingDir).Select(directory => Path.GetFileName(directory)).ToArray();
+
                     foreach (var packageName in stagingDirs)
                         Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.GameModPath, packageName));
                     foreach (var specialDir in specialDirs)
@@ -500,7 +505,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                     stagingDirs.Remove("special"); // Since it's not actually a real game package
                     Directory.Delete(patchStagingDir, true);
-                    Directory.Delete(Path.Combine(ConfigurationService.GameModPath, "special"), true);
+
+                    var specialModDir = Path.Combine(ConfigurationService.GameModPath, "special");
+                    if (Directory.Exists(specialModDir))
+                        Directory.Delete(specialModDir, true);
 
                     foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.GameModPath, packageDir)))
                     {
