@@ -226,6 +226,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public int RegionId { get; set; }
 
         public RelayCommand InstallPanaceaCommand { get; }
+        public RelayCommand RemovePanaceaCommand { get; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
         private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.dll");
         public Visibility PanaceaNotInstalledVisibility => !IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
@@ -316,6 +317,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (File.Exists(PanaceaSourceLocation))
                     // Again, do not bother in debug mode
                     File.Copy(PanaceaSourceLocation, PanaceaDestinationLocation, true);
+                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
+                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+            });
+            RemovePanaceaCommand = new RelayCommand(_ =>
+            {
+                if (File.Exists(PanaceaDestinationLocation))
+                    File.Delete(PanaceaDestinationLocation);
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
