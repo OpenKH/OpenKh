@@ -192,8 +192,8 @@
         <xctk:WizardPage
             x:Name="PageEosInstall"
             PageType="Interior"
-            Title="Install OpenKH Panacea (Experimental)"
-            Description="Install the Mods Manager support into the game's folder."
+            Title="Install OpenKH Panacea (Optional and Experimental)"
+            Description="Install automatic mod loading support into the game's folder."
             PreviousPage="{Binding ElementName=PageGameEdition}"
             NextPage="{Binding ElementName=PageEosConfig}">
             <StackPanel>
@@ -201,6 +201,8 @@
                         OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
                         modifying the game files.
                         If installed, this file is named 'DBGHELP.dll' and it can be found in your game's data folder.
+                        If installed, Panacea will run every time you start the game and attempt to load mods. To
+                        remove Panacea, run this wizard again, or delete the `DBGHELP.dll`.
                 </TextBlock>
                 <StackPanel Visibility="{Binding PanaceaNotInstalledVisibility}">
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
@@ -220,6 +222,12 @@
                     <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         OpenKH Panacea is installed!
                     </TextBlock>
+                    <Button
+                        Margin="0 0 0 6"
+                        Content="Remove OpenKH Panacea"
+                        HorizontalAlignment="Left"
+                        Width="160"
+                        Command="{Binding RemovePanaceaCommand}"/>
                 </StackPanel>
             </StackPanel>
         </xctk:WizardPage>
