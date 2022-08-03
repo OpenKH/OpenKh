@@ -69,9 +69,9 @@
                     <MenuItem Header="Build Only" Command="{Binding BuildCommand}" InputGestureText="Ctrl+B"/>
                     <MenuItem Header="Build and Patch [PC]" Command="{Binding PatchCommand}" CommandParameter="false" InputGestureText="Ctrl+P"/>
                     <MenuItem Header="Build and Patch [Fast/PC]" Command="{Binding PatchCommand}" CommandParameter="true" InputGestureText="Ctrl+P+F"/>
-                    <MenuItem Header="Build and Run [OpenKH/PCSX2]" Command="{Binding BuildAndRunCommand}" InputGestureText="F5"/>
+                    <MenuItem Header="Build and Run [OpenKH/PCSX2/PC]" Command="{Binding BuildAndRunCommand}" InputGestureText="F5"/>
                 </MenuItem>
-                <MenuItem Header="Run [OpenKH/PCSX2]" Command="{Binding RunCommand}" InputGestureText="Ctrl+F5"/>
+                <MenuItem Header="Run [OpenKH/PCSX2/PC]" Command="{Binding RunCommand}" InputGestureText="Ctrl+F5"/>
                 <MenuItem Header="Restore [PC]" Command="{Binding RestoreCommand}" InputGestureText="Ctrl+R"/>
                 <MenuItem Header="Stop" Command="{Binding StopRunningInstanceCommand}" InputGestureText="Shift+F5"/>
             </MenuItem>
@@ -93,12 +93,6 @@
                 <Separator/>
                 <MenuItem Header="Download _latest version" Command="{Binding OpenLinkCommand}"
                     CommandParameter="https://github.com/Xeeynamo/OpenKh/releases">
-                    <MenuItem.Icon>
-                        <Image Source="{StaticResource WebURL_16x}"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="OpenKH Mods License" Command="{Binding OpenLinkCommand}"
-                    CommandParameter="https://github.com/OpenKH/mods-manager-feed/blob/main/openkh-mods-license.md">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource WebURL_16x}"/>
                     </MenuItem.Icon>

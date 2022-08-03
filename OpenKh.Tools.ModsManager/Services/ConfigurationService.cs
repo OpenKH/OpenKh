@@ -34,6 +34,8 @@ namespace OpenKh.Tools.ModsManager.Services
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
             public int RegionId { get; internal set; }
+            public bool BypassLauncher { get; internal set; }
+            public string EpicGamesUserID { get; internal set; }
 
             public void Save(string fileName)
             {
@@ -51,9 +53,11 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private static string AssDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-        private static string ConfigPath = Path.Combine(AssDirectory, "mods-manager.yml");
-        private static string EnabledModsPath = Path.Combine(AssDirectory, "mods.txt");
+        private static string StoragePath = Directory.GetCurrentDirectory().IndexOf("system32") >= 0 ?
+            Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) :
+            Directory.GetCurrentDirectory();
+        private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
+        private static string EnabledModsPath = Path.Combine(StoragePath, "mods.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
 
         static ConfigurationService()
@@ -105,7 +109,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string ModCollectionPath
         {
-            get => _config.ModCollectionPath ?? Path.GetFullPath(Path.Combine(AssDirectory, "mods"));
+            get => _config.ModCollectionPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mods"));
             set
             {
                 _config.ModCollectionPath = value;
@@ -115,7 +119,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string GameModPath
         {
-            get => _config.GameModPath ?? Path.GetFullPath(Path.Combine(AssDirectory, "mod"));
+            get => _config.GameModPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mod"));
             set
             {
                 _config.GameModPath = value;
@@ -125,7 +129,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string GameDataLocation
         {
-            get => _config.GameDataPath ?? Path.GetFullPath(Path.Combine(AssDirectory, "data"));
+            get => _config.GameDataPath ?? Path.GetFullPath(Path.Combine(StoragePath, "data"));
             set
             {
                 _config.GameDataPath = value;
@@ -189,6 +193,26 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.RegionId = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static bool BypassLauncher
+        {
+            get => _config.BypassLauncher;
+            set
+            {
+                _config.BypassLauncher = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static string EpicGamesUserID
+        {
+            get => _config.EpicGamesUserID;
+            set
+            {
+                _config.EpicGamesUserID = value;
                 _config.Save(ConfigPath);
             }
         }

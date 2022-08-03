@@ -14,8 +14,20 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             new GameInfoModel()
             {
+                Id = "kh1",
+                Name = "Kingdom Hearts I",
+                UniqueFileName = "btltbl.bin",
+                Detectors = new()
+                {
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPS_251.97;1" },
+                    new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPS_251.98;1" },
+                }
+            },
+            new GameInfoModel()
+            {
                 Id = "kh2",
                 Name = "Kingdom Hearts II",
+                UniqueFileName = "00objentry.bin",
                 Detectors = new()
                 {
                     new GameDetectorModel { FileName = "SYSTEM.CNF;1", ProductId = "SLPM_662.33;1" },
@@ -51,5 +63,14 @@ namespace OpenKh.Tools.ModsManager.Services
         }
 
         public static GameInfoModel Lookup(string gameId) => Games.FirstOrDefault(x => x.Id == gameId);
+
+        public static bool FolderContainsUniqueFile(string gameId, string path)
+        {
+            var game = Lookup(gameId);
+            if (game == null)
+                return false;
+
+            return File.Exists(Path.Combine(path, game.UniqueFileName));
+        }
     }
 }

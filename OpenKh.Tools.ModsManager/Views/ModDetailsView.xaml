@@ -37,13 +37,10 @@
                     <TextBlock Text="Report bug" Foreground="{DynamicResource textHyperlink}"/>
                 </Hyperlink>
             </TextBlock>
-            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                <Run>This mod is protected by the OpenKH Mods License.</Run>
-            </TextBlock>
         </StackPanel>
         <StackPanel Visibility="{Binding LocalVisibility}">
             <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                This mod is available only locally and it is not linked to any GitHub repository or protected by the OpenKH Mods License.
+                This mod is available only locally and it is not linked to any GitHub repository.
             </TextBlock>
         </StackPanel>
         <Expander Header="Files to patch">
