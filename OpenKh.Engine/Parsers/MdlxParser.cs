@@ -17,8 +17,9 @@ namespace OpenKh.Engine.Parsers
         public float X, Y, Z;
         public float Tu, Tv;
         public float R, G, B, A;
+        public int? BoneAssign;
 
-        public PositionColoredTextured(float x, float y, float z, float tu, float tv, float r, float g, float b, float a)
+        public PositionColoredTextured(float x, float y, float z, float tu, float tv, float r, float g, float b, float a, int? boneAssign = null)
         {
             X = x;
             Y = y;
@@ -29,9 +30,10 @@ namespace OpenKh.Engine.Parsers
             G = g;
             B = b;
             A = a;
+            BoneAssign = boneAssign;
         }
 
-        public PositionColoredTextured(Vector3 pos, Vector2 uv, float r, float g, float b, float a)
+        public PositionColoredTextured(Vector3 pos, Vector2 uv, float r, float g, float b, float a, int? boneAssign = null)
         {
             X = pos.X;
             Y = pos.Y;
@@ -42,6 +44,7 @@ namespace OpenKh.Engine.Parsers
             G = g;
             B = b;
             A = a;
+            BoneAssign = boneAssign;
         }
     }
 

@@ -13,6 +13,10 @@
             <MenuItem Header="File">
                 <MenuItem Header="TEST" Visibility="Collapsed" Click="Menu_Test"/>
                 <MenuItem Header="Save As" Click="Menu_SaveFile"/>
+                <MenuItem Header="Export">
+                    <MenuItem Header="FBX" Click="Menu_ExportAsFbx"/>
+                    <MenuItem Header="DAE (Collada)" Visibility="Collapsed" Click="Menu_ExportAsDae"/>
+                </MenuItem>
             </MenuItem>
         </Menu>
 

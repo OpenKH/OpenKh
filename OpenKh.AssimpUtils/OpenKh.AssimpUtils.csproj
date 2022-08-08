@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+      <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />
+  </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+    </ItemGroup>
+
+</Project>

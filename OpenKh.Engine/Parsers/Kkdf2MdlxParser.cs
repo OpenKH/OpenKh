@@ -221,10 +221,23 @@ namespace OpenKh.Engine.Parsers
                     {
                         VertexRef vertRef = triRef.list[i];
                         indices.Add(vertices.Count);
+
+                        // Weight vertex uses global Id. Convert it to part identifier.
+                        int tempVertexIndex = vertRef.vertexIndex;
+                        int tempPartIndex = 0;
+                        while (tempVertexIndex >= immutableExportedMesh.vertexAssignments[tempPartIndex].Length)
+                        {
+                            tempVertexIndex -= immutableExportedMesh.vertexAssignments[tempPartIndex].Length;
+                            tempPartIndex++;
+                        }
+                        int vertexBoneWeight = immutableExportedMesh.vertexAssignments[tempPartIndex][tempVertexIndex][0].MatrixIndex;
+
+
                         vertices.Add(new PositionColoredTextured(
                             immutableExportedMesh.positionList[vertRef.vertexIndex],
                             immutableExportedMesh.uvList[vertRef.uvIndex],
-                            1.0f, 1.0f, 1.0f, 1.0f));
+                            1.0f, 1.0f, 1.0f, 1.0f,
+                            vertexBoneWeight));
                     }
                 }
 
