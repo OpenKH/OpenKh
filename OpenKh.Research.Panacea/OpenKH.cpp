@@ -108,18 +108,18 @@ void OpenKH::Initialize()
         freopen("CONOUT$", "w", stderr);
     }
 
-    if (m_OverrideEos)
-    {
-        fprintf(stdout, "Overriding Epic Games Online Service\n");
-        EOSOverride(g_hInstance);
-    }
-
     fprintf(stdout, "Executable instance at %p\n", g_hInstance);
     m_GameID = DetectGame();
     if (m_GameID == OpenKH::GameId::Unknown)
     {
         fprintf(stderr, "Unable to detect the running game. Panacea will not be executed.\n");
         return;
+    }
+
+    if (m_OverrideEos || strstr(GetCommandLineA(), "-eosoverride"))
+    {
+        fprintf(stdout, "Overriding Epic Games Online Service\n");
+        EOSOverride(g_hInstance);
     }
 
     Hook();

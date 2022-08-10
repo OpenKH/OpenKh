@@ -307,12 +307,12 @@ void Panacea::Initialize()
         }
     }
 
-    auto dllpath = CombinePaths(OpenKH::m_ModPath, "dll");
+    auto dllpath = CombinePaths(OpenKH::m_ModPath, "dll\\");
     
     char search[MAX_PATH];
     std::strcpy(search, dllpath.c_str());
     std::strcat(search, "*.dll");
-    std::vector<void(*)()> initfuncs;
+    std::vector<void(*)(const char*)> initfuncs;
     WIN32_FIND_DATAA find;
     HANDLE fh = FindFirstFileA(search, &find);
     if (fh != INVALID_HANDLE_VALUE)
@@ -327,7 +327,7 @@ void Panacea::Initialize()
             {
                 if (OpenKH::m_DebugLog)
                     fprintf(stdout, "Loaded DLL \"%s\".\n", find.cFileName);
-                void (*initfunc)() = (void(*)())GetProcAddress(dllhandle, "OnInit");
+                void (*initfunc)(const char*) = (void(*)(const char*))GetProcAddress(dllhandle, "OnInit");
                 if (initfunc)
                     initfuncs.push_back(initfunc);
                 void (*framefunc)() = (void(*)())GetProcAddress(dllhandle, "OnFrame");
@@ -338,7 +338,7 @@ void Panacea::Initialize()
         FindClose(fh);
     }
     for (auto f : initfuncs)
-        f();
+        f(OpenKH::m_ModPath.c_str());
 }
 
 int Panacea::FrameHook(__int64 a1)
