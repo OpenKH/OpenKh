@@ -307,7 +307,7 @@ void Panacea::Initialize()
         }
     }
 
-    auto dllpath = CombinePaths(OpenKH::m_ModPath, "dll");
+    auto dllpath = CombinePaths(OpenKH::m_ModPath, "dll\\");
     
     char search[MAX_PATH];
     std::strcpy(search, dllpath.c_str());
