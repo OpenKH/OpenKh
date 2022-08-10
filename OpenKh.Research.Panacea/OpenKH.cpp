@@ -116,7 +116,7 @@ void OpenKH::Initialize()
         return;
     }
 
-    if (m_OverrideEos)
+    if (m_OverrideEos || strstr(GetCommandLineA(), "-eosoverride"))
     {
         fprintf(stdout, "Overriding Epic Games Online Service\n");
         EOSOverride(g_hInstance);

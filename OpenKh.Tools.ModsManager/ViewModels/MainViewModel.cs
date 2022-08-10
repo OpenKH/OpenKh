@@ -262,7 +262,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             new string[]
                             {
                                 $"mod_path={ConfigurationService.GameModPath}",
-                                $"eos_override={ConfigurationService.BypassLauncher}",
                                 $"show_console={false}",
                             });
                     }
@@ -368,7 +367,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         FileName = Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
                         WorkingDirectory = ConfigurationService.PcReleaseLocation,
-                        Arguments = $"-AUTH_TYPE=refreshtoken -epiclocale=en -epicuserid={ConfigurationService.EpicGamesUserID}",
+                        Arguments = $"-AUTH_TYPE=refreshtoken -epiclocale=en -epicuserid={ConfigurationService.EpicGamesUserID} -eosoverride",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
