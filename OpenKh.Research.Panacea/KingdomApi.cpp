@@ -14,7 +14,7 @@ PFN_DEFINE(Axa_FreeAllPackages);
 PFN_DEFINE(Axa_CFileMan_GetRemasteredCount);
 PFN_DEFINE(Axa_CFileMan_GetRemasteredEntry);
 PFN_DEFINE(Axa_PackageFile_GetRemasteredAsset);
-PFN_DEFINE(Axa_CFileMan_GetAudioStream);
+PFN_DEFINE(Axa_AxaSoundStream__threadProc);
 PFN_DEFINE(Axa_OpenFile);
 PFN_DEFINE(Axa_DebugPrint);
 PFN_DEFINE(Bbs_File_load);
@@ -70,9 +70,9 @@ void* Axa::PackageFile::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* a
     return pfn_Axa_PackageFile_GetRemasteredAsset(a1, assetSizePtr, assetNum);
 }
 
-int Axa::CFileMan::GetAudioStream(CFileMan* a1, const char* a2)
+__int64 Axa::AxaSoundStream::_threadProc(unsigned int* instance)
 {
-    return pfn_Axa_CFileMan_GetAudioStream(a1, a2);
+    return pfn_Axa_AxaSoundStream__threadProc(instance);
 }
 
 int Axa::OpenFile(const char* Format, int OFlag)
@@ -93,6 +93,5 @@ void Bbs::CRsrcData::loadCallback(unsigned int* pMem, size_t size, unsigned int*
 
 PVAR_DEFINE(int, PackageFileCount);
 PVAR_DEFINE(int, LastOpenedPackage);
-PVAR_DEFINE(__int64(__cdecl*)(int FileHandle, __int64 Offset, int Origin), lseeki64);
 PARR_DEFINE(Axa::PackageFile*, PackageFiles, 16);
 PARR_DEFINE(char, BasePath, 128);
