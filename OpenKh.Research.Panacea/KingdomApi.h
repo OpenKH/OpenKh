@@ -64,7 +64,6 @@ namespace Axa
         static void *LoadFileWithMalloc(CFileMan* _this, const char* filename, int* sizePtr, bool useHdAsset, const char* filename2);
         __int64 GetRemasteredCount();
         Axa::RemasteredEntry* GetRemasteredEntry(CFileMan* a1, int* origOffsetPtr, int assetNum);
-        int GetAudioStream(CFileMan* a1, const char* a2);
     };
 
     namespace AxaResourceMan
@@ -76,6 +75,11 @@ namespace Axa
     {
         Axa::PackageFile* GetFileInfo(const char* filename, const char* filename2);
     };
+
+    namespace AxaSoundStream
+    {
+        __int64 _threadProc(unsigned int* instance);
+    }
 
     __int64 CalcHash(const void* data, int size, void* dst);
     int SetReplacePath(__int64 a1, const char* a2);
@@ -108,7 +112,7 @@ PFN_DECLARE(void, Axa_FreeAllPackages, ());
 PFN_DECLARE(__int64, Axa_CFileMan_GetRemasteredCount, ());
 PFN_DECLARE(Axa::RemasteredEntry*, Axa_CFileMan_GetRemasteredEntry, (Axa::CFileMan* a1, int* origOffsetPtr, int assetNum));
 PFN_DECLARE(void*, Axa_PackageFile_GetRemasteredAsset, (Axa::PackageFile* a1, unsigned int* assetSizePtr, int assetNum));
-PFN_DECLARE(int, Axa_CFileMan_GetAudioStream, (Axa::CFileMan* a1, const char* a2));
+PFN_DECLARE(__int64, Axa_AxaSoundStream__threadProc, (unsigned int* instance));
 PFN_DECLARE(int, Axa_OpenFile, (const char* Format, int OFlag));
 PFN_DECLARE(void, Axa_DebugPrint, (const char* Format, ...));
 PFN_DECLARE(size_t, Bbs_File_load, (const char* pszPath, long long a2));
@@ -170,6 +174,5 @@ private:
 
 PVAR_DECLARE(int, PackageFileCount);
 PVAR_DECLARE(int, LastOpenedPackage);
-PVAR_DECLARE(__int64 (__cdecl*)(int FileHandle, __int64 Offset, int Origin), lseeki64);
 PARR_DECLARE(Axa::PackageFile*, PackageFiles, 16);
 PARR_DECLARE(char, BasePath, 128);

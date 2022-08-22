@@ -262,7 +262,7 @@ Hook<PFN_Axa_CFileMan_GetFileSize>* Hook_Axa_CFileMan_GetFileSize;
 Hook<PFN_Axa_CFileMan_GetRemasteredCount>* Hook_Axa_CFileMan_GetRemasteredCount;
 Hook<PFN_Axa_CFileMan_GetRemasteredEntry>* Hook_Axa_CFileMan_GetRemasteredEntry;
 Hook<PFN_Axa_PackageFile_GetRemasteredAsset>* Hook_Axa_PackageFile_GetRemasteredAsset;
-Hook<PFN_Axa_CFileMan_GetAudioStream>* Hook_Axa_CFileMan_GetAudioStream;
+Hook<PFN_Axa_AxaSoundStream__threadProc>* Hook_Axa_AxaSoundStream__threadProc;
 Hook<PFN_Axa_DebugPrint>* Hook_Axa_DebugPrint;
 Hook<PFN_Bbs_File_load>* Hook_Bbs_File_load;
 Hook<PFN_Bbs_CRsrcData_loadCallback>* Hook_CRsrcData_loadCallback;
@@ -279,7 +279,7 @@ void Panacea::Initialize()
     Hook_Axa_CFileMan_GetRemasteredCount = NewHook(pfn_Axa_CFileMan_GetRemasteredCount, Panacea::GetRemasteredCount, "Axa::CFileMan::GetRemasteredCount");
     Hook_Axa_CFileMan_GetRemasteredEntry = NewHook(pfn_Axa_CFileMan_GetRemasteredEntry, Panacea::GetRemasteredEntry, "Axa::CFileMan::GetRemasteredEntry");
     Hook_Axa_PackageFile_GetRemasteredAsset = NewHook(pfn_Axa_PackageFile_GetRemasteredAsset, Panacea::GetRemasteredAsset, "Axa::PackageFile::GetRemasteredAsset");
-    //Hook_Axa_CFileMan_GetAudioStream = NewHook(pfn_Axa_CFileMan_GetAudioStream, Panacea::GetAudioStream, "Axa::CFileMan::GetAudioStream");
+    Hook_Axa_AxaSoundStream__threadProc = NewHook(pfn_Axa_AxaSoundStream__threadProc, Panacea::_threadProc, "Axa::AxaSoundStream::_threadProc");
     Hook_Axa_DebugPrint = NewHook(pfn_Axa_DebugPrint, Panacea::DebugPrint, "Axa::DebugPrint");
     //Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
     //Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
@@ -944,31 +944,11 @@ void* Panacea::GetRemasteredAsset(Axa::PackageFile* a1, unsigned int* assetSizeP
     return ret;
 }
 
-int Panacea::GetAudioStream(Axa::CFileMan* a1, const char* a2)
+__int64 Panacea::_threadProc(unsigned int* instance)
 {
-    char path[MAX_PATH];
-    bool isMod = false;
-    if (TransformFilePath(path, sizeof(path), a2))
-    {
-        if (OpenKH::m_DebugLog)
-            fprintf(stdout, "GetAudioStream(\"%s\")\n", path);
-        isMod = true;
-        memcpy(StreamDummy.PkgFileName, path, MAX_PATH);
-        std::string basefn = a2 + strlen(BasePath) + 1;
-        std::transform(basefn.begin(), basefn.end(), basefn.begin(), [](char c)
-            {
-                if (c == '\\')
-                    return '/';
-                return c;
-            });
-        Axa::CalcHash(basefn.c_str(), basefn.size(), StreamDummy.HeaderData->hash);
-    }
-    else if (OpenKH::m_DebugLog)
-        fprintf(stdout, "GetAudioStream(\"%s\")\n", a2);
-    auto ret = Hook_Axa_CFileMan_GetAudioStream->Unpatch()(a1, a2);
-    Hook_Axa_CFileMan_GetAudioStream->Patch();
-    if (isMod)
-        lseeki64(ret, 0, SEEK_SET);
+    instance[61] = 1;
+    auto ret = Hook_Axa_AxaSoundStream__threadProc->Unpatch()(instance);
+    Hook_Axa_AxaSoundStream__threadProc->Patch();
     return ret;
 }
 
