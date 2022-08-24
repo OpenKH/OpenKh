@@ -21,6 +21,7 @@ namespace OpenKh.Command.MapGen.Utils
         private List<BigMesh> smallMeshList = new List<BigMesh>();
         private ModelTexture modelTex;
         private CollisionBuilder collisionBuilder;
+        private DoctBuilder doctBuilder;
         private Logger logger = LogManager.GetCurrentClassLogger();
         private readonly MapGenConfig config;
 
@@ -30,17 +31,31 @@ namespace OpenKh.Command.MapGen.Utils
 
             ConvertModelIntoMapModel(modelFile, config);
 
-            logger.Debug($"Starting collision plane builder.");
+            logger.Debug($"Running collision plane builder.");
 
-            collisionBuilder = new CollisionBuilder(smallMeshList, config.disableBSPCollisionBuilder);
+            collisionBuilder = new CollisionBuilder(
+                smallMeshList,
+                config.disableBSPCollisionBuilder
+            );
 
-            if (collisionBuilder.vifPacketRenderingGroup != null)
+            logger.Debug($"Finished.");
+
+            logger.Debug($"Running doct builder.");
+
+            doctBuilder = new DoctBuilder(
+                smallMeshList
+                    .Where(it => !it.matDef.nodraw)
+            );
+
+            logger.Debug($"Finished.");
+
+            if (doctBuilder.vifPacketRenderingGroup != null)
             {
-                logger.Debug($"Updating vifPacketRenderingGroup builder.");
+                logger.Debug($"Using vifPacketRenderingGroup built by doct.");
 
-                mapModel.vifPacketRenderingGroup = collisionBuilder.vifPacketRenderingGroup;
+                mapModel.vifPacketRenderingGroup = doctBuilder.vifPacketRenderingGroup;
 
-                logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups.");
+                logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
             }
 
             logger.Debug($"Output: {collisionBuilder.coct.Nodes.Count:#,##0} collision mesh groups");
@@ -297,19 +312,19 @@ namespace OpenKh.Command.MapGen.Utils
 
             logger.Debug($"The builder has done.");
 
-            logger.Debug($"Starting vifPacketRenderingGroup builder.");
+            logger.Debug($"Emitting initial inefficient vifPacketRenderingGroup for fallback purpose.");
 
             // first group: render all
 
             mapModel.vifPacketRenderingGroup = new List<ushort[]>(
                 new ushort[][] {
-                        Enumerable.Range(0, mapModel.Chunks.Count)
-                            .Select(it => Convert.ToUInt16(it))
-                            .ToArray()
+                    Enumerable.Range(0, mapModel.Chunks.Count)
+                        .Select(it => Convert.ToUInt16(it))
+                        .ToArray()
                 }
             );
 
-            logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups.");
+            logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
 
             mapModel.DmaChainIndexRemapTable = new List<ushort>(
                 Enumerable.Range(0, mapModel.Chunks.Count)
@@ -461,7 +476,7 @@ namespace OpenKh.Command.MapGen.Utils
 
             {
                 var doctBin = new MemoryStream();
-                collisionBuilder.doct.Write(doctBin);
+                doctBuilder.doct.Write(doctBin);
                 doctBin.Position = 0;
 
                 entries.Add(
