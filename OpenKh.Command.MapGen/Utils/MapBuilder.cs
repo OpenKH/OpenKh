@@ -263,9 +263,7 @@ namespace OpenKh.Command.MapGen.Utils
                 Chunks = new List<ModelBackground.ModelChunk>(),
             };
 
-            foreach (var bigMesh in bigMeshContainer.MeshList
-                .Where(it => it.textureIndex != -1)
-            )
+            foreach (var bigMesh in bigMeshContainer.MeshList)
             {
                 foreach (var smallMesh in BigMeshSplitter.Split(bigMesh))
                 {
@@ -273,22 +271,25 @@ namespace OpenKh.Command.MapGen.Utils
 
                     smallMeshList.Add(smallMesh);
 
-                    bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
-                    smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
+                    if (smallMesh.textureIndex != -1)
+                    {
+                        bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
+                        smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
 
-                    mapModel.Chunks.Add(
-                        new ModelBackground.ModelChunk
-                        {
-                            VifPacket = dmaPack.vifPacket.ToArray(),
-                            TextureId = smallMesh.textureIndex,
-                            DmaPerVif = new ushort[] {
-                                dmaPack.firstVifPacketQwc,
-                                0,
-                            },
-                            TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
-                            UVScrollIndex = smallMesh.matDef.uvscIndex ?? 0,
-                        }
-                    );
+                        mapModel.Chunks.Add(
+                            new ModelBackground.ModelChunk
+                            {
+                                VifPacket = dmaPack.vifPacket.ToArray(),
+                                TextureId = smallMesh.textureIndex,
+                                DmaPerVif = new ushort[] {
+                                    dmaPack.firstVifPacketQwc,
+                                    0,
+                                },
+                                TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
+                                UVScrollIndex = smallMesh.matDef.uvscIndex ?? 0,
+                            }
+                        );
+                    }
                 }
             }
 
