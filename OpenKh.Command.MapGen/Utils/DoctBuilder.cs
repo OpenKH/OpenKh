@@ -1,6 +1,7 @@
 using OpenKh.Command.MapGen.Interfaces;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +32,11 @@ namespace OpenKh.Command.MapGen.Utils
 
         private WalkResult WalkTree(Node node)
         {
-            if (node.points != null)
+            int entry2Idx = -1;
+
+            if (node.meshes != null)
             {
-                var entry2Idx = doct.Entry2List.Count;
+                entry2Idx = doct.Entry2List.Count;
                 var entry2 = new Doct.Entry2
                 {
                     BoundingBox = node.bbox,
@@ -41,53 +44,47 @@ namespace OpenKh.Command.MapGen.Utils
                 doct.Entry2List.Add(entry2);
 
                 vifPacketRenderingGroup.Add(
-                    node.points
+                    node.meshes
                         .SelectMany(it => it.bigMesh.vifPacketIndices)
                         .ToArray()
                 );
-
-                var entry1Idx = doct.Entry1List.Count;
-                var entry1 = new Doct.Entry1
-                {
-                    Entry2Index = Convert.ToUInt16(entry2Idx),
-                    Entry2LastIndex = Convert.ToUInt16(entry2Idx + 1),
-                };
-                doct.Entry1List.Add(entry1);
-
-                return new WalkResult
-                {
-                    entry1Idx = Convert.ToUInt16(entry1Idx),
-                };
             }
 
-            if (node.a != null)
+            var entry1Idx = doct.Entry1List.Count;
+            var entry1 = new Doct.Entry1();
+            doct.Entry1List.Add(entry1);
+
+            var childNodes = (node.children ?? new Node[0])
+                .Select(it => WalkTree(it))
+                .ToArray();
+
+            entry1.Child1 = (short)(1 <= childNodes.Length ? childNodes[0].entry1Idx : -1);
+            entry1.Child2 = (short)(2 <= childNodes.Length ? childNodes[1].entry1Idx : -1);
+            entry1.Child3 = (short)(3 <= childNodes.Length ? childNodes[2].entry1Idx : -1);
+            entry1.Child4 = (short)(4 <= childNodes.Length ? childNodes[3].entry1Idx : -1);
+            entry1.Child5 = (short)(5 <= childNodes.Length ? childNodes[4].entry1Idx : -1);
+            entry1.Child6 = (short)(6 <= childNodes.Length ? childNodes[5].entry1Idx : -1);
+            entry1.Child7 = (short)(7 <= childNodes.Length ? childNodes[6].entry1Idx : -1);
+            entry1.Child8 = (short)(8 <= childNodes.Length ? childNodes[7].entry1Idx : -1);
+            entry1.BoundingBox = node.bbox;
+
+            if (entry2Idx != -1)
             {
-                var entry1Idx = doct.Entry1List.Count;
-                var entry1 = new Doct.Entry1();
-                doct.Entry1List.Add(entry1);
+                entry1.Entry2Index = Convert.ToUInt16(entry2Idx);
+                entry1.Entry2LastIndex = Convert.ToUInt16(entry2Idx + 1);
+            };
 
-                var a = WalkTree(node.a);
-                var b = WalkTree(node.b);
-
-                entry1.Child1 = (short)a.entry1Idx;
-                entry1.Child2 = (short)b.entry1Idx;
-                entry1.BoundingBox = node.bbox;
-
-                return new WalkResult
-                {
-                    entry1Idx = Convert.ToUInt16(entry1Idx),
-                };
-            }
-
-            throw new Exception("Unexpected");
+            return new WalkResult
+            {
+                entry1Idx = Convert.ToUInt16(entry1Idx),
+            };
         }
 
         private class Node
         {
-            internal Node a;
-            internal Node b;
+            internal Node[] children;
 
-            internal CenterPointedMesh[] points;
+            internal CenterPointedMesh[] meshes;
             internal BoundingBox bbox;
         }
 
@@ -103,26 +100,33 @@ namespace OpenKh.Command.MapGen.Utils
             private Node Walk(ISpatialMeshCutter cutter)
             {
                 var pair = cutter.Cut().ToArray();
-                if (pair.Length == 2)
+
+                if (8 < pair.Length)
                 {
-                    var a = Walk(pair[0]);
-                    var b = Walk(pair[1]);
+                    throw new Exception("Unexpected");
+                }
+
+                if (2 <= pair.Length)
+                {
+                    var children = pair
+                        .Select(it => Walk(it))
+                        .ToArray();
 
                     return new Node
                     {
-                        a = a,
-                        b = b,
-
-                        bbox = BoundingBox.Merge(a.bbox, a.bbox),
+                        children = children,
+                        bbox = children
+                            .Select(it => it.bbox)
+                            .MergeAll(),
                     };
                 }
                 else
                 {
-                    var meshes = pair[0].Meshes.ToArray();
+                    var meshes = pair.Single().Meshes.ToArray();
 
                     return new Node
                     {
-                        points = meshes,
+                        meshes = meshes,
 
                         bbox = BoundingBox.FromManyPoints(
                             meshes
