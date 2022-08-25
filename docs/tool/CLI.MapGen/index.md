@@ -303,6 +303,26 @@ bar:
     toFile: 'eh_1_0.doct'
 ```
 
+### nococt
+
+Applying `nococt: true` will skip COCT generation. default is `nococt: false`.
+
+```yml
+nococt: true
+```
+
+This is a mandatory option if we build SK0 model, because the bounding box of COCT has limitation of INT16 range (-32768 ~ 32767).
+
+### nodoct
+
+Applying `nodoct: true` will skip DOCT generation. default is `nodoct: false`.
+
+```yml
+nodoct: true
+```
+
+This is a mandatory option if we build SK0 model, because the bounding box of DOCT has limitation of INT16 range (-32768 ~ 32767).
+
 ### default
 
 ```yml

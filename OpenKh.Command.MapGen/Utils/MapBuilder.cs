@@ -31,50 +31,56 @@ namespace OpenKh.Command.MapGen.Utils
 
             ConvertModelIntoMapModel(modelFile, config);
 
-            logger.Debug($"Running collision plane builder.");
-
-            collisionBuilder = new CollisionBuilder(
-                new BSPMeshSplitter(
-                    smallMeshList
-                        .Where(it => !it.matDef.noclip)
-                        .Select(mesh => new CenterPointedMesh(mesh))
-                )
-            );
-
+            if (!config.nococt)
             {
-                var coct = collisionBuilder.coct;
-                var numNodes = coct.Nodes.Count;
-                var numTotalMeshes = coct.Nodes.Select(node => node.Meshes.Count).Sum();
-                var numTotalCollisions = coct.Nodes.Select(node => node.Meshes.Select(it => it.Collisions.Count).Sum()).Sum();
-                var numVerts = coct.VertexList.Count;
+                logger.Debug($"Running collision plane builder.");
 
-                logger.Debug($"{numNodes:#,##0} nodes, {numTotalMeshes:#,##0} total meshes, {numTotalCollisions:#,##0} total collisions, {numVerts:#,##0} vertices.");
+                collisionBuilder = new CollisionBuilder(
+                    new BSPMeshSplitter(
+                        smallMeshList
+                            .Where(it => !it.matDef.noclip)
+                            .Select(mesh => new CenterPointedMesh(mesh))
+                    )
+                );
+
+                {
+                    var coct = collisionBuilder.coct;
+                    var numNodes = coct.Nodes.Count;
+                    var numTotalMeshes = coct.Nodes.Select(node => node.Meshes.Count).Sum();
+                    var numTotalCollisions = coct.Nodes.Select(node => node.Meshes.Select(it => it.Collisions.Count).Sum()).Sum();
+                    var numVerts = coct.VertexList.Count;
+
+                    logger.Debug($"{numNodes:#,##0} nodes, {numTotalMeshes:#,##0} total meshes, {numTotalCollisions:#,##0} total collisions, {numVerts:#,##0} vertices.");
+                }
+
+                logger.Debug($"Finished.");
             }
 
-            logger.Debug($"Finished.");
-
-            logger.Debug($"Running doct builder.");
-
-            doctBuilder = new DoctBuilder(
-                new BSPMeshSplitter(
-                    smallMeshList
-                        .Where(it => !it.matDef.nodraw)
-                        .Select(mesh => new CenterPointedMesh(mesh))
-                )
-            );
-
-            logger.Debug($"Finished.");
-
-            if (doctBuilder.vifPacketRenderingGroup != null)
+            if (!config.nodoct)
             {
-                logger.Debug($"Using vifPacketRenderingGroup built by doct.");
+                logger.Debug($"Running doct builder.");
 
-                mapModel.vifPacketRenderingGroup = doctBuilder.vifPacketRenderingGroup;
+                doctBuilder = new DoctBuilder(
+                    new BSPMeshSplitter(
+                        smallMeshList
+                            .Where(it => !it.matDef.nodraw)
+                            .Select(mesh => new CenterPointedMesh(mesh))
+                    )
+                );
 
-                logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
+                logger.Debug($"Finished.");
+
+                if (doctBuilder.vifPacketRenderingGroup != null)
+                {
+                    logger.Debug($"Using vifPacketRenderingGroup built by doct.");
+
+                    mapModel.vifPacketRenderingGroup = doctBuilder.vifPacketRenderingGroup;
+
+                    logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
+                }
+
+                logger.Debug($"Output: {collisionBuilder.coct.Nodes.Count:#,##0} collision mesh groups");
             }
-
-            logger.Debug($"Output: {collisionBuilder.coct.Nodes.Count:#,##0} collision mesh groups");
 
             {
                 var matDefList = bigMeshContainer.AllocatedMaterialDefs;
@@ -490,6 +496,7 @@ namespace OpenKh.Command.MapGen.Utils
                 trySaveTo?.Invoke(config.bar?.texture?.toFile, texBin);
             }
 
+            if (!config.nodoct)
             {
                 var doctBin = new MemoryStream();
                 doctBuilder.doct.Write(doctBin);
@@ -507,6 +514,7 @@ namespace OpenKh.Command.MapGen.Utils
                 trySaveTo?.Invoke(config.bar?.doct?.toFile, doctBin);
             }
 
+            if (!config.nococt)
             {
                 var coctBin = new MemoryStream();
                 collisionBuilder.coct.Write(coctBin);

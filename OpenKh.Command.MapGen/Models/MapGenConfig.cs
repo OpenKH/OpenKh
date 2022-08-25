@@ -92,5 +92,9 @@ namespace OpenKh.Command.MapGen.Models
             return materials
                 .FirstOrDefault(one => SimplePatternUtil.CreateFrom(one.name).IsMatch(name));
         }
+
+        public bool nococt { get; set; }
+
+        public bool nodoct { get; set; }
     }
 }
