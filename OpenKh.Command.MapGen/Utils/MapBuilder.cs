@@ -34,8 +34,11 @@ namespace OpenKh.Command.MapGen.Utils
             logger.Debug($"Running collision plane builder.");
 
             collisionBuilder = new CollisionBuilder(
-                smallMeshList,
-                config.disableBSPCollisionBuilder
+                new BSPMeshSplitter(
+                    smallMeshList
+                        .Where(it => !it.matDef.noclip)
+                        .Select(mesh => new CenterPointedMesh(mesh))
+                )
             );
 
             logger.Debug($"Finished.");
