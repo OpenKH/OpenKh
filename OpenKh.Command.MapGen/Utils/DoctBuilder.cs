@@ -1,3 +1,4 @@
+using OpenKh.Command.MapGen.Interfaces;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Kh2;
 using System;
@@ -17,16 +18,9 @@ namespace OpenKh.Command.MapGen.Utils
 
         public List<ushort[]> vifPacketRenderingGroup { get; } = new List<ushort[]>();
 
-        public DoctBuilder(IEnumerable<BigMesh> bigMeshes)
+        public DoctBuilder(ISpatialMeshCutter cutter)
         {
-            var bsp = new BSP(
-                bigMeshes
-                    .Where(mesh => !mesh.matDef.noclip)
-                    .Select(mesh => new CenterPointedMesh(mesh))
-                    .ToArray()
-            );
-
-            var root = new BSPToTree(bsp).Root;
+            var root = new ToTree(cutter).Root;
             WalkTree(root);
         }
 
@@ -88,137 +82,6 @@ namespace OpenKh.Command.MapGen.Utils
             throw new Exception("Unexpected");
         }
 
-        private class CenterPointedMesh
-        {
-            public BigMesh bigMesh;
-
-            public Vector3 centerPoint;
-
-            public CenterPointedMesh(BigMesh bigMesh)
-            {
-                this.bigMesh = bigMesh;
-
-                centerPoint = GetCenter(
-                    bigMesh.triangleStripList
-                        .SelectMany(triangleStrip => triangleStrip.vertexIndices)
-                        .Select(index => bigMesh.vertexList[index])
-                );
-            }
-
-            public override string ToString() => centerPoint.ToString();
-
-            private static Vector3 GetCenter(IEnumerable<Vector3> positions)
-            {
-                double x = 0, y = 0, z = 0;
-                int n = 0;
-                foreach (var one in positions)
-                {
-                    ++n;
-                    x += one.X;
-                    y += one.Y;
-                    z += one.Z;
-                }
-                return new Vector3(
-                    (float)(x / n),
-                    (float)(y / n),
-                    (float)(z / n)
-                );
-            }
-        }
-
-
-        /// <summary>
-        /// Binary separated partitions
-        /// </summary>
-        class BSP
-        {
-            public CenterPointedMesh[] Points { get; }
-
-            public BSP(CenterPointedMesh[] points)
-            {
-                Points = points;
-            }
-
-            public override string ToString() => $"{Points.Length:#,##0} points";
-
-            public BSP[] Split()
-            {
-                if (Points.Length >= 20)
-                {
-                    var range = new Range(Points);
-                    if (range.yLen >= range.xLen)
-                    {
-                        if (range.zLen >= range.yLen)
-                        {
-                            // z-cut
-                            return new BSP[]
-                            {
-                                new BSP(Points.Where(it => it.centerPoint.Z >= range.zCenter).ToArray()),
-                                new BSP(Points.Where(it => it.centerPoint.Z < range.zCenter).ToArray()),
-                            };
-                        }
-                        else
-                        {
-                            // y-cut
-                            return new BSP[]
-                            {
-                                new BSP(Points.Where(it => it.centerPoint.Y >= range.yCenter).ToArray()),
-                                new BSP(Points.Where(it => it.centerPoint.Y < range.yCenter).ToArray()),
-                            };
-                        }
-                    }
-                    else
-                    {
-                        // x-cut
-                        return new BSP[]
-                        {
-                            new BSP(Points.Where(it => it.centerPoint.X >= range.xCenter).ToArray()),
-                            new BSP(Points.Where(it => it.centerPoint.X < range.xCenter).ToArray()),
-                        };
-                    }
-                }
-                return new BSP[] { this };
-            }
-
-            class Range
-            {
-                public float xMin = float.MaxValue;
-                public float xMax = float.MinValue;
-                public float yMin = float.MaxValue;
-                public float yMax = float.MinValue;
-                public float zMin = float.MaxValue;
-                public float zMax = float.MinValue;
-
-                public float xLen;
-                public float yLen;
-                public float zLen;
-
-                public float xCenter;
-                public float yCenter;
-                public float zCenter;
-
-                public Range(CenterPointedMesh[] points)
-                {
-                    foreach (var point in points)
-                    {
-                        var position = point.centerPoint;
-                        xMin = Math.Min(xMin, position.X);
-                        xMax = Math.Max(xMax, position.X);
-                        yMin = Math.Min(yMin, position.Y);
-                        yMax = Math.Max(yMax, position.Y);
-                        zMin = Math.Min(zMin, position.Z);
-                        zMax = Math.Max(zMax, position.Z);
-                    }
-                    xLen = (xMax - xMin);
-                    yLen = (yMax - yMin);
-                    zLen = (zMax - zMin);
-                    xCenter = (xMax + xMin) / 2;
-                    yCenter = (yMax + yMin) / 2;
-                    zCenter = (zMax + zMin) / 2;
-                }
-            }
-        }
-
         private class Node
         {
             internal Node a;
@@ -228,18 +91,18 @@ namespace OpenKh.Command.MapGen.Utils
             internal BoundingBox bbox;
         }
 
-        private class BSPToTree
+        private class ToTree
         {
             internal Node Root { get; }
 
-            public BSPToTree(BSP bsp)
+            public ToTree(ISpatialMeshCutter cutter)
             {
-                Root = Walk(bsp);
+                Root = Walk(cutter);
             }
 
-            private Node Walk(BSP bsp)
+            private Node Walk(ISpatialMeshCutter cutter)
             {
-                var pair = bsp.Split();
+                var pair = cutter.Cut().ToArray();
                 if (pair.Length == 2)
                 {
                     var a = Walk(pair[0]);
@@ -255,12 +118,14 @@ namespace OpenKh.Command.MapGen.Utils
                 }
                 else
                 {
+                    var meshes = pair[0].Meshes.ToArray();
+
                     return new Node
                     {
-                        points = pair[0].Points,
+                        points = meshes,
 
                         bbox = BoundingBox.FromManyPoints(
-                            pair[0].Points
+                            meshes
                                 .Select(point => point.bigMesh)
                                 .SelectMany(bigMesh => bigMesh.vertexList)
                         ),

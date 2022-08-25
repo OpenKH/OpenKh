@@ -43,8 +43,11 @@ namespace OpenKh.Command.MapGen.Utils
             logger.Debug($"Running doct builder.");
 
             doctBuilder = new DoctBuilder(
-                smallMeshList
-                    .Where(it => !it.matDef.nodraw)
+                new BSPMeshSplitter(
+                    smallMeshList
+                        .Where(it => !it.matDef.nodraw)
+                        .Select(mesh => new CenterPointedMesh(mesh))
+                )
             );
 
             logger.Debug($"Finished.");
