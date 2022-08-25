@@ -41,6 +41,16 @@ namespace OpenKh.Command.MapGen.Utils
                 )
             );
 
+            {
+                var coct = collisionBuilder.coct;
+                var numNodes = coct.Nodes.Count;
+                var numTotalMeshes = coct.Nodes.Select(node => node.Meshes.Count).Sum();
+                var numTotalCollisions = coct.Nodes.Select(node => node.Meshes.Select(it => it.Collisions.Count).Sum()).Sum();
+                var numVerts = coct.VertexList.Count;
+
+                logger.Debug($"{numNodes:#,##0} nodes, {numTotalMeshes:#,##0} total meshes, {numTotalCollisions:#,##0} total collisions, {numVerts:#,##0} vertices.");
+            }
+
             logger.Debug($"Finished.");
 
             logger.Debug($"Running doct builder.");
@@ -275,7 +285,7 @@ namespace OpenKh.Command.MapGen.Utils
                 logger.Debug($"Output: {kh2Mesh.vertexList.Count:#,##0} vertices, {kh2Mesh.triangleStripList.Count:#,##0} triangle strips.");
             }
 
-            logger.Debug($"The conversion has done.");
+            logger.Debug($"Loading process has done.");
 
             logger.Debug($"Starting mesh splitter and vif packets builder.");
 

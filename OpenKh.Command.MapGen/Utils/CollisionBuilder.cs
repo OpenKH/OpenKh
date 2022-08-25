@@ -40,7 +40,7 @@ namespace OpenKh.Command.MapGen.Utils
             };
             coct.Nodes.Add(collisionNode);
 
-            if (walkNode.meshes.Any())
+            if (walkNode.meshes?.Any() ?? false)
             {
                 var collisionMesh = new CollisionMesh
                 {
@@ -100,7 +100,7 @@ namespace OpenKh.Command.MapGen.Utils
             collisionNode.Child6 = (short)(6 <= childNodes.Length ? childNodes[5].collisionNodeIdx : -1);
             collisionNode.Child7 = (short)(7 <= childNodes.Length ? childNodes[6].collisionNodeIdx : -1);
             collisionNode.Child8 = (short)(8 <= childNodes.Length ? childNodes[7].collisionNodeIdx : -1);
-            collisionNode.BoundingBox = walkNode.bbox.ToBoundingBoxInt16();
+            helper.CompleteBBox(collisionNode);
 
             return new WalkResult
             {
