@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
-        <PackageReference Include="System.Interactive" Version="5.1.0" />
+        <PackageReference Include="System.Interactive" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
