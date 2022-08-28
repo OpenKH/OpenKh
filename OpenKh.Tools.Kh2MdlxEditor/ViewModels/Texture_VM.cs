@@ -15,5 +15,18 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
             this.texture = texture;
             bitmapImage = texture.GetBimapSource();
         }
+
+        public void ExportImage()
+        {
+            System.Windows.Forms.SaveFileDialog sfd;
+            sfd = new System.Windows.Forms.SaveFileDialog();
+            sfd.Title = "Export Image as PNG";
+            sfd.FileName = "Texture";
+            sfd.ShowDialog();
+            if (sfd.FileName != "")
+            {
+                AssimpUtils.AssimpGeneric.ExportBitmapSourceAsPng(this.bitmapImage, sfd.FileName);
+            }
+        }
     }
 }

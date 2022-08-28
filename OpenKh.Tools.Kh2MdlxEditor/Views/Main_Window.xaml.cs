@@ -1,4 +1,7 @@
+using OpenKh.AssimpUtils;
+using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
+using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -6,9 +9,12 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+//using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Views
 {
@@ -53,6 +59,15 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         private void Menu_SaveFile(object sender, EventArgs e)
         {
             saveFile();
+        }
+
+        private void Menu_ExportAsFbx(object sender, EventArgs e)
+        {
+            exportModel(AssimpGeneric.FileFormat.fbx);
+        }
+        private void Menu_ExportAsDae(object sender, EventArgs e)
+        {
+            exportModel(AssimpGeneric.FileFormat.collada);
         }
 
         // Loads the required control in the frame on BAR item click
@@ -112,6 +127,53 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                     break;
                 default:
                     break;
+            }
+        }
+
+        // Exports the first submodel of the loaded MDLX
+        public void exportModel(AssimpGeneric.FileFormat fileFormat = AssimpGeneric.FileFormat.fbx)
+        {
+            if(mainWiewModel.ModelFile != null)
+            {
+                MdlxParser mParser = new MdlxParser(mainWiewModel.ModelFile);
+                Assimp.Scene scene = Kh2MdlxAssimp.getAssimpScene(mParser);
+
+                System.Windows.Forms.SaveFileDialog sfd;
+                sfd = new System.Windows.Forms.SaveFileDialog();
+                sfd.Title = "Export model";
+                sfd.FileName = mainWiewModel.FileName + "." + AssimpGeneric.GetFormatFileExtension(fileFormat);
+                sfd.ShowDialog();
+                if (sfd.FileName != "")
+                {
+                    string dirPath = Path.GetDirectoryName(sfd.FileName);
+
+                    if (!Directory.Exists(dirPath))
+                        return;
+
+                    dirPath += "\\";
+
+                    AssimpGeneric.ExportScene(scene, fileFormat, sfd.FileName);
+                    exportTextures(dirPath);
+                }
+            }
+        }
+        public void exportTextures(string filePath)
+        {
+            for(int i = 0; i < mainWiewModel.TextureFile.Images.Count; i++)
+            {
+                ModelTexture.Texture texture = mainWiewModel.TextureFile.Images[i];
+                BitmapSource bitmapImage = texture.GetBimapSource();
+
+                string fullPath = filePath + "Texture" + i;
+                string finalPath = fullPath;
+                int repeat = 0;
+                while (File.Exists(finalPath))
+                {
+                    repeat++;
+                    finalPath = fullPath + " (" + repeat + ")";
+                }
+
+                AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, fullPath);
             }
         }
 
