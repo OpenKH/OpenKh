@@ -99,7 +99,7 @@ namespace OpenKh.Patcher
                         var _pcFile = name.Contains("remastered") || name.Contains("raw");
 
                         // Special case for mods that want to bundle scripts or DLL files
-                        var nonGameFile = name.StartsWith("scripts/") || name.StartsWith("dlls/");
+                        var nonGameFile = name.StartsWith("scripts/") || name.StartsWith("scripts\\") || name.StartsWith("dlls/") || name.StartsWith("dlls\\");
 
                         var _extraPath = _pcFile ? "" : "original/";
 
@@ -138,7 +138,8 @@ namespace OpenKh.Patcher
 
                         if (packageMap != null && packageMapLocation.Length > 0)
                         {
-                            packageMap[name] = packageMapLocation;
+                            // Protect against multiple mods having the same file where one uses forward slash and one uses backslash
+                            packageMap[name.Replace("\\", "/")] = packageMapLocation;
                         }
 
                         context.EnsureDirectoryExists(dstFile);
