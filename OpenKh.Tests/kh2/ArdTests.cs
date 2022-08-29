@@ -51,13 +51,13 @@ namespace OpenKh.Tests.kh2
             private const string SampleScriptDecompiled =
                 "Program 0x00\n" +
                 "AreaSettings 0 -1\n" +
-                "\tSetProgressFlag 0x380A\n" +
-                "\tSetEvent \"110\" Type 2\n" +
-                "\tSetJump Type 1 World NM Area 5 Entrance 0 LocalSet 0 FadeType 1\n" +
-                "\tSetPartyMenu 0\n" +
-                "\tSetProgressFlag 0x1234\n" +
-                "\tSetUnk05 0x1122\n" +
-                "\tSetInventory 666 777\n";
+                " SetProgressFlag 0x380A\n" +
+                " SetEvent \"110\" Type 2\n" +
+                " SetJump Type 1 World NM Area 5 Entrance 0 LocalSet 0 FadeType 1\n" +
+                " SetPartyMenu 0\n" +
+                " SetProgressFlag 0x1234\n" +
+                " SetUnk05 0x1122\n" +
+                " SetInventory 666 777\n";
 
             [Fact]
             public void ReadTest()
