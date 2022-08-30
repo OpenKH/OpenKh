@@ -96,5 +96,9 @@ namespace OpenKh.Command.MapGen.Models
         public bool nococt { get; set; }
 
         public bool nodoct { get; set; }
+
+        public int collisionPartitionSize { get; set; } = 10;
+
+        public int doctPartitionSize { get; set; } = 100;
     }
 }

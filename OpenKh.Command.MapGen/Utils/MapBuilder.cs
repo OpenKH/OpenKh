@@ -53,7 +53,10 @@ namespace OpenKh.Command.MapGen.Utils
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.nodraw),
-                        new BSPNodeSplitter.Option { PartitionSize = 30, }
+                        new BSPNodeSplitter.Option
+                        {
+                            PartitionSize = config.doctPartitionSize,
+                        }
                     )
                 )
                     .GetBuilt();
@@ -186,7 +189,10 @@ namespace OpenKh.Command.MapGen.Utils
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.noclip),
-                        new BSPNodeSplitter.Option { PartitionSize = 10, }
+                        new BSPNodeSplitter.Option
+                        {
+                            PartitionSize = config.collisionPartitionSize,
+                        }
                     )
                 )
                     .GetBuilt();

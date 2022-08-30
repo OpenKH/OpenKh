@@ -118,9 +118,10 @@ namespace OpenKh.Command.MapGen.Utils
                     return new Node
                     {
                         children = children,
-                        bbox = children
+                        bbox = ToIntBoundingBox(children
                             .Select(it => it.bbox)
-                            .MergeAll(),
+                            .MergeAll()
+                        ),
                     };
                 }
                 else
@@ -131,12 +132,31 @@ namespace OpenKh.Command.MapGen.Utils
                     {
                         faces = faces,
 
-                        bbox = BoundingBox.FromManyPoints(
-                            faces
-                                .SelectMany(point => point.positionList)
+                        bbox = ToIntBoundingBox(
+                            BoundingBox.FromManyPoints(
+                                faces
+                                    .SelectMany(face => face.positionList)
+                                    .Select(point => new Vector3(point.X, -point.Y, -point.Z)) // why -Y and -Z ?
+                            )
                         ),
                     };
                 }
+            }
+
+            private static BoundingBox ToIntBoundingBox(BoundingBox bbox)
+            {
+                return new BoundingBox(
+                    new Vector3(
+                        (float)Math.Floor(bbox.MinX),
+                        (float)Math.Floor(bbox.MinY),
+                        (float)Math.Floor(bbox.MinZ)
+                    ),
+                    new Vector3(
+                        (float)Math.Ceiling(bbox.MaxX),
+                        (float)Math.Ceiling(bbox.MaxY),
+                        (float)Math.Ceiling(bbox.MaxZ)
+                    )
+                );
             }
         }
     }

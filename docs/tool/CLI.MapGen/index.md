@@ -323,6 +323,22 @@ nodoct: true
 
 This is a mandatory option if we build SK0 model, because the bounding box of DOCT has limitation of INT16 range (-32768 ~ 32767).
 
+### collisionPartitionSize
+
+Split nodes until single node has up to specified mesh face count.
+
+```yml
+collisionPartitionSize: 10
+```
+
+### doctPartitionSize
+
+Split nodes until single node has up to specified mesh face count.
+
+```yml
+doctPartitionSize: 100
+```
+
 ### default
 
 ```yml
