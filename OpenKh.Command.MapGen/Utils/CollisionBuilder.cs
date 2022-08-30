@@ -17,9 +17,15 @@ namespace OpenKh.Command.MapGen.Utils
     public class CollisionBuilder
     {
         private readonly Coct coct = new Coct();
+        private bool isValid = false;
+        private readonly Func<MaterialDef, int> _getAttributeFrom;
 
-        public CollisionBuilder(ISpatialNodeCutter cutter)
+        public CollisionBuilder(
+            ISpatialNodeCutter cutter,
+            Func<MaterialDef, int> getAttributeFrom
+        )
         {
+            _getAttributeFrom = getAttributeFrom;
             var root = new ToTree(cutter).Root;
             var helper = new BuildHelper(coct);
             WalkTree(root, helper);
@@ -28,6 +34,7 @@ namespace OpenKh.Command.MapGen.Utils
         public CollisionBuilt GetBuilt() => new CollisionBuilt
         {
             Coct = coct,
+            IsValid = isValid,
         };
 
         private class WalkResult
@@ -47,6 +54,8 @@ namespace OpenKh.Command.MapGen.Utils
 
             if (walkNode.faces?.Any() ?? false)
             {
+                isValid = true;
+
                 var collisionMesh = new CollisionMesh
                 {
                     Collisions = new List<Collision>()
@@ -68,7 +77,9 @@ namespace OpenKh.Command.MapGen.Utils
                             Vertex2 = helper.AllocateVertex(v2.X, -v2.Y, -v2.Z),
                             Vertex3 = helper.AllocateVertex(v3.X, -v3.Y, -v3.Z),
                             Vertex4 = Convert.ToInt16(quad ? helper.AllocateVertex(v4.X, -v4.Y, -v4.Z) : -1),
-                            Attributes = new Attributes() { Flags = face.matDef.surfaceFlags }
+                            Attributes = new Attributes() { Flags = _getAttributeFrom(face.matDef) },
+                            Ground = face.matDef.ground,
+                            FloorLevel = face.matDef.floorLevel,
                         },
                         inflate: 1
                     ));

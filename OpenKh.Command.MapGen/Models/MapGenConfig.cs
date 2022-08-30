@@ -56,6 +56,8 @@ namespace OpenKh.Command.MapGen.Models
             public BarEntryConfig model { get; set; }
             public BarEntryConfig texture { get; set; }
             public BarEntryConfig coct { get; set; }
+            public BarEntryConfig camera { get; set; }
+            public BarEntryConfig light { get; set; }
             public BarEntryConfig doct { get; set; }
         }
 

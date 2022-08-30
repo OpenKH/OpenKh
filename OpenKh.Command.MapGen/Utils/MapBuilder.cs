@@ -22,6 +22,8 @@ namespace OpenKh.Command.MapGen.Utils
         private ModelBackground mapModel;
         private ModelTexture modelTex;
         private CollisionBuilt playerCollision;
+        private CollisionBuilt cameraCollision;
+        private CollisionBuilt lightCollision;
         private DoctBuilt doctBuilt;
         private Logger logger = LogManager.GetCurrentClassLogger();
         private readonly MapGenConfig config;
@@ -153,28 +155,71 @@ namespace OpenKh.Command.MapGen.Utils
 
             if (!config.nococt)
             {
-                logger.Debug($"Running collision plane builder.");
-
-                playerCollision = new CollisionBuilder(
-                    new BSPNodeSplitter(
-                        singleFaces
-                            .Where(it => !it.matDef.noclip),
-                        new BSPNodeSplitter.Option
-                        {
-                            PartitionSize = config.collisionPartitionSize,
-                        }
-                    )
-                )
-                    .GetBuilt();
-
+                void PrintFinished(Coct coct)
                 {
-                    var coct = playerCollision.Coct;
                     var numNodes = coct.Nodes.Count;
                     var numTotalMeshes = coct.Nodes.Select(node => node.Meshes.Count).Sum();
                     var numTotalCollisions = coct.Nodes.Select(node => node.Meshes.Select(it => it.Collisions.Count).Sum()).Sum();
                     var numVerts = coct.VertexList.Count;
 
                     logger.Debug($"Finished. {numNodes:#,##0} nodes, {numTotalMeshes:#,##0} total meshes, {numTotalCollisions:#,##0} total collisions, {numVerts:#,##0} vertices.");
+                }
+
+                {
+                    logger.Debug($"Running collision builder for player.");
+
+                    var it = playerCollision = new CollisionBuilder(
+                        new BSPNodeSplitter(
+                            singleFaces
+                                .Where(it => !it.matDef.noclip),
+                            new BSPNodeSplitter.Option
+                            {
+                                PartitionSize = config.collisionPartitionSize,
+                            }
+                        ),
+                        matDef => matDef.surfaceFlags
+                    )
+                        .GetBuilt();
+
+                    PrintFinished(it.Coct);
+                }
+
+                {
+                    logger.Debug($"Running collision builder for camera.");
+
+                    var it = cameraCollision = new CollisionBuilder(
+                        new BSPNodeSplitter(
+                            singleFaces
+                                .Where(it => it.matDef.cameraClip),
+                            new BSPNodeSplitter.Option
+                            {
+                                PartitionSize = config.collisionPartitionSize,
+                            }
+                        ),
+                        matDef => matDef.cameraFlags
+                    )
+                        .GetBuilt();
+
+                    PrintFinished(it.Coct);
+                }
+
+                {
+                    logger.Debug($"Running collision builder for light.");
+
+                    var it = lightCollision = new CollisionBuilder(
+                        new BSPNodeSplitter(
+                            singleFaces
+                                .Where(it => it.matDef.lightClip),
+                            new BSPNodeSplitter.Option
+                            {
+                                PartitionSize = config.collisionPartitionSize,
+                            }
+                        ),
+                        matDef => matDef.lightFlags
+                    )
+                        .GetBuilt();
+
+                    PrintFinished(it.Coct);
                 }
             }
 
@@ -675,20 +720,59 @@ namespace OpenKh.Command.MapGen.Utils
 
             if (!config.nococt)
             {
-                var coctBin = new MemoryStream();
-                playerCollision.Coct.Write(coctBin);
-                coctBin.Position = 0;
+                if (playerCollision.IsValid)
+                {
+                    var coctBin = new MemoryStream();
+                    playerCollision.Coct.Write(coctBin);
+                    coctBin.Position = 0;
 
-                entries.Add(
-                    new Bar.Entry
-                    {
-                        Name = config.bar?.coct?.name ?? "ID_e",
-                        Type = Bar.EntryType.CollisionOctalTree,
-                        Stream = coctBin,
-                    }
-                );
+                    entries.Add(
+                        new Bar.Entry
+                        {
+                            Name = config.bar?.coct?.name ?? "ID_e",
+                            Type = Bar.EntryType.CollisionOctalTree,
+                            Stream = coctBin,
+                        }
+                    );
 
-                trySaveTo?.Invoke(config.bar?.coct?.toFile, coctBin);
+                    trySaveTo?.Invoke(config.bar?.coct?.toFile, coctBin);
+                }
+
+                if (cameraCollision.IsValid)
+                {
+                    var coctBin = new MemoryStream();
+                    cameraCollision.Coct.Write(coctBin);
+                    coctBin.Position = 0;
+
+                    entries.Add(
+                        new Bar.Entry
+                        {
+                            Name = config.bar?.camera?.name ?? "CH_e",
+                            Type = Bar.EntryType.CameraOctalTree,
+                            Stream = coctBin,
+                        }
+                    );
+
+                    trySaveTo?.Invoke(config.bar?.camera?.toFile, coctBin);
+                }
+
+                if (lightCollision.IsValid)
+                {
+                    var coctBin = new MemoryStream();
+                    lightCollision.Coct.Write(coctBin);
+                    coctBin.Position = 0;
+
+                    entries.Add(
+                        new Bar.Entry
+                        {
+                            Name = config.bar?.light?.name ?? "COL_",
+                            Type = Bar.EntryType.ColorOctalTree,
+                            Stream = coctBin,
+                        }
+                    );
+
+                    trySaveTo?.Invoke(config.bar?.light?.toFile, coctBin);
+                }
             }
 
             return entries;

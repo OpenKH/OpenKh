@@ -283,6 +283,72 @@ reuseImd: true
   uvscIndex: 0
 ```
 
+### ground
+
+Ground value in collision. Such as 30, 25, 8, 2, 1, or 0
+
+```yml
+- name: 'floor'
+  ground: 1
+```
+
+### floorLevel
+
+FloorLevel value in collision
+
+```yml
+- name: 'floor'
+  floorLevel: 1
+```
+
+### cameraClip
+
+Setting cameraClip to true will generate camera collision plane.
+
+```yml
+- name: 'camera'
+  nodraw: true
+  noclip: true
+  cameraClip: true
+  cameraFlags: 0x000003F0
+```
+
+### cameraFlags
+
+This is Collision.Attributes (surfaceFlags) of camera collision data.
+
+```yml
+- name: 'camera'
+  nodraw: true
+  noclip: true
+  cameraClip: true
+  cameraFlags: 0x000003F0
+```
+
+### lightClip
+
+Setting lightClip to true will generate light collision plane.
+
+```yml
+- name: 'light'
+  nodraw: true
+  noclip: true
+  lightClip: true
+  lightFlags: 0x000803F1
+```
+
+### lightFlags
+
+This is Collision.Attributes (surfaceFlags) of light collision data.
+
+```yml
+- name: 'camera'
+  nodraw: true
+  noclip: true
+  cameraClip: true
+  lightFlags: 0x000003F0
+```
+
 ### bar
 
 ```yml
@@ -301,6 +367,12 @@ bar:
   doct:
     name: "eh_1"
     toFile: 'eh_1_0.doct'
+  camera:
+    name: "CH_e"
+    toFile: 'CH_e.coct'
+  light:
+    name: "COL_"
+    toFile: 'COL_.coct'
 ```
 
 ### nococt
