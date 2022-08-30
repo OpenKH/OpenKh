@@ -355,7 +355,7 @@ namespace OpenKh.Kh2.Ard
                 var sb = new StringBuilder();
                 sb.AppendLine($"{nameof(AreaSettings)} {Unk00} {Unk02}");
                 foreach (var item in Settings)
-                    sb.AppendLine($"\t{item}");
+                    sb.AppendLine($" {item}");
 
                 return sb.ToString().Replace("\r", string.Empty);
             }
@@ -813,7 +813,7 @@ namespace OpenKh.Kh2.Ard
 
         public static string Decompile(IEnumerable<AreaDataScript> scripts) =>
             string.Join("\n\n", scripts.Select(x => x.ToString()));
-
+        
         public static IEnumerable<AreaDataScript> Compile(string text)
         {
             const char Comment = '#';
@@ -863,7 +863,7 @@ namespace OpenKh.Kh2.Ard
                         function.Parse(row, tokens);
                         script.Functions.Add(function);
 
-                        while (row < lines.Length && (lines[row].Length == 0 || lines[row][0] == '\t'))
+                        while (row < lines.Length && (lines[row].Length == 0 || lines[row][0] == ' '))
                         {
                             line = lines[row++];
                             cleanLine = line.Split(Comment);

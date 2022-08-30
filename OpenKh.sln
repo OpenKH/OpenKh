@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+VisualStudioVersion = 17.1.32203.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Kh2", "OpenKh.Kh2\OpenKh.Kh2.csproj", "{D5B36CD1-5B5D-4CE9-A673-209AD386D68A}"
 EndProject
@@ -199,6 +199,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Tools.Kh2MsetEditor", "OpenKh.Tools.Kh2MsetEditor\OpenKh.Tools.Kh2MsetEditor.csproj", "{1F02AC54-9FC2-4922-B2DA-E76BC41E95C6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.MapGenUtils", "OpenKh.Command.MapGenUtils\OpenKh.Command.MapGenUtils.csproj", "{FADD190B-0608-4128-B59E-459E3C776728}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.AssimpUtils", "OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj", "{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -788,6 +789,14 @@ Global
 		{FADD190B-0608-4128-B59E-459E3C776728}.Debug|x64.Build.0 = Debug|Any CPU
 		{FADD190B-0608-4128-B59E-459E3C776728}.Release|x64.ActiveCfg = Release|Any CPU
 		{FADD190B-0608-4128-B59E-459E3C776728}.Release|x64.Build.0 = Release|Any CPU
+		{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}..NET Debug|x64.ActiveCfg = Debug|Any CPU
+		{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}..NET Debug|x64.Build.0 = Debug|Any CPU
+		{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}..NET Release|x64.ActiveCfg = Release|Any CPU
+		{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}..NET Release|x64.Build.0 = Release|Any CPU
+		{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}.Debug|x64.Build.0 = Debug|Any CPU
+		{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}.Release|x64.ActiveCfg = Release|Any CPU
+		{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -871,6 +880,7 @@ Global
 		{101C4A12-CAA4-4CF1-B9CC-59957165E0BA} = {402B2669-D594-4DFA-965B-02A92626ADC6}
 		{1F02AC54-9FC2-4922-B2DA-E76BC41E95C6} = {402B2669-D594-4DFA-965B-02A92626ADC6}
 		{FADD190B-0608-4128-B59E-459E3C776728} = {9C52D787-9819-4B89-989B-EEA6FEB20731}
+		{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5} = {0FB7CD6A-EE31-467D-A590-267DCD028618}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}
