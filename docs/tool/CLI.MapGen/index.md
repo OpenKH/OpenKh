@@ -385,11 +385,11 @@ Setting lightClip to true will generate light collision plane.
 This is Collision.Attributes (surfaceFlags) of light collision data.
 
 ```yml
-- name: 'camera'
+- name: 'light'
   nodraw: true
   noclip: true
-  cameraClip: true
-  lightFlags: 0x000003F0
+  lightClip: true
+  lightFlags: 0x000803F1
 ```
 
 ### bar
