@@ -10,6 +10,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using Xe.Graphics;
+using YamlDotNet.Serialization.NodeTypeResolvers;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 
 namespace OpenKh.Command.MapGen.Utils
@@ -19,11 +20,9 @@ namespace OpenKh.Command.MapGen.Utils
         private const int MaxVertCount = 71;
 
         private ModelBackground mapModel;
-        private BigMeshContainer bigMeshContainer;
-        private List<BigMesh> smallMeshList = new List<BigMesh>();
         private ModelTexture modelTex;
         private CollisionBuilder collisionBuilder;
-        private DoctBuilder doctBuilder;
+        private DoctBuilt doctBuilt;
         private Logger logger = LogManager.GetCurrentClassLogger();
         private readonly MapGenConfig config;
 
@@ -35,55 +34,67 @@ namespace OpenKh.Command.MapGen.Utils
 
             logger.Debug($"Loading process has done.");
 
-            logger.Debug($"Starting doct (including model composer) and coct.");
+            logger.Debug($"Starting MapBuilding.");
 
             var materialContainer = new MaterialContainer();
 
-            if (!config.nodoct)
+            if (config.nodoct)
+            {
+                logger.Debug($"Running dummy doct builder.");
+
+                doctBuilt = new DoctDummyBuilder(singleFaces)
+                    .GetBuilt();
+            }
+            else
             {
                 logger.Debug($"Running doct builder.");
 
-                doctBuilder = new DoctBuilder(
+                doctBuilt = new DoctBuilder(
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.nodraw),
-                        new BSPNodeSplitter.Option()
+                        new BSPNodeSplitter.Option { PartitionSize = 30, }
                     )
-                );
+                )
+                    .GetBuilt();
+            }
 
-                logger.Debug($"Finished.");
+            logger.Debug($"Finished. vifPacketRenderingGroup count is {doctBuilt.VifPacketRenderingGroup.Count:#,##0}.");
 
-                if (doctBuilder.vifPacketRenderingGroup != null)
+            if (doctBuilt.VifPacketRenderingGroup != null)
+            {
+                logger.Debug($"Using vifPacketRenderingGroup built by doct.");
+
+                mapModel = new ModelBackground
                 {
-                    logger.Debug($"Using vifPacketRenderingGroup built by doct.");
+                    Chunks = new List<ModelBackground.ModelChunk>(),
+                };
 
-                    mapModel = new ModelBackground
+                var vifPacketRenderingGroup = new List<ushort[]>();
+
+                PolygonsToTriangleStripsConverter polygonsToTriangleStrips = config.disableTriangleStripsOptimization
+                    ? PolygonsToTriangleStripsNoOpts
+                    : PolygonsToTriangleStripsOptimized;
+
+                foreach (var faceArray in doctBuilt.VifPacketRenderingGroup)
+                {
+                    var groups = faceArray.GroupBy(it => it.matDef);
+
+                    var vifPacketIdx = new List<ushort>();
+
+                    foreach (var facesByMaterial in groups)
                     {
-                        Chunks = new List<ModelBackground.ModelChunk>(),
-                    };
+                        var microMesh = new MicroMeshMaker(facesByMaterial).MicroMesh;
+                        var microMeshVertPairs = polygonsToTriangleStrips(microMesh.VertPairsList.ToArray());
 
-                    var vifPacketRenderingGroup = new List<ushort[]>();
-
-                    foreach (var faceArray in doctBuilder.vifPacketRenderingGroup)
-                    {
-                        var groups = faceArray.GroupBy(it => it.matDef);
-
-                        var vifPacketIdx = new List<ushort>();
-
-                        foreach (var facesByMaterial in groups)
+                        foreach (var subMicroMesh in CutByVUSuitableSize(microMesh, microMeshVertPairs))
                         {
-                            var pairMade = new VertMaker(facesByMaterial);
-
-                            var newPairs = TriangleToTriangleStripsOptimized(pairMade.VertPairsList.ToArray());
-
                             var dmaPack = new MapVifPacketBuilder(
-                                pairMade.CoordList,
-                                newPairs
+                                subMicroMesh.CoordList,
+                                subMicroMesh.VertPairsList
                                     .SelectMany(
-                                        (vertPair_, faceIndex) =>
+                                        (vertPair, faceIndex) =>
                                         {
-                                            var vertPair = vertPair_.ToArray();
-
                                             return Enumerable.Range(0, vertPair.Count())
                                                 .Select(
                                                     vertIdx =>
@@ -92,8 +103,8 @@ namespace OpenKh.Command.MapGen.Utils
                                                         {
                                                             Flag = MapVifPacketBuilder.Index.GetSuitableFlag(vertIdx),
                                                             CoordIndex = Convert.ToByte(vertPair[vertIdx].coordIndex),
-                                                            UV = pairMade.VertList[vertIdx].uv,
-                                                            Color = pairMade.VertList[vertIdx].color,
+                                                            UV = subMicroMesh.VertList[vertIdx].uv,
+                                                            Color = subMicroMesh.VertList[vertIdx].color,
                                                         };
                                                     }
                                                 )
@@ -121,50 +132,50 @@ namespace OpenKh.Command.MapGen.Utils
                                 }
                             );
                         }
-
-                        vifPacketRenderingGroup.Add(vifPacketIdx.ToArray());
                     }
 
-                    mapModel.vifPacketRenderingGroup = vifPacketRenderingGroup;
-
-                    mapModel.DmaChainIndexRemapTable = new List<ushort>(
-                        Enumerable.Range(0, mapModel.Chunks.Count)
-                            .Select(it => Convert.ToUInt16(it))
-                            .ToArray()
-                    );
-
-                    //foreach (var bigMesh in bigMeshContainer.MeshList)
-                    //{
-                    //    foreach (var smallMesh in BigMeshSplitter.Split(bigMesh))
-                    //    {
-                    //        var dmaPack = new MapVifPacketBuilder(smallMesh);
-
-                    //        smallMeshList.Add(smallMesh);
-
-                    //        if (smallMesh.textureIndex != -1)
-                    //        {
-                    //            bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
-                    //            smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
-
-                    //            mapModel.Chunks.Add(
-                    //                new ModelBackground.ModelChunk
-                    //                {
-                    //                    VifPacket = dmaPack.vifPacket.ToArray(),
-                    //                    TextureId = smallMesh.textureIndex,
-                    //                    DmaPerVif = new ushort[] {
-                    //                dmaPack.firstVifPacketQwc,
-                    //                0,
-                    //                    },
-                    //                    TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
-                    //                    UVScrollIndex = smallMesh.matDef.uvscIndex ?? 0,
-                    //                }
-                    //            );
-                    //        }
-                    //    }
-                    //}
-
-                    logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
+                    vifPacketRenderingGroup.Add(vifPacketIdx.ToArray());
                 }
+
+                mapModel.vifPacketRenderingGroup = vifPacketRenderingGroup;
+
+                mapModel.DmaChainIndexRemapTable = new List<ushort>(
+                    Enumerable.Range(0, mapModel.Chunks.Count)
+                        .Select(it => Convert.ToUInt16(it))
+                        .ToArray()
+                );
+
+                //foreach (var bigMesh in bigMeshContainer.MeshList)
+                //{
+                //    foreach (var smallMesh in BigMeshSplitter.Split(bigMesh))
+                //    {
+                //        var dmaPack = new MapVifPacketBuilder(smallMesh);
+
+                //        smallMeshList.Add(smallMesh);
+
+                //        if (smallMesh.textureIndex != -1)
+                //        {
+                //            bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
+                //            smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
+
+                //            mapModel.Chunks.Add(
+                //                new ModelBackground.ModelChunk
+                //                {
+                //                    VifPacket = dmaPack.vifPacket.ToArray(),
+                //                    TextureId = smallMesh.textureIndex,
+                //                    DmaPerVif = new ushort[] {
+                //                dmaPack.firstVifPacketQwc,
+                //                0,
+                //                    },
+                //                    TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
+                //                    UVScrollIndex = smallMesh.matDef.uvscIndex ?? 0,
+                //                }
+                //            );
+                //        }
+                //    }
+                //}
+
+                logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
             }
 
             if (!config.nococt)
@@ -175,7 +186,7 @@ namespace OpenKh.Command.MapGen.Utils
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.noclip),
-                        new BSPNodeSplitter.Option()
+                        new BSPNodeSplitter.Option { PartitionSize = 10, }
                     )
                 );
 
@@ -186,10 +197,8 @@ namespace OpenKh.Command.MapGen.Utils
                     var numTotalCollisions = coct.Nodes.Select(node => node.Meshes.Select(it => it.Collisions.Count).Sum()).Sum();
                     var numVerts = coct.VertexList.Count;
 
-                    logger.Debug($"{numNodes:#,##0} nodes, {numTotalMeshes:#,##0} total meshes, {numTotalCollisions:#,##0} total collisions, {numVerts:#,##0} vertices.");
+                    logger.Debug($"Finished. {numNodes:#,##0} nodes, {numTotalMeshes:#,##0} total meshes, {numTotalCollisions:#,##0} total collisions, {numVerts:#,##0} vertices.");
                 }
-
-                logger.Debug($"Finished.");
             }
 
             logger.Debug($"Running texture generator.");
@@ -258,56 +267,54 @@ namespace OpenKh.Command.MapGen.Utils
             logger.Debug($"The builder has done.");
         }
 
-        private class Vert
+        private IEnumerable<MicroMesh> CutByVUSuitableSize(
+            MicroMesh microMesh,
+            VertPair[][] microMeshVertPairsAlternative
+        )
         {
-            internal Vector2 uv;
-            internal Color color;
-        }
-
-        private class VertMaker
-        {
-            public List<VertPair[]> VertPairsList { get; } = new List<VertPair[]>();
-            public List<Vector3> CoordList { get; } = new List<Vector3>();
-            public List<Vert> VertList { get; } = new List<Vert>();
-
-            public VertMaker(IEnumerable<SingleFace> faces)
+            MicroMesh lastMesh = new MicroMesh();
+            for (int x = 0, cx = microMeshVertPairsAlternative.Length; x < cx; x++)
             {
-                var idx = 0;
+                var pairs = microMeshVertPairsAlternative[x];
 
-                foreach (var face in faces)
+                var exceed = lastMesh.VertList.Count + pairs.Length >= 71 || lastMesh.CoordList.Count + pairs.Length >= 71;
+                if (exceed)
                 {
-                    var vertPairs = new List<VertPair>();
-                    for (int x = 0, cx = face.positionList.Count(); x < cx; x++)
+                    yield return lastMesh;
+
+                    lastMesh = new MicroMesh();
+                }
+
+                var vertPairs = new List<VertPair>();
+
+                foreach (var pair in pairs)
+                {
+                    var coord = microMesh.CoordList[pair.coordIndex];
+
+                    var coordIdx = lastMesh.CoordList.IndexOf(coord);
+                    if (coordIdx < 0)
                     {
-                        var position = face.positionList[x];
-
-                        var coordIdx = CoordList.IndexOf(position);
-                        if (coordIdx < 0)
-                        {
-                            coordIdx = CoordList.Count;
-                            CoordList.Add(position);
-                        }
-
-                        VertList.Add(
-                            new Vert
-                            {
-                                uv = face.uvList[x],
-                                color = face.colorList[x],
-                            }
-                        );
-
-                        vertPairs.Add(
-                            new VertPair
-                            {
-                                index = idx,
-                                coordIndex = coordIdx,
-                            }
-                        );
-
-                        idx++;
+                        coordIdx = lastMesh.CoordList.Count;
+                        lastMesh.CoordList.Add(coord);
                     }
 
-                    VertPairsList.Add(vertPairs.ToArray());
+                    lastMesh.VertList.Add(microMesh.VertList[pair.index]);
+
+                    vertPairs.Add(
+                        new VertPair
+                        {
+                            index = lastMesh.VertList.Count - 1,
+                            coordIndex = coordIdx,
+                        }
+                    );
+                }
+
+                lastMesh.VertPairsList.Add(vertPairs.ToArray());
+
+                var isLast = (x + 1) == cx;
+                if (isLast)
+                {
+                    yield return lastMesh;
                 }
             }
         }
@@ -323,7 +330,7 @@ namespace OpenKh.Command.MapGen.Utils
             logger.Debug($"Loading 3D model file \"{modelFile}\" using Assimp.");
 
             var assimp = new Assimp.AssimpContext();
-            var scene = assimp.ImportFile(modelFile, Assimp.PostProcessSteps.PreTransformVertices | Assimp.PostProcessSteps.Triangulate);
+            var scene = assimp.ImportFile(modelFile, Assimp.PostProcessSteps.PreTransformVertices);
 
             var scale = config.scale;
 
@@ -535,6 +542,65 @@ namespace OpenKh.Command.MapGen.Utils
             return faces;
         }
 
+        private class MicroVert
+        {
+            internal Vector2 uv;
+            internal Color color;
+        }
+
+        private record MicroMesh
+        {
+            public List<VertPair[]> VertPairsList { get; } = new List<VertPair[]>();
+            public List<Vector3> CoordList { get; } = new List<Vector3>();
+            public List<MicroVert> VertList { get; } = new List<MicroVert>();
+        }
+
+        private class MicroMeshMaker
+        {
+            public MicroMesh MicroMesh { get; } = new MicroMesh();
+
+            public MicroMeshMaker(IEnumerable<SingleFace> faces)
+            {
+                var idx = 0;
+
+                foreach (var face in faces)
+                {
+                    var vertPairs = new List<VertPair>();
+                    for (int x = 0, cx = face.positionList.Count(); x < cx; x++)
+                    {
+                        var position = face.positionList[x];
+
+                        var coordIdx = MicroMesh.CoordList.IndexOf(position);
+                        if (coordIdx < 0)
+                        {
+                            coordIdx = MicroMesh.CoordList.Count;
+                            MicroMesh.CoordList.Add(position);
+                        }
+
+                        MicroMesh.VertList.Add(
+                            new MicroVert
+                            {
+                                uv = face.uvList[x],
+                                color = face.colorList[x],
+                            }
+                        );
+
+                        vertPairs.Add(
+                            new VertPair
+                            {
+                                index = idx,
+                                coordIndex = coordIdx,
+                            }
+                        );
+
+                        idx++;
+                    }
+
+                    MicroMesh.VertPairsList.Add(vertPairs.ToArray());
+                }
+            }
+        }
+
         class VertPair
         {
             /// <summary>
@@ -550,26 +616,36 @@ namespace OpenKh.Command.MapGen.Utils
             public override string ToString() => $"{coordIndex}";
         }
 
-        private delegate IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStripsConverter(VertPair[][] faces);
-
-        private IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStripsNoOpts(VertPair[][] faces) => faces;
-
-        private IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStripsOptimized(VertPair[][] faces)
+        private static IEnumerable<VertPair[]> PolygonsToTriangleStrips(VertPair[] verts)
         {
-            IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStrips(IEnumerable<VertPair> list)
+            switch (verts.Count())
             {
-                switch (list.Count())
+                case 3:
+                    yield return verts;
+                    break;
+                case 4:
                 {
-                    case 3:
-                        yield return list;
-                        break;
-                    case 4:
-                        throw new NotSupportedException();
+                    var array = verts.ToArray();
+                    yield return new VertPair[] { array[0], array[1], array[3], array[2], };
+                    break;
                 }
+                default:
+                    throw new NotSupportedException();
             }
+        }
 
+        private delegate VertPair[][] PolygonsToTriangleStripsConverter(VertPair[][] faces);
+
+        private VertPair[][] PolygonsToTriangleStripsNoOpts(VertPair[][] faces) =>
+            faces
+                .SelectMany(face => PolygonsToTriangleStrips(face))
+                .Select(it => it.ToArray())
+                .ToArray();
+
+        private VertPair[][] PolygonsToTriangleStripsOptimized(VertPair[][] faces)
+        {
             var list = faces
-                .SelectMany(face => TriangleToTriangleStrips(face))
+                .SelectMany(face => PolygonsToTriangleStrips(face))
                 .Select(it => it.ToList())
                 .ToList();
 
@@ -622,7 +698,10 @@ namespace OpenKh.Command.MapGen.Utils
                     break;
                 }
             }
-            return list;
+
+            return list
+                .Select(it => it.ToArray())
+                .ToArray();
         }
 
         public List<Bar.Entry> GetBarEntries(Action<string, MemoryStream> trySaveTo = null)
@@ -663,10 +742,9 @@ namespace OpenKh.Command.MapGen.Utils
                 trySaveTo?.Invoke(config.bar?.texture?.toFile, texBin);
             }
 
-            if (!config.nodoct)
             {
                 var doctBin = new MemoryStream();
-                doctBuilder.doct.Write(doctBin);
+                doctBuilt.Doct.Write(doctBin);
                 doctBin.Position = 0;
 
                 entries.Add(

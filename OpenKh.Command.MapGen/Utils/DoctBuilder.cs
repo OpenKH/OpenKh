@@ -15,9 +15,14 @@ namespace OpenKh.Command.MapGen.Utils
 {
     public class DoctBuilder
     {
-        public readonly Doct doct = new Doct();
+        private readonly Doct doct = new Doct();
+        private readonly List<SingleFace[]> vifPacketRenderingGroup = new List<SingleFace[]>();
 
-        public List<SingleFace[]> vifPacketRenderingGroup { get; } = new List<SingleFace[]>();
+        public DoctBuilt GetBuilt() => new DoctBuilt
+        {
+            Doct = doct,
+            VifPacketRenderingGroup = vifPacketRenderingGroup,
+        };
 
         public DoctBuilder(ISpatialNodeCutter cutter)
         {
