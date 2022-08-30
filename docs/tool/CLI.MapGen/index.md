@@ -1,4 +1,47 @@
-# [OpenKh Tool Documentation](../index.md) - MapGen
+# [OpenKh Tool Documentation](../index.md) - MapGen <!-- omit in toc -->
+
+TOC
+
+- [Overview](#overview)
+- [Command usage](#command-usage)
+  - [Supported 3D model data formats](#supported-3d-model-data-formats)
+  - [Supported 3D model data concepts](#supported-3d-model-data-concepts)
+  - [Example: fbx to map](#example-fbx-to-map)
+- [mapdef.yml](#mapdefyml)
+  - [Material definition](#material-definition)
+  - [scale](#scale)
+  - [applyMatrix](#applymatrix)
+  - [imageDirs](#imagedirs)
+  - [imgtoolOptions](#imgtooloptions)
+  - [textureOptions](#textureoptions)
+  - [uvscList](#uvsclist)
+  - [disableTriangleStripsOptimization](#disabletrianglestripsoptimization)
+  - [disableBSPCollisionBuilder](#disablebspcollisionbuilder)
+  - [ignore](#ignore)
+  - [nodraw](#nodraw)
+  - [noclip](#noclip)
+  - [fromFile](#fromfile)
+  - [surfaceFlags](#surfaceflags)
+  - [maxColorIntensity](#maxcolorintensity)
+  - [maxAlpha](#maxalpha)
+  - [transparentFlag](#transparentflag)
+  - [skipConversionIfExists](#skipconversionifexists)
+  - [reuseImd](#reuseimd)
+  - [uvscIndex](#uvscindex)
+  - [ground](#ground)
+  - [floorLevel](#floorlevel)
+  - [cameraClip](#cameraclip)
+  - [cameraFlags](#cameraflags)
+  - [lightClip](#lightclip)
+  - [lightFlags](#lightflags)
+  - [bar](#bar)
+  - [nococt](#nococt)
+  - [nodoct](#nodoct)
+  - [collisionPartitionSize](#collisionpartitionsize)
+  - [doctPartitionSize](#doctpartitionsize)
+  - [default](#default)
+  - [imageDirs and fromFile](#imagedirs-and-fromfile)
+- [Example of designer tools usage](#example-of-designer-tools-usage)
 
 ## Overview
 
