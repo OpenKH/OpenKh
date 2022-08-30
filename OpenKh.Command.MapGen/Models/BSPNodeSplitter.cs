@@ -28,14 +28,14 @@ namespace OpenKh.Command.MapGen.Models
                 BSPNodeSplitter Make(IEnumerable<SingleFace> faces) =>
                     new BSPNodeSplitter(faces, option);
 
-                (IEnumerable<T> a, IEnumerable<T> b) HalfHalf<T>(IEnumerable<T> collection)
+                static (IEnumerable<T> a, IEnumerable<T> b) HalfHalf<T>(IEnumerable<T> collection)
                 {
                     var array = collection.ToArray();
                     var halfPos = array.Length / 2;
                     return (array.Take(halfPos), array.Skip(halfPos));
                 }
 
-                (IEnumerable<T> y, IEnumerable<T> n) CutByCondition<T>(IEnumerable<T> collection, Func<T, bool> condition)
+                static (IEnumerable<T> y, IEnumerable<T> n) CutByCondition<T>(IEnumerable<T> collection, Func<T, bool> condition)
                 {
                     var y = new List<T>();
                     var n = new List<T>();
@@ -46,7 +46,9 @@ namespace OpenKh.Command.MapGen.Models
                     return (y, n);
                 }
 
-                BSPNodeSplitter[] CutNodeByConditionOrHalfHelper(Func<SingleFace, bool> condition)
+                BSPNodeSplitter[] CutNodeByConditionOrHalfHelper1Ax(
+                    Func<SingleFace, bool> condition
+                )
                 {
                     var (a, b) = CutByCondition(faces, condition);
 
@@ -62,31 +64,132 @@ namespace OpenKh.Command.MapGen.Models
                     return new BSPNodeSplitter[] { Make(a), Make(b), };
                 }
 
-                var range = new Range(faces);
-                var max = Math.Max(
-                    range.zDistinct,
-                    Math.Max(range.xDistinct, range.yDistinct)
-                );
-                if (max == range.zDistinct)
+                BSPNodeSplitter[] CutNodeByConditionOrHalfHelper2Axis(
+                    Func<SingleFace, bool> condition1, 
+                    Func<SingleFace, bool> condition2
+                )
                 {
-                    // z-cut
-                    return CutNodeByConditionOrHalfHelper(it => it.referencePosition.Z >= range.zCenter);
+                    var (x, y) = CutByCondition(faces, condition1);
+                    var (a, b) = CutByCondition(x, condition2);
+                    var (c, d) = CutByCondition(y, condition2);
+
+                    if (!a.Any())
+                    {
+                        (a, b) = HalfHalf(b);
+                    }
+                    else if (!b.Any())
+                    {
+                        (a, b) = HalfHalf(a);
+                    }
+
+                    if (!c.Any())
+                    {
+                        (c, d) = HalfHalf(d);
+                    }
+                    else if (!d.Any())
+                    {
+                        (c, d) = HalfHalf(c);
+                    }
+
+                    return new BSPNodeSplitter[] { Make(a), Make(b), Make(c), Make(d), };
                 }
-                else if (max == range.yDistinct)
+
+                BSPNodeSplitter[] CutNodeByConditionOrHalfHelper3Axis(
+                    Func<SingleFace, bool> condition1, 
+                    Func<SingleFace, bool> condition2,
+                    Func<SingleFace, bool> condition3
+                )
                 {
-                    // y-cut
-                    return CutNodeByConditionOrHalfHelper(it => it.referencePosition.Y >= range.yCenter);
+                    var (x, y) = CutByCondition(faces, condition1);
+                    var (s, t) = CutByCondition(x, condition2);
+                    var (u, v) = CutByCondition(y, condition2);
+                    var (a, b) = CutByCondition(s, condition3);
+                    var (c, d) = CutByCondition(t, condition3);
+                    var (e, f) = CutByCondition(u, condition3);
+                    var (g, h) = CutByCondition(v, condition3);
+
+                    if (!a.Any())
+                    {
+                        (a, b) = HalfHalf(b);
+                    }
+                    else if (!b.Any())
+                    {
+                        (a, b) = HalfHalf(a);
+                    }
+
+                    if (!c.Any())
+                    {
+                        (c, d) = HalfHalf(d);
+                    }
+                    else if (!d.Any())
+                    {
+                        (c, d) = HalfHalf(c);
+                    }
+
+                    if (!e.Any())
+                    {
+                        (e, f) = HalfHalf(f);
+                    }
+                    else if (!f.Any())
+                    {
+                        (e, f) = HalfHalf(e);
+                    }
+
+                    if (!g.Any())
+                    {
+                        (g, h) = HalfHalf(h);
+                    }
+                    else if (!h.Any())
+                    {
+                        (g, h) = HalfHalf(g);
+                    }
+
+                    return new BSPNodeSplitter[] { Make(a), Make(b), Make(c), Make(d), Make(e), Make(f), Make(g), Make(h), };
+                }
+
+                var gist = new Gist(faces);
+                var max = Math.Max(
+                    gist.zDistinct,
+                    Math.Max(gist.xDistinct, gist.yDistinct)
+                );
+                var threshold = max / 3;
+
+                var conditions = new List<Func<SingleFace, bool>>();
+
+                if (threshold <= gist.zDistinct)
+                {
+                    conditions.Add((it => gist.zCenter <= it.referencePosition.Z));
+                }
+                if (threshold <= gist.yDistinct)
+                {
+                    conditions.Add((it => gist.yCenter <= it.referencePosition.Y));
+                }
+                if (threshold <= gist.xDistinct)
+                {
+                    conditions.Add((it => gist.xCenter <= it.referencePosition.X));
+                }
+
+                if (conditions.Count == 1)
+                {
+                    return CutNodeByConditionOrHalfHelper1Ax(conditions[0]);
+                }
+                else if (conditions.Count == 2)
+                {
+                    return CutNodeByConditionOrHalfHelper2Axis(conditions[0], conditions[1]);
+                }
+                else if (conditions.Count == 3)
+                {
+                    return CutNodeByConditionOrHalfHelper3Axis(conditions[0], conditions[1], conditions[2]);
                 }
                 else
                 {
-                    // x-cut
-                    return CutNodeByConditionOrHalfHelper(it => it.referencePosition.X >= range.xCenter);
+                    throw new NotSupportedException();
                 }
             }
             return new BSPNodeSplitter[] { this };
         }
 
-        private class Range
+        private class Gist
         {
             public float xCenter;
             public float yCenter;
@@ -96,7 +199,7 @@ namespace OpenKh.Command.MapGen.Models
             public int yDistinct;
             public int zDistinct;
 
-            public Range(SingleFace[] faces)
+            public Gist(SingleFace[] faces)
             {
                 var xArray = new float[faces.Length];
                 var yArray = new float[faces.Length];
