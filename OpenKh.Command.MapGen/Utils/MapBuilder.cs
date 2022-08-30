@@ -21,7 +21,7 @@ namespace OpenKh.Command.MapGen.Utils
 
         private ModelBackground mapModel;
         private ModelTexture modelTex;
-        private CollisionBuilder collisionBuilder;
+        private CollisionBuilt playerCollision;
         private DoctBuilt doctBuilt;
         private Logger logger = LogManager.GetCurrentClassLogger();
         private readonly MapGenConfig config;
@@ -182,16 +182,17 @@ namespace OpenKh.Command.MapGen.Utils
             {
                 logger.Debug($"Running collision plane builder.");
 
-                collisionBuilder = new CollisionBuilder(
+                playerCollision = new CollisionBuilder(
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.noclip),
                         new BSPNodeSplitter.Option { PartitionSize = 10, }
                     )
-                );
+                )
+                    .GetBuilt();
 
                 {
-                    var coct = collisionBuilder.coct;
+                    var coct = playerCollision.Coct;
                     var numNodes = coct.Nodes.Count;
                     var numTotalMeshes = coct.Nodes.Select(node => node.Meshes.Count).Sum();
                     var numTotalCollisions = coct.Nodes.Select(node => node.Meshes.Select(it => it.Collisions.Count).Sum()).Sum();
@@ -762,7 +763,7 @@ namespace OpenKh.Command.MapGen.Utils
             if (!config.nococt)
             {
                 var coctBin = new MemoryStream();
-                collisionBuilder.coct.Write(coctBin);
+                playerCollision.Coct.Write(coctBin);
                 coctBin.Position = 0;
 
                 entries.Add(

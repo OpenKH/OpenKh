@@ -16,7 +16,7 @@ namespace OpenKh.Command.MapGen.Utils
 {
     public class CollisionBuilder
     {
-        public readonly Coct coct = new Coct();
+        private readonly Coct coct = new Coct();
 
         public CollisionBuilder(ISpatialNodeCutter cutter)
         {
@@ -24,6 +24,11 @@ namespace OpenKh.Command.MapGen.Utils
             var helper = new BuildHelper(coct);
             WalkTree(root, helper);
         }
+
+        public CollisionBuilt GetBuilt() => new CollisionBuilt
+        {
+            Coct = coct,
+        };
 
         private class WalkResult
         {
