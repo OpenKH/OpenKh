@@ -148,36 +148,6 @@ namespace OpenKh.Command.MapGen.Utils
                         .ToArray()
                 );
 
-                //foreach (var bigMesh in bigMeshContainer.MeshList)
-                //{
-                //    foreach (var smallMesh in BigMeshSplitter.Split(bigMesh))
-                //    {
-                //        var dmaPack = new MapVifPacketBuilder(smallMesh);
-
-                //        smallMeshList.Add(smallMesh);
-
-                //        if (smallMesh.textureIndex != -1)
-                //        {
-                //            bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
-                //            smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
-
-                //            mapModel.Chunks.Add(
-                //                new ModelBackground.ModelChunk
-                //                {
-                //                    VifPacket = dmaPack.vifPacket.ToArray(),
-                //                    TextureId = smallMesh.textureIndex,
-                //                    DmaPerVif = new ushort[] {
-                //                dmaPack.firstVifPacketQwc,
-                //                0,
-                //                    },
-                //                    TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
-                //                    UVScrollIndex = smallMesh.matDef.uvscIndex ?? 0,
-                //                }
-                //            );
-                //        }
-                //    }
-                //}
-
                 logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
             }
 
@@ -211,7 +181,6 @@ namespace OpenKh.Command.MapGen.Utils
             logger.Debug($"Running texture generator.");
 
             {
-                //var matDefList = bigMeshContainer.AllocatedMaterialDefs;
                 var imageSets = materialContainer.Materials
                     .Select(matDef => new ImageSet { image = imageLoader(matDef), matDef = matDef, })
                     .ToArray();
@@ -483,68 +452,6 @@ namespace OpenKh.Command.MapGen.Utils
                     );
                 }
             }
-
-            /*
-
-            mapModel = new ModelBackground
-            {
-                Chunks = new List<ModelBackground.ModelChunk>(),
-            };
-
-            foreach (var bigMesh in bigMeshContainer.MeshList)
-            {
-                foreach (var smallMesh in BigMeshSplitter.Split(bigMesh))
-                {
-                    var dmaPack = new MapVifPacketBuilder(smallMesh);
-
-                    smallMeshList.Add(smallMesh);
-
-                    if (smallMesh.textureIndex != -1)
-                    {
-                        bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
-                        smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
-
-                        mapModel.Chunks.Add(
-                            new ModelBackground.ModelChunk
-                            {
-                                VifPacket = dmaPack.vifPacket.ToArray(),
-                                TextureId = smallMesh.textureIndex,
-                                DmaPerVif = new ushort[] {
-                                    dmaPack.firstVifPacketQwc,
-                                    0,
-                                },
-                                TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
-                                UVScrollIndex = smallMesh.matDef.uvscIndex ?? 0,
-                            }
-                        );
-                    }
-                }
-            }
-
-            logger.Debug($"Output: {mapModel.Chunks.Count:#,##0} vif packets.");
-
-            logger.Debug($"The builder has done.");
-
-            logger.Debug($"Emitting initial inefficient vifPacketRenderingGroup for fallback purpose.");
-
-            // first group: render all
-
-            mapModel.vifPacketRenderingGroup = new List<ushort[]>(
-                new ushort[][] {
-                    Enumerable.Range(0, mapModel.Chunks.Count)
-                        .Select(it => Convert.ToUInt16(it))
-                        .ToArray()
-                }
-            );
-
-            logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
-
-            mapModel.DmaChainIndexRemapTable = new List<ushort>(
-                Enumerable.Range(0, mapModel.Chunks.Count)
-                    .Select(it => Convert.ToUInt16(it))
-                    .ToArray()
-            );
-            */
 
             return faces;
         }

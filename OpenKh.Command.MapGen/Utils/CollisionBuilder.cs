@@ -104,40 +104,6 @@ namespace OpenKh.Command.MapGen.Utils
             };
         }
 
-        private static IEnumerable<IList<int>> TriangleStripsToTriangleFans(IList<BigMesh.TriangleStrip> list)
-        {
-            foreach (var set in list)
-            {
-                var cx = set.vertexIndices.Count;
-                if (cx == 3)
-                {
-                    yield return set.vertexIndices;
-                }
-                if (cx >= 4)
-                {
-                    for (int x = 4; x <= cx; x += 2)
-                    {
-                        yield return new int[]
-                        {
-                            set.vertexIndices[x - 4 + 0],
-                            set.vertexIndices[x - 4 + 1],
-                            set.vertexIndices[x - 4 + 3],
-                            set.vertexIndices[x - 4 + 2],
-                        };
-                        if (x + 1 == cx)
-                        {
-                            yield return new int[]
-                            {
-                                set.vertexIndices[x - 2 + 0],
-                                set.vertexIndices[x - 2 + 1],
-                                set.vertexIndices[x - 2 + 2],
-                            };
-                        }
-                    }
-                }
-            }
-        }
-
         private class Node
         {
             internal Node[] children;
