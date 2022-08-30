@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenKh.Command.MapGen.Interfaces
 {
-    public interface ISpatialMeshCutter
+    public interface ISpatialNodeCutter
     {
         /// <summary>
         /// Split this node into sub nodes.
@@ -15,16 +15,16 @@ namespace OpenKh.Command.MapGen.Interfaces
         /// This must not be empty.
         /// The end node continues to supply single node `this`.
         /// 
-        /// Read and process `Meshes` property, only when this collection count is `1`.
+        /// Read and process `Faces` property, only when this collection count is `1`.
         /// </summary>
-        IEnumerable<ISpatialMeshCutter> Cut();
+        IEnumerable<ISpatialNodeCutter> Cut();
 
         /// <summary>
-        /// Array of meshes belonging to this and descendant nodes.
+        /// Array of faces belonging to this and descendant nodes.
         /// 
         /// This is always available.
         /// This also includes descendants meshes, recursively.
         /// </summary>
-        IEnumerable<CenterPointedMesh> Meshes { get; }
+        IEnumerable<SingleFace> Faces { get; }
     }
 }

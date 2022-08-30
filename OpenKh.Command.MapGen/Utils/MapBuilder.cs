@@ -1,3 +1,4 @@
+using Assimp;
 using NLog;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Kh2;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using Xe.Graphics;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 
@@ -29,17 +31,152 @@ namespace OpenKh.Command.MapGen.Utils
         {
             this.config = config;
 
-            ConvertModelIntoMapModel(modelFile, config);
+            var singleFaces = ConvertModelIntoFaces(modelFile, config);
+
+            logger.Debug($"Loading process has done.");
+
+            logger.Debug($"Starting doct (including model composer) and coct.");
+
+            var materialContainer = new MaterialContainer();
+
+            if (!config.nodoct)
+            {
+                logger.Debug($"Running doct builder.");
+
+                doctBuilder = new DoctBuilder(
+                    new BSPNodeSplitter(
+                        singleFaces
+                            .Where(it => !it.matDef.nodraw),
+                        new BSPNodeSplitter.Option()
+                    )
+                );
+
+                logger.Debug($"Finished.");
+
+                if (doctBuilder.vifPacketRenderingGroup != null)
+                {
+                    logger.Debug($"Using vifPacketRenderingGroup built by doct.");
+
+                    mapModel = new ModelBackground
+                    {
+                        Chunks = new List<ModelBackground.ModelChunk>(),
+                    };
+
+                    var vifPacketRenderingGroup = new List<ushort[]>();
+
+                    foreach (var faceArray in doctBuilder.vifPacketRenderingGroup)
+                    {
+                        var groups = faceArray.GroupBy(it => it.matDef);
+
+                        var vifPacketIdx = new List<ushort>();
+
+                        foreach (var facesByMaterial in groups)
+                        {
+                            int coordIdx = 0;
+
+                            var combined = new Combined(facesByMaterial);
+
+                            var newPairs = TriangleToTriangleStripsOptimized(combined.VertPairsList.ToArray());
+
+                            var dmaPack = new MapVifPacketBuilder(
+                                facesByMaterial
+                                    .SelectMany(face => face.positionList)
+                                    .ToArray(),
+                                facesByMaterial
+                                    .SelectMany(
+                                        (face, faceIndex) =>
+                                            Enumerable.Range(0, face.positionList.Length)
+                                                .Select(
+                                                    vertIdx =>
+                                                    {
+                                                        var idx = coordIdx++;
+                                                        return new MapVifPacketBuilder.Index
+                                                        {
+                                                            Flag = MapVifPacketBuilder.Index.GetSuitableFlag(vertIdx),
+                                                            CoordIndex = Convert.ToByte(idx),
+                                                            UV = face.uvList[vertIdx],
+                                                            Color = face.colorList[vertIdx],
+                                                        };
+                                                    }
+                                                )
+                                                .ToArray()
+                                    )
+                                    .ToArray()
+                            );
+
+                            var matDef = facesByMaterial.Key;
+
+                            vifPacketIdx.Add(Convert.ToUInt16(mapModel.Chunks.Count));
+
+                            mapModel.Chunks.Add(
+                                new ModelBackground.ModelChunk
+                                {
+                                    VifPacket = dmaPack.vifPacket.ToArray(),
+                                    TextureId = materialContainer.Add(matDef),
+                                    DmaPerVif = new ushort[] {
+                                        dmaPack.firstVifPacketQwc,
+                                        0,
+                                    },
+                                    TransparencyFlag = matDef.transparentFlag ?? 0,
+                                    UVScrollIndex = matDef.uvscIndex ?? 0,
+                                }
+                            );
+                        }
+
+                        vifPacketRenderingGroup.Add(vifPacketIdx.ToArray());
+                    }
+
+                    mapModel.vifPacketRenderingGroup = vifPacketRenderingGroup;
+
+                    mapModel.DmaChainIndexRemapTable = new List<ushort>(
+                        Enumerable.Range(0, mapModel.Chunks.Count)
+                            .Select(it => Convert.ToUInt16(it))
+                            .ToArray()
+                    );
+
+                    //foreach (var bigMesh in bigMeshContainer.MeshList)
+                    //{
+                    //    foreach (var smallMesh in BigMeshSplitter.Split(bigMesh))
+                    //    {
+                    //        var dmaPack = new MapVifPacketBuilder(smallMesh);
+
+                    //        smallMeshList.Add(smallMesh);
+
+                    //        if (smallMesh.textureIndex != -1)
+                    //        {
+                    //            bigMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
+                    //            smallMesh.vifPacketIndices.Add(Convert.ToUInt16(mapModel.Chunks.Count));
+
+                    //            mapModel.Chunks.Add(
+                    //                new ModelBackground.ModelChunk
+                    //                {
+                    //                    VifPacket = dmaPack.vifPacket.ToArray(),
+                    //                    TextureId = smallMesh.textureIndex,
+                    //                    DmaPerVif = new ushort[] {
+                    //                dmaPack.firstVifPacketQwc,
+                    //                0,
+                    //                    },
+                    //                    TransparencyFlag = smallMesh.matDef.transparentFlag ?? 0,
+                    //                    UVScrollIndex = smallMesh.matDef.uvscIndex ?? 0,
+                    //                }
+                    //            );
+                    //        }
+                    //    }
+                    //}
+
+                    logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
+                }
+            }
 
             if (!config.nococt)
             {
                 logger.Debug($"Running collision plane builder.");
 
                 collisionBuilder = new CollisionBuilder(
-                    new BSPMeshSplitter(
-                        smallMeshList
-                            .Where(it => !it.matDef.noclip)
-                            .Select(mesh => new CenterPointedMesh(mesh))
+                    new BSPNodeSplitter(
+                        singleFaces
+                            .Where(it => !it.matDef.noclip),
+                        new BSPNodeSplitter.Option()
                     )
                 );
 
@@ -56,35 +193,11 @@ namespace OpenKh.Command.MapGen.Utils
                 logger.Debug($"Finished.");
             }
 
-            if (!config.nodoct)
-            {
-                logger.Debug($"Running doct builder.");
-
-                doctBuilder = new DoctBuilder(
-                    new BSPMeshSplitter(
-                        smallMeshList
-                            .Where(it => !it.matDef.nodraw)
-                            .Select(mesh => new CenterPointedMesh(mesh))
-                    )
-                );
-
-                logger.Debug($"Finished.");
-
-                if (doctBuilder.vifPacketRenderingGroup != null)
-                {
-                    logger.Debug($"Using vifPacketRenderingGroup built by doct.");
-
-                    mapModel.vifPacketRenderingGroup = doctBuilder.vifPacketRenderingGroup;
-
-                    logger.Debug($"Output: {mapModel.vifPacketRenderingGroup.Count:#,##0} groups having total {mapModel.vifPacketRenderingGroup.Select(it => it.Length).Sum():#,##0} chunks.");
-                }
-
-                logger.Debug($"Output: {collisionBuilder.coct.Nodes.Count:#,##0} collision mesh groups");
-            }
+            logger.Debug($"Running texture generator.");
 
             {
-                var matDefList = bigMeshContainer.AllocatedMaterialDefs;
-                var imageSets = matDefList
+                //var matDefList = bigMeshContainer.AllocatedMaterialDefs;
+                var imageSets = materialContainer.Materials
                     .Select(matDef => new ImageSet { image = imageLoader(matDef), matDef = matDef, })
                     .ToArray();
 
@@ -142,22 +255,59 @@ namespace OpenKh.Command.MapGen.Utils
 
                 modelTex = new ModelTexture(build);
             }
+
+            logger.Debug($"The builder has done.");
         }
 
-        class ImageSet
+        private class Combined
+        {
+            public List<VertPair[]> VertPairsList { get; } = new List<VertPair[]>();
+            public List<Vector3> CoordList { get; } = new List<Vector3>();
+
+            public Combined(IEnumerable<SingleFace> faces)
+            {
+                var idx = 0;
+
+                foreach (var face in faces)
+                {
+                    var vertPairs = new List<VertPair>();
+                    foreach (var position in face.positionList)
+                    {
+                        var coordIdx = CoordList.IndexOf(position);
+                        if (coordIdx < 0)
+                        {
+                            coordIdx = CoordList.Count;
+                            CoordList.Add(position);
+                        }
+
+                        vertPairs.Add(
+                            new VertPair
+                            {
+                                index = idx,
+                                coordIndex = coordIdx,
+                            }
+                        );
+
+                        idx++;
+                    }
+
+                    VertPairsList.Add(vertPairs.ToArray());
+                }
+            }
+        }
+
+        private class ImageSet
         {
             public Imgd image;
             public MaterialDef matDef;
         }
 
-        private void ConvertModelIntoMapModel(string modelFile, MapGenConfig config)
+        private List<SingleFace> ConvertModelIntoFaces(string modelFile, MapGenConfig config)
         {
             logger.Debug($"Loading 3D model file \"{modelFile}\" using Assimp.");
 
             var assimp = new Assimp.AssimpContext();
-            var scene = assimp.ImportFile(modelFile, Assimp.PostProcessSteps.PreTransformVertices);
-
-            bigMeshContainer = new BigMeshContainer();
+            var scene = assimp.ImportFile(modelFile, Assimp.PostProcessSteps.PreTransformVertices | Assimp.PostProcessSteps.Triangulate);
 
             var scale = config.scale;
 
@@ -186,6 +336,8 @@ namespace OpenKh.Command.MapGen.Utils
 
             logger.Debug($"Starting triangle strip conversion for {scene.Meshes.Count} meshes.");
 
+            var faces = new List<SingleFace>();
+
             foreach (var inputMesh in scene.Meshes)
             {
                 logger.Debug($"Mesh: {inputMesh.Name} ({inputMesh.FaceCount:#,##0} faces, {inputMesh.VertexCount:#,##0} vertices)");
@@ -198,8 +350,6 @@ namespace OpenKh.Command.MapGen.Utils
                     logger.Info($"This mesh \"{inputMesh.Name}\" is not rendered due to ignore flag of material \"{modelMat.Name}\".");
                     continue;
                 }
-
-                var kh2Mesh = bigMeshContainer.AllocateBigMeshForMaterial(matDef);
 
                 var diffuseTextureFile = modelMat.TextureDiffuse.FilePath;
                 if (!string.IsNullOrEmpty(diffuseTextureFile))
@@ -219,81 +369,92 @@ namespace OpenKh.Command.MapGen.Utils
                     }
                 }
 
-                var kh2BaseVert = kh2Mesh.vertexList.Count;
-
-                List<int> vertexToLocal = new List<int>();
-
-                foreach (var inputVertex in inputMesh.Vertices)
+                Vector3 Transform(Vector3D inputVertex)
                 {
-                    var vertex = Vector3.Transform(
+                    return Vector3.Transform(
                         new Vector3(inputVertex.X, inputVertex.Y, inputVertex.Z),
                         matrix
                     );
-
-                    var index = kh2Mesh.vertexList.IndexOf(vertex);
-                    if (index < 0)
-                    {
-                        index = kh2Mesh.vertexList.Count;
-                        kh2Mesh.vertexList.Add(vertex);
-                    }
-
-                    vertexToLocal.Add(index);
                 }
 
-                var localFaces = inputMesh.Faces
-                    .Select(
-                        set => set.Indices
-                            .Select(index => new VertPair { uvColorIndex = index, vertexIndex = vertexToLocal[index] })
-                            .ToArray()
-                    )
-                    .ToArray();
-
-                var inputTexCoords = inputMesh.TextureCoordinateChannels.First();
-                var inputVertexColorList = inputMesh.VertexColorChannels.First();
-
-                var hasVertexColor = inputMesh.VertexColorChannelCount >= 1;
-
-                var maxIntensity = matDef.maxColorIntensity
+                var maxColorIntensity = matDef.maxColorIntensity
                     ?? config.maxColorIntensity
                     ?? 128;
                 var maxAlpha = matDef.maxAlpha
                     ?? config.maxAlpha
                     ?? 128;
 
-                var triConverter =
-                    config.disableTriangleStripsOptimization
-                    ? (TriangleFansToTriangleStripsConverter)TriangleFansToTriangleStripsNoOpts
-                    : (TriangleFansToTriangleStripsConverter)TriangleFansToTriangleStripsOptimized;
+                Color ConvertVertexColor(Assimp.Color4D clr) => new Color(
+                    (byte)Math.Min(255, clr.R * maxColorIntensity),
+                    (byte)Math.Min(255, clr.G * maxColorIntensity),
+                    (byte)Math.Min(255, clr.B * maxColorIntensity),
+                    (byte)Math.Min(255, clr.A * maxAlpha)
+                );
 
-                foreach (var triStripInput in triConverter(localFaces))
+                Vector2 Get2DCoord(Assimp.Vector3D vector3D) => new Vector2(
+                    vector3D.X,
+                    1 - vector3D.Y
+                );
+
+                Vector3 GetCenterOf(Vector3[] items)
                 {
-                    var triStripOut = new BigMesh.TriangleStrip();
-
-                    foreach (var vertPair in triStripInput)
+                    if (items.Length == 0)
                     {
-                        triStripOut.vertexIndices.Add(kh2BaseVert + vertPair.vertexIndex);
-
-                        triStripOut.uvList.Add(Get2DCoord(inputTexCoords[vertPair.uvColorIndex]));
-
-                        if (hasVertexColor)
-                        {
-                            triStripOut.vertexColorList.Add(ConvertVertexColor(inputVertexColorList[vertPair.uvColorIndex], maxIntensity, maxAlpha));
-                        }
-                        else
-                        {
-                            triStripOut.vertexColorList.Add(new Color(maxIntensity, maxIntensity, maxIntensity, maxAlpha));
-                        }
+                        return Vector3.Zero;
                     }
-
-                    kh2Mesh.triangleStripList.Add(triStripOut);
+                    else if (items.Length == 1)
+                    {
+                        return items[0];
+                    }
+                    else
+                    {
+                        var center = Vector3.Zero;
+                        var cx = items.Length;
+                        for (int x = 0; x < cx; x++)
+                        {
+                            center += items[x] / cx;
+                        }
+                        return center;
+                    }
                 }
 
-                logger.Debug($"Output: {kh2Mesh.vertexList.Count:#,##0} vertices, {kh2Mesh.triangleStripList.Count:#,##0} triangle strips.");
+                var inputTexCoords = inputMesh.TextureCoordinateChannels.First();
+                var inputVertexColorList = inputMesh.VertexColorChannels.First();
+                var hasVertexColor = inputMesh.VertexColorChannelCount >= 1;
+
+                foreach (var face in inputMesh.Faces)
+                {
+                    var positionList = face.Indices
+                        .Select(index => Transform(inputMesh.Vertices[index]))
+                        .ToArray();
+
+                    faces.Add(
+                        new SingleFace
+                        {
+                            referencePosition = GetCenterOf(positionList),
+
+                            positionList = face.Indices
+                                .Select(index => Transform(inputMesh.Vertices[index]))
+                                .ToArray(),
+                            uvList = face.Indices
+                                .Select(index => Get2DCoord(inputTexCoords[index]))
+                                .ToArray(),
+                            colorList = hasVertexColor
+                                ? face.Indices
+                                    .Select(index => ConvertVertexColor(inputVertexColorList[index]))
+                                    .ToArray()
+                                : Enumerable.Repeat(
+                                    new Color(maxColorIntensity, maxColorIntensity, maxColorIntensity, maxAlpha),
+                                    face.Indices.Count
+                                )
+                                    .ToArray(),
+                            matDef = matDef,
+                        }
+                    );
+                }
             }
 
-            logger.Debug($"Loading process has done.");
-
-            logger.Debug($"Starting mesh splitter and vif packets builder.");
+            /*
 
             mapModel = new ModelBackground
             {
@@ -353,31 +514,46 @@ namespace OpenKh.Command.MapGen.Utils
                     .Select(it => Convert.ToUInt16(it))
                     .ToArray()
             );
+            */
+
+            return faces;
         }
 
         class VertPair
         {
             /// <summary>
-            /// compacted vertex index
+            /// compacted vertex coord index
             /// </summary>
-            public int vertexIndex;
+            public int coordIndex;
 
             /// <summary>
             /// uv and vertex color index
             /// </summary>
-            public int uvColorIndex;
+            public int index;
 
-            public override string ToString() => $"{vertexIndex}";
+            public override string ToString() => $"{coordIndex}";
         }
 
-        private delegate IEnumerable<IEnumerable<VertPair>> TriangleFansToTriangleStripsConverter(VertPair[][] faces);
+        private delegate IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStripsConverter(VertPair[][] faces);
 
-        private IEnumerable<IEnumerable<VertPair>> TriangleFansToTriangleStripsNoOpts(VertPair[][] faces) => faces;
+        private IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStripsNoOpts(VertPair[][] faces) => faces;
 
-        private IEnumerable<IEnumerable<VertPair>> TriangleFansToTriangleStripsOptimized(VertPair[][] faces)
+        private IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStripsOptimized(VertPair[][] faces)
         {
+            IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStrips(IList<VertPair> list)
+            {
+                switch (list.Count)
+                {
+                    case 3:
+                        yield return list;
+                        break;
+                    case 4:
+                        throw new NotSupportedException();
+                }
+            }
+
             var list = faces
-                .SelectMany(face => TriangleFanToTriangleStrips(face))
+                .SelectMany(face => TriangleToTriangleStrips(face))
                 .Select(it => it.ToList())
                 .ToList();
 
@@ -391,14 +567,14 @@ namespace OpenKh.Command.MapGen.Utils
                     {
                         var anyInnerJoin = false;
 
-                        var v0 = list[x][0].vertexIndex;
-                        var v1 = list[x][1].vertexIndex;
-                        var v2 = list[x][list[x].Count - 2].vertexIndex;
-                        var v3 = list[x][list[x].Count - 1].vertexIndex;
+                        var v0 = list[x][0].coordIndex;
+                        var v1 = list[x][1].coordIndex;
+                        var v2 = list[x][list[x].Count - 2].coordIndex;
+                        var v3 = list[x][list[x].Count - 1].coordIndex;
 
                         for (int y = x + 1; y < list.Count; y++)
                         {
-                            if (list[y][0].vertexIndex == v2 && list[y][1].vertexIndex == v3 && list[x].Count + list[y].Count - 2 < MaxVertCount)
+                            if (list[y][0].coordIndex == v2 && list[y][1].coordIndex == v3 && list[x].Count + list[y].Count - 2 < MaxVertCount)
                             {
                                 list[x].AddRange(list[y].Skip(2));
                                 list.RemoveAt(y);
@@ -406,7 +582,7 @@ namespace OpenKh.Command.MapGen.Utils
                                 anyInnerJoin = true;
                                 break;
                             }
-                            if (list[y][list[y].Count - 2].vertexIndex == v0 && list[y][list[y].Count - 1].vertexIndex == v1 && list[x].Count + list[y].Count - 2 < MaxVertCount)
+                            if (list[y][list[y].Count - 2].coordIndex == v0 && list[y][list[y].Count - 1].coordIndex == v1 && list[x].Count + list[y].Count - 2 < MaxVertCount)
                             {
                                 list[x].InsertRange(0, list[y].SkipLast(2));
                                 list.RemoveAt(y);
@@ -432,31 +608,6 @@ namespace OpenKh.Command.MapGen.Utils
             }
             return list;
         }
-
-        private static IEnumerable<IEnumerable<VertPair>> TriangleFanToTriangleStrips(IList<VertPair> list)
-        {
-            switch (list.Count)
-            {
-                case 3:
-                    yield return list;
-                    break;
-                case 4:
-                    yield return new VertPair[] { list[0], list[1], list[3], list[2] };
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        private static Color ConvertVertexColor(Assimp.Color4D clr, byte maxColorIntensity, byte maxAlpha) => new Color(
-            (byte)Math.Min(255, clr.R * maxColorIntensity),
-            (byte)Math.Min(255, clr.G * maxColorIntensity),
-            (byte)Math.Min(255, clr.B * maxColorIntensity),
-            (byte)Math.Min(255, clr.A * maxAlpha)
-        );
-
-        private static Vector2 Get2DCoord(Assimp.Vector3D vector3D) => new Vector2(vector3D.X, 1 - vector3D.Y);
-
 
         public List<Bar.Entry> GetBarEntries(Action<string, MemoryStream> trySaveTo = null)
         {

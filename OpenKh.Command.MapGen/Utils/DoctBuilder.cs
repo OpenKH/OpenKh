@@ -17,9 +17,9 @@ namespace OpenKh.Command.MapGen.Utils
     {
         public readonly Doct doct = new Doct();
 
-        public List<ushort[]> vifPacketRenderingGroup { get; } = new List<ushort[]>();
+        public List<SingleFace[]> vifPacketRenderingGroup { get; } = new List<SingleFace[]>();
 
-        public DoctBuilder(ISpatialMeshCutter cutter)
+        public DoctBuilder(ISpatialNodeCutter cutter)
         {
             var root = new ToTree(cutter).Root;
             WalkTree(root);
@@ -34,7 +34,7 @@ namespace OpenKh.Command.MapGen.Utils
         {
             int entry2Idx = -1;
 
-            if (node.meshes != null)
+            if (node.faces != null)
             {
                 entry2Idx = doct.Entry2List.Count;
                 var entry2 = new Doct.Entry2
@@ -44,9 +44,7 @@ namespace OpenKh.Command.MapGen.Utils
                 doct.Entry2List.Add(entry2);
 
                 vifPacketRenderingGroup.Add(
-                    node.meshes
-                        .SelectMany(it => it.bigMesh.vifPacketIndices)
-                        .ToArray()
+                    node.faces
                 );
             }
 
@@ -84,7 +82,7 @@ namespace OpenKh.Command.MapGen.Utils
         {
             internal Node[] children;
 
-            internal CenterPointedMesh[] meshes;
+            internal SingleFace[] faces;
             internal BoundingBox bbox;
         }
 
@@ -92,12 +90,12 @@ namespace OpenKh.Command.MapGen.Utils
         {
             internal Node Root { get; }
 
-            public ToTree(ISpatialMeshCutter cutter)
+            public ToTree(ISpatialNodeCutter cutter)
             {
                 Root = Walk(cutter);
             }
 
-            private Node Walk(ISpatialMeshCutter cutter)
+            private Node Walk(ISpatialNodeCutter cutter)
             {
                 var pair = cutter.Cut().ToArray();
 
@@ -122,16 +120,15 @@ namespace OpenKh.Command.MapGen.Utils
                 }
                 else
                 {
-                    var meshes = pair.Single().Meshes.ToArray();
+                    var faces = pair.Single().Faces.ToArray();
 
                     return new Node
                     {
-                        meshes = meshes,
+                        faces = faces,
 
                         bbox = BoundingBox.FromManyPoints(
-                            meshes
-                                .Select(point => point.bigMesh)
-                                .SelectMany(bigMesh => bigMesh.vertexList)
+                            faces
+                                .SelectMany(point => point.positionList)
                         ),
                     };
                 }

@@ -8,6 +8,8 @@ using Xe.BinaryMapper;
 using OpenKh.Kh2;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils.Conventions;
+using System.ComponentModel;
+using System.Numerics;
 
 namespace OpenKh.Command.MapGen.Utils
 {
@@ -17,12 +19,49 @@ namespace OpenKh.Command.MapGen.Utils
 
         public ushort firstVifPacketQwc;
 
+        public class Index
+        {
+            /// <summary>
+            /// 0x10, 0x10, 0x20, 0x30, 0x20, 0x30, ...
+            /// </summary>
+            public byte Flag { get; set; }
+
+            /// <summary>
+            /// Index to coords
+            /// </summary>
+            public byte CoordIndex { get; set; }
+
+            /// <summary>
+            /// 0.0 to 1.0
+            /// </summary>
+            public Vector2 UV { get; set; }
+
+            /// <summary>
+            /// vertex color rgba is directly written.
+            /// 128 is PS2's max. 255 is doubled intensity.
+            /// </summary>
+            public Xe.Graphics.Color Color { get; set; }
+
+            public static byte GetSuitableFlag(int index)
+            {
+                switch (index)
+                {
+                    case 0:
+                    case 1:
+                        return 0x10;
+                    default:
+                        return ((index & 1) == 0) ? (byte)0x20 : (byte)0x30;
+                }
+            }
+        }
+
         public MapVifPacketBuilder(
-            BigMesh mesh
+            IEnumerable<Vector3> coords,
+            IEnumerable<Index> indices
         )
         {
-            var nLarge = mesh.triangleStripList.Sum(it => it.vertexIndices.Count);
-            var nSmall = mesh.vertexList.Count;
+            var nLarge = indices.Count();
+            var nSmall = coords.Count();
 
             var top = new TopHeader
             {
@@ -51,10 +90,10 @@ namespace OpenKh.Command.MapGen.Utils
                     var num = Convert.ToByte(nLarge);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x65008000 | off | (num << 16))); // unpack V2-16 c 14 a 004 usn 0 flg 1 m 0
-                    foreach (var one in mesh.triangleStripList.SelectMany(it => it.uvList))
+                    foreach (var one in indices)
                     {
-                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.X * 4096)))));
-                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.Y * 4096)))));
+                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.UV.X * 4096)))));
+                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.UV.Y * 4096)))));
                     }
                 }
 
@@ -68,9 +107,9 @@ namespace OpenKh.Command.MapGen.Utils
                     writer.Write(0xcfcfcfcf);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x7200C000 | off | (num << 16))); // unpack S-8 c 14 a 004 usn 1 flg 1 m 1
-                    foreach (var one in mesh.triangleStripList.SelectMany(it => it.vertexIndices))
+                    foreach (var one in indices)
                     {
-                        writer.Write(Convert.ToByte(one));
+                        writer.Write(Convert.ToByte(one.CoordIndex));
                     }
                 }
 
@@ -85,28 +124,9 @@ namespace OpenKh.Command.MapGen.Utils
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x7200C000 | off | (num << 16))); // unpack S-8 c 14 a 004 usn 1 flg 1 m 1
 
-                    foreach (var triStrip in mesh.triangleStripList)
+                    foreach (var one in indices)
                     {
-                        var count = triStrip.vertexIndices.Count;
-                        if (count >= 1)
-                        {
-                            writer.Write((byte)0x10);
-                            if (count >= 2)
-                            {
-                                writer.Write((byte)0x10);
-                                for (var x = 2; x < count; x++)
-                                {
-                                    if (0 == (x & 1))
-                                    {
-                                        writer.Write((byte)0x20);
-                                    }
-                                    else
-                                    {
-                                        writer.Write((byte)0x30);
-                                    }
-                                }
-                            }
-                        }
+                        writer.Write(Convert.ToByte(one.Flag));
                     }
                 }
 
@@ -120,7 +140,7 @@ namespace OpenKh.Command.MapGen.Utils
                     writer.Write(0x3f3f3f3f);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x6E00C000 | off | (num << 16))); // unpack V4-8 c 14 a 012 usn 1 flg 1 m 0
-                    foreach (var color in mesh.triangleStripList.SelectMany(it => it.vertexColorList))
+                    foreach (var color in indices.Select(it => it.Color))
                     {
                         writer.Write(color.r);
                         writer.Write(color.g);
@@ -144,7 +164,7 @@ namespace OpenKh.Command.MapGen.Utils
                     writer.Write(0x80808080);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x78008000 | off | (num << 16))); // unpack V3-32 c 9 a 020 usn 0 flg 1 m 1
-                    foreach (var one in mesh.vertexList)
+                    foreach (var one in coords)
                     {
                         writer.Write(one.X);
                         writer.Write(one.Y);

@@ -18,7 +18,7 @@ namespace OpenKh.Command.MapGen.Utils
     {
         public readonly Coct coct = new Coct();
 
-        public CollisionBuilder(ISpatialMeshCutter cutter)
+        public CollisionBuilder(ISpatialNodeCutter cutter)
         {
             var root = new ToTree(cutter).Root;
             var helper = new BuildHelper(coct);
@@ -40,42 +40,33 @@ namespace OpenKh.Command.MapGen.Utils
             };
             coct.Nodes.Add(collisionNode);
 
-            if (walkNode.meshes?.Any() ?? false)
+            if (walkNode.faces?.Any() ?? false)
             {
                 var collisionMesh = new CollisionMesh
                 {
                     Collisions = new List<Collision>()
                 };
 
-                var vifPacketIndices = new List<ushort>();
-
-                foreach (var point in walkNode.meshes.ToArray())
+                foreach (var face in walkNode.faces.ToArray())
                 {
-                    var mesh = point.bigMesh;
+                    var quad = face.positionList.Length == 4;
 
-                    vifPacketIndices.AddRange(mesh.vifPacketIndices);
+                    var v1 = face.positionList[0];
+                    var v2 = face.positionList[1];
+                    var v3 = face.positionList[2];
+                    var v4 = quad ? face.positionList[3] : Vector3.Zero;
 
-                    foreach (var set in TriangleStripsToTriangleFans(mesh.triangleStripList))
-                    {
-                        var quad = set.Count == 4;
-
-                        var v1 = mesh.vertexList[set[0]];
-                        var v2 = mesh.vertexList[set[1]];
-                        var v3 = mesh.vertexList[set[2]];
-                        var v4 = quad ? mesh.vertexList[set[3]] : Vector3.Zero;
-
-                        collisionMesh.Collisions.Add(coct.Complete(
-                            new Collision
-                            {
-                                Vertex1 = helper.AllocateVertex(v1.X, -v1.Y, -v1.Z), // why -Y and -Z ?
-                                Vertex2 = helper.AllocateVertex(v2.X, -v2.Y, -v2.Z),
-                                Vertex3 = helper.AllocateVertex(v3.X, -v3.Y, -v3.Z),
-                                Vertex4 = Convert.ToInt16(quad ? helper.AllocateVertex(v4.X, -v4.Y, -v4.Z) : -1),
-                                Attributes = new Attributes() { Flags = mesh.matDef.surfaceFlags }
-                            },
-                            inflate: 1
-                        ));
-                    }
+                    collisionMesh.Collisions.Add(coct.Complete(
+                        new Collision
+                        {
+                            Vertex1 = helper.AllocateVertex(v1.X, -v1.Y, -v1.Z), // why -Y and -Z ?
+                            Vertex2 = helper.AllocateVertex(v2.X, -v2.Y, -v2.Z),
+                            Vertex3 = helper.AllocateVertex(v3.X, -v3.Y, -v3.Z),
+                            Vertex4 = Convert.ToInt16(quad ? helper.AllocateVertex(v4.X, -v4.Y, -v4.Z) : -1),
+                            Attributes = new Attributes() { Flags = face.matDef.surfaceFlags }
+                        },
+                        inflate: 1
+                    ));
                 }
 
                 coct.Complete(collisionMesh);
@@ -146,7 +137,7 @@ namespace OpenKh.Command.MapGen.Utils
         {
             internal Node[] children;
 
-            internal CenterPointedMesh[] meshes;
+            internal SingleFace[] faces;
             internal BoundingBox bbox;
         }
 
@@ -154,12 +145,12 @@ namespace OpenKh.Command.MapGen.Utils
         {
             internal Node Root { get; }
 
-            public ToTree(ISpatialMeshCutter cutter)
+            public ToTree(ISpatialNodeCutter cutter)
             {
                 Root = Walk(cutter);
             }
 
-            private Node Walk(ISpatialMeshCutter cutter)
+            private Node Walk(ISpatialNodeCutter cutter)
             {
                 var pair = cutter.Cut().ToArray();
 
@@ -184,16 +175,15 @@ namespace OpenKh.Command.MapGen.Utils
                 }
                 else
                 {
-                    var meshes = pair.Single().Meshes.ToArray();
+                    var faces = pair.Single().Faces.ToArray();
 
                     return new Node
                     {
-                        meshes = meshes,
+                        faces = faces,
 
                         bbox = BoundingBox.FromManyPoints(
-                            meshes
-                                .Select(point => point.bigMesh)
-                                .SelectMany(bigMesh => bigMesh.vertexList)
+                            faces
+                                .SelectMany(point => point.positionList)
                         ),
                     };
                 }
