@@ -72,34 +72,33 @@ namespace OpenKh.Command.MapGen.Utils
 
                         foreach (var facesByMaterial in groups)
                         {
-                            int coordIdx = 0;
+                            var pairMade = new VertMaker(facesByMaterial);
 
-                            var combined = new Combined(facesByMaterial);
-
-                            var newPairs = TriangleToTriangleStripsOptimized(combined.VertPairsList.ToArray());
+                            var newPairs = TriangleToTriangleStripsOptimized(pairMade.VertPairsList.ToArray());
 
                             var dmaPack = new MapVifPacketBuilder(
-                                facesByMaterial
-                                    .SelectMany(face => face.positionList)
-                                    .ToArray(),
-                                facesByMaterial
+                                pairMade.CoordList,
+                                newPairs
                                     .SelectMany(
-                                        (face, faceIndex) =>
-                                            Enumerable.Range(0, face.positionList.Length)
+                                        (vertPair_, faceIndex) =>
+                                        {
+                                            var vertPair = vertPair_.ToArray();
+
+                                            return Enumerable.Range(0, vertPair.Count())
                                                 .Select(
                                                     vertIdx =>
                                                     {
-                                                        var idx = coordIdx++;
                                                         return new MapVifPacketBuilder.Index
                                                         {
                                                             Flag = MapVifPacketBuilder.Index.GetSuitableFlag(vertIdx),
-                                                            CoordIndex = Convert.ToByte(idx),
-                                                            UV = face.uvList[vertIdx],
-                                                            Color = face.colorList[vertIdx],
+                                                            CoordIndex = Convert.ToByte(vertPair[vertIdx].coordIndex),
+                                                            UV = pairMade.VertList[vertIdx].uv,
+                                                            Color = pairMade.VertList[vertIdx].color,
                                                         };
                                                     }
                                                 )
-                                                .ToArray()
+                                                .ToArray();
+                                        }
                                     )
                                     .ToArray()
                             );
@@ -259,26 +258,43 @@ namespace OpenKh.Command.MapGen.Utils
             logger.Debug($"The builder has done.");
         }
 
-        private class Combined
+        private class Vert
+        {
+            internal Vector2 uv;
+            internal Color color;
+        }
+
+        private class VertMaker
         {
             public List<VertPair[]> VertPairsList { get; } = new List<VertPair[]>();
             public List<Vector3> CoordList { get; } = new List<Vector3>();
+            public List<Vert> VertList { get; } = new List<Vert>();
 
-            public Combined(IEnumerable<SingleFace> faces)
+            public VertMaker(IEnumerable<SingleFace> faces)
             {
                 var idx = 0;
 
                 foreach (var face in faces)
                 {
                     var vertPairs = new List<VertPair>();
-                    foreach (var position in face.positionList)
+                    for (int x = 0, cx = face.positionList.Count(); x < cx; x++)
                     {
+                        var position = face.positionList[x];
+
                         var coordIdx = CoordList.IndexOf(position);
                         if (coordIdx < 0)
                         {
                             coordIdx = CoordList.Count;
                             CoordList.Add(position);
                         }
+
+                        VertList.Add(
+                            new Vert
+                            {
+                                uv = face.uvList[x],
+                                color = face.colorList[x],
+                            }
+                        );
 
                         vertPairs.Add(
                             new VertPair
@@ -540,9 +556,9 @@ namespace OpenKh.Command.MapGen.Utils
 
         private IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStripsOptimized(VertPair[][] faces)
         {
-            IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStrips(IList<VertPair> list)
+            IEnumerable<IEnumerable<VertPair>> TriangleToTriangleStrips(IEnumerable<VertPair> list)
             {
-                switch (list.Count)
+                switch (list.Count())
                 {
                     case 3:
                         yield return list;
