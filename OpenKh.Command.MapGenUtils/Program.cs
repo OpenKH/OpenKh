@@ -1,4 +1,5 @@
 using McMaster.Extensions.CommandLineUtils;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using OpenKh.Command.MapGen.Models;
@@ -30,6 +31,12 @@ namespace OpenKh.Command.MapGenUtils
             }
         }
 
+        protected int OnExecute(CommandLineApplication app)
+        {
+            app.ShowHelp();
+            return 1;
+        }
+
         private static string GetVersion()
             => typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "";
 
@@ -40,7 +47,7 @@ namespace OpenKh.Command.MapGenUtils
             [Required]
             [DirectoryExists]
             [Argument(0, Description = "Output dir")]
-            public string OutDir { get; set; }
+            public string? OutDir { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
@@ -52,7 +59,7 @@ namespace OpenKh.Command.MapGenUtils
                 var schemaData = schema.ToJson();
 
                 File.WriteAllText(
-                    Path.Combine(OutDir, "mapdef.schema.json"),
+                    Path.Combine(OutDir ?? ".", "mapdef.schema.json"),
                     schemaData
                 );
 

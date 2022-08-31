@@ -17,4 +17,11 @@
         <ProjectReference Include="..\OpenKh.Command.MapGen\OpenKh.Command.MapGen.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- for NJsonSchema. See https://github.com/RicoSuter/NJsonSchema/wiki/XML-Documentation#define-examples -->
+        <TrimmerRootAssembly Include="System.IO.FileSystem" />
+        <TrimmerRootAssembly Include="System.Xml.XPath.XDocument" />
+        <TrimmerRootAssembly Include="System.Xml.Linq" />
+    </ItemGroup>
+
 </Project>

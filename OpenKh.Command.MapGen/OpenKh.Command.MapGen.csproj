@@ -4,6 +4,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <OutputType>Exe</OutputType>
+
+    <!-- for NJsonSchema. See https://github.com/RicoSuter/NJsonSchema/wiki/XML-Documentation -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- Suppress: warning CS1591: Missing XML comment for publicly visible type or member '...' -->
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
