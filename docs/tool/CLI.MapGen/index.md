@@ -39,6 +39,9 @@ TOC
   - [nodoct](#nodoct)
   - [collisionPartitionSize](#collisionpartitionsize)
   - [doctPartitionSize](#doctpartitionsize)
+  - [fog](#fog)
+  - [bgColor](#bgcolor)
+  - [onColorTable](#oncolortable)
   - [default](#default)
   - [imageDirs and fromFile](#imagedirs-and-fromfile)
 - [Example of designer tools usage](#example-of-designer-tools-usage)
@@ -452,6 +455,38 @@ Split nodes until single node has up to specified mesh face count.
 
 ```yml
 doctPartitionSize: 100
+```
+
+### fog
+
+Fog effect. Color is AARRGGBB format.
+
+```yml
+fog:
+  color: 0x80402010
+  min: 100
+  max: 700
+  near: 0
+  far: 255
+```
+
+### bgColor
+
+Background color in AARRGGBB format.
+
+```yml
+bgColor: 0x80804010
+```
+
+### onColorTable
+
+Map colors up to 16 colors. `0x80808080` are appended on lack. Excess is dropped. Color is in AARRGGBB format.
+
+```yml
+onColorTable:
+  - 0x80808080
+  - 0x80808080
+  - 0x80808080
 ```
 
 ### default

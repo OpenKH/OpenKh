@@ -59,6 +59,7 @@ namespace OpenKh.Command.MapGen.Models
             public BarEntryConfig camera { get; set; }
             public BarEntryConfig light { get; set; }
             public BarEntryConfig doct { get; set; }
+            public BarEntryConfig mapColor { get; set; }
         }
 
         public class BarEntryConfig
@@ -102,5 +103,22 @@ namespace OpenKh.Command.MapGen.Models
         public int collisionPartitionSize { get; set; } = 10;
 
         public int doctPartitionSize { get; set; } = 100;
+
+        public class FogData
+        {
+            public uint color { get; set; }
+            public float min { get; set; }
+            public float max { get; set; }
+            public float near { get; set; }
+            public float far { get; set; }
+        }
+
+        public FogData fog { get; set; }
+
+        public const uint DefaultBgColor = 0x80000000U;
+
+        public uint bgColor { get; set; } = DefaultBgColor;
+
+        public uint[] onColorTable { get; set; }
     }
 }

@@ -2,7 +2,9 @@ using Assimp;
 using NLog;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Models.MapColorModel;
 using OpenKh.Kh2.TextureFooter;
+using OpenKh.Kh2.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,6 +29,7 @@ namespace OpenKh.Command.MapGen.Utils
         private DoctBuilt doctBuilt;
         private Logger logger = LogManager.GetCurrentClassLogger();
         private readonly MapGenConfig config;
+        private MapColor mapColorBuilt;
 
         public MapBuilder(string modelFile, MapGenConfig config, Func<MaterialDef, Imgd> imageLoader)
         {
@@ -223,6 +226,67 @@ namespace OpenKh.Command.MapGen.Utils
                     PrintFinished(it.Coct);
                 }
             }
+
+            static Color ToColor(uint rgba)
+            {
+                return new Color(
+                    r: (byte)(rgba >> 0),
+                    g: (byte)(rgba >> 8),
+                    b: (byte)(rgba >> 16),
+                    a: (byte)(rgba >> 24)
+                );
+            }
+
+            logger.Debug($"Running map color generator.");
+
+            {
+                Fog fog = null;
+
+                if (config.fog != null)
+                {
+                    fog = new Fog
+                    {
+                        FogColor = ToColor(config.fog.color),
+                        Min = config.fog.min,
+                        Max = config.fog.max,
+                        Near = config.fog.near,
+                        Far = config.fog.far,
+                    };
+                }
+
+                if (false
+                    || fog != null
+                    || config.bgColor != MapGenConfig.DefaultBgColor
+                    || config.onColorTable != null
+                )
+                {
+                    mapColorBuilt = new MapColor
+                    {
+                        Fog = fog ?? new Fog
+                        {
+                            FogColor = new Color(),
+                            Min = 1000,
+                            Max = 10000,
+                            Near = 0,
+                            Far = 255,
+                        },
+                        BgColor = ToColor(config.bgColor),
+                        OnColorTable = (config.onColorTable ?? new uint[0])
+                            .Concat(Enumerable.Repeat(0x80808080U, 16))
+                            .Take(16)
+                            .Select(ToColor)
+                            .ToArray(),
+                    };
+
+                    logger.Debug($"Something generated.");
+                }
+                else
+                {
+                    logger.Debug($"Nothing generated.");
+                }
+            }
+
+            logger.Debug($"Finished.");
 
             logger.Debug($"Running texture generator.");
 
@@ -774,6 +838,24 @@ namespace OpenKh.Command.MapGen.Utils
 
                     trySaveTo?.Invoke(config.bar?.light?.toFile, coctBin);
                 }
+            }
+
+            if (mapColorBuilt != null)
+            {
+                var stream = new MemoryStream();
+                new MapColorUtil().Write(stream, mapColorBuilt);
+                stream.Position = 0;
+
+                entries.Add(
+                    new Bar.Entry
+                    {
+                        Name = config.bar?.mapColor?.name ?? "eh_1",
+                        Type = Bar.EntryType.FogColor,
+                        Stream = stream,
+                    }
+                );
+
+                trySaveTo?.Invoke(config.bar?.mapColor?.toFile, stream);
             }
 
             return entries;
