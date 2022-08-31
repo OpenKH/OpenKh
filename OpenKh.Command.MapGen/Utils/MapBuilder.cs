@@ -104,12 +104,13 @@ namespace OpenKh.Command.MapGen.Utils
                                                 .Select(
                                                     vertIdx =>
                                                     {
+                                                        var one = vertPair[vertIdx];
                                                         return new MapVifPacketBuilder.Index
                                                         {
                                                             Flag = MapVifPacketBuilder.Index.GetSuitableFlag(vertIdx),
-                                                            CoordIndex = Convert.ToByte(vertPair[vertIdx].coordIndex),
-                                                            UV = subMicroMesh.VertList[vertIdx].uv,
-                                                            Color = subMicroMesh.VertList[vertIdx].color,
+                                                            CoordIndex = Convert.ToByte(one.coordIndex),
+                                                            UV = subMicroMesh.VertList[one.index].uv,
+                                                            Color = subMicroMesh.VertList[one.index].color,
                                                         };
                                                     }
                                                 )
