@@ -333,6 +333,8 @@ reuseImd: true
 
 Ground value in collision. Such as 30, 25, 8, 2, 1, or 0
 
+For light collision, this is index to `onColorTable[]`.
+
 ```yml
 - name: 'floor'
   ground: 1
