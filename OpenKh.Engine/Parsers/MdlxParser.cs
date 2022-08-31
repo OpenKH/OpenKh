@@ -17,9 +17,8 @@ namespace OpenKh.Engine.Parsers
         public float X, Y, Z;
         public float Tu, Tv;
         public float R, G, B, A;
-        public int? BoneAssign;
 
-        public PositionColoredTextured(float x, float y, float z, float tu, float tv, float r, float g, float b, float a, int? boneAssign = null)
+        public PositionColoredTextured(float x, float y, float z, float tu, float tv, float r, float g, float b, float a)
         {
             X = x;
             Y = y;
@@ -30,10 +29,9 @@ namespace OpenKh.Engine.Parsers
             G = g;
             B = b;
             A = a;
-            BoneAssign = boneAssign;
         }
 
-        public PositionColoredTextured(Vector3 pos, Vector2 uv, float r, float g, float b, float a, int? boneAssign = null)
+        public PositionColoredTextured(Vector3 pos, Vector2 uv, float r, float g, float b, float a)
         {
             X = pos.X;
             Y = pos.Y;
@@ -44,7 +42,23 @@ namespace OpenKh.Engine.Parsers
             G = g;
             B = b;
             A = a;
-            BoneAssign = boneAssign;
+        }
+    }
+
+    public class VertexBoxWeight
+    {
+        public int MatrixIndex;
+        public float Weight;
+
+        public VertexBoxWeight()
+        {
+
+        }
+
+        public VertexBoxWeight(int matrixIndex, float weight)
+        {
+            MatrixIndex = matrixIndex;
+            Weight = weight;
         }
     }
 
@@ -54,6 +68,7 @@ namespace OpenKh.Engine.Parsers
         public int[] Indices;
         public int TextureIndex;
         public bool IsOpaque;
+        public VertexBoxWeight[][] VertexBoneWeights;
     }
 
     public class MdlxParser : IModelMotion
