@@ -459,7 +459,7 @@ doctPartitionSize: 100
 
 ### fog
 
-Fog effect. Color is AARRGGBB format.
+Fog effect. Color is AABBGGRR format.
 
 ```yml
 fog:
@@ -472,7 +472,7 @@ fog:
 
 ### bgColor
 
-Background color in AARRGGBB format.
+Background color in AABBGGRR format.
 
 ```yml
 bgColor: 0x80804010
@@ -480,7 +480,7 @@ bgColor: 0x80804010
 
 ### onColorTable
 
-Map colors up to 16 colors. `0x80808080` are appended on lack. Excess is dropped. Color is in AARRGGBB format.
+Map colors up to 16 colors. `0x80808080` are appended on lack. Excess is dropped. Color is in AABBGGRR format.
 
 ```yml
 onColorTable:
