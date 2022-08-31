@@ -222,19 +222,19 @@ namespace OpenKh.Tests.Engine
             var actualCenter = (System.Numerics.Vector3)setCameraCall.GetArguments()[1];
             var actualFov = (float)setCameraCall.GetArguments()[2];
             var actualRoll = (float)setCameraCall.GetArguments()[3];
-            Assert.Equal(eyex, actualEye.X, 0);
-            Assert.Equal(eyey, -actualEye.Y, 0);
-            Assert.Equal(eyez, -actualEye.Z, 0);
-            Assert.Equal(0, actualCenter.X, 0);
-            Assert.Equal(-113.28f, -actualCenter.Y, 0);
-            Assert.Equal(-20.98f, -actualCenter.Z, 0);
-            Assert.Equal(0f, actualRoll, 0);
-            Assert.Equal(48.41f, actualFov, 0);
+            Assert.Equal(eyex, actualEye.X, 0.01f);
+            Assert.Equal(eyey, -actualEye.Y, 0.01f);
+            Assert.Equal(eyez, -actualEye.Z, 0.01f);
+            Assert.Equal(0, actualCenter.X, 0f);
+            Assert.Equal(-113.28f, -actualCenter.Y, 0.01f);
+            Assert.Equal(-20.98f, -actualCenter.Z, 0.01f);
+            Assert.Equal(0f, actualRoll, 0f);
+            Assert.Equal(48.41f, actualFov, 0.01f);
         }
 
         [Theory]
         [InlineData(122, -123.61f, -122.43f)]
-        [InlineData(140, -123.68f, -122.80f)]
+        [InlineData(140, -123.98f, -122.80f)]
         [InlineData(180, -126.95f, -125.76f)]
         [InlineData(200, -129.38f, -128.20f)]
         [InlineData(438, -176.39, -175.20)]
@@ -337,14 +337,14 @@ namespace OpenKh.Tests.Engine
             var actualCenter = (System.Numerics.Vector3)setCameraCall.GetArguments()[1];
             var actualFov = (float)setCameraCall.GetArguments()[2];
             var actualRoll = (float)setCameraCall.GetArguments()[3];
-            Assert.Equal(-317.25266f, actualEye.X, 0);
-            Assert.Equal(eyey, -actualEye.Y, 0);
-            Assert.Equal(79.360405f, -actualEye.Z, 0);
-            Assert.Equal(-357.23502f, actualCenter.X, 0);
-            Assert.Equal(centery, -actualCenter.Y, 0);
-            Assert.Equal(217.77927f, -actualCenter.Z, 0);
-            Assert.Equal(0f, actualRoll, 0);
-            Assert.Equal(42.026005f, actualFov, 0);
+            Assert.Equal(-317.25266f, actualEye.X, 0f);
+            Assert.Equal(eyey, -actualEye.Y, 0.01f);
+            Assert.Equal(79.360405f, -actualEye.Z, 0f);
+            Assert.Equal(-357.23502f, actualCenter.X, 0f);
+            Assert.Equal(centery, -actualCenter.Y, 0.01f);
+            Assert.Equal(217.77927f, -actualCenter.Z, 0f);
+            Assert.Equal(0f, actualRoll, 0f);
+            Assert.Equal(42.026005f, actualFov, 0f);
         }
 
         [Theory]
