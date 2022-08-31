@@ -62,16 +62,16 @@ namespace OpenKh.AssimpUtils
 
                 foreach (MeshDescriptor iMeshDesc in dic_meshDescriptorsByMeshId[i])
                 {
-                    foreach (PositionColoredTextured vertex in iMeshDesc.Vertices)
+                    foreach (var (vertex, boneAssigns) in iMeshDesc.Vertices.Zip(iMeshDesc.VertexBoneWeights))
                     {
                         iMesh.Vertices.Add(new Assimp.Vector3D(vertex.X, vertex.Y, vertex.Z));
                         iMesh.TextureCoordinateChannels[0].Add(new Assimp.Vector3D(vertex.Tu, 1 - vertex.Tv, 0));
 
                         // VERTEX WEIGHTS
-                        if (vertex.BoneAssign != null)
+                        foreach (var boneAssign in boneAssigns)
                         {
-                            Assimp.Bone bone = AssimpGeneric.FindBone(iMesh.Bones, "Bone" + vertex.BoneAssign);
-                            bone.VertexWeights.Add(new Assimp.VertexWeight(currentVertex, 1));
+                            Assimp.Bone bone = AssimpGeneric.FindBone(iMesh.Bones, "Bone" + boneAssign.MatrixIndex);
+                            bone.VertexWeights.Add(new Assimp.VertexWeight(currentVertex, boneAssign.Weight));
                         }
 
                         currentVertex++;
