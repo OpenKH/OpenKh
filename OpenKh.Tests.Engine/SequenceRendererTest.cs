@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
 using OpenKh.Kh2;
@@ -46,7 +46,7 @@ namespace OpenKh.Tests.Engine
 
             drawing.AssertDraw(x =>
             {
-                Assert.Equal(expected, x.Vec0.X, 0);
+                Assert.Equal(expected, x.Vec0.X, 1f);
             });
         }
 
@@ -82,7 +82,7 @@ namespace OpenKh.Tests.Engine
 
             drawing.AssertDraw(x =>
             {
-                Assert.Equal(expected, x.Vec0.X, 0);
+                Assert.Equal(expected, x.Vec0.X, 1f);
             });
         }
 
@@ -114,7 +114,7 @@ namespace OpenKh.Tests.Engine
 
             drawing.AssertDraw(x =>
             {
-                Assert.Equal(625, x.Vec0.X, 0);
+                Assert.Equal(625, x.Vec0.X, 0f);
             });
         }
 

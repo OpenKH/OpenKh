@@ -120,7 +120,7 @@ namespace OpenKh.Tests.Engine
             targetCamera.InstantlyRotateCameraToEntity(entity);
             targetCamera.Update(entity, 0);
 
-            Assert.Equal(expected, targetCamera.YRotation, 4);
+            Assert.Equal(expected, targetCamera.YRotation, 4f);
         }
 
         [Theory]
@@ -159,7 +159,7 @@ namespace OpenKh.Tests.Engine
             while (frameIndex-- > 0)
                 targetCamera.Update(entity, DeltaTime);
 
-            Assert.Equal(expected, targetCamera.At.X, 3);
+            Assert.Equal(expected, targetCamera.At.X, 3f);
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace OpenKh.Tests.Engine
 
         private void AssertVector3(Vector3 expected, Vector3 actual)
         {
-            const int Precision = 3;
+            const float Precision = 3;
             Assert.Equal(expected.X, actual.X, Precision);
             Assert.Equal(expected.Y, actual.Y, Precision);
             Assert.Equal(expected.Z, actual.Z, Precision);
@@ -199,7 +199,7 @@ namespace OpenKh.Tests.Engine
 
         private void AssertMatrix(Matrix4x4 expected, Matrix4x4 actual)
         {
-            const int Precision = 3;
+            const float Precision = 3;
             Assert.Equal(expected.M11, actual.M11, Precision);
             Assert.Equal(expected.M12, actual.M12, Precision);
             Assert.Equal(expected.M13, actual.M13, Precision);
