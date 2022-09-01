@@ -17,7 +17,8 @@ namespace OpenKh.Command.DoctChanger
         , typeof(CreateDummyDoctCommand)
         , typeof(ReadDoctCommand), typeof(ReadMapDoctCommand)
         , typeof(ShowStatsCommand)
-        , typeof(DumpDoctCommand))]
+        , typeof(DumpDoctCommand)
+        , typeof(ExposeMapDoctCommand))]
     class Program
     {
         static int Main(string[] args)
@@ -329,6 +330,41 @@ namespace OpenKh.Command.DoctChanger
             {
                 Console.WriteLine($"{coct.Entry1List.Count,8:#,##0} drawing mesh groups.");
                 Console.WriteLine($"{coct.Entry2List.Count,8:#,##0} drawing meshes.");
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "map file: map doct to fbx")]
+        private class ExposeMapDoctCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Map file input")]
+            public string MapIn { get; set; }
+
+            [Argument(1, Description = "Model file output (map.fbx)")]
+            public string ModelOut { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var doctBin = File.ReadAllBytes(MapIn);
+
+                var entries = File.OpenRead(MapIn).Using(s => Bar.Read(s));
+
+                var doctEntry = entries.Single(it => it.Type == Bar.EntryType.DrawOctalTree);
+
+                var doct = Doct.Read(doctEntry.Stream);
+
+                var modelOut = ModelOut ?? Path.GetFullPath(Path.GetFileNameWithoutExtension(MapIn) + ".DrawOctalTree.fbx");
+
+                Console.WriteLine($"Writing to: {modelOut}");
+
+                new ExposeMapDoctUtil().Export(
+                    doct,
+                    modelOut
+                );
+
+                return 0;
             }
         }
     }

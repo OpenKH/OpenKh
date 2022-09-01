@@ -1,16 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <OutputType>Exe</OutputType>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+        <ProjectReference Include="..\OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj" />
+    </ItemGroup>
 </Project>

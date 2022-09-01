@@ -1,4 +1,16 @@
-# [OpenKh Tool Documentation](../index.md) - DoctChanger
+# [OpenKh Tool Documentation](../index.md) - DoctChanger <!-- omit in toc -->
+
+TOC
+
+- [Overview](#overview)
+- [Command usage](#command-usage)
+  - [`create-dummy-doct` command](#create-dummy-doct-command)
+  - [`read-doct` command](#read-doct-command)
+  - [`use-this-doct` command](#use-this-doct-command)
+  - [`create-doct-for-map` command](#create-doct-for-map-command)
+  - [`read-map-doct` command](#read-map-doct-command)
+  - [`show-stats` command](#show-stats-command)
+  - [`expose-map-doct` command](#expose-map-doct-command)
 
 ## Overview
 
@@ -17,21 +29,22 @@ Applying empty doct will cause to disappear map mesh model:
 ## Command usage
 
 ```bat
-OpenKh.Command.DoctChanger.exe
-
 1.0.0
 
 Usage: OpenKh.Command.DoctChanger [command] [options]
 
 Options:
-  --version            Show version information
-  -?|-h|--help         Show help information
+  --version            Show version information.
+  -?|-h|--help         Show help information.
 
 Commands:
   create-doct-for-map  map file: create and set unoptimized doct for rendering entire map
   create-dummy-doct    doct file: create dummy
+  dump-doct            doct file: dump
+  expose-map-doct      map file: map doct to fbx
   read-doct            doct file: read
   read-map-doct        map file: read doct
+  show-stats           doct file: show stats
   use-this-doct        map file: replace doct with your doct
 
 Run 'OpenKh.Command.DoctChanger [command] -?|-h|--help' for more information about a command.
@@ -147,4 +160,17 @@ OpenKh.Command.DoctChanger.exe show-stats tt05.map
 # tt_0:0 (MeshOcclusion)
    1,320 drawing mesh groups.
    1,330 drawing meshes.
+```
+
+### `expose-map-doct` command
+
+Expose map doct entries1 as fbx model.
+
+1st param: specify `.map` file.
+2nd param: specify `.fbx` file (optional).
+
+```bat
+OpenKh.Command.DoctChanger expose-map-doct lk04.map
+
+Writing to: ...\lk04.DrawOctalTree.fbx
 ```

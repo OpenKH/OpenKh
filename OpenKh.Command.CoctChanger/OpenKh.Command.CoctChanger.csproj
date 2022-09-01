@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
+    <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
   </ItemGroup>
 
   <ItemGroup>
