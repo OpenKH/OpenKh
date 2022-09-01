@@ -100,7 +100,7 @@ namespace OpenKh.Kh2
 
                 stream.Position = baseOffset + RawMotionHeader.AnimationMatrixOffset;
                 AnimationMatrices = new List<Matrix4x4>();
-                while (stream.Position < RawMotionHeader.PositionMatrixOffset)
+                foreach (var _ in Enumerable.Repeat(0, RawMotionHeader.BoneCount * RawMotionHeader.TotalFrameCount))
                 {
                     AnimationMatrices.Add(stream.ReadMatrix4x4());
                 }
