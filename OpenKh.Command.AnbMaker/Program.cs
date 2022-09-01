@@ -68,8 +68,8 @@ namespace OpenKh.Command.AnbMaker
 
                 Console.WriteLine($"Writing to: {Output}");
 
-                //var fbxMesh = scene.Meshes.First();
-                var fbxArmatureRoot = scene.RootNode.FindNode(RootName ?? "kh_sk");
+                var fbxMesh = scene.Meshes.First();
+                var fbxArmatureRoot = scene.RootNode.FindNode(RootName ?? "bone000"); //"kh_sk"
                 var fbxArmatureNodes = FlattenNodes(fbxArmatureRoot);
                 var fbxArmatureBoneCount = fbxArmatureNodes.Length;
 
@@ -77,8 +77,7 @@ namespace OpenKh.Command.AnbMaker
 
                 var raw = RawMotion.CreateEmpty();
 
-                //var frameCount = (int)fbxAnim.DurationInTicks;
-                var frameCount = 1;
+                var frameCount = (int)fbxAnim.DurationInTicks;
 
                 raw.RawMotionHeader.BoneCount = fbxArmatureBoneCount;
                 raw.RawMotionHeader.FrameCount = frameCount;
@@ -99,7 +98,27 @@ namespace OpenKh.Command.AnbMaker
                             ? System.Numerics.Matrix4x4.Identity
                             : matrices[parentIdx];
 
-                        var absoluteMatrix = parentMatrix * GetDotNetMatrix(fbxArmatureNodes[boneIdx].ArmatureNode.Transform);
+                        var name = fbxArmatureNodes[boneIdx].ArmatureNode.Name;
+
+                        var hit = fbxAnim.NodeAnimationChannels.FirstOrDefault(it => it.NodeName == name);
+
+                        var translation = (hit == null)
+                            ? new Vector3D(0, 0, 0)
+                            : GetInterpolatedValue(hit.PositionKeys, frameIdx);
+
+                        var rotation = (hit == null)
+                            ? new Assimp.Quaternion(1, 0, 0, 0)
+                            : GetInterpolatedValue(hit.RotationKeys, frameIdx);
+
+                        var scale = (hit == null)
+                            ? new Vector3D(1, 1, 1)
+                            : GetInterpolatedValue(hit.ScalingKeys, frameIdx);
+
+                        var absoluteMatrix = System.Numerics.Matrix4x4.Identity
+                            * System.Numerics.Matrix4x4.CreateScale(ToDotNet(scale))
+                            * System.Numerics.Matrix4x4.CreateFromQuaternion(ToDotNet(rotation))
+                            * System.Numerics.Matrix4x4.CreateTranslation(ToDotNet(translation))
+                            * parentMatrix;
 
                         raw.AnimationMatrices.Add(absoluteMatrix);
                         matrices.Add(absoluteMatrix);
@@ -127,6 +146,74 @@ namespace OpenKh.Command.AnbMaker
 
                 return 0;
             }
+
+            private Assimp.Quaternion GetInterpolatedValue(List<QuaternionKey> keys, double time)
+            {
+                if (keys.Any())
+                {
+                    if (time < keys.First().Time)
+                    {
+                        return keys.First().Value;
+                    }
+                    if (keys.Last().Time < time)
+                    {
+                        return keys.Last().Value;
+                    }
+
+                    for (int x = 0, cx = keys.Count - 1; x < cx; x++)
+                    {
+                        var time0 = keys[x].Time;
+                        var time1 = keys[x + 1].Time;
+
+                        if (time0 <= time && time <= time1)
+                        {
+                            float ratio = (float)((time - time0) / (time1 - time0));
+
+                            return Assimp.Quaternion.Slerp(
+                                keys[x].Value,
+                                keys[x + 1].Value,
+                                ratio
+                            );
+                        }
+                    }
+                }
+
+                return new Assimp.Quaternion(1, 0, 0, 0);
+            }
+
+            private Vector3D GetInterpolatedValue(List<VectorKey> keys, double time)
+            {
+                if (keys.Any())
+                {
+                    if (time < keys.First().Time)
+                    {
+                        return keys.First().Value;
+                    }
+                    if (keys.Last().Time < time)
+                    {
+                        return keys.Last().Value;
+                    }
+
+                    for (int x = 0, cx = keys.Count - 1; x < cx; x++)
+                    {
+                        var time0 = keys[x].Time;
+                        var time1 = keys[x + 1].Time;
+
+                        if (time0 <= time && time <= time1)
+                        {
+                            float ratio = (float)((time - time0) / (time1 - time0));
+
+                            return (keys[x].Value * (1f - ratio)) + (keys[x + 1].Value * ratio);
+                        }
+                    }
+                }
+
+                return new Vector3D(0, 0, 0);
+            }
+
+            private System.Numerics.Quaternion ToDotNet(Assimp.Quaternion a) => new System.Numerics.Quaternion(a.X, a.Y, a.Z, a.W);
+
+            private Vector3 ToDotNet(Vector3D a) => new Vector3(a.X, a.Y, a.Z);
 
             private System.Numerics.Matrix4x4 GetDotNetMatrix(Assimp.Matrix4x4 transform)
             {
