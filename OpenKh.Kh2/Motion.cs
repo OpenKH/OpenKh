@@ -112,6 +112,68 @@ namespace OpenKh.Kh2
                     PositionMatrices.Add(stream.ReadMatrix4x4());
                 }
             }
+
+            private RawMotion()
+            {
+
+            }
+
+            public static RawMotion CreateEmpty()
+            {
+                return new RawMotion
+                {
+                    MotionHeader = new Header
+                    {
+                        Type = 1, // RAW
+                    },
+                    RawMotionHeader = new RawMotionHeader
+                    {
+                        Reserved = new uint[3],
+                        BoundingBox = new BoundingBox(),
+                        FrameData = new FrameData(),
+                    },
+                    AnimationMatrices = new List<Matrix4x4>(),
+                    PositionMatrices = new List<Matrix4x4>(),
+                };
+            }
+
+            public static void Write(Stream stream, RawMotion motion)
+            {
+                stream.Write(new byte[baseOffset]);
+
+                var topOffset = stream.Position;
+
+                var headerPos = stream.Position;
+                BinaryMapping.WriteObject(stream, motion.MotionHeader);
+                BinaryMapping.WriteObject(stream, motion.RawMotionHeader);
+
+                motion.RawMotionHeader.AnimationMatrixOffset = Convert.ToUInt32(stream.Position - topOffset);
+
+                foreach (var it in motion.AnimationMatrices)
+                {
+                    stream.Write(it);
+                }
+
+                if (motion.PositionMatrices.Any())
+                {
+                    motion.RawMotionHeader.PositionMatrixOffset = Convert.ToUInt32(stream.Position - topOffset);
+
+                    foreach (var it in motion.PositionMatrices)
+                    {
+                        stream.Write(it);
+                    }
+                }
+
+                motion.MotionHeader.ExtraOffset = Convert.ToInt32(stream.Position - topOffset);
+
+                var endPos = stream.Position;
+
+                stream.Position = headerPos;
+                BinaryMapping.WriteObject(stream, motion.MotionHeader);
+                BinaryMapping.WriteObject(stream, motion.RawMotionHeader);
+
+                stream.Position = endPos;
+            }
         }
 
         /*
@@ -185,7 +247,8 @@ namespace OpenKh.Kh2
 
                 stream.Position = baseOffset + InterpolatedMotionHeader.InitialPoseOffset;
                 InitialPoses = new List<InitialPose>();
-                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.InitialPoseCount)) {
+                foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.InitialPoseCount))
+                {
                     InitialPoses.Add(BinaryMapping.ReadObject<InitialPose>(stream));
                 }
 
@@ -239,10 +302,12 @@ namespace OpenKh.Kh2
                 foreach (int i in Enumerable.Range(0, InterpolatedMotionHeader.ConstraintCount))
                 {
                     Constraints.Add(BinaryMapping.ReadObject<Constraint>(stream));
-                    if (Constraints[i].ActivationCount != 0) {
+                    if (Constraints[i].ActivationCount != 0)
+                    {
                         activationCount += Constraints[i].ActivationCount;
                     }
-                    if (Constraints[i].LimiterId > limiterCount) {
+                    if (Constraints[i].LimiterId > limiterCount)
+                    {
                         limiterCount = Constraints[i].LimiterId;
                     }
                 }
@@ -370,7 +435,8 @@ namespace OpenKh.Kh2
             }
             public void alignStreamBytes(Stream stream, int alignToByte)
             {
-                while (stream.Length % alignToByte != 0) {
+                while (stream.Length % alignToByte != 0)
+                {
                     stream.WriteByte(0);
                 }
             }
@@ -426,7 +492,8 @@ namespace OpenKh.Kh2
             }
             public int alignOffsetBytes(int offset, int alignToByte)
             {
-                while (offset % alignToByte != 0) {
+                while (offset % alignToByte != 0)
+                {
                     offset++;
                 }
                 return offset;
@@ -450,7 +517,7 @@ namespace OpenKh.Kh2
             [Data] public short KeyStartId { get; set; }
 
             public override string ToString() =>
-                $"{JointId} {Transforms[Channel]} ({KeyStartId} - {KeyStartId + KeyCount -1})";
+                $"{JointId} {Transforms[Channel]} ({KeyStartId} - {KeyStartId + KeyCount - 1})";
         }
         public class Key
         {
@@ -926,7 +993,7 @@ namespace OpenKh.Kh2
             public FooterTable Footer { get; set; }
         }
 
-        
+
 
         public class BoneAnimationTableInternal
         {
