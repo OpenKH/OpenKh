@@ -44,7 +44,7 @@ namespace OpenKh.Command.DoctChanger.Utils
                     return meshIdx;
                 },
                 groupIdxToMesh: groupIdxToMesh,
-                bgMesh =>
+                tweakBgMesh: bgMesh =>
                 {
                     bgMesh.MaterialIndex = bgMatIdx;
                 }
@@ -74,7 +74,13 @@ namespace OpenKh.Command.DoctChanger.Utils
             private readonly Func<int, Mesh> _groupIdxToMesh;
             private readonly Action<Mesh> _tweakBgMesh;
 
-            internal Walker(Doct doct, Func<int, int> depthToMatIdx, Func<Mesh, int> addMeshToScene, Func<int, Mesh> groupIdxToMesh, Action<Mesh> tweakBgMesh)
+            internal Walker(
+                Doct doct, 
+                Func<int, int> depthToMatIdx, 
+                Func<Mesh, int> addMeshToScene, 
+                Func<int, Mesh> groupIdxToMesh, 
+                Action<Mesh> tweakBgMesh
+            )
             {
                 _doct = doct;
                 _depthToMatIdx = depthToMatIdx;

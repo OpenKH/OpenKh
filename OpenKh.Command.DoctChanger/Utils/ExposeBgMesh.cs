@@ -11,10 +11,10 @@ namespace OpenKh.Command.DoctChanger.Utils
 {
     internal class ExposeBgMesh
     {
-        private readonly Func<int, MeshDescriptor[]> _groupIdxToMeshDescs;
+        private readonly Func<int, (Vector3D[] vertices, int[] indices)[]> _groupIdxToMeshDescs;
 
         public ExposeBgMesh(
-            Func<int, MeshDescriptor[]> groupIdxToMeshDescs
+            Func<int, (Vector3D[] vertices, int[] indices)[]> groupIdxToMeshDescs
         )
         {
             _groupIdxToMeshDescs = groupIdxToMeshDescs;
@@ -24,16 +24,14 @@ namespace OpenKh.Command.DoctChanger.Utils
         {
             var mesh = new Mesh(PrimitiveType.Triangle);
 
-            foreach (var meshDesc in _groupIdxToMeshDescs(groupIdx))
+            foreach (var set in _groupIdxToMeshDescs(groupIdx))
             {
                 var topVertIdx = mesh.Vertices.Count;
 
-                mesh.Vertices.AddRange(
-                    meshDesc.Vertices
-                        .Select(vert => new Vector3D(vert.X, vert.Y, vert.Z))
-                );
+                mesh.Vertices.AddRange(set.vertices);
+
                 mesh.Faces.AddRange(
-                    meshDesc.Indices
+                    set.indices
                         .Buffer(3)
                         .Select(
                             triple => new Face(

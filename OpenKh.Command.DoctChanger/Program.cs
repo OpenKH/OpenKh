@@ -9,6 +9,7 @@ using System.Linq;
 using OpenKh.Kh2.Utils;
 using OpenKh.Command.DoctChanger.Utils;
 using OpenKh.Engine.Parsers;
+using Assimp;
 
 namespace OpenKh.Command.DoctChanger
 {
@@ -267,7 +268,7 @@ namespace OpenKh.Command.DoctChanger
                             .Select(
                                 index => new Doct.Entry2
                                 {
-                                    BoundingBox = new BoundingBox(
+                                    BoundingBox = new Kh2.Utils.BoundingBox(
                                         new System.Numerics.Vector3(-WorldBounds),
                                         new System.Numerics.Vector3(WorldBounds)
                                     )
@@ -373,15 +374,24 @@ namespace OpenKh.Command.DoctChanger
                 Console.WriteLine($"Writing to: {modelOut}");
 
                 var exposeBgMesh = new ExposeBgMesh(
-                    groupIdx => groupToVifParts[groupIdx]
-                        .Select(vifIdx => meshDescs[vifIdx])
-                        .ToArray()
+                    groupIdxToMeshDescs: groupIdx =>
+                    {
+                        return groupToVifParts[groupIdx]
+                            .Select(vifIdx => meshDescs[vifIdx])
+                            .Select(meshDesc => (
+                                meshDesc.Vertices
+                                    .Select(vert => new Vector3D(vert.X, vert.Y, vert.Z))
+                                    .ToArray(),
+                                meshDesc.Indices
+                            ))
+                            .ToArray();
+                    }
                 );
 
                 new ExposeMapDoctUtil().Export(
-                    doct,
-                    exposeBgMesh.GetMesh,
-                    modelOut
+                    doct: doct,
+                    groupIdxToMesh: exposeBgMesh.GetMesh,
+                    modelOut: modelOut
                 );
 
                 return 0;
