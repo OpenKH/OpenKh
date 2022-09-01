@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
+using static OpenKh.Bbs.Bbsa;
 using static OpenKh.Kh2.Motion;
 
 namespace OpenKh.Command.AnbMaker
@@ -68,7 +69,7 @@ namespace OpenKh.Command.AnbMaker
                 Console.WriteLine($"Writing to: {Output}");
 
                 //var fbxMesh = scene.Meshes.First();
-                var fbxArmatureRoot = FindNodeByName(scene.RootNode, RootName ?? "kh_sk");
+                var fbxArmatureRoot = scene.RootNode.FindNode(RootName ?? "kh_sk");
                 var fbxArmatureNodes = FlattenNodes(fbxArmatureRoot);
                 var fbxArmatureBoneCount = fbxArmatureNodes.Length;
 
@@ -164,28 +165,6 @@ namespace OpenKh.Command.AnbMaker
 
                 return list.ToArray();
             }
-
-            private Node FindNodeByName(Node topNode, string name)
-            {
-                var stack = new Stack<Node>();
-                stack.Push(topNode);
-
-                while (stack.Any())
-                {
-                    var node = stack.Pop();
-                    if (node.Name == name)
-                    {
-                        return node;
-                    }
-
-                    foreach (var sub in node.Children.Reverse())
-                    {
-                        stack.Push(sub);
-                    }
-                }
-
-                throw new Exception($"Node '{name}' not found");
-            }
         }
 
         [HelpOption]
@@ -200,6 +179,12 @@ namespace OpenKh.Command.AnbMaker
             [Argument(1, Description = "fbx output")]
             public string OutputFbx { get; set; }
 
+            private class MotionSet
+            {
+                internal RawMotion raw;
+                internal string name;
+            }
+
             protected int OnExecute(CommandLineApplication app)
             {
                 OutputFbx = Path.GetFullPath(OutputFbx ?? Path.GetFileNameWithoutExtension(InputMotion) + ".motion.fbx");
@@ -210,11 +195,49 @@ namespace OpenKh.Command.AnbMaker
                     File.ReadAllBytes(InputMotion)
                 );
 
-                var barA = Bar.Read(fileStream);
-                var barB = Bar.Read(barA.First(it => it.Type == Bar.EntryType.Anb).Stream);
-                var barMotionEntry = barB.Single(it => it.Type == Bar.EntryType.Motion);
+                var motionSetList = new List<MotionSet>();
 
-                var raw = new RawMotion(barMotionEntry.Stream);
+                string FilterName(string name) => name.Trim();
+
+                var barA = Bar.Read(fileStream);
+                if (barA.Any(it => it.Type == Bar.EntryType.Anb))
+                {
+                    // this is mset
+                    motionSetList.AddRange(
+                        barA
+                            .Where(barEntry => barEntry.Type == Bar.EntryType.Anb && barEntry.Stream.Length >= 16)
+                            .SelectMany(
+                                (barEntry, barEntryIndex) =>
+                                    Bar.Read(barEntry.Stream)
+                                        .Where(subBarEntry => subBarEntry.Type == Bar.EntryType.Motion)
+                                        .Select(
+                                            (subBarEntry, subBarEntryIndex) => new MotionSet
+                                            {
+                                                raw = new RawMotion(subBarEntry.Stream),
+                                                name = $"{barEntryIndex}_{FilterName(barEntry.Name)}_{subBarEntryIndex}_{FilterName(subBarEntry.Name)}",
+                                            }
+                                        )
+                            )
+                    );
+                }
+                else
+                {
+                    // this is anb
+                    motionSetList.AddRange(
+                        barA
+                            .Where(barEntry => barEntry.Type == Bar.EntryType.Motion)
+                            .Select(
+                                barEntry => new MotionSet
+                                {
+                                    raw = new RawMotion(barEntry.Stream),
+                                    name = $"{barEntry.Index}_{FilterName(barEntry.Name)}",
+                                }
+                            )
+                            .ToArray()
+                    );
+                }
+
+                var raw = motionSetList.First().raw;
 
                 Assimp.Scene scene = new Assimp.Scene();
                 scene.RootNode = new Assimp.Node("RootNode");
@@ -225,22 +248,28 @@ namespace OpenKh.Command.AnbMaker
                 var matIdx = scene.Materials.Count;
                 scene.Materials.Add(mat);
 
-                for (int x = 0; x < raw.RawMotionHeader.BoneCount; x++)
-                {
-                    var fbxMesh = new Mesh($"Bone{x}", PrimitiveType.Polygon);
-                    fbxMesh.MaterialIndex = matIdx;
+                var fbxMesh = new Mesh($"Mesh", PrimitiveType.Polygon);
+                fbxMesh.MaterialIndex = matIdx;
 
-                    var matrix = raw.AnimationMatrices[x];
+                var fbxBones = new List<Bone>();
+
+                var fbxBoneCount = raw.RawMotionHeader.BoneCount;
+
+                var fbxSkeletonRoot = new Node("Skeleton");
+                scene.RootNode.Children.Add(fbxSkeletonRoot);
+
+                for (int idx = 0; idx < fbxBoneCount; idx++)
+                {
+                    var matrix = raw.AnimationMatrices[idx];
 
                     Assimp.Vector3D ToFbxVector(Vector3 coord) => new Assimp.Vector3D(coord.X, coord.Y, coord.Z);
+
+                    var topVertIdx = fbxMesh.Vertices.Count;
 
                     void AddVert(float x, float y, float z) =>
                         fbxMesh.Vertices.Add(
                             ToFbxVector(
-                                Vector3.Transform(
-                                    new Vector3(x, y, z), 
-                                    matrix
-                                )
+                                new Vector3(x, y, z)
                             )
                         );
                     float margin = 1;
@@ -254,7 +283,9 @@ namespace OpenKh.Command.AnbMaker
                     AddVert(-margin, +margin, +margin);
                     AddVert(+margin, +margin, +margin);
 
-                    void AddFace(params int[] indices) => fbxMesh.Faces.Add(new Face(indices));
+                    var bottomVertIdx = fbxMesh.Vertices.Count;
+
+                    void AddFace(params int[] indices) => fbxMesh.Faces.Add(new Face(indices.Select(idx => topVertIdx + idx).ToArray()));
 
                     // left handed
                     AddFace(0, 1, 3, 2); // bottom
@@ -264,15 +295,105 @@ namespace OpenKh.Command.AnbMaker
                     AddFace(2, 6, 7, 3); // S
                     AddFace(0, 4, 6, 2); // W
 
-                    scene.Meshes.Add(fbxMesh);
-                    scene.RootNode.MeshIndices.Add(scene.Meshes.Count - 1);
+                    var fbxBone = new Bone(
+                        $"Bone{idx}",
+                        Matrix3x3.Identity,
+                        Enumerable.Range(topVertIdx, bottomVertIdx - topVertIdx)
+                            .Select(idx => new VertexWeight(idx, 1))
+                            .ToArray()
+                    );
+                    fbxBones.Add(fbxBone);
+                    fbxMesh.Bones.Add(fbxBone);
+
+                    var fbxSkeletonBone = new Node($"Bone{idx}");
+                    fbxSkeletonRoot.Children.Add(fbxSkeletonBone);
                 }
 
-                Assimp.AssimpContext context = new Assimp.AssimpContext();
-                context.ExportFile(scene, OutputFbx, "fbx");
+                scene.Meshes.Add(fbxMesh);
+                scene.RootNode.MeshIndices.Add(scene.Meshes.Count - 1);
+
+                foreach (var motionSet in motionSetList)
+                {
+                    var thisRaw = motionSet.raw;
+
+                    var total = thisRaw.RawMotionHeader.TotalFrameCount;
+
+                    var fbxAnim = new Assimp.Animation();
+                    fbxAnim.Name = motionSet.name;
+                    fbxAnim.DurationInTicks = total;
+                    fbxAnim.TicksPerSecond = thisRaw.RawMotionHeader.FrameData.FramesPerSecond;
+
+                    for (int boneIdx = 0; boneIdx < thisRaw.RawMotionHeader.BoneCount; boneIdx++)
+                    {
+                        var fbxAnimChannel = new NodeAnimationChannel();
+                        fbxAnimChannel.NodeName = $"Bone{boneIdx}";
+
+                        for (int step = 0; step < total; step++)
+                        {
+                            var time = step / fbxAnim.TicksPerSecond;
+
+                            var matrix = thisRaw.AnimationMatrices[fbxBoneCount * step + boneIdx];
+
+                            System.Numerics.Matrix4x4.Decompose(
+                                matrix,
+                                out Vector3 scale,
+                                out System.Numerics.Quaternion rotation,
+                                out Vector3 translation
+                            );
+
+                            fbxAnimChannel.PositionKeys.Add(
+                                new VectorKey(
+                                    time,
+                                    new Vector3D(translation.X, translation.Y, translation.Z)
+                                )
+                            );
+
+                            fbxAnimChannel.RotationKeys.Add(
+                                new QuaternionKey(
+                                    time,
+                                    new Assimp.Quaternion(rotation.W, rotation.X, rotation.Y, rotation.Z)
+                                )
+                            );
+
+                            fbxAnimChannel.ScalingKeys.Add(
+                                new VectorKey(
+                                    time,
+                                    new Vector3D(scale.X, scale.Y, scale.Z)
+                                )
+                            );
+                        }
+
+                        fbxAnim.NodeAnimationChannels.Add(fbxAnimChannel);
+
+                    }
+
+                    scene.Animations.Add(fbxAnim);
+
+                    // One animation per one fbx.
+                    // Multiple animations cannot read by Blender.
+                    Assimp.AssimpContext context = new Assimp.AssimpContext();
+                    context.ExportFile(scene, OutputFbx + $".{motionSet.name}.fbx", "fbx");
+
+                    scene.Animations.Remove(fbxAnim);
+                }
 
                 return 0;
             }
+
+            private Assimp.Matrix4x4 ToFbx4x4(System.Numerics.Matrix4x4 m) =>
+                new Assimp.Matrix4x4(
+                    m.M11, m.M12, m.M13, m.M14,
+                    m.M21, m.M22, m.M23, m.M24,
+                    m.M31, m.M32, m.M33, m.M34,
+                    m.M41, m.M42, m.M43, m.M44
+                );
+
+            private Matrix3x3 ToFbx3x3(System.Numerics.Matrix4x4 m) =>
+                new Matrix3x3(
+                    m.M11, m.M12, m.M13,
+                    m.M21, m.M22, m.M23,
+                    m.M31, m.M32, m.M33
+                );
 
             private System.Numerics.Matrix4x4 GetDotNetMatrix(Assimp.Matrix4x4 transform)
             {
