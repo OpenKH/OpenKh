@@ -10,9 +10,18 @@ namespace OpenKh.Command.DoctChanger.Utils
 {
     public class ExposeMapDoctUtil
     {
-        internal void Export(Doct doct, string modelOut)
+        internal void Export(Doct doct, Func<int, Mesh> groupIdxToMesh, string modelOut)
         {
             var scene = GetBaseScene();
+
+            int bgMatIdx;
+            {
+                var mat = new Material();
+                mat.Name = $"BackgroundModel";
+                mat.ColorDiffuse = new Color4D(0, 1f, 0);
+                bgMatIdx = (scene.Materials.Count);
+                scene.Materials.Add(mat);
+            }
 
             var depthMatIdx = new List<int>();
 
@@ -33,6 +42,11 @@ namespace OpenKh.Command.DoctChanger.Utils
                     var meshIdx = scene.Meshes.Count;
                     scene.Meshes.Add(mesh);
                     return meshIdx;
+                },
+                groupIdxToMesh: groupIdxToMesh,
+                bgMesh =>
+                {
+                    bgMesh.MaterialIndex = bgMatIdx;
                 }
             )
                 .Walk(
@@ -54,15 +68,19 @@ namespace OpenKh.Command.DoctChanger.Utils
 
         private class Walker
         {
-            private Doct doct;
-            private Func<int, int> depthToMatIdx;
-            private Func<Mesh, int> addMeshToScene;
+            private readonly Doct _doct;
+            private readonly Func<int, int> _depthToMatIdx;
+            private readonly Func<Mesh, int> _addMeshToScene;
+            private readonly Func<int, Mesh> _groupIdxToMesh;
+            private readonly Action<Mesh> _tweakBgMesh;
 
-            internal Walker(Doct doct, Func<int, int> depthToMatIdx, Func<Mesh, int> addMeshToScene)
+            internal Walker(Doct doct, Func<int, int> depthToMatIdx, Func<Mesh, int> addMeshToScene, Func<int, Mesh> groupIdxToMesh, Action<Mesh> tweakBgMesh)
             {
-                this.doct = doct;
-                this.depthToMatIdx = depthToMatIdx;
-                this.addMeshToScene = addMeshToScene;
+                _doct = doct;
+                _depthToMatIdx = depthToMatIdx;
+                _addMeshToScene = addMeshToScene;
+                _groupIdxToMesh = groupIdxToMesh;
+                _tweakBgMesh = tweakBgMesh;
             }
 
             internal void Walk(
@@ -71,7 +89,7 @@ namespace OpenKh.Command.DoctChanger.Utils
                 IEnumerable<int> ancestors
             )
             {
-                var entry1 = doct.Entry1List[entry1Idx];
+                var entry1 = _doct.Entry1List[entry1Idx];
                 var bbox = entry1.BoundingBox;
 
                 var depth = ancestors.Count();
@@ -79,16 +97,18 @@ namespace OpenKh.Command.DoctChanger.Utils
                 var mesh = new Mesh(PrimitiveType.Polygon);
                 mesh.Name = $"Mesh{entry1Idx}_D{depth}_{string.Join("_", ancestors)}";
 
-                mesh.Vertices.Add(new Vector3D(bbox.MinX, bbox.MinY, bbox.MinZ));
-                mesh.Vertices.Add(new Vector3D(bbox.MaxX, bbox.MinY, bbox.MinZ));
-                mesh.Vertices.Add(new Vector3D(bbox.MinX, bbox.MaxY, bbox.MinZ));
-                mesh.Vertices.Add(new Vector3D(bbox.MaxX, bbox.MaxY, bbox.MinZ));
-                mesh.Vertices.Add(new Vector3D(bbox.MinX, bbox.MinY, bbox.MaxZ));
-                mesh.Vertices.Add(new Vector3D(bbox.MaxX, bbox.MinY, bbox.MaxZ));
-                mesh.Vertices.Add(new Vector3D(bbox.MinX, bbox.MaxY, bbox.MaxZ));
-                mesh.Vertices.Add(new Vector3D(bbox.MaxX, bbox.MaxY, bbox.MaxZ));
+                void AddVert(float x, float y, float z) => mesh.Vertices.Add(new Vector3D(x, -y, -z));
 
-                mesh.MaterialIndex = depthToMatIdx(depth);
+                AddVert(bbox.MinX, bbox.MinY, bbox.MinZ);
+                AddVert(bbox.MaxX, bbox.MinY, bbox.MinZ);
+                AddVert(bbox.MinX, bbox.MaxY, bbox.MinZ);
+                AddVert(bbox.MaxX, bbox.MaxY, bbox.MinZ);
+                AddVert(bbox.MinX, bbox.MinY, bbox.MaxZ);
+                AddVert(bbox.MaxX, bbox.MinY, bbox.MaxZ);
+                AddVert(bbox.MinX, bbox.MaxY, bbox.MaxZ);
+                AddVert(bbox.MaxX, bbox.MaxY, bbox.MaxZ);
+
+                mesh.MaterialIndex = _depthToMatIdx(depth);
 
                 void AddFace(params int[] indices) => mesh.Faces.Add(new Face(indices));
 
@@ -113,7 +133,17 @@ namespace OpenKh.Command.DoctChanger.Utils
                     );
                 }
 
-                node.MeshIndices.Add(addMeshToScene(mesh));
+                node.MeshIndices.Add(_addMeshToScene(mesh));
+
+                for (int x = entry1.Entry2Index; x < entry1.Entry2LastIndex; x++)
+                {
+                    var backgroundMesh = _groupIdxToMesh(x);
+                    backgroundMesh.Name = $"Mesh{entry1Idx}_Group{x}_{backgroundMesh.FaceCount}Tris";
+
+                    _tweakBgMesh(backgroundMesh);
+
+                    node.MeshIndices.Add(_addMeshToScene(backgroundMesh));
+                }
             }
         }
     }

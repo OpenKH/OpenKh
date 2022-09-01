@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Linq;
 using OpenKh.Kh2.Utils;
 using OpenKh.Command.DoctChanger.Utils;
+using OpenKh.Engine.Parsers;
 
 namespace OpenKh.Command.DoctChanger
 {
@@ -355,12 +356,31 @@ namespace OpenKh.Command.DoctChanger
 
                 var doct = Doct.Read(doctEntry.Stream);
 
+                var modelEntry = entries.First(it => it.Type == Bar.EntryType.Model);
+
+                var mdlx = Mdlx.Read(modelEntry.Stream);
+                if (!mdlx.IsMap)
+                {
+                    throw new NotSupportedException("!IsMap");
+                }
+
+                var groupToVifParts = mdlx.ModelBackground.vifPacketRenderingGroup;
+                var mdlxParser = new MdlxParser(mdlx);
+                var meshDescs = mdlxParser.MeshDescriptors;
+
                 var modelOut = ModelOut ?? Path.GetFullPath(Path.GetFileNameWithoutExtension(MapIn) + ".DrawOctalTree.fbx");
 
                 Console.WriteLine($"Writing to: {modelOut}");
 
+                var exposeBgMesh = new ExposeBgMesh(
+                    groupIdx => groupToVifParts[groupIdx]
+                        .Select(vifIdx => meshDescs[vifIdx])
+                        .ToArray()
+                );
+
                 new ExposeMapDoctUtil().Export(
                     doct,
+                    exposeBgMesh.GetMesh,
                     modelOut
                 );
 
