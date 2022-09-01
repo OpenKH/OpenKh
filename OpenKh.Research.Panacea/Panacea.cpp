@@ -122,7 +122,39 @@ public:
     FakePackageFile()
     {
         strcpy(PkgFileName, "ModFiles");
-        std::string& basepath = OpenKH::m_ModPath;
+        ScanFolder(OpenKH::m_ModPath);
+        std::string rawfol = OpenKH::m_ModPath + "\\raw";
+        ScanFolder(rawfol);
+    }
+
+    bool OpenFile(const char* a1, const char* a2)
+    {
+        const char* fn;
+        if (a2)
+            fn = a1 + strlen(a2) + 1;
+        else
+            fn = a1 + strlen(BasePath) + 1;
+        auto result = fileData.find(fn);
+        if (result != fileData.end())
+        {
+            strcpy_s(CurrentFileName, a1);
+            HeaderData = &result->second.Header;
+            CurrentFileData = result->second.FileInfo;
+            FileDataCopy = result->second.FileInfo;
+            return true;
+        }
+        memset(CurrentFileName, 0, sizeof(CurrentFileName));
+        HeaderData = nullptr;
+        memset(&CurrentFileData, 0, sizeof(CurrentFileData));
+        memset(&FileDataCopy, 0, sizeof(FileDataCopy));
+        return false;
+    }
+
+    void OtherFunc() {}
+
+private:
+    void ScanFolder(std::string& basepath)
+    {
         std::queue<std::string> folq;
         folq.push(basepath);
         while (!folq.empty())
@@ -165,32 +197,6 @@ public:
         }
     }
 
-    bool OpenFile(const char* a1, const char* a2)
-    {
-        const char* fn;
-        if (a2)
-            fn = a1 + strlen(a2) + 1;
-        else
-            fn = a1 + strlen(BasePath) + 1;
-        auto result = fileData.find(fn);
-        if (result != fileData.end())
-        {
-            strcpy_s(CurrentFileName, a1);
-            HeaderData = &result->second.Header;
-            CurrentFileData = result->second.FileInfo;
-            FileDataCopy = result->second.FileInfo;
-            return true;
-        }
-        memset(CurrentFileName, 0, sizeof(CurrentFileName));
-        HeaderData = nullptr;
-        memset(&CurrentFileData, 0, sizeof(CurrentFileData));
-        memset(&FileDataCopy, 0, sizeof(FileDataCopy));
-        return false;
-    }
-
-    void OtherFunc() {}
-
-private:
     std::map<std::string, ModFileInfo> fileData;
 };
 
