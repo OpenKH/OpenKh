@@ -143,6 +143,7 @@ namespace OpenKh.Command.AnbMaker
                 );
 
                 File.WriteAllBytes(Output, anbBarStream.ToArray());
+                File.WriteAllBytes(Output + ".raw", rawMotionStream.ToArray());
 
                 return 0;
             }
