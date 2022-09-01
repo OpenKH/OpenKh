@@ -34,6 +34,9 @@ TOC
   - [cameraFlags](#cameraflags)
   - [lightClip](#lightclip)
   - [lightFlags](#lightflags)
+  - [noShadow](#noshadow)
+  - [alphaAdd](#alphaadd)
+  - [alphaSubtract](#alphasubtract)
   - [bar](#bar)
   - [nococt](#nococt)
   - [nodoct](#nodoct)
@@ -395,6 +398,27 @@ This is Collision.Attributes (surfaceFlags) of light collision data.
   noclip: true
   lightClip: true
   lightFlags: 0x000803F1
+```
+
+### noShadow
+
+```yml
+- name: 'floor'
+  noShadow: true
+```
+
+### alphaAdd
+
+```yml
+- name: 'floor'
+  alphaAdd: true
+```
+
+### alphaSubtract
+
+```yml
+- name: 'floor'
+  alphaSubtract: true
 ```
 
 ### bar

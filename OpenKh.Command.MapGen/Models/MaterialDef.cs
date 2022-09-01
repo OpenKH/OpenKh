@@ -98,6 +98,21 @@ namespace OpenKh.Command.MapGen.Models
         /// </summary>
         public int lightFlags { get; set; }
 
+        /// <summary>
+        /// Drop no shadow?
+        /// </summary>
+        public bool noShadow { get; set; }
+
+        /// <summary>
+        /// Additive alpha blending?
+        /// </summary>
+        public bool alphaAdd { get; set; }
+
+        /// <summary>
+        /// Subtractive alpha blending?
+        /// </summary>
+        public bool alphaSubtract { get; set; }
+
         public static MaterialDef CreateFallbackFor(string name) =>
             new MaterialDef
             {

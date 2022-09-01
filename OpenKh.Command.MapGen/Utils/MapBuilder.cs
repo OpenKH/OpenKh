@@ -138,6 +138,16 @@ namespace OpenKh.Command.MapGen.Utils
                                     },
                                     TransparencyFlag = matDef.transparentFlag ?? 0,
                                     UVScrollIndex = matDef.uvscIndex ?? 0,
+                                    IsShadowOff = matDef.noShadow,
+                                    IsAlphaAdd = matDef.alphaAdd,
+                                    IsAlphaSubtract = matDef.alphaSubtract,
+                                    IsAlpha = ((matDef.transparentFlag ?? 0) != 0) ? true : false,
+
+                                    // imitation of MAP file from PC version
+                                    Priority = 16,
+                                    DrawPriority = 16,
+                                    IsMulti = true,
+                                    PolygonCount = Convert.ToInt16(subMicroMesh.VertPairsList.Count - 2),
                                 }
                             );
                         }
