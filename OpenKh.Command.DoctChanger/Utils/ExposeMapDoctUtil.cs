@@ -1,5 +1,4 @@
 using Assimp;
-using OpenKh.AssimpUtils;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ namespace OpenKh.Command.DoctChanger.Utils
     {
         internal void Export(Doct doct, string modelOut)
         {
-            var scene = AssimpGeneric.GetBaseScene();
+            var scene = GetBaseScene();
 
             var depthMatIdx = new List<int>();
 
@@ -42,7 +41,15 @@ namespace OpenKh.Command.DoctChanger.Utils
                     ancestors: new int[0]
                 );
 
-            AssimpGeneric.ExportScene(scene, AssimpGeneric.FileFormat.fbx, modelOut);
+            Assimp.AssimpContext context = new Assimp.AssimpContext();
+            context.ExportFile(scene, modelOut, "fbx");
+        }
+
+        private static Scene GetBaseScene()
+        {
+            Assimp.Scene scene = new Assimp.Scene();
+            scene.RootNode = new Assimp.Node("RootNode");
+            return scene;
         }
 
         private class Walker
