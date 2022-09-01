@@ -20,7 +20,7 @@
     
   <ItemGroup>
     <PackageReference Include="ColorPickerWPF" Version="1.0.9" />
-    <PackageReference Include="YamlDotNet" Version="11.2.1" />
+    <PackageReference Include="YamlDotNet" Version="12.0.0" />
   </ItemGroup>
       
 </Project>

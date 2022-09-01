@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using OpenKh.Engine;
 using OpenKh.Engine.Renderers;
 using OpenKh.Engine.Renders;
@@ -402,10 +402,10 @@ namespace OpenKh.Tests.Engine
 
             expected = ColorF.FromRgba(expected.ToRgba());
             Assert.True(messageRenderer.HasBeenCalled);
-            Assert.Equal(expected.R, messageRenderer.LastColor.R, 2);
-            Assert.Equal(expected.G, messageRenderer.LastColor.G, 2);
-            Assert.Equal(expected.B, messageRenderer.LastColor.B, 2);
-            Assert.Equal(expected.A, messageRenderer.LastColor.A, 2);
+            Assert.Equal(expected.R, messageRenderer.LastColor.R, 2f);
+            Assert.Equal(expected.G, messageRenderer.LastColor.G, 2f);
+            Assert.Equal(expected.B, messageRenderer.LastColor.B, 2f);
+            Assert.Equal(expected.A, messageRenderer.LastColor.A, 2f);
         }
     }
 }
