@@ -156,6 +156,9 @@ namespace OpenKh.Command.AnbMaker
             [Option(Description = "specify mesh name to read bone data", ShortName = "m")]
             public string MeshName { get; set; }
 
+            [Option(Description = "apply scaling to each source node", ShortName = "x")]
+            public float NodeScaling { get; set; } = 1;
+
             [Option(Description = "specify animation name to read bone data", ShortName = "a")]
             public string AnimationName { get; set; }
 
@@ -173,6 +176,10 @@ namespace OpenKh.Command.AnbMaker
                 var scene = assimp.ImportFile(InputModel, Assimp.PostProcessSteps.None);
 
                 Output = Path.GetFullPath(Output ?? Path.GetFileNameWithoutExtension(InputModel) + ".anb");
+
+                var nodeFix = System.Numerics.Matrix4x4.CreateScale(
+                    NodeScaling
+                );
 
                 Console.WriteLine($"Writing to: {Output}");
 
@@ -233,12 +240,12 @@ namespace OpenKh.Command.AnbMaker
                             : hit.ScalingKeys.GetInterpolatedVector(frameIdx);
 
                         var absoluteMatrix = System.Numerics.Matrix4x4.Identity
-                            * System.Numerics.Matrix4x4.CreateScale(scale.ToDotNetVector3())
                             * System.Numerics.Matrix4x4.CreateFromQuaternion(rotation.ToDotNetQuaternion())
+                            * System.Numerics.Matrix4x4.CreateScale(scale.ToDotNetVector3())
                             * System.Numerics.Matrix4x4.CreateTranslation(translation.ToDotNetVector3())
                             * parentMatrix;
 
-                        raw.AnimationMatrices.Add(absoluteMatrix);
+                        raw.AnimationMatrices.Add(nodeFix * absoluteMatrix);
                         matrices.Add(absoluteMatrix);
                     }
                 }
