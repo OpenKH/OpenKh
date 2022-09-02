@@ -30,6 +30,7 @@ If you have never used the command line before or have used it very little, fear
 |[DOCT](../kh2/file/type/doct.md) | [OpenKh.Command.DoctChanger](./CLI.DoctChanger/index.md)
 |[COCT](../kh2/file/type/coct.md) | [OpenKh.Command.CoctChanger](./CLI.CoctChanger/index.md)
 |[MAP](../kh2/file/map.md) | [OpenKh.Command.MapGen](./CLI.MapGen/index.md)
+|[ANB](../kh2/file/anb/anb.md) | [OpenKh.Command.AnbMaker](./CLI.AnbMaker/index.md)
 |[00battle](../kh2/file/type/00battle.md) | OpenKh.Tools.LevelUpEditor
 |[00objentry](../kh2/file/type/00objentry.md) | OpenKh.Tools.ObjentryEditor
 |[00place](../kh2/file/type/place.md) | OpenKh.Tools.Kh2PlaceEditor

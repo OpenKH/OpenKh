@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Kh2.SystemData;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -372,67 +373,164 @@ namespace OpenKh.Kh2
                 Stream stream = new MemoryStream();
                 BinaryWriter writer = new BinaryWriter(stream);
 
-                recalcHeaderData();
                 stream.Write(new byte[baseOffset]);
 
+                var headerPos = stream.Position;
                 BinaryMapping.WriteObject(stream, MotionHeader);
                 BinaryMapping.WriteObject(stream, InterpolatedMotionHeader);
+
+                int GetOffset(long position) => Convert.ToInt32(position - baseOffset);
+
+                InterpolatedMotionHeader.TotalBoneCount = (short)(InterpolatedMotionHeader.BoneCount + IKHelpers.Count);
+
+                InterpolatedMotionHeader.InitialPoseOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.InitialPoseCount = InitialPoses.Count;
 
                 foreach (InitialPose item in InitialPoses)
                     BinaryMapping.WriteObject(stream, item);
 
+                InterpolatedMotionHeader.FCurveForwardOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.FCurveForwardCount = FCurvesForward.Count;
+
                 foreach (FCurve item in FCurvesForward)
                     BinaryMapping.WriteObject(stream, item);
+
+                InterpolatedMotionHeader.FCurveInverseOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.FCurveInverseCount = FCurvesInverse.Count;
 
                 foreach (FCurve item in FCurvesInverse)
                     BinaryMapping.WriteObject(stream, item);
 
+                InterpolatedMotionHeader.FCurveKeyOffset = GetOffset(stream.Position);
+
                 foreach (Key item in FCurveKeys)
                     BinaryMapping.WriteObject(stream, item);
+
+                InterpolatedMotionHeader.KeyTimeOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.KeyTimeCount = KeyTimes.Count;
 
                 alignStreamBytes(stream, 4);
                 foreach (float item in KeyTimes)
                     writer.Write(item);
 
+                InterpolatedMotionHeader.KeyValueOffset = GetOffset(stream.Position);
+
                 foreach (float item in KeyValues)
                     writer.Write(item);
+
+                InterpolatedMotionHeader.KeyTangentOffset = GetOffset(stream.Position);
 
                 foreach (float item in KeyTangents)
                     writer.Write(item);
 
+                InterpolatedMotionHeader.ConstraintCount = Constraints.Count;
+                InterpolatedMotionHeader.ConstraintOffset = GetOffset(stream.Position);
+
                 foreach (Constraint item in Constraints)
                     BinaryMapping.WriteObject(stream, item);
 
+                InterpolatedMotionHeader.ConstraintActivationOffset = GetOffset(stream.Position);
+
                 foreach (ConstraintActivation item in ConstraintActivations)
                     BinaryMapping.WriteObject(stream, item);
+
+                InterpolatedMotionHeader.LimiterOffset = GetOffset(stream.Position);
 
                 alignStreamBytes(stream, 16);
                 foreach (Limiter item in Limiters)
                     BinaryMapping.WriteObject(stream, item);
 
+                InterpolatedMotionHeader.ExpressionOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.ExpressionCount = Expressions.Count;
+
                 foreach (Expression item in Expressions)
                     BinaryMapping.WriteObject(stream, item);
 
+                InterpolatedMotionHeader.ExpressionNodeOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.ExpressionNodeCount = ExpressionNodes.Count;
+
                 foreach (ExpressionNode item in ExpressionNodes)
                     BinaryMapping.WriteObject(stream, item);
+
+                InterpolatedMotionHeader.IKHelperOffset = GetOffset(stream.Position);
 
                 alignStreamBytes(stream, 16);
                 foreach (IKHelper item in IKHelpers)
                     BinaryMapping.WriteObject(stream, item);
 
+                InterpolatedMotionHeader.JointOffset = GetOffset(stream.Position);
+
                 foreach (Joint item in Joints)
                     BinaryMapping.WriteObject(stream, item);
 
+                InterpolatedMotionHeader.RootPositionOffset = GetOffset(stream.Position);
+
                 alignStreamBytes(stream, 16);
                 BinaryMapping.WriteObject(stream, RootPosition);
+
+                InterpolatedMotionHeader.ExternalEffectorOffset = GetOffset(stream.Position);
 
                 foreach (ExternalEffector item in ExternalEffectors)
                     BinaryMapping.WriteObject(stream, item);
                 alignStreamBytes(stream, 16);
 
+                MotionHeader.ExtraOffset = GetOffset(stream.Position);
+
+                stream.Position = headerPos;
+                BinaryMapping.WriteObject(stream, MotionHeader);
+                BinaryMapping.WriteObject(stream, InterpolatedMotionHeader);
+
                 stream.Position = 0;
                 return stream;
             }
+
+            private InterpolatedMotion()
+            {
+            }
+
+            public static InterpolatedMotion CreateEmpty()
+            {
+                return new InterpolatedMotion
+                {
+                    MotionHeader = new Header
+                    {
+                        Type = 0, // interpolated version
+                        SubType = 0, // normal
+                    },
+                    InterpolatedMotionHeader = new InterpolatedMotionHeader
+                    {
+                        BoundingBox = new BoundingBox(),
+                        FrameData = new FrameData
+                        {
+
+                        },
+                        Reserved = new int[3],
+                    },
+                    InitialPoses = new List<InitialPose>(),
+                    FCurvesForward = new List<FCurve>(),
+                    FCurvesInverse = new List<FCurve>(),
+                    FCurveKeys = new List<Key>(),
+                    KeyTimes = new List<float>(),
+                    KeyValues = new List<float>(),
+                    KeyTangents = new List<float>(),
+                    Constraints = new List<Constraint>(),
+                    ConstraintActivations = new List<ConstraintActivation>(),
+                    Limiters = new List<Limiter>(),
+                    Expressions = new List<Expression>(),
+                    ExpressionNodes = new List<ExpressionNode>(),
+                    IKHelpers = new List<IKHelper>(),
+                    Joints = new List<Joint>(),
+                    RootPosition = new RootPosition
+                    {
+                        ScaleX = 1,
+                        ScaleY = 1,
+                        ScaleZ = 1,
+                        FCurveId = new int[9],
+                    },
+                    ExternalEffectors = new List<ExternalEffector>(),
+                };
+            }
+
             public void alignStreamBytes(Stream stream, int alignToByte)
             {
                 while (stream.Length % alignToByte != 0)
@@ -441,55 +539,6 @@ namespace OpenKh.Kh2
                 }
             }
 
-            public void recalcHeaderData()
-            {
-                InterpolatedMotionHeader.TotalBoneCount = (short)(InterpolatedMotionHeader.BoneCount + IKHelpers.Count);
-
-                InterpolatedMotionHeader.InitialPoseCount = InitialPoses.Count;
-
-                InterpolatedMotionHeader.FCurveForwardOffset = InterpolatedMotionHeader.InitialPoseOffset + (InterpolatedMotionHeader.InitialPoseCount * 8);
-                InterpolatedMotionHeader.FCurveForwardCount = FCurvesForward.Count;
-
-                InterpolatedMotionHeader.FCurveInverseOffset = InterpolatedMotionHeader.FCurveForwardOffset + (InterpolatedMotionHeader.FCurveForwardCount * 6);
-                InterpolatedMotionHeader.FCurveInverseCount = FCurvesInverse.Count;
-
-                InterpolatedMotionHeader.FCurveKeyOffset = InterpolatedMotionHeader.FCurveInverseOffset + (InterpolatedMotionHeader.FCurveInverseCount * 6);
-
-                InterpolatedMotionHeader.KeyTimeOffset = InterpolatedMotionHeader.FCurveKeyOffset + (FCurveKeys.Count * 8);
-                InterpolatedMotionHeader.KeyTimeCount = KeyTimes.Count;
-                InterpolatedMotionHeader.KeyTimeOffset = alignOffsetBytes(InterpolatedMotionHeader.KeyTimeOffset, 4);
-
-                InterpolatedMotionHeader.KeyValueOffset = InterpolatedMotionHeader.KeyTimeOffset + (InterpolatedMotionHeader.KeyTimeCount * 4);
-
-                InterpolatedMotionHeader.KeyTangentOffset = InterpolatedMotionHeader.KeyValueOffset + (KeyValues.Count * 4);
-
-                InterpolatedMotionHeader.ConstraintOffset = InterpolatedMotionHeader.KeyTangentOffset + (KeyTangents.Count * 4);
-                InterpolatedMotionHeader.ConstraintCount = Constraints.Count;
-
-                InterpolatedMotionHeader.ConstraintActivationOffset = InterpolatedMotionHeader.ConstraintOffset + (InterpolatedMotionHeader.ConstraintCount * 12);
-
-                InterpolatedMotionHeader.LimiterOffset = InterpolatedMotionHeader.ConstraintActivationOffset + (ConstraintActivations.Count * 8);
-                InterpolatedMotionHeader.LimiterOffset = alignOffsetBytes(InterpolatedMotionHeader.LimiterOffset, 16);
-
-                InterpolatedMotionHeader.ExpressionOffset = InterpolatedMotionHeader.LimiterOffset + (Limiters.Count * 48);
-                InterpolatedMotionHeader.ExpressionCount = Expressions.Count;
-
-                InterpolatedMotionHeader.ExpressionNodeOffset = InterpolatedMotionHeader.ExpressionOffset + (InterpolatedMotionHeader.ExpressionCount * 8);
-                InterpolatedMotionHeader.ExpressionNodeCount = ExpressionNodes.Count;
-
-                InterpolatedMotionHeader.IKHelperOffset = InterpolatedMotionHeader.ExpressionNodeOffset + (InterpolatedMotionHeader.ExpressionNodeCount * 12);
-                InterpolatedMotionHeader.IKHelperOffset = alignOffsetBytes(InterpolatedMotionHeader.IKHelperOffset, 16);
-
-                InterpolatedMotionHeader.JointOffset = InterpolatedMotionHeader.IKHelperOffset + (IKHelpers.Count * 64);
-
-                InterpolatedMotionHeader.RootPositionOffset = InterpolatedMotionHeader.JointOffset + (Joints.Count * 4);
-                InterpolatedMotionHeader.RootPositionOffset = alignOffsetBytes(InterpolatedMotionHeader.RootPositionOffset, 16);
-
-                InterpolatedMotionHeader.ExternalEffectorOffset = InterpolatedMotionHeader.RootPositionOffset + 84;
-
-                MotionHeader.ExtraOffset = InterpolatedMotionHeader.ExternalEffectorOffset + (ExternalEffectors.Count * 2);
-                MotionHeader.ExtraOffset = alignOffsetBytes(MotionHeader.ExtraOffset, 16);
-            }
             public int alignOffsetBytes(int offset, int alignToByte)
             {
                 while (offset % alignToByte != 0)

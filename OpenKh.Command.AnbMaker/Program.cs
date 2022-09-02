@@ -1,5 +1,6 @@
 using Assimp;
 using McMaster.Extensions.CommandLineUtils;
+using NLog;
 using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Command.AnbMaker.Models;
 using OpenKh.Command.AnbMaker.Utils;
@@ -10,8 +11,10 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
+using YamlDotNet.Core.Tokens;
 using static OpenKh.Bbs.Bbsa;
 using static OpenKh.Kh2.Motion;
+using Key = OpenKh.Kh2.Motion.Key;
 
 namespace OpenKh.Command.AnbMaker
 {
@@ -19,6 +22,7 @@ namespace OpenKh.Command.AnbMaker
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(typeof(AnbCommand))]
     [Subcommand(typeof(ExportRawCommand))]
+    [Subcommand(typeof(AnbExCommand))]
     internal class Program
     {
         private static string GetVersion()
@@ -34,23 +38,109 @@ namespace OpenKh.Command.AnbMaker
         {
             try
             {
-                return CommandLineApplication.Execute<Program>(args);
+                try
+                {
+                    return CommandLineApplication.Execute<Program>(args);
+                }
+                catch (FileNotFoundException e)
+                {
+                    Console.WriteLine($"The file {e.FileName} cannot be found. The program will now exit.");
+                    return 1;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"FATAL ERROR: {e.Message}\n{e.StackTrace}");
+                    return 1;
+                }
             }
-            catch (FileNotFoundException e)
+            finally
             {
-                Console.WriteLine($"The file {e.FileName} cannot be found. The program will now exit.");
-                return 1;
+                LogManager.Shutdown();
             }
-            catch (Exception e)
+        }
+
+        private interface IFbxSourceItemSelector
+        {
+            string RootName { get; }
+            string MeshName { get; }
+            string AnimationName { get; }
+        }
+
+        private interface IMsetInjector
+        {
+            string MsetFile { get; }
+            int MsetIndex { get; }
+        }
+
+        private class MsetInjector
+        {
+            internal void InjectMotionTo(IMsetInjector arg, byte[] motion)
             {
-                Console.WriteLine($"FATAL ERROR: {e.Message}\n{e.StackTrace}");
-                return 1;
+                if (string.IsNullOrEmpty(arg.MsetFile))
+                {
+                    return;
+                }
+
+                var logger = LogManager.GetLogger("MsetInjector");
+
+                logger.Debug($"Going to inject new motion data into existing mset file");
+
+                logger.Debug($"Loading {arg.MsetFile}");
+
+                var (msetBar, msetLen) = File.OpenRead(arg.MsetFile).Using(stream => (Bar.Read(stream), stream.Length));
+
+                logger.Debug($"{msetBar.Count} entries in mset");
+
+                logger.Debug($"Locating bar entry #{arg.MsetIndex}");
+
+                var msetBarEntry = msetBar[arg.MsetIndex];
+                if (msetBarEntry.Type != Bar.EntryType.Anb)
+                {
+                    throw new Exception($"#{arg.MsetIndex}: {msetBarEntry.Type} must be EntryType.Anb!");
+                }
+
+                logger.Debug($"Loading anb");
+
+                var anbBar = Bar.Read(msetBarEntry.Stream);
+
+                logger.Debug($"{anbBar.Count} entries in anb");
+
+                logger.Debug($"Locating bar entry having EntryType.Motion");
+
+                var anbBarEntry = anbBar.Single(it => it.Type == Bar.EntryType.Motion);
+
+                logger.Debug($"Found. Motion data: fromSize {anbBarEntry.Stream.Length:#,##0} newSize {motion.Length:#,##0}");
+
+                anbBarEntry.Stream = new MemoryStream(motion).FromBegin();
+
+                logger.Debug($"Packing new anb");
+
+                var anbNewBarStream = new MemoryStream();
+                Bar.Write(anbNewBarStream, anbBar);
+
+                msetBarEntry.Stream = anbNewBarStream.FromBegin();
+
+                logger.Debug($"Packing new mset");
+
+                var msetBarNewStream = new MemoryStream();
+                Bar.Write(msetBarNewStream, msetBar);
+
+                logger.Debug($"Writing to mset");
+
+                logger.Debug($"Mset file: fromSize {msetLen:#,##0} newSize {msetBarNewStream.Length:#,##0}");
+
+                File.WriteAllBytes(
+                    arg.MsetFile,
+                    msetBarNewStream.ToArray()
+                );
+
+                logger.Debug($"Done");
             }
         }
 
         [HelpOption]
-        [Command(Description = "fbx file: fbx to anb")]
-        private class AnbCommand
+        [Command(Description = "fbx file: fbx to raw anb")]
+        private class AnbCommand : IFbxSourceItemSelector, IMsetInjector
         {
             [Required]
             [FileExists]
@@ -60,14 +150,25 @@ namespace OpenKh.Command.AnbMaker
             [Argument(1, Description = "anb output")]
             public string Output { get; set; }
 
-            [Option(Description = "specify root armature node name")]
+            [Option(Description = "specify root armature node name", ShortName = "r")]
             public string RootName { get; set; }
 
-            [Option(Description = "specify mesh name to read bone data")]
+            [Option(Description = "specify mesh name to read bone data", ShortName = "m")]
             public string MeshName { get; set; }
+
+            [Option(Description = "specify animation name to read bone data", ShortName = "a")]
+            public string AnimationName { get; set; }
+
+            [Option(Description = "optionally inject new motion into mset directly", ShortName = "w")]
+            public string MsetFile { get; set; }
+
+            [Option(Description = "zero based target index of bar entry in mset file", ShortName = "i")]
+            public int MsetIndex { get; set; }
 
             protected int OnExecute(CommandLineApplication app)
             {
+                var logger = LogManager.GetLogger("RawMotionMaker");
+
                 var assimp = new Assimp.AssimpContext();
                 var scene = assimp.ImportFile(InputModel, Assimp.PostProcessSteps.None);
 
@@ -82,17 +183,22 @@ namespace OpenKh.Command.AnbMaker
 
                 var fbxMesh = scene.Meshes.First(mesh => IsMeshNameMatched(mesh.Name));
                 var fbxArmatureRoot = scene.RootNode.FindNode(RootName ?? "bone000"); //"kh_sk"
-                var fbxArmatureNodes = FlattenNodes(fbxArmatureRoot);
+                var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
                 var fbxArmatureBoneCount = fbxArmatureNodes.Length;
 
-                var fbxAnim = scene.Animations.First();
+                bool IsAnimationNameMatched(string animName) =>
+                    string.IsNullOrEmpty(AnimationName)
+                        ? true
+                        : animName == AnimationName;
+
+                var fbxAnim = scene.Animations.First(anim => IsAnimationNameMatched(anim.Name));
 
                 var raw = RawMotion.CreateEmpty();
 
                 var frameCount = (int)fbxAnim.DurationInTicks;
 
                 raw.RawMotionHeader.BoneCount = fbxArmatureBoneCount;
-                raw.RawMotionHeader.FrameCount = frameCount;
+                raw.RawMotionHeader.FrameCount = (int)(frameCount * 64 / fbxAnim.TicksPerSecond); // in 64 fps?
                 raw.RawMotionHeader.TotalFrameCount = frameCount;
                 raw.RawMotionHeader.FrameData.FrameStart = 0;
                 raw.RawMotionHeader.FrameData.FrameEnd = frameCount - 1;
@@ -137,6 +243,8 @@ namespace OpenKh.Command.AnbMaker
                     }
                 }
 
+                logger.Debug($"(frameCount {frameCount:#,##0}) x (boneCount {fbxArmatureBoneCount:#,##0}) -> {raw.AnimationMatrices.Count:#,##0} matrices ({64 * raw.AnimationMatrices.Count:#,##0} bytes)");
+
                 var rawMotionStream = new MemoryStream();
                 RawMotion.Write(rawMotionStream, raw);
 
@@ -157,41 +265,466 @@ namespace OpenKh.Command.AnbMaker
                 File.WriteAllBytes(Output, anbBarStream.ToArray());
                 File.WriteAllBytes(Output + ".raw", rawMotionStream.ToArray());
 
+                logger.Debug("Raw motion data generation successful");
+
+                new MsetInjector().InjectMotionTo(this, rawMotionStream.ToArray());
+
+                return 0;
+            }
+        }
+
+
+
+        [HelpOption]
+        [Command(Description = "fbx file: fbx to interpolated motion anb")]
+        private class AnbExCommand : IFbxSourceItemSelector, IMsetInjector
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "fbx input")]
+            public string InputModel { get; set; }
+
+            [Argument(1, Description = "anb output")]
+            public string Output { get; set; }
+
+            [Option(Description = "specify root armature node name", ShortName = "r")]
+            public string RootName { get; set; }
+
+            [Option(Description = "specify mesh name to read bone data", ShortName = "m")]
+            public string MeshName { get; set; }
+
+            [Option(Description = "specify animation name to read bone data", ShortName = "a")]
+            public string AnimationName { get; set; }
+
+            [Option(Description = "optionally inject new motion into mset directly", ShortName = "w")]
+            public string MsetFile { get; set; }
+
+            [Option(Description = "zero based target index of bar entry in mset file", ShortName = "i")]
+            public int MsetIndex { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var logger = LogManager.GetLogger("InterpolatedMotionMaker");
+
+                var assimp = new Assimp.AssimpContext();
+                var scene = assimp.ImportFile(InputModel, Assimp.PostProcessSteps.None);
+
+                Output = Path.GetFullPath(Output ?? Path.GetFileNameWithoutExtension(InputModel) + ".anb");
+
+                Console.WriteLine($"Writing to: {Output}");
+
+                bool IsMeshNameMatched(string meshName) =>
+                    string.IsNullOrEmpty(MeshName)
+                        ? true
+                        : meshName == MeshName;
+
+                var fbxMesh = scene.Meshes.First(mesh => IsMeshNameMatched(mesh.Name));
+                var fbxArmatureRoot = scene.RootNode.FindNode(RootName ?? "bone000"); //"kh_sk"
+                var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
+                var fbxArmatureBoneCount = fbxArmatureNodes.Length;
+
+                bool IsAnimationNameMatched(string animName) =>
+                    string.IsNullOrEmpty(AnimationName)
+                        ? true
+                        : animName == AnimationName;
+
+                var fbxAnim = scene.Animations.First(anim => IsAnimationNameMatched(anim.Name));
+
+                var ipm = InterpolatedMotion.CreateEmpty();
+
+                var frameCount = (int)fbxAnim.DurationInTicks;
+
+                ipm.InterpolatedMotionHeader.BoneCount = Convert.ToInt16(fbxArmatureBoneCount);
+                ipm.InterpolatedMotionHeader.TotalBoneCount = Convert.ToInt16(fbxArmatureBoneCount);
+                ipm.InterpolatedMotionHeader.FrameCount = (int)(frameCount * 64 / fbxAnim.TicksPerSecond); // in 64 fps?
+                ipm.InterpolatedMotionHeader.FrameData.FrameStart = 0;
+                ipm.InterpolatedMotionHeader.FrameData.FrameEnd = frameCount - 1;
+                ipm.InterpolatedMotionHeader.FrameData.FramesPerSecond = (float)fbxAnim.TicksPerSecond;
+
+                short AddKeyTime(float keyTime)
+                {
+                    var idx = ipm.KeyTimes.IndexOf(keyTime);
+                    if (idx < 0)
+                    {
+                        idx = ipm.KeyTimes.Count;
+                        ipm.KeyTimes.Add(keyTime);
+                    }
+                    return (short)Convert.ToUInt16(idx);
+                }
+
+                short AddKeyValue(float keyValue)
+                {
+                    var idx = ipm.KeyValues.IndexOf(keyValue);
+                    if (idx < 0)
+                    {
+                        idx = ipm.KeyValues.Count;
+                        ipm.KeyValues.Add(keyValue);
+                    }
+                    return (short)Convert.ToUInt16(idx);
+                }
+
+                static short CreateType_Time(Interpolation method, short keyValueIdx)
+                {
+                    if (16384 <= keyValueIdx)
+                    {
+                        throw new ArgumentOutOfRangeException("Too many KeyValue elements!");
+                    }
+
+                    return (short)((short)method | (short)(keyValueIdx << 2));
+                    //return (short)((short)((short)(method) << 14) | (short)(keyValueIdx));
+                }
+
+                for (int boneIdx = 0; boneIdx < fbxArmatureBoneCount; boneIdx++)
+                {
+                    var name = fbxArmatureNodes[boneIdx].ArmatureNode.Name;
+
+                    var animPosition = false;
+                    var animRotation = false;
+                    var animScaling = false;
+
+                    var hit = fbxAnim.NodeAnimationChannels.FirstOrDefault(it => it.NodeName == name);
+                    if (hit != null)
+                    {
+                        if (hit.PositionKeyCount != 0)
+                        {
+                            animPosition = true;
+
+                            var numKeys = Convert.ToByte(hit.PositionKeyCount);
+
+                            Key[] xKeys;
+                            Key[] yKeys;
+                            Key[] zKeys;
+
+                            {
+                                var lastKeyIdx = ipm.FCurveKeys.Count;
+
+                                ipm.FCurvesForward.Add(
+                                    new FCurve
+                                    {
+                                        JointId = Convert.ToInt16(boneIdx),
+                                        Channel = (byte)(Channel.TRANSLATION_X),
+                                        KeyStartId = Convert.ToInt16(lastKeyIdx),
+                                        KeyCount = numKeys,
+                                    }
+                                );
+
+                                ipm.FCurveKeys.AddRange(
+                                    xKeys = Enumerable.Range(0, numKeys)
+                                        .Select(_ => new Key { })
+                                        .ToArray()
+                                );
+                            }
+
+                            {
+                                var lastKeyIdx = ipm.FCurveKeys.Count;
+
+                                ipm.FCurvesForward.Add(
+                                    new FCurve
+                                    {
+                                        JointId = Convert.ToInt16(boneIdx),
+                                        Channel = (byte)(Channel.TRANSLATION_Y),
+                                        KeyStartId = Convert.ToInt16(lastKeyIdx),
+                                        KeyCount = numKeys,
+                                    }
+                                );
+
+                                ipm.FCurveKeys.AddRange(
+                                    yKeys = Enumerable.Range(0, numKeys)
+                                        .Select(_ => new Key { })
+                                        .ToArray()
+                                );
+                            }
+
+
+                            {
+                                var lastKeyIdx = ipm.FCurveKeys.Count;
+
+                                ipm.FCurvesForward.Add(
+                                    new FCurve
+                                    {
+                                        JointId = Convert.ToInt16(boneIdx),
+                                        Channel = (byte)(Channel.TRANSLATION_Z),
+                                        KeyStartId = Convert.ToInt16(lastKeyIdx),
+                                        KeyCount = numKeys,
+                                    }
+                                );
+
+                                ipm.FCurveKeys.AddRange(
+                                    zKeys = Enumerable.Range(0, numKeys)
+                                        .Select(_ => new Key { })
+                                        .ToArray()
+                                );
+                            }
+
+                            foreach (var (key, idx) in hit.PositionKeys.Select((key, idx) => (key, idx)))
+                            {
+                                var keyTimeIdx = AddKeyTime((float)key.Time);
+
+                                xKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+                                yKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+                                zKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+
+                                xKeys[idx].ValueId = AddKeyValue(key.Value.X);
+                                yKeys[idx].ValueId = AddKeyValue(key.Value.Y);
+                                zKeys[idx].ValueId = AddKeyValue(key.Value.Z);
+                            }
+                        }
+
+                        if (hit.RotationKeyCount != 0)
+                        {
+                            animRotation = true;
+
+                            var numKeys = Convert.ToByte(hit.RotationKeyCount);
+
+                            Key[] xKeys;
+                            Key[] yKeys;
+                            Key[] zKeys;
+
+                            {
+                                var lastKeyIdx = ipm.FCurveKeys.Count;
+
+                                ipm.FCurvesForward.Add(
+                                    new FCurve
+                                    {
+                                        JointId = Convert.ToInt16(boneIdx),
+                                        Channel = (byte)(Channel.ROTATATION_X),
+                                        KeyStartId = Convert.ToInt16(lastKeyIdx),
+                                        KeyCount = numKeys,
+                                    }
+                                );
+
+                                ipm.FCurveKeys.AddRange(
+                                    xKeys = Enumerable.Range(0, numKeys)
+                                        .Select(_ => new Key { })
+                                        .ToArray()
+                                );
+                            }
+
+                            {
+                                var lastKeyIdx = ipm.FCurveKeys.Count;
+
+                                ipm.FCurvesForward.Add(
+                                    new FCurve
+                                    {
+                                        JointId = Convert.ToInt16(boneIdx),
+                                        Channel = (byte)(Channel.ROTATATION_Y),
+                                        KeyStartId = Convert.ToInt16(lastKeyIdx),
+                                        KeyCount = numKeys,
+                                    }
+                                );
+
+                                ipm.FCurveKeys.AddRange(
+                                    yKeys = Enumerable.Range(0, numKeys)
+                                        .Select(_ => new Key { })
+                                        .ToArray()
+                                );
+                            }
+
+
+                            {
+                                var lastKeyIdx = ipm.FCurveKeys.Count;
+
+                                ipm.FCurvesForward.Add(
+                                    new FCurve
+                                    {
+                                        JointId = Convert.ToInt16(boneIdx),
+                                        Channel = (byte)(Channel.ROTATATION_Z),
+                                        KeyStartId = Convert.ToInt16(lastKeyIdx),
+                                        KeyCount = numKeys,
+                                    }
+                                );
+
+                                ipm.FCurveKeys.AddRange(
+                                    zKeys = Enumerable.Range(0, numKeys)
+                                        .Select(_ => new Key { })
+                                        .ToArray()
+                                );
+                            }
+
+                            foreach (var (key, idx) in hit.RotationKeys.Select((key, idx) => (key, idx)))
+                            {
+                                var keyTimeIdx = AddKeyTime((float)key.Time);
+
+                                xKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+                                yKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+                                zKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+
+                                var angles = ToEulerAngles(key.Value);
+
+                                static float FromEulerAngle(float angle) => angle;
+
+                                xKeys[idx].ValueId = AddKeyValue(FromEulerAngle(angles.X));
+                                yKeys[idx].ValueId = AddKeyValue(FromEulerAngle(angles.Y));
+                                zKeys[idx].ValueId = AddKeyValue(FromEulerAngle(angles.Z));
+                            }
+                        }
+
+                        if (hit.ScalingKeyCount != 0)
+                        {
+                            animScaling = true;
+
+                            var numKeys = Convert.ToByte(hit.ScalingKeyCount);
+
+                            Key[] xKeys;
+                            Key[] yKeys;
+                            Key[] zKeys;
+
+                            {
+                                var lastKeyIdx = ipm.FCurveKeys.Count;
+
+                                ipm.FCurvesForward.Add(
+                                    new FCurve
+                                    {
+                                        JointId = Convert.ToInt16(boneIdx),
+                                        Channel = (byte)(Channel.SCALE_X),
+                                        KeyStartId = Convert.ToInt16(lastKeyIdx),
+                                        KeyCount = numKeys,
+                                    }
+                                );
+
+                                ipm.FCurveKeys.AddRange(
+                                    xKeys = Enumerable.Range(0, numKeys)
+                                        .Select(_ => new Key { })
+                                        .ToArray()
+                                );
+                            }
+
+                            {
+                                var lastKeyIdx = ipm.FCurveKeys.Count;
+
+                                ipm.FCurvesForward.Add(
+                                    new FCurve
+                                    {
+                                        JointId = Convert.ToInt16(boneIdx),
+                                        Channel = (byte)(Channel.SCALE_Y),
+                                        KeyStartId = Convert.ToInt16(lastKeyIdx),
+                                        KeyCount = numKeys,
+                                    }
+                                );
+
+                                ipm.FCurveKeys.AddRange(
+                                    yKeys = Enumerable.Range(0, numKeys)
+                                        .Select(_ => new Key { })
+                                        .ToArray()
+                                );
+                            }
+
+
+                            {
+                                var lastKeyIdx = ipm.FCurveKeys.Count;
+
+                                ipm.FCurvesForward.Add(
+                                    new FCurve
+                                    {
+                                        JointId = Convert.ToInt16(boneIdx),
+                                        Channel = (byte)(Channel.SCALE_Z),
+                                        KeyStartId = Convert.ToInt16(lastKeyIdx),
+                                        KeyCount = numKeys,
+                                    }
+                                );
+
+                                ipm.FCurveKeys.AddRange(
+                                    zKeys = Enumerable.Range(0, numKeys)
+                                        .Select(_ => new Key { })
+                                        .ToArray()
+                                );
+                            }
+
+                            foreach (var (key, idx) in hit.ScalingKeys.Select((key, idx) => (key, idx)))
+                            {
+                                var keyTimeIdx = AddKeyTime((float)key.Time);
+
+                                xKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+                                yKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+                                zKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+
+                                xKeys[idx].ValueId = AddKeyValue(key.Value.X);
+                                yKeys[idx].ValueId = AddKeyValue(key.Value.Y);
+                                zKeys[idx].ValueId = AddKeyValue(key.Value.Z);
+                            }
+                        }
+                    }
+
+                    ipm.Joints.Add(
+                        new Joint
+                        {
+                            JointId = Convert.ToInt16(boneIdx),
+                            Flags = (byte)((animPosition || animRotation || animScaling) ? (2 | 4 | 16 | 32) : 0),
+                        }
+                    );
+                }
+
+                logger.Debug($"{ipm.ConstraintActivations.Count:#,##0} ConstraintActivations");
+                logger.Debug($"{ipm.Constraints.Count:#,##0} Constraints");
+                logger.Debug($"{ipm.ExpressionNodes.Count:#,##0} ExpressionNodes");
+                logger.Debug($"{ipm.Expressions.Count:#,##0} Expressions");
+                logger.Debug($"{ipm.ExternalEffectors.Count:#,##0} ExternalEffectors");
+                logger.Debug($"{ipm.FCurveKeys.Count:#,##0} FCurveKeys");
+                logger.Debug($"{ipm.FCurvesForward.Count:#,##0} FCurvesForward");
+                logger.Debug($"{ipm.FCurvesInverse.Count:#,##0} FCurvesInverse");
+                logger.Debug($"{ipm.IKHelpers.Count:#,##0} IKHelpers");
+                logger.Debug($"{ipm.InitialPoses.Count:#,##0} InitialPoses");
+                logger.Debug($"{ipm.Joints.Count:#,##0} Joints");
+                logger.Debug($"{ipm.KeyTangents.Count:#,##0} KeyTangents");
+                logger.Debug($"{ipm.KeyTimes.Count:#,##0} KeyTimes");
+                logger.Debug($"{ipm.KeyValues.Count:#,##0} KeyValues");
+
+                var motionStream = (MemoryStream)ipm.toStream();
+
+                var anbBarStream = new MemoryStream();
+                Bar.Write(
+                    anbBarStream,
+                    new Bar.Entry[]
+                    {
+                        new Bar.Entry
+                        {
+                            Type = Bar.EntryType.Motion,
+                            Name = "A999",
+                            Stream = motionStream,
+                        }
+                    }
+                );
+
+                File.WriteAllBytes(Output, anbBarStream.ToArray());
+                File.WriteAllBytes(Output + ".raw", motionStream.ToArray());
+
+                logger.Debug($"Motion data generation successful");
+
+                new MsetInjector().InjectMotionTo(this, motionStream.ToArray());
+
                 return 0;
             }
 
-            private record NodeRef
+            /// <summary>
+            /// ToEulerAngles
+            /// </summary>
+            /// <see cref="https://stackoverflow.com/a/70462919"/>
+            private static Vector3 ToEulerAngles(Assimp.Quaternion q)
             {
-                public int ParentIndex { get; set; }
-                public Node ArmatureNode { get; set; }
+                Vector3 angles = new();
 
-                public NodeRef(int parentIndex, Node armatureNode)
+                // roll / x
+                double sinr_cosp = 2 * (q.W * q.X + q.Y * q.Z);
+                double cosr_cosp = 1 - 2 * (q.X * q.X + q.Y * q.Y);
+                angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
+
+                // pitch / y
+                double sinp = 2 * (q.W * q.Y - q.Z * q.X);
+                if (Math.Abs(sinp) >= 1)
                 {
-                    ParentIndex = parentIndex;
-                    ArmatureNode = armatureNode;
+                    angles.Y = (float)Math.CopySign(Math.PI / 2, sinp);
                 }
-            }
-
-            private NodeRef[] FlattenNodes(Node topNode)
-            {
-                var list = new List<NodeRef>();
-
-                var stack = new Stack<NodeRef>();
-                stack.Push(new NodeRef(-1, topNode));
-
-                while (stack.Any())
+                else
                 {
-                    var nodeRef = stack.Pop();
-                    var idx = list.Count;
-                    list.Add(nodeRef);
-
-                    foreach (var sub in nodeRef.ArmatureNode.Children.Reverse())
-                    {
-                        stack.Push(new NodeRef(idx, sub));
-                    }
+                    angles.Y = (float)Math.Asin(sinp);
                 }
 
-                return list.ToArray();
+                // yaw / z
+                double siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
+                double cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
+                angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
+
+                return angles;
             }
         }
 
@@ -271,9 +804,9 @@ namespace OpenKh.Command.AnbMaker
                     return 1;
                 }
 
-                var raw = motionSetList.First().raw;
+                var sampleRaw = motionSetList.First().raw;
 
-                var sampleExport = new RawMotionExporter(raw).Export;
+                var sampleExport = new RawMotionExporter(sampleRaw).Export;
 
                 Assimp.Scene scene = new Assimp.Scene();
                 scene.RootNode = new Assimp.Node("RootNode");
@@ -294,7 +827,7 @@ namespace OpenKh.Command.AnbMaker
                 var fbxSkeletonRoot = new Node("Skeleton");
                 scene.RootNode.Children.Add(fbxSkeletonRoot);
 
-                foreach (var idx in Enumerable.Range(0, sampleExport.BoneCount))
+                foreach (var boneIdx in Enumerable.Range(0, sampleExport.BoneCount))
                 {
                     var topVertIdx = fbxMesh.Vertices.Count;
 
@@ -334,7 +867,7 @@ namespace OpenKh.Command.AnbMaker
                     AddFace(0, 4, 6, 2); // W
 
                     var fbxBone = new Bone(
-                        $"Bone{idx}",
+                        $"Bone{boneIdx}",
                         Matrix3x3.Identity,
                         Enumerable.Range(topVertIdx, bottomVertIdx - topVertIdx)
                             .Select(idx => new VertexWeight(idx, 1))
@@ -343,7 +876,7 @@ namespace OpenKh.Command.AnbMaker
                     fbxBones.Add(fbxBone);
                     fbxMesh.Bones.Add(fbxBone);
 
-                    var fbxSkeletonBone = new Node($"Bone{idx}");
+                    var fbxSkeletonBone = new Node($"Bone{boneIdx}");
                     fbxSkeletonRoot.Children.Add(fbxSkeletonBone);
                 }
 
