@@ -1,5 +1,8 @@
 using Assimp;
 using McMaster.Extensions.CommandLineUtils;
+using OpenKh.Command.AnbMaker.Extensions;
+using OpenKh.Command.AnbMaker.Models;
+using OpenKh.Command.AnbMaker.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using System.ComponentModel.DataAnnotations;
@@ -263,7 +266,7 @@ namespace OpenKh.Command.AnbMaker
         }
 
         [HelpOption]
-        [Command(Description = "raw anb file: to fbx")]
+        [Command(Description = "raw anb file: bone and animation to fbx")]
         private class ExportRawCommand
         {
             [Required]
@@ -340,6 +343,8 @@ namespace OpenKh.Command.AnbMaker
 
                 var raw = motionSetList.First().raw;
 
+                var sampleExport = new RawMotionExporter(raw).Export;
+
                 Assimp.Scene scene = new Assimp.Scene();
                 scene.RootNode = new Assimp.Node("RootNode");
 
@@ -354,15 +359,13 @@ namespace OpenKh.Command.AnbMaker
 
                 var fbxBones = new List<Bone>();
 
-                var fbxBoneCount = raw.RawMotionHeader.BoneCount;
+                var fbxBoneCount = sampleExport.BoneCount;
 
                 var fbxSkeletonRoot = new Node("Skeleton");
                 scene.RootNode.Children.Add(fbxSkeletonRoot);
 
-                for (int idx = 0; idx < fbxBoneCount; idx++)
+                foreach (var idx in Enumerable.Range(0, sampleExport.BoneCount))
                 {
-                    var matrix = raw.AnimationMatrices[idx];
-
                     var topVertIdx = fbxMesh.Vertices.Count;
 
                     void AddVert(float x, float y, float z) =>
@@ -419,25 +422,21 @@ namespace OpenKh.Command.AnbMaker
 
                 foreach (var motionSet in motionSetList)
                 {
-                    var thisRaw = motionSet.raw;
-
-                    var total = thisRaw.RawMotionHeader.TotalFrameCount;
+                    var thisExport = new RawMotionExporter(motionSet.raw).Export;
 
                     var fbxAnim = new Assimp.Animation();
                     fbxAnim.Name = motionSet.name;
-                    fbxAnim.DurationInTicks = total;
-                    fbxAnim.TicksPerSecond = thisRaw.RawMotionHeader.FrameData.FramesPerSecond;
+                    fbxAnim.DurationInTicks = thisExport.FrameCount;
+                    fbxAnim.TicksPerSecond = thisExport.FramesPerSecond;
 
-                    for (int boneIdx = 0; boneIdx < thisRaw.RawMotionHeader.BoneCount; boneIdx++)
+                    foreach (var (bone, boneIdx) in thisExport.Bones.Select((bone, boneIdx) => (bone, boneIdx)))
                     {
                         var fbxAnimChannel = new NodeAnimationChannel();
                         fbxAnimChannel.NodeName = $"Bone{boneIdx}";
 
-                        for (int step = 0; step < total; step++)
+                        foreach (var frame in bone.KeyFrames)
                         {
-                            var time = step / fbxAnim.TicksPerSecond;
-
-                            var matrix = thisRaw.AnimationMatrices[fbxBoneCount * step + boneIdx];
+                            var matrix = frame.AbsoluteMatrix;
 
                             System.Numerics.Matrix4x4.Decompose(
                                 matrix,
@@ -448,28 +447,27 @@ namespace OpenKh.Command.AnbMaker
 
                             fbxAnimChannel.PositionKeys.Add(
                                 new VectorKey(
-                                    time,
-                                    new Vector3D(translation.X, translation.Y, translation.Z)
+                                    frame.KeyTime,
+                                    translation.ToAssimpVector3D()
                                 )
                             );
 
                             fbxAnimChannel.RotationKeys.Add(
                                 new QuaternionKey(
-                                    time,
-                                    new Assimp.Quaternion(rotation.W, rotation.X, rotation.Y, rotation.Z)
+                                    frame.KeyTime,
+                                    rotation.ToAssimpQuaternion()
                                 )
                             );
 
                             fbxAnimChannel.ScalingKeys.Add(
                                 new VectorKey(
-                                    time,
-                                    new Vector3D(scale.X, scale.Y, scale.Z)
+                                    frame.KeyTime,
+                                    scale.ToAssimpVector3D()
                                 )
                             );
                         }
 
                         fbxAnim.NodeAnimationChannels.Add(fbxAnimChannel);
-
                     }
 
                     scene.Animations.Add(fbxAnim);
