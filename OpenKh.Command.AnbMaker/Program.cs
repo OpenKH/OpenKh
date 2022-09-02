@@ -363,30 +363,34 @@ namespace OpenKh.Command.AnbMaker
                 {
                     var matrix = raw.AnimationMatrices[idx];
 
-                    Assimp.Vector3D ToFbxVector(Vector3 coord) => new Assimp.Vector3D(coord.X, coord.Y, coord.Z);
-
                     var topVertIdx = fbxMesh.Vertices.Count;
 
                     void AddVert(float x, float y, float z) =>
                         fbxMesh.Vertices.Add(
-                            ToFbxVector(
-                                new Vector3(x, y, z)
-                            )
+                            new Assimp.Vector3D(x, y, z)
                         );
-                    float margin = 1;
 
-                    AddVert(-margin, -margin, -margin);
-                    AddVert(+margin, -margin, -margin);
-                    AddVert(-margin, +margin, -margin);
-                    AddVert(+margin, +margin, -margin);
-                    AddVert(-margin, -margin, +margin);
-                    AddVert(+margin, -margin, +margin);
-                    AddVert(-margin, +margin, +margin);
-                    AddVert(+margin, +margin, +margin);
+                    float boxLen = 1;
+
+                    AddVert(-boxLen, -boxLen, -boxLen);
+                    AddVert(+boxLen, -boxLen, -boxLen);
+                    AddVert(-boxLen, +boxLen, -boxLen);
+                    AddVert(+boxLen, +boxLen, -boxLen);
+                    AddVert(-boxLen, -boxLen, +boxLen);
+                    AddVert(+boxLen, -boxLen, +boxLen);
+                    AddVert(-boxLen, +boxLen, +boxLen);
+                    AddVert(+boxLen, +boxLen, +boxLen);
 
                     var bottomVertIdx = fbxMesh.Vertices.Count;
 
-                    void AddFace(params int[] indices) => fbxMesh.Faces.Add(new Face(indices.Select(idx => topVertIdx + idx).ToArray()));
+                    void AddFace(params int[] indices) =>
+                        fbxMesh.Faces.Add(
+                            new Face(
+                                indices
+                                    .Select(idx => topVertIdx + idx)
+                                    .ToArray()
+                            )
+                        );
 
                     // left handed
                     AddFace(0, 1, 3, 2); // bottom
