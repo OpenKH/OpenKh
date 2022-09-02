@@ -116,20 +116,20 @@ namespace OpenKh.Command.AnbMaker
 
                         var translation = (hit == null)
                             ? new Vector3D(0, 0, 0)
-                            : GetInterpolatedValue(hit.PositionKeys, frameIdx);
+                            : hit.PositionKeys.GetInterpolatedVector(frameIdx);
 
                         var rotation = (hit == null)
-                            ? new Assimp.Quaternion(1, 0, 0, 0)
-                            : GetInterpolatedValue(hit.RotationKeys, frameIdx);
+                            ? new Assimp.Quaternion(w: 1, 0, 0, 0)
+                            : hit.RotationKeys.GetInterpolatedQuaternion(frameIdx);
 
                         var scale = (hit == null)
                             ? new Vector3D(1, 1, 1)
-                            : GetInterpolatedValue(hit.ScalingKeys, frameIdx);
+                            : hit.ScalingKeys.GetInterpolatedVector(frameIdx);
 
                         var absoluteMatrix = System.Numerics.Matrix4x4.Identity
-                            * System.Numerics.Matrix4x4.CreateScale(ToDotNet(scale))
-                            * System.Numerics.Matrix4x4.CreateFromQuaternion(ToDotNet(rotation))
-                            * System.Numerics.Matrix4x4.CreateTranslation(ToDotNet(translation))
+                            * System.Numerics.Matrix4x4.CreateScale(scale.ToDotNetVector3())
+                            * System.Numerics.Matrix4x4.CreateFromQuaternion(rotation.ToDotNetQuaternion())
+                            * System.Numerics.Matrix4x4.CreateTranslation(translation.ToDotNetVector3())
                             * parentMatrix;
 
                         raw.AnimationMatrices.Add(absoluteMatrix);
@@ -159,76 +159,6 @@ namespace OpenKh.Command.AnbMaker
 
                 return 0;
             }
-
-            private Assimp.Quaternion GetInterpolatedValue(List<QuaternionKey> keys, double time)
-            {
-                if (keys.Any())
-                {
-                    if (time < keys.First().Time)
-                    {
-                        return keys.First().Value;
-                    }
-                    if (keys.Last().Time < time)
-                    {
-                        return keys.Last().Value;
-                    }
-
-                    for (int x = 0, cx = keys.Count - 1; x < cx; x++)
-                    {
-                        var time0 = keys[x].Time;
-                        var time1 = keys[x + 1].Time;
-
-                        if (time0 <= time && time <= time1)
-                        {
-                            float ratio = (float)((time - time0) / (time1 - time0));
-
-                            return Assimp.Quaternion.Slerp(
-                                keys[x].Value,
-                                keys[x + 1].Value,
-                                ratio
-                            );
-                        }
-                    }
-                }
-
-                return new Assimp.Quaternion(1, 0, 0, 0);
-            }
-
-            private Vector3D GetInterpolatedValue(List<VectorKey> keys, double time)
-            {
-                if (keys.Any())
-                {
-                    if (time < keys.First().Time)
-                    {
-                        return keys.First().Value;
-                    }
-                    if (keys.Last().Time < time)
-                    {
-                        return keys.Last().Value;
-                    }
-
-                    for (int x = 0, cx = keys.Count - 1; x < cx; x++)
-                    {
-                        var time0 = keys[x].Time;
-                        var time1 = keys[x + 1].Time;
-
-                        if (time0 <= time && time <= time1)
-                        {
-                            float ratio = (float)((time - time0) / (time1 - time0));
-
-                            return (keys[x].Value * (1f - ratio)) + (keys[x + 1].Value * ratio);
-                        }
-                    }
-                }
-
-                return new Vector3D(0, 0, 0);
-            }
-
-            private System.Numerics.Quaternion ToDotNet(Assimp.Quaternion a) =>
-                new System.Numerics.Quaternion(a.X, a.Y, a.Z, a.W);
-
-            private Vector3 ToDotNet(Vector3D a) =>
-                new Vector3(a.X, a.Y, a.Z);
 
             private record NodeRef
             {
