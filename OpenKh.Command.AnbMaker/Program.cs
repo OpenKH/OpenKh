@@ -3,6 +3,7 @@ using McMaster.Extensions.CommandLineUtils;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -59,6 +60,9 @@ namespace OpenKh.Command.AnbMaker
             [Option(Description = "specify root armature node name")]
             public string RootName { get; set; }
 
+            [Option(Description = "specify mesh name to read bone data")]
+            public string MeshName { get; set; }
+
             protected int OnExecute(CommandLineApplication app)
             {
                 var assimp = new Assimp.AssimpContext();
@@ -68,7 +72,12 @@ namespace OpenKh.Command.AnbMaker
 
                 Console.WriteLine($"Writing to: {Output}");
 
-                var fbxMesh = scene.Meshes.First();
+                bool IsMeshNameMatched(string meshName) =>
+                    string.IsNullOrEmpty(MeshName)
+                        ? true
+                        : meshName == MeshName;
+
+                var fbxMesh = scene.Meshes.First(mesh => IsMeshNameMatched(mesh.Name));
                 var fbxArmatureRoot = scene.RootNode.FindNode(RootName ?? "bone000"); //"kh_sk"
                 var fbxArmatureNodes = FlattenNodes(fbxArmatureRoot);
                 var fbxArmatureBoneCount = fbxArmatureNodes.Length;
@@ -212,24 +221,22 @@ namespace OpenKh.Command.AnbMaker
                 return new Vector3D(0, 0, 0);
             }
 
-            private System.Numerics.Quaternion ToDotNet(Assimp.Quaternion a) => new System.Numerics.Quaternion(a.X, a.Y, a.Z, a.W);
+            private System.Numerics.Quaternion ToDotNet(Assimp.Quaternion a) =>
+                new System.Numerics.Quaternion(a.X, a.Y, a.Z, a.W);
 
-            private Vector3 ToDotNet(Vector3D a) => new Vector3(a.X, a.Y, a.Z);
-
-            private System.Numerics.Matrix4x4 GetDotNetMatrix(Assimp.Matrix4x4 transform)
-            {
-                return new System.Numerics.Matrix4x4(
-                    transform.A1, transform.A2, transform.A3, transform.A4,
-                    transform.B1, transform.B2, transform.B3, transform.B4,
-                    transform.C1, transform.C2, transform.C3, transform.C4,
-                    transform.D1, transform.D2, transform.D3, transform.D4
-                );
-            }
+            private Vector3 ToDotNet(Vector3D a) =>
+                new Vector3(a.X, a.Y, a.Z);
 
             private record NodeRef
             {
                 public int ParentIndex { get; set; }
                 public Node ArmatureNode { get; set; }
+
+                public NodeRef(int parentIndex, Node armatureNode)
+                {
+                    ParentIndex = parentIndex;
+                    ArmatureNode = armatureNode;
+                }
             }
 
             private NodeRef[] FlattenNodes(Node topNode)
@@ -237,7 +244,7 @@ namespace OpenKh.Command.AnbMaker
                 var list = new List<NodeRef>();
 
                 var stack = new Stack<NodeRef>();
-                stack.Push(new NodeRef { ParentIndex = -1, ArmatureNode = topNode });
+                stack.Push(new NodeRef(-1, topNode));
 
                 while (stack.Any())
                 {
@@ -247,7 +254,7 @@ namespace OpenKh.Command.AnbMaker
 
                     foreach (var sub in nodeRef.ArmatureNode.Children.Reverse())
                     {
-                        stack.Push(new NodeRef { ParentIndex = idx, ArmatureNode = sub, });
+                        stack.Push(new NodeRef(idx, sub));
                     }
                 }
 
@@ -287,12 +294,12 @@ namespace OpenKh.Command.AnbMaker
 
                 string FilterName(string name) => name.Trim();
 
-                var barA = Bar.Read(fileStream);
-                if (barA.Any(it => it.Type == Bar.EntryType.Anb))
+                var barFile = Bar.Read(fileStream);
+                if (barFile.Any(it => it.Type == Bar.EntryType.Anb))
                 {
                     // this is mset
                     motionSetList.AddRange(
-                        barA
+                        barFile
                             .Where(barEntry => barEntry.Type == Bar.EntryType.Anb && barEntry.Stream.Length >= 16)
                             .SelectMany(
                                 (barEntry, barEntryIndex) =>
@@ -308,21 +315,27 @@ namespace OpenKh.Command.AnbMaker
                             )
                     );
                 }
-                else
+                else if (barFile.Any(barEntry => barEntry.Type == Bar.EntryType.Motion))
                 {
                     // this is anb
                     motionSetList.AddRange(
-                        barA
+                        barFile
                             .Where(barEntry => barEntry.Type == Bar.EntryType.Motion)
                             .Select(
-                                barEntry => new MotionSet
-                                {
-                                    raw = new RawMotion(barEntry.Stream),
-                                    name = $"{barEntry.Index}_{FilterName(barEntry.Name)}",
-                                }
+                                (barEntry, barEntryIndex) =>
+                                    new MotionSet
+                                    {
+                                        raw = new RawMotion(barEntry.Stream),
+                                        name = $"{barEntryIndex}_{FilterName(barEntry.Name)}",
+                                    }
                             )
                             .ToArray()
                     );
+                }
+                else
+                {
+                    Console.Error.WriteLine("Error. Specify valid file of either mset or anb.");
+                    return 1;
                 }
 
                 var raw = motionSetList.First().raw;
@@ -458,7 +471,8 @@ namespace OpenKh.Command.AnbMaker
                     scene.Animations.Add(fbxAnim);
 
                     // One animation per one fbx.
-                    // Multiple animations cannot read by Blender.
+                    // Multiple animations can be stored.
+                    // But Blender cannot import no more than one animation per one node.
                     Assimp.AssimpContext context = new Assimp.AssimpContext();
                     context.ExportFile(scene, OutputFbx + $".{motionSet.name}.fbx", "fbx");
 
@@ -466,81 +480,6 @@ namespace OpenKh.Command.AnbMaker
                 }
 
                 return 0;
-            }
-
-            private Assimp.Matrix4x4 ToFbx4x4(System.Numerics.Matrix4x4 m) =>
-                new Assimp.Matrix4x4(
-                    m.M11, m.M12, m.M13, m.M14,
-                    m.M21, m.M22, m.M23, m.M24,
-                    m.M31, m.M32, m.M33, m.M34,
-                    m.M41, m.M42, m.M43, m.M44
-                );
-
-            private Matrix3x3 ToFbx3x3(System.Numerics.Matrix4x4 m) =>
-                new Matrix3x3(
-                    m.M11, m.M12, m.M13,
-                    m.M21, m.M22, m.M23,
-                    m.M31, m.M32, m.M33
-                );
-
-            private System.Numerics.Matrix4x4 GetDotNetMatrix(Assimp.Matrix4x4 transform)
-            {
-                return new System.Numerics.Matrix4x4(
-                    transform.A1, transform.A2, transform.A3, transform.A4,
-                    transform.B1, transform.B2, transform.B3, transform.B4,
-                    transform.C1, transform.C2, transform.C3, transform.C4,
-                    transform.D1, transform.D2, transform.D3, transform.D4
-                );
-            }
-
-            private record NodeRef
-            {
-                public int ParentIndex { get; set; }
-                public Node ArmatureNode { get; set; }
-            }
-
-            private NodeRef[] FlattenNodes(Node topNode)
-            {
-                var list = new List<NodeRef>();
-
-                var stack = new Stack<NodeRef>();
-                stack.Push(new NodeRef { ParentIndex = -1, ArmatureNode = topNode });
-
-                while (stack.Any())
-                {
-                    var nodeRef = stack.Pop();
-                    var idx = list.Count;
-                    list.Add(nodeRef);
-
-                    foreach (var sub in nodeRef.ArmatureNode.Children.Reverse())
-                    {
-                        stack.Push(new NodeRef { ParentIndex = idx, ArmatureNode = sub, });
-                    }
-                }
-
-                return list.ToArray();
-            }
-
-            private Node FindNodeByName(Node topNode, string name)
-            {
-                var stack = new Stack<Node>();
-                stack.Push(topNode);
-
-                while (stack.Any())
-                {
-                    var node = stack.Pop();
-                    if (node.Name == name)
-                    {
-                        return node;
-                    }
-
-                    foreach (var sub in node.Children.Reverse())
-                    {
-                        stack.Push(sub);
-                    }
-                }
-
-                throw new Exception($"Node '{name}' not found");
             }
         }
     }
