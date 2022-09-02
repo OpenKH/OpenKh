@@ -704,20 +704,32 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
                 GetBAROffsets(addr, 0, entries);
             std::vector<Axa::RemasteredEntry> modfiles;
             if (folderexist)
-            {
                 ScanFolder(remasteredFolder, modfiles);
-                if (modfiles.size() == entries.size())
+            if (modfiles.size() >= entries.size())
+            {
+                std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
+                for (int i = 0; i < entries.size(); ++i)
                 {
-                    std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
-                    for (int i = 0; i < modfiles.size(); ++i)
-                    {
-                        int off = entries[i].origOffset;
-                        entries[i] = modfiles[i];
-                        entries[i].origOffset = off;
-                    }
+                    int off = entries[i].origOffset;
+                    entries[i] = modfiles[i];
+                    entries[i].origOffset = off;
                 }
-                else
-                    entries.clear();
+            }
+            else if (fileinfo->CurrentFileData.remasteredCount == entries.size())
+            {
+                for (int i = 0; i < entries.size(); ++i)
+                {
+                    auto origoff = entries[i].origOffset;
+                    entries[i] = fileinfo->RemasteredData[i];
+                    entries[i].origOffset = origoff;
+                    for (auto& modfile : modfiles)
+                        if (!strcmp(entries[i].name, modfile.name))
+                        {
+                            entries[i].decompressedSize = modfile.decompressedSize;
+                            entries[i].compressedSize = -2;
+                            break;
+                        }
+                }
             }
             else
                 entries.clear();
