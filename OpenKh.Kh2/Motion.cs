@@ -380,102 +380,102 @@ namespace OpenKh.Kh2
                 BinaryMapping.WriteObject(stream, MotionHeader);
                 BinaryMapping.WriteObject(stream, InterpolatedMotionHeader);
 
-                int GetOffset(long position) => Convert.ToInt32(position - baseOffset);
+                int EnsureOffset() => Convert.ToInt32(stream.Position - baseOffset);
 
                 InterpolatedMotionHeader.TotalBoneCount = (short)(InterpolatedMotionHeader.BoneCount + IKHelpers.Count);
 
-                InterpolatedMotionHeader.InitialPoseOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.InitialPoseOffset = EnsureOffset();
                 InterpolatedMotionHeader.InitialPoseCount = InitialPoses.Count;
 
                 foreach (InitialPose item in InitialPoses)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.FCurveForwardOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.FCurveForwardOffset = EnsureOffset();
                 InterpolatedMotionHeader.FCurveForwardCount = FCurvesForward.Count;
 
                 foreach (FCurve item in FCurvesForward)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.FCurveInverseOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.FCurveInverseOffset = EnsureOffset();
                 InterpolatedMotionHeader.FCurveInverseCount = FCurvesInverse.Count;
 
                 foreach (FCurve item in FCurvesInverse)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.FCurveKeyOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.FCurveKeyOffset = EnsureOffset();
 
                 foreach (Key item in FCurveKeys)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.KeyTimeOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.KeyTimeOffset = EnsureOffset();
                 InterpolatedMotionHeader.KeyTimeCount = KeyTimes.Count;
 
                 alignStreamBytes(stream, 4);
                 foreach (float item in KeyTimes)
                     writer.Write(item);
 
-                InterpolatedMotionHeader.KeyValueOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.KeyValueOffset = EnsureOffset();
 
                 foreach (float item in KeyValues)
                     writer.Write(item);
 
-                InterpolatedMotionHeader.KeyTangentOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.KeyTangentOffset = EnsureOffset();
 
                 foreach (float item in KeyTangents)
                     writer.Write(item);
 
                 InterpolatedMotionHeader.ConstraintCount = Constraints.Count;
-                InterpolatedMotionHeader.ConstraintOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.ConstraintOffset = EnsureOffset();
 
                 foreach (Constraint item in Constraints)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.ConstraintActivationOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.ConstraintActivationOffset = EnsureOffset();
 
                 foreach (ConstraintActivation item in ConstraintActivations)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.LimiterOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.LimiterOffset = EnsureOffset();
 
                 alignStreamBytes(stream, 16);
                 foreach (Limiter item in Limiters)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.ExpressionOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.ExpressionOffset = EnsureOffset();
                 InterpolatedMotionHeader.ExpressionCount = Expressions.Count;
 
                 foreach (Expression item in Expressions)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.ExpressionNodeOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.ExpressionNodeOffset = EnsureOffset();
                 InterpolatedMotionHeader.ExpressionNodeCount = ExpressionNodes.Count;
 
                 foreach (ExpressionNode item in ExpressionNodes)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.IKHelperOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.IKHelperOffset = EnsureOffset();
 
                 alignStreamBytes(stream, 16);
                 foreach (IKHelper item in IKHelpers)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.JointOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.JointOffset = EnsureOffset();
 
                 foreach (Joint item in Joints)
                     BinaryMapping.WriteObject(stream, item);
 
-                InterpolatedMotionHeader.RootPositionOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.RootPositionOffset = EnsureOffset();
 
                 alignStreamBytes(stream, 16);
                 BinaryMapping.WriteObject(stream, RootPosition);
 
-                InterpolatedMotionHeader.ExternalEffectorOffset = GetOffset(stream.Position);
+                InterpolatedMotionHeader.ExternalEffectorOffset = EnsureOffset();
 
                 foreach (ExternalEffector item in ExternalEffectors)
                     BinaryMapping.WriteObject(stream, item);
                 alignStreamBytes(stream, 16);
 
-                MotionHeader.ExtraOffset = GetOffset(stream.Position);
+                MotionHeader.ExtraOffset = EnsureOffset();
 
                 stream.Position = headerPos;
                 BinaryMapping.WriteObject(stream, MotionHeader);
@@ -526,7 +526,8 @@ namespace OpenKh.Kh2
                         ScaleX = 1,
                         ScaleY = 1,
                         ScaleZ = 1,
-                        FCurveId = new int[9],
+                        TranslateW = 1,
+                        FCurveId = Enumerable.Repeat(-1, 9).ToArray(),
                     },
                     ExternalEffectors = new List<ExternalEffector>(),
                 };
