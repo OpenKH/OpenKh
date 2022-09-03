@@ -671,9 +671,8 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
     {
         char remasteredFolder[MAX_PATH];
         sprintf_s(remasteredFolder, "%s\\remastered\\%s", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1);
-        std::vector<Axa::RemasteredEntry> entries;
-        bool folderexist = GetFileAttributesA(remasteredFolder) & FILE_ATTRIBUTE_DIRECTORY;
-        if (fileinfo->CurrentFileData.remasteredCount != 0 || folderexist)
+        std::vector<Axa::RemasteredEntry> entries{};
+        if (GetFileAttributesA(remasteredFolder) & FILE_ATTRIBUTE_DIRECTORY)
         {
             const char* ext = PathFindExtensionA(path);
             if (ext[-2] == '.' && ext[-1] == 'a')
@@ -703,8 +702,7 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
                 || !_stricmp(ext, ".mdlx"))
                 GetBAROffsets(addr, 0, entries);
             std::vector<Axa::RemasteredEntry> modfiles;
-            if (folderexist)
-                ScanFolder(remasteredFolder, modfiles);
+            ScanFolder(remasteredFolder, modfiles);
             if (modfiles.size() >= entries.size())
             {
                 std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
