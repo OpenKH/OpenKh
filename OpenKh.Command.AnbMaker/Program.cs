@@ -467,9 +467,14 @@ namespace OpenKh.Command.AnbMaker
                             {
                                 var keyTimeIdx = AddKeyTime((float)key.Time);
 
-                                xKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
-                                yKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
-                                zKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+                                xKeys[idx].Type = Interpolation.Linear;
+                                xKeys[idx].Time = keyTimeIdx;
+
+                                yKeys[idx].Type = Interpolation.Linear;
+                                yKeys[idx].Time = keyTimeIdx;
+
+                                zKeys[idx].Type = Interpolation.Linear;
+                                zKeys[idx].Time = keyTimeIdx;
 
                                 xKeys[idx].ValueId = AddKeyValue(key.Value.X);
                                 yKeys[idx].ValueId = AddKeyValue(key.Value.Y);
@@ -552,9 +557,14 @@ namespace OpenKh.Command.AnbMaker
                             {
                                 var keyTimeIdx = AddKeyTime((float)key.Time);
 
-                                xKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
-                                yKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
-                                zKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+                                xKeys[idx].Type = Interpolation.Linear;
+                                xKeys[idx].Time = keyTimeIdx;
+
+                                yKeys[idx].Type = Interpolation.Linear;
+                                yKeys[idx].Time = keyTimeIdx;
+
+                                zKeys[idx].Type = Interpolation.Linear;
+                                zKeys[idx].Time = keyTimeIdx;
 
                                 var angles = ToEulerAngles(key.Value);
 
@@ -641,9 +651,14 @@ namespace OpenKh.Command.AnbMaker
                             {
                                 var keyTimeIdx = AddKeyTime((float)key.Time);
 
-                                xKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
-                                yKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
-                                zKeys[idx].Type_Time = CreateType_Time(Interpolation.Linear, keyTimeIdx);
+                                xKeys[idx].Type = Interpolation.Linear;
+                                xKeys[idx].Time = keyTimeIdx;
+
+                                yKeys[idx].Type = Interpolation.Linear;
+                                yKeys[idx].Time = keyTimeIdx;
+
+                                zKeys[idx].Type = Interpolation.Linear;
+                                zKeys[idx].Time = keyTimeIdx;
 
                                 xKeys[idx].ValueId = AddKeyValue(key.Value.X);
                                 yKeys[idx].ValueId = AddKeyValue(key.Value.Y);
