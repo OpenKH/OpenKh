@@ -116,6 +116,12 @@ std::string CombinePaths(const std::string& left, const std::string& right)
     return CombinePaths(left.c_str(), right.c_str());
 }
 
+bool DirectoryExists(const char* path)
+{
+    auto attr = GetFileAttributesA(path);
+    return attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY);
+}
+
 class FakePackageFile : public Axa::PackageFile
 {
 public:
@@ -672,7 +678,7 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
         char remasteredFolder[MAX_PATH];
         sprintf_s(remasteredFolder, "%s\\remastered\\%s", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1);
         std::vector<Axa::RemasteredEntry> entries{};
-        if (GetFileAttributesA(remasteredFolder) & FILE_ATTRIBUTE_DIRECTORY)
+        if (DirectoryExists(remasteredFolder))
         {
             const char* ext = PathFindExtensionA(path);
             if (ext[-2] == '.' && ext[-1] == 'a')
