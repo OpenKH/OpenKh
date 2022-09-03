@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Common.Utils;
 using OpenKh.Kh2.SystemData;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using Xe.BinaryMapper;
 
 namespace OpenKh.Kh2
 {
-    public class Motion
+    public partial class Motion
     {
         /*
          * Motions animate character models. They can be either Raw or Interpolated. They always start with 0x90 reserved bytes and the Motion Header, which defines the type of the motion.
@@ -549,7 +550,7 @@ namespace OpenKh.Kh2
             }
         }
 
-        public class InitialPose
+        public partial class InitialPose
         {
             [Data] public short BoneId { get; set; }
             [Data] public short Channel { get; set; } // ENUM
@@ -558,7 +559,7 @@ namespace OpenKh.Kh2
             public override string ToString() =>
                 $"{BoneId} {Transforms[Channel]} {Value}";
         }
-        public class FCurve
+        public partial class FCurve
         {
             [Data] public short JointId { get; set; } // Either Bone ID or IK Helper ID starting from 0 for both types
             [Data] public byte Channel { get; set; } // ENUM. 4b channel + 2b pre + 2b post
@@ -568,15 +569,12 @@ namespace OpenKh.Kh2
             public override string ToString() =>
                 $"{JointId} {Transforms[Channel]} ({KeyStartId} - {KeyStartId + KeyCount - 1})";
         }
-        public class Key
+        public partial class Key
         {
             [Data] public short Type_Time { get; set; }
             [Data] public short ValueId { get; set; }
             [Data] public short LeftTangentId { get; set; }
             [Data] public short RightTangentId { get; set; }
-
-            public short Type { get { return (short)(Type_Time & 0xC000); } set { Type_Time = (short)(TimeId + value & 0xC000); } } // Interpolation type ENUM
-            public short TimeId { get { return (short)(Type_Time & 0x3FFF); } set { Type_Time = (short)(Type + value & 0x3FFF); } } // Keyframe
         }
         public class Constraint
         {
@@ -595,7 +593,7 @@ namespace OpenKh.Kh2
             [Data] public int Active { get; set; }
         }
 
-        public class Limiter
+        public partial class Limiter
         {
             [Data] public int Flags { get; set; }
             [Data] public int Padding { get; set; }
@@ -631,7 +629,7 @@ namespace OpenKh.Kh2
             [Data] public short NodeId { get; set; }
         }
 
-        public class ExpressionNode
+        public partial class ExpressionNode
         {
             [Data] public int Data { get; set; }
             [Data] public float Value { get; set; }
@@ -648,7 +646,7 @@ namespace OpenKh.Kh2
              */
         }
 
-        public class IKHelper
+        public partial class IKHelper
         {
             [Data] public short Index { get; set; }
             [Data] public short SiblingId { get; set; }
@@ -678,14 +676,11 @@ namespace OpenKh.Kh2
              * terminate 1b
              */
         }
-        public class Joint
+        public partial class Joint
         {
             [Data] public short JointId { get; set; } // Either Bone ID or IK Helper ID starting from last bone
             [Data] public byte Flags { get; set; }
             [Data] public byte Reserved { get; set; }
-            public byte IK { get { return (byte)(Flags & 0xC); } set { Flags = (byte)(((Flags - IK) + (value & 0xC))); } }
-            public byte extEffector { get { return (byte)(Flags & 0x1); } set { Flags = (byte)(((Flags - IK) + (value & 0x1))); } }
-            public byte calculated { get { return (byte)(Flags & 0x4); } set { Flags = (byte)(((Flags - IK) + (value & 0x4))); } }
             /*
              * NOT WORTH PARSING
              * FLAGS:
@@ -832,6 +827,20 @@ namespace OpenKh.Kh2
             ELEMENT_NAME = 42,
             FUNC_AT_FRAME_ROT = 43,
             EXPR_UNKNOWN = -1,
+        }
+        public enum CycleType
+        {
+            FirstLastKey = 0,
+            SubtractiveAdditive = 1,
+            Repeat = 2,
+            Zero = 3,
+        }
+        [Flags]
+        public enum LimiterType
+        {
+            Rot = 1,
+            Sphere = 1,
+            Box = 2,
         }
 
         public static bool isInterpolated(Stream stream)
