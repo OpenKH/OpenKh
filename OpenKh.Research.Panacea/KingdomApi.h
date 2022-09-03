@@ -38,7 +38,7 @@ namespace Axa
     class PackageFile
     {
     public:
-        virtual bool OpenFile(const char* a2, const char* a3) = 0;
+        virtual bool OpenFile(const char* filePath, const char* altBasePath) = 0;
         virtual void OtherFunc() = 0;
         HedEntry* HeaderData = nullptr;
         int PkgFileHandle = 0;

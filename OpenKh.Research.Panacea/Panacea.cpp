@@ -127,17 +127,17 @@ public:
         ScanFolder(rawfol);
     }
 
-    bool OpenFile(const char* a1, const char* a2)
+    bool OpenFile(const char* filePath, const char* altBasePath)
     {
         const char* fn;
-        if (a2)
-            fn = a1 + strlen(a2) + 1;
+        if (altBasePath)
+            fn = filePath + strlen(altBasePath) + 1;
         else
-            fn = a1 + strlen(BasePath) + 1;
+            fn = filePath + strlen(BasePath) + 1;
         auto result = fileData.find(fn);
         if (result != fileData.end())
         {
-            strcpy_s(CurrentFileName, a1);
+            strcpy_s(CurrentFileName, filePath);
             HeaderData = &result->second.Header;
             CurrentFileData = result->second.FileInfo;
             FileDataCopy = result->second.FileInfo;
