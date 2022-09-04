@@ -26,4 +26,5 @@ namespace OpenKH
     GameId DetectGame();
     long LoadFile(const char* filename, void* addr);
     void ReadSettings(const char* filename);
+
 }

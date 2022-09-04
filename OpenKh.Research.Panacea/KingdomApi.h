@@ -38,7 +38,7 @@ namespace Axa
     class PackageFile
     {
     public:
-        virtual bool OpenFile(const char* a2, const char* a3) = 0;
+        virtual bool OpenFile(const char* filePath, const char* altBasePath) = 0;
         virtual void OtherFunc() = 0;
         HedEntry* HeaderData = nullptr;
         int PkgFileHandle = 0;
@@ -85,6 +85,9 @@ namespace Axa
     int SetReplacePath(__int64 a1, const char* a2);
     void FreeAllPackages();
     int OpenFile(const char* Format, int OFlag);
+#undef DecryptFile
+    void DecryptFile(Axa::PackageFile* pkg, void* data, int size, PkgEntry* pkgent);
+    __int64 DecompressFile(void* outBuf, int* decSizePtr, void* inBuf, int compSize);
 }
 
 namespace Bbs
@@ -115,6 +118,8 @@ PFN_DECLARE(void*, Axa_PackageFile_GetRemasteredAsset, (Axa::PackageFile* a1, un
 PFN_DECLARE(__int64, Axa_AxaSoundStream__threadProc, (unsigned int* instance));
 PFN_DECLARE(int, Axa_OpenFile, (const char* Format, int OFlag));
 PFN_DECLARE(void, Axa_DebugPrint, (const char* Format, ...));
+PFN_DECLARE(void, Axa_DecryptFile, (Axa::PackageFile* pkg, void* data, int size, Axa::PkgEntry* pkgent));
+PFN_DECLARE(__int64, Axa_DecompressFile, (void* outBuf, int* decSizePtr, void* inBuf, int compSize));
 PFN_DECLARE(size_t, Bbs_File_load, (const char* pszPath, long long a2));
 PFN_DECLARE(void, Bbs_CRsrcData_loadCallback, (unsigned int* pMem, size_t size, unsigned int* pArg, int nOpt));
 
