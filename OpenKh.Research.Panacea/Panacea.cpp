@@ -354,17 +354,13 @@ bool Panacea::TransformFilePath(char* strOutPath, int maxLength, const char* ori
 
 std::unordered_map<std::string, std::vector<Axa::RemasteredEntry>> RemasteredData;
 
-void GetIMDOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+void GetIMDOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     if (*(int*)addr == 'DGMI')
-    {
-        Axa::RemasteredEntry ent{};
-        ent.origOffset = ((int*)addr)[2] + baseoff + 0x20000000;
-        entries.push_back(ent);
-    }
+        entries.push_back(((int*)addr)[2] + baseoff + 0x20000000);
 }
 
-void GetIMZOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+void GetIMZOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     if (*(int*)addr == 'ZGMI')
     {
@@ -379,7 +375,7 @@ void GetIMZOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& e
     }
 }
 
-void GetTM2Offsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+void GetTM2Offsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     if (*(int*)addr == '2MIT')
     {
@@ -389,16 +385,14 @@ void GetTM2Offsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& e
         while (texcnt-- > 0)
         {
             int next = *(int*)off;
-            Axa::RemasteredEntry ent{};
-            ent.origOffset = *(short*)(off + 12) + baseoff + 0x20000000;
-            entries.push_back(ent);
+            entries.push_back(*(short*)(off + 12) + baseoff + 0x20000000);
             off += next;
             baseoff += next;
         }
     }
 }
 
-void GetDPDOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+void GetDPDOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     int* off = (int*)addr;
     if (*off++ == 0x96)
@@ -426,15 +420,11 @@ void GetDPDOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& e
             }
         }
         for (auto& i : offsets)
-        {
-            Axa::RemasteredEntry ent{};
-            ent.origOffset = i.second + baseoff + 0x20000000;
-            entries.push_back(ent);
-        }
+            entries.push_back(i.second + baseoff + 0x20000000);
     }
 }
 
-void GetDPXOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+void GetDPXOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     int* off = (int*)((char*)addr + *(int*)addr * 0x20 + 4);
     int dpdcnt = *off++;
@@ -445,7 +435,7 @@ void GetDPXOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& e
     }
 }
 
-void GetPAXOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+void GetPAXOffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     if (*(int*)addr == '_XAP')
     {
@@ -455,7 +445,7 @@ void GetPAXOffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& e
 }
 
 const char TEXA[] = "TEXA";
-void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<int>& entries)
 {
     if (*(int*)addr == 0)
     {
@@ -497,18 +487,17 @@ void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<Axa::Rema
             unsigned int PSM = (unsigned int)(Tex0Reg >> 20) & 0x3fu;
 
             int FinalOffset = baseoff + PicOffsets[CurrentKey] + 0x20000000;
-            Axa::RemasteredEntry ent{};
             if (PSM == 20)
             {
-                ent.origOffset = FinalOffset + Pxl4Count + (Modifier * 0x10);
+                FinalOffset += Pxl4Count + (Modifier * 0x10);
                 Pxl4Count += 1;
             }
             else
             {
-                ent.origOffset = FinalOffset + (Pxl8Count * 0x10);
+                FinalOffset += (Pxl8Count * 0x10);
                 Pxl8Count += 1;
             }
-            entries.push_back(ent);
+            entries.push_back(FinalOffset);
         }
 
         delete[] PicOffsets;
@@ -518,23 +507,21 @@ void GetRAWOffsets(void* addr, void* endaddr, int baseoff, std::vector<Axa::Rema
         {
             int imageToApplyTo = *(short*)(texa + 0x0A);
             int texaOffset = *(int*)(texa + 0x28);
-            Axa::RemasteredEntry ent{};
-            ent.origOffset = (int)(baseoff + (texa - (char*)addr) + texaOffset + 0x08 + (imageToApplyTo * 0x10LL) + 0x20000000);
-            entries.push_back(ent);
+            entries.push_back((int)(baseoff + (texa - (char*)addr) + texaOffset + 0x08 + (imageToApplyTo * 0x10LL) + 0x20000000));
             texa = std::search(texa + 4, (char*)endaddr, TEXA, TEXA + 4);
         }
     }
 }
 
-void GetBAROffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& entries)
+void GetBAROffsets(void* addr, int baseoff, std::vector<int>& entries)
 {
     if (*(int*)addr == '\1RAB')
     {
-        std::vector<Axa::RemasteredEntry> entriesTIM;
-        std::vector<Axa::RemasteredEntry> entriesPAX;
-        std::vector<Axa::RemasteredEntry> entriesTM2;
-        std::vector<Axa::RemasteredEntry> entriesGeneral;
-        std::vector<Axa::RemasteredEntry> entriesAudio;
+        std::vector<int> entriesTIM;
+        std::vector<int> entriesPAX;
+        std::vector<int> entriesTM2;
+        std::vector<int> entriesGeneral;
+        std::vector<int> entriesAudio;
         int count = ((int*)addr)[1];
         int* off = (int*)addr + 4;
         while (count-- > 0)
@@ -560,18 +547,10 @@ void GetBAROffsets(void* addr, int baseoff, std::vector<Axa::RemasteredEntry>& e
             case 31:
             case 34:
                 if (!memcmp((char*)addr + datoff, "ORIGIN", 6))
-                {
-                    Axa::RemasteredEntry ent{};
-                    ent.origOffset = -1;
-                    entriesAudio.push_back(ent);
-                }
+                    entriesAudio.push_back(-1);
                 break;
             case 36:
-            {
-                Axa::RemasteredEntry ent{};
-                ent.origOffset = baseoff + datoff + 0x20000000;
-                entriesGeneral.push_back(ent);
-            }
+                entriesGeneral.push_back(baseoff + datoff + 0x20000000);
             break;
             case 46:
                 GetBAROffsets((char*)addr + datoff, baseoff + datoff, entriesGeneral);
@@ -677,20 +656,21 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
     {
         char remasteredFolder[MAX_PATH];
         sprintf_s(remasteredFolder, "%s\\remastered\\%s", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1);
-        std::vector<Axa::RemasteredEntry> entries{};
+        std::vector<Axa::RemasteredEntry> entries(fileinfo->RemasteredData, fileinfo->RemasteredData + fileinfo->CurrentFileData.remasteredCount);
         if (DirectoryExists(remasteredFolder))
         {
+            std::vector<int> assetoffs{};
             const char* ext = PathFindExtensionA(path);
             if (ext[-2] == '.' && ext[-1] == 'a')
                 ext -= 2;
             if (!_stricmp(ext, ".imd"))
-                GetIMDOffsets(addr, 0, entries);
+                GetIMDOffsets(addr, 0, assetoffs);
             else if (!_stricmp(ext, ".imz"))
-                GetIMZOffsets(addr, 0, entries);
+                GetIMZOffsets(addr, 0, assetoffs);
             else if (!_stricmp(ext, ".tm2"))
-                GetTM2Offsets(addr, 0, entries);
+                GetTM2Offsets(addr, 0, assetoffs);
             else if (!_stricmp(ext, ".pax"))
-                GetPAXOffsets(addr, 0, entries);
+                GetPAXOffsets(addr, 0, assetoffs);
             else if (!_stricmp(ext, ".2dd")
                 || !_stricmp(ext, ".2ld")
                 || !_stricmp(ext, ".a.fm")
@@ -706,26 +686,31 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
                 || !_stricmp(ext, ".mag")
                 || !_stricmp(ext, ".map")
                 || !_stricmp(ext, ".mdlx"))
-                GetBAROffsets(addr, 0, entries);
+                GetBAROffsets(addr, 0, assetoffs);
             std::vector<Axa::RemasteredEntry> modfiles;
             ScanFolder(remasteredFolder, modfiles);
-            if (modfiles.size() >= entries.size())
+            if (modfiles.size() >= assetoffs.size())
             {
                 std::stable_sort(modfiles.begin(), modfiles.end(), sortRemasteredFiles);
+                entries = modfiles;
+                entries.resize(assetoffs.size());
                 for (int i = 0; i < entries.size(); ++i)
-                {
-                    int off = entries[i].origOffset;
-                    entries[i] = modfiles[i];
-                    entries[i].origOffset = off;
-                }
+                    entries[i].origOffset = assetoffs[i];
             }
-            else if (fileinfo->CurrentFileData.remasteredCount == entries.size())
+            else
             {
+                if (entries.size() > assetoffs.size())
+                    entries.resize(assetoffs.size());
+                else
+                    while (entries.size() < assetoffs.size())
+                    {
+                        Axa::RemasteredEntry ent{};
+                        sprintf_s(ent.name, "-%d.dds", (int)entries.size());
+                        entries.push_back(ent);
+                    }
                 for (int i = 0; i < entries.size(); ++i)
                 {
-                    auto origoff = entries[i].origOffset;
-                    entries[i] = fileinfo->RemasteredData[i];
-                    entries[i].origOffset = origoff;
+                    entries[i].origOffset = assetoffs[i];
                     for (auto& modfile : modfiles)
                         if (!strcmp(entries[i].name, modfile.name))
                         {
@@ -735,8 +720,6 @@ void GetRemasteredFiles(Axa::PackageFile* fileinfo, const char* path, void* addr
                         }
                 }
             }
-            else
-                entries.clear();
         }
 #if 0
         FILE* fh;
