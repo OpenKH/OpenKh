@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static OpenKh.Kh2.Motion;
@@ -423,6 +424,7 @@ namespace OpenKh.Command.AnbMaker.Commands
                 );
             }
 
+            // reduce fcurve keys
             {
                 var numSames = 0;
 
@@ -493,6 +495,21 @@ namespace OpenKh.Command.AnbMaker.Commands
 
                 ipm.FCurveKeys.Clear();
                 ipm.FCurveKeys.AddRange(reducedFCurveKeys);
+            }
+
+            // sort key time in ascending order
+            {
+                var newKeyTimes = ipm.KeyTimes
+                    .OrderBy(it => it)
+                    .ToArray();
+
+                foreach (var fCurveKey in ipm.FCurveKeys)
+                {
+                    fCurveKey.Time = (short)Convert.ToUInt16(Array.IndexOf(newKeyTimes, ipm.KeyTimes[fCurveKey.Time]));
+                }
+
+                ipm.KeyTimes.Clear();
+                ipm.KeyTimes.AddRange(newKeyTimes);
             }
 
             logger.Debug($"{ipm.ConstraintActivations.Count,6:#,##0} ConstraintActivations");
