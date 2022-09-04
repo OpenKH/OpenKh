@@ -17,6 +17,8 @@ PFN_DEFINE(Axa_PackageFile_GetRemasteredAsset);
 PFN_DEFINE(Axa_AxaSoundStream__threadProc);
 PFN_DEFINE(Axa_OpenFile);
 PFN_DEFINE(Axa_DebugPrint);
+PFN_DEFINE(Axa_DecryptFile);
+PFN_DEFINE(Axa_DecompressFile);
 PFN_DEFINE(Bbs_File_load);
 PFN_DEFINE(Bbs_CRsrcData_loadCallback);
 
@@ -78,6 +80,16 @@ __int64 Axa::AxaSoundStream::_threadProc(unsigned int* instance)
 int Axa::OpenFile(const char* Format, int OFlag)
 {
     return pfn_Axa_OpenFile(Format, OFlag);
+}
+
+void Axa::DecryptFile(Axa::PackageFile* pkg, void* data, int size, PkgEntry* pkgent)
+{
+    return pfn_Axa_DecryptFile(pkg, data, size, pkgent);
+}
+
+__int64 Axa::DecompressFile(void* outBuf, int* decSizePtr, void* inBuf, int compSize)
+{
+    return pfn_Axa_DecompressFile(outBuf, decSizePtr, inBuf, compSize);
 }
 
 size_t Bbs::File::load(const char* filename, long long a2) {
