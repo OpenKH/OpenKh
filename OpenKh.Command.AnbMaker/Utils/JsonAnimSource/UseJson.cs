@@ -51,12 +51,12 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                     {
                         var action = obj.AnimationAction;
 
-                        AScalarKey GetKey(BKeyFrame source)
+                        AScalarKey GetKey(BKeyFrame source, float valueAdd = 0)
                         {
                             return new AScalarKey
                             {
                                 Time = source.Time - action.FrameStart,
-                                Value = source.Value,
+                                Value = source.Value + valueAdd,
                             };
                         }
 
@@ -128,16 +128,42 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                                                     return new PseudoRotation
                                                     {
                                                         time = Qw[idx].Time,
-                                                        rotation = new Quaternion(
-                                                            Qx[idx].Value,
-                                                            Qy[idx].Value,
-                                                            Qz[idx].Value,
-                                                            Qw[idx].Value
+                                                        rotation = (
+                                                            Quaternion.Identity
+                                                            * new Quaternion(
+                                                                w: bone.Rotation[0],
+                                                                x: bone.Rotation[1],
+                                                                y: bone.Rotation[2],
+                                                                z: bone.Rotation[3]
+                                                            )
+                                                            * new Quaternion(
+                                                                x: Qx[idx].Value,
+                                                                y: Qy[idx].Value,
+                                                                z: Qz[idx].Value,
+                                                                w: Qw[idx].Value
+                                                            )
                                                         )
                                                             .ToEulerAngles()
                                                     };
                                                 }
                                             )
+                                    );
+                                }
+
+                                if (!pseudoRotations.Any())
+                                {
+                                    pseudoRotations.Add(
+                                        new PseudoRotation
+                                        {
+                                            time = 0,
+                                            rotation = new Quaternion(
+                                                w: bone.Rotation[0],
+                                                x: bone.Rotation[1],
+                                                y: bone.Rotation[2],
+                                                z: bone.Rotation[3]
+                                            )
+                                                .ToEulerAngles(),
+                                        }
                                     );
                                 }
 
@@ -176,19 +202,19 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                                     PositionXKeys = (fcurves
                                         .FirstOrDefault(it => it.ChannelRef == "location.0") ?? ProvideFallback("location.0", bone.Translation[0]))
                                         .KeyFrames
-                                        .Select(it => GetKey(it))
+                                        .Select(it => GetKey(it, bone.Translation[0]))
                                         .ToArray(),
 
                                     PositionYKeys = (fcurves
                                         .FirstOrDefault(it => it.ChannelRef == "location.1") ?? ProvideFallback("location.1", bone.Translation[1]))
                                         .KeyFrames
-                                        .Select(it => GetKey(it))
+                                        .Select(it => GetKey(it, bone.Translation[1]))
                                         .ToArray(),
 
                                     PositionZKeys = (fcurves
                                         .FirstOrDefault(it => it.ChannelRef == "location.2") ?? ProvideFallback("location.2", bone.Translation[2]))
                                         .KeyFrames
-                                        .Select(it => GetKey(it))
+                                        .Select(it => GetKey(it, bone.Translation[2]))
                                         .ToArray(),
                                 };
                             }

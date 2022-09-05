@@ -63,7 +63,7 @@ namespace OpenKh.Command.AnbMaker.Commands
                     meshName: MeshName,
                     rootName: RootName,
                     animationName: AnimationName,
-                    nodeScaling: NodeScaling
+                    nodeScaling: 1
                 )
                     .Parameters;
             }
