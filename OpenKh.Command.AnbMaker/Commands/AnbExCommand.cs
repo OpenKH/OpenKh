@@ -77,6 +77,13 @@ namespace OpenKh.Command.AnbMaker.Commands
 
             var fbxAnim = scene.Animations.First(anim => IsAnimationNameMatched(anim.Name));
 
+            AScalarKey GetAScalarKey(double time, float value) =>
+                new AScalarKey
+                {
+                    Time = (float)time,
+                    Value = value,
+                };
+
             var builder = new InterpolatedMotionBuilder(
                 (int)fbxAnim.DurationInTicks,
                 (float)fbxAnim.TicksPerSecond,
@@ -88,39 +95,50 @@ namespace OpenKh.Command.AnbMaker.Commands
                     var hit = fbxAnim.NodeAnimationChannels.FirstOrDefault(it => it.NodeName == name);
                     if (hit != null)
                     {
+                        var pseudoRotations = hit.RotationKeys
+                            .Select(
+                                key => new PseudoRotation
+                                {
+                                    time = key.Time,
+                                    rotation = key.Value.ToDotNetQuaternion().ToEulerAngles()
+                                }
+                            )
+                            .ToArray();
+
                         return new AChannel
                         {
-                            ScalingKeyCount = hit.ScalingKeyCount,
-                            ScalingKeys = hit.ScalingKeys
-                                .Select(
-                                    it => new AVectorKey
-                                    {
-                                        Time = (float)it.Time,
-                                        Value = it.Value.ToDotNetVector3(),
-                                    }
-                                )
+                            ScaleXKeys = hit.ScalingKeys
+                                .Select(it => GetAScalarKey(it.Time, it.Value.X))
                                 .ToArray(),
 
-                            RotationKeyCount = hit.RotationKeyCount,
-                            RotationKeys = hit.RotationKeys
-                                .Select(
-                                    it => new AQuaternionKey
-                                    {
-                                        Time = (float)it.Time,
-                                        Value = it.Value.ToDotNetQuaternion(),
-                                    }
-                                )
+                            ScaleYKeys = hit.ScalingKeys
+                                .Select(it => GetAScalarKey(it.Time, it.Value.Y))
                                 .ToArray(),
 
-                            PositionKeyCount = hit.PositionKeyCount,
-                            PositionKeys = hit.PositionKeys
-                                .Select(
-                                    it => new AVectorKey
-                                    {
-                                        Time = (float)it.Time,
-                                        Value = it.Value.ToDotNetVector3(),
-                                    }
-                                )
+                            ScaleZKeys = hit.ScalingKeys
+                                .Select(it => GetAScalarKey(it.Time, it.Value.Z))
+                                .ToArray(),
+
+                            RotationXKeys = pseudoRotations
+                                .Select(it => GetAScalarKey(it.time, it.rotation.X))
+                                .ToArray(),
+                            RotationYKeys = pseudoRotations
+                                .Select(it => GetAScalarKey(it.time, it.rotation.Y))
+                                .ToArray(),
+                            RotationZKeys = pseudoRotations
+                                .Select(it => GetAScalarKey(it.time, it.rotation.Z))
+                                .ToArray(),
+
+                            PositionXKeys = hit.PositionKeys
+                                .Select(it => GetAScalarKey(it.Time, it.Value.X))
+                                .ToArray(),
+
+                            PositionYKeys = hit.PositionKeys
+                                .Select(it => GetAScalarKey(it.Time, it.Value.Y))
+                                .ToArray(),
+
+                            PositionZKeys = hit.PositionKeys
+                                .Select(it => GetAScalarKey(it.Time, it.Value.Z))
                                 .ToArray(),
                         };
                     }
@@ -170,6 +188,12 @@ namespace OpenKh.Command.AnbMaker.Commands
             new MsetInjector().InjectMotionTo(this, motionStream.ToArray());
 
             return 0;
+        }
+
+        private class PseudoRotation
+        {
+            internal double time;
+            internal Vector3 rotation;
         }
     }
 }

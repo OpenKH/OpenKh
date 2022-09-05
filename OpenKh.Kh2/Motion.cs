@@ -407,10 +407,11 @@ namespace OpenKh.Kh2
                 foreach (Key item in FCurveKeys)
                     BinaryMapping.WriteObject(stream, item);
 
+                alignStreamBytes(stream, 4);
+
                 InterpolatedMotionHeader.KeyTimeOffset = EnsureOffset();
                 InterpolatedMotionHeader.KeyTimeCount = KeyTimes.Count;
 
-                alignStreamBytes(stream, 4);
                 foreach (float item in KeyTimes)
                     writer.Write(item);
 
@@ -435,9 +436,10 @@ namespace OpenKh.Kh2
                 foreach (ConstraintActivation item in ConstraintActivations)
                     BinaryMapping.WriteObject(stream, item);
 
+                alignStreamBytes(stream, 16);
+
                 InterpolatedMotionHeader.LimiterOffset = EnsureOffset();
 
-                alignStreamBytes(stream, 16);
                 foreach (Limiter item in Limiters)
                     BinaryMapping.WriteObject(stream, item);
 
@@ -453,9 +455,10 @@ namespace OpenKh.Kh2
                 foreach (ExpressionNode item in ExpressionNodes)
                     BinaryMapping.WriteObject(stream, item);
 
+                alignStreamBytes(stream, 16);
+
                 InterpolatedMotionHeader.IKHelperOffset = EnsureOffset();
 
-                alignStreamBytes(stream, 16);
                 foreach (IKHelper item in IKHelpers)
                     BinaryMapping.WriteObject(stream, item);
 
@@ -464,15 +467,17 @@ namespace OpenKh.Kh2
                 foreach (Joint item in Joints)
                     BinaryMapping.WriteObject(stream, item);
 
+                alignStreamBytes(stream, 16);
+
                 InterpolatedMotionHeader.RootPositionOffset = EnsureOffset();
 
-                alignStreamBytes(stream, 16);
                 BinaryMapping.WriteObject(stream, RootPosition);
 
                 InterpolatedMotionHeader.ExternalEffectorOffset = EnsureOffset();
 
                 foreach (ExternalEffector item in ExternalEffectors)
                     BinaryMapping.WriteObject(stream, item);
+                
                 alignStreamBytes(stream, 16);
 
                 MotionHeader.ExtraOffset = EnsureOffset();

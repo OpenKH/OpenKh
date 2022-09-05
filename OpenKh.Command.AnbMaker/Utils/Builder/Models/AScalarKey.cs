@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace OpenKh.Command.AnbMaker.Utils.Builder.Models
 {
-    public class AVectorKey
+    public class AScalarKey
     {
         public float Time { get; set; }
-        public Vector3 Value { get; set; }
+        public float Value { get; set; }
     }
 }

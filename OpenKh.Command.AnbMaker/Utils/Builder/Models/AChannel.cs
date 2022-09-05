@@ -8,11 +8,16 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder.Models
 {
     public class AChannel
     {
-        public int ScalingKeyCount { get; set; }
-        public AVectorKey[] ScalingKeys { get; set; }
-        public int RotationKeyCount { get; set; }
-        public AQuaternionKey[] RotationKeys { get; set; }
-        public int PositionKeyCount { get; internal set; }
-        public AVectorKey[] PositionKeys { get; set; }
+        public AScalarKey[] PositionXKeys { get; set; }
+        public AScalarKey[] PositionYKeys { get; set; }
+        public AScalarKey[] PositionZKeys { get; set; }
+
+        public AScalarKey[] RotationXKeys { get; set; }
+        public AScalarKey[] RotationYKeys { get; set; }
+        public AScalarKey[] RotationZKeys { get; set; }
+
+        public AScalarKey[] ScaleXKeys { get; set; }
+        public AScalarKey[] ScaleYKeys { get; set; }
+        public AScalarKey[] ScaleZKeys { get; set; }
     }
 }

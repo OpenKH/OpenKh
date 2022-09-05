@@ -64,7 +64,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
             short AddSourceKeyTime(double sourceKeyTime)
             {
-                return AddKeyTime((float)(sourceKeyTime * keyTimeMultiplier));
+                return AddKeyTime(GetLowerPrecisionValue((float)(sourceKeyTime * keyTimeMultiplier)));
             }
 
             short AddKeyValue(float keyValue)
@@ -83,289 +83,122 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                 var hit = getAChannel(boneIdx);
                 if (hit != null)
                 {
+                    float FixScaling(float value)
+                    {
+                        return ((boneIdx == 0) ? NodeScaling : 1f) * value;
+                    }
+
+                    float FixScalingValue(float value) => GetLowerPrecisionValue(FixScaling(value));
+
+                    float FixPos(float value)
+                    {
+                        return value / ((boneIdx == 0) ? 1 : NodeScaling);
+                    }
+
+                    float FixPosValue(float value) => GetLowerPrecisionValue(FixPos(value));
+
+                    var channels = new ChannelProvider[]
+                    {
+                        new ChannelProvider
+                        {
+                            type = Channel.SCALE_X,
+                            jointFlags = JointFlags.HasScaling,
+                            keys = hit.ScaleXKeys,
+                            fixValue = FixScalingValue,
+                        },
+                        new ChannelProvider
+                        {
+                            type = Channel.SCALE_Y,
+                            jointFlags = JointFlags.HasScaling,
+                            keys = hit.ScaleYKeys,
+                            fixValue = FixScalingValue,
+                        },
+                        new ChannelProvider
+                        {
+                            type = Channel.SCALE_Z,
+                            jointFlags = JointFlags.HasScaling,
+                            keys = hit.ScaleZKeys,
+                            fixValue = FixScalingValue,
+                        },
+
+                        new ChannelProvider
+                        {
+                            type = Channel.ROTATATION_X,
+                            jointFlags = JointFlags.HasRotation,
+                            keys = hit.RotationXKeys,
+                            fixValue = it => it,
+                        },
+                        new ChannelProvider
+                        {
+                            type = Channel.ROTATATION_Y,
+                            jointFlags = JointFlags.HasRotation,
+                            keys = hit.RotationYKeys,
+                            fixValue = it => it,
+                        },
+                        new ChannelProvider
+                        {
+                            type = Channel.ROTATATION_Z,
+                            jointFlags = JointFlags.HasRotation,
+                            keys = hit.RotationZKeys,
+                            fixValue = it => it,
+                        },
+
+                        new ChannelProvider
+                        {
+                            type = Channel.TRANSLATION_X,
+                            jointFlags = JointFlags.HasPosition,
+                            keys = hit.PositionXKeys,
+                            fixValue = FixPosValue,
+                        },
+                        new ChannelProvider
+                        {
+                            type = Channel.TRANSLATION_Y,
+                            jointFlags = JointFlags.HasPosition,
+                            keys = hit.PositionYKeys,
+                            fixValue = FixPosValue,
+                        },
+                        new ChannelProvider
+                        {
+                            type = Channel.TRANSLATION_Z,
+                            jointFlags = JointFlags.HasPosition,
+                            keys = hit.PositionZKeys,
+                            fixValue = FixPosValue,
+                        },
+                    };
+
                     var jointFlag = JointFlags.None;
 
-                    if (hit.ScalingKeyCount != 0)
+                    foreach (var channel in channels)
                     {
-                        jointFlag |= JointFlags.HasScaling;
-
-                        var numKeys = Convert.ToByte(hit.ScalingKeyCount);
-
-                        Key[] xKeys;
-                        Key[] yKeys;
-                        Key[] zKeys;
-
+                        if (channel.keys.Any())
                         {
+                            jointFlag |= channel.jointFlags;
+
+                            var numKeys = Convert.ToByte(channel.keys.Count());
+
                             var lastKeyIdx = ipm.FCurveKeys.Count;
 
                             ipm.FCurvesForward.Add(
                                 new FCurve
                                 {
                                     JointId = Convert.ToInt16(boneIdx),
-                                    Channel = (byte)(Channel.SCALE_X),
+                                    Channel = (byte)(channel.type),
                                     KeyStartId = Convert.ToInt16(lastKeyIdx),
                                     KeyCount = numKeys,
                                 }
                             );
 
                             ipm.FCurveKeys.AddRange(
-                                xKeys = Enumerable.Range(0, numKeys)
-                                    .Select(_ => new Key { })
-                                    .ToArray()
+                                channel.keys
+                                    .Select(
+                                        key => new Key
+                                        {
+                                            Type = Interpolation.Hermite,
+                                            Time = AddSourceKeyTime(key.Time),
+                                            ValueId = AddKeyValue(channel.fixValue(key.Value)),
+                                        }
+                                    )
                             );
-                        }
-
-                        {
-                            var lastKeyIdx = ipm.FCurveKeys.Count;
-
-                            ipm.FCurvesForward.Add(
-                                new FCurve
-                                {
-                                    JointId = Convert.ToInt16(boneIdx),
-                                    Channel = (byte)(Channel.SCALE_Y),
-                                    KeyStartId = Convert.ToInt16(lastKeyIdx),
-                                    KeyCount = numKeys,
-                                }
-                            );
-
-                            ipm.FCurveKeys.AddRange(
-                                yKeys = Enumerable.Range(0, numKeys)
-                                    .Select(_ => new Key { })
-                                    .ToArray()
-                            );
-                        }
-
-
-                        {
-                            var lastKeyIdx = ipm.FCurveKeys.Count;
-
-                            ipm.FCurvesForward.Add(
-                                new FCurve
-                                {
-                                    JointId = Convert.ToInt16(boneIdx),
-                                    Channel = (byte)(Channel.SCALE_Z),
-                                    KeyStartId = Convert.ToInt16(lastKeyIdx),
-                                    KeyCount = numKeys,
-                                }
-                            );
-
-                            ipm.FCurveKeys.AddRange(
-                                zKeys = Enumerable.Range(0, numKeys)
-                                    .Select(_ => new Key { })
-                                    .ToArray()
-                            );
-                        }
-
-                        float FixScaling(float value)
-                        {
-                            return ((boneIdx == 0) ? NodeScaling : 1f) * value;
-                        }
-
-                        foreach (var (key, idx) in hit.ScalingKeys.Select((key, idx) => (key, idx)))
-                        {
-                            var keyTimeIdx = AddSourceKeyTime(key.Time);
-
-                            xKeys[idx].Type = Interpolation.Hermite;
-                            xKeys[idx].Time = keyTimeIdx;
-
-                            yKeys[idx].Type = Interpolation.Hermite;
-                            yKeys[idx].Time = keyTimeIdx;
-
-                            zKeys[idx].Type = Interpolation.Hermite;
-                            zKeys[idx].Time = keyTimeIdx;
-
-                            xKeys[idx].ValueId = AddKeyValue(GetLowerPrecisionValue(FixScaling(key.Value.X)));
-                            yKeys[idx].ValueId = AddKeyValue(GetLowerPrecisionValue(FixScaling(key.Value.Y)));
-                            zKeys[idx].ValueId = AddKeyValue(GetLowerPrecisionValue(FixScaling(key.Value.Z)));
-                        }
-                    }
-
-                    if (hit.RotationKeyCount != 0)
-                    {
-                        jointFlag |= JointFlags.HasRotation;
-
-                        var numKeys = Convert.ToByte(hit.RotationKeyCount);
-
-                        Key[] xKeys;
-                        Key[] yKeys;
-                        Key[] zKeys;
-
-                        {
-                            var lastKeyIdx = ipm.FCurveKeys.Count;
-
-                            ipm.FCurvesForward.Add(
-                                new FCurve
-                                {
-                                    JointId = Convert.ToInt16(boneIdx),
-                                    Channel = (byte)(Channel.ROTATATION_X),
-                                    KeyStartId = Convert.ToInt16(lastKeyIdx),
-                                    KeyCount = numKeys,
-                                }
-                            );
-
-                            ipm.FCurveKeys.AddRange(
-                                xKeys = Enumerable.Range(0, numKeys)
-                                    .Select(_ => new Key { })
-                                    .ToArray()
-                            );
-                        }
-
-                        {
-                            var lastKeyIdx = ipm.FCurveKeys.Count;
-
-                            ipm.FCurvesForward.Add(
-                                new FCurve
-                                {
-                                    JointId = Convert.ToInt16(boneIdx),
-                                    Channel = (byte)(Channel.ROTATATION_Y),
-                                    KeyStartId = Convert.ToInt16(lastKeyIdx),
-                                    KeyCount = numKeys,
-                                }
-                            );
-
-                            ipm.FCurveKeys.AddRange(
-                                yKeys = Enumerable.Range(0, numKeys)
-                                    .Select(_ => new Key { })
-                                    .ToArray()
-                            );
-                        }
-
-
-                        {
-                            var lastKeyIdx = ipm.FCurveKeys.Count;
-
-                            ipm.FCurvesForward.Add(
-                                new FCurve
-                                {
-                                    JointId = Convert.ToInt16(boneIdx),
-                                    Channel = (byte)(Channel.ROTATATION_Z),
-                                    KeyStartId = Convert.ToInt16(lastKeyIdx),
-                                    KeyCount = numKeys,
-                                }
-                            );
-
-                            ipm.FCurveKeys.AddRange(
-                                zKeys = Enumerable.Range(0, numKeys)
-                                    .Select(_ => new Key { })
-                                    .ToArray()
-                            );
-                        }
-
-                        foreach (var (key, idx) in hit.RotationKeys.Select((key, idx) => (key, idx)))
-                        {
-                            var keyTimeIdx = AddSourceKeyTime(key.Time);
-
-                            xKeys[idx].Type = Interpolation.Hermite;
-                            xKeys[idx].Time = keyTimeIdx;
-
-                            yKeys[idx].Type = Interpolation.Hermite;
-                            yKeys[idx].Time = keyTimeIdx;
-
-                            zKeys[idx].Type = Interpolation.Hermite;
-                            zKeys[idx].Time = keyTimeIdx;
-
-                            var angles = ToEulerAngles(key.Value);
-
-                            static float FromEulerAngle(float angle) => angle;
-
-                            xKeys[idx].ValueId = AddKeyValue(FromEulerAngle(angles.X));
-                            yKeys[idx].ValueId = AddKeyValue(FromEulerAngle(angles.Y));
-                            zKeys[idx].ValueId = AddKeyValue(FromEulerAngle(angles.Z));
-                        }
-                    }
-
-                    if (hit.PositionKeyCount != 0)
-                    {
-                        jointFlag |= JointFlags.HasPosition;
-
-                        var numKeys = Convert.ToByte(hit.PositionKeyCount);
-
-                        Key[] xKeys;
-                        Key[] yKeys;
-                        Key[] zKeys;
-
-                        {
-                            var lastKeyIdx = ipm.FCurveKeys.Count;
-
-                            ipm.FCurvesForward.Add(
-                                new FCurve
-                                {
-                                    JointId = Convert.ToInt16(boneIdx),
-                                    Channel = (byte)(Channel.TRANSLATION_X),
-                                    KeyStartId = Convert.ToInt16(lastKeyIdx),
-                                    KeyCount = numKeys,
-                                }
-                            );
-
-                            ipm.FCurveKeys.AddRange(
-                                xKeys = Enumerable.Range(0, numKeys)
-                                    .Select(_ => new Key { })
-                                    .ToArray()
-                            );
-                        }
-
-                        {
-                            var lastKeyIdx = ipm.FCurveKeys.Count;
-
-                            ipm.FCurvesForward.Add(
-                                new FCurve
-                                {
-                                    JointId = Convert.ToInt16(boneIdx),
-                                    Channel = (byte)(Channel.TRANSLATION_Y),
-                                    KeyStartId = Convert.ToInt16(lastKeyIdx),
-                                    KeyCount = numKeys,
-                                }
-                            );
-
-                            ipm.FCurveKeys.AddRange(
-                                yKeys = Enumerable.Range(0, numKeys)
-                                    .Select(_ => new Key { })
-                                    .ToArray()
-                            );
-                        }
-
-
-                        {
-                            var lastKeyIdx = ipm.FCurveKeys.Count;
-
-                            ipm.FCurvesForward.Add(
-                                new FCurve
-                                {
-                                    JointId = Convert.ToInt16(boneIdx),
-                                    Channel = (byte)(Channel.TRANSLATION_Z),
-                                    KeyStartId = Convert.ToInt16(lastKeyIdx),
-                                    KeyCount = numKeys,
-                                }
-                            );
-
-                            ipm.FCurveKeys.AddRange(
-                                zKeys = Enumerable.Range(0, numKeys)
-                                    .Select(_ => new Key { })
-                                    .ToArray()
-                            );
-                        }
-
-                        float FixPos(float value)
-                        {
-                            return value / ((boneIdx == 0) ? 1 : NodeScaling);
-                        }
-
-                        foreach (var (key, idx) in hit.PositionKeys.Select((key, idx) => (key, idx)))
-                        {
-                            var keyTimeIdx = AddSourceKeyTime(key.Time);
-
-                            xKeys[idx].Type = Interpolation.Hermite;
-                            xKeys[idx].Time = keyTimeIdx;
-
-                            yKeys[idx].Type = Interpolation.Hermite;
-                            yKeys[idx].Time = keyTimeIdx;
-
-                            zKeys[idx].Type = Interpolation.Hermite;
-                            zKeys[idx].Time = keyTimeIdx;
-
-                            xKeys[idx].ValueId = AddKeyValue(GetLowerPrecisionValue(FixPos(key.Value.X)));
-                            yKeys[idx].ValueId = AddKeyValue(GetLowerPrecisionValue(FixPos(key.Value.Y)));
-                            zKeys[idx].ValueId = AddKeyValue(GetLowerPrecisionValue(FixPos(key.Value.Z)));
                         }
                     }
                 }
@@ -391,10 +224,13 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                     .ToArray()
                 )
                 {
-                    var sames = ipm.FCurveKeys
+                    var thisKeys = ipm.FCurveKeys
                         .Skip(fCurve.KeyStartId)
                         .Take(fCurve.KeyCount)
-                        .Select(key => ipm.KeyValues[key.ValueId])
+                        .ToArray();
+
+                    var sames = thisKeys
+                        .Select(key => key.ValueId)
                         .Distinct()
                         .ToArray();
 
@@ -407,7 +243,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                             {
                                 BoneId = fCurve.JointId,
                                 ChannelValue = fCurve.ChannelValue,
-                                Value = sames.Single(),
+                                Value = ipm.KeyValues[sames.Single()],
                             }
                         );
 
@@ -417,8 +253,8 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                     {
                         var fCurveKeyReuseKey = string.Join(
                             " ",
-                            ipm.FCurveKeys.Skip(fCurve.KeyStartId).Take(fCurve.KeyCount)
-                                .Select(it => $"{it.Time:x4},{it.ValueId:x4},{it.LeftTangentId:x4},{it.RightTangentId:x4}")
+                            thisKeys
+                                .Select(it => $"{it.Type_Time:x4},{it.ValueId:x4},{it.LeftTangentId:x4},{it.RightTangentId:x4}")
                         );
 
                         if (fCurveKeyReuseTable.TryGetValue(fCurveKeyReuseKey, out ushort foundIdx))
@@ -429,11 +265,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                         {
                             var newIdx = Convert.ToUInt16(reducedFCurveKeys.Count);
 
-                            reducedFCurveKeys.AddRange(
-                                ipm.FCurveKeys
-                                    .Skip(fCurve.KeyStartId)
-                                    .Take(fCurve.KeyCount)
-                            );
+                            reducedFCurveKeys.AddRange(thisKeys);
 
                             fCurve.KeyStartId = (short)newIdx;
 
@@ -483,36 +315,12 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
             return (float)Math.Round(value, 2);
         }
 
-        /// <summary>
-        /// ToEulerAngles
-        /// </summary>
-        /// <see cref="https://stackoverflow.com/a/70462919"/>
-        private static Vector3 ToEulerAngles(Quaternion q)
+        private class ChannelProvider
         {
-            Vector3 angles = new();
-
-            // roll / x
-            double sinr_cosp = 2 * (q.W * q.X + q.Y * q.Z);
-            double cosr_cosp = 1 - 2 * (q.X * q.X + q.Y * q.Y);
-            angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
-
-            // pitch / y
-            double sinp = 2 * (q.W * q.Y - q.Z * q.X);
-            if (Math.Abs(sinp) >= 1)
-            {
-                angles.Y = (float)Math.CopySign(Math.PI / 2, sinp);
-            }
-            else
-            {
-                angles.Y = (float)Math.Asin(sinp);
-            }
-
-            // yaw / z
-            double siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
-            double cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
-            angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
-
-            return angles;
+            internal Channel type;
+            internal JointFlags jointFlags;
+            internal AScalarKey[] keys;
+            internal Func<float, float> fixValue;
         }
     }
 }
