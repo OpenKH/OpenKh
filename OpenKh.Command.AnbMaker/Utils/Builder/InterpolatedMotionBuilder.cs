@@ -175,7 +175,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
                     foreach (var channel in channels)
                     {
-                        if (channel.keys.Any())
+                        if (channel.keys?.Any() ?? false)
                         {
                             jointFlag |= channel.jointFlags;
 

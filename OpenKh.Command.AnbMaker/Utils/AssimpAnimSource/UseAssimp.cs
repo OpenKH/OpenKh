@@ -8,7 +8,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenKh.Command.AnbMaker.Utils.AssimpInputSource
+namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
 {
     public class UseAssimp
     {
@@ -28,10 +28,10 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpInputSource
             var assimp = new Assimp.AssimpContext();
             var scene = assimp.ImportFile(inputModel, Assimp.PostProcessSteps.None);
 
-            bool IsMeshNameMatched(string meshName) =>
+            bool IsMeshNameMatched(string it) =>
                 string.IsNullOrEmpty(meshName)
                     ? true
-                    : meshName == meshName;
+                    : it == meshName;
 
             foreach (var fbxMesh in scene.Meshes.Where(mesh => IsMeshNameMatched(mesh.Name)))
             {
@@ -39,10 +39,10 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpInputSource
                 var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
                 var fbxArmatureBoneCount = fbxArmatureNodes.Length;
 
-                bool IsAnimationNameMatched(string animName) =>
+                bool IsAnimationNameMatched(string it) =>
                     string.IsNullOrEmpty(animationName)
                         ? true
-                        : animName == animationName;
+                        : it == animationName;
 
                 foreach (var fbxAnim in scene.Animations.Where(anim => IsAnimationNameMatched(anim.Name)))
                 {

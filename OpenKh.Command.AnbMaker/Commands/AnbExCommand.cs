@@ -2,11 +2,9 @@ using McMaster.Extensions.CommandLineUtils;
 using NLog;
 using OpenKh.Command.AnbMaker.Commands.Interfaces;
 using OpenKh.Command.AnbMaker.Commands.Utils;
-using OpenKh.Command.AnbMaker.Extensions;
-using OpenKh.Command.AnbMaker.Utils;
-using OpenKh.Command.AnbMaker.Utils.AssimpInputSource;
+using OpenKh.Command.AnbMaker.Utils.AssimpAnimSource;
 using OpenKh.Command.AnbMaker.Utils.Builder;
-using OpenKh.Command.AnbMaker.Utils.Builder.Models;
+using OpenKh.Command.AnbMaker.Utils.JsonAnimSource;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -16,7 +14,6 @@ using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using static OpenKh.Kh2.Motion;
 
 namespace OpenKh.Command.AnbMaker.Commands
 {
@@ -58,14 +55,29 @@ namespace OpenKh.Command.AnbMaker.Commands
 
             Console.WriteLine($"Writing to: {Output}");
 
-            var parms = new UseAssimp(
-                inputModel: InputModel,
-                meshName: MeshName,
-                rootName: RootName,
-                animationName: AnimationName,
-                nodeScaling: NodeScaling
-            )
-                .Parameters;
+            IEnumerable<InterpolatedMotionBuilder.Parameter> parms;
+            if (Path.GetExtension(InputModel).ToLowerInvariant() == ".json")
+            {
+                parms = new UseJson(
+                    inputModel: InputModel,
+                    meshName: MeshName,
+                    rootName: RootName,
+                    animationName: AnimationName,
+                    nodeScaling: NodeScaling
+                )
+                    .Parameters;
+            }
+            else
+            {
+                parms = new UseAssimp(
+                    inputModel: InputModel,
+                    meshName: MeshName,
+                    rootName: RootName,
+                    animationName: AnimationName,
+                    nodeScaling: NodeScaling
+                )
+                    .Parameters;
+            }
 
             foreach (var parm in parms.Take(1))
             {
