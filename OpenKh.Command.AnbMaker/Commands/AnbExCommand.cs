@@ -78,9 +78,12 @@ namespace OpenKh.Command.AnbMaker.Commands
 
             var frameCount = (int)fbxAnim.DurationInTicks;
 
+            // convert source animation's keyTime to KH2 internal frame rate 60 fps which is called GFR (Global Frame Rate)
+            var keyTimeMultiplier = 60 / fbxAnim.TicksPerSecond;
+
             ipm.InterpolatedMotionHeader.BoneCount = Convert.ToInt16(fbxArmatureBoneCount);
             ipm.InterpolatedMotionHeader.TotalBoneCount = Convert.ToInt16(fbxArmatureBoneCount);
-            ipm.InterpolatedMotionHeader.FrameCount = (int)(frameCount * 60 / fbxAnim.TicksPerSecond); // in 1/60 sec
+            ipm.InterpolatedMotionHeader.FrameCount = (int)(frameCount * keyTimeMultiplier); // in 1/60 seconds
             ipm.InterpolatedMotionHeader.FrameData.FrameStart = 0;
             ipm.InterpolatedMotionHeader.FrameData.FrameEnd = frameCount - 1;
             ipm.InterpolatedMotionHeader.FrameData.FramesPerSecond = (float)fbxAnim.TicksPerSecond;
@@ -107,6 +110,11 @@ namespace OpenKh.Command.AnbMaker.Commands
                     ipm.KeyTimes.Add(keyTime);
                 }
                 return (short)Convert.ToUInt16(idx);
+            }
+
+            short AddSourceKeyTime(double sourceKeyTime)
+            {
+                return AddKeyTime((float)(sourceKeyTime * keyTimeMultiplier));
             }
 
             short AddKeyValue(float keyValue)
@@ -207,7 +215,7 @@ namespace OpenKh.Command.AnbMaker.Commands
 
                         foreach (var (key, idx) in hit.ScalingKeys.Select((key, idx) => (key, idx)))
                         {
-                            var keyTimeIdx = AddKeyTime((float)key.Time);
+                            var keyTimeIdx = AddSourceKeyTime(key.Time);
 
                             xKeys[idx].Type = Interpolation.Hermite;
                             xKeys[idx].Time = keyTimeIdx;
@@ -297,7 +305,7 @@ namespace OpenKh.Command.AnbMaker.Commands
 
                         foreach (var (key, idx) in hit.RotationKeys.Select((key, idx) => (key, idx)))
                         {
-                            var keyTimeIdx = AddKeyTime((float)key.Time);
+                            var keyTimeIdx = AddSourceKeyTime(key.Time);
 
                             xKeys[idx].Type = Interpolation.Hermite;
                             xKeys[idx].Time = keyTimeIdx;
@@ -396,7 +404,7 @@ namespace OpenKh.Command.AnbMaker.Commands
 
                         foreach (var (key, idx) in hit.PositionKeys.Select((key, idx) => (key, idx)))
                         {
-                            var keyTimeIdx = AddKeyTime((float)key.Time);
+                            var keyTimeIdx = AddSourceKeyTime(key.Time);
 
                             xKeys[idx].Type = Interpolation.Hermite;
                             xKeys[idx].Time = keyTimeIdx;
@@ -488,7 +496,7 @@ namespace OpenKh.Command.AnbMaker.Commands
 
                 if (numSames != 0)
                 {
-                    logger.Debug($"{numSames:#,##0} channels has same value. They are converted to InitialPoses.");
+                    logger.Debug($"{numSames:#,##0} channels have only single value. They are converted to InitialPoses.");
                 }
 
                 logger.Debug($"FCurveKeys count reduced from {ipm.FCurveKeys.Count:#,##0} to {reducedFCurveKeys.Count:#,##0}");
