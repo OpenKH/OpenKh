@@ -33,6 +33,11 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
             var frameCount = parm.DurationInTicks;
 
+            if (parm.TicksPerSecond <= 0)
+            {
+                throw new Exception("TicksPerSecond must be set!");
+            }
+
             // convert source animation's keyTime to KH2 internal frame rate 60 fps which is called GFR (Global Frame Rate)
             var keyTimeMultiplier = 60 / parm.TicksPerSecond;
 

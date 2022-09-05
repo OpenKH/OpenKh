@@ -64,7 +64,7 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                         {
                             return new AScalarKey
                             {
-                                Time = (float)rotation.time,
+                                Time = (float)(rotation.time - action.FrameStart),
                                 Value = value,
                             };
                         }
@@ -73,23 +73,47 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                         {
                             BoneCount = obj.Bones.Count(),
                             DurationInTicks = (int)(action.FrameEnd - action.FrameStart),
-                            TicksPerSecond = obj.Fps,
+                            TicksPerSecond = NzFloat(obj.Fps, 25),
                             NodeScaling = nodeScaling,
                             GetAChannel = boneIdx =>
                             {
-                                var fcurves = action.Groups[boneIdx].Channels;
+                                var bone = obj.Bones[boneIdx];
+                                var group = action.Groups.FirstOrDefault(it => it.Name == bone.Name);
 
-                                var Qw = fcurves
-                                    .First(it => it.ChannelRef == "rotation_quaternion.0")
+                                var fcurves = group?.Channels ?? new BFCurve[0];
+
+                                BFCurve ProvideFallback(string channelRef, float fallbackValue)
+                                {
+                                    return new BFCurve
+                                    {
+                                        ChannelRef = channelRef,
+                                        KeyFrames = new BKeyFrame[]
+                                        {
+                                            new BKeyFrame
+                                            {
+                                                Time = 0,
+                                                Value = fallbackValue,
+                                            },
+                                            new BKeyFrame
+                                            {
+                                                Time = action.FrameEnd - action.FrameStart,
+                                                Value = fallbackValue
+                                            },
+                                        }
+                                    };
+                                }
+
+                                var Qw = (fcurves
+                                    .FirstOrDefault(it => it.ChannelRef == "rotation_quaternion.0") ?? ProvideFallback("rotation_quaternion.0", 1))
                                     .KeyFrames;
-                                var Qx = fcurves
-                                    .First(it => it.ChannelRef == "rotation_quaternion.1")
+                                var Qx = (fcurves
+                                    .FirstOrDefault(it => it.ChannelRef == "rotation_quaternion.1") ?? ProvideFallback("rotation_quaternion.1", 0))
                                     .KeyFrames;
-                                var Qy = fcurves
-                                    .First(it => it.ChannelRef == "rotation_quaternion.2")
+                                var Qy = (fcurves
+                                    .FirstOrDefault(it => it.ChannelRef == "rotation_quaternion.2") ?? ProvideFallback("rotation_quaternion.2", 0))
                                     .KeyFrames;
-                                var Qz = fcurves
-                                    .First(it => it.ChannelRef == "rotation_quaternion.3")
+                                var Qz = (fcurves
+                                    .FirstOrDefault(it => it.ChannelRef == "rotation_quaternion.3") ?? ProvideFallback("rotation_quaternion.3", 0))
                                     .KeyFrames;
 
                                 var pseudoRotations = new List<PseudoRotation>();
@@ -119,20 +143,20 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
 
                                 return new AChannel
                                 {
-                                    ScaleXKeys = fcurves
-                                        .First(it => it.ChannelRef == "scale.0")
+                                    ScaleXKeys = (fcurves
+                                        .FirstOrDefault(it => it.ChannelRef == "scale.0") ?? ProvideFallback("scale.0", bone.Scale[0]))
                                         .KeyFrames
                                         .Select(it => GetKey(it))
                                         .ToArray(),
 
-                                    ScaleYKeys = fcurves
-                                        .First(it => it.ChannelRef == "scale.1")
+                                    ScaleYKeys = (fcurves
+                                        .FirstOrDefault(it => it.ChannelRef == "scale.1") ?? ProvideFallback("scale.1", bone.Scale[1]))
                                         .KeyFrames
                                         .Select(it => GetKey(it))
                                         .ToArray(),
 
-                                    ScaleZKeys = fcurves
-                                        .First(it => it.ChannelRef == "scale.2")
+                                    ScaleZKeys = (fcurves
+                                        .FirstOrDefault(it => it.ChannelRef == "scale.2") ?? ProvideFallback("scale.2", bone.Scale[2]))
                                         .KeyFrames
                                         .Select(it => GetKey(it))
                                         .ToArray(),
@@ -149,20 +173,20 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                                         .Select(it => GetRotationKey(it, it.rotation.Z))
                                         .ToArray(),
 
-                                    PositionXKeys = fcurves
-                                        .First(it => it.ChannelRef == "location.0")
+                                    PositionXKeys = (fcurves
+                                        .FirstOrDefault(it => it.ChannelRef == "location.0") ?? ProvideFallback("location.0", bone.Translation[0]))
                                         .KeyFrames
                                         .Select(it => GetKey(it))
                                         .ToArray(),
 
-                                    PositionYKeys = fcurves
-                                        .First(it => it.ChannelRef == "location.1")
+                                    PositionYKeys = (fcurves
+                                        .FirstOrDefault(it => it.ChannelRef == "location.1") ?? ProvideFallback("location.1", bone.Translation[1]))
                                         .KeyFrames
                                         .Select(it => GetKey(it))
                                         .ToArray(),
 
-                                    PositionZKeys = fcurves
-                                        .First(it => it.ChannelRef == "location.2")
+                                    PositionZKeys = (fcurves
+                                        .FirstOrDefault(it => it.ChannelRef == "location.2") ?? ProvideFallback("location.2", bone.Translation[2]))
                                         .KeyFrames
                                         .Select(it => GetKey(it))
                                         .ToArray(),
@@ -178,6 +202,11 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
         {
             internal double time;
             internal Vector3 rotation;
+        }
+
+        private static float NzFloat(float value, float fallback)
+        {
+            return (value == 0) ? fallback : value;
         }
     }
 }
