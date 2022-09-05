@@ -12,32 +12,37 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 {
     public class InterpolatedMotionBuilder
     {
-        public InterpolatedMotion ipm { get; }
+        public InterpolatedMotion Ipm { get; }
+
+        public class Parameter
+        {
+            public int DurationInTicks { get; set; }
+            public float TicksPerSecond { get; set; }
+            public int BoneCount { get; set; }
+            public float NodeScaling { get; set; }
+            public Func<int, AChannel> GetAChannel { get; set; }
+        }
 
         public InterpolatedMotionBuilder(
-            int DurationInTicks,
-            float TicksPerSecond,
-            int fbxArmatureBoneCount,
-            float NodeScaling,
-            Func<int, AChannel> getAChannel
+            Parameter parm
         )
         {
-            ipm = InterpolatedMotion.CreateEmpty();
+            Ipm = InterpolatedMotion.CreateEmpty();
 
             var logger = LogManager.GetCurrentClassLogger();
 
-            var frameCount = DurationInTicks;
+            var frameCount = parm.DurationInTicks;
 
             // convert source animation's keyTime to KH2 internal frame rate 60 fps which is called GFR (Global Frame Rate)
-            var keyTimeMultiplier = 60 / TicksPerSecond;
+            var keyTimeMultiplier = 60 / parm.TicksPerSecond;
 
-            ipm.InterpolatedMotionHeader.BoneCount = Convert.ToInt16(fbxArmatureBoneCount);
-            ipm.InterpolatedMotionHeader.TotalBoneCount = Convert.ToInt16(fbxArmatureBoneCount);
-            ipm.InterpolatedMotionHeader.FrameCount = (int)(frameCount * keyTimeMultiplier); // in 1/60 seconds
-            ipm.InterpolatedMotionHeader.FrameData.FrameStart = 0;
-            ipm.InterpolatedMotionHeader.FrameData.FrameEnd = frameCount - 1;
-            ipm.InterpolatedMotionHeader.FrameData.FramesPerSecond = TicksPerSecond;
-            ipm.InterpolatedMotionHeader.BoundingBox = new BoundingBox
+            Ipm.InterpolatedMotionHeader.BoneCount = Convert.ToInt16(parm.BoneCount);
+            Ipm.InterpolatedMotionHeader.TotalBoneCount = Convert.ToInt16(parm.BoneCount);
+            Ipm.InterpolatedMotionHeader.FrameCount = (int)(frameCount * keyTimeMultiplier); // in 1/60 seconds
+            Ipm.InterpolatedMotionHeader.FrameData.FrameStart = 0;
+            Ipm.InterpolatedMotionHeader.FrameData.FrameEnd = frameCount - 1;
+            Ipm.InterpolatedMotionHeader.FrameData.FramesPerSecond = parm.TicksPerSecond;
+            Ipm.InterpolatedMotionHeader.BoundingBox = new BoundingBox
             {
                 BoundingBoxMinX = -100,
                 BoundingBoxMinY = -100,
@@ -49,15 +54,15 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                 BoundingBoxMaxW = 1,
             };
 
-            ipm.KeyTangents.Add(0);
+            Ipm.KeyTangents.Add(0);
 
             short AddKeyTime(float keyTime)
             {
-                var idx = ipm.KeyTimes.IndexOf(keyTime);
+                var idx = Ipm.KeyTimes.IndexOf(keyTime);
                 if (idx < 0)
                 {
-                    idx = ipm.KeyTimes.Count;
-                    ipm.KeyTimes.Add(keyTime);
+                    idx = Ipm.KeyTimes.Count;
+                    Ipm.KeyTimes.Add(keyTime);
                 }
                 return (short)Convert.ToUInt16(idx);
             }
@@ -69,30 +74,30 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
             short AddKeyValue(float keyValue)
             {
-                var idx = ipm.KeyValues.IndexOf(keyValue);
+                var idx = Ipm.KeyValues.IndexOf(keyValue);
                 if (idx < 0)
                 {
-                    idx = ipm.KeyValues.Count;
-                    ipm.KeyValues.Add(keyValue);
+                    idx = Ipm.KeyValues.Count;
+                    Ipm.KeyValues.Add(keyValue);
                 }
                 return (short)Convert.ToUInt16(idx);
             }
 
-            for (int boneIdx = 0; boneIdx < fbxArmatureBoneCount; boneIdx++)
+            for (int boneIdx = 0; boneIdx < parm.BoneCount; boneIdx++)
             {
-                var hit = getAChannel(boneIdx);
+                var hit = parm.GetAChannel(boneIdx);
                 if (hit != null)
                 {
                     float FixScaling(float value)
                     {
-                        return ((boneIdx == 0) ? NodeScaling : 1f) * value;
+                        return ((boneIdx == 0) ? parm.NodeScaling : 1f) * value;
                     }
 
                     float FixScalingValue(float value) => GetLowerPrecisionValue(FixScaling(value));
 
                     float FixPos(float value)
                     {
-                        return value / ((boneIdx == 0) ? 1 : NodeScaling);
+                        return value / ((boneIdx == 0) ? 1 : parm.NodeScaling);
                     }
 
                     float FixPosValue(float value) => GetLowerPrecisionValue(FixPos(value));
@@ -176,9 +181,9 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
                             var numKeys = Convert.ToByte(channel.keys.Count());
 
-                            var lastKeyIdx = ipm.FCurveKeys.Count;
+                            var lastKeyIdx = Ipm.FCurveKeys.Count;
 
-                            ipm.FCurvesForward.Add(
+                            Ipm.FCurvesForward.Add(
                                 new FCurve
                                 {
                                     JointId = Convert.ToInt16(boneIdx),
@@ -188,7 +193,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                                 }
                             );
 
-                            ipm.FCurveKeys.AddRange(
+                            Ipm.FCurveKeys.AddRange(
                                 channel.keys
                                     .Select(
                                         key => new Key
@@ -203,7 +208,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                     }
                 }
 
-                ipm.Joints.Add(
+                Ipm.Joints.Add(
                     new Joint
                     {
                         JointId = Convert.ToInt16(boneIdx),
@@ -219,12 +224,12 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
                 var fCurveKeyReuseTable = new SortedDictionary<string, ushort>();
                 var reducedFCurveKeys = new List<Key>();
-                foreach (var (fCurve, idx) in ipm.FCurvesForward
+                foreach (var (fCurve, idx) in Ipm.FCurvesForward
                     .Select((fCurve, idx) => (fCurve, idx))
                     .ToArray()
                 )
                 {
-                    var thisKeys = ipm.FCurveKeys
+                    var thisKeys = Ipm.FCurveKeys
                         .Skip(fCurve.KeyStartId)
                         .Take(fCurve.KeyCount)
                         .ToArray();
@@ -238,16 +243,16 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                     {
                         numSames++;
 
-                        ipm.InitialPoses.Add(
+                        Ipm.InitialPoses.Add(
                             new InitialPose
                             {
                                 BoneId = fCurve.JointId,
                                 ChannelValue = fCurve.ChannelValue,
-                                Value = ipm.KeyValues[sames.Single()],
+                                Value = Ipm.KeyValues[sames.Single()],
                             }
                         );
 
-                        ipm.FCurvesForward.Remove(fCurve);
+                        Ipm.FCurvesForward.Remove(fCurve);
                     }
                     else
                     {
@@ -279,25 +284,25 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
                     logger.Debug($"{numSames:#,##0} channels have only single value. They are converted to InitialPoses.");
                 }
 
-                logger.Debug($"FCurveKeys count reduced from {ipm.FCurveKeys.Count:#,##0} to {reducedFCurveKeys.Count:#,##0}");
+                logger.Debug($"FCurveKeys count reduced from {Ipm.FCurveKeys.Count:#,##0} to {reducedFCurveKeys.Count:#,##0}");
 
-                ipm.FCurveKeys.Clear();
-                ipm.FCurveKeys.AddRange(reducedFCurveKeys);
+                Ipm.FCurveKeys.Clear();
+                Ipm.FCurveKeys.AddRange(reducedFCurveKeys);
             }
 
             // sort key time in ascending order
             {
-                var newKeyTimes = ipm.KeyTimes
+                var newKeyTimes = Ipm.KeyTimes
                     .OrderBy(it => it)
                     .ToArray();
 
-                foreach (var fCurveKey in ipm.FCurveKeys)
+                foreach (var fCurveKey in Ipm.FCurveKeys)
                 {
-                    fCurveKey.Time = (short)Convert.ToUInt16(Array.IndexOf(newKeyTimes, ipm.KeyTimes[fCurveKey.Time]));
+                    fCurveKey.Time = (short)Convert.ToUInt16(Array.IndexOf(newKeyTimes, Ipm.KeyTimes[fCurveKey.Time]));
                 }
 
-                ipm.KeyTimes.Clear();
-                ipm.KeyTimes.AddRange(newKeyTimes);
+                Ipm.KeyTimes.Clear();
+                Ipm.KeyTimes.AddRange(newKeyTimes);
             }
         }
 

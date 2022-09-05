@@ -4,6 +4,7 @@ using OpenKh.Command.AnbMaker.Commands.Interfaces;
 using OpenKh.Command.AnbMaker.Commands.Utils;
 using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Command.AnbMaker.Utils;
+using OpenKh.Command.AnbMaker.Utils.AssimpInputSource;
 using OpenKh.Command.AnbMaker.Utils.Builder;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
 using OpenKh.Kh2;
@@ -53,147 +54,65 @@ namespace OpenKh.Command.AnbMaker.Commands
         {
             var logger = LogManager.GetLogger("InterpolatedMotionMaker");
 
-            var assimp = new Assimp.AssimpContext();
-            var scene = assimp.ImportFile(InputModel, Assimp.PostProcessSteps.None);
-
             Output = Path.GetFullPath(Output ?? Path.GetFileNameWithoutExtension(InputModel) + ".anb");
 
             Console.WriteLine($"Writing to: {Output}");
 
-            bool IsMeshNameMatched(string meshName) =>
-                string.IsNullOrEmpty(MeshName)
-                    ? true
-                    : meshName == MeshName;
+            var parms = new UseAssimp(
+                inputModel: InputModel,
+                meshName: MeshName,
+                rootName: RootName,
+                animationName: AnimationName,
+                nodeScaling: NodeScaling
+            )
+                .Parameters;
 
-            var fbxMesh = scene.Meshes.First(mesh => IsMeshNameMatched(mesh.Name));
-            var fbxArmatureRoot = scene.RootNode.FindNode(RootName ?? "bone000"); //"kh_sk"
-            var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
-            var fbxArmatureBoneCount = fbxArmatureNodes.Length;
+            foreach (var parm in parms.Take(1))
+            {
+                var builder = new InterpolatedMotionBuilder(parm);
 
-            bool IsAnimationNameMatched(string animName) =>
-                string.IsNullOrEmpty(AnimationName)
-                    ? true
-                    : animName == AnimationName;
+                var ipm = builder.Ipm;
 
-            var fbxAnim = scene.Animations.First(anim => IsAnimationNameMatched(anim.Name));
+                logger.Debug($"{ipm.ConstraintActivations.Count,6:#,##0} ConstraintActivations");
+                logger.Debug($"{ipm.Constraints.Count,6:#,##0} Constraints");
+                logger.Debug($"{ipm.ExpressionNodes.Count,6:#,##0} ExpressionNodes");
+                logger.Debug($"{ipm.Expressions.Count,6:#,##0} Expressions");
+                logger.Debug($"{ipm.ExternalEffectors.Count,6:#,##0} ExternalEffectors");
+                logger.Debug($"{ipm.FCurveKeys.Count,6:#,##0} FCurveKeys");
+                logger.Debug($"{ipm.FCurvesForward.Count,6:#,##0} FCurvesForward");
+                logger.Debug($"{ipm.FCurvesInverse.Count,6:#,##0} FCurvesInverse");
+                logger.Debug($"{ipm.IKHelpers.Count,6:#,##0} IKHelpers");
+                logger.Debug($"{ipm.InitialPoses.Count,6:#,##0} InitialPoses");
+                logger.Debug($"{ipm.Joints.Count,6:#,##0} Joints");
+                logger.Debug($"{ipm.KeyTangents.Count,6:#,##0} KeyTangents");
+                logger.Debug($"{ipm.KeyTimes.Count,6:#,##0} KeyTimes");
+                logger.Debug($"{ipm.KeyValues.Count,6:#,##0} KeyValues");
 
-            AScalarKey GetAScalarKey(double time, float value) =>
-                new AScalarKey
-                {
-                    Time = (float)time,
-                    Value = value,
-                };
+                var motionStream = (MemoryStream)ipm.toStream();
 
-            var builder = new InterpolatedMotionBuilder(
-                (int)fbxAnim.DurationInTicks,
-                (float)fbxAnim.TicksPerSecond,
-                fbxArmatureBoneCount,
-                NodeScaling,
-                boneIdx =>
-                {
-                    var name = fbxArmatureNodes[boneIdx].ArmatureNode.Name;
-                    var hit = fbxAnim.NodeAnimationChannels.FirstOrDefault(it => it.NodeName == name);
-                    if (hit != null)
+                var anbBarStream = new MemoryStream();
+                Bar.Write(
+                    anbBarStream,
+                    new Bar.Entry[]
                     {
-                        var pseudoRotations = hit.RotationKeys
-                            .Select(
-                                key => new PseudoRotation
-                                {
-                                    time = key.Time,
-                                    rotation = key.Value.ToDotNetQuaternion().ToEulerAngles()
-                                }
-                            )
-                            .ToArray();
-
-                        return new AChannel
-                        {
-                            ScaleXKeys = hit.ScalingKeys
-                                .Select(it => GetAScalarKey(it.Time, it.Value.X))
-                                .ToArray(),
-
-                            ScaleYKeys = hit.ScalingKeys
-                                .Select(it => GetAScalarKey(it.Time, it.Value.Y))
-                                .ToArray(),
-
-                            ScaleZKeys = hit.ScalingKeys
-                                .Select(it => GetAScalarKey(it.Time, it.Value.Z))
-                                .ToArray(),
-
-                            RotationXKeys = pseudoRotations
-                                .Select(it => GetAScalarKey(it.time, it.rotation.X))
-                                .ToArray(),
-                            RotationYKeys = pseudoRotations
-                                .Select(it => GetAScalarKey(it.time, it.rotation.Y))
-                                .ToArray(),
-                            RotationZKeys = pseudoRotations
-                                .Select(it => GetAScalarKey(it.time, it.rotation.Z))
-                                .ToArray(),
-
-                            PositionXKeys = hit.PositionKeys
-                                .Select(it => GetAScalarKey(it.Time, it.Value.X))
-                                .ToArray(),
-
-                            PositionYKeys = hit.PositionKeys
-                                .Select(it => GetAScalarKey(it.Time, it.Value.Y))
-                                .ToArray(),
-
-                            PositionZKeys = hit.PositionKeys
-                                .Select(it => GetAScalarKey(it.Time, it.Value.Z))
-                                .ToArray(),
-                        };
-                    }
-
-                    return null;
-                }
-            );
-
-            var ipm = builder.ipm;
-
-            logger.Debug($"{ipm.ConstraintActivations.Count,6:#,##0} ConstraintActivations");
-            logger.Debug($"{ipm.Constraints.Count,6:#,##0} Constraints");
-            logger.Debug($"{ipm.ExpressionNodes.Count,6:#,##0} ExpressionNodes");
-            logger.Debug($"{ipm.Expressions.Count,6:#,##0} Expressions");
-            logger.Debug($"{ipm.ExternalEffectors.Count,6:#,##0} ExternalEffectors");
-            logger.Debug($"{ipm.FCurveKeys.Count,6:#,##0} FCurveKeys");
-            logger.Debug($"{ipm.FCurvesForward.Count,6:#,##0} FCurvesForward");
-            logger.Debug($"{ipm.FCurvesInverse.Count,6:#,##0} FCurvesInverse");
-            logger.Debug($"{ipm.IKHelpers.Count,6:#,##0} IKHelpers");
-            logger.Debug($"{ipm.InitialPoses.Count,6:#,##0} InitialPoses");
-            logger.Debug($"{ipm.Joints.Count,6:#,##0} Joints");
-            logger.Debug($"{ipm.KeyTangents.Count,6:#,##0} KeyTangents");
-            logger.Debug($"{ipm.KeyTimes.Count,6:#,##0} KeyTimes");
-            logger.Debug($"{ipm.KeyValues.Count,6:#,##0} KeyValues");
-
-            var motionStream = (MemoryStream)ipm.toStream();
-
-            var anbBarStream = new MemoryStream();
-            Bar.Write(
-                anbBarStream,
-                new Bar.Entry[]
-                {
                         new Bar.Entry
                         {
                             Type = Bar.EntryType.Motion,
                             Name = "A999",
                             Stream = motionStream,
                         }
-                }
-            );
+                    }
+                );
 
-            File.WriteAllBytes(Output, anbBarStream.ToArray());
-            File.WriteAllBytes(Output + ".raw", motionStream.ToArray());
+                File.WriteAllBytes(Output, anbBarStream.ToArray());
+                File.WriteAllBytes(Output + ".raw", motionStream.ToArray());
 
-            logger.Debug($"Motion data generation successful");
+                logger.Debug($"Motion data generation successful");
 
-            new MsetInjector().InjectMotionTo(this, motionStream.ToArray());
+                new MsetInjector().InjectMotionTo(this, motionStream.ToArray());
+            }
 
             return 0;
-        }
-
-        private class PseudoRotation
-        {
-            internal double time;
-            internal Vector3 rotation;
         }
     }
 }
