@@ -1,3 +1,4 @@
+using NLog;
 using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Command.AnbMaker.Utils.Builder;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
@@ -24,6 +25,10 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
             float nodeScaling
         )
         {
+            var logger = LogManager.GetCurrentClassLogger();
+
+            logger.Warn("JSON model importer is still incomplete! There will be problem on skeleton processing of scale, rotation, and location");
+
             var model = JsonSerializer.Deserialize<BRoot>(
                 File.ReadAllText(inputModel),
                 new JsonSerializerOptions
@@ -80,6 +85,25 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                                 var bone = obj.Bones[boneIdx];
                                 var group = action.Groups.FirstOrDefault(it => it.Name == bone.Name);
 
+                                var parent = (bone.Parent == -1)
+                                    ? Matrix4x4.Identity
+                                    : GetMatrix4x4(obj.Bones[bone.Parent].MatrixLocal);
+                                Matrix4x4.Invert(parent, out Matrix4x4 parentInv);
+
+                                var matrix = parentInv * GetMatrix4x4(bone.MatrixLocal);
+                                var head = ((bone.Parent == -1)
+                                    ? Vector3.Zero
+                                    : -GetVector3(obj.Bones[bone.Parent].HeadLocal)
+                                )
+                                    + GetVector3(bone.HeadLocal);
+
+                                Matrix4x4.Decompose(
+                                    matrix,
+                                    out Vector3 boneScale,
+                                    out Quaternion boneRotation,
+                                    out Vector3 boneTranslation
+                                );
+
                                 var fcurves = group?.Channels ?? new BFCurve[0];
 
                                 BFCurve ProvideFallback(string channelRef, float fallbackValue)
@@ -130,12 +154,7 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                                                         time = Qw[idx].Time,
                                                         rotation = (
                                                             Quaternion.Identity
-                                                            * new Quaternion(
-                                                                w: bone.Rotation[0],
-                                                                x: bone.Rotation[1],
-                                                                y: bone.Rotation[2],
-                                                                z: bone.Rotation[3]
-                                                            )
+                                                            * boneRotation
                                                             * new Quaternion(
                                                                 x: Qx[idx].Value,
                                                                 y: Qy[idx].Value,
@@ -156,12 +175,7 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                                         new PseudoRotation
                                         {
                                             time = 0,
-                                            rotation = new Quaternion(
-                                                w: bone.Rotation[0],
-                                                x: bone.Rotation[1],
-                                                y: bone.Rotation[2],
-                                                z: bone.Rotation[3]
-                                            )
+                                            rotation = boneRotation
                                                 .ToEulerAngles(),
                                         }
                                     );
@@ -170,19 +184,19 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                                 return new AChannel
                                 {
                                     ScaleXKeys = (fcurves
-                                        .FirstOrDefault(it => it.ChannelRef == "scale.0") ?? ProvideFallback("scale.0", bone.Scale[0]))
+                                        .FirstOrDefault(it => it.ChannelRef == "scale.0") ?? ProvideFallback("scale.0", boneScale.X))
                                         .KeyFrames
                                         .Select(it => GetKey(it))
                                         .ToArray(),
 
                                     ScaleYKeys = (fcurves
-                                        .FirstOrDefault(it => it.ChannelRef == "scale.1") ?? ProvideFallback("scale.1", bone.Scale[1]))
+                                        .FirstOrDefault(it => it.ChannelRef == "scale.1") ?? ProvideFallback("scale.1", boneScale.Y))
                                         .KeyFrames
                                         .Select(it => GetKey(it))
                                         .ToArray(),
 
                                     ScaleZKeys = (fcurves
-                                        .FirstOrDefault(it => it.ChannelRef == "scale.2") ?? ProvideFallback("scale.2", bone.Scale[2]))
+                                        .FirstOrDefault(it => it.ChannelRef == "scale.2") ?? ProvideFallback("scale.2", boneScale.Z))
                                         .KeyFrames
                                         .Select(it => GetKey(it))
                                         .ToArray(),
@@ -200,21 +214,21 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                                         .ToArray(),
 
                                     PositionXKeys = (fcurves
-                                        .FirstOrDefault(it => it.ChannelRef == "location.0") ?? ProvideFallback("location.0", bone.Translation[0]))
+                                        .FirstOrDefault(it => it.ChannelRef == "location.0") ?? ProvideFallback("location.0", boneTranslation.X))
                                         .KeyFrames
-                                        .Select(it => GetKey(it, bone.Translation[0]))
+                                        .Select(it => GetKey(it, head.X))
                                         .ToArray(),
 
                                     PositionYKeys = (fcurves
-                                        .FirstOrDefault(it => it.ChannelRef == "location.1") ?? ProvideFallback("location.1", bone.Translation[1]))
+                                        .FirstOrDefault(it => it.ChannelRef == "location.1") ?? ProvideFallback("location.1", boneTranslation.Y))
                                         .KeyFrames
-                                        .Select(it => GetKey(it, bone.Translation[1]))
+                                        .Select(it => GetKey(it, head.Y))
                                         .ToArray(),
 
                                     PositionZKeys = (fcurves
-                                        .FirstOrDefault(it => it.ChannelRef == "location.2") ?? ProvideFallback("location.2", bone.Translation[2]))
+                                        .FirstOrDefault(it => it.ChannelRef == "location.2") ?? ProvideFallback("location.2", boneTranslation.Z))
                                         .KeyFrames
-                                        .Select(it => GetKey(it, bone.Translation[2]))
+                                        .Select(it => GetKey(it, head.Z))
                                         .ToArray(),
                                 };
                             }
@@ -222,6 +236,25 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                     }
                 )
                 .ToArray();
+        }
+
+        private Vector3 GetVector3(float[] headLocal)
+        {
+            return new Vector3(
+                headLocal[0],
+                headLocal[1],
+                headLocal[2]
+            );
+        }
+
+        private static Matrix4x4 GetMatrix4x4(float[] m)
+        {
+            return new Matrix4x4(
+                m[0], m[1], m[2], m[3],
+                m[4], m[5], m[6], m[7],
+                m[8], m[9], m[10], m[11],
+                m[12], m[13], m[14], m[15]
+            );
         }
 
         private class PseudoRotation
