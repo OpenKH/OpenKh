@@ -4,6 +4,7 @@ using OpenKh.Command.AnbMaker.Commands.Interfaces;
 using OpenKh.Command.AnbMaker.Commands.Utils;
 using OpenKh.Command.AnbMaker.Utils.AssimpAnimSource;
 using OpenKh.Command.AnbMaker.Utils.Builder;
+using OpenKh.Command.AnbMaker.Utils.Builder.Models;
 using OpenKh.Command.AnbMaker.Utils.JsonAnimSource;
 using OpenKh.Kh2;
 using System;
@@ -55,7 +56,7 @@ namespace OpenKh.Command.AnbMaker.Commands
 
             Console.WriteLine($"Writing to: {Output}");
 
-            IEnumerable<InterpolatedMotionBuilder.Parameter> parms;
+            IEnumerable<BasicSourceMotion> parms;
             if (Path.GetExtension(InputModel).ToLowerInvariant() == ".json")
             {
                 parms = new UseJson(

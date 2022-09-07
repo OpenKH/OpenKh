@@ -5,6 +5,8 @@ using OpenKh.Command.AnbMaker.Commands.Interfaces;
 using OpenKh.Command.AnbMaker.Commands.Utils;
 using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Command.AnbMaker.Utils;
+using OpenKh.Command.AnbMaker.Utils.Builder;
+using OpenKh.Command.AnbMaker.Utils.Builder.Models;
 using OpenKh.Kh2;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static OpenKh.Command.AnbMaker.Utils.Builder.RawMotionBuilder;
 using static OpenKh.Kh2.Motion;
 
 namespace OpenKh.Command.AnbMaker.Commands
@@ -50,111 +53,138 @@ namespace OpenKh.Command.AnbMaker.Commands
         {
             var logger = LogManager.GetLogger("RawMotionMaker");
 
-            var assimp = new Assimp.AssimpContext();
-            var scene = assimp.ImportFile(InputModel, Assimp.PostProcessSteps.None);
-
             Output = Path.GetFullPath(Output ?? Path.GetFileNameWithoutExtension(InputModel) + ".anb");
-
-            var nodeFix = System.Numerics.Matrix4x4.CreateScale(
-                NodeScaling
-            );
 
             Console.WriteLine($"Writing to: {Output}");
 
-            bool IsMeshNameMatched(string meshName) =>
-                string.IsNullOrEmpty(MeshName)
-                    ? true
-                    : meshName == MeshName;
+            var parms = new UseAssimpForRaw(
+                InputModel,
+                MeshName,
+                RootName,
+                AnimationName,
+                NodeScaling
+            )
+                .Parameters;
 
-            var fbxMesh = scene.Meshes.First(mesh => IsMeshNameMatched(mesh.Name));
-            var fbxArmatureRoot = scene.RootNode.FindNode(RootName ?? "bone000"); //"kh_sk"
-            var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
-            var fbxArmatureBoneCount = fbxArmatureNodes.Length;
-
-            bool IsAnimationNameMatched(string animName) =>
-                string.IsNullOrEmpty(AnimationName)
-                    ? true
-                    : animName == AnimationName;
-
-            var fbxAnim = scene.Animations.First(anim => IsAnimationNameMatched(anim.Name));
-
-            var raw = RawMotion.CreateEmpty();
-
-            var frameCount = (int)fbxAnim.DurationInTicks;
-
-            raw.RawMotionHeader.BoneCount = fbxArmatureBoneCount;
-            raw.RawMotionHeader.FrameCount = (int)(frameCount * 60 / fbxAnim.TicksPerSecond); // in 1/60 sec
-            raw.RawMotionHeader.TotalFrameCount = frameCount;
-            raw.RawMotionHeader.FrameData.FrameStart = 0;
-            raw.RawMotionHeader.FrameData.FrameEnd = frameCount - 1;
-            raw.RawMotionHeader.FrameData.FramesPerSecond = (float)fbxAnim.TicksPerSecond;
-
-            for (int frameIdx = 0; frameIdx < frameCount; frameIdx++)
+            foreach (var parm in parms.Take(1))
             {
-                var matrices = new List<System.Numerics.Matrix4x4>();
+                var builder = new RawMotionBuilder(
+                    parm
+                );
 
-                for (int boneIdx = 0; boneIdx < fbxArmatureBoneCount; boneIdx++)
-                {
-                    var parentIdx = fbxArmatureNodes[boneIdx].ParentIndex;
+                logger.Debug($"(frameCount {parm.DurationInTicks:#,##0}) x (boneCount {parm.BoneCount:#,##0}) -> {builder.Raw.AnimationMatrices.Count:#,##0} matrices ({64 * builder.Raw.AnimationMatrices.Count:#,##0} bytes)");
 
-                    var parentMatrix = (parentIdx == -1)
-                        ? System.Numerics.Matrix4x4.Identity
-                        : matrices[parentIdx];
+                var rawMotionStream = new MemoryStream();
+                RawMotion.Write(rawMotionStream, builder.Raw);
 
-                    var name = fbxArmatureNodes[boneIdx].ArmatureNode.Name;
-
-                    var hit = fbxAnim.NodeAnimationChannels.FirstOrDefault(it => it.NodeName == name);
-
-                    var translation = (hit == null)
-                        ? new Vector3D(0, 0, 0)
-                        : hit.PositionKeys.GetInterpolatedVector(frameIdx);
-
-                    var rotation = (hit == null)
-                        ? new Assimp.Quaternion(w: 1, 0, 0, 0)
-                        : hit.RotationKeys.GetInterpolatedQuaternion(frameIdx);
-
-                    var scale = (hit == null)
-                        ? new Vector3D(1, 1, 1)
-                        : hit.ScalingKeys.GetInterpolatedVector(frameIdx);
-
-                    var absoluteMatrix = System.Numerics.Matrix4x4.Identity
-                        * System.Numerics.Matrix4x4.CreateFromQuaternion(rotation.ToDotNetQuaternion())
-                        * System.Numerics.Matrix4x4.CreateScale(scale.ToDotNetVector3())
-                        * System.Numerics.Matrix4x4.CreateTranslation(translation.ToDotNetVector3())
-                        * parentMatrix;
-
-                    raw.AnimationMatrices.Add(nodeFix * absoluteMatrix);
-                    matrices.Add(absoluteMatrix);
-                }
-            }
-
-            logger.Debug($"(frameCount {frameCount:#,##0}) x (boneCount {fbxArmatureBoneCount:#,##0}) -> {raw.AnimationMatrices.Count:#,##0} matrices ({64 * raw.AnimationMatrices.Count:#,##0} bytes)");
-
-            var rawMotionStream = new MemoryStream();
-            RawMotion.Write(rawMotionStream, raw);
-
-            var anbBarStream = new MemoryStream();
-            Bar.Write(
-                anbBarStream,
-                new Bar.Entry[]
-                {
+                var anbBarStream = new MemoryStream();
+                Bar.Write(
+                    anbBarStream,
+                    new Bar.Entry[]
+                    {
                         new Bar.Entry
                         {
                             Type = Bar.EntryType.Motion,
                             Name = "raw",
                             Stream = rawMotionStream,
                         }
-                }
-            );
+                    }
+                );
 
-            File.WriteAllBytes(Output, anbBarStream.ToArray());
-            File.WriteAllBytes(Output + ".raw", rawMotionStream.ToArray());
+                File.WriteAllBytes(Output, anbBarStream.ToArray());
+                File.WriteAllBytes(Output + ".raw", rawMotionStream.ToArray());
 
-            logger.Debug("Raw motion data generation successful");
+                logger.Debug("Raw motion data generation successful");
 
-            new MsetInjector().InjectMotionTo(this, rawMotionStream.ToArray());
+                new MsetInjector().InjectMotionTo(this, rawMotionStream.ToArray());
+            }
 
             return 0;
+        }
+
+        internal class UseAssimpForRaw
+        {
+            public IEnumerable<RawMotionBuilder.Parameter> Parameters { get; }
+
+            public UseAssimpForRaw(
+                string inputModel,
+                string meshName,
+                string rootName,
+                string animationName,
+                float nodeScaling
+            )
+            {
+                var assimp = new Assimp.AssimpContext();
+                var scene = assimp.ImportFile(inputModel, Assimp.PostProcessSteps.None);
+
+                var outputList = new List<RawMotionBuilder.Parameter>();
+
+                bool IsMeshNameMatched(string it) =>
+                    string.IsNullOrEmpty(meshName)
+                        ? true
+                        : it == meshName;
+
+                bool IsAnimationNameMatched(string it) =>
+                    string.IsNullOrEmpty(animationName)
+                        ? true
+                        : it == animationName;
+
+                foreach (var fbxMesh in scene.Meshes.Where(mesh => IsMeshNameMatched(mesh.Name)))
+                {
+                    var fbxArmatureRoot = scene.RootNode.FindNode(rootName ?? "bone000"); //"kh_sk"
+                    var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
+                    var fbxArmatureBoneCount = fbxArmatureNodes.Length;
+
+                    foreach (var fbxAnim in scene.Animations.Where(anim => IsAnimationNameMatched(anim.Name)))
+                    {
+                        outputList.Add(
+                            new Parameter
+                            {
+                                DurationInTicks = (int)fbxAnim.DurationInTicks,
+                                TicksPerSecond = (float)fbxAnim.TicksPerSecond,
+                                BoneCount = fbxArmatureNodes.Length,
+                                NodeScaling = nodeScaling,
+                                Bones = fbxArmatureNodes
+                                    .Select(
+                                        node => new ABone
+                                        {
+                                            NodeName = node.ArmatureNode.Name,
+                                            ParentIndex = node.ParentIndex,
+                                        }
+                                    )
+                                    .ToArray(),
+
+                                GetRelativeMatrix = (frameIdx, boneIdx) =>
+                                {
+                                    var name = fbxArmatureNodes[boneIdx].ArmatureNode.Name;
+
+                                    var hit = fbxAnim.NodeAnimationChannels.FirstOrDefault(it => it.NodeName == name);
+
+                                    var translation = (hit == null)
+                                        ? new Vector3D(0, 0, 0)
+                                        : hit.PositionKeys.GetInterpolatedVector(frameIdx);
+
+                                    var rotation = (hit == null)
+                                        ? new Assimp.Quaternion(w: 1, 0, 0, 0)
+                                        : hit.RotationKeys.GetInterpolatedQuaternion(frameIdx);
+
+                                    var scale = (hit == null)
+                                        ? new Vector3D(1, 1, 1)
+                                        : hit.ScalingKeys.GetInterpolatedVector(frameIdx);
+
+                                    return System.Numerics.Matrix4x4.Identity
+                                        * System.Numerics.Matrix4x4.CreateFromQuaternion(rotation.ToDotNetQuaternion())
+                                        * System.Numerics.Matrix4x4.CreateScale(scale.ToDotNetVector3())
+                                        * System.Numerics.Matrix4x4.CreateTranslation(translation.ToDotNetVector3())
+                                        ;
+                                }
+                            }
+                        );
+                    }
+                }
+
+                Parameters = outputList;
+            }
         }
     }
 }

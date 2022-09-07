@@ -15,7 +15,7 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
 {
     public class UseJson
     {
-        public IEnumerable<InterpolatedMotionBuilder.Parameter> Parameters { get; }
+        public IEnumerable<BasicSourceMotion> Parameters { get; }
 
         public UseJson(
             string inputModel,
@@ -74,7 +74,7 @@ namespace OpenKh.Command.AnbMaker.Utils.JsonAnimSource
                             };
                         }
 
-                        return new InterpolatedMotionBuilder.Parameter
+                        return new BasicSourceMotion
                         {
                             BoneCount = obj.Bones.Count(),
                             DurationInTicks = (int)(action.FrameEnd - action.FrameStart),

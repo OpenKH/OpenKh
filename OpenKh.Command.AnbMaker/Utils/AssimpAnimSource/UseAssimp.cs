@@ -12,7 +12,7 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
 {
     public class UseAssimp
     {
-        public IEnumerable<InterpolatedMotionBuilder.Parameter> Parameters { get; }
+        public IEnumerable<BasicSourceMotion> Parameters { get; }
 
         public UseAssimp(
             string inputModel,
@@ -22,7 +22,7 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
             float nodeScaling
         )
         {
-            var outputList = new List<InterpolatedMotionBuilder.Parameter>();
+            var outputList = new List<BasicSourceMotion>();
             Parameters = outputList;
 
             var assimp = new Assimp.AssimpContext();
@@ -33,16 +33,16 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
                     ? true
                     : it == meshName;
 
+            bool IsAnimationNameMatched(string it) =>
+                string.IsNullOrEmpty(animationName)
+                    ? true
+                    : it == animationName;
+
             foreach (var fbxMesh in scene.Meshes.Where(mesh => IsMeshNameMatched(mesh.Name)))
             {
                 var fbxArmatureRoot = scene.RootNode.FindNode(rootName ?? "bone000"); //"kh_sk"
                 var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
                 var fbxArmatureBoneCount = fbxArmatureNodes.Length;
-
-                bool IsAnimationNameMatched(string it) =>
-                    string.IsNullOrEmpty(animationName)
-                        ? true
-                        : it == animationName;
 
                 foreach (var fbxAnim in scene.Animations.Where(anim => IsAnimationNameMatched(anim.Name)))
                 {
@@ -53,7 +53,7 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
                             Value = value,
                         };
 
-                    var output = new InterpolatedMotionBuilder.Parameter
+                    var output = new BasicSourceMotion
                     {
                         DurationInTicks = (int)fbxAnim.DurationInTicks,
                         TicksPerSecond = (float)fbxAnim.TicksPerSecond,
@@ -114,7 +114,16 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
                             }
 
                             return null;
-                        }
+                        },
+                        Bones = fbxArmatureNodes
+                            .Select(
+                                node => new ABone
+                                {
+                                    NodeName = node.ArmatureNode.Name,
+                                    ParentIndex = node.ParentIndex,
+                                }
+                            )
+                            .ToArray(),
                     };
 
                     outputList.Add(output);

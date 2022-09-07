@@ -14,17 +14,8 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
     {
         public InterpolatedMotion Ipm { get; }
 
-        public class Parameter
-        {
-            public int DurationInTicks { get; set; }
-            public float TicksPerSecond { get; set; }
-            public int BoneCount { get; set; }
-            public float NodeScaling { get; set; }
-            public Func<int, AChannel> GetAChannel { get; set; }
-        }
-
         public InterpolatedMotionBuilder(
-            Parameter parm
+            BasicSourceMotion parm
         )
         {
             Ipm = InterpolatedMotion.CreateEmpty();
