@@ -863,7 +863,7 @@ namespace OpenKh.Kh2.Ard
                         function.Parse(row, tokens);
                         script.Functions.Add(function);
 
-                        while (row < lines.Length && (lines[row].Length == 0 || lines[row][0] == ' '))
+                        while (row < lines.Length && (lines[row].Length == 0 || char.IsWhiteSpace(lines[row][0])))
                         {
                             line = lines[row++];
                             cleanLine = line.Split(Comment);
