@@ -136,8 +136,6 @@ namespace OpenKh.Command.MapGen.Utils
                     // write vertex color list
                     var off = 4 + nLarge;
                     var num = Convert.ToByte(nLarge);
-                    writer.Write(0x20000000); // stmask  3 3 3 0  3 3 3 0  3 3 3 0  3 3 3 0 
-                    writer.Write(0x3f3f3f3f);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x6E00C000 | off | (num << 16))); // unpack V4-8 c 14 a 012 usn 1 flg 1 m 0
                     foreach (var color in indices.Select(it => it.Color))
