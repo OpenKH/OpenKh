@@ -1,3 +1,5 @@
+// #define UPDATE_TEST_DATA
+
 using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
@@ -11,7 +13,7 @@ namespace OpenKh.Tests.Commands
 {
     public class MapGenTest
     {
-        [Theory(Skip = "CURRENTLY REFACTORING")]
+        [Theory]
         [InlineData("res/mapgen/diagnoal/diagnoal.fbx")]
         [InlineData("res/mapgen/multi-4bpp/multi-4bpp.fbx")]
         [InlineData("res/mapgen/multi-8bpp/multi-8bpp.fbx")]
@@ -31,6 +33,9 @@ namespace OpenKh.Tests.Commands
                 new DumpDoctUtil(doct, writer);
 
                 var doctDumpFile = Path.ChangeExtension(inputModel, ".doct.dump");
+#if UPDATE_TEST_DATA
+                File.WriteAllText(doctDumpFile, writer.ToString());
+#endif
 
                 Assert.Equal(
                     expected: File.ReadAllText(doctDumpFile),
@@ -45,6 +50,9 @@ namespace OpenKh.Tests.Commands
                 new DumpCoctUtil(coct, writer);
 
                 var coctDumpFile = Path.ChangeExtension(inputModel, ".coct.dump");
+#if UPDATE_TEST_DATA
+                File.WriteAllText(coctDumpFile, writer.ToString());
+#endif
 
                 Assert.Equal(
                     expected: File.ReadAllText(coctDumpFile),
