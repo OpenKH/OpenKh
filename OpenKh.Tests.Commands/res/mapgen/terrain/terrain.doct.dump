@@ -1,3 +1,15 @@
-[Entry1] Unk=0; BoundingBox=Minimum: <-835, -283, -835> Maximum: <835, 266, 835>
- [Entry1] Unk=0; BoundingBox=Minimum: <-835, -283, -835> Maximum: <835, 266, 835>
-  [Entry2] Flags=0; BoundingBox=Minimum: <-835, -283, -835> Maximum: <835, 266, 835>
+[Entry1] Unk=0; BoundingBox=((-834, -283, -834), (834, 265, 834))
+ [Entry1] Unk=0; BoundingBox=((-834, -283, -834), (834, 130, 834))
+  [Entry1] Unk=0; BoundingBox=((104, -283, -834), (834, 114, 834))
+   [Entry2] Flags=0; BoundingBox=((104, -283, -834), (834, 114, 834))
+  [Entry1] Unk=0; BoundingBox=((-834, 85, -834), (834, 130, 834))
+   [Entry2] Flags=0; BoundingBox=((-834, 85, -834), (834, 130, 834))
+ [Entry1] Unk=0; BoundingBox=((-834, 102, -834), (834, 265, 834))
+  [Entry1] Unk=0; BoundingBox=((-834, 106, -834), (209, 150, 105))
+   [Entry2] Flags=0; BoundingBox=((-834, 106, -834), (209, 150, 105))
+  [Entry1] Unk=0; BoundingBox=((-834, 116, -105), (-104, 194, 105))
+   [Entry2] Flags=0; BoundingBox=((-834, 116, -105), (-104, 194, 105))
+  [Entry1] Unk=0; BoundingBox=((-105, 102, 104), (834, 149, 834))
+   [Entry2] Flags=0; BoundingBox=((-105, 102, 104), (834, 149, 834))
+  [Entry1] Unk=0; BoundingBox=((-834, 114, 104), (1, 265, 834))
+   [Entry2] Flags=0; BoundingBox=((-834, 114, 104), (1, 265, 834))
