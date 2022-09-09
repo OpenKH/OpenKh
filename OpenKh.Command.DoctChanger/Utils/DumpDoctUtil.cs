@@ -4,6 +4,7 @@ using System.Text;
 using OpenKh.Kh2;
 using System.IO;
 using System.Linq;
+using OpenKh.Kh2.Utils;
 
 namespace OpenKh.Command.DoctChanger.Utils
 {
@@ -31,7 +32,7 @@ namespace OpenKh.Command.DoctChanger.Utils
             }
 
             var entry = doct.Entry1List[index];
-            writer.WriteLine($"{new string(' ', indent)}[Entry1] {nameof(entry.Unk)}={entry.Unk}; {nameof(entry.BoundingBox)}={entry.BoundingBox}");
+            writer.WriteLine($"{new string(' ', indent)}[Entry1] {nameof(entry.Unk)}={entry.Unk}; {nameof(entry.BoundingBox)}={Format(entry.BoundingBox)}");
 
             for (var idx = entry.Entry2Index; idx < entry.Entry2LastIndex; idx++)
             {
@@ -48,10 +49,15 @@ namespace OpenKh.Command.DoctChanger.Utils
             DumpEntry1(entry.Child8, indent + 1);
         }
 
+        private string Format(BoundingBox box)
+        {
+            return $"(({Math.Floor(box.MinX)}, {Math.Floor(box.MinY)}, {Math.Floor(box.MinZ)}), ({Math.Floor(box.MaxX)}, {Math.Floor(box.MaxY)}, {Math.Floor(box.MaxZ)}))";
+        }
+
         private void DumpEntry2(int index, int indent)
         {
             var entry = doct.Entry2List[index];
-            writer.WriteLine($"{new string(' ', indent)}[Entry2] {nameof(entry.Flags)}={entry.Flags}; {nameof(entry.BoundingBox)}={entry.BoundingBox}");
+            writer.WriteLine($"{new string(' ', indent)}[Entry2] {nameof(entry.Flags)}={entry.Flags}; {nameof(entry.BoundingBox)}={Format(entry.BoundingBox)}");
         }
     }
 }
