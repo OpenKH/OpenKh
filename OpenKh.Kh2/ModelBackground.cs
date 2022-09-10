@@ -147,7 +147,7 @@ namespace OpenKh.Kh2
         public int Attribute { get; set; }
         private readonly int _nextOffset;
         public ushort ShadowCount { get; private set; }
-        public ushort TextureCount { get; private set; }
+        public ushort TextureCount { get; set; }
         public ushort OctalTreeCount { get; private set; }
         public List<ushort[]> vifPacketRenderingGroup;
 

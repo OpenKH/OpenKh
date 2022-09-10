@@ -358,6 +358,11 @@ namespace OpenKh.Command.MapGen.Utils
                 };
 
                 modelTex = new ModelTexture(build);
+
+                {
+                    // Setting texture count here
+                    mapModel.TextureCount = modelTex.GetGsInfoCount();
+                }
             }
 
             logger.Debug($"The builder has done.");
