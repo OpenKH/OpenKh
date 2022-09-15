@@ -35,6 +35,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private Pcsx2Injector _pcsx2Injector;
         private Process _runningProcess;
         private bool _isBuilding;
+        private bool _pc;
+        private bool _bypass;
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
@@ -80,6 +82,43 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public Visibility IsModInfoVisible => IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PatchVisible => PC ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility ModLoader => !PC || Bypass ? Visibility.Visible : Visibility.Collapsed;
+
+        public bool PC
+        {
+            get => _pc;
+            set
+            {
+                _pc = value;
+                if (ConfigurationService.GameEdition == 2)
+                {
+                    _pc = true;
+                }
+                else
+                {
+                    _pc = false;
+                }
+            }
+        }
+
+        public bool Bypass
+        {
+            get => _bypass;
+            set
+            {
+                _bypass = value;
+                if (ConfigurationService.BypassLauncher)
+                {
+                    _bypass = true;
+                }
+                else
+                {
+                    _bypass = false;
+                }
+            }
+        }
 
         public bool IsBuilding
         {
@@ -99,6 +138,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public MainViewModel()
         {
+            if (ConfigurationService.GameEdition == 2)
+                PC = true;
+            else
+                PC = false;
+            if (ConfigurationService.BypassLauncher)
+                Bypass = true;
+
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
 
