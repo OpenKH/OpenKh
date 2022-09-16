@@ -36,7 +36,8 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public byte Flag0  { get => Item.Flag0; set => Item.Flag0 = value; }
             public byte Flag1  { get => Item.Flag1; set => Item.Flag1 = value; }
             public Item.Rank Rank { get => Item.Rank; set => Item.Rank = value; }
-            public ushort StatEntry  { get => Item.StatEntry; set => Item.StatEntry = value; }
+            public byte StatEntry  { get => Item.StatEntry; set => Item.StatEntry = value; }
+            public byte APCost { get => Item.APCost; set => Item.APCost = value; }
             public ushort NameId
             {
                 get => Item.Name;
