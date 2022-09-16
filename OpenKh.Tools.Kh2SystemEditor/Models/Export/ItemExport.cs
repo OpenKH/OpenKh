@@ -34,7 +34,9 @@ namespace OpenKh.Tools.Kh2SystemEditor.Models.Export
         [ExportTarget]
         public Item.Rank Rank => Item.Rank;
         [ExportTarget]
-        public ushort StatEntry => Item.StatEntry;
+        public byte StatEntry => Item.StatEntry;
+        [ExportTarget]
+        public byte APCost => Item.APCost;
         [ExportTarget]
         public ushort NameId => Item.Name;
         [ExportTarget]
