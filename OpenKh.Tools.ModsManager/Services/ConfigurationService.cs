@@ -53,9 +53,7 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private static string StoragePath = Directory.GetCurrentDirectory().IndexOf("system32") >= 0 ?
-            Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) :
-            Directory.GetCurrentDirectory();
+        private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
         private static string EnabledModsPath = Path.Combine(StoragePath, "mods.txt");
         private static readonly Config _config = Config.Open(ConfigPath);

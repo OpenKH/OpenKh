@@ -37,6 +37,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _isBuilding;
         private bool _pc;
         private bool _bypass;
+        private bool _devView;
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
@@ -59,6 +60,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand StopRunningInstanceCommand { get; set; }
         public RelayCommand WizardCommand { get; set; }
         public RelayCommand OpenLinkCommand { get; set; }
+        public RelayCommand DevViewCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -82,10 +84,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public Visibility IsModInfoVisible => IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility PatchVisible => PC ? Visibility.Visible : Visibility.Collapsed;
-
+        public Visibility PatchVisible => PC && !Bypass || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || Bypass ? Visibility.Visible : Visibility.Collapsed;
 
+        public bool DevView
+        {
+            get => _devView;
+            set
+            {
+                _devView = value;
+                OnPropertyChanged(nameof(PatchVisible));
+            }
+        }     
+        
         public bool PC
         {
             get => _pc;
@@ -120,12 +131,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     _bypass = true;
                     OnPropertyChanged(nameof(Bypass));
                     OnPropertyChanged(nameof(ModLoader));
+                    OnPropertyChanged(nameof(PatchVisible));
                 }
                 else
                 {
                     _bypass = false;
                     OnPropertyChanged(nameof(Bypass));
                     OnPropertyChanged(nameof(ModLoader));
+                    OnPropertyChanged(nameof(PatchVisible));
                 }
             }
         }
@@ -331,6 +344,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         Bypass = false;
                 }
             });
+
+            DevViewCommand = new RelayCommand(_ =>
+            {
+                DevView = !DevView;                
+            });
+
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
             {
                 UseShellExecute = true
