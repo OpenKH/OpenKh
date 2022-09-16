@@ -95,10 +95,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (ConfigurationService.GameEdition == 2)
                 {
                     _pc = true;
+                    OnPropertyChanged(nameof(PC));
+                    OnPropertyChanged(nameof(ModLoader));
+                    OnPropertyChanged(nameof(PatchVisible));
                 }
                 else
                 {
                     _pc = false;
+                    OnPropertyChanged(nameof(PC));
+                    OnPropertyChanged(nameof(ModLoader));
+                    OnPropertyChanged(nameof(PatchVisible));
                 }
             }
         }
@@ -112,10 +118,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (ConfigurationService.BypassLauncher)
                 {
                     _bypass = true;
+                    OnPropertyChanged(nameof(Bypass));
+                    OnPropertyChanged(nameof(ModLoader));
                 }
                 else
                 {
                     _bypass = false;
+                    OnPropertyChanged(nameof(Bypass));
+                    OnPropertyChanged(nameof(ModLoader));
                 }
             }
         }
@@ -311,6 +321,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 $"show_console={false}",
                             });
                     }
+                    if (ConfigurationService.GameEdition == 2)
+                        PC = true;
+                    else
+                        PC = false;
+                    if (ConfigurationService.BypassLauncher)
+                        Bypass = true;
+                    else
+                        Bypass = false;
                 }
             });
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
