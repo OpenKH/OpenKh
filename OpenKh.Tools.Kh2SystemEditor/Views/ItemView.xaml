@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="OpenKh.Tools.Kh2SystemEditor.Views.ItemView"
+<UserControl x:Class="OpenKh.Tools.Kh2SystemEditor.Views.ItemView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -93,6 +93,10 @@
 
                 <TextBlock Text="StatEntry" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding StatEntry, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="APCost" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding APCost, UpdateSourceTrigger=PropertyChanged}"/>
+
 
                 <TextBlock Text="Name" Margin="{StaticResource LabelMargin}"/>
                 <Grid>
