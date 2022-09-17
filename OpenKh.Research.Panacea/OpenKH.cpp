@@ -10,7 +10,6 @@
 #include "OpenKH.h"
 #include "KingdomApi.h"
 #include "Panacea.h"
-#include "EOSOverrider.h"
 
 struct FuncInfo
 {
@@ -91,7 +90,6 @@ void Hook()
 
 OpenKH::GameId OpenKH::m_GameID = OpenKH::GameId::Unknown;
 std::string OpenKH::m_ModPath = "./mod";
-bool OpenKH::m_OverrideEos = false;
 bool OpenKH::m_ShowConsole = false;
 bool OpenKH::m_DebugLog = false;
 void OpenKH::Initialize()
@@ -115,12 +113,6 @@ void OpenKH::Initialize()
     {
         fprintf(stderr, "Unable to detect the running game. Panacea will not be executed.\n");
         return;
-    }
-
-    if (m_OverrideEos || strstr(GetCommandLineA(), "-eosoverride"))
-    {
-        fprintf(stdout, "Overriding Epic Games Online Service\n");
-        EOSOverride(g_hInstance);
     }
 
     Hook();
@@ -161,8 +153,6 @@ void OpenKH::ReadSettings(const char* filename)
 
         if (!strncmp(key, "mod_path", sizeof(buf)) && strnlen(value, sizeof(buf)) > 0)
             m_ModPath = std::string(value);
-        else if (!strncmp(key, "eos_override", sizeof(buf)))
-            parseBool(value, m_OverrideEos);
         else if (!strncmp(key, "show_console", sizeof(buf)))
             parseBool(value, m_ShowConsole);
         else if (!strncmp(key, "debug_log", sizeof(buf)))
