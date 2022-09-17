@@ -270,7 +270,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             PanaceaInstalled = false;
                             return false;
                         }
-                    PanaceaInstalled = false;
+                    PanaceaInstalled = true;
                     return true;
                 }
 
@@ -279,8 +279,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     CalculateChecksum(PanaceaDestinationLocation));
             }
         }
-
-        public string EpicGamesUserID { get; set; }
 
         public SetupWizardViewModel()
         {
