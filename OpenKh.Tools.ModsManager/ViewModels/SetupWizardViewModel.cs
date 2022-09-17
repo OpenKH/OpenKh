@@ -227,6 +227,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public RelayCommand InstallPanaceaCommand { get; }
         public RelayCommand RemovePanaceaCommand { get; }
+        public bool PanaceaInstalled { get; set; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
         private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.dll");
         public Visibility PanaceaNotInstalledVisibility => !IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
@@ -236,17 +237,27 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             get
             {
                 if (PcReleaseLocation == null)
+                {
                     // Won't be able to find the source location
+                    PanaceaInstalled = false;
                     return false;
+                }
 
                 if (!File.Exists(PanaceaSourceLocation))
+                {
                     // While debugging it is most likely to not have the compiled
                     // DLL into the right place. So don't bother.
+                    PanaceaInstalled = true;
                     return true;
+                }
+                  
 
                 if (!File.Exists(PanaceaDestinationLocation))
+                {
                     // DBGHELP.dll is not installed
+                    PanaceaInstalled = false;
                     return false;
+                }
 
                 byte[] CalculateChecksum(string fileName) =>
                     System.Security.Cryptography.MD5.Create().Using(md5 =>
@@ -255,7 +266,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     for (var i = 0; i < left.Length; i++)
                         if (left[i] != right[i])
+                        {
+                            PanaceaInstalled = false;
                             return false;
+                        }
+                    PanaceaInstalled = false;
                     return true;
                 }
 
@@ -265,18 +280,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
         }
 
-        public Visibility BypassLauncherVisibility => BypassLauncher ? Visibility.Visible : Visibility.Collapsed;
-        private bool _bypassLauncher;
-
-        public bool BypassLauncher
-        {
-            get => _bypassLauncher;
-            set
-            {
-                _bypassLauncher = value;
-                OnPropertyChanged(nameof(BypassLauncherVisibility));
-            }
-        }
         public string EpicGamesUserID { get; set; }
 
         public SetupWizardViewModel()
@@ -320,6 +323,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                PanaceaInstalled = true;
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
             {
@@ -328,6 +332,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                PanaceaInstalled = false;
             });
         }
 

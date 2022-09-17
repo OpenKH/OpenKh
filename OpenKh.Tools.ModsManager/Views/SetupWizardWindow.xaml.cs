@@ -32,8 +32,8 @@ namespace OpenKh.Tools.ModsManager.Views
         public string ConfigPcReleaseLocation { get => _vm.PcReleaseLocation; set => _vm.PcReleaseLocation = value; }
         public string ConfigGameDataLocation { get => _vm.GameDataLocation; set => _vm.GameDataLocation = value; }
         public int ConfigRegionId { get => _vm.RegionId; set => _vm.RegionId = value; }
-        public bool ConfigBypassLauncher { get => _vm.BypassLauncher; set => _vm.BypassLauncher = value; }
         public string ConfigEpicGamesUserID { get => _vm.EpicGamesUserID; set => _vm.EpicGamesUserID = value; }
+        public bool ConfigPanaceaInstalled { get => _vm.PanaceaInstalled; set => _vm.PanaceaInstalled = value; }
 
         private void Wizard_Finish(object sender, Xceed.Wpf.Toolkit.Core.CancelRoutedEventArgs e)
         {
