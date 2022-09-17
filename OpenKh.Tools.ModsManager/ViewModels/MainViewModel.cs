@@ -295,6 +295,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigOpenKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation,
                     ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
                     ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
+                    ConfigPcReleaseLanguage = ConfigurationService.PcReleaseLanguage,
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigEpicGamesUserID = ConfigurationService.EpicGamesUserID,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
@@ -429,7 +430,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         FileName = Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
                         WorkingDirectory = ConfigurationService.PcReleaseLocation,
-                        Arguments = $"-AUTH_TYPE=refreshtoken -epiclocale=en -epicuserid={ConfigurationService.EpicGamesUserID} -eosoverride",
+                        Arguments = $"-AUTH_TYPE=refreshtoken -epiclocale={ConfigurationService.PcReleaseLanguage} -epicuserid={ConfigurationService.EpicGamesUserID} -eosoverride",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
@@ -589,7 +590,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             patchFiles.AddRange(OpenKh.Egs.Helpers.GetAllFiles(_rawPath).ToList());
 
                         var _pkgSoft = fastMode ? "kh2_first" : _dirPart;
-                        var _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", "en", _pkgSoft + ".pkg");
+                        var _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _pkgSoft + ".pkg");
 
                         var _backupDir = Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage");
 
@@ -697,7 +698,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
 
                             var _fileBare = Path.GetFileName(file);
-                            var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", "en", _fileBare);
+                            var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _fileBare);
 
                             File.Delete(Path.ChangeExtension(_trueName, "hed"));
                             File.Delete(_trueName);

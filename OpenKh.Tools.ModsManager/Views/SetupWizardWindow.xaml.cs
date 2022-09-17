@@ -30,6 +30,7 @@ namespace OpenKh.Tools.ModsManager.Views
         public string ConfigOpenKhGameEngineLocation { get => _vm.OpenKhGameEngineLocation; set => _vm.OpenKhGameEngineLocation = value; }
         public string ConfigPcsx2Location { get => _vm.Pcsx2Location; set => _vm.Pcsx2Location = value; }
         public string ConfigPcReleaseLocation { get => _vm.PcReleaseLocation; set => _vm.PcReleaseLocation = value; }
+        public string ConfigPcReleaseLanguage { get => _vm.PcReleaseLanguage; set => _vm.PcReleaseLanguage = value; }
         public string ConfigGameDataLocation { get => _vm.GameDataLocation; set => _vm.GameDataLocation = value; }
         public int ConfigRegionId { get => _vm.RegionId; set => _vm.RegionId = value; }
         public string ConfigEpicGamesUserID { get => _vm.EpicGamesUserID; set => _vm.EpicGamesUserID = value; }

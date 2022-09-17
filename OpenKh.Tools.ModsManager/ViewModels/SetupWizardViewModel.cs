@@ -40,6 +40,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _openKhGameEngineLocation;
         private string _pcsx2Location;
         private string _pcReleaseLocation;
+        private string _pcReleaseLanguage;
         private string _gameDataLocation;
 
         private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterIntro;
@@ -191,6 +192,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             {
                 _pcReleaseLocation = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
+                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                OnPropertyChanged(nameof(IsGameSelected));
+                OnPropertyChanged(nameof(IsGameDataFound));
+            }
+        }
+
+        public string PcReleaseLanguage
+        {
+            get => _pcReleaseLanguage;
+            set
+            {
+                _pcReleaseLanguage = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(PcReleaseLanguage));
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
@@ -440,7 +457,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                         for (int i = 0; i < 6; i++)
                         {
-                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", "en", "kh2_" + _nameList[i] + ".hed"), FileMode.Open);
+                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList[i] + ".hed"), FileMode.Open);
                             var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                             _totalFiles += _hedFile.Count();
                         }
@@ -448,8 +465,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         for (int i = 0; i < 6; i++)
                         {
                             var outputDir = gameDataLocation;
-                            using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", "en", "kh2_" + _nameList[i] + ".hed"));
-                            using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", "en", "kh2_" + _nameList[i] + ".pkg"));
+                            using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList[i] + ".hed"));
+                            using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList[i] + ".pkg"));
 
                             foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                             {
