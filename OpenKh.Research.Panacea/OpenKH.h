@@ -16,7 +16,6 @@ namespace OpenKH
 
     extern GameId m_GameID;
     extern std::string m_ModPath;
-    extern bool m_OverrideEos;
     extern bool m_ShowConsole;
     extern bool m_DebugLog;
 
