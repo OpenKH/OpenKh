@@ -238,18 +238,8 @@
             Description="Change the way the launcher behaves."
             PreviousPage="{Binding ElementName=PageEosInstall}"
             NextPage="{Binding ElementName=PageGameData}">
-            <StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    To run the game within the Mods Manager, you need to bypass the launcher.
-                    You only need it to if you often change mods so you can test them faster
-                    or if you are developing one.
-                </TextBlock>
-                <CheckBox
-                    Margin="0 0 0 10"
-                    IsChecked="{Binding BypassLauncher}"
-                    Content="Bypass the launcher"/>
-
-                <StackPanel Visibility="{Binding BypassLauncherVisibility}">
+            <StackPanel>               
+                <StackPanel>
                     <Grid Margin="0 0 0 3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>

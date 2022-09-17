@@ -36,7 +36,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private Process _runningProcess;
         private bool _isBuilding;
         private bool _pc;
-        private bool _bypass;
+        private bool _panaceaInstalled;
         private bool _devView;
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
@@ -84,8 +84,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public Visibility IsModInfoVisible => IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility PatchVisible => PC && !Bypass || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility ModLoader => !PC || Bypass ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
 
         public bool DevView
         {
@@ -95,8 +95,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _devView = value;
                 OnPropertyChanged(nameof(PatchVisible));
             }
-        }     
-        
+        }
+        public bool PanaceaInstalled
+        {
+            get => _panaceaInstalled;
+            set
+            {
+                _panaceaInstalled = value;
+                OnPropertyChanged(nameof(PatchVisible));
+                OnPropertyChanged(nameof(ModLoader));
+            }
+        }
+
         public bool PC
         {
             get => _pc;
@@ -118,30 +128,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(PatchVisible));
                 }
             }
-        }
-
-        public bool Bypass
-        {
-            get => _bypass;
-            set
-            {
-                _bypass = value;
-                if (ConfigurationService.BypassLauncher)
-                {
-                    _bypass = true;
-                    OnPropertyChanged(nameof(Bypass));
-                    OnPropertyChanged(nameof(ModLoader));
-                    OnPropertyChanged(nameof(PatchVisible));
-                }
-                else
-                {
-                    _bypass = false;
-                    OnPropertyChanged(nameof(Bypass));
-                    OnPropertyChanged(nameof(ModLoader));
-                    OnPropertyChanged(nameof(PatchVisible));
-                }
-            }
-        }
+        }       
 
         public bool IsBuilding
         {
@@ -165,8 +152,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 PC = true;
             else
                 PC = false;
-            if (ConfigurationService.BypassLauncher)
-                Bypass = true;
+            if (ConfigurationService.PanaceaInstalled)
+                PanaceaInstalled = true;
+            else
+                PanaceaInstalled = false;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
@@ -308,7 +297,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigEpicGamesUserID = ConfigurationService.EpicGamesUserID,
-                    ConfigBypassLauncher = ConfigurationService.BypassLauncher,
+                    ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -320,7 +309,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                     ConfigurationService.EpicGamesUserID = dialog.ConfigEpicGamesUserID;
-                    ConfigurationService.BypassLauncher = dialog.ConfigBypassLauncher;
+                    ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
                     ConfigurationService.IsFirstRunComplete = true;
 
                     const int EpicGamesPC = 2;
@@ -338,10 +327,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         PC = true;
                     else
                         PC = false;
-                    if (ConfigurationService.BypassLauncher)
-                        Bypass = true;
+                    if (ConfigurationService.PanaceaInstalled)
+                        PanaceaInstalled = true;
                     else
-                        Bypass = false;
+                        PanaceaInstalled = false;
                 }
             });
 
@@ -435,16 +424,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    if (!ConfigurationService.BypassLauncher)
-                    {
-                        MessageBox.Show(
-                            "You can only run the game from the Mods Manager by bypassing the launcher.\nRepeat the wizard to change the setting.",
-                            "Unable to start the game",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning);
-                        return Task.CompletedTask;
-                    }
-
                     Log.Info("Starting Kingdom Hearts II: Final Mix");
                     processStartInfo = new ProcessStartInfo
                     {
