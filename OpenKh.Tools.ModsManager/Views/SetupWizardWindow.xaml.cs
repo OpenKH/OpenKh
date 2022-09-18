@@ -20,7 +20,6 @@ namespace OpenKh.Tools.ModsManager.Views
 
             _vm.PageIsoSelection = PageIsoSelection;
             _vm.PageEosInstall = PageEosInstall;
-            _vm.PageEosConfig = PageEosConfig;
             _vm.PageRegion = PageRegion;
             _vm.LastPage = LastPage;
         }
@@ -33,7 +32,6 @@ namespace OpenKh.Tools.ModsManager.Views
         public string ConfigPcReleaseLanguage { get => _vm.PcReleaseLanguage; set => _vm.PcReleaseLanguage = value; }
         public string ConfigGameDataLocation { get => _vm.GameDataLocation; set => _vm.GameDataLocation = value; }
         public int ConfigRegionId { get => _vm.RegionId; set => _vm.RegionId = value; }
-        public string ConfigEpicGamesUserID { get => _vm.EpicGamesUserID; set => _vm.EpicGamesUserID = value; }
         public bool ConfigPanaceaInstalled { get => _vm.PanaceaInstalled; set => _vm.PanaceaInstalled = value; }
 
         private void Wizard_Finish(object sender, Xceed.Wpf.Toolkit.Core.CancelRoutedEventArgs e)

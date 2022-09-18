@@ -10,7 +10,6 @@
 #include "OpenKH.h"
 #include "KingdomApi.h"
 #include "Panacea.h"
-#include "EOSOverrider.h"
 
 struct FuncInfo
 {
@@ -90,10 +89,10 @@ void Hook()
 }
 
 OpenKH::GameId OpenKH::m_GameID = OpenKH::GameId::Unknown;
-std::string OpenKH::m_ModPath = "./mod";
-bool OpenKH::m_OverrideEos = false;
+std::wstring OpenKH::m_ModPath = L"./mod";
 bool OpenKH::m_ShowConsole = false;
 bool OpenKH::m_DebugLog = false;
+bool OpenKH::m_DisableCache = false;
 void OpenKH::Initialize()
 {
     g_hInstance = GetModuleHandle(NULL);
@@ -115,12 +114,6 @@ void OpenKH::Initialize()
     {
         fprintf(stderr, "Unable to detect the running game. Panacea will not be executed.\n");
         return;
-    }
-
-    if (m_OverrideEos || strstr(GetCommandLineA(), "-eosoverride"))
-    {
-        fprintf(stdout, "Overriding Epic Games Online Service\n");
-        EOSOverride(g_hInstance);
     }
 
     Hook();
@@ -160,13 +153,16 @@ void OpenKH::ReadSettings(const char* filename)
         strtok(value, "\n\r"); // removes new line character
 
         if (!strncmp(key, "mod_path", sizeof(buf)) && strnlen(value, sizeof(buf)) > 0)
-            m_ModPath = std::string(value);
-        else if (!strncmp(key, "eos_override", sizeof(buf)))
-            parseBool(value, m_OverrideEos);
+        {
+            m_ModPath.resize(MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), nullptr, 0));
+            MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), &m_ModPath.front(), m_ModPath.size());
+        }
         else if (!strncmp(key, "show_console", sizeof(buf)))
             parseBool(value, m_ShowConsole);
         else if (!strncmp(key, "debug_log", sizeof(buf)))
             parseBool(value, m_DebugLog);
+        else if (!strncmp(key, "enable_cache", sizeof(buf)))
+            parseBool(value, m_DisableCache);
     }
 
     fclose(f);

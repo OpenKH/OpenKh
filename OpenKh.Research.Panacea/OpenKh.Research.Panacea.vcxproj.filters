@@ -5,12 +5,10 @@
     <ClCompile Include="KingdomApi.cpp" />
     <ClCompile Include="Panacea.cpp" />
     <ClCompile Include="OpenKH.cpp" />
-    <ClCompile Include="EOSOverrider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KingdomApi.h" />
     <ClInclude Include="Panacea.h" />
     <ClInclude Include="OpenKH.h" />
-    <ClInclude Include="EOSOverrider.h" />
   </ItemGroup>
 </Project>

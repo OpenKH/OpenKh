@@ -35,7 +35,6 @@ namespace OpenKh.Tools.ModsManager.Services
             public string PcReleaseLocation { get; internal set; }
             public string PcReleaseLanguage { get; internal set; } = "en";
             public int RegionId { get; internal set; }
-            public string EpicGamesUserID { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
 
             public void Save(string fileName)
@@ -205,15 +204,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static string EpicGamesUserID
-        {
-            get => _config.EpicGamesUserID;
-            set
-            {
-                _config.EpicGamesUserID = value;
-                _config.Save(ConfigPath);
-            }
-        }
+
         public static bool PanaceaInstalled
         {
             get => _config.PanaceaInstalled;

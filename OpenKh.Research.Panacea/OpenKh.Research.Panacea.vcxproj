@@ -89,13 +89,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="EOSOverrider.cpp" />
     <ClCompile Include="KingdomApi.cpp" />
     <ClCompile Include="OpenKH.cpp" />
     <ClCompile Include="Panacea.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EOSOverrider.h" />
     <ClInclude Include="KingdomApi.h" />
     <ClInclude Include="OpenKH.h" />
     <ClInclude Include="Panacea.h" />
