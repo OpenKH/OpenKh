@@ -195,7 +195,7 @@
             Title="Install OpenKH Panacea (Optional and Experimental)"
             Description="Install automatic mod loading support into the game's folder."
             PreviousPage="{Binding ElementName=PageGameEdition}"
-            NextPage="{Binding ElementName=PageEosConfig}">
+            NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
@@ -230,43 +230,7 @@
                         Command="{Binding RemovePanaceaCommand}"/>
                 </StackPanel>
             </StackPanel>
-        </xctk:WizardPage>
-        <xctk:WizardPage
-            x:Name="PageEosConfig"
-            PageType="Interior"
-            Title="Configure Kingdom Hearts HD 1.5+2.5 ReMIX"
-            Description="Change the way the launcher behaves."
-            PreviousPage="{Binding ElementName=PageEosInstall}"
-            NextPage="{Binding ElementName=PageGameData}">
-            <StackPanel>               
-                <StackPanel>
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock
-                            Grid.Column="0"
-                            Text="Epic Games User ID"
-                            Margin="0 0 3 0"/>
-                        <TextBox
-                            Grid.Column="1"
-                            Width="Auto"
-                            Text="{Binding EpicGamesUserID}"/>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        When bypassing the launcher, you need to specify your Epic Games User ID otherwise your
-                        existing saves will not work. Click the link below to find you User ID. It is right after
-                        the Account Info text.
-                        <Hyperlink NavigateUri="https://www.epicgames.com/account/personal"
-                                   TextDecorations="{x:Null}" RequestNavigate="NavigateURL">
-                            <TextBlock Text="https://www.epicgames.com/account/personal"
-                                       Foreground="{DynamicResource textHyperlink}"/>
-                        </Hyperlink>
-                    </TextBlock>
-                </StackPanel>
-            </StackPanel>
-        </xctk:WizardPage>
+        </xctk:WizardPage>        
         <xctk:WizardPage
             x:Name="LastPage"
             PageType="Exterior"
