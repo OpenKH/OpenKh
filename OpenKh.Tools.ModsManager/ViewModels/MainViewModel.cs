@@ -86,6 +86,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility BRVisible => !PC ? Visibility.Visible : Visibility.Collapsed;
 
         public bool DevView
         {
@@ -119,6 +120,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(PC));
                     OnPropertyChanged(nameof(ModLoader));
                     OnPropertyChanged(nameof(PatchVisible));
+                    OnPropertyChanged(nameof(BRVisible));
                 }
                 else
                 {
@@ -126,6 +128,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(PC));
                     OnPropertyChanged(nameof(ModLoader));
                     OnPropertyChanged(nameof(PatchVisible));
+                    OnPropertyChanged(nameof(BRVisible));
                 }
             }
         }       
@@ -296,7 +299,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
                     ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
                     ConfigRegionId = ConfigurationService.RegionId,
-                    ConfigEpicGamesUserID = ConfigurationService.EpicGamesUserID,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
                 };
                 if (dialog.ShowDialog() == true)
@@ -308,7 +310,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
-                    ConfigurationService.EpicGamesUserID = dialog.ConfigEpicGamesUserID;
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
                     ConfigurationService.IsFirstRunComplete = true;
 
@@ -424,17 +425,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    Log.Info("Starting Kingdom Hearts II: Final Mix");
-                    processStartInfo = new ProcessStartInfo
-                    {
-                        FileName = Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
-                        WorkingDirectory = ConfigurationService.PcReleaseLocation,
-                        Arguments = $"-AUTH_TYPE=refreshtoken -epiclocale=en -epicuserid={ConfigurationService.EpicGamesUserID} -eosoverride",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                    };
-                    break;
+                    MessageBox.Show(
+                        "You cannot run the PC game from the Mods Manager. Choose Build Only then start the game as you normally would.",
+                        "Unable to start the game",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return Task.CompletedTask;
                 default:
                     return Task.CompletedTask;
             }
