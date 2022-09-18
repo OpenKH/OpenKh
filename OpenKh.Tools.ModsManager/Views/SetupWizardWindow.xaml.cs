@@ -3,6 +3,7 @@ using OpenKh.Tools.ModsManager.ViewModels;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Navigation;
+using Xceed.Wpf.Toolkit;
 
 namespace OpenKh.Tools.ModsManager.Views
 {
@@ -22,6 +23,8 @@ namespace OpenKh.Tools.ModsManager.Views
             _vm.PageEosInstall = PageEosInstall;
             _vm.PageRegion = PageRegion;
             _vm.LastPage = LastPage;
+
+            _vm.PageStack.OnPageChanged(wizard.CurrentPage);
         }
 
         public string ConfigIsoLocation { get => _vm.IsoLocation; set => _vm.IsoLocation = value; }
@@ -37,6 +40,11 @@ namespace OpenKh.Tools.ModsManager.Views
         private void Wizard_Finish(object sender, Xceed.Wpf.Toolkit.Core.CancelRoutedEventArgs e)
         {
             DialogResult = true;
+        }
+
+        private void Wizard_PageChanged(object sender, RoutedEventArgs e)
+        {
+            _vm?.PageStack.OnPageChanged(((Wizard)sender).CurrentPage);
         }
 
         private void NavigateURL(object sender, RequestNavigateEventArgs e) =>
