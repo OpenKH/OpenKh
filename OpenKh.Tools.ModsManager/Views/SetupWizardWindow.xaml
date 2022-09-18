@@ -15,10 +15,12 @@
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
     </Window.Resources>
     <xctk:Wizard
+        Name="wizard"
         HelpButtonVisibility="Collapsed"
         CancelButtonClosesWindow="True"
         FinishButtonClosesWindow="True"
         CurrentPage="{Binding ElementName=PageGameEdition}"
+        PageChanged="Wizard_PageChanged"
         Finish="Wizard_Finish">
         
         <xctk:WizardPage
@@ -35,7 +37,7 @@
             Title="Game edition"
             CanSelectNextPage="{Binding IsGameSelected}"
             Description="Selected the preferred edition to launch the game"
-            PreviousPage="{Binding ElementName=IntroPage}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterIntro}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
@@ -93,7 +95,7 @@
             PageType="Interior"
             Title="Configure the game you want to mod"
             Description="Do not worry, you can change this option later"
-            PreviousPage="{Binding ElementName=PageGameEdition}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock>Supported games:</TextBlock>
@@ -129,7 +131,7 @@
             CanSelectNextPage="{Binding IsGameDataFound}"
             CanSelectPreviousPage="{Binding IsNotExtracting}"
             CanCancel="{Binding IsNotExtracting}"
-            PreviousPage="{Binding ElementName=PageIsoSelection}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterGameData}"
             IsEnabled="{Binding IsNotExtracting}">
             <StackPanel>
@@ -166,7 +168,7 @@
             Title="Set your preferred region"
             Description="This will instruct the game to force to load specific languages"
             CanSelectNextPage="{Binding IsGameDataFound}"
-            PreviousPage="{Binding ElementName=PageGameData}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=LastPage}">
             <StackPanel>
                 <TextBlock>Region</TextBlock>
@@ -194,7 +196,7 @@
             PageType="Interior"
             Title="Install OpenKH Panacea (Optional and Experimental)"
             Description="Install automatic mod loading support into the game's folder."
-            PreviousPage="{Binding ElementName=PageGameEdition}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageEosConfig}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
@@ -236,7 +238,7 @@
             PageType="Interior"
             Title="Configure Kingdom Hearts HD 1.5+2.5 ReMIX"
             Description="Change the way the launcher behaves."
-            PreviousPage="{Binding ElementName=PageEosInstall}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>               
                 <StackPanel>
@@ -272,7 +274,7 @@
             PageType="Exterior"
             Title="You're set!"
             Description="You successfully configured OpenKH Mods Manager. Have fun with all the amazing mods that the community has to offer!"
-            PreviousPage="{Binding ElementName=PageGameEdition}"
+            PreviousPage="{Binding PageStack.Back}"
             CanFinish="True"/>
     </xctk:Wizard>
 </Window>
