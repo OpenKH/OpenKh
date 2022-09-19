@@ -113,20 +113,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _pc = value;
-                if (ConfigurationService.GameEdition == 2)
-                {
-                    _pc = true;
-                    OnPropertyChanged(nameof(PC));
-                    OnPropertyChanged(nameof(ModLoader));
-                    OnPropertyChanged(nameof(PatchVisible));
-                }
-                else
-                {
-                    _pc = false;
-                    OnPropertyChanged(nameof(PC));
-                    OnPropertyChanged(nameof(ModLoader));
-                    OnPropertyChanged(nameof(PatchVisible));
-                }
+                OnPropertyChanged(nameof(PC));
+                OnPropertyChanged(nameof(ModLoader));
+                OnPropertyChanged(nameof(PatchVisible));
             }
         }
 
@@ -149,11 +138,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public MainViewModel()
         {
             if (ConfigurationService.GameEdition == 2)
+            {
                 PC = true;
+                PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+                DevView = ConfigurationService.DevView;
+            }
             else
                 PC = false;
-            PanaceaInstalled = ConfigurationService.PanaceaInstalled;
-            DevView = ConfigurationService.DevView;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
@@ -323,13 +314,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             });
                     }
                     if (ConfigurationService.GameEdition == 2)
+                    {
                         PC = true;
+                        PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+                    }
                     else
                         PC = false;
-                    if (ConfigurationService.PanaceaInstalled)
-                        PanaceaInstalled = true;
-                    else
-                        PanaceaInstalled = false;
                 }
             });
 
