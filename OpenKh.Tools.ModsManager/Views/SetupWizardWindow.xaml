@@ -197,7 +197,7 @@
             Title="Install OpenKH Panacea (Optional and Experimental)"
             Description="Install automatic mod loading support into the game's folder."
             PreviousPage="{Binding PageStack.Back}"
-            NextPage="{Binding ElementName=PageGameData}">
+            NextPage="{Binding ElementName=PCShortcutLocation}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
@@ -232,7 +232,29 @@
                         Command="{Binding RemovePanaceaCommand}"/>
                 </StackPanel>
             </StackPanel>
-        </xctk:WizardPage>        
+        </xctk:WizardPage>
+        <xctk:WizardPage
+            x:Name="PCShortcutLocation"
+            PageType="Interior"
+            Title="Shortcut Location"            
+            Description="Selected the location of the PC shortcut."
+            PreviousPage="{Binding PageStack.Back}"
+            NextPage="{Binding ElementName=LastPage}">
+            <StackPanel>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">Please select the KINGDOM HEARTS HD 1.5+2.5 ReMIX shortcut you created. To Create a shortcut in the Library view of EGS, right click the game, Manage, Create Desktop Shortcut</TextBlock>
+                <Grid Margin="0 0 0 3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding PcShortcutLocation, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcShortcutCommand}">
+                        <Image Source="{StaticResource FolderOpen_16x}"/>
+                    </Button>
+                </Grid>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version as updated might break the compatibility</TextBlock>
+            </StackPanel>
+        </xctk:WizardPage>
         <xctk:WizardPage
             x:Name="LastPage"
             PageType="Exterior"

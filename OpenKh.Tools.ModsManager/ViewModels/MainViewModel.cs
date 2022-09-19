@@ -86,7 +86,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility BRVisible => !PC ? Visibility.Visible : Visibility.Collapsed;
 
         public bool DevView
         {
@@ -120,7 +119,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(PC));
                     OnPropertyChanged(nameof(ModLoader));
                     OnPropertyChanged(nameof(PatchVisible));
-                    OnPropertyChanged(nameof(BRVisible));
                 }
                 else
                 {
@@ -128,10 +126,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     OnPropertyChanged(nameof(PC));
                     OnPropertyChanged(nameof(ModLoader));
                     OnPropertyChanged(nameof(PatchVisible));
-                    OnPropertyChanged(nameof(BRVisible));
                 }
             }
-        }       
+        }
 
         public bool IsBuilding
         {
@@ -301,6 +298,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigPcReleaseLanguage = ConfigurationService.PcReleaseLanguage,
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
+                    ConfigPcShortcutLocation = ConfigurationService.PcShortcutLocation,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -312,6 +310,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
+                    ConfigurationService.PcShortcutLocation = dialog.ConfigPcShortcutLocation;
                     ConfigurationService.IsFirstRunComplete = true;
 
                     const int EpicGamesPC = 2;
@@ -426,11 +425,22 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    MessageBox.Show(
-                        "You cannot run the PC game from the Mods Manager. Choose Build Only then start the game as you normally would.",
-                        "Unable to start the game",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    if (ConfigurationService.PcShortcutLocation == null)
+                    {
+                        MessageBox.Show(
+                            "You can only run the game from the Mods Manager by selecting a shortcut made through EGS.\nRepeat the wizard to locate the shortcut.",
+                            "Unable to start the game",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                        return Task.CompletedTask;
+                    }
+                    processStartInfo = new ProcessStartInfo
+                    {
+                        FileName = ConfigurationService.PcShortcutLocation,
+                        UseShellExecute = true,
+                    };
+                    Process.Start(processStartInfo);
+                    CloseAllWindows();
                     return Task.CompletedTask;
                 default:
                     return Task.CompletedTask;
