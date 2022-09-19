@@ -33,6 +33,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public string OpenKhGameEngineLocation { get; internal set; }
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
+            public string PcShortcutLocation { get; internal set; }
             public string PcReleaseLanguage { get; internal set; } = "en";
             public int RegionId { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
@@ -181,6 +182,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.PcReleaseLocation = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static string PcShortcutLocation
+        {
+            get => _config.PcShortcutLocation;
+            set
+            {
+                _config.PcShortcutLocation = value;
                 _config.Save(ConfigPath);
             }
         }
