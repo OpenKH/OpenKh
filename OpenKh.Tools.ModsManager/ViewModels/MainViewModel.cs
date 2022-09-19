@@ -60,7 +60,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand StopRunningInstanceCommand { get; set; }
         public RelayCommand WizardCommand { get; set; }
         public RelayCommand OpenLinkCommand { get; set; }
-        public RelayCommand DevViewCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -93,6 +92,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _devView = value;
+                ConfigurationService.DevView = DevView;
                 OnPropertyChanged(nameof(PatchVisible));
             }
         }
@@ -152,10 +152,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 PC = true;
             else
                 PC = false;
-            if (ConfigurationService.PanaceaInstalled)
-                PanaceaInstalled = true;
-            else
-                PanaceaInstalled = false;
+            PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+            DevView = ConfigurationService.DevView;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
@@ -333,11 +331,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     else
                         PanaceaInstalled = false;
                 }
-            });
-
-            DevViewCommand = new RelayCommand(_ =>
-            {
-                DevView = !DevView;                
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)

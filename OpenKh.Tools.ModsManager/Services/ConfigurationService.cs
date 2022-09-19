@@ -37,6 +37,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public string PcReleaseLanguage { get; internal set; } = "en";
             public int RegionId { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
+            public bool DevView { get; internal set; }
 
             public void Save(string fileName)
             {
@@ -221,6 +222,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.PanaceaInstalled = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool DevView
+        {
+            get => _config.DevView;
+            set
+            {
+                _config.DevView = value;
                 _config.Save(ConfigPath);
             }
         }
