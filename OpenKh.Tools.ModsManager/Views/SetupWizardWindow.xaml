@@ -239,7 +239,7 @@
             Title="Shortcut Location"            
             Description="Selected the location of the PC shortcut."
             PreviousPage="{Binding PageStack.Back}"
-            NextPage="{Binding ElementName=LastPage}">
+            NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">Please select the KINGDOM HEARTS HD 1.5+2.5 ReMIX shortcut you created. To Create a shortcut in the Library view of EGS, right click the game, Manage, Create Desktop Shortcut</TextBlock>
                 <Grid Margin="0 0 0 3">
