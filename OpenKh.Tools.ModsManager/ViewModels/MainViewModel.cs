@@ -408,7 +408,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    if (ConfigurationService.PcShortcutLocation == null)
+                    if (!File.Exists(ConfigurationService.PcShortcutLocation))
                     {
                         MessageBox.Show(
                             "You can only run the game from the Mods Manager by selecting a shortcut made through EGS.\nRepeat the wizard to locate the shortcut.",
