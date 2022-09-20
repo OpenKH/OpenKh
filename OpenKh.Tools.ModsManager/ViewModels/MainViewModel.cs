@@ -60,7 +60,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand StopRunningInstanceCommand { get; set; }
         public RelayCommand WizardCommand { get; set; }
         public RelayCommand OpenLinkCommand { get; set; }
-        public RelayCommand DevViewCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -93,6 +92,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _devView = value;
+                ConfigurationService.DevView = DevView;
                 OnPropertyChanged(nameof(PatchVisible));
             }
         }
@@ -113,20 +113,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             set
             {
                 _pc = value;
-                if (ConfigurationService.GameEdition == 2)
-                {
-                    _pc = true;
-                    OnPropertyChanged(nameof(PC));
-                    OnPropertyChanged(nameof(ModLoader));
-                    OnPropertyChanged(nameof(PatchVisible));
-                }
-                else
-                {
-                    _pc = false;
-                    OnPropertyChanged(nameof(PC));
-                    OnPropertyChanged(nameof(ModLoader));
-                    OnPropertyChanged(nameof(PatchVisible));
-                }
+                OnPropertyChanged(nameof(PC));
+                OnPropertyChanged(nameof(ModLoader));
+                OnPropertyChanged(nameof(PatchVisible));
             }
         }
 
@@ -149,13 +138,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public MainViewModel()
         {
             if (ConfigurationService.GameEdition == 2)
+            {
                 PC = true;
+                PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+                DevView = ConfigurationService.DevView;
+            }
             else
                 PC = false;
-            if (ConfigurationService.PanaceaInstalled)
-                PanaceaInstalled = true;
-            else
-                PanaceaInstalled = false;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
@@ -325,19 +314,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             });
                     }
                     if (ConfigurationService.GameEdition == 2)
+                    {
                         PC = true;
+                        PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+                    }
                     else
                         PC = false;
-                    if (ConfigurationService.PanaceaInstalled)
-                        PanaceaInstalled = true;
-                    else
-                        PanaceaInstalled = false;
                 }
-            });
-
-            DevViewCommand = new RelayCommand(_ =>
-            {
-                DevView = !DevView;                
             });
 
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
@@ -425,10 +408,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    if (ConfigurationService.PcShortcutLocation == null)
+                    if (!File.Exists(ConfigurationService.PcShortcutLocation))
                     {
                         MessageBox.Show(
-                            "You can only run the game from the Mods Manager by selecting a shortcut made through EGS.\nRepeat the wizard to locate the shortcut.",
+                            "You can only run the game from the Mods Manager by selecting a shortcut made through EGS.\nThere either is no shortcut provided or it has been renamed or moved.\nRepeat the wizard to locate the shortcut.",
                             "Unable to start the game",
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning);

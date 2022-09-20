@@ -121,7 +121,7 @@
                         <Image Source="{StaticResource WebURL_16x}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Dev View" IsCheckable="True" Command="{Binding DevViewCommand}"/>
+                <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}"/>
             </MenuItem>
         </Menu>
 
