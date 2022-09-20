@@ -241,7 +241,8 @@
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">Please select the KINGDOM HEARTS HD 1.5+2.5 ReMIX shortcut you created. To Create a shortcut in the Library view of EGS, right click the game, Manage, Create Desktop Shortcut</TextBlock>
+                <TextBlock Margin="0 0 0 3" TextAlignment="Center" TextWrapping="Wrap">**OPTIONAL: Shortcut Location**</TextBlock>
+                <TextBlock Margin="0 0 0 3" TextAlignment="Center" TextWrapping="Wrap">Select the location of the PC Launcher Shortcut</TextBlock>                
                 <Grid Margin="0 0 0 3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -252,7 +253,7 @@
                         <Image Source="{StaticResource FolderOpen_16x}"/>
                     </Button>
                 </Grid>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">NOTE: Always be sure to use a supported version as updated might break the compatibility</TextBlock>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">You can launch KINGDOM HEARTS HD 1.5+2.5 ReMIX from the Mod Manager by targeting the shortcut made by EGS here. To make a shortcut, open the Epic Games Store and go to Library. Click on the 3 dots next to KINGDOM HEARTS HD 1.5+2.5 ReMIX and choose "Manage". Then click "Create Desktop Shortcut".</TextBlock>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
