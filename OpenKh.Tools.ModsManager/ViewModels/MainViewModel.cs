@@ -411,7 +411,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (!File.Exists(ConfigurationService.PcShortcutLocation))
                     {
                         MessageBox.Show(
-                            "You can only run the game from the Mods Manager by selecting a shortcut made through EGS.\nRepeat the wizard to locate the shortcut.",
+                            "You can only run the game from the Mods Manager by selecting a shortcut made through EGS.\nThere either is no shortcut provided or it has been renamed or moved.\nRepeat the wizard to locate the shortcut.",
                             "Unable to start the game",
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning);
