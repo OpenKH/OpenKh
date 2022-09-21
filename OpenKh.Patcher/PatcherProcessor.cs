@@ -569,8 +569,28 @@ namespace OpenKh.Patcher
                             }
                             Kh2.Battle.Plrp.Write(stream.SetPosition(0), plrpList);
                         break;
+                    case "cmd":
+                        var cmdList = Kh2.SystemData.Cmd.Read(stream).ToDictionary(x => x.Id, x => x);
+                        var moddedCmd = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Cmd>>(sourceText);
+                        foreach (var command in moddedCmd)
+                        {
+                            if (cmdList.ContainsKey(command.Key))
 
-                        default:
+                                {
+                                    cmdList[command.Key] = command.Value;
+                                }
+                            
+                            else
+                            {
+                                cmdList.Add(command.Key, command.Value);
+                            }
+
+                        }
+                        Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList.Values);
+                        break;
+
+
+                    default:
                             break;
                     }
              }
