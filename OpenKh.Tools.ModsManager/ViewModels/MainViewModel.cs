@@ -10,6 +10,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Xe.Tools;
@@ -38,6 +41,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _pc;
         private bool _panaceaInstalled;
         private bool _devView;
+        private string _quickLaunch = "kh2";
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
@@ -118,6 +122,32 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(HideExtras));
+            }
+        }  
+
+        public int QuickLaunch
+        {
+            get => 0;
+            set            
+            {                
+                switch (value)
+                {
+                    case 0:
+                        _quickLaunch = "kh2";
+                        break;
+                    case 1:
+                        _quickLaunch = "kh1";
+                        break;
+                    case 2:
+                        _quickLaunch = "bbs";
+                        break;
+                    case 3:
+                        _quickLaunch = "recom";
+                        break;
+                    default:
+                        _quickLaunch = "off";
+                        break;
+                }
             }
         }
 
@@ -313,6 +343,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             {
                                 $"mod_path={ConfigurationService.GameModPath}",
                                 $"show_console={false}",
+                                $"quick_launch=off",
                             });
                     }
                     if (ConfigurationService.GameEdition == 2)
@@ -412,6 +443,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 case 2:
                     if (ConfigurationService.IsEGSVersion)
                     {
+                        string[] file = File.ReadAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"));
+                        if (Array.Find(file, element => element.StartsWith("quick")) != null)
+                            file[Array.FindIndex(file, element => element.StartsWith("quick"))] = "quick_launch=" + _quickLaunch;
+                        else
+                        {
+                            Array.Resize(ref file, file.Length + 1);
+                            file[file.Length-1] = "quick_launch=" + _quickLaunch;                            
+                        }
+                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), file);                        
                         processStartInfo = new ProcessStartInfo
                         {
                             FileName = "com.epicgames.launcher://apps/4158b699dd70447a981fee752d970a3e%3A5aac304f0e8948268ddfd404334dbdc7%3A68c214c58f694ae88c2dab6f209b43e4?action=launch&silent=true",
