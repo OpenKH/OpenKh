@@ -11,6 +11,8 @@ namespace OpenKH
         KingdomHeartsReCom,
         KingdomHeartsBbs,
         KingdomHeartsDdd,
+        Launcher1_5_2_5,
+        Launcher2_8,
         END,
     };
 
@@ -18,7 +20,7 @@ namespace OpenKH
     extern std::wstring m_ModPath;
     extern bool m_ShowConsole;
     extern bool m_DebugLog;
-    extern bool m_DisableCache;
+    extern bool m_EnableCache;
 
     void Initialize();
     void Main();
