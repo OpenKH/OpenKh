@@ -127,8 +127,25 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public int QuickLaunch
         {
-            get => 0;
-            set            
+            get
+            {
+                switch (_quickLaunch)
+                {
+                    case "kh2":
+                        return 0;
+                    case "kh1":
+                        return 1;
+                    case "bbs":
+                        return 2;
+                    case "recom":
+                        return 3;
+                    case "off":
+                        return 4;
+                    default:
+                        return 0;
+                }
+            }
+            set          
             {                
                 switch (value)
                 {
@@ -444,13 +461,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     if (ConfigurationService.IsEGSVersion)
                     {
                         string[] file = File.ReadAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"));
-                        if (Array.Find(file, element => element.StartsWith("quick")) != null)
-                            file[Array.FindIndex(file, element => element.StartsWith("quick"))] = "quick_launch=" + _quickLaunch;
-                        else
-                        {
-                            Array.Resize(ref file, file.Length + 1);
-                            file[file.Length-1] = "quick_launch=" + _quickLaunch;                            
-                        }
+                        Array.Resize(ref file, file.Length + 1);
+                        file[file.Length-1] = "quick_launch=" + _quickLaunch;              
                         File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), file);                        
                         processStartInfo = new ProcessStartInfo
                         {
