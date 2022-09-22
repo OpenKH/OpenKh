@@ -85,6 +85,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility HideExtras => !PC ? Visibility.Visible : Visibility.Collapsed;
 
         public bool DevView
         {
@@ -116,6 +117,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PC));
                 OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PatchVisible));
+                OnPropertyChanged(nameof(HideExtras));
             }
         }
 
@@ -287,7 +289,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigPcReleaseLanguage = ConfigurationService.PcReleaseLanguage,
                     ConfigRegionId = ConfigurationService.RegionId,
                     ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
-                    ConfigPcShortcutLocation = ConfigurationService.PcShortcutLocation,
+                    ConfigIsEGSVersion = ConfigurationService.IsEGSVersion,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -299,7 +301,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
-                    ConfigurationService.PcShortcutLocation = dialog.ConfigPcShortcutLocation;
+                    ConfigurationService.IsEGSVersion = dialog.ConfigIsEGSVersion;
                     ConfigurationService.IsFirstRunComplete = true;
 
                     const int EpicGamesPC = 2;
@@ -408,23 +410,28 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    if (!File.Exists(ConfigurationService.PcShortcutLocation))
+                    if (ConfigurationService.IsEGSVersion)
                     {
-                        MessageBox.Show(
-                            "You can only run the game from the Mods Manager by selecting a shortcut made through EGS.\nThere either is no shortcut provided or it has been renamed or moved.\nRepeat the wizard to locate the shortcut.",
-                            "Unable to start the game",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning);
+                        processStartInfo = new ProcessStartInfo
+                        {
+                            FileName = "com.epicgames.launcher://apps/4158b699dd70447a981fee752d970a3e%3A5aac304f0e8948268ddfd404334dbdc7%3A68c214c58f694ae88c2dab6f209b43e4?action=launch&silent=true",
+                            UseShellExecute = true,
+                        };
+                        Process.Start(processStartInfo);
+                        CloseAllWindows();
                         return Task.CompletedTask;
                     }
-                    processStartInfo = new ProcessStartInfo
+                    else
                     {
-                        FileName = ConfigurationService.PcShortcutLocation,
-                        UseShellExecute = true,
-                    };
-                    Process.Start(processStartInfo);
-                    CloseAllWindows();
-                    return Task.CompletedTask;
+                        processStartInfo = new ProcessStartInfo
+                        {
+                            FileName =  Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
+                            UseShellExecute = false,
+                        };
+                        Process.Start(processStartInfo);
+                        CloseAllWindows();
+                        return Task.CompletedTask;
+                    }
                 default:
                     return Task.CompletedTask;
             }

@@ -197,7 +197,7 @@
             Title="Install OpenKH Panacea (Optional and Experimental)"
             Description="Install automatic mod loading support into the game's folder."
             PreviousPage="{Binding PageStack.Back}"
-            NextPage="{Binding ElementName=PCShortcutLocation}">
+            NextPage="{Binding ElementName=PCLaunchOption}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
@@ -234,26 +234,20 @@
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
-            x:Name="PCShortcutLocation"
+            x:Name="PCLaunchOption"
             PageType="Interior"
-            Title="Shortcut Location"            
-            Description="Selected the location of the PC shortcut."
+            Title="Launch Option"            
+            Description="How OpenKH Mod Manager needs to launch Kingdom Hearts"
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
-                <TextBlock Margin="0 0 0 3" TextAlignment="Center" TextWrapping="Wrap">**OPTIONAL: Shortcut Location**</TextBlock>
-                <TextBlock Margin="0 0 0 3" TextAlignment="Center" TextWrapping="Wrap">Select the location of the PC Launcher Shortcut</TextBlock>                
-                <Grid Margin="0 0 0 3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="20"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding PcShortcutLocation, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="1" Grid.Row="4" Command="{Binding SelectPcShortcutCommand}">
-                        <Image Source="{StaticResource FolderOpen_16x}"/>
-                    </Button>
-                </Grid>
-                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">You can launch KINGDOM HEARTS HD 1.5+2.5 ReMIX from the Mod Manager by targeting the shortcut made by EGS here. To make a shortcut, open the Epic Games Store and go to Library. Click on the 3 dots next to KINGDOM HEARTS HD 1.5+2.5 ReMIX and choose "Manage". Then click "Create Desktop Shortcut".</TextBlock>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    OpenKH Mod Manager is able to start the game when using Panacea but needs to know how you normally run it. If you launch Kingdom hearts through the Epic Games Launcher leave the box below checked.
+                </TextBlock>
+                <CheckBox
+                    Margin="0 0 0 10"
+                    IsChecked="{Binding IsEGSVersion}"
+                    Content="KH from the Epic Games Store and launcher"/>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage

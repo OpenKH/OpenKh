@@ -33,11 +33,11 @@ namespace OpenKh.Tools.ModsManager.Services
             public string OpenKhGameEngineLocation { get; internal set; }
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
-            public string PcShortcutLocation { get; internal set; }
             public string PcReleaseLanguage { get; internal set; } = "en";
             public int RegionId { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
             public bool DevView { get; internal set; }
+            public bool isEGSVersion { get; internal set; } = true;
 
             public void Save(string fileName)
             {
@@ -186,15 +186,6 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
-        public static string PcShortcutLocation
-        {
-            get => _config.PcShortcutLocation;
-            set
-            {
-                _config.PcShortcutLocation = value;
-                _config.Save(ConfigPath);
-            }
-        }
 
         public static string PcReleaseLanguage
         {
@@ -231,6 +222,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.DevView = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool IsEGSVersion
+        {
+            get => _config.isEGSVersion;
+            set
+            {
+                _config.isEGSVersion = value;
                 _config.Save(ConfigPath);
             }
         }
