@@ -654,7 +654,7 @@ bool sortRemasteredFiles(const Axa::RemasteredEntry& a, const Axa::RemasteredEnt
 
 void GetRemasteredFiles(Axa::PackageFile* fileinfo, const wchar_t* path, void* addr)
 {
-    if (!OpenKH::m_DisableCache || RemasteredData.find(fileinfo->CurrentFileName) == RemasteredData.cend())
+    if (!OpenKH::m_EnableCache || RemasteredData.find(fileinfo->CurrentFileName) == RemasteredData.cend())
     {
         wchar_t remasteredFolder[MAX_PATH];
         swprintf_s(remasteredFolder, L"%ls\\remastered\\%ls", OpenKH::m_ModPath.c_str(), path + OpenKH::m_ModPath.length() + 1);
