@@ -54,11 +54,45 @@ namespace OpenKh.Tools.ModsManager.Services
                 return _deserializer.Deserialize<Config>(reader);
             }
         }
+        
+         private class FirstRun
+        {
+            private static readonly IDeserializer _deserializer =
+                new DeserializerBuilder()
+                .IgnoreFields()
+                .IgnoreUnmatchedProperties()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            private static readonly ISerializer _serializer =
+                new SerializerBuilder()
+                .IgnoreFields()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            
+            public bool IsFirstRunComplete { get; set; }
+
+            public void Save(string fileName)
+            {
+                using var writer = new StreamWriter(fileName);
+                _serializer.Serialize(writer, this);
+            }
+
+            public static FirstRun Open(string fileName)
+            {
+                if (!File.Exists(fileName))
+                    return new FirstRun();
+
+                using var reader = new StreamReader(fileName);
+                return _deserializer.Deserialize<FirstRun>(reader);
+            }
+        }
 
         private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
+        private static string FirstRunPath = Path.Combine(StoragePath, "first-run-complete.yml");
         private static string EnabledModsPath = Path.Combine(StoragePath, "mods.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
+        private static readonly FirstRun __config = FirstRun.Open(FirstRunPath);
 
         static ConfigurationService()
         {
@@ -99,11 +133,11 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static bool IsFirstRunComplete
         {
-            get => _config.IsFirstRunComplete;
+            get => __config.IsFirstRunComplete;
             set
             {
-                _config.IsFirstRunComplete = value;
-                _config.Save(ConfigPath);
+                __config.IsFirstRunComplete = value;
+                __config.Save(FirstRunPath);
             }
         }
 
