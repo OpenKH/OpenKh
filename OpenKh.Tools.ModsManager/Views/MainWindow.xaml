@@ -76,8 +76,8 @@
                 <MenuItem Header="Restore" Command="{Binding RestoreCommand}" InputGestureText="Ctrl+R"/>
             </MenuItem>
             <MenuItem Header="_Settings">
-                <MenuItem Header="Run _wizard" Command="{Binding WizardCommand}" InputGestureText="Alt+W"/>
-                <ComboBox Width="62" SelectedIndex="{Binding QuickLaunch}">
+                <MenuItem Header="Run _wizard" Command="{Binding WizardCommand}"  InputGestureText="Alt+W"/>
+                <ComboBox MinWidth="62" SelectedIndex="{Binding QuickLaunch}" Visibility="{Binding QuickLaunchVis}">
                     <ComboBoxItem>kh2</ComboBoxItem>
                     <ComboBoxItem>kh1</ComboBoxItem>
                     <ComboBoxItem>bbs</ComboBoxItem>

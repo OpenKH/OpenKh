@@ -237,17 +237,17 @@
             x:Name="PCLaunchOption"
             PageType="Interior"
             Title="Launch Option"            
-            Description="How OpenKH Mod Manager needs to launch Kingdom Hearts"
+            Description="Configure Mods Manager to launch Kingdom Hearts"
             PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    OpenKH Mod Manager is able to start the game when using Panacea but needs to know how you normally run it. If you launch Kingdom hearts through the Epic Games Launcher leave the box below checked.
+                    OpenKH Mods Manager has the ability to launch Kingdom Hearts directly. Leave the box below checked to have Mods Manager launch the game via Epic Games.    
                 </TextBlock>
                 <CheckBox
                     Margin="0 0 0 10"
                     IsChecked="{Binding IsEGSVersion}"
-                    Content="KH from the Epic Games Store and launcher"/>
+                    Content="Launch via Epic Games"/>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage

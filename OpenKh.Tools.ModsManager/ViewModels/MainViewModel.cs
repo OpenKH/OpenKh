@@ -90,6 +90,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility HideExtras => !PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility QuickLaunchVis => PC && DevView ? Visibility.Visible : Visibility.Collapsed;
 
         public bool DevView
         {
@@ -99,6 +100,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _devView = value;
                 ConfigurationService.DevView = DevView;
                 OnPropertyChanged(nameof(PatchVisible));
+                OnPropertyChanged(nameof(QuickLaunchVis));
             }
         }
         public bool PanaceaInstalled
@@ -360,7 +362,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             {
                                 $"mod_path={ConfigurationService.GameModPath}",
                                 $"show_console={false}",
-                                $"quick_launch=off",
                             });
                     }
                     if (ConfigurationService.GameEdition == 2)
