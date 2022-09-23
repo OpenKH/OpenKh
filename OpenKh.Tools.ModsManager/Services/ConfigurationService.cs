@@ -24,7 +24,6 @@ namespace OpenKh.Tools.ModsManager.Services
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
 
-            public bool IsFirstRunComplete { get; set; }
             public string ModCollectionPath { get; internal set; }
             public string GameModPath { get; internal set; }
             public string GameDataPath { get; internal set; }
