@@ -92,7 +92,7 @@ namespace OpenKh.Tools.ModsManager.Services
         private static string FirstRunPath = Path.Combine(StoragePath, "first-run-complete.yml");
         private static string EnabledModsPath = Path.Combine(StoragePath, "mods.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
-        private static readonly FirstRun __config = FirstRun.Open(FirstRunPath);
+        private static readonly FirstRun _config2 = FirstRun.Open(FirstRunPath);
 
         static ConfigurationService()
         {
@@ -133,11 +133,11 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static bool IsFirstRunComplete
         {
-            get => __config.IsFirstRunComplete;
+            get => _config2.IsFirstRunComplete;
             set
             {
-                __config.IsFirstRunComplete = value;
-                __config.Save(FirstRunPath);
+                _config2.IsFirstRunComplete = value;
+                _config2.Save(FirstRunPath);
             }
         }
 
