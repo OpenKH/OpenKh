@@ -54,6 +54,38 @@ namespace OpenKh.Tools.ModsManager.Services
                 return _deserializer.Deserialize<Config>(reader);
             }
         }
+        
+         private class FirstRun
+        {
+            private static readonly IDeserializer _deserializer =
+                new DeserializerBuilder()
+                .IgnoreFields()
+                .IgnoreUnmatchedProperties()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            private static readonly ISerializer _serializer =
+                new SerializerBuilder()
+                .IgnoreFields()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            
+            public bool IsFirstRunComplete { get; set; }
+
+            public void Save(string fileName)
+            {
+                using var writer = new StreamWriter(fileName);
+                _serializer.Serialize(writer, this);
+            }
+
+            public static FirstRun Open(string fileName)
+            {
+                if (!File.Exists(fileName))
+                    return new FirstRun();
+
+                using var reader = new StreamReader(fileName);
+                return _deserializer.Deserialize<FirstRun>(reader);
+            }
+        }
 
         private class FirstRun
         {
