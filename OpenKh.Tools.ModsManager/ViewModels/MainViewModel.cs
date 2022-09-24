@@ -479,6 +479,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         processStartInfo = new ProcessStartInfo
                         {
                             FileName =  Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
+                            WorkingDirectory = ConfigurationService.PcReleaseLocation,
                             UseShellExecute = false,
                         };
                         Process.Start(processStartInfo);
