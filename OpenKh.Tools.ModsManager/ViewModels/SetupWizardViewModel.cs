@@ -30,9 +30,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private static List<FileDialogFilter> _pcsx2Filter = FileDialogFilterComposer
             .Compose()
             .AddExtensions("PCSX2 Emulator", "exe");
-        private static List<FileDialogFilter> _pcShortcutFilter = FileDialogFilterComposer
-            .Compose()
-            .AddExtensions("PC Shortcut", "url", "lnk");
 
         const int OpenKHGameEngine = 0;
         const int PCSX2 = 1;
@@ -45,7 +42,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcReleaseLocation;
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
-        private string _pcShortcutLocation;
+        private bool _isEGSVersion;
 
         private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterIntro;
         public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterIntro
@@ -71,7 +68,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Xceed.Wpf.Toolkit.WizardPage PageEosInstall { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageEosConfig { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageRegion { get; internal set; }
-        public Xceed.Wpf.Toolkit.WizardPage PCShortcutLocation { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PCLaunchOption { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage LastPage { get; internal set; }
 
         public WizardPageStackService PageStack { get; set; } = new WizardPageStackService();
@@ -191,7 +188,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public RelayCommand SelectPcReleaseCommand { get; }
-        public RelayCommand SelectPcShortcutCommand { get; }
         public Visibility PcReleaseConfigVisibility => GameEdition == EpicGames ? Visibility.Visible : Visibility.Collapsed;
         public string PcReleaseLocation
         {
@@ -207,12 +203,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsGameDataFound));
             }
         }
-        public string PcShortcutLocation
+        public bool IsEGSVersion
         {
-            get => _pcShortcutLocation;
+            get => _isEGSVersion;
             set
             {
-                _pcShortcutLocation = value;
+                _isEGSVersion = value;
                 OnPropertyChanged();
             }
         }
@@ -366,8 +362,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
                 PanaceaInstalled = false;
             });
-            SelectPcShortcutCommand = new RelayCommand(_ =>
-               FileDialog.OnOpen(fileName => PcShortcutLocation = fileName, _pcShortcutFilter));
         }
 
         private async Task ExtractGameData(string isoLocation, string gameDataLocation)

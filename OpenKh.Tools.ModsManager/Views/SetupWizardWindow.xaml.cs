@@ -22,7 +22,7 @@ namespace OpenKh.Tools.ModsManager.Views
             _vm.PageIsoSelection = PageIsoSelection;
             _vm.PageEosInstall = PageEosInstall;
             _vm.PageRegion = PageRegion;
-            _vm.PCShortcutLocation = PCShortcutLocation;
+            _vm.PCLaunchOption = PCLaunchOption;
             _vm.LastPage = LastPage;
 
             _vm.PageStack.OnPageChanged(wizard.CurrentPage);
@@ -37,7 +37,7 @@ namespace OpenKh.Tools.ModsManager.Views
         public string ConfigGameDataLocation { get => _vm.GameDataLocation; set => _vm.GameDataLocation = value; }
         public int ConfigRegionId { get => _vm.RegionId; set => _vm.RegionId = value; }
         public bool ConfigPanaceaInstalled { get => _vm.PanaceaInstalled; set => _vm.PanaceaInstalled = value; }
-        public string ConfigPcShortcutLocation { get => _vm.PcShortcutLocation; set => _vm.PcShortcutLocation = value; }
+        public bool ConfigIsEGSVersion { get => _vm.IsEGSVersion; set => _vm.IsEGSVersion = value; }
 
         private void Wizard_Finish(object sender, Xceed.Wpf.Toolkit.Core.CancelRoutedEventArgs e)
         {

@@ -37,6 +37,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public int RegionId { get; internal set; }
             public bool PanaceaInstalled { get; internal set; }
             public bool DevView { get; internal set; }
+            public bool isEGSVersion { get; internal set; } = true;
 
             public void Save(string fileName)
             {
@@ -91,7 +92,7 @@ namespace OpenKh.Tools.ModsManager.Services
         private static string FirstRunPath = Path.Combine(StoragePath, "first-run-complete.yml");
         private static string EnabledModsPath = Path.Combine(StoragePath, "mods.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
-        private static readonly FirstRun __config = FirstRun.Open(FirstRunPath);
+        private static readonly FirstRun _config2 = FirstRun.Open(FirstRunPath);
 
         static ConfigurationService()
         {
@@ -132,11 +133,11 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static bool IsFirstRunComplete
         {
-            get => __config.IsFirstRunComplete;
+            get => _config2.IsFirstRunComplete;
             set
             {
-                __config.IsFirstRunComplete = value;
-                __config.Save(FirstRunPath);
+                _config2.IsFirstRunComplete = value;
+                _config2.Save(FirstRunPath);
             }
         }
 
@@ -264,6 +265,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.DevView = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool IsEGSVersion
+        {
+            get => _config.isEGSVersion;
+            set
+            {
+                _config.isEGSVersion = value;
                 _config.Save(ConfigPath);
             }
         }
