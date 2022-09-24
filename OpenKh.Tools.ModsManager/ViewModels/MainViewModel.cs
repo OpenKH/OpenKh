@@ -42,6 +42,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _panaceaInstalled;
         private bool _devView;
         private string _quickLaunch = "kh2";
+        private int _wizardVersionNumber = 1;
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
@@ -89,8 +90,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility HideExtras => !PC ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility QuickLaunchVis => PC && DevView ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility HideStop => !PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility HideQuickLaunch => PC && PanaceaInstalled && DevView ? Visibility.Visible : Visibility.Collapsed;
 
         public bool DevView
         {
@@ -100,7 +101,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _devView = value;
                 ConfigurationService.DevView = DevView;
                 OnPropertyChanged(nameof(PatchVisible));
-                OnPropertyChanged(nameof(QuickLaunchVis));
+                OnPropertyChanged(nameof(HideQuickLaunch));
             }
         }
         public bool PanaceaInstalled
@@ -123,7 +124,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PC));
                 OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PatchVisible));
-                OnPropertyChanged(nameof(HideExtras));
+                OnPropertyChanged(nameof(HideStop));
             }
         }  
 
@@ -351,7 +352,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
                     ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
                     ConfigurationService.IsEGSVersion = dialog.ConfigIsEGSVersion;
-                    ConfigurationService.IsFirstRunComplete = true;
+                    ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
 
                     const int EpicGamesPC = 2;
                     if (ConfigurationService.GameEdition == EpicGamesPC &&
@@ -382,7 +383,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
             FetchUpdates();
 
-            if (!ConfigurationService.IsFirstRunComplete)
+            if (ConfigurationService.WizardVersionNumber < _wizardVersionNumber)
                 WizardCommand.Execute(null);
         }
 
