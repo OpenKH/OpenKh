@@ -462,10 +462,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 case 2:
                     if (ConfigurationService.IsEGSVersion)
                     {
-                        string[] file = File.ReadAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"));
-                        Array.Resize(ref file, file.Length + 1);
-                        file[file.Length-1] = "quick_launch=" + _quickLaunch;              
-                        File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), file);                        
+                        if (File.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt")))
+                        {
+                            string[] file = File.ReadAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"));
+                            Array.Resize(ref file, file.Length + 1);
+                            file[file.Length - 1] = "quick_launch=" + _quickLaunch;
+                            File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), file);
+                        }
+                        else
+                        {
+                            File.WriteAllLines(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"),
+                            new string[]
+                            {
+                                $"mod_path={ConfigurationService.GameModPath}",
+                                $"show_console={false}",
+                                $"quick_launch={_quickLaunch}",
+                            });
+                        }
                         processStartInfo = new ProcessStartInfo
                         {
                             FileName = "com.epicgames.launcher://apps/4158b699dd70447a981fee752d970a3e%3A5aac304f0e8948268ddfd404334dbdc7%3A68c214c58f694ae88c2dab6f209b43e4?action=launch&silent=true",
