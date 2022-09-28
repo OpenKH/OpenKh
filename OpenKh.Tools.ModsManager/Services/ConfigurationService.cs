@@ -24,6 +24,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
 
+            public int WizardVersionNumber { get; set; }
             public string ModCollectionPath { get; internal set; }
             public string GameModPath { get; internal set; }
             public string GameDataPath { get; internal set; }
@@ -54,45 +55,11 @@ namespace OpenKh.Tools.ModsManager.Services
                 return _deserializer.Deserialize<Config>(reader);
             }
         }
-        
-         private class FirstRun
-        {
-            private static readonly IDeserializer _deserializer =
-                new DeserializerBuilder()
-                .IgnoreFields()
-                .IgnoreUnmatchedProperties()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
-            private static readonly ISerializer _serializer =
-                new SerializerBuilder()
-                .IgnoreFields()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
-            
-            public bool IsFirstRunComplete { get; set; }
-
-            public void Save(string fileName)
-            {
-                using var writer = new StreamWriter(fileName);
-                _serializer.Serialize(writer, this);
-            }
-
-            public static FirstRun Open(string fileName)
-            {
-                if (!File.Exists(fileName))
-                    return new FirstRun();
-
-                using var reader = new StreamReader(fileName);
-                return _deserializer.Deserialize<FirstRun>(reader);
-            }
-        }
 
         private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
-        private static string FirstRunPath = Path.Combine(StoragePath, "first-run-complete.yml");
         private static string EnabledModsPath = Path.Combine(StoragePath, "mods.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
-        private static readonly FirstRun _config2 = FirstRun.Open(FirstRunPath);
 
         static ConfigurationService()
         {
@@ -131,13 +98,13 @@ namespace OpenKh.Tools.ModsManager.Services
         public static ICollection<string> FeaturedMods { get; private set; }
         public static ICollection<string> BlacklistedMods { get; private set; }
 
-        public static bool IsFirstRunComplete
+        public static int WizardVersionNumber
         {
-            get => _config2.IsFirstRunComplete;
+            get => _config.WizardVersionNumber;
             set
             {
-                _config2.IsFirstRunComplete = value;
-                _config2.Save(FirstRunPath);
+                _config.WizardVersionNumber = value;
+                _config.Save(ConfigPath);
             }
         }
 
