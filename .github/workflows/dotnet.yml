@@ -28,13 +28,17 @@ jobs:
       run: powershell -ExecutionPolicy Unrestricted ./build.ps1
       shell: pwsh
 
+    - name: bin → openkh
+      run: ren bin openkh
+      shell: pwsh
     - name: zip
       uses: TheDoctor0/zip-release@0.6.2
       with:
         filename: openkh.zip
-        path: bin
+        path: openkh
 
-    - uses: "marvinpinto/action-automatic-releases@latest"
+    - name: "GitHub release"
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
