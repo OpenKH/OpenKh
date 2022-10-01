@@ -12,6 +12,7 @@
 
 param (
     [string] $configuration = "Release",
+    [string] $sourceConfiguration = ".NET Release",
     [string] $verbosity = "minimal",
     [string] $output = "bin"
 )
@@ -48,7 +49,7 @@ dotnet restore
 Test-Success $LASTEXITCODE
 
 # Run tests
-dotnet test --configuration $configuration --verbosity $verbosity
+dotnet test --configuration $sourceConfiguration --verbosity $verbosity
 Test-Success $LASTEXITCODE
 
 # Create temporary solution
@@ -73,7 +74,7 @@ Get-CSProjects "OpenKh.Game*" | ForEach-Object {
 }
 
 # Publish solution
-dotnet publish $solution --configuration $configuration --verbosity $verbosity --framework net6.0 --output $output /p:DebugType=None /p:DebugSymbols=false
+dotnet publish $solution --configuration $configuration --verbosity $verbosity --output $output /p:DebugType=None /p:DebugSymbols=false
 
 # Remove the temporary solution after the solution is published
 Remove-Item $solution -ErrorAction Ignore
