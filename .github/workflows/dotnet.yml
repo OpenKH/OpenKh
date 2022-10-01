@@ -27,8 +27,11 @@ jobs:
     - name: build.ps1
       run: powershell -ExecutionPolicy Unrestricted ./build.ps1
       shell: pwsh
+
     - name: zip
-      run: zip -r openkh bin
+      uses: montudor/action-zip@v1.0.0
+      with:
+        args: -r openkh bin
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
