@@ -639,6 +639,7 @@ namespace OpenKh.Tests.Patcher
 
         }
         
+        [Fact]
         public void ListPatchCmdTest()
         {
             var patcher = new PatcherProcessor();
@@ -681,7 +682,6 @@ namespace OpenKh.Tests.Patcher
                         Execute = 3,
                         Argument = 3,
                         SubMenu = 1,
-                        CmdIcon = 2
                     }
                     };
                 using var cmdStream = new MemoryStream();
@@ -704,7 +704,6 @@ namespace OpenKh.Tests.Patcher
                 writer.WriteLine("  Execute: 3");
                 writer.WriteLine("  Argument: 3");
                 writer.WriteLine("  SubMenu: 1");
-                writer.WriteLine("  CmdIcon: 2");
                 writer.Flush();
             });
 
@@ -720,7 +719,6 @@ namespace OpenKh.Tests.Patcher
                  Assert.Equal(3, cmdStream[0].Execute);
                  Assert.Equal(3, cmdStream[0].Argument);
                  Assert.Equal(1, cmdStream[0].SubMenu);
-                 Assert.Equal(2, cmdStream[0].CmdIcon);
              });
 
         }
