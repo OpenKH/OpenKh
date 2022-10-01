@@ -638,7 +638,91 @@ namespace OpenKh.Tests.Patcher
              });
 
         }
+        
+        [Fact]
+        public void ListPatchCmdTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata() { 
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "03system.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "cmd",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "CmdList.yml",
+                                        Type = "cmd"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
 
+            File.Create(Path.Combine(AssetsInputDir, "03system.bar")).Using(stream =>
+            {
+                var cmdEntry = new List<Kh2.SystemData.Cmd>()
+                {
+                    new Kh2.SystemData.Cmd
+                    {
+                        Id = 1,
+                        Execute = 3,
+                        Argument = 3,
+                        SubMenu = 1,
+                    }
+                    };
+                using var cmdStream = new MemoryStream();
+                Kh2.SystemData.Cmd.Write(cmdStream, cmdEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "cmd",
+                        Type = Bar.EntryType.List,
+                        Stream = cmdStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "CmdList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("1:");
+                writer.WriteLine("  Id: 1");
+                writer.WriteLine("  Execute: 3");
+                writer.WriteLine("  Argument: 3");
+                writer.WriteLine("  SubMenu: 1");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "03system.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bar")).Using(stream =>
+             {
+                 var binarc = Bar.Read(stream);
+                 var cmdStream = Kh2.SystemData.Cmd.Read(binarc[0].Stream);
+                 Assert.Equal(1, cmdStream[0].Id);
+                 Assert.Equal(3, cmdStream[0].Execute);
+                 Assert.Equal(3, cmdStream[0].Argument);
+                 Assert.Equal(1, cmdStream[0].SubMenu);
+             });
+
+        }
+        
         [Fact]
         public void ListPatchItemTest()
         {
