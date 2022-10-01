@@ -2,9 +2,9 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "fix-*" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "fix-*" ]
 
 jobs:
   build:
@@ -21,7 +21,19 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore --configuration ".NET Debug"
-    - name: Test
-      run: dotnet test --no-build --verbosity normal --configuration ".NET Debug"
+    - name: pre-build.ps1
+      run: powershell -ExecutionPolicy Unrestricted ./pre-build.ps1
+      shell: pwsh
+    - name: build.ps1
+      run: powershell -ExecutionPolicy Unrestricted ./build.ps1
+      shell: pwsh
+    - name: zip
+      run: zip -r openkh bin
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development Build"
+        files: |
+          openkh.zip
