@@ -185,6 +185,7 @@ Asset Example
 
 * `listpatch` (KH2) - Can modify the following different types of list binaries found within KH2.
  * `trsr`
+ * `cmd`
  * `item`
  * `fmlv`
  * `lvup`
@@ -209,7 +210,34 @@ Asset Example
 2:
   ItemId: 347
 ```
-
+`cmd` Source Example
+```
+1:
+  Id: 1
+  Execute: 3
+  Argument: 3
+  SubMenu: 1
+  CmdIcon: 3
+  MessageId: 33249
+  Flags: 49
+  Range: -1
+  Dir: 0
+  DirRange: -1
+  Cost: 0
+  CmdCamera: 0
+  Priority: 100
+  CmdReceiver: 0
+  Time: 0
+  Require: 0
+  Mark: 1
+  CmdAction: 0
+  ReactionCount: 0
+  DistRange: 0
+  Score: 0
+  DisableForm: 63552
+  Group: 2
+  Reserve: 0
+```
 `item` Source Example
 ```
 Stats:
