@@ -29,9 +29,11 @@ jobs:
       shell: pwsh
 
     - name: zip
-      uses: montudor/action-zip@v1.0.0
+      uses: TheDoctor0/zip-release@0.6.2
       with:
-        args: -r openkh bin
+        filename: openkh.zip
+        path: bin
+
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
