@@ -678,9 +678,9 @@ namespace OpenKh.Tests.Patcher
                     new Kh2.SystemData.Cmd
                     {
                         Id = 1,
-                        Execute = 3
-                        Argument = 3
-                        SubMenu = 1
+                        Execute = 3,
+                        Argument = 3,
+                        SubMenu = 1,
                         CmdIcon = 2
                     }
                     };
