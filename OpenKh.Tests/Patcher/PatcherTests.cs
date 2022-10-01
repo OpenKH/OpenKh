@@ -715,7 +715,7 @@ namespace OpenKh.Tests.Patcher
              {
                  var binarc = Bar.Read(stream);
                  var cmdStream = Kh2.SystemData.Cmd.Read(binarc[0].Stream);
-                 Assert.Equal(3, cmdStream[0].Id);
+                 Assert.Equal(1, cmdStream[0].Id);
                  Assert.Equal(3, cmdStream[0].Execute);
                  Assert.Equal(3, cmdStream[0].Argument);
                  Assert.Equal(1, cmdStream[0].SubMenu);
