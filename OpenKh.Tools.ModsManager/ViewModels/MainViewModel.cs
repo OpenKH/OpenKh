@@ -600,7 +600,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             await Task.Run(() =>
             {
-                if (ConfigurationService.GameEdition == 2)
+                if (ConfigurationService.GameEdition == 2 && _launchGame == "kh2")
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
                     var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame , "patch-package-map.txt");

@@ -43,6 +43,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
         private bool _isEGSVersion;
+        private bool _kh2 = ConfigurationService.kh2;
+        private bool _kh1 = ConfigurationService.kh1;
+        private bool _bbs = ConfigurationService.bbs;
+        private bool _recom = ConfigurationService.recom;
 
         private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterIntro;
         public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterIntro
@@ -212,7 +216,42 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged();
             }
         }
-
+        public bool kh1
+        {
+            get => _kh1;
+            set
+            {
+                _kh1 = value;
+                ConfigurationService.kh1 = value;
+            }
+        }
+        public bool kh2
+        {
+            get => _kh2;
+            set
+            {
+                _kh2 = value;
+                ConfigurationService.kh2 = value;
+            }
+        }
+        public bool bbs
+        {
+            get => _bbs;
+            set
+            {
+                _bbs = value;
+                ConfigurationService.bbs = value;
+            }
+        }
+        public bool recom
+        {
+            get => _recom;
+            set
+            {
+                _recom = value;
+                ConfigurationService.recom = value;
+            }
+        }
         public string PcReleaseLanguage
         {
             get => _pcReleaseLanguage;
@@ -453,7 +492,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                     await Task.Run(() =>
                     {
-                        var _nameList1 = new string[]
+                        var _nameListkh1 = new string[]
                         {
                             "first",
                             "second",
@@ -461,7 +500,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             "fourth",
                             "fifth"
                         };
-                        var _nameList2 = new string[]
+                        var _nameListkh2 = new string[]
                         {
                             "first",
                             "second",
@@ -477,7 +516,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             "third",
                             "fourth"
                         };
-                        string _nameListrecom = "Recom" ;
 
                         var _totalFiles = 0;
                         var _procTotalFiles = 0;
@@ -486,7 +524,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 5; i++)
                             {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameList1[i] + ".hed"), FileMode.Open);
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"), FileMode.Open);
                                 var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                                 _totalFiles += _hedFile.Count();
                             }
@@ -495,7 +533,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 6; i++)
                             {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList2[i] + ".hed"), FileMode.Open);
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"), FileMode.Open);
                                 var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                                 _totalFiles += _hedFile.Count();
                             }
@@ -512,7 +550,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
                         if (ConfigurationService.recom)
                         {
-                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, _nameListrecom + ".hed"), FileMode.Open);
+                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"), FileMode.Open);
                             var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                             _totalFiles += _hedFile.Count();
                         }
@@ -522,8 +560,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             for (int i = 0; i < 5; i++)
                             {
                                 var outputDir = Path.Combine(gameDataLocation, "kh1");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameList1[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameList1[i] + ".pkg"));
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".pkg"));
 
                                 foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                                 {
@@ -561,8 +599,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             for (int i = 0; i < 6; i++)
                             {
                                 var outputDir = Path.Combine(gameDataLocation, "kh2");
-                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList2[i] + ".hed"));
-                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList2[i] + ".pkg"));
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".pkg"));
 
                                 foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                                 {
