@@ -303,11 +303,12 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static Task<bool> RunPacherAsync(bool fastMode) => Task.Run(() => Handle(() =>
         {
-            if (Directory.Exists(ConfigurationService.GameModPath))
+            if (Directory.Exists(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame)))
             {
                 try
                 {
-                    Directory.Delete(ConfigurationService.GameModPath, true);
+                    Directory.Delete(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame), true);
+                    ;
                 }
                 catch (Exception ex)
                 {
@@ -315,7 +316,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 }
             }
 
-            Directory.CreateDirectory(ConfigurationService.GameModPath);
+            Directory.CreateDirectory(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame));
 
             var patcherProcessor = new PatcherProcessor();
             var modsList = GetMods(EnabledMods).ToList();
@@ -327,8 +328,8 @@ namespace OpenKh.Tools.ModsManager.Services
                 Log.Info($"Building {mod.Name} for {_gameList[ConfigurationService.GameEdition]} - {_langList[ConfigurationService.RegionId]}");
 
                 patcherProcessor.Patch(
-                    ConfigurationService.GameDataLocation,
-                    ConfigurationService.GameModPath,
+                    Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame),
+                    Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame),
                     mod.Metadata,
                     mod.Path,
                     ConfigurationService.GameEdition,
@@ -336,7 +337,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     packageMap);
             }
 
-            using var packageMapWriter = new StreamWriter(Path.Combine(ConfigurationService.GameModPath, "patch-package-map.txt"));
+            using var packageMapWriter = new StreamWriter(Path.Combine(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame), "patch-package-map.txt"));
             foreach (var entry in packageMap)
                 packageMapWriter.WriteLine(entry.Key + " $$$$ " + entry.Value);
             packageMapWriter.Flush();
