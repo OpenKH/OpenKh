@@ -135,12 +135,12 @@
             NextPage="{Binding WizardPageAfterGameData}"
             IsEnabled="{Binding IsNotExtracting}">
             <StackPanel>
-                <TextBlock Margin="0,0,0,3" TextWrapping="Wrap">OpenKh can extract all games in the KH 1.5 2.5 collection choose the games you wish to extract. Size values are rounded up.</TextBlock>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding kh1}" Content="kh1-13GB" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding kh2}" Content="kh2-25GB" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding bbs}" Content="bbs-10GB" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding recom}" Content="recom-10GB" Visibility="{Binding PcReleaseConfigVisibility}" Margin="0 0 10 4"/>
+                <TextBlock Margin="0,0,0,3" Visibility="{Binding PcReleaseConfigVisibility}" TextWrapping="Wrap">OpenKh can extract all games in the KH 1.5 2.5 collection. Choose the games you wish to extract. Size values are rounded up.</TextBlock>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding PcReleaseConfigVisibility}">
+                    <CheckBox IsChecked="{Binding kh1}" Content="KH1-13GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding kh2}" Content="KH2-25GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding bbs}" Content="BBS-10GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding recom}" Content="ReCOM-10GB" Margin="0 0 10 4"/>
                 </StackPanel>
                 <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
                 <Grid Margin="0 0 0 3">
@@ -153,12 +153,22 @@
                         <Image Source="{StaticResource FolderOpen_16x}"/>
                     </Button>
                 </Grid>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
                     It seems you do not have your Kingdom Hearts II copy extracted.
-                </TextBlock>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                    </TextBlock>
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
                     You already have your Kingdom Hearts II copy extracted.
-                </TextBlock>
+                    </TextBlock>
+                </StackPanel>
+                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                    You do not have any extracted data from a supported game.
+                    </TextBlock>
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                    You already have extracted data from a supported game.
+                    </TextBlock>
+                </StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                     Press the button below to initialize the game extraction. It will take between 5 and 15 minutes based on the speed of your hard drive.
                 </TextBlock>
