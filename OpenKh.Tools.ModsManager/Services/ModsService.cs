@@ -308,7 +308,6 @@ namespace OpenKh.Tools.ModsManager.Services
                 try
                 {
                     Directory.Delete(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame), true);
-                    ;
                 }
                 catch (Exception ex)
                 {
