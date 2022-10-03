@@ -524,37 +524,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                         if (ConfigurationService.kh1)
                         {
-                            for (int i = 0; i < 5; i++)
-                            {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"), FileMode.Open);
-                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
-                                _totalFiles += _hedFile.Count();
-                            }
+                            _totalFiles += 62647;
                         }                       
                         if (ConfigurationService.kh2)
                         {
-                            for (int i = 0; i < 6; i++)
-                            {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"), FileMode.Open);
-                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
-                                _totalFiles += _hedFile.Count();
-                            }
-
+                            _totalFiles += 44582;
                         }
                         if (ConfigurationService.bbs)
                         {
-                            for (int i = 0; i < 4; i++)
-                            {
-                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"), FileMode.Open);
-                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
-                                _totalFiles += _hedFile.Count();
-                            }
+                            _totalFiles += 27717;
                         }
                         if (ConfigurationService.recom)
                         {
-                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"), FileMode.Open);
-                            var _hedFile = OpenKh.Egs.Hed.Read(_stream);
-                            _totalFiles += _hedFile.Count();
+                            _totalFiles += 15430;
                         }
 
                         if (ConfigurationService.kh1)
