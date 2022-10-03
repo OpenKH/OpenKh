@@ -48,8 +48,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             "KINGDOM HEARTS II FINAL MIX.exe",
             "KINGDOM HEARTS FINAL MIX.exe",
             "KINGDOM HEARTS Birth by Sleep FINAL MIX.exe",
-            "KINGDOM HEARTS Re_Chain of Memories.exe",
-            ""
+            "KINGDOM HEARTS Re_Chain of Memories.exe"
         };
         private int launchExecutable = 0;
 
@@ -151,8 +150,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         return 2;
                     case "recom":
                         return 3;
-                    case "off":
-                        return 4;
                     default:
                         return 0;
                 }
@@ -179,8 +176,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         ConfigurationService.LaunchGame = "recom";
                         break;
                     default:
-                        _launchGame = "off";
-                        ConfigurationService.LaunchGame = "off";
+                        _launchGame = "kh2";
+                        ConfigurationService.LaunchGame = "kh2";
                         break;
                 }
             }

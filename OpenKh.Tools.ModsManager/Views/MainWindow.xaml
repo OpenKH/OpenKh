@@ -131,7 +131,6 @@
                     <ComboBoxItem>kh1</ComboBoxItem>
                     <ComboBoxItem>bbs</ComboBoxItem>
                     <ComboBoxItem>recom</ComboBoxItem>
-                    <ComboBoxItem>off</ComboBoxItem>
                 </ComboBox>               
             </MenuItem>
         </Menu>

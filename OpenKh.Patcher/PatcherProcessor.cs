@@ -69,13 +69,15 @@ namespace OpenKh.Patcher
             Patch(originalAssets, outputDir, metadata, modBasePath);
         }
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = "kh2")
         {
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {
                 if (metadata.Assets == null)
                     throw new Exception("No assets found.");
+                if (metadata.Game != null && metadata.Game != LaunchGame)
+                    return;
 
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
