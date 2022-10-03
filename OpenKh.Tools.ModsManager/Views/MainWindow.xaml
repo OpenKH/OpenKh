@@ -125,7 +125,7 @@
                 </MenuItem>
                 <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}"/>
             </MenuItem>
-            <MenuItem Header="Launch Game">                
+            <MenuItem Header="Launch Game" Visibility="{Binding isPC}">                
                 <ComboBox SelectedIndex="{Binding GametoLaunch}">
                     <ComboBoxItem>kh2</ComboBoxItem>
                     <ComboBoxItem>kh1</ComboBoxItem>

@@ -55,11 +55,11 @@ namespace OpenKh.Tools.ModsManager.Services
                 return false;
             }
 
-            finalFileName = Path.Combine(ConfigurationService.GameModPath, fileName);
+            finalFileName = Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame, fileName);
             if (File.Exists(finalFileName))
                 return true;
 
-            finalFileName = Path.Combine(ConfigurationService.GameDataLocation, fileName);
+            finalFileName = Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame, fileName);
             if (File.Exists(finalFileName))
                 return true;
 
@@ -73,11 +73,11 @@ namespace OpenKh.Tools.ModsManager.Services
                     .Replace($"/{region}/", $"/{fallback}/")
                     .Replace($".a.{region}", $".a.{fallback}")
                     .Replace($".apdx", $".a.{fallback}");
-                finalFileName = Path.Combine(ConfigurationService.GameModPath, temptativeRegionalFallbackFileName);
+                finalFileName = Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame, temptativeRegionalFallbackFileName);
                 if (File.Exists(finalFileName))
                     return true;
 
-                finalFileName = Path.Combine(ConfigurationService.GameDataLocation, temptativeRegionalFallbackFileName);
+                finalFileName = Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame, temptativeRegionalFallbackFileName);
                 if (File.Exists(finalFileName))
                     return true;
             }
