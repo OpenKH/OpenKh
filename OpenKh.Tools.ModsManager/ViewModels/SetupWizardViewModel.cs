@@ -524,19 +524,36 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                         if (ConfigurationService.kh1)
                         {
-                            _totalFiles += 62647;
+                            for (int i = 0; i < 5; i++)
+                            {
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"), FileMode.Open);
+                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
+                                _totalFiles += _hedFile.Count();
+                            }
                         }                       
                         if (ConfigurationService.kh2)
                         {
-                            _totalFiles += 44582;
+                            for (int i = 0; i < 6; i++)
+                            {
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"), FileMode.Open);
+                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
+                                _totalFiles += _hedFile.Count();
+                            }
                         }
                         if (ConfigurationService.bbs)
                         {
-                            _totalFiles += 27717;
+                            for (int i = 0; i < 4; i++)
+                            {
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"), FileMode.Open);
+                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
+                                _totalFiles += _hedFile.Count();
+                            }
                         }
                         if (ConfigurationService.recom)
                         {
-                            _totalFiles += 15430;
+                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"), FileMode.Open);
+                            var _hedFile = OpenKh.Egs.Hed.Read(_stream);
+                            _totalFiles += _hedFile.Count();
                         }
 
                         if (ConfigurationService.kh1)
@@ -570,11 +587,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                                         var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
                                         File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
-                                        _procTotalFiles++;
-
-                                        ExtractionProgress = (float)_procTotalFiles / _totalFiles;
-                                        OnPropertyChanged(nameof(ExtractionProgress));
                                     }
+                                    _procTotalFiles++;
+
+                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
+                                    OnPropertyChanged(nameof(ExtractionProgress));
                                 }
                             }
                         }                                           
@@ -609,11 +626,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                                         var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
                                         File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
-                                        _procTotalFiles++;
-
-                                        ExtractionProgress = (float)_procTotalFiles / _totalFiles;
-                                        OnPropertyChanged(nameof(ExtractionProgress));
                                     }
+                                    _procTotalFiles++;
+
+                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
+                                    OnPropertyChanged(nameof(ExtractionProgress));
                                 }
                             }
                         }                                              
@@ -648,11 +665,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                                         var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
                                         File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
-                                        _procTotalFiles++;
-
-                                        ExtractionProgress = (float)_procTotalFiles / _totalFiles;
-                                        OnPropertyChanged(nameof(ExtractionProgress));
                                     }
+                                    _procTotalFiles++;
+
+                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
+                                    OnPropertyChanged(nameof(ExtractionProgress));
                                 }
                             }
                         }
@@ -687,13 +704,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                                         var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
                                         File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
-                                        _procTotalFiles++;
-
-                                        ExtractionProgress = (float)_procTotalFiles / _totalFiles;
-                                        OnPropertyChanged(nameof(ExtractionProgress));
                                     }
-                                }
+                                    _procTotalFiles++;
 
+                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
+                                    OnPropertyChanged(nameof(ExtractionProgress));
+                                }
                             }
                         }                        
                         Application.Current.Dispatcher.Invoke(() =>
