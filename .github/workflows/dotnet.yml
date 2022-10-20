@@ -44,12 +44,22 @@ jobs:
         filename: openkh.zip
         path: openkh
 
-    - name: "GitHub release"
+    - name: "GitHub release latest"
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: "Development Build"
+        title: "OpenKh Latest Build"
+        files: |
+          openkh.zip
+
+    - name: "GitHub release numbered"
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "release2-${{github.run_number}}"
+        prerelease: true
+        title: "OpenKh Build ${{github.run_number}}"
         files: |
           openkh.zip
