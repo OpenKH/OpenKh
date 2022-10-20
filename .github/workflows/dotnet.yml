@@ -30,7 +30,7 @@ jobs:
       
     - name: setup-msbuild
       uses: microsoft/setup-msbuild@v1.1.3
-    - name: msbuild
+    - name: msbuild panacea
       run: |
         msbuild OpenKh.Research.Panacea\OpenKh.Research.Panacea.vcxproj /p:Configuration=Release /p:Platform=x64
         copy "OpenKh.Research.Panacea\Release\*.dll" bin\
