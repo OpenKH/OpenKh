@@ -421,6 +421,15 @@ This is Collision.Attributes (surfaceFlags) of light collision data.
   alphaSubtract: true
 ```
 
+### normal
+
+Set `IsSpecular` to true, and then attach normal vector.
+
+```yml
+- name: 'lens_flare'
+  normal: true
+```
+
 ### bar
 
 ```yml

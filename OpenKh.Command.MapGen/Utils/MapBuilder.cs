@@ -98,8 +98,8 @@ namespace OpenKh.Command.MapGen.Utils
                         foreach (var subMicroMesh in CutByVUSuitableSize(microMesh, microMeshVertPairs))
                         {
                             var dmaPack = new MapVifPacketBuilder(
-                                subMicroMesh.CoordList,
-                                subMicroMesh.VertPairsList
+                                coords: subMicroMesh.CoordList,
+                                indices: subMicroMesh.VertPairsList
                                     .SelectMany(
                                         (vertPair, faceIndex) =>
                                         {
@@ -114,13 +114,15 @@ namespace OpenKh.Command.MapGen.Utils
                                                             CoordIndex = Convert.ToByte(one.coordIndex),
                                                             UV = subMicroMesh.VertList[one.index].uv,
                                                             Color = subMicroMesh.VertList[one.index].color,
+                                                            Normal = subMicroMesh.VertList[one.index].normal,
                                                         };
                                                     }
                                                 )
                                                 .ToArray();
                                         }
                                     )
-                                    .ToArray()
+                                    .ToArray(),
+                                useNormal: facesByMaterial.Key.normal
                             );
 
                             var matDef = facesByMaterial.Key;
@@ -142,6 +144,7 @@ namespace OpenKh.Command.MapGen.Utils
                                     IsAlphaAdd = matDef.alphaAdd,
                                     IsAlphaSubtract = matDef.alphaSubtract,
                                     IsAlpha = ((matDef.transparentFlag ?? 0) != 0) ? true : false,
+                                    IsSpecular = matDef.normal,
 
                                     // imitation of MAP file from PC version
                                     Priority = 16,
@@ -501,6 +504,16 @@ namespace OpenKh.Command.MapGen.Utils
                     );
                 }
 
+                Vector3 TransformNormal(Vector3D inputNormal)
+                {
+                    return Vector3.Normalize(
+                        Vector3.TransformNormal(
+                            new Vector3(inputNormal.X, inputNormal.Y, inputNormal.Z),
+                            matrix
+                        )
+                    );
+                }
+
                 var maxColorIntensity = matDef.maxColorIntensity
                     ?? config.maxColorIntensity
                     ?? 128;
@@ -545,6 +558,7 @@ namespace OpenKh.Command.MapGen.Utils
                 var inputTexCoords = inputMesh.TextureCoordinateChannels.First();
                 var inputVertexColorList = inputMesh.VertexColorChannels.First();
                 var hasVertexColor = inputMesh.VertexColorChannelCount >= 1;
+                var inputNormals = inputMesh.Normals;
 
                 foreach (var face in inputMesh.Faces)
                 {
@@ -562,6 +576,9 @@ namespace OpenKh.Command.MapGen.Utils
                                 .ToArray(),
                             uvList = face.Indices
                                 .Select(index => Get2DCoord(inputTexCoords[index]))
+                                .ToArray(),
+                            normalList = face.Indices
+                                .Select(index => TransformNormal(inputNormals[index]))
                                 .ToArray(),
                             colorList = hasVertexColor
                                 ? face.Indices
@@ -585,6 +602,7 @@ namespace OpenKh.Command.MapGen.Utils
         {
             internal Vector2 uv;
             internal Color color;
+            internal Vector3 normal;
         }
 
         private record MicroMesh
@@ -621,6 +639,7 @@ namespace OpenKh.Command.MapGen.Utils
                             {
                                 uv = face.uvList[x],
                                 color = face.colorList[x],
+                                normal = face.normalList[x],
                             }
                         );
 

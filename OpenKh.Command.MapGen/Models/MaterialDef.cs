@@ -113,6 +113,11 @@ namespace OpenKh.Command.MapGen.Models
         /// </summary>
         public bool alphaSubtract { get; set; }
 
+        /// <summary>
+        /// Enable normal vector
+        /// </summary>
+        public bool normal { get; set; } = false;
+
         public static MaterialDef CreateFallbackFor(string name) =>
             new MaterialDef
             {

@@ -34,6 +34,7 @@ namespace OpenKh.Command.MapGen.Models
 
         public Vector3[] positionList;
         public Vector2[] uvList;
+        public Vector3[] normalList;
         public Color[] colorList;
     }
 }
