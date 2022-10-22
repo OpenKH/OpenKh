@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using Xe.BinaryMapper;
 
@@ -27,6 +28,183 @@ namespace OpenKh.Kh2.Events
 
                 yield return ReadOne(stream, stream.Position + chunkSize - 4, type);
             }
+        }
+
+        public static IEventObject ReadOne(EventRoot source)
+        {
+            switch (source.type)
+            {
+                case "Head":
+                    return ReadEventObject<Head>(source.with);
+                case "Chara":
+                    return ReadEventObject<Chara>(source.with);
+                case "Bg":
+                    return ReadEventObject<Bg>(source.with);
+                case "CameraData":
+                    return ReadEventObject<CameraData>(source.with);
+                case "CameraSeq":
+                    return ReadEventObject<CameraSeq>(source.with);
+                case "EffectData":
+                    return ReadEventObject<EffectData>(source.with);
+                case "EventEndFrame":
+                    return ReadEventObject<EventEndFrame>(source.with);
+                case "EffectSeq":
+                    return ReadEventObject<EffectSeq>(source.with);
+                case "AttachSeq":
+                    return ReadEventObject<AttachSeq>(source.with);
+                case "KageSeq":
+                    return ReadEventObject<KageSeq>(source.with);
+                case "BgcolSeq":
+                    return ReadEventObject<BgcolSeq>(source.with);
+                case "PartSeq":
+                    return ReadEventObject<PartSeq>(source.with);
+                case "AlphaSeq":
+                    return ReadEventObject<AlphaSeq>(source.with);
+                case "SystemStart":
+                    return ReadEventObject<SystemStart>(source.with);
+                case "EventJump":
+                    return ReadEventObject<EventJump>(source.with);
+                case "SeqFade":
+                    return ReadEventObject<SeqFade>(source.with);
+                case "CameraDataEnc":
+                    return ReadEventObject<CameraDataEnc>(source.with);
+                case "SeqMes":
+                    return ReadEventObject<SeqMes>(source.with);
+                case "BgGrupe":
+                    return ReadEventObject<BgGrupe>(source.with);
+                case "SeqBlur":
+                    return ReadEventObject<SeqBlur>(source.with);
+                case "SeqFocus":
+                    return ReadEventObject<SeqFocus>(source.with);
+                case "SeqTexanim":
+                    return ReadEventObject<SeqTexanim>(source.with);
+                case "SeqMem":
+                    return ReadEventObject<SeqMem>(source.with);
+                case "SeqCrossfade":
+                    return ReadEventObject<SeqCrossfade>(source.with);
+                case "IkSeq":
+                    return ReadEventObject<IkSeq>(source.with);
+                case "SplineDataEnc":
+                    return ReadEventObject<SplineDataEnc>(source.with);
+                case "SplinePoint":
+                    return ReadEventObject<SplinePoint>(source.with);
+                case "SplineSeq":
+                    return ReadEventObject<SplineSeq>(source.with);
+                case "SeqSystemGameSpeed":
+                    return ReadEventObject<SeqSystemGameSpeed>(source.with);
+                case "TexFade":
+                    return ReadEventObject<TexFade>(source.with);
+                case "WideMask":
+                    return ReadEventObject<WideMask>(source.with);
+                case "Audio":
+                    return ReadEventObject<Audio>(source.with);
+                case "ReadCtrlMotionTbl":
+                    return ReadEventObject<ReadCtrlMotionTbl>(source.with);
+                case "ReadCtrlAudioTbl":
+                    return ReadEventObject<ReadCtrlAudioTbl>(source.with);
+                case "Shake":
+                    return ReadEventObject<Shake>(source.with);
+                case "Scale":
+                    return ReadEventObject<Scale>(source.with);
+                case "Turn":
+                    return ReadEventObject<Turn>(source.with);
+                case "SeData":
+                    return ReadEventObject<SeData>(source.with);
+                case "SeSeq":
+                    return ReadEventObject<SeSeq>(source.with);
+                case "SeqBlendMotion":
+                    return ReadEventObject<SeqBlendMotion>(source.with);
+                case "SeqWaitMessage":
+                    return ReadEventObject<SeqWaitMessage>(source.with);
+                case "SeqBgm":
+                    return ReadEventObject<SeqBgm>(source.with);
+                case "BgmData":
+                    return ReadEventObject<BgmData>(source.with);
+                case "SendBgm":
+                    return ReadEventObject<SendBgm>(source.with);
+                case "SeqObjcamera":
+                    return ReadEventObject<SeqObjcamera>(source.with);
+                case "MusicalHeader":
+                    return ReadEventObject<MusicalHeader>(source.with);
+                case "MusicalTarget":
+                    return ReadEventObject<MusicalTarget>(source.with);
+                case "MusicalScene":
+                    return ReadEventObject<MusicalScene>(source.with);
+                case "VibData":
+                    return ReadEventObject<VibData>(source.with);
+                case "Lookat":
+                    return ReadEventObject<Lookat>(source.with);
+                case "ShadowAlpha":
+                    return ReadEventObject<ShadowAlpha>(source.with);
+                case "ReadCtrlCharaTbl":
+                    return ReadEventObject<ReadCtrlCharaTbl>(source.with);
+                case "ReadCtrlEffectTbl":
+                    return ReadEventObject<ReadCtrlEffectTbl>(source.with);
+                case "Mirror":
+                    return ReadEventObject<Mirror>(source.with);
+                case "SeqTreasure":
+                    return ReadEventObject<SeqTreasure>(source.with);
+                case "SeqMissionEffect":
+                    return ReadEventObject<SeqMissionEffect>(source.with);
+                case "SeqLayout":
+                    return ReadEventObject<SeqLayout>(source.with);
+                case "EffectDelete":
+                    return ReadEventObject<EffectDelete>(source.with);
+                case "CacheClear":
+                    return ReadEventObject<CacheClear>(source.with);
+                case "SeqObjPause":
+                    return ReadEventObject<SeqObjPause>(source.with);
+                case "SeqBgse":
+                    return ReadEventObject<SeqBgse>(source.with);
+                case "SeqGlow":
+                    return ReadEventObject<SeqGlow>(source.with);
+                case "SeqMovie":
+                    return ReadEventObject<SeqMovie>(source.with);
+                case "SeqSavePoint":
+                    return ReadEventObject<SeqSavePoint>(source.with);
+                case "SeqCameraCollision":
+                    return ReadEventObject<SeqCameraCollision>(source.with);
+                case "SeqPosMove":
+                    return ReadEventObject<SeqPosMove>(source.with);
+                case "BlackFog":
+                    return ReadEventObject<BlackFog>(source.with);
+                case "Fog":
+                    return ReadEventObject<Fog>(source.with);
+                case "PlayerOffsetCamera":
+                    return ReadEventObject<PlayerOffsetCamera>(source.with);
+                case "SkyOff":
+                    return ReadEventObject<SkyOff>(source.with);
+                case "HideFobj":
+                    return ReadEventObject<HideFobj>(source.with);
+                case "Light":
+                    return ReadEventObject<Light>(source.with);
+                case "SeqMob":
+                    return ReadEventObject<SeqMob>(source.with);
+                case "Countdown":
+                    return ReadEventObject<Countdown>(source.with);
+                case "Tag":
+                    return ReadEventObject<Tag>(source.with);
+                case "WallClip":
+                    return ReadEventObject<WallClip>(source.with);
+                case "VoiceAllFadeout":
+                    return ReadEventObject<VoiceAllFadeout>(source.with);
+            }
+            return null;
+        }
+
+        private static IEventObject ReadEventObject<T>(object with) where T : IEventObject, new()
+        {
+            if (with is IDictionary<object, object> dict)
+            {
+                var instance = new T();
+                var type = typeof(T);
+                foreach (var entry in dict)
+                {
+                    type.GetProperty(entry.Key + "")?.SetValue(instance, entry.Value);
+                }
+                return instance;
+            }
+            throw new NotSupportedException($"Cannot read {with}");
         }
 
         private static IEventObject ReadOne(Stream stream, long nextPosition, ushort type)
@@ -252,6 +430,23 @@ namespace OpenKh.Kh2.Events
             if (type == Audio.Type)
             {
                 var it = BinaryMapping.ReadObject<Audio>(stream);
+                return it;
+            }
+
+            if (type == ReadCtrl.Type)
+            {
+                var it = BinaryMapping.ReadObject<ReadCtrl>(stream);
+                it.ctrls_object = Enumerable.Range(0, it.cnt)
+                    .Select(
+                        index =>
+                        {
+                            var subType = stream.ReadUInt16();
+                            var subSize = stream.ReadUInt16();
+                            var subNext = stream.Position + subSize - 4;
+                            return ReadOne(stream, subNext, subType);
+                        }
+                    )
+                    .ToArray();
                 return it;
             }
 
