@@ -1,6 +1,7 @@
 using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.Conventions;
 using OpenKh.Command.CoctChanger.Utils;
+using OpenKh.Command.CoctChanger.Utils.Dot;
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Utils;
@@ -20,7 +21,9 @@ namespace OpenKh.Command.CoctChanger
     [Command("OpenKh.Command.CoctChanger")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(typeof(CreateRoomCoctCommand), typeof(UseThisCoctCommand), typeof(ShowStatsCommand)
-        , typeof(DumpCoctCommand))]
+        , typeof(DumpCoctCommand)
+        , typeof(MakeDotCommand)
+    )]
     class Program
     {
         static int Main(string[] args)
@@ -355,6 +358,57 @@ namespace OpenKh.Command.CoctChanger
                 var coct = File.OpenRead(CoctIn).Using(Coct.Read);
 
                 new DumpCoctUtil(coct, Console.Out);
+
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "map file: map coct to graphviz dot")]
+        private class MakeDotCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Map file input")]
+            public string MapIn { get; set; }
+
+            [Argument(1, Description = "Model file output prefix (map)")]
+            public string ModelOut { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var doctBin = File.ReadAllBytes(MapIn);
+
+                var entries = File.OpenRead(MapIn).Using(s => Bar.Read(s));
+
+                var exportPairs = new (Bar.EntryType EntryType, string Suffix)[] {
+                    (Bar.EntryType.CollisionOctalTree, ".CollisionOctalTree.dot"),
+                    (Bar.EntryType.CameraOctalTree, ".CameraOctalTree.dot"),
+                    (Bar.EntryType.ColorOctalTree, ".ColorOctalTree.dot"),
+                    (Bar.EntryType.MapCollision2, ".MapCollision2.dot"),
+                };
+
+                foreach (var exportPair in exportPairs)
+                {
+                    var coctEntry = entries.SingleOrDefault(it => it.Type == exportPair.EntryType);
+                    if (coctEntry == null)
+                    {
+                        continue;
+                    }
+
+                    var coct = Coct.Read(coctEntry.Stream);
+
+                    var modelOut = (ModelOut != null)
+                        ? ModelOut + exportPair.Suffix
+                        : Path.GetFullPath(Path.GetFileNameWithoutExtension(MapIn) + exportPair.Suffix);
+
+                    Console.WriteLine($"Writing to: {modelOut}");
+
+                    new ExposeDotUtil().ExportCoct(
+                        coct: coct,
+                        modelOut: modelOut
+                    );
+                }
 
                 return 0;
             }

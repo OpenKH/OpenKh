@@ -10,6 +10,7 @@ using OpenKh.Kh2.Utils;
 using OpenKh.Command.DoctChanger.Utils;
 using OpenKh.Engine.Parsers;
 using Assimp;
+using OpenKh.Command.DoctChanger.Utils.Dot;
 
 namespace OpenKh.Command.DoctChanger
 {
@@ -20,7 +21,9 @@ namespace OpenKh.Command.DoctChanger
         , typeof(ReadDoctCommand), typeof(ReadMapDoctCommand)
         , typeof(ShowStatsCommand)
         , typeof(DumpDoctCommand)
-        , typeof(ExposeMapDoctCommand))]
+        , typeof(ExposeMapDoctCommand)
+        , typeof(MakeDotCommand)
+    )]
     class Program
     {
         static int Main(string[] args)
@@ -391,6 +394,53 @@ namespace OpenKh.Command.DoctChanger
                 new ExposeMapDoctUtil().Export(
                     doct: doct,
                     groupIdxToMesh: exposeBgMesh.GetMesh,
+                    modelOut: modelOut
+                );
+
+                return 0;
+            }
+        }
+
+        [HelpOption]
+        [Command(Description = "map file: map doct to graphviz dot")]
+        private class MakeDotCommand
+        {
+            [Required]
+            [FileExists]
+            [Argument(0, Description = "Map file input")]
+            public string MapIn { get; set; }
+
+            [Argument(1, Description = "Model file output (map.dot)")]
+            public string ModelOut { get; set; }
+
+            protected int OnExecute(CommandLineApplication app)
+            {
+                var doctBin = File.ReadAllBytes(MapIn);
+
+                var entries = File.OpenRead(MapIn).Using(s => Bar.Read(s));
+
+                var doctEntry = entries.Single(it => it.Type == Bar.EntryType.DrawOctalTree);
+
+                var doct = Doct.Read(doctEntry.Stream);
+
+                var modelEntry = entries.First(it => it.Type == Bar.EntryType.Model);
+
+                var mdlx = Mdlx.Read(modelEntry.Stream);
+                if (!mdlx.IsMap)
+                {
+                    throw new NotSupportedException("!IsMap");
+                }
+
+                var groupToVifParts = mdlx.ModelBackground.vifPacketRenderingGroup;
+                var mdlxParser = new MdlxParser(mdlx);
+                var meshDescs = mdlxParser.MeshDescriptors;
+
+                var modelOut = ModelOut ?? Path.GetFullPath(Path.GetFileNameWithoutExtension(MapIn) + ".DrawOctalTree.dot");
+
+                Console.WriteLine($"Writing to: {modelOut}");
+
+                new ExposeDotUtil().ExportDoct(
+                    doct: doct,
                     modelOut: modelOut
                 );
 
