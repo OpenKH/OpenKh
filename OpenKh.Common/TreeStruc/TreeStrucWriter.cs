@@ -25,7 +25,7 @@ namespace OpenKh.Common.TreeStruc
                 _depth--;
             }
 
-            public override string ToString() => new string(' ', _depth);
+            public override string ToString() => new string(' ', 2 * _depth);
         }
 
         public static string GetString(object any)
@@ -67,7 +67,23 @@ namespace OpenKh.Common.TreeStruc
             internal Dictionary<string, PropertyInfo> props;
         }
 
+        private static readonly Dictionary<string, ICodec> _cache = new Dictionary<string, ICodec>();
+        private static readonly object _lock = new object();
+
         private static ICodec GetCodec(Type baseType, string nodeName)
+        {
+            lock (_lock)
+            {
+                var cacheKey = baseType.FullName + "|" + nodeName;
+                if (!_cache.TryGetValue(cacheKey, out ICodec codec))
+                {
+                    codec = _cache[cacheKey] = GetCodecCore(baseType, nodeName);
+                }
+                return codec;
+            }
+        }
+
+        private static ICodec GetCodecCore(Type baseType, string nodeName)
         {
             if (typeof(ICollection).IsAssignableFrom(baseType))
             {
@@ -145,7 +161,8 @@ namespace OpenKh.Common.TreeStruc
 
                 void WriteObjects(ObjectCollectionCodec it, IEnumerable<object> target)
                 {
-                    writer.WriteLine($"{indenter}{it.nodeName} " + "{");
+                    writer.WriteLine($"{indenter}{it.nodeName}");
+                    writer.WriteLine($"{indenter}" + "{");
                     indenter.Enter();
                     foreach (var item in target)
                     {
@@ -171,7 +188,8 @@ namespace OpenKh.Common.TreeStruc
 
                 void WriteObject(ObjectCodec it, object target)
                 {
-                    writer.WriteLine($"{indenter}{it.nodeName} " + "{");
+                    writer.WriteLine($"{indenter}{it.nodeName}");
+                    writer.WriteLine($"{indenter}" + "{");
                     indenter.Enter();
                     foreach (var pair in it.props)
                     {
