@@ -15,10 +15,12 @@
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
     </Window.Resources>
     <xctk:Wizard
+        Name="wizard"
         HelpButtonVisibility="Collapsed"
         CancelButtonClosesWindow="True"
         FinishButtonClosesWindow="True"
         CurrentPage="{Binding ElementName=PageGameEdition}"
+        PageChanged="Wizard_PageChanged"
         Finish="Wizard_Finish">
         
         <xctk:WizardPage
@@ -35,7 +37,7 @@
             Title="Game edition"
             CanSelectNextPage="{Binding IsGameSelected}"
             Description="Selected the preferred edition to launch the game"
-            PreviousPage="{Binding ElementName=IntroPage}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterIntro}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3">Game edition</TextBlock>
@@ -93,7 +95,7 @@
             PageType="Interior"
             Title="Configure the game you want to mod"
             Description="Do not worry, you can change this option later"
-            PreviousPage="{Binding ElementName=PageGameEdition}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock>Supported games:</TextBlock>
@@ -129,7 +131,7 @@
             CanSelectNextPage="{Binding IsGameDataFound}"
             CanSelectPreviousPage="{Binding IsNotExtracting}"
             CanCancel="{Binding IsNotExtracting}"
-            PreviousPage="{Binding ElementName=PageIsoSelection}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding WizardPageAfterGameData}"
             IsEnabled="{Binding IsNotExtracting}">
             <StackPanel>
@@ -166,7 +168,7 @@
             Title="Set your preferred region"
             Description="This will instruct the game to force to load specific languages"
             CanSelectNextPage="{Binding IsGameDataFound}"
-            PreviousPage="{Binding ElementName=PageGameData}"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=LastPage}">
             <StackPanel>
                 <TextBlock>Region</TextBlock>
@@ -194,8 +196,8 @@
             PageType="Interior"
             Title="Install OpenKH Panacea (Optional and Experimental)"
             Description="Install automatic mod loading support into the game's folder."
-            PreviousPage="{Binding ElementName=PageGameEdition}"
-            NextPage="{Binding ElementName=PageEosConfig}">
+            PreviousPage="{Binding PageStack.Back}"
+            NextPage="{Binding ElementName=PCLaunchOption}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                         OpenKH Panacea allows the PC version of Kingdom Hearts to load the mods you have installed, without
@@ -232,49 +234,20 @@
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
-            x:Name="PageEosConfig"
+            x:Name="PCLaunchOption"
             PageType="Interior"
-            Title="Configure Kingdom Hearts HD 1.5+2.5 ReMIX"
-            Description="Change the way the launcher behaves."
-            PreviousPage="{Binding ElementName=PageEosInstall}"
+            Title="Launch Option"            
+            Description="Configure Mods Manager to launch Kingdom Hearts"
+            PreviousPage="{Binding PageStack.Back}"
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    To run the game within the Mods Manager, you need to bypass the launcher.
-                    You only need it to if you often change mods so you can test them faster
-                    or if you are developing one.
+                    OpenKH Mods Manager has the ability to launch Kingdom Hearts directly. Leave the box below checked to have Mods Manager launch the game via Epic Games.    
                 </TextBlock>
                 <CheckBox
                     Margin="0 0 0 10"
-                    IsChecked="{Binding BypassLauncher}"
-                    Content="Bypass the launcher"/>
-
-                <StackPanel Visibility="{Binding BypassLauncherVisibility}">
-                    <Grid Margin="0 0 0 3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock
-                            Grid.Column="0"
-                            Text="Epic Games User ID"
-                            Margin="0 0 3 0"/>
-                        <TextBox
-                            Grid.Column="1"
-                            Width="Auto"
-                            Text="{Binding EpicGamesUserID}"/>
-                    </Grid>
-                    <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                        When bypassing the launcher, you need to specify your Epic Games User ID otherwise your
-                        existing saves will not work. Click the link below to find you User ID. It is right after
-                        the Account Info text.
-                        <Hyperlink NavigateUri="https://www.epicgames.com/account/personal"
-                                   TextDecorations="{x:Null}" RequestNavigate="NavigateURL">
-                            <TextBlock Text="https://www.epicgames.com/account/personal"
-                                       Foreground="{DynamicResource textHyperlink}"/>
-                        </Hyperlink>
-                    </TextBlock>
-                </StackPanel>
+                    IsChecked="{Binding IsEGSVersion}"
+                    Content="Launch via Epic Games"/>
             </StackPanel>
         </xctk:WizardPage>
         <xctk:WizardPage
@@ -282,7 +255,7 @@
             PageType="Exterior"
             Title="You're set!"
             Description="You successfully configured OpenKH Mods Manager. Have fun with all the amazing mods that the community has to offer!"
-            PreviousPage="{Binding ElementName=PageGameEdition}"
+            PreviousPage="{Binding PageStack.Back}"
             CanFinish="True"/>
     </xctk:Wizard>
 </Window>

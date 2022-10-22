@@ -24,7 +24,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
 
-            public bool IsFirstRunComplete { get; set; }
+            public int WizardVersionNumber { get; set; }
             public string ModCollectionPath { get; internal set; }
             public string GameModPath { get; internal set; }
             public string GameDataPath { get; internal set; }
@@ -33,9 +33,12 @@ namespace OpenKh.Tools.ModsManager.Services
             public string OpenKhGameEngineLocation { get; internal set; }
             public string Pcsx2Location { get; internal set; }
             public string PcReleaseLocation { get; internal set; }
+            public string PcShortcutLocation { get; internal set; }
+            public string PcReleaseLanguage { get; internal set; } = "en";
             public int RegionId { get; internal set; }
-            public bool BypassLauncher { get; internal set; }
-            public string EpicGamesUserID { get; internal set; }
+            public bool PanaceaInstalled { get; internal set; }
+            public bool DevView { get; internal set; }
+            public bool isEGSVersion { get; internal set; } = true;
 
             public void Save(string fileName)
             {
@@ -53,9 +56,7 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        private static string StoragePath = Directory.GetCurrentDirectory().IndexOf("system32") >= 0 ?
-            Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) :
-            Directory.GetCurrentDirectory();
+        private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
         private static string EnabledModsPath = Path.Combine(StoragePath, "mods.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
@@ -97,12 +98,12 @@ namespace OpenKh.Tools.ModsManager.Services
         public static ICollection<string> FeaturedMods { get; private set; }
         public static ICollection<string> BlacklistedMods { get; private set; }
 
-        public static bool IsFirstRunComplete
+        public static int WizardVersionNumber
         {
-            get => _config.IsFirstRunComplete;
+            get => _config.WizardVersionNumber;
             set
             {
-                _config.IsFirstRunComplete = value;
+                _config.WizardVersionNumber = value;
                 _config.Save(ConfigPath);
             }
         }
@@ -186,6 +187,25 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.Save(ConfigPath);
             }
         }
+        public static string PcShortcutLocation
+        {
+            get => _config.PcShortcutLocation;
+            set
+            {
+                _config.PcShortcutLocation = value;
+                _config.Save(ConfigPath);
+            }
+        }
+
+        public static string PcReleaseLanguage
+        {
+            get => _config.PcReleaseLanguage;
+            set
+            {
+                _config.PcReleaseLanguage = value;
+                _config.Save(ConfigPath);
+            }
+        }
 
         public static int RegionId
         {
@@ -197,22 +217,30 @@ namespace OpenKh.Tools.ModsManager.Services
             }
         }
 
-        public static bool BypassLauncher
+        public static bool PanaceaInstalled
         {
-            get => _config.BypassLauncher;
+            get => _config.PanaceaInstalled;
             set
             {
-                _config.BypassLauncher = value;
+                _config.PanaceaInstalled = value;
                 _config.Save(ConfigPath);
             }
         }
-
-        public static string EpicGamesUserID
+        public static bool DevView
         {
-            get => _config.EpicGamesUserID;
+            get => _config.DevView;
             set
             {
-                _config.EpicGamesUserID = value;
+                _config.DevView = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool IsEGSVersion
+        {
+            get => _config.isEGSVersion;
+            set
+            {
+                _config.isEGSVersion = value;
                 _config.Save(ConfigPath);
             }
         }

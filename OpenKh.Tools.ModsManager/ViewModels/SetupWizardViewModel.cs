@@ -40,7 +40,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _openKhGameEngineLocation;
         private string _pcsx2Location;
         private string _pcReleaseLocation;
+        private string _pcReleaseLanguage;
         private string _gameDataLocation;
+        private bool _isEGSVersion;
 
         private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterIntro;
         public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterIntro
@@ -66,7 +68,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Xceed.Wpf.Toolkit.WizardPage PageEosInstall { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageEosConfig { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage PageRegion { get; internal set; }
+        public Xceed.Wpf.Toolkit.WizardPage PCLaunchOption { get; internal set; }
         public Xceed.Wpf.Toolkit.WizardPage LastPage { get; internal set; }
+
+        public WizardPageStackService PageStack { get; set; } = new WizardPageStackService();
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
@@ -198,6 +203,31 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsGameDataFound));
             }
         }
+        public bool IsEGSVersion
+        {
+            get => _isEGSVersion;
+            set
+            {
+                _isEGSVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string PcReleaseLanguage
+        {
+            get => _pcReleaseLanguage;
+            set
+            {
+                _pcReleaseLanguage = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(PcReleaseLanguage));
+                OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
+                OnPropertyChanged(nameof(PanaceaInstalledVisibility));
+                OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                OnPropertyChanged(nameof(IsGameSelected));
+                OnPropertyChanged(nameof(IsGameDataFound));
+            }
+        }
 
         public RelayCommand SelectGameDataLocationCommand { get; }
         public string GameDataLocation
@@ -227,6 +257,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public RelayCommand InstallPanaceaCommand { get; }
         public RelayCommand RemovePanaceaCommand { get; }
+        public bool PanaceaInstalled { get; set; }
         private string PanaceaSourceLocation => Path.Combine(AppContext.BaseDirectory, PanaceaDllName);
         private string PanaceaDestinationLocation => Path.Combine(PcReleaseLocation, "DBGHELP.dll");
         public Visibility PanaceaNotInstalledVisibility => !IsLastPanaceaVersionInstalled ? Visibility.Visible : Visibility.Collapsed;
@@ -236,17 +267,27 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             get
             {
                 if (PcReleaseLocation == null)
+                {
                     // Won't be able to find the source location
+                    PanaceaInstalled = false;
                     return false;
+                }
 
                 if (!File.Exists(PanaceaSourceLocation))
+                {
                     // While debugging it is most likely to not have the compiled
                     // DLL into the right place. So don't bother.
+                    PanaceaInstalled = true;
                     return true;
+                }
+                  
 
                 if (!File.Exists(PanaceaDestinationLocation))
+                {
                     // DBGHELP.dll is not installed
+                    PanaceaInstalled = false;
                     return false;
+                }
 
                 byte[] CalculateChecksum(string fileName) =>
                     System.Security.Cryptography.MD5.Create().Using(md5 =>
@@ -255,7 +296,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     for (var i = 0; i < left.Length; i++)
                         if (left[i] != right[i])
+                        {
+                            PanaceaInstalled = false;
                             return false;
+                        }
+                    PanaceaInstalled = true;
                     return true;
                 }
 
@@ -264,20 +309,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     CalculateChecksum(PanaceaDestinationLocation));
             }
         }
-
-        public Visibility BypassLauncherVisibility => BypassLauncher ? Visibility.Visible : Visibility.Collapsed;
-        private bool _bypassLauncher;
-
-        public bool BypassLauncher
-        {
-            get => _bypassLauncher;
-            set
-            {
-                _bypassLauncher = value;
-                OnPropertyChanged(nameof(BypassLauncherVisibility));
-            }
-        }
-        public string EpicGamesUserID { get; set; }
 
         public SetupWizardViewModel()
         {
@@ -320,6 +351,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                PanaceaInstalled = true;
             });
             RemovePanaceaCommand = new RelayCommand(_ =>
             {
@@ -328,6 +360,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(IsLastPanaceaVersionInstalled));
                 OnPropertyChanged(nameof(PanaceaInstalledVisibility));
                 OnPropertyChanged(nameof(PanaceaNotInstalledVisibility));
+                PanaceaInstalled = false;
             });
         }
 
@@ -435,7 +468,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                         for (int i = 0; i < 6; i++)
                         {
-                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", "en", "kh2_" + _nameList[i] + ".hed"), FileMode.Open);
+                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList[i] + ".hed"), FileMode.Open);
                             var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                             _totalFiles += _hedFile.Count();
                         }
@@ -443,8 +476,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         for (int i = 0; i < 6; i++)
                         {
                             var outputDir = gameDataLocation;
-                            using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", "en", "kh2_" + _nameList[i] + ".hed"));
-                            using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", "en", "kh2_" + _nameList[i] + ".pkg"));
+                            using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList[i] + ".hed"));
+                            using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList[i] + ".pkg"));
 
                             foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                             {

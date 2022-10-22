@@ -10,6 +10,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Xe.Tools;
@@ -35,6 +38,11 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private Pcsx2Injector _pcsx2Injector;
         private Process _runningProcess;
         private bool _isBuilding;
+        private bool _pc;
+        private bool _panaceaInstalled;
+        private bool _devView;
+        private string _quickLaunch = "kh2";
+        private int _wizardVersionNumber = 1;
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
@@ -80,6 +88,88 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public Visibility IsModInfoVisible => IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility HideStop => !PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility HideQuickLaunch => PC && PanaceaInstalled && DevView ? Visibility.Visible : Visibility.Collapsed;
+
+        public bool DevView
+        {
+            get => _devView;
+            set
+            {
+                _devView = value;
+                ConfigurationService.DevView = DevView;
+                OnPropertyChanged(nameof(PatchVisible));
+                OnPropertyChanged(nameof(HideQuickLaunch));
+            }
+        }
+        public bool PanaceaInstalled
+        {
+            get => _panaceaInstalled;
+            set
+            {
+                _panaceaInstalled = value;
+                OnPropertyChanged(nameof(PatchVisible));
+                OnPropertyChanged(nameof(ModLoader));
+            }
+        }
+
+        public bool PC
+        {
+            get => _pc;
+            set
+            {
+                _pc = value;
+                OnPropertyChanged(nameof(PC));
+                OnPropertyChanged(nameof(ModLoader));
+                OnPropertyChanged(nameof(PatchVisible));
+                OnPropertyChanged(nameof(HideStop));
+            }
+        }  
+
+        public int QuickLaunch
+        {
+            get
+            {
+                switch (_quickLaunch)
+                {
+                    case "kh2":
+                        return 0;
+                    case "kh1":
+                        return 1;
+                    case "bbs":
+                        return 2;
+                    case "recom":
+                        return 3;
+                    case "off":
+                        return 4;
+                    default:
+                        return 0;
+                }
+            }
+            set
+            {
+                switch (value)
+                {
+                    case 0:
+                        _quickLaunch = "kh2";
+                        break;
+                    case 1:
+                        _quickLaunch = "kh1";
+                        break;
+                    case 2:
+                        _quickLaunch = "bbs";
+                        break;
+                    case 3:
+                        _quickLaunch = "recom";
+                        break;
+                    default:
+                        _quickLaunch = "off";
+                        break;
+                }
+            }
+        }
 
         public bool IsBuilding
         {
@@ -99,6 +189,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public MainViewModel()
         {
+            if (ConfigurationService.GameEdition == 2)
+            {
+                PC = true;
+                PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+                DevView = ConfigurationService.DevView;
+            }
+            else
+                PC = false;
+
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
 
@@ -237,9 +336,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigOpenKhGameEngineLocation = ConfigurationService.OpenKhGameEngineLocation,
                     ConfigPcsx2Location = ConfigurationService.Pcsx2Location,
                     ConfigPcReleaseLocation = ConfigurationService.PcReleaseLocation,
+                    ConfigPcReleaseLanguage = ConfigurationService.PcReleaseLanguage,
                     ConfigRegionId = ConfigurationService.RegionId,
-                    ConfigEpicGamesUserID = ConfigurationService.EpicGamesUserID,
-                    ConfigBypassLauncher = ConfigurationService.BypassLauncher,
+                    ConfigPanaceaInstalled = ConfigurationService.PanaceaInstalled,
+                    ConfigIsEGSVersion = ConfigurationService.IsEGSVersion,
                 };
                 if (dialog.ShowDialog() == true)
                 {
@@ -250,9 +350,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     ConfigurationService.Pcsx2Location = dialog.ConfigPcsx2Location;
                     ConfigurationService.PcReleaseLocation = dialog.ConfigPcReleaseLocation;
                     ConfigurationService.RegionId = dialog.ConfigRegionId;
-                    ConfigurationService.EpicGamesUserID = dialog.ConfigEpicGamesUserID;
-                    ConfigurationService.BypassLauncher = dialog.ConfigBypassLauncher;
-                    ConfigurationService.IsFirstRunComplete = true;
+                    ConfigurationService.PanaceaInstalled = dialog.ConfigPanaceaInstalled;
+                    ConfigurationService.IsEGSVersion = dialog.ConfigIsEGSVersion;
+                    ConfigurationService.WizardVersionNumber = _wizardVersionNumber;
 
                     const int EpicGamesPC = 2;
                     if (ConfigurationService.GameEdition == EpicGamesPC &&
@@ -265,8 +365,16 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 $"show_console={false}",
                             });
                     }
+                    if (ConfigurationService.GameEdition == 2)
+                    {
+                        PC = true;
+                        PanaceaInstalled = ConfigurationService.PanaceaInstalled;
+                    }
+                    else
+                        PC = false;
                 }
             });
+
             OpenLinkCommand = new RelayCommand(url => Process.Start(new ProcessStartInfo(url as string)
             {
                 UseShellExecute = true
@@ -275,7 +383,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
             FetchUpdates();
 
-            if (!ConfigurationService.IsFirstRunComplete)
+            if (ConfigurationService.WizardVersionNumber < _wizardVersionNumber)
                 WizardCommand.Execute(null);
         }
 
@@ -352,27 +460,38 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     isPcsx2 = true;
                     break;
                 case 2:
-                    if (!ConfigurationService.BypassLauncher)
+                    if (ConfigurationService.IsEGSVersion)
                     {
-                        MessageBox.Show(
-                            "You can only run the game from the Mods Manager by bypassing the launcher.\nRepeat the wizard to change the setting.",
-                            "Unable to start the game",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning);
-                        return Task.CompletedTask;
+                        if (ConfigurationService.PanaceaInstalled)
+                        {
+                            File.AppendAllText(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), "\nquick_launch=" + _quickLaunch);
+                        }                        
+                        processStartInfo = new ProcessStartInfo
+                        {
+                            FileName = "com.epicgames.launcher://apps/4158b699dd70447a981fee752d970a3e%3A5aac304f0e8948268ddfd404334dbdc7%3A68c214c58f694ae88c2dab6f209b43e4?action=launch&silent=true",
+                            UseShellExecute = true,
+                        };
                     }
-
-                    Log.Info("Starting Kingdom Hearts II: Final Mix");
-                    processStartInfo = new ProcessStartInfo
+                    else
                     {
-                        FileName = Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
-                        WorkingDirectory = ConfigurationService.PcReleaseLocation,
-                        Arguments = $"-AUTH_TYPE=refreshtoken -epiclocale=en -epicuserid={ConfigurationService.EpicGamesUserID} -eosoverride",
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                    };
-                    break;
+                        processStartInfo = new ProcessStartInfo
+                        {
+                            FileName =  Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
+                            WorkingDirectory = ConfigurationService.PcReleaseLocation,
+                            UseShellExecute = false,
+                        };
+                        if (processStartInfo == null || !File.Exists(processStartInfo.FileName))
+                        {
+                            MessageBox.Show(
+                                "Unable to start game. Please make sure youre Kingdom Hearts executable is correctly named and in the correct folder.",
+                                "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            CloseAllWindows();
+                            return Task.CompletedTask;
+                        }
+                    }
+                    Process.Start(processStartInfo);
+                    CloseAllWindows();
+                    return Task.CompletedTask;
                 default:
                     return Task.CompletedTask;
             }
@@ -527,7 +646,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             patchFiles.AddRange(OpenKh.Egs.Helpers.GetAllFiles(_rawPath).ToList());
 
                         var _pkgSoft = fastMode ? "kh2_first" : _dirPart;
-                        var _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", "en", _pkgSoft + ".pkg");
+                        var _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _pkgSoft + ".pkg");
 
                         var _backupDir = Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage");
 
@@ -635,7 +754,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
 
                             var _fileBare = Path.GetFileName(file);
-                            var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", "en", _fileBare);
+                            var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _fileBare);
 
                             File.Delete(Path.ChangeExtension(_trueName, "hed"));
                             File.Delete(_trueName);

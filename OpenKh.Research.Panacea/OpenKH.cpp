@@ -10,7 +10,6 @@
 #include "OpenKH.h"
 #include "KingdomApi.h"
 #include "Panacea.h"
-#include "EOSOverrider.h"
 
 struct FuncInfo
 {
@@ -89,11 +88,21 @@ void Hook()
     GetArrPtr(BasePath, (char*)pfn_Axa_AxaResourceMan_SetResourceItem + 0x3E);
 }
 
+int QuickLaunch = 0;
+__int64 (*LaunchGame)(int game);
+void QuickBootHook()
+{
+    LaunchGame(QuickLaunch);
+    ExitProcess(QuickLaunch);
+}
+
 OpenKH::GameId OpenKH::m_GameID = OpenKH::GameId::Unknown;
-std::string OpenKH::m_ModPath = "./mod";
-bool OpenKH::m_OverrideEos = false;
+std::wstring OpenKH::m_ModPath = L"./mod";
 bool OpenKH::m_ShowConsole = false;
 bool OpenKH::m_DebugLog = false;
+bool OpenKH::m_EnableCache = true;
+bool QuickMenu = false;
+const uint8_t quickmenupat[] = { 0xB1, 0x01, 0x90 };
 void OpenKH::Initialize()
 {
     g_hInstance = GetModuleHandle(NULL);
@@ -116,11 +125,57 @@ void OpenKH::Initialize()
         fprintf(stderr, "Unable to detect the running game. Panacea will not be executed.\n");
         return;
     }
-
-    if (m_OverrideEos || strstr(GetCommandLineA(), "-eosoverride"))
+    if (m_GameID == OpenKH::GameId::Launcher1_5_2_5)
     {
-        fprintf(stdout, "Overriding Epic Games Online Service\n");
-        EOSOverride(g_hInstance);
+        DWORD pp;
+        if (QuickLaunch > 0)
+        {
+            uint8_t* framefunc;
+            Hook(framefunc, "\x40\x57\x48\x83\xEC\x40\x48\xC7\x44\x24\x00\x00\x00\x00\x00\x48\x89\x5C\x24\x00\x48\x8B\xD9\x8B\x41\x34", "xxxxxxxxxx?????xxxx?xxxxxx");
+            Hook(LaunchGame, "\x40\x53\x48\x81\xEC\x00\x00\x00\x00\x48\x8B\x05\x00\x00\x00\x00\x48\x33\xC4\x48\x89\x84\x24\x00\x00\x00\x00\x8B\xD9", "xxxxx????xxx????xxxxxxx????xx");
+            FindAllFuncs();
+            intptr_t m_pReplaceFunc = (intptr_t)QuickBootHook;
+            unsigned char Patch[]
+            {
+                // jmp functionPtr
+                0xFF, 0x25, 0x00, 0x00, 0x00, 0x00,
+                (unsigned char)(m_pReplaceFunc >> 0),
+                (unsigned char)(m_pReplaceFunc >> 8),
+                (unsigned char)(m_pReplaceFunc >> 16),
+                (unsigned char)(m_pReplaceFunc >> 24),
+                (unsigned char)(m_pReplaceFunc >> 32),
+                (unsigned char)(m_pReplaceFunc >> 40),
+                (unsigned char)(m_pReplaceFunc >> 48),
+                (unsigned char)(m_pReplaceFunc >> 56),
+            };
+            VirtualProtect(framefunc, sizeof(Patch), PAGE_EXECUTE_READWRITE, &pp);
+            memcpy(framefunc, Patch, sizeof(Patch));
+            VirtualProtect(framefunc, sizeof(Patch), pp, &pp);
+            FILE* f = fopen("panacea_settings.txt", "w");
+            char buf[MAX_PATH];
+            memset(buf, 0, MAX_PATH);
+            WideCharToMultiByte(CP_UTF8, 0, &m_ModPath.front(), m_ModPath.size(), buf, MAX_PATH, nullptr, nullptr);
+            fprintf(f, "mod_path=%s\n", buf);
+            if (m_ShowConsole)
+                fputs("show_console=true\n", f);
+            if (m_DebugLog)
+                fputs("debug_log=true\n", f);
+            if (m_EnableCache)
+                fputs("enable_cache=true\n", f);
+            if (QuickMenu)
+                fputs("quick_menu=true\n", f);
+            fclose(f);
+        }
+        else if (QuickMenu)
+        {
+            uint8_t* axaAppMain;
+            Hook(axaAppMain, "\x48\x89\x5C\x24\x00\x57\xB8", "xxxx?xx");
+            FindAllFuncs();
+            VirtualProtect(axaAppMain + 0x108, sizeof(quickmenupat), PAGE_EXECUTE_READWRITE, &pp);
+            memcpy(axaAppMain + 0x108, quickmenupat, sizeof(quickmenupat));
+            VirtualProtect(axaAppMain + 0x108, sizeof(quickmenupat), pp, &pp);
+        }
+        return;
     }
 
     Hook();
@@ -160,13 +215,29 @@ void OpenKH::ReadSettings(const char* filename)
         strtok(value, "\n\r"); // removes new line character
 
         if (!strncmp(key, "mod_path", sizeof(buf)) && strnlen(value, sizeof(buf)) > 0)
-            m_ModPath = std::string(value);
-        else if (!strncmp(key, "eos_override", sizeof(buf)))
-            parseBool(value, m_OverrideEos);
+        {
+            m_ModPath.resize(MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), nullptr, 0));
+            MultiByteToWideChar(CP_UTF8, 0, value, strlen(value), &m_ModPath.front(), m_ModPath.size());
+        }
         else if (!strncmp(key, "show_console", sizeof(buf)))
             parseBool(value, m_ShowConsole);
         else if (!strncmp(key, "debug_log", sizeof(buf)))
             parseBool(value, m_DebugLog);
+        else if (!strncmp(key, "enable_cache", sizeof(buf)))
+            parseBool(value, m_EnableCache);
+        else if (!strncmp(key, "quick_launch", sizeof(buf)))
+        {
+            if (!_stricmp(value, "kh1"))
+                QuickLaunch = 1;
+            else if (!_stricmp(value, "recom"))
+                QuickLaunch = 2;
+            else if (!_stricmp(value, "kh2"))
+                QuickLaunch = 3;
+            else if (!_stricmp(value, "bbs"))
+                QuickLaunch = 4;
+        }
+        else if (!strncmp(key, "quick_menu", sizeof(buf)))
+            parseBool(value, QuickMenu);
     }
 
     fclose(f);
@@ -185,9 +256,10 @@ OpenKH::GameId OpenKH::DetectGame()
     wchar_t buffer[MAX_PATH]; // MAX_PATH default macro
     GetModuleFileNameW(NULL, buffer, MAX_PATH);
 
-    // We should just return unknown if the launcher is running
     if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS II FINAL MIX.exe") == 0)
         return GameId::KingdomHearts2;
+    if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS HD 1.5+2.5 Launcher.exe") == 0)
+        return GameId::Launcher1_5_2_5;
 
     return GameId::Unknown;
 }
