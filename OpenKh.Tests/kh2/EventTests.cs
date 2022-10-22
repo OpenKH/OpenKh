@@ -1,7 +1,11 @@
 using OpenKh.Common;
+using OpenKh.Common.TreeStruc;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xunit;
 using Xunit.Sdk;
 
@@ -43,15 +47,15 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ParseUnk0C() =>
-            AssertEvent<Event.Unk0C>();
+            AssertEvent<Event.SeqBgcol>();
 
         [Fact]
         public void ParseUnk0D() =>
-            AssertEvent(new Event.Unk0D
+            AssertEvent(new Event.SeqPart
             {
                 StartFrame = 123,
                 EndFrame = 456,
-                Unk = new short[]
+                Part = new short[]
                 {
                     11, 22, 33, 44
                 }
@@ -59,7 +63,7 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ParseUnk0E() =>
-            AssertEvent<Event.Unk0E>();
+            AssertEvent<Event.SeqAlpha>();
 
         [Fact]
         public void ParseSetupEvent() =>
@@ -83,9 +87,9 @@ namespace OpenKh.Tests.kh2
             AssertEvent(new Event.SetCameraData
             {
                 CameraId = 123,
-                PositionX = new List<Event.SetCameraData.CameraKeys>
+                PositionX = new List<Event.CameraKeys>
                 {
-                    new Event.SetCameraData.CameraKeys
+                    new Event.CameraKeys
                     {
                         Interpolation = Kh2.Motion.Interpolation.Hermite,
                         KeyFrame = 1234,
@@ -93,7 +97,7 @@ namespace OpenKh.Tests.kh2
                         TangentEaseIn = 3,
                         TangentEaseOut = 4
                     },
-                    new Event.SetCameraData.CameraKeys
+                    new Event.CameraKeys
                     {
                         Interpolation = Kh2.Motion.Interpolation.Linear,
                         KeyFrame = 5678,
@@ -102,9 +106,9 @@ namespace OpenKh.Tests.kh2
                         TangentEaseOut = 8
                     },
                 },
-                PositionY = new List<Event.SetCameraData.CameraKeys>()
+                PositionY = new List<Event.CameraKeys>()
                 {
-                    new Event.SetCameraData.CameraKeys
+                    new Event.CameraKeys
                     {
                         Interpolation = Kh2.Motion.Interpolation.Nearest,
                         KeyFrame = 32767,
@@ -113,12 +117,12 @@ namespace OpenKh.Tests.kh2
                         TangentEaseOut = 44
                     },
                 },
-                PositionZ = new List<Event.SetCameraData.CameraKeys>(),
-                LookAtX = new List<Event.SetCameraData.CameraKeys>(),
-                LookAtY = new List<Event.SetCameraData.CameraKeys>(),
-                LookAtZ = new List<Event.SetCameraData.CameraKeys>(),
-                FieldOfView = new List<Event.SetCameraData.CameraKeys>(),
-                Roll = new List<Event.SetCameraData.CameraKeys>(),
+                PositionZ = new List<Event.CameraKeys>(),
+                LookAtX = new List<Event.CameraKeys>(),
+                LookAtY = new List<Event.CameraKeys>(),
+                LookAtZ = new List<Event.CameraKeys>(),
+                FieldOfView = new List<Event.CameraKeys>(),
+                Roll = new List<Event.CameraKeys>(),
             });
 
         [Fact]
@@ -131,15 +135,15 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ParseEntryUnk16() =>
-            AssertEvent<Event.EntryUnk16>();
+            AssertEvent<Event.BgGrupe>();
 
         [Fact]
         public void ParseEntryUnk17() =>
-            AssertEvent<Event.EntryUnk17>();
+            AssertEvent<Event.SeqBlur>();
 
         [Fact]
         public void ParseEntryUnk18() =>
-            AssertEvent<Event.EntryUnk18>();
+            AssertEvent<Event.SeqFocus>();
 
         [Fact]
         public void ParseSeqTextureAnim() =>
@@ -155,24 +159,24 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ParseEntryUnk1D() =>
-            AssertEvent<Event.EntryUnk1D>();
+            AssertEvent<Event.SplineDataEnc>();
 
         [Fact]
         public void ParseEntryUnk1E() =>
-            AssertEvent(new Event.Unk1E
+            AssertEvent(new Event.SplinePoint
             {
                 Id = 123,
                 UnkG = 456,
                 UnkH = 789,
-                Entries = new List<Event.Unk1E.Entry>()
+                Entries = new List<Event.SplinePoint.Entry>()
                 {
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
                 }
             });
 
@@ -343,6 +347,65 @@ namespace OpenKh.Tests.kh2
                     throw new AssertActualExpectedException(
                         expectedValue, actualValue,
                         $"Different values for '{property.Name}'");
+            }
+        }
+
+        public class Massive
+        {
+            private static string SourceDir => Environment.GetEnvironmentVariable("KH2FM_EXTRACTION_DIR");
+
+            [SkippableTheory]
+            [MemberData(nameof(GetSource))]
+            public void ReadEvent(string source)
+            {
+                var eventStream = new MemoryStream(ResolveSource(source), false);
+                var eventEntries = Event.Read(eventStream);
+                Assert.NotNull(eventEntries);
+                var text = TreeStrucWriter.GetString(eventEntries);
+                Console.Write("");
+            }
+
+            private byte[] ResolveSource(string source)
+            {
+                var sources = source.Split('\t');
+                var bar = File.OpenRead(sources[0]).Using(fs => Bar.Read(fs));
+                for (int x = 1; x < sources.Length; x++)
+                {
+                    if (sources[x].StartsWith("#"))
+                    {
+                        var idx = int.Parse(sources[x].Substring(1));
+
+                        var temp = new MemoryStream();
+                        bar[idx].Stream.CopyTo(temp);
+                        return temp.ToArray();
+                    }
+                    else
+                    {
+                        throw new InvalidDataException();
+                    }
+                }
+                throw new InvalidDataException();
+            }
+
+            public static IEnumerable<object[]> GetSource()
+            {
+                var srcDir = SourceDir;
+
+                if (srcDir != null)
+                {
+                    foreach (var barFile in Directory.GetFiles(Path.Combine(srcDir, "ard"), "*.ard"))
+                    {
+                        foreach (var (barEntry, index) in File.OpenRead(barFile)
+                            .Using(fs => Bar.Read(fs))
+                            .Select((barEntry, index) => (barEntry, index))
+                            .ToArray()
+                            .Where(tuple => tuple.barEntry.Type == Bar.EntryType.Event && tuple.barEntry.Stream.Length != 0)
+                        )
+                        {
+                            yield return new object[] { $"{barFile}\t#{index}" };
+                        }
+                    }
+                }
             }
         }
     }

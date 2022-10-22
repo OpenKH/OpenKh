@@ -17,7 +17,7 @@ namespace OpenKh.Kh2.Ard
                 .ForType<SeqVoices>(ReadVoices, WriteVoices)
                 .ForType<SetCameraData>(ReadSetCameraData, WriteSetCameraData)
                 .ForType<ReadAssets>(ReadLoadAssets, WriteLoadAssets)
-                .ForType<Unk1E>(ReadUnk1E, WriteUnk1E)
+                .ForType<SplinePoint>(ReadUnk1E, WriteUnk1E)
                 .Build();
 
         private static readonly Dictionary<int, Type> _idType = new Dictionary<int, Type>()
@@ -26,27 +26,32 @@ namespace OpenKh.Kh2.Ard
             [0x01] = typeof(SetActor),
             [0x02] = typeof(SeqActorPosition),
             [0x03] = typeof(SetMap),
+            [0x05] = typeof(CameraData),
             [0x06] = typeof(SeqCamera),
+            [0x07] = typeof(EffectData),
             [0x08] = typeof(SetEndFrame),
             [0x09] = typeof(SeqEffect),
             [0x0A] = typeof(AttachEffect),
-            [0x0C] = typeof(Unk0C),
-            [0x0D] = typeof(Unk0D),
-            [0x0E] = typeof(Unk0E),
+            [0x0B] = typeof(SeqKage),
+            [0x0C] = typeof(SeqBgcol),
+            [0x0D] = typeof(SeqPart),
+            [0x0E] = typeof(SeqAlpha),
             [0x0F] = typeof(SetupEvent),
             [0x10] = typeof(EventStart),
+            [0x11] = typeof(JumpEvent),
             [0x12] = typeof(SeqFade),
             [0x13] = typeof(SetCameraData),
             [0x14] = typeof(EntryUnk14),
             [0x15] = typeof(SeqSubtitle),
-            [0x16] = typeof(EntryUnk16),
-            [0x17] = typeof(EntryUnk17),
-            [0x18] = typeof(EntryUnk18),
+            [0x16] = typeof(BgGrupe),
+            [0x17] = typeof(SeqBlur),
+            [0x18] = typeof(SeqFocus),
             [0x19] = typeof(SeqTextureAnim),
             [0x1A] = typeof(SeqActorLeave),
             [0x1B] = typeof(SeqCrossFade),
-            [0x1D] = typeof(EntryUnk1D),
-            [0x1E] = typeof(Unk1E),
+            [0x1C] = typeof(SeqIk),
+            [0x1D] = typeof(SplineDataEnc),
+            [0x1E] = typeof(SplinePoint),
             [0x1F] = typeof(Unk1F),
             [0x20] = typeof(SeqGameSpeed),
             [0x22] = typeof(EntryUnk22),
@@ -98,8 +103,7 @@ namespace OpenKh.Kh2.Ard
 
         public class SetProject : IEventEntry // unused
         {
-            [Data] public short Unk00 { get; set; }
-            [Data] public short Unk02 { get; set; }
+            [Data] public int MemSize { get; set; }
 
             // Always PS2_BIN_VER (2)
             [Data] public byte Version { get; set; }
@@ -109,7 +113,7 @@ namespace OpenKh.Kh2.Ard
             [Data] public string Name { get; set; }
 
             public override string ToString() =>
-                $"{nameof(SetProject)}: {Name}, Version {Version}, Camera type {ObjCameraType}, ({Unk00:X}, {Unk02:X})";
+                $"{nameof(SetProject)}: {Name}, Version {Version}, Camera type {ObjCameraType}, ({MemSize:X})";
         }
 
         public class SetActor : IEventEntry // sub_22F528
@@ -121,10 +125,10 @@ namespace OpenKh.Kh2.Ard
             public override string ToString() =>
                 $"{nameof(SetActor)}: ObjEntry {ObjectEntry:X}, Name {Name}, ActorID {ActorId}";
         }
-        
+
         public class SeqActorPosition : IEventEntry
         {
-            [Data] public short Unk00 { get; set; }
+            [Data] public short SubId { get; set; }
             [Data] public short Unk02 { get; set; }
             [Data] public float PositionX { get; set; }
             [Data] public float PositionY { get; set; }
@@ -132,12 +136,12 @@ namespace OpenKh.Kh2.Ard
             [Data] public float RotationX { get; set; }
             [Data] public float RotationY { get; set; }
             [Data] public float RotationZ { get; set; }
-            [Data] public float Unk1C { get; set; }
+            [Data] public float Scale { get; set; }
             [Data] public short ActorId { get; set; }
             [Data] public short Frame { get; set; }
 
             public override string ToString() =>
-                $"{nameof(SeqActorPosition)}: Frame {Frame}, ActorID {ActorId}, Pos({PositionX}, {PositionY}, {PositionZ}) Rot({RotationX}, {RotationY}, {RotationZ}) Unk({Unk00}, {Unk02}, {Unk1C})";
+                $"{nameof(SeqActorPosition)}: Frame {Frame}, ActorID {ActorId}, Pos({PositionX}, {PositionY}, {PositionZ}) Rot({RotationX}, {RotationY}, {RotationZ}) SubId({SubId}), {Unk02}, {Scale}";
         }
 
         public class SetMap : IEventEntry // unused
@@ -151,13 +155,31 @@ namespace OpenKh.Kh2.Ard
 
         public class SeqCamera : IEventEntry // ignored
         {
-            [Data] public short CameraId { get; set; }
+            [Data] public short PutId { get; set; }
             [Data] public short FrameStart { get; set; }
             [Data] public short FrameEnd { get; set; }
-            [Data] public short Unk06 { get; set; }
+            [Data] public short CameraId { get; set; }
 
             public override string ToString() =>
-                $"{nameof(SeqCamera)}: CameraID {CameraId}, Frame start {FrameStart}, Frame end {FrameEnd}, {Unk06}";
+                $"{nameof(SeqCamera)}: CameraID {PutId}, Frame start {FrameStart}, Frame end {FrameEnd}, {CameraId}";
+        }
+
+        public class EffectData : IEventEntry
+        {
+            [Data] public short EffectId { get; set; }
+            [Data] public string Name { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(EffectData)}: ";
+        }
+
+        public class CameraData : IEventEntry
+        {
+            [Data] public short CameraId { get; set; }
+            [Data] public short Unk02 { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(CameraData)}: ";
         }
 
         public class SetEndFrame : IEventEntry // sub_22D3B8
@@ -197,6 +219,17 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(AttachEffect)}: Frame start {FrameStart}, Frame end {FrameEnd}, Attach effect ID {AttachEffectId}, ActorID {ActorId}, Bone index {BoneIndex}, PAX entry {PaxEntryIndex}, Type {Type}";
         }
 
+        public class SeqKage : IEventEntry
+        {
+            [Data] public short FrameStart { get; set; }
+            [Data] public short FrameEnd { get; set; } // maybe unused?
+            [Data] public short PutId { get; set; }
+            [Data] public short Unk06 { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(SeqKage)}: ";
+        }
+
         public class EventStart : IEventEntry // sub_22D3A8
         {
             [Data] public short FadeIn { get; set; } // dword_35DE40
@@ -206,7 +239,19 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(EventStart)}: Fade in for {FadeIn} frames";
         }
 
-        public class SeqFade: IEventEntry
+        public class JumpEvent : IEventEntry
+        {
+            [Data] public short StartFrame { get; set; }
+            [Data] public short Type { get; set; }
+            [Data] public short SetNo { get; set; }
+            [Data] public short Area { get; set; }
+            [Data] public short Entrance { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(JumpEvent)}: ";
+        }
+
+        public class SeqFade : IEventEntry
         {
             public enum FadeType : short
             {
@@ -228,21 +273,22 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(SeqFade)}: Frame {FrameIndex}, Duration {Duration}, {Type}";
         }
 
+        public class CameraKeys
+        {
+            public Motion.Interpolation Interpolation { get; set; }
+            public int KeyFrame { get; set; }
+            public float Value { get; set; }
+            public float TangentEaseIn { get; set; }
+            public float TangentEaseOut { get; set; }
+
+            public override string ToString() =>
+                $"Key frame {KeyFrame}, Value {Value}, {TangentEaseIn}, {TangentEaseOut}, Interpolation {Interpolation}";
+        }
+
         public class SetCameraData : IEventEntry
         {
-            public class CameraKeys
-            {
-                public Motion.Interpolation Interpolation { get; set; }
-                public int KeyFrame { get; set; }
-                public float Value { get; set; }
-                public float TangentEaseIn { get; set; }
-                public float TangentEaseOut { get; set; }
-
-                public override string ToString() =>
-                    $"Key frame {KeyFrame}, Value {Value}, {TangentEaseIn}, {TangentEaseOut}, Interpolation {Interpolation}";
-            }
-
             public short CameraId { get; set; }
+            public List<CameraKeys> PositionX { get; set; }
             public List<CameraKeys> PositionY { get; set; }
             public List<CameraKeys> PositionZ { get; set; }
             public List<CameraKeys> LookAtX { get; set; }
@@ -250,7 +296,6 @@ namespace OpenKh.Kh2.Ard
             public List<CameraKeys> LookAtZ { get; set; }
             public List<CameraKeys> Roll { get; set; }
             public List<CameraKeys> FieldOfView { get; set; }
-            public List<CameraKeys> PositionX { get; set; }
 
             public override string ToString()
             {
@@ -295,50 +340,52 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(SeqSubtitle)}: Frame {FrameStart}, MsgId {MessageId}, Index {Index}, Hide {HideFlag != 0}";
         }
 
-        public class EntryUnk16 : IEventEntry
+        public class BgGrupe : IEventEntry
         {
-            [Data] public short Unk00 { get; set; }
-            [Data] public short Unk02 { get; set; }
+            [Data] public short StartFrame { get; set; }
+            [Data] public byte No { get; set; }
+            [Data] public byte Flag { get; set; }
 
             public override string ToString() =>
-                $"{nameof(EntryUnk16)}: {Unk00} {Unk02}";
+                $"{nameof(BgGrupe)}: {StartFrame} {No} {Flag}";
         }
 
-        public class EntryUnk17 : IEventEntry
+        public class SeqBlur : IEventEntry
         {
-            [Data] public short Unk00 { get; set; }
-            [Data] public short Unk02 { get; set; }
-            [Data] public short Unk04 { get; set; }
-            [Data] public short Unk06 { get; set; }
-            [Data] public short Unk08 { get; set; }
-            [Data] public short Unk0A { get; set; }
-            [Data] public short Unk0C { get; set; }
+            [Data] public short StartFrame { get; set; }
+            [Data] public byte Sw { get; set; }
+            [Data] public byte Alpha { get; set; }
+            [Data] public float Rot { get; set; }
+            [Data] public short X { get; set; }
+            [Data] public short Y { get; set; }
+            [Data] public short RotFrame { get; set; }
             [Data] public short Unk0E { get; set; }
 
             public override string ToString() =>
-                $"{nameof(EntryUnk17)}: {Unk00}, {Unk02} {Unk04} {Unk06} {Unk08} {Unk0A} {Unk0C} {Unk0E}";
+                $"{nameof(SeqBlur)}: {StartFrame}, {Sw}, {Alpha}, {Rot} {X} {Y} {RotFrame} {Unk0E}";
         }
 
-        public class EntryUnk18 : IEventEntry
+        public class SeqFocus : IEventEntry
         {
-            [Data] public short Frame { get; set; }
-            [Data] public short Unk02 { get; set; }
-            [Data] public short Unk04 { get; set; }
-            [Data] public short Unk06 { get; set; }
+            [Data] public short StartFrame { get; set; }
+            [Data] public byte Sw { get; set; }
+            [Data] public byte Type { get; set; }
+            [Data] public int Z { get; set; }
 
             public override string ToString() =>
-                $"{nameof(EntryUnk18)}: Frame {Frame}, {Unk02} {Unk04} {Unk06}";
+                $"{nameof(SeqFocus)}: Frame {StartFrame}, {Sw} {Type} {Z}";
         }
 
         public class SeqTextureAnim : IEventEntry
         {
             [Data] public short Frame { get; set; }
-            [Data] public short Unk02 { get; set; }
-            [Data] public short Unk04 { get; set; }
-            [Data] public short Unk06 { get; set; }
+            [Data] public short PutId { get; set; }
+            [Data] public short No { get; set; }
+            [Data] public byte Flag { get; set; }
+            [Data] public byte Dummy { get; set; }
 
             public override string ToString() =>
-                $"{nameof(SeqTextureAnim)}: Frame {Frame}, {Unk02}, {Unk04}, {Unk06}";
+                $"{nameof(SeqTextureAnim)}: Frame {Frame}, {PutId}, {No}, {Flag}, {Dummy}";
         }
 
         public class SeqActorLeave : IEventEntry
@@ -359,35 +406,35 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(SeqCrossFade)}: {Frame}, {Duration}";
         }
 
-        public class EntryUnk1D : IEventEntry
+        public class SeqIk : IEventEntry
         {
-            [Data] public short Channel { get; set; }
-            [Data] public short Unk02 { get; set; }
-            [Data] public short Unk04 { get; set; }
-            [Data] public short Unk06 { get; set; }
-            [Data] public short Unk08 { get; set; }
-            [Data] public short Unk0a { get; set; }
-            [Data] public short Unk0c { get; set; }
-            [Data] public short Unk0e { get; set; }
-            [Data] public short Unk10 { get; set; }
-            [Data] public short Unk12 { get; set; }
-            [Data] public short Unk14 { get; set; }
-            [Data] public short Unk16 { get; set; }
-            [Data] public short Unk18 { get; set; }
-            [Data] public short Unk1a { get; set; }
-            [Data] public float Unk1c { get; set; }
-            [Data] public float Unk20 { get; set; }
-            [Data] public float Unk24 { get; set; }
+            [Data] public short StartFrame { get; set; }
+            [Data] public short EndFrame { get; set; }
+            [Data] public short PutId { get; set; }
+            [Data] public short Flag { get; set; }
 
             public override string ToString() =>
-                $"{nameof(EntryUnk1D)}: Channel {Channel}, {Unk02} {Unk04} {Unk06} {Unk08} {Unk0a} {Unk0c} {Unk0e} {Unk10} {Unk12} {Unk14} {Unk16} {Unk18} {Unk1a} {Unk1c} {Unk20} {Unk24}";
+                $"{nameof(SeqIk)}: ";
         }
 
-        public class Unk1E : IEventEntry
+        public class SplineDataEnc : IEventEntry
+        {
+            public short PutId { get; set; }
+            public short TransOfs { get; set; }
+            public short TransCnt { get; set; }
+            public short Dummy { get; set; }
+
+            public List<CameraKeys> Keys { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(SplineDataEnc)}: Channel {PutId}, {TransOfs} {TransCnt} {Dummy}";
+        }
+
+        public class SplinePoint : IEventEntry
         {
             public class Entry
             {
-                [Data] public float Unk00 { get; set; }
+                [Data] public float PutId { get; set; }
                 [Data] public float Unk04 { get; set; }
                 [Data] public float Unk08 { get; set; }
                 [Data] public float Unk0C { get; set; }
@@ -405,7 +452,7 @@ namespace OpenKh.Kh2.Ard
             public short UnkH { get; set; }
 
             public override string ToString() =>
-                $"{nameof(Unk1E)}: Id {Id}";
+                $"{nameof(SplinePoint)}: Id {Id}";
         }
 
         public class Unk1F : IEventEntry
@@ -455,37 +502,38 @@ namespace OpenKh.Kh2.Ard
                 $"{nameof(SeqVoices)}:\n\t{string.Join("\n\t", Voices)}";
         }
 
-        public class Unk0C : IEventEntry
+        public class SeqBgcol : IEventEntry
         {
             [Data] public short StartFrame { get; set; }
             [Data] public short EndFrame { get; set; }
-            [Data] public short Unk04 { get; set; }
+            [Data] public short PutId { get; set; }
             [Data] public short Unk08 { get; set; }
 
             public override string ToString() =>
-                $"{nameof(Unk0C)}: Frame {StartFrame}, {Unk04}, {Unk08}";
+                $"{nameof(SeqBgcol)}: Frame {StartFrame}, {PutId}, {Unk08}";
         }
 
-        public class Unk0D : IEventEntry
+        public class SeqPart : IEventEntry
         {
             [Data] public short StartFrame { get; set; }
             [Data] public short EndFrame { get; set; }
-            [Data(Count = 34)] public short[] Unk { get; set; }
+            [Data(Count = 33)] public short[] Part { get; set; }
 
             public override string ToString() =>
-                $"{nameof(Unk0D)}: Frame {StartFrame}, ({string.Join(", ", Unk)})";
+                $"{nameof(SeqPart)}: Frame {StartFrame}, ({string.Join(", ", Part)})";
         }
 
-        public class Unk0E : IEventEntry
+        public class SeqAlpha : IEventEntry
         {
             [Data] public short StartFrame { get; set; }
             [Data] public short EndFrame { get; set; }
-            [Data] public short Unk04 { get; set; }
-            [Data] public short Unk06 { get; set; }
-            [Data] public short Unk08 { get; set; }
+            [Data] public byte StartAlpha { get; set; }
+            [Data] public byte EndAlpha { get; set; }
+            [Data] public short Time { get; set; }
+            [Data] public short PutId { get; set; }
 
             public override string ToString() =>
-                $"{nameof(Unk0E)}: Frame {StartFrame}, {Unk04}, {Unk06}, {Unk08}";
+                $"{nameof(SeqAlpha)}: Frame {StartFrame}, {StartAlpha}, {EndAlpha}, {Time}, {PutId}";
         }
 
         public class SetupEvent : IEventEntry // sub_22d358
@@ -770,7 +818,7 @@ namespace OpenKh.Kh2.Ard
                 stream.Position += 4;
                 Mapping.WriteObject(stream, item);
                 var nextPosition = stream.AlignPosition(2).Position;
-                
+
                 var id = _typeId[item.GetType()];
                 var length = stream.Position - startPosition;
                 stream.Position = startPosition;
@@ -856,7 +904,7 @@ namespace OpenKh.Kh2.Ard
 
         private static object ReadSetCameraData(MappingReadArgs args)
         {
-            List<SetCameraData.CameraKeys> AssignValues(SetCameraDataHeader header, IList<SetCameraData.CameraKeys> val) =>
+            List<CameraKeys> AssignValues(SetCameraDataHeader header, IList<CameraKeys> val) =>
                 Enumerable.Range(0, header.Count).Select(i => val[header.Index + i]).ToList();
 
             var cameraId = args.Reader.ReadInt16();
@@ -869,7 +917,7 @@ namespace OpenKh.Kh2.Ard
             var values = Enumerable
                 .Range(0, valueCount)
                 .Select(x => BinaryMapping.ReadObject<CameraValueInternal>(args.Reader.BaseStream))
-                .Select(x => new SetCameraData.CameraKeys
+                .Select(x => new CameraKeys
                 {
                     Interpolation = (Motion.Interpolation)(x.FlagData >> 29),
                     KeyFrame = (int)((x.FlagData & 0x1FFFFFFF ^ 0x10000000) - 0x10000000),
@@ -896,7 +944,7 @@ namespace OpenKh.Kh2.Ard
         private static void WriteSetCameraData(MappingWriteArgs args)
         {
             void WriteHeader(Stream stream,
-                List<SetCameraData.CameraKeys> values,
+                List<CameraKeys> values,
                 int sIndex) =>
                 Mapping.WriteObject(stream, new SetCameraDataHeader
                 {
@@ -904,7 +952,7 @@ namespace OpenKh.Kh2.Ard
                     Count = (short)values.Count
                 });
 
-            void WriteData(Stream stream, List<SetCameraData.CameraKeys> values)
+            void WriteData(Stream stream, List<CameraKeys> values)
             {
                 foreach (var value in values.Select(x => new CameraValueInternal
                 {
@@ -1022,12 +1070,12 @@ namespace OpenKh.Kh2.Ard
             var unk06 = args.Reader.ReadInt16();
             var entries = Enumerable
                 .Range(0, count)
-                .Select(x => Mapping.ReadObject<Unk1E.Entry>(args.Reader.BaseStream))
+                .Select(x => Mapping.ReadObject<SplinePoint.Entry>(args.Reader.BaseStream))
                 .ToList();
             var unkG = args.Reader.ReadInt16();
             var unkH = args.Reader.ReadInt16();
 
-            return new Unk1E
+            return new SplinePoint
             {
                 Id = id,
                 UnkG = unkG,
@@ -1038,7 +1086,7 @@ namespace OpenKh.Kh2.Ard
 
         private static void WriteUnk1E(MappingWriteArgs args)
         {
-            var item = args.Item as Unk1E;
+            var item = args.Item as SplinePoint;
             args.Writer.Write(item.Id);
             args.Writer.Write((short)item.Entries.Count);
             args.Writer.Write((short)3);

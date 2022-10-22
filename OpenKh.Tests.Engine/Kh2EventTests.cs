@@ -200,13 +200,13 @@ namespace OpenKh.Tests.Engine
                 },
                 new Event.SeqCamera
                 {
-                    CameraId = 0,
+                    PutId = 0,
                     FrameStart = 0,
                     FrameEnd = 100,
                 },
                 new Event.SeqCamera
                 {
-                    CameraId = 1,
+                    PutId = 1,
                     FrameStart = 1,
                     FrameEnd = 101,
                 },
@@ -315,13 +315,13 @@ namespace OpenKh.Tests.Engine
                 },
                 new Event.SeqCamera
                 {
-                    CameraId = 0,
+                    PutId = 0,
                     FrameStart = 15,
                     FrameEnd = 75,
                 },
                 new Event.SeqCamera
                 {
-                    CameraId = 1,
+                    PutId = 1,
                     FrameStart = 76,
                     FrameEnd = 286,
                 },

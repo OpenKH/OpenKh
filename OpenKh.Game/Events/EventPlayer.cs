@@ -124,7 +124,7 @@ namespace OpenKh.Game.Events
                     case SeqCamera item:
                         if (nFrame >= item.FrameStart && nFrame < item.FrameEnd)
                         {
-                            _cameraId = item.CameraId;
+                            _cameraId = item.PutId;
                             var frameLength = item.FrameEnd - item.FrameStart;
                             cameraFrameTime = (_seconds * FramesPerSecond - item.FrameStart) / 30f;
                         }
