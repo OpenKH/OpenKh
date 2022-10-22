@@ -1,0 +1,110 @@
+<UserControl x:Class="OpenKh.Tools.Kh2MdlxEditor.Views.Model_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2MdlxEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <Grid Background="Black">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="2" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <!-- 3D Viewport -->
+        <ContentControl Grid.Column="0" Background="#2d2d2d" x:Name="viewportFrame"/>
+        
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
+        
+        <!-- Model data -->
+        <Grid Grid.Column="2" Background="#202020">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="2" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Meshes
+            <ListView Grid.Row="0" ItemsSource="{Binding Groups}" DisplayMemberPath="Name" Background="#1d1d1d" Foreground="White">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <EventSetter Event="MouseLeftButtonUp" Handler="MeshList_MouseLeftButtonUp" />
+                        <EventSetter Event="MouseRightButtonUp" Handler="MeshList_MouseRightButtonUp" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView> -->
+            <!-- Meshes -->
+            <ListView Grid.Row="0" ItemsSource="{Binding Groups}" Background="#1d1d1d" Foreground="White">
+                <ListView.Resources>
+                    <Style TargetType="GridViewColumnHeader">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </Style>
+                </ListView.Resources>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <EventSetter Event="MouseLeftButtonUp" Handler="MeshList_MouseLeftButtonUp" />
+                        <EventSetter Event="MouseRightButtonUp" Handler="MeshList_MouseRightButtonUp" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                    <Border
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        Background="{TemplateBinding Background}">
+                                        <GridViewRowPresenter HorizontalAlignment="Stretch" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Width="Auto" Margin="0" Content="{TemplateBinding Content}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Selected_VM}" IsEnabled="False"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="Poly" DisplayMemberBinding="{Binding Group.Header.PolygonCount}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <!-- Meshes
+            <DataGrid Grid.Row="0" Background="#202020" AutoGenerateColumns="False" HeadersVisibility="None" GridLinesVisibility="None" BorderThickness="0"
+              ItemsSource="{Binding Groups}" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" Margin="10,10">
+                <DataGrid.Resources>
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Setter Property="Background" Value="#202020"/>
+                        <Setter Property="Foreground" Value="White"/>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Binding = "{Binding Selected}">
+                    </DataGridCheckBoxColumn>
+                    <DataGridTextColumn Binding = "{Binding Name}" />
+                </DataGrid.Columns>
+            </DataGrid> -->
+
+            <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" />
+            
+            <ContentControl Grid.Row="2" Background="#2d2d2d" x:Name="meshPropertiesFrame"/>
+            <!-- Mesh properties -->
+            <!-- <StackPanel Grid.Row="2" Background="#1d1d1d">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Texture:" Foreground="White"/>
+                    <TextBox Width="30" Text="{Binding Path=SelectedGroup.Header.TextureIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+            </StackPanel> -->
+
+        </Grid>
+        
+    </Grid>
+</UserControl>

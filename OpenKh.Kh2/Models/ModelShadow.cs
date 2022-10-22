@@ -1,6 +1,7 @@
 using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using Xe.BinaryMapper;
 using static OpenKh.Kh2.Models.ModelCommon;
 
@@ -99,10 +100,38 @@ namespace OpenKh.Kh2.Models
                 }
 
                 // Note: VPU packets don't have vertices in shadow models
-                //group.Mesh = getMeshFromGroup(group);
+                //group.Mesh = getMeshFromGroup(group, GetBoneMatrices(model.Bones));
             }
 
             return model;
+        }
+        public void Write(Stream stream)
+        {
+            BinaryMapping.WriteObject(stream, this);
+            foreach (ShadowGroup group in Groups)
+            {
+                BinaryMapping.WriteObject(stream, group.Header);
+            }
+            foreach (ShadowGroup group in Groups)
+            {
+                ModelCommon.alignStreamToByte(stream, 16);
+                using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, true))
+                {
+                    writer.Write(group.VifData);
+                }
+                foreach (DmaPacket dmaPacket in group.DmaData)
+                {
+                    BinaryMapping.WriteObject(stream, dmaPacket);
+                }
+                using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, true))
+                {
+                    writer.Write(group.BoneMatrix.Count);
+                    foreach (int boneIndex in group.BoneMatrix)
+                    {
+                        writer.Write(boneIndex);
+                    }
+                }
+            }
         }
 
         //----------
@@ -110,7 +139,7 @@ namespace OpenKh.Kh2.Models
         //----------
 
         // Gets the mesh from a given skeletal group
-        public static ModelSkeletal.SkeletalMesh getMeshFromGroup(ShadowGroup group)
+        public static ModelSkeletal.SkeletalMesh getMeshFromGroup(ShadowGroup group, Matrix4x4[] boneMatrices)
         {
             // Get the VIF-DMA-boneMatrix packets
             List<ModelSkeletal.DmaVifPacket> dmaVifPackets = GetDmaVifPackets(group);
@@ -126,7 +155,7 @@ namespace OpenKh.Kh2.Models
             ModelSkeletal.VpuGroup vpuGroup = ModelSkeletal.getVpuGroup(vpuPackets, dmaVifPackets);
 
             // Generates the mesh
-            return ModelSkeletal.GetSkeletalMeshFromVpuGroup(vpuGroup);
+            return ModelSkeletal.GetSkeletalMeshFromVpuGroup(vpuGroup, boneMatrices);
         }
 
         // Returns the DmaVifPackets that form the group

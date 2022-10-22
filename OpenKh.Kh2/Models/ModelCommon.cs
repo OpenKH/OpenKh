@@ -105,11 +105,12 @@ namespace OpenKh.Kh2.Models
             public float V { get; set; }
 
             public UVBVertex() { }
-            public UVBVertex(List<BPosition> BonePositions, float U = 0, float V = 0)
+            public UVBVertex(List<BPosition> BonePositions, float U = 0, float V = 0, Vector3 position = new Vector3())
             {
                 this.BPositions = BonePositions;
                 this.U = U;
                 this.V = V;
+                Position = position;
             }
         }
         // Position relative to bone. The W coordinate represents the weight of the bone.

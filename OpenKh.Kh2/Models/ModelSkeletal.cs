@@ -31,7 +31,7 @@ namespace OpenKh.Kh2.Models
             public byte[] VifData { get; set; }
             public List<DmaPacket> DmaData { get; set; }
             public List<int> BoneMatrix { get; set; }
-            public SkeletalMesh Mesh { get => getMeshFromGroup(this); }
+            public SkeletalMesh Mesh { get; set; }
 
             public SkeletalGroup()
             {
@@ -190,12 +190,13 @@ namespace OpenKh.Kh2.Models
                     group.BoneMatrix.Add(stream.ReadInt32());
                 }
 
-                //group.Mesh = getMeshFromGroup(group);
+                group.Mesh = getMeshFromGroup(group, GetBoneMatrices(model.Bones));
             }
 
-            model.calcVertexAbsolutePositions();
+            //model.calcVertexAbsolutePositions();
+            //model = calcVertexAbsolutePositions(model);
 
-            if(model.ModelHeader.Size > 0)
+            if (model.ModelHeader.Size > 0)
             {
                 stream.Position = ReservedSize + model.ModelHeader.Size;
                 model.Shadow = ModelShadow.Read(stream, model.Bones);
@@ -203,13 +204,54 @@ namespace OpenKh.Kh2.Models
 
             return model;
         }
+        public void Write(Stream stream)
+        {
+            int ReservedSize = 0x90;
+            stream.Position = ReservedSize;
+
+            BinaryMapping.WriteObject(stream, this);
+            foreach(SkeletalGroup group in Groups)
+            {
+                BinaryMapping.WriteObject(stream, group.Header);
+            }
+            BinaryMapping.WriteObject(stream, this.BoneData);
+            foreach (Bone bone in Bones)
+            {
+                BinaryMapping.WriteObject(stream, bone);
+            }
+            foreach (SkeletalGroup group in Groups)
+            {
+                ModelCommon.alignStreamToByte(stream, 16);
+                using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, true))
+                {
+                    writer.Write(group.VifData);
+                }
+                foreach (DmaPacket dmaPacket in group.DmaData)
+                {
+                    BinaryMapping.WriteObject(stream, dmaPacket);
+                }
+                using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, true))
+                {
+                    writer.Write(group.BoneMatrix.Count);
+                    foreach(int boneIndex in group.BoneMatrix)
+                    {
+                        writer.Write(boneIndex);
+                    }
+                }
+            }
+
+            ModelCommon.alignStreamToByte(stream, 16);
+            if (Shadow != null) {
+                Shadow.Write(stream);
+            }
+        }
 
         //----------
         // FUNCTIONS
         //----------
 
         // Gets the mesh from a given skeletal group
-        public static SkeletalMesh getMeshFromGroup(SkeletalGroup group)
+        public static SkeletalMesh getMeshFromGroup(SkeletalGroup group, Matrix4x4[] boneMatrices)
         {
             // Get the VIF-DMA-boneMatrix packets
             List<DmaVifPacket> dmaVifPackets = GetDmaVifPackets(group);
@@ -225,7 +267,7 @@ namespace OpenKh.Kh2.Models
             VpuGroup vpuGroup = getVpuGroup(vpuPackets, dmaVifPackets);
 
             // Generates the mesh
-            return GetSkeletalMeshFromVpuGroup(vpuGroup);
+            return GetSkeletalMeshFromVpuGroup(vpuGroup, boneMatrices);
         }
 
         //----------------------------
@@ -234,7 +276,7 @@ namespace OpenKh.Kh2.Models
         //----------------------------
 
         // Gets the mesh from a given vpu group
-        public static SkeletalMesh GetSkeletalMeshFromVpuGroup(VpuGroup vpuGroup)
+        public static SkeletalMesh GetSkeletalMeshFromVpuGroup(VpuGroup vpuGroup, Matrix4x4[] boneMatrices)
         {
             SkeletalMesh mesh = new SkeletalMesh();
 
@@ -243,7 +285,7 @@ namespace OpenKh.Kh2.Models
                 // Vertices
                 OpenKh.Ps2.VpuPacket.VertexIndex index = vpuGroup.Indices[i];
                 UVBVertex vertex = vpuGroup.Vertices[index.Index];
-                mesh.Vertices.Add(new UVBVertex(vertex.BPositions, index.U, index.V));
+                mesh.Vertices.Add(new UVBVertex(vertex.BPositions, index.U, index.V, ModelCommon.getAbsolutePosition(vertex.BPositions, boneMatrices)));
 
                 // Triangles
                 if (index.Function == OpenKh.Ps2.VpuPacket.VertexFunction.DrawTriangle ||
@@ -403,6 +445,7 @@ namespace OpenKh.Kh2.Models
         }
 
         // Calculates the absolute position of the vertices based on their positions relative to bones
+        // DELETE.............................................................................................................................................................
         public void calcVertexAbsolutePositions()
         {
             Matrix4x4[] boneMatrices = ModelCommon.GetBoneMatrices(this.Bones);
@@ -414,6 +457,19 @@ namespace OpenKh.Kh2.Models
                     vertex.Position = ModelCommon.getAbsolutePosition(vertex.BPositions, boneMatrices);
                 }
             }
+        }
+        public static ModelSkeletal calcVertexAbsolutePositions(ModelSkeletal model)
+        {
+            Matrix4x4[] boneMatrices = ModelCommon.GetBoneMatrices(model.Bones);
+
+            foreach (SkeletalGroup group in model.Groups)
+            {
+                foreach (UVBVertex vertex in group.Mesh.Vertices)
+                {
+                    vertex.Position = ModelCommon.getAbsolutePosition(vertex.BPositions, boneMatrices);
+                }
+            }
+            return model;
         }
 
         //----------------
