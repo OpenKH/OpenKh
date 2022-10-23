@@ -363,9 +363,9 @@ namespace OpenKh.Tests.kh2
                 var eventStream = new MemoryStream(ResolveSource(source), false);
                 var eventEntries = Event.Read(eventStream);
                 Assert.NotNull(eventEntries);
-                var text = TreeWriter.Serialize(eventEntries);
+                var text = new TreeWriterBuilder().Build().Serialize(eventEntries);
                 SaveTextTo(source, text);
-                var treeOptions = new TreeOptions()
+                var treeReader = new TreeReaderBuilder()
                     .AddType(nameof(SetProject), typeof(SetProject))
                     .AddType(nameof(SetActor), typeof(SetActor))
                     .AddType(nameof(SeqActorPosition), typeof(SeqActorPosition))
@@ -426,8 +426,8 @@ namespace OpenKh.Tests.kh2
                     .AddType("Voice", typeof(SeqVoices.Voice))
                     .AddType("CameraKeys", typeof(CameraKeys))
                     .AddType("Entry", typeof(SplinePoint.Entry))
-                    ;
-                var reversed = TreeWriter.Deserialize<List<Event.IEventEntry>>(text, treeOptions);
+                    .Build();
+                var reversed = treeReader.Deserialize<List<Event.IEventEntry>>(text);
             }
 
             private void SaveTextTo(string source, string text)

@@ -4,14 +4,19 @@ using System.Text;
 
 namespace OpenKh.DeeperTree
 {
-    public class TreeOptions
+    public class TreeReaderBuilder
     {
         public IDictionary<string, Type> ObjectTypes { get; set; } = new SortedDictionary<string, Type>();
 
-        public TreeOptions AddType(string name, Type type)
+        public TreeReaderBuilder AddType(string name, Type type)
         {
             ObjectTypes[name] = type;
             return this;
+        }
+
+        public TreeReader Build()
+        {
+            return new TreeReader(this);
         }
     }
 }

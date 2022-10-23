@@ -1,13 +1,10 @@
-a
-{
-    ; aaa
-    a b
-    a [ 
-        
-    ]
-    a [ b 
-    ]
-    a [ b c ]
-    a [ b c d ]
-    t {}
+a [ a 
+b
+ ]
+
+
+k v
+
+block {
+
 }

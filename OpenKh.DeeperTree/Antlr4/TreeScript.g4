@@ -1,12 +1,13 @@
 grammar TreeScript;
 
-script: NL* (statement NL*)* EOF;
-statement: property | array | block;
+script: NL* statement* EOF;
+statement: (property | array | block) NL*;
 
 property: name = token value = token;
-array: name = token NL* '[' NL* (value = token NL*)* NL* ']';
+array: name = token NL* '[' NL* (element NL*)* NL* ']';
 block: name = token NL* '{' NL* (statement NL*)* NL* '}';
 
+element: token;
 token: Bare | Quoted;
 
 Bare: ~[ \r\n"{}\u005b\u005d]+;
