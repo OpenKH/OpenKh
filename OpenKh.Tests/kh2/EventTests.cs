@@ -1,5 +1,5 @@
 using OpenKh.Common;
-using OpenKh.Common.TreeStruc;
+using OpenKh.DeeperTree;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using System;
@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using Xunit;
 using Xunit.Sdk;
+using static OpenKh.Kh2.Ard.Event;
 
 namespace OpenKh.Tests.kh2
 {
@@ -353,6 +354,7 @@ namespace OpenKh.Tests.kh2
         public class Massive
         {
             private static string SourceDir => Environment.GetEnvironmentVariable("KH2FM_EXTRACTION_DIR");
+            private static string SaveDir => Path.Combine(Environment.CurrentDirectory, "EventTests");
 
             [SkippableTheory]
             [MemberData(nameof(GetSource))]
@@ -361,8 +363,27 @@ namespace OpenKh.Tests.kh2
                 var eventStream = new MemoryStream(ResolveSource(source), false);
                 var eventEntries = Event.Read(eventStream);
                 Assert.NotNull(eventEntries);
-                var text = TreeStrucWriter.GetString(eventEntries);
-                Console.Write("");
+                var text = TreeWriter.Serialize(eventEntries);
+                SaveTextTo(source, text);
+                var treeOptions = new TreeOptions()
+                    .AddType("SetProject", typeof(SetProject))
+                    ;
+                //TreeWriter.Deserialize<List<Event.IEventEntry>>(text, treeOptions);
+            }
+
+            private void SaveTextTo(string source, string text)
+            {
+                source = source.Replace("\t", "\\");
+
+                if (source.StartsWith(SourceDir))
+                {
+                    source = source.Substring(SourceDir.Length);
+                }
+
+                source = Path.Combine(SaveDir, source.TrimStart('\\'));
+                Directory.CreateDirectory(Path.GetDirectoryName(source));
+
+                File.WriteAllText(source + ".txt", text);
             }
 
             private byte[] ResolveSource(string source)
@@ -393,7 +414,9 @@ namespace OpenKh.Tests.kh2
 
                 if (srcDir != null)
                 {
-                    foreach (var barFile in Directory.GetFiles(Path.Combine(srcDir, "ard"), "*.ard"))
+                    foreach (var barFile in new string[0]
+                        .Concat(Directory.GetFiles(Path.Combine(srcDir, "ard"), "*.ard"))
+                    )
                     {
                         foreach (var (barEntry, index) in File.OpenRead(barFile)
                             .Using(fs => Bar.Read(fs))

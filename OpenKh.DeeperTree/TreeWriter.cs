@@ -1,3 +1,4 @@
+using Antlr4.Runtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,10 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
+using static TreeScriptParser;
 
-namespace OpenKh.Common.TreeStruc
+namespace OpenKh.DeeperTree
 {
-    public class TreeStrucWriter
+    public class TreeWriter
     {
         private class Indenter
         {
@@ -28,11 +31,11 @@ namespace OpenKh.Common.TreeStruc
             public override string ToString() => new string(' ', 2 * _depth);
         }
 
-        public static string GetString(object any)
+        public static string Serialize(object any)
         {
             var writer = new StringWriter();
             var indenter = new Indenter();
-            GetString(writer, any, indenter);
+            Serialize(writer, any, indenter);
             return writer.ToString();
         }
 
@@ -141,7 +144,7 @@ namespace OpenKh.Common.TreeStruc
             }
         }
 
-        private static void GetString(TextWriter writer, object any, Indenter indenter)
+        private static void Serialize(TextWriter writer, object any, Indenter indenter)
         {
             if (any != null)
             {
@@ -155,8 +158,8 @@ namespace OpenKh.Common.TreeStruc
 
                 void WriteArray(SimpleCollectionCodec it, IEnumerable target)
                 {
-                    var values = string.Join(" ", target.Cast<object>().Select(it => GetValueToken(it)));
-                    writer.WriteLine($"{indenter}{it.nodeName} {values}");
+                    var values = string.Join(" ", target.Cast<object>().Select(one => GetValueToken(one)));
+                    writer.WriteLine($"{indenter}{it.nodeName} [ {values} ]");
                 }
 
                 void WriteObjects(ObjectCollectionCodec it, IEnumerable<object> target)
@@ -220,80 +223,28 @@ namespace OpenKh.Common.TreeStruc
                     writer.WriteLine($"{indenter}" + "}");
                 }
 
-                if (codec is SimpleCollectionCodec simpleCollectionCodec)
                 {
-                    WriteArray(simpleCollectionCodec, (IEnumerable<object>)any);
-                }
-                else if (codec is ObjectCollectionCodec objectCollectionCodec)
-                {
-                    WriteObjects(objectCollectionCodec, (IEnumerable<object>)any);
-                }
-                else if (codec is UnnamedObjectCollectionCodec unnamedObjectCollectionCodec)
-                {
-                    WriteUnnamedObjects(unnamedObjectCollectionCodec, (IEnumerable<object>)any);
-                }
-                else if (codec is ObjectCodec objectCodec)
-                {
-                    WriteObject(objectCodec, any);
-                }
-                else if (codec is EntryCodec entryCodec)
-                {
-                    WriteEntry(entryCodec, any);
-                }
-            }
-        }
-
-        private static void GetStringOld(TextWriter writer, object any, Indenter indenter)
-        {
-            if (any is ICollection items)
-            {
-                foreach (var item in items)
-                {
-                    GetString(writer, item, indenter);
-                }
-            }
-            else if (any != null)
-            {
-                var type = any.GetType();
-                writer.WriteLine($"{indenter}{type.Name} " + "{");
-                indenter.Enter();
-                foreach (var prop in type.GetProperties())
-                {
-                    var propValue = prop.GetValue(any);
-                    if (propValue != null)
+                    if (codec is SimpleCollectionCodec simpleCollectionCodec)
                     {
-                        if (propValue is ICollection)
-                        {
-                            var elementType = prop.PropertyType.GetInterfaces()
-                                .Where(type => type == typeof(ICollection<>))
-                                .Select(type => type.GetGenericArguments()[0])
-                                .FirstOrDefault()
-                                ?? (prop.PropertyType.IsArray
-                                    ? prop.PropertyType.GetElementType()
-                                    : null
-                                );
-
-                            if (IsValueTokenType(elementType))
-                            {
-                                writer.WriteLine($"{indenter}{prop.Name} {string.Join(" ", ((IEnumerable)propValue).Cast<object>().Select(it => GetValueToken(it)))}");
-                            }
-                            else
-                            {
-                                writer.WriteLine($"{indenter}{prop.Name} " + "{");
-                                indenter.Enter();
-                                GetString(writer, propValue, indenter);
-                                indenter.Leave();
-                                writer.WriteLine($"{indenter}" + "}");
-                            }
-                        }
-                        else
-                        {
-                            writer.WriteLine($"{indenter}{prop.Name} {GetValueToken(propValue)}");
-                        }
+                        WriteArray(simpleCollectionCodec, (IEnumerable<object>)any);
+                    }
+                    else if (codec is ObjectCollectionCodec objectCollectionCodec)
+                    {
+                        WriteObjects(objectCollectionCodec, (IEnumerable<object>)any);
+                    }
+                    else if (codec is UnnamedObjectCollectionCodec unnamedObjectCollectionCodec)
+                    {
+                        WriteUnnamedObjects(unnamedObjectCollectionCodec, (IEnumerable<object>)any);
+                    }
+                    else if (codec is ObjectCodec objectCodec)
+                    {
+                        WriteObject(objectCodec, any);
+                    }
+                    else if (codec is EntryCodec entryCodec)
+                    {
+                        WriteEntry(entryCodec, any);
                     }
                 }
-                indenter.Leave();
-                writer.WriteLine($"{indenter}" + "}");
             }
         }
 
@@ -324,5 +275,202 @@ namespace OpenKh.Common.TreeStruc
                 return text;
             }
         }
+
+        private static ICharStream FromString(string script, string sourceName)
+        {
+            var stream = CharStreams.fromString(script);
+            if (stream is CodePointCharStream charStream)
+            {
+                charStream.name = sourceName;
+            }
+            return stream;
+        }
+
+        private interface IStatementDeserializer
+        {
+            void Property(string name, string value);
+            IStatementDeserializer Block(string name);
+            object GetContainer();
+        }
+
+        private class NoopDeser : IStatementDeserializer
+        {
+            public IStatementDeserializer Block(string name) => this;
+
+            public object GetContainer() => throw new NotSupportedException();
+
+            public void Property(string name, string value) { }
+        }
+
+        private class ObjectDeser : IStatementDeserializer
+        {
+            private readonly DeserHelper _helper;
+            private readonly Type _targetType;
+            private readonly object _target;
+
+            public ObjectDeser(DeserHelper helper, object target)
+            {
+                _targetType = target.GetType();
+                _target = target;
+                _helper = helper;
+            }
+
+            public IStatementDeserializer Block(string name)
+            {
+                var prop = _targetType.GetProperty(name);
+                if (prop != null)
+                {
+                    var propType = prop.PropertyType;
+
+                    if (IsValueTokenType(propType))
+                    {
+                        throw new Exception("No scalar property for block");
+                    }
+                    else if (propType is ICollection)
+                    {
+                        var sub = new CollectionDeser(_helper);
+                        prop.SetValue(name, sub.GetContainer());
+                        return sub;
+                    }
+                    else
+                    {
+                        var sub = new ObjectDeser(_helper, null);
+                        prop.SetValue(name, sub.GetContainer());
+                        return sub;
+                    }
+                }
+
+                return new NoopDeser();
+            }
+
+            public object GetContainer()
+            {
+                return _target;
+            }
+
+            public void Property(string name, string value)
+            {
+                var prop = _targetType.GetProperty(name);
+                if (prop != null)
+                {
+                    prop.SetValue(_target, value);
+                }
+            }
+        }
+
+        private class CollectionDeser : IStatementDeserializer
+        {
+            private readonly DeserHelper _helper;
+            private readonly List<object> _items = new List<object>();
+
+            public CollectionDeser(DeserHelper helper)
+            {
+                _helper = helper;
+            }
+
+            public IStatementDeserializer Block(string name)
+            {
+                var target = _helper.CreateObject(name);
+                _items.Add(target);
+                return new ObjectDeser(_helper, null);
+            }
+
+            public object GetContainer()
+            {
+                return _items;
+            }
+
+            public void Property(string name, string value)
+            {
+                throw new Exception("Collection cannot declare property");
+            }
+        }
+
+        private class DeserHelper
+        {
+            private TreeOptions _options;
+
+            public DeserHelper(TreeOptions options)
+            {
+                _options = options;
+            }
+
+            public object CreateObject(string name)
+            {
+                if (_options.ObjectTypes.TryGetValue(name, out Type type))
+                {
+                    return type.InvokeMember(null, BindingFlags.CreateInstance, null, null, new object[0]);
+                }
+                else
+                {
+                    throw new Exception($"Object type {name} not registered");
+                }
+            }
+        }
+
+        private static void DeserializeCore(
+            StatementContext[] statements,
+            IStatementDeserializer statementDeserializer
+        )
+        {
+            foreach (var statement in statements)
+            {
+                if (statement.property() is PropertyContext propertyContext)
+                {
+                    statementDeserializer.Property(
+                        propertyContext.name.GetText(),
+                        propertyContext.value.GetText()
+                    );
+                }
+                else if (statement.block() is BlockContext blockContext)
+                {
+                    var subDes = statementDeserializer.Block(blockContext.name.GetText());
+                    DeserializeCore(
+                        blockContext.statement(),
+                        subDes
+                    );
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+            }
+        }
+
+        public static T Deserialize<T>(string body, TreeOptions options = null) where T : class
+        {
+            var stream = CharStreams.fromString(body);
+            var lexer = new TreeScriptLexer(stream);
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new TreeScriptParser(tokens);
+
+            if (parser.script() is ScriptContext scriptContext)
+            {
+                var deser = GetRootStatementDeser(typeof(T), new DeserHelper(options));
+                DeserializeCore(scriptContext.statement(), deser);
+                return (T)deser.GetContainer();
+            }
+
+            return null;
+        }
+
+        private static IStatementDeserializer GetRootStatementDeser(Type type, DeserHelper helper)
+        {
+            if (IsValueTokenType(type))
+            {
+                throw new Exception("No scalar type here");
+            }
+
+            var isCollection = typeof(ICollection).IsAssignableFrom(type);
+            if (isCollection)
+            {
+                return new CollectionDeser(helper);
+            }
+            else
+            {
+                return new ObjectDeser(helper, null);
+            }
+        }
+
     }
 }
