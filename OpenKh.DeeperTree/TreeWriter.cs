@@ -289,17 +289,58 @@ namespace OpenKh.DeeperTree
         private interface IStatementDeserializer
         {
             void Property(string name, string value);
-            IStatementDeserializer Block(string name);
+            (IStatementDeserializer, Action) Block(string name);
             object GetContainer();
         }
 
         private class NoopDeser : IStatementDeserializer
         {
-            public IStatementDeserializer Block(string name) => this;
+            public (IStatementDeserializer, Action) Block(string name) => (this, () => { });
 
             public object GetContainer() => throw new NotSupportedException();
 
             public void Property(string name, string value) { }
+        }
+
+        private class ObjectParentDeser : IStatementDeserializer
+        {
+            private bool _set = false;
+            private readonly DeserHelper _helper;
+            private readonly Action<object> _setValue;
+
+            public ObjectParentDeser(DeserHelper helper, Action<object> setValue)
+            {
+                _helper = helper;
+                _setValue = setValue;
+            }
+
+            public (IStatementDeserializer, Action) Block(string name)
+            {
+                if (_set)
+                {
+                    throw new Exception("Object block must contain only single block");
+                }
+                else
+                {
+                    _set = true;
+                }
+
+                var target = _helper.CreateObject(name);
+                _setValue(target);
+                return (
+                    new ObjectDeser(_helper, target, target.GetType()), () => { }
+                );
+            }
+
+            public object GetContainer()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Property(string name, string value)
+            {
+                throw new Exception("Object block must contain only single block");
+            }
         }
 
         private class ObjectDeser : IStatementDeserializer
@@ -308,14 +349,14 @@ namespace OpenKh.DeeperTree
             private readonly Type _targetType;
             private readonly object _target;
 
-            public ObjectDeser(DeserHelper helper, object target)
+            public ObjectDeser(DeserHelper helper, object target, Type targetType)
             {
-                _targetType = target.GetType();
+                _targetType = targetType;
                 _target = target;
                 _helper = helper;
             }
 
-            public IStatementDeserializer Block(string name)
+            public (IStatementDeserializer, Action) Block(string name)
             {
                 var prop = _targetType.GetProperty(name);
                 if (prop != null)
@@ -326,21 +367,24 @@ namespace OpenKh.DeeperTree
                     {
                         throw new Exception("No scalar property for block");
                     }
-                    else if (propType is ICollection)
+                    else if (typeof(ICollection).IsAssignableFrom(propType))
                     {
-                        var sub = new CollectionDeser(_helper);
-                        prop.SetValue(name, sub.GetContainer());
-                        return sub;
+                        var sub = new CollectionDeser(_helper, propType);
+                        return (
+                            sub, () => prop.SetValue(_target, sub.GetContainer())
+                        );
                     }
                     else
                     {
-                        var sub = new ObjectDeser(_helper, null);
-                        prop.SetValue(name, sub.GetContainer());
-                        return sub;
+                        return (
+                            new ObjectParentDeser(_helper, value => prop.SetValue(name, value)), () => { }
+                        );
                     }
                 }
 
-                return new NoopDeser();
+                return (
+                    new NoopDeser(), () => { }
+                );
             }
 
             public object GetContainer()
@@ -353,31 +397,68 @@ namespace OpenKh.DeeperTree
                 var prop = _targetType.GetProperty(name);
                 if (prop != null)
                 {
-                    prop.SetValue(_target, value);
+                    prop.SetValue(_target, ConvertHelper.ChangeType(value, prop.PropertyType));
                 }
+            }
+        }
+
+        private static class ConvertHelper
+        {
+            internal static object ChangeType(string value, Type type)
+            {
+                if (type.IsEnum && value is string text)
+                {
+                    return Enum.Parse(type, text);
+                }
+                return Convert.ChangeType(value, type);
             }
         }
 
         private class CollectionDeser : IStatementDeserializer
         {
             private readonly DeserHelper _helper;
+            private readonly Type _type;
             private readonly List<object> _items = new List<object>();
 
-            public CollectionDeser(DeserHelper helper)
+            public CollectionDeser(DeserHelper helper, Type type)
             {
                 _helper = helper;
+                _type = type;
             }
 
-            public IStatementDeserializer Block(string name)
+            public (IStatementDeserializer, Action) Block(string name)
             {
                 var target = _helper.CreateObject(name);
                 _items.Add(target);
-                return new ObjectDeser(_helper, null);
+                return (
+                    new ObjectDeser(_helper, target, target.GetType()),
+                    () => { }
+                );
             }
 
             public object GetContainer()
             {
-                return _items;
+                if (_type.IsArray)
+                {
+                    return _items.ToArray();
+                }
+                else
+                {
+                    var elementType = _type.GetInterfaces()
+                        .Single(it => it.IsGenericType && it.GetGenericTypeDefinition() == typeof(IList<>))
+                        .GetGenericArguments()
+                        .First();
+
+                    var list = Activator.CreateInstance(
+                        typeof(List<>).MakeGenericType(elementType)
+                    );
+                    foreach (var item in _items)
+                    {
+                        ((IList)list).Add(item);
+                    }
+
+                    return list;
+                }
             }
 
             public void Property(string name, string value)
@@ -395,15 +476,17 @@ namespace OpenKh.DeeperTree
                 _options = options;
             }
 
+            public object CreateObject(Type type) => Activator.CreateInstance(type);
+
             public object CreateObject(string name)
             {
                 if (_options.ObjectTypes.TryGetValue(name, out Type type))
                 {
-                    return type.InvokeMember(null, BindingFlags.CreateInstance, null, null, new object[0]);
+                    return CreateObject(type);
                 }
                 else
                 {
-                    throw new Exception($"Object type {name} not registered");
+                    throw new Exception($"Call `treeOptions.AddType(\"{name}\", typeof({name}))`");
                 }
             }
         }
@@ -424,15 +507,16 @@ namespace OpenKh.DeeperTree
                 }
                 else if (statement.block() is BlockContext blockContext)
                 {
-                    var subDes = statementDeserializer.Block(blockContext.name.GetText());
+                    var (subDes, onExit) = statementDeserializer.Block(blockContext.name.GetText());
                     DeserializeCore(
                         blockContext.statement(),
                         subDes
                     );
+                    onExit();
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    // only new line
                 }
             }
         }
@@ -464,11 +548,12 @@ namespace OpenKh.DeeperTree
             var isCollection = typeof(ICollection).IsAssignableFrom(type);
             if (isCollection)
             {
-                return new CollectionDeser(helper);
+                return new CollectionDeser(helper, type);
             }
             else
             {
-                return new ObjectDeser(helper, null);
+                var obj = helper.CreateObject(type);
+                return new ObjectDeser(helper, obj, type);
             }
         }
 
