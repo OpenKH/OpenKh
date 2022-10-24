@@ -123,6 +123,8 @@ namespace OpenKh.Tools.Kh2MapStudio
         public SpawnScriptModel SpawnScriptBattle { get; private set; }
         public SpawnScriptModel SpawnScriptEvent { get; private set; }
 
+        public List<EventScriptModel> EventScripts { get; private set; }
+
         public MapRenderer(ContentManager content, xna.GraphicsDeviceManager graphics)
         {
             _graphicsManager = graphics;
@@ -212,6 +214,18 @@ namespace OpenKh.Tools.Kh2MapStudio
             SpawnScriptMap = SpawnScriptModel.Create(ArdBarEntries, "map");
             SpawnScriptBattle = SpawnScriptModel.Create(ArdBarEntries, "btl");
             SpawnScriptEvent = SpawnScriptModel.Create(ArdBarEntries, "evt");
+
+            EventScripts = ArdBarEntries
+                .Where(x => x.Type == Bar.EntryType.Event)
+                .Select(
+                    x => {
+                        return new EventScriptModel(
+                            x.Name, 
+                            Event.Read(x.Stream)
+                        );
+                    }
+                )
+                .ToList();
         }
 
         public void SaveArd(string fileName)
@@ -232,6 +246,19 @@ namespace OpenKh.Tools.Kh2MapStudio
             SpawnScriptMap?.SaveToBar(ArdBarEntries);
             SpawnScriptBattle?.SaveToBar(ArdBarEntries);
             SpawnScriptEvent?.SaveToBar(ArdBarEntries);
+
+            foreach (var eventScript in EventScripts)
+            {
+                var memStream = new MemoryStream();
+                Event.Write(memStream, eventScript.EventEntries);
+
+                ArdBarEntries.AddOrReplace(new Bar.Entry
+                {
+                    Name = eventScript.Name,
+                    Type = Bar.EntryType.Event,
+                    Stream = memStream
+                });
+            }
 
             File.Create(fileName).Using(stream => Bar.Write(stream, ArdBarEntries));
         }

@@ -150,6 +150,14 @@ namespace OpenKh.Tools.Kh2MapStudio
                     SpawnScriptWindow.Run("btl", _mapRenderer.SpawnScriptBattle);
                 if (EditorSettings.ViewSpawnScriptEvent)
                     SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
+
+                if (_mapRenderer.EventScripts != null)
+                {
+                    foreach (var eventScript in _mapRenderer.EventScripts)
+                    {
+                        EventScriptWindow.Run(eventScript.Name, eventScript);
+                    }
+                }
             });
 
             ImGui.PopStyleColor();
