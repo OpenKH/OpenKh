@@ -116,7 +116,7 @@ namespace OpenKh.DeeperTree
                     else
                     {
                         return (
-                            new ObjectParentDeserializer(_helper, value => prop.SetValue(name, value)), () => { }
+                            new ObjectParentDeserializer(_helper, value => prop.SetValue(_target, value)), () => { }
                         );
                     }
                 }

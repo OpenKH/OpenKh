@@ -216,7 +216,12 @@ namespace OpenKh.DeeperTree
                             }
                             else if (subCodec is ObjectCodec objectCodec)
                             {
+                                writer.WriteLine($"{indenter}{pair.Key}");
+                                writer.WriteLine($"{indenter}" + "{");
+                                indenter.Enter();
                                 WriteObject(objectCodec, propValue);
+                                indenter.Leave();
+                                writer.WriteLine($"{indenter}" + "}");
                             }
                             else if (subCodec is EntryCodec entryCodec)
                             {
@@ -256,7 +261,7 @@ namespace OpenKh.DeeperTree
         private static string GetStringLiteral(object any)
         {
             var text = "" + any;
-            if (text.IndexOfAny(new char[] { ' ', '\t', '"', '[', ']', '{', '}', '\\' }) != -1)
+            if (text.Length == 0 || text.IndexOfAny(new char[] { ' ', '\t', '"', '[', ']', '{', '}', '\\' }) != -1)
             {
                 return "\"" + text.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "\\r").Replace("\n", "\\n") + "\"";
             }
