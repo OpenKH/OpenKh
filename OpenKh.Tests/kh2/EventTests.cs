@@ -9,7 +9,6 @@ using System.Linq;
 using Xunit;
 using Xunit.Sdk;
 using static OpenKh.Kh2.Ard.Event;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace OpenKh.Tests.kh2
 {
@@ -168,23 +167,23 @@ namespace OpenKh.Tests.kh2
             AssertEvent(new Event.SplinePoint
             {
                 Id = 123,
-                UnkG = 456,
-                UnkH = 789,
-                Entries = new List<Event.SplinePoint.Entry>()
+                Type = 456,
+                SplineLng = 789,
+                Points = new List<Event.SplinePoint.Point>()
                 {
-                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
-                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
-                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
-                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
-                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
-                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
-                    Helpers.CreateDummyObject<Event.SplinePoint.Entry>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
                 }
             });
 
         [Fact]
         public void ParseEntryUnk1F() =>
-            AssertEvent<Event.Unk1F>();
+            AssertEvent<Event.SeqSpline>();
 
         [Fact]
         public void ParseSeqGameSpeed() =>
@@ -192,7 +191,7 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ParseEntryUnk22() =>
-            AssertEvent<Event.EntryUnk22>();
+            AssertEvent<Event.WideMask>();
 
         [Fact]
         public void ParseSeqVoices() =>
@@ -244,7 +243,7 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ParseEntryUnk2A() =>
-            AssertEvent<Event.EntryUnk2A>();
+            AssertEvent<Event.SeData>();
 
         [Fact]
         public void ParseSeqPlayAudio() =>
@@ -272,7 +271,7 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ParseEntryUnk36() =>
-            AssertEvent<Event.EntryUnk36>();
+            AssertEvent<Event.Lookat>();
 
         [Fact]
         public void ParseReadActor() =>
@@ -300,11 +299,11 @@ namespace OpenKh.Tests.kh2
 
         [Fact]
         public void ParseUnk42() =>
-            AssertEvent<Event.Unk42>();
+            AssertEvent<Event.SeqBgse>();
 
         [Fact]
         public void ParseEntryUnk47() =>
-            AssertEvent<Event.EntryUnk47>();
+            AssertEvent<Event.SeqPosMove>();
 
         [Fact]
         public void ParseHideObject() =>
@@ -388,36 +387,57 @@ namespace OpenKh.Tests.kh2
                 .AddType(nameof(SeqIk), typeof(SeqIk))
                 .AddType(nameof(SplineDataEnc), typeof(SplineDataEnc))
                 .AddType(nameof(SplinePoint), typeof(SplinePoint))
-                .AddType(nameof(Unk1F), typeof(Unk1F))
+                .AddType(nameof(SeqSpline), typeof(SeqSpline))
                 .AddType(nameof(SeqGameSpeed), typeof(SeqGameSpeed))
-                .AddType(nameof(EntryUnk22), typeof(EntryUnk22))
+                .AddType(nameof(WideMask), typeof(WideMask))
                 .AddType(nameof(SeqVoices), typeof(SeqVoices))
                 .AddType(nameof(ReadAssets), typeof(ReadAssets))
                 .AddType(nameof(ReadMotion), typeof(ReadMotion))
                 .AddType(nameof(ReadAudio), typeof(ReadAudio))
                 .AddType(nameof(SetShake), typeof(SetShake))
-                .AddType(nameof(EntryUnk29), typeof(EntryUnk29))
-                .AddType(nameof(EntryUnk2A), typeof(EntryUnk2A))
+                .AddType(nameof(Turn), typeof(Turn))
+                .AddType(nameof(SeData), typeof(SeData))
                 .AddType(nameof(SeqPlayAudio), typeof(SeqPlayAudio))
                 .AddType(nameof(SeqPlayAnimation), typeof(SeqPlayAnimation))
                 .AddType(nameof(SeqDialog), typeof(SeqDialog))
                 .AddType(nameof(SeqPlayBgm), typeof(SeqPlayBgm))
                 .AddType(nameof(ReadBgm), typeof(ReadBgm))
                 .AddType(nameof(SetBgm), typeof(SetBgm))
-                .AddType(nameof(EntryUnk36), typeof(EntryUnk36))
+                .AddType(nameof(Lookat), typeof(Lookat))
                 .AddType(nameof(ReadActor), typeof(ReadActor))
                 .AddType(nameof(ReadEffect), typeof(ReadEffect))
                 .AddType(nameof(SeqLayout), typeof(SeqLayout))
                 .AddType(nameof(ReadLayout), typeof(ReadLayout))
                 .AddType(nameof(StopEffect), typeof(StopEffect))
-                .AddType(nameof(Unk42), typeof(Unk42))
+                .AddType(nameof(SeqBgse), typeof(SeqBgse))
                 .AddType(nameof(RunMovie), typeof(RunMovie))
-                .AddType(nameof(EntryUnk47), typeof(EntryUnk47))
+                .AddType(nameof(SeqPosMove), typeof(SeqPosMove))
                 .AddType(nameof(SeqHideObject), typeof(SeqHideObject))
+                .AddType(nameof(VibData), typeof(VibData))
+                .AddType(nameof(ShadowAlpha), typeof(ShadowAlpha))
+                .AddType(nameof(BlackFog), typeof(BlackFog))
+                .AddType(nameof(SeqMirror), typeof(SeqMirror))
+                .AddType(nameof(Scale), typeof(Scale))
+                .AddType(nameof(CacheClear), typeof(CacheClear))
+                .AddType(nameof(TexFade), typeof(TexFade))
+                .AddType(nameof(Light), typeof(Light))
+                .AddType(nameof(SeqMob), typeof(SeqMob))
+                .AddType(nameof(Fog), typeof(Fog))
+                .AddType(nameof(SkyOff), typeof(SkyOff))
+                .AddType(nameof(MusicalHeader), typeof(MusicalHeader))
+                .AddType(nameof(MusicalScene), typeof(MusicalScene))
+                .AddType(nameof(MusicalTarget), typeof(MusicalTarget))
+                .AddType(nameof(Tag), typeof(Tag))
+                .AddType(nameof(PlayerOffsetCamera), typeof(PlayerOffsetCamera))
+                .AddType(nameof(SeqCameraCollision), typeof(SeqCameraCollision))
+                .AddType(nameof(VoiceAllFadeout), typeof(VoiceAllFadeout))
+                .AddType(nameof(WallClip), typeof(WallClip))
+                .AddType(nameof(SeqGlow), typeof(SeqGlow))
 
                 .AddType("Voice", typeof(SeqVoices.Voice))
                 .AddType("CameraKeys", typeof(CameraKeys))
-                .AddType("Entry", typeof(SplinePoint.Entry))
+                .AddType("Point", typeof(SplinePoint.Point))
+                .AddType("Data", typeof(Light.Data))
                 .Build();
 
             private static string SourceDir => Environment.GetEnvironmentVariable("KH2FM_EXTRACTION_DIR");

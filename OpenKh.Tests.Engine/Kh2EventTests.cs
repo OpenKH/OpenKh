@@ -383,7 +383,7 @@ namespace OpenKh.Tests.Engine
                             ObjectId = 123,
                             ActorId = ActorId,
                             Name = MotionPath,
-                            UnknownIndex = 1,
+                            DeleteFlag = 1,
                         },
                     }
                 },

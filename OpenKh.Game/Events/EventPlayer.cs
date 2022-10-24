@@ -63,7 +63,7 @@ namespace OpenKh.Game.Events
                                     _field.SetActorAnimation(
                                         item.ActorId,
                                         GetAnmPath(item.ActorId, item.Name));
-                                    _field.SetActorVisibility(item.ActorId, item.UnknownIndex == 0);
+                                    _field.SetActorVisibility(item.ActorId, item.DeleteFlag == 0);
                                     break;
                             }
                         }
