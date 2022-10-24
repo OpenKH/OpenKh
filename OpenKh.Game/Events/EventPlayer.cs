@@ -199,8 +199,8 @@ namespace OpenKh.Game.Events
 
         private static double GetCameraValue(
             double time,
-            IList<SetCameraData.CameraKeys> keyFrames,
-            SetCameraData.CameraKeys prevKey)
+            IList<CameraKeys> keyFrames,
+            CameraKeys prevKey)
         {
             if (keyFrames.Count == 0)
                 return 0.0;
@@ -263,8 +263,8 @@ namespace OpenKh.Game.Events
         private static double InterpolateCamera(
             int keyFrameIndex,
             double time,
-            IList<SetCameraData.CameraKeys> keyFrames,
-            SetCameraData.CameraKeys prevKey)
+            IList<CameraKeys> keyFrames,
+            CameraKeys prevKey)
         {
             const double N = 1.0 / 512.0;
             var curKeyFrame = keyFrames[keyFrameIndex];
