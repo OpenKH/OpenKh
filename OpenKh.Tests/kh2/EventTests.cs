@@ -9,6 +9,7 @@ using System.Linq;
 using Xunit;
 using Xunit.Sdk;
 using static OpenKh.Kh2.Ard.Event;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace OpenKh.Tests.kh2
 {
@@ -432,6 +433,39 @@ namespace OpenKh.Tests.kh2
                 var text = _treeWriter.Serialize(eventEntries);
                 SaveTextTo(source, text);
                 var reversed = _treeReader.Deserialize<List<Event.IEventEntry>>(text);
+            }
+
+            [Fact]
+            public void NonQuotedStringTests()
+            {
+                Assert.Equal(
+                    expected: "123_456/abc.def",
+                    actual: _treeReader.Deserialize<SetProject>("Name 123_456/abc.def").Name
+                );
+            }
+
+            [Fact]
+            public void QuotedStringTests()
+            {
+                Assert.Equal(
+                    expected: "123\r\n\t456\\789",
+                    actual: _treeReader.Deserialize<SetProject>("Name \"123\\r\\n\\t456\\\\789\"").Name
+                );
+
+                Assert.Equal(
+                    expected: "123 456  789",
+                    actual: _treeReader.Deserialize<SetProject>("Name \"123 456  789\"").Name
+                );
+
+                Assert.Equal(
+                    expected: "abc\ndef",
+                    actual: _treeReader.Deserialize<SetProject>("Name \"abc\\\ndef\"").Name
+                );
+
+                Assert.Equal(
+                    expected: "abc\r\ndef",
+                    actual: _treeReader.Deserialize<SetProject>("Name \"abc\\\r\ndef\"").Name
+                );
             }
 
             private void SaveTextTo(string source, string text)

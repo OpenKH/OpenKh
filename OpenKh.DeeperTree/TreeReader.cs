@@ -269,9 +269,14 @@ namespace OpenKh.DeeperTree
             {
                 if (statement.property() is PropertyContext propertyContext)
                 {
+                    var bare = propertyContext.value.Bare();
+                    var quoted = propertyContext.value.Quoted();
+
                     statementDeserializer.Property(
                         propertyContext.name.GetText(),
-                        propertyContext.value.GetText()
+                        (bare != null)
+                            ? bare.GetText() 
+                            : Unquote(quoted.GetText())
                     );
                 }
                 else if (statement.array() is ArrayContext arrayContext)
@@ -297,6 +302,44 @@ namespace OpenKh.DeeperTree
                     // empty line
                 }
             }
+        }
+
+        private static string Unquote(string body)
+        {
+            var stream = CharStreams.fromString(body);
+            var lexer = new Quoted(stream);
+            var text = "";
+            while (true)
+            {
+                var token = lexer.NextToken();
+                if (token.Type == -1)
+                {
+                    //<EOF>
+                    break;
+                }
+                switch (token.Type)
+                {
+                    case Quoted.NL:
+                        text += token.Text.Substring(1);
+                        break;
+                    case Quoted.Cr:
+                        text += "\r";
+                        break;
+                    case Quoted.Lf:
+                        text += "\n";
+                        break;
+                    case Quoted.Tab:
+                        text += "\t";
+                        break;
+                    case Quoted.EscapedChar:
+                        text += token.Text.Substring(1);
+                        break;
+                    case Quoted.AnyChar:
+                        text += token.Text;
+                        break;
+                }
+            }
+            return text;
         }
 
         public T Deserialize<T>(string body) where T : class

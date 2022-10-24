@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from TreeScript.g4 by ANTLR 4.11.1
+// Generated from Quoted.g4 by ANTLR 4.11.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -29,38 +29,40 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.11.1")]
 [System.CLSCompliant(false)]
-public partial class TreeScriptLexer : Lexer {
+public partial class Quoted : Lexer {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
-		T__0=1, T__1=2, T__2=3, T__3=4, Bare=5, Quoted=6, WS=7, NL=8, LINE_COMMENT=9;
+		Start=1, End=2, NL=3, Cr=4, Lf=5, Tab=6, EscapedChar=7, AnyChar=8;
+	public const int
+		QUOTE=1;
 	public static string[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
 
 	public static string[] modeNames = {
-		"DEFAULT_MODE"
+		"DEFAULT_MODE", "QUOTE"
 	};
 
 	public static readonly string[] ruleNames = {
-		"T__0", "T__1", "T__2", "T__3", "Bare", "Quoted", "WS", "NL", "LINE_COMMENT"
+		"Start", "End", "NL", "Cr", "Lf", "Tab", "EscapedChar", "AnyChar"
 	};
 
 
-	public TreeScriptLexer(ICharStream input)
+	public Quoted(ICharStream input)
 	: this(input, Console.Out, Console.Error) { }
 
-	public TreeScriptLexer(ICharStream input, TextWriter output, TextWriter errorOutput)
+	public Quoted(ICharStream input, TextWriter output, TextWriter errorOutput)
 	: base(input, output, errorOutput)
 	{
 		Interpreter = new LexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}
 
 	private static readonly string[] _LiteralNames = {
-		null, "'['", "']'", "'{'", "'}'"
+		null, null, null, null, "'\\r'", "'\\n'", "'\\t'"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, null, null, null, null, "Bare", "Quoted", "WS", "NL", "LINE_COMMENT"
+		null, "Start", "End", "NL", "Cr", "Lf", "Tab", "EscapedChar", "AnyChar"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -73,7 +75,7 @@ public partial class TreeScriptLexer : Lexer {
 		}
 	}
 
-	public override string GrammarFileName { get { return "TreeScript.g4"; } }
+	public override string GrammarFileName { get { return "Quoted.g4"; } }
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
@@ -83,33 +85,27 @@ public partial class TreeScriptLexer : Lexer {
 
 	public override int[] SerializedAtn { get { return _serializedATN; } }
 
-	static TreeScriptLexer() {
+	static Quoted() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
 		for (int i = 0; i < _ATN.NumberOfDecisions; i++) {
 			decisionToDFA[i] = new DFA(_ATN.GetDecisionState(i), i);
 		}
 	}
 	private static int[] _serializedATN = {
-		4,0,9,63,6,-1,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,
-		2,7,7,7,2,8,7,8,1,0,1,0,1,1,1,1,1,2,1,2,1,3,1,3,1,4,4,4,29,8,4,11,4,12,
-		4,30,1,5,1,5,1,5,1,5,1,5,1,5,5,5,39,8,5,10,5,12,5,42,9,5,1,5,1,5,1,6,1,
-		6,1,6,1,6,1,7,1,7,1,7,3,7,53,8,7,1,8,1,8,5,8,57,8,8,10,8,12,8,60,9,8,1,
-		8,1,8,0,0,9,1,1,3,2,5,3,7,4,9,5,11,6,13,7,15,8,17,9,1,0,4,8,0,10,10,13,
-		13,32,32,34,34,91,91,93,93,123,123,125,125,1,0,34,34,2,0,9,9,32,32,2,0,
-		10,10,13,13,68,0,1,1,0,0,0,0,3,1,0,0,0,0,5,1,0,0,0,0,7,1,0,0,0,0,9,1,0,
-		0,0,0,11,1,0,0,0,0,13,1,0,0,0,0,15,1,0,0,0,0,17,1,0,0,0,1,19,1,0,0,0,3,
-		21,1,0,0,0,5,23,1,0,0,0,7,25,1,0,0,0,9,28,1,0,0,0,11,32,1,0,0,0,13,45,
-		1,0,0,0,15,52,1,0,0,0,17,54,1,0,0,0,19,20,5,91,0,0,20,2,1,0,0,0,21,22,
-		5,93,0,0,22,4,1,0,0,0,23,24,5,123,0,0,24,6,1,0,0,0,25,26,5,125,0,0,26,
-		8,1,0,0,0,27,29,8,0,0,0,28,27,1,0,0,0,29,30,1,0,0,0,30,28,1,0,0,0,30,31,
-		1,0,0,0,31,10,1,0,0,0,32,40,5,34,0,0,33,34,5,92,0,0,34,39,3,15,7,0,35,
-		36,5,92,0,0,36,39,9,0,0,0,37,39,8,1,0,0,38,33,1,0,0,0,38,35,1,0,0,0,38,
-		37,1,0,0,0,39,42,1,0,0,0,40,38,1,0,0,0,40,41,1,0,0,0,41,43,1,0,0,0,42,
-		40,1,0,0,0,43,44,5,34,0,0,44,12,1,0,0,0,45,46,7,2,0,0,46,47,1,0,0,0,47,
-		48,6,6,0,0,48,14,1,0,0,0,49,50,5,13,0,0,50,53,5,10,0,0,51,53,7,3,0,0,52,
-		49,1,0,0,0,52,51,1,0,0,0,53,16,1,0,0,0,54,58,5,59,0,0,55,57,8,3,0,0,56,
-		55,1,0,0,0,57,60,1,0,0,0,58,56,1,0,0,0,58,59,1,0,0,0,59,61,1,0,0,0,60,
-		58,1,0,0,0,61,62,6,8,0,0,62,18,1,0,0,0,6,0,30,38,40,52,58,1,6,0,0
+		4,0,8,48,6,-1,6,-1,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,
+		7,6,2,7,7,7,1,0,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,2,1,2,1,2,1,2,3,
+		2,33,8,2,1,3,1,3,1,3,1,4,1,4,1,4,1,5,1,5,1,5,1,6,1,6,1,6,1,7,1,7,0,0,8,
+		2,1,4,2,6,3,8,4,10,5,12,6,14,7,16,8,2,0,1,1,2,0,10,10,13,13,47,0,2,1,0,
+		0,0,1,4,1,0,0,0,1,6,1,0,0,0,1,8,1,0,0,0,1,10,1,0,0,0,1,12,1,0,0,0,1,14,
+		1,0,0,0,1,16,1,0,0,0,2,18,1,0,0,0,4,23,1,0,0,0,6,28,1,0,0,0,8,34,1,0,0,
+		0,10,37,1,0,0,0,12,40,1,0,0,0,14,43,1,0,0,0,16,46,1,0,0,0,18,19,5,34,0,
+		0,19,20,1,0,0,0,20,21,6,0,0,0,21,22,6,0,1,0,22,3,1,0,0,0,23,24,5,34,0,
+		0,24,25,1,0,0,0,25,26,6,1,0,0,26,27,6,1,2,0,27,5,1,0,0,0,28,32,5,92,0,
+		0,29,30,5,13,0,0,30,33,5,10,0,0,31,33,7,0,0,0,32,29,1,0,0,0,32,31,1,0,
+		0,0,33,7,1,0,0,0,34,35,5,92,0,0,35,36,5,114,0,0,36,9,1,0,0,0,37,38,5,92,
+		0,0,38,39,5,110,0,0,39,11,1,0,0,0,40,41,5,92,0,0,41,42,5,116,0,0,42,13,
+		1,0,0,0,43,44,5,92,0,0,44,45,3,16,7,0,45,15,1,0,0,0,46,47,9,0,0,0,47,17,
+		1,0,0,0,3,0,1,32,3,6,0,0,5,1,0,4,0,0
 	};
 
 	public static readonly ATN _ATN =

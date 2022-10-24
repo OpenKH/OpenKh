@@ -256,9 +256,9 @@ namespace OpenKh.DeeperTree
         private static string GetStringLiteral(object any)
         {
             var text = "" + any;
-            if (text.IndexOfAny(new char[] { '"', '[', ']', '{', '}', ' ', '\t', '\\' }) != -1)
+            if (text.IndexOfAny(new char[] { ' ', '\t', '"', '[', ']', '{', '}', '\\' }) != -1)
             {
-                return "\"" + text.Replace("\"", "\"\"") + "\"";
+                return "\"" + text.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "\\r").Replace("\n", "\\n") + "\"";
             }
             else
             {

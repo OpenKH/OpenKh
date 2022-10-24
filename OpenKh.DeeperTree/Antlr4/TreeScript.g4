@@ -11,7 +11,7 @@ element: token;
 token: Bare | Quoted;
 
 Bare: ~[ \r\n"{}\u005b\u005d]+;
-Quoted: '"' ~["]* '"';
+Quoted: '"' ('\\' NL | '\\' . | ~["])* '"';
 
 WS: [ \t] -> skip;
 NL: '\r\n' | '\n' | '\r';

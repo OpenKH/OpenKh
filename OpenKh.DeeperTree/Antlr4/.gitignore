@@ -1,5 +1,3 @@
-/TreeScript.interp
-/TreeScript.tokens
-/TreeScriptLexer.interp
-/TreeScriptLexer.tokens
+/*.interp
+/*.tokens
 /.antlr

@@ -1,10 +1,1 @@
-a [ a 
-b
- ]
-
-
-k v
-
-block {
-
-}
+SetProject { Name 123_456/abc.def }
