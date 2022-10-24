@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using Xunit;
 using Xunit.Sdk;
 using static OpenKh.Kh2.Ard.Event;
@@ -31,8 +32,16 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SetMap>();
 
         [Fact]
+        public void ParseCameraData() =>
+            AssertEvent<Event.CameraData>();
+
+        [Fact]
         public void ParseSeqCamera() =>
             AssertEvent<Event.SeqCamera>();
+
+        [Fact]
+        public void ParseEffectData() =>
+            AssertEvent<Event.EffectData>();
 
         [Fact]
         public void ParseSetEndFrame() =>
@@ -47,11 +56,15 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.AttachEffect>();
 
         [Fact]
-        public void ParseUnk0C() =>
+        public void ParseSeqKage() =>
+            AssertEvent<Event.SeqKage>();
+
+        [Fact]
+        public void ParseSeqBgcol() =>
             AssertEvent<Event.SeqBgcol>();
 
         [Fact]
-        public void ParseUnk0D() =>
+        public void ParseSeqPart() =>
             AssertEvent(new Event.SeqPart
             {
                 StartFrame = 123,
@@ -63,7 +76,7 @@ namespace OpenKh.Tests.kh2
             });
 
         [Fact]
-        public void ParseUnk0E() =>
+        public void ParseSeqAlpha() =>
             AssertEvent<Event.SeqAlpha>();
 
         [Fact]
@@ -73,6 +86,10 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ParseEventStart() =>
             AssertEvent<Event.EventStart>();
+
+        [Fact]
+        public void ParseJumpEvent() =>
+            AssertEvent<Event.JumpEvent>();
 
         [Fact]
         public void ParseSeqFade() =>
@@ -135,15 +152,15 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SeqSubtitle>();
 
         [Fact]
-        public void ParseEntryUnk16() =>
+        public void ParseBgGrupe() =>
             AssertEvent<Event.BgGrupe>();
 
         [Fact]
-        public void ParseEntryUnk17() =>
+        public void ParseSeqBlur() =>
             AssertEvent<Event.SeqBlur>();
 
         [Fact]
-        public void ParseEntryUnk18() =>
+        public void ParseSeqFocus() =>
             AssertEvent<Event.SeqFocus>();
 
         [Fact]
@@ -151,7 +168,7 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SeqTextureAnim>();
 
         [Fact]
-        public void ParseEntryUnk1A() =>
+        public void ParseSeqActorLeave() =>
             AssertEvent<Event.SeqActorLeave>();
 
         [Fact]
@@ -159,11 +176,32 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SeqCrossFade>();
 
         [Fact]
-        public void ParseEntryUnk1D() =>
-            AssertEvent<Event.SplineDataEnc>();
+        public void ParseSeqIk() =>
+            AssertEvent<Event.SeqIk>();
 
         [Fact]
-        public void ParseEntryUnk1E() =>
+        public void ParseSplineDataEnc() =>
+            AssertEvent<Event.SplineDataEnc>(
+                new SplineDataEnc
+                {
+                    PutId = 123,
+                    TransOfs = 789,
+                    Keys = new List<CameraKeys>()
+                    {
+                        new Event.CameraKeys
+                        {
+                            Interpolation = Kh2.Motion.Interpolation.Nearest,
+                            KeyFrame = 32767,
+                            Value = 11,
+                            TangentEaseIn = 33,
+                            TangentEaseOut = 44
+                        },
+                    },
+                }
+            );
+
+        [Fact]
+        public void ParseSplinePoint() =>
             AssertEvent(new Event.SplinePoint
             {
                 Id = 123,
@@ -182,7 +220,7 @@ namespace OpenKh.Tests.kh2
             });
 
         [Fact]
-        public void ParseEntryUnk1F() =>
+        public void ParseSeqSpline() =>
             AssertEvent<Event.SeqSpline>();
 
         [Fact]
@@ -190,7 +228,11 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SeqGameSpeed>();
 
         [Fact]
-        public void ParseEntryUnk22() =>
+        public void ParseTexFade() =>
+            AssertEvent<Event.TexFade>();
+
+        [Fact]
+        public void ParseWideMask() =>
             AssertEvent<Event.WideMask>();
 
         [Fact]
@@ -242,7 +284,15 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SetShake>();
 
         [Fact]
-        public void ParseEntryUnk2A() =>
+        public void ParseScale() =>
+            AssertEvent<Event.Scale>();
+
+        [Fact]
+        public void ParseTurn() =>
+            AssertEvent<Event.Turn>();
+
+        [Fact]
+        public void ParseSeData() =>
             AssertEvent<Event.SeData>();
 
         [Fact]
@@ -270,8 +320,39 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SetBgm>();
 
         [Fact]
-        public void ParseEntryUnk36() =>
+        public void ParseSeqObjCamera() =>
+            AssertEvent<Event.SeqObjCamera>();
+
+        [Fact]
+        public void ParseMusicalHeader() =>
+            AssertEvent<Event.MusicalHeader>();
+
+        [Fact]
+        public void ParseMusicalTarget() =>
+            AssertEvent<Event.MusicalTarget>();
+
+        [Fact]
+        public void ParseMusicalScene() =>
+            AssertEvent<Event.MusicalScene>();
+
+        [Fact]
+        public void ParseVibData() =>
+            AssertEvent<Event.VibData>(
+                new VibData
+                {
+                    Frame = 12,
+                    Dummy = 34,
+                    Data = new byte[] { 1, 2, 3, 4 },
+                }
+            );
+
+        [Fact]
+        public void ParseLookat() =>
             AssertEvent<Event.Lookat>();
+
+        [Fact]
+        public void ParseShadowAlpha() =>
+            AssertEvent<Event.ShadowAlpha>();
 
         [Fact]
         public void ParseReadActor() =>
@@ -280,6 +361,18 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ParseReadEffect() =>
             AssertEvent<Event.ReadEffect>();
+
+        [Fact]
+        public void ParseSeqMirror() =>
+            AssertEvent<Event.SeqMirror>();
+
+        [Fact]
+        public void ParseSeqTreasure() =>
+            AssertEvent<Event.SeqTreasure>();
+
+        [Fact]
+        public void ParseSeqMissionEffect() =>
+            AssertEvent<Event.SeqMissionEffect>();
 
         [Fact]
         public void ParseSeqLayout() =>
@@ -294,20 +387,107 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.StopEffect>();
 
         [Fact]
+        public void ParseCacheClear() =>
+            AssertEvent<Event.CacheClear>(
+                new CacheClear
+                {
+                    PutId = Enumerable.Range(0, 96).Select(idx => (byte)idx).ToArray(),
+                    Frame = 12345,
+                }
+            );
+
+        [Fact]
+        public void ParseSeqObjPause() =>
+            AssertEvent<Event.SeqObjPause>();
+
+        [Fact]
+        public void ParseSeqBgse() =>
+            AssertEvent<Event.SeqBgse>();
+
+        [Fact]
+        public void ParseSeqGlow() =>
+            AssertEvent<Event.SeqGlow>();
+
+        [Fact]
         public void ParseRunMovie() =>
             AssertEvent<Event.RunMovie>();
 
         [Fact]
-        public void ParseUnk42() =>
-            AssertEvent<Event.SeqBgse>();
+        public void ParseSeqSavePoint() =>
+            AssertEvent<Event.SeqSavePoint>();
 
         [Fact]
-        public void ParseEntryUnk47() =>
+        public void ParseSeqCameraCollision() =>
+            AssertEvent<Event.SeqCameraCollision>();
+
+        [Fact]
+        public void ParseSeqPosMove() =>
             AssertEvent<Event.SeqPosMove>();
+
+        [Fact]
+        public void ParseBlackFog() =>
+            AssertEvent<Event.BlackFog>();
+
+        [Fact]
+        public void ParseFog() =>
+            AssertEvent<Event.Fog>();
+
+        [Fact]
+        public void ParsePlayerOffsetCamera() =>
+            AssertEvent<Event.PlayerOffsetCamera>();
+
+        [Fact]
+        public void ParseSkyOff() =>
+            AssertEvent<Event.SkyOff>();
 
         [Fact]
         public void ParseHideObject() =>
             AssertEvent<Event.SeqHideObject>();
+
+        [Fact]
+        public void ParseCountdown() =>
+            AssertEvent<Event.Countdown>();
+
+        [Fact]
+        public void ParseTag() =>
+            AssertEvent<Event.Tag>();
+
+        [Fact]
+        public void ParseWallClip() =>
+            AssertEvent<Event.WallClip>();
+
+        [Fact]
+        public void ParseVoiceAllFadeout() =>
+            AssertEvent<Event.VoiceAllFadeout>();
+
+        [Fact]
+        public void ParseLight() =>
+            AssertEvent<Event.Light>(
+                new Light
+                {
+                    WorkNum = 12345,
+                    LightData = new List<Light.Data>()
+                    {
+                        new Light.Data
+                        {
+                            PutId = 1,
+                            StartFrame = 2,
+                            EndFrame = 3,
+                            CamNum = 4,
+                            SubNum = 5,
+                            Position = new Light.LightParamPosition
+                            {
+                                Pos = Enumerable.Range(0, 9).Select(it => (float)it).ToArray(),
+                                Color = Enumerable.Range(0, 12).Select(it => (float)it).ToArray(),
+                            },
+                        }
+                    },
+                }
+            );
+
+        [Fact]
+        public void ParseSeqMob() =>
+            AssertEvent<Event.SeqMob>();
 
         private static void AssertEvent<T>()
             where T : class, Event.IEventEntry =>
@@ -343,210 +523,30 @@ namespace OpenKh.Tests.kh2
             {
                 var expectedValue = property.GetValue(expected);
                 var actualValue = property.GetValue(actual);
-                if (expectedValue.ToString() !=
-                    actualValue.ToString())
+                if (!IsValueEqual(expectedValue, actualValue))
                     throw new AssertActualExpectedException(
                         expectedValue, actualValue,
                         $"Different values for '{property.Name}'");
             }
         }
 
-        public class Massive
+        private static bool IsValueEqual(object expectedValue, object actualValue)
         {
-            private static readonly TreeWriter _treeWriter = new TreeWriterBuilder()
-                .Build();
-
-            private static readonly TreeReader _treeReader = new TreeReaderBuilder()
-                .AddType(nameof(SetProject), typeof(SetProject))
-                .AddType(nameof(SetActor), typeof(SetActor))
-                .AddType(nameof(SeqActorPosition), typeof(SeqActorPosition))
-                .AddType(nameof(SetMap), typeof(SetMap))
-                .AddType(nameof(CameraData), typeof(CameraData))
-                .AddType(nameof(SeqCamera), typeof(SeqCamera))
-                .AddType(nameof(EffectData), typeof(EffectData))
-                .AddType(nameof(SetEndFrame), typeof(SetEndFrame))
-                .AddType(nameof(SeqEffect), typeof(SeqEffect))
-                .AddType(nameof(AttachEffect), typeof(AttachEffect))
-                .AddType(nameof(SeqKage), typeof(SeqKage))
-                .AddType(nameof(SeqBgcol), typeof(SeqBgcol))
-                .AddType(nameof(SeqPart), typeof(SeqPart))
-                .AddType(nameof(SeqAlpha), typeof(SeqAlpha))
-                .AddType(nameof(SetupEvent), typeof(SetupEvent))
-                .AddType(nameof(EventStart), typeof(EventStart))
-                .AddType(nameof(JumpEvent), typeof(JumpEvent))
-                .AddType(nameof(SeqFade), typeof(SeqFade))
-                .AddType(nameof(SetCameraData), typeof(SetCameraData))
-                .AddType(nameof(EntryUnk14), typeof(EntryUnk14))
-                .AddType(nameof(SeqSubtitle), typeof(SeqSubtitle))
-                .AddType(nameof(BgGrupe), typeof(BgGrupe))
-                .AddType(nameof(SeqBlur), typeof(SeqBlur))
-                .AddType(nameof(SeqFocus), typeof(SeqFocus))
-                .AddType(nameof(SeqTextureAnim), typeof(SeqTextureAnim))
-                .AddType(nameof(SeqActorLeave), typeof(SeqActorLeave))
-                .AddType(nameof(SeqCrossFade), typeof(SeqCrossFade))
-                .AddType(nameof(SeqIk), typeof(SeqIk))
-                .AddType(nameof(SplineDataEnc), typeof(SplineDataEnc))
-                .AddType(nameof(SplinePoint), typeof(SplinePoint))
-                .AddType(nameof(SeqSpline), typeof(SeqSpline))
-                .AddType(nameof(SeqGameSpeed), typeof(SeqGameSpeed))
-                .AddType(nameof(WideMask), typeof(WideMask))
-                .AddType(nameof(SeqVoices), typeof(SeqVoices))
-                .AddType(nameof(ReadAssets), typeof(ReadAssets))
-                .AddType(nameof(ReadMotion), typeof(ReadMotion))
-                .AddType(nameof(ReadAudio), typeof(ReadAudio))
-                .AddType(nameof(SetShake), typeof(SetShake))
-                .AddType(nameof(Turn), typeof(Turn))
-                .AddType(nameof(SeData), typeof(SeData))
-                .AddType(nameof(SeqPlayAudio), typeof(SeqPlayAudio))
-                .AddType(nameof(SeqPlayAnimation), typeof(SeqPlayAnimation))
-                .AddType(nameof(SeqDialog), typeof(SeqDialog))
-                .AddType(nameof(SeqPlayBgm), typeof(SeqPlayBgm))
-                .AddType(nameof(ReadBgm), typeof(ReadBgm))
-                .AddType(nameof(SetBgm), typeof(SetBgm))
-                .AddType(nameof(Lookat), typeof(Lookat))
-                .AddType(nameof(ReadActor), typeof(ReadActor))
-                .AddType(nameof(ReadEffect), typeof(ReadEffect))
-                .AddType(nameof(SeqLayout), typeof(SeqLayout))
-                .AddType(nameof(ReadLayout), typeof(ReadLayout))
-                .AddType(nameof(StopEffect), typeof(StopEffect))
-                .AddType(nameof(SeqBgse), typeof(SeqBgse))
-                .AddType(nameof(RunMovie), typeof(RunMovie))
-                .AddType(nameof(SeqPosMove), typeof(SeqPosMove))
-                .AddType(nameof(SeqHideObject), typeof(SeqHideObject))
-                .AddType(nameof(VibData), typeof(VibData))
-                .AddType(nameof(ShadowAlpha), typeof(ShadowAlpha))
-                .AddType(nameof(BlackFog), typeof(BlackFog))
-                .AddType(nameof(SeqMirror), typeof(SeqMirror))
-                .AddType(nameof(Scale), typeof(Scale))
-                .AddType(nameof(CacheClear), typeof(CacheClear))
-                .AddType(nameof(TexFade), typeof(TexFade))
-                .AddType(nameof(Light), typeof(Light))
-                .AddType(nameof(SeqMob), typeof(SeqMob))
-                .AddType(nameof(Fog), typeof(Fog))
-                .AddType(nameof(SkyOff), typeof(SkyOff))
-                .AddType(nameof(MusicalHeader), typeof(MusicalHeader))
-                .AddType(nameof(MusicalScene), typeof(MusicalScene))
-                .AddType(nameof(MusicalTarget), typeof(MusicalTarget))
-                .AddType(nameof(Tag), typeof(Tag))
-                .AddType(nameof(PlayerOffsetCamera), typeof(PlayerOffsetCamera))
-                .AddType(nameof(SeqCameraCollision), typeof(SeqCameraCollision))
-                .AddType(nameof(VoiceAllFadeout), typeof(VoiceAllFadeout))
-                .AddType(nameof(WallClip), typeof(WallClip))
-                .AddType(nameof(SeqGlow), typeof(SeqGlow))
-
-                .AddType("Voice", typeof(SeqVoices.Voice))
-                .AddType("CameraKeys", typeof(CameraKeys))
-                .AddType("Point", typeof(SplinePoint.Point))
-                .AddType("Data", typeof(Light.Data))
-                .Build();
-
-            private static string SourceDir => Environment.GetEnvironmentVariable("KH2FM_EXTRACTION_DIR");
-            private static string SaveDir => Path.Combine(Environment.CurrentDirectory, "EventTests");
-
-            [SkippableTheory]
-            [MemberData(nameof(GetSource))]
-            public void ReadEvent(string source)
+            if ((expectedValue == null) != (actualValue == null))
             {
-                var eventStream = new MemoryStream(ResolveSource(source), false);
-                var eventEntries = Event.Read(eventStream);
-                Assert.NotNull(eventEntries);
-                var text = _treeWriter.Serialize(eventEntries);
-                SaveTextTo(source, text);
-                var reversed = _treeReader.Deserialize<List<Event.IEventEntry>>(text);
+                return false;
+            }
+            if (expectedValue == null)
+            {
+                return true;
             }
 
-            [Fact]
-            public void NonQuotedStringTests()
+            if (expectedValue.GetType() != actualValue.GetType())
             {
-                Assert.Equal(
-                    expected: "123_456/abc.def",
-                    actual: _treeReader.Deserialize<SetProject>("Name 123_456/abc.def").Name
-                );
+                return false;
             }
 
-            [Fact]
-            public void QuotedStringTests()
-            {
-                Assert.Equal(
-                    expected: "123\r\n\t456\\789",
-                    actual: _treeReader.Deserialize<SetProject>("Name \"123\\r\\n\\t456\\\\789\"").Name
-                );
-
-                Assert.Equal(
-                    expected: "123 456  789",
-                    actual: _treeReader.Deserialize<SetProject>("Name \"123 456  789\"").Name
-                );
-
-                Assert.Equal(
-                    expected: "abc\ndef",
-                    actual: _treeReader.Deserialize<SetProject>("Name \"abc\\\ndef\"").Name
-                );
-
-                Assert.Equal(
-                    expected: "abc\r\ndef",
-                    actual: _treeReader.Deserialize<SetProject>("Name \"abc\\\r\ndef\"").Name
-                );
-            }
-
-            private void SaveTextTo(string source, string text)
-            {
-                source = source.Replace("\t", "\\");
-
-                if (source.StartsWith(SourceDir))
-                {
-                    source = source.Substring(SourceDir.Length);
-                }
-
-                source = Path.Combine(SaveDir, source.TrimStart('\\'));
-                Directory.CreateDirectory(Path.GetDirectoryName(source));
-
-                File.WriteAllText(source + ".txt", text);
-            }
-
-            private byte[] ResolveSource(string source)
-            {
-                var sources = source.Split('\t');
-                var bar = File.OpenRead(sources[0]).Using(fs => Bar.Read(fs));
-                for (int x = 1; x < sources.Length; x++)
-                {
-                    if (sources[x].StartsWith("#"))
-                    {
-                        var idx = int.Parse(sources[x].Substring(1));
-
-                        var temp = new MemoryStream();
-                        bar[idx].Stream.CopyTo(temp);
-                        return temp.ToArray();
-                    }
-                    else
-                    {
-                        throw new InvalidDataException();
-                    }
-                }
-                throw new InvalidDataException();
-            }
-
-            public static IEnumerable<object[]> GetSource()
-            {
-                var srcDir = SourceDir;
-
-                if (srcDir != null)
-                {
-                    foreach (var barFile in new string[0]
-                        .Concat(Directory.GetFiles(Path.Combine(srcDir, "ard"), "*.ard"))
-                    )
-                    {
-                        foreach (var (barEntry, index) in File.OpenRead(barFile)
-                            .Using(fs => Bar.Read(fs))
-                            .Select((barEntry, index) => (barEntry, index))
-                            .ToArray()
-                            .Where(tuple => tuple.barEntry.Type == Bar.EntryType.Event && tuple.barEntry.Stream.Length != 0)
-                        )
-                        {
-                            yield return new object[] { $"{barFile}\t#{index}" };
-                        }
-                    }
-                }
-            }
+            return JsonSerializer.Serialize(expectedValue) == JsonSerializer.Serialize(actualValue);
         }
     }
 }

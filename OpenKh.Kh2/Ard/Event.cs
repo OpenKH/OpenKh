@@ -128,6 +128,26 @@ namespace OpenKh.Kh2.Ard
             [Data] public float TangentEaseOut { get; set; }
         }
 
+        private static CameraKeys GetCameraKeys(CameraValueInternal x) =>
+            new CameraKeys
+            {
+                Interpolation = (Motion.Interpolation)(x.FlagData >> 29),
+                KeyFrame = (int)((x.FlagData & 0x1FFFFFFF ^ 0x10000000) - 0x10000000),
+                Value = x.Value,
+                TangentEaseIn = x.TangentEaseIn,
+                TangentEaseOut = x.TangentEaseOut
+            };
+
+        private static CameraValueInternal GetCameraValueInternal(CameraKeys x) =>
+            new CameraValueInternal
+            {
+                FlagData = (uint)((((x.KeyFrame + 0x10000000) ^ 0x10000000) & 0x1FFFFFFF) |
+                        ((int)x.Interpolation << 29)),
+                Value = x.Value,
+                TangentEaseIn = x.TangentEaseIn,
+                TangentEaseOut = x.TangentEaseOut
+            };
+
         public interface IEventEntry
         {
         }
@@ -453,12 +473,11 @@ namespace OpenKh.Kh2.Ard
         {
             public short PutId { get; set; }
             public short TransOfs { get; set; }
-            public short TransCnt { get; set; }
 
             public List<CameraKeys> Keys { get; set; }
 
             public override string ToString() =>
-                $"{nameof(SplineDataEnc)}: Channel {PutId}, {TransOfs} {TransCnt}";
+                $"{nameof(SplineDataEnc)}: Channel {PutId}, {TransOfs}";
         }
 
         public class SplinePoint : IEventEntry
@@ -972,7 +991,6 @@ namespace OpenKh.Kh2.Ard
 
         public class Light : IEventEntry
         {
-            public short Count { get; set; }
             public short WorkNum { get; set; }
             public List<Data> LightData { get; set; }
 
@@ -1166,15 +1184,7 @@ namespace OpenKh.Kh2.Ard
             var valueCount = headers.Max(x => x.Index + x.Count);
             var values = Enumerable
                 .Range(0, valueCount)
-                .Select(x => BinaryMapping.ReadObject<CameraValueInternal>(args.Reader.BaseStream))
-                .Select(x => new CameraKeys
-                {
-                    Interpolation = (Motion.Interpolation)(x.FlagData >> 29),
-                    KeyFrame = (int)((x.FlagData & 0x1FFFFFFF ^ 0x10000000) - 0x10000000),
-                    Value = x.Value,
-                    TangentEaseIn = x.TangentEaseIn,
-                    TangentEaseOut = x.TangentEaseOut
-                })
+                .Select(x => GetCameraKeys(BinaryMapping.ReadObject<CameraValueInternal>(args.Reader.BaseStream)))
                 .ToList();
 
             return new SetCameraData
@@ -1204,14 +1214,7 @@ namespace OpenKh.Kh2.Ard
 
             void WriteData(Stream stream, List<CameraKeys> values)
             {
-                foreach (var value in values.Select(x => new CameraValueInternal
-                {
-                    FlagData = (uint)((((x.KeyFrame + 0x10000000) ^ 0x10000000) & 0x1FFFFFFF) |
-                        ((int)x.Interpolation << 29)),
-                    Value = x.Value,
-                    TangentEaseIn = x.TangentEaseIn,
-                    TangentEaseOut = x.TangentEaseOut
-                }))
+                foreach (var value in values.Select(GetCameraValueInternal))
                     Mapping.WriteObject(stream, value);
             }
 
@@ -1358,7 +1361,6 @@ namespace OpenKh.Kh2.Ard
 
             return new Light
             {
-                Count = count,
                 WorkNum = workNum,
                 LightData = lightData,
             };
@@ -1367,7 +1369,7 @@ namespace OpenKh.Kh2.Ard
         private static void WriteLight(MappingWriteArgs args)
         {
             var item = args.Item as Light;
-            args.Writer.Write(item.Count);
+            args.Writer.Write((short)(item.LightData.Count));
             args.Writer.Write(item.WorkNum);
             foreach (var one in item.LightData)
             {
@@ -1383,14 +1385,13 @@ namespace OpenKh.Kh2.Ard
             args.Reader.ReadInt16();
             var keys = Enumerable
                 .Range(0, TransCnt)
-                .Select(x => Mapping.ReadObject<CameraKeys>(args.Reader.BaseStream))
+                .Select(x => GetCameraKeys(Mapping.ReadObject<CameraValueInternal>(args.Reader.BaseStream)))
                 .ToList();
 
             return new SplineDataEnc
             {
                 PutId = PutId,
                 TransOfs = TransOfs,
-                TransCnt = TransCnt,
                 Keys = keys,
             };
         }
@@ -1400,11 +1401,11 @@ namespace OpenKh.Kh2.Ard
             var item = args.Item as SplineDataEnc;
             args.Writer.Write(item.PutId);
             args.Writer.Write(item.TransOfs);
-            args.Writer.Write(item.TransCnt);
+            args.Writer.Write((short)item.Keys.Count);
             args.Writer.Write((short)0);
             foreach (var one in item.Keys)
             {
-                Mapping.WriteObject(args.Writer.BaseStream, one);
+                Mapping.WriteObject(args.Writer.BaseStream, GetCameraValueInternal(one));
             }
         }
 
