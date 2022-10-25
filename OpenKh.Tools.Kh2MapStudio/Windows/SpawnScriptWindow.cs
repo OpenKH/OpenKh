@@ -11,7 +11,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
         private static readonly Vector4 ErrorColor = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
         private static readonly Vector4 SuccessColor = new Vector4(0.0f, 1.0f, 0.0f, 1.0f);
 
-        public static bool Run(string type, SpawnScriptModel model) => ForHeader($"Event Script compiler for {type}", () =>
+        public static bool Run(string type, SpawnScriptModel model) => ForHeader($"Spawn Script compiler for {type}", () =>
         {
             if (model == null)
             {
