@@ -37,12 +37,48 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
             try
             {
                 EventEntries = EventsXmlRoot.FromXml(Decompiled).Entries;
+                LastError = "OK";
             }
             catch (Exception ex)
             {
                 IsError = true;
                 LastError = ex.Message;
             }
+        }
+
+        public void CopyAll()
+        {
+            IsError = false;
+            LastError = null;
+
+            ClipboardService.SetText(
+                Decompiled,
+                () => LastError = "Copied",
+                ex =>
+                {
+                    IsError = true;
+                    LastError = ex.Message;
+                }
+            );
+        }
+
+        public void PasteReplace()
+        {
+            IsError = false;
+            LastError = null;
+
+            ClipboardService.GetText(
+                text =>
+                {
+                    Decompiled = text;
+                    LastError = "Pasted";
+                },
+                ex =>
+                {
+                    IsError = true;
+                    LastError = ex.Message;
+                }
+            );
         }
     }
 }
