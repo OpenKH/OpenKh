@@ -137,7 +137,7 @@ namespace OpenKh.Tests.Engine
                 new Event.SetCameraData
                 {
                     CameraId = 1,
-                    PositionX = new List<Event.SetCameraData.CameraKeys>
+                    PositionX = new List<Event.CameraKeys>
                     {
                         CameraDataValue(-309.26492f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(411.81467f, Kh2.Motion.Interpolation.Hermite, 341, -0.6224821f, -0.6224821f),
@@ -145,19 +145,19 @@ namespace OpenKh.Tests.Engine
                         CameraDataValue(-106.03006f, Kh2.Motion.Interpolation.Linear, 819, 860.1719f, 860.1719f),
                         CameraDataValue(-106.03006f, Kh2.Motion.Interpolation.Linear, 1024, 0f, 0f),
                     },
-                    PositionY = new List<Event.SetCameraData.CameraKeys>
+                    PositionY = new List<Event.CameraKeys>
                     {
                         CameraDataValue(2446.094f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(515.0501f, Kh2.Motion.Interpolation.Linear, 819, -1865.6649f, -1865.6649f),
                         CameraDataValue(515.0501f, Kh2.Motion.Interpolation.Linear, 1024, 0f, 0f),
                     },
-                    PositionZ = new List<Event.SetCameraData.CameraKeys>
+                    PositionZ = new List<Event.CameraKeys>
                     {
                         CameraDataValue(1473.9126f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(288.39706f, Kh2.Motion.Interpolation.Linear, 819, -1165.8065f, -1165.8065f),
                         CameraDataValue(288.39706f, Kh2.Motion.Interpolation.Linear, 1024, 0f, 0f),
                     },
-                    LookAtX = new List<Event.SetCameraData.CameraKeys>
+                    LookAtX = new List<Event.CameraKeys>
                     {
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Hermite, 341, 0f, 0f),
@@ -165,7 +165,7 @@ namespace OpenKh.Tests.Engine
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Linear, 819, 0f, 0f),
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Linear, 1024, 0f, 0f),
                     },
-                    LookAtY = new List<Event.SetCameraData.CameraKeys>
+                    LookAtY = new List<Event.CameraKeys>
                     {
                         CameraDataValue(113.279144f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(113.279144f, Kh2.Motion.Interpolation.Hermite, 341, 0f, 0f),
@@ -173,7 +173,7 @@ namespace OpenKh.Tests.Engine
                         CameraDataValue(113.279144f, Kh2.Motion.Interpolation.Linear, 819, 0f, 0f),
                         CameraDataValue(113.279144f, Kh2.Motion.Interpolation.Linear, 1024, 0f, 0f),
                     },
-                    LookAtZ = new List<Event.SetCameraData.CameraKeys>
+                    LookAtZ = new List<Event.CameraKeys>
                     {
                         CameraDataValue(20.983765f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(20.983765f, Kh2.Motion.Interpolation.Hermite, 341, 0f, 0f),
@@ -181,7 +181,7 @@ namespace OpenKh.Tests.Engine
                         CameraDataValue(20.983765f, Kh2.Motion.Interpolation.Linear, 819, 0f, 0f),
                         CameraDataValue(20.983765f, Kh2.Motion.Interpolation.Linear, 1024, 0f, 0f),
                     },
-                    Roll = new List<Event.SetCameraData.CameraKeys>
+                    Roll = new List<Event.CameraKeys>
                     {
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Hermite, 341, 0f, 0f),
@@ -189,7 +189,7 @@ namespace OpenKh.Tests.Engine
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Linear, 819, 0f, 0f),
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Linear, 1024, 0f, 0f),
                     },
-                    FieldOfView = new List<Event.SetCameraData.CameraKeys>
+                    FieldOfView = new List<Event.CameraKeys>
                     {
                         CameraDataValue(48.41243f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(48.41243f, Kh2.Motion.Interpolation.Hermite, 341, 0f, 0f),
@@ -264,49 +264,49 @@ namespace OpenKh.Tests.Engine
                 new Event.SetCameraData
                 {
                     CameraId = 1,
-                    PositionX = new List<Event.SetCameraData.CameraKeys>
+                    PositionX = new List<Event.CameraKeys>
                     {
                         CameraDataValue(-317.25266f, Kh2.Motion.Interpolation.Linear, 0, 0f, 0f),
                         CameraDataValue(-317.25266f, Kh2.Motion.Interpolation.Linear, 3584, 0f, 0f),
                         CameraDataValue(-317.25266f, Kh2.Motion.Interpolation.Linear, 3754, 0f, 0f),
                     },
-                    PositionY = new List<Event.SetCameraData.CameraKeys>
+                    PositionY = new List<Event.CameraKeys>
                     {
                         CameraDataValue(123.61203f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(185.76723f, Kh2.Motion.Interpolation.Linear, 3584, 0f, 0f),
                         CameraDataValue(185.76723f, Kh2.Motion.Interpolation.Linear, 3754, 0f, 0f),
                     },
-                    PositionZ = new List<Event.SetCameraData.CameraKeys>
+                    PositionZ = new List<Event.CameraKeys>
                     {
                         CameraDataValue(-79.360405f, Kh2.Motion.Interpolation.Linear, 0, 0f, 0f),
                         CameraDataValue(-79.360405f, Kh2.Motion.Interpolation.Linear, 3584, 0f, 0f),
                         CameraDataValue(-79.360405f, Kh2.Motion.Interpolation.Linear, 3754, 0f, 0f),
                     },
-                    LookAtX = new List<Event.SetCameraData.CameraKeys>
+                    LookAtX = new List<Event.CameraKeys>
                     {
                         CameraDataValue(-357.23502f, Kh2.Motion.Interpolation.Linear, 0, 0f, 0f),
                         CameraDataValue(-357.23502f, Kh2.Motion.Interpolation.Linear, 3584, 0f, 0f),
                         CameraDataValue(-357.23502f, Kh2.Motion.Interpolation.Linear, 3754, 0f, 0f),
                     },
-                    LookAtY = new List<Event.SetCameraData.CameraKeys>
+                    LookAtY = new List<Event.CameraKeys>
                     {
                         CameraDataValue(122.42929f, Kh2.Motion.Interpolation.Hermite, 0, 0, 0),
                         CameraDataValue(184.58449f, Kh2.Motion.Interpolation.Linear, 3584, 0f, 0f),
                         CameraDataValue(184.58449f, Kh2.Motion.Interpolation.Linear, 3754, 0f, 0f),
                     },
-                    LookAtZ = new List<Event.SetCameraData.CameraKeys>
+                    LookAtZ = new List<Event.CameraKeys>
                     {
                         CameraDataValue(-217.77927f, Kh2.Motion.Interpolation.Linear, 0, 0f, 0f),
                         CameraDataValue(-217.77927f, Kh2.Motion.Interpolation.Linear, 3584, 0f, 0f),
                         CameraDataValue(-217.77927f, Kh2.Motion.Interpolation.Linear, 3754, 0f, 0f),
                     },
-                    Roll = new List<Event.SetCameraData.CameraKeys>
+                    Roll = new List<Event.CameraKeys>
                     {
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Linear, 0, 0f, 0f),
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Linear, 3584, 0f, 0f),
                         CameraDataValue(0f, Kh2.Motion.Interpolation.Linear, 3754, 0f, 0f),
                     },
-                    FieldOfView = new List<Event.SetCameraData.CameraKeys>
+                    FieldOfView = new List<Event.CameraKeys>
                     {
                         CameraDataValue(42.026005f, Kh2.Motion.Interpolation.Linear, 0, 0f, 0f),
                         CameraDataValue(42.026005f, Kh2.Motion.Interpolation.Linear, 3584, 0f, 0f),
@@ -417,9 +417,9 @@ namespace OpenKh.Tests.Engine
             Assert.Equal(expectedActorVisibility, lastVisibility);
         }
 
-        private static Event.SetCameraData.CameraKeys CameraDataValue(
+        private static Event.CameraKeys CameraDataValue(
             float value, Kh2.Motion.Interpolation interpolation, int keyFrame, float left, float right) =>
-            new Event.SetCameraData.CameraKeys
+            new Event.CameraKeys
             {
                 Interpolation = interpolation,
                 KeyFrame = keyFrame,
@@ -428,8 +428,8 @@ namespace OpenKh.Tests.Engine
                 TangentEaseOut = right
             };
 
-        private static List<Event.SetCameraData.CameraKeys> CameraDataSingleValue(float value) =>
-            new List<Event.SetCameraData.CameraKeys>()
+        private static List<Event.CameraKeys> CameraDataSingleValue(float value) =>
+            new List<Event.CameraKeys>()
             {
                 CameraDataValue(value, Kh2.Motion.Interpolation.Hermite, 0, 0, 0)
             };
