@@ -397,7 +397,7 @@ namespace OpenKh.Tools.Kh2MapStudio
         {
             int? area = null;
 
-            pos = new Vector3(pos.X, -pos.Y, -pos.Z);
+            pos = new Vector3(-pos.X, -pos.Y, -pos.Z);
 
             bool Contains(BoundingBoxInt16 bbox)
             {

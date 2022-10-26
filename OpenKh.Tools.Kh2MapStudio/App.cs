@@ -137,6 +137,8 @@ namespace OpenKh.Tools.Kh2MapStudio
             {
                 if (_mapRenderer.CurrentArea.AreaSettingsMask is int areaSettingsMask)
                 {
+                    ImGui.Text($"AreaSettings 0 -1");
+
                     for (int x = 0; x < 32; x++)
                     {
                         if ((areaSettingsMask & (1 << x)) != 0)
