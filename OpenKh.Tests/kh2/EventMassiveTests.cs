@@ -108,8 +108,8 @@ namespace OpenKh.Tests.kh2
 
         private static string SourceDir => Environment.GetEnvironmentVariable("KH2FM_EXTRACTION_DIR");
 
-        [SkippableTheory]
-        [MemberData(nameof(GetEventDataSource))]
+        //[SkippableTheory]
+        //[MemberData(nameof(GetEventDataSource))]
         public void EventRegression(string source)
         {
             var src = new BarEntrySource(source);
@@ -147,8 +147,8 @@ namespace OpenKh.Tests.kh2
             );
         }
 
-        [SkippableTheory]
-        [MemberData(nameof(GetEventDataSource))]
+        //[SkippableTheory]
+        //[MemberData(nameof(GetEventDataSource))]
         public void EventTextRegression(string source)
         {
             var src = new BarEntrySource(source);
@@ -163,8 +163,8 @@ namespace OpenKh.Tests.kh2
             Assert.Equal(expected: deeperTree1, actual: deeperTree2);
         }
 
-        [SkippableTheory]
-        [MemberData(nameof(GetEventDataSource))]
+        //[SkippableTheory]
+        //[MemberData(nameof(GetEventDataSource))]
         public void EventXmlRegression(string source)
         {
             var src = new BarEntrySource(source);

@@ -8,6 +8,7 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Models;
+using OpenKh.Kh2.Utils;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using OpenKh.Tools.Kh2MapStudio.Models;
 using System;
@@ -125,6 +126,8 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         public List<EventScriptModel> EventScripts { get; private set; }
 
+        public CurrentArea CurrentArea { get; private set; }
+
         public MapRenderer(ContentManager content, xna.GraphicsDeviceManager graphics)
         {
             _graphicsManager = graphics;
@@ -138,6 +141,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
+            CurrentArea = new CurrentArea();
 
             _whiteTexture = new Texture2D(_graphics, 2, 2);
             _whiteTexture.SetData(Enumerable.Range(0, 2 * 2 * sizeof(int)).Select(_ => (byte)0xff).ToArray());
@@ -289,6 +293,11 @@ namespace OpenKh.Tools.Kh2MapStudio
             var viewport = _graphics.Viewport;
             Camera.AspectRatio = viewport.Width / (float)viewport.Height;
 
+            if (MapCollision?.Coct is Coct coct)
+            {
+                CurrentArea.ActiveMapVisibility = LocateCurrentArea(coct, Camera.CameraPosition);
+            }
+
             _graphics.RasterizerState = new RasterizerState()
             {
                 CullMode = CullMode.CullClockwiseFace
@@ -382,6 +391,55 @@ namespace OpenKh.Tools.Kh2MapStudio
                     }
                 }
             });
+        }
+
+        private int? LocateCurrentArea(Coct coct, Vector3 pos)
+        {
+            int? area = null;
+
+            pos = new Vector3(pos.X, -pos.Y, -pos.Z);
+
+            bool Contains(BoundingBoxInt16 bbox)
+            {
+                return true
+                    && bbox.Minimum.X <= pos.X && pos.X <= bbox.Maximum.X
+                    && bbox.Minimum.Y <= pos.Y && pos.Y <= bbox.Maximum.Y
+                    && bbox.Minimum.Z <= pos.Z && pos.Z <= bbox.Maximum.Z
+                    ;
+            }
+
+            void Walk(int idx)
+            {
+                var node = coct.Nodes[idx];
+
+                if (Contains(node.BoundingBox))
+                {
+                    foreach (var mesh in node.Meshes)
+                    {
+                        if (Contains(mesh.BoundingBox))
+                        {
+                            if (area == null)
+                            {
+                                area = 0;
+                            }
+
+                            area |= mesh.MapVisibility;
+                            break;
+                        }
+                    }
+
+                    foreach (var child in new[] { node.Child1, node.Child2, node.Child3, node.Child4, node.Child5, node.Child6, node.Child7, node.Child8 }
+                        .Where(it => it != -1)
+                    )
+                    {
+                        Walk(child);
+                    }
+                }
+            }
+
+            Walk(0);
+
+            return area;
         }
 
         private void RenderMeshNew(EffectPass pass, MeshGroup mesh, bool passRenderOpaque)
