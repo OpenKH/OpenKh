@@ -295,7 +295,7 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             if (MapCollision?.Coct is Coct coct)
             {
-                CurrentArea.ActiveMapVisibility = LocateCurrentArea(coct, Camera.CameraPosition);
+                CurrentArea.AreaSettingsMask = LocateCurrentArea(coct, Camera.CameraPosition);
             }
 
             _graphics.RasterizerState = new RasterizerState()

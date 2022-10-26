@@ -8,6 +8,6 @@ namespace OpenKh.Engine
 {
     public class CurrentArea
     {
-        public int? ActiveMapVisibility { get; set; }
+        public int? AreaSettingsMask { get; set; }
     }
 }

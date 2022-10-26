@@ -135,13 +135,11 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             ForWindow("Tools", () =>
             {
-                if (_mapRenderer.CurrentArea.ActiveMapVisibility is int mapVisibility)
+                if (_mapRenderer.CurrentArea.AreaSettingsMask is int areaSettingsMask)
                 {
-                    ImGui.Text($"MapVisibility 0x{mapVisibility:X8} 0x00000000");
-
                     for (int x = 0; x < 32; x++)
                     {
-                        if ((mapVisibility & (1 << x)) != 0)
+                        if ((areaSettingsMask & (1 << x)) != 0)
                         {
                             ImGui.Text($"AreaSettings {x} -1");
                         }
