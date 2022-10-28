@@ -9,7 +9,9 @@
 
     <Grid Background="Black"
              MouseWheel="Viewport_MouseWheel"
-             MouseMove="Viewport_MouseMove">
+             MouseMove="Viewport_MouseMove"
+             MouseRightButtonDown="Viewport_MouseRightButtonDown"
+             MouseRightButtonUp="Viewport_MouseRightButtonUp">
         <ContentControl x:Name="viewportFrame"/>
     </Grid>
 
