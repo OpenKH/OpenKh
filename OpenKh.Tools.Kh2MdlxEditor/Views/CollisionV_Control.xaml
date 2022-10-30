@@ -71,7 +71,7 @@
 
             <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" />
 
-            <ContentControl Grid.Row="2" Background="#2d2d2d" x:Name="meshPropertiesFrame"/>
+            <ContentControl Grid.Row="2" Background="#2d2d2d" x:Name="collisionPropertiesFrame"/>
 
         </Grid>
 

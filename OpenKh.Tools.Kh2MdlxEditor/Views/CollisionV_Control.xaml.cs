@@ -38,11 +38,12 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         public void CollisionList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             CollisionWrapper collision = ((ListViewItem)sender).Content as CollisionWrapper;
-            //meshPropertiesFrame.Content = new MeshProperties_Control(collision.Collision);
+            collisionPropertiesFrame.Content = new CollisionProperties_Control(collision.Collision);
         }
         public void CollisionList_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             CollisionWrapper collision = ((ListViewItem)sender).Content as CollisionWrapper;
+            collisionPropertiesFrame.Content = new CollisionProperties_Control(collision.Collision);
             //meshPropertiesFrame.Content = new MeshProperties_Control(collision.Collision);
             collision.Selected_VM = !collision.Selected_VM;
             drawSelectedGroups();
