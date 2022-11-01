@@ -2,21 +2,10 @@ using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
 using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Views
 {
@@ -44,7 +33,6 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         {
             CollisionWrapper collision = ((ListViewItem)sender).Content as CollisionWrapper;
             collisionPropertiesFrame.Content = new CollisionProperties_Control(collision.Collision);
-            //meshPropertiesFrame.Content = new MeshProperties_Control(collision.Collision);
             collision.Selected_VM = !collision.Selected_VM;
             drawSelectedGroups();
         }

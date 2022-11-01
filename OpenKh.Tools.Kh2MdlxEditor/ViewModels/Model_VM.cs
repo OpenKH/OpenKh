@@ -17,6 +17,24 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
         public ModelCollision? CollisionFile { get; set; }
         public List<GroupWrapper> Groups { get; set; }
 
+        public uint? PolygonCount
+        {
+            get
+            {
+                uint count = 0;
+                if (ModelFile == null)
+                    return null;
+                else
+                {
+                    foreach(ModelSkeletal.SkeletalGroup group in ModelFile.Groups)
+                    {
+                        count += group.Header.PolygonCount;
+                    }
+                }
+                return count;
+            }
+        }
+
         public Model_VM() { }
         public Model_VM(ModelSkeletal modelFile, ModelTexture? textureFile = null, ModelCollision? collisionFile = null)
         {
@@ -43,15 +61,12 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                 if (collision.Bone != 16384)
                 {
                     basePosition = Vector3.Transform(new Vector3(collision.PositionX, collision.PositionY, collision.PositionZ), boneMatrices[collision.Bone]);
-                    //basePosition = boneMatrices[collision.Bone].Translation;
                     collisionBoxes.Add(Viewport3DUtils.getCube(collision.Radius, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), Color.FromArgb(100, 255, 0, 0)));
                 }
                 else
                 {
                     collisionBoxes.Add(Viewport3DUtils.getCube(collision.Radius, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), Color.FromArgb(100, 200, 200, 0)));
                 }
-
-                //collisionBoxes.Add(Viewport3DUtils.getCube(collision.Radius, new Vector3D(basePosition.X + collision.PositionX, basePosition.Y + collision.PositionY, basePosition.Z + collision.PositionZ)));
                 
             }
 

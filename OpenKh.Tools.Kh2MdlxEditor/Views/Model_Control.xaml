@@ -15,8 +15,24 @@
         </Grid.ColumnDefinitions>
         
         <!-- 3D Viewport -->
-        <ContentControl Grid.Column="0" Background="#2d2d2d" x:Name="viewportFrame"/>
-        
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+
+            <ContentControl Grid.Row="0" Background="#2d2d2d" x:Name="viewportFrame"/>
+            <StackPanel Grid.Row="1" Background="#2d2d2d" Orientation="Horizontal">
+                <Label Content="Bones:" Foreground="White"/>
+                <Label Content="{Binding ModelFile.BoneCount}" Foreground="White"/>
+                <Label Content="Meshes:" Foreground="White"/>
+                <Label Content="{Binding ModelFile.GroupCount}" Foreground="White"/>
+                <Label Content="Polygon Count:" Foreground="White"/>
+                <Label Content="{Binding PolygonCount}" Foreground="White"/>
+            </StackPanel>
+        </Grid>
+
+
         <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
         
         <!-- Model data -->
@@ -26,16 +42,7 @@
                 <RowDefinition Height="2" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-
-            <!-- Meshes
-            <ListView Grid.Row="0" ItemsSource="{Binding Groups}" DisplayMemberPath="Name" Background="#1d1d1d" Foreground="White">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <EventSetter Event="MouseLeftButtonUp" Handler="MeshList_MouseLeftButtonUp" />
-                        <EventSetter Event="MouseRightButtonUp" Handler="MeshList_MouseRightButtonUp" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-            </ListView> -->
+            
             <!-- Meshes -->
             <ListView Grid.Row="0" ItemsSource="{Binding Groups}" Background="#1d1d1d" Foreground="White">
                 <ListView.Resources>
@@ -76,34 +83,11 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-
-            <!-- Meshes
-            <DataGrid Grid.Row="0" Background="#202020" AutoGenerateColumns="False" HeadersVisibility="None" GridLinesVisibility="None" BorderThickness="0"
-              ItemsSource="{Binding Groups}" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" Margin="10,10">
-                <DataGrid.Resources>
-                    <Style TargetType="{x:Type DataGridRow}">
-                        <Setter Property="Background" Value="#202020"/>
-                        <Setter Property="Foreground" Value="White"/>
-                    </Style>
-                </DataGrid.Resources>
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Binding = "{Binding Selected}">
-                    </DataGridCheckBoxColumn>
-                    <DataGridTextColumn Binding = "{Binding Name}" />
-                </DataGrid.Columns>
-            </DataGrid> -->
-
-            <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" />
             
-            <ContentControl Grid.Row="2" Background="#2d2d2d" x:Name="meshPropertiesFrame"/>
-            <!-- Mesh properties -->
-            <!-- <StackPanel Grid.Row="2" Background="#1d1d1d">
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Texture:" Foreground="White"/>
-                    <TextBox Width="30" Text="{Binding Path=SelectedGroup.Header.TextureIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-            </StackPanel> -->
+            <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" />
 
+            <ContentControl Grid.Row="2" Background="#2d2d2d" x:Name="meshPropertiesFrame"/>
+            
         </Grid>
         
     </Grid>

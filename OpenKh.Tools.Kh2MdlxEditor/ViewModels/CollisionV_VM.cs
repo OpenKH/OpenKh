@@ -1,13 +1,9 @@
 using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
 using OpenKh.Tools.Kh2MdlxEditor.Utils;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using static OpenKh.Kh2.Models.ModelCommon;
@@ -45,7 +41,6 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
             if (collision.Bone != 16384 && boneMatrices.Length != 0)
             {
                 basePosition = Vector3.Transform(new Vector3(collision.PositionX, collision.PositionY, collision.PositionZ), boneMatrices[collision.Bone]);
-                //basePosition = boneMatrices[collision.Bone].Translation;
                 collisionBox = Viewport3DUtils.getCube(collision.Radius, collision.Height, new Vector3D(basePosition.X, basePosition.Y, basePosition.Z), Color.FromArgb(100, 255, 0, 0));
             }
             else
