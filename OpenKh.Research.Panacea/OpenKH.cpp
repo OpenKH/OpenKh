@@ -103,6 +103,13 @@ bool OpenKH::m_DebugLog = false;
 bool OpenKH::m_EnableCache = true;
 bool QuickMenu = false;
 const uint8_t quickmenupat[] = { 0xB1, 0x01, 0x90 };
+const std::wstring gamefolders[] = {
+    L"/kh1",
+    L"/kh2",
+    L"/recom",
+    L"/bbs",
+    L"/ddd",
+};
 void OpenKH::Initialize()
 {
     g_hInstance = GetModuleHandle(NULL);
@@ -178,10 +185,12 @@ void OpenKH::Initialize()
         return;
     }
 
+    m_ModPath.append(gamefolders[(int)m_GameID]);
+
     Hook();
     Panacea::Initialize();
     
-    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)OpenKH::Main, NULL, 0, NULL);
+    fprintf(stdout, "Welcome to OpenKH Panacea!\n");
 }
 
 void OpenKH::ReadSettings(const char* filename)
@@ -243,21 +252,22 @@ void OpenKH::ReadSettings(const char* filename)
     fclose(f);
 }
 
-void OpenKH::Main()
-{
-    fprintf(stdout, "Welcome to OpenKH Panacea!\n");
-    
-    return;
-}
-
 OpenKH::GameId OpenKH::DetectGame()
 {
     const char* DetectedFmt = "%s detected.\n";
     wchar_t buffer[MAX_PATH]; // MAX_PATH default macro
     GetModuleFileNameW(NULL, buffer, MAX_PATH);
 
+    if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS FINAL MIX.exe") == 0)
+        return GameId::KingdomHearts1;
     if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS II FINAL MIX.exe") == 0)
         return GameId::KingdomHearts2;
+    if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS Re_Chain of Memories.exe") == 0)
+        return GameId::KingdomHeartsReCom;
+    if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS Birth by Sleep FINAL MIX.exe") == 0)
+        return GameId::KingdomHeartsBbs;
+    if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS Dream Drop Distance.exe") == 0)
+        return GameId::KingdomHeartsDdd;
     if (_wcsicmp(PathFindFileNameW(buffer), L"KINGDOM HEARTS HD 1.5+2.5 Launcher.exe") == 0)
         return GameId::Launcher1_5_2_5;
 

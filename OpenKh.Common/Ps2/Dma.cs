@@ -1,4 +1,4 @@
-﻿using Xe.BinaryMapper;
+using Xe.BinaryMapper;
 
 namespace OpenKh.Common.Ps2
 {
@@ -56,9 +56,9 @@ namespace OpenKh.Common.Ps2
     /// </summary>
     public class DmaTag
     {
-        /// <summary>
-        /// Quadword count; packet size
-        /// </summary>
+        // QWC - Quadword Count. How much data is in the link, measured in quadwords (0x16 bytes)
+        // Parameter/Id - Specifies what the DMA does
+        // Address - Parameter for the tag. For models either memory location or bone matrix data
         [Data] public ushort Qwc { get; set; }
         [Data] public ushort Param { get; set; }
         [Data] public int Address { get; set; }

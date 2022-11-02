@@ -63,7 +63,7 @@ namespace OpenKh.Game.Events
                                     _field.SetActorAnimation(
                                         item.ActorId,
                                         GetAnmPath(item.ActorId, item.Name));
-                                    _field.SetActorVisibility(item.ActorId, item.UnknownIndex == 0);
+                                    _field.SetActorVisibility(item.ActorId, item.DeleteFlag == 0);
                                     break;
                             }
                         }
@@ -124,7 +124,7 @@ namespace OpenKh.Game.Events
                     case SeqCamera item:
                         if (nFrame >= item.FrameStart && nFrame < item.FrameEnd)
                         {
-                            _cameraId = item.CameraId;
+                            _cameraId = item.PutId;
                             var frameLength = item.FrameEnd - item.FrameStart;
                             cameraFrameTime = (_seconds * FramesPerSecond - item.FrameStart) / 30f;
                         }
@@ -199,8 +199,8 @@ namespace OpenKh.Game.Events
 
         private static double GetCameraValue(
             double time,
-            IList<SetCameraData.CameraKeys> keyFrames,
-            SetCameraData.CameraKeys prevKey)
+            IList<CameraKeys> keyFrames,
+            CameraKeys prevKey)
         {
             if (keyFrames.Count == 0)
                 return 0.0;
@@ -263,8 +263,8 @@ namespace OpenKh.Game.Events
         private static double InterpolateCamera(
             int keyFrameIndex,
             double time,
-            IList<SetCameraData.CameraKeys> keyFrames,
-            SetCameraData.CameraKeys prevKey)
+            IList<CameraKeys> keyFrames,
+            CameraKeys prevKey)
         {
             const double N = 1.0 / 512.0;
             var curKeyFrame = keyFrames[keyFrameIndex];

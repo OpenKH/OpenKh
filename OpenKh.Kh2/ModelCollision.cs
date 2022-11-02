@@ -38,6 +38,7 @@ namespace OpenKh.Kh2
 
         public Stream toStream()
         {
+            EntryCount = EntryList.Count;
             Stream outStream = new MemoryStream();
             outStream.Write(EntryCount);
             outStream.Write(Enable);
