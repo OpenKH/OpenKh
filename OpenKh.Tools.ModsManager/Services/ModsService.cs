@@ -171,25 +171,25 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     _yamlGen.Title = modName + " (KH2PCPATCH)";
                     _yamlGen.Game = "kh2";
-                    _yamlGen.Description = "This is an atuomatically generated metadata for this KH2PCPATCH Modification.";
+                    _yamlGen.Description = "This is an automatically generated metadata for this KH2PCPATCH Modification.";
                 }
                 else if (fileName.Contains(".kh1pcpatch"))
                 {
                     _yamlGen.Title = modName + " (KH1PCPATCH)";
                     _yamlGen.Game = "kh1";
-                    _yamlGen.Description = "This is an atuomatically generated metadata for this KH1PCPATCH Modification.";
+                    _yamlGen.Description = "This is an automatically generated metadata for this KH1PCPATCH Modification.";
                 }
                 else if (fileName.Contains(".compcpatch"))
                 {
                     _yamlGen.Title = modName + " (COMPCPATCH)";
                     _yamlGen.Game = "recom";
-                    _yamlGen.Description = "This is an atuomatically generated metadata for this COMPCPATCH Modification.";
+                    _yamlGen.Description = "This is an automatically generated metadata for this COMPCPATCH Modification.";
                 }
                 else if (fileName.Contains(".bbspcpatch"))
                 {
                     _yamlGen.Title = modName + " (BBSPCPATCH)";
                     _yamlGen.Game = "bbs";
-                    _yamlGen.Description = "This is an atuomatically generated metadata for this BBSPCPATCH Modification.";
+                    _yamlGen.Description = "This is an automatically generated metadata for this BBSPCPATCH Modification.";
                 }
                 _yamlGen.OriginalAuthor = "Unknown";
                 _yamlGen.Assets = new List<AssetFile>();
