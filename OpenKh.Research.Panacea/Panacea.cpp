@@ -219,6 +219,7 @@ struct MyAppVtbl
     void* onResize;
     void* onFrameForSaveWait;
     void* func3;
+    void* func4recom;
 };
 
 MyAppVtbl customAppVtbl;
