@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -135,6 +135,8 @@ namespace OpenKh.Kh2
             public List<Collision> Collisions { get; set; }
             public byte Visibility { get; set; }
             public byte Group { get; set; }
+
+            public int MapVisibility => (Group << 8) | Visibility;
         }
 
         public class Collision : IData

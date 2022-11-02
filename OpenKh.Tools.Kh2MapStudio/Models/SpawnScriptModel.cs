@@ -39,6 +39,41 @@ namespace OpenKh.Tools.Kh2MapStudio.Models
             }
         }
 
+        public void CopyAll()
+        {
+            IsError = false;
+            LastError = null;
+
+            ClipboardService.SetText(
+                Decompiled,
+                () => LastError = "Copied",
+                ex =>
+                {
+                    IsError = true;
+                    LastError = ex.Message;
+                }
+            );
+        }
+
+        public void PasteReplace()
+        {
+            IsError = false;
+            LastError = null;
+
+            ClipboardService.GetText(
+                text =>
+                {
+                    Decompiled = text;
+                    LastError = "Pasted";
+                },
+                ex =>
+                {
+                    IsError = true;
+                    LastError = ex.Message;
+                }
+            );
+        }
+
         public IEnumerable<Bar.Entry> SaveToBar(IEnumerable<Bar.Entry> entries)
         {
             var memStream = new MemoryStream();

@@ -1,0 +1,44 @@
+<UserControl x:Class="OpenKh.Tools.Kh2MdlxEditor.Views.CollisionProperties_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2MdlxEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Grid.Row="2" Background="#1d1d1d">
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <Label Content="Group:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=Group, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+            <Label Content="Parts:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=Parts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+            <Label Content="Argument:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=Argument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <Label Content="Type:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+            <Label Content="Shape:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=Shape, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <Label Content="Bone:" Foreground="White"/>
+            <TextBox Width="50" Text="{Binding Path=Bone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <Label Content="Position XYZ:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=PositionX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=PositionY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=PositionZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+            <Label Content="Position Height:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=PositionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <Label Content="Radius:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=Radius, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+            <Label Content="Height:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+        </StackPanel>
+    </StackPanel>
+    
+</UserControl>

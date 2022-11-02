@@ -8,9 +8,39 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\IconCollision.png" />
+    <None Remove="Assets\IconCollisionW.png" />
+    <None Remove="Assets\IconModel.png" />
+    <None Remove="Assets\IconModelW.png" />
+    <None Remove="Assets\IconTexture.png" />
+    <None Remove="Assets\IconTextureW.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj" />
     <ProjectReference Include="..\OpenKh.Command.Bar\OpenKh.Command.Bar.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.ImageViewer\OpenKh.Tools.ImageViewer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\IconCollision.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\IconCollisionW.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\IconModel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\IconModelW.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\IconTexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\IconTextureW.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

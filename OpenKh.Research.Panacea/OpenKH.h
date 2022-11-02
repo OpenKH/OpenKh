@@ -23,7 +23,6 @@ namespace OpenKH
     extern bool m_EnableCache;
 
     void Initialize();
-    void Main();
 
     GameId DetectGame();
     long LoadFile(const char* filename, void* addr);
