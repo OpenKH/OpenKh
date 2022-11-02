@@ -69,11 +69,13 @@
                 <MenuItem Header="Build Only" Command="{Binding BuildCommand}" InputGestureText="Ctrl+B"/>
                 <MenuItem Header="Run Only" Command="{Binding RunCommand}" InputGestureText="Ctrl+F5"/>
                 <MenuItem Header="Stop" Command="{Binding StopRunningInstanceCommand}" Visibility="{Binding HideStop}" InputGestureText="Shift+F5"/>
+                <MenuItem Header="Restore" Command="{Binding RestoreCommand}" Visibility="{Binding isPC}" CommandParameter="False" InputGestureText="Ctrl+R"/>
             </MenuItem>
-            <MenuItem Header="PC" Visibility="{Binding PatchVisible}">
+            <MenuItem Header="Patching" Visibility="{Binding PatchVisible}">
                 <MenuItem Header="Build and Patch" Command="{Binding PatchCommand}" CommandParameter="false" InputGestureText="Ctrl+P"/>
                 <MenuItem Header="Build and Fast Patch" Command="{Binding PatchCommand}" CommandParameter="true" InputGestureText="Ctrl+P+F"/>
-                <MenuItem Header="Restore" Command="{Binding RestoreCommand}" InputGestureText="Ctrl+R"/>
+                <MenuItem Header="Run Only" Command="{Binding RunCommand}" InputGestureText="Ctrl+F5"/>
+                <MenuItem Header="Restore" Command="{Binding RestoreCommand}" CommandParameter="True" InputGestureText="Ctrl+R"/>
             </MenuItem>
             <MenuItem Header="_Settings">
                 <MenuItem Header="Run _wizard" Command="{Binding WizardCommand}"  InputGestureText="Alt+W"/>
@@ -123,13 +125,12 @@
                 </MenuItem>
                 <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}"/>
             </MenuItem>
-            <MenuItem Header="Quick Launch"  Visibility="{Binding HideQuickLaunch}">                
-                <ComboBox SelectedIndex="{Binding QuickLaunch}">
+            <MenuItem Header="Launch Game" Visibility="{Binding isPC}">                
+                <ComboBox SelectedIndex="{Binding GametoLaunch}">
                     <ComboBoxItem>kh2</ComboBoxItem>
                     <ComboBoxItem>kh1</ComboBoxItem>
                     <ComboBoxItem>bbs</ComboBoxItem>
                     <ComboBoxItem>recom</ComboBoxItem>
-                    <ComboBoxItem>off</ComboBoxItem>
                 </ComboBox>               
             </MenuItem>
         </Menu>

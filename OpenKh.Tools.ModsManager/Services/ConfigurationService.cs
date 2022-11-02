@@ -39,6 +39,11 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool PanaceaInstalled { get; internal set; }
             public bool DevView { get; internal set; }
             public bool isEGSVersion { get; internal set; } = true;
+            public bool kh1 { get; internal set; }
+            public bool kh2 { get; internal set; } = true;
+            public bool bbs { get; internal set; }
+            public bool recom { get; internal set; }
+            public string LaunchGame { get; internal set; }
 
             public void Save(string fileName)
             {
@@ -241,6 +246,51 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.isEGSVersion = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool kh1
+        {
+            get => _config.kh1;
+            set
+            {
+                _config.kh1 = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool kh2
+        {
+            get => _config.kh2;
+            set
+            {
+                _config.kh2 = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool bbs
+        {
+            get => _config.bbs;
+            set
+            {
+                _config.bbs = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static bool recom
+        {
+            get => _config.recom;
+            set
+            {
+                _config.recom = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static string LaunchGame
+        {
+            get => _config.LaunchGame;
+            set
+            {
+                _config.LaunchGame = value;
                 _config.Save(ConfigPath);
             }
         }
