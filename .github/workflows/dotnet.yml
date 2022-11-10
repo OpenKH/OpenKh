@@ -33,7 +33,7 @@ jobs:
     - name: msbuild panacea
       run: |
         msbuild OpenKh.Research.Panacea\OpenKh.Research.Panacea.vcxproj /p:Configuration=Release /p:Platform=x64
-        copy "OpenKh.Research.Panacea\Release\*.dll" bin\
+        xcopy "OpenKh.Research.Panacea\Release\*.dll" bin\
       
     - name: bin → openkh
       run: ren bin openkh
