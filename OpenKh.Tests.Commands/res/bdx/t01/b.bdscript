@@ -1,0 +1,32 @@
+---
+WorkSize: 64
+StackSize: 64
+TempSize: 64
+Triggers:
+- Key: 0
+  Addr: TR0
+Name: aaa
+
+---
+; codeLabels: 
+; codeRevealer: 
+ section .text
+TR0:
+ pushFromPWp W0
+ drop 
+ pushFromPWp W12
+ drop 
+ pushFromPWp W24
+ drop 
+ gosub 2, L26
+ ret 
+L26:
+ ret 
+
+ section .bss
+W0:
+ resb 12
+W12:
+ resb 12
+W24:
+ resb 40
