@@ -46,6 +46,7 @@ jobs:
 
     - name: "GitHub release latest"
       uses: "marvinpinto/action-automatic-releases@latest"
+      continue-on-error: true # at non master branch this will always fail
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
@@ -56,6 +57,7 @@ jobs:
 
     - name: "GitHub release numbered"
       uses: "marvinpinto/action-automatic-releases@latest"
+      continue-on-error: true # at non master branch this will always fail
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "release2-${{github.run_number}}"
