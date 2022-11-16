@@ -2,6 +2,8 @@ using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
+using OpenKh.Command.Bdxio.Models;
+using OpenKh.Command.Bdxio.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -200,6 +202,9 @@ namespace OpenKh.Patcher
                 case "areadatascript":
                     PatchAreaDataScript(context, assetFile.Source, stream);
                     break;
+                case "bdscript":
+                    PatchBdscript(context, assetFile, stream);
+                    break;
                 case "spawnpoint":
                     PatchSpawnPoint(context, assetFile, stream);
                     break;
@@ -378,6 +383,36 @@ namespace OpenKh.Patcher
             }
 
             Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
+        }
+
+        private static void PatchBdscript(Context context, AssetFile assetFile, Stream stream)
+        {
+
+            if (assetFile.Source == null || assetFile.Source.Count == 0)
+                throw new Exception($"File '{assetFile.Name}' does not contain any source");
+
+            var scriptName = assetFile.Source[0].Name;
+            var srcFile = context.GetSourceModAssetPath(scriptName);
+            if (!File.Exists(srcFile))
+                throw new FileNotFoundException($"The mod does not contain the file {scriptName}", srcFile);
+
+ 
+            var programsInput = File.ReadAllText(context.GetSourceModAssetPath(scriptName));
+            var ascii = BdxAsciiModel.ParseText(programsInput);
+            var decoder = new BdxEncoder(
+                header: new YamlDotNet.Serialization.DeserializerBuilder()
+                    .Build()
+                    .Deserialize<BdxHeader>(
+                        ascii.Header ?? ""
+                    ),
+                script: ascii.GetLineNumberRetainedScriptBody(),
+                scriptName: scriptName,
+                loadScript: programsInput => programsInput
+                );
+
+            stream.SetPosition(0);
+            stream.Write(decoder.Content);
+
         }
 
         private static void PatchSpawnPoint(Context context, AssetFile assetFile, Stream stream)
