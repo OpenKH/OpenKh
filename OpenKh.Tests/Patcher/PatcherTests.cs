@@ -567,7 +567,7 @@ namespace OpenKh.Tests.Patcher
             var lines = script.Split("\r\n");
 
             Assert.Equal("WorkSize: 64", lines[1]);
-            Assert.Equal("Name: aaa", lines[8]);
+            Assert.Equal("Name: aaa", lines[7]);
 
         }
 
