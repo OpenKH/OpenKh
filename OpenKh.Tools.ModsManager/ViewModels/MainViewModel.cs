@@ -180,6 +180,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         ConfigurationService.LaunchGame = "kh2";
                         break;
                 }
+                ReloadModsList();
             }
         }
 
@@ -560,11 +561,37 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public void ModEnableStateChanged()
         {
-            ConfigurationService.EnabledMods = ModsList
-                .Where(x => x.Enabled)
-                .Select(x => x.Source)
-                .ToList();
-            OnPropertyChanged(nameof(BuildAndRunCommand));
+            switch (_launchGame)
+            {
+                case "kh1":
+                    ConfigurationService.EnabledModsKH1 = ModsList
+                        .Where(x => x.Enabled)
+                        .Select(x => x.Source)
+                        .ToList();
+                    OnPropertyChanged(nameof(BuildAndRunCommand));
+                    break;
+                case "kh2":
+                    ConfigurationService.EnabledModsKH2 = ModsList
+                        .Where(x => x.Enabled)
+                        .Select(x => x.Source)
+                        .ToList();
+                    OnPropertyChanged(nameof(BuildAndRunCommand));
+                    break;
+                case "bbs":
+                    ConfigurationService.EnabledModsBBS = ModsList
+                        .Where(x => x.Enabled)
+                        .Select(x => x.Source)
+                        .ToList();
+                    OnPropertyChanged(nameof(BuildAndRunCommand));
+                    break;
+                case "recom":
+                    ConfigurationService.EnabledModsRECOM = ModsList
+                        .Where(x => x.Enabled)
+                        .Select(x => x.Source)
+                        .ToList();
+                    OnPropertyChanged(nameof(BuildAndRunCommand));
+                    break;
+            }
         }
 
         private void MoveSelectedModDown()

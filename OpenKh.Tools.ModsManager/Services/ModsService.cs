@@ -81,12 +81,42 @@ namespace OpenKh.Tools.ModsManager.Services
         {
             get
             {
-                var mods = UnorderedMods.ToList();
-                foreach (var mod in ConfigurationService.EnabledMods)
+                switch (ConfigurationService.LaunchGame)
                 {
-                    if (mods.Contains(mod))
-                        yield return mod;
+                    case "kh1":
+                        var modskh1 = UnorderedMods.ToList();
+                        foreach (var mod in ConfigurationService.EnabledModsKH1)
+                        {
+                            if (modskh1.Contains(mod))
+                                yield return mod;
+                        }
+                        break;
+                    case "kh2":
+                        var modskh2 = UnorderedMods.ToList();
+                        foreach (var mod in ConfigurationService.EnabledModsKH2)
+                        {
+                            if (modskh2.Contains(mod))
+                                yield return mod;
+                        }
+                        break;
+                    case "bbs":
+                        var modsbbs = UnorderedMods.ToList();
+                        foreach (var mod in ConfigurationService.EnabledModsKH1)
+                        {
+                            if (modsbbs.Contains(mod))
+                                yield return mod;
+                        }
+                        break;
+                    case "recom":
+                        var modsrecom = UnorderedMods.ToList();
+                        foreach (var mod in ConfigurationService.EnabledModsKH1)
+                        {
+                            if (modsrecom.Contains(mod))
+                                yield return mod;
+                        }
+                        break;
                 }
+                
             }
         }
 
@@ -285,21 +315,74 @@ namespace OpenKh.Tools.ModsManager.Services
             Path.Combine(ConfigurationService.ModCollectionPath, repositoryName);
 
         public static IEnumerable<ModModel> GetMods(IEnumerable<string> modNames)
-        {
-            var enabledMods = ConfigurationService.EnabledMods;
-            foreach (var modName in modNames)
+        {            
+            switch (ConfigurationService.LaunchGame)
             {
-                var modPath = GetModPath(modName);
-                yield return new ModModel
-                {
-                    Name = modName,
-                    Path = modPath,
-                    IconImageSource = Path.Combine(modPath, "icon.png"),
-                    PreviewImageSource = Path.Combine(modPath, "preview.png"),
-                    Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
-                    IsEnabled = enabledMods.Contains(modName)
-                };
-            }
+                case "kh1":
+                    var enabledModsKH1 = ConfigurationService.EnabledModsKH1;
+                    foreach (var modName in modNames)
+                    {
+                        var modPath = GetModPath(modName);
+                        yield return new ModModel
+                        {
+                            Name = modName,
+                            Path = modPath,
+                            IconImageSource = Path.Combine(modPath, "icon.png"),
+                            PreviewImageSource = Path.Combine(modPath, "preview.png"),
+                            Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
+                            IsEnabled = enabledModsKH1.Contains(modName)
+                        };
+                    }
+                    break;
+                case "kh2":
+                    var enabledModsKH2 = ConfigurationService.EnabledModsKH2;
+                    foreach (var modName in modNames)
+                    {
+                        var modPath = GetModPath(modName);
+                        yield return new ModModel
+                        {
+                            Name = modName,
+                            Path = modPath,
+                            IconImageSource = Path.Combine(modPath, "icon.png"),
+                            PreviewImageSource = Path.Combine(modPath, "preview.png"),
+                            Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
+                            IsEnabled = enabledModsKH2.Contains(modName)
+                        };
+                    }
+                    break;
+                case "bbs":
+                    var enabledModsBBS = ConfigurationService.EnabledModsBBS;
+                    foreach (var modName in modNames)
+                    {
+                        var modPath = GetModPath(modName);
+                        yield return new ModModel
+                        {
+                            Name = modName,
+                            Path = modPath,
+                            IconImageSource = Path.Combine(modPath, "icon.png"),
+                            PreviewImageSource = Path.Combine(modPath, "preview.png"),
+                            Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
+                            IsEnabled = enabledModsBBS.Contains(modName)
+                        };
+                    }
+                    break;
+                case "recom":
+                    var enabledModsRECOM = ConfigurationService.EnabledModsRECOM;
+                    foreach (var modName in modNames)
+                    {
+                        var modPath = GetModPath(modName);
+                        yield return new ModModel
+                        {
+                            Name = modName,
+                            Path = modPath,
+                            IconImageSource = Path.Combine(modPath, "icon.png"),
+                            PreviewImageSource = Path.Combine(modPath, "preview.png"),
+                            Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
+                            IsEnabled = enabledModsRECOM.Contains(modName)
+                        };
+                    }
+                    break;
+            }            
         }
 
         public static async IAsyncEnumerable<ModUpdateModel> FetchUpdates()

@@ -63,7 +63,10 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
-        private static string EnabledModsPath = Path.Combine(StoragePath, "mods.txt");
+        private static string EnabledModsPathKH1 = Path.Combine(StoragePath,"kh1mods.txt");
+        private static string EnabledModsPathKH2 = Path.Combine(StoragePath, "kh2mods.txt");
+        private static string EnabledModsPathBBS = Path.Combine(StoragePath, "bbsmods.txt");
+        private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "recommods.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
 
         static ConfigurationService()
@@ -94,10 +97,25 @@ namespace OpenKh.Tools.ModsManager.Services
             });
         }
 
-        public static ICollection<string> EnabledMods
+        public static ICollection<string> EnabledModsKH1
         {
-            get => File.Exists(EnabledModsPath) ? File.ReadAllLines(EnabledModsPath) : new string[0];
-            set => File.WriteAllLines(EnabledModsPath, value);
+            get => File.Exists(EnabledModsPathKH1) ? File.ReadAllLines(EnabledModsPathKH1) : new string[0];
+            set => File.WriteAllLines(EnabledModsPathKH1, value);
+        }
+        public static ICollection<string> EnabledModsKH2
+        {
+            get => File.Exists(EnabledModsPathKH2) ? File.ReadAllLines(EnabledModsPathKH2) : new string[0];
+            set => File.WriteAllLines(EnabledModsPathKH2, value);
+        }
+        public static ICollection<string> EnabledModsBBS
+        {
+            get => File.Exists(EnabledModsPathBBS) ? File.ReadAllLines(EnabledModsPathBBS) : new string[0];
+            set => File.WriteAllLines(EnabledModsPathBBS, value);
+        }
+        public static ICollection<string> EnabledModsRECOM
+        {
+            get => File.Exists(EnabledModsPathRECOM) ? File.ReadAllLines(EnabledModsPathRECOM) : new string[0];
+            set => File.WriteAllLines(EnabledModsPathRECOM, value);
         }
 
         public static ICollection<string> FeaturedMods { get; private set; }
@@ -115,7 +133,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string ModCollectionPath
         {
-            get => _config.ModCollectionPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mods"));
+            get => _config.ModCollectionPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mods", LaunchGame));
             set
             {
                 _config.ModCollectionPath = value;
