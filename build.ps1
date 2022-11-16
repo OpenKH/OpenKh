@@ -24,7 +24,7 @@ function Test-Success([int] $exitCode) {
     if ($exitCode -ne 0) {
         Remove-Item $solution -ErrorAction Ignore
         Write-Error "Last command returned error $exitCode, therefore the build is canceled."
-        exit
+        exit $exitCode
     }
 }
 

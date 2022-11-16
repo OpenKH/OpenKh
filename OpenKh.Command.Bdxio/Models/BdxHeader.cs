@@ -16,7 +16,7 @@ namespace OpenKh.Command.Bdxio.Models
         [Data] public int TempSize { get; set; }
         public Trigger[] Triggers { get; set; } = new Trigger[0];
 
-        public bool IsEmpty { get; set; }
+        [YamlMember(DefaultValuesHandling = DefaultValuesHandling.OmitDefaults)] public bool IsEmpty { get; set; }
 
         public string Name
         {
