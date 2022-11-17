@@ -1,3 +1,4 @@
+using OpenKh.Command.Bdxio.Utils;
 using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
@@ -512,6 +513,62 @@ namespace OpenKh.Tests.Patcher
                 decompiled.Contains("Program 2");
                 decompiled.Contains("Spawn \"2222\"");
             });
+        }
+
+        [Fact]
+        public void PatchKh2BdscriptTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "aaa",
+                        Method = "bdscript",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "test.bdscript",
+                            }
+                        }
+                    },
+                }
+            };
+            File.Create(Path.Combine(ModInputDir, "test.bdscript")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("---");
+                writer.WriteLine("WorkSize: 64");
+                writer.WriteLine("StackSize: 64");
+                writer.WriteLine("TempSize: 64");
+                writer.WriteLine("Triggers:");
+                writer.WriteLine("- Key: 0");
+                writer.WriteLine("  Addr: TR0");
+                writer.WriteLine("Name: aaa");
+                writer.WriteLine("---");
+                writer.WriteLine(" section.text");
+                writer.WriteLine("TR0:");
+                writer.WriteLine(" ret");
+                writer.WriteLine("DUMMY:");
+                writer.WriteLine(" ret");
+                writer.Flush();
+            });
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "aaa");
+
+            var bdxStream = new MemoryStream(File.ReadAllBytes(Path.Combine(ModOutputDir, "aaa")));
+            var decoder = new BdxDecoder(bdxStream);
+            var script = BdxDecoder.TextFormatter.Format(decoder);
+
+            var lines = script.Split("\r\n");
+
+            Assert.Equal("WorkSize: 64", lines[1]);
+            Assert.Equal("Name: aaa", lines[7]);
+
         }
 
         [Fact]
