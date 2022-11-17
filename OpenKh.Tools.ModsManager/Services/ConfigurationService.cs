@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -63,7 +64,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
-        private static string EnabledModsPathKH1 = Path.Combine(StoragePath,"kh1mods.txt");
+        private static string EnabledModsPathKH1 = Path.Combine(StoragePath, "kh1mods.txt");
         private static string EnabledModsPathKH2 = Path.Combine(StoragePath, "kh2mods.txt");
         private static string EnabledModsPathBBS = Path.Combine(StoragePath, "bbsmods.txt");
         private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "recommods.txt");
@@ -96,26 +97,49 @@ namespace OpenKh.Tools.ModsManager.Services
                     .ToList();
             });
         }
-
-        public static ICollection<string> EnabledModsKH1
+        public static string LaunchGame
         {
-            get => File.Exists(EnabledModsPathKH1) ? File.ReadAllLines(EnabledModsPathKH1) : new string[0];
-            set => File.WriteAllLines(EnabledModsPathKH1, value);
+            get => _config.LaunchGame;
+            set
+            {
+                _config.LaunchGame = value;
+                _config.Save(ConfigPath);
+            }
         }
-        public static ICollection<string> EnabledModsKH2
+        public static ICollection<string> EnabledMods
         {
-            get => File.Exists(EnabledModsPathKH2) ? File.ReadAllLines(EnabledModsPathKH2) : new string[0];
-            set => File.WriteAllLines(EnabledModsPathKH2, value);
-        }
-        public static ICollection<string> EnabledModsBBS
-        {
-            get => File.Exists(EnabledModsPathBBS) ? File.ReadAllLines(EnabledModsPathBBS) : new string[0];
-            set => File.WriteAllLines(EnabledModsPathBBS, value);
-        }
-        public static ICollection<string> EnabledModsRECOM
-        {
-            get => File.Exists(EnabledModsPathRECOM) ? File.ReadAllLines(EnabledModsPathRECOM) : new string[0];
-            set => File.WriteAllLines(EnabledModsPathRECOM, value);
+            get
+            {
+                switch (LaunchGame)
+                {
+                    case "kh1":
+                        return File.Exists(EnabledModsPathKH1) ? File.ReadAllLines(EnabledModsPathKH1) : new string[0];
+                    case "bbs":
+                        return File.Exists(EnabledModsPathBBS) ? File.ReadAllLines(EnabledModsPathBBS) : new string[0];
+                    case "recom":
+                        return File.Exists(EnabledModsPathRECOM) ? File.ReadAllLines(EnabledModsPathRECOM) : new string[0];
+                    default:
+                        return File.Exists(EnabledModsPathKH2) ? File.ReadAllLines(EnabledModsPathKH2) : new string[0];
+                }
+            }
+            set
+            {
+                switch (LaunchGame)
+                {
+                    case "kh1":
+                        File.WriteAllLines(EnabledModsPathKH1, value);
+                        break;
+                    case "bbs":
+                        File.WriteAllLines(EnabledModsPathBBS, value);
+                        break;
+                    case "recom":
+                        File.WriteAllLines(EnabledModsPathRECOM, value);
+                        break;
+                    default:
+                        File.WriteAllLines(EnabledModsPathKH2, value);
+                        break;
+                }
+            }
         }
 
         public static ICollection<string> FeaturedMods { get; private set; }
@@ -300,15 +324,6 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.recom = value;
-                _config.Save(ConfigPath);
-            }
-        }
-        public static string LaunchGame
-        {
-            get => _config.LaunchGame;
-            set
-            {
-                _config.LaunchGame = value;
                 _config.Save(ConfigPath);
             }
         }
