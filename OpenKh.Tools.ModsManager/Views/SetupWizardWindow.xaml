@@ -140,7 +140,7 @@
                     <CheckBox IsChecked="{Binding kh1}" Content="KH1-13GB" Margin="0 0 10 4"/>
                     <CheckBox IsChecked="{Binding kh2}" Content="KH2-25GB" Margin="0 0 10 4"/>
                     <CheckBox IsChecked="{Binding bbs}" Content="BBS-10GB" Margin="0 0 10 4"/>
-                    <CheckBox IsChecked="{Binding recom}" Content="ReCOM-10GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding recom}" Content="ReCoM-10GB" Margin="0 0 10 4"/>
                 </StackPanel>
                 <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
                 <Grid Margin="0 0 0 3">

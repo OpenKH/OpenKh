@@ -64,10 +64,10 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
-        private static string EnabledModsPathKH1 = Path.Combine(StoragePath, "kh1mods.txt");
-        private static string EnabledModsPathKH2 = Path.Combine(StoragePath, "kh2mods.txt");
-        private static string EnabledModsPathBBS = Path.Combine(StoragePath, "bbsmods.txt");
-        private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "recommods.txt");
+        private static string EnabledModsPathKH1 = Path.Combine(StoragePath, "mods-KH1.txt");
+        private static string EnabledModsPathKH2 = Path.Combine(StoragePath, "mods-KH2.txt");
+        private static string EnabledModsPathBBS = Path.Combine(StoragePath, "mods-BBS.txt");
+        private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "mods-ReCoM.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
 
         static ConfigurationService()
