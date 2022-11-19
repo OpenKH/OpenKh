@@ -209,10 +209,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public MainViewModel()
         {
-            if (_supportedGames.Contains(ConfigurationService.LaunchGame))
-                _launchGame = ConfigurationService.LaunchGame;
-            else
-                ConfigurationService.LaunchGame = _launchGame;
             if (ConfigurationService.GameEdition == 2)
             {
                 PC = true;
@@ -221,6 +217,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
             else
                 PC = false;
+            if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC)
+                _launchGame = ConfigurationService.LaunchGame;
+            else
+                ConfigurationService.LaunchGame = _launchGame;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);

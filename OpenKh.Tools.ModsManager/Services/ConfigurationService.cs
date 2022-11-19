@@ -44,7 +44,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool kh2 { get; internal set; } = true;
             public bool bbs { get; internal set; }
             public bool recom { get; internal set; }
-            public string LaunchGame { get; internal set; }
+            public string LaunchGame { get; internal set; } = "kh2";
 
             public void Save(string fileName)
             {
@@ -97,15 +97,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     .ToList();
             });
         }
-        public static string LaunchGame
-        {
-            get => _config.LaunchGame;
-            set
-            {
-                _config.LaunchGame = value;
-                _config.Save(ConfigPath);
-            }
-        }
+        
         public static ICollection<string> EnabledMods
         {
             get
@@ -324,6 +316,15 @@ namespace OpenKh.Tools.ModsManager.Services
             set
             {
                 _config.recom = value;
+                _config.Save(ConfigPath);
+            }
+        }
+        public static string LaunchGame
+        {
+            get => _config.LaunchGame;
+            set
+            {
+                _config.LaunchGame = value;
                 _config.Save(ConfigPath);
             }
         }
