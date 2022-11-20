@@ -1454,6 +1454,94 @@ namespace OpenKh.Tests.Patcher
             });
         }
 
+        public void ListPatchEnmpTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "enmp",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "EnmpList.yml",
+                                        Type = "enmp"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var enmpEntry = new List<Kh2.Battle.Enmp>()
+                {
+                    new Kh2.Battle.Enmp
+                    {
+                        Id = 1,
+                        Level = 1,
+                        Health = new short[32],
+                        MaxDamage = 1
+                    }
+                };
+
+                using var EnmpStream = new MemoryStream();
+                Kh2.Battle.Enmp.Write(EnmpStream, enmpEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "enmp",
+                        Type = Bar.EntryType.List,
+                        Stream = EnmpStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "EnmpList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                var serializer = new Serializer();
+                var moddedEnmp = new List<Kh2.Battle.Enmp>{
+                    new Kh2.Battle.Enmp
+                    {
+                        Id = 7,
+                        Level = 1,
+                        Health = new short[32],
+                        MaxDamage = 1
+                    }
+                };
+                writer.Write(serializer.Serialize(moddedEnmp));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var enmp = Kh2.Battle.Enmp.Read(binarc[0].Stream);
+
+                Assert.Equal(50, enmp[0].Prize);
+            });
+        }
+
         [Fact]
         public void ProcessMultipleTest()
         {
