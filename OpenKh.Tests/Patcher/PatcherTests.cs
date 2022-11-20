@@ -1454,6 +1454,7 @@ namespace OpenKh.Tests.Patcher
             });
         }
 
+        [Fact]
         public void ListPatchEnmpTest()
         {
             var patcher = new PatcherProcessor();
