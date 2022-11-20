@@ -1496,8 +1496,6 @@ namespace OpenKh.Tests.Patcher
                     {
                         Id = 1,
                         Level = 1,
-                        Health = new short[32],
-                        MaxDamage = 1
                     }
                 };
 
@@ -1522,8 +1520,6 @@ namespace OpenKh.Tests.Patcher
                     {
                         Id = 7,
                         Level = 1,
-                        Health = new short[32],
-                        MaxDamage = 1
                     }
                 };
                 writer.Write(serializer.Serialize(moddedEnmp));
@@ -1539,7 +1535,7 @@ namespace OpenKh.Tests.Patcher
                 var binarc = Bar.Read(stream);
                 var enmp = Kh2.Battle.Enmp.Read(binarc[0].Stream);
 
-                Assert.Equal(50, enmp[0].Prize);
+                Assert.Equal(50, enmp[0].Level);
             });
         }
 
