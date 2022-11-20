@@ -94,13 +94,13 @@
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Download _latest version" Command="{Binding OpenLinkCommand}"
-                    CommandParameter="https://github.com/Xeeynamo/OpenKh/releases">
+                    CommandParameter="https://github.com/OpenKH/OpenKh/releases">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource WebURL_16x}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="OpenKH source code" Command="{Binding OpenLinkCommand}"
-                    CommandParameter="https://github.com/Xeeynamo/OpenKh">
+                    CommandParameter="https://github.com/OpenKH/OpenKh">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource WebURL_16x}"/>
                     </MenuItem.Icon>
@@ -112,7 +112,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Report bug or missing features" Command="{Binding OpenLinkCommand}"
-                    CommandParameter="https://github.com/Xeeynamo/OpenKh/issues">
+                    CommandParameter="https://github.com/OpenKH/OpenKh/issues">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource WebURL_16x}"/>
                     </MenuItem.Icon>
@@ -124,17 +124,15 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}"/>
-            </MenuItem>
-            <MenuItem Header="Launch Game" Visibility="{Binding isPC}">                
-                <ComboBox SelectedIndex="{Binding GametoLaunch}">
-                    <ComboBoxItem>kh2</ComboBoxItem>
-                    <ComboBoxItem>kh1</ComboBoxItem>
-                    <ComboBoxItem>bbs</ComboBoxItem>
-                    <ComboBoxItem>recom</ComboBoxItem>
-                </ComboBox>               
-            </MenuItem>
+            </MenuItem>            
         </Menu>
-
+        <ComboBox SelectedIndex="{Binding GametoLaunch}" Visibility="{Binding isPC}" HorizontalAlignment="Right" Margin="0,0,10,0" MinWidth="144">
+            <ComboBoxItem>Kingdom Hearts 2</ComboBoxItem>
+            <ComboBoxItem>Kingdom Hearts 1</ComboBoxItem>
+            <ComboBoxItem>Birth by Sleep</ComboBoxItem>
+            <ComboBoxItem>Re:Chain of Memories</ComboBoxItem>
+        </ComboBox>
         <local:ModManagerView Grid.Row="1" DataContext="{Binding}"/>
+
     </Grid>
 </Window>

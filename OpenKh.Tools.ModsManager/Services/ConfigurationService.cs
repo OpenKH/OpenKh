@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using YamlDotNet.Core.Tokens;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -43,7 +44,7 @@ namespace OpenKh.Tools.ModsManager.Services
             public bool kh2 { get; internal set; } = true;
             public bool bbs { get; internal set; }
             public bool recom { get; internal set; }
-            public string LaunchGame { get; internal set; }
+            public string LaunchGame { get; internal set; } = "kh2";
 
             public void Save(string fileName)
             {
@@ -63,7 +64,10 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private static string StoragePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         private static string ConfigPath = Path.Combine(StoragePath, "mods-manager.yml");
-        private static string EnabledModsPath = Path.Combine(StoragePath, "mods.txt");
+        private static string EnabledModsPathKH1 = Path.Combine(StoragePath, "mods-KH1.txt");
+        private static string EnabledModsPathKH2 = Path.Combine(StoragePath, "mods-KH2.txt");
+        private static string EnabledModsPathBBS = Path.Combine(StoragePath, "mods-BBS.txt");
+        private static string EnabledModsPathRECOM = Path.Combine(StoragePath, "mods-ReCoM.txt");
         private static readonly Config _config = Config.Open(ConfigPath);
 
         static ConfigurationService()
@@ -93,11 +97,41 @@ namespace OpenKh.Tools.ModsManager.Services
                     .ToList();
             });
         }
-
+        
         public static ICollection<string> EnabledMods
         {
-            get => File.Exists(EnabledModsPath) ? File.ReadAllLines(EnabledModsPath) : new string[0];
-            set => File.WriteAllLines(EnabledModsPath, value);
+            get
+            {
+                switch (LaunchGame)
+                {
+                    case "kh1":
+                        return File.Exists(EnabledModsPathKH1) ? File.ReadAllLines(EnabledModsPathKH1) : new string[0];
+                    case "bbs":
+                        return File.Exists(EnabledModsPathBBS) ? File.ReadAllLines(EnabledModsPathBBS) : new string[0];
+                    case "recom":
+                        return File.Exists(EnabledModsPathRECOM) ? File.ReadAllLines(EnabledModsPathRECOM) : new string[0];
+                    default:
+                        return File.Exists(EnabledModsPathKH2) ? File.ReadAllLines(EnabledModsPathKH2) : new string[0];
+                }
+            }
+            set
+            {
+                switch (LaunchGame)
+                {
+                    case "kh1":
+                        File.WriteAllLines(EnabledModsPathKH1, value);
+                        break;
+                    case "bbs":
+                        File.WriteAllLines(EnabledModsPathBBS, value);
+                        break;
+                    case "recom":
+                        File.WriteAllLines(EnabledModsPathRECOM, value);
+                        break;
+                    default:
+                        File.WriteAllLines(EnabledModsPathKH2, value);
+                        break;
+                }
+            }
         }
 
         public static ICollection<string> FeaturedMods { get; private set; }
@@ -115,7 +149,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static string ModCollectionPath
         {
-            get => _config.ModCollectionPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mods"));
+            get => _config.ModCollectionPath ?? Path.GetFullPath(Path.Combine(StoragePath, "mods", LaunchGame));
             set
             {
                 _config.ModCollectionPath = value;

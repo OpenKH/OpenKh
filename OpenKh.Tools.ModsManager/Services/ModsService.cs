@@ -86,7 +86,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     if (mods.Contains(mod))
                         yield return mod;
-                }
+                }                
             }
         }
 
@@ -299,7 +299,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
                     IsEnabled = enabledMods.Contains(modName)
                 };
-            }
+            }            
         }
 
         public static async IAsyncEnumerable<ModUpdateModel> FetchUpdates()

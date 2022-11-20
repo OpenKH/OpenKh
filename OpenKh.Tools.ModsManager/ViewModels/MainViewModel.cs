@@ -42,6 +42,13 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _panaceaInstalled;
         private bool _devView;
         private string _launchGame = "kh2";
+        private List<string> _supportedGames = new List<string>()
+        {
+            "kh2",
+            "kh1",
+            "bbs",
+            "recom"
+        };
         private int _wizardVersionNumber = 1;
         private string[] executable = new string[]
         {
@@ -180,6 +187,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         ConfigurationService.LaunchGame = "kh2";
                         break;
                 }
+                ReloadModsList();
             }
         }
 
@@ -201,7 +209,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
         public MainViewModel()
         {
-            ConfigurationService.LaunchGame = _launchGame;
             if (ConfigurationService.GameEdition == 2)
             {
                 PC = true;
@@ -210,6 +217,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
             else
                 PC = false;
+            if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC)
+                _launchGame = ConfigurationService.LaunchGame;
+            else
+                ConfigurationService.LaunchGame = _launchGame;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
