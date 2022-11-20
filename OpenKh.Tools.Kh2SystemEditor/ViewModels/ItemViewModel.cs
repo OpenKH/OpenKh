@@ -61,7 +61,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public ushort Slot  { get => Item.Slot; set => Item.Slot = value; }
             public short Picture  { get => Item.Picture; set => Item.Picture = value; }
             public byte Icon1  { get => Item.Icon1; set => Item.Icon1 = value; }
-            public byte Icon2  { get => Item.Icon1; set => Item.Icon1 = value; }
+            public byte Icon2  { get => Item.Icon2; set => Item.Icon2 = value; }
 
             public string IdText => $"{Id} (0x{Id:X})";
             public string Name { get => _messageProvider.GetString(Item.Name); set => _messageProvider.SetString(Item.Name, value); }
