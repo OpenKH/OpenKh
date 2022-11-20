@@ -1494,19 +1494,32 @@ namespace OpenKh.Tests.Patcher
                 {
                     new Kh2.Battle.Enmp
                     {
-                        Id = 1,
+                        Id = 7,
                         Level = 1,
+                        Health = new short[32],
+                        MaxDamage = 1,
+                        MinDamage = 1,
+                        PhysicalWeakness = 1,
+                        FireWeakness = 1,
+                        IceWeakness = 1,
+                        ThunderWeakness = 1,
+                        DarkWeakness = 1,
+                        LightWeakness = 1,
+                        GeneralWeakness = 1,
+                        Experience = 1,
+                        Prize = 1,
+                        BonusLevel = 1
                     }
                 };
 
-                using var EnmpStream = new MemoryStream();
-                Kh2.Battle.Enmp.Write(EnmpStream, enmpEntry);
+                using var enmpStream = new MemoryStream();
+                Kh2.Battle.Enmp.Write(enmpStream, enmpEntry);
                 Bar.Write(stream, new Bar() {
                     new Bar.Entry()
                     {
                         Name = "enmp",
                         Type = Bar.EntryType.List,
-                        Stream = EnmpStream
+                        Stream = enmpStream
                     }
                 });
             });
@@ -1520,6 +1533,19 @@ namespace OpenKh.Tests.Patcher
                     {
                         Id = 7,
                         Level = 1,
+                        Health = new short[32],
+                        MaxDamage = 1,
+                        MinDamage = 1,
+                        PhysicalWeakness = 1,
+                        FireWeakness = 1,
+                        IceWeakness = 1,
+                        ThunderWeakness = 1,
+                        DarkWeakness = 1,
+                        LightWeakness = 1,
+                        GeneralWeakness = 1,
+                        Experience = 1,
+                        Prize = 1,
+                        BonusLevel = 1
                     }
                 };
                 writer.Write(serializer.Serialize(moddedEnmp));
@@ -1535,7 +1561,7 @@ namespace OpenKh.Tests.Patcher
                 var binarc = Bar.Read(stream);
                 var enmp = Kh2.Battle.Enmp.Read(binarc[0].Stream);
 
-                Assert.Equal(50, enmp[0].Level);
+                Assert.Equal(1, enmp[0].Level);
             });
         }
 
