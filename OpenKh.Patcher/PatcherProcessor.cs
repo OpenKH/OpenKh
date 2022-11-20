@@ -616,26 +616,37 @@ namespace OpenKh.Patcher
                             }
                             Kh2.Battle.Plrp.Write(stream.SetPosition(0), plrpList);
                         break;
-                    case "cmd":
-                        var cmdList = Kh2.SystemData.Cmd.Read(stream).ToDictionary(x => x.Id, x => x);
-                        var moddedCmd = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Cmd>>(sourceText);
-                        foreach (var command in moddedCmd)
-                        {
-                            if (cmdList.ContainsKey(command.Key))
-
-                                {
-                                    cmdList[command.Key] = command.Value;
-                                }
-                            
-                            else
+                        
+                        case "cmd":
+                            var cmdList = Kh2.SystemData.Cmd.Read(stream).ToDictionary(x => x.Id, x => x);
+                            var moddedCmd = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Cmd>>(sourceText);
+                            foreach (var command in moddedCmd)
                             {
-                                cmdList.Add(command.Key, command.Value);
+                                if (cmdList.ContainsKey(command.Key))
+
+                                    {
+                                        cmdList[command.Key] = command.Value;
+                                    }
+
+                                else
+                                {
+                                    cmdList.Add(command.Key, command.Value);
+                                }
+
                             }
+                            Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList.Values);
+                            break;
 
-                        }
-                        Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList.Values);
-                        break;
-
+                        case "enmp":
+                            var enmpList = Kh2.Battle.Enmp.Read(stream);
+                            var moddedEnmp = deserializer.Deserialize<List<Kh2.Battle.Enmp>>(sourceText);
+                            foreach (var enmp in moddedEnmp)
+                            {
+                                var oldEnmp = enmpList.First(x => x.Id == enmp.Id);
+                                enmpList[enmpList.IndexOf(oldEnmp)] = enmp;
+                            }
+                            Kh2.Battle.Enmp.Write(stream.SetPosition(0), enmpList);
+                            break;
 
                     default:
                             break;
