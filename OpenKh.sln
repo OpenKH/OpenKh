@@ -203,6 +203,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.AssimpUtils", "OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj", "{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.AnbMaker", "OpenKh.Command.AnbMaker\OpenKh.Command.AnbMaker.csproj", "{D1180437-8B35-4A18-8A08-425B876159B2}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.Bdxio", "OpenKh.Command.Bdxio\OpenKh.Command.Bdxio.csproj", "{F0A7BD0D-C717-45D5-9544-4C3AECC3740F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.DeeperTree", "OpenKh.DeeperTree\OpenKh.DeeperTree.csproj", "{1D074EA4-9964-43EC-9389-7E60C2545C13}"
