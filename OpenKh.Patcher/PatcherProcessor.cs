@@ -360,6 +360,7 @@ namespace OpenKh.Patcher
                     var encoder = source.Language switch
                     {
                         "jp" => Encoders.JapaneseSystem,
+                        "je" => Encoders.JapaneseEvent,
                         "tr" => Encoders.TurkishSystem,
                         _ => Encoders.InternationalSystem,
                     };
