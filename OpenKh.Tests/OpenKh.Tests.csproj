@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
     <PackageReference Include="NSubstitute" Version="4.4.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
@@ -30,6 +30,7 @@
     <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
     <ProjectReference Include="..\OpenKh.Patcher\OpenKh.Patcher.csproj" />
     <ProjectReference Include="..\OpenKh.Ps2\OpenKh.Ps2.csproj" />
+    <ProjectReference Include="..\OpenKh.DeeperTree\OpenKh.DeeperTree.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe\Xe.csproj" />
     <ProjectReference Include="..\OpenKh.Command.MapGen\OpenKh.Command.MapGen.csproj" />
     <ProjectReference Include="..\OpenKh.Command.DoctChanger\OpenKh.Command.DoctChanger.csproj" />

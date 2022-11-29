@@ -2,6 +2,8 @@ using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Messages;
+using OpenKh.Command.Bdxio.Models;
+using OpenKh.Command.Bdxio.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -69,13 +71,25 @@ namespace OpenKh.Patcher
             Patch(originalAssets, outputDir, metadata, modBasePath);
         }
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null)
+        List<string> GamesList = new List<string>()
         {
+            "kh2",
+            "kh1",
+            "bbs",
+            "recom",
+        };
+
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
+        {
+            
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
             try
             {
+                
                 if (metadata.Assets == null)
                     throw new Exception("No assets found.");
+                if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame)
+                    return;
 
                 metadata.Assets.AsParallel().ForAll(assetFile =>
                 {
@@ -197,6 +211,9 @@ namespace OpenKh.Patcher
                     break;
                 case "areadatascript":
                     PatchAreaDataScript(context, assetFile.Source, stream);
+                    break;
+                case "bdscript":
+                    PatchBdscript(context, assetFile, stream);
                     break;
                 case "spawnpoint":
                     PatchSpawnPoint(context, assetFile, stream);
@@ -343,6 +360,7 @@ namespace OpenKh.Patcher
                     var encoder = source.Language switch
                     {
                         "jp" => Encoders.JapaneseSystem,
+                        "je" => Encoders.JapaneseEvent,
                         "tr" => Encoders.TurkishSystem,
                         _ => Encoders.InternationalSystem,
                     };
@@ -376,6 +394,36 @@ namespace OpenKh.Patcher
             }
 
             Kh2.Ard.AreaDataScript.Write(stream.SetPosition(0), scripts.Values);
+        }
+
+        private static void PatchBdscript(Context context, AssetFile assetFile, Stream stream)
+        {
+
+            if (assetFile.Source == null || assetFile.Source.Count == 0)
+                throw new Exception($"File '{assetFile.Name}' does not contain any source");
+
+            var scriptName = assetFile.Source[0].Name;
+            var srcFile = context.GetSourceModAssetPath(scriptName);
+            if (!File.Exists(srcFile))
+                throw new FileNotFoundException($"The mod does not contain the file {scriptName}", srcFile);
+
+ 
+            var programsInput = File.ReadAllText(context.GetSourceModAssetPath(scriptName));
+            var ascii = BdxAsciiModel.ParseText(programsInput);
+            var decoder = new BdxEncoder(
+                header: new YamlDotNet.Serialization.DeserializerBuilder()
+                    .Build()
+                    .Deserialize<BdxHeader>(
+                        ascii.Header ?? ""
+                    ),
+                script: ascii.GetLineNumberRetainedScriptBody(),
+                scriptName: scriptName,
+                loadScript: programsInput => programsInput
+                );
+
+            stream.SetPosition(0);
+            stream.Write(decoder.Content);
+
         }
 
         private static void PatchSpawnPoint(Context context, AssetFile assetFile, Stream stream)
@@ -569,26 +617,37 @@ namespace OpenKh.Patcher
                             }
                             Kh2.Battle.Plrp.Write(stream.SetPosition(0), plrpList);
                         break;
-                    case "cmd":
-                        var cmdList = Kh2.SystemData.Cmd.Read(stream).ToDictionary(x => x.Id, x => x);
-                        var moddedCmd = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Cmd>>(sourceText);
-                        foreach (var command in moddedCmd)
-                        {
-                            if (cmdList.ContainsKey(command.Key))
-
-                                {
-                                    cmdList[command.Key] = command.Value;
-                                }
-                            
-                            else
+                        
+                        case "cmd":
+                            var cmdList = Kh2.SystemData.Cmd.Read(stream).ToDictionary(x => x.Id, x => x);
+                            var moddedCmd = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Cmd>>(sourceText);
+                            foreach (var command in moddedCmd)
                             {
-                                cmdList.Add(command.Key, command.Value);
+                                if (cmdList.ContainsKey(command.Key))
+
+                                    {
+                                        cmdList[command.Key] = command.Value;
+                                    }
+
+                                else
+                                {
+                                    cmdList.Add(command.Key, command.Value);
+                                }
+
                             }
+                            Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList.Values);
+                            break;
 
-                        }
-                        Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList.Values);
-                        break;
-
+                        case "enmp":
+                            var enmpList = Kh2.Battle.Enmp.Read(stream);
+                            var moddedEnmp = deserializer.Deserialize<List<Kh2.Battle.Enmp>>(sourceText);
+                            foreach (var enmp in moddedEnmp)
+                            {
+                                var oldEnmp = enmpList.First(x => x.Id == enmp.Id);
+                                enmpList[enmpList.IndexOf(oldEnmp)] = enmp;
+                            }
+                            Kh2.Battle.Enmp.Write(stream.SetPosition(0), enmpList);
+                            break;
 
                     default:
                             break;

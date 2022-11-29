@@ -1,3 +1,4 @@
+using OpenKh.Command.Bdxio.Utils;
 using OpenKh.Common;
 using OpenKh.Imaging;
 using OpenKh.Kh2;
@@ -512,6 +513,62 @@ namespace OpenKh.Tests.Patcher
                 decompiled.Contains("Program 2");
                 decompiled.Contains("Spawn \"2222\"");
             });
+        }
+
+        [Fact]
+        public void PatchKh2BdscriptTest()
+        {
+            var patcher = new PatcherProcessor();
+            var patch = new Metadata
+            {
+                Assets = new List<AssetFile>
+                {
+                    new AssetFile
+                    {
+                        Name = "aaa",
+                        Method = "bdscript",
+                        Source = new List<AssetFile>
+                        {
+                            new AssetFile
+                            {
+                                Name = "test.bdscript",
+                            }
+                        }
+                    },
+                }
+            };
+            File.Create(Path.Combine(ModInputDir, "test.bdscript")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("---");
+                writer.WriteLine("WorkSize: 64");
+                writer.WriteLine("StackSize: 64");
+                writer.WriteLine("TempSize: 64");
+                writer.WriteLine("Triggers:");
+                writer.WriteLine("- Key: 0");
+                writer.WriteLine("  Addr: TR0");
+                writer.WriteLine("Name: aaa");
+                writer.WriteLine("---");
+                writer.WriteLine(" section.text");
+                writer.WriteLine("TR0:");
+                writer.WriteLine(" ret");
+                writer.WriteLine("DUMMY:");
+                writer.WriteLine(" ret");
+                writer.Flush();
+            });
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "aaa");
+
+            var bdxStream = new MemoryStream(File.ReadAllBytes(Path.Combine(ModOutputDir, "aaa")));
+            var decoder = new BdxDecoder(bdxStream);
+            var script = BdxDecoder.TextFormatter.Format(decoder);
+
+            var lines = script.Split("\r\n");
+
+            Assert.Equal("WorkSize: 64", lines[1]);
+            Assert.Equal("Name: aaa", lines[7]);
+
         }
 
         [Fact]
@@ -1394,6 +1451,117 @@ namespace OpenKh.Tests.Patcher
                 var plrp = Kh2.Battle.Plrp.Read(binarc[0].Stream);
 
                 Assert.Equal(200, plrp[0].Ap);
+            });
+        }
+
+        [Fact]
+        public void ListPatchEnmpTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "enmp",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "EnmpList.yml",
+                                        Type = "enmp"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var enmpEntry = new List<Kh2.Battle.Enmp>()
+                {
+                    new Kh2.Battle.Enmp
+                    {
+                        Id = 7,
+                        Level = 1,
+                        Health = new short[32],
+                        MaxDamage = 1,
+                        MinDamage = 1,
+                        PhysicalWeakness = 1,
+                        FireWeakness = 1,
+                        IceWeakness = 1,
+                        ThunderWeakness = 1,
+                        DarkWeakness = 1,
+                        LightWeakness = 1,
+                        GeneralWeakness = 1,
+                        Experience = 1,
+                        Prize = 1,
+                        BonusLevel = 1
+                    }
+                };
+
+                using var enmpStream = new MemoryStream();
+                Kh2.Battle.Enmp.Write(enmpStream, enmpEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "enmp",
+                        Type = Bar.EntryType.List,
+                        Stream = enmpStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "EnmpList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                var serializer = new Serializer();
+                var moddedEnmp = new List<Kh2.Battle.Enmp>{
+                    new Kh2.Battle.Enmp
+                    {
+                        Id = 7,
+                        Level = 1,
+                        Health = new short[32],
+                        MaxDamage = 1,
+                        MinDamage = 1,
+                        PhysicalWeakness = 1,
+                        FireWeakness = 1,
+                        IceWeakness = 1,
+                        ThunderWeakness = 1,
+                        DarkWeakness = 1,
+                        LightWeakness = 1,
+                        GeneralWeakness = 1,
+                        Experience = 1,
+                        Prize = 1,
+                        BonusLevel = 1
+                    }
+                };
+                writer.Write(serializer.Serialize(moddedEnmp));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var enmp = Kh2.Battle.Enmp.Read(binarc[0].Stream);
+
+                Assert.Equal(1, enmp[0].Level);
             });
         }
 

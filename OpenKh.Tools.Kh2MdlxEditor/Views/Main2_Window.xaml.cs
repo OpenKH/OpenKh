@@ -1,0 +1,174 @@
+using OpenKh.AssimpUtils;
+using OpenKh.Kh2;
+using OpenKh.Tools.Common.Wpf;
+using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
+using System;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+
+namespace OpenKh.Tools.Kh2MdlxEditor.Views
+{
+    public partial class Main2_Window : Window
+    {
+        // VIEW MODEL
+        //-----------------------------------------------------------------------
+        Main2_VM mainVM { get; set; }
+
+        // CONSTRUCTOR
+        //-----------------------------------------------------------------------
+        public Main2_Window()
+        {
+            InitializeComponent();
+        }
+
+        // ACTIONS
+        //-----------------------------------------------------------------------
+
+        // Opens the file that has been dropped on the window
+        private void Window_Drop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    string firstFile = files?.FirstOrDefault();
+                    loadFile(firstFile);
+
+                    if(mainVM.ModelFile != null)
+                    {
+                        contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
+                    }
+                }
+            }
+            catch(Exception exc)
+            {
+
+            }
+        }
+        private void Menu_SaveFile(object sender, EventArgs e)
+        {
+            saveFile();
+        }
+
+        private void Menu_ExportAsFbx(object sender, EventArgs e)
+        {
+            exportModel(AssimpGeneric.FileFormat.fbx);
+        }
+        private void Menu_ExportAsDae(object sender, EventArgs e)
+        {
+            exportModel(AssimpGeneric.FileFormat.collada);
+        }
+
+        private void Side_Model(object sender, EventArgs e)
+        {
+            contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
+        }
+        private void Side_Texture(object sender, EventArgs e)
+        {
+            contentFrame.Content = new TextureFile_Control(mainVM.TextureFile);
+        }
+        private void Side_Collision(object sender, EventArgs e)
+        {
+            contentFrame.Content = new CollisionV_Control(mainVM.CollisionFile, mainVM.ModelFile, mainVM.TextureFile);
+        }
+        private void Side_CollisionTable(object sender, EventArgs e)
+        {
+            contentFrame.Content = new Collision_Control(mainVM.CollisionFile);
+        }
+
+        // FUNCTIONS
+        //-----------------------------------------------------------------------
+
+        // Loads the given file
+        public void loadFile(string filePath)
+        {
+            contentFrame.Content = null;
+            mainVM = (filePath != null) ? new Main2_VM(filePath) : new Main2_VM();
+            DataContext = mainVM;
+
+            if(mainVM.ModelFile != null)
+                sideModel.Visibility = Visibility.Visible;
+            else
+                sideModel.Visibility = Visibility.Collapsed;
+
+            if (mainVM.TextureFile != null)
+                sideTexture.Visibility = Visibility.Visible;
+            else
+                sideTexture.Visibility = Visibility.Collapsed;
+
+            if (mainVM.CollisionFile != null)
+                sideCollision.Visibility = Visibility.Visible;
+            else
+                sideCollision.Visibility = Visibility.Collapsed;
+        }
+
+        // Saves the file
+        public void saveFile()
+        {
+            mainVM.buildBarFile();
+
+            System.Windows.Forms.SaveFileDialog sfd;
+            sfd = new System.Windows.Forms.SaveFileDialog();
+            sfd.Title = "Save file";
+            sfd.FileName = mainVM.FileName + ".out.mdlx";
+            sfd.ShowDialog();
+            if (sfd.FileName != "")
+            {
+                MemoryStream memStream = new MemoryStream();
+                Bar.Write(memStream, mainVM.BarFile);
+                File.WriteAllBytes(sfd.FileName, memStream.ToArray());
+            }
+        }
+
+
+        // Exports the first submodel of the loaded MDLX
+        public void exportModel(AssimpGeneric.FileFormat fileFormat = AssimpGeneric.FileFormat.fbx)
+        {
+            if (mainVM.ModelFile != null)
+            {
+                Assimp.Scene scene = Kh2MdlxAssimp.getAssimpScene(mainVM.ModelFile);
+
+                System.Windows.Forms.SaveFileDialog sfd;
+                sfd = new System.Windows.Forms.SaveFileDialog();
+                sfd.Title = "Export model";
+                sfd.FileName = mainVM.FileName + "." + AssimpGeneric.GetFormatFileExtension(fileFormat);
+                sfd.ShowDialog();
+                if (sfd.FileName != "")
+                {
+                    string dirPath = System.IO.Path.GetDirectoryName(sfd.FileName);
+
+                    if (!Directory.Exists(dirPath))
+                        return;
+
+                    dirPath += "\\";
+
+                    AssimpGeneric.ExportScene(scene, fileFormat, sfd.FileName);
+                    exportTextures(dirPath);
+                }
+            }
+        }
+        public void exportTextures(string filePath)
+        {
+            for (int i = 0; i < mainVM.TextureFile.Images.Count; i++)
+            {
+                ModelTexture.Texture texture = mainVM.TextureFile.Images[i];
+                BitmapSource bitmapImage = texture.GetBimapSource();
+
+                string fullPath = filePath + "Texture" + i;
+                string finalPath = fullPath;
+                int repeat = 0;
+                while (File.Exists(finalPath))
+                {
+                    repeat++;
+                    finalPath = fullPath + " (" + repeat + ")";
+                }
+
+                AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, fullPath);
+            }
+        }
+    }
+}

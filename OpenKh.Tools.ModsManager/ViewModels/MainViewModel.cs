@@ -41,8 +41,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private bool _pc;
         private bool _panaceaInstalled;
         private bool _devView;
-        private string _quickLaunch = "kh2";
+        private string _launchGame = "kh2";
+        private List<string> _supportedGames = new List<string>()
+        {
+            "kh2",
+            "kh1",
+            "bbs",
+            "recom"
+        };
         private int _wizardVersionNumber = 1;
+        private string[] executable = new string[]
+        {
+            "KINGDOM HEARTS II FINAL MIX.exe",
+            "KINGDOM HEARTS FINAL MIX.exe",
+            "KINGDOM HEARTS Birth by Sleep FINAL MIX.exe",
+            "KINGDOM HEARTS Re_Chain of Memories.exe"
+        };
+        private int launchExecutable = 0;
 
         private const string RAW_FILES_FOLDER_NAME = "raw";
         private const string ORIGINAL_FILES_FOLDER_NAME = "original";
@@ -91,7 +106,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
         public Visibility HideStop => !PC ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility HideQuickLaunch => PC && PanaceaInstalled && DevView ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
 
         public bool DevView
         {
@@ -101,7 +116,6 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 _devView = value;
                 ConfigurationService.DevView = DevView;
                 OnPropertyChanged(nameof(PatchVisible));
-                OnPropertyChanged(nameof(HideQuickLaunch));
             }
         }
         public bool PanaceaInstalled
@@ -125,14 +139,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PatchVisible));
                 OnPropertyChanged(nameof(HideStop));
+                OnPropertyChanged(nameof(isPC));
             }
         }  
 
-        public int QuickLaunch
+        public int GametoLaunch
         {
             get
             {
-                switch (_quickLaunch)
+                switch (_launchGame)
                 {
                     case "kh2":
                         return 0;
@@ -142,32 +157,37 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         return 2;
                     case "recom":
                         return 3;
-                    case "off":
-                        return 4;
                     default:
                         return 0;
                 }
             }
             set
             {
+                launchExecutable = value;
                 switch (value)
                 {
                     case 0:
-                        _quickLaunch = "kh2";
+                        _launchGame = "kh2";
+                        ConfigurationService.LaunchGame = "kh2";
                         break;
                     case 1:
-                        _quickLaunch = "kh1";
+                        _launchGame = "kh1";
+                        ConfigurationService.LaunchGame = "kh1";
                         break;
                     case 2:
-                        _quickLaunch = "bbs";
+                        _launchGame = "bbs";
+                        ConfigurationService.LaunchGame = "bbs";
                         break;
                     case 3:
-                        _quickLaunch = "recom";
+                        _launchGame = "recom";
+                        ConfigurationService.LaunchGame = "recom";
                         break;
                     default:
-                        _quickLaunch = "off";
+                        _launchGame = "kh2";
+                        ConfigurationService.LaunchGame = "kh2";
                         break;
                 }
+                ReloadModsList();
             }
         }
 
@@ -197,6 +217,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }
             else
                 PC = false;
+            if (_supportedGames.Contains(ConfigurationService.LaunchGame) && PC)
+                _launchGame = ConfigurationService.LaunchGame;
+            else
+                ConfigurationService.LaunchGame = _launchGame;
 
             Log.OnLogDispatch += (long ms, string tag, string message) =>
                 _debuggingWindow.Log(ms, tag, message);
@@ -308,10 +332,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 await RunGame();
             });
 
-            RestoreCommand = new RelayCommand(async _ =>
+            RestoreCommand = new RelayCommand(async (patched) =>
             {
                 ResetLogWindow();
-                await RestoreGame();
+                await RestoreGame(Convert.ToBoolean(patched));
                 CloseAllWindows();
             });
             BuildAndRunCommand = new RelayCommand(async _ =>
@@ -464,7 +488,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         if (ConfigurationService.PanaceaInstalled)
                         {
-                            File.AppendAllText(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), "\nquick_launch=" + _quickLaunch);
+                            File.AppendAllText(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), "\nquick_launch=" + _launchGame);
                         }                        
                         processStartInfo = new ProcessStartInfo
                         {
@@ -476,14 +500,14 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         processStartInfo = new ProcessStartInfo
                         {
-                            FileName =  Path.Combine(ConfigurationService.PcReleaseLocation, "KINGDOM HEARTS II FINAL MIX.exe"),
+                            FileName =  Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]),
                             WorkingDirectory = ConfigurationService.PcReleaseLocation,
                             UseShellExecute = false,
                         };
                         if (processStartInfo == null || !File.Exists(processStartInfo.FileName))
                         {
                             MessageBox.Show(
-                                "Unable to start game. Please make sure youre Kingdom Hearts executable is correctly named and in the correct folder.",
+                                "Unable to start game. Please make sure your Kingdom Hearts executable is correctly named and in the correct folder.",
                                 "Run error", MessageBoxButton.OK, MessageBoxImage.Error);
                             CloseAllWindows();
                             return Task.CompletedTask;
@@ -584,28 +608,28 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             await Task.Run(() =>
             {
-                if (ConfigurationService.GameEdition == 2)
+                if (ConfigurationService.GameEdition == 2 && _launchGame == "kh2")
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
-                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, "patch-package-map.txt");
+                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame , "patch-package-map.txt");
                     var packageMap = File
                         .ReadLines(packageMapLocation)
                         .Select(line => line.Split(" $$$$ "))
                         .ToDictionary(array => array[0], array => array[1]);
 
-                    var patchStagingDir = Path.Combine(ConfigurationService.GameModPath, "patch-staging");
+                    var patchStagingDir = Path.Combine(ConfigurationService.GameModPath, _launchGame, "patch-staging");
                     if (Directory.Exists(patchStagingDir))
                         Directory.Delete(patchStagingDir, true);
                     Directory.CreateDirectory(patchStagingDir);
                     foreach (var entry in packageMap)
                     {
-                        var sourceFile = Path.Combine(ConfigurationService.GameModPath, entry.Key);
+                        var sourceFile = Path.Combine(ConfigurationService.GameModPath, _launchGame, entry.Key);
                         var destFile = Path.Combine(patchStagingDir, entry.Value);
                         Directory.CreateDirectory(Path.GetDirectoryName(destFile));
                         File.Move(sourceFile, destFile);
                     }
 
-                    foreach (var directory in Directory.GetDirectories(ConfigurationService.GameModPath))
+                    foreach (var directory in Directory.GetDirectories(Path.Combine(ConfigurationService.GameModPath, _launchGame)))
                         if (!"patch-staging".Equals(Path.GetFileName(directory)))
                             Directory.Delete(directory, true);
 
@@ -736,31 +760,45 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             });
         }
 
-        private async Task RestoreGame()
+        private async Task RestoreGame(bool patched)
         {
             await Task.Run(() =>
             {
                 if (ConfigurationService.GameEdition == 2)
-                {
-                    if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
+                {                        
+                    if(patched)
                     {
-                        Log.Warn("backup folder cannot be found! Cannot restore the game.");
-                    }
-
-                    else
-                    {
-                        foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")).Where(x => x.Contains(".pkg")))
+                        if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
                         {
-                            Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
+                            Log.Warn("backup folder cannot be found! Cannot restore the game.");
+                        }
+                        else
+                        {
+                            foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")).Where(x => x.Contains(".pkg")))
+                            {
+                                Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
 
-                            var _fileBare = Path.GetFileName(file);
-                            var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _fileBare);
+                                var _fileBare = Path.GetFileName(file);
+                                var _trueName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _fileBare);
 
-                            File.Delete(Path.ChangeExtension(_trueName, "hed"));
-                            File.Delete(_trueName);
+                                File.Delete(Path.ChangeExtension(_trueName, "hed"));
+                                File.Delete(_trueName);
 
-                            File.Copy(file, _trueName);
-                            File.Copy(Path.ChangeExtension(file, "hed"), Path.ChangeExtension(_trueName, "hed"));
+                                File.Copy(file, _trueName);
+                                File.Copy(Path.ChangeExtension(file, "hed"), Path.ChangeExtension(_trueName, "hed"));
+                            }
+                        }
+
+                    }
+                    if (Directory.Exists(ConfigurationService.GameModPath))
+                    {
+                        try
+                        {
+                            Directory.Delete(Path.Combine(ConfigurationService.GameModPath, _launchGame), true);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warn("Unable to fully clean the mod directory:\n{0}", ex.Message);
                         }
                     }
                 }

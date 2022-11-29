@@ -15,7 +15,7 @@
         <DataGrid Name="DataTable"
                 AutoGenerateColumns="False"
                 ItemsSource="{Binding CollisionFile.EntryList}"
-                CanUserAddRows="False">
+                CanUserAddRows="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=Group}" Header="Group" />
                 <DataGridTextColumn Binding="{Binding Path=Parts}" Header="Parts" />

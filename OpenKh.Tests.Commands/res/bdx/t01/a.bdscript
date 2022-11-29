@@ -1,0 +1,32 @@
+---
+WorkSize: 64
+StackSize: 64
+TempSize: 64
+Triggers:
+- Key: 0
+  Addr: TR0
+Name: aaa
+
+---
+ section .text
+TR0:
+ pushFromPWp W0
+ drop 
+ pushFromPWp W12
+ drop 
+ pushFromPWp W24
+ drop 
+ gosub 2, DUMMY
+ ret 
+DUMMY:
+ ret 
+
+ section .bss
+W0:
+ resb dozen
+W12:
+ resb dozen
+W24:
+ resb dozen
+ 
+dozen equ 12

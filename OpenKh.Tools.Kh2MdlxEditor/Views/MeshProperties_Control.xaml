@@ -1,0 +1,49 @@
+<UserControl x:Class="OpenKh.Tools.Kh2MdlxEditor.Views.MeshProperties_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.Kh2MdlxEditor.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <StackPanel Grid.Row="2" Background="#1d1d1d">
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Texture:" Foreground="White"/>
+            <TextBox Width="30" Text="{Binding Path=Header.TextureIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="#3d3d3d" Foreground="White"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="DrawAlphaPhase" Foreground="White"/>
+            <CheckBox IsChecked="{Binding Path=Header.DrawAlphaPhase, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Alpha" Foreground="White"/>
+            <CheckBox IsChecked="{Binding Path=Header.Alpha, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Multi" Foreground="White"/>
+            <CheckBox IsChecked="{Binding Path=Header.Multi, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="AlphaEx" Foreground="White"/>
+            <CheckBox IsChecked="{Binding Path=Header.AlphaEx, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="AlphaAdd" Foreground="White"/>
+            <CheckBox IsChecked="{Binding Path=Header.AlphaAdd, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="AlphaSub" Foreground="White"/>
+            <CheckBox IsChecked="{Binding Path=Header.AlphaSub, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Specular" Foreground="White"/>
+            <CheckBox IsChecked="{Binding Path=Header.Specular, Mode=TwoWay}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="NoLight" Foreground="White"/>
+            <CheckBox IsChecked="{Binding Path=Header.NoLight, Mode=TwoWay}"/>
+        </StackPanel>
+    </StackPanel>
+    
+</UserControl>

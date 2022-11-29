@@ -11,6 +11,9 @@
         <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
         <PackageReference Include="System.Interactive" Version="6.0.1" />
     </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
+  </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\OpenKh.Engine\OpenKh.Engine.csproj" />

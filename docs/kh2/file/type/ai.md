@@ -2,6 +2,11 @@
 
 Process the artifical intelligence of the game. The engine parse this kind of files to change the behaviour of the game.
 
+See also:
+
+- [AI](../ai/index.md)
+- [KH2 ai | monitor-kh2fm](https://kenjiuno.github.io/monitor-kh2fm/kh2ai.html)
+
 # Format
 
 Header

@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="{Binding Title}" d:Title="OpenKH Mods Manager set-up"
-        Height="370" Width="400">
+        Height="400" Width="400">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
@@ -22,7 +22,7 @@
         CurrentPage="{Binding ElementName=PageGameEdition}"
         PageChanged="Wizard_PageChanged"
         Finish="Wizard_Finish">
-        
+
         <xctk:WizardPage
             x:Name="IntroPage" 
             Title="Welcome to OpenKH Mods Manager"
@@ -30,7 +30,7 @@
             Description="This set-up will guide you through the basic configuration of this tool, allowing you to install and play mods from the best modders in the Kingdom Hearts community."
             NextPage="{Binding ElementName=PageGameEdition}">
         </xctk:WizardPage>
-        
+
         <xctk:WizardPage
             x:Name="PageGameEdition"
             PageType="Interior"
@@ -135,6 +135,13 @@
             NextPage="{Binding WizardPageAfterGameData}"
             IsEnabled="{Binding IsNotExtracting}">
             <StackPanel>
+                <TextBlock Margin="0,0,0,3" Visibility="{Binding PcReleaseConfigVisibility}" TextWrapping="Wrap">OpenKh can extract all games in the KH 1.5 2.5 collection. Choose the games you wish to extract. Size values are rounded up.</TextBlock>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding PcReleaseConfigVisibility}">
+                    <CheckBox IsChecked="{Binding kh1}" Content="KH1-13GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding kh2}" Content="KH2-25GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding bbs}" Content="BBS-10GB" Margin="0 0 10 4"/>
+                    <CheckBox IsChecked="{Binding recom}" Content="ReCoM-10GB" Margin="0 0 10 4"/>
+                </StackPanel>
                 <TextBlock Margin="0 0 0 3">Extraction folder location:</TextBlock>
                 <Grid Margin="0 0 0 3">
                     <Grid.ColumnDefinitions>
@@ -146,12 +153,22 @@
                         <Image Source="{StaticResource FolderOpen_16x}"/>
                     </Button>
                 </Grid>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                <StackPanel Visibility="{Binding Pcsx2ConfigVisibility}">
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
                     It seems you do not have your Kingdom Hearts II copy extracted.
-                </TextBlock>
-                <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                    </TextBlock>
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
                     You already have your Kingdom Hearts II copy extracted.
-                </TextBlock>
+                    </TextBlock>
+                </StackPanel>
+                <StackPanel Visibility="{Binding PcReleaseConfigVisibility}">
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataNotFoundVisibility}">
+                    You do not have any extracted data from a supported game.
+                    </TextBlock>
+                    <TextBlock Margin="0 0 0 6" Visibility="{Binding GameDataFoundVisibility}">
+                    You already have extracted data from a supported game.
+                    </TextBlock>
+                </StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                     Press the button below to initialize the game extraction. It will take between 5 and 15 minutes based on the speed of your hard drive.
                 </TextBlock>
@@ -183,7 +200,7 @@
                     <ComboBoxItem>French (text FR, menu FR, voice FR)</ComboBoxItem>
                     <ComboBoxItem>Final Mix (text JP, menu FM, voice US)</ComboBoxItem>
                 </ComboBox>
-                
+
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
                     Forces to load the internal configuration to a specific region. This allows to effectively load files from other languages, swap the O and X buttons and use the font table in a different way.
                     Do not worry if some region files are not found as the Mods Manager has a fallback mechanic.
@@ -242,7 +259,7 @@
             NextPage="{Binding ElementName=PageGameData}">
             <StackPanel>
                 <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
-                    OpenKH Mods Manager has the ability to launch Kingdom Hearts directly. Leave the box below checked to have Mods Manager launch the game via Epic Games.    
+                    OpenKH Mods Manager has the ability to launch Kingdom Hearts directly. Leave the box below checked to have Mods Manager launch the game via Epic Games.
                 </TextBlock>
                 <CheckBox
                     Margin="0 0 0 10"

@@ -86,7 +86,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     if (mods.Contains(mod))
                         yield return mod;
-                }
+                }                
             }
         }
 
@@ -117,7 +117,7 @@ namespace OpenKh.Tools.ModsManager.Services
 
             using var zipFile = ZipFile.OpenRead(fileName);
 
-            var isModPatch = fileName.Contains(".kh2pcpatch");
+            var isModPatch = fileName.Contains(".kh2pcpatch") || fileName.Contains(".kh1pcpatch") || fileName.Contains(".compcpatch") || fileName.Contains(".bbspcpatch") ? true : false;
             var isValidMod = zipFile.GetEntry(ModMetadata) != null || isModPatch;
 
             if (!isValidMod)
@@ -167,9 +167,30 @@ namespace OpenKh.Tools.ModsManager.Services
             if (isModPatch)
             {
                 var _yamlGen = new Metadata();
-
-                _yamlGen.Title = modName + " (KH2PCPATCH)";
-                _yamlGen.Description = "This is an atuomatically generated metadata for this KH2PCPATCH Modification.";
+                if (fileName.Contains(".kh2pcpatch"))
+                {
+                    _yamlGen.Title = modName + " (KH2PCPATCH)";
+                    _yamlGen.Game = "kh2";
+                    _yamlGen.Description = "This is an automatically generated metadata for this KH2PCPATCH Modification.";
+                }
+                else if (fileName.Contains(".kh1pcpatch"))
+                {
+                    _yamlGen.Title = modName + " (KH1PCPATCH)";
+                    _yamlGen.Game = "kh1";
+                    _yamlGen.Description = "This is an automatically generated metadata for this KH1PCPATCH Modification.";
+                }
+                else if (fileName.Contains(".compcpatch"))
+                {
+                    _yamlGen.Title = modName + " (COMPCPATCH)";
+                    _yamlGen.Game = "recom";
+                    _yamlGen.Description = "This is an automatically generated metadata for this COMPCPATCH Modification.";
+                }
+                else if (fileName.Contains(".bbspcpatch"))
+                {
+                    _yamlGen.Title = modName + " (BBSPCPATCH)";
+                    _yamlGen.Game = "bbs";
+                    _yamlGen.Description = "This is an automatically generated metadata for this BBSPCPATCH Modification.";
+                }
                 _yamlGen.OriginalAuthor = "Unknown";
                 _yamlGen.Assets = new List<AssetFile>();
 
@@ -278,7 +299,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
                     IsEnabled = enabledMods.Contains(modName)
                 };
-            }
+            }            
         }
 
         public static async IAsyncEnumerable<ModUpdateModel> FetchUpdates()
@@ -303,11 +324,11 @@ namespace OpenKh.Tools.ModsManager.Services
 
         public static Task<bool> RunPacherAsync(bool fastMode) => Task.Run(() => Handle(() =>
         {
-            if (Directory.Exists(ConfigurationService.GameModPath))
+            if (Directory.Exists(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame)))
             {
                 try
                 {
-                    Directory.Delete(ConfigurationService.GameModPath, true);
+                    Directory.Delete(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame), true);
                 }
                 catch (Exception ex)
                 {
@@ -315,7 +336,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 }
             }
 
-            Directory.CreateDirectory(ConfigurationService.GameModPath);
+            Directory.CreateDirectory(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame));
 
             var patcherProcessor = new PatcherProcessor();
             var modsList = GetMods(EnabledMods).ToList();
@@ -327,16 +348,17 @@ namespace OpenKh.Tools.ModsManager.Services
                 Log.Info($"Building {mod.Name} for {_gameList[ConfigurationService.GameEdition]} - {_langList[ConfigurationService.RegionId]}");
 
                 patcherProcessor.Patch(
-                    ConfigurationService.GameDataLocation,
-                    ConfigurationService.GameModPath,
+                    Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame),
+                    Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame),
                     mod.Metadata,
                     mod.Path,
                     ConfigurationService.GameEdition,
                     fastMode,
-                    packageMap);
+                    packageMap,
+                    ConfigurationService.LaunchGame);
             }
 
-            using var packageMapWriter = new StreamWriter(Path.Combine(ConfigurationService.GameModPath, "patch-package-map.txt"));
+            using var packageMapWriter = new StreamWriter(Path.Combine(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame), "patch-package-map.txt"));
             foreach (var entry in packageMap)
                 packageMapWriter.WriteLine(entry.Key + " $$$$ " + entry.Value);
             packageMapWriter.Flush();

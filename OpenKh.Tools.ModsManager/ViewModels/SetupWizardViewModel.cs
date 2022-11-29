@@ -43,6 +43,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         private string _pcReleaseLanguage;
         private string _gameDataLocation;
         private bool _isEGSVersion;
+        private bool _kh2 = ConfigurationService.kh2;
+        private bool _kh1 = ConfigurationService.kh1;
+        private bool _bbs = ConfigurationService.bbs;
+        private bool _recom = ConfigurationService.recom;
 
         private Xceed.Wpf.Toolkit.WizardPage _wizardPageAfterIntro;
         public Xceed.Wpf.Toolkit.WizardPage WizardPageAfterIntro
@@ -212,7 +216,42 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged();
             }
         }
-
+        public bool kh1
+        {
+            get => _kh1;
+            set
+            {
+                _kh1 = value;
+                ConfigurationService.kh1 = value;
+            }
+        }
+        public bool kh2
+        {
+            get => _kh2;
+            set
+            {
+                _kh2 = value;
+                ConfigurationService.kh2 = value;
+            }
+        }
+        public bool bbs
+        {
+            get => _bbs;
+            set
+            {
+                _bbs = value;
+                ConfigurationService.bbs = value;
+            }
+        }
+        public bool recom
+        {
+            get => _recom;
+            set
+            {
+                _recom = value;
+                ConfigurationService.recom = value;
+            }
+        }
         public string PcReleaseLanguage
         {
             get => _pcReleaseLanguage;
@@ -244,8 +283,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         }
 
         public bool IsNotExtracting { get; private set; }
-        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, GameDataLocation) || 
-            (GameEdition == EpicGames && GameService.FolderContainsUniqueFile("kh2", GameDataLocation)));
+        public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) || 
+            (GameEdition == EpicGames && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
+            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1"))|| Directory.Exists(Path.Combine(GameDataLocation, "bbs")) ||
+            Directory.Exists(Path.Combine(GameDataLocation, "recom")))));
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;
@@ -414,7 +455,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             var fileName = IdxName.Lookup(fileEntry) ?? $"@{fileEntry.Hash32:08X}_{fileEntry.Hash16:04X}";
                             using var stream = img.FileOpen(fileEntry);
-                            var fileDestination = Path.Combine(gameDataLocation, fileName);
+                            var fileDestination = Path.Combine(gameDataLocation,"kh2", fileName);
                             var directoryDestination = Path.GetDirectoryName(fileDestination);
                             if (!Directory.Exists(directoryDestination))
                                 Directory.CreateDirectory(directoryDestination);
@@ -453,7 +494,15 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                     await Task.Run(() =>
                     {
-                        var _nameList = new string[]
+                        var _nameListkh1 = new string[]
+                        {
+                            "first",
+                            "second",
+                            "third",
+                            "fourth",
+                            "fifth"
+                        };
+                        var _nameListkh2 = new string[]
                         {
                             "first",
                             "second",
@@ -462,46 +511,161 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             "fifth",
                             "sixth"
                         };
+                        var _nameListbbs = new string[]
+                        {
+                            "first",
+                            "second",
+                            "third",
+                            "fourth"
+                        };
 
                         var _totalFiles = 0;
                         var _procTotalFiles = 0;
 
-                        for (int i = 0; i < 6; i++)
+                        if (ConfigurationService.kh1)
                         {
-                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList[i] + ".hed"), FileMode.Open);
+                            for (int i = 0; i < 5; i++)
+                            {
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"), FileMode.Open);
+                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
+                                _totalFiles += _hedFile.Count();
+                            }
+                        }                       
+                        if (ConfigurationService.kh2)
+                        {
+                            for (int i = 0; i < 6; i++)
+                            {
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"), FileMode.Open);
+                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
+                                _totalFiles += _hedFile.Count();
+                            }
+                        }
+                        if (ConfigurationService.bbs)
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"), FileMode.Open);
+                                var _hedFile = OpenKh.Egs.Hed.Read(_stream);
+                                _totalFiles += _hedFile.Count();
+                            }
+                        }
+                        if (ConfigurationService.recom)
+                        {
+                            using var _stream = new FileStream(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"), FileMode.Open);
                             var _hedFile = OpenKh.Egs.Hed.Read(_stream);
                             _totalFiles += _hedFile.Count();
                         }
 
-                        for (int i = 0; i < 6; i++)
+                        if (ConfigurationService.kh1)
                         {
-                            var outputDir = gameDataLocation;
-                            using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList[i] + ".hed"));
-                            using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameList[i] + ".pkg"));
-
-                            foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
+                            for (int i = 0; i < 5; i++)
                             {
-                                var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
-                                if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
-                                    fileName = $"{hash}.dat";
+                                var outputDir = Path.Combine(gameDataLocation, "kh1");
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh1_" + _nameListkh1[i] + ".pkg"));
 
-                                var outputFileName = Path.Combine(outputDir, fileName);
-
-                                OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
-
-                                var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
-
-                                File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
-
-                                outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
-
-                                foreach (var asset in hdAsset.Assets)
+                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
                                 {
-                                    var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
-                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
+                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
+                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
+                                        fileName = $"{hash}.dat";
 
-                                    var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
-                                    File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                                    var outputFileName = Path.Combine(outputDir, fileName);
+
+                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
+
+                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
+
+                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
+
+                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
+
+                                    foreach (var asset in hdAsset.Assets)
+                                    {
+                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
+                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
+
+                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
+                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                                    }
+                                    _procTotalFiles++;
+
+                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
+                                    OnPropertyChanged(nameof(ExtractionProgress));
+                                }
+                            }
+                        }                                           
+                        if(ConfigurationService.kh2)
+                        {
+                            for (int i = 0; i < 6; i++)
+                            {
+                                var outputDir = Path.Combine(gameDataLocation, "kh2");
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "kh2_" + _nameListkh2[i] + ".pkg"));
+
+                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
+                                {
+                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
+                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
+                                        fileName = $"{hash}.dat";
+
+                                    var outputFileName = Path.Combine(outputDir, fileName);
+
+                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
+
+                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
+
+                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
+
+                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
+
+                                    foreach (var asset in hdAsset.Assets)
+                                    {
+                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
+                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
+
+                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
+                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                                    }
+                                    _procTotalFiles++;
+
+                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
+                                    OnPropertyChanged(nameof(ExtractionProgress));
+                                }
+                            }
+                        }                                              
+                        if(ConfigurationService.bbs)
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                var outputDir = Path.Combine(gameDataLocation, "bbs");
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "bbs_" + _nameListbbs[i] + ".pkg"));
+
+                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
+                                {
+                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
+                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
+                                        fileName = $"{hash}.dat";
+
+                                    var outputFileName = Path.Combine(outputDir, fileName);
+
+                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
+
+                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
+
+                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
+
+                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
+
+                                    foreach (var asset in hdAsset.Assets)
+                                    {
+                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
+                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
+
+                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
+                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                                    }
                                     _procTotalFiles++;
 
                                     ExtractionProgress = (float)_procTotalFiles / _totalFiles;
@@ -509,7 +673,45 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                                 }
                             }
                         }
+                        if (ConfigurationService.recom)
+                        {
+                            for (int i = 0; i < 1; i++)
+                            {
+                                var outputDir = Path.Combine(gameDataLocation, "recom");
+                                using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"));
+                                using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.pkg"));
 
+                                foreach (var entry in OpenKh.Egs.Hed.Read(hedStream))
+                                {
+                                    var hash = OpenKh.Egs.Helpers.ToString(entry.MD5);
+                                    if (!OpenKh.Egs.EgsTools.Names.TryGetValue(hash, out var fileName))
+                                        fileName = $"{hash}.dat";
+
+                                    var outputFileName = Path.Combine(outputDir, fileName);
+
+                                    OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileName);
+
+                                    var hdAsset = new OpenKh.Egs.EgsHdAsset(img.SetPosition(entry.Offset));
+
+                                    File.Create(outputFileName).Using(stream => stream.Write(hdAsset.OriginalData));
+
+                                    outputFileName = Path.Combine(outputDir, REMASTERED_FILES_FOLDER_NAME, fileName);
+
+                                    foreach (var asset in hdAsset.Assets)
+                                    {
+                                        var outputFileNameRemastered = Path.Combine(OpenKh.Egs.EgsTools.GetHDAssetFolder(outputFileName), asset);
+                                        OpenKh.Egs.EgsTools.CreateDirectoryForFile(outputFileNameRemastered);
+
+                                        var assetData = hdAsset.RemasteredAssetsDecompressedData[asset];
+                                        File.Create(outputFileNameRemastered).Using(stream => stream.Write(assetData));
+                                    }
+                                    _procTotalFiles++;
+
+                                    ExtractionProgress = (float)_procTotalFiles / _totalFiles;
+                                    OnPropertyChanged(nameof(ExtractionProgress));
+                                }
+                            }
+                        }                        
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             IsNotExtracting = true;

@@ -1,0 +1,14 @@
+{
+    "version": "1.0.0",
+    "configurations": [
+        {
+            "name": "test.txt",
+            "type": "antlr-debug",
+            "request": "launch",
+            "input": "test.txt",
+            "grammar": "TreeScript.g4",
+            "printParseTree": true,
+            "visualParseTree": true
+        },
+    ]
+}

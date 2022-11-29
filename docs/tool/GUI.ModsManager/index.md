@@ -187,6 +187,7 @@ Asset Example
  * `trsr`
  * `cmd`
  * `item`
+ * `enmp`
  * `fmlv`
  * `lvup`
  * `bons`
@@ -271,6 +272,32 @@ Items:
   Picture: 1
   Icon1: 9
   Icon2: 0
+```
+
+`enmp` Source Example
+```
+- Id: 0
+  Level: 1
+  Health: 
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  MaxDamage: 1
+  MinDamage: 1
+  PhysicalWeakness: 1
+  FireWeakness: 1
+  IceWeakness: 1
+  ThunderWeakness: 1
+  DarkWeakness: 1
+  LightWeakness: 1
+  GeneralWeakness: 1
+  Experience: 1
+  Prize: 1
+  BonusLevel: 1  
 ```
 
 `fmlv` Source Example

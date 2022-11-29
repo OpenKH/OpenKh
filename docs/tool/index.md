@@ -20,6 +20,7 @@ If you have never used the command line before or have used it very little, fear
 |[IDX](../kh2/file/type/idx.md) | [OpenKh.Tools.IdxImg](./CLI.IdxImg/index.md)
 |[msg/*](../kh2/file/type/msg.md) | OpenKh.Command.MsgTool
 |[msg/*](../kh2/file/type/msg.md) | [OpenKh.Tools.Kh2TextEditor](./GUI.Kh2TextEditor/index.md)
+|[AI](../kh2/file/type/ai.md) | [OpenKh.Command.Bdxio](./CLI.Bdxio/index.md)
 |[BAR](../kh2/file/type/bar.md) | OpenKh.Tools.BarEditor
 |[IMD](../kh2/file/type/image.md#imgd) | [OpenKh.Tools.ImageViewer](./GUI.ImageViewer/index.md)
 |[IMZ](../kh2/file/type/image.md#imgz) | [OpenKh.Tools.ImageViewer](./GUI.ImageViewer/index.md)

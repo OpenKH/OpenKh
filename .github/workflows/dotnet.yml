@@ -2,7 +2,7 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "fix-*" ]
   pull_request:
     branches: [ "master" ]
 
@@ -21,7 +21,47 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore --configuration ".NET Debug"
-    - name: Test
-      run: dotnet test --no-build --verbosity normal --configuration ".NET Debug"
+    - name: pre-build.ps1
+      run: powershell -ExecutionPolicy Unrestricted ./pre-build.ps1
+      shell: pwsh
+    - name: build.ps1
+      run: powershell -ExecutionPolicy Unrestricted ./build.ps1
+      shell: pwsh
+      
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1.1.3
+    - name: msbuild panacea
+      run: |
+        msbuild OpenKh.Research.Panacea\OpenKh.Research.Panacea.vcxproj /p:Configuration=Release /p:Platform=x64
+        xcopy "OpenKh.Research.Panacea\Release\*.dll" bin\
+      
+    - name: bin → openkh
+      run: ren bin openkh
+      shell: pwsh
+    - name: zip
+      uses: TheDoctor0/zip-release@0.6.2
+      with:
+        filename: openkh.zip
+        path: openkh
+
+    - name: "GitHub release latest"
+      uses: "marvinpinto/action-automatic-releases@latest"
+      continue-on-error: true # at non master branch this will always fail
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "OpenKh Latest Build"
+        files: |
+          openkh.zip
+
+    - name: "GitHub release numbered"
+      uses: "marvinpinto/action-automatic-releases@latest"
+      continue-on-error: true # at non master branch this will always fail
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "release2-${{github.run_number}}"
+        prerelease: true
+        title: "OpenKh Build ${{github.run_number}}"
+        files: |
+          openkh.zip
