@@ -97,6 +97,50 @@ namespace OpenKh.Command.Bdxio.Utils
                 throw new ArgumentException(FormatErrorMessage(getStart(), $"Label {name} cannot be used here"));
             }
 
+            float LabelToFloat32Converter(string name, Func<IToken> getStart)
+            {
+                if (!labels.TryGetValue(name, out var any) || any == null)
+                {
+                    throw new ArgumentException(FormatErrorMessage(getStart(), $"Label {name} not found"));
+                }
+
+                if (any is ConstLabel constLabel)
+                {
+                    return constLabel.Value;
+                }
+
+                throw new ArgumentException(FormatErrorMessage(getStart(), $"Label {name} cannot be used here"));
+            }
+
+            Func<ArgContext, CompilePass, float> ResolveFloat32Factory(
+                Func<string, Func<IToken>, float> labelToFloat32
+            )
+            {
+                return (ArgContext argContext, CompilePass pass) =>
+                {
+                    if (pass.First)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        if (argContext.numberdata() is NumberdataContext numberdata)
+                        {
+                            return float.Parse(numberdata.GetText());
+                        }
+                        else if (argContext.id() is IdContext id)
+                        {
+                            var name = id.GetText();
+                            return labelToFloat32(name, () => id.Start);
+                        }
+                        else
+                        {
+                            throw new InvalidDataException($"{FormatLineColumn(argContext.Start)} Unknown arg!");
+                        }
+                    }
+                };
+            }
+
             var resolveInt32ForIntTrigger = ResolveInt32Factory(
                 stringToInt32: Helper.NumberdataContextToInt32ConverterFactory(allowFloat: false),
                 labelToInt32: LabelToInt32Converter
@@ -145,6 +189,10 @@ namespace OpenKh.Command.Bdxio.Utils
                     max: int.MaxValue
                 ),
                 labelToInt32: LabelToInt32Converter
+            );
+
+            var resolveFloat32ForValueFloat32 = ResolveFloat32Factory(
+                labelToFloat32: LabelToFloat32Converter
             );
 
             int lastBssBytes = 0;
@@ -403,6 +451,12 @@ namespace OpenKh.Command.Bdxio.Utils
                                             segment.Write(BitConverter.GetBytes((uint)(resolveInt32ForValueImm32(instrArgs[x], pass))));
                                         }
                                     }
+                                    else if (args[x].Type == ArgType.Float32)
+                                    {
+                                        {
+                                            segment.Write(BitConverter.GetBytes((float)(resolveFloat32ForValueFloat32(instrArgs[x], pass))));
+                                        }
+                                    }
                                 }
                             }
                             else if (order.include() is IncludeContext include)
@@ -528,7 +582,7 @@ namespace OpenKh.Command.Bdxio.Utils
                 return parser.arg();
             }
 
-            internal static Func<NumberdataContext, int> NumberdataContextToInt32ConverterFactory(bool allowFloat)
+            internal static Func<NumberdataContext, object> NumberdataContextToInt32OrFloat32ConverterFactory()
             {
                 return (NumberdataContext numberData) =>
                 {
@@ -565,15 +619,47 @@ namespace OpenKh.Command.Bdxio.Utils
                     }
                     else if (numberData.floatnumber is IToken floatnumber)
                     {
-                        if (!allowFloat)
+                        var body = floatnumber.Text;
+
+                        if (float.TryParse(body, NumberStyles.HexNumber, null, out float floatVal))
                         {
-                            throw new InvalidDataException(FormatErrorMessage(numberData.Start, "Float number is not allowed here"));
+                            return (float)floatVal;
                         }
-                        return BitConverter.ToInt32(BitConverter.GetBytes(Convert.ToSingle(floatnumber.Text)));
+                        else
+                        {
+                            throw new InvalidDataException(FormatErrorMessage(numberData.Start, "Must be float32 here"));
+                        }
                     }
                     else
                     {
                         throw new InvalidDataException(FormatErrorMessage(numberData.Start, "Unknown number data!"));
+                    }
+                };
+            }
+
+            internal static Func<NumberdataContext, int> NumberdataContextToInt32ConverterFactory(bool allowFloat)
+            {
+                var func = NumberdataContextToInt32OrFloat32ConverterFactory();
+
+                return (NumberdataContext numberData) =>
+                {
+                    var value = func(numberData);
+
+                    if (value is int intValue)
+                    {
+                        return intValue;
+                    }
+                    else if (value is float floatValue)
+                    {
+                        if (!allowFloat)
+                        {
+                            throw new InvalidDataException(FormatErrorMessage(numberData.Start, "Float number is not allowed here"));
+                        }
+                        return BitConverter.ToInt32(BitConverter.GetBytes(floatValue));
+                    }
+                    else
+                    {
+                        throw new InvalidDataException(FormatErrorMessage(numberData.Start, "Numeric converter bug"));
                     }
                 };
             }

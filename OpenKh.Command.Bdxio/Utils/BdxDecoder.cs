@@ -162,6 +162,11 @@ namespace OpenKh.Command.Bdxio.Utils
                             {
                                 argValue = read.ReadInt32();
                             }
+                            else if (arg.Type == BdxInstructionDesc.ArgType.Float32)
+                            {
+                                argValue = read.ReadInt32();
+                                parsedArg.PreferFloat32 = true;
+                            }
                             else
                             {
                                 argValue = new BdxInstruction(codeWord).Ssub;
@@ -507,6 +512,7 @@ namespace OpenKh.Command.Bdxio.Utils
             public string? Label { get; set; }
             public int Value { get; set; }
             public int? AddrRef { get; set; }
+            public bool PreferFloat32 { get; set; }
         }
 
         public sealed class CodeContent : IAnnotation
@@ -727,6 +733,10 @@ namespace OpenKh.Command.Bdxio.Utils
                 if (arg.Label != null)
                 {
                     return $"{arg.Label}"; //offset
+                }
+                else if (arg.PreferFloat32)
+                {
+                    return BitConverter.ToSingle(BitConverter.GetBytes(arg.Value)).ToString("R");
                 }
                 else
                 {
