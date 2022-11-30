@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeGen>
+    <OpenNamespace Name="OpenKh.Kh2">
+        <OpenClass Name="Motion" Partial="1">
+            <OpenClass Name="Key" Partial="1">
+                <IntBitsField NewName="Type" NewType="Interpolation" SourceName="Type_Time" SourceType="short" Position="0" Size="2" />
+                <IntBitsField NewName="Time" NewType="short" SourceName="Type_Time" SourceType="short" Position="2" Size="14" />
+            </OpenClass>
+            <OpenClass Name="InitialPose" Partial="1">
+                <IntBitsField NewName="ChannelValue" NewType="Channel" SourceName="Channel" SourceType="short" Position="0" Size="4" />
+            </OpenClass>
+            <OpenClass Name="FCurve" Partial="1">
+                <IntBitsField NewName="ChannelValue" NewType="Channel" SourceName="Channel" SourceType="byte" Position="0" Size="4" />
+                <IntBitsField NewName="Pre" NewType="CycleType" SourceName="Channel" SourceType="byte" Position="4" Size="2" />
+                <IntBitsField NewName="Post" NewType="CycleType" SourceName="Channel" SourceType="byte" Position="6" Size="2" />
+            </OpenClass>
+            <OpenClass Name="ExpressionNode" Partial="1">
+                <IntBitsField NewName="Element" NewType="int" SourceName="Data" SourceType="int" Position="0" Size="16" />
+                <IntBitField NewName="IsGlobal" SourceName="Data" SourceType="int" Position="23" />
+                <IntBitsField NewName="Type" NewType="byte" SourceName="Data" SourceType="int" Position="24" Size="8" />
+            </OpenClass>
+            <OpenClass Name="IKHelper" Partial="1">
+                <IntBitField NewName="Terminate" SourceName="Flags" SourceType="int" Position="0" />
+                <IntBitField NewName="Below" SourceName="Flags" SourceType="int" Position="1" />
+                <IntBitField NewName="EnableBias" SourceName="Flags" SourceType="int" Position="2" />
+                <IntBitsField NewName="Unknown" NewType="int" SourceName="Flags" SourceType="int" Position="22" Size="10" />
+            </OpenClass>
+            <OpenClass Name="Joint" Partial="1">
+                <IntBitField NewName="ExtEffector" SourceName="Flags" SourceType="byte" Position="0" />
+                <IntBitField NewName="CalcMatrix2Rot" SourceName="Flags" SourceType="byte" Position="1" />
+                <IntBitField NewName="Calculated" SourceName="Flags" SourceType="byte" Position="2" />
+                <IntBitField NewName="Fixed" SourceName="Flags" SourceType="byte" Position="3" />
+                <IntBitField NewName="Rotation" SourceName="Flags" SourceType="byte" Position="4" />
+                <IntBitField NewName="Trans" SourceName="Flags" SourceType="byte" Position="5" />
+                <IntBitsField NewName="IK" NewType="byte" SourceName="Flags" SourceType="byte" Position="6" Size="2" />
+            </OpenClass>
+            <OpenClass Name="Limiter" Partial="1">
+                <IntBitField NewName="HasXMin" SourceName="Flags" SourceType="int" Position="22" />
+                <IntBitField NewName="HasXMax" SourceName="Flags" SourceType="int" Position="23" />
+                <IntBitField NewName="HasYMin" SourceName="Flags" SourceType="int" Position="24" />
+                <IntBitField NewName="HasYMax" SourceName="Flags" SourceType="int" Position="25" />
+                <IntBitField NewName="HasZMin" SourceName="Flags" SourceType="int" Position="26" />
+                <IntBitField NewName="HasZMax" SourceName="Flags" SourceType="int" Position="27" />
+                <IntBitField NewName="Global" SourceName="Flags" SourceType="int" Position="28" />
+                <IntBitsField NewName="Type" NewType="LimiterType" SourceName="Flags" SourceType="int" Position="29" Size="3" />
+            </OpenClass>
+        </OpenClass>
+    </OpenNamespace>
+</CodeGen>
