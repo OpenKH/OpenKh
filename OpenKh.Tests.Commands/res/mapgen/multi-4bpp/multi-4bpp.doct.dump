@@ -1,2 +1,2 @@
-[Entry1] Unk=0; BoundingBox=((-1514, -916, -1514), (1514, 488, 1514))
- [Entry2] Flags=0; BoundingBox=((-1514, -916, -1514), (1514, 488, 1514))
+[Entry1] Unk=0; BoundingBox=Minimum: <-1514, -916, -1514> Maximum: <1514, 488, 1514>
+ [Entry2] Flags=0; BoundingBox=Minimum: <-1514, -916, -1514> Maximum: <1514, 488, 1514>
