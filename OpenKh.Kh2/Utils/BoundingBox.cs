@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2.Extensions;
+using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Jiminy;
 using System;
 using System.Collections.Generic;
@@ -36,6 +36,20 @@ namespace OpenKh.Kh2.Utils
         }
 
         public static BoundingBox FromPoints(params Vector3[] points)
+        {
+            var min = new Vector3(float.MaxValue);
+            var max = new Vector3(float.MinValue);
+
+            foreach (var point in points)
+            {
+                min = Vector3.Min(min, point);
+                max = Vector3.Max(max, point);
+            }
+
+            return new BoundingBox(min, max);
+        }
+
+        public static BoundingBox FromManyPoints(IEnumerable<Vector3> points)
         {
             var min = new Vector3(float.MaxValue);
             var max = new Vector3(float.MinValue);

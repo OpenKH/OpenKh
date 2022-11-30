@@ -8,6 +8,8 @@ using Xe.BinaryMapper;
 using OpenKh.Kh2;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils.Conventions;
+using System.ComponentModel;
+using System.Numerics;
 
 namespace OpenKh.Command.MapGen.Utils
 {
@@ -17,44 +19,110 @@ namespace OpenKh.Command.MapGen.Utils
 
         public ushort firstVifPacketQwc;
 
+        public class Index
+        {
+            /// <summary>
+            /// 0x10, 0x10, 0x20, 0x30, 0x20, 0x30, ...
+            /// </summary>
+            public byte Flag { get; set; }
+
+            /// <summary>
+            /// Index to coords
+            /// </summary>
+            public byte CoordIndex { get; set; }
+
+            /// <summary>
+            /// 0.0 to 1.0
+            /// </summary>
+            public Vector2 UV { get; set; }
+
+            /// <summary>
+            /// vertex color rgba is directly written.
+            /// 128 is PS2's max. 255 is doubled intensity.
+            /// </summary>
+            public Xe.Graphics.Color Color { get; set; }
+
+            /// <summary>
+            /// Normal vector
+            /// </summary>
+            public Vector3 Normal { get; set; }
+
+            public static byte GetSuitableFlag(int index)
+            {
+                switch (index)
+                {
+                    case 0:
+                    case 1:
+                        return 0x10;
+                    default:
+                        return ((index & 1) == 0) ? (byte)0x20 : (byte)0x30;
+                }
+            }
+        }
+
         public MapVifPacketBuilder(
-            BigMesh mesh
+            IEnumerable<Vector3> coords,
+            IEnumerable<Index> indices,
+            bool useNormal
         )
         {
-            var nLarge = mesh.triangleStripList.Sum(it => it.vertexIndices.Count);
-            var nSmall = mesh.vertexList.Count;
+            var lenLarge = indices.Count();
+            var lenSmall = coords.Count();
+            var lenNormal = useNormal ? lenLarge : 0;
+            var lenHeader = useNormal ? 5 : 4;
+
+            var adder = new OffsetAdder();
+
+            var offHeader = adder.Add(lenHeader);
+            var offVertIdx = adder.Add(lenLarge); // u v idx flags
+            var offClrVert = adder.Add(lenLarge); // r g b a
+            var offNormal = adder.Add(lenNormal); // x y z
+            var offPosVert = adder.Add(lenSmall); // x y z
 
             var top = new TopHeader
             {
-                numVertIdx = nLarge,
-                offVertIdx = 4,
+                numVertIdx = lenLarge,
+                offVertIdx = offVertIdx,
 
-                numClrVert = nLarge,
-                offClrVert = 4 + nLarge,
+                numClrVert = lenLarge,
+                offClrVert = offClrVert,
 
-                numPosVert = nSmall,
-                offPosVert = 4 + nLarge + nLarge,
+                numPosVert = lenSmall,
+                offPosVert = offPosVert,
+            };
+            var top2 = new TopHeader2
+            {
+                numNormal = lenNormal,
+                offNormal = offNormal,
             };
 
             {
                 var writer = new BinaryWriter(vifPacket);
 
-                writer.Write(0x01000101); // stcycl cl 01 wl 01
-                writer.Write(0x6C048000); // unpack V4-32 c 4 a 000 usn 0 flg 1 m 0
-                BinaryMapping.WriteObject(vifPacket, top);
+                {
+                    var num = lenHeader;
+
+                    writer.Write(0x01000101); // stcycl cl 01 wl 01
+                    writer.Write(0x6C008000 | (num << 16)); // unpack V4-32 c 4 a 000 usn 0 flg 1 m 0
+                    BinaryMapping.WriteObject(vifPacket, top);
+                    if (useNormal)
+                    {
+                        BinaryMapping.WriteObject(vifPacket, top2);
+                    }
+                }
 
                 vifPacket.AlignPosition(4);
 
                 {
                     // write uv
-                    var off = 4;
-                    var num = Convert.ToByte(nLarge);
+                    var off = offVertIdx;
+                    var num = Convert.ToByte(lenLarge);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x65008000 | off | (num << 16))); // unpack V2-16 c 14 a 004 usn 0 flg 1 m 0
-                    foreach (var one in mesh.triangleStripList.SelectMany(it => it.uvList))
+                    foreach (var one in indices)
                     {
-                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.X * 4096)))));
-                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.Y * 4096)))));
+                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.UV.X * 4096)))));
+                        writer.Write(Convert.ToInt16(Math.Max(-32768, Math.Min(32767, (one.UV.Y * 4096)))));
                     }
                 }
 
@@ -62,15 +130,15 @@ namespace OpenKh.Command.MapGen.Utils
 
                 {
                     // write idx
-                    var off = 4;
-                    var num = Convert.ToByte(nLarge);
+                    var off = offVertIdx;
+                    var num = Convert.ToByte(lenLarge);
                     writer.Write(0x20000000); // stmask  3 3 0 3  3 3 0 3  3 3 0 3  3 3 0 3 
                     writer.Write(0xcfcfcfcf);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x7200C000 | off | (num << 16))); // unpack S-8 c 14 a 004 usn 1 flg 1 m 1
-                    foreach (var one in mesh.triangleStripList.SelectMany(it => it.vertexIndices))
+                    foreach (var one in indices)
                     {
-                        writer.Write(Convert.ToByte(one));
+                        writer.Write(Convert.ToByte(one.CoordIndex));
                     }
                 }
 
@@ -78,35 +146,16 @@ namespace OpenKh.Command.MapGen.Utils
 
                 {
                     // write flags
-                    var off = 4;
-                    var num = Convert.ToByte(nLarge);
+                    var off = offVertIdx;
+                    var num = Convert.ToByte(lenLarge);
                     writer.Write(0x20000000); // stmask  3 3 3 0  3 3 3 0  3 3 3 0  3 3 3 0 
                     writer.Write(0x3f3f3f3f);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x7200C000 | off | (num << 16))); // unpack S-8 c 14 a 004 usn 1 flg 1 m 1
 
-                    foreach (var triStrip in mesh.triangleStripList)
+                    foreach (var one in indices)
                     {
-                        var count = triStrip.vertexIndices.Count;
-                        if (count >= 1)
-                        {
-                            writer.Write((byte)0x10);
-                            if (count >= 2)
-                            {
-                                writer.Write((byte)0x10);
-                                for (var x = 2; x < count; x++)
-                                {
-                                    if (0 == (x & 1))
-                                    {
-                                        writer.Write((byte)0x20);
-                                    }
-                                    else
-                                    {
-                                        writer.Write((byte)0x30);
-                                    }
-                                }
-                            }
-                        }
+                        writer.Write(Convert.ToByte(one.Flag));
                     }
                 }
 
@@ -114,13 +163,11 @@ namespace OpenKh.Command.MapGen.Utils
 
                 {
                     // write vertex color list
-                    var off = 4 + nLarge;
-                    var num = Convert.ToByte(nLarge);
-                    writer.Write(0x20000000); // stmask  3 3 3 0  3 3 3 0  3 3 3 0  3 3 3 0 
-                    writer.Write(0x3f3f3f3f);
+                    var off = offClrVert;
+                    var num = Convert.ToByte(lenLarge);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x6E00C000 | off | (num << 16))); // unpack V4-8 c 14 a 012 usn 1 flg 1 m 0
-                    foreach (var color in mesh.triangleStripList.SelectMany(it => it.vertexColorList))
+                    foreach (var color in indices.Select(it => it.Color))
                     {
                         writer.Write(color.r);
                         writer.Write(color.g);
@@ -131,20 +178,52 @@ namespace OpenKh.Command.MapGen.Utils
 
                 vifPacket.AlignPosition(4);
 
+                if (useNormal)
+                {
+                    var off = offNormal;
+                    var num = Convert.ToByte(top2.numNormal);
+
+                    {
+                        writer.Write(0x20000000); // stmask  0 0 0 3  0 0 0 3  0 0 0 3  0 0 0 3 
+                        writer.Write(0xC0C0C0C0);
+                        writer.Write(0x01000101); // stcycl cl 01 wl 01
+                        writer.Write((int)(0x78008000 | off | (num << 16))); // unpack V3-32 c 9 a 020 usn 0 flg 1 m 1
+                        foreach (var one in indices)
+                        {
+                            writer.Write(one.Normal.X);
+                            writer.Write(one.Normal.X);
+                            writer.Write(one.Normal.Z);
+                        }
+                    }
+
+                    {
+                        writer.Write(0x20000000); // stmask  3 3 3 0  3 3 3 0  3 3 3 0  3 3 3 0 
+                        writer.Write(0x3f3f3f3f);
+                        writer.Write(0x01000101); // stcycl cl 01 wl 01
+                        writer.Write((int)(0x7200C000 | off | (num << 16))); // unpack S-8 c 14 a 004 usn 1 flg 1 m 1
+                        foreach (var one in indices)
+                        {
+                            writer.Write(Convert.ToByte(0x00));
+                        }
+                    }
+                }
+
+                vifPacket.AlignPosition(4);
+
                 {
                     // write vertices
-                    var off = 4 + nLarge + nLarge;
-                    var num = Convert.ToByte(nSmall);
+                    var off = offPosVert;
+                    var num = Convert.ToByte(lenSmall);
                     writer.Write(0x31000000); // stcol 3f800000 3f800000 3f800000 3f800000
                     writer.Write(0x3f800000);
                     writer.Write(0x3f800000);
                     writer.Write(0x3f800000);
                     writer.Write(0x3f800000);
-                    writer.Write(0x20000000); // stmask  3 3 3 0  3 3 3 0  3 3 3 0  3 3 3 0 
+                    writer.Write(0x20000000); // stmask  0 0 0 2  0 0 0 2  0 0 0 2  0 0 0 2 
                     writer.Write(0x80808080);
                     writer.Write(0x01000101); // stcycl cl 01 wl 01
                     writer.Write((int)(0x78008000 | off | (num << 16))); // unpack V3-32 c 9 a 020 usn 0 flg 1 m 1
-                    foreach (var one in mesh.vertexList)
+                    foreach (var one in coords)
                     {
                         writer.Write(one.X);
                         writer.Write(one.Y);
@@ -173,7 +252,19 @@ namespace OpenKh.Command.MapGen.Utils
 
         private static byte ToPs2Alpha(byte data) => (byte)((data + 1) / 2);
 
-        class DmaSourceChainTag
+        private class OffsetAdder
+        {
+            private int _offset = 0;
+
+            public int Add(int len)
+            {
+                var thisOffset = _offset;
+                _offset += len;
+                return thisOffset;
+            }
+        }
+
+        private class DmaSourceChainTag
         {
             [Data] public ushort qwc { get; set; }
             [Data] public ushort idFlg { get; set; }
@@ -183,7 +274,7 @@ namespace OpenKh.Command.MapGen.Utils
         /// <summary>
         /// VPU1 map program header
         /// </summary>
-        class TopHeader
+        private class TopHeader
         {
             [Data] public int unk1 { get; set; }
             [Data] public int unk2 { get; set; }
@@ -204,6 +295,17 @@ namespace OpenKh.Command.MapGen.Utils
             [Data] public int offPosVert { get; set; }
             [Data] public int unk9 { get; set; }
             [Data] public int unk10 { get; set; }
+        }
+
+        /// <summary>
+        /// TopHeader + normal
+        /// </summary>
+        private class TopHeader2
+        {
+            [Data] public int numNormal { get; set; }
+            [Data] public int offNormal { get; set; }
+            [Data] public int unk1 { get; set; }
+            [Data] public int unk2 { get; set; }
         }
     }
 }

@@ -39,3 +39,6 @@ alias unspawnpoint='OpenKh.Command.SpawnScript unpoint'
 alias respawnpoint='OpenKh.Command.SpawnScript repoint'
 
 alias texfooter='OpenKh.Command.TexFooter'
+
+alias mapgen='OpenKh.Command.MapGen'
+alias mapgenutils='OpenKh.Command.MapGenUtils'
