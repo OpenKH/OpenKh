@@ -22,7 +22,7 @@ namespace OpenKh.Command.Bdxio.Models
             #region Generated
 
 			new BdxInstructionDesc { Code = 0x0000, CodeMask = 0x003F, Name = "pushImm", CodeSize = 3, Args = new[] { new Arg { Name = "imm32", Type = ArgType.Imm32 } } },
-            new BdxInstructionDesc { Code = 0x0010, CodeMask = 0x003F, Name = "pushImm", CodeSize = 3, Args = new[] { new Arg { Name = "imm32", Type = ArgType.Imm32 } } },
+            new BdxInstructionDesc { Code = 0x0010, CodeMask = 0x003F, Name = "pushImmf", CodeSize = 3, Args = new[] { new Arg { Name = "float32", Type = ArgType.Float32 } } },
             new BdxInstructionDesc { Code = 0x0020, CodeMask = 0xFFFF, Name = "pushFromPSp", CodeSize = 2, Args = new[] { new Arg { Name = "imm16", Type = ArgType.Imm16 } } },
             new BdxInstructionDesc { Code = 0x0060, CodeMask = 0xFFFF, Name = "pushFromPWp", CodeSize = 2, Args = new[] { new Arg { Name = "imm16", Type = ArgType.Imm16, WorkPos = true } } },
             new BdxInstructionDesc { Code = 0x00A0, CodeMask = 0xFFFF, Name = "pushFromPSpVal", CodeSize = 2, Args = new[] { new Arg { Name = "imm16", Type = ArgType.Imm16 } } },

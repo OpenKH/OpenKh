@@ -41,6 +41,7 @@ namespace OpenKh.Command.Bdxio.Models
             Ssub,
             Imm16,
             Imm32,
+            Float32,
         }
     }
 }
