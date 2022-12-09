@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace OpenKh.Command.MapGenUtils
 {
-    [Command("OpenKh.Command.ImgTool")]
+    [Command("OpenKh.Command.MapGenUtils")]
     [VersionOptionFromMember("--version", MemberName = nameof(GetVersion))]
     [Subcommand(typeof(GenSchemaCommand))]
     internal class Program
