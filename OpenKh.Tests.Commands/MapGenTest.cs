@@ -1,4 +1,6 @@
-﻿using OpenKh.Common;
+// #define UPDATE_TEST_DATA
+
+using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
 using System.Linq;
@@ -31,6 +33,9 @@ namespace OpenKh.Tests.Commands
                 new DumpDoctUtil(doct, writer);
 
                 var doctDumpFile = Path.ChangeExtension(inputModel, ".doct.dump");
+#if UPDATE_TEST_DATA
+                File.WriteAllText(doctDumpFile, writer.ToString());
+#endif
 
                 Assert.Equal(
                     expected: File.ReadAllText(doctDumpFile),
@@ -45,6 +50,9 @@ namespace OpenKh.Tests.Commands
                 new DumpCoctUtil(coct, writer);
 
                 var coctDumpFile = Path.ChangeExtension(inputModel, ".coct.dump");
+#if UPDATE_TEST_DATA
+                File.WriteAllText(coctDumpFile, writer.ToString());
+#endif
 
                 Assert.Equal(
                     expected: File.ReadAllText(coctDumpFile),

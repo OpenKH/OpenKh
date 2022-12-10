@@ -147,7 +147,7 @@ namespace OpenKh.Kh2
         public int Attribute { get; set; }
         private readonly int _nextOffset;
         public ushort ShadowCount { get; private set; }
-        public ushort TextureCount { get; private set; }
+        public ushort TextureCount { get; set; }
         public ushort OctalTreeCount { get; private set; }
         public List<ushort[]> vifPacketRenderingGroup;
 
@@ -270,6 +270,7 @@ namespace OpenKh.Kh2
             stream.Position += Chunks.Count * 0x10;
 
             mapHeader.OffsetVifPacketRenderingGroup = (int)stream.Position;
+            mapHeader.OctalTreeCount = Convert.ToUInt16(vifPacketRenderingGroup.Count);
             stream.Position += vifPacketRenderingGroup.Count * 4;
             var groupOffsets = new List<int>();
             foreach (var group in vifPacketRenderingGroup)

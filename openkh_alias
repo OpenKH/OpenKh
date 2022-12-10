@@ -41,3 +41,6 @@ alias respawnpoint='OpenKh.Command.SpawnScript repoint'
 alias texfooter='OpenKh.Command.TexFooter'
 
 alias anbmaker='OpenKh.Command.AnbMaker'
+
+alias mapgen='OpenKh.Command.MapGen'
+alias mapgenutils='OpenKh.Command.MapGenUtils'

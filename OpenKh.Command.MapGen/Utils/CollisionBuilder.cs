@@ -1,9 +1,13 @@
+using OpenKh.Command.MapGen.Interfaces;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Extensions;
+using OpenKh.Kh2.Utils;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Numerics;
 using System.Text;
 using static OpenKh.Kh2.Coct;
@@ -12,400 +16,59 @@ namespace OpenKh.Command.MapGen.Utils
 {
     public class CollisionBuilder
     {
-        public readonly Coct coct = new Coct();
-        public readonly Doct doct = new Doct();
+        private readonly Coct coct = new Coct();
+        private bool isValid = false;
+        private readonly Func<MaterialDef, int> _getAttributeFrom;
 
-        public List<ushort[]> vifPacketRenderingGroup { get; } = new List<ushort[]>();
-
-        public CollisionBuilder(IEnumerable<BigMesh> bigMeshes, bool disableBSPCollisionBuilder)
+        public CollisionBuilder(
+            ISpatialNodeCutter cutter,
+            Func<MaterialDef, int> getAttributeFrom
+        )
         {
-            if (disableBSPCollisionBuilder)
-            {
-                PerMeshClipRendering(bigMeshes);
-            }
-            else
-            {
-                UseBinarySeparatedPartitions(bigMeshes);
-            }
-        }
-
-        class CenterPointedMesh
-        {
-            public BigMesh bigMesh;
-
-            public Vector3 centerPoint;
-
-            public CenterPointedMesh(BigMesh bigMesh)
-            {
-                this.bigMesh = bigMesh;
-
-                centerPoint = GetCenter(
-                    bigMesh.triangleStripList
-                        .SelectMany(triangleStrip => triangleStrip.vertexIndices)
-                        .Select(index => bigMesh.vertexList[index])
-                );
-            }
-
-            public override string ToString() => centerPoint.ToString();
-
-            private static Vector3 GetCenter(IEnumerable<Vector3> positions)
-            {
-                double x = 0, y = 0, z = 0;
-                int n = 0;
-                foreach (var one in positions)
-                {
-                    ++n;
-                    x += one.X;
-                    y += one.Y;
-                    z += one.Z;
-                }
-                return new Vector3(
-                    (float)(x / n),
-                    (float)(y / n),
-                    (float)(z / n)
-                );
-            }
-        }
-
-        /// <summary>
-        /// Binary separated partitions
-        /// </summary>
-        class BSP
-        {
-            public CenterPointedMesh[] Points { get; }
-
-            public BSP(CenterPointedMesh[] points)
-            {
-                Points = points;
-            }
-
-            public override string ToString() => $"{Points.Length:#,##0} points";
-
-            public BSP[] Split()
-            {
-                if (Points.Length >= 20)
-                {
-                    var range = new Range(Points);
-                    if (range.yLen >= range.xLen)
-                    {
-                        if (range.zLen >= range.yLen)
-                        {
-                            // z-cut
-                            return new BSP[]
-                            {
-                                new BSP(Points.Where(it => it.centerPoint.Z >= range.zCenter).ToArray()),
-                                new BSP(Points.Where(it => it.centerPoint.Z < range.zCenter).ToArray()),
-                            };
-                        }
-                        else
-                        {
-                            // y-cut
-                            return new BSP[]
-                            {
-                                new BSP(Points.Where(it => it.centerPoint.Y >= range.yCenter).ToArray()),
-                                new BSP(Points.Where(it => it.centerPoint.Y < range.yCenter).ToArray()),
-                            };
-                        }
-                    }
-                    else
-                    {
-                        // x-cut
-                        return new BSP[]
-                        {
-                            new BSP(Points.Where(it => it.centerPoint.X >= range.xCenter).ToArray()),
-                            new BSP(Points.Where(it => it.centerPoint.X < range.xCenter).ToArray()),
-                        };
-                    }
-                }
-                return new BSP[] { this };
-            }
-
-            class Range
-            {
-                public float xMin = float.MaxValue;
-                public float xMax = float.MinValue;
-                public float yMin = float.MaxValue;
-                public float yMax = float.MinValue;
-                public float zMin = float.MaxValue;
-                public float zMax = float.MinValue;
-
-                public float xLen;
-                public float yLen;
-                public float zLen;
-
-                public float xCenter;
-                public float yCenter;
-                public float zCenter;
-
-                public Range(CenterPointedMesh[] points)
-                {
-                    foreach (var point in points)
-                    {
-                        var position = point.centerPoint;
-                        xMin = Math.Min(xMin, position.X);
-                        xMax = Math.Max(xMax, position.X);
-                        yMin = Math.Min(yMin, position.Y);
-                        yMax = Math.Max(yMax, position.Y);
-                        zMin = Math.Min(zMin, position.Z);
-                        zMax = Math.Max(zMax, position.Z);
-                    }
-                    xLen = (xMax - xMin);
-                    yLen = (yMax - yMin);
-                    zLen = (zMax - zMin);
-                    xCenter = (xMax + xMin) / 2;
-                    yCenter = (yMax + yMin) / 2;
-                    zCenter = (zMax + zMin) / 2;
-                }
-            }
-        }
-
-        class BSPWalker
-        {
-            private Coct coct;
-            private BuildHelper helper;
-
-            public List<ushort[]> vifPacketRenderingGroup = new List<ushort[]>();
-            public List<CollisionMesh> collisionMeshList = new List<CollisionMesh>();
-
-            public BSPWalker(BSP bsp, Coct coct, BuildHelper helper)
-            {
-                this.coct = coct;
-                this.helper = helper;
-
-                JoinResult(
-                    Walk(bsp),
-                    null
-                );
-            }
-
-            class WalkResult
-            {
-                internal int? groupIndex;
-                internal CollisionMesh? mesh;
-
-                public override string ToString() => $"group({groupIndex}) mesh({mesh})";
-            }
-
-            private WalkResult Walk(BSP bsp)
-            {
-                var pair = bsp.Split();
-                if (pair.Length == 2)
-                {
-                    return JoinResult(
-                        Walk(pair[0]),
-                        Walk(pair[1])
-                    );
-                }
-                else
-                {
-                    var collisionMesh = new CollisionMesh
-                    {
-                        Collisions = new List<Collision>()
-                    };
-
-                    var vifPacketIndices = new List<ushort>();
-
-                    foreach (var point in pair[0].Points)
-                    {
-                        var mesh = point.bigMesh;
-
-                        vifPacketIndices.AddRange(mesh.vifPacketIndices);
-
-                        foreach (var set in TriangleStripsToTriangleFans(mesh.triangleStripList))
-                        {
-                            var quad = set.Count == 4;
-
-                            var v1 = mesh.vertexList[set[0]];
-                            var v2 = mesh.vertexList[set[1]];
-                            var v3 = mesh.vertexList[set[2]];
-                            var v4 = quad ? mesh.vertexList[set[3]] : Vector3.Zero;
-
-                            collisionMesh.Collisions.Add(coct.Complete(
-                                new Collision
-                                {
-                                    Vertex1 = helper.AllocateVertex(v1.X, -v1.Y, -v1.Z), // why -Y and -Z ?
-                                    Vertex2 = helper.AllocateVertex(v2.X, -v2.Y, -v2.Z),
-                                    Vertex3 = helper.AllocateVertex(v3.X, -v3.Y, -v3.Z),
-                                    Vertex4 = Convert.ToInt16(quad ? helper.AllocateVertex(v4.X, -v4.Y, -v4.Z) : -1),
-                                    Attributes = new Attributes() { Flags = mesh.matDef.surfaceFlags }
-                                },
-                                inflate: 1
-                            ));
-                        }
-                    }
-
-                    coct.Complete(collisionMesh);
-
-                    collisionMeshList.Add(collisionMesh);
-
-                    vifPacketRenderingGroup.Add(
-                        vifPacketIndices
-                            .Distinct()
-                            .ToArray()
-                    );
-
-                    return new WalkResult
-                    {
-                        mesh = collisionMesh,
-                    };
-                }
-            }
-
-            private WalkResult JoinResult(WalkResult left, WalkResult right)
-            {
-                var groupChildren = new List<int>();
-
-                if (left.mesh != null)
-                {
-                    groupChildren.Add(coct.Nodes.Count);
-
-                    coct.CompleteAndAdd(
-                        new CollisionNode
-                        {
-                            Meshes = new List<CollisionMesh> { left.mesh }
-                        }
-                    );
-                }
-                else if (left.groupIndex.HasValue)
-                {
-                    groupChildren.Add(left.groupIndex.Value);
-                }
-
-                if (right == null)
-                {
-                    // skip
-                }
-                else if (right.mesh != null)
-                {
-                    groupChildren.Add(coct.Nodes.Count);
-
-                    coct.CompleteAndAdd(
-                        new CollisionNode
-                        {
-                            Meshes = new List<CollisionMesh> { right.mesh }
-                        }
-                    );
-                }
-                else if (right.groupIndex.HasValue)
-                {
-                    groupChildren.Add(right.groupIndex.Value);
-                }
-
-                var firstIdx1 = coct.Nodes.Count;
-
-                coct.CompleteAndAdd(
-                    new CollisionNode
-                    {
-                        Meshes = new List<CollisionMesh>(),
-                        Child1 = Convert.ToInt16((groupChildren.Count >= 1) ? groupChildren[0] : -1),
-                        Child2 = Convert.ToInt16((groupChildren.Count >= 2) ? groupChildren[1] : -1),
-                    }
-                );
-
-                return new WalkResult
-                {
-                    groupIndex = firstIdx1,
-                };
-            }
-        }
-
-        private void UseBinarySeparatedPartitions(IEnumerable<BigMesh> bigMeshes)
-        {
-            var bsp = new BSP(
-                bigMeshes
-                    .Where(mesh => !mesh.matDef.noclip)
-                    .Select(mesh => new CenterPointedMesh(mesh))
-                    .ToArray()
-            );
-
+            _getAttributeFrom = getAttributeFrom;
+            var root = new ToTree(cutter).Root;
             var helper = new BuildHelper(coct);
-            var walker = new BSPWalker(bsp, coct, helper);
-
-            vifPacketRenderingGroup.AddRange(walker.vifPacketRenderingGroup);
-
-            coct.ReverseMeshGroup();
-
-            // Entry2 index is tightly coupled to vifPacketRenderingGroup's index.
-            // Thus do not add Entry2 unplanned.
-
-            CreateDoctFromCoct(walker.collisionMeshList);
+            WalkTree(root, helper);
         }
 
-        private void CreateDoctFromCoct(IList<CollisionMesh> vifPacketRenderingGroupIndexMatched)
+        public CollisionBuilt GetBuilt() => new CollisionBuilt
         {
-            // directly mapping:
-            // coctMesh → doct.Entry2
-            // coctMeshGroup → doct.Entry1
+            Coct = coct,
+            IsValid = isValid,
+        };
 
-            var coctMeshList = new List<CollisionMesh>();
-
-            foreach (var coctMeshGroup in coct.Nodes)
-            {
-                var vifPacketIndices = coctMeshGroup.Meshes
-                    .Select(it => vifPacketRenderingGroupIndexMatched.IndexOf(it))
-                    .ToArray();
-
-                var minIdx = 0;
-                var maxIdx = 0;
-                if (vifPacketIndices.Length != 0)
-                {
-                    minIdx = vifPacketIndices.Min();
-                    maxIdx = vifPacketIndices.Max() + 1;
-                }
-
-                doct.Entry1List.Add(
-                    new Doct.Entry1
-                    {
-                        Child1 = coctMeshGroup.Child1,
-                        Child2 = coctMeshGroup.Child2,
-                        Child3 = coctMeshGroup.Child3,
-                        Child4 = coctMeshGroup.Child4,
-                        Child5 = coctMeshGroup.Child5,
-                        Child6 = coctMeshGroup.Child6,
-                        Child7 = coctMeshGroup.Child7,
-                        Child8 = coctMeshGroup.Child8,
-                        BoundingBox = coctMeshGroup.BoundingBox.ToBoundingBox(),
-                        Entry2Index = (ushort)minIdx,
-                        Entry2LastIndex = (ushort)maxIdx,
-                    }
-                );
-            }
-
-            foreach (var coctMesh in vifPacketRenderingGroupIndexMatched)
-            {
-                doct.Add(
-                    new Doct.Entry2
-                    {
-                        BoundingBox = coctMesh.BoundingBox
-                            .ToBoundingBox(),
-                    }
-                );
-            }
+        private class WalkResult
+        {
+            internal ushort collisionNodeIdx;
         }
 
-        private void PerMeshClipRendering(IEnumerable<BigMesh> bigMeshes)
+        private WalkResult WalkTree(Node walkNode, BuildHelper helper)
         {
-            var meshList = new List<CollisionMesh>();
+            var collisionNodeIdx = Convert.ToUInt16(coct.Nodes.Count);
 
-            var helper = new BuildHelper(coct);
-
-            foreach (var mesh in bigMeshes.Where(it => !it.matDef.noclip))
+            var collisionNode = new CollisionNode
             {
+                Meshes = new List<CollisionMesh>(),
+            };
+            coct.Nodes.Add(collisionNode);
+
+            if (walkNode.faces?.Any() ?? false)
+            {
+                isValid = true;
+
                 var collisionMesh = new CollisionMesh
                 {
                     Collisions = new List<Collision>()
                 };
 
-                var vifPacketIndices = new List<ushort>(mesh.vifPacketIndices);
-
-                foreach (var set in TriangleStripsToTriangleFans(mesh.triangleStripList))
+                foreach (var face in walkNode.faces.ToArray())
                 {
-                    var quad = set.Count == 4;
+                    var quad = face.positionList.Length == 4;
 
-                    var v1 = mesh.vertexList[set[0]];
-                    var v2 = mesh.vertexList[set[1]];
-                    var v3 = mesh.vertexList[set[2]];
-                    var v4 = quad ? mesh.vertexList[set[3]] : Vector3.Zero;
+                    var v1 = face.positionList[0];
+                    var v2 = face.positionList[1];
+                    var v3 = face.positionList[2];
+                    var v4 = quad ? face.positionList[3] : Vector3.Zero;
 
                     collisionMesh.Collisions.Add(coct.Complete(
                         new Collision
@@ -414,65 +77,97 @@ namespace OpenKh.Command.MapGen.Utils
                             Vertex2 = helper.AllocateVertex(v2.X, -v2.Y, -v2.Z),
                             Vertex3 = helper.AllocateVertex(v3.X, -v3.Y, -v3.Z),
                             Vertex4 = Convert.ToInt16(quad ? helper.AllocateVertex(v4.X, -v4.Y, -v4.Z) : -1),
-                            Attributes = new Attributes() { Flags = mesh.matDef.surfaceFlags }
+                            Attributes = new Attributes() { Flags = _getAttributeFrom(face.matDef) },
+                            Ground = face.matDef.ground,
+                            FloorLevel = face.matDef.floorLevel,
                         },
                         inflate: 1
                     ));
                 }
 
-                vifPacketRenderingGroup.Add(
-                    vifPacketIndices
-                        .Distinct()
-                        .ToArray()
-                );
-
                 coct.Complete(collisionMesh);
-                meshList.Add(collisionMesh);
+
+                collisionNode.Meshes.Add(collisionMesh);
             }
 
-            coct.CompleteAndAdd(
-                new CollisionNode
-                {
-                    Meshes = meshList
-                }
-            );
+            var childNodes = (walkNode.children ?? new Node[0])
+                .Select(it => WalkTree(it, helper))
+                .ToArray();
 
-            // Entry2 index is tightly coupled to vifPacketRenderingGroup's index.
-            // Thus do not add Entry2 unplanned.
+            if (8 < childNodes.Length)
+            {
+                throw new Exception("Unexpected");
+            }
 
-            CreateDoctFromCoct(meshList);
+            collisionNode.Child1 = (short)(1 <= childNodes.Length ? childNodes[0].collisionNodeIdx : -1);
+            collisionNode.Child2 = (short)(2 <= childNodes.Length ? childNodes[1].collisionNodeIdx : -1);
+            collisionNode.Child3 = (short)(3 <= childNodes.Length ? childNodes[2].collisionNodeIdx : -1);
+            collisionNode.Child4 = (short)(4 <= childNodes.Length ? childNodes[3].collisionNodeIdx : -1);
+            collisionNode.Child5 = (short)(5 <= childNodes.Length ? childNodes[4].collisionNodeIdx : -1);
+            collisionNode.Child6 = (short)(6 <= childNodes.Length ? childNodes[5].collisionNodeIdx : -1);
+            collisionNode.Child7 = (short)(7 <= childNodes.Length ? childNodes[6].collisionNodeIdx : -1);
+            collisionNode.Child8 = (short)(8 <= childNodes.Length ? childNodes[7].collisionNodeIdx : -1);
+            helper.CompleteBBox(collisionNode);
+
+            return new WalkResult
+            {
+                collisionNodeIdx = collisionNodeIdx,
+            };
         }
 
-        private static IEnumerable<IList<int>> TriangleStripsToTriangleFans(IList<BigMesh.TriangleStrip> list)
+        private class Node
         {
-            foreach (var set in list)
+            internal Node[] children;
+
+            internal SingleFace[] faces;
+            internal BoundingBox bbox;
+        }
+
+        private class ToTree
+        {
+            internal Node Root { get; }
+
+            public ToTree(ISpatialNodeCutter cutter)
             {
-                var cx = set.vertexIndices.Count;
-                if (cx == 3)
+                Root = Walk(cutter);
+            }
+
+            private Node Walk(ISpatialNodeCutter cutter)
+            {
+                var pair = cutter.Cut().ToArray();
+
+                if (8 < pair.Length)
                 {
-                    yield return set.vertexIndices;
+                    throw new Exception("Unexpected");
                 }
-                if (cx >= 4)
+
+                if (2 <= pair.Length)
                 {
-                    for (int x = 4; x <= cx; x += 2)
+                    var children = pair
+                        .Select(it => Walk(it))
+                        .ToArray();
+
+                    return new Node
                     {
-                        yield return new int[]
-                        {
-                            set.vertexIndices[x - 4 + 0],
-                            set.vertexIndices[x - 4 + 1],
-                            set.vertexIndices[x - 4 + 3],
-                            set.vertexIndices[x - 4 + 2],
-                        };
-                        if (x + 1 == cx)
-                        {
-                            yield return new int[]
-                            {
-                                set.vertexIndices[x - 2 + 0],
-                                set.vertexIndices[x - 2 + 1],
-                                set.vertexIndices[x - 2 + 2],
-                            };
-                        }
-                    }
+                        children = children,
+                        bbox = children
+                            .Select(it => it.bbox)
+                            .MergeAll(),
+                    };
+                }
+                else
+                {
+                    var faces = pair.Single().Faces.ToArray();
+
+                    return new Node
+                    {
+                        faces = faces,
+
+                        bbox = BoundingBox.FromManyPoints(
+                            faces
+                                .SelectMany(point => point.positionList)
+                        ),
+                    };
                 }
             }
         }

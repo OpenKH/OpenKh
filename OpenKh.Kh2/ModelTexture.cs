@@ -967,5 +967,7 @@ namespace OpenKh.Kh2
             var mask = (1 << size) - 1U;
             return Data & ~(mask << position) | ((value & mask) << position);
         }
+
+        public ushort GetGsInfoCount() => Convert.ToUInt16(_gsInfo.Count);
     }
 }
