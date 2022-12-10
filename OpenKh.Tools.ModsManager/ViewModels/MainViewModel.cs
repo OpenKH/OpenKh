@@ -105,7 +105,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility HideStop => !PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
 
         public bool DevView
@@ -138,7 +138,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PC));
                 OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PatchVisible));
-                OnPropertyChanged(nameof(HideStop));
+                OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
             }
         }  

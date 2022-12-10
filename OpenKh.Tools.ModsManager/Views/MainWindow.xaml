@@ -68,7 +68,7 @@
                 <MenuItem Header="Build and Run" Command="{Binding BuildAndRunCommand}" InputGestureText="F5"/>
                 <MenuItem Header="Build Only" Command="{Binding BuildCommand}" InputGestureText="Ctrl+B"/>
                 <MenuItem Header="Run Only" Command="{Binding RunCommand}" InputGestureText="Ctrl+F5"/>
-                <MenuItem Header="Stop" Command="{Binding StopRunningInstanceCommand}" Visibility="{Binding HideStop}" InputGestureText="Shift+F5"/>
+                <MenuItem Header="Stop" Command="{Binding StopRunningInstanceCommand}" Visibility="{Binding notPC}" InputGestureText="Shift+F5"/>
                 <MenuItem Header="Restore" Command="{Binding RestoreCommand}" Visibility="{Binding isPC}" CommandParameter="False" InputGestureText="Ctrl+R"/>
             </MenuItem>
             <MenuItem Header="Patching" Visibility="{Binding PatchVisible}">
@@ -124,7 +124,9 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}"/>
-            </MenuItem>            
+            </MenuItem>
+            <MenuItem Header="PC Version" Focusable="False" IsHitTestVisible="False" Visibility="{Binding isPC}"/>
+            <MenuItem Header="Emulator" Focusable="False" IsHitTestVisible="False" Visibility="{Binding notPC}"/>
         </Menu>
         <ComboBox SelectedIndex="{Binding GametoLaunch}" Visibility="{Binding isPC}" HorizontalAlignment="Right" Margin="0,0,10,0" MinWidth="144">
             <ComboBoxItem>Kingdom Hearts 2</ComboBoxItem>
