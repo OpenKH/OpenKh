@@ -106,7 +106,23 @@ namespace OpenKh.Patcher
                         if (assetFile.Required && !File.Exists(context.GetOriginalAssetPath(name)))
                             continue;
 
-                        var _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "kh2_first";
+                        string _packageFile = null;
+                        switch (LaunchGame)
+                        {
+                            case "kh1":
+                                _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "kh1_first";
+                                break;
+                            case "bbs":
+                                _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "bbs_first";
+                                break;
+                            case "recom":
+                                if (assetFile!= null)
+                                _packageFile = "Recom";
+                                break;
+                            default:
+                                _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "kh2_first";
+                                break;
+                        }
 
                         var dstFile = context.GetDestinationPath(name);
                         var packageMapLocation = "";
