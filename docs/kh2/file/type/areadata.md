@@ -348,7 +348,7 @@ Conditionals for the script based on the entrance.
 
 #### Unknown1d
 
-Determines Sora and the party's stats upon entering the room. The game will only check if Sora is using a form or summon when entering a room. Healing will refill items and reverting will refill Sora's drive gauge.
+Determines Sora and the party's stats upon entering the room. The game will only check if Sora is using a form or summon when entering a room. Healing will refill items and reverting will refill Sora's drive gauge. Multiple values can be entered.
 
 | Value | Description
 |-------|-------------
