@@ -41,7 +41,7 @@
             </TextBlock>
         </StackPanel>
         <StackPanel Visibility="{Binding LocalVisibility}">
-            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" FontWeight="Bold">
+            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" FontFamily="Segoe UI Semibold">
                 This mod is available only locally and it is not linked to any GitHub repository.
             </TextBlock>
         </StackPanel>
