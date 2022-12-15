@@ -254,11 +254,11 @@ Set the memory area `0034ecd0`, which represents the amount of memory reserved f
 
 #### Unknown06
 
-Set the memory area `0034ecd8` with the 4-byte parameter. The purpose of that memory area is unknown. Found 64 times and only in `btl`.
+Set the memory area `0034ecd8` with the 4-byte parameter. Changes the amount of room transitions needed to respawn an enemy if defeated.
 
 #### Unknown07
 
-Set the memory area `0034ecdc` with the 4-byte parameter. The purpose of that memory area is unknown. Very uncommon as it's ony found 7 times in the maps `ca12` and `nm02` in `btl`.
+Set the memory area `0034ecdc` with the 4-byte parameter. Very uncommon as it's ony found 7 times in the maps `ca12` and `nm02` in `btl`. Changes the amount of room transitions needed to respawn an object if destroyed.
 
 #### Unknown09
 
@@ -348,7 +348,7 @@ Conditionals for the script based on the entrance.
 
 #### Unknown1d
 
-Determines Sora and the party's stats upon entering the room. The game will only check if Sora is using a form or summon when entering a room. Healing will refill items and reverting will refill Sora's drive gauge. Multiple values can be entered.
+Determines Sora and the party's stats upon entering the room. The game will only check if Sora is using a form or summon when entering a room. Healing will refill items and reverting will refill Sora's drive gauge.
 
 | Value | Description
 |-------|-------------
