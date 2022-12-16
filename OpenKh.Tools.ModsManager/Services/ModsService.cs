@@ -182,7 +182,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 else if (fileName.Contains(".compcpatch"))
                 {
                     _yamlGen.Title = modName + " (COMPCPATCH)";
-                    _yamlGen.Game = "recom";
+                    _yamlGen.Game = "Recom";
                     _yamlGen.Description = "This is an automatically generated metadata for this COMPCPATCH Modification.";
                 }
                 else if (fileName.Contains(".bbspcpatch"))

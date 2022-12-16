@@ -76,7 +76,7 @@ namespace OpenKh.Patcher
             "kh2",
             "kh1",
             "bbs",
-            "recom",
+            "Recom",
         };
 
         public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
@@ -115,7 +115,7 @@ namespace OpenKh.Patcher
                             case "bbs":
                                 _packageFile = assetFile.Package != null && !fastMode ? assetFile.Package : "bbs_first";
                                 break;
-                            case "recom":
+                            case "Recom":
                                 if (assetFile!= null)
                                 _packageFile = "Recom";
                                 break;

@@ -47,7 +47,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             "kh2",
             "kh1",
             "bbs",
-            "recom"
+            "Recom"
         };
         private int _wizardVersionNumber = 1;
         private string[] executable = new string[]
@@ -158,7 +158,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     case "bbs":
                         launchExecutable = 2;
                         return 2;
-                    case "recom":
+                    case "Recom":
                         launchExecutable = 3;
                         return 3;
                     default:
@@ -184,8 +184,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         ConfigurationService.LaunchGame = "bbs";
                         break;
                     case 3:
-                        _launchGame = "recom";
-                        ConfigurationService.LaunchGame = "recom";
+                        _launchGame = "Recom";
+                        ConfigurationService.LaunchGame = "Recom";
                         break;
                     default:
                         _launchGame = "kh2";
@@ -683,8 +683,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                             case "bbs":
                                 _pkgSoft = fastMode ? "bbs_first" : _dirPart;
                                 break;
-                            case "recom":
-                                _pkgSoft = "recom";
+                            case "Recom":
+                                _pkgSoft = "Recom";
                                 break;
                             default:
                                 _pkgSoft = fastMode ? "kh2_first" : _dirPart;
@@ -795,7 +795,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
                         else
                         {
-                            foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")).Where(x => x.Contains(".pkg") && (x.Contains(_launchGame) || x.Contains("Recom"))))
+                            foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")).Where(x => x.Contains(".pkg") && (x.Contains(_launchGame))))
                             {
                                 Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
 

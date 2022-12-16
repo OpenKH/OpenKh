@@ -79,8 +79,8 @@ namespace OpenKh.Tools.ModsManager.Services
                 Directory.CreateDirectory(Path.Combine(modsPath, "kh1"));
             if (!Directory.Exists(Path.Combine(modsPath, "bbs")))
                 Directory.CreateDirectory(Path.Combine(modsPath, "bbs"));
-            if (!Directory.Exists(Path.Combine(modsPath, "recom")))
-                Directory.CreateDirectory(Path.Combine(modsPath, "recom"));
+            if (!Directory.Exists(Path.Combine(modsPath, "Recom")))
+                Directory.CreateDirectory(Path.Combine(modsPath, "Recom"));
            
 
             Task.Run(async () =>
@@ -116,7 +116,7 @@ namespace OpenKh.Tools.ModsManager.Services
                         return File.Exists(EnabledModsPathKH1) ? File.ReadAllLines(EnabledModsPathKH1) : new string[0];
                     case "bbs":
                         return File.Exists(EnabledModsPathBBS) ? File.ReadAllLines(EnabledModsPathBBS) : new string[0];
-                    case "recom":
+                    case "Recom":
                         return File.Exists(EnabledModsPathRECOM) ? File.ReadAllLines(EnabledModsPathRECOM) : new string[0];
                     default:
                         return File.Exists(EnabledModsPathKH2) ? File.ReadAllLines(EnabledModsPathKH2) : new string[0];
@@ -132,7 +132,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     case "bbs":
                         File.WriteAllLines(EnabledModsPathBBS, value);
                         break;
-                    case "recom":
+                    case "Recom":
                         File.WriteAllLines(EnabledModsPathRECOM, value);
                         break;
                     default:

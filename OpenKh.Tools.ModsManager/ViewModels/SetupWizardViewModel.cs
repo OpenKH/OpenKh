@@ -285,8 +285,9 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public bool IsNotExtracting { get; private set; }
         public bool IsGameDataFound => (IsNotExtracting && GameService.FolderContainsUniqueFile(GameId, Path.Combine(GameDataLocation, "kh2")) || 
             (GameEdition == EpicGames && (GameService.FolderContainsUniqueFile("kh2", Path.Combine(GameDataLocation, "kh2")) || 
-            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1"))|| Directory.Exists(Path.Combine(GameDataLocation, "bbs")) ||
-            Directory.Exists(Path.Combine(GameDataLocation, "recom")))));
+            GameService.FolderContainsUniqueFile("kh1", Path.Combine(GameDataLocation, "kh1")) || 
+            File.Exists(Path.Combine(GameDataLocation, "bbs", "message")) ||
+            File.Exists(Path.Combine(GameDataLocation, "Recom", "SYS")))));
         public Visibility GameDataNotFoundVisibility => !IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility GameDataFoundVisibility => IsGameDataFound ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ProgressBarVisibility => IsNotExtracting ? Visibility.Collapsed : Visibility.Visible;
@@ -677,7 +678,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         {
                             for (int i = 0; i < 1; i++)
                             {
-                                var outputDir = Path.Combine(gameDataLocation, "recom");
+                                var outputDir = Path.Combine(gameDataLocation, "Recom");
                                 using var hedStream = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.hed"));
                                 using var img = File.OpenRead(Path.Combine(_pcReleaseLocation, "Image", _pcReleaseLanguage, "Recom.pkg"));
 
