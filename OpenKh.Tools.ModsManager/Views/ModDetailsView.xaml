@@ -25,9 +25,11 @@
                 </TextBlock>
                 <Button Margin="0 0 0 3" Content="Download updates" Command="{Binding UpdateCommand}"/>
             </StackPanel>
-            <Image MaxWidth="256" MaxHeight="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
-            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Text="{Binding Description}"/>
-            <TextBlock Margin="0 0 0 3">
+        </StackPanel>
+        <Image MaxWidth="256" MaxHeight="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
+        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Text="{Binding Description}"/>
+        <StackPanel Visibility="{Binding SourceVisibility}">
+                <TextBlock Margin="0 0 0 3">
                 <Hyperlink NavigateUri="{Binding SourceUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
                     <TextBlock Text="Mod source code" Foreground="{DynamicResource textHyperlink}"/>
                 </Hyperlink>
@@ -39,7 +41,7 @@
             </TextBlock>
         </StackPanel>
         <StackPanel Visibility="{Binding LocalVisibility}">
-            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" FontFamily="Segoe UI Semibold">
                 This mod is available only locally and it is not linked to any GitHub repository.
             </TextBlock>
         </StackPanel>

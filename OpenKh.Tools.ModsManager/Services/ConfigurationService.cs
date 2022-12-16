@@ -72,8 +72,16 @@ namespace OpenKh.Tools.ModsManager.Services
 
         static ConfigurationService()
         {
-            if (!Directory.Exists(ModCollectionPath))
-                Directory.CreateDirectory(ModCollectionPath);
+            string modsPath = Path.GetFullPath(Path.Combine(ModCollectionPath, ".."));
+            if (!Directory.Exists(Path.Combine(modsPath, "kh2")))
+                Directory.CreateDirectory(Path.Combine(modsPath, "kh2"));
+            if (!Directory.Exists(Path.Combine(modsPath, "kh1")))
+                Directory.CreateDirectory(Path.Combine(modsPath, "kh1"));
+            if (!Directory.Exists(Path.Combine(modsPath, "bbs")))
+                Directory.CreateDirectory(Path.Combine(modsPath, "bbs"));
+            if (!Directory.Exists(Path.Combine(modsPath, "recom")))
+                Directory.CreateDirectory(Path.Combine(modsPath, "recom"));
+           
 
             Task.Run(async () =>
             {

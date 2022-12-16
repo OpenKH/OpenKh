@@ -105,7 +105,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public Visibility IsModUnselectedMessageVisible => !IsModSelected ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PatchVisible => PC && !PanaceaInstalled || PC && DevView ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ModLoader => !PC || PanaceaInstalled ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility HideStop => !PC ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility notPC => !PC ? Visibility.Visible : Visibility.Collapsed;
         public Visibility isPC => PC ? Visibility.Visible : Visibility.Collapsed;
 
         public bool DevView
@@ -138,7 +138,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(PC));
                 OnPropertyChanged(nameof(ModLoader));
                 OnPropertyChanged(nameof(PatchVisible));
-                OnPropertyChanged(nameof(HideStop));
+                OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
             }
         }  
@@ -150,14 +150,19 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 switch (_launchGame)
                 {
                     case "kh2":
+                        launchExecutable = 0;
                         return 0;
                     case "kh1":
+                        launchExecutable = 1;
                         return 1;
                     case "bbs":
+                        launchExecutable = 2;
                         return 2;
                     case "recom":
+                        launchExecutable = 3;
                         return 3;
                     default:
+                        launchExecutable = 0;
                         return 0;
                 }
             }
@@ -608,7 +613,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         {
             await Task.Run(() =>
             {
-                if (ConfigurationService.GameEdition == 2 && _launchGame == "kh2")
+                if (ConfigurationService.GameEdition == 2)
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
                     var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame , "patch-package-map.txt");
@@ -641,18 +646,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         specialDirs = Directory.GetDirectories(specialStagingDir).Select(directory => Path.GetFileName(directory)).ToArray();
 
                     foreach (var packageName in stagingDirs)
-                        Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.GameModPath, packageName));
+                        Directory.Move(Path.Combine(patchStagingDir, packageName), Path.Combine(ConfigurationService.GameModPath, _launchGame, packageName));
                     foreach (var specialDir in specialDirs)
-                        Directory.Move(Path.Combine(ConfigurationService.GameModPath, "special", specialDir), Path.Combine(ConfigurationService.GameModPath, specialDir));
+                        Directory.Move(Path.Combine(ConfigurationService.GameModPath, _launchGame, "special", specialDir), Path.Combine(ConfigurationService.GameModPath, _launchGame, specialDir));
 
                     stagingDirs.Remove("special"); // Since it's not actually a real game package
                     Directory.Delete(patchStagingDir, true);
 
-                    var specialModDir = Path.Combine(ConfigurationService.GameModPath, "special");
+                    var specialModDir = Path.Combine(ConfigurationService.GameModPath, _launchGame, "special");
                     if (Directory.Exists(specialModDir))
                         Directory.Delete(specialModDir, true);
 
-                    foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.GameModPath, packageDir)))
+                    foreach (var directory in stagingDirs.Select(packageDir => Path.Combine(ConfigurationService.GameModPath, _launchGame, packageDir)))
                     {
                         if (specialDirs.Contains(Path.GetDirectoryName(directory)))
                             continue;
@@ -669,7 +674,23 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (Directory.Exists(_rawPath))
                             patchFiles.AddRange(OpenKh.Egs.Helpers.GetAllFiles(_rawPath).ToList());
 
-                        var _pkgSoft = fastMode ? "kh2_first" : _dirPart;
+                        string _pkgSoft;
+                        switch (_launchGame)
+                        {
+                            case "kh1":
+                                _pkgSoft = fastMode ? "kh1_first" : _dirPart;
+                                break;
+                            case "bbs":
+                                _pkgSoft = fastMode ? "bbs_first" : _dirPart;
+                                break;
+                            case "recom":
+                                _pkgSoft = "recom";
+                                break;
+                            default:
+                                _pkgSoft = fastMode ? "kh2_first" : _dirPart;
+                                break;
+
+                        }
                         var _pkgName = Path.Combine(ConfigurationService.PcReleaseLocation, "Image", ConfigurationService.PcReleaseLanguage, _pkgSoft + ".pkg");
 
                         var _backupDir = Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage");
@@ -774,7 +795,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         }
                         else
                         {
-                            foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")).Where(x => x.Contains(".pkg")))
+                            foreach (var file in Directory.GetFiles(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")).Where(x => x.Contains(".pkg") && (x.Contains(_launchGame) || x.Contains("Recom"))))
                             {
                                 Log.Info($"Restoring Package File {file.Replace(".pkg", "")}");
 
