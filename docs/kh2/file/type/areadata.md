@@ -254,11 +254,11 @@ Set the memory area `0034ecd0`, which represents the amount of memory reserved f
 
 #### Unknown06
 
-Set the memory area `0034ecd8` with the 4-byte parameter. The purpose of that memory area is unknown. Found 64 times and only in `btl`.
+Set the memory area `0034ecd8` with the 4-byte parameter. Changes the amount of room transitions needed to respawn an enemy if defeated.
 
 #### Unknown07
 
-Set the memory area `0034ecdc` with the 4-byte parameter. The purpose of that memory area is unknown. Very uncommon as it's ony found 7 times in the maps `ca12` and `nm02` in `btl`.
+Set the memory area `0034ecdc` with the 4-byte parameter. Very uncommon as it's ony found 7 times in the maps `ca12` and `nm02` in `btl`. Changes the amount of room transitions needed to respawn an object if destroyed.
 
 #### Unknown09
 
@@ -286,8 +286,8 @@ Set how the party member needs to be structured. According to `dbg/member.bin`, 
 
 | Value | Name          | Description
 |-------|---------------|-------------
-| 0     | NO_FRIEND     | Allow only Sora
-| 1     | DEFAULT       | Allow Donald and Goofy
+| 0     | NO_FRIEND     | Allow only Sora.
+| 1     | DEFAULT       | Allow Donald and Goofy.
 | 2     | W_FRIEND      | Allow Donald, Goofy and world guest.
 | 3     | W_FRIEND_IN   | Same as `W_FRIEND` but forces the world guest to be in at the beginning.
 | 4     | W_FRIEND_FIX  | Same as `W_FRIEND_IN`, but you can not swap the world guest.
@@ -348,7 +348,16 @@ Conditionals for the script based on the entrance.
 
 #### Unknown1d
 
-Determines Sora's stats. Value of 4 Auto revert Sora when the room is entered, 5 disables drive, 6 enables using forms alone, while 1 or 3 have unknown effects. Used 196 times.
+Determines Sora and the party's stats upon entering the room. The game will only check if Sora is using a form or summon when entering a room. Healing will refill items and reverting will refill Sora's drive gauge.
+
+| Value | Description
+|-------|-------------
+| 1     | Heal party and revert Sora if he's using a form or summon.
+| 2     | Heal party and revert Sora.
+| 3     | Heal party.
+| 4     | Revert Sora if he's using a form or summon.
+| 5     | Revert Sora if he's using a form or summon and lock his drive gauge.
+| 6     | Revert Sora.
 
 #### BattleLevel
 
