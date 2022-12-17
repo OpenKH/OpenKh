@@ -147,7 +147,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 {
                     OpenKHGameEngine => LastPage,
                     PCSX2 => PageIsoSelection,
-                    EpicGames => IsLastPanaceaVersionInstalled ? PageEosConfig : PageEosInstall,
+                    EpicGames => PageEosInstall,
                     _ => null,
                 };
                 WizardPageAfterGameData = GameEdition switch
