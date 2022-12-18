@@ -88,7 +88,7 @@ namespace OpenKh.Patcher
                 
                 if (metadata.Assets == null)
                     throw new Exception("No assets found.");
-                if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame)
+                if (metadata.Game.ToLower() != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
                     return;
 
                 metadata.Assets.AsParallel().ForAll(assetFile =>
