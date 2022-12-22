@@ -238,7 +238,7 @@ void OpenKH::ReadSettings(const char* filename)
         {
             if (!_stricmp(value, "kh1"))
                 QuickLaunch = 1;
-            else if (!_stricmp(value, "recom"))
+            else if (!_stricmp(value, "Recom"))
                 QuickLaunch = 2;
             else if (!_stricmp(value, "kh2"))
                 QuickLaunch = 3;
