@@ -878,6 +878,87 @@ namespace OpenKh.Tests.Patcher
         }
 
         [Fact]
+        public void ListPatchSkltTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "03system.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "sklt",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "SkltList.yml",
+                                        Type = "sklt"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "03system.bar")).Using(stream =>
+            {
+                var skltEntry = new List<Kh2.SystemData.Sklt>()
+                {
+                    new Kh2.SystemData.Sklt
+                    {
+                        CharacterId = 1,
+                        Bone1 = 178,
+                        Bone2 = 86
+                    }
+                };
+
+                using var skltStream = new MemoryStream();
+                Kh2.SystemData.Sklt.Write(skltStream, skltEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "sklt",
+                        Type = Bar.EntryType.List,
+                        Stream = skltStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "SkltList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- CharacterId: 1");
+                writer.WriteLine("  Bone1: 178");
+                writer.WriteLine("  Bone2: 86");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "03system.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "03system.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var skltStream = Kh2.SystemData.Sklt.Read(binarc[0].Stream);
+                Assert.Equal(1U, skltStream[0].CharacterId);
+                Assert.Equal(178, skltStream[0].Bone1);
+                Assert.Equal(86, skltStream[0].Bone2);
+            });
+        }
+
+        [Fact]
         public void ListPatchFmlvTest()
         {
             var patcher = new PatcherProcessor();

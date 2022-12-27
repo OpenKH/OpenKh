@@ -187,6 +187,7 @@ Asset Example
  * `trsr`
  * `cmd`
  * `item`
+ * `sklt`
  * `enmp`
  * `fmlv`
  * `lvup`
@@ -272,6 +273,12 @@ Items:
   Picture: 1
   Icon1: 9
   Icon2: 0
+```
+`sklt` Source Example
+```
+- CharacterId: 1
+  Bone1: 178
+  Bone2: 86
 ```
 
 `enmp` Source Example

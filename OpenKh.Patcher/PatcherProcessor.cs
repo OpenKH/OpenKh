@@ -664,8 +664,18 @@ namespace OpenKh.Patcher
                             }
                             Kh2.Battle.Enmp.Write(stream.SetPosition(0), enmpList);
                             break;
+                         case "sklt":
+                             var skltList = Kh2.SystemData.Sklt.Read(stream);
+                             var moddedSklt = deserializer.Deserialize<List<Kh2.SystemData.Sklt>>(sourceText);
+                             foreach (var sklt in moddedSklt)
+                             {
+                                 var oldSklt = skltList.First(x => x.CharacterId == sklt.CharacterId);
+                                 skltList[skltList.IndexOf(oldSklt)] = sklt;
+                             }
+                             Kh2.SystemData.Sklt.Write(stream.SetPosition(0), skltList);
+                             break;
 
-                    default:
+                        default:
                             break;
                     }
              }
