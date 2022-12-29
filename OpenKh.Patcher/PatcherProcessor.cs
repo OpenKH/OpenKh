@@ -461,225 +461,236 @@ namespace OpenKh.Patcher
         };
 
         private static readonly IDeserializer deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
-            
+
         private static void PatchList(Context context, List<AssetFile> sources, Stream stream)
         {
             foreach (var source in sources)
             {
-                    string sourceText = File.ReadAllText(context.GetSourceModAssetPath(source.Name));
-                    switch (source.Type)
-                    {
-                        case "trsr":
-                            var trsrList = Kh2.SystemData.Trsr.Read(stream).ToDictionary(x => x.Id, x => x);
-                            var moddedTrsr = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Trsr>>(sourceText);
-                            foreach (var treasure in moddedTrsr)
+                string sourceText = File.ReadAllText(context.GetSourceModAssetPath(source.Name));
+                switch (source.Type)
+                {
+                    case "trsr":
+                        var trsrList = Kh2.SystemData.Trsr.Read(stream).ToDictionary(x => x.Id, x => x);
+                        var moddedTrsr = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Trsr>>(sourceText);
+                        foreach (var treasure in moddedTrsr)
+                        {
+                            if (trsrList.ContainsKey(treasure.Key))
                             {
-                                if (trsrList.ContainsKey(treasure.Key))
+                                if (treasure.Value.World == 0)
                                 {
-                                    if (treasure.Value.World == 0)
-                                    {
-                                        trsrList[treasure.Key].ItemId = treasure.Value.ItemId;
-                                    }
-                                    else
-                                    {
-                                        trsrList[treasure.Key] = treasure.Value;
-                                    } 
+                                    trsrList[treasure.Key].ItemId = treasure.Value.ItemId;
                                 }
                                 else
                                 {
-                                    trsrList.Add(treasure.Key, treasure.Value);
-                                }
-
-                            }
-                                Kh2.SystemData.Trsr.Write(stream.SetPosition(0), trsrList.Values);
-                            break;
-
-                        case "item":
-                            var itemList = Kh2.SystemData.Item.Read(stream);
-                            var moddedItem = deserializer.Deserialize<Kh2.SystemData.Item>(sourceText);
-                            if (moddedItem.Items != null)
-                            {
-                                foreach (var item in moddedItem.Items)
-                                {
-                                    var itemToUpdate = itemList.Items.FirstOrDefault(x => x.Id == item.Id);
-                                    if (itemToUpdate != null)
-                                    {
-                                        itemList.Items[itemList.Items.IndexOf(itemToUpdate)] = item;
-                                    }
-                                    else
-                                    {
-                                        itemList.Items.Add(item);
-                                    }
+                                    trsrList[treasure.Key] = treasure.Value;
                                 }
                             }
-                            if (moddedItem.Stats != null)
+                            else
                             {
-                                foreach (var item in moddedItem.Stats)
+                                trsrList.Add(treasure.Key, treasure.Value);
+                            }
+
+                        }
+                        Kh2.SystemData.Trsr.Write(stream.SetPosition(0), trsrList.Values);
+                        break;
+
+                    case "item":
+                        var itemList = Kh2.SystemData.Item.Read(stream);
+                        var moddedItem = deserializer.Deserialize<Kh2.SystemData.Item>(sourceText);
+                        if (moddedItem.Items != null)
+                        {
+                            foreach (var item in moddedItem.Items)
+                            {
+                                var itemToUpdate = itemList.Items.FirstOrDefault(x => x.Id == item.Id);
+                                if (itemToUpdate != null)
                                 {
-                                    var itemToUpdate = itemList.Stats.FirstOrDefault(x => x.Id == item.Id);
-                                    if (itemToUpdate != null)
-                                    {
-                                        itemList.Stats[itemList.Stats.IndexOf(itemToUpdate)] = item;
-                                    }
-                                    else
-                                    {
-                                        itemList.Stats.Add(item);
-                                    }
+                                    itemList.Items[itemList.Items.IndexOf(itemToUpdate)] = item;
+                                }
+                                else
+                                {
+                                    itemList.Items.Add(item);
                                 }
                             }
-                            itemList.Write(stream.SetPosition(0));
-                            break;
-
-                        case "fmlv":
-                            var formRaw = Kh2.Battle.Fmlv.Read(stream).ToList();
-                            var formList = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv>>();
-                            foreach (var form in formRaw)
+                        }
+                        if (moddedItem.Stats != null)
+                        {
+                            foreach (var item in moddedItem.Stats)
                             {
-                                if (!formList.ContainsKey(form.FinalMixForm))
+                                var itemToUpdate = itemList.Stats.FirstOrDefault(x => x.Id == item.Id);
+                                if (itemToUpdate != null)
                                 {
-                                    formList.Add(form.FinalMixForm, new List<Kh2.Battle.Fmlv>());
+                                    itemList.Stats[itemList.Stats.IndexOf(itemToUpdate)] = item;
                                 }
-                                formList[form.FinalMixForm].Add(form);
-                            }
-                            var moddedForms = deserializer.Deserialize<Dictionary<Kh2.Battle.Fmlv.FormFm, List<FmlvDTO>>>(sourceText);
-                                foreach (var form in moddedForms)
+                                else
                                 {
-                                    foreach (var level in form.Value)
-                                    {
-                                        formList[form.Key][level.FormLevel - 1].Ability = (ushort)level.Ability;
-                                        formList[form.Key][level.FormLevel - 1].Exp = level.Experience;
-                                        formList[form.Key][level.FormLevel - 1].Unk1= level.GrowthAbilityLevel;
-                                        
-                                    }
-
-                                }
-                            Kh2.Battle.Fmlv.Write(stream.SetPosition(0), formList.Values.SelectMany(x=>x).ToList());
-                            break;
-
-                        case "lvup":
-                            var levelList = Kh2.Battle.Lvup.Read(stream);
-                            var moddedLevels = deserializer.Deserialize<Dictionary<string, Dictionary<int, Kh2.Battle.Lvup.PlayableCharacter.Level>>> (sourceText);
-
-                            foreach (var character in moddedLevels)
-                            {
-                                foreach (var level in moddedLevels[character.Key])
-                                {
-                                    levelList.Characters[characterMap[character.Key] - 1].Levels[level.Key - 1] = moddedLevels[character.Key][level.Key];
-                                }
-                            }   
-
-                            levelList.Write(stream.SetPosition(0));
-                            break;
-
-                        case "bons":
-                            var bonusRaw = Kh2.Battle.Bons.Read(stream);
-                            var bonusList = new Dictionary<byte, Dictionary<string, Kh2.Battle.Bons>>();
-                            foreach (var bonus in bonusRaw)
-                            {
-                                if (!bonusList.ContainsKey(bonus.RewardId))
-                                {
-                                    bonusList.Add(bonus.RewardId, new Dictionary<string, Kh2.Battle.Bons>());
-                                }
-                                var character = characterMap.First(x => x.Value == bonus.CharacterId).Key;
-                                if (!bonusList[bonus.RewardId].ContainsKey(character))
-                                {
-                                    bonusList[bonus.RewardId].Add(character, bonus);
+                                    itemList.Stats.Add(item);
                                 }
                             }
-                            var moddedBonus = deserializer.Deserialize<Dictionary<byte, Dictionary<string, Kh2.Battle.Bons>>>(sourceText);
-                                foreach (var bonus in moddedBonus)
+                        }
+                        itemList.Write(stream.SetPosition(0));
+                        break;
+
+                    case "fmlv":
+                        var formRaw = Kh2.Battle.Fmlv.Read(stream).ToList();
+                        var formList = new Dictionary<Kh2.Battle.Fmlv.FormFm, List<Kh2.Battle.Fmlv>>();
+                        foreach (var form in formRaw)
+                        {
+                            if (!formList.ContainsKey(form.FinalMixForm))
+                            {
+                                formList.Add(form.FinalMixForm, new List<Kh2.Battle.Fmlv>());
+                            }
+                            formList[form.FinalMixForm].Add(form);
+                        }
+                        var moddedForms = deserializer.Deserialize<Dictionary<Kh2.Battle.Fmlv.FormFm, List<FmlvDTO>>>(sourceText);
+                        foreach (var form in moddedForms)
+                        {
+                            foreach (var level in form.Value)
+                            {
+                                formList[form.Key][level.FormLevel - 1].Ability = (ushort)level.Ability;
+                                formList[form.Key][level.FormLevel - 1].Exp = level.Experience;
+                                formList[form.Key][level.FormLevel - 1].Unk1 = level.GrowthAbilityLevel;
+
+                            }
+
+                        }
+                        Kh2.Battle.Fmlv.Write(stream.SetPosition(0), formList.Values.SelectMany(x => x).ToList());
+                        break;
+
+                    case "lvup":
+                        var levelList = Kh2.Battle.Lvup.Read(stream);
+                        var moddedLevels = deserializer.Deserialize<Dictionary<string, Dictionary<int, Kh2.Battle.Lvup.PlayableCharacter.Level>>>(sourceText);
+
+                        foreach (var character in moddedLevels)
+                        {
+                            foreach (var level in moddedLevels[character.Key])
+                            {
+                                levelList.Characters[characterMap[character.Key] - 1].Levels[level.Key - 1] = moddedLevels[character.Key][level.Key];
+                            }
+                        }
+
+                        levelList.Write(stream.SetPosition(0));
+                        break;
+
+                    case "bons":
+                        var bonusRaw = Kh2.Battle.Bons.Read(stream);
+                        var bonusList = new Dictionary<byte, Dictionary<string, Kh2.Battle.Bons>>();
+                        foreach (var bonus in bonusRaw)
+                        {
+                            if (!bonusList.ContainsKey(bonus.RewardId))
+                            {
+                                bonusList.Add(bonus.RewardId, new Dictionary<string, Kh2.Battle.Bons>());
+                            }
+                            var character = characterMap.First(x => x.Value == bonus.CharacterId).Key;
+                            if (!bonusList[bonus.RewardId].ContainsKey(character))
+                            {
+                                bonusList[bonus.RewardId].Add(character, bonus);
+                            }
+                        }
+                        var moddedBonus = deserializer.Deserialize<Dictionary<byte, Dictionary<string, Kh2.Battle.Bons>>>(sourceText);
+                        foreach (var bonus in moddedBonus)
+                        {
+                            if (!bonusList.ContainsKey(bonus.Key))
+                            {
+                                bonusList.Add(bonus.Key, new Dictionary<string, Kh2.Battle.Bons>());
+                            }
+                            foreach (var character in moddedBonus[bonus.Key])
+                            {
+                                if (!bonusList[bonus.Key].ContainsKey(character.Key))
                                 {
-                                    if (!bonusList.ContainsKey(bonus.Key))
-                                    {
-                                        bonusList.Add(bonus.Key, new Dictionary<string, Kh2.Battle.Bons>());
-                                    }
-                                    foreach (var character in moddedBonus[bonus.Key])
-                                    {
-                                        if (!bonusList[bonus.Key].ContainsKey(character.Key))
-                                        {
-                                            bonusList[bonus.Key].Add(character.Key, new Kh2.Battle.Bons());
-                                        }
-                                        bonusList[bonus.Key][character.Key] = character.Value;
-                                    }
+                                    bonusList[bonus.Key].Add(character.Key, new Kh2.Battle.Bons());
                                 }
+                                bonusList[bonus.Key][character.Key] = character.Value;
+                            }
+                        }
 
                         Kh2.Battle.Bons.Write(stream.SetPosition(0), bonusList.Values.SelectMany(x => x.Values));
-                            break;
-
-                        case "objentry":
-                            var objEntryList = Kh2.Objentry.Read(stream).ToDictionary(x => x.ObjectId, x=>x);
-                            var moddedObjEntry = deserializer.Deserialize<Dictionary<uint, Kh2.Objentry>>(sourceText);
-                            foreach (var objEntry in moddedObjEntry)
-                            {
-                                if (objEntryList.ContainsKey(objEntry.Key))
-                                {
-                                    objEntryList[objEntry.Key] = objEntry.Value;
-                                }
-                                else
-                                {
-                                    objEntryList.Add(objEntry.Key, objEntry.Value);
-                                }
-                            }
-                            Kh2.Objentry.Write(stream.SetPosition(0), objEntryList.Values);
-                            break;
-
-                        case "plrp":
-                            var plrpList = Kh2.Battle.Plrp.Read(stream);
-                            var moddedPlrp = deserializer.Deserialize<List<Kh2.Battle.Plrp>>(sourceText);
-                            foreach (var plrp in moddedPlrp)
-                            {
-                                var oldPlrp = plrpList.First(x => x.Character == plrp.Character && x.Id == plrp.Id);
-                                plrpList[plrpList.IndexOf(oldPlrp)] = plrp;
-                            }
-                            Kh2.Battle.Plrp.Write(stream.SetPosition(0), plrpList);
                         break;
-                        
-                        case "cmd":
-                            var cmdList = Kh2.SystemData.Cmd.Read(stream).ToDictionary(x => x.Id, x => x);
-                            var moddedCmd = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Cmd>>(sourceText);
-                            foreach (var command in moddedCmd)
+
+                    case "atkp":
+                        var atkpList = Kh2.Battle.Atkp.Read(stream);
+                        var moddedAtkp = deserializer.Deserialize<List<Kh2.Battle.Atkp>>(sourceText);
+                        foreach (var attack in moddedAtkp)
+                        {
+                            var oldAtkp = atkpList.First(x => x.Id == attack.Id);
+                            atkpList[atkpList.IndexOf(oldAtkp)] = attack;
+                        }
+                        Kh2.Battle.Atkp.Write(stream.SetPosition(0), atkpList);
+                        break;
+
+                    case "objentry":
+                        var objEntryList = Kh2.Objentry.Read(stream).ToDictionary(x => x.ObjectId, x => x);
+                        var moddedObjEntry = deserializer.Deserialize<Dictionary<uint, Kh2.Objentry>>(sourceText);
+                        foreach (var objEntry in moddedObjEntry)
+                        {
+                            if (objEntryList.ContainsKey(objEntry.Key))
                             {
-                                if (cmdList.ContainsKey(command.Key))
-
-                                    {
-                                        cmdList[command.Key] = command.Value;
-                                    }
-
-                                else
-                                {
-                                    cmdList.Add(command.Key, command.Value);
-                                }
-
+                                objEntryList[objEntry.Key] = objEntry.Value;
                             }
-                            Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList.Values);
-                            break;
-
-                        case "enmp":
-                            var enmpList = Kh2.Battle.Enmp.Read(stream);
-                            var moddedEnmp = deserializer.Deserialize<List<Kh2.Battle.Enmp>>(sourceText);
-                            foreach (var enmp in moddedEnmp)
+                            else
                             {
-                                var oldEnmp = enmpList.First(x => x.Id == enmp.Id);
-                                enmpList[enmpList.IndexOf(oldEnmp)] = enmp;
+                                objEntryList.Add(objEntry.Key, objEntry.Value);
                             }
-                            Kh2.Battle.Enmp.Write(stream.SetPosition(0), enmpList);
-                            break;
-                         case "sklt":
-                             var skltList = Kh2.SystemData.Sklt.Read(stream);
-                             var moddedSklt = deserializer.Deserialize<List<Kh2.SystemData.Sklt>>(sourceText);
-                             foreach (var sklt in moddedSklt)
-                             {
-                                 var oldSklt = skltList.First(x => x.CharacterId == sklt.CharacterId);
-                                 skltList[skltList.IndexOf(oldSklt)] = sklt;
-                             }
-                             Kh2.SystemData.Sklt.Write(stream.SetPosition(0), skltList);
-                             break;
+                        }
+                        Kh2.Objentry.Write(stream.SetPosition(0), objEntryList.Values);
+                        break;
 
-                        default:
-                            break;
-                    }
-             }
-            
+                    case "plrp":
+                        var plrpList = Kh2.Battle.Plrp.Read(stream);
+                        var moddedPlrp = deserializer.Deserialize<List<Kh2.Battle.Plrp>>(sourceText);
+                        foreach (var plrp in moddedPlrp)
+                        {
+                            var oldPlrp = plrpList.First(x => x.Character == plrp.Character && x.Id == plrp.Id);
+                            plrpList[plrpList.IndexOf(oldPlrp)] = plrp;
+                        }
+                        Kh2.Battle.Plrp.Write(stream.SetPosition(0), plrpList);
+                        break;
+
+                    case "cmd":
+                        var cmdList = Kh2.SystemData.Cmd.Read(stream).ToDictionary(x => x.Id, x => x);
+                        var moddedCmd = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Cmd>>(sourceText);
+                        foreach (var command in moddedCmd)
+                        {
+                            if (cmdList.ContainsKey(command.Key))
+
+                            {
+                                cmdList[command.Key] = command.Value;
+                            }
+
+                            else
+                            {
+                                cmdList.Add(command.Key, command.Value);
+                            }
+
+                        }
+                        Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList.Values);
+                        break;
+
+                    case "enmp":
+                        var enmpList = Kh2.Battle.Enmp.Read(stream);
+                        var moddedEnmp = deserializer.Deserialize<List<Kh2.Battle.Enmp>>(sourceText);
+                        foreach (var enmp in moddedEnmp)
+                        {
+                            var oldEnmp = enmpList.First(x => x.Id == enmp.Id);
+                            enmpList[enmpList.IndexOf(oldEnmp)] = enmp;
+                        }
+                        Kh2.Battle.Enmp.Write(stream.SetPosition(0), enmpList);
+                        break;
+                    case "sklt":
+                        var skltList = Kh2.SystemData.Sklt.Read(stream);
+                        var moddedSklt = deserializer.Deserialize<List<Kh2.SystemData.Sklt>>(sourceText);
+                        foreach (var sklt in moddedSklt)
+                        {
+                            var oldSklt = skltList.First(x => x.CharacterId == sklt.CharacterId);
+                            skltList[skltList.IndexOf(oldSklt)] = sklt;
+                        }
+                        Kh2.SystemData.Sklt.Write(stream.SetPosition(0), skltList);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
         }
     }
 }

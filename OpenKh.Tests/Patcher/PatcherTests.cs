@@ -619,8 +619,7 @@ namespace OpenKh.Tests.Patcher
            
         }
 
-                
-                
+        
         public void ListPatchTrsrTest()
         {
             var patcher = new PatcherProcessor();
@@ -1379,6 +1378,176 @@ namespace OpenKh.Tests.Patcher
                 Assert.Equal(500, lvupStream.Characters[0].Levels[0].Exp);
             });
 
+        }
+
+        void ListPatchAtkpTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "atkp",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "AtkpList.yml",
+                                        Type = "atkp"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var atkpEntry = new List<Kh2.Battle.Atkp>()
+                {
+                    new Kh2.Battle.Atkp
+                    {
+                        Id = 0,
+                        SubId = 3,
+                        Type = Kh2.Battle.Atkp.AttackType.PierceArmor,
+                        CriticalAdjust = 0,
+                        Power = 25,
+                        Team = 0,
+                        Element = 0,
+                        EnemyReaction = 0,
+                        EffectOnHit = 2,
+                        KnockbackStrength1 = 32767,
+                        KnockbackStrength2 = 0,
+                        Unknown = 0000,
+                        Flags = Kh2.Battle.Atkp.AttackFlags.BGHit,
+                        RefactSelf = 0,
+                        RefactOther = 0,
+                        ReflectedMotion = 0,
+                        ReflectHitBack = 0,
+                        ReflectAction = 0,
+                        ReflectHitSound = 0,
+                        ReflectRC = 0,
+                        ReflectRange = 0,
+                        ReflectAngle = 0,
+                        DamageEffect = 0,
+                        Switch = 1,
+                        Interval = 1,
+                        FloorCheck = 1,
+                        DriveDrain = 1,
+                        RevengeDamage = 1,
+                        AttackTrReaction = Kh2.Battle.Atkp.TrReaction.Charge,
+                        ComboGroup = 1,
+                        RandomEffect = 1,
+                        Kind = Kh2.Battle.Atkp.AttackKind.ComboFinisher,
+                        HpDrain = 15
+                    }
+                };
+
+                using var atkpStream = new MemoryStream();
+                Kh2.Battle.Atkp.Write(atkpStream, atkpEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "atkp",
+                        Type = Bar.EntryType.List,
+                        Stream = atkpStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "AtkpList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                writer.WriteLine("- Id: 0 #Hitbox 0");
+                writer.WriteLine("  SubId: 3");
+                writer.WriteLine("  Type: 1");
+                writer.WriteLine("  CriticalAdjust: 0");
+                writer.WriteLine("  Power: 25");
+                writer.WriteLine("  Team: 0");
+                writer.WriteLine("  Element: 0");
+                writer.WriteLine("  EnemyReaction: 0");
+                writer.WriteLine("  EffectOnHit: 2");
+                writer.WriteLine("  KnockbackStrength1: 32767");
+                writer.WriteLine("  KnockbackStrength2: 0");
+                writer.WriteLine("  Unknown: 0000");
+                writer.WriteLine("  Flags: BGHit");
+                writer.WriteLine("  RefactSelf: 0");
+                writer.WriteLine("  RefactOther: 0");
+                writer.WriteLine("  ReflectedMotion: 0");
+                writer.WriteLine("  ReflectHitBack: 0");
+                writer.WriteLine("  ReflectAction: 0");
+                writer.WriteLine("  ReflectHitSound: 0");
+                writer.WriteLine("  ReflectRC: 0");
+                writer.WriteLine("  ReflectRange: 0");
+                writer.WriteLine("  ReflectAngle: 0");
+                writer.WriteLine("  DamageEffect: 0");
+                writer.WriteLine("  Switch: 1");
+                writer.WriteLine("  Interval: 1");
+                writer.WriteLine("  FloorCheck: 1");
+                writer.WriteLine("  DriveDrain: 1");
+                writer.WriteLine("  RevengeDamage: 1");
+                writer.WriteLine("  AttackTrReaction: 1");
+                writer.WriteLine("  ComboGroup: 1");
+                writer.WriteLine("  RandomEffect: 1");
+                writer.WriteLine("  Kind: ComboFinisher");
+                writer.WriteLine("  HpDrain: 15");
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var atkpStream = Kh2.Battle.Atkp.Read(binarc[0].Stream);
+                Assert.Equal(0, atkpStream[0].Id);
+                Assert.Equal(3, atkpStream[0].SubId);
+                Assert.Equal(Kh2.Battle.Atkp.AttackType.PierceArmor, atkpStream[0].Type);
+                Assert.Equal(0, atkpStream[0].CriticalAdjust);
+                Assert.Equal(25, atkpStream[0].Power);
+                Assert.Equal(0, atkpStream[0].Team);
+                Assert.Equal(0, atkpStream[0].Element);
+                Assert.Equal(0, atkpStream[0].EnemyReaction);
+                Assert.Equal(2, atkpStream[0].EffectOnHit);
+                Assert.Equal(32767, atkpStream[0].KnockbackStrength1);
+                Assert.Equal(0, atkpStream[0].KnockbackStrength2);
+                Assert.Equal(0000, atkpStream[0].Unknown);
+                Assert.Equal(Kh2.Battle.Atkp.AttackFlags.BGHit, atkpStream[0].Flags);
+                Assert.Equal(Kh2.Battle.Atkp.Refact.Reflect, atkpStream[0].RefactSelf);
+                Assert.Equal(Kh2.Battle.Atkp.Refact.Reflect, atkpStream[0].RefactOther);
+                Assert.Equal(0, atkpStream[0].ReflectedMotion);
+                Assert.Equal(0, atkpStream[0].ReflectHitBack);
+                Assert.Equal(0, atkpStream[0].ReflectAction);
+                Assert.Equal(0, atkpStream[0].ReflectHitSound);
+                Assert.Equal(0, atkpStream[0].ReflectRC);
+                Assert.Equal(0, atkpStream[0].ReflectRange);
+                Assert.Equal(0, atkpStream[0].ReflectAngle);
+                Assert.Equal(0, atkpStream[0].DamageEffect);
+                Assert.Equal(1, atkpStream[0].Switch);
+                Assert.Equal(1, atkpStream[0].Interval);
+                Assert.Equal(1, atkpStream[0].FloorCheck);
+                Assert.Equal(1, atkpStream[0].DriveDrain);
+                Assert.Equal(1, atkpStream[0].RevengeDamage);
+                Assert.Equal(Kh2.Battle.Atkp.TrReaction.Charge, atkpStream[0].AttackTrReaction);
+                Assert.Equal(1, atkpStream[0].ComboGroup);
+                Assert.Equal(1, atkpStream[0].RandomEffect);
+                Assert.Equal(Kh2.Battle.Atkp.AttackKind.ComboFinisher, atkpStream[0].Kind);
+                Assert.Equal(15, atkpStream[0].HpDrain);
+            });
         }
 
         [Fact]

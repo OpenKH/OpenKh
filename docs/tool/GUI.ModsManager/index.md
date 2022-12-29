@@ -192,6 +192,7 @@ Asset Example
  * `fmlv`
  * `lvup`
  * `bons`
+ * `atkp`
  * `objentry`
 
 Asset Example
@@ -350,6 +351,43 @@ Sora:
     MpIncrease: 0
     RewardId: 2
     Unknown0c: 0
+```
+
+`atkp` Source Example
+```
+- Id: 0 #Hitbox 0
+  SubId: 3
+  Type: 1
+  CriticalAdjust: 0
+  Power: 25
+  Team: 0
+  Element: 0
+  EnemyReaction: 0
+  EffectOnHit: 2
+  KnockbackStrength1: 32767
+  KnockbackStrength2: 0
+  Unknown: 0000
+  Flags: BGHit, LimitPAX, Land, CapturePAX, ThankYou, KillBoss #Every possible AttackFlag shown
+  RefactSelf: 0
+  RefactOther: 0
+  ReflectedMotion: 0
+  ReflectHitBack: 0
+  ReflectAction: 0
+  ReflectHitSound: 0
+  ReflectRC: 0
+  ReflectRange: 0
+  ReflectAngle: 0
+  DamageEffect: 0
+  Switch: 1
+  Interval: 1
+  FloorCheck: 1
+  DriveDrain: 1
+  RevengeDamage: 1
+  AttackTrReaction: 1
+  ComboGroup: 1
+  RandomEffect: 1
+  Kind: ComboFinisher
+  HpDrain: 15
 ```
 
 `objentry` Source Example
