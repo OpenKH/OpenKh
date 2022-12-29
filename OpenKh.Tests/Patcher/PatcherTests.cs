@@ -1430,10 +1430,10 @@ namespace OpenKh.Tests.Patcher
                         EffectOnHit = 2,
                         KnockbackStrength1 = 32767,
                         KnockbackStrength2 = 0,
-                        Unknown = 0000,
+                        Unknown = 0,
                         Flags = Kh2.Battle.Atkp.AttackFlags.BGHit,
-                        RefactSelf = 0,
-                        RefactOther = 0,
+                        RefactSelf = Kh2.Battle.Atkp.Refact.Reflect,
+                        RefactOther = Kh2.Battle.Atkp.Refact.Reflect,
                         ReflectedMotion = 0,
                         ReflectHitBack = 0,
                         ReflectAction = 0,
@@ -1470,9 +1470,9 @@ namespace OpenKh.Tests.Patcher
             File.Create(Path.Combine(ModInputDir, "AtkpList.yml")).Using(stream =>
             {
                 var writer = new StreamWriter(stream);
-                writer.WriteLine("- Id: 0 #Hitbox 0");
+                writer.WriteLine("- Id: 0");
                 writer.WriteLine("  SubId: 3");
-                writer.WriteLine("  Type: 1");
+                writer.WriteLine("  Type: PierceArmor");
                 writer.WriteLine("  CriticalAdjust: 0");
                 writer.WriteLine("  Power: 25");
                 writer.WriteLine("  Team: 0");
@@ -1481,7 +1481,7 @@ namespace OpenKh.Tests.Patcher
                 writer.WriteLine("  EffectOnHit: 2");
                 writer.WriteLine("  KnockbackStrength1: 32767");
                 writer.WriteLine("  KnockbackStrength2: 0");
-                writer.WriteLine("  Unknown: 0000");
+                writer.WriteLine("  Unknown: 0");
                 writer.WriteLine("  Flags: BGHit");
                 writer.WriteLine("  RefactSelf: 0");
                 writer.WriteLine("  RefactOther: 0");
