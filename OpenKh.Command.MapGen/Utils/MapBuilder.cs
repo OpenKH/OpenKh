@@ -50,6 +50,18 @@ namespace OpenKh.Command.MapGen.Utils
                 doctBuilt = new DoctDummyBuilder(singleFaces)
                     .GetBuilt();
             }
+            else if (config.disableBSPCollisionBuilder)
+            {
+                logger.Debug($"Running disableBSPCollisionBuilder doct builder.");
+
+                doctBuilt = new DoctBuilder(
+                    new SingleNodeEmitter(
+                        singleFaces
+                            .Where(it => !it.matDef.nodraw)
+                    )
+                )
+                    .GetBuilt();
+            }
             else
             {
                 logger.Debug($"Running doct builder.");
@@ -182,19 +194,28 @@ namespace OpenKh.Command.MapGen.Utils
                     logger.Debug($"Finished. {numNodes:#,##0} nodes, {numTotalMeshes:#,##0} total meshes, {numTotalCollisions:#,##0} total collisions, {numVerts:#,##0} vertices.");
                 }
 
+                CollisionBuilder CreateCollisionBuilder(IEnumerable<SingleFace> inputFaces)
                 {
-                    logger.Debug($"Running collision builder for player.");
-
-                    var it = playerCollision = new CollisionBuilder(
-                        new BSPNodeSplitter(
-                            singleFaces
-                                .Where(it => !it.matDef.noclip),
+                    return new CollisionBuilder(
+                        config.disableBSPCollisionBuilder
+                        ? new SingleNodeEmitter(inputFaces)
+                        : new BSPNodeSplitter(
+                            inputFaces,
                             new BSPNodeSplitter.Option
                             {
                                 PartitionSize = config.collisionPartitionSize,
                             }
                         ),
                         matDef => matDef.surfaceFlags
+                    );
+                }
+
+                {
+                    logger.Debug($"Running collision builder for player.");
+
+                    var it = playerCollision = CreateCollisionBuilder(
+                        singleFaces
+                            .Where(it => !it.matDef.noclip)
                     )
                         .GetBuilt();
 
@@ -204,16 +225,9 @@ namespace OpenKh.Command.MapGen.Utils
                 {
                     logger.Debug($"Running collision builder for camera.");
 
-                    var it = cameraCollision = new CollisionBuilder(
-                        new BSPNodeSplitter(
-                            singleFaces
-                                .Where(it => it.matDef.cameraClip),
-                            new BSPNodeSplitter.Option
-                            {
-                                PartitionSize = config.collisionPartitionSize,
-                            }
-                        ),
-                        matDef => matDef.cameraFlags
+                    var it = cameraCollision = CreateCollisionBuilder(
+                        singleFaces
+                            .Where(it => it.matDef.cameraClip)
                     )
                         .GetBuilt();
 
@@ -223,16 +237,9 @@ namespace OpenKh.Command.MapGen.Utils
                 {
                     logger.Debug($"Running collision builder for light.");
 
-                    var it = lightCollision = new CollisionBuilder(
-                        new BSPNodeSplitter(
-                            singleFaces
-                                .Where(it => it.matDef.lightClip),
-                            new BSPNodeSplitter.Option
-                            {
-                                PartitionSize = config.collisionPartitionSize,
-                            }
-                        ),
-                        matDef => matDef.lightFlags
+                    var it = lightCollision = CreateCollisionBuilder(
+                        singleFaces
+                            .Where(it => it.matDef.lightClip)
                     )
                         .GetBuilt();
 
