@@ -1,5 +1,6 @@
 using Assimp;
 using NLog;
+using OpenKh.Command.MapGen.Interfaces;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Models.MapColorModel;
@@ -52,21 +53,9 @@ namespace OpenKh.Command.MapGen.Utils
             }
             else if (config.disableBSPCollisionBuilder)
             {
-                logger.Debug($"Running disableBSPCollisionBuilder doct builder.");
+                logger.Debug($"Running flatten doct builder.");
 
-                doctBuilt = new DoctBuilder(
-                    new SingleNodeEmitter(
-                        singleFaces
-                            .Where(it => !it.matDef.nodraw)
-                    )
-                )
-                    .GetBuilt();
-            }
-            else
-            {
-                logger.Debug($"Running doct builder.");
-
-                doctBuilt = new DoctBuilder(
+                doctBuilt = new FlattenDoctBuilder(
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.nodraw),
@@ -74,7 +63,25 @@ namespace OpenKh.Command.MapGen.Utils
                         {
                             PartitionSize = config.doctPartitionSize,
                         }
-                    )
+                    ),
+                    matDef => 0
+                )
+                    .GetBuilt();
+            }
+            else
+            {
+                logger.Debug($"Running hierarchical doct builder.");
+
+                doctBuilt = new HierarchicalDoctBuilder(
+                    new BSPNodeSplitter(
+                        singleFaces
+                            .Where(it => !it.matDef.nodraw),
+                        new BSPNodeSplitter.Option
+                        {
+                            PartitionSize = config.doctPartitionSize,
+                        }
+                    ),
+                    matDef => 0
                 )
                     .GetBuilt();
             }
@@ -194,20 +201,25 @@ namespace OpenKh.Command.MapGen.Utils
                     logger.Debug($"Finished. {numNodes:#,##0} nodes, {numTotalMeshes:#,##0} total meshes, {numTotalCollisions:#,##0} total collisions, {numVerts:#,##0} vertices.");
                 }
 
-                CollisionBuilder CreateCollisionBuilder(IEnumerable<SingleFace> inputFaces)
+                ICollisionBuilder CreateCollisionBuilder(IEnumerable<SingleFace> inputFaces)
                 {
-                    return new CollisionBuilder(
-                        config.disableBSPCollisionBuilder
-                        ? new SingleNodeEmitter(inputFaces)
-                        : new BSPNodeSplitter(
-                            inputFaces,
-                            new BSPNodeSplitter.Option
-                            {
-                                PartitionSize = config.collisionPartitionSize,
-                            }
-                        ),
-                        matDef => matDef.surfaceFlags
+                    var splitter = new BSPNodeSplitter(
+                        inputFaces,
+                        new BSPNodeSplitter.Option
+                        {
+                            PartitionSize = config.collisionPartitionSize,
+                        }
                     );
+
+                    return config.disableBSPCollisionBuilder
+                        ? new FlattenCollisionBuilder(
+                            splitter,
+                            matDef => matDef.surfaceFlags
+                        )
+                        : new HierarchicalCollisionBuilder(
+                            splitter,
+                            matDef => matDef.surfaceFlags
+                        );
                 }
 
                 {

@@ -14,13 +14,13 @@ using static OpenKh.Kh2.Coct;
 
 namespace OpenKh.Command.MapGen.Utils
 {
-    public class CollisionBuilder
+    public class HierarchicalCollisionBuilder : ICollisionBuilder
     {
         private readonly Coct coct = new Coct();
         private bool isValid = false;
         private readonly Func<MaterialDef, int> _getAttributeFrom;
 
-        public CollisionBuilder(
+        public HierarchicalCollisionBuilder(
             ISpatialNodeCutter cutter,
             Func<MaterialDef, int> getAttributeFrom
         )

@@ -100,9 +100,9 @@ namespace OpenKh.Command.MapGen.Models
 
         public bool nodoct { get; set; }
 
-        public int collisionPartitionSize { get; set; } = 10;
+        public int collisionPartitionSize { get; set; } = 300;
 
-        public int doctPartitionSize { get; set; } = 100;
+        public int doctPartitionSize { get; set; } = 500;
 
         public class FogData
         {
