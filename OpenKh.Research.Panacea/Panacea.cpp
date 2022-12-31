@@ -262,7 +262,7 @@ void Panacea::Initialize()
     MEMORY_BASIC_INFORMATION meminf;
     for (int i = 0; i < ntHeaders->FileHeader.NumberOfSections; i++)
     {
-        VirtualQuery((const void*)(baseImage + section->VirtualAddress), &meminf, sizeof(meminf));
+        VirtualQuery((const void*)(baseImage + section[i].VirtualAddress), &meminf, sizeof(meminf));
         DWORD oldprot;
         switch (meminf.Protect & 0xFF)
         {
