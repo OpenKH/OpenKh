@@ -1,5 +1,6 @@
 using Assimp;
 using NLog;
+using OpenKh.Command.MapGen.Interfaces;
 using OpenKh.Command.MapGen.Models;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Models.MapColorModel;
@@ -50,11 +51,11 @@ namespace OpenKh.Command.MapGen.Utils
                 doctBuilt = new DoctDummyBuilder(singleFaces)
                     .GetBuilt();
             }
-            else
+            else if (config.disableBSPCollisionBuilder)
             {
-                logger.Debug($"Running doct builder.");
+                logger.Debug($"Running flatten doct builder.");
 
-                doctBuilt = new DoctBuilder(
+                doctBuilt = new FlattenDoctBuilder(
                     new BSPNodeSplitter(
                         singleFaces
                             .Where(it => !it.matDef.nodraw),
@@ -62,7 +63,25 @@ namespace OpenKh.Command.MapGen.Utils
                         {
                             PartitionSize = config.doctPartitionSize,
                         }
-                    )
+                    ),
+                    matDef => 0
+                )
+                    .GetBuilt();
+            }
+            else
+            {
+                logger.Debug($"Running hierarchical doct builder.");
+
+                doctBuilt = new HierarchicalDoctBuilder(
+                    new BSPNodeSplitter(
+                        singleFaces
+                            .Where(it => !it.matDef.nodraw),
+                        new BSPNodeSplitter.Option
+                        {
+                            PartitionSize = config.doctPartitionSize,
+                        }
+                    ),
+                    matDef => 0
                 )
                     .GetBuilt();
             }
@@ -182,19 +201,33 @@ namespace OpenKh.Command.MapGen.Utils
                     logger.Debug($"Finished. {numNodes:#,##0} nodes, {numTotalMeshes:#,##0} total meshes, {numTotalCollisions:#,##0} total collisions, {numVerts:#,##0} vertices.");
                 }
 
+                ICollisionBuilder CreateCollisionBuilder(IEnumerable<SingleFace> inputFaces)
+                {
+                    var splitter = new BSPNodeSplitter(
+                        inputFaces,
+                        new BSPNodeSplitter.Option
+                        {
+                            PartitionSize = config.collisionPartitionSize,
+                        }
+                    );
+
+                    return config.disableBSPCollisionBuilder
+                        ? new FlattenCollisionBuilder(
+                            splitter,
+                            matDef => matDef.surfaceFlags
+                        )
+                        : new HierarchicalCollisionBuilder(
+                            splitter,
+                            matDef => matDef.surfaceFlags
+                        );
+                }
+
                 {
                     logger.Debug($"Running collision builder for player.");
 
-                    var it = playerCollision = new CollisionBuilder(
-                        new BSPNodeSplitter(
-                            singleFaces
-                                .Where(it => !it.matDef.noclip),
-                            new BSPNodeSplitter.Option
-                            {
-                                PartitionSize = config.collisionPartitionSize,
-                            }
-                        ),
-                        matDef => matDef.surfaceFlags
+                    var it = playerCollision = CreateCollisionBuilder(
+                        singleFaces
+                            .Where(it => !it.matDef.noclip)
                     )
                         .GetBuilt();
 
@@ -204,16 +237,9 @@ namespace OpenKh.Command.MapGen.Utils
                 {
                     logger.Debug($"Running collision builder for camera.");
 
-                    var it = cameraCollision = new CollisionBuilder(
-                        new BSPNodeSplitter(
-                            singleFaces
-                                .Where(it => it.matDef.cameraClip),
-                            new BSPNodeSplitter.Option
-                            {
-                                PartitionSize = config.collisionPartitionSize,
-                            }
-                        ),
-                        matDef => matDef.cameraFlags
+                    var it = cameraCollision = CreateCollisionBuilder(
+                        singleFaces
+                            .Where(it => it.matDef.cameraClip)
                     )
                         .GetBuilt();
 
@@ -223,16 +249,9 @@ namespace OpenKh.Command.MapGen.Utils
                 {
                     logger.Debug($"Running collision builder for light.");
 
-                    var it = lightCollision = new CollisionBuilder(
-                        new BSPNodeSplitter(
-                            singleFaces
-                                .Where(it => it.matDef.lightClip),
-                            new BSPNodeSplitter.Option
-                            {
-                                PartitionSize = config.collisionPartitionSize,
-                            }
-                        ),
-                        matDef => matDef.lightFlags
+                    var it = lightCollision = CreateCollisionBuilder(
+                        singleFaces
+                            .Where(it => it.matDef.lightClip)
                     )
                         .GetBuilt();
 

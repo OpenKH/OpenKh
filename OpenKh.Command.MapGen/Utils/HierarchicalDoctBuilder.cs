@@ -13,10 +13,11 @@ using BoundingBox = OpenKh.Kh2.Utils.BoundingBox;
 
 namespace OpenKh.Command.MapGen.Utils
 {
-    public class DoctBuilder
+    public class HierarchicalDoctBuilder
     {
         private readonly Doct doct = new Doct();
         private readonly List<SingleFace[]> vifPacketRenderingGroup = new List<SingleFace[]>();
+        private readonly Func<MaterialDef, int> _getAttributeFrom;
 
         public DoctBuilt GetBuilt() => new DoctBuilt
         {
@@ -24,9 +25,13 @@ namespace OpenKh.Command.MapGen.Utils
             VifPacketRenderingGroup = vifPacketRenderingGroup,
         };
 
-        public DoctBuilder(ISpatialNodeCutter cutter)
+        public HierarchicalDoctBuilder(
+            ISpatialNodeCutter cutter,
+            Func<MaterialDef, int> getAttributeFrom
+        )
         {
             var root = new ToTree(cutter).Root;
+            _getAttributeFrom = getAttributeFrom;
             WalkTree(root);
         }
 
@@ -41,16 +46,19 @@ namespace OpenKh.Command.MapGen.Utils
 
             if (node.faces != null)
             {
-                entry2Idx = doct.Entry2List.Count;
-                var entry2 = new Doct.Entry2
+                foreach (var group in node.faces.GroupBy(face => _getAttributeFrom(face.matDef)))
                 {
-                    BoundingBox = node.bbox,
-                };
-                doct.Entry2List.Add(entry2);
+                    entry2Idx = doct.Entry2List.Count;
+                    var entry2 = new Doct.Entry2
+                    {
+                        BoundingBox = node.bbox,
+                    };
+                    doct.Entry2List.Add(entry2);
 
-                vifPacketRenderingGroup.Add(
-                    node.faces
-                );
+                    vifPacketRenderingGroup.Add(
+                        group.ToArray()
+                    );
+                }
             }
 
             var entry1Idx = doct.Entry1List.Count;

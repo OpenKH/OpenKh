@@ -37,6 +37,7 @@ TOC
   - [noShadow](#noshadow)
   - [alphaAdd](#alphaadd)
   - [alphaSubtract](#alphasubtract)
+  - [normal](#normal)
   - [bar](#bar)
   - [nococt](#nococt)
   - [nodoct](#nodoct)
@@ -481,7 +482,7 @@ This is a mandatory option if we build SK0 model, because the bounding box of DO
 Split nodes until single node has up to specified mesh face count.
 
 ```yml
-collisionPartitionSize: 10
+collisionPartitionSize: 300
 ```
 
 ### doctPartitionSize
@@ -489,7 +490,7 @@ collisionPartitionSize: 10
 Split nodes until single node has up to specified mesh face count.
 
 ```yml
-doctPartitionSize: 100
+doctPartitionSize: 500
 ```
 
 ### fog
