@@ -22,7 +22,6 @@ class Hook
     TFunc m_pReplaceFunc;
     void* m_pPatchLoadFile;
     void* m_pUnpatchLoadFile;
-    DWORD m_PreviousProtectionValue;
     int m_patchLenLoadFile;
 
 public:
@@ -62,8 +61,6 @@ public:
             (unsigned char)(((long long)m_pReplaceFunc >> 56)),
         };
 
-        VirtualProtect(originalFunc, sizeof(Patch), PAGE_EXECUTE_READWRITE, &m_PreviousProtectionValue);
-
         m_patchLenLoadFile = sizeof(Patch);
         m_pPatchLoadFile = malloc(m_patchLenLoadFile);
         assert(m_pPatchLoadFile != 0);
@@ -83,7 +80,6 @@ public:
         Unpatch();
         free(m_pPatchLoadFile);
         free(m_pUnpatchLoadFile);
-        VirtualProtect(m_pOriginalFunc, m_patchLenLoadFile, m_PreviousProtectionValue, &m_PreviousProtectionValue);
     }
 };
 
@@ -241,18 +237,6 @@ std::vector<void(*)()> framefuncs;
 
 void Panacea::Initialize()
 {
-    Hook_Axa_SetReplacePath = NewHook(pfn_Axa_SetReplacePath, Panacea::SetReplacePath, "Axa::SetReplacePath");
-    Hook_Axa_FreeAllPackages = NewHook(pfn_Axa_FreeAllPackages, Panacea::FreeAllPackages, "Axa::FreeAllPackages");
-    Hook_Axa_CFileMan_LoadFile = NewHook(pfn_Axa_CFileMan_LoadFile, Panacea::LoadFile, "Axa::CFileMan::LoadFile");
-    Hook_Axa_CFileMan_LoadFileWithMalloc = NewHook(pfn_Axa_CFileMan_LoadFileWithMalloc, Panacea::LoadFileWithMalloc, "Axa::CFileMan::LoadFileWithMalloc");
-    Hook_Axa_CFileMan_GetFileSize = NewHook(pfn_Axa_CFileMan_GetFileSize, Panacea::GetFileSize, "Axa::CFileMan::GetFileSize");
-    Hook_Axa_CFileMan_GetRemasteredCount = NewHook(pfn_Axa_CFileMan_GetRemasteredCount, Panacea::GetRemasteredCount, "Axa::CFileMan::GetRemasteredCount");
-    Hook_Axa_CFileMan_GetRemasteredEntry = NewHook(pfn_Axa_CFileMan_GetRemasteredEntry, Panacea::GetRemasteredEntry, "Axa::CFileMan::GetRemasteredEntry");
-    Hook_Axa_PackageFile_GetRemasteredAsset = NewHook(pfn_Axa_PackageFile_GetRemasteredAsset, Panacea::GetRemasteredAsset, "Axa::PackageFile::GetRemasteredAsset");
-    Hook_Axa_AxaSoundStream__threadProc = NewHook(pfn_Axa_AxaSoundStream__threadProc, Panacea::_threadProc, "Axa::AxaSoundStream::_threadProc");
-    Hook_Axa_DebugPrint = NewHook(pfn_Axa_DebugPrint, Panacea::DebugPrint, "Axa::DebugPrint");
-    //Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
-    //Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
     ULONG_PTR baseImage = (ULONG_PTR)GetModuleHandle(nullptr);
 
     PIMAGE_DOS_HEADER dosHeaders = (PIMAGE_DOS_HEADER)baseImage;
@@ -262,7 +246,7 @@ void Panacea::Initialize()
     MEMORY_BASIC_INFORMATION meminf;
     for (int i = 0; i < ntHeaders->FileHeader.NumberOfSections; i++)
     {
-        VirtualQuery((const void*)(baseImage + section->VirtualAddress), &meminf, sizeof(meminf));
+        VirtualQuery((const void*)(baseImage + section[i].VirtualAddress), &meminf, sizeof(meminf));
         DWORD oldprot;
         switch (meminf.Protect & 0xFF)
         {
@@ -276,6 +260,19 @@ void Panacea::Initialize()
             break;
         }
     }
+
+    Hook_Axa_SetReplacePath = NewHook(pfn_Axa_SetReplacePath, Panacea::SetReplacePath, "Axa::SetReplacePath");
+    Hook_Axa_FreeAllPackages = NewHook(pfn_Axa_FreeAllPackages, Panacea::FreeAllPackages, "Axa::FreeAllPackages");
+    Hook_Axa_CFileMan_LoadFile = NewHook(pfn_Axa_CFileMan_LoadFile, Panacea::LoadFile, "Axa::CFileMan::LoadFile");
+    Hook_Axa_CFileMan_LoadFileWithMalloc = NewHook(pfn_Axa_CFileMan_LoadFileWithMalloc, Panacea::LoadFileWithMalloc, "Axa::CFileMan::LoadFileWithMalloc");
+    Hook_Axa_CFileMan_GetFileSize = NewHook(pfn_Axa_CFileMan_GetFileSize, Panacea::GetFileSize, "Axa::CFileMan::GetFileSize");
+    Hook_Axa_CFileMan_GetRemasteredCount = NewHook(pfn_Axa_CFileMan_GetRemasteredCount, Panacea::GetRemasteredCount, "Axa::CFileMan::GetRemasteredCount");
+    Hook_Axa_CFileMan_GetRemasteredEntry = NewHook(pfn_Axa_CFileMan_GetRemasteredEntry, Panacea::GetRemasteredEntry, "Axa::CFileMan::GetRemasteredEntry");
+    Hook_Axa_PackageFile_GetRemasteredAsset = NewHook(pfn_Axa_PackageFile_GetRemasteredAsset, Panacea::GetRemasteredAsset, "Axa::PackageFile::GetRemasteredAsset");
+    Hook_Axa_AxaSoundStream__threadProc = NewHook(pfn_Axa_AxaSoundStream__threadProc, Panacea::_threadProc, "Axa::AxaSoundStream::_threadProc");
+    Hook_Axa_DebugPrint = NewHook(pfn_Axa_DebugPrint, Panacea::DebugPrint, "Axa::DebugPrint");
+    //Hook_Bbs_File_load = NewHook(pfn_Bbs_File_load, Panacea::BbsFileLoad, "Bbs::File::Load");
+    //Hook_CRsrcData_loadCallback = NewHook(pfn_Bbs_CRsrcData_loadCallback, Panacea::BbsCRsrcDataloadCallback, "Bbs::CRsrcData::loadCallback");
 
     auto dllpath = CombinePaths(OpenKH::m_ModPath, L"dll\\");
     
