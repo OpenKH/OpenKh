@@ -755,8 +755,7 @@ namespace OpenKh.Tests.Patcher
             File.Create(Path.Combine(ModInputDir, "CmdList.yml")).Using(stream =>
             {
                 var writer = new StreamWriter(stream);
-                writer.WriteLine("1:");
-                writer.WriteLine("  Id: 1");
+                writer.WriteLine("- Id: 1");
                 writer.WriteLine("  Execute: 3");
                 writer.WriteLine("  Argument: 3");
                 writer.WriteLine("  SubMenu: 1");
