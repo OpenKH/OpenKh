@@ -19,9 +19,9 @@ namespace OpenKh.Kh2.Battle
         [Data] public short FinishBlend { get; set; }
         [Data] public short AirMotion { get; set; }
         [Data] public short AirBlend { get; set; }
-        [Data] public byte Voice { get; set; }
-        [Data] public byte VoiceFinisher { get; set; }
-        [Data] public byte VoiceSelf { get; set; }
+        [Data] public sbyte Voice { get; set; }
+        [Data] public sbyte VoiceFinisher { get; set; }
+        [Data] public sbyte VoiceSelf { get; set; }
         [Data] public byte Padding2 { get; set; }
 
         public static List<Magc> Read(Stream stream) => BaseTable<Magc>.Read(stream);
