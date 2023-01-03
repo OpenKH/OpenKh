@@ -685,6 +685,28 @@ namespace OpenKh.Patcher
                         }
                         Kh2.SystemData.Sklt.Write(stream.SetPosition(0), skltList);
                         break;
+                       
+                    case "przt":
+                        var prztList = Kh2.Battle.Przt.Read(stream);
+                        var moddedPrzt = deserializer.Deserialize<List<Kh2.Battle.Przt>>(sourceText);
+                        foreach (var przt in moddedPrzt)
+                        {
+                            var oldPrzt = prztList.First(x => x.Id == przt.Id);
+                            prztList[prztList.IndexOf(oldPrzt)] = przt;
+                        }
+                        Kh2.Battle.Przt.Write(stream.SetPosition(0), prztList);
+                        break;
+
+                    case "magc":
+                        var magcList = Kh2.Battle.Magc.Read(stream); //Base kh2 battle->Atkp file. Reads from extracted data.
+                        var moddedMagc = deserializer.Deserialize<List<Kh2.Battle.Magc>>(sourceText); //Our modded file. Adds to our original battle file.
+                        foreach (var magc in moddedMagc) //For every piece of ATKP in modded file, add this.
+                        {
+                            var oldMagc = magcList.First(x => x.Id == magc.Id);
+                            magcList[magcList.IndexOf(oldMagc)] = magc;
+                        }
+                        Kh2.Battle.Magc.Write(stream.SetPosition(0), magcList);
+                        break;
 
                     default:
                         break;
