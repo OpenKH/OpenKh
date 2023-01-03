@@ -646,23 +646,14 @@ namespace OpenKh.Patcher
                         break;
 
                     case "cmd":
-                        var cmdList = Kh2.SystemData.Cmd.Read(stream).ToDictionary(x => x.Id, x => x);
-                        var moddedCmd = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Cmd>>(sourceText);
-                        foreach (var command in moddedCmd)
+                        var cmdList = Kh2.SystemData.Cmd.Read(stream); 
+                        var moddedCmd = deserializer.Deserialize<List<Kh2.SystemData.Cmd>>(sourceText); 
+                        foreach (var commands in moddedCmd) 
                         {
-                            if (cmdList.ContainsKey(command.Key))
-
-                            {
-                                cmdList[command.Key] = command.Value;
-                            }
-
-                            else
-                            {
-                                cmdList.Add(command.Key, command.Value);
-                            }
-
+                            var oldCommands = cmdList.First(x => x.Id == commands.Id && x.Id == commands.Id);
+                            cmdList[cmdList.IndexOf(oldCommands)] = commands;
                         }
-                        Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList.Values);
+                        Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList);
                         break;
 
                     case "enmp":
