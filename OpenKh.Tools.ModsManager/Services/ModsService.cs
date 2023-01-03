@@ -86,12 +86,16 @@ namespace OpenKh.Tools.ModsManager.Services
                 {
                     if (mods.Contains(mod))
                         yield return mod;
-                }                
+                }
             }
         }
 
-        public static bool IsModBlocked(string repositoryName) =>
-            ConfigurationService.BlacklistedMods.Any(x => x.Equals(repositoryName, StringComparison.InvariantCultureIgnoreCase));
+        public static bool IsModBlocked(string repositoryName)
+            {
+            if (ConfigurationService.BlacklistedMods != null)
+                return ConfigurationService.BlacklistedMods.Any(x => x.Equals(repositoryName, StringComparison.InvariantCultureIgnoreCase));
+            return false;
+            }
 
         public static bool IsUserBlocked(string repositoryName) =>
             IsModBlocked(Path.GetDirectoryName(repositoryName));
