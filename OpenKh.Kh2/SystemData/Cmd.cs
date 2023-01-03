@@ -39,6 +39,27 @@ namespace OpenKh.Kh2.SystemData
             Target = 1,
             Both = 2,
         }
+        
+        public enum Flag : uint
+        {
+            Cursor = 0x1,
+            Land = 0x2,
+            Force = 0x4,
+            Combo = 0x8,
+            Battle = 0x10,
+            Secure = 0x20,
+            Require = 0x40,
+            NoCombo = 0x80,
+            Drive = 0x100,
+            Short = 0x200,
+            DisableSora = 0x400,
+            DisableRoxas = 0x800,
+            DisableLionSora = 0x1000,
+            DisableLimitForm = 0x2000,
+            Unused = 0x4000,
+            DisableSkateboard = 0x8000,
+            InBattleOnly = 0x10000
+        }
 
         [Data] public ushort Id { get; set; }
         [Data] public ushort Execute { get; set; }
@@ -46,7 +67,7 @@ namespace OpenKh.Kh2.SystemData
         [Data] public sbyte SubMenu { get; set; }
         [Data] public Icon CmdIcon { get; set; }
         [Data] public int MessageId { get; set; }
-        [Data] public uint Flags { get; set; }
+        [Data] public Flag Flags { get; set; }
         [Data] public float Range { get; set; }
         [Data] public float Dir { get; set; }
         [Data] public float DirRange { get; set; }

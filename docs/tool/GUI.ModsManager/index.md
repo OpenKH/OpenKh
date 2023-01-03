@@ -193,6 +193,8 @@ Asset Example
  * `lvup`
  * `bons`
  * `atkp`
+ * `przt`
+ * `magc`
  * `objentry`
 
 Asset Example
@@ -215,14 +217,13 @@ Asset Example
 ```
 `cmd` Source Example
 ```
-1:
-  Id: 1
+- Id: 1
   Execute: 3
   Argument: 3
   SubMenu: 1
   CmdIcon: 3
   MessageId: 33249
-  Flags: 49
+  Flags: Cursor, InBattleOnly
   Range: -1
   Dir: 0
   DirRange: -1
@@ -388,6 +389,45 @@ Sora:
   RandomEffect: 1
   Kind: ComboFinisher
   HpDrain: 15
+```
+
+`przt` Source Example
+```
+- Id: 1
+  SmallHpOrbs: 0
+  BigHpOrbs: 1
+  BigMoneyOrbs: 1
+  MediumMoneyOrbs: 1
+  SmallMoneyOrbs: 1
+  SmallMpOrbs: 1
+  BigMpOrbs: 1
+  SmallDriveOrbs: 0
+  BigDriveOrbs: 1
+  Item1: 1
+  Item1Percentage: 1
+  Item2: 0
+  Item2Percentage: 0
+  Item3: 0
+  Item3Percentage: 0
+```
+
+`magc` Source Example
+```
+- Id: 0 
+  Level: 3
+  World: 1
+  FileName: magic/FIRE_3.mag
+  Item: 21
+  Command: 120
+  GroundMotion: 56
+  GroundBlend: 2
+  FinishMotion: 57
+  FinishBlend: 2
+  AirMotion: 58
+  AirBlend: 2
+  Voice: 7
+  VoiceFinisher: 11
+  VoiceSelf: -1
 ```
 
 `objentry` Source Example

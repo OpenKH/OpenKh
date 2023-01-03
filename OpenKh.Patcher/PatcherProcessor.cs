@@ -646,23 +646,14 @@ namespace OpenKh.Patcher
                         break;
 
                     case "cmd":
-                        var cmdList = Kh2.SystemData.Cmd.Read(stream).ToDictionary(x => x.Id, x => x);
-                        var moddedCmd = deserializer.Deserialize<Dictionary<ushort, Kh2.SystemData.Cmd>>(sourceText);
-                        foreach (var command in moddedCmd)
+                        var cmdList = Kh2.SystemData.Cmd.Read(stream); 
+                        var moddedCmd = deserializer.Deserialize<List<Kh2.SystemData.Cmd>>(sourceText); 
+                        foreach (var commands in moddedCmd) 
                         {
-                            if (cmdList.ContainsKey(command.Key))
-
-                            {
-                                cmdList[command.Key] = command.Value;
-                            }
-
-                            else
-                            {
-                                cmdList.Add(command.Key, command.Value);
-                            }
-
+                            var oldCommands = cmdList.First(x => x.Id == commands.Id && x.Id == commands.Id);
+                            cmdList[cmdList.IndexOf(oldCommands)] = commands;
                         }
-                        Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList.Values);
+                        Kh2.SystemData.Cmd.Write(stream.SetPosition(0), cmdList);
                         break;
 
                     case "enmp":
@@ -684,6 +675,28 @@ namespace OpenKh.Patcher
                             skltList[skltList.IndexOf(oldSklt)] = sklt;
                         }
                         Kh2.SystemData.Sklt.Write(stream.SetPosition(0), skltList);
+                        break;
+                       
+                    case "przt":
+                        var prztList = Kh2.Battle.Przt.Read(stream);
+                        var moddedPrzt = deserializer.Deserialize<List<Kh2.Battle.Przt>>(sourceText);
+                        foreach (var przt in moddedPrzt)
+                        {
+                            var oldPrzt = prztList.First(x => x.Id == przt.Id);
+                            prztList[prztList.IndexOf(oldPrzt)] = przt;
+                        }
+                        Kh2.Battle.Przt.Write(stream.SetPosition(0), prztList);
+                        break;
+
+                    case "magc":
+                        var magcList = Kh2.Battle.Magc.Read(stream); 
+                        var moddedMagc = deserializer.Deserialize<List<Kh2.Battle.Magc>>(sourceText); 
+                        foreach (var magc in moddedMagc)
+                        {
+                            var oldMagc = magcList.First(x => x.Id == magc.Id);
+                            magcList[magcList.IndexOf(oldMagc)] = magc;
+                        }
+                        Kh2.Battle.Magc.Write(stream.SetPosition(0), magcList);
                         break;
 
                     default:

@@ -755,8 +755,7 @@ namespace OpenKh.Tests.Patcher
             File.Create(Path.Combine(ModInputDir, "CmdList.yml")).Using(stream =>
             {
                 var writer = new StreamWriter(stream);
-                writer.WriteLine("1:");
-                writer.WriteLine("  Id: 1");
+                writer.WriteLine("- Id: 1");
                 writer.WriteLine("  Execute: 3");
                 writer.WriteLine("  Argument: 3");
                 writer.WriteLine("  SubMenu: 1");
@@ -1812,6 +1811,182 @@ namespace OpenKh.Tests.Patcher
                 var enmp = Kh2.Battle.Enmp.Read(binarc[0].Stream);
 
                 Assert.Equal(1, enmp[0].Level);
+            });
+        }
+        
+        [Fact]
+        public void ListPatchMagcTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "magc",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "MagcList.yml",
+                                        Type = "magc"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var magcEntry = new List<Kh2.Battle.Magc>()
+                {
+                    new Kh2.Battle.Magc
+                    {
+                        Id = 7,
+                        Level = 3,
+                        World = 1,
+                        FileName = "magic/FIRE_7.mag"
+                    }
+                };
+
+                using var magcStream = new MemoryStream();
+                Kh2.Battle.Magc.Write(magcStream, magcEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "magc",
+                        Type = Bar.EntryType.List,
+                        Stream = magcStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "MagcList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                var serializer = new Serializer();
+                var moddedMagc = new List<Kh2.Battle.Magc>{
+                    new Kh2.Battle.Magc
+                    {
+                        Id = 7,
+                        Level = 3,
+                        World = 1,
+                        FileName = "magic/FIRE_7.mag"
+                    }
+                };
+                writer.Write(serializer.Serialize(moddedMagc));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var magc = Kh2.Battle.Magc.Read(binarc[0].Stream);
+
+                Assert.Equal(3, magc[0].Level);
+            });
+        }
+
+        [Fact]
+        public void ListPatchPrztTest()
+        {
+            var patcher = new PatcherProcessor();
+            var serializer = new Serializer();
+            var patch = new Metadata()
+            {
+                Assets = new List<AssetFile>()
+                {
+                    new AssetFile()
+                    {
+                        Name = "00battle.bar",
+                        Method = "binarc",
+                        Source = new List<AssetFile>()
+                        {
+                            new AssetFile()
+                            {
+                                Name = "przt",
+                                Method = "listpatch",
+                                Type = "List",
+                                Source = new List<AssetFile>()
+                                {
+                                    new AssetFile()
+                                    {
+                                        Name = "PrztList.yml",
+                                        Type = "przt"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            File.Create(Path.Combine(AssetsInputDir, "00battle.bar")).Using(stream =>
+            {
+                var prztEntry = new List<Kh2.Battle.Przt>()
+                {
+                    new Kh2.Battle.Przt
+                    {
+                        Id = 1,
+                        SmallHpOrbs = 0,
+                        BigHpOrbs = 1
+                    }
+                };
+
+                using var prztStream = new MemoryStream();
+                Kh2.Battle.Przt.Write(prztStream, prztEntry);
+                Bar.Write(stream, new Bar() {
+                    new Bar.Entry()
+                    {
+                        Name = "przt",
+                        Type = Bar.EntryType.List,
+                        Stream = prztStream
+                    }
+                });
+            });
+
+            File.Create(Path.Combine(ModInputDir, "PrztList.yml")).Using(stream =>
+            {
+                var writer = new StreamWriter(stream);
+                var serializer = new Serializer();
+                var moddedPrzt = new List<Kh2.Battle.Przt>{
+                    new Kh2.Battle.Przt
+                    {
+                        Id = 1,
+                        SmallHpOrbs = 0,
+                        BigHpOrbs = 1
+                    }
+                };
+                writer.Write(serializer.Serialize(moddedPrzt));
+                writer.Flush();
+            });
+
+            patcher.Patch(AssetsInputDir, ModOutputDir, patch, ModInputDir);
+
+            AssertFileExists(ModOutputDir, "00battle.bar");
+
+            File.OpenRead(Path.Combine(ModOutputDir, "00battle.bar")).Using(stream =>
+            {
+                var binarc = Bar.Read(stream);
+                var przt = Kh2.Battle.Przt.Read(binarc[0].Stream);
+
+                Assert.Equal(1, przt[0].BigHpOrbs);
             });
         }
 
