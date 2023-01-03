@@ -698,9 +698,9 @@ namespace OpenKh.Patcher
                         break;
 
                     case "magc":
-                        var magcList = Kh2.Battle.Magc.Read(stream); //Base kh2 battle->Atkp file. Reads from extracted data.
-                        var moddedMagc = deserializer.Deserialize<List<Kh2.Battle.Magc>>(sourceText); //Our modded file. Adds to our original battle file.
-                        foreach (var magc in moddedMagc) //For every piece of ATKP in modded file, add this.
+                        var magcList = Kh2.Battle.Magc.Read(stream); 
+                        var moddedMagc = deserializer.Deserialize<List<Kh2.Battle.Magc>>(sourceText); 
+                        foreach (var magc in moddedMagc)
                         {
                             var oldMagc = magcList.First(x => x.Id == magc.Id);
                             magcList[magcList.IndexOf(oldMagc)] = magc;
