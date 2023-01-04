@@ -693,7 +693,7 @@ namespace OpenKh.Patcher
                         var moddedMagc = deserializer.Deserialize<List<Kh2.Battle.Magc>>(sourceText); 
                         foreach (var magc in moddedMagc)
                         {
-                            var oldMagc = magcList.First(x => x.Id == magc.Id);
+                            var oldMagc = magcList.First(x => x.Id == magc.Id && x.Level == magc.Level);
                             magcList[magcList.IndexOf(oldMagc)] = magc;
                         }
                         Kh2.Battle.Magc.Write(stream.SetPosition(0), magcList);
