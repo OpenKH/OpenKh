@@ -7,8 +7,8 @@ namespace OpenKh.Kh2.SystemData
     public class Sklt
     {
         [Data] public uint CharacterId { get; set; }
-        [Data] public ushort Bone1 { get; set; }
-        [Data] public ushort Bone2 { get; set; }
+        [Data] public short Bone1 { get; set; }
+        [Data] public short Bone2 { get; set; }
 
         public static List<Sklt> Read(Stream stream) => BaseTable<Sklt>.Read(stream);
         public static void Write(Stream stream, IEnumerable<Sklt> entries) =>
