@@ -15,7 +15,7 @@ namespace OpenKh.Kh2.Battle
         [Data] public ushort Command { get; set; }
         [Data] public short GroundMotion { get; set; }
         [Data] public short GroundBlend { get; set; }
-        [Data] public short FinishMotion { get; set; }
+        [Data] public ushort FinishMotion { get; set; }
         [Data] public short FinishBlend { get; set; }
         [Data] public short AirMotion { get; set; }
         [Data] public short AirBlend { get; set; }
