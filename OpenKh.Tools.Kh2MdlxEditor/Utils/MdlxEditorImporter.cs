@@ -13,18 +13,16 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
     public class MdlxEditorImporter
     {
         private static bool TRIANGLE_INVERSE = true; // UNUSED for now
-        private static bool KEEP_SHADOW = false;
+        private static bool KEEP_ORIGINAL_SHADOW = true;
 
         public static ModelSkeletal replaceMeshModelSkeletal(Assimp.Scene scene, ModelSkeletal oldModel)
         {
             ModelSkeletal model = new ModelSkeletal();
 
             // If you want to convert only specific meshes for debugging purposes set them here. Otherwise leave the list empty
-            List<int> DEBUG_ONLY_THESE_MESHES = new List<int> { 3 };
+            List<int> DEBUG_ONLY_THESE_MESHES = new List<int> { };
 
             model.ModelHeader = oldModel.ModelHeader;
-            if (!KEEP_SHADOW)
-                model.ModelHeader.Size = 0;
             model.BoneCount = oldModel.BoneCount;
             model.TextureCount = oldModel.TextureCount;
             model.BoneOffset = oldModel.BoneOffset;
@@ -52,12 +50,10 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 
                 Assimp.Mesh mesh = scene.Meshes[i];
 
-                //List<DmaVifPacket> dmaVifPackets = VifUtils.vifMeshToDmaVifPackets(getVifMeshFromAssimp(mesh, boneMatrices));
                 VifMesh vifMesh = Kh2MdlxAssimp.getVifMeshFromAssimp(mesh, boneMatrices);
                 List<DmaVifPacket> dmaVifPackets = VifProcessor.vifMeshToDmaVifPackets(vifMesh);
 
                 // TEST
-                //ModelSkeletal.SkeletalGroup group = getSkeletalGroup2(dmaVifPackets, (uint)mesh.MaterialIndex, baseAddress);
                 ModelSkeletal.SkeletalGroup group = VifProcessor.getSkeletalGroup(dmaVifPackets, (uint)mesh.MaterialIndex, baseAddress);
 
                 model.Groups.Add(group);
@@ -68,6 +64,11 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             foreach (ModelSkeletal.SkeletalGroup group in model.Groups)
             {
                 group.Mesh = ModelSkeletal.getMeshFromGroup(group, ModelCommon.GetBoneMatrices(model.Bones)); // Comment this and save the model to see what's wrong with the VIF code
+            }
+
+            if (KEEP_ORIGINAL_SHADOW)
+            {
+                model.Shadow = oldModel.Shadow;
             }
 
             return model;

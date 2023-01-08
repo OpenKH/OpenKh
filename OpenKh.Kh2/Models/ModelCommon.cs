@@ -314,13 +314,14 @@ namespace OpenKh.Kh2.Models
             return relativePosition;
         }
 
-
         // Aligns the stream to the given byte
         public static void alignStreamToByte(Stream stream, int alignByte)
         {
             if (stream.Position % alignByte != 0)
             {
-                stream.Position += (alignByte - (stream.Position % alignByte));
+                byte[] extraBytes = new byte[(alignByte - (stream.Position % alignByte))];
+                MemoryStream extraStream = new MemoryStream(extraBytes);
+                extraStream.CopyTo(stream);
             }
         }
 

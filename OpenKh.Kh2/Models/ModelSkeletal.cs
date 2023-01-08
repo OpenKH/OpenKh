@@ -482,6 +482,19 @@ namespace OpenKh.Kh2.Models
             {
                 ModelHeader.Size = 0;
             }
+            else
+            {
+                uint lastPosition = Groups[Groups.Count - 1].Header.BoneMatrixOffset;
+                lastPosition += (uint)(1 + Groups[Groups.Count - 1].BoneMatrix.Count);
+
+                uint remainingUpTo16 = (uint)(lastPosition % 16);
+                if (remainingUpTo16 != 0)
+                {
+                    remainingUpTo16 = 16 - remainingUpTo16;
+                }
+
+                ModelHeader.Size = lastPosition + remainingUpTo16;
+            }
         }
 
         // Calculates the absolute position of the vertices based on their positions relative to bones

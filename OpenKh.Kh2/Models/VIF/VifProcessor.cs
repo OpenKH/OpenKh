@@ -12,8 +12,8 @@ namespace OpenKh.Kh2.Models.VIF
      */
     public class VifProcessor
     {
-        private static bool USE_UNCOMPRESSED = false;
-        private static bool FORCE_MULTIWEIGHT = false;
+        private static bool USE_UNCOMPRESSED = false; // For testing purposes
+        private static bool FORCE_MULTIWEIGHT = false; // For testing purposes
 
         // VIF packet limits
         public static int VERTEX_LIMIT = 0xFF; // Shouldn't need to cap, but just in case
