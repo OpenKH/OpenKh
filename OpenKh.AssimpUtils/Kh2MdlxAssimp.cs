@@ -1,12 +1,16 @@
 using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
+using OpenKh.Kh2.Models.VIF;
 using System.Numerics;
 
 namespace OpenKh.AssimpUtils
 {
     public class Kh2MdlxAssimp
     {
+        /****************
+         * PROCESSES
+         ****************/
         public static Assimp.Scene getAssimpScene(MdlxParser mParser)
         {
             Assimp.Scene scene = AssimpGeneric.GetBaseScene();
@@ -169,17 +173,17 @@ namespace OpenKh.AssimpUtils
             for (int i = 0; i < model.TextureCount; i++)
             {
                 Assimp.TextureSlot texture = new Assimp.TextureSlot();
-                texture.FilePath = "Texture" + i;
+                texture.FilePath = "Texture" + i.ToString("D4");
                 texture.TextureType = Assimp.TextureType.Diffuse;
                 textures.Add(texture);
             }
 
-            Matrix4x4[] boneMatrices = ModelCommon.GetBoneMatrices(model.Bones);
+            //Matrix4x4[] boneMatrices = ModelCommon.GetBoneMatrices(model.Bones);
 
             for (int i = 0; i < model.Groups.Count; i++)
             {
                 ModelSkeletal.SkeletalGroup group = model.Groups[i];
-                Assimp.Mesh iMesh = new Assimp.Mesh("Mesh" + i, Assimp.PrimitiveType.Triangle);
+                Assimp.Mesh iMesh = new Assimp.Mesh("Mesh" + i.ToString("D4"), Assimp.PrimitiveType.Triangle);
                 iMesh.UVComponentCount[0] = 2; // Required for some reason
 
                 // TEXTURE
@@ -189,7 +193,7 @@ namespace OpenKh.AssimpUtils
 
                 // MATERIAL
                 Assimp.Material mat = new Assimp.Material();
-                mat.Name = "Material" + i;
+                mat.Name = "Material" + i.ToString("D4");
                 mat.TextureDiffuse = textures[(int)group.Header.TextureIndex];
                 //mat.TextureDiffuse = texture;
                 iMesh.MaterialIndex = i;
@@ -199,7 +203,7 @@ namespace OpenKh.AssimpUtils
                 // BONES - Assimp requires all of the bones even if they don't have weights
                 for (int j = 0; j < model.Bones.Count; j++)
                 {
-                    iMesh.Bones.Add(new Assimp.Bone("Bone" + j, Assimp.Matrix3x3.Identity, new Assimp.VertexWeight[0]));
+                    iMesh.Bones.Add(new Assimp.Bone("Bone" + j.ToString("D4"), Assimp.Matrix3x3.Identity, new Assimp.VertexWeight[0]));
                 }
 
                 // VERTICES
@@ -210,12 +214,12 @@ namespace OpenKh.AssimpUtils
 
                     iMesh.Vertices.Add(new Assimp.Vector3D(vertex.Position.X, vertex.Position.Y, vertex.Position.Z));
 
-                    iMesh.TextureCoordinateChannels[0].Add(new Assimp.Vector3D(vertex.U / 16 / 256.0f, 1 - (vertex.V / 16 / 256.0f), 0)); // Stored as int, convert to float
+                    iMesh.TextureCoordinateChannels[0].Add(new Assimp.Vector3D(vertex.U / 4096.0f, 1 - (vertex.V / 4096.0f), 0)); // Stored as int, convert to float
 
                     // VERTEX WEIGHTS
                     foreach (ModelCommon.BPosition bPosition in vertex.BPositions)
                     {
-                        Assimp.Bone bone = AssimpGeneric.FindBone(iMesh.Bones, "Bone" + bPosition.BoneIndex);
+                        Assimp.Bone bone = AssimpGeneric.FindBone(iMesh.Bones, "Bone" + bPosition.BoneIndex.ToString("D4"));
                         float weight = bPosition.Position.W == 0 ? 1 : bPosition.Position.W;
                         bone.VertexWeights.Add(new Assimp.VertexWeight(currentVertex, weight));
                     }
@@ -232,7 +236,7 @@ namespace OpenKh.AssimpUtils
                 scene.Meshes.Add(iMesh);
 
                 // NODE
-                Assimp.Node iMeshNode = new Assimp.Node("MeshNode" + i);
+                Assimp.Node iMeshNode = new Assimp.Node("MeshNode" + i.ToString("D4"));
                 iMeshNode.MeshIndices.Add(i);
 
                 scene.RootNode.Children.Add(iMeshNode);
@@ -241,7 +245,7 @@ namespace OpenKh.AssimpUtils
             // BONES (Node hierarchy)
             foreach (ModelCommon.Bone bone in model.Bones)
             {
-                string boneName = "Bone" + bone.Index;
+                string boneName = "Bone" + bone.Index.ToString("D4");
                 Assimp.Node boneNode = new Assimp.Node(boneName);
 
                 Assimp.Node parentNode;
@@ -251,7 +255,7 @@ namespace OpenKh.AssimpUtils
                 }
                 else
                 {
-                    parentNode = scene.RootNode.FindNode("Bone" + bone.ParentIndex);
+                    parentNode = scene.RootNode.FindNode("Bone" + bone.ParentIndex.ToString("D4"));
                 }
 
                 boneNode.Transform = AssimpGeneric.GetNodeTransformMatrix(new Vector3(bone.ScaleX, bone.ScaleY, bone.ScaleZ),
@@ -263,6 +267,94 @@ namespace OpenKh.AssimpUtils
 
             return scene;
         }
+
+        public static VifMesh getVifMeshFromAssimp(Assimp.Mesh mesh, Matrix4x4[] boneMatrices)
+        {
+            VifMesh vifMesh = new VifMesh();
+            vifMesh.BoneMatrices = boneMatrices;
+
+            // STEP 1 - Get all of the vertex data together
+
+            List<VifCommon.VifVertex> verticesAssimpOrder = new List<VifCommon.VifVertex>();
+
+            // Absolute position and UV coordinates
+            for (int i = 0; i < mesh.Vertices.Count; i++)
+            {
+                VifCommon.VifVertex vertex = new VifCommon.VifVertex();
+
+                vertex.AbsolutePosition = AssimpGeneric.ToNumerics(mesh.Vertices[i]);
+
+                short u = (short)(mesh.TextureCoordinateChannels[0][i].X * 4096.0f);
+                short v = (short)((1 - mesh.TextureCoordinateChannels[0][i].Y) * 4096.0f);
+                vertex.UvCoord = new VifCommon.UVCoord(u, v);
+
+                verticesAssimpOrder.Add(vertex);
+            }
+
+            // Weights (Assimp stores the weights in the bones, not the vertices)
+            for (int i = 0; i < mesh.Bones.Count; i++)
+            {
+                for (int j = 0; j < mesh.Bones[i].VertexWeights.Count; j++)
+                {
+                    Assimp.VertexWeight vertexWeight = mesh.Bones[i].VertexWeights[j];
+                    VifCommon.BoneRelativePosition relativePosition = new VifCommon.BoneRelativePosition();
+
+                    relativePosition.BoneIndex = i;
+                    relativePosition.Weight = vertexWeight.Weight;
+
+                    if (relativePosition.BoneIndex > boneMatrices.Count())
+                    {
+                        throw new Exception("Weight to non-existent bone");
+                    }
+                    if (relativePosition.Weight < 0 || relativePosition.Weight > 1)
+                    {
+                        throw new Exception("Weight is under 0 or over 1");
+                    }
+
+                    verticesAssimpOrder[vertexWeight.VertexID].RelativePositions.Add(relativePosition);
+                }
+            }
+
+            // Calc bone-relative positions
+            for (int i = 0; i < verticesAssimpOrder.Count; i++)
+            {
+                VifCommon.VifVertex vertex = verticesAssimpOrder[i];
+                for (int j = 0; j < vertex.RelativePositions.Count; j++)
+                {
+                    VifCommon.BoneRelativePosition boneRelativePos = vertex.RelativePositions[j];
+                    boneRelativePos.Coord = ModelCommon.getRelativePosition(vertex.AbsolutePosition, boneMatrices[boneRelativePos.BoneIndex], boneRelativePos.Weight);
+                }
+            }
+
+            // STEP 2 - Create the packet based on face order. Each face will add 3 vertices (Not compressed)
+
+            for (int i = 0; i < mesh.Faces.Count; i++)
+            {
+                if (mesh.Faces[i].IndexCount != 3)
+                {
+                    throw new Exception("Face doesn't have exactly 3 vertices. VIF meshes only accept 3-vertex faces.");
+                }
+
+                VifCommon.VifVertex vertex1 = verticesAssimpOrder[mesh.Faces[i].Indices[0]];
+                VifCommon.VifVertex vertex2 = verticesAssimpOrder[mesh.Faces[i].Indices[1]];
+                VifCommon.VifVertex vertex3 = verticesAssimpOrder[mesh.Faces[i].Indices[2]];
+
+                if (!vertex1.isValidVertex() ||
+                   !vertex2.isValidVertex() ||
+                   !vertex3.isValidVertex())
+                {
+                    throw new Exception("Vertex is not valid. Make sure that all of the vertices have at least 1 weight");
+                }
+
+                vifMesh.Faces.Add(new VifCommon.VifFace(vertex1, vertex2, vertex3));
+            }
+
+            return vifMesh;
+        }
+
+        /****************
+         * UTILITIES
+         ****************/
 
         private static Vector3 ToVector3(Vector4 pos) => new Vector3(pos.X, pos.Y, pos.Z);
     }

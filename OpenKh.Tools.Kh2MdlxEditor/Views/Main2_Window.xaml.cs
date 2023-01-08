@@ -1,6 +1,7 @@
 using OpenKh.AssimpUtils;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
+using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
 using System;
 using System.IO;
@@ -30,24 +31,31 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         // Opens the file that has been dropped on the window
         private void Window_Drop(object sender, DragEventArgs e)
         {
-            try
-            {
+            //try
+            //{
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                     string firstFile = files?.FirstOrDefault();
-                    loadFile(firstFile);
+
+                    if(firstFile.ToLower().EndsWith(".mdlx"))
+                    {
+                        loadFile(firstFile);
+                    }
+                    else if(firstFile.ToLower().EndsWith(".fbx") || firstFile.ToLower().EndsWith(".dae"))
+                    {
+                        replaceModel(firstFile);
+                    }
 
                     if(mainVM.ModelFile != null)
                     {
                         contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
                     }
                 }
-            }
-            catch(Exception exc)
+            //}
+            /*catch(Exception exc)
             {
-
-            }
+            }*/
         }
         private void Menu_SaveFile(object sender, EventArgs e)
         {
@@ -169,6 +177,13 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
 
                 AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, fullPath);
             }
+        }
+
+        public void replaceModel(string filePath)
+        {
+            Assimp.Scene scene = AssimpGeneric.getAssimpSceneFromFile(filePath);
+
+            mainVM.ModelFile = MdlxEditorImporter.replaceMeshModelSkeletal(scene, mainVM.ModelFile);
         }
     }
 }

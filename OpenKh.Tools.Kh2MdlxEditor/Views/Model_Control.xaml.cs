@@ -24,7 +24,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             DataContext = modelControlModel;
             List<GeometryModel3D> geometry = new List<GeometryModel3D>();
             geometry.AddRange(Viewport3DUtils.getGeometryFromModel(modelControlModel.ModelFile, modelControlModel.TextureFile));
-            if(modelControlModel.CollisionFile != null)
+            //if(modelControlModel.CollisionFile != null)
             //geometry.AddRange(modelControlModel.getCollisionBoxes());
             //geometry.AddRange(modelControlModel.getBoneBoxes());
             viewportFrame.Content = new Viewport_Control(geometry);

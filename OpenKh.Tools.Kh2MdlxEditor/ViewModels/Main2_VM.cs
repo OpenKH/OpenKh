@@ -83,6 +83,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                 switch (barEntry.Type)
                 {
                     case Bar.EntryType.Model:
+                        barEntry.Stream = new MemoryStream();
                         ModelFile.Write(barEntry.Stream);
                         break;
                     case Bar.EntryType.ModelTexture:
