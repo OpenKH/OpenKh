@@ -859,7 +859,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 async monitor =>
                 {
                     monitor.SetTitle("Checking update");
-                    return await new OpenkhUpdateCheckerService().CheckAsync();
+                    return await new OpenkhUpdateCheckerService().CheckAsync(monitor.Cancellation);
                 }
             );
             if (checkResult.HasUpdate)
@@ -873,17 +873,18 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     await progressWindowService.ShowAsync(
                         async monitor =>
                         {
-                            monitor.SetTitle("Downloading");
+                            monitor.SetTitle("Downloading latest openkh.zip");
 
                             await new OpenkhUpdateProceederService().UpdateAsync(
                                 checkResult.DownloadZipUrl,
-                                rate => monitor.SetProgress(rate)
+                                rate => monitor.SetProgress(rate),
+                                monitor.Cancellation
                             );
                         }
                     );
 
                     // quit app
-                    Window.Close();
+                    Window?.Close();
                 }
             }
         }

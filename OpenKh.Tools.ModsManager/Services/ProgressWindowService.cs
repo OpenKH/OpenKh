@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 
 namespace OpenKh.Tools.ModsManager.Services
 {
@@ -11,7 +13,8 @@ namespace OpenKh.Tools.ModsManager.Services
     {
         public record ProgressMonitor(
             Action<string> SetTitle,
-            Action<float> SetProgress
+            Action<float> SetProgress,
+            CancellationToken Cancellation
         );
 
         public async Task ShowAsync(Func<ProgressMonitor, Task> yourService)
@@ -29,16 +32,30 @@ namespace OpenKh.Tools.ModsManager.Services
             Func<ProgressMonitor, Task<T>> yourService
         )
         {
-            var window = new InstallModProgressWindow()
-            {
-                OperationName = "In progress",
-                ModName = "OpenKh",
-                ProgressText = "In progress",
-            };
+            var cancel = new CancellationTokenSource();
+            var vm = new WorkInProgressWindow.TViewModel(
+                DialogTitle: "OpenKh",
+                OperationName: "Work in progress",
+                ModName: "",
+                ProgressUnknown: true,
+                ProgressValue: 0f,
+                ProgressText: "Please wait",
+                Cancel: () => cancel.Cancel()
+            );
+            var window = new WorkInProgressWindow() { ViewModel = vm, };
             window.Show();
             var monitor = new ProgressMonitor(
-                SetTitle: title => window.OperationName = title,
-                SetProgress: rate => window.ProgressValue = rate
+                SetTitle: title =>
+                {
+                    vm = vm with { ProgressText = title, };
+                    window.ViewModel = vm;
+                },
+                SetProgress: rate =>
+                {
+                    vm = vm with { ProgressValue = rate, ProgressUnknown = false, };
+                    window.ViewModel = vm;
+                },
+                Cancellation: cancel.Token
             );
             try
             {

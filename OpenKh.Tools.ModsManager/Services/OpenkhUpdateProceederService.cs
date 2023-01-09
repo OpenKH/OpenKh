@@ -7,13 +7,14 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenKh.Tools.ModsManager.Services
 {
     public class OpenkhUpdateProceederService
     {
-        public async Task UpdateAsync(string downloadZipUrl, Action<float> progress)
+        public async Task UpdateAsync(string downloadZipUrl, Action<float> progress, CancellationToken cancellation)
         {
             var tempId = Guid.NewGuid().ToString("N");
             var tempZipFile = Path.Combine(Path.GetTempPath(), $"openkh-{tempId}.zip");
@@ -22,11 +23,11 @@ namespace OpenKh.Tools.ModsManager.Services
             {
                 using (var zipOutput = File.Create(tempZipFile))
                 {
-                    using (var resp = await client.GetAsync(downloadZipUrl))
+                    using (var resp = await client.GetAsync(downloadZipUrl, cancellation))
                     {
                         var maxLen = resp.Content.Headers.ContentLength;
                         var zipInput = await resp.Content.ReadAsStreamAsync();
-                        await CopyToAsyncWithProgress(zipInput, zipOutput, maxLen, progress);
+                        await CopyToAsyncWithProgress(zipInput, zipOutput, maxLen, progress, cancellation);
                     }
                 }
             }
@@ -60,18 +61,18 @@ namespace OpenKh.Tools.ModsManager.Services
             );
         }
 
-        private async Task CopyToAsyncWithProgress(Stream input, Stream output, long? maxLen, Action<float> progress)
+        private async Task CopyToAsyncWithProgress(Stream input, Stream output, long? maxLen, Action<float> progress, CancellationToken cancellation)
         {
             byte[] buffer = new byte[8192];
             var totalTransferred = 0L;
             while (true)
             {
-                var read = await input.ReadAsync(buffer);
+                var read = await input.ReadAsync(buffer, cancellation);
                 if (read <= 0)
                 {
                     break;
                 }
-                await output.WriteAsync(buffer.AsMemory(0, read));
+                await output.WriteAsync(buffer.AsMemory(0, read), cancellation);
                 totalTransferred += read;
                 if (maxLen != null)
                 {

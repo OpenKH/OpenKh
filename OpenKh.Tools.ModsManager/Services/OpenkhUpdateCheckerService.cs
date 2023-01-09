@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenKh.Tools.ModsManager.Services
@@ -16,10 +17,19 @@ namespace OpenKh.Tools.ModsManager.Services
 
         private static readonly Regex _validTag = new Regex("^release2-(?<build>\\d+)$");
 
-        public async Task<CheckResult> CheckAsync()
+        public async Task<CheckResult> CheckAsync(CancellationToken cancellation)
         {
             var gitClient = new GitHubClient(new ProductHeaderValue("OpenKh.Tools.ModsManager"));
-            var releases = await gitClient.Repository.Release.GetAll("OpenKh", "OpenKh", new ApiOptions { PageCount = 1, PageSize = 10, StartPage = 1 });
+            var releases = await gitClient.Repository.Release.GetAll(
+                owner: "OpenKh",
+                name: "OpenKh",
+                options: new ApiOptions
+                {
+                    PageCount = 1,
+                    PageSize = 10,
+                    StartPage = 1
+                }
+            );
             var latestAssets = releases
                 .OrderByDescending(release => release.CreatedAt)
                 .Where(release => _validTag.IsMatch(release.TagName))
