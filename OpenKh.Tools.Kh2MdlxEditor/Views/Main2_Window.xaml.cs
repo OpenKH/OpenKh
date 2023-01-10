@@ -31,8 +31,8 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         // Opens the file that has been dropped on the window
         private void Window_Drop(object sender, DragEventArgs e)
         {
-            //try
-            //{
+            try
+            {
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -52,10 +52,10 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                         contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
                     }
                 }
-            //}
-            /*catch(Exception exc)
+            }
+            catch(Exception exc)
             {
-            }*/
+            }
         }
         private void Menu_SaveFile(object sender, EventArgs e)
         {
