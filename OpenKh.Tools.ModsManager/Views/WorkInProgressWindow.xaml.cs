@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Input;
 
 namespace OpenKh.Tools.ModsManager.Views
 {
@@ -13,11 +14,10 @@ namespace OpenKh.Tools.ModsManager.Views
         public record TViewModel(
             string DialogTitle,
             string OperationName,
-            string ModName,
             bool ProgressUnknown,
             float ProgressValue,
-            string ProgressText,
-            Action Cancel
+            ICommand Cancel,
+            bool CancelEnabled
         );
 
         public WorkInProgressWindow()
@@ -30,7 +30,7 @@ namespace OpenKh.Tools.ModsManager.Views
                     cancelEventArgs.Cancel = true;
                 }
 
-                ViewModel?.Cancel?.Invoke();
+                ViewModel?.Cancel?.Execute(null);
             };
         }
 

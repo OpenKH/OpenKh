@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Animation;
+using Xe.Tools.Wpf.Commands;
 
 namespace OpenKh.Tools.ModsManager.Services
 {
@@ -32,22 +33,27 @@ namespace OpenKh.Tools.ModsManager.Services
             Func<ProgressMonitor, Task<T>> yourService
         )
         {
-            var cancel = new CancellationTokenSource();
+            Action cancel = () => { };
             var vm = new WorkInProgressWindow.TViewModel(
                 DialogTitle: "OpenKh",
                 OperationName: "Work in progress",
-                ModName: "",
                 ProgressUnknown: true,
                 ProgressValue: 0f,
-                ProgressText: "Please wait",
-                Cancel: () => cancel.Cancel()
+                Cancel: new RelayCommand(
+                    _ =>
+                    {
+                        cancel();
+                    }
+                ),
+                CancelEnabled: true
             );
             var window = new WorkInProgressWindow() { ViewModel = vm, };
             window.Show();
+            var cancelSource = new CancellationTokenSource();
             var monitor = new ProgressMonitor(
                 SetTitle: title =>
                 {
-                    vm = vm with { ProgressText = title, };
+                    vm = vm with { OperationName = title, };
                     window.ViewModel = vm;
                 },
                 SetProgress: rate =>
@@ -55,8 +61,14 @@ namespace OpenKh.Tools.ModsManager.Services
                     vm = vm with { ProgressValue = rate, ProgressUnknown = false, };
                     window.ViewModel = vm;
                 },
-                Cancellation: cancel.Token
+                Cancellation: cancelSource.Token
             );
+            cancel = () =>
+            {
+                cancelSource.Cancel();
+                vm = vm with { CancelEnabled = false };
+                window.ViewModel = vm;
+            };
             try
             {
                 var result = await yourService(monitor);

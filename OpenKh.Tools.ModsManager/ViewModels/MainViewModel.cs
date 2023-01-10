@@ -858,8 +858,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             var checkResult = await progressWindowService.ShowAsync(
                 async monitor =>
                 {
-                    monitor.SetTitle("Checking update");
-                    return await new OpenkhUpdateCheckerService().CheckAsync(monitor.Cancellation);
+                    monitor.SetTitle("Checking update from github.com");
+                    var result = await new OpenkhUpdateCheckerService().CheckAsync(monitor.Cancellation);
+                    monitor.Cancellation.ThrowIfCancellationRequested();
+                    return result;
                 }
             );
             if (checkResult.HasUpdate)
@@ -873,7 +875,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     await progressWindowService.ShowAsync(
                         async monitor =>
                         {
-                            monitor.SetTitle("Downloading latest openkh.zip");
+                            monitor.SetTitle("Updating");
 
                             await new OpenkhUpdateProceederService().UpdateAsync(
                                 checkResult.DownloadZipUrl,

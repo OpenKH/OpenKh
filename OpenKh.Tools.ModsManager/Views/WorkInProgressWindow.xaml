@@ -9,10 +9,8 @@
     <StackPanel Margin="10">
         <TextBlock Margin="0 0 0 10" d:Text="Installing the mod XYZ">
             <Run Text="{Binding OperationName}"/> 
-            <Run FontWeight="Bold" Text="{Binding ModName}" d:Text="openkh/mod-template"/>
-            <Run>...</Run>
         </TextBlock>
         <ProgressBar Margin="0 0 0 10" Height="20" IsIndeterminate="{Binding ProgressUnknown}" Value="{Binding ProgressValue}" Maximum="1" d:IsIndeterminate="True" />
-        <TextBlock Text="{Binding ProgressText}" d:Text="Downloading file title1.png"/>
+        <Button HorizontalAlignment="Center" Command="{Binding Cancel}" IsEnabled="{Binding CancelEnabled}">Cancel</Button>
     </StackPanel>
 </Window>
