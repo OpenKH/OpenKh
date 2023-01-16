@@ -202,11 +202,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.MapGenUtils"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.AssimpUtils", "OpenKh.AssimpUtils\OpenKh.AssimpUtils.csproj", "{6EF1EA92-13A6-4B3D-A465-54B6C9319AC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.AnbMaker", "OpenKh.Command.AnbMaker\OpenKh.Command.AnbMaker.csproj", "{D1180437-8B35-4A18-8A08-425B876159B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.AnbMaker", "OpenKh.Command.AnbMaker\OpenKh.Command.AnbMaker.csproj", "{D1180437-8B35-4A18-8A08-425B876159B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Command.Bdxio", "OpenKh.Command.Bdxio\OpenKh.Command.Bdxio.csproj", "{F0A7BD0D-C717-45D5-9544-4C3AECC3740F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.Bdxio", "OpenKh.Command.Bdxio\OpenKh.Command.Bdxio.csproj", "{F0A7BD0D-C717-45D5-9544-4C3AECC3740F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.DeeperTree", "OpenKh.DeeperTree\OpenKh.DeeperTree.csproj", "{1D074EA4-9964-43EC-9389-7E60C2545C13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.DeeperTree", "OpenKh.DeeperTree\OpenKh.DeeperTree.csproj", "{1D074EA4-9964-43EC-9389-7E60C2545C13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenKh.Tools.ImageViewer.Tests", "OpenKh.Tools.ImageViewer.Tests\OpenKh.Tools.ImageViewer.Tests.csproj", "{1BA98068-E0F2-4131-8BCF-58E38B72EB0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -828,6 +830,14 @@ Global
 		{1D074EA4-9964-43EC-9389-7E60C2545C13}.Debug|x64.Build.0 = Debug|Any CPU
 		{1D074EA4-9964-43EC-9389-7E60C2545C13}.Release|x64.ActiveCfg = Release|Any CPU
 		{1D074EA4-9964-43EC-9389-7E60C2545C13}.Release|x64.Build.0 = Release|Any CPU
+		{1BA98068-E0F2-4131-8BCF-58E38B72EB0D}..NET Debug|x64.ActiveCfg = Debug|Any CPU
+		{1BA98068-E0F2-4131-8BCF-58E38B72EB0D}..NET Debug|x64.Build.0 = Debug|Any CPU
+		{1BA98068-E0F2-4131-8BCF-58E38B72EB0D}..NET Release|x64.ActiveCfg = Release|Any CPU
+		{1BA98068-E0F2-4131-8BCF-58E38B72EB0D}..NET Release|x64.Build.0 = Release|Any CPU
+		{1BA98068-E0F2-4131-8BCF-58E38B72EB0D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1BA98068-E0F2-4131-8BCF-58E38B72EB0D}.Debug|x64.Build.0 = Debug|Any CPU
+		{1BA98068-E0F2-4131-8BCF-58E38B72EB0D}.Release|x64.ActiveCfg = Release|Any CPU
+		{1BA98068-E0F2-4131-8BCF-58E38B72EB0D}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -915,6 +925,7 @@ Global
 		{D1180437-8B35-4A18-8A08-425B876159B2} = {9C52D787-9819-4B89-989B-EEA6FEB20731}
 		{F0A7BD0D-C717-45D5-9544-4C3AECC3740F} = {9C52D787-9819-4B89-989B-EEA6FEB20731}
 		{1D074EA4-9964-43EC-9389-7E60C2545C13} = {0FB7CD6A-EE31-467D-A590-267DCD028618}
+		{1BA98068-E0F2-4131-8BCF-58E38B72EB0D} = {402B2669-D594-4DFA-965B-02A92626ADC6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DF3960B-4FE5-4E56-92D4-2FC0A912E823}
