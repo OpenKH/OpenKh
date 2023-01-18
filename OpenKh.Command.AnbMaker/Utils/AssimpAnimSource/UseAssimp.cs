@@ -19,7 +19,8 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
             string meshName,
             string rootName,
             string animationName,
-            float nodeScaling
+            float nodeScaling,
+            float positionScaling
         )
         {
             var outputList = new List<BasicSourceMotion>();
@@ -41,7 +42,7 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
             foreach (var fbxMesh in scene.Meshes.Where(mesh => IsMeshNameMatched(mesh.Name)))
             {
                 var fbxArmatureRoot = scene.RootNode.FindNode(rootName ?? "bone000"); //"kh_sk"
-                var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot);
+                var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot, fbxMesh);
                 var fbxArmatureBoneCount = fbxArmatureNodes.Length;
 
                 foreach (var fbxAnim in scene.Animations.Where(anim => IsAnimationNameMatched(anim.Name)))
@@ -59,6 +60,7 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
                         TicksPerSecond = (float)fbxAnim.TicksPerSecond,
                         BoneCount = fbxArmatureBoneCount,
                         NodeScaling = nodeScaling,
+                        PositionScaling = positionScaling,
                         GetAChannel = boneIdx =>
                         {
                             var name = fbxArmatureNodes[boneIdx].ArmatureNode.Name;

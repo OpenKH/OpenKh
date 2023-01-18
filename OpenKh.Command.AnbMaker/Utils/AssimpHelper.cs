@@ -10,12 +10,15 @@ namespace OpenKh.Command.AnbMaker.Utils
 {
     internal class AssimpHelper
     {
-        public static NodeRef[] FlattenNodes(Node topNode)
+        public static NodeRef[] FlattenNodes(Node topNode, Mesh mesh)
         {
+            var boneDict = mesh.Bones
+                .ToDictionary(bone => bone.Name, bone => bone);
+
             var list = new List<NodeRef>();
 
             var stack = new Stack<NodeRef>();
-            stack.Push(new NodeRef(-1, topNode));
+            stack.Push(new NodeRef(-1, topNode, boneDict[topNode.Name]));
 
             while (stack.Any())
             {
@@ -25,7 +28,7 @@ namespace OpenKh.Command.AnbMaker.Utils
 
                 foreach (var sub in nodeRef.ArmatureNode.Children.Reverse())
                 {
-                    stack.Push(new NodeRef(idx, sub));
+                    stack.Push(new NodeRef(idx, sub, boneDict[topNode.Name]));
                 }
             }
 

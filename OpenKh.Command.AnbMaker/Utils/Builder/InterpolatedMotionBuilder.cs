@@ -93,7 +93,7 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
 
                     float FixPos(float value)
                     {
-                        return value / ((boneIdx == 0) ? 1 : parm.NodeScaling);
+                        return value / ((boneIdx == 0) ? 1 : parm.NodeScaling) * parm.PositionScaling;
                     }
 
                     float FixPosValue(float value) => GetLowerPrecisionValue(FixPos(value));
