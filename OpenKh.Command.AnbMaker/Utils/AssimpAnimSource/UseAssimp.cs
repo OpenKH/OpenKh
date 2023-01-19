@@ -43,7 +43,7 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
 
             foreach (var fbxMesh in scene.Meshes.Where(mesh => IsMeshNameMatched(mesh.Name)))
             {
-                var fbxArmatureRoot = scene.RootNode.FindNode(rootName ?? "bone000"); //"kh_sk"
+                var fbxArmatureRoot = AssimpHelper.FindRootBone(scene.RootNode, rootName);
                 var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot, fbxMesh);
                 var fbxArmatureBoneCount = fbxArmatureNodes.Length;
 

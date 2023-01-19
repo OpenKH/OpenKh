@@ -161,7 +161,7 @@ namespace OpenKh.Command.AnbMaker.Commands
 
                 foreach (var hit in hits.Take(1))
                 {
-                    var fbxArmatureRoot = scene.RootNode.FindNode(rootName ?? "bone000"); //"kh_sk"
+                    var fbxArmatureRoot = AssimpHelper.FindRootBone(scene.RootNode, rootName);
                     var fbxArmatureNodes = AssimpHelper.FlattenNodes(fbxArmatureRoot, hit.mesh);
                     var fbxArmatureBoneCount = fbxArmatureNodes.Length;
 

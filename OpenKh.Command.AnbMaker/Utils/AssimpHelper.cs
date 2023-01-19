@@ -34,5 +34,36 @@ namespace OpenKh.Command.AnbMaker.Utils
 
             return list.ToArray();
         }
+
+        public static Node FindRootBone(Node rootNode, string rootName)
+        {
+            rootName = rootName ?? "bone000";
+
+            var found = rootNode.FindNode(rootName);
+            if (found == null)
+            {
+                static string DumpTree(Node target)
+                {
+                    var writer = new StringWriter();
+
+                    void VisitNode(Node at, int depth)
+                    {
+                        writer.WriteLine($"{new string(' ', 2 * depth)}- {at.Name}");
+
+                        foreach (var child in at.Children)
+                        {
+                            VisitNode(child, depth + 1);
+                        }
+                    }
+
+                    VisitNode(target, 0);
+
+                    return writer.ToString();
+                }
+
+                throw new Exception($"Find node by name \"{rootName}\" not found. It can be one of the following node name:\n\n{DumpTree(rootNode)}");
+            }
+            return found;
+        }
     }
 }
