@@ -42,7 +42,7 @@ namespace OpenKh.Command.AnbMaker.Commands
         [Option(Description = "apply scaling to each source node", ShortName = "x", LongName = "node-scaling")]
         public float NodeScaling { get; set; } = 1;
 
-        [Option(Description = "apply scaling to bone position", ShortName = "p", LongName = "position-scaling")]
+        [Option(Description = "apply scaling to each bone position", ShortName = "p", LongName = "position-scaling")]
         public float PositionScaling { get; set; } = 1;
 
         [Option(Description = "optionally inject new motion into mset directly", ShortName = "w")]

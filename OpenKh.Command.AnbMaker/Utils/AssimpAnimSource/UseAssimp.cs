@@ -1,3 +1,4 @@
+using Assimp;
 using OpenKh.Command.AnbMaker.Extensions;
 using OpenKh.Command.AnbMaker.Utils.Builder;
 using OpenKh.Command.AnbMaker.Utils.Builder.Models;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
 {
@@ -63,7 +65,8 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
                         PositionScaling = positionScaling,
                         GetAChannel = boneIdx =>
                         {
-                            var name = fbxArmatureNodes[boneIdx].ArmatureNode.Name;
+                            var armatureNode = fbxArmatureNodes[boneIdx].ArmatureNode;
+                            var name = armatureNode.Name;
                             var hit = fbxAnim.NodeAnimationChannels.FirstOrDefault(it => it.NodeName == name);
                             if (hit != null)
                             {
@@ -126,6 +129,11 @@ namespace OpenKh.Command.AnbMaker.Utils.AssimpAnimSource
                                 }
                             )
                             .ToArray(),
+                        GetInitialMatrix = (boneIdx) =>
+                        {
+                            return fbxArmatureNodes[boneIdx].ArmatureNode.Transform
+                                .ToDotNetMatrix4x4();
+                        },
                     };
 
                     outputList.Add(output);
