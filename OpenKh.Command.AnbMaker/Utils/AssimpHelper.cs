@@ -1,4 +1,5 @@
 using Assimp;
+using NLog;
 using OpenKh.Command.AnbMaker.Utils.AssimpSupplemental;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace OpenKh.Command.AnbMaker.Utils
     {
         public static NodeRef[] FlattenNodes(Node topNode, Mesh mesh)
         {
+            var logger = LogManager.GetLogger("FlattenNodes");
+
             var boneDict = mesh.Bones
                 .ToDictionary(bone => bone.Name, bone => bone);
 
@@ -28,7 +31,14 @@ namespace OpenKh.Command.AnbMaker.Utils
 
                 foreach (var sub in nodeRef.ArmatureNode.Children.Reverse())
                 {
-                    stack.Push(new NodeRef(idx, sub, boneDict[topNode.Name]));
+                    if (boneDict.TryGetValue(sub.Name, out Bone? meshBone) && meshBone != null)
+                    {
+                        stack.Push(new NodeRef(idx, sub, meshBone));
+                    }
+                    else
+                    {
+                        logger.Warn($"Node '{sub.Name}' does not belong to target mesh. Skipping.");
+                    }
                 }
             }
 

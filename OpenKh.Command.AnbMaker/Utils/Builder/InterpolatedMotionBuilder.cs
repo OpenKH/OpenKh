@@ -33,6 +33,9 @@ namespace OpenKh.Command.AnbMaker.Utils.Builder
             // convert source animation's keyTime to KH2 internal frame rate 60 fps which is called GFR (Global Frame Rate)
             var keyTimeMultiplier = 60 / parm.TicksPerSecond;
 
+            logger.Info($"BoneCount {parm.BoneCount}");
+            logger.Debug($"Frame {0} to {frameCount - 1}, framesPerSecond {parm.TicksPerSecond}, consumes {frameCount * 1.0f / parm.TicksPerSecond:0.0} seconds");
+
             Ipm.InterpolatedMotionHeader.BoneCount = Convert.ToInt16(parm.BoneCount);
             Ipm.InterpolatedMotionHeader.TotalBoneCount = Convert.ToInt16(parm.BoneCount);
             Ipm.InterpolatedMotionHeader.FrameCount = (int)(frameCount * keyTimeMultiplier); // in 1/60 seconds
