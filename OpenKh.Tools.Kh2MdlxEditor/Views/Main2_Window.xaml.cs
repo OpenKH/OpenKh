@@ -46,6 +46,13 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                     {
                         replaceModel(firstFile);
                     }
+                    /*
+                    // TESTING
+                    else if (firstFile.ToLower().EndsWith(".png"))
+                    {
+                        ImageUtils.pngToImgd(firstFile);
+                        return;
+                    }*/
 
                     if(mainVM.ModelFile != null)
                     {
@@ -166,7 +173,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 ModelTexture.Texture texture = mainVM.TextureFile.Images[i];
                 BitmapSource bitmapImage = texture.GetBimapSource();
 
-                string fullPath = filePath + "Texture" + i;
+                string fullPath = filePath + "Texture" + i.ToString("D4");
                 string finalPath = fullPath;
                 int repeat = 0;
                 while (File.Exists(finalPath))
@@ -183,7 +190,9 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         {
             Assimp.Scene scene = AssimpGeneric.getAssimpSceneFromFile(filePath);
 
-            mainVM.ModelFile = MdlxEditorImporter.replaceMeshModelSkeletal(scene, mainVM.ModelFile);
+            mainVM.TextureFile = MdlxEditorImporter.createModelTexture(scene, filePath);
+
+            mainVM.ModelFile = MdlxEditorImporter.replaceMeshModelSkeletal(scene, mainVM.ModelFile, filePath);
         }
     }
 }

@@ -1,12 +1,11 @@
 using OpenKh.AssimpUtils;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
 using OpenKh.Kh2.Models.VIF;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 {
@@ -16,7 +15,43 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
         private static bool KEEP_ORIGINAL_SHADOW = false;
         private static bool KEEP_ORIGINAL_SKELETON = true;
 
-        public static ModelSkeletal replaceMeshModelSkeletal(Assimp.Scene scene, ModelSkeletal oldModel)
+        public static Dictionary<int,int> materialToTexture = null;
+        public static ModelTexture createModelTexture(Assimp.Scene scene, string filePath)
+        {
+            materialToTexture = new Dictionary<int, int>();
+
+            string directoryPath = Path.GetDirectoryName(filePath);
+
+            List<Imgd> imgdList = new List<Imgd>();
+
+            // Note: Some materials may share a texture
+            int uniqueTextureCount = 0;
+            List<string> materialPaths = new List<string>();
+            for(int i = 0; i < scene.Materials.Count; i++)
+            {
+                string texturePath = directoryPath + "\\" + scene.Materials[i].TextureDiffuse.FilePath + ".png";
+                if (materialPaths.Contains(texturePath))
+                {
+                    materialToTexture.Add(i, materialPaths.IndexOf(texturePath));
+                }
+                else
+                {
+                    materialToTexture.Add(i, uniqueTextureCount);
+                    uniqueTextureCount++;
+                    materialPaths.Add(texturePath);
+                    imgdList.Add(ImageUtils.pngToImgd(texturePath));
+                }
+            }
+
+            // A write-read is necessary to reload the texture data
+            ModelTexture modTex = new ModelTexture(imgdList.ToArray());
+            Stream tempStream = new MemoryStream();
+            modTex.Write(tempStream);
+
+            return ModelTexture.Read(tempStream);
+        }
+
+        public static ModelSkeletal replaceMeshModelSkeletal(Assimp.Scene scene, ModelSkeletal oldModel, string filePath)
         {
             ModelSkeletal model = new ModelSkeletal();
 
@@ -56,6 +91,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 
                 // TEST
                 ModelSkeletal.SkeletalGroup group = VifProcessor.getSkeletalGroup(dmaVifPackets, (uint)mesh.MaterialIndex, baseAddress);
+                group.Header.TextureIndex = (uint)materialToTexture[mesh.MaterialIndex];
 
                 model.Groups.Add(group);
 
