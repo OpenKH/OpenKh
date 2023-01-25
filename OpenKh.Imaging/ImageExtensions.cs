@@ -14,6 +14,8 @@ namespace OpenKh.Imaging
                 case PixelFormat.Indexed8:
                     return ImageDataHelpers.FromIndexed8ToBitmap32(imageRead.GetData(), imageRead.GetClut(),
                         ImageDataHelpers.RGBA);
+                case PixelFormat.Rgb888:
+                    return ImageDataHelpers.FromRgb888ToBgra32(imageRead.GetData());
                 case PixelFormat.Rgba8888:
                     return imageRead.GetData();
                 default:
