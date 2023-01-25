@@ -1,16 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <!-- for NJsonSchema. See https://github.com/RicoSuter/NJsonSchema/wiki/XML-Documentation -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- Suppress: warning CS1591: Missing XML comment for publicly visible type or member '...' -->
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
-    <PackageReference Include="NLog" Version="4.7.7" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
+    <PackageReference Include="NLog" Version="5.1.1" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
-    <PackageReference Include="YamlDotNet" Version="9.1.4" />
+    <PackageReference Include="YamlDotNet" Version="12.3.1" />
   </ItemGroup>
 
   <ItemGroup>

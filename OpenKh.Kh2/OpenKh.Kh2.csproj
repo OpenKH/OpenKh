@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-      <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
+      <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
       <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -14,13 +14,24 @@
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
     <ProjectReference Include="..\OpenKh.Imaging\OpenKh.Imaging.csproj" />
+    <ProjectReference Include="..\OpenKh.Ps2\OpenKh.Ps2.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe\Xe.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="CodeGenerators\Core.t4">
+      <Generator></Generator>
+    </None>
+    <None Update="CodeGenerators\CodeGen.tt">
+      <Generator></Generator>
+    </None>
     <None Update="resources\kh2idx.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
 </Project>

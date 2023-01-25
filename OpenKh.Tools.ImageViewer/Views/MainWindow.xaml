@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:OpenKh.Tools.ImageViewer.Views"
         xmlns:xe="clr-namespace:Xe.Tools.Wpf.Controls;assembly=Xe.Tools.Wpf"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="450" Width="600">
+        AllowDrop="True"
+        Title="{Binding Title}" Height="450" Width="600" Drop="DropAction">
     <Window.Resources>
         <Thickness x:Key="LabelMargin" Left="0" Top="0" Right="5" Bottom="0" />
     </Window.Resources>

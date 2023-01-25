@@ -5,7 +5,7 @@ using System.Windows;
 using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Kh2.SystemData;
-using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Common.Wpf.Models;
 using OpenKh.Tools.Kh2SystemEditor.Extensions;
 using OpenKh.Tools.Kh2SystemEditor.Interfaces;
 using Xe.Tools;
@@ -61,7 +61,7 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             public ushort Slot  { get => Item.Slot; set => Item.Slot = value; }
             public short Picture  { get => Item.Picture; set => Item.Picture = value; }
             public byte Icon1  { get => Item.Icon1; set => Item.Icon1 = value; }
-            public byte Icon2  { get => Item.Icon1; set => Item.Icon1 = value; }
+            public byte Icon2  { get => Item.Icon2; set => Item.Icon2 = value; }
 
             public string IdText => $"{Id} (0x{Id:X})";
             public string Name { get => _messageProvider.GetString(Item.Name); set => _messageProvider.SetString(Item.Name, value); }
@@ -91,16 +91,16 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
         public ItemViewModel(IMessageProvider messageProvider) :
             this(messageProvider, new Item
             {
-                Items1 = new List<Item.Entry>(),
-                Items2 = new List<Item.Stat>()
+                Items = new List<Item.Entry>(),
+                Stats = new List<Item.Stat>()
             })
         { }
 
         private ItemViewModel(IMessageProvider messageProvider, Item item) :
-            this(messageProvider, item.Items1)
+            this(messageProvider, item.Items)
         {
             _messageProvider = messageProvider;
-            _item2 = item.Items2;
+            _item2 = item.Stats;
         }
 
         private ItemViewModel(IMessageProvider messageProvider, IEnumerable<Item.Entry> items) :
@@ -129,8 +129,8 @@ namespace OpenKh.Tools.Kh2SystemEditor.ViewModels
             var stream = new MemoryStream();
             new Item
             {
-                Items1 = UnfilteredItems.Select(x => x.Item).ToList(),
-                Items2 = _item2
+                Items = UnfilteredItems.Select(x => x.Item).ToList(),
+                Stats = _item2
             }.Write(stream);
 
             return stream;

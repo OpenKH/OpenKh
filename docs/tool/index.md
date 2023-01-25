@@ -1,7 +1,10 @@
-# OpenKH tools
+# OpenKH tools - Back to [Index](../index.md)
 
 As a preface before tools are listed, it is important to note that different tools will be marked as either "CLI.ToolName" or "GUI.ToolName". This is to distinguish whether a specific program uses the command line or terminal or a GUI. The primary difference between the two is one involves typing commands into a terminal while the other has fancy clickable buttons.
 If you have never used the command line before or have used it very little, fear not, for instructions for those tools will be equally as thorough as GUI instructions!
+
+## General
+[OpenKh.Tools.ModsManager](./GUI.ModsManager/index.md)
 
 ## Common formats
 
@@ -17,6 +20,7 @@ If you have never used the command line before or have used it very little, fear
 |[IDX](../kh2/file/type/idx.md) | [OpenKh.Tools.IdxImg](./CLI.IdxImg/index.md)
 |[msg/*](../kh2/file/type/msg.md) | OpenKh.Command.MsgTool
 |[msg/*](../kh2/file/type/msg.md) | [OpenKh.Tools.Kh2TextEditor](./GUI.Kh2TextEditor/index.md)
+|[AI](../kh2/file/type/ai.md) | [OpenKh.Command.Bdxio](./CLI.Bdxio/index.md)
 |[BAR](../kh2/file/type/bar.md) | OpenKh.Tools.BarEditor
 |[IMD](../kh2/file/type/image.md#imgd) | [OpenKh.Tools.ImageViewer](./GUI.ImageViewer/index.md)
 |[IMZ](../kh2/file/type/image.md#imgz) | [OpenKh.Tools.ImageViewer](./GUI.ImageViewer/index.md)
@@ -27,6 +31,7 @@ If you have never used the command line before or have used it very little, fear
 |[DOCT](../kh2/file/type/doct.md) | [OpenKh.Command.DoctChanger](./CLI.DoctChanger/index.md)
 |[COCT](../kh2/file/type/coct.md) | [OpenKh.Command.CoctChanger](./CLI.CoctChanger/index.md)
 |[MAP](../kh2/file/map.md) | [OpenKh.Command.MapGen](./CLI.MapGen/index.md)
+|[ANB](../kh2/file/anb/anb.md) | [OpenKh.Command.AnbMaker](./CLI.AnbMaker/index.md)
 |[00battle](../kh2/file/type/00battle.md) | OpenKh.Tools.LevelUpEditor
 |[00objentry](../kh2/file/type/00objentry.md) | OpenKh.Tools.ObjentryEditor
 |[00place](../kh2/file/type/place.md) | OpenKh.Tools.Kh2PlaceEditor

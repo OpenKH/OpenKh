@@ -1,16 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
+    <ProjectReference Include="..\OpenKh.Egs\OpenKh.Egs.csproj" />
+    <ProjectReference Include="..\OpenKh.Kh1\OpenKh.Kh1.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
   </ItemGroup>
 

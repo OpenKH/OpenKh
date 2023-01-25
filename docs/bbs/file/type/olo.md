@@ -7,21 +7,21 @@ This file controls what objects and how they're spawned in levels within [Kingdo
 | Offset | Type  | Description
 |--------|-------|---------------
 | 0x0     | char[4]  | File identifier, always `@OLO`.
-| 0x4     | ushort   | File version.
-| 0x6     | ushort   | Flag from [OLO Flags](###OLO-Flags)
-| 0x8     | uint     | Number of Objects to spawn.
-| 0xC     | uint     | Offset to the [Object Name](###Object-Name) section.
-| 0x10    | uint     | Number of file path addresses.
-| 0x14    | uint     | Offset to a list of [Path Name](###Path-Name) for **files**.
-| 0x18    | uint     | Number of Script name
-| 0x1C    | uint     | Offset to a list of [Path Name](###Path-Name) for **Scripts**.
-| 0x20    | uint     | Number of Mission labels.
-| 0x24    | uint     | Offset to the [Mission Name](###Mission-Name) definitions.
-| 0x28    | uint     | Number of Triggers.
-| 0x2C    | uint     | Offset to the [Trigger Data](###Trigger-Data) definitions.
-| 0x30    | uint     | Number of Group data.
-| 0x34    | uint     | Offset to the [Group Data](###Group-Data) definitions.
-| 0x38    | uint[2]  | Padding.
+| 0x4     | uint16   | File version.
+| 0x6     | uint16   | Flag from [OLO Flags](###OLO-Flags)
+| 0x8     | uint32     | Number of Objects to spawn.
+| 0xC     | uint32     | Offset to the [Object Name](###Object-Name) section.
+| 0x10    | uint32     | Number of file path addresses.
+| 0x14    | uint32     | Offset to a list of [Path Name](###Path-Name) for **files**.
+| 0x18    | uint32     | Number of Script name
+| 0x1C    | uint32     | Offset to a list of [Path Name](###Path-Name) for **Scripts**.32
+| 0x20    | uint32     | Number of Mission labels.
+| 0x24    | uint32     | Offset to the [Mission Name](###Mission-Name) definitions.
+| 0x28    | uint32     | Number of Triggers.
+| 0x2C    | uint32     | Offset to the [Trigger Data](###Trigger-Data) definitions.
+| 0x30    | uint32     | Number of Group data.
+| 0x34    | uint32     | Offset to the [Group Data](###Group-Data) definitions.
+| 0x38    | uint32[2]  | Padding.
 
 ### **OLO Flags**
 
@@ -62,11 +62,12 @@ OLO Flags is a bitfield.
 |--------|-------|------------
 | 0x0    | Vector3  | Trigger location.
 | 0xC    | Vector3  | Trigger scale.
-| 0x18   | uint  | Trigger ID. (uiID)
-| 0x1C   | uint  | [Trigger Behavior](###Trigger-Behavior)
-| 0x20   | ushort[2]  | Unknown Parameters
-| 0x24   | uint  | ID of CTD file to load
-| 0x28   | uint  | Possibly a reference to [Trigger Type](###Trigger-Type) (Game Trigger)
+| 0x18   | uint32  | Trigger ID. (uiID)
+| 0x1C   | uint32  | [Trigger Behavior](###Trigger-Behavior)
+| 0x20   | uint16  | Parameter 1 (Room to Teleport to)
+| 0x22   | uint16  | Parameter 2 (Room Entrance to use)
+| 0x24   | uint32  | ID of CTD file to load
+| 0x28   | uint32  | Possibly a reference to [Trigger Type](###Trigger-Type) (Game Trigger)
 | 0x2C   | float  | Yaw rotation.
 
 ### Trigger Behavior
@@ -105,16 +106,16 @@ OLO Flags is a bitfield.
 |--------|-------|------------
 | 0x0    | Vector3 | Object center location.
 | 0xC    | float | Radius of object.
-| 0x10   | uint | ID of the Trigger associated
-| 0x14   | uint | [Group Flag](###Group-Flag)
+| 0x10   | uint32 | ID of the Trigger associated
+| 0x14   | uint32 | [Group Flag](###Group-Flag)
 | 0x18   | float | Appear Parameter
-| 0x1C   | uint | Offset to Group Data (?)
+| 0x1C   | uint32 | Offset to Group Data (?)
 | 0x20   | float | Dead Rate
-| 0x24   | ushort | Game Trigger
+| 0x24   | uint16 | Game Trigger
 | 0x26   | uint8 | Mission Parameter
 | 0x27   | uint8 | Unknown Parameter
-| 0x28   | uint | Number of Layout Object Data entities.
-| 0x2A   | uint | Offset to the [Layout Data](###Layout-Data).
+| 0x28   | uint32 | Number of Layout Object Data entities.
+| 0x2C   | uint32 | Offset to the [Layout Data](###Layout-Data).
 
 ### Group Flag
 
@@ -128,8 +129,8 @@ OLO Flags is a bitfield.
 | 11    | 1  | Fire
 | 12    | 8  | ID
 | 20    | 1  | Specified
-| 21    | 1  | Game Trigger to Fire
-| 22    | 1  | Mission to Fire
+| 21    | 1  | Game Trigger Fire
+| 22    | 1  | Mission Fire
 | 23    | 1  | All Dead No Appear
 | 24    | 5  | Group ID
 | 29    | 3  | Padding
@@ -147,20 +148,24 @@ OLO Flags is a bitfield.
 
 | Offset | Type  | Description
 |--------|-------|------------
-| 0x0    | char[16] | Object Name
-| 0x10   | Vector3 | Position
-| 0x1C   | Vector3 | Rotation
-| 0x20   | float | Height
-| 0x24   | uint | [Layout Info](###Layout-Info)
-| 0x28   | uint | Unique ID
-| 0x2C   | ushort | Parameter 5
-| 0x2E   | ushort | Parameter 6
-| 0x30   | ushort | Parameter 7
-| 0x32   | ushort | Parameter 8
-| 0x34   | uint | Message ID
-| 0x38   | char[32] | Path Name
-| 0x58   | char[32] | Script Name
-| 0x78   | char[16] | Mission Label
+| 0x0    | uint32 | Object Name
+| 0x4    | Vector3 | Position
+| 0x10   | Vector3 | Rotation
+| 0x1C   | float | Height
+| 0x20   | uint32 | [Layout Info](###Layout-Info)
+| 0x24   | uint32 | Unique ID
+| 0x28   | uint16 | Parameter 1 (Reward ID for [Sticker](itc.md) & [Chest](itb.md))
+| 0x2A   | uint16 | Parameter 2 (Controls effect spawns)
+| 0x2C   | uint16 | Parameter 3
+| 0x2E   | uint16 | Trigger
+| 0x30   | float | Parameter 5
+| 0x34   | float | Parameter 6
+| 0x38   | float | Parameter 7
+| 0x3C   | float | Parameter 8
+| 0x40   | int32 | Message ID
+| 0x44   | uint32 | Path Name
+| 0x48   | uint32 | Script Name
+| 0x4C   | uint32 | Mission Label
 
  ### Layout Info
 

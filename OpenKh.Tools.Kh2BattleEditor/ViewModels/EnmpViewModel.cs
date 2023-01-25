@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
-using OpenKh.Tools.Common.Models;
+using OpenKh.Tools.Common.Wpf.Models;
 using OpenKh.Tools.Kh2BattleEditor.Extensions;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
 using OpenKh.Tools.Kh2BattleEditor.Services;
@@ -26,20 +26,20 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
 
             public string Id => $"{Enmp.Id:X02}";
 
-            public short Level { get => Enmp.Level; set => Enmp.Level = value; }
+            public ushort Level { get => Enmp.Level; set => Enmp.Level = value; }
             public short Health { get => Enmp.Health[0]; set => Enmp.Health[0] = value; }
-            public short Unknown44 { get => Enmp.Unknown44; set => Enmp.Unknown44 = value; }
-            public short Unknown46 { get => Enmp.Unknown46; set => Enmp.Unknown46 = value; }
-            public short PhysicalWeakness { get => Enmp.PhysicalWeakness; set => Enmp.PhysicalWeakness = value; }
-            public short FireWeakness { get => Enmp.FireWeakness; set => Enmp.FireWeakness = value; }
-            public short IceWeakness { get => Enmp.IceWeakness; set => Enmp.IceWeakness = value; }
-            public short ThunderWeakness { get => Enmp.ThunderWeakness; set => Enmp.ThunderWeakness = value; }
-            public short DarkWeakness { get => Enmp.DarkWeakness; set => Enmp.DarkWeakness = value; }
-            public short Unknown52 { get => Enmp.Unknown52; set => Enmp.Unknown52 = value; }
-            public short ReflectWeakness { get => Enmp.ReflectWeakness; set => Enmp.ReflectWeakness = value; }
-            public short Unknown56 { get => Enmp.Unknown56; set => Enmp.Unknown56 = value; }
-            public short Unknown58 { get => Enmp.Unknown58; set => Enmp.Unknown58 = value; }
-            public short Unknown5a { get => Enmp.Unknown5a; set => Enmp.Unknown5a = value; }
+            public ushort MaxDamage { get => Enmp.MaxDamage; set => Enmp.MaxDamage = value; }
+            public ushort MinDamage { get => Enmp.MinDamage; set => Enmp.MinDamage = value; }
+            public ushort PhysicalWeakness { get => Enmp.PhysicalWeakness; set => Enmp.PhysicalWeakness = value; }
+            public ushort FireWeakness { get => Enmp.FireWeakness; set => Enmp.FireWeakness = value; }
+            public ushort IceWeakness { get => Enmp.IceWeakness; set => Enmp.IceWeakness = value; }
+            public ushort ThunderWeakness { get => Enmp.ThunderWeakness; set => Enmp.ThunderWeakness = value; }
+            public ushort DarkWeakness { get => Enmp.DarkWeakness; set => Enmp.DarkWeakness = value; }
+            public ushort LightWeakness { get => Enmp.LightWeakness; set => Enmp.LightWeakness = value; }
+            public ushort GeneralWeakness { get => Enmp.GeneralWeakness; set => Enmp.GeneralWeakness = value; }
+            public ushort Experience { get => Enmp.Experience; set => Enmp.Experience = value; }
+            public ushort Prize { get => Enmp.Prize; set => Enmp.Prize = value; }
+            public ushort BonusLevel { get => Enmp.BonusLevel; set => Enmp.BonusLevel = value; }
 
             public override string ToString() => Name;
         }

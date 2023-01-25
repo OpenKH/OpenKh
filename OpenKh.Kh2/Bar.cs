@@ -19,9 +19,9 @@ namespace OpenKh.Kh2
             [EntryType.ModelTexture] = 0x80,
             [EntryType.Motion] = 0x10,
             [EntryType.Tim2] = 0x40,
-            [EntryType.CameraCollision] = 0x10,
-            [EntryType.MapCollision] = 0x10,
-            [EntryType.LightData] = 0x10,
+            [EntryType.CameraOctalTree] = 0x10,
+            [EntryType.CollisionOctalTree] = 0x10,
+            [EntryType.ColorOctalTree] = 0x10,
             [EntryType.Anb] = 0x10,
             [EntryType.Pax] = 0x10,
             [EntryType.MapCollision2] = 0x10,
@@ -51,17 +51,17 @@ namespace OpenKh.Kh2
 			List = 2,
 			Bdx = 3,
 			Model = 4,
-            MeshOcclusion = 5,
-            MapCollision = 6,
+            DrawOctalTree = 5,
+            CollisionOctalTree = 6,
 			ModelTexture = 7,
 			Dpx = 8,
 			Motion = 9,
 			Tim2 = 10,
-            CameraCollision = 11,
+            CameraOctalTree = 11,
             AreaDataSpawn = 12,
             AreaDataScript = 13,
             FogColor = 14,
-            LightData = 15,
+            ColorOctalTree = 15,
             MotionTriggers = 16,
 			Anb = 17,
 			Pax = 18,
@@ -262,7 +262,7 @@ namespace OpenKh.Kh2
         }
 
         public static bool IsValid(Stream stream) =>
-            stream.Length >= 4 && new BinaryReader(stream).PeekInt32() == MagicCode;
+            stream.Length >= 4 && stream.PeekInt32() == MagicCode;
 
     }
 }

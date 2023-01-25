@@ -1,6 +1,6 @@
 using OpenKh.Bbs;
 using OpenKh.Common;
-using OpenKh.Tools.Common;
+using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.CtdEditor.Interfaces;
 using OpenKh.Tools.CtdEditor.Views;
 using System;

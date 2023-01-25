@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <UseWPF>true</UseWPF>
     <AssemblyTitle>KH2 Battle editor</AssemblyTitle>
     <Product>KH2 Battle editor - OpenKH</Product>
@@ -11,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common.WPF\OpenKh.Tools.Common.Wpf.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />

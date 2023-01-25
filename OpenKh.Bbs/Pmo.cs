@@ -1,6 +1,6 @@
 using OpenKh.Common;
 using OpenKh.Imaging;
-using OpenKh.Common.Utils;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +12,11 @@ namespace OpenKh.Bbs
 {
     public class Pmo
     {
+        private static readonly IBinaryMapping Mapping =
+           MappingConfiguration.DefaultConfiguration()
+               .ForTypeMatrix4x4()
+               .Build();
+
         private const UInt32 MagicCode = 0x4F4D50;
 
         public class Header
@@ -20,9 +25,10 @@ namespace OpenKh.Bbs
             [Data] public byte Number { get; set; }
             [Data] public byte Group { get; set; }
             [Data] public byte Version { get; set; }
-            [Data] public byte Padding { get; set; }
-            [Data] public ushort TextureCount { get; set; }
-            [Data] public ushort Unk0A { get; set; }
+            [Data] public byte Padding1 { get; set; }
+            [Data] public byte TextureCount { get; set; }
+            [Data] public byte Padding2 { get; set; }
+            [Data] public ushort Flag { get; set; }
             [Data] public UInt32 SkeletonOffset { get; set; }
             [Data] public UInt32 MeshOffset0 { get; set; }
             [Data] public ushort TriangleCount { get; set; }
@@ -95,9 +101,10 @@ namespace OpenKh.Bbs
             [Data] public ushort Padding2 { get; set; }
             [Data] public ushort SkinnedBoneIndex { get; set; }
             [Data] public ushort Padding3 { get; set; }
+            [Data] public uint Padding4 { get; set; }
             [Data(Count = 16)] public string JointName { get; set; }
-            [Data(Count = 16)] public float[] Transform { get; set; }
-            [Data(Count = 16)] public float[] InverseTransform { get; set; }
+            [Data] public Matrix4x4 Transform { get; set; }
+            [Data] public Matrix4x4 InverseTransform { get; set; }
         }
 
         public class MeshSectionOptional1
@@ -185,6 +192,12 @@ namespace OpenKh.Bbs
             return bit;
         }
 
+        public class WeightData
+        {
+            [Data] public CoordinateFormat coordFormart { get; set; }
+            [Data] public List<float> weights { get; set; }
+        }
+
         public class MeshChunks
         {
             [Data] public bool IsTextureOpaque { get; set; }
@@ -194,7 +207,7 @@ namespace OpenKh.Bbs
             [Data] public MeshSectionOptional2 SectionInfo_opt2 { get; set; }
             [Data] public UInt16[] TriangleStripValues { get; set; }
             [Data] public int TextureID { get; set; }
-            [Data] public List<float> jointWeights { get; set; }
+            [Data] public List<WeightData> jointWeights { get; set; }
             [Data] public List<Vector2> textureCoordinates { get; set; }
             [Data] public List<Vector4> colors { get; set; }
             [Data] public List<Vector3> vertices { get; set; }
@@ -206,7 +219,7 @@ namespace OpenKh.Bbs
                 MeshNumber = 0;
                 TriangleStripValues = new UInt16[0];
                 TextureID = 0;
-                jointWeights = new List<float>();
+                jointWeights = new List<WeightData>();
                 textureCoordinates = new List<Vector2>();
                 colors = new List<Vector4>();
                 vertices = new List<Vector3>();
@@ -231,14 +244,14 @@ namespace OpenKh.Bbs
 
         public static void ReadHeader(Stream stream, Pmo pmo)
         {
-            pmo.header = BinaryMapping.ReadObject<Header>(stream);
+            pmo.header = Mapping.ReadObject<Header>(stream);
         }
 
         public static void ReadTextureSection(Stream stream, Pmo pmo)
         {
             pmo.textureInfo = new TextureInfo[pmo.header.TextureCount];
             for (ushort i = 0; i < pmo.header.TextureCount; i++)
-                pmo.textureInfo[i] = BinaryMapping.ReadObject<TextureInfo>(stream);
+                pmo.textureInfo[i] = Mapping.ReadObject<TextureInfo>(stream);
         }
 
         public static void ReadMeshData(Stream stream, Pmo pmo, int MeshNumber = 0)
@@ -254,7 +267,7 @@ namespace OpenKh.Bbs
                 MeshChunks meshChunk = new MeshChunks();
                 meshChunk.MeshNumber = MeshNumber;
 
-                meshChunk.SectionInfo = BinaryMapping.ReadObject<MeshSection>(stream);
+                meshChunk.SectionInfo = Mapping.ReadObject<MeshSection>(stream);
 
                 // Exit if Vertex Count is zero.
                 if (meshChunk.SectionInfo.VertexCount <= 0)
@@ -266,9 +279,9 @@ namespace OpenKh.Bbs
                 bool isColorFlagRisen = flags.UniformDiffuseFlag;
 
                 if (pmo.header.SkeletonOffset != 0)
-                    meshChunk.SectionInfo_opt1 = BinaryMapping.ReadObject<MeshSectionOptional1>(stream);
+                    meshChunk.SectionInfo_opt1 = Mapping.ReadObject<MeshSectionOptional1>(stream);
                 if (isColorFlagRisen)
-                    meshChunk.SectionInfo_opt2 = BinaryMapping.ReadObject<MeshSectionOptional2>(stream);
+                    meshChunk.SectionInfo_opt2 = Mapping.ReadObject<MeshSectionOptional2>(stream);
                 if (meshChunk.SectionInfo.TriangleStripCount > 0)
                 {
                     meshChunk.TriangleStripValues = new UInt16[meshChunk.SectionInfo.TriangleStripCount];
@@ -338,25 +351,32 @@ namespace OpenKh.Bbs
                     long vertexStartPos = stream.Position;
                     int vertexIncreaseAmount = 0;
 
+                    // Vertex Weights.
                     if(pmo.header.SkeletonOffset != 0 && WeightFormat != CoordinateFormat.NO_VERTEX)
                     {
+                        WeightData WeightList = new WeightData();
+                        WeightList.weights = new List<float>();
+                        WeightList.coordFormart = WeightFormat;
+                        
                         for (int i = 0; i < (SkinningWeightsCount + 1); i++)
                         {
                             switch (WeightFormat)
                             {
                                 case CoordinateFormat.NORMALIZED_8_BITS:
-                                    meshChunk.jointWeights.Add(stream.ReadByte() / 127.0f);
+                                    WeightList.weights.Add(stream.ReadByte() / 128.0f);
                                     break;
                                 case CoordinateFormat.NORMALIZED_16_BITS:
-                                    meshChunk.jointWeights.Add(stream.ReadUInt16() / 32767.0f);
+                                    WeightList.weights.Add(stream.ReadUInt16() / 32768.0f);
                                     break;
                                 case CoordinateFormat.FLOAT_32_BITS:
-                                    meshChunk.jointWeights.Add(stream.ReadFloat());
+                                    WeightList.weights.Add(stream.ReadFloat());
                                     break;
                                 case CoordinateFormat.NO_VERTEX:
                                     break;
                             }
                         }
+
+                        meshChunk.jointWeights.Add(WeightList);
                     }
 
                     Vector2 currentTexCoord = new Vector2(0, 0);
@@ -364,16 +384,16 @@ namespace OpenKh.Bbs
                     switch (TexCoordFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            currentTexCoord.X = stream.ReadByte() / 127.0f;
-                            currentTexCoord.Y = stream.ReadByte() / 127.0f;
+                            currentTexCoord.X = stream.ReadByte() / 128.0f;
+                            currentTexCoord.Y = stream.ReadByte() / 128.0f;
                             meshChunk.textureCoordinates.Add(currentTexCoord);
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
                             vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
                             stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
 
-                            currentTexCoord.X = stream.ReadUInt16() / 32767.0f;
-                            currentTexCoord.Y = stream.ReadUInt16() / 32767.0f;
+                            currentTexCoord.X = stream.ReadUInt16() / 32768.0f;
+                            currentTexCoord.Y = stream.ReadUInt16() / 32768.0f;
                             meshChunk.textureCoordinates.Add(currentTexCoord);
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
@@ -389,31 +409,45 @@ namespace OpenKh.Bbs
                             break;
                     }
 
-                    switch (ColorFormat)
-                    {
-                        case Pmo.ColorFormat.NO_COLOR:
-                            meshChunk.colors.Add(new Vector4(0xFF, 0xFF, 0xFF, 0xFF));
-                            break;
-                        case Pmo.ColorFormat.BGR_5650_16BITS:
-                            stream.ReadUInt16();
-                            break;
-                        case Pmo.ColorFormat.ABGR_5551_16BITS:
-                            stream.ReadUInt16();
-                            break;
-                        case Pmo.ColorFormat.ABGR_4444_16BITS:
-                            stream.ReadUInt16();
-                            break;
-                        case Pmo.ColorFormat.ABGR_8888_32BITS:
-                            vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
-                            stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+                    Vector4 col;
 
-                            Vector4 col;
-                            col.X = stream.ReadByte();
-                            col.Y = stream.ReadByte();
-                            col.Z = stream.ReadByte();
-                            col.W = stream.ReadByte();
-                            meshChunk.colors.Add(col);
-                            break;
+                    if (isColorFlagRisen)
+                    {
+                        uint c = meshChunk.SectionInfo_opt2.DiffuseColor;
+                        col.X = c % 0x100;
+                        col.Y = (c >> 8) % 0x100;
+                        col.Z = (c >> 16) % 0x100;
+                        col.W = (c >> 24) % 0x100;
+
+                        meshChunk.colors.Add(col);
+                    }
+                    else
+                    {
+                        switch (ColorFormat)
+                        {
+                            case Pmo.ColorFormat.NO_COLOR:
+                                meshChunk.colors.Add(new Vector4(0xFF, 0xFF, 0xFF, 0xFF));
+                                break;
+                            case Pmo.ColorFormat.BGR_5650_16BITS:
+                                stream.ReadUInt16();
+                                break;
+                            case Pmo.ColorFormat.ABGR_5551_16BITS:
+                                stream.ReadUInt16();
+                                break;
+                            case Pmo.ColorFormat.ABGR_4444_16BITS:
+                                stream.ReadUInt16();
+                                break;
+                            case Pmo.ColorFormat.ABGR_8888_32BITS:
+                                vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
+                                stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
+
+                                col.X = stream.ReadByte();
+                                col.Y = stream.ReadByte();
+                                col.Z = stream.ReadByte();
+                                col.W = stream.ReadByte();
+                                meshChunk.colors.Add(col);
+                                break;
+                        }
                     }
 
                     Vector3 currentVertex;
@@ -422,18 +456,18 @@ namespace OpenKh.Bbs
                     switch (VertexPositionFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            currentVertex.X = r.ReadSByte() / 127.0f;
-                            currentVertex.Y = r.ReadSByte() / 127.0f;
-                            currentVertex.Z = r.ReadSByte() / 127.0f;
+                            currentVertex.X = r.ReadSByte() / 128.0f;
+                            currentVertex.Y = r.ReadSByte() / 128.0f;
+                            currentVertex.Z = r.ReadSByte() / 128.0f;
                             meshChunk.vertices.Add(currentVertex);
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
                             vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
                             stream.Seek(vertexIncreaseAmount, SeekOrigin.Current);
 
-                            currentVertex.X = (float)stream.ReadInt16() / 32767.0f;
-                            currentVertex.Y = (float)stream.ReadInt16() / 32767.0f;
-                            currentVertex.Z = (float)stream.ReadInt16() / 32767.0f;
+                            currentVertex.X = (float)stream.ReadInt16() / 32768.0f;
+                            currentVertex.Y = (float)stream.ReadInt16() / 32768.0f;
+                            currentVertex.Z = (float)stream.ReadInt16() / 32768.0f;
                             meshChunk.vertices.Add(currentVertex);
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
@@ -479,23 +513,26 @@ namespace OpenKh.Bbs
             // Read textures.
             for (int i = 0; i < pmo.textureInfo.Length; i++)
             {
-                stream.Seek(pmo.textureInfo[i].TextureOffset + 0x10, SeekOrigin.Begin);
-                uint tm2size = stream.ReadUInt32() + 0x10;
-                stream.Seek(pmo.textureInfo[i].TextureOffset, SeekOrigin.Begin);
-                Tm2 tm2 = Tm2.Read(stream, true).First();
+                if(pmo.textureInfo[i].TextureOffset != 0)
+                {
+                    stream.Seek(pmo.textureInfo[i].TextureOffset + 0x10, SeekOrigin.Begin);
+                    uint tm2size = stream.ReadUInt32() + 0x10;
+                    stream.Seek(pmo.textureInfo[i].TextureOffset, SeekOrigin.Begin);
+                    Tm2 tm2 = Tm2.Read(stream, true).First();
 
-                pmo.texturesData.Add(tm2);
+                    pmo.texturesData.Add(tm2);
+                }
             }
 
             // Read Skeleton.
             if(pmo.header.SkeletonOffset != 0)
             {
                 stream.Seek(pmo.PMO_StartPosition + pmo.header.SkeletonOffset, SeekOrigin.Begin);
-                pmo.skeletonHeader = BinaryMapping.ReadObject<SkeletonHeader>(stream);
+                pmo.skeletonHeader = Mapping.ReadObject<SkeletonHeader>(stream);
                 pmo.boneList = new BoneData[pmo.skeletonHeader.BoneCount];
                 for (int j = 0; j < pmo.skeletonHeader.BoneCount; j++)
                 {
-                    pmo.boneList[j] = BinaryMapping.ReadObject<BoneData>(stream);
+                    pmo.boneList[j] = Mapping.ReadObject<BoneData>(stream);
                 }
             }
 
@@ -513,25 +550,30 @@ namespace OpenKh.Bbs
             WriteTextureData(stream, pmo);
             WriteTextureOffsets(stream, pmo);
 
-            if (pmo.header.SkeletonOffset != 0)
+            if (pmo.boneList != null && pmo.boneList.Length > 0)
             {
+                stream.Seek(0, SeekOrigin.End);
+                pmo.header.SkeletonOffset = (uint)stream.Position;
+                stream.Seek(0xC, SeekOrigin.Begin);
+                stream.Write(pmo.header.SkeletonOffset);
+                stream.Seek(0, SeekOrigin.End);
                 stream.Seek(pmo.header.SkeletonOffset, SeekOrigin.Begin);
-                BinaryMapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
+                Mapping.WriteObject<SkeletonHeader>(stream, pmo.skeletonHeader);
 
                 for (int joint = 0; joint < pmo.boneList.Length; joint++)
                 {
-                    BinaryMapping.WriteObject<BoneData>(stream, pmo.boneList[joint]);
+                    Mapping.WriteObject<BoneData>(stream, pmo.boneList[joint]);
                 }
             }
         }
 
         public static void WriteHeaderData(Stream stream, Pmo pmo)
         {
-            BinaryMapping.WriteObject<Pmo.Header>(stream, pmo.header);
+            Mapping.WriteObject<Pmo.Header>(stream, pmo.header);
 
             for (int i = 0; i < pmo.header.TextureCount; i++)
             {
-                BinaryMapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
+                Mapping.WriteObject<Pmo.TextureInfo>(stream, pmo.textureInfo[i]);
             }
         }
 
@@ -577,11 +619,11 @@ namespace OpenKh.Bbs
 
                 MeshChunks chunk = pmo.Meshes[j];
 
-                BinaryMapping.WriteObject<Pmo.MeshSection>(stream, chunk.SectionInfo);
+                Mapping.WriteObject<Pmo.MeshSection>(stream, chunk.SectionInfo);
                 if (chunk.SectionInfo_opt1 != null)
-                    BinaryMapping.WriteObject<Pmo.MeshSectionOptional1>(stream, chunk.SectionInfo_opt1);
+                    Mapping.WriteObject<Pmo.MeshSectionOptional1>(stream, chunk.SectionInfo_opt1);
                 if (chunk.SectionInfo_opt2 != null)
-                    BinaryMapping.WriteObject<Pmo.MeshSectionOptional2>(stream, chunk.SectionInfo_opt2);
+                    Mapping.WriteObject<Pmo.MeshSectionOptional2>(stream, chunk.SectionInfo_opt2);
 
                 if (chunk.TriangleStripValues.Length > 0)
                 {
@@ -608,13 +650,13 @@ namespace OpenKh.Bbs
                             switch (flags.WeightFormat)
                             {
                                 case CoordinateFormat.NORMALIZED_8_BITS:
-                                    stream.Write((byte)(chunk.jointWeights[currentIndex] * 127.0f));
+                                    stream.Write((byte)(chunk.jointWeights[k].weights[currentIndex] * 127.0f));
                                     break;
                                 case CoordinateFormat.NORMALIZED_16_BITS:
-                                    stream.Write((byte)(chunk.jointWeights[currentIndex] * 32767.0f));
+                                    stream.Write((byte)(chunk.jointWeights[k].weights[currentIndex] * 32767.0f));
                                     break;
                                 case CoordinateFormat.FLOAT_32_BITS:
-                                    StreamExtensions.Write(stream, chunk.jointWeights[currentIndex]);
+                                    StreamExtensions.Write(stream, chunk.jointWeights[k].weights[currentIndex]);
                                     break;
                             }
                         }
@@ -624,16 +666,16 @@ namespace OpenKh.Bbs
                     switch (flags.TextureCoordinateFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            stream.Write((byte)(chunk.textureCoordinates[k].X * 127.0f));
-                            stream.Write((byte)(chunk.textureCoordinates[k].Y * 127.0f));
+                            stream.Write((byte)(chunk.textureCoordinates[k].X * 128.0f));
+                            stream.Write((byte)(chunk.textureCoordinates[k].Y * 128.0f));
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
                             vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
                             for (int a = 0; a < vertexIncreaseAmount; a++)
                                 stream.Write((byte)0xAB);
 
-                            stream.Write((ushort)(chunk.textureCoordinates[k].X * 32767.0f));
-                            stream.Write((ushort)(chunk.textureCoordinates[k].Y * 32767.0f));
+                            stream.Write((ushort)(chunk.textureCoordinates[k].X * 32768.0f));
+                            stream.Write((ushort)(chunk.textureCoordinates[k].Y * 32768.0f));
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
                             vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);
@@ -672,18 +714,18 @@ namespace OpenKh.Bbs
                     switch (flags.PositionFormat)
                     {
                         case CoordinateFormat.NORMALIZED_8_BITS:
-                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].X * 127.0f));
-                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Y * 127.0f));
-                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Z * 127.0f));
+                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].X * 128.0f));
+                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Y * 128.0f));
+                            StreamExtensions.Write(stream, (sbyte)(chunk.vertices[k].Z * 128.0f));
                             break;
                         case CoordinateFormat.NORMALIZED_16_BITS:
                             vertexIncreaseAmount = ((0x2 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x1)) & 0x1);
                             for (int a = 0; a < vertexIncreaseAmount; a++)
                                 stream.Write((byte)0xAB);
 
-                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].X * 32767.0f));
-                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Y * 32767.0f));
-                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Z * 32767.0f));
+                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].X * 32768.0f));
+                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Y * 32768.0f));
+                            StreamExtensions.Write(stream, (short)(chunk.vertices[k].Z * 32768.0f));
                             break;
                         case CoordinateFormat.FLOAT_32_BITS:
                             vertexIncreaseAmount = ((0x4 - (Convert.ToInt32(stream.Position - vertexStartPos) & 0x3)) & 0x3);

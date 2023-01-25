@@ -1,11 +1,16 @@
-﻿using System.Collections;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace OpenKh.Kh2
 {
-    public class IdxDictionary : IEnumerable<Idx.Entry>
+    public class IdxDictionary : ICollection<Idx.Entry>
     {
         private readonly Dictionary<long, Idx.Entry> _entries = new Dictionary<long, Idx.Entry>();
+
+        public int Count => _entries.Count;
+
+        public bool IsReadOnly => false;
 
         public IEnumerator<Idx.Entry> GetEnumerator() =>
             _entries.Values.GetEnumerator();
@@ -38,5 +43,32 @@ namespace OpenKh.Kh2
 
         internal static long GetHash(uint hash32, ushort hash16) =>
             hash32 | ((long)hash16 << 32);
+
+        public void Clear() => _entries.Clear();
+
+        public bool Contains(Idx.Entry item) => _entries.ContainsValue(item);
+
+        public void CopyTo(Idx.Entry[] array, int arrayIndex)
+        {
+            if (array.Length - arrayIndex > _entries.Count)
+                throw new ArgumentOutOfRangeException("The destination array is too small");
+
+            foreach (var entry in _entries)
+                array[arrayIndex++] = entry.Value;
+        }
+
+        public bool Remove(Idx.Entry item)
+        {
+            foreach (var entry in _entries)
+            {
+                if (entry.Value == item)
+                {
+                    _entries.Remove(entry.Key);
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

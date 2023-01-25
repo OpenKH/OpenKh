@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
+
+        <Folder Include="Codecs\" />
+        <Folder Include="Antlr4\" />
+    </ItemGroup>
+
+</Project>

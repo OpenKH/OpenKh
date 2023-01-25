@@ -6,11 +6,11 @@ on:
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v2
-      - uses: ahmadnassri/action-dependabot-auto-merge@v2
+      - uses: ahmadnassri/action-dependabot-auto-merge@v2.3.1
         with:
           target: minor
           approve: true
           command: squash and merge
-          github-token: ${{ secrets.DEPENDABOT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

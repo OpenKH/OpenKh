@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using OpenKh.Kh2;
 using System.IO;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace OpenKh.Tests.kh2
     public class MdlxTests
     {
         private const string FileName = "kh2/res/p_ex.vif";
-        private const string MapFileName = "kh2/res/map.vif";
+        private const string MapFileName = "kh2/res/map.model";
 
         [Fact]
         public void ShouldReadTheCorrectAmountOfSubModels() => File.OpenRead(FileName).Using(stream =>
@@ -79,7 +79,7 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ReadRemapTable() => File.OpenRead(MapFileName).Using(stream =>
         {
-            var remapTable = Mdlx.Read(stream).MapModel.DmaChainIndexRemapTable;
+            var remapTable = Mdlx.Read(stream).ModelBackground.DmaChainIndexRemapTable;
             Assert.Equal(97, remapTable.Count);
 
             Assert.Equal(0, remapTable[0]);
@@ -91,7 +91,7 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ReadRenderingGroup() => File.OpenRead(MapFileName).Using(stream =>
         {
-            var renderingGroup = Mdlx.Read(stream).MapModel.vifPacketRenderingGroup;
+            var renderingGroup = Mdlx.Read(stream).ModelBackground.vifPacketRenderingGroup;
             Assert.Equal(9, renderingGroup.Count);
 
             Assert.Equal(20, renderingGroup[0].Length);
@@ -106,7 +106,7 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ReadVifPackets() => File.OpenRead(MapFileName).Using(stream =>
         {
-            var alvifpkt = Mdlx.Read(stream).MapModel.VifPackets;
+            var alvifpkt = Mdlx.Read(stream).ModelBackground.Chunks;
             Assert.Equal(97, alvifpkt.Count);
 
             var packet1 = alvifpkt[0];

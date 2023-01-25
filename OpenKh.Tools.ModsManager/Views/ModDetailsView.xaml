@@ -1,0 +1,52 @@
+<UserControl x:Class="OpenKh.Tools.ModsManager.Views.ModDetailsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="256">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="textHyperlink" Color="#569CD6" />
+    </UserControl.Resources>
+    <StackPanel>
+        <TextBlock Margin="0 0 0 3" FontWeight="Bold" Text="{Binding Title}" d:Text="Mod title"/>
+        <StackPanel Visibility="{Binding SourceVisibility}">
+            <TextBlock Margin="0 0 0 3">
+                <Hyperlink NavigateUri="{Binding AuthorUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
+                    <TextBlock Text="{Binding Author}" Foreground="{DynamicResource textHyperlink}" d:Text="Author name"/>
+                </Hyperlink>
+            </TextBlock>
+            <StackPanel Visibility="{Binding UpdateVisibility}">
+                <TextBlock Margin="0 0 0 3">
+                <Run>The mod is </Run>
+                <Run Text="{Binding UpdateCount}"/>
+                <Run> updates behind.</Run>
+                </TextBlock>
+                <Button Margin="0 0 0 3" Content="Download updates" Command="{Binding UpdateCommand}"/>
+            </StackPanel>
+        </StackPanel>
+        <Image MaxWidth="256" MaxHeight="144" Margin="0 3 0 3" Source="{Binding PreviewImage}" Visibility="{Binding PreviewImageVisibility}"/>
+        <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" Text="{Binding Description}"/>
+        <StackPanel Visibility="{Binding SourceVisibility}">
+                <TextBlock Margin="0 0 0 3">
+                <Hyperlink NavigateUri="{Binding SourceUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
+                    <TextBlock Text="Mod source code" Foreground="{DynamicResource textHyperlink}"/>
+                </Hyperlink>
+            </TextBlock>
+            <TextBlock Margin="0 0 0 3">
+                <Hyperlink NavigateUri="{Binding ReportBugUrl}" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_RequestNavigate">
+                    <TextBlock Text="Report bug" Foreground="{DynamicResource textHyperlink}"/>
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+        <StackPanel Visibility="{Binding LocalVisibility}">
+            <TextBlock Margin="0 0 0 3" TextWrapping="Wrap" FontStyle="Italic">
+                This mod is available only locally and it is not linked to any GitHub repository.
+            </TextBlock>
+        </StackPanel>
+        <Expander Header="Files to patch">
+            <TextBlock Text="{Binding FilesToPatch}" TextWrapping="Wrap" d:Text="msg/jp/sys.bar"/>
+        </Expander>
+    </StackPanel>
+</UserControl>

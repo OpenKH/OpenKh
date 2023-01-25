@@ -12,6 +12,7 @@
 
 param (
     [string] $configuration = "Release",
+    [string] $sourceConfiguration = ".NET Release",
     [string] $verbosity = "minimal",
     [string] $output = "bin"
 )
@@ -23,7 +24,16 @@ function Test-Success([int] $exitCode) {
     if ($exitCode -ne 0) {
         Remove-Item $solution -ErrorAction Ignore
         Write-Error "Last command returned error $exitCode, therefore the build is canceled."
-        exit
+        exit $exitCode
+    }
+}
+
+function Get-CSProjects([string]$filter) {
+    Get-ChildItem -Filter $filter | ForEach-Object {
+        $csprojPath = (Join-Path $_.FullName $_.Name) + ".csproj"
+        if ( Test-Path -Path $csprojPath -PathType Leaf ) {
+            Write-Output $csprojPath
+        }
     }
 }
 
@@ -39,7 +49,7 @@ dotnet restore
 Test-Success $LASTEXITCODE
 
 # Run tests
-dotnet test --configuration $configuration --verbosity $verbosity
+dotnet test --configuration $sourceConfiguration --verbosity $verbosity
 Test-Success $LASTEXITCODE
 
 # Create temporary solution
@@ -47,25 +57,24 @@ dotnet new sln -n $solutionBase --force
 Test-Success $LASTEXITCODE
 
 # Add items to solution
-Get-ChildItem -Filter OpenKh.Command.* | ForEach-Object {
-    dotnet sln $solution add $_.FullName
+Get-CSProjects "OpenKh.Command.*" | ForEach-Object {
+    dotnet sln $solution add $_
+}
+Get-CSProjects "OpenKh.Tools.*" | ForEach-Object {
+    dotnet sln $solution add $_
     Test-Success $LASTEXITCODE
 }
-Get-ChildItem -Filter OpenKh.Tools.* | ForEach-Object {
-    dotnet sln $solution add $_.FullName
+Get-CSProjects "OpenKh.WinShell.*" | ForEach-Object {
+    dotnet sln $solution add $_
     Test-Success $LASTEXITCODE
 }
-Get-ChildItem -Filter OpenKh.WinShell.* | ForEach-Object {
-    dotnet sln $solution add $_.FullName
-    Test-Success $LASTEXITCODE
-}
-Get-ChildItem -Filter OpenKh.Game* | ForEach-Object {
-    dotnet sln $solution add $_.FullName
+Get-CSProjects "OpenKh.Game*" | ForEach-Object {
+    dotnet sln $solution add $_
     Test-Success $LASTEXITCODE
 }
 
 # Publish solution
-dotnet publish $solution --configuration $configuration --verbosity $verbosity --framework netcoreapp3.1 --output $output /p:DebugType=None /p:DebugSymbols=false
+dotnet publish $solution --configuration $configuration --verbosity $verbosity --output $output /p:DebugType=None /p:DebugSymbols=false
 
 # Remove the temporary solution after the solution is published
 Remove-Item $solution -ErrorAction Ignore

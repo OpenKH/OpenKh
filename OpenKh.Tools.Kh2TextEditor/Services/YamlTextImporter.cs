@@ -1,10 +1,7 @@
-using OpenKh.Tools.Kh2TextEditor.Models;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace OpenKh.Tools.Kh2TextEditor.Services
 {
@@ -14,16 +11,24 @@ namespace OpenKh.Tools.Kh2TextEditor.Services
 
         IEnumerable<ExchangeableMessage> ITextImporter.Import(TextReader reader)
         {
-            var model = new YamlDotNet.Serialization.DeserializerBuilder()
+            var messages = new YamlDotNet.Serialization.DeserializerBuilder()
+                .IgnoreFields()
+                .IgnoreUnmatchedProperties()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build()
-                .Deserialize<RootModel>(reader);
+                .Deserialize<MessageModel[]>(reader);
 
-            return model.Messages;
+            return messages.Select(x => new ExchangeableMessage
+            {
+                Id = x.id,
+                Text = x.text
+            });
         }
 
-        public class RootModel
+        public class MessageModel
         {
-            public ExchangeableMessage[] Messages { get; set; }
+            public int id { get; set; }
+            public string text { get; set; }
         }
     }
 }

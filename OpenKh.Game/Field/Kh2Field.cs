@@ -5,7 +5,6 @@ using OpenKh.Engine;
 using OpenKh.Engine.Extensions;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Renders;
-using OpenKh.Common;
 using OpenKh.Game.Entities;
 using OpenKh.Game.Events;
 using OpenKh.Game.Infrastructure;
@@ -16,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using n = System.Numerics;
+using OpenKh.Engine.Input;
 
 namespace OpenKh.Game.Field
 {
@@ -23,9 +23,10 @@ namespace OpenKh.Game.Field
     {
         private readonly Kernel _kernel;
         private readonly Camera _camera;
+        private readonly TargetCamera _targetCamera;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly KingdomShader _shader;
-        private readonly InputManager _inputManager;
+        private readonly IInput _input;
         private readonly Kh2MessageRenderer _messageRenderer;
         private readonly DrawContext _messageDrawContext;
         private readonly Kh2MessageProvider _eventMessageProvider;
@@ -57,13 +58,14 @@ namespace OpenKh.Game.Field
             Dictionary<string, string> settings,
             GraphicsDevice graphicsDevice,
             KingdomShader shader,
-            InputManager inputManager)
+            IInput input)
         {
             _kernel = kernel;
             _camera = camera;
+            _targetCamera = new TargetCamera(_camera);
             _graphicsDevice = graphicsDevice;
             _shader = shader;
-            _inputManager = inputManager;
+            _input = input;
 
             var viewport = graphicsDevice.Viewport;
             _drawing = new MonoSpriteDrawing(graphicsDevice, _shader);
@@ -124,6 +126,26 @@ namespace OpenKh.Game.Field
             // TODO load summons
             // TODO load mission
             // TODO dispatch entity loading here, not in LoadAreaData
+
+            if (world >= 0 && world < _kernel.AreaInfo.Count)
+            {
+                var worldInfos = _kernel.AreaInfo[world];
+                if (area >= 0 && area < worldInfos.Count)
+                {
+                    var areaInfo = worldInfos[area];
+                    var isKnown = (areaInfo.Flags & 1) != 0;
+                    var isInDoor = (areaInfo.Flags & 2) != 0;
+                    var isMonochrome = (areaInfo.Flags & 4) != 0;
+                    var hasNoShadow = (areaInfo.Flags & 8) != 0;
+                    var hasGlow = (areaInfo.Flags & 16) != 0;
+
+                    _targetCamera.Type = isInDoor ? 1 : 0;
+                }
+                else
+                    Log.Err("Area {0} can not be found in AreaInfo for world {1}", area, world);
+            }
+            else
+                Log.Err("World {0} can not be found in AreaInfo", world);
         }
 
         private void LoadAreaData(int world, int area)
@@ -172,10 +194,12 @@ namespace OpenKh.Game.Field
 
         public void Update(double deltaTime)
         {
-            _isEventPause = _inputManager.RightTrigger;
-            _isFreeCam = _inputManager.LeftTrigger;
+            var isPlayingEvent = _eventPlayer != null && _isEventPause == false;
+            _camera.IsEventMode = isPlayingEvent;
+            _isEventPause = _input.Pressed.R2;
+            _isFreeCam = _input.Pressed.L2;
 
-            if (_eventPlayer != null && _isEventPause == false)
+            if (isPlayingEvent)
             {
                 _eventPlayer.Update(deltaTime);
                 if (_eventPlayer.IsEnd)
@@ -185,8 +209,38 @@ namespace OpenKh.Game.Field
                 }
             }
 
+            IEntity playerEntity = null;
             foreach (var entity in _actors.Where(x => x.IsMeshLoaded && x.IsVisible))
+            {
+                if (!isPlayingEvent && !_kernel.DebugMode && entity.IsPlayer)
+                {
+                    playerEntity = entity;
+                    PlayerManager.ProcessPlayer(_input, entity, _targetCamera.YRotation, deltaTime);
+                }
+
                 entity.Update((float)deltaTime);
+            }
+
+            if (!isPlayingEvent && !_kernel.DebugMode && playerEntity != null)
+            {
+                const float RadiusSpeed = 480f;
+                const double YSpeed = Math.PI;
+
+                var analogY = 0f;
+                var radius = 0f;
+                var yRotation = 0f;
+                analogY = -_input.AxisRight.X;
+                radius -= (float)(_input.AxisRight.Y * RadiusSpeed * deltaTime);
+
+                yRotation -= (float)(YSpeed * analogY * deltaTime);
+
+                _targetCamera.Radius = Math.Min(
+                    Math.Max(_targetCamera.Radius + radius, _targetCamera.ObjectiveRadiusMin),
+                    _targetCamera.ObjectiveRadiusMax);
+                _targetCamera.BackYRotation += yRotation;
+
+                _targetCamera.Update(playerEntity, deltaTime, Math.Abs(analogY) >= 0.9f);
+            }
 
             if (_isFading)
             {
@@ -302,8 +356,8 @@ namespace OpenKh.Game.Field
             if (_isFreeCam == true)
                 return;
 
-            _camera.CameraPosition = new n.Vector3(position.X, position.Y, position.Z);
-            _camera.CameraLookAt = new n.Vector3(lookAt.X, lookAt.Y, lookAt.Z);
+            _camera.CameraPosition = new n.Vector3(-position.X, position.Y, position.Z);
+            _camera.CameraLookAt = new n.Vector3(-lookAt.X, lookAt.Y, lookAt.Z);
             _camera.FieldOfView = (float)(fieldOfView * Math.PI / 180);
         }
 
@@ -471,8 +525,8 @@ namespace OpenKh.Game.Field
             {
                 switch (_kernel.RegionId)
                 {
-                    case 0: // jp
-                    case Constants.RegionFinalMix: // fm
+                    case (int)Constants.RegionId.Japanese:
+                    case (int)Constants.RegionId.FinalMix:
                         return $"anm/fm/{path}.anb";
                     default:
                         return $"anm/us/{path}.anb";

@@ -1,20 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.1.0" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
-    <PackageReference Include="YamlDotNet" Version="9.1.4" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+    <PackageReference Include="YamlDotNet" Version="12.3.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\nQuant\nQuant.Core\nQuant.Core.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
-    <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
   </ItemGroup>
 
 </Project>

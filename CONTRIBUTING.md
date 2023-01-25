@@ -28,3 +28,5 @@ To request a feature, [open a new issue](https://github.com/Xeeynamo/OpenKh/issu
 ## Documents contribution
 
 Documentation is really important, as it is what everyone (including non-coders) can read and understand. It includes all technical research done for the games in the series, such as file formats, differences between various version of the game in question, unused content, how to use the libraries, tools, or modding tutorials, etc. RAM hacking content is more than welcome too.
+
+In order to create proper documentation, it is recommended that you follow [these](DOCS_GUIDELINE.md) guidelines to make sure all documentation is easy to understand by anyone.

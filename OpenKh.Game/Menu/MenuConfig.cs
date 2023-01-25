@@ -1,3 +1,4 @@
+using OpenKh.Engine.Input;
 using OpenKh.Engine.Renderers;
 using OpenKh.Game.Infrastructure;
 using System;
@@ -337,22 +338,22 @@ namespace OpenKh.Game.Menu
             return anim;
         }
 
-        protected override void ProcessInput(InputManager inputManager)
+        protected override void ProcessInput(IInput input)
         {
-            if (inputManager.IsMenuUp)
+            if (input.Repeated.Up)
                 SelectedSettingIndex--;
-            else if (inputManager.IsMenuDown)
+            else if (input.Repeated.Down)
                 SelectedSettingIndex++;
-            else if (inputManager.IsMenuLeft)
+            else if (input.Repeated.Left)
                 SetSelectedOption(SelectedSettingIndex, GetSelectedOption(SelectedSettingIndex) - 1);
-            else if (inputManager.IsMenuRight)
+            else if (input.Repeated.Right)
                 SetSelectedOption(SelectedSettingIndex, GetSelectedOption(SelectedSettingIndex) + 1);
-            else if (inputManager.IsCircle)
+            else if (input.Triggered.Confirm)
             {
                 // ignore
             }
             else
-                base.ProcessInput(inputManager);
+                base.ProcessInput(input);
         }
 
         public override void Open()

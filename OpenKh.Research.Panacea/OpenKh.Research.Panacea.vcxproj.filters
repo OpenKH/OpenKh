@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="KingdomApi.cpp" />
+    <ClCompile Include="Panacea.cpp" />
+    <ClCompile Include="OpenKH.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="KingdomApi.h" />
+    <ClInclude Include="Panacea.h" />
+    <ClInclude Include="OpenKH.h" />
+  </ItemGroup>
+</Project>

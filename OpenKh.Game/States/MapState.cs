@@ -1,9 +1,12 @@
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
+using OpenKh.Engine;
+using OpenKh.Engine.Input;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Game.Debugging;
 using OpenKh.Game.Field;
 using OpenKh.Game.Infrastructure;
+using System;
 using System.Numerics;
 using xna = Microsoft.Xna.Framework;
 
@@ -28,7 +31,7 @@ namespace OpenKh.Game.States
         private IDataContent _dataContent;
         private ArchiveManager _archiveManager;
         private xna.GraphicsDeviceManager _graphics;
-        private InputManager _input;
+        private IInput _input;
         private IStateChange _stateChange;
         private KingdomShader _shader;
         private Camera _camera;
@@ -43,13 +46,13 @@ namespace OpenKh.Game.States
             _dataContent = initDesc.DataContent;
             _archiveManager = initDesc.ArchiveManager;
             _graphics = initDesc.GraphicsDevice;
-            _input = initDesc.InputManager;
+            _input = initDesc.Input;
             _stateChange = initDesc.StateChange;
             _shader = new KingdomShader(initDesc.ContentManager);
             _camera = new Camera()
             {
-                CameraPosition = new Vector3(0, 100, 200),
-                CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
+                CameraPosition = new Vector3(0, 251, -920),
+                CameraRotationYawPitchRoll = new Vector3(-90, 0, -10),
             };
             _menuState = new MenuState(this);
 
@@ -81,32 +84,18 @@ namespace OpenKh.Game.States
                 return;
             }
 
-            if (_input.IsStart)
+            if (_input.Triggered.SpecialRight)
             {
                 _menuState.OpenMenu();
             }
-            else if (Kernel.DebugMode)
+            else
             {
                 const double Speed = 100.0;
                 var speed = (float)(deltaTimes.DeltaTime * Speed);
-
-                if (_input.W)
-                    _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtX, speed * 5);
-                if (_input.S)
-                    _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtX, speed * 5);
-                if (_input.A)
-                    _camera.CameraPosition -= Vector3.Multiply(_camera.CameraLookAtY, speed * 5);
-                if (_input.D)
-                    _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtY, speed * 5);
-
-                if (_input.Up)
-                    _camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * speed);
-                if (_input.Down)
-                    _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, 1 * speed);
-                if (_input.Left)
-                    _camera.CameraRotationYawPitchRoll += new Vector3(1 * speed, 0, 0);
-                if (_input.Right)
-                    _camera.CameraRotationYawPitchRoll -= new Vector3(1 * speed, 0, 0);
+                _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtX, _input.AxisLeft.Y * speed * 5);
+                _camera.CameraPosition += Vector3.Multiply(_camera.CameraLookAtY, -_input.AxisLeft.X * speed * 5);
+                _camera.CameraRotationYawPitchRoll -= new Vector3(0, 0, -_input.AxisRight.Y * speed);
+                _camera.CameraRotationYawPitchRoll += new Vector3(_input.AxisRight.X * speed, 0, 0);
 
                 Field.Update(deltaTimes.DeltaTime);
             }
@@ -114,7 +103,8 @@ namespace OpenKh.Game.States
 
         public void Draw(DeltaTimes deltaTimes)
         {
-            _camera.AspectRatio = _graphics.PreferredBackBufferWidth / (float)_graphics.PreferredBackBufferHeight;
+            var viewport = _graphics.GraphicsDevice.Viewport;
+            _camera.AspectRatio = (float)viewport.Width / viewport.Height;
 
             _graphics.GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
 
@@ -173,7 +163,7 @@ namespace OpenKh.Game.States
 
         public void DebugUpdate(IDebug debug)
         {
-            if (_input.IsDebug)
+            if (_input.Triggered.SpecialLeft)
                 Kernel.DebugMode = !Kernel.DebugMode;
         }
 

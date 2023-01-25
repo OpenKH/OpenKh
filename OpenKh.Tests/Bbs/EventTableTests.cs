@@ -1,4 +1,4 @@
-﻿using OpenKh.Bbs;
+using OpenKh.Bbs;
 using OpenKh.Common;
 using System.IO;
 using Xunit;
@@ -25,7 +25,8 @@ namespace OpenKh.Tests.Bbs
             Assert.Equal(301, @event.EventIndex);
             Assert.Equal(4, @event.World);
             Assert.Equal(7, @event.Room);
-            Assert.Equal(61, @event.Unknown06);
+            Assert.Equal(61, @event.EventPtn);
+            Assert.Equal(0, @event.Opt);
         });
 
         [Fact]

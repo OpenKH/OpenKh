@@ -73,6 +73,10 @@ namespace OpenKh.Command.PmpConverter
         private static Pmp MeshGroupList2PMP(List<MeshGroup> meshGroup)
         {
             Pmp pmp = new Pmp();
+            pmp.header.MagicCode = 0x504D50;
+            pmp.header.TextureCount = (ushort)TexList.Count;
+            pmp.header.ObjectCount =(ushort) meshGroup.Count;
+            pmp.header.ModelCount = (ushort)meshGroup.Count;
             pmp.header.Padding = new int[2];
             pmp.PmoList = new List<Pmo>();
             pmp.objectInfo = new List<Pmp.ObjectInfo>();
@@ -124,24 +128,31 @@ namespace OpenKh.Command.PmpConverter
                     }
                     else
                         chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 2, 3, (uint)0x7);
-                    chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, (uint)TextureCoordinateFormat);
-                    chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, (uint)VertexFormat);
+                    //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, (uint)TextureCoordinateFormat);
+                    //chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, (uint)VertexFormat);
+
+                    chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 0, 2, 2);
+                    chunk.SectionInfo.VertexFlags = BitsUtil.Int.SetBits(chunk.SectionInfo.VertexFlags, 7, 2, 2);
 
                     chunk.SectionInfo.VertexSize += 0; // Weights.
+                    TextureCoordinateFormat = Pmo.CoordinateFormat.NORMALIZED_16_BITS;
                     chunk.SectionInfo.VertexSize += (TextureCoordinateFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)8 : (byte)((int)TextureCoordinateFormat * 2); // Texture Coordinates
                     if (chunk.SectionInfo.VertexSize % 4 != 0)
                         chunk.SectionInfo.VertexSize += 2;
                     chunk.SectionInfo.VertexSize += UsesUniformColor ? (byte)0 : (byte)4; // VertexColor
+                    VertexFormat = Pmo.CoordinateFormat.NORMALIZED_16_BITS;
                     chunk.SectionInfo.VertexSize += (VertexFormat == Pmo.CoordinateFormat.FLOAT_32_BITS) ? (byte)12 : (byte)((int)VertexFormat * 3); // Vertices
+                    if (chunk.SectionInfo.VertexSize % 4 != 0)
+                        chunk.SectionInfo.VertexSize += 2;
 
 
                     for (int v = 0; v < desc.Vertices.Length; v++)
                     {
                         Vector4 Color = new Vector4();
-                        Color.X = desc.Vertices[v].R;
-                        Color.Y = desc.Vertices[v].G;
-                        Color.Z = desc.Vertices[v].B;
-                        Color.W = desc.Vertices[v].A;
+                        Color.X = desc.Vertices[v].R * 256;
+                        Color.Y = desc.Vertices[v].G * 256;
+                        Color.Z = desc.Vertices[v].B * 256;
+                        Color.W = 128;
                         chunk.colors.Add(Color);
 
                         Vector3 vec;
@@ -162,8 +173,11 @@ namespace OpenKh.Command.PmpConverter
                 // Header.
                 pmo.header = new Pmo.Header();
                 pmo.header.MagicCode = 0x4F4D50;
-                pmo.header.TextureCount = (ushort)TextureData.Count; // TODO.
-                pmo.header.Unk0A = 0x80;
+                pmo.header.Number = 1;
+                pmo.header.Group = 1;
+                pmo.header.Version = 3;
+                pmo.header.TextureCount = (byte)textureIndices.Count; // TODO.
+                pmo.header.Flag = 0x800;
                 pmo.header.MeshOffset0 = 0xA0 + ((uint)pmo.header.TextureCount * 0x20);
                 pmo.header.VertexCount = descriptorVertexCount;
                 pmo.header.TriangleCount = pmo.header.VertexCount;
@@ -350,16 +364,17 @@ namespace OpenKh.Command.PmpConverter
                         vertices[k].Z = x.Vertices[k].Z * Scale;
                         vertices[k].Tu = x.TextureCoordinateChannels[0][k].X;
                         vertices[k].Tv = 1.0f - x.TextureCoordinateChannels[0][k].Y;
-                        vertices[k].R = 0xFF;
-                        vertices[k].G = 0xFF;
-                        vertices[k].B = 0xFF;
-                        vertices[k].A = 0xFF;
+                        vertices[k].R = x.VertexColorChannels[0][i].R;
+                        vertices[k].G = x.VertexColorChannels[0][i].G;
+                        vertices[k].B = x.VertexColorChannels[0][i].B;
+                        vertices[k].A = x.VertexColorChannels[0][i].A;
                     }
 
                     meshDescriptor.Vertices = vertices;
                     meshDescriptor.Indices = x.GetIndices();
                     meshDescriptor.IsOpaque = false;
                     meshDescriptor.TextureIndex = x.MaterialIndex;
+                    
 
                     currentMeshGroup.MeshDescriptors.Add(meshDescriptor);
                 }

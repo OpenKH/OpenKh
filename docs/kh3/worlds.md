@@ -72,6 +72,7 @@
 |dp_01| /Game/Levels/dp/dp_01/dp_01     | Land of Departure
 |dp_50| /Game/Levels/dp_DLC/dp_50/dp_50 | Land of Departure - Drops the debug message "[rg071] Ends the reminiscence scene". Need to research more.
 |dp_50| /Game/Levels/dp_DLC/dp_50/dp    |
+
 ## Dark World
 
 | Map | Path                            | Name or description

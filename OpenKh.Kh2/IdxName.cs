@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace OpenKh.Kh2
 {
     public class IdxName
     {
-        private static Dictionary<long, string> _nameDictionary = File
-            .ReadAllLines(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources/kh2idx.txt"))
+        private static string _filenameDictionary = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory), "resources/kh2idx.txt");
+
+        public static string[] Names = File.ReadAllLines(_filenameDictionary);
+
+        private static Dictionary<long, string> _nameDictionary = Names
             .ToDictionary(name => IdxDictionary.GetHash(name), name => name);
 
         public Idx.Entry Entry { get; set; }

@@ -45,12 +45,30 @@ namespace OpenKh.Engine.Parsers
         }
     }
 
+    public class VertexBoxWeight
+    {
+        public int MatrixIndex;
+        public float Weight;
+
+        public VertexBoxWeight()
+        {
+
+        }
+
+        public VertexBoxWeight(int matrixIndex, float weight)
+        {
+            MatrixIndex = matrixIndex;
+            Weight = weight;
+        }
+    }
+
     public class MeshDescriptor
     {
         public PositionColoredTextured[] Vertices;
         public int[] Indices;
         public int TextureIndex;
         public bool IsOpaque;
+        public VertexBoxWeight[][] VertexBoneWeights;
     }
 
     public class MdlxParser : IModelMotion
@@ -68,7 +86,7 @@ namespace OpenKh.Engine.Parsers
             }
             else if (IsMap(mdlx))
             {
-                MeshDescriptors = mdlx.MapModel.VifPackets
+                MeshDescriptors = mdlx.ModelBackground.Chunks
                     .Select(vifPacket => Parse(vifPacket))
                     .ToList();
             }
@@ -82,7 +100,7 @@ namespace OpenKh.Engine.Parsers
 
         private static bool IsEntity(Mdlx mdlx) => mdlx.SubModels != null;
 
-        private static bool IsMap(Mdlx mdlx) => mdlx.MapModel != null;
+        private static bool IsMap(Mdlx mdlx) => mdlx.IsMap;
 
         public List<MeshDescriptor> MeshDescriptors { get; private set; }
 
@@ -92,7 +110,7 @@ namespace OpenKh.Engine.Parsers
 
         public Matrix4x4[] CurrentPose { get; private set; }
 
-        private static MeshDescriptor Parse(Mdlx.VifPacketDescriptor vifPacketDescriptor)
+        private static MeshDescriptor Parse(ModelBackground.ModelChunk vifPacketDescriptor)
         {
             var vertices = new List<PositionColoredTextured>();
             var indices = new List<int>();
@@ -173,7 +191,7 @@ namespace OpenKh.Engine.Parsers
                 Vertices = vertices.ToArray(),
                 Indices = indices.ToArray(),
                 TextureIndex = vifPacketDescriptor.TextureId,
-                IsOpaque = vifPacketDescriptor.IsTransparentFlag == 0,
+                IsOpaque = vifPacketDescriptor.TransparencyFlag == 0,
             };
         }
 

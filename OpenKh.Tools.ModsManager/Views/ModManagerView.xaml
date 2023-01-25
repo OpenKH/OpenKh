@@ -1,0 +1,111 @@
+<UserControl x:Class="OpenKh.Tools.ModsManager.Views.ModManagerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="600">
+    <UserControl.Resources>
+        <ControlTemplate x:Key="modList" TargetType="ListBox">
+            <Border Name="Border" BorderThickness="1">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="#FFABADB3" />
+                </Border.BorderBrush>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Margin="3">
+                        <TextBlock HorizontalAlignment="Center" Text="Highest priority"/>
+                        <Separator Margin="3" Background="#FFABADB3"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Margin="3">
+                        <Separator Margin="3" Background="#FFABADB3"/>
+                        <TextBlock HorizontalAlignment="Center" Text="Lowest priority"/>
+                    </StackPanel>
+                    <ScrollViewer Grid.Row="1" Margin="0" Focusable="false">
+                        <StackPanel Margin="0" IsItemsHost="True" />
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </UserControl.Resources>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="282"/>
+        </Grid.ColumnDefinitions>
+
+        <ListBox
+            Template="{DynamicResource modList}"
+            Grid.Column="0"
+            VerticalAlignment="Stretch"
+            ItemsSource="{Binding ModsList}"
+            SelectedValue="{Binding SelectedValue}" KeyUp="ListBox_KeyUp"
+            HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="64" Margin="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0" VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding Enabled}">
+                            <CheckBox.Content>
+                                <Grid Margin="3 1 10 0">
+                                    <Image Width="64" Height="64" Source="{Binding IconImage}"/>
+                                </Grid>
+                            </CheckBox.Content>
+                        </CheckBox>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Author}"/>
+                            <TextBlock Visibility="{Binding UpdateVisibility}" Text="Update available" Foreground="Gray"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Grid Grid.Column="1">
+            <StackPanel VerticalAlignment="Center">
+                <Button Grid.Row="0" Margin="0 3 0 3" Command="{Binding MoveUp}">
+                    <Image Source="{StaticResource AddRowToAbove_16x}"/>
+                </Button>
+                <Button Grid.Row="4" Margin="0 3 0 3" Command="{Binding MoveDown}">
+                    <Image Source="{StaticResource AddRowToBelow_16x}"/>
+                </Button>
+                <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding AddModCommand}">
+                    <Image Source="{StaticResource Add_16x}"/>
+                </Button>
+                <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding RemoveModCommand}">
+                    <Image Source="{StaticResource Remove_color_16x}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Column="3">
+            <StackPanel Visibility="{Binding IsModUnselectedMessageVisible}">
+                <TextBlock Margin="0 0 0 3" Text="The selected mod info will be displayed here." TextWrapping="Wrap"/>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    To add a new mod click the '+' button or go to the Mods menu.
+                    A simple mod to add for testing can be 'OpenKH/mod-template'.
+                </TextBlock>
+                <TextBlock Margin="0 0 0 3" TextWrapping="Wrap">
+                    Once you will select the mods you want to, go to the menu 'Run'
+                    and then select 'Build and Run'! The 'Build' is only required when the
+                    content of a mod or the selected mod changes. If you are unsure, you
+                    can just always use 'Build and Run'.
+                </TextBlock>
+            </StackPanel>
+            <ScrollViewer Visibility="{Binding IsModInfoVisible}">
+                <local:ModDetailsView Grid.Column="3" DataContext="{Binding SelectedValue}"/>
+            </ScrollViewer>
+        </Grid>
+
+    </Grid>
+</UserControl>

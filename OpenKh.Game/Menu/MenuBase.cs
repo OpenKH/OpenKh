@@ -1,4 +1,5 @@
-﻿using OpenKh.Game.Infrastructure;
+using OpenKh.Engine.Input;
+using OpenKh.Game.Infrastructure;
 
 namespace OpenKh.Game.Menu
 {
@@ -9,7 +10,7 @@ namespace OpenKh.Game.Menu
 
         protected IMenuManager MenuManager { get; }
         protected AnimatedSequenceFactory SequenceFactory => MenuManager.SequenceFactory;
-        protected InputManager InputManager => MenuManager.InputManager;
+        protected IInput Input => MenuManager.Input;
         abstract protected bool IsEnd { get; }
         abstract public ushort MenuNameId { get; }
         public bool IsClosed { get; private set; }
@@ -19,9 +20,9 @@ namespace OpenKh.Game.Menu
             MenuManager = menuManager;
         }
 
-        virtual protected void ProcessInput(InputManager inputManager)
+        virtual protected void ProcessInput(IInput input)
         {
-            if (inputManager.IsCross)
+            if (input.Triggered.Cancel)
                 Close();
         }
 
@@ -56,7 +57,7 @@ namespace OpenKh.Game.Menu
             if (_subMenu == null)
             {
                 if (!_isClosing)
-                    ProcessInput(InputManager);
+                    ProcessInput(Input);
 
                 IsClosed = IsEnd;
             }

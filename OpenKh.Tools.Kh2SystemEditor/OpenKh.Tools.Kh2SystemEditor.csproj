@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <UseWPF>true</UseWPF>
     <AssemblyTitle>KH2 System editor</AssemblyTitle>
     <Product>KH2 System editor - OpenKH</Product>
@@ -11,15 +12,16 @@
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
     <ProjectReference Include="..\OpenKh.Kh2\OpenKh.Kh2.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common.WPF\OpenKh.Tools.Common.Wpf.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.0.2" />
-    <PackageReference Include="YamlDotNet" Version="9.1.4" />
-    <PackageReference Include="NPOI" Version="2.5.2" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.5.0" />
+    <PackageReference Include="YamlDotNet" Version="12.3.1" />
+    <PackageReference Include="NPOI" Version="2.6.0" />
   </ItemGroup>
 
 </Project>

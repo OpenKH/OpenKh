@@ -2,6 +2,7 @@ using OpenKh.Kh2;
 using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 
@@ -15,29 +16,45 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             base(name, EntryParserModel.GetChildren(entries, idxManager))
         {
             _idxManager = idxManager;
-            ExportCommand = new RelayCommand(_ => FileDialog.OnFolder(Extract));
-            ExportAndMergeCommand = new RelayCommand(_ => FileDialog.OnFolder(ExtractAndMerge));
+            ExportCommand = new RelayCommand(_ =>
+                FileDialog.OnFolder(x =>
+                    Task.Run(() =>
+                        ExtractProcessor.ShowProgress(progress =>
+                            Extract(x, progress)))));
+            ExportAndMergeCommand = new RelayCommand(_ =>
+                FileDialog.OnFolder(x =>
+                    Task.Run(() =>
+                        ExtractProcessor.ShowProgress(progress =>
+                            ExtractAndMerge(x, progress)))));
         }
 
         public string ShortName => Path.GetFileNameWithoutExtension(Name);
         public RelayCommand ExportCommand { get; }
         public RelayCommand ExportAndMergeCommand { get; }
 
-        public override void Extract(string outputPath)
-        {
-            foreach (var child in Children)
-                child.Extract(Path.Combine(outputPath, ShortName));
-        }
-
-        public void ExtractAndMerge(string outputPath)
+        public override void Extract(string outputPath, IExtractProgress progress)
         {
             foreach (var child in Children)
             {
+                if (progress.CancellationToken.IsCancellationRequested)
+                    break;
+
+                child.Extract(Path.Combine(outputPath, ShortName), progress);
+            }
+        }
+
+        public void ExtractAndMerge(string outputPath, IExtractProgress progress)
+        {
+            foreach (var child in Children)
+            {
+                if (progress.CancellationToken.IsCancellationRequested)
+                    break;
+
                 var childOutputPath = Path.Combine(outputPath, ShortName);
                 if (child is IdxViewModel idxVm)
-                    idxVm.ExtractAndMerge(childOutputPath);
+                    idxVm.ExtractAndMerge(childOutputPath, progress);
                 else
-                    child.Extract(childOutputPath);
+                    child.Extract(childOutputPath, progress);
             }
         }
     }

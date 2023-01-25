@@ -124,20 +124,20 @@ namespace OpenKh.Game
                 };
 
                 while (!_tokenSource.Token.IsCancellationRequested)
-                    Thread.Sleep(1000);
-
+                    Thread.Sleep(10);
+                _tokenSource.Dispose();
             }, _tokenSource.Token);
         }
 
         public static void Save()
         {
-            Log.Info("Save configuration file to {0}, ActualConfigFilePath");
+            Log.Info("Save configuration file to {0}", ActualConfigFilePath);
             InternalSave();
         }
 
         public static void Close()
         {
-            _tokenSource?.Dispose();
+            _tokenSource.Cancel();
         }
     }
 }

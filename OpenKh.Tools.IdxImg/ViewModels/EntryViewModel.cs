@@ -1,3 +1,5 @@
+using OpenKh.Tools.IdxImg.Interfaces;
+
 namespace OpenKh.Tools.IdxImg.ViewModels
 {
     public abstract class EntryViewModel
@@ -9,6 +11,6 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             Name = name;
         }
 
-        public abstract void Extract(string outputPath);
+        public abstract void Extract(string outputPath, IExtractProgress progress);
     }
 }

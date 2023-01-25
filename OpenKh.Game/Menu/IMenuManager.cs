@@ -1,4 +1,4 @@
-﻿using OpenKh.Game.Infrastructure;
+using OpenKh.Engine.Input;
 
 namespace OpenKh.Game.Menu
 {
@@ -6,7 +6,7 @@ namespace OpenKh.Game.Menu
     {
         IGameContext GameContext { get; }
         AnimatedSequenceFactory SequenceFactory { get; }
-        InputManager InputManager { get; }
+        IInput Input { get; }
 
         void PushSubMenuDescription(ushort messageId);
         void PushSubMenuDescription(string message);

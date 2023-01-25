@@ -126,6 +126,8 @@ namespace OpenKh.Engine.Renderers
                 DrawAnimation(context, animationGroup.Animations[i], i);
             }
 
+            if (animationGroup.Animations.Count == 0)
+                return false;
             return animationGroup.DoNotLoop == 0 ||
                 context.FrameIndex < animationGroup.Animations.Max(x => x.FrameEnd);
         }

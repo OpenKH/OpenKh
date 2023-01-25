@@ -51,13 +51,13 @@ namespace OpenKh.Tests.kh2
             private const string SampleScriptDecompiled =
                 "Program 0x00\n" +
                 "AreaSettings 0 -1\n" +
-                "\tSetProgressFlag 0x380A\n" +
-                "\tSetEvent \"110\" Type 2\n" +
-                "\tSetJump Type 1 World NM Area 5 Entrance 0 LocalSet 0 FadeType 1\n" +
-                "\tSetPartyMenu 0\n" +
-                "\tSetProgressFlag 0x1234\n" +
-                "\tSetUnk05 0x1122\n" +
-                "\tSetInventory 666 777\n";
+                " SetProgressFlag 0x380A\n" +
+                " SetEvent \"110\" Type 2\n" +
+                " SetJump Type 1 World NM Area 5 Entrance 0 LocalSet 0 FadeType 1\n" +
+                " SetPartyMenu 0\n" +
+                " SetProgressFlag 0x1234\n" +
+                " SetUnk05 0x1122\n" +
+                " SetInventory 666 777\n";
 
             [Fact]
             public void ReadTest()
@@ -82,7 +82,7 @@ namespace OpenKh.Tests.kh2
             [InlineData("MapVisibility 0xffffffff 0x00000001", 1, -1, 1)]
             [InlineData("RandomSpawn \"0123\" \"4567\"", 2, 0x33323130, 0x37363534)]
             [InlineData("CasualSpawn 123 \"666\"", 3, 123, 0x363636)]
-            [InlineData("Capacity 123", 4, 0x42F60000)]
+            [InlineData("Capacity 123", 4, 123)]
             [InlineData("AllocEnemy 123", 5, 123)]
             [InlineData("Unk06 123", 6, 123)]
             [InlineData("Unk07 123", 7, 123)]

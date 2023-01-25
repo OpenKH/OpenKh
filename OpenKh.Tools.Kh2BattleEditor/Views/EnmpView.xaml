@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="OpenKh.Tools.Kh2BattleEditor.Views.EnmpView"
+<UserControl x:Class="OpenKh.Tools.Kh2BattleEditor.Views.EnmpView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -64,11 +64,11 @@
                 <TextBlock Text="Health" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding Health, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown44, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Max Damage" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding MaxDamage, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown46, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Min Damage" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding MinDamage, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Text="Physical weakness" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding PhysicalWeakness, UpdateSourceTrigger=PropertyChanged}"/>
@@ -85,20 +85,20 @@
                 <TextBlock Text="Dark weakness" Margin="{StaticResource LabelMargin}"/>
                 <TextBox Text="{Binding DarkWeakness, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown52, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Light weakness" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding LightWeakness, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Reflect weakness" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding ReflectWeakness, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="General weakness" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding GeneralWeakness, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown56, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Experience" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Experience, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown58, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Prize" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding Prize, UpdateSourceTrigger=PropertyChanged}"/>
 
-                <TextBlock Text="Unknown" Margin="{StaticResource LabelMargin}"/>
-                <TextBox Text="{Binding Unknown5a, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Bonus Level" Margin="{StaticResource LabelMargin}"/>
+                <TextBox Text="{Binding BonusLevel, UpdateSourceTrigger=PropertyChanged}"/>
             </controls:TwoColumnsPanel>
         </ScrollViewer>
     </Grid>

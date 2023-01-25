@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static OpenKh.Game.States.Title.Constants;
+using OpenKh.Engine.Input;
 
 namespace OpenKh.Game.States.Title
 {
@@ -48,7 +49,7 @@ namespace OpenKh.Game.States.Title
         private bool _isInTheaterMenu;
 
         public Kernel Kernel { get; private set; }
-        public InputManager InputManager { get; private set; }
+        public IInput Input { get; private set; }
         public IMessageRenderer MessageRenderer => _messageRenderer;
 
         public MainMenuState State
@@ -99,7 +100,7 @@ namespace OpenKh.Game.States.Title
         {
             Kernel = initDesc.Kernel;
             _archiveManager = initDesc.ArchiveManager;
-            InputManager = initDesc.InputManager;
+            Input = initDesc.Input;
             _stateChange = initDesc.StateChange;
 
             var viewport = initDesc.GraphicsDevice.GraphicsDevice.Viewport;
@@ -125,7 +126,7 @@ namespace OpenKh.Game.States.Title
                 else
                     _titleLayoutDesc = ReMixTitleLayout;
             }
-            else if (Kernel.RegionId == Kh2.Constants.RegionFinalMix)
+            else if (Kernel.RegionId == (int)Kh2.Constants.RegionId.FinalMix)
             {
                 if (_isTheaterModeUnlocked)
                     _titleLayoutDesc = FinalMixTheaterTitleLayout;
@@ -201,7 +202,7 @@ namespace OpenKh.Game.States.Title
             {
                 if (IsIntro)
                 {
-                    if (InputManager.IsCross || InputManager.IsCircle)
+                    if (Input.Triggered.Confirm || Input.Triggered.Cancel || Input.Triggered.SpecialRight)
                         SkipIntro();
                 }
                 else if (IsNewGameStarting)
@@ -234,7 +235,7 @@ namespace OpenKh.Game.States.Title
         private void ProcessInputMainMenu()
         {
             var currentOption = _optionSelected;
-            if (InputManager.IsUp)
+            if (Input.Repeated.Up)
             {
                 currentOption--;
                 if (currentOption < 0)
@@ -245,7 +246,7 @@ namespace OpenKh.Game.States.Title
                 if (currentOption == MainMenuTheaterOption && !_titleLayoutDesc.HasTheater)
                     currentOption = MainMenuLoadOption;
             }
-            else if (InputManager.IsDown)
+            else if (Input.Repeated.Down)
             {
                 currentOption++;
                 if (currentOption == MainMenuTheaterOption && !_titleLayoutDesc.HasTheater)
@@ -255,7 +256,7 @@ namespace OpenKh.Game.States.Title
                 if (currentOption >= MainMenuMaxOptionCount)
                     currentOption = 0;
             }
-            else if (InputManager.IsCircle)
+            else if (Input.Triggered.Confirm)
             {
                 switch (currentOption)
                 {
@@ -281,7 +282,7 @@ namespace OpenKh.Game.States.Title
 
         private void ProcessInputTheaterMenu()
         {
-            if (InputManager.IsCross)
+            if (Input.Repeated.Cancel)
             {
                 layoutRendererTheater.FrameIndex = 0;
                 layoutRendererTheater.SelectedSequenceGroupIndex = 2;

@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -86,13 +86,14 @@ namespace OpenKh.Kh2
             writer.Write(entries.Count);
 
             var offset = 8 + entries.Count * 8;
-            foreach (var entry in entries)
+            var orderedEntries = entries.OrderBy(x => x.Id).ToList();
+            foreach (var entry in orderedEntries)
             {
                 writer.Write(entry.Id);
                 writer.Write(offset);
                 offset += entry.Data.Length;
             }
-            foreach (var entry in entries)
+            foreach (var entry in orderedEntries)
             {
                 writer.Write(entry.Data);
             }
@@ -107,7 +108,7 @@ namespace OpenKh.Kh2
             writer.Write(MagicCode);
             writer.Write(entries.Count);
 
-            var optimizedEntries = entries.Select(x => new OptimizedEntry(x)).ToList();
+            var optimizedEntries = entries.OrderBy(x => x.Id).Select(x => new OptimizedEntry(x)).ToList();
             foreach (var entry in optimizedEntries)
             {
                 if (entry.HasbeenLinked)
@@ -242,7 +243,7 @@ namespace OpenKh.Kh2
         }
 
         public static bool IsValid(Stream stream) =>
-            stream.Length >= 4 && new BinaryReader(stream).PeekUInt32() == MagicCode;
+            stream.Length >= 4 && stream.PeekUInt32() == MagicCode;
 
     }
 }

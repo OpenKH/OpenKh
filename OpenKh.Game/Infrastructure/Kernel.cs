@@ -28,22 +28,7 @@ namespace OpenKh.Game.Infrastructure
             get => Config.RegionId == -1 ? _regionId : Config.RegionId;
             set => Config.RegionId = value;
         }
-        public string Language
-        {
-            get
-            {
-                int languageId;
-                if (RegionId == Constants.RegionFinalMix) // Final mix should load JP assets
-                    languageId = 0;
-                else if (RegionId == 2) // UK region should load US assets
-                    languageId = 1;
-                else
-                    languageId = RegionId;
-
-                return Constants.Regions[languageId];
-            }
-        }
-
+        public string Language => Constants.Languages[RegionId];
         public string Region => Constants.Regions[RegionId];
         public IDataContent DataContent { get; }
         public FontContext FontContext { get; }
@@ -91,13 +76,14 @@ namespace OpenKh.Game.Infrastructure
         }
 
         // System
+        public List<List<Arif>> AreaInfo { get; private set; }
         public List<Ftst.Entry> Ftst { get; private set; }
         public Item Item { get; private set; }
         public Memt MemberTable { get; private set; }
         public List<Trsr> Trsr { get; private set; }
 
         // Battle
-        public List<Fmlv.Level> Fmlv { get; private set; }
+        public List<Fmlv> Fmlv { get; private set; }
         public List<Lvup.PlayableCharacter> Lvup { get; private set; }
 
         // 00worldpoint
@@ -116,7 +102,7 @@ namespace OpenKh.Game.Infrastructure
             IsReMix = IsReMixFileExists(dataContent, Region);
             Log.Info("ReMIX={0}", IsReMix);
 
-            IsFinalMix = IsReMix || RegionId == Constants.RegionFinalMix;
+            IsFinalMix = IsReMix || RegionId == (int)Constants.RegionId.FinalMix;
             Log.Info("Final Mix={0}", IsFinalMix);
 
             // Load files in the same order as KH2 does
@@ -202,6 +188,7 @@ namespace OpenKh.Game.Infrastructure
         {
             var bar = DataContent.FileOpen(fileName).Using(stream => Bar.Read(stream));
 
+            AreaInfo = bar.ForEntry("arif", Bar.EntryType.List, Kh2.SystemData.Arif.Read);
             Ftst = bar.ForEntry("ftst", Bar.EntryType.List, Kh2.SystemData.Ftst.Read);
             Item = bar.ForEntry("item", Bar.EntryType.List, Kh2.SystemData.Item.Read);
             MemberTable = bar.ForEntry("memt", Bar.EntryType.List, Kh2.SystemData.Memt.Read);

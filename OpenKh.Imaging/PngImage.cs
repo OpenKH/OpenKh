@@ -67,6 +67,7 @@ namespace OpenKh.Imaging
 
         public PngImage(Stream stream)
         {
+            stream.SetPosition(0);
             var header = BinaryMapping.ReadObject<Signature>(stream);
             if (header.Magic != Signature.Valid)
             {
@@ -133,12 +134,14 @@ namespace OpenKh.Imaging
 
             fullData.Position = 2;
 
-            var deflater = new DeflateStream(fullData, CompressionMode.Decompress);
-
-            Size = new Size(ihdr.Width, ihdr.Height);
+            using var deflated = new MemoryStream((int)fullData.Length * 2);
+            using (var deflater = new DeflateStream(fullData, CompressionMode.Decompress))
+                deflater.CopyTo(deflated);
+            deflated.FromBegin();
 
             var bits = ihdr.Bits;
             var colorType = (ColorType)ihdr.ColorType;
+            Size = new Size(ihdr.Width, ihdr.Height);
 
             if (bits == 4 && colorType == ColorType.Indexed)
             {
@@ -147,8 +150,8 @@ namespace OpenKh.Imaging
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
                 {
-                    var filter = deflater.ReadByte();
-                    deflater.Read(_data, y * stride, stride);
+                    var filter = deflated.ReadByte();
+                    deflated.Read(_data, y * stride, stride);
                     ApplyFilter(_data, y * stride, 1, stride, filter);
                 }
                 _clut = PrepareClut(PLTE, tRNS, 16);
@@ -160,8 +163,8 @@ namespace OpenKh.Imaging
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
                 {
-                    var filter = deflater.ReadByte();
-                    deflater.Read(_data, y * stride, stride);
+                    var filter = deflated.ReadByte();
+                    deflated.Read(_data, y * stride, stride);
                     ApplyFilter(_data, y * stride, 1, stride, filter);
                 }
                 _clut = PrepareClut(PLTE, tRNS, 256);
@@ -173,8 +176,8 @@ namespace OpenKh.Imaging
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
                 {
-                    var filter = deflater.ReadByte();
-                    deflater.Read(_data, y * stride, stride);
+                    var filter = deflated.ReadByte();
+                    deflated.Read(_data, y * stride, stride);
                     ApplyFilter(_data, y * stride, 3, stride, filter);
                 }
             }
@@ -185,8 +188,8 @@ namespace OpenKh.Imaging
                 _data = new byte[stride * Size.Height];
                 for (int y = 0; y < Size.Height; y++)
                 {
-                    var filter = deflater.ReadByte();
-                    deflater.Read(_data, y * stride, stride);
+                    var filter = deflated.ReadByte();
+                    deflated.Read(_data, y * stride, stride);
                     ApplyFilter(_data, y * stride, 4, stride, filter);
                 }
 
@@ -272,7 +275,7 @@ namespace OpenKh.Imaging
             }
             else
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException($"PNG filter {filter} not supported");
             }
         }
 
@@ -328,6 +331,19 @@ namespace OpenKh.Imaging
                 | ((val >> 8) & 0x0000FF00)
                 | ((val >> 24) & 0x000000FF)
                 ;
+        }
+
+        public static bool IsValid(Stream stream)
+        {
+            stream.SetPosition(0);
+            return stream.ReadByte() == 0x89 &&
+                stream.ReadByte() == 0x50 &&
+                stream.ReadByte() == 0x4e &&
+                stream.ReadByte() == 0x47 &&
+                stream.ReadByte() == 0x0d &&
+                stream.ReadByte() == 0x0a &&
+                stream.ReadByte() == 0x1a &&
+                stream.ReadByte() == 0x0a;
         }
 
         public static PngImage Read(Stream stream) => new PngImage(stream);

@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-      <TargetFramework>net472</TargetFramework>
-      <OutputPath>..\bin\WinShell\</OutputPath>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <OutputPath>..\bin\WinShell\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

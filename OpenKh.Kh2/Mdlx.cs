@@ -15,36 +15,38 @@ namespace OpenKh.Kh2
         private const int ReservedArea = 0x90;
 
         public List<SubModel> SubModels { get; }
-        public M4 MapModel { get; }
+        public Model Model { get; }
+        public ModelBackground ModelBackground => Model as ModelBackground;
 
         private Mdlx(Stream stream)
         {
             var type = ReadMdlxType(stream);
-            stream.Position = 0;
+            stream.FromBegin();
 
             switch (type)
             {
-                case Map:
-                    MapModel = ReadAsMap(new SubStream(stream, ReservedArea, stream.Length - ReservedArea));
-                    break;
                 case Entity:
                     SubModels = ReadAsModel(stream).ToList();
+                    break;
+                default:
+                    Model = Model.Read(stream.FromBegin());
                     break;
             }
         }
 
-        public bool IsMap => MapModel != null;
+        public bool IsMap => Model is ModelBackground;
 
-        public void Write(Stream realStream)
+        public void Write(Stream stream)
         {
-            var stream = new MemoryStream();
-            if (IsMap)
-                WriteAsMap(stream, MapModel);
+            if (Model != null)
+                Model.Write(stream);
             else
-                WriteAsModel(stream, SubModels);
-
-            realStream.Position = ReservedArea;
-            realStream.Write(stream.GetBuffer(), 0, (int)stream.Length);
+            {
+                var tempStream = new MemoryStream();
+                WriteAsModel(tempStream, SubModels);
+                stream.Position = ReservedArea;
+                stream.Write(tempStream.GetBuffer(), 0, (int)tempStream.Length);
+            }
         }
 
         private static void WriteAsModel(Stream stream, List<SubModel> subModels)
@@ -70,28 +72,30 @@ namespace OpenKh.Kh2
         private static T[] For<T>(int count, Func<T> func) =>
             Enumerable.Range(0, count).Select(_ => func()).ToArray();
 
-        private Mdlx(M4 mapModel)
+        private Mdlx(Model model)
         {
-            this.MapModel = mapModel;
+            Model = model;
         }
 
-        public static Mdlx CreateFromMapModel(M4 mapModel) => new Mdlx(mapModel);
+        public static Mdlx CreateFromMapModel(ModelBackground model) => new(model);
 
         private Mdlx()
         {
-            SubModels = new List<SubModel>();
-            SubModels.Add(new SubModel
+            SubModels = new List<SubModel>
             {
-                Type = Entity,
-                Bones = new List<Bone>(),
-                DmaChains = new List<DmaChain>(),
-            });
-            SubModels.Add(new SubModel
-            {
-                Type = Shadow,
-                Bones = new List<Bone>(),
-                DmaChains = new List<DmaChain>(),
-            });
+                new SubModel
+                {
+                    Type = Entity,
+                    Bones = new List<Bone>(),
+                    DmaChains = new List<DmaChain>(),
+                },
+                new SubModel
+                {
+                    Type = Shadow,
+                    Bones = new List<Bone>(),
+                    DmaChains = new List<DmaChain>(),
+                }
+            };
         }
 
         public static Mdlx CreateModelFromScratch() => new Mdlx();

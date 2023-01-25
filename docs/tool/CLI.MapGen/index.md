@@ -1,4 +1,54 @@
-# [OpenKh Tool Documentation](../index.md) - MapGen
+# [OpenKh Tool Documentation](../index.md) - MapGen <!-- omit in toc -->
+
+TOC
+
+- [Overview](#overview)
+- [Command usage](#command-usage)
+  - [Supported 3D model data formats](#supported-3d-model-data-formats)
+  - [Supported 3D model data concepts](#supported-3d-model-data-concepts)
+  - [Example: fbx to map](#example-fbx-to-map)
+- [mapdef.yml](#mapdefyml)
+  - [Material definition](#material-definition)
+  - [scale](#scale)
+  - [applyMatrix](#applymatrix)
+  - [imageDirs](#imagedirs)
+  - [imgtoolOptions](#imgtooloptions)
+  - [textureOptions](#textureoptions)
+  - [uvscList](#uvsclist)
+  - [disableTriangleStripsOptimization](#disabletrianglestripsoptimization)
+  - [disableBSPCollisionBuilder](#disablebspcollisionbuilder)
+  - [ignore](#ignore)
+  - [nodraw](#nodraw)
+  - [noclip](#noclip)
+  - [fromFile](#fromfile)
+  - [surfaceFlags](#surfaceflags)
+  - [maxColorIntensity](#maxcolorintensity)
+  - [maxAlpha](#maxalpha)
+  - [transparentFlag](#transparentflag)
+  - [skipConversionIfExists](#skipconversionifexists)
+  - [reuseImd](#reuseimd)
+  - [uvscIndex](#uvscindex)
+  - [ground](#ground)
+  - [floorLevel](#floorlevel)
+  - [cameraClip](#cameraclip)
+  - [cameraFlags](#cameraflags)
+  - [lightClip](#lightclip)
+  - [lightFlags](#lightflags)
+  - [noShadow](#noshadow)
+  - [alphaAdd](#alphaadd)
+  - [alphaSubtract](#alphasubtract)
+  - [normal](#normal)
+  - [bar](#bar)
+  - [nococt](#nococt)
+  - [nodoct](#nodoct)
+  - [collisionPartitionSize](#collisionpartitionsize)
+  - [doctPartitionSize](#doctpartitionsize)
+  - [fog](#fog)
+  - [bgColor](#bgcolor)
+  - [onColorTable](#oncolortable)
+  - [default](#default)
+  - [imageDirs and fromFile](#imagedirs-and-fromfile)
+- [Example of designer tools usage](#example-of-designer-tools-usage)
 
 ## Overview
 
@@ -283,6 +333,104 @@ reuseImd: true
   uvscIndex: 0
 ```
 
+### ground
+
+Ground value in collision. Such as 30, 25, 8, 2, 1, or 0
+
+For light collision, this is index to `onColorTable[]`.
+
+```yml
+- name: 'floor'
+  ground: 1
+```
+
+### floorLevel
+
+FloorLevel value in collision
+
+```yml
+- name: 'floor'
+  floorLevel: 1
+```
+
+### cameraClip
+
+Setting cameraClip to true will generate camera collision plane.
+
+```yml
+- name: 'camera'
+  nodraw: true
+  noclip: true
+  cameraClip: true
+  cameraFlags: 0x000003F0
+```
+
+### cameraFlags
+
+This is Collision.Attributes (surfaceFlags) of camera collision data.
+
+```yml
+- name: 'camera'
+  nodraw: true
+  noclip: true
+  cameraClip: true
+  cameraFlags: 0x000003F0
+```
+
+### lightClip
+
+Setting lightClip to true will generate light collision plane.
+
+```yml
+- name: 'light'
+  nodraw: true
+  noclip: true
+  lightClip: true
+  lightFlags: 0x000803F1
+```
+
+### lightFlags
+
+This is Collision.Attributes (surfaceFlags) of light collision data.
+
+```yml
+- name: 'light'
+  nodraw: true
+  noclip: true
+  lightClip: true
+  lightFlags: 0x000803F1
+```
+
+### noShadow
+
+```yml
+- name: 'floor'
+  noShadow: true
+```
+
+### alphaAdd
+
+```yml
+- name: 'floor'
+  alphaAdd: true
+```
+
+### alphaSubtract
+
+```yml
+- name: 'floor'
+  alphaSubtract: true
+```
+
+### normal
+
+Set `IsSpecular` to true, and then attach normal vector.
+
+```yml
+- name: 'lens_flare'
+  normal: true
+```
+
 ### bar
 
 ```yml
@@ -301,6 +449,80 @@ bar:
   doct:
     name: "eh_1"
     toFile: 'eh_1_0.doct'
+  camera:
+    name: "CH_e"
+    toFile: 'CH_e.coct'
+  light:
+    name: "COL_"
+    toFile: 'COL_.coct'
+```
+
+### nococt
+
+Applying `nococt: true` will skip COCT generation. default is `nococt: false`.
+
+```yml
+nococt: true
+```
+
+This is a mandatory option if we build SK0 model, because the bounding box of COCT has limitation of INT16 range (-32768 ~ 32767).
+
+### nodoct
+
+Applying `nodoct: true` will skip DOCT generation. default is `nodoct: false`.
+
+```yml
+nodoct: true
+```
+
+This is a mandatory option if we build SK0 model, because the bounding box of DOCT has limitation of INT16 range (-32768 ~ 32767).
+
+### collisionPartitionSize
+
+Split nodes until single node has up to specified mesh face count.
+
+```yml
+collisionPartitionSize: 300
+```
+
+### doctPartitionSize
+
+Split nodes until single node has up to specified mesh face count.
+
+```yml
+doctPartitionSize: 500
+```
+
+### fog
+
+Fog effect. Color is AABBGGRR format.
+
+```yml
+fog:
+  color: 0x80402010
+  min: 100
+  max: 700
+  near: 0
+  far: 255
+```
+
+### bgColor
+
+Background color in AABBGGRR format.
+
+```yml
+bgColor: 0x80804010
+```
+
+### onColorTable
+
+Map colors up to 16 colors. `0x80808080` are appended on lack. Excess is dropped. Color is in AABBGGRR format.
+
+```yml
+onColorTable:
+  - 0x80808080
+  - 0x80808080
+  - 0x80808080
 ```
 
 ### default

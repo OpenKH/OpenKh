@@ -1,4 +1,4 @@
-﻿using OpenKh.Kh2;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Battle;
 using OpenKh.Tools.Kh2BattleEditor.Extensions;
 using OpenKh.Tools.Kh2BattleEditor.Interfaces;
@@ -89,9 +89,9 @@ namespace OpenKh.Tools.Kh2BattleEditor.ViewModels
                 public byte Magic { get => _level.Magic; set => _level.Magic = value; }
                 public byte Defense { get => _level.Defense; set => _level.Defense = value; }
                 public byte Ap { get => _level.Ap; set => _level.Ap = value; }
-                public short SwordAbility { get => _level.SwordAbility; set => _level.SwordAbility = value; }
-                public short ShieldAbility { get => _level.ShieldAbility; set => _level.ShieldAbility = value; }
-                public short StaffAbility { get => _level.StaffAbility; set => _level.StaffAbility = value; }
+                public ushort SwordAbility { get => _level.SwordAbility; set => _level.SwordAbility = value; }
+                public ushort ShieldAbility { get => _level.ShieldAbility; set => _level.ShieldAbility = value; }
+                public ushort StaffAbility { get => _level.StaffAbility; set => _level.StaffAbility = value; }
             }
         }
     }

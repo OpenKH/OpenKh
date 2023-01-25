@@ -17,7 +17,7 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                 return;
             ForTreeNode($"Node {index}", () =>
             {
-                var node = coct.CollisionMeshGroupList[index];
+                var node = coct.Nodes[index];
                 ImGui.Text($"Box {node.BoundingBox}");
                 Node(coct, node.Child1);
                 Node(coct, node.Child2);
@@ -33,17 +33,18 @@ namespace OpenKh.Tools.Kh2MapStudio.Windows
                     ForTreeNode($"Mesh {mesh.GetHashCode()}", () =>
                     {
                         ImGui.Text($"Box {mesh.BoundingBox}");
-                        ImGui.Text($"Unk10 {mesh.v10}");
-                        ImGui.Text($"Unk12 {mesh.v12}");
+                        ImGui.Text($"Visibility {mesh.Visibility}");
+                        ImGui.Text($"Group {mesh.Group}");
 
                         foreach (var collision in mesh.Collisions)
                         {
                             ForTreeNode($"Collision {collision.GetHashCode()}", () =>
                             {
-                                ImGui.Text($"Unk00 {collision.v00}");
+                                ImGui.Text($"Ground {collision.Ground}");
+                                ImGui.Text($"Floor Level {collision.FloorLevel}");
                                 ImGui.Text($"Plane {collision.Plane}");
                                 ImGui.Text($"Bound Box {collision.BoundingBox}");
-                                ImGui.Text($"Flags {collision.SurfaceFlags:X08}");
+                                ImGui.Text($"Flags {collision.Attributes:X08}");
                             });
                         }
                     });

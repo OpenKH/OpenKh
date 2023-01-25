@@ -23,6 +23,7 @@ namespace OpenKh.WinShell.IMDUtilities
             using (MemoryStream _cStream = new MemoryStream())
             {
                 SelectedItemStream.CopyTo(_cStream);
+                SelectedItemStream.Dispose();
 
                 _tImage = new Lazy<IImageRead>(() => Imgd.Read(_cStream));
 

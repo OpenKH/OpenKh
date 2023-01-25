@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xe.BinaryMapper;
@@ -7,12 +7,12 @@ namespace OpenKh.Bbs
 {
     public partial class Bbsa
     {
-        protected interface ILba
+        public interface ILba
         {
             uint Hash { get; }
         }
 
-        protected class Partition<TLba> where TLba : ILba
+        public class Partition<TLba> where TLba : ILba
         {
             [Data] public uint Name { get; set; }
             [Data] public short Count { get; set; }
@@ -23,42 +23,59 @@ namespace OpenKh.Bbs
                 $"{Name:X08} {Count:X04} {Offset:X04}";
         }
 
-        protected class PartitionFileEntry : ILba
+        public class PartitionFileEntry : ILba
         {
             [Data] public uint Hash { get; set; }
             [Data] public uint Info { get; set; }
             public int Offset => (int)(Info >> 12);
             public int Size => (int)(Info & 0xFFF);
 
+            public long LocationOffset;
             public override string ToString() =>
                 $"{Hash:X08} {Offset:X06} {Size:X03}";
 
-            internal static PartitionFileEntry Read(Stream stream) =>
-                BinaryMapping.ReadObject<PartitionFileEntry>(stream);
+            internal static PartitionFileEntry Read(Stream stream)
+            {
+                var pastPos = stream.Position;
+                PartitionFileEntry part = BinaryMapping.ReadObject<PartitionFileEntry>(stream);
+                part.LocationOffset = pastPos;
+                return part;
+            }
+            internal void Write(Stream stream)
+            {
+                Info = (uint)((Offset << 12) + Size);
+                BinaryMapping.WriteObject<PartitionFileEntry>(stream, this, (int)LocationOffset);
+            }
         }
 
-        protected class ArchivePartitionEntry : ILba
+        public class ArchivePartitionEntry : ILba
         {
             [Data] public uint Hash { get; set; }
+            [Data] public short Count { get; set; }
             [Data] public short Offset { get; set; }
-            [Data] public byte Count { get; set; }
-            [Data] public byte Unknown { get; set; }
+
+            public long LocationOffset;
             public ArcEntry[] UnknownItems { get; set; }
 
             public override string ToString() =>
-                $"{Hash:X08} {Offset:X04} {Count:X02} {Unknown:X02}";
+                $"{Hash:X08} {Offset:X04} {Count:X02}";
 
-            internal static ArchivePartitionEntry Read(Stream stream) =>
-                BinaryMapping.ReadObject<ArchivePartitionEntry>(stream);
+            internal static ArchivePartitionEntry Read(Stream stream)
+            {
+                var pastPos = stream.Position;
+                ArchivePartitionEntry archivepart = BinaryMapping.ReadObject<ArchivePartitionEntry>(stream);
+                archivepart.LocationOffset = pastPos;
+                return archivepart;
+            }
         }
 
-        protected class ArcEntry
+        public class ArcEntry
         {
-            [Data] public short Unknown00 { get; set; }
+            [Data] public short LinkIndex { get; set; }//+6 to partition entry index
             [Data] public uint Hash { get; set; }
 
             public override string ToString() =>
-                $"{Hash:X08} {Unknown00:X04}";
+                $"{Hash:X08} {LinkIndex:X04}";
 
             internal static ArcEntry Read(Stream stream) =>
                 BinaryMapping.ReadObject<ArcEntry>(stream);
@@ -99,7 +116,7 @@ namespace OpenKh.Bbs
             }
         }
 
-        private static void ReadUnknownStruct(IEnumerable<Partition<ArchivePartitionEntry>> partitions, Stream stream, int baseOffset)
+        private static void ReadArcEntries(IEnumerable<Partition<ArchivePartitionEntry>> partitions, Stream stream, int baseOffset)
         {
             foreach (var partition in partitions)
             {

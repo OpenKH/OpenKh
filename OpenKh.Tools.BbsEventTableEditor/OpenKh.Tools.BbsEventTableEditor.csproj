@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <UseWPF>true</UseWPF>
     <AssemblyTitle>BBS Event table editor</AssemblyTitle>
     <Product>BBS Event table editor - OpenKH</Product>
@@ -11,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OpenKh.Common\OpenKh.Common.csproj" />
     <ProjectReference Include="..\OpenKh.Bbs\OpenKh.Bbs.csproj" />
+    <ProjectReference Include="..\OpenKh.Tools.Common.Wpf\OpenKh.Tools.Common.Wpf.csproj" />
     <ProjectReference Include="..\OpenKh.Tools.Common\OpenKh.Tools.Common.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools.Wpf\Xe.Tools.Wpf.csproj" />
     <ProjectReference Include="..\XeEngine.Tools.Public\Xe.Tools\Xe.Tools.csproj" />

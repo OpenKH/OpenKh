@@ -1,12 +1,14 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using OpenKh.Common;
+using OpenKh.Engine;
 using OpenKh.Engine.MonoGame;
 using OpenKh.Engine.Parsers;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
 using OpenKh.Kh2.Extensions;
 using OpenKh.Kh2.Models;
+using OpenKh.Kh2.Utils;
 using OpenKh.Tools.Kh2MapStudio.Interfaces;
 using OpenKh.Tools.Kh2MapStudio.Models;
 using System;
@@ -122,6 +124,10 @@ namespace OpenKh.Tools.Kh2MapStudio
         public SpawnScriptModel SpawnScriptBattle { get; private set; }
         public SpawnScriptModel SpawnScriptEvent { get; private set; }
 
+        public List<EventScriptModel> EventScripts { get; private set; }
+
+        public CurrentArea CurrentArea { get; private set; }
+
         public MapRenderer(ContentManager content, xna.GraphicsDeviceManager graphics)
         {
             _graphicsManager = graphics;
@@ -135,6 +141,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 CameraPosition = new Vector3(0, 100, 200),
                 CameraRotationYawPitchRoll = new Vector3(90, 0, 10),
             };
+            CurrentArea = new CurrentArea();
 
             _whiteTexture = new Texture2D(_graphics, 2, 2);
             _whiteTexture.SetData(Enumerable.Range(0, 2 * 2 * sizeof(int)).Select(_ => (byte)0xff).ToArray());
@@ -165,19 +172,19 @@ namespace OpenKh.Tools.Kh2MapStudio
             }
 
             var mapCollisionEntry = MapBarEntries
-                .Where(x => x.Name.StartsWith("ID_") && x.Type == Bar.EntryType.MapCollision)
+                .Where(x => x.Name.StartsWith("ID_") && x.Type == Bar.EntryType.CollisionOctalTree)
                 .FirstOrDefault();
             if (mapCollisionEntry != null)
                 MapCollision = new CollisionModel(Coct.Read(mapCollisionEntry.Stream));
 
             var cameraCollisionEntry = MapBarEntries
-                .Where(x => x.Name.StartsWith("CH_") && x.Type == Bar.EntryType.CameraCollision)
+                .Where(x => x.Name.StartsWith("CH_") && x.Type == Bar.EntryType.CameraOctalTree)
                 .FirstOrDefault();
             if (cameraCollisionEntry != null)
                 CameraCollision = new CollisionModel(Coct.Read(cameraCollisionEntry.Stream));
 
             var lightCollisionEntry = MapBarEntries
-                .Where(x => x.Name == "COL_" && x.Type == Bar.EntryType.LightData)
+                .Where(x => x.Name == "COL_" && x.Type == Bar.EntryType.ColorOctalTree)
                 .FirstOrDefault();
             if (lightCollisionEntry != null)
                 LightCollision = new CollisionModel(Coct.Read(lightCollisionEntry.Stream));
@@ -211,6 +218,18 @@ namespace OpenKh.Tools.Kh2MapStudio
             SpawnScriptMap = SpawnScriptModel.Create(ArdBarEntries, "map");
             SpawnScriptBattle = SpawnScriptModel.Create(ArdBarEntries, "btl");
             SpawnScriptEvent = SpawnScriptModel.Create(ArdBarEntries, "evt");
+
+            EventScripts = ArdBarEntries
+                .Where(x => x.Type == Bar.EntryType.Event)
+                .Select(
+                    x => {
+                        return new EventScriptModel(
+                            x.Name, 
+                            Event.Read(x.Stream)
+                        );
+                    }
+                )
+                .ToList();
         }
 
         public void SaveArd(string fileName)
@@ -231,6 +250,19 @@ namespace OpenKh.Tools.Kh2MapStudio
             SpawnScriptMap?.SaveToBar(ArdBarEntries);
             SpawnScriptBattle?.SaveToBar(ArdBarEntries);
             SpawnScriptEvent?.SaveToBar(ArdBarEntries);
+
+            foreach (var eventScript in EventScripts)
+            {
+                var memStream = new MemoryStream();
+                Event.Write(memStream, eventScript.EventEntries);
+
+                ArdBarEntries.AddOrReplace(new Bar.Entry
+                {
+                    Name = eventScript.Name,
+                    Type = Bar.EntryType.Event,
+                    Stream = memStream
+                });
+            }
 
             File.Create(fileName).Using(stream => Bar.Write(stream, ArdBarEntries));
         }
@@ -260,6 +292,11 @@ namespace OpenKh.Tools.Kh2MapStudio
         {
             var viewport = _graphics.Viewport;
             Camera.AspectRatio = viewport.Width / (float)viewport.Height;
+
+            if (MapCollision?.Coct is Coct coct)
+            {
+                CurrentArea.AreaSettingsMask = LocateCurrentArea(coct, Camera.CameraPosition);
+            }
 
             _graphics.RasterizerState = new RasterizerState()
             {
@@ -356,8 +393,60 @@ namespace OpenKh.Tools.Kh2MapStudio
             });
         }
 
+        private int? LocateCurrentArea(Coct coct, Vector3 pos)
+        {
+            int? area = null;
+
+            pos = new Vector3(-pos.X, -pos.Y, -pos.Z);
+
+            bool Contains(BoundingBoxInt16 bbox)
+            {
+                return true
+                    && bbox.Minimum.X <= pos.X && pos.X <= bbox.Maximum.X
+                    && bbox.Minimum.Y <= pos.Y && pos.Y <= bbox.Maximum.Y
+                    && bbox.Minimum.Z <= pos.Z && pos.Z <= bbox.Maximum.Z
+                    ;
+            }
+
+            void Walk(int idx)
+            {
+                var node = coct.Nodes[idx];
+
+                if (Contains(node.BoundingBox))
+                {
+                    foreach (var mesh in node.Meshes)
+                    {
+                        if (Contains(mesh.BoundingBox))
+                        {
+                            if (area == null)
+                            {
+                                area = 0;
+                            }
+
+                            area |= mesh.MapVisibility;
+                            break;
+                        }
+                    }
+
+                    foreach (var child in new[] { node.Child1, node.Child2, node.Child3, node.Child4, node.Child5, node.Child6, node.Child7, node.Child8 }
+                        .Where(it => it != -1)
+                    )
+                    {
+                        Walk(child);
+                    }
+                }
+            }
+
+            Walk(0);
+
+            return area;
+        }
+
         private void RenderMeshNew(EffectPass pass, MeshGroup mesh, bool passRenderOpaque)
         {
+            if (mesh.MeshDescriptors == null)
+                return;
+
             foreach (var meshDescriptor in mesh.MeshDescriptors)
             {
                 if (meshDescriptor.IsOpaque != passRenderOpaque)

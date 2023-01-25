@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="OpenKh.Tools.Kh2SystemEditor.Views.FtstView"
+<UserControl x:Class="OpenKh.Tools.Kh2SystemEditor.Views.FtstView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2SystemEditor.Views"
-             xmlns:wpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+             xmlns:wpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit.NET5"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="500">
     <UserControl.Resources>

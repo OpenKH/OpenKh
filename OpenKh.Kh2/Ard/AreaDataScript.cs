@@ -126,6 +126,7 @@ namespace OpenKh.Kh2.Ard
             [0x0F] = typeof(Party),
             [0x10] = typeof(Bgm),
             [0x11] = typeof(MsgWall),
+            [0x12] = typeof(AllocPacket),
             [0x13] = typeof(Camera),
             [0x14] = typeof(StatusFlag3),
             [0x15] = typeof(Mission),
@@ -233,11 +234,11 @@ namespace OpenKh.Kh2.Ard
 
         public class Capacity : IAreaDataCommand
         {
-            [Data] public float Value { get; set; }
+            [Data] public int Value { get; set; }
 
             public void Parse(int nRow, List<string> tokens)
             {
-                Value = ParseAsFloat(nRow, GetToken(nRow, tokens, 1));
+                Value = ParseAsInt(nRow, GetToken(nRow, tokens, 1));
             }
 
             public override string ToString() =>
@@ -250,6 +251,19 @@ namespace OpenKh.Kh2.Ard
 
             public override string ToString() =>
                 $"{nameof(AllocEnemy)} {Value}";
+
+            public void Parse(int nRow, List<string> tokens)
+            {
+                Value = ParseAsInt(nRow, GetToken(nRow, tokens, 1));
+            }
+        }
+
+        public class AllocPacket : IAreaDataCommand
+        {
+            [Data] public int Value { get; set; }
+
+            public override string ToString() =>
+                $"{nameof(AllocPacket)} {Value}";
 
             public void Parse(int nRow, List<string> tokens)
             {
@@ -341,7 +355,7 @@ namespace OpenKh.Kh2.Ard
                 var sb = new StringBuilder();
                 sb.AppendLine($"{nameof(AreaSettings)} {Unk00} {Unk02}");
                 foreach (var item in Settings)
-                    sb.AppendLine($"\t{item}");
+                    sb.AppendLine($" {item}");
 
                 return sb.ToString().Replace("\r", string.Empty);
             }
@@ -527,7 +541,6 @@ namespace OpenKh.Kh2.Ard
 
             public void Parse(int nRow, List<string> tokens)
             {
-                Value = ParseAsInt(nRow, GetToken(nRow, tokens, 1));
                 throw new Exception($"Parsing an '{nameof(If)}' is not yet supported");
             }
 
@@ -756,6 +769,16 @@ namespace OpenKh.Kh2.Ard
             return sb.ToString().Replace("\r", string.Empty);
         }
 
+        public static bool IsValid(Stream stream)
+        {
+            if (stream.Length == 0)
+                return false;
+
+            var isValid = stream.SetPosition(stream.Length - 4).ReadInt32() == 0x0000FFFF;
+            stream.SetPosition(0);
+            return isValid;
+        }
+
         public static List<AreaDataScript> Read(Stream stream) =>
             ReadAll(stream).ToList();
 
@@ -790,7 +813,7 @@ namespace OpenKh.Kh2.Ard
 
         public static string Decompile(IEnumerable<AreaDataScript> scripts) =>
             string.Join("\n\n", scripts.Select(x => x.ToString()));
-
+        
         public static IEnumerable<AreaDataScript> Compile(string text)
         {
             const char Comment = '#';
@@ -840,7 +863,7 @@ namespace OpenKh.Kh2.Ard
                         function.Parse(row, tokens);
                         script.Functions.Add(function);
 
-                        while (row < lines.Length && (lines[row].Length == 0 || lines[row][0] == '\t'))
+                        while (row < lines.Length && (lines[row].Length == 0 || char.IsWhiteSpace(lines[row][0])))
                         {
                             line = lines[row++];
                             cleanLine = line.Split(Comment);

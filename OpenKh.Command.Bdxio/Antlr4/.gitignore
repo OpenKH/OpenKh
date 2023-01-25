@@ -1,0 +1,7 @@
+/.antlr
+/.vscode
+/BdxScript.interp
+/BdxScript.tokens
+/BdxScriptLexer.interp
+/BdxScriptLexer.tokens
+/test.bdxa

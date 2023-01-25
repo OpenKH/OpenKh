@@ -1,6 +1,7 @@
 using OpenKh.Common;
 using OpenKh.Kh2;
 using OpenKh.Ps2;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -172,6 +173,7 @@ namespace OpenKh.Engine.Parsers
         public List<MeshDescriptor> ProcessVerticesAndBuildModel(Matrix4x4[] matrices)
         {
             immutableExportedMesh.positionList.Clear();
+            var weights = new List<VertexBoxWeight[]>();
             for (var i = 0; i < immutableExportedMesh.vertexAssignments.Count; i++)
             {
                 var vertexAssignments = immutableExportedMesh.vertexAssignments[i];
@@ -181,6 +183,16 @@ namespace OpenKh.Engine.Parsers
                     vertexAssignments.Select(
                         vertexAssigns =>
                         {
+                            weights.Add(
+                                (vertexAssigns.Length == 1)
+                                ? vertexAssigns
+                                    .Select(it => new VertexBoxWeight(it.MatrixIndex, 1f))
+                                    .ToArray()
+                                : vertexAssigns
+                                    .Select(it => new VertexBoxWeight(it.MatrixIndex, vertices[it.VertexIndex].W))
+                                    .ToArray()
+                            );
+
                             Vector3 finalPos = Vector3.Zero;
                             if (vertexAssigns.Length == 1)
                             {
@@ -212,6 +224,7 @@ namespace OpenKh.Engine.Parsers
             {
                 var vertices = new List<PositionColoredTextured>();
                 var indices = new List<int>();
+                var vertexBoneWeights = new List<VertexBoxWeight[]>();
 
                 int triangleRefCount = part.triangleRefList.Count;
                 for (int triIndex = 0; triIndex < triangleRefCount; triIndex++)
@@ -221,10 +234,14 @@ namespace OpenKh.Engine.Parsers
                     {
                         VertexRef vertRef = triRef.list[i];
                         indices.Add(vertices.Count);
+
+                        vertexBoneWeights.Add(weights[vertRef.vertexIndex]);
+
                         vertices.Add(new PositionColoredTextured(
                             immutableExportedMesh.positionList[vertRef.vertexIndex],
                             immutableExportedMesh.uvList[vertRef.uvIndex],
-                            1.0f, 1.0f, 1.0f, 1.0f));
+                            1.0f, 1.0f, 1.0f, 1.0f
+                        ));
                     }
                 }
 
@@ -235,6 +252,7 @@ namespace OpenKh.Engine.Parsers
                         TextureIndex = part.TextureIndex,
                         Vertices = vertices.ToArray(),
                         Indices = indices.ToArray(),
+                        VertexBoneWeights = vertexBoneWeights.ToArray(),
                     }
                 );
             }

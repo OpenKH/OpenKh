@@ -1,12 +1,14 @@
 using Assimp;
 using ImGuiNET;
 using Microsoft.Xna.Framework.Input;
+using OpenKh.Engine;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.CustomImGui;
 using OpenKh.Tools.Kh2MapStudio.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Windows;
 using Xe.Tools.Wpf.Dialogs;
@@ -133,6 +135,19 @@ namespace OpenKh.Tools.Kh2MapStudio
 
             ForWindow("Tools", () =>
             {
+                if (_mapRenderer.CurrentArea.AreaSettingsMask is int areaSettingsMask)
+                {
+                    ImGui.Text($"AreaSettings 0 -1");
+
+                    for (int x = 0; x < 32; x++)
+                    {
+                        if ((areaSettingsMask & (1 << x)) != 0)
+                        {
+                            ImGui.Text($"AreaSettings {x} -1");
+                        }
+                    }
+                }
+
                 if (EditorSettings.ViewCamera)
                     CameraWindow.Run(_mapRenderer.Camera);
                 if (EditorSettings.ViewLayerControl)
@@ -149,6 +164,14 @@ namespace OpenKh.Tools.Kh2MapStudio
                     SpawnScriptWindow.Run("btl", _mapRenderer.SpawnScriptBattle);
                 if (EditorSettings.ViewSpawnScriptEvent)
                     SpawnScriptWindow.Run("evt", _mapRenderer.SpawnScriptEvent);
+
+                if (_mapRenderer.EventScripts != null)
+                {
+                    foreach (var eventScript in _mapRenderer.EventScripts)
+                    {
+                        EventScriptWindow.Run(eventScript.Name, eventScript);
+                    }
+                }
             });
 
             ImGui.PopStyleColor();
@@ -313,29 +336,24 @@ namespace OpenKh.Tools.Kh2MapStudio
 
         private void EnumerateMapList()
         {
-            var mapFiles = Directory.GetFiles(_mapPath, "*.map");
-            if (mapFiles.Length == 0)
+            var mapFiles = Array.Empty<string>();
+            foreach (var region in Constants.Regions)
             {
-                foreach (var region in Constants.Regions)
+                var testPath = Path.Combine(_mapPath, region);
+                if (Directory.Exists(testPath))
                 {
-                    var testPath = Path.Combine(_mapPath, region);
-                    if (Directory.Exists(testPath))
+                    mapFiles = Directory.GetFiles(testPath, "*.map");
+                    if (mapFiles.Length != 0)
                     {
                         _mapPath = testPath;
                         _region = region;
                         break;
                     }
                 }
-                mapFiles = Directory.GetFiles(_mapPath, "*.map");
             }
 
             _mapList.Clear();
-            foreach (var mapFile in mapFiles)
-            {
-                var mapName = Path.GetFileNameWithoutExtension(mapFile);
-                if (File.Exists(Path.Combine(_ardPath, $"{mapName}.ard")))
-                    _mapList.Add(mapName);
-            }
+            _mapList.AddRange(mapFiles.Select(Path.GetFileNameWithoutExtension));
         }
 
         private void AddKeyMapping(Keys key, Action action)
@@ -369,9 +387,9 @@ namespace OpenKh.Tools.Kh2MapStudio
                 camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
             if (keyboard.IsKeyDown(Keys.S))
                 camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtX, moveSpeed * 5);
-            if (keyboard.IsKeyDown(Keys.A))
-                camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
             if (keyboard.IsKeyDown(Keys.D))
+                camera.CameraPosition -= Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
+            if (keyboard.IsKeyDown(Keys.A))
                 camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtY, moveSpeed * 5);
             if (keyboard.IsKeyDown(Keys.Q))
                 camera.CameraPosition += Vector3.Multiply(camera.CameraLookAtZ, moveSpeed * 5);
@@ -396,7 +414,7 @@ namespace OpenKh.Tools.Kh2MapStudio
                 var camera = _mapRenderer.Camera;
                 var xSpeed = (_previousMousePosition.X - mouse.Position.X) * Speed;
                 var ySpeed = (_previousMousePosition.Y - mouse.Position.Y) * Speed;
-                camera.CameraRotationYawPitchRoll += new Vector3(1 * xSpeed, 0, 0);
+                camera.CameraRotationYawPitchRoll += new Vector3(1 * -xSpeed, 0, 0);
                 camera.CameraRotationYawPitchRoll += new Vector3(0, 0, 1 * ySpeed);
             }
 

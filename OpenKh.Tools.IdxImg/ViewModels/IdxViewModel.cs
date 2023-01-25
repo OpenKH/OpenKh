@@ -3,6 +3,7 @@ using OpenKh.Tools.IdxImg.Interfaces;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Xe.Tools.Wpf.Commands;
 using Xe.Tools.Wpf.Dialogs;
 
@@ -16,7 +17,11 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             base(name, GetChildren(name, idxManager))
         {
             _idxManager = idxManager;
-            ExportCommand = new RelayCommand(_ => FileDialog.OnFolder(Extract));
+            ExportCommand = new RelayCommand(_ =>
+                FileDialog.OnFolder(x =>
+                    Task.Run(() =>
+                        ExtractProcessor.ShowProgress(progress =>
+                            Extract(x, progress)))));
         }
 
         public string ShortName => Path.GetFileNameWithoutExtension(Name);
@@ -34,16 +39,26 @@ namespace OpenKh.Tools.IdxImg.ViewModels
             }
         }
 
-        public override void Extract(string outputPath)
+        public override void Extract(string outputPath, IExtractProgress progress)
         {
             foreach (var child in Children)
-                child.Extract(Path.Combine(outputPath, ShortName));
+            {
+                if (progress.CancellationToken.IsCancellationRequested)
+                    break;
+
+                child.Extract(Path.Combine(outputPath, ShortName), progress);
+            }
         }
 
-        public void ExtractAndMerge(string outputPath)
+        public void ExtractAndMerge(string outputPath, IExtractProgress progress)
         {
             foreach (var child in Children)
-                child.Extract(outputPath);
+            {
+                if (progress.CancellationToken.IsCancellationRequested)
+                    break;
+
+                child.Extract(outputPath, progress);
+            }    
         }
     }
 }

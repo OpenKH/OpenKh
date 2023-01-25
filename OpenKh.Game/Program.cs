@@ -65,6 +65,10 @@ namespace OpenKh.Game
         [Option("--data <GAME_PATH>", "Location of game's data", CommandOptionType.SingleValue)]
         public string ContentPath { get; }
 
+
+        [Option("--modpath <MOD_PATH>", "Location of game's modified assets", CommandOptionType.SingleValue)]
+        public string ModPath { get; }
+
         [Option(CommandOptionType.NoValue, ShortName = "v", LongName = "console", Description = "Show the console output (Windows only)")]
         public bool ShowConsole { get; set; }
 
@@ -105,6 +109,7 @@ namespace OpenKh.Game
             using var game = new OpenKhGame(new OpenKhGameStartup
             {
                 ContentPath = ContentPath,
+                ModPath = ModPath,
                 InitialState = InitialState,
                 InitialMap = Kh2.Constants.WorldIds
                     .Select((world, index) => (world, index))

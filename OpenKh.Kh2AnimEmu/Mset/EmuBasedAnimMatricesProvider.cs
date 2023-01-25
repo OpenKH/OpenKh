@@ -1,3 +1,4 @@
+using OpenKh.Common;
 using OpenKh.Kh2Anim.Mset.EmuRunner;
 using OpenKh.Kh2Anim.Mset.Interfaces;
 using System;
@@ -62,26 +63,7 @@ namespace OpenKh.Kh2Anim.Mset
             matrixOutStream.Position = 0;
             var matrixOut = new Matrix4x4[animReader.cntb1];
             for (int t = 0; t < animReader.cntb1; t++)
-            {
-                var m = new Matrix4x4();
-                m.M11 = br.ReadSingle();
-                m.M12 = br.ReadSingle();
-                m.M13 = br.ReadSingle();
-                m.M14 = br.ReadSingle();
-                m.M21 = br.ReadSingle();
-                m.M22 = br.ReadSingle();
-                m.M23 = br.ReadSingle();
-                m.M24 = br.ReadSingle();
-                m.M31 = br.ReadSingle();
-                m.M32 = br.ReadSingle();
-                m.M33 = br.ReadSingle();
-                m.M34 = br.ReadSingle();
-                m.M41 = br.ReadSingle();
-                m.M42 = br.ReadSingle();
-                m.M43 = br.ReadSingle();
-                m.M44 = br.ReadSingle();
-                matrixOut[t] = m;
-            }
+                matrixOut[t] = matrixOutStream.ReadMatrix4x4();
 
             return matrixOut;
         }

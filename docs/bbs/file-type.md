@@ -21,27 +21,29 @@
 | [bcd](file//type/bcd.md) | Map collision | 
 | [bdc](file//type/bdc.md) | Contains Command Board settings | 
 | [bdd](file//type/bdd.md) | Contains settings related to the Command Board's dice behavior | 
-| [bep](file//type/bep.md) | List of base enemy parameters | 
+| [bep](file//type/bep.md) | List of base enemy parameters | OpenKh.Tools.BepEditor
 | [bgm](file//type/bgm.md) | List of background music in the game | 
 | [bsd](file//type/bsd.md) | List of Status Ailments and the effects they play on characters | 
 | [ctd](file//type/ctd.md) | File containing a list of text strings and how they need to be displayed | 
 | [ead](file//type/ead.md) | Controls effects attached to weapons | 
-| ecm | Unknown | 
-| edp | Unknown | 
-| [epd](file//type/epd.md) | File that controls various parameters for enemies. Overwrites data in .bep | 
-| esd | Unknown | 
-| ese | Unknown | 
+| [ecm](file//type/ecm.md) | Controls camera used on characters, mainly NPCs | 
+| edp | File used for special settings, for example, EXP 0 stats | 
+| [epd](file//type/epd.md) | File that controls various parameters for enemies. Overwrites data in .bep | OpenKh.Tools.EpdEditor
+| [esd](file//type/esd.md) | It controls what files the current arc inherits from | 
+| [ese](file//type/esd.md) | Sound effects for particle effects | 
 | ept | AI routine | 
+| etp | Unknown | 
 | [exa](file//type/exa.md) | Cutscene files | 
-| exb | Unknown | 
-| fep | Particle Effects | 
+| [exb](file//type/exb.md) | Binary version of an Excel file containing minigame related data | 
+| [fep](file//type/fep.md) | Particle Effects | 
 | [frr](file//type/frr.md) | Unknown | 
-| gpd | Unknown | 
-| [itb](file//type/itb.md) | List of treasure boxes and their contents | 
-| [itc](file//type/itc.md) | List of items obtained through events | 
-| l2d | Layout file | 
+| [gpd](file//type/gpd.md) | List of prizes dropped by Gimmick entities | 
+| [itb](file//type/itb.md) | List of treasure boxes and their contents | OpenKh.Tools.ItbEditor
+| [itc](file//type/itc.md) | List of items obtained through collectibles | OpenKh.Tools.ItcEditor
+| [ite](file//type/ite.md) | List of items used in the game | OpenKh.Tools.IteEditor
+| [l2d](file//type/l2d.md) | Layout 2D files | 
 | lad | Unknown | 
-| lub | Compiled lua script used for AI | 
+| lub | Compiled lua script used for AI using LUA 5.1 | 
 | [mss](file//type/mss.md) | Controls how sounds behave in a map | 
 | [ngd](file//type/ngd.md) | Controls how the navigation grid is created for levels | 
 | [nmd](file//type/nmd.md) | Unknown | 
@@ -51,7 +53,7 @@
 | [pmo](file//type/pmo.md) | 3D Model (Skeletal and Static) | 
 | [pmp](file//type/pmp.md) | Map geometry files | 
 | pst | Unknown | 
-| [ptx](file//type/ptx.md) | Unknown | 
+| [ptx](file//type/ptx.md) | File controlling many event related events happening in a map | 
 | [pvd](file//type/pvd.md) | File that controls special effects on maps such as fog | 
 | [scd](file//type/scd.md) | Sound container | 
 | [seb](file//type/seb.md) | Controls which sounds are played per animation | 

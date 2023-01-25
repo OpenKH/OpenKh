@@ -1,0 +1,44 @@
+<Window x:Class="OpenKh.Tools.Kh2MdlxEditor.Views.Main2_Window"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.Kh2MdlxEditor.Views"
+        mc:Ignorable="d"
+        Title="OpenKH | MDLX Editor" Height="900" Width="1600">
+
+    <DockPanel AllowDrop="True" Drop="Window_Drop">
+        
+        <!-- Top navbar -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Save As..." Click="Menu_SaveFile"/>
+                <MenuItem Header="Export model">
+                    <MenuItem Header="FBX" Click="Menu_ExportAsFbx"/>
+                    <MenuItem Header="DAE (Collada)" Visibility="Collapsed" Click="Menu_ExportAsDae"/>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        
+        <Grid Background="Black">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="50" />
+            </Grid.ColumnDefinitions>
+            
+            <!-- Content loader -->
+            <ContentControl x:Name="contentFrame" Grid.Column="0" Background="#2d2d2d"/>
+            
+            <!-- Side menu -->
+            <StackPanel Grid.Column="1" Background="#2d2d2d">
+                <!-- Model -->
+                <Image x:Name="sideModel" Visibility="Collapsed" Height="50" Source="../Assets/IconModelW.png" MouseLeftButtonUp="Side_Model"></Image>
+                <!-- Texture -->
+                <Image x:Name="sideTexture" Visibility="Collapsed" Height="50" Source="../Assets/IconTextureW.png" MouseLeftButtonUp="Side_Texture"></Image>
+                <!-- Collision -->
+                <Image x:Name="sideCollision" Visibility="Collapsed" Height="50" Source="../Assets/IconCollisionW.png" MouseLeftButtonUp="Side_Collision" MouseRightButtonUp="Side_CollisionTable"></Image>
+            </StackPanel>
+
+        </Grid>
+    </DockPanel>
+</Window>

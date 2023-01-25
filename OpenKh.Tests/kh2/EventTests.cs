@@ -1,9 +1,15 @@
 using OpenKh.Common;
+using OpenKh.DeeperTree;
+using OpenKh.Kh2;
 using OpenKh.Kh2.Ard;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using Xunit;
 using Xunit.Sdk;
+using static OpenKh.Kh2.Ard.Event;
 
 namespace OpenKh.Tests.kh2
 {
@@ -26,8 +32,16 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SetMap>();
 
         [Fact]
+        public void ParseCameraData() =>
+            AssertEvent<Event.CameraData>();
+
+        [Fact]
         public void ParseSeqCamera() =>
             AssertEvent<Event.SeqCamera>();
+
+        [Fact]
+        public void ParseEffectData() =>
+            AssertEvent<Event.EffectData>();
 
         [Fact]
         public void ParseSetEndFrame() =>
@@ -42,24 +56,28 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.AttachEffect>();
 
         [Fact]
-        public void ParseUnk0C() =>
-            AssertEvent<Event.Unk0C>();
+        public void ParseSeqKage() =>
+            AssertEvent<Event.SeqKage>();
 
         [Fact]
-        public void ParseUnk0D() =>
-            AssertEvent(new Event.Unk0D
+        public void ParseSeqBgcol() =>
+            AssertEvent<Event.SeqBgcol>();
+
+        [Fact]
+        public void ParseSeqPart() =>
+            AssertEvent(new Event.SeqPart
             {
                 StartFrame = 123,
                 EndFrame = 456,
-                Unk = new short[]
+                Part = new short[]
                 {
                     11, 22, 33, 44
                 }
             });
 
         [Fact]
-        public void ParseUnk0E() =>
-            AssertEvent<Event.Unk0E>();
+        public void ParseSeqAlpha() =>
+            AssertEvent<Event.SeqAlpha>();
 
         [Fact]
         public void ParseSetupEvent() =>
@@ -68,6 +86,10 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ParseEventStart() =>
             AssertEvent<Event.EventStart>();
+
+        [Fact]
+        public void ParseJumpEvent() =>
+            AssertEvent<Event.JumpEvent>();
 
         [Fact]
         public void ParseSeqFade() =>
@@ -83,9 +105,9 @@ namespace OpenKh.Tests.kh2
             AssertEvent(new Event.SetCameraData
             {
                 CameraId = 123,
-                PositionX = new List<Event.SetCameraData.CameraKeys>
+                PositionX = new List<Event.CameraKeys>
                 {
-                    new Event.SetCameraData.CameraKeys
+                    new Event.CameraKeys
                     {
                         Interpolation = Kh2.Motion.Interpolation.Hermite,
                         KeyFrame = 1234,
@@ -93,7 +115,7 @@ namespace OpenKh.Tests.kh2
                         TangentEaseIn = 3,
                         TangentEaseOut = 4
                     },
-                    new Event.SetCameraData.CameraKeys
+                    new Event.CameraKeys
                     {
                         Interpolation = Kh2.Motion.Interpolation.Linear,
                         KeyFrame = 5678,
@@ -102,9 +124,9 @@ namespace OpenKh.Tests.kh2
                         TangentEaseOut = 8
                     },
                 },
-                PositionY = new List<Event.SetCameraData.CameraKeys>()
+                PositionY = new List<Event.CameraKeys>()
                 {
-                    new Event.SetCameraData.CameraKeys
+                    new Event.CameraKeys
                     {
                         Interpolation = Kh2.Motion.Interpolation.Nearest,
                         KeyFrame = 32767,
@@ -113,12 +135,12 @@ namespace OpenKh.Tests.kh2
                         TangentEaseOut = 44
                     },
                 },
-                PositionZ = new List<Event.SetCameraData.CameraKeys>(),
-                LookAtX = new List<Event.SetCameraData.CameraKeys>(),
-                LookAtY = new List<Event.SetCameraData.CameraKeys>(),
-                LookAtZ = new List<Event.SetCameraData.CameraKeys>(),
-                FieldOfView = new List<Event.SetCameraData.CameraKeys>(),
-                Roll = new List<Event.SetCameraData.CameraKeys>(),
+                PositionZ = new List<Event.CameraKeys>(),
+                LookAtX = new List<Event.CameraKeys>(),
+                LookAtY = new List<Event.CameraKeys>(),
+                LookAtZ = new List<Event.CameraKeys>(),
+                FieldOfView = new List<Event.CameraKeys>(),
+                Roll = new List<Event.CameraKeys>(),
             });
 
         [Fact]
@@ -130,23 +152,23 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SeqSubtitle>();
 
         [Fact]
-        public void ParseEntryUnk16() =>
-            AssertEvent<Event.EntryUnk16>();
+        public void ParseBgGrupe() =>
+            AssertEvent<Event.BgGrupe>();
 
         [Fact]
-        public void ParseEntryUnk17() =>
-            AssertEvent<Event.EntryUnk17>();
+        public void ParseSeqBlur() =>
+            AssertEvent<Event.SeqBlur>();
 
         [Fact]
-        public void ParseEntryUnk18() =>
-            AssertEvent<Event.EntryUnk18>();
+        public void ParseSeqFocus() =>
+            AssertEvent<Event.SeqFocus>();
 
         [Fact]
         public void ParseSeqTextureAnim() =>
             AssertEvent<Event.SeqTextureAnim>();
 
         [Fact]
-        public void ParseEntryUnk1A() =>
+        public void ParseSeqActorLeave() =>
             AssertEvent<Event.SeqActorLeave>();
 
         [Fact]
@@ -154,39 +176,64 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SeqCrossFade>();
 
         [Fact]
-        public void ParseEntryUnk1D() =>
-            AssertEvent<Event.EntryUnk1D>();
+        public void ParseSeqIk() =>
+            AssertEvent<Event.SeqIk>();
 
         [Fact]
-        public void ParseEntryUnk1E() =>
-            AssertEvent(new Event.Unk1E
+        public void ParseSplineDataEnc() =>
+            AssertEvent<Event.SplineDataEnc>(
+                new SplineDataEnc
+                {
+                    PutId = 123,
+                    TransOfs = 789,
+                    Keys = new List<CameraKeys>()
+                    {
+                        new Event.CameraKeys
+                        {
+                            Interpolation = Kh2.Motion.Interpolation.Nearest,
+                            KeyFrame = 32767,
+                            Value = 11,
+                            TangentEaseIn = 33,
+                            TangentEaseOut = 44
+                        },
+                    },
+                }
+            );
+
+        [Fact]
+        public void ParseSplinePoint() =>
+            AssertEvent(new Event.SplinePoint
             {
                 Id = 123,
-                UnkG = 456,
-                UnkH = 789,
-                Entries = new List<Event.Unk1E.Entry>()
+                Type = 456,
+                SplineLng = 789,
+                Points = new List<Event.SplinePoint.Point>()
                 {
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
-                    Helpers.CreateDummyObject<Event.Unk1E.Entry>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
+                    Helpers.CreateDummyObject<Event.SplinePoint.Point>(),
                 }
             });
 
         [Fact]
-        public void ParseEntryUnk1F() =>
-            AssertEvent<Event.Unk1F>();
+        public void ParseSeqSpline() =>
+            AssertEvent<Event.SeqSpline>();
 
         [Fact]
         public void ParseSeqGameSpeed() =>
             AssertEvent<Event.SeqGameSpeed>();
 
         [Fact]
-        public void ParseEntryUnk22() =>
-            AssertEvent<Event.EntryUnk22>();
+        public void ParseTexFade() =>
+            AssertEvent<Event.TexFade>();
+
+        [Fact]
+        public void ParseWideMask() =>
+            AssertEvent<Event.WideMask>();
 
         [Fact]
         public void ParseSeqVoices() =>
@@ -237,8 +284,16 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SetShake>();
 
         [Fact]
-        public void ParseEntryUnk2A() =>
-            AssertEvent<Event.EntryUnk2A>();
+        public void ParseScale() =>
+            AssertEvent<Event.Scale>();
+
+        [Fact]
+        public void ParseTurn() =>
+            AssertEvent<Event.Turn>();
+
+        [Fact]
+        public void ParseSeData() =>
+            AssertEvent<Event.SeData>();
 
         [Fact]
         public void ParseSeqPlayAudio() =>
@@ -265,8 +320,39 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.SetBgm>();
 
         [Fact]
-        public void ParseEntryUnk36() =>
-            AssertEvent<Event.EntryUnk36>();
+        public void ParseSeqObjCamera() =>
+            AssertEvent<Event.SeqObjCamera>();
+
+        [Fact]
+        public void ParseMusicalHeader() =>
+            AssertEvent<Event.MusicalHeader>();
+
+        [Fact]
+        public void ParseMusicalTarget() =>
+            AssertEvent<Event.MusicalTarget>();
+
+        [Fact]
+        public void ParseMusicalScene() =>
+            AssertEvent<Event.MusicalScene>();
+
+        [Fact]
+        public void ParseVibData() =>
+            AssertEvent<Event.VibData>(
+                new VibData
+                {
+                    Frame = 12,
+                    Dummy = 34,
+                    Data = new byte[] { 1, 2, 3, 4 },
+                }
+            );
+
+        [Fact]
+        public void ParseLookat() =>
+            AssertEvent<Event.Lookat>();
+
+        [Fact]
+        public void ParseShadowAlpha() =>
+            AssertEvent<Event.ShadowAlpha>();
 
         [Fact]
         public void ParseReadActor() =>
@@ -275,6 +361,18 @@ namespace OpenKh.Tests.kh2
         [Fact]
         public void ParseReadEffect() =>
             AssertEvent<Event.ReadEffect>();
+
+        [Fact]
+        public void ParseSeqMirror() =>
+            AssertEvent<Event.SeqMirror>();
+
+        [Fact]
+        public void ParseSeqTreasure() =>
+            AssertEvent<Event.SeqTreasure>();
+
+        [Fact]
+        public void ParseSeqMissionEffect() =>
+            AssertEvent<Event.SeqMissionEffect>();
 
         [Fact]
         public void ParseSeqLayout() =>
@@ -289,20 +387,107 @@ namespace OpenKh.Tests.kh2
             AssertEvent<Event.StopEffect>();
 
         [Fact]
+        public void ParseCacheClear() =>
+            AssertEvent<Event.CacheClear>(
+                new CacheClear
+                {
+                    PutId = Enumerable.Range(0, 96).Select(idx => (byte)idx).ToArray(),
+                    Frame = 12345,
+                }
+            );
+
+        [Fact]
+        public void ParseSeqObjPause() =>
+            AssertEvent<Event.SeqObjPause>();
+
+        [Fact]
+        public void ParseSeqBgse() =>
+            AssertEvent<Event.SeqBgse>();
+
+        [Fact]
+        public void ParseSeqGlow() =>
+            AssertEvent<Event.SeqGlow>();
+
+        [Fact]
         public void ParseRunMovie() =>
             AssertEvent<Event.RunMovie>();
 
         [Fact]
-        public void ParseUnk42() =>
-            AssertEvent<Event.Unk42>();
+        public void ParseSeqSavePoint() =>
+            AssertEvent<Event.SeqSavePoint>();
 
         [Fact]
-        public void ParseEntryUnk47() =>
-            AssertEvent<Event.EntryUnk47>();
+        public void ParseSeqCameraCollision() =>
+            AssertEvent<Event.SeqCameraCollision>();
+
+        [Fact]
+        public void ParseSeqPosMove() =>
+            AssertEvent<Event.SeqPosMove>();
+
+        [Fact]
+        public void ParseBlackFog() =>
+            AssertEvent<Event.BlackFog>();
+
+        [Fact]
+        public void ParseFog() =>
+            AssertEvent<Event.Fog>();
+
+        [Fact]
+        public void ParsePlayerOffsetCamera() =>
+            AssertEvent<Event.PlayerOffsetCamera>();
+
+        [Fact]
+        public void ParseSkyOff() =>
+            AssertEvent<Event.SkyOff>();
 
         [Fact]
         public void ParseHideObject() =>
             AssertEvent<Event.SeqHideObject>();
+
+        [Fact]
+        public void ParseCountdown() =>
+            AssertEvent<Event.Countdown>();
+
+        [Fact]
+        public void ParseTag() =>
+            AssertEvent<Event.Tag>();
+
+        [Fact]
+        public void ParseWallClip() =>
+            AssertEvent<Event.WallClip>();
+
+        [Fact]
+        public void ParseVoiceAllFadeout() =>
+            AssertEvent<Event.VoiceAllFadeout>();
+
+        [Fact]
+        public void ParseLight() =>
+            AssertEvent<Event.Light>(
+                new Light
+                {
+                    WorkNum = 12345,
+                    LightData = new List<Light.Data>()
+                    {
+                        new Light.Data
+                        {
+                            PutId = 1,
+                            StartFrame = 2,
+                            EndFrame = 3,
+                            CamNum = 4,
+                            SubNum = 5,
+                            Position = new Light.LightParamPosition
+                            {
+                                Pos = Enumerable.Range(0, 9).Select(it => (float)it).ToArray(),
+                                Color = Enumerable.Range(0, 12).Select(it => (float)it).ToArray(),
+                            },
+                        }
+                    },
+                }
+            );
+
+        [Fact]
+        public void ParseSeqMob() =>
+            AssertEvent<Event.SeqMob>();
 
         private static void AssertEvent<T>()
             where T : class, Event.IEventEntry =>
@@ -338,12 +523,30 @@ namespace OpenKh.Tests.kh2
             {
                 var expectedValue = property.GetValue(expected);
                 var actualValue = property.GetValue(actual);
-                if (expectedValue.ToString() !=
-                    actualValue.ToString())
+                if (!IsValueEqual(expectedValue, actualValue))
                     throw new AssertActualExpectedException(
                         expectedValue, actualValue,
                         $"Different values for '{property.Name}'");
             }
+        }
+
+        private static bool IsValueEqual(object expectedValue, object actualValue)
+        {
+            if ((expectedValue == null) != (actualValue == null))
+            {
+                return false;
+            }
+            if (expectedValue == null)
+            {
+                return true;
+            }
+
+            if (expectedValue.GetType() != actualValue.GetType())
+            {
+                return false;
+            }
+
+            return JsonSerializer.Serialize(expectedValue) == JsonSerializer.Serialize(actualValue);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 PRIZEBOXDATA is a single file that contains every prize box dropped by every enemy in the game.
 
-Located in the `ITEM` folder.
+Located in the `ITEM` folder or inside `arc/system/commongame.arc`.
 
 The file lacks a header. You keep reading data until the `name` field is *`null`*.
 
