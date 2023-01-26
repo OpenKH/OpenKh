@@ -237,10 +237,13 @@ namespace OpenKh.Imaging
             }
             else if (filter == 2)
             {
-                var endPtr = ptr + stride;
-                for (; ptr < endPtr; ptr++)
+                if (ptr != 0)
                 {
-                    data[ptr] += data[ptr - stride];
+                    var endPtr = ptr + stride;
+                    for (; ptr < endPtr; ptr++)
+                    {
+                        data[ptr] += data[ptr - stride];
+                    }
                 }
             }
             else if (filter == 3)
