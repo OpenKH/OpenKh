@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -81,7 +82,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 Directory.CreateDirectory(Path.Combine(modsPath, "bbs"));
             if (!Directory.Exists(Path.Combine(modsPath, "Recom")))
                 Directory.CreateDirectory(Path.Combine(modsPath, "Recom"));
-           
+
 
             Task.Run(async () =>
             {
@@ -105,7 +106,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     .ToList();
             });
         }
-        
+
         public static ICollection<string> EnabledMods
         {
             get
@@ -335,6 +336,104 @@ namespace OpenKh.Tools.ModsManager.Services
                 _config.LaunchGame = value;
                 _config.Save(ConfigPath);
             }
+        }
+
+        public static class EasyPrefs
+        {
+            public static readonly string ConfigPath = Path.Combine(StoragePath, "mods-easy-prefs.yml");
+
+            private static EasyPrefsRoot FixRoot(EasyPrefsRoot root)
+            {
+                root ??= new EasyPrefsRoot();
+                root.EasyPrefItems ??= new EasyPrefItem[0];
+                return root;
+            }
+
+            private static EasyPrefsRoot LoadRoot()
+            {
+                if (File.Exists(ConfigPath))
+                {
+                    using var reader = new StreamReader(ConfigPath);
+
+                    return FixRoot(_deserializer.Deserialize<EasyPrefsRoot>(reader));
+                }
+                else
+                {
+                    return FixRoot(null);
+                }
+            }
+
+            private static void SaveRoot(EasyPrefsRoot root)
+            {
+                using var writer = new StreamWriter(ConfigPath);
+                _serializer.Serialize(writer, root);
+            }
+
+            public static IDictionary<string, string> TryLoad(string modName)
+            {
+                var dict = new Dictionary<string, string>();
+
+                LoadRoot().EasyPrefItems?
+                    .Where(it => it.ModName == modName)
+                    .ToList()
+                    .ForEach(
+                        item =>
+                        {
+                            dict[item.Key] = item.Value;
+                        }
+                    );
+
+                return dict;
+            }
+
+            public static void Save(string modName, IDictionary<string, string> dict)
+            {
+                var root = LoadRoot();
+                var items = root.EasyPrefItems.ToList();
+
+                items.RemoveAll(item => item.ModName == modName);
+                items.AddRange(
+                    dict
+                        .Select(
+                            pair =>
+                            {
+                                return new EasyPrefItem
+                                {
+                                    ModName = modName,
+                                    Key = pair.Key,
+                                    Value = pair.Value,
+                                };
+                            }
+                        )
+                );
+
+                root.EasyPrefItems = items.ToArray();
+                SaveRoot(root);
+            }
+
+            private class EasyPrefsRoot
+            {
+                public EasyPrefItem[] EasyPrefItems { get; set; }
+            }
+
+            private class EasyPrefItem
+            {
+                public string ModName { get; set; }
+                public string Key { get; set; }
+                public string Value { get; set; }
+            }
+
+            private static readonly IDeserializer _deserializer =
+                new DeserializerBuilder()
+                .IgnoreFields()
+                .IgnoreUnmatchedProperties()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            private static readonly ISerializer _serializer =
+                new SerializerBuilder()
+                .IgnoreFields()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
         }
     }
 }

@@ -1,3 +1,4 @@
+using OpenKh.Patcher;
 using OpenKh.Tools.ModsManager.Models;
 using OpenKh.Tools.ModsManager.Services;
 using OpenKh.Tools.ModsManager.Views;
@@ -124,6 +125,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public string SourceUrl => $"https://github.com/{Source}";
         public string ReportBugUrl => $"https://github.com/{Source}/issues";
         public string FilesToPatch => string.Join('\n', GetFilesToPatch());
+        public EasyPref[] EasyPrefs => _model?.Metadata?.EasyPrefs?.ToArray();
 
         public string Description => _model.Metadata.Description;
 

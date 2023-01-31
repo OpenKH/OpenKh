@@ -79,7 +79,7 @@ namespace OpenKh.Patcher
             "Recom",
         };
 
-        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null)
+        public void Patch(string originalAssets, string outputDir, Metadata metadata, string modBasePath, int platform = 1, bool fastMode = false, IDictionary<string, string> packageMap = null, string LaunchGame = null, Func<string, bool> evalAssetIf = null)
         {
             
             var context = new Context(metadata, originalAssets, modBasePath, outputDir);
@@ -91,7 +91,13 @@ namespace OpenKh.Patcher
                 if (metadata.Game != null && GamesList.Contains(metadata.Game.ToLower()) && metadata.Game.ToLower() != LaunchGame.ToLower())
                     return;
 
-                metadata.Assets.AsParallel().ForAll(assetFile =>
+                evalAssetIf ??= any => true;
+
+                var allowedAssets = metadata.Assets
+                    .Where(asset => evalAssetIf(asset.If))
+                    .ToArray();
+
+                allowedAssets.AsParallel().ForAll(assetFile =>
                 {
                     var names = new List<string>();
                     names.Add(assetFile.Name);

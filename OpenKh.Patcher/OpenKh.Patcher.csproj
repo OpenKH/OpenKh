@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="12.3.1" />
+    <PackageReference Include="Scriban" Version="5.5.2" />
   </ItemGroup>
 
   <ItemGroup>

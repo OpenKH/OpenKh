@@ -1,0 +1,19 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.EditModEasyPrefsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        WindowStartupLocation="CenterOwner"
+        Title="Edit mod easy preferences"
+        Height="400" Width="400"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        >
+    <Grid>
+        <xctk:PropertyGrid
+            x:Name="Editor"
+            x:FieldModifier="internal"
+            Margin="3"
+            />
+    </Grid>
+</Window>

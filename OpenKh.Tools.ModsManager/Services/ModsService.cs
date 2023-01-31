@@ -91,11 +91,11 @@ namespace OpenKh.Tools.ModsManager.Services
         }
 
         public static bool IsModBlocked(string repositoryName)
-            {
+        {
             if (ConfigurationService.BlacklistedMods != null)
                 return ConfigurationService.BlacklistedMods.Any(x => x.Equals(repositoryName, StringComparison.InvariantCultureIgnoreCase));
             return false;
-            }
+        }
 
         public static bool IsUserBlocked(string repositoryName) =>
             IsModBlocked(Path.GetDirectoryName(repositoryName));
@@ -303,7 +303,7 @@ namespace OpenKh.Tools.ModsManager.Services
                     Metadata = File.OpenRead(Path.Combine(modPath, ModMetadata)).Using(Metadata.Read),
                     IsEnabled = enabledMods.Contains(modName)
                 };
-            }            
+            }
         }
 
         public static async IAsyncEnumerable<ModUpdateModel> FetchUpdates()
@@ -351,6 +351,36 @@ namespace OpenKh.Tools.ModsManager.Services
                 var mod = modsList[i];
                 Log.Info($"Building {mod.Name} for {_gameList[ConfigurationService.GameEdition]} - {_langList[ConfigurationService.RegionId]}");
 
+                var easyPrefProcessor = new EasyPrefProcessor(mod.Metadata.EasyPrefs?.ToArray());
+                var modPrefDict = ConfigurationService.EasyPrefs.TryLoad(mod.Name);
+                var easyPrefs = easyPrefProcessor.GetPrefDictionary(
+                    key =>
+                    {
+                        modPrefDict.TryGetValue(key, out string savedText);
+                        return savedText;
+                    }
+                );
+                var ifProcessor = new IfProcessor(
+                    register =>
+                    {
+                        register("easyPrefs", easyPrefs);
+                        register("config",
+                            new
+                            {
+                                LaunchGame = ConfigurationService.LaunchGame,
+                                GameEdition = _gameList[ConfigurationService.GameEdition],
+                                Language = _langList[ConfigurationService.RegionId],
+                            }
+                        );
+                    }
+                );
+
+                bool evalAssetIf(string expression)
+                {
+                    return string.IsNullOrWhiteSpace(expression)
+                        || ifProcessor.EvalIf(expression);
+                }
+
                 patcherProcessor.Patch(
                     Path.Combine(ConfigurationService.GameDataLocation, ConfigurationService.LaunchGame),
                     Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame),
@@ -359,7 +389,8 @@ namespace OpenKh.Tools.ModsManager.Services
                     ConfigurationService.GameEdition,
                     fastMode,
                     packageMap,
-                    ConfigurationService.LaunchGame);
+                    ConfigurationService.LaunchGame,
+                    evalAssetIf: evalAssetIf);
             }
 
             using var packageMapWriter = new StreamWriter(Path.Combine(Path.Combine(ConfigurationService.GameModPath, ConfigurationService.LaunchGame), "patch-package-map.txt"));

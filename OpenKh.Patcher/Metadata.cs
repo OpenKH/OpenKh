@@ -20,6 +20,7 @@ namespace OpenKh.Patcher
         public int Specifications { get; set; }
         public List<Dependency> Dependencies { get; set; }
         public List<AssetFile> Assets { get; set; }
+        public List<EasyPref> EasyPrefs { get; set; }
 
         private static readonly IDeserializer deserializer =
             new DeserializerBuilder()
@@ -56,10 +57,20 @@ namespace OpenKh.Patcher
         public string Language { get; set; }
         public bool IsSwizzled { get; set; }
         public int Index { get; set; }
+        public string If { get; set; }
     }
 
     public class Multi
     {
         public string Name { get; set; }
+    }
+
+    public class EasyPref
+    {
+        public string Key { get; set; }
+        public string ValueType { get; set; }
+        public string Category { get; set; }
+        public string Description { get; set; }
+        public string DefaultValue { get; set; }
     }
 }

@@ -83,6 +83,9 @@
                 <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding AddModCommand}">
                     <Image Source="{StaticResource Add_16x}"/>
                 </Button>
+                <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding EditModPrefCommand}">
+                    <Image Source="{StaticResource EditWindow_16x}"/>
+                </Button>
                 <Button Grid.Row="2" Margin="0 3 0 3" Command="{Binding RemoveModCommand}">
                     <Image Source="{StaticResource Remove_color_16x}"/>
                 </Button>

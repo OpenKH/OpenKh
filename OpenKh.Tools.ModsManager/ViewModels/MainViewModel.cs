@@ -1,4 +1,5 @@
 using OpenKh.Common;
+using OpenKh.Patcher;
 using OpenKh.Tools.Common.Wpf;
 using OpenKh.Tools.ModsManager.Models;
 using OpenKh.Tools.ModsManager.Services;
@@ -68,6 +69,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public ObservableCollection<ModViewModel> ModsList { get; set; }
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand AddModCommand { get; set; }
+        public RelayCommand EditModPrefCommand { get; set; }
         public RelayCommand RemoveModCommand { get; set; }
         public RelayCommand OpenModFolderCommand { get; set; }
         public RelayCommand MoveUp { get; set; }
@@ -94,6 +96,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(MoveUp));
                 OnPropertyChanged(nameof(MoveDown));
                 OnPropertyChanged(nameof(AddModCommand));
+                OnPropertyChanged(nameof(EditModPrefCommand));
                 OnPropertyChanged(nameof(RemoveModCommand));
                 OnPropertyChanged(nameof(OpenModFolderCommand));
             }
@@ -285,6 +288,43 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         Application.Current.Dispatcher.Invoke(() => progressWindow?.Close());
                     }
                 });
+            }, _ => true);
+            EditModPrefCommand = new RelayCommand(_ =>
+            {
+                var modRef = SelectedValue;
+
+                var easyPrefProcessor = new EasyPrefProcessor(modRef.EasyPrefs);
+                var modPrefDict = ConfigurationService.EasyPrefs.TryLoad(modRef.Source);
+                var easyPrefs = easyPrefProcessor.GetPrefDictionary(
+                    key =>
+                    {
+                        modPrefDict.TryGetValue(key, out string savedText);
+                        return savedText;
+                    }
+                );
+
+                var dialog = new EditModEasyPrefsWindow();
+                dialog.Owner = Window;
+                dialog.Editor.SelectedObject = new PreferenceWrapperService()
+                    .GetWrappedObject(
+                        easyPrefs,
+                        easyPrefProcessor.ValueEditors
+                    );
+
+                dialog.ShowDialog();
+
+                if (MessageBox.Show("Save changes?", "ModsManager", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    ConfigurationService.EasyPrefs.Save(
+                        modRef.Source,
+                        easyPrefs
+                            .ToDictionary(
+                                pair => pair.Key,
+                                pair => pair.Value?.ToString()
+                            )
+                    );
+                }
+
             }, _ => true);
             RemoveModCommand = new RelayCommand(_ =>
             {
