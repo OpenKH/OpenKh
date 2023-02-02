@@ -14,6 +14,8 @@
             x:Name="Editor"
             x:FieldModifier="internal"
             Margin="3"
+            SelectedObjectTypeName="{Binding PropertyGridCaption}"
+            SelectedObject="{Binding PropertyGridSelectedObject}"
             />
     </Grid>
 </Window>

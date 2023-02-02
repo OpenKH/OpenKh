@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -144,7 +145,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
             }
-        }  
+        }
 
         public int GametoLaunch
         {
@@ -291,39 +292,52 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             }, _ => true);
             EditModPrefCommand = new RelayCommand(_ =>
             {
-                var modRef = SelectedValue;
-
-                var easyPrefProcessor = new EasyPrefProcessor(modRef.EasyPrefs);
-                var modPrefDict = ConfigurationService.EasyPrefs.TryLoad(modRef.Source);
-                var easyPrefs = easyPrefProcessor.GetPrefDictionary(
-                    key =>
+                Handle(() =>
+                {
+                    var modRef = SelectedValue;
+                    if (modRef == null)
                     {
-                        modPrefDict.TryGetValue(key, out string savedText);
-                        return savedText;
+                        return;
                     }
-                );
 
-                var dialog = new EditModEasyPrefsWindow();
-                dialog.Owner = Window;
-                dialog.Editor.SelectedObject = new PreferenceWrapperService()
-                    .GetWrappedObject(
-                        easyPrefs,
-                        easyPrefProcessor.ValueEditors
+                    var easyPrefProcessor = new EasyPrefProcessor(modRef.EasyPrefs);
+                    if (!easyPrefProcessor.ValueEditors.Any())
+                    {
+                        MessageBox.Show(Window, "This mod doesn't have easyPrefs.");
+                        return;
+                    }
+
+                    var modPrefDict = ConfigurationService.EasyPrefs.TryLoad(modRef.Source);
+                    var easyPrefs = easyPrefProcessor.GetPrefDictionary(
+                        key =>
+                        {
+                            modPrefDict.TryGetValue(key, out string savedText);
+                            return savedText;
+                        }
                     );
 
-                dialog.ShowDialog();
+                    var dialog = new EditModEasyPrefsWindow();
+                    dialog.Owner = Window;
+                    dialog.ViewModel = new EditModEasyPrefsWindow.TViewModel(
+                        OnSave: () =>
+                        {
+                            ConfigurationService.EasyPrefs.Save(
+                                modRef.Source,
+                                easyPrefProcessor.ConvertBack(easyPrefs)
+                            );
 
-                if (MessageBox.Show("Save changes?", "ModsManager", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                {
-                    ConfigurationService.EasyPrefs.Save(
-                        modRef.Source,
-                        easyPrefs
-                            .ToDictionary(
-                                pair => pair.Key,
-                                pair => pair.Value?.ToString()
+                            MessageBox.Show(Window, "Saved");
+                        },
+                        PropertyGridCaption: $"{modRef.Source}",
+                        PropertyGridSelectedObject: new PreferenceWrapperService()
+                            .GetWrappedObject(
+                                easyPrefs,
+                                easyPrefProcessor.ValueEditors
                             )
                     );
-                }
+
+                    dialog.ShowDialog();
+                });
 
             }, _ => true);
             RemoveModCommand = new RelayCommand(_ =>
@@ -534,7 +548,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (ConfigurationService.PanaceaInstalled)
                         {
                             File.AppendAllText(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), "\nquick_launch=" + _launchGame);
-                        }                        
+                        }
                         processStartInfo = new ProcessStartInfo
                         {
                             FileName = "com.epicgames.launcher://apps/4158b699dd70447a981fee752d970a3e%3A5aac304f0e8948268ddfd404334dbdc7%3A68c214c58f694ae88c2dab6f209b43e4?action=launch&silent=true",
@@ -545,7 +559,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         processStartInfo = new ProcessStartInfo
                         {
-                            FileName =  Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]),
+                            FileName = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]),
                             WorkingDirectory = ConfigurationService.PcReleaseLocation,
                             UseShellExecute = false,
                         };
@@ -656,7 +670,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (ConfigurationService.GameEdition == 2)
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
-                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame , "patch-package-map.txt");
+                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame, "patch-package-map.txt");
                     var packageMap = File
                         .ReadLines(packageMapLocation)
                         .Select(line => line.Split(" $$$$ "))
@@ -813,7 +827,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                         File.Delete(hedFile);
                         File.Delete(_pkgName);
-                        
+
                         File.Move(Path.Combine(outputDir, Path.GetFileName(hedFile)), hedFile);
                         File.Move(Path.Combine(outputDir, Path.GetFileName(_pkgName)), _pkgName);
                     }
@@ -826,8 +840,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             await Task.Run(() =>
             {
                 if (ConfigurationService.GameEdition == 2)
-                {                        
-                    if(patched)
+                {
+                    if (patched)
                     {
                         if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
                         {

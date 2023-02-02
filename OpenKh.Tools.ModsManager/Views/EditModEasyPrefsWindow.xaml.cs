@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,35 @@ namespace OpenKh.Tools.ModsManager.Views
         public EditModEasyPrefsWindow()
         {
             InitializeComponent();
+        }
+
+        public TViewModel ViewModel
+        {
+            get => (TViewModel)DataContext;
+            set => DataContext = value;
+        }
+
+        public record TViewModel(
+            Action OnSave,
+            string PropertyGridCaption,
+            object PropertyGridSelectedObject
+        );
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            switch (MessageBox.Show(this, "Save changes?", "ModsManager", MessageBoxButton.YesNoCancel))
+            {
+                case MessageBoxResult.Yes:
+                    ViewModel?.OnSave?.Invoke();
+                    DialogResult = true;
+                    break;
+                case MessageBoxResult.No:
+                    DialogResult = false;
+                    break;
+                default:
+                    e.Cancel = true;
+                    break;
+            }
         }
     }
 }

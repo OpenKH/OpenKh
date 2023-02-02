@@ -19,9 +19,17 @@ namespace OpenKh.Patcher
             EasyPref EasyPref
         );
 
+        public static readonly ValueEditor Invalid = new ValueEditor(
+            "Invalid",
+            typeof(DBNull),
+            _ => throw new NotImplementedException(),
+            _ => throw new NotImplementedException(),
+            new EasyPref()
+        );
+
         public EasyPrefProcessor(EasyPref[] easyPrefs)
         {
-            ValueEditors = easyPrefs
+            ValueEditors = (easyPrefs ?? new EasyPref[0])
                 .Select(
                     pref =>
                     {
@@ -31,9 +39,7 @@ namespace OpenKh.Patcher
                         switch (pref.ValueType)
                         {
                             default:
-                                valueType = typeof(string);
-                                stringToObject = str => str;
-                                break;
+                                return Invalid;
 
                             case "int":
                                 valueType = typeof(int);
@@ -43,6 +49,12 @@ namespace OpenKh.Patcher
                             case "bool":
                                 valueType = typeof(bool);
                                 stringToObject = str => Convert.ToBoolean(str);
+                                break;
+
+                            case "text":
+                            case "string":
+                                valueType = typeof(string);
+                                stringToObject = str => str;
                                 break;
                         }
 
@@ -55,6 +67,7 @@ namespace OpenKh.Patcher
                         );
                     }
                 )
+                .Where(it => !ReferenceEquals(it, Invalid))
                 .ToArray();
         }
 
@@ -69,6 +82,21 @@ namespace OpenKh.Patcher
                 dict[editor.Key] = (preferredValue != null)
                     ? Convert.ChangeType(preferredValue, editor.ValueType)
                     : editor.StringToObject(editor.EasyPref.DefaultValue);
+            }
+
+            return dict;
+        }
+
+        public IDictionary<string, string> ConvertBack(IDictionary<string, object> easyPrefs)
+        {
+            var dict = new Dictionary<string, string>();
+
+            foreach (var editor in ValueEditors)
+            {
+                if (easyPrefs.TryGetValue(editor.Key, out object value))
+                {
+                    dict[editor.Key] = editor.ObjectToString(value);
+                }
             }
 
             return dict;
