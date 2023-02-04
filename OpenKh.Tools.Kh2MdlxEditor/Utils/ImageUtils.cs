@@ -1,8 +1,11 @@
+using OpenKh.Command.ImgTool.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -11,6 +14,25 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
     public class ImageUtils
     {
         public static Imgd pngToImgd(string filePath)
+        {
+            var inputFile = filePath;
+            Imgd imgd;
+
+            // Alpha enabled png → always 32 bpp
+            using (var bitmap = new Bitmap(inputFile))
+            {
+                imgd = ImgdBitmapUtil.ToImgd(bitmap, 8, null);
+
+                var buffer = new MemoryStream();
+                imgd.Write(buffer);
+            }
+
+            return imgd;
+        }
+
+        // OLD VERSION USING THE CONSOLE COMMAND VVV
+
+        public static Imgd pngToImgd_Old(string filePath)
         {
 
             if (filePath.EndsWith(".imd"))
@@ -56,6 +78,8 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             return imgdFile;
         }
 
+        
+
         class RunCmd
         {
             private Process p;
@@ -80,11 +104,6 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
                 StandardOutput = stdOutAsync.Result;
                 StandardError = stdErrAsync.Result;
             }
-        }
-
-        public static ModelTexture toTexture(List<Imgd> images)
-        {
-            return new ModelTexture(images);
         }
     }
 }
