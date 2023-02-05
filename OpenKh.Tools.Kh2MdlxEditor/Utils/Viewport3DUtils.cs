@@ -4,7 +4,6 @@ using OpenKh.Tools.Common.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -19,6 +18,16 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             myPCamera.LookDirection = new Vector3D(0, 0, -1);
             myPCamera.FieldOfView = 60;
             
+            return myPCamera;
+        }
+        public static PerspectiveCamera getCameraByBoundingBox(Rect3D boundingBox)
+        {
+            double maxSize = boundingBox.SizeX > boundingBox.SizeY ? boundingBox.SizeX : boundingBox.SizeY;
+            PerspectiveCamera myPCamera = new PerspectiveCamera();
+            myPCamera.Position = new Point3D(0, 0, maxSize * 1.2);
+            myPCamera.LookDirection = new Vector3D(0, 0, -1);
+            myPCamera.FieldOfView = 60;
+
             return myPCamera;
         }
         public static Vector3D getVectorToTarget(Point3D position, Point3D targetPosition = new Point3D())
