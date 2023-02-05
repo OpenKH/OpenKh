@@ -17,7 +17,7 @@ namespace OpenKh.Kh2.Models.VIF
 
         // VIF packet limits
         public static int VERTEX_LIMIT = 0xFF; // Shouldn't need to cap, but just in case
-        public static int MEMORY_LIMIT = 0xA0;
+        public static int MEMORY_LIMIT = 0xE0;
 
         public static List<DmaVifPacket> vifMeshToDmaVifPackets(VifMesh mesh)
         {
@@ -135,7 +135,7 @@ namespace OpenKh.Kh2.Models.VIF
                 // HARD LIMIT
                 if (currentPacket.getPacketLengthInVPUWithBones() + face.worstCaseScenarioVpuSize() >= 0xFF)
                 {
-                    throw new System.Exception("DmaVifPacket size exceeded");
+                    throw new System.Exception("DmaVifPacket size exceeded. Reduce memory limit.");
                 }
                 // ADJUSTED BY PARAMS LIMIT
                 else if (currentPacket.UvCoords.Count + 3 > VERTEX_LIMIT ||

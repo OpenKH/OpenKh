@@ -5,15 +5,14 @@ using OpenKh.Kh2.Models.VIF;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 {
     public class MdlxEditorImporter
     {
-        private static bool TRIANGLE_INVERSE = false; // UNUSED for now
-        private static bool KEEP_ORIGINAL_SHADOW = false;
-        private static bool KEEP_ORIGINAL_SKELETON = true;
+        public static bool TRIANGLE_INVERSE = false; // UNUSED for now
+        public static bool KEEP_ORIGINAL_SHADOW = false;
+        public static bool KEEP_ORIGINAL_SKELETON = true;
 
         public static Dictionary<int,int> materialToTexture = null;
         public static ModelTexture createModelTexture(Assimp.Scene scene, string filePath)
@@ -29,7 +28,15 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             List<string> materialPaths = new List<string>();
             for(int i = 0; i < scene.Materials.Count; i++)
             {
-                string texturePath = directoryPath + "\\" + scene.Materials[i].TextureDiffuse.FilePath + ".png";
+                string texturePath = directoryPath + "\\" + Path.GetFileName(scene.Materials[i].TextureDiffuse.FilePath);
+                if (!Path.HasExtension(texturePath))
+                {
+                    texturePath += ".png";
+                }
+                else if(!texturePath.EndsWith(".png"))
+                {
+                    throw new Exception("Texture is not PNG");
+                }
                 if (materialPaths.Contains(texturePath))
                 {
                     materialToTexture.Add(i, materialPaths.IndexOf(texturePath));
@@ -77,7 +84,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             }
 
             int baseAddress = VifUtils.calcBaseAddress(model.Bones.Count, model.GroupCount);
-            Matrix4x4[] boneMatrices = ModelCommon.GetBoneMatrices(model.Bones);
+            System.Numerics.Matrix4x4[] boneMatrices = ModelCommon.GetBoneMatrices(model.Bones);
 
             for (int i = 0; i < scene.Meshes.Count; i++)
             {
@@ -136,34 +143,24 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
                 bone.Index = (short)i;
                 bone.ParentIndex = (short)assimpBones.IndexOf(assimpBone.Parent);
 
-                Assimp.Vector3D s = new Assimp.Vector3D();
-                Assimp.Quaternion r = new Assimp.Quaternion();
-                Assimp.Vector3D t = new Assimp.Vector3D();
-                assimpBone.Transform.Decompose(out s, out r, out t);
+                assimpBones[i].Transform.Decompose(
+                    out Assimp.Vector3D scale, 
+                    out Assimp.Quaternion rotation, 
+                    out Assimp.Vector3D translation);
 
-                Matrix4x4 mn = AssimpGeneric.ToNumerics(assimpBone.Transform);
-                Matrix4x4 mParent = AssimpGeneric.ToNumerics(assimpBone.Parent.Transform);
-                Vector3 sn = new Vector3();
-                Quaternion rn = new Quaternion();
-                Vector3 tn = new Vector3();
-                Matrix4x4.Decompose(mn, out sn, out rn, out tn);
+                bone.ScaleX= scale.X;
+                bone.ScaleY= scale.Y;
+                bone.ScaleZ= scale.Z;
+                bone.TranslationX= translation.X;
+                bone.TranslationY= translation.Y;
+                bone.TranslationZ= translation.Z;
 
-                bone.ScaleX = (s.X > 0.999) ? 1 : s.X;
-                bone.ScaleY = (s.Y > 0.999) ? 1 : s.Y;
-                bone.ScaleZ = (s.Z > 0.999) ? 1 : s.Z;
-                bone.RotationX = r.X;
-                bone.RotationY = r.Y;
-                bone.RotationZ = r.Z;
-                bone.RotationW = r.W;
-                bone.TranslationX = t.X;
-                bone.TranslationY = t.Y;
-                bone.TranslationZ = t.Z;
+                System.Numerics.Quaternion numQuat = new System.Numerics.Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W);
 
-                //Vector3 euler = AssimpGeneric.ToEulerAngles(rn);
-                Assimp.Vector3D euler = AssimpGeneric.ToEulerAngles(r);
-                bone.RotationX = euler.X;
-                bone.RotationY = euler.Y;
-                bone.RotationZ = euler.Z;
+                System.Numerics.Vector3 rotationRadian = MathUtils.toRadian(MathUtils.ToEulerAngles(numQuat));
+                bone.RotationX = rotationRadian.X;
+                bone.RotationY = rotationRadian.Y;
+                bone.RotationZ = rotationRadian.Z;
                 bone.RotationW = 0;
 
                 mdlxBones.Add(bone);

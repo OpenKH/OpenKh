@@ -15,19 +15,26 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
     {
         public static Imgd pngToImgd(string filePath)
         {
-            var inputFile = filePath;
-            Imgd imgd;
-
-            // Alpha enabled png → always 32 bpp
-            using (var bitmap = new Bitmap(inputFile))
+            try
             {
-                imgd = ImgdBitmapUtil.ToImgd(bitmap, 8, null);
+                var inputFile = filePath;
+                Imgd imgd;
 
-                var buffer = new MemoryStream();
-                imgd.Write(buffer);
+                // Alpha enabled png → always 32 bpp
+                using (var bitmap = new Bitmap(inputFile))
+                {
+                    imgd = ImgdBitmapUtil.ToImgd(bitmap, 8, null);
+
+                    var buffer = new MemoryStream();
+                    imgd.Write(buffer);
+                }
+
+                return imgd;
             }
-
-            return imgd;
+            catch(Exception excep)
+            {
+                throw new Exception("Error loading texture: " + filePath);
+            }
         }
 
         // OLD VERSION USING THE CONSOLE COMMAND VVV

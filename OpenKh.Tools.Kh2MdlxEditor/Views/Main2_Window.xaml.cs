@@ -44,20 +44,10 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                     }
                     else if(firstFile.ToLower().EndsWith(".fbx") || firstFile.ToLower().EndsWith(".dae"))
                     {
-                        replaceModel(firstFile);
+                        mainVM.replaceModel(firstFile);
                     }
-                    /*
-                    // TESTING
-                    else if (firstFile.ToLower().EndsWith(".png"))
-                    {
-                        ImageUtils.pngToImgd(firstFile);
-                        return;
-                    }*/
 
-                    if(mainVM.ModelFile != null)
-                    {
-                        contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
-                    }
+                    reloadModelControl();
                 }
             }
             catch(Exception exc)
@@ -77,10 +67,17 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         {
             exportModel(AssimpGeneric.FileFormat.collada);
         }
+        private void Menu_Import(object sender, EventArgs e)
+        {
+            if (mainVM == null)
+                return;
+            Importer_Window importerWindow = new Importer_Window(mainVM, this);
+            importerWindow.Show();
+        }
 
         private void Side_Model(object sender, EventArgs e)
         {
-            contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
+            reloadModelControl();
         }
         private void Side_Texture(object sender, EventArgs e)
         {
@@ -185,14 +182,12 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, fullPath);
             }
         }
-
-        public void replaceModel(string filePath)
+        public void reloadModelControl()
         {
-            Assimp.Scene scene = AssimpGeneric.getAssimpSceneFromFile(filePath);
-
-            mainVM.TextureFile = MdlxEditorImporter.createModelTexture(scene, filePath);
-
-            mainVM.ModelFile = MdlxEditorImporter.replaceMeshModelSkeletal(scene, mainVM.ModelFile, filePath);
+            if (mainVM.ModelFile != null)
+            {
+                contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
+            }
         }
     }
 }
