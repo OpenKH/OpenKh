@@ -240,9 +240,27 @@ namespace OpenKh.Command.Bdxio.Utils
                 }
             }
 
+            var knownItems = BdxTrigger.GetKnownItems()
+                .ToDictionary(
+                    one => one.Key,
+                    one => one.Label
+                );
+
+            string GetTriggerLabelFor(int key)
+            {
+                if (knownItems.TryGetValue(key, out string? label) && label != null)
+                {
+                    return label;
+                }
+                else
+                {
+                    return $"TR{key}";
+                }
+            }
+
             foreach (var trigger in triggers)
             {
-                AddAddr(trigger.Addr, $"TR{trigger.Key}");
+                AddAddr(trigger.Addr, GetTriggerLabelFor(trigger.Key));
                 Walk(trigger.Addr);
             }
 
