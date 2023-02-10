@@ -158,7 +158,7 @@ namespace OpenKh.Tools.LayoutEditor
                 const float PositionY = 32f;
                 const float ViewportWidth = 1024f;
                 const float ViewportHeight = 1024f;
-                var width = ImGui.GetWindowContentRegionWidth();
+                var width = ImGui.GetWindowContentRegionMax().X;
                 var height = ImGui.GetWindowHeight();
                 var backgroundColorInverse = new ColorF(
                     1f - _settings.EditorBackground.R,
