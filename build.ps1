@@ -75,6 +75,7 @@ Get-CSProjects "OpenKh.Game*" | ForEach-Object {
 
 # Publish solution
 dotnet publish $solution --configuration $configuration --verbosity $verbosity --output $output /p:DebugType=None /p:DebugSymbols=false
+Test-Success $LASTEXITCODE
 
 # Remove the temporary solution after the solution is published
 Remove-Item $solution -ErrorAction Ignore
