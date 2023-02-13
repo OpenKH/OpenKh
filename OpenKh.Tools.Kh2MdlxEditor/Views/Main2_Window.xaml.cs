@@ -1,6 +1,7 @@
 using OpenKh.AssimpUtils;
 using OpenKh.Kh2;
 using OpenKh.Tools.Common.Wpf;
+using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using OpenKh.Tools.Kh2MdlxEditor.ViewModels;
 using System;
 using System.IO;
@@ -36,17 +37,21 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 {
                     string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                     string firstFile = files?.FirstOrDefault();
-                    loadFile(firstFile);
 
-                    if(mainVM.ModelFile != null)
+                    if(firstFile.ToLower().EndsWith(".mdlx"))
                     {
-                        contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
+                        loadFile(firstFile);
                     }
+                    else if(firstFile.ToLower().EndsWith(".fbx") || firstFile.ToLower().EndsWith(".dae"))
+                    {
+                        mainVM.replaceModel(firstFile);
+                    }
+
+                    reloadModelControl();
                 }
             }
             catch(Exception exc)
             {
-
             }
         }
         private void Menu_SaveFile(object sender, EventArgs e)
@@ -62,10 +67,17 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         {
             exportModel(AssimpGeneric.FileFormat.collada);
         }
+        private void Menu_Import(object sender, EventArgs e)
+        {
+            if (mainVM == null)
+                return;
+            Importer_Window importerWindow = new Importer_Window(mainVM, this);
+            importerWindow.Show();
+        }
 
         private void Side_Model(object sender, EventArgs e)
         {
-            contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
+            reloadModelControl();
         }
         private void Side_Texture(object sender, EventArgs e)
         {
@@ -158,7 +170,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 ModelTexture.Texture texture = mainVM.TextureFile.Images[i];
                 BitmapSource bitmapImage = texture.GetBimapSource();
 
-                string fullPath = filePath + "Texture" + i;
+                string fullPath = filePath + "Texture" + i.ToString("D4");
                 string finalPath = fullPath;
                 int repeat = 0;
                 while (File.Exists(finalPath))
@@ -168,6 +180,13 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 }
 
                 AssimpGeneric.ExportBitmapSourceAsPng(bitmapImage, fullPath);
+            }
+        }
+        public void reloadModelControl()
+        {
+            if (mainVM.ModelFile != null)
+            {
+                contentFrame.Content = new Model_Control(mainVM.ModelFile, mainVM.TextureFile, mainVM.CollisionFile);
             }
         }
     }
