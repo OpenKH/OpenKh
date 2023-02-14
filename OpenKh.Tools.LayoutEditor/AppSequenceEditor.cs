@@ -255,7 +255,7 @@ namespace OpenKh.Tools.LayoutEditor
                 const float ViewportWidth = 1024f;
                 const float ViewportHeight = 1024f;
                 const float Infinite = 65536f;
-                var width = ImGui.GetWindowContentRegionWidth();
+                var width = ImGui.GetWindowContentRegionMax().X;
                 var height = ImGui.GetWindowHeight();
                 var originX = width / 4.0f;
                 var originY = height / 4.0f;

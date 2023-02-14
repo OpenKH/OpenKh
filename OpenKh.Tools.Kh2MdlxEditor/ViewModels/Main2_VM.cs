@@ -1,11 +1,13 @@
+using OpenKh.AssimpUtils;
 using OpenKh.Kh2;
 using OpenKh.Kh2.Models;
+using OpenKh.Tools.Kh2MdlxEditor.Utils;
 using System;
 using System.IO;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
 {
-    internal class Main2_VM
+    public class Main2_VM
     {
         // DATA
         //-----------------------------------------------------------------------
@@ -83,6 +85,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                 switch (barEntry.Type)
                 {
                     case Bar.EntryType.Model:
+                        barEntry.Stream = new MemoryStream();
                         ModelFile.Write(barEntry.Stream);
                         break;
                     case Bar.EntryType.ModelTexture:
@@ -100,6 +103,14 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
         public bool isValidFilepath(string filePath)
         {
             return (filePath != null && filePath.EndsWith(".mdlx"));
+        }
+        public void replaceModel(string filePath)
+        {
+            Assimp.Scene scene = AssimpGeneric.getAssimpSceneFromFile(filePath);
+
+            TextureFile = MdlxEditorImporter.createModelTexture(scene, filePath);
+
+            ModelFile = MdlxEditorImporter.replaceMeshModelSkeletal(scene, ModelFile, filePath);
         }
     }
 }

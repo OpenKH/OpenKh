@@ -33,11 +33,14 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
         {
             InitializeComponent();
             Viewport = new Viewport3D();
+            Rect3D boundingBox = getBoundingBox(vpMeshes);
 
-            if(vpCamera != null)
+            if (vpCamera != null)
                 VPCamera = vpCamera;
             else
-                VPCamera = Viewport3DUtils.getDefaultCamera();
+            {
+                VPCamera = Viewport3DUtils.getCameraByBoundingBox(boundingBox);
+            }
 
             Viewport.Camera = VPCamera;
             AnchorPoint = new Point3D();
@@ -180,6 +183,51 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
                 perpendicularVector.Normalize();
 
             return perpendicularVector;
+        }
+
+        private Rect3D getBoundingBox(List<GeometryModel3D> vpMeshes)
+        {
+            Rect3D boundingBox = new Rect3D();
+            float minX = 0;
+            float maxX = 0;
+            float minY = 0;
+            float maxY = 0;
+            float minZ = 0;
+            float maxZ = 0;
+            foreach (GeometryModel3D mesh in vpMeshes)
+            {
+                float localMinX = (float)(mesh.Geometry.Bounds.Location.X - mesh.Geometry.Bounds.SizeX);
+                float localMaxX = (float)(mesh.Geometry.Bounds.Location.X + mesh.Geometry.Bounds.SizeX);
+                float localMinY = (float)(mesh.Geometry.Bounds.Location.Y - mesh.Geometry.Bounds.SizeY);
+                float localMaxY = (float)(mesh.Geometry.Bounds.Location.Y + mesh.Geometry.Bounds.SizeY);
+                float localMinZ = (float)(mesh.Geometry.Bounds.Location.Z - mesh.Geometry.Bounds.SizeZ);
+                float localMaxZ = (float)(mesh.Geometry.Bounds.Location.Z + mesh.Geometry.Bounds.SizeZ);
+
+                if (localMinX < minX)
+                    minX = localMinX;
+                if (localMaxX > maxX)
+                    maxX = localMaxX;
+                if (localMinY < minY)
+                    minY = localMinY;
+                if (localMaxY > maxY)
+                    maxY = localMaxY;
+                if (localMinZ < minZ)
+                    minZ = localMinZ;
+                if (localMaxZ > maxZ)
+                    maxZ = localMaxZ;
+            }
+
+            boundingBox.SizeX = Math.Abs(maxX - minX);
+            boundingBox.SizeY = Math.Abs(maxY - minY);
+            boundingBox.SizeZ = Math.Abs(maxZ - minZ);
+
+            double X = minX + (boundingBox.SizeX / 2);
+            double Y = minY + (boundingBox.SizeY / 2);
+            double Z = minZ + (boundingBox.SizeZ / 2);
+
+            boundingBox.Location = new Point3D(X, Y, Z);
+
+            return boundingBox;
         }
     }
 }

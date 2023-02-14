@@ -21,7 +21,7 @@ namespace OpenKh.Kh2.Models
         [Data] public uint BoneDataOffset { get; set; }
         [Data] public int GroupCount { get; set; }
         public List<SkeletalGroup> Groups { get; set; }
-        public BoneData BoneData { get; set; }
+        public SkeletonData BoneData { get; set; }
         public List<Bone> Bones { get; set; }
         public ModelShadow Shadow { get; set; }
 
@@ -55,17 +55,17 @@ namespace OpenKh.Kh2.Models
             public bool DrawAlphaPhase
             {
                 get => BitsUtil.Int.GetBit(AttributesBitfield, 0);
-                set => AttributesBitfield = (ushort)BitsUtil.Int.SetBit(AttributesBitfield, 0, value);
+                set => AttributesBitfield = (int)BitsUtil.Int.SetBit(AttributesBitfield, 0, value);
             }
             public bool Alpha
             {
                 get => BitsUtil.Int.GetBit(AttributesBitfield, 1);
-                set => AttributesBitfield = (ushort)BitsUtil.Int.SetBit(AttributesBitfield, 1, value);
+                set => AttributesBitfield = (int)BitsUtil.Int.SetBit(AttributesBitfield, 1, value);
             }
             public bool Multi
             {
                 get => BitsUtil.Int.GetBit(AttributesBitfield, 2);
-                set => AttributesBitfield = (ushort)BitsUtil.Int.SetBit(AttributesBitfield, 2, value);
+                set => AttributesBitfield = (int)BitsUtil.Int.SetBit(AttributesBitfield, 2, value);
             }
             public int Part
             {
@@ -85,7 +85,7 @@ namespace OpenKh.Kh2.Models
             public bool AlphaEx
             {
                 get => BitsUtil.Int.GetBit(AttributesBitfield, 21);
-                set => AttributesBitfield = (ushort)BitsUtil.Int.SetBit(AttributesBitfield, 21, value);
+                set => AttributesBitfield = (int)BitsUtil.Int.SetBit(AttributesBitfield, 21, value);
             }
             public int UVScroll
             {
@@ -95,22 +95,22 @@ namespace OpenKh.Kh2.Models
             public bool AlphaAdd
             {
                 get => BitsUtil.Int.GetBit(AttributesBitfield, 27);
-                set => AttributesBitfield = (ushort)BitsUtil.Int.SetBit(AttributesBitfield, 27, value);
+                set => AttributesBitfield = (int)BitsUtil.Int.SetBit(AttributesBitfield, 27, value);
             }
             public bool AlphaSub
             {
                 get => BitsUtil.Int.GetBit(AttributesBitfield, 28);
-                set => AttributesBitfield = (ushort)BitsUtil.Int.SetBit(AttributesBitfield, 28, value);
+                set => AttributesBitfield = (int)BitsUtil.Int.SetBit(AttributesBitfield, 28, value);
             }
             public bool Specular
             {
                 get => BitsUtil.Int.GetBit(AttributesBitfield, 29);
-                set => AttributesBitfield = (ushort)BitsUtil.Int.SetBit(AttributesBitfield, 29, value);
+                set => AttributesBitfield = (int)BitsUtil.Int.SetBit(AttributesBitfield, 29, value);
             }
             public bool NoLight
             {
                 get => BitsUtil.Int.GetBit(AttributesBitfield, 30);
-                set => AttributesBitfield = (ushort)BitsUtil.Int.SetBit(AttributesBitfield, 30, value);
+                set => AttributesBitfield = (int)BitsUtil.Int.SetBit(AttributesBitfield, 30, value);
             }
         }
 
@@ -155,7 +155,7 @@ namespace OpenKh.Kh2.Models
             }
 
             // Bone Data
-            model.BoneData = BinaryMapping.ReadObject<BoneData>(stream);
+            model.BoneData = BinaryMapping.ReadObject<SkeletonData>(stream);
 
             // Bone List
             model.Bones = new List<Bone>();
@@ -206,11 +206,13 @@ namespace OpenKh.Kh2.Models
         }
         public void Write(Stream stream)
         {
+            recalcOffsets();
+
             int ReservedSize = 0x90;
             stream.Position = ReservedSize;
 
             BinaryMapping.WriteObject(stream, this);
-            foreach(SkeletalGroup group in Groups)
+            foreach (SkeletalGroup group in Groups)
             {
                 BinaryMapping.WriteObject(stream, group.Header);
             }
@@ -233,7 +235,7 @@ namespace OpenKh.Kh2.Models
                 using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, true))
                 {
                     writer.Write(group.BoneMatrix.Count);
-                    foreach(int boneIndex in group.BoneMatrix)
+                    foreach (int boneIndex in group.BoneMatrix)
                     {
                         writer.Write(boneIndex);
                     }
@@ -241,7 +243,8 @@ namespace OpenKh.Kh2.Models
             }
 
             ModelCommon.alignStreamToByte(stream, 16);
-            if (Shadow != null) {
+            if (Shadow != null)
+            {
                 Shadow.Write(stream);
             }
         }
@@ -442,6 +445,56 @@ namespace OpenKh.Kh2.Models
             }
 
             return vpuGroup;
+        }
+
+        public void recalcOffsets()
+        {
+            BoneCount = (ushort)Bones.Count;
+            GroupCount = (ushort)Groups.Count;
+
+            int currentCount = 0;
+            // Headers
+            currentCount += 32;
+            // Group headers
+            currentCount += Groups.Count * 32;
+            BoneDataOffset = (uint)currentCount;
+            // Bone data
+            currentCount += 0x120;
+            BoneOffset = (uint)currentCount;
+            // Bones
+            currentCount += Bones.Count * 64;
+
+            foreach (SkeletalGroup group in Groups)
+            {
+                currentCount += group.VifData.Length;
+                group.Header.DmaPacketOffset = (uint)(currentCount);
+                currentCount += group.DmaData.Count * 16;
+                group.Header.BoneMatrixOffset = (uint)(currentCount);
+                currentCount += (1 + group.BoneMatrix.Count) * 4;
+                int alignTo16 = 16 - (currentCount % 16);
+                if (alignTo16 != 16)
+                    currentCount += alignTo16;
+            }
+
+            GroupCount = Groups.Count;
+
+            if (Shadow == null)
+            {
+                ModelHeader.Size = 0;
+            }
+            else
+            {
+                uint lastPosition = Groups[Groups.Count - 1].Header.BoneMatrixOffset;
+                lastPosition += (uint)(1 + Groups[Groups.Count - 1].BoneMatrix.Count);
+
+                uint remainingUpTo16 = (uint)(lastPosition % 16);
+                if (remainingUpTo16 != 0)
+                {
+                    remainingUpTo16 = 16 - remainingUpTo16;
+                }
+
+                ModelHeader.Size = lastPosition + remainingUpTo16;
+            }
         }
 
         // Calculates the absolute position of the vertices based on their positions relative to bones

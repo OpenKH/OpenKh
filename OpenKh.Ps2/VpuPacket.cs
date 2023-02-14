@@ -1,4 +1,4 @@
-﻿using OpenKh.Common;
+using OpenKh.Common;
 using System;
 using System.IO;
 using System.Linq;
@@ -19,22 +19,32 @@ namespace OpenKh.Ps2
         public class VpuHeader
         {
             [Data] public int Type { get; set; }
-            [Data] public int Unknown04 { get; set; }
-            [Data] public int Unknown08 { get; set; }
-            [Data] public int Unknown0c { get; set; }
-            [Data] public int IndexCount { get; set; }
-            [Data] public int IndexLocation { get; set; }
-            [Data] public int UnkBoxLocation { get; set; }
-            [Data] public int Unknown1cLocation { get; set; }
+            [Data] public int VertexColorPtrInc { get; set; }
+            [Data] public int MagicNumber { get; set; }
+            [Data] public int VertexBufferPointer { get; set; }
+            [Data] public int TriStripNodeCount { get; set; }
+            [Data] public int TriStripNodeOffset { get; set; }
+            [Data] public int MatrixCountOffset { get; set; }
+            [Data] public int MatrixOffset { get; set; }
             [Data] public int ColorCount { get; set; }
-            [Data] public int ColorLocation { get; set; }
-            [Data] public int VertexMixerCount { get; set; }
-            [Data] public int VertexMixerOffset { get; set; }
-            [Data] public int VertexCount { get; set; }
-            [Data] public int VertexLocation { get; set; }
-            [Data] public int Unknown38 { get; set; }
-            [Data] public int UnkBoxCount { get; set; }
+            [Data] public int ColorOffset { get; set; }
+            [Data] public int WeightGroupCount { get; set; }
+            [Data] public int WeightGroupCountOffset { get; set; }
+            [Data] public int VertexCoordCount { get; set; }
+            [Data] public int VertexCoordOffset { get; set; }
+            [Data] public int VertexIndexOffset { get; set; }
+            [Data] public int MatrixCount { get; set; }
         }
+
+        /*
+         * SKELETAL REFERENCE
+         * Header[1]
+         * StripNodes[] - U; V; VertexIndex; Function (1 int each) | TriStripNodeOffset (Always 0x04)
+         * VertexCoords[] - X; Y; Z; W; (1 int each, W is weight asignment) | VertexCoordOffset ! W = 0 for single bones
+         * MatrixCounts[] - Amount of vertices assigned to the bone in this position (1 int each) | MatrixCountOffset
+         * VertexIndices[] - Weight groups (1 int per weight) | WeightGroupCountOffset + VertexIndexOffset ! Only for multiple bones
+         * Matrices[] - Transform matrices of the bones | MatrixOffset
+         */
 
         public class VertexIndex
         {
@@ -80,14 +90,14 @@ namespace OpenKh.Ps2
         {
             var vpu = BinaryMapping.ReadObject<VpuHeader>(stream);
 
-            VertexRange = Read(stream, vpu.UnkBoxLocation, vpu.UnkBoxCount, ReadInt32);
-            Indices = Read(stream, vpu.IndexLocation, vpu.IndexCount, ReadIndex);
-            Colors = Read(stream, vpu.ColorLocation, vpu.ColorCount, ReadColor);
-            Vertices = Read(stream, vpu.VertexLocation, vpu.VertexCount, ReadVertex);
+            VertexRange = Read(stream, vpu.MatrixCountOffset, vpu.MatrixCount, ReadInt32);
+            Indices = Read(stream, vpu.TriStripNodeOffset, vpu.TriStripNodeCount, ReadIndex);
+            Colors = Read(stream, vpu.ColorOffset, vpu.ColorCount, ReadColor);
+            Vertices = Read(stream, vpu.VertexCoordOffset, vpu.VertexCoordCount, ReadVertex);
 
-            if (vpu.VertexMixerCount > 0)
+            if (vpu.WeightGroupCount > 0)
             {
-                var countPerAmount = Read(stream, vpu.VertexMixerOffset, vpu.VertexMixerCount, ReadInt32);
+                var countPerAmount = Read(stream, vpu.WeightGroupCountOffset, vpu.WeightGroupCount, ReadInt32);
                 VertexWeightedCount = countPerAmount.Sum();
 
                 VertexWeightedIndices = countPerAmount

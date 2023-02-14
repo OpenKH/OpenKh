@@ -1,0 +1,25 @@
+<Window x:Class="OpenKh.Tools.Kh2MdlxEditor.Views.Importer_Window"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.Kh2MdlxEditor.Views"
+        mc:Ignorable="d"
+        Title="Import and Replace Mesh" Height="320" Width="460">
+    <StackPanel Margin="10">
+        <CheckBox Margin="5" IsChecked="{Binding Path=KeepShadow, Mode=TwoWay}">Keep shadow</CheckBox>
+        <StackPanel Margin="10" Orientation="Horizontal">
+            <TextBox Text="{Binding Path=VertexLimitPerPacket}" Width="50"></TextBox>
+            <Label>Vertex limit per packet (255 Max)</Label>
+        </StackPanel>
+        <StackPanel Margin="10" Orientation="Horizontal">
+            <TextBox Text="{Binding Path=MemoryLimitPerPacket}" Width="50"></TextBox>
+            <Label>Memory limit per packet (240 Max)</Label>
+        </StackPanel>
+        <Label>The higher the limits the lower the output file's size</Label>
+        <Label>If the model is too heavy to process (Eg: Multiweight) lower the memory limit</Label>
+        <Label>If the model doesn't load properly ingame (Eg: PS2) lower the vertex limit</Label>
+        <Button Margin="10" Click="Button_Import" Width="200">Select file and Import Mesh</Button>
+        <Label Name="ErrorMessage"/>
+    </StackPanel>
+</Window>

@@ -17,6 +17,10 @@
                     <MenuItem Header="FBX" Click="Menu_ExportAsFbx"/>
                     <MenuItem Header="DAE (Collada)" Visibility="Collapsed" Click="Menu_ExportAsDae"/>
                 </MenuItem>
+                <MenuItem Header="Import">
+                    <MenuItem Header="Replace mesh" Click="Menu_Import"/>
+                    <MenuItem Header="Convert to MDLX" Visibility="Collapsed"/>
+                </MenuItem>
             </MenuItem>
         </Menu>
         
