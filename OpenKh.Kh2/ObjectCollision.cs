@@ -21,6 +21,39 @@ namespace OpenKh.Kh2
         [Data] public short Radius { get; set; }
         [Data] public short Height { get; set; }
 
+        public enum TypeEnum
+        {
+            BG = 0x0,
+            OBJ = 0x1,
+            HIT = 0x2,
+            TARGET = 0x3,
+            BG_PLAYER = 0x4,
+            REACTION = 0x5,
+            ATTACK = 0x6,
+            CAMERA = 0x7,
+            CAST_ITEM = 0x8,
+            ITEM = 0x9,
+            IK = 0xa,
+            IK_DOWN = 0xb,
+            NECK = 0xc,
+            GUARD = 0xd,
+            REF_RC = 0xe,
+            WEAPON_TOP = 0xf,
+            STUN = 0x10,
+            HEAD = 0x11,
+            BLIND = 0x12,
+            TALKCAMERA = 0x13,
+            RTN_NECK = 0x14,
+        }
+
+        public enum ShapeEnum
+        {
+            ELLIPSOID = 0x0,
+            COLUMN = 0x1,
+            CUBE = 0x2,
+            SPHERE = 0x3,
+        }
+
         public static List<ObjectCollision> Read(Stream stream)
         {
             var count = stream.ReadInt32();
