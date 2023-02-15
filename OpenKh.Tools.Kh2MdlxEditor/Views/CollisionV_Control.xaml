@@ -4,9 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpenKh.Tools.Kh2MdlxEditor.Views"
+             xmlns:ValueConverters="clr-namespace:OpenKh.Tools.Kh2MdlxEditor.ValueConverters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    
+
+    <FrameworkElement.Resources>
+        <ValueConverters:EnumDisplayConverter x:Key="EnumDisplayConverter" />
+    </FrameworkElement.Resources>
     <Grid Background="Black">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -62,8 +66,8 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Collision.Type}"/>
-                        <GridViewColumn Header="Shape" DisplayMemberBinding="{Binding Collision.Shape}"/>
+                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Collision.Type, Converter={StaticResource EnumDisplayConverter}, ConverterParameter='OpenKh.Kh2.ObjectCollision+TypeEnum, OpenKh.Kh2'}"/>
+                        <GridViewColumn Header="Shape" DisplayMemberBinding="{Binding Collision.Shape, Converter={StaticResource EnumDisplayConverter}, ConverterParameter='OpenKh.Kh2.ObjectCollision+ShapeEnum, OpenKh.Kh2'}"/>
                         <GridViewColumn Header="Bone" DisplayMemberBinding="{Binding Collision.Bone}"/>
                     </GridView>
                 </ListView.View>
