@@ -80,6 +80,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
         public RelayCommand StopRunningInstanceCommand { get; set; }
         public RelayCommand WizardCommand { get; set; }
         public RelayCommand OpenLinkCommand { get; set; }
+        public RelayCommand CheckOpenkhUpdateCommand { get; set; }
 
         public ModViewModel SelectedValue
         {
@@ -141,7 +142,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 OnPropertyChanged(nameof(notPC));
                 OnPropertyChanged(nameof(isPC));
             }
-        }  
+        }
 
         public int GametoLaunch
         {
@@ -409,6 +410,10 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 UseShellExecute = true
             }));
 
+            CheckOpenkhUpdateCommand = new RelayCommand(
+                _ => UpdateOpenkhAsync()
+            );
+
             _pcsx2Injector = new Pcsx2Injector(new OperationDispatcher());
             FetchUpdates();
 
@@ -494,7 +499,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                         if (ConfigurationService.PanaceaInstalled)
                         {
                             File.AppendAllText(Path.Combine(ConfigurationService.PcReleaseLocation, "panacea_settings.txt"), "\nquick_launch=" + _launchGame);
-                        }                        
+                        }
                         processStartInfo = new ProcessStartInfo
                         {
                             FileName = "com.epicgames.launcher://apps/4158b699dd70447a981fee752d970a3e%3A5aac304f0e8948268ddfd404334dbdc7%3A68c214c58f694ae88c2dab6f209b43e4?action=launch&silent=true",
@@ -505,7 +510,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     {
                         processStartInfo = new ProcessStartInfo
                         {
-                            FileName =  Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]),
+                            FileName = Path.Combine(ConfigurationService.PcReleaseLocation, executable[launchExecutable]),
                             WorkingDirectory = ConfigurationService.PcReleaseLocation,
                             UseShellExecute = false,
                         };
@@ -616,7 +621,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                 if (ConfigurationService.GameEdition == 2)
                 {
                     // Use the package map file to rearrange the files in the structure needed by the patcher
-                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame , "patch-package-map.txt");
+                    var packageMapLocation = Path.Combine(ConfigurationService.GameModPath, _launchGame, "patch-package-map.txt");
                     var packageMap = File
                         .ReadLines(packageMapLocation)
                         .Select(line => line.Split(" $$$$ "))
@@ -773,7 +778,7 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                         File.Delete(hedFile);
                         File.Delete(_pkgName);
-                        
+
                         File.Move(Path.Combine(outputDir, Path.GetFileName(hedFile)), hedFile);
                         File.Move(Path.Combine(outputDir, Path.GetFileName(_pkgName)), _pkgName);
                     }
@@ -786,8 +791,8 @@ namespace OpenKh.Tools.ModsManager.ViewModels
             await Task.Run(() =>
             {
                 if (ConfigurationService.GameEdition == 2)
-                {                        
-                    if(patched)
+                {
+                    if (patched)
                     {
                         if (!Directory.Exists(Path.Combine(ConfigurationService.PcReleaseLocation, "BackupImage")))
                         {
@@ -843,6 +848,46 @@ namespace OpenKh.Tools.ModsManager.ViewModels
 
                 Application.Current.Dispatcher.Invoke(() =>
                     mod.UpdateCount = modUpdate.UpdateCount);
+            }
+        }
+
+        private async Task UpdateOpenkhAsync()
+        {
+            var progressWindowService = new ProgressWindowService();
+
+            var checkResult = await progressWindowService.ShowAsync(
+                async monitor =>
+                {
+                    monitor.SetTitle("Checking update from github.com");
+                    var result = await new OpenkhUpdateCheckerService().CheckAsync(monitor.Cancellation);
+                    monitor.Cancellation.ThrowIfCancellationRequested();
+                    return result;
+                }
+            );
+            if (checkResult.HasUpdate)
+            {
+                var message = "A new version of OpenKh has been detected!\n" +
+                    $"[Current: {checkResult.CurrentVersion}, Latest: {checkResult.NewVersion}]\n\n" +
+                    "Do you wish to update the game?";
+
+                if (MessageBox.Show(message, "OpenKh", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    await progressWindowService.ShowAsync(
+                        async monitor =>
+                        {
+                            monitor.SetTitle("Updating");
+
+                            await new OpenkhUpdateProceederService().UpdateAsync(
+                                checkResult.DownloadZipUrl,
+                                rate => monitor.SetProgress(rate),
+                                monitor.Cancellation
+                            );
+                        }
+                    );
+
+                    // quit app
+                    Window?.Close();
+                }
             }
         }
     }
