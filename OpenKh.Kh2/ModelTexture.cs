@@ -15,15 +15,15 @@ namespace OpenKh.Kh2
     {
         private class Header
         {
-            [Data] public int MagicCode { get; set; }
-            [Data] public int ColorCount { get; set; }
-            [Data] public int TextureInfoCount { get; set; }
-            [Data] public int GsInfoCount { get; set; }
-            [Data] public int Offset1 { get; set; }
-            [Data] public int Texinf1off { get; set; }
-            [Data] public int Texinf2off { get; set; }
-            [Data] public int PictureOffset { get; set; }
-            [Data] public int PaletteOffset { get; set; }
+            [Data] public int MagicCode { get; set; } // shorts type + flag
+            [Data] public int ColorCount { get; set; } // clutDataNum (Color LookUp Table) / Color Palettes
+            [Data] public int TextureInfoCount { get; set; } // pixelDataNum
+            [Data] public int GsInfoCount { get; set; } // textureEnvNum
+            [Data] public int Offset1 { get; set; } // pixelNoOffset
+            [Data] public int Texinf1off { get; set; } // sendPacketOffset
+            [Data] public int Texinf2off { get; set; } // textureEnvPacketOffset
+            [Data] public int PictureOffset { get; set; } // pixelDataOffset
+            [Data] public int PaletteOffset { get; set; } // clutDataOffset
         }
 
         public class Texture : IImageRead
