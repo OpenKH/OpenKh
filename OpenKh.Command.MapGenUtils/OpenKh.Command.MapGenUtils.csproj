@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.2" />
-        <PackageReference Include="YamlDotNet" Version="13.0.0" />
+        <PackageReference Include="YamlDotNet" Version="13.0.1" />
         <PackageReference Include="NJsonSchema" Version="10.8.0" />
     </ItemGroup>
 
