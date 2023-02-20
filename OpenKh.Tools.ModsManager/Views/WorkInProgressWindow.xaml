@@ -1,0 +1,16 @@
+<Window x:Class="OpenKh.Tools.ModsManager.Views.WorkInProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.ModsManager.Views"
+        mc:Ignorable="d"
+        Title="{Binding DialogTitle}" d:Title="Installing mod..." Height="120" Width="300" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <StackPanel Margin="10">
+        <TextBlock Margin="0 0 0 10" d:Text="Installing the mod XYZ">
+            <Run Text="{Binding OperationName}"/> 
+        </TextBlock>
+        <ProgressBar Margin="0 0 0 10" Height="20" IsIndeterminate="{Binding ProgressUnknown}" Value="{Binding ProgressValue}" Maximum="1" d:IsIndeterminate="True" />
+        <Button HorizontalAlignment="Center" Command="{Binding Cancel}" IsEnabled="{Binding CancelEnabled}">Cancel</Button>
+    </StackPanel>
+</Window>

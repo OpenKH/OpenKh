@@ -124,6 +124,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Dev View" IsCheckable="True" IsChecked="{Binding DevView}"/>
+                <MenuItem Header="Check for update" Command="{Binding CheckOpenkhUpdateCommand}"/>
             </MenuItem>
             <MenuItem Header="PC Version" Focusable="False" IsHitTestVisible="False" Visibility="{Binding isPC}"/>
             <MenuItem Header="Emulator" Focusable="False" IsHitTestVisible="False" Visibility="{Binding notPC}"/>
