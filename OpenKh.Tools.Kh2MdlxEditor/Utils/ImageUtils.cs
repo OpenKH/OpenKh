@@ -1,13 +1,14 @@
-using OpenKh.Command.ImgTool.Utils;
 using OpenKh.Common;
 using OpenKh.Kh2;
+using OpenKh.Kh2.TextureFooter;
 using OpenKh.Kh2.Utils;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
+using static OpenKh.Tools.Kh2MdlxEditor.ViewModels.TexAnim_VM;
 
 namespace OpenKh.Tools.Kh2MdlxEditor.Utils
 {
@@ -37,11 +38,32 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Utils
             }
         }
 
+        public static ModelTexture.Texture imgdToTexture(Imgd imgdFile)
+        {
+            Imgd[] imgdArray = new Imgd[1];
+            imgdArray[0] = imgdFile;
+            ModelTexture modTex = new ModelTexture(imgdArray);
+            // The only method for loading the textures is reading the whole binary again
+            Stream buffer = new MemoryStream();
+            modTex.Write(buffer);
+            modTex = ModelTexture.Read(buffer);
+
+            return modTex.Images[0];
+        }
+
+        public static ModelTexture.Texture pngToTexture(string filePath)
+        {
+            return imgdToTexture(pngToImgd(filePath));
+        }
+        public static BitmapSource getBitmapSource(TextureAnimation texAnim, byte[] clutPalette)
+        {
+            return GetBimapSource(ToBgra32(texAnim.SpriteImage, clutPalette), texAnim.SpriteWidth, texAnim.SpriteHeight * texAnim.NumSpritesInImageData);
+        }
+
         // OLD VERSION USING THE CONSOLE COMMAND VVV
 
         public static Imgd pngToImgd_Old(string filePath)
         {
-
             if (filePath.EndsWith(".imd"))
             {
                 return ImageResizer.NormalizeImageSize(File.OpenRead(filePath).Using(s => Imgd.Read(s)));

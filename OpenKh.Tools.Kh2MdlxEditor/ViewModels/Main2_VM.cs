@@ -89,6 +89,7 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                         ModelFile.Write(barEntry.Stream);
                         break;
                     case Bar.EntryType.ModelTexture:
+                        barEntry.Stream = new MemoryStream();
                         TextureFile.Write(barEntry.Stream);
                         break;
                     case Bar.EntryType.ModelCollision:
