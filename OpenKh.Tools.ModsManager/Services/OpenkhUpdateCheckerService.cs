@@ -49,18 +49,15 @@ namespace OpenKh.Tools.ModsManager.Services
 
                 var localReleaseTagFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "openkh-release");
                 var localReleaseTag = File.Exists(localReleaseTagFile)
-                    ? File.ReadAllText(localReleaseTagFile)
+                    ? File.ReadAllLines(localReleaseTagFile).First()
                     : "(Unknown version)";
 
-                if (localReleaseTag != remoteReleaseTag)
-                {
-                    return new CheckResult(
-                        HasUpdate: true,
-                        CurrentVersion: localReleaseTag,
-                        NewVersion: remoteReleaseTag,
-                        DownloadZipUrl: latestAsset.Asset.BrowserDownloadUrl
-                    );
-                }
+                return new CheckResult(
+                    HasUpdate: localReleaseTag != remoteReleaseTag,
+                    CurrentVersion: localReleaseTag,
+                    NewVersion: remoteReleaseTag,
+                    DownloadZipUrl: latestAsset.Asset.BrowserDownloadUrl
+                );
             }
 
             return new CheckResult(

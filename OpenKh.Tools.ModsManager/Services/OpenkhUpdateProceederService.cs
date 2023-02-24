@@ -48,7 +48,7 @@ namespace OpenKh.Tools.ModsManager.Services
                 tempBatFile: tempBatFile,
                 copyFrom: Path.Combine(tempZipDir, "openkh"),
                 copyTo: copyTo,
-                execAfter: $"start {Path.Combine(copyTo, "OpenKh.Tools.ModsManager.exe")}" // no enclosing double-quotes!
+                execAfter: $"start \"\" \"{Path.Combine(copyTo, "OpenKh.Tools.ModsManager.exe")}\""
             );
 
             Process.Start(

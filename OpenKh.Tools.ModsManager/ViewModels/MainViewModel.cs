@@ -889,6 +889,12 @@ namespace OpenKh.Tools.ModsManager.ViewModels
                     Window?.Close();
                 }
             }
+            else
+            {
+                var message = $"The latest version '{checkResult.CurrentVersion}' is already installed!";
+
+                MessageBox.Show(message, "OpenKh");
+            }
         }
     }
 }
