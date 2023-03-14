@@ -39,7 +39,26 @@
                     <Label Foreground="White">Frame return:</Label>
                     <TextBox MinWidth="30" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.FrameData.FrameReturn}"></TextBox>
                 </StackPanel>
-                
+                <StackPanel Orientation="Horizontal">
+                    <Label Foreground="White">Bound MinX:</Label>
+                    <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMinX}"></TextBox>
+                    <Label Foreground="White">Bound MinY:</Label>
+                    <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMinY}"></TextBox>
+                    <Label Foreground="White">Bound MinZ:</Label>
+                    <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMinZ}"></TextBox>
+                    <Label Foreground="White">Bound MinW:</Label>
+                    <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMinW}"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Foreground="White">Bound MaxX:</Label>
+                    <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxX}"></TextBox>
+                    <Label Foreground="White">Bound MaxY:</Label>
+                    <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxY}"></TextBox>
+                    <Label Foreground="White">Bound MaxZ:</Label>
+                    <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxZ}"></TextBox>
+                    <Label Foreground="White">Bound MaxW:</Label>
+                    <TextBox MinWidth="25" Margin="10" Text="{Binding Path=MotionFile.InterpolatedMotionHeader.BoundingBox.BoundingBoxMaxW}"></TextBox>
+                </StackPanel>
             </StackPanel>
         </DockPanel>
         
