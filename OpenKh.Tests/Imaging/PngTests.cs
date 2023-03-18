@@ -421,5 +421,81 @@ namespace OpenKh.Tests.Imaging
                 Assert.Equal(bitmap.GetData(), it.GetData());
             }
         }
+
+        private class Bitmap4x4_4 : IImageRead
+        {
+            public Size Size => new Size(4, 4);
+            public PixelFormat PixelFormat => PixelFormat.Indexed4;
+
+            public byte[] GetClut() => new byte[] {
+                0x00, 0x00, 0x00, 0xFF,
+                0x00, 0x00, 0x11, 0xFF,
+                0x00, 0x00, 0x22, 0xFF,
+                0x00, 0x00, 0x33, 0xFF,
+                0x00, 0x00, 0x44, 0xFF,
+                0x00, 0x00, 0x55, 0xFF,
+                0x00, 0x00, 0x66, 0xFF,
+                0x00, 0x00, 0x77, 0xFF,
+                0x00, 0x00, 0x88, 0xFF,
+                0x00, 0x00, 0x99, 0xFF,
+                0x00, 0x00, 0xaa, 0xFF,
+                0x00, 0x00, 0xbb, 0xFF,
+                0x00, 0x00, 0xcc, 0xFF,
+                0x00, 0x00, 0xdd, 0xFF,
+                0x00, 0x00, 0xee, 0xFF,
+                0x00, 0x00, 0xff, 0xFF,
+            };
+            public byte[] GetData() => new byte[] {
+                0x01, 0x23,
+                0x45, 0x67,
+                0x89, 0xab,
+                0xcd, 0xef,
+            };
+        }
+
+        [Fact]
+        public void Save4x4_4()
+        {
+            using var stream = File.Create("4x4_4.png");
+            var bitmap = new Bitmap4x4_4();
+            PngImage.Write(stream, bitmap);
+
+            stream.FromBegin();
+            {
+                var it = PngImage.Read(stream);
+                Assert.Equal(bitmap.Size, it.Size);
+                Assert.Equal(bitmap.PixelFormat, it.PixelFormat);
+                Assert.Equal(bitmap.GetData(), it.GetData());
+            }
+        }
+
+        private class Bitmap16x16_8 : IImageRead
+        {
+            public Size Size => new Size(16, 16);
+            public PixelFormat PixelFormat => PixelFormat.Indexed8;
+
+            public byte[] GetClut() => Enumerable.Range(0, 256)
+                .SelectMany(index => new byte[] { (byte)index, 0, 0, 255 })
+                .ToArray();
+            public byte[] GetData() => Enumerable.Range(0, 256)
+                .Select(index => (byte)index)
+                .ToArray();
+        }
+
+        [Fact]
+        public void Save16x16_8()
+        {
+            using var stream = File.Create("16x16_8.png");
+            var bitmap = new Bitmap16x16_8();
+            PngImage.Write(stream, bitmap);
+
+            stream.FromBegin();
+            {
+                var it = PngImage.Read(stream);
+                Assert.Equal(bitmap.Size, it.Size);
+                Assert.Equal(bitmap.PixelFormat, it.PixelFormat);
+                Assert.Equal(bitmap.GetData(), it.GetData());
+            }
+        }
     }
 }

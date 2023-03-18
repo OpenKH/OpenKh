@@ -399,7 +399,7 @@ namespace OpenKh.Imaging
                 case PixelFormat.Indexed4:
                     bits = 4;
                     colorType = (byte)ColorType.Indexed;
-                    stride = (width / 2 + 1) & ~1;
+                    stride = (width + 1) / 2;
                     break;
                 case PixelFormat.Indexed8:
                     bits = 8;
@@ -438,7 +438,7 @@ namespace OpenKh.Imaging
             if (colorType == (byte)ColorType.Indexed)
             {
                 var num = 1 << bits;
-                var plte = new byte[12 * num];
+                var plte = new byte[3 * num];
                 var trns = new byte[num];
                 var clut = bitmap.GetClut();
                 for (int idx = 0; idx < num; idx++)
