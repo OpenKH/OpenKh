@@ -6,11 +6,16 @@ namespace OpenKh.Imaging
         /// Get pixel data
         /// </summary>
         /// <remarks>
-        /// PixelFormat == Rgba8888
-        /// - 4 bytes [B, G, R, A] per pixel.
+        /// Always byte aligned.
         /// </remarks>
         byte[] GetData();
 
+        /// <summary>
+        /// Get color lookup table
+        /// </summary>
+        /// <remarks>
+        /// - 4 bytes [R, G, B, A] per entry.
+        /// </remarks>
         byte[] GetClut();
     }
 }

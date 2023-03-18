@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using OpenKh.Common;
+using OpenKh.Imaging;
 using OpenKh.Kh2;
 using static System.Drawing.Imaging.PixelFormat;
 
@@ -13,7 +12,8 @@ namespace OpenKh.Kh2.Utils
 {
     public class ImgdBitmapUtil
     {
-        public static Bitmap ToBitmap(Imgd imgd)
+#if false
+        public static IImageRead ToBitmap(Imgd imgd)
         {
             switch (imgd.PixelFormat)
             {
@@ -111,45 +111,28 @@ namespace OpenKh.Kh2.Utils
             }
             throw new NotSupportedException($"{imgd.PixelFormat} not recognized!");
         }
+#endif
 
         class ReadAs32bppPixels
         {
-            public ReadAs32bppPixels(Bitmap bitmap)
+            public ReadAs32bppPixels(IImageRead bitmap)
             {
-                Width = bitmap.Width;
-                Height = bitmap.Height;
+                Width = bitmap.Size.Width;
+                Height = bitmap.Size.Height;
 
-                var src = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                var srcBits = new byte[src.Stride * src.Height];
-                try
-                {
-                    Marshal.Copy(src.Scan0, srcBits, 0, srcBits.Length);
-                }
-                finally
-                {
-                    bitmap.UnlockBits(src);
-                }
+                Pixels = new uint[Width * Height];
 
-                Pixels = new List<uint>(Width * Height);
-
-                for (int y = 0; y < Height; y++)
-                {
-                    for (int x = 0; x < Width; x++)
-                    {
-                        Pixels.Add(BitConverter.ToUInt32(srcBits, src.Stride * y + 4 * x));
-                    }
-                }
-
+                Buffer.BlockCopy(bitmap.ToBgra32(), 0, Pixels, 0, 4 * Pixels.Length);
             }
 
-            public List<uint> Pixels { get; }
+            public uint[] Pixels { get; }
             public int Width { get; }
             public int Height { get; }
         }
 
         static class PaletteColorUsageCounter
         {
-            public static bool IfMaxColorCountIsOver(List<uint> pixels, int maxColors)
+            public static bool IfMaxColorCountIsOver(uint[] pixels, int maxColors)
             {
                 return pixels
                     .GroupBy(pixel => pixel)
@@ -159,7 +142,7 @@ namespace OpenKh.Kh2.Utils
 
         class PaletteGenerator
         {
-            public PaletteGenerator(List<uint> pixels, int maxColors)
+            public PaletteGenerator(uint[] pixels, int maxColors)
             {
                 MostUsedPixels = pixels
                     .GroupBy(pixel => pixel)
@@ -206,7 +189,7 @@ namespace OpenKh.Kh2.Utils
             }
         }
 
-        public static Imgd ToImgd(Bitmap bitmap, int bpp, Func<Bitmap, Bitmap> quantizer, bool swizzle = false)
+        public static Imgd ToImgd(IImageRead bitmap, int bpp, Func<IImageRead, IImageRead> quantizer, bool swizzle = false)
         {
             if (quantizer != null)
             {
@@ -342,13 +325,13 @@ namespace OpenKh.Kh2.Utils
             throw new NotSupportedException($"BitsPerPixel {bpp} not recognized!");
         }
 
-        public static IEnumerable<Imgd> FromFileToImgdList(string anyFile, int bitsPerPixel, Func<Bitmap, Bitmap> quantizer, bool swizzle)
+        public static IEnumerable<Imgd> FromFileToImgdList(string anyFile, int bitsPerPixel, Func<IImageRead, IImageRead> quantizer, bool swizzle)
         {
             switch (Path.GetExtension(anyFile).ToLowerInvariant())
             {
                 case ".png":
                 {
-                    yield return new Bitmap(anyFile).Using(bitmap => ToImgd(bitmap, bitsPerPixel, quantizer, swizzle));
+                    yield return ToImgd(PngImage.Read(new MemoryStream(File.ReadAllBytes(anyFile))), bitsPerPixel, quantizer, swizzle);
                     break;
                 }
                 case ".imd":
@@ -367,7 +350,8 @@ namespace OpenKh.Kh2.Utils
             }
         }
 
-        public static Imgd ToImgd(Bitmap bitmap)
+#if false
+        public static Imgd ToImgd(IImageRead bitmap)
         {
             switch (bitmap.PixelFormat)
             {
@@ -444,5 +428,6 @@ namespace OpenKh.Kh2.Utils
             }
             throw new NotSupportedException($"{bitmap.PixelFormat} not recognized!");
         }
+#endif
     }
 }
