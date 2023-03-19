@@ -60,7 +60,7 @@ namespace OpenKh.Command.TexFooter.Utils
 
             return new LocalBitmap
             {
-                Size = new Size(SpriteWidth, SpriteHeight),
+                Size = new Size(SpriteWidth, SpriteHeight * NumSpritesInImageData),
                 PixelFormat = pixFmt,
                 Clut = palette,
                 Data = bitmapData,

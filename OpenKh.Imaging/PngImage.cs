@@ -3,6 +3,7 @@ using Ionic.Zlib;
 using OpenKh.Common;
 using OpenKh.Imaging;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;

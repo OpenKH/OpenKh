@@ -75,7 +75,10 @@ namespace OpenKh.Command.ImgTool.Utils
                                 Height = bitmap.Size.Height,
                                 PixelLines = Enumerable.Range(0, bitmap.Size.Height)
                                     .Select(
-                                        index => intArray.AsMemory(bitmap.Size.Width * index, bitmap.Size.Width)
+                                        index => intArray
+                                            .Skip(bitmap.Size.Width * index)
+                                            .Take(bitmap.Size.Width)
+                                            .ToArray()
                                     )
                             };
 
