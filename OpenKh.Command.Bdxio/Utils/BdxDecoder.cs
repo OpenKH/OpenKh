@@ -3,6 +3,7 @@ using OpenKh.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -754,7 +755,7 @@ namespace OpenKh.Command.Bdxio.Utils
                 }
                 else if (arg.PreferFloat32)
                 {
-                    return BitConverter.ToSingle(BitConverter.GetBytes(arg.Value)).ToString("R");
+                    return BitConverter.ToSingle(BitConverter.GetBytes(arg.Value)).ToString("R", invariantNumberFormat);
                 }
                 else
                 {
@@ -803,5 +804,7 @@ namespace OpenKh.Command.Bdxio.Utils
                 return string.Join(",", tokens);
             }
         }
+
+        private static readonly IFormatProvider invariantNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
     }
 }
