@@ -105,10 +105,49 @@ namespace OpenKh.Bbs
                         }
                         stream.SetPosition(frame.OffsetPixels);
                         frame.Pixels = stream.ReadBytes(szMul * group.DestWidth * group.DestHeight);
+                        // This is either "If Square texture" or "If Lip texture" and I don't know so I'm assuming square.
+                        if (group.DestWidth == group.DestHeight)
+                            RearrangePixels(frame.Pixels, szMul * group.DestWidth);
                         frame.Image = new SimpleImage(group.DestWidth, group.DestHeight, dstTex.PixelFormat, frame.Pixels, dstTex.ClutFormat, dstTex.GetClut());
                     }
                 }
             }
+        }
+
+        // TODO: When we add writing TXAs we'll need to do the opposite of this.
+        private static void RearrangePixels(byte[] pixels, int rowLen)
+        {
+            // TODO: This is fundamentally the same as Unswizzle in FontsArc so we sould probably find a way to merge the 2 functions.
+            // ALSO yes the blocks are 16x8 bytes, NOT 16x16. I don't know why.
+            const int blkWidth = 16;
+            const int blkHeight = 8;
+            
+            int rowCount = rowLen / blkWidth;
+            byte[] result = new byte[pixels.Length];
+            int readPtr = 0;
+            int blkPtr = 0;
+            int blkNum = 0;
+
+            do
+            {
+                for (int blkRow = 0; blkRow < blkHeight; blkRow++)
+                {
+                    Buffer.BlockCopy(pixels, readPtr, result, blkPtr + (rowLen * blkRow), blkWidth);
+                    readPtr += blkWidth;
+                }
+                
+                blkPtr += blkWidth;
+                blkNum++;
+
+                if (blkNum == rowCount)
+                {
+                    blkNum = 0;
+                    blkPtr += rowLen * (blkHeight - 1);
+                }
+            }
+            while (readPtr < pixels.Length);
+
+            Buffer.BlockCopy(result, 0, pixels, 0, pixels.Length);
         }
     }
 }
