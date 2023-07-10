@@ -503,8 +503,8 @@ namespace OpenKh.Tests.kh2
             });
             var actualLength = stream.Position - 2;
             if ((actualLength % 2) == 1)
-                throw new AssertActualExpectedException(
-                    actualLength + 1, actualLength,
+                throw NotEqualException.ForEqualValues(
+                    $"{actualLength + 1}", $"{actualLength}",
                     "Offset is not aligned by 2");
 
             stream.Position = 0;
@@ -514,8 +514,8 @@ namespace OpenKh.Tests.kh2
             Assert.Single(eventSet);
             Assert.IsType<T>(eventSet[0]);
             if (expectedLength != actualLength)
-                throw new AssertActualExpectedException(
-                    expectedLength, actualLength,
+                throw NotEqualException.ForEqualValues(
+                    $"{expectedLength}", $"{actualLength}",
                     "Stream length does not match");
 
             var actual = eventSet[0];
@@ -524,8 +524,8 @@ namespace OpenKh.Tests.kh2
                 var expectedValue = property.GetValue(expected);
                 var actualValue = property.GetValue(actual);
                 if (!IsValueEqual(expectedValue, actualValue))
-                    throw new AssertActualExpectedException(
-                        expectedValue, actualValue,
+                    throw NotEqualException.ForEqualValues(
+                        $"{expectedValue}", $"{actualValue}",
                         $"Different values for '{property.Name}'");
             }
         }
