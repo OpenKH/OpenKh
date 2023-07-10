@@ -2049,7 +2049,7 @@ namespace OpenKh.Tests.Patcher
         {
             var filePath = Path.Join(paths);
             if (File.Exists(filePath) == false)
-                throw new TrueException($"File not found '{filePath}'", false);
+                Assert.Fail($"File not found '{filePath}'");
         }
 
         private static void AssertBarFile(string name, Action<Bar.Entry> assertion, params string[] paths)
@@ -2058,7 +2058,7 @@ namespace OpenKh.Tests.Patcher
             var entries = File.OpenRead(filePath).Using(x =>
             {
                 if (!Bar.IsValid(x))
-                    throw new TrueException($"Not a valid BinArc", false);
+                    Assert.Fail($"Not a valid BinArc");
                 return Bar.Read(x);
             });
 
