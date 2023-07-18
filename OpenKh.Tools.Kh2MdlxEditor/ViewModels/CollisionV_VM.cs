@@ -84,17 +84,24 @@ namespace OpenKh.Tools.Kh2MdlxEditor.ViewModels
                     ObjectCollision collision = Collisions[i].Collision;
 
                     Vector3 basePosition = Vector3.Zero;
-
-                    Color color = new Color();
-
                     if (collision.Bone != 16384 && boneMatrices.Length != 0)
                     {
-                        color = Color.FromArgb(100, 255, 0, 0);
                         basePosition = Vector3.Transform(new Vector3(collision.PositionX, collision.PositionY, collision.PositionZ), boneMatrices[collision.Bone]);
+                    }
+
+
+                    Color color = new Color();
+                    if (collision.Type == (byte)ObjectCollision.TypeEnum.HIT)
+                    {
+                        color = Color.FromArgb(100, 255, 0, 0);
+                    }
+                    else if (collision.Type == (byte)ObjectCollision.TypeEnum.REACTION)
+                    {
+                        color = Color.FromArgb(100, 0, 255, 0);
                     }
                     else
                     {
-                        color = Color.FromArgb(100, 200, 200, 0);
+                        color = Color.FromArgb(100, 0, 0, 255);
                     }
 
                     if(collision.Shape == (byte) ObjectCollision.ShapeEnum.ELLIPSOID)

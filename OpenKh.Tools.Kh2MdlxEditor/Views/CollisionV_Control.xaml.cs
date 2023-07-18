@@ -23,9 +23,19 @@ namespace OpenKh.Tools.Kh2MdlxEditor.Views
             CollisionVM = new CollisionV_VM(collisionFile, modelFile, textureFile);
             DataContext = CollisionVM;
 
-            thisViewport = new Simple3DViewport_Control(new List<SimpleModel> { CollisionVM.ThisModel });
+            if(CollisionVM.ThisModel != null)
+            {
+                thisViewport = new Simple3DViewport_Control(new List<SimpleModel> { CollisionVM.ThisModel });
+            }
+            else
+            {
+                thisViewport = new Simple3DViewport_Control();
+            }
+            
+            thisViewport.setOpacityById(0.7, "MODEL_1");
             thisViewport.VPModels.Add(CollisionVM.ThisCollisions);
             thisViewport.setVisibilityByLabel(false, "COLLISION_SINGLE");
+
             viewportFrame.Content = thisViewport;
         }
         public void CollisionList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
