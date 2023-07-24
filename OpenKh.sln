@@ -210,6 +210,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.DeeperTree", "OpenKh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenKh.Command.Txa", "OpenKh.Command.Txa\OpenKh.Command.Txa.csproj", "{EAD6D51F-5106-4E11-A4E4-104A18C0235B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simple3DViewport", "Simple3DViewport\Simple3DViewport\Simple3DViewport.csproj", "{CA7DCF50-324E-4C36-B476-49940EBA393A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		.NET Debug|x64 = .NET Debug|x64
@@ -838,6 +840,14 @@ Global
 		{EAD6D51F-5106-4E11-A4E4-104A18C0235B}.Debug|x64.Build.0 = Debug|Any CPU
 		{EAD6D51F-5106-4E11-A4E4-104A18C0235B}.Release|x64.ActiveCfg = Release|Any CPU
 		{EAD6D51F-5106-4E11-A4E4-104A18C0235B}.Release|x64.Build.0 = Release|Any CPU
+		{CA7DCF50-324E-4C36-B476-49940EBA393A}..NET Debug|x64.ActiveCfg = Debug|Any CPU
+		{CA7DCF50-324E-4C36-B476-49940EBA393A}..NET Debug|x64.Build.0 = Debug|Any CPU
+		{CA7DCF50-324E-4C36-B476-49940EBA393A}..NET Release|x64.ActiveCfg = Release|Any CPU
+		{CA7DCF50-324E-4C36-B476-49940EBA393A}..NET Release|x64.Build.0 = Release|Any CPU
+		{CA7DCF50-324E-4C36-B476-49940EBA393A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CA7DCF50-324E-4C36-B476-49940EBA393A}.Debug|x64.Build.0 = Debug|Any CPU
+		{CA7DCF50-324E-4C36-B476-49940EBA393A}.Release|x64.ActiveCfg = Release|Any CPU
+		{CA7DCF50-324E-4C36-B476-49940EBA393A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
