@@ -1,0 +1,29 @@
+<Window x:Class="OpenKh.Tools.Kh2ObjectEditor.Views.Main_Window"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenKh.Tools.Kh2ObjectEditor.Views"
+        mc:Ignorable="d"
+        Title="Main_Window" Height="900" Width="1600">
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Height="20">
+            <MenuItem Header="TEST"></MenuItem>
+        </Menu>
+
+        <Grid AllowDrop="True" Drop="Window_Drop">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <!-- SELECTOR  -->
+            <local:ObjectSelector_Control Grid.Column="0" x:Name="ObjectSelector"/>
+            <local:Viewport_Control Grid.Column="1" x:Name="Viewport" />
+            <local:MotionSelector_Control Grid.Column="2" x:Name="MotionSelector"/>
+            <!-- CONTROLS  -->
+        </Grid>
+    </DockPanel>
+    
+</Window>
