@@ -58,6 +58,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
                 DrawCropAtlasTexture();
             }
 
+            ImGui.Image(_cropAtlasTextureId, Vector2.Zero);
             ImGui.Image(_cropAtlasTextureId, new Vector2(_atlasTexture.Width, _atlasTexture.Height));
 
             var source = new int[]
@@ -109,6 +110,7 @@ namespace OpenKh.Tools.LayoutEditor.Dialogs
             }
 
             SpriteModel.Draw(0, 0);
+            ImGui.Image(SpriteModel.TextureId, Vector2.Zero);
             ImGui.Image(SpriteModel.TextureId, SuggestSpriteSize());
         }
 
